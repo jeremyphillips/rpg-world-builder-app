@@ -126,6 +126,131 @@ describe('MonsterEquipmentPanel', () => {
     expect(screen.queryByText(resolveEquipmentNotProficientShortLabel())).not.toBeInTheDocument()
   })
 
+  describe('Unmodified supporting metadata', () => {
+    it('does not show Unmodified for a lone plain stack', () => {
+      const battleaxe = pickEquipment('battleaxe')
+      render(
+        <Host
+          catalogEquipment={[battleaxe]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            weaponProficiencyMode: 'categories',
+            proficiencies: {
+              ...resolveMonsterCreateDefaultValues().proficiencies,
+              weapons: { categories: ['martial'], items: [] },
+            },
+            equipment: [{ entryId: 'plain', equipmentId: battleaxe.id, quantity: 1 }],
+          }}
+        />,
+      )
+
+      expect(screen.getByText('1d8 slashing')).toBeInTheDocument()
+      expect(screen.queryByText('Unmodified')).not.toBeInTheDocument()
+    })
+
+    it('prepends Unmodified on the plain sibling before calculated weapon metadata', () => {
+      const battleaxe = pickEquipment('battleaxe')
+      render(
+        <Host
+          catalogEquipment={[battleaxe]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            weaponProficiencyMode: 'categories',
+            proficiencies: {
+              ...resolveMonsterCreateDefaultValues().proficiencies,
+              weapons: { categories: ['martial'], items: [] },
+            },
+            equipment: [
+              { entryId: 'plain', equipmentId: battleaxe.id, quantity: 1, equipped: true },
+              { entryId: 'plus', equipmentId: battleaxe.id, quantity: 1, magical: true },
+            ],
+          }}
+        />,
+      )
+
+      expect(screen.getAllByText('Unmodified')).toHaveLength(1)
+      expect(screen.getAllByText('1d8 slashing').length).toBeGreaterThanOrEqual(1)
+      expect(screen.getAllByRole('checkbox', { name: 'Equipped: Battleaxe' })).toHaveLength(2)
+    })
+
+    it('does not label a mechanically adjusted stack Unmodified', () => {
+      const battleaxe = pickEquipment('battleaxe')
+      render(
+        <Host
+          catalogEquipment={[battleaxe]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            weaponProficiencyMode: 'categories',
+            proficiencies: {
+              ...resolveMonsterCreateDefaultValues().proficiencies,
+              weapons: { categories: ['martial'], items: [] },
+            },
+            equipment: [
+              { entryId: 'plain', equipmentId: battleaxe.id, quantity: 1 },
+              {
+                entryId: 'adj',
+                equipmentId: battleaxe.id,
+                quantity: 1,
+                adjustments: [{ effectId: 'manual', target: 'attack_roll' as const, bonus: 1 }],
+              },
+            ],
+          }}
+        />,
+      )
+
+      expect(screen.getByText('Unmodified')).toBeInTheDocument()
+      const rows = screen.getAllByText('1d8 slashing')
+      expect(rows.length).toBeGreaterThanOrEqual(1)
+    })
+
+    it('removes Unmodified when the configured sibling is deleted', async () => {
+      const dagger = pickEquipment('dagger')
+      const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+      render(
+        <Host
+          formRef={formRef}
+          catalogEquipment={[dagger]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            equipment: [
+              { entryId: 'plain', equipmentId: dagger.id, quantity: 1 },
+              { entryId: 'mag', equipmentId: dagger.id, quantity: 1, magical: true },
+            ],
+          }}
+        />,
+      )
+
+      expect(screen.getByText('Unmodified')).toBeInTheDocument()
+      act(() => {
+        formRef.current?.setValue(
+          'equipment',
+          [{ entryId: 'plain', equipmentId: dagger.id, quantity: 1 }],
+          { shouldDirty: true },
+        )
+      })
+      expect(screen.queryByText('Unmodified')).not.toBeInTheDocument()
+    })
+
+    it('does not qualify plain stacks when only a different equipment id is configured', () => {
+      const dagger = pickEquipment('dagger')
+      const shortsword = pickEquipment('shortsword')
+      render(
+        <Host
+          catalogEquipment={[dagger, shortsword]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            equipment: [
+              { entryId: 'plain', equipmentId: dagger.id, quantity: 1 },
+              { entryId: 'other', equipmentId: shortsword.id, quantity: 1, magical: true },
+            ],
+          }}
+        />,
+      )
+
+      expect(screen.queryByText('Unmodified')).not.toBeInTheDocument()
+    })
+  })
+
   it('recalculates damage and to-hit from unsaved strength', () => {
     const greataxe = pickEquipment('greataxe')
     const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }

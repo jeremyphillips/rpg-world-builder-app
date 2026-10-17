@@ -69,7 +69,10 @@ from a layer below it in this diagram, it is in the wrong module.
 `creature/equipment-stack.ts`, `creature/proficiencies.ts`, `creature/weapon-cross-recommendation.ts`,
 `creature/resolve-inventory-weapon-attack.ts`, `creature/resolve-equipment-row-summary.ts`
 (card/read-model weapon summaries for any creature-like inventory row),
+`creature/equipment-inventory-unmodified-context.ts` (plain vs configured sibling context for UI qualifiers),
 `creature/spellcasting.ts`
+
+Loadout and inventory architecture (implemented vs future): [equipment-loadout.md](./equipment-loadout.md).
 
 ---
 

@@ -17,6 +17,7 @@ Monster loadout editing uses the same stack model as the character inventory: pl
 picker priority, scope splits, and stable `entryId`s. See
 [`equipment-stack.ts`](../../../packages/contracts/src/rpg/runtime/creature/equipment-stack.ts)
 and [`magic-properties.md`](../../../packages/contracts/docs/magic-properties.md).
+Architecture, open loadout decisions, and variant semantics: [`equipment-loadout.md`](../../../packages/contracts/docs/equipment-loadout.md).
 
 ### Creature-adjusted weapon metadata (inventory cards)
 

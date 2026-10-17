@@ -93,6 +93,7 @@ export const EnhancementOverlap: Story = {
   ),
 }
 
+/** Plain and magical stacks share a catalog id — plain row shows Unmodified before weapon metadata. */
 export const SplitStacks: Story = {
   render: () => (
     <Host

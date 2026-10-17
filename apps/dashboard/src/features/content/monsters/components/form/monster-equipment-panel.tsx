@@ -2,12 +2,14 @@ import { useCallback, useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import {
+  buildEquipmentInventoryUnmodifiedContext,
   findCanonicalPlainEntry,
   creatureWeaponProficienciesSchema,
   creatureWeaponProficiencyTargetsFromGrantSet,
   getContentTypeTerm,
   normalizeEquipmentInstance,
   resolveEquipmentInstanceSummary,
+  shouldShowUnmodifiedEquipmentQualifier,
   type EquipmentPickerItem,
   type SystemRulesetId,
 } from '@rpg/contracts'
@@ -56,6 +58,10 @@ import {
   coerceCreatureWeaponProficienciesForForm,
   MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
 } from '../../lib/creature-details/monster-weapon-proficiencies-form.lib'
+import {
+  buildCreatureEquipmentRowSupportingMetadata,
+  EQUIPMENT_ROW_UNMODIFIED_SUPPORTING_SEGMENT,
+} from '../../../equipment/lib/inventory/resolve-creature-equipment-row-projection.lib'
 import { resolveMonsterEquipmentRowProjection } from '../../lib/equipment/resolve-monster-equipment-row-projection.lib'
 import { resolveMonsterEquipmentRowStatus } from '../../lib/equipment/resolve-monster-equipment-row-status.lib'
 import { resolveLoadoutEquipmentIsProficient } from '../../../equipment/lib/loadout/equipment-loadout-picker.lib'
@@ -107,6 +113,10 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
 
   const referenceOptions = ctx.options?.equipment?.forReference() ?? []
   const equipment = values?.equipment ?? []
+  const unmodifiedContext = useMemo(
+    () => buildEquipmentInventoryUnmodifiedContext(equipment),
+    [equipment],
+  )
   const pickerItems = useMemo(
     () =>
       enrichEquipmentPickerItemsWithSearchDocument(
@@ -283,6 +293,12 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
             })
             const rowStatus = inventoryStatus.status
             const equipped = Boolean(summary.equipped)
+            const supportingMetadata = buildCreatureEquipmentRowSupportingMetadata({
+              rowSummary,
+              leadingSegments: shouldShowUnmodifiedEquipmentQualifier(entry, unmodifiedContext)
+                ? [EQUIPMENT_ROW_UNMODIFIED_SUPPORTING_SEGMENT]
+                : undefined,
+            })
             return (
               <ContentFormEntitySelectionRow
                 headingInline={
@@ -300,8 +316,8 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
                 }
                 entity={{
                   heading: label,
-                  ...(rowSummary && rowSummary.supportingMetadata.length > 0
-                    ? { supportingMetadata: [...rowSummary.supportingMetadata] }
+                  ...(supportingMetadata.length > 0
+                    ? { supportingMetadata: [...supportingMetadata] }
                     : {}),
                   ...(rowStatus.length > 0
                     ? { status: rowStatus, statusComposition: 'metadata' }

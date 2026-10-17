@@ -15,7 +15,7 @@ Magic property **presets** live in `@rpg/catalog` (`loadSeedMagicProperties`, `c
 
 Equipment entries are **stacks** of identically configured copies. Customizing one copy of a quantity &gt; 1 stack uses editor **scope** (`one` splits via `splitEquipmentEntry`; `all` edits in place). Picker **loadout** mode adjusts only the canonical **plain** stack (`findCanonicalPlainEntry`).
 
-See `summarizeEquipmentStacks` in `packages/contracts/src/rpg/runtime/creature/equipment-stack.ts`.
+See `summarizeEquipmentStacks` in `packages/contracts/src/rpg/runtime/creature/equipment-stack.ts` and [equipment-loadout.md](./equipment-loadout.md) for loadout architecture and variant labeling.
 
 ## Warnings
 
