@@ -2,33 +2,27 @@ import { useCallback, useId, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
-  ABILITY_ENTRIES,
   ABILITY_IDS,
   ABILITY_SCORE_MIN,
   CHARACTER_ABILITY_SCORE_MAX,
-  abilityModifier,
   getAbilityGenerationMethodDisplayName,
   type Ability,
   type AbilityScoreRecommendation,
   type AbilityScoreRecommendationClassInput,
 } from '@rpg/contracts'
-import { NumberInput, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 
-import { abilitiesFormCopy } from '../../../../../lib/steps/abilities-form-labels'
-import type { AbilitiesFormValues } from '../../../../../lib/steps/abilities-form-fields'
-import { scoresFromFormValues } from '../../../../../lib/steps/fixed-scores-assignment.lib'
-import { formatPreviewSignedNumber } from '../../../../../lib/builder-preview/character-builder-preview-panel.lib'
-import { AbilityRecommendationPanel } from '../recommendation/ability-recommendation-panel'
-import { AbilityScoreCardBadge } from '../recommendation/ability-score-card-badge'
-import { abilityScoreCardColumnClasses } from '../recommendation/ability-recommendation.variants'
 import {
-  abilityScoreCardAbbrClasses,
-  abilityScoreCardClasses,
-  abilityScoreCardHeaderClasses,
-  abilityScoreCardModifierClasses,
-  abilityScoreCardNameClasses,
-  abilityScoreCardScoreAreaClasses,
-  abilityScoreCardScoreSlotClasses,
+  AbilityScoreNumeric,
+  AbilityScoreRecommendationIndicator,
+  type AbilityScoreCardState,
+} from '@/components/ability-score'
+
+import type { AbilitiesFormValues } from '../../../../../lib/steps/abilities-form-fields'
+import { buildAbilityPreferenceLabelsByAbility } from '../../../../../lib/steps/ability-preference-indicator.lib'
+import { scoresFromFormValues } from '../../../../../lib/steps/fixed-scores-assignment.lib'
+import { AbilityRecommendationPanel } from '../recommendation/ability-recommendation-panel'
+import {
   fixedScoresAbilityGridClasses,
   fixedScoresAssignmentIntroClasses,
   fixedScoresAssignmentRootClasses,
@@ -41,74 +35,15 @@ export type ManualAbilitiesAssignmentProps = {
   recommendation?: AbilityScoreRecommendation | null
 }
 
-function ManualAbilityScoreCard({
-  ability,
-  assignedScore,
-  showInvalidStates,
-  recommendation,
-  onScoreChange,
-}: {
-  ability: Ability
-  assignedScore: number | undefined
-  showInvalidStates: boolean
-  recommendation: AbilityScoreRecommendation | null
-  onScoreChange: (ability: Ability, value: number | undefined) => void
-}) {
-  const entry = ABILITY_ENTRIES[ability]
-  const cardState =
-    showInvalidStates && typeof assignedScore !== 'number'
-      ? 'invalidAfterAttempt'
-      : typeof assignedScore === 'number'
-        ? 'filled'
-        : 'empty'
-
-  const modifierLabel =
-    typeof assignedScore === 'number'
-      ? formatPreviewSignedNumber(abilityModifier(assignedScore))
-      : abilitiesFormCopy.emptyModifier
-
-  return (
-    <div className={abilityScoreCardColumnClasses}>
-      <AbilityScoreCardBadge ability={ability} recommendation={recommendation} />
-
-      <article className={abilityScoreCardClasses(cardState)} aria-label={entry.label}>
-        <header className={abilityScoreCardHeaderClasses}>
-          <div className={abilityScoreCardAbbrClasses}>{ability.toUpperCase()}</div>
-          <div className={abilityScoreCardNameClasses}>{entry.label}</div>
-        </header>
-
-        <div className={abilityScoreCardScoreAreaClasses}>
-          <div className={abilityScoreCardScoreSlotClasses}>
-            <NumberInput
-              aria-label={`${entry.label} score`}
-              size="sm"
-              digits={2}
-              min={ABILITY_SCORE_MIN}
-              max={CHARACTER_ABILITY_SCORE_MAX}
-              value={typeof assignedScore === 'number' ? assignedScore : ''}
-              onChange={(event) => {
-                const raw = event.target.value.trim()
-                if (raw === '') {
-                  onScoreChange(ability, undefined)
-                  return
-                }
-                const parsed = Number(raw)
-                if (!Number.isFinite(parsed)) return
-                onScoreChange(ability, parsed)
-              }}
-            />
-          </div>
-          <span className={abilityScoreCardModifierClasses} aria-live="polite">
-            <span className="sr-only">Modifier </span>
-            {modifierLabel}
-          </span>
-        </div>
-      </article>
-    </div>
-  )
+function resolveManualCardState(
+  assignedScore: number | undefined,
+  showInvalidStates: boolean,
+): AbilityScoreCardState {
+  if (showInvalidStates && typeof assignedScore !== 'number') return 'invalid'
+  return 'resting'
 }
 
-/** Manual per-ability score entry with class-based recommendation badges. */
+/** Manual per-ability score entry with class-based recommendation stars. */
 export function ManualAbilitiesAssignment({
   showInvalidStates = false,
   classInput = null,
@@ -120,11 +55,15 @@ export function ManualAbilitiesAssignment({
   const watchedValues = useWatch<AbilitiesFormValues>()
 
   const scores = useMemo(() => scoresFromFormValues(watchedValues ?? {}), [watchedValues])
+  const preferenceLabels = useMemo(
+    () => buildAbilityPreferenceLabelsByAbility(recommendation?.preferences ?? []),
+    [recommendation?.preferences],
+  )
   const methodHeading = getAbilityGenerationMethodDisplayName('manual')
 
-  const handleScoreChange = useCallback(
-    (ability: Ability, value: number | undefined) => {
-      form.setValue(ability, value, { shouldDirty: true, shouldValidate: true })
+  const handleCommit = useCallback(
+    (ability: Ability, value: number | null) => {
+      form.setValue(ability, value ?? undefined, { shouldDirty: true, shouldValidate: true })
     },
     [form],
   )
@@ -138,16 +77,28 @@ export function ManualAbilitiesAssignment({
       </div>
 
       <div className={fixedScoresAbilityGridClasses} role="group" aria-labelledby={introId}>
-        {ABILITY_IDS.map((ability) => (
-          <ManualAbilityScoreCard
-            key={ability}
-            ability={ability}
-            assignedScore={scores[ability]}
-            showInvalidStates={showInvalidStates}
-            recommendation={recommendation}
-            onScoreChange={handleScoreChange}
-          />
-        ))}
+        {ABILITY_IDS.map((ability) => {
+          const assignedScore = scores[ability]
+          const preferenceLabel = preferenceLabels[ability]
+          const headerAdornment = preferenceLabel ? (
+            <AbilityScoreRecommendationIndicator label={preferenceLabel} />
+          ) : undefined
+
+          return (
+            <AbilityScoreNumeric
+              key={ability}
+              ability={ability}
+              value={typeof assignedScore === 'number' ? assignedScore : null}
+              min={ABILITY_SCORE_MIN}
+              max={CHARACTER_ABILITY_SCORE_MAX}
+              clearable
+              size="md"
+              state={resolveManualCardState(assignedScore, showInvalidStates)}
+              headerAdornment={headerAdornment}
+              onCommit={(value) => handleCommit(ability, value)}
+            />
+          )
+        })}
       </div>
 
       <AbilityRecommendationPanel

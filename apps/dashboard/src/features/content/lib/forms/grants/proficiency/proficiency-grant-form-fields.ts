@@ -20,13 +20,15 @@ import {
   type FormItem,
 } from '@rpg/ui/form'
 
+import { buildWeaponProficiencyGrantComboboxFilters } from '@/lib/forms/grant-sets/weapon-proficiency-combobox-filters.lib'
+
 import type { ContentFormCtx } from '../../registry/content-form-registry'
 import { grantFieldLabel } from '../grant-field-terms'
 import {
-  referenceArmorFieldOptions,
+  referenceArmorComboboxFieldOptions,
   referenceSkillFieldOptions,
-  referenceToolFieldOptions,
-  referenceWeaponFieldOptions,
+  referenceToolComboboxFieldOptions,
+  referenceWeaponComboboxFieldOptions,
 } from '../../../form-options/content-field-option.lib'
 import { refineToolProficiencyPoolFormRow } from './tool-proficiency-pool-form-validation'
 import {
@@ -208,7 +210,7 @@ export const weaponProficiencyItemFormSchema = z.discriminatedUnion('proficiency
 export type WeaponProficiencyItemForm = z.infer<typeof weaponProficiencyItemFormSchema>
 
 function weaponProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility): FormItem[] {
-  const weaponOptions = referenceWeaponFieldOptions(ctx.options?.equipment)
+  const weaponOptions = referenceWeaponComboboxFieldOptions(ctx.options?.equipment)
 
   return [
     {
@@ -243,6 +245,7 @@ function weaponProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibilit
       label: grantFieldLabel('weaponProficiencySlugs', { plural: true }),
       multiple: true,
       options: weaponOptions,
+      filterSelects: buildWeaponProficiencyGrantComboboxFilters(),
       required: true,
       visibility: visibleForPoolSource('explicit', guard),
     },
@@ -263,7 +266,7 @@ export function weaponProficiencyGrantItemFields(
   opts: ProficiencyGrantItemFieldsOptions = {},
 ): FormItem[] {
   const guard = opts.guardVisibility
-  const weaponOptions = referenceWeaponFieldOptions(ctx.options?.equipment)
+  const weaponOptions = referenceWeaponComboboxFieldOptions(ctx.options?.equipment)
 
   return [
     proficiencySourceField(weaponSourceOptions, guard),
@@ -273,6 +276,7 @@ export function weaponProficiencyGrantItemFields(
       label: grantFieldLabel('weaponProficiencySlugs', { plural: true }),
       multiple: true,
       options: weaponOptions,
+      filterSelects: buildWeaponProficiencyGrantComboboxFilters(),
       required: true,
       visibility: visibleForProficiencySource('specific', guard),
       width: 'full',
@@ -340,7 +344,7 @@ export function toolProficiencyGrantItemFields(
   opts: ProficiencyGrantItemFieldsOptions = {},
 ): FormItem[] {
   const guard = opts.guardVisibility
-  const toolOptions = referenceToolFieldOptions(ctx.options?.equipment)
+  const toolOptions = referenceToolComboboxFieldOptions(ctx.options?.equipment)
 
   return [
     proficiencySourceField(toolSourceOptions, guard),
@@ -500,7 +504,7 @@ export const armorTrainingItemFormSchema = z.discriminatedUnion('proficiencySour
 export type ArmorTrainingItemForm = z.infer<typeof armorTrainingItemFormSchema>
 
 function armorTrainingPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility): FormItem[] {
-  const armorOptions = referenceArmorFieldOptions(ctx.options?.equipment)
+  const armorOptions = referenceArmorComboboxFieldOptions(ctx.options?.equipment)
 
   return [
     {
@@ -555,7 +559,7 @@ export function armorTrainingGrantItemFields(
   opts: ProficiencyGrantItemFieldsOptions = {},
 ): FormItem[] {
   const guard = opts.guardVisibility
-  const armorOptions = referenceArmorFieldOptions(ctx.options?.equipment)
+  const armorOptions = referenceArmorComboboxFieldOptions(ctx.options?.equipment)
 
   return [
     proficiencySourceField(armorSourceOptions, guard),

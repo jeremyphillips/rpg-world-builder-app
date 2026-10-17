@@ -72,8 +72,11 @@ export function useEquipmentPickerAcquisition(args: {
       equipment: Parameters<typeof resolveEquipmentAcquisitionActionState>[0]['equipment']
       workflowMode: EquipmentPickerWorkflowMode
       requestedQuantity: number
-    }) =>
-      buildEquipmentPickerRowActionViewModel(
+    }) => {
+      if (pickerArgs.workflowMode === 'loadout') {
+        throw new Error('Loadout workflow requires a custom resolveRowActionViewModel.')
+      }
+      return buildEquipmentPickerRowActionViewModel(
         resolveEquipmentAcquisitionActionState({
           draft,
           context: resolveEquipmentAcquisitionContext({ context, catalogIndex }),
@@ -83,7 +86,8 @@ export function useEquipmentPickerAcquisition(args: {
           focusedAllowanceId,
         }),
         { budget },
-      ),
+      )
+    },
     [budget, catalogIndex, context, draft, focusedAllowanceId],
   )
 

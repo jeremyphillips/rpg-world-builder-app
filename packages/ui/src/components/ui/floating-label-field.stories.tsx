@@ -358,6 +358,12 @@ function assertFocusRingClearance(label: HTMLElement, floatedSizeToken: string) 
 export const ClassReference: Story = {
   tags: ['control-parity'],
   parameters: { semanticClasses: true },
+  args: {
+    label: 'School',
+    size: 'md',
+    populated: false,
+    children: <Input value="" size="md" readOnly aria-label="Sample" />,
+  },
   render: () => (
     <ClassReferenceTable
       rows={FLOATING_LABEL_SIZE_SPECS.map((spec) => ({

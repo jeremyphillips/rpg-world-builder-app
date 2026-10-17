@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
@@ -50,4 +51,204 @@ export const ClassReference: Story = {
       />
     )
   },
+}
+
+export const ToneSuccess: Story = { args: { defaultChecked: true, tone: 'success' } }
+
+export const ToneWarning: Story = { args: { defaultChecked: true, tone: 'warning' } }
+
+export const ToneDestructive: Story = { args: { defaultChecked: true, tone: 'destructive' } }
+
+export const CircleUnchecked: Story = {
+  args: { appearance: 'circle', tone: 'success', 'aria-label': 'Equip longsword' },
+}
+
+export const CircleChecked: Story = {
+  args: {
+    appearance: 'circle',
+    tone: 'success',
+    'aria-label': 'Unequip longsword',
+    defaultChecked: true,
+  },
+}
+
+export const CircleCheckedDisabled: Story = {
+  args: {
+    appearance: 'circle',
+    tone: 'success',
+    'aria-label': 'Equipped longsword',
+    defaultChecked: true,
+    disabled: true,
+  },
+}
+
+export const CircleInvalid: Story = {
+  args: { appearance: 'circle', tone: 'success', 'aria-label': 'Equip item', 'aria-invalid': true },
+}
+
+const cardChromeClasses =
+  'flex flex-wrap items-center gap-6 rounded-lg border border-border bg-card p-6'
+
+function CircleOnCardRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      {children}
+    </div>
+  )
+}
+
+/** Rest / hover / focus on the same surface as entity equipment rows (`bg-card`). */
+export const CircleOnCardSurface: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Hover and Tab through each control: rest shows only the 16px indicator; hover adds a 24px lift fill and border; focus uses the default standalone ring (`--ui-focus-ring-standalone`).',
+      },
+    },
+  },
+  render: () => (
+    <div className={cardChromeClasses}>
+      <CircleOnCardRow label="Unchecked">
+        <Checkbox appearance="circle" tone="success" aria-label="Equip item" />
+      </CircleOnCardRow>
+      <CircleOnCardRow label="Checked">
+        <Checkbox appearance="circle" tone="success" aria-label="Unequip item" defaultChecked />
+      </CircleOnCardRow>
+      <CircleOnCardRow label="Checked disabled">
+        <Checkbox
+          appearance="circle"
+          tone="success"
+          aria-label="Equipped item"
+          defaultChecked
+          disabled
+        />
+      </CircleOnCardRow>
+      <CircleOnCardRow label="Focus (Tab here)">
+        <Checkbox
+          appearance="circle"
+          tone="success"
+          aria-label="Focus demo checked"
+          defaultChecked
+          autoFocus
+        />
+      </CircleOnCardRow>
+    </div>
+  ),
+}
+
+/** Hover and keyboard focus expand the same checkbox into Equip / Unequip. */
+export const CircleExpandOnCard: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Resting footprint stays 24px. Hover or Tab reveals the action word to the right. The embedded focus ring follows the pill. Disabled stays collapsed.',
+      },
+    },
+  },
+  render: () => (
+    <div className="flex max-w-sm flex-col gap-3 rounded-lg border border-border bg-card p-4">
+      <div className="flex min-w-0 items-center gap-1">
+        <span className="min-w-0 truncate text-sm font-medium">Battleaxe</span>
+        <Checkbox
+          appearance="circle"
+          tone="success"
+          focusContext="embedded"
+          expandLabel="Unequip"
+          expandLabelReserve="Equip"
+          aria-label="Equipped: Battleaxe"
+          defaultChecked
+        />
+        <span className="ms-auto text-xs text-muted-foreground">Rest / hover</span>
+      </div>
+      <div className="flex min-w-0 items-center gap-1">
+        <span className="min-w-0 truncate text-sm font-medium">
+          +1 Flaming Battleaxe of Very Long Names
+        </span>
+        <Checkbox
+          appearance="circle"
+          tone="success"
+          focusContext="embedded"
+          expandLabel="Equip"
+          expandLabelReserve="Unequip"
+          aria-label="Equipped: +1 Flaming Battleaxe of Very Long Names"
+        />
+        <button type="button" className="text-xs text-muted-foreground">
+          Edit
+        </button>
+      </div>
+      <div className="flex min-w-0 items-center justify-end gap-1">
+        <span className="min-w-0 truncate text-sm font-medium">Edge</span>
+        <Checkbox
+          appearance="circle"
+          tone="success"
+          focusContext="embedded"
+          expandLabel="Unequip"
+          expandLabelReserve="Equip"
+          aria-label="Equipped: Edge"
+          defaultChecked
+        />
+      </div>
+      <div className="flex min-w-0 items-center gap-1">
+        <span className="text-sm font-medium">Disabled</span>
+        <Checkbox
+          appearance="circle"
+          tone="success"
+          focusContext="embedded"
+          expandLabel="Unequip"
+          expandLabelReserve="Equip"
+          aria-label="Equipped: Disabled"
+          defaultChecked
+          disabled
+        />
+      </div>
+    </div>
+  ),
+}
+
+/** Dense heading inline slot — embedded focus avoids standalone ring bleed into truncated titles. */
+export const CircleEmbeddedInHeading: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Mirrors entity `headingInline` (`gap-1`, truncated title). Use `focusContext="embedded"` for dense inline chrome; spacious layouts keep the default standalone ring.',
+      },
+    },
+  },
+  render: () => (
+    <div className={cardChromeClasses}>
+      <div className="flex min-w-0 max-w-xs items-center gap-1">
+        <span className="min-w-0 truncate text-sm font-medium">
+          +1 Flaming Battleaxe of Very Long Names
+        </span>
+        <span className="inline-flex shrink-0 self-center">
+          <Checkbox
+            appearance="circle"
+            tone="success"
+            focusContext="embedded"
+            aria-label="Unequip +1 Flaming Battleaxe of Very Long Names"
+            defaultChecked
+          />
+        </span>
+      </div>
+      <div className="flex min-w-0 max-w-xs items-center gap-1">
+        <span className="min-w-0 truncate text-sm font-medium">
+          +1 Flaming Battleaxe of Very Long Names
+        </span>
+        <span className="inline-flex shrink-0 self-center">
+          <Checkbox
+            appearance="circle"
+            tone="success"
+            focusContext="standalone"
+            aria-label="Standalone focus comparison"
+            defaultChecked
+            autoFocus
+          />
+        </span>
+      </div>
+    </div>
+  ),
 }

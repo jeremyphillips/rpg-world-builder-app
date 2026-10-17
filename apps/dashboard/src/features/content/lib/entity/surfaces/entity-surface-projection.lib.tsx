@@ -1,11 +1,10 @@
-import {
-  CatalogPickerRowAction,
-  ContentCardMedia,
-  contentCardMediaVariants,
-  type ContentCardDensity,
-} from '@rpg/ui'
+import { CatalogPickerRowAction, contentCardMediaVariants, type ContentCardDensity } from '@rpg/ui'
 
-import { ContentMediaImage, type ContentMediaImageFrame } from '@/features/media'
+import {
+  ContentMediaFallback,
+  ContentMediaImage,
+  type ContentMediaImageFrame,
+} from '@/features/media'
 
 import type { EntityAnatomyTrailing } from '../anatomy/entity-anatomy-trailing.types'
 import type {
@@ -15,36 +14,34 @@ import type {
 import type { EntitySummaryModel } from '../summary/entity-summary.types'
 import type { EntitySurfaceConfig } from './entity-surface.types'
 
-function resolveEntitySurfaceMediaFrame(density: ContentCardDensity): ContentMediaImageFrame {
-  return density === 'compact' ? 'square' : 'insetSm'
-}
+/** Default entity-row thumbnail — IdentityFrame `sm` (40px); independent of text density. */
+export const ENTITY_SURFACE_LEADING_THUMB_FRAME: ContentMediaImageFrame = 'insetSm'
 
 export function buildEntitySurfaceLeadingMediaNode(
   identity: EntitySurfaceIdentity,
-  density: ContentCardDensity = 'compact',
+  _density: ContentCardDensity = 'compact',
 ) {
-  return buildEntitySurfaceMedia(identity, density)
+  return buildEntitySurfaceMedia(identity)
 }
 
-function buildEntitySurfaceMedia(identity: EntitySurfaceIdentity, density: ContentCardDensity) {
-  const className = contentCardMediaVariants({ density })
+function buildEntitySurfaceMedia(identity: EntitySurfaceIdentity) {
+  const className = contentCardMediaVariants({ density: 'compact' })
 
   if (identity.displayImage) {
     return (
       <ContentMediaImage
         display={identity.displayImage}
         alt={identity.heading}
-        frame={resolveEntitySurfaceMediaFrame(density)}
+        frame={ENTITY_SURFACE_LEADING_THUMB_FRAME}
         className={className}
       />
     )
   }
 
   return (
-    <ContentCardMedia
+    <ContentMediaFallback
       fallback={identity.fallback}
-      alt={identity.heading}
-      density={density}
+      frame={ENTITY_SURFACE_LEADING_THUMB_FRAME}
       className={className}
     />
   )
@@ -52,15 +49,15 @@ function buildEntitySurfaceMedia(identity: EntitySurfaceIdentity, density: Conte
 
 export function projectEntitySurfaceIdentityToSummaryModel(
   identity: EntitySurfaceIdentity,
-  density: ContentCardDensity = 'compact',
+  _density: ContentCardDensity = 'compact',
 ): EntitySummaryModel {
   const { heading, metadata, classification, status, selectionState } = identity
 
   return {
     heading,
-    media: buildEntitySurfaceMedia(identity, density),
+    media: buildEntitySurfaceMedia(identity),
     ...(classification ? { classification } : {}),
-    ...(metadata ? { description: metadata } : {}),
+    ...(metadata && metadata.length > 0 ? { supportingMetadata: metadata } : {}),
     ...(status && status.length > 0 ? { status } : {}),
     ...(selectionState ? { selectionState } : {}),
   }

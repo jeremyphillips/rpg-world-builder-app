@@ -110,6 +110,32 @@ describe('useMasterDetailArray', () => {
     expect(result.current.selectedIndex).toBe(0)
   })
 
+  it('selects the next row when the selected first row is removed', () => {
+    const { result } = setup()
+    act(() => result.current.handleAdd())
+    act(() => result.current.handleAdd())
+    act(() => result.current.select(0))
+
+    act(() => result.current.requestRemove(0))
+    act(() => result.current.confirmRemove())
+    expect(result.current.fields).toHaveLength(1)
+    expect(result.current.selectedIndex).toBe(0)
+  })
+
+  it('selects the next row when the selected middle row is removed', () => {
+    const { result } = setup()
+    act(() => result.current.handleAdd())
+    act(() => result.current.handleAdd())
+    act(() => result.current.handleAdd())
+    act(() => result.current.select(1))
+    const nextFieldId = result.current.fields[2]?.id
+
+    act(() => result.current.requestRemove(1))
+    act(() => result.current.confirmRemove())
+    expect(result.current.selectedFieldId).toBe(nextFieldId)
+    expect(result.current.selectedIndex).toBe(1)
+  })
+
   it('clears selection when the last row is removed', () => {
     const { result } = setup()
     act(() => result.current.handleAdd())

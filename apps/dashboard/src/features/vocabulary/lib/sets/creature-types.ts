@@ -6,13 +6,19 @@ import { buildLabelActiveVocabulary, buildVocabularyFromSeedSet } from '../build
 export type CreatureTypeVocabulary = {
   labelById: Record<string, string>
   activeIds: ReadonlySet<string>
+  languageAffinitiesById: Record<string, readonly string[]>
 }
 
 /** Build label/active-id maps from a resolved creature-types set. */
 export function buildCreatureTypeVocabulary(
   set: Pick<ResolvedVocabularyOptionSet, 'options'>,
 ): CreatureTypeVocabulary {
-  return buildLabelActiveVocabulary(set)
+  const base = buildLabelActiveVocabulary(set)
+  const languageAffinitiesById = Object.fromEntries(
+    set.options.map((option) => [option.id, option.languageAffinities ?? []]),
+  )
+
+  return { ...base, languageAffinitiesById }
 }
 
 /** Default ruleset seed vocabulary for flows without a campaign id (e.g. create wizard). */

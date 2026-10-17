@@ -9,6 +9,7 @@ import {
   resolvePersistedContentMediaOverride,
   serializeMediaScopeKey,
   validateContentMediaForCatalogWrite,
+  CONTENT_TYPE_MEDIA_ENABLED_KEYS,
   type ApiContentTypeKey,
   type ContentMedia,
   type ContentSource,
@@ -22,13 +23,7 @@ import { findMediaAssetsByIds } from '../../media'
 import { prepareContentMediaReconciliation, reconcileReferencesWithSession } from '../../media'
 import type { ContentWriteConfig, WriteEntityBase } from './content-write-config'
 
-const CATALOG_MEDIA_TYPES = new Set<ApiContentTypeKey>([
-  'classes',
-  'species',
-  'equipment',
-  'locations',
-  'organizations',
-])
+const CATALOG_MEDIA_TYPES = new Set<ApiContentTypeKey>(CONTENT_TYPE_MEDIA_ENABLED_KEYS)
 
 export function isCatalogMediaContentType(typeName: string): typeName is ApiContentTypeKey {
   return CATALOG_MEDIA_TYPES.has(typeName as ApiContentTypeKey)

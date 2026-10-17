@@ -43,7 +43,7 @@ describe('JoinedPair', () => {
     )
   })
 
-  it('renders select + select with chevrons on both segments', () => {
+  it('renders select + select and omits the caret when the unit has one option', () => {
     render(
       <JoinedPair.Root aria-label="Speed">
         <JoinedPair.SelectOccupant
@@ -70,10 +70,14 @@ describe('JoinedPair', () => {
     )
 
     expect(screen.getByRole('combobox', { name: 'Speed value' })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Speed unit' })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Speed unit' })).toHaveClass(
-      'ui-field-group__segment--surface-faint',
-    )
+    expect(
+      screen
+        .getByRole('combobox', { name: 'Speed value' })
+        .querySelector(`[${SELECT_CARET_SLOT_DATA_ATTR}]`),
+    ).toBeInTheDocument()
+    const unit = screen.getByRole('combobox', { name: 'Speed unit' })
+    expect(unit).toHaveClass('ui-field-group__segment--surface-faint')
+    expect(unit.querySelector(`[${SELECT_CARET_SLOT_DATA_ATTR}]`)).not.toBeInTheDocument()
   })
 
   it('applies grouped digit width and visual slot on start segments', () => {
@@ -95,7 +99,7 @@ describe('JoinedPair', () => {
     )
 
     const trigger = screen.getByRole('combobox', { name: 'Speed value' })
-    expect(trigger).toHaveClass('w-auto')
+    expect(trigger).toHaveClass('ui-field-control--trigger-fit')
     expect(trigger).toHaveClass('ui-field-group__segment')
     expect(trigger.querySelector('[data-select-value-slot]')).toHaveClass('min-w-[calc(2*1ch)]')
     expect(trigger.querySelector('[data-select-caret-slot]')).toHaveClass(
@@ -132,11 +136,12 @@ describe('JoinedPair', () => {
     )
 
     const trigger = screen.getByRole('combobox', { name: 'Speed unit' })
-    expect(trigger).toHaveClass('w-auto')
+    expect(trigger.querySelector('[data-select-caret-slot]')).not.toBeInTheDocument()
+    expect(trigger.querySelector(`[${SELECT_VALUE_SLOT_DATA_ATTR}]`)).toHaveClass(
+      'ui-field-group__value-slot--end',
+    )
+    expect(trigger).toHaveClass('ui-field-control--trigger-fit')
     expect(trigger).toHaveClass('ui-field-group__segment--end')
-    const column = trigger.querySelector('[data-select-caret-slot]')
-    expect(column).toHaveClass('ui-field-group__caret-slot')
-    expect(column).not.toHaveClass('ui-field-group__caret-slot--grouped-start')
   })
 
   it('supports sizingLabel on grouped end segments', () => {

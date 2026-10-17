@@ -14,7 +14,12 @@ export {
   type SlotFieldRendererProps,
 } from './containers/form-items.client'
 export { FormFieldStack, type FormFieldStackProps } from './containers/form-field-stack.client'
-export { FieldNode, buildFieldControlId } from './containers/form-conditional.client'
+export {
+  FieldNode,
+  FieldSeparatorWrapper,
+  buildFieldControlId,
+  type FieldSeparatorWrapperProps,
+} from './containers/form-conditional.client'
 export {
   FormSectionProvider,
   FormRhythmStack,
@@ -217,9 +222,13 @@ export {
   type InlineSentenceFieldConfig,
   type JoinedPairFieldConfig,
   type InlineSentenceSegment,
-  COMBOBOX_FILTER_ALL_VALUE,
+  type ActiveDimensionFilters,
   type ComboboxFieldConfig,
-  type ComboboxFilterSelectConfig,
+  type ComboboxFilterDimensionConfig,
+  type FieldDynamicComboboxFilterSelects,
+  type FieldDynamicRecommendation,
+  type FieldRecommendationResolveContext,
+  type FilterDimensionValue,
   type ComboboxRenderSelectedItem,
   type EditableGridColumnConfig,
   type EditableGridFieldConfig,
@@ -322,7 +331,9 @@ export {
 export {
   DICE_FORMULA_TAIL_OPERATORS,
   DICE_FORMULA_OPERATORS,
+  resolveDiceFormulaValue,
   type DiceFormulaTailOperator,
+  type DiceFormulaValue,
 } from '../components/ui/dice-formula-field.lib'
 export type { FieldSize } from '../components/ui/field.client'
 export {

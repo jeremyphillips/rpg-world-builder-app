@@ -51,10 +51,12 @@ import {
   type EquipmentStepRemoveTarget,
   type StartingEquipmentOption,
   type StartingEquipmentOptionSummary,
-  getEquipmentKindCollectionLabel,
-  getEquipmentKindCompactLabel,
   type EffectiveStartingEquipmentPackageItem,
 } from '@rpg/contracts'
+
+import { EQUIPMENT_INVENTORY_GROUP_LABELS } from '../../../content/equipment/lib/inventory/equipment-inventory-group-labels.lib'
+
+export { EQUIPMENT_INVENTORY_GROUP_LABELS } from '../../../content/equipment/lib/inventory/equipment-inventory-group-labels.lib'
 
 import {
   enrichEquipmentPickerItemsWithSearchDocument,
@@ -151,16 +153,6 @@ export function formatEquipmentPackageItemCount(count: number): string {
   return `${count} ${count === 1 ? 'item' : 'items'}`
 }
 
-export const EQUIPMENT_INVENTORY_GROUP_LABELS = {
-  weapons: getEquipmentKindCollectionLabel('weapon'),
-  armor: getEquipmentKindCollectionLabel('armor'),
-  tools: getEquipmentKindCollectionLabel('tool'),
-  gear: getEquipmentKindCompactLabel('adventuring_gear'),
-  magicItems: getEquipmentKindCollectionLabel('magic_item'),
-  vehicles: getEquipmentKindCollectionLabel('vehicle'),
-  mounts: getEquipmentKindCollectionLabel('mount'),
-} as const satisfies Record<keyof CharacterEquipment, string>
-
 export const EQUIPMENT_MAGIC_ITEMS_SECTION_LABEL = EQUIPMENT_INVENTORY_GROUP_LABELS.magicItems
 
 export const EQUIPMENT_MAGIC_ITEMS_BROWSE_LABEL = 'Browse magic items'
@@ -212,7 +204,7 @@ export function formatEquipmentInventoryManageHeadline(equipmentName: string): s
   return `Manage ${equipmentName}`
 }
 
-export type EquipmentPickerWorkflowMode = 'purchase' | 'magic_items'
+export type EquipmentPickerWorkflowMode = 'purchase' | 'magic_items' | 'loadout'
 
 export const EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL = 'Customize'
 

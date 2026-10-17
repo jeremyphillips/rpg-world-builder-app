@@ -1,11 +1,5 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import {
-  RowAnatomyCell,
-  contentCardHeadingLinkVariants,
-  rowAnatomyRootProps,
-  type ContentCardDensity,
-} from '@rpg/ui'
+import { RowAnatomyCell, rowAnatomyRootProps, type ContentCardDensity } from '@rpg/ui'
 
 import { EntityLeadingRail } from './entity-leading-rail'
 import { EntityAnatomyTrailingCells } from './entity-anatomy-trailing'
@@ -15,12 +9,16 @@ import {
   EntitySummaryDescription,
   EntitySummaryHeading,
   EntitySummaryStatus,
+  EntitySummarySupportingMetadata,
 } from '../summary/entity-summary'
 import type { EntitySummaryModel } from '../summary/entity-summary.types'
 import { entitySummaryStatusLaneVariants } from '../summary/entity-summary.variants'
 import { PickerSelectionStateLine } from '../summary/picker-selection-state-line'
-import { resolveEntityAnatomyBand } from './entity-anatomy-band.lib'
-import { entityAnatomyHostRootVariants, entityAnatomyVariants } from './entity-anatomy.variants'
+import {
+  entityAnatomyHostRootVariants,
+  entityAnatomyMediaContentSpanClasses,
+  entityAnatomyVariants,
+} from './entity-anatomy.variants'
 
 export type { EntityAnatomyTrailing } from './entity-anatomy-trailing.types'
 
@@ -34,6 +32,8 @@ export type EntityAnatomyProps = {
   density?: ContentCardDensity
   /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
   headingEndValue?: number
+  /** Intrinsic-width slot immediately after the title (private transport from ContentEntityCard). */
+  headingInline?: ReactNode
 }
 
 export type EntityAnatomyHostProps = {
@@ -46,18 +46,6 @@ export type EntityAnatomyHostProps = {
   density?: ContentCardDensity
 }
 
-function resolveLinkedHeading(heading: ReactNode, headingHref: string | undefined): ReactNode {
-  if (!headingHref) {
-    return heading
-  }
-
-  return (
-    <Link to={headingHref} className={contentCardHeadingLinkVariants()}>
-      {heading}
-    </Link>
-  )
-}
-
 /** Row-track entity anatomy — every part is a RowAnatomy cell; trailing kind selects its cell. */
 // fallow-ignore-next-line complexity
 export function EntityAnatomy({
@@ -67,16 +55,18 @@ export function EntityAnatomy({
   trailing,
   density = 'comfortable',
   headingEndValue,
+  headingInline,
 }: EntityAnatomyProps) {
   const resolvedLeadingUtilities = leadingUtilities?.filter((utility) => utility != null) ?? []
   const hasStatusItems = (entity.status?.length ?? 0) > 0
   const hasProvenance = (entity.provenance?.length ?? 0) > 0
   const hasSelectionState = entity.selectionState != null
   const hasStatusCell = hasStatusItems || hasProvenance || hasSelectionState
-  const band = resolveEntityAnatomyBand(entity.media)
+  const hasSupportingMetadata = (entity.supportingMetadata?.length ?? 0) > 0
+  const hasMetaCell = entity.description != null || hasSupportingMetadata
 
   return (
-    <div className={entityAnatomyVariants({ density, band })} {...rowAnatomyRootProps}>
+    <div className={entityAnatomyVariants({ density })} {...rowAnatomyRootProps}>
       {resolvedLeadingUtilities.length > 0 ? (
         <RowAnatomyCell<EntityAnatomyColumn>
           cell={{ slot: 'band', column: 'leading' }}
@@ -87,10 +77,10 @@ export function EntityAnatomy({
       ) : null}
       {entity.media ? (
         <RowAnatomyCell<EntityAnatomyColumn>
-          cell={{ slot: 'band', column: 'media' }}
+          cell={{ slot: 'stretch', column: 'media' }}
           data-entity-item-slot="media"
         >
-          {entity.media}
+          <div className={entityAnatomyMediaContentSpanClasses}>{entity.media}</div>
         </RowAnatomyCell>
       ) : null}
       <RowAnatomyCell<EntityAnatomyColumn>
@@ -98,20 +88,29 @@ export function EntityAnatomy({
         data-entity-item-slot="content"
       >
         <EntitySummaryHeading
-          heading={resolveLinkedHeading(entity.heading, headingHref)}
+          heading={entity.heading}
           classification={entity.classification}
           density={density}
           headingEndValue={headingEndValue}
+          headingInline={headingInline}
+          headingHref={headingHref}
         />
       </RowAnatomyCell>
-      {entity.description ? (
+      {hasMetaCell ? (
         <RowAnatomyCell<EntityAnatomyColumn>
           cell={{ slot: 'meta', column: 'content' }}
           data-entity-item-slot="description"
         >
-          <EntitySummaryDescription density={density}>
-            {entity.description}
-          </EntitySummaryDescription>
+          {entity.description != null ? (
+            <EntitySummaryDescription density={density}>
+              {entity.description}
+            </EntitySummaryDescription>
+          ) : (
+            <EntitySummarySupportingMetadata
+              segments={entity.supportingMetadata ?? []}
+              density={density}
+            />
+          )}
         </RowAnatomyCell>
       ) : null}
       {hasStatusCell ? (

@@ -37,6 +37,7 @@ export const searchBarLeadingIconVariants = cva(
         embedded: '',
       },
       size: {
+        xs: 'ui-search-bar__leading-icon--xs',
         sm: 'ui-search-bar__leading-icon--sm',
         md: 'ui-search-bar__leading-icon--md',
         lg: 'ui-search-bar__leading-icon--lg',
@@ -69,6 +70,7 @@ export const searchBarEmbeddedLeadingIconVariants = cva(UI_SEARCH_BAR_EMBEDDED_L
 export const searchBarFieldInputVariants = cva('', {
   variants: {
     size: {
+      xs: resolveSearchBarFieldInputClass('xs'),
       sm: resolveSearchBarFieldInputClass('sm'),
       md: resolveSearchBarFieldInputClass('md'),
       lg: resolveSearchBarFieldInputClass('lg'),
@@ -79,6 +81,7 @@ export const searchBarFieldInputVariants = cva('', {
     },
   },
   compoundVariants: [
+    { size: 'xs', clearable: true, class: 'ui-search-bar__field-input--clearable' },
     { size: 'sm', clearable: true, class: 'ui-search-bar__field-input--clearable' },
     { size: 'md', clearable: true, class: 'ui-search-bar__field-input--clearable' },
     { size: 'lg', clearable: true, class: 'ui-search-bar__field-input--clearable' },
@@ -92,6 +95,7 @@ export const searchBarFieldInputVariants = cva('', {
 export const searchBarEmbeddedInputVariants = cva(searchBarEmbeddedChromeInputVariants(), {
   variants: {
     size: {
+      xs: resolveSearchBarEmbeddedInputClass('xs'),
       sm: resolveSearchBarEmbeddedInputClass('sm'),
       md: resolveSearchBarEmbeddedInputClass('md'),
       lg: resolveSearchBarEmbeddedInputClass('lg'),
@@ -102,6 +106,7 @@ export const searchBarEmbeddedInputVariants = cva(searchBarEmbeddedChromeInputVa
     },
   },
   compoundVariants: [
+    { size: 'xs', clearable: true, class: 'ui-search-bar__embedded-input--clearable' },
     { size: 'sm', clearable: true, class: 'ui-search-bar__embedded-input--clearable' },
     { size: 'md', clearable: true, class: 'ui-search-bar__embedded-input--clearable' },
     { size: 'lg', clearable: true, class: 'ui-search-bar__embedded-input--clearable' },

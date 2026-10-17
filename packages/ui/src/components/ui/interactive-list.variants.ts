@@ -9,11 +9,12 @@ import {
 } from './interactive-row.styles'
 import {
   menuChoiceRowItemResetClasses,
-  selectableRowHighlightFillClasses,
   selectableRowHighlightRailClasses,
+  selectableRowListHighlightSelectedClasses,
+  selectableRowListHighlightUnselectedClasses,
+  selectableRowListPointerHoverClasses,
   selectableRowMenuHighlightFillClasses,
   selectableRowMenuHighlightRailClasses,
-  selectableRowPointerHoverClasses,
 } from './interactive-row.variants'
 
 export type InteractiveListSize = 'sm' | 'md' | 'lg'
@@ -96,7 +97,7 @@ export const interactiveListRowChromeVariants = cva(
         ),
       },
       highlighted: {
-        true: cn(selectableRowHighlightFillClasses, selectableRowHighlightRailClasses),
+        true: '',
         false: '',
       },
       selected: {
@@ -108,7 +109,7 @@ export const interactiveListRowChromeVariants = cva(
         false: '',
       },
       interactive: {
-        true: selectableRowPointerHoverClasses,
+        true: '',
         false: '',
       },
     },
@@ -116,14 +117,29 @@ export const interactiveListRowChromeVariants = cva(
       {
         host: 'row',
         highlighted: true,
+        selected: false,
+        className: cn(
+          selectableRowListHighlightUnselectedClasses,
+          selectableRowHighlightRailClasses,
+        ),
+      },
+      {
+        host: 'row',
+        highlighted: true,
+        selected: true,
+        className: cn(selectableRowListHighlightSelectedClasses, selectableRowHighlightRailClasses),
+      },
+      {
+        host: 'row',
         interactive: true,
-        className: selectableRowPointerHoverClasses,
+        selected: false,
+        className: selectableRowListPointerHoverClasses,
       },
       {
         host: 'row',
         selected: true,
         interactive: true,
-        className: UI_INTERACTIVE_ROW_HOVER_CLASS.surface,
+        className: UI_INTERACTIVE_ROW_HOVER_CLASS.selected,
       },
       {
         host: 'menuitem',

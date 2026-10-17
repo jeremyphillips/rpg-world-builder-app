@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useFormContext } from 'react-hook-form'
 
+import { catalogNounFromContentType } from '@rpg/contracts'
 import { ComboboxField } from '@rpg/ui'
 import type { ComboboxFieldOption } from '@rpg/ui'
 
@@ -15,7 +16,10 @@ import type {
 import { QuickNpcSpellRequirementPreview } from './quick-npc-requirement-preview'
 import { QuickNpcStartingChoiceSelectedRow } from './quick-npc-starting-choice-selected-row'
 
-const QUICK_NPC_SPELL_ADD_LABEL = '+ Add spell'
+const QUICK_NPC_SPELLS_FIELD_NOUN = (() => {
+  const spells = catalogNounFromContentType('spells')
+  return { singular: spells.singular, plural: spells.plural }
+})()
 
 function excludeSelectedOptions(
   options: ComboboxFieldOption[],
@@ -50,6 +54,7 @@ function SpellRequirementsField({ entries }: { entries: QuickNpcSpellRequirement
       id="quick-npc-required-spells"
       label="Spells"
       labelVisibility="srOnly"
+      noun={QUICK_NPC_SPELLS_FIELD_NOUN}
       options={options}
       multiple
       value={value}
@@ -58,7 +63,6 @@ function SpellRequirementsField({ entries }: { entries: QuickNpcSpellRequirement
           shouldDirty: true,
         })
       }}
-      placeholder={QUICK_NPC_SPELL_ADD_LABEL}
       emptyMessage="No matching spells"
       resolveFilteredOptions={(panelOptions, query, selected) =>
         filterComboboxOptions(panelOptions, query, selected)

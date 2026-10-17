@@ -75,6 +75,16 @@ export const CREATURE_SIZE_ENTRIES = {
 
 export type CreatureSize = keyof typeof CREATURE_SIZE_ENTRIES
 
+/** Hit die faces by size — used for monster HP derivation. */
+export const CREATURE_SIZE_HIT_DIE: Record<CreatureSize, number> = {
+  tiny: 4,
+  small: 6,
+  medium: 8,
+  large: 10,
+  huge: 12,
+  gargantuan: 20,
+}
+
 export const CREATURE_SIZES = keysFromEntries(CREATURE_SIZE_ENTRIES)
 
 export const creatureSizeSchema = vocabEnumFromEntries(CREATURE_SIZE_ENTRIES)

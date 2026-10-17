@@ -14,6 +14,7 @@ export const inputActionGroupVariants = cva(
   {
     variants: {
       size: {
+        xs: '',
         sm: '',
         md: '',
         lg: '',
@@ -28,6 +29,7 @@ export const inputActionGroupVariants = cva(
       },
     },
     compoundVariants: [
+      { size: 'xs', class: 'ui-field-group--xs' },
       { size: 'sm', class: 'ui-field-group--sm' },
       { size: 'md', class: 'ui-field-group--md' },
       { size: 'lg', class: 'ui-field-group--lg' },
@@ -49,6 +51,7 @@ export const inputActionGroupDividerVariants = cva(fieldGroupedDividerClasses)
 export const inputActionGroupActionSegmentVariants = cva('shrink-0 overflow-hidden', {
   variants: {
     size: {
+      xs: resolveFieldGroupActionSegmentClasses('xs'),
       sm: resolveFieldGroupActionSegmentClasses('sm'),
       md: resolveFieldGroupActionSegmentClasses('md'),
       lg: resolveFieldGroupActionSegmentClasses('lg'),

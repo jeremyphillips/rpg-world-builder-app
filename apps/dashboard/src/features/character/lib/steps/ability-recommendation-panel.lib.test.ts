@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { characterBuilderAbilityRecommendationMessages, formatFieldMessage } from '@rpg/contracts'
+import {
+  characterBuilderAbilityRecommendationMessages,
+  formatFieldMessage,
+  type AbilityScoreRecommendation,
+} from '@rpg/contracts'
 
 import { buildAbilityRecommendationPanelModel } from './ability-recommendation-panel.lib'
 
@@ -9,9 +13,11 @@ const fighterClassInput = {
   primaryAbilities: ['str', 'dex'] as const,
 }
 
-const fighterRecommendation = {
-  primary: ['str'] as const,
-  secondary: ['dex'] as const,
+const fighterRecommendation: AbilityScoreRecommendation = {
+  preferences: [
+    { ability: 'str', source: 'class', emphasis: 'primary', className: 'Fighter' },
+    { ability: 'dex', source: 'class', emphasis: 'secondary', className: 'Fighter' },
+  ],
   suggestedAssignment: { str: 15, dex: 14 },
 }
 
@@ -53,8 +59,10 @@ describe('buildAbilityRecommendationPanelModel', () => {
         abilityScoreOrder: ['str', 'dex', 'con', 'cha', 'wis', 'int'],
       },
       recommendation: {
-        primary: ['str'],
-        secondary: ['dex'],
+        preferences: [
+          { ability: 'str', source: 'class', emphasis: 'primary', className: 'Fighter' },
+          { ability: 'dex', source: 'class', emphasis: 'secondary', className: 'Fighter' },
+        ],
         suggestedAssignment: {
           str: 15,
           dex: 14,

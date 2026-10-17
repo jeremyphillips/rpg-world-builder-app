@@ -32,10 +32,7 @@ import {
 
 import type { ContentFormCtx } from '../../registry/content-form-registry'
 import { referenceEquipmentFieldOptions } from '../../../form-options/content-field-option.lib'
-import {
-  formatChooseContentTypePlaceholder,
-  getContentTypeItemLabel,
-} from '../../../content-type-labels'
+import { getContentTypeItemLabel, nounFromContentType } from '../../../content-type-labels'
 import {
   EQUIPMENT_GRANT_ITEM_KIND_LABELS,
   EQUIPMENT_GRANT_TARGET_SOURCE_LABELS,
@@ -338,9 +335,8 @@ export function grantedEquipmentItemFields(
           label: LINKED_PROFICIENCY_CHOICE_LABEL,
           options: proficiencyChoiceOptions,
           required: true,
-          placeholder: hasEligibleProficiencyChoices
-            ? 'Choose proficiency choice…'
-            : 'No eligible choices',
+          noun: { singular: 'proficiency choice', plural: 'proficiency choices' },
+          placeholder: hasEligibleProficiencyChoices ? undefined : 'No eligible choices',
           disabled: !hasEligibleProficiencyChoices,
           hint: hasEligibleProficiencyChoices
             ? PROFICIENCY_LINK_GRANT_HINT
@@ -370,7 +366,7 @@ export function grantedEquipmentItemFields(
           label: getContentTypeItemLabel('equipment'),
           options: equipmentOptions,
           multiple: false,
-          placeholder: formatChooseContentTypePlaceholder('equipment'),
+          noun: nounFromContentType('equipment'),
           required: true,
           width: 'full',
         },
@@ -403,7 +399,7 @@ export function grantedEquipmentItemFields(
     {
       type: 'switch',
       name: 'equipped',
-      label: 'Equipped by default',
+      label: 'Equipped',
       visibility: visibleForItemKind('grant', guard),
     },
   ]
@@ -450,7 +446,7 @@ export function equipmentChoiceGrantFields(
       label: getContentTypeItemLabel('equipment'),
       multiple: true,
       options: equipmentOptions,
-      placeholder: formatChooseContentTypePlaceholder('equipment'),
+      noun: nounFromContentType('equipment'),
       visibility: visibleForChoicePoolSource('explicit', guard),
     },
     {

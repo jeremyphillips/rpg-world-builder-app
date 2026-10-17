@@ -21,6 +21,7 @@ export const fieldGroupSummaryTriggerShellClasses = cn(
 export const fieldGroupSummaryTriggerSizeVariants = cva('', {
   variants: {
     size: {
+      xs: cn(fieldControlSizeClasses.xs, fieldGroupSummaryTriggerTypographyClasses),
       sm: cn(fieldControlSizeClasses.sm, fieldGroupSummaryTriggerTypographyClasses),
       md: cn(fieldControlSizeClasses.md, fieldGroupSummaryTriggerTypographyClasses),
       lg: cn(fieldControlSizeClasses.lg, fieldGroupSummaryTriggerTypographyClasses),

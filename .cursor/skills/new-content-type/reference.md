@@ -16,11 +16,14 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 | 1    | Contracts | `<type>.ts` schema, inputs, patch DTOs, tests, barrel export                                                                                              |
 | 1b   | Contracts | `CONTENT_TYPE_TERMS` entry; vocab maps if closed sets                                                                                                     |
 | 1c   | Contracts | `CONTENT_TYPE_CAPABILITIES` when duplication applies                                                                                                      |
-| 1d   | Contracts | Display fallback: `resolve-content-media-domain.ts` when type opts into `ContentMedia`; else `CONTENT_TYPE_NON_MEDIA_FALLBACK_SUBJECT` in `content-display-fallback.ts` + tests |
+| 1d   | Contracts | Media slice (`CONTENT_TYPE_MEDIA_DOMAIN`, `mediaBearingAuthoredContentBodySchema`, policies) **or** `CONTENT_TYPE_NON_MEDIA_FALLBACK_SUBJECT` + `content-display-fallback.test.ts` |
+| 1e   | Contracts | `HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS`, `CONTENT_ACCESS_CAPABILITIES` when sidebar/hub |
+| 1f   | Dashboard | `CONTENT_TYPE_PRESENTATION` (source badge vs suppressed) in `content-type-presentation.ts` |
 | 2    | Catalog   | Declare `catalog.bundledContent`; bundled types add seed JSON under `packages/catalog/src/<type>/data/srd-cc-5.2.1/`                                      |
 | 3    | Catalog   | Bundled types only: `index.ts` loaders + `index.test.ts`; `package.json` export. No-bundle types omit the package.                                        |
 | 4    | API       | Patch/homebrew Mongoose models when needed                                                                                                                |
-| 5    | API       | `<type>.config.ts` — imports `@rpg/catalog/<type>`                                                                                                        |
+| 5    | API       | `<type>.config.ts` — import `@rpg/catalog/<type>` only when `bundledContent: 'bundled'`                                                                 |
+| 5b   | API       | `CONTENT_PROJECTORS` + `defineContentUsage` registration                                                                                                  |
 | 6    | API       | One line in `content-types.ts`                                                                                                                            |
 | 7    | API       | List route — automatic after step 6 (no controller change)                                                                                                |
 | 8    | Dashboard | `api/<type>-api.ts` (or `createContentListApi` factory)                                                                                                   |
@@ -33,8 +36,10 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 | 15   | Dashboard | `CONTENT_ROUTES` entry in `app/content-routes.ts`                                                                                                         |
 | 16   | Dashboard | Lazy route exports in `app/lazy-routes.ts`                                                                                                                |
 | 17   | Dashboard | Router tree in `app/router.tsx`                                                                                                                           |
-| 18   | Dashboard | `VISIBLE_SIDEBAR_CONTENT` when `visibleInSidebar: true`                                                                                                   |
+| 18   | Dashboard | `VISIBLE_SIDEBAR_CONTENT` when `visibleInSidebar: true` (sync `HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS`)                                                     |
+| 18a  | Dashboard | `CAMPAIGN_SIDEBAR_CONTENT_SECTION` — Game Library vs World (`campaign-sidebar-content-section.ts`)                                                      |
 | 18b  | Dashboard | `sidebar-nav-icons.ts` — `contentIdentityIcon` for the catalog role; extend `icon-registry-identity-ban.test.ts` if adding alias consumers                |
+| 18c  | Dashboard | Global search: `globalSearchTargetSchema` + `resolve-global-search-href.ts`                                                                               |
 | —    | Dashboard | Authorable types: API `routeKey` mapping in `content-form-navigation.ts` for post-create edit navigation                                                  |
 | —    | Tests     | `content-form-test-registry.ts` import when form def exists                                                                                               |
 | 10b  | Dashboard | `factories/<type>.ts` + `CONTENT_TEST_FACTORY_REGISTRY` entry (synthetic `makeX`; catalog via `pickX`)                                                    |
@@ -88,6 +93,8 @@ use to narrow the list. User can always add columns later.
 | Full homebrew + custom read | `classes`             | `classes.config.ts`, `derive-classes-catalog`, subclass nested routes                                                     |
 | Multi-variant union         | `equipment`           | Family routes, discriminated union — [equipment README](../../../apps/dashboard/src/features/content/equipment/README.md) |
 | Resolution-heavy            | `spells`              | [spell-resolution skill](../spell-resolution/SKILL.md)                                                                    |
+| Campaign-authored + media   | `locations`           | `location-form-fields.ts`, `ContentDetailLayout`, no form `preview`                                                      |
+| Shared create projection    | `organizations`       | `organization-form-projection.ts` (form-lib exception), suppressed source presentation                                  |
 
 Dashboard sub-areas live under `apps/dashboard/src/features/content/<folder>/`.
 API configs under `apps/api/src/features/content/<type>/`. Catalog under
@@ -130,14 +137,15 @@ Query helpers (for drift tests): `@rpg/content-types` exports
 
 | Layer             | Location                                                             | Asserts                           |
 | ----------------- | -------------------------------------------------------------------- | --------------------------------- |
-| Tooling           | `tools/content-types/src/content-type-integration-manifest.test.ts`  | Manifest keys, path files exist   |
-| Contracts         | `packages/contracts/.../content-type-term-coverage.test.ts`          | Terms + capabilities ↔ keys       |
+| Tooling           | `tools/content-types/src/content-type-integration-manifest.test.ts`  | Manifest keys, paths, homebrew/API parity |
+| Contracts         | `content-type-term-coverage.test.ts`, `content-display-fallback.test.ts`, `content-type-presentation.test.ts`, `content-access-capabilities.test.ts`, `resolve-content-media-domain.test.ts` | Keys, terms, media/fallback maps |
 | Catalog           | `packages/catalog/src/content-type-integration-manifest.test.ts`     | Export subpaths                   |
-| API               | `apps/api/.../content-types.integration-manifest.test.ts`            | Registry ↔ manifest               |
-| Dashboard routes  | `apps/dashboard/src/app/content-routes.integration-manifest.test.ts` | `CONTENT_ROUTES` ↔ `routeSection` |
-| Dashboard sidebar | `apps/dashboard/.../content-registry.test.ts`                        | Sidebar ↔ `visibleInSidebar`      |
-| Dashboard forms   | `apps/dashboard/.../content-form-registry.test.ts`                   | Registry ↔ `formDefinitionPath`   |
-| Dashboard test factories | `apps/dashboard/src/test/fixtures/content-test-factory-registry.test.ts` | Registry ↔ `ContentTypeKey` |
+| API               | `content-types.integration-manifest.test.ts`, `content-usage-registrations.test.ts`, `apply-content-keys.test.ts` | Registry ↔ manifest, usage surfaces |
+| Dashboard routes  | `content-routes.integration-manifest.test.ts`                        | `CONTENT_ROUTES` ↔ `routeSection` |
+| Dashboard sidebar | `content-registry.test.ts`, `campaign-sidebar-content-section.test.ts`, `sidebar-nav-icons.test.ts` | Sidebar, section map, icons       |
+| Dashboard forms   | `content-form-registry.test.ts`, `content-managed-media-form-schemas.test.ts`, `content-form-preview-coverage.test.ts` | Forms, media, preview ↔ tabs      |
+| Dashboard test factories | `content-test-factory-registry.test.ts`                            | Registry ↔ `ContentTypeKey`       |
+| Entity / copy     | `entity-surface-config.guard.test.ts`, content-type copy drift     | Picker/detail surfaces, catalog nouns |
 
 Detail: [testing.md § Content test factories](../../../apps/dashboard/docs/testing.md#content-test-factories).
 
@@ -147,10 +155,12 @@ Detail: [testing.md § Content test factories](../../../apps/dashboard/docs/test
 
 | Registry          | Path                                                                  |
 | ----------------- | --------------------------------------------------------------------- |
-| Keys              | `packages/contracts/src/rpg/content/lib/content-type-keys.ts`         |
-| Terms             | `packages/contracts/src/rpg/content/lib/content-type-terms.ts`        |
+| Keys              | `packages/contracts/src/rpg/primitives/content/content-type-keys.ts`  |
+| Terms             | `packages/contracts/src/rpg/primitives/content/content-type-terms.ts` |
 | Capabilities      | `packages/contracts/src/rpg/content/lib/content-type-capabilities.ts` |
 | Homebrew hub keys | `packages/contracts/src/rpg/content/lib/homebrew-summary.ts`          |
+| Media opt-in      | `packages/contracts/src/rpg/primitives/media/resolve-content-media-domain.ts` |
+| Source presentation | `apps/dashboard/src/features/content/lib/content-type-presentation.ts` |
 
 ---
 
@@ -176,7 +186,7 @@ Detail: [testing.md § Content test factories](../../../apps/dashboard/docs/test
 | ----------------------------------------------- | ------------------------------------------- |
 | Nested resource manifest                        | Deferred — subclasses documented separately |
 | Campaign availability server persistence        | Deferred                                    |
-| `locations` / `monsters` dashboard placeholders | Not registered types                        |
+| `monsters` dashboard scaffold                 | Not a `ContentTypeKey` — folder only        |
 | Scaffold CLI                                    | Future — reads integration manifest         |
 
 ---

@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import {
   type EquipmentBudgetSummary,
   type EquipmentPickerBrowseSortContext,
@@ -95,6 +97,10 @@ export type EquipmentPickerViewDefaults = {
 export type EquipmentPickerDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
+  /** Overrides the default choice-set heading (for example loadout "Add equipment"). */
+  title?: ReactNode
+  /** Overrides the default picker description. */
+  description?: ReactNode
   items: readonly EquipmentPickerRow[]
   browseSortContext?: EquipmentPickerBrowseSortContext
   budget?: EquipmentBudgetSummary
@@ -128,6 +134,8 @@ export type EquipmentPickerDrawerProps = {
   onCommitAdd: (item: EquipmentPickerItem) => boolean | void
   /** Sets the aggregate editable purchased quantity for an item. */
   onSetPurchasedQuantity?: (item: EquipmentPickerItem, total: number) => void
+  /** Neutral alias for loadout mode — adjusts the plain stack quantity. */
+  onSetRowQuantity?: (item: EquipmentPickerItem, total: number) => void
   onReleaseChoice?: (item: EquipmentPickerItem, allowanceId: string) => void
   onRemovePurchaseOne?: (item: EquipmentPickerItem) => void
 }

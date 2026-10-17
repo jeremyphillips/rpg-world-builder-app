@@ -6,6 +6,7 @@ import {
   getSenseLabel,
   getSenseSentenceForm,
   senseIdSchema,
+  senseDraftSchema,
   senseSchema,
 } from './sense'
 
@@ -30,13 +31,19 @@ describe('senseSchema', () => {
   })
 })
 
+describe('senseDraftSchema', () => {
+  it('allows missing range during authoring', () => {
+    expect(senseDraftSchema.parse({ type: 'darkvision' })).toEqual({ type: 'darkvision' })
+  })
+})
+
 describe('sense vocabulary', () => {
   it('registers the sense option set id', () => {
     expect(SENSE_SET_ID).toBe('senses')
   })
 
   it('exposes standard sense range presets for UI', () => {
-    expect(SENSE_RANGES).toEqual([10, 30, 60, 90, 120])
+    expect(SENSE_RANGES).toEqual([10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120])
   })
 
   it('returns title-cased slug labels', () => {

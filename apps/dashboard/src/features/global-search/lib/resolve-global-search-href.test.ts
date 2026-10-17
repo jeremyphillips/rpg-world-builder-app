@@ -47,6 +47,9 @@ describe('resolveGlobalSearchHref', () => {
         id: 'item-1',
       }),
     ).toBe('/campaigns/campaign-1/equipment/weapons/item-1')
+    expect(resolveGlobalSearchHref(campaignId, { kind: 'monster', id: 'kobold-1' })).toBe(
+      '/campaigns/campaign-1/monsters/kobold-1',
+    )
   })
 })
 

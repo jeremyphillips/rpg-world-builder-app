@@ -1,4 +1,4 @@
-import { abilityModifier } from '../character/derive/index'
+import { abilityModifier } from './ability-modifier'
 
 // ---------------------------------------------------------------------------
 // Initiative — creature-scoped default (DEX modifier unless a feature overrides).

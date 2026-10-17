@@ -18,6 +18,7 @@ import type { ContentDisplayImage } from '@rpg/contracts'
 
 import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
 import { buildOrganizationContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
+import { entitySurfaceMetadataLine } from '../../lib/entity/summary/entity-surface-metadata.lib'
 import type { EntitySurfaceIdentity } from '../../lib/entity/summary/entity-surface-identity.types'
 import type { PickerSelectionStateLineModel } from '../../lib/entity/summary/picker-selection-state-line.types'
 import type { EntitySummaryStatusItem } from '../../lib/entity/summary/entity-summary-status.types'
@@ -85,20 +86,19 @@ export function buildOrganizationEntitySummaryVm(
 export function buildOrganizationEntityCardModel(
   vm: OrganizationEntitySummaryVm,
   options: {
-    metadata?: string
+    metadata?: readonly string[]
     status?: readonly EntitySummaryStatusItem[]
     selectionState?: PickerSelectionStateLineModel
   } = {},
 ): EntitySurfaceIdentity {
+  const metadata =
+    options.metadata !== undefined ? entitySurfaceMetadataLine(options.metadata) : undefined
+
   return {
     heading: vm.name,
     fallback: 'organization',
     classification: getOrganizationDomainLabel(vm.organizationDomain),
-    ...(options.metadata !== undefined
-      ? options.metadata
-        ? { metadata: options.metadata }
-        : {}
-      : {}),
+    ...(metadata ? { metadata } : {}),
     ...(options.status && options.status.length > 0 ? { status: options.status } : {}),
     ...(options.selectionState ? { selectionState: options.selectionState } : {}),
     ...(vm.displayImage ? { displayImage: vm.displayImage } : {}),

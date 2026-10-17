@@ -27,10 +27,10 @@ const MOUNT_MIDDLE_COLUMNS: ColumnDef<MountEquipment>[] = [
   costColumn<MountEquipment>(),
 ]
 
-export const mountFilterSchema = buildContentFilterSchema<MountRow, MountOverviewFilterState>(
-  'equipment',
-  [],
-)
+export const mountOverviewFilterSchema = buildContentFilterSchema<
+  MountRow,
+  MountOverviewFilterState
+>('equipment', [])
 
 /** Mount column definitions with the name cell linked to the detail page. */
 export function mountColumns(

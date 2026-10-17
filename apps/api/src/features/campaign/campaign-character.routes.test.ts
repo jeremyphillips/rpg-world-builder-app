@@ -655,6 +655,87 @@ describe('PATCH /api/campaigns/:campaignId/characters/:characterId/status', () =
   })
 })
 
+describe('PATCH /api/campaigns/:campaignId/characters/:characterId/ability-scores', () => {
+  it('allows a campaign manager to patch one ability score', async () => {
+    const owner = await registerOwner('campaign-char-ability-owner@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Ability Score Campaign',
+    )
+    const characterId = await seedParticipatingPc({
+      campaignId,
+      ownerAgent: owner.agent,
+      ownerCsrfToken: owner.csrfToken,
+      ownerUserId: owner.userId,
+    })
+
+    const response = await owner.agent
+      .patch(`/api/campaigns/${campaignId}/characters/${characterId}/ability-scores`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ ability: 'str', score: 18 })
+      .expect(200)
+
+    expect(response.body.character.abilityScores.str).toBe(18)
+  })
+
+  it('forbids a campaign pc from patching ability scores', async () => {
+    const owner = await registerOwner('campaign-char-ability-pc-owner@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Ability Score PC Campaign',
+    )
+
+    const player = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'campaign-char-ability-pc@example.com',
+      campaignRole: 'pc',
+    })
+    const playerCharacterId = await createCharacter(player.agent, player.csrfToken, 'Player PC')
+    await seedCharacterParticipation({ campaignId, characterId: playerCharacterId })
+
+    await player.agent
+      .patch(`/api/campaigns/${campaignId}/characters/${playerCharacterId}/ability-scores`)
+      .set(CSRF_HEADER, player.csrfToken)
+      .send({ ability: 'str', score: 18 })
+      .expect(403)
+  })
+
+  it('rejects out-of-range and unknown ability scores', async () => {
+    const owner = await registerOwner('campaign-char-ability-invalid@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Ability Score Invalid Campaign',
+    )
+    const characterId = await seedParticipatingPc({
+      campaignId,
+      ownerAgent: owner.agent,
+      ownerCsrfToken: owner.csrfToken,
+      ownerUserId: owner.userId,
+    })
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/characters/${characterId}/ability-scores`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ ability: 'str', score: 0 })
+      .expect(400)
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/characters/${characterId}/ability-scores`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ ability: 'str', score: 21 })
+      .expect(400)
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/characters/${characterId}/ability-scores`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ ability: 'unknown', score: 10 })
+      .expect(400)
+  })
+})
+
 describe('GET /api/characters/:characterId/routing-context', () => {
   it('returns openCampaign for the owner with open participation', async () => {
     const owner = await registerOwner('routing-context-owner@example.com')

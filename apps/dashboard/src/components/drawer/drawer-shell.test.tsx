@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { Button } from '@rpg/ui'
+import { ActionIcon, Button } from '@rpg/ui'
 
 import { DrawerShell } from './drawer-shell'
 
@@ -76,6 +76,31 @@ describe('DrawerShell', () => {
     )
 
     expect(screen.getByRole('dialog', { name: 'Add item' })).toHaveClass('bg-background')
+  })
+
+  it('renders entityContext in a band below the title row and keeps description', () => {
+    render(
+      <DrawerShell
+        open
+        onOpenChange={() => undefined}
+        title="Edit item"
+        description="Task guidance"
+        headerLeading={
+          <span data-testid="back-icon">
+            <ActionIcon action="back" />
+          </span>
+        }
+        entityContext={<p data-testid="entity-band">Shortsword</p>}
+      >
+        <p>Drawer body</p>
+      </DrawerShell>,
+    )
+
+    expect(screen.getByTestId('back-icon')).toBeInTheDocument()
+    expect(screen.getByText('Task guidance')).toBeInTheDocument()
+    const entityBand = screen.getByTestId('entity-band')
+    expect(entityBand).toBeInTheDocument()
+    expect(entityBand.closest('[class*="bg-surface-subtle"]')).toBeTruthy()
   })
 
   it('allows surface override', () => {

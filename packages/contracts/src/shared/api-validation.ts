@@ -1,3 +1,5 @@
+import type { z } from 'zod'
+
 import { isApiError } from './errors'
 
 /** Stable issue code for invalid pagination cursors in hand-built API validation payloads. */
@@ -11,6 +13,35 @@ export type ApiValidationIssue = {
 
 export type ApiValidationDetails = {
   issues: ApiValidationIssue[]
+}
+
+/** Maps Zod issues onto the API validation payload, including `code`. */
+export function toApiValidationIssues(
+  issues: readonly { path: readonly PropertyKey[]; message: string; code: string }[],
+): ApiValidationIssue[] {
+  return issues.map((issue) => ({
+    path: issue.path.map(String).join('.'),
+    message: issue.message,
+    code: issue.code,
+  }))
+}
+
+/** Maps a dotted API path onto Zod path segments (numeric indices stay numbers). */
+export function apiValidationPathToZodPath(path: string): Array<string | number> {
+  return path.split('.').map((segment) => (/^\d+$/.test(segment) ? Number(segment) : segment))
+}
+
+/** Adds a structured API validation issue to a Zod superRefine context. */
+export function addApiValidationIssueToRefinement(
+  ctx: z.RefinementCtx,
+  issue: ApiValidationIssue,
+): void {
+  ctx.addIssue({
+    code: 'custom',
+    message: issue.message,
+    path: apiValidationPathToZodPath(issue.path),
+    params: { code: issue.code },
+  })
 }
 
 export function isApiValidationDetails(value: unknown): value is ApiValidationDetails {

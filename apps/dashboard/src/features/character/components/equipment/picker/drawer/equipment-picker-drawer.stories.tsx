@@ -147,9 +147,38 @@ export const OwnedStackable: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Owned stackables show an owned-count badge and Add in the header row.',
+        story: 'A purchased stack shows Owned, then Purchased and the slice total.',
       },
     },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText('Owned')).toBeInTheDocument()
+    await expect(canvas.getByText('Purchased · 2 GP')).toBeInTheDocument()
+    await expect(canvas.queryByText('Owned · Owned')).not.toBeInTheDocument()
+  },
+}
+
+export const LoadoutOwned: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: [equipmentPickerItemsFixture[0]!],
+    workflowMode: 'loadout',
+    workflowModes: ['loadout'],
+    resolveRowActionViewModel: () => ({
+      kind: 'loadout',
+      ownedQuantity: 1,
+      plainQuantity: 1,
+      customizedQuantity: 0,
+    }),
+    onCommitAdd: () => undefined,
+    onSetRowQuantity: () => undefined,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getAllByText('Owned')).toHaveLength(1)
+    await expect(canvas.queryByText('Purchased')).not.toBeInTheDocument()
   },
 }
 

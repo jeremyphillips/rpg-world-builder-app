@@ -8,6 +8,7 @@ import {
   type CampaignAccessAvailabilityContextValue,
   type CampaignAccessFormContextValue,
 } from './campaign-access-form-state'
+import { campaignAccessPatchesEqual } from './campaign-access-state'
 
 export type {
   CampaignAccessAvailabilityContextValue,
@@ -37,10 +38,19 @@ export function CampaignAccessFormProvider({ children }: { children: ReactNode }
     resetRef.current = bindings.reset
     readPendingAvailableRef.current = bindings.readPendingAvailable
     readAccessAvailabilityChangedRef.current = bindings.readAccessAvailabilityChanged
-    setSnapshot({
-      isDirty: bindings.isDirty,
-      isPending: bindings.isPending,
-      pendingAccess: bindings.pendingAccess,
+    setSnapshot((previous) => {
+      if (
+        previous.isDirty === bindings.isDirty &&
+        previous.isPending === bindings.isPending &&
+        campaignAccessPatchesEqual(previous.pendingAccess, bindings.pendingAccess)
+      ) {
+        return previous
+      }
+      return {
+        isDirty: bindings.isDirty,
+        isPending: bindings.isPending,
+        pendingAccess: bindings.pendingAccess,
+      }
     })
   }, [])
 

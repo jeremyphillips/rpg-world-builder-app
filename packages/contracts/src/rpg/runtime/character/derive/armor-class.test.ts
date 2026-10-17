@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { armorBodySchema } from '../../../content/equipment'
+import { toEquippedArmorPiece } from '../../creature/armor-class'
 import {
   bodyArmorAc,
   dexModifierForArmor,
@@ -89,6 +90,11 @@ const shield = armorBodySchema.parse({
   stealthDisadvantage: false,
 })
 
+const leatherPiece = toEquippedArmorPiece(leatherArmor)
+const chainMailPiece = toEquippedArmorPiece(chainMail)
+const halfPlatePiece = toEquippedArmorPiece(halfPlate)
+const shieldPiece = toEquippedArmorPiece(shield)
+
 describe('dexModifierForArmor', () => {
   it('caps medium armor DEX bonus', () => {
     expect(dexModifierForArmor(4, halfPlate)).toBe(2)
@@ -102,17 +108,17 @@ describe('dexModifierForArmor', () => {
 
 describe('bodyArmorAc', () => {
   it('adds full DEX to light armor', () => {
-    expect(bodyArmorAc(leatherArmor, 2)).toBe(13)
+    expect(bodyArmorAc(leatherPiece, 2)).toBe(13)
   })
 
   it('ignores DEX on heavy armor', () => {
-    expect(bodyArmorAc(chainMail, 3)).toBe(16)
+    expect(bodyArmorAc(chainMailPiece, 3)).toBe(16)
   })
 })
 
 describe('shieldAcBonus', () => {
   it('returns the shield bonus', () => {
-    expect(shieldAcBonus(shield)).toBe(2)
+    expect(shieldAcBonus(shieldPiece)).toBe(2)
   })
 })
 
@@ -122,7 +128,7 @@ describe('resolveEquippedArmorClass', () => {
       resolveEquippedArmorClass({
         acBase: 10,
         dexModifier: 2,
-        equippedArmor: [shield],
+        equippedArmor: [shieldPiece],
       }),
     ).toBe(14)
   })
@@ -132,7 +138,7 @@ describe('resolveEquippedArmorClass', () => {
       resolveEquippedArmorClass({
         acBase: 10,
         dexModifier: 3,
-        equippedArmor: [halfPlate, shield],
+        equippedArmor: [halfPlatePiece, shieldPiece],
       }),
     ).toBe(19)
   })
@@ -142,7 +148,7 @@ describe('resolveEquippedArmorClass', () => {
       resolveEquippedArmorClass({
         acBase: 10,
         dexModifier: 2,
-        equippedArmor: [leatherArmor, shield],
+        equippedArmor: [leatherPiece, shieldPiece],
       }),
     ).toBe(15)
   })

@@ -290,7 +290,7 @@ export function buildLocationAuthoringTypeComboboxOptions(): FieldOption[] {
       for (const id of [...STRUCTURE_TYPE_IDS, UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE]) {
         options.push({
           ...structureAuthoringTypeOption(id),
-          filterCategory: family.id,
+          filterValues: { family: family.id },
         })
       }
       continue
@@ -301,7 +301,7 @@ export function buildLocationAuthoringTypeComboboxOptions(): FieldOption[] {
       if (isDeferredLocationAuthoringType(authoringType)) continue
       options.push({
         ...nonStructureKindOption(kind),
-        filterCategory: family.id,
+        filterValues: { family: family.id },
       })
     }
   }

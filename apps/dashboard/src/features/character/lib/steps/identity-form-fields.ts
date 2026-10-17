@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { ReactNode } from 'react'
 import {
-  ALIGNMENTS,
+  CHARACTER_ALIGNMENTS,
   CHARACTER_GENDERS,
   characterBuilderValidationMessages,
   formatFieldMessage,
@@ -39,8 +39,8 @@ export const identityFormSchema = z.object({
 export type IdentityFormValues = z.infer<typeof identityFormSchema>
 
 const ALIGNMENT_LABELS = Object.fromEntries(
-  ALIGNMENTS.map((alignment) => [alignment, getAlignmentLabel(alignment)]),
-) as Record<(typeof ALIGNMENTS)[number], string>
+  CHARACTER_ALIGNMENTS.map((alignment) => [alignment, getAlignmentLabel(alignment)]),
+) as Record<(typeof CHARACTER_ALIGNMENTS)[number], string>
 
 const GENDER_LABELS = Object.fromEntries(
   CHARACTER_GENDERS.map((gender) => [gender, getGenderLabel(gender)]),
@@ -138,7 +138,7 @@ export function buildIdentityStepFormFields({
           name: 'alignment',
           label: 'Alignment',
           multiple: false,
-          options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
+          options: toOptions(CHARACTER_ALIGNMENTS, ALIGNMENT_LABELS),
           width: 'full',
         },
       ],

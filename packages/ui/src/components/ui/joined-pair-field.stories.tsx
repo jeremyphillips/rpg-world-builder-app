@@ -148,6 +148,7 @@ export const ClassReference: Story = {
         ),
         propsLabel: `size="${spec.size}"`,
         className: spec.className,
+        keyValues: `control height: ${spec.controlHeight}`,
         notes: spec.useCase,
       }))}
     />

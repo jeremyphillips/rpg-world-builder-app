@@ -1,6 +1,10 @@
 import * as React from 'react'
 
-import { catalogNounFromContentType, formatChoiceSetDrawerHeading } from '@rpg/contracts'
+import {
+  catalogNounFromContentType,
+  formatChoiceSetDrawerHeading,
+  formatEquipmentLoadoutPickerHeading,
+} from '@rpg/contracts'
 import { resourceIcon, SegmentedControl, type ResourceIconRole } from '@rpg/ui'
 
 import { CatalogEntityPickerSheet } from '@/features/content'
@@ -38,15 +42,18 @@ import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equi
 const equipmentNoun = catalogNounFromContentType('equipment')
 const EQUIPMENT_PICKER_WORKFLOW_GROUP_LABEL = `${equipmentNoun.label} picker workflow`
 const EQUIPMENT_PICKER_DESCRIPTION = 'Search the catalog and add items to your loadout.'
+export const EQUIPMENT_PICKER_LOADOUT_DESCRIPTION =
+  "Search the catalog and add items to this creature's equipment."
 const EQUIPMENT_PICKER_MODE_LABELS = {
   purchase: 'Purchase',
   magic_items: 'Magic items',
+  loadout: 'Loadout',
 } as const satisfies Record<EquipmentPickerWorkflowMode, string>
 
 const EQUIPMENT_PICKER_MODE_ICON_ROLES = {
   purchase: 'currency',
   magic_items: 'magicItem',
-} as const satisfies Record<EquipmentPickerWorkflowMode, ResourceIconRole>
+} as const satisfies Record<'purchase' | 'magic_items', ResourceIconRole>
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
@@ -86,9 +93,12 @@ function EquipmentPickerToolbarActions({
 }
 
 /** Equipment catalog drawer — domain composition over `CatalogEntityPickerSheet`. */
+// fallow-ignore-next-line complexity
 export function EquipmentPickerDrawer({
   open,
   onOpenChange,
+  title,
+  description,
   items,
   browseSortContext,
   budget,
@@ -108,9 +118,21 @@ export function EquipmentPickerDrawer({
   resolveRowActionViewModel,
   onCommitAdd,
   onSetPurchasedQuantity,
+  onSetRowQuantity,
   onReleaseChoice,
   onRemovePurchaseOne,
 }: EquipmentPickerDrawerProps) {
+  const setRowQuantity = onSetRowQuantity ?? onSetPurchasedQuantity
+  const resolvedTitle =
+    title ??
+    (workflowMode === 'loadout'
+      ? formatEquipmentLoadoutPickerHeading()
+      : formatChoiceSetDrawerHeading('equipment'))
+  const resolvedDescription =
+    description ??
+    (workflowMode === 'loadout'
+      ? EQUIPMENT_PICKER_LOADOUT_DESCRIPTION
+      : EQUIPMENT_PICKER_DESCRIPTION)
   const picker = useEquipmentPickerController({
     items,
     browseSortContext,
@@ -142,7 +164,8 @@ export function EquipmentPickerDrawer({
         value={workflowMode}
         onValueChange={(value) => onWorkflowModeChange(value as EquipmentPickerWorkflowMode)}
         options={workflowModes.map((mode) => {
-          const Icon = resourceIcon(EQUIPMENT_PICKER_MODE_ICON_ROLES[mode])
+          const iconRole = mode === 'loadout' ? 'currency' : EQUIPMENT_PICKER_MODE_ICON_ROLES[mode]
+          const Icon = resourceIcon(iconRole)
           return {
             value: mode,
             label: EQUIPMENT_PICKER_MODE_LABELS[mode],
@@ -173,8 +196,14 @@ export function EquipmentPickerDrawer({
     <CatalogEntityPickerSheet
       open={open}
       onOpenChange={onOpenChange}
-      title={formatChoiceSetDrawerHeading('equipment')}
-      description={EQUIPMENT_PICKER_DESCRIPTION}
+      title={
+        typeof resolvedTitle === 'string' ? resolvedTitle : formatEquipmentLoadoutPickerHeading()
+      }
+      description={
+        typeof resolvedDescription === 'string'
+          ? resolvedDescription
+          : EQUIPMENT_PICKER_LOADOUT_DESCRIPTION
+      }
       items={picker.filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
@@ -255,7 +284,7 @@ export function EquipmentPickerDrawer({
             isGoldShoppingPath={isGoldShoppingPath}
             budget={picker.effectiveBudget}
             onCommitAdd={() => picker.handleHeaderCommit(item)}
-            onSetPurchasedQuantity={(total) => onSetPurchasedQuantity?.(item, total)}
+            onSetPurchasedQuantity={(total) => setRowQuantity?.(item, total)}
             onReleaseChoice={(allowanceId) => onReleaseChoice?.(item, allowanceId)}
             onRemovePurchaseOne={() => onRemovePurchaseOne?.(item)}
           />

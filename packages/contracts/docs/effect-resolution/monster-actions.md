@@ -1,10 +1,10 @@
 # Effect resolution — monster actions
 
-**Status:** stub — monster stat blocks are not yet modeled in contracts.
+**Status:** stat-block actions are modeled in `content/monster/action.ts` (`weapon`, `natural-weapon`, `special`). Structured effect resolution attachment remains future work.
 
 ## Expected attachment (TBD)
 
-Per-action `resolution` on monster action blocks.
+Per-action `resolution` on monster action blocks (see [monster-stat-blocks.md](../monster-stat-blocks.md) for derived attack lines today).
 
 ## Inherited from base
 

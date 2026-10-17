@@ -4,6 +4,8 @@ import {
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
   CHARACTER_ABILITY_SCORE_MAX,
+  NEUTRAL_ABILITY_SCORE,
+  neutralAbilityScores,
   abilitySchema,
   abilityScoreSchema,
   buildGroupedSpellcastingAbilityOptions,
@@ -37,6 +39,20 @@ describe('abilityScoreSchema', () => {
     expect(abilityScoreSchema.safeParse(0).success).toBe(false)
     expect(abilityScoreSchema.safeParse(ABILITY_SCORE_MAX + 1).success).toBe(false)
     expect(abilityScoreSchema.safeParse(10.5).success).toBe(false)
+  })
+})
+
+describe('neutralAbilityScores', () => {
+  it('sets every ability to the modifier-zero score', () => {
+    expect(abilityScoreSchema.parse(NEUTRAL_ABILITY_SCORE)).toBe(NEUTRAL_ABILITY_SCORE)
+    expect(neutralAbilityScores()).toEqual({
+      str: NEUTRAL_ABILITY_SCORE,
+      dex: NEUTRAL_ABILITY_SCORE,
+      con: NEUTRAL_ABILITY_SCORE,
+      int: NEUTRAL_ABILITY_SCORE,
+      wis: NEUTRAL_ABILITY_SCORE,
+      cha: NEUTRAL_ABILITY_SCORE,
+    })
   })
 })
 

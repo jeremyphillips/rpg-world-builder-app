@@ -17,4 +17,4 @@ export type RowAnatomyCellSpec<C extends string = RowColumn> =
   | { slot: 'meta'; column: RowAnatomySecondaryColumn }
   | { slot: 'status'; column: RowAnatomySecondaryColumn }
   | { slot: 'full'; column: C }
-  | { slot: 'stretch'; column: 'trailing' }
+  | { slot: 'stretch'; column: C }

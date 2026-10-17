@@ -21,6 +21,7 @@ import {
 
 /** @deprecated Prefer {@link resolveFieldGroupCaretSlotClass} — caret width lives in field-group.css. */
 export const selectCaretSlotWidthClasses = {
+  xs: resolveFieldGroupCaretSlotClass(),
   sm: resolveFieldGroupCaretSlotClass(),
   md: resolveFieldGroupCaretSlotClass(),
   lg: resolveFieldGroupCaretSlotClass(),

@@ -1,3 +1,4 @@
+import { createElement } from 'react'
 import { z, type RefinementCtx } from 'zod'
 import {
   ABILITY_ENTRIES,
@@ -13,26 +14,30 @@ import {
   armorCategorySchema,
   fieldValidationMessages,
   getProficiencyDomainSentenceForm,
+  proficiencyDomainFieldNoun,
   skillSchema,
   toolCategorySchema,
   weaponCategorySchema,
 } from '@rpg/contracts'
-import { COMBOBOX_FILTER_ALL_VALUE, toOptions, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import { modeDependentGrantSetField } from '@/lib/forms/mode-dependent-grant-set-form-fields'
-
+import { armorProficiencyGrantSetField } from '@/lib/forms/grant-sets/armor-proficiency-grant-field'
+import { equipmentProficiencyGrantComboboxConfig } from '@/lib/forms/grant-sets/equipment-proficiency-grant-combobox-config.lib'
+import { weaponProficiencyGrantSetField } from '@/lib/forms/grant-sets/weapon-proficiency-grant-field'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import { resolveContentWeaponGrantOptionLabel } from '../../lib/forms/grants/content-weapon-grant-option-label.lib'
+import { referenceSkillFieldOptions } from '../../lib/form-options/content-field-option.lib'
 import {
-  referenceSkillFieldOptions,
-  referenceToolFieldOptions,
-  referenceWeaponFieldOptions,
-} from '../../lib/form-options/content-field-option.lib'
-import { WEAPON_PROFICIENCY_MODES, type WeaponProficiencyMode } from './class-form-constants'
+  ARMOR_PROFICIENCY_MODES,
+  type ArmorProficiencyMode,
+  type WeaponProficiencyMode,
+} from './class-form-constants'
 import {
+  ARMOR_PROFICIENCY_MODE_LABELS,
   INDIVIDUAL_WEAPONS_TOGGLE_HINT,
   WEAPON_PROFICIENCIES_HINT,
-  WEAPON_PROFICIENCY_MODE_LABELS,
 } from './class-form-labels'
+import { ClassWeaponProficiencyReconciliationField } from '../components/class-weapon-proficiency-reconciliation-field'
 
 const abilityOptions = toOptions(
   ABILITY_IDS,
@@ -68,7 +73,10 @@ const toolCategoryOptions = toOptions(
 
 export const proficienciesFormSchema = z.object({
   savingThrows: z.array(abilitySchema).min(1).max(2),
-  armor: z.array(armorCategorySchema),
+  armor: z.object({
+    categories: z.array(armorCategorySchema),
+    items: z.array(z.string()).optional(),
+  }),
   weapons: z.object({
     categories: z.array(weaponCategorySchema),
     items: z.array(z.string()).optional(),
@@ -87,14 +95,57 @@ export const proficienciesDraftFormSchema = proficienciesFormSchema.extend({
   savingThrows: z.array(abilitySchema).max(2).default([]),
 })
 
+export function refineClassArmorProficiencies(
+  values: {
+    armorProficiencyMode: ArmorProficiencyMode
+    proficiencies: z.infer<typeof proficienciesFormSchema>
+  },
+  ctx: RefinementCtx,
+): void {
+  const { armorProficiencyMode, proficiencies } = values
+
+  if (armorProficiencyMode === 'categories') {
+    if (proficiencies.armor.categories.length === 0) {
+      addCustomRefinementIssue(
+        ctx,
+        fieldValidationMessages.minSelections({ itemLabel: 'armor training category' }),
+        ['proficiencies', 'armor', 'categories'],
+      )
+    }
+    return
+  }
+
+  if ((proficiencies.armor.items ?? []).length === 0) {
+    addCustomRefinementIssue(
+      ctx,
+      fieldValidationMessages.minSelections({ itemLabel: 'armor choice' }),
+      ['proficiencies', 'armor', 'items'],
+    )
+  }
+}
+
 export function refineClassWeaponProficiencies(
   values: {
     weaponProficiencyMode: WeaponProficiencyMode
+    weaponProficiencyReconciliationPending?: boolean
     proficiencies: z.infer<typeof proficienciesFormSchema>
   },
   ctx: RefinementCtx,
 ): void {
   const { weaponProficiencyMode, proficiencies } = values
+
+  if (values.weaponProficiencyReconciliationPending) {
+    addCustomRefinementIssue(
+      ctx,
+      'Resolve stored weapon proficiencies by choosing a weapon proficiency mode.',
+      ['weaponProficiencyMode'],
+    )
+    return
+  }
+
+  if (weaponProficiencyMode === 'none') {
+    return
+  }
 
   if (weaponProficiencyMode === 'categories') {
     if (proficiencies.weapons.categories.length === 0) {
@@ -121,6 +172,9 @@ const grantedToolProficienciesLegend = `Granted ${getProficiencyDomainSentenceFo
 
 export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
   const skillOptions = referenceSkillFieldOptions(ctx.options?.skills)
+  const armorCombobox = equipmentProficiencyGrantComboboxConfig(ctx.options?.equipment, 'armor')
+  const weaponCombobox = equipmentProficiencyGrantComboboxConfig(ctx.options?.equipment, 'weapon')
+  const toolCombobox = equipmentProficiencyGrantComboboxConfig(ctx.options?.equipment, 'tool')
 
   const defensesGroup: FormItem = {
     kind: 'group',
@@ -140,12 +194,24 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         },
         separator: 'subtle',
       },
-      {
-        type: 'chips',
-        name: 'proficiencies.armor',
-        label: 'Armor training',
-        options: armorCategoryOptions,
-      },
+      armorProficiencyGrantSetField({
+        modeFieldName: 'armorProficiencyMode',
+        modes: ARMOR_PROFICIENCY_MODES,
+        modeLabels: ARMOR_PROFICIENCY_MODE_LABELS,
+        categoriesPath: 'proficiencies.armor.categories',
+        itemsPath: 'proficiencies.armor.items',
+        label: 'Armor proficiency mode',
+        categoryOptions: armorCategoryOptions,
+        itemOptions: armorCombobox.itemOptions,
+        itemsCombobox: armorCombobox.itemsCombobox,
+        categoriesLabel: 'Armor training',
+        itemsLabel: 'Specific armor',
+        categoryMode: 'categories',
+        specificMode: 'specific',
+        labelVisibility: 'srOnly',
+        categoriesRequired: true,
+        itemsRequired: true,
+      }),
     ],
   }
 
@@ -153,21 +219,25 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     kind: 'group',
     legend: 'Weapons',
     fields: [
-      modeDependentGrantSetField({
+      {
+        kind: 'slot',
+        name: 'weaponProficiencyReconciliation',
+        render: () => createElement(ClassWeaponProficiencyReconciliationField),
+      },
+      weaponProficiencyGrantSetField({
         modeFieldName: 'weaponProficiencyMode',
-        modes: WEAPON_PROFICIENCY_MODES,
-        modeLabels: WEAPON_PROFICIENCY_MODE_LABELS,
         categoriesPath: 'proficiencies.weapons.categories',
         itemsPath: 'proficiencies.weapons.items',
         label: 'Weapon proficiency mode',
         hint: { text: INDIVIDUAL_WEAPONS_TOGGLE_HINT, position: 'below-control' },
         categoryOptions: weaponCategoryOptions,
-        itemOptions: referenceWeaponFieldOptions(ctx.options?.equipment),
+        itemOptions: weaponCombobox.itemOptions,
+        itemsCombobox: weaponCombobox.itemsCombobox,
+        resolveOptionLabel: (value) =>
+          resolveContentWeaponGrantOptionLabel(value, ctx.options, ctx.equipmentCatalogById),
         categoriesLabel: 'Weapon proficiencies',
         itemsLabel: 'Weapon choices',
         categoriesHint: WEAPON_PROFICIENCIES_HINT,
-        categoryMode: 'categories',
-        specificMode: 'individual',
         labelVisibility: 'srOnly',
         categoriesRequired: true,
         itemsRequired: true,
@@ -203,15 +273,10 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         type: 'combobox',
         name: 'proficiencies.tools.items',
         label: 'Specific tools',
+        noun: proficiencyDomainFieldNoun('tool'),
         multiple: true,
-        options: referenceToolFieldOptions(ctx.options?.equipment),
-        filterSelect: {
-          ariaLabel: 'Filter by tool category',
-          options: [
-            { value: COMBOBOX_FILTER_ALL_VALUE, label: 'All categories' },
-            ...toolCategoryOptions,
-          ],
-        },
+        options: toolCombobox.itemOptions,
+        filterSelects: toolCombobox.itemsCombobox.filterSelects,
         width: 'full',
       },
     ],

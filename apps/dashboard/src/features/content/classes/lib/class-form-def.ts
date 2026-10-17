@@ -25,6 +25,8 @@ import {
 } from './class-form-fields'
 import { buildClassSpellSelectionValueSyncs } from './class-spell-selection-form.lib'
 import { buildClassSpellcastingValueSyncs } from './class-spellcasting-value-syncs'
+import { weaponProficiencyModeFromGrantSet } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
+
 import {
   buildClassCreateInput,
   classCreateDefaultValues,
@@ -108,9 +110,21 @@ const classFormDef: ContentFormDef<
         spellbookAcquisitionCurve: acquisition.curve,
       }
     })(),
-    weaponProficiencyMode:
-      entity.proficiencies && (entity.proficiencies.weapons.items?.length ?? 0) > 0
-        ? 'individual'
+    ...(() => {
+      const weapons = entity.proficiencies?.weapons ?? { categories: [], items: [] }
+      const weaponMode = weaponProficiencyModeFromGrantSet({
+        categories: weapons.categories ?? [],
+        items: weapons.items ?? [],
+      })
+      return {
+        weaponProficiencyMode:
+          weaponMode.kind === 'mixed' ? ('categories' as const) : weaponMode.mode,
+        weaponProficiencyReconciliationPending: weaponMode.kind === 'mixed',
+      }
+    })(),
+    armorProficiencyMode:
+      entity.proficiencies && (entity.proficiencies.armor.items?.length ?? 0) > 0
+        ? 'specific'
         : 'categories',
     spellcasting: spellcastingToFormValues(entity.spellcasting),
     proficiencies: entity.proficiencies

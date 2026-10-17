@@ -383,7 +383,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
             identity: buildCharacterEntityCardModel(
               buildConnectedPartyCharacterEntitySummary(character),
               {
-                metadata: !hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined,
+                metadata: !hasAvailableKind ? [CHARACTER_DRAWER_FULLY_LINKED_REASON] : undefined,
               },
             ),
             inlineAction: buildCatalogToggleSelectInlineAction({

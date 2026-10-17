@@ -1,17 +1,20 @@
 import type { ReactNode, Ref } from 'react'
 
 import type { FieldSize } from './field.client'
+import type { ResolveComboboxOptionLabel } from './combobox-field.lib'
 
 export interface ComboboxFieldOption {
   label: string
   value: string
   disabled?: boolean
+  /** Shown in the panel when the option is disabled (e.g. cross-list defense exclusion). */
+  disabledReason?: string
   /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
   metadata?: string
   /** Optional classification shown inline after the label (`Name · Classification`). */
   classification?: string
-  /** Category slug matched by panel category filters (not shown in the row UI). */
-  filterCategory?: string
+  /** Dimension slugs for panel filters (not shown in the row UI). */
+  filterValues?: Readonly<Record<string, string>>
   /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
   searchTerms?: readonly string[]
 }
@@ -59,6 +62,8 @@ export interface ComboboxFieldControlProps {
   loading?: boolean
   size: FieldSize
   placeholder: string
+  /** Open-panel search input placeholder; derived from `noun` when omitted at the field shell. */
+  searchPlaceholder?: string
   emptyMessage: string
   /** When false, the panel omits the search row and keyboard nav targets the listbox. */
   enableSearch?: boolean
@@ -67,6 +72,8 @@ export interface ComboboxFieldControlProps {
   renderOption?: ComboboxRenderOption
   /** Custom filter/rank for panel options; selected values must remain visible when set. */
   resolveFilteredOptions?: ResolveComboboxFilteredOptions
+  /** Labels for selected values missing from `options` (e.g. stale catalog slugs). */
+  resolveOptionLabel?: ResolveComboboxOptionLabel
   /** Optional filter row below search — hosts own filter UI and state. */
   filter?: React.ReactNode
   clearable?: boolean

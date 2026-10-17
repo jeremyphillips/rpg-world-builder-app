@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mechanics-patch'
 
+import { toEquippedArmorPiece } from '../../creature/armor-class'
+
 import { resolveArmorClassIfEquipped } from './preview-equipped-armor'
 
 const leatherArmor = {
@@ -34,7 +36,7 @@ describe('resolveArmorClassIfEquipped', () => {
       resolveArmorClassIfEquipped({
         acBase: DEFAULT_ARMOR_CLASS_BASE,
         dexModifier: 3,
-        currentEquippedArmor: [leatherArmor],
+        currentEquippedArmor: [toEquippedArmorPiece(leatherArmor)],
         candidateArmor: chainMail,
       }),
     ).toBe(16)
@@ -45,7 +47,7 @@ describe('resolveArmorClassIfEquipped', () => {
       resolveArmorClassIfEquipped({
         acBase: DEFAULT_ARMOR_CLASS_BASE,
         dexModifier: 3,
-        currentEquippedArmor: [leatherArmor],
+        currentEquippedArmor: [toEquippedArmorPiece(leatherArmor)],
         candidateArmor: shield,
       }),
     ).toBe(16)

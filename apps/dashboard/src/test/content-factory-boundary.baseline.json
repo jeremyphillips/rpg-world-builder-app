@@ -1,3 +1,53 @@
 {
-  "violations": []
+  "violations": [
+    {
+      "file": "features/content/monsters/lib/actions/monster-action-editors.test.ts",
+      "kind": "type-assertion",
+      "type": "Equipment",
+      "line": 152,
+      "fingerprint": "70a1cc1355a762de"
+    },
+    {
+      "file": "features/content/monsters/lib/actions/monster-action-editors.test.ts",
+      "kind": "type-assertion",
+      "type": "Equipment",
+      "line": 158,
+      "fingerprint": "12d923911dfcf76c"
+    },
+    {
+      "file": "features/content/monsters/lib/equipment/monster-equipment-catalog-change.test.ts",
+      "kind": "type-assertion",
+      "type": "Equipment",
+      "line": 12,
+      "fingerprint": "60b697a6706dda45"
+    },
+    {
+      "file": "features/content/monsters/lib/equipment/monster-equipment-catalog-change.test.ts",
+      "kind": "type-assertion",
+      "type": "Equipment",
+      "line": 13,
+      "fingerprint": "99fa3ae7cf949041"
+    },
+    {
+      "file": "features/content/monsters/lib/equipment/monster-equipment-catalog-change.test.ts",
+      "kind": "type-assertion",
+      "type": "Equipment",
+      "line": 14,
+      "fingerprint": "09910c5ecb0cda2c"
+    },
+    {
+      "file": "features/content/monsters/lib/equipment/monster-equipment-catalog-change.test.ts",
+      "kind": "type-assertion",
+      "type": "Equipment",
+      "line": 15,
+      "fingerprint": "5474229bf99ab45d"
+    },
+    {
+      "file": "features/content/monsters/lib/equipment/monster-equipment-catalog-change.test.ts",
+      "kind": "type-assertion",
+      "type": "Equipment",
+      "line": 16,
+      "fingerprint": "920a8e434537edd4"
+    }
+  ]
 }

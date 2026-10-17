@@ -164,14 +164,16 @@ describe('deriveAbilityScoreRecommendations', () => {
     expect(deriveAbilityScoreRecommendations([], [15, 14, 13, 12, 10, 8])).toBeNull()
   })
 
-  it('derives primary and secondary abilities from a single class', () => {
+  it('derives ability preferences from a single class', () => {
     const result = deriveAbilityScoreRecommendations([
       { className: 'Fighter', primaryAbilities: ['str', 'dex'] },
     ])
 
     expect(result).toEqual({
-      primary: ['str'],
-      secondary: ['dex'],
+      preferences: [
+        { ability: 'str', source: 'class', emphasis: 'primary', className: 'Fighter' },
+        { ability: 'dex', source: 'class', emphasis: 'secondary', className: 'Fighter' },
+      ],
     })
   })
 
@@ -219,8 +221,7 @@ describe('deriveAbilityScoreRecommendations', () => {
     ])
 
     expect(result).toEqual({
-      primary: ['int'],
-      secondary: [],
+      preferences: [{ ability: 'int', source: 'class', emphasis: 'primary', className: 'Wizard' }],
     })
     expect(result?.suggestedAssignment).toBeUndefined()
   })

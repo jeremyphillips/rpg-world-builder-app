@@ -2,7 +2,6 @@
 
 import { CatalogFilterChips } from '../components/ui/catalog-filter-chips.client'
 import { Button } from '../components/ui/button.client'
-import { Checkbox } from '../components/ui/checkbox.client'
 import { FilterPopover } from '../components/ui/filter-popover.client'
 import { Input } from '../components/ui/input.client'
 import { SearchBar } from '../components/ui/search-bar.client'
@@ -11,7 +10,7 @@ import { cn } from '../lib/utils'
 import { useFilterChrome } from './filter-chrome.context'
 import { isFilterFieldDisabled, resolveFilterPopoverSizerLabels } from './filter-bar.lib'
 import { resolveChipsFieldOptions, resolvePopoverFieldGroups } from './filter-field-options.lib'
-import { FilterInlineControl } from './filter-inline-control.client'
+import { BooleanField } from '../components/ui/boolean-field.client'
 import {
   resolveFilterFieldPresentation,
   resolveFilterFieldWidthClasses,
@@ -309,28 +308,20 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
   const isChecked = state[booleanField.id] === true
 
   return (
-    <FilterInlineControl
+    <BooleanField
+      id={controlId}
+      label={booleanField.label}
       className={presentation.groupClassName}
-      variant={presentation.shellVariant}
-    >
-      <Checkbox
-        id={controlId}
-        checked={isChecked}
-        disabled={disabled}
-        onCheckedChange={(checked) => {
-          onValueChange(
-            booleanField.id,
-            (checked === true ? true : undefined) as TState[typeof booleanField.id] | undefined,
-          )
-        }}
-      />
-      <label
-        htmlFor={controlId}
-        className={cn(presentation.labelClassName, 'cursor-pointer font-medium leading-snug')}
-      >
-        {booleanField.label}
-      </label>
-    </FilterInlineControl>
+      toolbarAlign
+      checked={isChecked}
+      disabled={disabled}
+      onCheckedChange={(checked) => {
+        onValueChange(
+          booleanField.id,
+          (checked ? true : undefined) as TState[typeof booleanField.id] | undefined,
+        )
+      }}
+    />
   )
 }
 

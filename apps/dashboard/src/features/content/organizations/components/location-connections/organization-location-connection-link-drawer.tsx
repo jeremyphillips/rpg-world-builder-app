@@ -7,7 +7,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { getOrganizationLocationConnectionDisplayLabel } from '@rpg/contracts'
-import { Button, Heading, SelectionSummaryCard, SelectionSummaryChangeAction, Text } from '@rpg/ui'
+import { Button, Heading, Text } from '@rpg/ui'
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 import type { ContentCreateContext } from '@/lib/create-flow'
@@ -35,6 +35,7 @@ import {
 } from '../../../locations/lib/location-display'
 import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context'
+import { DrawerDecisionSummary } from '../../../lib/relationship/drawer/drawer-decision-summary'
 import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.types'
 import { ENTITY_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
@@ -62,7 +63,6 @@ import {
   ORGANIZATION_DRAWER_KIND_FIELD_LABELS,
   ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS,
   RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL,
-  RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW,
   type OrganizationConnectionDrawerIntent,
   filterLocationsForOrganizationKind,
   locationEligibleForOrganizationKind,
@@ -675,23 +675,20 @@ function OrganizationLocationConnectionLinkDrawerContent({
               />
             ) : null}
             {showKindSummary && selectedKindOption ? (
-              <SelectionSummaryCard
-                eyebrow={RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW}
+              <DrawerDecisionSummary
                 rows={[
                   {
+                    id: 'kind',
                     label: kindFieldLabel,
                     value: selectedKindOption.label,
-                    onValueClick: startEditingKind,
+                    decisionId: 'kind',
+                    onNavigate: startEditingKind,
+                    changeLabel: RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL,
                     valueActionAriaLabel: kindChangeAriaLabel,
-                    action: (
-                      <SelectionSummaryChangeAction
-                        changeLabel={RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL}
-                        ariaLabel={kindChangeAriaLabel}
-                        onChange={startEditingKind}
-                      />
-                    ),
                   },
                 ]}
+                activeDecisionId={showKindField ? 'kind' : null}
+                defaultChangeLabel={RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL}
               />
             ) : null}
             {mode === 'changeTarget' &&
@@ -829,7 +826,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
                 excludeConnectionId,
               })
             const isSelected = selectedLocationId === location.id
-            const metadata = !kindAvailable ? fullyLinkedReason : undefined
+            const metadata = !kindAvailable ? [fullyLinkedReason] : undefined
 
             return {
               identity: summary

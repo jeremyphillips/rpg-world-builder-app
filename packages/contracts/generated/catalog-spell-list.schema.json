@@ -95,6 +95,7 @@
                 "blinded",
                 "charmed",
                 "deafened",
+                "exhaustion",
                 "frightened",
                 "grappled",
                 "incapacitated",
@@ -107,7 +108,7 @@
                 "stunned",
                 "unconscious"
               ],
-              "description": "blinded | charmed | deafened | frightened | grappled | incapacitated | invisible | paralyzed | petrified | poisoned | prone | restrained | stunned | unconscious"
+              "description": "blinded | charmed | deafened | exhaustion | frightened | grappled | incapacitated | invisible | paralyzed | petrified | poisoned | prone | restrained | stunned | unconscious"
             }
           },
           "roles": {

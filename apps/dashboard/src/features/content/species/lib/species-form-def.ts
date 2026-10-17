@@ -1,6 +1,11 @@
 import { type CreateSpeciesInput, type Species } from '@rpg/contracts'
+import type { FormValueSync } from '@rpg/ui/form'
 
 import { allowedCharacterCreatureTypesFromCtx } from './creature-type-field-options'
+import {
+  movementRowsIncludeFly,
+  type MovementRowDraftFormValues,
+} from '../../lib/forms/fields/content-movement-form-fields'
 import {
   contentFormRegistry,
   contentFormFields,
@@ -29,6 +34,22 @@ import {
 } from './species-preview-projection'
 import { SpeciesPreviewPlayerHost } from './species-preview-player-host'
 
+function buildSpeciesFormValueSyncs(): FormValueSync[] {
+  return [
+    {
+      dependsOn: ['movement'],
+      apply: (values, changedKeys) => {
+        if (!changedKeys.includes('movement')) return undefined
+        const movement = values.movement as MovementRowDraftFormValues[] | undefined
+        if (!movementRowsIncludeFly(movement) && values.hover !== undefined) {
+          return { hover: undefined }
+        }
+        return undefined
+      },
+    },
+  ]
+}
+
 const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesInput> = {
   routeKey: 'species',
   ...managedMediaFormDefFields('species'),
@@ -48,6 +69,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
 
   buildTabs: buildSpeciesTabs,
   buildFields: (ctx) => contentFormFields(speciesFormDef, ctx),
+  valueSyncs: buildSpeciesFormValueSyncs,
 
   toFormValues: speciesToFormValues,
 

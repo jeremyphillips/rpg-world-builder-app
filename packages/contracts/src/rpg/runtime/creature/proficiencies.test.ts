@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
+import type { CreatureWeaponProficiencies } from '../../content/creature'
 import type { Equipment } from '../../content/equipment'
 import type { SkillProficiency } from '../../content/skill-proficiency'
+import { equipmentSchema } from '../../content/equipment'
 import {
   armorPoolChoiceOptions,
+  creatureWeaponProficiencyGrantSetFromTargets,
+  creatureWeaponProficiencyTargetsFromGrantSet,
   isToolProficient,
+  isWeaponProficient,
+  isWeaponProficientFromGrantSet,
   listArmorMatchingPool,
   listSkillsMatchingPool,
   listToolsMatchingPool,
@@ -226,5 +232,70 @@ describe('listArmorMatchingPool', () => {
         }),
       ),
     ).toEqual([{ id: leatherArmor.id, label: 'Leather Armor' }])
+  })
+})
+
+describe('creature weapon proficiency grant set helpers', () => {
+  const dagger = equipmentSchema.parse({
+    id: 'srd-cc-5.2.1:dagger',
+    slug: 'dagger',
+    rulesetId: 'srd-cc-5.2.1',
+    source: 'system',
+    campaignId: null,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    name: 'Dagger',
+    description: '',
+    cost: { amount: 1, currency: 'gp' },
+    weight: { value: 1, unit: 'lb' },
+    kind: 'weapon',
+    category: 'simple',
+    mode: 'melee',
+    properties: ['finesse', 'light'],
+    mastery: 'nick',
+    damage: { dice: { count: 1, faces: 4 } },
+    damageType: 'piercing',
+  }) as Extract<Equipment, { kind: 'weapon' }>
+
+  it('expands grant sets to sorted category rows then sorted item rows', () => {
+    expect(
+      creatureWeaponProficiencyTargetsFromGrantSet({
+        categories: ['martial', 'simple'],
+        items: ['srd-cc-5.2.1:shortbow', 'srd-cc-5.2.1:dagger'],
+      }),
+    ).toEqual([
+      { weaponCategory: 'martial' },
+      { weaponCategory: 'simple' },
+      { weaponId: 'srd-cc-5.2.1:dagger' },
+      { weaponId: 'srd-cc-5.2.1:shortbow' },
+    ])
+  })
+
+  it('folds target rows into a deduped sorted grant set', () => {
+    expect(
+      creatureWeaponProficiencyGrantSetFromTargets([
+        { weaponId: 'srd-cc-5.2.1:shortbow' },
+        { weaponCategory: 'simple' },
+        { weaponId: 'srd-cc-5.2.1:dagger' },
+        { weaponCategory: 'simple' },
+      ]),
+    ).toEqual({
+      categories: ['simple'],
+      items: ['srd-cc-5.2.1:dagger', 'srd-cc-5.2.1:shortbow'],
+    })
+  })
+
+  it('matches weapons from grant sets and target rows consistently', () => {
+    const grant: CreatureWeaponProficiencies = {
+      categories: ['simple'],
+      items: ['srd-cc-5.2.1:dagger'],
+    }
+    expect(isWeaponProficientFromGrantSet(dagger, grant)).toBe(true)
+    expect(isWeaponProficient(dagger, creatureWeaponProficiencyTargetsFromGrantSet(grant))).toBe(
+      true,
+    )
+    expect(isWeaponProficientFromGrantSet(dagger, { categories: ['martial'], items: [] })).toBe(
+      false,
+    )
   })
 })

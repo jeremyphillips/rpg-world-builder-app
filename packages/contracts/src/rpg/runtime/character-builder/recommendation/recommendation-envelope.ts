@@ -10,7 +10,14 @@ import type { RecommendationSourceRef } from './recommendation-source-ref'
 /** Ranking-only proficiency provenance. Not an equipment reason and not a badge. */
 export const ABILITY_FIT_RECOMMENDATION_REASON = 'abilityFit' as const
 
-export const PROFICIENCY_RECOMMENDATION_REASONS = [ABILITY_FIT_RECOMMENDATION_REASON] as const
+export const MATCHES_EQUIPPED_WEAPON_RECOMMENDATION_REASON = 'matchesEquippedWeapon' as const
+export const MATCHES_OWNED_WEAPON_RECOMMENDATION_REASON = 'matchesOwnedWeapon' as const
+
+export const PROFICIENCY_RECOMMENDATION_REASONS = [
+  ABILITY_FIT_RECOMMENDATION_REASON,
+  MATCHES_EQUIPPED_WEAPON_RECOMMENDATION_REASON,
+  MATCHES_OWNED_WEAPON_RECOMMENDATION_REASON,
+] as const
 
 export type ProficiencyRecommendationReason = (typeof PROFICIENCY_RECOMMENDATION_REASONS)[number]
 

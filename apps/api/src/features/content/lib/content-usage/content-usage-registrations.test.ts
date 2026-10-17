@@ -1,20 +1,17 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { CONTENT_USAGE_SURFACE_KEYS, defineContentUsage } from './define-content-usage'
 import {
   CONTENT_USAGE_REGISTRATIONS,
   getContentUsageRegistration,
 } from './content-usage-registrations'
-import { defineContentUsage } from './define-content-usage'
 import type { ContentUsageSource } from './content-usage-source'
-import {
-  assertContentUsageRegistrationCoverage,
-  EXPECTED_CONTENT_USAGE_SURFACES,
-} from './content-usage-resolvers'
+import { assertContentUsageRegistrationCoverage } from './content-usage-resolvers'
 
 describe('content usage registrations', () => {
   it('registers every expected content usage surface', () => {
     const keys = Object.keys(CONTENT_USAGE_REGISTRATIONS).sort()
-    expect(keys).toEqual([...EXPECTED_CONTENT_USAGE_SURFACES].sort())
+    expect(keys).toEqual([...CONTENT_USAGE_SURFACE_KEYS].sort())
   })
 
   it('assertContentUsageRegistrationCoverage passes for the current registry', () => {
@@ -26,6 +23,11 @@ describe('content usage registrations', () => {
       if (!registration) continue
       if (registration.contentType === 'locations') {
         expect(registration.overviewUsageScope).toBe('complete')
+        continue
+      }
+      if (registration.contentType === 'monsters') {
+        expect(registration.sources.some((source) => source.entry)).toBe(true)
+        expect(registration.sources.some((source) => source.batch)).toBe(false)
         continue
       }
       expect(registration.overviewUsageScope).toBe('characters')

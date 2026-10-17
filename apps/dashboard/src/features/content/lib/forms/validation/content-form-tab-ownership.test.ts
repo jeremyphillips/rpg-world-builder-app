@@ -39,6 +39,7 @@ const TAB_OWNERSHIP_EXEMPT: Readonly<Record<string, readonly string[]>> = {
   feats: ['slug'],
   locations: ['slug'],
   'skill-proficiencies': ['slug', 'examples'],
+  monsters: ['slug'],
 }
 
 function publishSchemaTopLevelKeys(def: AnyDef, ctx: Record<string, unknown>): string[] {

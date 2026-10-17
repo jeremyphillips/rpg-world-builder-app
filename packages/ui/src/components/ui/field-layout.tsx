@@ -8,12 +8,16 @@ import { hasActiveFieldChrome } from './field-chrome.variants'
 import type { FieldControlBand } from './field-control-band.variants'
 import { FieldControlRegion, FieldLabelRegion, FieldMessageRegion } from './field-anatomy-regions'
 import { resolveFieldPresentation } from './field-row-presentation.lib'
-import { fieldLabelHintStackClasses, type FieldHintPosition } from './field.variants'
+import type { FieldHintPosition } from './field.variants'
 import { cn } from '../../lib/utils'
+import { FieldLayoutLabelRegionContent } from './field-layout-label-region.client'
+import { resolveFieldLayoutRecommendation } from './field-recommendation.lib'
+import type { FieldLayoutRecommendation } from './field-recommendation.types'
 
 export interface FieldLayoutProps {
   hintPosition?: FieldHintPosition
   label: ReactNode
+  recommendation?: FieldLayoutRecommendation | null
   control: ReactElement | ReactNode
   /**
    * When false, `control` is rendered as-is (e.g. Select with an internal
@@ -42,6 +46,7 @@ export interface FieldLayoutProps {
 export function FieldLayout({
   hintPosition = 'below-label',
   label,
+  recommendation,
   control,
   wrapControl = true,
   chrome,
@@ -49,6 +54,7 @@ export function FieldLayout({
   controlBand = 'single-line',
   labelVisibility = 'visible',
 }: FieldLayoutProps) {
+  const resolvedRecommendation = resolveFieldLayoutRecommendation(hintPosition, recommendation)
   const showVisibleLabel = Boolean(label) && labelVisibility !== 'srOnly'
   const presentation = resolveFieldPresentation({
     size,
@@ -71,23 +77,16 @@ export function FieldLayout({
     </div>
   )
 
-  const labelRegionContent =
-    hintPosition === 'below-label' ? (
-      showVisibleLabel ? (
-        <div className={fieldLabelHintStackClasses}>
-          {label}
-          <Field.Hint />
-        </div>
-      ) : (
-        <Field.Hint />
-      )
-    ) : showVisibleLabel ? (
-      label
-    ) : null
-
   const regions = (
     <>
-      <FieldLabelRegion size={size}>{labelRegionContent}</FieldLabelRegion>
+      <FieldLabelRegion size={size}>
+        <FieldLayoutLabelRegionContent
+          hintPosition={hintPosition}
+          showVisibleLabel={showVisibleLabel}
+          label={label}
+          recommendation={resolvedRecommendation}
+        />
+      </FieldLabelRegion>
       <FieldControlRegion>{bandedControl}</FieldControlRegion>
       <FieldMessageRegion size={size}>
         <Field.DerivedMeta />

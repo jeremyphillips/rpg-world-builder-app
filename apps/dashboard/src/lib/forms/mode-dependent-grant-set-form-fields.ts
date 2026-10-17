@@ -1,4 +1,7 @@
+import type { FieldNoun } from '@rpg/contracts'
+
 import {
+  type ComboboxFieldConfig,
   type DependentChrome,
   type FieldConfig,
   type FieldOption,
@@ -23,6 +26,15 @@ export type DependentPresentationOptions = {
   chrome?: DependentChrome
 }
 
+export type GrantSetItemsComboboxConfig = Pick<
+  ComboboxFieldConfig,
+  | 'filterSelects'
+  | 'optionsResolve'
+  | 'resolveFilteredOptions'
+  | 'recommendation'
+  | 'recommendationResolve'
+>
+
 export type ModeDependentGrantSetFieldOptions = {
   modeFieldName: string
   modes: readonly string[]
@@ -35,6 +47,8 @@ export type ModeDependentGrantSetFieldOptions = {
   itemOptions: FieldOption[]
   categoriesLabel?: string
   itemsLabel?: string
+  /** Domain noun for generated closed/search copy on the items combobox (independent of `itemsLabel`). */
+  itemsNoun?: FieldNoun
   categoriesHint?: FieldConfig['hint']
   itemsHint?: FieldConfig['hint']
   categoryMode: string
@@ -48,6 +62,9 @@ export type ModeDependentGrantSetFieldOptions = {
   dependents?: DependentPresentationOptions
   categoriesRequired?: boolean
   itemsRequired?: boolean
+  renderSelectedItem?: ComboboxFieldConfig['renderSelectedItem']
+  resolveOptionLabel?: ComboboxFieldConfig['resolveOptionLabel']
+  itemsCombobox?: GrantSetItemsComboboxConfig
 }
 
 function visibleWhenGrantMode(modeFieldName: string, mode: string): FieldVisibility {
@@ -78,15 +95,19 @@ function grantSetDependentFields(options: ModeDependentGrantSetFieldOptions): Fo
     itemOptions,
     categoriesLabel = 'Categories',
     itemsLabel = 'Specific items',
+    itemsNoun,
     categoriesHint,
     itemsHint,
     categoryMode,
     specificMode,
     categoriesRequired,
     itemsRequired,
+    renderSelectedItem,
+    resolveOptionLabel,
+    itemsCombobox,
   } = options
 
-  return [
+  const fields: FormItem[] = [
     {
       type: 'chips',
       name: categoriesPath,
@@ -96,18 +117,25 @@ function grantSetDependentFields(options: ModeDependentGrantSetFieldOptions): Fo
       ...(categoriesRequired ? { required: true } : {}),
       visibility: visibleWhenGrantMode(modeFieldName, categoryMode),
     },
-    {
-      type: 'combobox',
-      name: itemsPath,
-      label: itemsLabel,
-      ...(itemsHint ? { hint: itemsHint } : {}),
-      multiple: true,
-      options: itemOptions,
-      width: 'full',
-      ...(itemsRequired ? { required: true } : {}),
-      visibility: visibleWhenGrantMode(modeFieldName, specificMode),
-    },
   ]
+
+  fields.push({
+    type: 'combobox',
+    name: itemsPath,
+    label: itemsLabel,
+    ...(itemsNoun ? { noun: itemsNoun } : {}),
+    ...(itemsHint ? { hint: itemsHint } : {}),
+    multiple: true,
+    options: itemOptions,
+    width: 'full',
+    ...(itemsCombobox ?? {}),
+    ...(renderSelectedItem ? { renderSelectedItem } : {}),
+    ...(resolveOptionLabel ? { resolveOptionLabel } : {}),
+    ...(itemsRequired ? { required: true } : {}),
+    visibility: visibleWhenGrantMode(modeFieldName, specificMode),
+  })
+
+  return fields
 }
 
 /** Shared mode radio + dependent grant-set editors. */

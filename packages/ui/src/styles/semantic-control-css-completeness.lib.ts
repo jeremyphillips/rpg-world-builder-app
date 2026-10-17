@@ -182,11 +182,9 @@ const BUTTON_APPEARANCE_REQUIRED = ['background-color', 'color'] as const
 const BUTTON_LABELED_SIZE_REQUIRED = ['height', 'gap'] as const
 const BUTTON_ICON_SIZE_REQUIRED = ['width', 'height'] as const
 
-const FIELD_CONTROL_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+const FIELD_CONTROL_SIZE_MODIFIERS = ['xs', 'sm', 'md', 'lg'] as const
 const FIELD_CONTROL_MULTILINE_MODIFIERS = ['multiline-sm', 'multiline-md', 'multiline-lg'] as const
-const FIELD_CONTROL_DIGITS_MODIFIERS = ['digits-sm', 'digits-md', 'digits-lg'] as const
-const FIELD_CONTROL_FILTER_APPEARANCE_MODIFIERS = ['filter-outline', 'filter-ghost'] as const
-
+const FIELD_CONTROL_DIGITS_MODIFIERS = ['digits-xs', 'digits-sm', 'digits-md', 'digits-lg'] as const
 const FIELD_CONTROL_SIZE_REQUIRED = [
   'height',
   'padding-inline',
@@ -204,8 +202,6 @@ const FIELD_CONTROL_MULTILINE_REQUIRED = [
 ] as const
 
 const FIELD_CONTROL_DIGITS_REQUIRED = ['padding-inline-start', 'padding-inline-end'] as const
-
-const FIELD_CONTROL_FILTER_APPEARANCE_REQUIRED = ['background-color', 'border-color'] as const
 
 const FIELD_CONTROL_TRIGGER_FLOW_MODIFIERS = [
   'trigger-fill',
@@ -263,7 +259,7 @@ const COMPACT_CONTROL_ICON_REQUIRED = ['width', 'height'] as const
 
 const COMPACT_CONTROL_STEPPER_REQUIRED = ['width', 'height'] as const
 
-const FIELD_GROUP_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+const FIELD_GROUP_SIZE_MODIFIERS = ['xs', 'sm', 'md', 'lg'] as const
 
 const FIELD_GROUP_SIZE_REQUIRED = [
   '--ui-field-group-height',
@@ -291,6 +287,7 @@ const INTERACTIVE_ROW_HOVER_MODIFIERS = [
   'hover-navigation',
   'hover-selected',
   'hover-surface',
+  'hover-list',
 ] as const
 
 const INTERACTIVE_ROW_SELECTED_MODIFIERS = [
@@ -369,10 +366,6 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       ...FIELD_CONTROL_DIGITS_MODIFIERS.map((name) => ({
         modifierPrefix: `ui-field-control--${name}`,
         requiredProperties: FIELD_CONTROL_DIGITS_REQUIRED,
-      })),
-      ...FIELD_CONTROL_FILTER_APPEARANCE_MODIFIERS.map((name) => ({
-        modifierPrefix: `ui-field-control--${name}`,
-        requiredProperties: FIELD_CONTROL_FILTER_APPEARANCE_REQUIRED,
       })),
       ...FIELD_CONTROL_TRIGGER_FLOW_MODIFIERS.map((name) => ({
         modifierPrefix: `ui-field-control--${name}`,

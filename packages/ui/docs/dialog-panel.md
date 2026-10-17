@@ -9,6 +9,7 @@ scrim (`modalOverlayVariants` / `bg-overlay`).
 ```text
 dialog-parts.client.tsx     Header, Close, dismiss handlers (header padding SSOT;
                             shared dialogTitle headline default for Modal + Sheet)
+dialog-panel-header-nav-button.client.tsx  Header back affordance (Modal/Sheet leadIcon)
 dialog-panel.variants.ts    Section inset, body, footer chrome, action row helper
 modal.variants.ts           ModalSize + centered panel shell (background only)
 sheet.variants.ts           SheetSize, SheetSurface, dock placement only
@@ -49,24 +50,26 @@ media keep the pinned header + scrolling body anatomy unchanged.
 
 ## Shared tokens (`dialog-panel.variants.ts`)
 
-| Token                                          | Role                                                                                                                      |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `dialogPanelSectionPaddingClasses`             | Canonical `p-6` section inset                                                                                             |
-| `dialogPanelSectionInsetXClasses`              | Horizontal slice (`px-6`) for managed Form content                                                                        |
-| `dialogPanelBodyVariants`                      | Clip shell — inner `DialogPanelScrollRegion` owns scroll                                                                  |
-| `dialogPanelStableBodyVariants`                | Stable shell (`px-6`, clip) — child uses `inset="inner"` or `inset="innerLeading"`                                        |
-| `dialogPanelStableBodyClipVariants`            | Stable clip shell without `px-6` — section inset on child scrollports or pinned chrome wrappers (`CreateModalShell`)      |
-| `dialogPanelSectionScrollViewportClasses`      | Section scrollport preset (`px-6` + `pt-5` + `pb-6`) — default Body / `externalFooter`                                    |
-| `dialogPanelInnerScrollViewportClasses`        | Inner scrollport preset (`ps-1` + `pe-2.5` + `pb-6`) — below pinned chrome in section-inset shell                         |
-| `dialogPanelInnerLeadingScrollViewportClasses` | Leading inner preset — inner scroll chrome + `pt-5` as first content below header border                                  |
-| `dialogPanelScrollRegionClasses`               | Deprecated alias for inner scroll region layout + inner preset                                                            |
-| `dialogPanelSectionSeparatorBorderClasses`     | Shared faint separator color for header/footer section borders (`border-border-faint`)                                    |
-| `dialogPanelHeaderClasses`                     | Overlay header section chrome (`border-b` + separator token + `px-6 pt-6 pb-4`; title typography on `DialogPanelHeader`)  |
-| `dialogPanelHeaderLeadRowClasses`              | Leading icon + copy row when `DialogPanelHeader.leadIcon` is set (`gap-4` / 16px)                                         |
-| `dialogPanelHeaderCopyStackClasses`            | Title/description stack beside a header lead icon                                                                         |
-| `dialogPanelHeaderHeadlineStackClasses`        | Headline row → supporting description (`gap-0.5` / 2px)                                                                   |
-| `dialogPanelFooterClasses`                     | Overlay footer section chrome (`border-t` + separator token + `px-6` + `py-4`; no fill)                                   |
-| `dialogPanelActionRowClasses`                  | Action row flex helper — prefer `Modal.FooterActions` under Modal.Footer; `DialogPanelActionRow` for Sheet / form publish |
+| Token                                          | Role                                                                                                                                           |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dialogPanelSectionPaddingClasses`             | Canonical `p-6` section inset                                                                                                                  |
+| `dialogPanelSectionInsetXClasses`              | Horizontal slice (`px-6`) for managed Form content                                                                                             |
+| `dialogPanelBodyVariants`                      | Clip shell — inner `DialogPanelScrollRegion` owns scroll                                                                                       |
+| `dialogPanelStableBodyVariants`                | Stable shell (`px-6`, clip) — child uses `inset="inner"` or `inset="innerLeading"`                                                             |
+| `dialogPanelStableBodyClipVariants`            | Stable clip shell without `px-6` — section inset on child scrollports or pinned chrome wrappers (`CreateModalShell`)                           |
+| `dialogPanelSectionScrollViewportClasses`      | Section scrollport preset (`px-6` + `pt-5` + `pb-6`) — default Body / `externalFooter`                                                         |
+| `dialogPanelInnerScrollViewportClasses`        | Inner scrollport preset (`ps-1` + `pe-2.5` + `pb-6`) — below pinned chrome in section-inset shell                                              |
+| `dialogPanelInnerLeadingScrollViewportClasses` | Leading inner preset — inner scroll chrome + `pt-5` as first content below header border                                                       |
+| `dialogPanelScrollRegionClasses`               | Deprecated alias for inner scroll region layout + inner preset                                                                                 |
+| `dialogPanelSectionSeparatorBorderClasses`     | Shared faint separator color for header/footer section borders (`border-border-faint`)                                                         |
+| `dialogPanelHeaderClasses`                     | Overlay header section chrome (`border-b` + separator token + `px-6 pt-6 pb-4`; title typography on `DialogPanelHeader`)                       |
+| `dialogPanelHeaderLeadRowClasses`              | Leading icon + copy row when `DialogPanelHeader.leadIcon` is set (`items-center`, `gap-4`)                                                     |
+| `DialogPanelHeaderNavButton`                   | Interactive header back control (shared `dialogPanelHeaderIconControlClasses` + responsive header glyph); decorative leads use `IconContainer` |
+| `DialogCloseButton`                            | Panel dismiss — same icon control chrome and glyph scale as header back                                                                        |
+| `dialogPanelHeaderCopyStackClasses`            | Title/description stack beside a header lead icon                                                                                              |
+| `dialogPanelHeaderHeadlineStackClasses`        | Headline row → supporting description (`gap-0.5` / 2px)                                                                                        |
+| `dialogPanelFooterClasses`                     | Overlay footer section chrome (`border-t` + separator token + `px-6` + `py-4`; no fill)                                                        |
+| `dialogPanelActionRowClasses`                  | Action row flex helper — prefer `Modal.FooterActions` under Modal.Footer; `DialogPanelActionRow` for Sheet / form publish                      |
 
 **Do not** extract header padding into dialog-panel — `DialogPanelHeader` already owns it.
 **Do not** add Form-specific horizontal padding SSOTs; managed Form inset derives from

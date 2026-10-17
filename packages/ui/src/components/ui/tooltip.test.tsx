@@ -3,7 +3,9 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { overlayArrowPath } from './popover-content.variants'
 import { Button } from './button.client'
+import { Checkbox } from './checkbox.client'
 import {
   InfoTooltip,
   Tooltip,
@@ -40,6 +42,45 @@ describe('InfoTooltip', () => {
     )
 
     expect(screen.getByRole('button', { name: 'Action' })).toHaveClass('cursor-pointer')
+  })
+})
+
+describe('TooltipContent arrow', () => {
+  it('renders overlay arrow on focus when arrow is enabled', async () => {
+    const user = userEvent.setup()
+    render(
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger interactive asChild>
+            <Button variant="outline">Equip</Button>
+          </TooltipTrigger>
+          <TooltipContent arrow>Unequip</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
+    )
+    await user.tab()
+    const tooltip = await screen.findByRole('tooltip')
+    expect(tooltip).toHaveTextContent('Unequip')
+    expect(document.body.querySelector('.ui-popover-content--with-arrow')).not.toBeNull()
+    const arrow = document.body.querySelector('.ui-overlay-arrow path')
+    expect(arrow).toHaveAttribute('d', overlayArrowPath)
+  })
+
+  it('keeps checkbox data-state when the trigger wraps a span', () => {
+    render(
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span data-testid="tooltip-wrap">
+              <Checkbox appearance="circle" aria-label="Equipped item" defaultChecked />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent arrow>Unequip</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
+    )
+
+    expect(screen.getByLabelText('Equipped item')).toHaveAttribute('data-state', 'checked')
   })
 })
 

@@ -1,7 +1,12 @@
-import type { z } from 'zod'
+import { z } from 'zod'
 
 import type { VocabularyTerm } from './types'
-import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from './vocabulary'
+import { languageIdSchema } from './language'
+import {
+  vocabularyOptionIdSchema,
+  vocabularySeedOptionSchema,
+  type VocabularyOptionSetId,
+} from './vocabulary'
 
 // ---------------------------------------------------------------------------
 // Creature types — SRD 5.2.1 taxonomy shared by species, monsters, and character
@@ -27,3 +32,10 @@ export const CREATURE_TYPE_SET_ID = 'creature-types' as const satisfies Vocabula
 export const creatureTypeSchema = vocabularyOptionIdSchema
 
 export type CreatureTypeId = z.infer<typeof creatureTypeSchema>
+
+/** Extended catalog seed row — language affinities are validated at catalog load. */
+export const creatureTypeSeedOptionSchema = vocabularySeedOptionSchema.extend({
+  languageAffinities: z.array(languageIdSchema).optional(),
+})
+
+export type CreatureTypeSeedOption = z.infer<typeof creatureTypeSeedOptionSchema>

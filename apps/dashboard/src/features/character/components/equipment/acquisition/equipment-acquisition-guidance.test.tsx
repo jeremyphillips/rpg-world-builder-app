@@ -54,8 +54,8 @@ describe('EquipmentAcquisitionGuidance', () => {
 
     const browseEquipment = screen.getByRole('button', { name: 'Browse equipment' })
     const browseMagicItems = screen.getByRole('button', { name: 'Browse magic items' })
-    expect(browseEquipment).toHaveClass('bg-action-secondary')
-    expect(browseMagicItems).toHaveClass('bg-action-secondary')
+    expect(browseEquipment).toHaveClass('ui-button--secondary')
+    expect(browseMagicItems).toHaveClass('ui-button--secondary')
 
     const user = userEvent.setup()
     await user.click(browseEquipment)
@@ -169,7 +169,7 @@ describe('EquipmentAcquisitionGuidance', () => {
     )
 
     const manage = screen.getByRole('button', { name: 'Manage magic items' })
-    expect(manage).toHaveClass('border-interactive-outline')
+    expect(manage).toHaveClass('ui-button--outline')
     expect(screen.queryByRole('button', { name: 'Browse magic items' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Browse equipment' })).toBeInTheDocument()
 

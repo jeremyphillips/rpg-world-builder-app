@@ -6,10 +6,14 @@ import {
   type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
 
+import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
+
 import {
+  buildActiveLanguageFieldOptions,
   buildVocabularyEntrySheetDefaultValues,
   resolveVocabularyEntrySheetHeadline,
   submitVocabularyEntrySheet,
+  useLanguageVocabulary,
   useVocabularyEntryUsage,
   vocabularyEntrySheetFormSchema,
   type VocabularyEntryFormValues,
@@ -51,6 +55,11 @@ export function useVocabularyEntrySheet({
     open && isEdit && capabilities.usageResolution,
   )
 
+  const { vocabulary: languageVocabulary } = useLanguageVocabulary(
+    setId === CREATURE_TYPE_SET_ID ? campaignId : undefined,
+  )
+  const languageOptions = buildActiveLanguageFieldOptions(languageVocabulary)
+
   const defaultValues = useMemo(
     () => buildVocabularyEntrySheetDefaultValues(isEdit, entry),
     [entry, isEdit],
@@ -67,6 +76,7 @@ export function useVocabularyEntrySheet({
         entry,
         usageResolution: capabilities.usageResolution,
         references: usage?.references ?? [],
+        languageOptions,
       }),
     [
       campaignId,
@@ -75,6 +85,7 @@ export function useVocabularyEntrySheet({
       groupId,
       isEdit,
       isPending,
+      languageOptions,
       setId,
       usage?.references,
     ],

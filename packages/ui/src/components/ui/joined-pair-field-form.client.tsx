@@ -131,6 +131,7 @@ export function JoinedPairFieldForm({
     >
       <FieldLayout
         hintPosition={hintPosition}
+        labelVisibility={labelVisibility}
         wrapControl={false}
         chrome={chrome}
         size={size}
@@ -148,6 +149,7 @@ export function JoinedPairFieldForm({
         control={
           <JoinedPair.Root
             layout="intrinsic"
+            size={size}
             invalid={hasError}
             disabled={disabled}
             aria-labelledby={labelId}

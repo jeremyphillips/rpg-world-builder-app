@@ -6,18 +6,27 @@ import type { ControllerRenderProps } from 'react-hook-form'
 import { ComboboxField } from '../../../components/ui/combobox-field.client'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { FieldSize } from '../../../components/ui/field.client'
-import type { ComboboxFieldConfig } from '../../field-config'
+import type {
+  ActiveDimensionFilters,
+  ComboboxFieldConfig,
+  ComboboxFilterDimensionConfig,
+} from '../../field-config'
 import { fieldDefaultValue } from '../../field-config'
 import type { FieldValidationProps } from '../../../components/ui/field-validation-props'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
-import { ComboboxFilterSelect } from './combobox-filter-select.client'
+import { ComboboxFilterToolbar } from './combobox-filter-toolbar.client'
 import type { ResolveComboboxFilteredOptions } from '../../../components/ui/combobox-field.types'
 import {
-  composeComboboxResolveFilteredOptions,
-  resolveComboboxFilterDefaultValue,
+  activeDimensionFiltersEqual,
+  composeComboboxResolveFilteredOptionsFromActive,
+  reconcileActiveDimensionFilters,
+  resolveInitialActiveDimensionFilters,
   toComboboxFieldOptions,
   toFieldOptions,
 } from './combobox-field-form.lib'
+import { useComboboxFieldRecommendation } from './use-combobox-field-recommendation.client'
+
+const EMPTY_FILTER_SELECTS: readonly ComboboxFilterDimensionConfig[] = []
 
 export interface ComboboxFieldRendererProps extends FieldValidationProps {
   config: ComboboxFieldConfig
@@ -27,9 +36,34 @@ export interface ComboboxFieldRendererProps extends FieldValidationProps {
   hint?: string
   hintPosition?: FieldHintPosition
   labelVisibility?: ComboboxFieldConfig['labelVisibility']
+  namePrefix?: string
 }
 
-/** RHF adapter for `ComboboxField` with optional category filter toolbar support. */
+function useComboboxDimensionFilters(config: ComboboxFieldConfig) {
+  const dimensionConfigsKey = React.useMemo(
+    () => JSON.stringify(config.filterSelects ?? EMPTY_FILTER_SELECTS),
+    [config.filterSelects],
+  )
+  const dimensionConfigs = React.useMemo(
+    () => config.filterSelects ?? EMPTY_FILTER_SELECTS,
+    [dimensionConfigsKey],
+  )
+
+  const [active, setActive] = React.useState<ActiveDimensionFilters>(() =>
+    resolveInitialActiveDimensionFilters(dimensionConfigs),
+  )
+
+  React.useEffect(() => {
+    setActive((prev) => {
+      const next = reconcileActiveDimensionFilters(prev, dimensionConfigs)
+      return activeDimensionFiltersEqual(prev, next) ? prev : next
+    })
+  }, [dimensionConfigsKey, dimensionConfigs])
+
+  return { dimensionConfigs, active, setActive }
+}
+
+/** RHF adapter for `ComboboxField` with optional dimension filter toolbar support. */
 export function ComboboxFieldRenderer({
   config,
   controlSize,
@@ -38,45 +72,43 @@ export function ComboboxFieldRenderer({
   hint,
   hintPosition,
   labelVisibility,
+  namePrefix,
   ...validation
 }: ComboboxFieldRendererProps) {
+  const recommendation = useComboboxFieldRecommendation(config, namePrefix)
+
   const comboboxOptions = React.useMemo(
     () => toComboboxFieldOptions(config.options ?? []),
     [config.options],
   )
-  const [categoryFilter, setCategoryFilter] = React.useState(() =>
-    config.filterSelect ? resolveComboboxFilterDefaultValue(config.filterSelect) : undefined,
-  )
 
-  const effectiveCategoryFilter = React.useMemo(() => {
-    if (!config.filterSelect) return undefined
-    const isValid = config.filterSelect.options.some((option) => option.value === categoryFilter)
-    if (isValid) return categoryFilter
-    return resolveComboboxFilterDefaultValue(config.filterSelect)
-  }, [categoryFilter, config.filterSelect])
+  const { dimensionConfigs, active, setActive } = useComboboxDimensionFilters(config)
 
   const resolveFilteredOptions = React.useMemo((): ResolveComboboxFilteredOptions | undefined => {
-    const formResolver = config.filterSelect
-      ? composeComboboxResolveFilteredOptions(
-          effectiveCategoryFilter!,
-          config.resolveFilteredOptions,
+    if (dimensionConfigs.length === 0) {
+      if (!config.resolveFilteredOptions) return undefined
+      return (options, query, selected) =>
+        toComboboxFieldOptions(
+          config.resolveFilteredOptions!(toFieldOptions(options), query, selected),
         )
-      : config.resolveFilteredOptions
+    }
 
-    if (!formResolver) return undefined
-
+    const formResolver = composeComboboxResolveFilteredOptionsFromActive(
+      active,
+      config.resolveFilteredOptions,
+    )
     return (options, query, selected) =>
       toComboboxFieldOptions(formResolver(toFieldOptions(options), query, selected))
-  }, [effectiveCategoryFilter, config.filterSelect, config.resolveFilteredOptions])
+  }, [active, dimensionConfigs.length, config.resolveFilteredOptions])
 
-  const filter = config.filterSelect ? (
-    <ComboboxFilterSelect
-      ariaLabel={config.filterSelect.ariaLabel}
-      options={config.filterSelect.options}
-      value={effectiveCategoryFilter!}
-      onValueChange={setCategoryFilter}
-    />
-  ) : undefined
+  const filter =
+    dimensionConfigs.length > 0 ? (
+      <ComboboxFilterToolbar
+        dimensionConfigs={dimensionConfigs}
+        active={active}
+        onActiveChange={setActive}
+      />
+    ) : undefined
 
   return (
     <ComboboxField
@@ -88,9 +120,13 @@ export function ComboboxFieldRenderer({
       multiple={config.multiple}
       max={config.max}
       placeholder={config.placeholder}
+      closedPlaceholderIntent={config.closedPlaceholderIntent}
+      noun={config.noun}
+      searchPlaceholder={config.searchPlaceholder}
       {...validation}
       hint={hint}
       hintPosition={hintPosition}
+      recommendation={recommendation}
       info={config.info}
       required={config.required}
       width={config.width}
@@ -101,7 +137,9 @@ export function ComboboxFieldRenderer({
       onBlur={field.onBlur}
       renderSelectedItem={config.renderSelectedItem}
       resolveFilteredOptions={resolveFilteredOptions}
+      resolveOptionLabel={config.resolveOptionLabel}
       filter={filter}
+      enableSearch={config.enableSearch}
     />
   )
 }

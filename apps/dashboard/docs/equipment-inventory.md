@@ -4,6 +4,58 @@ Dashboard layout and editing rules for the Equipment step inventory. Contracts
 resolvers and conversion commit logic live in `@rpg/contracts`; this doc covers
 dashboard IA and how the UI composes existing row controls.
 
+## Shared list chrome
+
+`EquipmentInventorySectionHeader` and `EquipmentCategoryGroupedList` live under
+`features/content/equipment/components/inventory-list/`. The character builder
+**Added Equipment** section and the monster **Equipment** tab both use them for
+section title, count badge, and kind-grouped rows (eyebrows only when more than
+one non-empty group). Row metadata uses `statusComposition: 'metadata'` on
+`ContentEntityCard` (Equipped, enhancement, properties, effects).
+
+Monster loadout editing uses the same stack model as the character inventory: plain-stack
+picker priority, scope splits, and stable `entryId`s. See
+[`equipment-stack.ts`](../../../packages/contracts/src/rpg/runtime/creature/equipment-stack.ts)
+and [`magic-properties.md`](../../../packages/contracts/docs/magic-properties.md).
+Architecture, open loadout decisions, and variant semantics: [`equipment-loadout.md`](../../../packages/contracts/docs/equipment-loadout.md).
+
+### Creature-adjusted weapon metadata (inventory cards)
+
+Weapon rows on creature loadouts (monster equipment today; character inventory cards next)
+split presentation across two lanes:
+
+| Lane                              | Owner                                                                                                            | Contents                                                                                                |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Supporting metadata** (band)    | `@rpg/contracts` `resolveEquipmentRowSummary` via `resolveCreatureEquipmentRowProjection` in `content/equipment` | Damage expression, damage type, to-hit — same math as `resolveInventoryWeaponAttackTotals`              |
+| **Status** (metadata composition) | `resolveCreatureEquipmentInventoryRowStatus` in `content/equipment`                                              | Not proficient, Magical, property names, calculated adjustment source segments; optional Equipped badge |
+
+Surface adapters only supply creature context:
+
+- **Monster** — `resolveMonsterEquipmentRowProjection` (CR → proficiency bonus); status omits Equipped (inline toggle).
+- **Character** — `resolveCharacterEquipmentRowProjection` (level → proficiency bonus); character detail action rows use the same summary path.
+
+Loadout picker rows stamp unowned weapon-proficiency matches only through
+`applyLoadoutWeaponMatchSignals` in `equipment-loadout-picker.lib.ts` (do not fork).
+Signal rules live in `resolveWeaponCrossRecommendation` (`@rpg/contracts`).
+
+Inventory bucket labels and ordering use `EQUIPMENT_INVENTORY_GROUP_LABELS` in
+`features/content/equipment/lib/inventory/equipment-inventory-group-labels.lib.ts`
+with `CHARACTER_EQUIPMENT_INVENTORY_BUCKETS` from `@rpg/contracts`. Monster rows
+group through `inventoryBucketForEquipment`; an unresolved `equipmentId` is shown
+under the **Gear** eyebrow as a **display fallback only** (the entry is not stored
+as gear).
+
+When a saved `equipmentId` is missing from the campaign catalog, builder and monster
+surfaces show `EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE` from
+`equipment-catalog-reference-status.lib.ts` (same sentence as the character sheet).
+Rows stay editable for removal; customize requires a resolved catalog item.
+
+Catalog load errors on content create/edit forms are retried from `ContentFormOptionsGate`
+(`ContentFormShellResolver`); only failed TanStack queries are refetched.
+
+Catalog-item swap (change underlying item on an existing row) is **not** implemented yet.
+See [`.cursor/plans/monster-equipment-catalog-swap.plan.md`](../../.cursor/plans/monster-equipment-catalog-swap.plan.md).
+
 ## Pending cart after class change
 
 A class change keeps only the player's own purchases (picker and manual rows; see

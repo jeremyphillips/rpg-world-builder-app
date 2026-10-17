@@ -44,6 +44,7 @@ import {
   getSeedAttackResolutionModeLabel,
   getSeedConditionEntry,
   getSeedCreatureTypeEntry,
+  getSeedCreatureTypeLanguageAffinities,
   getSeedCreatureTypeLabel,
   getSeedDamageTypeEntry,
   getSeedDamageTypeLabel,
@@ -132,6 +133,32 @@ describe('SRD 5.2.1 creature type vocabulary seed', () => {
         (entry) => entry.id === option.id,
       ),
     ).toBe(true)
+  })
+
+  it('seeds creature-type language affinities and validates language ids', () => {
+    const expected: Record<string, readonly string[]> = {
+      aberration: ['deep-speech'],
+      celestial: ['celestial'],
+      dragon: ['draconic'],
+      elemental: ['primordial'],
+      fey: ['sylvan'],
+      fiend: ['abyssal', 'infernal'],
+      giant: ['giant'],
+    }
+
+    for (const [type, affinities] of Object.entries(expected)) {
+      expect(getSeedCreatureTypeLanguageAffinities(RULESET, type)).toEqual(affinities)
+      for (const languageId of affinities) {
+        expect(getSeedLanguageEntry(RULESET, languageId)).toBeDefined()
+      }
+    }
+
+    expect(getSeedCreatureTypeLanguageAffinities(RULESET, 'humanoid')).toEqual([])
+    expect(
+      loadSeedCreatureTypes(RULESET).options.find((option) => option.id === 'dragon'),
+    ).toMatchObject({
+      languageAffinities: ['draconic'],
+    })
   })
 })
 

@@ -224,6 +224,21 @@ export async function deleteNpcById(npcId: string): Promise<boolean> {
   return result.deletedCount === 1
 }
 
+export async function updateCharacterAbilityScoreRecord(
+  characterId: string,
+  ability: string,
+  score: number,
+): Promise<boolean> {
+  if (!isValidObjectId(characterId)) return false
+
+  const result = await CharacterModel.updateOne(
+    { _id: characterId },
+    { $set: { [`abilityScores.${ability}`]: score } },
+  )
+
+  return result.matchedCount === 1
+}
+
 export async function updateCharacterVitalRecord(
   characterId: string,
   nextVital: CharacterVitalState,

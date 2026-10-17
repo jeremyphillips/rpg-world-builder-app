@@ -49,10 +49,14 @@ function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEq
       equipmentSlug: startingEquipmentGrantEquipmentSlug(item) ?? '',
       quantity: item.quantity,
       equipped: item.equipped,
-      modifiers: item.modifiers?.map((modifier) => ({
-        kind: modifier.kind,
-        spellcastingGearKind: modifier.spellcastingGearKind,
-      })),
+      modifiers: item.modifiers?.map((modifier) =>
+        modifier.kind === 'spellcasting_focus'
+          ? {
+              kind: modifier.kind,
+              spellcastingGearKind: modifier.spellcastingGearKind,
+            }
+          : { kind: modifier.kind, bonus: modifier.bonus },
+      ),
     }
   }
   return {

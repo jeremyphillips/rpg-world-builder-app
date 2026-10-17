@@ -474,7 +474,7 @@ function PreviewRailStatusPanel({
       <div className="flex w-full items-start gap-2">
         {resolvedIcon}
         <div className={previewRailStatusPanelContentClasses}>
-          <p className={alertTitleVariants({ variant, density: 'compact' })}>{title}</p>
+          <p className={alertTitleVariants({ density: 'compact' })}>{title}</p>
           {description ? (
             <p className={previewRailStatusPanelDescriptionClasses}>{description}</p>
           ) : null}

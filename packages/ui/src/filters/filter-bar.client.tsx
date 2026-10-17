@@ -69,7 +69,7 @@ export function FilterBar<TData, TState extends Record<string, unknown>>({
         <Button
           type="button"
           variant="outline"
-          size={resetButtonSize}
+          size={resetButtonSize === 'md' ? 'default' : 'sm'}
           className={filterBarResetButtonClasses}
           disabled={disabled}
           onClick={onReset}

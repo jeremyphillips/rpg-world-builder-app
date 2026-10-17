@@ -3,6 +3,34 @@
  * Source order: block → shared states → kind modifiers → indicator sizes → thumb → marks.
  */
 @layer components {
+  /*
+   * One tone map for checkbox indicators and BooleanField surfaces.
+   * Unchecked chrome does not read these variables.
+   */
+  [data-choice-tone='default'] {
+    --choice-indicator-fill: var(--primary);
+    --choice-indicator-border: var(--primary);
+    --choice-indicator-foreground: var(--primary-foreground);
+  }
+
+  [data-choice-tone='success'] {
+    --choice-indicator-fill: var(--success);
+    --choice-indicator-border: var(--success);
+    --choice-indicator-foreground: var(--success-foreground);
+  }
+
+  [data-choice-tone='warning'] {
+    --choice-indicator-fill: var(--warning);
+    --choice-indicator-border: var(--warning);
+    --choice-indicator-foreground: var(--warning-foreground);
+  }
+
+  [data-choice-tone='destructive'] {
+    --choice-indicator-fill: var(--destructive);
+    --choice-indicator-border: var(--destructive);
+    --choice-indicator-foreground: var(--destructive-foreground);
+  }
+
   .ui-choice-control {
     flex-shrink: 0;
     cursor: pointer;
@@ -39,13 +67,169 @@
   }
 
   .ui-choice-control--checkbox[data-state='checked'] {
-    background-color: var(--primary);
-    color: var(--primary-foreground);
+    background-color: var(--choice-indicator-fill, var(--primary));
+    border-color: var(--choice-indicator-border, var(--primary));
+    color: var(--choice-indicator-foreground, var(--primary-foreground));
+  }
+
+  .ui-choice-control--checkbox[data-state='checked'][aria-invalid='true'] {
+    border-color: var(--field-control-border-invalid);
   }
 
   .ui-choice-control--checkbox .ui-choice-control__mark svg {
     width: var(--icon-glyph-md);
     height: var(--icon-glyph-md);
+  }
+
+  /* --- Checkbox appearance: circle (24px target, 16px indicator) --- */
+
+  .ui-choice-control--checkbox.ui-choice-control--circle {
+    display: grid;
+    place-items: center;
+    width: var(--control-height-compact);
+    height: var(--control-height-compact);
+    border-color: transparent;
+    background-color: transparent;
+    border-radius: 9999px;
+    color: var(--choice-indicator-foreground, var(--primary-foreground));
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle:not(:focus-visible) {
+    box-shadow: none;
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle[data-state='checked'],
+  .ui-choice-control--checkbox.ui-choice-control--circle[aria-checked='true'] {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--choice-indicator-foreground, var(--primary-foreground));
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle::before {
+    content: '';
+    grid-area: 1 / 1;
+    width: var(--control-choice-indicator-size-sm);
+    height: var(--control-choice-indicator-size-sm);
+    border-radius: 9999px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--choice-control-border);
+    background-color: var(--background);
+    box-sizing: border-box;
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle[data-state='checked']::before,
+  .ui-choice-control--checkbox.ui-choice-control--circle[aria-checked='true']::before {
+    background-color: var(--choice-indicator-fill, var(--primary));
+    border-color: var(--choice-indicator-border, var(--primary));
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle[aria-invalid='true'] {
+    border-color: transparent;
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle[aria-invalid='true']::before {
+    border-color: var(--field-control-border-invalid);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle:hover:not(:disabled) {
+    background-color: var(--surface-lift);
+    border-color: var(--choice-control-border);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle .ui-choice-control__mark {
+    grid-area: 1 / 1;
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle .ui-choice-control__mark svg {
+    width: var(--icon-glyph-xs);
+    height: var(--icon-glyph-xs);
+    color: currentColor;
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle[data-state='indeterminate']
+    .ui-choice-control__mark {
+    display: none;
+  }
+
+  /*
+   * Circle expand — fixed 24px anchor; the checkbox grows right over later siblings.
+   * Label clip lives on the label, not the root, so the focus ring is not cut off.
+   */
+  .ui-choice-control-expand-anchor {
+    position: relative;
+    isolation: isolate;
+    z-index: 1;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    vertical-align: middle;
+    line-height: 0;
+    width: var(--control-height-compact);
+    height: var(--control-height-compact);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle.ui-choice-control--circle-expand {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    box-sizing: border-box;
+    width: max-content;
+    height: var(--control-height-compact);
+    display: inline-grid;
+    /* 22px track + 1px border each side = the 24px border box when the label clip is closed. */
+    grid-template-columns: calc(var(--control-height-compact) - 2px) max-content;
+    align-items: center;
+    justify-items: center;
+    transition-property: background-color, border-color, box-shadow;
+    transition-duration: 160ms;
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle.ui-choice-control--circle-expand:hover:not(
+      :disabled
+    ),
+  .ui-choice-control--checkbox.ui-choice-control--circle.ui-choice-control--circle-expand:focus-visible {
+    background-color: var(--surface-lift);
+    border-color: var(--choice-control-border);
+  }
+
+  .ui-choice-control__expand-clip {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 0fr);
+    min-width: 0;
+    transition: grid-template-columns 160ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle.ui-choice-control--circle-expand:hover:not(
+      :disabled
+    )
+    .ui-choice-control__expand-clip,
+  .ui-choice-control--checkbox.ui-choice-control--circle.ui-choice-control--circle-expand:focus-visible
+    .ui-choice-control__expand-clip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ui-choice-control__expand-clip-inner {
+    display: grid;
+    min-width: 0;
+    overflow: hidden;
+    align-items: center;
+  }
+
+  .ui-choice-control__expand-label,
+  .ui-choice-control__expand-reserve {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+    padding-inline-end: calc(var(--spacing) * 2);
+    font-size: var(--text-xs);
+    line-height: 1;
+    color: var(--foreground);
+  }
+
+  .ui-choice-control__expand-reserve {
+    visibility: hidden;
   }
 
   /* --- Kind: radio --- */

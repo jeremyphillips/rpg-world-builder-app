@@ -11,6 +11,7 @@ export const richTextProseBase = 'prose max-w-none [&_p_strong]:text-foreground'
 
 /** Maps field size tokens to typography plugin prose modifiers. */
 export const richTextProseSizeClasses = {
+  xs: 'prose-sm',
   sm: 'prose-sm',
   md: 'prose-md',
   lg: '',

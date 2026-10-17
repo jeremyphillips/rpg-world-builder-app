@@ -116,6 +116,30 @@ describe('entity surface config guard', () => {
     }
   })
 
+  it('forbids legacy DrawerEntityContext props and hand-built leading media outside entity internals', () => {
+    for (const path of featureImplementationFiles()) {
+      const relativePath = relative(FEATURE_ROOT, path)
+      if (relativePath.startsWith('content/lib/entity/')) continue
+
+      const source = readFileSync(path, 'utf8')
+      if (source.includes('DrawerEntityContext')) {
+        expect(
+          source,
+          `${relativePath} must compose DrawerEntityContext with surface={EntitySurfaceConfig}`,
+        ).not.toMatch(/<DrawerEntityContext[\s\S]{0,240}\bheading=/)
+        expect(
+          source,
+          `${relativePath} must not pass displayImage/fallback directly to DrawerEntityContext`,
+        ).not.toMatch(/<DrawerEntityContext[\s\S]{0,320}\b(fallback|displayImage)=/)
+      }
+
+      expect(
+        source,
+        `${relativePath} must project entity media through EntitySurfaceIdentity, not buildEntitySurfaceLeadingMediaNode`,
+      ).not.toMatch(/\bbuildEntitySurfaceLeadingMediaNode\b/)
+    }
+  })
+
   it('never passes spell entity media on spell detail routes', () => {
     const source = readFileSync(
       join(FEATURE_ROOT, 'content/spells/routes/spells-detail.tsx'),

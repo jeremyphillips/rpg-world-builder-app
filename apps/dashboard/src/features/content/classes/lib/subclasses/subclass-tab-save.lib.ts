@@ -48,7 +48,7 @@ export async function persistSubclassCampaignAccess(args: {
   onDeferredError: (message: string) => void
 }): Promise<void> {
   const { campaignId, classId, subclassId, pendingAccess, onDeferredError } = args
-  if (!pendingAccess || isDefaultCampaignAccessPatch(pendingAccess)) return
+  if (!pendingAccess || isDefaultCampaignAccessPatch(pendingAccess, 'subclasses')) return
 
   try {
     await updateContentCampaignAccess(campaignId, 'subclasses', subclassId, pendingAccess, {

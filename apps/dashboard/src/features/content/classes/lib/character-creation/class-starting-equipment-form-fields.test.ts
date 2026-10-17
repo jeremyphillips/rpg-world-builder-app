@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildContentPurposeSelectors } from '@rpg/contracts'
+import { type ArrayConfig, isContainer } from '@rpg/ui/form'
 
 import { pickClass, pickEquipment } from '../../../lib/fixtures/pick'
 import { equipmentGrantSummary } from '../../../lib/forms/grants/equipment/equipment-grant-form-values'
@@ -9,6 +10,7 @@ import {
   startingEquipmentFormSchema,
   startingEquipmentItemFields,
   startingEquipmentItemTitle,
+  startingEquipmentModifierFields,
   startingEquipmentOptionCompactSummary,
   startingEquipmentOptionFormSchema,
 } from './class-starting-equipment-form-fields'
@@ -200,6 +202,23 @@ describe('startingEquipmentItemTitle', () => {
         equipmentOptions,
       ),
     ).toBe('Linked to Tool Proficiencies')
+  })
+})
+
+describe('startingEquipmentModifierFields', () => {
+  it('uses fallback header label when focus kind is not set yet', () => {
+    const fields = startingEquipmentModifierFields()
+    const modifiersField = fields.find(
+      (field): field is ArrayConfig =>
+        isContainer(field) && field.kind === 'array' && field.name === 'modifiers',
+    )
+    const primary = modifiersField?.item?.header?.primary
+
+    expect(primary?.({ kind: 'spellcasting_focus' }, 0)).toBeUndefined()
+    expect(modifiersField?.appendDefaults?.([])).toMatchObject({
+      kind: 'spellcasting_focus',
+      spellcastingGearKind: 'arcane_focus',
+    })
   })
 })
 

@@ -9,7 +9,9 @@ import type {
   ResolvedStartingEquipmentFunding,
   StartingPackageConversionPreview,
 } from '@rpg/contracts'
-import { Badge, Heading, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
+
+import { EquipmentInventorySectionHeader } from '@/features/content'
 
 import {
   EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL,
@@ -28,11 +30,9 @@ import {
   type EquipmentInventoryStartingChannel,
 } from '../../../../lib/equipment/equipment-inventory-summary.lib'
 import {
-  EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,
   equipmentInventoryPanelClasses,
   equipmentInventoryPanelDividerClasses,
   equipmentInventorySectionClasses,
-  equipmentInventorySectionHeaderClasses,
 } from '../equipment-inventory.variants'
 import { useEquipmentSelectionFacts } from '../../../../hooks/use-equipment-selection-facts'
 
@@ -145,16 +145,10 @@ function EquipmentAddedInventoryBlock({
 
   return (
     <section className={equipmentInventorySectionClasses}>
-      <div className={equipmentInventorySectionHeaderClasses}>
-        <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
-          {EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL}
-        </Heading>
-        {addedInventoryCount > 0 ? (
-          <Badge appearance="soft" tone="neutral" size="sm">
-            {addedInventoryCount}
-          </Badge>
-        ) : null}
-      </div>
+      <EquipmentInventorySectionHeader
+        title={EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL}
+        count={addedInventoryCount}
+      />
       <EquipmentAddedInventorySection
         addedEquipment={addedEquipment}
         draft={draft}

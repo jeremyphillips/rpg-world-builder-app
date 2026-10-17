@@ -1,30 +1,37 @@
 import { z } from 'zod'
 
 import { coinWealthSchema, type CoinWealth } from '../../../primitives/wealth'
-import type { ArmorEquipment, Equipment } from '../../../content/equipment'
+import type { Equipment } from '../../../content/equipment'
 import { isArmorEquipment } from '../../../content/equipment'
+import {
+  equipmentInstanceSchemaBase,
+  type EquipmentInstance,
+} from '../../../content/equipment/instance/instance'
+import { normalizeEquipmentInstance } from '../../../content/equipment/instance/normalize-equipment-instance'
+import { refineEquipmentInstanceInvariants } from '../../../content/equipment/instance/instance-invariants'
 import type { CharacterWealthGrant } from '../../../content/lib/grants/wealth-grant'
-import { equipmentModifierSchema } from '../../../content/equipment/modifier'
 import type { EquipmentKind } from '../../../vocab/equipment/kind'
 import type { CreatureEquipmentCatalog } from '../../creature/equipment'
+import { toEquippedArmorPieceForEntry, type EquippedArmorPiece } from '../../creature/armor-class'
+import type { MagicPropertyDefinitionProvider } from '../../../content/equipment/instance/magic-property'
 import { characterSelectionSourcesSchema } from './selection-sources'
 
 // ---------------------------------------------------------------------------
 // Equipment, wealth, and feats
 // ---------------------------------------------------------------------------
 
-export const characterEquipmentEntrySchema = z.object({
-  /** Optional stable row id for duplicate or customized copies of the same item. */
-  entryId: z.string().min(1).optional(),
-  equipmentId: z.string().min(1),
-  quantity: z.number().int().min(1).default(1),
-  equipped: z.boolean().optional(),
-  attuned: z.boolean().optional(),
-  customName: z.string().min(1).optional(),
-  modifiers: z.array(equipmentModifierSchema).optional(),
-  sources: characterSelectionSourcesSchema,
-  notes: z.string().optional(),
-})
+const characterEquipmentEntrySchemaParsed = equipmentInstanceSchemaBase
+  .extend({
+    attuned: z.boolean().optional(),
+    sources: characterSelectionSourcesSchema,
+    notes: z.string().optional(),
+  })
+  .superRefine((entry, ctx) => refineEquipmentInstanceInvariants(entry, ctx))
+
+export const characterEquipmentEntrySchema = z.preprocess((value) => {
+  if (!value || typeof value !== 'object') return value
+  return normalizeEquipmentInstance(value as EquipmentInstance)
+}, characterEquipmentEntrySchemaParsed)
 
 export type CharacterEquipmentEntry = z.infer<typeof characterEquipmentEntrySchema>
 
@@ -121,14 +128,19 @@ export function characterWealthFromGrant(grant: CharacterWealthGrant | undefined
 }
 
 /** Returns equipped armor catalog rows referenced by the character inventory. */
+const EMPTY_MAGIC_PROPERTY_PROVIDER: MagicPropertyDefinitionProvider = () => undefined
+
 export function resolveEquippedArmorFromInventory(args: {
   equipment: CharacterEquipment
   catalog: CreatureEquipmentCatalog
-}): ArmorEquipment[] {
+  magicPropertyProvider?: MagicPropertyDefinitionProvider
+}): EquippedArmorPiece[] {
+  const provider = args.magicPropertyProvider ?? EMPTY_MAGIC_PROPERTY_PROVIDER
   return args.equipment.armor.flatMap((entry) => {
     if (!entry.equipped) return []
     const item = args.catalog.get(entry.equipmentId)
-    return item && isArmorEquipment(item) ? [item] : []
+    if (!item || !isArmorEquipment(item)) return []
+    return [toEquippedArmorPieceForEntry(item, entry, item, provider)]
   })
 }
 

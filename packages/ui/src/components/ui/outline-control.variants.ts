@@ -1,6 +1,6 @@
 /**
  * Shared interactive outline shell — transparent fill, role-named border, neutral hover/active.
- * Used by Button `outline` variant, FilterInlineControl, and similar controls (not field inputs).
+ * Used by Button `outline` variant and similar controls (not field inputs).
  */
 export const outlineControlShellClasses =
   'rounded-md border border-interactive-outline bg-transparent transition-colors hover:bg-interactive-outline-hover active:bg-interactive-outline-active'

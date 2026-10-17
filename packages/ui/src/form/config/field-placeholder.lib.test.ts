@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { COMPACT_UNSET_PLACEHOLDER, resolveFieldPlaceholder } from './field-placeholder.lib'
+import {
+  COMPACT_UNSET_PLACEHOLDER,
+  resolveFieldPlaceholder,
+  resolveFieldSearchPlaceholder,
+} from './field-placeholder.lib'
 
 describe('resolveFieldPlaceholder', () => {
   it('defaults single-select placeholders to Choose vocabulary', () => {
@@ -54,5 +58,65 @@ describe('resolveFieldPlaceholder', () => {
 
   it('returns undefined for text-like categories', () => {
     expect(resolveFieldPlaceholder({ label: 'Name', category: 'text' })).toBeUndefined()
+  })
+
+  it('resolves add-to-collection closed triggers from explicit noun metadata', () => {
+    expect(
+      resolveFieldPlaceholder({
+        label: 'Add language',
+        category: 'choice',
+        intent: 'add',
+        noun: { singular: 'language', plural: 'languages' },
+      }),
+    ).toBe('Add language')
+  })
+
+  it('requires noun metadata for add intent', () => {
+    expect(() =>
+      resolveFieldPlaceholder({ label: 'Add language', category: 'choice', intent: 'add' }),
+    ).toThrow(/requires explicit noun/)
+  })
+
+  it('defaults choice copy from vocabulary nouns', () => {
+    expect(
+      resolveFieldPlaceholder({
+        label: 'Languages',
+        category: 'choice',
+        noun: { singular: 'language', plural: 'languages' },
+      }),
+    ).toBe('Choose a language…')
+  })
+})
+
+describe('resolveFieldSearchPlaceholder', () => {
+  it('derives search copy from domain nouns, not action labels', () => {
+    expect(
+      resolveFieldSearchPlaceholder({
+        label: 'Add skill',
+        noun: { singular: 'skill', plural: 'skills' },
+      }),
+    ).toBe('Search skills…')
+    expect(
+      resolveFieldSearchPlaceholder({
+        label: 'Add language',
+        noun: { singular: 'language', plural: 'languages' },
+      }),
+    ).toBe('Search languages…')
+  })
+
+  it('falls back to label heuristics for non-action field labels', () => {
+    expect(resolveFieldSearchPlaceholder({ label: 'Specific weapons' })).toBe(
+      'Search specific weapons…',
+    )
+  })
+
+  it('documents the incorrect fallback when action labels omit noun metadata', () => {
+    expect(resolveFieldSearchPlaceholder({ label: 'Add skill' })).toBe('Search add skill…')
+  })
+
+  it('honors explicit search placeholder overrides', () => {
+    expect(resolveFieldSearchPlaceholder({ label: 'Add skill' }, 'Search custom…')).toBe(
+      'Search custom…',
+    )
   })
 })

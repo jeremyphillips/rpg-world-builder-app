@@ -19,23 +19,23 @@ import {
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import {
   armorDetailFilterGroups,
-  armorDetailFiltersActive,
-  countWeaponDetailFilters,
-  EMPTY_ARMOR_DETAIL_FILTERS,
-  EMPTY_WEAPON_DETAIL_FILTERS,
+  countEquipmentPickerWeaponDetailFilters,
+  EMPTY_EQUIPMENT_PICKER_ARMOR_DETAIL_FILTERS,
+  EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS,
+  equipmentPickerArmorDetailFiltersActive,
   equipmentPickerKeepsNonProficientHidden,
   EQUIPMENT_PICKER_ARMOR_FILTER_LABEL,
   EQUIPMENT_PICKER_HIDE_NON_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_WEAPON_FILTER_LABEL,
-  formatEquipmentDetailFilterTriggerLabel,
-  matchesArmorDetailFilters,
-  matchesWeaponDetailFilters,
+  formatEquipmentPickerDetailFilterTriggerLabel,
+  matchesEquipmentPickerArmorDetailFilters,
+  matchesEquipmentPickerWeaponDetailFilters,
   shouldShowHideNonProficientFilter,
   weaponDetailFilterGroups,
-  weaponDetailFiltersActive,
-  type EquipmentArmorDetailFilters,
-  type EquipmentWeaponDetailFilters,
-} from './equipment-picker-kind-detail-filters'
+  equipmentPickerWeaponDetailFiltersActive,
+  type EquipmentPickerArmorDetailFilters,
+  type EquipmentPickerWeaponDetailFilters,
+} from './equipment-picker-detail-filters.lib'
 import type {
   EquipmentBudgetSummary,
   EquipmentPickerItem,
@@ -54,8 +54,8 @@ export type EquipmentPickerFilterState = {
   selectedRarity?: string
   showAffordableOnly?: boolean
   hideNonProficient?: boolean
-  weaponFilters?: EquipmentWeaponDetailFilters
-  armorFilters?: EquipmentArmorDetailFilters
+  weaponFilters?: EquipmentPickerWeaponDetailFilters
+  armorFilters?: EquipmentPickerArmorDetailFilters
 }
 
 export const EQUIPMENT_PICKER_PRIMARY_FILTER_FIELD_ORDER = [
@@ -238,31 +238,35 @@ export function createEquipmentPickerFilterSchema<
       createPopoverFilter<TItem, EquipmentPickerFilterState, 'weaponFilters'>({
         id: 'weaponFilters',
         label: EQUIPMENT_PICKER_WEAPON_FILTER_LABEL,
-        defaultValue: EMPTY_WEAPON_DETAIL_FILTERS,
+        defaultValue: EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS,
         visible: (state) => state.selectedKind === 'weapon',
         triggerLabel: (activeCount) =>
-          formatEquipmentDetailFilterTriggerLabel(
+          formatEquipmentPickerDetailFilterTriggerLabel(
             EQUIPMENT_PICKER_WEAPON_FILTER_LABEL,
             activeCount,
           ),
         groups: weaponGroups,
         isValueConstraining: (value) =>
-          weaponDetailFiltersActive(
-            (value as EquipmentWeaponDetailFilters | undefined) ?? EMPTY_WEAPON_DETAIL_FILTERS,
+          equipmentPickerWeaponDetailFiltersActive(
+            (value as EquipmentPickerWeaponDetailFilters | undefined) ??
+              EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS,
           ),
         isValueEqual: (left, right) =>
-          countWeaponDetailFilters(
-            (left as EquipmentWeaponDetailFilters | undefined) ?? EMPTY_WEAPON_DETAIL_FILTERS,
+          countEquipmentPickerWeaponDetailFilters(
+            (left as EquipmentPickerWeaponDetailFilters | undefined) ??
+              EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS,
           ) ===
-            countWeaponDetailFilters(
-              (right as EquipmentWeaponDetailFilters | undefined) ?? EMPTY_WEAPON_DETAIL_FILTERS,
+            countEquipmentPickerWeaponDetailFilters(
+              (right as EquipmentPickerWeaponDetailFilters | undefined) ??
+                EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS,
             ) &&
-          JSON.stringify(left ?? EMPTY_WEAPON_DETAIL_FILTERS) ===
-            JSON.stringify(right ?? EMPTY_WEAPON_DETAIL_FILTERS),
+          JSON.stringify(left ?? EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS) ===
+            JSON.stringify(right ?? EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS),
         matches: (row, value) =>
-          matchesWeaponDetailFilters(
+          matchesEquipmentPickerWeaponDetailFilters(
             row,
-            (value as EquipmentWeaponDetailFilters | undefined) ?? EMPTY_WEAPON_DETAIL_FILTERS,
+            (value as EquipmentPickerWeaponDetailFilters | undefined) ??
+              EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS,
           ),
       }),
     )
@@ -274,19 +278,24 @@ export function createEquipmentPickerFilterSchema<
       createPopoverFilter<TItem, EquipmentPickerFilterState, 'armorFilters'>({
         id: 'armorFilters',
         label: EQUIPMENT_PICKER_ARMOR_FILTER_LABEL,
-        defaultValue: EMPTY_ARMOR_DETAIL_FILTERS,
+        defaultValue: EMPTY_EQUIPMENT_PICKER_ARMOR_DETAIL_FILTERS,
         visible: (state) => state.selectedKind === 'armor',
         triggerLabel: (activeCount) =>
-          formatEquipmentDetailFilterTriggerLabel(EQUIPMENT_PICKER_ARMOR_FILTER_LABEL, activeCount),
+          formatEquipmentPickerDetailFilterTriggerLabel(
+            EQUIPMENT_PICKER_ARMOR_FILTER_LABEL,
+            activeCount,
+          ),
         groups: armorGroups,
         isValueConstraining: (value) =>
-          armorDetailFiltersActive(
-            (value as EquipmentArmorDetailFilters | undefined) ?? EMPTY_ARMOR_DETAIL_FILTERS,
+          equipmentPickerArmorDetailFiltersActive(
+            (value as EquipmentPickerArmorDetailFilters | undefined) ??
+              EMPTY_EQUIPMENT_PICKER_ARMOR_DETAIL_FILTERS,
           ),
         matches: (row, value) =>
-          matchesArmorDetailFilters(
+          matchesEquipmentPickerArmorDetailFilters(
             row,
-            (value as EquipmentArmorDetailFilters | undefined) ?? EMPTY_ARMOR_DETAIL_FILTERS,
+            (value as EquipmentPickerArmorDetailFilters | undefined) ??
+              EMPTY_EQUIPMENT_PICKER_ARMOR_DETAIL_FILTERS,
           ),
       }),
     )
@@ -311,8 +320,8 @@ export function toEquipmentPickerFilterState(args: {
   selectedRarity: string
   showAffordableOnly: boolean
   hideNonProficient?: boolean
-  weaponFilters?: EquipmentWeaponDetailFilters
-  armorFilters?: EquipmentArmorDetailFilters
+  weaponFilters?: EquipmentPickerWeaponDetailFilters
+  armorFilters?: EquipmentPickerArmorDetailFilters
 }): EquipmentPickerFilterState {
   return {
     selectedKind: args.selectedKind,

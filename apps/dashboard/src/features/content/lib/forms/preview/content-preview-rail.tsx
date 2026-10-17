@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
 import {
-  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  resolveDefaultResolvedContentCampaignAccess,
   getContentTypeTerm,
   type ContentCampaignAccessPatch,
   type ContentTypeKey,
@@ -111,7 +111,7 @@ function ContentPreviewRailBody({
 
   const identity = useMemo(() => preview?.buildIdentity(values, ctx), [preview, values, ctx])
 
-  const access = pendingAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS
+  const access = pendingAccess ?? resolveDefaultResolvedContentCampaignAccess(contentTypeKey)
   const accessSummary = resolveCampaignAccessSummary(access)
   const attentionCount = tabStates.filter((state) => state.count > 0).length
   const renderPlayerPreview = preview?.renderPlayerPreview

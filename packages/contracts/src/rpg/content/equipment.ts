@@ -112,7 +112,70 @@ export {
   type EquipmentModifierKind,
   type SpellcastingFocusGearKind,
   type SpellcastingFocusModifier,
-} from './equipment/modifier'
+} from './equipment/instance/modifier'
+
+export {
+  EQUIPMENT_EFFECT_BONUS_MIN,
+  EQUIPMENT_EFFECT_BONUS_MAX,
+  equipmentBonusEffectSchema,
+  equipmentAdjustmentSchema,
+  nextNonZeroBonus,
+  type EquipmentAdjustment,
+  type EquipmentBonusEffect,
+} from './equipment/instance/effect'
+
+export {
+  MAGIC_PROPERTY_APPLIES_TO,
+  magicPropertyAppliesToSchema,
+  magicPropertyDefinitionSchema,
+  equipmentMagicPropertyEntrySchema,
+  equipmentMagicPropertyPresetEntrySchema,
+  equipmentMagicPropertyCustomEntrySchema,
+  type MagicPropertyAppliesTo,
+  type MagicPropertyDefinition,
+  type MagicPropertyDefinitionProvider,
+  type EquipmentMagicPropertyEntry,
+} from './equipment/instance/magic-property'
+
+export { normalizeEquipmentInstance } from './equipment/instance/normalize-equipment-instance'
+export { refineEquipmentInstanceInvariants } from './equipment/instance/instance-invariants'
+export {
+  resolveEquipmentMagicProperties,
+  type ResolvedEquipmentMagicProperties,
+  type ResolvedEquipmentMagicPropertyPreset,
+} from './equipment/instance/resolve-equipment-magic-properties'
+export {
+  validateEquipmentMagicProperties,
+  EQUIPMENT_MAGIC_PROPERTY_ISSUE_CODE,
+} from './equipment/instance/validate-equipment-magic-properties'
+export {
+  resolveEquipmentEntryEffectTotals,
+  type EquipmentEffectTotals,
+} from './equipment/instance/equipment-effect-totals'
+export {
+  resolveEquipmentEffectWarnings,
+  EQUIPMENT_EFFECT_WARNING,
+  type EquipmentEffectWarning,
+  type EquipmentEffectWarningCode,
+} from './equipment/instance/equipment-effect-warnings'
+export { equipmentInstanceSchema, type EquipmentInstance } from './equipment/instance/instance'
+export {
+  resolveEquipmentInstanceSummary,
+  EQUIPMENT_INSTANCE_VISIBLE_PROPERTY_NAME_LIMIT,
+  type EquipmentInstanceIntegrityWarning,
+  type EquipmentInstanceSummary,
+  type ResolveEquipmentInstanceSummaryOptions,
+} from './equipment/instance/resolve-equipment-instance-summary'
+export {
+  adjustmentBonusOnTarget,
+  adjustmentMetadataSegments,
+  enhancementBonusOnTarget,
+  formatEquipmentEffectSourceSegments,
+  formatEquipmentMechanicalComponentSegments,
+  formatEquipmentMechanicalComponentsForTarget,
+} from './equipment/instance/equipment-mechanical-metadata'
+export { resolveEquipmentInstanceReferenceLabel } from './equipment/instance/resolve-equipment-instance-reference-label'
+export { formatEquipmentEntryDisplayToken } from './equipment/instance/equipment-entry-display-token'
 
 export {
   getEquipmentSpellcastingGearKind,

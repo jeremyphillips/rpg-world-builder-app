@@ -1,13 +1,15 @@
 import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
 import type { CatalogPickerRowActionIntent, CatalogPickerRowActionTooltip } from '@rpg/ui'
 
+import type { EntitySurfaceMetadataLine } from './entity-surface-metadata.lib'
 import type { PickerSelectionStateLineModel } from './picker-selection-state-line.types'
 import type { EntitySummaryStatusItem } from './entity-summary-status.types'
 
 /** Plain identity slots for compact entity surfaces — no JSX, no media nodes. */
 export type EntitySurfaceIdentity = {
   heading: string
-  metadata?: string
+  /** Supporting-line segments (meta cell) — one or more labels with standard separators. */
+  metadata?: EntitySurfaceMetadataLine
   classification?: string
   status?: readonly EntitySummaryStatusItem[]
   /** Resolved selection-state copy. Connection sheets set this without JSX. */

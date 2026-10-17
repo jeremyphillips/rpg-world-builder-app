@@ -2,8 +2,6 @@ import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mec
 import type { ClassHitDie } from '../../../primitives/dice'
 import type { Ability } from '../../../vocab/ability'
 import type { ArmorClassBase } from '../../../vocab/mechanics/edition-preset-mechanics'
-import type { CharacterSkillToolProficiencyRank } from '../sheet/proficiencies'
-
 // ---------------------------------------------------------------------------
 // Derived stat helpers — pure functions over raw scores and catalog data.
 //
@@ -20,10 +18,8 @@ import type { CharacterSkillToolProficiencyRank } from '../sheet/proficiencies'
 // Ability modifier — the fundamental formula underlying every derived stat.
 // ---------------------------------------------------------------------------
 
-/** Standard D&D ability modifier: ⌊(score − 10) / 2⌋. */
-export function abilityModifier(score: number): number {
-  return Math.floor((score - 10) / 2)
-}
+export { abilityModifier } from '../../creature/ability-modifier'
+import { abilityModifier } from '../../creature/ability-modifier'
 
 // ---------------------------------------------------------------------------
 // Hit points
@@ -73,35 +69,7 @@ export function hasSavingThrowProficiency(
  * Saving throw bonus for one ability.
  * Proficient characters add the proficiency bonus; non-proficient don't.
  */
-export function savingThrowBonus(
-  abilityScore: number,
-  isProficient: boolean,
-  profBonus: number,
-): number {
-  return abilityModifier(abilityScore) + (isProficient ? profBonus : 0)
-}
-
-// ---------------------------------------------------------------------------
-// Skill modifiers
-// ---------------------------------------------------------------------------
-
-/**
- * Skill modifier for a single skill.
- *
- * @param abilityScore - The score of the governing ability (e.g. STR for Athletics).
- * @param rank         - The character's proficiency rank, or `undefined` if not proficient.
- * @param profBonus    - Current proficiency bonus.
- */
-export function skillModifier(
-  abilityScore: number,
-  rank: CharacterSkillToolProficiencyRank | undefined,
-  profBonus: number,
-): number {
-  const base = abilityModifier(abilityScore)
-  if (rank === 'expertise') return base + profBonus * 2
-  if (rank === 'proficient') return base + profBonus
-  return base
-}
+export { savingThrowBonus, skillModifier } from '../../creature/checks'
 
 // ---------------------------------------------------------------------------
 // Spellcasting
@@ -131,10 +99,8 @@ export function baseArmorClass(acBase: ArmorClassBase): number {
   return acBase
 }
 
-/** Unarmored AC from a ruleset base and a DEX modifier (may be neutral 0). */
-export function unarmoredAcFromDexModifier(acBase: ArmorClassBase, dexModifier: number): number {
-  return acBase + dexModifier
-}
+export { unarmoredAcFromDexModifier } from '../../creature/armor-class'
+import { unarmoredAcFromDexModifier } from '../../creature/armor-class'
 
 /**
  * Unarmored AC from a DEX score and ruleset base.

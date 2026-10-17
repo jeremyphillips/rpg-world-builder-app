@@ -11,7 +11,7 @@ import type { ContentFormCtx } from '../../lib/forms/registry/content-form-regis
 
 const schema = z.object({
   hasSpellcasting: z.boolean(),
-  features: z.array(z.record(z.unknown())),
+  features: z.array(z.record(z.string(), z.unknown())),
   spellcasting: z
     .object({
       slotProgressionId: z.string().min(1, 'Choose a slot progression'),

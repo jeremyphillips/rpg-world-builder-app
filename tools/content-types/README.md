@@ -55,15 +55,15 @@ exists.
 
 ## Drift-test ownership
 
-| Layer             | Test location                                                        |
-| ----------------- | -------------------------------------------------------------------- |
-| Tooling           | `src/content-type-integration-manifest.test.ts` — path resolution    |
-| Contracts         | `content-type-term-coverage.test.ts` — terms + capabilities keys     |
-| API               | `apps/api/.../content-types.integration-manifest.test.ts`            |
-| Dashboard routes  | `apps/dashboard/src/app/content-routes.integration-manifest.test.ts` |
-| Dashboard sidebar | `content-registry.test.ts`                                           |
-| Dashboard forms   | `content-form-registry.test.ts`                                      |
-| Catalog           | `packages/catalog/src/content-type-integration-manifest.test.ts`     |
+| Layer             | Test location                                                                                                                                                                                |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tooling           | `src/content-type-integration-manifest.test.ts` — paths + homebrew/API parity                                                                                                                |
+| Contracts         | `content-type-term-coverage.test.ts`, `content-display-fallback.test.ts`, `content-type-presentation.test.ts`, `content-access-capabilities.test.ts`, `resolve-content-media-domain.test.ts` |
+| API               | `content-types.integration-manifest.test.ts`, `content-usage-registrations.test.ts`                                                                                                          |
+| Dashboard routes  | `apps/dashboard/src/app/content-routes.integration-manifest.test.ts`                                                                                                                         |
+| Dashboard sidebar | `content-registry.test.ts`, `campaign-sidebar-content-section.test.ts`, `sidebar-nav-icons.test.ts`                                                                                          |
+| Dashboard forms   | `content-form-registry.test.ts`, `content-managed-media-form-schemas.test.ts`                                                                                                                |
+| Catalog           | `packages/catalog/src/content-type-integration-manifest.test.ts`                                                                                                                             |
 
 When adding a type, update `CONTENT_TYPE_INTEGRATION_MANIFEST` first, then wire
 each layer. See [`docs/content-types.md`](../../docs/content-types.md).

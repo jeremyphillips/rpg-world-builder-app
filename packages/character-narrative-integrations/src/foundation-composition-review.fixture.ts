@@ -1,4 +1,4 @@
-import { ALIGNMENTS } from '@rpg/contracts'
+import { CHARACTER_ALIGNMENTS } from '@rpg/contracts'
 import type {
   NarrativeFragmentCondition,
   NarrativeGenerationContext,
@@ -12,7 +12,7 @@ export interface FoundationCompositionReviewCase {
   minimumConditionedFragments?: number
 }
 
-const alignments = ALIGNMENTS
+const alignments = CHARACTER_ALIGNMENTS
 const sparseSeeds = [1, 2, 3, 6, 7, 8, 11, 22, 4]
 const richSeeds = [4, 6, 7, 9, 13, 16, 19, 20, 21]
 

@@ -1,4 +1,4 @@
-export type FieldGroupSizeKey = 'sm' | 'md' | 'lg'
+export type FieldGroupSizeKey = 'xs' | 'sm' | 'md' | 'lg'
 
 export const UI_FIELD_GROUP_BLOCK_CLASS = 'ui-field-group' as const
 
@@ -18,6 +18,12 @@ export type FieldGroupSizeSpec = {
 }
 
 export const FIELD_GROUP_SIZE_SPECS: readonly FieldGroupSizeSpec[] = [
+  {
+    size: 'xs',
+    className: 'ui-field-group--xs',
+    controlHeight: '24px',
+    useCase: 'Entity-card utility grouped controls (JoinedPair xs)',
+  },
   {
     size: 'sm',
     className: 'ui-field-group--sm',
@@ -39,6 +45,7 @@ export const FIELD_GROUP_SIZE_SPECS: readonly FieldGroupSizeSpec[] = [
 ] as const
 
 const FIELD_GROUP_SIZE_CLASS: Record<FieldGroupSizeKey, string> = {
+  xs: 'ui-field-group--xs',
   sm: 'ui-field-group--sm',
   md: 'ui-field-group--md',
   lg: 'ui-field-group--lg',

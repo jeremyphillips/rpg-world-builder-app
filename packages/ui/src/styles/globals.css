@@ -15,7 +15,9 @@
 @import '../components/ui/label-sizer.css';
 @import '../components/ui/field-group.css';
 @import '../components/ui/compact-control.css';
+@import '../components/ui/dialog-panel-header-nav-button.css';
 @import '../components/ui/choice-control.css';
+@import '../components/ui/boolean-field.css';
 @import '../components/ui/interactive-row.css';
 @import '../components/ui/popover-content.css';
 @import '../components/ui/interactive-list.css';
@@ -253,6 +255,8 @@
   --text-heading-2--line-height: 2.4375rem; /* 39px */
   --text-heading-3: 1.75rem; /* 28px */
   --text-heading-3--line-height: 2.125rem; /* 34px */
+  --text-ability-score-md: 2rem; /* 32px — ability score card numerals (md) */
+  --text-ability-score-md--line-height: 2.25rem; /* 36px */
   --text-heading-3-md: var(--text-2xl); /* 24px — between heading-3 and heading-4 */
   --text-heading-3-md--line-height: var(--text-2xl--line-height);
   --text-heading-4: 1.1875rem; /* 19px */
@@ -393,6 +397,7 @@
   --control-gap-xs: calc(var(--spacing) * 1); /* 4px */
   --control-gap-sm: calc(var(--spacing) * 1.5); /* 6px */
   --control-gap-md: calc(var(--spacing) * 2); /* 8px */
+  --field-padding-xs: calc(var(--spacing) * 2); /* 8px */
   --field-padding-sm: calc(var(--spacing) * 2.5); /* 10px */
   --field-padding-md: calc(var(--spacing) * 3); /* 12px */
   --field-padding-lg: calc(var(--spacing) * 4); /* 16px */
@@ -939,6 +944,20 @@
 }
 
 @utility text-style-field-hint-compact {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-field-group-description {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-field-group-description-compact {
   font-size: var(--text-xs);
   line-height: var(--text-xs--line-height);
   font-weight: var(--font-weight-normal);

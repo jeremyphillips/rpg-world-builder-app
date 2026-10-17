@@ -1,5 +1,7 @@
 import { type FieldOption, type FormItem } from '@rpg/ui/form'
 
+import { languageMultiComboboxField } from '@/lib/forms/language-combobox-form-fields.lib'
+
 export type LanguageGrantItemsFieldOptions = {
   path: string
   label: string
@@ -10,7 +12,7 @@ export type LanguageGrantItemsFieldOptions = {
   separator?: 'subtle'
 }
 
-/** Shared granted-languages chips field for campaign language grant authoring. */
+/** Shared granted-languages combobox field for campaign language grant authoring. */
 export function languageGrantItemsField(options: LanguageGrantItemsFieldOptions): FormItem {
   const {
     path,
@@ -22,8 +24,7 @@ export function languageGrantItemsField(options: LanguageGrantItemsFieldOptions)
     separator = 'subtle',
   } = options
 
-  return {
-    type: 'chips',
+  return languageMultiComboboxField({
     name: path,
     label,
     labelVisibility,
@@ -31,5 +32,5 @@ export function languageGrantItemsField(options: LanguageGrantItemsFieldOptions)
     ...(hint ? { hint } : {}),
     options: languageOptions,
     separator,
-  }
+  })
 }

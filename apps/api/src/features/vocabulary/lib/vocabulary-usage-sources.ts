@@ -2,6 +2,7 @@ import type { CharacterClass, Equipment, Species, Spell } from '@rpg/contracts'
 
 import { extractClassLanguageIds } from './reference-sources/classes'
 import { indexCharacterLanguageBlockersByLanguageId } from './reference-sources/characters-languages'
+import { indexCreatureTypeLanguageBlockersByLanguageId } from './reference-sources/creature-types-languages'
 import { extractEquipmentCategoryId, extractWeaponPropertyIds } from './reference-sources/equipment'
 import {
   extractSpeciesCreatureTypeId,
@@ -140,6 +141,11 @@ export const characterLanguageSource: VocabularyUsageSource = {
       purpose: ctx.purpose,
       viewer: ctx.viewer,
     }),
+}
+
+/** Creature-type language affinities from the campaign-resolved creature-types set. */
+export const creatureTypeLanguageSource: VocabularyUsageSource = {
+  loadBlockerIndex: (ctx) => indexCreatureTypeLanguageBlockersByLanguageId(ctx),
 }
 
 export const speciesSenseSource = deferredCatalogSource(async () => {

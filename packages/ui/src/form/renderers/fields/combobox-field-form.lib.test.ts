@@ -1,54 +1,169 @@
 import { describe, expect, it } from 'vitest'
 
-import { COMBOBOX_FILTER_ALL_VALUE } from '../../field-config'
+import type { ComboboxFilterDimensionConfig, FieldOption } from '../../field-config'
 import {
-  composeComboboxResolveFilteredOptions,
-  filterComboboxOptionsByCategory,
+  activeDimensionFiltersEqual,
+  composeComboboxResolveFilteredOptionsFromActive,
+  dimensionValueToSelectValue,
+  filterComboboxOptionsByActiveFilters,
+  reconcileActiveDimensionFilters,
+  selectValueToDimensionValue,
   toComboboxFieldOptions,
 } from './combobox-field-form.lib'
 
-const toolOptions = [
+const toolOptions: FieldOption[] = [
   {
     value: 'thieves-tools',
     label: "Thieves' tools",
-    filterCategory: 'thieves',
+    filterValues: { category: 'thieves' },
     classification: "Thieves' tools",
   },
   {
     value: 'lute',
     label: 'Lute',
-    filterCategory: 'musical_instrument',
+    filterValues: { category: 'musical_instrument' },
     classification: 'Musical instrument',
+  },
+  {
+    value: 'dagger',
+    label: 'Dagger',
+    filterValues: { category: 'simple', mode: 'melee' },
+  },
+  {
+    value: 'longbow',
+    label: 'Longbow',
+    filterValues: { category: 'martial', mode: 'ranged' },
   },
 ]
 
-describe('filterComboboxOptionsByCategory', () => {
-  it('returns all options when the filter is "all"', () => {
+describe('toComboboxFieldOptions', () => {
+  it('maps disabledReason onto combobox panel options', () => {
     expect(
-      filterComboboxOptionsByCategory(
-        toComboboxFieldOptions(toolOptions),
-        COMBOBOX_FILTER_ALL_VALUE,
-        [],
-      ),
-    ).toEqual(toComboboxFieldOptions(toolOptions))
-  })
-
-  it('keeps selected values visible when they fall outside the active category', () => {
-    expect(
-      filterComboboxOptionsByCategory(toComboboxFieldOptions(toolOptions), 'thieves', ['lute']),
-    ).toEqual([toComboboxFieldOptions(toolOptions)[0], toComboboxFieldOptions(toolOptions)[1]])
-  })
-
-  it('filters unselected options by category slug', () => {
-    expect(
-      filterComboboxOptionsByCategory(toComboboxFieldOptions(toolOptions), 'thieves', []),
-    ).toEqual([toComboboxFieldOptions(toolOptions)[0]])
+      toComboboxFieldOptions([
+        {
+          value: 'fire',
+          label: 'Fire',
+          disabled: true,
+          disabledReason: 'Already in Vulnerabilities',
+        },
+      ]),
+    ).toEqual([
+      {
+        value: 'fire',
+        label: 'Fire',
+        disabled: true,
+        disabledReason: 'Already in Vulnerabilities',
+      },
+    ])
   })
 })
 
-describe('composeComboboxResolveFilteredOptions', () => {
-  it('applies category filtering before the default query filter', () => {
-    const resolver = composeComboboxResolveFilteredOptions('thieves', undefined)!
+describe('dimension select wire adapters', () => {
+  it('maps undefined to the internal All wire value and back', () => {
+    expect(dimensionValueToSelectValue(undefined)).toBe('__all__')
+    expect(selectValueToDimensionValue('__all__')).toBeUndefined()
+    expect(selectValueToDimensionValue('melee')).toBe('melee')
+  })
+})
+
+describe('filterComboboxOptionsByActiveFilters', () => {
+  const panelOptions = toComboboxFieldOptions(toolOptions)
+
+  it('returns all options when no dimensions are active (undefined = All)', () => {
+    expect(filterComboboxOptionsByActiveFilters(panelOptions, {}, [])).toEqual(panelOptions)
+  })
+
+  it('ANDs across active dimension keys', () => {
+    expect(
+      filterComboboxOptionsByActiveFilters(
+        panelOptions,
+        { category: 'martial', mode: 'ranged' },
+        [],
+      ),
+    ).toEqual([panelOptions[3]])
+  })
+
+  it('excludes options missing filterValues metadata for active dimensions', () => {
+    const withoutMetadata = toComboboxFieldOptions([{ value: 'mystery', label: 'Mystery' }])
+    expect(
+      filterComboboxOptionsByActiveFilters(withoutMetadata, { category: 'simple' }, []),
+    ).toEqual([])
+  })
+
+  it('keeps selected values visible even when filters exclude them', () => {
+    expect(
+      filterComboboxOptionsByActiveFilters(panelOptions, { category: 'thieves' }, ['lute']),
+    ).toEqual([panelOptions[0], panelOptions[1]])
+  })
+})
+
+describe('activeDimensionFiltersEqual', () => {
+  it('returns true for equivalent filter maps', () => {
+    expect(activeDimensionFiltersEqual({ category: 'simple' }, { category: 'simple' })).toBe(true)
+    expect(activeDimensionFiltersEqual({}, {})).toBe(true)
+  })
+
+  it('returns false when values or keys differ', () => {
+    expect(activeDimensionFiltersEqual({ category: 'simple' }, { category: 'martial' })).toBe(false)
+    expect(activeDimensionFiltersEqual({ category: 'simple' }, {})).toBe(false)
+  })
+})
+
+describe('reconcileActiveDimensionFilters', () => {
+  const categoryDimension: ComboboxFilterDimensionConfig = {
+    filterKey: 'category',
+    ariaLabel: 'Filter by category',
+    options: [
+      { value: 'simple', label: 'Simple' },
+      { value: 'martial', label: 'Martial' },
+    ],
+    defaultValue: undefined,
+  }
+
+  it('drops keys absent from resolved dimension configs', () => {
+    expect(
+      reconcileActiveDimensionFilters({ category: 'simple', mode: 'melee' }, [categoryDimension]),
+    ).toEqual({ category: 'simple' })
+  })
+
+  it('resets invalid slugs to defaultValue or undefined', () => {
+    expect(
+      reconcileActiveDimensionFilters({ category: 'exotic' }, [
+        { ...categoryDimension, defaultValue: 'simple' },
+      ]),
+    ).toEqual({ category: 'simple' })
+
+    expect(reconcileActiveDimensionFilters({ category: 'exotic' }, [categoryDimension])).toEqual({
+      category: undefined,
+    })
+  })
+
+  it('preserves valid keys when configs add a second dimension', () => {
+    const dual: ComboboxFilterDimensionConfig[] = [
+      categoryDimension,
+      {
+        filterKey: 'mode',
+        ariaLabel: 'Filter by mode',
+        options: [
+          { value: 'melee', label: 'Melee' },
+          { value: 'ranged', label: 'Ranged' },
+        ],
+      },
+    ]
+
+    expect(reconcileActiveDimensionFilters({ category: 'simple', mode: 'ranged' }, dual)).toEqual({
+      category: 'simple',
+      mode: 'ranged',
+    })
+  })
+})
+
+describe('composeComboboxResolveFilteredOptionsFromActive', () => {
+  it('applies dimension filtering before the default query filter', () => {
+    const resolver = composeComboboxResolveFilteredOptionsFromActive(
+      { category: 'thieves' },
+      undefined,
+    )
     expect(resolver(toolOptions, 'lute', [])).toEqual([])
     expect(resolver(toolOptions, 'thieves', [])).toEqual([toolOptions[0]])
   })

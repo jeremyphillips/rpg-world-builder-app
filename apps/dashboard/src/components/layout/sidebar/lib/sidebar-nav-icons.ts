@@ -34,6 +34,7 @@ export const SIDEBAR_NAV_ICONS = {
   feats: contentIdentityIcon('feat'),
   equipment: contentIdentityIcon('equipment'),
   'skill-proficiencies': contentIdentityIcon('skill-proficiency'),
+  monsters: contentIdentityIcon('monster'),
   'admin-users': Users,
   'admin-settings': ShieldCheck,
 } as const satisfies Record<string, LucideIcon>

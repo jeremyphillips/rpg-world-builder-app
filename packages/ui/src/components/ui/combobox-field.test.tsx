@@ -69,6 +69,41 @@ describe('ComboboxField', () => {
     )
   })
 
+  it('resolves add intent closed and search copy from domain nouns', () => {
+    render(
+      <ComboboxField
+        id="monster-add-skill"
+        label="Add skill"
+        labelVisibility="srOnly"
+        options={weaponOptions}
+        multiple={false}
+        value=""
+        closedPlaceholderIntent="add"
+        noun={{ singular: 'skill', plural: 'skills' }}
+      />,
+    )
+    const trigger = screen.getByRole('combobox', { name: 'Add skill' })
+    expect(trigger).toHaveTextContent('Add skill')
+  })
+
+  it('prefers explicit placeholder overrides over add intent', () => {
+    render(
+      <ComboboxField
+        id="custom-add"
+        label="Add skill"
+        options={weaponOptions}
+        multiple={false}
+        value=""
+        closedPlaceholderIntent="add"
+        noun={{ singular: 'skill', plural: 'skills' }}
+        placeholder="Custom closed copy"
+      />,
+    )
+    expect(screen.getByRole('combobox', { name: 'Add skill' })).toHaveTextContent(
+      'Custom closed copy',
+    )
+  })
+
   it('shows the placeholder and spinner while loading', () => {
     render(
       <ComboboxField
@@ -210,11 +245,36 @@ describe('ComboboxField', () => {
 
     await user.click(screen.getByRole('combobox', { name: 'Spells' }))
     const trigger = screen.getByRole('combobox', { name: 'Spells' })
-    const search = screen.getByRole('searchbox', { name: 'Search Spells' })
+    const search = screen.getByRole('searchbox', { name: 'Search spells…' })
 
     expect(trigger).toHaveClass('invisible')
     expect(search).toHaveClass('dark:bg-transparent')
     expect(search.closest('.ui-interactive-list__toolbar')).not.toBeNull()
+  })
+
+  it('shows disabled reasons in the panel end slot', async () => {
+    const user = userEvent.setup()
+    render(
+      <ComboboxField
+        id="defenses"
+        label="Resistances"
+        options={[
+          {
+            value: 'fire',
+            label: 'Fire',
+            disabled: true,
+            disabledReason: 'Already in Vulnerabilities',
+          },
+          { value: 'cold', label: 'Cold' },
+        ]}
+        multiple
+        value={[]}
+        enableSearch={false}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Resistances' }))
+    expect(screen.getByText('Already in Vulnerabilities')).toBeInTheDocument()
   })
 
   it('omits the search row when enableSearch is false', async () => {
@@ -232,7 +292,7 @@ describe('ComboboxField', () => {
 
     await user.click(screen.getByRole('combobox', { name: 'Specific weapons' }))
     expect(
-      screen.queryByRole('searchbox', { name: 'Search Specific weapons' }),
+      screen.queryByRole('searchbox', { name: 'Search specific weapons…' }),
     ).not.toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Specific weapons' })).not.toHaveClass('invisible')
     expect(screen.getByRole('listbox', { name: 'Specific weapons' })).toHaveFocus()
@@ -266,7 +326,7 @@ describe('ComboboxField', () => {
     render(<ComboboxField id="spells" label="Spells" options={spellOptions} multiple value={[]} />)
 
     await user.click(screen.getByRole('combobox', { name: 'Spells' }))
-    const search = screen.getByRole('searchbox', { name: 'Search Spells' })
+    const search = screen.getByRole('searchbox', { name: 'Search spells…' })
     await user.type(search, 'magic')
 
     expect(screen.getByRole('option', { name: /Magic Missile/i })).toBeInTheDocument()
@@ -286,7 +346,7 @@ describe('ComboboxField', () => {
     )
 
     await user.click(screen.getByRole('combobox', { name: 'Specific weapons' }))
-    await user.type(screen.getByRole('searchbox', { name: 'Search Specific weapons' }), 'long')
+    await user.type(screen.getByRole('searchbox', { name: 'Search specific weapons…' }), 'long')
 
     expect(screen.getByRole('option', { name: 'Dagger' })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Longsword' })).toBeInTheDocument()
@@ -306,7 +366,7 @@ describe('ComboboxField', () => {
     )
 
     await user.click(screen.getByRole('combobox', { name: 'Specific weapons' }))
-    const search = screen.getByRole('searchbox', { name: 'Search Specific weapons' })
+    const search = screen.getByRole('searchbox', { name: 'Search specific weapons…' })
     await user.type(search, 'long')
     await user.keyboard('{Escape}')
 
@@ -326,7 +386,7 @@ describe('ComboboxField', () => {
     )
 
     await user.click(screen.getByRole('combobox', { name: 'Specific weapons' }))
-    const search = screen.getByRole('searchbox', { name: 'Search Specific weapons' })
+    const search = screen.getByRole('searchbox', { name: 'Search specific weapons…' })
     await user.type(search, 'long')
     await user.click(screen.getByRole('button', { name: 'Clear search' }))
 
@@ -393,7 +453,7 @@ describe('ComboboxField', () => {
 
     expect(onChange).toHaveBeenCalledWith('longsword')
     expect(
-      screen.queryByRole('searchbox', { name: 'Search Primary weapon' }),
+      screen.queryByRole('searchbox', { name: 'Search primary weapon…' }),
     ).not.toBeInTheDocument()
   })
 

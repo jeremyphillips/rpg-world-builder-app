@@ -7,8 +7,6 @@ import {
 } from './interactive-list.variants'
 import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
 import type { FieldSize } from './field.client'
-import { searchBarEmbeddedChromeInputVariants } from './search-bar.variants'
-
 /** Trigger placeholder / selected value type scale — matches single-line field controls. */
 export function comboboxTriggerValueTextClasses(size: FieldSize = 'md'): string {
   return cn('min-w-0 truncate', fieldSizeTypographyClasses[size])
@@ -16,6 +14,7 @@ export function comboboxTriggerValueTextClasses(size: FieldSize = 'md'): string 
 
 /** Negative `sideOffset` magnitude — matches field-control height so the panel overlaps the trigger. */
 export const COMBOBOX_TRIGGER_OVERLAP_OFFSET = {
+  xs: 24,
   sm: 32,
   md: 36,
   lg: 44,
@@ -35,6 +34,7 @@ export const comboboxContentVariants = (options?: { triggerWidth?: 'match' | 'fi
 export const comboboxSearchRowVariants = cva('flex w-full items-center gap-2 px-3', {
   variants: {
     size: {
+      xs: 'h-6 text-xs',
       sm: 'h-8 text-xs',
       md: 'h-9 text-md',
       lg: 'h-11 text-base',
@@ -45,14 +45,8 @@ export const comboboxSearchRowVariants = cva('flex w-full items-center gap-2 px-
   },
 })
 
-/** @deprecated Prefer {@link searchBarEmbeddedChromeInputVariants}. */
-export const comboboxSearchInputVariants = searchBarEmbeddedChromeInputVariants
-
 /** Dismissible-badge row shown below the trigger in multi-select mode. */
 export const comboboxSelectedItemsRowVariants = cva('flex flex-wrap gap-1.5 pt-2')
-
-/** @deprecated Use {@link comboboxSelectedItemsRowVariants}. */
-export const comboboxChipRowVariants = comboboxSelectedItemsRowVariants
 
 /** Vertical list for custom selected-item renderers in multi-select mode. */
 export const comboboxSelectedListVariants = cva('flex flex-col gap-2 pt-2')

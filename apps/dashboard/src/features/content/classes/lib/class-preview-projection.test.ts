@@ -112,7 +112,7 @@ describe('class preview projection', () => {
         proficiencies: {
           ...classCreateDefaultValues.proficiencies!,
           savingThrows: ['con', 'wis'],
-          armor: ['light', 'shields'],
+          armor: { categories: ['light', 'shields'], items: [] },
           weapons: {
             categories: ['simple', 'martial'],
             items: [],

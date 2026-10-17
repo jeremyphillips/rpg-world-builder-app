@@ -87,11 +87,7 @@ function EntityAnatomyTrailingPrimary({ trailing }: { trailing: EntityAnatomyTra
       return (
         <div className={entityAnatomyTrailingIndicatorVariants()}>
           {trailing.variant === 'label' ? (
-            <Text
-              as="span"
-              variant="muted"
-              className={entityAnatomyTrailingQuantityLabelVariants()}
-            >
+            <Text as="span" variant="muted" className={entityAnatomyTrailingMetaVariants()}>
               {trailing.label}
             </Text>
           ) : (

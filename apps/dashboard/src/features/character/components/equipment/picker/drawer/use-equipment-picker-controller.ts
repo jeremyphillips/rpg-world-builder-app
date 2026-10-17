@@ -15,9 +15,9 @@ import {
   toEquipmentPickerFilterState,
 } from '../browse/equipment-picker-filter-schema'
 import {
-  EMPTY_ARMOR_DETAIL_FILTERS,
-  EMPTY_WEAPON_DETAIL_FILTERS,
-} from '../browse/equipment-picker-kind-detail-filters'
+  EMPTY_EQUIPMENT_PICKER_ARMOR_DETAIL_FILTERS,
+  EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS,
+} from '../browse/equipment-picker-detail-filters.lib'
 import {
   EQUIPMENT_PICKER_MODE_MAGIC_ITEMS,
   EQUIPMENT_PICKER_RARITY_ALL,
@@ -61,10 +61,11 @@ export function useEquipmentPickerController({
   onCommitAdd,
 }: UseEquipmentPickerControllerArgs) {
   const isMagicItemsWorkflow = workflowMode === EQUIPMENT_PICKER_MODE_MAGIC_ITEMS
-  const effectiveBudget = isMagicItemsWorkflow ? undefined : budget
+  const isLoadoutWorkflow = workflowMode === 'loadout'
+  const effectiveBudget = isMagicItemsWorkflow || isLoadoutWorkflow ? undefined : budget
   const effectiveSortModes = React.useMemo(
-    () => resolveEquipmentPickerAvailableSortModes(isMagicItemsWorkflow),
-    [isMagicItemsWorkflow],
+    () => resolveEquipmentPickerAvailableSortModes(workflowMode),
+    [workflowMode],
   )
 
   const supportedItems = React.useMemo(() => filterEligibleEquipmentPickerItems(items), [items])
@@ -80,8 +81,12 @@ export function useEquipmentPickerController({
     EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly,
   )
   const [hideNonProficient, setHideNonProficient] = React.useState(false)
-  const [weaponFilters, setWeaponFilters] = React.useState(EMPTY_WEAPON_DETAIL_FILTERS)
-  const [armorFilters, setArmorFilters] = React.useState(EMPTY_ARMOR_DETAIL_FILTERS)
+  const [weaponFilters, setWeaponFilters] = React.useState(
+    EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS,
+  )
+  const [armorFilters, setArmorFilters] = React.useState(
+    EMPTY_EQUIPMENT_PICKER_ARMOR_DETAIL_FILTERS,
+  )
   const [sortMode, setSortMode] = React.useState<EquipmentPickerSortMode>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode,
   )
@@ -173,8 +178,8 @@ export function useEquipmentPickerController({
       }
       setShowAffordableOnly(next.showAffordableOnly === true)
       setHideNonProficient(next.hideNonProficient === true)
-      setWeaponFilters(next.weaponFilters ?? EMPTY_WEAPON_DETAIL_FILTERS)
-      setArmorFilters(next.armorFilters ?? EMPTY_ARMOR_DETAIL_FILTERS)
+      setWeaponFilters(next.weaponFilters ?? EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS)
+      setArmorFilters(next.armorFilters ?? EMPTY_EQUIPMENT_PICKER_ARMOR_DETAIL_FILTERS)
     },
     [onFocusedAllowanceIdChange],
   )
@@ -201,7 +206,7 @@ export function useEquipmentPickerController({
           preferMartialWeaponBrowseOrder:
             browseSortContext?.preferMartialWeaponBrowseOrder ?? false,
           ...browseSortContext,
-          rankPurchaseAvailability: workflowMode === 'purchase',
+          rankPurchaseAvailability: workflowMode === 'purchase' && !isLoadoutWorkflow,
           rankCompatibility: browseSortContext?.rankCompatibility ?? true,
         },
       }),
@@ -212,8 +217,8 @@ export function useEquipmentPickerController({
     setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
     setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
     setHideNonProficient(false)
-    setWeaponFilters(EMPTY_WEAPON_DETAIL_FILTERS)
-    setArmorFilters(EMPTY_ARMOR_DETAIL_FILTERS)
+    setWeaponFilters(EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS)
+    setArmorFilters(EMPTY_EQUIPMENT_PICKER_ARMOR_DETAIL_FILTERS)
     setSortMode(EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode)
     onFocusedAllowanceIdChange?.(undefined)
   }, [onFocusedAllowanceIdChange])

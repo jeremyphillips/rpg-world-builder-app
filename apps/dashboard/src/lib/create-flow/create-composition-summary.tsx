@@ -1,11 +1,5 @@
 import type { ReactNode } from 'react'
-import {
-  SelectionSummaryChangeAction,
-  SelectionSummaryRow,
-  type SelectionSummaryRowProps,
-} from '@rpg/ui'
-
-import { createCompositionSummaryRowsClasses } from './create-composition.variants'
+import { DecisionSummaryPanel, type SummaryDecisionRow } from '@rpg/ui'
 
 export type CreateCompositionSummaryRow = {
   id: string
@@ -22,52 +16,28 @@ export type CreateCompositionSummaryProps = {
   defaultChangeLabel?: string
 }
 
-function toSelectionSummaryRowProps(
-  row: CreateCompositionSummaryRow,
-  defaultChangeLabel: string,
-): SelectionSummaryRowProps {
-  if (row.onChange == null) {
-    return {
-      label: row.label,
-      value: row.value,
-      helper: row.helper,
-    }
-  }
-
-  const changeLabel = row.changeLabel ?? defaultChangeLabel
-  const valueActionAriaLabel = row.valueActionAriaLabel ?? `Change ${row.label.toLowerCase()}`
-
-  return {
+function toSummaryDecisionRows(rows: readonly CreateCompositionSummaryRow[]): SummaryDecisionRow[] {
+  return rows.map((row) => ({
+    id: row.id,
     label: row.label,
     value: row.value,
-    helper: row.helper,
-    onValueClick: row.onChange,
-    valueActionAriaLabel,
-    action: (
-      <SelectionSummaryChangeAction
-        changeLabel={changeLabel}
-        ariaLabel={valueActionAriaLabel}
-        onChange={row.onChange}
-      />
-    ),
-  }
+    ...(row.helper ? { description: row.helper } : {}),
+    ...(row.onChange ? { onNavigate: row.onChange } : {}),
+    ...(row.changeLabel ? { changeLabel: row.changeLabel } : {}),
+    ...(row.valueActionAriaLabel ? { valueActionAriaLabel: row.valueActionAriaLabel } : {}),
+  }))
 }
 
+/** Cardless completed-decision rows for nested composition review stacks. */
 export function CreateCompositionSummary({
   rows,
   defaultChangeLabel = 'Change',
 }: CreateCompositionSummaryProps) {
-  if (rows.length === 0) return null
-
   return (
-    <dl className={createCompositionSummaryRowsClasses}>
-      {rows.map((row, index) => (
-        <SelectionSummaryRow
-          key={row.id}
-          {...toSelectionSummaryRowProps(row, defaultChangeLabel)}
-          showDivider={index > 0}
-        />
-      ))}
-    </dl>
+    <DecisionSummaryPanel
+      chrome="embedded"
+      rows={toSummaryDecisionRows(rows)}
+      defaultChangeLabel={defaultChangeLabel}
+    />
   )
 }

@@ -74,6 +74,7 @@ export async function createVocabularyEntry(req: Request, res: Response): Promis
     label: parsed.data.label,
     description: parsed.data.description,
     status: parsed.data.status,
+    languageAffinities: parsed.data.languageAffinities,
   }
 
   if (input.status !== undefined) {

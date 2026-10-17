@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { UseFormReturn, FieldValues } from 'react-hook-form'
 import { useFormState } from 'react-hook-form'
-import { Button } from '@rpg/ui'
+import { Button, SemanticText } from '@rpg/ui'
 import { FormFooterActions, useFormUiContext, useSchemaFormSubmit } from '@rpg/ui/form'
 
 import {
@@ -14,6 +14,7 @@ import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
 import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/use-subclass-unsaved-edits'
 
 import { resolveContentFormFooterPresentation } from './content-form-footer.lib'
+import { useContentFormWriteGateReason } from './content-form-write-gate'
 import { useContentFormActionState } from './use-content-form-action-state'
 import type { ContentSaveActionState } from '../session/use-content-save-session'
 
@@ -40,16 +41,68 @@ function CreateCancelButton({ backHref, pending }: { backHref?: string; pending:
   )
 }
 
+function ContentEditDiscardButton<TFieldValues extends FieldValues>({
+  actionState,
+  form,
+  discardDisabled,
+  resetValidationPresentation,
+}: {
+  actionState?: ContentSaveActionState
+  form: UseFormReturn<TFieldValues>
+  discardDisabled: boolean
+  resetValidationPresentation: () => void
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      disabled={discardDisabled}
+      onClick={() => {
+        if (actionState) {
+          actionState.discard()
+          return
+        }
+        form.reset()
+        resetValidationPresentation()
+      }}
+    >
+      {DISCARD_CHANGES_LABEL}
+    </Button>
+  )
+}
+
+function ContentEditSaveButton({
+  submitDisabled,
+  pending,
+  pendingLabel,
+  submitLabel,
+  onSave,
+}: {
+  submitDisabled: boolean
+  pending: boolean
+  pendingLabel: string
+  submitLabel: string
+  onSave: () => void
+}) {
+  return (
+    <Button type="button" disabled={submitDisabled || pending} onClick={onSave}>
+      {pending ? pendingLabel : submitLabel}
+    </Button>
+  )
+}
+
 function ContentCreateFooterSecondary<TFieldValues extends FieldValues>({
   backHref,
   createPending,
-  submitDisabled,
+  submitDisabled: _submitDisabled,
+  saveDraftDisabled,
   saveDraftPending,
   onSaveDraft,
 }: {
   backHref?: string
   createPending: boolean
   submitDisabled: boolean
+  saveDraftDisabled: boolean
   saveDraftPending: boolean
   onSaveDraft?: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void | Promise<void>
 }) {
@@ -62,7 +115,7 @@ function ContentCreateFooterSecondary<TFieldValues extends FieldValues>({
         <Button
           type="button"
           variant="outline"
-          disabled={submitDisabled || saveDraftPending}
+          disabled={saveDraftDisabled}
           onClick={() => schemaFormSubmit?.requestSubmit(onSaveDraft)}
         >
           {saveDraftPending ? SAVING_DRAFT_LABEL : SAVE_DRAFT_LABEL}
@@ -103,7 +156,9 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
   onLeaveGuardReady,
 }: ContentFormFooterProps<TFieldValues>) {
   const fallbackActionState = useContentFormActionState({ mode, pending })
+  const strictWriteGateReason = useContentFormWriteGateReason('strict')
   const resolvedActionState = actionState ?? fallbackActionState
+  const submitDisabled = resolvedActionState.submitDisabled || strictWriteGateReason !== null
   const createPending = pending || saveDraftPending
   const { dirtyFields } = useFormState({ control: form.control })
   const subclassEdits = useSubclassUnsavedEditsBlocking()
@@ -127,37 +182,29 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
       <ContentCreateFooterSecondary
         backHref={backHref}
         createPending={createPending}
-        submitDisabled={resolvedActionState.submitDisabled}
+        submitDisabled={submitDisabled}
+        saveDraftDisabled={resolvedActionState.submitDisabled || saveDraftPending}
         saveDraftPending={saveDraftPending}
         onSaveDraft={onSaveDraft}
       />
     ) : (
-      <Button
-        type="button"
-        variant="outline"
-        disabled={resolvedActionState.discardDisabled}
-        onClick={() => {
-          if (actionState) {
-            actionState.discard()
-            return
-          }
-          form.reset()
-          resetValidationPresentation()
-        }}
-      >
-        {DISCARD_CHANGES_LABEL}
-      </Button>
+      <ContentEditDiscardButton
+        actionState={actionState}
+        form={form}
+        discardDisabled={resolvedActionState.discardDisabled}
+        resetValidationPresentation={resetValidationPresentation}
+      />
     )
 
   const submitButton =
     mode === 'edit' && actionState ? (
-      <Button
-        type="button"
-        disabled={resolvedActionState.submitDisabled || pending}
-        onClick={() => void actionState.save()}
-      >
-        {pending ? pendingLabel : submitLabel}
-      </Button>
+      <ContentEditSaveButton
+        submitDisabled={submitDisabled}
+        pending={pending}
+        pendingLabel={pendingLabel}
+        submitLabel={submitLabel}
+        onSave={() => void actionState.save()}
+      />
     ) : undefined
 
   return (
@@ -168,10 +215,13 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
         pending={leavePending}
         renderDialog={false}
       />
+      {strictWriteGateReason ? (
+        <SemanticText tone="warning">{strictWriteGateReason}</SemanticText>
+      ) : null}
       <FormFooterActions
         secondary={secondary}
         pending={pending}
-        submitDisabled={resolvedActionState.submitDisabled}
+        submitDisabled={submitDisabled}
         secondaryDisabled={createPending}
         isSuccess={presentation.isSuccess}
         submitLabel={presentation.submitLabel}

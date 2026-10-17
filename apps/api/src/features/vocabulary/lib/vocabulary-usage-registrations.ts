@@ -15,6 +15,7 @@ import { defineVocabularyUsage, type VocabularyUsageRegistration } from './defin
 import {
   characterLanguageSource,
   classLanguageSource,
+  creatureTypeLanguageSource,
   equipmentCategorySource,
   speciesCreatureTypeSource,
   speciesDamageTypeSource,
@@ -71,6 +72,7 @@ const VOCABULARY_USAGE_REGISTRATIONS_LIST = [
     sources: [
       { source: speciesLanguageSource, entry: true, batch: true },
       { source: classLanguageSource, entry: true, batch: true },
+      { source: creatureTypeLanguageSource, entry: true, batch: true },
       { source: characterLanguageSource, entry: true, batch: false },
     ],
     summaryLabels: { singular: 'reference', plural: 'references' },

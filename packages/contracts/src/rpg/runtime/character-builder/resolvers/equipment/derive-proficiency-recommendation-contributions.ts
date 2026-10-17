@@ -11,6 +11,7 @@ import {
 import type { ToolCategory } from '../../../../vocab/equipment/tool-category'
 import { toEquipmentContentId } from '../../../creature/equipment'
 import { buildChoiceSetId } from '../../choice-set'
+import type { CharacterProficiencies } from '../../../character/sheet/proficiencies'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
@@ -306,4 +307,24 @@ export function deriveProficiencyRecommendationContributions(args: {
       }),
     ),
   ]
+}
+
+/** Exact weapon grants the creature does not already own. Category grants are browse order only. */
+export function deriveSelectedWeaponProficiencyContributions(args: {
+  proficiencies: CharacterProficiencies
+  ownedIds: ReadonlySet<string>
+}): EquipmentRecommendationContribution[] {
+  return args.proficiencies.weapons.flatMap((entry) => {
+    if (!entry.weaponId) return []
+    return [
+      {
+        selector: { kind: 'equipment' as const, equipmentId: entry.weaponId },
+        tier: 'compatible' as const,
+        reason: 'selectedWeaponProficiency' as const,
+        dedupeKey: `weapon-proficiency:${entry.weaponId}`,
+        basis: 'inferred' as const,
+        excludeEquipmentIds: args.ownedIds,
+      },
+    ]
+  })
 }

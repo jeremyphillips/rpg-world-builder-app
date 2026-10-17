@@ -20,6 +20,20 @@ describe('FormSectionHeader', () => {
     expect(document.querySelector('.grid')).toHaveClass('items-start')
   })
 
+  it('centers the action with a single-line heading when no hint is present', () => {
+    render(
+      <FormSectionHeader
+        label="Equipment"
+        labelAccessory={<span data-testid="count">2</span>}
+        action={<button type="button">Add equipment</button>}
+      />,
+    )
+
+    expect(document.querySelector('.grid')).toHaveClass('items-center')
+    expect(screen.getByTestId('count')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add equipment' })).toBeInTheDocument()
+  })
+
   it('applies comfortable field-label typography when labelPresentation is field-label', () => {
     render(
       <FormSectionHeader

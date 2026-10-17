@@ -55,6 +55,7 @@ export {
   toCampaignParticipatingCharacterStatusEditorValues,
 } from './lib/campaign-participating-character-status.lib'
 export { CharacterDetailContent } from './components/detail/character-detail-content'
+export type { CharacterDetailAbilityScoreEditor } from './components/detail/sheet/character-detail-abilities-row'
 export { CharacterDetailRouteMedia } from './components/detail/sheet/character-detail-route-media'
 export { CharacterIdentityConnectionsSupplement } from './components/detail/memberships/character-identity-connections-supplement'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
@@ -171,6 +172,13 @@ export {
   createCharacterClassFilterLabelResolver,
   formatContentReferenceLabel,
 } from './lib/display/format-content-reference-label'
+export {
+  EquipmentPickerDrawer,
+  type EquipmentPickerDrawerProps,
+} from './components/equipment/picker/drawer/equipment-picker-drawer'
+export { buildEquipmentLoadoutRowViewModel } from './components/equipment/picker/equipment-picker-action.lib'
+export { enrichEquipmentPickerItemsWithSearchDocument } from './lib/equipment/equipment-picker-search.lib'
+export { EquipmentQuantityStepper } from './components/equipment/equipment-quantity-stepper'
 export {
   hasCatalogPickerNarrowingCriteria,
   hasCatalogPickerResetViewCriteria,

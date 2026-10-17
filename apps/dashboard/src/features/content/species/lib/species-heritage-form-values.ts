@@ -71,7 +71,7 @@ export function heritageOptionToFormRow(
 
 function heritageCampaignAccessFromForm(row: HeritageOptionRowForm) {
   const patch = toCampaignAccessPatch(row.campaignAccess)
-  return isDefaultCampaignAccessPatch(patch) ? undefined : patch
+  return isDefaultCampaignAccessPatch(patch, 'species') ? undefined : patch
 }
 
 function heritageOptionFromFormRow(

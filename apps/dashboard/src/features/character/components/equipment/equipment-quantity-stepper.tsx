@@ -49,7 +49,7 @@ export function EquipmentQuantityStepper({
       max={max}
       value={value}
       disabled={disabled}
-      valuePrefix={additional ? '+' : undefined}
+      signDisplay={additional ? 'positive-prefix' : undefined}
       minAction={minAction}
       onChange={onChange}
     />

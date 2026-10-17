@@ -71,6 +71,30 @@ export const NoFooter: Story = {
   ),
 }
 
+export const WithEntityContext: Story = {
+  render: () => (
+    <DrawerShellDemo
+      title="Edit weapon"
+      description="Adjustments apply to this copy only."
+      headerBack={{
+        ariaLabel: 'Back to edit item',
+        onClick: () => undefined,
+      }}
+      entityContext={
+        <div className="flex min-w-0 items-center justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-style-body-emphasis">Shortsword</p>
+            <p className="text-style-caption text-muted-foreground">Simple · Melee</p>
+          </div>
+          <Text variant="muted">Qty 1</Text>
+        </div>
+      }
+    >
+      <Text variant="muted">Editor body scrolls below the subject band.</Text>
+    </DrawerShellDemo>
+  ),
+}
+
 export const WithDescription: Story = {
   render: () => (
     <DrawerShellDemo

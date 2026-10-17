@@ -110,8 +110,10 @@ function walkInactiveContainerFields(
   walkInactiveFromItems(fields, formValues, inactive, namePrefix, hidden)
 }
 
+type FormContainerItem = Extract<FormItem, { kind: string }>
+
 function walkInactiveFormItem(
-  item: FormItem,
+  item: FormContainerItem,
   formValues: Record<string, unknown>,
   inactive: Set<string>,
   namePrefix?: string,
@@ -135,7 +137,7 @@ function walkInactiveFormItem(
       for (const column of item.columns) {
         walkInactiveContainerFields(
           column.fields,
-          column.visibility,
+          item.visibility,
           formValues,
           inactive,
           namePrefix,

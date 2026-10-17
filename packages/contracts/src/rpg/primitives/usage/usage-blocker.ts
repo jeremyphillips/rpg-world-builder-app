@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { catalogEntityUsageBlockerArmSchema } from './catalog-entity-usage-blocker'
+import { gameTermUsageBlockerArmSchema } from './game-term-usage-blocker'
 import { usageBlockerSourceKeySchema } from './usage-blocker-source-key'
 import { characterUsageReferenceSchema } from './character-usage-reference'
 import { ruleUsageBlockerArmSchema } from './rule-blocker'
@@ -13,6 +14,7 @@ export const usageBlockerSchema = z.discriminatedUnion('kind', [
     usage: characterUsageReferenceSchema,
   }),
   catalogEntityUsageBlockerArmSchema,
+  gameTermUsageBlockerArmSchema,
   ruleUsageBlockerArmSchema,
 ])
 

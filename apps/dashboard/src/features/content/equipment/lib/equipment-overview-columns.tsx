@@ -30,7 +30,7 @@ const EQUIPMENT_MIDDLE_COLUMNS: ColumnDef<Equipment>[] = [
   costColumn<Equipment>(),
 ]
 
-export const equipmentFilterSchema = buildContentFilterSchema<
+export const equipmentOverviewFilterSchema = buildContentFilterSchema<
   EquipmentRow,
   EquipmentOverviewFilterState
 >('equipment', [

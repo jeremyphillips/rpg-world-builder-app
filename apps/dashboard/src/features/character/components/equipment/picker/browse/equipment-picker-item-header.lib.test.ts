@@ -579,6 +579,110 @@ describe('equipment picker blocker mapping', () => {
     expect(presentation.control).toEqual({ kind: 'disabled', label: 'Not for sale' })
   })
 
+  it('renders loadout owned line with customized segment and plain stack stepper', () => {
+    const dagger = equipmentStepPotionOfHealingFixture
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: dagger,
+      row: buildEquipmentPickerRowViewModel(dagger),
+      workflowMode: 'loadout',
+      rowActionVm: {
+        kind: 'loadout',
+        ownedQuantity: 3,
+        plainQuantity: 2,
+        customizedQuantity: 1,
+      },
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+    })
+
+    expect(presentation.priceSlot).toBeUndefined()
+    expect(presentation.control).toEqual({ kind: 'stepper', value: 2, max: 1001 })
+    expect(presentation.selectionState).toEqual({
+      kind: 'owned',
+      provenance: [{ kind: 'other', quantity: 1, label: '1 customized' }],
+    })
+    expect(
+      presentation.selectionState?.provenance?.some((segment) => segment.label === 'Owned'),
+    ).toBe(false)
+  })
+
+  it('renders a plain loadout stack as Owned without a second Owned segment', () => {
+    const dagger = equipmentStepPotionOfHealingFixture
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: dagger,
+      row: buildEquipmentPickerRowViewModel(dagger),
+      workflowMode: 'loadout',
+      rowActionVm: {
+        kind: 'loadout',
+        ownedQuantity: 1,
+        plainQuantity: 1,
+        customizedQuantity: 0,
+      },
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+    })
+
+    expect(presentation.selectionState).toEqual({ kind: 'owned' })
+    expect(presentation.provenance).toEqual([])
+  })
+
+  it('keeps a customized-only loadout stack on Add and still reports Owned', () => {
+    const dagger = equipmentStepPotionOfHealingFixture
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: dagger,
+      row: buildEquipmentPickerRowViewModel(dagger),
+      workflowMode: 'loadout',
+      rowActionVm: {
+        kind: 'loadout',
+        ownedQuantity: 1,
+        plainQuantity: 0,
+        customizedQuantity: 1,
+      },
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+    })
+
+    expect(presentation.control).toEqual({ kind: 'add', disabled: false })
+    expect(presentation.selectionState).toEqual({
+      kind: 'owned',
+      provenance: [{ kind: 'other', quantity: 1, label: '1 customized' }],
+    })
+  })
+
+  it('omits wealth when an editable purchase has no spend', () => {
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: equipmentStepPotionOfHealingFixture,
+      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      workflowMode: 'purchase',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: false,
+        availability: { status: 'available' },
+      },
+      ownership: purchaseOwnership({ quantity: 1, spendCp: 0 }),
+      maxPurchaseQuantity: 5,
+    })
+
+    expect(presentation.selectionState).toEqual({
+      kind: 'owned',
+      provenance: [{ kind: 'purchase', label: 'Purchased', quantity: 1 }],
+    })
+  })
+
+  it('shows add-only loadout control when no plain stack exists', () => {
+    const dagger = equipmentStepPotionOfHealingFixture
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: dagger,
+      row: buildEquipmentPickerRowViewModel(dagger),
+      workflowMode: 'loadout',
+      rowActionVm: {
+        kind: 'loadout',
+        ownedQuantity: 1,
+        plainQuantity: 0,
+        customizedQuantity: 1,
+      },
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+    })
+    expect(presentation.control).toEqual({ kind: 'add', disabled: false })
+  })
+
   it('emits an unaffordable blocker only when no price label is shown', () => {
     const unpriced = { ...equipmentStepPotionOfHealingFixture, cost: null }
     const presentation = resolveEquipmentPickerItemPresentation({

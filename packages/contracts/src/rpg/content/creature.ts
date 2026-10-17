@@ -1,13 +1,19 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
-import { abilitySchema, abilityScoreSchema } from '../vocab/ability'
+import { abilityScoreSchema } from '../vocab/ability'
 import { alignmentSchema } from '../vocab/alignment'
+import { damageTypeIdSchema, getDamageTypeLabel } from '../vocab/damage'
+import { effectConditionSchema } from '../vocab/effect-condition'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
-import { senseSchema } from '../vocab/sense'
+import { SENSE_RANGES, senseDraftSchema, senseSchema } from '../vocab/sense'
 import { movementSpeedsSchema } from '../vocab/movement-mode'
 import { skillSchema } from './skill-proficiency'
+import { proficiencyRankSchema } from '../vocab/proficiency'
+import { weaponProficiencyGrantSetSchema } from '../primitives/proficiency/typed-proficiency-grant-set'
+import { weaponCategorySchema } from '../vocab/weapon/category'
+import { equipmentInstanceSchema, equipmentInstanceSchemaBase } from './equipment/instance/instance'
 
 /**
  * Shared creature value objects for contracts that describe creatures.
@@ -28,6 +34,44 @@ export const creatureSizeRefSchema = creatureSizeSchema
 export const creatureTypeRefSchema = creatureTypeSchema
 export const creatureMovementSchema = movementSpeedsSchema
 export const creatureSensesSchema = z.array(senseSchema).default([])
+
+export const creatureSensesDraftSchema = z.array(senseDraftSchema).default([])
+
+const SENSE_RANGE_PRESETS: readonly number[] = SENSE_RANGES
+
+export {
+  TELEPATHY_MILE_FEET,
+  creatureCommunicationSchema,
+  refineCreatureTelepathyRange,
+  EMPTY_CREATURE_COMMUNICATION,
+  type CreatureCommunication,
+} from './creature/communication'
+export {
+  creatureLanguageProficiencyEntrySchema,
+  type CreatureLanguageProficiencyEntry,
+} from './creature/proficiencies'
+export { formatTelepathyRange } from '../runtime/creature/communication'
+
+/** Publish validation — every sense row needs a range in feet. */
+export function refineCreatureSenseRanges(
+  senses: readonly { type: string; range?: number }[],
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
+  senses.forEach((sense, index) => {
+    if (sense.range === undefined) {
+      addCustomRefinementIssue(ctx, 'Enter a range in feet for each sense.', [
+        ...path,
+        index,
+        'range',
+      ])
+      return
+    }
+    if (!SENSE_RANGE_PRESETS.includes(sense.range)) {
+      addCustomRefinementIssue(ctx, 'Choose a sense range in feet.', [...path, index, 'range'])
+    }
+  })
+}
 
 // ---------------------------------------------------------------------------
 // Ability scores
@@ -82,33 +126,118 @@ export const creatureStatBlockHitPointsSchema = z.object({
 export type CreatureStatBlockHitPoints = z.infer<typeof creatureStatBlockHitPointsSchema>
 
 // ---------------------------------------------------------------------------
-// Stat-block modifiers
+// Proficiency entries (neutral — characters extend with sources / mastery)
 // ---------------------------------------------------------------------------
 
-/**
- * Explicit skill modifier for stat blocks.
- *
- * Monsters often publish final skill values that are better treated as authored
- * outputs than derived proficiency ranks.
- */
-export const creatureSkillModifierEntrySchema = z.object({
+export const creatureSkillProficiencyEntrySchema = z.object({
   skill: skillSchema,
-  modifier: z.number().int(),
+  rank: proficiencyRankSchema,
 })
 
-export type CreatureSkillModifierEntry = z.infer<typeof creatureSkillModifierEntrySchema>
+export type CreatureSkillProficiencyEntry = z.infer<typeof creatureSkillProficiencyEntrySchema>
 
-/**
- * Explicit saving throw modifier for stat blocks.
- *
- * Character saving throw proficiency can remain class/feature derived; monsters
- * can store the final stat-block modifier directly.
- */
-export const creatureSavingThrowModifierEntrySchema = z.object({
-  ability: abilitySchema,
-  modifier: z.number().int(),
+export const creatureWeaponProficiencyTargetSchema = z
+  .object({
+    weaponId: z.string().min(1).optional(),
+    weaponCategory: weaponCategorySchema.optional(),
+  })
+  .superRefine((target, ctx) => {
+    const hasWeaponId = target.weaponId !== undefined
+    const hasCategory = target.weaponCategory !== undefined
+    if (hasWeaponId === hasCategory) {
+      addCustomRefinementIssue(
+        ctx,
+        'Provide exactly one of weaponId or weaponCategory.',
+        hasWeaponId ? ['weaponCategory'] : ['weaponId'],
+      )
+    }
+  })
+
+export type CreatureWeaponProficiencyTarget = z.infer<typeof creatureWeaponProficiencyTargetSchema>
+
+/** Monster and class weapon proficiency buckets at rest (`categories` + `items`). */
+export const creatureWeaponProficienciesSchema = weaponProficiencyGrantSetSchema
+
+export type CreatureWeaponProficiencies = z.infer<typeof creatureWeaponProficienciesSchema>
+
+export const EMPTY_CREATURE_WEAPON_PROFICIENCIES: CreatureWeaponProficiencies = {
+  categories: [],
+  items: [],
+}
+
+export const creatureDefensesSchema = z.object({
+  vulnerabilities: z.array(damageTypeIdSchema).default([]),
+  resistances: z.array(damageTypeIdSchema).default([]),
+  immunities: z.array(damageTypeIdSchema).default([]),
+  conditionImmunities: z.array(effectConditionSchema).default([]),
 })
 
-export type CreatureSavingThrowModifierEntry = z.infer<
-  typeof creatureSavingThrowModifierEntrySchema
->
+export type CreatureDefenses = z.infer<typeof creatureDefensesSchema>
+
+const DAMAGE_DEFENSE_LISTS = ['vulnerabilities', 'resistances', 'immunities'] as const
+
+export type CreatureDamageDefenseList = (typeof DAMAGE_DEFENSE_LISTS)[number]
+
+export const CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES = {
+  vulnerabilities: { label: 'Vulnerabilities', noun: 'vulnerability' },
+  resistances: { label: 'Resistances', noun: 'resistance' },
+  immunities: { label: 'Immunities', noun: 'immunity' },
+} as const satisfies Record<CreatureDamageDefenseList, { label: string; noun: string }>
+
+const DAMAGE_DEFENSE_NOUN = {
+  vulnerabilities: CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES.vulnerabilities.noun,
+  resistances: CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES.resistances.noun,
+  immunities: CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES.immunities.noun,
+} as const
+
+/** Per-option disabled state for damage-defense comboboxes (cross-list exclusion). */
+export function resolveDamageDefenseOptionState(
+  damageTypeId: string,
+  activeList: CreatureDamageDefenseList,
+  defenses: {
+    vulnerabilities?: readonly string[]
+    resistances?: readonly string[]
+    immunities?: readonly string[]
+  },
+): { disabled: boolean; disabledReason?: string } {
+  for (const list of DAMAGE_DEFENSE_LISTS) {
+    if (list === activeList) continue
+    if ((defenses[list] ?? []).includes(damageTypeId)) {
+      return {
+        disabled: true,
+        disabledReason: `Already in ${CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES[list].label}`,
+      }
+    }
+  }
+  return { disabled: false }
+}
+
+/** Publish guard: a damage type belongs to at most one damage-defense list. */
+export function refineCreatureDamageDefenses(
+  defenses: {
+    vulnerabilities?: readonly string[]
+    resistances?: readonly string[]
+    immunities?: readonly string[]
+  },
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[] = [],
+): void {
+  const seen = new Map<string, (typeof DAMAGE_DEFENSE_LISTS)[number]>()
+  for (const list of DAMAGE_DEFENSE_LISTS) {
+    for (const [index, damageType] of (defenses[list] ?? []).entries()) {
+      const prior = seen.get(damageType)
+      if (prior) {
+        addCustomRefinementIssue(
+          ctx,
+          `${getDamageTypeLabel(damageType)} is already a ${DAMAGE_DEFENSE_NOUN[prior]}.`,
+          [...prefix, list, index],
+        )
+      } else {
+        seen.set(damageType, list)
+      }
+    }
+  }
+}
+
+export { equipmentInstanceSchema, equipmentInstanceSchemaBase }
+export type { EquipmentInstance } from './equipment/instance/instance'

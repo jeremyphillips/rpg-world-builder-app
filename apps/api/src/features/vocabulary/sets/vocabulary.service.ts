@@ -12,7 +12,13 @@ import type {
   VocabularyOptionSetId,
   VocabularyOptionSetPatch,
 } from '@rpg/contracts'
-import { getVocabularySetCapability, vocabularyEntryUsageSchema } from '@rpg/contracts'
+import {
+  activeVocabularyOptionIds,
+  CREATURE_TYPE_SET_ID,
+  getVocabularySetCapability,
+  LANGUAGE_SET_ID,
+  vocabularyEntryUsageSchema,
+} from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import {
@@ -41,6 +47,10 @@ import {
   withAuthoritativeGuardPurpose,
 } from '../lib/vocabulary-usage-context'
 import { applyVocabularyEntryMediaPatch } from '../lib/apply-vocabulary-entry-media-patch.lib'
+import {
+  assertCreatureTypeLanguageAffinitiesSetOnly,
+  mergeSystemEntryLanguageAffinitiesPatch,
+} from '../lib/creature-type-language-affinities.lib'
 
 function assertSeedSetAvailable(rulesetId: SystemRulesetId, setId: VocabularyOptionSetId): void {
   if (!listSeedVocabularySetIds(rulesetId).includes(setId)) {
@@ -68,6 +78,41 @@ function reservedVocabularyOptionIds(
   options: ReturnType<typeof resolveVocabularySet>,
 ): ReadonlySet<string> {
   return new Set(options.map((option) => option.id))
+}
+
+async function assertLanguageAffinitiesActiveInCampaign(
+  ctx: VocabularyUsageResolverContext,
+  languageAffinities: readonly string[],
+): Promise<void> {
+  if (languageAffinities.length === 0) {
+    return
+  }
+
+  const languageSet = await resolveVocabularySetForCampaign(ctx, LANGUAGE_SET_ID)
+  const activeLanguageIds = activeVocabularyOptionIds(languageSet)
+  const unknown = languageAffinities.filter((id) => !activeLanguageIds.has(id))
+  if (unknown.length > 0) {
+    throw new HttpError(
+      400,
+      'bad_request',
+      `Unknown or inactive language id(s): ${unknown.join(', ')}.`,
+    )
+  }
+}
+
+function rejectLanguageAffinitiesOnUnsupportedSet(
+  setId: VocabularyOptionSetId,
+  languageAffinities: string[] | undefined,
+): void {
+  try {
+    assertCreatureTypeLanguageAffinitiesSetOnly(setId, languageAffinities)
+  } catch {
+    throw new HttpError(
+      400,
+      'bad_request',
+      'languageAffinities is only supported for creature-types vocabulary entries.',
+    )
+  }
 }
 
 export async function countVocabularyOptionUsage(
@@ -248,6 +293,11 @@ export async function createCampaignVocabularyEntry(
     reservedIds: reservedVocabularyOptionIds(current.options),
   })
 
+  rejectLanguageAffinitiesOnUnsupportedSet(input.setId, input.languageAffinities)
+  if (input.languageAffinities !== undefined) {
+    await assertLanguageAffinitiesActiveInCampaign(ctx, input.languageAffinities)
+  }
+
   const patchDoc = await getOrCreatePatchDocument(campaignId, rulesetId)
   const setPatch = getSetPatch(patchDoc, input.setId)
 
@@ -257,6 +307,9 @@ export async function createCampaignVocabularyEntry(
     label: input.label,
     description: input.description,
     status: input.status ?? 'active',
+    ...(input.setId === CREATURE_TYPE_SET_ID
+      ? { languageAffinities: input.languageAffinities ?? [] }
+      : {}),
   })
 
   const removedCampaignEntryIds = (setPatch.removedCampaignEntryIds ?? []).filter(
@@ -293,6 +346,9 @@ function applyVocabularyEntryInput<T extends { id: string }>(
     ...(input.description !== undefined && { description: input.description }),
     ...(input.status !== undefined && { status: input.status }),
     ...(input.media !== undefined && { media: input.media }),
+    ...(input.languageAffinities !== undefined && {
+      languageAffinities: input.languageAffinities,
+    }),
   }
 }
 
@@ -300,10 +356,22 @@ function upsertSystemEntryPatch(
   setPatch: VocabularyOptionSetPatch,
   entryId: string,
   input: UpdateVocabularyEntryInput,
+  rulesetId: SystemRulesetId,
 ): VocabularyOptionSetPatch {
   const patches = setPatch.systemEntryPatches ?? []
   const index = patches.findIndex((patch) => patch.id === entryId)
-  const next = applyVocabularyEntryInput(index >= 0 ? patches[index]! : { id: entryId }, input)
+  const existing = index >= 0 ? patches[index]! : { id: entryId }
+  let next = applyVocabularyEntryInput(existing, input)
+
+  if (setPatch.setId === CREATURE_TYPE_SET_ID && input.languageAffinities !== undefined) {
+    next = mergeSystemEntryLanguageAffinitiesPatch(
+      rulesetId,
+      entryId,
+      next,
+      input.languageAffinities,
+    )
+  }
+
   const systemEntryPatches =
     index === -1 ? [...patches, next] : patches.map((patch, i) => (i === index ? next : patch))
 
@@ -334,21 +402,25 @@ function patchVocabularyEntry(
   existing: ResolvedVocabularyOptionSet['options'][number],
   entryId: string,
   input: UpdateVocabularyEntryInput,
+  rulesetId: SystemRulesetId,
 ): VocabularyOptionSetPatch {
   return existing.source === 'system'
-    ? upsertSystemEntryPatch(setPatch, entryId, input)
+    ? upsertSystemEntryPatch(setPatch, entryId, input, rulesetId)
     : patchCampaignEntry(setPatch, entryId, input)
 }
 
 async function assertVocabularyEntryPatchAllowed(
-  _setId: VocabularyOptionSetId,
+  setId: VocabularyOptionSetId,
   input: UpdateVocabularyEntryInput,
 ): Promise<void> {
   const hasLabelOrDescription = input.label !== undefined || input.description !== undefined
   const hasStatus = input.status !== undefined
   const hasMedia = input.media !== undefined
+  const hasLanguageAffinities = input.languageAffinities !== undefined
 
-  if (!hasLabelOrDescription && !hasStatus && !hasMedia) {
+  rejectLanguageAffinitiesOnUnsupportedSet(setId, input.languageAffinities)
+
+  if (!hasLabelOrDescription && !hasStatus && !hasMedia && !hasLanguageAffinities) {
     throw new HttpError(400, 'bad_request', 'No supported vocabulary patch fields were provided.')
   }
 }
@@ -488,6 +560,39 @@ export async function getVocabularyDeleteAvailability(
   return resolveVocabularyDeleteBlockers(ctx, setId, entryId)
 }
 
+function vocabularyEntryPatchHasMetadata(
+  entryPatch: Omit<UpdateVocabularyEntryInput, 'media' | 'expectedMediaRevision'>,
+): boolean {
+  return (
+    entryPatch.label !== undefined ||
+    entryPatch.description !== undefined ||
+    entryPatch.status !== undefined ||
+    entryPatch.languageAffinities !== undefined
+  )
+}
+
+async function assertVocabularyDisableTransitionAllowed(
+  ctx: VocabularyUsageResolverContext,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+  existing: ResolvedVocabularyOptionSet['options'][number],
+  input: UpdateVocabularyEntryInput,
+): Promise<void> {
+  if (input.status !== 'disabled' || existing.status !== 'active') {
+    return
+  }
+
+  const disableCheck = await resolveVocabularyDisableBlockers(ctx, setId, entryId)
+  if (disableCheck.status === 'blocked') {
+    throw new HttpError(
+      409,
+      'in_use',
+      `Vocabulary entry "${entryId}" is referenced and cannot be disabled.`,
+      { blockers: disableCheck.blockers },
+    )
+  }
+}
+
 export async function updateVocabularyEntry(
   ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
@@ -505,6 +610,10 @@ export async function updateVocabularyEntry(
 
   const { media, expectedMediaRevision, ...entryPatch } = input
 
+  if (entryPatch.languageAffinities !== undefined) {
+    await assertLanguageAffinitiesActiveInCampaign(ctx, entryPatch.languageAffinities)
+  }
+
   if (media !== undefined) {
     await applyVocabularyEntryMediaPatch({
       campaignId,
@@ -517,26 +626,12 @@ export async function updateVocabularyEntry(
       expectedMediaRevision: expectedMediaRevision ?? 0,
     })
 
-    if (
-      entryPatch.label === undefined &&
-      entryPatch.description === undefined &&
-      entryPatch.status === undefined
-    ) {
+    if (!vocabularyEntryPatchHasMetadata(entryPatch)) {
       return resolveVocabularySetForCampaign(ctx, setId)
     }
   }
 
-  if (input.status === 'disabled' && existing.status === 'active') {
-    const disableCheck = await resolveVocabularyDisableBlockers(ctx, setId, entryId)
-    if (disableCheck.status === 'blocked') {
-      throw new HttpError(
-        409,
-        'in_use',
-        `Vocabulary entry "${entryId}" is referenced and cannot be disabled.`,
-        { blockers: disableCheck.blockers },
-      )
-    }
-  }
+  await assertVocabularyDisableTransitionAllowed(ctx, setId, entryId, existing, input)
 
   const patchDoc = await getOrCreatePatchDocument(campaignId, rulesetId)
   const setPatch = getSetPatch(patchDoc, setId)
@@ -544,7 +639,7 @@ export async function updateVocabularyEntry(
   await saveSetPatch(
     campaignId,
     rulesetId,
-    patchVocabularyEntry(setPatch, existing, entryId, entryPatch),
+    patchVocabularyEntry(setPatch, existing, entryId, entryPatch, rulesetId),
   )
 
   return resolveVocabularySetForCampaign(ctx, setId)

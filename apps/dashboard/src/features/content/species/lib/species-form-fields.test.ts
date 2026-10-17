@@ -29,7 +29,7 @@ describe('buildSpeciesTabs basics', () => {
     const columns = speciesBasicsColumns()
     const [left, right] = columns.columns
 
-    expect(left?.fields.map(columnItemKey)).toEqual(['creatureType', 'movement', 'Culture'])
+    expect(left?.fields.map(columnItemKey)).toEqual(['creatureType', 'Movement', 'Culture'])
     expect(right?.fields.map(columnItemKey)).toEqual(['sizes', 'description'])
     expect(right?.fields[0]).toMatchObject({
       type: 'chips',
@@ -46,6 +46,6 @@ describe('buildSpeciesTabs basics', () => {
     const columns = speciesBasicsColumns()
     expect(
       resolveColumnsCollapseSequence(columns.columns, columns.collapseOrder).map(columnItemKey),
-    ).toEqual(['creatureType', 'sizes', 'movement', 'Culture', 'description'])
+    ).toEqual(['creatureType', 'sizes', 'Movement', 'Culture', 'description'])
   })
 })

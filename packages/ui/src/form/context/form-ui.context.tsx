@@ -37,6 +37,11 @@ export interface FormUiContextValue {
   /** Clears progressive submit/publish presentation flags after confirmed save or discard. */
   resetValidationPresentation: () => void
   /**
+   * Increments when validation presentation resets (successful save or discard).
+   * Session-scoped editor state clears on this change.
+   */
+  sessionResetGeneration?: number
+  /**
    * Checks values with the same resolver used at submit without writing RHF errors.
    * Provided by `<Form>` / `<TabbedForm>`; absent outside schema-driven shells.
    */
@@ -56,6 +61,7 @@ const defaultContext: FormUiContextValue = {
   addValidationSessionExpandKeys: () => undefined,
   removeValidationSessionExpandKeys: () => undefined,
   resetValidationPresentation: () => undefined,
+  sessionResetGeneration: 0,
 }
 
 export const FormUiContext = React.createContext<FormUiContextValue>(defaultContext)
@@ -146,7 +152,9 @@ export function FormUiProvider({
     [],
   )
 
+  const [sessionResetGeneration, setSessionResetGeneration] = React.useState(0)
   const resetValidationPresentation = React.useCallback(() => {
+    setSessionResetGeneration((generation) => generation + 1)
     setValidationSessionExpandKeys(new Set())
     if (onResetValidationPresentation) {
       onResetValidationPresentation()
@@ -171,12 +179,14 @@ export function FormUiProvider({
       addValidationSessionExpandKeys,
       removeValidationSessionExpandKeys,
       resetValidationPresentation,
+      sessionResetGeneration,
       validateSilently,
     }),
     [
       uiStateKey,
       validationPresentation,
       fields,
+      sessionResetGeneration,
       hasAttemptedSubmit,
       markSubmitAttempted,
       hasAttemptedPublish,

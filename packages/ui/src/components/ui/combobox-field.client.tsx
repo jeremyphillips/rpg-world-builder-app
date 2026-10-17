@@ -26,12 +26,17 @@ import type {
 import type { SelectFieldValueProps } from './select-field-value-props'
 import type { FieldChromeProps } from './field-chrome.variants'
 import { resolveFieldAnatomyWidth } from './field-chrome.variants'
-import { resolveFieldPlaceholder } from '../../form/config/field-placeholder.lib'
+import {
+  resolveFieldPlaceholder,
+  resolveFieldSearchPlaceholder,
+} from '../../form/config/field-placeholder.lib'
+import type { FieldNoun } from '@rpg/contracts'
 import { useFormSectionContext } from '../../form/context/form-section.context'
 import { useComposedRef } from './use-composed-ref.client'
 import { resolveFormDensity } from '../../form/form-density'
 import { useComboboxControl } from './use-combobox-control.client'
 import type { FieldLabelPresentationProps } from './field-label-props'
+import type { FieldLayoutRecommendation } from './field-recommendation.types'
 
 export type {
   ComboboxFieldOption,
@@ -54,11 +59,19 @@ export interface ComboboxFieldProps
   width?: FieldWidth
   size?: FieldSize
   placeholder?: string
+  /** Closed-state copy when `placeholder` is omitted — see `ComboboxFieldConfig`. */
+  closedPlaceholderIntent?: 'choice' | 'add'
+  /** Noun metadata for generated closed-state and search placeholders. */
+  noun?: FieldNoun
+  /** Overrides generated `Search {plural}…` panel copy. */
+  searchPlaceholder?: string
   emptyMessage?: string
   /** When false, the panel omits the search row and keyboard nav targets the listbox. */
   enableSearch?: boolean
   /** Custom selected-value renderer in multi-select mode; defaults to `Chip mode="removable"`. */
   renderSelectedItem?: ComboboxRenderSelectedItem
+  /** Labels for selected values missing from `options`. */
+  resolveOptionLabel?: ComboboxFieldControlProps['resolveOptionLabel']
   /** Custom interior for dropdown options; primitive retains label-only fallback and a11y name. */
   renderOption?: ComboboxRenderOption
   /** Custom filter/rank for panel options; selected values must remain visible when set. */
@@ -66,6 +79,7 @@ export interface ComboboxFieldProps
   /** Optional filter row below search — hosts own filter UI and state. */
   filter?: React.ReactNode
   hintPosition?: FieldHintPosition
+  recommendation?: FieldLayoutRecommendation | null
   /** Single-select only — inline clear paired with the trigger (see SelectField clearable). */
   clearable?: boolean
   clearAccessibleName?: string
@@ -76,6 +90,7 @@ export interface ComboboxFieldProps
 function ComboboxFieldControl(props: ComboboxFieldControlProps) {
   const {
     label,
+    searchPlaceholder = '',
     selected,
     loading,
     size,
@@ -114,6 +129,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
       />
       <ComboboxPanel
         label={label}
+        searchPlaceholder={searchPlaceholder}
         listboxId={control.listboxId}
         searchId={control.searchId}
         size={size}
@@ -197,13 +213,18 @@ export function ComboboxField({
   width,
   size: sizeProp,
   placeholder,
+  closedPlaceholderIntent,
+  noun,
+  searchPlaceholder: searchPlaceholderProp,
   emptyMessage = 'No options found.',
   enableSearch = true,
   renderSelectedItem,
   renderOption,
   resolveFilteredOptions,
+  resolveOptionLabel,
   filter,
   hintPosition,
+  recommendation,
   chrome,
   clearable,
   clearAccessibleName,
@@ -214,8 +235,17 @@ export function ComboboxField({
   const size = sizeProp ?? resolveFormDensity(density).size
   const selected = React.useMemo(() => normalizeSelected(multiple, value), [multiple, value])
   const resolvedPlaceholder = resolveFieldPlaceholder(
-    { label, category: multiple ? 'multi' : 'choice' },
+    {
+      label,
+      noun,
+      intent: closedPlaceholderIntent,
+      category: multiple ? 'multi' : 'choice',
+    },
     placeholder,
+  )
+  const resolvedSearchPlaceholder = resolveFieldSearchPlaceholder(
+    { label, noun },
+    searchPlaceholderProp,
   )
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
@@ -233,6 +263,7 @@ export function ComboboxField({
     >
       <FieldLayout
         hintPosition={hintPosition}
+        recommendation={recommendation}
         wrapControl={false}
         labelVisibility={labelVisibility}
         label={
@@ -256,11 +287,13 @@ export function ComboboxField({
             loading={loading}
             size={size}
             placeholder={resolvedPlaceholder ?? ''}
+            searchPlaceholder={resolvedSearchPlaceholder}
             emptyMessage={emptyMessage}
             enableSearch={enableSearch}
             renderSelectedItem={renderSelectedItem}
             renderOption={renderOption}
             resolveFilteredOptions={resolveFilteredOptions}
+            resolveOptionLabel={resolveOptionLabel}
             filter={filter}
             clearable={clearable}
             clearAccessibleName={clearAccessibleName}

@@ -349,7 +349,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer nested create', () => 
       />,
     )
 
-    const search = screen.getByRole('textbox', { name: 'Search organizations…' })
+    const search = screen.getByRole('searchbox', { name: 'Search organizations…' })
     await user.type(search, 'City')
     expect(screen.getByText('City Council')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Create organization' })).toBeInTheDocument()
@@ -358,7 +358,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer nested create', () => 
 
     expect(screen.getByText('City Council')).toBeInTheDocument()
     expect(
-      screen.getByRole('textbox', { name: 'Search organizations…', hidden: true }),
+      screen.getByRole('searchbox', { name: 'Search organizations…', hidden: true }),
     ).toHaveValue('City')
     expect(
       screen.getByRole('button', { name: 'Add headquarters organization', hidden: true }),
@@ -404,7 +404,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer nested create', () => 
 
     expect(visiblePickerItemKeys()).toEqual(['organization-a', 'organization-b', 'organization-z'])
 
-    await user.type(screen.getByRole('textbox', { name: 'Search organizations…' }), 'amber')
+    await user.type(screen.getByRole('searchbox', { name: 'Search organizations…' }), 'amber')
 
     expect(visiblePickerItemKeys()).toEqual(['organization-a', 'organization-b'])
   })

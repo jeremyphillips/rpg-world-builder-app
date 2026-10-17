@@ -34,20 +34,20 @@ const VEHICLE_MIDDLE_COLUMNS: ColumnDef<VehicleEquipment>[] = [
   costColumn<VehicleEquipment>(),
 ]
 
-export const vehicleFilterSchema = buildContentFilterSchema<VehicleRow, VehicleOverviewFilterState>(
-  'equipment',
-  [
-    createEqualsFilter<VehicleRow, VehicleOverviewFilterState, 'vehicleCategory', string>({
-      id: 'vehicleCategory',
-      label: 'Category',
-      options: VEHICLE_CATEGORIES.map((category) => ({
-        label: getVehicleCategoryLabel(category),
-        value: category,
-      })),
-      getValue: (row) => row.vehicleCategory,
-    }),
-  ],
-)
+export const vehicleOverviewFilterSchema = buildContentFilterSchema<
+  VehicleRow,
+  VehicleOverviewFilterState
+>('equipment', [
+  createEqualsFilter<VehicleRow, VehicleOverviewFilterState, 'vehicleCategory', string>({
+    id: 'vehicleCategory',
+    label: 'Category',
+    options: VEHICLE_CATEGORIES.map((category) => ({
+      label: getVehicleCategoryLabel(category),
+      value: category,
+    })),
+    getValue: (row) => row.vehicleCategory,
+  }),
+])
 
 /** Vehicle column definitions with the name cell linked to the detail page. */
 export function vehicleColumns(

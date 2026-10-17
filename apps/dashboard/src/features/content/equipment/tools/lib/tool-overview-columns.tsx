@@ -38,7 +38,7 @@ const TOOL_MIDDLE_COLUMNS: ColumnDef<ToolEquipment>[] = [
   costColumn<ToolEquipment>(),
 ]
 
-export const toolFilterSchema = buildContentFilterSchema<ToolRow, ToolOverviewFilterState>(
+export const toolOverviewFilterSchema = buildContentFilterSchema<ToolRow, ToolOverviewFilterState>(
   'equipment',
   [
     createEqualsFilter<ToolRow, ToolOverviewFilterState, 'toolCategory', string>({

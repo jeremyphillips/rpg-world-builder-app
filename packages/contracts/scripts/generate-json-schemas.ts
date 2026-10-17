@@ -12,10 +12,12 @@ import { fileURLToPath } from 'node:url'
 
 import { classStoredSchema, subclassSchema } from '../src/rpg/content/classes/class.ts'
 import { equipmentSchema } from '../src/rpg/content/equipment.ts'
+import { magicPropertyDefinitionSchema } from '../src/rpg/content/equipment/instance/magic-property.ts'
 import { featSchema } from '../src/rpg/content/feat.ts'
 import { grantGroupSchema } from '../src/rpg/content/lib/grants/grants.ts'
 import { skillProficiencySchema } from '../src/rpg/content/skill-proficiency.ts'
 import { spellSchema } from '../src/rpg/content/spell/body.ts'
+import { monsterSchema } from '../src/rpg/content/monster.ts'
 import { speciesSchema } from '../src/rpg/content/species.ts'
 import { xpProgressionSchema } from '../src/rpg/content/xp-progression.ts'
 import { startingWealthRulesSchema } from '../src/rpg/campaign/rules/starting-wealth.ts'
@@ -24,6 +26,7 @@ import {
   campaignTemplateSchema,
   worldSeedPackSchema,
 } from '../src/rpg/campaign/campaign-template.ts'
+import { creatureTypeSeedOptionSchema } from '../src/rpg/vocab/creature-type.ts'
 import { languageSeedOptionSchema } from '../src/rpg/vocab/language.ts'
 import { vocabularySeedOptionSchema } from '../src/rpg/vocab/vocabulary.ts'
 import { CATALOG_SCHEMA_MANIFEST, catalogSchemaVsCodeEntries } from './catalog-schema-manifest.ts'
@@ -41,6 +44,8 @@ const xpProgressionSeedFileSchema = z
   .length(1, 'Each SRD ruleset must ship exactly one XP progression')
 
 const slotProgressionSeedFileSchema = z.array(slotProgressionSchema).min(1)
+
+const magicPropertySeedFileSchema = z.array(magicPropertyDefinitionSchema).min(1)
 
 const ROOT = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = join(ROOT, '../../..')
@@ -78,8 +83,16 @@ const SCHEMAS: GeneratedSchema[] = [
     schema: z.array(equipmentSchema),
   },
   {
+    file: 'catalog-magic-property-list.schema.json',
+    schema: magicPropertySeedFileSchema,
+  },
+  {
     file: 'catalog-feat-list.schema.json',
     schema: z.array(featSchema),
+  },
+  {
+    file: 'catalog-monster-list.schema.json',
+    schema: z.array(monsterSchema),
   },
   {
     file: 'catalog-skill-proficiency-list.schema.json',
@@ -92,6 +105,10 @@ const SCHEMAS: GeneratedSchema[] = [
   {
     file: 'catalog-language-list.schema.json',
     schema: z.array(languageSeedOptionSchema),
+  },
+  {
+    file: 'catalog-creature-type-list.schema.json',
+    schema: z.array(creatureTypeSeedOptionSchema),
   },
   {
     file: 'catalog-starting-wealth-seed.schema.json',

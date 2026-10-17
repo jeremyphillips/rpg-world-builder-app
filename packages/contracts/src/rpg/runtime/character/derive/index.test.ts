@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { NEUTRAL_ABILITY_SCORE } from '../../../vocab/ability'
 import {
   abilityModifier,
   baseArmorClass,
@@ -20,8 +21,8 @@ import {
 // ---------------------------------------------------------------------------
 
 describe('abilityModifier', () => {
-  it('returns 0 for a score of 10', () => {
-    expect(abilityModifier(10)).toBe(0)
+  it('returns 0 for the neutral ability score', () => {
+    expect(abilityModifier(NEUTRAL_ABILITY_SCORE)).toBe(0)
   })
 
   it('returns 0 for a score of 11', () => {

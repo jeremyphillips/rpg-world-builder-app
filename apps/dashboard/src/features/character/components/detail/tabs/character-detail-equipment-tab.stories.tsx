@@ -60,6 +60,29 @@ export const WithEquipment: Story = {
   },
 }
 
+export const MissingReference: Story = {
+  args: {
+    cards: buildCharacterSheetEquipmentCards(
+      {
+        ...SAMPLE_PC,
+        equipment: {
+          ...SAMPLE_PC.equipment,
+          gear: [
+            {
+              entryId: 'missing-gear',
+              equipmentId: 'removed-from-catalog',
+              quantity: 1,
+              sources: [{ kind: 'manual' }],
+            },
+          ],
+        },
+      },
+      catalogIndex,
+    ),
+    wealth: { label: 'Wealth', value: '0 gp' },
+  },
+}
+
 export const Empty: Story = {
   args: {
     cards: [],

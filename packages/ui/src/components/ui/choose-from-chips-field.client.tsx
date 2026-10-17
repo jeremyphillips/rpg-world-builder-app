@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import type { FieldOption } from '../../form/field-config'
 import type { FieldSize } from './field.client'
+import { fieldSizeToChipSize } from './field-sizing.variants'
 import type { FieldChrome } from './field-chrome.variants'
 import type { FieldWidth } from './field-control.variants'
 import { ChipsFieldOptions } from './chips-field.client'
@@ -70,7 +71,7 @@ export function ChooseFromChipsField({
   width,
   chrome,
 }: ChooseFromChipsFieldProps) {
-  const resolvedChipSize = chipSize ?? size
+  const resolvedChipSize = chipSize ?? fieldSizeToChipSize[size]
   return (
     <ChooseCountFieldShell
       id={id}

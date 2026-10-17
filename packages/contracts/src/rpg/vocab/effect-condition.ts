@@ -34,6 +34,11 @@ export const EFFECT_CONDITION_ENTRIES = {
     description:
       "A deafened creature can't hear and automatically fails ability checks that require hearing.",
   },
+  exhaustion: {
+    label: 'Exhaustion',
+    description:
+      'Exhaustion is measured in six levels. An exhausted creature suffers escalating penalties to ability checks, speed, attack rolls, and saving throws until the condition is removed.',
+  },
   frightened: {
     label: 'Frightened',
     description:

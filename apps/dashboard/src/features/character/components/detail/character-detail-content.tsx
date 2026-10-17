@@ -10,6 +10,7 @@ import { ContentDeletionBlockedDialog } from '@/features/content'
 import { useDeleteCharacter } from '../../hooks/use-delete-character'
 import type { CharacterDetailViewModel } from '../../lib/display/character-display'
 import { CharacterDetailSheet } from './character-detail-sheet'
+import type { CharacterDetailAbilityScoreEditor } from './sheet/character-detail-abilities-row'
 
 export type CharacterDetailDeleteConfig = {
   open: boolean
@@ -28,6 +29,7 @@ export type CharacterDetailContentProps = {
   statusSummary?: ReactNode
   statusActions?: ReactNode
   identitySupplement?: ReactNode
+  abilityScoreEditor?: CharacterDetailAbilityScoreEditor
 }
 
 /**
@@ -42,6 +44,7 @@ export function CharacterDetailContent({
   statusSummary,
   statusActions,
   identitySupplement,
+  abilityScoreEditor,
 }: CharacterDetailContentProps) {
   useSetBreadcrumbLabel(viewModel.identity.name)
   const navigate = useNavigate()
@@ -84,6 +87,7 @@ export function CharacterDetailContent({
         identitySupplement={identitySupplement}
         showDelete={showDelete}
         onDeleteClick={() => setDeleteDialogOpen(true)}
+        abilityScoreEditor={abilityScoreEditor}
       />
 
       <ConfirmDialog

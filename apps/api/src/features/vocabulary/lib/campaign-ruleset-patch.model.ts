@@ -21,6 +21,7 @@ const vocabularySystemEntryPatchEntrySchema = new Schema(
     description: { type: String },
     status: { type: String, enum: VOCABULARY_OPTION_STATUSES },
     media: { type: Schema.Types.Mixed },
+    languageAffinities: { type: [String], default: undefined },
   },
   { _id: false },
 )
@@ -32,6 +33,7 @@ const vocabularyCampaignEntrySchema = new Schema(
     description: { type: String },
     status: { type: String, enum: VOCABULARY_OPTION_STATUSES, default: 'active' },
     media: { type: Schema.Types.Mixed },
+    languageAffinities: { type: [String], default: undefined },
   },
   { _id: false },
 )

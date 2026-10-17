@@ -13,6 +13,8 @@ const EQUIPMENT_ADD_PENDING_LABEL = resolvePickerPendingLabel('genericSelection'
 export type EquipmentPickerRowAcquisitionControlProps = {
   control: EquipmentPickerHeaderControl
   equipmentName: string
+  /** When true, stepper copy uses neutral quantity labels (loadout mode). */
+  neutralQuantityLabels?: boolean
   addLabel: string
   isPending?: boolean
   commitFailed?: boolean
@@ -28,6 +30,7 @@ export type EquipmentPickerRowAcquisitionControlProps = {
 export function EquipmentPickerRowAcquisitionControl({
   control,
   equipmentName,
+  neutralQuantityLabels = false,
   addLabel,
   isPending = false,
   commitFailed = false,
@@ -81,9 +84,15 @@ export function EquipmentPickerRowAcquisitionControl({
           value={control.value}
           min={1}
           max={control.max}
-          ariaLabel={`Purchased quantity of ${equipmentName}`}
+          ariaLabel={
+            neutralQuantityLabels
+              ? `Quantity of ${equipmentName}`
+              : `Purchased quantity of ${equipmentName}`
+          }
           remove={{
-            ariaLabel: `Remove purchased ${equipmentName}`,
+            ariaLabel: neutralQuantityLabels
+              ? `Remove ${equipmentName}`
+              : `Remove purchased ${equipmentName}`,
             onRemove: () => onSetPurchasedQuantity(0),
           }}
           onChange={onSetPurchasedQuantity}

@@ -8,7 +8,8 @@ export const entitySummaryHeadingEndValueVariants = cva(
   {
     variants: {
       density: {
-        compact: 'text-sm',
+        /** Size comes from the title-line end slot (`text-style-caption`, 12px). */
+        compact: '',
         comfortable: 'text-base',
       },
     },
@@ -48,6 +49,11 @@ export const entitySummaryStatusVariants = cva('', {
 
 /** Status items wrap within the lane; the row-anatomy status cell owns the top offset. */
 export const entitySummaryStatusRowVariants = cva('flex min-w-0 flex-wrap gap-x-2 gap-y-1')
+
+/** Consecutive badges inside one metadata line — spacing only, no middle-dot separators. */
+export const entitySummaryStatusBadgeGroupVariants = cva(
+  'inline-flex min-w-0 max-w-full flex-wrap items-center gap-x-2 gap-y-1',
+)
 
 /** Selection-state line stacked above status and provenance actions inside the status cell. */
 export const entitySummaryStatusLaneVariants = cva('flex min-w-0 flex-col gap-1')

@@ -10,6 +10,7 @@ import type { CampaignCharacterGetResponse } from '@rpg/contracts'
 
 import { resolveCampaignCharacterDetailAccess } from '../lib/characters/campaign-character-detail-access.lib'
 import type { useCampaignCharacterDetail } from '../hooks/use-campaign-character-detail'
+import { useCampaignCharacterAbilityScoreEditor } from '../hooks/use-campaign-character-ability-score-editor'
 import { useUpdateCampaignCharacterStatus } from '../hooks/use-update-campaign-character-status'
 
 type DetailResult = ReturnType<typeof useCampaignCharacterDetail>
@@ -38,10 +39,16 @@ export function CampaignCharacterDetailBody({
     campaignId,
   })
   const updateStatus = useUpdateCampaignCharacterStatus(campaignId, characterId)
+  const abilityScoreEditor = useCampaignCharacterAbilityScoreEditor(
+    campaignId,
+    characterId,
+    character.abilityScores,
+  )
 
   return (
     <CharacterDetailContent
       viewModel={detail.viewModel}
+      abilityScoreEditor={canManage ? abilityScoreEditor : undefined}
       identityMedia={
         <CharacterDetailRouteMedia
           characterType="pc"

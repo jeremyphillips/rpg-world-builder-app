@@ -221,7 +221,7 @@ describe('ProficienciesStep', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add language' }))
     expect(screen.getByRole('heading', { name: 'Choose language' })).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Search languages' })).toBeInTheDocument()
+    expect(screen.getByRole('searchbox', { name: 'Search languages…' })).toBeInTheDocument()
 
     const dialog = screen.getByRole('dialog', { name: 'Choose language' })
     const elvishRow = within(dialog)
@@ -292,7 +292,7 @@ describe('ProficienciesStep', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add skill' }))
     expect(screen.getByRole('heading', { name: 'Choose skill proficiency' })).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Search skills' })).toBeInTheDocument()
+    expect(screen.getByRole('searchbox', { name: 'Search skills…' })).toBeInTheDocument()
 
     const acrobaticsRow = screen
       .getByText('Acrobatics')

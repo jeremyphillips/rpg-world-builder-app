@@ -29,7 +29,8 @@ import {
 import { createAsiFeature } from './class-asi-features'
 import { createSubclassChoiceFeature } from './class-subclass-choice-features'
 import { featuresFromFormValues, featureToFormRow } from './class-feature-form-fields'
-import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
+import { normalizeArmorProficiencyGrantSet } from './class-armor-proficiency-helpers'
+import { normalizeWeaponProficiencyGrantSet } from './class-weapon-proficiency-helpers'
 import {
   startingEquipmentEmptyFormValues,
   startingEquipmentFromFormValues,
@@ -39,7 +40,10 @@ import { characterCreationProficienciesFromFormValues } from './character-creati
 export function proficienciesToFormValues(proficiencies: ClassProficiencies) {
   return {
     savingThrows: proficiencies.savingThrows,
-    armor: proficiencies.armor.categories,
+    armor: {
+      categories: proficiencies.armor.categories,
+      items: proficiencies.armor.items ?? [],
+    },
     weapons: {
       categories: proficiencies.weapons.categories,
       items: proficiencies.weapons.items ?? [],
@@ -68,18 +72,24 @@ function normalizeClassToolProficiencies(
 
 export function proficienciesFromFormValues(
   proficiencies: ClassFormValues['proficiencies'],
-  hasSpecificWeapons: boolean,
+  weaponProficiencyMode: ClassFormValues['weaponProficiencyMode'],
+  hasSpecificArmor: boolean,
 ): ClassProficiencies {
   const tools = normalizeClassToolProficiencies(proficiencies.tools)
-  const weapons = normalizeClassWeaponProficiencies({
+  const weapons = normalizeWeaponProficiencyGrantSet({
     categories: proficiencies.weapons.categories,
     items: proficiencies.weapons.items,
-    hasSpecificWeapons,
+    mode: weaponProficiencyMode,
+  })
+  const armor = normalizeArmorProficiencyGrantSet({
+    categories: proficiencies.armor.categories,
+    items: proficiencies.armor.items,
+    hasSpecificArmor,
   })
 
   return {
     savingThrows: proficiencies.savingThrows,
-    armor: { categories: proficiencies.armor, items: [] },
+    armor,
     weapons,
     ...(tools ? { tools } : {}),
     skills: { categories: [], items: proficiencies.skills.items ?? [] },
@@ -88,10 +98,11 @@ export function proficienciesFromFormValues(
 
 function proficienciesForInput(
   proficiencies: ClassFormValues['proficiencies'],
-  hasSpecificWeapons: boolean,
+  weaponProficiencyMode: ClassFormValues['weaponProficiencyMode'],
+  hasSpecificArmor: boolean,
   validationIntent: ContentValidationIntent,
 ): ClassProficiencies | undefined {
-  const parsed = proficienciesFromFormValues(proficiencies, hasSpecificWeapons)
+  const parsed = proficienciesFromFormValues(proficiencies, weaponProficiencyMode, hasSpecificArmor)
   if (validationIntent === 'draft' && parsed.savingThrows.length === 0) {
     return undefined
   }
@@ -190,7 +201,8 @@ function classWirePayloadParts(
     characterCreation: classCharacterCreationInputFromForm(values, ctx?.entity),
     proficiencies: proficienciesForInput(
       values.proficiencies,
-      values.weaponProficiencyMode === 'individual',
+      values.weaponProficiencyMode,
+      values.armorProficiencyMode === 'specific',
       validationIntent,
     ),
     features: featuresForInput(values.features, ctx?.entity?.features, validationIntent),
@@ -374,9 +386,11 @@ export const classCreateDefaultValues: Partial<ClassFormValues> = {
   grantsCantrips: false,
   spellbookAcquisitionIrregular: false,
   weaponProficiencyMode: 'categories',
+  weaponProficiencyReconciliationPending: false,
+  armorProficiencyMode: 'categories',
   proficiencies: {
     savingThrows: [],
-    armor: [],
+    armor: { categories: [], items: [] },
     weapons: { categories: [], items: [] },
     tools: { categories: [], items: [] },
     skills: { items: [] },

@@ -30,16 +30,27 @@ export function FieldDerivedMeta({ id, className }: FieldDerivedMetaProps) {
       className={cn(fieldDerivedMetaRegionVariants({ reserveSpace }), className)}
       aria-hidden={!hasRows || undefined}
     >
-      {rows.map((row) => (
-        <div key={row.label} className={fieldDerivedMetaRowVariants()}>
-          <Text variant="caption" as="span" className={fieldDerivedMetaLabelVariants()}>
-            {row.label}
-          </Text>
-          <Text variant="caption" as="span" className={fieldDerivedMetaValueVariants()}>
+      {rows.map((row, index) =>
+        row.label ? (
+          <div key={row.label} className={fieldDerivedMetaRowVariants()}>
+            <Text variant="caption" as="span" className={fieldDerivedMetaLabelVariants()}>
+              {row.label}
+            </Text>
+            <Text variant="caption" as="span" className={fieldDerivedMetaValueVariants()}>
+              {row.value}
+            </Text>
+          </div>
+        ) : (
+          <Text
+            key={`value-${index}`}
+            variant="caption"
+            as="span"
+            className={fieldDerivedMetaValueVariants()}
+          >
             {row.value}
           </Text>
-        </div>
-      ))}
+        ),
+      )}
     </div>
   )
 }

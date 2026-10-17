@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useFormContext } from 'react-hook-form'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
@@ -8,10 +9,10 @@ import {
   DEFAULT_STANDARD_ARRAY,
   characterBuilderAbilityRecommendationMessages,
   formatFieldMessage,
+  type AbilityScoreRecommendation,
 } from '@rpg/contracts'
 import { Form } from '@rpg/ui/form'
 
-import { abilitiesFormCopy } from '../../../../../lib/steps/abilities-form-labels'
 import { abilitiesFormSchema } from '../../../../../lib/steps/abilities-form-fields'
 import { FixedScoresAssignment } from './fixed-scores-assignment'
 
@@ -32,10 +33,12 @@ const fighterRecommendation = {
     primaryAbilities: ['str', 'dex'] as const,
   },
   recommendation: {
-    primary: ['str'] as const,
-    secondary: ['dex'] as const,
+    preferences: [
+      { ability: 'str', source: 'class', emphasis: 'primary', className: 'Fighter' },
+      { ability: 'dex', source: 'class', emphasis: 'secondary', className: 'Fighter' },
+    ],
     suggestedAssignment: { str: 15, dex: 14 },
-  },
+  } satisfies AbilityScoreRecommendation,
 }
 
 function renderAssignment(
@@ -71,7 +74,7 @@ function renderAssignment(
 }
 
 function getScorePoolSection() {
-  return screen.getByRole('region', { name: abilitiesFormCopy.availableScores })
+  return screen.getByRole('region', { name: 'Available scores' })
 }
 
 function getAutoFillButton() {
@@ -86,13 +89,12 @@ function getClearScoresButton() {
   })
 }
 
-function getScoreActionButton(
-  abilityLabel: string,
-  actionLabel: string = abilitiesFormCopy.chooseScore,
-) {
-  return screen.getByRole('button', {
-    name: new RegExp(`${actionLabel} for ${abilityLabel}`, 'i'),
-  })
+function getChooseScoreTrigger(abilityLabel: string) {
+  return screen.getByRole('button', { name: `Choose ${abilityLabel} score` })
+}
+
+function getChangeScoreTrigger(abilityLabel: string) {
+  return screen.getByRole('button', { name: `Change ${abilityLabel} score` })
 }
 
 describe('FixedScoresAssignment', () => {
@@ -106,7 +108,7 @@ describe('FixedScoresAssignment', () => {
 
     const pool = within(getScorePoolSection())
     expect(pool.getByText('6 scores remaining')).toBeInTheDocument()
-    expect(container.querySelector('.border-dashed')).toBeInTheDocument()
+    expect(container.querySelector('.ui-inset-panel--dashed')).toBeInTheDocument()
 
     for (const score of DEFAULT_STANDARD_ARRAY) {
       expect(pool.getByRole('button', { name: `Score ${score}` })).toBeInTheDocument()
@@ -126,8 +128,8 @@ describe('FixedScoresAssignment', () => {
   it('assigns a score via choose score, updates the pool, and shows the modifier', async () => {
     renderAssignment()
 
-    await userEvent.click(getScoreActionButton('Strength'))
-    await userEvent.click(screen.getByRole('menuitem', { name: '15' }))
+    await userEvent.click(getChooseScoreTrigger('Strength'))
+    await userEvent.click(screen.getByRole('radio', { name: '15' }))
 
     await waitFor(() => {
       expect(screen.getByText('5 scores remaining')).toBeInTheDocument()
@@ -137,28 +139,63 @@ describe('FixedScoresAssignment', () => {
     expect(screen.getByText('+2')).toBeInTheDocument()
   })
 
-  it('disables scores already assigned to another ability in choose score', async () => {
+  it('moves a score from another ability via the popover', async () => {
     renderAssignment({ str: 15 })
 
-    await userEvent.click(getScoreActionButton('Dexterity'))
-    expect(screen.getByRole('menuitem', { name: '15 — assigned to STR' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    )
-  })
-
-  it('clears an assigned score and restores the pool via choose score', async () => {
-    renderAssignment({ str: 15, dex: 14 })
-
-    await userEvent.click(getScoreActionButton('Strength', abilitiesFormCopy.changeScore))
-    await userEvent.click(screen.getByRole('menuitem', { name: '—' }))
+    await userEvent.click(getChooseScoreTrigger('Dexterity'))
+    await userEvent.click(screen.getByRole('radio', { name: 'Move from Strength, 15' }))
 
     await waitFor(() => {
-      expect(screen.getByText('5 scores remaining')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Dexterity score 15' })).toBeInTheDocument()
+      expect(getChooseScoreTrigger('Strength')).toBeInTheDocument()
     })
+    expect(getScorePoolSection().textContent).not.toContain('15')
+  })
 
-    const pool = within(getScorePoolSection())
-    expect(pool.getByRole('button', { name: 'Score 15' })).toBeInTheDocument()
+  it('swaps scores between abilities via the popover', async () => {
+    renderAssignment({ str: 15, dex: 14 })
+
+    await userEvent.click(getChangeScoreTrigger('Dexterity'))
+    await userEvent.click(screen.getByRole('radio', { name: 'Swap with Strength, 15' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Dexterity score 15' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Strength score 14' })).toBeInTheDocument()
+    })
+  })
+
+  it('marks the form dirty after the first popover assignment', async () => {
+    function DirtyProbe() {
+      const form = useFormContext()
+      return <span data-testid="form-dirty">{String(form.formState.isDirty)}</span>
+    }
+
+    render(
+      <Form
+        schema={abilitiesFormSchema}
+        fields={[
+          {
+            kind: 'slot',
+            name: 'fixedScoresAssignment',
+            render: () => (
+              <>
+                <DirtyProbe />
+                <FixedScoresAssignment scorePool={DEFAULT_ABILITY_GENERATION_RULES.standardArray} />
+              </>
+            ),
+          },
+        ]}
+        defaultValues={{}}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await userEvent.click(getChooseScoreTrigger('Strength'))
+    await userEvent.click(screen.getByRole('radio', { name: '15' }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('form-dirty')).toHaveTextContent('true')
+    })
   })
 
   it('keeps the dashed pool container visible when all values are assigned', () => {
@@ -174,51 +211,32 @@ describe('FixedScoresAssignment', () => {
     const pool = within(getScorePoolSection())
     expect(pool.getByText('All scores assigned')).toBeInTheDocument()
     expect(pool.queryByRole('button', { name: /Score \d+/ })).not.toBeInTheDocument()
-    expect(container.querySelector('.border-dashed')).toBeInTheDocument()
+    expect(container.querySelector('.ui-inset-panel--dashed')).toBeInTheDocument()
   })
 
-  it('keeps choose score visible for every ability card', () => {
-    renderAssignment()
-
-    for (const label of [
-      'Strength',
-      'Dexterity',
-      'Constitution',
-      'Intelligence',
-      'Wisdom',
-      'Charisma',
-    ]) {
-      expect(getScoreActionButton(label)).toBeVisible()
-    }
-  })
-
-  it('shows change score when an ability already has a value', () => {
+  it('shows choose on empty cards and change on filled cards', () => {
     renderAssignment({ str: 15 })
 
-    expect(getScoreActionButton('Strength', abilitiesFormCopy.changeScore)).toBeVisible()
-    expect(getScoreActionButton('Dexterity')).toBeVisible()
+    expect(getChangeScoreTrigger('Strength')).toBeVisible()
+    expect(getChooseScoreTrigger('Dexterity')).toBeVisible()
   })
 
-  it('renders drop placeholders without grab affordance on empty cards', () => {
-    renderAssignment()
-
-    const placeholders = screen.getAllByText(abilitiesFormCopy.dropScoreHere)
-    expect(placeholders).toHaveLength(6)
-    for (const placeholder of placeholders) {
-      expect(placeholder).not.toHaveClass('cursor-grab')
-      expect(placeholder.closest('button')).toBeNull()
-    }
-  })
-
-  it('uses token surface for pool scores and plain surface for assigned scores at rest', () => {
+  it('opens the popover from the pencil trigger', async () => {
     renderAssignment({ str: 15 })
 
-    const poolToken = within(getScorePoolSection()).getByRole('button', { name: 'Score 14' })
-    expect(poolToken).toHaveClass('bg-card', 'border-border')
+    await userEvent.click(getChangeScoreTrigger('Strength'))
+    expect(screen.getByText('Choose a score')).toBeInTheDocument()
+  })
 
-    const assignedScore = screen.getByRole('button', { name: 'Strength score 15' })
-    expect(assignedScore).toHaveClass('bg-transparent', 'px-0', 'w-fit', 'hover:px-4', 'hover:py-2')
-    expect(assignedScore).not.toHaveClass('bg-card')
+  it('does not open the popover after a drag past the activation distance', async () => {
+    renderAssignment()
+
+    const poolToken = within(getScorePoolSection()).getByRole('button', { name: 'Score 15' })
+    fireEvent.pointerDown(poolToken, { clientX: 0, clientY: 0, pointerId: 1, isPrimary: true })
+    fireEvent.pointerMove(poolToken, { clientX: 20, clientY: 0, pointerId: 1, isPrimary: true })
+    fireEvent.pointerUp(poolToken, { clientX: 20, clientY: 0, pointerId: 1, isPrimary: true })
+
+    expect(screen.queryByRole('heading', { name: 'Choose a score' })).not.toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {
@@ -245,15 +263,9 @@ describe('FixedScoresAssignment', () => {
     expect(screen.getByText(/are useful for Fighters\./)).toBeInTheDocument()
     expect(screen.getByText(/Suggested: 15 → Strength, 14 → Dexterity/)).toBeInTheDocument()
     expect(
-      screen.getAllByText(
-        formatFieldMessage(characterBuilderAbilityRecommendationMessages.badgePrimary()),
-      ),
+      screen.getAllByRole('button', { name: /Recommended primary ability for Fighter/ }),
     ).toHaveLength(1)
-    expect(
-      screen.getAllByText(
-        formatFieldMessage(characterBuilderAbilityRecommendationMessages.badgeSecondary()),
-      ),
-    ).toHaveLength(1)
+    expect(screen.getAllByRole('button', { name: /Also useful for Fighter/ })).toHaveLength(1)
   })
 
   it('labels the action Replace with suggestions when existing assignments conflict', () => {
@@ -296,7 +308,7 @@ describe('FixedScoresAssignment', () => {
       expect(screen.getByRole('button', { name: 'Wisdom score 10' })).toBeInTheDocument()
     })
 
-    expect(screen.queryByRole('button', { name: /Charisma score/ })).not.toBeInTheDocument()
+    expect(getChooseScoreTrigger('Charisma')).toBeInTheDocument()
     expect(
       within(getScorePoolSection()).queryByRole('button', { name: 'Score 15' }),
     ).not.toBeInTheDocument()

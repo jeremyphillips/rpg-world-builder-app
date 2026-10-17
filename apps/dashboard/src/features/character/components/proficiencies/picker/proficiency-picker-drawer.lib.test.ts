@@ -46,7 +46,7 @@ describe('proficiency-picker-drawer.lib', () => {
       ]),
     ).toBe('Selected 1 of 2. Choose 1 more.')
     expect(formatProficiencyPickerSearchPlaceholder(proficiencyPickerSkillChoiceSetFixture)).toBe(
-      'Search skills',
+      'Search skills…',
     )
   })
 

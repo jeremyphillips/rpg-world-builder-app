@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 import {
   createBooleanFilter,
@@ -148,6 +148,43 @@ function RendererHarness({
     </FilterChromeProvider>
   )
 }
+
+describe('FilterFieldRenderer boolean', () => {
+  it('writes true when checked and undefined when cleared', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+    const field = schema.fields.find((entry) => entry.id === 'hiddenOnly')
+    if (!field) throw new Error('missing boolean field')
+
+    const context: FilterRenderContext<DemoRow, TestFilterState> = {
+      schema,
+      state: {},
+      idPrefix: 'test',
+      onValueChange,
+    }
+
+    const { rerender } = render(
+      <FilterChromeProvider density="compact">
+        <FilterFieldRenderer field={field} controlId="test-hiddenOnly" context={context} />
+      </FilterChromeProvider>,
+    )
+
+    await user.click(screen.getByRole('checkbox', { name: 'Hidden only' }))
+    expect(onValueChange).toHaveBeenCalledWith('hiddenOnly', true)
+
+    rerender(
+      <FilterChromeProvider density="compact">
+        <FilterFieldRenderer
+          field={field}
+          controlId="test-hiddenOnly"
+          context={{ ...context, state: { hiddenOnly: true } }}
+        />
+      </FilterChromeProvider>,
+    )
+    await user.click(screen.getByRole('checkbox', { name: 'Hidden only' }))
+    expect(onValueChange).toHaveBeenLastCalledWith('hiddenOnly', undefined)
+  })
+})
 
 describe('FilterFieldRenderer chrome', () => {
   it('uses compact label sizing by default for stacked select', () => {

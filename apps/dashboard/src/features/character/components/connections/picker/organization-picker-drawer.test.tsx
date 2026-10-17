@@ -34,7 +34,7 @@ describe('OrganizationPickerDrawer', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Choose organization' })).toBeInTheDocument()
 
-    await user.type(screen.getByRole('textbox', { name: 'Search organizations' }), 'Lantern')
+    await user.type(screen.getByRole('searchbox', { name: 'Search organizations…' }), 'Lantern')
     await user.click(screen.getByRole('button', { name: 'Add' }))
     expect(onAdd).not.toHaveBeenCalled()
     expect(screen.getByText('Title')).toBeInTheDocument()
@@ -89,7 +89,7 @@ describe('OrganizationPickerDrawer', () => {
     expect(screen.getByText('Selected')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
 
-    await user.type(screen.getByRole('textbox', { name: 'Search organizations' }), 'government')
+    await user.type(screen.getByRole('searchbox', { name: 'Search organizations…' }), 'government')
     expect(screen.getByText('City Council')).toBeInTheDocument()
     expect(screen.queryByText('Silver Circle')).not.toBeInTheDocument()
   })
@@ -105,7 +105,7 @@ describe('OrganizationPickerDrawer', () => {
       />,
     )
 
-    await user.type(screen.getByRole('textbox', { name: 'Search organizations' }), 'circle')
+    await user.type(screen.getByRole('searchbox', { name: 'Search organizations…' }), 'circle')
     await user.click(screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME }))
 
     expect(screen.getByText('City Council')).toBeInTheDocument()

@@ -186,6 +186,40 @@ Centralized in `Field.Root` context:
 
 **Hint placement.** `hintPosition`: `below-label` (default) or `below-control`.
 
+### Field recommendations
+
+Field-owned recommendations (single inline quick-add **or** a grouped outline list) share one
+placement band: **below label/hint, above the control**. Cardinality does not change placement —
+[`FieldLayout`](../../packages/ui/src/components/ui/field-layout.tsx) owns the band via
+`FieldLayoutRecommendation` (`FieldRecommendation | FieldRecommendationGroup`).
+
+Pass `recommendation` on [`FormField`](../../packages/ui/src/components/ui/form-field.tsx),
+[`FieldLayout`](../../packages/ui/src/components/ui/field-layout.tsx), leaf wrappers such as
+[`ComboboxField`](../../packages/ui/src/components/ui/combobox-field.client.tsx), or schema-driven
+combobox fields via `recommendation` / `recommendationResolve` on [`ComboboxFieldConfig`](../../packages/ui/src/form/field-config.ts).
+
+```ts
+type FieldLayoutRecommendation = FieldRecommendation | FieldRecommendationGroup
+```
+
+- **Not** a hint, description, placeholder, or validation message — do not repurpose `hint`.
+- **Not** combobox option `metadata` (dropdown row supporting text).
+- Recommendations stay in the label region even when `hintPosition` is `below-control` (hint
+  remains in the message region under the control).
+- Dynamic field recommendations: `recommendationResolve: { dependsOn, recommendationWhen(values, ctx) }`
+  where `ctx` exposes `setValue` / `getValues` for quick-add mutations. Keep eligibility logic in
+  the feature layer; the renderer only wires placement.
+
+**Collection recommendations.** For inventory-style hosts (e.g. monster equipment), render
+[`FieldRecommendationGroupView`](../../packages/ui/src/components/ui/field-recommendation.client.tsx)
+with `placement="collection"` above the list or empty state. Same `FieldRecommendationGroup` shape;
+the collection host owns recommendation → list spacing (`FieldRecommendationGroupView` internal
+heading/action spacing only). Do not add sibling `FormItem` slots or monster-specific layout
+wrappers for field-owned groups.
+
+**Spacing ownership.** `FieldLayout` owns label → hint → recommendation → control gaps.
+`FieldRecommendationGroupView` with `placement="field"` omits collection-only outer margin.
+
 **Requirement:** every field must pass axe. See [AGENTS.md](../../../AGENTS.md) (WCAG 2.2 AA).
 
 ## Form density
@@ -335,21 +369,21 @@ covering each edge case. Tiers, naming, and copy style →
 Linguistic templates (`Choose …`, choice-count hints) live in
 `@rpg/contracts/form-copy`. Presentation orchestration lives in `@rpg/ui/form`:
 
-| Layer                               | Owns                                                         |
-| ----------------------------------- | ------------------------------------------------------------ |
-| `@rpg/contracts/form-copy`          | `FieldNoun`, `resolveChoicePlaceholder`, `choiceCountPhrase` |
-| `@rpg/ui` `resolveFieldPlaceholder` | Compact unset (`—`), presentation/digits inference           |
+| Layer                                     | Owns                                                                                                              |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `@rpg/contracts/form-copy`                | `FieldNoun`, `resolveChoicePlaceholder`, `resolveAddPlaceholder`, `resolveSearchPlaceholder`, `choiceCountPhrase` |
+| `@rpg/ui` `resolveFieldPlaceholder`       | Choice vs add intent, compact unset (`—`), presentation/digits inference                                          |
+| `@rpg/ui` `resolveFieldSearchPlaceholder` | Combobox panel search — always `Search {plural}…` from `noun`                                                     |
 
-**Placeholder precedence** (when config omits an explicit `placeholder`):
+**Closed-state copy** (when config omits an explicit `placeholder`):
 
-```text
-presentation ?? (digits != null ? 'compact' : 'default')
-```
+| Intent                | Config                                             | Result                                                  |
+| --------------------- | -------------------------------------------------- | ------------------------------------------------------- |
+| Choice (default)      | `closedPlaceholderIntent` omitted or `'choice'`    | Single → `Choose a {noun}…`; multi → `Choose {plural}…` |
+| Add-to-collection     | `closedPlaceholderIntent: 'add'` + required `noun` | `Add {singular}` (no ellipsis)                          |
+| Compact single-select | `digits` or `presentation: 'compact'`              | `—` (choice intent only)                                |
 
-- **Default** single-select → `Choose a {noun}…` from contracts.
-- **Compact** single-select → `—` (visual unset only; labels / `ariaLabel` name the control).
-- **`presentation: 'default'` + `digits`** → full Choose copy (escape hatch for digit-sized controls that need it).
-- **Text / number** → no auto placeholder (digit-sized number inputs stay empty when labeled).
+**Search** (combobox panel): omit `searchPlaceholder`; set **`noun`** (never infer from `Add …` action labels). Dashboard conventions → [form-lib-conventions.md](../../../apps/dashboard/docs/form-lib-conventions.md).
 
 Explicit `placeholder` on field config always wins. Do not hand-author `—` in
 dashboard form modules — set `digits` on narrow selects or `presentation: 'compact'`.

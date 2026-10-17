@@ -373,6 +373,28 @@ Searchable dropdown for large lists (catalog refs).
 - `resolveFilteredOptions(options, query, selected)` — optional custom filter/rank for large
   vocabularies (e.g. building archetype Model E precedence). Selected values must remain
   visible when set, matching the default `filterOptions` contract.
+- `enableSearch: false` — omits the panel search row; keyboard navigation targets the listbox
+  (short closed vocabularies such as damage defenses).
+- `optionAvailability` — same `enabledWhen` contract as `select` / `chips`; merges with static
+  `option.disabled`. Pair with `FieldOption.disabledReason` (or `optionsResolve`) when disabled
+  options should explain why in the panel end slot.
+
+### Panel filters (`filterSelects`)
+
+Toolbar dimensions use `filterSelects` (static) or `filterSelectsResolve` (dynamic). Option rows
+carry matching slugs in `filterValues` (keyed by each dimension’s `filterKey`). Dashboard
+equipment options: see [equipment-filter-surfaces.md](../../../../apps/dashboard/docs/equipment-filter-surfaces.md)
+(`resolveEquipmentComboboxFilterValues` — not overview or picker filter state).
+
+- **All / reset:** filtering uses `FilterDimensionValue = string | undefined`. `undefined` means
+  unrestricted for that dimension. The renderer injects the All menu row; config `options` list
+  **concrete slugs only**.
+- **Resolve order:** `optionsResolve` → `filterSelectsResolve` → reconcile active dimension state →
+  render toolbar → `composeComboboxResolveFilteredOptions`.
+- **Dynamic dimensions:** stable `filterKey` per dimension; invalid slugs reset to `defaultValue`
+  or `undefined`; removed dimensions drop from reconciled state.
+- **Array `filterSelect`:** unrelated cross-row select disabling on parent `array` configs — same
+  name, different feature (see [array-field-authoring.md](./array-field-authoring.md)).
 
 ## Level range (`levelRange`)
 

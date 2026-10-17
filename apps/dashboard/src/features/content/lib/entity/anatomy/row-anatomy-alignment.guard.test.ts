@@ -36,6 +36,7 @@ const CROSS_AXIS_ALIGNMENT = /\bitems-(start|center)\b/
 
 const INNER_CONTENT_ALIGNMENT_ALLOWLIST = new Set([
   'anatomy/entity-anatomy-trailing.variants.ts',
+  'anatomy/entity-anatomy.variants.ts',
   'anatomy/entity-leading-rail.variants.ts',
   'summary/entity-summary.variants.ts',
   'summary/entity-summary-status.tsx',

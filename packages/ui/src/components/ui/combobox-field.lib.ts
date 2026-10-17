@@ -8,10 +8,13 @@ export function normalizeSelected(multiple: boolean, value: unknown): string[] {
   return value != null && value !== '' ? [String(value)] : []
 }
 
+export type ResolveComboboxOptionLabel = (value: string) => string | undefined
+
 export function filterOptions(
   options: ComboboxFieldOption[],
   query: string,
   selected: string[] = [],
+  resolveOptionLabel?: ResolveComboboxOptionLabel,
 ): ComboboxFieldOption[] {
   const selectedSet = new Set(selected)
   const visible = options.filter(
@@ -20,14 +23,21 @@ export function filterOptions(
   const visibleValues = new Set(visible.map((option) => option.value))
   for (const value of selected) {
     if (!visibleValues.has(value)) {
-      visible.push(resolveOption(value, options))
+      visible.push(resolveOption(value, options, resolveOptionLabel))
     }
   }
   return visible
 }
 
-export function resolveOption(value: string, options: ComboboxFieldOption[]): ComboboxFieldOption {
-  return options.find((option) => option.value === value) ?? { value, label: value }
+export function resolveOption(
+  value: string,
+  options: ComboboxFieldOption[],
+  resolveOptionLabel?: ResolveComboboxOptionLabel,
+): ComboboxFieldOption {
+  const found = options.find((option) => option.value === value)
+  if (found) return found
+  const resolvedLabel = resolveOptionLabel?.(value)
+  return { value, label: resolvedLabel ?? value }
 }
 
 export function nextMultiSelection(
@@ -45,13 +55,14 @@ export function resolveTriggerLabel(
   selected: string[],
   placeholder: string,
   options: ComboboxFieldOption[],
+  resolveOptionLabel?: ResolveComboboxOptionLabel,
 ): string {
   if (multiple) {
     if (selected.length === 0) return placeholder
     return `${selected.length} selected`
   }
   if (selected.length === 0) return placeholder
-  return resolveOption(selected[0]!, options).label
+  return resolveOption(selected[0]!, options, resolveOptionLabel).label
 }
 
 export function clampHighlightedIndex(activeIndex: number, optionCount: number): number {

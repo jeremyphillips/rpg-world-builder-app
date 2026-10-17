@@ -21,8 +21,10 @@ export type ButtonDropdownGroup = {
 }
 
 export type ButtonDropdownProps = {
-  /** Trigger label — also used for search-field and listbox aria labels. */
+  /** Trigger label — also used for listbox aria labels. */
   label: string
+  /** Open-panel search placeholder; defaults to `Search {plural}…` from the trigger label. */
+  searchPlaceholder?: string
   groups: ButtonDropdownGroup[]
   items: ButtonDropdownItem[]
   enableSearch?: boolean

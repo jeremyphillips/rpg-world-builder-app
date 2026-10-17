@@ -20,6 +20,7 @@ import { TextField } from '../../components/ui/text-field'
 import { MarkdownField } from '../../components/ui/markdown-field.client'
 import type { FieldHintPosition } from '../../components/ui/field.variants'
 import type { FieldSize } from '../../components/ui/field.client'
+import { fieldSizeToChipSize } from '../../components/ui/field-sizing.variants'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
 import { resolveFieldConfigBoundNames } from '../field-config'
@@ -491,7 +492,7 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       size={controlSize}
-      chipSize={config.chipSize}
+      chipSize={config.chipSize ? fieldSizeToChipSize[config.chipSize] : undefined}
       width={config.width}
       disabled={config.disabled}
       value={field.value ?? fieldDefaultValue(config)}
@@ -507,6 +508,7 @@ const fieldRenderers: {
     hint,
     hintPosition,
     labelVisibility,
+    namePrefix,
     ...validation
   }) => (
     <ComboboxFieldRenderer
@@ -517,6 +519,7 @@ const fieldRenderers: {
       hint={hint}
       hintPosition={hintPosition}
       labelVisibility={labelVisibility}
+      namePrefix={namePrefix}
       {...fieldValidationProps(validation)}
     />
   ),
@@ -732,8 +735,8 @@ function StandardFieldRenderer({
   }, [boundPaths, trigger])
   const progressiveField = {
     ...field,
-    onBlur: (event: Parameters<typeof field.onBlur>[0]) => {
-      field.onBlur(event)
+    onBlur: () => {
+      field.onBlur()
       runFieldTrigger()
     },
     onChange: (value: Parameters<typeof field.onChange>[0]) => {

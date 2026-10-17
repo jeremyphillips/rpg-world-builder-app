@@ -15,6 +15,7 @@ const diceFormulaGroupShellClasses = cn(
 export const diceFormulaCoreGroupVariants = cva(diceFormulaGroupShellClasses, {
   variants: {
     size: {
+      xs: 'ui-field-group--xs',
       sm: 'ui-field-group--sm',
       md: 'ui-field-group--md',
       lg: 'ui-field-group--lg',
@@ -39,6 +40,7 @@ export const diceFormulaCoreGroupVariants = cva(diceFormulaGroupShellClasses, {
 export const diceFormulaModifierGroupVariants = cva(diceFormulaGroupShellClasses, {
   variants: {
     size: {
+      xs: 'ui-field-group--xs',
       sm: 'ui-field-group--sm',
       md: 'ui-field-group--md',
       lg: 'ui-field-group--lg',

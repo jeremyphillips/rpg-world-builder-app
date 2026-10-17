@@ -12,7 +12,7 @@ import {
 
 describe('equipment-picker-sort-sections.lib', () => {
   it('lists purchase workflow modes in menu order from the catalog-sort registry', () => {
-    expect(resolveEquipmentPickerAvailableSortModes(false)).toEqual([
+    expect(resolveEquipmentPickerAvailableSortModes('purchase')).toEqual([
       EQUIPMENT_PICKER_SORT_BEST_MATCH,
       'price_asc',
       'price_desc',
@@ -24,7 +24,7 @@ describe('equipment-picker-sort-sections.lib', () => {
   })
 
   it('omits price modes on magic-items workflow', () => {
-    const modes = resolveEquipmentPickerAvailableSortModes(true)
+    const modes = resolveEquipmentPickerAvailableSortModes('magic_items')
 
     expect(modes).not.toContain('price_asc')
     expect(modes).not.toContain('price_desc')

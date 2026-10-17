@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { vocabularyTermLabel } from '../types'
-import { HIT_POINTS_TERM } from './hit-points'
+import { getTermCompactLabel, vocabularyTermLabel } from '../types'
+import { getAverageHitPointsLabel, HIT_POINTS_TERM } from './hit-points'
 
 describe('HIT_POINTS_TERM', () => {
   it('uses lowercase sentence forms for generated prose', () => {
@@ -11,6 +11,11 @@ describe('HIT_POINTS_TERM', () => {
     expect(vocabularyTermLabel(HIT_POINTS_TERM, { number: 'singular', casing: 'sentence' })).toBe(
       'hit point',
     )
+  })
+
+  it('exposes HP compact label and average authoring label', () => {
+    expect(getTermCompactLabel(HIT_POINTS_TERM)).toBe('HP')
+    expect(getAverageHitPointsLabel()).toBe('Average HP')
   })
 
   it('keeps title label on the term for editorial surfaces', () => {

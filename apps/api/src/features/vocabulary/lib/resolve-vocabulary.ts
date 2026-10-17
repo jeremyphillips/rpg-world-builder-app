@@ -2,7 +2,24 @@ import type {
   VocabularyOption,
   VocabularyOptionSet,
   VocabularyOptionSetPatch,
+  VocabularySystemEntryPatchEntry,
 } from '@rpg/contracts'
+
+function resolveLanguageAffinities(
+  seedAffinities: string[] | undefined,
+  patch: Pick<VocabularySystemEntryPatchEntry, 'languageAffinities'> | undefined,
+  campaignAffinities: string[] | undefined,
+): string[] | undefined {
+  if (campaignAffinities !== undefined) {
+    return campaignAffinities
+  }
+
+  if (patch?.languageAffinities !== undefined) {
+    return patch.languageAffinities
+  }
+
+  return seedAffinities
+}
 
 /** Merge catalog seed with a campaign vocabulary patch into one resolved set. */
 export function resolveVocabularySet(
@@ -20,13 +37,20 @@ export function resolveVocabularySet(
 
   const resolvedSystem = seed.options.map((seedOption) => {
     const patch = systemPatches.get(seedOption.id)
+    const languageAffinities = resolveLanguageAffinities(
+      seedOption.languageAffinities,
+      patch,
+      undefined,
+    )
+
     return {
       id: seedOption.id,
       label: patch?.label ?? seedOption.label,
       description: patch?.description ?? seedOption.description,
       source: 'system' as const,
       status: patch?.status ?? seedOption.status,
-      media: patch?.media,
+      ...(patch?.media !== undefined ? { media: patch.media } : {}),
+      ...(languageAffinities !== undefined ? { languageAffinities } : {}),
     }
   })
 
@@ -42,6 +66,9 @@ export function resolveVocabularySet(
       source: 'campaign',
       status: entry.status ?? 'active',
       media: entry.media,
+      ...(entry.languageAffinities !== undefined
+        ? { languageAffinities: entry.languageAffinities }
+        : {}),
     })
   }
 

@@ -1,7 +1,5 @@
 import * as React from 'react'
 
-import { getOrganizationDomainLabel } from '@rpg/contracts'
-import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   Button,
   ConfirmDialog,
@@ -12,6 +10,11 @@ import {
 
 import { DrawerShell } from '@/components/drawer'
 import { drawerShellBodyVariants } from '@/components/drawer/drawer-shell.variants'
+import {
+  DrawerEntityContext,
+  buildOrganizationEntityCardModel,
+  buildOrganizationEntitySummaryVm,
+} from '@/features/content'
 
 import { OrganizationMembershipTitleField } from './organization-membership-title-field'
 import {
@@ -111,15 +114,28 @@ export function EditOrganizationMembershipDrawer({
     }
   }, [onOpenChange, onRemove, pending])
 
-  const kindLabel = getOrganizationDomainLabel(organization.organizationDomain)
-
+  const organizationVm = buildOrganizationEntitySummaryVm({
+    id: organization.id,
+    name: organization.name,
+    organizationDomain: organization.organizationDomain,
+    slug: organization.id,
+    source: 'homebrew',
+    rulesetId: 'srd-cc-5.2.1',
+    media: undefined,
+  })
   return (
     <>
       <DrawerShell
         open={open}
         onOpenChange={handleOpenChange}
         title={copy.drawerTitle}
-        description={joinInlineMetadata([organization.name, kindLabel])}
+        entityContext={
+          <DrawerEntityContext
+            surface={{
+              identity: buildOrganizationEntityCardModel(organizationVm),
+            }}
+          />
+        }
         bodyMode="composed"
       >
         <DrawerShell.Body className={drawerShellBodyVariants({ mode: 'managed' })}>

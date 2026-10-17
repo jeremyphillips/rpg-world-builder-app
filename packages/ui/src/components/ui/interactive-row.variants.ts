@@ -7,6 +7,8 @@ import {
   UI_INTERACTIVE_ROW_HIGHLIGHT_CLASS,
   UI_INTERACTIVE_ROW_HIT_CLASS,
   UI_INTERACTIVE_ROW_HOVER_CLASS,
+  UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_SELECTED_CLASS,
+  UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_UNSELECTED_CLASS,
   UI_INTERACTIVE_ROW_MENU_HIGHLIGHT_CLASS,
   UI_INTERACTIVE_ROW_MENU_RAIL_CLASS,
   UI_INTERACTIVE_ROW_MENU_RESET_CLASS,
@@ -22,6 +24,18 @@ export const selectableRowPointerHoverClasses = cn(
 )
 
 export const selectableRowHighlightFillClasses = UI_INTERACTIVE_ROW_HIGHLIGHT_CLASS
+
+/** Pointer hover for `InteractiveListRow` — panel flush with `--background`. */
+export const selectableRowListPointerHoverClasses = cn(
+  UI_INTERACTIVE_ROW_BLOCK_CLASS,
+  UI_INTERACTIVE_ROW_HOVER_CLASS.list,
+)
+
+export const selectableRowListHighlightUnselectedClasses =
+  UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_UNSELECTED_CLASS
+
+export const selectableRowListHighlightSelectedClasses =
+  UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_SELECTED_CLASS
 
 export const selectableRowMenuHighlightFillClasses = UI_INTERACTIVE_ROW_MENU_HIGHLIGHT_CLASS
 

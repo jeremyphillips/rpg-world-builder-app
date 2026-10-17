@@ -6,7 +6,6 @@ import {
   UI_BUTTON_SIZE_CLASSES,
   UI_BUTTON_TEXT_GEOMETRY_CLASSES,
   UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
-  UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,
   UI_FIELD_CONTROL_SIZE_CLASSES,
   UI_FIELD_CONTROL_TRIGGER_FLOW_CLASSES,
@@ -74,6 +73,8 @@ const TEXT_STYLE_UTILITIES = [
   'text-style-field-legend-compact',
   'text-style-field-hint',
   'text-style-field-hint-compact',
+  'text-style-field-group-description',
+  'text-style-field-group-description-compact',
   'text-style-field-error',
 ] as const
 
@@ -191,7 +192,6 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-field-control-size': [...UI_FIELD_CONTROL_SIZE_CLASSES],
       'ui-field-control-multiline-size': [...UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES],
       'ui-field-control-digits-size': [...UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES],
-      'ui-field-control-filter-appearance': [...UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES],
       'ui-field-control-trigger-flow': [...UI_FIELD_CONTROL_TRIGGER_FLOW_CLASSES],
       'ui-field-control-width': [...UI_FIELD_CONTROL_WIDTH_CLASSES],
       'ui-floating-label-size': [...UI_FLOATING_LABEL_SIZE_CLASSES],

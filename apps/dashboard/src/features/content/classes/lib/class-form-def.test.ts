@@ -61,9 +61,10 @@ it('draft: accepts incomplete publish fields', () => {
       hasSpellcasting: false,
       grantsCantrips: false,
       weaponProficiencyMode: 'categories',
+      armorProficiencyMode: 'categories',
       proficiencies: {
         savingThrows: [],
-        armor: [],
+        armor: { categories: [], items: [] },
         weapons: { categories: [], items: [] },
         tools: { categories: [], items: [] },
         skills: { items: [] },
@@ -295,7 +296,7 @@ describe('classFormDef round-trips', () => {
 
   it('toInput omits categories when individual weapons mode is on', () => {
     const formValues = publishReadyClassValues({
-      weaponProficiencyMode: 'individual',
+      weaponProficiencyMode: 'specific',
       proficiencies: {
         ...classFormDef.createDefaultValues!.proficiencies!,
         savingThrows: ['str'],
@@ -398,6 +399,7 @@ describe('classFormDef round-trips', () => {
       spellSelectionModel: 'prepareFromClassList',
       spellSelectionChangePackage: 'longRest:all',
       weaponProficiencyMode: 'categories',
+      armorProficiencyMode: 'categories',
       spellcasting: {
         slotProgressionId: 'full-caster',
         ability: 'int',
@@ -407,7 +409,7 @@ describe('classFormDef round-trips', () => {
       },
       proficiencies: {
         savingThrows: ['int'],
-        armor: [],
+        armor: { categories: [], items: [] },
         weapons: { categories: ['simple'], items: [] },
         tools: { categories: [], items: [] },
         skills: { items: [] },

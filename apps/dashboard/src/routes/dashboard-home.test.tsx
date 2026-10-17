@@ -66,7 +66,7 @@ describe('DashboardHome', () => {
     expect(screen.getByText(DASHBOARD_HOME_COPY.starterCards.character.title)).toBeInTheDocument()
     const newCampaignLink = screen.getByRole('link', { name: 'New campaign' })
     expect(newCampaignLink).toHaveAttribute('href', '/campaigns/new')
-    expect(newCampaignLink).not.toHaveClass('border-interactive-outline')
+    expect(newCampaignLink).not.toHaveClass('ui-button--outline')
     expect(screen.queryByRole('link', { name: 'View all campaigns' })).not.toBeInTheDocument()
   })
 
@@ -200,7 +200,7 @@ describe('DashboardHome', () => {
     renderHome()
 
     expect(await screen.findByRole('link', { name: 'New campaign' })).toHaveClass(
-      'border-interactive-outline',
+      'ui-button--outline',
     )
   })
 
@@ -219,7 +219,7 @@ describe('DashboardHome', () => {
     renderHome()
 
     expect(await screen.findByRole('link', { name: 'New campaign' })).toHaveClass(
-      'border-interactive-outline',
+      'ui-button--outline',
     )
     expect(await screen.findByRole('link', { name: 'Continue setup' })).toBeInTheDocument()
   })

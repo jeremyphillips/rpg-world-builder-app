@@ -15,7 +15,7 @@ import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/
 import {
   getContentTypeItemLabel,
   getContentTypeMidSentenceLabel,
-  formatChooseContentTypePlaceholder,
+  nounFromContentType,
 } from '../../lib/content-type-labels'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { formSelectNumberSchema } from '../../lib/forms/validation/draft-form-schema-helpers'
@@ -89,7 +89,7 @@ function classPolicyClassIdFields(ctx: ContentFormCtx): FormItem[] {
       hint: SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT,
       multiple: true,
       options: classOptions,
-      placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
+      noun: nounFromContentType('classes'),
       required: true,
       visibility: visibleWhenClassPolicyMode('only'),
     },
@@ -100,7 +100,7 @@ function classPolicyClassIdFields(ctx: ContentFormCtx): FormItem[] {
       hint: SPECIES_CLASS_POLICY_FORBIDDEN_CLASSES_HINT,
       multiple: true,
       options: classOptions,
-      placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
+      noun: nounFromContentType('classes'),
       required: true,
       visibility: visibleWhenClassPolicyMode('all_except'),
     },
@@ -160,7 +160,7 @@ function classLevelCapItemFields(ctx: ContentFormCtx): FormItem[] {
           name: 'classId',
           label: getContentTypeItemLabel('classes'),
           options: referenceClassFieldOptions(ctx.options?.classes),
-          placeholder: formatChooseContentTypePlaceholder('classes'),
+          noun: nounFromContentType('classes'),
           required: true,
           width: 'lg',
         },

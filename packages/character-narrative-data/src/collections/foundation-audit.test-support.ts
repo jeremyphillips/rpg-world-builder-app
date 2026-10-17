@@ -6,9 +6,9 @@ import type {
   NarrativeTheme,
 } from '@rpg/contracts/character-narrative'
 import { NARRATIVE_SLOTS, NARRATIVE_THEMES } from '@rpg/contracts/character-narrative'
-import { ALIGNMENTS } from '@rpg/contracts'
+import { CHARACTER_ALIGNMENTS } from '@rpg/contracts'
 
-type NarrativeAlignment = (typeof ALIGNMENTS)[number]
+type NarrativeAlignment = (typeof CHARACTER_ALIGNMENTS)[number]
 
 export const ALIGNMENT_SENSITIVE_SLOTS = [
   'ideals',
@@ -93,7 +93,7 @@ export function buildEligibleByAlignment(collection: NarrativeCollection) {
     NARRATIVE_SLOTS.map((slot) => [
       slot,
       Object.fromEntries(
-        ALIGNMENTS.map((alignment) => [
+        CHARACTER_ALIGNMENTS.map((alignment) => [
           alignment,
           collection.fragments.filter(
             (fragment) =>
@@ -111,7 +111,7 @@ export function buildExplicitAlignmentCoverage(collection: NarrativeCollection) 
     NARRATIVE_SLOTS.map((slot) => [
       slot,
       Object.fromEntries(
-        ALIGNMENTS.map((alignment) => [
+        CHARACTER_ALIGNMENTS.map((alignment) => [
           alignment,
           collection.fragments.filter(
             (fragment) =>

@@ -13,6 +13,7 @@ import {
   ORGANIZATION_LOCATION_CONNECTION_ENTRIES,
   resolveLocationConnectionEligibility,
 } from '@rpg/contracts'
+import { SELECTION_SUMMARY_DEFAULT_EYEBROW } from '@rpg/ui'
 
 import { toLocationConnectionEligibilityInput } from './location-connection-eligibility-input'
 import {
@@ -53,7 +54,8 @@ export const LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON = 'Already linked'
 
 export const LOCATION_CONNECTION_KIND_CHANGE_LABEL = 'Change connection type'
 
-export const RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW = 'Selections' as const
+/** @deprecated Use `SELECTION_SUMMARY_DEFAULT_EYEBROW` from `@rpg/ui` or `DrawerDecisionSummary`. */
+export const RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW = SELECTION_SUMMARY_DEFAULT_EYEBROW
 
 export const RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL = 'Change' as const
 

@@ -4,11 +4,7 @@ import type {
   ContentOverviewUsageScope,
   ContentUsageSummaryLabels,
 } from '@rpg/contracts'
-import {
-  API_CONTENT_TYPE_KEYS,
-  contentEntryUsageSchema,
-  contentListUsageFieldsSchema,
-} from '@rpg/contracts'
+import { contentEntryUsageSchema, contentListUsageFieldsSchema } from '@rpg/contracts'
 
 import type { ContentBatchUsageEntryResult } from './build-content-batch-entry-result'
 import type {
@@ -17,6 +13,7 @@ import type {
   ContentBatchUsageResolver,
   ContentUsageSurfaceKey,
 } from './define-content-usage'
+import { CONTENT_USAGE_SURFACE_KEYS } from './define-content-usage'
 import {
   CONTENT_USAGE_REGISTRATIONS,
   getContentUsageRegistration,
@@ -77,34 +74,34 @@ export function resolveContentUsageLookupKey(
   return registration.lookupKey === 'slug' ? entity.slug : entity.id
 }
 
-/** Nested surfaces registered separately from {@link API_CONTENT_TYPE_KEYS}. */
-export const NESTED_CONTENT_USAGE_SURFACE_KEYS = [
-  'subclasses',
-] as const satisfies readonly ContentUsageSurfaceKey[]
-
 /** Expected usage registrations — derived from contracts/API type SSOT. */
-export const EXPECTED_CONTENT_USAGE_SURFACES = [
-  ...API_CONTENT_TYPE_KEYS,
-  ...NESTED_CONTENT_USAGE_SURFACE_KEYS,
-] as const satisfies readonly ContentUsageSurfaceKey[]
+export const EXPECTED_CONTENT_USAGE_SURFACES = CONTENT_USAGE_SURFACE_KEYS
+
+export { NESTED_CONTENT_USAGE_SURFACE_KEYS } from './define-content-usage'
+
+/** Surfaces registered for detail usage only until overview Used By batch exists. */
+const CONTENT_USAGE_BATCH_OPTIONAL_SURFACES = new Set<ContentUsageSurfaceKey>(['monsters'])
 
 /** Asserts every catalog + nested surface has entry and batch usage registrations. */
 export function assertContentUsageRegistrationCoverage(): void {
   const registrationKeys = Object.keys(CONTENT_USAGE_REGISTRATIONS).sort()
-  const expectedKeys = [...EXPECTED_CONTENT_USAGE_SURFACES].sort()
+  const expectedKeys = [...CONTENT_USAGE_SURFACE_KEYS].sort()
 
   if (registrationKeys.join('|') !== expectedKeys.join('|')) {
     throw new Error(
-      `Content usage registration keys drift from EXPECTED_CONTENT_USAGE_SURFACES: registered=[${registrationKeys.join(', ')}], expected=[${expectedKeys.join(', ')}].`,
+      `Content usage registration keys drift from CONTENT_USAGE_SURFACE_KEYS: registered=[${registrationKeys.join(', ')}], expected=[${expectedKeys.join(', ')}].`,
     )
   }
 
-  for (const contentType of EXPECTED_CONTENT_USAGE_SURFACES) {
+  for (const contentType of CONTENT_USAGE_SURFACE_KEYS) {
     const registration = CONTENT_USAGE_REGISTRATIONS[contentType]
     if (!registration || !registration.sources.some((source) => source.entry)) {
       throw new Error(`Missing content usage registration with entry sources for "${contentType}".`)
     }
-    if (!registration.sources.some((source) => source.batch)) {
+    if (
+      !registration.sources.some((source) => source.batch) &&
+      !CONTENT_USAGE_BATCH_OPTIONAL_SURFACES.has(contentType)
+    ) {
       throw new Error(`Missing content usage registration with batch sources for "${contentType}".`)
     }
     if (!registration.viewerCharacterRelationship) {

@@ -65,7 +65,14 @@ from a layer below it in this diagram, it is in the wrong module.
 
 **Suggested modules:** one noun per file — `languages.ts`, `senses.ts`, `damage-resistances.ts`.
 
-**Exists today:** `creature/languages.ts`, `creature/equipment.ts`, `creature/spellcasting.ts`
+**Exists today:** `creature/languages.ts`, `creature/equipment.ts`, `creature/equipment-id-match.ts`,
+`creature/equipment-stack.ts`, `creature/proficiencies.ts`, `creature/weapon-cross-recommendation.ts`,
+`creature/resolve-inventory-weapon-attack.ts`, `creature/resolve-equipment-row-summary.ts`
+(card/read-model weapon summaries for any creature-like inventory row),
+`creature/equipment-inventory-unmodified-context.ts` (plain vs configured sibling context for UI qualifiers),
+`creature/spellcasting.ts`
+
+Loadout and inventory architecture (implemented vs future): [equipment-loadout.md](./equipment-loadout.md).
 
 ---
 
@@ -109,17 +116,17 @@ lookup when assembling derivation input from a persisted sheet — not draft sem
 
 ---
 
-### `runtime/monster/` (future)
+### `runtime/monster/`
 
-**Audience:** Monster / stat-block documents (not yet modeled).
+**Audience:** Monster catalog stat blocks (`content/monster.ts`).
 
-**Responsibilities:** Same _class_ of work as `runtime/character/` but for monster
-sheet shapes — e.g. `speaks`, `understands but cannot speak`, telepathy range.
+**Responsibilities:** Derive printed-style values from authored monster bodies — AC,
+HP, saves, skills, passive Perception, attack lines, XP, and initiative. Policy
+lives in [monster-stat-blocks.md](./monster-stat-blocks.md).
 
-**May import:** `runtime/creature/`
+**May import:** `runtime/creature/` (shared math only).
 
-**Must not import:** `runtime/character-builder/`, and generally not `runtime/character/`
-unless a shared neutral type is intentionally extracted upward.
+**Must not import:** `runtime/character-builder/` or `runtime/character/`.
 
 Do not fold monster-only behavior into `creature/` or `character/` preemptively.
 

@@ -146,6 +146,22 @@ export const SpeciesEditRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/species/routes/species-edit'), 'SpeciesEdit'),
 )
 
+export const MonstersOverviewRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/content/monsters/routes/monsters-overview'),
+    'MonstersOverview',
+  ),
+)
+export const MonsterDetailRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/content/monsters/routes/monster-detail'), 'MonsterDetail'),
+)
+export const MonsterCreateRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/content/monsters/routes/monster-create'), 'MonsterCreate'),
+)
+export const MonsterEditRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/content/monsters/routes/monster-edit'), 'MonsterEdit'),
+)
+
 export const FeatsOverviewRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/feats/routes/feats-overview'), 'FeatsOverview'),
 )

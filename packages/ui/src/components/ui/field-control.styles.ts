@@ -47,7 +47,7 @@ export function resolveFieldControlWidthClass(width: FieldControlWidthKey): stri
   return FIELD_CONTROL_WIDTH_CLASS[width]
 }
 
-export type FieldControlSizeKey = 'sm' | 'md' | 'lg'
+export type FieldControlSizeKey = 'xs' | 'sm' | 'md' | 'lg'
 
 export type FieldControlSizeSpec = {
   size: FieldControlSizeKey
@@ -57,6 +57,12 @@ export type FieldControlSizeSpec = {
 }
 
 export const FIELD_CONTROL_SIZE_SPECS: readonly FieldControlSizeSpec[] = [
+  {
+    size: 'xs',
+    className: 'ui-field-control--xs',
+    controlHeight: '24px',
+    useCase: 'Entity-card utility band and inline dense controls',
+  },
   {
     size: 'sm',
     className: 'ui-field-control--sm',
@@ -114,6 +120,12 @@ export type FieldControlDigitsSizeSpec = {
 
 export const FIELD_CONTROL_DIGITS_SIZE_SPECS: readonly FieldControlDigitsSizeSpec[] = [
   {
+    size: 'xs',
+    className: 'ui-field-control--digits-xs',
+    trailingReserve: '20px',
+    useCase: 'Digit fields at xs control scale',
+  },
+  {
     size: 'sm',
     className: 'ui-field-control--digits-sm',
     trailingReserve: '24px',
@@ -133,29 +145,6 @@ export const FIELD_CONTROL_DIGITS_SIZE_SPECS: readonly FieldControlDigitsSizeSpe
   },
 ] as const
 
-export type FilterInlineAppearanceKey = 'outline' | 'ghost'
-
-export type FilterInlineAppearanceSpec = {
-  appearance: FilterInlineAppearanceKey
-  className: string
-  useCase: string
-}
-
-export const FILTER_INLINE_APPEARANCE_SPECS: readonly FilterInlineAppearanceSpec[] = [
-  {
-    appearance: 'outline',
-    className: 'ui-field-control--filter-outline',
-    useCase: 'Default bordered boolean filter shell',
-  },
-  {
-    appearance: 'ghost',
-    className: 'ui-field-control--filter-ghost',
-    useCase: 'Toolbar boolean filters without border',
-  },
-] as const
-
-export const UI_FILTER_INLINE_SHELL_CLASS = 'ui-field-control--filter-inline' as const
-
 export const UI_SEARCH_BAR_CLASS = 'ui-search-bar' as const
 export const UI_SEARCH_BAR_EMBEDDED_HOST_CLASS = 'ui-search-bar--embedded-host' as const
 export const UI_SEARCH_BAR_EMBEDDED_INPUT_WRAP_CLASS = 'ui-search-bar__embedded-wrap' as const
@@ -165,26 +154,24 @@ const UI_SEARCH_BAR_FIELD_INPUT_CLASS = 'ui-search-bar__field-input' as const
 const UI_SEARCH_BAR_EMBEDDED_INPUT_CLASS = 'ui-search-bar__embedded-input' as const
 
 const FIELD_CONTROL_SIZE_CLASS: Record<FieldControlSizeKey, string> = {
+  xs: 'ui-field-control--xs',
   sm: 'ui-field-control--sm',
   md: 'ui-field-control--md',
   lg: 'ui-field-control--lg',
 }
 
 const FIELD_CONTROL_MULTILINE_SIZE_CLASS: Record<FieldControlSizeKey, string> = {
+  xs: 'ui-field-control--multiline-sm',
   sm: 'ui-field-control--multiline-sm',
   md: 'ui-field-control--multiline-md',
   lg: 'ui-field-control--multiline-lg',
 }
 
 const FIELD_CONTROL_DIGITS_SIZE_CLASS: Record<FieldControlSizeKey, string> = {
+  xs: 'ui-field-control--digits-xs',
   sm: 'ui-field-control--digits-sm',
   md: 'ui-field-control--digits-md',
   lg: 'ui-field-control--digits-lg',
-}
-
-const FILTER_INLINE_APPEARANCE_CLASS: Record<FilterInlineAppearanceKey, string> = {
-  outline: 'ui-field-control--filter-outline',
-  ghost: 'ui-field-control--filter-ghost',
 }
 
 export function resolveFieldControlSizeClass(size: FieldControlSizeKey = 'md'): string {
@@ -197,12 +184,6 @@ export function resolveFieldControlMultilineSizeClass(size: FieldControlSizeKey 
 
 export function resolveFieldControlDigitsSizeClass(size: FieldControlSizeKey = 'md'): string {
   return FIELD_CONTROL_DIGITS_SIZE_CLASS[size]
-}
-
-export function resolveFilterInlineAppearanceClass(
-  appearance: FilterInlineAppearanceKey = 'outline',
-): string {
-  return FILTER_INLINE_APPEARANCE_CLASS[appearance]
 }
 
 export function resolveSearchBarLeadingIconClass(size: FieldControlSizeKey = 'md'): string {
@@ -235,9 +216,5 @@ export const UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES = FIELD_CONTROL_MULTILINE_S
 ) as readonly string[]
 
 export const UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES = FIELD_CONTROL_DIGITS_SIZE_SPECS.map(
-  (spec) => spec.className,
-) as readonly string[]
-
-export const UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES = FILTER_INLINE_APPEARANCE_SPECS.map(
   (spec) => spec.className,
 ) as readonly string[]

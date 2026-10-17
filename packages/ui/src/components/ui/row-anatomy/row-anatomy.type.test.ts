@@ -6,11 +6,14 @@ import type { RowAnatomyCellSpec } from './row-anatomy.types'
 type HostColumn = 'leading' | 'media' | 'content' | 'trailing'
 
 describe('RowAnatomyCellSpec', () => {
-  it('accepts host-declared columns for band and full cells', () => {
+  it('accepts host-declared columns for band, full, and stretch cells', () => {
     expectTypeOf<{ slot: 'band'; column: 'media' }>().toMatchTypeOf<
       RowAnatomyCellSpec<HostColumn>
     >()
     expectTypeOf<{ slot: 'full'; column: 'leading' }>().toMatchTypeOf<
+      RowAnatomyCellSpec<HostColumn>
+    >()
+    expectTypeOf<{ slot: 'stretch'; column: 'media' }>().toMatchTypeOf<
       RowAnatomyCellSpec<HostColumn>
     >()
   })
@@ -20,14 +23,12 @@ describe('RowAnatomyCellSpec', () => {
     const metaLeading: RowAnatomyCellSpec = { slot: 'meta', column: 'leading' }
     // @ts-expect-error status rows never hold leading rails
     const statusLeading: RowAnatomyCellSpec = { slot: 'status', column: 'leading' }
-    // @ts-expect-error stretch is trailing-only
-    const stretchContent: RowAnatomyCellSpec = { slot: 'stretch', column: 'content' }
-    // @ts-expect-error columns outside the host union are rejected
+    // @ts-expect-error columns outside the default row union are rejected
     const unknownColumn: RowAnatomyCellSpec = { slot: 'band', column: 'media' }
     // @ts-expect-error unknown slots are rejected
     const unknownSlot: RowAnatomyCellSpec = { slot: 'center', column: 'content' }
 
-    void [metaLeading, statusLeading, stretchContent, unknownColumn, unknownSlot]
+    void [metaLeading, statusLeading, unknownColumn, unknownSlot]
   })
 
   it('RowAnatomyCell has no className or style seam', () => {

@@ -109,6 +109,7 @@ export function EquipmentPickerDisclosureRow({
             <EquipmentPickerRowAcquisitionControl
               control={presentation.control}
               equipmentName={row.name}
+              neutralQuantityLabels={workflowMode === 'loadout'}
               addLabel={resolvePickerMutationCopy('genericSelection').acquire}
               isPending={isPending}
               commitFailed={commitFailed}

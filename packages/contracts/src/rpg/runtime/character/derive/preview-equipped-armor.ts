@@ -1,17 +1,18 @@
-import type { ArmorEquipmentKindFields } from '../../../content/equipment/armor-variant'
+import type { EquipmentModifier } from '../../../content/equipment/instance/modifier'
 import type { ArmorClassBase } from '../../../vocab/mechanics/edition-preset-mechanics'
-import { resolveEquippedArmorClass } from './armor-class'
-
-type ArmorAcFields = Pick<
-  ArmorEquipmentKindFields,
-  'category' | 'baseAc' | 'acBonus' | 'addDexModifier' | 'maxDexBonus'
->
+import {
+  resolveEquippedArmorClass,
+  toEquippedArmorPiece,
+  type ArmorAcFields,
+  type EquippedArmorPiece,
+} from '../../creature/armor-class'
 
 export type ResolveArmorClassIfEquippedInput = {
   acBase: ArmorClassBase
   dexModifier: number
-  currentEquippedArmor: readonly ArmorAcFields[]
+  currentEquippedArmor: readonly EquippedArmorPiece[]
   candidateArmor: ArmorAcFields
+  candidateModifiers?: readonly EquipmentModifier[]
 }
 
 /**
@@ -23,11 +24,13 @@ export function resolveArmorClassIfEquipped({
   dexModifier,
   currentEquippedArmor,
   candidateArmor,
+  candidateModifiers,
 }: ResolveArmorClassIfEquippedInput): number {
+  const candidatePiece = toEquippedArmorPiece(candidateArmor, candidateModifiers)
   const equipped =
-    candidateArmor.category === 'shields'
-      ? [...currentEquippedArmor.filter((armor) => armor.category !== 'shields'), candidateArmor]
-      : [...currentEquippedArmor.filter((armor) => armor.category === 'shields'), candidateArmor]
+    candidatePiece.category === 'shields'
+      ? [...currentEquippedArmor.filter((armor) => armor.category !== 'shields'), candidatePiece]
+      : [...currentEquippedArmor.filter((armor) => armor.category === 'shields'), candidatePiece]
 
   return resolveEquippedArmorClass({
     acBase,

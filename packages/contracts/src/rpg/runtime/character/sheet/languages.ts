@@ -40,10 +40,15 @@ export function mergeLanguageProficiencyEntries(
       continue
     }
 
+    const existingSpeaks = existing.speaks !== false
+    const incomingSpeaks = entry.speaks !== false
+    const speaks = existingSpeaks || incomingSpeaks ? undefined : (false as const)
+
     byLanguage.set(entry.language, {
       language: entry.language,
       sources: [...(existing.sources ?? []), ...(entry.sources ?? [])],
       notes: existing.notes ?? entry.notes,
+      ...(speaks === false ? { speaks: false } : {}),
     })
   }
 

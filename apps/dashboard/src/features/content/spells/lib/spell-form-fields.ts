@@ -38,10 +38,7 @@ import {
   feetInputUnitField,
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../lib/forms/fields/content-identity-form-fields'
-import {
-  formatChooseContentTypePlaceholder,
-  getContentTypeCollectionLabel,
-} from '../../lib/content-type-labels'
+import { getContentTypeCollectionLabel, nounFromContentType } from '../../lib/content-type-labels'
 import { distanceInputSelectField } from '../../lib/forms/fields/content-speed-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { referenceSpellcastingClassFieldOptions } from '../../lib/form-options/content-field-option.lib'
@@ -393,7 +390,7 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
       label: getContentTypeCollectionLabel('classes'),
       multiple: true,
       options: referenceSpellcastingClassFieldOptions(ctx.options?.classes),
-      placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
+      noun: nounFromContentType('classes'),
       required: true,
     },
     spellDescriptionSection(ctx),

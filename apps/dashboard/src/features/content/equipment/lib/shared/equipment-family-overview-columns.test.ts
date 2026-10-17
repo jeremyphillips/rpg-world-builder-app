@@ -7,7 +7,7 @@ vi.mock('../../weapons/lib/weapon-overview-columns', () => ({
     { accessorKey: 'name', header: 'Name' },
     { accessorKey: 'category', header: 'Category' },
   ],
-  weaponFilterSchema: { fields: [{ id: 'category', label: 'Category' }] },
+  weaponOverviewFilterSchema: { fields: [{ id: 'category', label: 'Category' }] },
 }))
 
 describe('loadFamilyTableConfig', () => {

@@ -1,0 +1,12 @@
+/*
+ * Dialog panel header icon glyphs — back, dismiss, and matching header affordances.
+ */
+@utility size-dialog-panel-header-glyph {
+  width: var(--text-heading-dialog-title);
+  height: var(--text-heading-dialog-title);
+
+  @media (width >= 48rem) {
+    width: var(--text-heading-dialog-title-md);
+    height: var(--text-heading-dialog-title-md);
+  }
+}

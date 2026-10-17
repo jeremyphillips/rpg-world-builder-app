@@ -3,8 +3,12 @@ import type { ContentTypeKey, VocabularyUsageReference } from '@rpg/contracts'
 import { getContentTypeCollectionLabel } from '@/features/content/lib/content-type-labels'
 
 export const USAGE_REFERENCE_CHARACTER_GROUP_KEY = 'character' as const
+export const USAGE_REFERENCE_GAME_TERM_GROUP_KEY = 'game-term' as const
 
-export type UsageReferenceGroupKey = ContentTypeKey | typeof USAGE_REFERENCE_CHARACTER_GROUP_KEY
+export type UsageReferenceGroupKey =
+  | ContentTypeKey
+  | typeof USAGE_REFERENCE_CHARACTER_GROUP_KEY
+  | typeof USAGE_REFERENCE_GAME_TERM_GROUP_KEY
 
 export type UsageReferenceGroup = {
   key: UsageReferenceGroupKey
@@ -14,18 +18,29 @@ export type UsageReferenceGroup = {
 }
 
 const USAGE_REFERENCE_CHARACTER_GROUP_LABEL = 'Characters'
+const USAGE_REFERENCE_GAME_TERM_GROUP_LABEL = 'Game terms'
 
 function resolveUsageReferenceGroupKey(
   reference: VocabularyUsageReference,
 ): UsageReferenceGroupKey {
-  return reference.kind === 'content'
-    ? reference.contentTypeKey
-    : USAGE_REFERENCE_CHARACTER_GROUP_KEY
+  if (reference.kind === 'content') {
+    return reference.contentTypeKey
+  }
+
+  if (reference.kind === 'game-term') {
+    return USAGE_REFERENCE_GAME_TERM_GROUP_KEY
+  }
+
+  return USAGE_REFERENCE_CHARACTER_GROUP_KEY
 }
 
 function resolveUsageReferenceGroupLabel(key: UsageReferenceGroupKey): string {
   if (key === USAGE_REFERENCE_CHARACTER_GROUP_KEY) {
     return USAGE_REFERENCE_CHARACTER_GROUP_LABEL
+  }
+
+  if (key === USAGE_REFERENCE_GAME_TERM_GROUP_KEY) {
+    return USAGE_REFERENCE_GAME_TERM_GROUP_LABEL
   }
 
   return getContentTypeCollectionLabel(key)

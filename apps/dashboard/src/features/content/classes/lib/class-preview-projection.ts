@@ -188,11 +188,10 @@ function buildProficienciesSection(
     CLASS_PREVIEW_FACT_LABELS.savingThrows,
     (proficiencies?.savingThrows ?? []).map(getAbilityCompactLabel),
   )
-  appendFact(
-    facts,
-    CLASS_PREVIEW_FACT_LABELS.armorTraining,
-    (proficiencies?.armor ?? []).map(getArmorCategoryPreviewLabel),
-  )
+  appendFact(facts, CLASS_PREVIEW_FACT_LABELS.armorTraining, [
+    ...(proficiencies?.armor?.categories ?? []).map(getArmorCategoryPreviewLabel),
+    ...(proficiencies?.armor?.items ?? []).map(formatSlugLabel),
+  ])
 
   const weapons = [
     ...(proficiencies?.weapons.categories ?? []).map(getWeaponCategoryPreviewLabel),
@@ -401,7 +400,8 @@ export function classDetailSourceFromFormValues(
     description: values.description,
     proficiencies: proficienciesFromFormValues(
       values.proficiencies ?? classCreateDefaultValues.proficiencies!,
-      values.weaponProficiencyMode === 'individual',
+      values.weaponProficiencyMode ?? 'categories',
+      values.armorProficiencyMode === 'specific',
     ),
     features: featuresFromFormValues(values.features ?? []),
     characterCreation: {

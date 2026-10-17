@@ -576,4 +576,34 @@ describe('InlineSentenceField form integration', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
     expect(onSubmit).toHaveBeenCalledWith({ feet: 30 }, expect.anything())
   })
+
+  it('renders derived metadata below inline sentence fieldset controls', () => {
+    const fields: FormItem[] = [
+      {
+        type: 'inlineSentence',
+        name: 'choose',
+        label: 'Choose',
+        labelVisibility: 'srOnly',
+        segments: [{ kind: 'number', name: 'choose', defaultValue: 2, min: 1 }],
+        derivedMeta: {
+          dependsOn: ['choose'],
+          metaWhen: (values) => ({
+            rows: [{ value: `Count ${values.choose}` }],
+          }),
+        },
+      },
+    ]
+
+    render(
+      <Form
+        schema={z.object({ choose: z.number() })}
+        fields={fields}
+        defaultValues={{ choose: 2 }}
+        onSubmit={vi.fn()}
+        footer={null}
+      />,
+    )
+
+    expect(screen.getByText('Count 2')).toBeInTheDocument()
+  })
 })

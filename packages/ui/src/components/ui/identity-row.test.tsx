@@ -6,7 +6,7 @@ import {
   identityRowHeadingEndVariants,
   identityRowHeadingVariants,
 } from './identity-row.variants'
-import { IdentityRow } from './identity-row.client'
+import { IdentityRow, IdentityRowHeadingLine } from './identity-row.client'
 
 describe('IdentityRow', () => {
   it('truncates a long heading while classification stays shrink-0', () => {
@@ -101,6 +101,45 @@ describe('IdentityRow', () => {
     render(<IdentityRow heading="Compact row" classification="Tag" size="sm" />)
 
     expect(screen.getByText('Compact row').className).toMatch(/\btext-xs\b/)
+  })
+
+  it('keeps md classification on the title scale', () => {
+    expect(identityRowClassificationVariants({ size: 'md' })).toContain('text-sm')
+  })
+})
+
+describe('IdentityRowHeadingLine headingInline', () => {
+  it('places headingInline beside a truncating title without a separator', () => {
+    render(
+      <IdentityRowHeadingLine
+        heading="An extraordinarily long equipment name that should truncate in narrow layouts"
+        headingInline={<span data-testid="inline-slot">toggle</span>}
+        recipe="entity-compact"
+      />,
+    )
+    expect(screen.getByTestId('inline-slot')).toBeInTheDocument()
+    expect(screen.getByTestId('inline-slot').closest('.gap-1')).not.toBeNull()
+    expect(screen.queryByText('·')).not.toBeInTheDocument()
+  })
+})
+
+describe('IdentityRowHeadingLine entity-compact', () => {
+  it('keeps the title at 14px and classification, dot, and end text at 12px', () => {
+    render(
+      <IdentityRowHeadingLine
+        heading="Fire Bolt"
+        classification="Spell"
+        headingEnd="3"
+        recipe="entity-compact"
+      />,
+    )
+
+    expect(screen.getByText('Fire Bolt')).toHaveClass('text-sm')
+    expect(screen.getByText('Fire Bolt')).not.toHaveClass('text-xs')
+    expect(screen.getByText('Spell')).toHaveClass('text-xs')
+    expect(screen.getByText('Spell')).not.toHaveClass('text-sm')
+    expect(document.querySelector('[data-inline-metadata-separator]')).toHaveClass('text-xs')
+    expect(screen.getByText('3')).toHaveClass('text-style-caption')
   })
 })
 

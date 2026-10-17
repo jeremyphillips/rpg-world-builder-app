@@ -36,6 +36,19 @@ describe('deepMerge', () => {
     expect(deepMerge(base, { resolution: null })).toEqual({ a: 1 })
   })
 
+  it('stores a top-level tombstone null and still deletes other nulls', () => {
+    const base = { experiencePointsOverride: 0, hover: true, nested: { fly: 30 } }
+    expect(
+      deepMerge(
+        base,
+        { experiencePointsOverride: null, hover: null, nested: { fly: null } },
+        {
+          tombstoneKeys: ['experiencePointsOverride'],
+        },
+      ),
+    ).toEqual({ experiencePointsOverride: null, nested: {} })
+  })
+
   it('replaces listed keys wholesale instead of deep-merging objects', () => {
     const base = {
       resolution: {

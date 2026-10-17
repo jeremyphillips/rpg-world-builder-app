@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { resolveSearchPlaceholder } from '../../form-copy/messages'
 import {
   PROFICIENCY_DOMAINS,
   formatProficiencyGrantChooseFromAnyScopePhrase,
@@ -9,6 +10,7 @@ import {
   getProficiencyDomainCompactActionNoun,
   getProficiencyGrantAddLabel,
   getProficiencyGrantCompactAddLabel,
+  proficiencyDomainFieldNoun,
   getProficiencyGrantCompactManageLabel,
   getProficiencyGrantCompactSuffix,
   getProficiencyGrantManageLabel,
@@ -69,6 +71,14 @@ describe('proficiency grant vocabulary', () => {
     expect(getProficiencyDomainCompactActionNoun('skill', 1)).toBe('skill')
     expect(getProficiencyDomainCompactActionNoun('skill', 2)).toBe('skills')
     expect(getProficiencyDomainCompactActionNoun('armor', 2)).toBe('armor')
+  })
+
+  it('derives compact action nouns for searchable combobox copy', () => {
+    expect(proficiencyDomainFieldNoun('skill')).toEqual({
+      singular: 'skill',
+      plural: 'skills',
+    })
+    expect(resolveSearchPlaceholder(proficiencyDomainFieldNoun('skill'))).toBe('Search skills…')
   })
 
   it('returns builder add and manage labels', () => {

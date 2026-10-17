@@ -5,10 +5,12 @@ import type { FormItem, FormValueSync, TabbedFormTab } from '@rpg/ui/form'
 import type {
   ContentMediaDomain,
   ContentSource,
+  ContentValidationIntent,
+  Equipment,
   EquipmentKind,
   OrganizationPractice,
+  SkillProficiency,
   WeaponCategory,
-  ContentValidationIntent,
 } from '@rpg/contracts'
 import type { ResolvedCampaignRules, ResolvedSpellcastingProgressionConfig } from '@rpg/contracts'
 
@@ -68,6 +70,14 @@ export type ContentFormCtx = {
   /** Campaign-resolved weapon property labels and active ids. */
   weaponPropertyVocabulary?: WeaponPropertyVocabulary
   options?: Partial<ContentFormOptionSets>
+  /** Full effective equipment catalog for monster catalog rules and derived AC. */
+  equipmentCatalogById?: ReadonlyMap<string, Equipment>
+  /** Effective skill proficiencies keyed by slug for monster catalog rules. */
+  skillCatalogBySlug?: ReadonlyMap<string, SkillProficiency>
+  /** `ready` once `equipmentCatalogById` is the campaign's effective catalog. */
+  equipmentCatalogStatus?: 'pending' | 'ready' | 'error'
+  /** `ready` once `skillCatalogBySlug` is the campaign's effective catalog. */
+  skillCatalogStatus?: 'pending' | 'ready' | 'error'
   /** Selected member class affinity ids for orphan chip union on edit load. */
   organizationMemberClassAffinitySeedIds?: readonly string[]
   /** Selected member species affinity ids for orphan chip union on edit load. */

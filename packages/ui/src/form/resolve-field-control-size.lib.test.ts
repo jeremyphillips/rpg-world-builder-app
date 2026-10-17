@@ -14,4 +14,8 @@ describe('resolveFieldControlSize', () => {
   it('prefers override over inherited density', () => {
     expect(resolveFieldControlSize({ density: 'compact', override: 'lg' })).toBe('lg')
   })
+
+  it('allows xs override for entity-card utility controls', () => {
+    expect(resolveFieldControlSize({ density: 'comfortable', override: 'xs' })).toBe('xs')
+  })
 })

@@ -15,12 +15,14 @@ export type VocabularyEntryFormValues = {
   label: string
   description: string
   status: VocabularyEntryStatus
+  languageAffinities?: string[]
 }
 
 export const vocabularyEntrySheetFormSchema = z.object({
   label: z.string().min(1),
   description: z.string().optional(),
   available: z.boolean().default(true),
+  languageAffinities: z.array(z.string()).optional(),
 })
 
 export type VocabularyEntrySheetFormValues = z.infer<typeof vocabularyEntrySheetFormSchema>

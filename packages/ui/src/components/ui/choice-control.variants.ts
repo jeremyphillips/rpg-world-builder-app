@@ -1,8 +1,13 @@
 import { cn } from '../../lib/utils'
-import { interactiveFocusVariants } from './interactive-focus.variants'
+import {
+  interactiveFocusVariants,
+  type InteractiveFocusVariantProps,
+} from './interactive-focus.variants'
 import {
   CHOICE_CONTROL_INDICATOR_SIZE_SPECS,
   UI_CHOICE_CONTROL_BLOCK_CLASS,
+  UI_CHOICE_CONTROL_CIRCLE_CLASS,
+  UI_CHOICE_CONTROL_CIRCLE_EXPAND_CLASS,
   UI_CHOICE_CONTROL_THUMB_CLASS,
   resolveChoiceControlIndicatorSizeClass,
   resolveChoiceControlKindClass,
@@ -12,20 +17,52 @@ import {
 
 export const UI_CHOICE_CONTROL_MARK_CLASS = 'ui-choice-control__mark' as const
 
+export {
+  UI_CHOICE_CONTROL_CIRCLE_CLASS,
+  UI_CHOICE_CONTROL_CIRCLE_EXPAND_CLASS,
+  UI_CHOICE_CONTROL_EXPAND_ANCHOR_CLASS,
+  UI_CHOICE_CONTROL_EXPAND_CLIP_CLASS,
+  UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS,
+  UI_CHOICE_CONTROL_EXPAND_RESERVE_CLASS,
+} from './choice-control.styles'
+
+export type CheckboxAppearance = 'default' | 'circle'
+
+/** Where the control sits in the layout — not appearance or domain. */
+export type ChoiceControlFocusContext = NonNullable<InteractiveFocusVariantProps['context']>
+
 export function choiceControlClasses(
   kind: ChoiceControlKind,
-  options: { className?: string } = {},
+  options: { className?: string; focusContext?: ChoiceControlFocusContext } = {},
 ): string {
+  const focusContext = options.focusContext ?? 'standalone'
   return cn(
     UI_CHOICE_CONTROL_BLOCK_CLASS,
     resolveChoiceControlKindClass(kind),
-    interactiveFocusVariants({ context: 'standalone' }),
+    interactiveFocusVariants({ context: focusContext }),
     options.className,
   )
 }
 
-export function checkboxControlClasses(className?: string): string {
-  return choiceControlClasses('checkbox', { className: cn('peer', className) })
+export function checkboxControlClasses(options?: {
+  className?: string
+  appearance?: CheckboxAppearance
+  focusContext?: ChoiceControlFocusContext
+  /** Horizontal label reveal. Only valid with `appearance: 'circle'`. */
+  expand?: boolean
+}): string {
+  const appearance = options?.appearance ?? 'default'
+  const focusContext = options?.focusContext ?? 'standalone'
+  const expand = appearance === 'circle' && options?.expand === true
+  return choiceControlClasses('checkbox', {
+    focusContext,
+    className: cn(
+      'peer',
+      appearance === 'circle' && UI_CHOICE_CONTROL_CIRCLE_CLASS,
+      expand && UI_CHOICE_CONTROL_CIRCLE_EXPAND_CLASS,
+      options?.className,
+    ),
+  })
 }
 
 export function radioGroupItemControlClasses(className?: string): string {

@@ -70,6 +70,7 @@ export function useContentOverviewTable<
   data,
   caption,
   getEditHref,
+  readOnly = false,
   bulkExtensions = [],
   tableRootRef,
   actionTriggerRefs,
@@ -79,6 +80,7 @@ export function useContentOverviewTable<
 }) {
   const selectTriggerRef = useRef<HTMLButtonElement>(null)
   const canManage = useCanManageCampaign(campaignId)
+  const authoringEnabled = canManage && !readOnly
   const viewer = useContentViewer(campaignId)
 
   const overviewColumns = useOverviewColumnsWithNameContext(columns, {
@@ -87,6 +89,7 @@ export function useContentOverviewTable<
     contentTypeKey,
     viewer,
     getEditHref,
+    readOnly,
   })
 
   const discoveryFilteredData = useMemo(
@@ -165,7 +168,8 @@ export function useContentOverviewTable<
 
   const [bulkAccessOpen, setBulkAccessOpen] = useState(false)
   const [openExtensionId, setOpenExtensionId] = useState<string | null>(null)
-  const supportsBulkCampaignAccess = supportsContentBulkCampaignAccess(contentTypeKey)
+  const supportsBulkCampaignAccess =
+    authoringEnabled && supportsContentBulkCampaignAccess(contentTypeKey)
 
   const handleBulkAccessApplyComplete = useCallback(
     (result: { updatedIds: string[]; fullSuccess: boolean }) => {
@@ -197,7 +201,7 @@ export function useContentOverviewTable<
   }, [exitBulkSelectionMode])
 
   const additionalBulkActions = useMemo(() => {
-    if (!canManage || selectedCount === 0) {
+    if (!authoringEnabled || selectedCount === 0) {
       return [] as OverviewBulkAction[]
     }
 
@@ -205,7 +209,7 @@ export function useContentOverviewTable<
       ...extension.menuAction,
       onSelect: () => setOpenExtensionId(extension.menuAction.id),
     }))
-  }, [bulkExtensions, canManage, selectedCount])
+  }, [authoringEnabled, bulkExtensions, selectedCount])
 
   const handleAdvancedOpenChange = useCallback(
     (open: boolean) => {
@@ -299,9 +303,10 @@ export function useContentOverviewTable<
     bulkExtensions: bulkExtensions as ContentOverviewBulkExtension<T>[],
     campaignAvailability,
     campaignId,
-    canManage,
+    canManage: authoringEnabled,
     caption,
     contentTypeKey,
+    readOnly,
     data,
     emptyState,
     filterSchema,

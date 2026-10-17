@@ -18,20 +18,34 @@ const RadioGroup = React.forwardRef<
 ))
 RadioGroup.displayName = RadioGroupPrimitive.Root.displayName
 
+type RadioGroupItemProps = React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> & {
+  variant?: 'default' | 'tile'
+}
+
 const RadioGroupItem = React.forwardRef<
   React.ComponentRef<typeof RadioGroupPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
->(({ className, ...props }, ref) => (
-  <RadioGroupPrimitive.Item
-    ref={ref}
-    className={cn(radioGroupItemControlClasses(), className)}
-    {...props}
-  >
-    <RadioGroupPrimitive.Indicator className={UI_CHOICE_CONTROL_MARK_CLASS}>
-      <Circle aria-hidden />
-    </RadioGroupPrimitive.Indicator>
-  </RadioGroupPrimitive.Item>
-))
+  RadioGroupItemProps
+>(({ className, variant = 'default', children, ...props }, ref) => {
+  if (variant === 'tile') {
+    return (
+      <RadioGroupPrimitive.Item ref={ref} className={cn(className)} {...props}>
+        {children}
+      </RadioGroupPrimitive.Item>
+    )
+  }
+
+  return (
+    <RadioGroupPrimitive.Item
+      ref={ref}
+      className={cn(radioGroupItemControlClasses(), className)}
+      {...props}
+    >
+      <RadioGroupPrimitive.Indicator className={UI_CHOICE_CONTROL_MARK_CLASS}>
+        <Circle aria-hidden />
+      </RadioGroupPrimitive.Indicator>
+    </RadioGroupPrimitive.Item>
+  )
+})
 RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName
 
 export { RadioGroup, RadioGroupItem }

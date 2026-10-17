@@ -38,3 +38,20 @@ export function getEquipmentWeaponCategoryBrowseRank(
 
   return EQUIPMENT_RECOMMENDATION_WEAPON_CATEGORY_RANK[equipment.category] ?? 0
 }
+
+/**
+ * Late browse rank for an explicit proficient-category set.
+ * Weapons in the set sort before weapons outside it.
+ * When both simple and martial are present, martial stays ahead of simple.
+ * An empty set leaves order unchanged.
+ */
+export function getProficientWeaponCategoryBrowseRank(
+  equipment: Equipment,
+  categories: readonly WeaponCategory[],
+): number {
+  if (categories.length === 0 || equipment.kind !== 'weapon') return 0
+  if (!categories.includes(equipment.category)) return 2
+  const both = categories.includes('simple') && categories.includes('martial')
+  if (!both) return 0
+  return EQUIPMENT_RECOMMENDATION_WEAPON_CATEGORY_RANK[equipment.category] ?? 0
+}

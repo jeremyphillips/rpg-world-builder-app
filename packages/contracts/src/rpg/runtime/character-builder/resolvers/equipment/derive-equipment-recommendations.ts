@@ -1,7 +1,7 @@
 import type { CharacterClass } from '../../../../content/classes/class'
 import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting/class-spellcasting-ownership'
 import { getEquipmentSpellcastingGearKind } from '../../../../content/equipment/adventuring-gear-variant'
-import type { SpellcastingFocusGearKind } from '../../../../content/equipment/modifier'
+import type { SpellcastingFocusGearKind } from '../../../../content/equipment/instance/modifier'
 import {
   isWealthOnlyStartingEquipmentOption,
   startingEquipmentGrantEquipmentSlug,
@@ -30,6 +30,7 @@ import {
 import {
   applyRecommendationContributions,
   deriveProficiencyRecommendationContributions,
+  deriveSelectedWeaponProficiencyContributions,
   deriveStartingEquipmentRecommendationContributions,
   listSelectedStartingEquipmentGrantIds,
 } from './derive-equipment-recommendation-contributions'
@@ -385,6 +386,14 @@ export function deriveEquipmentRecommendations(
 
   const startingEquipmentIds = resolveFocusInferenceIds(characterClass, catalogIndex, draft)
   const ownedIds = listOwnedEquipmentIds({ characterClass, catalogIndex, draft })
+
+  applyRecommendationContributions({
+    accumulators,
+    contributions: deriveSelectedWeaponProficiencyContributions({ proficiencies, ownedIds }),
+    catalogIndex,
+    rulesetId: characterClass.rulesetId,
+    selectedClassId: characterClass.id,
+  })
 
   applyRequiredGearContributions({
     accumulators,

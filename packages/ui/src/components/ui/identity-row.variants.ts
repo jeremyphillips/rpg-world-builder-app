@@ -10,7 +10,14 @@ export type IdentityRowSize = 'sm' | 'md' | 'lg'
 
 export const identityRowRootVariants = cva('min-w-0 flex-1')
 
-export const identityRowHeadingLineVariants = cva('flex min-w-0 items-baseline')
+export const identityRowHeadingLineVariants = cva('flex w-full min-w-0 items-baseline')
+
+/**
+ * Compact entity-card secondary copy on the title line.
+ * The title item overrides this with `text-sm`. The separator sets its own `text-xs`
+ * because it renders inside the classification item, not as a sibling of the root.
+ */
+export const identityRowEntityCompactMetaVariants = cva('min-w-0 text-xs')
 
 export const identityRowHeadingClusterVariants = cva('flex min-w-0 flex-1 items-baseline')
 

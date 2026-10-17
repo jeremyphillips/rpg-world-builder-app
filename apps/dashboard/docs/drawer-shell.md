@@ -31,15 +31,18 @@ Implementation: [`src/components/drawer/`](../src/components/drawer/).
 
 ## API
 
-| Prop                 | Role                                                                       |
-| -------------------- | -------------------------------------------------------------------------- |
-| `title`              | Required header headline                                                   |
-| `description?`       | Optional header helper line (e.g. vocabulary create)                       |
-| `bodyMode?`          | `scrolling` (default), `managed`, or `composed` — see Body modes           |
-| `footer?`            | Optional shell-owned `Sheet.Footer` actions (`scrolling` / `managed` only) |
-| `DrawerShell.Close`  | Re-export of `Sheet.Close` for cancel buttons                              |
-| `DrawerShell.Body`   | Re-export of `Sheet.Body` for composed Form `contentWrapper` flows         |
-| `DrawerShell.Footer` | Re-export of `Sheet.Footer` for composed external-footer flows             |
+| Prop                 | Role                                                                                      |
+| -------------------- | ----------------------------------------------------------------------------------------- |
+| `title`              | Required header headline                                                                  |
+| `description?`       | Optional header helper line (e.g. vocabulary create)                                      |
+| `headerBack?`        | Canonical back control (`DialogPanelHeaderNavButton` in the header lead slot)             |
+| `headerLeading?`     | Escape hatch for decorative `leadIcon` content (e.g. `IconContainer`)                     |
+| `entityContext?`     | Subject identity band below the title — typically `DrawerEntityContext` (content feature) |
+| `bodyMode?`          | `scrolling` (default), `managed`, or `composed` — see Body modes                          |
+| `footer?`            | Optional shell-owned `Sheet.Footer` actions (`scrolling` / `managed` only)                |
+| `DrawerShell.Close`  | Re-export of `Sheet.Close` for cancel buttons                                             |
+| `DrawerShell.Body`   | Re-export of `Sheet.Body` for composed Form `contentWrapper` flows                        |
+| `DrawerShell.Footer` | Re-export of `Sheet.Footer` for composed external-footer flows                            |
 
 **No `size` prop in v1.** Application width is fixed at 550px via `Sheet.Content`
 `size="lg"`. Add a DrawerShell size variant only when a second legitimate

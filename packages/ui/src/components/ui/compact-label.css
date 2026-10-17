@@ -18,7 +18,7 @@
   }
 
   .ui-compact-label--sm {
-    height: 22px;
+    height: var(--control-height-compact);
     padding-inline: calc(var(--spacing) * 2);
     font-size: var(--text-compact-label-sm);
     line-height: var(--text-compact-label-sm--line-height);
@@ -223,8 +223,19 @@
     cursor: pointer;
   }
 
-  .ui-compact-label--interactive:hover {
+  /* Unselected selectable chips — CSS only (Tailwind bg-* utilities beat @layer components). */
+  .ui-compact-label--interactive:not(.ui-compact-label--selected) {
+    border-color: var(--border);
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  .ui-compact-label--interactive:not(.ui-compact-label--selected):hover {
     background-color: var(--color-control-hover);
+  }
+
+  .ui-compact-label--interactive:not(.ui-compact-label--selected):active {
+    background-color: color-mix(in oklch, var(--color-control-hover) 88%, var(--foreground) 12%);
   }
 
   .ui-compact-label--interactive:disabled {

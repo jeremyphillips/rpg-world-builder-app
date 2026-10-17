@@ -41,6 +41,12 @@ export {
   type ContentEntityCardProps,
 } from './lib/entity/surfaces/cards/content/content-entity-card'
 export {
+  EntityCardUtilityFieldSizeProvider,
+  resolveEntityCardUtilityFieldSize,
+  useEntityCardUtilityFieldSize,
+} from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.context'
+export { useEntityCardUtilityControlSizes } from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
+export {
   DisclosureEntityCard,
   type DisclosureEntityCardProps,
 } from './lib/entity/surfaces/cards/disclosure/disclosure-entity-card'
@@ -131,7 +137,6 @@ export { EntitySurfaceContentCard } from './lib/entity/surfaces/cards/content/en
 export type { EntitySurfaceContentCardProps } from './lib/entity/surfaces/cards/content/entity-surface-content-card'
 export {
   buildCatalogToggleSelectInlineAction,
-  buildEntitySurfaceLeadingMediaNode,
   projectEntitySurfaceConfig,
   projectEntitySurfaceIdentityToSummaryModel,
 } from './lib/entity/surfaces/entity-surface-projection.lib'
@@ -148,6 +153,12 @@ export type {
   EntitySurfaceIdentity,
   EntitySurfaceInlineAction,
 } from './lib/entity/summary/entity-surface-identity.types'
+export {
+  entitySurfaceMetadataFromJoinedCopy,
+  entitySurfaceMetadataFromText,
+  entitySurfaceMetadataLine,
+  type EntitySurfaceMetadataLine,
+} from './lib/entity/summary/entity-surface-metadata.lib'
 export type { PickerSelectionStateLineModel } from './lib/entity/summary/picker-selection-state-line.types'
 export {
   CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
@@ -179,6 +190,27 @@ export {
   getEquipmentFamilyLabel,
   buildEquipmentDetailViewModel,
   buildEquipmentPickerRowViewModel,
+  applyLoadoutWeaponMatchSignals,
+  buildLoadoutEquipmentPickerItems,
+  resolveLoadoutEquipmentIsProficient,
+  resolveCreatureEquipmentRowProjection,
+  resolveCreatureEquipmentInventoryRowStatus,
+  EquipmentCategoryGroupedList,
+  EquipmentInventorySectionHeader,
+  commitEquipmentEditorSession,
+  createEquipmentEditorState,
+  equipmentEditorReducer,
+  isEquipmentEditorSessionDirty,
+  type EquipmentCategoryGroup,
+  type EquipmentEditorState,
+  EquipmentInstanceEditorDrawer,
+  mapEquipmentInstanceInventoryStatus,
+  resolveEquipmentNotProficientCompatibilityStatus,
+  EQUIPMENT_INSTANCE_EQUIPPED_STATUS_LABEL,
+  EQUIPMENT_INSTANCE_MAGICAL_STATUS_LABEL,
+  EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE,
+  EQUIPMENT_INVENTORY_GROUP_LABELS,
+  mergeEquipmentInventoryCatalogReferenceStatus,
   EQUIPMENT_DETAILS_SECTION_TITLES,
   EQUIPMENT_STAT_LABELS,
   type EquipmentDetailViewModel,
@@ -240,10 +272,17 @@ export {
 } from './organizations'
 export { listLocations, useLocations, locationsQueryKey } from './locations'
 export {
+  buildLocationContextPresentationFromLocation,
   buildLocationEntityCardModel,
   buildLocationEntityCardModelFromClassification,
   buildLocationPickerSearchText,
 } from './locations/lib/location-display'
+export {
+  DrawerEntityContext,
+  type DrawerEntityContextProps,
+} from './lib/entity/surfaces/drawer/drawer-entity-context'
+export { toDrawerEntityBlockModel } from './lib/entity/surfaces/drawer/drawer-entity.lib'
+export { DrawerContext } from './lib/relationship/drawer/drawer-context'
 export { assembleLocationPickerSearchDocument } from './locations/lib/location-picker-search.lib'
 export { RelationshipDrawerSubjectField } from './lib/relationship/drawer/relationship-drawer-subject-field'
 export {
@@ -310,9 +349,12 @@ export {
 } from './lib/forms/registry/content-form-registry'
 export {
   buildContentFormOptionSets,
+  referenceArmorComboboxFieldOptions,
   referenceClassFieldOptions,
   referenceEquipmentFieldOptions,
   referenceSpellcastingClassFieldOptions,
+  referenceToolComboboxFieldOptions,
+  referenceWeaponComboboxFieldOptions,
   toContentFieldOption,
   toSortedContentFieldOptions,
   useContentFormOptions,

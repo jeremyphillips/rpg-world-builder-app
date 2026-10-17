@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { ChevronDown, Check } from 'lucide-react'
+import { ChevronDown, Check, Lock, X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Chip } from './chip.client'
@@ -23,6 +23,7 @@ import type {
   ComboboxRenderSelectedItem,
 } from './combobox-field.types'
 import { SearchBar } from './search-bar.client'
+import { selectOptionItemReasonVariants } from './select-option-item.variants'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxTriggerValueTextClasses,
@@ -127,9 +128,32 @@ interface ComboboxOptionItemProps {
   onSelect: () => void
 }
 
-function comboboxSelectionEndSlot(multiple: boolean, isSelected: boolean) {
+function comboboxSelectionEndSlot(multiple: boolean, isSelected: boolean, isHighlighted: boolean) {
   if (!multiple || !isSelected) return undefined
-  return <Check className="size-4 shrink-0" aria-hidden />
+  const Icon = isHighlighted ? X : Check
+  return <Icon className="size-4 shrink-0" aria-hidden />
+}
+
+function comboboxDisabledReasonEndSlot(reason: string) {
+  return (
+    <span className="flex shrink-0 items-center gap-1.5">
+      <Lock className="size-3.5 shrink-0 opacity-60" aria-hidden />
+      <span className={selectOptionItemReasonVariants()}>{reason}</span>
+    </span>
+  )
+}
+
+function comboboxOptionEndSlot(
+  option: ComboboxFieldOption,
+  multiple: boolean,
+  isSelected: boolean,
+  isDisabled: boolean,
+  isHighlighted: boolean,
+) {
+  if (isDisabled && option.disabledReason) {
+    return comboboxDisabledReasonEndSlot(option.disabledReason)
+  }
+  return comboboxSelectionEndSlot(multiple, isSelected, isHighlighted)
 }
 
 function ComboboxOptionItem({
@@ -145,7 +169,13 @@ function ComboboxOptionItem({
   onSelect,
 }: ComboboxOptionItemProps) {
   const rowSize = resolveInteractiveListSizeForFieldSize(size)
-  const selectionEndSlot = comboboxSelectionEndSlot(multiple, isSelected)
+  const selectionEndSlot = comboboxOptionEndSlot(
+    option,
+    multiple,
+    isSelected,
+    isDisabled,
+    isHighlighted,
+  )
 
   if (renderOption) {
     const optionContent = renderOption(option, {
@@ -187,7 +217,7 @@ function ComboboxOptionItem({
       heading={option.label}
       classification={option.classification}
       supporting={option.metadata}
-      endSlot={selectionEndSlot}
+      endSlot={comboboxOptionEndSlot(option, multiple, isSelected, isDisabled, isHighlighted)}
       onHighlight={onHighlight}
       onSelect={onSelect}
     />
@@ -195,7 +225,7 @@ function ComboboxOptionItem({
 }
 
 interface ComboboxSearchFieldProps {
-  label: string
+  searchPlaceholder: string
   listboxId: string
   searchId: string
   size: FieldSize
@@ -209,7 +239,7 @@ interface ComboboxSearchFieldProps {
 
 /** Search row shared by combobox panel and searchable input-select unit segments. */
 export function ComboboxSearchField({
-  label,
+  searchPlaceholder,
   listboxId,
   searchId,
   size,
@@ -230,8 +260,8 @@ export function ComboboxSearchField({
             value={query}
             onValueChange={onQueryChange}
             onKeyDown={onSearchKeyDown}
-            placeholder={`Search ${label.toLowerCase()}…`}
-            ariaLabel={`Search ${label}`}
+            placeholder={searchPlaceholder}
+            ariaLabel={searchPlaceholder}
             size={size}
             inputRef={searchInputRef}
             aria-controls={listboxId}
@@ -246,6 +276,7 @@ export function ComboboxSearchField({
 
 interface ComboboxPanelProps {
   label: string
+  searchPlaceholder: string
   listboxId: string
   searchId: string
   size: FieldSize
@@ -272,6 +303,7 @@ interface ComboboxPanelProps {
 
 export function ComboboxPanel({
   label,
+  searchPlaceholder,
   listboxId,
   searchId,
   size,
@@ -310,7 +342,7 @@ export function ComboboxPanel({
       >
         {enableSearch ? (
           <ComboboxSearchField
-            label={label}
+            searchPlaceholder={searchPlaceholder}
             listboxId={listboxId}
             searchId={searchId}
             size={size}

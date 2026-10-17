@@ -2,8 +2,16 @@
 
 import * as React from 'react'
 
+import { parseNumberStepperChangeValue } from './number-stepper-change.lib'
 import { buildStepOptions, normalizeInputValue, stepNumber } from './number-input.lib'
 import { useNumberInput } from './number-input.use.client'
+import {
+  numberStepperInputValueForBinding,
+  numberStepperValueSlotAriaValueText,
+  resolveNumberStepperSignDisplay,
+  warnIfPositivePrefixWithNegativeMin,
+  type NumberStepperSignDisplay,
+} from './number-stepper-sign-display.lib'
 import {
   resolveNumberStepperActions,
   type NumberStepperMinAction,
@@ -21,8 +29,15 @@ export function useNumberStepperInteraction(args: {
   disabled: boolean
   minAction?: NumberStepperMinAction
   ariaLabel: string
+  signDisplay?: NumberStepperSignDisplay
 }) {
-  const { value, onChange, min, max, step, disabled, minAction, ariaLabel } = args
+  const { value, onChange, min, max, step, disabled, minAction, ariaLabel, signDisplay } = args
+
+  const resolvedSignDisplay = resolveNumberStepperSignDisplay(signDisplay)
+
+  React.useEffect(() => {
+    warnIfPositivePrefixWithNegativeMin(resolvedSignDisplay, min)
+  }, [min, resolvedSignDisplay])
 
   const stepOptions = React.useMemo(
     () => buildStepOptions(step, min, max, min, max, false),
@@ -33,10 +48,17 @@ export function useNumberStepperInteraction(args: {
 
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const next = Number(event.target.value)
-      onChange(Number.isFinite(next) ? next : min)
+      onChange(
+        parseNumberStepperChangeValue({
+          rawValue: event.target.value,
+          signDisplay: resolvedSignDisplay,
+          resolvedValue,
+          min,
+          max,
+        }),
+      )
     },
-    [min, onChange],
+    [max, min, onChange, resolvedSignDisplay, resolvedValue],
   )
 
   const numberInput = useNumberInput({
@@ -46,7 +68,7 @@ export function useNumberStepperInteraction(args: {
     step,
     stepperMin: min,
     stepperMax: max,
-    value,
+    value: numberStepperInputValueForBinding(resolvedSignDisplay, resolvedValue, value),
     onChange: handleChange,
   })
 
@@ -82,6 +104,7 @@ export function useNumberStepperInteraction(args: {
 
   return {
     resolvedValue,
+    resolvedSignDisplay,
     showRemoveAtMin,
     leftDisabled: stepperActions.leftDisabled,
     stepperLocked: stepperActions.stepperLocked,
@@ -93,5 +116,6 @@ export function useNumberStepperInteraction(args: {
     inputRef: numberInput.inputRef,
     fieldBinding: numberInput.fieldBinding,
     handleInputChange: numberInput.onChange,
+    valueSlotAriaValueText: numberStepperValueSlotAriaValueText(resolvedSignDisplay, resolvedValue),
   }
 }

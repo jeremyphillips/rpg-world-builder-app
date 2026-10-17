@@ -2,6 +2,7 @@ import type { ContentUsageBlocker } from '@rpg/contracts'
 
 export type ContentUsageReferrerIdentity =
   | { kind: 'content'; contentTypeKey: string; id: string }
+  | { kind: 'game-term'; setId: string; id: string }
   | { kind: 'character'; id: string }
   | { kind: 'rule'; code: string }
 
@@ -9,6 +10,10 @@ export type ContentUsageReferrerIdentity =
 export function contentUsageReferrerIdentityKey(referrer: ContentUsageReferrerIdentity): string {
   if (referrer.kind === 'content') {
     return `content:${referrer.contentTypeKey}:${referrer.id}`
+  }
+
+  if (referrer.kind === 'game-term') {
+    return `game-term:${referrer.setId}:${referrer.id}`
   }
 
   if (referrer.kind === 'rule') {
@@ -33,6 +38,14 @@ export function contentUsageReferrerIdentityFromBlocker(
     return {
       kind: 'character',
       id: blocker.usage.id,
+    }
+  }
+
+  if (blocker.kind === 'game-term') {
+    return {
+      kind: 'game-term',
+      setId: blocker.setId,
+      id: blocker.id,
     }
   }
 

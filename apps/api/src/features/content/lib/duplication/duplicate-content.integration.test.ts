@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  deriveMonsterStatBlock,
   ELDRITCH_BLAST_RESOLUTION,
+  monsterSchema,
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
 } from '@rpg/contracts'
+import { loadSeedEquipment } from '@rpg/catalog/equipment'
+import { loadSeedMonsters } from '@rpg/catalog/monsters'
+import { loadSeedSkillProficiencies } from '@rpg/catalog/skill-proficiencies'
 
 import { CSRF_HEADER } from '../../../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../../test/auth-agent'
@@ -146,7 +151,7 @@ describe('duplicate content routes', () => {
     expect(res.body.equipment.slug).toBe('dup-source-armor-copy')
   })
 
-  it('does not inherit campaign access overlay from the source feat', async () => {
+  it('does not inherit campaign access overlay from the source feat (duplicate uses feat type default all_players)', async () => {
     const { agent, csrfToken } = await registerOwner()
     const campaignId = await createTestCampaign(agent, csrfToken)
 
@@ -282,6 +287,68 @@ describe('duplicate content routes', () => {
       (feat: { name: string }) => feat.name === 'Idempotent Feat Copy',
     )
     expect(copies).toHaveLength(1)
+  })
+
+  it('duplicates skeleton without regenerating equipment entry ids or action ids', async () => {
+    const { agent, csrfToken } = await registerOwner()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const skeleton = loadSeedMonsters('srd-cc-5.2.1').find((row) => row.slug === 'skeleton')
+    expect(skeleton).toBeDefined()
+
+    const res = await agent
+      .post(`/api/campaigns/${campaignId}/content/monsters/${skeleton!.id}/duplicate`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ name: 'Skeleton Copy' })
+      .expect(201)
+
+    const copy = res.body.monsters
+    expect(copy.equipment.map((entry: { entryId: string }) => entry.entryId)).toEqual(
+      skeleton!.equipment.map((entry) => entry.entryId),
+    )
+    expect(copy.actions.map((action: { id: string }) => action.id)).toEqual(
+      skeleton!.actions.map((action) => action.id),
+    )
+    expect(
+      copy.actions
+        .filter((action: { kind: string }) => action.kind === 'weapon')
+        .map((action: { equipmentEntryId?: string }) => action.equipmentEntryId),
+    ).toEqual(
+      skeleton!.actions
+        .filter((action) => action.kind === 'weapon')
+        .map((action) => action.equipmentEntryId),
+    )
+    expect(monsterSchema.safeParse(copy).success).toBe(true)
+
+    const equipmentCatalog = new Map(loadSeedEquipment('srd-cc-5.2.1').map((row) => [row.id, row]))
+    const skillCatalog = new Map(
+      loadSeedSkillProficiencies('srd-cc-5.2.1').map((row) => [row.slug, row]),
+    )
+
+    const sourceBlock = deriveMonsterStatBlock({
+      monster: skeleton!,
+      equipmentCatalog,
+      skillCatalog,
+    })
+    const copyBlock = deriveMonsterStatBlock({
+      monster: copy,
+      equipmentCatalog,
+      skillCatalog,
+    })
+
+    expect(copyBlock.attacks).toEqual(sourceBlock.attacks)
+
+    const listRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/monsters`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const listedCopy = listRes.body.monsters.find((row: { id: string }) => row.id === copy.id)
+    expect(listedCopy?.campaignAccess).toMatchObject({
+      available: true,
+      visibilityMode: 'dm_only',
+      effectiveAudience: 'dm_only',
+    })
   })
 
   it('rejects empty duplicate names', async () => {

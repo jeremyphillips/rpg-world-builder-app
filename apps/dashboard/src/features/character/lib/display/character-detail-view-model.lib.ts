@@ -2,8 +2,6 @@ import type {
   CharacterBuildCatalogIndex,
   CharacterDerivationInput,
   CharacterLocationReferenceResolution,
-  CharacterProficiencies,
-  Equipment,
   MovementMode,
   OrganizationReferenceResolution,
   ResolvedCharacterCreationRules,
@@ -15,26 +13,24 @@ import {
   ABILITY_IDS,
   deriveCharacterProfile,
   formatSignedModifier,
-  formatWeaponDamageWithModifier,
   getGenderLabel,
   getCharacterLocationConnectionDisplayLabel,
   getMovementModeLabel,
   getOrganizationDomainLabel,
   MOVEMENT_MODES,
-  proficiencyBonus,
   resolveCharacterXpDisplay,
   resolveCreatureInitiativeModifier,
   resolveCreatureMovement,
   createDefaultCharacterVitalState,
   resolveEquippedArmorFromInventory,
   resolveTraitDisplay,
-  resolveWeaponAttackAbilityModifier,
-  weaponAttackBonus,
+  resolveEquipmentInstanceSummary,
   getWeaponCategoryLabel,
   getArmorCategoryLabel,
   getToolCategoryLabel,
 } from '@rpg/contracts'
 
+import { resolveCharacterEquipmentRowProjection } from '../equipment/resolve-character-equipment-row-projection.lib'
 import { resolveLanguagePreviewLabel } from '../builder-preview/language-preview-label'
 import {
   buildCharacterSheetEquipmentCards,
@@ -121,15 +117,42 @@ function resolveIdentitySummary(
   return formatCharacterSummaryFromCatalog(summaryInput, catalogIndex)
 }
 
-function isCharacterProficientWithWeapon(
-  proficiencies: CharacterProficiencies,
-  weapon: Extract<Equipment, { kind: 'weapon' }>,
-): boolean {
-  return proficiencies.weapons.some((entry) => {
-    if (entry.weaponId) return entry.weaponId === weapon.id
-    if (entry.weaponCategory) return entry.weaponCategory === weapon.category
-    return false
+const characterDetailEmptyMagicProvider = () => undefined
+
+function weaponInventoryEntryToActionRow(args: {
+  entry: CharacterDetailSource['equipment']['weapons'][number]
+  catalogIndex: CharacterBuildCatalogIndex
+  level: number
+  abilityScores: NonNullable<CharacterDetailSource['abilityScores']>
+  weaponProficiencyTargets: CharacterDetailSource['proficiencies']['weapons']
+}): CharacterActionRowViewModel | undefined {
+  const equipment = args.catalogIndex.equipment.get(args.entry.equipmentId)
+  if (!equipment || equipment.kind !== 'weapon' || !equipment.damage) return undefined
+
+  const instanceSummary = resolveEquipmentInstanceSummary(
+    args.entry,
+    equipment,
+    characterDetailEmptyMagicProvider,
+  )
+  const rowSummary = resolveCharacterEquipmentRowProjection({
+    entry: args.entry,
+    item: equipment,
+    abilityScores: args.abilityScores,
+    level: args.level,
+    weaponProficiencyTargets: args.weaponProficiencyTargets,
+    omitSharedEnhancement: instanceSummary.enhancementInDisplayName,
+    provider: characterDetailEmptyMagicProvider,
   })
+  if (rowSummary?.attackBonus === undefined || rowSummary.damage?.expression === undefined) {
+    return undefined
+  }
+
+  return {
+    id: args.entry.entryId ?? args.entry.equipmentId,
+    name: args.entry.customName ?? equipment.name,
+    attackBonus: formatSignedModifier(rowSummary.attackBonus),
+    damage: rowSummary.damage.expression,
+  }
 }
 
 function buildActionRows(
@@ -137,29 +160,19 @@ function buildActionRows(
   catalogIndex: CharacterBuildCatalogIndex,
   level: number,
 ): CharacterActionRowViewModel[] {
-  const profBonus = proficiencyBonus(level)
-  const rows: CharacterActionRowViewModel[] = []
   const abilityScores = source.abilityScores ?? {}
+  const weaponProficiencyTargets = source.proficiencies.weapons
 
-  for (const entry of source.equipment.weapons) {
-    const equipment = catalogIndex.equipment.get(entry.equipmentId)
-    if (!equipment || equipment.kind !== 'weapon' || !equipment.damage) continue
-
-    const abilityMod = resolveWeaponAttackAbilityModifier(equipment, abilityScores)
-    if (abilityMod === undefined) continue
-
-    const isProficient = isCharacterProficientWithWeapon(source.proficiencies, equipment)
-    const attack = weaponAttackBonus(abilityMod, isProficient, profBonus)
-
-    rows.push({
-      id: entry.entryId ?? entry.equipmentId,
-      name: entry.customName ?? equipment.name,
-      attackBonus: formatSignedModifier(attack),
-      damage: formatWeaponDamageWithModifier(equipment.damage, abilityMod),
+  return source.equipment.weapons.flatMap((entry) => {
+    const row = weaponInventoryEntryToActionRow({
+      entry,
+      catalogIndex,
+      level,
+      abilityScores,
+      weaponProficiencyTargets,
     })
-  }
-
-  return rows
+    return row ? [row] : []
+  })
 }
 
 function buildSavingThrowSection(

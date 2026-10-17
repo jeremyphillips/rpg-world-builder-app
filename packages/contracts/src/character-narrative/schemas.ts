@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../lib/add-custom-refinement-issue'
-import { alignmentSchema } from '../rpg/vocab/alignment'
+import { characterAlignmentSchema } from '../rpg/vocab/alignment'
 import { characterTypeSchema } from '../rpg/runtime/character/sheet/core'
 import { characterNarrativeSchema } from '../rpg/runtime/character/sheet/narrative'
 import { organizationSchema } from '../rpg/content/organization/organization'
@@ -30,7 +30,7 @@ export const narrativeOrganizationSchema = organizationSchema
 export const narrativeResidenceSchema = narrativeResidenceFactSchema
 
 export const narrativeGenerationContextSchema = z.object({
-  alignment: alignmentSchema.optional(),
+  alignment: characterAlignmentSchema.optional(),
   characterKind: characterTypeSchema,
   level: z.number().int().nonnegative(),
   affinities: z.array(z.string()).default([]),
@@ -49,7 +49,7 @@ export const narrativeFragmentSchema = z
     id: z.string().min(1),
     slot: narrativeSlotSchema,
     text: z.string().min(1),
-    alignmentIds: z.array(alignmentSchema).min(1).optional(),
+    alignmentIds: z.array(characterAlignmentSchema).min(1).optional(),
     themeIds: z.array(narrativeThemeSchema).min(1),
     requires: z.array(narrativeTokenSchema).default([]),
     conditions: z.array(narrativeFragmentConditionSchema).default([]),

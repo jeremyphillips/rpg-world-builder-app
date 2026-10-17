@@ -20,6 +20,9 @@ import {
 } from '../../campaign'
 import { CharacterModel, createPcRecord } from '../../character'
 import { classWriteConfig } from '../classes/classes.config'
+import { equipmentWriteConfig } from '../equipment/equipment.config'
+import { monstersWriteConfig } from '../monsters/monsters.config'
+import { minimalHomebrewMonsterReferencingEquipment } from '../../../test/fixtures/monsters'
 import { HomebrewClassModel } from '../classes/homebrew-class.model'
 import { resolveCatalogForCampaign } from '../content.service'
 import { organizationWriteConfig } from '../organizations/organizations.config'
@@ -113,6 +116,49 @@ describe('content deletion service', () => {
 
     const remaining = await HomebrewClassModel.findById(created.id).lean()
     expect(remaining).toBeNull()
+  })
+
+  it('blocks delete when a monster references homebrew equipment', async () => {
+    const campaign = await makeTestCampaign()
+    const minimalWeaponInput = {
+      kind: 'weapon' as const,
+      slug: 'delete-guard-blade',
+      name: 'Delete Guard Blade',
+      category: 'simple' as const,
+      mode: 'melee' as const,
+      cost: { amount: 1, currency: 'gp' as const },
+      damage: { dice: { count: 1, faces: 4 } },
+      damageType: 'piercing' as const,
+      properties: [] as const,
+      mastery: 'sap' as const,
+    }
+    const equipment = await createHomebrewContent(
+      equipmentWriteConfig,
+      campaign.id,
+      minimalWeaponInput,
+    )
+
+    await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      minimalHomebrewMonsterReferencingEquipment(equipment.id),
+    )
+
+    const availability = await getContentDeletionAvailability(
+      equipmentWriteConfig,
+      campaign.id,
+      equipment.id,
+    )
+    expect(availability.status).toBe('blocked')
+    if (availability.status !== 'blocked') throw new Error('expected blocked')
+    expect(
+      availability.blockers.some(
+        (blocker) => blocker.kind === 'content' && blocker.contentTypeKey === 'monsters',
+      ),
+    ).toBe(true)
+
+    const deleteResult = await deleteContentEntity(equipmentWriteConfig, campaign.id, equipment.id)
+    expect(deleteResult).toMatchObject({ status: 'blocked' })
   })
 
   it('blocks delete when a campaign NPC references the entity', async () => {

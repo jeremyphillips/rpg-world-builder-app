@@ -1,3 +1,3 @@
-// fallow-ignore-file unused-file
-// content/monsters — scaffold only. Export the public surface here as it's built.
-export {}
+export { MonstersOverview } from './routes/monsters-overview'
+export { MonsterDetail } from './routes/monster-detail'
+export { useMonsters, useMonstersUsageMeta, monstersQueryKey } from './hooks/use-monsters'

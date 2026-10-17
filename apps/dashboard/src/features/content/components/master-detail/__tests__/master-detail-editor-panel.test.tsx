@@ -27,6 +27,8 @@ function makeEditor(
     selectedIndex: 0,
     select: vi.fn(),
     handleAdd: vi.fn(),
+    appendRow: vi.fn(),
+    removeAt: vi.fn(),
     lastAddedFieldId: null,
     clearLastAddedFieldId: vi.fn(),
     deleteIndex: null,

@@ -49,8 +49,14 @@ describe('OrganizationMemberPickerDrawer', () => {
 
     expect(screen.getByRole('heading', { name: 'Add member' })).toBeInTheDocument()
     expect(screen.getByText('Choose a character to add to Lantern Guild.')).toBeInTheDocument()
-    expect(screen.getByText('PC · Dwarf · Level 1 Fighter')).toBeInTheDocument()
-    expect(screen.getByText('NPC · Human · Level 3 Rogue')).toBeInTheDocument()
+    const vernaRow = screen.getByText('Verna').closest('article') as HTMLElement
+    for (const segment of ['PC', 'Dwarf', 'Level 1 Fighter']) {
+      expect(within(vernaRow).getByText(segment)).toBeInTheDocument()
+    }
+    const circleEnvoyRow = screen.getByText('Circle Envoy').closest('article') as HTMLElement
+    for (const segment of ['NPC', 'Human', 'Level 3 Rogue']) {
+      expect(within(circleEnvoyRow).getByText(segment)).toBeInTheDocument()
+    }
   })
 
   it('marks existing members with a status badge and no trailing control', () => {
@@ -152,7 +158,7 @@ describe('OrganizationMemberPickerDrawer', () => {
     const user = userEvent.setup()
     renderPicker()
 
-    await user.type(screen.getByRole('textbox', { name: 'Search characters' }), 'Envoy')
+    await user.type(screen.getByRole('searchbox', { name: 'Search characters' }), 'Envoy')
 
     expect(screen.getByText('Circle Envoy')).toBeInTheDocument()
     expect(screen.queryByText('Verna')).not.toBeInTheDocument()
@@ -194,7 +200,7 @@ describe('OrganizationMemberPickerDrawer', () => {
       onCreateNpc: vi.fn(),
     })
 
-    const search = screen.getByRole('textbox', { name: 'Search characters' })
+    const search = screen.getByRole('searchbox', { name: 'Search characters' })
     const action = screen.getByRole('button', { name: 'Create new NPC' })
     const result = screen.getByText('Verna')
     const scrollBody = result.closest('.overflow-y-auto')
@@ -239,12 +245,12 @@ describe('OrganizationMemberPickerDrawer', () => {
       onCreateNpc,
     })
 
-    await user.type(screen.getByRole('textbox', { name: 'Search characters' }), 'Envoy')
+    await user.type(screen.getByRole('searchbox', { name: 'Search characters' }), 'Envoy')
     await user.click(screen.getByRole('button', { name: 'Create new NPC' }))
 
     expect(onCreateNpc).toHaveBeenCalledTimes(1)
     expect(screen.getByRole('heading', { name: 'Add member' })).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Search characters' })).toHaveValue('Envoy')
+    expect(screen.getByRole('searchbox', { name: 'Search characters' })).toHaveValue('Envoy')
     expect(screen.queryByRole('heading', { name: 'Create NPC' })).not.toBeInTheDocument()
   })
 

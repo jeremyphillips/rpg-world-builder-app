@@ -8,7 +8,7 @@ import {
   type ContentUsageBlocker,
   type ResolvedContentCampaignAccess,
   contentCampaignAccessPatchSchema,
-  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  resolveDefaultResolvedContentCampaignAccess,
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 import {
@@ -39,6 +39,8 @@ import { buildCampaignAccessFields } from './campaign-access-form-fields'
 import { formatCampaignAccessParticipantOptionLabel } from './campaign-access-labels'
 import type { CampaignAvailabilityPresentation } from '@/lib/campaign-availability/campaign-availability-form-fields'
 import {
+  campaignAccessPatchesEqual,
+  campaignAccessResolvedBaselineKey,
   isDefaultCampaignAccessPatch,
   resolvedToCampaignAccessPatch,
 } from './campaign-access-state'
@@ -73,13 +75,20 @@ export function CampaignAvailabilityField({
   targetType,
   entityId,
   classId,
-  initialAccess = DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  initialAccess: initialAccessProp,
   onDraftChange,
   entityName,
   onPersistedChange,
   density,
   presentation = 'disclosure',
 }: CampaignAvailabilityFieldProps) {
+  const defaultInitialAccess = useMemo(
+    () => resolveDefaultResolvedContentCampaignAccess(targetType),
+    [targetType],
+  )
+  const initialAccessBaselineKey = initialAccessProp
+    ? campaignAccessResolvedBaselineKey(initialAccessProp)
+    : `default:${targetType}`
   const createFlowDensity = useCreateFlowFormDensity()
   const resolvedDensity = density ?? createFlowDensity ?? DEFAULT_FORM_DENSITY
   const capability = CONTENT_ACCESS_CAPABILITIES[targetType]
@@ -87,7 +96,7 @@ export function CampaignAvailabilityField({
   const groupId = `campaign-access-${entityId ?? 'create'}`
 
   const [persistedBaseline, setPersistedBaseline] = useState<ContentCampaignAccessPatch>(() =>
-    resolvedToCampaignAccessPatch(initialAccess),
+    resolvedToCampaignAccessPatch(initialAccessProp ?? defaultInitialAccess),
   )
   const [persistError, setPersistError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
@@ -110,7 +119,10 @@ export function CampaignAvailabilityField({
     [participantRoster],
   )
 
-  const initialPatch = useMemo(() => resolvedToCampaignAccessPatch(initialAccess), [initialAccess])
+  const initialPatch = useMemo(
+    () => resolvedToCampaignAccessPatch(initialAccessProp ?? defaultInitialAccess),
+    [defaultInitialAccess, initialAccessBaselineKey],
+  )
 
   const resolverFields = useMemo(
     () =>
@@ -166,19 +178,23 @@ export function CampaignAvailabilityField({
   )
 
   useEffect(() => {
-    const baseline = resolvedToCampaignAccessPatch(initialAccess)
-    setPersistedBaseline(baseline)
-    form.reset(baseline)
+    const access = initialAccessProp ?? defaultInitialAccess
+    const baseline = resolvedToCampaignAccessPatch(access)
+    setPersistedBaseline((prev) => (campaignAccessPatchesEqual(prev, baseline) ? prev : baseline))
+    if (!campaignAccessPatchesEqual(form.getValues(), baseline)) {
+      form.reset(baseline)
+    }
     setPersistError(null)
     setBlockedOpen(false)
     setBlockers([])
-  }, [entityId, form, initialAccess, initialPatch])
+  }, [defaultInitialAccess, entityId, form, initialAccessBaselineKey])
 
   const isEditMode = Boolean(entityId)
   const isDirty = isEditMode
     ? hasDirtyFields(dirtyFields)
     : !isDefaultCampaignAccessPatch(
         (watchedValues ?? form.getValues()) as ContentCampaignAccessPatch,
+        targetType,
       )
 
   const applyLocalChange = useCallback(

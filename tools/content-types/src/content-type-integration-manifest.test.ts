@@ -13,8 +13,10 @@ import {
   contentTypeKeysWithApiRegistration,
   contentTypeKeysWithCatalogPackage,
   contentTypeKeysWithoutBundledContent,
+  contentTypeKeysWithDeferredAuthoring,
   contentTypeKeysWithFormDefinition,
   contentTypeKeysWithRequiredCapabilities,
+  formDefinitionParity,
   contentTypeKeysWithRouteSection,
   contentTypeKeysWithVisibleInSidebar,
   integrationManifestEntries,
@@ -80,10 +82,30 @@ describe('CONTENT_TYPE_INTEGRATION_MANIFEST', () => {
     expect(contentTypeKeysWithApiRegistration()).toEqual([...API_CONTENT_TYPE_KEYS].sort())
   })
 
-  it('declares form definitions for every type with dashboard authoring today', () => {
-    expect(contentTypeKeysWithFormDefinition()).toEqual(
-      [...HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS].sort(),
+  it('declares form definitions for every route type without deferred authoring', () => {
+    const { expected, actual } = formDefinitionParity(
+      integrationManifestEntries().map(([key, entry]) => ({
+        key,
+        routeSection: entry.dashboard?.routeSection,
+        authoring: entry.dashboard?.authoring,
+        formDefinitionPath: entry.dashboard?.formDefinitionPath,
+      })),
     )
+    expect(actual).toEqual(expected)
+    expect(contentTypeKeysWithDeferredAuthoring()).toEqual([])
+    expect(contentTypeKeysWithFormDefinition()).toContain('monsters')
+  })
+
+  it('rejects deferred authoring that also registers a form, and enabled authoring without one', () => {
+    const row = (authoring: 'deferred' | undefined, formDefinitionPath: string | undefined) =>
+      formDefinitionParity([
+        { key: 'monsters', routeSection: 'monsters', authoring, formDefinitionPath },
+      ])
+
+    expect(row('deferred', undefined).expected).toEqual(row('deferred', undefined).actual)
+    expect(row('deferred', 'form.ts').expected).not.toEqual(row('deferred', 'form.ts').actual)
+    expect(row(undefined, 'form.ts').expected).toEqual(row(undefined, 'form.ts').actual)
+    expect(row(undefined, undefined).expected).not.toEqual(row(undefined, undefined).actual)
   })
 
   it('declares sidebar visibility for every homebrew-summary type today', () => {

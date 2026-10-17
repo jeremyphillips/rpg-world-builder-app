@@ -1,12 +1,16 @@
 import type { ReactNode } from 'react'
-import { Spinner, Text } from '@rpg/ui'
+import { Button, Spinner, Text } from '@rpg/ui'
 
 export const CONTENT_CATALOG_OPTIONS_ERROR = 'Could not load catalog options.'
+
+export const CONTENT_CATALOG_OPTIONS_RETRY_LABEL = 'Retry'
 
 export interface ContentFormShellResolverProps {
   isPending: boolean
   isError: boolean
   errorLabel?: string
+  isRetrying?: boolean
+  onRetry?: () => void
   children: ReactNode
 }
 
@@ -15,6 +19,8 @@ export function ContentFormShellResolver({
   isPending,
   isError,
   errorLabel,
+  isRetrying = false,
+  onRetry,
   children,
 }: ContentFormShellResolverProps) {
   if (isPending) {
@@ -26,9 +32,16 @@ export function ContentFormShellResolver({
   }
   if (isError) {
     return (
-      <Text variant="destructive" role="alert">
-        {errorLabel ?? 'Could not load page data.'}
-      </Text>
+      <div className="flex flex-col items-center gap-3 py-8">
+        <Text variant="destructive" role="alert">
+          {errorLabel ?? 'Could not load page data.'}
+        </Text>
+        {onRetry ? (
+          <Button type="button" variant="outline" disabled={isRetrying} onClick={onRetry}>
+            {isRetrying ? 'Retrying…' : CONTENT_CATALOG_OPTIONS_RETRY_LABEL}
+          </Button>
+        ) : null}
+      </div>
     )
   }
   return children

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
@@ -6,6 +7,7 @@ import {
   EntitySummaryDescription,
   EntitySummaryHeading,
   EntitySummaryStatus,
+  EntitySummarySupportingMetadata,
 } from '../entity-summary'
 
 describe('EntitySummaryHeading', () => {
@@ -22,6 +24,25 @@ describe('EntitySummaryHeading', () => {
       mixedHeadingRow.querySelector('[data-inline-metadata-separator]')?.textContent,
     ).toContain('·')
     expect(mixedHeadingRow).toHaveTextContent('Fire Bolt · Spell')
+  })
+
+  it('sizes compact classification and title-line end text below the title', () => {
+    render(
+      <EntitySummaryHeading
+        density="compact"
+        heading="Fire Bolt"
+        classification="Spell"
+        headingEndValue={3}
+      />,
+    )
+
+    expect(screen.getByText('Fire Bolt')).toHaveClass('text-sm')
+    expect(screen.getByText('Spell')).toHaveClass('text-xs')
+    expect(document.querySelector('[data-inline-metadata-separator]')).toHaveClass('text-xs')
+    const endValue = screen.getByText('3')
+    expect(endValue).toHaveClass('tabular-nums')
+    expect(endValue).not.toHaveClass('text-sm')
+    expect(endValue.parentElement).toHaveClass('text-style-caption')
   })
 
   it('fills the content cell so the heading end value sits at the column end', () => {
@@ -61,6 +82,39 @@ describe('EntitySummaryHeading', () => {
 
     expect(container.querySelector('[class*="min-h-control-action-compact"]')).toBeNull()
     expect(container.querySelector('[data-entity-summary-band]')).toBeNull()
+  })
+
+  it('wraps headingHref around the title only when headingInline is set', () => {
+    render(
+      <MemoryRouter>
+        <EntitySummaryHeading
+          density="compact"
+          heading="Longsword"
+          headingHref="/items/longsword"
+          headingInline={<button type="button">toggle</button>}
+        />
+      </MemoryRouter>,
+    )
+
+    const link = screen.getByRole('link', { name: 'Longsword' })
+    expect(link).toHaveAttribute('href', '/items/longsword')
+    expect(screen.getByRole('button', { name: 'toggle' })).not.toContainElement(link)
+  })
+})
+
+describe('EntitySummarySupportingMetadata', () => {
+  it('wraps every segment so a later to-hit fact stays visible', () => {
+    render(
+      <EntitySummarySupportingMetadata
+        density="compact"
+        segments={['1d8+3 slashing', '+5 to hit']}
+      />,
+    )
+
+    expect(screen.getByText(/\+5 to hit/)).toBeInTheDocument()
+    const line = screen.getByText(/1d8\+3 slashing/).closest('div')
+    expect(line).toHaveClass('leading-snug')
+    expect(line).not.toHaveClass('truncate')
   })
 })
 
@@ -130,7 +184,7 @@ describe('EntitySummaryStatus', () => {
       { kind: 'text', variant: 'guidance', label: 'Included in package option' },
     ] as const
 
-    it('joins badges and guidance text with aria-hidden separators', () => {
+    it('joins badge group and guidance text with aria-hidden separators', () => {
       const { container } = render(
         <EntitySummaryStatus density="compact" composition="metadata" items={items} />,
       )
@@ -166,7 +220,7 @@ describe('EntitySummaryStatus', () => {
       expect(screen.getByText('Not proficient')).toBeInTheDocument()
     })
 
-    it('keeps multiple badges on one line', () => {
+    it('keeps multiple badges in one group without separators', () => {
       const { container } = render(
         <EntitySummaryStatus
           density="compact"
@@ -178,8 +232,120 @@ describe('EntitySummaryStatus', () => {
         />,
       )
 
-      expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
+      expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(0)
+      expect(container.querySelectorAll('[data-entity-summary-status]')).toHaveLength(1)
       expect(container.querySelector('[data-entity-summary-status] button')).toBeNull()
+    })
+
+    it('renders equipped and magical badges with one separator before metadata text', () => {
+      const { container } = render(
+        <EntitySummaryStatus
+          density="compact"
+          composition="metadata"
+          items={[
+            { kind: 'badge', label: 'Equipped', tone: 'success' },
+            { kind: 'badge', label: 'Magical', tone: 'neutral', appearance: 'soft' },
+            { kind: 'text', variant: 'muted', label: 'Returning · +1 adjustment' },
+          ]}
+        />,
+      )
+
+      expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
+      expect(container).toHaveTextContent('Equipped')
+      expect(container).toHaveTextContent('Magical')
+      expect(container).toHaveTextContent('Returning · +1 adjustment')
+    })
+
+    it('separates consecutive text items', () => {
+      const { container } = render(
+        <EntitySummaryStatus
+          density="compact"
+          composition="metadata"
+          items={[
+            { kind: 'text', variant: 'muted', label: 'Returning' },
+            { kind: 'text', variant: 'muted', label: '+1 adjustment' },
+          ]}
+        />,
+      )
+
+      expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
+    })
+
+    it('preserves badge, text, badge order without merging separated badges', () => {
+      const { container } = render(
+        <EntitySummaryStatus
+          density="compact"
+          composition="metadata"
+          items={[
+            { kind: 'badge', label: 'Equipped', tone: 'success' },
+            { kind: 'text', variant: 'muted', label: 'Returning' },
+            { kind: 'badge', label: 'Magical', tone: 'neutral' },
+          ]}
+        />,
+      )
+
+      expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(2)
+      const statusHosts = container.querySelectorAll('[data-entity-summary-status]')
+      expect(statusHosts).toHaveLength(3)
+    })
+
+    it('renders warning text after badges with a separator', () => {
+      const { container } = render(
+        <EntitySummaryStatus
+          density="compact"
+          composition="metadata"
+          items={[
+            { kind: 'badge', label: 'Magical', tone: 'neutral' },
+            { kind: 'text', variant: 'warning', label: 'Unknown property' },
+          ]}
+        />,
+      )
+
+      expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
+      expect(screen.getByText('Unknown property')).toHaveClass('text-warning')
+    })
+
+    it('renders validation error after a badge group', () => {
+      const { container } = render(
+        <EntitySummaryStatus
+          density="compact"
+          composition="metadata"
+          items={[
+            { kind: 'badge', label: 'Equipped', tone: 'success' },
+            { kind: 'validationError' },
+          ]}
+        />,
+      )
+
+      expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
+      expect(container.querySelector('.text-destructive')).toBeInTheDocument()
+    })
+
+    it('renders nothing when status is empty', () => {
+      const { container } = render(
+        <EntitySummaryStatus density="compact" composition="metadata" items={[]} />,
+      )
+
+      expect(container.querySelector('[data-inline-metadata-separator]')).toBeNull()
+      expect(container.textContent).toBe('')
+    })
+
+    it('wraps mixed metadata in a narrow container without separators between badges', () => {
+      const { container } = render(
+        <div className="w-48">
+          <EntitySummaryStatus
+            density="compact"
+            composition="metadata"
+            items={[
+              { kind: 'badge', label: 'Equipped', tone: 'success' },
+              { kind: 'badge', label: 'Magical', tone: 'neutral' },
+              { kind: 'text', variant: 'muted', label: 'Returning · +1 adjustment' },
+            ]}
+          />
+        </div>,
+      )
+
+      expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
     })
 
     itAxe('has no axe violations', async () => {

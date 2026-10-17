@@ -61,6 +61,7 @@ import type {
   FieldLabelPosition,
   FieldSeparator,
 } from '../components/ui/field.variants'
+import type { FieldLayoutRecommendation } from '../components/ui/field-recommendation.types'
 import type { FormDensity } from './form-density'
 import type { FieldLabelVisibility, FormHeading, FormHeadingContent } from './form-heading.lib'
 
@@ -144,8 +145,8 @@ export interface FieldOption {
   searchTerms?: readonly string[]
   /** Optional classification shown inline after the label in combobox panels. */
   classification?: string
-  /** Category slug matched by combobox `filterSelect` (e.g. tool category id). */
-  filterCategory?: string
+  /** Canonical dimension slugs matched by combobox `filterSelects` (AND across active keys). */
+  filterValues?: Readonly<Record<string, string>>
   /** Inline title badge rendered by `radioCard` fields; ignored by other option controls. */
   badge?: string
 }
@@ -260,10 +261,44 @@ export interface FieldDynamicSelectOptions {
   optionsWhen: (values: Record<string, unknown>) => readonly FieldOption[]
 }
 
-/** Resolves combobox panel category filter config from watched form values. */
-export interface FieldDynamicComboboxFilterSelect {
+/** Unrestricted dimension — resolver skips undefined or absent keys. */
+export type FilterDimensionValue = string | undefined
+
+export type ActiveDimensionFilters = Readonly<Record<string, FilterDimensionValue>>
+
+export interface ComboboxFilterDimensionConfig {
+  /** Unique within the field; stable across `filterSelectsWhen` resolves. */
+  filterKey: string
+  ariaLabel: string
+  /** Concrete dimension slugs only — the renderer injects the All menu item. */
+  options: FieldOption[]
+  defaultValue?: FilterDimensionValue
+  allOptionLabel?: string
+}
+
+/** Resolves combobox panel dimension filter configs from watched form values. */
+export interface FieldDynamicComboboxFilterSelects {
   dependsOn: readonly string[]
-  filterSelectWhen: (values: Record<string, unknown>) => ComboboxFilterSelectConfig
+  filterSelectsWhen: (values: Record<string, unknown>) => readonly ComboboxFilterDimensionConfig[]
+}
+
+/** RHF helpers for schema-driven recommendation actions (append grants, etc.). */
+export interface FieldRecommendationResolveContext {
+  setValue: (
+    name: string,
+    value: unknown,
+    options?: { shouldDirty?: boolean; shouldValidate?: boolean },
+  ) => void
+  getValues: (fieldName?: string) => unknown
+}
+
+/** Resolves field recommendations from watched form values. */
+export interface FieldDynamicRecommendation {
+  dependsOn: readonly string[]
+  recommendationWhen: (
+    values: Record<string, unknown>,
+    ctx: FieldRecommendationResolveContext,
+  ) => FieldLayoutRecommendation | null
 }
 
 /** Static and dynamic hint configuration on leaf fields. */
@@ -275,7 +310,8 @@ export interface FieldHintConfig {
 
 /** One label/value row in derived field metadata (informational, not authored). */
 export interface FieldDerivedMetaRow {
-  label: string
+  /** Omit or leave empty for a single value line (no label column). */
+  label?: string
   value: string
 }
 
@@ -793,18 +829,6 @@ export interface LevelRangeFieldConfig extends BaseFieldConfig {
  *   placeholder: 'Search tags…',
  * })
  */
-/** Sentinel value for combobox category filters that show every option. */
-export const COMBOBOX_FILTER_ALL_VALUE = 'all'
-
-export interface ComboboxFilterSelectConfig {
-  /** Accessible name for the category filter select. */
-  ariaLabel: string
-  /** Filter options — include `{ value: COMBOBOX_FILTER_ALL_VALUE, label: 'All …' }` when needed. */
-  options: FieldOption[]
-  /** Initial filter value. Defaults to the first option value. */
-  defaultValue?: string
-}
-
 export interface ComboboxFieldConfig extends BaseFieldConfig {
   type: 'combobox'
   /** Static options — omit when `optionsResolve` supplies the list at render time. */
@@ -821,6 +845,11 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   /** Maximum selections when `multiple` is true. Omits the ceiling when unset. */
   max?: number
   placeholder?: string
+  /**
+   * Closed-state copy when `placeholder` is omitted — `add` uses `Add {singular}` and
+   * requires explicit `noun`; default `choice` uses Choose vocabulary.
+   */
+  closedPlaceholderIntent?: 'choice' | 'add'
   defaultValue?: string | string[]
   /**
    * Custom selected-value renderer in multi-select mode.
@@ -836,10 +865,24 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
     query: string,
     selected: string[],
   ) => FieldOption[]
-  /** Optional category filter row in the combobox panel toolbar. */
-  filterSelect?: ComboboxFilterSelectConfig
-  /** Dynamic category filter resolved from watched values; replaces `filterSelect` when set. */
-  filterSelectResolve?: FieldDynamicComboboxFilterSelect
+  /** Multi-dimension filter row in the combobox panel toolbar. */
+  filterSelects?: readonly ComboboxFilterDimensionConfig[]
+  /** Dynamic dimension filters resolved from watched values; replaces `filterSelects` when set. */
+  filterSelectsResolve?: FieldDynamicComboboxFilterSelects
+  /** Static inline or grouped recommendation in the field label band (above the control). */
+  recommendation?: FieldLayoutRecommendation
+  /** Dynamic recommendation; `dependsOn` triggers re-resolution. */
+  recommendationResolve?: FieldDynamicRecommendation
+  /** When false, omits the panel search row (keyboard nav targets the listbox). */
+  enableSearch?: boolean
+  /** Overrides generated `Search {plural}…` panel copy. */
+  searchPlaceholder?: string
+  optionAvailability?: FieldOptionAvailability
+  /**
+   * Resolves display labels for selected values that are not in the current `options`
+   * list (stale slugs, catalog rows filtered from reference options, etc.).
+   */
+  resolveOptionLabel?: (value: string) => string | undefined
 }
 
 export type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
@@ -1886,13 +1929,30 @@ export function normalizeFieldHint(hint: string | FieldHintConfig | undefined): 
   }
 }
 
+function comboboxFilterDependsOn(field: {
+  type?: FieldConfig['type']
+  filterSelectsResolve?: FieldDynamicComboboxFilterSelects
+}): readonly string[] {
+  if (field.type !== 'combobox') return []
+  return field.filterSelectsResolve?.dependsOn ?? []
+}
+
+function comboboxRecommendationDependsOn(field: {
+  type?: FieldConfig['type']
+  recommendationResolve?: FieldDynamicRecommendation
+}): readonly string[] {
+  if (field.type !== 'combobox') return []
+  return field.recommendationResolve?.dependsOn ?? []
+}
+
 /** Collects watched field names for dynamic hint, derived metadata, and select options resolution. */
 export function collectFieldDynamicDependsOn(field: {
   hint?: BaseFieldConfig['hint']
   derivedMeta?: BaseFieldConfig['derivedMeta']
   type?: FieldConfig['type']
   optionsResolve?: FieldDynamicSelectOptions
-  filterSelectResolve?: FieldDynamicComboboxFilterSelect
+  filterSelectsResolve?: FieldDynamicComboboxFilterSelects
+  recommendationResolve?: FieldDynamicRecommendation
 }): readonly string[] {
   const hintDependsOn = normalizeFieldHint(field.hint).resolve?.dependsOn ?? []
   const derivedMetaDependsOn = field.derivedMeta?.dependsOn ?? []
@@ -1901,16 +1961,14 @@ export function collectFieldDynamicDependsOn(field: {
     field.optionsResolve
       ? field.optionsResolve.dependsOn
       : []
-  const filterSelectResolveDependsOn =
-    field.type === 'combobox' && field.filterSelectResolve
-      ? field.filterSelectResolve.dependsOn
-      : []
+
   return [
     ...new Set([
       ...hintDependsOn,
       ...derivedMetaDependsOn,
       ...optionsResolveDependsOn,
-      ...filterSelectResolveDependsOn,
+      ...comboboxFilterDependsOn(field),
+      ...comboboxRecommendationDependsOn(field),
     ]),
   ]
 }
@@ -1923,14 +1981,14 @@ export function resolveComboboxFieldConfig(
   const options = config.optionsResolve
     ? [...config.optionsResolve.optionsWhen(values)]
     : (config.options ?? [])
-  const filterSelect = config.filterSelectResolve
-    ? config.filterSelectResolve.filterSelectWhen(values)
-    : config.filterSelect
+  const filterSelects = config.filterSelectsResolve
+    ? config.filterSelectsResolve.filterSelectsWhen(values)
+    : config.filterSelects
 
   return {
     ...config,
     options,
-    filterSelect,
+    filterSelects,
   }
 }
 

@@ -15,13 +15,22 @@ import { formatStandardSelectionSourceLabel } from '../../../character/format-se
 import type { Ability } from '../../../../vocab/ability'
 import { deriveRecommendedLanguageIds } from './derive-recommended-language-ids'
 import { deriveStrongestAbilities } from './derive-strongest-abilities'
+import { listOwnedEquipmentIds } from '../equipment/project-equipment-option-facts'
+import { isWeaponEquipment } from '../../../../content/equipment'
 import {
+  MATCHES_EQUIPPED_WEAPON_RECOMMENDATION_REASON,
+  MATCHES_OWNED_WEAPON_RECOMMENDATION_REASON,
   ABILITY_FIT_RECOMMENDATION_REASON,
   NEUTRAL_OPTION_RECOMMENDATION,
   softRecommendationFacts,
   type OptionPresentationFacts,
   type OptionRecommendation,
 } from '../../recommendation'
+import {
+  resolveWeaponCrossRecommendation,
+  weaponReferenceMatchesEquipment,
+  type WeaponInventoryEntry,
+} from '../../../creature/weapon-cross-recommendation'
 
 export type ProficiencyPickerItemState = PickerItemStateBase & {
   isAlreadySelected: boolean
@@ -86,6 +95,78 @@ function abilityFitRecommendation(
   }
 }
 
+function addEquipmentIds(
+  ids: Set<string>,
+  rows: readonly { equipmentId: string }[] | undefined,
+): void {
+  for (const row of rows ?? []) ids.add(row.equipmentId)
+}
+
+function equippedEquipmentIds(draft: CharacterBuilderDraft): Set<string> {
+  const equipped = new Set<string>()
+  for (const row of draft.equipment?.purchases ?? []) {
+    if (row.equipped === true) equipped.add(row.equipmentId)
+  }
+  return equipped
+}
+
+function weaponInventoryForDraft(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+): WeaponInventoryEntry[] {
+  const characterClass = draft.class.classId
+    ? catalogIndex.classes.get(draft.class.classId)
+    : undefined
+  const ownedIds = characterClass
+    ? listOwnedEquipmentIds({ characterClass, catalogIndex, draft })
+    : new Set<string>()
+  addEquipmentIds(ownedIds, draft.equipment?.purchases)
+  addEquipmentIds(ownedIds, draft.equipment?.grants)
+  const equipped = equippedEquipmentIds(draft)
+
+  return [...ownedIds].map((equipmentId) => ({
+    equipmentId,
+    quantity: 1,
+    equipped: equipped.has(equipmentId),
+  }))
+}
+
+function weaponPossessionRecommendation(args: {
+  optionId: string
+  canSelect: boolean
+  proficiencies: CharacterProficiencies
+  catalogIndex: CharacterBuildCatalogIndex
+  inventory: readonly WeaponInventoryEntry[]
+}): OptionRecommendation {
+  if (!args.canSelect) return NEUTRAL_OPTION_RECOMMENDATION
+  const weapon = [...args.catalogIndex.equipment.values()].find(
+    (row) => isWeaponEquipment(row) && weaponReferenceMatchesEquipment(args.optionId, row),
+  )
+  if (!weapon || !isWeaponEquipment(weapon)) return NEUTRAL_OPTION_RECOMMENDATION
+
+  const signal = resolveWeaponCrossRecommendation({
+    equipment: weapon,
+    targets: args.proficiencies.weapons,
+    inventory: args.inventory,
+  })
+  if (signal?.kind !== 'missing_proficiency') return NEUTRAL_OPTION_RECOMMENDATION
+
+  const equipped = signal.possession === 'equipped'
+  return {
+    strength: equipped ? 'strong' : 'compatible',
+    signals: [
+      {
+        strength: equipped ? 'strong' : 'compatible',
+        basis: 'inferred',
+        specificity: 'exact',
+        reason: equipped
+          ? MATCHES_EQUIPPED_WEAPON_RECOMMENDATION_REASON
+          : MATCHES_OWNED_WEAPON_RECOMMENDATION_REASON,
+      },
+    ],
+  }
+}
+
 function resolveRowRecommendation(args: {
   choiceType: ChoiceSet['choiceType']
   optionId: string
@@ -93,12 +174,19 @@ function resolveRowRecommendation(args: {
   speciesId: string | undefined
   skillAbility: Ability | undefined
   strongestAbilities: ReadonlySet<Ability>
+  canSelect: boolean
+  proficiencies: CharacterProficiencies
+  catalogIndex: CharacterBuildCatalogIndex
+  inventory: readonly WeaponInventoryEntry[]
 }): OptionRecommendation {
   if (args.choiceType === 'language') {
     return languageRecommendation(args)
   }
   if (args.choiceType === 'skillProficiency') {
     return abilityFitRecommendation(args.skillAbility, args.strongestAbilities)
+  }
+  if (args.choiceType === 'weaponProficiency') {
+    return weaponPossessionRecommendation(args)
   }
   return NEUTRAL_OPTION_RECOMMENDATION
 }
@@ -166,6 +254,7 @@ function resolveProficiencyPickerItemState(
   draft: CharacterBuilderDraft,
   skillAbility: Ability | undefined,
   strongestAbilities: ReadonlySet<Ability>,
+  inventory: readonly WeaponInventoryEntry[],
 ): ProficiencyPickerItemState {
   const isAlreadySelected = selectedIds.includes(optionId)
   const isSelectionFull = selectedIds.length >= choiceSet.max
@@ -179,6 +268,7 @@ function resolveProficiencyPickerItemState(
     disabledReasons.push(PICKER_DISABLED_REASON_SELECTION_FULL)
   }
 
+  const canSelect = !isAlreadySelected && !isSelectionFull && !isAlreadyGranted
   const recommendation = resolveRowRecommendation({
     choiceType: choiceSet.choiceType,
     optionId,
@@ -186,6 +276,10 @@ function resolveProficiencyPickerItemState(
     speciesId: draft.species.speciesId,
     skillAbility,
     strongestAbilities,
+    canSelect,
+    proficiencies,
+    catalogIndex,
+    inventory,
   })
   const recommendationFacts = softRecommendationFacts({
     recommendation,
@@ -201,7 +295,7 @@ function resolveProficiencyPickerItemState(
     isAlreadySelected,
     isAlreadyGranted,
     isSelectionFull,
-    canSelect: !isAlreadySelected && !isSelectionFull && !isAlreadyGranted,
+    canSelect,
     disabledReasons,
   }
 }
@@ -232,6 +326,8 @@ export function resolveProficiencyPickerItems({
     choiceSet.choiceType === 'skillProficiency'
       ? deriveStrongestAbilities(draft.abilities.scores)
       : new Set<Ability>()
+  const weaponInventory =
+    choiceSet.choiceType === 'weaponProficiency' ? weaponInventoryForDraft(draft, catalogIndex) : []
 
   return choiceSet.options.map((option) => {
     const skillRow =
@@ -252,6 +348,7 @@ export function resolveProficiencyPickerItems({
         draft,
         skillRow?.ability,
         strongestAbilities,
+        weaponInventory,
       ),
       ...(skillRow ? { compactSummary: buildSkillProficiencyCompactSummary(skillRow) } : {}),
     }

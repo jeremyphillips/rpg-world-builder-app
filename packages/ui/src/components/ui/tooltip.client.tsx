@@ -5,6 +5,7 @@ import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import { Info } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { OverlayArrowSvg, overlayArrowHeight, overlayArrowWidth } from './overlay-arrow.client'
 import { popoverContentVariants, tooltipContentMotionClasses } from './popover-content.variants'
 import { tooltipTriggerCursorVariants } from './tooltip-trigger.variants'
 
@@ -31,23 +32,40 @@ const TooltipTrigger = React.forwardRef<
 ))
 TooltipTrigger.displayName = TooltipPrimitive.Trigger.displayName
 
+type TooltipContentProps = React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content> & {
+  arrow?: boolean
+}
+
 const TooltipContent = React.forwardRef<
   React.ComponentRef<typeof TooltipPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
-  <TooltipPrimitive.Portal>
-    <TooltipPrimitive.Content
-      ref={ref}
-      sideOffset={sideOffset}
-      className={cn(
-        popoverContentVariants({ tone: 'tooltip' }),
-        tooltipContentMotionClasses,
-        className,
-      )}
-      {...props}
-    />
-  </TooltipPrimitive.Portal>
-))
+  TooltipContentProps
+>(({ className, sideOffset, arrow = false, children, ...props }, ref) => {
+  // Radix adds arrow height to the main-axis gap; keep a small gap past the tip.
+  const resolvedSideOffset = sideOffset ?? 4
+
+  return (
+    <TooltipPrimitive.Portal>
+      <TooltipPrimitive.Content
+        ref={ref}
+        sideOffset={resolvedSideOffset}
+        className={cn(
+          popoverContentVariants({ tone: 'tooltip' }),
+          tooltipContentMotionClasses,
+          arrow && 'ui-popover-content--with-arrow',
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        {arrow ? (
+          <TooltipPrimitive.Arrow asChild width={overlayArrowWidth} height={overlayArrowHeight}>
+            <OverlayArrowSvg fill="var(--surface-lift)" />
+          </TooltipPrimitive.Arrow>
+        ) : null}
+      </TooltipPrimitive.Content>
+    </TooltipPrimitive.Portal>
+  )
+})
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
 export interface InfoTooltipProps {

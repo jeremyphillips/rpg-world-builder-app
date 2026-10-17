@@ -69,7 +69,7 @@ export function InteractiveListRow({
     <>
       {startSlot ? <div className="shrink-0">{startSlot}</div> : null}
       {identityCore}
-      {content == null && endSlot ? <div className="shrink-0">{endSlot}</div> : null}
+      {endSlot ? <div className="shrink-0 self-center">{endSlot}</div> : null}
     </>
   )
 

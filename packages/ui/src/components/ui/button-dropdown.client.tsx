@@ -15,6 +15,7 @@ import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
 import { useButtonDropdownControl } from './use-button-dropdown-control.client'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
+import { resolveFieldSearchPlaceholder } from '../../form/config/field-placeholder.lib'
 import type {
   ButtonDropdownGroup,
   ButtonDropdownItem,
@@ -120,7 +121,9 @@ export function ButtonDropdown({
   leadingIcon,
   width = 'full',
   className,
+  searchPlaceholder: searchPlaceholderProp,
 }: ButtonDropdownProps) {
+  const searchPlaceholder = resolveFieldSearchPlaceholder({ label }, searchPlaceholderProp)
   const {
     open,
     searchActive,
@@ -184,7 +187,7 @@ export function ButtonDropdown({
         >
           {enableSearch ? (
             <ComboboxSearchField
-              label={label}
+              searchPlaceholder={searchPlaceholder}
               listboxId={listboxId}
               searchId={searchId}
               size={searchFieldSize}

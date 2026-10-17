@@ -259,7 +259,7 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
+    await user.type(screen.getByRole('searchbox', { name: 'Search catalog' }), 'rope')
     await user.click(screen.getByRole('radio', { name: 'Weapons' }))
     await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
     await user.click(screen.getByRole('button', { name: 'Sort by, Best match' }))
@@ -271,7 +271,7 @@ describe('EquipmentPickerDrawer', () => {
 
     await user.click(screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }))
 
-    expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
+    expect(screen.getByRole('searchbox', { name: 'Search catalog' })).toHaveValue('')
     expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute('aria-checked', 'true')
     expect(
       screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
@@ -360,7 +360,7 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
+    await user.type(screen.getByRole('searchbox', { name: 'Search catalog' }), 'rope')
 
     const resetButton = screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME })
     expect(resetButton).toHaveTextContent('Reset')

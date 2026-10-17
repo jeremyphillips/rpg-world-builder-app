@@ -287,9 +287,11 @@ export {
 } from './components/ui/number-input.client'
 export {
   NumberStepper,
+  NumberStepperStepButton,
   type NumberStepperDigits,
   type NumberStepperMinAction,
   type NumberStepperProps,
+  type NumberStepperSignDisplay,
 } from './components/ui/number-stepper.client'
 export { Textarea, type TextareaProps } from './components/ui/textarea.client'
 export {
@@ -368,6 +370,21 @@ export {
 } from './components/ui/field-label-content'
 export { FormField } from './components/ui/form-field'
 export { FieldLayout, type FieldLayoutProps } from './components/ui/field-layout'
+export type {
+  FieldRecommendation,
+  FieldRecommendationAction,
+  FieldRecommendationGroup,
+  FieldRecommendationItem,
+  FieldLayoutRecommendation,
+} from './components/ui/field-recommendation.types'
+export { isFieldRecommendationGroup } from './components/ui/field-recommendation.types'
+export {
+  FieldRecommendationInline,
+  FieldRecommendationGroupView,
+  type FieldRecommendationInlineProps,
+  type FieldRecommendationGroupProps,
+} from './components/ui/field-recommendation.client'
+export { resolveFieldLayoutRecommendation } from './components/ui/field-recommendation.lib'
 export {
   FieldControlRegion,
   FieldLabelRegion,
@@ -534,6 +551,18 @@ export {
   type SelectionSummaryRowProps,
 } from './components/ui/selection-summary-card'
 export {
+  DecisionSummaryPanel,
+  mapSummaryDecisionRowsToSelectionProps,
+  SELECTION_SUMMARY_DEFAULT_CHANGE_LABEL,
+  SELECTION_SUMMARY_DEFAULT_EYEBROW,
+  SelectionSummaryCards,
+  type DecisionSummaryChrome,
+  type DecisionSummaryPanelProps,
+  type SelectionSummaryCardsProps,
+  type SummaryDecisionCard,
+  type SummaryDecisionRow,
+} from './components/ui/selection-summary-decisions'
+export {
   selectionSummaryCardListClasses,
   selectionSummaryCardRowHelperVariants,
 } from './components/ui/selection-summary-card.variants'
@@ -699,6 +728,7 @@ export {
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   type IdentityRowHeadingLineProps,
+  type IdentityRowHeadingRecipe,
   type IdentityRowProps,
   type IdentityRowSize,
   type IdentityRowSupportingProps,
@@ -836,6 +866,7 @@ export {
   type NotificationPopoverProps,
   type NotificationPopoverHeaderProps,
 } from './components/ui/notification-popover.client'
+export { Popover, PopoverTrigger, PopoverContent } from './components/ui/popover.client'
 export {
   NotificationPreviewList,
   type NotificationPreviewListProps,
@@ -908,6 +939,8 @@ export {
   resolveSelectSizingGhostLabels,
 } from './components/ui/select-trigger.lib'
 export { Checkbox } from './components/ui/checkbox.client'
+export { BooleanField, type BooleanFieldProps } from './components/ui/boolean-field.client'
+export type { ChoiceTone } from './components/ui/choice-control.styles'
 export { RadioGroup, RadioGroupItem } from './components/ui/radio-group.client'
 export { Switch } from './components/ui/switch.client'
 
@@ -1033,6 +1066,9 @@ export {
   dialogPanelFooterClasses,
   dialogPanelHeaderClasses,
   dialogPanelHeaderPaddingClasses,
+  dialogPanelHeaderLeadRowClasses,
+  dialogPanelHeaderCopyStackClasses,
+  dialogPanelHeaderHeadlineStackClasses,
   dialogPanelSectionSeparatorBorderClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
@@ -1050,6 +1086,11 @@ export {
   DialogPanelActionRow,
   type DialogPanelActionRowProps,
 } from './components/ui/dialog-panel-action-row.client'
+export {
+  DialogPanelHeaderNavButton,
+  dialogPanelHeaderNavButtonClasses,
+  type DialogPanelHeaderNavButtonProps,
+} from './components/ui/dialog-panel-header-nav-button.client'
 export { DIALOG_INITIAL_FOCUS_SELECTOR } from './components/ui/dialog-focus.lib'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export {
@@ -1219,9 +1260,21 @@ export {
   type ComboboxSelectedItemRenderContext,
 } from './components/ui/combobox-field.client'
 export {
-  ComboboxFilterSelect,
-  type ComboboxFilterSelectProps,
-} from './form/renderers/fields/combobox-filter-select.client'
+  SharedFilterSelect,
+  type SharedFilterSelectOption,
+  type SharedFilterSelectProps,
+} from './filters/shared-filter-select.client'
+export {
+  InputSelectField,
+  InputUnitField,
+  type InputSelectFieldProps,
+  type InputUnitFieldProps,
+} from './components/ui/input-select-field.client'
+export {
+  JoinedPairFieldForm,
+  type JoinedPairFieldFormProps,
+} from './components/ui/joined-pair-field-form.client'
+export type { InputSelectOption } from './components/ui/input-select-field.lib'
 
 export {
   EditableGrid,

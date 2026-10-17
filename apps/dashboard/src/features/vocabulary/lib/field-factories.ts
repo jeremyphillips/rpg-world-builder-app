@@ -1,9 +1,9 @@
-import { vocabularyTermFieldCopy, type VocabularyTerm } from '@rpg/contracts'
+import { nounFromTerm, vocabularyTermFieldCopy, type VocabularyTerm } from '@rpg/contracts'
 import type { ComboboxFieldConfig, FieldOption, SelectFieldConfig } from '@rpg/ui/form'
 
 type VocabularyMemberFieldBase = Pick<
   SelectFieldConfig,
-  'name' | 'label' | 'required' | 'hint' | 'width' | 'disabled'
+  'name' | 'label' | 'required' | 'hint' | 'width' | 'disabled' | 'labelVisibility' | 'separator'
 > & {
   options: FieldOption[]
 }
@@ -13,6 +13,7 @@ export function vocabularySelectField(
   config: VocabularyMemberFieldBase & {
     placeholder?: string
     defaultValue?: string
+    noun?: SelectFieldConfig['noun']
   },
 ): SelectFieldConfig {
   return {
@@ -28,6 +29,8 @@ export function vocabularyComboboxField(
     max?: number
     placeholder?: string
     defaultValue?: string | string[]
+    enableSearch?: boolean
+    noun?: ComboboxFieldConfig['noun']
   },
 ): ComboboxFieldConfig {
   return {
@@ -51,7 +54,8 @@ export function vocabularySelectFieldForTerm(
   return vocabularySelectField({
     ...config,
     label: config.label ?? copy.label,
-    placeholder: config.placeholder ?? copy.placeholder,
+    placeholder: config.placeholder,
+    noun: nounFromTerm(term),
   })
 }
 
@@ -60,6 +64,7 @@ type VocabularyComboboxFieldForTermConfig = Omit<VocabularyMemberFieldBase, 'lab
   max?: number
   placeholder?: string
   defaultValue?: string | string[]
+  enableSearch?: boolean
   label?: string
 }
 
@@ -72,6 +77,7 @@ export function vocabularyComboboxFieldForTerm(
   return vocabularyComboboxField({
     ...config,
     label: config.label ?? copy.label,
-    placeholder: config.placeholder ?? copy.placeholder,
+    placeholder: config.placeholder,
+    noun: nounFromTerm(term),
   })
 }

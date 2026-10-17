@@ -58,7 +58,7 @@ function renderHint(hint: string | FieldHintConfig | undefined, tier: FormHeadin
     return <Text variant="caption">{normalized.text}</Text>
   }
   return (
-    <Text as="span" variant="small" className={fieldGroupDescriptionTypographyClasses}>
+    <Text as="span" className={fieldGroupDescriptionTypographyClasses}>
       {normalized.text}
     </Text>
   )

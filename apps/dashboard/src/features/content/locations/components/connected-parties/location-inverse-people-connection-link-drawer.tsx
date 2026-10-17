@@ -10,14 +10,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { getOrganizationDomainLabel } from '@rpg/contracts'
-import {
-  Button,
-  Eyebrow,
-  SegmentedControl,
-  SelectionSummaryCard,
-  SelectionSummaryChangeAction,
-  Text,
-} from '@rpg/ui'
+import { Button, Eyebrow, SegmentedControl, Text } from '@rpg/ui'
 
 import {
   CatalogToolbarResetSlot,
@@ -46,13 +39,13 @@ import {
 } from '../../../organizations/lib/organization-display'
 import { buildConnectedPartyCharacterEntitySummary } from '../../lib/connected-parties/location-connected-party-character-options.lib'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context'
+import { DrawerDecisionSummary } from '../../../lib/relationship/drawer/drawer-decision-summary'
 import { applyPeopleKindSlotDownstreamState } from '../../../locations/lib/connected-parties/apply-people-kind-slot-downstream-state.lib'
 import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
 import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
   RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL,
-  RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW,
   characterInverseSubjectHasAvailableKind,
   organizationDrawerIntentFromKind,
   organizationInverseSubjectHasAvailableKind,
@@ -580,23 +573,19 @@ function LocationInversePeopleConnectionLinkDrawerContent({
         />
       ) : null}
       {showKindSummary && selectedKindOption ? (
-        <SelectionSummaryCard
-          eyebrow={RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW}
+        <DrawerDecisionSummary
           rows={[
             {
+              id: 'kind',
               label: kindFieldLabel,
               value: selectedKindOption.label,
-              onValueClick: startEditingKind,
+              decisionId: 'kind',
+              onNavigate: startEditingKind,
+              changeLabel: RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL,
               valueActionAriaLabel: kindChangeAriaLabel,
-              action: (
-                <SelectionSummaryChangeAction
-                  changeLabel={RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL}
-                  ariaLabel={kindChangeAriaLabel}
-                  onChange={startEditingKind}
-                />
-              ),
             },
           ]}
+          defaultChangeLabel={RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL}
         />
       ) : null}
       {showSubjectTypeSegment && activeSlot ? (
@@ -722,7 +711,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                   {
                     metadata:
                       organizationDomain != null && !hasAvailableKind
-                        ? organizationFullyLinkedReason
+                        ? [organizationFullyLinkedReason]
                         : undefined,
                   },
                 ),
@@ -830,7 +819,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                 {
                   metadata:
                     characterKind != null && !hasAvailableKind
-                      ? CHARACTER_DRAWER_FULLY_LINKED_REASON
+                      ? [CHARACTER_DRAWER_FULLY_LINKED_REASON]
                       : undefined,
                 },
               ),

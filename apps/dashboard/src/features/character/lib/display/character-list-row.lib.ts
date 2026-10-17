@@ -1,7 +1,10 @@
 import type { CharacterRosterStatus } from '@rpg/contracts'
 import { resolveContentDisplayFallback } from '@rpg/contracts'
 
-import { buildEntitySurfaceLeadingMediaNode, type EntityRowListRowProps } from '@/features/content'
+import {
+  projectEntitySurfaceIdentityToSummaryModel,
+  type EntityRowListRowProps,
+} from '@/features/content'
 
 import { resolveCharacterRosterStatusPresentation } from '../campaign-roster-presentation'
 import type { CharacterListCardData } from '../../components/character-list-card.lib'
@@ -55,7 +58,7 @@ export function buildCharacterListRowPresentation(
     characterType: 'pc',
   })
 
-  const leadingMedia = buildEntitySurfaceLeadingMediaNode(identity, 'compact')
+  const leadingMedia = projectEntitySurfaceIdentityToSummaryModel(identity, 'compact').media
 
   const description = joinInlineMetadata([input.card.summary, input.controllerLine]) || undefined
 

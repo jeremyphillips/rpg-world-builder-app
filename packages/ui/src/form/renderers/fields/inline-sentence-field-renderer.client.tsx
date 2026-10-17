@@ -4,6 +4,7 @@ import { useContext, useEffect, useMemo, useRef } from 'react'
 import { useController, useFormState, type UseControllerReturn } from 'react-hook-form'
 
 import { InlineSentenceField } from '../../../components/ui/inline-sentence-field.client'
+import { fieldSizeToChipSize } from '../../../components/ui/field-sizing.variants'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import { assertAllowedJoinedPairComposition } from '../../../components/ui/joined-pair-field.lib'
 import {
@@ -395,17 +396,16 @@ export function InlineSentenceFieldRenderer({
   useEffect(() => {
     if (!config.optionsResolve) return
 
-    if (isMountRef.current) {
-      isMountRef.current = false
-      return
-    }
-
     syncResolvedInlineSentenceSelectValues(
       visibleSegments,
       config.name,
       controllerByName,
       resolvedSelectOptionsBySegment,
     )
+
+    if (isMountRef.current) {
+      isMountRef.current = false
+    }
   }, [
     config.name,
     config.optionsResolve,
@@ -541,7 +541,7 @@ export function InlineSentenceFieldRenderer({
       size={controlSize}
       width={config.width}
       labelVisibility={config.labelVisibility}
-      chipSize={config.chipSize}
+      chipSize={config.chipSize ? fieldSizeToChipSize[config.chipSize] : undefined}
     />
   )
 }

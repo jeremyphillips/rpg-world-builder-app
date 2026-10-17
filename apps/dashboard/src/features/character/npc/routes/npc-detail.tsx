@@ -1,5 +1,6 @@
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { PageShell } from '@/components/layout/page/page-shell'
+import { useCampaignCharacterAbilityScoreEditor } from '@/features/campaign'
 
 import { CampaignCharacterStatusSummary } from '../../components/detail/status/campaign-character-status-summary'
 import { CharacterDetailContent } from '../../components/detail/character-detail-content'
@@ -21,6 +22,12 @@ export function NpcDetail() {
     viewModel,
   } = useNpcDetailPage()
 
+  const abilityScoreEditor = useCampaignCharacterAbilityScoreEditor(
+    campaignId,
+    npcDetail?.character.id,
+    npcDetail?.character.abilityScores ?? {},
+  )
+
   return (
     <PageShell width="full" rhythm="relaxed">
       <PageLoadState
@@ -32,6 +39,7 @@ export function NpcDetail() {
         {viewModel && npcDetail ? (
           <CharacterDetailContent
             viewModel={viewModel}
+            abilityScoreEditor={canManage ? abilityScoreEditor : undefined}
             identityMedia={
               <CharacterDetailRouteMedia
                 characterType="npc"

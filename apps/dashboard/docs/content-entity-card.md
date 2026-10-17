@@ -48,6 +48,7 @@ to outline row-track grids and cells.
 | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Identity inside preview, destination, or master-detail host         | `EntityAnatomyHost`                                                                                                                                     |
 | Global search hit (link row)                                        | `InteractiveListRow` + `IdentityRow`; media/status via `projectSearchHitToInteractiveListPresentation` — not `EntityAnatomyHost` inside the link        |
+| Drawer subject band (task title + pinned record)                    | `DrawerEntityContext` in `DrawerShell` `entityContext`                                                                                                  |
 | Bordered static identity                                            | `ContentEntityCard`                                                                                                                                     |
 | Bordered identity with expandable domain content                    | `DisclosureEntityCard`                                                                                                                                  |
 | Create-tab Add/Pending discovery or pending rows                    | `ContentEntityCard` + trailing action                                                                                                                   |
@@ -73,12 +74,26 @@ primitives — not ad-hoc menu item class stacks. Menu rows derive highlight/was
 Campaign-unavailable search hits use entity `inactive` status in the identity status slot
 only — not a duplicate trailing badge.
 
-### EntitySurfaceConfig (character / organization / location pickers)
+### Entity surface projection (cards, catalogs, drawer subject bands)
 
-Compact catalog and bordered cards share one **data-only** identity contract:
+Compact catalog rows, bordered cards, and `DrawerEntityContext` share one **data-only**
+identity contract and one projector (`projectEntitySurfaceConfig` /
+`projectEntitySurfaceIdentityToSummaryModel`):
 
-- Feature display modules return `EntitySurfaceIdentity` (`heading`, optional `metadata`, `classification`, `status`, optional `displayImage`, required semantic `fallback`) via `buildCharacterEntityCardModel`, `buildLocationEntityCardModel`, and `buildOrganizationEntityCardModel`. No JSX, no media nodes, no row chrome. Projection always paints compact media (image or fallback icon).
-- Callers pass `EntitySurfaceConfig` (`identity`, optional `details`, optional `inlineAction`) into `CatalogEntitySurfaceRow`, `EntitySurfaceContentCard`, or `createCatalogEntityRowRenderer({ buildSurface })`.
+- Feature display modules return `EntitySurfaceIdentity` (`heading`, optional
+  `metadata` segment line, `classification`, `status`, optional `displayImage`, required
+  semantic `fallback`) via domain builders such as `buildCharacterEntityCardModel`,
+  `buildLocationEntityCardModel`, `buildOrganizationEntityCardModel`, and
+  `buildEquipmentEntitySurfaceIdentity`. No JSX, no media nodes, no row chrome.
+  **Entity surface projection** paints the standard entity-row thumbnail
+  (`ENTITY_SURFACE_LEADING_THUMB_FRAME`, 40px / `sm`) and maps `metadata` segments onto
+  `EntitySummaryModel.supportingMetadata` for anatomy to render.
+- Callers pass `EntitySurfaceConfig` (`identity`, optional `details`, optional
+  `inlineAction`) into `CatalogEntitySurfaceRow`, `EntitySurfaceContentCard`,
+  `DrawerEntityContext`, or `createCatalogEntityRowRenderer({ buildSurface })`.
+- `DrawerEntityContext` uses the same projection as cards; only drawer band chrome differs.
+  Drawer-only utilities pass `trailing` (`EntityAnatomyTrailing`) — not extra fields on
+  `EntitySurfaceConfig`.
 - Heading label buttons use **`inlineAction` only** (`label`, `onClick`, `disabled?`, `loading?`). Surfaces render locked compact picker buttons.
 - **Allowed exceptions:** disclosure-body commit `Button`s inside `details` / DEC children; `trailing.kind: 'utility'` for inventory steppers and icon-remove controls; `trailing.kind: 'group'` for commerce stacks.
 
@@ -434,6 +449,13 @@ Entity/content **density** (`compact` | `comfortable`) is unrelated to form-cont
 **size** tokens — do not force unrelated systems into one scale because both use names
 like `compact`.
 
+Compact entity titles stay 14px (`text-sm`). Classification, its middle dot, and title-line
+end text are 12px (`text-xs` on the classification and dot, `text-style-caption` on the
+heading end slot). Price and grant-preview text in the trailing group secondary slot are
+12px (`text-xs`). Trailing meta and value labels (`Purchased · 10 GP`) are 12px
+(`text-xs`). List rows keep a single shared size and do not use the heading recipe.
+Trailing-rail quantity marks stay 14px.
+
 ---
 
 ## Edge geometry contract
@@ -504,7 +526,7 @@ trailing
 ```
 
 `resolveEntityAnatomyTrailingCells` maps each kind onto exactly one RowAnatomy cell. Kinds
-never choose their own alignment. `meta` renders as muted `text-sm` before the control
+never choose their own alignment. `meta` renders as muted `text-xs` before the control
 inside that same cell. It does not add a second cell.
 
 | Kind        | Type contract                                                                         | Cell                                     | Use                                                                                          |
@@ -540,7 +562,7 @@ but must not grow solely to push classification away from the name. `EntitySumma
 
 ```text
 EntitySummary parts            RowAnatomy cell
-├── EntitySummaryHeading      → band   (heading · classification · headingEndValue)
+├── EntitySummaryHeading      → band   (heading · classification · headingEndValue · optional headingInline after title)
 ├── EntitySummaryDescription  → meta
 └── status cell                → status (track offset owned by the cell, not the row)
     ├── PickerSelectionStateLine        (resolved copy, stacked above status)
@@ -614,6 +636,8 @@ AddPendingWorkflow
 └── composing slot    → CreateComposition* + domain-owned discovery / forms / child footer
 ```
 
+**`headingInline`** — optional intrinsic-width slot immediately after the title (not `headingEndValue`). Heading links wrap title text only. The slot is marked `data-heading-inline`, which forces a nested `BooleanField` to `sm`. Card frames publish `data-content-density` so a compact card resolves that field to `sm` and a comfortable card to `md`, ahead of the surrounding form density. Trailing utility controls keep their own `xs` scale.
+
 **`ContentEntityCard` must not expand.** Do not add collapse, composer, or
 relationship-kind props to CEC. Discovery uses CEC + trailing **Select**
 (outline, `size="sm"`, `density="compact"`). Pending **Edit** leaves the row on
@@ -672,7 +696,7 @@ prevent regression:
 | `collapsible-list-item.variants.test.ts`   | Entity-card body classes exclude legacy inset                                |
 | `catalog-entity-row.stories.tsx`           | Flat + disclosure rhythm side-by-side; location picker drawer context        |
 | `content-card.variants.test.ts`            | Mixed-heading title must not use `flex-1`, `%` caps, or right-push hacks     |
-| `entity-summary.test.tsx`                  | Classification adjacent; density-sized badges; parts carry no track offsets  |
+| `entity-summary.test.tsx`                  | Compact title 14px; classification, dot, and end text 12px; no track offsets |
 | `entity-summary-status.type.test.ts`       | Status prop is structured data, not ReactNode                                |
 | `entity-anatomy-trailing.type.test.ts`     | Trailing action/group primary require ReactElement; closed secondary         |
 | AGENTS.md component rule                   | No consumer padding overrides on entity surfaces                             |
@@ -720,11 +744,11 @@ make room for an image.
 
 ### Layout modes
 
-| Mode          | Surfaces                                                   | Geometry                                                                                                                                                                                        |
-| ------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-4` comfortable); comfortable titles use `entity-card-heading-comfortable` (19px); media grows the RowAnatomy band track; heading centers on the band |
-| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                                                                                          |
-| Stacked bleed | Species/class radio cards; character list cards            | Full-bleed `builderCard` (2:1) derives a window inside the saved **primary** role crop when present, otherwise cover at the surface default. Text padding sits under the image band.            |
+| Mode          | Surfaces                                                   | Geometry                                                                                                                                                                                                             |
+| ------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-4` comfortable); comfortable titles use `entity-card-heading-comfortable` (19px); leading media spans the identity stack (`stretch`); heading band stays `control` height |
+| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                                                                                                               |
+| Stacked bleed | Species/class radio cards; character list cards            | Full-bleed `builderCard` (2:1) derives a window inside the saved **primary** role crop when present, otherwise cover at the surface default. Text padding sits under the image band.                                 |
 
 Portrait role copy targets compact circle/square tokens. Saved role presentation (crop,
 then focal) wins over surface defaults for both system and upload sources.

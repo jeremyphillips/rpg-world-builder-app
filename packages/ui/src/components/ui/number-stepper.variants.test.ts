@@ -63,6 +63,14 @@ describe('numberStepperWidthVariants', () => {
     expect(classes).toContain('disabled:[&_svg]:text-input-disabled')
     expect(classes).not.toContain('disabled:opacity-40')
   })
+
+  it('uses faint isolated chrome for ability score card steppers', () => {
+    const classes = numberStepperButtonVariants({ appearance: 'isolated', size: 'xs' })
+    expect(classes).toContain('bg-transparent')
+    expect(classes).toContain('border-border-faint')
+    expect(classes).toContain('hover:bg-surface-faint')
+    expect(classes).toContain('active:bg-surface-subtle')
+  })
 })
 
 describe('xs inline-row tier', () => {
@@ -77,10 +85,10 @@ describe('xs inline-row tier', () => {
     expect(numberStepperRootWidthClass('xs', 1)).toBe(
       `w-[calc(${numberStepperValueSlotWidthPx.xs[1]}px+3rem)]`,
     )
-    expect(numberStepperRootWidthClass('xs', 1, '+')).toBe(
+    expect(numberStepperRootWidthClass('xs', 1, true)).toBe(
       `w-[calc(${numberStepperPrefixedValueSlotWidthPx.xs[1]}px+3rem)]`,
     )
-    expect(numberStepperRootWidthClass('sm', 1, '+')).toBe(
+    expect(numberStepperRootWidthClass('sm', 1, true)).toBe(
       `w-[calc(${numberStepperPrefixedValueSlotWidthPx.sm[1]}px+4rem)]`,
     )
   })
@@ -93,7 +101,8 @@ describe('xs inline-row tier', () => {
 })
 
 describe('resolveNumberStepperSizeFromFieldSize', () => {
-  it('maps field sm/md/lg to sm/md/lg stepper tiers', () => {
+  it('maps field xs/sm/md/lg to matching stepper tiers', () => {
+    expect(resolveNumberStepperSizeFromFieldSize('xs')).toBe('xs')
     expect(resolveNumberStepperSizeFromFieldSize('sm')).toBe('sm')
     expect(resolveNumberStepperSizeFromFieldSize('md')).toBe('md')
     expect(resolveNumberStepperSizeFromFieldSize('lg')).toBe('lg')

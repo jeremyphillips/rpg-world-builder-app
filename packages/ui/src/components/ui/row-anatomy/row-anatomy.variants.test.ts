@@ -5,7 +5,7 @@ import { rowAnatomyCellClasses, rowAnatomyTracksVariants } from './row-anatomy.v
 
 const SLOT_EXPECTATIONS: ReadonlyArray<[RowAnatomyCellSpec, string[]]> = [
   [{ slot: 'band', column: 'content' }, ['row-start-[band]', 'self-center']],
-  [{ slot: 'meta', column: 'content' }, ['row-start-[meta]', 'self-start', 'mt-0.5']],
+  [{ slot: 'meta', column: 'content' }, ['row-start-[meta]', 'self-start']],
   [{ slot: 'status', column: 'trailing' }, ['row-start-[status]', 'self-start', 'mt-1']],
   [
     { slot: 'full', column: 'trailing' },

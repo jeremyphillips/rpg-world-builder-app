@@ -1,14 +1,13 @@
 import {
-  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   formatEquipmentCostLabel,
   moneyToCp,
   type ContentOverviewUsageScope,
   type ContentStatus,
   type ContentUsageSummaryLabels,
   type EquipmentCost,
-  type ResolvedContentCampaignAccess,
   type WithCampaignAccess,
   type ContentMedia,
+  isContentTypeMediaEnabled,
   type ContentTypeKey,
 } from '@rpg/contracts'
 import { dataTableColumnMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
@@ -27,6 +26,7 @@ import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { ContentOverviewNameCell } from './content-overview-name-cell'
 import { shouldPresentContentSource } from '../content-type-presentation'
 import { buildContentUsedByColumn } from './content-used-by-column'
+import { resolveReadSurfaceCampaignAccess } from '../campaign-access/resolve-read-surface-campaign-access'
 
 /**
  * Minimum shape every content type shares. Used to constrain the generic
@@ -41,16 +41,10 @@ export type ContentBase = {
   media?: ContentMedia
 }
 
-function readCampaignAccess(row: ContentBase): ResolvedContentCampaignAccess {
-  return (row as WithCampaignAccess<ContentBase>).campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS
-}
-
-export { readCampaignAccess as readContentRowCampaignAccess }
-
 export type ContentTableOptions<T> = {
   /** Content type used to resolve shared source-presentation policy. */
   contentType: ContentTypeKey
-  /** When false, omits the leading image column (spells, feats, skill-proficiencies). */
+  /** When false, omits the leading image column (non-media catalog types). */
   includeImageColumn?: boolean
   /** Optional resolver for crop-aware overview thumbnails and fallback icons. */
   resolveOverviewDisplay?: (row: T) => DashboardContentDisplayResult
@@ -108,7 +102,7 @@ export function buildContentColumns<T extends ContentBase>(
 ): ColumnDef<T>[] {
   const {
     contentType,
-    includeImageColumn = !['spells', 'feats', 'skill-proficiencies'].includes(contentType),
+    includeImageColumn = isContentTypeMediaEnabled(contentType),
     resolveOverviewDisplay,
     nameHref,
     editHref,
@@ -143,7 +137,10 @@ export function buildContentColumns<T extends ContentBase>(
       <ContentOverviewNameCell
         name={row.getValue<string>('name')}
         status={row.original.status}
-        campaignAccess={readCampaignAccess(row.original)}
+        campaignAccess={resolveReadSurfaceCampaignAccess(
+          contentType,
+          (row.original as unknown as WithCampaignAccess<ContentBase>).campaignAccess,
+        )}
         nameHref={nameHref?.(row.original)}
         editHref={canManage ? editHref?.(row.original) : undefined}
         canManage={canManage}

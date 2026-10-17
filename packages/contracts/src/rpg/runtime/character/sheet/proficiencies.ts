@@ -4,7 +4,7 @@ import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-
 import { characterValidationMessages } from '../character-messages'
 import { armorCategorySchema } from '../../../vocab/armor/category'
 import { toolCategorySchema } from '../../../vocab/equipment/tool-category'
-import { languageIdSchema } from '../../../vocab/language'
+import { creatureLanguageProficiencyEntrySchema } from '../../../content/creature/proficiencies'
 import { weaponCategorySchema } from '../../../vocab/weapon/category'
 import { skillSchema } from '../../../content/skill-proficiency'
 import { characterSelectionSourcesSchema } from './selection-sources'
@@ -20,11 +20,11 @@ import { characterSelectionSourcesSchema } from './selection-sources'
 // Proficiencies
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_SKILL_TOOL_PROFICIENCY_RANKS = ['proficient', 'expertise'] as const
+import { PROFICIENCY_RANK_IDS, proficiencyRankSchema } from '../../../vocab/proficiency'
 
-export const characterSkillToolProficiencyRankSchema = z.enum(
-  CHARACTER_SKILL_TOOL_PROFICIENCY_RANKS,
-)
+export const CHARACTER_SKILL_TOOL_PROFICIENCY_RANKS = PROFICIENCY_RANK_IDS
+
+export const characterSkillToolProficiencyRankSchema = proficiencyRankSchema
 
 export type CharacterSkillToolProficiencyRank = z.infer<
   typeof characterSkillToolProficiencyRankSchema
@@ -87,11 +87,11 @@ export const characterArmorProficiencyEntrySchema = z.object({
 
 export type CharacterArmorProficiencyEntry = z.infer<typeof characterArmorProficiencyEntrySchema>
 
-export const characterLanguageProficiencyEntrySchema = z.object({
-  language: languageIdSchema,
-  sources: characterSelectionSourcesSchema,
-  notes: z.string().optional(),
-})
+export const characterLanguageProficiencyEntrySchema =
+  creatureLanguageProficiencyEntrySchema.extend({
+    sources: characterSelectionSourcesSchema,
+    notes: z.string().optional(),
+  })
 
 export type CharacterLanguageProficiencyEntry = z.infer<
   typeof characterLanguageProficiencyEntrySchema

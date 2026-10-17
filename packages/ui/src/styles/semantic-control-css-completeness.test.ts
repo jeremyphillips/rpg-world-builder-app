@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest'
 import {
   SEMANTIC_CONTROL_CSS_REGISTRY,
   validateSemanticControlCssCompleteness,
+  type SemanticControlCssRegistryEntry,
 } from './semantic-control-css-completeness.lib'
 
 describe('semantic control CSS completeness', () => {
@@ -28,10 +29,10 @@ describe('semantic control CSS completeness', () => {
       `,
     )
 
-    const entry = {
+    const entry: SemanticControlCssRegistryEntry = {
       filePath,
       dimensions: [{ modifierPrefix: 'dash-card--info', requiredProperties: ['color'] }],
-    } as const
+    }
 
     expect(validateSemanticControlCssCompleteness({ ...entry, classPrefix: 'dash' })).toEqual([])
     expect(

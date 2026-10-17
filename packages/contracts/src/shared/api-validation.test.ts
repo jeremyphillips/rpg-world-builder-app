@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
+import type { RefinementCtx, ZodIssue } from 'zod'
+import { z } from 'zod'
+
 import { ApiError } from './errors'
 import {
+  addApiValidationIssueToRefinement,
   getApiValidationIssues,
   INVALID_CURSOR_ISSUE_CODE,
   isApiValidationDetails,
+  toApiValidationIssues,
 } from './api-validation'
 
 describe('isApiValidationDetails', () => {
@@ -22,6 +27,36 @@ describe('isApiValidationDetails', () => {
       false,
     )
     expect(isApiValidationDetails({ issues: [{ path: 'name', message: 'Required' }] })).toBe(false)
+  })
+})
+
+describe('addApiValidationIssueToRefinement', () => {
+  it('maps structured issues onto Zod paths with stable params.code', () => {
+    const issues: ZodIssue[] = []
+    addApiValidationIssueToRefinement(
+      {
+        addIssue: (issue: ZodIssue) => {
+          issues.push(issue)
+        },
+      } as unknown as RefinementCtx,
+      { path: 'equipment.0.equipmentId', message: 'Unknown equipment.', code: 'unknown_equipment' },
+    )
+    expect(issues[0]).toMatchObject({
+      message: 'Unknown equipment.',
+      path: ['equipment', 0, 'equipmentId'],
+      params: { code: 'unknown_equipment' },
+    })
+  })
+})
+
+describe('toApiValidationIssues', () => {
+  it('keeps Zod issue codes so promotion payloads pass isApiValidationDetails', () => {
+    const parsed = z.object({ name: z.string().min(1) }).safeParse({ name: '' })
+    expect(parsed.success).toBe(false)
+    if (parsed.success) return
+    const issues = toApiValidationIssues(parsed.error.issues)
+    expect(isApiValidationDetails({ issues })).toBe(true)
+    expect(issues[0]?.code).toBeTruthy()
   })
 })
 

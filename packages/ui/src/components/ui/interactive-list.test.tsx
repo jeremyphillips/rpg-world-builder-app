@@ -28,7 +28,7 @@ describe('InteractiveListRow', () => {
     )
 
     expect(container.firstChild).toHaveClass(
-      'ui-interactive-row--highlight',
+      'ui-interactive-row--highlight-list',
       'ui-interactive-row--rail',
     )
 

@@ -1,8 +1,9 @@
-import type {
-  CharacterRelationshipKind,
-  ContentOverviewUsageScope,
-  ContentUsageBlocker,
-  ContentUsageSummaryLabels,
+import {
+  API_CONTENT_TYPE_KEYS,
+  type CharacterRelationshipKind,
+  type ContentOverviewUsageScope,
+  type ContentUsageBlocker,
+  type ContentUsageSummaryLabels,
 } from '@rpg/contracts'
 
 import {
@@ -15,18 +16,19 @@ import {
 } from './reference-sources/index-by-content-id'
 import type { ContentUsageSource } from './content-usage-source'
 import type { ContentUsageResolverContext } from './content-usage-context'
+import { filterContentUsageBlockersForViewer } from './filter-content-usage-blockers-for-viewer'
 
-/** Surface key for content usage registration — ApiContentTypeKey plus nested subclasses. */
-export type ContentUsageSurfaceKey =
-  | 'classes'
-  | 'spells'
-  | 'species'
-  | 'feats'
-  | 'equipment'
-  | 'skill-proficiencies'
-  | 'organizations'
-  | 'locations'
-  | 'subclasses'
+/** Nested surfaces registered separately from {@link API_CONTENT_TYPE_KEYS}. */
+export const NESTED_CONTENT_USAGE_SURFACE_KEYS = ['subclasses'] as const
+
+/** Surface keys that require a content usage registration entry. */
+export const CONTENT_USAGE_SURFACE_KEYS = [
+  ...API_CONTENT_TYPE_KEYS,
+  ...NESTED_CONTENT_USAGE_SURFACE_KEYS,
+] as const
+
+/** ApiContentTypeKey plus nested subclasses. */
+export type ContentUsageSurfaceKey = (typeof CONTENT_USAGE_SURFACE_KEYS)[number]
 
 export type ContentUsageResolverResult = {
   count: number
@@ -128,7 +130,8 @@ function buildEntryResolver(
       activeSources.map((registration) => registration.source.loadBlockerIndex(ctx)),
     )
     const merged = mergeBlockerIndexes(indexes)
-    const blockers = blockersForContentEntry(merged, entryKey)
+    const rawBlockers = blockersForContentEntry(merged, entryKey)
+    const blockers = await filterContentUsageBlockersForViewer(ctx, rawBlockers)
     return { count: blockers.length, blockers }
   }
 }
@@ -143,17 +146,18 @@ function buildBatchResolver(
       activeSources.map((registration) => registration.source.loadBlockerIndex(ctx)),
     )
     const merged = mergeBlockerIndexes(indexes)
-    return buildContentBatchUsageResults(
-      entryKeys,
-      new Map(entryKeys.map((entryKey) => [entryKey, blockersForContentEntry(merged, entryKey)])),
-    )
+    const blockersByKey = new Map<string, ContentUsageBlocker[]>()
+    for (const entryKey of entryKeys) {
+      const rawBlockers = blockersForContentEntry(merged, entryKey)
+      blockersByKey.set(entryKey, await filterContentUsageBlockersForViewer(ctx, rawBlockers))
+    }
+    return buildContentBatchUsageResults(entryKeys, blockersByKey)
   }
 }
 
 /** Registers discovery topology for one content surface and derives entry/batch resolvers. */
 export function defineContentUsage(input: DefineContentUsageInput): ContentUsageRegistration {
   const entrySources = input.sources.filter((registration) => registration.entry)
-  const batchSources = input.sources.filter((registration) => registration.batch)
 
   if (entrySources.length === 0) {
     throw new Error(
@@ -161,11 +165,7 @@ export function defineContentUsage(input: DefineContentUsageInput): ContentUsage
     )
   }
 
-  if (batchSources.length === 0) {
-    throw new Error(
-      `Content usage registration for "${input.contentType}" requires at least one batch source.`,
-    )
-  }
+  // Batch sources are optional for surfaces without overview Used By (e.g. monsters until encounters).
 
   validateViewerCharacterRelationship(input.contentType, input.viewerCharacterRelationship)
 

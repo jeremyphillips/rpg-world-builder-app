@@ -36,7 +36,7 @@ import {
 } from '../location-authoring-type'
 import {
   buildParentLocationComboboxOptionsResolve,
-  buildParentLocationFilterSelectResolve,
+  buildParentLocationFilterSelectsResolve,
 } from '../hierarchy/location-parent-combobox.lib'
 import {
   LOCATION_PARENT_FIELD_HINT,
@@ -216,7 +216,7 @@ export function buildLocationFields(
         ctx,
         ctx.locationParentLocationIdSeed,
       ),
-      filterSelectResolve: buildParentLocationFilterSelectResolve(),
+      filterSelectsResolve: buildParentLocationFilterSelectsResolve(),
       hint: LOCATION_PARENT_FIELD_HINT,
       visibility: parentLocationFieldVisibility(),
       width: 'full',

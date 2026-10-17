@@ -12,6 +12,10 @@
       "types": "./src/equipment/index.ts",
       "default": "./src/equipment/index.ts"
     },
+    "./magic-properties": {
+      "types": "./src/magic-properties/index.ts",
+      "default": "./src/magic-properties/index.ts"
+    },
     "./classes": {
       "types": "./src/classes/index.ts",
       "default": "./src/classes/index.ts"
@@ -27,6 +31,10 @@
     "./feats": {
       "types": "./src/feats/index.ts",
       "default": "./src/feats/index.ts"
+    },
+    "./monsters": {
+      "types": "./src/monsters/index.ts",
+      "default": "./src/monsters/index.ts"
     },
     "./xp-progressions": {
       "types": "./src/xp-progressions/index.ts",

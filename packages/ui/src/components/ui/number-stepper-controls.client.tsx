@@ -3,7 +3,11 @@
 import { Minus, Plus } from 'lucide-react'
 
 import { ActionIcon } from './action-icon.client'
-import { numberStepperButtonVariants, type NumberStepperSize } from './number-stepper.variants'
+import {
+  numberStepperButtonVariants,
+  type NumberStepperButtonAppearance,
+  type NumberStepperSize,
+} from './number-stepper.variants'
 import type { IconGlyphStep } from './icon-glyph.variants'
 
 function resolveNumberStepperLeftIconStep(size: NumberStepperSize): IconGlyphStep {
@@ -16,12 +20,14 @@ export function NumberStepperDecreaseButton({
   showRemoveAtMin,
   leftDisabled,
   leftAriaLabel,
+  appearance = 'default',
   onClick,
 }: {
   resolvedSize: NumberStepperSize
   showRemoveAtMin: boolean
   leftDisabled: boolean
   leftAriaLabel: string
+  appearance?: NumberStepperButtonAppearance
   onClick: () => void
 }) {
   return (
@@ -31,6 +37,7 @@ export function NumberStepperDecreaseButton({
       disabled={leftDisabled}
       aria-label={leftAriaLabel}
       className={numberStepperButtonVariants({
+        appearance,
         size: resolvedSize,
         minBoundary: showRemoveAtMin ? 'remove' : 'default',
       })}
@@ -46,15 +53,56 @@ export function NumberStepperDecreaseButton({
   )
 }
 
+export function NumberStepperStepButton({
+  direction,
+  disabled,
+  size,
+  appearance = 'default',
+  'aria-label': ariaLabel,
+  onClick,
+}: {
+  direction: 'increase' | 'decrease'
+  disabled: boolean
+  size: NumberStepperSize
+  appearance?: NumberStepperButtonAppearance
+  'aria-label': string
+  onClick: () => void
+}) {
+  if (direction === 'decrease') {
+    return (
+      <NumberStepperDecreaseButton
+        resolvedSize={size}
+        showRemoveAtMin={false}
+        leftDisabled={disabled}
+        leftAriaLabel={ariaLabel}
+        appearance={appearance}
+        onClick={onClick}
+      />
+    )
+  }
+
+  return (
+    <NumberStepperIncreaseButton
+      resolvedSize={size}
+      disabled={disabled}
+      ariaLabel={ariaLabel}
+      appearance={appearance}
+      onClick={onClick}
+    />
+  )
+}
+
 export function NumberStepperIncreaseButton({
   resolvedSize,
   disabled,
   ariaLabel,
+  appearance = 'default',
   onClick,
 }: {
   resolvedSize: NumberStepperSize
   disabled: boolean
   ariaLabel: string
+  appearance?: NumberStepperButtonAppearance
   onClick: () => void
 }) {
   return (
@@ -63,7 +111,7 @@ export function NumberStepperIncreaseButton({
       tabIndex={-1}
       disabled={disabled}
       aria-label={ariaLabel}
-      className={numberStepperButtonVariants({ size: resolvedSize })}
+      className={numberStepperButtonVariants({ appearance, size: resolvedSize })}
       onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}
     >

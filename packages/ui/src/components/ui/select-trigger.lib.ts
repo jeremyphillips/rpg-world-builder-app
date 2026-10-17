@@ -67,3 +67,35 @@ export function resolveSelectSizingGhostLabels(props: SelectCompactSizingProps):
 
   return []
 }
+
+export type SelectValueSlotPosition = 'start' | 'end' | 'standalone'
+
+export type SelectValueSlotTrailing = 'content' | 'slot'
+
+export function resolveSelectValuePosition(
+  grouped: boolean,
+  groupedPosition: 'start' | 'end',
+): SelectValueSlotPosition {
+  if (!grouped) return 'standalone'
+  return groupedPosition === 'end' ? 'end' : 'start'
+}
+
+export function resolveSelectValueTrailing(
+  hideCaret: boolean,
+  valuePosition: SelectValueSlotPosition,
+): SelectValueSlotTrailing {
+  if (hideCaret) return 'content'
+  if (valuePosition === 'end' || valuePosition === 'standalone') return 'slot'
+  return 'content'
+}
+
+export function assertSelectTriggerNotInsideFloatingLabel(
+  insideFloatingLabel: boolean,
+  options: { digits?: FieldDigits; grouped?: boolean },
+): void {
+  if (insideFloatingLabel && (options.digits != null || options.grouped)) {
+    throw new Error(
+      'SelectTrigger: `digits` and `grouped` are not supported inside FloatingLabelField.',
+    )
+  }
+}

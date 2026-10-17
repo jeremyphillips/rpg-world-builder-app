@@ -27,6 +27,16 @@ export function contentUsageBlockersToUsageReferences(
         characterType: blocker.usage.characterType,
         campaignId: blocker.usage.campaignId,
       })
+      continue
+    }
+
+    if (blocker.kind === 'game-term') {
+      references.push({
+        kind: 'game-term',
+        setId: blocker.setId,
+        id: blocker.id,
+        label: blocker.label,
+      })
     }
   }
 

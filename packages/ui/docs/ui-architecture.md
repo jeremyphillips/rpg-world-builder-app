@@ -53,20 +53,21 @@ The registry records gaps ("No owner yet") explicitly. It grows only when a fami
 
 ### Single-owner responsibilities
 
-| UI responsibility              | Canonical owner                                 |
-| ------------------------------ | ----------------------------------------------- |
-| Interactive button chrome      | `Button` (split actions: `SplitButton`)         |
-| Table filter presentation      | `DataTableFilterChrome`                         |
-| Compact sort selection         | `SortMenu`                                      |
-| Callout or warning surface     | `Alert`                                         |
-| Transient feedback             | `Toast`                                         |
-| Catalog picking                | `CatalogPickerSheet` (composes `Sheet`)         |
-| Key/value metadata             | `MetadataList`                                  |
-| Inline metadata separators     | `InlineMetadata`                                |
-| Tabs                           | `Tabs`                                          |
-| Multi-step flow                | `Wizard`                                        |
-| Page width shell (dashboard)   | `PageShell`                                     |
-| Popover / menu content surface | `popoverContentVariants` (`ui-popover-content`) |
+| UI responsibility              | Canonical owner                                                   |
+| ------------------------------ | ----------------------------------------------------------------- |
+| Interactive button chrome      | `Button` (split actions: `SplitButton`)                           |
+| Table filter presentation      | `DataTableFilterChrome`                                           |
+| Compact sort selection         | `SortMenu`                                                        |
+| Callout or warning surface     | `Alert`                                                           |
+| Transient feedback             | `Toast`                                                           |
+| Catalog picking                | `CatalogPickerSheet` (composes `Sheet`)                           |
+| Key/value metadata             | `MetadataList`                                                    |
+| Completed decision summaries   | `DecisionSummaryPanel` + `mapSummaryDecisionRowsToSelectionProps` |
+| Inline metadata separators     | `InlineMetadata`                                                  |
+| Tabs                           | `Tabs`                                                            |
+| Multi-step flow                | `Wizard`                                                          |
+| Page width shell (dashboard)   | `PageShell`                                                       |
+| Popover / menu content surface | `popoverContentVariants` (`ui-popover-content`)                   |
 
 ### Families with overlapping ownership
 

@@ -1,14 +1,22 @@
 import { describe, expect, it } from 'vitest'
+import type { RefinementCtx, ZodIssue } from 'zod'
 
 import { characterSchema } from '../runtime/character/sheet'
+import { formatFieldMessage } from '../../validation/define-message'
 import {
   creatureAbilityScoresSchema,
   creatureRuntimeHitPointsSchema,
-  creatureSavingThrowModifierEntrySchema,
+  creatureSensesDraftSchema,
   creatureSensesSchema,
-  creatureSkillModifierEntrySchema,
+  refineCreatureTelepathyRange,
+  TELEPATHY_MILE_FEET,
+  refineCreatureSenseRanges,
   creatureMovementSchema,
   creatureStatBlockHitPointsSchema,
+  creatureSkillProficiencyEntrySchema,
+  creatureWeaponProficienciesSchema,
+  creatureWeaponProficiencyTargetSchema,
+  resolveDamageDefenseOptionState,
 } from './creature'
 
 describe('creatureAbilityScoresSchema', () => {
@@ -89,18 +97,110 @@ describe('creature movement and senses', () => {
   it('defaults omitted senses to an empty list', () => {
     expect(creatureSensesSchema.parse(undefined)).toEqual([])
   })
+
+  it('allows draft senses without range until publish refinement', () => {
+    expect(creatureSensesDraftSchema.parse([{ type: 'darkvision' }])).toEqual([
+      { type: 'darkvision' },
+    ])
+  })
 })
 
-describe('creature stat-block modifier entries', () => {
-  it('parses explicit skill and saving throw modifiers', () => {
-    expect(creatureSkillModifierEntrySchema.parse({ skill: 'perception', modifier: 7 })).toEqual({
+function refinementIssueCollector() {
+  const issues: { message: string; path: (string | number)[] }[] = []
+  const ctx = {
+    addIssue: (issue: ZodIssue) => {
+      issues.push({ message: issue.message, path: issue.path as (string | number)[] })
+    },
+  } as unknown as RefinementCtx
+  return { issues, ctx }
+}
+
+describe('refineCreatureSenseRanges', () => {
+  it('requires range on publish refinement', () => {
+    const { issues, ctx } = refinementIssueCollector()
+    refineCreatureSenseRanges([{ type: 'darkvision' }], ctx, ['senses'])
+    expect(issues).toEqual([
+      {
+        message: 'Enter a range in feet for each sense.',
+        path: ['senses', 0, 'range'],
+      },
+    ])
+  })
+
+  it('rejects a mile value on a sense range', () => {
+    const { issues, ctx } = refinementIssueCollector()
+    refineCreatureSenseRanges([{ type: 'darkvision', range: TELEPATHY_MILE_FEET }], ctx, ['senses'])
+    expect(issues).toEqual([
+      {
+        message: 'Choose a sense range in feet.',
+        path: ['senses', 0, 'range'],
+      },
+    ])
+  })
+})
+
+describe('refineCreatureTelepathyRange', () => {
+  it('accepts a feet preset and one mile', () => {
+    const issues: string[] = []
+    const ctx = {
+      addIssue: (issue: { message: string }) => {
+        issues.push(issue.message)
+      },
+    } as never
+    refineCreatureTelepathyRange(60, ctx, ['communication', 'telepathy'])
+    refineCreatureTelepathyRange(TELEPATHY_MILE_FEET, ctx, ['communication', 'telepathy'])
+    expect(issues).toEqual([])
+  })
+
+  it('rejects a distance outside the telepathy presets', () => {
+    const { issues, ctx } = refinementIssueCollector()
+    refineCreatureTelepathyRange(15, ctx, ['communication', 'telepathy'])
+    expect(issues).toHaveLength(1)
+    expect(formatFieldMessage(issues[0]!.message)).toBe('Choose a telepathy range.')
+    expect(issues[0]!.path).toEqual(['communication', 'telepathy'])
+  })
+})
+
+describe('creature proficiency entries', () => {
+  it('parses skill proficiency ranks and weapon targets', () => {
+    expect(
+      creatureSkillProficiencyEntrySchema.parse({ skill: 'perception', rank: 'expertise' }),
+    ).toEqual({
       skill: 'perception',
-      modifier: 7,
+      rank: 'expertise',
     })
 
-    expect(creatureSavingThrowModifierEntrySchema.parse({ ability: 'wis', modifier: 5 })).toEqual({
-      ability: 'wis',
-      modifier: 5,
+    expect(
+      creatureWeaponProficiencyTargetSchema.parse({
+        weaponId: 'srd-cc-5.2.1:dagger',
+      }),
+    ).toEqual({
+      weaponId: 'srd-cc-5.2.1:dagger',
+    })
+  })
+
+  it('rejects weapon targets with both weaponId and weaponCategory', () => {
+    expect(
+      creatureWeaponProficiencyTargetSchema.safeParse({
+        weaponId: 'srd-cc-5.2.1:dagger',
+        weaponCategory: 'simple',
+      }).success,
+    ).toBe(false)
+  })
+
+  it('parses monster weapon proficiency grant sets', () => {
+    expect(
+      creatureWeaponProficienciesSchema.parse({
+        categories: ['simple'],
+        items: ['srd-cc-5.2.1:dagger'],
+      }),
+    ).toEqual({
+      categories: ['simple'],
+      items: ['srd-cc-5.2.1:dagger'],
+    })
+    expect(creatureWeaponProficienciesSchema.parse({})).toEqual({
+      categories: [],
+      items: [],
     })
   })
 })
@@ -144,5 +244,30 @@ describe('character schema creature reuse', () => {
       cha: 8,
     })
     expect(parsed.hitPoints).toEqual({ base: 12, current: 12, temporary: 0 })
+  })
+})
+
+describe('resolveDamageDefenseOptionState', () => {
+  it('disables damage types already assigned to another defense list', () => {
+    expect(
+      resolveDamageDefenseOptionState('fire', 'resistances', {
+        vulnerabilities: ['fire'],
+        resistances: [],
+        immunities: [],
+      }),
+    ).toEqual({
+      disabled: true,
+      disabledReason: 'Already in Vulnerabilities',
+    })
+  })
+
+  it('leaves options enabled when the type is only on the active list', () => {
+    expect(
+      resolveDamageDefenseOptionState('fire', 'vulnerabilities', {
+        vulnerabilities: ['fire'],
+        resistances: [],
+        immunities: [],
+      }),
+    ).toEqual({ disabled: false })
   })
 })

@@ -12,11 +12,11 @@ export function readUsageBlockerSourceKey(
 }
 
 export function isUsageReferenceBlocker(blocker: UsageBlocker): boolean {
-  return blocker.kind === 'usage' || blocker.kind === 'content'
+  return blocker.kind === 'usage' || blocker.kind === 'content' || blocker.kind === 'game-term'
 }
 
 export function isSourceKeyedUsageBlocker(blocker: UsageBlocker): boolean {
-  if (blocker.kind === 'usage' || blocker.kind === 'content') {
+  if (blocker.kind === 'usage' || blocker.kind === 'content' || blocker.kind === 'game-term') {
     return true
   }
 

@@ -1,0 +1,83 @@
+[
+  {
+    "id": "srd-cc-5.2.1:weapon-enhancement-1",
+    "name": "Enhancement +1",
+    "description": "Grants +1 to attack and damage rolls made with this weapon.",
+    "category": "enhancement",
+    "appliesTo": ["weapon"],
+    "effects": [
+      { "target": "attack_roll", "bonus": 1 },
+      { "target": "damage_roll", "bonus": 1 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:weapon-enhancement-2",
+    "name": "Enhancement +2",
+    "description": "Grants +2 to attack and damage rolls made with this weapon.",
+    "category": "enhancement",
+    "appliesTo": ["weapon"],
+    "effects": [
+      { "target": "attack_roll", "bonus": 2 },
+      { "target": "damage_roll", "bonus": 2 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:weapon-enhancement-3",
+    "name": "Enhancement +3",
+    "description": "Grants +3 to attack and damage rolls made with this weapon.",
+    "category": "enhancement",
+    "appliesTo": ["weapon"],
+    "effects": [
+      { "target": "attack_roll", "bonus": 3 },
+      { "target": "damage_roll", "bonus": 3 }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:armor-enhancement-1",
+    "name": "Enhancement +1",
+    "description": "Grants +1 to Armor Class while this armor is worn.",
+    "category": "enhancement",
+    "appliesTo": ["armor"],
+    "effects": [{ "target": "armor_class", "bonus": 1 }]
+  },
+  {
+    "id": "srd-cc-5.2.1:armor-enhancement-2",
+    "name": "Enhancement +2",
+    "description": "Grants +2 to Armor Class while this armor is worn.",
+    "category": "enhancement",
+    "appliesTo": ["armor"],
+    "effects": [{ "target": "armor_class", "bonus": 2 }]
+  },
+  {
+    "id": "srd-cc-5.2.1:armor-enhancement-3",
+    "name": "Enhancement +3",
+    "description": "Grants +3 to Armor Class while this armor is worn.",
+    "category": "enhancement",
+    "appliesTo": ["armor"],
+    "effects": [{ "target": "armor_class", "bonus": 3 }]
+  },
+  {
+    "id": "srd-cc-5.2.1:shield-enhancement-1",
+    "name": "Enhancement +1",
+    "description": "Grants +1 to Armor Class while this shield is equipped.",
+    "category": "enhancement",
+    "appliesTo": ["shield"],
+    "effects": [{ "target": "armor_class", "bonus": 1 }]
+  },
+  {
+    "id": "srd-cc-5.2.1:shield-enhancement-2",
+    "name": "Enhancement +2",
+    "description": "Grants +2 to Armor Class while this shield is equipped.",
+    "category": "enhancement",
+    "appliesTo": ["shield"],
+    "effects": [{ "target": "armor_class", "bonus": 2 }]
+  },
+  {
+    "id": "srd-cc-5.2.1:shield-enhancement-3",
+    "name": "Enhancement +3",
+    "description": "Grants +3 to Armor Class while this shield is equipped.",
+    "category": "enhancement",
+    "appliesTo": ["shield"],
+    "effects": [{ "target": "armor_class", "bonus": 3 }]
+  }
+]

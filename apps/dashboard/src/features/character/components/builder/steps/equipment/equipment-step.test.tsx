@@ -330,7 +330,7 @@ describe('EquipmentStep', () => {
     renderEquipmentStep(draft)
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
-    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'breastplate')
+    await user.type(screen.getByRole('searchbox', { name: 'Search catalog' }), 'breastplate')
 
     const breastplateRow = screen
       .getAllByRole('listitem')
@@ -441,7 +441,7 @@ describe('EquipmentStep', () => {
     const { onDraftChange } = renderEquipmentStep(draft)
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
-    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rations')
+    await user.type(screen.getByRole('searchbox', { name: 'Search catalog' }), 'rations')
 
     const rationsRow = screen
       .getAllByRole('listitem')

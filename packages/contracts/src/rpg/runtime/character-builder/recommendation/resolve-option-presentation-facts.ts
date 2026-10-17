@@ -1,7 +1,14 @@
 import { isStartingEquipmentRecommendationReason } from '../../../content/equipment-recommendation'
+import {
+  MATCHES_EQUIPPED_WEAPON_LABEL,
+  MATCHES_OWNED_WEAPON_LABEL,
+  MATCHES_WEAPON_PROFICIENCY_LABEL,
+} from '../../creature/weapon-cross-recommendation'
 import type { Ability } from '../../../vocab/ability'
 import {
   ABILITY_FIT_RECOMMENDATION_REASON,
+  MATCHES_EQUIPPED_WEAPON_RECOMMENDATION_REASON,
+  MATCHES_OWNED_WEAPON_RECOMMENDATION_REASON,
   type OptionRecommendation,
   type RecommendationSignal,
 } from './recommendation-envelope'
@@ -139,6 +146,19 @@ function softRecommendationLabel(args: {
   authoredLabel: string | undefined
 }): string {
   const { group, authoredLabel } = args
+  if (group.signals.every((signal) => signal.reason === 'selectedWeaponProficiency')) {
+    return MATCHES_WEAPON_PROFICIENCY_LABEL
+  }
+  if (
+    group.signals.every((signal) => signal.reason === MATCHES_EQUIPPED_WEAPON_RECOMMENDATION_REASON)
+  ) {
+    return MATCHES_EQUIPPED_WEAPON_LABEL
+  }
+  if (
+    group.signals.every((signal) => signal.reason === MATCHES_OWNED_WEAPON_RECOMMENDATION_REASON)
+  ) {
+    return MATCHES_OWNED_WEAPON_LABEL
+  }
   if (group.signals.every((signal) => signal.detail?.kind === 'toolCategory')) {
     return OPTION_PRESENTATION_COMMON_FOR_CLASS_LABEL
   }
@@ -150,6 +170,12 @@ function softRecommendationLabel(args: {
 
 function isOmittedFromRecommendationFacts(reason: RecommendationSignal['reason']): boolean {
   if (reason === ABILITY_FIT_RECOMMENDATION_REASON) return true
+  if (
+    reason === MATCHES_EQUIPPED_WEAPON_RECOMMENDATION_REASON ||
+    reason === MATCHES_OWNED_WEAPON_RECOMMENDATION_REASON
+  ) {
+    return false
+  }
   return isStartingEquipmentRecommendationReason(reason)
 }
 

@@ -1,6 +1,6 @@
 import { loadSeedClasses } from '@rpg/catalog/classes'
 import { loadSeedSpecies } from '@rpg/catalog/species'
-import { contentMediaSchema } from '@rpg/contracts'
+import { CONTENT_TYPE_MEDIA_ENABLED_KEYS, contentMediaSchema } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import '../../../classes/lib/class-form-def'
@@ -8,6 +8,7 @@ import '../../../equipment/lib/equipment-form-def'
 import '../../../locations/lib/forms/location-form-def'
 import '../../../organizations/lib/organization-form-def'
 import '../../../species/lib/species-form-def'
+import '../../../monsters/lib/monster-form-def'
 import { classFormDef } from '../../../classes/lib/class-form-def'
 import { classDraftFormSchema, classFormSchema } from '../../../classes/lib/class-form-fields'
 import { equipmentFormDef } from '../../../equipment/lib/equipment-form-def'
@@ -35,16 +36,8 @@ const sampleMedia = contentMediaSchema.parse({
   roles: {},
 })
 
-const MEDIA_ENABLED_ROUTE_KEYS = [
-  'classes',
-  'species',
-  'equipment',
-  'locations',
-  'organizations',
-] as const
-
 describe('managed content media form defs', () => {
-  it.each(MEDIA_ENABLED_ROUTE_KEYS)('registers media capability on %s', (routeKey) => {
+  it.each(CONTENT_TYPE_MEDIA_ENABLED_KEYS)('registers media capability on %s', (routeKey) => {
     const def = contentFormRegistry[routeKey]
     expect(def?.supportsManagedMedia).toBe(true)
     expect(def?.mediaDomain).toBeDefined()

@@ -44,6 +44,32 @@ describe('system content image registry', () => {
     })
   })
 
+  it('resolves seed monster primary PNGs to the public path', () => {
+    expect(
+      resolveSystemContentImage({
+        imageSetId: 'srd-cc-5.2.1',
+        subject: contentTypeSubject('monsters'),
+        assetRole: 'primary',
+        slug: 'kobold-warrior',
+        contentSource: 'system',
+      }),
+    ).toEqual({
+      path: 'assets/system/srd-cc-5.2.1/monsters/primary/kobold-warrior.png',
+      sourceDimensions: { width: 1364, height: 1023 },
+      presentation: { treatment: 'white-paper-knockout' },
+    })
+
+    expect(
+      resolveSystemContentImage({
+        imageSetId: 'srd-cc-5.2.1',
+        subject: contentTypeSubject('monsters'),
+        assetRole: 'primary',
+        slug: 'skeleton',
+        contentSource: 'system',
+      })?.path,
+    ).toBe('assets/system/srd-cc-5.2.1/monsters/primary/skeleton.png')
+  })
+
   it('resolves elf and human system species primary to the public path', () => {
     expect(
       resolveSystemContentImage({

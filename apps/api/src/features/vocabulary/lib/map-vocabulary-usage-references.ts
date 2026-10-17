@@ -26,6 +26,16 @@ export function mapBlockersToVocabularyUsageReferences(
         characterType: blocker.usage.characterType,
         campaignId: blocker.usage.campaignId,
       })
+      continue
+    }
+
+    if (blocker.kind === 'game-term') {
+      references.push({
+        kind: 'game-term',
+        setId: blocker.setId,
+        id: blocker.id,
+        label: blocker.label,
+      })
     }
   }
 
@@ -44,6 +54,10 @@ export function sortVocabularyUsageReferences(
     (reference): reference is Extract<VocabularyUsageReference, { kind: 'character' }> =>
       reference.kind === 'character',
   )
+  const gameTermRefs = references.filter(
+    (reference): reference is Extract<VocabularyUsageReference, { kind: 'game-term' }> =>
+      reference.kind === 'game-term',
+  )
 
   contentRefs.sort((left, right) => {
     const typeCompare = left.contentTypeKey.localeCompare(right.contentTypeKey)
@@ -54,8 +68,9 @@ export function sortVocabularyUsageReferences(
   })
 
   characterRefs.sort((left, right) => left.label.localeCompare(right.label))
+  gameTermRefs.sort((left, right) => left.label.localeCompare(right.label))
 
-  return [...contentRefs, ...characterRefs]
+  return [...contentRefs, ...gameTermRefs, ...characterRefs]
 }
 
 export function buildVocabularyEntryUsageFromBlockers(blockers: ContentUsageBlocker[]): {

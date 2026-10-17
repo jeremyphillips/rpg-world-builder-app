@@ -118,27 +118,62 @@ function normalizeWriteInput(
   }
 }
 
+function patchMergeKeys<T extends StoredEntity>(config: ContentWriteConfig<T>) {
+  return {
+    replaceKeys: config.patchReplaceKeys ?? config.readConfig.patchReplaceKeys,
+    tombstoneKeys: config.patchTombstoneKeys,
+  }
+}
+
+/** Accumulates a system patch, preserving declared top-level null tombstones. */
+export function accumulateSystemPatch(args: {
+  existingPatch: Record<string, unknown> | undefined
+  update: Record<string, unknown>
+  replaceKeys?: readonly string[]
+  tombstoneKeys?: readonly string[]
+}): Record<string, unknown> {
+  const merged = deepMerge(args.existingPatch ?? {}, stripUndefined(args.update), {
+    replaceKeys: args.replaceKeys,
+    tombstoneKeys: args.tombstoneKeys,
+  })
+  return stripNullDeep(merged, { preserveTopLevelNullKeys: args.tombstoneKeys })
+}
+
+function mergeHomebrewEffectiveBody(
+  existingBody: Record<string, unknown>,
+  input: Record<string, unknown>,
+): Record<string, unknown> {
+  const merged: Record<string, unknown> = { ...existingBody, ...stripUndefined(input) }
+  for (const [key, value] of Object.entries(merged)) {
+    if (value === null) delete merged[key]
+  }
+  return merged
+}
+
 function prepareSystemPatchMerge<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   existing: T,
   existingPatch: Record<string, unknown> | undefined,
   update: Record<string, unknown>,
 ): { mergedBody: Record<string, unknown>; cumulativePatch: Record<string, unknown> } {
-  const mergeOptions = { replaceKeys: config.readConfig.patchReplaceKeys }
+  const { replaceKeys, tombstoneKeys } = patchMergeKeys(config)
   const patchBody = stripUndefined(update)
   const existingPatchStripped = existingPatch ?? {}
   const mergedBodyRaw = deepMerge(
-    deepMerge(
-      entityBody(existing as unknown as Record<string, unknown>),
-      existingPatchStripped,
-      mergeOptions,
-    ),
+    deepMerge(entityBody(existing as unknown as Record<string, unknown>), existingPatchStripped, {
+      replaceKeys,
+    }),
     patchBody,
-    mergeOptions,
+    { replaceKeys },
   )
   return {
     mergedBody: mergedBodyRaw,
-    cumulativePatch: deepMerge(existingPatchStripped, patchBody, mergeOptions),
+    cumulativePatch: accumulateSystemPatch({
+      existingPatch: existingPatchStripped,
+      update: patchBody,
+      replaceKeys,
+      tombstoneKeys,
+    }),
   }
 }
 
@@ -160,11 +195,22 @@ function buildWriteContext(
   input: Record<string, unknown>,
   normalized: Record<string, unknown>,
   existing?: StoredEntity,
+  effectiveBody?: Record<string, unknown>,
 ): ContentWriteContext {
-  return { campaignId, rulesetId, mode, validationIntent, input, normalized, existing }
+  return {
+    campaignId,
+    rulesetId,
+    mode,
+    validationIntent,
+    input,
+    normalized,
+    existing,
+    effectiveBody,
+  }
 }
 
-async function runValidateBeforeWrite<T extends StoredEntity>(
+/** Shared write and promotion hook entry. */
+export async function runValidateBeforeWrite<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   ctx: ContentWriteContext,
 ): Promise<void> {
@@ -242,19 +288,33 @@ async function updateHomebrewRecord<T extends StoredEntity>(
   return resolveStoredSchema(config, validationIntent).parse(entity)
 }
 
+function omitClearedTombstones(
+  body: Record<string, unknown>,
+  tombstoneKeys: readonly string[] | undefined,
+): Record<string, unknown> {
+  if (!tombstoneKeys?.length) return body
+  const next = { ...body }
+  for (const key of tombstoneKeys) {
+    if (next[key] === null) delete next[key]
+  }
+  return next
+}
+
 function parseSystemPatchedStoredEntity<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   existing: T,
   mergedBody: Record<string, unknown>,
 ): T {
-  const mergedBodyForParse = config.readConfig.patchReplaceKeys?.length
+  const replaced = config.readConfig.patchReplaceKeys?.length
     ? stripNullDeepFields(mergedBody, config.readConfig.patchReplaceKeys)
     : mergedBody
+  // Cleared tombstones are absent on the effective record. Identity fields come
+  // from the stored row so a key removed from the body cannot fall back to it.
+  const mergedBodyForParse = omitClearedTombstones(replaced, config.patchTombstoneKeys)
   config.bodySchema.parse(mergedBodyForParse)
 
   const existingRecord = existing as Record<string, unknown>
   const entityForParse = {
-    ...existingRecord,
     ...mergedBodyForParse,
     id: existing.id,
     slug: existing.slug,
@@ -262,6 +322,8 @@ function parseSystemPatchedStoredEntity<T extends StoredEntity>(
     status: existing.status,
     campaignId: existing.campaignId,
     rulesetId: existingRecord.rulesetId,
+    createdAt: existingRecord.createdAt,
+    updatedAt: existingRecord.updatedAt,
   }
 
   return config.storedSchema.parse(entityForParse as unknown as T)
@@ -292,7 +354,7 @@ async function updateSystemPatch<T extends StoredEntity>(
     update,
   )
 
-  const sanitizedPatch = stripNullDeep(cumulativePatch) as Record<string, unknown>
+  const sanitizedPatch = cumulativePatch
 
   await config.patchModel.findOneAndUpdate(
     { campaignId, targetId: entityId },
@@ -520,6 +582,8 @@ export async function createHomebrewContent<T extends StoredEntity>(
     validationIntent,
     input,
     normalized,
+    undefined,
+    config.bodyFromCreateInput(input),
   )
   await runValidateBeforeWrite(config, writeCtx)
 
@@ -624,6 +688,8 @@ export async function validateHomebrewContentCreate<T extends StoredEntity>(
     validationIntent,
     input,
     normalized,
+    undefined,
+    config.bodyFromCreateInput(input),
   )
   await runValidateBeforeWrite(config, writeCtx)
   await resolveSlugForCreateAttempt({
@@ -662,6 +728,25 @@ export async function resolveContentEntityForWrite<T extends StoredEntity>(
   return { campaign, entity: existing }
 }
 
+async function resolveUpdateEffectiveBody<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  existing: T,
+  existingBody: Record<string, unknown>,
+  update: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  if (existing.source === 'homebrew') {
+    return mergeHomebrewEffectiveBody(existingBody, update)
+  }
+  if (!config.patchModel) {
+    return mergeHomebrewEffectiveBody(existingBody, update)
+  }
+  const existingPatchDoc = await config.patchModel
+    .findOne({ campaignId, targetId: existing.id })
+    .lean<{ patch: Record<string, unknown> }>()
+  return prepareSystemPatchMerge(config, existing, existingPatchDoc?.patch, update).mergedBody
+}
+
 /** Update a homebrew record or upsert a system overlay patch. */
 export async function updateContentEntity<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
@@ -691,6 +776,13 @@ export async function updateContentEntity<T extends StoredEntity>(
 
   const validationIntent = contentStatusToValidationIntent(existing.status)
   const update = parsePersistedWriteInput(config, normalized, 'update', validationIntent)
+  const effectiveBody = await resolveUpdateEffectiveBody(
+    config,
+    campaignId,
+    existing,
+    existingBody,
+    update,
+  )
   const writeCtx = buildWriteContext(
     campaignId,
     campaign.rulesetId,
@@ -699,6 +791,7 @@ export async function updateContentEntity<T extends StoredEntity>(
     update,
     normalized,
     existing,
+    effectiveBody,
   )
   await runValidateBeforeWrite(config, writeCtx)
 

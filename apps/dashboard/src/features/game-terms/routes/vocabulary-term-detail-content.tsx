@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import {
   DEFAULT_SYSTEM_RULESET_ID,
+  CREATURE_TYPE_SET_ID,
   getVocabularyOptionSetTerm,
   getVocabularySetCapability,
   vocabularyOptionSetIdSchema,
@@ -184,6 +185,9 @@ function VocabularyTermDetailLoaded({
         label: values.label,
         description: values.description || undefined,
         status: values.status,
+        ...(setId === CREATURE_TYPE_SET_ID
+          ? { languageAffinities: values.languageAffinities }
+          : {}),
       },
     })
     notifyVocabularyEntrySaved(values.label)

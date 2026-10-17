@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
@@ -34,9 +34,16 @@ describe('OrganizationMembersSection', () => {
       '/campaigns/camp-1/npcs/npc-1',
     )
     expect(screen.getByText('Speaker')).toBeInTheDocument()
-    expect(screen.getByText('NPC · Human · Level 3 Rogue')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Verna' })).toBeInTheDocument()
-    expect(screen.getByText('PC · Dwarf · Level 1 Fighter')).toBeInTheDocument()
+    const circleEnvoyRow = screen
+      .getByRole('link', { name: 'Circle Envoy' })
+      .closest('article') as HTMLElement
+    for (const segment of ['NPC', 'Human', 'Level 3 Rogue']) {
+      expect(within(circleEnvoyRow).getByText(segment)).toBeInTheDocument()
+    }
+    const vernaRow = screen.getByRole('link', { name: 'Verna' }).closest('article') as HTMLElement
+    for (const segment of ['PC', 'Dwarf', 'Level 1 Fighter']) {
+      expect(within(vernaRow).getByText(segment)).toBeInTheDocument()
+    }
   })
 
   it('renders untitled memberships as the name alone', () => {

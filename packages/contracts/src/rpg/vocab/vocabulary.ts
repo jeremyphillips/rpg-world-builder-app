@@ -65,6 +65,8 @@ export const vocabularyOptionSchema = z.object({
   source: vocabularyOptionSourceSchema,
   status: vocabularyOptionStatusSchema,
   media: contentMediaSchema.optional(),
+  /** Creature-type seed or patch only — recommended monster languages. */
+  languageAffinities: z.array(vocabularyOptionIdSchema).optional(),
 })
 
 export type VocabularyOption = z.infer<typeof vocabularyOptionSchema>
@@ -139,6 +141,7 @@ export const vocabularySystemEntryPatchSchema = z
     description: z.string().optional(),
     status: vocabularyOptionStatusSchema.optional(),
     media: contentMediaSchema.optional(),
+    languageAffinities: z.array(vocabularyOptionIdSchema).optional(),
   })
   .strict()
 
@@ -157,6 +160,7 @@ export const vocabularyCampaignEntrySchema = z
     description: z.string().optional(),
     status: vocabularyOptionStatusSchema.default('active'),
     media: contentMediaSchema.optional(),
+    languageAffinities: z.array(vocabularyOptionIdSchema).optional(),
   })
   .strict()
 
@@ -188,6 +192,7 @@ export const createVocabularyCampaignEntryRequestSchema = z
     description: z.string().optional(),
     id: vocabularyOptionIdSchema.optional(),
     status: vocabularyOptionStatusSchema.optional(),
+    languageAffinities: z.array(vocabularyOptionIdSchema).optional(),
   })
   .strict()
 
@@ -203,6 +208,7 @@ export const createVocabularyCampaignEntryInputSchema = z
     label: z.string().min(1),
     description: z.string().optional(),
     status: vocabularyOptionStatusSchema.optional(),
+    languageAffinities: z.array(vocabularyOptionIdSchema).optional(),
   })
   .strict()
 
@@ -217,6 +223,7 @@ export const updateVocabularyEntryInputSchema = z
     status: vocabularyOptionStatusSchema.optional(),
     media: contentMediaSchema.optional(),
     expectedMediaRevision: z.number().int().min(0).optional(),
+    languageAffinities: z.array(vocabularyOptionIdSchema).optional(),
   })
   .strict()
   .superRefine((value, ctx) => {

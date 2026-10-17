@@ -2,7 +2,7 @@ import type { ContentDisplayImage } from '@rpg/contracts'
 import { resolveContentDisplayFallback } from '@rpg/contracts'
 
 import { DetailRowLeadingMedia } from '../../../lib/detail/row/detail-row-leading-media'
-import { buildEntitySurfaceLeadingMediaNode } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
+import { projectEntitySurfaceIdentityToSummaryModel } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 
 import {
   buildCharacterEntityCardModel,
@@ -30,7 +30,7 @@ export function buildOrganizationMemberLeadingMedia(
     characterType: row.characterType,
   })
 
-  const media = buildEntitySurfaceLeadingMediaNode(identity, 'compact')
+  const media = projectEntitySurfaceIdentityToSummaryModel(identity, 'compact').media
   if (!media) return undefined
 
   return (

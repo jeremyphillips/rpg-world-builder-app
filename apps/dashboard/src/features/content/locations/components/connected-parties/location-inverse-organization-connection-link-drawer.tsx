@@ -564,7 +564,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
               identity: buildOrganizationEntityCardModel(
                 buildOrganizationEntitySummaryVm(organization),
                 {
-                  metadata: !hasAvailableKind ? fullyLinkedReason : undefined,
+                  metadata: !hasAvailableKind ? [fullyLinkedReason] : undefined,
                 },
               ),
               inlineAction: buildCatalogToggleSelectInlineAction({

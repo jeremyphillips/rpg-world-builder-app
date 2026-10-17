@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { CREATURE_TYPE_SET_ID, creatureTypeSchema } from './creature-type'
+import {
+  CREATURE_TYPE_SET_ID,
+  creatureTypeSchema,
+  creatureTypeSeedOptionSchema,
+} from './creature-type'
 
 describe('creatureTypeSchema', () => {
   it('accepts slug-shaped ids including campaign custom terms', () => {
@@ -17,5 +21,27 @@ describe('creatureTypeSchema', () => {
 describe('creature type vocabulary', () => {
   it('registers the creature type option set id', () => {
     expect(CREATURE_TYPE_SET_ID).toBe('creature-types')
+  })
+})
+
+describe('creatureTypeSeedOptionSchema', () => {
+  const base = {
+    id: 'dragon',
+    label: 'Dragon',
+    description: 'Dragons.',
+  } as const
+
+  it('parses optional language affinities', () => {
+    expect(
+      creatureTypeSeedOptionSchema.parse({ ...base, languageAffinities: ['draconic'] })
+        .languageAffinities,
+    ).toEqual(['draconic'])
+  })
+
+  it('rejects invalid language ids', () => {
+    expect(
+      creatureTypeSeedOptionSchema.safeParse({ ...base, languageAffinities: ['Not Valid'] })
+        .success,
+    ).toBe(false)
   })
 })

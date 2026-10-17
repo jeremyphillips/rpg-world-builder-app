@@ -7,6 +7,7 @@ import {
   choiceOptionTitle,
   defineMessage,
   formatStartingEquipmentOptionCompactSummary,
+  getSpellcastingGearKindLabel,
   spellcastingFocusGearKindSchema,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
@@ -68,10 +69,19 @@ const wealthGrantMoneyFormSchema = z.object({
   currency: z.enum(['cp', 'sp', 'gp', 'pp']).default('gp'),
 })
 
-export const startingEquipmentModifierFormSchema = z.object({
-  kind: z.literal('spellcasting_focus'),
-  spellcastingGearKind: spellcastingFocusGearKindSchema,
-})
+export const startingEquipmentModifierFormSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('spellcasting_focus'),
+    spellcastingGearKind: spellcastingFocusGearKindSchema,
+  }),
+  z.object({
+    kind: z.literal('armor_class'),
+    bonus: z.coerce
+      .number()
+      .int()
+      .refine((value) => value !== 0, { message: 'Bonus must be non-zero.' }),
+  }),
+])
 
 export type StartingEquipmentModifierForm = z.infer<typeof startingEquipmentModifierFormSchema>
 
@@ -236,14 +246,23 @@ export function startingEquipmentModifierFields(): FormItem[] {
       legend: 'Modifiers',
       visibility: visibleForEquipmentGrantTarget(),
       addAction: { label: 'Add modifier' },
+      appendDefaults: () => ({
+        kind: 'spellcasting_focus',
+        spellcastingGearKind: SPELLCASTING_FOCUS_GEAR_KINDS[0],
+      }),
       item: {
         collapsible: true,
         header: {
           fallback: () => 'Modifier',
           primary: (values) => {
             const row = values as StartingEquipmentModifierForm | undefined
-            if (row?.spellcastingGearKind) {
-              return SPELLCASTING_GEAR_KIND_ENTRIES[row.spellcastingGearKind].label
+            if (row?.kind === 'spellcasting_focus') {
+              return row.spellcastingGearKind
+                ? getSpellcastingGearKindLabel(row.spellcastingGearKind)
+                : undefined
+            }
+            if (row?.kind === 'armor_class' && row.bonus != null && !Number.isNaN(row.bonus)) {
+              return `AC ${row.bonus >= 0 ? '+' : ''}${row.bonus}`
             }
             return undefined
           },
@@ -264,6 +283,7 @@ export function startingEquipmentModifierFields(): FormItem[] {
           label: 'Focus kind',
           options: focusKindOptions,
           required: true,
+          defaultValue: SPELLCASTING_FOCUS_GEAR_KINDS[0],
         },
       ],
     },

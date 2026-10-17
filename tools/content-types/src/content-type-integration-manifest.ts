@@ -27,6 +27,11 @@ export type ContentTypeIntegrationManifestEntry = {
     routeSection?: string
     formDefinitionPath?: string
     visibleInSidebar?: boolean
+    /**
+     * Read surfaces exist, but create/edit registration is intentionally absent.
+     * A form definition while this is set is manifest drift.
+     */
+    authoring?: 'deferred'
   }
   capabilities: {
     /** When true, drift tests expect `CONTENT_TYPE_CAPABILITIES[key]`. */
@@ -148,6 +153,19 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
       routeSection: 'locations',
       formDefinitionPath:
         'apps/dashboard/src/features/content/locations/lib/forms/location-form-def.ts',
+      visibleInSidebar: true,
+    },
+    capabilities: { required: true },
+  },
+  monsters: {
+    catalog: { bundledContent: 'bundled', packageName: '@rpg/catalog/monsters' },
+    api: {
+      registrationPath: 'apps/api/src/features/content/monsters/monsters.config.ts',
+    },
+    dashboard: {
+      folder: 'monsters',
+      routeSection: 'monsters',
+      formDefinitionPath: 'apps/dashboard/src/features/content/monsters/lib/monster-form-def.ts',
       visibleInSidebar: true,
     },
     capabilities: { required: true },

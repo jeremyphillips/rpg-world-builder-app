@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { Form, type FormItem } from '../field-config'
+import type { FormItem } from '../field-config'
 import { flattenPatchToLeafSetValues } from './form-value-sync-patch.lib'
 import { Form as FormShell } from '../shells/form.client'
 

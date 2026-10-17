@@ -1,9 +1,13 @@
 import { z } from 'zod'
 import {
+  magicPropertyDefinitionSchema,
   slotProgressionSchema,
   startingWealthRulesSchema,
   xpProgressionSchema,
 } from '@rpg/contracts'
+
+/** On-disk shape for magic-properties seed JSON. */
+export const magicPropertySeedFileSchema = z.array(magicPropertyDefinitionSchema).min(1)
 
 /** On-disk shape for starting-wealth seed JSON (one table per ruleset). */
 export const startingWealthSeedFileSchema = z

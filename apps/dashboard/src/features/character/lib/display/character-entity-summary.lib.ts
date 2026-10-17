@@ -19,6 +19,8 @@ import {
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
+import { entitySurfaceMetadataFromJoinedCopy, entitySurfaceMetadataLine } from '@/features/content'
+
 import { resolveDashboardCharacterSummaryParts } from './character-summary.lib'
 
 export type CharacterEntitySummaryVm = {
@@ -85,10 +87,10 @@ export function buildCharacterEntitySummaryVmFromTransport(input: {
   }
 }
 
-export function formatCharacterInlineSummary(
+export function formatCharacterInlineSummarySegments(
   vm: CharacterEntitySummaryVm,
   options: CharacterInlineSummaryOptions,
-): string {
+): readonly string[] {
   const segments: string[] = []
 
   if (options.includeCharacterType) {
@@ -98,10 +100,17 @@ export function formatCharacterInlineSummary(
   if (vm.parts) {
     segments.push(...formatCharacterSummarySegments(vm.parts))
   } else if (vm.identitySummary) {
-    segments.push(vm.identitySummary)
+    segments.push(...(entitySurfaceMetadataFromJoinedCopy(vm.identitySummary) ?? []))
   }
 
-  return joinInlineMetadata(segments)
+  return segments
+}
+
+export function formatCharacterInlineSummary(
+  vm: CharacterEntitySummaryVm,
+  options: CharacterInlineSummaryOptions,
+): string {
+  return joinInlineMetadata(formatCharacterInlineSummarySegments(vm, options))
 }
 
 export function formatCharacterMixedClassification(
@@ -133,7 +142,7 @@ export type BuildCharacterEntityCardModelOptions = {
   /** When true, PC/NPC is part of the metadata line (organization member picker). */
   includeCharacterTypeInMetadata?: boolean
   /** When set, replaces the default metadata line from the VM. */
-  metadata?: string
+  metadata?: readonly string[]
   status?: readonly EntitySummaryStatusItem[]
   selectionState?: PickerSelectionStateLineModel
   displayImage?: ContentDisplayImage
@@ -155,18 +164,22 @@ export function buildCharacterEntityCardModel(
   }
 
   if (options.metadata !== undefined) {
-    if (options.metadata) {
-      identity.metadata = options.metadata
+    const metadata = entitySurfaceMetadataLine(options.metadata)
+    if (metadata) {
+      identity.metadata = metadata
     }
   } else if (options.includeCharacterTypeInMetadata) {
-    const metadata = formatCharacterInlineSummary(vm, { includeCharacterType: true })
+    const metadata = entitySurfaceMetadataLine(
+      formatCharacterInlineSummarySegments(vm, { includeCharacterType: true }),
+    )
     if (metadata) {
       identity.metadata = metadata
     }
   } else {
     identity.classification = vm.characterType.label
-    if (vm.identitySummary) {
-      identity.metadata = vm.identitySummary
+    const metadata = entitySurfaceMetadataFromJoinedCopy(vm.identitySummary)
+    if (metadata) {
+      identity.metadata = metadata
     }
   }
 

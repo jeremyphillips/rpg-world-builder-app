@@ -39,6 +39,7 @@ export const CONTENT_MEDIA_DOMAINS = [
   'location',
   'organization',
   'game-term',
+  'monster',
 ] as const
 
 export type ContentMediaDomain = (typeof CONTENT_MEDIA_DOMAINS)[number]
@@ -106,6 +107,11 @@ export const CONTENT_MEDIA_POLICIES = {
     representativeRoles: ['emblem'] as const,
     detailRoles: ['emblem'] as const,
     collection: { maxItems: 1 },
+  },
+  monster: {
+    domain: 'monster',
+    allowedRoles: PRIMARY_ONLY,
+    representativeRoles: PRIMARY_REPRESENTATIVE,
   },
 } as const satisfies Record<ContentMediaDomain, ContentMediaPolicy>
 

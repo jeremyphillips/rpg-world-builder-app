@@ -61,6 +61,8 @@ import { type FieldSizeToken } from './field-sizing.variants'
 export const fieldAnatomyStackVariants = cva('flex flex-col', {
   variants: {
     size: {
+      /** Entity-card utility band and extra-dense controls — 4px label-to-control gap. */
+      xs: 'gap-y-1',
       /** Dense forms (`FormDensity: 'compact'`) — 4px label-to-control gap. */
       sm: 'gap-y-1',
       /** Comfortable default — 6px label-to-control / control-to-message gap. */
@@ -77,6 +79,7 @@ export const fieldAnatomyStackVariants = cva('flex flex-col', {
 export const fieldAnatomyAlignVariants = cva('flex flex-col', {
   variants: {
     size: {
+      xs: 'gap-y-1',
       sm: 'gap-y-1',
       md: 'gap-y-1.5',
       lg: 'gap-y-1.5',
@@ -109,6 +112,7 @@ export const fieldLabelRegionVariants = cva(
   {
     variants: {
       size: {
+        xs: 'has-[*]:pb-1',
         sm: 'has-[*]:pb-1',
         md: 'has-[*]:pb-1.5',
         lg: 'has-[*]:pb-1.5',
@@ -129,6 +133,7 @@ export const fieldMessageRegionVariants = cva(
   {
     variants: {
       size: {
+        xs: 'has-[*]:pt-1.5',
         sm: 'has-[*]:pt-1.5',
         md: 'has-[*]:pt-1.5',
         lg: 'has-[*]:pt-1.5',
@@ -149,6 +154,31 @@ export const fieldAnatomyStackClasses = fieldAnatomyStackVariants({ size: 'md' }
 export const fieldLabelContentClusterClasses = 'inline-flex items-center gap-1.5'
 /** Label + below-label hint — 2px; cluster → control gap is the anatomy token. */
 export const fieldLabelHintStackClasses = 'flex flex-col gap-0.5'
+/** Inline recommendation row below the label/hint stack — supporting text + text action. */
+export const fieldRecommendationRowClasses = 'mt-1 flex flex-wrap items-center gap-x-1 gap-y-0.5'
+/** Caption scale with foreground ink — same size as field hints, not muted. */
+export const fieldRecommendationSupportingTextClasses = 'text-style-caption text-foreground'
+/** Decoration overrides for recommendation text actions — geometry stays on `Button` text tokens. */
+export const fieldRecommendationActionVariants = cva('no-underline hover:no-underline')
+
+/** Field recommendation group — internal layout only; field band spacing is `fieldRecommendationRowClasses`. */
+export const fieldRecommendationFieldGroupClasses =
+  'flex w-fit max-w-full flex-col items-start gap-1'
+
+/** Collection recommendation stack — host adds spacing before the collection body. */
+export const fieldRecommendationCollectionGroupClasses =
+  'mb-2 flex w-fit max-w-full flex-col items-start gap-1'
+
+/** @deprecated Use {@link fieldRecommendationFieldGroupClasses} or {@link fieldRecommendationCollectionGroupClasses}. */
+export const fieldRecommendationGroupClasses = fieldRecommendationCollectionGroupClasses
+
+/** Source label + optional bulk action — wraps together with token gap. */
+export const fieldRecommendationGroupHeaderClasses =
+  'flex max-w-full flex-wrap items-center gap-x-1 gap-y-0.5'
+
+/** Wrapping row of outline recommendation actions (no metadata separators). */
+export const fieldRecommendationGroupItemsClasses = 'flex max-w-full flex-wrap gap-2'
+
 export const fieldGroupStackClasses = 'flex flex-col gap-6'
 export const fieldGroupBottomMarginClasses = 'mb-8'
 /** Omits standalone group bottom margin when a parent rhythm stack owns sibling gap. */
@@ -158,9 +188,11 @@ export const formSectionStackClasses = 'flex flex-col gap-7'
 export const fieldRowGapClasses = 'gap-6'
 /** Horizontal + wrap gap between chip pills — vertical label→chips spacing is the anatomy token. */
 export const fieldChipWrapGapClasses = 'gap-2'
-export const fieldGroupDescriptionTypographyClasses = 'text-style-field-hint'
+/** Comfortable group/subgroup legend description — explicit scale (not leaf field hints). */
+export const fieldGroupDescriptionTypographyClasses = 'text-style-field-group-description'
 /** Compact group legend description — 12px caption scale. */
-export const fieldGroupDescriptionCompactTypographyClasses = 'text-style-field-hint-compact'
+export const fieldGroupDescriptionCompactTypographyClasses =
+  'text-style-field-group-description-compact'
 /** Group/subgroup hint copy — legend→body spacing lives on FieldGroup body wrapper. */
 export const fieldGroupDescriptionClasses = fieldGroupDescriptionTypographyClasses
 /** Vertical gap between a group legend and its optional hint. */
@@ -194,6 +226,7 @@ export const fieldGroupLegendCompactTypographyClasses = 'text-style-field-legend
 export const fieldLabelTypographyVariants = cva('', {
   variants: {
     size: {
+      xs: 'text-style-field-label-sm',
       sm: 'text-style-field-label-sm',
       md: 'text-style-field-label-md',
       lg: 'text-style-field-label-lg',
@@ -208,6 +241,7 @@ export const fieldLabelTypographyVariants = cva('', {
 export const fieldArrayLegendSpacingVariants = cva('', {
   variants: {
     size: {
+      xs: 'mb-1',
       sm: 'mb-1',
       md: 'mb-1.5',
       lg: 'mb-1.5',
@@ -294,6 +328,15 @@ export const fieldSettingsRowClasses =
 
 /** Vertical gap between siblings in a stack or dependents region. */
 export type FieldRhythm = 'compact' | 'comfortable'
+
+/** Group legend description typography — follows form density (`rhythm`), not legend title scale. */
+export function resolveFieldGroupDescriptionTypography(
+  rhythm: FieldRhythm = 'comfortable',
+): string {
+  return rhythm === 'compact'
+    ? fieldGroupDescriptionCompactTypographyClasses
+    : fieldGroupDescriptionTypographyClasses
+}
 
 export const fieldStackRhythmVariants = cva('flex flex-col', {
   variants: {
@@ -471,6 +514,7 @@ export type FieldLabelPosition = 'above' | 'settings'
 export const fieldLabelVariants = cva(['flex w-fit self-start items-center gap-1.5'], {
   variants: {
     size: {
+      xs: 'text-style-field-label-sm',
       sm: 'text-style-field-label-sm',
       md: 'text-style-field-label-md',
       lg: 'text-style-field-label-lg',
@@ -483,6 +527,7 @@ export const fieldLabelVariants = cva(['flex w-fit self-start items-center gap-1
     },
   },
   compoundVariants: [
+    { placement: 'default', size: 'xs', class: 'min-h-4' },
     { placement: 'default', size: 'sm', class: 'min-h-4' },
     { placement: 'default', size: 'md', class: 'min-h-[1.375rem]' },
     { placement: 'default', size: 'lg', class: 'min-h-[1.375rem]' },
@@ -498,6 +543,7 @@ export type FieldLabelPlacement = NonNullable<VariantProps<typeof fieldLabelVari
 export const fieldErrorTextVariants = cva('', {
   variants: {
     size: {
+      xs: 'text-style-field-error',
       sm: 'text-style-field-error',
       md: 'text-style-field-error',
       lg: 'text-style-field-error',
@@ -518,12 +564,12 @@ export type FieldGroupLegendScale = 'default' | 'sm'
 
 /** @deprecated Array legends use {@link resolveArrayLegendClassName}. */
 export function resolveArrayLegendScale(size: FieldSizeToken): FieldGroupLegendScale {
-  return size === 'sm' ? 'sm' : 'default'
+  return size === 'sm' || size === 'xs' ? 'sm' : 'default'
 }
 
 /**
  * Legend-row disclosure trigger inside `<FieldGroupLegend>`.
- * Typography inherits from the parent `<legend>` (`fieldGroupLegendVariants` + density rhythm).
+ * Title scale is on the label span inside the trigger, not on `<legend>`.
  */
 export const fieldGroupLegendDisclosureTriggerVariants = cva(
   cn(
@@ -623,6 +669,7 @@ export const fieldGroupBodyGapVariants = cva('', {
       compact: '',
     },
     fieldSize: {
+      xs: '',
       sm: '',
       md: '',
       lg: '',
@@ -633,6 +680,7 @@ export const fieldGroupBodyGapVariants = cva('', {
     { size: 'subsection', rhythm: 'comfortable', class: 'mt-4' },
     { size: 'section', rhythm: 'compact', class: 'mt-3' },
     { size: 'subsection', rhythm: 'compact', class: 'mt-3' },
+    { size: 'array', fieldSize: 'xs', class: 'mt-1' },
     { size: 'array', fieldSize: 'sm', class: 'mt-1' },
     { size: 'array', fieldSize: 'md', class: 'mt-1.5' },
     { size: 'array', fieldSize: 'lg', class: 'mt-1.5' },

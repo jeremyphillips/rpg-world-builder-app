@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   CONTENT_ACCESS_CAPABILITIES,
   CONTENT_ACCESS_TARGET_TYPES,
+  resolveDefaultResolvedContentCampaignAccess,
   supportsContentBulkCampaignAccess,
 } from './content-access-capabilities'
 import { CONTENT_TYPE_KEYS } from '../../primitives/content/content-type-keys'
@@ -20,5 +21,14 @@ describe('CONTENT_ACCESS_CAPABILITIES', () => {
     }
 
     expect(supportsContentBulkCampaignAccess('subclasses')).toBe(false)
+  })
+
+  it('resolves dm-only defaults for monsters', () => {
+    expect(resolveDefaultResolvedContentCampaignAccess('monsters')).toMatchObject({
+      available: true,
+      visibilityMode: 'dm_only',
+      effectiveAudience: 'dm_only',
+      participantIds: [],
+    })
   })
 })

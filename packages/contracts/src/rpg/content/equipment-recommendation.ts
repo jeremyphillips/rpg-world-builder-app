@@ -53,6 +53,8 @@ export const EQUIPMENT_RECOMMENDATION_REASONS = [
   'startingEquipmentChoice',
   /** Semantic category sibling after a multi-select proficiency pool resolves. */
   'classToolCategory',
+  /** Specific weapon proficiency for a weapon the creature does not own. */
+  'selectedWeaponProficiency',
   /** Item appears in an unselected or preview starting-equipment branch. */
   'availableInStartingOption',
 ] as const

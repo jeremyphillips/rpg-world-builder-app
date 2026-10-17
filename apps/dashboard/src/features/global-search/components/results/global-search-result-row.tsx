@@ -8,7 +8,10 @@ import {
 } from '@rpg/contracts'
 import { IdentityRow, InteractiveListRow, cn, interactiveFocusVariants } from '@rpg/ui'
 
-import { projectSearchHitToInteractiveListPresentation } from '@/features/content'
+import {
+  entitySurfaceMetadataFromText,
+  projectSearchHitToInteractiveListPresentation,
+} from '@/features/content'
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator'
 
@@ -50,7 +53,7 @@ export function SearchResultRow({
   const presentation = projectSearchHitToInteractiveListPresentation({
     heading: title,
     classification: typeLabel,
-    ...(secondary ? { metadata: secondary } : {}),
+    ...(secondary ? { metadata: entitySurfaceMetadataFromText(secondary) } : {}),
     fallback: resolveContentDisplayFallbackForSearchTarget(target),
     ...(wiredDisplayImage ? { displayImage: wiredDisplayImage } : {}),
     ...(campaignUnavailable
