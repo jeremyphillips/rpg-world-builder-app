@@ -18,10 +18,7 @@ import type { ContentDisplayImage } from '@rpg/contracts'
 
 import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
 import { buildOrganizationContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
-import {
-  entitySurfaceMetadataFromText,
-  entitySurfaceMetadataLine,
-} from '../../lib/entity/summary/entity-surface-metadata.lib'
+import { entitySurfaceMetadataLine } from '../../lib/entity/summary/entity-surface-metadata.lib'
 import type { EntitySurfaceIdentity } from '../../lib/entity/summary/entity-surface-identity.types'
 import type { PickerSelectionStateLineModel } from '../../lib/entity/summary/picker-selection-state-line.types'
 import type { EntitySummaryStatusItem } from '../../lib/entity/summary/entity-summary-status.types'

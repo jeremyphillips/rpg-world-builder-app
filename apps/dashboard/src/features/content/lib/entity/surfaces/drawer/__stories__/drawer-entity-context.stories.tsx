@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { NumberStepper, Text } from '@rpg/ui'
 
-import { buildEquipmentEntitySurfaceIdentity } from '../../../../equipment/lib/equipment-entity-surface-identity.lib'
+import { buildEquipmentEntitySurfaceIdentity } from '../../../../../equipment/lib/equipment-entity-surface-identity.lib'
 import { DrawerEntityContext } from '../drawer-entity-context'
 
 const meta = {

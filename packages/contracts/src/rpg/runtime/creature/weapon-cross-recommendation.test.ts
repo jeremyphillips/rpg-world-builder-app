@@ -13,26 +13,27 @@ import {
 } from './weapon-cross-recommendation'
 
 const longsword = {
-  id: 'srd:longsword',
+  id: 'srd-cc-5.2.1:longsword',
   slug: 'longsword',
-  rulesetId: 'srd',
+  rulesetId: 'srd-cc-5.2.1',
   name: 'Longsword',
   kind: 'weapon',
   category: 'martial',
 } as Extract<Equipment, { kind: 'weapon' }>
 
 const dagger = {
-  ...longsword,
-  id: 'srd:dagger',
+  id: 'srd-cc-5.2.1:dagger',
   slug: 'dagger',
+  rulesetId: 'srd-cc-5.2.1',
   name: 'Dagger',
+  kind: 'weapon',
   category: 'simple',
 } as Extract<Equipment, { kind: 'weapon' }>
 
 const armor = {
-  id: 'srd:leather',
+  id: 'srd-cc-5.2.1:leather',
   slug: 'leather',
-  rulesetId: 'srd',
+  rulesetId: 'srd-cc-5.2.1',
   name: 'Leather',
   kind: 'armor',
 } as Equipment

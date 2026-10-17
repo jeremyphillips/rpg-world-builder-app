@@ -200,7 +200,7 @@ describe('EntityAnatomy trailing kind to cell', () => {
     expect(trailing).toHaveTextContent('30 GP')
     expect(slot('trailing-secondary')?.textContent).toBe('30 GP')
     expect(slot('trailing-secondary')).toHaveClass(
-      'text-xs',
+      'text-style-caption',
       'font-body-emphasis',
       'tabular-nums',
       'text-foreground',

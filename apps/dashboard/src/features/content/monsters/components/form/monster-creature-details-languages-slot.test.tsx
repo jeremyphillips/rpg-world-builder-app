@@ -1,10 +1,13 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import type { MonsterFormValues } from '../../lib/monster-form-values'
+import {
+  resolveMonsterCreateDefaultValues,
+  type MonsterFormValues,
+} from '../../lib/monster-form-values'
 import { MonsterCreatureDetailsLanguagesSlot } from './monster-creature-details-slots'
 import {
   MONSTER_LANGUAGES_FIELD_HINT,
@@ -150,14 +153,9 @@ describe('MonsterCreatureDetailsLanguagesSlot recommendation', () => {
     const HarnessWithSpy = () => {
       const form = useForm<MonsterFormValues>({
         defaultValues: {
+          ...resolveMonsterCreateDefaultValues(),
           creatureType: 'dragon',
-          proficiencies: {
-            savingThrows: [],
-            skills: [],
-            languages: [],
-            weapons: { categories: [], items: [] },
-          },
-        } as MonsterFormValues,
+        },
       })
       const watchLanguages = form.watch('proficiencies.languages')
       return (

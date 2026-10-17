@@ -44,7 +44,7 @@ describe('ProficiencyPickerDrawer', () => {
     expect(screen.getByText('Acrobatics')).toBeInTheDocument()
     expect(screen.getByText('Perception')).toBeInTheDocument()
 
-    await user.type(screen.getByRole('textbox', { name: 'Search skills…' }), 'stealth')
+    await user.type(screen.getByRole('searchbox', { name: 'Search skills…' }), 'stealth')
 
     expect(screen.getByText('Stealth')).toBeInTheDocument()
     expect(screen.queryByText('Acrobatics')).not.toBeInTheDocument()
@@ -260,7 +260,7 @@ describe('ProficiencyPickerDrawer', () => {
       />,
     )
 
-    await user.type(screen.getByRole('textbox', { name: 'Search skills…' }), 'zzzz')
+    await user.type(screen.getByRole('searchbox', { name: 'Search skills…' }), 'zzzz')
     expect(screen.getByText(PROFICIENCY_PICKER_NO_RESULTS_MESSAGE)).toBeInTheDocument()
   })
 
@@ -280,10 +280,10 @@ describe('ProficiencyPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByRole('textbox', { name: 'Search languages…' })).toBeInTheDocument()
+    expect(screen.getByRole('searchbox', { name: 'Search languages…' })).toBeInTheDocument()
     expect(screen.getByText('Common')).toBeInTheDocument()
 
-    await user.type(screen.getByRole('textbox', { name: 'Search languages…' }), 'elvish')
+    await user.type(screen.getByRole('searchbox', { name: 'Search languages…' }), 'elvish')
     expect(screen.getByText('Elvish')).toBeInTheDocument()
     expect(screen.queryByText('Common')).not.toBeInTheDocument()
   })

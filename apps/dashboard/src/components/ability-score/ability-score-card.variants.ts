@@ -172,7 +172,7 @@ export const abilityScoreCardStepperButtonAppearance = 'isolated' as const
 
 export const abilityScoreCardModifierClasses = 'text-base tabular-nums text-muted-foreground'
 
-export const abilityScoreCardFooterActionLabelClasses = 'text-xs font-body'
+export const abilityScoreCardFooterActionLabelClasses = 'text-style-caption font-body'
 
 /** Checkbox on footer row — surface stays visible over outline hover/active on the label. */
 export const abilityScoreCardFooterCheckboxClasses =

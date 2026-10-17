@@ -16,6 +16,10 @@ const PRODUCTION_DRAWER_SURFACES: readonly { label: string; path: string }[] = [
     path: 'apps/dashboard/src/features/character/components/equipment/picker/drawer/equipment-picker-drawer.tsx',
   },
   {
+    label: 'EquipmentInstanceEditorDrawer',
+    path: 'apps/dashboard/src/features/content/equipment/components/instance-editor/equipment-instance-editor-drawer.tsx',
+  },
+  {
     label: 'SpellPickerDrawer',
     path: 'apps/dashboard/src/features/character/components/spells/picker/spell-picker-drawer.tsx',
   },
@@ -114,6 +118,10 @@ const DRAWER_INVENTORY_ALLOWLIST: readonly { path: string; reason: string }[] = 
   {
     path: 'apps/dashboard/src/features/content/lib/entity/surfaces/drawer/drawer-entity-block.tsx',
     reason: 'Entity block rendered inside drawer bodies, not a surface.',
+  },
+  {
+    path: 'apps/dashboard/src/features/content/lib/entity/surfaces/drawer/drawer-entity-context.tsx',
+    reason: 'Drawer entity identity context provider, not a surface.',
   },
   {
     path: 'apps/dashboard/src/features/content/lib/relationship/drawer/drawer-context.tsx',

@@ -15,7 +15,10 @@ describe('monster hit points form', () => {
     expect(resolveAuthoringCreatureSize('')).toBe('medium')
     expect(resolveAuthoringCreatureSize('large')).toBe('large')
     expect(
-      hitPointsDiceFromFormValues({ hitPoints: { kind: 'hit-dice', count: 1 }, size: '' }),
+      hitPointsDiceFromFormValues({
+        hitPoints: { kind: 'hit-dice', count: 1 },
+        size: undefined,
+      }),
     ).toEqual({ count: 1, faces: 8 })
   })
 

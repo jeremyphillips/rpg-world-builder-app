@@ -9,6 +9,7 @@ export function resolveSingleFieldRecommendation(input: {
   if (recommendedIds.length !== 1) return undefined
 
   const recommendedId = recommendedIds[0]
+  if (recommendedId === undefined) return undefined
   const available = new Set(availableIds)
   if (!available.has(recommendedId)) return undefined
   return recommendedId

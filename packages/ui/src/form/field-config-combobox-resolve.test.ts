@@ -74,7 +74,8 @@ describe('resolveComboboxFieldConfig', () => {
 
     expect(resolved.options).toHaveLength(1)
     expect(resolved.filterSelects?.[0]?.filterKey).toBe('kind')
-    expect(resolved.options[0]?.filterValues?.kind).toBe('district')
+    const [firstOption] = resolved.options ?? []
+    expect(firstOption?.filterValues?.kind).toBe('district')
   })
 
   it('collects recommendationResolve dependsOn for combobox fields', () => {

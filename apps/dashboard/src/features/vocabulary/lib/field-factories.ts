@@ -13,6 +13,7 @@ export function vocabularySelectField(
   config: VocabularyMemberFieldBase & {
     placeholder?: string
     defaultValue?: string
+    noun?: SelectFieldConfig['noun']
   },
 ): SelectFieldConfig {
   return {
@@ -29,6 +30,7 @@ export function vocabularyComboboxField(
     placeholder?: string
     defaultValue?: string | string[]
     enableSearch?: boolean
+    noun?: ComboboxFieldConfig['noun']
   },
 ): ComboboxFieldConfig {
   return {

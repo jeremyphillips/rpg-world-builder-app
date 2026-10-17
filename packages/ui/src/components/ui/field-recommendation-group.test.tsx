@@ -3,10 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { FormSectionProvider } from '../../form/context/form-section.context'
-import {
-  FieldRecommendationGroupView,
-  FieldRecommendationInline,
-} from './field-recommendation.client'
+import { FieldRecommendationGroupView } from './field-recommendation.client'
 import { Field } from './field.client'
 import { FieldLayout } from './field-layout'
 import { Input } from './input.client'

@@ -170,6 +170,12 @@ function softRecommendationLabel(args: {
 
 function isOmittedFromRecommendationFacts(reason: RecommendationSignal['reason']): boolean {
   if (reason === ABILITY_FIT_RECOMMENDATION_REASON) return true
+  if (
+    reason === MATCHES_EQUIPPED_WEAPON_RECOMMENDATION_REASON ||
+    reason === MATCHES_OWNED_WEAPON_RECOMMENDATION_REASON
+  ) {
+    return false
+  }
   return isStartingEquipmentRecommendationReason(reason)
 }
 

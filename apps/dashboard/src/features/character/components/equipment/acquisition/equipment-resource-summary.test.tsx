@@ -77,10 +77,10 @@ describe('EquipmentResourceSummary', () => {
     )
 
     const browseEquipment = screen.getByRole('button', { name: 'Browse equipment' })
-    expect(browseEquipment).toHaveClass('bg-action-secondary')
+    expect(browseEquipment).toHaveClass('ui-button--secondary')
     expect(browseEquipment.parentElement).toHaveClass('shrink-0', 'self-center')
     expect(screen.getByRole('button', { name: 'Browse magic items' })).toHaveClass(
-      'bg-action-secondary',
+      'ui-button--secondary',
     )
     expect(container.querySelector('.border-t')).toHaveClass('mt-4', 'pt-4', 'border-border')
   })

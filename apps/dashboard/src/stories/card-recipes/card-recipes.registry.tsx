@@ -38,6 +38,7 @@ import {
   EntityDisclosureArrayItemShell,
   EntityRowList,
   EntitySurfaceContentCard,
+  entitySurfaceMetadataFromText,
 } from '@/features/content'
 import { DetailEntityRow } from '@/features/content/lib/detail/row/entity/detail-entity-row'
 import { DrawerEntityBlock } from '@/features/content/lib/entity/surfaces/drawer/drawer-entity-block'
@@ -380,7 +381,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
           identity: {
             heading: 'Wizard',
             classification: 'Class',
-            metadata: 'Intelligence spellcaster',
+            metadata: entitySurfaceMetadataFromText('Intelligence spellcaster'),
             fallback: 'class',
           },
           inlineAction: { label: 'Select', onClick: noop },
@@ -434,7 +435,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
           identity: {
             heading: 'Fireball',
             classification: 'Spell',
-            metadata: 'Level 3 · Evocation',
+            metadata: entitySurfaceMetadataFromText('Level 3 · Evocation'),
             fallback: 'spell',
           },
           inlineAction: { label: 'Add', onClick: noop },

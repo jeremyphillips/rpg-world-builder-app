@@ -12,9 +12,9 @@ import {
 } from './prepare-weapon-proficiency-combobox-options.lib'
 
 const dagger = {
-  id: 'srd:dagger',
+  id: 'srd-cc-5.2.1:dagger',
   slug: 'dagger',
-  rulesetId: 'srd',
+  rulesetId: 'srd-cc-5.2.1',
   name: 'Dagger',
   kind: 'weapon',
   category: 'simple',
@@ -22,7 +22,7 @@ const dagger = {
 
 const longsword = {
   ...dagger,
-  id: 'srd:longsword',
+  id: 'srd-cc-5.2.1:longsword',
   slug: 'longsword',
   name: 'Longsword',
   category: 'martial',

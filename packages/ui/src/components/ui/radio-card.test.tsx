@@ -255,7 +255,7 @@ describe('RadioCard', () => {
     expect(drow).toHaveClass('rounded-md')
     expect(drow).not.toHaveClass('shadow-sm')
     expect(drow).toHaveClass('border-0')
-    expect(drow).toHaveClass('data-[state=checked]:bg-row-selected')
+    expect(drow).toHaveClass('ui-interactive-row--data-checked')
     expect(drow).not.toHaveClass('data-[state=checked]:ring-1')
   })
 

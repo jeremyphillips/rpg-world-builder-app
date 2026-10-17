@@ -80,7 +80,7 @@ export function incrementMonsterPlainStacks(
 ): MonsterEquipmentFormEntry[] {
   return equipmentIds.reduce(
     (acc, equipmentId) => incrementMonsterPlainStack(acc, equipmentId, createOptions),
-    entries,
+    [...entries],
   )
 }
 

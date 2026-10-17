@@ -553,7 +553,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
 
     expect(visiblePickerItemKeys()).toEqual(['organization-a', 'organization-b', 'organization-z'])
 
-    await user.type(screen.getByRole('textbox', { name: 'Search organizations…' }), 'amber')
+    await user.type(screen.getByRole('searchbox', { name: 'Search organizations…' }), 'amber')
 
     expect(visiblePickerItemKeys()).toEqual(['organization-a', 'organization-b'])
   })

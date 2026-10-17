@@ -71,7 +71,10 @@ describe('SpellPickerDrawer', () => {
     expect(screen.getByText('2 of 2 selected')).toBeInTheDocument()
     expect(screen.getByText(/Wizard cantrips/)).toBeInTheDocument()
 
-    await user.type(screen.getByRole('textbox', { name: SPELL_PICKER_SEARCH_PLACEHOLDER }), 'magic')
+    await user.type(
+      screen.getByRole('searchbox', { name: SPELL_PICKER_SEARCH_PLACEHOLDER }),
+      'magic',
+    )
 
     expect(screen.queryByText('Mage Hand')).not.toBeInTheDocument()
     expect(screen.getByText('Detect Magic')).toBeInTheDocument()
@@ -378,7 +381,10 @@ describe('SpellPickerDrawer', () => {
       />,
     )
 
-    await user.type(screen.getByRole('textbox', { name: SPELL_PICKER_SEARCH_PLACEHOLDER }), 'zzzz')
+    await user.type(
+      screen.getByRole('searchbox', { name: SPELL_PICKER_SEARCH_PLACEHOLDER }),
+      'zzzz',
+    )
     expect(screen.getByText(SPELL_PICKER_NO_RESULTS_MESSAGE)).toBeInTheDocument()
   })
 

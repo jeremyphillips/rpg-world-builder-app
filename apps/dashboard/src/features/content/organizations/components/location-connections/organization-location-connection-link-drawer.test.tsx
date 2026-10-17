@@ -569,7 +569,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
 
     expect(screen.getByText('Choose a structure for this headquarters.')).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Search structures…' })).toBeInTheDocument()
+    expect(screen.getByRole('searchbox', { name: 'Search structures…' })).toBeInTheDocument()
     expect(screen.getByText('The Silver Eel')).toBeInTheDocument()
     expect(screen.queryByText('Port City')).not.toBeInTheDocument()
   })
@@ -778,7 +778,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     await user.click(screen.getByRole('button', { name: 'Create region' }))
 
     expect(screen.getByText('Northern March')).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Search locations…', hidden: true })).toHaveValue(
+    expect(screen.getByRole('searchbox', { name: 'Search locations…', hidden: true })).toHaveValue(
       'North',
     )
     expect(
@@ -819,7 +819,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
 
     expect(visiblePickerItemKeys()).toEqual(['loc-amber-a', 'loc-amber-b', 'loc-zeta'])
 
-    await user.type(screen.getByRole('textbox', { name: /Search/i }), 'amber')
+    await user.type(screen.getByRole('searchbox', { name: /Search/i }), 'amber')
 
     expect(visiblePickerItemKeys()).toEqual(['loc-amber-a', 'loc-amber-b'])
   })

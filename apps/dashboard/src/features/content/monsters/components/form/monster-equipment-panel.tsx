@@ -372,7 +372,10 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
         open={pickerOpen}
         onOpenChange={setPickerOpen}
         items={pickerItems}
-        browseSortContext={{ proficientWeaponCategories: weaponGrants.categories }}
+        browseSortContext={{
+          proficientWeaponCategories: weaponGrants.categories,
+          preferMartialWeaponBrowseOrder: false,
+        }}
         workflowMode="loadout"
         workflowModes={['loadout']}
         showCharacterPreview={false}

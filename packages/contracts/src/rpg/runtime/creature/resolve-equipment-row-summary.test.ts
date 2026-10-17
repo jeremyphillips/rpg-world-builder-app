@@ -148,7 +148,7 @@ function entry(
 }
 
 const proficientMartial = { categories: ['martial' as const], items: [] as string[] }
-const noProficiencies = { categories: [] as const, items: [] as string[] }
+const noProficiencies = { categories: [] as ('simple' | 'martial')[], items: [] as string[] }
 
 describe('resolveEquipmentRowSummary', () => {
   it('adds proficiency only when the creature is proficient', () => {

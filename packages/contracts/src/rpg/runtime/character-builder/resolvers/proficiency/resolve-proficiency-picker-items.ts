@@ -104,7 +104,7 @@ function addEquipmentIds(
 
 function equippedEquipmentIds(draft: CharacterBuilderDraft): Set<string> {
   const equipped = new Set<string>()
-  for (const row of [...(draft.equipment?.purchases ?? []), ...(draft.equipment?.grants ?? [])]) {
+  for (const row of draft.equipment?.purchases ?? []) {
     if (row.equipped === true) equipped.add(row.equipmentId)
   }
   return equipped

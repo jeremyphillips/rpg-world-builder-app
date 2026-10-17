@@ -12,9 +12,9 @@ export const entityAnatomyTrailingIndicatorVariants = cva('flex shrink-0 text-mu
 export const entityAnatomyTrailingQuantityLabelVariants = cva('text-sm tabular-nums')
 
 /** Provenance and value copy in the trailing band — 12px. Quantity marks stay 14px. */
-export const entityAnatomyTrailingMetaVariants = cva('shrink-0 text-xs')
+export const entityAnatomyTrailingMetaVariants = cva('shrink-0 text-style-caption')
 
 /** Price or rarity-choice label in the trailing band — 12px, foreground. */
 export const entityAnatomyTrailingGroupSecondaryVariants = cva(
-  'shrink-0 text-xs font-body-emphasis tabular-nums text-foreground',
+  'shrink-0 text-style-caption font-body-emphasis tabular-nums text-foreground',
 )

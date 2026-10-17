@@ -83,8 +83,8 @@ export const WithEntityContext: Story = {
       entityContext={
         <div className="flex min-w-0 items-center justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-sm font-medium">Shortsword</p>
-            <p className="text-xs text-muted-foreground">Simple · Melee</p>
+            <p className="text-style-body-emphasis">Shortsword</p>
+            <p className="text-style-caption text-muted-foreground">Simple · Melee</p>
           </div>
           <Text variant="muted">Qty 1</Text>
         </div>

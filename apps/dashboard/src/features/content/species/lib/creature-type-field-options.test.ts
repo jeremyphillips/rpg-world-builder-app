@@ -37,6 +37,7 @@ describe('getCharacterCreatureTypeFieldOptions', () => {
     const vocabulary = {
       labelById: { humanoid: 'Humanoid', fey: 'Fey' },
       activeIds: new Set(['humanoid']),
+      languageAffinitiesById: {},
     }
 
     expect(
@@ -71,6 +72,7 @@ describe('getCreatureTypeLabel', () => {
         creatureTypeVocabulary: {
           labelById: { fey: 'Custom Fey' },
           activeIds: new Set(['fey']),
+          languageAffinitiesById: {},
         },
       }),
     ).toBe('Custom Fey')
