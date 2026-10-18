@@ -312,10 +312,6 @@ export {
   type CardSurfaceVariantProps,
 } from './components/ui/card.variants'
 export {
-  CardSurfaceToneProvider,
-  useCardSurfaceTone,
-} from './components/ui/card-surface-tone.client'
-export {
   SelectionTarget,
   SelectionTargetRadio,
   SelectionTargetRaised,

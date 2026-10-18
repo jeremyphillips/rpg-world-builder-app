@@ -2,7 +2,6 @@ import { type OrganizationLocationConnectionKind } from '@rpg/contracts'
 import {
   Alert,
   Button,
-  CardSurfaceToneProvider,
   Heading,
   RadioCardField,
   RadioGroup,
@@ -114,6 +113,7 @@ function BuildingOrganizationRelationshipKindField({
       }
       label={BUILDING_ORGANIZATIONS_INTENT_PROMPT}
       density="compact"
+      tone="quiet"
       value={rawKind ?? ''}
       options={toRelationshipRadioOptions(relationshipKindOptions)}
       onValueChange={(value) => handleKindChange(value as OrganizationLocationConnectionKind)}
@@ -346,10 +346,10 @@ export function BuildingOrganizationComposer({
   }
 
   return (
-    <CardSurfaceToneProvider tone="quiet" inheritHostPlane>
+    <div className="ui-card-tone-host--inherit">
       <CreateCompositionComposer heading={BUILDING_ORGANIZATIONS_COMPOSER_HEADING}>
         <BuildingOrganizationRelationshipReview controller={controller} />
       </CreateCompositionComposer>
-    </CardSurfaceToneProvider>
+    </div>
   )
 }

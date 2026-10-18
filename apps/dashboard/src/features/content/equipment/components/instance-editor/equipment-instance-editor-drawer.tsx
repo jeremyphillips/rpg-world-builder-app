@@ -304,6 +304,7 @@ function ScopeModeBody({
       </Heading>
       <Text variant="muted">{formatScopeChooseCustomizationCopy(subjectIntro)}</Text>
       <RadioCard
+        tone="quiet"
         value={scope}
         onValueChange={(value) => onScopeChange(value as 'one' | 'all')}
         options={[
@@ -341,6 +342,7 @@ function EffectChooseBody({
   const targets = allowedEffectTargetsForEquipment(item)
   return (
     <RadioCard
+      tone="quiet"
       value={mode.draft.target ?? ''}
       onValueChange={(value) =>
         dispatch({

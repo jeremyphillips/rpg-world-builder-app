@@ -136,9 +136,9 @@ Feature-owned discovery body (when applicable)
 Building Organizations discovery uses a `RadioGroup` of `CatalogEntityRow`
 **selection mode** rows (leading radio, no trailing Select). Choosing an existing
 organization stays on the `discovery` stage; footer commit uses the child-workflow
-projection while the list remains visible. `BuildingOrganizationComposer` wraps
-`CreateCompositionComposer` in `CardSurfaceToneProvider tone="quiet"` so intent
-`RadioCardField` rows match entity picker rows.
+projection while the list remains visible. `BuildingOrganizationComposer` uses
+`ui-card-tone-host--inherit` and `RadioCardField tone="quiet"` so intent rows
+match entity picker rows.
 
 Import spacing tokens from `@/lib/create-flow`. Do not fork composition
 stage or composer review values in feature variants.

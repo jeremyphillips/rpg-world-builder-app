@@ -7,6 +7,7 @@ import {
 } from './radio-card.client'
 import type { SelectionOptionCardDensity } from './selection-option-card-anatomy.client'
 import { RadioOptionCard, RadioOptionCardTitleAdornment } from './radio-option-card.client'
+import type { CardSurfaceTone } from './card.variants'
 import { radioCardGroupGapVariants } from './radio-card.variants'
 import { RadioGroup } from './radio-group.client'
 import { RadioFieldShell, type BaseRadioFieldProps } from './radio-field-shell'
@@ -28,6 +29,7 @@ export interface RadioCardFieldProps extends BaseRadioFieldProps {
   onValueChange?: (value: string) => void
   /** Forwarded to the group root so RHF's `field.onBlur` (touched state) can fire. */
   onBlur?: () => void
+  tone?: CardSurfaceTone
 }
 
 type GroupedRadioCardOptionsProps = {
@@ -41,6 +43,7 @@ type GroupedRadioCardOptionsProps = {
   defaultValue?: string
   onValueChange?: (value: string) => void
   onBlur?: () => void
+  tone?: CardSurfaceTone
 }
 
 function GroupedRadioCardOptions({
@@ -54,6 +57,7 @@ function GroupedRadioCardOptions({
   defaultValue,
   onValueChange,
   onBlur,
+  tone = 'strong',
 }: GroupedRadioCardOptionsProps) {
   return (
     <RadioGroup
@@ -88,6 +92,7 @@ function GroupedRadioCardOptions({
                   />
                 }
                 density={density}
+                tone={tone}
                 onClick={createRadioCardReselectClickHandler(
                   option.value,
                   value,
@@ -127,6 +132,7 @@ export function RadioCardField({
   onBlur,
   labelVisibility,
   chrome,
+  tone = 'strong',
 }: RadioCardFieldProps) {
   return (
     <RadioFieldShell
@@ -155,6 +161,7 @@ export function RadioCardField({
             defaultValue={defaultValue}
             onValueChange={onValueChange}
             onBlur={onBlur}
+            tone={tone}
           />
         ) : (
           <RadioCard
@@ -163,6 +170,7 @@ export function RadioCardField({
             name={name}
             disabled={disabled}
             density={density}
+            tone={tone}
             value={value}
             defaultValue={defaultValue}
             onValueChange={onValueChange}

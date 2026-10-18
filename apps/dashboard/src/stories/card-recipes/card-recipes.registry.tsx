@@ -742,8 +742,8 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     name: 'radio-card-quiet-in-sheet',
     section: 'ui-cards-form-rows',
     component: 'RadioOptionCard',
-    chain: ['Sheet.Content', 'CardSurfaceToneProvider', 'RadioCard', 'RadioOptionCard'],
-    useWhen: 'Footer-committed drawer kind fields inherit quiet tone from Sheet.Content.',
+    chain: ['Sheet.Content', 'RadioCard tone=quiet', 'RadioOptionCard'],
+    useWhen: 'Footer-committed drawer kind fields pass tone="quiet" on RadioCard.',
     density: 'compact',
     leading: 'radio',
     trailing: 'none',
@@ -755,6 +755,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
             aria-label="Connection kind"
             value="owns"
             density="compact"
+            tone="quiet"
             options={[
               { value: 'owns', label: 'Owner', description: 'Controls the location' },
               { value: 'tenant', label: 'Tenant', description: 'Occupies the location' },

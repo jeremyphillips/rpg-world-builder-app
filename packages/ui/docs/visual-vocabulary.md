@@ -9,15 +9,15 @@ See also [design tokens](./design-tokens.md) for Layer 1–3 mechanics.
 
 ## Dimensions
 
-| Dimension         | Type               | Phase 1 export? | Rules                                                                                                                            |
-| ----------------- | ------------------ | --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Semantic tone     | `SemanticTone`     | Yes             | Meaning only — `neutral`, `info`, `success`, `warning`, `destructive`                                                            |
-| Visual emphasis   | `VisualEmphasis`   | Yes             | `faint` \| `subtle` \| `default` \| `strong` — **not** `plain`                                                                   |
-| Card surface tone | `CardSurfaceTone`  | Yes             | `quiet` (drawers, entity rows) \| `strong` (standalone radio cards) — via `ui-card` modifiers and host `CardSurfaceToneProvider` |
-| Elevation         | `SurfaceElevation` | Yes (type only) | On `SurfaceConfig`, not `ChromeConfig` until subsystem migration                                                                 |
-| Content hierarchy | `ContentTone`      | Yes             | Prefer over new `muted` variant values                                                                                           |
-| Component state   | (doc only)         | **No**          | `inactive` \| `selected` \| `invalid` \| `disabled` — export when an API consumes it                                             |
-| Chrome shape      | `ChromeVariant`    | Yes             | Separate from tone/emphasis                                                                                                      |
+| Dimension         | Type               | Phase 1 export? | Rules                                                                                                                           |
+| ----------------- | ------------------ | --------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Semantic tone     | `SemanticTone`     | Yes             | Meaning only — `neutral`, `info`, `success`, `warning`, `destructive`                                                           |
+| Visual emphasis   | `VisualEmphasis`   | Yes             | `faint` \| `subtle` \| `default` \| `strong` — **not** `plain`                                                                  |
+| Card surface tone | `CardSurfaceTone`  | Yes             | `quiet` (entity rows, drawer radio cards) \| `strong` (default radio cards) — via `ui-card` modifiers and explicit `tone` props |
+| Elevation         | `SurfaceElevation` | Yes (type only) | On `SurfaceConfig`, not `ChromeConfig` until subsystem migration                                                                |
+| Content hierarchy | `ContentTone`      | Yes             | Prefer over new `muted` variant values                                                                                          |
+| Component state   | (doc only)         | **No**          | `inactive` \| `selected` \| `invalid` \| `disabled` — export when an API consumes it                                            |
+| Chrome shape      | `ChromeVariant`    | Yes             | Separate from tone/emphasis                                                                                                     |
 
 ## Rules
 

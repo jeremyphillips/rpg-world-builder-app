@@ -7,7 +7,6 @@ import { cn } from '../../lib/utils'
 import { Badge } from './badge'
 import { Button } from './button.client'
 import { cardSurfaceVariants, type CardSurfaceTone } from './card.variants'
-import { useCardSurfaceTone } from './card-surface-tone.client'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
 import { DisclosureChevronTrigger } from './disclosure-chevron-trigger.client'
 import {
@@ -71,6 +70,8 @@ export type RadioOptionCardProps = {
   onDetails?: () => void
   onClick?: React.MouseEventHandler<HTMLButtonElement>
   className?: string
+  /** Card chrome ladder; defaults to strong for standalone choice cards. */
+  tone?: CardSurfaceTone
 }
 
 function resolveRadioCardDetailsAriaLabel(label: string): string {
@@ -386,8 +387,8 @@ export const RadioOptionCard = React.forwardRef<HTMLDivElement, RadioOptionCardP
       value,
       id,
       media,
+      tone = 'strong',
     } = props
-    const tone = useCardSurfaceTone('strong')
     const selected = useRadioGroupItemSelected(value)
     const detailsBodyId = details && id ? `${id}-details` : undefined
     const shellClassName = resolveRadioOptionCardShellClassName({

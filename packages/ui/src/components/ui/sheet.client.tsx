@@ -22,7 +22,6 @@ import {
 } from './sheet.variants'
 import { SheetMediaScroll } from './sheet-media-scroll.client'
 import { useDialogLayerPortalContainer } from './use-dialog-layer-portal-container.client'
-import { CardSurfaceToneProvider } from './card-surface-tone.client'
 
 const SheetRoot = DialogPrimitive.Root
 
@@ -98,10 +97,10 @@ const SheetContent = React.forwardRef<
           {...props}
         >
           {portalProvider(
-            <CardSurfaceToneProvider tone="quiet">
+            <>
               {children}
               <DialogCloseButton closeLabel={closeLabel} />
-            </CardSurfaceToneProvider>,
+            </>,
           )}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

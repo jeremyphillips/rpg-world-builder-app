@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event'
 import { ChartNoAxesColumn, Grid3x3 } from 'lucide-react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { CardSurfaceToneProvider } from './card-surface-tone.client'
 import { RadioCard } from './radio-card.client'
 
 const options = [
@@ -23,15 +22,14 @@ const options = [
 ]
 
 describe('RadioCard', () => {
-  it('uses quiet tone chrome when a quiet host provider is present', () => {
+  it('uses quiet tone chrome when tone is quiet', () => {
     render(
-      <CardSurfaceToneProvider tone="quiet">
-        <RadioCard
-          aria-label="Connection kind"
-          density="compact"
-          options={[{ label: 'Owner', value: 'owns', description: 'Controls the location' }]}
-        />
-      </CardSurfaceToneProvider>,
+      <RadioCard
+        aria-label="Connection kind"
+        density="compact"
+        tone="quiet"
+        options={[{ label: 'Owner', value: 'owns', description: 'Controls the location' }]}
+      />,
     )
 
     const shell = screen.getByRole('radio', { name: /Owner/i }).closest('.ui-card')

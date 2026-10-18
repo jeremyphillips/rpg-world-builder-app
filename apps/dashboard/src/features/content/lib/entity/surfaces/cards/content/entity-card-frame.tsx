@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { cardSurfaceVariants, cn, useCardSurfaceTone } from '@rpg/ui'
+import { cardSurfaceVariants, cn } from '@rpg/ui'
 import type { ContentCardDensity } from '@rpg/ui'
 
 import {
@@ -30,12 +30,10 @@ export function EntityCardFrame({
   leadingUtilityCount = 0,
   children,
 }: EntityCardFrameProps) {
-  const tone = useCardSurfaceTone('quiet')
-
   return (
     <article
       className={cn(
-        cardSurfaceVariants({ tone, interactive, selected, disabled }),
+        cardSurfaceVariants({ tone: 'quiet', interactive, selected, disabled }),
         entityCardFrameVariants({ density, edges, leadingUtilityCount }),
       )}
       data-content-density={density}

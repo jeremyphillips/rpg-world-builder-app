@@ -9,6 +9,7 @@ import type {
   SelectionOptionCardCopyWidth,
   SelectionOptionCardDensity,
 } from './selection-option-card-anatomy.client'
+import type { CardSurfaceTone } from './card.variants'
 import { radioCardGroupGapVariants } from './radio-card.variants'
 
 /** Radix RadioGroup skips onValueChange when the current option is clicked again. */
@@ -75,6 +76,8 @@ export interface RadioCardProps extends React.ComponentPropsWithoutRef<typeof Ra
   visualControl?: RadioCardVisualControl
   columns?: RadioCardColumns
   copyWidth?: SelectionOptionCardCopyWidth
+  /** Card chrome ladder; defaults to strong. Pass quiet in drawer hosts. */
+  tone?: CardSurfaceTone
 }
 
 function RadioCard({
@@ -86,6 +89,7 @@ function RadioCard({
   visualControl = 'radio',
   columns = 'one',
   copyWidth = 'fill',
+  tone = 'strong',
   value,
   onValueChange,
   ...props
@@ -118,6 +122,7 @@ function RadioCard({
             summaryLines={option.summaryLines}
             summaryContent={option.summaryContent}
             density={density}
+            tone={tone}
             variant={variant}
             visualControl={visualControl}
             icon={option.icon}
