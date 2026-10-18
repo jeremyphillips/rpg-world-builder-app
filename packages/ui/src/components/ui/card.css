@@ -1,30 +1,42 @@
 /*
- * Card shell — quiet and strong toned ladders only.
+ * Card shell — generic chrome on the block; quiet and strong override it.
  * Selected state requires a tone (see cardSurfaceVariants).
+ * Nest with the full class after `&` (`&.ui-card--quiet`). Gluing `&` to a
+ * modifier dash is rewritten into a selector that matches nothing.
  */
 @layer components {
   .ui-card {
     color: var(--card-foreground);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--card-border);
+    background-color: var(--card);
+    box-shadow: var(--shadow-surface-raised);
+    --surface-current: var(--card);
 
-    &--static,
-    &--interactive {
+    &.ui-card--static,
+    &.ui-card--interactive {
       transition-property: background-color, border-color, color, box-shadow;
       transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
       transition-duration: 150ms;
     }
 
-    &--disabled {
+    &.ui-card--interactive:not(.ui-card--quiet):not(.ui-card--strong):hover {
+      background-color: var(--row-hover-bg);
+      border-color: var(--card-border);
+    }
+
+    &.ui-card--disabled {
       opacity: 0.5;
       pointer-events: none;
     }
 
-    &--interactive:has(.ui-selection-target__control:focus-visible),
-    &--interactive:has(.ui-choice-control:focus-visible) {
+    &.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
+    &.ui-card--interactive:has(.ui-choice-control:focus-visible) {
       outline: none;
     }
 
     /* Drawer / catalog entity rows */
-    &--quiet {
+    &.ui-card--quiet {
       border-radius: var(--radius-md);
       border: 1px solid var(--border);
       background-color: var(--ui-card-quiet-bg, var(--card));
@@ -54,7 +66,7 @@
     }
 
     /* Builder options, selection cards */
-    &--strong {
+    &.ui-card--strong {
       border-radius: var(--radius-card);
       border: 1px solid var(--border);
       background-color: var(--surface-muted);
@@ -94,19 +106,19 @@
       }
     }
 
-    &__header {
+    &.ui-card__header {
       display: flex;
       flex-direction: column;
       gap: calc(var(--spacing) * 1.5);
       padding: calc(var(--spacing) * 6);
     }
 
-    &__content {
+    &.ui-card__content {
       padding: calc(var(--spacing) * 6);
       padding-top: 0;
     }
 
-    &__footer {
+    &.ui-card__footer {
       display: flex;
       align-items: center;
       padding: calc(var(--spacing) * 6);
@@ -114,9 +126,7 @@
     }
   }
 
-  .ui-card-tone-host {
-    &--inherit {
-      --ui-card-quiet-bg: var(--surface-current);
-    }
+  .ui-card-tone-host--inherit {
+    --ui-card-quiet-bg: var(--surface-current);
   }
 }

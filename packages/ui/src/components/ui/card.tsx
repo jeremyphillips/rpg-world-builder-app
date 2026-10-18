@@ -14,8 +14,12 @@ import { textVariants } from './text.variants'
 type CardProps = React.HTMLAttributes<HTMLDivElement> & CardSurfaceVariantProps
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, interactive, ...props }, ref) => (
-    <div ref={ref} className={cn(cardSurfaceVariants({ interactive }), className)} {...props} />
+  ({ className, tone, interactive, selected, disabled, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(cardSurfaceVariants({ tone, interactive, selected, disabled }), className)}
+      {...props}
+    />
   ),
 )
 Card.displayName = 'Card'

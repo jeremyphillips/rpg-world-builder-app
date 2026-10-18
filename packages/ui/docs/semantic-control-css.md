@@ -56,7 +56,7 @@ For each migrated primitive, verify in Storybook DevTools:
 
 ## Card, inset panel, and empty panel
 
-`ui-card` owns radius, border, fill, shadow, and `--surface-current`. Tone modifiers `--quiet` and `--strong` set the same `--ui-card-*` custom-property list; state modifiers `--interactive`, `--static`, `--selected`, and `--disabled` read those variables. Parts are `__header`, `__content`, and `__footer`. `cardSurfaceVariants()` is the styling primitive.
+`ui-card` owns radius, border, fill, shadow, and `--surface-current`. `--quiet` and `--strong` override that chrome; `--selected` requires a tone. Parts are `__header`, `__content`, and `__footer`. `cardSurfaceVariants()` is the styling primitive. Nest with the full class after `&` (`&.ui-card--quiet`). The short form `&--quiet` is rewritten into an invalid selector by the CSS optimizer.
 
 `ui-radio-card` splits density (`--default`, `--compact`), layout (`--media`, `--row`), and elements `__details`, `__embedded`, and `__footer` from the shared card resolver.
 
