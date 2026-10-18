@@ -309,9 +309,12 @@ export {
 export {
   DestinationList,
   DestinationRow,
+  type DestinationListAppearance,
   type DestinationListDensity,
   type DestinationListProps,
   type DestinationRowProps,
+  type DestinationRowRichProps,
+  type DestinationRowSimpleProps,
 } from './components/ui/destination-list'
 export {
   CARD_CLASS_SPECS,

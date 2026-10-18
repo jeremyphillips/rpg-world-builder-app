@@ -31,6 +31,27 @@ describe('CharacterRelationshipIndicator', () => {
     expect(screen.getByRole('img', { name: 'Class of Aric' })).toBeInTheDocument()
   })
 
+  it('inlinePassive hides icon from accessibility tree', () => {
+    renderWithProviders(
+      <CharacterRelationshipIndicator
+        presentation="inlinePassive"
+        viewerCharacterRelationships={{
+          count: 1,
+          groups: [
+            {
+              kind: 'class',
+              count: 1,
+              relationships: [{ kind: 'class', characterId: '1', characterName: 'Aric' }],
+            },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.queryByRole('img', { name: 'Class of Aric' })).not.toBeInTheDocument()
+    expect(document.querySelector('span[aria-hidden="true"] .lucide-user-round-check')).toBeTruthy()
+  })
+
   itAxe('has no axe violations', async () => {
     const { container } = renderWithProviders(
       <div className="group">

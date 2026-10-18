@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { InlineMetadata } from './inline-metadata'
 import { Card } from './card'
 import { DestinationList, DestinationRow } from './destination-list'
+import { IdentityRow } from './identity-row.client'
 
 const meta = {
   title: 'Components/DestinationList',
@@ -58,6 +59,41 @@ export const ComfortableGrouped: Story = {
         link={<a href="#conditions">nav</a>}
         title="Conditions"
         description="Temporary states that alter what characters can do."
+      />
+    </DestinationList>
+  ),
+}
+
+export const EmbeddedRichSearchRow: Story = {
+  name: 'Embedded rich search row',
+  render: () => (
+    <DestinationList appearance="embedded" density="compact">
+      <DestinationRow
+        link={<a href="#fireball">nav</a>}
+        startSlot={
+          <span className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
+            ✦
+          </span>
+        }
+        content={
+          <IdentityRow
+            heading="Fireball"
+            classification="Spell"
+            supporting="3rd-level evocation"
+            size="md"
+          />
+        }
+      />
+      <DestinationRow
+        link={<a href="#champion">nav</a>}
+        content={
+          <IdentityRow
+            heading="Champion"
+            classification="Subclass"
+            supporting="Fighter subclass with a longer supporting line that wraps across multiple rows in narrow layouts."
+            size="md"
+          />
+        }
       />
     </DestinationList>
   ),

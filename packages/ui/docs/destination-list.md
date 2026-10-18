@@ -1,57 +1,50 @@
 # Destination list
 
-Grouped hub navigation — one bordered panel, inset dividers, full-row links with trailing navigation chevrons.
+Grouped navigation rows — shared link-root behavior with navigable `Card`, distinct list chrome.
 
-Source: `packages/ui/src/components/ui/destination-list.tsx`, `destination-list.css`.
+Source: `packages/ui/src/components/ui/destination-list.tsx`, `destination-list.css`, `navigable-link-root.lib.ts`.
 
-For entity-rich rows (media, status, menus), use dashboard entity surfaces — see [row anatomy](./row-anatomy.md) and [content-entity-card](../../../apps/dashboard/docs/content-entity-card.md).
+Entity-rich pickers (combobox, menus) stay on `InteractiveList` + `InteractiveListRow`.
 
 ## When to use
 
-| Presentation                                                                         | Component                                |
-| ------------------------------------------------------------------------------------ | ---------------------------------------- |
-| Standalone tile or grid cell with its own border and radius                          | Navigable `Card` (`link` prop)           |
-| Hub-style list inside one panel (Game Terms vocabulary, settings-style destinations) | `DestinationList` + `DestinationRow`     |
-| Combobox, menu, or search hit inside a popover                                       | `InteractiveList` + `InteractiveListRow` |
+| Presentation                    | Component                                                       |
+| ------------------------------- | --------------------------------------------------------------- |
+| Standalone tile (grid/hub cell) | Navigable `Card` (`link` prop)                                  |
+| Hub panel with inset dividers   | `DestinationList appearance="panel"` + simple `DestinationRow`  |
+| Popover/search grouped results  | `DestinationList appearance="embedded"` + rich `DestinationRow` |
+| Combobox / menu rows            | `InteractiveList` + `InteractiveListRow`                        |
 
-## Public API
+## API
 
-Two components only:
+### `DestinationList`
 
-- **`DestinationList`** — `<ul>` panel chrome, `density="compact" \| "comfortable"` (default `comfortable`).
-- **`DestinationRow`** — renders `<li>` and clones the app-supplied `link` as the full-row hit target.
+- `appearance?: 'panel' | 'embedded'` (default `panel`)
+- `density?: 'compact' | 'comfortable'` (default `comfortable`) — row padding + simple copy sizes only
 
-```tsx
-<DestinationList density="compact">
-  {items.map((item) => (
-    <DestinationRow
-      key={item.id}
-      link={<Link to={item.href} />}
-      title={item.title}
-      description={item.description}
-      metadata={<InlineMetadata>...</InlineMetadata>}
-    />
-  ))}
-</DestinationList>
-```
+### `DestinationRow` (discriminated union)
 
-Router links stay in the app — `@rpg/ui` does not import React Router.
+**Shared:** `link` (required), `showNavigationChevron?` (default true)
 
-## Ownership
+**Simple:** `title`, optional `description`, optional `metadata`
 
-| Concern                                            | Owner                                                                                     |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Outer border, radius, transparent panel background | `DestinationList`                                                                         |
-| Inset dividers between items                       | `DestinationList` CSS (`::after` on `.ui-destination-item`)                               |
-| Row padding, hover, focus, link cloning            | `DestinationRow`                                                                          |
-| Title / description / metadata typography          | `destination-list.css` vars (aligned with card copy sizes, not `.ui-card__*` classes)     |
-| Navigation chevron                                 | `DestinationRow` (decorative, `aria-hidden`; opt out via `showNavigationChevron={false}`) |
-| `href` / `to` / click handlers                     | App `link` element                                                                        |
+**Rich:** `content` (required), optional `startSlot`, optional `trailingInfo` (passive informational nodes only)
 
-## Navigation parity with Card
+Link-specific attributes (`to`, `href`, `aria-label`, `onClick`, refs) belong on the **`link`** element.
 
-Both use `renderNavigableCardLink` from `card.lib.tsx` to merge surface classes onto the supplied link. Destination rows use **embedded** focus rings (`ui-focus-ring--embedded`) so focus remains visible inside the panel’s `overflow-hidden` clip.
+## Navigation
 
-## Deferred
+`renderNavigableLinkRoot` ([`navigable-link-root.lib.ts`](../src/components/ui/navigable-link-root.lib.ts)) clones the app link and merges row/card surface classes. Rows use embedded focus rings (`ui-focus-ring--embedded`).
 
-- Row `media`, disabled destinations, and campaign entity rows — document future consumers; extend API only when required.
+## Relationship indicator in search rows
+
+Dashboard `CharacterRelationshipIndicator` supports `presentation="inlinePassive"` inside rich rows: icon is decorative (`aria-hidden`); screen readers get relationship copy from the link `aria-label`; pointer hover still opens the tooltip without an extra tab stop.
+
+## Appearance vs density
+
+|          | `panel`                        | `embedded`                          |
+| -------- | ------------------------------ | ----------------------------------- |
+| Chrome   | Border, radius, transparent bg | No outer panel border               |
+| Dividers | Inset `::after` on items       | Full-bleed top border between items |
+
+Density controls `--ui-destination-inset-*` (compact vs comfortable). Rich `IdentityRow` typography is owned by the caller (`size="md"` in search).

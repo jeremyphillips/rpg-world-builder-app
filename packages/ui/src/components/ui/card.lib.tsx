@@ -2,6 +2,7 @@ import * as React from 'react'
 import { ChevronRight } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { renderNavigableLinkRoot } from './navigable-link-root.lib'
 import { interactiveFocusVariants, interactivePointerClasses } from './interactive-focus.variants'
 import type { CardHeaderModel, CardProps } from './card.types'
 import {
@@ -22,18 +23,7 @@ export function cardHasBody(children: React.ReactNode): boolean {
   return React.Children.toArray(children).length > 0
 }
 
-export function composeRefs<T>(...refs: Array<React.Ref<T> | undefined>): React.RefCallback<T> {
-  return (node) => {
-    for (const ref of refs) {
-      if (ref == null) continue
-      if (typeof ref === 'function') {
-        ref(node)
-      } else {
-        ref.current = node
-      }
-    }
-  }
-}
+export { composeRefs } from './navigable-link-root.lib'
 
 function CardHeaderRegion({ header }: { header: CardHeaderModel }) {
   return (
@@ -244,10 +234,6 @@ export function parseCardProps(props: CardProps): ParsedCardProps {
   }
 }
 
-type LinkElementProps = React.HTMLAttributes<HTMLElement> & {
-  ref?: React.Ref<HTMLElement>
-}
-
 export function renderNavigableCardLink(
   link: React.ReactElement,
   surfaceClassName: string,
@@ -255,14 +241,5 @@ export function renderNavigableCardLink(
   restProps: Record<string, unknown>,
   ref: React.ForwardedRef<HTMLDivElement>,
 ): React.ReactElement {
-  const linkElement = link as React.ReactElement<LinkElementProps>
-  const { className: linkClassName, ref: linkRef, ...linkRest } = linkElement.props
-
-  return React.cloneElement(linkElement, {
-    ...restProps,
-    ...linkRest,
-    ref: composeRefs(ref, linkRef),
-    className: cn(surfaceClassName, linkClassName),
-    children: interior,
-  })
+  return renderNavigableLinkRoot(link, surfaceClassName, interior, restProps, ref)
 }

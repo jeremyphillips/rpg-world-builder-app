@@ -6,13 +6,16 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
+import { IdentityRow } from './identity-row.client'
 import { DestinationList, DestinationRow } from './destination-list'
 import {
   UI_DESTINATION_ITEM_CLASS,
   UI_DESTINATION_LIST_COMPACT_CLASS,
   UI_DESTINATION_LIST_COMFORTABLE_CLASS,
+  UI_DESTINATION_LIST_EMBEDDED_CLASS,
   UI_DESTINATION_ROW_CHEVRON_CLASS,
   UI_DESTINATION_ROW_CLASS,
+  UI_DESTINATION_ROW_IDENTITY_CLUSTER_CLASS,
 } from './destination-list.variants'
 
 const destinationListCssPath = join(dirname(fileURLToPath(import.meta.url)), 'destination-list.css')
@@ -20,7 +23,12 @@ const destinationListCssPath = join(dirname(fileURLToPath(import.meta.url)), 'de
 describe('destination-list.css inset divider contract', () => {
   it('declares list-owned inset separators on items', () => {
     const css = readFileSync(destinationListCssPath, 'utf8')
-    expect(css).toContain('.ui-destination-item:not(:last-child)::after')
+    expect(css).toContain(
+      '.ui-destination-list--panel .ui-destination-item:not(:last-child)::after',
+    )
+    expect(css).toContain(
+      '.ui-destination-list--embedded .ui-destination-item + .ui-destination-item',
+    )
     expect(css).toContain('left: var(--ui-destination-inset-inline)')
     expect(css).toContain('right: var(--ui-destination-inset-inline)')
   })
@@ -106,6 +114,25 @@ describe('DestinationList + DestinationRow', () => {
       </DestinationList>,
     )
     expect(container.firstElementChild).toHaveClass(UI_DESTINATION_LIST_COMFORTABLE_CLASS)
+  })
+
+  it('renders rich content with identity cluster and no nested anchors', () => {
+    const { container } = render(
+      <DestinationList appearance="embedded" density="compact">
+        <DestinationRow
+          link={<a href="/spell">nav</a>}
+          startSlot={<span data-testid="media">M</span>}
+          content={<IdentityRow heading="Fireball" classification="Spell" size="md" />}
+          trailingInfo={<span data-testid="info">i</span>}
+        />
+      </DestinationList>,
+    )
+    expect(container.firstElementChild).toHaveClass(UI_DESTINATION_LIST_EMBEDDED_CLASS)
+    expect(container.querySelector(`.${UI_DESTINATION_ROW_IDENTITY_CLUSTER_CLASS}`)).toBeTruthy()
+    expect(screen.getByTestId('media')).toBeInTheDocument()
+    expect(screen.getByTestId('info')).toBeInTheDocument()
+    expect(container.querySelectorAll('a a')).toHaveLength(0)
+    expect(container.querySelectorAll('a button')).toHaveLength(0)
   })
 
   it('activates link on Enter when focused', async () => {

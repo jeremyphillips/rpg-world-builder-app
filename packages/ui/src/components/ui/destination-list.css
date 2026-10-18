@@ -5,10 +5,6 @@
   .ui-destination-list {
     margin: 0;
     list-style: none;
-    overflow: hidden;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    background-color: transparent;
     padding: 0;
     --ui-destination-inset-inline: calc(var(--spacing) * 5);
     --ui-destination-inset-block: calc(var(--spacing) * 2);
@@ -19,6 +15,20 @@
     --ui-destination-description-line-height: var(--text-sm--line-height);
     --ui-destination-metadata-size: var(--text-xs);
     --ui-destination-metadata-line-height: var(--text-xs--line-height);
+  }
+
+  .ui-destination-list--panel {
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background-color: transparent;
+  }
+
+  .ui-destination-list--embedded {
+    overflow: visible;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
   }
 
   .ui-destination-list--compact {
@@ -35,7 +45,7 @@
     position: relative;
   }
 
-  .ui-destination-item:not(:last-child)::after {
+  .ui-destination-list--panel .ui-destination-item:not(:last-child)::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -43,6 +53,10 @@
     right: var(--ui-destination-inset-inline);
     border-bottom: 1px solid var(--border-faint);
     pointer-events: none;
+  }
+
+  .ui-destination-list--embedded .ui-destination-item + .ui-destination-item {
+    border-top: 1px solid var(--border-faint);
   }
 
   .ui-destination-row {
@@ -76,6 +90,22 @@
     font-size: var(--ui-destination-metadata-size);
     line-height: var(--ui-destination-metadata-line-height);
     color: var(--muted-foreground);
+  }
+
+  .ui-destination-row__identity-cluster {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 0%;
+    align-items: flex-start;
+    gap: var(--control-gap-sm);
+    text-align: left;
+  }
+
+  .ui-destination-row__trailing-info {
+    display: flex;
+    flex-shrink: 0;
+    align-self: center;
+    align-items: center;
   }
 
   .ui-destination-row__chevron {
