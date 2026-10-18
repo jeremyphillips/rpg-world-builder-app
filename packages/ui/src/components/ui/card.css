@@ -1,18 +1,10 @@
 /*
- * Card shell — two toned ladders (quiet / strong) plus generic untoned Card.
+ * Card shell — quiet and strong toned ladders only.
  * Selected state requires a tone (see cardSurfaceVariants).
  */
 @layer components {
   .ui-card {
     color: var(--card-foreground);
-  }
-
-  .ui-card:not(.ui-card--quiet):not(.ui-card--strong) {
-    border-radius: var(--radius-card);
-    border: 1px solid var(--card-border);
-    background-color: var(--card);
-    box-shadow: var(--shadow-surface-raised);
-    --surface-current: var(--card);
   }
 
   .ui-card-tone-host--inherit {
@@ -80,15 +72,6 @@
     transition-property: background-color, border-color, color, box-shadow;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
-  }
-
-  .ui-card:not(.ui-card--quiet):not(.ui-card--strong).ui-card--static:hover {
-    background-color: var(--card);
-  }
-
-  .ui-card:not(.ui-card--quiet):not(.ui-card--strong).ui-card--interactive:hover {
-    background-color: var(--row-hover-bg);
-    border-color: var(--card-border);
   }
 
   .ui-card--disabled {
