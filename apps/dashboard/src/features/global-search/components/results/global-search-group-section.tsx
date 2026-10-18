@@ -10,6 +10,7 @@ import {
 } from '../../lib/global-search-preview-group'
 import {
   globalSearchGroupContentInsetClasses,
+  globalSearchGroupHeadingClasses,
   globalSearchGroupHeadingCountClasses,
   globalSearchGroupSectionVariants,
   globalSearchGroupShowAllLinkVariants,
@@ -59,6 +60,7 @@ export function GlobalSearchGroupSection({
         as="h2"
         first={sectionIndex === 0}
         follows={follows}
+        className={globalSearchGroupHeadingClasses}
       >
         <InlineMetadata role="heading" density="compact" wrap={false}>
           <InlineMetadata.Item>{groupLabel}</InlineMetadata.Item>

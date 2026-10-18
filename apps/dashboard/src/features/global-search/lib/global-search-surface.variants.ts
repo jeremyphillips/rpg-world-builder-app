@@ -1,7 +1,6 @@
-import { cn, establishSurfaceCurrent } from '@rpg/ui'
+import { cn } from '@rpg/ui'
 
-/** Route results block — faint wash on page canvas with established surface plane. */
+/** Bordered results shell — matches {@link DestinationList} panel chrome (transparent, no surface wash). */
 export const globalSearchPageResultsShellClasses = cn(
-  'overflow-hidden rounded-md border border-border-subtle bg-surface-faint',
-  establishSurfaceCurrent('surface-faint'),
+  'overflow-hidden rounded-md border border-border bg-transparent',
 )

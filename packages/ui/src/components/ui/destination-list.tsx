@@ -65,6 +65,10 @@ export type DestinationRowRichProps = DestinationRowShared & {
 
 export type DestinationRowProps = DestinationRowSimpleProps | DestinationRowRichProps
 
+function isDestinationRowRich(props: DestinationRowProps): props is DestinationRowRichProps {
+  return 'content' in props && props.content != null
+}
+
 function warnInvalidLink(link: React.ReactElement | undefined) {
   if (process.env.NODE_ENV !== 'development' || link == null) {
     return
@@ -125,12 +129,11 @@ export function DestinationRow(props: DestinationRowProps) {
   const { link, showNavigationChevron = true } = props
   warnInvalidLink(link)
 
-  const interior =
-    'content' in props && props.content != null ? (
-      <DestinationRowRichInterior {...props} showNavigationChevron={showNavigationChevron} />
-    ) : (
-      <DestinationRowSimpleInterior {...props} showNavigationChevron={showNavigationChevron} />
-    )
+  const interior = isDestinationRowRich(props) ? (
+    <DestinationRowRichInterior {...props} showNavigationChevron={showNavigationChevron} />
+  ) : (
+    <DestinationRowSimpleInterior {...props} showNavigationChevron={showNavigationChevron} />
+  )
 
   const navigableLink = renderNavigableLinkRoot(
     link,

@@ -86,7 +86,7 @@ describe('GlobalSearchGroupSection', () => {
     const list = container.querySelector('.ui-destination-list--embedded')
     const row = rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))
 
-    expect(heading).toHaveClass('ui-interactive-list__heading--first')
+    expect(heading).toHaveClass('ui-interactive-list__heading--first', 'bg-surface-faint')
     expect(list).toBeInTheDocument()
     expect(row).toHaveClass('ui-destination-row', 'ui-interactive-row--hover-navigation')
   })
