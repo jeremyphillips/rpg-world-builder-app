@@ -5,123 +5,118 @@
 @layer components {
   .ui-card {
     color: var(--card-foreground);
+
+    &--static,
+    &--interactive {
+      transition-property: background-color, border-color, color, box-shadow;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 150ms;
+    }
+
+    &--disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    &--interactive:has(.ui-selection-target__control:focus-visible),
+    &--interactive:has(.ui-choice-control:focus-visible) {
+      outline: none;
+    }
+
+    /* Drawer / catalog entity rows */
+    &--quiet {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background-color: var(--ui-card-quiet-bg, var(--card));
+      box-shadow: none;
+      --surface-current: var(--ui-card-quiet-bg, var(--card));
+
+      &.ui-card--interactive:hover {
+        background-color: var(--row-hover-bg);
+        border-color: var(--border);
+      }
+
+      &.ui-card--selected {
+        background-color: var(--row-selected-bg);
+        border-color: var(--primary);
+        --surface-current: var(--row-selected-bg);
+      }
+
+      &.ui-card--selected.ui-card--interactive:hover {
+        background-color: var(--row-selected-bg);
+        border-color: var(--primary);
+      }
+
+      &.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
+      &.ui-card--interactive:has(.ui-choice-control:focus-visible) {
+        box-shadow: var(--ui-focus-ring-standalone);
+      }
+    }
+
+    /* Builder options, selection cards */
+    &--strong {
+      border-radius: var(--radius-card);
+      border: 1px solid var(--border);
+      background-color: var(--surface-muted);
+      box-shadow: 0 1px 2px 0 color-mix(in oklab, var(--foreground) 6%, transparent);
+      --surface-current: var(--surface-muted);
+
+      &.ui-card--interactive:hover {
+        background-color: var(--surface-subtle);
+        border-color: var(--primary);
+      }
+
+      &.ui-card--selected {
+        background-color: var(--surface-strong);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent);
+        --surface-current: var(--surface-strong);
+      }
+
+      &.ui-card--selected.ui-card--interactive:hover {
+        background-color: var(--surface-strong);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent);
+      }
+
+      &.ui-card--interactive:not(.ui-card--selected):has(
+          .ui-selection-target__control:focus-visible
+        ),
+      &.ui-card--interactive:not(.ui-card--selected):has(.ui-choice-control:focus-visible) {
+        box-shadow: var(--ui-focus-ring-standalone);
+      }
+
+      &.ui-card--selected.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
+      &.ui-card--selected.ui-card--interactive:has(.ui-choice-control:focus-visible) {
+        box-shadow:
+          0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent),
+          var(--ui-focus-ring-standalone);
+      }
+    }
+
+    &__header {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing) * 1.5);
+      padding: calc(var(--spacing) * 6);
+    }
+
+    &__content {
+      padding: calc(var(--spacing) * 6);
+      padding-top: 0;
+    }
+
+    &__footer {
+      display: flex;
+      align-items: center;
+      padding: calc(var(--spacing) * 6);
+      padding-top: 0;
+    }
   }
 
-  .ui-card-tone-host--inherit {
-    --ui-card-quiet-bg: var(--surface-current);
-  }
-
-  /* --- Quiet (drawer / catalog entity rows) --- */
-
-  .ui-card.ui-card--quiet {
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    background-color: var(--ui-card-quiet-bg, var(--card));
-    box-shadow: none;
-    --surface-current: var(--ui-card-quiet-bg, var(--card));
-  }
-
-  .ui-card.ui-card--quiet.ui-card--interactive:hover {
-    background-color: var(--row-hover-bg);
-    border-color: var(--border);
-  }
-
-  .ui-card.ui-card--quiet.ui-card--selected {
-    background-color: var(--row-selected-bg);
-    border-color: var(--primary);
-    --surface-current: var(--row-selected-bg);
-  }
-
-  .ui-card.ui-card--quiet.ui-card--selected.ui-card--interactive:hover {
-    background-color: var(--row-selected-bg);
-    border-color: var(--primary);
-  }
-
-  /* --- Strong (builder options, selection cards) --- */
-
-  .ui-card.ui-card--strong {
-    border-radius: var(--radius-card);
-    border: 1px solid var(--border);
-    background-color: var(--surface-muted);
-    box-shadow: 0 1px 2px 0 color-mix(in oklab, var(--foreground) 6%, transparent);
-    --surface-current: var(--surface-muted);
-  }
-
-  .ui-card.ui-card--strong.ui-card--interactive:hover {
-    background-color: var(--surface-subtle);
-    border-color: var(--primary);
-  }
-
-  .ui-card.ui-card--strong.ui-card--selected {
-    background-color: var(--surface-strong);
-    border-color: var(--primary);
-    box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent);
-    --surface-current: var(--surface-strong);
-  }
-
-  .ui-card.ui-card--strong.ui-card--selected.ui-card--interactive:hover {
-    background-color: var(--surface-strong);
-    border-color: var(--primary);
-    box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent);
-  }
-
-  /* --- Shared interaction --- */
-
-  .ui-card--static,
-  .ui-card--interactive {
-    transition-property: background-color, border-color, color, box-shadow;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-  }
-
-  .ui-card--disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-
-  .ui-card--interactive:has(.ui-selection-target__control:focus-visible),
-  .ui-card--interactive:has(.ui-choice-control:focus-visible) {
-    outline: none;
-  }
-
-  .ui-card.ui-card--quiet.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
-  .ui-card.ui-card--quiet.ui-card--interactive:has(.ui-choice-control:focus-visible),
-  .ui-card.ui-card--strong.ui-card--interactive:not(.ui-card--selected):has(
-      .ui-selection-target__control:focus-visible
-    ),
-  .ui-card.ui-card--strong.ui-card--interactive:not(.ui-card--selected):has(
-      .ui-choice-control:focus-visible
-    ) {
-    box-shadow: var(--ui-focus-ring-standalone);
-  }
-
-  .ui-card.ui-card--strong.ui-card--selected.ui-card--interactive:has(
-      .ui-selection-target__control:focus-visible
-    ),
-  .ui-card.ui-card--strong.ui-card--selected.ui-card--interactive:has(
-      .ui-choice-control:focus-visible
-    ) {
-    box-shadow:
-      0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent),
-      var(--ui-focus-ring-standalone);
-  }
-
-  .ui-card__header {
-    display: flex;
-    flex-direction: column;
-    gap: calc(var(--spacing) * 1.5);
-    padding: calc(var(--spacing) * 6);
-  }
-
-  .ui-card__content {
-    padding: calc(var(--spacing) * 6);
-    padding-top: 0;
-  }
-
-  .ui-card__footer {
-    display: flex;
-    align-items: center;
-    padding: calc(var(--spacing) * 6);
-    padding-top: 0;
+  .ui-card-tone-host {
+    &--inherit {
+      --ui-card-quiet-bg: var(--surface-current);
+    }
   }
 }

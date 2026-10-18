@@ -16,15 +16,16 @@ describe('ui-card toned ladders', () => {
     )
   })
 
-  it('keeps independent quiet and strong selected paint with border-color', () => {
+  it('nests quiet and strong ladders with selected border-color', () => {
     const source = readFileSync(cardCssPath, 'utf8')
 
-    expect(source).toContain('.ui-card.ui-card--quiet.ui-card--selected')
-    expect(source).toContain('.ui-card.ui-card--strong.ui-card--selected')
-    expect(source).not.toMatch(/\.ui-card--selected:not\(\.ui-card--quiet\)/)
+    expect(source).toContain('&--quiet')
+    expect(source).toContain('&--strong')
+    expect(source).toContain('&--inherit')
     expect(source).toMatch(
-      /\.ui-card\.ui-card--quiet\.ui-card--selected[\s\S]*border-color:\s*var\(--primary\)/,
+      /&--quiet[\s\S]*&\.ui-card--selected[\s\S]*border-color:\s*var\(--primary\)/,
     )
+    expect(source).not.toMatch(/\.ui-card--selected:not\(\.ui-card--quiet\)/)
     expect(source).not.toMatch(/--ui-card-bg-selected/)
   })
 })
