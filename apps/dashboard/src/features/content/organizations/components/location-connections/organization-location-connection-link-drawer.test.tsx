@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
@@ -57,7 +57,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     )
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
-    await user.click(screen.getByRole('button', { name: 'Select' }))
+    await user.click(screen.getByRole('radio', { name: 'Royal Mint' }))
 
     await user.click(screen.getByRole('button', { name: 'Change' }))
 
@@ -220,7 +220,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       />,
     )
 
-    const searchInput = screen.getByRole('textbox', {
+    const searchInput = screen.getByRole('searchbox', {
       name: DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION.searchPlaceholder,
     })
     await user.type(searchInput, 'Port')
@@ -284,7 +284,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     await user.click(screen.getByRole('radio', { name: /Controls/i }))
 
     expect(screen.getByText('Northern March')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Select' })).toBeEnabled()
+    expect(screen.getByRole('radio', { name: 'Northern March' })).toBeEnabled()
   })
 
   it('preserves a compatible selected location when changing kind', async () => {
@@ -312,13 +312,13 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     renderWithProviders(<ControlledDrawer />)
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
-    await user.click(screen.getByRole('button', { name: 'Select' }))
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: 'Royal Mint' }))
+    expect(screen.getByRole('radio', { name: 'Royal Mint' })).toBeChecked()
 
     await user.click(screen.getByRole('button', { name: 'Change' }))
     await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
 
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Royal Mint' })).toBeChecked()
   })
 
   it('opens change-kind with expanded relationship type and fixed location', async () => {
@@ -348,7 +348,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByRole('radiogroup', { name: 'Relationship type' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeChecked()
     expect(screen.getByRole('radio', { name: /Owner/i })).toBeInTheDocument()
-    expect(screen.queryByRole('textbox', { name: 'Search structures…' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('searchbox', { name: 'Search structures…' })).not.toBeInTheDocument()
     expect(screen.queryByText('No locations are available.')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Select' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save change' })).toBeDisabled()
@@ -390,14 +390,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     )
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
-    await user.click(
-      within(screen.getByText('City Waterworks').closest('[data-picker-item-key]')!).getByRole(
-        'button',
-        {
-          name: 'Select',
-        },
-      ),
-    )
+    await user.click(screen.getByRole('radio', { name: 'City Waterworks' }))
 
     await user.click(screen.getByRole('button', { name: 'Change' }))
     await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
@@ -447,7 +440,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByText('Structure')).toBeInTheDocument()
     expect(screen.getByText(headquartersPresentation.targetHelp!)).toBeInTheDocument()
     expect(
-      screen.getByRole('textbox', { name: headquartersPresentation.searchPlaceholder }),
+      screen.getByRole('searchbox', { name: headquartersPresentation.searchPlaceholder }),
     ).toBeInTheDocument()
     expect(screen.queryByRole('group', { name: 'Location type' })).not.toBeInTheDocument()
     expect(screen.getAllByText('Thieves Guildhouse')).toHaveLength(1)
@@ -455,14 +448,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.queryByText('Port City')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save change' })).toBeDisabled()
 
-    await user.click(
-      within(screen.getByText('The Silver Eel').closest('[data-picker-item-key]')!).getByRole(
-        'button',
-        {
-          name: 'Select',
-        },
-      ),
-    )
+    await user.click(screen.getByRole('radio', { name: 'The Silver Eel' }))
 
     expect(screen.getAllByText('Thieves Guildhouse')).toHaveLength(1)
     expect(screen.getByRole('button', { name: 'Save change' })).toBeEnabled()
@@ -594,7 +580,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.type(
-      screen.getByRole('textbox', {
+      screen.getByRole('searchbox', {
         name: DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION.searchPlaceholder,
       }),
       'zzzz-no-match',
@@ -671,11 +657,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByRole('radio', { name: 'Settlements' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: 'Regions' })).toBeInTheDocument()
 
-    await user.click(
-      within(screen.getByText('Port City').closest('[data-picker-item-key]')!).getByRole('button', {
-        name: 'Select',
-      }),
-    )
+    await user.click(screen.getByRole('radio', { name: 'Port City' }))
     await user.click(screen.getByRole('button', { name: 'Save change' }))
 
     expect(onSubmit).toHaveBeenCalledWith({

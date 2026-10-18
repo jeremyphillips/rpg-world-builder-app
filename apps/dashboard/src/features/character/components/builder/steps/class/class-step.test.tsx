@@ -107,11 +107,7 @@ describe('ClassStep', () => {
     const radios = screen.getAllByRole('radio')
     expect(radios).toHaveLength(2)
     for (const radio of radios) {
-      let shell: Element | null = radio
-      while (shell && !shell.classList.contains('h-full')) {
-        shell = shell.parentElement
-      }
-      expect(shell).not.toBeNull()
+      expect(radio.closest('.ui-card')).not.toBeNull()
     }
     expect(container.querySelectorAll('img')).toHaveLength(1)
   })

@@ -16,14 +16,14 @@ describe('array-item-issue', () => {
     )
 
     const badge = screen.getByRole('button', { name: '2 issues in Hero' })
-    expect(badge).toHaveClass('text-semantic-destructive-soft-foreground')
+    expect(badge).toHaveClass('ui-compact-label--soft-destructive')
     expect(badge).toHaveTextContent('2 issues')
     expect(badge.querySelector('svg')).toHaveClass('size-icon-inline')
     expect(badge.querySelector('svg')).not.toHaveClass('size-3.5')
 
     rerender(<ArrayItemIssueBadge issueCount={2} rowLabel="Hero" prominence="aggregate" />)
     expect(screen.getByRole('button', { name: '2 issues in Hero' })).toHaveClass(
-      'text-semantic-destructive-soft-foreground',
+      'ui-compact-label--soft-destructive',
     )
   })
 

@@ -20,7 +20,7 @@ describe('ArrayLikeSectionHeader', () => {
     expect(legend).toHaveClass('text-style-field-label-md')
     expect(screen.getByText('Grants')).toBeInTheDocument()
     expect(screen.getByText('Add the mechanical effects this feature provides.')).toHaveClass(
-      'text-style-field-hint',
+      'text-style-field-group-description',
     )
     expect(screen.getByRole('button', { name: 'Add grant' })).toBeInTheDocument()
   })

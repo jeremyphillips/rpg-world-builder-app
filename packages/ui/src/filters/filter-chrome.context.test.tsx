@@ -31,7 +31,7 @@ describe('FilterChromeProvider', () => {
     render(<ReadChrome />)
     expect(screen.getByTestId('density')).toHaveTextContent('compact')
     expect(screen.getByTestId('presentation')).toHaveTextContent('per-field')
-    expect(screen.getByTestId('label')).toHaveClass('text-xs')
+    expect(screen.getByTestId('label')).toHaveClass('text-style-caption')
     expect(screen.getByTestId('control')).toHaveTextContent('sm')
   })
 
@@ -43,7 +43,7 @@ describe('FilterChromeProvider', () => {
     )
 
     expect(screen.getByTestId('density')).toHaveTextContent('comfortable')
-    expect(screen.getByTestId('label')).toHaveClass('text-sm')
+    expect(screen.getByTestId('label')).toHaveClass('text-style-supporting')
     expect(screen.getByTestId('control')).toHaveTextContent('md')
   })
 

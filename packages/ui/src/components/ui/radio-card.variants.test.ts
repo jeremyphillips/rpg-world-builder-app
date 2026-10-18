@@ -11,10 +11,10 @@ describe('radioCard surface establishment', () => {
     expect(radioCardVariants({ variant: 'row' })).not.toContain('[--surface-current:')
   })
 
-  it('uses comfortable density card padding and typography', () => {
-    expect(radioCardVariants({ variant: 'card', density: 'default' })).toContain('px-4')
-    expect(radioCardVariants({ variant: 'card', density: 'default' })).toContain('py-3')
-    expect(radioCardVariants({ variant: 'card', density: 'default' })).not.toContain('pl-3')
+  it('uses comfortable density card content gap', () => {
+    expect(radioCardVariants({ variant: 'card', density: 'default' })).toContain('gap-2')
+    expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('gap-1')
+    expect(radioCardVariants({ variant: 'card', density: 'default' })).not.toContain('px-4')
   })
 
   it('uses compact horizontal rhythm with semantic indicator-sm decoration', () => {

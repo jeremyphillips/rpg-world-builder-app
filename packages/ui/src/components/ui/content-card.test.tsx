@@ -79,7 +79,6 @@ describe('ContentCard', () => {
 
   it('applies the same density inset for standalone and embedded chrome', () => {
     const density = 'compact' as const
-    const inset = resolveContentCardDensityInsetClasses(density)
     const standalone = contentCardRootVariants({ chrome: 'standalone' })
     const embedded = contentCardRootVariants({ chrome: 'embedded' })
 

@@ -80,7 +80,8 @@ export function effectTargetDescription(target: EquipmentEffectTarget): string {
 
 export function stripMagicPropertiesOnDone(draft: EquipmentInstance): EquipmentInstance {
   if (draft.magical) return draft
-  return { ...draft, magicProperties: undefined }
+  const { magicProperties: _magicProperties, ...rest } = draft
+  return rest
 }
 
 export function createDefaultMagicPropertyProvider(

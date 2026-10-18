@@ -149,7 +149,7 @@ describe('SearchResultRow', () => {
     expect(screen.queryByRole('img', { name: 'Subclass of Aric' })).not.toBeInTheDocument()
     const passiveIndicator = link.querySelector('span[aria-hidden="true"]')
     expect(passiveIndicator).toBeTruthy()
-    expect(link).toContainElement(passiveIndicator!)
+    expect(link).toContainElement(passiveIndicator as HTMLElement)
   })
 
   it('does not add a separate tab stop for the passive relationship indicator', async () => {

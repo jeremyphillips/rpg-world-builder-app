@@ -316,7 +316,7 @@ describe('EquipmentInventorySummary', () => {
       />,
     )
 
-    expect(screen.getByRole('spinbutton', { name: 'Rations quantity' })).toHaveValue(12)
+    expect(screen.getByLabelText('Rations quantity')).toHaveValue(12)
     await user.click(screen.getByRole('button', { name: 'Increase Rations quantity' }))
     expect(onSetPurchaseQuantity).toHaveBeenCalledWith(
       { kind: 'purchase', purchaseId: 'purchase-test-0' },
@@ -430,7 +430,7 @@ describe('EquipmentInventorySummary', () => {
 
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.getByText('Battleaxe')).toBeInTheDocument()
-    expect(container.querySelector('article.bg-card')).toBeInTheDocument()
+    expect(container.querySelector('.rounded-lg.border')).toBeInTheDocument()
   })
 
   it('counts only added purchases in the title badge when a package also provides the item', () => {

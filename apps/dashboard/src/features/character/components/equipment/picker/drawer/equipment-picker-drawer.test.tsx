@@ -485,8 +485,8 @@ describe('EquipmentPickerDrawer', () => {
     )
 
     expect(screen.queryByRole('button', { name: 'Add' })).toBeNull()
-    const stepper = screen.getByRole('spinbutton', { name: 'Purchased quantity of Rope' })
-    expect(stepper).toHaveValue(2)
+    const stepper = screen.getByLabelText('Purchased quantity of Rope')
+    expect(stepper).toHaveValue('2')
 
     await user.click(screen.getByRole('button', { name: 'Increase Purchased quantity of Rope' }))
     expect(onSetPurchasedQuantity).toHaveBeenCalledWith(ropeRow, 3)

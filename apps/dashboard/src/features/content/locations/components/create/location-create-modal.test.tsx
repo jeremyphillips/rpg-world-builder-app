@@ -1261,10 +1261,12 @@ describe('LocationCreateModal', () => {
       screen.getByRole('radiogroup', { name: 'Political type' }),
     ).getAllByRole('radio')[0]
     expect(firstRegionType).toBeTruthy()
-    const firstRegionTypeName = within(firstRegionType!).getByText(
-      /^(Realm|Kingdom|Empire|Country|State|Province|Territory|Duchy|County|Frontier)$/,
-    ).textContent
-    expect(firstRegionTypeName).toBeTruthy()
+    const firstRegionTypeName =
+      firstRegionType!.getAttribute('aria-label') ??
+      firstRegionType!.textContent?.replace(/\s+/g, ' ').trim()
+    expect(firstRegionTypeName).toMatch(
+      /^(Realm|Kingdom|Empire|Country|State|Province|Territory|Duchy|County|Frontier)/,
+    )
     await user.click(firstRegionType!)
 
     expect(screen.getByText('Setup')).toBeInTheDocument()

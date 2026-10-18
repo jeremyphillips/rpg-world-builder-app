@@ -118,7 +118,7 @@ describe('PreviewRail', () => {
     )
 
     const subheadline = container.querySelector(
-      '[data-slot="preview-rail-identity"] .text-sm.text-muted-foreground',
+      '[data-slot="preview-rail-identity"] .text-style-supporting',
     )
 
     expect(subheadline).toHaveTextContent('Level 1 Fighter')

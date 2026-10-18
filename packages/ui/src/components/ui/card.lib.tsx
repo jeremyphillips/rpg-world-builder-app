@@ -40,7 +40,7 @@ function CardHeaderRegion({ header }: { header: CardHeaderModel }) {
 export function NavigationChevron({ className }: { className?: string }) {
   return (
     <span className={cn(UI_CARD_NAV_CHEVRON_CLASS, className)} aria-hidden>
-      <ChevronRight className="size-4 shrink-0" />
+      <ChevronRight className="size-icon-glyph-md shrink-0" />
     </span>
   )
 }
@@ -237,5 +237,11 @@ export function renderNavigableCardLink(
   restProps: Record<string, unknown>,
   ref: React.ForwardedRef<HTMLDivElement>,
 ): React.ReactElement {
-  return renderNavigableLinkRoot(link, surfaceClassName, interior, restProps, ref)
+  return renderNavigableLinkRoot(
+    link,
+    surfaceClassName,
+    interior,
+    restProps,
+    ref as React.ForwardedRef<HTMLElement>,
+  )
 }

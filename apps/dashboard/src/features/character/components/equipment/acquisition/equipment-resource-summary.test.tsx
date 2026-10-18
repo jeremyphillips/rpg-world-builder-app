@@ -32,12 +32,9 @@ describe('EquipmentResourceSummary', () => {
 
     expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
     const badge = screen.getByLabelText('Common, complete')
-    expect(badge).toHaveClass('text-muted-foreground', 'bg-semantic-neutral-soft')
+    expect(badge).toHaveClass('ui-compact-label--soft-neutral', 'ui-compact-label--subdued')
     expect(badge.className).not.toContain('text-foreground-disabled')
-    expect(badge.querySelector('.rounded-full')).toHaveClass(
-      'bg-status-icon-idle',
-      'text-status-icon-neutral-foreground',
-    )
+    expect(badge.querySelector('svg')).toBeInTheDocument()
     expect(badge).not.toHaveTextContent('·')
     expect(screen.getByRole('heading', { name: 'Magic items' })).toHaveClass('heading-style-group')
   })

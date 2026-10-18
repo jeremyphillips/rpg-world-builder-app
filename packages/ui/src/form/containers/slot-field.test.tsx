@@ -128,7 +128,7 @@ describe('SlotFieldRenderer', () => {
     )
 
     expect(screen.getByTestId('slot-density')).toHaveTextContent('comfortable')
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('ui-field-control--md')
   })
 
   it('omits the rhythm wrapper when an unlabeled slot renders null', () => {

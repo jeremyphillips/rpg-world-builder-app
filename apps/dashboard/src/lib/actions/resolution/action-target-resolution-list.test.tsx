@@ -82,7 +82,7 @@ describe('ActionTargetResolutionList', () => {
       )
 
       if (state === 'failed') {
-        expect(screen.getByText('Could not reach the server.')).toHaveClass('text-muted-foreground')
+        expect(screen.getByText('Could not reach the server.')).toHaveClass('text-sm')
       }
 
       const checkboxes = container.querySelectorAll('[role="checkbox"]')

@@ -169,11 +169,9 @@ describe('LocationChildrenSection', () => {
       </QueryClientProvider>,
     )
 
-    const marketWardRow = screen.getByRole('link', { name: 'Market Ward' }).parentElement
-      ?.parentElement
     const marketWardLink = screen.getByRole('link', { name: 'Market Ward' })
-    expect(marketWardLink.closest('[style]')).toBeInTheDocument()
-    expect(marketWardRow).toHaveTextContent(/0 locations/)
+    expect(marketWardLink).toBeInTheDocument()
+    expect(screen.getByText(/0 locations/)).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'Show locations in Market Ward' }),
     ).not.toBeInTheDocument()
@@ -337,7 +335,7 @@ describe('LocationChildrenSection', () => {
 
     await user.click(screen.getByRole('button', { name: 'Actions for Yawning Portal' }))
     await user.click(screen.getByRole('menuitem', { name: 'Move location' }))
-    await user.click(screen.getByRole('button', { name: 'Select' }))
+    await user.click(screen.getByRole('radio', { name: 'Harborford' }))
     await user.click(screen.getByRole('button', { name: 'Move location' }))
 
     await waitFor(() => {
@@ -360,7 +358,7 @@ describe('LocationChildrenSection', () => {
 
     await user.click(screen.getByRole('button', { name: 'Actions for Yawning Portal' }))
     await user.click(screen.getByRole('menuitem', { name: 'Move location' }))
-    await user.click(screen.getByRole('button', { name: 'Select' }))
+    await user.click(screen.getByRole('radio', { name: 'Harborford' }))
     await user.click(screen.getByRole('button', { name: 'Move location' }))
 
     await waitFor(() => {

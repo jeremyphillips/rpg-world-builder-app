@@ -17,11 +17,13 @@ export function DisclosureChevronTrigger({ label }: { label: string }): React.JS
           variant="ghost"
           size="sm"
           density="compact"
-          className="size-6 shrink-0 p-0"
+          className="shrink-0 p-0"
           aria-label={label}
         >
           <ChevronDown
-            className={cn('size-4 transition-transform [[data-state=open]_&]:rotate-180')}
+            className={cn(
+              'size-icon-glyph-md transition-transform [[data-state=open]_&]:rotate-180',
+            )}
           />
         </Button>
       </CollapsibleTrigger>

@@ -47,9 +47,10 @@ describe('resolveSearchBarControlSize', () => {
 })
 
 describe('searchBarControlHeightClass', () => {
-  it('maps size tokens to field height utilities', () => {
-    expect(searchBarControlHeightClass('sm')).toContain('h-8')
-    expect(searchBarControlHeightClass('md')).toContain('h-9')
-    expect(searchBarControlHeightClass('lg')).toContain('h-11')
+  it('maps size tokens to grouped action-segment height classes', () => {
+    expect(searchBarControlHeightClass('sm')).toContain('ui-field-group--sm')
+    expect(searchBarControlHeightClass('sm')).toContain('ui-field-group__action-segment')
+    expect(searchBarControlHeightClass('md')).toContain('ui-field-group--md')
+    expect(searchBarControlHeightClass('lg')).toContain('ui-field-group--lg')
   })
 })

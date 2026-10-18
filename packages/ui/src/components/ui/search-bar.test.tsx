@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { FormSectionProvider } from '../../form/context/form-section.context'
 import { FilterChromeProvider } from '../../filters/filter-chrome.context'
 import { SearchBar } from './search-bar.client'
-import { searchBarControlHeightClass } from './search-bar-control-size.lib'
 
 const SEARCH_ARIA = 'Search organizations'
 
@@ -49,11 +48,12 @@ describe('SearchBar', () => {
     )
 
     const clear = screen.getByRole('button', { name: 'Clear search' })
-    expect(clear.className).toContain('w-8')
+    expect(clear.className).toContain('ui-field-group__caret-slot')
     expect(clear.className).toContain('inset-y-0')
-    expect(screen.getByRole('searchbox')).toHaveClass(
-      'pr-8',
-      '[&::-webkit-search-cancel-button]:appearance-none',
+    const searchInput = screen.getByRole('searchbox')
+    expect(searchInput).toHaveClass(
+      'ui-search-bar__field-input--md',
+      'ui-search-bar__field-input--clearable',
     )
     await user.click(clear)
     expect(onValueChange).toHaveBeenCalledWith('')
@@ -101,7 +101,7 @@ describe('SearchBar', () => {
     )
 
     const input = screen.getByRole('searchbox', { name: SEARCH_ARIA })
-    expect(input.className).toContain(searchBarControlHeightClass('md'))
+    expect(input.className).toContain('ui-field-control--md')
   })
 
   it('applies className to the field appearance root shell', () => {
@@ -115,7 +115,7 @@ describe('SearchBar', () => {
       />,
     )
 
-    expect(container.firstElementChild).toHaveClass('max-w-md', 'relative', 'w-full')
+    expect(container.firstElementChild).toHaveClass('ui-search-bar', 'max-w-md')
   })
 
   it('forwards onValueChange while an IME composition is active', () => {

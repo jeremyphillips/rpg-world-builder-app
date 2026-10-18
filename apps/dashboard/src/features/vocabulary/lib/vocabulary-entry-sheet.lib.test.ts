@@ -19,6 +19,7 @@ describe('submitVocabularyEntrySheet', () => {
       label: 'Construct',
       description: '',
       status: 'disabled',
+      languageAffinities: [],
     })
   })
 
@@ -38,6 +39,7 @@ describe('submitVocabularyEntrySheet', () => {
       label: 'Construct',
       description: '',
       status: 'active',
+      languageAffinities: [],
     })
   })
 })

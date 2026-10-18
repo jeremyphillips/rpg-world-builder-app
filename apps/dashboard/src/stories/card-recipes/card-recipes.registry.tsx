@@ -42,6 +42,7 @@ import {
   EntityRowList,
   EntitySurfaceContentCard,
   entitySurfaceMetadataFromText,
+  getContentTypeCollectionLabel,
 } from '@/features/content'
 import { DetailEntityRow } from '@/features/content/lib/detail/row/entity/detail-entity-row'
 import { DrawerEntityBlock } from '@/features/content/lib/entity/surfaces/drawer/drawer-entity-block'
@@ -782,7 +783,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     trailing: 'none',
     anatomy: 'row-track',
     render: () => (
-      <RadioGroup aria-label="Organizations" defaultValue="org-1">
+      <RadioGroup aria-label={getContentTypeCollectionLabel('organizations')} defaultValue="org-1">
         <CatalogEntityRow
           toolbarLabel="City Council"
           domIds={{

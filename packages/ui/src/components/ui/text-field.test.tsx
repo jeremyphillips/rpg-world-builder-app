@@ -134,7 +134,7 @@ describe('TextField trailingAction', () => {
 
     const button = screen.getByRole('button', { name: 'Generate' })
     expect(button.className).toContain('font-body-emphasis')
-    expect(button.className).toContain('text-sm')
+    expect(button.className).toContain('ui-button--attached-md')
     expect(button.className).not.toContain('text-md')
     expect(button.parentElement?.className).not.toMatch(/\b(text-|font-)/)
   })

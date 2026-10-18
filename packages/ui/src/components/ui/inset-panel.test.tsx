@@ -25,10 +25,10 @@ describe('InsetPanel', () => {
       </InsetPanel>,
     )
 
-    expect(container.firstChild).toHaveClass('border-dashed')
+    expect(container.firstChild).toHaveClass('ui-inset-panel--dashed')
     expect(container.firstChild).toHaveClass('bg-sunken')
     expect(container.firstChild).toHaveClass('shadow-surface-sunken')
-    expect(container.firstChild).toHaveClass('text-center')
+    expect(container.firstChild).toHaveClass('ui-inset-panel--align-center')
   })
 
   it.each(['sm', 'md', 'lg'] as const)('passes size %s to InsetPanel.Text typography', (size) => {

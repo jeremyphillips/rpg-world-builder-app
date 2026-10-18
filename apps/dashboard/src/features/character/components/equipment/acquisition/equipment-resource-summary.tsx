@@ -8,12 +8,14 @@ import {
   Heading,
   IconContainer,
   StatusIcon,
+  cardDensityClassName,
   cn,
   contentCardBodyVariants,
   contentCardHeadingRowVariants,
   contentCardMediaEndGapVariants,
   contentCardMetadataVariants,
   contentCardRootVariants,
+  resolveContentCardDensityInsetClasses,
   contentCardSubheadingVariants,
   resolveContentCardBodyCrossAxis,
   resolveContentCardHeadingRowRhythm,
@@ -179,7 +181,9 @@ export function EquipmentResourceSummary({
   return (
     <article
       className={cn(
-        contentCardRootVariants({ density, chrome: 'standalone' }),
+        cardDensityClassName(density),
+        resolveContentCardDensityInsetClasses(density),
+        contentCardRootVariants({ chrome: 'standalone' }),
         resolveSurfaceClasses({ emphasis: 'faint' }),
       )}
     >

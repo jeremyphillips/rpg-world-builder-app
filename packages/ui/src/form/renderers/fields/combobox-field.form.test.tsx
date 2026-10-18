@@ -253,7 +253,7 @@ describe('Form combobox field', () => {
     render(<Form schema={schema} fields={fields} defaultValues={{}} onSubmit={vi.fn()} />)
 
     await user.click(screen.getByRole('combobox', { name: 'Choice' }))
-    await user.type(screen.getByRole('searchbox', { name: 'Search Choice' }), 'match')
+    await user.type(screen.getByRole('searchbox', { name: /Search choice/i }), 'match')
 
     const panelOptions = screen.getAllByRole('option')
     expect(panelOptions[0]).toHaveAccessibleName('Second match')

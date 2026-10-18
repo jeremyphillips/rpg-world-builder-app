@@ -308,7 +308,7 @@ describe('nested grant validation integration', () => {
     await user.click(screen.getByRole('button', { name: 'Add feature' }))
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
     await user.type(
-      screen.getByRole('searchbox', { name: 'Search Add grant' }),
+      screen.getByRole('searchbox', { name: 'Search add grant…' }),
       'weapon proficiency',
     )
     await user.click(screen.getByRole('menuitem', { name: GRANT_TYPE_LABELS.weaponProficiency }))

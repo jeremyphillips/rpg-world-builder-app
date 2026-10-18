@@ -42,7 +42,7 @@ describe('Form section rendering', () => {
   it('renders group and array legends with expected typography', () => {
     render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
 
-    expect(screen.getByText('Identity').closest('legend')).toHaveClass('text-style-field-legend')
+    expect(screen.getByText('Identity')).toHaveClass('text-style-field-legend')
     const tagsLegend = screen.getByRole('group', { name: /Tags/ }).querySelector('legend')
     expect(tagsLegend).toHaveClass('text-style-field-label-md')
     expect(tagsLegend).not.toHaveClass('text-field-array-legend')
@@ -96,8 +96,8 @@ describe('Form section rendering', () => {
 
     render(<Form schema={schema} fields={anonymousWrapperFields} onSubmit={vi.fn()} />)
 
-    expect(screen.getByText('Weapon').closest('legend')).toHaveClass('text-style-field-legend')
-    expect(screen.getByText('Damage').closest('legend')).toHaveClass('text-style-field-legend-sub')
+    expect(screen.getByText('Weapon')).toHaveClass('text-style-field-legend')
+    expect(screen.getByText('Damage')).toHaveClass('text-style-field-legend-sub')
   })
 
   it('omits section bottom margin on top-level arrays spaced by form rhythm', () => {

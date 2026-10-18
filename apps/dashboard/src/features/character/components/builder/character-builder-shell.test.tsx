@@ -25,17 +25,16 @@ import {
   createStandaloneBuilderCatalogIndexFixture,
   createStandaloneBuilderContextFixture,
 } from '../../lib/fixtures/character-builder-fixtures'
-import { abilitiesFormCopy } from '../../lib/steps/abilities-form-labels'
 import { resetCharacterBuilderStoreCache } from '../../store/character-builder-store'
 import { CharacterBuilderShell } from './character-builder-shell'
 
 async function assignStrengthScore(score: number) {
   await userEvent.click(
     screen.getByRole('button', {
-      name: new RegExp(`${abilitiesFormCopy.chooseScore} for Strength`, 'i'),
+      name: /Choose Strength score/i,
     }),
   )
-  await userEvent.click(screen.getByRole('menuitem', { name: String(score) }))
+  await userEvent.click(screen.getByRole('radio', { name: String(score) }))
 }
 
 function installSessionStorageMock(): void {

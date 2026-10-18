@@ -1,6 +1,7 @@
 import type { EquipmentInstance } from '@rpg/contracts'
 import { splitEquipmentEntry } from '@rpg/contracts'
 
+import { stripMagicPropertiesOnDone } from './equipment-instance-editor.lib'
 import type { EquipmentEditorSession } from './equipment-editor-types'
 
 function entriesEqual(a: EquipmentInstance, b: EquipmentInstance): boolean {
@@ -22,7 +23,7 @@ export function commitEquipmentEditorSession<T extends EquipmentInstance & { ent
   const source = entries[sourceIndex]!
   if (entriesEqual(source, session.draft)) return [...entries]
 
-  let draft = { ...session.draft }
+  let draft = stripMagicPropertiesOnDone({ ...session.draft })
   if (session.scope === 'one') {
     draft = { ...draft, quantity: 1 }
     if (entriesEqual(source, draft)) return [...entries]

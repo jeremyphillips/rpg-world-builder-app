@@ -1,6 +1,5 @@
 import type { ContentCardDensity } from '@rpg/ui'
 
-import { ENTITY_CONTENT_OFFSET_VAR } from './entity-geometry.tokens'
 import {
   ENTITY_UTILITY_SIZE_VALUE,
   resolveEntityLeadingGeometry,
@@ -45,7 +44,7 @@ export function buildEntityLeadingOffsetValue(utilityCount: number): string {
 
 /** @deprecated Geometry is published via `dash-entity-surface` on EntityCardFrame. */
 export function buildEntityLeadingOffsetStyle(
-  utilityCount: number,
+  _utilityCount: number,
   _density: ContentCardDensity = 'compact',
 ): Record<string, never> {
   return {}

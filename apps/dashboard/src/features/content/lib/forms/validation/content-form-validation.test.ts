@@ -107,6 +107,7 @@ const CLASS_SCHEMA_EXEMPT = [
   /^spellSelectionModel$/,
   /^spellSelectionChangePackage$/,
   /^spellbookAcquisition/,
+  /^weaponProficiencyReconciliationPending$/,
 ] as const
 
 const COMMON_SCHEMA_EXEMPT = [
@@ -367,7 +368,7 @@ function invalidValueFor(routeKey: string): unknown {
           savingThrows: [],
           skills: [],
           languages: [],
-          weapons: [],
+          weapons: { categories: [], items: [] },
         },
         defenses: {
           vulnerabilities: [],

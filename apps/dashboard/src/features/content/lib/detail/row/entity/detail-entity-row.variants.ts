@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-import { cn, iconGhostControlVariants } from '@rpg/ui'
+import { iconGhostControlVariants } from '@rpg/ui'
 
 import {
   DASH_ENTITY_SURFACE_DISCLOSURE_CONTENT_CLASS,

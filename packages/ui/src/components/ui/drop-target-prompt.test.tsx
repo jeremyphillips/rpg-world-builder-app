@@ -56,8 +56,8 @@ describe('DropTargetPrompt', () => {
     rerender(<DropTargetPrompt {...inlineIdleProps} state="active" />)
 
     expect(surface.getBoundingClientRect().height).toBe(idleHeight)
-    expect(surface.querySelector('p.text-sm.text-muted-foreground')).toHaveClass('invisible')
-    expect(surface.querySelector('p.text-xs.text-muted-foreground')).toHaveClass('invisible')
+    expect(surface.querySelector('p.text-style-supporting')).toHaveClass('invisible')
+    expect(surface.querySelector('p.text-style-caption')).toHaveClass('invisible')
     expect(surface.querySelector('button')).toHaveClass('invisible')
   })
 

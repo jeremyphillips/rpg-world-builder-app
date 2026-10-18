@@ -138,7 +138,7 @@ describe('ContentOverviewTable interactions', () => {
 
     const callsAfterMount = persistPreferencesMock.mock.calls.length
 
-    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
+    await user.click(screen.getByRole('button', { name: /additional filters/i }))
 
     expect(persistPreferencesMock.mock.calls.length - callsAfterMount).toBeLessThanOrEqual(1)
   })
@@ -172,9 +172,9 @@ describe('ContentOverviewTable interactions', () => {
 
     const callsAfterMount = persistPreferencesMock.mock.calls.length
 
-    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
-    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
-    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
+    await user.click(screen.getByRole('button', { name: /additional filters/i }))
+    await user.click(screen.getByRole('button', { name: /additional filters/i }))
+    await user.click(screen.getByRole('button', { name: /additional filters/i }))
 
     expect(persistPreferencesMock.mock.calls.length - callsAfterMount).toBeLessThanOrEqual(3)
   })
@@ -207,9 +207,9 @@ describe('ContentOverviewTable interactions', () => {
 
     const rendersAfterMount = dataTableRenderCount
 
-    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
-    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
-    await user.click(screen.getByRole('button', { name: /Show more filters|Hide more filters/ }))
+    await user.click(screen.getByRole('button', { name: /additional filters/i }))
+    await user.click(screen.getByRole('button', { name: /additional filters/i }))
+    await user.click(screen.getByRole('button', { name: /additional filters/i }))
 
     expect(dataTableRenderCount - rendersAfterMount).toBe(0)
   })
