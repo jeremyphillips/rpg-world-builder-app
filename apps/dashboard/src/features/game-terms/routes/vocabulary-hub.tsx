@@ -1,6 +1,5 @@
-import { useParams } from 'react-router-dom'
-import { Card, InlineMetadata, Text } from '@rpg/ui'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import { DestinationList, DestinationRow, InlineMetadata, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
@@ -53,7 +52,7 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
         isError={isError}
         defaultErrorLabel="Could not load game terms."
       >
-        <ul className="flex flex-col gap-2">
+        <DestinationList density="compact">
           {[...GAME_TERMS_VOCABULARY_CATEGORIES]
             .sort((left, right) => left.label.localeCompare(right.label))
             .map((category) => {
@@ -64,28 +63,22 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
               }
 
               return (
-                <li key={category.setId}>
-                  <Card
-                    link={<Link to={ROUTES.gameTerms.overview(campaignId, category.setId)} />}
-                    density="compact"
-                    tone="quiet"
-                    header={{
-                      title: category.label,
-                      description: category.description,
-                    }}
-                  >
-                    <Text variant="muted" className="text-xs">
-                      <InlineMetadata role="supporting" density="compact">
-                        {metadataParts.map((part) => (
-                          <InlineMetadata.Item key={part}>{part}</InlineMetadata.Item>
-                        ))}
-                      </InlineMetadata>
-                    </Text>
-                  </Card>
-                </li>
+                <DestinationRow
+                  key={category.setId}
+                  link={<Link to={ROUTES.gameTerms.overview(campaignId, category.setId)} />}
+                  title={category.label}
+                  description={category.description}
+                  metadata={
+                    <InlineMetadata role="supporting" density="compact">
+                      {metadataParts.map((part) => (
+                        <InlineMetadata.Item key={part}>{part}</InlineMetadata.Item>
+                      ))}
+                    </InlineMetadata>
+                  }
+                />
               )
             })}
-        </ul>
+        </DestinationList>
       </PageLoadState>
     </PageShell>
   )

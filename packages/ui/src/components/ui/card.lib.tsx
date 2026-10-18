@@ -46,12 +46,17 @@ function CardHeaderRegion({ header }: { header: CardHeaderModel }) {
   )
 }
 
-function CardNavigationChevron() {
+/** Decorative trailing chevron for navigable Card and destination rows. */
+export function NavigationChevron({ className }: { className?: string }) {
   return (
-    <span className={UI_CARD_NAV_CHEVRON_CLASS}>
-      <ChevronRight aria-hidden className="size-4 shrink-0" />
+    <span className={cn(UI_CARD_NAV_CHEVRON_CLASS, className)} aria-hidden>
+      <ChevronRight className="size-4 shrink-0" />
     </span>
   )
+}
+
+function CardNavigationChevron() {
+  return <NavigationChevron />
 }
 
 type DeclarativeInteriorProps = {

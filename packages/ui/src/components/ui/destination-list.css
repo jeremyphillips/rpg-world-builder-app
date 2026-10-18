@@ -1,0 +1,88 @@
+/*
+ * Grouped destination hub list — panel chrome, list-owned inset dividers, density vars.
+ */
+@layer components {
+  .ui-destination-list {
+    margin: 0;
+    list-style: none;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background-color: transparent;
+    padding: 0;
+    --ui-destination-inset-inline: calc(var(--spacing) * 5);
+    --ui-destination-inset-block: calc(var(--spacing) * 2);
+    --ui-destination-title-size: var(--text-base);
+    --ui-destination-title-line-height: var(--text-base--line-height);
+    --ui-destination-title-weight: var(--font-weight-heading);
+    --ui-destination-description-size: var(--text-sm);
+    --ui-destination-description-line-height: var(--text-sm--line-height);
+    --ui-destination-metadata-size: var(--text-xs);
+    --ui-destination-metadata-line-height: var(--text-xs--line-height);
+  }
+
+  .ui-destination-list--compact {
+    --ui-destination-inset-inline: calc(var(--spacing) * 4);
+    --ui-destination-inset-block: calc(var(--spacing) * 2);
+    --ui-destination-title-size: var(--text-sm);
+    --ui-destination-title-line-height: var(--text-sm--line-height);
+    --ui-destination-title-weight: var(--font-weight-body-emphasis);
+    --ui-destination-description-size: var(--text-xs);
+    --ui-destination-description-line-height: var(--text-xs--line-height);
+  }
+
+  .ui-destination-item {
+    position: relative;
+  }
+
+  .ui-destination-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: var(--ui-destination-inset-inline);
+    right: var(--ui-destination-inset-inline);
+    border-bottom: 1px solid var(--border-faint);
+    pointer-events: none;
+  }
+
+  .ui-destination-row {
+    padding-inline: var(--ui-destination-inset-inline);
+    padding-block: var(--ui-destination-inset-block);
+  }
+
+  .ui-destination-row__main {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 0%;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 0.5);
+    text-align: left;
+  }
+
+  .ui-destination-row__title {
+    font-size: var(--ui-destination-title-size);
+    line-height: var(--ui-destination-title-line-height);
+    font-weight: var(--ui-destination-title-weight);
+    color: var(--foreground);
+  }
+
+  .ui-destination-row__description {
+    font-size: var(--ui-destination-description-size);
+    line-height: var(--ui-destination-description-line-height);
+    color: var(--muted-foreground);
+  }
+
+  .ui-destination-row__metadata {
+    font-size: var(--ui-destination-metadata-size);
+    line-height: var(--ui-destination-metadata-line-height);
+    color: var(--muted-foreground);
+  }
+
+  .ui-destination-row__chevron {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    align-self: center;
+    color: var(--muted-foreground);
+  }
+}

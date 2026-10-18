@@ -307,6 +307,13 @@ export {
   type StaticCardProps,
 } from './components/ui/card'
 export {
+  DestinationList,
+  DestinationRow,
+  type DestinationListDensity,
+  type DestinationListProps,
+  type DestinationRowProps,
+} from './components/ui/destination-list'
+export {
   CARD_CLASS_SPECS,
   CARD_DENSITIES,
   CARD_INSET_DENSITIES,
