@@ -8,7 +8,6 @@ import {
   resolveRadioCardIndicatorSize,
 } from './choice-control.variants'
 import {
-  optionCardDensityBodyLayoutVariants,
   optionCardDensityContentGapVariants,
   optionCardSummaryBadgeRowVariants,
 } from './selection-option-card.variants'
@@ -52,18 +51,12 @@ export const radioCardVariants = cva('', {
     {
       variant: 'card',
       density: 'default',
-      class: cn(
-        optionCardDensityContentGapVariants({ density: 'default' }),
-        optionCardDensityBodyLayoutVariants({ density: 'default' }),
-      ),
+      class: optionCardDensityContentGapVariants({ density: 'default' }),
     },
     {
       variant: 'card',
       density: 'compact',
-      class: cn(
-        optionCardDensityContentGapVariants({ density: 'compact' }),
-        optionCardDensityBodyLayoutVariants({ density: 'compact' }),
-      ),
+      class: optionCardDensityContentGapVariants({ density: 'compact' }),
     },
     { variant: 'row', density: 'default', class: 'gap-1 px-0 py-2' },
     { variant: 'row', density: 'compact', class: 'gap-0.5 px-0 py-2' },

@@ -33,9 +33,8 @@ describe('optionCard surface establishment', () => {
   })
 
   it('uses compact option padding with control and density-owned typography', () => {
-    expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('py-2')
-    expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('pl-3')
-    expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('pr-4')
+    expect(radioCardVariants({ variant: 'card', density: 'compact' })).not.toContain('pl-3')
+    expect(radioCardVariants({ variant: 'card', density: 'compact' })).not.toContain('px-4')
     expect(optionCardTitleVariants({ density: 'compact' })).toContain('text-sm')
     expect(optionCardSummaryTitleVariants({ density: 'compact' })).toContain('text-sm')
     expect(optionCardSummaryTitleVariants({ density: 'default' })).toContain('text-base')

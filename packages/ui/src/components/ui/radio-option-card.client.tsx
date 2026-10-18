@@ -6,7 +6,11 @@ import { Info } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Badge } from './badge'
 import { Button } from './button.client'
-import { cardSurfaceVariants, type CardSurfaceTone } from './card.variants'
+import {
+  cardSurfaceVariants,
+  resolveOptionCardSurfaceDensity,
+  type CardSurfaceTone,
+} from './card.variants'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
 import { DisclosureChevronTrigger } from './disclosure-chevron-trigger.client'
 import {
@@ -32,7 +36,6 @@ import {
   SelectionTargetRaised,
 } from './selection-target.client'
 import {
-  optionCardDensityBodyLayoutVariants,
   optionCardDensityContentGapVariants,
   optionCardEmbeddedSlotVariants,
   optionCardFooterSlotVariants,
@@ -182,6 +185,7 @@ function resolveRadioOptionCardShellClassName({
   return cn(
     cardSurfaceVariants({
       tone,
+      density: resolveOptionCardSurfaceDensity(density),
       interactive: !disabled,
       selected,
       disabled,
@@ -358,7 +362,6 @@ function RadioOptionCardInterior(props: RadioOptionCardInteriorProps) {
       <div
         className={cn(
           'ui-radio-card__body',
-          optionCardDensityBodyLayoutVariants({ density }),
           optionCardDensityContentGapVariants({ density }),
           showCardMedia && 'flex min-h-0 flex-1 flex-col',
         )}

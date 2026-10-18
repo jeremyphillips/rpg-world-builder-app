@@ -85,11 +85,11 @@ describe('RadioCard', () => {
       />,
     )
 
-    const body = screen
-      .getByRole('radio', { name: /Owner/i })
-      .closest('.ui-card')
-      ?.querySelector('.ui-radio-card__body')
-    expect(body).toHaveClass('pl-3', 'pr-4', 'py-2')
+    const shell = screen.getByRole('radio', { name: /Owner/i }).closest('.ui-card')
+    const body = shell?.querySelector('.ui-radio-card__body')
+    expect(shell).toHaveClass('ui-card--compact')
+    expect(body).toHaveClass('ui-radio-card__body')
+    expect(body).not.toHaveClass('pl-3', 'px-4', 'py-2')
   })
 
   it('selects an option on click', async () => {

@@ -520,6 +520,14 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
     filePath: cardCssPath,
     dimensions: [
       {
+        modifierPrefix: 'ui-card--compact',
+        requiredProperties: ['--ui-card-inset-block', '--ui-card-inset-inline'],
+      },
+      {
+        modifierPrefix: 'ui-card--comfortable',
+        requiredProperties: ['--ui-card-inset-block', '--ui-card-inset-inline'],
+      },
+      {
         modifierPrefix: 'ui-card--static',
         requiredProperties: ['transition-property'],
       },

@@ -63,14 +63,6 @@ describe('entity card surface contract', () => {
       classPrefix: 'dash',
       dimensions: [
         {
-          modifierPrefix: 'dash-entity-card--compact',
-          requiredProperties: ['--entity-surface-block-inset'],
-        },
-        {
-          modifierPrefix: 'dash-entity-card--comfortable',
-          requiredProperties: ['--entity-surface-block-inset'],
-        },
-        {
           modifierPrefix: 'dash-entity-card__content',
           requiredProperties: ['padding-inline-start', 'padding-inline-end', 'padding-block'],
         },

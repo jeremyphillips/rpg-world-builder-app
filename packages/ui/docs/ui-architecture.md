@@ -28,7 +28,7 @@ The rule prohibits duplicated styling ownership. It does not require identical c
 
 Styling primitives must be exportable. Every owner whose styling may be reused without its component exposes its semantic classes through a function, the same way `buttonVariants()` styles a Next `<Link>` without rendering `Button`. Card exports `cardSurfaceVariants({ … })`, which returns `ui-card ui-card--…`.
 
-`EntityCardFrame` already reuses ContentCard's inset recipe (`contentCardDensityInsetVariants`; see [semantic-style-layers.md](./semantic-style-layers.md)) without rendering ContentCard.
+`EntityCardFrame` shares the card density ladder (`--ui-card-inset-*` via `ui-card--compact|comfortable` on the frame) with generic `Card`, `ContentCard`, and option cards — without rendering `ContentCard`.
 
 Avoid wrappers that exist only to satisfy reuse. A feature that would need awkward wrapper elements or escape-hatch props to fit a shared component should use the styling primitive instead.
 

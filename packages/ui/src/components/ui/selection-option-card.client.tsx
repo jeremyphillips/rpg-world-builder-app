@@ -11,7 +11,7 @@ import {
   type SelectionOptionCardDensity,
 } from './selection-option-card-anatomy.client'
 import type { EyebrowVariantProps } from './eyebrow.variants'
-import { cardSurfaceVariants } from './card.variants'
+import { cardSurfaceVariants, resolveOptionCardSurfaceDensity } from './card.variants'
 import {
   optionCardEmbeddedSlotVariants,
   selectionOptionCardBodyVariants,
@@ -155,7 +155,15 @@ export function SelectionOptionCard({
 
   return (
     <Comp
-      className={cn(cardSurfaceVariants({ tone: 'strong', selected, disabled }), className)}
+      className={cn(
+        cardSurfaceVariants({
+          tone: 'strong',
+          density: resolveOptionCardSurfaceDensity(density),
+          selected,
+          disabled,
+        }),
+        className,
+      )}
       aria-disabled={disabled || undefined}
     >
       <div className={selectionOptionCardBodyVariants()}>

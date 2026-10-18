@@ -41,9 +41,24 @@
     flex-direction: column;
   }
 
+  .ui-radio-card:not(.ui-radio-card--row) .ui-radio-card__body {
+    padding-block: var(--ui-card-inset-block);
+    padding-inline: var(--ui-card-inset-inline);
+  }
+
+  .ui-radio-card--compact:not(.ui-radio-card--row) .ui-radio-card__body {
+    padding-inline-start: calc(var(--ui-card-inset-inline) - var(--spacing) * 1);
+    padding-inline-end: var(--ui-card-inset-inline);
+  }
+
+  .ui-selection-option-card__body {
+    padding-block: var(--ui-card-inset-block);
+    padding-inline: var(--ui-card-inset-inline);
+  }
+
   .ui-radio-card__details {
-    padding-inline: calc(var(--spacing) * 4);
-    padding-block-end: calc(var(--spacing) * 3);
+    padding-inline: var(--ui-card-inset-inline);
+    padding-block-end: var(--ui-card-inset-block);
   }
 
   .ui-radio-card__embedded,

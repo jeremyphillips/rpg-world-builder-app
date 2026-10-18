@@ -1,15 +1,20 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import {
+  cardDensityClassName,
+  UI_CONTENT_CARD_INSET_CLASS,
+  type CardDensity,
+} from './card.variants'
 import { resolveCompactControlRecipeClasses } from './compact-control.styles'
 import { iconGhostControlVariants } from './icon-ghost-control.variants'
 
-/** Entity-owned density inset — shared by standalone and embedded chrome. */
+/** @deprecated Prefer {@link cardDensityClassName} + {@link UI_CONTENT_CARD_INSET_CLASS}. */
 export const contentCardDensityInsetVariants = cva('', {
   variants: {
     density: {
-      compact: 'px-3 py-2',
-      comfortable: 'px-5 py-3',
+      compact: cn(cardDensityClassName('compact'), UI_CONTENT_CARD_INSET_CLASS),
+      comfortable: cn(cardDensityClassName('comfortable'), UI_CONTENT_CARD_INSET_CLASS),
     },
   },
   defaultVariants: {
@@ -19,17 +24,12 @@ export const contentCardDensityInsetVariants = cva('', {
 
 export const contentCardRootVariants = cva('w-full min-w-0 rounded-md', {
   variants: {
-    density: {
-      compact: 'px-3 py-2',
-      comfortable: 'px-5 py-3',
-    },
     chrome: {
       standalone: 'border border-border',
       embedded: '',
     },
   },
   defaultVariants: {
-    density: 'comfortable',
     chrome: 'standalone',
   },
 })
@@ -194,13 +194,11 @@ export const contentCardMediaVariants = cva('shrink-0', {
   },
 })
 
-export type ContentCardDensity = NonNullable<
-  VariantProps<typeof contentCardRootVariants>['density']
->
+export type ContentCardDensity = CardDensity
 export type ContentCardChrome = NonNullable<VariantProps<typeof contentCardRootVariants>['chrome']>
 
 export function resolveContentCardDensityInsetClasses(density: ContentCardDensity): string {
-  return contentCardDensityInsetVariants({ density })
+  return cn(cardDensityClassName(density), UI_CONTENT_CARD_INSET_CLASS)
 }
 
 /** @deprecated Use {@link ContentCardChrome} — `outline` maps to `standalone`, `ghost` to `embedded`. */

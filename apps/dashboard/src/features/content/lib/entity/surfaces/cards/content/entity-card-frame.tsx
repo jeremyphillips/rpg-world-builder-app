@@ -33,7 +33,7 @@ export function EntityCardFrame({
   return (
     <article
       className={cn(
-        cardSurfaceVariants({ tone: 'quiet', interactive, selected, disabled }),
+        cardSurfaceVariants({ tone: 'quiet', density, interactive, selected, disabled }),
         entityCardFrameVariants({ density, edges, leadingUtilityCount }),
       )}
       data-content-density={density}

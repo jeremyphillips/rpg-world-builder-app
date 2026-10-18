@@ -2,8 +2,10 @@
 
 import { cn } from '../../lib/utils'
 import { ContentCardBody, type ContentCardBodyProps } from './content-card-body.client'
+import { cardDensityClassName } from './card.variants'
 import {
   contentCardRootVariants,
+  resolveContentCardDensityInsetClasses,
   type ContentCardChrome,
   type ContentCardDensity,
   type ContentCardSurface,
@@ -50,7 +52,9 @@ export function ContentCard({
   return (
     <article
       className={cn(
-        contentCardRootVariants({ density, chrome: resolvedChrome }),
+        cardDensityClassName(density),
+        resolveContentCardDensityInsetClasses(density),
+        contentCardRootVariants({ chrome: resolvedChrome }),
         filledSurface,
         className,
       )}

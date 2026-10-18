@@ -304,10 +304,17 @@ export {
 } from './components/ui/card'
 export {
   CARD_CLASS_SPECS,
+  CARD_DENSITIES,
   CARD_SURFACE_TONES,
+  cardDensityClassName,
   cardSurfaceClasses,
   cardSurfaceVariants,
+  resolveOptionCardSurfaceDensity,
+  UI_CONTENT_CARD_INSET_CLASS,
+  UI_CARD_DENSITY_COMPACT_CLASS,
+  UI_CARD_DENSITY_COMFORTABLE_CLASS,
   type CardClassSpec,
+  type CardDensity,
   type CardSurfaceTone,
   type CardSurfaceVariantProps,
 } from './components/ui/card.variants'

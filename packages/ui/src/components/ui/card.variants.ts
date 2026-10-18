@@ -15,9 +15,28 @@ export const UI_CARD_HEADER_CLASS = 'ui-card__header' as const
 export const UI_CARD_CONTENT_CLASS = 'ui-card__content' as const
 export const UI_CARD_FOOTER_CLASS = 'ui-card__footer' as const
 
+export const CARD_DENSITIES = ['compact', 'comfortable'] as const
+export type CardDensity = (typeof CARD_DENSITIES)[number]
+
+export const UI_CARD_DENSITY_COMPACT_CLASS = 'ui-card--compact' as const
+export const UI_CARD_DENSITY_COMFORTABLE_CLASS = 'ui-card--comfortable' as const
+
+export const UI_CONTENT_CARD_INSET_CLASS = 'ui-content-card-inset' as const
+
+/** Maps option-card `default` density to the shared comfortable ladder step. */
+export function resolveOptionCardSurfaceDensity(density: 'default' | 'compact'): CardDensity {
+  return density === 'compact' ? 'compact' : 'comfortable'
+}
+
+export function cardDensityClassName(density: CardDensity = 'comfortable'): string {
+  return density === 'compact' ? UI_CARD_DENSITY_COMPACT_CLASS : UI_CARD_DENSITY_COMFORTABLE_CLASS
+}
+
 export type CardSurfaceVariantProps = {
   /** Omitted: generic Card look (information / navigation). */
   tone?: CardSurfaceTone
+  /** Baseline content inset ladder — independent of tone. */
+  density?: CardDensity
   /** Enables the CSS :hover ladder. Static cards never get hover. */
   interactive?: boolean
   /** Supplied by the interaction owner (radio group value), never by consumers. */
@@ -28,12 +47,14 @@ export type CardSurfaceVariantProps = {
 /** Styling primitive for card chrome without rendering `Card`. */
 export function cardSurfaceVariants({
   tone,
+  density = 'comfortable',
   interactive = false,
   selected = false,
   disabled = false,
 }: CardSurfaceVariantProps = {}): string {
   return cn(
     UI_CARD_CLASS,
+    cardDensityClassName(density),
     tone && `ui-card--${tone}`,
     interactive ? 'ui-card--interactive' : 'ui-card--static',
     selected && tone && 'ui-card--selected',

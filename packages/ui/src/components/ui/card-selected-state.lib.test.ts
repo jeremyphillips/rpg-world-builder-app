@@ -22,6 +22,9 @@ describe('ui-card toned ladders', () => {
     expect(source).toContain('&.ui-card--quiet')
     expect(source).toContain('&.ui-card--strong')
     expect(source).toContain('.ui-card-tone-host--inherit')
+    expect(source).toContain('.ui-card--compact')
+    expect(source).toContain('--ui-card-inset-block')
+    expect(source).toContain('--ui-card-inset-inline')
     expect(source).not.toMatch(/&--/)
     expect(source).not.toMatch(/&__/)
     expect(source).toMatch(

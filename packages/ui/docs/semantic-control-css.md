@@ -56,13 +56,13 @@ For each migrated primitive, verify in Storybook DevTools:
 
 ## Card, inset panel, and empty panel
 
-`ui-card` owns radius, border, fill, shadow, and `--surface-current`. `--quiet` and `--strong` override that chrome; `--selected` requires a tone. Parts are `__header`, `__content`, and `__footer`. `cardSurfaceVariants()` is the styling primitive. Nest with the full class after `&` (`&.ui-card--quiet`). The short form `&--quiet` is rewritten into an invalid selector by the CSS optimizer.
+`ui-card` owns radius, border, fill, shadow, and `--surface-current`. `--quiet` and `--strong` override that chrome; `--selected` requires a tone. `--compact` and `--comfortable` publish shared baseline inset (`--ui-card-inset-block`, `--ui-card-inset-inline`); tone does not change density. Parts are `__header`, `__content`, and `__footer` (generic cards). `cardSurfaceVariants()` is the styling primitive. Nest with the full class after `&` (`&.ui-card--quiet`). The short form `&--quiet` is rewritten into an invalid selector by the CSS optimizer.
 
 `ui-radio-card` splits density (`--default`, `--compact`), layout (`--media`, `--row`), and elements `__details`, `__embedded`, and `__footer` from the shared card resolver.
 
 `ui-selection-target` exposes `__control` (stretched hit area) and `__raised` (trailing controls above the hit area).
 
-`dash-entity-card` (dashboard `index.css`) publishes block inset on `--compact` / `--comfortable` and elements `__content`, `__details`, and `__body`. `dash-entity-surface` on the same article publishes density, edge (`--start-*`, `--end-*`), and leading-count (`--leading-0|1|2`) custom properties — no inline `style`. Entity frames compose `cardSurfaceVariants({ tone: quiet, … })`. Drawer radio cards pass `tone="quiet"`. Host-plane quiet fill uses `.ui-card-tone-host--inherit` on sheet content and create-composition hosts.
+`dash-entity-card` (dashboard `index.css`) elements `__content`, `__details`, and `__body` consume the shared card inset vars; asymmetric rails come from `dash-entity-surface` edge tokens. `dash-entity-surface` on the same article publishes density, edge (`--start-*`, `--end-*`), and leading-count (`--leading-0|1|2`) custom properties — no inline `style`. Entity frames compose `cardSurfaceVariants({ tone: quiet, density, … })`. Option-card bodies (`ui-radio-card__body`, `ui-selection-option-card__body`) consume the same vars; compact card variants may apply structural control-column offsets. Host-plane quiet fill uses `.ui-card-tone-host--inherit` on sheet content and create-composition hosts.
 
 `ui-row-anatomy` owns row tracks and `__cell--{slot}` / `__cell--{column}` placement. `dash-entity-anatomy` and `dash-entity-leading` (dashboard) own entity column gaps and leading-rail columns. `ui-collapsible-list-item--entity-card` resets CLI chrome for DEC / catalog rows. `ui-identity-row__*` size modifiers own identity type scale (`__title`, `__classification`, `__supporting`).
 

@@ -5,8 +5,16 @@ import { cardSurfaceClasses, cardSurfaceVariants } from './card.variants'
 describe('cardSurfaceVariants', () => {
   it('emits the card block for the default surface', () => {
     expect(cardSurfaceClasses).toContain('ui-card')
+    expect(cardSurfaceClasses).toContain('ui-card--comfortable')
     expect(cardSurfaceClasses).toContain('ui-card--static')
     expect(cardSurfaceClasses).not.toContain('ui-card--interactive')
+  })
+
+  it('emits density modifiers independent of tone', () => {
+    expect(cardSurfaceVariants({ density: 'compact', tone: 'strong' })).toContain(
+      'ui-card--compact',
+    )
+    expect(cardSurfaceVariants({ density: 'compact', tone: 'quiet' })).toContain('ui-card--compact')
   })
 
   it('emits an interactive modifier for navigation cards', () => {

@@ -179,8 +179,10 @@ export const selectionOptionCardShellVariants = cva(
   },
 )
 
+export const UI_SELECTION_OPTION_CARD_BODY_CLASS = 'ui-selection-option-card__body' as const
+
 export const selectionOptionCardBodyVariants = cva(
-  cn(optionCardCompactSummaryBodyLayoutClasses, optionCardCompactSummaryContentGapClasses),
+  cn(UI_SELECTION_OPTION_CARD_BODY_CLASS, optionCardCompactSummaryContentGapClasses),
   {
     variants: {
       density: {
@@ -285,7 +287,7 @@ export const optionCardEmbeddedSlotVariants = cva('', {
     {
       tone: 'panel',
       density: 'default',
-      class: '-mx-4 -mb-3 mt-4 rounded-b-card pb-3 pt-4',
+      class: '-mx-5 -mb-3 mt-4 rounded-b-card pb-3 pt-4',
     },
     {
       tone: 'panel',

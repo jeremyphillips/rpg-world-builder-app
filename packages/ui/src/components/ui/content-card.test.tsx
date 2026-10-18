@@ -80,11 +80,22 @@ describe('ContentCard', () => {
   it('applies the same density inset for standalone and embedded chrome', () => {
     const density = 'compact' as const
     const inset = resolveContentCardDensityInsetClasses(density)
-    const standalone = contentCardRootVariants({ density, chrome: 'standalone' })
-    const embedded = contentCardRootVariants({ density, chrome: 'embedded' })
+    const standalone = contentCardRootVariants({ chrome: 'standalone' })
+    const embedded = contentCardRootVariants({ chrome: 'embedded' })
 
-    expect(standalone).toContain(inset)
-    expect(embedded).toContain(inset)
+    const { container: standaloneContainer } = render(
+      <ContentCard density={density} chrome="standalone" heading="Harbor District" />,
+    )
+    const { container: embeddedContainer } = render(
+      <ContentCard density={density} chrome="embedded" heading="Harbor District" />,
+    )
+
+    for (const article of [
+      standaloneContainer.querySelector('article'),
+      embeddedContainer.querySelector('article'),
+    ]) {
+      expect(article).toHaveClass('ui-card--compact', 'ui-content-card-inset')
+    }
     expect(standalone).toContain('border')
     expect(embedded).not.toContain('border')
   })

@@ -17,7 +17,7 @@ describe('dash-entity-card content', () => {
     const css = readFileSync(cssPath, 'utf8')
     expect(css).toContain('.dash-entity-card__content')
     expect(css).toContain('width: 100%')
-    expect(css).toContain('padding-block: var(--entity-surface-block-inset)')
+    expect(css).toContain('padding-block: var(--ui-card-inset-block)')
     expect(css).toContain('.dash-entity-card__body')
   })
 })

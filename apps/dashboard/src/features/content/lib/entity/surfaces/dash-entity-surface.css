@@ -6,13 +6,13 @@
   }
 
   .dash-entity-surface--compact {
-    --entity-surface-inset: calc(var(--spacing) * 4);
+    --entity-surface-inset: var(--ui-card-inset-inline);
     --entity-surface-utility-inset: calc(var(--spacing) * 1);
     --entity-leading-content-gap: calc(var(--spacing) * 2);
   }
 
   .dash-entity-surface--comfortable {
-    --entity-surface-inset: calc(var(--spacing) * 5);
+    --entity-surface-inset: var(--ui-card-inset-inline);
     --entity-surface-utility-inset: calc(var(--spacing) * 2);
     --entity-leading-content-gap: calc(var(--spacing) * 3);
   }
