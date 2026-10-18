@@ -528,6 +528,15 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
         requiredProperties: ['--ui-card-inset-block', '--ui-card-inset-inline'],
       },
       {
+        modifierPrefix: 'ui-card--spacious',
+        requiredProperties: [
+          '--ui-card-inset-block',
+          '--ui-card-inset-inline',
+          '--ui-card-title-size',
+          '--ui-card-description-size',
+        ],
+      },
+      {
         modifierPrefix: 'ui-card--static',
         requiredProperties: ['transition-property'],
       },

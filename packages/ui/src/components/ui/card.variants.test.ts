@@ -15,6 +15,7 @@ describe('cardSurfaceVariants', () => {
       'ui-card--compact',
     )
     expect(cardSurfaceVariants({ density: 'compact', tone: 'quiet' })).toContain('ui-card--compact')
+    expect(cardSurfaceVariants({ density: 'spacious' })).toContain('ui-card--spacious')
   })
 
   it('emits an interactive modifier for navigation cards', () => {

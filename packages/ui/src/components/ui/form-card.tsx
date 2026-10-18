@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { Card, CardDescription, CardHeader, CardTitle } from './card'
+import { Card } from './card'
 
 import { UI_CARD_CONTENT_CLASS } from './card.variants'
 
@@ -27,11 +27,7 @@ interface FormCardProps {
  */
 export function FormCard({ title, description, children, className }: FormCardProps) {
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
+    <Card className={className} header={{ title, description }}>
       {children}
     </Card>
   )

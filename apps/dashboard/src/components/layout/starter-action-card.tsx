@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@rpg/ui'
+import { Card } from '@rpg/ui'
 
 export type StarterActionCardProps = {
   title: string
@@ -9,13 +9,5 @@ export type StarterActionCardProps = {
 
 /** Lightweight starter card for dashboard entry-point actions. */
 export function StarterActionCard({ title, description, actions }: StarterActionCardProps) {
-  return (
-    <Card className="flex h-full flex-col">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardFooter className="mt-auto flex flex-wrap gap-2">{actions}</CardFooter>
-    </Card>
-  )
+  return <Card stretch header={{ title, description }} footer={actions} />
 }

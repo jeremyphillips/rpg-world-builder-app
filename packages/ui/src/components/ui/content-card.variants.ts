@@ -1,11 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import {
-  cardDensityClassName,
-  UI_CONTENT_CARD_INSET_CLASS,
-  type CardDensity,
-} from './card.variants'
+import { cardDensityClassName, UI_CONTENT_CARD_INSET_CLASS } from './card.variants'
 import { resolveCompactControlRecipeClasses } from './compact-control.styles'
 import { iconGhostControlVariants } from './icon-ghost-control.variants'
 
@@ -194,7 +190,8 @@ export const contentCardMediaVariants = cva('shrink-0', {
   },
 })
 
-export type ContentCardDensity = CardDensity
+export const CONTENT_CARD_DENSITIES = ['compact', 'comfortable'] as const
+export type ContentCardDensity = (typeof CONTENT_CARD_DENSITIES)[number]
 export type ContentCardChrome = NonNullable<VariantProps<typeof contentCardRootVariants>['chrome']>
 
 export function resolveContentCardDensityInsetClasses(density: ContentCardDensity): string {

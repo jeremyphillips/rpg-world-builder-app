@@ -27,6 +27,9 @@ describe('ui-card toned ladders', () => {
     expect(source).toContain('--ui-card-inset-inline')
     expect(source).not.toMatch(/&--/)
     expect(source).not.toMatch(/&__/)
+    expect(source).toContain('.ui-card .ui-card__header')
+    expect(source).toContain('.ui-card .ui-card__content')
+    expect(source).toContain('.ui-card .ui-card__footer')
     expect(source).toMatch(
       /\.ui-card \{[\s\S]*border:\s*1px solid var\(--card-border\)[\s\S]*background-color:\s*var\(--card\)/,
     )

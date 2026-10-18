@@ -5,15 +5,35 @@
  * modifier dash is rewritten into a selector that matches nothing.
  */
 @layer components {
-  /* Baseline inset ladder — published on shell; content regions consume vars. */
+  /* Baseline inset + header copy ladder — published on shell; regions consume vars. */
   .ui-card--compact {
     --ui-card-inset-block: calc(var(--spacing) * 2);
     --ui-card-inset-inline: calc(var(--spacing) * 4);
+    --ui-card-title-size: var(--text-sm);
+    --ui-card-title-line-height: var(--text-sm--line-height);
+    --ui-card-title-weight: var(--font-weight-body-emphasis);
+    --ui-card-description-size: var(--text-xs);
+    --ui-card-description-line-height: var(--text-xs--line-height);
   }
 
   .ui-card--comfortable {
     --ui-card-inset-block: calc(var(--spacing) * 3);
     --ui-card-inset-inline: calc(var(--spacing) * 5);
+    --ui-card-title-size: var(--text-base);
+    --ui-card-title-line-height: var(--text-base--line-height);
+    --ui-card-title-weight: var(--font-weight-heading);
+    --ui-card-description-size: var(--text-sm);
+    --ui-card-description-line-height: var(--text-sm--line-height);
+  }
+
+  .ui-card--spacious {
+    --ui-card-inset-block: calc(var(--spacing) * 5);
+    --ui-card-inset-inline: calc(var(--spacing) * 6);
+    --ui-card-title-size: var(--text-heading-card);
+    --ui-card-title-line-height: var(--text-heading-card--line-height);
+    --ui-card-title-weight: var(--font-weight-heading);
+    --ui-card-description-size: var(--text-sm);
+    --ui-card-description-line-height: var(--text-sm--line-height);
   }
 
   .ui-card {
@@ -25,6 +45,11 @@
     --surface-current: var(--card);
     --ui-card-inset-block: calc(var(--spacing) * 3);
     --ui-card-inset-inline: calc(var(--spacing) * 5);
+    --ui-card-title-size: var(--text-base);
+    --ui-card-title-line-height: var(--text-base--line-height);
+    --ui-card-title-weight: var(--font-weight-heading);
+    --ui-card-description-size: var(--text-sm);
+    --ui-card-description-line-height: var(--text-sm--line-height);
 
     &.ui-card--static,
     &.ui-card--interactive {
@@ -118,28 +143,53 @@
           var(--ui-focus-ring-standalone);
       }
     }
+  }
 
-    &.ui-card__header {
-      display: flex;
-      flex-direction: column;
-      gap: calc(var(--spacing) * 1.5);
-      padding-block: var(--ui-card-inset-block);
-      padding-inline: var(--ui-card-inset-inline);
-    }
+  .ui-card .ui-card__header {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 1.5);
+    padding-block: var(--ui-card-inset-block);
+    padding-inline: var(--ui-card-inset-inline);
+  }
 
-    &.ui-card__content {
-      padding-block-end: var(--ui-card-inset-block);
-      padding-inline: var(--ui-card-inset-inline);
-      padding-top: 0;
-    }
+  .ui-card .ui-card__content {
+    padding-inline: var(--ui-card-inset-inline);
+    padding-block-end: var(--ui-card-inset-block);
+    padding-top: var(--ui-card-inset-block);
+  }
 
-    &.ui-card__footer {
-      display: flex;
-      align-items: center;
-      padding-block-end: var(--ui-card-inset-block);
-      padding-inline: var(--ui-card-inset-inline);
-      padding-top: 0;
-    }
+  .ui-card:has(.ui-card__header) .ui-card__content {
+    padding-top: 0;
+  }
+
+  .ui-card .ui-card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    padding-inline: var(--ui-card-inset-inline);
+    padding-block-end: var(--ui-card-inset-block);
+    padding-top: var(--ui-card-inset-block);
+  }
+
+  .ui-card:has(.ui-card__header) .ui-card__footer,
+  .ui-card:has(.ui-card__content) .ui-card__footer {
+    padding-top: 0;
+  }
+
+  .ui-card .ui-card__title {
+    margin: 0;
+    font-size: var(--ui-card-title-size);
+    line-height: var(--ui-card-title-line-height);
+    font-weight: var(--ui-card-title-weight);
+    letter-spacing: var(--tracking-heading);
+  }
+
+  .ui-card .ui-card__description {
+    font-size: var(--ui-card-description-size);
+    line-height: var(--ui-card-description-line-height);
+    color: var(--muted-foreground);
   }
 
   .ui-content-card-inset {

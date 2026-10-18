@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { buttonVariants, Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@rpg/ui'
+import { buttonVariants, Card } from '@rpg/ui'
 
 type HomebrewHubCardProps = {
   title: string
@@ -18,21 +18,21 @@ export function HomebrewHubCard({
   showCreate = false,
 }: HomebrewHubCardProps) {
   return (
-    <Card className="flex h-full flex-col">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardFooter className="mt-auto gap-2">
-        <Link to={viewHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
-          View
-        </Link>
-        {showCreate && createHref ? (
-          <Link to={createHref} className={buttonVariants({ size: 'sm' })}>
-            Create
+    <Card
+      stretch
+      header={{ title, description }}
+      footer={
+        <>
+          <Link to={viewHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+            View
           </Link>
-        ) : null}
-      </CardFooter>
-    </Card>
+          {showCreate && createHref ? (
+            <Link to={createHref} className={buttonVariants({ size: 'sm' })}>
+              Create
+            </Link>
+          ) : null}
+        </>
+      }
+    />
   )
 }
