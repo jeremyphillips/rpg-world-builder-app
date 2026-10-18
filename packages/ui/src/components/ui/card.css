@@ -58,6 +58,10 @@
       transition-duration: 150ms;
     }
 
+    &.ui-card--interactive:not(.ui-card--disabled) {
+      cursor: pointer;
+    }
+
     &.ui-card--interactive:not(.ui-card--quiet):not(.ui-card--strong):hover {
       background-color: var(--row-hover-bg);
       border-color: var(--card-border);

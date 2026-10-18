@@ -36,6 +36,15 @@ Link-specific attributes (`to`, `href`, `aria-label`, `onClick`, refs) belong on
 
 `renderNavigableLinkRoot` ([`navigable-link-root.lib.ts`](../src/components/ui/navigable-link-root.lib.ts)) clones the app link and merges row/card surface classes. Rows use embedded focus rings (`ui-focus-ring--embedded`).
 
+Row link ownership:
+
+| Layer                                          | Responsibility                                                                     |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `.ui-destination-row` (`destination-list.css`) | Stable link geometry, base text color, no underline                                |
+| `interactiveRowVariants`                       | Hover family, hit target (`ui-interactive-row--hit-pointer`), selection/state axes |
+| `interactiveFocusVariants`                     | Embedded focus-visible policy                                                      |
+| `DestinationList`                              | Panel/embedded chrome, density vars, dividers                                      |
+
 ## Relationship indicator in search rows
 
 Dashboard `CharacterRelationshipIndicator` supports `presentation="inlinePassive"` inside rich rows: icon is decorative (`aria-hidden`); screen readers get relationship copy from the link `aria-label`; pointer hover still opens the tooltip without an extra tab stop.

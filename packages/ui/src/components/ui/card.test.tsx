@@ -377,6 +377,13 @@ describe('Card navigable link', () => {
     expect(screen.getByRole('link')).toHaveClass('ui-focus-ring')
   })
 
+  it('does not duplicate cursor styling on navigable links', () => {
+    render(<Card link={<a href="/dest">Navigate</a>} header={{ title: 'Category' }} />)
+    const link = screen.getByRole('link')
+    expect(link).toHaveClass('ui-card--interactive')
+    expect(link.className).not.toContain('cursor-pointer')
+  })
+
   it('activates link on Enter when focused', async () => {
     const user = userEvent.setup()
     const onClick = vi.fn((event: { preventDefault: () => void }) => {

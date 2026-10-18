@@ -35,16 +35,20 @@ Features do not assemble `focus-visible:ring-*` stacks.
 Tailwind v4 preflight sets `button { cursor: default }`. `@rpg/ui/styles.css` restores
 `cursor: pointer` on enabled buttons in `@layer base`. Compose `interactivePointerClasses`
 (or `hitTarget: 'pointer'` on `interactiveRowVariants`) for non-button hit targets.
+Actionable `ui-card--interactive` shells (navigable `Card`, radio/entity option rows) set
+`cursor: pointer` in `card.css` when not `ui-card--disabled`.
 
-| Surface                                   | Cursor                                        |
-| ----------------------------------------- | --------------------------------------------- |
-| Buttons, icon ghosts, disclosure triggers | `pointer`                                     |
-| Text inputs / textarea                    | `text` (UA default)                           |
-| Select/combobox/dropdown triggers         | `pointer`                                     |
-| Menu / listbox options in popovers        | `pointer`                                     |
-| Drag handles                              | `grab` / `grabbing` (`dragHandleVariants`)    |
-| Disabled controls                         | `not-allowed` or `pointer-events-none`        |
-| Static rows (no activation)               | `default` (e.g. preview rail static sections) |
+| Surface                                   | Cursor                                          |
+| ----------------------------------------- | ----------------------------------------------- |
+| Buttons, icon ghosts, disclosure triggers | `pointer`                                       |
+| Navigable cards, interactive card shells  | `pointer` via `ui-card--interactive` CSS        |
+| Destination row links                     | `pointer` via `ui-interactive-row--hit-pointer` |
+| Text inputs / textarea                    | `text` (UA default)                             |
+| Select/combobox/dropdown triggers         | `pointer`                                       |
+| Menu / listbox options in popovers        | `pointer`                                       |
+| Drag handles                              | `grab` / `grabbing` (`dragHandleVariants`)      |
+| Disabled controls                         | `not-allowed` or `pointer-events-none`          |
+| Static rows (no activation)               | `default` (e.g. preview rail static sections)   |
 
 ### Ghost visual state (`ghostControlVisualStateClasses`)
 

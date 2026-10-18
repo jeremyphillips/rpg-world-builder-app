@@ -32,6 +32,13 @@ describe('destination-list.css inset divider contract', () => {
     expect(css).toContain('left: var(--ui-destination-inset-inline)')
     expect(css).toContain('right: var(--ui-destination-inset-inline)')
   })
+
+  it('declares stable row link geometry on ui-destination-row', () => {
+    const css = readFileSync(destinationListCssPath, 'utf8')
+    expect(css).toMatch(/\.ui-destination-row\s*\{[^}]*display:\s*flex/s)
+    expect(css).toContain('gap: calc(var(--spacing) * 3)')
+    expect(css).toContain('text-decoration: none')
+  })
 })
 
 describe('DestinationList + DestinationRow', () => {
@@ -98,6 +105,17 @@ describe('DestinationList + DestinationRow', () => {
     )
     expect(screen.getByRole('link')).toHaveClass('ui-focus-ring')
     expect(screen.getByRole('link')).toHaveClass('ui-focus-ring--embedded')
+  })
+
+  it('uses hit-target pointer policy without duplicate cursor utility', () => {
+    render(
+      <DestinationList>
+        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+      </DestinationList>,
+    )
+    const link = screen.getByRole('link')
+    expect(link).toHaveClass('ui-interactive-row--hit-pointer')
+    expect(link.className).not.toContain('cursor-pointer')
   })
 
   it('inherits list density class without row density prop', () => {

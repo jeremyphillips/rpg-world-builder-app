@@ -60,8 +60,15 @@
   }
 
   .ui-destination-row {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    gap: calc(var(--spacing) * 3);
     padding-inline: var(--ui-destination-inset-inline);
     padding-block: var(--ui-destination-inset-block);
+    color: var(--foreground);
+    text-decoration: none;
   }
 
   .ui-destination-row__main {

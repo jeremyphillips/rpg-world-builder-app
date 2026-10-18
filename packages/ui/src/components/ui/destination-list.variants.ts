@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { interactiveFocusVariants, interactivePointerClasses } from './interactive-focus.variants'
+import { interactiveFocusVariants } from './interactive-focus.variants'
 import { interactiveRowVariants } from './interactive-row.variants'
 
 export const DESTINATION_LIST_DENSITIES = ['compact', 'comfortable'] as const
@@ -47,13 +47,11 @@ export const destinationListVariants = cva(UI_DESTINATION_LIST_CLASS, {
 export const destinationRowLinkVariants = cva(
   cn(
     UI_DESTINATION_ROW_CLASS,
-    'flex w-full min-w-0 items-center gap-3 no-underline text-foreground',
     interactiveRowVariants({
       interaction: 'hoverable',
       hoverFamily: 'navigation',
       hitTarget: 'pointer',
     }),
     interactiveFocusVariants({ context: 'embedded' }),
-    interactivePointerClasses,
   ),
 )

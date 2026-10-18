@@ -3,7 +3,7 @@ import { ChevronRight } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { renderNavigableLinkRoot } from './navigable-link-root.lib'
-import { interactiveFocusVariants, interactivePointerClasses } from './interactive-focus.variants'
+import { interactiveFocusVariants } from './interactive-focus.variants'
 import type { CardHeaderModel, CardProps } from './card.types'
 import {
   cardSurfaceVariants,
@@ -112,11 +112,7 @@ export function resolveCardSurfaceClassName({
   return cn(
     cardSurfaceVariants({ tone, density, interactive, selected, disabled }),
     navigable &&
-      cn(
-        'block w-full min-w-0 no-underline',
-        interactiveFocusVariants({ context: 'standalone' }),
-        interactivePointerClasses,
-      ),
+      cn('block w-full min-w-0 no-underline', interactiveFocusVariants({ context: 'standalone' })),
     stretch && 'flex h-full flex-col',
     className,
   )

@@ -1,6 +1,12 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { describe, expect, it } from 'vitest'
 
 import { cardSurfaceClasses, cardSurfaceVariants } from './card.variants'
+
+const cardCssPath = join(dirname(fileURLToPath(import.meta.url)), 'card.css')
 
 describe('cardSurfaceVariants', () => {
   it('emits the card block for the default surface', () => {
@@ -26,5 +32,15 @@ describe('cardSurfaceVariants', () => {
   it('does not emit selected without a tone', () => {
     expect(cardSurfaceVariants({ selected: true })).not.toContain('ui-card--selected')
     expect(cardSurfaceVariants({ tone: 'quiet', selected: true })).toContain('ui-card--selected')
+  })
+})
+
+describe('card.css interactive cursor contract', () => {
+  it('assigns pointer cursor to actionable interactive shells excluding disabled', () => {
+    const css = readFileSync(cardCssPath, 'utf8')
+    expect(css).toContain('.ui-card--interactive:not(.ui-card--disabled)')
+    expect(css).toMatch(
+      /\.ui-card--interactive:not\(\.ui-card--disabled\)\s*\{[^}]*cursor:\s*pointer/s,
+    )
   })
 })
