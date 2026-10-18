@@ -13,4 +13,9 @@ describe('cardSurfaceVariants', () => {
     expect(cardSurfaceVariants({ interactive: true })).toContain('ui-card--interactive')
     expect(cardSurfaceVariants({ interactive: true })).not.toContain('ui-card--static')
   })
+
+  it('does not emit selected without a tone', () => {
+    expect(cardSurfaceVariants({ selected: true })).not.toContain('ui-card--selected')
+    expect(cardSurfaceVariants({ tone: 'quiet', selected: true })).toContain('ui-card--selected')
+  })
 })

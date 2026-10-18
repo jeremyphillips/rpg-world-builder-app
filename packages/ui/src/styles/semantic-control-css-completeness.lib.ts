@@ -468,32 +468,20 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
     filePath: cardCssPath,
     dimensions: [
       {
-        modifierPrefix: 'ui-card--quiet',
-        requiredProperties: [
-          '--ui-card-bg',
-          '--ui-card-border',
-          '--ui-card-shadow',
-          '--ui-card-radius',
-          '--ui-card-bg-hover',
-          '--ui-card-border-hover',
-          '--ui-card-bg-selected',
-          '--ui-card-border-selected',
-          '--ui-card-ring-selected',
-        ],
+        modifierPrefix: '.ui-card.ui-card--quiet',
+        requiredProperties: ['border', 'background-color', 'border-radius', 'box-shadow'],
       },
       {
-        modifierPrefix: 'ui-card--strong',
-        requiredProperties: [
-          '--ui-card-bg',
-          '--ui-card-border',
-          '--ui-card-shadow',
-          '--ui-card-radius',
-          '--ui-card-bg-hover',
-          '--ui-card-border-hover',
-          '--ui-card-bg-selected',
-          '--ui-card-border-selected',
-          '--ui-card-ring-selected',
-        ],
+        modifierPrefix: '.ui-card.ui-card--strong',
+        requiredProperties: ['border', 'background-color', 'border-radius', 'box-shadow'],
+      },
+      {
+        modifierPrefix: '.ui-card.ui-card--quiet.ui-card--selected',
+        requiredProperties: ['background-color', 'border-color'],
+      },
+      {
+        modifierPrefix: '.ui-card.ui-card--strong.ui-card--selected',
+        requiredProperties: ['background-color', 'border-color', 'box-shadow'],
       },
       {
         modifierPrefix: 'ui-card--static',

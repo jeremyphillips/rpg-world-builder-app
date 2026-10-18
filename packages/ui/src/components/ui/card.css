@@ -1,13 +1,12 @@
 /*
- * Card shell. Part padding lives here. Tone modifiers set tokens; toned chrome resolves once.
- * Source order: block → tone tokens → toned chrome → interactive/static → selected → disabled → parts.
+ * Card shell — two toned ladders (quiet / strong) plus generic untoned Card.
+ * Selected state requires a tone (see cardSurfaceVariants).
  */
 @layer components {
   .ui-card {
     color: var(--card-foreground);
   }
 
-  /* Untoned cards only — quiet/strong chrome resolves on the compound selector below. */
   .ui-card:not(.ui-card--quiet):not(.ui-card--strong) {
     border-radius: var(--radius-card);
     border: 1px solid var(--card-border);
@@ -16,57 +15,65 @@
     --surface-current: var(--card);
   }
 
-  /*
-   * Drawer / canvas hosts set `--ui-card-quiet-bg` via `.ui-card-tone-host--inherit`
-   * so quiet rows sit on the host plane instead of the panel fill.
-   */
   .ui-card-tone-host--inherit {
     --ui-card-quiet-bg: var(--surface-current);
   }
 
-  /* Tone dimensions — custom properties only (completeness guard). */
-  .ui-card--quiet {
-    --ui-card-bg: var(--ui-card-quiet-bg, var(--card));
-    --ui-card-border: var(--border);
-    --ui-card-shadow: none;
-    --ui-card-radius: var(--radius-md);
-    --ui-card-bg-hover: var(--row-hover-bg);
-    --ui-card-border-hover: var(--border);
-    --ui-card-bg-selected: var(--row-selected-bg);
-    /*
-     * Strong-border recipe vs resting host plane (`--ui-card-bg`). Do not use
-     * `--row-selected-border` here — it resolves through surface-relative
-     * `--border-strong` and collapses once `--surface-current` lifts to the fill.
-     */
-    --ui-card-border-selected: color-mix(
-      in oklch,
-      var(--foreground) var(--mix-border-strong),
-      var(--ui-card-bg)
-    );
-    --ui-card-ring-selected: none;
+  /* --- Quiet (drawer / catalog entity rows) --- */
+
+  .ui-card.ui-card--quiet {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background-color: var(--ui-card-quiet-bg, var(--card));
+    box-shadow: none;
+    --surface-current: var(--ui-card-quiet-bg, var(--card));
   }
 
-  .ui-card--strong {
-    --ui-card-bg: var(--surface-muted);
-    /* Resting stroke reads on muted fill; full raised stack drowned the old card-border edge. */
-    --ui-card-border: var(--border);
-    --ui-card-shadow: 0 1px 2px 0 color-mix(in oklab, var(--foreground) 6%, transparent);
-    --ui-card-radius: var(--radius-card);
-    --ui-card-bg-hover: var(--surface-subtle);
-    --ui-card-border-hover: var(--primary);
-    --ui-card-bg-selected: var(--surface-strong);
-    --ui-card-border-selected: var(--primary);
-    --ui-card-ring-selected: 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent);
+  .ui-card.ui-card--quiet.ui-card--interactive:hover {
+    background-color: var(--row-hover-bg);
+    border-color: var(--border);
   }
 
-  .ui-card.ui-card--quiet,
+  .ui-card.ui-card--quiet.ui-card--selected {
+    background-color: var(--row-selected-bg);
+    border-color: var(--primary);
+    --surface-current: var(--row-selected-bg);
+  }
+
+  .ui-card.ui-card--quiet.ui-card--selected.ui-card--interactive:hover {
+    background-color: var(--row-selected-bg);
+    border-color: var(--primary);
+  }
+
+  /* --- Strong (builder options, selection cards) --- */
+
   .ui-card.ui-card--strong {
-    border-radius: var(--ui-card-radius);
-    border: 1px solid var(--ui-card-border);
-    background-color: var(--ui-card-bg);
-    box-shadow: var(--ui-card-shadow);
-    --surface-current: var(--ui-card-bg);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border);
+    background-color: var(--surface-muted);
+    box-shadow: 0 1px 2px 0 color-mix(in oklab, var(--foreground) 6%, transparent);
+    --surface-current: var(--surface-muted);
   }
+
+  .ui-card.ui-card--strong.ui-card--interactive:hover {
+    background-color: var(--surface-subtle);
+    border-color: var(--primary);
+  }
+
+  .ui-card.ui-card--strong.ui-card--selected {
+    background-color: var(--surface-strong);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent);
+    --surface-current: var(--surface-strong);
+  }
+
+  .ui-card.ui-card--strong.ui-card--selected.ui-card--interactive:hover {
+    background-color: var(--surface-strong);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+
+  /* --- Shared interaction --- */
 
   .ui-card--static,
   .ui-card--interactive {
@@ -75,40 +82,13 @@
     transition-duration: 150ms;
   }
 
-  .ui-card--static:hover {
-    background-color: var(--ui-card-bg, var(--card));
+  .ui-card:not(.ui-card--quiet):not(.ui-card--strong).ui-card--static:hover {
+    background-color: var(--card);
   }
 
-  .ui-card--interactive:hover {
-    background-color: var(--ui-card-bg-hover, var(--row-hover-bg));
-    border-color: var(--ui-card-border-hover, var(--card-border));
-  }
-
-  /*
-   * Toned selected (3 classes) beats `.ui-card.ui-card--quiet|strong` resting chrome (2).
-   * `border` shorthand — tone resting rules use the same shorthand; longhand lost.
-   */
-  .ui-card.ui-card--quiet.ui-card--selected,
-  .ui-card.ui-card--strong.ui-card--selected {
-    background-color: var(--ui-card-bg-selected);
-    border: 1px solid var(--ui-card-border-selected);
-    box-shadow: var(--ui-card-ring-selected);
-    --surface-current: var(--ui-card-bg-selected);
-  }
-
-  .ui-card.ui-card--selected:not(.ui-card--quiet):not(.ui-card--strong) {
-    background-color: var(--ui-card-bg-selected, var(--row-selected-bg));
-    border: 1px solid var(--ui-card-border-selected, var(--row-selected-border));
-    box-shadow: var(--ui-card-ring-selected, none);
-    --surface-current: var(--ui-card-bg-selected, var(--row-selected-bg));
-  }
-
-  .ui-card.ui-card--quiet.ui-card--selected.ui-card--interactive:hover,
-  .ui-card.ui-card--strong.ui-card--selected.ui-card--interactive:hover,
-  .ui-card.ui-card--selected:not(.ui-card--quiet):not(.ui-card--strong).ui-card--interactive:hover {
-    background-color: var(--ui-card-bg-selected, var(--row-selected-bg));
-    border: 1px solid var(--ui-card-border-selected, var(--row-selected-border));
-    box-shadow: var(--ui-card-ring-selected, none);
+  .ui-card:not(.ui-card--quiet):not(.ui-card--strong).ui-card--interactive:hover {
+    background-color: var(--row-hover-bg);
+    border-color: var(--card-border);
   }
 
   .ui-card--disabled {
@@ -119,7 +99,28 @@
   .ui-card--interactive:has(.ui-selection-target__control:focus-visible),
   .ui-card--interactive:has(.ui-choice-control:focus-visible) {
     outline: none;
-    box-shadow: var(--ui-card-ring-selected, none), var(--ui-focus-ring-standalone);
+  }
+
+  .ui-card.ui-card--quiet.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
+  .ui-card.ui-card--quiet.ui-card--interactive:has(.ui-choice-control:focus-visible),
+  .ui-card.ui-card--strong.ui-card--interactive:not(.ui-card--selected):has(
+      .ui-selection-target__control:focus-visible
+    ),
+  .ui-card.ui-card--strong.ui-card--interactive:not(.ui-card--selected):has(
+      .ui-choice-control:focus-visible
+    ) {
+    box-shadow: var(--ui-focus-ring-standalone);
+  }
+
+  .ui-card.ui-card--strong.ui-card--selected.ui-card--interactive:has(
+      .ui-selection-target__control:focus-visible
+    ),
+  .ui-card.ui-card--strong.ui-card--selected.ui-card--interactive:has(
+      .ui-choice-control:focus-visible
+    ) {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent),
+      var(--ui-focus-ring-standalone);
   }
 
   .ui-card__header {

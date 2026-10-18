@@ -36,7 +36,7 @@ export function cardSurfaceVariants({
     UI_CARD_CLASS,
     tone && `ui-card--${tone}`,
     interactive ? 'ui-card--interactive' : 'ui-card--static',
-    selected && 'ui-card--selected',
+    selected && tone && 'ui-card--selected',
     disabled && 'ui-card--disabled',
   )
 }
@@ -79,7 +79,7 @@ const CARD_TONE_STATE_MATRIX: readonly {
     interactive: true,
     selected: true,
     useCase: 'Selected quiet row',
-    keyValues: 'bg --row-selected-bg; border strong mix vs resting --ui-card-bg',
+    keyValues: 'bg --row-selected-bg, border --primary',
   },
   {
     key: 'quiet-disabled',
