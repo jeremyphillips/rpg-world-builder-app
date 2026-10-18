@@ -83,6 +83,12 @@ pnpm --filter @rpg/dashboard storybook
 Use `:6006` for design-system work; use `:6007` for content catalog and layout
 composition stories that depend on dashboard paths and providers.
 
+If Storybook reports **Failed to resolve import** for a `*.stories.tsx` path that no
+longer exists, the Storybook cache is stale (often after deleting or moving stories).
+`pnpm storybook:dashboard` and `pnpm storybook:ui` clear hoisted caches before starting.
+You can also run `node tools/scripts/clear-storybook-cache.mjs` or
+`pnpm --filter @rpg/dashboard clean` manually.
+
 CI runs axe against both Storybooks on PRs via the
 [Storybook A11y](../.github/workflows/storybook-a11y.yml) workflow (`ui` and
 `dashboard` matrix jobs).
