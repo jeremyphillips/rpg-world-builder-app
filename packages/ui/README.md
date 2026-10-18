@@ -23,7 +23,7 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 | `Input`                                         | component  | Styled text input                                                                                                                                                             |
 | `SearchBar`                                     | component  | Search field (`appearance`: bordered `field` or popover `embedded`) with icon + clear; requires `ariaLabel`                                                                   |
 | `NumberInput`                                   | component  | Numeric input with hover/focus stepper controls; hides native browser spinners                                                                                                |
-| `Card` + subcomponents                          | component  | `CardHeader/Title/Description/Content/Footer`                                                                                                                                 |
+| `Card` + subcomponents                          | component  | Prefer declarative `header` / `footer` / `stretch`; `density` drives inset + `ui-card__title` / `ui-card__description`; compound parts for escape hatch                       |
 | `Field` (compound)                              | component  | `Field.Root/Label/Control/Hint/Error`; centralizes id + aria wiring                                                                                                           |
 | `FormField`                                     | component  | Label + control slot + inline error/hint (+ optional `[i]` info)                                                                                                              |
 | Field wrappers                                  | component  | `TextField`, `TextareaField`, `NumberField`, `SelectField`, `ComboboxField`, `CheckboxField`, `RadioGroupField`, `SwitchField`, `JsonField`, `RichTextField`                  |
@@ -124,16 +124,15 @@ import { Heading, Text, RichTextContent } from '@rpg/ui'
 Low-level primitives compose directly:
 
 ```tsx
-import { Button, Card, CardHeader, CardTitle, Input } from '@rpg/ui'
+import { Button, Card, Input } from '@rpg/ui'
 
 export function Example() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Sign in</CardTitle>
-      </CardHeader>
+    <Card
+      header={{ title: 'Sign in', description: 'Enter your email to continue.' }}
+      footer={<Button>Continue</Button>}
+    >
       <Input aria-label="Email" type="email" />
-      <Button>Continue</Button>
     </Card>
   )
 }

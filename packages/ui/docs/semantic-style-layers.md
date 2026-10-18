@@ -126,14 +126,14 @@ Cards and Rows**.
 
 ## Layer 2 presentation
 
-| Primitive                                             | Owner        | Consumers                               |
-| ----------------------------------------------------- | ------------ | --------------------------------------- |
-| `supportingTextDensityVariants`                       | content-card | EntitySummary, ContentCard body         |
-| `--ui-card-inset-*` (`ui-card--compact\|comfortable`) | card.css     | Card parts, ContentCard, entity, option |
-| `contentCardDensityInsetVariants` (deprecated)        | content-card | Legacy class helper for ContentCard     |
-| `contentCardIdentityColumnGapVariants`                | content-card | ContentCard body, EntityAnatomy content |
-| `entity-card-heading-comfortable` (@utility)          | globals      | Comfortable entity card titles          |
-| `rowAnatomyTracksVariants` / `RowAnatomyCell`         | row-anatomy  | EntityAnatomy (row tracks + cells)      |
+| Primitive                                                                          | Owner        | Consumers                                                                                                      |
+| ---------------------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------- |
+| `supportingTextDensityVariants`                                                    | content-card | EntitySummary, ContentCard body                                                                                |
+| `--ui-card-inset-*` + header copy vars (`ui-card--compact\|comfortable\|spacious`) | card.css     | Generic `Card` regions; entity/option inset only (`compact\|comfortable`; title/description vars generic-only) |
+| `contentCardDensityInsetVariants` (deprecated)                                     | content-card | Legacy class helper for ContentCard                                                                            |
+| `contentCardIdentityColumnGapVariants`                                             | content-card | ContentCard body, EntityAnatomy content                                                                        |
+| `entity-card-heading-comfortable` (@utility)                                       | globals      | Comfortable entity card titles                                                                                 |
+| `rowAnatomyTracksVariants` / `RowAnatomyCell`                                      | row-anatomy  | EntityAnatomy (row tracks + cells)                                                                             |
 
 Vertical alignment of identity rows has one owner — the row-track grid. Cells never
 self-align or offset; see [row-anatomy.md](./row-anatomy.md).

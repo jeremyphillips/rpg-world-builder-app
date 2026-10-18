@@ -111,7 +111,7 @@ Keep step values **flat**; map to API shape in `onComplete`. Review step: plain 
 
 ## FormCard + Form
 
-`FormCard` is card chrome only — render one `<Form>` child for a single RHF surface.
+`FormCard` is thin generic [`Card`](../../README.md) chrome (`header` prop) — render one `<Form>` child for a single RHF surface. Optional `density` on `Card` (`comfortable` default, `spacious` for larger titles) applies to the wrapped shell only.
 
 ```tsx
 <FormCard title="Log in" description="Welcome back." className="w-full max-w-sm">

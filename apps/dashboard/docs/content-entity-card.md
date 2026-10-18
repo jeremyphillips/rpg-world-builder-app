@@ -20,6 +20,14 @@ each slot into a named column and a track; it never self-aligns or offsets cells
 **Each visual concern has one owner.** When debugging inset, alignment, or chrome, ask
 which semantic layer owns the concern — see [Ownership hierarchy](#ownership-hierarchy).
 
+### Boundary with generic `@rpg/ui` Card
+
+Hub tiles, starter actions, and auth **form chrome** use generic [`Card`](../../../packages/ui/docs/ui-architecture.md) (`header` / `footer`, optional `stretch`, shell `ui-card--compact|comfortable|spacious`). Header copy comes from shell CSS vars (`ui-card__title` / `ui-card__description`) — **not** from `Heading variant="card"` or `Text small` at call sites.
+
+**Entity identity in this doc** uses `EntityCardFrame` + `EntitySummary` typography (`entity-card-heading-comfortable` at comfortable density, IdentityRow at compact). That is a **different title scale** than generic `Card` comfortable (16px title). Shared **`--ui-card-inset-*`** steps align with generic Card and option shells; **`spacious` inset exists only on generic `Card`**, not on `ContentCardDensity` / entity frames.
+
+Do not replace `ContentEntityCard`, `DisclosureEntityCard`, or `CatalogEntityRow` with generic `Card` for catalog identity rows.
+
 ## Module layout (`lib/entity/`)
 
 ```text
