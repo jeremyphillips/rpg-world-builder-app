@@ -89,15 +89,15 @@ Nested create-tab panels share tab-level rhythm in
 `create-composition.variants.ts`. Import tokens from `@/lib/create-flow` —
 do not reintroduce ad-hoc `gap-*` / `mt-*` stacks in feature tab content.
 
-| Token                                | Tailwind  | Use                                                             |
-| ------------------------------------ | --------- | --------------------------------------------------------------- |
-| `createTabPanelContentOffsetClasses` | `mt-3`    | Tab list → first panel content (12px)                           |
-| `createTabPanelStackClasses`         | `gap-3`   | Major panel sections — alerts, intro, workflow root (12px)      |
-| `createTabIntroClasses`              | `gap-1`   | Tab intro heading → helper copy (4px)                           |
-| `createTabDiscoveryBodyClasses`      | `gap-0.5` | Feature-owned discovery body: create action → picker list (2px) |
-| `createTabDiscoveryControlsClasses`  | `gap-2`   | Feature-owned discovery: search → inline create action (8px)    |
-| `createTabDiscoveryListClasses`      | `gap-2`   | Feature-owned discovery: sibling picker / entity cards (8px)    |
-| `createTabPendingListClasses`        | `gap-2`   | Sibling pending draft cards (8px)                               |
+| Token                                | Tailwind  | Use                                                                                                    |
+| ------------------------------------ | --------- | ------------------------------------------------------------------------------------------------------ |
+| `createTabPanelContentOffsetClasses` | `mt-3`    | Tab list → first panel content (12px)                                                                  |
+| `createTabPanelStackClasses`         | `gap-3`   | Major panel sections — alerts, intro, workflow root (12px)                                             |
+| `createTabIntroClasses`              | `gap-1`   | Tab intro heading → helper copy (4px)                                                                  |
+| `createTabDiscoveryBodyClasses`      | `gap-0.5` | Feature-owned discovery body: create action → picker list (2px)                                        |
+| `createTabDiscoveryControlsClasses`  | `gap-2`   | Feature-owned discovery: search → inline create action (8px)                                           |
+| `createTabDiscoveryListClasses`      | `gap-2`   | Feature-owned discovery: sibling picker / entity cards (8px; `@rpg/ui` `catalogPickerCardListClasses`) |
+| `createTabPendingListClasses`        | `gap-2`   | Sibling pending draft cards (8px; same SSOT)                                                           |
 
 Composition stage spacing lives in `create-composition.variants.ts` — use
 `CreateCompositionStage` and `CreateCompositionComposer` rather than forking

@@ -27,9 +27,9 @@ export function EntityReplacementSection({
   const labels = resolveReplacementFieldLabels(entityLabel)
 
   return (
-    <>
+    <div className="flex flex-col gap-3">
       {current ? (
-        <div className="mb-3">
+        <div className="flex flex-col gap-2">
           <EntityReplacementCurrentField
             label={labels.currentLabel}
             entity={current.entity}
@@ -37,14 +37,14 @@ export function EntityReplacementSection({
             fallback={current.fallback}
           />
           {current.unavailable ? (
-            <Text variant="muted" className="mt-2 text-sm" role="status">
+            <Text variant="muted" className="text-sm" role="status">
               {unavailableMessage}
             </Text>
           ) : null}
         </div>
       ) : null}
       {showNewSection ? (
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Heading variant="label" as="p">
             {labels.newLabel}
           </Heading>
@@ -60,6 +60,6 @@ export function EntityReplacementSection({
           {children}
         </div>
       ) : null}
-    </>
+    </div>
   )
 }

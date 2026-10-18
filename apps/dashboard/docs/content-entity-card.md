@@ -302,7 +302,9 @@ Applies to CollapsibleListItem-based rows:
 
 - CollapsibleListItem state-machine internals
 - Domain field rhythm inside `children` (form `itemBodyStackClasses`, field gaps)
-- Section/list surrounding inset outside the card
+- Section/list surrounding inset outside the card — sibling picker cards use
+  `catalogPickerCardListClasses` on `CatalogPickerSheetResults` only (see
+  [drawer-shell.md](./drawer-shell.md#card-list-rhythm-picker-results))
 
 ### Consumers must not
 

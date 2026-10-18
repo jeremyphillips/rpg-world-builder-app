@@ -1,4 +1,4 @@
-import { cn } from '@rpg/ui'
+import { catalogPickerCardListClasses, cn } from '@rpg/ui'
 
 /** 12px — offset from tab list to tab panel content. */
 export const createTabPanelContentOffsetClasses = 'mt-3'
@@ -17,8 +17,8 @@ export const createTabDiscoveryControlsClasses = cn('flex flex-col gap-2')
 
 export const createTabDiscoveryCreateActionClasses = cn('flex justify-end')
 
-/** 8px — sibling picker / entity cards in discovery. */
-export const createTabDiscoveryListClasses = cn('flex flex-col gap-2')
+/** 8px — sibling picker / entity cards in discovery (matches catalog picker sheet lists). */
+export const createTabDiscoveryListClasses = cn(catalogPickerCardListClasses)
 
 /** 8px — sibling pending draft cards in Add / Pending mode. */
-export const createTabPendingListClasses = cn('flex flex-col gap-2')
+export const createTabPendingListClasses = cn(catalogPickerCardListClasses)

@@ -450,6 +450,10 @@ describe('CatalogPickerSheet', () => {
 
     const group = screen.getByRole('radiogroup', { name: 'Pick one' })
     expect(group).toBeInTheDocument()
+    expect(group).toHaveAttribute('data-picker-card-list', '')
+    expect(group).toHaveClass('gap-2')
+    expect(group).not.toHaveClass('space-y-2')
+    expect(group.className).toMatch(/\bflex\b/)
     expect(screen.queryByRole('list')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: 'Beta Item' }))

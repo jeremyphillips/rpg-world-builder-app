@@ -1,3 +1,3 @@
-import { cn } from '@rpg/ui'
+import { catalogPickerCardListClasses, cn } from '@rpg/ui'
 
-export const catalogCollapsibleListClasses = cn('space-y-2')
+export const catalogCollapsibleListClasses = cn(catalogPickerCardListClasses)

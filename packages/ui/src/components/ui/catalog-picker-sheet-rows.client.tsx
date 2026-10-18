@@ -156,6 +156,7 @@ export function CatalogPickerSheetResults<TItem>({
         aria-label={resultsLabel}
         value={rowProps.selection.value ?? ''}
         onValueChange={rowProps.selection.onValueChange}
+        data-picker-card-list=""
       >
         {rows}
       </RadioGroup>
@@ -163,7 +164,7 @@ export function CatalogPickerSheetResults<TItem>({
   }
 
   return (
-    <div className={listClassName} role="list">
+    <div className={listClassName} role="list" data-picker-card-list="">
       {rows.map((row) => (
         <div key={row.key} role="listitem">
           {row}

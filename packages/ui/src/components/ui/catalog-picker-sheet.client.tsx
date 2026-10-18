@@ -36,6 +36,10 @@ export type {
   CatalogToolbarTab,
   CatalogToolbarTabs,
 } from './catalog-toolbar.types'
+export {
+  catalogPickerCardListClasses,
+  catalogPickerSheetListVariants,
+} from './catalog-picker-sheet.variants'
 
 const DEFAULT_SEARCH_PLACEHOLDER = 'Search catalog'
 const DEFAULT_NO_RESULTS_MESSAGE = 'No items match your search.'

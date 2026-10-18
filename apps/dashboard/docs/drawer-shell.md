@@ -95,6 +95,23 @@ Rules:
 - Use `footer` for workflow completion — not alternate acquisition.
 - Search and `auxiliaryAction` stay fixed above the scrollable result list.
 
+### Card list rhythm (picker results)
+
+Sibling bordered cards in catalog picker scroll bodies (drawers and aligned surfaces)
+use **`catalogPickerCardListClasses`** from `@rpg/ui` (`flex flex-col gap-2 w-full`).
+`CatalogPickerSheetResults` is the only owner for sheet/drawer result lists.
+
+Rules:
+
+- **Gap only** between sibling picker cards — no `space-y-*` on the list host and no
+  outer `mb-*` / `mt-*` on row/card hosts.
+- Row interiors (`details`, form fields, domain sections) may use their own vertical stacks.
+- Create-tab discovery lists re-export the same token via `createTabDiscoveryListClasses`
+  in `@/lib/create-flow` — do not fork the gap scale in feature drawers.
+
+Drift tests: `catalog-picker-sheet-list-spacing.lib.test.ts` (`@rpg/ui`) and
+`create-tab-content-spacing.test.ts` (dashboard create-flow alias).
+
 ## ESLint boundary
 
 Production feature and `src/lib` code **must not** import `Sheet` from

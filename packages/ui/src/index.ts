@@ -1159,6 +1159,8 @@ export {
 } from './components/ui/collapsible-list-item'
 export {
   CatalogPickerSheet,
+  catalogPickerCardListClasses,
+  catalogPickerSheetListVariants,
   type CatalogPickerSheetProps,
   type CatalogPickerSearchStrategy,
   type CatalogPickerSheetActionsHelpers,
