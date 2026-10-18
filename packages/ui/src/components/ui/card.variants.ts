@@ -79,7 +79,7 @@ const CARD_TONE_STATE_MATRIX: readonly {
     interactive: true,
     selected: true,
     useCase: 'Selected quiet row',
-    keyValues: 'bg --row-selected-bg, border --row-selected-border',
+    keyValues: 'bg --row-selected-bg; border strong mix vs resting --ui-card-bg',
   },
   {
     key: 'quiet-disabled',

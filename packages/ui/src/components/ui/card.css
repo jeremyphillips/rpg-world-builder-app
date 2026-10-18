@@ -33,7 +33,16 @@
     --ui-card-bg-hover: var(--row-hover-bg);
     --ui-card-border-hover: var(--border);
     --ui-card-bg-selected: var(--row-selected-bg);
-    --ui-card-border-selected: var(--row-selected-border);
+    /*
+     * Strong-border recipe vs resting host plane (`--ui-card-bg`). Do not use
+     * `--row-selected-border` here — it resolves through surface-relative
+     * `--border-strong` and collapses once `--surface-current` lifts to the fill.
+     */
+    --ui-card-border-selected: color-mix(
+      in oklch,
+      var(--foreground) var(--mix-border-strong),
+      var(--ui-card-bg)
+    );
     --ui-card-ring-selected: none;
   }
 
@@ -75,17 +84,31 @@
     border-color: var(--ui-card-border-hover, var(--card-border));
   }
 
-  .ui-card--selected {
+  /*
+   * Toned selected (3 classes) beats `.ui-card.ui-card--quiet|strong` resting chrome (2).
+   * `border` shorthand — tone resting rules use the same shorthand; longhand lost.
+   */
+  .ui-card.ui-card--quiet.ui-card--selected,
+  .ui-card.ui-card--strong.ui-card--selected {
     background-color: var(--ui-card-bg-selected);
-    border-color: var(--ui-card-border-selected);
+    border: 1px solid var(--ui-card-border-selected);
     box-shadow: var(--ui-card-ring-selected);
     --surface-current: var(--ui-card-bg-selected);
   }
 
-  .ui-card--selected.ui-card--interactive:hover {
-    background-color: var(--ui-card-bg-selected);
-    border-color: var(--ui-card-border-selected);
-    box-shadow: var(--ui-card-ring-selected);
+  .ui-card.ui-card--selected:not(.ui-card--quiet):not(.ui-card--strong) {
+    background-color: var(--ui-card-bg-selected, var(--row-selected-bg));
+    border: 1px solid var(--ui-card-border-selected, var(--row-selected-border));
+    box-shadow: var(--ui-card-ring-selected, none);
+    --surface-current: var(--ui-card-bg-selected, var(--row-selected-bg));
+  }
+
+  .ui-card.ui-card--quiet.ui-card--selected.ui-card--interactive:hover,
+  .ui-card.ui-card--strong.ui-card--selected.ui-card--interactive:hover,
+  .ui-card.ui-card--selected:not(.ui-card--quiet):not(.ui-card--strong).ui-card--interactive:hover {
+    background-color: var(--ui-card-bg-selected, var(--row-selected-bg));
+    border: 1px solid var(--ui-card-border-selected, var(--row-selected-border));
+    box-shadow: var(--ui-card-ring-selected, none);
   }
 
   .ui-card--disabled {
