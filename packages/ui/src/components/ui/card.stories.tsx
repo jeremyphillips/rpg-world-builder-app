@@ -56,6 +56,38 @@ export const Interactive: Story = {
   ),
 }
 
+export const NavigableCompact: Story = {
+  render: () => (
+    <Card
+      className="max-w-md"
+      link={<a href="#creature-types">Creature types</a>}
+      density="compact"
+      tone="quiet"
+      header={{
+        title: 'Creature types',
+        description: 'Taxonomic classification shared by species and monsters.',
+      }}
+    >
+      <p className="text-xs text-muted-foreground">12 terms · 1 unavailable</p>
+    </Card>
+  ),
+}
+
+export const NavigableStrong: Story = {
+  render: () => (
+    <div className="h-40 max-w-xs">
+      <Card
+        link={<a href="#weapons">Weapons</a>}
+        stretch
+        className="h-full"
+        density="comfortable"
+        tone="strong"
+        header={{ title: 'Weapons' }}
+      />
+    </div>
+  ),
+}
+
 export const DensityTypography: Story = {
   parameters: { semanticClasses: true },
   render: () => (

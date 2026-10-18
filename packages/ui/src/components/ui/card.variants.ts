@@ -17,6 +17,10 @@ export const UI_CARD_FOOTER_CLASS = 'ui-card__footer' as const
 export const UI_CARD_TITLE_CLASS = 'ui-card__title' as const
 export const UI_CARD_DESCRIPTION_CLASS = 'ui-card__description' as const
 
+export const UI_CARD_NAV_CLASS = 'ui-card__nav' as const
+export const UI_CARD_NAV_MAIN_CLASS = 'ui-card__nav-main' as const
+export const UI_CARD_NAV_CHEVRON_CLASS = 'ui-card__nav-chevron' as const
+
 export const CARD_INSET_DENSITIES = ['compact', 'comfortable', 'spacious'] as const
 export type CardInsetDensity = (typeof CARD_INSET_DENSITIES)[number]
 

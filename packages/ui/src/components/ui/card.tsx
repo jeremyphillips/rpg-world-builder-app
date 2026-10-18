@@ -2,118 +2,67 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import {
-  cardSurfaceVariants,
+  DeclarativeCardInterior,
+  parseCardProps,
+  renderNavigableCardLink,
+  resolveCardSurfaceClassName,
+} from './card.lib'
+import type { CardHeaderModel, CardProps, NavigableCardProps, StaticCardProps } from './card.types'
+import {
   UI_CARD_CONTENT_CLASS,
   UI_CARD_DESCRIPTION_CLASS,
   UI_CARD_FOOTER_CLASS,
   UI_CARD_HEADER_CLASS,
   UI_CARD_TITLE_CLASS,
-  type CardSurfaceVariantProps,
   type GenericCardDensity,
 } from './card.variants'
 
-export type CardHeaderModel = {
-  title: string
-  description?: string
-}
+export type { CardHeaderModel, CardProps, NavigableCardProps, StaticCardProps }
 
-type CardProps = Omit<CardSurfaceVariantProps, 'density'> &
-  React.HTMLAttributes<HTMLDivElement> & {
-    density?: GenericCardDensity
-    header?: CardHeaderModel
-    footer?: React.ReactNode
-    /** Full-height column; pins footer with mt-auto on internal layout. */
-    stretch?: boolean
-    children?: React.ReactNode
-  }
+const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
+  const parsed = parseCardProps(props)
+  const surfaceClassName = resolveCardSurfaceClassName({
+    tone: parsed.tone,
+    density: parsed.density,
+    interactive: parsed.interactive,
+    selected: parsed.selected,
+    disabled: parsed.disabled,
+    stretch: parsed.stretch,
+    className: parsed.className,
+    navigable: parsed.link != null,
+  })
 
-function cardHasBody(children: React.ReactNode): boolean {
-  return React.Children.toArray(children).length > 0
-}
-
-/** Form-style cards keep body regions on the child (e.g. `<Form contentClassName={…}>`). */
-function shouldWrapBodyInContent(
-  header: CardHeaderModel | undefined,
-  footer: React.ReactNode | undefined,
-  hasBody: boolean,
-): boolean {
-  if (!hasBody) {
-    return false
-  }
-  if (header != null && footer == null) {
-    return false
-  }
-  return true
-}
-
-const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  (
-    {
-      className,
-      tone,
-      density = 'comfortable',
-      interactive,
-      selected,
-      disabled,
-      header,
-      footer,
-      stretch,
-      children,
-      ...props
-    },
-    ref,
-  ) => {
-    const hasBody = cardHasBody(children)
-    const useDeclarativeLayout = header != null || footer != null
-    const wrapBody = shouldWrapBodyInContent(header, footer, hasBody)
-
-    if (!useDeclarativeLayout) {
-      return (
-        <div
-          ref={ref}
-          className={cn(
-            cardSurfaceVariants({ tone, density, interactive, selected, disabled }),
-            className,
-          )}
-          {...props}
-        >
-          {children}
-        </div>
-      )
-    }
-
+  if (!parsed.useDeclarativeLayout) {
     return (
-      <div
-        ref={ref}
-        className={cn(
-          cardSurfaceVariants({ tone, density, interactive, selected, disabled }),
-          stretch && 'flex h-full flex-col',
-          className,
-        )}
-        {...props}
-      >
-        {header ? (
-          <div className={UI_CARD_HEADER_CLASS}>
-            <h3 className={UI_CARD_TITLE_CLASS}>{header.title}</h3>
-            {header.description ? (
-              <p className={UI_CARD_DESCRIPTION_CLASS}>{header.description}</p>
-            ) : null}
-          </div>
-        ) : null}
-        {hasBody ? (
-          wrapBody ? (
-            <div className={UI_CARD_CONTENT_CLASS}>{children}</div>
-          ) : (
-            children
-          )
-        ) : null}
-        {footer ? (
-          <div className={cn(UI_CARD_FOOTER_CLASS, stretch && 'mt-auto')}>{footer}</div>
-        ) : null}
+      <div ref={ref} className={surfaceClassName} {...parsed.restProps}>
+        {parsed.children}
       </div>
     )
-  },
-)
+  }
+
+  const interior = (
+    <DeclarativeCardInterior
+      header={parsed.header}
+      footer={parsed.footer}
+      stretch={parsed.stretch}
+      hasBody={parsed.hasBody}
+      navigable={parsed.link != null}
+      showNavigationChevron={parsed.showNavigationChevron}
+    >
+      {parsed.children}
+    </DeclarativeCardInterior>
+  )
+
+  if (parsed.link != null) {
+    return renderNavigableCardLink(parsed.link, surfaceClassName, interior, parsed.restProps, ref)
+  }
+
+  return (
+    <div ref={ref} className={surfaceClassName} {...parsed.restProps}>
+      {interior}
+    </div>
+  )
+})
 Card.displayName = 'Card'
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -153,4 +102,4 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 CardFooter.displayName = 'CardFooter'
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
-export type { GenericCardDensity, CardProps }
+export type { GenericCardDensity }

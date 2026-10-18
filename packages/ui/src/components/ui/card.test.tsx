@@ -1,5 +1,6 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './card'
 import {
@@ -7,6 +8,7 @@ import {
   UI_CARD_DESCRIPTION_CLASS,
   UI_CARD_FOOTER_CLASS,
   UI_CARD_HEADER_CLASS,
+  UI_CARD_NAV_CHEVRON_CLASS,
   UI_CARD_TITLE_CLASS,
 } from './card.variants'
 
@@ -311,6 +313,89 @@ describe('Card region inset', () => {
     )
     expect(container.firstElementChild).toHaveClass('flex', 'h-full', 'flex-col')
     expect(queryCardRegion(container, UI_CARD_FOOTER_CLASS)).toHaveClass('mt-auto')
+  })
+
+  it('wraps header and body in separate regions when footer is absent', () => {
+    const { container } = render(
+      <Card density="compact" header={{ title: 'Title', description: 'Details' }}>
+        <p>Metadata line</p>
+      </Card>,
+    )
+    expect(container.getElementsByClassName(UI_CARD_HEADER_CLASS)).toHaveLength(1)
+    const content = queryCardRegion(container, UI_CARD_CONTENT_CLASS)
+    expect(content).toHaveTextContent('Metadata line')
+    expectInset(content, 'compact', { top: 0, bottom: INSET.compact.block })
+  })
+})
+
+describe('Card navigable link', () => {
+  let styleEl: HTMLStyleElement
+
+  beforeAll(() => {
+    styleEl = injectCardStyles()
+  })
+
+  afterAll(() => {
+    styleEl.remove()
+  })
+
+  it('renders static card without link or chevron', () => {
+    const { container } = render(<Card header={{ title: 'Static' }} />)
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
+    expect(container.getElementsByClassName(UI_CARD_NAV_CHEVRON_CLASS)).toHaveLength(0)
+  })
+
+  it('renders one interactive link with default navigation chevron', () => {
+    const { container } = render(
+      <Card
+        link={<a href="/dest">Navigate</a>}
+        header={{ title: 'Category', description: 'Details' }}
+      >
+        <span>2 terms</span>
+      </Card>,
+    )
+    const links = screen.getAllByRole('link')
+    expect(links).toHaveLength(1)
+    expect(links[0]).toHaveAttribute('href', '/dest')
+    expect(links[0]).toHaveClass('ui-card--interactive')
+    expect(container.getElementsByClassName(UI_CARD_NAV_CHEVRON_CLASS)).toHaveLength(1)
+  })
+
+  it('hides navigation chevron when showNavigationChevron is false', () => {
+    const { container } = render(
+      <Card
+        link={<a href="/dest">Navigate</a>}
+        showNavigationChevron={false}
+        header={{ title: 'Category' }}
+      />,
+    )
+    expect(container.getElementsByClassName(UI_CARD_NAV_CHEVRON_CLASS)).toHaveLength(0)
+  })
+
+  it('applies focus ring classes on navigable root', () => {
+    render(<Card link={<a href="/dest">Navigate</a>} header={{ title: 'Category' }} />)
+    expect(screen.getByRole('link')).toHaveClass('ui-focus-ring')
+  })
+
+  it('activates link on Enter when focused', async () => {
+    const user = userEvent.setup()
+    const onClick = vi.fn((event: { preventDefault: () => void }) => {
+      event.preventDefault()
+    })
+    render(
+      <Card
+        link={
+          <a href="/dest" onClick={onClick}>
+            Navigate
+          </a>
+        }
+        header={{ title: 'Category' }}
+      />,
+    )
+    const link = screen.getByRole('link')
+    link.focus()
+    await user.keyboard('{Enter}')
+    expect(onClick).toHaveBeenCalled()
   })
 })
 

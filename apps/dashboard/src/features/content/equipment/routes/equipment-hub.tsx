@@ -22,18 +22,15 @@ export function EquipmentHubContent({ campaignId }: EquipmentHubContentProps) {
       <PageHeader heading={getContentTypeCollectionLabel('equipment')} />
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {EQUIPMENT_FAMILY_PATHS.map((family) => (
-          <li key={family}>
-            <Link
-              to={ROUTES.content.equipment.family(campaignId, family)}
-              className="block h-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Card
-                interactive
-                stretch
-                className="h-full"
-                header={{ title: getEquipmentFamilyLabel(family as EquipmentFamilyPath) }}
-              />
-            </Link>
+          <li key={family} className="h-full">
+            <Card
+              link={<Link to={ROUTES.content.equipment.family(campaignId, family)} />}
+              stretch
+              className="h-full"
+              density="comfortable"
+              tone="strong"
+              header={{ title: getEquipmentFamilyLabel(family as EquipmentFamilyPath) }}
+            />
           </li>
         ))}
       </ul>

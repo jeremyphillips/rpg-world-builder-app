@@ -192,6 +192,27 @@
     color: var(--muted-foreground);
   }
 
+  .ui-card .ui-card__nav {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: calc(var(--spacing) * 3);
+  }
+
+  .ui-card .ui-card__nav-main {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .ui-card .ui-card__nav-chevron {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--muted-foreground);
+    padding-inline-end: var(--ui-card-inset-inline);
+  }
+
   .ui-content-card-inset {
     padding-block: var(--ui-card-inset-block);
     padding-inline: var(--ui-card-inset-inline);

@@ -303,6 +303,8 @@ export {
   CardContent,
   type CardHeaderModel,
   type CardProps,
+  type NavigableCardProps,
+  type StaticCardProps,
 } from './components/ui/card'
 export {
   CARD_CLASS_SPECS,

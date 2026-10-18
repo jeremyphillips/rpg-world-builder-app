@@ -78,6 +78,7 @@ describe('VocabularyHubContent', () => {
     useCanManageCampaignMock.mockReturnValue(true)
     renderHub()
 
-    expect(screen.getByText('2 terms · 1 unavailable')).toBeInTheDocument()
+    expect(screen.getByText('2 terms')).toBeInTheDocument()
+    expect(screen.getByText('1 unavailable')).toBeInTheDocument()
   })
 })
