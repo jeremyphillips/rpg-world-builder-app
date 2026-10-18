@@ -93,7 +93,7 @@ const CARD_TONE_STATE_MATRIX: readonly {
     key: 'strong-rest',
     tone: 'strong',
     useCase: 'Builder step option rest',
-    keyValues: 'bg --surface-muted, shadow raised',
+    keyValues: 'bg --surface-muted, border --border, soft drop shadow',
   },
   {
     key: 'strong-hover',

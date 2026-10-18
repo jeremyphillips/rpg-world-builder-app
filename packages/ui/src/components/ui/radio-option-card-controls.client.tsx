@@ -26,7 +26,11 @@ function RadioOptionCardControl({
 
   return (
     <span
-      className={cn(radioCardControlVariants({ variant, density }), 'mt-0.5', className)}
+      className={cn(
+        radioCardControlVariants({ variant, density }),
+        variant === 'row' && 'mt-0.5',
+        className,
+      )}
       aria-hidden="true"
     >
       <span className={radioCardIndicatorVariants()}>
@@ -46,10 +50,7 @@ function RadioOptionCardIconControl({
   className?: string
 }) {
   return (
-    <span
-      className={cn(radioCardIconControlVariants({ density }), 'mt-0.5', className)}
-      aria-hidden="true"
-    >
+    <span className={cn(radioCardIconControlVariants({ density }), className)} aria-hidden="true">
       {icon}
     </span>
   )

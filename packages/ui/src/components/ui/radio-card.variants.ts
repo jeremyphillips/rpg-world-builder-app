@@ -74,18 +74,27 @@ export const radioCardVariants = cva('', {
   },
 })
 
-/** Centers the leading radio with the option title line when a title-end action is present. */
+/** Card variant: vertically centers the leading control on the title line (text-base / text-sm). */
 export const radioCardLeadingControlTitleLineVariants = cva(
   'flex shrink-0 items-center self-start',
   {
     variants: {
       density: {
-        default: 'h-5',
-        compact: 'h-5',
+        default: '',
+        compact: '',
+      },
+      titleEnd: {
+        true: 'h-control-action-compact',
+        false: '',
       },
     },
+    compoundVariants: [
+      { density: 'default', titleEnd: false, class: 'h-6' },
+      { density: 'compact', titleEnd: false, class: 'h-5' },
+    ],
     defaultVariants: {
       density: 'default',
+      titleEnd: false,
     },
   },
 )

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ContentCardHeadingAction, type ContentCardDensity } from '@rpg/ui'
 
 import { EntityAnatomy } from '../../../anatomy/entity-anatomy'
+import type { EntityAnatomyLeading } from '../../../anatomy/entity-anatomy-leading.types'
 import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
 import { resolveEntitySurfaceEdges } from '../../../anatomy/entity-surface-edges.lib'
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
@@ -15,8 +16,7 @@ import {
 
 export type ContentEntityCardProps = {
   entity: EntitySummaryModel
-  /** Exactly one leading utility when set — never a multi-control fragment. */
-  leading?: ReactNode
+  leading?: EntityAnatomyLeading
   trailing?: EntityAnatomyTrailing
   density?: ContentCardDensity
   disabled?: boolean
@@ -42,14 +42,17 @@ export function ContentEntityCard({
     <EntityCardFrame
       density={resolvedDensity}
       disabled={disabled}
-      edges={resolveEntitySurfaceEdges({ leadingUtilityCount: leading ? 1 : 0, trailing })}
-      leadingUtilityCount={leading ? 1 : 0}
+      edges={resolveEntitySurfaceEdges({
+        leadingUtilityCount: leading != null ? 1 : 0,
+        trailing,
+      })}
+      leadingUtilityCount={leading != null ? 1 : 0}
     >
       <EntityCardUtilityFieldSizeProvider size={utilityFieldSize}>
         <EntityCardContent>
           <EntityAnatomy
             entity={entity}
-            leadingUtilities={leading != null ? [leading] : undefined}
+            leading={leading}
             trailing={trailing}
             density={resolvedDensity}
             headingEndValue={headingEndValue}

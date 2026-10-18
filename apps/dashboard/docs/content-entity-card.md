@@ -8,8 +8,9 @@ EntitySummaryModel → EntitySummary parts → EntityAnatomy (RowAnatomy cells) 
 
 `EntitySummaryModel` contains identity content only: `heading`, optional
 `classification`, `description`, `status`, and `media`. It never carries navigation.
-`EntityAnatomyHost` adds optional heading navigation (`headingHref`), a single leading utility,
-semantic trailing (`action` | `utility` | `indicator` | `group`, with optional inline `meta`), and density.
+`EntityAnatomyHost` adds optional heading navigation (`headingHref`), a single
+`EntityAnatomyLeading` seam, semantic trailing (`action` | `utility` | `indicator` | `group`,
+with optional inline `meta`), and density.
 
 Vertical alignment is owned by the shared row-track grid in `@rpg/ui`
 (`RowAnatomy` — band / meta / status tracks with slack gutters). Entity anatomy places
@@ -506,6 +507,19 @@ helper.
 **Behavior** owns what a control does (collapse, drag). **Entity anatomy** owns where it
 lives. Do not use CLI `chromeCount` or `--content-column-indent` as a second entity
 offset system.
+
+### Leading kinds
+
+Single leading controls on `ContentEntityCard` / `EntityAnatomyHost` use **`EntityAnatomyLeading`**
+(mirror of trailing kinds). Anatomy resolves the row track via `resolveEntityLeadingCell`:
+
+| Kind        | Row track | Use                                                                |
+| ----------- | --------- | ------------------------------------------------------------------ |
+| `title`     | `band`    | Grip, checkbox, granted icon — aligned with the heading row        |
+| `selection` | `full`    | Catalog picker radio — vertically centered like trailing `utility` |
+
+Disclosure rows with grip + caret still use `leadingUtilities` on `EntityAnatomy` (always
+title-band cells).
 
 ---
 

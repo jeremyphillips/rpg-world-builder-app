@@ -39,8 +39,9 @@
 
   .ui-card--strong {
     --ui-card-bg: var(--surface-muted);
-    --ui-card-border: var(--card-border);
-    --ui-card-shadow: var(--shadow-surface-raised);
+    /* Resting stroke reads on muted fill; full raised stack drowned the old card-border edge. */
+    --ui-card-border: var(--border);
+    --ui-card-shadow: 0 1px 2px 0 color-mix(in oklab, var(--foreground) 6%, transparent);
     --ui-card-radius: var(--radius-card);
     --ui-card-bg-hover: var(--surface-subtle);
     --ui-card-border-hover: var(--primary);

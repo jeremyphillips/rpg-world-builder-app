@@ -39,6 +39,45 @@ describe('RadioCard', () => {
     expect(shell).not.toHaveClass('ui-card--strong')
   })
 
+  it('uses strong tone chrome and title-line control alignment by default', () => {
+    render(
+      <RadioCard
+        aria-label="Edition preset"
+        options={[{ label: 'Modern 5e', value: '5e', description: 'Familiar modern fantasy.' }]}
+      />,
+    )
+
+    const radio = screen.getByRole('radio', { name: /Modern 5e/i })
+    const shell = radio.closest('.ui-card')
+    expect(shell).toHaveClass('ui-card--strong', 'ui-card--interactive')
+    expect(shell).not.toHaveClass('ui-card--selected')
+
+    const titleLineAlign = radio.closest('.flex.shrink-0.items-center.self-start')
+    expect(titleLineAlign).toHaveClass('h-6')
+  })
+
+  it('matches title-end action height for compact cards with onDetails', () => {
+    render(
+      <RadioCard
+        aria-label="Class"
+        density="compact"
+        options={[
+          {
+            label: 'Fighter',
+            value: 'fighter',
+            description: 'A martial class.',
+            onDetails: () => {},
+          },
+        ]}
+      />,
+    )
+
+    const radio = screen.getByRole('radio', { name: /Fighter/i })
+    const titleLineAlign = radio.closest('.flex.shrink-0.items-center.self-start')
+    expect(titleLineAlign).toHaveClass('h-control-action-compact')
+    expect(titleLineAlign).not.toHaveClass('h-5')
+  })
+
   it('applies density body padding inside the radio card shell', () => {
     render(
       <RadioCard

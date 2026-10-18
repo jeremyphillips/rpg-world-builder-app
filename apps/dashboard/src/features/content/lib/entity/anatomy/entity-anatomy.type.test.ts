@@ -2,6 +2,7 @@ import { describe, expectTypeOf, it } from 'vitest'
 
 import type { ContentEntityCardProps, DisclosureEntityCardProps } from '@/features/content'
 
+import type { EntityAnatomyLeading } from './entity-anatomy-leading.types'
 import type { EntityAnatomyHostProps } from './entity-anatomy'
 
 type ConsumerPresentationKeys =
@@ -60,7 +61,7 @@ describe('entity surface closed API', () => {
     expectTypeOf<EntityAnatomyHostProps>().toMatchTypeOf<{
       entity: EntityAnatomyHostProps['entity']
       headingHref?: string
-      leading?: React.ReactNode
+      leading?: EntityAnatomyLeading
       trailing?: EntityAnatomyHostProps['trailing']
       density?: EntityAnatomyHostProps['density']
     }>()

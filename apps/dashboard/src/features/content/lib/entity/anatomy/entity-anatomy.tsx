@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import { RowAnatomyCell, rowAnatomyRootProps, type ContentCardDensity } from '@rpg/ui'
 
 import { EntityLeadingRail } from './entity-leading-rail'
+import type { EntityAnatomyLeading } from './entity-anatomy-leading.types'
+import { resolveEntityLeadingCell } from './entity-leading-cell.lib'
 import { EntityAnatomyTrailingCells } from './entity-anatomy-trailing'
 import type { EntityAnatomyTrailing } from './entity-anatomy-trailing.types'
 import type { EntityAnatomyColumn } from './entity-anatomy.types'
@@ -20,13 +22,16 @@ import {
   entityAnatomyVariants,
 } from './entity-anatomy.variants'
 
+export type { EntityAnatomyLeading } from './entity-anatomy-leading.types'
 export type { EntityAnatomyTrailing } from './entity-anatomy-trailing.types'
 
 export type EntityAnatomyProps = {
   entity: EntitySummaryModel
   /** Links the entity heading only — not whole-row/card navigation. */
   headingHref?: string
-  /** Ordered leading utilities; Anatomy is the sole EntityLeadingRail wrapper. */
+  /** Single leading control — kind selects the row track (see {@link resolveEntityLeadingCell}). */
+  leading?: EntityAnatomyLeading
+  /** Ordered disclosure utilities (grip, caret) — always title-band cells. */
   leadingUtilities?: readonly ReactNode[]
   trailing?: EntityAnatomyTrailing
   density?: ContentCardDensity
@@ -40,8 +45,7 @@ export type EntityAnatomyHostProps = {
   entity: EntitySummaryModel
   /** Links the entity heading only — not whole-row/card navigation. */
   headingHref?: string
-  /** Exactly one leading utility when set — never a multi-control group or fragment. */
-  leading?: ReactNode
+  leading?: EntityAnatomyLeading
   trailing?: EntityAnatomyTrailing
   density?: ContentCardDensity
 }
@@ -51,6 +55,7 @@ export type EntityAnatomyHostProps = {
 export function EntityAnatomy({
   entity,
   headingHref,
+  leading,
   leadingUtilities,
   trailing,
   density = 'comfortable',
@@ -67,6 +72,14 @@ export function EntityAnatomy({
 
   return (
     <div className={entityAnatomyVariants({ density })} {...rowAnatomyRootProps}>
+      {leading ? (
+        <RowAnatomyCell<EntityAnatomyColumn>
+          cell={resolveEntityLeadingCell(leading)}
+          data-entity-item-slot="leading"
+        >
+          <EntityLeadingRail density={density}>{leading.content}</EntityLeadingRail>
+        </RowAnatomyCell>
+      ) : null}
       {resolvedLeadingUtilities.length > 0 ? (
         <RowAnatomyCell<EntityAnatomyColumn>
           cell={{ slot: 'band', column: 'leading' }}
@@ -150,7 +163,7 @@ export function EntityAnatomyHost({
       <EntityAnatomy
         entity={entity}
         headingHref={headingHref}
-        leadingUtilities={leading != null ? [leading] : undefined}
+        leading={leading}
         trailing={trailing}
         density={density}
       />

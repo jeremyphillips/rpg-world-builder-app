@@ -20,7 +20,7 @@ export function ChoiceGrantedRow({ row }: ChoiceGrantedRowProps) {
           </Text>
         ) : undefined,
       }}
-      leading={<GrantedChoiceLeadingIcon />}
+      leading={{ kind: 'title', content: <GrantedChoiceLeadingIcon /> }}
       density="compact"
     />
   )

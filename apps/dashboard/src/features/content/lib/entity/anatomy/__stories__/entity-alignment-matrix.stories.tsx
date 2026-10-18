@@ -327,6 +327,27 @@ export const CatalogRowRadioLeading: Story = {
             selection={{ value: 'org-blocked', disabled: true }}
           />
         </div>
+        <div data-edge-case="radio-leading-media">
+          <CatalogEntityRow
+            toolbarLabel="Silver Circle"
+            domIds={{
+              itemId: 'matrix-radio-media',
+              titleId: 'matrix-radio-media-title',
+              bodyId: 'matrix-radio-media-body',
+            }}
+            entity={{
+              heading: 'Silver Circle',
+              classification: 'Guild',
+              description: 'Located in Grey Coast',
+              media: (
+                <DetailRowLeadingMedia size="xs">
+                  <span aria-hidden>SC</span>
+                </DetailRowLeadingMedia>
+              ),
+            }}
+            selection={{ value: 'org-media' }}
+          />
+        </div>
       </RadioGroup>
       <div data-edge-case="radio-leading-disclosure">
         <DisclosureEntityCard
@@ -342,7 +363,7 @@ export const CatalogRowRadioLeading: Story = {
   ),
   play: async ({ canvasElement }) => {
     await waitForRowAnatomyLayout()
-    await expectRowAnatomyAligned(canvasElement, { minGrids: 3 })
+    await expectRowAnatomyAligned(canvasElement, { minGrids: 4 })
   },
 }
 

@@ -21,6 +21,7 @@ import { RadioOptionCardLeadingControl } from './radio-option-card-controls.clie
 import {
   radioCardDetailsActionVariants,
   radioCardGroupItemRowClasses,
+  radioCardLeadingControlTitleLineVariants,
   radioCardMediaSlotClasses,
   type RadioCardVariant,
   type RadioCardVisualControl,
@@ -281,27 +282,49 @@ function RadioOptionCardPrimaryRow(props: RadioOptionCardInteriorProps) {
 
   const leadingIndicator =
     visualControl === 'icon' && icon ? (
-      <RadioOptionCardLeadingControl visualControl="icon" icon={icon} density={density} />
+      <RadioOptionCardLeadingControl
+        visualControl="icon"
+        icon={icon}
+        variant={variant}
+        density={density}
+      />
     ) : undefined
+
+  const titleEndSlot = resolveRadioOptionCardTitleEndSlot(label, details, onDetails)
+
+  const leadingControl = (
+    <SelectionTargetRadio
+      id={id}
+      value={value}
+      disabled={disabled}
+      indicator={leadingIndicator}
+      aria-label={label}
+      aria-describedby={description ? `${id}-description` : undefined}
+      onClick={onClick}
+    />
+  )
 
   return (
     <SelectionOptionCardAnatomy
       density={density}
       leadingControl={
-        <SelectionTargetRadio
-          id={id}
-          value={value}
-          disabled={disabled}
-          indicator={leadingIndicator}
-          aria-label={label}
-          aria-describedby={description ? `${id}-description` : undefined}
-          onClick={onClick}
-        />
+        variant === 'card' ? (
+          <div
+            className={radioCardLeadingControlTitleLineVariants({
+              density,
+              titleEnd: titleEndSlot != null,
+            })}
+          >
+            {leadingControl}
+          </div>
+        ) : (
+          leadingControl
+        )
       }
       leadingMedia={variant === 'row' ? media : undefined}
       label={label}
       titleAdornment={titleAdornment}
-      titleEndSlot={resolveRadioOptionCardTitleEndSlot(label, details, onDetails)}
+      titleEndSlot={titleEndSlot}
       description={description}
       summaryItems={summaryItems}
       summaryLines={summaryLines}

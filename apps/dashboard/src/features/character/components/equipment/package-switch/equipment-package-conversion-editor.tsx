@@ -181,16 +181,19 @@ export function EquipmentPackageConversionEditor({
                           stagedRemoval: !checked,
                           status,
                         })}
-                        leading={
-                          <Checkbox
-                            checked={checked}
-                            disabled={disabled}
-                            aria-label={title}
-                            onCheckedChange={(nextChecked) =>
-                              toggleItem(item.packageItemKey, nextChecked === true)
-                            }
-                          />
-                        }
+                        leading={{
+                          kind: 'title',
+                          content: (
+                            <Checkbox
+                              checked={checked}
+                              disabled={disabled}
+                              aria-label={title}
+                              onCheckedChange={(nextChecked) =>
+                                toggleItem(item.packageItemKey, nextChecked === true)
+                              }
+                            />
+                          ),
+                        }}
                         trailing={
                           valueLabel
                             ? { kind: 'indicator', variant: 'label', label: valueLabel }

@@ -66,15 +66,18 @@ function CatalogEntityRowSelectionBody({
           <EntityAnatomyHost
             entity={entity}
             density={CATALOG_ENTITY_ROW_DENSITY}
-            leading={
-              <SelectionTargetRadio
-                id={radioId}
-                value={selection.value}
-                disabled={disabled}
-                aria-label={toolbarLabel}
-                aria-describedby={domIds.titleId}
-              />
-            }
+            leading={{
+              kind: 'selection',
+              content: (
+                <SelectionTargetRadio
+                  id={radioId}
+                  value={selection.value}
+                  disabled={disabled}
+                  aria-label={toolbarLabel}
+                  aria-describedby={domIds.titleId}
+                />
+              ),
+            }}
           />
         </EntityCardContent>
       </SelectionTarget>

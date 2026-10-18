@@ -107,6 +107,8 @@ describe('CatalogEntityRow', () => {
     expect(frame).toHaveClass('ui-card--interactive')
     expect(frame).toHaveClass('dash-entity-surface--leading-1')
     expect(screen.getByRole('radio', { name: 'The Foos' })).toBeInTheDocument()
+    const leadingSlot = document.querySelector('[data-entity-item-slot="leading"]')
+    expect(leadingSlot).toHaveAttribute('data-row-anatomy-slot', 'full')
     await user.click(screen.getByText('The Foos'))
     expect(onValueChange).toHaveBeenCalledWith('org-1')
   })

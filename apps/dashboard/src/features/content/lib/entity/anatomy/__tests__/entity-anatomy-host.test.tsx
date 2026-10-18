@@ -40,7 +40,7 @@ describe('EntityAnatomyHost', () => {
       <MemoryRouter>
         <EntityAnatomyHost
           entity={GREY_COAST_ENTITY}
-          leading={<span data-testid="leading">Grip</span>}
+          leading={{ kind: 'title', content: <span data-testid="leading">Grip</span> }}
           trailing={{ kind: 'action', content: <button type="button">Select</button> }}
           density="compact"
         />
@@ -49,6 +49,22 @@ describe('EntityAnatomyHost', () => {
 
     expect(screen.getByTestId('leading')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
+  })
+
+  it('centers selection leading on the row via the full cell', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <EntityAnatomyHost
+          entity={GREY_COAST_ENTITY}
+          leading={{ kind: 'selection', content: <span data-testid="radio">Radio</span> }}
+          density="compact"
+        />
+      </MemoryRouter>,
+    )
+
+    const leadingSlot = container.querySelector('[data-entity-item-slot="leading"]')
+    expect(leadingSlot).toHaveAttribute('data-row-anatomy-slot', 'full')
+    expect(screen.getByTestId('radio')).toBeInTheDocument()
   })
 
   it('centers a chevron indicator on the row via the full cell', () => {

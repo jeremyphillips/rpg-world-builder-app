@@ -68,6 +68,11 @@ export type {
   EntitySummaryProvenanceText,
 } from './lib/entity/summary/entity-summary-provenance.types'
 export type {
+  EntityAnatomyLeading,
+  EntityAnatomySelectionLeading,
+  EntityAnatomyTitleLeading,
+} from './lib/entity/anatomy/entity-anatomy-leading.types'
+export type {
   EntityAnatomyTrailing,
   EntityAnatomyTrailingSecondary,
 } from './lib/entity/anatomy/entity-anatomy-trailing.types'

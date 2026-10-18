@@ -77,17 +77,22 @@ function SortableAbilityScoreOrderRow({
         entity={{ heading: ABILITY_ENTRIES[ability].label }}
         headingEndValue={projectedScore}
         leading={
-          disabled ? null : (
-            <button
-              type="button"
-              className={dragHandleVariants({ visibility: 'always', dragging: isDragging })}
-              aria-label={`Drag to reorder ${ABILITY_ENTRIES[ability].label}`}
-              {...attributes}
-              {...listeners}
-            >
-              <GripVertical className="size-3.5" aria-hidden />
-            </button>
-          )
+          disabled
+            ? undefined
+            : {
+                kind: 'title',
+                content: (
+                  <button
+                    type="button"
+                    className={dragHandleVariants({ visibility: 'always', dragging: isDragging })}
+                    aria-label={`Drag to reorder ${ABILITY_ENTRIES[ability].label}`}
+                    {...attributes}
+                    {...listeners}
+                  >
+                    <GripVertical className="size-3.5" aria-hidden />
+                  </button>
+                ),
+              }
         }
       />
     </div>
