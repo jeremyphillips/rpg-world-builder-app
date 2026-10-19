@@ -99,6 +99,25 @@ export const EmbeddedRichSearchRow: Story = {
   ),
 }
 
+export const FilledStrongGrouped: Story = {
+  name: 'Filled strong grouped',
+  render: () => (
+    <DestinationList appearance="filled" tone="strong" density="comfortable">
+      <DestinationRow
+        link={<a href="#shattered-vale">nav</a>}
+        title="The Shattered Vale"
+        description="Active · 3 players · Last opened yesterday"
+      />
+      <DestinationRow
+        link={<a href="#review-invite">nav</a>}
+        title="Review invitation"
+        description="Avery invited you to join a campaign."
+        metadata="Expires in 6 days"
+      />
+    </DestinationList>
+  ),
+}
+
 export const ComparedToNavigableCard: Story = {
   name: 'Compared to navigable Card',
   render: () => (

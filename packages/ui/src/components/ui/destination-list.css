@@ -31,6 +31,28 @@
     background-color: transparent;
   }
 
+  .ui-destination-list--filled {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border);
+    background-color: transparent;
+  }
+
+  .ui-destination-list--filled.ui-destination-list--tone-strong {
+    background-color: var(--surface-muted);
+    box-shadow: 0 1px 2px 0 color-mix(in oklab, var(--foreground) 6%, transparent);
+  }
+
+  .ui-destination-list--filled .ui-destination-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-bottom: 1px solid var(--border-faint);
+    pointer-events: none;
+  }
+
   .ui-destination-list--compact {
     --ui-destination-inset-inline: calc(var(--spacing) * 4);
     --ui-destination-inset-block: calc(var(--spacing) * 2);

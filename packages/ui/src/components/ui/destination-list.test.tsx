@@ -13,6 +13,8 @@ import {
   UI_DESTINATION_LIST_COMPACT_CLASS,
   UI_DESTINATION_LIST_COMFORTABLE_CLASS,
   UI_DESTINATION_LIST_EMBEDDED_CLASS,
+  UI_DESTINATION_LIST_FILLED_CLASS,
+  UI_DESTINATION_LIST_TONE_STRONG_CLASS,
   UI_DESTINATION_ROW_CHEVRON_CLASS,
   UI_DESTINATION_ROW_CLASS,
   UI_DESTINATION_ROW_IDENTITY_CLUSTER_CLASS,
@@ -31,6 +33,13 @@ describe('destination-list.css inset divider contract', () => {
     )
     expect(css).toContain('left: var(--ui-destination-inset-inline)')
     expect(css).toContain('right: var(--ui-destination-inset-inline)')
+    expect(css).toContain(
+      '.ui-destination-list--filled .ui-destination-item:not(:last-child)::after',
+    )
+    expect(css).toContain('left: 0')
+    expect(css).toMatch(
+      /\.ui-destination-list--filled\.ui-destination-list--tone-strong[^}]*background-color:\s*var\(--surface-muted\)/s,
+    )
   })
 
   it('declares stable row link geometry on ui-destination-row', () => {
@@ -116,6 +125,24 @@ describe('DestinationList + DestinationRow', () => {
     const link = screen.getByRole('link')
     expect(link).toHaveClass('ui-interactive-row--hit-pointer')
     expect(link.className).not.toContain('cursor-pointer')
+  })
+
+  it('applies filled strong chrome and ignores tone on panel appearance', () => {
+    const { container, rerender } = render(
+      <DestinationList appearance="filled" tone="strong" density="comfortable">
+        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+      </DestinationList>,
+    )
+    const list = container.firstElementChild
+    expect(list).toHaveClass(UI_DESTINATION_LIST_FILLED_CLASS)
+    expect(list).toHaveClass(UI_DESTINATION_LIST_TONE_STRONG_CLASS)
+
+    rerender(
+      <DestinationList appearance="panel" tone="strong" density="comfortable">
+        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+      </DestinationList>,
+    )
+    expect(container.firstElementChild).not.toHaveClass(UI_DESTINATION_LIST_TONE_STRONG_CLASS)
   })
 
   it('inherits list density class without row density prop', () => {

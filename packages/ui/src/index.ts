@@ -311,6 +311,7 @@ export {
   DestinationRow,
   type DestinationListAppearance,
   type DestinationListDensity,
+  type DestinationListTone,
   type DestinationListProps,
   type DestinationRowProps,
   type DestinationRowRichProps,

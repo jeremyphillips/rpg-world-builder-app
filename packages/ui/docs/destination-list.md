@@ -12,6 +12,7 @@ Entity-rich pickers (combobox, menus) stay on `InteractiveList` + `InteractiveLi
 | ------------------------------- | --------------------------------------------------------------- |
 | Standalone tile (grid/hub cell) | Navigable `Card` (`link` prop)                                  |
 | Hub panel with inset dividers   | `DestinationList appearance="panel"` + simple `DestinationRow`  |
+| Filled grouped lists (campaign) | `DestinationList appearance="filled" tone="strong"` + row       |
 | Popover/search grouped results  | `DestinationList appearance="embedded"` + rich `DestinationRow` |
 | Combobox / menu rows            | `InteractiveList` + `InteractiveListRow`                        |
 
@@ -19,7 +20,8 @@ Entity-rich pickers (combobox, menus) stay on `InteractiveList` + `InteractiveLi
 
 ### `DestinationList`
 
-- `appearance?: 'panel' | 'embedded'` (default `panel`)
+- `appearance?: 'panel' | 'embedded' | 'filled'` (default `panel`)
+- `tone?: 'strong'` — list rest chrome when `appearance="filled"` (ignored for panel and embedded)
 - `density?: 'compact' | 'comfortable'` (default `comfortable`) — row padding + simple copy sizes only
 
 ### `DestinationRow` (discriminated union)
@@ -43,7 +45,7 @@ Row link ownership:
 | `.ui-destination-row` (`destination-list.css`) | Stable link geometry, base text color, no underline                                |
 | `interactiveRowVariants`                       | Hover family, hit target (`ui-interactive-row--hit-pointer`), selection/state axes |
 | `interactiveFocusVariants`                     | Embedded focus-visible policy                                                      |
-| `DestinationList`                              | Panel/embedded chrome, density vars, dividers                                      |
+| `DestinationList`                              | Panel/embedded/filled chrome, optional filled tone, density vars, dividers         |
 
 ## Relationship indicator in search rows
 
@@ -51,9 +53,9 @@ Dashboard `CharacterRelationshipIndicator` supports `presentation="inlinePassive
 
 ## Appearance vs density
 
-|          | `panel`                        | `embedded`                          |
-| -------- | ------------------------------ | ----------------------------------- |
-| Chrome   | Border, radius, transparent bg | No outer panel border               |
-| Dividers | Inset `::after` on items       | Full-bleed top border between items |
+|          | `panel`                        | `embedded`                          | `filled` (+ optional `tone="strong"`)        |
+| -------- | ------------------------------ | ----------------------------------- | -------------------------------------------- |
+| Chrome   | Border, radius, transparent bg | No outer panel border               | Border, card radius; strong → muted + shadow |
+| Dividers | Inset `::after` on items       | Full-bleed top border between items | Full-bleed `::after` between items           |
 
 Density controls `--ui-destination-inset-*` (compact vs comfortable). Rich `IdentityRow` typography is owned by the caller (`size="md"` in search).

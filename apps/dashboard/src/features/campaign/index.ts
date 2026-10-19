@@ -64,11 +64,6 @@ export {
   useCampaignOnboardingEligibleCharacters,
   useCompleteCampaignOnboarding,
 } from './hooks/use-campaign-onboarding-eligible-characters'
-export {
-  campaignDestinationChevronClasses,
-  campaignDestinationListVariants,
-  campaignDestinationRowVariants,
-} from './components/recovery/campaign-destination.variants'
 export { useUpdateCampaignCharacterMedia } from './hooks/use-update-campaign-character-media'
 export { useCampaignCharacter, campaignCharacterQueryKey } from './hooks/use-campaign-character'
 export { useCampaignCharacterAbilityScoreEditor } from './hooks/use-campaign-character-ability-score-editor'

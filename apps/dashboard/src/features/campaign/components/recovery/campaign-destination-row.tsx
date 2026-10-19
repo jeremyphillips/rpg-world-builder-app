@@ -1,11 +1,10 @@
 import type { CampaignListItem } from '@rpg/contracts'
+import { DestinationRow, IdentityFrame } from '@rpg/ui'
 import { Link } from 'react-router-dom'
-import { IdentityFrame } from '@rpg/ui'
 
 import { EntityAnatomyHost } from '@/features/content'
 
 import { CampaignMetaLine } from '../campaign-meta-line'
-import { campaignDestinationRowVariants } from './campaign-destination.variants'
 import {
   buildCampaignDisplay,
   resolveCampaignGameMasterDisplayStyle,
@@ -38,33 +37,39 @@ export function CampaignDestinationRow({
     destination.supportingCopy ?? (meta ? <CampaignMetaLine meta={meta} includeRecency /> : null)
 
   return (
-    <Link
-      to={destination.href}
-      aria-label={destination.ariaLabel}
-      className={campaignDestinationRowVariants()}
-      onClick={(event) => {
-        if (!destination.shouldPersistSelection || !shouldRunCampaignSelectionSideEffect(event)) {
-          return
-        }
+    <DestinationRow
+      link={
+        <Link
+          to={destination.href}
+          aria-label={destination.ariaLabel}
+          onClick={(event) => {
+            if (
+              !destination.shouldPersistSelection ||
+              !shouldRunCampaignSelectionSideEffect(event)
+            ) {
+              return
+            }
 
-        onPersistSelection(campaign.id)
-      }}
-    >
-      <EntityAnatomyHost
-        density="comfortable"
-        entity={{
-          heading: display.name,
-          description,
-          media: display.imageUrl ? (
-            <IdentityFrame src={display.imageUrl} alt="" shape="box" size="sm" fit="contain" />
-          ) : undefined,
-          status:
-            badgeLabel && badgeTone
-              ? [{ kind: 'badge', label: badgeLabel, appearance: 'outline', tone: badgeTone }]
-              : undefined,
-        }}
-        trailing={{ kind: 'indicator', variant: 'chevron' }}
-      />
-    </Link>
+            onPersistSelection(campaign.id)
+          }}
+        />
+      }
+      content={
+        <EntityAnatomyHost
+          density="comfortable"
+          entity={{
+            heading: display.name,
+            description,
+            media: display.imageUrl ? (
+              <IdentityFrame src={display.imageUrl} alt="" shape="box" size="sm" fit="contain" />
+            ) : undefined,
+            status:
+              badgeLabel && badgeTone
+                ? [{ kind: 'badge', label: badgeLabel, appearance: 'outline', tone: badgeTone }]
+                : undefined,
+          }}
+        />
+      }
+    />
   )
 }
