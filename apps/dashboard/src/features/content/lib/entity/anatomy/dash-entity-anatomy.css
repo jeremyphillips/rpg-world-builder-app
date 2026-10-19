@@ -3,23 +3,12 @@
     grid-template-columns: [leading] auto [media] auto [content] minmax(0, 1fr) [trailing] auto;
   }
 
-  .dash-entity-anatomy--compact .ui-row-anatomy__cell--media {
+  .dash-entity-anatomy .ui-row-anatomy__cell--media {
     margin-inline-end: calc(var(--spacing) * 4);
-  }
-
-  .dash-entity-anatomy--compact .ui-row-anatomy__cell--trailing {
-    margin-inline-start: calc(var(--spacing) * 2);
-  }
-
-  .dash-entity-anatomy--comfortable .ui-row-anatomy__cell--media {
-    margin-inline-end: calc(var(--spacing) * 4);
-  }
-
-  .dash-entity-anatomy--comfortable .ui-row-anatomy__cell--trailing {
-    margin-inline-start: calc(var(--spacing) * 3);
   }
 
   .dash-entity-anatomy .ui-row-anatomy__cell--trailing {
+    margin-inline-start: var(--ui-anatomy-trailing-gap, calc(var(--spacing) * 3));
     justify-self: end;
   }
 }

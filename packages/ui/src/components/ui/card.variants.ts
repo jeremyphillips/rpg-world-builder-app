@@ -40,9 +40,9 @@ export const UI_CONTENT_CARD_INSET_CLASS = 'ui-content-card-inset' as const
 
 export type ContentCardInsetDensity = Exclude<CardInsetDensity, 'spacious'>
 
-/** Maps option-card `default` density to the shared comfortable inset step. */
+/** Maps option-card `comfortable` density to the shared comfortable inset step. */
 export function resolveOptionCardSurfaceDensity(
-  density: 'default' | 'compact',
+  density: 'comfortable' | 'compact',
 ): ContentCardInsetDensity {
   return density === 'compact' ? 'compact' : 'comfortable'
 }

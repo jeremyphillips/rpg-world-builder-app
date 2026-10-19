@@ -167,7 +167,7 @@ describe('DestinationList + DestinationRow', () => {
         <DestinationRow
           link={<a href="/spell">nav</a>}
           startSlot={<span data-testid="media">M</span>}
-          content={<IdentityRow heading="Fireball" classification="Spell" size="md" />}
+          content={<IdentityRow heading="Fireball" classification="Spell" />}
           trailingInfo={<span data-testid="info">i</span>}
         />
       </DestinationList>,

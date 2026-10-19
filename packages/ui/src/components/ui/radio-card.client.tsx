@@ -85,7 +85,7 @@ function RadioCard({
   options,
   idPrefix = 'radio-card',
   variant = 'card',
-  density = 'default',
+  density = 'comfortable',
   visualControl = 'radio',
   columns = 'one',
   copyWidth = 'fill',

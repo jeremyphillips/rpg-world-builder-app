@@ -7,12 +7,12 @@ export const entityAnatomyHostRootVariants = cva('w-full min-w-0')
 
 export const entityAnatomyMediaContentSpanClasses = 'flex h-full items-start'
 
-export function entityAnatomyVariants({
-  density = 'comfortable',
-}: { density?: ContentCardDensity } = {}) {
+export function entityAnatomyVariants({ density }: { density?: ContentCardDensity } = {}) {
   return cn(
     rowAnatomyTracksVariants({ band: 'control' }),
     'dash-entity-anatomy min-w-0 w-full',
-    density === 'compact' ? 'dash-entity-anatomy--compact' : 'dash-entity-anatomy--comfortable',
+    density === 'compact' && 'dash-entity-anatomy--compact',
+    density === 'comfortable' && 'dash-entity-anatomy--comfortable',
+    density === 'spacious' && 'dash-entity-anatomy--spacious',
   )
 }

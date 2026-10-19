@@ -59,6 +59,7 @@ export type EquipmentResourceSummaryProps = {
 const RESOURCE_ICON_SIZE: Record<ContentCardDensity, IconContainerSize> = {
   compact: 'xs',
   comfortable: 'sm',
+  spacious: 'sm',
 }
 
 const CurrencyIcon = resourceIcon('currency')

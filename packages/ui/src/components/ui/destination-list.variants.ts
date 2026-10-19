@@ -4,7 +4,7 @@ import { cn } from '../../lib/utils'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import { interactiveRowVariants } from './interactive-row.variants'
 
-export const DESTINATION_LIST_DENSITIES = ['compact', 'comfortable'] as const
+export const DESTINATION_LIST_DENSITIES = ['compact', 'comfortable', 'spacious'] as const
 export type DestinationListDensity = (typeof DESTINATION_LIST_DENSITIES)[number]
 
 export const DESTINATION_LIST_APPEARANCES = ['panel', 'embedded', 'filled'] as const
@@ -20,6 +20,7 @@ export const UI_DESTINATION_LIST_FILLED_CLASS = 'ui-destination-list--filled' as
 export const UI_DESTINATION_LIST_TONE_STRONG_CLASS = 'ui-destination-list--tone-strong' as const
 export const UI_DESTINATION_LIST_COMPACT_CLASS = 'ui-destination-list--compact' as const
 export const UI_DESTINATION_LIST_COMFORTABLE_CLASS = 'ui-destination-list--comfortable' as const
+export const UI_DESTINATION_LIST_SPACIOUS_CLASS = 'ui-destination-list--spacious' as const
 
 export const UI_DESTINATION_ITEM_CLASS = 'ui-destination-item' as const
 export const UI_DESTINATION_ROW_CLASS = 'ui-destination-row' as const
@@ -42,6 +43,7 @@ export const destinationListVariants = cva(UI_DESTINATION_LIST_CLASS, {
     density: {
       compact: UI_DESTINATION_LIST_COMPACT_CLASS,
       comfortable: UI_DESTINATION_LIST_COMFORTABLE_CLASS,
+      spacious: UI_DESTINATION_LIST_SPACIOUS_CLASS,
     },
     tone: {
       strong: UI_DESTINATION_LIST_TONE_STRONG_CLASS,

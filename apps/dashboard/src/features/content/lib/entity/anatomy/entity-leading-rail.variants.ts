@@ -9,9 +9,7 @@ export const entityLeadingRailVariants = cva('dash-entity-leading', {
     density: {
       compact: 'dash-entity-leading--compact',
       comfortable: 'dash-entity-leading--comfortable',
+      spacious: 'dash-entity-leading--comfortable',
     },
-  },
-  defaultVariants: {
-    density: 'comfortable',
   },
 })

@@ -191,7 +191,7 @@ function resolveRadioOptionCardShellClassName({
       disabled,
     }),
     'group ui-radio-card',
-    density === 'compact' ? 'ui-radio-card--compact' : 'ui-radio-card--default',
+    density === 'compact' ? 'ui-radio-card--compact' : 'ui-radio-card--comfortable',
     media && 'ui-radio-card--media',
     className,
   )
@@ -266,7 +266,7 @@ function RadioOptionCardPrimaryRow(props: RadioOptionCardInteriorProps) {
     summaryItems,
     summaryLines,
     summaryContent,
-    density = 'default',
+    density = 'comfortable',
     variant = 'card',
     visualControl = 'radio',
     icon,
@@ -344,7 +344,7 @@ function RadioOptionCardPrimaryRow(props: RadioOptionCardInteriorProps) {
 function RadioOptionCardInterior(props: RadioOptionCardInteriorProps) {
   const {
     id,
-    density = 'default',
+    density = 'comfortable',
     variant = 'card',
     media,
     embedded,
@@ -383,7 +383,7 @@ export const RadioOptionCard = React.forwardRef<HTMLDivElement, RadioOptionCardP
   (props, ref) => {
     const {
       className,
-      density = 'default',
+      density = 'comfortable',
       variant = 'card',
       details,
       disabled,

@@ -21,12 +21,12 @@ export const optionCardCompactSummaryBodyLayoutClasses = 'px-4 py-2'
 export const optionCardDensityBodyLayoutVariants = cva('', {
   variants: {
     density: {
-      default: 'px-4 py-3',
+      comfortable: 'px-4 py-3',
       compact: optionCardCompactOptionBodyLayoutClasses,
     },
   },
   defaultVariants: {
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -34,12 +34,12 @@ export const optionCardDensityBodyLayoutVariants = cva('', {
 export const optionCardDensityContentGapVariants = cva('', {
   variants: {
     density: {
-      default: 'gap-2',
+      comfortable: 'gap-2',
       compact: 'gap-1',
     },
   },
   defaultVariants: {
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -49,12 +49,12 @@ export const optionCardCompactSummaryContentGapClasses = 'gap-0'
 export const optionCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
   variants: {
     density: {
-      default: 'gap-0.5',
+      comfortable: 'gap-0.5',
       compact: 'gap-0',
     },
   },
   defaultVariants: {
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -62,12 +62,12 @@ export const optionCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
 export const optionCardPrimaryCopyStackVariants = cva('flex flex-col', {
   variants: {
     density: {
-      default: 'gap-0.5',
+      comfortable: 'gap-0.5',
       compact: 'gap-0',
     },
   },
   defaultVariants: {
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -78,7 +78,7 @@ export const optionCardCompactSecondaryTypographyClasses = 'text-xs leading-snug
 export const optionCardSecondaryCopyStackVariants = cva('min-w-0', {
   variants: {
     density: {
-      default: '',
+      comfortable: '',
       compact: optionCardCompactSecondaryTypographyClasses,
     },
     copyWidth: {
@@ -87,7 +87,7 @@ export const optionCardSecondaryCopyStackVariants = cva('min-w-0', {
     },
   },
   defaultVariants: {
-    density: 'default',
+    density: 'comfortable',
     copyWidth: 'fill',
   },
 })
@@ -100,12 +100,12 @@ export const optionCardTitleLineVariants = cva(
 export const optionCardTitleVariants = cva('font-bold', {
   variants: {
     density: {
-      default: 'text-base',
+      comfortable: 'text-base',
       compact: 'text-sm',
     },
   },
   defaultVariants: {
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -113,12 +113,12 @@ export const optionCardTitleVariants = cva('font-bold', {
 export const optionCardSummaryTitleVariants = cva('font-bold', {
   variants: {
     density: {
-      default: 'text-base',
+      comfortable: 'text-base',
       compact: 'text-sm',
     },
   },
   defaultVariants: {
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -133,12 +133,12 @@ export const optionCardSummaryLinesVariants = cva('flex flex-col gap-0.5')
 export const optionCardDescriptionVariants = cva('text-muted-foreground', {
   variants: {
     density: {
-      default: 'text-sm',
+      comfortable: 'text-sm',
       compact: optionCardCompactSecondaryTypographyClasses,
     },
   },
   defaultVariants: {
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -186,12 +186,12 @@ export const selectionOptionCardBodyVariants = cva(
   {
     variants: {
       density: {
-        default: '',
+        comfortable: '',
         compact: '',
       },
     },
     defaultVariants: {
-      density: 'default',
+      density: 'comfortable',
     },
   },
 )
@@ -204,12 +204,12 @@ export const selectionOptionCardHeaderRowVariants = cva(
 export const optionCardIdentityRowVariants = cva('flex min-w-0 items-start', {
   variants: {
     density: {
-      default: identityInsetRowVariants({ density: 'comfortable', align: 'start' }),
+      comfortable: identityInsetRowVariants({ density: 'comfortable', align: 'start' }),
       compact: identityInsetRowVariants({ density: 'compact', align: 'start' }),
     },
   },
   defaultVariants: {
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -242,7 +242,7 @@ export const optionCardCompactBodyInsetClasses = 'pl-[calc(0.75rem+1rem+0.75rem)
  * Panel tone breaks out to the card edge and must not use these.
  */
 export const optionCardEmbeddedContentInsetClasses = {
-  default: 'pl-[calc(1.25rem+1rem)]',
+  comfortable: 'pl-[calc(1.25rem+1rem)]',
   compact: 'pl-[calc(1rem+0.75rem)]',
 } as const
 
@@ -259,15 +259,15 @@ export const optionCardEmbeddedSlotVariants = cva('', {
       plain: 'border-t border-border',
     },
     density: {
-      default: '',
+      comfortable: '',
       compact: '',
     },
   },
   compoundVariants: [
     {
       tone: 'divider',
-      density: 'default',
-      class: cn('mt-4 pt-4', optionCardEmbeddedContentInsetClasses.default),
+      density: 'comfortable',
+      class: cn('mt-4 pt-4', optionCardEmbeddedContentInsetClasses.comfortable),
     },
     {
       tone: 'divider',
@@ -276,8 +276,8 @@ export const optionCardEmbeddedSlotVariants = cva('', {
     },
     {
       tone: 'plain',
-      density: 'default',
-      class: cn('mt-4 pt-4', optionCardEmbeddedContentInsetClasses.default),
+      density: 'comfortable',
+      class: cn('mt-4 pt-4', optionCardEmbeddedContentInsetClasses.comfortable),
     },
     {
       tone: 'plain',
@@ -286,7 +286,7 @@ export const optionCardEmbeddedSlotVariants = cva('', {
     },
     {
       tone: 'panel',
-      density: 'default',
+      density: 'comfortable',
       class: '-mx-5 -mb-3 mt-4 rounded-b-card pb-3 pt-4',
     },
     {
@@ -297,7 +297,7 @@ export const optionCardEmbeddedSlotVariants = cva('', {
   ],
   defaultVariants: {
     tone: 'divider',
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -305,12 +305,12 @@ export const optionCardEmbeddedSlotVariants = cva('', {
 export const optionCardFooterSlotVariants = cva('min-w-0', {
   variants: {
     density: {
-      default: 'mt-2',
+      comfortable: 'mt-2',
       compact: 'mt-1',
     },
   },
   defaultVariants: {
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -343,12 +343,12 @@ export const selectionOptionCardAnatomyRootVariants = cva('flex w-full min-w-0 i
       right: 'flex-row-reverse',
     },
     density: {
-      default: 'gap-4',
+      comfortable: 'gap-4',
       compact: 'gap-3',
     },
   },
   defaultVariants: {
     controlPosition: 'left',
-    density: 'default',
+    density: 'comfortable',
   },
 })

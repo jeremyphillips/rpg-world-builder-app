@@ -7,7 +7,7 @@ import {
   InlineMetadata,
   contentCardHeadingLinkVariants,
   type ContentCardDensity,
-  type IdentityRowSize,
+  type InlineMetadataDensity,
 } from '@rpg/ui'
 
 import type { EntitySummaryModel } from './entity-summary.types'
@@ -27,14 +27,12 @@ import {
   entitySummaryStatusRowVariants,
 } from './entity-summary.variants'
 
-/** Supporting copy scale per density — compact `text-xs`, comfortable `text-sm`. */
-const ENTITY_SUMMARY_SUPPORTING_SIZE: Record<ContentCardDensity, IdentityRowSize> = {
-  compact: 'md',
-  comfortable: 'lg',
+function inlineMetadataDensity(density?: ContentCardDensity): InlineMetadataDensity {
+  return density === 'compact' ? 'compact' : 'comfortable'
 }
 
 export type EntitySummaryHeadingProps = Pick<EntitySummaryModel, 'heading' | 'classification'> & {
-  density: ContentCardDensity
+  density?: ContentCardDensity
   /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
   headingEndValue?: number
   /** Intrinsic-width slot immediately after the title (private transport from ContentEntityCard). */
@@ -98,16 +96,11 @@ export function EntitySummaryHeading({
 /** Description line — placed in the host meta cell. */
 export function EntitySummaryDescription({
   children,
-  density,
 }: {
   children: ReactNode
-  density: ContentCardDensity
+  density?: ContentCardDensity
 }) {
-  return (
-    <IdentityRowSupporting size={ENTITY_SUMMARY_SUPPORTING_SIZE[density]}>
-      {children}
-    </IdentityRowSupporting>
-  )
+  return <IdentityRowSupporting>{children}</IdentityRowSupporting>
 }
 
 /** Structured supporting segments — placed in the host meta cell. */
@@ -116,15 +109,15 @@ export function EntitySummarySupportingMetadata({
   density,
 }: {
   segments: readonly string[]
-  density: ContentCardDensity
+  density?: ContentCardDensity
 }) {
   if (segments.length === 0) {
     return null
   }
 
   return (
-    <IdentityRowSupporting size={ENTITY_SUMMARY_SUPPORTING_SIZE[density]} wrap>
-      <InlineMetadata role="supporting" density={density}>
+    <IdentityRowSupporting wrap>
+      <InlineMetadata role="supporting" density={inlineMetadataDensity(density)}>
         {segments.map((label) => (
           <InlineMetadata.Item key={label}>{label}</InlineMetadata.Item>
         ))}
@@ -145,7 +138,7 @@ export function EntitySummaryStatus({
 }: {
   items: readonly EntitySummaryStatusItem[]
   provenance?: readonly EntitySummaryProvenanceItem[]
-  density: ContentCardDensity
+  density?: ContentCardDensity
   composition?: EntitySummaryStatusComposition
 }) {
   const provenanceItems = provenance ?? []
@@ -154,7 +147,7 @@ export function EntitySummaryStatus({
     return (
       <InlineMetadata
         role="supporting"
-        density={density}
+        density={inlineMetadataDensity(density)}
         wrap
         className={entitySummaryStatusMetadataVariants({ density })}
       >

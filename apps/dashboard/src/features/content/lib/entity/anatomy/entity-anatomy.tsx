@@ -58,7 +58,7 @@ export function EntityAnatomy({
   leading,
   leadingUtilities,
   trailing,
-  density = 'comfortable',
+  density,
   headingEndValue,
   headingInline,
 }: EntityAnatomyProps) {
@@ -156,7 +156,7 @@ export function EntityAnatomyHost({
   headingHref,
   leading,
   trailing,
-  density = 'comfortable',
+  density,
 }: EntityAnatomyHostProps) {
   return (
     <div className={entityAnatomyHostRootVariants()}>

@@ -30,9 +30,9 @@ export type RadioCardVisualControl = 'radio' | 'icon'
 export function radioCardGroupItemRowClasses({
   density,
 }: {
-  density: 'default' | 'compact'
+  density: 'comfortable' | 'compact'
 }): string {
-  return cn(radioCardRowBase, density === 'default' ? 'gap-1 px-0 py-2' : 'gap-0.5 px-0 py-2')
+  return cn(radioCardRowBase, density === 'comfortable' ? 'gap-1 px-0 py-2' : 'gap-0.5 px-0 py-2')
 }
 
 /** Card-style radio option density padding (applied inside ui-radio-card body). */
@@ -43,27 +43,27 @@ export const radioCardVariants = cva('', {
       row: radioCardRowBase,
     },
     density: {
-      default: '',
+      comfortable: '',
       compact: '',
     },
   },
   compoundVariants: [
     {
       variant: 'card',
-      density: 'default',
-      class: optionCardDensityContentGapVariants({ density: 'default' }),
+      density: 'comfortable',
+      class: optionCardDensityContentGapVariants({ density: 'comfortable' }),
     },
     {
       variant: 'card',
       density: 'compact',
       class: optionCardDensityContentGapVariants({ density: 'compact' }),
     },
-    { variant: 'row', density: 'default', class: 'gap-1 px-0 py-2' },
+    { variant: 'row', density: 'comfortable', class: 'gap-1 px-0 py-2' },
     { variant: 'row', density: 'compact', class: 'gap-0.5 px-0 py-2' },
   ],
   defaultVariants: {
     variant: 'card',
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -73,7 +73,7 @@ export const radioCardLeadingControlTitleLineVariants = cva(
   {
     variants: {
       density: {
-        default: '',
+        comfortable: '',
         compact: '',
       },
       titleEnd: {
@@ -82,11 +82,11 @@ export const radioCardLeadingControlTitleLineVariants = cva(
       },
     },
     compoundVariants: [
-      { density: 'default', titleEnd: false, class: 'h-6' },
+      { density: 'comfortable', titleEnd: false, class: 'h-6' },
       { density: 'compact', titleEnd: false, class: 'h-5' },
     ],
     defaultVariants: {
-      density: 'default',
+      density: 'comfortable',
       titleEnd: false,
     },
   },
@@ -100,14 +100,14 @@ export const radioCardControlVariants = cva('', {
       row: '',
     },
     density: {
-      default: '',
+      comfortable: '',
       compact: '',
     },
   },
   compoundVariants: [
     {
       variant: 'card',
-      density: 'default',
+      density: 'comfortable',
       class: radioCardDecorativeControlClasses({ indicatorSize: 'lg' }),
     },
     {
@@ -117,7 +117,7 @@ export const radioCardControlVariants = cva('', {
     },
     {
       variant: 'row',
-      density: 'default',
+      density: 'comfortable',
       class: radioCardDecorativeControlClasses({ indicatorSize: 'sm' }),
     },
     {
@@ -128,7 +128,7 @@ export const radioCardControlVariants = cva('', {
   ],
   defaultVariants: {
     variant: 'card',
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -144,12 +144,12 @@ export const radioCardIconControlVariants = cva(
   {
     variants: {
       density: {
-        default: 'size-5 [&_svg]:size-5',
+        comfortable: 'size-5 [&_svg]:size-5',
         compact: 'size-4 [&_svg]:size-4',
       },
     },
     defaultVariants: {
-      density: 'default',
+      density: 'comfortable',
     },
   },
 )
@@ -169,7 +169,7 @@ export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 ite
       row: 'gap-1',
     },
     density: {
-      default: '',
+      comfortable: '',
       compact: '',
     },
     columns: {
@@ -179,11 +179,11 @@ export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 ite
     },
   },
   compoundVariants: [
-    { variant: 'card', density: 'default', class: 'gap-3' },
+    { variant: 'card', density: 'comfortable', class: 'gap-3' },
     { variant: 'card', density: 'compact', class: 'gap-2' },
   ],
   defaultVariants: {
     variant: 'card',
-    density: 'default',
+    density: 'comfortable',
   },
 })

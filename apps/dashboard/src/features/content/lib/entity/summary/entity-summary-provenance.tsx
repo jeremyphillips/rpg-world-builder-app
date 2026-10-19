@@ -11,7 +11,7 @@ export function EntitySummaryProvenanceItemView({
   density,
 }: {
   item: EntitySummaryProvenanceItem
-  density: ContentCardDensity
+  density?: ContentCardDensity
 }) {
   if (item.kind === 'text') {
     return <span className={entitySummaryProvenanceTextVariants({ density })}>{item.label}</span>

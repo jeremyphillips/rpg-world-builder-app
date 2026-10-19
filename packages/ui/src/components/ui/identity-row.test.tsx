@@ -15,7 +15,7 @@ describe('IdentityRow', () => {
         <IdentityRow
           heading="Very Long Location Name That Should Truncate"
           classification="District"
-          size="md"
+          density="comfortable"
         />
       </div>,
     )
@@ -24,9 +24,9 @@ describe('IdentityRow', () => {
     const classification = screen.getByText('District')
 
     expect(heading).toHaveClass('truncate')
-    expect(heading.className).toContain(identityRowHeadingVariants({ size: 'md' }))
+    expect(heading.className).toContain(identityRowHeadingVariants())
     expect(classification).toHaveClass('shrink-0')
-    expect(classification.className).toContain(identityRowClassificationVariants({ size: 'md' }))
+    expect(classification.className).toContain(identityRowClassificationVariants())
     expect(screen.getByText('District')).toBeInTheDocument()
   })
 
@@ -35,7 +35,7 @@ describe('IdentityRow', () => {
       <IdentityRow
         heading="Harborford"
         classification="Very Long Classification Label Here"
-        size="md"
+        density="comfortable"
       />,
     )
 
@@ -50,7 +50,7 @@ describe('IdentityRow', () => {
         heading="Building"
         supporting="A contained structure such as a tavern, temple, or guild hall."
         supportingWrap
-        size="md"
+        density="comfortable"
       />,
     )
 
@@ -62,14 +62,14 @@ describe('IdentityRow', () => {
   })
 
   it('truncates supporting copy by default', () => {
-    render(<IdentityRow heading="Building" supporting="Secondary metadata line" size="md" />)
+    render(<IdentityRow heading="Building" supporting="Secondary metadata line" />)
 
     const supporting = screen.getByText('Secondary metadata line')
     expect(supporting).toHaveClass('ui-identity-row__supporting--truncate')
   })
 
   it('omits supporting line when absent', () => {
-    render(<IdentityRow heading="Only heading" size="md" />)
+    render(<IdentityRow heading="Only heading" />)
 
     expect(screen.getByText('Only heading')).toBeInTheDocument()
     expect(screen.queryByText('Secondary')).not.toBeInTheDocument()
@@ -82,7 +82,7 @@ describe('IdentityRow', () => {
           heading="Very Long Weapon Name That Should Truncate Before The Quantity"
           classification="Weapon"
           headingEnd={<span>x2</span>}
-          size="sm"
+          density="compact"
         />
       </div>,
     )
@@ -97,16 +97,17 @@ describe('IdentityRow', () => {
     expect(screen.getByText('Weapon')).toHaveClass('shrink-0')
   })
 
-  it('uses text-xs heading at sm size', () => {
-    render(<IdentityRow heading="Compact row" classification="Tag" size="sm" />)
+  it('marks an explicit compact density on the row', () => {
+    const { container } = render(
+      <IdentityRow heading="Compact row" classification="Tag" density="compact" />,
+    )
 
-    expect(screen.getByText('Compact row').className).toContain('ui-identity-row__title--sm')
+    expect(container.firstElementChild).toHaveClass('ui-identity-row--compact')
+    expect(screen.getByText('Compact row')).toHaveClass('ui-identity-row__title')
   })
 
-  it('keeps md classification on the title scale', () => {
-    expect(identityRowClassificationVariants({ size: 'md' })).toContain(
-      'ui-identity-row__classification--md',
-    )
+  it('keeps classification on the shared title class', () => {
+    expect(identityRowClassificationVariants()).toContain('ui-identity-row__classification')
   })
 })
 
@@ -136,10 +137,11 @@ describe('IdentityRowHeadingLine entity-compact', () => {
       />,
     )
 
-    expect(screen.getByText('Fire Bolt')).toHaveClass('ui-identity-row__title--md')
-    expect(screen.getByText('Fire Bolt')).not.toHaveClass('ui-identity-row__title--sm')
-    expect(screen.getByText('Spell')).toHaveClass('ui-identity-row__classification--sm')
-    expect(screen.getByText('Spell')).not.toHaveClass('ui-identity-row__classification--md')
+    expect(screen.getByText('Fire Bolt')).toHaveClass('ui-identity-row__title')
+    expect(screen.getByText('Spell')).toHaveClass('ui-identity-row__classification')
+    expect(
+      screen.getByText('Spell').closest('.ui-identity-row__meta--entity-compact'),
+    ).not.toBeNull()
     expect(screen.getByText('3')).toHaveClass('text-style-caption')
   })
 })

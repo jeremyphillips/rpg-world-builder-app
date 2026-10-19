@@ -11,6 +11,7 @@ export const contentCardDensityInsetVariants = cva('', {
     density: {
       compact: cn(cardDensityClassName('compact'), UI_CONTENT_CARD_INSET_CLASS),
       comfortable: cn(cardDensityClassName('comfortable'), UI_CONTENT_CARD_INSET_CLASS),
+      spacious: cn(cardDensityClassName('spacious'), UI_CONTENT_CARD_INSET_CLASS),
     },
   },
   defaultVariants: {
@@ -36,6 +37,7 @@ export const contentCardIdentityColumnGapVariants = cva('', {
     density: {
       compact: 'gap-2',
       comfortable: 'gap-4',
+      spacious: 'gap-4',
     },
   },
   defaultVariants: {
@@ -52,6 +54,7 @@ export const contentCardMediaEndGapVariants = cva('', {
     density: {
       compact: 'me-2',
       comfortable: '',
+      spacious: '',
     },
   },
   defaultVariants: {
@@ -70,6 +73,7 @@ export const contentCardBodyVariants = cva('flex min-w-0 w-full', {
     density: {
       compact: resolveContentCardIdentityColumnGapClasses('compact'),
       comfortable: resolveContentCardIdentityColumnGapClasses('comfortable'),
+      spacious: resolveContentCardIdentityColumnGapClasses('spacious'),
     },
     crossAxis: {
       top: 'items-start',
@@ -100,35 +104,23 @@ export const contentCardHeadingRowVariants = cva('flex min-w-0 items-center gap-
   },
 })
 
+export function contentCardHeadingScaleClass(density?: ContentCardDensity): string {
+  return cn(
+    'ui-content-card-heading ui-copy-title',
+    density === 'compact' && 'ui-content-card-heading--compact',
+    density === 'comfortable' && 'ui-content-card-heading--comfortable',
+    density === 'spacious' && 'ui-content-card-heading--spacious',
+  )
+}
+
 export const contentCardHeadingVariants = cva(
   'truncate font-body-emphasis [&_a]:block [&_a]:min-w-0 [&_a]:truncate',
-  {
-    variants: {
-      density: {
-        compact: 'text-sm',
-        comfortable: 'entity-card-heading-comfortable',
-      },
-    },
-    defaultVariants: {
-      density: 'comfortable',
-    },
-  },
 )
 
-export const contentCardMixedHeadingRowVariants = cva('flex min-w-0 items-baseline gap-x-1', {
-  variants: {
-    density: {
-      compact: 'text-sm',
-      comfortable: 'entity-card-heading-comfortable',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
+export const contentCardMixedHeadingRowVariants = cva('flex min-w-0 items-baseline gap-x-1')
 
 export const contentCardMixedHeadingNameVariants = cva(
-  'min-w-0 shrink truncate font-body-emphasis text-foreground [&_a]:truncate',
+  'ui-copy-title min-w-0 shrink truncate font-body-emphasis text-foreground [&_a]:truncate',
 )
 
 export const contentCardMixedHeadingSeparatorVariants = cva(
@@ -145,6 +137,7 @@ export const supportingTextDensityVariants = cva('truncate text-muted-foreground
     density: {
       compact: 'text-xs',
       comfortable: 'text-sm',
+      spacious: 'text-sm',
     },
   },
   defaultVariants: {
@@ -183,6 +176,7 @@ export const contentCardMediaVariants = cva('shrink-0', {
     density: {
       compact: '',
       comfortable: '',
+      spacious: '',
     },
   },
   defaultVariants: {
@@ -190,7 +184,7 @@ export const contentCardMediaVariants = cva('shrink-0', {
   },
 })
 
-export const CONTENT_CARD_DENSITIES = ['compact', 'comfortable'] as const
+export const CONTENT_CARD_DENSITIES = ['compact', 'comfortable', 'spacious'] as const
 export type ContentCardDensity = (typeof CONTENT_CARD_DENSITIES)[number]
 export type ContentCardChrome = NonNullable<VariantProps<typeof contentCardRootVariants>['chrome']>
 

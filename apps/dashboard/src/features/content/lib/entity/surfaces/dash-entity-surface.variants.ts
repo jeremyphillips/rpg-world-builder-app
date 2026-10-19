@@ -27,13 +27,17 @@ export function entitySurfaceVariants({
   edges,
   leadingUtilityCount,
 }: {
-  density: 'compact' | 'comfortable'
+  density: 'compact' | 'comfortable' | 'spacious'
   edges: EntitySurfaceEdges
   leadingUtilityCount: number
 }): string {
   return cn(
     DASH_ENTITY_SURFACE_BLOCK,
-    density === 'compact' ? 'dash-entity-surface--compact' : 'dash-entity-surface--comfortable',
+    density === 'compact'
+      ? 'dash-entity-surface--compact'
+      : density === 'spacious'
+        ? 'dash-entity-surface--spacious'
+        : 'dash-entity-surface--comfortable',
     edges.start === 'utility'
       ? 'dash-entity-surface--start-utility'
       : 'dash-entity-surface--start-default',

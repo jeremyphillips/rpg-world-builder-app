@@ -14,6 +14,7 @@ export function ContinueCampaignCard({ campaign }: ContinueCampaignCardProps) {
       eyebrow={CAMPAIGN_DESTINATION_COPY.continueCampaignEyebrow}
       eyebrowAs="h2"
       eyebrowTone="foreground"
+      density="spacious"
       campaigns={[campaign]}
     />
   )

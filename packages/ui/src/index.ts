@@ -773,7 +773,7 @@ export {
   type IdentityRowHeadingLineProps,
   type IdentityRowHeadingRecipe,
   type IdentityRowProps,
-  type IdentityRowSize,
+  type IdentityRowDensity,
   type IdentityRowSupportingProps,
 } from './components/ui/identity-row.client'
 export {
@@ -803,7 +803,6 @@ export {
   menuChoiceItemResetVariants,
   type InteractiveListSize,
 } from './components/ui/interactive-list.variants'
-export { identityRowSizeFromInteractiveListSize } from './components/ui/interactive-list.lib'
 export {
   PreviewRail,
   PreviewRailAction,

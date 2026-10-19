@@ -42,7 +42,7 @@ describe('StartingEquipmentOptionSummaryCard', () => {
     render(
       <StartingEquipmentOptionSummaryCard
         summary={summary}
-        density="default"
+        density="comfortable"
         onChangePackage={vi.fn()}
       />,
     )
@@ -60,7 +60,7 @@ describe('StartingEquipmentOptionSummaryCard', () => {
     render(
       <StartingEquipmentOptionSummaryCard
         summary={summary}
-        density="default"
+        density="comfortable"
         onChangePackage={onChangePackage}
       />,
     )
@@ -96,7 +96,7 @@ describe('StartingEquipmentOptionSummaryCard', () => {
     render(
       <StartingEquipmentOptionSummaryCard
         summary={summary}
-        density="default"
+        density="comfortable"
         onChangePackage={vi.fn()}
         showChangePackage={false}
       />,
@@ -130,7 +130,7 @@ describe('StartingEquipmentOptionSummaryCard', () => {
             totalStartingWealth: { cp: 0, sp: 5, gp: 712, pp: 0 },
           },
         }}
-        density="default"
+        density="comfortable"
         onChangePackage={vi.fn()}
         advisoryLabels={['Shield proficiency is missing.']}
       />,
@@ -148,7 +148,7 @@ describe('StartingEquipmentOptionSummaryCard', () => {
     const { container } = render(
       <StartingEquipmentOptionSummaryCard
         summary={summary}
-        density="default"
+        density="comfortable"
         onChangePackage={vi.fn()}
       />,
     )

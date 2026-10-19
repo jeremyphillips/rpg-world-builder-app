@@ -63,7 +63,7 @@ describe('ContentCard', () => {
     const subheading = screen.getByText('Settlement overview')
     const metadata = screen.getByText('Unavailable in this campaign')
 
-    expect(heading).toHaveClass(contentCardHeadingVariants({ density: 'comfortable' }))
+    expect(heading).toHaveClass(contentCardHeadingVariants())
     expect(subheading).toHaveClass(contentCardSubheadingVariants({ density: 'comfortable' }))
     expect(metadata).toHaveClass(contentCardMetadataVariants({ density: 'comfortable' }))
     expect(container.querySelector('article')).toHaveClass(
@@ -166,7 +166,8 @@ describe('ContentCard', () => {
     )
 
     expect(screen.getByText('Harbor District')).toHaveClass(
-      contentCardHeadingVariants({ density: 'compact' }),
+      'ui-content-card-heading--compact',
+      contentCardHeadingVariants(),
     )
     expect(screen.getByText('Settlement overview')).toHaveClass(
       contentCardSubheadingVariants({ density: 'compact' }),

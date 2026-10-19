@@ -1,0 +1,81 @@
+/*
+ * Canonical density copy scale.
+ * compact 14/12, comfortable 16/14, spacious 19/14.
+ * Font size and the line-height token paired with that size. Weight stays on the component.
+ * A density class on the same element overrides an inherited value.
+ */
+@layer components {
+  .ui-copy-title,
+  .ui-content-card-heading {
+    font-size: var(--ui-copy-title-size, var(--text-base));
+    line-height: var(--ui-copy-title-line-height, var(--text-base--line-height));
+    letter-spacing: var(--tracking-heading);
+  }
+
+  .ui-copy-supporting {
+    font-size: var(--ui-copy-supporting-size, var(--text-sm));
+    line-height: var(--ui-copy-supporting-line-height, var(--text-sm--line-height));
+  }
+
+  .ui-card,
+  .ui-destination-list,
+  .ui-interactive-list__main--md {
+    --ui-copy-title-size: var(--text-base);
+    --ui-copy-title-line-height: var(--text-base--line-height);
+    --ui-copy-supporting-size: var(--text-sm);
+    --ui-copy-supporting-line-height: var(--text-sm--line-height);
+    --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
+    --entity-leading-content-gap: calc(var(--spacing) * 3);
+  }
+
+  .ui-card--compact,
+  .ui-destination-list--compact,
+  .ui-interactive-list__main--sm,
+  .dash-entity-anatomy--compact,
+  .ui-identity-row--compact,
+  .ui-content-card-heading--compact {
+    --ui-copy-title-size: var(--text-sm);
+    --ui-copy-title-line-height: var(--text-sm--line-height);
+    --ui-copy-supporting-size: var(--text-xs);
+    --ui-copy-supporting-line-height: var(--text-xs--line-height);
+    --ui-anatomy-trailing-gap: calc(var(--spacing) * 2);
+    --entity-leading-content-gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-card--comfortable,
+  .ui-destination-list--comfortable,
+  .dash-entity-anatomy--comfortable,
+  .ui-identity-row--comfortable,
+  .ui-content-card-heading--comfortable {
+    --ui-copy-title-size: var(--text-base);
+    --ui-copy-title-line-height: var(--text-base--line-height);
+    --ui-copy-supporting-size: var(--text-sm);
+    --ui-copy-supporting-line-height: var(--text-sm--line-height);
+    --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
+    --entity-leading-content-gap: calc(var(--spacing) * 3);
+  }
+
+  .ui-card--spacious,
+  .ui-destination-list--spacious,
+  .ui-interactive-list__main--lg,
+  .dash-entity-anatomy--spacious,
+  .ui-identity-row--spacious,
+  .ui-content-card-heading--spacious {
+    --ui-copy-title-size: var(--text-heading-card);
+    --ui-copy-title-line-height: var(--text-heading-card--line-height);
+    --ui-copy-supporting-size: var(--text-sm);
+    --ui-copy-supporting-line-height: var(--text-sm--line-height);
+    --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
+    --entity-leading-content-gap: calc(var(--spacing) * 3);
+  }
+
+  /* Later than card.css so density modifiers beat the untoned `.ui-card` title vars. */
+  .ui-card--compact,
+  .ui-card--comfortable,
+  .ui-card--spacious {
+    --ui-card-title-size: var(--ui-copy-title-size);
+    --ui-card-title-line-height: var(--ui-copy-title-line-height);
+    --ui-card-description-size: var(--ui-copy-supporting-size);
+    --ui-card-description-line-height: var(--ui-copy-supporting-line-height);
+  }
+}

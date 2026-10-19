@@ -6,7 +6,6 @@ import { cn } from '../../lib/utils'
 import { DropdownMenuItem } from './dropdown-menu.client'
 import { IdentityRow } from './identity-row.client'
 import { identityRowHeadingVariants } from './identity-row.variants'
-import { identityRowSizeFromInteractiveListSize } from './interactive-list.lib'
 import type { InteractiveListSize } from './interactive-list.variants'
 import {
   interactiveListRowChromeVariants,
@@ -32,7 +31,6 @@ export const MenuChoiceRow = React.forwardRef<
   { heading, supporting, supportingWrap = false, size = 'md', className, disabled, ...props },
   ref,
 ) {
-  const identitySize = identityRowSizeFromInteractiveListSize(size)
   const hasIdentityCopy = supporting != null && supporting !== ''
 
   return (
@@ -52,16 +50,10 @@ export const MenuChoiceRow = React.forwardRef<
           heading={heading}
           supporting={supporting}
           supportingWrap={supportingWrap}
-          size={identitySize}
           className="min-w-0 flex-1 flex-none"
         />
       ) : (
-        <span
-          className={cn(
-            'min-w-0 flex-1 truncate text-left',
-            identityRowHeadingVariants({ size: identitySize }),
-          )}
-        >
+        <span className={cn('min-w-0 flex-1 truncate text-left', identityRowHeadingVariants())}>
           {heading}
         </span>
       )}

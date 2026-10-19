@@ -12,13 +12,17 @@ export function entityCardFrameVariants({
   edges = ENTITY_SURFACE_DEFAULT_EDGES,
   leadingUtilityCount = 0,
 }: {
-  density: 'compact' | 'comfortable'
+  density: 'compact' | 'comfortable' | 'spacious'
   edges?: EntitySurfaceEdges
   leadingUtilityCount?: number
 }) {
   return cn(
     'dash-entity-card',
-    density === 'compact' ? 'dash-entity-card--compact' : 'dash-entity-card--comfortable',
+    density === 'compact'
+      ? 'dash-entity-card--compact'
+      : density === 'spacious'
+        ? 'dash-entity-card--spacious'
+        : 'dash-entity-card--comfortable',
     entitySurfaceVariants({ density, edges, leadingUtilityCount }),
   )
 }

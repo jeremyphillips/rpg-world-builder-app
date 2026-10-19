@@ -22,7 +22,9 @@ Entity-rich pickers (combobox, menus) stay on `InteractiveList` + `InteractiveLi
 
 - `appearance?: 'panel' | 'embedded' | 'filled'` (default `panel`)
 - `tone?: 'strong'` — list rest chrome when `appearance="filled"` (ignored for panel and embedded)
-- `density?: 'compact' | 'comfortable'` (default `comfortable`) — row padding + simple copy sizes only
+- `density?: 'compact' | 'comfortable' | 'spacious'` (default `comfortable`) — row padding and the canonical copy pair (14/12, 16/14, 19/14)
+
+Rich `content` inherits that pair unless it sets its own `density`. Standalone identity falls back to comfortable (16/14).
 
 ### `DestinationRow` (discriminated union)
 
@@ -58,4 +60,4 @@ Dashboard `CharacterRelationshipIndicator` supports `presentation="inlinePassive
 | Chrome   | Border, radius, transparent bg | No outer panel border               | Border, card radius; strong → muted + shadow |
 | Dividers | Inset `::after` on items       | Full-bleed top border between items | Full-bleed `::after` between items           |
 
-Density controls `--ui-destination-inset-*` (compact vs comfortable). Rich `IdentityRow` typography is owned by the caller (`size="md"` in search).
+Density controls row inset and publishes `--ui-copy-title-size` / `--ui-copy-supporting-size`. Simple rows and rich identity read the same pair. Search inherits compact (14/12) from its list. Campaign destinations inherit comfortable (16/14).

@@ -69,7 +69,6 @@ export function SearchResultRow({
           classification={presentation.classification}
           supporting={presentation.supporting}
           status={presentation.status}
-          size="md"
         />
       }
       trailingInfo={

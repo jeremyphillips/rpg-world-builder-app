@@ -21,7 +21,7 @@ export const Default: Story = {
     heading: 'Dock Ward',
     classification: 'District',
     supporting: 'Located in Harborford',
-    size: 'md',
+    density: 'comfortable',
   },
 }
 
@@ -32,7 +32,7 @@ export const LongHeadingVisibleClassification: Story = {
         heading="Very Long Location Name That Should Truncate Before Classification"
         classification="District"
         supporting="Secondary line"
-        size="md"
+        density="comfortable"
       />
     </div>
   ),
@@ -44,7 +44,7 @@ export const LongClassification: Story = {
       <IdentityRow
         heading="Harborford"
         classification="Very Long Classification Label That Stays shrink-0"
-        size="md"
+        density="comfortable"
       />
     </div>
   ),
@@ -56,7 +56,7 @@ export const WrappedSupporting: Story = {
     supporting:
       'A contained structure such as a tavern, temple, or guild hall within a parent location.',
     supportingWrap: true,
-    size: 'md',
+    density: 'comfortable',
   },
 }
 
@@ -76,16 +76,31 @@ export const EntityCompactHeadingLine: Story = {
 export const HeadingOnly: Story = {
   args: {
     heading: 'Circle Envoy',
-    size: 'md',
+    density: 'comfortable',
   },
 }
 
 export const Sizes: Story = {
   render: () => (
     <div className="flex max-w-md flex-col gap-4">
-      <IdentityRow heading="Small (12px)" classification="sm" size="sm" supporting="Supporting" />
-      <IdentityRow heading="Medium (14px)" classification="md" size="md" supporting="Supporting" />
-      <IdentityRow heading="Large (16px)" classification="lg" size="lg" supporting="Supporting" />
+      <IdentityRow
+        heading="Compact (14px)"
+        classification="compact"
+        density="compact"
+        supporting="Supporting"
+      />
+      <IdentityRow
+        heading="Comfortable (16px)"
+        classification="comfortable"
+        density="comfortable"
+        supporting="Supporting"
+      />
+      <IdentityRow
+        heading="Spacious (19px)"
+        classification="spacious"
+        density="spacious"
+        supporting="Supporting"
+      />
     </div>
   ),
 }

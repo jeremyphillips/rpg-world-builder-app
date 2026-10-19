@@ -14,6 +14,7 @@ export function CampaignPicker({ campaigns }: CampaignPickerProps) {
       eyebrow={CAMPAIGN_DESTINATION_COPY.yourCampaignsEyebrow}
       eyebrowAs="h3"
       eyebrowTone="foreground"
+      density="spacious"
       campaigns={campaigns}
     />
   )

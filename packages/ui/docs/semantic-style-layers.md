@@ -136,7 +136,7 @@ Cards and Rows**.
 | `--ui-card-inset-*` + header copy vars (`ui-card--compact\|comfortable\|spacious`) | card.css     | Generic `Card` regions; entity/option inset only (`compact\|comfortable`; title/description vars generic-only) |
 | `contentCardDensityInsetVariants` (deprecated)                                     | content-card | Legacy class helper for ContentCard                                                                            |
 | `contentCardIdentityColumnGapVariants`                                             | content-card | ContentCard body, EntityAnatomy content                                                                        |
-| `entity-card-heading-comfortable` (@utility)                                       | globals      | Comfortable entity card titles                                                                                 |
+| `ui-copy-title` / `ui-copy-supporting`                                             | copy-scale   | Canonical density heading and supporting sizes                                                                 |
 | `rowAnatomyTracksVariants` / `RowAnatomyCell`                                      | row-anatomy  | EntityAnatomy (row tracks + cells)                                                                             |
 
 Vertical alignment of identity rows has one owner — the row-track grid. Cells never

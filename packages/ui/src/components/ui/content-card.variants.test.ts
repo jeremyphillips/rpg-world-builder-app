@@ -43,11 +43,9 @@ describe('contentCardIdentityColumnGapVariants', () => {
 })
 
 describe('contentCardHeadingVariants', () => {
-  it('maps comfortable titles to entity-card-heading-comfortable', () => {
-    expect(contentCardHeadingVariants({ density: 'comfortable' })).toContain(
-      'entity-card-heading-comfortable',
-    )
-    expect(contentCardHeadingVariants({ density: 'compact' })).toContain('text-sm')
+  it('does not bake a density font size into the heading class', () => {
+    expect(contentCardHeadingVariants()).not.toContain('entity-card-heading-comfortable')
+    expect(contentCardHeadingVariants()).not.toContain('text-sm')
   })
 })
 

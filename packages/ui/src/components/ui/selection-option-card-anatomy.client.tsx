@@ -29,7 +29,7 @@ export type SelectionOptionCardCopyWidth = 'fill' | 'content'
 
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
-export type SelectionOptionCardDensity = 'default' | 'compact'
+export type SelectionOptionCardDensity = 'comfortable' | 'compact'
 
 /** Default card eyebrow is `sm`; compact density steps down one size. */
 export function resolveSelectionOptionCardEyebrowSize(
@@ -46,7 +46,7 @@ export type SelectionOptionCardHeaderEyebrowProps = {
 }
 
 export function SelectionOptionCardHeaderEyebrow({
-  density = 'default',
+  density = 'comfortable',
   size,
   children,
 }: SelectionOptionCardHeaderEyebrowProps) {
@@ -86,7 +86,7 @@ export type SelectionOptionCardAnatomyProps = {
 
 function SelectionOptionCardSummaryLines({
   summaryLines,
-  density = 'default',
+  density = 'comfortable',
 }: {
   summaryLines: string[]
   density?: SelectionOptionCardDensity
@@ -107,7 +107,7 @@ function SelectionOptionCardSecondaryContent({
   summaryText,
   summaryLines,
   summaryContent,
-  density = 'default',
+  density = 'comfortable',
   clampDescription = false,
 }: {
   description?: string
@@ -237,7 +237,7 @@ function SelectionOptionCardPrimaryCopy({
 }
 
 export function SelectionOptionCardAnatomy({
-  density = 'default',
+  density = 'comfortable',
   headerRow,
   leadingControl,
   label,

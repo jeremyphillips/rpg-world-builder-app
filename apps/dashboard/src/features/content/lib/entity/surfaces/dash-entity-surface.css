@@ -11,7 +11,8 @@
     --entity-leading-content-gap: calc(var(--spacing) * 2);
   }
 
-  .dash-entity-surface--comfortable {
+  .dash-entity-surface--comfortable,
+  .dash-entity-surface--spacious {
     --entity-surface-inset: var(--ui-card-inset-inline);
     --entity-surface-utility-inset: calc(var(--spacing) * 2);
     --entity-leading-content-gap: calc(var(--spacing) * 3);

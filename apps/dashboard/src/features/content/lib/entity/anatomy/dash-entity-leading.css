@@ -4,6 +4,7 @@
     flex-shrink: 0;
     align-items: center;
     gap: 0;
+    padding-inline-end: var(--entity-leading-content-gap, calc(var(--spacing) * 3));
   }
 
   .dash-entity-leading__column {

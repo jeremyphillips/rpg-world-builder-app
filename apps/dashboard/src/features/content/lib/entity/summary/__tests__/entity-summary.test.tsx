@@ -36,12 +36,14 @@ describe('EntitySummaryHeading', () => {
       />,
     )
 
-    expect(screen.getByText('Fire Bolt')).toHaveClass('ui-identity-row__title--md')
-    expect(screen.getByText('Spell')).toHaveClass('ui-identity-row__classification--sm')
+    expect(screen.getByText('Fire Bolt')).toHaveClass('ui-identity-row__title')
+    expect(screen.getByText('Spell')).toHaveClass('ui-identity-row__classification')
+    expect(
+      screen.getByText('Spell').closest('.ui-identity-row__meta--entity-compact'),
+    ).not.toBeNull()
     const endValue = screen.getByText('3')
-    expect(endValue).toHaveClass('tabular-nums')
+    expect(endValue).toHaveClass('tabular-nums', 'text-style-caption')
     expect(endValue).not.toHaveClass('text-sm')
-    expect(endValue.parentElement).toHaveClass('text-style-caption')
   })
 
   it('fills the content cell so the heading end value sits at the column end', () => {
@@ -118,7 +120,7 @@ describe('EntitySummarySupportingMetadata', () => {
 })
 
 describe('EntitySummaryDescription', () => {
-  it('maps density to supporting text size', () => {
+  it('uses the shared supporting class; size comes from the copy variables', () => {
     render(
       <>
         <EntitySummaryDescription density="compact">Compact copy</EntitySummaryDescription>
@@ -127,12 +129,11 @@ describe('EntitySummaryDescription', () => {
     )
 
     expect(screen.getByText('Compact copy')).toHaveClass(
-      'ui-identity-row__supporting--md',
-      'text-muted-foreground',
+      'ui-identity-row__supporting',
       'ui-identity-row__supporting--truncate',
     )
     expect(screen.getByText('Comfortable copy')).toHaveClass(
-      'ui-identity-row__supporting--lg',
+      'ui-identity-row__supporting',
       'ui-identity-row__supporting--truncate',
     )
   })

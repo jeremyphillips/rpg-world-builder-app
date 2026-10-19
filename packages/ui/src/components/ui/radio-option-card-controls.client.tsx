@@ -16,7 +16,7 @@ import type { SelectionOptionCardDensity } from './selection-option-card-anatomy
 function RadioOptionCardControl({
   className,
   variant = 'card',
-  density = 'default',
+  density = 'comfortable',
 }: {
   className?: string
   variant?: RadioCardVariant
@@ -42,7 +42,7 @@ function RadioOptionCardControl({
 
 function RadioOptionCardIconControl({
   icon,
-  density = 'default',
+  density = 'comfortable',
   className,
 }: {
   icon: React.ReactNode
@@ -60,7 +60,7 @@ export function RadioOptionCardLeadingControl({
   visualControl = 'radio',
   icon,
   variant = 'card',
-  density = 'default',
+  density = 'comfortable',
   className,
 }: {
   visualControl?: RadioCardVisualControl

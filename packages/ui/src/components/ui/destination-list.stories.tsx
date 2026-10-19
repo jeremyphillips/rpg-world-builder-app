@@ -76,12 +76,7 @@ export const EmbeddedRichSearchRow: Story = {
           </span>
         }
         content={
-          <IdentityRow
-            heading="Fireball"
-            classification="Spell"
-            supporting="3rd-level evocation"
-            size="md"
-          />
+          <IdentityRow heading="Fireball" classification="Spell" supporting="3rd-level evocation" />
         }
       />
       <DestinationRow
@@ -91,7 +86,6 @@ export const EmbeddedRichSearchRow: Story = {
             heading="Champion"
             classification="Subclass"
             supporting="Fighter subclass with a longer supporting line that wraps across multiple rows in narrow layouts."
-            size="md"
           />
         }
       />
@@ -115,6 +109,49 @@ export const FilledStrongGrouped: Story = {
         metadata="Expires in 6 days"
       />
     </DestinationList>
+  ),
+}
+
+export const CopyScale: Story = {
+  name: 'Copy scale',
+  render: () => (
+    <div className="grid max-w-xl gap-8">
+      <DestinationList density="comfortable">
+        <DestinationRow
+          link={<a href="#simple">nav</a>}
+          title="Simple row"
+          description="Comfortable supporting copy"
+        />
+        <DestinationRow
+          link={<a href="#rich">nav</a>}
+          content={
+            <IdentityRow
+              heading="Rich row"
+              classification="Campaign"
+              supporting="Same comfortable title size as the simple row"
+            />
+          }
+        />
+      </DestinationList>
+      <DestinationList density="compact">
+        <DestinationRow
+          link={<a href="#compact">nav</a>}
+          content={
+            <IdentityRow heading="Inherited compact" supporting="14px title, 12px supporting" />
+          }
+        />
+      </DestinationList>
+      <Card
+        density="spacious"
+        header={{ title: 'Spacious card', description: '19px title, 14px supporting' }}
+      >
+        <IdentityRow heading="Inherited spacious" supporting="Title follows the card" />
+      </Card>
+      <IdentityRow
+        heading="Standalone"
+        supporting="Comfortable fallback when no surface sets density"
+      />
+    </div>
   ),
 }
 

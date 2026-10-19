@@ -57,7 +57,7 @@ export type SelectionOptionCardProps = {
 }
 
 function SelectionOptionCardHeaderRow({
-  density = 'default',
+  density = 'comfortable',
   headerEyebrow,
   headerEyebrowSize,
   headerStartSlot,
@@ -101,7 +101,7 @@ export function SelectionOptionCardHeaderAction({
   label,
   onClick,
   ariaLabel,
-  density = 'default',
+  density = 'comfortable',
 }: SelectionOptionCardHeaderActionProps) {
   const buttonSize = density === 'compact' ? 'xs' : 'sm'
 
@@ -127,7 +127,7 @@ export function SelectionOptionCard({
   selected,
   disabled = false,
   asChild = false,
-  density = 'default',
+  density = 'comfortable',
   headerStartSlot,
   headerEyebrow,
   headerEyebrowSize,

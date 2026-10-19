@@ -15,7 +15,7 @@ import {
 import type { EntitySummaryStatusItem } from './entity-summary-status.types'
 import { entitySummaryStatusVariants } from './entity-summary.variants'
 
-function resolveStatusBadgeSize(density: ContentCardDensity): BadgeSize {
+function resolveStatusBadgeSize(density?: ContentCardDensity): BadgeSize {
   return density === 'compact' ? 'sm' : 'md'
 }
 
@@ -31,7 +31,7 @@ export function EntitySummaryStatusItemView({
   layout = 'block',
 }: {
   item: EntitySummaryStatusItem
-  density: ContentCardDensity
+  density?: ContentCardDensity
   /** `inline` renders text as a non-truncating span for the metadata composition. */
   layout?: 'block' | 'inline'
 }) {

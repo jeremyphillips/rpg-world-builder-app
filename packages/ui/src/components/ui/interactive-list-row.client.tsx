@@ -4,7 +4,6 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { IdentityRow } from './identity-row.client'
-import { identityRowSizeFromInteractiveListSize } from './interactive-list.lib'
 import type { InteractiveListSize } from './interactive-list.variants'
 import {
   interactiveListRowChromeVariants,
@@ -54,15 +53,8 @@ export function InteractiveListRow({
   asChild = false,
   children,
 }: InteractiveListRowProps) {
-  const identitySize = identityRowSizeFromInteractiveListSize(size)
-
   const identityCore = content ?? (
-    <IdentityRow
-      heading={name}
-      classification={classification}
-      supporting={metadata}
-      size={identitySize}
-    />
+    <IdentityRow heading={name} classification={classification} supporting={metadata} />
   )
 
   const identity = (

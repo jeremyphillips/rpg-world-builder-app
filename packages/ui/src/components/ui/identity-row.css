@@ -5,21 +5,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .ui-identity-row__title--sm {
-    font-size: var(--text-xs);
-    line-height: var(--text-xs--line-height);
-  }
-
-  .ui-identity-row__title--md {
-    font-size: var(--text-sm);
-    line-height: var(--text-sm--line-height);
-  }
-
-  .ui-identity-row__title--lg {
-    font-size: var(--text-base);
-    line-height: var(--text-base--line-height);
+    font-size: var(--ui-copy-title-size, var(--text-base));
+    line-height: var(--ui-copy-title-line-height, var(--text-base--line-height));
   }
 
   .ui-identity-row__title a {
@@ -32,46 +19,23 @@
     flex-shrink: 0;
     font-weight: var(--font-weight-normal);
     color: var(--muted-foreground);
-  }
-
-  .ui-identity-row__classification--sm {
-    font-size: var(--text-xs);
-    line-height: var(--text-xs--line-height);
-  }
-
-  .ui-identity-row__classification--md {
-    font-size: var(--text-sm);
-    line-height: var(--text-sm--line-height);
-  }
-
-  .ui-identity-row__classification--lg {
-    font-size: var(--text-base);
-    line-height: var(--text-base--line-height);
+    font-size: var(--ui-copy-title-size, var(--text-base));
+    line-height: var(--ui-copy-title-line-height, var(--text-base--line-height));
   }
 
   .ui-identity-row__meta--entity-compact {
     min-width: 0;
-    font-size: var(--text-xs);
-    line-height: var(--text-xs--line-height);
+  }
+
+  .ui-identity-row__meta--entity-compact .ui-identity-row__classification {
+    font-size: var(--ui-copy-supporting-size, var(--text-xs));
+    line-height: var(--ui-copy-supporting-line-height, var(--text-xs--line-height));
   }
 
   .ui-identity-row__supporting {
     color: var(--muted-foreground);
-  }
-
-  .ui-identity-row__supporting--sm {
-    font-size: var(--text-xs);
-    line-height: var(--text-xs--line-height);
-  }
-
-  .ui-identity-row__supporting--md {
-    font-size: var(--text-xs);
-    line-height: var(--text-xs--line-height);
-  }
-
-  .ui-identity-row__supporting--lg {
-    font-size: var(--text-sm);
-    line-height: var(--text-sm--line-height);
+    font-size: var(--ui-copy-supporting-size, var(--text-sm));
+    line-height: var(--ui-copy-supporting-line-height, var(--text-sm--line-height));
   }
 
   .ui-identity-row__supporting--wrap {

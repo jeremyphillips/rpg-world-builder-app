@@ -108,15 +108,22 @@ export const DensityTypography: Story = {
         </div>
       </section>
       <section className="space-y-3">
-        <h2 className="text-style-label">Reference — entity comfortable (19px title)</h2>
-        <ContentCard
-          density="comfortable"
-          heading="Harbor District"
-          subheading="Settlement overview"
-        />
+        <h2 className="text-style-label">Content card — comfortable 16px, spacious 19px</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <ContentCard
+            density="comfortable"
+            heading="Harbor District"
+            subheading="Comfortable supporting copy"
+          />
+          <ContentCard
+            density="spacious"
+            heading="Harbor District"
+            subheading="Spacious supporting copy"
+          />
+        </div>
       </section>
       <section className="space-y-3">
-        <h2 className="text-style-label">Reference — radio default (16px bold title)</h2>
+        <h2 className="text-style-label">Reference — radio comfortable (16px bold title)</h2>
         <RadioGroup defaultValue="a" className="max-w-sm">
           <RadioOptionCard value="a" label="Fighter" description="Martial prowess" />
         </RadioGroup>

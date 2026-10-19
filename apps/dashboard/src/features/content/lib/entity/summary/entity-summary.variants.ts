@@ -4,17 +4,15 @@ import { cn, textActionVariants } from '@rpg/ui'
 export const entitySummaryHeadingRowVariants = cva('flex min-w-0 flex-1 items-center gap-2')
 
 export const entitySummaryHeadingEndValueVariants = cva(
-  'shrink-0 tabular-nums font-body-emphasis text-muted-foreground',
+  'ui-copy-title shrink-0 tabular-nums font-body-emphasis text-muted-foreground',
   {
     variants: {
       density: {
         /** Size comes from the title-line end slot (`text-style-caption`, 12px). */
-        compact: '',
-        comfortable: 'text-base',
+        compact: 'text-style-caption',
+        comfortable: '',
+        spacious: '',
       },
-    },
-    defaultVariants: {
-      density: 'comfortable',
     },
   },
 )
@@ -24,11 +22,12 @@ export const entitySummaryHeadingEndValueVariants = cva(
  * detail, selection guidance, and warning advisories. `inline` text flows inside the
  * metadata composition and never truncates. The status cell owns the top offset.
  */
-export const entitySummaryStatusVariants = cva('', {
+export const entitySummaryStatusVariants = cva('ui-copy-supporting', {
   variants: {
     density: {
       compact: 'text-style-caption',
-      comfortable: 'text-sm',
+      comfortable: '',
+      spacious: '',
     },
     tone: {
       muted: 'text-muted-foreground',
@@ -41,7 +40,6 @@ export const entitySummaryStatusVariants = cva('', {
     },
   },
   defaultVariants: {
-    density: 'comfortable',
     tone: 'muted',
     layout: 'block',
   },
@@ -59,15 +57,13 @@ export const entitySummaryStatusBadgeGroupVariants = cva(
 export const entitySummaryStatusLaneVariants = cva('flex min-w-0 flex-col gap-1')
 
 /** Provenance segment copy — foreground source labels on the third line, beside status. */
-export const entitySummaryProvenanceTextVariants = cva('text-foreground', {
+export const entitySummaryProvenanceTextVariants = cva('ui-copy-supporting text-foreground', {
   variants: {
     density: {
       compact: 'text-style-caption',
-      comfortable: 'text-sm',
+      comfortable: '',
+      spacious: '',
     },
-  },
-  defaultVariants: {
-    density: 'comfortable',
   },
 })
 
@@ -82,24 +78,20 @@ export const entitySummaryProvenanceActionVariants = cva(
     variants: {
       density: {
         compact: 'text-style-caption',
-        comfortable: 'text-sm',
+        comfortable: '',
+        spacious: '',
       },
-    },
-    defaultVariants: {
-      density: 'comfortable',
     },
   },
 )
 
 /** Metadata composition root — one wrapping inline-metadata line sized by density. */
-export const entitySummaryStatusMetadataVariants = cva('block min-w-0', {
+export const entitySummaryStatusMetadataVariants = cva('ui-copy-supporting block min-w-0', {
   variants: {
     density: {
       compact: 'text-style-caption',
-      comfortable: 'text-sm',
+      comfortable: '',
+      spacious: '',
     },
-  },
-  defaultVariants: {
-    density: 'comfortable',
   },
 })

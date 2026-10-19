@@ -12,9 +12,9 @@ describe('radioCard surface establishment', () => {
   })
 
   it('uses comfortable density card content gap', () => {
-    expect(radioCardVariants({ variant: 'card', density: 'default' })).toContain('gap-2')
+    expect(radioCardVariants({ variant: 'card', density: 'comfortable' })).toContain('gap-2')
     expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('gap-1')
-    expect(radioCardVariants({ variant: 'card', density: 'default' })).not.toContain('px-4')
+    expect(radioCardVariants({ variant: 'card', density: 'comfortable' })).not.toContain('px-4')
   })
 
   it('uses compact horizontal rhythm with semantic indicator-sm decoration', () => {
@@ -32,7 +32,9 @@ describe('radioCard group layout', () => {
 
   it('uses 8px gap between compact card options', () => {
     expect(radioCardGroupGapVariants({ variant: 'card', density: 'compact' })).toContain('gap-2')
-    expect(radioCardGroupGapVariants({ variant: 'card', density: 'default' })).toContain('gap-3')
+    expect(radioCardGroupGapVariants({ variant: 'card', density: 'comfortable' })).toContain(
+      'gap-3',
+    )
   })
 
   it('uses a responsive two-column grid when columns is two', () => {

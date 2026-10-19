@@ -37,7 +37,7 @@ describe('optionCard surface establishment', () => {
     expect(radioCardVariants({ variant: 'card', density: 'compact' })).not.toContain('px-4')
     expect(optionCardTitleVariants({ density: 'compact' })).toContain('text-sm')
     expect(optionCardSummaryTitleVariants({ density: 'compact' })).toContain('text-sm')
-    expect(optionCardSummaryTitleVariants({ density: 'default' })).toContain('text-base')
+    expect(optionCardSummaryTitleVariants({ density: 'comfortable' })).toContain('text-base')
     expect(optionCardDescriptionVariants({ density: 'compact' })).toContain('text-xs')
     expect(optionCardDescriptionVariants({ density: 'compact' })).toContain('leading-snug')
   })
@@ -54,16 +54,16 @@ describe('optionCard surface establishment', () => {
   })
 
   it('insets in-flow embedded slots to the title column', () => {
-    expect(optionCardEmbeddedContentInsetClasses.default).toBe('pl-[calc(1.25rem+1rem)]')
+    expect(optionCardEmbeddedContentInsetClasses.comfortable).toBe('pl-[calc(1.25rem+1rem)]')
     expect(optionCardEmbeddedContentInsetClasses.compact).toBe('pl-[calc(1rem+0.75rem)]')
-    expect(optionCardEmbeddedSlotVariants({ tone: 'plain', density: 'default' })).toContain(
-      optionCardEmbeddedContentInsetClasses.default,
+    expect(optionCardEmbeddedSlotVariants({ tone: 'plain', density: 'comfortable' })).toContain(
+      optionCardEmbeddedContentInsetClasses.comfortable,
     )
     expect(optionCardEmbeddedSlotVariants({ tone: 'divider', density: 'compact' })).toContain(
       optionCardEmbeddedContentInsetClasses.compact,
     )
-    expect(optionCardEmbeddedSlotVariants({ tone: 'panel', density: 'default' })).not.toContain(
-      optionCardEmbeddedContentInsetClasses.default,
+    expect(optionCardEmbeddedSlotVariants({ tone: 'panel', density: 'comfortable' })).not.toContain(
+      optionCardEmbeddedContentInsetClasses.comfortable,
     )
   })
 

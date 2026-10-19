@@ -56,7 +56,6 @@ export function CampaignDestinationRow({
       }
       content={
         <EntityAnatomyHost
-          density="comfortable"
           entity={{
             heading: display.name,
             description,

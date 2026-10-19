@@ -47,7 +47,7 @@ export function StartingEquipmentOptionCards({
   onChoiceSelectionChange,
   onCollapseChooser,
   includeGoldOption = true,
-  density = 'default',
+  density = 'comfortable',
 }: StartingEquipmentOptionCardsProps) {
   const [pendingNestedSelections, setPendingNestedSelections] = useState<PendingNestedSelections>(
     {},

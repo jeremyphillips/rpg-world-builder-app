@@ -170,6 +170,7 @@ export const collapsibleListItemHeaderVerticalPaddingVariants = cva('', {
     density: {
       compact: 'py-2',
       comfortable: 'py-3',
+      spacious: 'py-3',
     },
   },
   defaultVariants: {

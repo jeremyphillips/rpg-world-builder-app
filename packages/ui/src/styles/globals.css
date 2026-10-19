@@ -23,6 +23,7 @@
 @import '../components/ui/interactive-list.css';
 @import '../components/ui/card.css';
 @import '../components/ui/destination-list.css';
+@import '../components/ui/copy-scale.css';
 @import '../components/ui/row-anatomy/ui-row-anatomy.css';
 @import '../components/ui/collapsible-list-item/ui-collapsible-list-item.css';
 @import '../components/ui/identity-row.css';
@@ -743,14 +744,6 @@
   font-size: var(--text-heading-card);
   line-height: var(--leading-none);
   font-weight: var(--font-weight-heading);
-  letter-spacing: var(--tracking-heading);
-}
-
-/** Entity card comfortable title — 19px heading-card size with body emphasis weight. */
-@utility entity-card-heading-comfortable {
-  font-size: var(--text-heading-card);
-  line-height: var(--text-heading-card--line-height);
-  font-weight: var(--font-weight-body-emphasis);
   letter-spacing: var(--tracking-heading);
 }
 

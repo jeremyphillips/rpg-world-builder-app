@@ -24,7 +24,7 @@ which semantic layer owns the concern — see [Ownership hierarchy](#ownership-h
 
 Hub tiles, starter actions, and auth **form chrome** use generic [`Card`](../../../packages/ui/docs/ui-architecture.md) (`header` / `footer`, optional `stretch`, shell `ui-card--compact|comfortable|spacious`). Header copy comes from shell CSS vars (`ui-card__title` / `ui-card__description`) — **not** from `Heading variant="card"` or `Text small` at call sites.
 
-**Entity identity in this doc** uses `EntityCardFrame` + `EntitySummary` typography (`entity-card-heading-comfortable` at comfortable density, IdentityRow at compact). That is a **different title scale** than generic `Card` comfortable (16px title). Shared **`--ui-card-inset-*`** steps align with generic Card and option shells; **`spacious` inset exists only on generic `Card`**, not on `ContentCardDensity` / entity frames.
+**Entity identity in this doc** uses `EntityCardFrame` + `EntitySummary`. Heading size follows the shared density ladder: compact 14/12, comfortable 16/14, spacious 19/14 (`--ui-copy-title-size` / `--ui-copy-supporting-size`). Comfortable is the default. Set `density="spacious"` when a 19px heading is required. Shared **`--ui-card-inset-*`** steps align with generic Card, including `spacious`.
 
 Do not replace `ContentEntityCard`, `DisclosureEntityCard`, or `CatalogEntityRow` with generic `Card` for catalog identity rows.
 
@@ -768,11 +768,11 @@ make room for an image.
 
 ### Layout modes
 
-| Mode          | Surfaces                                                   | Geometry                                                                                                                                                                                                             |
-| ------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-4` comfortable); comfortable titles use `entity-card-heading-comfortable` (19px); leading media spans the identity stack (`stretch`); heading band stays `control` height |
-| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                                                                                                               |
-| Stacked bleed | Species/class radio cards; character list cards            | Full-bleed `builderCard` (2:1) derives a window inside the saved **primary** role crop when present, otherwise cover at the surface default. Text padding sits under the image band.                                 |
+| Mode          | Surfaces                                                   | Geometry                                                                                                                                                                                                                             |
+| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-4` comfortable and spacious); titles use the shared copy scale (16px comfortable, 19px spacious); leading media spans the identity stack (`stretch`); heading band stays `control` height |
+| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                                                                                                                               |
+| Stacked bleed | Species/class radio cards; character list cards            | Full-bleed `builderCard` (2:1) derives a window inside the saved **primary** role crop when present, otherwise cover at the surface default. Text padding sits under the image band.                                                 |
 
 Portrait role copy targets compact circle/square tokens. Saved role presentation (crop,
 then focal) wins over surface defaults for both system and upload sources.

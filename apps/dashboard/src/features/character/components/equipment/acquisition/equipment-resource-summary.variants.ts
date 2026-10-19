@@ -10,6 +10,7 @@ export const equipmentResourceSummarySectionDividerVariants = cva('border-t bord
     density: {
       compact: 'mt-2 pt-2',
       comfortable: 'mt-4 pt-4',
+      spacious: 'mt-4 pt-4',
     },
   },
   defaultVariants: {

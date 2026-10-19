@@ -3,7 +3,6 @@
 import * as React from 'react'
 
 import { IdentityRow } from './identity-row.client'
-import { identityRowSizeFromInteractiveListSize } from './interactive-list.lib'
 import type { InteractiveListSize } from './interactive-list.variants'
 import { InteractiveListRow } from './interactive-list-row.client'
 
@@ -42,8 +41,6 @@ export function ComboboxOptionRow({
   onHighlight,
   onSelect,
 }: ComboboxOptionRowProps) {
-  const identitySize = identityRowSizeFromInteractiveListSize(size)
-
   const content =
     renderContent ??
     (heading != null || classification != null || supporting != null ? (
@@ -52,7 +49,6 @@ export function ComboboxOptionRow({
         classification={classification}
         supporting={supporting}
         supportingWrap={supportingWrap}
-        size={identitySize}
       />
     ) : null)
 

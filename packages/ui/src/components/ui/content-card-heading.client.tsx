@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import {
+  contentCardHeadingScaleClass,
   contentCardHeadingVariants,
   contentCardMixedHeadingRowVariants,
   contentCardMixedHeadingNameVariants,
@@ -35,22 +36,23 @@ export type ContentCardHeadingProps = {
 export function ContentCardHeading({
   heading,
   classification,
-  density = 'comfortable',
+  density,
   className,
   headingInline,
 }: ContentCardHeadingProps) {
   const items = classification ? classificationItems(classification) : []
   const showHeadingInline = isPresent(headingInline)
+  const scaleClass = cn(contentCardHeadingScaleClass(density), contentCardHeadingVariants())
 
   if (items.length === 0 && !showHeadingInline) {
-    return <div className={cn(contentCardHeadingVariants({ density }), className)}>{heading}</div>
+    return <div className={cn(scaleClass, className)}>{heading}</div>
   }
 
   const metaDensity = density === 'compact' ? 'compact' : 'comfortable'
 
   if (items.length === 0 && showHeadingInline) {
     return (
-      <div className={cn(contentCardMixedHeadingRowVariants({ density }), className)}>
+      <div className={cn(contentCardMixedHeadingRowVariants(), scaleClass, className)}>
         <span
           className={cn(contentCardMixedHeadingNameVariants(), 'flex min-w-0 items-center gap-1')}
         >
@@ -64,7 +66,7 @@ export function ContentCardHeading({
   }
 
   return (
-    <div className={cn(contentCardMixedHeadingRowVariants({ density }), className)}>
+    <div className={cn(contentCardMixedHeadingRowVariants(), scaleClass, className)}>
       <InlineMetadata role="heading" density={metaDensity} wrap={false} className="min-w-0 flex-1">
         {showHeadingInline ? (
           <InlineMetadata.Item className="flex min-w-0 items-center gap-1">

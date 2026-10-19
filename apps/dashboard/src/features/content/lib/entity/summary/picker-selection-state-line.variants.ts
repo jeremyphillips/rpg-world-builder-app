@@ -2,15 +2,13 @@ import { cva } from 'class-variance-authority'
 import { cn, inlineIconTextClasses } from '@rpg/ui'
 
 /** Selection-state line. Density matches supporting copy; the status cell owns the offset. */
-export const pickerSelectionStateLineVariants = cva('min-w-0', {
+export const pickerSelectionStateLineVariants = cva('ui-copy-supporting min-w-0', {
   variants: {
     density: {
       compact: 'text-style-caption',
-      comfortable: 'text-sm',
+      comfortable: '',
+      spacious: '',
     },
-  },
-  defaultVariants: {
-    density: 'comfortable',
   },
 })
 
