@@ -19,7 +19,10 @@ describe('EntityReplacementCurrentField', () => {
     expect(screen.getByText('Current location')).toBeInTheDocument()
     expect(screen.getByText("Thieves' Guildhouse")).toBeInTheDocument()
     expect(screen.getByText('Building · Guildhall')).toBeInTheDocument()
-    expect(screen.getByText('Located in Dock Ward')).toHaveClass('ui-identity-row__supporting--md')
+    expect(screen.getByText('Located in Dock Ward')).toHaveClass(
+      'ui-identity-row__supporting',
+      'ui-identity-row__supporting--truncate',
+    )
     expect(container.querySelector('.bg-sunken')).toBeInTheDocument()
   })
 })
