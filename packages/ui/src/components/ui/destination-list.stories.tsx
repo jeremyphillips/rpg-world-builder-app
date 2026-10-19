@@ -8,7 +8,7 @@ import { IdentityRow } from './identity-row.client'
 const meta = {
   title: 'Components/DestinationList',
   component: DestinationList,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', semanticClasses: true },
 } satisfies Meta<typeof DestinationList>
 
 export default meta

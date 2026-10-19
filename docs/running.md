@@ -84,10 +84,12 @@ Use `:6006` for design-system work; use `:6007` for content catalog and layout
 composition stories that depend on dashboard paths and providers.
 
 If Storybook reports **Failed to resolve import** for a `*.stories.tsx` path that no
-longer exists, the Storybook cache is stale (often after deleting or moving stories).
-`pnpm storybook:dashboard` and `pnpm storybook:ui` clear hoisted caches before starting.
-You can also run `node tools/scripts/clear-storybook-cache.mjs` or
-`pnpm --filter @rpg/dashboard clean` manually.
+longer exists, or **Failed to fetch dynamically imported module** for a story that exists
+on disk, the Storybook cache is usually stale (common after deleting, moving, or refactoring
+stories and their imports). Stop the dev server and restart with `pnpm storybook:dashboard`
+or `pnpm storybook:ui` — both clear hoisted caches before starting. You can also run
+`node tools/scripts/clear-storybook-cache.mjs` or `pnpm --filter @rpg/dashboard clean`
+(or `@rpg/ui clean`) manually.
 
 CI runs axe against both Storybooks on PRs via the
 [Storybook A11y](../.github/workflows/storybook-a11y.yml) workflow (`ui` and
