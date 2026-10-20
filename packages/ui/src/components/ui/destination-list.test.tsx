@@ -39,7 +39,7 @@ describe('destination-list.css inset divider contract', () => {
     )
     expect(css).toContain('left: 0')
     expect(css).toMatch(
-      /\.ui-destination-list--filled\.ui-destination-list--tone-strong[^}]*background-color:\s*var\(--surface-muted\)/s,
+      /\.ui-destination-list--filled\.ui-destination-list--tone-strong[^}]*background-color:\s*var\(--surface-strong\)/s,
     )
     expect(css).not.toMatch(
       /\.ui-destination-list--filled\.ui-destination-list--tone-strong[^}]*box-shadow:/s,

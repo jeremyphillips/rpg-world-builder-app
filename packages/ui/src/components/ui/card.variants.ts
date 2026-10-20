@@ -134,14 +134,14 @@ const CARD_TONE_STATE_MATRIX: readonly {
     key: 'quiet-rest',
     tone: 'quiet',
     useCase: 'Drawer / entity row rest',
-    keyValues: 'bg host plane when `.ui-card-tone-host--inherit`, else --card; border --border',
+    keyValues: 'bg --surface-lift; border --border',
   },
   {
     key: 'quiet-hover',
     tone: 'quiet',
     interactive: true,
     useCase: 'Selectable quiet row hover',
-    keyValues: 'hover --row-hover-bg',
+    keyValues: 'hover color-mix 96% rest + --palette-neutral-contrast',
   },
   {
     key: 'quiet-selected',
@@ -149,7 +149,7 @@ const CARD_TONE_STATE_MATRIX: readonly {
     interactive: true,
     selected: true,
     useCase: 'Selected quiet row',
-    keyValues: 'bg --row-selected-bg, border --primary',
+    keyValues: 'bg --ui-surface-selected-bg, border --primary',
   },
   {
     key: 'quiet-disabled',
@@ -163,7 +163,7 @@ const CARD_TONE_STATE_MATRIX: readonly {
     key: 'strong-rest',
     tone: 'strong',
     useCase: 'Default card / builder option rest (strong + flat)',
-    keyValues: 'bg --surface-muted, border --border; elevation flat (no shadow class)',
+    keyValues: 'bg --surface-strong, border --border; elevation flat (no shadow class)',
   },
   {
     key: 'strong-subtle',
@@ -184,7 +184,7 @@ const CARD_TONE_STATE_MATRIX: readonly {
     tone: 'strong',
     interactive: true,
     useCase: 'Strong option hover',
-    keyValues: 'hover --surface-subtle, border --primary',
+    keyValues: 'hover color-mix 96% rest + --palette-neutral-contrast; border --primary',
   },
   {
     key: 'strong-selected',
@@ -192,7 +192,7 @@ const CARD_TONE_STATE_MATRIX: readonly {
     interactive: true,
     selected: true,
     useCase: 'Selected strong option',
-    keyValues: 'bg --surface-strong, ring primary/20',
+    keyValues: 'bg --ui-surface-selected-bg, ring primary/20',
   },
   {
     key: 'strong-disabled',

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect } from 'storybook/test'
 
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
+import { cardSurfaceVariants } from './card.variants'
 import { Button } from './button.client'
 import { Card, CardHeader } from './card'
 import { CARD_CLASS_SPECS, UI_CARD_CONTENT_CLASS } from './card.variants'
@@ -169,6 +171,69 @@ export const DensityTypography: Story = {
       </section>
     </div>
   ),
+}
+
+function shellBackgroundColor(element: HTMLElement): string {
+  return getComputedStyle(element).backgroundColor
+}
+
+export const SurfaceInteractionMatrix: Story = {
+  tags: ['card-surface-colors'],
+  render: () => (
+    <div className="grid max-w-3xl gap-3">
+      <div
+        data-testid="card-quiet-rest"
+        className={cardSurfaceVariants({ tone: 'quiet', interactive: true })}
+      >
+        Quiet rest
+      </div>
+      <div
+        data-testid="card-strong-rest"
+        className={cardSurfaceVariants({ tone: 'strong', interactive: true })}
+      >
+        Strong rest
+      </div>
+      <div
+        data-testid="card-quiet-selected"
+        className={cardSurfaceVariants({ tone: 'quiet', interactive: true, selected: true })}
+      >
+        Quiet selected
+      </div>
+      <div
+        data-testid="card-strong-selected"
+        className={cardSurfaceVariants({ tone: 'strong', interactive: true, selected: true })}
+      >
+        Strong selected
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.ownerDocument.documentElement
+    const selectedToken = getComputedStyle(root).getPropertyValue('--ui-surface-selected-bg').trim()
+    expect(selectedToken.length).toBeGreaterThan(0)
+
+    const quietRest = canvasElement.querySelector<HTMLElement>('[data-testid="card-quiet-rest"]')
+    const strongRest = canvasElement.querySelector<HTMLElement>('[data-testid="card-strong-rest"]')
+    const quietSelected = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="card-quiet-selected"]',
+    )
+    const strongSelected = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="card-strong-selected"]',
+    )
+    if (!quietRest || !strongRest || !quietSelected || !strongSelected) {
+      throw new Error('Missing surface interaction matrix nodes')
+    }
+
+    const quietRestBg = shellBackgroundColor(quietRest)
+    const strongRestBg = shellBackgroundColor(strongRest)
+    expect(quietRestBg).not.toBe(strongRestBg)
+
+    const quietSelectedBg = shellBackgroundColor(quietSelected)
+    const strongSelectedBg = shellBackgroundColor(strongSelected)
+    expect(quietSelectedBg).toBe(strongSelectedBg)
+    expect(quietSelectedBg).not.toBe(quietRestBg)
+    expect(strongSelectedBg).not.toBe(strongRestBg)
+  },
 }
 
 export const ClassReference: Story = {

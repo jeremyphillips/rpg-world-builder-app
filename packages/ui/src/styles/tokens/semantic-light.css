@@ -285,6 +285,7 @@
     var(--accent) var(--mix-control-selected),
     var(--surface-current)
   );
+  --ui-surface-selected-bg: var(--palette-surface-selected);
   --row-hover-bg: var(--surface-subtle);
   --row-selected-bg: var(--surface-strong);
   --row-selected-border: var(--border-strong);

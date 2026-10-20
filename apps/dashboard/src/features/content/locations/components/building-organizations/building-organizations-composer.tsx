@@ -346,10 +346,8 @@ export function BuildingOrganizationComposer({
   }
 
   return (
-    <div className="ui-card-tone-host--inherit">
-      <CreateCompositionComposer heading={BUILDING_ORGANIZATIONS_COMPOSER_HEADING}>
-        <BuildingOrganizationRelationshipReview controller={controller} />
-      </CreateCompositionComposer>
-    </div>
+    <CreateCompositionComposer heading={BUILDING_ORGANIZATIONS_COMPOSER_HEADING}>
+      <BuildingOrganizationRelationshipReview controller={controller} />
+    </CreateCompositionComposer>
   )
 }

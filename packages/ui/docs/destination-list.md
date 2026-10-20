@@ -22,7 +22,7 @@ Entity-rich pickers (combobox, menus) stay on `InteractiveList` + `InteractiveLi
 ### `DestinationList`
 
 - `appearance?: 'panel' | 'embedded' | 'filled'` (default `panel`)
-- `tone?: 'strong'` — muted fill when `appearance="filled"` (ignored for panel and embedded); does not apply shadow
+- `tone?: 'strong'` — `--surface-strong` fill when `appearance="filled"` (ignored for panel and embedded); does not apply shadow
 - `elevation?: 'flat' | 'subtle' | 'raised'` — depth when `appearance="filled"` (default `flat`; campaign shells use `subtle`). Same tokens as `Card` elevation.
 - `density?: 'compact' | 'comfortable' | 'spacious'` (default `comfortable`) — item padding and the canonical copy pair (14/12, 16/14, 19/14)
 
@@ -57,9 +57,9 @@ Dashboard `CharacterRelationshipIndicator` supports `presentation="inlinePassive
 
 ## Appearance vs density
 
-|          | `panel`                        | `embedded`                          | `filled` (+ optional `tone="strong"`)                                   |
-| -------- | ------------------------------ | ----------------------------------- | ----------------------------------------------------------------------- |
-| Chrome   | Border, radius, transparent bg | No outer panel border               | Border, card radius; strong → muted fill; optional elevation for shadow |
-| Dividers | Inset `::after` on items       | Full-bleed top border between items | Full-bleed `::after` between items                                      |
+|          | `panel`                        | `embedded`                          | `filled` (+ optional `tone="strong"`)                                                |
+| -------- | ------------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------ |
+| Chrome   | Border, radius, transparent bg | No outer panel border               | Border, card radius; strong → `--surface-strong` fill; optional elevation for shadow |
+| Dividers | Inset `::after` on items       | Full-bleed top border between items | Full-bleed `::after` between items                                                   |
 
 Density controls item inset and publishes `--ui-copy-title-size` / `--ui-copy-supporting-size`. Simple items and rich identity read the same pair. Search inherits compact (14/12) from its list. Campaign destinations inherit comfortable (16/14).

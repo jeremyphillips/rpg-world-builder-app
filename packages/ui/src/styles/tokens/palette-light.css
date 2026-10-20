@@ -40,6 +40,8 @@
     var(--palette-neutral-contrast) 32%,
     var(--palette-surface-base)
   );
+  /* Persistent card-shell selection fill (~#f4e8dd) — independent of tone rest */
+  --palette-surface-selected: oklch(0.938 0.02 65);
   /* Authored inset well — neutral gray-beige (#efede7), distinct from warm wash ladder */
   --palette-surface-sunken: oklch(0.946 0.0083 91.48);
 

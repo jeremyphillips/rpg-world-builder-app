@@ -42,7 +42,7 @@
   }
 
   .ui-destination-list--filled.ui-destination-list--tone-strong {
-    background-color: var(--surface-muted);
+    background-color: var(--surface-strong);
   }
 
   .ui-destination-list--elevation-subtle {

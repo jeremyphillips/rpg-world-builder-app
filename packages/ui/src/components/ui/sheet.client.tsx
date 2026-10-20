@@ -83,7 +83,7 @@ const SheetContent = React.forwardRef<
           className={cn(
             sheetContentVariants({ side, surface, size }),
             dialogContentFocusShellClasses,
-            'group/sheet ui-card-tone-host--inherit',
+            'group/sheet',
             className,
           )}
           data-has-media={hasMedia ? true : undefined}
