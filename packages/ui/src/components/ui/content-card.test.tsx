@@ -9,10 +9,7 @@ import { ContentCard } from './content-card.client'
 import { ContentCardRemoveButton, formatContentCardRemoveLabel } from './content-card-parts.client'
 import {
   contentCardHeadingRowVariants,
-  contentCardHeadingVariants,
   contentCardMetadataVariants,
-  contentCardMixedHeadingNameVariants,
-  contentCardMixedHeadingSuffixVariants,
   contentCardRootVariants,
   contentCardSubheadingVariants,
   resolveContentCardDensityInsetClasses,
@@ -63,7 +60,8 @@ describe('ContentCard', () => {
     const subheading = screen.getByText('Settlement overview')
     const metadata = screen.getByText('Unavailable in this campaign')
 
-    expect(heading).toHaveClass(contentCardHeadingVariants())
+    expect(heading).toHaveClass('ui-identity-row__title', 'truncate')
+    expect(heading.closest('.ui-content-card-heading--comfortable')).not.toBeNull()
     expect(subheading).toHaveClass(contentCardSubheadingVariants({ density: 'comfortable' }))
     expect(metadata).toHaveClass(contentCardMetadataVariants({ density: 'comfortable' }))
     expect(container.querySelector('article')).toHaveClass(
@@ -131,12 +129,11 @@ describe('ContentCard', () => {
     const name = screen.getByText('Fire Bolt')
     const classificationLabel = screen.getByText('Spell')
 
-    expect(name).toHaveClass(contentCardMixedHeadingNameVariants())
-    expect(name).toHaveClass('min-w-0', 'shrink', 'truncate')
+    expect(name).toHaveClass('ui-identity-row__title', 'min-w-0', 'truncate')
     expect(name.className).not.toMatch(/\bflex-1\b/)
     expect(name.className).not.toMatch(/\bmax-w-\[60%\]/)
 
-    expect(classificationLabel).toHaveClass(contentCardMixedHeadingSuffixVariants())
+    expect(classificationLabel).toHaveClass('ui-identity-row__classification')
     expect(classificationLabel).toHaveClass('shrink-0')
     expect(classificationLabel.className).not.toMatch(/\bflex-1\b/)
     expect(document.querySelector('[data-inline-metadata-separator]')).toBeInTheDocument()
@@ -165,10 +162,9 @@ describe('ContentCard', () => {
       <ContentCard density="compact" heading="Harbor District" subheading="Settlement overview" />,
     )
 
-    expect(screen.getByText('Harbor District')).toHaveClass(
-      'ui-content-card-heading--compact',
-      contentCardHeadingVariants(),
-    )
+    const heading = screen.getByText('Harbor District')
+    expect(heading).toHaveClass('ui-identity-row__title')
+    expect(heading.closest('.ui-content-card-heading--compact')).not.toBeNull()
     expect(screen.getByText('Settlement overview')).toHaveClass(
       contentCardSubheadingVariants({ density: 'compact' }),
     )
@@ -198,8 +194,9 @@ describe('ContentCard', () => {
       />,
     )
 
-    expect(screen.getByText('View')).toBeInTheDocument()
-    expect(screen.getByText('Unavailable')).toBeInTheDocument()
+    expect(screen.getAllByText('View')).toHaveLength(1)
+    expect(screen.getAllByText('Unavailable')).toHaveLength(1)
+    expect(screen.getByText('Harbor District')).not.toContainElement(screen.getByText('View'))
   })
 
   it('supports remove actions via ContentCardRemoveButton', async () => {
@@ -257,6 +254,16 @@ describe('ContentCard', () => {
     expect(screen.getByRole('link', { name: 'Open Harbor District' })).toHaveClass(
       'ui-compact-control--icon-compact',
     )
+  })
+
+  it('places the shared title under the content-card density scale', () => {
+    for (const density of ['compact', 'comfortable', 'spacious'] as const) {
+      const { unmount } = render(<ContentCard density={density} heading={`${density} title`} />)
+      const title = screen.getByText(`${density} title`)
+      expect(title).toHaveClass('ui-identity-row__title')
+      expect(title.closest(`.ui-content-card-heading--${density}`)).not.toBeNull()
+      unmount()
+    }
   })
 
   itAxe('has no axe accessibility violations', async () => {

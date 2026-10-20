@@ -16,7 +16,7 @@ describe('EntitySummaryHeading', () => {
 
     const name = screen.getByText('Fire Bolt')
     const classification = screen.getByText('Spell')
-    const mixedHeadingRow = name.parentElement as HTMLElement
+    const mixedHeadingRow = name.parentElement?.parentElement as HTMLElement
 
     expect(name.className).not.toMatch(/\bflex-1\b/)
     expect(classification.className).toMatch(/\bshrink-0\b/)
@@ -99,7 +99,8 @@ describe('EntitySummaryHeading', () => {
 
     const link = screen.getByRole('link', { name: 'Longsword' })
     expect(link).toHaveAttribute('href', '/items/longsword')
-    expect(screen.getByRole('button', { name: 'toggle' })).not.toContainElement(link)
+    expect(link).toHaveClass('ui-identity-row__title')
+    expect(link).not.toContainElement(screen.getByRole('button', { name: 'toggle' }))
   })
 })
 

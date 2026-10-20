@@ -111,6 +111,31 @@ describe('IdentityRow', () => {
   })
 })
 
+describe('IdentityRowHeadingLine semantics', () => {
+  it('merges title classes onto a single heading element and keeps the end slot outside it', () => {
+    render(<IdentityRowHeadingLine heading={<h3>Verna</h3>} headingEnd={<span>Inactive</span>} />)
+
+    const heading = screen.getByRole('heading', { name: 'Verna', level: 3 })
+    expect(heading).toHaveClass('ui-identity-row__title', 'truncate')
+    expect(heading).not.toContainElement(screen.getByText('Inactive'))
+  })
+
+  it('truncates a long title beside a trailing badge', () => {
+    render(
+      <div className="w-32">
+        <IdentityRowHeadingLine
+          heading="Very Long Character Name That Should Truncate"
+          headingEnd={<span>Inactive</span>}
+        />
+      </div>,
+    )
+
+    const title = screen.getByText('Very Long Character Name That Should Truncate')
+    expect(title).toHaveClass('truncate', 'min-w-0')
+    expect(screen.getByText('Inactive').parentElement).toHaveClass('shrink-0')
+  })
+})
+
 describe('IdentityRowHeadingLine headingInline', () => {
   it('places headingInline beside a truncating title without a separator', () => {
     render(

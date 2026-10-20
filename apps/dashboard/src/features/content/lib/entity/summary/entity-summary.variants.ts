@@ -1,7 +1,8 @@
 import { cva } from 'class-variance-authority'
 import { cn, textActionVariants } from '@rpg/ui'
 
-export const entitySummaryHeadingRowVariants = cva('flex min-w-0 flex-1 items-center gap-2')
+/** Fills the anatomy content cell. The heading line owns end alignment. */
+export const entitySummaryHeadingRowVariants = cva('flex min-w-0 w-full flex-1')
 
 export const entitySummaryHeadingEndValueVariants = cva(
   'ui-copy-title shrink-0 tabular-nums font-body-emphasis text-muted-foreground',

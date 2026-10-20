@@ -5,11 +5,11 @@ import {
   buttonVariants,
   cn,
   Card,
-  CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
-  Text,
+  IdentityRowHeadingLine,
+  IdentityRowSupporting,
+  identityRowStackVariants,
 } from '@rpg/ui'
 
 import { BuilderOptionCardImage } from './builder/steps/shared/builder-option-card-image'
@@ -39,32 +39,37 @@ function CharacterListCardHeader({
   controllerLine,
   rosterPresentation,
 }: CharacterListCardHeaderProps) {
+  const campaignLine =
+    showCampaign && card.campaign ? (
+      <CampaignDisplayName
+        display={buildCampaignDisplay({
+          id: card.campaign.id,
+          name: card.campaign.name,
+          emblemUrl: card.campaign.emblemUrl,
+        })}
+        surface="inlineMuted"
+      />
+    ) : null
+
   return (
-    <CardHeader className={card.displayImagesByRole?.primary ? 'px-5 pb-3 pt-3' : undefined}>
-      <div className="flex items-start justify-between gap-2">
-        <CardTitle>{card.name}</CardTitle>
-        {rosterPresentation ? (
-          <Badge appearance={rosterPresentation.appearance} tone={rosterPresentation.tone}>
-            {rosterPresentation.label}
-          </Badge>
-        ) : null}
-      </div>
-      <CardDescription>{card.summary}</CardDescription>
-      {controllerLine ? (
-        <Text variant="small" className="text-muted-foreground">
-          {controllerLine}
-        </Text>
-      ) : null}
-      {showCampaign && card.campaign ? (
-        <CampaignDisplayName
-          display={buildCampaignDisplay({
-            id: card.campaign.id,
-            name: card.campaign.name,
-            emblemUrl: card.campaign.emblemUrl,
-          })}
-          surface="inlineMuted"
+    <CardHeader>
+      <div className={cn(identityRowStackVariants(), 'min-w-0')}>
+        <IdentityRowHeadingLine
+          heading={<h3>{card.name}</h3>}
+          headingEnd={
+            rosterPresentation ? (
+              <Badge appearance={rosterPresentation.appearance} tone={rosterPresentation.tone}>
+                {rosterPresentation.label}
+              </Badge>
+            ) : undefined
+          }
         />
-      ) : null}
+        <IdentityRowSupporting wrap>{card.summary}</IdentityRowSupporting>
+        {controllerLine ? (
+          <IdentityRowSupporting wrap>{controllerLine}</IdentityRowSupporting>
+        ) : null}
+        {campaignLine ? <IdentityRowSupporting wrap>{campaignLine}</IdentityRowSupporting> : null}
+      </div>
     </CardHeader>
   )
 }
@@ -82,7 +87,7 @@ export function CharacterListCard({
     : null
 
   return (
-    <Card className="flex h-full flex-col overflow-hidden p-0">
+    <Card stretch className="overflow-hidden p-0">
       {card.displayImagesByRole?.primary ? (
         <BuilderOptionCardImage display={card.displayImagesByRole.primary} alt="" />
       ) : null}
@@ -92,9 +97,7 @@ export function CharacterListCard({
         controllerLine={controllerLine}
         rosterPresentation={rosterPresentation}
       />
-      <CardFooter
-        className={cn('mt-auto', card.displayImagesByRole?.primary != null && 'px-5 pb-5')}
-      >
+      <CardFooter className="mt-auto">
         <Link to={detailHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
           View
         </Link>

@@ -1,6 +1,7 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { Fragment, isValidElement, type ReactElement, type ReactNode } from 'react'
+import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '../../lib/utils'
 
@@ -20,6 +21,7 @@ import {
 import { InlineMetadata } from './inline-metadata'
 
 export type { IdentityRowDensity } from './identity-row.variants'
+export { identityRowStackVariants } from './identity-row.variants'
 
 /** Compact entity cards: 14px title, 12px classification, dot, and title-line end text. */
 export type IdentityRowHeadingRecipe = 'entity-compact'
@@ -42,6 +44,19 @@ export type IdentityRowProps = {
 function isPresent(value: ReactNode | undefined): value is ReactNode {
   return value != null && value !== '' && value !== false
 }
+
+function isComposableHeading(heading: ReactNode): heading is ReactElement {
+  return isValidElement(heading) && heading.type !== Fragment
+}
+
+function IdentityRowTitle({ heading, className }: { heading: ReactNode; className: string }) {
+  if (isComposableHeading(heading)) {
+    return <Slot className={className}>{heading}</Slot>
+  }
+  return <span className={className}>{heading}</span>
+}
+
+const identityRowTitleClassName = cn(identityRowHeadingVariants(), 'min-w-0 truncate')
 
 function classificationParts(classification?: ReactNode | readonly ReactNode[]): ReactNode[] {
   if (classification == null || classification === '' || classification === false) {
@@ -87,14 +102,14 @@ function IdentityRowHeadingContent({
       {showHeading ? (
         showHeadingInline ? (
           <InlineMetadata.Item className="flex min-w-0 items-center gap-1">
-            <span className={cn(identityRowHeadingVariants(), 'min-w-0 truncate')}>{heading}</span>
+            <IdentityRowTitle heading={heading} className={identityRowTitleClassName} />
             <span className="shrink-0 self-center" data-heading-inline="">
               {headingInline}
             </span>
           </InlineMetadata.Item>
         ) : (
           <InlineMetadata.Item truncate className={identityRowHeadingVariants()}>
-            {heading}
+            <IdentityRowTitle heading={heading} className={identityRowTitleClassName} />
           </InlineMetadata.Item>
         )
       ) : null}

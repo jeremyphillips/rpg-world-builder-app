@@ -113,24 +113,6 @@ export function contentCardHeadingScaleClass(density?: ContentCardDensity): stri
   )
 }
 
-export const contentCardHeadingVariants = cva(
-  'truncate font-body-emphasis [&_a]:block [&_a]:min-w-0 [&_a]:truncate',
-)
-
-export const contentCardMixedHeadingRowVariants = cva('flex min-w-0 items-baseline gap-x-1')
-
-export const contentCardMixedHeadingNameVariants = cva(
-  'ui-copy-title min-w-0 shrink truncate font-body-emphasis text-foreground [&_a]:truncate',
-)
-
-export const contentCardMixedHeadingSeparatorVariants = cva(
-  'shrink-0 font-normal text-muted-foreground',
-)
-
-export const contentCardMixedHeadingSuffixVariants = cva(
-  'shrink-0 font-normal text-muted-foreground',
-)
-
 /** Layer-2 supporting copy density — shared by content-card and entity summary surfaces. */
 export const supportingTextDensityVariants = cva('truncate text-muted-foreground', {
   variants: {

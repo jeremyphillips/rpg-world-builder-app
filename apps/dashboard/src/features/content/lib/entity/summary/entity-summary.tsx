@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  ContentCardHeading,
+  cn,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   InlineMetadata,
   contentCardHeadingLinkVariants,
+  contentCardHeadingScaleClass,
   type ContentCardDensity,
   type InlineMetadataDensity,
 } from '@rpg/ui'
@@ -69,26 +70,14 @@ export function EntitySummaryHeading({
   const resolvedHeading = resolveLinkedHeading(heading, headingHref)
 
   return (
-    <div className={entitySummaryHeadingRowVariants()}>
-      {density === 'compact' ? (
-        <IdentityRowHeadingLine
-          heading={resolvedHeading}
-          classification={classification}
-          headingEnd={headingEnd}
-          headingInline={headingInline}
-          recipe="entity-compact"
-        />
-      ) : (
-        <>
-          <ContentCardHeading
-            heading={resolvedHeading}
-            classification={classification}
-            density={density}
-            headingInline={headingInline}
-          />
-          {headingEnd}
-        </>
-      )}
+    <div className={cn(entitySummaryHeadingRowVariants(), contentCardHeadingScaleClass(density))}>
+      <IdentityRowHeadingLine
+        heading={resolvedHeading}
+        classification={classification}
+        headingEnd={headingEnd}
+        headingInline={headingInline}
+        recipe={density === 'compact' ? 'entity-compact' : undefined}
+      />
     </div>
   )
 }

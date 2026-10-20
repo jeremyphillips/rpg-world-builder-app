@@ -1,5 +1,6 @@
 @layer components {
   .ui-identity-row__title {
+    margin: 0;
     min-width: 0;
     flex-shrink: 1;
     overflow: hidden;
