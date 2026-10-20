@@ -40,7 +40,7 @@ Link-specific attributes (`to`, `href`, `aria-label`, `onClick`, refs) belong on
 
 ## Navigation
 
-`renderNavigableLinkRoot` clones the app-supplied link and merges surface classes. Destination items use embedded focus rings (`ui-focus-ring--embedded`). Navigable cards and static `EntityCard` use standalone focus (`ui-focus-ring`).
+`renderNavigableLinkRoot` clones the app-supplied link and merges surface classes. The same helper powers `ButtonLink` ([button-link.md](./button-link.md)). Destination items use embedded focus rings (`ui-focus-ring--embedded`). Navigable cards and static `EntityCard` use standalone focus (`ui-focus-ring`).
 
 Item link ownership:
 

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { DEFAULT_SYSTEM_RULESET_ID, type SystemRulesetId } from '@rpg/contracts'
-import { buttonVariants, Heading } from '@rpg/ui'
+import { ButtonLink, Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { CharacterListCard } from '@/features/character'
@@ -109,12 +109,12 @@ export function CharactersOverview() {
 
   const characterActions = (
     <>
-      <Link to={ROUTES.characters.import} className={buttonVariants({ variant: 'outline' })}>
+      <ButtonLink link={<Link to={ROUTES.characters.import} />} variant="outline">
         {CHARACTERS_OVERVIEW_COPY.importLabel}
-      </Link>
-      <Link to={ROUTES.characters.new} className={buttonVariants({ variant: 'default' })}>
+      </ButtonLink>
+      <ButtonLink link={<Link to={ROUTES.characters.new} />}>
         {CHARACTERS_OVERVIEW_COPY.createLabel}
-      </Link>
+      </ButtonLink>
     </>
   )
 

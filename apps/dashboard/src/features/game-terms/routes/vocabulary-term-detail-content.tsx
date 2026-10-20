@@ -8,7 +8,7 @@ import {
   type VocabularyOptionSetId,
   type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
-import { Badge, buttonVariants, Eyebrow, Text } from '@rpg/ui'
+import { Badge, Button, Eyebrow, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { contentDetailHeroEyebrowClasses } from '@/features/content'
@@ -71,13 +71,9 @@ function VocabularyTermDetailBody({
   const rulesetId = DEFAULT_SYSTEM_RULESET_ID
 
   const editAction = canEdit ? (
-    <button
-      type="button"
-      className={buttonVariants({ variant: 'outline', size: 'sm' })}
-      onClick={onEdit}
-    >
+    <Button type="button" variant="outline" size="sm" onClick={onEdit}>
       Edit
-    </button>
+    </Button>
   ) : undefined
 
   const sourceBadge = (

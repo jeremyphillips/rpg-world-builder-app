@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { buttonVariants } from '@rpg/ui'
+import { ButtonLink } from '@rpg/ui'
 
 import { PromotionCard } from '@/components/layout/promotion-card'
 
@@ -11,25 +11,26 @@ type CampaignRecoveryPromotionCardProps = {
 }
 
 export function CampaignRecoveryPromotionCard({ promotion }: CampaignRecoveryPromotionCardProps) {
-  const actionClassName = buttonVariants({
-    variant:
-      promotion.actionLabel && isCampaignOnboardingPrimaryAction(promotion.actionLabel)
-        ? 'default'
-        : 'outline',
-    size: 'sm',
-  })
+  const variant =
+    promotion.actionLabel && isCampaignOnboardingPrimaryAction(promotion.actionLabel)
+      ? 'default'
+      : 'outline'
 
   const action =
     promotion.href && promotion.actionLabel ? (
-      promotion.kind === 'pending_invite' ? (
-        <a href={promotion.href} className={actionClassName}>
-          {promotion.actionLabel}
-        </a>
-      ) : (
-        <Link to={promotion.href} className={actionClassName}>
-          {promotion.actionLabel}
-        </Link>
-      )
+      <ButtonLink
+        link={
+          promotion.kind === 'pending_invite' ? (
+            <a href={promotion.href} />
+          ) : (
+            <Link to={promotion.href} />
+          )
+        }
+        variant={variant}
+        size="sm"
+      >
+        {promotion.actionLabel}
+      </ButtonLink>
     ) : null
 
   return (

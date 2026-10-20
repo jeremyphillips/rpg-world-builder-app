@@ -2,9 +2,9 @@
 
 import * as React from 'react'
 
-import { cn } from '../../lib/utils'
-import { buttonVariants, type ButtonVariantProps } from './button.variants'
-import { textActionVariants, type TextActionTone } from './text-action.variants'
+import { type ButtonVariantProps } from './button.variants'
+import { resolveButtonAppearance } from './resolve-button-appearance'
+import { type TextActionTone } from './text-action.variants'
 
 type ButtonSharedProps = {
   size?: ButtonVariantProps['size']
@@ -26,17 +26,11 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, density, type = 'button', tone, ...props }, ref) => {
-    const resolvedVariant = variant ?? 'default'
-
     return (
       <button
         ref={ref}
         type={type}
-        className={cn(
-          buttonVariants({ variant: resolvedVariant, size, density }),
-          resolvedVariant === 'text' ? textActionVariants({ context: 'standalone', tone }) : null,
-          className,
-        )}
+        className={resolveButtonAppearance({ variant, size, density, tone, className })}
         {...props}
       />
     )

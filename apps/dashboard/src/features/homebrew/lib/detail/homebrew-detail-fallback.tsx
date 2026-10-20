@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { buttonVariants, Heading, Text } from '@rpg/ui'
+import { ButtonLink, Heading, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { PageShell } from '@/components/layout/page/page-shell'
@@ -40,12 +40,9 @@ export function HomebrewDetailFallback({
       ) : null}
       <Text variant="muted">{message}</Text>
       {status === 'unknown' && campaignId ? (
-        <Link
-          to={ROUTES.homebrew.hub(campaignId)}
-          className={buttonVariants({ variant: 'outline' })}
-        >
+        <ButtonLink link={<Link to={ROUTES.homebrew.hub(campaignId)} />} variant="outline">
           Back to Homebrew
-        </Link>
+        </ButtonLink>
       ) : null}
     </>
   )

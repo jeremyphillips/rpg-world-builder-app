@@ -28,7 +28,7 @@ The rule prohibits duplicated styling ownership. It does not require identical c
 | Shared semantic styling primitive | Styling matches, but DOM structure or behavior differs                  |
 | Domain-specific implementation    | The pattern is genuinely unique (record it as an intentional exception) |
 
-Styling primitives must be exportable. Every owner whose styling may be reused without its component exposes its semantic classes through a function, the same way `buttonVariants()` styles a Next `<Link>` without rendering `Button`. Card exports `cardSurfaceVariants({ … })`, which returns `ui-card ui-card--…`.
+Styling primitives must be exportable. Every owner whose styling may be reused without its component exposes its semantic classes through a function — for example `cardSurfaceVariants({ … })` returns `ui-card ui-card--…`. For **button-shaped navigation**, use `ButtonLink` (app supplies the router link via `link`); `resolveButtonAppearance()` and `buttonVariants()` remain for styling-only or non-navigation cases. See [button-link.md](./button-link.md).
 
 `EntityCardFrame` shares the **inset** ladder (`--ui-card-inset-*` via `ui-card--compact|comfortable` on the frame) with generic `Card` and option cards. The legacy `ContentCard` article shell is retired. Generic `Card` also publishes shared copy vars (`--ui-copy-title-size` via `copy-scale.css`) and `spacious` inset; hub tiles can pair `Card` with `IdentityRowHeadingLine` without a separate density wrapper. Entity frames use `ContentCardDensity` only (no `spacious`, separate title typography via `contentCardHeadingScaleClass` on `EntitySummaryHeading`).
 
@@ -58,6 +58,8 @@ The registry records gaps ("No owner yet") explicitly. It grows only when a fami
 | UI responsibility              | Canonical owner                                                   |
 | ------------------------------ | ----------------------------------------------------------------- |
 | Interactive button chrome      | `Button` (split actions: `SplitButton`)                           |
+| Button-shaped link navigation  | `ButtonLink`                                                      |
+| Inline / text link navigation  | `Link`                                                            |
 | Table filter presentation      | `DataTableFilterChrome`                                           |
 | Compact sort selection         | `SortMenu`                                                        |
 | Callout or warning surface     | `Alert`                                                           |

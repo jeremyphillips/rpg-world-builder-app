@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import type { CharacterRosterStatus } from '@rpg/contracts'
 import {
   Badge,
-  buttonVariants,
+  ButtonLink,
   cn,
   Card,
   CardFooter,
@@ -115,9 +115,9 @@ export function CharacterListCard({
         density={density}
       />
       <CardFooter>
-        <Link to={detailHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+        <ButtonLink link={<Link to={detailHref} />} variant="outline" size="sm">
           View
-        </Link>
+        </ButtonLink>
       </CardFooter>
     </Card>
   )

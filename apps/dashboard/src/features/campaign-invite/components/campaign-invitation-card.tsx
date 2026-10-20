@@ -1,4 +1,4 @@
-import { buttonVariants } from '@rpg/ui'
+import { ButtonLink } from '@rpg/ui'
 
 import { PromotionCard } from '@/components/layout/promotion-card'
 
@@ -17,9 +17,9 @@ export function CampaignInvitationCard({ promotion }: CampaignInvitationCardProp
       meta={promotion.meta}
       actions={
         promotion.href && promotion.actionLabel ? (
-          <a href={promotion.href} className={buttonVariants({ size: 'sm' })}>
+          <ButtonLink link={<a href={promotion.href} />} size="sm">
             {promotion.actionLabel}
-          </a>
+          </ButtonLink>
         ) : null
       }
     />

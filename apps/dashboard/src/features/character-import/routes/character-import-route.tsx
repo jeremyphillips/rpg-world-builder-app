@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
-import { buttonVariants, Heading } from '@rpg/ui'
+import { ButtonLink, Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { PageShell } from '@/components/layout/page/page-shell'
@@ -39,9 +39,9 @@ export function CharacterImportRoute() {
         <Heading variant="page" as="h1">
           Import D&amp;D Beyond character
         </Heading>
-        <Link to={ROUTES.characters.list} className={buttonVariants({ variant: 'outline' })}>
+        <ButtonLink link={<Link to={ROUTES.characters.list} />} variant="outline">
           Back to characters
-        </Link>
+        </ButtonLink>
       </div>
 
       <PageLoadState

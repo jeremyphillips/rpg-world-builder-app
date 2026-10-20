@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { buttonVariants, Heading, Text } from '@rpg/ui'
+import { ButtonLink, Heading, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { PageShell } from '@/components/layout/page/page-shell'
@@ -26,12 +26,9 @@ export function GameTermsFallback({
         Not found
       </Heading>
       <Text variant="muted">{message}</Text>
-      <Link
-        to={ROUTES.gameTerms.hub(campaignId)}
-        className={buttonVariants({ variant: 'outline' })}
-      >
+      <ButtonLink link={<Link to={ROUTES.gameTerms.hub(campaignId)} />} variant="outline">
         Back to Game Terms
-      </Link>
+      </ButtonLink>
     </PageShell>
   )
 }

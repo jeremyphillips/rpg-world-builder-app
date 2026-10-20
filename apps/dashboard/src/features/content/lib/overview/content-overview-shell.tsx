@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { buttonVariants } from '@rpg/ui'
+import { ButtonLink } from '@rpg/ui'
 
 import { OverviewPageShell } from '@/components/layout/page/overview-page-shell'
 import { useCanManageCampaign } from '@/features/campaign'
@@ -39,9 +39,9 @@ export function ContentOverviewShell({
   const resolvedActions =
     actions ??
     (newHref ? (
-      <Link to={newHref} className={buttonVariants({ size: 'sm' })}>
+      <ButtonLink link={<Link to={newHref} />} size="sm">
         {newLabel}
-      </Link>
+      </ButtonLink>
     ) : undefined)
 
   return (

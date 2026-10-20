@@ -22,15 +22,7 @@ import type {
   CharacterBuilderStepId,
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
-import {
-  buttonVariants,
-  Button,
-  Heading,
-  ScrollBoundaryRegion,
-  Spinner,
-  Text,
-  Alert,
-} from '@rpg/ui'
+import { Button, ButtonLink, Heading, ScrollBoundaryRegion, Spinner, Text, Alert } from '@rpg/ui'
 
 import { CampaignCharacterEligibilityAlert } from '@/features/campaign'
 import { useCompleteCampaignOnboarding } from '@/features/campaign'
@@ -522,18 +514,18 @@ export function CharacterBuilderShell({
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
             {chrome.importHref && chrome.importLabel ? (
-              <Link to={chrome.importHref} className={buttonVariants({ variant: 'outline' })}>
+              <ButtonLink link={<Link to={chrome.importHref} />} variant="outline">
                 {chrome.importLabel}
-              </Link>
+              </ButtonLink>
             ) : null}
             {onExitClick ? (
               <Button type="button" variant="outline" onClick={onExitClick}>
                 {chrome.exitLabel}
               </Button>
             ) : (
-              <Link to={chrome.exitHref} className={buttonVariants({ variant: 'outline' })}>
+              <ButtonLink link={<Link to={chrome.exitHref} />} variant="outline">
                 {chrome.exitLabel}
-              </Link>
+              </ButtonLink>
             )}
           </div>
         </header>

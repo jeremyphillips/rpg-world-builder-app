@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { buttonVariants } from '@rpg/ui'
+import { ButtonLink } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import { PromotionCard } from './promotion-card'
@@ -20,9 +20,9 @@ export const Default: Story = {
     description: 'The Shattered Vale. Avery invited you to join this campaign.',
     meta: 'Expires in 7 days',
     actions: (
-      <a href="/app/campaign-invites/abc" className={buttonVariants({ size: 'sm' })}>
+      <ButtonLink link={<a href="/app/campaign-invites/abc" />} size="sm">
         Review invitation
-      </a>
+      </ButtonLink>
     ),
   },
 }
@@ -33,12 +33,9 @@ export const Warning: Story = {
     title: 'Finish joining Stormwatch',
     description: 'Create or connect a character to complete your campaign setup.',
     actions: (
-      <Link
-        to="/campaigns/camp_1/onboarding"
-        className={buttonVariants({ variant: 'outline', size: 'sm' })}
-      >
+      <ButtonLink link={<Link to="/campaigns/camp_1/onboarding" />} variant="outline" size="sm">
         Continue setup
-      </Link>
+      </ButtonLink>
     ),
   },
 }

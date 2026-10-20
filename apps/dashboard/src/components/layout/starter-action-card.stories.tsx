@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Link } from 'react-router-dom'
-import { buttonVariants } from '@rpg/ui'
+import { ButtonLink } from '@rpg/ui'
 
 import { StarterActionCard } from './starter-action-card'
 
@@ -19,9 +19,9 @@ export const Campaign: Story = {
     title: 'Create a campaign',
     description: 'Build a shared world, invite players, and manage characters and game content.',
     actions: (
-      <Link to="/campaigns/new" className={buttonVariants({ size: 'sm' })}>
+      <ButtonLink link={<Link to="/campaigns/new" />} size="sm">
         New campaign
-      </Link>
+      </ButtonLink>
     ),
   },
 }
@@ -32,15 +32,12 @@ export const Character: Story = {
     description: 'Build a standalone character now. You can connect it to a campaign later.',
     actions: (
       <>
-        <Link to="/characters/new" className={buttonVariants({ size: 'sm' })}>
+        <ButtonLink link={<Link to="/characters/new" />} size="sm">
           Create character
-        </Link>
-        <Link
-          to="/characters/import"
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
-        >
+        </ButtonLink>
+        <ButtonLink link={<Link to="/characters/import" />} variant="outline" size="sm">
           Import character
-        </Link>
+        </ButtonLink>
       </>
     ),
   },

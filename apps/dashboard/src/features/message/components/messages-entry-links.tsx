@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { buttonVariants, cn } from '@rpg/ui'
+import { ButtonLink, cn } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
@@ -14,18 +14,8 @@ type MessagesEntryLinksProps = {
   layout?: MessagesEntryLinksLayout
 }
 
-function entryLinkClassName(
-  tone: MessagesEntryLinksTone,
-  layout: MessagesEntryLinksLayout,
-): string {
-  const variant = tone === 'overview' ? 'outline' : 'ghost'
-  const base = buttonVariants({ variant, size: 'sm' })
-  return layout === 'stacked' ? cn(base, 'w-full justify-start') : base
-}
-
-function secondaryLinkClassName(layout: MessagesEntryLinksLayout): string {
-  const base = buttonVariants({ variant: 'ghost', size: 'sm' })
-  return layout === 'stacked' ? cn(base, 'w-full justify-start') : base
+function stackedLayoutClassName(layout: MessagesEntryLinksLayout): string | undefined {
+  return layout === 'stacked' ? 'w-full justify-start' : undefined
 }
 
 /** Campaign-scoped and global message entry links for nav chrome, overview, and bell footer. */
@@ -36,26 +26,40 @@ export function MessagesEntryLinks({
 }: MessagesEntryLinksProps) {
   const containerClassName =
     layout === 'stacked' ? 'flex flex-col gap-1' : 'flex flex-wrap items-center gap-2'
+  const layoutClassName = stackedLayoutClassName(layout)
+  const primaryVariant = tone === 'overview' ? 'outline' : 'ghost'
 
   if (!campaignId) {
     return (
-      <Link to={ROUTES.messages.list} className={entryLinkClassName(tone, layout)}>
+      <ButtonLink
+        link={<Link to={ROUTES.messages.list} />}
+        variant={primaryVariant}
+        size="sm"
+        className={cn(layoutClassName)}
+      >
         {MESSAGES_ACTION_COPY.viewAll}
-      </Link>
+      </ButtonLink>
     )
   }
 
   return (
     <div className={containerClassName}>
-      <Link
-        to={ROUTES.messages.listScoped(campaignId)}
-        className={entryLinkClassName(tone, layout)}
+      <ButtonLink
+        link={<Link to={ROUTES.messages.listScoped(campaignId)} />}
+        variant={primaryVariant}
+        size="sm"
+        className={cn(layoutClassName)}
       >
         {MESSAGES_ACTION_COPY.viewForCampaign}
-      </Link>
-      <Link to={ROUTES.messages.list} className={secondaryLinkClassName(layout)}>
+      </ButtonLink>
+      <ButtonLink
+        link={<Link to={ROUTES.messages.list} />}
+        variant="ghost"
+        size="sm"
+        className={cn(layoutClassName)}
+      >
         {MESSAGES_ACTION_COPY.viewAll}
-      </Link>
+      </ButtonLink>
     </div>
   )
 }
