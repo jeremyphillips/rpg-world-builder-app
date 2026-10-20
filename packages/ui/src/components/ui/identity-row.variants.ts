@@ -1,11 +1,5 @@
 import { cva } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
-import {
-  ROW_IDENTITY_STACK_GAP_CLASS,
-  ROW_IDENTITY_STATUS_OFFSET_CLASS,
-} from './row-anatomy/row-identity-rhythm.tokens'
-
 import type { ContentCardDensity } from './content-card.variants'
 
 export type IdentityRowDensity = ContentCardDensity
@@ -56,16 +50,4 @@ export const identityRowSupportingVariants = cva(
   },
 )
 
-export const identityRowStackVariants = cva(cn('flex flex-col', ROW_IDENTITY_STACK_GAP_CLASS))
-
-export const identityRowStatusVariants = cva('', {
-  variants: {
-    spacing: {
-      offset: ROW_IDENTITY_STATUS_OFFSET_CLASS,
-      flush: '',
-    },
-  },
-  defaultVariants: {
-    spacing: 'offset',
-  },
-})
+export const identityRowStackVariants = cva('ui-identity-row__stack')

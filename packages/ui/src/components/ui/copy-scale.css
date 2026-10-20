@@ -3,8 +3,14 @@
  * compact 14/12, comfortable 16/14, spacious 19/14.
  * Font size and the line-height token paired with that size. Weight stays on the component.
  * A density class on the same element overrides an inherited value.
+ *
+ * --ui-anatomy-row-gap: spacing between related stacked anatomy rows (title, supporting, status).
+ * Ladder: row-anatomy.md. Surfaces own region gaps; lists own item gaps.
  */
 @layer components {
+  :root {
+    --ui-anatomy-row-gap: calc(var(--spacing) * 1);
+  }
   .ui-copy-title,
   .ui-content-card-heading {
     font-size: var(--ui-copy-title-size, var(--text-base));
@@ -26,6 +32,7 @@
     --ui-copy-supporting-line-height: var(--text-sm--line-height);
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
     --entity-leading-content-gap: calc(var(--spacing) * 3);
+    --ui-anatomy-row-gap: calc(var(--spacing) * 1);
   }
 
   .ui-card--compact,
@@ -41,6 +48,7 @@
     --ui-copy-supporting-line-height: var(--text-xs--line-height);
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 2);
     --entity-leading-content-gap: calc(var(--spacing) * 2);
+    --ui-anatomy-row-gap: calc(var(--spacing) * 0.5);
   }
 
   .ui-card--comfortable,
@@ -55,6 +63,7 @@
     --ui-copy-supporting-line-height: var(--text-sm--line-height);
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
     --entity-leading-content-gap: calc(var(--spacing) * 3);
+    --ui-anatomy-row-gap: calc(var(--spacing) * 1);
   }
 
   .ui-card--spacious,
@@ -70,6 +79,7 @@
     --ui-copy-supporting-line-height: var(--text-sm--line-height);
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
     --entity-leading-content-gap: calc(var(--spacing) * 3);
+    --ui-anatomy-row-gap: calc(var(--spacing) * 1.5);
   }
 
   /* Later than card.css so density modifiers beat the untoned `.ui-card` title vars. */

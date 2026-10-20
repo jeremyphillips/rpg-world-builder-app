@@ -55,6 +55,20 @@ function resolvedCopySize(
   return property === '--ui-copy-title-size' ? '16px' : '14px'
 }
 
+/** Resolve --ui-anatomy-row-gap from calc(var(--spacing) * N) on ancestors. */
+function resolvedAnatomyRowGap(testId: string): string {
+  let node: Element | null = screen.getByTestId(testId)
+  while (node) {
+    const specified = getComputedStyle(node).getPropertyValue('--ui-anatomy-row-gap').trim()
+    const multiplier = specified.match(/\*\s*([\d.]+)\)/)?.[1]
+    if (multiplier != null) {
+      return `${4 * Number.parseFloat(multiplier)}px`
+    }
+    node = node.parentElement
+  }
+  return '4px'
+}
+
 describe('canonical copy scale', () => {
   it('uses comfortable 16/14 when no density ancestor is present', () => {
     installTokens()
@@ -155,5 +169,41 @@ describe('canonical copy scale', () => {
     expect(resolvedCopySize('sm', '--ui-copy-title-size')).toBe('14px')
     expect(resolvedCopySize('md', '--ui-copy-title-size')).toBe('16px')
     expect(resolvedCopySize('lg', '--ui-copy-title-size')).toBe('19px')
+  })
+
+  it('publishes anatomy row gap 2 / 4 / 6px by density', () => {
+    installTokens()
+    render(
+      <>
+        <div className="ui-card ui-card--compact" data-testid="compact">
+          <span data-testid="compact-gap">x</span>
+        </div>
+        <div className="ui-card ui-card--comfortable" data-testid="comfortable">
+          <span data-testid="comfortable-gap">x</span>
+        </div>
+        <div className="ui-card ui-card--spacious" data-testid="spacious">
+          <span data-testid="spacious-gap">x</span>
+        </div>
+        <span data-testid="root-gap">x</span>
+      </>,
+    )
+
+    expect(resolvedAnatomyRowGap('compact-gap')).toBe('2px')
+    expect(resolvedAnatomyRowGap('comfortable-gap')).toBe('4px')
+    expect(resolvedAnatomyRowGap('spacious-gap')).toBe('6px')
+    expect(resolvedAnatomyRowGap('root-gap')).toBe('4px')
+  })
+
+  it('lets a nested density override anatomy row gap', () => {
+    installTokens()
+    render(
+      <div className="ui-destination-list ui-destination-list--compact">
+        <div className="dash-entity-anatomy dash-entity-anatomy--spacious">
+          <span data-testid="nested-gap">x</span>
+        </div>
+      </div>,
+    )
+
+    expect(resolvedAnatomyRowGap('nested-gap')).toBe('6px')
   })
 })

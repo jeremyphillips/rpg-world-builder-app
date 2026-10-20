@@ -14,7 +14,6 @@ import {
   identityRowHeadingVariants,
   identityRowRootVariants,
   identityRowStackVariants,
-  identityRowStatusVariants,
   identityRowSupportingVariants,
   type IdentityRowDensity,
 } from './identity-row.variants'
@@ -34,8 +33,6 @@ export type IdentityRowProps = {
   /** End of the heading line. Not status copy, which stays under supporting text. */
   headingEnd?: ReactNode
   status?: ReactNode
-  /** `flush` matches supporting-line spacing. Badges keep the default offset. */
-  statusSpacing?: 'offset' | 'flush'
   /** Sets the canonical copy pair on this row. Omit to inherit from the surface. */
   density?: IdentityRowDensity
   className?: string
@@ -185,7 +182,6 @@ export function IdentityRow({
   supportingWrap = false,
   headingEnd,
   status,
-  statusSpacing = 'offset',
   density,
   className,
 }: IdentityRowProps) {
@@ -210,9 +206,7 @@ export function IdentityRow({
         {showSupporting ? (
           <IdentityRowSupporting wrap={supportingWrap}>{supporting}</IdentityRowSupporting>
         ) : null}
-        {showStatus ? (
-          <div className={identityRowStatusVariants({ spacing: statusSpacing })}>{status}</div>
-        ) : null}
+        {showStatus ? <div>{status}</div> : null}
       </div>
     </div>
   )

@@ -31,12 +31,13 @@
   .ui-row-anatomy__cell--meta {
     grid-row: meta;
     align-self: start;
+    margin-block-start: var(--ui-anatomy-row-gap);
   }
 
   .ui-row-anatomy__cell--status {
     grid-row: status;
     align-self: start;
-    margin-block-start: calc(var(--spacing) * 1);
+    margin-block-start: var(--ui-anatomy-row-gap);
   }
 
   .ui-row-anatomy__cell--full {

@@ -14,12 +14,31 @@ Entity-family usage: start with [card-guide](../../../apps/dashboard/docs/card-g
 | ------------------------------------- | ------------------------------------------ |
 | Row tracks (vertical)                 | `rowAnatomyTracksVariants`                 |
 | Cell row placement and self-alignment | `rowAnatomyCellClasses` (sole resolver)    |
+| Gap between related stacked copy rows | `--ui-anatomy-row-gap` (`copy-scale.css`)  |
 | Columns, column gaps                  | Host (e.g. `entityAnatomyColumnsVariants`) |
 | Padding / surface inset               | Host surface (e.g. `EntityCardFrame`)      |
 | Inner content layout                  | Cell children (flex rows inside a cell)    |
 
-The track variant emits **rows only** — never columns, gaps, padding, or inset. Hosts
-compose it with their own column template.
+The track variant emits **rows only** — never columns, horizontal gaps, padding, or inset.
+Hosts compose it with their own column template. Vertical rhythm between band, meta, and
+status uses `--ui-anatomy-row-gap` on flex stacks (`IdentityRow`, Card header, Alert copy)
+and as `margin-block-start` on row-anatomy meta/status cells — not `row-gap` on the grid
+(empty tracks would create phantom spacing).
+
+## Anatomy row gap
+
+Density-aware spacing between related stacked rows (title, supporting, status). Surfaces own
+region separation (`--ui-surface-region-gap`); lists own spacing between distinct items.
+
+| Density     | Row gap |
+| ----------- | ------- |
+| compact     | 2px     |
+| comfortable | 4px     |
+| spacious    | 6px     |
+
+Published on the same density selectors as copy scale (`ui-card--*`, `ui-alert--*`,
+`ui-identity-row--*`, `dash-entity-anatomy--*`, …). Comfortable is the `:root` default when
+no density ancestor is present. Status uses this gap only — no separate offset.
 
 ## Tracks
 
@@ -53,13 +72,13 @@ type RowAnatomyCellSpec<C extends string = RowColumn> =
   | { slot: 'stretch'; column: 'trailing' }
 ```
 
-| Slot      | Row placement                 | Self-alignment         | Typical content                                 |
-| --------- | ----------------------------- | ---------------------- | ----------------------------------------------- |
-| `band`    | `[band]`                      | center                 | Heading line, labeled action, media, grip/caret |
-| `meta`    | `[meta]`                      | start (+ track offset) | Description, secondary price/quantity           |
-| `status`  | `[status]`                    | start (+ track offset) | Status badges / annotations                     |
-| `full`    | `[slack-start]` → `[row-end]` | center                 | Ghost utilities, chevrons, steppers             |
-| `stretch` | `[slack-start]` → `[row-end]` | stretch                | Full-height trailing chrome                     |
+| Slot      | Row placement                 | Self-alignment | Typical content                                 |
+| --------- | ----------------------------- | -------------- | ----------------------------------------------- |
+| `band`    | `[band]`                      | center         | Heading line, labeled action, media, grip/caret |
+| `meta`    | `[meta]`                      | start          | Description, secondary price/quantity           |
+| `status`  | `[status]`                    | start          | Status badges / annotations                     |
+| `full`    | `[slack-start]` → `[row-end]` | center         | Ghost utilities, chevrons, steppers             |
+| `stretch` | `[slack-start]` → `[row-end]` | stretch        | Full-height trailing chrome                     |
 
 `RowAnatomyCell` renders the cell: it accepts the spec, children, and `data-*` attributes
 only — **no `className` or `style`**. Column placement is inline `grid-column: <name>`;
@@ -92,7 +111,6 @@ If a cell looks misaligned, fix the track or the resolver — never the consumer
 - No per-consumer alignment props. `trailingAlign`, `headingBand`, `actionsAlign`, and
   `rowAlign` are retired — rhythm resolves inside the owning primitive
   (`resolveCollapsibleListItemHeaderActionsPlacement`, `resolveContentCardBodyCrossAxis`).
-- Meta/status offsets share `row-identity-rhythm.tokens.ts` with `IdentityRow` stacks.
 - A primitive that needs a new slot, variant, or override to fit is a **different
   anatomy** — document it below instead of bending the contract.
 

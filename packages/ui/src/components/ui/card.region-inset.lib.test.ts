@@ -46,4 +46,19 @@ describe('card region inset CSS contract', () => {
     expect(cardSource).toContain('.ui-card:has(.ui-card__header) .ui-card__footer')
     expect(cardSource).toContain('.ui-card:has(.ui-card__content) .ui-card__footer')
   })
+
+  it('consumes shared anatomy row gap on the declarative header stack', () => {
+    expect(cardSource).toMatch(
+      /\.ui-card \.ui-card__header[\s\S]*row-gap:\s*var\(--ui-anatomy-row-gap\)/,
+    )
+    expect(copyScaleSource).toMatch(
+      /\.ui-card--compact[\s\S]*--ui-anatomy-row-gap:\s*calc\(var\(--spacing\) \* 0\.5\)/,
+    )
+    expect(copyScaleSource).toMatch(
+      /\.ui-card--comfortable[\s\S]*--ui-anatomy-row-gap:\s*calc\(var\(--spacing\) \* 1\)/,
+    )
+    expect(copyScaleSource).toMatch(
+      /\.ui-card--spacious[\s\S]*--ui-anatomy-row-gap:\s*calc\(var\(--spacing\) \* 1\.5\)/,
+    )
+  })
 })

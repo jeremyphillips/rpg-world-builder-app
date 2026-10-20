@@ -1,4 +1,10 @@
 @layer components {
+  .ui-identity-row__stack {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--ui-anatomy-row-gap);
+  }
+
   .ui-identity-row__title {
     margin: 0;
     min-width: 0;

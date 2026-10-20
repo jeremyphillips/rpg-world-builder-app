@@ -64,7 +64,7 @@
     display: flex;
     min-width: 0;
     flex-direction: column;
-    gap: calc(var(--spacing) * 2);
+    row-gap: var(--ui-anatomy-row-gap);
   }
 
   .ui-alert__title {

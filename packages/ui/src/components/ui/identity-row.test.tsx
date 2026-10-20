@@ -1,5 +1,9 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import {
   identityRowClassificationVariants,
@@ -7,6 +11,31 @@ import {
   identityRowHeadingVariants,
 } from './identity-row.variants'
 import { IdentityRow, IdentityRowHeadingLine } from './identity-row.client'
+
+const copyScaleCss = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), 'copy-scale.css'),
+  'utf8',
+)
+  .replace('@layer components {', '')
+  .replace(/\n}\s*$/, '')
+const identityRowCss = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), 'identity-row.css'),
+  'utf8',
+)
+const SURFACE_TEST_TOKENS = `:root { --spacing: 4px; --text-base: 16px; --text-sm: 14px; }`
+
+function resolveAnatomyRowGapPx(element: Element): string {
+  let node: Element | null = element
+  while (node) {
+    const specified = getComputedStyle(node).getPropertyValue('--ui-anatomy-row-gap').trim()
+    const multiplier = specified.match(/\*\s*([\d.]+)\)/)?.[1]
+    if (multiplier != null) {
+      return `${4 * Number.parseFloat(multiplier)}px`
+    }
+    node = node.parentElement
+  }
+  return '4px'
+}
 
 describe('IdentityRow', () => {
   it('truncates a long heading while classification stays shrink-0', () => {
@@ -108,6 +137,37 @@ describe('IdentityRow', () => {
 
   it('keeps classification on the shared title class', () => {
     expect(identityRowClassificationVariants()).toContain('ui-identity-row__classification')
+  })
+
+  describe('anatomy row gap', () => {
+    let styleEl: HTMLStyleElement
+
+    beforeAll(() => {
+      styleEl = document.createElement('style')
+      styleEl.textContent = `${SURFACE_TEST_TOKENS}\n${copyScaleCss}\n${identityRowCss}`
+      document.head.appendChild(styleEl)
+    })
+
+    afterAll(() => {
+      styleEl.remove()
+    })
+
+    it('uses the shared row-gap on the stack without extra status offset', () => {
+      const { container } = render(
+        <IdentityRow
+          heading="Item"
+          supporting="Details"
+          status={<span data-testid="status">Ready</span>}
+          density="compact"
+        />,
+      )
+
+      const stack = container.querySelector('.ui-identity-row__stack')
+      expect(stack).not.toBeNull()
+      expect(identityRowCss).toMatch(/row-gap:\s*var\(--ui-anatomy-row-gap\)/)
+      expect(resolveAnatomyRowGapPx(container.firstElementChild!)).toBe('2px')
+      expect(screen.getByTestId('status').parentElement).not.toHaveClass('mt-1')
+    })
   })
 })
 

@@ -35,7 +35,7 @@ export const ROW_ANATOMY_CLASS_SPECS: readonly RowAnatomyClassSpec[] = [
   {
     key: 'cell-meta-content',
     className: rowAnatomyCellClasses({ slot: 'meta', column: 'content' }),
-    keyValues: 'grid-row: meta; margin-block-start on status slot only',
+    keyValues: 'grid-row: meta; margin-block-start: var(--ui-anatomy-row-gap)',
     useCase: 'Description / supporting line',
   },
   {

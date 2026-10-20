@@ -142,7 +142,7 @@
   .ui-card .ui-card__header {
     display: flex;
     flex-direction: column;
-    gap: calc(var(--spacing) * 1.5);
+    row-gap: var(--ui-anatomy-row-gap);
     padding-block: var(--ui-card-inset-block);
     padding-inline: var(--ui-card-inset-inline);
   }

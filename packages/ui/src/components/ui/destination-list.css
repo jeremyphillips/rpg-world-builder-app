@@ -114,7 +114,7 @@
     min-width: 0;
     flex: 1 1 0%;
     flex-direction: column;
-    gap: calc(var(--spacing) * 0.5);
+    row-gap: var(--ui-anatomy-row-gap);
     text-align: left;
   }
 
