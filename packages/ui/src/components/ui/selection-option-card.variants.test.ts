@@ -20,6 +20,15 @@ describe('optionCard selected chrome parity', () => {
     expect(cardSurfaceVariants({ tone: 'strong', selected: true })).toContain('ui-card--selected')
     expect(cardSurfaceVariants({ tone: 'strong', selected: true })).toContain('ui-card--strong')
   })
+
+  it('defaults selection shells to raised elevation', () => {
+    expect(cardSurfaceVariants({ tone: 'strong', elevation: 'raised', selected: true })).toContain(
+      'ui-card--elevation-raised',
+    )
+    expect(
+      cardSurfaceVariants({ tone: 'strong', elevation: 'raised', selected: true }),
+    ).not.toContain('ui-card--elevation-subtle')
+  })
 })
 
 describe('optionCard surface establishment', () => {

@@ -96,7 +96,7 @@ export const EmbeddedRichSearchRow: Story = {
 export const FilledStrongGrouped: Story = {
   name: 'Filled strong grouped',
   render: () => (
-    <DestinationList appearance="filled" tone="strong" density="comfortable">
+    <DestinationList appearance="filled" tone="strong" elevation="subtle" density="comfortable">
       <DestinationRow
         link={<a href="#shattered-vale">nav</a>}
         title="The Shattered Vale"

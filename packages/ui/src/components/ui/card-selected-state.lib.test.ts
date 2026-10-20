@@ -7,11 +7,11 @@ import { cardSurfaceVariants } from './card.variants'
 const cardCssPath = fileURLToPath(new URL('./card.css', import.meta.url))
 
 describe('ui-card toned ladders', () => {
-  it('requires tone for selected modifier emission', () => {
+  it('emits selected modifier with default strong tone', () => {
     expect(cardSurfaceVariants({ tone: 'quiet', interactive: true, selected: true })).toContain(
       'ui-card--selected',
     )
-    expect(cardSurfaceVariants({ interactive: true, selected: true })).not.toContain(
+    expect(cardSurfaceVariants({ interactive: true, selected: true })).toContain(
       'ui-card--selected',
     )
   })
@@ -30,9 +30,10 @@ describe('ui-card toned ladders', () => {
     expect(source).toContain('.ui-card .ui-card__header')
     expect(source).toContain('.ui-card .ui-card__content')
     expect(source).toContain('.ui-card .ui-card__footer')
-    expect(source).toMatch(
-      /\.ui-card \{[\s\S]*border:\s*1px solid var\(--card-border\)[\s\S]*background-color:\s*var\(--card\)/,
-    )
+    expect(source).toMatch(/\.ui-card \{[\s\S]*box-shadow:\s*none/)
+    expect(source).toContain('.ui-card--elevation-subtle')
+    expect(source).toContain('.ui-card--elevation-raised')
+    expect(source).not.toMatch(/&\.ui-card--quiet[\s\S]*border-radius:\s*var\(--radius-md\)/)
     expect(source).toMatch(
       /&\.ui-card--quiet[\s\S]*&\.ui-card--selected[\s\S]*border-color:\s*var\(--primary\)/,
     )

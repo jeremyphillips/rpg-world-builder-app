@@ -341,6 +341,8 @@ describe('Card navigable link', () => {
 
   it('renders static card without link or chevron', () => {
     const { container } = render(<Card header={{ title: 'Static' }} />)
+    expect(container.firstElementChild).toHaveClass('ui-card--strong')
+    expect(container.firstElementChild).not.toHaveClass('ui-card--elevation-raised')
     expect(screen.queryByRole('link')).not.toBeInTheDocument()
     expect(container.getElementsByClassName(UI_CARD_NAV_CHEVRON_CLASS)).toHaveLength(0)
   })

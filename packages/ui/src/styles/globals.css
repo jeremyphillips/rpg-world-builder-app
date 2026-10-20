@@ -201,6 +201,7 @@
   --color-message-bubble-peer: var(--message-bubble-peer-bg);
   --color-message-bubble-peer-foreground: var(--message-bubble-peer-fg);
 
+  --shadow-surface-subtle: var(--surface-subtle-shadow);
   --shadow-surface-raised: var(--surface-raised-shadow);
   --shadow-surface-sunken: var(--surface-sunken-shadow);
 

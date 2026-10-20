@@ -11,9 +11,17 @@ const cardCssPath = join(dirname(fileURLToPath(import.meta.url)), 'card.css')
 describe('cardSurfaceVariants', () => {
   it('emits the card block for the default surface', () => {
     expect(cardSurfaceClasses).toContain('ui-card')
+    expect(cardSurfaceClasses).toContain('ui-card--strong')
     expect(cardSurfaceClasses).toContain('ui-card--comfortable')
     expect(cardSurfaceClasses).toContain('ui-card--static')
     expect(cardSurfaceClasses).not.toContain('ui-card--interactive')
+    expect(cardSurfaceClasses).not.toContain('ui-card--elevation-subtle')
+    expect(cardSurfaceClasses).not.toContain('ui-card--elevation-raised')
+  })
+
+  it('emits elevation modifiers when requested', () => {
+    expect(cardSurfaceVariants({ elevation: 'subtle' })).toContain('ui-card--elevation-subtle')
+    expect(cardSurfaceVariants({ elevation: 'raised' })).toContain('ui-card--elevation-raised')
   })
 
   it('emits density modifiers independent of tone', () => {
@@ -29,8 +37,8 @@ describe('cardSurfaceVariants', () => {
     expect(cardSurfaceVariants({ interactive: true })).not.toContain('ui-card--static')
   })
 
-  it('does not emit selected without a tone', () => {
-    expect(cardSurfaceVariants({ selected: true })).not.toContain('ui-card--selected')
+  it('emits selected whenever the interaction owner marks selected', () => {
+    expect(cardSurfaceVariants({ selected: true })).toContain('ui-card--selected')
     expect(cardSurfaceVariants({ tone: 'quiet', selected: true })).toContain('ui-card--selected')
   })
 })

@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import type { CardElevation } from './card.variants'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import { interactiveRowVariants } from './interactive-row.variants'
 
@@ -12,6 +13,14 @@ export type DestinationListAppearance = (typeof DESTINATION_LIST_APPEARANCES)[nu
 
 export const DESTINATION_LIST_TONES = ['strong'] as const
 export type DestinationListTone = (typeof DESTINATION_LIST_TONES)[number]
+
+/** Same elevation ladder as {@link CardElevation} — shared shadow tokens. */
+export type DestinationListElevation = CardElevation
+
+export const UI_DESTINATION_LIST_ELEVATION_SUBTLE_CLASS =
+  'ui-destination-list--elevation-subtle' as const
+export const UI_DESTINATION_LIST_ELEVATION_RAISED_CLASS =
+  'ui-destination-list--elevation-raised' as const
 
 export const UI_DESTINATION_LIST_CLASS = 'ui-destination-list' as const
 export const UI_DESTINATION_LIST_PANEL_CLASS = 'ui-destination-list--panel' as const
@@ -47,6 +56,10 @@ export const destinationListVariants = cva(UI_DESTINATION_LIST_CLASS, {
     },
     tone: {
       strong: UI_DESTINATION_LIST_TONE_STRONG_CLASS,
+    },
+    elevation: {
+      subtle: UI_DESTINATION_LIST_ELEVATION_SUBTLE_CLASS,
+      raised: UI_DESTINATION_LIST_ELEVATION_RAISED_CLASS,
     },
   },
   defaultVariants: {

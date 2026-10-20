@@ -8,20 +8,21 @@ Entity-rich pickers (combobox, menus) stay on `InteractiveList` + `InteractiveLi
 
 ## When to use
 
-| Presentation                    | Component                                                       |
-| ------------------------------- | --------------------------------------------------------------- |
-| Standalone tile (grid/hub cell) | Navigable `Card` (`link` prop)                                  |
-| Hub panel with inset dividers   | `DestinationList appearance="panel"` + simple `DestinationRow`  |
-| Filled grouped lists (campaign) | `DestinationList appearance="filled" tone="strong"` + row       |
-| Popover/search grouped results  | `DestinationList appearance="embedded"` + rich `DestinationRow` |
-| Combobox / menu rows            | `InteractiveList` + `InteractiveListRow`                        |
+| Presentation                    | Component                                                                    |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| Standalone tile (grid/hub cell) | Navigable `Card` (`link` prop)                                               |
+| Hub panel with inset dividers   | `DestinationList appearance="panel"` + simple `DestinationRow`               |
+| Filled grouped lists (campaign) | `DestinationList appearance="filled" tone="strong" elevation="subtle"` + row |
+| Popover/search grouped results  | `DestinationList appearance="embedded"` + rich `DestinationRow`              |
+| Combobox / menu rows            | `InteractiveList` + `InteractiveListRow`                                     |
 
 ## API
 
 ### `DestinationList`
 
 - `appearance?: 'panel' | 'embedded' | 'filled'` (default `panel`)
-- `tone?: 'strong'` — list rest chrome when `appearance="filled"` (ignored for panel and embedded)
+- `tone?: 'strong'` — muted fill when `appearance="filled"` (ignored for panel and embedded); does not apply shadow
+- `elevation?: 'flat' | 'subtle' | 'raised'` — depth when `appearance="filled"` (default `flat`; campaign shells use `subtle`). Same tokens as `Card` elevation.
 - `density?: 'compact' | 'comfortable' | 'spacious'` (default `comfortable`) — row padding and the canonical copy pair (14/12, 16/14, 19/14)
 
 Rich `content` inherits that pair unless it sets its own `density`. Standalone identity falls back to comfortable (16/14).
@@ -55,9 +56,9 @@ Dashboard `CharacterRelationshipIndicator` supports `presentation="inlinePassive
 
 ## Appearance vs density
 
-|          | `panel`                        | `embedded`                          | `filled` (+ optional `tone="strong"`)        |
-| -------- | ------------------------------ | ----------------------------------- | -------------------------------------------- |
-| Chrome   | Border, radius, transparent bg | No outer panel border               | Border, card radius; strong → muted + shadow |
-| Dividers | Inset `::after` on items       | Full-bleed top border between items | Full-bleed `::after` between items           |
+|          | `panel`                        | `embedded`                          | `filled` (+ optional `tone="strong"`)                                   |
+| -------- | ------------------------------ | ----------------------------------- | ----------------------------------------------------------------------- |
+| Chrome   | Border, radius, transparent bg | No outer panel border               | Border, card radius; strong → muted fill; optional elevation for shadow |
+| Dividers | Inset `::after` on items       | Full-bleed top border between items | Full-bleed `::after` between items                                      |
 
 Density controls row inset and publishes `--ui-copy-title-size` / `--ui-copy-supporting-size`. Simple rows and rich identity read the same pair. Search inherits compact (14/12) from its list. Campaign destinations inherit comfortable (16/14).

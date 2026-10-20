@@ -18,13 +18,14 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
+export const DefaultCard: Story = {
+  name: 'Default (strong / flat / comfortable)',
   render: () => (
     <Card
       className="w-80"
       header={{
-        title: 'Create campaign',
-        description: 'Start a new world for your party.',
+        title: 'Default Card',
+        description: 'Strong tone, flat elevation, comfortable density.',
       }}
       footer={
         <>
@@ -40,6 +41,45 @@ export const Default: Story = {
         <Input id="campaign-name" placeholder="The Sunless Citadel" />
       </div>
     </Card>
+  ),
+}
+
+export const Default: Story = DefaultCard
+
+export const ToneComparison: Story = {
+  render: () => (
+    <div className="grid max-w-2xl gap-4 md:grid-cols-2">
+      <Card header={{ title: 'Strong / flat', description: 'Default generic card.' }} />
+      <Card
+        tone="quiet"
+        header={{ title: 'Quiet / flat', description: 'Entity row and catalog frames.' }}
+      />
+    </div>
+  ),
+}
+
+export const ElevationComparison: Story = {
+  render: () => (
+    <div className="grid max-w-4xl gap-6">
+      {(['strong', 'quiet'] as const).map((tone) => (
+        <div key={tone} className="space-y-2">
+          <p className="text-style-label">{tone} tone</p>
+          <div className="grid gap-4 md:grid-cols-3">
+            {(['flat', 'subtle', 'raised'] as const).map((elevation) => (
+              <Card
+                key={elevation}
+                tone={tone}
+                elevation={elevation}
+                header={{
+                  title: elevation,
+                  description: `${tone} · ${elevation}`,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   ),
 }
 

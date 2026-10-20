@@ -23,6 +23,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   const parsed = parseCardProps(props)
   const surfaceClassName = resolveCardSurfaceClassName({
     tone: parsed.tone,
+    elevation: parsed.elevation,
     density: parsed.density,
     interactive: parsed.interactive,
     selected: parsed.selected,

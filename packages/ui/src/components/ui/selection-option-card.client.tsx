@@ -11,7 +11,11 @@ import {
   type SelectionOptionCardDensity,
 } from './selection-option-card-anatomy.client'
 import type { EyebrowVariantProps } from './eyebrow.variants'
-import { cardSurfaceVariants, resolveOptionCardSurfaceDensity } from './card.variants'
+import {
+  cardSurfaceVariants,
+  resolveOptionCardSurfaceDensity,
+  type CardElevation,
+} from './card.variants'
 import {
   optionCardEmbeddedSlotVariants,
   selectionOptionCardBodyVariants,
@@ -35,6 +39,8 @@ export type SelectionOptionCardProps = {
   disabled?: boolean
   asChild?: boolean
   density?: SelectionOptionCardDensity
+  /** Shell depth — defaults raised so chooser cards keep depth after tone/elevation split. */
+  elevation?: CardElevation
   headerStartSlot?: ReactNode
   /** Renders a density-scaled eyebrow in the header row (preferred over raw `Eyebrow` in `headerStartSlot`). */
   headerEyebrow?: string
@@ -128,6 +134,7 @@ export function SelectionOptionCard({
   disabled = false,
   asChild = false,
   density = 'comfortable',
+  elevation = 'raised',
   headerStartSlot,
   headerEyebrow,
   headerEyebrowSize,
@@ -158,6 +165,7 @@ export function SelectionOptionCard({
       className={cn(
         cardSurfaceVariants({
           tone: 'strong',
+          elevation,
           density: resolveOptionCardSurfaceDensity(density),
           selected,
           disabled,

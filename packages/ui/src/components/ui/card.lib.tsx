@@ -92,6 +92,7 @@ export function DeclarativeCardInterior({
 
 export function resolveCardSurfaceClassName({
   tone,
+  elevation,
   density,
   interactive,
   selected,
@@ -101,6 +102,7 @@ export function resolveCardSurfaceClassName({
   navigable,
 }: {
   tone?: CardSurfaceVariantProps['tone']
+  elevation?: CardSurfaceVariantProps['elevation']
   density: GenericCardDensity
   interactive: boolean
   selected?: boolean
@@ -110,7 +112,7 @@ export function resolveCardSurfaceClassName({
   navigable: boolean
 }): string {
   return cn(
-    cardSurfaceVariants({ tone, density, interactive, selected, disabled }),
+    cardSurfaceVariants({ tone, elevation, density, interactive, selected, disabled }),
     navigable &&
       cn('block w-full min-w-0 no-underline', interactiveFocusVariants({ context: 'standalone' })),
     stretch && 'flex h-full flex-col',
@@ -121,6 +123,7 @@ export function resolveCardSurfaceClassName({
 export type ParsedCardProps = {
   className?: string
   tone?: CardSurfaceVariantProps['tone']
+  elevation?: CardSurfaceVariantProps['elevation']
   density: GenericCardDensity
   interactive: boolean
   selected?: boolean
@@ -158,6 +161,7 @@ function splitIncomingCardProps(props: CardProps) {
   const {
     className,
     tone,
+    elevation,
     density = 'comfortable',
     interactive: interactiveProp,
     selected,
@@ -174,6 +178,7 @@ function splitIncomingCardProps(props: CardProps) {
   return {
     className,
     tone,
+    elevation,
     density,
     interactiveProp,
     selected,
@@ -214,6 +219,7 @@ export function parseCardProps(props: CardProps): ParsedCardProps {
   return {
     className: incoming.className,
     tone: incoming.tone,
+    elevation: incoming.elevation,
     density: incoming.density,
     interactive,
     selected: incoming.selected,

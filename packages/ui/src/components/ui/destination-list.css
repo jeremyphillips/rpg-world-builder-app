@@ -6,6 +6,7 @@
     margin: 0;
     list-style: none;
     padding: 0;
+    box-shadow: none;
     --ui-destination-inset-inline: calc(var(--spacing) * 5);
     --ui-destination-inset-block: calc(var(--spacing) * 2);
     --ui-destination-title-size: var(--ui-copy-title-size, var(--text-base));
@@ -46,7 +47,14 @@
 
   .ui-destination-list--filled.ui-destination-list--tone-strong {
     background-color: var(--surface-muted);
-    box-shadow: 0 1px 2px 0 color-mix(in oklab, var(--foreground) 6%, transparent);
+  }
+
+  .ui-destination-list--elevation-subtle {
+    box-shadow: var(--shadow-surface-subtle);
+  }
+
+  .ui-destination-list--elevation-raised {
+    box-shadow: var(--shadow-surface-raised);
   }
 
   .ui-destination-list--filled .ui-destination-item:not(:last-child)::after {

@@ -14,6 +14,7 @@ import {
   UI_DESTINATION_LIST_COMFORTABLE_CLASS,
   UI_DESTINATION_LIST_EMBEDDED_CLASS,
   UI_DESTINATION_LIST_FILLED_CLASS,
+  UI_DESTINATION_LIST_ELEVATION_SUBTLE_CLASS,
   UI_DESTINATION_LIST_TONE_STRONG_CLASS,
   UI_DESTINATION_ROW_CHEVRON_CLASS,
   UI_DESTINATION_ROW_CLASS,
@@ -39,6 +40,13 @@ describe('destination-list.css inset divider contract', () => {
     expect(css).toContain('left: 0')
     expect(css).toMatch(
       /\.ui-destination-list--filled\.ui-destination-list--tone-strong[^}]*background-color:\s*var\(--surface-muted\)/s,
+    )
+    expect(css).not.toMatch(
+      /\.ui-destination-list--filled\.ui-destination-list--tone-strong[^}]*box-shadow:/s,
+    )
+    expect(css).toContain('.ui-destination-list--elevation-subtle')
+    expect(css).toMatch(
+      /\.ui-destination-list--elevation-subtle[\s\S]*var\(--shadow-surface-subtle\)/,
     )
   })
 
@@ -125,6 +133,22 @@ describe('DestinationList + DestinationRow', () => {
     const link = screen.getByRole('link')
     expect(link).toHaveClass('ui-interactive-row--hit-pointer')
     expect(link.className).not.toContain('cursor-pointer')
+  })
+
+  it('applies filled elevation only when appearance is filled', () => {
+    const { container, rerender } = render(
+      <DestinationList appearance="filled" tone="strong" elevation="subtle">
+        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+      </DestinationList>,
+    )
+    expect(container.firstElementChild).toHaveClass(UI_DESTINATION_LIST_ELEVATION_SUBTLE_CLASS)
+
+    rerender(
+      <DestinationList appearance="panel" tone="strong" elevation="subtle">
+        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+      </DestinationList>,
+    )
+    expect(container.firstElementChild).not.toHaveClass(UI_DESTINATION_LIST_ELEVATION_SUBTLE_CLASS)
   })
 
   it('applies filled strong chrome and ignores tone on panel appearance', () => {

@@ -1,6 +1,6 @@
 /*
- * Card shell — generic chrome on the block; quiet and strong override it.
- * Selected state requires a tone (see cardSurfaceVariants).
+ * Card shell — structure on `.ui-card`; tone (quiet|strong) owns fill/border;
+ * elevation (subtle|raised) owns depth. Selected/focus may replace shell shadow.
  * Nest with the full class after `&` (`&.ui-card--quiet`). Gluing `&` to a
  * modifier dash is rewritten into a selector that matches nothing.
  */
@@ -39,17 +39,8 @@
   .ui-card {
     color: var(--card-foreground);
     border-radius: var(--radius-card);
-    border: 1px solid var(--card-border);
-    background-color: var(--card);
-    box-shadow: var(--shadow-surface-raised);
+    box-shadow: none;
     --surface-current: var(--card);
-    --ui-card-inset-block: calc(var(--spacing) * 3);
-    --ui-card-inset-inline: calc(var(--spacing) * 5);
-    --ui-card-title-size: var(--text-base);
-    --ui-card-title-line-height: var(--text-base--line-height);
-    --ui-card-title-weight: var(--font-weight-heading);
-    --ui-card-description-size: var(--text-sm);
-    --ui-card-description-line-height: var(--text-sm--line-height);
 
     &.ui-card--static,
     &.ui-card--interactive {
@@ -60,11 +51,6 @@
 
     &.ui-card--interactive:not(.ui-card--disabled) {
       cursor: pointer;
-    }
-
-    &.ui-card--interactive:not(.ui-card--quiet):not(.ui-card--strong):hover {
-      background-color: var(--row-hover-bg);
-      border-color: var(--card-border);
     }
 
     &.ui-card--disabled {
@@ -79,10 +65,8 @@
 
     /* Drawer / catalog entity rows */
     &.ui-card--quiet {
-      border-radius: var(--radius-md);
       border: 1px solid var(--border);
       background-color: var(--ui-card-quiet-bg, var(--card));
-      box-shadow: none;
       --surface-current: var(--ui-card-quiet-bg, var(--card));
 
       &.ui-card--interactive:hover {
@@ -107,12 +91,10 @@
       }
     }
 
-    /* Builder options, selection cards */
+    /* Builder options, selection cards, default navigation chrome */
     &.ui-card--strong {
-      border-radius: var(--radius-card);
       border: 1px solid var(--border);
       background-color: var(--surface-muted);
-      box-shadow: 0 1px 2px 0 color-mix(in oklab, var(--foreground) 6%, transparent);
       --surface-current: var(--surface-muted);
 
       &.ui-card--interactive:hover {
@@ -147,6 +129,14 @@
           var(--ui-focus-ring-standalone);
       }
     }
+  }
+
+  .ui-card--elevation-subtle {
+    box-shadow: var(--shadow-surface-subtle);
+  }
+
+  .ui-card--elevation-raised {
+    box-shadow: var(--shadow-surface-raised);
   }
 
   .ui-card .ui-card__header {

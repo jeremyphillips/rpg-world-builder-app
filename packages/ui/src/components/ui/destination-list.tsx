@@ -16,12 +16,14 @@ import {
   UI_DESTINATION_ROW_TRAILING_INFO_CLASS,
   type DestinationListAppearance,
   type DestinationListDensity,
+  type DestinationListElevation,
   type DestinationListTone,
 } from './destination-list.variants'
 
 export type {
   DestinationListAppearance,
   DestinationListDensity,
+  DestinationListElevation,
   DestinationListTone,
 } from './destination-list.variants'
 
@@ -30,6 +32,8 @@ export type DestinationListProps = Omit<React.ComponentPropsWithoutRef<'ul'>, 'c
   density?: DestinationListDensity
   /** Rest chrome when `appearance="filled"` (ignored for panel and embedded). */
   tone?: DestinationListTone
+  /** Depth when `appearance="filled"` (ignored for panel and embedded). Default flat. */
+  elevation?: DestinationListElevation
   children?: React.ReactNode
 }
 
@@ -37,16 +41,23 @@ export function DestinationList({
   appearance = 'panel',
   density = 'comfortable',
   tone,
+  elevation = 'flat',
   className,
   children,
   ...props
 }: DestinationListProps) {
   const resolvedTone = appearance === 'filled' ? tone : undefined
+  const resolvedElevation = appearance === 'filled' && elevation !== 'flat' ? elevation : undefined
 
   return (
     <ul
       className={cn(
-        destinationListVariants({ appearance, density, tone: resolvedTone }),
+        destinationListVariants({
+          appearance,
+          density,
+          tone: resolvedTone,
+          elevation: resolvedElevation,
+        }),
         className,
       )}
       {...props}

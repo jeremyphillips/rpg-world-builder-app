@@ -128,7 +128,7 @@ describe('SelectionOptionCard', () => {
     )
 
     const shell = container.firstElementChild
-    expect(shell).toHaveClass('ui-card--strong', 'ui-card--selected')
+    expect(shell).toHaveClass('ui-card--strong', 'ui-card--selected', 'ui-card--elevation-raised')
   })
 
   itAxe('has no axe accessibility violations', async () => {

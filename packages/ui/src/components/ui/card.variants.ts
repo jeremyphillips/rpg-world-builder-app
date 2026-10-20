@@ -8,6 +8,14 @@ export const cardBorderClasses = 'border border-card-border'
 
 export const CARD_SURFACE_TONES = ['quiet', 'strong'] as const
 export type CardSurfaceTone = (typeof CARD_SURFACE_TONES)[number]
+/** @alias CardSurfaceTone */
+export type CardTone = CardSurfaceTone
+
+export const CARD_ELEVATIONS = ['flat', 'subtle', 'raised'] as const
+export type CardElevation = (typeof CARD_ELEVATIONS)[number]
+
+export const UI_CARD_ELEVATION_SUBTLE_CLASS = 'ui-card--elevation-subtle' as const
+export const UI_CARD_ELEVATION_RAISED_CLASS = 'ui-card--elevation-raised' as const
 
 export const UI_CARD_CLASS = 'ui-card' as const
 
@@ -58,8 +66,8 @@ export function cardDensityClassName(density: CardInsetDensity = 'comfortable'):
 }
 
 export type CardSurfaceVariantProps = {
-  /** Omitted: generic Card look (information / navigation). */
   tone?: CardSurfaceTone
+  elevation?: CardElevation
   /** Baseline content inset + header copy ladder — independent of tone. */
   density?: CardInsetDensity
   /** Enables the CSS :hover ladder. Static cards never get hover. */
@@ -69,9 +77,20 @@ export type CardSurfaceVariantProps = {
   disabled?: boolean
 }
 
+function cardElevationClassName(elevation: CardElevation = 'flat'): string | undefined {
+  if (elevation === 'subtle') {
+    return UI_CARD_ELEVATION_SUBTLE_CLASS
+  }
+  if (elevation === 'raised') {
+    return UI_CARD_ELEVATION_RAISED_CLASS
+  }
+  return undefined
+}
+
 /** Styling primitive for card chrome without rendering `Card`. */
 export function cardSurfaceVariants({
-  tone,
+  tone = 'strong',
+  elevation = 'flat',
   density = 'comfortable',
   interactive = false,
   selected = false,
@@ -80,9 +99,10 @@ export function cardSurfaceVariants({
   return cn(
     UI_CARD_CLASS,
     cardDensityClassName(density),
-    tone && `ui-card--${tone}`,
+    `ui-card--${tone}`,
+    cardElevationClassName(elevation),
     interactive ? 'ui-card--interactive' : 'ui-card--static',
-    selected && tone && 'ui-card--selected',
+    selected && 'ui-card--selected',
     disabled && 'ui-card--disabled',
   )
 }
@@ -100,6 +120,7 @@ export type CardClassSpec = {
 const CARD_TONE_STATE_MATRIX: readonly {
   key: string
   tone?: CardSurfaceTone
+  elevation?: CardElevation
   interactive?: boolean
   selected?: boolean
   disabled?: boolean
@@ -138,8 +159,22 @@ const CARD_TONE_STATE_MATRIX: readonly {
   {
     key: 'strong-rest',
     tone: 'strong',
-    useCase: 'Builder step option rest',
-    keyValues: 'bg --surface-muted, border --border, soft drop shadow',
+    useCase: 'Default card / builder option rest (strong + flat)',
+    keyValues: 'bg --surface-muted, border --border; elevation flat (no shadow class)',
+  },
+  {
+    key: 'strong-subtle',
+    tone: 'strong',
+    elevation: 'subtle',
+    useCase: 'Light depth without raised inset highlight',
+    keyValues: 'elevation --shadow-surface-subtle',
+  },
+  {
+    key: 'strong-raised',
+    tone: 'strong',
+    elevation: 'raised',
+    useCase: 'Selection option card default shell',
+    keyValues: 'elevation --shadow-surface-raised',
   },
   {
     key: 'strong-hover',
@@ -164,23 +199,13 @@ const CARD_TONE_STATE_MATRIX: readonly {
     useCase: 'Disabled strong option',
     keyValues: 'opacity 0.5',
   },
-  {
-    key: 'static',
-    useCase: 'Information card (untone)',
-    keyValues: 'radius --radius-card, shadow --shadow-surface-raised',
-  },
-  {
-    key: 'interactive',
-    interactive: true,
-    useCase: 'Navigation card (untone)',
-    keyValues: 'hover --row-hover-bg',
-  },
 ]
 
 export const CARD_CLASS_SPECS: readonly CardClassSpec[] = CARD_TONE_STATE_MATRIX.map((entry) => ({
   key: entry.key,
   className: cardSurfaceVariants({
     tone: entry.tone,
+    elevation: entry.elevation,
     interactive: entry.interactive,
     selected: entry.selected,
     disabled: entry.disabled,
