@@ -7,18 +7,18 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { IdentityRow } from './identity-row.client'
-import { DestinationList, DestinationRow } from './destination-list'
+import { DestinationList, DestinationItem } from './destination-list'
 import {
+  UI_DESTINATION_ITEM_CHEVRON_CLASS,
   UI_DESTINATION_ITEM_CLASS,
+  UI_DESTINATION_ITEM_IDENTITY_CLUSTER_CLASS,
+  UI_DESTINATION_ITEM_LINK_CLASS,
   UI_DESTINATION_LIST_COMPACT_CLASS,
   UI_DESTINATION_LIST_COMFORTABLE_CLASS,
   UI_DESTINATION_LIST_EMBEDDED_CLASS,
   UI_DESTINATION_LIST_FILLED_CLASS,
   UI_DESTINATION_LIST_ELEVATION_SUBTLE_CLASS,
   UI_DESTINATION_LIST_TONE_STRONG_CLASS,
-  UI_DESTINATION_ROW_CHEVRON_CLASS,
-  UI_DESTINATION_ROW_CLASS,
-  UI_DESTINATION_ROW_IDENTITY_CLUSTER_CLASS,
 } from './destination-list.variants'
 
 const destinationListCssPath = join(dirname(fileURLToPath(import.meta.url)), 'destination-list.css')
@@ -50,19 +50,19 @@ describe('destination-list.css inset divider contract', () => {
     )
   })
 
-  it('declares stable row link geometry on ui-destination-row', () => {
+  it('declares stable item link geometry on ui-destination-item__link', () => {
     const css = readFileSync(destinationListCssPath, 'utf8')
-    expect(css).toMatch(/\.ui-destination-row\s*\{[^}]*display:\s*flex/s)
+    expect(css).toMatch(/\.ui-destination-item__link\s*\{[^}]*display:\s*flex/s)
     expect(css).toContain('gap: calc(var(--spacing) * 3)')
     expect(css).toContain('text-decoration: none')
   })
 })
 
-describe('DestinationList + DestinationRow', () => {
+describe('DestinationList + DestinationItem', () => {
   it('renders ul > li > link structure', () => {
     const { container } = render(
       <DestinationList>
-        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
 
@@ -70,14 +70,14 @@ describe('DestinationList + DestinationRow', () => {
     expect(list).toBeTruthy()
     const item = container.querySelector(`li.${UI_DESTINATION_ITEM_CLASS}`)
     expect(item).toBeTruthy()
-    const link = item?.querySelector(`a.${UI_DESTINATION_ROW_CLASS}`)
+    const link = item?.querySelector(`a.${UI_DESTINATION_ITEM_LINK_CLASS}`)
     expect(link).toHaveAttribute('href', '/a')
   })
 
   it('exposes accessible name from title text', () => {
     render(
       <DestinationList>
-        <DestinationRow link={<a href="/creature-types">nav</a>} title="Creature types" />
+        <DestinationItem link={<a href="/creature-types">nav</a>} title="Creature types" />
       </DestinationList>,
     )
     expect(screen.getByRole('link', { name: 'Creature types' })).toBeInTheDocument()
@@ -86,7 +86,7 @@ describe('DestinationList + DestinationRow', () => {
   it('renders description and metadata together', () => {
     render(
       <DestinationList>
-        <DestinationRow
+        <DestinationItem
           link={<a href="/x">nav</a>}
           title="Damage types"
           description="Energy and physical categories."
@@ -101,23 +101,23 @@ describe('DestinationList + DestinationRow', () => {
   it('shows navigation chevron by default and hides when opted out', () => {
     const { container, rerender } = render(
       <DestinationList>
-        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
-    expect(container.getElementsByClassName(UI_DESTINATION_ROW_CHEVRON_CLASS)).toHaveLength(1)
+    expect(container.getElementsByClassName(UI_DESTINATION_ITEM_CHEVRON_CLASS)).toHaveLength(1)
 
     rerender(
       <DestinationList>
-        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" showNavigationChevron={false} />
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" showNavigationChevron={false} />
       </DestinationList>,
     )
-    expect(container.getElementsByClassName(UI_DESTINATION_ROW_CHEVRON_CLASS)).toHaveLength(0)
+    expect(container.getElementsByClassName(UI_DESTINATION_ITEM_CHEVRON_CLASS)).toHaveLength(0)
   })
 
   it('applies embedded focus ring on the row link', () => {
     render(
       <DestinationList>
-        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
     expect(screen.getByRole('link')).toHaveClass('ui-focus-ring')
@@ -127,7 +127,7 @@ describe('DestinationList + DestinationRow', () => {
   it('uses hit-target pointer policy without duplicate cursor utility', () => {
     render(
       <DestinationList>
-        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
     const link = screen.getByRole('link')
@@ -138,14 +138,14 @@ describe('DestinationList + DestinationRow', () => {
   it('applies filled elevation only when appearance is filled', () => {
     const { container, rerender } = render(
       <DestinationList appearance="filled" tone="strong" elevation="subtle">
-        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
     expect(container.firstElementChild).toHaveClass(UI_DESTINATION_LIST_ELEVATION_SUBTLE_CLASS)
 
     rerender(
       <DestinationList appearance="panel" tone="strong" elevation="subtle">
-        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
     expect(container.firstElementChild).not.toHaveClass(UI_DESTINATION_LIST_ELEVATION_SUBTLE_CLASS)
@@ -154,7 +154,7 @@ describe('DestinationList + DestinationRow', () => {
   it('applies filled strong chrome and ignores tone on panel appearance', () => {
     const { container, rerender } = render(
       <DestinationList appearance="filled" tone="strong" density="comfortable">
-        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
     const list = container.firstElementChild
@@ -163,7 +163,7 @@ describe('DestinationList + DestinationRow', () => {
 
     rerender(
       <DestinationList appearance="panel" tone="strong" density="comfortable">
-        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
     expect(container.firstElementChild).not.toHaveClass(UI_DESTINATION_LIST_TONE_STRONG_CLASS)
@@ -172,14 +172,14 @@ describe('DestinationList + DestinationRow', () => {
   it('inherits list density class without row density prop', () => {
     const { container, rerender } = render(
       <DestinationList density="compact">
-        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
     expect(container.firstElementChild).toHaveClass(UI_DESTINATION_LIST_COMPACT_CLASS)
 
     rerender(
       <DestinationList density="comfortable">
-        <DestinationRow link={<a href="/a">nav</a>} title="Alpha" />
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
     expect(container.firstElementChild).toHaveClass(UI_DESTINATION_LIST_COMFORTABLE_CLASS)
@@ -188,7 +188,7 @@ describe('DestinationList + DestinationRow', () => {
   it('renders rich content with identity cluster and no nested anchors', () => {
     const { container } = render(
       <DestinationList appearance="embedded" density="compact">
-        <DestinationRow
+        <DestinationItem
           link={<a href="/spell">nav</a>}
           startSlot={<span data-testid="media">M</span>}
           content={<IdentityRow heading="Fireball" classification="Spell" />}
@@ -197,7 +197,7 @@ describe('DestinationList + DestinationRow', () => {
       </DestinationList>,
     )
     expect(container.firstElementChild).toHaveClass(UI_DESTINATION_LIST_EMBEDDED_CLASS)
-    expect(container.querySelector(`.${UI_DESTINATION_ROW_IDENTITY_CLUSTER_CLASS}`)).toBeTruthy()
+    expect(container.querySelector(`.${UI_DESTINATION_ITEM_IDENTITY_CLUSTER_CLASS}`)).toBeTruthy()
     expect(screen.getByTestId('media')).toBeInTheDocument()
     expect(screen.getByTestId('info')).toBeInTheDocument()
     expect(container.querySelectorAll('a a')).toHaveLength(0)
@@ -211,7 +211,7 @@ describe('DestinationList + DestinationRow', () => {
     })
     render(
       <DestinationList>
-        <DestinationRow
+        <DestinationItem
           link={
             <a href="/dest" onClick={onClick}>
               nav

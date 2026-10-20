@@ -4,16 +4,16 @@ import { cn } from '../../lib/utils'
 import { NavigationChevron } from './card.lib'
 import { renderNavigableLinkRoot } from './navigable-link-root.lib'
 import {
+  destinationItemLinkVariants,
   destinationListVariants,
-  destinationRowLinkVariants,
+  UI_DESTINATION_ITEM_CHEVRON_CLASS,
   UI_DESTINATION_ITEM_CLASS,
-  UI_DESTINATION_ROW_CHEVRON_CLASS,
-  UI_DESTINATION_ROW_DESCRIPTION_CLASS,
-  UI_DESTINATION_ROW_IDENTITY_CLUSTER_CLASS,
-  UI_DESTINATION_ROW_MAIN_CLASS,
-  UI_DESTINATION_ROW_METADATA_CLASS,
-  UI_DESTINATION_ROW_TITLE_CLASS,
-  UI_DESTINATION_ROW_TRAILING_INFO_CLASS,
+  UI_DESTINATION_ITEM_DESCRIPTION_CLASS,
+  UI_DESTINATION_ITEM_IDENTITY_CLUSTER_CLASS,
+  UI_DESTINATION_ITEM_MAIN_CLASS,
+  UI_DESTINATION_ITEM_METADATA_CLASS,
+  UI_DESTINATION_ITEM_TITLE_CLASS,
+  UI_DESTINATION_ITEM_TRAILING_INFO_CLASS,
   type DestinationListAppearance,
   type DestinationListDensity,
   type DestinationListElevation,
@@ -67,12 +67,12 @@ export function DestinationList({
   )
 }
 
-type DestinationRowShared = {
+type DestinationItemShared = {
   link: React.ReactElement
   showNavigationChevron?: boolean
 }
 
-export type DestinationRowSimpleProps = DestinationRowShared & {
+export type DestinationItemSimpleProps = DestinationItemShared & {
   title: string
   description?: string
   metadata?: React.ReactNode
@@ -81,7 +81,7 @@ export type DestinationRowSimpleProps = DestinationRowShared & {
   trailingInfo?: never
 }
 
-export type DestinationRowRichProps = DestinationRowShared & {
+export type DestinationItemRichProps = DestinationItemShared & {
   content: React.ReactNode
   startSlot?: React.ReactNode
   trailingInfo?: React.ReactNode
@@ -90,9 +90,9 @@ export type DestinationRowRichProps = DestinationRowShared & {
   metadata?: never
 }
 
-export type DestinationRowProps = DestinationRowSimpleProps | DestinationRowRichProps
+export type DestinationItemProps = DestinationItemSimpleProps | DestinationItemRichProps
 
-function isDestinationRowRich(props: DestinationRowProps): props is DestinationRowRichProps {
+function isDestinationItemRich(props: DestinationItemProps): props is DestinationItemRichProps {
   return 'content' in props && props.content != null
 }
 
@@ -101,70 +101,66 @@ function warnInvalidLink(link: React.ReactElement | undefined) {
     return
   }
   if (!React.isValidElement(link)) {
-    console.warn('DestinationRow: `link` must be a single React element.')
+    console.warn('DestinationItem: `link` must be a single React element.')
   }
 }
 
-function DestinationRowChevron({ show }: { show: boolean }) {
-  if (!show) {
-    return null
-  }
-  return <NavigationChevron className={UI_DESTINATION_ROW_CHEVRON_CLASS} />
-}
-
-function DestinationRowSimpleInterior({
+function DestinationItemSimpleContent({
   title,
   description,
   metadata,
-  showNavigationChevron,
-}: DestinationRowSimpleProps & { showNavigationChevron: boolean }) {
+}: DestinationItemSimpleProps) {
   return (
-    <>
-      <span className={UI_DESTINATION_ROW_MAIN_CLASS}>
-        <span className={UI_DESTINATION_ROW_TITLE_CLASS}>{title}</span>
-        {description ? (
-          <span className={UI_DESTINATION_ROW_DESCRIPTION_CLASS}>{description}</span>
-        ) : null}
-        {metadata ? <span className={UI_DESTINATION_ROW_METADATA_CLASS}>{metadata}</span> : null}
-      </span>
-      <DestinationRowChevron show={showNavigationChevron} />
-    </>
+    <span className={UI_DESTINATION_ITEM_MAIN_CLASS}>
+      <span className={UI_DESTINATION_ITEM_TITLE_CLASS}>{title}</span>
+      {description ? (
+        <span className={UI_DESTINATION_ITEM_DESCRIPTION_CLASS}>{description}</span>
+      ) : null}
+      {metadata ? <span className={UI_DESTINATION_ITEM_METADATA_CLASS}>{metadata}</span> : null}
+    </span>
   )
 }
 
-function DestinationRowRichInterior({
+function DestinationItemRichContent({
   startSlot,
   content,
   trailingInfo,
-  showNavigationChevron,
-}: DestinationRowRichProps & { showNavigationChevron: boolean }) {
+}: DestinationItemRichProps) {
   return (
     <>
-      <div className={UI_DESTINATION_ROW_IDENTITY_CLUSTER_CLASS}>
+      <div className={UI_DESTINATION_ITEM_IDENTITY_CLUSTER_CLASS}>
         {startSlot ? <div className="shrink-0">{startSlot}</div> : null}
         <div className="min-w-0 flex-1">{content}</div>
       </div>
       {trailingInfo ? (
-        <div className={UI_DESTINATION_ROW_TRAILING_INFO_CLASS}>{trailingInfo}</div>
+        <div className={UI_DESTINATION_ITEM_TRAILING_INFO_CLASS}>{trailingInfo}</div>
       ) : null}
-      <DestinationRowChevron show={showNavigationChevron} />
     </>
   )
 }
 
-export function DestinationRow(props: DestinationRowProps) {
+export function DestinationItem(props: DestinationItemProps) {
   const { link, showNavigationChevron = true } = props
   warnInvalidLink(link)
 
-  const interior = isDestinationRowRich(props) ? (
-    <DestinationRowRichInterior {...props} showNavigationChevron={showNavigationChevron} />
+  const content = isDestinationItemRich(props) ? (
+    <DestinationItemRichContent {...props} />
   ) : (
-    <DestinationRowSimpleInterior {...props} showNavigationChevron={showNavigationChevron} />
+    <DestinationItemSimpleContent {...props} />
+  )
+
+  const interior = (
+    <>
+      {content}
+      {showNavigationChevron ? (
+        <NavigationChevron className={UI_DESTINATION_ITEM_CHEVRON_CLASS} />
+      ) : null}
+    </>
   )
 
   const navigableLink = renderNavigableLinkRoot(
     link,
-    destinationRowLinkVariants(),
+    destinationItemLinkVariants(),
     interior,
     {},
     null,

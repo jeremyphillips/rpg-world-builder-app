@@ -97,7 +97,7 @@
     border-top: 1px solid var(--border-faint);
   }
 
-  .ui-destination-row {
+  .ui-destination-item__link {
     display: flex;
     width: 100%;
     min-width: 0;
@@ -109,7 +109,7 @@
     text-decoration: none;
   }
 
-  .ui-destination-row__main {
+  .ui-destination-item__main {
     display: flex;
     min-width: 0;
     flex: 1 1 0%;
@@ -118,26 +118,26 @@
     text-align: left;
   }
 
-  .ui-destination-row__title {
+  .ui-destination-item__title {
     font-size: var(--ui-destination-title-size);
     line-height: var(--ui-destination-title-line-height);
     font-weight: var(--ui-destination-title-weight);
     color: var(--foreground);
   }
 
-  .ui-destination-row__description {
+  .ui-destination-item__description {
     font-size: var(--ui-destination-description-size);
     line-height: var(--ui-destination-description-line-height);
     color: var(--muted-foreground);
   }
 
-  .ui-destination-row__metadata {
+  .ui-destination-item__metadata {
     font-size: var(--ui-destination-metadata-size);
     line-height: var(--ui-destination-metadata-line-height);
     color: var(--muted-foreground);
   }
 
-  .ui-destination-row__identity-cluster {
+  .ui-destination-item__identity-cluster {
     display: flex;
     min-width: 0;
     flex: 1 1 0%;
@@ -146,14 +146,14 @@
     text-align: left;
   }
 
-  .ui-destination-row__trailing-info {
+  .ui-destination-item__trailing-info {
     display: flex;
     flex-shrink: 0;
     align-self: center;
     align-items: center;
   }
 
-  .ui-destination-row__chevron {
+  .ui-destination-item__chevron {
     display: flex;
     flex-shrink: 0;
     align-items: center;

@@ -32,15 +32,15 @@ export const UI_DESTINATION_LIST_COMFORTABLE_CLASS = 'ui-destination-list--comfo
 export const UI_DESTINATION_LIST_SPACIOUS_CLASS = 'ui-destination-list--spacious' as const
 
 export const UI_DESTINATION_ITEM_CLASS = 'ui-destination-item' as const
-export const UI_DESTINATION_ROW_CLASS = 'ui-destination-row' as const
-export const UI_DESTINATION_ROW_MAIN_CLASS = 'ui-destination-row__main' as const
-export const UI_DESTINATION_ROW_TITLE_CLASS = 'ui-destination-row__title' as const
-export const UI_DESTINATION_ROW_DESCRIPTION_CLASS = 'ui-destination-row__description' as const
-export const UI_DESTINATION_ROW_METADATA_CLASS = 'ui-destination-row__metadata' as const
-export const UI_DESTINATION_ROW_CHEVRON_CLASS = 'ui-destination-row__chevron' as const
-export const UI_DESTINATION_ROW_IDENTITY_CLUSTER_CLASS =
-  'ui-destination-row__identity-cluster' as const
-export const UI_DESTINATION_ROW_TRAILING_INFO_CLASS = 'ui-destination-row__trailing-info' as const
+export const UI_DESTINATION_ITEM_LINK_CLASS = 'ui-destination-item__link' as const
+export const UI_DESTINATION_ITEM_MAIN_CLASS = 'ui-destination-item__main' as const
+export const UI_DESTINATION_ITEM_TITLE_CLASS = 'ui-destination-item__title' as const
+export const UI_DESTINATION_ITEM_DESCRIPTION_CLASS = 'ui-destination-item__description' as const
+export const UI_DESTINATION_ITEM_METADATA_CLASS = 'ui-destination-item__metadata' as const
+export const UI_DESTINATION_ITEM_CHEVRON_CLASS = 'ui-destination-item__chevron' as const
+export const UI_DESTINATION_ITEM_IDENTITY_CLUSTER_CLASS =
+  'ui-destination-item__identity-cluster' as const
+export const UI_DESTINATION_ITEM_TRAILING_INFO_CLASS = 'ui-destination-item__trailing-info' as const
 
 export const destinationListVariants = cva(UI_DESTINATION_LIST_CLASS, {
   variants: {
@@ -68,9 +68,9 @@ export const destinationListVariants = cva(UI_DESTINATION_LIST_CLASS, {
   },
 })
 
-export const destinationRowLinkVariants = cva(
+export const destinationItemLinkVariants = cva(
   cn(
-    UI_DESTINATION_ROW_CLASS,
+    UI_DESTINATION_ITEM_LINK_CLASS,
     interactiveRowVariants({
       interaction: 'hoverable',
       hoverFamily: 'navigation',

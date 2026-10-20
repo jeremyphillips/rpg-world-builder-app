@@ -88,7 +88,7 @@ describe('GlobalSearchGroupSection', () => {
 
     expect(heading).toHaveClass('ui-interactive-list__heading--first', 'bg-surface-faint')
     expect(list).toBeInTheDocument()
-    expect(row).toHaveClass('ui-destination-row', 'ui-interactive-row--hover-navigation')
+    expect(row).toHaveClass('ui-destination-item__link', 'ui-interactive-row--hover-navigation')
   })
 
   it('renders truncated groups with show-all and bottom spacing', () => {

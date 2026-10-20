@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Link } from 'react-router-dom'
 
 import { EntityCard } from '@/features/content'
 import { EntityAnatomyHost } from '../entity-anatomy'
@@ -47,6 +48,30 @@ export const EntityCardComfortable: Story = {
   render: () => (
     <div className="max-w-md">
       <EntityCard entity={HARBOR_DISTRICT_ENTITY} />
+    </div>
+  ),
+}
+
+export const EntityCardNavigable: Story = {
+  render: () => (
+    <div className="flex max-w-md flex-col gap-4">
+      <EntityCard
+        entity={HARBOR_DISTRICT_ENTITY}
+        link={<Link to="/campaigns/demo/locations/harbor-district" />}
+      />
+      <EntityCard
+        entity={{
+          ...HARBOR_DISTRICT_ENTITY,
+          heading:
+            'Harbor District with an intentionally long heading to verify truncation beside the navigation chevron',
+        }}
+        link={<Link to="/campaigns/demo/locations/harbor-district" />}
+      />
+      <EntityCard
+        entity={SILVER_CIRCLE_ENTITY}
+        link={<Link to="/campaigns/demo/organizations/silver-circle" />}
+        showNavigationChevron={false}
+      />
     </div>
   ),
 }

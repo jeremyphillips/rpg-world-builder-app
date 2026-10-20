@@ -4,7 +4,7 @@ import { DestinationList, Eyebrow, type DestinationListProps } from '@rpg/ui'
 
 import { usePersistCampaignSelection } from '../../hooks/use-select-campaign'
 import { campaignDestinationListProps } from './campaign-destination-list-shell'
-import { CampaignDestinationRow } from './campaign-destination-row'
+import { CampaignDestinationItem } from './campaign-destination-item'
 
 type CampaignDestinationSectionProps = {
   eyebrow: string
@@ -34,7 +34,7 @@ export function CampaignDestinationSection({
       </Eyebrow>
       <DestinationList {...campaignDestinationListProps} {...(density ? { density } : {})}>
         {campaigns.map((campaign) => (
-          <CampaignDestinationRow
+          <CampaignDestinationItem
             key={campaign.id}
             campaign={campaign}
             onPersistSelection={onPersistSelection}

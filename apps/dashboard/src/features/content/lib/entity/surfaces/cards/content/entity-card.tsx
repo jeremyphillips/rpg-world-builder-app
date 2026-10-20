@@ -2,8 +2,12 @@ import { EntityCardDisclosureRenderer } from '../disclosure/entity-card-disclosu
 import type { EntityCardDisclosureRendererProps } from '../disclosure/entity-card-disclosure-renderer'
 import {
   EntityCardStaticRenderer,
+  type EntityCardStaticInteractiveProps,
+  type EntityCardStaticNavigableProps,
   type EntityCardStaticRendererProps,
 } from './entity-card-static-renderer'
+
+export type { EntityCardStaticInteractiveProps, EntityCardStaticNavigableProps }
 
 export type EntityCardStaticProps = EntityCardStaticRendererProps & {
   variant?: 'static'

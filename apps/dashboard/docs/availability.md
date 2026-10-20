@@ -103,7 +103,7 @@ to are excluded server-side and again client-side before render.
 | --------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Campaign layout | `CampaignLayoutRecoveryChrome` + `CampaignOnboardingIncompleteAlert` | Persistent recovery inside `/campaigns/:id/*` (hidden on `/onboarding`); loading/error chrome when campaign row unresolved |
 | Dashboard home  | `CampaignRecoveryPromotionCard`, `CampaignInvitationCard`            | Highest-priority recovery promotion + pending invites                                                                      |
-| Campaigns index | `CampaignDestinationRow`                                             | Every campaign status row                                                                                                  |
+| Campaigns index | `CampaignDestinationItem`                                            | Every campaign status row                                                                                                  |
 
 **Destination row description priority:** recovery/onboarding `supportingCopy`
 (from `resolveCampaignEntryDestination`) overrides the normal meta line

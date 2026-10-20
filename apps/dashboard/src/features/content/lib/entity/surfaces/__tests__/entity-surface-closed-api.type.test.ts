@@ -2,7 +2,11 @@ import { describe, expectTypeOf, it } from 'vitest'
 
 import type { EntityAnatomyLeading } from '../../anatomy/entity-anatomy-leading.types'
 import type { EntityAnatomyHostProps } from '../../anatomy/entity-anatomy'
-import type { EntityCardDisclosureProps, EntityCardStaticProps } from '../cards/content/entity-card'
+import type {
+  EntityCardDisclosureProps,
+  EntityCardStaticNavigableProps,
+  EntityCardStaticProps,
+} from '../cards/content/entity-card'
 
 type ConsumerPresentationKeys =
   | 'className'
@@ -36,6 +40,19 @@ describe('entity surface closed API', () => {
     expectTypeOf<
       Extract<keyof EntityCardStaticProps, ConsumerPresentationKeys>
     >().toEqualTypeOf<never>()
+  })
+
+  it('EntityCard static navigable rejects interactive slots', () => {
+    expectTypeOf<
+      Extract<
+        keyof EntityCardStaticNavigableProps,
+        'leading' | 'trailing' | 'headingInline' | 'disabled'
+      >
+    >().toEqualTypeOf<never>()
+  })
+
+  it('EntityCard disclosure rejects link', () => {
+    expectTypeOf<Extract<keyof EntityCardDisclosureProps, 'link'>>().toEqualTypeOf<never>()
   })
 
   it('EntityCard static rejects legacy slot and chrome props', () => {

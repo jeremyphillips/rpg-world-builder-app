@@ -306,17 +306,19 @@ export {
   type NavigableCardProps,
   type StaticCardProps,
 } from './components/ui/card'
+export { NavigationChevron } from './components/ui/card.lib'
+export { renderNavigableLinkRoot, composeRefs } from './components/ui/navigable-link-root.lib'
 export {
   DestinationList,
-  DestinationRow,
+  DestinationItem,
   type DestinationListAppearance,
   type DestinationListDensity,
   type DestinationListElevation,
   type DestinationListTone,
   type DestinationListProps,
-  type DestinationRowProps,
-  type DestinationRowRichProps,
-  type DestinationRowSimpleProps,
+  type DestinationItemProps,
+  type DestinationItemRichProps,
+  type DestinationItemSimpleProps,
 } from './components/ui/destination-list'
 export {
   CARD_CLASS_SPECS,

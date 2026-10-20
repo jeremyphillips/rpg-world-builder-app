@@ -252,12 +252,14 @@ EntityCard
 
 ### Consumer supplies
 
-- `entity`, optional `leading`, optional semantic `trailing`, optional `headingHref`
-- `density`
+- `entity`, `density`
+- Non-navigable static: optional `leading`, optional semantic `trailing`, optional `headingInline`, optional `disabled`
+- Navigable static: required `link` (single `Link` or `<a>`), optional `showNavigationChevron` — no `leading`, `trailing`, `headingInline`, or `disabled`. Entity copy must not nest interactive controls.
 
 ### Does not own
 
 - Disclosure behavior or body wash
+- `headingHref` (disclosure and `EntityAnatomyHost` only)
 - Domain content below the identity block
 - Host collection inset
 

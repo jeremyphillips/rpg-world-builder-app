@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { DestinationList, DestinationRow, InlineMetadata, Text } from '@rpg/ui'
+import { DestinationList, DestinationItem, InlineMetadata, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
@@ -63,7 +63,7 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
               }
 
               return (
-                <DestinationRow
+                <DestinationItem
                   key={category.setId}
                   link={<Link to={ROUTES.gameTerms.overview(campaignId, category.setId)} />}
                   title={category.label}

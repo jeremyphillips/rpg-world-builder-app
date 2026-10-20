@@ -6,7 +6,7 @@ import {
   type GlobalSearchDocument,
   type ViewerCharacterRelationships,
 } from '@rpg/contracts'
-import { DestinationRow, IdentityRow } from '@rpg/ui'
+import { DestinationItem, IdentityRow } from '@rpg/ui'
 
 import {
   entitySurfaceMetadataFromText,
@@ -60,7 +60,7 @@ export function SearchResultRow({
   })
 
   return (
-    <DestinationRow
+    <DestinationItem
       link={<Link to={href} onClick={onActivate} aria-label={accessibleName} />}
       startSlot={presentation.startSlot}
       content={

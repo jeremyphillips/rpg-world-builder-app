@@ -38,7 +38,7 @@ describe('SearchResultRow', () => {
     const { container } = renderWithProviders(
       <SearchResultRow document={spellDocument()} href="/campaigns/c1/spells/fireball" />,
     )
-    expect(container.getElementsByClassName('ui-destination-row__chevron')).toHaveLength(1)
+    expect(container.getElementsByClassName('ui-destination-item__chevron')).toHaveLength(1)
   })
 
   it('renders presentation fields and navigates via link', () => {

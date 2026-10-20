@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { InlineMetadata } from './inline-metadata'
 import { Card } from './card'
-import { DestinationList, DestinationRow } from './destination-list'
+import { DestinationList, DestinationItem } from './destination-list'
 import { IdentityRow } from './identity-row.client'
 
 const meta = {
@@ -17,7 +17,7 @@ type Story = StoryObj<typeof meta>
 export const CompactGrouped: Story = {
   render: () => (
     <DestinationList density="compact">
-      <DestinationRow
+      <DestinationItem
         link={<a href="#creature-types">nav</a>}
         title="Creature types"
         description="Taxonomic classification shared by species and monsters."
@@ -28,7 +28,7 @@ export const CompactGrouped: Story = {
           </InlineMetadata>
         }
       />
-      <DestinationRow
+      <DestinationItem
         link={<a href="#damage-types">nav</a>}
         title="Damage types"
         description="Energy, physical, and other harm categories."
@@ -45,7 +45,7 @@ export const CompactGrouped: Story = {
 export const ComfortableGrouped: Story = {
   render: () => (
     <DestinationList density="comfortable">
-      <DestinationRow
+      <DestinationItem
         link={<a href="#skills">nav</a>}
         title="Skills"
         description="Ability-linked proficiencies used in play."
@@ -55,7 +55,7 @@ export const ComfortableGrouped: Story = {
           </InlineMetadata>
         }
       />
-      <DestinationRow
+      <DestinationItem
         link={<a href="#conditions">nav</a>}
         title="Conditions"
         description="Temporary states that alter what characters can do."
@@ -68,7 +68,7 @@ export const EmbeddedRichSearchRow: Story = {
   name: 'Embedded rich search row',
   render: () => (
     <DestinationList appearance="embedded" density="compact">
-      <DestinationRow
+      <DestinationItem
         link={<a href="#fireball">nav</a>}
         startSlot={
           <span className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
@@ -79,7 +79,7 @@ export const EmbeddedRichSearchRow: Story = {
           <IdentityRow heading="Fireball" classification="Spell" supporting="3rd-level evocation" />
         }
       />
-      <DestinationRow
+      <DestinationItem
         link={<a href="#champion">nav</a>}
         content={
           <IdentityRow
@@ -97,12 +97,12 @@ export const FilledStrongGrouped: Story = {
   name: 'Filled strong grouped',
   render: () => (
     <DestinationList appearance="filled" tone="strong" elevation="subtle" density="comfortable">
-      <DestinationRow
+      <DestinationItem
         link={<a href="#shattered-vale">nav</a>}
         title="The Shattered Vale"
         description="Active · 3 players · Last opened yesterday"
       />
-      <DestinationRow
+      <DestinationItem
         link={<a href="#review-invite">nav</a>}
         title="Review invitation"
         description="Avery invited you to join a campaign."
@@ -117,12 +117,12 @@ export const CopyScale: Story = {
   render: () => (
     <div className="grid max-w-xl gap-8">
       <DestinationList density="comfortable">
-        <DestinationRow
+        <DestinationItem
           link={<a href="#simple">nav</a>}
           title="Simple row"
           description="Comfortable supporting copy"
         />
-        <DestinationRow
+        <DestinationItem
           link={<a href="#rich">nav</a>}
           content={
             <IdentityRow
@@ -134,7 +134,7 @@ export const CopyScale: Story = {
         />
       </DestinationList>
       <DestinationList density="compact">
-        <DestinationRow
+        <DestinationItem
           link={<a href="#compact">nav</a>}
           content={
             <IdentityRow heading="Inherited compact" supporting="14px title, 12px supporting" />
@@ -162,7 +162,7 @@ export const ComparedToNavigableCard: Story = {
       <div className="space-y-2">
         <p className="text-sm font-medium text-foreground">Grouped destination rows</p>
         <DestinationList density="compact">
-          <DestinationRow
+          <DestinationItem
             link={<a href="#weapons">nav</a>}
             title="Weapons"
             description="Melee and ranged gear families."

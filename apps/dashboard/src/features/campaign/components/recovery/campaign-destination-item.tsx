@@ -1,5 +1,5 @@
 import type { CampaignListItem } from '@rpg/contracts'
-import { DestinationRow, IdentityFrame } from '@rpg/ui'
+import { DestinationItem, IdentityFrame } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import { EntityAnatomyHost } from '@/features/content'
@@ -17,15 +17,15 @@ import {
   shouldRunCampaignSelectionSideEffect,
 } from '../../lib/recovery/campaign-destination.lib'
 
-type CampaignDestinationRowProps = {
+type CampaignDestinationItemProps = {
   campaign: CampaignListItem
   onPersistSelection: (campaignId: string) => void
 }
 
-export function CampaignDestinationRow({
+export function CampaignDestinationItem({
   campaign,
   onPersistSelection,
-}: CampaignDestinationRowProps) {
+}: CampaignDestinationItemProps) {
   const destination = resolveCampaignEntryDestination(campaign)
   const display = buildCampaignDisplay(campaign)
   const gameMasterStyle = resolveCampaignGameMasterDisplayStyle()
@@ -37,7 +37,7 @@ export function CampaignDestinationRow({
     destination.supportingCopy ?? (meta ? <CampaignMetaLine meta={meta} includeRecency /> : null)
 
   return (
-    <DestinationRow
+    <DestinationItem
       link={
         <Link
           to={destination.href}

@@ -1,6 +1,6 @@
 import type { CampaignInviteInviteeListItem } from '@rpg/contracts'
 import { dashboardCampaignInviteReviewPath, resolveCampaignInviteExpiryLabel } from '@rpg/contracts'
-import { DestinationRow } from '@rpg/ui'
+import { DestinationItem } from '@rpg/ui'
 
 import { CAMPAIGN_INVITATION_COPY } from '../../lib/onboarding/campaign-onboarding-copy'
 
@@ -14,7 +14,7 @@ export function PendingCampaignInvitation({ invite }: PendingCampaignInvitationP
   const body = CAMPAIGN_INVITATION_COPY.body(invite.inviterDisplayName)
 
   return (
-    <DestinationRow
+    <DestinationItem
       link={<a href={reviewHref} aria-label={`Review invitation to ${invite.campaignName}`} />}
       title={invite.campaignName}
       description={body}

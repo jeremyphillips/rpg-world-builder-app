@@ -4,10 +4,10 @@ Use this guide to pick a surface. It covers generic `@rpg/ui` components and das
 
 **`Card` and `EntityCard` are different components.** `Card` is flexible layout chrome in `@rpg/ui`. `EntityCard` is a closed entity-identity surface in the dashboard — shared anatomy, trailing semantics, and static or disclosure variants. Do not substitute one for the other.
 
-| Import from              | Examples                                                                         |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| `@rpg/ui`                | `Card`, `DestinationList`, `DestinationRow`, `IdentityRow`, `InteractiveListRow` |
-| `content` feature barrel | `EntityCard`, `CatalogCard`, `EntityAnatomyHost`, `DetailEntityRow`              |
+| Import from              | Examples                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| `@rpg/ui`                | `Card`, `DestinationList`, `DestinationItem`, `IdentityRow`, `InteractiveListRow` |
+| `content` feature barrel | `EntityCard`, `CatalogCard`, `EntityAnatomyHost`, `DetailEntityRow`               |
 
 **Authoritative contracts:** [entity-surfaces.md](./entity-surfaces.md) (entity behavior and enforcement) · [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md) (generic `Card`) · [row-anatomy.md](../../../packages/ui/docs/row-anatomy.md) · [destination-list.md](../../../packages/ui/docs/destination-list.md)
 
@@ -15,14 +15,15 @@ Use this guide to pick a surface. It covers generic `@rpg/ui` components and das
 
 ## Which component should I use?
 
-| Need                                                                | Component                             | Contract                                                                    |
-| ------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------- |
-| General-purpose content (hub tile, form section, footer actions)    | `Card`                                | [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md)          |
-| Entity in a workflow (inventory, grants, pending rows, form arrays) | `EntityCard`                          | [entity-surfaces.md](./entity-surfaces.md)                                  |
-| Catalog browse, pick, radio selection, optional expanded details    | `CatalogCard`                         | [entity-surfaces.md](./entity-surfaces.md#catalog-entity-picker-rows)       |
-| Grouped navigation inside a list                                    | `DestinationRow` in `DestinationList` | [destination-list.md](../../../packages/ui/docs/destination-list.md)        |
-| Entity identity when the host already owns inset and chrome         | `EntityAnatomyHost`                   | [entity-surfaces.md](./entity-surfaces.md#hosts-embedded-entityanatomyhost) |
-| Heading, classification, and supporting copy (building block)       | `IdentityRow`                         | [row-anatomy.md](../../../packages/ui/docs/row-anatomy.md)                  |
+| Need                                                                | Component                              | Contract                                                                    |
+| ------------------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------- |
+| General-purpose content (hub tile, form section, footer actions)    | `Card`                                 | [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md)          |
+| Entity in a workflow (inventory, grants, pending rows, form arrays) | `EntityCard`                           | [entity-surfaces.md](./entity-surfaces.md)                                  |
+| Catalog browse, pick, radio selection, optional expanded details    | `CatalogCard`                          | [entity-surfaces.md](./entity-surfaces.md#catalog-entity-picker-rows)       |
+| Grouped navigation inside a list                                    | `DestinationItem` in `DestinationList` | [destination-list.md](../../../packages/ui/docs/destination-list.md)        |
+| Standalone navigable entity surface                                 | `EntityCard` with `link`               | [entity-surfaces.md](./entity-surfaces.md)                                  |
+| Entity identity when the host already owns inset and chrome         | `EntityAnatomyHost`                    | [entity-surfaces.md](./entity-surfaces.md#hosts-embedded-entityanatomyhost) |
+| Heading, classification, and supporting copy (building block)       | `IdentityRow`                          | [row-anatomy.md](../../../packages/ui/docs/row-anatomy.md)                  |
 
 **Also common (links only):**
 
@@ -38,7 +39,9 @@ Use this guide to pick a surface. It covers generic `@rpg/ui` components and das
 
 **`Card`** — declarative `header` / `footer`, optional cover media, tone and elevation, whole-card `link`. You compose arbitrary children.
 
-**`EntityCard`** — `entity` model, optional semantic `leading` / `trailing`, optional `headingHref`. Static by default; set `variant="disclosure"` for expandable body content. Closed presentation API (no ad-hoc padding or class overrides).
+**`EntityCard`** — `entity` model, optional semantic `leading` / `trailing` on non-navigable static cards. Optional whole-card `link` on static cards (no interactive slots). Disclosure supports optional `headingHref` on the title only. Static by default; set `variant="disclosure"` for expandable body content. Closed presentation API (no ad-hoc padding or class overrides).
+
+**`link` contract (shared with `Card`):** pass a single React Router `Link` or `<a>` element. Navigation attributes (`to`, `href`, `aria-label`, `onClick`, refs) live on that element. `showNavigationChevron` defaults to true. Simple metadata, rich `content`, and entity copy must not introduce nested links or controls.
 
 ```tsx
 import { Card } from '@rpg/ui'
@@ -47,6 +50,8 @@ import { EntityCard } from '@/features/content'
 <Card header={{ title: 'Campaign tools' }} density="comfortable">…</Card>
 
 <EntityCard entity={model} density="compact" trailing={{ kind: 'action', content: … }} />
+
+<EntityCard entity={model} link={<Link to={href} />} />
 
 <EntityCard variant="disclosure" itemId="grant-1" entity={model} collapsed={…} onToggleCollapse={…}>
   …domain fields…
