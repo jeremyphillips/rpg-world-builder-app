@@ -87,17 +87,21 @@ export function CharacterListCard({
     : null
 
   return (
-    <Card stretch className="overflow-hidden p-0">
-      {card.displayImagesByRole?.primary ? (
-        <BuilderOptionCardImage display={card.displayImagesByRole.primary} alt="" />
-      ) : null}
+    <Card
+      stretch
+      leadMedia={
+        card.displayImagesByRole?.primary ? (
+          <BuilderOptionCardImage display={card.displayImagesByRole.primary} alt="" />
+        ) : undefined
+      }
+    >
       <CharacterListCardHeader
         card={card}
         showCampaign={showCampaign}
         controllerLine={controllerLine}
         rosterPresentation={rosterPresentation}
       />
-      <CardFooter className="mt-auto">
+      <CardFooter>
         <Link to={detailHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
           View
         </Link>

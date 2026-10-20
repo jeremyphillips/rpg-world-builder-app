@@ -19,6 +19,9 @@ export const UI_CARD_ELEVATION_RAISED_CLASS = 'ui-card--elevation-raised' as con
 
 export const UI_CARD_CLASS = 'ui-card' as const
 
+export const UI_CARD_MEDIA_CLASS = 'ui-card__media' as const
+export const UI_CARD_MEDIA_MODIFIER_CLASS = 'ui-card--media' as const
+export const UI_CARD_STRETCH_CLASS = 'ui-card--stretch' as const
 export const UI_CARD_HEADER_CLASS = 'ui-card__header' as const
 export const UI_CARD_CONTENT_CLASS = 'ui-card__content' as const
 export const UI_CARD_FOOTER_CLASS = 'ui-card__footer' as const

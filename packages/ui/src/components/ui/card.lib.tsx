@@ -11,6 +11,9 @@ import {
   UI_CARD_DESCRIPTION_CLASS,
   UI_CARD_FOOTER_CLASS,
   UI_CARD_HEADER_CLASS,
+  UI_CARD_MEDIA_CLASS,
+  UI_CARD_MEDIA_MODIFIER_CLASS,
+  UI_CARD_STRETCH_CLASS,
   UI_CARD_NAV_CHEVRON_CLASS,
   UI_CARD_NAV_CLASS,
   UI_CARD_NAV_MAIN_CLASS,
@@ -49,10 +52,16 @@ function CardNavigationChevron() {
   return <NavigationChevron />
 }
 
+export function CardMedia({ leadMedia }: { leadMedia?: React.ReactNode }) {
+  if (leadMedia == null) {
+    return null
+  }
+  return <div className={UI_CARD_MEDIA_CLASS}>{leadMedia}</div>
+}
+
 type DeclarativeInteriorProps = {
   header?: CardHeaderModel
   footer?: React.ReactNode
-  stretch?: boolean
   hasBody: boolean
   children?: React.ReactNode
   navigable: boolean
@@ -62,7 +71,6 @@ type DeclarativeInteriorProps = {
 export function DeclarativeCardInterior({
   header,
   footer,
-  stretch,
   hasBody,
   children,
   navigable,
@@ -72,9 +80,7 @@ export function DeclarativeCardInterior({
     <>
       {header ? <CardHeaderRegion header={header} /> : null}
       {hasBody ? <div className={UI_CARD_CONTENT_CLASS}>{children}</div> : null}
-      {footer ? (
-        <div className={cn(UI_CARD_FOOTER_CLASS, stretch && 'mt-auto')}>{footer}</div>
-      ) : null}
+      {footer ? <div className={UI_CARD_FOOTER_CLASS}>{footer}</div> : null}
     </>
   )
 
@@ -98,6 +104,7 @@ export function resolveCardSurfaceClassName({
   selected,
   disabled,
   stretch,
+  leadMedia,
   className,
   navigable,
 }: {
@@ -108,6 +115,7 @@ export function resolveCardSurfaceClassName({
   selected?: boolean
   disabled?: boolean
   stretch?: boolean
+  leadMedia?: boolean
   className?: string
   navigable: boolean
 }): string {
@@ -115,7 +123,8 @@ export function resolveCardSurfaceClassName({
     cardSurfaceVariants({ tone, elevation, density, interactive, selected, disabled }),
     navigable &&
       cn('block w-full min-w-0 no-underline', interactiveFocusVariants({ context: 'standalone' })),
-    stretch && 'flex h-full flex-col',
+    stretch && UI_CARD_STRETCH_CLASS,
+    leadMedia && UI_CARD_MEDIA_MODIFIER_CLASS,
     className,
   )
 }
@@ -130,6 +139,7 @@ export type ParsedCardProps = {
   disabled?: boolean
   header?: CardHeaderModel
   footer?: React.ReactNode
+  leadMedia?: React.ReactNode
   stretch?: boolean
   children?: React.ReactNode
   link?: React.ReactElement
@@ -168,6 +178,7 @@ function splitIncomingCardProps(props: CardProps) {
     disabled,
     header,
     footer,
+    leadMedia,
     stretch,
     children,
     link,
@@ -185,6 +196,7 @@ function splitIncomingCardProps(props: CardProps) {
     disabled,
     header,
     footer,
+    leadMedia,
     stretch,
     children,
     link,
@@ -226,6 +238,7 @@ export function parseCardProps(props: CardProps): ParsedCardProps {
     disabled: incoming.disabled,
     header: incoming.header,
     footer: incoming.footer,
+    leadMedia: incoming.leadMedia,
     stretch: incoming.stretch,
     children: incoming.children,
     link: incoming.link,

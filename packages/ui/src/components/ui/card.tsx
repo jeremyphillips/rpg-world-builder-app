@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import {
+  CardMedia,
   DeclarativeCardInterior,
   parseCardProps,
   renderNavigableCardLink,
@@ -29,6 +30,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
     selected: parsed.selected,
     disabled: parsed.disabled,
     stretch: parsed.stretch,
+    leadMedia: parsed.leadMedia != null,
     className: parsed.className,
     navigable: parsed.link != null,
   })
@@ -36,22 +38,25 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   if (!parsed.useDeclarativeLayout) {
     return (
       <div ref={ref} className={surfaceClassName} {...parsed.restProps}>
+        <CardMedia leadMedia={parsed.leadMedia} />
         {parsed.children}
       </div>
     )
   }
 
   const interior = (
-    <DeclarativeCardInterior
-      header={parsed.header}
-      footer={parsed.footer}
-      stretch={parsed.stretch}
-      hasBody={parsed.hasBody}
-      navigable={parsed.link != null}
-      showNavigationChevron={parsed.showNavigationChevron}
-    >
-      {parsed.children}
-    </DeclarativeCardInterior>
+    <>
+      <CardMedia leadMedia={parsed.leadMedia} />
+      <DeclarativeCardInterior
+        header={parsed.header}
+        footer={parsed.footer}
+        hasBody={parsed.hasBody}
+        navigable={parsed.link != null}
+        showNavigationChevron={parsed.showNavigationChevron}
+      >
+        {parsed.children}
+      </DeclarativeCardInterior>
+    </>
   )
 
   if (parsed.link != null) {

@@ -215,4 +215,24 @@
   .ui-card-tone-host--inherit {
     --ui-card-quiet-bg: var(--surface-current);
   }
+
+  .ui-card--media {
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .ui-card__media {
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .ui-card--stretch {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+  }
+
+  .ui-card--stretch .ui-card__footer {
+    margin-top: auto;
+  }
 }

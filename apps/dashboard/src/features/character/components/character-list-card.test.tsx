@@ -130,13 +130,16 @@ describe('CharacterListCard', () => {
       </MemoryRouter>,
     )
 
+    expect(container.firstElementChild).toHaveClass('ui-card--media', 'ui-card--stretch')
     const header = container.querySelector('.ui-card__header')
     const footer = container.querySelector('.ui-card__footer')
+    const media = container.querySelector('.ui-card__media')
     expect(header).toBeTruthy()
     expect(header?.className).not.toContain('px-5')
-    expect(footer).toHaveClass('mt-auto')
+    expect(footer).toBeTruthy()
+    expect(footer?.className).not.toContain('mt-auto')
     expect(footer?.className).not.toContain('px-5')
-    expect(container.querySelector('img')).toBeTruthy()
+    expect(media?.querySelector('img')).toBeTruthy()
     expect(
       screen.getByRole('heading', {
         name: 'Very Long Character Name That Should Truncate Beside The Badge',

@@ -10,6 +10,8 @@ export type CardHeaderModel = {
 type CardSharedSurfaceProps = Omit<CardSurfaceVariantProps, 'interactive' | 'density'> & {
   density?: GenericCardDensity
   header?: CardHeaderModel
+  /** Full-bleed art above the header. The shell clips it to the card radius. */
+  leadMedia?: React.ReactNode
   stretch?: boolean
 }
 

@@ -307,12 +307,26 @@ describe('Card region inset', () => {
     expect(container.getElementsByClassName(UI_CARD_FOOTER_CLASS)).toHaveLength(0)
   })
 
+  it('renders stacked media above the header and clips the shell', () => {
+    const { container } = render(
+      <Card leadMedia={<img alt="" src="/hero.png" />} header={{ title: 'Portrait' }} />,
+    )
+    const shell = container.firstElementChild
+    expect(shell).toHaveClass('ui-card--media')
+    const media = shell?.querySelector('.ui-card__media')
+    const header = shell?.querySelector(`.${UI_CARD_HEADER_CLASS}`)
+    expect(media?.querySelector('img')).toBeTruthy()
+    expect(
+      media && header && media.compareDocumentPosition(header) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
   it('pins footer when stretch is enabled', () => {
     const { container } = render(
       <Card stretch header={{ title: 'Stretch' }} footer={<span>Actions</span>} />,
     )
-    expect(container.firstElementChild).toHaveClass('flex', 'h-full', 'flex-col')
-    expect(queryCardRegion(container, UI_CARD_FOOTER_CLASS)).toHaveClass('mt-auto')
+    expect(container.firstElementChild).toHaveClass('ui-card--stretch')
+    expect(queryCardRegion(container, UI_CARD_FOOTER_CLASS)).not.toHaveClass('mt-auto')
   })
 
   it('wraps header and body in separate regions when footer is absent', () => {
