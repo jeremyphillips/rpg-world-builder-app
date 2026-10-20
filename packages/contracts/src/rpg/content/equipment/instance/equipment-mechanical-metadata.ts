@@ -1,4 +1,4 @@
-import { formatSignedModifier } from '../../../runtime/creature/weapon-attack'
+import { formatSignedModifier } from '../../../primitives/signed-modifier'
 import {
   EQUIPMENT_EFFECT_TARGET_ENTRIES,
   type EquipmentEffectTarget,

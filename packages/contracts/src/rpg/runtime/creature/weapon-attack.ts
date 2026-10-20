@@ -2,16 +2,15 @@ import { formatWeaponDamage, type WeaponDamage } from '../../content/equipment/w
 import type { WeaponProperty } from '../../vocab/weapon'
 import type { Ability } from '../../vocab/ability'
 
+import { formatSignedModifier } from '../../primitives/signed-modifier'
+
 import { abilityModifier } from './ability-modifier'
+
+export { formatSignedModifier } from '../../primitives/signed-modifier'
 
 type WeaponAttackFields = {
   mode: 'melee' | 'ranged'
   properties: readonly WeaponProperty[]
-}
-
-/** Formats a signed modifier for attack/damage display (e.g. "+3", "-1"). */
-export function formatSignedModifier(modifier: number): string {
-  return modifier >= 0 ? `+${modifier}` : String(modifier)
 }
 
 /** Governing ability for a weapon attack when only one ability applies. */

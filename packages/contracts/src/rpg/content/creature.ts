@@ -50,7 +50,7 @@ export {
   creatureLanguageProficiencyEntrySchema,
   type CreatureLanguageProficiencyEntry,
 } from './creature/proficiencies'
-export { formatTelepathyRange } from '../runtime/creature/communication'
+export { formatTelepathyRange } from './creature/communication'
 
 /** Publish validation — every sense row needs a range in feet. */
 export function refineCreatureSenseRanges(

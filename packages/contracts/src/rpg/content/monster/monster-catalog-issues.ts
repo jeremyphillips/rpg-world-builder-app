@@ -1,16 +1,12 @@
-import type { ApiValidationIssue } from '../../../shared/api-validation'
 import type { ContentValidationIntent } from '../lib/content-validation-intent'
+import type { ContentValidationIssue } from '../lib/content-validation-issue'
+import { isContentCampaignEligible, isContentReferenceable } from '../lib/content-resolution-policy'
 import type { Equipment, EquipmentInstance } from '../equipment'
 import { isArmorEquipment, isWeaponEquipment } from '../equipment'
 import type { MagicPropertyDefinitionProvider } from '../equipment/instance/magic-property'
 import { normalizeEquipmentInstance } from '../equipment/instance/normalize-equipment-instance'
 import { validateEquipmentMagicProperties } from '../equipment/instance/validate-equipment-magic-properties'
 import type { SkillProficiency } from '../skill-proficiency'
-import {
-  isContentCampaignEligible,
-  isContentReferenceable,
-} from '../../runtime/campaign/content-resolution-policy'
-
 export const MONSTER_CATALOG_ISSUE_CODE = {
   unknownEquipment: 'unknown_equipment',
   weaponActionNotWeapon: 'weapon_action_not_weapon',
@@ -63,7 +59,11 @@ export type MonsterCatalogs = {
 
 const ACTION_SECTIONS = ['actions', 'bonusActions', 'reactions'] as const
 
-function issue(path: string, message: string, code: MonsterCatalogIssueCode): ApiValidationIssue {
+function issue(
+  path: string,
+  message: string,
+  code: MonsterCatalogIssueCode,
+): ContentValidationIssue {
   return { path, message, code }
 }
 
@@ -79,7 +79,7 @@ function collectEquipmentRowIssues(
   entry: CatalogEquipmentEntry,
   index: number,
   catalogs: MonsterCatalogs,
-  issues: ApiValidationIssue[],
+  issues: ContentValidationIssue[],
   equippedBodyArmor: { index: number; label: string }[],
   intent: ContentValidationIntent,
 ): void {
@@ -126,7 +126,7 @@ function collectEquipmentRowIssues(
 
 function collectBodyArmorConflicts(
   equippedBodyArmor: { index: number; label: string }[],
-  issues: ApiValidationIssue[],
+  issues: ContentValidationIssue[],
 ): void {
   if (equippedBodyArmor.length < 2) return
   const names = equippedBodyArmor.map((row) => row.label)
@@ -147,7 +147,7 @@ function collectWeaponActionIssues(
   body: MonsterCatalogIssueBody,
   equipment: readonly CatalogEquipmentEntry[],
   catalogs: MonsterCatalogs,
-  issues: ApiValidationIssue[],
+  issues: ContentValidationIssue[],
 ): void {
   for (const section of ACTION_SECTIONS) {
     for (const [index, action] of (body[section] ?? []).entries()) {
@@ -162,7 +162,7 @@ function pushWeaponActionIssue(
   action: NonNullable<MonsterCatalogIssueBody['actions']>[number],
   equipment: readonly CatalogEquipmentEntry[],
   catalogs: MonsterCatalogs,
-  issues: ApiValidationIssue[],
+  issues: ContentValidationIssue[],
 ): void {
   if (action.kind !== 'weapon' || !action.equipmentEntryId) return
   const entry = equipment.find((row) => row.entryId === action.equipmentEntryId)
@@ -181,7 +181,7 @@ function pushWeaponActionIssue(
 function collectSkillIssues(
   body: MonsterCatalogIssueBody,
   catalogs: MonsterCatalogs,
-  issues: ApiValidationIssue[],
+  issues: ContentValidationIssue[],
 ): void {
   if (catalogStatus(catalogs.skillCatalog) === 'unavailable') {
     issues.push(
@@ -241,8 +241,8 @@ export function collectMonsterCatalogIssues(
   body: MonsterCatalogIssueBody,
   catalogs: MonsterCatalogs,
   intent: ContentValidationIntent,
-): ApiValidationIssue[] {
-  const issues: ApiValidationIssue[] = []
+): ContentValidationIssue[] {
+  const issues: ContentValidationIssue[] = []
   const equipment = body.equipment ?? []
   const equippedBodyArmor: { index: number; label: string }[] = []
   const equipmentReady = catalogStatus(catalogs.equipmentCatalog) === 'ready'
