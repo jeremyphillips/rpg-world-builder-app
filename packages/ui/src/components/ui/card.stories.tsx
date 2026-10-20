@@ -2,10 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect } from 'storybook/test'
 
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
-import { cardSurfaceVariants } from './card.variants'
+import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { Card, CardHeader } from './card'
-import { CARD_CLASS_SPECS, UI_CARD_CONTENT_CLASS } from './card.variants'
+import './card-surface-interaction-matrix.css'
+import { CARD_CLASS_SPECS, UI_CARD_CONTENT_CLASS, cardSurfaceVariants } from './card.variants'
 import { IdentityRowHeadingLine } from './identity-row.client'
 import { Input } from './input.client'
 import { RadioOptionCard } from './radio-option-card.client'
@@ -173,38 +174,190 @@ export const DensityTypography: Story = {
   ),
 }
 
+type SurfaceMatrixTone = 'quiet' | 'strong'
+
+type SurfaceMatrixState =
+  | 'static-rest'
+  | 'rest'
+  | 'hover'
+  | 'pressed'
+  | 'selected'
+  | 'selected-hover'
+  | 'disabled'
+  | 'focus'
+
+const SURFACE_MATRIX_STATE_ROWS: { state: SurfaceMatrixState; label: string }[] = [
+  { state: 'static-rest', label: 'Static rest' },
+  { state: 'rest', label: 'Rest' },
+  { state: 'hover', label: 'Hover' },
+  { state: 'pressed', label: 'Pressed' },
+  { state: 'selected', label: 'Selected' },
+  { state: 'selected-hover', label: 'Selected + hover' },
+  { state: 'disabled', label: 'Disabled' },
+  { state: 'focus', label: 'Focus visible' },
+]
+
+function surfaceMatrixPreviewClass(state: SurfaceMatrixState): string | undefined {
+  if (state === 'hover' || state === 'selected-hover') {
+    return 'ui-card-surface-matrix-preview--hover'
+  }
+  if (state === 'pressed') {
+    return 'ui-card-surface-matrix-preview--pressed'
+  }
+  if (state === 'focus') {
+    return 'ui-card-surface-matrix-preview--focus'
+  }
+  return undefined
+}
+
+function surfaceMatrixShellClassName(tone: SurfaceMatrixTone, state: SurfaceMatrixState): string {
+  const interactive = state !== 'static-rest'
+  const selected = state === 'selected' || state === 'selected-hover'
+  const disabled = state === 'disabled'
+
+  return cn(
+    cardSurfaceVariants({
+      tone,
+      density: 'comfortable',
+      interactive,
+      selected,
+      disabled,
+    }),
+    'w-full min-h-[5.5rem]',
+    surfaceMatrixPreviewClass(state),
+  )
+}
+
+function surfaceMatrixTestId(tone: SurfaceMatrixTone, state: SurfaceMatrixState): string {
+  return `matrix-${tone}-${state}`
+}
+
 function shellBackgroundColor(element: HTMLElement): string {
   return getComputedStyle(element).backgroundColor
 }
 
+function SurfaceMatrixCell({
+  tone,
+  state,
+  label,
+}: {
+  tone: SurfaceMatrixTone
+  state: SurfaceMatrixState
+  label: string
+}) {
+  return (
+    <div
+      data-testid={surfaceMatrixTestId(tone, state)}
+      data-matrix-tone={tone}
+      data-matrix-state={state}
+      className={surfaceMatrixShellClassName(tone, state)}
+    >
+      <div className={UI_CARD_CONTENT_CLASS}>
+        <p className="text-style-label">{label}</p>
+        <p className="text-xs text-muted-foreground">{tone} · comfortable inset</p>
+      </div>
+    </div>
+  )
+}
+
+function SurfaceMatrixTable({ className }: { className?: string }) {
+  return (
+    <div className={cn('overflow-x-auto', className)}>
+      <table className="w-full min-w-[40rem] border-collapse text-left">
+        <thead>
+          <tr className="border-b border-border">
+            <th className="p-3 text-xs font-medium text-muted-foreground">State</th>
+            <th className="p-3 text-xs font-medium text-muted-foreground">Quiet</th>
+            <th className="p-3 text-xs font-medium text-muted-foreground">Strong</th>
+          </tr>
+        </thead>
+        <tbody>
+          {SURFACE_MATRIX_STATE_ROWS.map(({ state, label }) => (
+            <tr key={state} className="border-b border-border-subtle align-top">
+              <th className="p-3 text-xs font-normal text-muted-foreground">{label}</th>
+              <td className="p-3">
+                <SurfaceMatrixCell tone="quiet" state={state} label={label} />
+              </td>
+              <td className="p-3">
+                <SurfaceMatrixCell tone="strong" state={state} label={label} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 export const SurfaceInteractionMatrix: Story = {
+  name: 'Surface interaction matrix',
   tags: ['card-surface-colors'],
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        story:
+          'Tone × interaction state grid with comfortable card inset. Hover, pressed, and focus cells use story-only preview classes that mirror `card.css` (real pointer/focus still applies on live cells).',
+      },
+    },
+  },
   render: () => (
-    <div className="grid max-w-3xl gap-3">
-      <div
-        data-testid="card-quiet-rest"
-        className={cardSurfaceVariants({ tone: 'quiet', interactive: true })}
-      >
-        Quiet rest
-      </div>
-      <div
-        data-testid="card-strong-rest"
-        className={cardSurfaceVariants({ tone: 'strong', interactive: true })}
-      >
-        Strong rest
-      </div>
-      <div
-        data-testid="card-quiet-selected"
-        className={cardSurfaceVariants({ tone: 'quiet', interactive: true, selected: true })}
-      >
-        Quiet selected
-      </div>
-      <div
-        data-testid="card-strong-selected"
-        className={cardSurfaceVariants({ tone: 'strong', interactive: true, selected: true })}
-      >
-        Strong selected
-      </div>
+    <div className="mx-auto flex max-w-5xl flex-col gap-10">
+      <header className="space-y-1">
+        <h2 className="text-style-label">Card surface interaction matrix</h2>
+        <p className="text-sm text-muted-foreground">
+          Compare rest, hover, pressed, selected, disabled, and focus-visible fills on canvas and on
+          a muted parent.
+        </p>
+      </header>
+
+      <section className="space-y-3">
+        <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          On canvas
+        </h3>
+        <SurfaceMatrixTable />
+      </section>
+
+      <section className="space-y-3 rounded-lg border border-border bg-muted p-4">
+        <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Nested on muted panel
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          Quiet interactive rest vs hover — common entity-row context.
+        </p>
+        <div className="grid gap-4 md:grid-cols-2">
+          <SurfaceMatrixCell tone="quiet" state="rest" label="Rest" />
+          <SurfaceMatrixCell tone="quiet" state="hover" label="Hover" />
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Elevation (strong · interactive rest)
+        </h3>
+        <div className="grid gap-4 md:grid-cols-3">
+          {(['flat', 'subtle', 'raised'] as const).map((elevation) => (
+            <div
+              key={elevation}
+              data-testid={`matrix-strong-rest-elevation-${elevation}`}
+              className={cn(
+                cardSurfaceVariants({
+                  tone: 'strong',
+                  density: 'comfortable',
+                  interactive: true,
+                  elevation,
+                }),
+                'min-h-[5.5rem] w-full',
+              )}
+            >
+              <div className={UI_CARD_CONTENT_CLASS}>
+                <p className="text-style-label">{elevation}</p>
+                <p className="text-xs text-muted-foreground">strong · elevation</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -212,27 +365,38 @@ export const SurfaceInteractionMatrix: Story = {
     const selectedToken = getComputedStyle(root).getPropertyValue('--ui-surface-selected-bg').trim()
     expect(selectedToken.length).toBeGreaterThan(0)
 
-    const quietRest = canvasElement.querySelector<HTMLElement>('[data-testid="card-quiet-rest"]')
-    const strongRest = canvasElement.querySelector<HTMLElement>('[data-testid="card-strong-rest"]')
-    const quietSelected = canvasElement.querySelector<HTMLElement>(
-      '[data-testid="card-quiet-selected"]',
-    )
-    const strongSelected = canvasElement.querySelector<HTMLElement>(
-      '[data-testid="card-strong-selected"]',
-    )
-    if (!quietRest || !strongRest || !quietSelected || !strongSelected) {
-      throw new Error('Missing surface interaction matrix nodes')
+    const query = (tone: SurfaceMatrixTone, state: SurfaceMatrixState) =>
+      canvasElement.querySelector<HTMLElement>(
+        `[data-testid="${surfaceMatrixTestId(tone, state)}"]`,
+      )
+
+    for (const tone of ['quiet', 'strong'] as const) {
+      for (const { state } of SURFACE_MATRIX_STATE_ROWS) {
+        expect(query(tone, state), `missing ${tone} ${state}`).toBeTruthy()
+      }
     }
 
-    const quietRestBg = shellBackgroundColor(quietRest)
-    const strongRestBg = shellBackgroundColor(strongRest)
-    expect(quietRestBg).not.toBe(strongRestBg)
+    const quietRest = query('quiet', 'rest')!
+    const strongRest = query('strong', 'rest')!
+    expect(shellBackgroundColor(quietRest)).not.toBe(shellBackgroundColor(strongRest))
 
-    const quietSelectedBg = shellBackgroundColor(quietSelected)
-    const strongSelectedBg = shellBackgroundColor(strongSelected)
-    expect(quietSelectedBg).toBe(strongSelectedBg)
-    expect(quietSelectedBg).not.toBe(quietRestBg)
-    expect(strongSelectedBg).not.toBe(strongRestBg)
+    const quietHover = query('quiet', 'hover')!
+    const strongHover = query('strong', 'hover')!
+    expect(shellBackgroundColor(quietHover)).not.toBe(shellBackgroundColor(quietRest))
+    expect(shellBackgroundColor(strongHover)).not.toBe(shellBackgroundColor(strongRest))
+
+    const quietPressed = query('quiet', 'pressed')!
+    expect(shellBackgroundColor(quietPressed)).not.toBe(shellBackgroundColor(quietHover))
+
+    const quietSelected = query('quiet', 'selected')!
+    const strongSelected = query('strong', 'selected')!
+    expect(shellBackgroundColor(quietSelected)).toBe(shellBackgroundColor(strongSelected))
+
+    const quietSelectedHover = query('quiet', 'selected-hover')!
+    expect(shellBackgroundColor(quietSelectedHover)).toBe(shellBackgroundColor(quietSelected))
+
+    const quietDisabled = query('quiet', 'disabled')!
+    expect(Number.parseFloat(getComputedStyle(quietDisabled).opacity)).toBeLessThan(1)
   },
 }
 

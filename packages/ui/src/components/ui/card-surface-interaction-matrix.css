@@ -1,0 +1,36 @@
+/*
+ * Storybook-only — mirrors card.css interaction selectors for static matrix cells.
+ * Preview classes apply the same custom properties as :hover / :active / focus-visible.
+ */
+@layer components {
+  .ui-card-surface-matrix-preview--hover.ui-card.ui-card--interactive:not(.ui-card--selected):not(
+      .ui-card--disabled
+    ):is(.ui-card--quiet, .ui-card--strong) {
+    background-color: var(--ui-surface-hover-bg);
+  }
+
+  .ui-card-surface-matrix-preview--pressed.ui-card.ui-card--interactive:not(.ui-card--selected):not(
+      .ui-card--disabled
+    ):is(.ui-card--quiet, .ui-card--strong) {
+    background-color: var(--ui-surface-pressed-bg);
+  }
+
+  .ui-card-surface-matrix-preview--hover.ui-card--strong.ui-card--interactive:not(
+      .ui-card--selected
+    ):not(.ui-card--disabled) {
+    border-color: var(--primary);
+  }
+
+  .ui-card-surface-matrix-preview--focus.ui-card--interactive:not(.ui-card--selected):is(
+      .ui-card--quiet,
+      .ui-card--strong
+    ) {
+    box-shadow: var(--ui-focus-ring-standalone);
+  }
+
+  .ui-card-surface-matrix-preview--focus.ui-card--strong.ui-card--selected.ui-card--interactive {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent),
+      var(--ui-focus-ring-standalone);
+  }
+}
