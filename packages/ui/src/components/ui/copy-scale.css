@@ -29,6 +29,7 @@
   }
 
   .ui-card--compact,
+  .ui-alert--compact,
   .ui-destination-list--compact,
   .ui-interactive-list__main--sm,
   .dash-entity-anatomy--compact,
@@ -43,6 +44,7 @@
   }
 
   .ui-card--comfortable,
+  .ui-alert--comfortable,
   .ui-destination-list--comfortable,
   .dash-entity-anatomy--comfortable,
   .ui-identity-row--comfortable,
@@ -56,6 +58,7 @@
   }
 
   .ui-card--spacious,
+  .ui-alert--spacious,
   .ui-destination-list--spacious,
   .ui-interactive-list__main--lg,
   .dash-entity-anatomy--spacious,
@@ -77,5 +80,26 @@
     --ui-card-title-line-height: var(--ui-copy-title-line-height);
     --ui-card-description-size: var(--ui-copy-supporting-size);
     --ui-card-description-line-height: var(--ui-copy-supporting-line-height);
+  }
+
+  .ui-card--compact,
+  .ui-alert--compact {
+    --ui-surface-inset-block: calc(var(--spacing) * 2);
+    --ui-surface-inset-inline: calc(var(--spacing) * 4);
+    --ui-surface-region-gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-card--comfortable,
+  .ui-alert--comfortable {
+    --ui-surface-inset-block: calc(var(--spacing) * 3);
+    --ui-surface-inset-inline: calc(var(--spacing) * 5);
+    --ui-surface-region-gap: calc(var(--spacing) * 3);
+  }
+
+  .ui-card--spacious,
+  .ui-alert--spacious {
+    --ui-surface-inset-block: calc(var(--spacing) * 5);
+    --ui-surface-inset-inline: calc(var(--spacing) * 6);
+    --ui-surface-region-gap: calc(var(--spacing) * 3);
   }
 }

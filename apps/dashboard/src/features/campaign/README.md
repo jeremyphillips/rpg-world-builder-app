@@ -62,7 +62,7 @@ acquisition model (axes, ownership, build/import finalization).
   completion marks the linked invite when possible (audit-only after membership is established).
 - **Recovery:** Membership survives invite expiry; players can return to
   onboarding without an `inviteId` query param. Recovery prompts are split by
-  surface — layout alert (in-campaign), home promotion cards (`PromotionCard`),
+  surface — layout alert (in-campaign), home `Card` / `Alert` promotions,
   and campaigns index rows (`CampaignDestinationItem`). See
   [availability.md](../../../docs/availability.md#onboarding-recovery-surfaces).
 - **Invite handoff:** Public accept and dashboard/public **Continue setup** navigate
@@ -73,7 +73,6 @@ acquisition model (axes, ownership, build/import finalization).
 
 | Component                            | Location                                                           | Surface                                                     |
 | ------------------------------------ | ------------------------------------------------------------------ | ----------------------------------------------------------- |
-| `PromotionCard`                      | `components/layout/promotion-card.tsx`                             | Shared home promotion chrome                                |
 | `CampaignRecoveryState`              | `lib/recovery/campaign-recovery-state.ts`                          | Dashboard wrapper over `viewerState`                        |
 | `resolveCampaignEntryDestination`    | `lib/recovery/campaign-destination.lib.ts`                         | Index/switcher/continue → campaign shell                    |
 | `resolveCampaignRecoveryDestination` | `lib/recovery/campaign-destination.lib.ts`                         | Home/alert/nav CTA → onboarding or reconnect                |

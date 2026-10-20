@@ -7,8 +7,8 @@
 @layer components {
   /* Baseline inset + header copy ladder — published on shell; regions consume vars. */
   .ui-card--compact {
-    --ui-card-inset-block: calc(var(--spacing) * 2);
-    --ui-card-inset-inline: calc(var(--spacing) * 4);
+    --ui-card-inset-block: var(--ui-surface-inset-block);
+    --ui-card-inset-inline: var(--ui-surface-inset-inline);
     --ui-card-title-size: var(--text-sm);
     --ui-card-title-line-height: var(--text-sm--line-height);
     --ui-card-title-weight: var(--font-weight-body-emphasis);
@@ -17,8 +17,8 @@
   }
 
   .ui-card--comfortable {
-    --ui-card-inset-block: calc(var(--spacing) * 3);
-    --ui-card-inset-inline: calc(var(--spacing) * 5);
+    --ui-card-inset-block: var(--ui-surface-inset-block);
+    --ui-card-inset-inline: var(--ui-surface-inset-inline);
     --ui-card-title-size: var(--text-base);
     --ui-card-title-line-height: var(--text-base--line-height);
     --ui-card-title-weight: var(--font-weight-heading);
@@ -27,8 +27,8 @@
   }
 
   .ui-card--spacious {
-    --ui-card-inset-block: calc(var(--spacing) * 5);
-    --ui-card-inset-inline: calc(var(--spacing) * 6);
+    --ui-card-inset-block: var(--ui-surface-inset-block);
+    --ui-card-inset-inline: var(--ui-surface-inset-inline);
     --ui-card-title-size: var(--text-heading-card);
     --ui-card-title-line-height: var(--text-heading-card--line-height);
     --ui-card-title-weight: var(--font-weight-heading);

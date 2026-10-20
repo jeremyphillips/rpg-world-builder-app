@@ -10,7 +10,7 @@ import {
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   identityRowStackVariants,
-  resolveCardFooterButtonSize,
+  resolveSurfaceActionButtonSize,
   resolveHeadingAccessoryBadgeSize,
   type GenericCardDensity,
 } from '@rpg/ui'
@@ -118,7 +118,7 @@ export function CharacterListCard({
         <ButtonLink
           link={<Link to={detailHref} />}
           variant="outline"
-          size={resolveCardFooterButtonSize(density)}
+          size={resolveSurfaceActionButtonSize(density)}
         >
           View
         </ButtonLink>

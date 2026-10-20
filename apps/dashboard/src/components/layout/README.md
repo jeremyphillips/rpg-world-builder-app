@@ -14,7 +14,7 @@ etc.) stay in their feature folders — see [`page/` boundary](#page-boundary) b
 | Reusable page width, spacing, header, load state, index intro                       | [`page/`](./page/)                                                                                                                                                           |
 | Sidebar navigation (scope switch, section builders, nav items)                      | [`sidebar/`](./sidebar/) — see [`sidebar-navigation.md`](../../../docs/sidebar-navigation.md)                                                                                |
 | Cross-cutting pure layout logic shared by multiple chrome areas                     | layout **root** (e.g. [`resolve-dashboard-navigation-scope.ts`](./resolve-dashboard-navigation-scope.ts)); introduce `navigation/` or `lib/` only when 2+ such modules exist |
-| Dashboard-wide promotional/card surfaces (exceptions, not layout chrome)            | layout **root** — [`promotion-card`](./promotion-card.tsx), [`starter-action-card`](./starter-action-card.tsx)                                                               |
+| Dashboard-wide promotional/card surfaces (exceptions, not layout chrome)            | layout **root** — [`starter-action-card`](./starter-action-card.tsx); campaign invites/recovery use `Card` / `Alert` in feature wrappers                                     |
 
 ## Import convention
 
@@ -48,7 +48,7 @@ Page layout usage for routes → [`feature-conventions.md`](../../../docs/featur
 
 ## Root exceptions
 
-`promotion-card` and `starter-action-card` are promotional/content surface
+`starter-action-card` is a promotional/content surface
 primitives, not frame or page geometry. They remain at layout root for historical
 placement; optional follow-up is a dedicated `components/promotion/` folder or
 route colocation if ownership clarifies further.
@@ -63,6 +63,5 @@ layout/
   page/            PageShell, PageHeader, PageLoadState, variants, overview/index intro
   sidebar/         Primary navigation — see sidebar-navigation.md
   resolve-dashboard-navigation-scope.ts
-  promotion-card.*
   starter-action-card.*
 ```

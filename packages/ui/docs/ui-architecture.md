@@ -111,7 +111,9 @@ A `variant="selection"` request routes to `SelectionOptionCard`, not `Card`, so 
 
 ### Card footer labeled actions
 
-For density-aware hub/roster `Card` stacks with labeled footer controls (`Button`, `ButtonLink`, or `buttonVariants()` on a real link), pass explicit `size` from `resolveCardFooterButtonSize(density)` in `@rpg/ui`. `CardFooter` is layout-only — no contextual descendant sizing.
+Card and Alert share canonical copy scale and `--ui-surface-inset-*` rhythm via [`copy-scale.css`](../src/components/ui/copy-scale.css). Alert keeps semantic variants and optional `leading`; Card keeps tone, elevation, and navigation. Choose **Card** for neutral hub tiles and invitations; choose **Alert** for status-colored guidance.
+
+For labeled footer or Alert action controls, pass explicit `size` from `resolveSurfaceActionButtonSize(density)` in `@rpg/ui`. `CardFooter` is layout-only — no contextual descendant sizing. Persistent dashboard copy may use `announcement="none"` on Alert so variant color does not imply a live region.
 
 | Card `density` | Labeled footer `Button` / `ButtonLink` `size` |
 | -------------- | --------------------------------------------- |

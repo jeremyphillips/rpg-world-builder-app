@@ -136,4 +136,4 @@ This table is **not** the entity **status-lane** badge rule (compact → `sm`, e
 
 Do not add contextual Badge CSS or wrapper components that override an explicit `size` prop.
 
-Use `resolveHeadingAccessoryBadgeSize` from `@rpg/ui` at call sites. Card **footer** labeled-action sizing is documented separately in [ui-architecture.md](./ui-architecture.md#card-footer-labeled-actions) (`resolveCardFooterButtonSize`).
+Use `resolveHeadingAccessoryBadgeSize` from `@rpg/ui` at call sites. Card **footer** and Alert **actions** labeled-control sizing: [ui-architecture.md](./ui-architecture.md#card-footer-labeled-actions) (`resolveSurfaceActionButtonSize`).

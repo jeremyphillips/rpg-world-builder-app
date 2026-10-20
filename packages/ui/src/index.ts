@@ -56,7 +56,13 @@ export {
   inlineMetadataRootVariants,
   inlineMetadataSeparatorVariants,
 } from './components/ui/inline-metadata.variants'
-export { Alert, type AlertDensity, type AlertProps, type AlertVariant } from './components/ui/alert'
+export {
+  Alert,
+  type AlertAnnouncement,
+  type AlertDensity,
+  type AlertProps,
+  type AlertVariant,
+} from './components/ui/alert'
 export {
   alertVariants,
   alertTitleVariants,
@@ -353,7 +359,7 @@ export {
   type ContentCardInsetDensity,
   type GenericCardDensity,
 } from './components/ui/card.variants'
-export { resolveCardFooterButtonSize } from './components/ui/card-footer-button-size.lib'
+export { resolveSurfaceActionButtonSize } from './components/ui/surface-action-button-size.lib'
 export { resolveHeadingAccessoryBadgeSize } from './components/ui/heading-accessory-size.lib'
 export {
   SelectionTarget,

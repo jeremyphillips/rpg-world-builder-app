@@ -575,23 +575,13 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
         requiredProperties: ['border-color', 'background-color', 'color'] as const,
       })),
       {
-        modifierPrefix: 'ui-alert--comfortable',
-        requiredProperties: ['gap', 'padding'] as const,
+        modifierPrefix: 'ui-alert',
+        requiredProperties: ['padding-block', 'padding-inline', 'gap'] as const,
       },
       {
-        modifierPrefix: 'ui-alert--compact',
-        requiredProperties: ['gap', 'padding-inline', 'padding-block'] as const,
+        modifierPrefix: 'ui-alert__title',
+        requiredProperties: ['font-weight', 'color'] as const,
       },
-      ...(['comfortable', 'compact'] as const).map((density) => ({
-        modifierPrefix: `ui-alert__title--${density}`,
-        requiredProperties: [
-          'font-size',
-          'line-height',
-          'font-weight',
-          'letter-spacing',
-          'color',
-        ] as const,
-      })),
     ],
   },
   {

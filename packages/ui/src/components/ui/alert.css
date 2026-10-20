@@ -5,17 +5,13 @@
 @layer components {
   .ui-alert {
     display: flex;
-    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--ui-surface-region-gap, calc(var(--spacing) * 3));
     border-radius: var(--radius-lg);
     border-width: 1px;
     border-style: solid;
-  }
-
-  @media (width >= 40rem) {
-    .ui-alert {
-      flex-direction: row;
-      align-items: flex-start;
-    }
+    padding-block: var(--ui-surface-inset-block, calc(var(--spacing) * 3));
+    padding-inline: var(--ui-surface-inset-inline, calc(var(--spacing) * 5));
   }
 
   .ui-alert--default {
@@ -49,36 +45,48 @@
     color: var(--foreground);
   }
 
-  .ui-alert--comfortable {
-    gap: calc(var(--spacing) * 3);
-    padding: calc(var(--spacing) * 4);
+  .ui-alert__leading {
+    display: flex;
+    flex-shrink: 0;
+    align-items: flex-start;
+    padding-top: calc(var(--spacing) * 0.5);
   }
 
-  .ui-alert--compact {
+  .ui-alert__main {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--ui-surface-region-gap, calc(var(--spacing) * 3));
+  }
+
+  .ui-alert__copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
     gap: calc(var(--spacing) * 2);
-    padding-inline: calc(var(--spacing) * 3);
-    padding-block: calc(var(--spacing) * 2.5);
   }
 
-  .ui-alert__title--comfortable {
-    font-size: var(--text-heading-compact);
-    line-height: var(--leading-none);
+  .ui-alert__title {
+    margin: 0;
     font-weight: var(--font-weight-heading);
-    letter-spacing: var(--tracking-heading);
     color: var(--foreground);
   }
 
-  .ui-alert__title--compact {
-    font-size: var(--text-sm);
-    line-height: var(--text-sm--line-height);
+  .ui-alert--compact .ui-alert__title {
     font-weight: var(--font-weight-body-emphasis);
     letter-spacing: normal;
-    color: var(--foreground);
   }
 
   .ui-alert__description {
-    font-size: var(--text-sm);
-    line-height: var(--text-sm--line-height);
+    margin: 0;
     color: var(--muted-foreground);
+  }
+
+  .ui-alert__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
   }
 }
