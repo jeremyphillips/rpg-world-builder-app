@@ -66,20 +66,7 @@ const dashboardEntitySurfaceImportGuard = {
     'no-restricted-imports': [
       'error',
       {
-        paths: [
-          {
-            name: '@rpg/ui',
-            importNames: ['ContentCardHeading'],
-            message:
-              'Entity identity must compose EntityAnatomyHost, ContentEntityCard, or DisclosureEntityCard. ContentCardHeading is internal to the entity surface.',
-          },
-          {
-            name: '@rpg/ui',
-            importNames: ['ContentCardBody'],
-            message:
-              'Entity presentation must compose EntityAnatomyHost, ContentEntityCard, or DisclosureEntityCard. ContentCardBody is internal to the entity surface.',
-          },
-        ],
+        paths: [],
       },
     ],
   },
@@ -431,18 +418,6 @@ const dashboardAuthApiContractsImportGuard = {
             name: '@rpg/contracts',
             message:
               'Import @rpg/contracts/vocab, /shared, /runtime, /content, or another subpath. A root import invalidates this module on every contracts save.',
-          },
-          {
-            name: '@rpg/ui',
-            importNames: ['ContentCardHeading'],
-            message:
-              'Entity identity must compose EntityAnatomyHost, ContentEntityCard, or DisclosureEntityCard. ContentCardHeading is internal to the entity surface.',
-          },
-          {
-            name: '@rpg/ui',
-            importNames: ['ContentCardBody'],
-            message:
-              'Entity presentation must compose EntityAnatomyHost, ContentEntityCard, or DisclosureEntityCard. ContentCardBody is internal to the entity surface.',
           },
           {
             name: '@rpg/ui',

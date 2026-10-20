@@ -848,28 +848,13 @@ export {
   type PreviewRailStatusPanelVariant,
   type PreviewRailStatusTone,
 } from './components/preview-rail'
-export { ContentCard, type ContentCardProps } from './components/ui/content-card.client'
-export {
-  ContentCardBody,
-  type ContentCardBodyProps,
-} from './components/ui/content-card-body.client'
-export {
-  ContentCardHeading,
-  type ContentCardHeadingProps,
-} from './components/ui/content-card-heading.client'
 export {
   ContentCardHeadingAction,
-  ContentCardIconAction,
   type ContentCardHeadingActionProps,
-  type ContentCardIconActionProps,
 } from './components/ui/content-card-actions.client'
 export {
   ContentCardMedia,
-  ContentCardRemoveButton,
-  CONTENT_CARD_REMOVE_LABEL_PREFIX,
-  formatContentCardRemoveLabel,
   type ContentCardMediaProps,
-  type ContentCardRemoveButtonProps,
 } from './components/ui/content-card-parts.client'
 export {
   ContentDisplayFallbackIcon,

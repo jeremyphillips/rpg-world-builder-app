@@ -1,9 +1,7 @@
 'use client'
 
 import type { ContentDisplayFallback } from '@rpg/contracts'
-import { cn } from '../../lib/utils'
-import { ActionIcon } from './action-icon.client'
-import { contentCardRemoveButtonVariants } from './content-card.variants'
+
 import { ContentDisplayFallbackIcon } from './content-display-fallback-icon.client'
 import { IdentityFrame } from './identity-frame.client'
 import type { ContentCardDensity } from './content-card.variants'
@@ -38,36 +36,5 @@ export function ContentCardMedia({
       className={className}
       fallback={<ContentDisplayFallbackIcon fallback={fallback} size={frameSize} />}
     />
-  )
-}
-
-export const CONTENT_CARD_REMOVE_LABEL_PREFIX = 'Remove' as const
-
-export function formatContentCardRemoveLabel(label: string): string {
-  return `${CONTENT_CARD_REMOVE_LABEL_PREFIX} ${label}`
-}
-
-export type ContentCardRemoveButtonProps = {
-  label: string
-  removeAriaLabel?: string
-  onRemove: () => void
-  className?: string
-}
-
-export function ContentCardRemoveButton({
-  label,
-  removeAriaLabel,
-  onRemove,
-  className,
-}: ContentCardRemoveButtonProps) {
-  return (
-    <button
-      type="button"
-      className={cn(contentCardRemoveButtonVariants(), className)}
-      aria-label={removeAriaLabel ?? formatContentCardRemoveLabel(label)}
-      onClick={onRemove}
-    >
-      <ActionIcon action="remove" step="md" />
-    </button>
   )
 }

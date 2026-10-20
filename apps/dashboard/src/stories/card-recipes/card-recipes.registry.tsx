@@ -7,7 +7,8 @@ import {
   Badge,
   Button,
   ComboboxOptionRow,
-  ContentCard,
+  Card,
+  CardHeader,
   CollapsibleListItem,
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,7 @@ import {
   Field,
   FieldLayout,
   IdentityRow,
+  IdentityRowHeadingLine,
   Input,
   InteractiveList,
   InteractiveListRow,
@@ -606,22 +608,25 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     render: () => <CollapsibleListItemRecipe />,
   },
   {
-    name: 'Content card',
+    name: 'Generic card + identity heading',
     section: 'ui-cards-form-rows',
-    component: 'ContentCard',
-    chain: ['ContentCard', 'ContentCardBody'],
-    useWhen: '@rpg/ui consumers outside the dashboard entity family (e.g. public app).',
+    component: 'Card',
+    chain: ['Card', 'CardHeader', 'IdentityRowHeadingLine'],
+    useWhen: 'Hub and roster tiles — generic Card shell with shared identity heading anatomy.',
     density: 'comfortable',
-    leading: 'media',
-    trailing: 'endSlot',
+    leading: 'leadMedia (optional)',
+    trailing: 'CardFooter actions',
     anatomy: 'different',
     render: () => (
-      <ContentCard
-        heading="Harbor District"
-        subheading="Located in Grey Coast"
-        metadata="Settlement"
-        endSlot={<Badge tone="warning">Unavailable</Badge>}
-      />
+      <Card density="comfortable" className="max-w-sm">
+        <CardHeader>
+          <IdentityRowHeadingLine
+            heading="Harbor District"
+            classification="Settlement"
+            headingEnd={<Badge tone="warning">Unavailable</Badge>}
+          />
+        </CardHeader>
+      </Card>
     ),
   },
   {

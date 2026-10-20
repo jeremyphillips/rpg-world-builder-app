@@ -27,7 +27,7 @@ const UI_ROW_PRIMITIVES = [
   'InteractiveListRow',
   'ComboboxOptionRow',
   'MenuChoiceRow',
-  'ContentCard',
+  'Card',
   'SelectionOptionCard',
   'SelectionSummaryCard',
   'CollapsibleListItem',

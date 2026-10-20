@@ -60,6 +60,7 @@ describe('CharacterListCard', () => {
     const heading = screen.getByRole('heading', { name: 'Verna', level: 3 })
     expect(screen.getByText('Inactive')).toBeInTheDocument()
     expect(heading).not.toContainElement(screen.getByText('Inactive'))
+    expect(screen.getByText('Inactive')).toHaveClass('ui-compact-label--sm')
   })
 
   it('hides campaign metadata when showCampaign is false', () => {

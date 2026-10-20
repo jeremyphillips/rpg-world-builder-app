@@ -15,10 +15,10 @@ import { alertTitleVariants } from '../ui/alert.variants'
 import { ScrollBoundaryRegion } from '../ui/scroll-boundary-region.client'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button.client'
-import { ContentCardHeading } from '../ui/content-card-heading.client'
+import { IdentityRowHeadingLine } from '../ui/identity-row.client'
 import { ContentCardMedia } from '../ui/content-card-parts.client'
 import { IconContainer } from '../ui/icon-container.client'
-import { contentCardMediaVariants } from '../ui/content-card.variants'
+import { contentCardHeadingScaleClass, contentCardMediaVariants } from '../ui/content-card.variants'
 import { Eyebrow } from '../ui/eyebrow'
 import { Heading } from '../ui/heading'
 import { SemanticText } from '../ui/semantic-text/semantic-text'
@@ -233,7 +233,9 @@ function PreviewRailIdentity({ media, name, status, facts }: PreviewRailIdentity
           {media}
           <div className={previewRailIdentityContentClasses}>
             <div className={previewRailIdentityHeadingBandClasses}>
-              <ContentCardHeading heading={name} density="comfortable" />
+              <div className={cn(contentCardHeadingScaleClass('comfortable'), 'min-w-0')}>
+                <IdentityRowHeadingLine heading={name} />
+              </div>
             </div>
             {status ? <div className={previewRailIdentitySubheadlineClasses}>{status}</div> : null}
           </div>

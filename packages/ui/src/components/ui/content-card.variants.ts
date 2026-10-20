@@ -3,7 +3,6 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
 import { cardDensityClassName, UI_CONTENT_CARD_INSET_CLASS } from './card.variants'
 import { resolveCompactControlRecipeClasses } from './compact-control.styles'
-import { iconGhostControlVariants } from './icon-ghost-control.variants'
 
 /** @deprecated Prefer {@link cardDensityClassName} + {@link UI_CONTENT_CARD_INSET_CLASS}. */
 export const contentCardDensityInsetVariants = cva('', {
@@ -96,7 +95,6 @@ export const contentCardHeadingRowVariants = cva('flex min-w-0 items-center gap-
     rhythm: {
       none: '',
       secondary: 'mb-1',
-      withHeadingEndSlot: 'mb-0',
     },
   },
   defaultVariants: {
@@ -131,14 +129,6 @@ export const contentCardSubheadingVariants = supportingTextDensityVariants
 
 export const contentCardMetadataVariants = supportingTextDensityVariants
 
-export const contentCardIconActionVariants = cva(
-  iconGhostControlVariants({ hover: 'accent', layout: 'inline' }),
-)
-
-export const contentCardRemoveButtonVariants = cva(
-  iconGhostControlVariants({ hover: 'destructive', layout: 'inline' }),
-)
-
 /** Heading-row actions stay compact regardless of card density. Link actions use pr-0. */
 export const contentCardHeadingActionVariants = cva(
   cn(
@@ -146,8 +136,6 @@ export const contentCardHeadingActionVariants = cva(
     resolveCompactControlRecipeClasses('text-compact', { includeBlock: false }),
   ),
 )
-
-export const contentCardHeadingEndSlotVariants = cva('shrink-0 text-sm')
 
 /** Linked entity headings — link color only; no hover underline. */
 export const contentCardHeadingLinkVariants = cva('text-link')

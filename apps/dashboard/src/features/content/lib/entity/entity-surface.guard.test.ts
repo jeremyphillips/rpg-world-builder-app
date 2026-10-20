@@ -5,9 +5,8 @@ import { describe, expect, it } from 'vitest'
 
 const REPO_ROOT = join(__dirname, '../../../../../../..')
 const FEATURE_ROOT = join(REPO_ROOT, 'apps/dashboard/src/features')
-const INTERNAL_ENTITY_FILES = new Set([
+const INTERNAL_ENTITY_FRAME_FILES = new Set([
   'content/lib/entity/surfaces/cards/content/content-entity-card.tsx',
-  'content/lib/entity/summary/entity-summary.tsx',
 ])
 
 function sourceFiles(directory: string): string[] {
@@ -25,14 +24,12 @@ function featureImplementationFiles(): string[] {
 }
 
 describe('entity surface architecture guard', () => {
-  it('keeps ContentCardHeading and ContentCardBody internal to entity surfaces', () => {
+  it('does not import retired ContentCard shell components from @rpg/ui', () => {
     for (const path of featureImplementationFiles()) {
       const relativePath = relative(FEATURE_ROOT, path)
-      if (INTERNAL_ENTITY_FILES.has(relativePath)) continue
-
       const source = readFileSync(path, 'utf8')
-      expect(source, `${relativePath} must not compose entity heading internals`).not.toMatch(
-        /\bContentCardHeading\b|\bContentCardBody\b/,
+      expect(source, `${relativePath} must not import retired ContentCard shell`).not.toMatch(
+        /\bimport\s+\{[^}]*\b(?:ContentCard|ContentCardBody|ContentCardHeading)\b/,
       )
     }
   })
@@ -40,7 +37,10 @@ describe('entity surface architecture guard', () => {
   it('does not expose EntityCardFrame outside entity internals', () => {
     for (const path of featureImplementationFiles()) {
       const relativePath = relative(FEATURE_ROOT, path)
-      if (relativePath.startsWith('content/lib/entity/') || INTERNAL_ENTITY_FILES.has(relativePath))
+      if (
+        relativePath.startsWith('content/lib/entity/') ||
+        INTERNAL_ENTITY_FRAME_FILES.has(relativePath)
+      )
         continue
 
       const source = readFileSync(path, 'utf8')

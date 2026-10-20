@@ -10,11 +10,13 @@ import {
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   identityRowStackVariants,
+  type GenericCardDensity,
 } from '@rpg/ui'
 
 import { BuilderOptionCardImage } from './builder/steps/shared/builder-option-card-image'
 import { CampaignDisplayName, buildCampaignDisplay } from '@/features/campaign'
 
+import { resolveHeadingAccessoryBadgeSize } from '../lib/heading-accessory-size.lib'
 import { resolveCharacterRosterStatusPresentation } from '../lib/campaign-roster-presentation'
 import type { CharacterListCardData } from './character-list-card.lib'
 
@@ -24,6 +26,7 @@ export type CharacterListCardProps = {
   showCampaign?: boolean
   controllerLine?: string
   rosterStatus?: CharacterRosterStatus
+  density?: GenericCardDensity
 }
 
 type CharacterListCardHeaderProps = {
@@ -31,6 +34,7 @@ type CharacterListCardHeaderProps = {
   showCampaign: boolean
   controllerLine?: string
   rosterPresentation: ReturnType<typeof resolveCharacterRosterStatusPresentation> | null
+  density: GenericCardDensity
 }
 
 function CharacterListCardHeader({
@@ -38,7 +42,9 @@ function CharacterListCardHeader({
   showCampaign,
   controllerLine,
   rosterPresentation,
+  density,
 }: CharacterListCardHeaderProps) {
+  const headingAccessoryBadgeSize = resolveHeadingAccessoryBadgeSize(density)
   const campaignLine =
     showCampaign && card.campaign ? (
       <CampaignDisplayName
@@ -58,7 +64,11 @@ function CharacterListCardHeader({
           heading={<h3>{card.name}</h3>}
           headingEnd={
             rosterPresentation ? (
-              <Badge appearance={rosterPresentation.appearance} tone={rosterPresentation.tone}>
+              <Badge
+                appearance={rosterPresentation.appearance}
+                tone={rosterPresentation.tone}
+                size={headingAccessoryBadgeSize}
+              >
                 {rosterPresentation.label}
               </Badge>
             ) : undefined
@@ -81,6 +91,7 @@ export function CharacterListCard({
   showCampaign = true,
   controllerLine,
   rosterStatus,
+  density = 'comfortable',
 }: CharacterListCardProps) {
   const rosterPresentation = rosterStatus
     ? resolveCharacterRosterStatusPresentation(rosterStatus)
@@ -88,6 +99,7 @@ export function CharacterListCard({
 
   return (
     <Card
+      density={density}
       stretch
       leadMedia={
         card.displayImagesByRole?.primary ? (
@@ -100,6 +112,7 @@ export function CharacterListCard({
         showCampaign={showCampaign}
         controllerLine={controllerLine}
         rosterPresentation={rosterPresentation}
+        density={density}
       />
       <CardFooter>
         <Link to={detailHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>

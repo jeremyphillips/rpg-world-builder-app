@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Button } from './button.client'
-import { Card } from './card'
-import { ContentCard } from './content-card.client'
+import { Card, CardHeader } from './card'
 import { CARD_CLASS_SPECS, UI_CARD_CONTENT_CLASS } from './card.variants'
+import { IdentityRowHeadingLine } from './identity-row.client'
 import { Input } from './input.client'
 import { RadioOptionCard } from './radio-option-card.client'
 import { RadioGroup } from './radio-group.client'
@@ -148,18 +148,17 @@ export const DensityTypography: Story = {
         </div>
       </section>
       <section className="space-y-3">
-        <h2 className="text-style-label">Content card — comfortable 16px, spacious 19px</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <ContentCard
-            density="comfortable"
-            heading="Harbor District"
-            subheading="Comfortable supporting copy"
-          />
-          <ContentCard
-            density="spacious"
-            heading="Harbor District"
-            subheading="Spacious supporting copy"
-          />
+        <h2 className="text-style-label">Card + identity heading — density copy ladder</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          {(['compact', 'comfortable', 'spacious'] as const).map((density) => (
+            <Card key={density} density={density} className="w-full">
+              <CardHeader>
+                <div data-testid={`card-identity-title-${density}`}>
+                  <IdentityRowHeadingLine heading={<h3>Harbor District</h3>} />
+                </div>
+              </CardHeader>
+            </Card>
+          ))}
         </div>
       </section>
       <section className="space-y-3">

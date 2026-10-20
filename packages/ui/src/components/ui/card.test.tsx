@@ -1,8 +1,12 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './card'
+import { IdentityRowHeadingLine } from './identity-row.client'
 import {
   UI_CARD_CONTENT_CLASS,
   UI_CARD_DESCRIPTION_CLASS,
@@ -458,4 +462,86 @@ describe('Card compound escape hatch', () => {
       container.firstElementChild,
     )
   })
+})
+
+const copyScaleCss = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), 'copy-scale.css'),
+  'utf8',
+)
+  .replace('@layer components {', '')
+  .replace(/\n}\s*$/, '')
+
+const identityTitleCss = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), 'identity-row.css'),
+  'utf8',
+)
+  .replace('@layer components {', '')
+  .replace(/\n}\s*$/, '')
+
+const COPY_SCALE_TEST_TOKENS = `
+  :root {
+    --text-xs: 12px;
+    --text-sm: 14px;
+    --text-base: 16px;
+    --text-heading-card: 19px;
+    --text-xs--line-height: 16px;
+    --text-sm--line-height: 20px;
+    --text-base--line-height: 24px;
+    --text-heading-card--line-height: 25px;
+    --spacing: 4px;
+    --tracking-heading: 0;
+    --font-weight-body-emphasis: 600;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --foreground: #111;
+    --muted-foreground: #666;
+  }
+`
+
+function resolvedTitleCopySize(testId: string): string {
+  const tokenPx: Record<string, string> = {
+    '--text-sm': '14px',
+    '--text-base': '16px',
+    '--text-heading-card': '19px',
+  }
+  let node: Element | null = screen.getByTestId(testId)
+  while (node) {
+    const specified = getComputedStyle(node).getPropertyValue('--ui-copy-title-size').trim()
+    const token = specified.match(/^var\((--[^)]+)\)$/)?.[1]
+    if (token && tokenPx[token]) return tokenPx[token]
+    node = node.parentElement
+  }
+  return '16px'
+}
+
+describe('Card identity heading copy scale', () => {
+  let styleEl: HTMLStyleElement
+
+  beforeAll(() => {
+    styleEl = document.createElement('style')
+    styleEl.textContent = `${COPY_SCALE_TEST_TOKENS}\n${copyScaleCss}\n${identityTitleCss}`
+    document.head.appendChild(styleEl)
+  })
+
+  afterAll(() => {
+    styleEl.remove()
+  })
+
+  it.each([
+    ['compact', '14px'],
+    ['comfortable', '16px'],
+    ['spacious', '19px'],
+  ] as const)(
+    'inherits %s title size on IdentityRowHeadingLine inside CardHeader',
+    (density, px) => {
+      render(
+        <Card density={density}>
+          <CardHeader>
+            <IdentityRowHeadingLine heading={<h3 data-testid={`title-${density}`}>Title</h3>} />
+          </CardHeader>
+        </Card>,
+      )
+      expect(resolvedTitleCopySize(`title-${density}`)).toBe(px)
+    },
+  )
 })

@@ -106,10 +106,7 @@ function ResourceSummaryRow({
 }) {
   const hasSecondaryText = Boolean(subheading || metadata)
   const crossAxis = resolveContentCardBodyCrossAxis(hasSecondaryText)
-  const headingRowRhythm = resolveContentCardHeadingRowRhythm({
-    hasSecondaryText,
-    hasHeadingEndSlot: false,
-  })
+  const headingRowRhythm = resolveContentCardHeadingRowRhythm({ hasSecondaryText })
 
   return (
     <div className={contentCardBodyVariants({ density, crossAxis })}>

@@ -644,7 +644,9 @@ Character builder selection rows always use `metadata` and get their items from
 `resolveSelectionRowStatusItems`. Do not build them by hand. See
 [character-builder-picker-chrome.md](./character-builder-picker-chrome.md#selection-row-status-guidance-and-context-policy).
 
-EntitySummary owns badge presentation. Badge size follows density: **compact → `sm`**, **comfortable → `md`**. Consumers must not pass hand-built `<Badge size="…">` or local `mt-1` around entity status.
+EntitySummary owns badge presentation in the **status lane**. Badge size follows density: **compact → `sm`**, **comfortable → `md`** (`resolveStatusBadgeSize`). Consumers must not pass hand-built `<Badge size="…">` or local `mt-1` around entity status.
+
+Title-line **heading accessories** (badges beside `IdentityRowHeadingLine.headingEnd` on generic `Card` stacks) use a separate policy — compact/comfortable → `sm`, spacious → `md`; pass explicit `Badge size` at the call site. See [packages/ui/docs/row-anatomy.md](../../../packages/ui/docs/row-anatomy.md#heading-accessories). **`headingEndValue`** numerals keep title-scale emphasis and are not badge accessories.
 
 ---
 
@@ -692,8 +694,8 @@ Typed cross-content edges on detail pages use `EntityRowList.Row` →
 inset, header/body, or divider styling props. Provide semantic data and controls
 through `entity`, `leading`, `trailing`, `headingHref`, and DEC `children` only.
 
-`ContentCardHeading`, `ContentCardBody`, `EntityCardFrame`, `EntityAnatomy`, and
-`EntityLeadingRail` are internal implementation details. Feature code uses the entity
+The legacy `@rpg/ui` `ContentCard` shell (`ContentCard`, `ContentCardBody`, `ContentCardHeading`) is retired. `EntityCardFrame`, `EntityAnatomy`, and
+`EntityLeadingRail` remain internal implementation details. Feature code uses the entity
 surfaces above rather than composing those internals directly.
 
 ---

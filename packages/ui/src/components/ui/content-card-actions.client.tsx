@@ -4,26 +4,7 @@ import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '../../lib/utils'
-import {
-  contentCardHeadingActionVariants,
-  contentCardIconActionVariants,
-} from './content-card.variants'
-
-export type ContentCardIconActionProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  asChild?: boolean
-}
-
-export function ContentCardIconAction({
-  asChild = false,
-  className,
-  type = 'button',
-  ...props
-}: ContentCardIconActionProps) {
-  const resolvedClassName = cn(contentCardIconActionVariants(), className)
-  const Comp = asChild ? Slot : 'button'
-
-  return <Comp className={resolvedClassName} type={asChild ? undefined : type} {...props} />
-}
+import { contentCardHeadingActionVariants } from './content-card.variants'
 
 export type ContentCardHeadingActionProps = React.HTMLAttributes<HTMLElement> & {
   asChild?: boolean

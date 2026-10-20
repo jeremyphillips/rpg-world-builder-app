@@ -19,7 +19,7 @@ Lucide remains the default glyph set. **One owner per semantic role** — charac
 
 ## Actions
 
-`ActionButton` accepts only `action` (closed verb) plus normal `Button` props. It does not accept custom glyphs, `icon`, or destructive styling for `remove`. Use `ArrayItemRemoveButton`, `ContentCardRemoveButton`, or explicit `variant` on the button.
+`ActionButton` accepts only `action` (closed verb) plus normal `Button` props. It does not accept custom glyphs, `icon`, or destructive styling for `remove`. Use `ArrayItemRemoveButton` or explicit `variant` on the button.
 
 Domain verbs (`invite`, `addMedia`, `compose`) are explicit keys, not overloads of `add`.
 
