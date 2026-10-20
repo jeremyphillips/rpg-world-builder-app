@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { DASH_ENTITY_CARD_BODY_CLASS } from '../../../dash-entity-surface.variants'
-import { disclosureEntityCardBodyWashVariants } from '../disclosure-entity-card.variants'
+import { disclosureEntityCardBodyWashVariants } from '../entity-card-disclosure-renderer.variants'
 
 describe('disclosure entity card body wash', () => {
   it('uses dash-entity-card__body for expanded inline inset', () => {

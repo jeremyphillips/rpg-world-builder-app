@@ -43,7 +43,7 @@ export const EmbeddedWithAction: Story = {
   ),
 }
 
-export const ContentEntityCardComfortable: Story = {
+export const EntityCardComfortable: Story = {
   render: () => (
     <div className="max-w-md">
       <EntityCard entity={HARBOR_DISTRICT_ENTITY} />

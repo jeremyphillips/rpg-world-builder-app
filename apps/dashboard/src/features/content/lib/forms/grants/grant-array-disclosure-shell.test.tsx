@@ -112,7 +112,7 @@ function getGrantRow(prefix: string): HTMLElement {
   return document.querySelector(`[data-array-item-prefix="${prefix}"]`) as HTMLElement
 }
 
-describe('grant array DisclosureEntityCard shell', () => {
+describe('grant array EntityCardDisclosureRenderer shell', () => {
   it('renders entity summary, grip + caret, delete, and shell-owned body alignment', async () => {
     const user = userEvent.setup()
 

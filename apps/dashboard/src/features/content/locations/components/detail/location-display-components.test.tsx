@@ -43,7 +43,7 @@ describe('LocationDetailIdentity', () => {
   })
 })
 
-describe('ContentEntityCard (location rows)', () => {
+describe('EntityCardStaticRenderer (location rows)', () => {
   it('renders title and summary line', () => {
     render(
       <MemoryRouter>

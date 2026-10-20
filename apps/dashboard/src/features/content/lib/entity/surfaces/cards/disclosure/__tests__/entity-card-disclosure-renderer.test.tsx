@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { ActionIcon, iconGhostControlVariants } from '@rpg/ui'
 
-import { DisclosureEntityCard } from '../disclosure-entity-card'
+import { EntityCardDisclosureRenderer } from '../entity-card-disclosure-renderer'
 import { DASH_ENTITY_CARD_BODY_CLASS } from '../../../dash-entity-surface.variants'
 import { HARBOR_DISTRICT_ENTITY } from '../../../../__tests__/entity.fixture'
 
@@ -37,18 +37,18 @@ function ghostRemoveUtility(label: string) {
   )
 }
 
-describe('DisclosureEntityCard', () => {
+describe('EntityCardDisclosureRenderer', () => {
   it('renders entity identity and hides body when collapsed by default', () => {
     render(
       <MemoryRouter>
-        <DisclosureEntityCard
+        <EntityCardDisclosureRenderer
           itemId="harbor"
           toolbarAriaLabel="Harbor District"
           entity={HARBOR_DISTRICT_ENTITY}
           headingHref="/campaigns/demo/locations/harbor"
         >
           <p>Expanded inventory details</p>
-        </DisclosureEntityCard>
+        </EntityCardDisclosureRenderer>
       </MemoryRouter>,
     )
 
@@ -62,14 +62,14 @@ describe('DisclosureEntityCard', () => {
 
   it('expands body content and keeps the header/body divider on the disclosure shell', () => {
     const { container } = render(
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
         defaultCollapsed={false}
       >
         <p>Expanded inventory details</p>
-      </DisclosureEntityCard>,
+      </EntityCardDisclosureRenderer>,
     )
 
     const body = screen.getByText('Expanded inventory details').parentElement
@@ -113,7 +113,7 @@ describe('DisclosureEntityCard', () => {
     render(
       <div>
         {cases.map((entry) => (
-          <DisclosureEntityCard
+          <EntityCardDisclosureRenderer
             key={entry.id}
             itemId={entry.id}
             toolbarAriaLabel={entry.id}
@@ -123,7 +123,7 @@ describe('DisclosureEntityCard', () => {
             defaultCollapsed={false}
           >
             <p>{entry.label}</p>
-          </DisclosureEntityCard>
+          </EntityCardDisclosureRenderer>
         ))}
       </div>,
     )
@@ -137,7 +137,7 @@ describe('DisclosureEntityCard', () => {
 
   it('publishes compact surface inset tokens and utility end inset for ghost trailing', () => {
     const { container } = render(
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
@@ -146,7 +146,7 @@ describe('DisclosureEntityCard', () => {
         defaultCollapsed={false}
       >
         <p>Compact body</p>
-      </DisclosureEntityCard>,
+      </EntityCardDisclosureRenderer>,
     )
 
     const shell = container.querySelector('[role="group"]') as HTMLElement
@@ -163,7 +163,7 @@ describe('DisclosureEntityCard', () => {
     const onToggleCollapse = vi.fn()
 
     render(
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
@@ -171,7 +171,7 @@ describe('DisclosureEntityCard', () => {
         onToggleCollapse={onToggleCollapse}
       >
         <p>Expanded inventory details</p>
-      </DisclosureEntityCard>,
+      </EntityCardDisclosureRenderer>,
     )
 
     await user.click(screen.getByRole('button', { name: 'Expand Harbor District' }))
@@ -180,14 +180,14 @@ describe('DisclosureEntityCard', () => {
 
   it('uses equal-width leading chrome columns for grip and caret', () => {
     render(
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
         dragHandleProps={mockDragHandleProps}
       >
         <p>Expanded inventory details</p>
-      </DisclosureEntityCard>,
+      </EntityCardDisclosureRenderer>,
     )
 
     const expandButton = screen.getByRole('button', { name: 'Expand Harbor District' })
@@ -199,13 +199,13 @@ describe('DisclosureEntityCard', () => {
 
   it('renders caret-only leading chrome when drag is omitted', () => {
     const { container } = render(
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
       >
         <p>Expanded inventory details</p>
-      </DisclosureEntityCard>,
+      </EntityCardDisclosureRenderer>,
     )
 
     const article = container.querySelector('article') as HTMLElement
@@ -216,14 +216,14 @@ describe('DisclosureEntityCard', () => {
 
   it('applies presentational disabled treatment on the outer shell', () => {
     const { container } = render(
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
         disabled
       >
         <p>Expanded inventory details</p>
-      </DisclosureEntityCard>,
+      </EntityCardDisclosureRenderer>,
     )
 
     const article = container.querySelector('article')
@@ -234,14 +234,14 @@ describe('DisclosureEntityCard', () => {
   it('owns quiet card fill independent of parent host surfaces', () => {
     const { container } = render(
       <div className="bg-surface-muted">
-        <DisclosureEntityCard
+        <EntityCardDisclosureRenderer
           itemId="harbor"
           toolbarAriaLabel="Harbor District"
           entity={HARBOR_DISTRICT_ENTITY}
           defaultCollapsed={false}
         >
           <p>Expanded inventory details</p>
-        </DisclosureEntityCard>
+        </EntityCardDisclosureRenderer>
       </div>,
     )
 
@@ -252,7 +252,7 @@ describe('DisclosureEntityCard', () => {
 
   it('forwards trailing seam to EntityAnatomyHost anatomy', () => {
     render(
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
@@ -260,7 +260,7 @@ describe('DisclosureEntityCard', () => {
         defaultCollapsed={false}
       >
         <p>Expanded inventory details</p>
-      </DisclosureEntityCard>,
+      </EntityCardDisclosureRenderer>,
     )
 
     expect(screen.getByRole('button', { name: 'Remove Harbor District' })).toBeInTheDocument()
@@ -269,7 +269,7 @@ describe('DisclosureEntityCard', () => {
   it('fills the header region so short-heading trailing aligns to column 3', () => {
     const { container } = render(
       <div className="w-[480px]">
-        <DisclosureEntityCard
+        <EntityCardDisclosureRenderer
           itemId="short-heading"
           toolbarAriaLabel="Harbor District"
           entity={{ heading: 'Light' }}
@@ -278,7 +278,7 @@ describe('DisclosureEntityCard', () => {
           defaultCollapsed={false}
         >
           <p>Body</p>
-        </DisclosureEntityCard>
+        </EntityCardDisclosureRenderer>
       </div>,
     )
 
@@ -301,7 +301,7 @@ describe('DisclosureEntityCard', () => {
   it('keeps trailing in column 3 when heading and description wrap', () => {
     const { container } = render(
       <div className="w-[320px]">
-        <DisclosureEntityCard
+        <EntityCardDisclosureRenderer
           itemId="long-heading"
           toolbarAriaLabel="Grants · Speak with Animals"
           entity={{
@@ -316,7 +316,7 @@ describe('DisclosureEntityCard', () => {
           defaultCollapsed={false}
         >
           <p>Body</p>
-        </DisclosureEntityCard>
+        </EntityCardDisclosureRenderer>
       </div>,
     )
 
@@ -340,7 +340,7 @@ describe('DisclosureEntityCard', () => {
 
   it('does not merge legacy CLI body inset when rowLayout is entity-card', () => {
     const { container } = render(
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
@@ -349,7 +349,7 @@ describe('DisclosureEntityCard', () => {
         defaultCollapsed={false}
       >
         <p>Isolated body</p>
-      </DisclosureEntityCard>,
+      </EntityCardDisclosureRenderer>,
     )
 
     const body = bodyFor('Isolated body')
@@ -372,7 +372,7 @@ describe('DisclosureEntityCard', () => {
 
   it('matches leading offset to grip+caret count on the article root', () => {
     const { container } = render(
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
@@ -380,7 +380,7 @@ describe('DisclosureEntityCard', () => {
         defaultCollapsed={false}
       >
         <p>Grip and caret body</p>
-      </DisclosureEntityCard>,
+      </EntityCardDisclosureRenderer>,
     )
 
     const article = container.querySelector('article') as HTMLElement
@@ -389,14 +389,14 @@ describe('DisclosureEntityCard', () => {
 
   it('matches leading offset to caret-only count on the article root', () => {
     const { container } = render(
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
         defaultCollapsed={false}
       >
         <p>Caret-only body</p>
-      </DisclosureEntityCard>,
+      </EntityCardDisclosureRenderer>,
     )
 
     const article = container.querySelector('article') as HTMLElement
@@ -405,7 +405,7 @@ describe('DisclosureEntityCard', () => {
 
   it('composes entity-card CLI behavior-only with a single leading rail and two columns', () => {
     const { container } = render(
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
@@ -413,7 +413,7 @@ describe('DisclosureEntityCard', () => {
         defaultCollapsed={false}
       >
         <p>Combined invariant body</p>
-      </DisclosureEntityCard>,
+      </EntityCardDisclosureRenderer>,
     )
 
     const leadingSlot = container.querySelector('[data-entity-item-slot="leading"]') as HTMLElement

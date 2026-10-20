@@ -61,7 +61,7 @@ describe('Entity card host contract (single inset owner)', () => {
     }
   })
 
-  it('renders exactly one EntityCardContent region on CEC, DEC, and CatalogCard', () => {
+  it('renders exactly one EntityCardContent region on EntityCard static, disclosure, and CatalogCard', () => {
     const { container: cecContainer } = render(
       <MemoryRouter>
         <EntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />

@@ -95,7 +95,7 @@ Companion primitives (composed by features, not imported by `DetailEntityRow` it
 | `DetailEntityRowActions` | Layout-only trailing control cluster                                                          |
 | `DetailOverflowMenu`     | Detail-surface compact overflow menu ([`detail-overflow-menu.tsx`](detail-overflow-menu.tsx)) |
 
-`DetailOverflowMenu` also appears on `ContentEntityCard` in building-orgs create — a
+`DetailOverflowMenu` also appears on `EntityCardStaticRenderer` in building-orgs create — a
 documented cross-surface reuse of detail overflow chrome, not entity-surface ownership.
 
 ## Folder layout

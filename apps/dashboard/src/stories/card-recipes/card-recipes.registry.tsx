@@ -91,7 +91,7 @@ function SelectAction() {
   )
 }
 
-function DisclosureEntityCardRecipe() {
+function EntityCardDisclosureRecipe() {
   const [collapsed, setCollapsed] = useState(true)
   return (
     <EntityCard
@@ -141,7 +141,7 @@ function ArrayItemShellRecipe() {
   )
 }
 
-function CatalogEntityRowRecipe() {
+function CatalogCardRecipe() {
   const [collapsed, setCollapsed] = useState(true)
   return (
     <CatalogCard
@@ -280,7 +280,7 @@ const ENTITY_CHAIN = ['EntityCardFrame', 'EntityAnatomyHost', 'EntityAnatomy', '
 
 export const CARD_RECIPES: readonly CardRecipe[] = [
   {
-    name: 'Content entity card — action',
+    name: 'Entity card (static) — action',
     section: 'entity-surfaces',
     component: 'EntityCard',
     chain: ['EntityCard', ...ENTITY_CHAIN],
@@ -302,7 +302,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     ),
   },
   {
-    name: 'Content entity card — media and status',
+    name: 'Entity card (static) — media and status',
     section: 'entity-surfaces',
     component: 'EntityCard',
     chain: ['EntityCard', ...ENTITY_CHAIN],
@@ -330,7 +330,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     ),
   },
   {
-    name: 'Content entity card — stepper utility',
+    name: 'Entity card (static) — stepper utility',
     section: 'entity-surfaces',
     component: 'EntityCard',
     chain: ['EntityCard', ...ENTITY_CHAIN],
@@ -342,7 +342,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     render: () => <StepperRecipe />,
   },
   {
-    name: 'Disclosure entity card — grip, caret, remove',
+    name: 'Entity card (disclosure) — grip, caret, remove',
     section: 'entity-surfaces',
     component: 'EntityCard',
     chain: ['EntityCard', 'CollapsibleListItem', ...ENTITY_CHAIN],
@@ -351,7 +351,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     leading: 'grip + caret',
     trailing: 'utility remove (full)',
     anatomy: 'row-track',
-    render: () => <DisclosureEntityCardRecipe />,
+    render: () => <EntityCardDisclosureRecipe />,
   },
   {
     name: 'Entity anatomy host — embedded',
@@ -383,7 +383,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     render: () => <ArrayItemShellRecipe />,
   },
   {
-    name: 'Catalog entity row — add with price',
+    name: 'Catalog card — add with price',
     section: 'picker-rows',
     component: 'CatalogCard',
     chain: ['CatalogCard', 'CollapsibleListItem', ...ENTITY_CHAIN],
@@ -392,7 +392,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     leading: 'caret',
     trailing: 'group: action (band) + price (meta)',
     anatomy: 'row-track',
-    render: () => <CatalogEntityRowRecipe />,
+    render: () => <CatalogCardRecipe />,
   },
   {
     name: 'Catalog entity surface row',
@@ -788,7 +788,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     leading: 'caret',
     trailing: 'action (band)',
     anatomy: 'row-track',
-    render: () => <CatalogEntityRowRecipe />,
+    render: () => <CatalogCardRecipe />,
   },
   {
     name: 'Choice block row',

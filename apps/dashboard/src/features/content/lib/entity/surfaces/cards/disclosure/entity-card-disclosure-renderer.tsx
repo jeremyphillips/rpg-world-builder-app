@@ -15,9 +15,9 @@ import { DisclosureEntityCardHeader } from './disclosure-entity-card-header'
 import {
   disclosureEntityCardBodyWashVariants,
   disclosureEntityCardListItemVariants,
-} from './disclosure-entity-card.variants'
+} from './entity-card-disclosure-renderer.variants'
 
-export type DisclosureEntityCardProps = {
+export type EntityCardDisclosureRendererProps = {
   entity: EntitySummaryModel
   itemId: string
   toolbarAriaLabel: string
@@ -34,7 +34,7 @@ export type DisclosureEntityCardProps = {
   dragHandleProps?: CollapsibleListItemDragHandleConfig
 }
 
-export function DisclosureEntityCard({
+export function EntityCardDisclosureRenderer({
   entity,
   itemId,
   toolbarAriaLabel,
@@ -47,7 +47,7 @@ export function DisclosureEntityCard({
   defaultCollapsed = true,
   disabled = false,
   dragHandleProps,
-}: DisclosureEntityCardProps) {
+}: EntityCardDisclosureRendererProps) {
   const showDragHandle = Boolean(dragHandleProps)
   const leadingUtilityCount = resolveEntityLeadingUtilityCount({
     dragHandle: showDragHandle,

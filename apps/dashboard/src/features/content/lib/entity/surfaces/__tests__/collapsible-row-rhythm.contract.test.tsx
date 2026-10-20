@@ -46,7 +46,7 @@ describe('Entity card surface rhythm contract', () => {
     expect(document.querySelector('article .dash-entity-card__content')).toBeTruthy()
   })
 
-  it('applies shared compact content inset on CEC, DEC, and catalog rows', () => {
+  it('applies shared compact content inset on EntityCard static, disclosure, and catalog rows', () => {
     render(
       <MemoryRouter>
         <EntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />
@@ -104,7 +104,7 @@ describe('Entity card surface rhythm contract', () => {
     expect(headerRowFromGroup(/Damage/)).toHaveClass(compactHeaderRhythm)
   })
 
-  it('uses the shared body frame on DEC and catalog disclosure rows', () => {
+  it('uses the shared body frame on EntityCard disclosure and catalog disclosure rows', () => {
     render(
       <MemoryRouter>
         <EntityCard

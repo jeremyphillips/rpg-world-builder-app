@@ -24,7 +24,7 @@ export const DASH_ENTITY_SURFACE_CLASS_SPECS: readonly DashEntitySurfaceClassSpe
       leadingUtilityCount: 0,
     }),
     keyValues: 'inset 16px; utility inset 4px; content offset 0',
-    useCase: 'Flat CEC / catalog row without leading utility',
+    useCase: 'Flat EntityCard static / catalog row without leading utility',
   },
   {
     key: 'surface-compact-disclosure',
@@ -34,7 +34,7 @@ export const DASH_ENTITY_SURFACE_CLASS_SPECS: readonly DashEntitySurfaceClassSpe
       leadingUtilityCount: 1,
     }),
     keyValues: 'start utility inset; offset = chrome + gap',
-    useCase: 'DEC / catalog disclosure with one caret',
+    useCase: 'EntityCard disclosure / catalog disclosure with one caret',
   },
   {
     key: 'surface-compact-two-leading',
@@ -44,7 +44,7 @@ export const DASH_ENTITY_SURFACE_CLASS_SPECS: readonly DashEntitySurfaceClassSpe
       leadingUtilityCount: 2,
     }),
     keyValues: 'offset = 2× chrome + gap',
-    useCase: 'DEC with grip + caret',
+    useCase: 'EntityCard disclosure with grip + caret',
   },
   {
     key: 'surface-end-utility',
@@ -73,7 +73,7 @@ export const DASH_ENTITY_SURFACE_CLASS_SPECS: readonly DashEntitySurfaceClassSpe
     key: 'body-wash',
     className: DASH_ENTITY_CARD_BODY_CLASS,
     keyValues: 'padding-inline-start: start + content-offset; end: base inset',
-    useCase: 'Expanded DEC / catalog body wash',
+    useCase: 'Expanded disclosure body wash (EntityCard / catalog)',
   },
   {
     key: 'surface-block',

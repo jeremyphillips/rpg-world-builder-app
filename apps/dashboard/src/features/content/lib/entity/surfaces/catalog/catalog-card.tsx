@@ -13,7 +13,7 @@ import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 import { EntityCardContent } from '../cards/content/entity-card-content'
 import { EntityCardFrame } from '../cards/content/entity-card-frame'
 import { DisclosureEntityCardHeader } from '../cards/disclosure/disclosure-entity-card-header'
-import { disclosureEntityCardListItemVariants } from '../cards/disclosure/disclosure-entity-card.variants'
+import { disclosureEntityCardListItemVariants } from '../cards/disclosure/entity-card-disclosure-renderer.variants'
 import { catalogCardBodyWashVariants } from './catalog-card.variants'
 
 type CatalogCardBaseProps = {
@@ -111,7 +111,7 @@ function CatalogCardFlatBody({
 
 /**
  * Disclosure catalog rows stay on CollapsibleListItem — not EntityCard disclosure.
- * Body wash, domIds, and picker summary stacking differ from DisclosureEntityCard;
+ * Body wash, domIds, and picker summary stacking differ from EntityCardDisclosureRenderer;
  * keep this shell catalog-local rather than a shared cross-surface composer.
  */
 function CatalogCardDisclosureBody({

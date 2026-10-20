@@ -13,7 +13,7 @@ import {
   resolveEntityCardUtilityFieldSize,
 } from './entity-card-utility-field-size.context'
 
-export type ContentEntityCardProps = {
+export type EntityCardStaticRendererProps = {
   entity: EntitySummaryModel
   leading?: EntityAnatomyLeading
   trailing?: EntityAnatomyTrailing
@@ -25,7 +25,7 @@ export type ContentEntityCardProps = {
   headingInline?: ReactNode
 }
 
-export function ContentEntityCard({
+export function EntityCardStaticRenderer({
   entity,
   leading,
   trailing,
@@ -33,7 +33,7 @@ export function ContentEntityCard({
   disabled = false,
   headingEndValue,
   headingInline,
-}: ContentEntityCardProps) {
+}: EntityCardStaticRendererProps) {
   const resolvedDensity = density ?? 'comfortable'
   const utilityFieldSize = resolveEntityCardUtilityFieldSize(resolvedDensity)
 

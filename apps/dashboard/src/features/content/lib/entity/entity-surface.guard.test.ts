@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 const REPO_ROOT = join(__dirname, '../../../../../../..')
 const FEATURE_ROOT = join(REPO_ROOT, 'apps/dashboard/src/features')
 const INTERNAL_ENTITY_FRAME_FILES = new Set([
-  'content/lib/entity/surfaces/cards/content/content-entity-card.tsx',
+  'content/lib/entity/surfaces/cards/content/entity-card-static-renderer.tsx',
 ])
 
 function sourceFiles(directory: string): string[] {
@@ -70,7 +70,7 @@ describe('entity surface architecture guard', () => {
     }
   })
 
-  it('keeps entity-backed grant arrays on DisclosureEntityCard shells', () => {
+  it('keeps entity-backed grant arrays on EntityCardDisclosureRenderer shells', () => {
     const grantFormFields = join(FEATURE_ROOT, 'content/lib/forms/grants/grant-form-fields.ts')
     const startingEquipmentFields = join(
       FEATURE_ROOT,
@@ -80,7 +80,7 @@ describe('entity surface architecture guard', () => {
     for (const path of [grantFormFields, startingEquipmentFields]) {
       const relativePath = relative(FEATURE_ROOT, path)
       const source = readFileSync(path, 'utf8')
-      expect(source, `${relativePath} must render entity-backed rows via DEC shell`).toMatch(
+      expect(source, `${relativePath} must render entity-backed rows via disclosure shell`).toMatch(
         /renderShell/,
       )
       expect(source, `${relativePath} must not compose ArrayItemShell`).not.toMatch(
@@ -107,8 +107,8 @@ describe('entity surface architecture guard', () => {
 
   it('does not import entity anatomy internals outside allowlist', () => {
     const allowlist = new Set([
-      'content/lib/entity/surfaces/cards/content/content-entity-card.tsx',
-      'content/lib/entity/surfaces/cards/disclosure/disclosure-entity-card.tsx',
+      'content/lib/entity/surfaces/cards/content/entity-card-static-renderer.tsx',
+      'content/lib/entity/surfaces/cards/disclosure/entity-card-disclosure-renderer.tsx',
       'content/lib/detail/row/entity/detail-entity-row.tsx',
       'content/lib/entity/surfaces/drawer/drawer-entity-block.tsx',
     ])

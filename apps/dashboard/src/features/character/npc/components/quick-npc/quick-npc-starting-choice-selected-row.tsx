@@ -20,7 +20,7 @@ export type QuickNpcStartingChoiceSelectedRowProps = {
   onRemove: () => void
 }
 
-/** Removable starting-choice row — shared ContentEntityCard anatomy for skills, equipment, and spells. */
+/** Removable starting-choice row — shared EntityCardStaticRenderer anatomy for skills, equipment, and spells. */
 export function QuickNpcStartingChoiceSelectedRow({
   label,
   quantity,

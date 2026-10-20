@@ -102,10 +102,10 @@ dragHandleVariants({ visibility: 'always' | 'hoverReveal', dragging?: boolean })
 dragSurfaceVariants({ dragging: boolean }) // sortable-row family only
 ```
 
-| Visibility    | Use when                                       |
-| ------------- | ---------------------------------------------- |
-| `always`      | Collapsible list items, array fields, DEC grip |
-| `hoverReveal` | Master-detail sortable rows                    |
+| Visibility    | Use when                                                         |
+| ------------- | ---------------------------------------------------------------- |
+| `always`      | Collapsible list items, array fields, disclosure EntityCard grip |
+| `hoverReveal` | Master-detail sortable rows                                      |
 
 Both visibilities share compact control-action geometry and embedded focus. Hover-reveal
 adds opacity/group wiring only.

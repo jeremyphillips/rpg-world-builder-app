@@ -250,7 +250,7 @@ export type CollapsibleListItemBodyClassOptions =
   }
 
 /**
- * Entity-card hosts — structural pass-through only. Outer surfaces (DEC) own all
+ * Entity-card hosts — structural pass-through only. Outer surfaces (disclosure EntityCard) own all
  * header/body inset; CLI supplies disclosure behavior and DOM structure.
  */
 export const collapsibleListItemEntityCardBodyClasses = 'min-w-0'

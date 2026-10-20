@@ -20,7 +20,7 @@ export type EntityDisclosureArrayItemShellProps = ArrayItemShellRenderProps & {
 
 /**
  * Form-array presentation bridge: keeps RHF ownership (prefix, action rail,
- * field children) while DisclosureEntityCard owns card chrome and content-column
+ * field children) while EntityCardDisclosureRenderer owns card chrome and content-column
  * alignment. Do not wrap this in ArrayItemShell / local card chrome.
  */
 export function EntityDisclosureArrayItemShell({

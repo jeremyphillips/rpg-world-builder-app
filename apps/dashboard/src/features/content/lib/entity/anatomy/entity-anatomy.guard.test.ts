@@ -33,7 +33,7 @@ describe('entity anatomy guard', () => {
 
   it('publishes leading geometry via EntityCardFrame leadingUtilityCount', () => {
     const decSource = readFileSync(
-      join(ENTITY_ROOT, 'surfaces/cards/disclosure/disclosure-entity-card.tsx'),
+      join(ENTITY_ROOT, 'surfaces/cards/disclosure/entity-card-disclosure-renderer.tsx'),
       'utf8',
     )
     const frameSource = readFileSync(
@@ -59,9 +59,9 @@ describe('entity anatomy guard', () => {
     expect(variantsSource).not.toMatch(/grid-cols-\[\[leading\]/)
   })
 
-  it('keeps DEC on entity-card CLI row layout without consumer padding props', () => {
+  it('keeps EntityCard disclosure on entity-card CLI row layout without consumer padding props', () => {
     const decSource = readFileSync(
-      join(ENTITY_ROOT, 'surfaces/cards/disclosure/disclosure-entity-card.tsx'),
+      join(ENTITY_ROOT, 'surfaces/cards/disclosure/entity-card-disclosure-renderer.tsx'),
       'utf8',
     )
 
@@ -99,7 +99,7 @@ describe('entity anatomy guard', () => {
     const featureRoot = join(ENTITY_ROOT, '../..')
     const allowlist = new Set([
       join(ENTITY_ROOT, 'surfaces/catalog/catalog-entity-picker-sheet.tsx'),
-      join(ENTITY_ROOT, 'surfaces/cards/content/__tests__/content-entity-card.test.tsx'),
+      join(ENTITY_ROOT, 'surfaces/cards/content/__tests__/entity-card-static-renderer.test.tsx'),
     ])
     const entityPickerPattern =
       /(picker|drawer)\.(client|integration)\.(tsx|ts)$|(picker|drawer)\.client\.(tsx|ts)$/

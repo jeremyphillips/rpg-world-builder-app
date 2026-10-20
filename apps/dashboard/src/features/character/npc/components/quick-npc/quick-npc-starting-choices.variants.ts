@@ -39,7 +39,7 @@ export const quickNpcStartingChoiceInnerPanelClasses =
 export const quickNpcStartingChoiceInnerSectionClasses =
   'flex flex-col gap-y-2 border-b border-border pb-3 last:border-b-0 last:pb-0 [&:not(:first-child)]:pt-3'
 
-/** Spacing between {@link ContentEntityCard} choice rows (builder choice-block parity). */
+/** Spacing between {@link EntityCardStaticRenderer} choice rows (builder choice-block parity). */
 export const quickNpcStartingChoiceSelectedListClasses = 'flex flex-col gap-y-2'
 
 export const quickNpcAdditionalEquipmentQuantityClasses =

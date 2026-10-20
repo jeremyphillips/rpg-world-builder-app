@@ -35,9 +35,9 @@ export type EntityAnatomyProps = {
   leadingUtilities?: readonly ReactNode[]
   trailing?: EntityAnatomyTrailing
   density?: ContentCardDensity
-  /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
+  /** Passive numeric scalar aligned with the heading row (private transport from EntityCardStaticRenderer). */
   headingEndValue?: number
-  /** Intrinsic-width slot immediately after the title (private transport from ContentEntityCard). */
+  /** Intrinsic-width slot immediately after the title (private transport from EntityCardStaticRenderer). */
   headingInline?: ReactNode
 }
 

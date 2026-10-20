@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ActionIcon, iconGhostControlVariants } from '@rpg/ui'
 
 import type { EntityAnatomyTrailing } from '../../../../anatomy/entity-anatomy-trailing.types'
-import { DisclosureEntityCard } from '../disclosure-entity-card'
+import { EntityCardDisclosureRenderer } from '../entity-card-disclosure-renderer'
 import { HARBOR_DISTRICT_ENTITY } from '../../../../__tests__/entity.fixture'
 
 const mockDragHandleProps = {
@@ -20,7 +20,7 @@ const mockDragHandleProps = {
 } as const
 
 const meta = {
-  title: 'Content/Entity/DisclosureEntityCard',
+  title: 'Content/Entity/EntityCardDisclosureRenderer',
   parameters: { layout: 'padded' },
 } satisfies Meta
 
@@ -39,7 +39,7 @@ function GhostRemoveUtility({ label }: { label: string }) {
   )
 }
 
-function DisclosureEntityCardDemo({
+function EntityCardDisclosureDemo({
   density = 'comfortable',
   dragHandleProps,
   trailing,
@@ -54,7 +54,7 @@ function DisclosureEntityCardDemo({
 
   return (
     <div className="max-w-md">
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="harbor-district"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
@@ -78,27 +78,27 @@ function DisclosureEntityCardDemo({
           <p>Population overview and district notes belong in the disclosed body.</p>
           <p>Inner content aligns to the entity content column without consumer inset props.</p>
         </div>
-      </DisclosureEntityCard>
+      </EntityCardDisclosureRenderer>
     </div>
   )
 }
 
 export const CaretOnlyComfortable: Story = {
-  render: () => <DisclosureEntityCardDemo initialCollapsed={false} />,
+  render: () => <EntityCardDisclosureDemo initialCollapsed={false} />,
 }
 
 export const CaretOnlyCompact: Story = {
-  render: () => <DisclosureEntityCardDemo density="compact" initialCollapsed={false} />,
+  render: () => <EntityCardDisclosureDemo density="compact" initialCollapsed={false} />,
 }
 
 export const GripAndCaretExpanded: Story = {
   render: () => (
-    <DisclosureEntityCardDemo dragHandleProps={mockDragHandleProps} initialCollapsed={false} />
+    <EntityCardDisclosureDemo dragHandleProps={mockDragHandleProps} initialCollapsed={false} />
   ),
 }
 
 export const Collapsed: Story = {
-  render: () => <DisclosureEntityCardDemo />,
+  render: () => <EntityCardDisclosureDemo />,
 }
 
 export const BodyEndInsetInvariant: Story = {
@@ -131,7 +131,7 @@ export const BodyEndInsetInvariant: Story = {
           },
         ] as const
       ).map((entry) => (
-        <DisclosureEntityCard
+        <EntityCardDisclosureRenderer
           key={entry.id}
           itemId={entry.id}
           toolbarAriaLabel={entry.label}
@@ -147,7 +147,7 @@ export const BodyEndInsetInvariant: Story = {
           <p className="bg-surface-subtle text-style-supporting">
             Domain content — right edge uses density inset only.
           </p>
-        </DisclosureEntityCard>
+        </EntityCardDisclosureRenderer>
       ))}
     </div>
   ),
@@ -156,7 +156,7 @@ export const BodyEndInsetInvariant: Story = {
 export const PilotInventoryRow: Story = {
   render: () => (
     <div className="max-w-md">
-      <DisclosureEntityCard
+      <EntityCardDisclosureRenderer
         itemId="longsword"
         toolbarAriaLabel="Longsword"
         entity={{
@@ -179,7 +179,7 @@ export const PilotInventoryRow: Story = {
             <dd>Versatile</dd>
           </div>
         </dl>
-      </DisclosureEntityCard>
+      </EntityCardDisclosureRenderer>
     </div>
   ),
 }

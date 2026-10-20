@@ -133,7 +133,7 @@ Feature-owned discovery body (when applicable)
   Picker cards (8px — createTabDiscoveryListClasses)
 ```
 
-Building Organizations discovery uses a `RadioGroup` of `CatalogEntityRow`
+Building Organizations discovery uses a `RadioGroup` of `CatalogCard`
 **selection mode** rows (leading radio, no trailing Select). Choosing an existing
 organization stays on the `discovery` stage; footer commit uses the child-workflow
 projection while the list remains visible. `BuildingOrganizationComposer` uses
@@ -301,7 +301,7 @@ PENDING MODE → review drafts → edit/remove in place → add another
 ```text
 AddPendingWorkflow
   → composing slot (CreateComposition* + domain-owned discovery / forms)
-  → pending collection slot (ContentEntityCard rows + add-another)
+  → pending collection slot (EntityCard rows + add-another)
 ```
 
 ### Architecture checkpoint
@@ -309,15 +309,15 @@ AddPendingWorkflow
 Recorded before the relationship-first refinement. Findings:
 
 1. **Add Member owner today.** `OrganizationMemberPickerDrawer` composes
-   `CatalogEntityPickerSheet` + `CatalogEntityRow`. Trailing **Add** comes from
+   `CatalogEntityPickerSheet` + `CatalogCard`. Trailing **Add** comes from
    `CatalogPickerSelectionActions`. Expansion is one-open via
    `expandedItemId` / `onExpandedItemChange`. The expanded body is
    `OrganizationMembershipTitleField` plus a confirm **Add member** button.
 2. **Disclosure/card anatomy is not directly reusable in a create modal.**
-   `CatalogEntityRow` is picker-sheet specific. Nesting `CatalogEntityPickerSheet`
+   `CatalogCard` is picker-sheet specific. Nesting `CatalogEntityPickerSheet`
    inside `CreateModalShell` would add a second overlay/scroll owner. The
    reusable bordered surface for discovery and pending rows is
-   `ContentEntityCard` (static).
+   `EntityCard` (static).
 3. **Radio selection is domain-specific.** Add Member radios are membership
    titles from `OrganizationMembershipTitleField`. Relationship-first building
    composition uses `RadioCardField` for active kind and `CreateCompositionSummary`
@@ -334,16 +334,16 @@ Recorded before the relationship-first refinement. Findings:
 5. **Reusable root.** `AddPendingWorkflow` in `src/lib/create-flow`. Add Member
    has no pending-review mode and persists immediately, so it is not generalized
    into this root.
-6. **`ContentEntityCard` stays pure.** Discovery and pending rows use CEC with a
-   trailing action only. CEC never receives expand, composer, or relationship
-   props.
+6. **`EntityCard` stays pure (static default).** Discovery and pending rows use
+   `EntityCard` with a trailing action only. Static cards never receive expand,
+   composer, or relationship props.
 7. **Pending edit switches to composing mode.** Overflow **Edit** on a pending row
    opens the full Organizations composer in **composing** mode (intro hidden, child
-   footer active). Pending `ContentEntityCard` rows stay visible only in **resting**
+   footer active). Pending `EntityCard` rows stay visible only in **resting**
    pending mode — not inline `SelectionSummaryCard` review. While the relationship
    kind is being edited, downstream discovery/review/branch stages hide (same reveal
    invariant as create-setup).
-8. **Parallel patterns left in place.** `CatalogEntityRow` in picker sheets,
+8. **Parallel patterns left in place.** `CatalogCard` in picker sheets,
    equipment picker disclosure (commerce), and mutation-oriented relationship
    drawers. Do not migrate them in this phase.
 
@@ -360,11 +360,11 @@ pending-row content, and domain actions.
 The root API uses `addAnotherLabel` / slot props — never domain nouns such as
 “organization.”
 
-### `ContentEntityCard` consumption
+### `EntityCard` consumption (Add / Pending)
 
 See [content-entity-card.md](./content-entity-card.md#add--pending-composition).
-Discovery rows use CEC + trailing **Select** (outline, compact). Pending rows
-use CEC + overflow actions; **Edit** opens the focused composition composer in
+Discovery rows use `EntityCard` + trailing **Select** (outline, compact). Pending rows
+use `EntityCard` + overflow actions; **Edit** opens the focused composition composer in
 the `AddPendingWorkflow` composing slot — not an inline summary card on the row.
 
 ## Building composite create (atomic submit)

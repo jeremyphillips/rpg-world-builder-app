@@ -64,7 +64,7 @@ For each migrated primitive, verify in Storybook DevTools:
 
 `dash-entity-card` (dashboard `index.css`) elements `__content`, `__details`, and `__body` consume the shared card inset vars; asymmetric rails come from `dash-entity-surface` edge tokens. `dash-entity-surface` on the same article publishes density, edge (`--start-*`, `--end-*`), and leading-count (`--leading-0|1|2`) custom properties — no inline `style`. Entity frames compose `cardSurfaceVariants({ tone: quiet, density, … })`. Option-card bodies (`ui-radio-card__body`, `ui-selection-option-card__body`) consume the same vars; compact card variants may apply structural control-column offsets. Host-plane quiet fill uses `.ui-card-tone-host--inherit` on sheet content and create-composition hosts.
 
-`ui-row-anatomy` owns row tracks and `__cell--{slot}` / `__cell--{column}` placement. `dash-entity-anatomy` and `dash-entity-leading` (dashboard) own entity column gaps and leading-rail columns. `ui-collapsible-list-item--entity-card` resets CLI chrome for DEC / catalog rows. `ui-identity-row__*` size modifiers own identity type scale (`__title`, `__classification`, `__supporting`).
+`ui-row-anatomy` owns row tracks and `__cell--{slot}` / `__cell--{column}` placement. `dash-entity-anatomy` and `dash-entity-leading` (dashboard) own entity column gaps and leading-rail columns. `ui-collapsible-list-item--entity-card` resets CLI chrome for disclosure EntityCard / catalog rows. `ui-identity-row__*` size modifiers own identity type scale (`__title`, `__classification`, `__supporting`).
 
 `ui-inset-panel--{sm,md,lg}` owns radius and padding. Border style and alignment are separate modifiers. Surface wash still comes from the visual-vocabulary resolver.
 

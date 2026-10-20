@@ -4,12 +4,12 @@ Dashboard surfaces that show **typed edges** between catalog entities (organizat
 
 ## Entity vs edge
 
-| Surface                                        | Primitive                                                                          | Example                        |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------ |
-| Pick an entity in a drawer                     | Embedded `EntityAnatomyHost` or `DisclosureEntityCard` + catalog selection actions | Choose an organization to link |
-| Show a persisted relationship on a detail page | `EntityRowList.Row`                                                                | The Monarchy                   |
+| Surface                                        | Primitive                                                                                  | Example                        |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------ |
+| Pick an entity in a drawer                     | Embedded `EntityAnatomyHost` or `EntityCardDisclosureRenderer` + catalog selection actions | Choose an organization to link |
+| Show a persisted relationship on a detail page | `EntityRowList.Row`                                                                        | The Monarchy                   |
 
-Do **not** use `ContentEntityCard` as the default relationship row. Kind labels belong in slot/collection headings or optional row classification — not as entity badges duplicating the slot.
+Do **not** use `EntityCard` as the default relationship row. Kind labels belong in slot/collection headings or optional row classification — not as entity badges duplicating the slot.
 
 ## Cardinality: dedupe vs UI slots
 
@@ -83,8 +83,8 @@ Do **not** use `Text variant="emphasis"` or raw `uppercase tracking-*` for detai
 Primitive APIs must stay presentation-only — no relationship kinds, hierarchy semantics, or mutation builders in props. Features supply plain labels, hrefs, slots, and pre-built action arrays.
 
 `DetailEntityRow.trailing` and panel/group `action` are **detail-host** composition
-seams — not entity-surface trailing APIs. `EntityAnatomyHost`, `ContentEntityCard`, and
-`DisclosureEntityCard` use semantic trailing (`action` | `indicator` | `group`) only.
+seams — not entity-surface trailing APIs. `EntityAnatomyHost`, `EntityCard`, and
+`EntityCardDisclosureRenderer` use semantic trailing (`action` | `indicator` | `group`) only.
 See [content-entity-card.md](./content-entity-card.md#trailing-kinds).
 
 Use **`DetailCollectionPanel`** + **`EntityRowList`** for typed-edge relationship sections (location Territorial Authority, People & organizations, organization forward family groups, organization Members). Use **`DetailCollectionPanel`** + **`DetailCollectionGroup`** + **`DetailCollectionRowList`** for hierarchy (City structure districts / direct places) — not `EntityRowList`. The panel is shared outer chrome; body grammar differs by domain.
@@ -308,7 +308,7 @@ Structural impossibility (e.g. single-kind families with no registry alternates)
 | `EntityReplacementCurrentField` / `EntityReplacementSection` | Sunken Current chrome hosting the same entity context composition for searchable replacement flows                 |
 | `LocationConnectionKindField`                                | Dumb active kind radios (options, value, onValueChange) — drawer owns summary vs field visibility                  |
 | `SelectionSummaryCard`                                       | Completed decision row within sequenced Add drawers and create-modal setup                                         |
-| Embedded `ContentEntityCard` + selection actions             | Entity picker rows in drawers                                                                                      |
+| Embedded `EntityCard` + selection actions                    | Entity picker rows in drawers                                                                                      |
 
 ### Picker order and search
 

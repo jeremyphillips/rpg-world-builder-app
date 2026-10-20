@@ -34,10 +34,20 @@ Do not replace `EntityCard`, `CatalogCard`, or catalog browse rows with generic 
 summary/   — EntitySummaryModel, EntitySummary parts (heading / description / status), projection, media
 anatomy/   — EntityAnatomy, EntityAnatomyHost, trailing cells, leading rail, surface edges, geometry tokens
 surfaces/  — EntityCard facade, catalog cards; imports anatomy/ + summary/ only via dependency direction
-  cards/content/     EntityCard (public), ContentEntityCard + EntityCardFrame (internal)
-  cards/disclosure/  DisclosureEntityCard, DisclosureEntityCardHeader (internal)
+  cards/content/     EntityCard (public), EntityCardStaticRenderer + EntityCardFrame (internal)
+  cards/disclosure/  EntityCardDisclosureRenderer, DisclosureEntityCardHeader (internal)
   catalog/           CatalogCard, CatalogEntityPickerSheet
   drawer/            DrawerEntityBlock (compact drawer identity — see [feature-structure.md](./feature-structure.md))
+```
+
+Public card API vs internal renderers:
+
+```text
+EntityCard (public)
+├── EntityCardStaticRenderer       variant="static" (default)
+└── EntityCardDisclosureRenderer   variant="disclosure"
+        ↓
+EntityCardFrame / EntityAnatomy
 ```
 
 Dependency direction: `surfaces → anatomy → summary`. `summary/` must not import `anatomy/`;
@@ -79,7 +89,7 @@ primitives — not ad-hoc menu item class stacks. Menu rows derive highlight/was
 | Action choice menu / split-button items | `InteractiveList` + `MenuChoiceRow` inside `interactiveListChoiceMenuContentClasses` | `menu` / `menuitem`                            | `IdentityRow` when the item has identity copy  |
 | Search hit                              | `InteractiveListRow` slots                                                           | link                                           | `IdentityRow`                                  |
 | Detail / relationship section           | `DetailEntityRow` / `EntityRowList`                                                  | section row                                    | EntitySummary parts → `IdentityRowHeadingLine` |
-| Bordered catalog + disclosure           | `CatalogCard` / DEC                                                                  | card / disclosure                              | anatomy + card frame                           |
+| Bordered catalog + disclosure           | `CatalogCard` / `EntityCard` disclosure                                              | card / disclosure                              | anatomy + card frame                           |
 
 Campaign-unavailable search hits use entity `inactive` status in the identity status slot
 only — not a duplicate trailing badge.
@@ -105,7 +115,7 @@ identity contract and one projector (`projectEntitySurfaceConfig` /
   Drawer-only utilities pass `trailing` (`EntityAnatomyTrailing`) — not extra fields on
   `EntitySurfaceConfig`.
 - Heading label buttons use **`inlineAction` only** (`label`, `onClick`, `disabled?`, `loading?`). Surfaces render locked compact picker buttons.
-- **Allowed exceptions:** disclosure-body commit `Button`s inside `details` / DEC children; `trailing.kind: 'utility'` for inventory steppers and icon-remove controls; `trailing.kind: 'group'` for commerce stacks.
+- **Allowed exceptions:** disclosure-body commit `Button`s inside `details` / disclosure body children; `trailing.kind: 'utility'` for inventory steppers and icon-remove controls; `trailing.kind: 'group'` for commerce stacks.
 
 The host keeps its own navigation, hover, selection, separators, drag behavior, and
 domain controls. Never put a full-row link in `EntitySummaryModel`; when a host owns
@@ -140,26 +150,26 @@ drag chrome, or interactive-row fills.
 
 ### Ownership audit matrix
 
-| Concern                        | Target owner                        | Notes                                                               |
-| ------------------------------ | ----------------------------------- | ------------------------------------------------------------------- |
-| Card perimeter                 | `EntityCardFrame`                   | Border, radius, surface identity, disabled chrome; **no padding**   |
-| Card header/content inset      | `EntityCardContent`                 | Vertical inset; horizontal inset via frame edge vars                |
-| Surface edge inset             | `EntityCardFrame`                   | `resolveEntitySurfaceEdges` → `entitySurfaceInsetVariants` per edge |
-| Vertical alignment             | `RowAnatomy` (`@rpg/ui`)            | Band / meta / status tracks; cells never self-align or offset       |
-| Section vs card inset          | Feature section / host              | e.g. equipment panel `px-4 py-4` is section padding, not card inset |
-| Embedded row inset             | Host                                | SearchResultRow, master-detail list — not entity card surfaces      |
-| EntityAnatomyHost columns      | EntityAnatomyHost anatomy           | Named lines `[leading] [media] [content] [trailing]`                |
-| Leading content offset         | `EntityCardFrame` (when needed)     | `--entity-content-offset` on frame root for aligned sibling regions |
-| Trailing rail                  | EntityAnatomyHost semantic trailing | `action` \| `utility` \| `indicator` \| `group` — no `endSlot`      |
-| Disclosure behavior            | CollapsibleListItem                 | Collapse state, ARIA, structural DOM                                |
-| CLI header vertical rhythm     | CollapsibleListItem                 | **Default rows only** — not `rowLayout="entity-card"`               |
-| CLI body frame                 | CollapsibleListItem                 | `collapsibleListItemBodyFrameClasses` (divider + `py-3`)            |
-| DEC / catalog body inset       | Surface body wash variants          | Body tone + entity inline start/end on shared body frame            |
-| CLI body spacing (entity-card) | **None**                            | `rowLayout="entity-card"` → behavior + structural `p-0` reset only  |
-| Drag chrome                    | Foundational UI                     | `dragHandleVariants`, host reveal contract                          |
-| Control/focus chrome           | Foundational UI                     | `iconGhostControlVariants`, Button focus stack                      |
-| Separators                     | Host                                | List/section separators, not EntityAnatomyHost                      |
-| Form-array styling             | DEC + form field rhythm             | Form owns registration; DEC owns card geometry                      |
+| Concern                                    | Target owner                        | Notes                                                               |
+| ------------------------------------------ | ----------------------------------- | ------------------------------------------------------------------- |
+| Card perimeter                             | `EntityCardFrame`                   | Border, radius, surface identity, disabled chrome; **no padding**   |
+| Card header/content inset                  | `EntityCardContent`                 | Vertical inset; horizontal inset via frame edge vars                |
+| Surface edge inset                         | `EntityCardFrame`                   | `resolveEntitySurfaceEdges` → `entitySurfaceInsetVariants` per edge |
+| Vertical alignment                         | `RowAnatomy` (`@rpg/ui`)            | Band / meta / status tracks; cells never self-align or offset       |
+| Section vs card inset                      | Feature section / host              | e.g. equipment panel `px-4 py-4` is section padding, not card inset |
+| Embedded row inset                         | Host                                | SearchResultRow, master-detail list — not entity card surfaces      |
+| EntityAnatomyHost columns                  | EntityAnatomyHost anatomy           | Named lines `[leading] [media] [content] [trailing]`                |
+| Leading content offset                     | `EntityCardFrame` (when needed)     | `--entity-content-offset` on frame root for aligned sibling regions |
+| Trailing rail                              | EntityAnatomyHost semantic trailing | `action` \| `utility` \| `indicator` \| `group` — no `endSlot`      |
+| Disclosure behavior                        | CollapsibleListItem                 | Collapse state, ARIA, structural DOM                                |
+| CLI header vertical rhythm                 | CollapsibleListItem                 | **Default rows only** — not `rowLayout="entity-card"`               |
+| CLI body frame                             | CollapsibleListItem                 | `collapsibleListItemBodyFrameClasses` (divider + `py-3`)            |
+| EntityCard disclosure / catalog body inset | Surface body wash variants          | Body tone + entity inline start/end on shared body frame            |
+| CLI body spacing (entity-card)             | **None**                            | `rowLayout="entity-card"` → behavior + structural `p-0` reset only  |
+| Drag chrome                                | Foundational UI                     | `dragHandleVariants`, host reveal contract                          |
+| Control/focus chrome                       | Foundational UI                     | `iconGhostControlVariants`, Button focus stack                      |
+| Separators                                 | Host                                | List/section separators, not EntityAnatomyHost                      |
+| Form-array styling                         | EntityCard disclosure + form rhythm | Form owns registration; disclosure renderer owns card geometry      |
 
 ---
 
@@ -201,17 +211,17 @@ Optional DOM children must never alter grid-track ownership: every cell names it
 
 ### Leading utilities contract
 
-| API                              | Scope                 | Rule                                                                           |
-| -------------------------------- | --------------------- | ------------------------------------------------------------------------------ |
-| `EntityAnatomyHost.leading`      | Public embedded hosts | Exactly **one** utility when set — maps to `[leading]` internally              |
-| `EntityAnatomy.leadingUtilities` | Internal / surfaces   | Ordered list of utilities; **Anatomy is the sole `EntityLeadingRail` wrapper** |
-| DEC / DER disclosure             | Surface composition   | Pass explicit utility nodes — never pre-wrap `EntityLeadingRail`               |
+| API                                    | Scope                 | Rule                                                                           |
+| -------------------------------------- | --------------------- | ------------------------------------------------------------------------------ |
+| `EntityAnatomyHost.leading`            | Public embedded hosts | Exactly **one** utility when set — maps to `[leading]` internally              |
+| `EntityAnatomy.leadingUtilities`       | Internal / surfaces   | Ordered list of utilities; **Anatomy is the sole `EntityLeadingRail` wrapper** |
+| EntityCard disclosure / DER disclosure | Surface composition   | Pass explicit utility nodes — never pre-wrap `EntityLeadingRail`               |
 
 Surfaces with disclosed sibling content publish `--entity-content-offset` on their root
 from utility **count** and **density**. Anatomy and `EntityLeadingRail` establish the
 coordinate physically; they never publish offset.
 
-**Combined entity-card host invariant:** CEC, DEC, and `CatalogCard` share
+**Combined entity-card host invariant:** `EntityCard` (static and disclosure) and `CatalogCard` share
 `EntityCardFrame` + `EntityCardContent`. `rowLayout="entity-card"` ⇒ CLI behavior-only
 (no header/body inset, no competing padding) + exactly one `EntityCardContent` header
 inset region + frame publishes surface inset CSS vars and content offset when needed.
@@ -233,14 +243,16 @@ EntityCardFrame (article)
 
 | Host tone     | Used by                         | Resolver                                        |
 | ------------- | ------------------------------- | ----------------------------------------------- |
-| `quiet`       | CEC, DEC, `CatalogCard`         | `cardSurfaceVariants({ tone: 'quiet' })`        |
+| `quiet`       | `EntityCard`, `CatalogCard`     | `cardSurfaceVariants({ tone: 'quiet' })`        |
 | (interactive) | Selectable catalog / radio rows | `ui-card--interactive` + `selected` when chosen |
 
 Rhythm must **never** depend on `collapsible`, `details`, or collapsed state.
 
 ---
 
-## EntityCard
+## EntityCard — static (default)
+
+Public API: `<EntityCard … />` (omit `variant` or `variant="static"`). Implementation: internal `EntityCardStaticRenderer`.
 
 ```text
 EntityCard
@@ -266,14 +278,16 @@ EntityCard
 
 ### Consumers must not
 
-- Wrap CEC in a feature card wrapper with duplicate border/padding
+- Wrap `EntityCard` in a feature card wrapper with duplicate border/padding
 - Calculate leading indentation locally
 
 ---
 
-## EntityCard
+## EntityCard — `variant="disclosure"`
 
-DEC composes the shared frame/content stack with CLI disclosure behavior.
+Public API: `<EntityCard variant="disclosure" … />`. Implementation: internal `EntityCardDisclosureRenderer`.
+
+Disclosure `EntityCard` composes the shared frame/content stack with CLI disclosure behavior.
 `DetailEntityRow` is outside this contract.
 
 ```text
@@ -282,7 +296,7 @@ EntityCard
     └── CollapsibleListItem (rowLayout="entity-card", density)
         ├── EntityCardContent
         │   └── EntityCardHeader → EntityAnatomy
-        └── body — shared body frame + DEC wash tone + entity inline inset
+        └── body — shared body frame + disclosure body wash tone + entity inline inset
 ```
 
 ### Owns
@@ -308,7 +322,7 @@ Applies to CollapsibleListItem-based rows:
 ### Consumer supplies
 
 - `entity`, optional `dragHandleProps`, semantic `trailing`, domain `children`
-- Collapse control wiring via DEC props (`collapsed`, `onToggleCollapse`, …)
+- Collapse control wiring via disclosure props (`collapsed`, `onToggleCollapse`, …)
 
 ### Does not own
 
@@ -320,7 +334,7 @@ Applies to CollapsibleListItem-based rows:
 
 ### Consumers must not
 
-- Add card inset wrappers around DEC
+- Add card inset wrappers around disclosure `EntityCard`
 - Calculate grip/caret indentation or compensate with negative margins
 - Position trailing controls outside EntityAnatomyHost anatomy
 - Rely on CLI `--content-column-indent` or duplicate body vertical padding on adapter wrappers
@@ -332,7 +346,7 @@ structural plumbing only**. It does **not** own entity-card header/body inset or
 leading geometry.
 
 **Single ownership switch:** `rowLayout="entity-card"` — not a combination of
-`rowLayout` and `toolbarLeadingChrome`. DEC composition sets
+`rowLayout` and `toolbarLeadingChrome`. Disclosure renderer composition sets
 `toolbarLeadingChrome="none"` because leading controls live in `EntityLeadingRail`; body
 inset ownership follows from `rowLayout` alone.
 
@@ -341,7 +355,7 @@ CLI entity-card mode must contribute **no competing**:
 - `pl` / `pr` / `pt` / `pb` on the body slot
 - `--content-column-indent` / `--content-inline-start` on the shell
 
-DEC `bodyClassName` owns all horizontal and block inset.
+Disclosure body wash owns all horizontal and block inset.
 
 ---
 
@@ -357,7 +371,7 @@ DEC `bodyClassName` owns all horizontal and block inset.
 
 - Entity-card header inset
 - Entity-card body inset
-- Entity content offset (DEC `article` publishes `--entity-content-offset`)
+- Entity content offset (disclosure frame root publishes `--entity-content-offset`)
 
 Non-entity ArrayItem rows (`rowLayout="default"`) retain legacy content-column indent
 via CLI — that path is for anonymous form arrays, not entity-backed disclosure cards.
@@ -382,7 +396,7 @@ collection spacing.
 
 Detail and relationship rows compose `DetailEntityRow` → `EntityAnatomy`. Non-entity
 detail primitives may use `endSlot` for utility controls — that API does not apply to
-`EntityAnatomyHost`, CEC, or DEC. See
+`EntityAnatomyHost` or `EntityCard` (either variant). See
 [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
 
 ### Catalog entity picker rows
@@ -451,12 +465,11 @@ form field stacks).
 ## Density
 
 `EntityAnatomy` owns identity typography, rhythm, media/leading/trailing geometry.
-Embedded hosts own collection inset. `EntityCardContent` owns header inset; CEC, DEC,
-and `CatalogCard` pass density to both `EntityCardContent` and internal anatomy.
+Embedded hosts own collection inset. `EntityCardContent` owns header inset; `EntityCard` and `CatalogCard` pass density to both `EntityCardContent` and internal anatomy.
 
 Set density **exactly once**:
 
-- standalone cards: CEC or DEC;
+- standalone cards: `EntityCard` static or disclosure;
 - embedded hosts: `EntityAnatomyHost` + host-owned row inset;
 - never size a shell and nested item independently.
 
@@ -503,8 +516,8 @@ policy via `resolveEntityLeadingGeometry({ count, density })`:
 does not add `mr-*` for content-start.
 
 **Publication rule:** publish `--entity-content-offset` only when content outside
-`EntityAnatomy` must align to column 2 (DEC disclosed body, DER disclosure body).
-CEC, master-detail, and embedded `EntityAnatomyHost` hosts need anatomy layout only — CEC may
+`EntityAnatomy` must align to column 2 (EntityCard disclosure disclosed body, DER disclosure body).
+Static `EntityCard`, master-detail, and embedded `EntityAnatomyHost` hosts need anatomy layout only — static `EntityCard` may
 publish `--leading-chrome-size` when a leading utility is present.
 
 `EntityCardFrame` publishes surface inset tokens and `--entity-content-offset` when
@@ -669,12 +682,12 @@ AddPendingWorkflow
 **`headingInline`** — optional intrinsic-width slot immediately after the title (not `headingEndValue`). Heading links wrap title text only. The slot is marked `data-heading-inline`, which forces a nested `BooleanField` to `sm`. Card frames publish `data-content-density` so a compact card resolves that field to `sm` and a comfortable card to `md`, ahead of the surrounding form density. Trailing utility controls keep their own `xs` scale.
 
 **`EntityCard` must not expand.** Do not add collapse, composer, or
-relationship-kind props to CEC. Discovery uses CEC + trailing **Select**
+relationship-kind props to `EntityCard`. Discovery uses `EntityCard` + trailing **Select**
 (outline, `size="sm"`, `density="compact"`). Pending **Edit** leaves the row on
-CEC and opens the focused composition composer in the `AddPendingWorkflow`
+`EntityCard` and opens the focused composition composer in the `AddPendingWorkflow`
 composing slot — sibling pending cards remain visible only while resting.
 
-Zero-eligible discovery rows stay on CEC with a disabled trailing **Select** and
+Zero-eligible discovery rows stay on `EntityCard` with a disabled trailing **Select** and
 the authoritative reason in the entity status lane.
 
 Pending-row edit switches to **composing** mode (focused composer + child footer).
@@ -694,9 +707,9 @@ Typed cross-content edges on detail pages use `EntityRowList.Row` →
 
 ## Closed consumer API
 
-`EntityAnatomyHost`, CEC, and DEC deliberately expose no `className`, `style`, padding,
+`EntityAnatomyHost` and `EntityCard` deliberately expose no `className`, `style`, padding,
 inset, header/body, or divider styling props. Provide semantic data and controls
-through `entity`, `leading`, `trailing`, `headingHref`, and DEC `children` only.
+through `entity`, `leading`, `trailing`, `headingHref`, and disclosure `children` only.
 
 The legacy `@rpg/ui` `ContentCard` shell (`ContentCard`, `ContentCardBody`, `ContentCardHeading`) is retired. `EntityCardFrame`, `EntityAnatomy`, and
 `EntityLeadingRail` remain internal implementation details. Feature code uses the entity
@@ -709,27 +722,27 @@ surfaces above rather than composing those internals directly.
 Guards and tests encode ownership — they are not the contract themselves, but they
 prevent regression:
 
-| Guard / test                               | Enforces                                                                     |
-| ------------------------------------------ | ---------------------------------------------------------------------------- |
-| `entity-alignment-matrix.stories.tsx`      | Real-browser geometry: every leading × trailing × depth × media combination  |
-| `UtilityEdgeParity` story                  | Trailing utility end inset equals leading caret start inset                  |
-| `card-recipes.stories.tsx` (`AllRecipes`)  | Every row-track recipe passes `expectRowAnatomyAligned`                      |
-| `card-recipes.registry.test.ts`            | Every entity surface and row primitive has a classified recipe               |
-| `row-anatomy-alignment.guard.test.ts`      | Retired align props banned; no self-align / `mt-*` compensation in anatomy   |
-| `entity-anatomy.guard.test.ts`             | EntityAnatomyHost variants stay inset-free; hosts use Frame + Content        |
-| `entity-surface.guard.test.ts`             | Entity-backed grants use DEC shell bridge, not generic ArrayItem card        |
-| `entity-card-surface.contract.test.ts`     | Frame owns perimeter only; Content owns inset                                |
-| `entity-card-host.contract.test.tsx`       | Single inset owner per host; CLI entity-card mode padding-free               |
-| `collapsible-row-rhythm.contract.test.tsx` | Shared content inset across CEC/DEC/catalog; form-array CLI rhythm preserved |
-| `disclosure-entity-card.test.tsx`          | DEC body present; CLI legacy indent absent; leading offset on frame          |
-| `grant-array-disclosure-shell.test.tsx`    | Grant integration: DEC alignment, no CLI `content-column-indent`             |
-| `collapsible-list-item.variants.test.ts`   | Entity-card body classes exclude legacy inset                                |
-| `catalog-entity-row.stories.tsx`           | Flat + disclosure rhythm side-by-side; location picker drawer context        |
-| `content-card.variants.test.ts`            | Mixed-heading title must not use `flex-1`, `%` caps, or right-push hacks     |
-| `entity-summary.test.tsx`                  | Compact title 14px; classification, dot, and end text 12px; no track offsets |
-| `entity-summary-status.type.test.ts`       | Status prop is structured data, not ReactNode                                |
-| `entity-anatomy-trailing.type.test.ts`     | Trailing action/group primary require ReactElement; closed secondary         |
-| AGENTS.md component rule                   | No consumer padding overrides on entity surfaces                             |
+| Guard / test                               | Enforces                                                                                          |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `entity-alignment-matrix.stories.tsx`      | Real-browser geometry: every leading × trailing × depth × media combination                       |
+| `UtilityEdgeParity` story                  | Trailing utility end inset equals leading caret start inset                                       |
+| `card-recipes.stories.tsx` (`AllRecipes`)  | Every row-track recipe passes `expectRowAnatomyAligned`                                           |
+| `card-recipes.registry.test.ts`            | Every entity surface and row primitive has a classified recipe                                    |
+| `row-anatomy-alignment.guard.test.ts`      | Retired align props banned; no self-align / `mt-*` compensation in anatomy                        |
+| `entity-anatomy.guard.test.ts`             | EntityAnatomyHost variants stay inset-free; hosts use Frame + Content                             |
+| `entity-surface.guard.test.ts`             | Entity-backed grants use `EntityCardDisclosureRenderer` shell bridge, not generic ArrayItem card  |
+| `entity-card-surface.contract.test.ts`     | Frame owns perimeter only; Content owns inset                                                     |
+| `entity-card-host.contract.test.tsx`       | Single inset owner per host; CLI entity-card mode padding-free                                    |
+| `collapsible-row-rhythm.contract.test.tsx` | Shared content inset across EntityCard static/disclosure/catalog; form-array CLI rhythm preserved |
+| `entity-card-disclosure-renderer.test.tsx` | Disclosure body present; CLI legacy indent absent; leading offset on frame                        |
+| `grant-array-disclosure-shell.test.tsx`    | Grant integration: disclosure alignment, no CLI `content-column-indent`                           |
+| `collapsible-list-item.variants.test.ts`   | Entity-card body classes exclude legacy inset                                                     |
+| `catalog-card.stories.tsx`                 | Flat + disclosure rhythm side-by-side; location picker drawer context                             |
+| `content-card.variants.test.ts`            | Mixed-heading title must not use `flex-1`, `%` caps, or right-push hacks                          |
+| `entity-summary.test.tsx`                  | Compact title 14px; classification, dot, and end text 12px; no track offsets                      |
+| `entity-summary-status.type.test.ts`       | Status prop is structured data, not ReactNode                                                     |
+| `entity-anatomy-trailing.type.test.ts`     | Trailing action/group primary require ReactElement; closed secondary                              |
+| AGENTS.md component rule                   | No consumer padding overrides on entity surfaces                                                  |
 
 ---
 
@@ -738,17 +751,17 @@ prevent regression:
 Documented policy is authoritative. These items may still exist in code and are tracked
 for cleanup — do not weaken docs to match legacy patterns:
 
-| Item                                           | Status                                                                      |
-| ---------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Non-entity ArrayItem CLI content-column indent | **Intentional** for anonymous form arrays only                              |
-| `DetailEntityRow.endSlot`                      | **Intentional** for non-entity detail hosts — not for EntityAnatomyHost/DEC |
-| Catalog picker entity rows                     | `CatalogEntityPickerSheet` → `CatalogCard`                                  | Mandatory; perimeter on `EntityCardFrame`, inset on `EntityCardContent` |
+| Item                                           | Status                                                                                          |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Non-entity ArrayItem CLI content-column indent | **Intentional** for anonymous form arrays only                                                  |
+| `DetailEntityRow.endSlot`                      | **Intentional** for non-entity detail hosts — not for EntityAnatomyHost/disclosure `EntityCard` |
+| Catalog picker entity rows                     | `CatalogEntityPickerSheet` → `CatalogCard`                                                      | Mandatory; perimeter on `EntityCardFrame`, inset on `EntityCardContent` |
 
 ---
 
 ## Disabled state
 
-CEC and DEC expose presentational disabled state. Hosts still own interactive
+`EntityCard` exposes presentational disabled state. Hosts still own interactive
 `disabled`, `aria-disabled`, and focus behavior.
 
 ---

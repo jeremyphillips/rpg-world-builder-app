@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { projectEntitySurfaceIdentityToSummaryModel } from '../../../entity-surface-projection.lib'
-import { ContentEntityCard } from '../content-entity-card'
+import { EntityCardStaticRenderer } from '../entity-card-static-renderer'
 import { useEntityCardUtilityFieldSize } from '../entity-card-utility-field-size.context'
 
 function UtilityFieldSizeProbe() {
@@ -10,10 +10,10 @@ function UtilityFieldSizeProbe() {
   return <span data-testid="utility-field-size">{size}</span>
 }
 
-describe('ContentEntityCard', () => {
+describe('EntityCardStaticRenderer', () => {
   it('renders compact identity with semantic fallback media', () => {
     render(
-      <ContentEntityCard
+      <EntityCardStaticRenderer
         entity={projectEntitySurfaceIdentityToSummaryModel({
           heading: 'Silver Circle',
           classification: 'Guild',
@@ -28,7 +28,7 @@ describe('ContentEntityCard', () => {
 
   it('supplies xs field scale to compact card trailing utilities', () => {
     render(
-      <ContentEntityCard
+      <EntityCardStaticRenderer
         density="compact"
         entity={projectEntitySurfaceIdentityToSummaryModel({
           heading: 'Darkvision',
@@ -46,7 +46,7 @@ describe('ContentEntityCard', () => {
 
   it('does not override field scale on comfortable cards', () => {
     render(
-      <ContentEntityCard
+      <EntityCardStaticRenderer
         density="comfortable"
         entity={projectEntitySurfaceIdentityToSummaryModel({
           heading: 'Darkvision',

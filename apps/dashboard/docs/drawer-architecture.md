@@ -23,7 +23,7 @@ SHARED PRESENTATION/MECHANICS  reusable across domains
   @rpg/ui: Sheet, Modal, ConfirmDialog, CatalogPickerSheet, SelectionSummaryCard,
            CatalogPickerSelectionActions, usePendingAwareOpenChange
   dashboard shells: DrawerShell, CatalogEntityPickerSheet, ContentFormDrawer/Host
-  shared kits: CatalogEntityRow, EntityReplacementSection, DrawerContext, SubjectField,
+  shared kits: CatalogCard, EntityReplacementSection, DrawerContext, SubjectField,
                nested-create lifecycle
 
 DOMAIN POLICY                  eligibility, vocabulary, cardinality, projections
@@ -197,7 +197,7 @@ CatalogEntityPickerSheet (content) — entity row contract
 feature drawer (grammar composition)
 
 Footer-committed **single-choice** pickers pass `CatalogPickerSheet.selection`
-(radio group labelled by the sheet title) and render `CatalogEntityRow` selection
+(radio group labelled by the sheet title) and render `CatalogCard` selection
 mode — not Select/Remove inline actions. `Sheet.Content` provides quiet card tone
 for kind fields and picker rows automatically.
 

@@ -6,7 +6,7 @@ import type { ResolvedArrayItemHeader } from './array-item-config.lib'
 /**
  * Props passed to `ArrayItemConfig.renderShell` when a consumer replaces the
  * default ArrayItem presentation shell (e.g. dashboard entity-backed grants →
- * DisclosureEntityCard). Form ownership of registration, remove/reorder, and
+ * EntityCardDisclosureRenderer). Form ownership of registration, remove/reorder, and
  * validation chrome stays here; the shell owns visual card anatomy only.
  */
 export type ArrayItemShellRenderProps = {

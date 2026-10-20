@@ -1,12 +1,8 @@
 import { describe, expectTypeOf, it } from 'vitest'
 
-import type {
-  EntityCardDisclosureProps,
-  EntityCardStaticProps,
-} from '../surfaces/cards/content/entity-card'
-
-import type { EntityAnatomyLeading } from './entity-anatomy-leading.types'
-import type { EntityAnatomyHostProps } from './entity-anatomy'
+import type { EntityAnatomyLeading } from '../../anatomy/entity-anatomy-leading.types'
+import type { EntityAnatomyHostProps } from '../../anatomy/entity-anatomy'
+import type { EntityCardDisclosureProps, EntityCardStaticProps } from '../cards/content/entity-card'
 
 type ConsumerPresentationKeys =
   | 'className'
@@ -17,7 +13,7 @@ type ConsumerPresentationKeys =
   | 'padding'
   | 'inset'
 
-type LegacyContentEntityCardKeys =
+type LegacyEntityCardStaticKeys =
   | 'heading'
   | 'classification'
   | 'subheading'
@@ -44,7 +40,7 @@ describe('entity surface closed API', () => {
 
   it('EntityCard static rejects legacy slot and chrome props', () => {
     expectTypeOf<
-      Extract<keyof EntityCardStaticProps, LegacyContentEntityCardKeys>
+      Extract<keyof EntityCardStaticProps, LegacyEntityCardStaticKeys>
     >().toEqualTypeOf<never>()
   })
 

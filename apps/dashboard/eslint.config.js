@@ -59,7 +59,7 @@ const dashboardEntitySurfaceImportGuard = {
   files: ['src/features/**/*.{ts,tsx}'],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',
-    'src/features/content/lib/entity/surfaces/cards/content/content-entity-card.client.tsx',
+    'src/features/content/lib/entity/surfaces/cards/content/entity-card-static-renderer.tsx',
     'src/features/content/lib/entity/summary/entity-summary.client.tsx',
   ],
   rules: {
