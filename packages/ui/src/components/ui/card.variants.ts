@@ -6,7 +6,7 @@ export const cardRadiusClasses = 'rounded-card'
 /** @deprecated Option shells migrated to `ui-card`; retained for preview rail. */
 export const cardBorderClasses = 'border border-card-border'
 
-export const CARD_SURFACE_TONES = ['transparent', 'quiet', 'strong'] as const
+export const CARD_SURFACE_TONES = ['transparent', 'quiet', 'subtle', 'strong'] as const
 export type CardSurfaceTone = (typeof CARD_SURFACE_TONES)[number]
 /** @alias CardSurfaceTone */
 export type CardTone = CardSurfaceTone
@@ -186,6 +186,35 @@ const CARD_TONE_STATE_MATRIX: readonly {
     interactive: true,
     disabled: true,
     useCase: 'Disabled quiet row',
+    keyValues: 'opacity 0.5',
+  },
+  {
+    key: 'subtle-rest',
+    tone: 'subtle',
+    useCase: 'Light wash between lift and strong',
+    keyValues: 'bg --surface-subtle; border --border',
+  },
+  {
+    key: 'subtle-hover',
+    tone: 'subtle',
+    interactive: true,
+    useCase: 'Subtle tone interactive hover',
+    keyValues: 'hover color-mix 94% rest + --palette-neutral-contrast; pressed 88%',
+  },
+  {
+    key: 'subtle-selected',
+    tone: 'subtle',
+    interactive: true,
+    selected: true,
+    useCase: 'Selected subtle shell',
+    keyValues: 'bg --ui-surface-selected-bg, border --primary',
+  },
+  {
+    key: 'subtle-disabled',
+    tone: 'subtle',
+    interactive: true,
+    disabled: true,
+    useCase: 'Disabled subtle shell',
     keyValues: 'opacity 0.5',
   },
   {

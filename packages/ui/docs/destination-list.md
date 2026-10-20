@@ -56,12 +56,12 @@ Item link ownership:
 Opaque hover and pressed colors for interactive **strong** surfaces share one CSS owner:
 `surface-interaction.css`. Publishers set immutable `--ui-surface-bg` on the shell; the file
 derives `--ui-surface-hover-bg` and `--ui-surface-pressed-bg` with the same 94% / 88%
-`color-mix` recipe used by interactive `Card` (`quiet` and `strong`).
+`color-mix` recipe used by interactive `Card` (opaque tones including `quiet`, `subtle`, and `strong`).
 
-| Publisher                                             | Rest                                                   |
-| ----------------------------------------------------- | ------------------------------------------------------ |
-| Interactive `Card` (`quiet` / `strong`)               | `--ui-surface-bg` on `.ui-card`                        |
-| `DestinationList` `appearance="filled"` + strong tone | `--ui-surface-bg: var(--surface-strong)` on the `<ul>` |
+| Publisher                                                          | Rest                                                   |
+| ------------------------------------------------------------------ | ------------------------------------------------------ |
+| Interactive `Card` (`transparent` / `quiet` / `subtle` / `strong`) | `--ui-surface-bg` on `.ui-card`                        |
+| `DestinationList` `appearance="filled"` + strong tone              | `--ui-surface-bg: var(--surface-strong)` on the `<ul>` |
 
 Filled strong lists wire navigation rows only inside that shell:
 

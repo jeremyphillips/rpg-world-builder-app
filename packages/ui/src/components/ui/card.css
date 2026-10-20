@@ -1,5 +1,5 @@
 /*
- * Card shell — structure on `.ui-card`; tone (transparent|quiet|strong) owns fill/border;
+ * Card shell — structure on `.ui-card`; tone (transparent|quiet|subtle|strong) owns fill/border;
  * elevation (subtle|raised) owns depth. Selected/focus may replace shell shadow.
  * Nest with the full class after `&` (`&.ui-card--quiet`). Gluing `&` to a
  * modifier dash is rewritten into a selector that matches nothing.
@@ -75,6 +75,14 @@
       background-color: var(--ui-surface-bg);
     }
 
+    /* Light wash between lift and strong */
+    &.ui-card--subtle {
+      border: 1px solid var(--border);
+      --ui-surface-bg: var(--surface-subtle);
+      --surface-current: var(--surface-subtle);
+      background-color: var(--ui-surface-bg);
+    }
+
     /* Builder options, selection cards, default navigation chrome */
     &.ui-card--strong {
       border: 1px solid var(--border);
@@ -86,6 +94,7 @@
     &.ui-card--interactive:not(.ui-card--selected):not(.ui-card--disabled):hover:is(
         .ui-card--transparent,
         .ui-card--quiet,
+        .ui-card--subtle,
         .ui-card--strong
       ) {
       background-color: var(--ui-surface-hover-bg);
@@ -94,14 +103,30 @@
     &.ui-card--interactive:not(.ui-card--selected):not(.ui-card--disabled):active:is(
         .ui-card--transparent,
         .ui-card--quiet,
+        .ui-card--subtle,
         .ui-card--strong
       ) {
       background-color: var(--ui-surface-pressed-bg);
     }
 
-    &.ui-card--selected:is(.ui-card--transparent, .ui-card--quiet, .ui-card--strong),
-    &.ui-card--selected:hover:is(.ui-card--transparent, .ui-card--quiet, .ui-card--strong),
-    &.ui-card--selected:active:is(.ui-card--transparent, .ui-card--quiet, .ui-card--strong) {
+    &.ui-card--selected:is(
+        .ui-card--transparent,
+        .ui-card--quiet,
+        .ui-card--subtle,
+        .ui-card--strong
+      ),
+    &.ui-card--selected:hover:is(
+        .ui-card--transparent,
+        .ui-card--quiet,
+        .ui-card--subtle,
+        .ui-card--strong
+      ),
+    &.ui-card--selected:active:is(
+        .ui-card--transparent,
+        .ui-card--quiet,
+        .ui-card--subtle,
+        .ui-card--strong
+      ) {
       background-color: var(--ui-surface-selected-bg);
       border-color: var(--primary);
       --surface-current: var(--ui-surface-selected-bg);
@@ -118,7 +143,9 @@
     &.ui-card--transparent.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
     &.ui-card--transparent.ui-card--interactive:has(.ui-choice-control:focus-visible),
     &.ui-card--quiet.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
-    &.ui-card--quiet.ui-card--interactive:has(.ui-choice-control:focus-visible) {
+    &.ui-card--quiet.ui-card--interactive:has(.ui-choice-control:focus-visible),
+    &.ui-card--subtle.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
+    &.ui-card--subtle.ui-card--interactive:has(.ui-choice-control:focus-visible) {
       box-shadow: var(--ui-focus-ring-standalone);
     }
 

@@ -14,9 +14,10 @@ const paletteLight = readFileSync(join(tokensDir, 'palette-light.css'), 'utf8')
 const paletteDark = readFileSync(join(tokensDir, 'palette-dark.css'), 'utf8')
 
 describe('card surface interaction contract', () => {
-  it('maps tone rest to transparent, lift, and strong planes', () => {
+  it('maps tone rest to transparent, lift, subtle, and strong planes', () => {
     expect(cardCss).toMatch(/&\.ui-card--transparent[\s\S]*--ui-surface-bg:\s*transparent/)
     expect(cardCss).toMatch(/&\.ui-card--quiet[\s\S]*--ui-surface-bg:\s*var\(--surface-lift\)/)
+    expect(cardCss).toMatch(/&\.ui-card--subtle[\s\S]*--ui-surface-bg:\s*var\(--surface-subtle\)/)
     expect(cardCss).toMatch(/&\.ui-card--strong[\s\S]*--ui-surface-bg:\s*var\(--surface-strong\)/)
   })
 
@@ -25,7 +26,7 @@ describe('card surface interaction contract', () => {
     expect(cardCss).toContain('var(--ui-surface-pressed-bg)')
     expect(cardCss).not.toContain('var(--ui-surface-bg) 96%')
     expect(cardCss).not.toContain('--row-hover-bg')
-    expect(cardCss).not.toContain('--surface-subtle')
+    expect(cardCss).not.toContain('--ui-row-bg-hover')
   })
 
   it('uses shared selected fill with explicit hover/active persistence', () => {

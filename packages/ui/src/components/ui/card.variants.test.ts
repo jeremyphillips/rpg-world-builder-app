@@ -24,8 +24,9 @@ describe('cardSurfaceVariants', () => {
     expect(cardSurfaceVariants({ elevation: 'raised' })).toContain('ui-card--elevation-raised')
   })
 
-  it('emits transparent tone modifier', () => {
+  it('emits transparent and subtle tone modifiers', () => {
     expect(cardSurfaceVariants({ tone: 'transparent' })).toContain('ui-card--transparent')
+    expect(cardSurfaceVariants({ tone: 'subtle' })).toContain('ui-card--subtle')
   })
 
   it('emits density modifiers independent of tone', () => {

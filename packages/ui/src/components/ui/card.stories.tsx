@@ -57,8 +57,12 @@ export const Default: Story = DefaultCard
 
 export const ToneComparison: Story = {
   render: () => (
-    <div className="grid max-w-4xl gap-4 md:grid-cols-3">
+    <div className="grid max-w-5xl gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Card header={{ title: 'Strong / flat', description: 'Default generic card.' }} />
+      <Card
+        tone="subtle"
+        header={{ title: 'Subtle / flat', description: 'Light wash between lift and strong.' }}
+      />
       <Card
         tone="quiet"
         header={{ title: 'Quiet / flat', description: 'Entity row and catalog frames.' }}
@@ -74,7 +78,7 @@ export const ToneComparison: Story = {
 export const ElevationComparison: Story = {
   render: () => (
     <div className="grid max-w-4xl gap-6">
-      {(['strong', 'quiet'] as const).map((tone) => (
+      {CARD_SURFACE_TONES.map((tone) => (
         <div key={tone} className="space-y-2">
           <p className="text-style-label">{tone} tone</p>
           <div className="grid gap-4 md:grid-cols-3">
@@ -189,6 +193,7 @@ const SURFACE_MATRIX_TONES = CARD_SURFACE_TONES
 const SURFACE_MATRIX_TONE_LABEL: Record<CardSurfaceTone, string> = {
   transparent: 'Transparent',
   quiet: 'Quiet',
+  subtle: 'Subtle (tone)',
   strong: 'Strong',
 }
 
@@ -279,7 +284,7 @@ function SurfaceMatrixCell({
 function SurfaceMatrixTable({ className }: { className?: string }) {
   return (
     <div className={cn('overflow-x-auto', className)}>
-      <table className="w-full min-w-[52rem] border-collapse text-left">
+      <table className="w-full min-w-[68rem] border-collapse text-left">
         <thead>
           <tr className="border-b border-border">
             <th className="p-3 text-xs font-medium text-muted-foreground">State</th>
@@ -315,7 +320,7 @@ export const SurfaceInteractionMatrix: Story = {
     docs: {
       description: {
         story:
-          'Tone × interaction state grid with comfortable card inset. Hover, pressed, and focus cells use story-only preview classes that mirror `card.css` (real pointer/focus still applies on live cells).',
+          'Tone × interaction state grid with comfortable card inset. `Subtle (tone)` is surface fill (`--surface-subtle`), not `elevation="subtle"`. Hover, pressed, and focus cells use story-only preview classes that mirror `card.css`.',
       },
     },
   },
