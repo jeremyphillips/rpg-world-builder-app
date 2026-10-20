@@ -1,6 +1,6 @@
 /*
  * Canonical density copy scale.
- * compact 14/12, comfortable 16/14, spacious 19/14.
+ * Title 14/20, 16/22, 19/26; supporting 12/16, 14/20, 14/20 (compact / comfortable / spacious).
  * Font size, line-height, and heading weight for anatomy titles (`ui-copy-title`).
  * A density class on the same element overrides an inherited value.
  *
@@ -10,11 +10,12 @@
 @layer components {
   :root {
     --ui-anatomy-row-gap: calc(var(--spacing) * 1);
+    --ui-copy-title-line-height: 1.375rem; /* 22px — comfortable title default */
   }
   .ui-copy-title,
   .ui-content-card-heading {
     font-size: var(--ui-copy-title-size, var(--text-base));
-    line-height: var(--ui-copy-title-line-height, var(--text-base--line-height));
+    line-height: var(--ui-copy-title-line-height, 1.375rem);
     font-weight: var(--font-weight-heading);
     letter-spacing: var(--tracking-heading);
   }
@@ -28,7 +29,7 @@
   .ui-destination-list,
   .ui-interactive-list__main--md {
     --ui-copy-title-size: var(--text-base);
-    --ui-copy-title-line-height: var(--text-base--line-height);
+    --ui-copy-title-line-height: 1.375rem;
     --ui-copy-supporting-size: var(--text-sm);
     --ui-copy-supporting-line-height: var(--text-sm--line-height);
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
@@ -59,7 +60,7 @@
   .ui-identity-row--comfortable,
   .ui-content-card-heading--comfortable {
     --ui-copy-title-size: var(--text-base);
-    --ui-copy-title-line-height: var(--text-base--line-height);
+    --ui-copy-title-line-height: 1.375rem;
     --ui-copy-supporting-size: var(--text-sm);
     --ui-copy-supporting-line-height: var(--text-sm--line-height);
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
@@ -75,7 +76,7 @@
   .ui-identity-row--spacious,
   .ui-content-card-heading--spacious {
     --ui-copy-title-size: var(--text-heading-card);
-    --ui-copy-title-line-height: var(--text-heading-card--line-height);
+    --ui-copy-title-line-height: 1.625rem;
     --ui-copy-supporting-size: var(--text-sm);
     --ui-copy-supporting-line-height: var(--text-sm--line-height);
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);

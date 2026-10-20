@@ -10,10 +10,7 @@
     --ui-destination-inset-inline: calc(var(--spacing) * 5);
     --ui-destination-inset-block: calc(var(--spacing) * 2);
     --ui-destination-title-size: var(--ui-copy-title-size, var(--text-base));
-    --ui-destination-title-line-height: var(
-      --ui-copy-title-line-height,
-      var(--text-base--line-height)
-    );
+    --ui-destination-title-line-height: var(--ui-copy-title-line-height, 1.375rem);
     --ui-destination-description-size: var(--ui-copy-supporting-size, var(--text-sm));
     --ui-destination-description-line-height: var(
       --ui-copy-supporting-line-height,

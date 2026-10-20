@@ -16,31 +16,31 @@ styles, and list behavior on all descendants and fights layout utilities
 Document outline presets — pair each `variant` with the matching `as` level. Use **one
 h1 per page** (route title via `page`, or entity title via `display` on detail routes).
 
-| Variant / component               | `as`   | px    | Weight               | Use case                                                                      |
-| --------------------------------- | ------ | ----- | -------------------- | ----------------------------------------------------------------------------- |
-| `Heading` `display`               | `h1`   | 42    | 700                  | Hero, content detail entity titles                                            |
-| `Heading` `page`                  | `h1`   | 34    | 600                  | Route titles (`PageHeader`)                                                   |
-| `Heading` `heroTitle`             | `h1`   | 19→34 | 600                  | Page hero titles (`Hero`, campaign overview) — 19px mobile, 24px md, 34px lg+ |
-| `Heading` `section`               | `h2`   | 28    | 600                  | Top-level in-page sections                                                    |
-| `Heading` `subsection`            | `h3`   | 19    | 600                  | Nested blocks within a section                                                |
-| `Heading` `group`                 | `h4`   | 16    | 500                  | Headings inside subsections                                                   |
-| `Heading` `card`                  | Radix  | 19    | 600                  | Legacy / non-card surfaces; **not** generic `Card` headers (see below)        |
-| `Heading` `dialogTitle`           | Radix  | 19→24 | 600                  | `Modal.Header` / `Sheet.Header` default (19px mobile, 24px md+)               |
-| `Heading` `confirmDialogTitle`    | Radix  | 19    | 600                  | `ConfirmDialog` title — compact, non-responsive                               |
-| `Heading` `nav` / `brand`         | `span` | 16    | 600                  | Topbar title, sidebar product name                                            |
-| `Heading` `alert`                 | Radix  | 16    | 600                  | Inline `Alert` titles                                                         |
-| `Heading` `label`                 | `p`    | 16    | 500                  | Inline non-outline titles (trait names)                                       |
-| `Text` `body`                     | `p`    | 16    | 400                  | Default foreground copy                                                       |
-| `Text` `muted`                    | `p`    | 16    | 400                  | Non-catalog plain copy (hints, errors)                                        |
-| `Text` `small`                    | `p`    | 15    | 400                  | Helper text, secondary metadata                                               |
-| `Text` `caption`                  | `p`    | 12    | 400                  | Form field hints                                                              |
-| `Text` `lead`                     | `p`    | 18    | 400                  | Marketing subheads                                                            |
-| `Text` `destructive`              | `p`    | 15    | 400                  | Inline errors — pair with `role="alert"`                                      |
-| `Eyebrow` `xs` / `sm` / `md`      | `p`    | 9–13  | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)                 |
-| `RichTextContent` `size="md"`     | `div`  | 15    | 400                  | Catalog descriptions (TipTap / CMS HTML)                                      |
-| Generic `Card` header title       | `h3`   | 14–19 | 600 (`heading`)      | `ui-card__title` — size from `Card` `density`; weight from heading role       |
-| Anatomy title (`ui-copy-title`)   | varies | 14–19 | 600 (`heading`)      | Identity rows, Alert titles, content-card headings — size from copy-scale     |
-| Generic `Card` header description | `p`    | 12–14 | shell vars           | `ui-card__description` — comfortable/spacious 14px; compact 12px              |
+| Variant / component               | `as`   | px    | Weight               | Use case                                                                               |
+| --------------------------------- | ------ | ----- | -------------------- | -------------------------------------------------------------------------------------- |
+| `Heading` `display`               | `h1`   | 42    | 700                  | Hero, content detail entity titles                                                     |
+| `Heading` `page`                  | `h1`   | 34    | 600                  | Route titles (`PageHeader`)                                                            |
+| `Heading` `heroTitle`             | `h1`   | 19→34 | 600                  | Page hero titles (`Hero`, campaign overview) — 19px mobile, 24px md, 34px lg+          |
+| `Heading` `section`               | `h2`   | 28    | 600                  | Top-level in-page sections                                                             |
+| `Heading` `subsection`            | `h3`   | 19    | 600                  | Nested blocks within a section                                                         |
+| `Heading` `group`                 | `h4`   | 16    | 500                  | Headings inside subsections                                                            |
+| `Heading` `card`                  | Radix  | 19    | 600                  | Legacy / non-card surfaces; **not** generic `Card` headers (see below)                 |
+| `Heading` `dialogTitle`           | Radix  | 19→24 | 600                  | `Modal.Header` / `Sheet.Header` default (19px mobile, 24px md+)                        |
+| `Heading` `confirmDialogTitle`    | Radix  | 19    | 600                  | `ConfirmDialog` title — compact, non-responsive                                        |
+| `Heading` `nav` / `brand`         | `span` | 16    | 600                  | Topbar title, sidebar product name                                                     |
+| `Heading` `alert`                 | Radix  | 16    | 600                  | Inline `Alert` titles                                                                  |
+| `Heading` `label`                 | `p`    | 16    | 500                  | Inline non-outline titles (trait names)                                                |
+| `Text` `body`                     | `p`    | 16    | 400                  | Default foreground copy                                                                |
+| `Text` `muted`                    | `p`    | 16    | 400                  | Non-catalog plain copy (hints, errors)                                                 |
+| `Text` `small`                    | `p`    | 15    | 400                  | Helper text, secondary metadata                                                        |
+| `Text` `caption`                  | `p`    | 12    | 400                  | Form field hints                                                                       |
+| `Text` `lead`                     | `p`    | 18    | 400                  | Marketing subheads                                                                     |
+| `Text` `destructive`              | `p`    | 15    | 400                  | Inline errors — pair with `role="alert"`                                               |
+| `Eyebrow` `xs` / `sm` / `md`      | `p`    | 9–13  | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)                          |
+| `RichTextContent` `size="md"`     | `div`  | 15    | 400                  | Catalog descriptions (TipTap / CMS HTML)                                               |
+| Generic `Card` header title       | `h3`   | 14–19 | 600 (`heading`)      | `ui-card__title` — size from `Card` `density`; weight from heading role                |
+| Anatomy title (`ui-copy-title`)   | varies | 14–19 | 600 (`heading`)      | 14/20, 16/22, 19/26 by density — [row-anatomy.md](./row-anatomy.md#anatomy-title-copy) |
+| Generic `Card` header description | `p`    | 12–14 | shell vars           | `ui-card__description` — comfortable/spacious 14px; compact 12px                       |
 
 Preserve semantic headings and existing `id`s — content detail routes use
 `aria-labelledby` on sections.

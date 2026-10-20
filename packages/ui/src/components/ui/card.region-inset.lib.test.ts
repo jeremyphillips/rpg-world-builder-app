@@ -47,6 +47,19 @@ describe('card region inset CSS contract', () => {
     expect(cardSource).toContain('.ui-card:has(.ui-card__content) .ui-card__footer')
   })
 
+  it('uses anatomy title line-height on comfortable and spacious card headers', () => {
+    expect(copyScaleSource).toMatch(
+      /\.ui-card--comfortable[\s\S]*--ui-copy-title-line-height:\s*1\.375rem/,
+    )
+    expect(copyScaleSource).toMatch(
+      /\.ui-card--spacious[\s\S]*--ui-copy-title-line-height:\s*1\.625rem/,
+    )
+    expect(cardSource).toMatch(
+      /\.ui-card--comfortable[\s\S]*--ui-card-title-line-height:\s*1\.375rem/,
+    )
+    expect(cardSource).toMatch(/\.ui-card--spacious[\s\S]*--ui-card-title-line-height:\s*1\.625rem/)
+  })
+
   it('uses heading weight for card titles at every density', () => {
     expect(cardSource).toMatch(
       /\.ui-card \.ui-card__title[\s\S]*font-weight:\s*var\(--font-weight-heading\)/,

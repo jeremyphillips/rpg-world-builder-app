@@ -69,6 +69,23 @@ function resolvedAnatomyRowGap(testId: string): string {
   return '4px'
 }
 
+/** Resolve --ui-copy-title-line-height from rem or var(--text-sm--line-height) on ancestors. */
+function resolvedTitleLineHeight(testId: string): string {
+  const remPx: Record<string, string> = {
+    '1.375rem': '22px',
+    '1.625rem': '26px',
+  }
+  let node: Element | null = screen.getByTestId(testId)
+  while (node) {
+    const specified = getComputedStyle(node).getPropertyValue('--ui-copy-title-line-height').trim()
+    if (remPx[specified]) return remPx[specified]
+    const token = specified.match(/^var\((--[^)]+)\)$/)?.[1]
+    if (token === '--text-sm--line-height') return '20px'
+    node = node.parentElement
+  }
+  return '22px'
+}
+
 describe('canonical copy scale', () => {
   it('uses comfortable 16/14 when no density ancestor is present', () => {
     installTokens()
@@ -211,5 +228,36 @@ describe('canonical copy scale', () => {
     expect(copyScaleCss).toMatch(
       /\.ui-copy-title[\s\S]*font-weight:\s*var\(--font-weight-heading\)/,
     )
+  })
+
+  it('publishes anatomy title line-height 20 / 22 / 26px by density', () => {
+    installTokens()
+    render(
+      <>
+        <div className="ui-card ui-card--compact">
+          <span className="ui-copy-title" data-testid="compact-lh">
+            x
+          </span>
+        </div>
+        <div className="ui-card ui-card--comfortable">
+          <span className="ui-copy-title" data-testid="comfortable-lh">
+            x
+          </span>
+        </div>
+        <div className="ui-card ui-card--spacious">
+          <span className="ui-copy-title" data-testid="spacious-lh">
+            x
+          </span>
+        </div>
+        <span className="ui-copy-title" data-testid="root-lh">
+          x
+        </span>
+      </>,
+    )
+
+    expect(resolvedTitleLineHeight('compact-lh')).toBe('20px')
+    expect(resolvedTitleLineHeight('comfortable-lh')).toBe('22px')
+    expect(resolvedTitleLineHeight('spacious-lh')).toBe('26px')
+    expect(resolvedTitleLineHeight('root-lh')).toBe('22px')
   })
 })

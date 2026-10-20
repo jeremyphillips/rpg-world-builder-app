@@ -19,7 +19,7 @@
     --ui-card-inset-block: var(--ui-surface-inset-block);
     --ui-card-inset-inline: var(--ui-surface-inset-inline);
     --ui-card-title-size: var(--text-base);
-    --ui-card-title-line-height: var(--text-base--line-height);
+    --ui-card-title-line-height: 1.375rem;
     --ui-card-description-size: var(--text-sm);
     --ui-card-description-line-height: var(--text-sm--line-height);
   }
@@ -28,7 +28,7 @@
     --ui-card-inset-block: var(--ui-surface-inset-block);
     --ui-card-inset-inline: var(--ui-surface-inset-inline);
     --ui-card-title-size: var(--text-heading-card);
-    --ui-card-title-line-height: var(--text-heading-card--line-height);
+    --ui-card-title-line-height: 1.625rem;
     --ui-card-description-size: var(--text-sm);
     --ui-card-description-line-height: var(--text-sm--line-height);
   }

@@ -40,6 +40,18 @@ Published on the same density selectors as copy scale (`ui-card--*`, `ui-alert--
 `ui-identity-row--*`, `dash-entity-anatomy--*`, …). Comfortable is the `:root` default when
 no density ancestor is present. Status uses this gap only — no separate offset.
 
+## Anatomy title copy
+
+Title size and line-height (`--ui-copy-title-size` / `--ui-copy-title-line-height` on density
+ancestors, consumed by `ui-copy-title`). Supporting copy uses `ui-copy-supporting` (12/16,
+14/20, 14/20). Authoritative ladder in [`copy-scale.css`](../src/components/ui/copy-scale.css).
+
+| Density     | Title (size / line-height) |
+| ----------- | -------------------------- |
+| compact     | 14px / 20px                |
+| comfortable | 16px / 22px                |
+| spacious    | 19px / 26px                |
+
 ## Tracks
 
 ```text
@@ -146,9 +158,9 @@ Density for identity copy is published on ancestors (`.ui-card--*`, `ui-identity
 
 | Card / identity density | Title copy | Title weight | Badge or `StatusIcon` beside the title line (`headingEnd`)    |
 | ----------------------- | ---------: | ------------ | ------------------------------------------------------------- |
-| compact                 |       14px | 600          | `sm` — set explicitly on `Badge` / `StatusIcon` at call sites |
-| comfortable             |       16px | 600          | `sm`                                                          |
-| spacious                |       19px | 600          | `md`                                                          |
+| compact                 |    14 / 20 | 600          | `sm` — set explicitly on `Badge` / `StatusIcon` at call sites |
+| comfortable             |    16 / 22 | 600          | `sm`                                                          |
+| spacious                |    19 / 26 | 600          | `md`                                                          |
 
 This table is **not** the entity **status-lane** badge rule (compact → `sm`, else `md` on `EntitySummary.status`) — see [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
 
