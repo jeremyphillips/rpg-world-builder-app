@@ -86,6 +86,92 @@ function CatalogCardSelectionBody({
   )
 }
 
+function CatalogCardFlatBody({
+  entity,
+  trailing,
+  summary,
+}: {
+  entity: EntitySummaryModel
+  trailing?: EntityAnatomyTrailing
+  summary?: ReactNode
+}) {
+  return (
+    <EntityCardFrame
+      density={CATALOG_CARD_DENSITY}
+      edges={resolveEntitySurfaceEdges({ leadingUtilityCount: 0, trailing })}
+      leadingUtilityCount={0}
+    >
+      <EntityCardContent>
+        <EntityAnatomyHost entity={entity} trailing={trailing} density={CATALOG_CARD_DENSITY} />
+      </EntityCardContent>
+      {summary}
+    </EntityCardFrame>
+  )
+}
+
+/**
+ * Disclosure catalog rows stay on CollapsibleListItem — not EntityCard disclosure.
+ * Body wash, domIds, and picker summary stacking differ from DisclosureEntityCard;
+ * keep this shell catalog-local rather than a shared cross-surface composer.
+ */
+function CatalogCardDisclosureBody({
+  toolbarLabel,
+  domIds,
+  collapsed,
+  onToggleCollapse,
+  summary,
+  details,
+  entity,
+  trailing,
+}: {
+  toolbarLabel: string
+  domIds: CatalogCardBaseProps['domIds']
+  collapsed?: boolean
+  onToggleCollapse?: () => void
+  summary?: ReactNode
+  details?: ReactNode
+  entity: EntitySummaryModel
+  trailing?: EntityAnatomyTrailing
+}) {
+  const leadingUtilityCount = 1
+
+  return (
+    <EntityCardFrame
+      density={CATALOG_CARD_DENSITY}
+      edges={resolveEntitySurfaceEdges({ leadingUtilityCount, trailing })}
+      leadingUtilityCount={leadingUtilityCount}
+    >
+      <CollapsibleListItem
+        itemId={domIds.itemId}
+        titleId={domIds.titleId}
+        bodyId={domIds.bodyId}
+        toolbarAriaLabel={toolbarLabel}
+        rowLayout="entity-card"
+        density={CATALOG_CARD_DENSITY}
+        toolbarCompact
+        toolbarLeadingChrome="none"
+        collapsible
+        collapsed={collapsed}
+        onToggleCollapse={onToggleCollapse}
+        showDragHandle={false}
+        className={disclosureEntityCardListItemVariants()}
+        bodyClassName={catalogCardBodyWashVariants()}
+        header={
+          <EntityCardContent>
+            <DisclosureEntityCardHeader
+              entity={entity}
+              trailing={trailing}
+              density={CATALOG_CARD_DENSITY}
+            />
+          </EntityCardContent>
+        }
+        summary={summary}
+        body={details}
+      />
+    </EntityCardFrame>
+  )
+}
+
 /** Entity-aware catalog browse card — EntityCardFrame owns perimeter; EntityCardContent owns inset. */
 export function CatalogCard(props: CatalogCardProps) {
   const {
@@ -112,50 +198,21 @@ export function CatalogCard(props: CatalogCardProps) {
   }
 
   const trailing = 'trailing' in props ? props.trailing : undefined
-  const isDisclosure = collapsible
-  const leadingUtilityCount = isDisclosure ? 1 : 0
+
+  if (!collapsible) {
+    return <CatalogCardFlatBody entity={entity} trailing={trailing} summary={summary} />
+  }
 
   return (
-    <EntityCardFrame
-      density={CATALOG_CARD_DENSITY}
-      edges={resolveEntitySurfaceEdges({ leadingUtilityCount, trailing })}
-      leadingUtilityCount={leadingUtilityCount}
-    >
-      <CollapsibleListItem
-        itemId={domIds.itemId}
-        titleId={domIds.titleId}
-        bodyId={domIds.bodyId}
-        toolbarAriaLabel={toolbarLabel}
-        rowLayout="entity-card"
-        density={CATALOG_CARD_DENSITY}
-        toolbarCompact
-        toolbarLeadingChrome="none"
-        collapsible={isDisclosure && collapsible}
-        collapsed={collapsed}
-        onToggleCollapse={onToggleCollapse}
-        showDragHandle={false}
-        className={disclosureEntityCardListItemVariants()}
-        bodyClassName={isDisclosure ? catalogCardBodyWashVariants() : undefined}
-        header={
-          <EntityCardContent>
-            {isDisclosure ? (
-              <DisclosureEntityCardHeader
-                entity={entity}
-                trailing={trailing}
-                density={CATALOG_CARD_DENSITY}
-              />
-            ) : (
-              <EntityAnatomyHost
-                entity={entity}
-                trailing={trailing}
-                density={CATALOG_CARD_DENSITY}
-              />
-            )}
-          </EntityCardContent>
-        }
-        summary={summary}
-        body={details}
-      />
-    </EntityCardFrame>
+    <CatalogCardDisclosureBody
+      toolbarLabel={toolbarLabel}
+      domIds={domIds}
+      collapsed={collapsed}
+      onToggleCollapse={onToggleCollapse}
+      summary={summary}
+      details={details}
+      entity={entity}
+      trailing={trailing}
+    />
   )
 }

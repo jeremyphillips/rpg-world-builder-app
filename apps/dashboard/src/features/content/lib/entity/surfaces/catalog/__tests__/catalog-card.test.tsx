@@ -13,9 +13,15 @@ const domIds = {
   bodyId: 'picker-item-rope-body',
 }
 
-function entityCardContentFromShell(container: HTMLElement): HTMLElement {
+function entityCardContentFromDisclosureShell(container: HTMLElement): HTMLElement {
   const shell = container.querySelector('[role="group"]') as HTMLElement
   const contentInset = shell.querySelector('.dash-entity-card__content')
+  expect(contentInset).toBeTruthy()
+  return contentInset as HTMLElement
+}
+
+function entityCardContentFromFlatCard(container: HTMLElement): HTMLElement {
+  const contentInset = container.querySelector('article .dash-entity-card__content')
   expect(contentInset).toBeTruthy()
   return contentInset as HTMLElement
 }
@@ -51,7 +57,7 @@ describe('CatalogCard', () => {
       collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
     )
 
-    const contentInset = entityCardContentFromShell(container)
+    const contentInset = entityCardContentFromDisclosureShell(container)
     expect(contentInset).toHaveClass('dash-entity-card__content')
 
     const leading = document.querySelector('[data-entity-item-slot="leading"]')
@@ -76,13 +82,10 @@ describe('CatalogCard', () => {
     expect(frame).toHaveClass('dash-entity-surface--leading-0')
     expect(frame).not.toHaveAttribute('style')
 
-    const contentInset = entityCardContentFromShell(container)
-    expect(contentInset).toHaveClass('dash-entity-card__content')
+    expect(screen.queryByRole('group')).toBeNull()
 
-    const headerRow = screen.getByRole('group').firstElementChild as HTMLElement
-    expect(headerRow).not.toHaveClass(
-      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
-    )
+    const contentInset = entityCardContentFromFlatCard(container)
+    expect(contentInset).toHaveClass('dash-entity-card__content')
 
     expect(screen.queryByRole('button', { name: 'The Foos' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()

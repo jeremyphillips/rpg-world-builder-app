@@ -33,7 +33,7 @@ function entityCardContentFromGroup(label: RegExp | string): HTMLElement {
 }
 
 describe('Entity card surface rhythm contract', () => {
-  it('keeps entity-card CLI header rows free of vertical padding', () => {
+  it('renders flat catalog rows without collapsible list chrome', () => {
     render(
       <CatalogCard
         toolbarLabel="Dagger"
@@ -42,7 +42,8 @@ describe('Entity card surface rhythm contract', () => {
       />,
     )
 
-    expect(headerRowFromGroup(/Dagger/)).not.toHaveClass(compactHeaderRhythm)
+    expect(screen.queryByRole('group')).toBeNull()
+    expect(document.querySelector('article .dash-entity-card__content')).toBeTruthy()
   })
 
   it('applies shared compact content inset on CEC, DEC, and catalog rows', () => {

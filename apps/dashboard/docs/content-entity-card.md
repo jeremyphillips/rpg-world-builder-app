@@ -298,7 +298,11 @@ Applies to CollapsibleListItem-based rows:
   `EntityCardContent` owns header inset; CLI contributes no meaningful padding
 - **Default form-array rows:** CLI owns header vertical padding
   (`collapsibleListItemHeaderVerticalPaddingVariants`), body divider, body vertical padding
-- **Invariant:** entity-card header rhythm is identical for flat and disclosure catalog rows
+- **Flat catalog rows** (`CatalogCard` without `collapsible`): frame + `EntityCardContent` +
+  `EntityAnatomyHost` only — no `CollapsibleListItem` shell
+- **Disclosure catalog rows:** `CollapsibleListItem` with `rowLayout="entity-card"`; header
+  inset still owned by `EntityCardContent`
+- **Invariant:** flat and disclosure catalog headers share the same compact content inset class
   at the same density
 
 ### Consumer supplies
