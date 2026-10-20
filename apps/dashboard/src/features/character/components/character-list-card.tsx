@@ -91,7 +91,7 @@ export function CharacterListCard({
   showCampaign = true,
   controllerLine,
   rosterStatus,
-  density = 'comfortable',
+  density = 'spacious',
 }: CharacterListCardProps) {
   const rosterPresentation = rosterStatus
     ? resolveCharacterRosterStatusPresentation(rosterStatus)
