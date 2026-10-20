@@ -12,8 +12,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: var(--ui-copy-title-size, var(--text-base));
-    line-height: var(--ui-copy-title-line-height, var(--text-base--line-height));
   }
 
   .ui-identity-row__title a {

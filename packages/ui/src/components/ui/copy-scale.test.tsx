@@ -206,4 +206,10 @@ describe('canonical copy scale', () => {
 
     expect(resolvedAnatomyRowGap('nested-gap')).toBe('6px')
   })
+
+  it('applies heading weight on ui-copy-title via copy-scale.css', () => {
+    expect(copyScaleCss).toMatch(
+      /\.ui-copy-title[\s\S]*font-weight:\s*var\(--font-weight-heading\)/,
+    )
+  })
 })

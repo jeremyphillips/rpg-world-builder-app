@@ -111,7 +111,7 @@ A `variant="selection"` request routes to `SelectionOptionCard`, not `Card`, so 
 
 ### Card footer labeled actions
 
-Card and Alert share canonical copy scale, `--ui-anatomy-row-gap` between related header/copy rows, and `--ui-surface-inset-*` rhythm via [`copy-scale.css`](../src/components/ui/copy-scale.css) (row-gap ladder in [row-anatomy.md](./row-anatomy.md)). Alert keeps semantic variants and optional `leading`; Card keeps tone, elevation, and navigation. Choose **Card** for neutral hub tiles and invitations; choose **Alert** for status-colored guidance.
+Card and Alert share canonical copy scale (`ui-copy-title` size and heading weight), `--ui-anatomy-row-gap` between related header/copy rows, and `--ui-surface-inset-*` rhythm via [`copy-scale.css`](../src/components/ui/copy-scale.css) (typography ladder in [row-anatomy.md](./row-anatomy.md)). Alert keeps semantic variants and optional `leading`; Card keeps tone, elevation, and navigation. Choose **Card** for neutral hub tiles and invitations; choose **Alert** for status-colored guidance.
 
 For labeled footer or Alert action controls, pass explicit `size` from `resolveSurfaceActionButtonSize(density)` in `@rpg/ui`. `CardFooter` is layout-only — no contextual descendant sizing. Persistent dashboard copy may use `announcement="none"` on Alert so variant color does not imply a live region.
 

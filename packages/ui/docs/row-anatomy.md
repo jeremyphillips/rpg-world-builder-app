@@ -142,13 +142,13 @@ primitive that needs a new slot, variant, or override to fit is a different anat
 
 ## Heading accessories
 
-Density for identity copy is published on ancestors (`.ui-card--*`, `ui-identity-row--*`, `ui-content-card-heading--*`, `dash-entity-anatomy--*`) via [`copy-scale.css`](../src/components/ui/copy-scale.css). Generic **`Card`** + `IdentityRowHeadingLine` inside `CardHeader` inherits title size from the card shell without `contentCardHeadingScaleClass`.
+Density for identity copy is published on ancestors (`.ui-card--*`, `ui-identity-row--*`, `ui-content-card-heading--*`, `dash-entity-anatomy--*`) via [`copy-scale.css`](../src/components/ui/copy-scale.css). Anatomy titles use `ui-copy-title` (or equivalent shell rules) for **size and `--font-weight-heading` (600)** at every density — density does not switch titles to body-emphasis. Generic **`Card`** + `IdentityRowHeadingLine` inside `CardHeader` inherits title size from the card shell without `contentCardHeadingScaleClass`.
 
-| Card / identity density | Title copy | Badge or `StatusIcon` beside the title line (`headingEnd`)    |
-| ----------------------- | ---------: | ------------------------------------------------------------- |
-| compact                 |       14px | `sm` — set explicitly on `Badge` / `StatusIcon` at call sites |
-| comfortable             |       16px | `sm`                                                          |
-| spacious                |       19px | `md`                                                          |
+| Card / identity density | Title copy | Title weight | Badge or `StatusIcon` beside the title line (`headingEnd`)    |
+| ----------------------- | ---------: | ------------ | ------------------------------------------------------------- |
+| compact                 |       14px | 600          | `sm` — set explicitly on `Badge` / `StatusIcon` at call sites |
+| comfortable             |       16px | 600          | `sm`                                                          |
+| spacious                |       19px | 600          | `md`                                                          |
 
 This table is **not** the entity **status-lane** badge rule (compact → `sm`, else `md` on `EntitySummary.status`) — see [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
 

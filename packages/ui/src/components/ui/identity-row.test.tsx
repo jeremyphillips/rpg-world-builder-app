@@ -132,7 +132,7 @@ describe('IdentityRow', () => {
     )
 
     expect(container.firstElementChild).toHaveClass('ui-identity-row--compact')
-    expect(screen.getByText('Compact row')).toHaveClass('ui-identity-row__title')
+    expect(screen.getByText('Compact row')).toHaveClass('ui-identity-row__title', 'ui-copy-title')
   })
 
   it('keeps classification on the shared title class', () => {

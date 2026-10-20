@@ -24,7 +24,7 @@ export const identityRowHeadingClusterVariants = cva('flex min-w-0 flex-1 items-
 export const identityRowHeadingEndVariants = cva('shrink-0 text-style-caption')
 
 export const identityRowHeadingVariants = cva(
-  'ui-identity-row__title font-body-emphasis text-foreground',
+  'ui-identity-row__title ui-copy-title text-foreground',
 )
 
 export const identityRowSeparatorVariants = cva(

@@ -38,7 +38,8 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | `Text` `destructive`              | `p`    | 15    | 400                  | Inline errors — pair with `role="alert"`                                      |
 | `Eyebrow` `xs` / `sm` / `md`      | `p`    | 9–13  | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)                 |
 | `RichTextContent` `size="md"`     | `div`  | 15    | 400                  | Catalog descriptions (TipTap / CMS HTML)                                      |
-| Generic `Card` header title       | `h3`   | 14–19 | shell vars           | `ui-card__title` — size from `Card` `density` (comfortable default 16px)      |
+| Generic `Card` header title       | `h3`   | 14–19 | 600 (`heading`)      | `ui-card__title` — size from `Card` `density`; weight from heading role       |
+| Anatomy title (`ui-copy-title`)   | varies | 14–19 | 600 (`heading`)      | Identity rows, Alert titles, content-card headings — size from copy-scale     |
 | Generic `Card` header description | `p`    | 12–14 | shell vars           | `ui-card__description` — comfortable/spacious 14px; compact 12px              |
 
 Preserve semantic headings and existing `id`s — content detail routes use

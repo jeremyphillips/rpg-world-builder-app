@@ -69,12 +69,10 @@
 
   .ui-alert__title {
     margin: 0;
-    font-weight: var(--font-weight-heading);
     color: var(--foreground);
   }
 
   .ui-alert--compact .ui-alert__title {
-    font-weight: var(--font-weight-body-emphasis);
     letter-spacing: normal;
   }
 

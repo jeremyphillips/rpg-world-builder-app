@@ -47,6 +47,13 @@ describe('card region inset CSS contract', () => {
     expect(cardSource).toContain('.ui-card:has(.ui-card__content) .ui-card__footer')
   })
 
+  it('uses heading weight for card titles at every density', () => {
+    expect(cardSource).toMatch(
+      /\.ui-card \.ui-card__title[\s\S]*font-weight:\s*var\(--font-weight-heading\)/,
+    )
+    expect(cardSource).not.toContain('--ui-card-title-weight')
+  })
+
   it('consumes shared anatomy row gap on the declarative header stack', () => {
     expect(cardSource).toMatch(
       /\.ui-card \.ui-card__header[\s\S]*row-gap:\s*var\(--ui-anatomy-row-gap\)/,

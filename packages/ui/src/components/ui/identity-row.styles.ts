@@ -16,7 +16,7 @@ export const IDENTITY_ROW_CLASS_SPECS: readonly IdentityRowClassSpec[] = [
   {
     key: 'title',
     className: identityRowHeadingVariants(),
-    keyValues: 'font-size: var(--ui-copy-title-size, var(--text-base))',
+    keyValues: 'ui-copy-title: size, line-height, and --font-weight-heading from copy-scale.css',
     useCase: 'Primary identity heading. Scale comes from density or the parent surface.',
   },
   {

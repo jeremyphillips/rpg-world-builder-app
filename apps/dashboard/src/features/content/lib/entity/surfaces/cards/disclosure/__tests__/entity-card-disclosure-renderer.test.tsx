@@ -283,7 +283,7 @@ describe('EntityCardDisclosureRenderer', () => {
     )
 
     const headerWrap = screen
-      .getByText('Light', { selector: '.font-body-emphasis' })
+      .getByText('Light', { selector: '.ui-copy-title' })
       .closest('.dash-entity-card__content') as HTMLElement
     const anatomy = headerWrap.querySelector('[data-row-anatomy]') as HTMLElement
     const trailing = container.querySelector('[data-entity-item-slot="trailing"]') as HTMLElement
@@ -365,7 +365,7 @@ describe('EntityCardDisclosureRenderer', () => {
     expect(shell.style.getPropertyValue('--content-inline-start')).toBe('')
 
     const headerWrap = screen
-      .getByText('Harbor District', { selector: '.font-body-emphasis' })
+      .getByText('Harbor District', { selector: '.ui-copy-title' })
       .closest('.dash-entity-card__content') as HTMLElement
     expect(headerWrap).toHaveClass('dash-entity-card__content')
   })

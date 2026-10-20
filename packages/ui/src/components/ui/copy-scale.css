@@ -1,7 +1,7 @@
 /*
  * Canonical density copy scale.
  * compact 14/12, comfortable 16/14, spacious 19/14.
- * Font size and the line-height token paired with that size. Weight stays on the component.
+ * Font size, line-height, and heading weight for anatomy titles (`ui-copy-title`).
  * A density class on the same element overrides an inherited value.
  *
  * --ui-anatomy-row-gap: spacing between related stacked anatomy rows (title, supporting, status).
@@ -15,6 +15,7 @@
   .ui-content-card-heading {
     font-size: var(--ui-copy-title-size, var(--text-base));
     line-height: var(--ui-copy-title-line-height, var(--text-base--line-height));
+    font-weight: var(--font-weight-heading);
     letter-spacing: var(--tracking-heading);
   }
 

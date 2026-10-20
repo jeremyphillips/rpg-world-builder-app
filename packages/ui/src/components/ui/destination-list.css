@@ -14,7 +14,6 @@
       --ui-copy-title-line-height,
       var(--text-base--line-height)
     );
-    --ui-destination-title-weight: var(--font-weight-heading);
     --ui-destination-description-size: var(--ui-copy-supporting-size, var(--text-sm));
     --ui-destination-description-line-height: var(
       --ui-copy-supporting-line-height,
@@ -70,13 +69,11 @@
   .ui-destination-list--compact {
     --ui-destination-inset-inline: calc(var(--spacing) * 4);
     --ui-destination-inset-block: calc(var(--spacing) * 2);
-    --ui-destination-title-weight: var(--font-weight-body-emphasis);
   }
 
   .ui-destination-list--spacious {
     --ui-destination-inset-inline: calc(var(--spacing) * 6);
     --ui-destination-inset-block: calc(var(--spacing) * 5);
-    --ui-destination-title-weight: var(--font-weight-heading);
   }
 
   .ui-destination-item {
@@ -121,7 +118,7 @@
   .ui-destination-item__title {
     font-size: var(--ui-destination-title-size);
     line-height: var(--ui-destination-title-line-height);
-    font-weight: var(--ui-destination-title-weight);
+    font-weight: var(--font-weight-heading);
     color: var(--foreground);
   }
 
