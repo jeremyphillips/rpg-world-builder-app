@@ -7,6 +7,7 @@ import {
   heroIdentityRowClasses,
   heroMarkShellVariants,
   heroMediaFrameClasses,
+  heroMetaClasses,
   heroMetaStackClasses,
   heroRootClasses,
   heroTitleShellClasses,
@@ -52,7 +53,7 @@ export function Hero({
           </div>
           {meta || secondary ? (
             <div className={heroMetaStackClasses}>
-              {meta}
+              {meta ? <div className={heroMetaClasses}>{meta}</div> : null}
               {secondary}
             </div>
           ) : null}

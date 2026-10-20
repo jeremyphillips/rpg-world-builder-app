@@ -56,6 +56,7 @@ export function CampaignDestinationItem({
       }
       content={
         <EntityAnatomyHost
+          descriptionWrap
           entity={{
             heading: display.name,
             description,

@@ -4,13 +4,7 @@ import { Ellipsis } from 'lucide-react'
 import { Badge } from './badge'
 import { Button } from './button.client'
 import { Heading } from './heading'
-import {
-  Hero,
-  heroMarkFrameClasses,
-  heroMarkImageClasses,
-  heroMediaImageClasses,
-  heroMetaClasses,
-} from './hero'
+import { Hero, heroMarkFrameClasses, heroMarkImageClasses, heroMediaImageClasses } from './hero'
 import { InlineMetadata } from './inline-metadata'
 import { StatusDot } from './status-dot'
 import { Text } from './text'
@@ -54,7 +48,7 @@ type HeroMetaSegment =
  */
 function HeroCampaignMetaLine({ segments }: { segments: readonly HeroMetaSegment[] }) {
   return (
-    <Text variant="muted" className={heroMetaClasses} as="span">
+    <Text variant="muted" as="span">
       <InlineMetadata role="supporting" density="comfortable" wrap>
         {segments.map((segment, index) => (
           <InlineMetadata.Item key={`${segment.kind}-${index}`}>

@@ -24,9 +24,11 @@ Entity-rich pickers (combobox, menus) stay on `InteractiveList` + `InteractiveLi
 - `appearance?: 'panel' | 'embedded' | 'filled'` (default `panel`)
 - `tone?: 'strong'` — strong rest plane when `appearance="filled"` (defaults to `strong` when omitted); ignored for panel and embedded; does not apply shadow
 - `elevation?: 'flat' | 'subtle' | 'raised'` — depth when `appearance="filled"` (default `flat`; campaign shells use `subtle`). Same tokens as `Card` elevation.
-- `density?: 'compact' | 'comfortable' | 'spacious'` (default `comfortable`) — item padding and the canonical copy pair (14/12, 16/14, 19/14)
+- `density?: 'compact' | 'comfortable' | 'spacious'` (default `comfortable`) — item padding and the shared copy-scale contract (`copy-scale.css`: title, classification, supporting sizes, `--ui-anatomy-row-gap`, leading/trailing gaps)
 
-Rich `content` inherits that pair unless it sets its own `density`. Standalone identity falls back to comfortable (16/14).
+Rich `content` inherits those CSS variables from the list. Do not pass a second density on embedded `EntityAnatomyHost` when the list already publishes the step you need (campaign collections use spacious from `CampaignDestinationSection`). Explicit `density` on nested anatomy or `IdentityRow` overrides the ancestor — use only when intentional.
+
+Compact-only presentation (status badge `sm`, caption classes, `InlineMetadata` density props) still resolves in React when anatomy receives an explicit `density` prop; omitting the prop is not the same as inheriting compact. See [row-anatomy.md](./row-anatomy.md).
 
 ### `DestinationItem` (discriminated union)
 
@@ -83,4 +85,4 @@ Dashboard `CharacterRelationshipIndicator` supports `presentation="inlinePassive
 | Chrome   | Border, radius, transparent bg | No outer panel border               | Border, card radius; strong → `--surface-strong` fill; optional elevation for shadow |
 | Dividers | Inset `::after` on items       | Full-bleed top border between items | Full-bleed `::after` between items                                                   |
 
-Density controls item inset and publishes `--ui-copy-title-size` / `--ui-copy-supporting-size`. Simple items and rich identity read the same pair. Search inherits compact (14/12) from its list. Campaign destinations inherit comfortable (16/14).
+Density controls item inset and publishes the copy-scale variables on `.ui-destination-list--*`. Simple items alias those vars for title/description classes; rich identity (`IdentityRow`, `EntityAnatomyHost`) consumes the same inherited vars. Search lists use compact (14/12). Dashboard campaign destination sections publish spacious (19/14); invitation destination lists on the campaigns index use comfortable (16/14) explicitly.

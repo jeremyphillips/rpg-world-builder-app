@@ -84,11 +84,13 @@ export function EntitySummaryHeading({
 /** Description line — placed in the host meta cell. */
 export function EntitySummaryDescription({
   children,
+  wrap = false,
 }: {
   children: ReactNode
   density?: ContentCardDensity
+  wrap?: boolean
 }) {
-  return <IdentityRowSupporting>{children}</IdentityRowSupporting>
+  return <IdentityRowSupporting wrap={wrap}>{children}</IdentityRowSupporting>
 }
 
 /** Structured supporting segments — placed in the host meta cell. */

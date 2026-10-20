@@ -46,7 +46,7 @@ export function PendingCampaignInvitationsSection({
           ))}
         </div>
       ) : (
-        <DestinationList {...campaignDestinationListProps}>
+        <DestinationList {...campaignDestinationListProps} density="comfortable">
           {invites.map((invite) => (
             <PendingCampaignInvitation key={invite.inviteId} invite={invite} />
           ))}

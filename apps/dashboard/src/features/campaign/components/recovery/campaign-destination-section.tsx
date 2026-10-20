@@ -1,17 +1,18 @@
 import type { CampaignListItem } from '@rpg/contracts'
 import type { EyebrowVariantProps } from '@rpg/ui'
-import { DestinationList, Eyebrow, type DestinationListProps } from '@rpg/ui'
+import { DestinationList, Eyebrow } from '@rpg/ui'
 
 import { usePersistCampaignSelection } from '../../hooks/use-select-campaign'
 import { campaignDestinationListProps } from './campaign-destination-list-shell'
 import { CampaignDestinationItem } from './campaign-destination-item'
+
+const CAMPAIGN_DESTINATION_LIST_DENSITY = 'spacious' as const
 
 type CampaignDestinationSectionProps = {
   eyebrow: string
   eyebrowAs?: 'h2' | 'h3'
   eyebrowTone?: NonNullable<EyebrowVariantProps['tone']>
   campaigns: readonly CampaignListItem[]
-  density?: DestinationListProps['density']
   onPersistSelection?: (campaignId: string) => void
 }
 
@@ -21,7 +22,6 @@ export function CampaignDestinationSection({
   eyebrowAs = 'h3',
   eyebrowTone = 'muted',
   campaigns,
-  density,
   onPersistSelection: onPersistSelectionProp,
 }: CampaignDestinationSectionProps) {
   const persistSelectionFromHook = usePersistCampaignSelection()
@@ -32,7 +32,10 @@ export function CampaignDestinationSection({
       <Eyebrow as={eyebrowAs} size="sm" tone={eyebrowTone}>
         {eyebrow}
       </Eyebrow>
-      <DestinationList {...campaignDestinationListProps} {...(density ? { density } : {})}>
+      <DestinationList
+        {...campaignDestinationListProps}
+        density={CAMPAIGN_DESTINATION_LIST_DENSITY}
+      >
         {campaigns.map((campaign) => (
           <CampaignDestinationItem
             key={campaign.id}

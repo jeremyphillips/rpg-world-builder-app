@@ -55,7 +55,7 @@ describe('CampaignMetaLine', () => {
     const separators = container.querySelectorAll('[data-inline-metadata-separator]')
     expect(separators.length).toBe(3)
 
-    expect(container.querySelector('.text-xs')).toBeInTheDocument()
+    expect(container.querySelector('.text-xs')).not.toBeInTheDocument()
     expect(statusLabel).not.toHaveClass('text-style-caption')
   })
 

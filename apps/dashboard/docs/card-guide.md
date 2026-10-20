@@ -15,18 +15,18 @@ Use this guide to pick a surface. It covers generic `@rpg/ui` components and das
 
 ## Which component should I use?
 
-| Need                                                                | Component                              | Contract                                                                                                   |
-| ------------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| General-purpose content (hub tile, form section, footer actions)    | `Card`                                 | [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md)                                         |
-| Entity in a workflow (inventory, grants, pending rows, form arrays) | `EntityCard`                           | [entity-surfaces.md](./entity-surfaces.md)                                                                 |
-| Catalog browse, pick, radio selection, optional expanded details    | `CatalogCard`                          | [entity-surfaces.md](./entity-surfaces.md#catalog-entity-picker-rows)                                      |
-| Grouped navigation inside a list                                    | `DestinationItem` in `DestinationList` | [destination-list.md](../../../packages/ui/docs/destination-list.md)                                       |
-| Standalone navigable entity surface                                 | `EntityCard` with `link`               | [entity-surfaces.md](./entity-surfaces.md)                                                                 |
-| Entity identity when the host already owns inset and chrome         | `EntityAnatomyHost`                    | [entity-surfaces.md](./entity-surfaces.md#hosts-embedded-entityanatomyhost)                                |
-| Heading, classification, and supporting copy (building block)       | `IdentityRow`                          | [row-anatomy.md](../../../packages/ui/docs/row-anatomy.md) (shared `--ui-anatomy-row-gap` with Card/Alert) |
-| Primary action (submit, handler)                                    | `Button` (`@rpg/ui`)                   | [button-link.md](../../../packages/ui/docs/button-link.md)                                                 |
-| Navigate with button chrome                                         | `ButtonLink` (`@rpg/ui`)               | [button-link.md](../../../packages/ui/docs/button-link.md)                                                 |
-| Inline / text navigation                                            | `Link` (`@rpg/ui`)                     | [button-link.md](../../../packages/ui/docs/button-link.md)                                                 |
+| Need                                                                | Component                              | Contract                                                                                                                                       |
+| ------------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| General-purpose content (hub tile, form section, footer actions)    | `Card`                                 | [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md)                                                                             |
+| Entity in a workflow (inventory, grants, pending rows, form arrays) | `EntityCard`                           | [entity-surfaces.md](./entity-surfaces.md)                                                                                                     |
+| Catalog browse, pick, radio selection, optional expanded details    | `CatalogCard`                          | [entity-surfaces.md](./entity-surfaces.md#catalog-entity-picker-rows)                                                                          |
+| Grouped navigation inside a list                                    | `DestinationItem` in `DestinationList` | [destination-list.md](../../../packages/ui/docs/destination-list.md) — list owns density; rich `EntityAnatomyHost` content inherits copy scale |
+| Standalone navigable entity surface                                 | `EntityCard` with `link`               | [entity-surfaces.md](./entity-surfaces.md)                                                                                                     |
+| Entity identity when the host already owns inset and chrome         | `EntityAnatomyHost`                    | [entity-surfaces.md](./entity-surfaces.md#hosts-embedded-entityanatomyhost)                                                                    |
+| Heading, classification, and supporting copy (building block)       | `IdentityRow`                          | [row-anatomy.md](../../../packages/ui/docs/row-anatomy.md) (shared `--ui-anatomy-row-gap` with Card/Alert)                                     |
+| Primary action (submit, handler)                                    | `Button` (`@rpg/ui`)                   | [button-link.md](../../../packages/ui/docs/button-link.md)                                                                                     |
+| Navigate with button chrome                                         | `ButtonLink` (`@rpg/ui`)               | [button-link.md](../../../packages/ui/docs/button-link.md)                                                                                     |
+| Inline / text navigation                                            | `Link` (`@rpg/ui`)                     | [button-link.md](../../../packages/ui/docs/button-link.md)                                                                                     |
 
 **Also common (links only):**
 

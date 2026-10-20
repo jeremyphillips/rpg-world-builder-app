@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
 import { Heading } from './heading'
-import { Hero, heroMarkFrameClasses, heroMarkImageClasses, heroMediaImageClasses } from './hero'
+import {
+  Hero,
+  heroMarkFrameClasses,
+  heroMarkImageClasses,
+  heroMediaImageClasses,
+  heroMetaClasses,
+} from './hero'
 
 describe('Hero', () => {
   it('omits the media region when media is absent', () => {
@@ -72,6 +78,12 @@ describe('Hero', () => {
   it('shares mark corner radius between the frame and image utilities', () => {
     expect(heroMarkFrameClasses).toContain('rounded-lg')
     expect(heroMarkImageClasses).toContain('rounded-lg')
+  })
+
+  it('applies hero meta type scale on the meta slot wrapper', () => {
+    render(<Hero title="Campaign" meta={<span data-testid="meta">Meta</span>} />)
+
+    expect(screen.getByTestId('meta').parentElement).toHaveClass(heroMetaClasses)
   })
 
   it('omits desktop emblem spacing when the mark is absent', () => {

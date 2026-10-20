@@ -39,6 +39,8 @@ export type EntityAnatomyProps = {
   headingEndValue?: number
   /** Intrinsic-width slot immediately after the title (private transport from EntityCardStaticRenderer). */
   headingInline?: ReactNode
+  /** When true, description supporting copy wraps instead of truncating. */
+  descriptionWrap?: boolean
 }
 
 export type EntityAnatomyHostProps = {
@@ -48,6 +50,8 @@ export type EntityAnatomyHostProps = {
   leading?: EntityAnatomyLeading
   trailing?: EntityAnatomyTrailing
   density?: ContentCardDensity
+  /** When true, description supporting copy wraps instead of truncating. */
+  descriptionWrap?: boolean
 }
 
 /** Row-track entity anatomy — every part is a RowAnatomy cell; trailing kind selects its cell. */
@@ -61,6 +65,7 @@ export function EntityAnatomy({
   density,
   headingEndValue,
   headingInline,
+  descriptionWrap = false,
 }: EntityAnatomyProps) {
   const resolvedLeadingUtilities = leadingUtilities?.filter((utility) => utility != null) ?? []
   const hasStatusItems = (entity.status?.length ?? 0) > 0
@@ -115,7 +120,7 @@ export function EntityAnatomy({
           data-entity-item-slot="description"
         >
           {entity.description != null ? (
-            <EntitySummaryDescription density={density}>
+            <EntitySummaryDescription density={density} wrap={descriptionWrap}>
               {entity.description}
             </EntitySummaryDescription>
           ) : (
@@ -157,6 +162,7 @@ export function EntityAnatomyHost({
   leading,
   trailing,
   density,
+  descriptionWrap,
 }: EntityAnatomyHostProps) {
   return (
     <div className={entityAnatomyHostRootVariants()}>
@@ -166,6 +172,7 @@ export function EntityAnatomyHost({
         leading={leading}
         trailing={trailing}
         density={density}
+        descriptionWrap={descriptionWrap}
       />
     </div>
   )

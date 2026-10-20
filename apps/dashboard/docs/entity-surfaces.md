@@ -182,7 +182,7 @@ drag chrome, or interactive-row fills.
 - Optional `leading` utility node (host or surface places behavior; anatomy places layout)
 - Optional semantic `trailing`
 - Optional `headingHref` (heading-only navigation)
-- `density` when embedded without an outer card shell
+- `density` when embedded without a density-publishing shell (e.g. search host with its own inset). When the collection shell publishes copy scale (`DestinationList`, `Card`, …), omit anatomy `density` and inherit CSS variables; pass `density` only to override or to activate compact React-only rules (badge `sm`, caption classes).
 
 ### Consumers must not
 
@@ -457,7 +457,8 @@ Embedded hosts own collection inset. `EntityCardContent` owns header inset; `Ent
 Set density **exactly once**:
 
 - standalone cards: `EntityCard` static or disclosure;
-- embedded hosts: `EntityAnatomyHost` + host-owned row inset;
+- embedded hosts with their own inset but no copy-scale publisher: `EntityAnatomyHost` `density`;
+- embedded hosts inside a density-publishing collection (`DestinationList`, …): list (or section) owns density; anatomy inherits — do not forward a second density;
 - never size a shell and nested item independently.
 
 Entity/content **density** (`compact` | `comfortable`) is unrelated to form-control
