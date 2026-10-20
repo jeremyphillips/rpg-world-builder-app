@@ -12,11 +12,13 @@ type DashboardHomeStarterCardsProps = {
 
 export function DashboardHomeStarterCards({ hasCampaignRows }: DashboardHomeStarterCardsProps) {
   const newCampaignVariant = hasCampaignRows ? 'outline' : 'default'
+  const starterCardTone = 'quiet'
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <Card
         stretch
+        tone={starterCardTone}
         header={{
           title: DASHBOARD_HOME_COPY.starterCards.campaign.title,
           description: DASHBOARD_HOME_COPY.starterCards.campaign.description,
@@ -26,6 +28,7 @@ export function DashboardHomeStarterCards({ hasCampaignRows }: DashboardHomeStar
 
       <Card
         stretch
+        tone={starterCardTone}
         header={{
           title: DASHBOARD_HOME_COPY.starterCards.character.title,
           description: DASHBOARD_HOME_COPY.starterCards.character.description,
