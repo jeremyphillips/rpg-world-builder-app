@@ -650,7 +650,7 @@ Character builder selection rows always use `metadata` and get their items from
 
 EntitySummary owns badge presentation in the **status lane**. Badge size follows density: **compact → `sm`**, **comfortable → `md`** (`resolveStatusBadgeSize`). Consumers must not pass hand-built `<Badge size="…">` or local `mt-1` around entity status.
 
-Title-line **heading accessories** (badges beside `IdentityRowHeadingLine.headingEnd` on generic `Card` stacks) use a separate policy — compact/comfortable → `sm`, spacious → `md`; pass explicit `Badge size` at the call site. See [packages/ui/docs/row-anatomy.md](../../../packages/ui/docs/row-anatomy.md#heading-accessories). **`headingEndValue`** numerals keep title-scale emphasis and are not badge accessories.
+Title-line **heading accessories** (badges beside `IdentityRowHeadingLine.headingEnd` on generic `Card` stacks) use a separate policy — compact/comfortable → `sm`, spacious → `md`; use `resolveHeadingAccessoryBadgeSize` from `@rpg/ui`. See [packages/ui/docs/row-anatomy.md](../../../packages/ui/docs/row-anatomy.md#heading-accessories). Generic `Card` footer labeled actions: [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md#card-footer-labeled-actions). **`headingEndValue`** numerals keep title-scale emphasis and are not badge accessories.
 
 ---
 

@@ -353,6 +353,8 @@ export {
   type ContentCardInsetDensity,
   type GenericCardDensity,
 } from './components/ui/card.variants'
+export { resolveCardFooterButtonSize } from './components/ui/card-footer-button-size.lib'
+export { resolveHeadingAccessoryBadgeSize } from './components/ui/heading-accessory-size.lib'
 export {
   SelectionTarget,
   SelectionTargetRadio,

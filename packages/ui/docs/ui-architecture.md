@@ -109,6 +109,18 @@ The registry records gaps ("No owner yet") explicitly. It grows only when a fami
 
 A `variant="selection"` request routes to `SelectionOptionCard`, not `Card`, so Card does not become one giant generic component. Treat Card's information-and-navigation scope as a hypothesis that classification may revise. Record those revisions here when ownership actually changes.
 
+### Card footer labeled actions
+
+For density-aware hub/roster `Card` stacks with labeled footer controls (`Button`, `ButtonLink`, or `buttonVariants()` on a real link), pass explicit `size` from `resolveCardFooterButtonSize(density)` in `@rpg/ui`. `CardFooter` is layout-only — no contextual descendant sizing.
+
+| Card `density` | Labeled footer `Button` / `ButtonLink` `size` |
+| -------------- | --------------------------------------------- |
+| compact        | `sm`                                          |
+| comfortable    | `sm`                                          |
+| spacious       | `default` (md tier)                           |
+
+Heading-line badge accessories use a parallel ladder with `Badge` sizes — see [row-anatomy.md](./row-anatomy.md#heading-accessories). Form submit footers, icon-only controls, and footers with caller-chosen sizes are out of scope for this resolver.
+
 ## Exception policy
 
 An exception gets a one-line comment at the implementation, or a note in the component's doc, explaining why the surface is unique. While [semantic-css-migration.md](./semantic-css-migration.md) exists, classified exceptions are also recorded there. Do not copy that inventory into this document.

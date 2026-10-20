@@ -71,3 +71,25 @@ export const PlayedByYou: Story = {
     rosterStatus: 'active',
   },
 }
+
+const densityComparisonCard = {
+  ...buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+  campaign: { id: 'camp-1', name: 'The Argent Road' },
+}
+
+export const DensityComparison: Story = {
+  render: () => (
+    <div className="grid max-w-sm gap-4">
+      {(['compact', 'comfortable', 'spacious'] as const).map((density) => (
+        <CharacterListCard
+          key={density}
+          density={density}
+          card={densityComparisonCard}
+          detailHref="/campaigns/camp-1/characters/char-sample-1"
+          rosterStatus="active"
+          showCampaign={false}
+        />
+      ))}
+    </div>
+  ),
+}

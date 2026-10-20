@@ -135,3 +135,5 @@ Density for identity copy is published on ancestors (`.ui-card--*`, `ui-identity
 This table is **not** the entity **status-lane** badge rule (compact → `sm`, else `md` on `EntitySummary.status`) — see [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
 
 Do not add contextual Badge CSS or wrapper components that override an explicit `size` prop.
+
+Use `resolveHeadingAccessoryBadgeSize` from `@rpg/ui` at call sites. Card **footer** labeled-action sizing is documented separately in [ui-architecture.md](./ui-architecture.md#card-footer-labeled-actions) (`resolveCardFooterButtonSize`).

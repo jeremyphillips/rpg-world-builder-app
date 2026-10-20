@@ -40,7 +40,7 @@ Use this guide to pick a surface. It covers generic `@rpg/ui` components and das
 
 ## Generic Card vs EntityCard
 
-**`Card`** — declarative `header` / `footer`, optional cover media, tone and elevation, whole-card `link`. You compose arbitrary children.
+**`Card`** — declarative `header` / `footer`, optional cover media, tone and elevation, whole-card `link`. You compose arbitrary children. Density-aware heading badges and labeled footer actions use explicit `@rpg/ui` resolvers — see [row-anatomy.md](../../../packages/ui/docs/row-anatomy.md#heading-accessories) and [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md#card-footer-labeled-actions).
 
 **`EntityCard`** — `entity` model, optional semantic `leading` / `trailing` on non-navigable static cards. Optional whole-card `link` on static cards (no interactive slots). Disclosure supports optional `headingHref` on the title only. Static by default; set `variant="disclosure"` for expandable body content. Closed presentation API (no ad-hoc padding or class overrides).
 

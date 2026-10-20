@@ -10,13 +10,13 @@ import {
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   identityRowStackVariants,
+  resolveCardFooterButtonSize,
+  resolveHeadingAccessoryBadgeSize,
   type GenericCardDensity,
 } from '@rpg/ui'
 
 import { BuilderOptionCardImage } from './builder/steps/shared/builder-option-card-image'
 import { CampaignDisplayName, buildCampaignDisplay } from '@/features/campaign'
-
-import { resolveHeadingAccessoryBadgeSize } from '../lib/heading-accessory-size.lib'
 import { resolveCharacterRosterStatusPresentation } from '../lib/campaign-roster-presentation'
 import type { CharacterListCardData } from './character-list-card.lib'
 
@@ -115,7 +115,11 @@ export function CharacterListCard({
         density={density}
       />
       <CardFooter>
-        <ButtonLink link={<Link to={detailHref} />} variant="outline" size="sm">
+        <ButtonLink
+          link={<Link to={detailHref} />}
+          variant="outline"
+          size={resolveCardFooterButtonSize(density)}
+        >
           View
         </ButtonLink>
       </CardFooter>
