@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import type { Page } from '@playwright/test'
 import type { TestRunnerConfig } from '@storybook/test-runner'
 
 const PARITY_OUTPUT_DIR = join(process.cwd(), '.tmp/control-parity/current')
@@ -9,7 +10,7 @@ function sanitizeFileName(id: string) {
   return id.replace(/[^a-zA-Z0-9._-]+/g, '_')
 }
 
-async function snapshotControlParity(page: import('@playwright/test').Page, storyId: string) {
+async function snapshotControlParity(page: Page, storyId: string) {
   const sample = page.locator('[data-semantic-class-target]').first()
   const target =
     (await sample.count()) > 0 ? sample : page.locator('button, input, select, textarea').first()
