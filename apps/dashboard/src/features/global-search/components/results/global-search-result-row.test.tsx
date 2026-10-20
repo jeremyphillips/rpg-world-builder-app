@@ -98,11 +98,14 @@ describe('SearchResultRow', () => {
 
     const name = screen.getByText('Fireball')
     const classification = screen.getByText('Spell')
-    const mixedHeadingRow = name.parentElement as HTMLElement
+    const mixedHeadingRow = name.parentElement?.parentElement as HTMLElement
 
-    expect(mixedHeadingRow).toContainElement(classification)
-    expect(mixedHeadingRow.textContent).toContain('Fireball')
-    expect(mixedHeadingRow.textContent).toContain('Spell')
+    expect(name.className).not.toMatch(/\bflex-1\b/)
+    expect(classification.className).toMatch(/\bshrink-0\b/)
+    expect(
+      mixedHeadingRow.querySelector('[data-inline-metadata-separator]')?.textContent,
+    ).toContain('·')
+    expect(mixedHeadingRow).toHaveTextContent('Fireball · Spell')
   })
 
   it('renders a semantic fallback icon for spell hits without displayImage', () => {

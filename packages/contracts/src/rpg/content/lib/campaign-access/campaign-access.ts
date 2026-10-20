@@ -95,6 +95,7 @@ export type ResolveContentCampaignAccessOptions = {
   defaultAccess?: Pick<ContentCampaignAccess, 'available' | 'visibilityMode' | 'participantIds'>
 }
 
+// fallow-ignore-next-line complexity
 export function resolveContentCampaignAccess(
   stored: Partial<ContentCampaignAccess> | null | undefined,
   options?: ResolveContentCampaignAccessOptions,

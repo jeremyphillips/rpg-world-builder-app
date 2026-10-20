@@ -23,6 +23,7 @@ const RECIPE_SEMANTIC_ROLES = new Set([
   '--catalog-picker-row-surface',
   '--surface-raised-shadow',
   '--surface-sunken-shadow',
+  '--surface-subtle-shadow',
   ...SURFACE_RELATIVE_CHROME_ROLES,
   ...INTERACTIVE_OUTLINE_SEMANTIC_ROLES,
   ...INTERACTION_SEMANTIC_ROLES,

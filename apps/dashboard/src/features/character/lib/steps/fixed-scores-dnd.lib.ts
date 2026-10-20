@@ -108,6 +108,7 @@ export const fixedScoresCollisionDetection: CollisionDetection = (args) => {
   return collisions
 }
 
+// fallow-ignore-next-line complexity
 export function resolveFixedScoresDragEnd(
   event: DragEndEvent,
   scores: Partial<Record<Ability, number>>,
