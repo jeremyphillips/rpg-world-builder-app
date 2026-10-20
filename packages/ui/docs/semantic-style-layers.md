@@ -161,6 +161,6 @@ shrunk the icon-glyph sizing grandfather list. Open investigations: **F4** (whol
 contract), **F5** (unavailable entity presentation), **F3** per-surface audits as products evolve.
 
 Entity/card ownership at Layer 2–3 (anatomy, surfaces, hosts) →
-[dashboard entity presentation contract](../../../apps/dashboard/docs/content-entity-card.md).
+[dashboard entity surfaces contract](../../../apps/dashboard/docs/entity-surfaces.md) ([card-guide](../../../apps/dashboard/docs/card-guide.md) for selection).
 
 Row-track vertical alignment → [row-anatomy.md](./row-anatomy.md).

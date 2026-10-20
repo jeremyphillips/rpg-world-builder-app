@@ -108,6 +108,8 @@ Root shorthands: `pnpm storybook:dashboard`, `pnpm storybook` (UI + dashboard).
 
 ## Documentation
 
+- [card-guide.md](./docs/card-guide.md) — which card/row/entity surface to use (start here)
+- [entity-surfaces.md](./docs/entity-surfaces.md) — entity surface behavior, geometry, and enforcement
 - [feature-structure.md](./docs/feature-structure.md) — feature folder layout, `lib/` concern index, README template
 - [feature-conventions.md](./docs/feature-conventions.md) — boundary rule, layout shells, Storybook, catalog UI recipes
 - [form-lib-conventions.md](./docs/form-lib-conventions.md) — schema-driven form module splits and content inventory

@@ -6,7 +6,7 @@ offsets a cell to "fix" alignment.
 
 Source: `packages/ui/src/components/ui/row-anatomy/`. Live catalog of every surface:
 dashboard Storybook **Recipes / Cards and Rows** (`apps/dashboard/src/stories/card-recipes/`).
-Entity-family usage: [dashboard entity presentation contract](../../../apps/dashboard/docs/content-entity-card.md).
+Entity-family usage: start with [card-guide](../../../apps/dashboard/docs/card-guide.md); entity rules in [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md).
 
 ## Ownership invariant
 
@@ -132,6 +132,6 @@ Density for identity copy is published on ancestors (`.ui-card--*`, `ui-identity
 | comfortable             |       16px | `sm`                                                          |
 | spacious                |       19px | `md`                                                          |
 
-This table is **not** the entity **status-lane** badge rule (compact → `sm`, else `md` on `EntitySummary.status`) — see [entity presentation contract](../../../apps/dashboard/docs/content-entity-card.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
+This table is **not** the entity **status-lane** badge rule (compact → `sm`, else `md` on `EntitySummary.status`) — see [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
 
 Do not add contextual Badge CSS or wrapper components that override an explicit `size` prop.

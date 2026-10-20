@@ -192,8 +192,9 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
   alignment, divider, or chrome overrides to `EntityAnatomyHost`,
   `EntityCardStaticRenderer`, or `EntityCardDisclosureRenderer`. First determine whether the
   change belongs to the shared surface; genuine domain layout remains inside
-  disclosure body `children`. Ownership hierarchy and per-primitive contracts →
-  [content-entity-card.md](apps/dashboard/docs/content-entity-card.md).
+  disclosure body `children`. Surface selection →
+  [card-guide.md](apps/dashboard/docs/card-guide.md); ownership and enforcement →
+  [entity-surfaces.md](apps/dashboard/docs/entity-surfaces.md).
 
 ## Accessibility
 

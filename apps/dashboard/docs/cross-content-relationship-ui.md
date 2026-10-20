@@ -85,7 +85,7 @@ Primitive APIs must stay presentation-only — no relationship kinds, hierarchy 
 `DetailEntityRow.trailing` and panel/group `action` are **detail-host** composition
 seams — not entity-surface trailing APIs. `EntityAnatomyHost`, `EntityCard`, and
 `EntityCardDisclosureRenderer` use semantic trailing (`action` | `indicator` | `group`) only.
-See [content-entity-card.md](./content-entity-card.md#trailing-kinds).
+See [entity-surfaces.md](./entity-surfaces.md#trailing-kinds).
 
 Use **`DetailCollectionPanel`** + **`EntityRowList`** for typed-edge relationship sections (location Territorial Authority, People & organizations, organization forward family groups, organization Members). Use **`DetailCollectionPanel`** + **`DetailCollectionGroup`** + **`DetailCollectionRowList`** for hierarchy (City structure districts / direct places) — not `EntityRowList`. The panel is shared outer chrome; body grammar differs by domain.
 
@@ -642,5 +642,5 @@ membership-specific props on shared primitives).
 
 ## Related
 
-- Entity card contract: [content-entity-card.md](./content-entity-card.md)
+- Entity surfaces: [card-guide.md](./card-guide.md) · [entity-surfaces.md](./entity-surfaces.md)
 - Organization location connection rules: [organization-location-connections.md](./organization-location-connections.md)

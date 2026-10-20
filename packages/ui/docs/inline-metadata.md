@@ -39,7 +39,7 @@ Dashboard entity status with `statusComposition: 'metadata'` mixes badges and te
 is wrapped in `InlineMetadata.Item`. Text renders as an inline span, and badges keep their
 density sizing. Badge baseline alignment inside inline flow belongs in
 `inline-metadata.variants.ts`, not in consumers. Detail:
-[content-entity-card.md](../../../apps/dashboard/docs/content-entity-card.md#entitysummary-status-lane).
+[entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md#entitysummary-status-lane).
 
 ## Exemptions (not metadata separators)
 

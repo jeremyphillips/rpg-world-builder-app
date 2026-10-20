@@ -6,6 +6,8 @@ The goal is to eliminate hand-rolled implementations of established UI patterns,
 
 Migration inventory, classification, and wave status live in [semantic-css-migration.md](./semantic-css-migration.md) and leave this document when the migration ends. Technical class conventions live in [semantic-control-css.md](./semantic-control-css.md). Fine-grained presentation recipes live in [semantic-style-layers.md](./semantic-style-layers.md). Tone, emphasis, and elevation live in [visual-vocabulary.md](./visual-vocabulary.md).
 
+**Cards, rows, and entity UI:** generic `Card` and list rows are owned here and in [row-anatomy.md](./row-anatomy.md) / [destination-list.md](./destination-list.md). For which surface to use (including dashboard `EntityCard` and `CatalogCard`), start at the dashboard [card-guide.md](../../../apps/dashboard/docs/card-guide.md).
+
 ## Rules
 
 1. **Reuse before creating.** Search existing primitives and compositions before introducing a new visual component.

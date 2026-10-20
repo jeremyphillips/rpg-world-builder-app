@@ -167,7 +167,7 @@ action rail; the shell owns card anatomy (dashboard: `EntityCard` `variant="disc
 **Form-owned ≠ form-styled.** The form layer must not add card padding, leading
 indentation, or disclosure body inset — disclosure `EntityCard` owns complete header/body
 geometry when `CollapsibleListItem` uses `rowLayout="entity-card"`. See
-[dashboard entity presentation contract](../../../../apps/dashboard/docs/content-entity-card.md#entitycard--variantdisclosure).
+[dashboard entity surfaces contract](../../../../apps/dashboard/docs/entity-surfaces.md#entitycard--variantdisclosure) ([card-guide](../../../../apps/dashboard/docs/card-guide.md)).
 
 ```ts
 item: {

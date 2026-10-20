@@ -1,4 +1,6 @@
-# Entity presentation contract
+# Entity surfaces contract
+
+**Component selection:** start at [card-guide.md](./card-guide.md). This document is the authoritative contract for entity surface behavior, geometry, interaction boundaries, and enforcement.
 
 Entity identity uses one stack:
 
@@ -55,26 +57,9 @@ Dependency direction: `surfaces → anatomy → summary`. `summary/` must not im
 `anatomy/entity-geometry.tokens.ts`; surface CVA **values** live in
 `surfaces/dash-entity-surface.variants.ts` + `dash-entity-surface.css`.
 
-## Choose a surface
+## Storybook reference
 
-Every card and row surface — entity and non-entity — is rendered side by side in the
-dashboard Storybook page **Recipes / Cards and Rows**
-(`apps/dashboard/src/stories/card-recipes/`), with its composition chain, density,
-leading/trailing kinds, and anatomy classification. Toggle **Show anatomy** in the toolbar
-to outline row-track grids and cells.
-
-| Need                                                                | Surface                                                                                                                                                 |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Identity inside preview, destination, or master-detail host         | `EntityAnatomyHost`                                                                                                                                     |
-| Global search hit (link row)                                        | `InteractiveListRow` + `IdentityRow`; media/status via `projectSearchHitToInteractiveListPresentation` — not `EntityAnatomyHost` inside the link        |
-| Drawer subject band (task title + pinned record)                    | `DrawerEntityContext` in `DrawerShell` `entityContext`                                                                                                  |
-| Bordered static identity                                            | `EntityCard`                                                                                                                                            |
-| Bordered identity with expandable domain content                    | `EntityCard` with `variant="disclosure"`                                                                                                                |
-| Create-tab Add/Pending discovery (single choice)                    | `CatalogCard` **selection mode** inside a `RadioGroup` — no trailing Select/Remove                                                                      |
-| Pending rows with immediate commit                                  | `EntityCard` + trailing action                                                                                                                          |
-| Detail hierarchy or typed relationship                              | `DetailEntityRow` / `EntityRowList`                                                                                                                     |
-| Combobox option, action choice menu item, or split-button menu item | Shared interactive list chrome + `IdentityRow` (`ComboboxOptionRow` / `MenuChoiceRow`) — `InteractiveListSize` `sm` / `md` / `lg`; not `FieldSizeToken` |
-| Custom combobox interiors (`renderOption`) or non-entity pickers    | Purpose-built row content                                                                                                                               |
+Side-by-side recipes live in dashboard Storybook **Recipes / Cards and Rows** ([card-recipes](../src/stories/card-recipes/)). Toggle **Show anatomy** in the toolbar to outline row-track grids and cells. For which surface to pick, use [card-guide.md](./card-guide.md).
 
 ### Interactive list chrome vs semantic hosts
 

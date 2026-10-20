@@ -362,7 +362,7 @@ The root API uses `addAnotherLabel` / slot props — never domain nouns such as
 
 ### `EntityCard` consumption (Add / Pending)
 
-See [content-entity-card.md](./content-entity-card.md#add--pending-composition).
+See [entity-surfaces.md](./entity-surfaces.md#add--pending-composition).
 Discovery rows use `EntityCard` + trailing **Select** (outline, compact). Pending rows
 use `EntityCard` + overflow actions; **Edit** opens the focused composition composer in
 the `AddPendingWorkflow` composing slot — not an inline summary card on the row.
