@@ -6,7 +6,7 @@ export const cardRadiusClasses = 'rounded-card'
 /** @deprecated Option shells migrated to `ui-card`; retained for preview rail. */
 export const cardBorderClasses = 'border border-card-border'
 
-export const CARD_SURFACE_TONES = ['quiet', 'strong'] as const
+export const CARD_SURFACE_TONES = ['transparent', 'quiet', 'strong'] as const
 export type CardSurfaceTone = (typeof CARD_SURFACE_TONES)[number]
 /** @alias CardSurfaceTone */
 export type CardTone = CardSurfaceTone
@@ -130,6 +130,35 @@ const CARD_TONE_STATE_MATRIX: readonly {
   useCase: string
   keyValues: string
 }[] = [
+  {
+    key: 'transparent-rest',
+    tone: 'transparent',
+    useCase: 'Border-only shell on parent surface',
+    keyValues: 'bg transparent; --ui-surface-bg transparent; border --border',
+  },
+  {
+    key: 'transparent-hover',
+    tone: 'transparent',
+    interactive: true,
+    useCase: 'Transparent shell hover wash',
+    keyValues: 'hover color-mix 94% rest + --palette-neutral-contrast; pressed 88%',
+  },
+  {
+    key: 'transparent-selected',
+    tone: 'transparent',
+    interactive: true,
+    selected: true,
+    useCase: 'Selected transparent shell',
+    keyValues: 'bg --ui-surface-selected-bg, border --primary',
+  },
+  {
+    key: 'transparent-disabled',
+    tone: 'transparent',
+    interactive: true,
+    disabled: true,
+    useCase: 'Disabled transparent shell',
+    keyValues: 'opacity 0.5',
+  },
   {
     key: 'quiet-rest',
     tone: 'quiet',

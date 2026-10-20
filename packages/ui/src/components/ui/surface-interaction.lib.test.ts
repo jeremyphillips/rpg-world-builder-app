@@ -15,7 +15,7 @@ describe('surface-interaction.css contract', () => {
     expect(surfaceInteractionCss).toContain('var(--ui-surface-bg) 94%')
     expect(surfaceInteractionCss).toContain('var(--ui-surface-bg) 88%')
     expect(surfaceInteractionCss).toContain(
-      '.ui-card--interactive:is(.ui-card--quiet, .ui-card--strong)',
+      '.ui-card--interactive:is(.ui-card--transparent, .ui-card--quiet, .ui-card--strong)',
     )
     expect(surfaceInteractionCss).toContain(
       '.ui-destination-list--filled.ui-destination-list--tone-strong',

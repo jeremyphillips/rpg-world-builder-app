@@ -9,15 +9,15 @@ See also [design tokens](./design-tokens.md) for Layer 1–3 mechanics.
 
 ## Dimensions
 
-| Dimension         | Type               | Phase 1 export? | Rules                                                                                                                                                                             |
-| ----------------- | ------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Semantic tone     | `SemanticTone`     | Yes             | Meaning only — `neutral`, `info`, `success`, `warning`, `destructive`                                                                                                             |
-| Visual emphasis   | `VisualEmphasis`   | Yes             | `faint` \| `subtle` \| `default` \| `strong` — **not** `plain`                                                                                                                    |
-| Card surface tone | `CardSurfaceTone`  | Yes             | `quiet` → `--surface-lift` rest \| `strong` → `--surface-strong` rest; shared `color-mix` hover/pressed and `--ui-surface-selected-bg` — via `ui-card` modifiers and `tone` props |
-| Elevation         | `SurfaceElevation` | Yes (type only) | On `SurfaceConfig`, not `ChromeConfig` until subsystem migration                                                                                                                  |
-| Content hierarchy | `ContentTone`      | Yes             | Prefer over new `muted` variant values                                                                                                                                            |
-| Component state   | (doc only)         | **No**          | `inactive` \| `selected` \| `invalid` \| `disabled` — export when an API consumes it                                                                                              |
-| Chrome shape      | `ChromeVariant`    | Yes             | Separate from tone/emphasis                                                                                                                                                       |
+| Dimension         | Type               | Phase 1 export? | Rules                                                                                                                                                                                                       |
+| ----------------- | ------------------ | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Semantic tone     | `SemanticTone`     | Yes             | Meaning only — `neutral`, `info`, `success`, `warning`, `destructive`                                                                                                                                       |
+| Visual emphasis   | `VisualEmphasis`   | Yes             | `faint` \| `subtle` \| `default` \| `strong` — **not** `plain`                                                                                                                                              |
+| Card surface tone | `CardSurfaceTone`  | Yes             | `transparent` → transparent rest \| `quiet` → `--surface-lift` \| `strong` → `--surface-strong`; shared `color-mix` hover/pressed and `--ui-surface-selected-bg` — via `ui-card` modifiers and `tone` props |
+| Elevation         | `SurfaceElevation` | Yes (type only) | On `SurfaceConfig`, not `ChromeConfig` until subsystem migration                                                                                                                                            |
+| Content hierarchy | `ContentTone`      | Yes             | Prefer over new `muted` variant values                                                                                                                                                                      |
+| Component state   | (doc only)         | **No**          | `inactive` \| `selected` \| `invalid` \| `disabled` — export when an API consumes it                                                                                                                        |
+| Chrome shape      | `ChromeVariant`    | Yes             | Separate from tone/emphasis                                                                                                                                                                                 |
 
 ## Rules
 

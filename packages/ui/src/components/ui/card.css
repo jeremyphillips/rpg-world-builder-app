@@ -1,5 +1,5 @@
 /*
- * Card shell — structure on `.ui-card`; tone (quiet|strong) owns fill/border;
+ * Card shell — structure on `.ui-card`; tone (transparent|quiet|strong) owns fill/border;
  * elevation (subtle|raised) owns depth. Selected/focus may replace shell shadow.
  * Nest with the full class after `&` (`&.ui-card--quiet`). Gluing `&` to a
  * modifier dash is rewritten into a selector that matches nothing.
@@ -60,6 +60,13 @@
       outline: none;
     }
 
+    /* Border-only on inherited surface; interaction mixes from transparent rest plane */
+    &.ui-card--transparent {
+      border: 1px solid var(--border);
+      --ui-surface-bg: transparent;
+      background-color: transparent;
+    }
+
     /* Drawer / catalog entity rows */
     &.ui-card--quiet {
       border: 1px solid var(--border);
@@ -77,6 +84,7 @@
     }
 
     &.ui-card--interactive:not(.ui-card--selected):not(.ui-card--disabled):hover:is(
+        .ui-card--transparent,
         .ui-card--quiet,
         .ui-card--strong
       ) {
@@ -84,15 +92,16 @@
     }
 
     &.ui-card--interactive:not(.ui-card--selected):not(.ui-card--disabled):active:is(
+        .ui-card--transparent,
         .ui-card--quiet,
         .ui-card--strong
       ) {
       background-color: var(--ui-surface-pressed-bg);
     }
 
-    &.ui-card--selected:is(.ui-card--quiet, .ui-card--strong),
-    &.ui-card--selected:hover:is(.ui-card--quiet, .ui-card--strong),
-    &.ui-card--selected:active:is(.ui-card--quiet, .ui-card--strong) {
+    &.ui-card--selected:is(.ui-card--transparent, .ui-card--quiet, .ui-card--strong),
+    &.ui-card--selected:hover:is(.ui-card--transparent, .ui-card--quiet, .ui-card--strong),
+    &.ui-card--selected:active:is(.ui-card--transparent, .ui-card--quiet, .ui-card--strong) {
       background-color: var(--ui-surface-selected-bg);
       border-color: var(--primary);
       --surface-current: var(--ui-surface-selected-bg);
@@ -106,6 +115,8 @@
       box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent);
     }
 
+    &.ui-card--transparent.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
+    &.ui-card--transparent.ui-card--interactive:has(.ui-choice-control:focus-visible),
     &.ui-card--quiet.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
     &.ui-card--quiet.ui-card--interactive:has(.ui-choice-control:focus-visible) {
       box-shadow: var(--ui-focus-ring-standalone);

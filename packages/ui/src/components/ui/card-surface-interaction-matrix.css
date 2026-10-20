@@ -5,13 +5,13 @@
 @layer components {
   .ui-card-surface-matrix-preview--hover.ui-card.ui-card--interactive:not(.ui-card--selected):not(
       .ui-card--disabled
-    ):is(.ui-card--quiet, .ui-card--strong) {
+    ):is(.ui-card--transparent, .ui-card--quiet, .ui-card--strong) {
     background-color: var(--ui-surface-hover-bg);
   }
 
   .ui-card-surface-matrix-preview--pressed.ui-card.ui-card--interactive:not(.ui-card--selected):not(
       .ui-card--disabled
-    ):is(.ui-card--quiet, .ui-card--strong) {
+    ):is(.ui-card--transparent, .ui-card--quiet, .ui-card--strong) {
     background-color: var(--ui-surface-pressed-bg);
   }
 
@@ -22,6 +22,7 @@
   }
 
   .ui-card-surface-matrix-preview--focus.ui-card--interactive:not(.ui-card--selected):is(
+      .ui-card--transparent,
       .ui-card--quiet,
       .ui-card--strong
     ) {

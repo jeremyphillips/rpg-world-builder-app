@@ -6,7 +6,13 @@ import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { Card, CardHeader } from './card'
 import './card-surface-interaction-matrix.css'
-import { CARD_CLASS_SPECS, UI_CARD_CONTENT_CLASS, cardSurfaceVariants } from './card.variants'
+import {
+  CARD_CLASS_SPECS,
+  CARD_SURFACE_TONES,
+  UI_CARD_CONTENT_CLASS,
+  cardSurfaceVariants,
+  type CardSurfaceTone,
+} from './card.variants'
 import { IdentityRowHeadingLine } from './identity-row.client'
 import { Input } from './input.client'
 import { RadioOptionCard } from './radio-option-card.client'
@@ -51,11 +57,15 @@ export const Default: Story = DefaultCard
 
 export const ToneComparison: Story = {
   render: () => (
-    <div className="grid max-w-2xl gap-4 md:grid-cols-2">
+    <div className="grid max-w-4xl gap-4 md:grid-cols-3">
       <Card header={{ title: 'Strong / flat', description: 'Default generic card.' }} />
       <Card
         tone="quiet"
         header={{ title: 'Quiet / flat', description: 'Entity row and catalog frames.' }}
+      />
+      <Card
+        tone="transparent"
+        header={{ title: 'Transparent / flat', description: 'Border-only on parent surface.' }}
       />
     </div>
   ),
@@ -174,7 +184,13 @@ export const DensityTypography: Story = {
   ),
 }
 
-type SurfaceMatrixTone = 'quiet' | 'strong'
+const SURFACE_MATRIX_TONES = CARD_SURFACE_TONES
+
+const SURFACE_MATRIX_TONE_LABEL: Record<CardSurfaceTone, string> = {
+  transparent: 'Transparent',
+  quiet: 'Quiet',
+  strong: 'Strong',
+}
 
 type SurfaceMatrixState =
   | 'static-rest'
@@ -210,7 +226,7 @@ function surfaceMatrixPreviewClass(state: SurfaceMatrixState): string | undefine
   return undefined
 }
 
-function surfaceMatrixShellClassName(tone: SurfaceMatrixTone, state: SurfaceMatrixState): string {
+function surfaceMatrixShellClassName(tone: CardSurfaceTone, state: SurfaceMatrixState): string {
   const interactive = state !== 'static-rest'
   const selected = state === 'selected' || state === 'selected-hover'
   const disabled = state === 'disabled'
@@ -228,7 +244,7 @@ function surfaceMatrixShellClassName(tone: SurfaceMatrixTone, state: SurfaceMatr
   )
 }
 
-function surfaceMatrixTestId(tone: SurfaceMatrixTone, state: SurfaceMatrixState): string {
+function surfaceMatrixTestId(tone: CardSurfaceTone, state: SurfaceMatrixState): string {
   return `matrix-${tone}-${state}`
 }
 
@@ -241,7 +257,7 @@ function SurfaceMatrixCell({
   state,
   label,
 }: {
-  tone: SurfaceMatrixTone
+  tone: CardSurfaceTone
   state: SurfaceMatrixState
   label: string
 }) {
@@ -263,24 +279,26 @@ function SurfaceMatrixCell({
 function SurfaceMatrixTable({ className }: { className?: string }) {
   return (
     <div className={cn('overflow-x-auto', className)}>
-      <table className="w-full min-w-[40rem] border-collapse text-left">
+      <table className="w-full min-w-[52rem] border-collapse text-left">
         <thead>
           <tr className="border-b border-border">
             <th className="p-3 text-xs font-medium text-muted-foreground">State</th>
-            <th className="p-3 text-xs font-medium text-muted-foreground">Quiet</th>
-            <th className="p-3 text-xs font-medium text-muted-foreground">Strong</th>
+            {SURFACE_MATRIX_TONES.map((tone) => (
+              <th key={tone} className="p-3 text-xs font-medium text-muted-foreground">
+                {SURFACE_MATRIX_TONE_LABEL[tone]}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
           {SURFACE_MATRIX_STATE_ROWS.map(({ state, label }) => (
             <tr key={state} className="border-b border-border-subtle align-top">
               <th className="p-3 text-xs font-normal text-muted-foreground">{label}</th>
-              <td className="p-3">
-                <SurfaceMatrixCell tone="quiet" state={state} label={label} />
-              </td>
-              <td className="p-3">
-                <SurfaceMatrixCell tone="strong" state={state} label={label} />
-              </td>
+              {SURFACE_MATRIX_TONES.map((tone) => (
+                <td key={tone} className="p-3">
+                  <SurfaceMatrixCell tone={tone} state={state} label={label} />
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>
@@ -365,35 +383,42 @@ export const SurfaceInteractionMatrix: Story = {
     const selectedToken = getComputedStyle(root).getPropertyValue('--ui-surface-selected-bg').trim()
     expect(selectedToken.length).toBeGreaterThan(0)
 
-    const query = (tone: SurfaceMatrixTone, state: SurfaceMatrixState) =>
+    const query = (tone: CardSurfaceTone, state: SurfaceMatrixState) =>
       canvasElement.querySelector<HTMLElement>(
         `[data-testid="${surfaceMatrixTestId(tone, state)}"]`,
       )
 
-    for (const tone of ['quiet', 'strong'] as const) {
+    for (const tone of SURFACE_MATRIX_TONES) {
       for (const { state } of SURFACE_MATRIX_STATE_ROWS) {
         expect(query(tone, state), `missing ${tone} ${state}`).toBeTruthy()
       }
     }
 
+    const transparentRest = query('transparent', 'rest')!
     const quietRest = query('quiet', 'rest')!
     const strongRest = query('strong', 'rest')!
     expect(shellBackgroundColor(quietRest)).not.toBe(shellBackgroundColor(strongRest))
+    expect(shellBackgroundColor(transparentRest)).not.toBe(shellBackgroundColor(strongRest))
 
-    const quietHover = query('quiet', 'hover')!
-    const strongHover = query('strong', 'hover')!
-    expect(shellBackgroundColor(quietHover)).not.toBe(shellBackgroundColor(quietRest))
-    expect(shellBackgroundColor(strongHover)).not.toBe(shellBackgroundColor(strongRest))
+    for (const tone of SURFACE_MATRIX_TONES) {
+      const rest = query(tone, 'rest')!
+      const hover = query(tone, 'hover')!
+      expect(shellBackgroundColor(hover)).not.toBe(shellBackgroundColor(rest))
 
-    const quietPressed = query('quiet', 'pressed')!
-    expect(shellBackgroundColor(quietPressed)).not.toBe(shellBackgroundColor(quietHover))
+      const pressed = query(tone, 'pressed')!
+      expect(shellBackgroundColor(pressed)).not.toBe(shellBackgroundColor(hover))
+    }
 
-    const quietSelected = query('quiet', 'selected')!
-    const strongSelected = query('strong', 'selected')!
-    expect(shellBackgroundColor(quietSelected)).toBe(shellBackgroundColor(strongSelected))
+    const selectedByTone = SURFACE_MATRIX_TONES.map((tone) =>
+      shellBackgroundColor(query(tone, 'selected')!),
+    )
+    expect(new Set(selectedByTone).size).toBe(1)
 
-    const quietSelectedHover = query('quiet', 'selected-hover')!
-    expect(shellBackgroundColor(quietSelectedHover)).toBe(shellBackgroundColor(quietSelected))
+    for (const tone of SURFACE_MATRIX_TONES) {
+      const selected = query(tone, 'selected')!
+      const selectedHover = query(tone, 'selected-hover')!
+      expect(shellBackgroundColor(selectedHover)).toBe(shellBackgroundColor(selected))
+    }
 
     const quietDisabled = query('quiet', 'disabled')!
     expect(Number.parseFloat(getComputedStyle(quietDisabled).opacity)).toBeLessThan(1)
