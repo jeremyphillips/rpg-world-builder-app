@@ -19,9 +19,10 @@ describe('card surface interaction contract', () => {
     expect(cardCss).toMatch(/&\.ui-card--strong[\s\S]*--ui-surface-bg:\s*var\(--surface-strong\)/)
   })
 
-  it('mixes hover and pressed from immutable --ui-surface-bg', () => {
-    expect(cardCss).toContain('var(--ui-surface-bg) 96%')
-    expect(cardCss).toContain('var(--ui-surface-bg) 92%')
+  it('consumes shared hover and pressed vars on the shell (formula in surface-interaction.css)', () => {
+    expect(cardCss).toContain('var(--ui-surface-hover-bg)')
+    expect(cardCss).toContain('var(--ui-surface-pressed-bg)')
+    expect(cardCss).not.toContain('var(--ui-surface-bg) 96%')
     expect(cardCss).not.toContain('--row-hover-bg')
     expect(cardCss).not.toContain('--surface-subtle')
   })

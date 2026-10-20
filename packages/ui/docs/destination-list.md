@@ -22,7 +22,7 @@ Entity-rich pickers (combobox, menus) stay on `InteractiveList` + `InteractiveLi
 ### `DestinationList`
 
 - `appearance?: 'panel' | 'embedded' | 'filled'` (default `panel`)
-- `tone?: 'strong'` — `--surface-strong` fill when `appearance="filled"` (ignored for panel and embedded); does not apply shadow
+- `tone?: 'strong'` — strong rest plane when `appearance="filled"` (defaults to `strong` when omitted); ignored for panel and embedded; does not apply shadow
 - `elevation?: 'flat' | 'subtle' | 'raised'` — depth when `appearance="filled"` (default `flat`; campaign shells use `subtle`). Same tokens as `Card` elevation.
 - `density?: 'compact' | 'comfortable' | 'spacious'` (default `comfortable`) — item padding and the canonical copy pair (14/12, 16/14, 19/14)
 
@@ -50,6 +50,27 @@ Item link ownership:
 | `interactiveRowVariants`                              | Hover family, hit target (`ui-interactive-row--hit-pointer`), selection/state axes |
 | `interactiveFocusVariants`                            | Embedded focus-visible policy                                                      |
 | `DestinationList`                                     | Panel/embedded/filled chrome, optional filled tone, density vars, dividers         |
+
+## Shared surface interaction
+
+Opaque hover and pressed colors for interactive **strong** surfaces share one CSS owner:
+`surface-interaction.css`. Publishers set immutable `--ui-surface-bg` on the shell; the file
+derives `--ui-surface-hover-bg` and `--ui-surface-pressed-bg` with the same 94% / 88%
+`color-mix` recipe used by interactive `Card` (`quiet` and `strong`).
+
+| Publisher                                             | Rest                                                   |
+| ----------------------------------------------------- | ------------------------------------------------------ |
+| Interactive `Card` (`quiet` / `strong`)               | `--ui-surface-bg` on `.ui-card`                        |
+| `DestinationList` `appearance="filled"` + strong tone | `--ui-surface-bg: var(--surface-strong)` on the `<ul>` |
+
+Filled strong lists wire navigation rows only inside that shell:
+
+- Hover: `--ui-row-bg-hover: var(--ui-surface-hover-bg)` on `.ui-interactive-row--hover-navigation`
+- Pressed: scoped `:active` on the row link uses `--ui-surface-pressed-bg` (not a global InteractiveRow change)
+
+Panel, embedded, and unfilled navigation rows keep `--ui-row-bg-hover: var(--muted)`. Row links stay
+transparent at rest; the list shell shows the strong wash. Cross-links:
+[semantic-control-css.md](./semantic-control-css.md), [design-tokens.md](./design-tokens.md).
 
 ## Relationship indicator in search rows
 

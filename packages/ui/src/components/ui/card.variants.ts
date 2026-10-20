@@ -141,7 +141,7 @@ const CARD_TONE_STATE_MATRIX: readonly {
     tone: 'quiet',
     interactive: true,
     useCase: 'Selectable quiet row hover',
-    keyValues: 'hover color-mix 96% rest + --palette-neutral-contrast',
+    keyValues: 'hover color-mix 94% rest + --palette-neutral-contrast; pressed 88%',
   },
   {
     key: 'quiet-selected',
@@ -184,7 +184,8 @@ const CARD_TONE_STATE_MATRIX: readonly {
     tone: 'strong',
     interactive: true,
     useCase: 'Strong option hover',
-    keyValues: 'hover color-mix 96% rest + --palette-neutral-contrast; border --primary',
+    keyValues:
+      'hover color-mix 94% rest + --palette-neutral-contrast; pressed 88%; border --primary',
   },
   {
     key: 'strong-selected',

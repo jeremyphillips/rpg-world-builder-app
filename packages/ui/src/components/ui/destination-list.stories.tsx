@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, userEvent } from 'storybook/test'
 
 import { InlineMetadata } from './inline-metadata'
 import { Card } from './card'
 import { DestinationList, DestinationItem } from './destination-list'
+import { UI_DESTINATION_ITEM_LINK_CLASS } from './destination-list.variants'
 import { IdentityRow } from './identity-row.client'
 
 const meta = {
@@ -153,6 +155,100 @@ export const CopyScale: Story = {
       />
     </div>
   ),
+}
+
+function shellBackgroundColor(element: HTMLElement): string {
+  return getComputedStyle(element).backgroundColor
+}
+
+function SurfaceInteractionParityBlock({ testIdPrefix }: { testIdPrefix: string }) {
+  return (
+    <div className="grid max-w-md gap-6">
+      <Card
+        interactive
+        tone="strong"
+        data-testid={`${testIdPrefix}-interactive-strong-card`}
+        header={{ title: 'Equipment', description: 'Open a catalog family.' }}
+      />
+      <DestinationList
+        appearance="filled"
+        density="comfortable"
+        data-testid={`${testIdPrefix}-filled-strong-list`}
+      >
+        <DestinationItem
+          link={<a href="#continue">nav</a>}
+          title="Continue campaign"
+          description="The Shattered Vale"
+        />
+      </DestinationList>
+    </div>
+  )
+}
+
+async function assertSurfaceInteractionParity(canvasElement: ParentNode, testIdPrefix: string) {
+  const card = canvasElement.querySelector<HTMLElement>(
+    `[data-testid="${testIdPrefix}-interactive-strong-card"]`,
+  )!
+  const list = canvasElement.querySelector<HTMLElement>(
+    `[data-testid="${testIdPrefix}-filled-strong-list"]`,
+  )!
+  const link = canvasElement.querySelector<HTMLElement>(`.${UI_DESTINATION_ITEM_LINK_CLASS}`)!
+
+  expect(shellBackgroundColor(card)).toBe(shellBackgroundColor(list))
+
+  await userEvent.hover(card)
+  const cardHover = shellBackgroundColor(card)
+  await userEvent.hover(link)
+  const linkHover = shellBackgroundColor(link)
+  expect(linkHover).toBe(cardHover)
+
+  await userEvent.unhover(card)
+  await userEvent.unhover(link)
+
+  await userEvent.pointer({ keys: '[MouseLeft>]', target: card })
+  const cardPressed = shellBackgroundColor(card)
+  await userEvent.pointer({ keys: '[/MouseLeft]', target: card })
+
+  await userEvent.pointer({ keys: '[MouseLeft>]', target: link })
+  const linkPressed = shellBackgroundColor(link)
+  await userEvent.pointer({ keys: '[/MouseLeft]', target: link })
+  expect(linkPressed).toBe(cardPressed)
+
+  link.focus()
+  const linkFocusBg = shellBackgroundColor(link)
+  expect(linkFocusBg).not.toBe(cardHover)
+  expect(linkFocusBg).not.toBe(linkHover)
+}
+
+export const SurfaceInteractionParity: Story = {
+  name: 'Surface interaction parity',
+  tags: ['card-surface-colors'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Filled strong destination row hover/pressed backgrounds match interactive strong Card using `surface-interaction.css` (real pointer, not preview classes).',
+      },
+    },
+  },
+  render: () => (
+    <div className="grid gap-10">
+      <section className="space-y-2" data-testid="parity-light">
+        <p className="text-style-label">Light</p>
+        <SurfaceInteractionParityBlock testIdPrefix="parity-light" />
+      </section>
+      <section className="dark space-y-2 rounded-lg bg-background p-4" data-testid="parity-dark">
+        <p className="text-style-label">Dark</p>
+        <SurfaceInteractionParityBlock testIdPrefix="parity-dark" />
+      </section>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const light = canvasElement.querySelector('[data-testid="parity-light"]')!
+    const dark = canvasElement.querySelector('[data-testid="parity-dark"]')!
+    await assertSurfaceInteractionParity(light, 'parity-light')
+    await assertSurfaceInteractionParity(dark, 'parity-dark')
+  },
 }
 
 export const ComparedToNavigableCard: Story = {

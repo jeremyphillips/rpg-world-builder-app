@@ -39,8 +39,9 @@ describe('destination-list.css inset divider contract', () => {
     )
     expect(css).toContain('left: 0')
     expect(css).toMatch(
-      /\.ui-destination-list--filled\.ui-destination-list--tone-strong[^}]*background-color:\s*var\(--surface-strong\)/s,
+      /\.ui-destination-list--filled\.ui-destination-list--tone-strong[^}]*--ui-surface-bg:\s*var\(--surface-strong\)/s,
     )
+    expect(css).toContain('--ui-row-bg-hover: var(--ui-surface-hover-bg)')
     expect(css).not.toMatch(
       /\.ui-destination-list--filled\.ui-destination-list--tone-strong[^}]*box-shadow:/s,
     )
@@ -149,6 +150,35 @@ describe('DestinationList + DestinationItem', () => {
       </DestinationList>,
     )
     expect(container.firstElementChild).not.toHaveClass(UI_DESTINATION_LIST_ELEVATION_SUBTLE_CLASS)
+  })
+
+  it('defaults filled appearance to strong tone when tone is omitted', () => {
+    const { container } = render(
+      <DestinationList appearance="filled">
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
+      </DestinationList>,
+    )
+    expect(container.firstElementChild).toHaveClass(UI_DESTINATION_LIST_TONE_STRONG_CLASS)
+  })
+
+  it('does not apply filled strong row overrides on panel appearance', () => {
+    const { container } = render(
+      <DestinationList appearance="panel">
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
+      </DestinationList>,
+    )
+    const list = container.firstElementChild!
+    expect(list).not.toHaveClass(UI_DESTINATION_LIST_TONE_STRONG_CLASS)
+    expect(list).not.toHaveClass(UI_DESTINATION_LIST_FILLED_CLASS)
+  })
+
+  it('does not apply filled strong row overrides on embedded appearance', () => {
+    const { container } = render(
+      <DestinationList appearance="embedded">
+        <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
+      </DestinationList>,
+    )
+    expect(container.firstElementChild).not.toHaveClass(UI_DESTINATION_LIST_TONE_STRONG_CLASS)
   })
 
   it('applies filled strong chrome and ignores tone on panel appearance', () => {

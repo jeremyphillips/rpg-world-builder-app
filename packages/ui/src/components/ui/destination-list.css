@@ -42,7 +42,19 @@
   }
 
   .ui-destination-list--filled.ui-destination-list--tone-strong {
-    background-color: var(--surface-strong);
+    --ui-surface-bg: var(--surface-strong);
+    --surface-current: var(--ui-surface-bg);
+    background-color: var(--ui-surface-bg);
+  }
+
+  .ui-destination-list--filled.ui-destination-list--tone-strong
+    .ui-interactive-row--hover-navigation {
+    --ui-row-bg-hover: var(--ui-surface-hover-bg);
+  }
+
+  .ui-destination-list--filled.ui-destination-list--tone-strong
+    .ui-interactive-row--hover-navigation:not(.ui-interactive-row--disabled):active {
+    background-color: var(--ui-surface-pressed-bg);
   }
 
   .ui-destination-list--elevation-subtle {

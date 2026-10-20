@@ -76,19 +76,6 @@
       background-color: var(--ui-surface-bg);
     }
 
-    &.ui-card--interactive:not(.ui-card--disabled):is(.ui-card--quiet, .ui-card--strong) {
-      --ui-surface-hover-bg: color-mix(
-        in oklch,
-        var(--ui-surface-bg) 96%,
-        var(--palette-neutral-contrast)
-      );
-      --ui-surface-pressed-bg: color-mix(
-        in oklch,
-        var(--ui-surface-bg) 92%,
-        var(--palette-neutral-contrast)
-      );
-    }
-
     &.ui-card--interactive:not(.ui-card--selected):not(.ui-card--disabled):hover:is(
         .ui-card--quiet,
         .ui-card--strong

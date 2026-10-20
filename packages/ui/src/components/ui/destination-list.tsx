@@ -46,7 +46,7 @@ export function DestinationList({
   children,
   ...props
 }: DestinationListProps) {
-  const resolvedTone = appearance === 'filled' ? tone : undefined
+  const resolvedTone = appearance === 'filled' ? (tone ?? 'strong') : undefined
   const resolvedElevation = appearance === 'filled' && elevation !== 'flat' ? elevation : undefined
 
   return (

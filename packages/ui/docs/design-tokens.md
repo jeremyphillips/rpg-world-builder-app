@@ -211,6 +211,7 @@ Review in Storybook (both modes) without pixel-matching:
 - Placeholder on field
 - Default / subtle / strong border on page and on panel
 - Control-hover / row-hover on page and on panel (opaque mix holds up)
+- Interactive strong card shell vs filled strong destination row link (shared `surface-interaction.css` — [destination-list.md](./destination-list.md#shared-surface-interaction))
 - Outline button hover/active on page and on card
 - Choice-control ring on page and on card
 
