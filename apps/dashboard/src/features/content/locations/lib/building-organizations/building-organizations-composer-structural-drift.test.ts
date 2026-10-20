@@ -26,7 +26,7 @@ describe('building organizations composer structural drift', () => {
     expect(source).not.toContain('SelectionSummaryCard')
     expect(source).toContain('RadioCardField')
     expect(source).toContain('RadioGroup')
-    expect(source).toContain('CatalogEntityRow')
+    expect(source).toContain('CatalogCard')
     expect(source).not.toContain('ChooserSummaryCard')
     expect(source).not.toContain('CollapsibleRadioCardField')
     expect(source).not.toContain('LocationConnectionKindStep')

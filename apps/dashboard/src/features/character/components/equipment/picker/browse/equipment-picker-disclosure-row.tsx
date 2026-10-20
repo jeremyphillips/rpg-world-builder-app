@@ -2,7 +2,7 @@ import type { CatalogPickerCollapsibleRowRenderArgs } from '@rpg/ui'
 
 import {
   buildEquipmentPickerRowViewModel,
-  CatalogEntityRow,
+  CatalogCard,
   CatalogMetadataRenderer,
   type EntitySummaryProvenanceItem,
 } from '@/features/content'
@@ -123,7 +123,7 @@ export function EquipmentPickerDisclosureRow({
         }
 
   return (
-    <CatalogEntityRow
+    <CatalogCard
       toolbarLabel={rowArgs.toolbarLabel}
       domIds={rowArgs.domIds}
       collapsible={rowArgs.collapsible}

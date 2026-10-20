@@ -34,15 +34,13 @@ import {
 import { ArrayItemAnatomyGrid } from '@rpg/ui/form'
 
 import {
-  CatalogEntityRow,
+  CatalogCard,
   CatalogEntitySurfaceRow,
-  ContentEntityCard,
+  EntityCard,
   DetailRowLeadingMedia,
-  DisclosureEntityCard,
   EntityAnatomyHost,
   EntityDisclosureArrayItemShell,
   EntityRowList,
-  EntitySurfaceContentCard,
   entitySurfaceMetadataFromText,
   getContentTypeCollectionLabel,
 } from '@/features/content'
@@ -96,7 +94,8 @@ function SelectAction() {
 function DisclosureEntityCardRecipe() {
   const [collapsed, setCollapsed] = useState(true)
   return (
-    <DisclosureEntityCard
+    <EntityCard
+      variant="disclosure"
       itemId="recipe-dec"
       toolbarAriaLabel="Harbor District"
       entity={{
@@ -111,7 +110,7 @@ function DisclosureEntityCardRecipe() {
       trailing={{ kind: 'utility', content: <RemoveUtility label="Harbor District" /> }}
     >
       <Text variant="muted">District notes live in the disclosed body.</Text>
-    </DisclosureEntityCard>
+    </EntityCard>
   )
 }
 
@@ -145,7 +144,7 @@ function ArrayItemShellRecipe() {
 function CatalogEntityRowRecipe() {
   const [collapsed, setCollapsed] = useState(true)
   return (
-    <CatalogEntityRow
+    <CatalogCard
       toolbarLabel="Longsword"
       domIds={{
         itemId: 'recipe-catalog',
@@ -255,7 +254,7 @@ function ChoiceBlockRowRecipe() {
 function StepperRecipe() {
   const [quantity, setQuantity] = useState(2)
   return (
-    <ContentEntityCard
+    <EntityCard
       entity={{ heading: 'Javelin', classification: 'Simple weapon', description: '1d6 piercing' }}
       density="compact"
       trailing={{
@@ -283,15 +282,15 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
   {
     name: 'Content entity card — action',
     section: 'entity-surfaces',
-    component: 'ContentEntityCard',
-    chain: ['ContentEntityCard', ...ENTITY_CHAIN],
+    component: 'EntityCard',
+    chain: ['EntityCard', ...ENTITY_CHAIN],
     useWhen: 'Standalone entity identity with one labeled commit control.',
     density: 'compact',
     leading: 'none',
     trailing: 'action (band)',
     anatomy: 'row-track',
     render: () => (
-      <ContentEntityCard
+      <EntityCard
         entity={{
           heading: 'Harbor District',
           classification: 'Settlement',
@@ -305,15 +304,15 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
   {
     name: 'Content entity card — media and status',
     section: 'entity-surfaces',
-    component: 'ContentEntityCard',
-    chain: ['ContentEntityCard', ...ENTITY_CHAIN],
+    component: 'EntityCard',
+    chain: ['EntityCard', ...ENTITY_CHAIN],
     useWhen: 'Comfortable identity with leading media and a status lane.',
     density: 'comfortable',
     leading: 'none',
     trailing: 'indicator chevron (full)',
     anatomy: 'row-track',
     render: () => (
-      <ContentEntityCard
+      <EntityCard
         entity={{
           heading: 'Silver Circle',
           classification: 'Guild',
@@ -333,8 +332,8 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
   {
     name: 'Content entity card — stepper utility',
     section: 'entity-surfaces',
-    component: 'ContentEntityCard',
-    chain: ['ContentEntityCard', ...ENTITY_CHAIN],
+    component: 'EntityCard',
+    chain: ['EntityCard', ...ENTITY_CHAIN],
     useWhen: 'Quantity editing on an inventory-style row; the 36px stepper centers on the row.',
     density: 'compact',
     leading: 'none',
@@ -345,8 +344,8 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
   {
     name: 'Disclosure entity card — grip, caret, remove',
     section: 'entity-surfaces',
-    component: 'DisclosureEntityCard',
-    chain: ['DisclosureEntityCard', 'CollapsibleListItem', ...ENTITY_CHAIN],
+    component: 'EntityCard',
+    chain: ['EntityCard', 'CollapsibleListItem', ...ENTITY_CHAIN],
     useWhen: 'Sortable, expandable entity rows with a trailing ghost utility.',
     density: 'compact',
     leading: 'grip + caret',
@@ -372,34 +371,10 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     ),
   },
   {
-    name: 'Entity surface content card — inline action',
-    section: 'entity-surfaces',
-    component: 'EntitySurfaceContentCard',
-    chain: ['EntitySurfaceContentCard', 'ContentEntityCard', ...ENTITY_CHAIN],
-    useWhen: 'Plain identity config (no JSX) projected onto a content card.',
-    density: 'compact',
-    leading: 'none',
-    trailing: 'action (band)',
-    anatomy: 'row-track',
-    render: () => (
-      <EntitySurfaceContentCard
-        surface={{
-          identity: {
-            heading: 'Wizard',
-            classification: 'Class',
-            metadata: entitySurfaceMetadataFromText('Intelligence spellcaster'),
-            fallback: 'class',
-          },
-          inlineAction: { label: 'Select', onClick: noop },
-        }}
-      />
-    ),
-  },
-  {
     name: 'Entity disclosure array item shell',
     section: 'entity-surfaces',
     component: 'EntityDisclosureArrayItemShell',
-    chain: ['EntityDisclosureArrayItemShell', 'DisclosureEntityCard', ...ENTITY_CHAIN],
+    chain: ['EntityDisclosureArrayItemShell', 'EntityCard', ...ENTITY_CHAIN],
     useWhen: 'Schema-driven form array items presented as entity disclosure cards.',
     density: 'compact',
     leading: 'caret',
@@ -410,8 +385,8 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
   {
     name: 'Catalog entity row — add with price',
     section: 'picker-rows',
-    component: 'CatalogEntityRow',
-    chain: ['CatalogEntityRow', 'CollapsibleListItem', ...ENTITY_CHAIN],
+    component: 'CatalogCard',
+    chain: ['CatalogCard', 'CollapsibleListItem', ...ENTITY_CHAIN],
     useWhen: 'Catalog picker rows with a commit control and a secondary scalar.',
     density: 'compact',
     leading: 'caret',
@@ -423,7 +398,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     name: 'Catalog entity surface row',
     section: 'picker-rows',
     component: 'CatalogEntitySurfaceRow',
-    chain: ['CatalogEntitySurfaceRow', 'CatalogEntityRow', ...ENTITY_CHAIN],
+    chain: ['CatalogEntitySurfaceRow', 'CatalogCard', ...ENTITY_CHAIN],
     useWhen: 'Catalog rows fed by plain identity config.',
     density: 'compact',
     leading: 'none',
@@ -696,7 +671,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     name: 'Quick NPC starting choice selected row',
     section: 'feature-grids',
     component: 'QuickNpcStartingChoiceSelectedRow',
-    chain: ['QuickNpcStartingChoiceSelectedRow', 'ContentEntityCard', ...ENTITY_CHAIN],
+    chain: ['QuickNpcStartingChoiceSelectedRow', 'EntityCard', ...ENTITY_CHAIN],
     useWhen: 'Selected starting choices with optional quantity and remove.',
     density: 'compact',
     leading: 'none',
@@ -774,10 +749,10 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
   {
     name: 'catalog-entity-row-radio',
     section: 'picker-rows',
-    component: 'CatalogEntityRow',
+    component: 'CatalogCard',
     chain: [
       'RadioGroup',
-      'CatalogEntityRow',
+      'CatalogCard',
       'SelectionTarget',
       'SelectionTargetRadio',
       ...ENTITY_CHAIN,
@@ -789,7 +764,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     anatomy: 'row-track',
     render: () => (
       <RadioGroup aria-label={getContentTypeCollectionLabel('organizations')} defaultValue="org-1">
-        <CatalogEntityRow
+        <CatalogCard
           toolbarLabel="City Council"
           domIds={{
             itemId: 'recipe-catalog-radio',
@@ -805,8 +780,8 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
   {
     name: 'catalog-entity-row-radio-disclosure',
     section: 'picker-rows',
-    component: 'CatalogEntityRow',
-    chain: ['CatalogEntityRow', 'CollapsibleListItem', ...ENTITY_CHAIN],
+    component: 'CatalogCard',
+    chain: ['CatalogCard', 'CollapsibleListItem', ...ENTITY_CHAIN],
     useWhen:
       'Spell/proficiency pickers keep leading caret disclosure; selection mode is flat rows.',
     density: 'compact',
@@ -819,7 +794,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     name: 'Choice block row',
     section: 'feature-grids',
     component: 'ChoiceBlockRow',
-    chain: ['ChoiceBlockRow', 'ChoiceSelectedRow', 'ContentEntityCard'],
+    chain: ['ChoiceBlockRow', 'ChoiceSelectedRow', 'EntityCard'],
     useWhen: 'Builder choice section header with add action and selected rows.',
     density: 'fixed',
     leading: 'none',

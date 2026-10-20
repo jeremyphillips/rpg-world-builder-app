@@ -1,6 +1,6 @@
 import { ActionIcon, Text, iconGhostControlVariants } from '@rpg/ui'
 
-import { ContentEntityCard, type EntityAnatomyTrailing } from '@/features/content'
+import { EntityCard, type EntityAnatomyTrailing } from '@/features/content'
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
@@ -227,7 +227,7 @@ export function EquipmentInventoryRowItem({
     })
 
     return (
-      <ContentEntityCard
+      <EntityCard
         entity={entity}
         trailing={resolveInventoryRowTrailing({ display, detailLabelOverride, actions })}
         density="compact"
@@ -252,7 +252,7 @@ export function EquipmentInventoryRowItem({
     : null
 
   return (
-    <ContentEntityCard
+    <EntityCard
       entity={entity}
       trailing={resolveInventoryRowTrailing({ display, detailLabelOverride, actions })}
       density="compact"

@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ContentEntityCard } from '@/features/content'
+import { EntityCard } from '@/features/content'
 import { Text } from '@rpg/ui'
 
 import { BuilderInventoryRemoveAction } from './builder-inventory-remove-action'
 
 const meta = {
   title: 'Character Builder/BuilderSelectedEntityCard',
-  component: ContentEntityCard,
+  component: EntityCard,
   parameters: { layout: 'padded' },
-} satisfies Meta<typeof ContentEntityCard>
+} satisfies Meta<typeof EntityCard>
 
 export default meta
 type Story = StoryObj<typeof meta>

@@ -6,11 +6,7 @@ import type {
   CharacterBuilderDraft,
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
-import {
-  ContentEntityCard,
-  DisclosureEntityCard,
-  type EntitySummaryStatusItem,
-} from '@/features/content'
+import { EntityCard, type EntitySummaryStatusItem } from '@/features/content'
 import {
   EQUIPMENT_INVENTORY_RELEASE_LABEL,
   EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL,
@@ -65,7 +61,7 @@ function GrantOnlyReleaseRow({
   const removeTarget = row.removeTarget
 
   return (
-    <ContentEntityCard
+    <EntityCard
       entity={buildEquipmentInventoryRowEntity({
         equipmentName: entry.equipmentName,
         status,
@@ -132,7 +128,8 @@ function ManagedInventoryRow({
   if (!equipment) return null
 
   return (
-    <DisclosureEntityCard
+    <EntityCard
+      variant="disclosure"
       itemId={entry.equipmentId}
       toolbarAriaLabel={entry.equipmentName}
       entity={buildEquipmentInventoryRowEntity({
@@ -169,7 +166,7 @@ function ManagedInventoryRow({
         onRemovePurchase={onRemovePurchase}
         onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
       />
-    </DisclosureEntityCard>
+    </EntityCard>
   )
 }
 

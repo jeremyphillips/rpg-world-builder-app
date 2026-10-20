@@ -8,9 +8,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
 import { HARBOR_DISTRICT_ENTITY } from '../../__tests__/entity.fixture'
-import { CatalogEntityRow } from '../catalog/catalog-entity-row'
-import { ContentEntityCard } from '../cards/content/content-entity-card'
-import { DisclosureEntityCard } from '../cards/disclosure/disclosure-entity-card'
+import { CatalogCard } from '../catalog/catalog-card'
+import { EntityCard } from '../cards/content/entity-card'
 
 const compactHeaderRhythm = collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' })
 const ENTITY_CARD_CONTENT_CLASS = 'dash-entity-card__content'
@@ -36,7 +35,7 @@ function entityCardContentFromGroup(label: RegExp | string): HTMLElement {
 describe('Entity card surface rhythm contract', () => {
   it('keeps entity-card CLI header rows free of vertical padding', () => {
     render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Dagger"
         domIds={catalogDomIds}
         entity={{ heading: 'Dagger', classification: 'Weapon' }}
@@ -49,13 +48,14 @@ describe('Entity card surface rhythm contract', () => {
   it('applies shared compact content inset on CEC, DEC, and catalog rows', () => {
     render(
       <MemoryRouter>
-        <ContentEntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />
+        <EntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />
       </MemoryRouter>,
     )
 
     render(
       <MemoryRouter>
-        <DisclosureEntityCard
+        <EntityCard
+          variant="disclosure"
           itemId="dec-item"
           toolbarAriaLabel="Feat choice"
           entity={HARBOR_DISTRICT_ENTITY}
@@ -63,12 +63,12 @@ describe('Entity card surface rhythm contract', () => {
           defaultCollapsed={false}
         >
           <p>Grant fields</p>
-        </DisclosureEntityCard>
+        </EntityCard>
       </MemoryRouter>,
     )
 
     render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Dagger"
         domIds={catalogDomIds}
         collapsible
@@ -106,7 +106,8 @@ describe('Entity card surface rhythm contract', () => {
   it('uses the shared body frame on DEC and catalog disclosure rows', () => {
     render(
       <MemoryRouter>
-        <DisclosureEntityCard
+        <EntityCard
+          variant="disclosure"
           itemId="dec-body"
           toolbarAriaLabel="Feat choice"
           entity={HARBOR_DISTRICT_ENTITY}
@@ -114,12 +115,12 @@ describe('Entity card surface rhythm contract', () => {
           defaultCollapsed={false}
         >
           <p>Grant fields</p>
-        </DisclosureEntityCard>
+        </EntityCard>
       </MemoryRouter>,
     )
 
     render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Dagger"
         domIds={{
           itemId: 'contract-catalog-body',
@@ -144,7 +145,8 @@ describe('Entity card surface rhythm contract', () => {
   it('renders exactly one EntityCardContent inset region per entity-card host header', () => {
     const { container: decContainer } = render(
       <MemoryRouter>
-        <DisclosureEntityCard
+        <EntityCard
+          variant="disclosure"
           itemId="dec-single-inset"
           toolbarAriaLabel="Harbor District"
           entity={HARBOR_DISTRICT_ENTITY}
@@ -152,12 +154,12 @@ describe('Entity card surface rhythm contract', () => {
           defaultCollapsed={false}
         >
           <p>Body</p>
-        </DisclosureEntityCard>
+        </EntityCard>
       </MemoryRouter>,
     )
 
     const { container: catalogContainer } = render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Flat row"
         domIds={{
           itemId: 'flat-row',

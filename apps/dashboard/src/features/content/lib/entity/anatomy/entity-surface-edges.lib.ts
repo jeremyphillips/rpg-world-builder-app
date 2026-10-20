@@ -11,7 +11,7 @@ export type EntitySurfaceEdges = {
 export const ENTITY_SURFACE_DEFAULT_EDGES: EntitySurfaceEdges = { start: 'default', end: 'default' }
 
 /**
- * Edge inset policy shared by CEC, DEC, CatalogEntityRow, and DetailEntityRow.
+ * Edge inset policy shared by CEC, DEC, CatalogCard, and DetailEntityRow.
  * Triggered by kind, not presence: bordered `action` / `group` trailing keeps the default end.
  */
 export function resolveEntitySurfaceEdges({

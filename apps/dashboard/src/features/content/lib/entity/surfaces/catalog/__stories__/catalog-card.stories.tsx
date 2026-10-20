@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { Button, Text } from '@rpg/ui'
 
-import { CatalogEntityRow } from '../catalog-entity-row'
+import { CatalogCard } from '../catalog-card'
 import { CatalogEntityPickerSheet } from '../catalog-entity-picker-sheet'
 import { createCatalogEntityRowRenderer } from '../catalog-entity-row-renderer'
 
 const meta = {
-  title: 'Content/Entity/CatalogEntityRow',
+  title: 'Content/Entity/CatalogCard',
   parameters: { layout: 'padded' },
 } satisfies Meta
 
@@ -23,13 +23,13 @@ const domIds = {
 export const FlatAndDisclosureRhythm: Story = {
   render: () => (
     <div className="flex max-w-xl flex-col gap-2">
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="City Guard"
         domIds={{ ...domIds, itemId: 'flat-row' }}
         entity={{ heading: 'City Guard', classification: 'Government' }}
         trailing={{ kind: 'action', content: <Button type="button">Select</Button> }}
       />
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Wooden Staff"
         domIds={{ ...domIds, itemId: 'disclosure-row' }}
         collapsible
@@ -114,7 +114,7 @@ export const DisclosureToggle: Story = {
 
     return (
       <div className="max-w-xl">
-        <CatalogEntityRow
+        <CatalogCard
           toolbarLabel="Sprig of Mistletoe"
           domIds={domIds}
           collapsible
@@ -137,7 +137,7 @@ export const DisclosureToggle: Story = {
 export const WarningStatusText: Story = {
   render: () => (
     <div className="max-w-xl">
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Greatsword"
         domIds={{ ...domIds, itemId: 'warning-row' }}
         entity={{
@@ -193,7 +193,7 @@ export const MetadataStatusComposition: Story = {
   render: () => (
     <div className="flex max-w-xl flex-col gap-2">
       {METADATA_STATUS_ROWS.map((row) => (
-        <CatalogEntityRow
+        <CatalogCard
           key={row.id}
           toolbarLabel={row.heading}
           domIds={{ ...domIds, itemId: `metadata-${row.id}` }}
@@ -214,7 +214,7 @@ export const MetadataStatusComposition: Story = {
 export const MetadataStatusNarrowWrap: Story = {
   render: () => (
     <div className="w-64">
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Plate Armor"
         domIds={{ ...domIds, itemId: 'metadata-narrow' }}
         entity={{

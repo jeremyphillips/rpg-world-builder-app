@@ -1,6 +1,6 @@
 import type { BuilderChoiceSelectedRow } from '@rpg/contracts'
 
-import { ContentEntityCard } from '@/features/content'
+import { EntityCard } from '@/features/content'
 import { BuilderInventoryRemoveAction } from '../../../inventory/builder-inventory-remove-action'
 
 export const CHOICE_SELECTED_ROW_STALE_BADGE_LABEL = 'Stale' as const
@@ -12,7 +12,7 @@ export type ChoiceSelectedRowProps = {
 
 export function ChoiceSelectedRow({ row, onRemove }: ChoiceSelectedRowProps) {
   return (
-    <ContentEntityCard
+    <EntityCard
       entity={{
         heading: row.label,
         status: row.isStale

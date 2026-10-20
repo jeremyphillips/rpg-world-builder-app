@@ -13,11 +13,9 @@ import { CARD_RECIPES, CARD_RECIPE_SECTIONS } from './card-recipes.registry'
 
 /** Entity surfaces exported from `@/features/content` — every one needs a recipe. */
 const CONTENT_ENTITY_SURFACES = [
-  'ContentEntityCard',
-  'DisclosureEntityCard',
-  'CatalogEntityRow',
+  'EntityCard',
+  'CatalogCard',
   'CatalogEntitySurfaceRow',
-  'EntitySurfaceContentCard',
   'EntityAnatomyHost',
   'EntityRowList',
   'EntityDisclosureArrayItemShell',

@@ -14,9 +14,9 @@ import { EntityCardContent } from '../cards/content/entity-card-content'
 import { EntityCardFrame } from '../cards/content/entity-card-frame'
 import { DisclosureEntityCardHeader } from '../cards/disclosure/disclosure-entity-card-header'
 import { disclosureEntityCardListItemVariants } from '../cards/disclosure/disclosure-entity-card.variants'
-import { catalogEntityRowBodyWashVariants } from './catalog-entity-row.variants'
+import { catalogCardBodyWashVariants } from './catalog-card.variants'
 
-type CatalogEntityRowBaseProps = {
+type CatalogCardBaseProps = {
   toolbarLabel: string
   domIds: { itemId: string; titleId: string; bodyId: string }
   collapsible?: boolean
@@ -27,15 +27,15 @@ type CatalogEntityRowBaseProps = {
   entity: EntitySummaryModel
 }
 
-export type CatalogEntityRowProps = CatalogEntityRowBaseProps &
+export type CatalogCardProps = CatalogCardBaseProps &
   (
     | { selection?: undefined; trailing?: EntityAnatomyTrailing }
     | { selection: { value: string; disabled?: boolean }; trailing?: never }
   )
 
-const CATALOG_ENTITY_ROW_DENSITY = 'compact' as const
+const CATALOG_CARD_DENSITY = 'compact' as const
 
-function CatalogEntityRowSelectionBody({
+function CatalogCardSelectionBody({
   toolbarLabel,
   domIds,
   summary,
@@ -43,7 +43,7 @@ function CatalogEntityRowSelectionBody({
   selection,
 }: {
   toolbarLabel: string
-  domIds: CatalogEntityRowBaseProps['domIds']
+  domIds: CatalogCardBaseProps['domIds']
   summary?: ReactNode
   entity: EntitySummaryModel
   selection: { value: string; disabled?: boolean }
@@ -54,7 +54,7 @@ function CatalogEntityRowSelectionBody({
 
   return (
     <EntityCardFrame
-      density={CATALOG_ENTITY_ROW_DENSITY}
+      density={CATALOG_CARD_DENSITY}
       interactive={!disabled}
       selected={selected}
       disabled={disabled}
@@ -65,7 +65,7 @@ function CatalogEntityRowSelectionBody({
         <EntityCardContent>
           <EntityAnatomyHost
             entity={entity}
-            density={CATALOG_ENTITY_ROW_DENSITY}
+            density={CATALOG_CARD_DENSITY}
             leading={{
               kind: 'selection',
               content: (
@@ -86,8 +86,8 @@ function CatalogEntityRowSelectionBody({
   )
 }
 
-/** Entity-aware catalog picker row — EntityCardFrame owns perimeter; EntityCardContent owns inset. */
-export function CatalogEntityRow(props: CatalogEntityRowProps) {
+/** Entity-aware catalog browse card — EntityCardFrame owns perimeter; EntityCardContent owns inset. */
+export function CatalogCard(props: CatalogCardProps) {
   const {
     toolbarLabel,
     domIds,
@@ -101,7 +101,7 @@ export function CatalogEntityRow(props: CatalogEntityRowProps) {
 
   if (props.selection && !collapsible) {
     return (
-      <CatalogEntityRowSelectionBody
+      <CatalogCardSelectionBody
         toolbarLabel={toolbarLabel}
         domIds={domIds}
         summary={summary}
@@ -117,7 +117,7 @@ export function CatalogEntityRow(props: CatalogEntityRowProps) {
 
   return (
     <EntityCardFrame
-      density={CATALOG_ENTITY_ROW_DENSITY}
+      density={CATALOG_CARD_DENSITY}
       edges={resolveEntitySurfaceEdges({ leadingUtilityCount, trailing })}
       leadingUtilityCount={leadingUtilityCount}
     >
@@ -127,7 +127,7 @@ export function CatalogEntityRow(props: CatalogEntityRowProps) {
         bodyId={domIds.bodyId}
         toolbarAriaLabel={toolbarLabel}
         rowLayout="entity-card"
-        density={CATALOG_ENTITY_ROW_DENSITY}
+        density={CATALOG_CARD_DENSITY}
         toolbarCompact
         toolbarLeadingChrome="none"
         collapsible={isDisclosure && collapsible}
@@ -135,20 +135,20 @@ export function CatalogEntityRow(props: CatalogEntityRowProps) {
         onToggleCollapse={onToggleCollapse}
         showDragHandle={false}
         className={disclosureEntityCardListItemVariants()}
-        bodyClassName={isDisclosure ? catalogEntityRowBodyWashVariants() : undefined}
+        bodyClassName={isDisclosure ? catalogCardBodyWashVariants() : undefined}
         header={
           <EntityCardContent>
             {isDisclosure ? (
               <DisclosureEntityCardHeader
                 entity={entity}
                 trailing={trailing}
-                density={CATALOG_ENTITY_ROW_DENSITY}
+                density={CATALOG_CARD_DENSITY}
               />
             ) : (
               <EntityAnatomyHost
                 entity={entity}
                 trailing={trailing}
-                density={CATALOG_ENTITY_ROW_DENSITY}
+                density={CATALOG_CARD_DENSITY}
               />
             )}
           </EntityCardContent>

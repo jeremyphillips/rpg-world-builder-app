@@ -119,7 +119,7 @@ registry resolution and panel wiring only — not a second visual system.
 | Authoring recap or modal strip after setup            | `resolveSetupSummaryRows` + `SetupSummaryRows`, or `CreateModalShell.setupSummary` |
 | Drawer / reducer wizard (no `CreateSetupSet[]`)       | `DrawerDecisionSummary` or `DecisionSummaryPanel` (default card + Selections)      |
 | Nested composer completed decisions (cardless stack)  | `CreateCompositionSummary` → embedded `DecisionSummaryPanel`                       |
-| Committed entities in a list (edit/remove)            | `ContentFormEntitySelectionRow` — not summary cards                                |
+| Committed entities in a list (edit/remove)            | `EntityCard` with `density="compact"` — not summary cards                          |
 
 ## Consumers
 

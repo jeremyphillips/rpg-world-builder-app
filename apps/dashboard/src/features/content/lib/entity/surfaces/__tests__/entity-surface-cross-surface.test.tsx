@@ -4,7 +4,7 @@ import { resolveContentDisplayFallback } from '@rpg/contracts'
 
 import { buildEquipmentEntitySurfaceIdentity } from '../../../../equipment/lib/equipment-entity-surface-identity.lib'
 import { projectEntitySurfaceConfig } from '../entity-surface-projection.lib'
-import { ContentEntityCard } from '../cards/content/content-entity-card'
+import { EntityCard } from '../cards/content/entity-card'
 import { DrawerEntityContext } from '../drawer/drawer-entity-context'
 
 const WEAPON_SURFACE = {
@@ -28,10 +28,7 @@ describe('entity surface cross-surface parity', () => {
 
   it('renders matching identity semantics on card and drawer surfaces', () => {
     const { unmount: unmountCard } = render(
-      <ContentEntityCard
-        density="compact"
-        entity={projectEntitySurfaceConfig(WEAPON_SURFACE).entity}
-      />,
+      <EntityCard density="compact" entity={projectEntitySurfaceConfig(WEAPON_SURFACE).entity} />,
     )
 
     expect(screen.getByText('Shortsword')).toBeInTheDocument()
@@ -65,7 +62,7 @@ describe('entity surface cross-surface parity', () => {
     } as const
 
     const { unmount } = render(
-      <ContentEntityCard density="compact" entity={projectEntitySurfaceConfig(surface).entity} />,
+      <EntityCard density="compact" entity={projectEntitySurfaceConfig(surface).entity} />,
     )
     expect(screen.getByText('Government')).toBeInTheDocument()
     expect(

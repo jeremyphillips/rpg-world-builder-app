@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 import {
-  ContentEntityCard,
+  EntityCard,
   DetailEntityRowActions,
   type EntitySummaryStatusItem,
 } from '@/features/content'
@@ -32,7 +32,7 @@ export function QuickNpcStartingChoiceSelectedRow({
 }: QuickNpcStartingChoiceSelectedRowProps) {
   const description = [suggestionHint, alsoGrantedHint].filter(Boolean).join(' ')
   return (
-    <ContentEntityCard
+    <EntityCard
       entity={{
         heading: label,
         description: description ? (

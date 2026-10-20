@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
-import { DisclosureEntityCard } from '../../entity/surfaces/cards/disclosure/disclosure-entity-card'
+import { EntityCard } from '../../entity/surfaces/cards/content/entity-card'
 import { projectArrayItemEntitySummary } from '../../entity/surfaces/cards/disclosure/array-item-entity-summary.lib'
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import {
@@ -83,7 +83,8 @@ function GrantRowPresentationDemo({ values }: { values: Record<string, unknown> 
   })
 
   return (
-    <DisclosureEntityCard
+    <EntityCard
+      variant="disclosure"
       itemId={heading}
       toolbarAriaLabel={toolbarAriaLabel}
       entity={entity}
@@ -92,7 +93,7 @@ function GrantRowPresentationDemo({ values }: { values: Record<string, unknown> 
       onToggleCollapse={() => setCollapsed((current) => !current)}
     >
       <p className="text-style-supporting">Grant body fields render here when expanded.</p>
-    </DisclosureEntityCard>
+    </EntityCard>
   )
 }
 

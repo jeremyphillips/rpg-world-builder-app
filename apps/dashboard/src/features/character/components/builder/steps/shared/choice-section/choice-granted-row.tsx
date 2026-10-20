@@ -1,7 +1,7 @@
 import type { BuilderChoiceGrantedRow } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
-import { ContentEntityCard } from '@/features/content'
+import { EntityCard } from '@/features/content'
 
 import { GrantedChoiceLeadingIcon } from './granted-choice-leading-icon'
 
@@ -11,7 +11,7 @@ export type ChoiceGrantedRowProps = {
 
 export function ChoiceGrantedRow({ row }: ChoiceGrantedRowProps) {
   return (
-    <ContentEntityCard
+    <EntityCard
       entity={{
         heading: row.label,
         description: row.sourceLabel ? (

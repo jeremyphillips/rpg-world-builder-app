@@ -83,7 +83,7 @@ describe('entity anatomy guard', () => {
 
   it('keeps catalog entity row on entity-card CLI mode with shared anatomy', () => {
     const catalogRowSource = readFileSync(
-      join(ENTITY_ROOT, 'surfaces/catalog/catalog-entity-row.tsx'),
+      join(ENTITY_ROOT, 'surfaces/catalog/catalog-card.tsx'),
       'utf8',
     )
 

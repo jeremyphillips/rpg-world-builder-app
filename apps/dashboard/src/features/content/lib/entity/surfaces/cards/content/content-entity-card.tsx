@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import { ContentCardHeadingAction, type ContentCardDensity } from '@rpg/ui'
+import { type ContentCardDensity } from '@rpg/ui'
 
 import { EntityAnatomy } from '../../../anatomy/entity-anatomy'
 import type { EntityAnatomyLeading } from '../../../anatomy/entity-anatomy-leading.types'
@@ -61,13 +60,5 @@ export function ContentEntityCard({
         </EntityCardContent>
       </EntityCardUtilityFieldSizeProvider>
     </EntityCardFrame>
-  )
-}
-
-export function ContentEntityCardViewLink({ href }: { href: string }) {
-  return (
-    <ContentCardHeadingAction asChild>
-      <Link to={href}>View</Link>
-    </ContentCardHeadingAction>
   )
 }

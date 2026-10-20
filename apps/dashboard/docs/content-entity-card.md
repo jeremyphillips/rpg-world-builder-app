@@ -3,7 +3,7 @@
 Entity identity uses one stack:
 
 ```text
-EntitySummaryModel → EntitySummary parts → EntityAnatomy (RowAnatomy cells) → embedded host | ContentEntityCard | DisclosureEntityCard
+EntitySummaryModel → EntitySummary parts → EntityAnatomy (RowAnatomy cells) → embedded host | EntityCard (static) | EntityCard variant disclosure
 ```
 
 `EntitySummaryModel` contains identity content only: `heading`, optional
@@ -26,17 +26,17 @@ Hub tiles, starter actions, and auth **form chrome** use generic [`Card`](../../
 
 **Entity identity in this doc** uses `EntityCardFrame` + `EntitySummary`. Heading size follows the shared density ladder: compact 14/12, comfortable 16/14, spacious 19/14 (`--ui-copy-title-size` / `--ui-copy-supporting-size`). Comfortable is the default. Set `density="spacious"` when a 19px heading is required. Shared **`--ui-card-inset-*`** steps align with generic Card, including `spacious`.
 
-Do not replace `ContentEntityCard`, `DisclosureEntityCard`, or `CatalogEntityRow` with generic `Card` for catalog identity rows.
+Do not replace `EntityCard`, `CatalogCard`, or catalog browse rows with generic `Card` for catalog identity rows.
 
 ## Module layout (`lib/entity/`)
 
 ```text
 summary/   — EntitySummaryModel, EntitySummary parts (heading / description / status), projection, media
 anatomy/   — EntityAnatomy, EntityAnatomyHost, trailing cells, leading rail, surface edges, geometry tokens
-surfaces/  — CEC, DEC, catalog rows; imports anatomy/ + summary/ only via dependency direction
-  cards/content/     ContentEntityCard, EntityCardFrame, EntityCardContent (internal)
-  cards/disclosure/  DisclosureEntityCard, DisclosureEntityCardHeader
-  catalog/           CatalogEntityRow, CatalogEntityPickerSheet
+surfaces/  — EntityCard facade, catalog cards; imports anatomy/ + summary/ only via dependency direction
+  cards/content/     EntityCard (public), ContentEntityCard + EntityCardFrame (internal)
+  cards/disclosure/  DisclosureEntityCard, DisclosureEntityCardHeader (internal)
+  catalog/           CatalogCard, CatalogEntityPickerSheet
   drawer/            DrawerEntityBlock (compact drawer identity — see [feature-structure.md](./feature-structure.md))
 ```
 
@@ -58,10 +58,10 @@ to outline row-track grids and cells.
 | Identity inside preview, destination, or master-detail host         | `EntityAnatomyHost`                                                                                                                                     |
 | Global search hit (link row)                                        | `InteractiveListRow` + `IdentityRow`; media/status via `projectSearchHitToInteractiveListPresentation` — not `EntityAnatomyHost` inside the link        |
 | Drawer subject band (task title + pinned record)                    | `DrawerEntityContext` in `DrawerShell` `entityContext`                                                                                                  |
-| Bordered static identity                                            | `ContentEntityCard`                                                                                                                                     |
-| Bordered identity with expandable domain content                    | `DisclosureEntityCard`                                                                                                                                  |
-| Create-tab Add/Pending discovery (single choice)                    | `CatalogEntityRow` **selection mode** inside a `RadioGroup` — no trailing Select/Remove                                                                 |
-| Pending rows with immediate commit                                  | `ContentEntityCard` + trailing action                                                                                                                   |
+| Bordered static identity                                            | `EntityCard`                                                                                                                                            |
+| Bordered identity with expandable domain content                    | `EntityCard` with `variant="disclosure"`                                                                                                                |
+| Create-tab Add/Pending discovery (single choice)                    | `CatalogCard` **selection mode** inside a `RadioGroup` — no trailing Select/Remove                                                                      |
+| Pending rows with immediate commit                                  | `EntityCard` + trailing action                                                                                                                          |
 | Detail hierarchy or typed relationship                              | `DetailEntityRow` / `EntityRowList`                                                                                                                     |
 | Combobox option, action choice menu item, or split-button menu item | Shared interactive list chrome + `IdentityRow` (`ComboboxOptionRow` / `MenuChoiceRow`) — `InteractiveListSize` `sm` / `md` / `lg`; not `FieldSizeToken` |
 | Custom combobox interiors (`renderOption`) or non-entity pickers    | Purpose-built row content                                                                                                                               |
@@ -79,7 +79,7 @@ primitives — not ad-hoc menu item class stacks. Menu rows derive highlight/was
 | Action choice menu / split-button items | `InteractiveList` + `MenuChoiceRow` inside `interactiveListChoiceMenuContentClasses` | `menu` / `menuitem`                            | `IdentityRow` when the item has identity copy  |
 | Search hit                              | `InteractiveListRow` slots                                                           | link                                           | `IdentityRow`                                  |
 | Detail / relationship section           | `DetailEntityRow` / `EntityRowList`                                                  | section row                                    | EntitySummary parts → `IdentityRowHeadingLine` |
-| Bordered catalog + disclosure           | `CatalogEntityRow` / DEC                                                             | card / disclosure                              | anatomy + card frame                           |
+| Bordered catalog + disclosure           | `CatalogCard` / DEC                                                                  | card / disclosure                              | anatomy + card frame                           |
 
 Campaign-unavailable search hits use entity `inactive` status in the identity status slot
 only — not a duplicate trailing badge.
@@ -99,8 +99,8 @@ identity contract and one projector (`projectEntitySurfaceConfig` /
   (`ENTITY_SURFACE_LEADING_THUMB_FRAME`, 40px / `sm`) and maps `metadata` segments onto
   `EntitySummaryModel.supportingMetadata` for anatomy to render.
 - Callers pass `EntitySurfaceConfig` (`identity`, optional `details`, optional
-  `inlineAction`) into `CatalogEntitySurfaceRow`, `EntitySurfaceContentCard`,
-  `DrawerEntityContext`, or `createCatalogEntityRowRenderer({ buildSurface })`.
+  `inlineAction`) into `CatalogEntitySurfaceRow`, `CatalogEntitySurfaceRow`,
+  `DrawerEntityContext`, or `createCatalogCardRenderer({ buildSurface })`.
 - `DrawerEntityContext` uses the same projection as cards; only drawer band chrome differs.
   Drawer-only utilities pass `trailing` (`EntityAnatomyTrailing`) — not extra fields on
   `EntitySurfaceConfig`.
@@ -211,7 +211,7 @@ Surfaces with disclosed sibling content publish `--entity-content-offset` on the
 from utility **count** and **density**. Anatomy and `EntityLeadingRail` establish the
 coordinate physically; they never publish offset.
 
-**Combined entity-card host invariant:** CEC, DEC, and `CatalogEntityRow` share
+**Combined entity-card host invariant:** CEC, DEC, and `CatalogCard` share
 `EntityCardFrame` + `EntityCardContent`. `rowLayout="entity-card"` ⇒ CLI behavior-only
 (no header/body inset, no competing padding) + exactly one `EntityCardContent` header
 inset region + frame publishes surface inset CSS vars and content offset when needed.
@@ -233,17 +233,17 @@ EntityCardFrame (article)
 
 | Host tone     | Used by                         | Resolver                                        |
 | ------------- | ------------------------------- | ----------------------------------------------- |
-| `quiet`       | CEC, DEC, `CatalogEntityRow`    | `cardSurfaceVariants({ tone: 'quiet' })`        |
+| `quiet`       | CEC, DEC, `CatalogCard`         | `cardSurfaceVariants({ tone: 'quiet' })`        |
 | (interactive) | Selectable catalog / radio rows | `ui-card--interactive` + `selected` when chosen |
 
 Rhythm must **never** depend on `collapsible`, `details`, or collapsed state.
 
 ---
 
-## ContentEntityCard
+## EntityCard
 
 ```text
-ContentEntityCard
+EntityCard
 └── EntityCardFrame (surface="card")
     └── EntityCardContent
         └── EntityAnatomy
@@ -271,17 +271,17 @@ ContentEntityCard
 
 ---
 
-## DisclosureEntityCard
+## EntityCard
 
 DEC composes the shared frame/content stack with CLI disclosure behavior.
 `DetailEntityRow` is outside this contract.
 
 ```text
-DisclosureEntityCard
+EntityCard
 └── EntityCardFrame (surface="subtle")
     └── CollapsibleListItem (rowLayout="entity-card", density)
         ├── EntityCardContent
-        │   └── DisclosureEntityCardHeader → EntityAnatomy
+        │   └── EntityCardHeader → EntityAnatomy
         └── body — shared body frame + DEC wash tone + entity inline inset
 ```
 
@@ -383,29 +383,29 @@ detail primitives may use `endSlot` for utility controls — that API does not a
 
 ### Catalog entity picker rows
 
-Entity-backed catalog pickers **must** use `CatalogEntityPickerSheet` → `CatalogEntityRow`.
+Entity-backed catalog pickers **must** use `CatalogEntityPickerSheet` → `CatalogCard`.
 Raw `CatalogPickerSheet` remains for generic/non-entity catalogs only.
 
 ```text
-CatalogEntityRow
+CatalogCard
 └── EntityCardFrame (surface="catalogRow")
     └── CollapsibleListItem (rowLayout="entity-card")
         ├── EntityCardContent
-        │   └── EntityAnatomyHost | DisclosureEntityCardHeader
+        │   └── EntityAnatomyHost | EntityCardHeader
         └── details? (body wash)
 ```
 
-| Layer                                              | Owns                                                                                      |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `EntityCardFrame`                                  | Border, radius, `catalogRow` surface, inset CSS vars, content-offset when leading present |
-| `EntityCardContent`                                | Header horizontal + vertical inset (flat and disclosure modes)                            |
-| CLI (`rowLayout="entity-card"`)                    | Disclosure behavior, structural `p-0` reset — no catalog chrome                           |
-| `EntityAnatomyHost` / `DisclosureEntityCardHeader` | Three-column identity                                                                     |
-| Body wash variants                                 | Optional expanded details inset                                                           |
+| Layer                                    | Owns                                                                                      |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `EntityCardFrame`                        | Border, radius, `catalogRow` surface, inset CSS vars, content-offset when leading present |
+| `EntityCardContent`                      | Header horizontal + vertical inset (flat and disclosure modes)                            |
+| CLI (`rowLayout="entity-card"`)          | Disclosure behavior, structural `p-0` reset — no catalog chrome                           |
+| `EntityAnatomyHost` / `EntityCardHeader` | Three-column identity                                                                     |
+| Body wash variants                       | Optional expanded details inset                                                           |
 
 Features supply entity model, trailing semantics, and optional per-item `details` via
-`renderEntityRow` or `createCatalogEntityRowRenderer`. `rowLayout="entity-card"` is
-internal to `CatalogEntityRow` — not a feature concern.
+`renderEntityRow` or `createCatalogCardRenderer`. `rowLayout="entity-card"` is
+internal to `CatalogCard` — not a feature concern.
 
 Disclosure mode activates when **resolved** `details` is non-null (not merely when a
 `buildDetails` callback exists).
@@ -426,7 +426,7 @@ Disclosure mode activates when **resolved** `details` is non-null (not merely wh
 - Grip/caret spacing, trailing-rail geometry, focus/button chrome
 
 **Form-owned ≠ form-styled.** Entity-backed grant and equipment rows use
-`EntityDisclosureArrayItemShell` → `DisclosureEntityCard`; the form layer owns RHF
+`EntityDisclosureArrayItemShell` → `EntityCard`; the form layer owns RHF
 registration, not card geometry. See
 [`array-field-authoring.md`](../../../packages/ui/docs/forms/array-field-authoring.md#itemrendershell--entity-presentation).
 
@@ -448,7 +448,7 @@ form field stacks).
 
 `EntityAnatomy` owns identity typography, rhythm, media/leading/trailing geometry.
 Embedded hosts own collection inset. `EntityCardContent` owns header inset; CEC, DEC,
-and `CatalogEntityRow` pass density to both `EntityCardContent` and internal anatomy.
+and `CatalogCard` pass density to both `EntityCardContent` and internal anatomy.
 
 Set density **exactly once**:
 
@@ -520,7 +520,7 @@ offset system.
 
 ### Leading kinds
 
-Single leading controls on `ContentEntityCard` / `EntityAnatomyHost` use **`EntityAnatomyLeading`**
+Single leading controls on `EntityCard` / `EntityAnatomyHost` use **`EntityAnatomyLeading`**
 (mirror of trailing kinds). Anatomy resolves the row track via `resolveEntityLeadingCell`:
 
 | Kind        | Row track | Use                                                                |
@@ -653,18 +653,18 @@ Title-line **heading accessories** (badges beside `IdentityRowHeadingLine.headin
 ## Add / Pending composition
 
 Create-tab relationship composition (Building Organizations first) uses stable
-`ContentEntityCard` rows inside `AddPendingWorkflow`. Ownership and mode rules
+`EntityCard` rows inside `AddPendingWorkflow`. Ownership and mode rules
 live in [create-flow.md](./create-flow.md#add--pending-workflow).
 
 ```text
 AddPendingWorkflow
-├── resting / pending → ContentEntityCard rows + overflow; optional empty state
+├── resting / pending → EntityCard rows + overflow; optional empty state
 └── composing slot    → CreateComposition* + domain-owned discovery / forms / child footer
 ```
 
 **`headingInline`** — optional intrinsic-width slot immediately after the title (not `headingEndValue`). Heading links wrap title text only. The slot is marked `data-heading-inline`, which forces a nested `BooleanField` to `sm`. Card frames publish `data-content-density` so a compact card resolves that field to `sm` and a comfortable card to `md`, ahead of the surrounding form density. Trailing utility controls keep their own `xs` scale.
 
-**`ContentEntityCard` must not expand.** Do not add collapse, composer, or
+**`EntityCard` must not expand.** Do not add collapse, composer, or
 relationship-kind props to CEC. Discovery uses CEC + trailing **Select**
 (outline, `size="sm"`, `density="compact"`). Pending **Edit** leaves the row on
 CEC and opens the focused composition composer in the `AddPendingWorkflow`
@@ -738,7 +738,7 @@ for cleanup — do not weaken docs to match legacy patterns:
 | ---------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | Non-entity ArrayItem CLI content-column indent | **Intentional** for anonymous form arrays only                              |
 | `DetailEntityRow.endSlot`                      | **Intentional** for non-entity detail hosts — not for EntityAnatomyHost/DEC |
-| Catalog picker entity rows                     | `CatalogEntityPickerSheet` → `CatalogEntityRow`                             | Mandatory; perimeter on `EntityCardFrame`, inset on `EntityCardContent` |
+| Catalog picker entity rows                     | `CatalogEntityPickerSheet` → `CatalogCard`                                  | Mandatory; perimeter on `EntityCardFrame`, inset on `EntityCardContent` |
 
 ---
 

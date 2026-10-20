@@ -5,7 +5,7 @@ import type { EntityAnatomyTrailing } from '../../anatomy/entity-anatomy-trailin
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 import { projectEntitySurfaceConfig } from '../entity-surface-projection.lib'
 import type { EntitySurfaceConfig } from '../entity-surface.types'
-import { CatalogEntityRow, type CatalogEntityRowProps } from './catalog-entity-row'
+import { CatalogCard, type CatalogCardProps } from './catalog-card'
 
 type CatalogEntityRowRendererConfig<TItem> = {
   buildSurface?: (item: TItem) => EntitySurfaceConfig
@@ -73,9 +73,9 @@ function renderCatalogEntityRow<TItem>(
           },
         }
       : { trailing }),
-  } as CatalogEntityRowProps
+  } as CatalogCardProps
 
-  return <CatalogEntityRow {...rowProps} />
+  return <CatalogCard {...rowProps} />
 }
 
 export function createCatalogEntityRowRenderer<TItem>(

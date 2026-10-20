@@ -20,7 +20,7 @@ import {
   CREATE_FLOW_FORM_DENSITY,
 } from '@/lib/create-flow'
 
-import { CatalogEntityRow } from '@/features/content'
+import { CatalogCard } from '@/features/content'
 import {
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,
@@ -145,7 +145,7 @@ function BuildingOrganizationDiscoveryRow({
   const options = kindOptionsFor({ kind: 'existing', organizationId: organization.id })
   const selectState = resolveBuildingOrganizationSelectState({ kind, options })
   return (
-    <CatalogEntityRow
+    <CatalogCard
       toolbarLabel={organization.name}
       domIds={resolveBuildingOrganizationDiscoveryDomIds(organization.id)}
       entity={buildOrganizationEntityCardModel(buildOrganizationEntitySummaryVm(organization), {

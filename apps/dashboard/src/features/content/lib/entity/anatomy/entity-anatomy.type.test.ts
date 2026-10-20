@@ -1,6 +1,9 @@
 import { describe, expectTypeOf, it } from 'vitest'
 
-import type { ContentEntityCardProps, DisclosureEntityCardProps } from '@/features/content'
+import type {
+  EntityCardDisclosureProps,
+  EntityCardStaticProps,
+} from '../surfaces/cards/content/entity-card'
 
 import type { EntityAnatomyLeading } from './entity-anatomy-leading.types'
 import type { EntityAnatomyHostProps } from './entity-anatomy'
@@ -33,27 +36,27 @@ describe('entity surface closed API', () => {
     >().toEqualTypeOf<never>()
   })
 
-  it('ContentEntityCard rejects consumer styling props', () => {
+  it('EntityCard static rejects consumer styling props', () => {
     expectTypeOf<
-      Extract<keyof ContentEntityCardProps, ConsumerPresentationKeys>
+      Extract<keyof EntityCardStaticProps, ConsumerPresentationKeys>
     >().toEqualTypeOf<never>()
   })
 
-  it('ContentEntityCard rejects legacy slot and chrome props', () => {
+  it('EntityCard static rejects legacy slot and chrome props', () => {
     expectTypeOf<
-      Extract<keyof ContentEntityCardProps, LegacyContentEntityCardKeys>
+      Extract<keyof EntityCardStaticProps, LegacyContentEntityCardKeys>
     >().toEqualTypeOf<never>()
   })
 
-  it('DisclosureEntityCard rejects consumer styling props', () => {
+  it('EntityCard disclosure rejects consumer styling props', () => {
     expectTypeOf<
-      Extract<keyof DisclosureEntityCardProps, ConsumerPresentationKeys>
+      Extract<keyof EntityCardDisclosureProps, ConsumerPresentationKeys>
     >().toEqualTypeOf<never>()
   })
 
-  it('DisclosureEntityCard rejects consumer body alignment props', () => {
+  it('EntityCard disclosure rejects consumer body alignment props', () => {
     expectTypeOf<
-      Extract<keyof DisclosureEntityCardProps, 'bodyPadding' | 'bodyInset' | 'alignBody'>
+      Extract<keyof EntityCardDisclosureProps, 'bodyPadding' | 'bodyInset' | 'alignBody'>
     >().toEqualTypeOf<never>()
   })
 
@@ -70,7 +73,7 @@ describe('entity surface closed API', () => {
   it('entity surfaces expose no vertical alignment knobs — trailing kind selects the cell', () => {
     type AlignKeys = 'trailingAlign' | 'actionsAlign' | 'rowAlign' | 'headingBand'
     expectTypeOf<Extract<keyof EntityAnatomyHostProps, AlignKeys>>().toEqualTypeOf<never>()
-    expectTypeOf<Extract<keyof ContentEntityCardProps, AlignKeys>>().toEqualTypeOf<never>()
-    expectTypeOf<Extract<keyof DisclosureEntityCardProps, AlignKeys>>().toEqualTypeOf<never>()
+    expectTypeOf<Extract<keyof EntityCardStaticProps, AlignKeys>>().toEqualTypeOf<never>()
+    expectTypeOf<Extract<keyof EntityCardDisclosureProps, AlignKeys>>().toEqualTypeOf<never>()
   })
 })

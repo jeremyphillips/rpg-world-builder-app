@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url'
 import { resolveEntitySurfaceEdges } from '../../../../anatomy/entity-surface-edges.lib'
 import type { EntityAnatomyTrailing } from '../../../../anatomy/entity-anatomy-trailing.types'
 import { DASH_ENTITY_CARD_BODY_CLASS } from '../../../dash-entity-surface.variants'
-import { catalogEntityRowBodyWashVariants } from '../../../catalog/catalog-entity-row.variants'
+import { catalogCardBodyWashVariants } from '../../../catalog/catalog-card.variants'
 import { disclosureEntityCardBodyWashVariants } from '../../disclosure/disclosure-entity-card.variants'
 import { entityCardFrameVariants } from '../entity-card-frame.variants'
 
@@ -144,10 +144,7 @@ describe('edge-aware surface inset', () => {
   })
 
   it('keeps body wash on dash-entity-card__body', () => {
-    for (const wash of [
-      disclosureEntityCardBodyWashVariants(),
-      catalogEntityRowBodyWashVariants(),
-    ]) {
+    for (const wash of [disclosureEntityCardBodyWashVariants(), catalogCardBodyWashVariants()]) {
       expect(wash).toContain(DASH_ENTITY_CARD_BODY_CLASS)
       expect(wash).not.toContain('pr-[var(--entity-body-inline-end)]')
     }

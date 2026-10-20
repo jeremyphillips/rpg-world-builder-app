@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { collapsibleListItemHeaderVerticalPaddingVariants, RadioGroup } from '@rpg/ui'
 import { describe, expect, it, vi } from 'vitest'
 
-import { CatalogEntityRow } from '../catalog-entity-row'
-import { catalogEntityRowBodyWashVariants } from '../catalog-entity-row.variants'
+import { CatalogCard } from '../catalog-card'
+import { catalogCardBodyWashVariants } from '../catalog-card.variants'
 import { DASH_ENTITY_CARD_BODY_CLASS } from '../../dash-entity-surface.variants'
 
 const domIds = {
@@ -20,10 +20,10 @@ function entityCardContentFromShell(container: HTMLElement): HTMLElement {
   return contentInset as HTMLElement
 }
 
-describe('CatalogEntityRow', () => {
+describe('CatalogCard', () => {
   it('uses entity-card CLI mode with disclosure trigger when details are present', () => {
     const { container } = render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Rope"
         domIds={domIds}
         collapsible
@@ -62,7 +62,7 @@ describe('CatalogEntityRow', () => {
 
   it('uses compact content inset for flat rows without details', () => {
     const { container } = render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="The Foos"
         domIds={domIds}
         entity={{ heading: 'The Foos', classification: 'Government' }}
@@ -94,7 +94,7 @@ describe('CatalogEntityRow', () => {
 
     render(
       <RadioGroup aria-label="Organizations" value="" onValueChange={onValueChange}>
-        <CatalogEntityRow
+        <CatalogCard
           toolbarLabel="The Foos"
           domIds={domIds}
           entity={{ heading: 'The Foos', classification: 'Government' }}
@@ -115,7 +115,7 @@ describe('CatalogEntityRow', () => {
 
   it('keeps the disclosure trigger before details are mounted', () => {
     render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Rope"
         domIds={domIds}
         collapsible
@@ -130,7 +130,7 @@ describe('CatalogEntityRow', () => {
 
   it('aligns expanded body with entity inline start and end inset', () => {
     render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Rope"
         domIds={domIds}
         collapsible
@@ -141,7 +141,7 @@ describe('CatalogEntityRow', () => {
     )
 
     const body = screen.getByText('Expanded details').parentElement
-    expect(body).toHaveClass(catalogEntityRowBodyWashVariants())
+    expect(body).toHaveClass(catalogCardBodyWashVariants())
     expect(body).toHaveClass(DASH_ENTITY_CARD_BODY_CLASS)
     expect(body).not.toHaveClass('-ml-2')
   })

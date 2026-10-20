@@ -14,12 +14,7 @@ import {
   waitForRowAnatomyLayout,
 } from '@rpg/ui/storybook/row-anatomy-geometry'
 
-import {
-  CatalogEntityRow,
-  ContentEntityCard,
-  DetailRowLeadingMedia,
-  DisclosureEntityCard,
-} from '@/features/content'
+import { CatalogCard, DetailRowLeadingMedia, EntityCard } from '@/features/content'
 import { DetailEntityRow } from '../../../detail/row/entity/detail-entity-row'
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 import type { EntityAnatomyTrailing } from '../entity-anatomy-trailing.types'
@@ -161,11 +156,12 @@ function MatrixCard({
   const [collapsed, setCollapsed] = useState(true)
 
   if (leading === 'none') {
-    return <ContentEntityCard entity={entity} density={density} trailing={trailing} />
+    return <EntityCard entity={entity} density={density} trailing={trailing} />
   }
 
   return (
-    <DisclosureEntityCard
+    <EntityCard
+      variant="disclosure"
       itemId={label}
       toolbarAriaLabel={label}
       entity={entity}
@@ -176,7 +172,7 @@ function MatrixCard({
       dragHandleProps={leading === 'grip-caret' ? mockDragHandleProps : undefined}
     >
       <p className="text-style-supporting">Disclosed body.</p>
-    </DisclosureEntityCard>
+    </EntityCard>
   )
 }
 
@@ -259,7 +255,7 @@ function EdgeGeometryPair({ density }: { density: ContentCardDensity }) {
   return (
     <div className="flex flex-col gap-2">
       <div data-edge-case={`${density}-trailing-remove`}>
-        <ContentEntityCard
+        <EntityCard
           entity={{ heading: 'Longsword', classification: 'Martial weapon' }}
           density={density}
           trailing={{ kind: 'utility', content: <RemoveUtility label="Longsword" /> }}
@@ -275,7 +271,8 @@ function EdgeGeometryPair({ density }: { density: ContentCardDensity }) {
         </div>
       ) : null}
       <div data-edge-case={`${density}-leading-caret`}>
-        <DisclosureEntityCard
+        <EntityCard
+          variant="disclosure"
           itemId={`${density}-caret`}
           toolbarAriaLabel="Harbor District"
           entity={{ heading: 'Harbor District', classification: 'Settlement' }}
@@ -284,7 +281,7 @@ function EdgeGeometryPair({ density }: { density: ContentCardDensity }) {
           onToggleCollapse={() => setCollapsed((current) => !current)}
         >
           <p className="text-style-supporting">Disclosed body.</p>
-        </DisclosureEntityCard>
+        </EntityCard>
       </div>
     </div>
   )
@@ -300,7 +297,7 @@ export const CatalogRowRadioLeading: Story = {
     <div className="flex max-w-md flex-col gap-2">
       <RadioGroup aria-label="Organizations" defaultValue="org-eligible">
         <div data-edge-case="radio-leading-none">
-          <CatalogEntityRow
+          <CatalogCard
             toolbarLabel="City Council"
             domIds={{
               itemId: 'matrix-radio-none',
@@ -312,7 +309,7 @@ export const CatalogRowRadioLeading: Story = {
           />
         </div>
         <div data-edge-case="radio-leading-status">
-          <CatalogEntityRow
+          <CatalogCard
             toolbarLabel="Harbor Guild"
             domIds={{
               itemId: 'matrix-radio-status',
@@ -328,7 +325,7 @@ export const CatalogRowRadioLeading: Story = {
           />
         </div>
         <div data-edge-case="radio-leading-media">
-          <CatalogEntityRow
+          <CatalogCard
             toolbarLabel="Silver Circle"
             domIds={{
               itemId: 'matrix-radio-media',
@@ -350,14 +347,15 @@ export const CatalogRowRadioLeading: Story = {
         </div>
       </RadioGroup>
       <div data-edge-case="radio-leading-disclosure">
-        <DisclosureEntityCard
+        <EntityCard
+          variant="disclosure"
           itemId="matrix-radio-disclosure"
           toolbarAriaLabel="Spell details"
           entity={{ heading: 'Fireball', classification: 'Evocation' }}
           density="compact"
         >
           <p className="text-style-supporting">Disclosed picker body.</p>
-        </DisclosureEntityCard>
+        </EntityCard>
       </div>
     </div>
   ),

@@ -7,7 +7,7 @@ import {
   buildCatalogDisclosureLabel,
   CatalogCollapsibleList,
   CatalogMetadataRenderer,
-  DisclosureEntityCard,
+  EntityCard,
 } from '@/features/content'
 import { buildEquipmentDetailViewModel, EquipmentDetailMetadata } from '@/features/content'
 import { CHARACTER_EMPTY_SECTION_TEXT } from '../../../lib/display/character-display'
@@ -57,7 +57,8 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
   )
 
   return (
-    <DisclosureEntityCard
+    <EntityCard
+      variant="disclosure"
       itemId={card.id}
       toolbarAriaLabel={toolbarLabel}
       entity={{
@@ -87,7 +88,7 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
       ) : (
         <Text variant="muted">{header.unavailableMessage}</Text>
       )}
-    </DisclosureEntityCard>
+    </EntityCard>
   )
 }
 

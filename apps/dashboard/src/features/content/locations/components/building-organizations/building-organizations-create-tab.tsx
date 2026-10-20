@@ -8,7 +8,7 @@ import {
   type CreateWorkflowPanelStatus,
 } from '@/lib/create-flow'
 
-import { ContentEntityCard } from '@/features/content'
+import { EntityCard } from '@/features/content'
 import { DetailOverflowMenu } from '../../../lib/detail/detail-overflow-menu'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import type {
@@ -116,7 +116,7 @@ export function BuildingOrganizationsCreateTab(props: BuildingOrganizationsCreat
         pendingHeading={BUILDING_ORGANIZATIONS_PENDING_HEADING}
         emptyState={<Text variant="muted">{BUILDING_ORGANIZATIONS_EMPTY_STATE_LABEL}</Text>}
         pendingItems={plan.relationships.map((relationship) => (
-          <ContentEntityCard
+          <EntityCard
             key={relationship.draftId}
             entity={buildBuildingOrganizationPendingEntity({
               relationship,

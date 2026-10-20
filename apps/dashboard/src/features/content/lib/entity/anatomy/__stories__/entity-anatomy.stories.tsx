@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ContentEntityCard } from '@/features/content'
+import { EntityCard } from '@/features/content'
 import { EntityAnatomyHost } from '../entity-anatomy'
 import {
   GREY_COAST_ENTITY,
@@ -46,7 +46,7 @@ export const EmbeddedWithAction: Story = {
 export const ContentEntityCardComfortable: Story = {
   render: () => (
     <div className="max-w-md">
-      <ContentEntityCard entity={HARBOR_DISTRICT_ENTITY} />
+      <EntityCard entity={HARBOR_DISTRICT_ENTITY} />
     </div>
   ),
 }
@@ -54,7 +54,7 @@ export const ContentEntityCardComfortable: Story = {
 export const SharedFixtureParity: Story = {
   render: () => (
     <div className="flex max-w-md flex-col gap-4">
-      <ContentEntityCard entity={SILVER_CIRCLE_ENTITY} density="comfortable" />
+      <EntityCard entity={SILVER_CIRCLE_ENTITY} density="comfortable" />
       <div className="rounded-md border border-border bg-catalog-picker-row-surface">
         <EntityAnatomyHost entity={SILVER_CIRCLE_ENTITY} density="compact" />
       </div>

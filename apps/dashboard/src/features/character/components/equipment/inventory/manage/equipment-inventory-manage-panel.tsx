@@ -8,7 +8,7 @@ import type {
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
 
-import { DisclosureEntityCard, type EntitySummaryStatusItem } from '@/features/content'
+import { EntityCard, type EntitySummaryStatusItem } from '@/features/content'
 import { type EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 import type { AddedEquipmentEntryViewModel } from '../../../../lib/equipment/equipment-inventory-summary.lib'
 import type { EquipmentOwnedSourceAction } from '../../acquisition/equipment-acquisition-panel.lib'
@@ -110,7 +110,8 @@ export function EquipmentInventoryManageDisclosureCard({
   ...bodyProps
 }: EquipmentInventoryManageDisclosureCardProps) {
   return (
-    <DisclosureEntityCard
+    <EntityCard
+      variant="disclosure"
       itemId={itemId}
       toolbarAriaLabel={equipmentName}
       entity={buildEquipmentInventoryRowEntity({ equipmentName, status })}
@@ -125,7 +126,7 @@ export function EquipmentInventoryManageDisclosureCard({
       density="compact"
     >
       <EquipmentInventoryManagePanelBody equipment={equipment} rows={rows} {...bodyProps} />
-    </DisclosureEntityCard>
+    </EntityCard>
   )
 }
 

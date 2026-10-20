@@ -14,7 +14,7 @@ import {
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { Button, Checkbox, Eyebrow, Text } from '@rpg/ui'
 
-import { ContentEntityCard } from '@/features/content'
+import { EntityCard } from '@/features/content'
 import { useEquipmentSelectionFacts } from '../../../hooks/use-equipment-selection-facts'
 import { resolveEquipmentConversionItemPresentation } from '../../../lib/equipment/equipment-selection-facts.lib'
 import type { StartingPackageInventoryGroup } from '../../../lib/equipment/equipment-step.lib'
@@ -175,7 +175,7 @@ export function EquipmentPackageConversionEditor({
 
                   return (
                     <li key={item.packageItemKey}>
-                      <ContentEntityCard
+                      <EntityCard
                         entity={buildEquipmentInventoryRowEntity({
                           equipmentName: title,
                           stagedRemoval: !checked,
