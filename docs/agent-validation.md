@@ -30,7 +30,7 @@ Finish by reporting checks run and which repository gates were deferred.
 
 Pre-commit is intentionally fast (no full affected package test suites). Broad typecheck
 and collect-all affected tests since `origin/main` live in `pnpm gate:pre-push`
-(`typecheck:ci`, `test:affected:gate`).
+(`gate:ci:quality`, `test:affected:gate`).
 
 ## Writing implementation plans
 
