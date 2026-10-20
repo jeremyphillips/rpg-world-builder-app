@@ -41,10 +41,12 @@ const TOKEN_PX: Record<string, string> = {
 }
 
 /** jsdom keeps nested var() unevaluated. Resolve the copy variable the cascade would use. */
-function resolvedCopySize(
-  testId: string,
-  property: '--ui-copy-title-size' | '--ui-copy-supporting-size',
-) {
+type CopySizeProperty =
+  | '--ui-copy-title-size'
+  | '--ui-copy-supporting-size'
+  | '--ui-copy-classification-size'
+
+function resolvedCopySize(testId: string, property: CopySizeProperty) {
   let node: Element | null = screen.getByTestId(testId)
   while (node) {
     const specified = getComputedStyle(node).getPropertyValue(property).trim()
@@ -52,7 +54,27 @@ function resolvedCopySize(
     if (token && TOKEN_PX[token]) return TOKEN_PX[token]
     node = node.parentElement
   }
-  return property === '--ui-copy-title-size' ? '16px' : '14px'
+  if (property === '--ui-copy-title-size') return '16px'
+  return '14px'
+}
+
+/** Resolve --ui-copy-classification-line-height from rem or line-height tokens on ancestors. */
+function resolvedClassificationLineHeight(testId: string): string {
+  const remPx: Record<string, string> = {
+    '1.375rem': '22px',
+  }
+  let node: Element | null = screen.getByTestId(testId)
+  while (node) {
+    const specified = getComputedStyle(node)
+      .getPropertyValue('--ui-copy-classification-line-height')
+      .trim()
+    if (remPx[specified]) return remPx[specified]
+    const token = specified.match(/^var\((--[^)]+)\)$/)?.[1]
+    if (token === '--text-xs--line-height') return '16px'
+    if (token === '--text-sm--line-height') return '20px'
+    node = node.parentElement
+  }
+  return '20px'
 }
 
 /** Resolve --ui-anatomy-row-gap from calc(var(--spacing) * N) on ancestors. */
@@ -104,6 +126,9 @@ describe('canonical copy scale', () => {
     expect(getComputedStyle(screen.getByTestId('supporting')).fontSize).toContain('var(--text-sm)')
     expect(resolvedCopySize('title', '--ui-copy-title-size')).toBe('16px')
     expect(resolvedCopySize('supporting', '--ui-copy-supporting-size')).toBe('14px')
+    expect(
+      getComputedStyle(document.documentElement).getPropertyValue('--ui-copy-classification-size'),
+    ).toContain('var(--text-sm)')
   })
 
   it('inherits the surface density and lets an explicit child density override it', () => {
@@ -127,6 +152,7 @@ describe('canonical copy scale', () => {
     expect(resolvedCopySize('inherited', '--ui-copy-title-size')).toBe('14px')
     expect(resolvedCopySize('override', '--ui-copy-title-size')).toBe('19px')
     expect(resolvedCopySize('override-supporting', '--ui-copy-supporting-size')).toBe('14px')
+    expect(resolvedCopySize('override', '--ui-copy-classification-size')).toBe('16px')
     expect(
       getComputedStyle(screen.getByTestId('inherited').parentElement!).getPropertyValue(
         '--ui-anatomy-trailing-gap',
@@ -159,6 +185,35 @@ describe('canonical copy scale', () => {
 
     expect(resolvedCopySize('title', '--ui-copy-title-size')).toBe('19px')
     expect(resolvedCopySize('supporting', '--ui-copy-supporting-size')).toBe('14px')
+    expect(resolvedCopySize('title', '--ui-copy-classification-size')).toBe('16px')
+    expect(resolvedClassificationLineHeight('title')).toBe('22px')
+  })
+
+  it('publishes classification 12 / 14 / 16px by density', () => {
+    installTokens()
+    render(
+      <>
+        <div className="ui-card ui-card--compact">
+          <span data-testid="compact-class">x</span>
+        </div>
+        <div className="ui-card ui-card--comfortable">
+          <span data-testid="comfortable-class">x</span>
+        </div>
+        <div className="ui-card ui-card--spacious">
+          <span data-testid="spacious-class">x</span>
+        </div>
+        <span data-testid="root-class">x</span>
+      </>,
+    )
+
+    expect(resolvedCopySize('compact-class', '--ui-copy-classification-size')).toBe('12px')
+    expect(resolvedClassificationLineHeight('compact-class')).toBe('16px')
+    expect(resolvedCopySize('comfortable-class', '--ui-copy-classification-size')).toBe('14px')
+    expect(resolvedClassificationLineHeight('comfortable-class')).toBe('20px')
+    expect(resolvedCopySize('spacious-class', '--ui-copy-classification-size')).toBe('16px')
+    expect(resolvedClassificationLineHeight('spacious-class')).toBe('22px')
+    expect(resolvedCopySize('root-class', '--ui-copy-classification-size')).toBe('14px')
+    expect(resolvedClassificationLineHeight('root-class')).toBe('20px')
   })
 
   it('maps interactive list size onto the same ladder', () => {

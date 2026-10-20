@@ -60,15 +60,10 @@ export const WrappedSupporting: Story = {
   },
 }
 
-export const EntityCompactHeadingLine: Story = {
+export const CompactHeadingLine: Story = {
   render: () => (
-    <div className="w-72 border border-border p-2">
-      <IdentityRowHeadingLine
-        heading="Longsword"
-        classification="Weapon"
-        headingEnd="15 gp"
-        recipe="entity-compact"
-      />
+    <div className="ui-identity-row--compact w-72 border border-border p-2">
+      <IdentityRowHeadingLine heading="Longsword" classification="Weapon" headingEnd="15 gp" />
     </div>
   ),
 }

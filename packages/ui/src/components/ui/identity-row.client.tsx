@@ -7,7 +7,6 @@ import { cn } from '../../lib/utils'
 
 import {
   identityRowClassificationVariants,
-  identityRowEntityCompactMetaVariants,
   identityRowHeadingClusterVariants,
   identityRowHeadingEndVariants,
   identityRowHeadingLineVariants,
@@ -21,9 +20,6 @@ import { InlineMetadata } from './inline-metadata'
 
 export type { IdentityRowDensity } from './identity-row.variants'
 export { identityRowStackVariants } from './identity-row.variants'
-
-/** Compact entity cards: 14px title, 12px classification, dot, and title-line end text. */
-export type IdentityRowHeadingRecipe = 'entity-compact'
 
 export type IdentityRowProps = {
   heading?: ReactNode
@@ -69,12 +65,10 @@ function IdentityRowHeadingContent({
   heading,
   classification,
   headingInline,
-  recipe,
 }: {
   heading?: ReactNode
   classification?: ReactNode | readonly ReactNode[]
   headingInline?: ReactNode
-  recipe?: IdentityRowHeadingRecipe
 }) {
   const showHeading = isPresent(heading)
   const showHeadingInline = isPresent(headingInline)
@@ -89,13 +83,7 @@ function IdentityRowHeadingContent({
   }
 
   return (
-    <InlineMetadata
-      role="heading"
-      density="compact"
-      wrap={false}
-      separatorSize={recipe === 'entity-compact' ? 'xs' : undefined}
-      className={recipe === 'entity-compact' ? identityRowEntityCompactMetaVariants() : 'min-w-0'}
-    >
+    <InlineMetadata role="heading" density="compact" wrap={false} className="min-w-0">
       {showHeading ? (
         showHeadingInline ? (
           <InlineMetadata.Item className="flex min-w-0 items-center gap-1">
@@ -125,11 +113,6 @@ export type IdentityRowHeadingLineProps = {
   headingEnd?: ReactNode
   /** Intrinsic-width slot immediately after the title (not `headingEnd`). */
   headingInline?: ReactNode
-  /**
-   * Compact entity title line. Classification uses the supporting size.
-   * Title size still comes from the surrounding density.
-   */
-  recipe?: IdentityRowHeadingRecipe
 }
 
 /** Heading + classification line — row-track hosts place it in their band cell. */
@@ -138,14 +121,12 @@ export function IdentityRowHeadingLine({
   classification,
   headingEnd,
   headingInline,
-  recipe,
 }: IdentityRowHeadingLineProps) {
   const content = (
     <IdentityRowHeadingContent
       heading={heading}
       classification={classification}
       headingInline={headingInline}
-      recipe={recipe}
     />
   )
   const showHeadingEnd = isPresent(headingEnd)

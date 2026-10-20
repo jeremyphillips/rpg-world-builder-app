@@ -44,13 +44,13 @@ Compact list presentation — no card border/background on relationship rows. Ro
 
 Detail and relationship rows compose **`EntityAnatomyHost`** (via `DetailEntityRow` or embedded `EntityAnatomy`) using the shared **`EntitySummaryModel`** vocabulary:
 
-| Row / drawer prop  | Entity summary field          | Notes                                                                                    |
-| ------------------ | ----------------------------- | ---------------------------------------------------------------------------------------- |
-| `heading`          | `heading`                     | Entity name                                                                              |
-| `classification`   | `classification`              | Inline muted kind/context after the title (separator-free; `InlineMetadata` renders `·`) |
-| `headingAccessory` | (composed into inline suffix) | Membership titles, roles, and other compact qualifiers — distinct from `classification`  |
-| `description`      | `description`                 | Second-line disambiguation (e.g. Located in …)                                           |
-| `status`           | `status`                      | Trailing metadata such as availability badges                                            |
+| Row / drawer prop  | Entity summary field          | Notes                                                                                                        |
+| ------------------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `heading`          | `heading`                     | Entity name                                                                                                  |
+| `classification`   | `classification`              | Inline muted kind/context after the title (`--ui-copy-classification-*` scale; `InlineMetadata` renders `·`) |
+| `headingAccessory` | (composed into inline suffix) | Membership titles, roles, and other compact qualifiers — distinct from `classification`                      |
+| `description`      | `description`                 | Second-line disambiguation (e.g. Located in …)                                                               |
+| `status`           | `status`                      | Trailing metadata such as availability badges                                                                |
 
 `EntityRowList.Row` maps these props onto `DetailEntityRow` / `EntitySummaryModel`. Navigation (`headingHref`) stays on the surface, not the model.
 

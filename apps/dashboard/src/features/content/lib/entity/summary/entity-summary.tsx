@@ -76,7 +76,6 @@ export function EntitySummaryHeading({
         classification={classification}
         headingEnd={headingEnd}
         headingInline={headingInline}
-        recipe={density === 'compact' ? 'entity-compact' : undefined}
       />
     </div>
   )

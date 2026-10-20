@@ -24,17 +24,8 @@
     flex-shrink: 0;
     font-weight: var(--font-weight-normal);
     color: var(--muted-foreground);
-    font-size: var(--ui-copy-title-size, var(--text-base));
-    line-height: var(--ui-copy-title-line-height, 1.375rem);
-  }
-
-  .ui-identity-row__meta--entity-compact {
-    min-width: 0;
-  }
-
-  .ui-identity-row__meta--entity-compact .ui-identity-row__classification {
-    font-size: var(--ui-copy-supporting-size, var(--text-xs));
-    line-height: var(--ui-copy-supporting-line-height, var(--text-xs--line-height));
+    font-size: var(--ui-copy-classification-size, var(--text-sm));
+    line-height: var(--ui-copy-classification-line-height, var(--text-sm--line-height));
   }
 
   .ui-identity-row__supporting {

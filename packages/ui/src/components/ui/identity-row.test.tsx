@@ -8,6 +8,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import {
   identityRowClassificationVariants,
   identityRowHeadingEndVariants,
+  identityRowHeadingClusterVariants,
+  identityRowHeadingLineVariants,
   identityRowHeadingVariants,
 } from './identity-row.variants'
 import { IdentityRow, IdentityRowHeadingLine } from './identity-row.client'
@@ -22,7 +24,16 @@ const identityRowCss = readFileSync(
   join(dirname(fileURLToPath(import.meta.url)), 'identity-row.css'),
   'utf8',
 )
-const SURFACE_TEST_TOKENS = `:root { --spacing: 4px; --text-base: 16px; --text-sm: 14px; }`
+const SURFACE_TEST_TOKENS = `:root {
+  --spacing: 4px;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-heading-card: 19px;
+  --text-xs--line-height: 16px;
+  --text-sm--line-height: 20px;
+  --text-base--line-height: 24px;
+}`
 
 function resolveAnatomyRowGapPx(element: Element): string {
   let node: Element | null = element
@@ -194,6 +205,16 @@ describe('IdentityRowHeadingLine semantics', () => {
     expect(title).toHaveClass('truncate', 'min-w-0')
     expect(screen.getByText('Inactive').parentElement).toHaveClass('shrink-0')
   })
+
+  it('centers headingEnd on the cross axis while the title cluster stays baseline-aligned', () => {
+    const { container } = render(
+      <IdentityRowHeadingLine heading="Verna" headingEnd={<span>Inactive</span>} />,
+    )
+
+    const line = container.firstElementChild
+    expect(line).toHaveClass(identityRowHeadingLineVariants())
+    expect(line?.firstElementChild).toHaveClass(identityRowHeadingClusterVariants())
+  })
 })
 
 describe('IdentityRowHeadingLine headingInline', () => {
@@ -202,7 +223,6 @@ describe('IdentityRowHeadingLine headingInline', () => {
       <IdentityRowHeadingLine
         heading="An extraordinarily long equipment name that should truncate in narrow layouts"
         headingInline={<span data-testid="inline-slot">toggle</span>}
-        recipe="entity-compact"
       />,
     )
     expect(screen.getByTestId('inline-slot')).toBeInTheDocument()
@@ -211,23 +231,73 @@ describe('IdentityRowHeadingLine headingInline', () => {
   })
 })
 
-describe('IdentityRowHeadingLine entity-compact', () => {
-  it('keeps the title at 14px and classification, dot, and end text at 12px', () => {
-    render(
-      <IdentityRowHeadingLine
-        heading="Fire Bolt"
-        classification="Spell"
-        headingEnd="3"
-        recipe="entity-compact"
-      />,
-    )
+describe('IdentityRowHeadingLine classification copy scale', () => {
+  let styleEl: HTMLStyleElement
 
-    expect(screen.getByText('Fire Bolt')).toHaveClass('ui-identity-row__title')
-    expect(screen.getByText('Spell')).toHaveClass('ui-identity-row__classification')
-    expect(
-      screen.getByText('Spell').closest('.ui-identity-row__meta--entity-compact'),
-    ).not.toBeNull()
-    expect(screen.getByText('3')).toHaveClass('text-style-caption')
+  beforeAll(() => {
+    styleEl = document.createElement('style')
+    styleEl.textContent = `${SURFACE_TEST_TOKENS}\n${copyScaleCss}\n${identityRowCss}`
+    document.head.appendChild(styleEl)
+  })
+
+  afterAll(() => {
+    styleEl.remove()
+  })
+
+  const TOKEN_PX: Record<string, string> = {
+    '--text-xs': '12px',
+    '--text-sm': '14px',
+    '--text-base': '16px',
+  }
+
+  function resolvedClassificationSize(label: string): string {
+    let node: Element | null = screen.getByText(label)
+    while (node) {
+      const specified = getComputedStyle(node)
+        .getPropertyValue('--ui-copy-classification-size')
+        .trim()
+      const token = specified.match(/^var\((--[^)]+)\)$/)?.[1]
+      if (token && TOKEN_PX[token]) return TOKEN_PX[token]
+      node = node.parentElement
+    }
+    return '14px'
+  }
+
+  it('resolves classification size from ui-identity-row density', () => {
+    const { rerender } = render(
+      <div className="ui-identity-row--compact">
+        <IdentityRowHeadingLine heading="Greataxe" classification="Weapon" />
+      </div>,
+    )
+    expect(resolvedClassificationSize('Weapon')).toBe('12px')
+
+    rerender(
+      <div className="ui-identity-row--comfortable">
+        <IdentityRowHeadingLine heading="Greataxe" classification="Weapon" />
+      </div>,
+    )
+    expect(resolvedClassificationSize('Weapon')).toBe('14px')
+
+    rerender(
+      <div className="ui-identity-row--spacious">
+        <IdentityRowHeadingLine heading="Greataxe" classification="Weapon" />
+      </div>,
+    )
+    expect(resolvedClassificationSize('Weapon')).toBe('16px')
+  })
+
+  it('uses comfortable classification on a standalone row without density', () => {
+    render(<IdentityRow heading="Harborford" classification="District" />)
+    expect(resolvedClassificationSize('District')).toBe('14px')
+  })
+
+  it('inherits compact classification from a generic card shell', () => {
+    render(
+      <div className="ui-card ui-card--compact">
+        <IdentityRowHeadingLine heading="Greataxe" classification="Weapon" />
+      </div>,
+    )
+    expect(resolvedClassificationSize('Weapon')).toBe('12px')
   })
 })
 

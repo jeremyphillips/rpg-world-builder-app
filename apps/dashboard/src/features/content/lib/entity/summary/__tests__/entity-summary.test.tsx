@@ -38,9 +38,6 @@ describe('EntitySummaryHeading', () => {
 
     expect(screen.getByText('Fire Bolt')).toHaveClass('ui-identity-row__title')
     expect(screen.getByText('Spell')).toHaveClass('ui-identity-row__classification')
-    expect(
-      screen.getByText('Spell').closest('.ui-identity-row__meta--entity-compact'),
-    ).not.toBeNull()
     const endValue = screen.getByText('3')
     expect(endValue).toHaveClass('tabular-nums', 'text-style-caption')
     expect(endValue).not.toHaveClass('text-sm')

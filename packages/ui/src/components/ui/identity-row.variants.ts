@@ -14,10 +14,7 @@ export const identityRowRootVariants = cva('min-w-0 flex-1', {
   },
 })
 
-export const identityRowHeadingLineVariants = cva('flex w-full min-w-0 items-baseline')
-
-/** Compact entity-card secondary copy on the title line. */
-export const identityRowEntityCompactMetaVariants = cva('ui-identity-row__meta--entity-compact')
+export const identityRowHeadingLineVariants = cva('flex w-full min-w-0 items-center')
 
 export const identityRowHeadingClusterVariants = cva('flex min-w-0 flex-1 items-baseline')
 

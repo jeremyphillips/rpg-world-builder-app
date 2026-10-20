@@ -1,7 +1,9 @@
 /*
- * Canonical density copy scale.
- * Title 14/20, 16/22, 19/26; supporting 12/16, 14/20, 14/20 (compact / comfortable / spacious).
- * Font size, line-height, and heading weight for anatomy titles (`ui-copy-title`).
+ * Canonical density copy scale (compact / comfortable / spacious).
+ * Title 14/20, 16/22, 19/26.
+ * Classification (heading-line) 12/16, 14/20, 16/22.
+ * Supporting 12/16, 14/20, 14/20.
+ * Anatomy titles use `ui-copy-title` for size, line-height, and --font-weight-heading.
  * A density class on the same element overrides an inherited value.
  *
  * --ui-anatomy-row-gap: spacing between related stacked anatomy rows (title, supporting, status).
@@ -11,6 +13,8 @@
   :root {
     --ui-anatomy-row-gap: calc(var(--spacing) * 1);
     --ui-copy-title-line-height: 1.375rem; /* 22px — comfortable title default */
+    --ui-copy-classification-size: var(--text-sm);
+    --ui-copy-classification-line-height: var(--text-sm--line-height);
   }
   .ui-copy-title,
   .ui-content-card-heading {
@@ -32,6 +36,8 @@
     --ui-copy-title-line-height: 1.375rem;
     --ui-copy-supporting-size: var(--text-sm);
     --ui-copy-supporting-line-height: var(--text-sm--line-height);
+    --ui-copy-classification-size: var(--text-sm);
+    --ui-copy-classification-line-height: var(--text-sm--line-height);
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
     --entity-leading-content-gap: calc(var(--spacing) * 3);
     --ui-anatomy-row-gap: calc(var(--spacing) * 1);
@@ -48,6 +54,8 @@
     --ui-copy-title-line-height: var(--text-sm--line-height);
     --ui-copy-supporting-size: var(--text-xs);
     --ui-copy-supporting-line-height: var(--text-xs--line-height);
+    --ui-copy-classification-size: var(--text-xs);
+    --ui-copy-classification-line-height: var(--text-xs--line-height);
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 2);
     --entity-leading-content-gap: calc(var(--spacing) * 2);
     --ui-anatomy-row-gap: calc(var(--spacing) * 0.5);
@@ -63,6 +71,8 @@
     --ui-copy-title-line-height: 1.375rem;
     --ui-copy-supporting-size: var(--text-sm);
     --ui-copy-supporting-line-height: var(--text-sm--line-height);
+    --ui-copy-classification-size: var(--text-sm);
+    --ui-copy-classification-line-height: var(--text-sm--line-height);
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
     --entity-leading-content-gap: calc(var(--spacing) * 3);
     --ui-anatomy-row-gap: calc(var(--spacing) * 1);
@@ -79,6 +89,8 @@
     --ui-copy-title-line-height: 1.625rem;
     --ui-copy-supporting-size: var(--text-sm);
     --ui-copy-supporting-line-height: var(--text-sm--line-height);
+    --ui-copy-classification-size: var(--text-base);
+    --ui-copy-classification-line-height: 1.375rem;
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
     --entity-leading-content-gap: calc(var(--spacing) * 3);
     --ui-anatomy-row-gap: calc(var(--spacing) * 1.5);

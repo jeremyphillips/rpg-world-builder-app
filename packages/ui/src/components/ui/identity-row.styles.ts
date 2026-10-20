@@ -1,6 +1,5 @@
 import {
   identityRowClassificationVariants,
-  identityRowEntityCompactMetaVariants,
   identityRowHeadingVariants,
   identityRowSupportingVariants,
 } from './identity-row.variants'
@@ -22,8 +21,9 @@ export const IDENTITY_ROW_CLASS_SPECS: readonly IdentityRowClassSpec[] = [
   {
     key: 'classification',
     className: identityRowClassificationVariants(),
-    keyValues: 'font-size: var(--ui-copy-title-size, var(--text-base))',
-    useCase: 'Classification beside the title',
+    keyValues:
+      'font-size: var(--ui-copy-classification-size); line-height: var(--ui-copy-classification-line-height)',
+    useCase: 'Classification beside the title on the heading line',
   },
   {
     key: 'supporting-truncate',
@@ -36,11 +36,5 @@ export const IDENTITY_ROW_CLASS_SPECS: readonly IdentityRowClassSpec[] = [
     className: identityRowSupportingVariants({ wrap: true }),
     keyValues: 'line-height: var(--leading-snug)',
     useCase: 'Wrapped supporting copy',
-  },
-  {
-    key: 'meta-entity-compact',
-    className: identityRowEntityCompactMetaVariants(),
-    keyValues: 'classification uses --ui-copy-supporting-size',
-    useCase: 'Compact entity title-line classification',
   },
 ]

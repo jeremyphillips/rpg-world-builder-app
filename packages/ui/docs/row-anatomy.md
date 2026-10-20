@@ -40,17 +40,22 @@ Published on the same density selectors as copy scale (`ui-card--*`, `ui-alert--
 `ui-identity-row--*`, `dash-entity-anatomy--*`, …). Comfortable is the `:root` default when
 no density ancestor is present. Status uses this gap only — no separate offset.
 
-## Anatomy title copy
+## Anatomy copy roles
 
-Title size and line-height (`--ui-copy-title-size` / `--ui-copy-title-line-height` on density
-ancestors, consumed by `ui-copy-title`). Supporting copy uses `ui-copy-supporting` (12/16,
-14/20, 14/20). Authoritative ladder in [`copy-scale.css`](../src/components/ui/copy-scale.css).
+Three typography roles share the density contract in [`copy-scale.css`](../src/components/ui/copy-scale.css)
+(`--ui-copy-title-*`, `--ui-copy-classification-*`, `--ui-copy-supporting-*` on the same density
+selectors as cards, entity anatomy, and `ui-identity-row--*`). Comfortable defaults also publish on
+`:root` for standalone rows without a density ancestor.
 
-| Density     | Title (size / line-height) |
-| ----------- | -------------------------- |
-| compact     | 14px / 20px                |
-| comfortable | 16px / 22px                |
-| spacious    | 19px / 26px                |
+| Density     | Title (size / lh) | Classification (size / lh) | Supporting (size / lh) |
+| ----------- | ----------------- | -------------------------- | ---------------------- |
+| compact     | 14px / 20px       | 12px / 16px                | 12px / 16px            |
+| comfortable | 16px / 22px       | 14px / 20px                | 14px / 20px            |
+| spacious    | 19px / 26px       | 16px / 22px                | 14px / 20px            |
+
+Titles use `ui-copy-title` (weight `--font-weight-heading`). Classification on
+`IdentityRowHeadingLine` uses `.ui-identity-row__classification` (normal weight, muted
+foreground). Supporting lines use `ui-copy-supporting` / `.ui-identity-row__supporting`.
 
 ## Tracks
 
@@ -165,5 +170,8 @@ Density for identity copy is published on ancestors (`.ui-card--*`, `ui-identity
 This table is **not** the entity **status-lane** badge rule (compact → `sm`, else `md` on `EntitySummary.status`) — see [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
 
 Do not add contextual Badge CSS or wrapper components that override an explicit `size` prop.
+
+`IdentityRowHeadingLine` uses `items-center` on the outer flex row (title cluster vs `headingEnd`) and
+`items-baseline` inside the cluster for title + classification via `InlineMetadata`.
 
 Use `resolveHeadingAccessoryBadgeSize` from `@rpg/ui` at call sites. Card **footer** and Alert **actions** labeled-control sizing: [ui-architecture.md](./ui-architecture.md#card-footer-labeled-actions) (`resolveSurfaceActionButtonSize`).
