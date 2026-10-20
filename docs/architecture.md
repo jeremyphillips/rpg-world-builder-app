@@ -203,6 +203,8 @@ barrel. An ESLint boundary rule (`@rpg/config/eslint/base`) forbids importing
 another feature's internals — cross-feature imports must go through its
 `index.ts`. The dashboard's domain feature slots are documented in
 [apps/dashboard/docs/feature-conventions.md](../apps/dashboard/docs/feature-conventions.md).
+Card, row, and entity surface selection starts at
+[apps/dashboard/docs/card-guide.md](../apps/dashboard/docs/card-guide.md).
 
 ## Build & tooling
 

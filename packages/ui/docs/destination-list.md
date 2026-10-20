@@ -4,7 +4,7 @@ Grouped navigation rows — shared link-root behavior with navigable `Card`, dis
 
 Source: `packages/ui/src/components/ui/destination-list.tsx`, `destination-list.css`, `navigable-link-root.lib.ts`.
 
-Entity-rich pickers (combobox, menus) stay on `InteractiveList` + `InteractiveListRow`.
+Entity-rich pickers (combobox, menus) stay on `InteractiveList` + `InteractiveListRow`. For choosing among `Card`, entity surfaces, and list rows, see the dashboard [card-guide](../../../apps/dashboard/docs/card-guide.md).
 
 ## When to use
 
