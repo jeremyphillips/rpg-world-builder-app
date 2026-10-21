@@ -50,6 +50,7 @@ export const identityInsetRowVariants = cva('flex min-w-0', {
     density: {
       compact: 'gap-2',
       comfortable: 'gap-3',
+      spacious: 'gap-4',
     },
     align: {
       start: 'items-start',
