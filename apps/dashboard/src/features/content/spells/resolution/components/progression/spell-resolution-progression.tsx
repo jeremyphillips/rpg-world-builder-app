@@ -8,6 +8,8 @@ import {
   ActionIcon,
   Button,
   ButtonDropdown,
+  Card,
+  CardContent,
   Heading,
   NumberInput,
   Select,
@@ -127,103 +129,105 @@ function ProgressionTrackCard({
       : RESOLUTION_SECTION_LABELS.progressionLeveledMode
 
   return (
-    <article className="rounded-md border border-border bg-background p-4 space-y-3">
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          <Heading as="h4" variant="subsection" className="text-style-label">
-            {heading}
-          </Heading>
-          <Text variant="muted" className="text-sm">
-            {modeLabel}
-          </Text>
-        </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onRemove}
-          aria-label="Remove track"
-        >
-          <ActionIcon action="remove" step="md" />
-        </Button>
-      </div>
-
-      <dl className="space-y-2 text-sm">
-        <div className="grid grid-cols-[minmax(8rem,auto)_1fr] items-center gap-x-4 gap-y-1">
-          <dt className="text-muted-foreground">
-            {track.kind === 'thresholds'
-              ? RESOLUTION_SECTION_LABELS.progressionBaseValue
-              : RESOLUTION_SECTION_LABELS.progressionBaseAtLevel(spellLevel)}
-          </dt>
-          <dd>{baseLabel}</dd>
+    <Card tone="subtle" density="comfortable">
+      <CardContent className="flex flex-col gap-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1">
+            <Heading as="h4" variant="subsection" className="text-style-label">
+              {heading}
+            </Heading>
+            <Text variant="muted" className="text-sm">
+              {modeLabel}
+            </Text>
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onRemove}
+            aria-label="Remove track"
+          >
+            <ActionIcon action="remove" step="md" />
+          </Button>
         </div>
 
-        {track.kind === 'thresholds'
-          ? (track.entries ?? []).map((entry, entryIndex) => (
-              <div
-                key={entry.threshold}
-                className="grid grid-cols-[minmax(8rem,auto)_1fr] items-center gap-x-4 gap-y-1"
-              >
-                <dt className="text-muted-foreground">Level {entry.threshold}</dt>
-                <dd>
-                  {entry.valueKind === 'count' ? (
-                    <CompactNumberField
-                      name={`${trackPrefix}.entries.${entryIndex}.count`}
-                      label={`Level ${entry.threshold} count`}
-                    />
-                  ) : (
-                    <div className="flex flex-wrap items-center gap-2">
-                      <CompactNumberField
-                        name={`${trackPrefix}.entries.${entryIndex}.roll.dice.count`}
-                        label={`Level ${entry.threshold} dice count`}
-                      />
-                      <CompactDieFaceSelect
-                        name={`${trackPrefix}.entries.${entryIndex}.roll.dice.faces`}
-                        label={`Level ${entry.threshold} die size`}
-                      />
-                    </div>
-                  )}
-                </dd>
-              </div>
-            ))
-          : null}
-
-        {track.kind === 'linear' ? (
+        <dl className="space-y-2 text-sm">
           <div className="grid grid-cols-[minmax(8rem,auto)_1fr] items-center gap-x-4 gap-y-1">
             <dt className="text-muted-foreground">
-              {RESOLUTION_SECTION_LABELS.progressionEachSlotAbove(spellLevel)}
+              {track.kind === 'thresholds'
+                ? RESOLUTION_SECTION_LABELS.progressionBaseValue
+                : RESOLUTION_SECTION_LABELS.progressionBaseAtLevel(spellLevel)}
             </dt>
-            <dd>
-              {track.incrementKind === 'count' ? (
-                <div className="flex items-center gap-2">
-                  <Text as="span" variant="muted" className="text-sm">
-                    +
-                  </Text>
-                  <CompactNumberField
-                    name={`${trackPrefix}.incrementCount`}
-                    label="Increment count"
-                  />
-                </div>
-              ) : (
-                <div className="flex flex-wrap items-center gap-2">
-                  <Text as="span" variant="muted" className="text-sm">
-                    +
-                  </Text>
-                  <CompactNumberField
-                    name={`${trackPrefix}.incrementRoll.dice.count`}
-                    label="Increment dice count"
-                  />
-                  <CompactDieFaceSelect
-                    name={`${trackPrefix}.incrementRoll.dice.faces`}
-                    label="Increment die size"
-                  />
-                </div>
-              )}
-            </dd>
+            <dd>{baseLabel}</dd>
           </div>
-        ) : null}
-      </dl>
-    </article>
+
+          {track.kind === 'thresholds'
+            ? (track.entries ?? []).map((entry, entryIndex) => (
+                <div
+                  key={entry.threshold}
+                  className="grid grid-cols-[minmax(8rem,auto)_1fr] items-center gap-x-4 gap-y-1"
+                >
+                  <dt className="text-muted-foreground">Level {entry.threshold}</dt>
+                  <dd>
+                    {entry.valueKind === 'count' ? (
+                      <CompactNumberField
+                        name={`${trackPrefix}.entries.${entryIndex}.count`}
+                        label={`Level ${entry.threshold} count`}
+                      />
+                    ) : (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <CompactNumberField
+                          name={`${trackPrefix}.entries.${entryIndex}.roll.dice.count`}
+                          label={`Level ${entry.threshold} dice count`}
+                        />
+                        <CompactDieFaceSelect
+                          name={`${trackPrefix}.entries.${entryIndex}.roll.dice.faces`}
+                          label={`Level ${entry.threshold} die size`}
+                        />
+                      </div>
+                    )}
+                  </dd>
+                </div>
+              ))
+            : null}
+
+          {track.kind === 'linear' ? (
+            <div className="grid grid-cols-[minmax(8rem,auto)_1fr] items-center gap-x-4 gap-y-1">
+              <dt className="text-muted-foreground">
+                {RESOLUTION_SECTION_LABELS.progressionEachSlotAbove(spellLevel)}
+              </dt>
+              <dd>
+                {track.incrementKind === 'count' ? (
+                  <div className="flex items-center gap-2">
+                    <Text as="span" variant="muted" className="text-sm">
+                      +
+                    </Text>
+                    <CompactNumberField
+                      name={`${trackPrefix}.incrementCount`}
+                      label="Increment count"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Text as="span" variant="muted" className="text-sm">
+                      +
+                    </Text>
+                    <CompactNumberField
+                      name={`${trackPrefix}.incrementRoll.dice.count`}
+                      label="Increment dice count"
+                    />
+                    <CompactDieFaceSelect
+                      name={`${trackPrefix}.incrementRoll.dice.faces`}
+                      label="Increment die size"
+                    />
+                  </div>
+                )}
+              </dd>
+            </div>
+          ) : null}
+        </dl>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -296,16 +300,18 @@ export function SpellResolutionProgression() {
       </Text>
 
       {!hasProgression ? (
-        <div className="rounded-md border border-dashed border-border p-4 space-y-3">
-          <Text variant="muted" className="text-sm">
-            {RESOLUTION_SECTION_LABELS.progressionEmpty}
-          </Text>
-          {menuItems.length > 0 ? (
-            <Button type="button" variant="secondary" size="sm" onClick={handleAddProgression}>
-              {RESOLUTION_SECTION_LABELS.addProgression}
-            </Button>
-          ) : null}
-        </div>
+        <Card tone="subtle" density="comfortable" className="border-dashed">
+          <CardContent className="flex flex-col gap-3">
+            <Text variant="muted" className="text-sm">
+              {RESOLUTION_SECTION_LABELS.progressionEmpty}
+            </Text>
+            {menuItems.length > 0 ? (
+              <Button type="button" variant="secondary" size="sm" onClick={handleAddProgression}>
+                {RESOLUTION_SECTION_LABELS.addProgression}
+              </Button>
+            ) : null}
+          </CardContent>
+        </Card>
       ) : (
         <div className="space-y-3">
           {tracks.map((track, trackIndex) => (

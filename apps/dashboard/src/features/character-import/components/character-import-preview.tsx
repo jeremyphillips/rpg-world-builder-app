@@ -1,5 +1,5 @@
 import type { CharacterImportResult } from '@rpg/contracts/character-import'
-import { Heading } from '@rpg/ui'
+import { Card, CardContent, Heading } from '@rpg/ui'
 
 import {
   EXTRACTION_FIELD_KEYS,
@@ -25,21 +25,23 @@ export function CharacterImportPreview({ result }: CharacterImportPreviewProps) 
         <Heading variant="section" as="h2" id="character-import-extraction-heading">
           Extracted data
         </Heading>
-        <div className="mt-3 rounded-md border border-border-subtle px-4">
-          {EXTRACTION_FIELD_KEYS.map((field) => (
-            <CharacterImportPreviewRow
-              key={field}
-              field={field}
-              label={EXTRACTION_FIELD_LABELS[field]}
-              result={result.extraction[field]}
-              displayValue={formatExtractionDisplayValue(field, result.extraction[field])}
-            />
-          ))}
-          <CharacterImportNarrativePreviewSection result={result.extraction.narrative} />
-          <CharacterImportEquipmentPreviewSection result={result.extraction.equipment} />
-          <CharacterImportSpellsPreviewSection result={result.extraction.spells} />
-          <CharacterImportProficienciesPreviewSection result={result.extraction.proficiencies} />
-        </div>
+        <Card tone="subtle" density="compact" className="mt-3">
+          <CardContent className="px-4">
+            {EXTRACTION_FIELD_KEYS.map((field) => (
+              <CharacterImportPreviewRow
+                key={field}
+                field={field}
+                label={EXTRACTION_FIELD_LABELS[field]}
+                result={result.extraction[field]}
+                displayValue={formatExtractionDisplayValue(field, result.extraction[field])}
+              />
+            ))}
+            <CharacterImportNarrativePreviewSection result={result.extraction.narrative} />
+            <CharacterImportEquipmentPreviewSection result={result.extraction.equipment} />
+            <CharacterImportSpellsPreviewSection result={result.extraction.spells} />
+            <CharacterImportProficienciesPreviewSection result={result.extraction.proficiencies} />
+          </CardContent>
+        </Card>
       </section>
 
       <CharacterImportDispositionReport dispositions={result.dispositions} />

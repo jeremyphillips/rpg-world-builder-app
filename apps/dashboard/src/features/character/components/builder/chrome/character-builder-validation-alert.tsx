@@ -1,11 +1,6 @@
 import { characterBuilderValidationMessages, formatFieldMessage } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { Text } from '@rpg/ui'
-
-import {
-  characterBuilderValidationAlertListClasses,
-  characterBuilderValidationAlertRootClasses,
-} from './character-builder-validation-alert.variants'
+import { Alert } from '@rpg/ui'
 
 export type CharacterBuilderValidationAlertProps = {
   issues: CharacterBuildValidationIssue[]
@@ -25,17 +20,14 @@ export function CharacterBuilderValidationAlert({
   const displayHeading = formatFieldMessage(heading)
 
   return (
-    <div role="alert" className={characterBuilderValidationAlertRootClasses}>
-      <Text variant="destructive" className="font-medium">
-        {displayHeading}
-      </Text>
-      <ul className={characterBuilderValidationAlertListClasses}>
+    <Alert variant="destructive" title={displayHeading}>
+      <ul className="mt-2 list-none space-y-3 pl-0 text-sm text-destructive">
         {issues.map((issue) => (
           <li key={`${issue.code}-${issue.path ?? issue.choiceSetId ?? issue.message}`}>
             {formatFieldMessage(issue.message)}
           </li>
         ))}
       </ul>
-    </div>
+    </Alert>
   )
 }

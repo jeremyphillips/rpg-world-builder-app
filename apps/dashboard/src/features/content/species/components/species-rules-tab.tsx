@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { Heading, Text } from '@rpg/ui'
+import { Card, CardContent, Heading, Text } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
 
 import { AvailabilityAlert, campaignSettingHref, resolveAvailability } from '@/lib/availability'
@@ -44,15 +44,17 @@ function RulesSectionDisabled({
   campaignId: string
 }) {
   return (
-    <section className="space-y-2 rounded-md border border-border bg-surface-muted p-4">
-      <Heading variant="subsection" as="h3">
-        {title}
-      </Heading>
-      <Text variant="muted" className="text-sm">
-        {message}
-      </Text>
-      <RulesConfigLink campaignId={campaignId} />
-    </section>
+    <Card tone="subtle" density="comfortable">
+      <CardContent className="flex flex-col gap-2">
+        <Heading variant="subsection" as="h3">
+          {title}
+        </Heading>
+        <Text variant="muted" className="text-sm">
+          {message}
+        </Text>
+        <RulesConfigLink campaignId={campaignId} />
+      </CardContent>
+    </Card>
   )
 }
 
@@ -87,12 +89,14 @@ function SpeciesRulesEditor({ formCtx }: { formCtx: ContentFormCtx }) {
 
   if (!policyEnabled && !limitsEnabled) {
     return (
-      <div className="space-y-3 rounded-md border border-border bg-surface-muted p-4">
-        <Text variant="muted" className="text-sm">
-          {`Enable ${getContentTypeMidSentenceLabel('species')} multiclass policy or ${getContentTypeMidSentenceLabel('species')} level limits in campaign rules to author ${getContentTypeMidSentenceLabel('species')}-specific multiclass data.`}
-        </Text>
-        <RulesConfigLink campaignId={campaignId} />
-      </div>
+      <Card tone="subtle" density="comfortable">
+        <CardContent className="flex flex-col gap-3">
+          <Text variant="muted" className="text-sm">
+            {`Enable ${getContentTypeMidSentenceLabel('species')} multiclass policy or ${getContentTypeMidSentenceLabel('species')} level limits in campaign rules to author ${getContentTypeMidSentenceLabel('species')}-specific multiclass data.`}
+          </Text>
+          <RulesConfigLink campaignId={campaignId} />
+        </CardContent>
+      </Card>
     )
   }
 

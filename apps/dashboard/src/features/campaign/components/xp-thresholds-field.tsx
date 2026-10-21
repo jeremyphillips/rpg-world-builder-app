@@ -2,7 +2,15 @@ import { useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { resolveXpThresholdsSummary, type SystemRulesetId } from '@rpg/contracts'
 import { Table2 } from 'lucide-react'
-import { ActionButton, IconContainer, InlineMetadata, SemanticText, Text } from '@rpg/ui'
+import {
+  ActionButton,
+  Card,
+  CardContent,
+  IconContainer,
+  InlineMetadata,
+  SemanticText,
+  Text,
+} from '@rpg/ui'
 
 import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
 
@@ -14,14 +22,6 @@ import {
   resolveSystemXpEntries,
   type XpThresholdOverrideFormEntry,
 } from '../lib/rules/character-configuration/xp-thresholds-field.lib'
-import {
-  xpThresholdsFieldCopyClasses,
-  xpThresholdsFieldLayoutClasses,
-  xpThresholdsFieldMetadataClasses,
-  xpThresholdsFieldShellClasses,
-  xpThresholdsFieldTitleClasses,
-  xpThresholdsFieldTrailingClasses,
-} from './xp-thresholds-field.variants'
 
 const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
@@ -114,14 +114,16 @@ export function XpThresholdsField() {
 
   return (
     <>
-      <div className={xpThresholdsFieldShellClasses}>
-        <div className={xpThresholdsFieldLayoutClasses}>
+      <Card tone="subtle" density="compact">
+        <CardContent className="flex items-start gap-3">
           <IconContainer>
             <Table2 />
           </IconContainer>
-          <div className={xpThresholdsFieldCopyClasses}>
-            <div className={xpThresholdsFieldTitleClasses}>Experience thresholds</div>
-            <div className={xpThresholdsFieldMetadataClasses}>
+          <div className="min-w-0 flex-1 space-y-1">
+            <Text as="div" className="text-style-label text-foreground">
+              Experience thresholds
+            </Text>
+            <div className="text-sm">
               {summary.status === 'derived' ? (
                 <InlineMetadata role="supporting" density="compact" wrap={false}>
                   <InlineMetadata.Item>
@@ -143,7 +145,7 @@ export function XpThresholdsField() {
               )}
             </div>
           </div>
-          <div className={xpThresholdsFieldTrailingClasses}>
+          <div className="shrink-0">
             <ActionButton
               action="edit"
               variant="outline"
@@ -153,8 +155,8 @@ export function XpThresholdsField() {
               Edit table
             </ActionButton>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       <TableBuilderModal
         open={modalOpen}

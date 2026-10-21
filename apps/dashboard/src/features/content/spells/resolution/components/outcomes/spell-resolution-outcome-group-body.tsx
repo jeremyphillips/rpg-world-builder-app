@@ -1,5 +1,5 @@
 import { getSpellResolutionOutcomeAuthoringLabel } from '@rpg/contracts'
-import { Heading } from '@rpg/ui'
+import { Card, CardContent, Heading } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
 
 import { outcomeBranchBodyFields } from '../../lib/form/resolution-outcome-form-fields'
@@ -18,16 +18,18 @@ export function SpellResolutionOutcomeGroupBody({
   outcomeIndex,
 }: SpellResolutionOutcomeGroupBodyProps) {
   return (
-    <section aria-labelledby={headingId} className="rounded-md border border-border p-3">
-      <Heading variant="group" as="h3" id={headingId}>
-        {getSpellResolutionOutcomeAuthoringLabel(result)}
-      </Heading>
+    <Card tone="subtle" density="compact" aria-labelledby={headingId}>
+      <CardContent className="flex flex-col gap-3">
+        <Heading variant="group" as="h3" id={headingId}>
+          {getSpellResolutionOutcomeAuthoringLabel(result)}
+        </Heading>
 
-      <FormItems
-        items={outcomeBranchBodyFields(outcomeIndex, true)}
-        idPrefix={`resolution-outcome-${outcomeIndex}`}
-        namePrefix={`${RESOLUTION_FIELD_NAME}.outcomes.${outcomeIndex}`}
-      />
-    </section>
+        <FormItems
+          items={outcomeBranchBodyFields(outcomeIndex, true)}
+          idPrefix={`resolution-outcome-${outcomeIndex}`}
+          namePrefix={`${RESOLUTION_FIELD_NAME}.outcomes.${outcomeIndex}`}
+        />
+      </CardContent>
+    </Card>
   )
 }

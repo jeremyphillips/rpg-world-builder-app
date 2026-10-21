@@ -1,6 +1,13 @@
 import { useCallback, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import { Button, Text } from '@rpg/ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  emptyStateWellSupportingClasses,
+  emptyStateWellTitleLgClasses,
+  Text,
+} from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
@@ -30,14 +37,6 @@ import {
 import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-state'
 import { resolveSpeciesParentCampaignAccess } from '../lib/resolve-species-parent-campaign-access'
 import { heritageOptionItemDefaultValues } from '../lib/species-trait-form-values'
-import {
-  speciesHeritageEmptyStateContentClasses,
-  speciesHeritageEmptyStateDescriptionClasses,
-  speciesHeritageEmptyStateShellClasses,
-  speciesHeritageEmptyStateTitleClasses,
-  speciesHeritageGroupActionsClasses,
-  speciesHeritageGroupShellClasses,
-} from './species-heritage-tab.variants'
 
 const HERITAGE_FIELD_NAME = 'heritage'
 const OPTIONS_FIELD_NAME = 'heritage.options'
@@ -50,12 +49,16 @@ function HeritageEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
   const { setValue } = useFormContext()
 
   return (
-    <div className={speciesHeritageEmptyStateShellClasses}>
-      <div className={speciesHeritageEmptyStateContentClasses} role="status">
-        <Text as="p" className={speciesHeritageEmptyStateTitleClasses}>
+    <Card
+      tone="subtle"
+      density="comfortable"
+      className="flex flex-col items-center justify-center px-6 py-10 text-center"
+    >
+      <CardContent className="flex max-w-md flex-col items-center gap-3" role="status">
+        <Text as="p" className={emptyStateWellTitleLgClasses}>
           {HERITAGE_EMPTY_TITLE}
         </Text>
-        <Text as="p" className={speciesHeritageEmptyStateDescriptionClasses}>
+        <Text as="p" className={emptyStateWellSupportingClasses}>
           {HERITAGE_EMPTY_DESCRIPTION}
         </Text>
         <Button
@@ -68,8 +71,8 @@ function HeritageEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
         >
           {SET_UP_HERITAGE_LABEL}
         </Button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -94,9 +97,9 @@ function HeritageScalarSection({
   })
 
   return (
-    <div className={speciesHeritageGroupShellClasses}>
+    <div className="relative">
       {showRemovalAction ? (
-        <div className={speciesHeritageGroupActionsClasses}>
+        <div className="absolute right-0 top-0 z-10">
           <DetailOverflowMenu
             triggerLabel={HERITAGE_GROUP_OVERFLOW_LABEL}
             actions={[detailOverflowDeleteAction(REMOVE_HERITAGE_GROUP_ACTION, handleRemoveClick)]}

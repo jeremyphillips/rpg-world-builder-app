@@ -84,10 +84,10 @@ Do **not** pass `surface={{}}` to suppress fill on empty wells — that escape h
 
 ### B. Master-detail placeholders
 
-| Location                                                                                                                                                     | Pattern                  |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
-| [`MasterDetailEditorEmptyState`](../../apps/dashboard/src/features/content/components/master-detail/master-detail-editor-empty-state.tsx)                    | Title lg + supporting lg |
-| Species heritage empty ([`species-heritage-tab.variants.ts`](../../apps/dashboard/src/features/content/species/components/species-heritage-tab.variants.ts)) | Title lg + supporting    |
+| Location                                                                                                                                     | Pattern                  |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| [`MasterDetailEditorEmptyState`](../../apps/dashboard/src/features/content/components/master-detail/master-detail-editor-empty-state.tsx)    | Title lg + supporting lg |
+| Species heritage empty ([`species-heritage-tab.tsx`](../../apps/dashboard/src/features/content/species/components/species-heritage-tab.tsx)) | Title lg + supporting    |
 
 ### Out of scope (copy-only / inline)
 
