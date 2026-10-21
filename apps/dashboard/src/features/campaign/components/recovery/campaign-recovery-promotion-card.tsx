@@ -60,6 +60,3 @@ export function CampaignRecoveryPromotionCard({ promotion }: CampaignRecoveryPro
     </Card>
   )
 }
-
-/** @deprecated Use {@link CampaignRecoveryPromotionCard}. */
-export const FinishJoiningCampaignCard = CampaignRecoveryPromotionCard

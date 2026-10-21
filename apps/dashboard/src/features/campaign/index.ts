@@ -9,10 +9,7 @@ export {
   CampaignTopbarTitleSkeleton,
 } from './components/campaign-topbar-title'
 export { ContinueCampaignCard } from './components/recovery/continue-campaign-card'
-export {
-  CampaignRecoveryPromotionCard,
-  FinishJoiningCampaignCard,
-} from './components/recovery/campaign-recovery-promotion-card'
+export { CampaignRecoveryPromotionCard } from './components/recovery/campaign-recovery-promotion-card'
 export { PendingCampaignInvitation } from './components/recovery/pending-campaign-invitation'
 export { PendingCampaignInvitationsSection } from './components/recovery/pending-campaign-invitations-section'
 export { CampaignCharacterEligibilityAlert } from './components/onboarding/campaign-character-eligibility-alert'
