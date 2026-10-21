@@ -115,7 +115,7 @@ export function GlobalSearchResultsBody({
             segmentWidth="auto"
             aria-label={GLOBAL_SEARCH_COPY.filterAriaLabel}
           />
-          <Text as="p" variant="muted" className="text-sm">
+          <Text as="p" variant="supporting">
             {GLOBAL_SEARCH_COPY.activeResultsSummary(activeResultCount, trimmedQuery)}
           </Text>
         </>

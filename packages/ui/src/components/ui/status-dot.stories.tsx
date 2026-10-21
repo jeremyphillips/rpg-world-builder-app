@@ -21,7 +21,7 @@ export const Default: Story = {}
 /** Labeled dots inherit typography from the host — wrap like production meta / summary rows. */
 export const WithLabel: Story = {
   render: (args) => (
-    <p className="text-xs text-muted-foreground">
+    <p className="text-style-caption">
       <StatusDot {...args} />
     </p>
   ),
@@ -51,7 +51,7 @@ export const Sizes: Story = {
 
 export const Sunken: Story = {
   render: (args) => (
-    <p className="text-xs sm:text-sm text-muted-foreground">
+    <p className="sm:text-sm text-style-caption">
       <StatusDot {...args} />
     </p>
   ),

@@ -25,9 +25,7 @@ export function CampaignInvitationCard({ promotion }: CampaignInvitationCardProp
     >
       {promotion.meta ? (
         <CardContent>
-          <Text variant="small" className="text-muted-foreground">
-            {promotion.meta}
-          </Text>
+          <Text variant="small">{promotion.meta}</Text>
         </CardContent>
       ) : null}
     </Card>

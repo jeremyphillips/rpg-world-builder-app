@@ -21,7 +21,7 @@ export const scoreTokenVariants = cva(
       surface: {
         token: scoreTokenSurfaceTokenClasses,
         plain: 'border-0 bg-transparent shadow-none',
-        placeholder: 'text-center text-sm font-normal text-muted-foreground',
+        placeholder: 'text-center font-normal text-style-supporting',
       },
       interactive: {
         true: '',

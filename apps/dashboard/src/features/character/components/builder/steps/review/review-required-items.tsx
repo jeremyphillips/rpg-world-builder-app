@@ -50,7 +50,7 @@ export function ReviewRequiredItems({ requiredItems, onNavigateToStep }: ReviewR
                     {item.message}
                   </Text>
                   {progress ? (
-                    <Text as="p" variant="muted" className="text-xs">
+                    <Text as="p" variant="caption">
                       {progress}
                     </Text>
                   ) : null}

@@ -67,18 +67,12 @@ function SectionItem({ item }: { item: BuilderOptionDetailsSectionItem }) {
       </Heading>
       {item.summaryLines && item.summaryLines.length > 0 ? (
         item.summaryLines.map((line, index) => (
-          <Text
-            key={`${item.title}-summary-${index}`}
-            variant="small"
-            className="text-muted-foreground"
-          >
+          <Text key={`${item.title}-summary-${index}`} variant="small">
             {line}
           </Text>
         ))
       ) : item.metadata && item.metadata.length > 0 ? (
-        <Text variant="small" className="text-muted-foreground">
-          {joinInlineMetadata(item.metadata)}
-        </Text>
+        <Text variant="small">{joinInlineMetadata(item.metadata)}</Text>
       ) : null}
       {item.optionPool ? (
         <div className="flex flex-wrap items-center gap-x-1 gap-y-1">

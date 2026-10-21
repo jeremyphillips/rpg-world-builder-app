@@ -67,7 +67,7 @@ export function BuildCardTemplateIdentity({
         </Text>
       </div>
       {templateDescription ? (
-        <Text as="p" className="text-style-supporting">
+        <Text as="p" variant="supporting">
           {templateDescription}
         </Text>
       ) : null}

@@ -35,9 +35,7 @@ export function QuickNpcStartingChoiceSubsectionHeader({
             size={QUICK_NPC_CREATE_CHOICE_SELECTION_COUNTER_SIZE}
           />
         ) : itemCountLabel ? (
-          <Text variant="caption" className="text-muted-foreground">
-            {itemCountLabel}
-          </Text>
+          <Text variant="caption">{itemCountLabel}</Text>
         ) : null}
       </div>
       {subtitle ? <p className={quickNpcStartingChoiceProvenanceClasses}>{subtitle}</p> : null}

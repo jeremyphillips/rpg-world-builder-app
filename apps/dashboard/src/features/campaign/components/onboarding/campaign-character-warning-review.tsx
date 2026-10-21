@@ -33,12 +33,9 @@ export function CampaignCharacterWarningReview({
         {WARNING_REVIEW_HEADING}
       </Heading>
     ) : (
-      <Text variant={isDestructive ? 'destructive' : 'small'} className="text-style-label">
-        {WARNING_REVIEW_HEADING}
-      </Text>
+      <Text variant={isDestructive ? 'destructive' : 'label'}>{WARNING_REVIEW_HEADING}</Text>
     )
 
-  const categoryHeadingClassName = isDestructive ? 'text-style-label' : 'font-medium'
   const listClassName = isDestructive
     ? 'list-disc pl-5 text-sm text-destructive'
     : 'list-disc pl-5 text-style-supporting'
@@ -49,10 +46,7 @@ export function CampaignCharacterWarningReview({
       {layout === 'card' ? <Text variant="muted">{WARNING_REVIEW_DESCRIPTION}</Text> : null}
       {Object.entries(warningGroups).map(([category, categoryWarnings]) => (
         <div key={category} className={layout === 'card' ? 'flex flex-col gap-1' : 'space-y-1'}>
-          <Text
-            variant={isDestructive ? 'destructive' : 'small'}
-            className={categoryHeadingClassName}
-          >
+          <Text variant="label" className={isDestructive ? 'text-destructive' : undefined}>
             {WARNING_CATEGORY_LABELS[category as CharacterCampaignWarningCategory]}
           </Text>
           <ul className={listClassName}>

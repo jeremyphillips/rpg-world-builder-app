@@ -35,9 +35,7 @@ export function CharacterDetailHeader({
             {name}
           </Heading>
           <Text variant="muted">{summary}</Text>
-          <Text variant="muted" className="text-sm">
-            Gender: {gender}
-          </Text>
+          <Text variant="supporting">Gender: {gender}</Text>
           {xp !== null ? <Text variant="muted">{xp} XP</Text> : null}
           {statusSummary ? (
             <div className="flex flex-wrap items-center gap-3 pt-1">

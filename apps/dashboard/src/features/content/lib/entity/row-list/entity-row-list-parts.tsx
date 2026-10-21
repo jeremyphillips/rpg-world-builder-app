@@ -106,11 +106,7 @@ export type EntityRowListEmptyProps = {
 export function EntityRowListEmpty({ emptyLabel, action }: EntityRowListEmptyProps) {
   return (
     <div className={entityRowListEmptyVariants()} data-slot="entity-row-list-empty">
-      {emptyLabel ? (
-        <Text variant="muted" className="text-sm">
-          {emptyLabel}
-        </Text>
-      ) : null}
+      {emptyLabel ? <Text variant="supporting">{emptyLabel}</Text> : null}
       {action ? <EntityRowListHeaderAction action={action} /> : null}
     </div>
   )
@@ -197,11 +193,7 @@ export function EntityRowListGroup({
             {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
           </div>
         ) : null}
-        {emptyLabel ? (
-          <Text variant="muted" className="text-sm">
-            {emptyLabel}
-          </Text>
-        ) : null}
+        {emptyLabel ? <Text variant="supporting">{emptyLabel}</Text> : null}
       </div>
     )
   }

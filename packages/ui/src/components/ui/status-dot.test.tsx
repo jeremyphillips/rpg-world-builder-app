@@ -17,7 +17,7 @@ describe('StatusDot', () => {
 
   it('spaces dot and label with gap-1.5 and inherits label typography', () => {
     render(
-      <p className="text-xs text-muted-foreground">
+      <p className="text-style-caption">
         <StatusDot tone="success" label="Active" />
       </p>,
     )
@@ -25,7 +25,7 @@ describe('StatusDot', () => {
     const label = screen.getByText('Active')
     expect(label.closest('.inline-flex.items-center.gap-1\\.5')).toBeInTheDocument()
     expect(label).not.toHaveClass('text-style-caption')
-    expect(label.closest('p')).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(label.closest('p')).toHaveClass('text-style-caption')
   })
 
   it('applies tone and size variants', () => {

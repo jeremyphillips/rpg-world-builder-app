@@ -80,10 +80,10 @@ export function IdentityNarrativeGenerateAction({
   return (
     <div className="flex items-center justify-between gap-3">
       <div>
-        <Text as="h3" variant="muted" className="text-sm">
+        <Text as="h3" variant="supporting">
           Generate a background
         </Text>
-        <Text variant="muted" className="text-sm">
+        <Text variant="supporting">
           Create aligned traits, ideals, bonds, flaws, and a first-person backstory.
         </Text>
         {statusMessage ? (

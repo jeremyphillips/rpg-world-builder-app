@@ -14,7 +14,7 @@ export function SpellResolutionProjectilesPreview() {
   if (pattern?.kind !== 'projectiles') return null
 
   return (
-    <Text as="p" variant="muted" className="text-sm" role="status">
+    <Text as="p" variant="supporting" role="status">
       {formatResolutionProjectilesPreview(pattern)}
     </Text>
   )

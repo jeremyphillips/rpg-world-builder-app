@@ -205,7 +205,11 @@ check and `eslint-plugin-jsx-a11y` run on every PR. Do not suppress axe rules gl
 ## Design tokens
 
 Never hardcode color values or font sizes — use design-token classes. Tailwind
-classes belong in `*.variants.ts` via CVA, not long inline strings.
+classes belong in `*.variants.ts` via CVA, not long inline strings. Body copy roles
+use `Text` / `text-style-*` composites — see
+[packages/ui/docs/typography.md](packages/ui/docs/typography.md). Prefer primary
+roles (`supporting`, `caption`, `label`) for new copy; do not hand-roll
+`text-sm text-muted-foreground` or invent `role-state` combination names.
 
 - Components consume Layer 2 / Tailwind utilities only — never `--palette-*`.
 - Prefer named surfaces (`bg-background`, `bg-muted`, `bg-sunken`, `bg-card`) over

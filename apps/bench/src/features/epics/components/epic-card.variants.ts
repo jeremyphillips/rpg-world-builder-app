@@ -8,4 +8,4 @@ export const epicCardHeaderBodyClasses = 'min-w-0 flex-1 space-y-1'
 export const epicCardRecentSectionLabelClasses = 'text-xs font-medium'
 
 export const epicCardRecentItemClasses =
-  'block w-full truncate rounded-sm text-left text-xs text-muted-foreground hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+  'block w-full truncate rounded-sm text-left hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background text-style-caption'

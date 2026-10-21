@@ -471,11 +471,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
                 )}
               />
             ) : null}
-            {instructionCopy ? (
-              <Text variant="muted" className="text-sm">
-                {instructionCopy}
-              </Text>
-            ) : null}
+            {instructionCopy ? <Text variant="supporting">{instructionCopy}</Text> : null}
             {showKindStep ? (
               <LocationConnectionKindField
                 id="location-inverse-organization-connection-kind"
@@ -491,7 +487,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
         }
         emptyState={
           mode === 'add' && !resolvedAddKind && !selectedOrganizationId ? (
-            <Text variant="muted" className="text-sm" role="status">
+            <Text variant="supporting" role="status">
               {LOCATION_INVERSE_ORG_LINK_CHOOSE_SUBJECT_MESSAGE}
             </Text>
           ) : undefined

@@ -75,7 +75,7 @@ export function EquipmentStartingPackageGoldHeader({ optionLabel }: { optionLabe
         <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
           {EQUIPMENT_STARTING_PACKAGE_TITLE}
         </Heading>
-        <Text as="p" className="mt-2 text-style-supporting">
+        <Text as="p" variant="supporting" className="mt-2">
           {joinInlineMetadata([EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT, optionLabel])}
         </Text>
       </div>
@@ -167,7 +167,7 @@ export function EquipmentStartingPackageDisclosure({
             <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
               {EQUIPMENT_STARTING_PACKAGE_TITLE}
             </Heading>
-            <Text as="p" className="text-style-supporting">
+            <Text as="p" variant="supporting">
               {subtitle}
             </Text>
           </button>

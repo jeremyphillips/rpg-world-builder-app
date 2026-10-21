@@ -53,7 +53,7 @@ export function ClassSpellcastingRecommendationsField({
 
   return (
     <div className="flex flex-col gap-4">
-      <Text variant="muted" className="text-sm">
+      <Text variant="supporting">
         Recommended starting spells appear as badges in the character builder spell picker. They do
         not grant spells or change quotas.
       </Text>

@@ -16,7 +16,7 @@ export function SpellResolutionEmptyState() {
 
   return (
     <div className="space-y-3">
-      <Text variant="muted" className="text-sm" role="status">
+      <Text variant="supporting" role="status">
         {RESOLUTION_SECTION_LABELS.emptyState}
       </Text>
       <Button

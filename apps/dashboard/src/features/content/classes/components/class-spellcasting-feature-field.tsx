@@ -13,7 +13,7 @@ export function ClassSpellcastingFeatureField() {
 
   if (!summary) {
     return (
-      <Text variant="muted" className="text-sm">
+      <Text variant="supporting">
         Add a Spellcasting feature on the Features tab, or turn spellcasting off and on again to
         create one automatically.
       </Text>

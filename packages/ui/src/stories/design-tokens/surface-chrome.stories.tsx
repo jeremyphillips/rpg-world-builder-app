@@ -103,11 +103,7 @@ const INTERACTION_SAMPLES = [
 function InteractionSampleGrid({ title }: { title?: string }) {
   return (
     <div className="space-y-3">
-      {title ? (
-        <Text variant="muted" className="text-sm">
-          {title}
-        </Text>
-      ) : null}
+      {title ? <Text variant="supporting">{title}</Text> : null}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         {INTERACTION_SAMPLES.map((sample) => (
           <div key={sample.label} className={sample.className}>
@@ -122,11 +118,7 @@ function InteractionSampleGrid({ title }: { title?: string }) {
 function ChromeSampleGrid({ title }: { title?: string }) {
   return (
     <div className="space-y-3">
-      {title ? (
-        <Text variant="muted" className="text-sm">
-          {title}
-        </Text>
-      ) : null}
+      {title ? <Text variant="supporting">{title}</Text> : null}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         {CHROME_SAMPLES.map((sample) => (
           <div key={sample.label} className={cn('rounded-md px-3 py-2 text-sm', sample.className)}>

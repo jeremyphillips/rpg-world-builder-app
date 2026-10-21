@@ -8,7 +8,7 @@ export const ticketLinkSelectedPreviewLinkClasses = [
   'rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
 ].join(' ')
 
-export const ticketLinkSelectedPreviewKeyClasses = 'font-mono text-xs text-muted-foreground'
+export const ticketLinkSelectedPreviewKeyClasses = 'font-mono text-style-caption'
 
 export const ticketLinkSelectedPreviewTitleClasses = 'truncate text-sm'
 

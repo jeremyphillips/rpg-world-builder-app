@@ -125,7 +125,7 @@ export const NavigableCompact: Story = {
         description: 'Taxonomic classification shared by species and monsters.',
       }}
     >
-      <p className="text-xs text-muted-foreground">12 terms · 1 unavailable</p>
+      <p className="text-style-caption">12 terms · 1 unavailable</p>
     </Card>
   ),
 }
@@ -275,7 +275,7 @@ function SurfaceMatrixCell({
     >
       <div className={UI_CARD_CONTENT_CLASS}>
         <p className="text-style-label">{label}</p>
-        <p className="text-xs text-muted-foreground">{tone} · comfortable inset</p>
+        <p className="text-style-caption">{tone} · comfortable inset</p>
       </div>
     </div>
   )
@@ -298,7 +298,7 @@ function SurfaceMatrixTable({ className }: { className?: string }) {
         <tbody>
           {SURFACE_MATRIX_STATE_ROWS.map(({ state, label }) => (
             <tr key={state} className="border-b border-border-subtle align-top">
-              <th className="p-3 text-xs font-normal text-muted-foreground">{label}</th>
+              <th className="p-3 font-normal text-style-caption">{label}</th>
               {SURFACE_MATRIX_TONES.map((tone) => (
                 <td key={tone} className="p-3">
                   <SurfaceMatrixCell tone={tone} state={state} label={label} />
@@ -328,7 +328,7 @@ export const SurfaceInteractionMatrix: Story = {
     <div className="mx-auto flex max-w-5xl flex-col gap-10">
       <header className="space-y-1">
         <h2 className="text-style-label">Card surface interaction matrix</h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-style-supporting">
           Compare rest, hover, pressed, selected, disabled, and focus-visible fills on canvas and on
           a muted parent.
         </p>
@@ -345,7 +345,7 @@ export const SurfaceInteractionMatrix: Story = {
         <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Nested on muted panel
         </h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-style-supporting">
           Quiet interactive rest vs hover — common entity-row context.
         </p>
         <div className="grid gap-4 md:grid-cols-2">
@@ -375,7 +375,7 @@ export const SurfaceInteractionMatrix: Story = {
             >
               <div className={UI_CARD_CONTENT_CLASS}>
                 <p className="text-style-label">{elevation}</p>
-                <p className="text-xs text-muted-foreground">strong · elevation</p>
+                <p className="text-style-caption">strong · elevation</p>
               </div>
             </div>
           ))}

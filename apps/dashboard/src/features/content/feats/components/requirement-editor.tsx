@@ -529,9 +529,7 @@ export function RequirementEditor({
 
       <FieldGroup legend={CONDITION_SETS_HEADING} legendSize="array" size={size} rhythm={rhythm}>
         {fields.length === 0 ? (
-          <Text variant="muted" className="text-sm">
-            {EMPTY_CONDITION_SETS_HINT}
-          </Text>
+          <Text variant="supporting">{EMPTY_CONDITION_SETS_HINT}</Text>
         ) : (
           <div className="space-y-2">
             {fields.map((field, setIndex) => (

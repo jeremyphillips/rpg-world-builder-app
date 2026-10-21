@@ -75,10 +75,10 @@ export const arrayItemHeaderTitleClasses = 'min-w-0 flex-1 truncate text-style-l
 export const arrayItemHeaderDividerClasses = 'mx-1.5 text-muted-foreground'
 
 /** Fallback label after the divider (lighter than primary). */
-export const arrayItemHeaderFallbackClasses = 'text-xs font-light text-muted-foreground'
+export const arrayItemHeaderFallbackClasses = 'font-light text-style-caption'
 
 /** Summary line below the title row — typography only; spacing owned by CLI header rhythm. */
-export const arrayItemHeaderSummaryClasses = 'truncate text-xs leading-snug text-muted-foreground'
+export const arrayItemHeaderSummaryClasses = 'truncate leading-snug text-style-caption'
 
 /** Leading toolbar row — grip, caret, and title/compact fields only (no trailing actions). */
 export const arrayItemToolbarRowClasses = collapsibleListItemToolbarRowClasses

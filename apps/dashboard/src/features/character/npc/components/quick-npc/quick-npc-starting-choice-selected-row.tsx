@@ -36,7 +36,7 @@ export function QuickNpcStartingChoiceSelectedRow({
       entity={{
         heading: label,
         description: description ? (
-          <Text variant="caption" title={suggestionTitle} className="text-muted-foreground">
+          <Text variant="caption" title={suggestionTitle}>
             {description}
           </Text>
         ) : undefined,

@@ -20,7 +20,7 @@ function Matrix({ density }: { density: 'compact' | 'comfortable' }) {
   return (
     <div className="flex flex-col gap-6">
       <section data-content-density={density} className={cardClass}>
-        <p className="mb-3 text-sm text-muted-foreground">{density} card</p>
+        <p className="mb-3 text-style-supporting">{density} card</p>
         <div className="flex flex-wrap gap-3">
           {tones.map((tone) => (
             <BooleanField key={`${tone}-off`} label={tone} tone={tone} />

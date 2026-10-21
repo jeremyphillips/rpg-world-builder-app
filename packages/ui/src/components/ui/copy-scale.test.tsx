@@ -12,20 +12,7 @@ const copyScaleCss = readFileSync(
   .replace('@layer components {', '')
   .replace(/\n}\s*$/, '')
 
-const COPY_TOKENS = `
-  :root {
-    --text-xs: 12px;
-    --text-sm: 14px;
-    --text-base: 16px;
-    --text-heading-card: 19px;
-    --text-xs--line-height: 16px;
-    --text-sm--line-height: 20px;
-    --text-base--line-height: 24px;
-    --text-heading-card--line-height: 25px;
-    --spacing: 4px;
-    --tracking-heading: 0;
-  }
-`
+const COPY_TOKENS = `:root { --text-xs: 12px; --text-sm: 14px; --text-base: 16px; --text-heading-card: 19px; --text-xs--line-height: --text-sm--line-height: 20px; --text-base--line-height: 24px; --text-heading-card--line-height: 25px; --spacing: 4px; --tracking-heading: 0; }`
 
 function installTokens() {
   const style = document.createElement('style')

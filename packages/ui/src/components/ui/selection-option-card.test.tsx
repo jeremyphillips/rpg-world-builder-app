@@ -29,22 +29,7 @@ function stripLayer(css: string): string {
 }
 
 const optionCardMeasureCss = [
-  `
-  :root {
-    --text-xs: 12px;
-    --text-sm: 14px;
-    --text-base: 16px;
-    --text-xs--line-height: 16px;
-    --text-sm--line-height: 20px;
-    --spacing: 4px;
-    --font-weight-heading: 600;
-    --tracking-heading: 0;
-    --border: #ccc;
-    --radius-card: 8px;
-    --control-choice-indicator-size-sm: 16px;
-    --control-choice-indicator-size-lg: 20px;
-  }
-`,
+  `:root { --text-xs: 12px; --text-sm: 14px; --text-base: 16px; --text-xs--line-height: --text-sm--line-height: 20px; --spacing: 4px; --font-weight-heading: 600; --tracking-heading: 0; --border: #ccc; --radius-card: 8px; --control-choice-indicator-size-sm: --control-choice-indicator-size-lg: }`,
   stripLayer(readFileSync(join(uiDir, 'copy-scale.css'), 'utf8')),
   stripLayer(readFileSync(join(uiDir, 'ui-radio-card.css'), 'utf8')),
 ].join('\n')

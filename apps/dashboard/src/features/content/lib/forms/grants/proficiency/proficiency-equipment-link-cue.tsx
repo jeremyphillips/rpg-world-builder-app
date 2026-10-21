@@ -18,9 +18,7 @@ export function ProficiencyEquipmentLinkCue({
     <div className="flex items-start gap-2 text-sm">
       <Link className="mt-0.5 size-icon-inline shrink-0 text-muted-foreground" aria-hidden />
       <div className="space-y-1">
-        <Text variant="muted" className="text-sm">
-          {message}
-        </Text>
+        <Text variant="supporting">{message}</Text>
         {onNavigate ? (
           <Button type="button" variant="text" tone="accent" size="sm" onClick={onNavigate}>
             {navigateLabel}

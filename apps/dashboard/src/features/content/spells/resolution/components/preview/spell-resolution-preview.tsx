@@ -20,7 +20,7 @@ export function SpellResolutionPreview() {
         role="status"
         aria-live="polite"
       >
-        <Text variant="muted" className="text-sm">
+        <Text variant="supporting">
           Configure resolution to preview structured summaries here. Prose in the Basics tab remains
           the escape hatch.
         </Text>
@@ -36,7 +36,7 @@ export function SpellResolutionPreview() {
         role="status"
         aria-live="polite"
       >
-        <Text variant="muted" className="text-sm">
+        <Text variant="supporting">
           Complete target, method, and effects to preview resolution.
         </Text>
       </Alert>

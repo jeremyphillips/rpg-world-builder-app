@@ -3,21 +3,29 @@ import { cva, type VariantProps } from 'class-variance-authority'
 /** Shared size token for secondary body copy (15px @ 16px root). */
 export const textSecondaryBodyClasses = 'text-md'
 
+export const TEXT_VARIANT_MAP = {
+  body: 'text-style-body',
+  muted: 'text-style-muted',
+  supporting: 'text-style-supporting',
+  small: 'text-style-small',
+  caption: 'text-style-caption',
+  label: 'text-style-label',
+  emphasis: 'text-style-emphasis',
+  option: 'text-style-option',
+  lead: 'text-style-lead',
+  info: 'text-style-info',
+  success: 'text-style-success',
+  warning: 'text-style-warning',
+  destructive: 'text-style-destructive',
+} as const
+
+export type TextVariant = keyof typeof TEXT_VARIANT_MAP
+
+export const TEXT_VARIANTS = Object.keys(TEXT_VARIANT_MAP) as TextVariant[]
+
 export const textVariants = cva('', {
   variants: {
-    variant: {
-      body: 'text-style-body',
-      muted: 'text-style-muted',
-      small: 'text-style-small',
-      caption: 'text-style-caption',
-      emphasis: 'text-style-emphasis',
-      option: 'text-style-option',
-      lead: 'text-style-lead',
-      info: 'text-style-info',
-      success: 'text-style-success',
-      warning: 'text-style-warning',
-      destructive: 'text-style-destructive',
-    },
+    variant: TEXT_VARIANT_MAP,
   },
   defaultVariants: {
     variant: 'body',

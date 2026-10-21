@@ -37,7 +37,7 @@ function FilterSelect({
 }) {
   return (
     <div className="space-y-1">
-      <label htmlFor={id} className="text-xs text-muted-foreground">
+      <label htmlFor={id} className="text-style-caption">
         {label}
       </label>
       <Select value={value} onValueChange={onValueChange}>

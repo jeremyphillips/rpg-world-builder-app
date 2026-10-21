@@ -31,7 +31,13 @@ export {
 export { Heading, type HeadingProps } from './components/ui/heading'
 export { headingVariants, type HeadingVariantProps } from './components/ui/heading.variants'
 export { Text, type TextProps } from './components/ui/text'
-export { textVariants, type TextVariantProps } from './components/ui/text.variants'
+export {
+  TEXT_VARIANT_MAP,
+  TEXT_VARIANTS,
+  textVariants,
+  type TextVariant,
+  type TextVariantProps,
+} from './components/ui/text.variants'
 export {
   SemanticText,
   semanticTextVariants,

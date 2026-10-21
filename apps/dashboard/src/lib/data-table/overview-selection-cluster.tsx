@@ -90,7 +90,7 @@ export function OverviewSelectionCluster({
         role="status"
         aria-live="polite"
         aria-atomic="true"
-        className="text-sm tabular-nums text-muted-foreground"
+        className="tabular-nums text-style-supporting"
       >
         {selectedCount} selected
       </span>

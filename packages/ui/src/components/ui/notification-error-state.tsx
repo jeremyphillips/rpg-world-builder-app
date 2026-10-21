@@ -16,7 +16,7 @@ export function NotificationErrorState({
 }: NotificationErrorStateProps) {
   return (
     <div className="space-y-3 px-4 py-6 text-center" role="alert">
-      <Text as="p" variant="muted" className="text-sm">
+      <Text as="p" variant="supporting">
         {message}
       </Text>
       {onRetry ? (

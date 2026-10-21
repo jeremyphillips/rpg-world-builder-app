@@ -49,7 +49,7 @@ export function AdminUserContextLine() {
   const { user } = useAdminUserRouteContext()
 
   return (
-    <Text variant="muted" className="text-sm">
+    <Text variant="supporting">
       <InlineMetadata role="supporting" density="comfortable">
         <InlineMetadata.Item>{user.email}</InlineMetadata.Item>
         <InlineMetadata.Item>{PLATFORM_ROLE_ENTRIES[user.platformRole].label}</InlineMetadata.Item>

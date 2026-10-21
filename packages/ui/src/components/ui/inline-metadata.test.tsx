@@ -32,7 +32,7 @@ describe('InlineMetadata', () => {
     expect(container.querySelectorAll('.text-muted-foreground')).toHaveLength(1)
   })
 
-  it('opts the separator into text-xs without changing the default', () => {
+  it('opts the separator into text-xs without changing default', () => {
     const { container } = renderTwoItems({
       role: 'heading',
       density: 'compact',

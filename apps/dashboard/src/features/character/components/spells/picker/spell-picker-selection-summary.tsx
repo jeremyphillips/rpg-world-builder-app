@@ -23,7 +23,7 @@ export function SpellPickerSelectionSummary({
   metadata,
 }: SpellPickerSelectionSummaryProps) {
   return (
-    <Text as="span" variant="muted" className="text-sm">
+    <Text as="span" variant="supporting">
       {metadata ? (
         <InlineMetadata role="supporting" density="compact">
           <InlineMetadata.Item>

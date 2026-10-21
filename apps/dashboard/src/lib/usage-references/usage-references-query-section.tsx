@@ -33,9 +33,7 @@ function UsageReferencesQueryBody({
             {heading}
           </Heading>
         ) : null}
-        <Text variant="muted" className="text-sm">
-          Loading usage references…
-        </Text>
+        <Text variant="supporting">Loading usage references…</Text>
       </div>
     )
   }
@@ -71,9 +69,7 @@ function UsageReferencesQueryBody({
             {heading}
           </Heading>
         ) : null}
-        <Text variant="muted" className="text-sm">
-          Nothing references this yet.
-        </Text>
+        <Text variant="supporting">Nothing references this yet.</Text>
       </div>
     )
   }

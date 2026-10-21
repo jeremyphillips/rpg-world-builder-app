@@ -19,7 +19,7 @@ import type { EquipmentAcquisitionPanelBodyProps } from './equipment-acquisition
 function OwnedSourceQuantity({ source }: { source: EquipmentOwnedSourceViewModel }) {
   if (!source.spendSuffix) {
     return (
-      <Text as="span" className="text-sm tabular-nums text-muted-foreground text-right">
+      <Text as="span" variant="supporting" className="tabular-nums text-right">
         {source.quantityLabel}
       </Text>
     )
@@ -27,7 +27,7 @@ function OwnedSourceQuantity({ source }: { source: EquipmentOwnedSourceViewModel
 
   return (
     <div className="flex min-w-0 flex-col items-end text-right">
-      <Text as="span" className="text-sm tabular-nums text-muted-foreground text-right">
+      <Text as="span" variant="supporting" className="tabular-nums text-right">
         {source.quantityLabel}
       </Text>
       <span className="text-style-supporting">{source.spendSuffix}</span>
@@ -147,7 +147,12 @@ function AcquisitionPreviewLines({
   isDisclosureLayout: boolean
 }) {
   return lines.map((line) => (
-    <Text key={line} as="p" className={cn('text-style-supporting', isDisclosureLayout && 'mb-3')}>
+    <Text
+      key={line}
+      as="p"
+      variant="supporting"
+      className={isDisclosureLayout ? 'mb-3' : undefined}
+    >
       {line}
     </Text>
   ))

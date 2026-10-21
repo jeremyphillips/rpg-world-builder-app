@@ -211,10 +211,10 @@ function StabilitySequenceHarness() {
             key={item.id}
             type="button"
             className={cn(
-              'rounded-md border px-2.5 py-1 text-sm',
+              'rounded-md border px-2.5 py-1',
               step === item.id
-                ? 'border-foreground bg-muted text-foreground'
-                : 'border-border text-muted-foreground',
+                ? 'border-foreground bg-muted text-sm text-foreground'
+                : 'border-border text-style-supporting',
             )}
             onClick={() => setStep(item.id === 'clear' ? 'clean' : item.id)}
           >

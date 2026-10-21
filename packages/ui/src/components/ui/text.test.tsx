@@ -27,6 +27,13 @@ describe('Text', () => {
     expect(screen.getByText('Hint')).toHaveClass('text-style-small')
   })
 
+  it('applies supporting and label variant classes', () => {
+    render(<Text variant="supporting">Supporting</Text>)
+    expect(screen.getByText('Supporting')).toHaveClass('text-style-supporting')
+    render(<Text variant="label">Label</Text>)
+    expect(screen.getByText('Label')).toHaveClass('text-style-label')
+  })
+
   it('applies status variant classes', () => {
     render(<Text variant="warning">Caution</Text>)
     expect(screen.getByText('Caution')).toHaveClass('text-style-warning')

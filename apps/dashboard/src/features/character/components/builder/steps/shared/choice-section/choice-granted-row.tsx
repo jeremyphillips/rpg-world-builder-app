@@ -14,11 +14,7 @@ export function ChoiceGrantedRow({ row }: ChoiceGrantedRowProps) {
     <EntityCard
       entity={{
         heading: row.label,
-        description: row.sourceLabel ? (
-          <Text variant="caption" className="text-muted-foreground">
-            {row.sourceLabel}
-          </Text>
-        ) : undefined,
+        description: row.sourceLabel ? <Text variant="caption">{row.sourceLabel}</Text> : undefined,
       }}
       leading={{ kind: 'title', content: <GrantedChoiceLeadingIcon /> }}
       density="compact"

@@ -44,7 +44,7 @@ export function CharacterBuilderFooter({
       placement="docked"
       validationSummary={
         onReview && !canCreateCharacter ? (
-          <Text variant="muted" className="mb-3 text-sm">
+          <Text variant="supporting" className="mb-3">
             {reviewFooterHint}
           </Text>
         ) : undefined

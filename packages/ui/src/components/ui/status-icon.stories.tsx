@@ -53,7 +53,7 @@ export const Variants: Story = {
           <StatusIcon variant={variant} size="sm" />
           <StatusIcon variant={variant} size="md" />
           <StatusIcon variant={variant} size="lg" />
-          <span className="text-sm capitalize text-muted-foreground">{variant}</span>
+          <span className="capitalize text-style-supporting">{variant}</span>
         </div>
       ))}
     </div>

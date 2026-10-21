@@ -9,14 +9,7 @@ export function SpellResolutionChangeNotice() {
   if (!notice) return null
 
   return (
-    <Text
-      as="p"
-      variant="muted"
-      className="text-sm"
-      role="status"
-      aria-live="polite"
-      onClick={clearNotice}
-    >
+    <Text as="p" variant="supporting" role="status" aria-live="polite" onClick={clearNotice}>
       {notice.message}
     </Text>
   )

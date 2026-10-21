@@ -7,7 +7,7 @@ export const builderFactSummaryIconRowLabelClasses = 'text-style-label text-fore
 
 export const builderFactSummaryIconRowSetValueClasses = 'text-style-label text-foreground'
 
-export const builderFactSummaryIconRowUnsetValueClasses = 'text-sm italic text-muted-foreground'
+export const builderFactSummaryIconRowUnsetValueClasses = 'italic text-style-supporting'
 
 export const builderFactSummaryRowsClasses = 'grid gap-3 sm:grid-cols-2'
 
@@ -17,7 +17,7 @@ export const builderFactSummarySimpleLabelClasses = 'text-style-caption'
 
 export const builderFactSummarySetValueClasses = 'text-style-label text-foreground'
 
-export const builderFactSummaryUnsetValueClasses = 'text-sm italic text-muted-foreground'
+export const builderFactSummaryUnsetValueClasses = 'italic text-style-supporting'
 
 export const builderFactSummarySimpleValueClasses = builderFactSummarySetValueClasses
 

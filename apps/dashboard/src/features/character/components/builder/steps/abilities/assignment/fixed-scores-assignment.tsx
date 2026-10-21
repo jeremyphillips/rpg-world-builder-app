@@ -239,7 +239,7 @@ function ScorePoolSection({
   return (
     <section aria-labelledby={poolId} className={fixedScoresTokenPoolSectionClasses}>
       <div className={fixedScoresScorePoolHeaderClasses}>
-        <Text as="h4" id={poolId} variant="body" className="text-style-label">
+        <Text as="h4" id={poolId} variant="label">
           {abilitiesFormCopy.availableScores}
         </Text>
         {showPoolAction ? (
@@ -431,14 +431,10 @@ export function FixedScoresAssignment({
   return (
     <div className={fixedScoresAssignmentRootClasses}>
       <div className={fixedScoresAssignmentIntroClasses}>
-        <Text as="h3" id={introId} variant="body" className="text-style-label">
+        <Text as="h3" id={introId} variant="label">
           {methodHeading}
         </Text>
-        {methodDescription ? (
-          <Text variant="muted" className="text-sm">
-            {methodDescription}
-          </Text>
-        ) : null}
+        {methodDescription ? <Text variant="supporting">{methodDescription}</Text> : null}
       </div>
 
       <DndContext

@@ -24,16 +24,7 @@ const identityRowCss = readFileSync(
   join(dirname(fileURLToPath(import.meta.url)), 'identity-row.css'),
   'utf8',
 )
-const SURFACE_TEST_TOKENS = `:root {
-  --spacing: 4px;
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-base: 16px;
-  --text-heading-card: 19px;
-  --text-xs--line-height: 16px;
-  --text-sm--line-height: 20px;
-  --text-base--line-height: 24px;
-}`
+const SURFACE_TEST_TOKENS = `:root { --spacing: 4px; --text-xs: 12px; --text-sm: 14px; --text-base: 16px; --text-heading-card: 19px; --text-xs--line-height: --text-sm--line-height: 20px; --text-base--line-height: 24px; }`
 
 function resolveAnatomyRowGapPx(element: Element): string {
   let node: Element | null = element

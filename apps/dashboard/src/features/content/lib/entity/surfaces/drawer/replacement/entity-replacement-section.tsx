@@ -37,7 +37,7 @@ export function EntityReplacementSection({
             fallback={current.fallback}
           />
           {current.unavailable ? (
-            <Text variant="muted" className="text-sm" role="status">
+            <Text variant="supporting" role="status">
               {unavailableMessage}
             </Text>
           ) : null}
@@ -50,9 +50,7 @@ export function EntityReplacementSection({
           </Heading>
           {newHelper ? (
             typeof newHelper === 'string' ? (
-              <Text variant="muted" className="text-sm">
-                {newHelper}
-              </Text>
+              <Text variant="supporting">{newHelper}</Text>
             ) : (
               newHelper
             )

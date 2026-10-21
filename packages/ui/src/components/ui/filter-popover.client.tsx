@@ -89,7 +89,7 @@ export function FilterPopover({
                 key={group.id}
                 className={index === 0 ? primaryColumnClassName : secondaryColumnClassName}
               >
-                <Text as="p" variant="muted" className="mb-2 text-xs font-body-emphasis">
+                <Text as="p" variant="caption" className="mb-2 font-body-emphasis">
                   {group.label}
                 </Text>
                 <div className="space-y-2">

@@ -263,7 +263,7 @@ export const EmbeddedDependentChoice: Story = {
               titleAs="h3"
               description="Choose one option."
               endSlot={
-                <span className="shrink-0 text-right text-xs leading-snug text-muted-foreground">
+                <span className="shrink-0 text-right leading-snug text-style-caption">
                   Required
                 </span>
               }

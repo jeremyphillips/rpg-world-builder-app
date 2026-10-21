@@ -99,7 +99,7 @@ function LocationParentReplacementDrawerFooter({
 }) {
   if (contextMismatch) {
     return (
-      <Text variant="muted" className="text-sm" role="status">
+      <Text variant="supporting" role="status">
         {LOCATION_PARENT_REPLACEMENT_DRAWER.mismatchStatus}
       </Text>
     )
