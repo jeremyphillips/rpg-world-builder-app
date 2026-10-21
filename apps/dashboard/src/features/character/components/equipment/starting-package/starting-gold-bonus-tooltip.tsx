@@ -9,8 +9,6 @@ import {
 import {
   STARTING_GOLD_BONUS_LABEL,
   startingGoldBonusFormulaVariants,
-  startingGoldBonusSummaryVariants,
-  startingGoldBonusTooltipVariants,
 } from './starting-gold-bonus-tooltip.variants'
 
 const CALCULATED_FROM_LABEL = 'Calculated from'
@@ -40,8 +38,8 @@ export function StartingGoldBonusTooltipBody({
   bonusGold,
 }: StartingGoldBonusTooltipBodyProps) {
   return (
-    <div className={startingGoldBonusTooltipVariants()}>
-      <p className={startingGoldBonusSummaryVariants()}>
+    <div className="grid gap-1">
+      <p className="text-foreground">
         {joinInlineMetadata([STARTING_GOLD_BONUS_LABEL, `+${formatInlineWealth(bonusWealth)}`])}
       </p>
       <StartingGoldBonusFormula bonusGold={bonusGold} tone="muted" />

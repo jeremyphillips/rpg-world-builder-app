@@ -24,10 +24,6 @@ import {
   QUICK_NPC_SETUP_SUMMARY,
 } from '../../lib/quick-npc/quick-npc-create-modal-setup.lib'
 import { QuickNpcBuildCard } from './quick-npc-build-card'
-import {
-  quickNpcBuildCardSectionClasses,
-  quickNpcBuildCardSetupOffsetClasses,
-} from './quick-npc-build-card.variants'
 import type { CreateSetupSet } from '@/lib/create-setup'
 
 export type QuickNpcCreateSetupPhaseProps = {
@@ -113,7 +109,7 @@ export function QuickNpcCreateSetupPhase({
       />
       {showBuildCard && buildCardModel ? (
         <QuickNpcBuildCard
-          className={cn(quickNpcBuildCardSectionClasses, quickNpcBuildCardSetupOffsetClasses)}
+          className={cn('flex flex-col gap-y-3', 'mt-4')}
           model={buildCardModel}
           onClassChange={(classId) =>
             onSetupValueChange({

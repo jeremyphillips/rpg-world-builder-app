@@ -105,7 +105,6 @@ import { useQuickNpcEditingLock } from './use-quick-npc-editing-lock'
 import { collectionPanelEmptyStateBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 
 import { QuickNpcPackageCustomizationPanel } from './quick-npc-package-customization-panel'
-import { quickNpcPackageHeaderActionsClasses } from './quick-npc-package-customization.variants'
 import {
   quickNpcAdditionalEquipmentQuantityClasses,
   quickNpcStartingChoiceAddControlClasses,
@@ -414,7 +413,7 @@ function QuickNpcStartingEquipmentPackageSection({
           }
           headerEndSlot={
             disclosureOpen ? null : (
-              <span className={quickNpcPackageHeaderActionsClasses}>
+              <span className="flex items-center gap-1">
                 {canChangePackage ? (
                   <SelectionOptionCardHeaderAction
                     label={EQUIPMENT_CHANGE_PACKAGE_LABEL}

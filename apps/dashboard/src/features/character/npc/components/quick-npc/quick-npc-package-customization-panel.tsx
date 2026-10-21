@@ -32,13 +32,6 @@ import {
   quickNpcWealthNote,
   type QuickNpcPackageCustomizationRow,
 } from '../../lib/quick-npc/quick-npc-package-customization.lib'
-import {
-  quickNpcPackageCustomizationFooterActionsClasses,
-  quickNpcPackageCustomizationFooterClasses,
-  quickNpcPackageCustomizationLockClasses,
-  quickNpcPackageCustomizationNoteClasses,
-} from './quick-npc-package-customization.variants'
-
 export type QuickNpcPackageCustomizationPanelProps = {
   packageLabel: string
   rows: readonly QuickNpcPackageCustomizationRow[]
@@ -143,19 +136,19 @@ export function QuickNpcPackageCustomizationPanel({
         })}
       </SelectionOptionCardEmbeddedPanelList>
       {wealthLabel && !everyItemRemoved ? (
-        <p className={quickNpcPackageCustomizationNoteClasses}>{quickNpcWealthNote(wealthLabel)}</p>
+        <p className="text-style-caption">{quickNpcWealthNote(wealthLabel)}</p>
       ) : null}
       {everyItemRemoved ? (
-        <p className={quickNpcPackageCustomizationNoteClasses}>
+        <p className="text-style-caption">
           {wealthLabel
             ? quickNpcAllRemovedWithWealthNote(wealthLabel)
             : QUICK_NPC_ALL_REMOVED_WITHOUT_WEALTH_NOTE}
         </p>
       ) : null}
       {showLockMessage ? (
-        <p className={quickNpcPackageCustomizationLockClasses}>{QUICK_NPC_EDITING_LOCK_MESSAGE}</p>
+        <p className="text-style-caption">{QUICK_NPC_EDITING_LOCK_MESSAGE}</p>
       ) : null}
-      <div className={quickNpcPackageCustomizationFooterClasses}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <Button
           type="button"
           variant="text"
@@ -166,7 +159,7 @@ export function QuickNpcPackageCustomizationPanel({
         >
           {QUICK_NPC_RESTORE_ALL_LABEL}
         </Button>
-        <div className={quickNpcPackageCustomizationFooterActionsClasses}>
+        <div className="flex items-center gap-2">
           <Button type="button" variant="text" size="xs" density="compact" onClick={onCancel}>
             {QUICK_NPC_CANCEL_LABEL}
           </Button>

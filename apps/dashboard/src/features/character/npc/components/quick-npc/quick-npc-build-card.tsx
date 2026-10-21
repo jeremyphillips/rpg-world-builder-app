@@ -12,11 +12,6 @@ import {
 } from './quick-npc-build-card-parts'
 import { collectionPanelLiftShellClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 
-import {
-  quickNpcBuildCardAttributesShellClasses,
-  quickNpcBuildCardSectionClasses,
-} from './quick-npc-build-card.variants'
-
 export type QuickNpcBuildCardProps = {
   model: QuickNpcBuildCardModel
   onClassChange: (classId: string) => void
@@ -49,7 +44,7 @@ export function QuickNpcBuildCard({
   }
 
   return (
-    <section className={className ?? quickNpcBuildCardSectionClasses}>
+    <section className={className ?? 'flex flex-col gap-y-3'}>
       <Eyebrow size="md">{model.sectionEyebrow}</Eyebrow>
       <article className={collectionPanelLiftShellClasses}>
         {model.showTemplateIdentity && model.templateLabel ? (
@@ -59,7 +54,7 @@ export function QuickNpcBuildCard({
           />
         ) : null}
 
-        <div className={quickNpcBuildCardAttributesShellClasses}>
+        <div className="flex flex-col">
           {model.roleRow && onRoleChange ? (
             <BuildCardRoleAttributeRow
               baseId={baseId}

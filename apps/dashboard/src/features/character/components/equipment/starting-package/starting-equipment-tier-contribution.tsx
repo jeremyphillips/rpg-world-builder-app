@@ -11,11 +11,6 @@ import {
 } from '@rpg/ui'
 
 import { formatStartingEquipmentTierContribution } from './starting-equipment-tier-contribution.lib'
-import {
-  startingEquipmentTierContributionBaseVariants,
-  startingEquipmentTierContributionRowVariants,
-  startingEquipmentTierContributionTotalVariants,
-} from './starting-equipment-option-cards.variants'
 import { StartingGoldBonusTooltipBody } from './starting-gold-bonus-tooltip'
 
 export type StartingEquipmentTierContributionProps = {
@@ -59,12 +54,12 @@ export function StartingEquipmentTierContribution({
   const { tierLabel, bonusGold, tierAdditionalWealth } = summary.funding
 
   return (
-    <div className={startingEquipmentTierContributionRowVariants()}>
+    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-style-caption">
       <InlineMetadata role="heading" density="compact">
-        <InlineMetadata.Item className={startingEquipmentTierContributionBaseVariants()}>
+        <InlineMetadata.Item className="font-normal text-muted-foreground">
           {tierContribution.baseLabel}
         </InlineMetadata.Item>
-        <InlineMetadata.Item className={startingEquipmentTierContributionTotalVariants()}>
+        <InlineMetadata.Item className="font-normal text-foreground">
           {tierContribution.totalLabel}
         </InlineMetadata.Item>
       </InlineMetadata>

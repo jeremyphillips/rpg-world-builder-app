@@ -13,14 +13,6 @@ import {
   QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL,
   resolveQuickNpcBuildCardExpandActionLabel,
 } from '../../lib/quick-npc/quick-npc-build-card.lib'
-import {
-  quickNpcBuildCardDescriptionClasses,
-  quickNpcBuildCardIdentityRowClasses,
-  quickNpcBuildCardIdentityTitleClasses,
-  quickNpcBuildCardLevelEditorClasses,
-  quickNpcBuildCardTemplateIdentityClasses,
-} from './quick-npc-build-card.variants'
-
 type BuildCardRoleAttributeRowProps = {
   baseId: string
   roleRow: QuickNpcBuildCardRoleRow
@@ -68,14 +60,14 @@ export function BuildCardTemplateIdentity({
   templateDescription?: string
 }) {
   return (
-    <div className={quickNpcBuildCardTemplateIdentityClasses}>
-      <div className={quickNpcBuildCardIdentityRowClasses}>
-        <Text as="h3" className={quickNpcBuildCardIdentityTitleClasses}>
+    <div className="flex flex-col gap-y-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <Text as="h3" className="text-foreground">
           {templateLabel}
         </Text>
       </div>
       {templateDescription ? (
-        <Text as="p" className={quickNpcBuildCardDescriptionClasses}>
+        <Text as="p" className="text-style-supporting">
           {templateDescription}
         </Text>
       ) : null}
@@ -148,7 +140,7 @@ export function BuildCardLevelAttributeRow({
 }: BuildCardLevelAttributeRowProps) {
   return (
     <SetupAttributeRow eyebrow="LEVEL" showHelperWhileEditing helper={levelRow.helper}>
-      <div className={quickNpcBuildCardLevelEditorClasses}>
+      <div className="flex flex-wrap items-center gap-3">
         <NumberStepper
           aria-label="Level"
           bordered

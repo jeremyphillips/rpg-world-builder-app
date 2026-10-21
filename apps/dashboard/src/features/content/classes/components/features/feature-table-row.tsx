@@ -1,17 +1,9 @@
 import { Table2 } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-import { ActionButton, Badge, Card, IconContainer } from '@rpg/ui'
+import { ActionButton, Badge, Card, IconContainer, Text } from '@rpg/ui'
 
 import { DetailEntityRowActions } from '../../../lib/detail/row/entity/detail-entity-row-actions'
-import {
-  featureTableRowActionsClasses,
-  featureTableRowCopyClasses,
-  featureTableRowLayoutClasses,
-  featureTableRowMetadataClasses,
-  featureTableRowTitleClasses,
-  featureTableRowTrailingClasses,
-} from './feature-table-row.variants'
 
 export type FeatureTableRowModel = {
   title: string
@@ -35,23 +27,25 @@ export function FeatureTableRow({
 }: FeatureTableRowProps) {
   return (
     <Card tone="subtle" density="compact" className="px-3 py-2.5">
-      <div className={featureTableRowLayoutClasses}>
+      <div className="flex min-w-0 items-center gap-3">
         <IconContainer>
           <Table2 />
         </IconContainer>
-        <div className={featureTableRowCopyClasses}>
-          <div className={featureTableRowTitleClasses}>{title}</div>
-          <div className={featureTableRowMetadataClasses}>{metadata}</div>
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <div className="truncate font-medium text-foreground">{title}</div>
+          <Text as="div" variant="caption" className="truncate">
+            {metadata}
+          </Text>
         </div>
         {typeLabel || onEdit || overflowActions ? (
-          <div className={featureTableRowTrailingClasses}>
+          <div className="flex shrink-0 items-center gap-4">
             {typeLabel ? (
               <Badge appearance="soft" tone="info" size="sm" className="shrink-0">
                 {typeLabel}
               </Badge>
             ) : null}
             {onEdit || overflowActions ? (
-              <DetailEntityRowActions className={featureTableRowActionsClasses}>
+              <DetailEntityRowActions className="flex shrink-0 items-center gap-3">
                 {onEdit ? (
                   <ActionButton action="edit" variant="outline" size="sm" onClick={onEdit}>
                     {editLabel}

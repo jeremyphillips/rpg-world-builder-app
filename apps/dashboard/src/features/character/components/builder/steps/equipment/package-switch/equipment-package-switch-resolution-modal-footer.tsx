@@ -1,11 +1,6 @@
 import { Button, Text } from '@rpg/ui'
 
 import { PACKAGE_SWITCH_CANCEL_LABEL } from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
-import {
-  equipmentPackageSwitchResolutionFooterActionsClasses,
-  equipmentPackageSwitchResolutionFooterClasses,
-  equipmentPackageSwitchResolutionHelperClasses,
-} from './equipment-package-switch-resolution-modal.variants'
 
 export function EquipmentPackageSwitchResolutionModalFooter({
   isBlocked,
@@ -25,13 +20,13 @@ export function EquipmentPackageSwitchResolutionModalFooter({
   onConfirm: () => void
 }) {
   return (
-    <div className={equipmentPackageSwitchResolutionFooterClasses}>
+    <div className="flex flex-col items-end gap-2">
       {helperMessage ? (
-        <Text as="p" className={equipmentPackageSwitchResolutionHelperClasses}>
+        <Text as="p" className="text-style-supporting">
           {helperMessage}
         </Text>
       ) : null}
-      <div className={equipmentPackageSwitchResolutionFooterActionsClasses}>
+      <div className="flex items-center gap-2">
         <Button type="button" variant="outline" onClick={onCancel}>
           {PACKAGE_SWITCH_CANCEL_LABEL}
         </Button>

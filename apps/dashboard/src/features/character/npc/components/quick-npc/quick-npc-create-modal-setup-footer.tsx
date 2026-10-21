@@ -16,8 +16,6 @@ import {
   type QuickNpcCreateSetupFooterContext,
 } from '../../lib/quick-npc/quick-npc-create-modal-setup.lib'
 import { QuickNpcPreviewNpcButton } from './quick-npc-preview-npc-button'
-import { quickNpcCreateFooterLayoutClasses } from './quick-npc-create-footer.variants'
-
 export type QuickNpcCreateModalSetupFooterProps = {
   buildContext: CharacterBuildContext
   createContext: QuickNpcCreateContext
@@ -45,7 +43,7 @@ export function QuickNpcCreateModalSetupFooter({
   const showSetupPreviewNpc = quickNpcCreateSetupShowsPreviewNpc(setupFooterActions)
 
   return (
-    <div className={quickNpcCreateFooterLayoutClasses()}>
+    <div className="flex w-full flex-wrap items-center justify-between gap-3">
       {showSetupPreviewNpc ? (
         <QuickNpcPreviewNpcButton
           buttonRef={previewNpcButtonRef}

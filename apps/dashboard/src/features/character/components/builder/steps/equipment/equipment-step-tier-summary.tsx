@@ -23,11 +23,7 @@ import {
 
 import { formatMagicItemChoiceGrantValue } from '../../../../lib/equipment/magic-item-choice-label.lib'
 import { StartingGoldBonusFormulaTooltip } from '../../../equipment/starting-package/starting-gold-bonus-tooltip'
-import {
-  STARTING_GOLD_BONUS_LABEL,
-  startingGoldBonusKeyVariants,
-  startingGoldBonusValueVariants,
-} from '../../../equipment/starting-package/starting-gold-bonus-tooltip.variants'
+import { STARTING_GOLD_BONUS_LABEL } from '../../../equipment/starting-package/starting-gold-bonus-tooltip.variants'
 const MAGIC_ITEM_CHOICES_LABEL = 'Magic item choices'
 const STARTING_GOLD_BONUS_FORMULA_LABEL = 'About starting gold bonus'
 
@@ -114,13 +110,8 @@ export function EquipmentStepTierSummary({
           >
             {hasBonusWealth ? (
               <>
-                <span className={startingGoldBonusKeyVariants()}>{STARTING_GOLD_BONUS_LABEL}</span>
-                <span
-                  className={cn(
-                    'inline-flex items-center justify-end gap-1 text-right',
-                    startingGoldBonusValueVariants(),
-                  )}
-                >
+                <span className="text-muted-foreground">{STARTING_GOLD_BONUS_LABEL}</span>
+                <span className="inline-flex items-center justify-end gap-1 text-right text-foreground">
                   +{formatInlineWealth(resources.bonusWealth)}
                   {bonusGold ? (
                     <InfoTooltip aria-label={STARTING_GOLD_BONUS_FORMULA_LABEL}>
@@ -132,13 +123,8 @@ export function EquipmentStepTierSummary({
             ) : null}
             {magicItemValue ? (
               <>
-                <span className={startingGoldBonusKeyVariants()}>{MAGIC_ITEM_CHOICES_LABEL}</span>
-                <span
-                  className={cn(
-                    'inline-flex items-center justify-end gap-1 text-right',
-                    startingGoldBonusValueVariants(),
-                  )}
-                >
+                <span className="text-muted-foreground">{MAGIC_ITEM_CHOICES_LABEL}</span>
+                <span className="inline-flex items-center justify-end gap-1 text-right text-foreground">
                   {magicItemValue}
                 </span>
               </>

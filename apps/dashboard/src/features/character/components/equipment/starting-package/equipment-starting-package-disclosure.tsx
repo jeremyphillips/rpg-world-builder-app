@@ -41,17 +41,11 @@ import {
 } from '../inventory/equipment-inventory.variants'
 import { EquipmentPackageConversionEditor } from '../package-switch/equipment-package-conversion-editor'
 import {
-  equipmentStartingPackageBodyClasses,
   equipmentStartingPackageCategoryClasses,
   equipmentStartingPackageChevronVariants,
-  equipmentStartingPackageCustomizeFooterClasses,
-  equipmentStartingPackageCustomizeReasonClasses,
-  equipmentStartingPackageFooterClasses,
   equipmentStartingPackageHeaderActionsClasses,
   equipmentStartingPackageHeaderClasses,
   equipmentStartingPackageHeaderCopyClasses,
-  equipmentStartingPackageGoldSubtitleClasses,
-  equipmentStartingPackageSubtitleClasses,
 } from './equipment-starting-package.variants'
 
 export type EquipmentStartingPackageDisclosureProps = {
@@ -81,7 +75,7 @@ export function EquipmentStartingPackageGoldHeader({ optionLabel }: { optionLabe
         <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
           {EQUIPMENT_STARTING_PACKAGE_TITLE}
         </Heading>
-        <Text as="p" className={equipmentStartingPackageGoldSubtitleClasses}>
+        <Text as="p" className="mt-2 text-style-supporting">
           {joinInlineMetadata([EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT, optionLabel])}
         </Text>
       </div>
@@ -122,7 +116,7 @@ function EquipmentStartingPackageInventory({
       ))}
 
       {packageGroup.includedWealthLabel ? (
-        <footer className={equipmentStartingPackageFooterClasses}>
+        <footer className="border-t border-border px-4 py-3 text-style-supporting">
           {packageGroup.includedWealthLabel} {EQUIPMENT_PACKAGE_INCLUDED_WEALTH_LABEL}
         </footer>
       ) : null}
@@ -173,7 +167,7 @@ export function EquipmentStartingPackageDisclosure({
             <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
               {EQUIPMENT_STARTING_PACKAGE_TITLE}
             </Heading>
-            <Text as="p" className={equipmentStartingPackageSubtitleClasses}>
+            <Text as="p" className="text-style-supporting">
               {subtitle}
             </Text>
           </button>
@@ -212,7 +206,7 @@ export function EquipmentStartingPackageDisclosure({
         </div>
       </div>
 
-      <CollapsibleContent className={equipmentStartingPackageBodyClasses}>
+      <CollapsibleContent className="border-t border-border">
         {conversionEditorOpen && goldOptionFunding ? (
           <EquipmentPackageConversionEditor
             draft={draft}
@@ -230,11 +224,9 @@ export function EquipmentStartingPackageDisclosure({
           <>
             <EquipmentStartingPackageInventory packageGroup={packageGroup} />
             {packageGroup.customize.status === 'disabled' ? (
-              <p className={equipmentStartingPackageCustomizeReasonClasses}>
-                {packageGroup.customize.reason}
-              </p>
+              <p className="px-4 py-3 text-style-supporting">{packageGroup.customize.reason}</p>
             ) : (
-              <div className={equipmentStartingPackageCustomizeFooterClasses}>
+              <div className="flex justify-end px-4 py-3">
                 <Button type="button" variant="secondary" size="sm" onClick={openCustomize}>
                   {EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL}
                 </Button>

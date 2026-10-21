@@ -32,7 +32,6 @@ import {
 } from './equipment-picker-drawer.types'
 import { EquipmentResourceSummary } from '../../acquisition/equipment-resource-summary'
 import { resolveEquipmentPickerHeaderResource } from './equipment-picker-header-resource.lib'
-import { equipmentPickerHeaderExtraStackClasses } from './equipment-picker-drawer.variants'
 import { EquipmentPickerItemDetails } from '../details/equipment-picker-item-details'
 import { EquipmentPickerDisclosureRow } from '../browse/equipment-picker-disclosure-row'
 import { getEquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
@@ -210,7 +209,7 @@ export function EquipmentPickerDrawer({
       hasStructuredFilters={picker.structuredFilterCount > 0}
       headerExtra={
         workflowSegment || resourceSummary ? (
-          <div className={equipmentPickerHeaderExtraStackClasses}>
+          <div className="flex flex-col gap-4">
             {workflowSegment}
             {resourceSummary}
           </div>

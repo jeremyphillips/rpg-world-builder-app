@@ -1,5 +1,6 @@
 import type { EquipmentPackageSwitchEvaluation } from '@rpg/contracts'
 import { Text, cn } from '@rpg/ui'
+import { cva } from 'class-variance-authority'
 
 import { collectionPanelMutedSummaryClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 
@@ -10,14 +11,19 @@ import {
   packageSwitchDraftHasEdits,
   resolvePackageSwitchBudgetStatusLabel,
 } from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
-import {
-  equipmentPackageSwitchResolutionBudgetLabelClasses,
-  equipmentPackageSwitchResolutionBudgetRowClasses,
-  equipmentPackageSwitchResolutionBudgetStatusRowClasses,
-  equipmentPackageSwitchResolutionBudgetStatusVariants,
-  equipmentPackageSwitchResolutionBudgetSummaryTitleClasses,
-  equipmentPackageSwitchResolutionBudgetValueClasses,
-} from './equipment-package-switch-resolution-modal.variants'
+
+const packageSwitchBudgetStatusValueVariants = cva('shrink-0 tabular-nums font-medium', {
+  variants: {
+    tone: {
+      warning: 'text-destructive',
+      success: 'text-semantic-success',
+      neutral: 'text-foreground',
+    },
+  },
+  defaultVariants: {
+    tone: 'neutral',
+  },
+})
 
 function BudgetSummaryRow({
   label,
@@ -31,14 +37,11 @@ function BudgetSummaryRow({
   className?: string
 }) {
   return (
-    <div className={cn(equipmentPackageSwitchResolutionBudgetRowClasses, className)}>
-      <Text as="span" className={equipmentPackageSwitchResolutionBudgetLabelClasses}>
+    <div className={cn('flex items-start justify-between gap-4 text-sm', className)}>
+      <Text as="span" variant="muted">
         {label}
       </Text>
-      <Text
-        as="span"
-        className={valueClassName ?? equipmentPackageSwitchResolutionBudgetValueClasses}
-      >
+      <Text as="span" className={valueClassName ?? 'shrink-0 tabular-nums text-foreground'}>
         {value}
       </Text>
     </div>
@@ -67,7 +70,7 @@ export function PackageSwitchBudgetSummary({
       aria-label="Budget summary"
       className={collectionPanelMutedSummaryClasses}
     >
-      <Text as="p" className={equipmentPackageSwitchResolutionBudgetSummaryTitleClasses}>
+      <Text as="p" className="mb-3 text-style-label text-foreground">
         Budget summary
       </Text>
       <div className="space-y-2">
@@ -90,10 +93,8 @@ export function PackageSwitchBudgetSummary({
         <BudgetSummaryRow
           label={status.label}
           value={statusValue}
-          valueClassName={equipmentPackageSwitchResolutionBudgetStatusVariants({
-            tone: status.tone,
-          })}
-          className={equipmentPackageSwitchResolutionBudgetStatusRowClasses}
+          valueClassName={packageSwitchBudgetStatusValueVariants({ tone: status.tone })}
+          className="border-t border-border pt-2"
         />
       </div>
     </section>

@@ -12,14 +12,11 @@ import {
   PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE,
   type buildPackageSwitchDraftPurchasedGroups,
 } from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
-import {
-  equipmentPackageSwitchResolutionAlertClasses,
-  equipmentPackageSwitchResolutionBlockedBodyClasses,
-  equipmentPackageSwitchResolutionModalInventoryScrollClasses,
-  equipmentPackageSwitchResolutionModalInventorySectionClasses,
-  equipmentPackageSwitchResolutionSafetyNoteClasses,
-} from './equipment-package-switch-resolution-modal.variants'
 import { PackageSwitchBudgetSummary } from './equipment-package-switch-resolution-modal-summary'
+
+/** Scrollport for purchased inventory inside the package-switch modal. */
+export const packageSwitchModalInventoryScrollClasses =
+  'max-h-72 min-w-0 overflow-y-auto overflow-x-hidden pe-3'
 
 export type EquipmentPackageSwitchResolutionModalBodyProps = {
   evaluation: EquipmentPackageSwitchEvaluation
@@ -47,13 +44,13 @@ export function EquipmentPackageSwitchResolutionModalBody({
   return (
     <>
       {staleMessage ? (
-        <Text as="p" className={equipmentPackageSwitchResolutionAlertClasses} role="status">
+        <Text as="p" className="text-sm text-destructive" role="status">
           {staleMessage}
         </Text>
       ) : null}
 
       {isBlocked ? (
-        <div className={equipmentPackageSwitchResolutionBlockedBodyClasses}>
+        <div className="space-y-3 text-style-supporting">
           <PackageSwitchBudgetSummary
             evaluation={evaluation}
             draftQuantitiesByPurchaseId={draftQuantitiesByPurchaseId}
@@ -66,8 +63,8 @@ export function EquipmentPackageSwitchResolutionModalBody({
             draftQuantitiesByPurchaseId={draftQuantitiesByPurchaseId}
           />
 
-          <div className={equipmentPackageSwitchResolutionModalInventoryScrollClasses}>
-            <section className={equipmentPackageSwitchResolutionModalInventorySectionClasses}>
+          <div className={packageSwitchModalInventoryScrollClasses}>
+            <section className="space-y-3">
               <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
                 {PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE}
               </Heading>
@@ -81,14 +78,14 @@ export function EquipmentPackageSwitchResolutionModalBody({
             </section>
           </div>
 
-          <Text as="p" className={equipmentPackageSwitchResolutionSafetyNoteClasses}>
+          <Text as="p" variant="caption">
             {safetyNote}
           </Text>
         </>
       )}
 
       {inlineError ? (
-        <Text as="p" className={equipmentPackageSwitchResolutionAlertClasses} role="alert">
+        <Text as="p" className="text-sm text-destructive" role="alert">
           {inlineError}
         </Text>
       ) : null}

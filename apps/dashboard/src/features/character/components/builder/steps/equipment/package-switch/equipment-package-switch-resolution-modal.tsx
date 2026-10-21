@@ -22,8 +22,6 @@ import {
 } from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
 import { EquipmentPackageSwitchResolutionModalBody } from './equipment-package-switch-resolution-modal-body'
 import { EquipmentPackageSwitchResolutionModalFooter } from './equipment-package-switch-resolution-modal-footer'
-import { equipmentPackageSwitchResolutionModalBodyClasses } from './equipment-package-switch-resolution-modal.variants'
-
 export type EquipmentPackageSwitchResolutionModalProps = {
   open: boolean
   catalogIndex: CharacterBuildCatalogIndex
@@ -144,7 +142,7 @@ export function EquipmentPackageSwitchResolutionModal({
             )
           }
         />
-        <Modal.Body className={equipmentPackageSwitchResolutionModalBodyClasses}>
+        <Modal.Body className="flex min-h-0 min-w-0 flex-col gap-4">
           <EquipmentPackageSwitchResolutionModalBody
             evaluation={evaluation}
             draftQuantitiesByPurchaseId={draftQuantitiesByPurchaseId}

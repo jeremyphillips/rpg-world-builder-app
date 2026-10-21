@@ -5,11 +5,7 @@ import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } fro
 import type { SlotProgression } from '@rpg/contracts'
 
 import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
-import {
-  DetailOverflowMenu,
-  FeatureTableRow,
-  featureTablesSectionBodyClasses,
-} from '@/lib/content-table-surface'
+import { DetailOverflowMenu, FeatureTableRow } from '@/lib/content-table-surface'
 
 import {
   applySlotProgressionDraft,
@@ -173,7 +169,7 @@ export function SlotProgressionsField() {
           }
           wrapper="none"
         />
-        <div className={featureTablesSectionBodyClasses}>
+        <div className="flex flex-col gap-2">
           {slotProgressions.map((progression) => (
             <FeatureTableRow
               key={progression.id}

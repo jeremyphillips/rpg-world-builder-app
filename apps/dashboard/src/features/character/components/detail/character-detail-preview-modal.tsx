@@ -4,7 +4,6 @@ import { CHARACTER_DETAIL_PREVIEW_NOTICE } from '../../lib/display/character-det
 import type { CharacterDetailProjectionCompleteness } from '../../lib/display/character-detail-source.lib'
 import type { CharacterDetailViewModel } from '../../lib/display/character-display'
 import { CharacterDetailSheet } from './character-detail-sheet'
-import { characterDetailPreviewNoticeClasses } from './character-detail-preview.variants'
 
 export type CharacterDetailPreviewModalProps = {
   open: boolean
@@ -30,7 +29,7 @@ export function CharacterDetailPreviewModal({
   return (
     <DetailPreviewModal open={open} onOpenChange={onOpenChange} headline={headline}>
       {notice ? (
-        <Text variant="muted" className={characterDetailPreviewNoticeClasses()}>
+        <Text variant="muted" className="mb-4 text-sm">
           {notice}
         </Text>
       ) : null}

@@ -20,13 +20,6 @@ import {
   resolveProficiencyLinkFieldState,
   type StartingEquipmentNestedPool,
 } from '../../../lib/equipment/equipment-step.lib'
-import {
-  startingEquipmentIncludedToolGuidanceClasses,
-  startingEquipmentIncludedToolHeadingClasses,
-  startingEquipmentOptionNestedFieldsClasses,
-  startingEquipmentOptionReasonsClasses,
-} from './starting-equipment-option-cards.variants'
-
 export type StartingEquipmentOptionSelectionHandlers = {
   onSelectOption: (
     optionId: string,
@@ -75,7 +68,7 @@ function buildNestedSelectionsPatch(
 
 export function StartingEquipmentUnselectableReasons({ reasons }: { reasons: readonly string[] }) {
   return (
-    <div className={startingEquipmentOptionReasonsClasses}>
+    <div className="space-y-1">
       {reasons.map((reason) => (
         <Text key={reason} variant="small" className="text-destructive">
           {reason}
@@ -133,7 +126,7 @@ function IncludedToolField({
 
   return (
     <div>
-      <Eyebrow size="sm" className={startingEquipmentIncludedToolHeadingClasses}>
+      <Eyebrow size="sm" className="mb-0.5">
         {EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL}
       </Eyebrow>
       <div className="space-y-2">
@@ -144,9 +137,7 @@ function IncludedToolField({
             onChoiceSelectionChange(link.choiceSetId, nextSelection)
           }
         />
-        <Text variant="muted" className={startingEquipmentIncludedToolGuidanceClasses}>
-          {EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE}
-        </Text>
+        <Text variant="caption">{EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE}</Text>
       </div>
     </div>
   )
@@ -182,10 +173,7 @@ export function StartingEquipmentNestedFields({
   const proficiencyLinks = option ? listProficiencyLinksForOption(characterClass, option) : []
 
   return (
-    <div
-      className={startingEquipmentOptionNestedFieldsClasses}
-      onPointerDown={(event) => event.stopPropagation()}
-    >
+    <div className="space-y-4" onPointerDown={(event) => event.stopPropagation()}>
       {proficiencyLinks.map((link) =>
         option ? (
           <IncludedToolField

@@ -1,7 +1,6 @@
 import { Heading, Text } from '@rpg/ui'
 
 import type { DependentChoiceSectionCopy } from '../../../lib/builder/builder-dependent-choice.lib'
-import { builderDependentChoiceSectionHeaderClasses } from './builder-dependent-choice-section.variants'
 
 export type BuilderDependentChoiceSectionHeaderProps = {
   title: string
@@ -19,7 +18,7 @@ export function BuilderDependentChoiceSectionHeader({
   if (embedded) return null
 
   return (
-    <div className={builderDependentChoiceSectionHeaderClasses}>
+    <div className="flex items-start justify-between gap-3 border-0">
       <Heading variant="subsection" as="h3" id={headingId}>
         {title}
       </Heading>
