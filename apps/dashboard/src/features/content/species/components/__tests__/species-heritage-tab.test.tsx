@@ -78,6 +78,11 @@ describe('SpeciesHeritageTab', () => {
       ),
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Set up heritage/i })).toBeInTheDocument()
+    const panel = screen
+      .getByRole('button', { name: /Set up heritage/i })
+      .closest('.ui-inset-panel')
+    expect(panel).toHaveClass('ui-inset-panel--dashed')
+    expect(panel).not.toHaveClass('ui-card')
   })
 
   it('adds heritage and shows scalar fields plus options master-detail', async () => {

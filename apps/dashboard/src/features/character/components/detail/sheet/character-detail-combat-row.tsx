@@ -1,4 +1,4 @@
-import { Card, Eyebrow, InlineMetadata, Text } from '@rpg/ui'
+import { Card, CardContent, Eyebrow, InlineMetadata, Text } from '@rpg/ui'
 
 import {
   CHARACTER_EMPTY_SECTION_TEXT,
@@ -42,24 +42,26 @@ function CharacterDetailActionsPanel({ actions }: { actions: CharacterActionRowV
   return (
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{CHARACTER_SECTION_LABELS.actions}</Eyebrow>
-      <Card tone="subtle" density="comfortable" className="space-y-3">
-        {actions.length === 0 ? (
-          <Text variant="muted">{CHARACTER_EMPTY_SECTION_TEXT.actions}</Text>
-        ) : (
-          <ul className="space-y-2">
-            {actions.map((action) => (
-              <li key={action.id} className="rounded-md bg-surface-strong px-3 py-2 text-sm">
-                <div className="font-medium">{action.name}</div>
-                <div className="text-muted-foreground">
-                  <InlineMetadata role="supporting" density="compact">
-                    <InlineMetadata.Item>Attack {action.attackBonus}</InlineMetadata.Item>
-                    <InlineMetadata.Item>Damage {action.damage}</InlineMetadata.Item>
-                  </InlineMetadata>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+      <Card tone="subtle" density="comfortable">
+        <CardContent>
+          {actions.length === 0 ? (
+            <Text variant="muted">{CHARACTER_EMPTY_SECTION_TEXT.actions}</Text>
+          ) : (
+            <ul className="space-y-2">
+              {actions.map((action) => (
+                <li key={action.id} className="rounded-md bg-surface-strong px-3 py-2 text-sm">
+                  <div className="font-medium">{action.name}</div>
+                  <div className="text-muted-foreground">
+                    <InlineMetadata role="supporting" density="compact">
+                      <InlineMetadata.Item>Attack {action.attackBonus}</InlineMetadata.Item>
+                      <InlineMetadata.Item>Damage {action.damage}</InlineMetadata.Item>
+                    </InlineMetadata>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
       </Card>
     </div>
   )
@@ -70,7 +72,9 @@ function CharacterDetailSavingThrowsPanel({ section }: { section: CharacterDetai
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{section.title}</Eyebrow>
       <Card tone="subtle" density="comfortable">
-        <CharacterDetailListItems items={section.items} emptyText={section.emptyText} />
+        <CardContent>
+          <CharacterDetailListItems items={section.items} emptyText={section.emptyText} />
+        </CardContent>
       </Card>
     </div>
   )
@@ -87,18 +91,20 @@ function CharacterDetailProficienciesPanel({
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{section.title}</Eyebrow>
       <Card tone="subtle" density="comfortable">
-        {!hasItems ? (
-          <Text variant="muted">{section.emptyText}</Text>
-        ) : (
-          <div className="space-y-4">
-            {section.groups.map((group) => (
-              <div key={group.id} className="space-y-2">
-                <Eyebrow size="xs">{group.title}</Eyebrow>
-                <CharacterDetailListItems items={group.items} emptyText={section.emptyText} />
-              </div>
-            ))}
-          </div>
-        )}
+        <CardContent>
+          {!hasItems ? (
+            <Text variant="muted">{section.emptyText}</Text>
+          ) : (
+            <div className="space-y-4">
+              {section.groups.map((group) => (
+                <div key={group.id} className="space-y-2">
+                  <Eyebrow size="xs">{group.title}</Eyebrow>
+                  <CharacterDetailListItems items={group.items} emptyText={section.emptyText} />
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
       </Card>
     </div>
   )

@@ -44,6 +44,7 @@ function RulesSectionDisabled({
   campaignId: string
 }) {
   return (
+    // TODO(empty-well): model this disabled-rules gate as a shared well component.
     <Card tone="subtle" density="comfortable">
       <CardContent className="flex flex-col gap-2">
         <Heading variant="subsection" as="h3">
@@ -89,6 +90,7 @@ function SpeciesRulesEditor({ formCtx }: { formCtx: ContentFormCtx }) {
 
   if (!policyEnabled && !limitsEnabled) {
     return (
+      // TODO(empty-well): model this rules gate as a shared well component.
       <Card tone="subtle" density="comfortable">
         <CardContent className="flex flex-col gap-3">
           <Text variant="muted" className="text-sm">

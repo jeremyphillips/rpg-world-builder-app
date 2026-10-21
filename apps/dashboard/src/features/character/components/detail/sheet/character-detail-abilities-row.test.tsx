@@ -27,6 +27,9 @@ describe('CharacterDetailAbilitiesRow', () => {
 
     expect(screen.getAllByRole('article')).toHaveLength(6)
     expect(screen.queryByRole('button', { name: /Increase/i })).not.toBeInTheDocument()
+    const card = screen.getAllByRole('article')[0]?.closest('.ui-card')
+    expect(card).toHaveClass('w-fit', 'p-3')
+    expect(card?.querySelector('.ui-card__content')).toBeNull()
   })
 
   it('renders numeric editors when an editor is provided', () => {

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { EntityAnatomyHost } from '@/features/content'
 
 import { CampaignMetaLine } from '../campaign-meta-line'
+import { CAMPAIGN_DESTINATION_LIST_DENSITY } from './campaign-destination-list-shell'
 import {
   buildCampaignDisplay,
   resolveCampaignGameMasterDisplayStyle,
@@ -56,6 +57,7 @@ export function CampaignDestinationItem({
       }
       content={
         <EntityAnatomyHost
+          density={CAMPAIGN_DESTINATION_LIST_DENSITY}
           descriptionWrap
           entity={{
             heading: display.name,

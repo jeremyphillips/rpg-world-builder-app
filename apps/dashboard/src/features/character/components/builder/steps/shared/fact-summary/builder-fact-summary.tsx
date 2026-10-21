@@ -4,7 +4,7 @@ import type {
   GrantedProficiencySummaryRow,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-import { Card, IconContainer } from '@rpg/ui'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, IconContainer } from '@rpg/ui'
 import type { LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 
@@ -76,15 +76,12 @@ type BuilderFactSummaryShellProps = {
 
 function BuilderFactSummaryShell({ heading, subhead, children }: BuilderFactSummaryShellProps) {
   return (
-    <Card
-      tone="subtle"
-      density="comfortable"
-      header={{
-        title: heading,
-        description: subhead,
-      }}
-    >
-      {children}
+    <Card tone="subtle" density="comfortable">
+      <CardHeader>
+        <CardTitle>{heading}</CardTitle>
+        {subhead ? <CardDescription>{subhead}</CardDescription> : null}
+      </CardHeader>
+      <CardContent>{children}</CardContent>
     </Card>
   )
 }

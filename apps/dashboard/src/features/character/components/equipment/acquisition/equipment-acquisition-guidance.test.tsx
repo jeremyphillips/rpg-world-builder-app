@@ -145,6 +145,10 @@ describe('EquipmentAcquisitionGuidance', () => {
     expect(screen.getByText('5 SP selected')).toBeInTheDocument()
     expect(screen.queryByText(/remaining/)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Browse equipment' })).not.toBeInTheDocument()
+    const card = screen.getByRole('heading', { name: 'Starting funds not set' }).closest('.ui-card')
+    const content = card?.querySelectorAll('.ui-card__content')
+    expect(content).toHaveLength(1)
+    expect(content?.[0]).toHaveTextContent('5 SP selected')
   })
 
   it('switches the magic-items action to manage when no choice capacity remains', async () => {

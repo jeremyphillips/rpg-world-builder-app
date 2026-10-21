@@ -6,8 +6,6 @@ import { usePersistCampaignSelection } from '../../hooks/use-select-campaign'
 import { campaignDestinationListProps } from './campaign-destination-list-shell'
 import { CampaignDestinationItem } from './campaign-destination-item'
 
-const CAMPAIGN_DESTINATION_LIST_DENSITY = 'spacious' as const
-
 type CampaignDestinationSectionProps = {
   eyebrow: string
   eyebrowAs?: 'h2' | 'h3'
@@ -32,10 +30,7 @@ export function CampaignDestinationSection({
       <Eyebrow as={eyebrowAs} size="sm" tone={eyebrowTone}>
         {eyebrow}
       </Eyebrow>
-      <DestinationList
-        {...campaignDestinationListProps}
-        density={CAMPAIGN_DESTINATION_LIST_DENSITY}
-      >
+      <DestinationList {...campaignDestinationListProps}>
         {campaigns.map((campaign) => (
           <CampaignDestinationItem
             key={campaign.id}

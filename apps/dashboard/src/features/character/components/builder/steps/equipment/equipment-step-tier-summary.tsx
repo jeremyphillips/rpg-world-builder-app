@@ -103,11 +103,7 @@ export function EquipmentStepTierSummary({
       </CollapsibleTrigger>
       <CollapsibleContent asChild>
         <Card tone="subtle" density="compact" className="mt-1">
-          <CardContent
-            className={cn(
-              'mt-1 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 text-style-caption py-2.5',
-            )}
-          >
+          <CardContent className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 text-style-caption">
             {hasBonusWealth ? (
               <>
                 <span className="text-muted-foreground">{STARTING_GOLD_BONUS_LABEL}</span>

@@ -1,7 +1,7 @@
 import { Table2 } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-import { ActionButton, Badge, Card, IconContainer, Text } from '@rpg/ui'
+import { ActionButton, Badge, Card, CardContent, IconContainer, Text } from '@rpg/ui'
 
 import { DetailEntityRowActions } from '../../../lib/detail/row/entity/detail-entity-row-actions'
 
@@ -26,8 +26,8 @@ export function FeatureTableRow({
   overflowActions,
 }: FeatureTableRowProps) {
   return (
-    <Card tone="subtle" density="compact" className="px-3 py-2.5">
-      <div className="flex min-w-0 items-center gap-3">
+    <Card tone="subtle" density="compact">
+      <CardContent className="flex min-w-0 items-center gap-3">
         <IconContainer>
           <Table2 />
         </IconContainer>
@@ -56,7 +56,7 @@ export function FeatureTableRow({
             ) : null}
           </div>
         ) : null}
-      </div>
+      </CardContent>
     </Card>
   )
 }

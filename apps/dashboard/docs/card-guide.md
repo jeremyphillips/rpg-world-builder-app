@@ -47,10 +47,15 @@ Use this guide to pick a surface. It covers generic `@rpg/ui` components and das
 **`link` contract (shared with `Card`):** pass a single React Router `Link` or `<a>` element. Navigation attributes (`to`, `href`, `aria-label`, `onClick`, refs) live on that element. `showNavigationChevron` defaults to true. Simple metadata, rich `content`, and entity copy must not introduce nested links or controls.
 
 ```tsx
-import { Card } from '@rpg/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@rpg/ui'
 import { EntityCard } from '@/features/content'
 
-<Card header={{ title: 'Campaign tools' }} density="comfortable">…</Card>
+<Card density="comfortable">
+  <CardHeader>
+    <CardTitle>Campaign tools</CardTitle>
+  </CardHeader>
+  <CardContent>…</CardContent>
+</Card>
 
 <EntityCard entity={model} density="compact" trailing={{ kind: 'action', content: … }} />
 
@@ -60,6 +65,14 @@ import { EntityCard } from '@/features/content'
   …domain fields…
 </EntityCard>
 ```
+
+### Density inset
+
+Density does not pad arbitrary children. `.ui-card__header`, `.ui-card__content`, and `.ui-card__footer` own the inset. When a header is present, content and footer drop their top padding so the regions do not stack.
+
+A `Card` without `header`, `footer`, or `link` renders children directly. Put the body in `CardContent`. Raw children are for intentional full-bleed only; `leadMedia` stays edge-to-edge. Do not add root `p-*`, `px-*`, or `py-*` when a region should own the inset — those utilities replace the region padding.
+
+`FormCard` is header chrome and does not render `CardContent`. Pass `formCardContentClass` on the child form so the fields use the content inset.
 
 ---
 

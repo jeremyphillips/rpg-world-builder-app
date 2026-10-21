@@ -26,7 +26,7 @@ export function CharacterImportPreview({ result }: CharacterImportPreviewProps) 
           Extracted data
         </Heading>
         <Card tone="subtle" density="compact" className="mt-3">
-          <CardContent className="px-4">
+          <CardContent>
             {EXTRACTION_FIELD_KEYS.map((field) => (
               <CharacterImportPreviewRow
                 key={field}

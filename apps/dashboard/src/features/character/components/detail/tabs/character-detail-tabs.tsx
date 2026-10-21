@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { CharacterNarrative } from '@rpg/contracts'
-import { Card, Tabs, TabsContent, TabsList, TabsTrigger, Text } from '@rpg/ui'
+import { Card, CardContent, Tabs, TabsContent, TabsList, TabsTrigger, Text } from '@rpg/ui'
 
 import {
   CHARACTER_DETAIL_TAB_LABELS,
@@ -100,7 +100,7 @@ export function CharacterDetailTabs({
 function CharacterDetailTabPanel({ children }: { children: ReactNode }) {
   return (
     <Card tone="subtle" density="comfortable">
-      {children}
+      <CardContent>{children}</CardContent>
     </Card>
   )
 }

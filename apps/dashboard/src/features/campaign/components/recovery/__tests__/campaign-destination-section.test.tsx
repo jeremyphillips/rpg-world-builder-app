@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@/test/render'
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
 import { CAMPAIGN_DESTINATION_COPY } from '../../../lib/recovery/campaign-destination-copy'
 import { CampaignDestinationSection } from '../campaign-destination-section'
@@ -33,19 +33,22 @@ describe('CampaignDestinationSection', () => {
     expect(list).not.toHaveClass('ui-destination-list--comfortable')
   })
 
-  it('renders embedded anatomy without a redundant density modifier class', () => {
+  it('renders spacious anatomy and an md onboarding badge', () => {
     const { container } = renderWithProviders(
       <CampaignDestinationSection
         eyebrow={CAMPAIGN_DESTINATION_COPY.yourCampaignsEyebrow}
-        campaigns={[makeCampaignListItem({ identity: { name: 'Shattered Vale' } })]}
+        campaigns={[
+          makeCampaignListItem({
+            identity: { name: 'Shattered Vale' },
+            viewerState: VIEWER_STATE.onboardingIncomplete,
+          }),
+        ]}
       />,
     )
 
     const anatomy = container.querySelector('.dash-entity-anatomy')
-    expect(anatomy).toBeTruthy()
-    expect(anatomy).not.toHaveClass('dash-entity-anatomy--spacious')
-    expect(anatomy).not.toHaveClass('dash-entity-anatomy--comfortable')
-    expect(anatomy).not.toHaveClass('dash-entity-anatomy--compact')
+    expect(anatomy).toHaveClass('dash-entity-anatomy--spacious')
+    expect(screen.getByText('Setup incomplete')).toHaveClass('ui-compact-label--md')
   })
 
   it('wraps destination supporting copy', () => {

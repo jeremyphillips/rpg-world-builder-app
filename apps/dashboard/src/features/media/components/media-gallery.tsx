@@ -141,6 +141,7 @@ export function MediaGallery({
             }}
           />
         </div>
+        {/* TODO(empty-well): model this gallery empty as a shared well component. */}
         {contextBlocked ? (
           <div className={styles.galleryEmpty()} role="alert">
             <Images className={styles.galleryEmptyIcon()} aria-hidden="true" />

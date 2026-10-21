@@ -444,6 +444,24 @@ describe('Card compound escape hatch', () => {
     expect(contentOnly.innerHTML).toContain(UI_CARD_CONTENT_CLASS)
   })
 
+  it('leaves a raw child outside the content region and places CardContent inside it', () => {
+    const { container: raw } = render(
+      <Card>
+        <p>Flush</p>
+      </Card>,
+    )
+    expect(raw.getElementsByClassName(UI_CARD_CONTENT_CLASS)).toHaveLength(0)
+    expect(screen.getByText('Flush')).toBeInTheDocument()
+
+    const { container: inset } = render(
+      <Card>
+        <CardContent>Inset</CardContent>
+      </Card>,
+    )
+    expect(inset.getElementsByClassName(UI_CARD_CONTENT_CLASS)).toHaveLength(1)
+    expect(queryCardRegion(inset, UI_CARD_CONTENT_CLASS)).toHaveTextContent('Inset')
+  })
+
   it('renders compound regions as direct card children', () => {
     const { container } = render(
       <Card>

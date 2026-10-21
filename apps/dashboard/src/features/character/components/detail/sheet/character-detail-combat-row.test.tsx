@@ -1,0 +1,53 @@
+import { render, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+
+import {
+  CHARACTER_EMPTY_SECTION_TEXT,
+  CHARACTER_SECTION_LABELS,
+} from '../../../lib/display/character-display'
+import { CharacterDetailCombatRow } from './character-detail-combat-row'
+
+const savingThrows = {
+  title: CHARACTER_SECTION_LABELS.savingThrows,
+  items: [{ id: 'dex', label: 'Dexterity', detail: '+2' }],
+  emptyText: CHARACTER_EMPTY_SECTION_TEXT.savingThrows,
+}
+
+const emptyProficiencies = {
+  title: CHARACTER_SECTION_LABELS.proficiencies,
+  groups: [],
+  emptyText: CHARACTER_EMPTY_SECTION_TEXT.proficiencies,
+}
+
+describe('CharacterDetailCombatRow', () => {
+  it('insets an empty actions card', () => {
+    render(
+      <CharacterDetailCombatRow
+        actions={[]}
+        savingThrows={savingThrows}
+        proficiencies={emptyProficiencies}
+      />,
+    )
+
+    const empty = screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.actions)
+    expect(empty.closest('.ui-card__content')).toBeTruthy()
+    expect(empty.closest('.ui-card')).not.toHaveClass('space-y-3')
+    expect(screen.getByText('Dexterity').closest('.ui-card__content')).toBeTruthy()
+    expect(
+      screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.proficiencies).closest('.ui-card__content'),
+    ).toBeTruthy()
+  })
+
+  it('insets populated actions', () => {
+    render(
+      <CharacterDetailCombatRow
+        actions={[{ id: 'longsword', name: 'Longsword', attackBonus: '+5', damage: '1d8+3' }]}
+        savingThrows={savingThrows}
+        proficiencies={emptyProficiencies}
+      />,
+    )
+
+    expect(screen.getByText('Longsword').closest('.ui-card__content')).toBeTruthy()
+    expect(screen.getByText('Attack +5')).toBeInTheDocument()
+  })
+})

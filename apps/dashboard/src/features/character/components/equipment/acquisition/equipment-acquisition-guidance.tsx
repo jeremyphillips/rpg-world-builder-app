@@ -1,5 +1,5 @@
 import type { MagicItemAllowance, MagicItemGrantProgress } from '@rpg/contracts'
-import { Card, Text } from '@rpg/ui'
+import { Card, CardContent, CardHeader, CardTitle, Text } from '@rpg/ui'
 
 import {
   EQUIPMENT_MAGIC_ITEMS_BROWSE_LABEL,
@@ -31,19 +31,18 @@ export type EquipmentAcquisitionGuidanceProps = {
 
 function EquipmentUnresolvedFundingCard({ pendingCostCp }: { pendingCostCp: number }) {
   return (
-    <Card
-      tone="subtle"
-      density="comfortable"
-      header={{ title: EQUIPMENT_UNRESOLVED_FUNDING_HEADING }}
-    >
-      <div className="flex min-w-0 flex-col gap-3">
+    <Card tone="subtle" density="comfortable">
+      <CardHeader>
+        <CardTitle>{EQUIPMENT_UNRESOLVED_FUNDING_HEADING}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex min-w-0 flex-col gap-3">
         <Text as="p" variant="muted">
           {EQUIPMENT_UNRESOLVED_FUNDING_DESCRIPTION}
         </Text>
         <Text as="p" variant="muted">
           {formatEquipmentUnresolvedFundingSelectedLabel(pendingCostCp)}
         </Text>
-      </div>
+      </CardContent>
     </Card>
   )
 }

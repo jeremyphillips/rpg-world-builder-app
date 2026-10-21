@@ -7,7 +7,10 @@ import {
   RESOLUTION_FIELD_NAME,
 } from '../../lib/form/resolution-form-values'
 
-/** Empty state with Add resolution action (attack preset defaults). */
+/**
+ * Empty state with Add resolution action (attack preset defaults).
+ * TODO(empty-well): model this setup empty as a shared well component.
+ */
 export function SpellResolutionEmptyState() {
   const { setValue, getValues } = useFormContext()
 

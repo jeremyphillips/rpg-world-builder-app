@@ -56,8 +56,8 @@ describe('EquipmentStepTierSummary', () => {
     expect(panel).toBeTruthy()
     expect(panel).toHaveClass('ui-card--subtle')
     const panelContent = screen.getByText('Starting gold bonus').parentElement
-    expect(panelContent).toHaveClass('gap-y-2', 'py-2.5')
-    expect(panelContent).not.toHaveClass('text-muted-foreground')
+    expect(panelContent).toHaveClass('ui-card__content', 'gap-y-2')
+    expect(panelContent).not.toHaveClass('py-2.5', 'mt-1', 'text-muted-foreground')
     expect(screen.getByText('Starting gold bonus')).toHaveClass('text-muted-foreground')
     expect(screen.getByText('+637 GP 5 SP')).toHaveClass('text-foreground')
     expect(screen.getByText('Magic item choices')).toHaveClass('text-muted-foreground')

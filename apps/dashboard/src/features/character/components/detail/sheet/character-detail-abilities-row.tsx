@@ -24,6 +24,7 @@ export function CharacterDetailAbilitiesRow({
   abilityScoreEditor,
 }: CharacterDetailAbilitiesRowProps) {
   return (
+    // TODO(panel): replace this Card shell with panel treatment.
     <Card tone="subtle" density="comfortable" className="w-fit p-3">
       <div className={characterDetailAbilitiesRowClasses}>
         {abilities.map((ability) => {

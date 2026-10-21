@@ -2,8 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import {
   Button,
-  Card,
-  CardContent,
+  InsetPanel,
   emptyStateWellSupportingClasses,
   emptyStateWellTitleLgClasses,
   Text,
@@ -49,12 +48,13 @@ function HeritageEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
   const { setValue } = useFormContext()
 
   return (
-    <Card
-      tone="subtle"
-      density="comfortable"
-      className="flex flex-col items-center justify-center px-6 py-10 text-center"
+    <InsetPanel
+      borderStyle="dashed"
+      size="lg"
+      align="center"
+      className="flex flex-col items-center"
     >
-      <CardContent className="flex max-w-md flex-col items-center gap-3" role="status">
+      <div className="flex max-w-md flex-col items-center gap-3" role="status">
         <Text as="p" className={emptyStateWellTitleLgClasses}>
           {HERITAGE_EMPTY_TITLE}
         </Text>
@@ -71,8 +71,8 @@ function HeritageEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
         >
           {SET_UP_HERITAGE_LABEL}
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </InsetPanel>
   )
 }
 
