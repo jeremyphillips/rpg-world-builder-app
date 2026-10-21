@@ -1,5 +1,5 @@
 import type { CampaignListItem } from '@rpg/contracts'
-import { DestinationItem, IdentityFrame } from '@rpg/ui'
+import { DestinationItem } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import { EntityAnatomyHost } from '@/features/content'
@@ -61,7 +61,11 @@ export function CampaignDestinationItem({
             heading: display.name,
             description,
             media: display.imageUrl ? (
-              <IdentityFrame src={display.imageUrl} alt="" shape="box" size="sm" fit="contain" />
+              <img
+                src={display.imageUrl}
+                alt=""
+                className="block size-full max-w-none select-none object-contain"
+              />
             ) : undefined,
             status:
               badgeLabel && badgeTone

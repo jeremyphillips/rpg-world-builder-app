@@ -111,6 +111,7 @@ describe('EntityAnatomy row tracks', () => {
     expect(cellOf(slot('content'))).toEqual({ slot: 'band', column: 'content' })
     expect(cellOf(slot('status'))).toEqual({ slot: 'status', column: 'content' })
     expect(slot('leading')!.querySelectorAll('.dash-entity-leading__column')).toHaveLength(2)
+    expect(slot('media')!.querySelector('[data-detail-row-leading-media]')).not.toBeNull()
   })
 
   it('applies leading content gap on the rail and trailing separation from the host columns', () => {

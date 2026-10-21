@@ -10,14 +10,15 @@ Entity-family usage: start with [card-guide](../../../apps/dashboard/docs/card-g
 
 ## Ownership invariant
 
-| Concern                               | Owner                                      |
-| ------------------------------------- | ------------------------------------------ |
-| Row tracks (vertical)                 | `rowAnatomyTracksVariants`                 |
-| Cell row placement and self-alignment | `rowAnatomyCellClasses` (sole resolver)    |
-| Gap between related stacked copy rows | `--ui-anatomy-row-gap` (`copy-scale.css`)  |
-| Columns, column gaps                  | Host (e.g. `entityAnatomyColumnsVariants`) |
-| Padding / surface inset               | Host surface (e.g. `EntityCardFrame`)      |
-| Inner content layout                  | Cell children (flex rows inside a cell)    |
+| Concern                               | Owner                                                                        |
+| ------------------------------------- | ---------------------------------------------------------------------------- |
+| Row tracks (vertical)                 | `rowAnatomyTracksVariants`                                                   |
+| Cell row placement and self-alignment | `rowAnatomyCellClasses` (sole resolver)                                      |
+| Gap between related stacked copy rows | `--ui-anatomy-row-gap` (`copy-scale.css`)                                    |
+| Leading thumbnail dimensions          | `--ui-anatomy-leading-size` + `.ui-anatomy-leading-media` (`copy-scale.css`) |
+| Columns, column gaps                  | Host (e.g. `entityAnatomyColumnsVariants`)                                   |
+| Padding / surface inset               | Host surface (e.g. `EntityCardFrame`)                                        |
+| Inner content layout                  | Cell children (flex rows inside a cell)                                      |
 
 The track variant emits **rows only** — never columns, horizontal gaps, padding, or inset.
 Hosts compose it with their own column template. Vertical rhythm between band, meta, and

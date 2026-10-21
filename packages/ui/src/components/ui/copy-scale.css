@@ -7,10 +7,12 @@
  * A density class on the same element overrides an inherited value.
  *
  * --ui-anatomy-row-gap: spacing between related stacked anatomy rows (title, supporting, status).
+ * --ui-anatomy-leading-size: row-anatomy leading thumbnail (40px compact/comfortable, 60px spacious).
  * Ladder: row-anatomy.md. Surfaces own region gaps; lists own item gaps.
  */
 @layer components {
   :root {
+    --ui-anatomy-leading-size: 2.5rem;
     --ui-anatomy-row-gap: calc(var(--spacing) * 1);
     --ui-copy-title-line-height: 1.375rem; /* 22px — comfortable title default */
     --ui-copy-classification-size: var(--text-sm);
@@ -41,6 +43,7 @@
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
     --entity-leading-content-gap: calc(var(--spacing) * 3);
     --ui-anatomy-row-gap: calc(var(--spacing) * 1);
+    --ui-anatomy-leading-size: 2.5rem;
   }
 
   .ui-card--compact,
@@ -59,6 +62,7 @@
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 2);
     --entity-leading-content-gap: calc(var(--spacing) * 2);
     --ui-anatomy-row-gap: calc(var(--spacing) * 0.5);
+    --ui-anatomy-leading-size: 2.5rem;
   }
 
   .ui-card--comfortable,
@@ -76,6 +80,7 @@
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
     --entity-leading-content-gap: calc(var(--spacing) * 3);
     --ui-anatomy-row-gap: calc(var(--spacing) * 1);
+    --ui-anatomy-leading-size: 2.5rem;
   }
 
   .ui-card--spacious,
@@ -94,6 +99,23 @@
     --ui-anatomy-trailing-gap: calc(var(--spacing) * 3);
     --entity-leading-content-gap: calc(var(--spacing) * 3);
     --ui-anatomy-row-gap: calc(var(--spacing) * 1.5);
+    --ui-anatomy-leading-size: 3.75rem;
+  }
+
+  .ui-anatomy-leading-media {
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+    width: var(--ui-anatomy-leading-size);
+    height: var(--ui-anatomy-leading-size);
+  }
+
+  .ui-anatomy-leading-media[data-shape='box'] {
+    border-radius: var(--radius-md);
+  }
+
+  .ui-anatomy-leading-media[data-shape='circle'] {
+    border-radius: 9999px;
   }
 
   /* Later than card.css so density modifiers beat the untoned `.ui-card` title vars. */

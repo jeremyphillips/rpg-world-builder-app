@@ -58,7 +58,7 @@ export function buildCharacterListRowPresentation(
     characterType: 'pc',
   })
 
-  const leadingMedia = projectEntitySurfaceIdentityToSummaryModel(identity, 'compact').media
+  const leadingMedia = projectEntitySurfaceIdentityToSummaryModel(identity).media
 
   const description = joinInlineMetadata([input.card.summary, input.controllerLine]) || undefined
 

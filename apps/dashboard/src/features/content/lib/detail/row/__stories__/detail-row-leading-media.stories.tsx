@@ -13,7 +13,7 @@ type Story = StoryObj
 
 export const OversizedImageInBoxFrame: Story = {
   render: () => (
-    <DetailRowLeadingMedia shape="box" size="xs">
+    <DetailRowLeadingMedia shape="box">
       <img
         alt="Oversized sample"
         src="https://picsum.photos/2400/2400"

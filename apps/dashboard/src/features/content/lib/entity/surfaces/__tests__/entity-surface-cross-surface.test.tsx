@@ -17,7 +17,7 @@ const WEAPON_SURFACE = {
 
 describe('entity surface cross-surface parity', () => {
   it('projects identical semantic identity for card and drawer shells', () => {
-    const projected = projectEntitySurfaceConfig(WEAPON_SURFACE, 'compact')
+    const projected = projectEntitySurfaceConfig(WEAPON_SURFACE)
 
     expect(projected.entity).toMatchObject({
       heading: 'Shortsword',
@@ -36,7 +36,7 @@ describe('entity surface cross-surface parity', () => {
     expect(screen.getByText('Melee')).toBeInTheDocument()
     const cardMedia = document.querySelector('[data-entity-item-slot="media"]')
     expect(cardMedia?.getAttribute('data-row-anatomy-slot')).toBe('stretch')
-    expect(cardMedia?.querySelector('.size-10')).toBeTruthy()
+    expect(cardMedia?.querySelector('[data-detail-row-leading-media]')).toBeTruthy()
     unmountCard()
 
     render(<DrawerEntityContext surface={WEAPON_SURFACE} />)
@@ -46,7 +46,7 @@ describe('entity surface cross-surface parity', () => {
     expect(screen.getByText('Melee')).toBeInTheDocument()
     const drawerMedia = document.querySelector('[data-entity-item-slot="media"]')
     expect(drawerMedia?.getAttribute('data-row-anatomy-slot')).toBe('stretch')
-    expect(drawerMedia?.querySelector('.size-10')).toBeTruthy()
+    expect(drawerMedia?.querySelector('[data-detail-row-leading-media]')).toBeTruthy()
   })
 
   it('keeps organization domain on classification for drawer and card', () => {

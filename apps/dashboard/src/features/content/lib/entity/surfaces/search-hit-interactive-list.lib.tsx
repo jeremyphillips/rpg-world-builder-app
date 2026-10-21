@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { DetailRowLeadingMedia } from '../../detail/row/detail-row-leading-media'
 import type { EntitySurfaceIdentity } from '../summary/entity-surface-identity.types'
 import { EntitySummaryStatusItemView } from '../summary/entity-summary-status'
 import { EntitySummarySupportingMetadata } from '../summary/entity-summary'
@@ -20,8 +21,11 @@ export type SearchHitInteractiveListPresentation = {
 export function projectSearchHitToInteractiveListPresentation(
   identity: EntitySurfaceIdentity,
 ): SearchHitInteractiveListPresentation {
-  const entity = projectEntitySurfaceIdentityToSummaryModel(identity, 'compact')
-  const startSlot = buildEntitySurfaceLeadingMediaNode(identity, 'compact')
+  const entity = projectEntitySurfaceIdentityToSummaryModel(identity)
+  const fillMedia = buildEntitySurfaceLeadingMediaNode(identity)
+  const startSlot = fillMedia ? (
+    <DetailRowLeadingMedia>{fillMedia}</DetailRowLeadingMedia>
+  ) : undefined
 
   const status =
     entity.status && entity.status.length > 0 ? (

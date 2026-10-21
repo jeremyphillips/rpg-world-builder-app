@@ -11,7 +11,7 @@ export type DrawerEntityContextProps = {
 
 /** Subject identity for drawer header bands — same projection as bordered entity cards. */
 export function DrawerEntityContext({ surface, trailing }: DrawerEntityContextProps) {
-  const projected = projectEntitySurfaceConfig(surface, 'compact')
+  const projected = projectEntitySurfaceConfig(surface)
   const resolvedTrailing = trailing ?? projected.trailing
 
   return <EntityAnatomy density="compact" entity={projected.entity} trailing={resolvedTrailing} />

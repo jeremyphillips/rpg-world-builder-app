@@ -77,6 +77,21 @@ function resolvedClassificationLineHeight(testId: string): string {
   return '20px'
 }
 
+/** Resolve --ui-anatomy-leading-size from rem on ancestors. */
+function resolvedAnatomyLeadingSize(testId: string): string {
+  const remPx: Record<string, string> = {
+    '2.5rem': '40px',
+    '3.75rem': '60px',
+  }
+  let node: Element | null = screen.getByTestId(testId)
+  while (node) {
+    const specified = getComputedStyle(node).getPropertyValue('--ui-anatomy-leading-size').trim()
+    if (remPx[specified]) return remPx[specified]
+    node = node.parentElement
+  }
+  return '40px'
+}
+
 /** Resolve --ui-anatomy-row-gap from calc(var(--spacing) * N) on ancestors. */
 function resolvedAnatomyRowGap(testId: string): string {
   let node: Element | null = screen.getByTestId(testId)
@@ -264,6 +279,29 @@ describe('canonical copy scale', () => {
     expect(resolvedAnatomyRowGap('comfortable-gap')).toBe('4px')
     expect(resolvedAnatomyRowGap('spacious-gap')).toBe('6px')
     expect(resolvedAnatomyRowGap('root-gap')).toBe('4px')
+  })
+
+  it('publishes anatomy leading size 40 / 40 / 60px by density', () => {
+    installTokens()
+    render(
+      <>
+        <div className="ui-card ui-card--compact">
+          <span data-testid="compact-leading">x</span>
+        </div>
+        <div className="ui-card ui-card--comfortable">
+          <span data-testid="comfortable-leading">x</span>
+        </div>
+        <div className="ui-card ui-card--spacious">
+          <span data-testid="spacious-leading">x</span>
+        </div>
+        <span data-testid="root-leading">x</span>
+      </>,
+    )
+
+    expect(resolvedAnatomyLeadingSize('compact-leading')).toBe('40px')
+    expect(resolvedAnatomyLeadingSize('comfortable-leading')).toBe('40px')
+    expect(resolvedAnatomyLeadingSize('spacious-leading')).toBe('60px')
+    expect(resolvedAnatomyLeadingSize('root-leading')).toBe('40px')
   })
 
   it('lets a nested density override anatomy row gap', () => {

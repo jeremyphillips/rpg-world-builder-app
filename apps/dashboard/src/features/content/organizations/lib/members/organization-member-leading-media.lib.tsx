@@ -1,7 +1,6 @@
 import type { ContentDisplayImage } from '@rpg/contracts'
 import { resolveContentDisplayFallback } from '@rpg/contracts'
 
-import { DetailRowLeadingMedia } from '../../../lib/detail/row/detail-row-leading-media'
 import { projectEntitySurfaceIdentityToSummaryModel } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 
 import {
@@ -30,14 +29,7 @@ export function buildOrganizationMemberLeadingMedia(
     characterType: row.characterType,
   })
 
-  const media = projectEntitySurfaceIdentityToSummaryModel(identity, 'compact').media
-  if (!media) return undefined
-
-  return (
-    <DetailRowLeadingMedia shape="box" size="xs">
-      {media}
-    </DetailRowLeadingMedia>
-  )
+  return projectEntitySurfaceIdentityToSummaryModel(identity).media
 }
 
 export type OrganizationMemberRowMediaInput = {

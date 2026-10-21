@@ -90,8 +90,9 @@ identity contract and one projector (`projectEntitySurfaceConfig` /
   semantic `fallback`) via domain builders such as `buildCharacterEntityCardModel`,
   `buildLocationEntityCardModel`, `buildOrganizationEntityCardModel`, and
   `buildEquipmentEntitySurfaceIdentity`. No JSX, no media nodes, no row chrome.
-  **Entity surface projection** paints the standard entity-row thumbnail
-  (`ENTITY_SURFACE_LEADING_THUMB_FRAME`, 40px / `sm`) and maps `metadata` segments onto
+  **Entity surface projection** paints fill-only thumbnail content (`anatomyFill`);
+  `EntityAnatomy` owns
+  final dimensions via `--ui-anatomy-leading-size`. Maps `metadata` segments onto
   `EntitySummaryModel.supportingMetadata` for anatomy to render.
 - Callers pass `EntitySurfaceConfig` (`identity`, optional `details`, optional
   `inlineAction`) into `CatalogEntitySurfaceRow`, `CatalogEntitySurfaceRow`,

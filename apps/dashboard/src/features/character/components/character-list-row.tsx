@@ -1,6 +1,6 @@
 import type { CharacterRosterStatus } from '@rpg/contracts'
 
-import { DetailRowLeadingMedia, EntityRowList } from '@/features/content'
+import { EntityRowList } from '@/features/content'
 
 import { buildCharacterListRowPresentation } from '../lib/display/character-list-row.lib'
 import type { CharacterListCardData } from './character-list-card.lib'
@@ -26,16 +26,5 @@ export function CharacterListRow({
     rosterStatus,
   })
 
-  return (
-    <EntityRowList.Row
-      {...row}
-      leadingMedia={
-        row.leadingMedia ? (
-          <DetailRowLeadingMedia shape="box" size="xs">
-            {row.leadingMedia}
-          </DetailRowLeadingMedia>
-        ) : undefined
-      }
-    />
-  )
+  return <EntityRowList.Row {...row} leadingMedia={row.leadingMedia} />
 }

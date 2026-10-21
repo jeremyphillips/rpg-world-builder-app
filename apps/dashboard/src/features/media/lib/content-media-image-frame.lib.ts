@@ -14,7 +14,13 @@ export type ContentMediaImageRenderMode = 'crop' | 'cover' | 'contain'
 export function resolveFrameAspectRatio(frame: ContentMediaImageFrame): number | undefined {
   if (frame === 'primary' || frame === 'builderSheetHero') return 4 / 3
   if (frame === 'builderCard') return 4 / 2
-  if (frame === 'square' || frame === 'insetSm' || frame === 'emblem' || frame === 'emblemHero') {
+  if (
+    frame === 'square' ||
+    frame === 'insetSm' ||
+    frame === 'anatomyFill' ||
+    frame === 'emblem' ||
+    frame === 'emblemHero'
+  ) {
     return 1
   }
   return undefined
@@ -22,7 +28,9 @@ export function resolveFrameAspectRatio(frame: ContentMediaImageFrame): number |
 
 /** Roles whose saved crop may be applied on this frame. Empty means cover-only (no role crop). */
 export function resolveFrameAcceptedCropRoles(frame: ContentMediaImageFrame): readonly MediaRole[] {
-  if (frame === 'square' || frame === 'insetSm') return ['portrait', 'primary']
+  if (frame === 'square' || frame === 'insetSm' || frame === 'anatomyFill') {
+    return ['portrait', 'primary']
+  }
   if (frame === 'primary' || frame === 'builderSheetHero' || frame === 'builderCard') {
     return ['primary']
   }

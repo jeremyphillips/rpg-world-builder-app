@@ -29,8 +29,7 @@ function projectPickerIdentity(
   identity: ReturnType<typeof buildLocationEntityCardModel>,
   options: EntitySummaryAdapterOptions,
 ): EntitySummaryModel {
-  const density = options.density ?? 'compact'
-  const model = projectEntitySurfaceIdentityToSummaryModel(identity, density)
+  const model = projectEntitySurfaceIdentityToSummaryModel(identity)
 
   if (options.description !== undefined) {
     return { ...model, description: options.description }
@@ -66,8 +65,7 @@ export function buildCharacterPickerEntitySummary(
   const vm = buildConnectedPartyCharacterEntitySummary(character)
   const identity = buildCharacterEntityCardModel(vm, { includeCharacterTypeInMetadata: true })
 
-  const density = options.density ?? 'compact'
-  const model = projectEntitySurfaceIdentityToSummaryModel(identity, density)
+  const model = projectEntitySurfaceIdentityToSummaryModel(identity)
 
   if (options.description !== undefined) {
     return { ...model, description: options.description }

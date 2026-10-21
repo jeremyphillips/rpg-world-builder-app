@@ -16,6 +16,7 @@ import {
 import type { EntitySummaryModel } from '../summary/entity-summary.types'
 import { entitySummaryStatusLaneVariants } from '../summary/entity-summary.variants'
 import { PickerSelectionStateLine } from '../summary/picker-selection-state-line'
+import { wrapEntityAnatomyLeadingMedia } from './entity-leading-media-shell.lib'
 import {
   entityAnatomyHostRootVariants,
   entityAnatomyMediaContentSpanClasses,
@@ -98,7 +99,9 @@ export function EntityAnatomy({
           cell={{ slot: 'stretch', column: 'media' }}
           data-entity-item-slot="media"
         >
-          <div className={entityAnatomyMediaContentSpanClasses}>{entity.media}</div>
+          <div className={entityAnatomyMediaContentSpanClasses}>
+            {wrapEntityAnatomyLeadingMedia(entity.media)}
+          </div>
         </RowAnatomyCell>
       ) : null}
       <RowAnatomyCell<EntityAnatomyColumn>

@@ -82,11 +82,14 @@ DetailEntityRow
 `ContentDisplayImage` into list rows — use `buildEntitySurfaceLeadingMediaNode` or
 `DetailRowLeadingMedia` in feature projection code first.
 
-**Geometry rule:** any `leadingMedia` node must be **self-bounded** via
-[`DetailRowLeadingMedia`](row/detail-row-leading-media.tsx) (`shape` + `size`, default
-`box` + `xs`). The shell composes `IdentityFrame` tokens — not `contentCardMediaVariants`.
-Children fill the frame (`size-full`); intrinsic image dimensions must never size the row.
-User avatars: [`DetailRowLeadingAvatar`](row/detail-row-leading-avatar.tsx).
+**Geometry rule:** pass **fill-only** projected media (`anatomyFill` via
+`projectEntitySurfaceIdentityToSummaryModel`) or a pre-wrapped
+[`DetailRowLeadingMedia`](row/detail-row-leading-media.tsx) / avatar shell.
+[`EntityAnatomy`](../../entity/anatomy/entity-anatomy.tsx) applies the density-owned
+`.ui-anatomy-leading-media` shell (`--ui-anatomy-leading-size`: 40px compact/comfortable,
+60px spacious) when the node is not already shell-owned. Search `startSlot` rows wrap with
+`DetailRowLeadingMedia` directly. Fixed `size` on `DetailRowLeadingMedia` is for non-anatomy
+exceptions only. User avatars: [`DetailRowLeadingAvatar`](row/detail-row-leading-avatar.tsx).
 
 Companion primitives (composed by features, not imported by `DetailEntityRow` itself):
 

@@ -24,7 +24,7 @@ Entity-rich pickers (combobox, menus) stay on `InteractiveList` + `InteractiveLi
 - `appearance?: 'panel' | 'embedded' | 'filled'` (default `panel`)
 - `tone?: 'strong'` — strong rest plane when `appearance="filled"` (defaults to `strong` when omitted); ignored for panel and embedded; does not apply shadow
 - `elevation?: 'flat' | 'subtle' | 'raised'` — depth when `appearance="filled"` (default `flat`; campaign shells use `subtle`). Same tokens as `Card` elevation.
-- `density?: 'compact' | 'comfortable' | 'spacious'` (default `comfortable`) — item padding and the shared copy-scale contract (`copy-scale.css`: title, classification, supporting sizes, `--ui-anatomy-row-gap`, leading/trailing gaps)
+- `density?: 'compact' | 'comfortable' | 'spacious'` (default `comfortable`) — item padding and the shared copy-scale contract (`copy-scale.css`: title, classification, supporting sizes, `--ui-anatomy-row-gap`, `--ui-anatomy-leading-size`, leading/trailing gaps)
 
 Rich `content` inherits those CSS variables from the list. Do not pass a second density on embedded `EntityAnatomyHost` when the list already publishes the step you need (campaign collections use spacious from `CampaignDestinationSection`). Explicit `density` on nested anatomy or `IdentityRow` overrides the ancestor — use only when intentional.
 

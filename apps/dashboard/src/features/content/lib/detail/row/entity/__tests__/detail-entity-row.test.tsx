@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
-import { DetailRowLeadingMedia } from '../../detail-row-leading-media'
 import { DetailEntityRow } from '../detail-entity-row'
 import { DetailCollectionRowList } from '../../../collection/row-list/detail-collection-row-list'
 
@@ -84,9 +83,7 @@ describe('DetailEntityRow', () => {
           heading="Verna"
           headingHref="/characters/verna"
           leadingMedia={
-            <DetailRowLeadingMedia shape="box" size="xs">
-              <img alt="Portrait" src="/portrait.png" />
-            </DetailRowLeadingMedia>
+            <img alt="Portrait" src="/portrait.png" className="block size-full object-cover" />
           }
         />
       </MemoryRouter>,

@@ -133,7 +133,7 @@ function buildEntity(depth: DepthCase, withMedia: boolean, label: string): Entit
     description: depth === 'heading' ? undefined : 'Located in Grey Coast',
     status: depth === 'status' ? [{ kind: 'badge', label: 'Member', tone: 'success' }] : undefined,
     media: withMedia ? (
-      <DetailRowLeadingMedia size="xs">
+      <DetailRowLeadingMedia>
         <span aria-hidden>HD</span>
       </DetailRowLeadingMedia>
     ) : undefined,
@@ -337,7 +337,7 @@ export const CatalogRowRadioLeading: Story = {
               classification: 'Guild',
               description: 'Located in Grey Coast',
               media: (
-                <DetailRowLeadingMedia size="xs">
+                <DetailRowLeadingMedia>
                   <span aria-hidden>SC</span>
                 </DetailRowLeadingMedia>
               ),

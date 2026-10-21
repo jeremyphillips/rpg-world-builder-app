@@ -319,7 +319,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
           description: 'Merchants of the Grey Coast',
           status: [{ kind: 'badge', label: 'Member', tone: 'success' }],
           media: (
-            <DetailRowLeadingMedia size="sm">
+            <DetailRowLeadingMedia>
               <span aria-hidden>SC</span>
             </DetailRowLeadingMedia>
           ),
