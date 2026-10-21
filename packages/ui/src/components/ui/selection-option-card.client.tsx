@@ -20,7 +20,7 @@ import {
   optionCardEmbeddedSlotClassName,
   UI_SELECTION_OPTION_CARD_BODY_CLASS,
   type OptionCardEmbeddedSlotTone,
-} from './selection-option-card.variants'
+} from './selection-option-card.lib'
 
 export type { SelectionOptionCardDensity } from './selection-option-card-anatomy.client'
 

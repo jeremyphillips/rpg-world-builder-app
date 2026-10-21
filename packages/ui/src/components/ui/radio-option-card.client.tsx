@@ -38,7 +38,7 @@ import {
 import {
   optionCardEmbeddedSlotClassName,
   type OptionCardEmbeddedSlotTone,
-} from './selection-option-card.variants'
+} from './selection-option-card.lib'
 
 export type RadioOptionCardEmbeddedSlotTone = OptionCardEmbeddedSlotTone
 

@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils'
 import {
   UI_OPTION_CARD_EMBEDDED_PANEL_CLASS_NAME,
   UI_OPTION_CARD_EMBEDDED_PANEL_HEADER_CLASS,
-} from './selection-option-card.variants'
+} from './selection-option-card.lib'
 
 const OPTION_CARD_SUPPORTING_CLASS = 'ui-copy-supporting text-muted-foreground'
 

@@ -11,7 +11,7 @@ import {
   selectionOptionCardAnatomyClassName,
   UI_OPTION_CARD_BODY_CLASS,
   UI_OPTION_CARD_PRIMARY_CLASS,
-} from './selection-option-card.variants'
+} from './selection-option-card.lib'
 
 export type SelectionOptionCardCopyWidth = 'fill' | 'content'
 

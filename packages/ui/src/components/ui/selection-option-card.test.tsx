@@ -20,7 +20,7 @@ import {
   UI_OPTION_CARD_EMBEDDED_IN_FLOW_CLASS,
   UI_OPTION_CARD_EMBEDDED_PANEL_CLASS,
   UI_OPTION_CARD_PRIMARY_CLASS,
-} from './selection-option-card.variants'
+} from './selection-option-card.lib'
 
 const uiDir = dirname(fileURLToPath(import.meta.url))
 

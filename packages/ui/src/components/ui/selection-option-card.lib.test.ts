@@ -12,7 +12,7 @@ import {
   UI_OPTION_CARD_EMBEDDED_PANEL_CLASS,
   UI_OPTION_CARD_PRIMARY_CLASS,
   UI_SELECTION_OPTION_CARD_ANATOMY_CLASS,
-} from './selection-option-card.variants'
+} from './selection-option-card.lib'
 import { radioCardVariants } from './radio-card.variants'
 
 const radioCardCss = readFileSync(
