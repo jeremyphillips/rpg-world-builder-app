@@ -359,6 +359,7 @@ export {
   type GenericCardDensity,
 } from './components/ui/card.variants'
 export { resolveSurfaceActionButtonSize } from './components/ui/surface-action-button-size.lib'
+export { resolveEntityRowInlineBadgeSize } from './components/ui/entity-row-inline-badge-size.lib'
 export { resolveHeadingAccessoryBadgeSize } from './components/ui/heading-accessory-size.lib'
 export {
   SelectionTarget,

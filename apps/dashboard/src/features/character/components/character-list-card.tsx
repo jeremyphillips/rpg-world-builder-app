@@ -11,7 +11,7 @@ import {
   IdentityRowSupporting,
   identityRowStackVariants,
   resolveSurfaceActionButtonSize,
-  resolveHeadingAccessoryBadgeSize,
+  resolveEntityRowInlineBadgeSize,
   type GenericCardDensity,
 } from '@rpg/ui'
 
@@ -44,7 +44,7 @@ function CharacterListCardHeader({
   rosterPresentation,
   density,
 }: CharacterListCardHeaderProps) {
-  const headingAccessoryBadgeSize = resolveHeadingAccessoryBadgeSize(density)
+  const headingAccessoryBadgeSize = resolveEntityRowInlineBadgeSize(density)
   const campaignLine =
     showCampaign && card.campaign ? (
       <CampaignDisplayName

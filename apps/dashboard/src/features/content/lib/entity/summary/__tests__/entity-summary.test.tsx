@@ -151,7 +151,7 @@ describe('EntitySummaryStatus', () => {
     expect(screen.getByText('Spellcasting focus')).toHaveClass('ui-compact-label--sm')
   })
 
-  it('renders comfortable status badges at md density', () => {
+  it('renders comfortable status badges at sm density', () => {
     render(
       <EntitySummaryStatus
         density="comfortable"
@@ -159,7 +159,7 @@ describe('EntitySummaryStatus', () => {
       />,
     )
 
-    expect(screen.getByText('Equipped')).toHaveClass('ui-compact-label--md')
+    expect(screen.getByText('Equipped')).toHaveClass('ui-compact-label--sm')
   })
 
   it('defaults to the wrapped cluster without separators', () => {

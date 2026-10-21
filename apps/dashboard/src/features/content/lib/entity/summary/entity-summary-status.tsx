@@ -4,20 +4,16 @@ import { AlertCircle } from 'lucide-react'
 import {
   Badge,
   InlineInactiveStatus,
+  resolveEntityRowInlineBadgeSize,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-  type BadgeSize,
   type ContentCardDensity,
 } from '@rpg/ui'
 
 import type { EntitySummaryStatusItem } from './entity-summary-status.types'
 import { entitySummaryStatusVariants } from './entity-summary.variants'
-
-function resolveStatusBadgeSize(density?: ContentCardDensity): BadgeSize {
-  return density === 'compact' ? 'sm' : 'md'
-}
 
 function resolveStatusLeadingIcon(icon: 'check' | 'warning' | undefined) {
   if (icon === 'check') return <Check aria-hidden />
@@ -41,7 +37,7 @@ export function EntitySummaryStatusItemView({
         <Badge
           appearance={item.appearance}
           tone={item.tone}
-          size={resolveStatusBadgeSize(density)}
+          size={resolveEntityRowInlineBadgeSize(density)}
           leadingIcon={resolveStatusLeadingIcon(item.leadingIcon)}
           title={item.tooltip ? undefined : item.title}
         >

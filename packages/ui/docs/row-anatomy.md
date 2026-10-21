@@ -170,11 +170,11 @@ Density for identity copy is published on ancestors (`.ui-card--*`, `ui-destinat
 | comfortable             |    16 / 22 | 600          | `sm`                                                          |
 | spacious                |    19 / 26 | 600          | `md`                                                          |
 
-This table is **not** the entity **status-lane** badge rule (compact → `sm`, else `md` on `EntitySummary.status`) — see [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
+The same ladder applies to entity **status-lane** badges on `EntitySummary.status` — see [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
 
 Do not add contextual Badge CSS or wrapper components that override an explicit `size` prop.
 
 `IdentityRowHeadingLine` uses `items-center` on the outer flex row (title cluster vs `headingEnd`) and
 `items-baseline` inside the cluster for title + classification via `InlineMetadata`.
 
-Use `resolveHeadingAccessoryBadgeSize` from `@rpg/ui` at call sites. Card **footer** and Alert **actions** labeled-control sizing: [ui-architecture.md](./ui-architecture.md#card-footer-labeled-actions) (`resolveSurfaceActionButtonSize`).
+Use `resolveEntityRowInlineBadgeSize` from `@rpg/ui` at call sites (title accessories and status items). `resolveHeadingAccessoryBadgeSize` is a deprecated alias. Card **footer** and Alert **actions** labeled-control sizing: [ui-architecture.md](./ui-architecture.md#card-footer-labeled-actions) (`resolveSurfaceActionButtonSize`).
