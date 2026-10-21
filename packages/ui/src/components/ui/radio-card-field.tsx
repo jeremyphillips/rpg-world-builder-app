@@ -57,7 +57,7 @@ function GroupedRadioCardOptions({
   defaultValue,
   onValueChange,
   onBlur,
-  tone = 'strong',
+  tone = 'subtle',
 }: GroupedRadioCardOptionsProps) {
   return (
     <RadioGroup
@@ -132,7 +132,7 @@ export function RadioCardField({
   onBlur,
   labelVisibility,
   chrome,
-  tone = 'strong',
+  tone = 'subtle',
 }: RadioCardFieldProps) {
   return (
     <RadioFieldShell

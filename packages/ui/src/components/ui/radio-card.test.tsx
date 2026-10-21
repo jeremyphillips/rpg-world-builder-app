@@ -37,7 +37,7 @@ describe('RadioCard', () => {
     expect(shell).not.toHaveClass('ui-card--strong')
   })
 
-  it('uses strong tone chrome and title-line control alignment by default', () => {
+  it('uses subtle tone chrome and title-line control alignment by default', () => {
     render(
       <RadioCard
         aria-label="Edition preset"
@@ -47,8 +47,8 @@ describe('RadioCard', () => {
 
     const radio = screen.getByRole('radio', { name: /Modern 5e/i })
     const shell = radio.closest('.ui-card')
-    expect(shell).toHaveClass('ui-card--strong', 'ui-card--interactive')
-    expect(shell).not.toHaveClass('ui-card--selected')
+    expect(shell).toHaveClass('ui-card--subtle', 'ui-card--interactive')
+    expect(shell).not.toHaveClass('ui-card--selected', 'ui-card--strong')
 
     const titleLineAlign = radio.closest('.flex.shrink-0.items-center.self-start')
     expect(titleLineAlign).toHaveClass('h-6')
@@ -231,7 +231,7 @@ describe('RadioCard', () => {
     )
 
     const shell = screen.getByRole('radio', { name: /Elf/i }).closest('.ui-card--selected')
-    expect(shell).toHaveClass('ui-card--strong')
+    expect(shell).toHaveClass('ui-card--subtle')
     expect(shell).toHaveTextContent('Lineage picker')
   })
 
@@ -252,7 +252,7 @@ describe('RadioCard', () => {
 
     expect(screen.getByText('Requires strength 13')).toBeInTheDocument()
     const shell = screen.getByRole('radio', { name: /Dwarf/i }).closest('.ui-card')
-    expect(shell).toHaveClass('ui-card--strong')
+    expect(shell).toHaveClass('ui-card--subtle')
   })
 
   it('renders embedded content inside the selected card shell', () => {

@@ -76,7 +76,7 @@ export interface RadioCardProps extends React.ComponentPropsWithoutRef<typeof Ra
   visualControl?: RadioCardVisualControl
   columns?: RadioCardColumns
   copyWidth?: SelectionOptionCardCopyWidth
-  /** Card chrome ladder; defaults to strong. Pass quiet in drawer hosts. */
+  /** Card chrome ladder; defaults to subtle. */
   tone?: CardSurfaceTone
 }
 
@@ -89,7 +89,7 @@ function RadioCard({
   visualControl = 'radio',
   columns = 'one',
   copyWidth = 'fill',
-  tone = 'strong',
+  tone = 'subtle',
   value,
   onValueChange,
   ...props

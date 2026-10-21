@@ -73,7 +73,7 @@ export type RadioOptionCardProps = {
   onDetails?: () => void
   onClick?: React.MouseEventHandler<HTMLButtonElement>
   className?: string
-  /** Card chrome ladder; defaults to strong for standalone choice cards. */
+  /** Card chrome ladder; defaults to subtle for standalone choice cards. */
   tone?: CardSurfaceTone
 }
 
@@ -390,7 +390,7 @@ export const RadioOptionCard = React.forwardRef<HTMLDivElement, RadioOptionCardP
       value,
       id,
       media,
-      tone = 'strong',
+      tone = 'subtle',
     } = props
     const selected = useRadioGroupItemSelected(value)
     const detailsBodyId = details && id ? `${id}-details` : undefined
