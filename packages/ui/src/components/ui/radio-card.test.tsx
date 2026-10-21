@@ -492,7 +492,7 @@ describe('RadioCard', () => {
     )
 
     const title = screen.getByText('Dwarf')
-    const titleRow = title.closest('.flex.min-w-0.items-center.justify-between')
+    const titleRow = title.closest('.ui-option-card__title-line')
     const detailsButton = screen.getByRole('button', { name: 'View Dwarf details' })
 
     expect(titleRow).toContainElement(title)

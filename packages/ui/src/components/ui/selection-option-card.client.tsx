@@ -18,10 +18,7 @@ import {
 } from './card.variants'
 import {
   optionCardEmbeddedSlotClassName,
-  selectionOptionCardBodyClassName,
-  selectionOptionCardHeaderActionClasses,
-  selectionOptionCardHeaderActionSlotVariants,
-  selectionOptionCardHeaderRowVariants,
+  UI_SELECTION_OPTION_CARD_BODY_CLASS,
   type OptionCardEmbeddedSlotTone,
 } from './selection-option-card.variants'
 
@@ -86,10 +83,10 @@ function SelectionOptionCardHeaderRow({
   }
 
   return (
-    <div className={selectionOptionCardHeaderRowVariants()}>
+    <div className="ui-selection-option-card__header-row">
       {startSlot ? <div className="min-w-0">{startSlot}</div> : null}
       {headerEndSlot ? (
-        <div className={selectionOptionCardHeaderActionSlotVariants()}>{headerEndSlot}</div>
+        <div className="ui-selection-option-card__header-action-slot">{headerEndSlot}</div>
       ) : null}
     </div>
   )
@@ -118,10 +115,7 @@ export function SelectionOptionCardHeaderAction({
       variant="text"
       size={buttonSize}
       density="compact"
-      className={cn(
-        selectionOptionCardHeaderActionClasses,
-        density === 'compact' && 'text-control-action-xs',
-      )}
+      className={cn('shrink-0', density === 'compact' && 'text-control-action-xs')}
       aria-label={ariaLabel}
       onClick={onClick}
     >
@@ -175,7 +169,7 @@ export function SelectionOptionCard({
       )}
       aria-disabled={disabled || undefined}
     >
-      <div className={selectionOptionCardBodyClassName}>
+      <div className={UI_SELECTION_OPTION_CARD_BODY_CLASS}>
         <SelectionOptionCardAnatomy
           density={density}
           headerRow={headerRow}

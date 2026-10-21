@@ -17,7 +17,6 @@ import {
   SelectionOptionCardEmbeddedPanelHeader,
 } from './selection-option-card-embedded-panel.client'
 import {
-  selectionOptionCardHeaderActionClasses,
   UI_OPTION_CARD_EMBEDDED_IN_FLOW_CLASS,
   UI_OPTION_CARD_EMBEDDED_PANEL_CLASS,
   UI_OPTION_CARD_PRIMARY_CLASS,
@@ -144,7 +143,7 @@ describe('SelectionOptionCard', () => {
     )
 
     const action = screen.getByRole('button', { name: 'Change package' })
-    expect(action.className).toContain(selectionOptionCardHeaderActionClasses)
+    expect(action.className).toContain('shrink-0')
     expect(action.className).toContain('ui-button__text--sm-compact')
     expect(action.className).toContain('text-action-standalone')
     expect(action.className).not.toContain('text-control-action-xs')

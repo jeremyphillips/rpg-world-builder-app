@@ -6,12 +6,12 @@ import { describe, expect, it } from 'vitest'
 
 import { cardSurfaceVariants } from './card.variants'
 import {
-  optionCardBodyVariants,
   optionCardEmbeddedSlotClassName,
-  optionCardSecondaryCopyStackVariants,
-  optionCardSummaryBadgeRowVariants,
+  UI_OPTION_CARD_BODY_CLASS,
   UI_OPTION_CARD_EMBEDDED_IN_FLOW_CLASS,
   UI_OPTION_CARD_EMBEDDED_PANEL_CLASS,
+  UI_OPTION_CARD_PRIMARY_CLASS,
+  UI_SELECTION_OPTION_CARD_ANATOMY_CLASS,
 } from './selection-option-card.variants'
 import { radioCardVariants } from './radio-card.variants'
 
@@ -75,22 +75,24 @@ describe('optionCard surface establishment', () => {
     )
   })
 
-  it('keeps compact header-to-title spacing off the anatomy row gap', () => {
-    expect(optionCardBodyVariants({ density: 'compact' })).toContain('gap-0')
-    expect(optionCardBodyVariants({ density: 'comfortable' })).toContain('gap-0.5')
+  it('keeps region spacing in ui-radio-card.css instead of variant CVAs', () => {
+    expect(radioCardCss).toContain(`.${UI_OPTION_CARD_BODY_CLASS}`)
+    expect(radioCardCss).toContain('--ui-option-card-body-gap')
+    expect(radioCardCss).toContain(`.${UI_OPTION_CARD_PRIMARY_CLASS}`)
+    expect(radioCardCss).toContain('gap: var(--ui-anatomy-row-gap)')
+    expect(radioCardCss).toContain(`.${UI_SELECTION_OPTION_CARD_ANATOMY_CLASS}`)
+    expect(radioCardCss).toContain('.ui-option-card__summary-badge-row')
+    expect(radioCardCss).toContain('min-height: 22px')
+    expect(radioCardCss).toContain('.ui-option-card__secondary--content')
   })
 
-  it('shrink-wraps secondary copy when copyWidth is content', () => {
-    expect(optionCardSecondaryCopyStackVariants({ copyWidth: 'content' })).toContain('w-fit')
-    expect(optionCardSecondaryCopyStackVariants({ copyWidth: 'content' })).not.toContain('text-xs')
-  })
-
-  it('reserves badge sm height for optional summary badge rows', () => {
-    expect(optionCardSummaryBadgeRowVariants()).toContain('min-h-[22px]')
-  })
-
-  it('keeps the content column flexible in the card body stack', () => {
-    expect(optionCardBodyVariants()).toContain('flex-1')
-    expect(optionCardBodyVariants()).toContain('min-w-0')
+  it('owns radio card body and footer spacing in css', () => {
+    expect(radioCardCss).toMatch(
+      /\.ui-radio-card--comfortable:not\(\.ui-radio-card--row\) \.ui-radio-card__body[\s\S]*gap: calc\(var\(--spacing\) \* 2\)/,
+    )
+    expect(radioCardCss).toMatch(
+      /\.ui-radio-card--compact:not\(\.ui-radio-card--row\) \.ui-radio-card__body[\s\S]*gap: calc\(var\(--spacing\) \* 1\)/,
+    )
+    expect(radioCardCss).toContain('.ui-radio-card__footer')
   })
 })

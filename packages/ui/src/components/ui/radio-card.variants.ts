@@ -7,8 +7,6 @@ import {
   radioCardDecorativeControlClasses,
   resolveRadioCardIndicatorSize,
 } from './choice-control.variants'
-import { optionCardDensityContentGapVariants } from './selection-option-card.variants'
-
 const radioCardRowBase = cn(
   'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground',
   interactiveRowVariants({
@@ -45,16 +43,6 @@ export const radioCardVariants = cva('', {
     },
   },
   compoundVariants: [
-    {
-      variant: 'card',
-      density: 'comfortable',
-      class: optionCardDensityContentGapVariants({ density: 'comfortable' }),
-    },
-    {
-      variant: 'card',
-      density: 'compact',
-      class: optionCardDensityContentGapVariants({ density: 'compact' }),
-    },
     { variant: 'row', density: 'comfortable', class: 'gap-1 px-0 py-2' },
     { variant: 'row', density: 'compact', class: 'gap-0.5 px-0 py-2' },
   ],

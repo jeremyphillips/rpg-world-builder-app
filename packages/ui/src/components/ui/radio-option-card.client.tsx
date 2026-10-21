@@ -36,9 +36,7 @@ import {
   SelectionTargetRaised,
 } from './selection-target.client'
 import {
-  optionCardDensityContentGapVariants,
   optionCardEmbeddedSlotClassName,
-  optionCardFooterSlotVariants,
   type OptionCardEmbeddedSlotTone,
 } from './selection-option-card.variants'
 
@@ -229,15 +227,11 @@ type RadioOptionCardInteriorProps = Pick<
 }
 
 function RadioOptionCardBodyExtras({
-  density,
   embeddedTone,
   selected,
   embedded,
   footer,
-}: Pick<
-  RadioOptionCardInteriorProps,
-  'density' | 'embeddedTone' | 'selected' | 'embedded' | 'footer'
->) {
+}: Pick<RadioOptionCardInteriorProps, 'embeddedTone' | 'selected' | 'embedded' | 'footer'>) {
   return (
     <>
       {selected && embedded ? (
@@ -247,11 +241,7 @@ function RadioOptionCardBodyExtras({
           {embedded}
         </div>
       ) : null}
-      {footer ? (
-        <div className={cn('ui-radio-card__footer', optionCardFooterSlotVariants({ density }))}>
-          {footer}
-        </div>
-      ) : null}
+      {footer ? <div className="ui-radio-card__footer">{footer}</div> : null}
     </>
   )
 }
@@ -358,16 +348,9 @@ function RadioOptionCardInterior(props: RadioOptionCardInteriorProps) {
       {showCardMedia ? (
         <div className={cn('ui-radio-card__media', radioCardMediaSlotClasses)}>{media}</div>
       ) : null}
-      <div
-        className={cn(
-          'ui-radio-card__body',
-          optionCardDensityContentGapVariants({ density }),
-          showCardMedia && 'flex min-h-0 flex-1 flex-col',
-        )}
-      >
+      <div className={cn('ui-radio-card__body', showCardMedia && 'flex min-h-0 flex-1 flex-col')}>
         <RadioOptionCardPrimaryRow {...props} />
         <RadioOptionCardBodyExtras
-          density={density}
           embeddedTone={embeddedTone}
           selected={selected}
           embedded={embedded}

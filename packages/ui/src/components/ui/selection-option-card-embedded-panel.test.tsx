@@ -45,7 +45,7 @@ describe('SelectionOptionCardEmbeddedPanel', () => {
       </SelectionOptionCardEmbeddedPanel>,
     )
 
-    expect(container.firstElementChild).toHaveClass('p-3', 'ui-option-card-embedded-panel')
+    expect(container.firstElementChild).toHaveClass('ui-option-card-embedded-panel')
     expect(screen.getByRole('heading', { name: 'Customize Heavy Armor' })).toHaveClass(
       'ui-copy-title',
     )

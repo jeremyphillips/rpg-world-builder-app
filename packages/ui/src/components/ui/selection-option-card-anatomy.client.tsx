@@ -8,18 +8,8 @@ import type { EyebrowVariantProps } from './eyebrow.variants'
 import { identityInsetRowVariants } from './identity-frame.variants'
 import { textVariants } from './text.variants'
 import {
-  optionCardBodyVariants,
-  optionCardDescriptionClampVariants,
-  optionCardSummaryLinesVariants,
-  optionCardSupportingClassName,
-  optionCardTitleClampVariants,
-  optionCardTitleClassName,
-  optionCardTitleRowVariants,
-  selectionOptionCardAnatomyBodyVariants,
-  optionCardSecondaryCopyStackVariants,
-  optionCardSummaryBadgeRowVariants,
-  optionCardTitleLineVariants,
-  selectionOptionCardAnatomyRootVariants,
+  selectionOptionCardAnatomyClassName,
+  UI_OPTION_CARD_BODY_CLASS,
   UI_OPTION_CARD_PRIMARY_CLASS,
 } from './selection-option-card.variants'
 
@@ -28,6 +18,8 @@ export type SelectionOptionCardCopyWidth = 'fill' | 'content'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type SelectionOptionCardDensity = 'comfortable' | 'compact'
+
+const OPTION_CARD_SUPPORTING_CLASS = 'ui-copy-supporting text-muted-foreground'
 
 /** Default card eyebrow is `sm`; compact density steps down one size. */
 export function resolveSelectionOptionCardEyebrowSize(
@@ -84,9 +76,9 @@ export type SelectionOptionCardAnatomyProps = {
 
 function SelectionOptionCardSummaryLines({ summaryLines }: { summaryLines: string[] }) {
   return (
-    <div className={optionCardSummaryLinesVariants()}>
+    <div className="ui-option-card__summary-lines">
       {summaryLines.map((line) => (
-        <span key={line} className={optionCardSupportingClassName}>
+        <span key={line} className={OPTION_CARD_SUPPORTING_CLASS}>
           {line}
         </span>
       ))}
@@ -112,14 +104,14 @@ function SelectionOptionCardSecondaryContent({
       {description ? (
         <span
           className={cn(
-            optionCardSupportingClassName,
-            clampDescription && optionCardDescriptionClampVariants(),
+            OPTION_CARD_SUPPORTING_CLASS,
+            clampDescription && 'line-clamp-2 min-h-[2lh]',
           )}
         >
           {description}
         </span>
       ) : null}
-      {summaryText ? <span className={optionCardSupportingClassName}>{summaryText}</span> : null}
+      {summaryText ? <span className={OPTION_CARD_SUPPORTING_CLASS}>{summaryText}</span> : null}
       {summaryContent}
       {summaryLines && summaryLines.length > 0 ? (
         <SelectionOptionCardSummaryLines summaryLines={summaryLines} />
@@ -144,13 +136,9 @@ function SelectionOptionCardTitleRow({
   const TitleElement = useSummaryTitle ? 'h3' : 'span'
 
   return (
-    <div className={optionCardTitleRowVariants()}>
+    <div className="ui-option-card__title-row">
       <TitleElement
-        className={cn(
-          optionCardTitleClassName,
-          clampDescription && optionCardTitleClampVariants(),
-          titleClassName,
-        )}
+        className={cn('ui-copy-title', clampDescription && 'line-clamp-1', titleClassName)}
       >
         {label}
       </TitleElement>
@@ -188,14 +176,19 @@ function SelectionOptionCardPrimaryCopy({
     <div className={cn('flex min-w-0 w-full flex-col', showSummaryBadgeRow && 'min-h-0 flex-1')}>
       <div className={cn(UI_OPTION_CARD_PRIMARY_CLASS, showSummaryBadgeRow && 'min-h-0 flex-1')}>
         {titleEndSlot ? (
-          <div className={optionCardTitleLineVariants()}>
+          <div className="ui-option-card__title-line">
             <div className="min-w-0 shrink">{titleRow}</div>
             <div className="shrink-0">{titleEndSlot}</div>
           </div>
         ) : (
           titleRow
         )}
-        <div className={optionCardSecondaryCopyStackVariants({ copyWidth })}>
+        <div
+          className={cn(
+            'ui-option-card__secondary',
+            copyWidth === 'content' && 'ui-option-card__secondary--content',
+          )}
+        >
           <SelectionOptionCardSecondaryContent
             description={description}
             summaryText={summaryText}
@@ -206,7 +199,7 @@ function SelectionOptionCardPrimaryCopy({
         </div>
       </div>
       {showSummaryBadgeRow ? (
-        <div className={optionCardSummaryBadgeRowVariants()}>{summaryBadge}</div>
+        <div className="ui-option-card__summary-badge-row">{summaryBadge}</div>
       ) : null}
     </div>
   )
@@ -262,13 +255,7 @@ export function SelectionOptionCardAnatomy({
   )
 
   const body = (
-    <div
-      className={
-        useSummaryTitle
-          ? selectionOptionCardAnatomyBodyVariants()
-          : optionCardBodyVariants({ density })
-      }
-    >
+    <div className={UI_OPTION_CARD_BODY_CLASS}>
       {headerRow}
       {leadingMedia ? (
         <div className={identityInsetRowVariants({ density, align: 'start' })}>
@@ -288,12 +275,7 @@ export function SelectionOptionCardAnatomy({
   }
 
   return (
-    <div
-      className={selectionOptionCardAnatomyRootVariants({
-        controlPosition,
-        density,
-      })}
-    >
+    <div className={selectionOptionCardAnatomyClassName({ controlPosition })}>
       {leadingControl}
       {body}
     </div>
