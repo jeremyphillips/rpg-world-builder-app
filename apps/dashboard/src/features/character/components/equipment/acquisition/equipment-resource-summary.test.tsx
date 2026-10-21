@@ -68,7 +68,7 @@ describe('EquipmentResourceSummary', () => {
     expect(container.querySelectorAll('.ui-card__content')).toHaveLength(1)
   })
 
-  it('gives each resource section its own action and space between them', () => {
+  it('gives each resource section its own action inside a divided stack', () => {
     const { container } = render(
       <EquipmentResourceSummary
         density="comfortable"
@@ -92,7 +92,7 @@ describe('EquipmentResourceSummary', () => {
 
     expect(screen.getByRole('button', { name: 'Browse equipment' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Browse magic items' })).toBeInTheDocument()
-    expect(container.querySelector('.border-t')).toHaveClass('mt-4', 'pt-4', 'border-border')
+    expect(container.querySelector('[data-slot="divided-stack"]')).toBeInTheDocument()
   })
 
   it('shows one badge per rarity slot passed in', () => {

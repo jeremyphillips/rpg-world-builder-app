@@ -562,6 +562,13 @@ export {
   type AttentionFrameProps,
 } from './components/ui/attention-frame.client'
 export { attentionFrameVariants } from './components/ui/attention-frame.variants'
+export { DividedStack, type DividedStackProps } from './components/ui/divided-stack'
+export {
+  DIVIDED_STACK_DENSITIES,
+  dividedStackVariants,
+  type DividedStackDensity,
+  type DividedStackVariantProps,
+} from './components/ui/divided-stack.variants'
 export {
   InsetPanel,
   InsetPanelPassiveMessage,

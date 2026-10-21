@@ -9,6 +9,7 @@ import {
   Button,
   Card,
   CardContent,
+  DividedStack,
   IconContainer,
   resourceIcon,
   type ContentCardDensity,
@@ -21,11 +22,6 @@ import {
   formatEquipmentMagicItemSlotPresentation,
   type EquipmentBudgetGuidanceCopy,
 } from './equipment-acquisition-guidance.lib'
-import {
-  equipmentResourceSummarySectionDividerVariants,
-  equipmentResourceSummaryStackClasses,
-} from './equipment-resource-summary.variants'
-
 export type EquipmentResourceSummaryAction = {
   label: string
   onClick: () => void
@@ -104,7 +100,7 @@ export function EquipmentResourceSummary({
   return (
     <Card tone="transparent" density={density}>
       <CardContent>
-        <div className={equipmentResourceSummaryStackClasses}>
+        <DividedStack density={density}>
           {currency ? (
             <EntityAnatomyHost
               density={density}
@@ -117,23 +113,17 @@ export function EquipmentResourceSummary({
             />
           ) : null}
           {showMagic ? (
-            <div
-              className={
-                currency ? equipmentResourceSummarySectionDividerVariants({ density }) : undefined
-              }
-            >
-              <EntityAnatomyHost
-                density={density}
-                entity={{
-                  heading: EQUIPMENT_MAGIC_ITEMS_RESOURCE_HEADING,
-                  status: magicSlots.map(mapMagicItemSlotToStatus),
-                  media: <ResourceGlyph role="magicItem" density={density} />,
-                }}
-                trailing={resolveTrailingAction(magicItemsAction)}
-              />
-            </div>
+            <EntityAnatomyHost
+              density={density}
+              entity={{
+                heading: EQUIPMENT_MAGIC_ITEMS_RESOURCE_HEADING,
+                status: magicSlots.map(mapMagicItemSlotToStatus),
+                media: <ResourceGlyph role="magicItem" density={density} />,
+              }}
+              trailing={resolveTrailingAction(magicItemsAction)}
+            />
           ) : null}
-        </div>
+        </DividedStack>
       </CardContent>
     </Card>
   )

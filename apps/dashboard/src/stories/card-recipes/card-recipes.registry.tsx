@@ -375,7 +375,14 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     name: 'Equipment acquisition resource panel',
     section: 'ui-cards-form-rows',
     component: 'EquipmentResourceSummary',
-    chain: ['Card', 'CardContent', 'EntityAnatomyHost', 'EntityAnatomy', 'RowAnatomyCell'],
+    chain: [
+      'Card',
+      'CardContent',
+      'DividedStack',
+      'EntityAnatomyHost',
+      'EntityAnatomy',
+      'RowAnatomyCell',
+    ],
     useWhen:
       'Builder equipment step and picker header: budget and magic-item grant rows in one transparent Card shell.',
     density: 'fixed',
