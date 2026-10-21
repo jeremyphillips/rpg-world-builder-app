@@ -1,18 +1,17 @@
 import { Sparkles } from 'lucide-react'
-import { Text } from '@rpg/ui'
+import {
+  Card,
+  Text,
+  emptyStateWellIconLgClasses,
+  emptyStateWellSupportingLgClasses,
+  emptyStateWellTitleLgClasses,
+} from '@rpg/ui'
 
 import {
   masterDetailEmptySelectionHeading,
   masterDetailEmptySelectionSubhead,
 } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
-import {
-  masterDetailEditorEmptyStateContentClasses,
-  masterDetailEditorEmptyStateHeadingClasses,
-  masterDetailEditorEmptyStateIconClasses,
-  masterDetailEditorEmptyStateShellClasses,
-  masterDetailEditorEmptyStateSubheadClasses,
-} from './master-detail-editor-empty-state.variants'
 
 export interface MasterDetailEditorEmptyStateProps {
   itemNoun: MasterDetailItemNounTerm
@@ -20,16 +19,21 @@ export interface MasterDetailEditorEmptyStateProps {
 
 export function MasterDetailEditorEmptyState({ itemNoun }: MasterDetailEditorEmptyStateProps) {
   return (
-    <div className={masterDetailEditorEmptyStateShellClasses} role="status">
-      <div className={masterDetailEditorEmptyStateContentClasses}>
-        <Sparkles aria-hidden className={masterDetailEditorEmptyStateIconClasses} />
-        <Text as="p" className={masterDetailEditorEmptyStateHeadingClasses}>
+    <Card
+      tone="subtle"
+      stretch
+      className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-center"
+      role="status"
+    >
+      <div className="flex flex-col items-center gap-3">
+        <Sparkles aria-hidden className={emptyStateWellIconLgClasses} />
+        <Text as="p" className={emptyStateWellTitleLgClasses}>
           {masterDetailEmptySelectionHeading(itemNoun)}
         </Text>
-        <Text as="p" className={masterDetailEditorEmptyStateSubheadClasses}>
+        <Text as="p" className={emptyStateWellSupportingLgClasses}>
           {masterDetailEmptySelectionSubhead(itemNoun)}
         </Text>
       </div>
-    </div>
+    </Card>
   )
 }

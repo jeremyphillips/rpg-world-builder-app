@@ -1,12 +1,11 @@
 import { ABILITY_SCORE_MIN, CHARACTER_ABILITY_SCORE_MAX, type Ability } from '@rpg/contracts'
 
+import { Card } from '@rpg/ui'
+
 import { AbilityScoreCard, AbilityScoreNumeric } from '@/components/ability-score'
 
 import type { CharacterAbilityTile } from '../../../lib/display/character-display'
-import {
-  characterDetailAbilitiesContainerClasses,
-  characterDetailAbilitiesRowClasses,
-} from './character-detail-sheet.variants'
+import { characterDetailAbilitiesRowClasses } from './character-detail-sheet.variants'
 
 export type CharacterDetailAbilityScoreEditor = {
   abilityScores: Partial<Record<Ability, number>>
@@ -25,7 +24,7 @@ export function CharacterDetailAbilitiesRow({
   abilityScoreEditor,
 }: CharacterDetailAbilitiesRowProps) {
   return (
-    <div className={characterDetailAbilitiesContainerClasses}>
+    <Card tone="subtle" density="comfortable" className="w-fit p-3">
       <div className={characterDetailAbilitiesRowClasses}>
         {abilities.map((ability) => {
           const abilityId = ability.id as Ability
@@ -59,6 +58,6 @@ export function CharacterDetailAbilitiesRow({
           )
         })}
       </div>
-    </div>
+    </Card>
   )
 }

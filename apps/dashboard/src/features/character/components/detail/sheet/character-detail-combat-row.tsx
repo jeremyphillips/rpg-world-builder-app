@@ -1,4 +1,4 @@
-import { Eyebrow, InlineMetadata, Text } from '@rpg/ui'
+import { Card, Eyebrow, InlineMetadata, Text } from '@rpg/ui'
 
 import {
   CHARACTER_EMPTY_SECTION_TEXT,
@@ -9,8 +9,6 @@ import {
   type CharacterProficienciesViewModel,
 } from '../../../lib/display/character-display'
 import {
-  characterDetailActionsPanelClasses,
-  characterDetailCombatCardClasses,
   characterDetailCombatColumnClasses,
   characterDetailCombatPrimaryColumnClasses,
   characterDetailCombatSectionClasses,
@@ -44,7 +42,7 @@ function CharacterDetailActionsPanel({ actions }: { actions: CharacterActionRowV
   return (
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{CHARACTER_SECTION_LABELS.actions}</Eyebrow>
-      <section className={characterDetailActionsPanelClasses}>
+      <Card tone="subtle" density="comfortable" className="space-y-3">
         {actions.length === 0 ? (
           <Text variant="muted">{CHARACTER_EMPTY_SECTION_TEXT.actions}</Text>
         ) : (
@@ -62,7 +60,7 @@ function CharacterDetailActionsPanel({ actions }: { actions: CharacterActionRowV
             ))}
           </ul>
         )}
-      </section>
+      </Card>
     </div>
   )
 }
@@ -71,9 +69,9 @@ function CharacterDetailSavingThrowsPanel({ section }: { section: CharacterDetai
   return (
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{section.title}</Eyebrow>
-      <section className={characterDetailCombatCardClasses}>
+      <Card tone="subtle" density="comfortable">
         <CharacterDetailListItems items={section.items} emptyText={section.emptyText} />
-      </section>
+      </Card>
     </div>
   )
 }
@@ -88,7 +86,7 @@ function CharacterDetailProficienciesPanel({
   return (
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{section.title}</Eyebrow>
-      <section className={characterDetailCombatCardClasses}>
+      <Card tone="subtle" density="comfortable">
         {!hasItems ? (
           <Text variant="muted">{section.emptyText}</Text>
         ) : (
@@ -101,7 +99,7 @@ function CharacterDetailProficienciesPanel({
             ))}
           </div>
         )}
-      </section>
+      </Card>
     </div>
   )
 }

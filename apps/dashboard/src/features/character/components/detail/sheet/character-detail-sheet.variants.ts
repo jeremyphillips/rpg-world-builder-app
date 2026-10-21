@@ -48,8 +48,6 @@ export const characterDetailStatTileHitPointsNumberClasses =
 
 export const characterDetailAbilitiesStatsSectionClasses = 'flex flex-wrap items-start gap-2'
 
-export const characterDetailAbilitiesContainerClasses = 'w-fit rounded-md bg-surface-subtle p-3'
-
 export const characterDetailAbilitiesRowClasses = 'flex flex-wrap gap-2'
 
 export const characterDetailStatsRowClasses = 'flex flex-wrap gap-2'
@@ -66,10 +64,4 @@ export const characterDetailCombatPrimaryColumnClasses = 'space-y-4'
 
 export const characterDetailCombatColumnClasses = 'space-y-2'
 
-export const characterDetailCombatCardClasses = 'rounded-md bg-surface-subtle p-4'
-
-export const characterDetailActionsPanelClasses = 'space-y-3 rounded-md border border-border p-4'
-
 export const characterDetailListItemClasses = 'rounded-md bg-surface-subtle px-3 py-2 text-sm'
-
-export const characterDetailTabPanelClasses = 'rounded-md bg-surface-subtle p-4'

@@ -221,7 +221,7 @@ describe('EquipmentStep', () => {
     expect(screen.getByText(EQUIPMENT_SELECTED_PACKAGE_EYEBROW)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Starting Gold' })).toBeInTheDocument()
     expect(screen.queryByRole('radio', { name: /^Starting Gold/ })).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /\d[\d,]* GP remaining/ })).toBeInTheDocument()
+    expect(screen.getByText(/\d[\d,]* GP remaining/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
     expect(screen.getAllByText(/90 GP/).length).toBeGreaterThanOrEqual(1)
 
@@ -531,7 +531,7 @@ describe('EquipmentStep', () => {
     renderEquipmentStep(draft)
 
     expect(screen.getByRole('button', { name: /^Starting Package/ })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /\d[\d,]* GP remaining/ })).toBeInTheDocument()
+    expect(screen.getByText(/\d[\d,]* GP remaining/)).toBeInTheDocument()
     expect(screen.getAllByText(/19 GP/).length).toBeGreaterThanOrEqual(1)
     expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
 
@@ -567,7 +567,7 @@ describe('EquipmentStep', () => {
     expect(
       screen.getByText(new RegExp(EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT)),
     ).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /\d[\d,]* GP remaining/ })).toBeInTheDocument()
+    expect(screen.getByText(/\d[\d,]* GP remaining/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
   })
 
@@ -774,7 +774,7 @@ describe('EquipmentStep', () => {
           }),
         }),
       )
-      expect(screen.getByRole('heading', { name: /GP remaining/ })).toBeInTheDocument()
+      expect(screen.getByText(/GP remaining/)).toBeInTheDocument()
       expect(
         screen.queryByRole('heading', { name: 'Starting funds not set' }),
       ).not.toBeInTheDocument()

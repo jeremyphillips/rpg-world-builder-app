@@ -1,7 +1,7 @@
 import { Table2 } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-import { ActionButton, Badge, IconContainer } from '@rpg/ui'
+import { ActionButton, Badge, Card, IconContainer } from '@rpg/ui'
 
 import { DetailEntityRowActions } from '../../../lib/detail/row/entity/detail-entity-row-actions'
 import {
@@ -9,7 +9,6 @@ import {
   featureTableRowCopyClasses,
   featureTableRowLayoutClasses,
   featureTableRowMetadataClasses,
-  featureTableRowShellClasses,
   featureTableRowTitleClasses,
   featureTableRowTrailingClasses,
 } from './feature-table-row.variants'
@@ -35,7 +34,7 @@ export function FeatureTableRow({
   overflowActions,
 }: FeatureTableRowProps) {
   return (
-    <div className={featureTableRowShellClasses}>
+    <Card tone="subtle" density="compact" className="px-3 py-2.5">
       <div className={featureTableRowLayoutClasses}>
         <IconContainer>
           <Table2 />
@@ -64,6 +63,6 @@ export function FeatureTableRow({
           </div>
         ) : null}
       </div>
-    </div>
+    </Card>
   )
 }
