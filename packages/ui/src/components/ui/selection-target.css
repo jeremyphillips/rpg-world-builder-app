@@ -1,0 +1,35 @@
+@layer components {
+  .ui-selection-target {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    cursor: pointer;
+  }
+
+  .ui-selection-target::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .ui-selection-target > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .ui-selection-target__control {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ui-selection-target__raised {
+    position: relative;
+    z-index: 2;
+  }
+}

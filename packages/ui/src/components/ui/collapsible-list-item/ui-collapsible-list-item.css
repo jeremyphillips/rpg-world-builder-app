@@ -1,0 +1,31 @@
+@layer components {
+  .ui-collapsible-list-item--entity-card {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    border-width: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .ui-collapsible-list-item__header {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-collapsible-list-item__stack {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .ui-collapsible-list-item__stack--with-summary {
+    gap: calc(var(--spacing) * 0.5);
+  }
+}

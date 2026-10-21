@@ -39,4 +39,26 @@ describe('semantic control CSS completeness', () => {
       validateSemanticControlCssCompleteness({ ...entry, classPrefix: 'ui' }).length,
     ).toBeGreaterThan(0)
   })
+
+  it('reads a nested modifier written as &.ui-card--static', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'semantic-css-'))
+    const filePath = path.join(dir, 'card.css')
+    writeFileSync(
+      filePath,
+      `
+        .ui-card {
+          &.ui-card--static { transition-property: color; }
+        }
+      `,
+    )
+
+    expect(
+      validateSemanticControlCssCompleteness({
+        filePath,
+        dimensions: [
+          { modifierPrefix: 'ui-card--static', requiredProperties: ['transition-property'] },
+        ],
+      }),
+    ).toEqual([])
+  })
 })

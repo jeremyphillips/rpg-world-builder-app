@@ -1,7 +1,5 @@
 import { Button } from '@rpg/ui'
 
-import { abilityRecommendationCalloutActionClasses } from '../recommendation/ability-recommendation.variants'
-
 export type AutoFillRemainingActionProps = {
   label: string
   onAutoFill: () => void
@@ -10,13 +8,7 @@ export type AutoFillRemainingActionProps = {
 /** MVP: single strategy button; future: dropdown trigger for multiple fill strategies. */
 export function AutoFillRemainingAction({ label, onAutoFill }: AutoFillRemainingActionProps) {
   return (
-    <Button
-      type="button"
-      variant="text"
-      size="sm"
-      className={abilityRecommendationCalloutActionClasses}
-      onClick={onAutoFill}
-    >
+    <Button type="button" variant="text" size="sm" className="font-normal" onClick={onAutoFill}>
       {label}
     </Button>
   )

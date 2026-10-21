@@ -14,8 +14,11 @@ describe('RowAnatomyCell', () => {
     const cell = screen.getByTestId('cell')
     expect(cell).toHaveAttribute('data-row-anatomy-slot', 'band')
     expect(cell).toHaveAttribute('data-row-anatomy-column', 'trailing')
-    expect(cell.style.gridColumn).toBe('trailing')
-    expect(cell).toHaveClass('row-start-[band]', 'self-center')
+    expect(cell).toHaveClass(
+      'ui-row-anatomy__cell',
+      'ui-row-anatomy__cell--band',
+      'ui-row-anatomy__cell--trailing',
+    )
   })
 
   it('forwards host data attributes without overriding slot attributes', () => {

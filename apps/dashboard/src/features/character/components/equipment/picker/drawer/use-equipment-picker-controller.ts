@@ -92,6 +92,7 @@ export function useEquipmentPickerController({
   )
 
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reconcile sort mode when the active picker workflow changes allowed modes.
     setSortMode((current) =>
       normalizeEquipmentPickerSortMode(
         current,

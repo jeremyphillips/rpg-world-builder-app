@@ -1,113 +1,50 @@
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
 
-import {
-  ROW_IDENTITY_STACK_GAP_CLASS,
-  ROW_IDENTITY_STATUS_OFFSET_CLASS,
-} from './row-anatomy/row-identity-rhythm.tokens'
+import type { ContentCardDensity } from './content-card.variants'
 
-/** Row identity text scale — not `FieldSizeToken` (field md is 15px `text-md`). */
-export type IdentityRowSize = 'sm' | 'md' | 'lg'
+export type IdentityRowDensity = ContentCardDensity
 
-export const identityRowRootVariants = cva('min-w-0 flex-1')
+export const identityRowRootVariants = cva('min-w-0 flex-1', {
+  variants: {
+    density: {
+      compact: 'ui-identity-row--compact',
+      comfortable: 'ui-identity-row--comfortable',
+      spacious: 'ui-identity-row--spacious',
+    },
+  },
+})
 
-export const identityRowHeadingLineVariants = cva('flex w-full min-w-0 items-baseline')
-
-/**
- * Compact entity-card secondary copy on the title line.
- * The title item overrides this with `text-sm`. The separator sets its own `text-xs`
- * because it renders inside the classification item, not as a sibling of the root.
- */
-export const identityRowEntityCompactMetaVariants = cva('min-w-0 text-xs')
+export const identityRowHeadingLineVariants = cva('flex w-full min-w-0 items-center')
 
 export const identityRowHeadingClusterVariants = cva('flex min-w-0 flex-1 items-baseline')
 
 export const identityRowHeadingEndVariants = cva('shrink-0 text-style-caption')
 
 export const identityRowHeadingVariants = cva(
-  'min-w-0 shrink truncate font-body-emphasis text-foreground [&_a]:truncate',
+  'ui-identity-row__title ui-copy-title text-foreground',
+)
+
+export const identityRowSeparatorVariants = cva(
+  'ui-identity-row__classification shrink-0 font-normal text-muted-foreground',
+)
+
+export const identityRowClassificationVariants = cva(
+  'ui-identity-row__classification shrink-0 font-normal text-muted-foreground',
+)
+
+export const identityRowSupportingVariants = cva(
+  'ui-identity-row__supporting text-muted-foreground',
   {
     variants: {
-      size: {
-        sm: 'text-xs',
-        md: 'text-sm',
-        lg: 'text-base',
+      wrap: {
+        true: 'ui-identity-row__supporting--wrap',
+        false: 'ui-identity-row__supporting--truncate',
       },
     },
     defaultVariants: {
-      size: 'md',
+      wrap: false,
     },
   },
 )
 
-export const identityRowSeparatorVariants = cva('shrink-0 font-normal text-muted-foreground', {
-  variants: {
-    size: {
-      sm: 'text-xs',
-      md: 'text-sm',
-      lg: 'text-base',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-  },
-})
-
-export const identityRowClassificationVariants = cva('shrink-0 font-normal text-muted-foreground', {
-  variants: {
-    size: {
-      sm: 'text-xs',
-      md: 'text-sm',
-      lg: 'text-base',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-  },
-})
-
-export const identityRowSupportingVariants = cva('text-muted-foreground', {
-  variants: {
-    size: {
-      sm: 'text-xs',
-      md: 'text-xs',
-      lg: 'text-sm',
-    },
-    wrap: {
-      true: 'leading-snug',
-      false: 'truncate',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-    wrap: false,
-  },
-})
-
-export const identityRowStatusVariants = cva('', {
-  variants: {
-    spacing: {
-      /** Badges sit slightly below the metadata line. */
-      offset: ROW_IDENTITY_STATUS_OFFSET_CLASS,
-      /** Text advisories share the stack gap with the supporting metadata line. */
-      flush: '',
-    },
-  },
-  defaultVariants: {
-    spacing: 'offset',
-  },
-})
-
-export const identityRowStackVariants = cva('flex min-w-0 flex-col', {
-  variants: {
-    size: {
-      sm: ROW_IDENTITY_STACK_GAP_CLASS,
-      md: ROW_IDENTITY_STACK_GAP_CLASS,
-      lg: 'gap-1',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-  },
-})
-
-export type IdentityRowVariantProps = VariantProps<typeof identityRowHeadingVariants>
+export const identityRowStackVariants = cva('ui-identity-row__stack')

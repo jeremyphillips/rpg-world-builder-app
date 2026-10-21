@@ -1,46 +1,116 @@
-import type { CSSProperties, ReactNode } from 'react'
-import { cn } from '@rpg/ui'
+'use client'
+
+import type { ReactElement, ReactNode } from 'react'
+import {
+  cardSurfaceVariants,
+  cn,
+  interactiveFocusVariants,
+  NavigationChevron,
+  renderNavigableLinkRoot,
+} from '@rpg/ui'
 import type { ContentCardDensity } from '@rpg/ui'
 
-import { buildEntityLeadingChromeSizeStyle } from '../../../anatomy/entity-leading-rail.lib'
 import {
   ENTITY_SURFACE_DEFAULT_EDGES,
   type EntitySurfaceEdges,
 } from '../../../anatomy/entity-surface-edges.lib'
-import { entityCardFrameVariants, type EntityCardSurface } from './entity-card-frame.variants'
+import { entityCardFrameVariants } from './entity-card-frame.variants'
+
+const UI_CARD_NAV_CLASS = 'ui-card__nav' as const
+const UI_CARD_NAV_MAIN_CLASS = 'ui-card__nav-main' as const
+const UI_CARD_NAV_CHEVRON_CLASS = 'ui-card__nav-chevron' as const
 
 type EntityCardFrameProps = {
   density?: ContentCardDensity
-  surface?: EntityCardSurface
+  interactive?: boolean
+  selected?: boolean
   disabled?: boolean
-  /** From `resolveEntitySurfaceEdges` — utility edges tighten the start/end inset. */
   edges?: EntitySurfaceEdges
-  style?: CSSProperties
+  leadingUtilityCount?: number
+  link?: ReactElement
+  showNavigationChevron?: boolean
   children: ReactNode
+}
+
+function resolveFrameClassName({
+  density,
+  interactive,
+  selected,
+  disabled,
+  edges,
+  leadingUtilityCount,
+  navigable,
+}: {
+  density: ContentCardDensity
+  interactive: boolean
+  selected: boolean
+  disabled: boolean
+  edges: EntitySurfaceEdges
+  leadingUtilityCount: number
+  navigable: boolean
+}): string {
+  return cn(
+    cardSurfaceVariants({ tone: 'quiet', density, interactive, selected, disabled }),
+    entityCardFrameVariants({ density, edges, leadingUtilityCount }),
+    navigable &&
+      cn('block w-full min-w-0 no-underline', interactiveFocusVariants({ context: 'standalone' })),
+  )
+}
+
+function frameDataAttributes({
+  density,
+  disabled,
+  edges,
+}: {
+  density: ContentCardDensity
+  disabled: boolean
+  edges: EntitySurfaceEdges
+}) {
+  return {
+    'data-content-density': density,
+    'data-disabled': disabled ? true : undefined,
+    'data-entity-surface-start': edges.start,
+    'data-entity-surface-end': edges.end,
+  }
 }
 
 /** @internal Shared perimeter shell for entity card surfaces — not exported to feature consumers. */
 export function EntityCardFrame({
   density = 'comfortable',
-  surface = 'card',
+  interactive = false,
+  selected = false,
   disabled = false,
   edges = ENTITY_SURFACE_DEFAULT_EDGES,
-  style,
+  leadingUtilityCount = 0,
+  link,
+  showNavigationChevron = true,
   children,
 }: EntityCardFrameProps) {
-  const leadingChromeStyle = (
-    edges.start === 'utility' ? buildEntityLeadingChromeSizeStyle() : undefined
-  ) as CSSProperties | undefined
+  const navigable = link != null
+  const resolvedInteractive = navigable ? true : interactive
+  const className = resolveFrameClassName({
+    density,
+    interactive: resolvedInteractive,
+    selected,
+    disabled,
+    edges,
+    leadingUtilityCount,
+    navigable,
+  })
+  const dataProps = frameDataAttributes({ density, disabled, edges })
+
+  if (navigable) {
+    const interior = (
+      <div className={UI_CARD_NAV_CLASS}>
+        <div className={cn(UI_CARD_NAV_MAIN_CLASS, 'min-w-0 flex-1')}>{children}</div>
+        {showNavigationChevron ? <NavigationChevron className={UI_CARD_NAV_CHEVRON_CLASS} /> : null}
+      </div>
+    )
+    return renderNavigableLinkRoot(link, className, interior, dataProps, null)
+  }
 
   return (
-    <article
-      className={cn(entityCardFrameVariants({ density, surface, disabled, edges }))}
-      style={{ ...leadingChromeStyle, ...style }}
-      data-content-density={density}
-      data-disabled={disabled ? true : undefined}
-      data-entity-surface-start={edges.start}
-      data-entity-surface-end={edges.end}
-    >
+    <article className={className} {...dataProps}>
       {children}
     </article>
   )

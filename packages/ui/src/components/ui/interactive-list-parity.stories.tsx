@@ -119,7 +119,7 @@ export const SameIdentityAcrossHosts: Story = {
       </DropdownMenu>
       <DemoPanel>
         <InteractiveList>
-          <InteractiveListRow content={<IdentityRow {...FIXTURE} size="md" />} asChild>
+          <InteractiveListRow content={<IdentityRow {...FIXTURE} />} asChild>
             <a href="/example" className={cn(interactiveFocusVariants({ context: 'standalone' }))}>
               Navigate
             </a>

@@ -7,7 +7,7 @@ import {
   type VocabularyOptionSetId,
   type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
-import { buttonVariants } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
@@ -109,13 +109,9 @@ function VocabularyOverviewPage({
 
   const newAction =
     canManage && overview.capabilities.create ? (
-      <button
-        type="button"
-        className={buttonVariants({ size: 'sm' })}
-        onClick={() => setSheet({ mode: 'create' })}
-      >
+      <Button type="button" size="sm" onClick={() => setSheet({ mode: 'create' })}>
         New {singularLabel.toLowerCase()}
-      </button>
+      </Button>
     ) : undefined
 
   return (

@@ -103,7 +103,7 @@ describe('Form', () => {
         onSubmit={vi.fn()}
       />,
     )
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-8')
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('ui-field-control--sm')
   })
 
   it('keeps md control scale on comfortable density by default', () => {
@@ -114,7 +114,7 @@ describe('Form', () => {
         onSubmit={vi.fn()}
       />,
     )
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('ui-field-control--md')
   })
 
   it('uses controlSizeOverride for leaf control scale', () => {
@@ -133,7 +133,7 @@ describe('Form', () => {
         onSubmit={vi.fn()}
       />,
     )
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-11')
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('ui-field-control--lg')
   })
 
   it('renders inlineSentence fields in schema rows with field anatomy regions', () => {

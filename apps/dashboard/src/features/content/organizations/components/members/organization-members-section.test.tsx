@@ -36,14 +36,14 @@ describe('OrganizationMembersSection', () => {
     expect(screen.getByText('Speaker')).toBeInTheDocument()
     const circleEnvoyRow = screen
       .getByRole('link', { name: 'Circle Envoy' })
-      .closest('article') as HTMLElement
-    for (const segment of ['NPC', 'Human', 'Level 3 Rogue']) {
-      expect(within(circleEnvoyRow).getByText(segment)).toBeInTheDocument()
-    }
-    const vernaRow = screen.getByRole('link', { name: 'Verna' }).closest('article') as HTMLElement
-    for (const segment of ['PC', 'Dwarf', 'Level 1 Fighter']) {
-      expect(within(vernaRow).getByText(segment)).toBeInTheDocument()
-    }
+      .closest('li') as HTMLElement
+    expect(within(circleEnvoyRow).getByText(/NPC/)).toBeInTheDocument()
+    expect(within(circleEnvoyRow).getByText(/Human/)).toBeInTheDocument()
+    expect(within(circleEnvoyRow).getByText(/Level 3 Rogue/)).toBeInTheDocument()
+    const vernaRow = screen.getByRole('link', { name: 'Verna' }).closest('li') as HTMLElement
+    expect(within(vernaRow).getByText(/PC/)).toBeInTheDocument()
+    expect(within(vernaRow).getByText(/Dwarf/)).toBeInTheDocument()
+    expect(within(vernaRow).getByText(/Level 1 Fighter/)).toBeInTheDocument()
   })
 
   it('renders untitled memberships as the name alone', () => {

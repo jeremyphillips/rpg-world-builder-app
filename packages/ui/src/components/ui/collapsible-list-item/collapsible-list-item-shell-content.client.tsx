@@ -5,6 +5,8 @@ import * as React from 'react'
 import { cn } from '../../../lib/utils'
 import { CollapsibleListItemActions } from './collapsible-list-item-actions.client'
 import {
+  collapsibleListItemEntityCardHeaderStackClasses,
+  collapsibleListItemEntityCardHeaderStackSummaryGapClasses,
   collapsibleListItemHeaderRowClassesForRowLayout,
   collapsibleListItemHeaderStackClasses,
   collapsibleListItemHeaderStackSummaryGapClasses,
@@ -60,8 +62,13 @@ function CollapsibleListItemCenterActionsContent({
       <div className={cn(headerRowClasses, headerRowPadding)}>
         <div
           className={cn(
-            collapsibleListItemHeaderStackClasses,
-            summary && collapsibleListItemHeaderStackSummaryGapClasses,
+            rowLayout === 'entity-card'
+              ? collapsibleListItemEntityCardHeaderStackClasses
+              : collapsibleListItemHeaderStackClasses,
+            summary &&
+              (rowLayout === 'entity-card'
+                ? collapsibleListItemEntityCardHeaderStackSummaryGapClasses
+                : collapsibleListItemHeaderStackSummaryGapClasses),
             'min-w-0 flex-1',
           )}
         >

@@ -167,7 +167,7 @@ describe('CatalogToolbar', () => {
       expect(catalogToolbarUtilityBandVariants()).not.toContain('flex-col')
       expect(band?.className).not.toMatch(/\bsm:/)
       expect(catalogToolbarViewControlsVariants()).toContain('items-end')
-      expect(catalogToolbarViewControlsVariants()).toContain('gap-0.5')
+      expect(catalogToolbarViewControlsVariants()).toContain('gap-2')
       expect(catalogToolbarViewControlsVariants()).not.toMatch(/\bsm:/)
     }
 
@@ -280,8 +280,10 @@ describe('CatalogToolbar', () => {
       />,
     )
 
-    expect(screen.getByRole('searchbox', { name: 'Search catalog' })).toHaveClass('h-8')
-    expect(screen.getByText('Status')).toHaveClass('text-xs')
-    expect(screen.getByText('Sort')).toHaveClass('text-xs')
+    expect(screen.getByRole('searchbox', { name: 'Search catalog' })).toHaveClass(
+      'ui-field-control--sm',
+    )
+    expect(screen.getByText('Status')).toHaveClass('text-style-caption')
+    expect(screen.getByText('Sort')).toHaveClass('text-style-caption')
   })
 })

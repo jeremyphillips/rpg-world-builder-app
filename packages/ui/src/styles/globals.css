@@ -21,7 +21,15 @@
 @import '../components/ui/interactive-row.css';
 @import '../components/ui/popover-content.css';
 @import '../components/ui/interactive-list.css';
+@import '../components/ui/surface-interaction.css';
 @import '../components/ui/card.css';
+@import '../components/ui/destination-list.css';
+@import '../components/ui/copy-scale.css';
+@import '../components/ui/row-anatomy/ui-row-anatomy.css';
+@import '../components/ui/collapsible-list-item/ui-collapsible-list-item.css';
+@import '../components/ui/identity-row.css';
+@import '../components/ui/selection-target.css';
+@import '../components/ui/ui-radio-card.css';
 @import '../components/ui/inset-panel.css';
 @import '../components/ui/empty-panel.css';
 @import '../components/ui/compact-label.css';
@@ -194,6 +202,7 @@
   --color-message-bubble-peer: var(--message-bubble-peer-bg);
   --color-message-bubble-peer-foreground: var(--message-bubble-peer-fg);
 
+  --shadow-surface-subtle: var(--surface-subtle-shadow);
   --shadow-surface-raised: var(--surface-raised-shadow);
   --shadow-surface-sunken: var(--surface-sunken-shadow);
 
@@ -737,14 +746,6 @@
   font-size: var(--text-heading-card);
   line-height: var(--leading-none);
   font-weight: var(--font-weight-heading);
-  letter-spacing: var(--tracking-heading);
-}
-
-/** Entity card comfortable title — 19px heading-card size with body emphasis weight. */
-@utility entity-card-heading-comfortable {
-  font-size: var(--text-heading-card);
-  line-height: var(--text-heading-card--line-height);
-  font-weight: var(--font-weight-body-emphasis);
   letter-spacing: var(--tracking-heading);
 }
 

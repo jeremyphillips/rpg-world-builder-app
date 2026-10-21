@@ -3,24 +3,10 @@ import { cva } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import { interactiveRowVariants } from './interactive-row.variants'
-import { cardBorderClasses, cardRadiusClasses } from './card.variants'
 import {
   radioCardDecorativeControlClasses,
   resolveRadioCardIndicatorSize,
 } from './choice-control.variants'
-import { fieldSurfaceRaisedShadowClasses } from './field-surface.variants'
-import { establishSurfaceCurrent } from './surface-current.lib'
-import {
-  optionCardDensityBodyLayoutVariants,
-  optionCardDensityContentGapVariants,
-  optionCardSummaryBadgeRowVariants,
-} from './selection-option-card.variants'
-
-const radioCardCardBase = cn(
-  `group relative flex h-full w-full cursor-pointer flex-col ${cardRadiusClasses} ${cardBorderClasses} bg-surface-muted text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary hover:bg-surface-subtle hover:[--surface-current:var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-surface-strong data-[state=checked]:[--surface-current:var(--surface-strong)] data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`,
-  establishSurfaceCurrent('surface-muted'),
-)
-
 const radioCardRowBase = cn(
   'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground',
   interactiveRowVariants({
@@ -36,106 +22,57 @@ export type RadioCardVariant = 'card' | 'row'
 
 export type RadioCardVisualControl = 'radio' | 'icon'
 
-/** Card-style radio option: selected, hover, and focus states use design tokens only. */
+export function radioCardGroupItemRowClasses({
+  density,
+}: {
+  density: 'comfortable' | 'compact'
+}): string {
+  return cn(radioCardRowBase, density === 'comfortable' ? 'gap-1 px-0 py-2' : 'gap-0.5 px-0 py-2')
+}
+
+/** Card-style radio option density padding (applied inside ui-radio-card body). */
 export const radioCardVariants = cva('', {
   variants: {
     variant: {
-      card: radioCardCardBase,
+      card: '',
       row: radioCardRowBase,
     },
     density: {
-      default: '',
+      comfortable: '',
       compact: '',
     },
   },
   compoundVariants: [
-    {
-      variant: 'card',
-      density: 'default',
-      class: cn(
-        optionCardDensityContentGapVariants({ density: 'default' }),
-        optionCardDensityBodyLayoutVariants({ density: 'default' }),
-      ),
-    },
-    {
-      variant: 'card',
-      density: 'compact',
-      class: cn(
-        optionCardDensityContentGapVariants({ density: 'compact' }),
-        optionCardDensityBodyLayoutVariants({ density: 'compact' }),
-      ),
-    },
-    { variant: 'row', density: 'default', class: 'gap-1 px-0 py-2' },
+    { variant: 'row', density: 'comfortable', class: 'gap-1 px-0 py-2' },
     { variant: 'row', density: 'compact', class: 'gap-0.5 px-0 py-2' },
   ],
   defaultVariants: {
     variant: 'card',
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
-/** Selected/hover chrome for radio card shells (distinct from static selection cards). */
-export const radioCardShellSelectedChromeClasses =
-  'border-primary bg-surface-strong ring-1 ring-primary/20 [--surface-current:var(--surface-strong)]'
-
-/** Outer shell when a details action sits beside the radio item (avoids nested interactives). */
-export const radioCardShellVariants = cva(
-  cn(
-    `relative flex h-full flex-col overflow-hidden ${cardRadiusClasses} ${cardBorderClasses} bg-surface-muted text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background`,
-    establishSurfaceCurrent('surface-muted'),
-  ),
-  {
-    variants: {
-      hasMedia: {
-        true: 'p-0',
-        false: '',
-      },
-      selected: {
-        true: radioCardShellSelectedChromeClasses,
-        false:
-          'hover:border-primary hover:bg-surface-subtle hover:[--surface-current:var(--surface-subtle)]',
-      },
-    },
-    defaultVariants: {
-      hasMedia: false,
-      selected: false,
-    },
-  },
-)
-
-/** Body region below a full-bleed media slot. */
-export const radioCardShellBodyVariants = cva('flex min-h-0 flex-1 flex-col', {
-  variants: {
-    density: {
-      default: optionCardDensityBodyLayoutVariants({ density: 'default' }),
-      compact: optionCardDensityBodyLayoutVariants({ density: 'compact' }),
-    },
-  },
-  defaultVariants: {
-    density: 'default',
-  },
-})
-
-/** Full-bleed top image slot for card-variant radio options. */
-export const radioCardMediaSlotVariants = cva('shrink-0 overflow-hidden')
-
-/** Transparent radio row inside an outer shell (embedded/footer slots below). */
-export const radioCardShellItemVariants = cva(
-  'flex w-full cursor-pointer border-0 bg-transparent p-0 text-left text-inherit shadow-none outline-none disabled:cursor-not-allowed disabled:opacity-50',
-)
-
-/** Centers the leading radio with the option title line when a title-end action is present. */
+/** Card variant: vertically centers the leading control on the title line (text-base / text-sm). */
 export const radioCardLeadingControlTitleLineVariants = cva(
   'flex shrink-0 items-center self-start',
   {
     variants: {
       density: {
-        default: 'h-5',
-        compact: 'h-5',
+        comfortable: '',
+        compact: '',
+      },
+      titleEnd: {
+        true: 'h-control-action-compact',
+        false: '',
       },
     },
+    compoundVariants: [
+      { density: 'comfortable', titleEnd: false, class: 'h-6' },
+      { density: 'compact', titleEnd: false, class: 'h-5' },
+    ],
     defaultVariants: {
-      density: 'default',
+      density: 'comfortable',
+      titleEnd: false,
     },
   },
 )
@@ -148,14 +85,14 @@ export const radioCardControlVariants = cva('', {
       row: '',
     },
     density: {
-      default: '',
+      comfortable: '',
       compact: '',
     },
   },
   compoundVariants: [
     {
       variant: 'card',
-      density: 'default',
+      density: 'comfortable',
       class: radioCardDecorativeControlClasses({ indicatorSize: 'lg' }),
     },
     {
@@ -165,7 +102,7 @@ export const radioCardControlVariants = cva('', {
     },
     {
       variant: 'row',
-      density: 'default',
+      density: 'comfortable',
       class: radioCardDecorativeControlClasses({ indicatorSize: 'sm' }),
     },
     {
@@ -176,7 +113,7 @@ export const radioCardControlVariants = cva('', {
   ],
   defaultVariants: {
     variant: 'card',
-    density: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -192,20 +129,19 @@ export const radioCardIconControlVariants = cva(
   {
     variants: {
       density: {
-        default: 'size-5 [&_svg]:size-5',
+        comfortable: 'size-5 [&_svg]:size-5',
         compact: 'size-4 [&_svg]:size-4',
       },
     },
     defaultVariants: {
-      density: 'default',
+      density: 'comfortable',
     },
   },
 )
 
 export const radioCardDetailsActionVariants = cva('shrink-0 [&_svg]:size-4')
 
-/** Reserved third-row height for spellcasting badges in equal-height card grids. */
-export const radioCardSummaryBadgeRowVariants = optionCardSummaryBadgeRowVariants
+export const radioCardMediaSlotClasses = 'shrink-0 overflow-hidden'
 
 /** Vertical gap between sibling radio options in a group. */
 export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 items-stretch', {
@@ -215,7 +151,7 @@ export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 ite
       row: 'gap-1',
     },
     density: {
-      default: '',
+      comfortable: '',
       compact: '',
     },
     columns: {
@@ -225,12 +161,11 @@ export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 ite
     },
   },
   compoundVariants: [
-    { variant: 'card', density: 'default', class: 'gap-3' },
+    { variant: 'card', density: 'comfortable', class: 'gap-3' },
     { variant: 'card', density: 'compact', class: 'gap-2' },
   ],
   defaultVariants: {
     variant: 'card',
-    density: 'default',
-    columns: 'one',
+    density: 'comfortable',
   },
 })

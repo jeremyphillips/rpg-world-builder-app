@@ -9,6 +9,7 @@ export type ContentMediaImageFrame =
   | 'builderCard'
   | 'square'
   | 'insetSm'
+  | 'anatomyFill'
   | 'emblem'
   | 'emblemHero'
 
@@ -25,6 +26,8 @@ export const contentMediaImageFrameVariants = cva('relative overflow-hidden', {
       builderCard: cn('aspect-[4/2] w-full min-h-0', contentMediaImageSurfaceBackdropClasses),
       square: cn(identityFrameVariants({ shape: 'box', size: 'xs' }), 'isolate'),
       insetSm: cn(identityFrameVariants({ shape: 'box', size: 'sm' }), 'isolate'),
+      /** Fills a parent-owned `.ui-anatomy-leading-media` shell — no intrinsic frame size. */
+      anatomyFill: 'isolate size-full min-h-0 min-w-0 overflow-hidden',
       emblem: cn(identityFrameVariants({ shape: 'box', size: 'xs' }), 'isolate aspect-square'),
       emblemHero:
         'isolate aspect-square size-full max-h-hero-emblem max-w-hero-emblem overflow-hidden',
@@ -65,6 +68,7 @@ export const contentMediaImageFallbackWellClasses =
 export const contentMediaImageFallbackIconClasses: Record<ContentMediaImageFrame, string> = {
   square: 'size-icon-glyph-xs',
   insetSm: 'size-icon-glyph-sm',
+  anatomyFill: 'size-icon-glyph-sm',
   builderCard: 'size-icon-glyph-lg',
   primary: 'size-icon-glyph-xl',
   builderSheetHero: 'size-icon-glyph-xl',

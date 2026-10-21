@@ -17,7 +17,7 @@ describe('CatalogSortControl', () => {
   it('uses compact button sizing by default', () => {
     render(<CatalogSortControl value="name_asc" axes={['name']} onValueChange={vi.fn()} />)
 
-    expect(screen.getByRole('button', { name: 'Sort by, Name: A–Z' })).toHaveClass('text-xs')
+    expect(screen.getByRole('button', { name: 'Sort by, Name: A–Z' })).toHaveClass('ui-button--sm')
   })
 
   it('uses comfortable button sizing inside comfortable chrome', () => {
@@ -28,7 +28,7 @@ describe('CatalogSortControl', () => {
     )
 
     const trigger = screen.getByRole('button', { name: 'Sort by, Name: A–Z' })
-    expect(trigger).not.toHaveClass('text-xs')
+    expect(trigger).not.toHaveClass('ui-button--sm')
   })
 
   it('maps compact filter rhythm to sm size without compact button density', () => {
@@ -39,8 +39,7 @@ describe('CatalogSortControl', () => {
     )
 
     const trigger = screen.getByRole('button', { name: 'Sort by, Name: A–Z' })
-    expect(trigger).toHaveClass('text-xs')
-    expect(trigger).toHaveClass('h-8')
+    expect(trigger).toHaveClass('ui-button--sm')
     expect(trigger).not.toHaveClass('py-0')
   })
 

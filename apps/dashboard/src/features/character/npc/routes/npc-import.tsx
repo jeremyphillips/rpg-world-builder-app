@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { buttonVariants, Heading } from '@rpg/ui'
+import { ButtonLink, Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { PageShell } from '@/components/layout/page/page-shell'
@@ -41,12 +41,9 @@ export function NpcImportRoute() {
           <Heading variant="page" as="h1">
             Import D&amp;D Beyond NPC
           </Heading>
-          <Link
-            to={ROUTES.campaign.npcs.list(campaignId)}
-            className={buttonVariants({ variant: 'outline' })}
-          >
+          <ButtonLink link={<Link to={ROUTES.campaign.npcs.list(campaignId)} />} variant="outline">
             Back to NPCs
-          </Link>
+          </ButtonLink>
         </div>
 
         <PageLoadState

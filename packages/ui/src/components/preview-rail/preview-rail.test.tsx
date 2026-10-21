@@ -94,6 +94,25 @@ describe('PreviewRail', () => {
     expect(basicsTrigger).toHaveAttribute('aria-expanded', 'false')
   })
 
+  it('sizes preview identity media with the anatomy leading shell', () => {
+    const { container } = render(
+      <PreviewRail>
+        <PreviewRail.Identity
+          media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+          name="Fighter"
+          status="Level 1"
+        />
+      </PreviewRail>,
+    )
+
+    expect(container.querySelector('[data-slot="preview-rail-leading-media"]')).toHaveClass(
+      'ui-anatomy-leading-media',
+    )
+    expect(
+      container.querySelector('.ui-card--comfortable [data-slot="preview-rail-leading-media"]'),
+    ).toBeTruthy()
+  })
+
   it('omits the identity metadata divider when facts are absent', () => {
     const { container } = render(
       <PreviewRail>
@@ -118,7 +137,7 @@ describe('PreviewRail', () => {
     )
 
     const subheadline = container.querySelector(
-      '[data-slot="preview-rail-identity"] .text-sm.text-muted-foreground',
+      '[data-slot="preview-rail-identity"] .text-style-supporting',
     )
 
     expect(subheadline).toHaveTextContent('Level 1 Fighter')

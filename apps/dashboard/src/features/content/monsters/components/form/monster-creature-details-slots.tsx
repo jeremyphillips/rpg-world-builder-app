@@ -10,11 +10,10 @@ import {
 } from '@rpg/contracts'
 import { BooleanField, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
 
-import { buildLabelDescriptionActiveVocabulary } from '@/features/vocabulary/lib/build-vocabulary-maps'
-import { useVocabularySet } from '@/features/vocabulary/hooks/use-vocabulary-set'
+import { buildLabelDescriptionActiveVocabulary, useVocabularySet } from '@/features/vocabulary'
 
 import { useEntityCardUtilityControlSizes } from '../../../lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
-import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
+import { EntityCard } from '@/features/content'
 import {
   feetFromTelepathyRange,
   SENSE_RANGE_PLACEHOLDER,
@@ -223,7 +222,8 @@ export function MonsterCreatureDetailsSensesSlot({ ctx }: { ctx: ContentFormCtx 
       {(values.senses ?? []).map((row, index) => {
         const label = getSenseLabel(row.type as SenseId)
         return (
-          <ContentFormEntitySelectionRow
+          <EntityCard
+            density="compact"
             key={row.type}
             entity={{
               heading: label,
@@ -346,7 +346,8 @@ export function MonsterCreatureDetailsLanguagesSlot({ ctx }: { ctx: ContentFormC
         const label = ctx.languageVocabulary?.labelById[entry.language] ?? entry.language
         const speaks = entry.speaks !== false
         return (
-          <ContentFormEntitySelectionRow
+          <EntityCard
+            density="compact"
             key={entry.language}
             entity={{ heading: label }}
             trailing={{

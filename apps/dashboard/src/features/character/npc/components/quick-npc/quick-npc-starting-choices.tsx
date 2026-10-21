@@ -4,6 +4,8 @@ import { useFormContext } from 'react-hook-form'
 
 import { EntityActionChoiceMenu } from '@/features/content'
 
+import { collectionPanelNestedBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+
 import { Button, ChoiceSelectionCounter, ComboboxField, Eyebrow, StatusDot, cn } from '@rpg/ui'
 
 import type {
@@ -74,7 +76,6 @@ import {
   quickNpcStartingChoiceHeadingClasses,
   quickNpcStartingChoiceHeadingRowClasses,
   quickNpcStartingChoiceIdentityStackClasses,
-  quickNpcStartingChoiceInnerPanelClasses,
   quickNpcStartingChoiceInnerSectionClasses,
   quickNpcStartingChoiceOptionsContainerClasses,
   quickNpcStartingChoiceProvenanceClasses,
@@ -403,6 +404,7 @@ function StartingChoiceCategoryRow({
 
   return (
     <section className={quickNpcStartingChoiceRowClasses}>
+      {/* TODO(disclosure): consolidate ad hoc expand/caret row with shared @rpg/ui disclosure primitives. */}
       <button
         type="button"
         className={quickNpcStartingChoiceRowHeaderClasses}
@@ -433,7 +435,7 @@ function StartingChoiceCategoryRow({
       </button>
       {expanded ? (
         <div className={quickNpcStartingChoiceExpandedPanelClasses}>
-          <div className={quickNpcStartingChoiceInnerPanelClasses}>{panel}</div>
+          <div className={collectionPanelNestedBodyClasses}>{panel}</div>
         </div>
       ) : null}
     </section>

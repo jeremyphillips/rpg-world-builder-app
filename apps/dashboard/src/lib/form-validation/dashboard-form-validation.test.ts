@@ -134,9 +134,16 @@ describe('dashboard form validation', () => {
     assertInvalidSubmitUsesRefinedMessages(mechanicsValuesSchema, fields)
   })
 
+  const VOCABULARY_ENTRY_DYNAMIC_FIELD_IGNORE = [
+    'languageAffinities',
+    'languageAffinities.*',
+  ] as const
+
   it('vocabulary entry create sheet', () => {
     assertFieldPathsRegistered(vocabularyEntryCreateFields)
-    assertRegistryCoverage(vocabularyEntryCreateFormSchema, vocabularyEntryCreateFields)
+    assertRegistryCoverage(vocabularyEntryCreateFormSchema, vocabularyEntryCreateFields, {
+      ignorePaths: VOCABULARY_ENTRY_DYNAMIC_FIELD_IGNORE,
+    })
     assertInvalidSubmitUsesRefinedMessages(
       vocabularyEntryCreateFormSchema,
       vocabularyEntryCreateFields,
@@ -145,7 +152,9 @@ describe('dashboard form validation', () => {
 
   it('vocabulary entry edit sheet', () => {
     assertFieldPathsRegistered(vocabularyEntryEditFields)
-    assertRegistryCoverage(vocabularyEntryEditFormSchema, vocabularyEntryEditFields)
+    assertRegistryCoverage(vocabularyEntryEditFormSchema, vocabularyEntryEditFields, {
+      ignorePaths: VOCABULARY_ENTRY_DYNAMIC_FIELD_IGNORE,
+    })
     assertInvalidSubmitUsesRefinedMessages(
       vocabularyEntryEditFormSchema,
       vocabularyEntryEditFields,

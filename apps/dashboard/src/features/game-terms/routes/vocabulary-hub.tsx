@@ -1,23 +1,15 @@
-import { useParams } from 'react-router-dom'
-import { Text } from '@rpg/ui'
-import { ChevronRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import { DestinationList, DestinationItem, InlineMetadata, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { PageShell } from '@/components/layout/page/page-shell'
 import { ROUTES } from '@/app/routes'
 import { useCanManageCampaign } from '@/features/campaign'
-import {
-  campaignDestinationChevronClasses,
-  campaignDestinationListVariants,
-  campaignDestinationRowVariants,
-} from '@/features/campaign'
 
 import { useVocabularySets } from '@/features/vocabulary'
 import { GAME_TERMS_VOCABULARY_CATEGORIES } from '../lib/hub/vocabulary-set-registry'
 import { GAME_TERMS_HUB_LABEL } from '../lib/detail/game-terms-fallback'
-import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 const GAME_TERMS_HUB_DESCRIPTION =
   'Browse and customize the closed vocabulary sets that shape how rules read in this campaign.'
@@ -51,7 +43,7 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
   )
 
   return (
-    <PageShell width="full" rhythm="relaxed">
+    <PageShell width="narrow" rhythm="relaxed">
       <PageHeader heading={GAME_TERMS_HUB_LABEL} />
       <Text variant="muted">{GAME_TERMS_HUB_DESCRIPTION}</Text>
 
@@ -60,7 +52,7 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
         isError={isError}
         defaultErrorLabel="Could not load game terms."
       >
-        <ul className={campaignDestinationListVariants()}>
+        <DestinationList density="compact">
           {[...GAME_TERMS_VOCABULARY_CATEGORIES]
             .sort((left, right) => left.label.localeCompare(right.label))
             .map((category) => {
@@ -71,24 +63,22 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
               }
 
               return (
-                <li key={category.setId}>
-                  <Link
-                    to={ROUTES.gameTerms.overview(campaignId, category.setId)}
-                    className={campaignDestinationRowVariants()}
-                  >
-                    <div className="flex min-w-0 flex-1 flex-col gap-1">
-                      <span className="font-medium text-foreground">{category.label}</span>
-                      <Text variant="small">{category.description}</Text>
-                      <Text variant="muted" className="text-xs">
-                        {joinInlineMetadata(metadataParts)}
-                      </Text>
-                    </div>
-                    <ChevronRight aria-hidden className={campaignDestinationChevronClasses} />
-                  </Link>
-                </li>
+                <DestinationItem
+                  key={category.setId}
+                  link={<Link to={ROUTES.gameTerms.overview(campaignId, category.setId)} />}
+                  title={category.label}
+                  description={category.description}
+                  metadata={
+                    <InlineMetadata role="supporting" density="compact">
+                      {metadataParts.map((part) => (
+                        <InlineMetadata.Item key={part}>{part}</InlineMetadata.Item>
+                      ))}
+                    </InlineMetadata>
+                  }
+                />
               )
             })}
-        </ul>
+        </DestinationList>
       </PageLoadState>
     </PageShell>
   )

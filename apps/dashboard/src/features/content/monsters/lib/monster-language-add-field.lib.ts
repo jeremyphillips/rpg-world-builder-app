@@ -35,7 +35,7 @@ export function useMonsterLanguageAddField(ctx: ContentFormCtx) {
       )
       setAddLanguageKey((key) => key + 1)
     },
-    [form, values?.proficiencies],
+    [form, values],
   )
 
   const recommendation = useMemo(

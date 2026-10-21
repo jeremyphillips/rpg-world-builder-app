@@ -39,7 +39,7 @@ import {
 } from '@/features/character'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
+import { EntityCard } from '@/features/content'
 import { resolveStrictCatalogWriteGateReason } from '../../../lib/forms/shells/layout/content-form-catalog-write-gate.lib'
 import { useReportContentFormWriteGate } from '../../../lib/forms/shells/layout/content-form-write-gate'
 import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
@@ -300,7 +300,8 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
                 : undefined,
             })
             return (
-              <ContentFormEntitySelectionRow
+              <EntityCard
+                density="compact"
                 headingInline={
                   <MonsterEquipmentEquippedToggle
                     displayName={label}

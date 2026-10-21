@@ -11,13 +11,10 @@ const DETAIL_LANE_FILES = [
 ] as const
 
 describe('entity detail lane migration guard', () => {
-  it('does not compose ContentCardHeading directly in DER or drawer context paths', () => {
+  it('composes EntityAnatomy in DER and drawer context paths', () => {
     for (const relativePath of DETAIL_LANE_FILES) {
       const source = readFileSync(join(REPO_ROOT, relativePath), 'utf8')
-      expect(source, `${relativePath} must not import ContentCardHeading`).not.toMatch(
-        /ContentCardHeading/,
-      )
-      expect(source, `${relativePath} must compose EntityAnatomyHost`).toMatch(/EntityAnatomy/)
+      expect(source, `${relativePath} must compose EntityAnatomy`).toMatch(/EntityAnatomy/)
     }
   })
 })

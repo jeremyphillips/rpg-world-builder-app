@@ -21,6 +21,12 @@ export {
 } from './components/inventory-list/equipment-category-grouped-list'
 export { EquipmentInventorySectionHeader } from './components/inventory-list/equipment-inventory-section-header'
 export {
+  EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,
+  equipmentInventoryRowListClasses,
+  equipmentPurchasedInventoryCategoryClasses,
+  equipmentPurchasedInventoryCategoryListClasses,
+} from './components/inventory-list/equipment-inventory-list.variants'
+export {
   applyLoadoutWeaponMatchSignals,
   buildLoadoutEquipmentPickerItems,
   resolveLoadoutEquipmentIsProficient,

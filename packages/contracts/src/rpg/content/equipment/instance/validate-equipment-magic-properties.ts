@@ -1,4 +1,4 @@
-import type { ApiValidationIssue } from '../../../../shared/api-validation'
+import type { ContentValidationIssue } from '../../lib/content-validation-issue'
 import type { Equipment } from '../../equipment'
 import type { EquipmentInstance } from './instance'
 import type { MagicPropertyDefinitionProvider } from './magic-property'
@@ -13,7 +13,7 @@ export const EQUIPMENT_MAGIC_PROPERTY_ISSUE_CODE = {
   duplicateEffectTarget: 'duplicate_equipment_adjustment_target',
 } as const
 
-function issue(path: string, message: string, code: string): ApiValidationIssue {
+function issue(path: string, message: string, code: string): ContentValidationIssue {
   return { path, message, code }
 }
 
@@ -22,10 +22,10 @@ export function validateEquipmentMagicProperties(args: {
   item: Equipment
   provider: MagicPropertyDefinitionProvider
   pathPrefix: string
-}): ApiValidationIssue[] {
+}): ContentValidationIssue[] {
   const { entry, item, provider, pathPrefix } = args
   const normalized = normalizeEquipmentInstance(entry)
-  const issues: ApiValidationIssue[] = []
+  const issues: ContentValidationIssue[] = []
   const magic = resolveEquipmentMagicProperties(normalized, item, provider)
 
   for (const unresolved of magic.unresolved) {

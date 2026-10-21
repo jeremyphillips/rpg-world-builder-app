@@ -2,19 +2,21 @@ import { Link } from 'react-router-dom'
 import type { CharacterRosterStatus } from '@rpg/contracts'
 import {
   Badge,
-  buttonVariants,
+  ButtonLink,
   cn,
   Card,
-  CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
-  Text,
+  IdentityRowHeadingLine,
+  IdentityRowSupporting,
+  identityRowStackVariants,
+  resolveSurfaceActionButtonSize,
+  resolveEntityRowInlineBadgeSize,
+  type GenericCardDensity,
 } from '@rpg/ui'
 
 import { BuilderOptionCardImage } from './builder/steps/shared/builder-option-card-image'
 import { CampaignDisplayName, buildCampaignDisplay } from '@/features/campaign'
-
 import { resolveCharacterRosterStatusPresentation } from '../lib/campaign-roster-presentation'
 import type { CharacterListCardData } from './character-list-card.lib'
 
@@ -24,6 +26,7 @@ export type CharacterListCardProps = {
   showCampaign?: boolean
   controllerLine?: string
   rosterStatus?: CharacterRosterStatus
+  density?: GenericCardDensity
 }
 
 type CharacterListCardHeaderProps = {
@@ -31,6 +34,7 @@ type CharacterListCardHeaderProps = {
   showCampaign: boolean
   controllerLine?: string
   rosterPresentation: ReturnType<typeof resolveCharacterRosterStatusPresentation> | null
+  density: GenericCardDensity
 }
 
 function CharacterListCardHeader({
@@ -38,33 +42,44 @@ function CharacterListCardHeader({
   showCampaign,
   controllerLine,
   rosterPresentation,
+  density,
 }: CharacterListCardHeaderProps) {
+  const headingAccessoryBadgeSize = resolveEntityRowInlineBadgeSize(density)
+  const campaignLine =
+    showCampaign && card.campaign ? (
+      <CampaignDisplayName
+        display={buildCampaignDisplay({
+          id: card.campaign.id,
+          name: card.campaign.name,
+          emblemUrl: card.campaign.emblemUrl,
+        })}
+        surface="inlineMuted"
+      />
+    ) : null
+
   return (
-    <CardHeader className={card.displayImagesByRole?.primary ? 'px-5 pb-3 pt-3' : undefined}>
-      <div className="flex items-start justify-between gap-2">
-        <CardTitle>{card.name}</CardTitle>
-        {rosterPresentation ? (
-          <Badge appearance={rosterPresentation.appearance} tone={rosterPresentation.tone}>
-            {rosterPresentation.label}
-          </Badge>
-        ) : null}
-      </div>
-      <CardDescription>{card.summary}</CardDescription>
-      {controllerLine ? (
-        <Text variant="small" className="text-muted-foreground">
-          {controllerLine}
-        </Text>
-      ) : null}
-      {showCampaign && card.campaign ? (
-        <CampaignDisplayName
-          display={buildCampaignDisplay({
-            id: card.campaign.id,
-            name: card.campaign.name,
-            emblemUrl: card.campaign.emblemUrl,
-          })}
-          surface="inlineMuted"
+    <CardHeader>
+      <div className={cn(identityRowStackVariants(), 'min-w-0')}>
+        <IdentityRowHeadingLine
+          heading={<h3>{card.name}</h3>}
+          headingEnd={
+            rosterPresentation ? (
+              <Badge
+                appearance={rosterPresentation.appearance}
+                tone={rosterPresentation.tone}
+                size={headingAccessoryBadgeSize}
+              >
+                {rosterPresentation.label}
+              </Badge>
+            ) : undefined
+          }
         />
-      ) : null}
+        <IdentityRowSupporting wrap>{card.summary}</IdentityRowSupporting>
+        {controllerLine ? (
+          <IdentityRowSupporting wrap>{controllerLine}</IdentityRowSupporting>
+        ) : null}
+        {campaignLine ? <IdentityRowSupporting wrap>{campaignLine}</IdentityRowSupporting> : null}
+      </div>
     </CardHeader>
   )
 }
@@ -76,28 +91,37 @@ export function CharacterListCard({
   showCampaign = true,
   controllerLine,
   rosterStatus,
+  density = 'spacious',
 }: CharacterListCardProps) {
   const rosterPresentation = rosterStatus
     ? resolveCharacterRosterStatusPresentation(rosterStatus)
     : null
 
   return (
-    <Card className="flex h-full flex-col overflow-hidden p-0">
-      {card.displayImagesByRole?.primary ? (
-        <BuilderOptionCardImage display={card.displayImagesByRole.primary} alt="" />
-      ) : null}
+    <Card
+      density={density}
+      stretch
+      leadMedia={
+        card.displayImagesByRole?.primary ? (
+          <BuilderOptionCardImage display={card.displayImagesByRole.primary} alt="" />
+        ) : undefined
+      }
+    >
       <CharacterListCardHeader
         card={card}
         showCampaign={showCampaign}
         controllerLine={controllerLine}
         rosterPresentation={rosterPresentation}
+        density={density}
       />
-      <CardFooter
-        className={cn('mt-auto', card.displayImagesByRole?.primary != null && 'px-5 pb-5')}
-      >
-        <Link to={detailHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+      <CardFooter>
+        <ButtonLink
+          link={<Link to={detailHref} />}
+          variant="outline"
+          size={resolveSurfaceActionButtonSize(density)}
+        >
           View
-        </Link>
+        </ButtonLink>
       </CardFooter>
     </Card>
   )

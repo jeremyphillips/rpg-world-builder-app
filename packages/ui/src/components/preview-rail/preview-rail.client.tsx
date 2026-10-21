@@ -15,10 +15,10 @@ import { alertTitleVariants } from '../ui/alert.variants'
 import { ScrollBoundaryRegion } from '../ui/scroll-boundary-region.client'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button.client'
-import { ContentCardHeading } from '../ui/content-card-heading.client'
-import { ContentCardMedia } from '../ui/content-card-parts.client'
+import { IdentityRowHeadingLine } from '../ui/identity-row.client'
 import { IconContainer } from '../ui/icon-container.client'
-import { contentCardMediaVariants } from '../ui/content-card.variants'
+import { IdentityFrame } from '../ui/identity-frame.client'
+import { contentCardHeadingScaleClass } from '../ui/content-card.variants'
 import { Eyebrow } from '../ui/eyebrow'
 import { Heading } from '../ui/heading'
 import { SemanticText } from '../ui/semantic-text/semantic-text'
@@ -60,6 +60,8 @@ import {
   previewRailIdentityHeadingBandClasses,
   previewRailIdentitySubheadlineClasses,
   previewRailIdentityRowClasses,
+  previewRailLeadingMediaShellClasses,
+  previewRailLeadingMediaSlotClasses,
   previewRailIdentitySectionContentClasses,
   previewRailIdentitySectionShellClasses,
   previewRailIdentityStackClasses,
@@ -169,18 +171,32 @@ export type PreviewRailMediaProps = {
   fallbackIcon?: React.ReactNode
 }
 
+function PreviewRailLeadingMediaShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className={previewRailLeadingMediaShellClasses}
+      data-shape="box"
+      data-slot="preview-rail-leading-media"
+    >
+      <div className={previewRailLeadingMediaSlotClasses}>{children}</div>
+    </div>
+  )
+}
+
 function PreviewRailMedia({ imageSrc, imageAlt = '', fallbackIcon }: PreviewRailMediaProps) {
   if (imageSrc) {
     return (
-      <ContentCardMedia
-        src={imageSrc}
-        alt={imageAlt}
-        className={contentCardMediaVariants({ density: 'comfortable' })}
-      />
+      <PreviewRailLeadingMediaShell>
+        <IdentityFrame src={imageSrc} alt={imageAlt} shape="box" className="!size-full" />
+      </PreviewRailLeadingMediaShell>
     )
   }
 
-  return <IconContainer>{fallbackIcon}</IconContainer>
+  return (
+    <PreviewRailLeadingMediaShell>
+      <IconContainer className="!size-full">{fallbackIcon}</IconContainer>
+    </PreviewRailLeadingMediaShell>
+  )
 }
 
 export type PreviewRailAvailabilityLineProps = PreviewRailAvailability
@@ -233,7 +249,9 @@ function PreviewRailIdentity({ media, name, status, facts }: PreviewRailIdentity
           {media}
           <div className={previewRailIdentityContentClasses}>
             <div className={previewRailIdentityHeadingBandClasses}>
-              <ContentCardHeading heading={name} density="comfortable" />
+              <div className={cn(contentCardHeadingScaleClass('comfortable'), 'min-w-0')}>
+                <IdentityRowHeadingLine heading={name} />
+              </div>
             </div>
             {status ? <div className={previewRailIdentitySubheadlineClasses}>{status}</div> : null}
           </div>
@@ -474,7 +492,7 @@ function PreviewRailStatusPanel({
       <div className="flex w-full items-start gap-2">
         {resolvedIcon}
         <div className={previewRailStatusPanelContentClasses}>
-          <p className={alertTitleVariants({ density: 'compact' })}>{title}</p>
+          <p className={alertTitleVariants()}>{title}</p>
           {description ? (
             <p className={previewRailStatusPanelDescriptionClasses}>{description}</p>
           ) : null}

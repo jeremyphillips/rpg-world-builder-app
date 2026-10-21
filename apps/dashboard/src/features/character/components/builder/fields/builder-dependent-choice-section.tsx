@@ -27,11 +27,6 @@ import {
 } from '../../../lib/builder/builder-dependent-choice-section.lib'
 import { CHANGE_HERITAGE_LABEL } from '../../../lib/builder/builder-parent-choice-status.lib'
 import { BuilderDependentChoiceSectionHeader } from './builder-dependent-choice-section-header'
-import {
-  builderDependentChoiceSectionClasses,
-  builderDependentChoiceSectionCopyClasses,
-  builderDependentChoiceSectionRadioGroupClasses,
-} from './builder-dependent-choice-section.variants'
 
 export type BuilderDependentChoiceSectionProps = {
   /** Rules-facing label, e.g. "Elven Lineage", "Martial Archetype". */
@@ -84,7 +79,7 @@ export function BuilderDependentChoiceSection({
     <RadioCard
       variant="row"
       density="compact"
-      className={builderDependentChoiceSectionRadioGroupClasses}
+      className="border-0"
       value={value}
       onValueChange={handleValueChange}
       options={visibleOptions}
@@ -110,7 +105,7 @@ export function BuilderDependentChoiceSection({
       ref={sectionRef}
       role="region"
       aria-labelledby={headingId}
-      className={embedded ? undefined : builderDependentChoiceSectionClasses}
+      className={embedded ? undefined : 'space-y-3'}
     >
       {embedded ? (
         <SelectionOptionCardEmbeddedPanel>
@@ -132,7 +127,7 @@ export function BuilderDependentChoiceSection({
         </SelectionOptionCardEmbeddedPanel>
       ) : (
         <>
-          <div className={builderDependentChoiceSectionCopyClasses}>
+          <div className="space-y-1">
             <BuilderDependentChoiceSectionHeader
               title={title}
               headingId={headingId}

@@ -20,7 +20,13 @@ describe('CharacterListCard', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText('Verna')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Verna', level: 3 })).toHaveClass(
+      'ui-identity-row__title',
+    )
+    expect(
+      screen.getByRole('heading', { name: 'Verna', level: 3 }).closest('.ui-card--spacious'),
+    ).not.toBeNull()
+    expect(screen.getByRole('link', { name: 'View' })).toHaveClass('ui-button--md')
     expect(screen.getByText('Dwarf · Level 1 Fighter')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'View' })).toHaveAttribute('href', '/characters/char-1')
   })
@@ -52,7 +58,36 @@ describe('CharacterListCard', () => {
       </MemoryRouter>,
     )
 
+    const heading = screen.getByRole('heading', { name: 'Verna', level: 3 })
     expect(screen.getByText('Inactive')).toBeInTheDocument()
+    expect(heading).not.toContainElement(screen.getByText('Inactive'))
+    expect(screen.getByText('Inactive')).toHaveClass('ui-compact-label--md')
+  })
+
+  it('uses sm footer action and badge at comfortable density', () => {
+    render(
+      <MemoryRouter>
+        <CharacterListCard
+          card={sampleCard}
+          detailHref="/characters/char-1"
+          density="comfortable"
+          rosterStatus="inactive"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'View' })).toHaveClass('ui-button--sm')
+    expect(screen.getByText('Inactive')).toHaveClass('ui-compact-label--sm')
+  })
+
+  it('uses sm footer action at compact density', () => {
+    render(
+      <MemoryRouter>
+        <CharacterListCard card={sampleCard} detailHref="/characters/char-1" density="compact" />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'View' })).toHaveClass('ui-button--sm')
   })
 
   it('hides campaign metadata when showCampaign is false', () => {
@@ -99,5 +134,45 @@ describe('CharacterListCard', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+
+  it('keeps card region insets around a full-bleed portrait', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <CharacterListCard
+          card={{
+            ...sampleCard,
+            name: 'Very Long Character Name That Should Truncate Beside The Badge',
+            displayImagesByRole: {
+              primary: {
+                src: '/hero.png',
+                role: 'primary',
+                sourceKind: 'upload',
+                crop: { x: 0.1, y: 0.2, width: 0.5, height: 0.5 },
+              },
+            },
+          }}
+          detailHref="/characters/char-1"
+          rosterStatus="inactive"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(container.firstElementChild).toHaveClass('ui-card--media', 'ui-card--stretch')
+    const header = container.querySelector('.ui-card__header')
+    const footer = container.querySelector('.ui-card__footer')
+    const media = container.querySelector('.ui-card__media')
+    expect(header).toBeTruthy()
+    expect(header?.className).not.toContain('px-5')
+    expect(footer).toBeTruthy()
+    expect(footer?.className).not.toContain('mt-auto')
+    expect(footer?.className).not.toContain('px-5')
+    expect(media?.querySelector('img')).toBeTruthy()
+    expect(
+      screen.getByRole('heading', {
+        name: 'Very Long Character Name That Should Truncate Beside The Badge',
+      }),
+    ).toHaveClass('truncate')
+    expect(screen.getByRole('link', { name: 'View' })).toHaveAttribute('href', '/characters/char-1')
   })
 })

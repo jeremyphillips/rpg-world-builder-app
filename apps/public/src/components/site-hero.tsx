@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { Badge, buttonVariants, Heading, Text } from '@rpg/ui'
+import { Badge, ButtonLink, Heading, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/lib/routes'
 
@@ -18,12 +18,12 @@ export function SiteHero() {
         focused DM dashboard. No spreadsheets, no clutter.
       </Text>
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <Link href={ROUTES.signup} className={buttonVariants({ size: 'lg' })}>
+        <ButtonLink link={<Link href={ROUTES.signup} />} size="lg">
           Get started
-        </Link>
-        <Link href={ROUTES.login} className={buttonVariants({ variant: 'outline', size: 'lg' })}>
+        </ButtonLink>
+        <ButtonLink link={<Link href={ROUTES.login} />} variant="outline" size="lg">
           Log in
-        </Link>
+        </ButtonLink>
       </div>
     </section>
   )

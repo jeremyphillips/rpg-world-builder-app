@@ -16,7 +16,7 @@ describe('EntitySummaryHeading', () => {
 
     const name = screen.getByText('Fire Bolt')
     const classification = screen.getByText('Spell')
-    const mixedHeadingRow = name.parentElement as HTMLElement
+    const mixedHeadingRow = name.parentElement?.parentElement as HTMLElement
 
     expect(name.className).not.toMatch(/\bflex-1\b/)
     expect(classification.className).toMatch(/\bshrink-0\b/)
@@ -36,13 +36,11 @@ describe('EntitySummaryHeading', () => {
       />,
     )
 
-    expect(screen.getByText('Fire Bolt')).toHaveClass('text-sm')
-    expect(screen.getByText('Spell')).toHaveClass('text-xs')
-    expect(document.querySelector('[data-inline-metadata-separator]')).toHaveClass('text-xs')
+    expect(screen.getByText('Fire Bolt')).toHaveClass('ui-identity-row__title')
+    expect(screen.getByText('Spell')).toHaveClass('ui-identity-row__classification')
     const endValue = screen.getByText('3')
-    expect(endValue).toHaveClass('tabular-nums')
+    expect(endValue).toHaveClass('tabular-nums', 'text-style-caption')
     expect(endValue).not.toHaveClass('text-sm')
-    expect(endValue.parentElement).toHaveClass('text-style-caption')
   })
 
   it('fills the content cell so the heading end value sits at the column end', () => {
@@ -98,7 +96,8 @@ describe('EntitySummaryHeading', () => {
 
     const link = screen.getByRole('link', { name: 'Longsword' })
     expect(link).toHaveAttribute('href', '/items/longsword')
-    expect(screen.getByRole('button', { name: 'toggle' })).not.toContainElement(link)
+    expect(link).toHaveClass('ui-identity-row__title')
+    expect(link).not.toContainElement(screen.getByRole('button', { name: 'toggle' }))
   })
 })
 
@@ -113,13 +112,13 @@ describe('EntitySummarySupportingMetadata', () => {
 
     expect(screen.getByText(/\+5 to hit/)).toBeInTheDocument()
     const line = screen.getByText(/1d8\+3 slashing/).closest('div')
-    expect(line).toHaveClass('leading-snug')
-    expect(line).not.toHaveClass('truncate')
+    expect(line).toHaveClass('ui-identity-row__supporting--wrap')
+    expect(line).not.toHaveClass('ui-identity-row__supporting--truncate')
   })
 })
 
 describe('EntitySummaryDescription', () => {
-  it('maps density to supporting text size', () => {
+  it('uses the shared supporting class; size comes from the copy variables', () => {
     render(
       <>
         <EntitySummaryDescription density="compact">Compact copy</EntitySummaryDescription>
@@ -128,11 +127,13 @@ describe('EntitySummaryDescription', () => {
     )
 
     expect(screen.getByText('Compact copy')).toHaveClass(
-      'text-xs',
-      'text-muted-foreground',
-      'truncate',
+      'ui-identity-row__supporting',
+      'ui-identity-row__supporting--truncate',
     )
-    expect(screen.getByText('Comfortable copy')).toHaveClass('text-sm', 'truncate')
+    expect(screen.getByText('Comfortable copy')).toHaveClass(
+      'ui-identity-row__supporting',
+      'ui-identity-row__supporting--truncate',
+    )
   })
 })
 
@@ -150,7 +151,7 @@ describe('EntitySummaryStatus', () => {
     expect(screen.getByText('Spellcasting focus')).toHaveClass('ui-compact-label--sm')
   })
 
-  it('renders comfortable status badges at md density', () => {
+  it('renders comfortable status badges at sm density', () => {
     render(
       <EntitySummaryStatus
         density="comfortable"
@@ -158,7 +159,7 @@ describe('EntitySummaryStatus', () => {
       />,
     )
 
-    expect(screen.getByText('Equipped')).toHaveClass('ui-compact-label--md')
+    expect(screen.getByText('Equipped')).toHaveClass('ui-compact-label--sm')
   })
 
   it('defaults to the wrapped cluster without separators', () => {

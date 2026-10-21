@@ -28,7 +28,7 @@ import {
 
 import { DrawerShell } from '@/components/drawer'
 import { useUnsavedChangesConfirm } from '@/lib/use-unsaved-changes-confirm'
-import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
+import { EntityCard } from '@/features/content'
 import { commitEquipmentEditorSession } from '../../lib/instance-editor/commit-equipment-editor-session'
 import {
   createEquipmentEditorState,
@@ -304,6 +304,7 @@ function ScopeModeBody({
       </Heading>
       <Text variant="muted">{formatScopeChooseCustomizationCopy(subjectIntro)}</Text>
       <RadioCard
+        tone="quiet"
         value={scope}
         onValueChange={(value) => onScopeChange(value as 'one' | 'all')}
         options={[
@@ -341,6 +342,7 @@ function EffectChooseBody({
   const targets = allowedEffectTargetsForEquipment(item)
   return (
     <RadioCard
+      tone="quiet"
       value={mode.draft.target ?? ''}
       onValueChange={(value) =>
         dispatch({
@@ -450,7 +452,8 @@ function PropertyBrowseBody({
           const choice = presetPropertyBrowseChoice(sessionDraft, preset.id)
           return (
             <li key={preset.id}>
-              <ContentFormEntitySelectionRow
+              <EntityCard
+                density="compact"
                 entity={{
                   heading: preset.name,
                   description: preset.description,

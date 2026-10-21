@@ -83,9 +83,7 @@ describe('DiceFormulaField', () => {
     expect(screen.getByLabelText('Modifier')).toHaveValue(1)
     expect(screen.queryByRole('button', { name: 'Add modifier' })).not.toBeInTheDocument()
 
-    const modifierGroups = container.querySelectorAll(
-      '.grid.w-fit.min-w-max.max-w-full.rounded-md.border',
-    )
+    const modifierGroups = container.querySelectorAll('.ui-field-group--flow-col')
     expect(modifierGroups.length).toBeGreaterThanOrEqual(2)
   })
 
@@ -108,12 +106,12 @@ describe('DiceFormulaField', () => {
       <DiceFormulaField id="roll" label="Roll" modifierMode="none" size="md" />,
     )
 
-    const coreGroup = container.querySelector('.grid.w-fit.min-w-max.max-w-full.rounded-md.border')
+    const coreGroup = container.querySelector('.ui-field-group--flow-col')
     expect(coreGroup).toBeInTheDocument()
-    expect(coreGroup).toHaveClass('grid-flow-col', 'auto-cols-max')
+    expect(coreGroup).toHaveClass('ui-field-group--md')
 
-    expect(screen.getByLabelText('Count')).toHaveClass('h-9')
-    expect(screen.getByLabelText('Die faces')).toHaveClass('h-9')
+    expect(screen.getByLabelText('Count')).toHaveClass('ui-field-group__input-segment')
+    expect(screen.getByLabelText('Die faces')).toHaveClass('ui-field-control--trigger-fit')
   })
 
   it('aligns count and digit-sized select widths for the same digit count', () => {
@@ -136,7 +134,7 @@ describe('DiceFormulaField', () => {
     expect(screen.getByLabelText('Modifier').parentElement).toHaveClass(sharedTwoDigitWidth)
 
     const facesTrigger = screen.getByLabelText('Die faces')
-    expect(facesTrigger).toHaveClass('w-auto')
+    expect(facesTrigger).toHaveClass('ui-field-control--trigger-fit')
     expect(facesTrigger.querySelector('[data-select-value-slot]')).toHaveClass(
       'min-w-[calc(3*1ch)]',
     )
@@ -163,10 +161,14 @@ describe('DiceFormulaField', () => {
     expect(screen.getByLabelText('Multiplier')).toHaveValue(250)
 
     const multiplyGlyph = screen.getByText('×')
-    expect(multiplyGlyph).toHaveClass('ps-2')
-    expect(multiplyGlyph.closest('[aria-hidden]')).not.toHaveClass('bg-surface-faint')
+    expect(multiplyGlyph.parentElement).toHaveClass('ui-field-group__segment--start')
+    expect(multiplyGlyph.closest('[aria-hidden]')).not.toHaveClass(
+      'ui-field-group__segment--surface-faint',
+    )
 
-    const dividers = container.querySelectorAll('.bg-border, .bg-border-subtle')
+    const dividers = container.querySelectorAll(
+      '.ui-field-group__divider--primary, .ui-field-group__divider--subtle',
+    )
     expect(dividers.length).toBeGreaterThanOrEqual(2)
   })
 
@@ -201,9 +203,11 @@ describe('DiceFormulaField', () => {
     )
 
     const diceSeparator = screen.getByText('d')
-    expect(diceSeparator).toHaveClass('ps-2', 'pe-2', 'font-mono')
-    expect(diceSeparator.closest('[aria-hidden]')).toHaveClass('bg-surface-faint')
-    expect(container.querySelector('.bg-border-subtle')).toBeInTheDocument()
+    expect(diceSeparator.closest('.ui-field-group__segment--surface-faint')).toHaveClass(
+      'ui-field-group__segment--surface-faint',
+    )
+    expect(diceSeparator.closest('.font-mono')).toBeInTheDocument()
+    expect(container.querySelector('.ui-field-group__divider--subtle')).toBeInTheDocument()
   })
 
   itAxe('has no axe violations with multiply-only mode', async () => {

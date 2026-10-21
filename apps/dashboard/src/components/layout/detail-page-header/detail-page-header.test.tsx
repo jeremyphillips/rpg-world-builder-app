@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react'
-import { Link, MemoryRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
+import { ContentDetailEditAction } from '@/features/content/lib/detail/page/content-detail-edit-action'
 import { PageChromeActionsContext } from '@/components/layout/page-chrome/page-chrome-actions-context'
-import { pageChromeOutlineActionClasses } from '@/components/layout/page-chrome/page-chrome-action.variants'
 
 import { DetailPageHeader } from './detail-page-header'
 
@@ -12,11 +12,7 @@ vi.mock('@/components/layout/breadcrumb/use-resolved-breadcrumbs', () => ({
 }))
 
 function renderHeaderWithActions() {
-  const editAction = (
-    <Link to="/edit" className={pageChromeOutlineActionClasses}>
-      Edit
-    </Link>
-  )
+  const editAction = <ContentDetailEditAction to="/edit" />
 
   return render(
     <MemoryRouter>

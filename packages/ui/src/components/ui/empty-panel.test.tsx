@@ -9,13 +9,11 @@ describe('EmptyPanel', () => {
 
     const panel = screen.getByText('No tables added.')
     expect(panel).not.toHaveAttribute('role', 'status')
-    expect(panel).toHaveClass('bg-sunken')
-    expect(panel).toHaveClass('shadow-surface-sunken')
+    expect(panel).toHaveClass('ui-empty-panel')
   })
 
   it('applies passive message typography on the sunken surface', () => {
     render(<EmptyPanel>No grants added.</EmptyPanel>)
-    expect(screen.getByText('No grants added.')).toHaveClass('text-muted-foreground')
-    expect(screen.getByText('No grants added.')).toHaveClass('italic')
+    expect(screen.getByText('No grants added.')).toHaveClass('ui-empty-panel')
   })
 })

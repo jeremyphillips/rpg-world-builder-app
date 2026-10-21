@@ -10,7 +10,7 @@ import {
 
 export type PickerSelectionStateLineProps = {
   model: PickerSelectionStateLineModel
-  density: ContentCardDensity
+  density?: ContentCardDensity
 }
 
 /** Persistent selection result. Not a badge, and not the trailing action. */
@@ -19,7 +19,11 @@ export function PickerSelectionStateLine({ model, density }: PickerSelectionStat
 
   return (
     <div className={pickerSelectionStateLineVariants({ density })} data-picker-selection-state>
-      <InlineMetadata role="supporting" density={density} wrap>
+      <InlineMetadata
+        role="supporting"
+        density={density === 'compact' ? 'compact' : 'comfortable'}
+        wrap
+      >
         <InlineMetadata.Item>
           <span className={pickerSelectionStateWordVariants()}>
             <Check aria-hidden className={pickerSelectionStateIconVariants()} />

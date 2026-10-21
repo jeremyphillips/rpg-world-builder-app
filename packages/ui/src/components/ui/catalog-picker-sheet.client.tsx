@@ -28,6 +28,7 @@ export type {
   CatalogPickerRowLayout,
   CatalogPickerAuxiliaryAction,
   CatalogPickerCollapsibleRowRenderArgs,
+  CatalogPickerSheetSelection,
 } from './catalog-picker-sheet.types'
 export type {
   CatalogToolbarProps,
@@ -35,6 +36,10 @@ export type {
   CatalogToolbarTab,
   CatalogToolbarTabs,
 } from './catalog-toolbar.types'
+export {
+  catalogPickerCardListClasses,
+  catalogPickerSheetListVariants,
+} from './catalog-picker-sheet.variants'
 
 const DEFAULT_SEARCH_PLACEHOLDER = 'Search catalog'
 const DEFAULT_NO_RESULTS_MESSAGE = 'No items match your search.'
@@ -155,7 +160,6 @@ export function CatalogPickerSheet<TItem>({
   onOpenChange,
   title,
   description,
-  headlineClassName,
   items,
   getItemKey,
   getSearchText,
@@ -190,14 +194,9 @@ export function CatalogPickerSheet<TItem>({
   noResultsMessage = DEFAULT_NO_RESULTS_MESSAGE,
   noScopedItemsMessage = DEFAULT_NO_SCOPED_ITEMS_MESSAGE,
   noItemsMessage = DEFAULT_NO_ITEMS_MESSAGE,
-  rowPreset,
-  rowLayout,
-  rowSurface,
-  toolbarCompact,
-  rowBodyClassName,
-  rowShellClassName,
   expandedItemId,
   onExpandedItemChange,
+  selection,
 }: CatalogPickerSheetProps<TItem>) {
   const resultsReady = useCatalogPickerResultsReady(open)
   const {
@@ -237,14 +236,9 @@ export function CatalogPickerSheet<TItem>({
     renderItemActions,
     renderItemDetails,
     getItemToolbarLabel,
-    rowPreset,
-    rowLayout,
-    rowSurface,
-    toolbarCompact,
-    rowBodyClassName,
-    rowShellClassName,
     expandedItemId,
     onExpandedItemChange,
+    selection,
   } as CatalogPickerSheetProps<TItem>
 
   const bodyContent = resolveCatalogPickerSheetBodyContent({
@@ -261,7 +255,12 @@ export function CatalogPickerSheet<TItem>({
     emptyState,
     emptyMessage,
     results: (
-      <CatalogPickerSheetResults items={visibleItems} getItemKey={getItemKey} rowProps={rowProps} />
+      <CatalogPickerSheetResults
+        items={visibleItems}
+        getItemKey={getItemKey}
+        rowProps={rowProps}
+        resultsLabel={title}
+      />
     ),
   })
 
@@ -296,7 +295,6 @@ export function CatalogPickerSheet<TItem>({
         <Sheet.Header
           headline={title}
           description={description}
-          headlineClassName={headlineClassName}
           className={pinChromeInHeader ? 'pb-2' : undefined}
         >
           <CatalogPickerSheetHeaderChrome

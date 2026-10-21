@@ -1,6 +1,6 @@
 import type { GlobalSearchDocument } from '@rpg/contracts'
 import { getGlobalSearchFilterGroupLabel } from '@rpg/contracts'
-import { InlineMetadata, InteractiveListGroupHeading, InteractiveList, cn } from '@rpg/ui'
+import { DestinationList, InlineMetadata, InteractiveListGroupHeading, cn } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
@@ -10,6 +10,7 @@ import {
 } from '../../lib/global-search-preview-group'
 import {
   globalSearchGroupContentInsetClasses,
+  globalSearchGroupHeadingClasses,
   globalSearchGroupHeadingCountClasses,
   globalSearchGroupSectionVariants,
   globalSearchGroupShowAllLinkVariants,
@@ -59,6 +60,7 @@ export function GlobalSearchGroupSection({
         as="h2"
         first={sectionIndex === 0}
         follows={follows}
+        className={globalSearchGroupHeadingClasses}
       >
         <InlineMetadata role="heading" density="compact" wrap={false}>
           <InlineMetadata.Item>{groupLabel}</InlineMetadata.Item>
@@ -68,7 +70,7 @@ export function GlobalSearchGroupSection({
         </InlineMetadata>
       </InteractiveListGroupHeading>
 
-      <InteractiveList>
+      <DestinationList appearance="embedded" density="compact">
         {section.items.map((document) => (
           <SearchResultRow
             key={document.id}
@@ -79,7 +81,7 @@ export function GlobalSearchGroupSection({
             viewerCharacterRelationships={document.viewerCharacterRelationships}
           />
         ))}
-      </InteractiveList>
+      </DestinationList>
 
       {showGroupAction ? (
         onShowAll ? (

@@ -58,7 +58,7 @@ export function StartingEquipmentOptionSection({
   onChangePackage,
   onCollapseChooser,
   includeGoldOption = true,
-  density = 'default',
+  density = 'comfortable',
 }: StartingEquipmentOptionSectionProps) {
   const cardSummaries = useMemo(
     () =>

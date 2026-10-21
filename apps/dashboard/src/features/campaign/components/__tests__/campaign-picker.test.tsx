@@ -54,7 +54,7 @@ describe('CampaignPicker', () => {
       'href',
       ROUTES.campaign.detail('camp_1'),
     )
-    expect(screen.getByText('Active Campaign')).toHaveClass('font-body-emphasis')
+    expect(screen.getByText('Active Campaign')).toHaveClass('ui-copy-title')
     expect(screen.getByText(/GM/)).toBeInTheDocument()
     expect(screen.getByText(/0 players/)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Open campaign' })).not.toBeInTheDocument()

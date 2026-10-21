@@ -8,8 +8,7 @@ import { Form, type FormItem } from '@rpg/ui/form'
 import { createGrantArrayItemShell } from './grant-array-item-shell.lib'
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import { resolveGrantRowPresentation } from './grant-row-presentation.lib'
-import { entityBodyInlineStartClasses as disclosureEntityCardBodyInlineStartClasses } from '../../entity/surfaces/entity-surface-inset.variants'
-import { ENTITY_CONTENT_OFFSET_VAR } from '../../entity/anatomy/entity-geometry.tokens'
+import { DASH_ENTITY_CARD_BODY_CLASS } from '../../entity/surfaces/dash-entity-surface.variants'
 
 const grantRowSchema = z.object({
   grantType: z.literal('spells'),
@@ -113,7 +112,7 @@ function getGrantRow(prefix: string): HTMLElement {
   return document.querySelector(`[data-array-item-prefix="${prefix}"]`) as HTMLElement
 }
 
-describe('grant array DisclosureEntityCard shell', () => {
+describe('grant array EntityCardDisclosureRenderer shell', () => {
   it('renders entity summary, grip + caret, delete, and shell-owned body alignment', async () => {
     const user = userEvent.setup()
 
@@ -129,10 +128,12 @@ describe('grant array DisclosureEntityCard shell', () => {
 
     const firstRow = getGrantRow('grants.0')
     expect(
-      within(firstRow).getByText('Spells', { selector: '.font-body-emphasis' }),
+      within(firstRow).getByText('Spells', { selector: '.ui-identity-row__title' }),
     ).toBeInTheDocument()
     expect(
-      within(firstRow).getByText('Speak with Animals', { selector: '.text-muted-foreground' }),
+      within(firstRow).getByText('Speak with Animals', {
+        selector: '.ui-identity-row__classification',
+      }),
     ).toBeInTheDocument()
     expect(
       within(firstRow).getByText('Character has Speak with Animals always prepared.'),
@@ -142,11 +143,11 @@ describe('grant array DisclosureEntityCard shell', () => {
       name: 'Expand Spells, Speak with Animals',
     })
     expect(expand).toHaveAttribute('aria-expanded', 'false')
-    expect(expand.parentElement).toHaveClass('w-[var(--leading-chrome-size)]')
+    expect(expand.parentElement).toHaveClass('dash-entity-leading__column')
     expect(
       within(firstRow).getByRole('button', { name: 'Drag to reorder Spells, Speak with Animals' })
         .parentElement,
-    ).toHaveClass('w-[var(--leading-chrome-size)]')
+    ).toHaveClass('dash-entity-leading__column')
     expect(
       within(firstRow).getByRole('button', { name: 'Remove Grants · Spells' }),
     ).toBeInTheDocument()
@@ -165,34 +166,24 @@ describe('grant array DisclosureEntityCard shell', () => {
     const ability = within(firstRow).getByRole('textbox', { name: 'Spellcasting ability' })
     expect(ability.closest('[hidden]')).toBeNull()
     const body = ability.closest('[class*="border-t"]')
-    expect(body?.className).toContain(disclosureEntityCardBodyInlineStartClasses)
-    expect(body?.className).toContain('pr-[var(--entity-body-inline-end)]')
+    expect(body).toHaveClass(DASH_ENTITY_CARD_BODY_CLASS)
     expect(body).toHaveClass('border-t')
     expect(body).toHaveClass('bg-background')
     expect(body?.className).not.toContain('content-column-indent')
     expect(body?.className).not.toContain('content-inline-start')
 
     const article = firstRow.querySelector('article') as HTMLElement
-    expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
-      'calc(2 * calc(var(--spacing)*6)',
-    )
-    expect(article).toHaveClass('[--entity-surface-utility-inset:calc(var(--spacing)*1)]')
-    expect(article).toHaveClass(
-      '[--entity-surface-inline-start:var(--entity-surface-utility-inset)]',
-    )
-    expect(article).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-utility-inset)]')
-    expect(article.style.getPropertyValue('--entity-body-inline-end')).toBe(
-      'var(--entity-surface-inset)',
-    )
+    expect(article).toHaveClass('dash-entity-surface--leading-2')
+    expect(article).toHaveClass('dash-entity-surface--end-utility')
+    expect(article).not.toHaveAttribute('style')
     const shell = firstRow.querySelector('[role="group"]') as HTMLElement
     expect(shell.style.getPropertyValue('--content-column-indent')).toBe('')
     expect(shell.className).not.toContain('--entity-surface-inline-start')
 
     const headerWrap = within(firstRow)
-      .getByText('Spells', { selector: '.font-body-emphasis' })
-      .closest('[class*="pl-[var(--entity-surface-inline-start)]"]') as HTMLElement
-    expect(headerWrap?.className).toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
-    expect(headerWrap?.className).toMatch(/pr-\[var\(--entity-surface-inline-end\)\]/)
+      .getByText('Spells', { selector: '.ui-identity-row__title' })
+      .closest('.dash-entity-card__content') as HTMLElement
+    expect(headerWrap).toHaveClass('dash-entity-card__content')
 
     await user.clear(ability)
     await user.type(ability, 'int')

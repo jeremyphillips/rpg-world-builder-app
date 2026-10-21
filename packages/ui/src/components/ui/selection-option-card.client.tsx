@@ -12,13 +12,15 @@ import {
 } from './selection-option-card-anatomy.client'
 import type { EyebrowVariantProps } from './eyebrow.variants'
 import {
-  optionCardEmbeddedSlotVariants,
-  selectionOptionCardBodyVariants,
-  selectionOptionCardHeaderActionClasses,
-  selectionOptionCardHeaderActionSlotVariants,
-  selectionOptionCardHeaderRowVariants,
-  selectionOptionCardShellVariants,
-} from './selection-option-card.variants'
+  cardSurfaceVariants,
+  resolveOptionCardSurfaceDensity,
+  type CardElevation,
+} from './card.variants'
+import {
+  optionCardEmbeddedSlotClassName,
+  UI_SELECTION_OPTION_CARD_BODY_CLASS,
+  type OptionCardEmbeddedSlotTone,
+} from './selection-option-card.lib'
 
 export type { SelectionOptionCardDensity } from './selection-option-card-anatomy.client'
 
@@ -35,6 +37,8 @@ export type SelectionOptionCardProps = {
   disabled?: boolean
   asChild?: boolean
   density?: SelectionOptionCardDensity
+  /** Shell depth — defaults raised so chooser cards keep depth after tone/elevation split. */
+  elevation?: CardElevation
   headerStartSlot?: ReactNode
   /** Renders a density-scaled eyebrow in the header row (preferred over raw `Eyebrow` in `headerStartSlot`). */
   headerEyebrow?: string
@@ -49,15 +53,15 @@ export type SelectionOptionCardProps = {
   summaryContent?: ReactNode
   /**
    * Nested region below the description. The card owns the chrome via
-   * `optionCardEmbeddedSlotVariants`.
+   * `optionCardEmbeddedSlotClassName`.
    */
   embedded?: ReactNode
-  embeddedTone?: 'divider' | 'panel' | 'plain'
+  embeddedTone?: OptionCardEmbeddedSlotTone
   className?: string
 }
 
 function SelectionOptionCardHeaderRow({
-  density = 'default',
+  density = 'comfortable',
   headerEyebrow,
   headerEyebrowSize,
   headerStartSlot,
@@ -79,10 +83,10 @@ function SelectionOptionCardHeaderRow({
   }
 
   return (
-    <div className={selectionOptionCardHeaderRowVariants()}>
+    <div className="ui-selection-option-card__header-row">
       {startSlot ? <div className="min-w-0">{startSlot}</div> : null}
       {headerEndSlot ? (
-        <div className={selectionOptionCardHeaderActionSlotVariants()}>{headerEndSlot}</div>
+        <div className="ui-selection-option-card__header-action-slot">{headerEndSlot}</div>
       ) : null}
     </div>
   )
@@ -101,7 +105,7 @@ export function SelectionOptionCardHeaderAction({
   label,
   onClick,
   ariaLabel,
-  density = 'default',
+  density = 'comfortable',
 }: SelectionOptionCardHeaderActionProps) {
   const buttonSize = density === 'compact' ? 'xs' : 'sm'
 
@@ -111,10 +115,7 @@ export function SelectionOptionCardHeaderAction({
       variant="text"
       size={buttonSize}
       density="compact"
-      className={cn(
-        selectionOptionCardHeaderActionClasses,
-        density === 'compact' && 'text-control-action-xs',
-      )}
+      className={cn('shrink-0', density === 'compact' && 'text-control-action-xs')}
       aria-label={ariaLabel}
       onClick={onClick}
     >
@@ -127,7 +128,8 @@ export function SelectionOptionCard({
   selected,
   disabled = false,
   asChild = false,
-  density = 'default',
+  density = 'comfortable',
+  elevation = 'raised',
   headerStartSlot,
   headerEyebrow,
   headerEyebrowSize,
@@ -155,10 +157,19 @@ export function SelectionOptionCard({
 
   return (
     <Comp
-      className={cn(selectionOptionCardShellVariants({ selected, disabled }), className)}
+      className={cn(
+        cardSurfaceVariants({
+          tone: 'strong',
+          elevation,
+          density: resolveOptionCardSurfaceDensity(density),
+          selected,
+          disabled,
+        }),
+        className,
+      )}
       aria-disabled={disabled || undefined}
     >
-      <div className={selectionOptionCardBodyVariants()}>
+      <div className={UI_SELECTION_OPTION_CARD_BODY_CLASS}>
         <SelectionOptionCardAnatomy
           density={density}
           headerRow={headerRow}
@@ -169,9 +180,7 @@ export function SelectionOptionCard({
           summaryContent={summaryContent}
           embedded={
             embedded ? (
-              <div className={optionCardEmbeddedSlotVariants({ density, tone: embeddedTone })}>
-                {embedded}
-              </div>
+              <div className={optionCardEmbeddedSlotClassName(embeddedTone)}>{embedded}</div>
             ) : undefined
           }
           useSummaryTitle

@@ -22,7 +22,7 @@ describe('formatEquipmentBudgetGuidanceCopy', () => {
       }),
     ).toEqual({
       heading: '74 GP 6 SP remaining',
-      subheading: '75 GP budget · 4 SP spent',
+      metadata: ['75 GP budget', '4 SP spent'],
     })
 
     expect(
@@ -33,7 +33,7 @@ describe('formatEquipmentBudgetGuidanceCopy', () => {
       }),
     ).toEqual({
       heading: '74 GP 5 SP 6 CP remaining',
-      subheading: '75 GP budget · 4 SP 4 CP spent',
+      metadata: ['75 GP budget', '4 SP 4 CP spent'],
     })
   })
 

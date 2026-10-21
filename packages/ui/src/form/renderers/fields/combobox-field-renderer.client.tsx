@@ -52,13 +52,15 @@ function useComboboxDimensionFilters(config: ComboboxFieldConfig) {
   const [active, setActive] = React.useState<ActiveDimensionFilters>(() =>
     resolveInitialActiveDimensionFilters(dimensionConfigs),
   )
+  const [lastDimensionConfigsKey, setLastDimensionConfigsKey] = React.useState(dimensionConfigsKey)
 
-  React.useEffect(() => {
-    setActive((prev) => {
-      const next = reconcileActiveDimensionFilters(prev, dimensionConfigs)
-      return activeDimensionFiltersEqual(prev, next) ? prev : next
-    })
-  }, [dimensionConfigsKey, dimensionConfigs])
+  if (lastDimensionConfigsKey !== dimensionConfigsKey) {
+    setLastDimensionConfigsKey(dimensionConfigsKey)
+    const next = reconcileActiveDimensionFilters(active, dimensionConfigs)
+    if (!activeDimensionFiltersEqual(active, next)) {
+      setActive(next)
+    }
+  }
 
   return { dimensionConfigs, active, setActive }
 }

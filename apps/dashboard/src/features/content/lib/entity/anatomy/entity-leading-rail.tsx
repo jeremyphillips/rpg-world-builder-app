@@ -12,7 +12,7 @@ type EntityLeadingRailProps = {
 }
 
 /** Lays out leading utilities — width includes padding-inline-end(contentGap). */
-export function EntityLeadingRail({ children, density = 'comfortable' }: EntityLeadingRailProps) {
+export function EntityLeadingRail({ children, density }: EntityLeadingRailProps) {
   const utilities = Children.toArray(children).filter((child) => child != null)
 
   if (utilities.length === 0) {

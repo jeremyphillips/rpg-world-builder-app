@@ -71,9 +71,8 @@ describe('EquipmentPurchasedInventorySection', () => {
     const { container } = render(<EquipmentPurchasedInventorySection purchased={[]} />)
 
     expect(screen.getByText(EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE)).toBeInTheDocument()
-    expect(container.firstChild).toHaveClass('bg-sunken')
-    expect(container.firstChild).toHaveClass('text-center')
-    expect(container.firstChild).not.toHaveClass('border-dashed')
+    expect(container.firstChild).toHaveClass('ui-inset-panel')
+    expect(container.firstChild).toHaveClass('ui-inset-panel--align-center')
   })
 
   it('renders category headings by default', () => {

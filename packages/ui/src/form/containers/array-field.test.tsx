@@ -166,7 +166,7 @@ describe('ArrayFieldRenderer', () => {
       'gap-3',
     )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('h-9')
+    expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('ui-button--md')
     expect(screen.getByText('No trait added.')).toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
     expect(screen.getByRole('group', { name: /Traits/ })).not.toHaveClass('mb-8')
@@ -292,7 +292,7 @@ describe('ArrayFieldRenderer', () => {
     renderForm()
 
     const addButton = screen.getByRole('button', { name: 'Add trait' })
-    expect(addButton).toHaveClass('border-interactive-outline')
+    expect(addButton).toHaveClass('ui-button--outline')
     expect(addButton).not.toHaveClass('bg-primary')
     expect(addButton).not.toHaveClass('bg-secondary')
   })
@@ -360,8 +360,13 @@ describe('ArrayFieldRenderer', () => {
     expect(legend).toHaveTextContent('Movement')
     expect(legend).toContainElement(addButton)
     expect(legend).toHaveClass('w-full')
-    expect(addButton).toHaveClass('h-6', 'text-action-standalone', 'text-foreground', 'px-0')
-    expect(addButton).not.toHaveClass('border-interactive-outline', 'hover:bg-accent')
+    expect(addButton).toHaveClass(
+      'ui-button--text',
+      'ui-button__text--sm-compact',
+      'text-action-standalone',
+      'text-foreground',
+    )
+    expect(addButton).not.toHaveClass('ui-button--outline', 'hover:bg-accent')
     expect(addButton.querySelector('svg')).toBeTruthy()
     expect(screen.getAllByRole('button', { name: 'Add speed' })).toHaveLength(1)
   })
@@ -423,8 +428,7 @@ describe('ArrayFieldRenderer', () => {
     )
 
     const addButton = screen.getByRole('button', { name: 'Add trait' })
-    expect(addButton).toHaveClass('h-8')
-    expect(addButton).toHaveClass('text-xs')
+    expect(addButton).toHaveClass('ui-button--sm')
   })
 
   it('applies addActionVariant on the add control', () => {
@@ -448,8 +452,8 @@ describe('ArrayFieldRenderer', () => {
     )
 
     const addButton = screen.getByRole('button', { name: 'Add trait' })
-    expect(addButton).toHaveClass('bg-action-secondary')
-    expect(addButton).not.toHaveClass('border-interactive-outline')
+    expect(addButton).toHaveClass('ui-button--secondary')
+    expect(addButton).not.toHaveClass('ui-button--outline')
   })
 
   it('applies addActionVariant on addActionMenu dropdown triggers', async () => {
@@ -492,8 +496,8 @@ describe('ArrayFieldRenderer', () => {
     )
 
     const addButton = screen.getByRole('button', { name: 'Add grant' })
-    expect(addButton).toHaveClass('bg-action-primary')
-    expect(addButton).not.toHaveClass('border-interactive-outline')
+    expect(addButton).toHaveClass('ui-button--primary')
+    expect(addButton).not.toHaveClass('ui-button--outline')
 
     await user.click(addButton)
     expect(screen.getByRole('menuitem', { name: 'Movement bonus' })).toBeInTheDocument()
@@ -606,10 +610,10 @@ describe('ArrayFieldRenderer', () => {
   it('adds an item when the add button is clicked', async () => {
     const user = userEvent.setup()
     renderForm()
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('ui-field-control--md')
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('h-8')
+    expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('ui-field-control--sm')
     expect(screen.getByRole('group', { name: 'Trait #1' })).toHaveClass(
       'rounded-sm',
       'border',
@@ -1631,7 +1635,10 @@ describe('ArrayFieldRenderer', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText(/species movement cap/i)).toBeInTheDocument()
+      expect(screen.getByRole('combobox', { name: 'Speed value' })).toHaveAttribute(
+        'aria-invalid',
+        'true',
+      )
     })
     assertAnatomyGridChrome()
   })

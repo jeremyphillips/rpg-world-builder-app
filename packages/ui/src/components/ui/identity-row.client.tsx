@@ -1,38 +1,25 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { Fragment, isValidElement, type ReactElement, type ReactNode } from 'react'
+import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '../../lib/utils'
 
 import {
   identityRowClassificationVariants,
-  identityRowEntityCompactMetaVariants,
   identityRowHeadingClusterVariants,
   identityRowHeadingEndVariants,
   identityRowHeadingLineVariants,
   identityRowHeadingVariants,
   identityRowRootVariants,
   identityRowStackVariants,
-  identityRowStatusVariants,
   identityRowSupportingVariants,
-  type IdentityRowSize,
+  type IdentityRowDensity,
 } from './identity-row.variants'
 import { InlineMetadata } from './inline-metadata'
 
-export type { IdentityRowSize } from './identity-row.variants'
-
-/** Compact entity cards: 14px title, 12px classification, dot, and title-line end text. */
-export type IdentityRowHeadingRecipe = 'entity-compact'
-
-function resolveIdentityRowHeadingScale(
-  size: IdentityRowSize,
-  recipe?: IdentityRowHeadingRecipe,
-): { title: IdentityRowSize; classification: IdentityRowSize } {
-  if (recipe === 'entity-compact') {
-    return { title: 'md', classification: 'sm' }
-  }
-  return { title: size, classification: size }
-}
+export type { IdentityRowDensity } from './identity-row.variants'
+export { identityRowStackVariants } from './identity-row.variants'
 
 export type IdentityRowProps = {
   heading?: ReactNode
@@ -42,15 +29,27 @@ export type IdentityRowProps = {
   /** End of the heading line. Not status copy, which stays under supporting text. */
   headingEnd?: ReactNode
   status?: ReactNode
-  /** `flush` matches supporting-line spacing. Badges keep the default offset. */
-  statusSpacing?: 'offset' | 'flush'
-  size?: IdentityRowSize
+  /** Sets the canonical copy pair on this row. Omit to inherit from the surface. */
+  density?: IdentityRowDensity
   className?: string
 }
 
 function isPresent(value: ReactNode | undefined): value is ReactNode {
   return value != null && value !== '' && value !== false
 }
+
+function isComposableHeading(heading: ReactNode): heading is ReactElement {
+  return isValidElement(heading) && heading.type !== Fragment
+}
+
+function IdentityRowTitle({ heading, className }: { heading: ReactNode; className: string }) {
+  if (isComposableHeading(heading)) {
+    return <Slot className={className}>{heading}</Slot>
+  }
+  return <span className={className}>{heading}</span>
+}
+
+const identityRowTitleClassName = cn(identityRowHeadingVariants(), 'min-w-0 truncate')
 
 function classificationParts(classification?: ReactNode | readonly ReactNode[]): ReactNode[] {
   if (classification == null || classification === '' || classification === false) {
@@ -66,66 +65,41 @@ function IdentityRowHeadingContent({
   heading,
   classification,
   headingInline,
-  size,
-  recipe,
 }: {
   heading?: ReactNode
   classification?: ReactNode | readonly ReactNode[]
   headingInline?: ReactNode
-  size: IdentityRowSize
-  recipe?: IdentityRowHeadingRecipe
 }) {
   const showHeading = isPresent(heading)
   const showHeadingInline = isPresent(headingInline)
   const parts = classificationParts(classification)
-  const scale = resolveIdentityRowHeadingScale(size, recipe)
 
   if (!showHeading && parts.length === 0) {
     return null
   }
 
   if (!showHeading && parts.length === 1) {
-    return (
-      <span className={identityRowClassificationVariants({ size: scale.classification })}>
-        {parts[0]}
-      </span>
-    )
+    return <span className={identityRowClassificationVariants()}>{parts[0]}</span>
   }
 
   return (
-    <InlineMetadata
-      role="heading"
-      density="compact"
-      wrap={false}
-      separatorSize={recipe === 'entity-compact' ? 'xs' : undefined}
-      className={recipe === 'entity-compact' ? identityRowEntityCompactMetaVariants() : 'min-w-0'}
-    >
+    <InlineMetadata role="heading" density="compact" wrap={false} className="min-w-0">
       {showHeading ? (
         showHeadingInline ? (
           <InlineMetadata.Item className="flex min-w-0 items-center gap-1">
-            <span
-              className={cn(identityRowHeadingVariants({ size: scale.title }), 'min-w-0 truncate')}
-            >
-              {heading}
-            </span>
+            <IdentityRowTitle heading={heading} className={identityRowTitleClassName} />
             <span className="shrink-0 self-center" data-heading-inline="">
               {headingInline}
             </span>
           </InlineMetadata.Item>
         ) : (
-          <InlineMetadata.Item
-            truncate
-            className={identityRowHeadingVariants({ size: scale.title })}
-          >
-            {heading}
+          <InlineMetadata.Item truncate className={identityRowHeadingVariants()}>
+            <IdentityRowTitle heading={heading} className={identityRowTitleClassName} />
           </InlineMetadata.Item>
         )
       ) : null}
       {parts.map((part, index) => (
-        <InlineMetadata.Item
-          key={index}
-          className={identityRowClassificationVariants({ size: scale.classification })}
-        >
+        <InlineMetadata.Item key={index} className={identityRowClassificationVariants()}>
           {part}
         </InlineMetadata.Item>
       ))}
@@ -139,12 +113,6 @@ export type IdentityRowHeadingLineProps = {
   headingEnd?: ReactNode
   /** Intrinsic-width slot immediately after the title (not `headingEnd`). */
   headingInline?: ReactNode
-  size?: IdentityRowSize
-  /**
-   * Closed compact-card scale. Title stays 14px; classification, its dot, and
-   * `headingEnd` stay 12px. List rows omit this and keep one shared `size`.
-   */
-  recipe?: IdentityRowHeadingRecipe
 }
 
 /** Heading + classification line — row-track hosts place it in their band cell. */
@@ -153,16 +121,12 @@ export function IdentityRowHeadingLine({
   classification,
   headingEnd,
   headingInline,
-  size = 'md',
-  recipe,
 }: IdentityRowHeadingLineProps) {
   const content = (
     <IdentityRowHeadingContent
       heading={heading}
       classification={classification}
       headingInline={headingInline}
-      size={size}
-      recipe={recipe}
     />
   )
   const showHeadingEnd = isPresent(headingEnd)
@@ -183,17 +147,12 @@ export function IdentityRowHeadingLine({
 
 export type IdentityRowSupportingProps = {
   children: ReactNode
-  size?: IdentityRowSize
   wrap?: boolean
 }
 
 /** Supporting copy line — row-track hosts place it in their meta cell. */
-export function IdentityRowSupporting({
-  children,
-  size = 'md',
-  wrap = false,
-}: IdentityRowSupportingProps) {
-  return <div className={identityRowSupportingVariants({ size, wrap })}>{children}</div>
+export function IdentityRowSupporting({ children, wrap = false }: IdentityRowSupportingProps) {
+  return <div className={identityRowSupportingVariants({ wrap })}>{children}</div>
 }
 
 /** Shared compact entity identity — heading truncates; classification stays shrink-0 on the first line. */
@@ -204,8 +163,7 @@ export function IdentityRow({
   supportingWrap = false,
   headingEnd,
   status,
-  statusSpacing = 'offset',
-  size = 'md',
+  density,
   className,
 }: IdentityRowProps) {
   const showHeadingLine = isPresent(heading) || classificationParts(classification).length > 0
@@ -217,24 +175,19 @@ export function IdentityRow({
   }
 
   return (
-    <div className={cn(identityRowRootVariants(), className)}>
-      <div className={identityRowStackVariants({ size })}>
+    <div className={cn(identityRowRootVariants({ density }), className)}>
+      <div className={identityRowStackVariants()}>
         {showHeadingLine ? (
           <IdentityRowHeadingLine
             heading={heading}
             classification={classification}
             headingEnd={headingEnd}
-            size={size}
           />
         ) : null}
         {showSupporting ? (
-          <IdentityRowSupporting size={size} wrap={supportingWrap}>
-            {supporting}
-          </IdentityRowSupporting>
+          <IdentityRowSupporting wrap={supportingWrap}>{supporting}</IdentityRowSupporting>
         ) : null}
-        {showStatus ? (
-          <div className={identityRowStatusVariants({ spacing: statusSpacing })}>{status}</div>
-        ) : null}
+        {showStatus ? <div>{status}</div> : null}
       </div>
     </div>
   )

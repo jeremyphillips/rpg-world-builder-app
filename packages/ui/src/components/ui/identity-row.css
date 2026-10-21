@@ -1,0 +1,46 @@
+@layer components {
+  .ui-identity-row__stack {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--ui-anatomy-row-gap);
+  }
+
+  .ui-identity-row__title {
+    margin: 0;
+    min-width: 0;
+    flex-shrink: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ui-identity-row__title a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ui-identity-row__classification {
+    flex-shrink: 0;
+    font-weight: var(--font-weight-normal);
+    color: var(--muted-foreground);
+    font-size: var(--ui-copy-classification-size, var(--text-sm));
+    line-height: var(--ui-copy-classification-line-height, var(--text-sm--line-height));
+  }
+
+  .ui-identity-row__supporting {
+    color: var(--muted-foreground);
+    font-size: var(--ui-copy-supporting-size, var(--text-sm));
+    line-height: var(--ui-copy-supporting-line-height, var(--text-sm--line-height));
+  }
+
+  .ui-identity-row__supporting--wrap {
+    line-height: var(--leading-snug);
+  }
+
+  .ui-identity-row__supporting--truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

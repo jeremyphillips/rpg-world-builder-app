@@ -111,6 +111,8 @@ Co-located `*.stories.tsx` files run in the **dashboard** Storybook instance
 (`pnpm storybook:dashboard`, port **6007**). Primitives and form recipes belong
 in `@rpg/ui` Storybook (`:6006`) instead.
 
+Which card or entity surface to use in features → [card-guide.md](./card-guide.md). Live side-by-side recipes: Storybook **Recipes / Cards and Rows**.
+
 ### Routing in stories
 
 [`preview.tsx`](../.storybook/preview.tsx) wraps every story in `MemoryRouter`.

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Ability, CampaignCharacterGetResponse } from '@rpg/contracts'
 
@@ -15,12 +15,14 @@ export function useCampaignCharacterAbilityScoreEditor(
   const queryClient = useQueryClient()
   const [abilityScores, setAbilityScores] =
     useState<Partial<Record<Ability, number>>>(initialAbilityScores)
+  const [syncedInitialAbilityScores, setSyncedInitialAbilityScores] = useState(initialAbilityScores)
   const [pendingAbilities, setPendingAbilities] = useState<Set<Ability>>(() => new Set())
   const requestGenerationRef = useRef<Partial<Record<Ability, number>>>({})
 
-  useEffect(() => {
+  if (initialAbilityScores !== syncedInitialAbilityScores) {
+    setSyncedInitialAbilityScores(initialAbilityScores)
     setAbilityScores(initialAbilityScores)
-  }, [initialAbilityScores])
+  }
 
   const mutation = useMutation({
     mutationFn: (input: { ability: Ability; score: number; generation: number }) =>

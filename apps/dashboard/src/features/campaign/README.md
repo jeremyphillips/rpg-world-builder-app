@@ -62,8 +62,8 @@ acquisition model (axes, ownership, build/import finalization).
   completion marks the linked invite when possible (audit-only after membership is established).
 - **Recovery:** Membership survives invite expiry; players can return to
   onboarding without an `inviteId` query param. Recovery prompts are split by
-  surface — layout alert (in-campaign), home promotion cards (`PromotionCard`),
-  and campaigns index rows (`CampaignDestinationRow`). See
+  surface — layout alert (in-campaign), home `Card` / `Alert` promotions,
+  and campaigns index rows (`CampaignDestinationItem`). See
   [availability.md](../../../docs/availability.md#onboarding-recovery-surfaces).
 - **Invite handoff:** Public accept and dashboard/public **Continue setup** navigate
   to plain onboarding — not `resolveCampaignRecoveryDestination`. Accept and continue
@@ -73,7 +73,6 @@ acquisition model (axes, ownership, build/import finalization).
 
 | Component                            | Location                                                           | Surface                                                     |
 | ------------------------------------ | ------------------------------------------------------------------ | ----------------------------------------------------------- |
-| `PromotionCard`                      | `components/layout/promotion-card.tsx`                             | Shared home promotion chrome                                |
 | `CampaignRecoveryState`              | `lib/recovery/campaign-recovery-state.ts`                          | Dashboard wrapper over `viewerState`                        |
 | `resolveCampaignEntryDestination`    | `lib/recovery/campaign-destination.lib.ts`                         | Index/switcher/continue → campaign shell                    |
 | `resolveCampaignRecoveryDestination` | `lib/recovery/campaign-destination.lib.ts`                         | Home/alert/nav CTA → onboarding or reconnect                |
@@ -82,7 +81,7 @@ acquisition model (axes, ownership, build/import finalization).
 | `CampaignInvitationCard`             | `features/campaign-invite/components/campaign-invitation-card.tsx` | Home pending invite promotion                               |
 | `CampaignLayoutRecoveryChrome`       | `components/recovery/campaign-layout-recovery-chrome.tsx`          | Layout loading/error/recovery shell                         |
 | `CampaignOnboardingIncompleteAlert`  | `components/recovery/campaign-onboarding-incomplete-alert.tsx`     | Campaign layout warning                                     |
-| `CampaignDestinationRow`             | `components/recovery/campaign-destination-row.tsx`                 | Campaigns index rows                                        |
+| `CampaignDestinationItem`            | `components/recovery/campaign-destination-item.tsx`                | Campaigns index rows                                        |
 | `persistCampaignSelectionBestEffort` | `@rpg/api-client`                                                  | Public accept/continue handoff (local + server)             |
 | `usePersistCampaignSelection`        | `features/campaign`                                                | Dashboard accept/continue handoff                           |
 

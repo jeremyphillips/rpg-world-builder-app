@@ -204,7 +204,12 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'proficiencies',
       label: 'Proficiencies',
       fields: proficienciesFields(ctx),
-      errorPaths: ['proficiencies', 'weaponProficiencyMode', 'armorProficiencyMode'],
+      errorPaths: [
+        'proficiencies',
+        'weaponProficiencyMode',
+        'armorProficiencyMode',
+        'weaponProficiencyReconciliationPending',
+      ],
     },
     {
       id: 'spellcasting',

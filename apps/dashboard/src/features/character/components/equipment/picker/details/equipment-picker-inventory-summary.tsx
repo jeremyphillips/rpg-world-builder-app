@@ -1,21 +1,18 @@
 import { Heading, Text } from '@rpg/ui'
 
+import { collectionPanelLedgerBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+
 import type { EquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import {
   buildEquipmentPickerInventorySummaryRows,
   type EquipmentPickerInventorySummaryRow,
 } from './equipment-picker-inventory-summary.lib'
-import {
-  equipmentPickerInventorySummaryDividerClasses,
-  equipmentPickerInventorySummaryPanelClasses,
-  equipmentPickerInventorySummaryRowClasses,
-} from './equipment-picker-inventory-summary.variants'
 
 export const EQUIPMENT_PICKER_INVENTORY_SUMMARY_LABEL = 'In your inventory'
 
 function SummaryRow({ row }: { row: EquipmentPickerInventorySummaryRow }) {
   return (
-    <div className={equipmentPickerInventorySummaryRowClasses}>
+    <div className="flex items-center justify-between gap-3 text-sm">
       <Text as="span" variant="muted">
         {row.label}
       </Text>
@@ -50,12 +47,12 @@ export function EquipmentPickerInventorySummary({
         {EQUIPMENT_PICKER_INVENTORY_SUMMARY_LABEL}
       </Heading>
 
-      <div className={equipmentPickerInventorySummaryPanelClasses}>
+      <div className={collectionPanelLedgerBodyClasses}>
         <div className="space-y-2">
           {rows.map((row) => (
             <SummaryRow key={row.label} row={row} />
           ))}
-          <div className={equipmentPickerInventorySummaryDividerClasses} role="presentation" />
+          <div className="border-b border-border" role="presentation" />
           <SummaryRow row={total} />
         </div>
       </div>

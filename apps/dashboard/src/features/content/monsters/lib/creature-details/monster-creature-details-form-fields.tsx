@@ -8,7 +8,7 @@ import {
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
 } from '@rpg/contracts'
-import { vocabularyFieldLabel } from '@/features/vocabulary/lib/term-labels'
+import { vocabularyFieldLabel } from '@/features/vocabulary'
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
 import { createElement } from 'react'

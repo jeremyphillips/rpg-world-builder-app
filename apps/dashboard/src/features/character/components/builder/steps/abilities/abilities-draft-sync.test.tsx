@@ -5,20 +5,19 @@ import userEvent from '@testing-library/user-event'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
 import { createStandaloneBuilderContextFixture } from '../../../../lib/fixtures/character-builder-fixtures'
-import { abilitiesFormCopy } from '../../../../lib/steps/abilities-form-labels'
 import { AbilitiesStep } from './abilities-step'
 
 const context = createStandaloneBuilderContextFixture()
 
 function getChooseScoreButton(abilityLabel: string) {
   return screen.getByRole('button', {
-    name: new RegExp(`${abilitiesFormCopy.chooseScore} for ${abilityLabel}`, 'i'),
+    name: new RegExp(`Choose ${abilityLabel} score`, 'i'),
   })
 }
 
 async function assignStrengthScore(score: number) {
   await userEvent.click(getChooseScoreButton('Strength'))
-  await userEvent.click(screen.getByRole('menuitem', { name: String(score) }))
+  await userEvent.click(screen.getByRole('radio', { name: String(score) }))
 }
 
 beforeAll(() => {

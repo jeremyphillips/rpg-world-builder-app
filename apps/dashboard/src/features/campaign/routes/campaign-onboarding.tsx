@@ -1,6 +1,6 @@
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 
-import { buttonVariants, Text } from '@rpg/ui'
+import { ButtonLink, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
@@ -42,9 +42,9 @@ export function CampaignOnboarding() {
           <Text variant="muted" role="status">
             {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.activeWithoutCharacter.message}
           </Text>
-          <Link to={ROUTES.campaign.detail(context.campaignId)} className={buttonVariants()}>
+          <ButtonLink link={<Link to={ROUTES.campaign.detail(context.campaignId)} />}>
             {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.activeWithoutCharacter.action}
-          </Link>
+          </ButtonLink>
         </div>
       </PageShell>
     )

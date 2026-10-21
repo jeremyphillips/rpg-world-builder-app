@@ -127,7 +127,7 @@ describe('Form inputSelect field', () => {
     expect(numberInputRoot).toHaveClass('w-[calc(3*1ch+2.75rem)]')
 
     const group = container.querySelector('[role="group"]')
-    expect(group).toHaveClass('w-fit')
+    expect(group).toHaveClass('ui-field-group--intrinsic')
   })
 
   it('disables only the unit segment when unitDisabled is true', () => {

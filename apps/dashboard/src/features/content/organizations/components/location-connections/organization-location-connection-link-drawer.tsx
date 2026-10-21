@@ -27,7 +27,6 @@ import {
 } from '@/features/content'
 import { getContentDisplayImage } from '@/features/content/lib/detail/page/content-display-image'
 import { buildLocationContentDisplayImageInput } from '@/features/content/lib/detail/page/content-display-image-input'
-import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../../locations/lib/connected-parties/location-connection-kind-options-copy.lib'
 import {
   buildLocationEntityCardModel,
@@ -811,6 +810,22 @@ function OrganizationLocationConnectionLinkDrawerContent({
           const summary = pickerLocationSummaries.get(location.id)
           return summary ? buildLocationEntitySummarySearchText(summary) : location.name
         }}
+        selection={{
+          value: selectedLocationId,
+          onValueChange: setSelectedLocationId,
+          isItemDisabled: (location) => {
+            if (activeKind == null) return true
+            const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
+            return !organizationLocationConnectionHasAvailableKind({
+              locationId: location.id,
+              kinds: [activeKind],
+              subjectOrganizationId: organizationId,
+              connections: existingConnections,
+              edgesAtLocation,
+              excludeConnectionId,
+            })
+          },
+        }}
         renderEntityRow={createCatalogEntityRowRenderer({
           buildSurface: (location) => {
             const summary = pickerLocationSummaries.get(location.id)
@@ -825,7 +840,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
                 edgesAtLocation,
                 excludeConnectionId,
               })
-            const isSelected = selectedLocationId === location.id
             const metadata = !kindAvailable ? [fullyLinkedReason] : undefined
 
             return {
@@ -839,12 +853,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
                       buildLocationContentDisplayImageInput(location, 'compact'),
                     ),
                   }),
-              inlineAction: buildCatalogToggleSelectInlineAction({
-                isSelected,
-                canSelect: kindAvailable,
-                onSelect: () => setSelectedLocationId(location.id),
-                onDeselect: () => setSelectedLocationId(null),
-              }),
             }
           },
         })}

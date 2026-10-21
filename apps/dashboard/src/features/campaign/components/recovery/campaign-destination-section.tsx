@@ -1,10 +1,10 @@
 import type { CampaignListItem } from '@rpg/contracts'
 import type { EyebrowVariantProps } from '@rpg/ui'
-import { Eyebrow } from '@rpg/ui'
+import { DestinationList, Eyebrow } from '@rpg/ui'
 
 import { usePersistCampaignSelection } from '../../hooks/use-select-campaign'
-import { campaignDestinationListVariants } from './campaign-destination.variants'
-import { CampaignDestinationRow } from './campaign-destination-row'
+import { campaignDestinationListProps } from './campaign-destination-list-shell'
+import { CampaignDestinationItem } from './campaign-destination-item'
 
 type CampaignDestinationSectionProps = {
   eyebrow: string
@@ -30,13 +30,15 @@ export function CampaignDestinationSection({
       <Eyebrow as={eyebrowAs} size="sm" tone={eyebrowTone}>
         {eyebrow}
       </Eyebrow>
-      <ul className={campaignDestinationListVariants()}>
+      <DestinationList {...campaignDestinationListProps}>
         {campaigns.map((campaign) => (
-          <li key={campaign.id}>
-            <CampaignDestinationRow campaign={campaign} onPersistSelection={onPersistSelection} />
-          </li>
+          <CampaignDestinationItem
+            key={campaign.id}
+            campaign={campaign}
+            onPersistSelection={onPersistSelection}
+          />
         ))}
-      </ul>
+      </DestinationList>
     </section>
   )
 }

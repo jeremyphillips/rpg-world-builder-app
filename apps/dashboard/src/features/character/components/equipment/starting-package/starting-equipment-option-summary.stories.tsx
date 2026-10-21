@@ -71,7 +71,7 @@ const meta = {
   parameters: { layout: 'padded' },
   args: {
     summary: goldSummary,
-    density: 'default',
+    density: 'comfortable',
     onChangePackage: () => undefined,
   },
 } satisfies Meta<typeof StartingEquipmentOptionSummaryCard>

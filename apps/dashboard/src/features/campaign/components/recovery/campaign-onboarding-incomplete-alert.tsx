@@ -1,6 +1,6 @@
 import type { CampaignListItem } from '@rpg/contracts'
 import { Link } from 'react-router-dom'
-import { Alert, buttonVariants } from '@rpg/ui'
+import { Alert, ButtonLink } from '@rpg/ui'
 
 import { buildCampaignDisplay } from '../../lib/campaign-display'
 import {
@@ -42,9 +42,9 @@ export function CampaignOnboardingIncompleteAlert({ campaign }: { campaign: Camp
         title={campaignConnectionRestoreTitle(campaignName)}
         description={CAMPAIGN_CONNECTION_RESTORE_BODY}
         actions={
-          <Link to={destination.href} className={buttonVariants({ size: 'sm' })}>
+          <ButtonLink link={<Link to={destination.href} />} size="sm">
             {CAMPAIGN_CONNECTION_RESTORE_ACTION}
-          </Link>
+          </ButtonLink>
         }
       />
     )
@@ -60,9 +60,9 @@ export function CampaignOnboardingIncompleteAlert({ campaign }: { campaign: Camp
       title={finishJoiningCampaignTitle(campaignName)}
       description={CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.message}
       actions={
-        <Link to={destination.href} className={buttonVariants({ size: 'sm' })}>
+        <ButtonLink link={<Link to={destination.href} />} size="sm">
           {CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.action}
-        </Link>
+        </ButtonLink>
       }
     />
   )

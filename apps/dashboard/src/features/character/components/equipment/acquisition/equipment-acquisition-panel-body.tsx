@@ -1,6 +1,6 @@
 import { useId, useMemo } from 'react'
 
-import { Badge, Button, Heading, NumberStepper, Text } from '@rpg/ui'
+import { Badge, Button, cn, DividedStack, Heading, NumberStepper, Text } from '@rpg/ui'
 import {
   clampEquipmentStepQuantity,
   EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,
@@ -13,65 +13,24 @@ import {
   type EquipmentOwnedSourceViewModel,
 } from './equipment-acquisition-panel.lib'
 import { resolveAcquisitionCommitButtonLabel } from './equipment-acquisition-commit-labels.lib'
-import {
-  equipmentAcquisitionPanelBlockerClasses,
-  equipmentAcquisitionPanelBodyClasses,
-  equipmentAcquisitionPanelCommitButtonClasses,
-  equipmentAcquisitionPanelDividerClasses,
-  equipmentAcquisitionPanelNextActionClasses,
-  equipmentAcquisitionPanelNextActionDisclosureClasses,
-  equipmentAcquisitionPanelOwnedHeadingRowClasses,
-  equipmentAcquisitionPanelOwnedHeadingRowDisclosureClasses,
-  equipmentAcquisitionPanelOwnedSectionClasses,
-  equipmentAcquisitionPanelOwnedSectionDisclosureClasses,
-  equipmentAcquisitionPanelOwnedSourceListDisclosureClasses,
-  equipmentAcquisitionPanelPreviewLineClasses,
-  equipmentAcquisitionPanelPreviewLineDisclosureClasses,
-  equipmentAcquisitionPanelQuantityLabelClasses,
-  equipmentAcquisitionPanelQuantityRowClasses,
-  equipmentAcquisitionPanelQuantityRowDisclosureClasses,
-  equipmentAcquisitionPanelSectionHeadingClasses,
-  equipmentAcquisitionPanelSourceActionsClasses,
-  equipmentAcquisitionPanelSourceLabelClasses,
-  equipmentAcquisitionPanelSourceListClasses,
-  equipmentAcquisitionPanelSourceMetaClasses,
-  equipmentAcquisitionPanelSourceQuantityClasses,
-  equipmentAcquisitionPanelSourceQuantityWrapClasses,
-  equipmentAcquisitionPanelSourceRowClasses,
-  equipmentAcquisitionPanelSourceSpendSuffixClasses,
-} from './equipment-acquisition-panel.variants'
 import { EquipmentInventorySourceActionButton } from '../inventory/equipment-inventory-source-action-button'
 import type { EquipmentAcquisitionPanelBodyProps } from './equipment-acquisition-panel-body.types'
-
-type LayoutVariant = {
-  default: string
-  disclosure: string
-}
-
-function resolveAcquisitionPanelLayoutClass(
-  isDisclosureLayout: boolean,
-  classes: LayoutVariant,
-): string {
-  return isDisclosureLayout ? classes.disclosure : classes.default
-}
 
 function OwnedSourceQuantity({ source }: { source: EquipmentOwnedSourceViewModel }) {
   if (!source.spendSuffix) {
     return (
-      <Text as="span" className={equipmentAcquisitionPanelSourceQuantityClasses}>
+      <Text as="span" className="text-sm tabular-nums text-muted-foreground text-right">
         {source.quantityLabel}
       </Text>
     )
   }
 
   return (
-    <div className={equipmentAcquisitionPanelSourceQuantityWrapClasses}>
-      <Text as="span" className={equipmentAcquisitionPanelSourceQuantityClasses}>
+    <div className="flex min-w-0 flex-col items-end text-right">
+      <Text as="span" className="text-sm tabular-nums text-muted-foreground text-right">
         {source.quantityLabel}
       </Text>
-      <span className={equipmentAcquisitionPanelSourceSpendSuffixClasses}>
-        {source.spendSuffix}
-      </span>
+      <span className="text-style-supporting">{source.spendSuffix}</span>
     </div>
   )
 }
@@ -86,14 +45,14 @@ function OwnedSourceRow({
   disabled?: boolean
 }) {
   return (
-    <div className={equipmentAcquisitionPanelSourceRowClasses}>
-      <Text as="span" className={equipmentAcquisitionPanelSourceLabelClasses}>
+    <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-start gap-x-3">
+      <Text as="span" className="text-sm text-foreground">
         {source.label}
       </Text>
-      <div className={equipmentAcquisitionPanelSourceMetaClasses}>
+      <div className="min-w-0">
         <OwnedSourceQuantity source={source} />
       </div>
-      <div className={equipmentAcquisitionPanelSourceActionsClasses}>
+      <div className="flex justify-end">
         <EquipmentInventorySourceActionButton
           disabled={disabled}
           onClick={() => onSourceAction(source.action)}
@@ -117,63 +76,41 @@ function AcquisitionOwnedSection({
   onSourceAction: (action: EquipmentOwnedSourceAction) => void
 }) {
   return (
-    <>
+    <div className={isDisclosureLayout ? 'space-y-0' : 'space-y-3'}>
       <div
-        className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
-          default: equipmentAcquisitionPanelOwnedSectionClasses,
-          disclosure: equipmentAcquisitionPanelOwnedSectionDisclosureClasses,
-        })}
+        className={cn('flex min-w-0 flex-wrap items-center gap-2', isDisclosureLayout && 'mb-1')}
       >
-        <div
-          className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
-            default: equipmentAcquisitionPanelOwnedHeadingRowClasses,
-            disclosure: equipmentAcquisitionPanelOwnedHeadingRowDisclosureClasses,
-          })}
-        >
-          <Heading
-            variant="group"
-            as="h4"
-            className={equipmentAcquisitionPanelSectionHeadingClasses}
-          >
-            {owned.heading}
-          </Heading>
-          {owned.totalQuantity > 0 ? (
-            <Badge appearance="soft" tone="neutral" size="sm">
-              {owned.totalQuantity}
-            </Badge>
-          ) : null}
-        </div>
-        <div
-          className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
-            default: equipmentAcquisitionPanelSourceListClasses,
-            disclosure: equipmentAcquisitionPanelOwnedSourceListDisclosureClasses,
-          })}
-        >
-          {owned.sources.map((source) => (
-            <OwnedSourceRow
-              key={source.key}
-              source={source}
-              onSourceAction={onSourceAction}
-              disabled={isPending}
-            />
-          ))}
-        </div>
+        <Heading variant="group" as="h4">
+          {owned.heading}
+        </Heading>
+        {owned.totalQuantity > 0 ? (
+          <Badge appearance="soft" tone="neutral" size="sm">
+            {owned.totalQuantity}
+          </Badge>
+        ) : null}
       </div>
-      <div className={equipmentAcquisitionPanelDividerClasses} />
-    </>
+      <div className="space-y-3">
+        {owned.sources.map((source) => (
+          <OwnedSourceRow
+            key={source.key}
+            source={source}
+            onSourceAction={onSourceAction}
+            disabled={isPending}
+          />
+        ))}
+      </div>
+    </div>
   )
 }
 
 function AcquisitionNextActionQuantityRow({
   nextAction,
   quantity,
-  isDisclosureLayout,
   isPending,
   onQuantityChange,
 }: {
   nextAction: EquipmentAcquisitionPanelViewModel['nextAction']
   quantity: number
-  isDisclosureLayout: boolean
   isPending?: boolean
   onQuantityChange: (quantity: number) => void
 }) {
@@ -182,13 +119,8 @@ function AcquisitionNextActionQuantityRow({
   }
 
   return (
-    <div
-      className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
-        default: equipmentAcquisitionPanelQuantityRowClasses,
-        disclosure: equipmentAcquisitionPanelQuantityRowDisclosureClasses,
-      })}
-    >
-      <Text as="span" className={equipmentAcquisitionPanelQuantityLabelClasses}>
+    <div className="flex items-center justify-between gap-3">
+      <Text as="span" className="text-sm text-foreground">
         {nextAction.quantityLabel}
       </Text>
       <NumberStepper
@@ -215,14 +147,7 @@ function AcquisitionPreviewLines({
   isDisclosureLayout: boolean
 }) {
   return lines.map((line) => (
-    <Text
-      key={line}
-      as="p"
-      className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
-        default: equipmentAcquisitionPanelPreviewLineClasses,
-        disclosure: equipmentAcquisitionPanelPreviewLineDisclosureClasses,
-      })}
-    >
+    <Text key={line} as="p" className={cn('text-style-supporting', isDisclosureLayout && 'mb-3')}>
       {line}
     </Text>
   ))
@@ -250,7 +175,6 @@ function AcquisitionNextActionActiveContent({
       <AcquisitionNextActionQuantityRow
         nextAction={nextAction}
         quantity={quantity}
-        isDisclosureLayout={isDisclosureLayout}
         isPending={isPending}
         onQuantityChange={onQuantityChange}
       />
@@ -261,7 +185,7 @@ function AcquisitionNextActionActiveContent({
       <Button
         type="button"
         size="sm"
-        className={equipmentAcquisitionPanelCommitButtonClasses}
+        className="min-w-[13rem] justify-center tabular-nums"
         disabled={nextAction.disabled}
         onClick={() => onCommit(nextAction.commitQuantity)}
       >
@@ -293,20 +217,15 @@ function AcquisitionNextActionSection({
   onCommit: (requestedQuantity: number) => void
 }) {
   return (
-    <div
-      className={resolveAcquisitionPanelLayoutClass(isDisclosureLayout, {
-        default: equipmentAcquisitionPanelNextActionClasses,
-        disclosure: equipmentAcquisitionPanelNextActionDisclosureClasses,
-      })}
-    >
+    <div className={isDisclosureLayout ? 'space-y-0' : 'space-y-2'}>
       {nextAction.heading ? (
-        <Heading variant="group" as="h4" className={equipmentAcquisitionPanelSectionHeadingClasses}>
+        <Heading variant="group" as="h4">
           {nextAction.heading}
         </Heading>
       ) : null}
 
       {nextAction.blocked ? (
-        <Text as="p" className={equipmentAcquisitionPanelBlockerClasses}>
+        <Text as="p" variant="muted">
           {nextAction.blockerNote}
         </Text>
       ) : (
@@ -373,7 +292,7 @@ export function EquipmentAcquisitionPanelBody({
       : undefined
 
   return (
-    <div className={equipmentAcquisitionPanelBodyClasses}>
+    <DividedStack density="compact">
       {owned ? (
         <AcquisitionOwnedSection
           owned={owned}
@@ -394,6 +313,6 @@ export function EquipmentAcquisitionPanelBody({
         onQuantityChange={onQuantityChange}
         onCommit={onCommit}
       />
-    </div>
+    </DividedStack>
   )
 }

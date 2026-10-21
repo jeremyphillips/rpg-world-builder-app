@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../../lib/utils'
+import { cardSurfaceVariants } from '../card.variants'
 import { dragHandleVariants } from '../drag-handle.variants'
 import { dragSurfaceVariants } from '../drag-surface.variants'
 import { iconGhostControlVariants } from '../icon-ghost-control.variants'
@@ -58,17 +59,25 @@ export const collapsibleListItemChromeButtonClasses = iconGhostControlVariants({
 /** Catalog row shell — drop default bottom pad; expanded body owns vertical rhythm. */
 export const collapsibleListItemCatalogShellExtraClasses = 'pb-0'
 
-/** Entity-card host — catalog shell keeps border/bg but drops content-area inset. */
+/** Entity-card host — structural reset; perimeter lives on EntityCardFrame. */
+export const collapsibleListItemEntityCardShellClasses =
+  'ui-collapsible-list-item ui-collapsible-list-item--entity-card'
+
+/** @deprecated Padding reset is owned by `ui-collapsible-list-item--entity-card`. */
 export const collapsibleListItemEntityCardShellPaddingClasses = 'p-0'
 
 /** Entity-card host header row — no duplicate vertical padding; entity card owns rhythm. */
-export const collapsibleListItemEntityCardHeaderRowClasses =
-  'flex w-full min-w-0 items-center gap-2'
+export const collapsibleListItemEntityCardHeaderRowClasses = 'ui-collapsible-list-item__header'
+
+export const collapsibleListItemEntityCardHeaderStackClasses = 'ui-collapsible-list-item__stack'
+
+export const collapsibleListItemEntityCardHeaderStackSummaryGapClasses =
+  'ui-collapsible-list-item__stack--with-summary'
 
 export type CollapsibleListItemRowLayout = 'default' | 'entity-card'
 
-/** Catalog row chrome — picker/sheet row surface tone. */
-export const collapsibleListItemCatalogChromeClasses = 'border-border bg-catalog-picker-row-surface'
+/** Catalog row chrome — quiet card tone for raw picker rows (no Tailwind border/radius utilities). */
+export const collapsibleListItemCatalogChromeClasses = cardSurfaceVariants({ tone: 'quiet' })
 
 /** Shared body divider and vertical rhythm — no surface tone. */
 export const collapsibleListItemBodyFrameClasses = 'border-t border-border-subtle py-3'
@@ -109,36 +118,32 @@ export function collapsibleListItemHeaderRowClassesForRowLayout(
 }
 
 /** Item shell — border and shell padding; actions rail sits inside padded box on row 1. */
-export const collapsibleListItemShellVariants = cva(
-  cn('relative overflow-hidden rounded-md border'),
-  {
-    variants: {
-      layout: {
-        default: cn(
-          'grid grid-cols-[minmax(0,1fr)_auto] items-start',
-          collapsibleListItemShellPaddingClasses,
-        ),
-        headerActions: 'flex flex-col',
-        compactRow: collapsibleListItemFlatShellPaddingClasses,
-        entityCardHeaderActions: cn(
-          'flex flex-col',
-          collapsibleListItemEntityCardShellPaddingClasses,
-        ),
-      },
-      preset: {
-        default: 'border-border',
-        catalog: cn(
-          collapsibleListItemCatalogChromeClasses,
-          collapsibleListItemCatalogShellExtraClasses,
-        ),
-      },
+export const collapsibleListItemShellVariants = cva(cn('relative overflow-hidden'), {
+  variants: {
+    layout: {
+      default: cn(
+        'grid grid-cols-[minmax(0,1fr)_auto] items-start',
+        collapsibleListItemShellPaddingClasses,
+      ),
+      headerActions: 'flex flex-col',
+      compactRow: collapsibleListItemFlatShellPaddingClasses,
+      entityCardHeaderActions: collapsibleListItemEntityCardShellClasses,
     },
-    defaultVariants: {
-      layout: 'default',
-      preset: 'default',
+    preset: {
+      /** Entity-card hosts — perimeter lives on EntityCardFrame; CLI is structural only. */
+      none: '',
+      default: cn('rounded-md border border-border'),
+      catalog: cn(
+        collapsibleListItemCatalogChromeClasses,
+        collapsibleListItemCatalogShellExtraClasses,
+      ),
     },
   },
-)
+  defaultVariants: {
+    layout: 'default',
+    preset: 'default',
+  },
+})
 
 /** Preset-aware shell classes — use when composing rows outside the shell component. */
 export function collapsibleListItemShellPresetClasses(
@@ -165,6 +170,7 @@ export const collapsibleListItemHeaderVerticalPaddingVariants = cva('', {
     density: {
       compact: 'py-2',
       comfortable: 'py-3',
+      spacious: 'py-3',
     },
   },
   defaultVariants: {
@@ -244,7 +250,7 @@ export type CollapsibleListItemBodyClassOptions =
   }
 
 /**
- * Entity-card hosts — structural pass-through only. Outer surfaces (DEC) own all
+ * Entity-card hosts — structural pass-through only. Outer surfaces (disclosure EntityCard) own all
  * header/body inset; CLI supplies disclosure behavior and DOM structure.
  */
 export const collapsibleListItemEntityCardBodyClasses = 'min-w-0'

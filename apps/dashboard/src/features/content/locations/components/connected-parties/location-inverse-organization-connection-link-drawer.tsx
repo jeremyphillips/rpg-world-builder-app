@@ -29,7 +29,6 @@ import {
   resolveOrganizationRelationshipFilterLayout,
   useRelationshipCatalogFilters,
 } from '@/features/content'
-import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import {
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,
@@ -549,9 +548,25 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
         getSearchText={(organization) =>
           [organization.name, getOrganizationDomainLabel(organization.organizationDomain)].join(' ')
         }
+        selection={{
+          value: selectedOrganizationId,
+          onValueChange: (organizationId) => {
+            setSelectedOrganizationId(organizationId)
+            if (!resolvedAddKind) {
+              setSelectedKind(null)
+            }
+          },
+          isItemDisabled: (organization) =>
+            !organizationInverseSubjectHasAvailableKind(
+              organization.id,
+              location.id,
+              availabilityKinds,
+              orgRows,
+              excludeRelationshipId,
+            ),
+        }}
         renderEntityRow={createCatalogEntityRowRenderer({
           buildSurface: (organization) => {
-            const isSelected = selectedOrganizationId === organization.id
             const hasAvailableKind = organizationInverseSubjectHasAvailableKind(
               organization.id,
               location.id,
@@ -567,22 +582,6 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
                   metadata: !hasAvailableKind ? [fullyLinkedReason] : undefined,
                 },
               ),
-              inlineAction: buildCatalogToggleSelectInlineAction({
-                isSelected,
-                canSelect: hasAvailableKind,
-                onSelect: () => {
-                  setSelectedOrganizationId(organization.id)
-                  if (!resolvedAddKind) {
-                    setSelectedKind(null)
-                  }
-                },
-                onDeselect: () => {
-                  setSelectedOrganizationId(null)
-                  if (!resolvedAddKind) {
-                    setSelectedKind(null)
-                  }
-                },
-              }),
             }
           },
         })}

@@ -8,5 +8,9 @@
  */
 @import '@fontsource-variable/inter';
 @import '@rpg/ui/styles.css';
+@import './features/content/lib/entity/surfaces/cards/content/dash-entity-card.css';
+@import './features/content/lib/entity/surfaces/dash-entity-surface.css';
+@import './features/content/lib/entity/anatomy/dash-entity-anatomy.css';
+@import './features/content/lib/entity/anatomy/dash-entity-leading.css';
 @import './features/content/components/master-detail/master-detail-list-scroll.utilities.css';
 @source "../node_modules/@rpg/ui/src";

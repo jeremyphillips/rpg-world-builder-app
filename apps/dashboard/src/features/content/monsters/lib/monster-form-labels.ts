@@ -34,7 +34,7 @@ import {
   getContentTypeItemLabel,
   getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
-import { vocabularyFieldLabel } from '@/features/vocabulary/lib/term-labels'
+import { vocabularyFieldLabel } from '@/features/vocabulary'
 
 const armorClassLabel = CREATURE_ARMOR_CLASS_KIND_TERM.label
 

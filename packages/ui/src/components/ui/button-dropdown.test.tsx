@@ -43,7 +43,7 @@ describe('ButtonDropdown', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
     expect(screen.getByText('Proficiencies & training')).toBeInTheDocument()
-    expect(screen.getByRole('searchbox', { name: 'Search Add grant' })).toBeInTheDocument()
+    expect(screen.getByRole('searchbox', { name: 'Search add grant…' })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: /Skill proficiency/i })).toBeInTheDocument()
     expect(screen.getByText(/Already added/i)).toBeInTheDocument()
   })
@@ -63,7 +63,7 @@ describe('ButtonDropdown', () => {
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
     await user.click(screen.getByRole('menuitem', { name: /Movement bonus/i }))
     expect(onSelectItem).toHaveBeenCalledWith('movement-bonus')
-    expect(screen.queryByRole('searchbox', { name: 'Search Add grant' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('searchbox', { name: 'Search add grant…' })).not.toBeInTheDocument()
   })
 
   it('filters to a ranked flat list while searching', async () => {
@@ -73,7 +73,7 @@ describe('ButtonDropdown', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
-    await user.type(screen.getByRole('searchbox', { name: 'Search Add grant' }), 'walking')
+    await user.type(screen.getByRole('searchbox', { name: 'Search add grant…' }), 'walking')
 
     expect(screen.getByRole('menuitem', { name: /Movement bonus/i })).toBeInTheDocument()
     expect(screen.queryByRole('menuitem', { name: /Skill proficiency/i })).not.toBeInTheDocument()
@@ -93,7 +93,7 @@ describe('ButtonDropdown', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
-    const search = screen.getByRole('searchbox', { name: 'Search Add grant' })
+    const search = screen.getByRole('searchbox', { name: 'Search add grant…' })
     await user.type(search, 'skill')
     await user.keyboard('{Enter}')
     expect(onSelectItem).toHaveBeenCalledWith('skill-proficiency')
@@ -112,8 +112,8 @@ describe('ButtonDropdown', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
-    const search = screen.getByRole('searchbox', { name: 'Search Add grant' })
-    expect(search.closest('.h-9')).toBeInTheDocument()
+    const search = screen.getByRole('searchbox', { name: 'Search add grant…' })
+    expect(search.className).toContain('ui-search-bar__embedded-input--md')
   })
 
   itAxe('has no axe accessibility violations', async () => {
@@ -154,7 +154,7 @@ describe('ButtonDropdown', () => {
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
     expect(
       screen.getByRole('menu', { name: 'Add grant' }).parentElement?.parentElement,
-    ).toHaveClass('min-w-[var(--popover-menu-min-width)]')
+    ).toHaveClass('ui-interactive-list__panel--fit')
   })
 
   it('does not apply fit width classes by default', () => {

@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react'
 
-import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
 import type { CollapsibleListItemRowLayout } from './collapsible-list-item/collapsible-list-item.variants'
-import type { SurfaceConfig } from './visual-vocabulary.types'
 import type { CatalogToolbarTab, CatalogToolbarTabs } from './catalog-toolbar.types'
 
 export type CatalogPickerTab = CatalogToolbarTab
@@ -32,6 +30,13 @@ export type CatalogPickerCollapsibleRowRenderArgs<TItem> = {
   onToggleCollapse?: () => void
   summary?: ReactNode
   details?: ReactNode
+  selection?: { value: string; disabled: boolean }
+}
+
+export type CatalogPickerSheetSelection<TItem> = {
+  value: string | null
+  onValueChange: (itemKey: string) => void
+  isItemDisabled?: (item: TItem) => boolean
 }
 
 type CatalogPickerSheetRowRenderProps<TItem> =
@@ -103,8 +108,6 @@ export type CatalogPickerSheetProps<TItem> = {
   onOpenChange: (open: boolean) => void
   title: string
   description?: ReactNode
-  /** Merged onto the sheet headline — defaults to card title (19px). */
-  headlineClassName?: string
   items: readonly TItem[]
   getItemKey: (item: TItem) => string
   renderItemSummary?: (item: TItem) => ReactNode
@@ -169,17 +172,7 @@ export type CatalogPickerSheetProps<TItem> = {
   noResultsMessage?: string
   noScopedItemsMessage?: string
   noItemsMessage?: string
-  /** Collapsible row shell preset — equipment picker uses `catalog`. */
-  rowPreset?: CollapsibleListItemShellPreset
-  /** Row host layout — `entity-card` drops catalog content inset for embedded entity cards. Host-composition only; dashboard entity pickers use `CatalogEntityPickerSheet`. */
-  rowLayout?: CatalogPickerRowLayout
-  /** Collapsible row surface config — defaults to flat canvas. */
-  rowSurface?: SurfaceConfig
-  /** Top-align caret/grip with the first header line for multi-line headers. */
-  toolbarCompact?: boolean
-  /** Optional class merged onto each collapsible row expanded body. */
-  rowBodyClassName?: string
-  /** Optional class merged onto each collapsible row shell (`role="group"`). */
-  rowShellClassName?: string
+  /** Single-choice picker rows — results render as a radio group labelled by the sheet title. */
+  selection?: CatalogPickerSheetSelection<TItem>
 } & CatalogPickerSheetRowRenderProps<TItem> &
   CatalogPickerSearchStrategy<TItem>

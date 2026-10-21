@@ -31,9 +31,9 @@ describe('entity anatomy guard', () => {
     }
   })
 
-  it('publishes leading offset from DEC and CEC surface roots only', () => {
+  it('publishes leading geometry via EntityCardFrame leadingUtilityCount', () => {
     const decSource = readFileSync(
-      join(ENTITY_ROOT, 'surfaces/cards/disclosure/disclosure-entity-card.tsx'),
+      join(ENTITY_ROOT, 'surfaces/cards/disclosure/entity-card-disclosure-renderer.tsx'),
       'utf8',
     )
     const frameSource = readFileSync(
@@ -41,27 +41,27 @@ describe('entity anatomy guard', () => {
       'utf8',
     )
 
-    expect(decSource).toMatch(/buildEntityContentOffsetStyle/)
-    expect(frameSource).toMatch(/buildEntityLeadingChromeSizeStyle/)
+    expect(decSource).toMatch(/leadingUtilityCount=/)
+    expect(frameSource).toMatch(/leadingUtilityCount/)
+    expect(frameSource).not.toMatch(/\bstyle=/)
   })
 
-  it('owns named column lines without a global horizontal gap; rows come from RowAnatomy', () => {
+  it('composes row tracks and dash-entity-anatomy columns without inline grid utilities', () => {
     const variantsSource = readFileSync(
       join(ENTITY_ROOT, 'anatomy/entity-anatomy.variants.ts'),
       'utf8',
     )
 
-    expect(variantsSource).toContain(
-      'grid-cols-[[leading]_auto_[media]_auto_[content]_minmax(0,1fr)_[trailing]_auto]',
-    )
+    expect(variantsSource).toContain('dash-entity-anatomy')
     expect(variantsSource).toMatch(/rowAnatomyTracksVariants\(/)
     expect(variantsSource).not.toMatch(/\bgrid-rows-|\brow-start-|\bcol-start-/)
     expect(variantsSource).not.toMatch(/\bgap-x-/)
+    expect(variantsSource).not.toMatch(/grid-cols-\[\[leading\]/)
   })
 
-  it('keeps DEC on entity-card CLI row layout without consumer padding props', () => {
+  it('keeps EntityCard disclosure on entity-card CLI row layout without consumer padding props', () => {
     const decSource = readFileSync(
-      join(ENTITY_ROOT, 'surfaces/cards/disclosure/disclosure-entity-card.tsx'),
+      join(ENTITY_ROOT, 'surfaces/cards/disclosure/entity-card-disclosure-renderer.tsx'),
       'utf8',
     )
 
@@ -83,7 +83,7 @@ describe('entity anatomy guard', () => {
 
   it('keeps catalog entity row on entity-card CLI mode with shared anatomy', () => {
     const catalogRowSource = readFileSync(
-      join(ENTITY_ROOT, 'surfaces/catalog/catalog-entity-row.tsx'),
+      join(ENTITY_ROOT, 'surfaces/catalog/catalog-card.tsx'),
       'utf8',
     )
 
@@ -99,7 +99,7 @@ describe('entity anatomy guard', () => {
     const featureRoot = join(ENTITY_ROOT, '../..')
     const allowlist = new Set([
       join(ENTITY_ROOT, 'surfaces/catalog/catalog-entity-picker-sheet.tsx'),
-      join(ENTITY_ROOT, 'surfaces/cards/content/__tests__/content-entity-card.test.tsx'),
+      join(ENTITY_ROOT, 'surfaces/cards/content/__tests__/entity-card-static-renderer.test.tsx'),
     ])
     const entityPickerPattern =
       /(picker|drawer)\.(client|integration)\.(tsx|ts)$|(picker|drawer)\.client\.(tsx|ts)$/

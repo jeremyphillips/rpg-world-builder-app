@@ -6,20 +6,59 @@ offsets a cell to "fix" alignment.
 
 Source: `packages/ui/src/components/ui/row-anatomy/`. Live catalog of every surface:
 dashboard Storybook **Recipes / Cards and Rows** (`apps/dashboard/src/stories/card-recipes/`).
-Entity-family usage: [dashboard entity presentation contract](../../../apps/dashboard/docs/content-entity-card.md).
+Entity-family usage: start with [card-guide](../../../apps/dashboard/docs/card-guide.md); entity rules in [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md).
 
 ## Ownership invariant
 
-| Concern                               | Owner                                      |
-| ------------------------------------- | ------------------------------------------ |
-| Row tracks (vertical)                 | `rowAnatomyTracksVariants`                 |
-| Cell row placement and self-alignment | `rowAnatomyCellClasses` (sole resolver)    |
-| Columns, column gaps                  | Host (e.g. `entityAnatomyColumnsVariants`) |
-| Padding / surface inset               | Host surface (e.g. `EntityCardFrame`)      |
-| Inner content layout                  | Cell children (flex rows inside a cell)    |
+| Concern                               | Owner                                                                        |
+| ------------------------------------- | ---------------------------------------------------------------------------- |
+| Row tracks (vertical)                 | `rowAnatomyTracksVariants`                                                   |
+| Cell row placement and self-alignment | `rowAnatomyCellClasses` (sole resolver)                                      |
+| Gap between related stacked copy rows | `--ui-anatomy-row-gap` (`copy-scale.css`)                                    |
+| Leading thumbnail dimensions          | `--ui-anatomy-leading-size` + `.ui-anatomy-leading-media` (`copy-scale.css`) |
+| Columns, column gaps                  | Host (e.g. `entityAnatomyColumnsVariants`)                                   |
+| Padding / surface inset               | Host surface (e.g. `EntityCardFrame`)                                        |
+| Inner content layout                  | Cell children (flex rows inside a cell)                                      |
 
-The track variant emits **rows only** — never columns, gaps, padding, or inset. Hosts
-compose it with their own column template.
+The track variant emits **rows only** — never columns, horizontal gaps, padding, or inset.
+Hosts compose it with their own column template. Vertical rhythm between band, meta, and
+status uses `--ui-anatomy-row-gap` on flex stacks (`IdentityRow`, Card header, Alert copy)
+and as `margin-block-start` on row-anatomy meta/status cells — not `row-gap` on the grid
+(empty tracks would create phantom spacing).
+
+## Anatomy row gap
+
+Density-aware spacing between related stacked rows (title, supporting, status). Surfaces own
+region separation (`--ui-surface-region-gap`); lists own spacing between distinct items.
+
+| Density     | Row gap |
+| ----------- | ------- |
+| compact     | 2px     |
+| comfortable | 4px     |
+| spacious    | 6px     |
+
+Published on the same density selectors as copy scale (`ui-card--*`, `ui-alert--*`,
+`ui-destination-list--*`, `ui-identity-row--*`, `dash-entity-anatomy--*`, …). Comfortable is the `:root` default when
+no density ancestor is present. Status uses this gap only — no separate offset.
+
+Embedded entity rows inside a `DestinationList` inherit row gap and copy vars from the list shell; they do not need `dash-entity-anatomy--*` unless overriding the list. Compact badge sizing, caption treatment, and `InlineMetadata` density still require an explicit anatomy `density` prop when those rules apply.
+
+## Anatomy copy roles
+
+Three typography roles share the density contract in [`copy-scale.css`](../src/components/ui/copy-scale.css)
+(`--ui-copy-title-*`, `--ui-copy-classification-*`, `--ui-copy-supporting-*` on the same density
+selectors as cards, entity anatomy, and `ui-identity-row--*`). Comfortable defaults also publish on
+`:root` for standalone rows without a density ancestor.
+
+| Density     | Title (size / lh) | Classification (size / lh) | Supporting (size / lh) |
+| ----------- | ----------------- | -------------------------- | ---------------------- |
+| compact     | 14px / 20px       | 12px / 16px                | 12px / 16px            |
+| comfortable | 16px / 22px       | 14px / 20px                | 14px / 20px            |
+| spacious    | 19px / 26px       | 16px / 22px                | 14px / 20px            |
+
+Titles use `ui-copy-title` (weight `--font-weight-heading`). Classification on
+`IdentityRowHeadingLine` uses `.ui-identity-row__classification` (normal weight, muted
+foreground). Supporting lines use `ui-copy-supporting` / `.ui-identity-row__supporting`.
 
 ## Tracks
 
@@ -53,13 +92,13 @@ type RowAnatomyCellSpec<C extends string = RowColumn> =
   | { slot: 'stretch'; column: 'trailing' }
 ```
 
-| Slot      | Row placement                 | Self-alignment         | Typical content                                 |
-| --------- | ----------------------------- | ---------------------- | ----------------------------------------------- |
-| `band`    | `[band]`                      | center                 | Heading line, labeled action, media, grip/caret |
-| `meta`    | `[meta]`                      | start (+ track offset) | Description, secondary price/quantity           |
-| `status`  | `[status]`                    | start (+ track offset) | Status badges / annotations                     |
-| `full`    | `[slack-start]` → `[row-end]` | center                 | Ghost utilities, chevrons, steppers             |
-| `stretch` | `[slack-start]` → `[row-end]` | stretch                | Full-height trailing chrome                     |
+| Slot      | Row placement                 | Self-alignment | Typical content                                 |
+| --------- | ----------------------------- | -------------- | ----------------------------------------------- |
+| `band`    | `[band]`                      | center         | Heading line, labeled action, media, grip/caret |
+| `meta`    | `[meta]`                      | start          | Description, secondary price/quantity           |
+| `status`  | `[status]`                    | start          | Status badges / annotations                     |
+| `full`    | `[slack-start]` → `[row-end]` | center         | Ghost utilities, chevrons, steppers             |
+| `stretch` | `[slack-start]` → `[row-end]` | stretch        | Full-height trailing chrome                     |
 
 `RowAnatomyCell` renders the cell: it accepts the spec, children, and `data-*` attributes
 only — **no `className` or `style`**. Column placement is inline `grid-column: <name>`;
@@ -69,18 +108,18 @@ track offsets live in the resolver, not in consumers. Hosts mark their grid root
 
 ## Entity kind → cell
 
-| Entity slot / trailing kind | Cell                                                                  |
-| --------------------------- | --------------------------------------------------------------------- |
-| leading utilities           | `band` / `leading`                                                    |
-| media                       | `stretch` / `media` (spans identity stack; band stays control height) |
-| heading                     | `band` / `content`                                                    |
-| description                 | `meta` / `content`                                                    |
-| status                      | `status` / `content`                                                  |
-| `action`                    | `band` / `trailing`                                                   |
-| `utility`                   | `full` / `trailing`                                                   |
-| `indicator` chevron         | `full` / `trailing`                                                   |
-| `indicator` quantity        | `band` / `trailing`                                                   |
-| `group`                     | primary `band`, secondary `meta` (both `trailing`)                    |
+| Entity slot / trailing kind | Cell                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------- |
+| leading utilities           | `band` / `leading` (caret, drag grip, **selection radio** via `SelectionTargetRadio`) |
+| media                       | `stretch` / `media` (spans identity stack; band stays control height)                 |
+| heading                     | `band` / `content`                                                                    |
+| description                 | `meta` / `content`                                                                    |
+| status                      | `status` / `content`                                                                  |
+| `action`                    | `band` / `trailing`                                                                   |
+| `utility`                   | `full` / `trailing`                                                                   |
+| `indicator` chevron         | `full` / `trailing`                                                                   |
+| `indicator` quantity        | `band` / `trailing`                                                                   |
+| `group`                     | primary `band`, secondary `meta` (both `trailing`)                                    |
 
 ## No compensation rule
 
@@ -92,7 +131,6 @@ If a cell looks misaligned, fix the track or the resolver — never the consumer
 - No per-consumer alignment props. `trailingAlign`, `headingBand`, `actionsAlign`, and
   `rowAlign` are retired — rhythm resolves inside the owning primitive
   (`resolveCollapsibleListItemHeaderActionsPlacement`, `resolveContentCardBodyCrossAxis`).
-- Meta/status offsets share `row-identity-rhythm.tokens.ts` with `IdentityRow` stacks.
 - A primitive that needs a new slot, variant, or override to fit is a **different
   anatomy** — document it below instead of bending the contract.
 
@@ -113,14 +151,30 @@ recipes in feature variants.
 Classification of the non-entity row primitives against the row-track contract. Rule: a
 primitive that needs a new slot, variant, or override to fit is a different anatomy.
 
-| Primitive                                                     | Classification                    | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `CollapsibleListItem` (default header)                        | **Different anatomy**             | Header is a toolbar row (grip, caret, title, optional inline compact fields) with actions centered on the title row or stacked below via `resolveCollapsibleListItemHeaderActionsPlacement` (`headerActions` flex-col). Not a band/meta/status stack; headers can host form fields on field-row tracks. Fitting it would need a new "toolbar" slot. Entity hosts bypass via `rowLayout="entity-card"`.                                                                   |
-| `ArrayItemAnatomyGrid`                                        | **Different anatomy**             | Rows are field tracks (`label` / `control` / `message`, `grid-rows-[auto_auto_auto]`) shared via subgrid with `Field.Root rowParticipation`. Grip/actions span all tracks and center — analogous to `full` cells — but the content tracks are field anatomy, not identity band/meta/status.                                                                                                                                                                              |
-| `ContentCardBody` (`ContentCard`)                             | **Different anatomy** (candidate) | Shape matches (media / heading / secondary / end slot) but it carries two secondary lines (`subheading` + `metadata`) plus an arbitrary `footer` with its own `mt-2` rhythm; cross-axis alignment is derived via `resolveContentCardBodyCrossAxis`. Migration would need `footer` → `status` with a rhythm change. Dashboard entity surfaces no longer use it; remaining consumers are `@rpg/ui` / public-app `ContentCard`. Candidate for a reviewed Phase 4 migration. |
-| `InteractiveListRow` (+ `ComboboxOptionRow`, `MenuChoiceRow`) | **Different anatomy**             | Two-root composition: the interactive hit area (`button` / `a` / Radix `menuitem`, often via `asChild`) wraps `startSlot` + `IdentityRow` + `endSlot`, and `trailingAction` is a sibling outside the hit area with its own divider. Row-track cells must be direct grid children, which would split the single interactive element. Identity text already shares `IdentityRowHeadingLine` / `IdentityRowSupporting` with the entity family.                              |
-| `SelectionOptionCard`                                         | **Different anatomy**             | Vertical card stack: optional header row (eyebrow + start/end slots) above title, description, summary lines, and embedded content. Not a single identity row.                                                                                                                                                                                                                                                                                                           |
-| `SelectionSummaryCard` + Quick NPC starting-choices grid      | **Different anatomy**             | Key/value tables: `dl` rows with label / value / action columns plus a helper row; Quick NPC uses a `grid-cols-[max-content_minmax(0,1fr)_auto]` subgrid across category rows. Column alignment across rows is the contract, not per-row tracks. Selected-choice rows inside the Quick NPC panel are entity rows and already use the row-track contract.                                                                                                                 |
+| Primitive                                                     | Classification        | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CollapsibleListItem` (default header)                        | **Different anatomy** | Header is a toolbar row (grip, caret, title, optional inline compact fields) with actions centered on the title row or stacked below via `resolveCollapsibleListItemHeaderActionsPlacement` (`headerActions` flex-col). Not a band/meta/status stack; headers can host form fields on field-row tracks. Fitting it would need a new "toolbar" slot. Entity hosts bypass via `rowLayout="entity-card"`.                                      |
+| `ArrayItemAnatomyGrid`                                        | **Different anatomy** | Rows are field tracks (`label` / `control` / `message`, `grid-rows-[auto_auto_auto]`) shared via subgrid with `Field.Root rowParticipation`. Grip/actions span all tracks and center — analogous to `full` cells — but the content tracks are field anatomy, not identity band/meta/status.                                                                                                                                                 |
+| Legacy `ContentCard` shell                                    | **Retired**           | Entity identity uses dashboard `EntityCard` + `EntityAnatomy` + `IdentityRow*`. Hub/roster tiles use generic `Card` + `IdentityRowHeadingLine`. Layout helpers in `content-card.variants.ts` remain for inset/copy only.                                                                                                                                                                                                                    |
+| `InteractiveListRow` (+ `ComboboxOptionRow`, `MenuChoiceRow`) | **Different anatomy** | Two-root composition: the interactive hit area (`button` / `a` / Radix `menuitem`, often via `asChild`) wraps `startSlot` + `IdentityRow` + `endSlot`, and `trailingAction` is a sibling outside the hit area with its own divider. Row-track cells must be direct grid children, which would split the single interactive element. Identity text already shares `IdentityRowHeadingLine` / `IdentityRowSupporting` with the entity family. |
+| `SelectionOptionCard`                                         | **Different anatomy** | Vertical card stack: optional header row (eyebrow + start/end slots) above title, description, summary lines, and embedded content. Not a single identity row.                                                                                                                                                                                                                                                                              |
+| `SelectionSummaryCard` + Quick NPC starting-choices grid      | **Different anatomy** | Key/value tables: `dl` rows with label / value / action columns plus a helper row; Quick NPC uses a `grid-cols-[max-content_minmax(0,1fr)_auto]` subgrid across category rows. Column alignment across rows is the contract, not per-row tracks. Selected-choice rows inside the Quick NPC panel are entity rows and already use the row-track contract.                                                                                    |
 
-Phase 4 outcome: no non-entity primitive was migrated. `ContentCardBody` is the only
-candidate and needs a reviewed decision on its `footer` rhythm first.
+## Heading accessories
+
+Density for identity copy is published on ancestors (`.ui-card--*`, `ui-destination-list--*`, `ui-identity-row--*`, `ui-content-card-heading--*`, `dash-entity-anatomy--*`) via [`copy-scale.css`](../src/components/ui/copy-scale.css). Anatomy titles use `ui-copy-title` (or equivalent shell rules) for **size and `--font-weight-heading` (600)** at every density — density does not switch titles to body-emphasis. Generic **`Card`** + `IdentityRowHeadingLine` inside `CardHeader` inherits title size from the card shell without `contentCardHeadingScaleClass`.
+
+| Card / identity density | Title copy | Title weight | Badge or `StatusIcon` beside the title line (`headingEnd`)    |
+| ----------------------- | ---------: | ------------ | ------------------------------------------------------------- |
+| compact                 |    14 / 20 | 600          | `sm` — set explicitly on `Badge` / `StatusIcon` at call sites |
+| comfortable             |    16 / 22 | 600          | `sm`                                                          |
+| spacious                |    19 / 26 | 600          | `md`                                                          |
+
+The same ladder applies to entity **status-lane** badges on `EntitySummary.status` — see [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
+
+Do not add contextual Badge CSS or wrapper components that override an explicit `size` prop.
+
+`IdentityRowHeadingLine` uses `items-center` on the outer flex row (title cluster vs `headingEnd`) and
+`items-baseline` inside the cluster for title + classification via `InlineMetadata`.
+
+Use `resolveEntityRowInlineBadgeSize` from `@rpg/ui` at call sites (title accessories and status items). `resolveHeadingAccessoryBadgeSize` is a deprecated alias. Card **footer** and Alert **actions** labeled-control sizing: [ui-architecture.md](./ui-architecture.md#card-footer-labeled-actions) (`resolveSurfaceActionButtonSize`).

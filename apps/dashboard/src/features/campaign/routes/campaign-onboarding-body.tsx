@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import type { CampaignOnboardingContext } from '@rpg/contracts'
-import { buttonVariants, Text } from '@rpg/ui'
+import { ButtonLink, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { PageShell } from '@/components/layout/page/page-shell'
@@ -25,9 +25,9 @@ export function CampaignOnboardingBody({
           <Text variant="muted" role="status">
             {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.complete.message}
           </Text>
-          <Link to={ROUTES.campaign.detail(context.campaignId)} className={buttonVariants()}>
+          <ButtonLink link={<Link to={ROUTES.campaign.detail(context.campaignId)} />}>
             {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.complete.action}
-          </Link>
+          </ButtonLink>
         </div>
       </PageShell>
     )

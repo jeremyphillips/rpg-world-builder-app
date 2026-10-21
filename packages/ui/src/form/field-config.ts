@@ -1465,7 +1465,7 @@ export interface ArrayItemConfig {
   removeSlot?: Pick<SlotConfig, 'name' | 'render' | 'visibility'>
   /**
    * Replace default ArrayItem card chrome with a custom shell (e.g. entity
-   * DisclosureEntityCard). Form behavior stays array-owned; presentation does not.
+   * EntityCardDisclosureRenderer). Form behavior stays array-owned; presentation does not.
    * Ignored for compact inline rows.
    */
   renderShell?: (props: ArrayItemShellRenderProps) => ReactNode

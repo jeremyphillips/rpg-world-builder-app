@@ -30,38 +30,52 @@ describe('EquipmentResourceSummary', () => {
   it('keeps a magic-items row when every slot is fulfilled', () => {
     render(<EquipmentResourceSummary density="comfortable" slots={[fulfilledCommon]} />)
 
-    expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
-    const badge = screen.getByLabelText('Common, complete')
-    expect(badge).toHaveClass('text-muted-foreground', 'bg-semantic-neutral-soft')
-    expect(badge.className).not.toContain('text-foreground-disabled')
-    expect(badge.querySelector('.rounded-full')).toHaveClass(
-      'bg-status-icon-idle',
-      'text-status-icon-neutral-foreground',
-    )
-    expect(badge).not.toHaveTextContent('·')
-    expect(screen.getByRole('heading', { name: 'Magic items' })).toHaveClass('heading-style-group')
+    expect(screen.getByText('Magic items')).toBeInTheDocument()
+    expect(screen.getByText('Common, complete')).toBeInTheDocument()
+    expect(screen.getByText('Common, complete').querySelector('svg')).toBeInTheDocument()
   })
 
   it('omits the trailing action in compact currency summaries', () => {
     render(
       <EquipmentResourceSummary
         density="compact"
-        currency={{ heading: '40 GP remaining', subheading: '100 GP budget · 15 GP spent' }}
+        currency={{
+          heading: '40 GP remaining',
+          metadata: ['100 GP budget', '15 GP spent'],
+        }}
       />,
     )
 
-    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toHaveClass(
-      'heading-style-group',
-    )
-    expect(screen.getByText('100 GP budget · 15 GP spent')).toHaveClass('text-sm')
+    expect(screen.getByText('40 GP remaining')).toBeInTheDocument()
+    expect(screen.getByText('100 GP budget')).toBeInTheDocument()
+    expect(screen.getByText('15 GP spent')).toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('gives each resource section its own action and space between them', () => {
+  it('uses a single panel shell with embedded anatomy hosts', () => {
     const { container } = render(
       <EquipmentResourceSummary
         density="comfortable"
-        currency={{ heading: '15 GP remaining', subheading: '15 GP budget · 0 GP spent' }}
+        currency={{
+          heading: '15 GP remaining',
+          metadata: ['15 GP budget', '0 GP spent'],
+        }}
+        slots={[openCommon]}
+      />,
+    )
+
+    expect(container.querySelectorAll('.ui-card')).toHaveLength(0)
+    expect(container.firstElementChild).toHaveClass('rounded-md', 'border', 'overflow-hidden')
+  })
+
+  it('gives each resource section its own action inside a divided stack', () => {
+    const { container } = render(
+      <EquipmentResourceSummary
+        density="comfortable"
+        currency={{
+          heading: '15 GP remaining',
+          metadata: ['15 GP budget', '0 GP spent'],
+        }}
         slots={[openCommon]}
         currencyAction={{
           label: 'Browse equipment',
@@ -76,20 +90,14 @@ describe('EquipmentResourceSummary', () => {
       />,
     )
 
-    const browseEquipment = screen.getByRole('button', { name: 'Browse equipment' })
-    expect(browseEquipment).toHaveClass('ui-button--secondary')
-    expect(browseEquipment.parentElement).toHaveClass('shrink-0', 'self-center')
-    expect(screen.getByRole('button', { name: 'Browse magic items' })).toHaveClass(
-      'ui-button--secondary',
-    )
-    expect(container.querySelector('.border-t')).toHaveClass('mt-4', 'pt-4', 'border-border')
+    expect(screen.getByRole('button', { name: 'Browse equipment' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Browse magic items' })).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="divided-stack"]')).toBeInTheDocument()
   })
 
-  it('shows one aggregated badge for duplicate rarity slots passed in', () => {
+  it('shows one badge per rarity slot passed in', () => {
     render(<EquipmentResourceSummary density="comfortable" slots={[openCommon]} />)
-    const badge = screen.getByLabelText('Common · 2 remaining')
-    expect(badge).toHaveTextContent('Common · 2 remaining')
-    expect(badge.querySelector('[data-inline-metadata-separator]')).toBeNull()
-    expect(screen.getAllByLabelText(/Common/)).toHaveLength(1)
+    expect(screen.getByText('Common · 2 remaining')).toBeInTheDocument()
+    expect(screen.getAllByText(/Common/)).toHaveLength(1)
   })
 })

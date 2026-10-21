@@ -1,4 +1,4 @@
-import { InlineMetadata, StatusDot, Text, heroMetaClasses } from '@rpg/ui'
+import { InlineMetadata, StatusDot, Text } from '@rpg/ui'
 
 import { buildCampaignMetaSegments, type CampaignMeta } from '../lib/campaign-meta.lib'
 
@@ -12,7 +12,7 @@ export function CampaignMetaLine({ meta, includeRecency, countsPending }: Campai
   const segments = buildCampaignMetaSegments(meta, { includeRecency, countsPending })
 
   return (
-    <Text variant="muted" className={heroMetaClasses} as="span">
+    <Text variant="muted" as="span">
       <InlineMetadata role="supporting" density="comfortable" wrap>
         {segments.map((segment, index) => (
           <InlineMetadata.Item key={`${segment.kind}-${index}`}>

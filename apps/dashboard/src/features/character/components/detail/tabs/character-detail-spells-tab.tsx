@@ -7,7 +7,7 @@ import {
   buildCatalogDisclosureLabel,
   CatalogCollapsibleList,
   CatalogMetadataRenderer,
-  DisclosureEntityCard,
+  EntityCard,
 } from '@/features/content'
 import { buildSpellDetailViewModel, SpellDetailMetadata } from '@/features/content'
 import { CHARACTER_EMPTY_SECTION_TEXT } from '../../../lib/display/character-display'
@@ -47,7 +47,8 @@ function SpellCatalogRow({ card }: { card: CharacterSheetSpellCard }) {
   })
 
   return (
-    <DisclosureEntityCard
+    <EntityCard
+      variant="disclosure"
       itemId={card.id}
       toolbarAriaLabel={toolbarLabel}
       entity={{
@@ -82,7 +83,7 @@ function SpellCatalogRow({ card }: { card: CharacterSheetSpellCard }) {
       ) : (
         <Text variant="muted">{header.unavailableMessage}</Text>
       )}
-    </DisclosureEntityCard>
+    </EntityCard>
   )
 }
 

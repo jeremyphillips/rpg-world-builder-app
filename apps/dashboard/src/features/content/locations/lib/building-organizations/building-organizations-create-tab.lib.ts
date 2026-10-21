@@ -35,7 +35,6 @@ export const BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL = 'Choose existing'
 export const BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL = '+ Add another relationship'
 export const BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL = 'Add relationship'
 export const BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL = 'Update relationship'
-export const BUILDING_ORGANIZATIONS_SELECT_LABEL = 'Select'
 export const BUILDING_ORGANIZATIONS_PENDING_HEADING = 'Pending relationships'
 export const BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE =
   'Finish or cancel the relationship you are adding.'
@@ -97,7 +96,9 @@ export function buildBuildingOrganizationPendingEntity(input: {
   const relationshipLabel = getOrganizationLocationConnectionLabel(input.relationship.kind)
   return {
     heading: relationshipOrganizationName(input),
-    classification: domainLabel ? joinInlineMetadata([domainLabel, relationshipLabel]) : relationshipLabel,
+    classification: domainLabel
+      ? joinInlineMetadata([domainLabel, relationshipLabel])
+      : relationshipLabel,
     ...(input.relationship.organization.kind === 'new'
       ? {
           status: [

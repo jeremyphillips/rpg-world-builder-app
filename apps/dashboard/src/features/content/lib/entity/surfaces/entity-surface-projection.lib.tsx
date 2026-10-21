@@ -1,10 +1,6 @@
-import { CatalogPickerRowAction, contentCardMediaVariants, type ContentCardDensity } from '@rpg/ui'
+import { CatalogPickerRowAction } from '@rpg/ui'
 
-import {
-  ContentMediaFallback,
-  ContentMediaImage,
-  type ContentMediaImageFrame,
-} from '@/features/media'
+import { ContentMediaFallback, ContentMediaImage } from '@/features/media'
 
 import type { EntityAnatomyTrailing } from '../anatomy/entity-anatomy-trailing.types'
 import type {
@@ -14,48 +10,35 @@ import type {
 import type { EntitySummaryModel } from '../summary/entity-summary.types'
 import type { EntitySurfaceConfig } from './entity-surface.types'
 
-/** Default entity-row thumbnail — IdentityFrame `sm` (40px); independent of text density. */
-export const ENTITY_SURFACE_LEADING_THUMB_FRAME: ContentMediaImageFrame = 'insetSm'
-
-export function buildEntitySurfaceLeadingMediaNode(
-  identity: EntitySurfaceIdentity,
-  _density: ContentCardDensity = 'compact',
-) {
+export function buildEntitySurfaceLeadingMediaNode(identity: EntitySurfaceIdentity) {
   return buildEntitySurfaceMedia(identity)
 }
 
 function buildEntitySurfaceMedia(identity: EntitySurfaceIdentity) {
-  const className = contentCardMediaVariants({ density: 'compact' })
-
   if (identity.displayImage) {
     return (
       <ContentMediaImage
         display={identity.displayImage}
         alt={identity.heading}
-        frame={ENTITY_SURFACE_LEADING_THUMB_FRAME}
-        className={className}
+        frame="anatomyFill"
       />
     )
   }
 
-  return (
-    <ContentMediaFallback
-      fallback={identity.fallback}
-      frame={ENTITY_SURFACE_LEADING_THUMB_FRAME}
-      className={className}
-    />
-  )
+  return <ContentMediaFallback fallback={identity.fallback} frame="anatomyFill" />
 }
 
 export function projectEntitySurfaceIdentityToSummaryModel(
   identity: EntitySurfaceIdentity,
-  _density: ContentCardDensity = 'compact',
 ): EntitySummaryModel {
   const { heading, metadata, classification, status, selectionState } = identity
 
+  const media =
+    identity.displayImage || identity.fallback ? buildEntitySurfaceMedia(identity) : undefined
+
   return {
     heading,
-    media: buildEntitySurfaceMedia(identity),
+    ...(media ? { media } : {}),
     ...(classification ? { classification } : {}),
     ...(metadata && metadata.length > 0 ? { supportingMetadata: metadata } : {}),
     ...(status && status.length > 0 ? { status } : {}),
@@ -84,31 +67,13 @@ export function buildEntitySurfaceInlineActionTrailing(
   }
 }
 
-export function buildCatalogToggleSelectInlineAction(input: {
-  isSelected: boolean
-  onSelect: () => void
-  onDeselect: () => void
-  canSelect?: boolean
-  selectLabel?: string
-}): EntitySurfaceInlineAction {
-  return {
-    label: input.isSelected ? 'Remove' : (input.selectLabel ?? 'Select'),
-    intent: input.isSelected ? 'remove' : 'add',
-    onClick: input.isSelected ? input.onDeselect : input.onSelect,
-    disabled: !input.isSelected && input.canSelect === false,
-  }
-}
-
-export function projectEntitySurfaceConfig(
-  config: EntitySurfaceConfig,
-  density: ContentCardDensity = 'compact',
-): {
+export function projectEntitySurfaceConfig(config: EntitySurfaceConfig): {
   entity: EntitySummaryModel
   trailing: EntityAnatomyTrailing | undefined
   details: EntitySurfaceConfig['details']
 } {
   return {
-    entity: projectEntitySurfaceIdentityToSummaryModel(config.identity, density),
+    entity: projectEntitySurfaceIdentityToSummaryModel(config.identity),
     trailing: config.inlineAction
       ? buildEntitySurfaceInlineActionTrailing(config.inlineAction)
       : undefined,

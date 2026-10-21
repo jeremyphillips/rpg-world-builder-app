@@ -18,11 +18,6 @@ import type {
 } from '../drawer/equipment-picker-drawer.types'
 import { EquipmentPickerCharacterPreviewSection } from './equipment-picker-item-details-sections'
 import { EquipmentPickerInventorySummary } from './equipment-picker-inventory-summary'
-import {
-  equipmentPickerItemDetailsPurchaseSectionClasses,
-  equipmentPickerItemDetailsSectionClasses,
-} from './equipment-picker-item-details.variants'
-
 export type EquipmentPickerItemDetailsProps = {
   equipment: Equipment
   itemState: EquipmentPickerItemState
@@ -52,7 +47,7 @@ export function EquipmentPickerItemDetails({
     })
 
   return (
-    <div className={equipmentPickerItemDetailsSectionClasses}>
+    <div className="space-y-4">
       <EquipmentDetailMetadata
         viewModel={detailViewModel}
         sectionId={`${equipment.id}-detail-metadata`}
@@ -70,7 +65,7 @@ export function EquipmentPickerItemDetails({
       ) : null}
 
       {ownership.totalQuantity > 0 ? (
-        <div className={equipmentPickerItemDetailsPurchaseSectionClasses}>
+        <div className="!mt-6">
           <EquipmentPickerInventorySummary equipmentId={equipment.id} ownership={ownership} />
         </div>
       ) : null}

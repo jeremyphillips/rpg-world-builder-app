@@ -301,7 +301,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.click(screen.getByRole('button', { name: 'Organization' }))
-    await user.click(screen.getByRole('button', { name: 'Select' }))
+    await user.click(screen.getByRole('radio', { name: 'City Council' }))
 
     await user.click(screen.getByRole('button', { name: 'Change' }))
 
@@ -339,14 +339,14 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.click(screen.getByRole('button', { name: 'Organization' }))
-    await user.click(screen.getByRole('button', { name: 'Select' }))
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: 'City Council' }))
+    expect(screen.getByText('City Council')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Change' }))
-    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+    expect(screen.queryByText('City Council')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+    expect(screen.getByText('City Council')).toBeInTheDocument()
   })
 
   it('preserves organization selection when changing to another compatible kind', async () => {
@@ -371,12 +371,12 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.click(screen.getByRole('button', { name: 'Organization' }))
-    await user.click(screen.getByRole('button', { name: 'Select' }))
+    await user.click(screen.getByRole('radio', { name: 'City Council' }))
 
     await user.click(screen.getByRole('button', { name: 'Change' }))
     await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
 
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+    expect(screen.getByText('City Council')).toBeInTheDocument()
   })
 
   it('clears organization selection when changing to an incompatible kind', async () => {
@@ -401,12 +401,12 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.click(screen.getByRole('button', { name: 'Organization' }))
-    await user.click(screen.getByRole('button', { name: 'Select' }))
+    await user.click(screen.getByRole('radio', { name: 'City Council' }))
 
     await user.click(screen.getByRole('button', { name: 'Change' }))
     await user.click(screen.getByRole('radio', { name: /Resident/i }))
 
-    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+    expect(screen.queryByText('City Council')).not.toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

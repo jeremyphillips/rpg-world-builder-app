@@ -3,13 +3,10 @@ import { describe, expect, it } from 'vitest'
 
 import { resolveContentDisplayFallback } from '@rpg/contracts'
 
-import {
-  ENTITY_SURFACE_LEADING_THUMB_FRAME,
-  projectEntitySurfaceIdentityToSummaryModel,
-} from './entity-surface-projection.lib'
+import { projectEntitySurfaceIdentityToSummaryModel } from './entity-surface-projection.lib'
 
 describe('entity surface projection media', () => {
-  it('paints the standard sm thumbnail frame for fallback media', () => {
+  it('paints fill-only thumbnail media inside an anatomy-owned shell', () => {
     const { container } = render(
       projectEntitySurfaceIdentityToSummaryModel({
         heading: 'Shortsword',
@@ -20,7 +17,7 @@ describe('entity surface projection media', () => {
       }).media!,
     )
 
-    expect(container.firstElementChild).toHaveClass('size-10')
-    expect(ENTITY_SURFACE_LEADING_THUMB_FRAME).toBe('insetSm')
+    expect(container.firstElementChild).toHaveClass('size-full')
+    expect(container.firstElementChild).not.toHaveClass('size-10')
   })
 })

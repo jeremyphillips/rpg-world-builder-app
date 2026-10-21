@@ -4,34 +4,41 @@ import type { RowAnatomyCellSpec } from './row-anatomy.types'
 import { rowAnatomyCellClasses, rowAnatomyTracksVariants } from './row-anatomy.variants'
 
 const SLOT_EXPECTATIONS: ReadonlyArray<[RowAnatomyCellSpec, string[]]> = [
-  [{ slot: 'band', column: 'content' }, ['row-start-[band]', 'self-center']],
-  [{ slot: 'meta', column: 'content' }, ['row-start-[meta]', 'self-start']],
-  [{ slot: 'status', column: 'trailing' }, ['row-start-[status]', 'self-start', 'mt-1']],
+  [
+    { slot: 'band', column: 'content' },
+    ['ui-row-anatomy__cell--band', 'ui-row-anatomy__cell--content'],
+  ],
+  [
+    { slot: 'meta', column: 'content' },
+    ['ui-row-anatomy__cell--meta', 'ui-row-anatomy__cell--content'],
+  ],
+  [
+    { slot: 'status', column: 'trailing' },
+    ['ui-row-anatomy__cell--status', 'ui-row-anatomy__cell--trailing'],
+  ],
   [
     { slot: 'full', column: 'trailing' },
-    ['row-start-[slack-start]', 'row-end-[row-end]', 'self-center'],
+    ['ui-row-anatomy__cell--full', 'ui-row-anatomy__cell--trailing'],
   ],
   [
     { slot: 'stretch', column: 'trailing' },
-    ['row-start-[slack-start]', 'row-end-[row-end]', 'self-stretch'],
+    ['ui-row-anatomy__cell--stretch', 'ui-row-anatomy__cell--trailing'],
   ],
 ]
 
 describe('rowAnatomyTracksVariants', () => {
-  it('declares slack gutters around band, meta, and status tracks', () => {
+  it('emits ui-row-anatomy block and band modifiers', () => {
     const classes = rowAnatomyTracksVariants()
-    expect(classes).toContain(
-      'grid-rows-[[slack-start]_1fr_[band]_minmax(var(--row-band-height),auto)_[meta]_auto_[status]_auto_[slack-end]_1fr_[row-end]]',
-    )
-    expect(classes).toContain('[--row-band-height:var(--control-action-compact-height)]')
+    expect(classes).toContain('ui-row-anatomy')
+    expect(classes).toContain('ui-row-anatomy--band-control')
   })
 
-  it('maps media bands to identity frame heights', () => {
+  it('maps media bands to identity frame height modifiers', () => {
     expect(rowAnatomyTracksVariants({ band: 'media-xs' })).toContain(
-      '[--row-band-height:calc(var(--spacing)*8)]',
+      'ui-row-anatomy--band-media-xs',
     )
     expect(rowAnatomyTracksVariants({ band: 'media-sm' })).toContain(
-      '[--row-band-height:calc(var(--spacing)*10)]',
+      'ui-row-anatomy--band-media-sm',
     )
   })
 
@@ -44,13 +51,13 @@ describe('rowAnatomyTracksVariants', () => {
 })
 
 describe('rowAnatomyCellClasses', () => {
-  it.each(SLOT_EXPECTATIONS)('maps %o to one row placement and alignment', (cell, expected) => {
+  it.each(SLOT_EXPECTATIONS)('maps %o to slot and column cell modifiers', (cell, expected) => {
     const classes = rowAnatomyCellClasses(cell).split(' ')
     expect(classes).toEqual(expect.arrayContaining(expected))
-    expect(classes.filter((token) => token.startsWith('self-'))).toHaveLength(1)
+    expect(classes).toContain('ui-row-anatomy__cell')
   })
 
-  it('never emits horizontal placement or spacing', () => {
+  it('never emits horizontal placement or spacing utilities', () => {
     for (const [cell] of SLOT_EXPECTATIONS) {
       expect(rowAnatomyCellClasses(cell)).not.toMatch(/\bcol-|\bjustify-|\bm[xlrse]-|\bp[xlrse]-/)
     }

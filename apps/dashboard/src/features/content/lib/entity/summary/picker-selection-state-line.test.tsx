@@ -39,7 +39,7 @@ describe('PickerSelectionStateLine', () => {
     expect(screen.getByText('Selected')).toBeInTheDocument()
     expect(container.querySelector('[data-inline-metadata-separator]')).toBeNull()
     expect(screen.getByText('Selected').closest('[data-picker-selection-state]')).toHaveClass(
-      'text-sm',
+      'ui-copy-supporting',
     )
   })
 })

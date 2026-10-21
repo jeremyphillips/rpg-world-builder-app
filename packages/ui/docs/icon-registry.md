@@ -9,7 +9,7 @@ Lucide remains the default glyph set. **One owner per semantic role** — charac
 | Identity       | `CONTENT_DISPLAY_FALLBACK_ICONS` + contracts `ContentDisplayFallback` keys     | `contentIdentityIcon(key)`, `ContentDisplayFallbackIcon`                                 |
 | Surface policy | `resolveContentDisplayFallback`, `resolveContentDisplayFallbackForContentType` | Chooses which identity key (or `generic`) a surface uses                                 |
 | Section        | Feature-local maps (form tabs, connections, builder facts)                     | `contentIdentityIcon` for semantic aliases; direct Lucide for section-owned glyphs       |
-| Granted choice | `GrantedChoiceLeadingIcon` (builder choice-section)                            | `BadgeCheck` leading affordance on granted `ContentEntityCard` rows — not an action verb |
+| Granted choice | `GrantedChoiceLeadingIcon` (builder choice-section)                            | `BadgeCheck` leading affordance on granted `EntityCard` rows — not an action verb        |
 | Action         | `ACTION_ICONS`                                                                 | `ActionIcon`, `ActionButton`, remove/add wrappers                                        |
 | Resource       | `RESOURCE_ICONS`                                                               | `resourceIcon('currency' \| 'magicItem')` — Coins and Gem; not content identity or verbs |
 
@@ -19,7 +19,7 @@ Lucide remains the default glyph set. **One owner per semantic role** — charac
 
 ## Actions
 
-`ActionButton` accepts only `action` (closed verb) plus normal `Button` props. It does not accept custom glyphs, `icon`, or destructive styling for `remove`. Use `ArrayItemRemoveButton`, `ContentCardRemoveButton`, or explicit `variant` on the button.
+`ActionButton` accepts only `action` (closed verb) plus normal `Button` props. It does not accept custom glyphs, `icon`, or destructive styling for `remove`. Use `ArrayItemRemoveButton` or explicit `variant` on the button.
 
 Domain verbs (`invite`, `addMedia`, `compose`) are explicit keys, not overloads of `add`.
 

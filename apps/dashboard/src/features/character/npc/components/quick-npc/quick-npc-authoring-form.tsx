@@ -59,12 +59,6 @@ import {
 import { useCharacterBuildAdvisoryConfirm } from '../../../hooks/use-character-build-advisory-confirm'
 import { prepareQuickNpcAuthoringCreate } from '../../lib/quick-npc/quick-npc-authoring-submit.lib'
 import {
-  quickNpcCreateFooterActionsClasses,
-  quickNpcCreateFooterLayoutClasses,
-  quickNpcNarrativeRecoveryActionsClasses,
-  quickNpcNarrativeRecoveryClasses,
-} from './quick-npc-create-footer.variants'
-import {
   QUICK_NPC_CREATE_SUBMIT_LABEL,
   type QuickNpcCreateContext,
 } from '../../lib/quick-npc/quick-npc-create-context'
@@ -409,12 +403,12 @@ export function QuickNpcAuthoringForm({
           return (
             <>
               {showNarrativeRecovery ? (
-                <div className={quickNpcNarrativeRecoveryClasses()}>
+                <div className="flex flex-col gap-2 pb-2">
                   <Text variant="muted" className="text-sm">
                     Narrative generation failed. Retry or create this NPC without a generated
                     narrative.
                   </Text>
-                  <div className={quickNpcNarrativeRecoveryActionsClasses()}>
+                  <div className="flex flex-wrap gap-2">
                     <Button
                       type="button"
                       variant="secondary"
@@ -443,7 +437,7 @@ export function QuickNpcAuthoringForm({
                   </div>
                 </div>
               ) : null}
-              <div className={quickNpcCreateFooterLayoutClasses()}>
+              <div className="flex w-full flex-wrap items-center justify-between gap-3">
                 <QuickNpcAuthoringPreviewButton
                   buttonRef={previewButtonRef}
                   buildContext={buildContext}
@@ -452,7 +446,7 @@ export function QuickNpcAuthoringForm({
                   getAuthoringValues={() => form.getValues()}
                   disabled={isSubmitting}
                 />
-                <div className={quickNpcCreateFooterActionsClasses()}>
+                <div className="flex flex-wrap items-center gap-2">
                   <Button
                     type="button"
                     variant="outline"

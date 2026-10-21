@@ -1,5 +1,5 @@
 import type { Equipment } from '../../equipment'
-import { formatSignedModifier } from '../../../runtime/creature/weapon-attack'
+import { formatSignedModifier } from '../../../primitives/signed-modifier'
 import type { EquipmentEffectWarning } from './equipment-effect-warnings'
 import { resolveEquipmentEffectWarnings } from './equipment-effect-warnings'
 import type { EquipmentInstance } from './instance'

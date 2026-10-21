@@ -35,16 +35,20 @@ Features do not assemble `focus-visible:ring-*` stacks.
 Tailwind v4 preflight sets `button { cursor: default }`. `@rpg/ui/styles.css` restores
 `cursor: pointer` on enabled buttons in `@layer base`. Compose `interactivePointerClasses`
 (or `hitTarget: 'pointer'` on `interactiveRowVariants`) for non-button hit targets.
+Actionable `ui-card--interactive` shells (navigable `Card`, radio/entity option rows) set
+`cursor: pointer` in `card.css` when not `ui-card--disabled`.
 
-| Surface                                   | Cursor                                        |
-| ----------------------------------------- | --------------------------------------------- |
-| Buttons, icon ghosts, disclosure triggers | `pointer`                                     |
-| Text inputs / textarea                    | `text` (UA default)                           |
-| Select/combobox/dropdown triggers         | `pointer`                                     |
-| Menu / listbox options in popovers        | `pointer`                                     |
-| Drag handles                              | `grab` / `grabbing` (`dragHandleVariants`)    |
-| Disabled controls                         | `not-allowed` or `pointer-events-none`        |
-| Static rows (no activation)               | `default` (e.g. preview rail static sections) |
+| Surface                                   | Cursor                                          |
+| ----------------------------------------- | ----------------------------------------------- |
+| Buttons, icon ghosts, disclosure triggers | `pointer`                                       |
+| Navigable cards, interactive card shells  | `pointer` via `ui-card--interactive` CSS        |
+| Destination row links                     | `pointer` via `ui-interactive-row--hit-pointer` |
+| Text inputs / textarea                    | `text` (UA default)                             |
+| Select/combobox/dropdown triggers         | `pointer`                                       |
+| Menu / listbox options in popovers        | `pointer`                                       |
+| Drag handles                              | `grab` / `grabbing` (`dragHandleVariants`)      |
+| Disabled controls                         | `not-allowed` or `pointer-events-none`          |
+| Static rows (no activation)               | `default` (e.g. preview rail static sections)   |
 
 ### Ghost visual state (`ghostControlVisualStateClasses`)
 
@@ -98,10 +102,10 @@ dragHandleVariants({ visibility: 'always' | 'hoverReveal', dragging?: boolean })
 dragSurfaceVariants({ dragging: boolean }) // sortable-row family only
 ```
 
-| Visibility    | Use when                                       |
-| ------------- | ---------------------------------------------- |
-| `always`      | Collapsible list items, array fields, DEC grip |
-| `hoverReveal` | Master-detail sortable rows                    |
+| Visibility    | Use when                                                         |
+| ------------- | ---------------------------------------------------------------- |
+| `always`      | Collapsible list items, array fields, disclosure EntityCard grip |
+| `hoverReveal` | Master-detail sortable rows                                      |
 
 Both visibilities share compact control-action geometry and embedded focus. Hover-reveal
 adds opacity/group wiring only.
@@ -126,13 +130,15 @@ Cards and Rows**.
 
 ## Layer 2 presentation
 
-| Primitive                                     | Owner        | Consumers                               |
-| --------------------------------------------- | ------------ | --------------------------------------- |
-| `supportingTextDensityVariants`               | content-card | EntitySummary, ContentCard body         |
-| `contentCardDensityInsetVariants`             | content-card | EntityCardFrame, ContentCard shell      |
-| `contentCardIdentityColumnGapVariants`        | content-card | ContentCard body, EntityAnatomy content |
-| `entity-card-heading-comfortable` (@utility)  | globals      | Comfortable entity card titles          |
-| `rowAnatomyTracksVariants` / `RowAnatomyCell` | row-anatomy  | EntityAnatomy (row tracks + cells)      |
+| Primitive                                                                          | Owner        | Consumers                                                                                                                                                                                                           |
+| ---------------------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `supportingTextDensityVariants`                                                    | content-card | EntitySummary, ContentCard body                                                                                                                                                                                     |
+| `--ui-card-inset-*` + header copy vars (`ui-card--compact\|comfortable\|spacious`) | card.css     | Generic `Card` regions; entity/option inset only (`compact\|comfortable`; title/description vars generic-only)                                                                                                      |
+| `ui-card--{transparent,quiet,subtle,strong}` (tone) + `ui-card--elevation-*`       | card.css     | Fixed rest per tone (`transparent`, `lift`, `subtle`, `strong`), shared interaction mixes, `--ui-surface-selected-bg`; elevation owns shadow tokens. Filled `DestinationList` strong shell uses `--surface-strong`. |
+| `contentCardDensityInsetVariants` (deprecated)                                     | content-card | Legacy class helper for ContentCard                                                                                                                                                                                 |
+| `contentCardIdentityColumnGapVariants`                                             | content-card | ContentCard body, EntityAnatomy content                                                                                                                                                                             |
+| `ui-copy-title` / `ui-copy-supporting`                                             | copy-scale   | Canonical density title/supporting size, line-height; titles use `--font-weight-heading`                                                                                                                            |
+| `rowAnatomyTracksVariants` / `RowAnatomyCell`                                      | row-anatomy  | EntityAnatomy (row tracks + cells)                                                                                                                                                                                  |
 
 Vertical alignment of identity rows has one owner — the row-track grid. Cells never
 self-align or offset; see [row-anatomy.md](./row-anatomy.md).
@@ -155,6 +161,6 @@ shrunk the icon-glyph sizing grandfather list. Open investigations: **F4** (whol
 contract), **F5** (unavailable entity presentation), **F3** per-surface audits as products evolve.
 
 Entity/card ownership at Layer 2–3 (anatomy, surfaces, hosts) →
-[dashboard entity presentation contract](../../../apps/dashboard/docs/content-entity-card.md).
+[dashboard entity surfaces contract](../../../apps/dashboard/docs/entity-surfaces.md) ([card-guide](../../../apps/dashboard/docs/card-guide.md) for selection).
 
 Row-track vertical alignment → [row-anatomy.md](./row-anatomy.md).

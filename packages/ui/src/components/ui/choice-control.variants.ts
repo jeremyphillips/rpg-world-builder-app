@@ -96,7 +96,7 @@ export function radioCardDecorativeControlClasses({
 /** Maps RadioCard density × variant to indicator size spec (for ClassReference). */
 export function resolveRadioCardIndicatorSize(options: {
   variant: 'card' | 'row'
-  density: 'default' | 'compact'
+  density: 'comfortable' | 'compact'
 }): ChoiceControlIndicatorSize {
   if (options.variant === 'row') return 'sm'
   if (options.density === 'compact') return 'sm'
@@ -105,9 +105,9 @@ export function resolveRadioCardIndicatorSize(options: {
 
 export const RADIO_CARD_INDICATOR_REFERENCE_ROWS = [
   {
-    key: 'card-default',
+    key: 'card-comfortable',
     indicatorSize: 'lg' as const,
-    propsLabel: 'variant="card" density="default"',
+    propsLabel: 'variant="card" density="comfortable"',
     useCase: CHOICE_CONTROL_INDICATOR_SIZE_SPECS.find((spec) => spec.size === 'lg')?.useCase ?? '',
   },
   {

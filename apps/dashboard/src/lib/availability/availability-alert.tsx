@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Alert, buttonVariants, cn } from '@rpg/ui'
+import { Alert, ButtonLink } from '@rpg/ui'
 
 import {
   getAvailabilityReasonDefinition,
@@ -31,13 +31,14 @@ function AvailabilityAlertActions({
   return (
     <>
       {actions.map((action) => (
-        <Link
+        <ButtonLink
           key={`${action.label}-${action.href}`}
-          to={action.href}
-          className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+          link={<Link to={action.href} />}
+          variant="outline"
+          size="sm"
         >
           {action.label}
-        </Link>
+        </ButtonLink>
       ))}
     </>
   )

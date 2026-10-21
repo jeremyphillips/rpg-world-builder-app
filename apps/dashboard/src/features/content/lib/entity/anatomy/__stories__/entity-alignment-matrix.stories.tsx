@@ -6,6 +6,7 @@ import {
   ActionIcon,
   iconGhostControlVariants,
   NumberStepper,
+  RadioGroup,
   type ContentCardDensity,
 } from '@rpg/ui'
 import {
@@ -13,7 +14,7 @@ import {
   waitForRowAnatomyLayout,
 } from '@rpg/ui/storybook/row-anatomy-geometry'
 
-import { ContentEntityCard, DetailRowLeadingMedia, DisclosureEntityCard } from '@/features/content'
+import { CatalogCard, DetailRowLeadingMedia, EntityCard } from '@/features/content'
 import { DetailEntityRow } from '../../../detail/row/entity/detail-entity-row'
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 import type { EntityAnatomyTrailing } from '../entity-anatomy-trailing.types'
@@ -132,7 +133,7 @@ function buildEntity(depth: DepthCase, withMedia: boolean, label: string): Entit
     description: depth === 'heading' ? undefined : 'Located in Grey Coast',
     status: depth === 'status' ? [{ kind: 'badge', label: 'Member', tone: 'success' }] : undefined,
     media: withMedia ? (
-      <DetailRowLeadingMedia size="xs">
+      <DetailRowLeadingMedia>
         <span aria-hidden>HD</span>
       </DetailRowLeadingMedia>
     ) : undefined,
@@ -155,11 +156,12 @@ function MatrixCard({
   const [collapsed, setCollapsed] = useState(true)
 
   if (leading === 'none') {
-    return <ContentEntityCard entity={entity} density={density} trailing={trailing} />
+    return <EntityCard entity={entity} density={density} trailing={trailing} />
   }
 
   return (
-    <DisclosureEntityCard
+    <EntityCard
+      variant="disclosure"
       itemId={label}
       toolbarAriaLabel={label}
       entity={entity}
@@ -170,7 +172,7 @@ function MatrixCard({
       dragHandleProps={leading === 'grip-caret' ? mockDragHandleProps : undefined}
     >
       <p className="text-style-supporting">Disclosed body.</p>
-    </DisclosureEntityCard>
+    </EntityCard>
   )
 }
 
@@ -253,7 +255,7 @@ function EdgeGeometryPair({ density }: { density: ContentCardDensity }) {
   return (
     <div className="flex flex-col gap-2">
       <div data-edge-case={`${density}-trailing-remove`}>
-        <ContentEntityCard
+        <EntityCard
           entity={{ heading: 'Longsword', classification: 'Martial weapon' }}
           density={density}
           trailing={{ kind: 'utility', content: <RemoveUtility label="Longsword" /> }}
@@ -269,7 +271,8 @@ function EdgeGeometryPair({ density }: { density: ContentCardDensity }) {
         </div>
       ) : null}
       <div data-edge-case={`${density}-leading-caret`}>
-        <DisclosureEntityCard
+        <EntityCard
+          variant="disclosure"
           itemId={`${density}-caret`}
           toolbarAriaLabel="Harbor District"
           entity={{ heading: 'Harbor District', classification: 'Settlement' }}
@@ -278,7 +281,7 @@ function EdgeGeometryPair({ density }: { density: ContentCardDensity }) {
           onToggleCollapse={() => setCollapsed((current) => !current)}
         >
           <p className="text-style-supporting">Disclosed body.</p>
-        </DisclosureEntityCard>
+        </EntityCard>
       </div>
     </div>
   )
@@ -288,6 +291,80 @@ function EdgeGeometryPair({ density }: { density: ContentCardDensity }) {
  * Edge contract: a trailing ghost utility sits as far from the end edge as a leading caret
  * sits from the start edge — the surface tightens whichever edge carries utility chrome.
  */
+/** Representative catalog-picker rows: leading radio × trailing none, status metadata, and caret disclosure. */
+export const CatalogRowRadioLeading: Story = {
+  render: () => (
+    <div className="flex max-w-md flex-col gap-2">
+      <RadioGroup aria-label="Organizations" defaultValue="org-eligible">
+        <div data-edge-case="radio-leading-none">
+          <CatalogCard
+            toolbarLabel="City Council"
+            domIds={{
+              itemId: 'matrix-radio-none',
+              titleId: 'matrix-radio-none-title',
+              bodyId: 'matrix-radio-none-body',
+            }}
+            entity={{ heading: 'City Council', classification: 'Government' }}
+            selection={{ value: 'org-eligible' }}
+          />
+        </div>
+        <div data-edge-case="radio-leading-status">
+          <CatalogCard
+            toolbarLabel="Harbor Guild"
+            domIds={{
+              itemId: 'matrix-radio-status',
+              titleId: 'matrix-radio-status-title',
+              bodyId: 'matrix-radio-status-body',
+            }}
+            entity={{
+              heading: 'Harbor Guild',
+              classification: 'Trade',
+              status: [{ kind: 'text', label: 'Already linked' }],
+            }}
+            selection={{ value: 'org-blocked', disabled: true }}
+          />
+        </div>
+        <div data-edge-case="radio-leading-media">
+          <CatalogCard
+            toolbarLabel="Silver Circle"
+            domIds={{
+              itemId: 'matrix-radio-media',
+              titleId: 'matrix-radio-media-title',
+              bodyId: 'matrix-radio-media-body',
+            }}
+            entity={{
+              heading: 'Silver Circle',
+              classification: 'Guild',
+              description: 'Located in Grey Coast',
+              media: (
+                <DetailRowLeadingMedia>
+                  <span aria-hidden>SC</span>
+                </DetailRowLeadingMedia>
+              ),
+            }}
+            selection={{ value: 'org-media' }}
+          />
+        </div>
+      </RadioGroup>
+      <div data-edge-case="radio-leading-disclosure">
+        <EntityCard
+          variant="disclosure"
+          itemId="matrix-radio-disclosure"
+          toolbarAriaLabel="Spell details"
+          entity={{ heading: 'Fireball', classification: 'Evocation' }}
+          density="compact"
+        >
+          <p className="text-style-supporting">Disclosed picker body.</p>
+        </EntityCard>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await waitForRowAnatomyLayout()
+    await expectRowAnatomyAligned(canvasElement, { minGrids: 4 })
+  },
+}
+
 export const UtilityEdgeParity: Story = {
   render: () => (
     <div className="flex max-w-md flex-col gap-6">

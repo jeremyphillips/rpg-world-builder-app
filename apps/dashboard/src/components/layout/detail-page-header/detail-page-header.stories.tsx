@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Link } from 'react-router-dom'
 import { Button } from '@rpg/ui'
 
+import { ContentDetailEditAction } from '@/features/content/lib/detail/page/content-detail-edit-action'
 import { PageChromeActionsProvider } from '@/components/layout/page-chrome/page-chrome-actions-provider'
-import { pageChromeOutlineActionClasses } from '@/components/layout/page-chrome/page-chrome-action.variants'
 import { useSetPageChromeActions } from '@/components/layout/page-chrome/use-set-page-chrome-actions'
 import { withDashboardProviders } from '../../../../.storybook/decorators'
 
@@ -11,11 +10,7 @@ import { DetailPageHeader } from './detail-page-header'
 import { detailPageHeaderClasses } from './detail-page-header.variants'
 
 function RegisteredEditAction() {
-  useSetPageChromeActions(
-    <Link to="/campaigns/demo/classes/fighter/edit" className={pageChromeOutlineActionClasses}>
-      Edit
-    </Link>,
-  )
+  useSetPageChromeActions(<ContentDetailEditAction to="/campaigns/demo/classes/fighter/edit" />)
   return null
 }
 

@@ -73,12 +73,14 @@ export function useMonsterActionSections(entityId?: string) {
   ).join('|')
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset action editor state when switching monsters.
     setSelectedActionId(firstMonsterActionId(getValues()))
     setNotice(null)
     setPending(null)
   }, [entityId, getValues])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- keep selection aligned with action row ids after list edits.
     setSelectedActionId((current) => {
       if (
         current &&
@@ -93,6 +95,7 @@ export function useMonsterActionSections(entityId?: string) {
   useEffect(() => {
     if (formState.submitCount === 0) return
     const resolved = resolveFirstInvalidActionPath(formState.errors, getValues())
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- focus first invalid action after failed submit.
     if (resolved) setSelectedActionId(resolved.id)
   }, [formState.errors, formState.submitCount, getValues])
 

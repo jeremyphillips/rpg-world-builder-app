@@ -1,8 +1,8 @@
 import { cva } from 'class-variance-authority'
 
-export const detailCollectionPanelVariants = cva(
-  'overflow-hidden rounded-md border border-border-subtle',
-)
+import { collectionPanelShellClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+
+export const detailCollectionPanelVariants = cva(collectionPanelShellClasses)
 
 export const detailCollectionPanelHeaderVariants = cva('border-b border-border-subtle px-4 py-3', {
   variants: {

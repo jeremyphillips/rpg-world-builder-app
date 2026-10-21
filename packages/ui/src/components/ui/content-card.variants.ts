@@ -1,15 +1,16 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { cardDensityClassName, UI_CONTENT_CARD_INSET_CLASS } from './card.variants'
 import { resolveCompactControlRecipeClasses } from './compact-control.styles'
-import { iconGhostControlVariants } from './icon-ghost-control.variants'
 
-/** Entity-owned density inset — shared by standalone and embedded chrome. */
+/** @deprecated Prefer {@link cardDensityClassName} + {@link UI_CONTENT_CARD_INSET_CLASS}. */
 export const contentCardDensityInsetVariants = cva('', {
   variants: {
     density: {
-      compact: 'px-3 py-2',
-      comfortable: 'px-5 py-3',
+      compact: cn(cardDensityClassName('compact'), UI_CONTENT_CARD_INSET_CLASS),
+      comfortable: cn(cardDensityClassName('comfortable'), UI_CONTENT_CARD_INSET_CLASS),
+      spacious: cn(cardDensityClassName('spacious'), UI_CONTENT_CARD_INSET_CLASS),
     },
   },
   defaultVariants: {
@@ -19,17 +20,12 @@ export const contentCardDensityInsetVariants = cva('', {
 
 export const contentCardRootVariants = cva('w-full min-w-0 rounded-md', {
   variants: {
-    density: {
-      compact: 'px-3 py-2',
-      comfortable: 'px-5 py-3',
-    },
     chrome: {
       standalone: 'border border-border',
       embedded: '',
     },
   },
   defaultVariants: {
-    density: 'comfortable',
     chrome: 'standalone',
   },
 })
@@ -40,6 +36,7 @@ export const contentCardIdentityColumnGapVariants = cva('', {
     density: {
       compact: 'gap-2',
       comfortable: 'gap-4',
+      spacious: 'gap-4',
     },
   },
   defaultVariants: {
@@ -56,6 +53,7 @@ export const contentCardMediaEndGapVariants = cva('', {
     density: {
       compact: 'me-2',
       comfortable: '',
+      spacious: '',
     },
   },
   defaultVariants: {
@@ -74,6 +72,7 @@ export const contentCardBodyVariants = cva('flex min-w-0 w-full', {
     density: {
       compact: resolveContentCardIdentityColumnGapClasses('compact'),
       comfortable: resolveContentCardIdentityColumnGapClasses('comfortable'),
+      spacious: resolveContentCardIdentityColumnGapClasses('spacious'),
     },
     crossAxis: {
       top: 'items-start',
@@ -96,7 +95,6 @@ export const contentCardHeadingRowVariants = cva('flex min-w-0 items-center gap-
     rhythm: {
       none: '',
       secondary: 'mb-1',
-      withHeadingEndSlot: 'mb-0',
     },
   },
   defaultVariants: {
@@ -104,44 +102,14 @@ export const contentCardHeadingRowVariants = cva('flex min-w-0 items-center gap-
   },
 })
 
-export const contentCardHeadingVariants = cva(
-  'truncate font-body-emphasis [&_a]:block [&_a]:min-w-0 [&_a]:truncate',
-  {
-    variants: {
-      density: {
-        compact: 'text-sm',
-        comfortable: 'entity-card-heading-comfortable',
-      },
-    },
-    defaultVariants: {
-      density: 'comfortable',
-    },
-  },
-)
-
-export const contentCardMixedHeadingRowVariants = cva('flex min-w-0 items-baseline gap-x-1', {
-  variants: {
-    density: {
-      compact: 'text-sm',
-      comfortable: 'entity-card-heading-comfortable',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
-
-export const contentCardMixedHeadingNameVariants = cva(
-  'min-w-0 shrink truncate font-body-emphasis text-foreground [&_a]:truncate',
-)
-
-export const contentCardMixedHeadingSeparatorVariants = cva(
-  'shrink-0 font-normal text-muted-foreground',
-)
-
-export const contentCardMixedHeadingSuffixVariants = cva(
-  'shrink-0 font-normal text-muted-foreground',
-)
+export function contentCardHeadingScaleClass(density?: ContentCardDensity): string {
+  return cn(
+    'ui-content-card-heading ui-copy-title',
+    density === 'compact' && 'ui-content-card-heading--compact',
+    density === 'comfortable' && 'ui-content-card-heading--comfortable',
+    density === 'spacious' && 'ui-content-card-heading--spacious',
+  )
+}
 
 /** Layer-2 supporting copy density — shared by content-card and entity summary surfaces. */
 export const supportingTextDensityVariants = cva('truncate text-muted-foreground', {
@@ -149,6 +117,7 @@ export const supportingTextDensityVariants = cva('truncate text-muted-foreground
     density: {
       compact: 'text-xs',
       comfortable: 'text-sm',
+      spacious: 'text-sm',
     },
   },
   defaultVariants: {
@@ -160,14 +129,6 @@ export const contentCardSubheadingVariants = supportingTextDensityVariants
 
 export const contentCardMetadataVariants = supportingTextDensityVariants
 
-export const contentCardIconActionVariants = cva(
-  iconGhostControlVariants({ hover: 'accent', layout: 'inline' }),
-)
-
-export const contentCardRemoveButtonVariants = cva(
-  iconGhostControlVariants({ hover: 'destructive', layout: 'inline' }),
-)
-
 /** Heading-row actions stay compact regardless of card density. Link actions use pr-0. */
 export const contentCardHeadingActionVariants = cva(
   cn(
@@ -175,8 +136,6 @@ export const contentCardHeadingActionVariants = cva(
     resolveCompactControlRecipeClasses('text-compact', { includeBlock: false }),
   ),
 )
-
-export const contentCardHeadingEndSlotVariants = cva('shrink-0 text-sm')
 
 /** Linked entity headings — link color only; no hover underline. */
 export const contentCardHeadingLinkVariants = cva('text-link')
@@ -187,6 +146,7 @@ export const contentCardMediaVariants = cva('shrink-0', {
     density: {
       compact: '',
       comfortable: '',
+      spacious: '',
     },
   },
   defaultVariants: {
@@ -194,13 +154,12 @@ export const contentCardMediaVariants = cva('shrink-0', {
   },
 })
 
-export type ContentCardDensity = NonNullable<
-  VariantProps<typeof contentCardRootVariants>['density']
->
+export const CONTENT_CARD_DENSITIES = ['compact', 'comfortable', 'spacious'] as const
+export type ContentCardDensity = (typeof CONTENT_CARD_DENSITIES)[number]
 export type ContentCardChrome = NonNullable<VariantProps<typeof contentCardRootVariants>['chrome']>
 
 export function resolveContentCardDensityInsetClasses(density: ContentCardDensity): string {
-  return contentCardDensityInsetVariants({ density })
+  return cn(cardDensityClassName(density), UI_CONTENT_CARD_INSET_CLASS)
 }
 
 /** @deprecated Use {@link ContentCardChrome} — `outline` maps to `standalone`, `ghost` to `embedded`. */

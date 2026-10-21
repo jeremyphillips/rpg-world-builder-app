@@ -1,5 +1,7 @@
 import { Eyebrow, InlineMetadata, Text } from '@rpg/ui'
 
+import { collectionPanelLedgerBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+
 import {
   CHARACTER_EMPTY_SECTION_TEXT,
   CHARACTER_SECTION_LABELS,
@@ -9,8 +11,6 @@ import {
   type CharacterProficienciesViewModel,
 } from '../../../lib/display/character-display'
 import {
-  characterDetailActionsPanelClasses,
-  characterDetailCombatCardClasses,
   characterDetailCombatColumnClasses,
   characterDetailCombatPrimaryColumnClasses,
   characterDetailCombatSectionClasses,
@@ -44,7 +44,8 @@ function CharacterDetailActionsPanel({ actions }: { actions: CharacterActionRowV
   return (
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{CHARACTER_SECTION_LABELS.actions}</Eyebrow>
-      <section className={characterDetailActionsPanelClasses}>
+      <div className={collectionPanelLedgerBodyClasses}>
+        {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
         {actions.length === 0 ? (
           <Text variant="muted">{CHARACTER_EMPTY_SECTION_TEXT.actions}</Text>
         ) : (
@@ -62,7 +63,7 @@ function CharacterDetailActionsPanel({ actions }: { actions: CharacterActionRowV
             ))}
           </ul>
         )}
-      </section>
+      </div>
     </div>
   )
 }
@@ -71,9 +72,10 @@ function CharacterDetailSavingThrowsPanel({ section }: { section: CharacterDetai
   return (
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{section.title}</Eyebrow>
-      <section className={characterDetailCombatCardClasses}>
+      <div className={collectionPanelLedgerBodyClasses}>
+        {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
         <CharacterDetailListItems items={section.items} emptyText={section.emptyText} />
-      </section>
+      </div>
     </div>
   )
 }
@@ -88,7 +90,8 @@ function CharacterDetailProficienciesPanel({
   return (
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{section.title}</Eyebrow>
-      <section className={characterDetailCombatCardClasses}>
+      <div className={collectionPanelLedgerBodyClasses}>
+        {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
         {!hasItems ? (
           <Text variant="muted">{section.emptyText}</Text>
         ) : (
@@ -101,7 +104,7 @@ function CharacterDetailProficienciesPanel({
             ))}
           </div>
         )}
-      </section>
+      </div>
     </div>
   )
 }

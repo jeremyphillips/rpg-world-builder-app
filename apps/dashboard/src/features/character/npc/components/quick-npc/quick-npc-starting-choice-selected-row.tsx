@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 import {
-  ContentEntityCard,
+  EntityCard,
   DetailEntityRowActions,
   type EntitySummaryStatusItem,
 } from '@/features/content'
@@ -20,7 +20,7 @@ export type QuickNpcStartingChoiceSelectedRowProps = {
   onRemove: () => void
 }
 
-/** Removable starting-choice row — shared ContentEntityCard anatomy for skills, equipment, and spells. */
+/** Removable starting-choice row — shared EntityCardStaticRenderer anatomy for skills, equipment, and spells. */
 export function QuickNpcStartingChoiceSelectedRow({
   label,
   quantity,
@@ -32,7 +32,7 @@ export function QuickNpcStartingChoiceSelectedRow({
 }: QuickNpcStartingChoiceSelectedRowProps) {
   const description = [suggestionHint, alsoGrantedHint].filter(Boolean).join(' ')
   return (
-    <ContentEntityCard
+    <EntityCard
       entity={{
         heading: label,
         description: description ? (

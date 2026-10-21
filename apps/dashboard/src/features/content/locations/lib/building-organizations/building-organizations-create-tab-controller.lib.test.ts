@@ -50,7 +50,7 @@ describe('resolveBuildingOrganizationComposerView', () => {
     expect(view.summaryRows.some((row) => row.id === 'organization')).toBe(false)
   })
 
-  it('shows review commit with both summary rows when organization is resolved', () => {
+  it('shows both summary rows on review when organization is resolved outside discovery', () => {
     const view = resolveBuildingOrganizationComposerView({
       composerStage: 'review',
       editingDecision: null,
@@ -117,7 +117,7 @@ describe('resolveBuildingOrganizationComposerView', () => {
 
   it('shows unpinned discovery with relationship row only while editing organization', () => {
     const view = resolveBuildingOrganizationComposerView({
-      composerStage: 'review',
+      composerStage: 'discovery',
       editingDecision: 'organization',
       kindLabel: 'Owner',
       organizationName: 'City Bank',
@@ -130,7 +130,7 @@ describe('resolveBuildingOrganizationComposerView', () => {
     expect(view.activeDecision).toBe('organization')
     expect(view.showDiscovery).toBe(true)
     expect(view.showOrganizationChange).toBe(false)
-    expect(view.summaryRows.map((row) => row.value)).toEqual(['Owner', 'City Bank · Commercial'])
+    expect(view.summaryRows.map((row) => row.value)).toEqual(['Owner'])
   })
 })
 
@@ -170,11 +170,11 @@ describe('resolveBuildingOrganizationChildWorkflowView', () => {
     ).toBeNull()
   })
 
-  it('projects an action commit on review with a resolved existing organization', () => {
+  it('projects an action commit on discovery with a resolved existing organization', () => {
     expect(
       resolveBuildingOrganizationChildWorkflowView({
         composerMode: 'composing',
-        composerStage: 'review',
+        composerStage: 'discovery',
         editingDraftId: null,
         kind: 'owns',
         selectedOrganization: { kind: 'existing', organizationId: 'organization-1' },
@@ -210,7 +210,7 @@ describe('resolveBuildingOrganizationChildWorkflowView', () => {
     expect(
       resolveBuildingOrganizationChildWorkflowView({
         composerMode: 'composing',
-        composerStage: 'review',
+        composerStage: 'discovery',
         editingDraftId: 'relationship-1',
         kind: 'owns',
         selectedOrganization: { kind: 'existing', organizationId: 'organization-1' },

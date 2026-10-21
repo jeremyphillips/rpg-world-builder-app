@@ -121,7 +121,7 @@ describe('EquipmentInventoryRowItem', () => {
     render(<EquipmentInventoryRowItem display={{ kind: 'single', row }} onRemoveItem={vi.fn()} />)
 
     const priceLine = screen.getByText('2 GP each · Qty 2 · 4 GP total')
-    expect(priceLine).toHaveClass('text-xs')
+    expect(priceLine).toHaveClass('text-style-caption')
     expect(priceLine).not.toHaveClass('text-sm')
     expect(screen.queryByText('Qty 2')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
@@ -175,7 +175,7 @@ describe('EquipmentInventoryRowItem', () => {
 
     expect(screen.getByText('Rations')).toBeInTheDocument()
     expect(screen.getByText('Staged for removal')).toBeInTheDocument()
-    expect(screen.getByRole('spinbutton', { name: 'Rations quantity' })).toHaveValue(0)
+    expect(screen.getByLabelText('Rations quantity')).toHaveValue(0)
   })
 
   it('renders a plus prefix when another source already provides the item', () => {
@@ -197,11 +197,9 @@ describe('EquipmentInventoryRowItem', () => {
     )
 
     expect(screen.getByText('+')).toBeInTheDocument()
-    expect(
-      screen.getByRole('spinbutton', {
-        name: 'Additional Dagger purchased, 2 from other sources',
-      }),
-    ).toHaveValue(2)
+    expect(screen.getByLabelText('Additional Dagger purchased, 2 from other sources')).toHaveValue(
+      '2',
+    )
     expect(screen.getByText('Package ×2 · Purchased · 4 GP')).toBeInTheDocument()
   })
 
@@ -222,7 +220,7 @@ describe('EquipmentInventoryRowItem', () => {
       />,
     )
 
-    expect(screen.getByRole('spinbutton', { name: 'Amulet quantity' })).toHaveValue(1)
+    expect(screen.getByLabelText('Amulet quantity')).toHaveValue(1)
     expect(screen.queryByText('+')).not.toBeInTheDocument()
   })
 

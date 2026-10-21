@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ActionIcon, Badge, buttonVariants, Heading, RowActionsMenu, Text } from '@rpg/ui'
+import { ActionIcon, Badge, ButtonLink, Heading, RowActionsMenu, Text } from '@rpg/ui'
 import { PLATFORM_ROLE_ENTRIES } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
@@ -161,18 +161,20 @@ export function AdminUserDetail() {
       </section>
 
       <div className="flex flex-wrap gap-2">
-        <Link
-          to={ROUTES.admin.user.campaigns(user.id)}
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
+        <ButtonLink
+          link={<Link to={ROUTES.admin.user.campaigns(user.id)} />}
+          variant="outline"
+          size="sm"
         >
           View campaigns
-        </Link>
-        <Link
-          to={ROUTES.admin.user.characters(user.id)}
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
+        </ButtonLink>
+        <ButtonLink
+          link={<Link to={ROUTES.admin.user.characters(user.id)} />}
+          variant="outline"
+          size="sm"
         >
           View characters
-        </Link>
+        </ButtonLink>
       </div>
 
       <DeleteUserDialog

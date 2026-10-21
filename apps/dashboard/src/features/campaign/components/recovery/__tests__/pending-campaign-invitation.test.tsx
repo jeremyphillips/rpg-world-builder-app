@@ -12,7 +12,7 @@ const invite = {
 }
 
 describe('PendingCampaignInvitation', () => {
-  it('uses an anchor row on the compact list variant', () => {
+  it('renders a destination row link to the invite review route', () => {
     render(<PendingCampaignInvitation invite={invite} />)
 
     expect(

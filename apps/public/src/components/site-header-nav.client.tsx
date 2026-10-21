@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 
-import { buttonVariants } from '@rpg/ui'
+import { ButtonLink } from '@rpg/ui'
 
 import { useSession } from '@/features/auth'
 import { ROUTES } from '@/lib/routes'
@@ -24,12 +24,12 @@ export function SiteHeaderNav() {
 
   return (
     <>
-      <Link href={ROUTES.login} className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+      <ButtonLink link={<Link href={ROUTES.login} />} variant="ghost" size="sm">
         Log in
-      </Link>
-      <Link href={ROUTES.signup} className={buttonVariants({ size: 'sm' })}>
+      </ButtonLink>
+      <ButtonLink link={<Link href={ROUTES.signup} />} size="sm">
         Sign up
-      </Link>
+      </ButtonLink>
     </>
   )
 }

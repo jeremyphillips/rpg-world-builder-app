@@ -97,6 +97,7 @@ describe('VocabularyEntrySheet', () => {
       label: 'Construct',
       description: '',
       status: 'active',
+      languageAffinities: [],
     })
   })
 

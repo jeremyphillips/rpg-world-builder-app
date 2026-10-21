@@ -8,7 +8,9 @@ import {
   ActionIcon,
   Button,
   ButtonDropdown,
+  cn,
   Heading,
+  InsetPanel,
   NumberInput,
   Select,
   SelectContent,
@@ -16,7 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
   Text,
+  emptyStateWellSupportingClasses,
 } from '@rpg/ui'
+
+import { collectionPanelNestedBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 import type { ButtonDropdownItem } from '@rpg/ui'
 import { useFormContext, useWatch, useController } from 'react-hook-form'
 
@@ -127,7 +132,8 @@ function ProgressionTrackCard({
       : RESOLUTION_SECTION_LABELS.progressionLeveledMode
 
   return (
-    <article className="rounded-md border border-border bg-background p-4 space-y-3">
+    <div className={cn(collectionPanelNestedBodyClasses, 'gap-3')}>
+      {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
           <Heading as="h4" variant="subsection" className="text-style-label">
@@ -223,7 +229,7 @@ function ProgressionTrackCard({
           </div>
         ) : null}
       </dl>
-    </article>
+    </div>
   )
 }
 
@@ -296,8 +302,8 @@ export function SpellResolutionProgression() {
       </Text>
 
       {!hasProgression ? (
-        <div className="rounded-md border border-dashed border-border p-4 space-y-3">
-          <Text variant="muted" className="text-sm">
+        <InsetPanel borderStyle="dashed" size="lg" className="flex flex-col gap-3">
+          <Text as="p" className={emptyStateWellSupportingClasses}>
             {RESOLUTION_SECTION_LABELS.progressionEmpty}
           </Text>
           {menuItems.length > 0 ? (
@@ -305,7 +311,7 @@ export function SpellResolutionProgression() {
               {RESOLUTION_SECTION_LABELS.addProgression}
             </Button>
           ) : null}
-        </div>
+        </InsetPanel>
       ) : (
         <div className="space-y-3">
           {tracks.map((track, trackIndex) => (

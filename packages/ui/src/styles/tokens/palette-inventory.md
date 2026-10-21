@@ -48,16 +48,17 @@ Exact allowlist for intentional solid-control / backdrop opacity:
 
 ## Elevation surfaces
 
-| Token                      | Layer 2 mapping                                             | Job                                                                                                        |
-| -------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `--palette-surface-base`   | `--background`                                              | Canvas / page                                                                                              |
-| `--palette-surface-subtle` | `--surface-subtle`                                          | Derived wash — barely visible grouping                                                                     |
-| `--palette-surface-muted`  | `--surface-muted`, `--muted`                                | Derived wash — standard secondary panel                                                                    |
-| `--palette-surface-strong` | `--surface-strong`                                          | Derived wash — dense neutral chrome                                                                        |
-| `--palette-surface-panel`  | `--card`                                                    | Authored warm elevated panels                                                                              |
-| `--palette-surface-lift`   | `--popover`, `--palette-field-bg` (alias), `--surface-lift` | Derived lift plane — canvas lifted toward white (light) or panel (dark); overlays, list panels, and fields |
-| `--palette-surface-sunken` | `--sunken`                                                  | Recessed / inset fills (derived or thin-authored)                                                          |
-| `--palette-surface-accent` | `--accent`                                                  | Aliases `neutral-contrast` in light; hover chrome in dark                                                  |
+| Token                        | Layer 2 mapping                                             | Job                                                                                                        |
+| ---------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `--palette-surface-base`     | `--background`                                              | Canvas / page                                                                                              |
+| `--palette-surface-subtle`   | `--surface-subtle`                                          | Derived wash — barely visible grouping                                                                     |
+| `--palette-surface-muted`    | `--surface-muted`, `--muted`                                | Derived wash — standard secondary panel                                                                    |
+| `--palette-surface-strong`   | `--surface-strong`                                          | Derived wash — dense neutral chrome                                                                        |
+| `--palette-surface-selected` | `--ui-surface-selected-bg`                                  | Authored persistent card-shell selection fill (independent of tone rest)                                   |
+| `--palette-surface-panel`    | `--card`                                                    | Authored warm elevated panels                                                                              |
+| `--palette-surface-lift`     | `--popover`, `--palette-field-bg` (alias), `--surface-lift` | Derived lift plane — canvas lifted toward white (light) or panel (dark); overlays, list panels, and fields |
+| `--palette-surface-sunken`   | `--sunken`                                                  | Recessed / inset fills (derived or thin-authored)                                                          |
+| `--palette-surface-accent`   | `--accent`                                                  | Aliases `neutral-contrast` in light; hover chrome in dark                                                  |
 
 `--secondary` aliases the secondary action fill. It is not a neutral page or section surface.
 Solid buttons use `--action-primary-*` and `--action-secondary-*`.
@@ -142,8 +143,9 @@ for inline/status text — never reference palette steps from UI code.
 Layer 2 roles may reference `--palette-*` theme roles, another established Layer 2
 semantic role, or `color-mix` of those roles toward a **concrete surface** (never
 `transparent` as the default wash pattern). Layer 2 must not contain independent
-authored `oklch`/`hex` constants or reference component-only recipes
-(`--catalog-picker-row-surface`, `--surface-raised-shadow`).
+authored `oklch`/`hex` constants or reference removed component-only recipes
+(`--surface-raised-shadow`). Entity picker rows use `ui-card--quiet` (`--card`) instead of
+`--catalog-picker-row-surface`.
 
 ## Layer 2 (semantic)
 

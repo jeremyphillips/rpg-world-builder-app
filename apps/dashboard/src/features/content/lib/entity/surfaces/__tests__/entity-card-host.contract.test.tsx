@@ -4,13 +4,10 @@ import { describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
 import { HARBOR_DISTRICT_ENTITY } from '../../__tests__/entity.fixture'
-import { CatalogEntityRow } from '../catalog/catalog-entity-row'
-import { entityCardContentInsetVariants } from '../cards/content/entity-card-content.variants'
-import { ContentEntityCard } from '../cards/content/content-entity-card'
-import { DisclosureEntityCard } from '../cards/disclosure/disclosure-entity-card'
+import { CatalogCard } from '../catalog/catalog-card'
+import { EntityCard } from '../cards/content/entity-card'
 
-const compactContentInset = entityCardContentInsetVariants({ density: 'compact' })
-const comfortableContentInset = entityCardContentInsetVariants({ density: 'comfortable' })
+const ENTITY_CARD_CONTENT_CLASS = 'dash-entity-card__content'
 
 const MEANINGFUL_PADDING_PATTERN = /\b(p[xytblr]-(?!0\b)\d+|p-(?!0\b)\d+)\b/
 
@@ -24,16 +21,13 @@ function countEntityCardContentRegions(container: HTMLElement): number {
   const article = container.querySelector('article') as HTMLElement
   return Array.from(article.querySelectorAll('*')).filter((element) => {
     const className = element.getAttribute('class') ?? ''
-    return (
-      className.includes('pl-[var(--entity-surface-inline-start)]') &&
-      (className.includes('py-2') || className.includes('py-3'))
-    )
+    return className.includes(ENTITY_CARD_CONTENT_CLASS)
   }).length
 }
 
 function entityCardContentElement(container: HTMLElement): HTMLElement {
   const article = container.querySelector('article') as HTMLElement
-  const contentInset = article.querySelector('.pl-\\[var\\(--entity-surface-inline-start\\)\\]')
+  const contentInset = article.querySelector(`.${ENTITY_CARD_CONTENT_CLASS}`)
   expect(contentInset).toBeTruthy()
   return contentInset as HTMLElement
 }
@@ -48,7 +42,7 @@ describe('Entity card host contract (single inset owner)', () => {
   it('keeps entity-card CLI shell and header row free of meaningful padding', () => {
     for (const collapsed of [true, false]) {
       const { container, unmount } = render(
-        <CatalogEntityRow
+        <CatalogCard
           toolbarLabel="Rope"
           domIds={{ ...catalogDomIds, itemId: `disclosure-${collapsed}` }}
           collapsible
@@ -67,16 +61,17 @@ describe('Entity card host contract (single inset owner)', () => {
     }
   })
 
-  it('renders exactly one EntityCardContent region on CEC, DEC, and CatalogEntityRow', () => {
+  it('renders exactly one EntityCardContent region on EntityCard static, disclosure, and CatalogCard', () => {
     const { container: cecContainer } = render(
       <MemoryRouter>
-        <ContentEntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />
+        <EntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />
       </MemoryRouter>,
     )
 
     const { container: decContainer } = render(
       <MemoryRouter>
-        <DisclosureEntityCard
+        <EntityCard
+          variant="disclosure"
           itemId="dec-host"
           toolbarAriaLabel="Harbor District"
           entity={HARBOR_DISTRICT_ENTITY}
@@ -84,12 +79,12 @@ describe('Entity card host contract (single inset owner)', () => {
           defaultCollapsed={false}
         >
           <p>Grant fields</p>
-        </DisclosureEntityCard>
+        </EntityCard>
       </MemoryRouter>,
     )
 
     const { container: flatCatalogContainer } = render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="City Guard"
         domIds={catalogDomIds}
         entity={{ heading: 'City Guard', classification: 'Government' }}
@@ -97,7 +92,7 @@ describe('Entity card host contract (single inset owner)', () => {
     )
 
     const { container: disclosureCatalogContainer } = render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Wooden Staff"
         domIds={{ ...catalogDomIds, itemId: 'disclosure-catalog' }}
         collapsible
@@ -115,7 +110,7 @@ describe('Entity card host contract (single inset owner)', () => {
 
   it('resolves identical compact header inset on flat and disclosure catalog rows', () => {
     const { container: flatContainer } = render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="City Guard"
         domIds={catalogDomIds}
         entity={{ heading: 'City Guard', classification: 'Government' }}
@@ -123,7 +118,7 @@ describe('Entity card host contract (single inset owner)', () => {
     )
 
     const { container: disclosureContainer } = render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Wooden Staff"
         domIds={{ ...catalogDomIds, itemId: 'disclosure-parity' }}
         collapsible
@@ -136,19 +131,20 @@ describe('Entity card host contract (single inset owner)', () => {
     const flatInset = entityCardContentElement(flatContainer).className
     const disclosureInset = entityCardContentElement(disclosureContainer).className
     expect(flatInset).toBe(disclosureInset)
-    expect(flatInset).toContain(compactContentInset)
+    expect(flatInset).toContain(ENTITY_CARD_CONTENT_CLASS)
   })
 
   it('resolves identical content inset classes across all three hosts at compact density', () => {
     const { container: cecContainer } = render(
       <MemoryRouter>
-        <ContentEntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />
+        <EntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />
       </MemoryRouter>,
     )
 
     const { container: decContainer } = render(
       <MemoryRouter>
-        <DisclosureEntityCard
+        <EntityCard
+          variant="disclosure"
           itemId="dec-parity"
           toolbarAriaLabel="Harbor District"
           entity={HARBOR_DISTRICT_ENTITY}
@@ -156,12 +152,12 @@ describe('Entity card host contract (single inset owner)', () => {
           defaultCollapsed={false}
         >
           <p>Body</p>
-        </DisclosureEntityCard>
+        </EntityCard>
       </MemoryRouter>,
     )
 
     const { container: catalogContainer } = render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="City Guard"
         domIds={catalogDomIds}
         entity={{ heading: 'City Guard' }}
@@ -175,20 +171,20 @@ describe('Entity card host contract (single inset owner)', () => {
     ]
 
     expect(new Set(insetClassNames).size).toBe(1)
-    expect(insetClassNames[0]).toContain(compactContentInset)
+    expect(insetClassNames[0]).toContain(ENTITY_CARD_CONTENT_CLASS)
   })
 
   it('maps comfortable density inset on EntityCardContent only', () => {
     const { container } = render(
       <MemoryRouter>
-        <ContentEntityCard entity={HARBOR_DISTRICT_ENTITY} density="comfortable" />
+        <EntityCard entity={HARBOR_DISTRICT_ENTITY} density="comfortable" />
       </MemoryRouter>,
     )
 
     const article = container.querySelector('article') as HTMLElement
     const content = entityCardContentElement(container)
     assertNoMeaningfulPadding(article.className)
-    expect(content.className).toContain(comfortableContentInset)
+    expect(content.className).toContain(ENTITY_CARD_CONTENT_CLASS)
   })
 
   it('does not apply entity-card header padding on default CLI rows with collapsible=false', () => {

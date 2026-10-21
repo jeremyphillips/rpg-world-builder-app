@@ -75,6 +75,7 @@ export type ResolveFieldRenderConfigOptions = {
 }
 
 /** Applies inherited density, dynamic hints, derived metadata, and option availability to a field config. */
+// fallow-ignore-next-line complexity
 export function resolveFieldRenderConfig(
   config: FieldConfig,
   density: FormDensity,

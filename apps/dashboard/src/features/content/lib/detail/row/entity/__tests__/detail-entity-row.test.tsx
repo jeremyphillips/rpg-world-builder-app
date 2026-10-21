@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
-import { DetailRowLeadingMedia } from '../../detail-row-leading-media'
 import { DetailEntityRow } from '../detail-entity-row'
 import { DetailCollectionRowList } from '../../../collection/row-list/detail-collection-row-list'
 
@@ -30,8 +29,7 @@ describe('DetailEntityRow', () => {
     expect(screen.getByText('Building · Tavern')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument()
     expect(container.firstElementChild).toHaveClass('py-1')
-    expect(container.firstElementChild).toHaveClass('pl-[var(--entity-surface-inline-start)]')
-    expect(container.firstElementChild).toHaveClass('pr-[var(--entity-surface-inline-end)]')
+    expect(container.firstElementChild).toHaveClass('dash-entity-surface__inset-horizontal')
   })
 
   it('keeps the leading separator visible beside the classification suffix', () => {
@@ -85,9 +83,7 @@ describe('DetailEntityRow', () => {
           heading="Verna"
           headingHref="/characters/verna"
           leadingMedia={
-            <DetailRowLeadingMedia shape="box" size="xs">
-              <img alt="Portrait" src="/portrait.png" />
-            </DetailRowLeadingMedia>
+            <img alt="Portrait" src="/portrait.png" className="block size-full object-cover" />
           }
         />
       </MemoryRouter>,
@@ -116,7 +112,8 @@ describe('DetailEntityRow', () => {
     )
 
     expect(container.firstElementChild).toHaveClass('min-w-0', 'py-1')
-    expect(container.firstElementChild).toHaveClass('pl-[var(--entity-surface-inline-start)]')
+    expect(container.firstElementChild).toHaveClass('dash-entity-surface__inset-horizontal')
+    expect(container.firstElementChild).toHaveClass('dash-entity-surface--leading-0')
     expect(screen.queryByRole('button', { name: /show/i })).not.toBeInTheDocument()
   })
 
@@ -195,7 +192,7 @@ describe('DetailEntityRow', () => {
 
     const root = container.firstElementChild as HTMLElement
     expect(root).toHaveAttribute('data-entity-surface-end', 'utility')
-    expect(root).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-utility-inset)]')
+    expect(root).toHaveClass('dash-entity-surface--end-utility')
   })
 
   it('publishes compact surface inset on self-inset disclosure rows', () => {
@@ -215,14 +212,12 @@ describe('DetailEntityRow', () => {
 
     const disclosureRoot = screen
       .getByRole('link', { name: 'Dock Ward' })
-      .closest('[style*="--entity-content-offset"]')
-    expect(disclosureRoot).toHaveClass(
-      '[--entity-surface-inline-start:var(--entity-surface-utility-inset)]',
-    )
-    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-inset)]')
+      .closest('.dash-entity-surface')
+    expect(disclosureRoot).toHaveClass('dash-entity-surface--start-utility')
+    expect(disclosureRoot).toHaveClass('dash-entity-surface--leading-1')
 
     const headerRow = disclosureRoot?.firstElementChild as HTMLElement
-    expect(headerRow.className).toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
+    expect(headerRow).toHaveClass('dash-entity-surface__inset-horizontal')
 
     expect(container.querySelector('[id]')).toBeNull()
   })
@@ -248,9 +243,10 @@ describe('DetailEntityRow', () => {
 
     const expandedRegion = container.querySelector('[id]')
     expect(expandedRegion).toHaveClass('mb-2')
-    expect(expandedRegion).toHaveClass('pl-[var(--entity-surface-inline-start)]')
-    expect(expandedRegion).toHaveClass('pr-[var(--entity-body-inline-end)]')
-    expect(expandedRegion?.firstElementChild).toHaveClass('pl-[var(--entity-content-offset)]')
+    expect(expandedRegion).toHaveClass('dash-entity-surface__disclosure-content')
+    expect(expandedRegion?.firstElementChild).toHaveClass(
+      'dash-entity-surface__disclosure-preview-offset',
+    )
     expect(expandedRegion?.firstElementChild?.firstElementChild).toHaveClass(
       'border-l',
       'border-border-subtle',
@@ -292,7 +288,7 @@ describe('DetailEntityRow', () => {
 
     const disclosureItem = screen
       .getByRole('link', { name: 'Dock Ward' })
-      .closest('[style*="--entity-content-offset"]')
+      .closest('.dash-entity-surface')
     const expandedRegion = disclosureItem?.querySelector('[id]')
     expect(expandedRegion).toBeInTheDocument()
     expect(expandedRegion?.previousElementSibling).not.toHaveClass('border-t')
@@ -328,17 +324,10 @@ describe('DetailEntityRow', () => {
     const expandableItem = expandableContainer.firstElementChild as HTMLElement | null
     const reservedItem = reservedContainer.firstElementChild as HTMLElement | null
 
-    expect(expandableItem?.style.getPropertyValue('--leading-chrome-size')).toBe(
-      'calc(var(--spacing)*6)',
-    )
-    expect(reservedItem?.style.getPropertyValue('--leading-chrome-size')).toBe(
-      'calc(var(--spacing)*6)',
-    )
-    expect(expandableItem?.style.getPropertyValue('--entity-content-offset')).toContain(
-      'calc(var(--spacing)*6)',
-    )
-    expect(expandableItem?.querySelector('[class*="w-[var(--leading-chrome-size)]"]')).toBeTruthy()
-    expect(reservedItem?.querySelector('[class*="w-[var(--leading-chrome-size)]"]')).toBeTruthy()
+    expect(expandableItem).toHaveClass('dash-entity-surface--leading-1')
+    expect(reservedItem).toHaveClass('dash-entity-surface--leading-1')
+    expect(expandableItem?.querySelector('.dash-entity-leading__column')).toBeTruthy()
+    expect(reservedItem?.querySelector('.dash-entity-leading__column')).toBeTruthy()
   })
 
   it('keeps reserved disclosure out of tab order with no expand affordance', () => {

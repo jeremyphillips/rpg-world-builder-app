@@ -51,7 +51,9 @@ describe('InputSelectField', () => {
 
   it('applies faint surface wash to the unit segment', () => {
     render(<ControlledField />)
-    expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveClass('bg-surface-faint')
+    expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveClass(
+      'ui-field-group__segment--surface-faint',
+    )
   })
 
   it('calls onValueChange when the value input changes', async () => {
@@ -88,9 +90,9 @@ describe('InputSelectField', () => {
     )
 
     await userEvent.click(screen.getByRole('combobox', { name: 'Cost unit' }))
-    expect(screen.getByLabelText('Search Cost')).toBeInTheDocument()
+    expect(screen.getByLabelText(/Search cost/i)).toBeInTheDocument()
 
-    await userEvent.type(screen.getByLabelText('Search Cost'), 'pp')
+    await userEvent.type(screen.getByLabelText(/Search cost/i), 'pp')
     await waitFor(() => {
       expect(screen.getByRole('option', { name: /^PP$/i })).toBeInTheDocument()
       expect(screen.queryByRole('option', { name: /^SP$/i })).not.toBeInTheDocument()
@@ -106,7 +108,7 @@ describe('InputSelectField', () => {
   it('marks only the value segment invalid when error is set', () => {
     const { container } = render(<ControlledField error="Too low." />)
     const group = container.querySelector('[role="group"]')
-    expect(group).toHaveClass('border-input-invalid')
+    expect(group).toHaveClass('ui-field-group--invalid')
 
     const valueSegments = container.querySelectorAll('[data-input-select-value]')
     expect(valueSegments).toHaveLength(1)
@@ -141,8 +143,7 @@ describe('InputSelectField', () => {
   it('uses intrinsic layout when valueDigits is set on a number field', () => {
     const { container } = render(<ControlledField valueDigits={2} width="auto" />)
     const group = container.querySelector('[role="group"]')
-    expect(group).toHaveClass('w-fit')
-    expect(group).toHaveClass('grid-cols-[auto_minmax(1px,1px)_auto]')
+    expect(group).toHaveClass('ui-field-group--intrinsic')
     expect(group).toHaveClass('items-center')
 
     const numberInputRoot = screen.getByLabelText('Cost value').parentElement
@@ -156,7 +157,7 @@ describe('InputSelectField', () => {
     expect(numberInputRoot).not.toHaveClass('w-full')
 
     const group = container.querySelector('[role="group"]')
-    expect(group).toHaveClass('w-fit')
+    expect(group).toHaveClass('ui-field-group--intrinsic')
   })
 
   it('uses stretch layout for text fields', () => {
@@ -174,8 +175,7 @@ describe('InputSelectField', () => {
       />,
     )
     const group = container.querySelector('[role="group"]')
-    expect(group).toHaveClass('w-full')
-    expect(group).toHaveClass('grid-cols-[1fr_1px_auto]')
+    expect(group).toHaveClass('ui-field-group--stretch')
   })
 
   it('shows a single required marker via RequiredIndicator', () => {
@@ -213,7 +213,7 @@ describe('InputSelectField', () => {
   })
 
   it('renders a static unit label without a combobox when unitMode is label', () => {
-    const { container } = render(
+    render(
       <ControlledField
         unitMode="label"
         fixedUnit="ft."
@@ -227,9 +227,9 @@ describe('InputSelectField', () => {
     expect(screen.queryByRole('combobox', { name: 'Cost unit' })).not.toBeInTheDocument()
     expect(screen.getByText('ft.')).toBeInTheDocument()
 
-    const unitLabel = container.querySelector('[aria-hidden].rounded-r-md')
+    const unitLabel = screen.getByText('ft.').closest('[aria-hidden]')
     expect(unitLabel).toHaveTextContent('ft.')
-    expect(unitLabel).toHaveClass('bg-surface-faint')
+    expect(unitLabel).toHaveClass('ui-field-group__segment--surface-faint')
     expect(unitLabel).not.toHaveClass('min-w-[5rem]')
   })
 
@@ -238,8 +238,8 @@ describe('InputSelectField', () => {
       <ControlledField unitMode="label" fixedUnit="ft." valueDigits={2} width="auto" />,
     )
     const group = container.querySelector('[role="group"]')
-    expect(group).toHaveClass('w-fit', 'items-center', 'grid-cols-[auto_minmax(1px,1px)_auto]')
-    expect(screen.getByLabelText('Cost value')).toHaveClass('h-9')
+    expect(group).toHaveClass('ui-field-group--intrinsic', 'items-center')
+    expect(screen.getByLabelText('Cost value')).toHaveClass('ui-field-group__input-segment')
   })
 })
 

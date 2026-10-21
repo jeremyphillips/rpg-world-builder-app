@@ -3,15 +3,7 @@ import * as React from 'react'
 
 import { SemanticClassCaption } from './semantic-class-caption.client'
 
-/**
- * When `parameters.semanticClasses` is true, wraps the story and shows live
- * `className` readout for the first `[data-semantic-class-target]` descendant.
- */
-export const withSemanticClassCaption: Decorator = (Story, context) => {
-  if (!context.parameters.semanticClasses) {
-    return <Story />
-  }
-
+function SemanticClassCaptionFrame({ children }: { children: React.ReactNode }) {
   const targetRef = React.useRef<HTMLElement | null>(null)
 
   return (
@@ -28,9 +20,25 @@ export const withSemanticClassCaption: Decorator = (Story, context) => {
           targetRef.current = (marked ?? node.firstElementChild) as HTMLElement | null
         }}
       >
-        <Story />
+        {children}
       </div>
       <SemanticClassCaption targetRef={targetRef} />
     </div>
+  )
+}
+
+/**
+ * When `parameters.semanticClasses` is true, wraps the story and shows live
+ * `className` readout for the first `[data-semantic-class-target]` descendant.
+ */
+export const withSemanticClassCaption: Decorator = (Story, context) => {
+  if (!context.parameters.semanticClasses) {
+    return <Story />
+  }
+
+  return (
+    <SemanticClassCaptionFrame>
+      <Story />
+    </SemanticClassCaptionFrame>
   )
 }

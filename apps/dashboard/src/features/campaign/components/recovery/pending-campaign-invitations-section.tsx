@@ -1,10 +1,10 @@
 import type { CampaignInviteInviteeListItem } from '@rpg/contracts'
-import { Eyebrow } from '@rpg/ui'
+import { DestinationList, Eyebrow } from '@rpg/ui'
 
 import { CampaignInvitationCard } from '@/features/campaign-invite'
 import { toPendingInvitePromotion } from '../../lib/recovery/campaign-recovery-promotions.lib'
 import { CAMPAIGN_INVITATION_COPY } from '../../lib/onboarding/campaign-onboarding-copy'
-import { campaignDestinationListVariants } from './campaign-destination.variants'
+import { campaignDestinationListProps } from './campaign-destination-list-shell'
 import { PendingCampaignInvitation } from './pending-campaign-invitation'
 
 type PendingCampaignInvitationsSectionProps = {
@@ -46,13 +46,11 @@ export function PendingCampaignInvitationsSection({
           ))}
         </div>
       ) : (
-        <ul className={campaignDestinationListVariants()}>
+        <DestinationList {...campaignDestinationListProps} density="comfortable">
           {invites.map((invite) => (
-            <li key={invite.inviteId}>
-              <PendingCampaignInvitation invite={invite} />
-            </li>
+            <PendingCampaignInvitation key={invite.inviteId} invite={invite} />
           ))}
-        </ul>
+        </DestinationList>
       )}
     </section>
   )

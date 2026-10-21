@@ -181,7 +181,7 @@ Do **not** combine `digits` with mixed-length enum labels — use full-width siz
 `NumberStepper` resolves `size` from an optional prop or from `useFieldControlSize()` via
 `resolveNumberStepperSizeFromFieldSize`. Form density never maps to **`xs`** — compact forms
 inherit **`sm` (32px)**; comfortable default is **`md` (36px)**. Field scale **`xs` (24px,
-`--control-height-compact`)** is explicit opt-in (for example compact `ContentEntityCard`
+`--control-height-compact`)** is explicit opt-in (for example compact `EntityCard`
 utility bands via `useEntityCardUtilityFieldSize()`).
 
 | Stepper `size` | Root height | Side buttons | Typical use                                                              |

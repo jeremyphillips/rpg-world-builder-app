@@ -17,7 +17,7 @@ const PICKER_PROJECTOR_EXEMPT = new Set([
 ])
 
 const FORBIDDEN_HEADING_ACTION_PATTERN =
-  /(?:CatalogEntityRow|ContentEntityCard|DisclosureEntityCard|EntityAnatomyHost)[\s\S]{0,400}trailing=\{\{[\s\S]{0,120}kind:\s*['"]action['"][\s\S]{0,120}content:\s*<(?:Button|CatalogPickerSelectionActions)/
+  /(?:CatalogCard|EntityCard|EntityAnatomyHost)[\s\S]{0,400}trailing=\{\{[\s\S]{0,120}kind:\s*['"]action['"][\s\S]{0,120}content:\s*<(?:Button|CatalogPickerSelectionActions)/
 
 const LEGACY_DISPLAY_IMAGE_HELPERS = [
   'getContentImageUrl',
@@ -68,7 +68,7 @@ describe('entity surface config guard', () => {
       if (!relativePath.endsWith('.tsx')) continue
 
       const source = readFileSync(path, 'utf8')
-      if (!source.includes('CatalogEntityRow') && !source.includes('CatalogEntitySurfaceRow')) {
+      if (!source.includes('CatalogCard') && !source.includes('CatalogEntitySurfaceRow')) {
         continue
       }
 

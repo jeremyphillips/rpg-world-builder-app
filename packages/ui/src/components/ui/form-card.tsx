@@ -1,14 +1,16 @@
 import type { ReactNode } from 'react'
 
-import { Card, CardDescription, CardHeader, CardTitle } from './card'
+import { Card } from './card'
+
+import { UI_CARD_CONTENT_CLASS } from './card.variants'
 
 /**
  * Padding for a form body rendered inside `FormCard` chrome — mirrors
- * `CardContent` (`p-6 pt-0`). Pass to `<Form contentClassName={...}>` so the
- * fields inset from the card edge while the header/footer keep their own
- * padding. (`<Form>` owns the `<form>`; `FormCard` is pure chrome.)
+ * `CardContent`. Pass to `<Form contentClassName={...}>` so the fields inset
+ * from the card edge while the header/footer keep their own padding. (`<Form>`
+ * owns the `<form>`; `FormCard` is pure chrome.)
  */
-export const formCardContentClass = 'p-6 pt-0'
+export const formCardContentClass = UI_CARD_CONTENT_CLASS
 
 interface FormCardProps {
   title: string
@@ -25,11 +27,7 @@ interface FormCardProps {
  */
 export function FormCard({ title, description, children, className }: FormCardProps) {
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
+    <Card className={className} header={{ title, description }}>
       {children}
     </Card>
   )

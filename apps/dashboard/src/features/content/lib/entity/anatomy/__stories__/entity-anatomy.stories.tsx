@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Link } from 'react-router-dom'
 
-import { ContentEntityCard } from '@/features/content'
+import { EntityCard } from '@/features/content'
 import { EntityAnatomyHost } from '../entity-anatomy'
 import {
   GREY_COAST_ENTITY,
@@ -43,12 +44,33 @@ export const EmbeddedWithAction: Story = {
   ),
 }
 
-export const ContentEntityCardComfortable: Story = {
+export const EntityCardComfortable: Story = {
   render: () => (
     <div className="max-w-md">
-      <ContentEntityCard
+      <EntityCard entity={HARBOR_DISTRICT_ENTITY} />
+    </div>
+  ),
+}
+
+export const EntityCardNavigable: Story = {
+  render: () => (
+    <div className="flex max-w-md flex-col gap-4">
+      <EntityCard
         entity={HARBOR_DISTRICT_ENTITY}
-        headingHref="/campaigns/demo/locations/harbor"
+        link={<Link to="/campaigns/demo/locations/harbor-district" />}
+      />
+      <EntityCard
+        entity={{
+          ...HARBOR_DISTRICT_ENTITY,
+          heading:
+            'Harbor District with an intentionally long heading to verify truncation beside the navigation chevron',
+        }}
+        link={<Link to="/campaigns/demo/locations/harbor-district" />}
+      />
+      <EntityCard
+        entity={SILVER_CIRCLE_ENTITY}
+        link={<Link to="/campaigns/demo/organizations/silver-circle" />}
+        showNavigationChevron={false}
       />
     </div>
   ),
@@ -57,7 +79,7 @@ export const ContentEntityCardComfortable: Story = {
 export const SharedFixtureParity: Story = {
   render: () => (
     <div className="flex max-w-md flex-col gap-4">
-      <ContentEntityCard entity={SILVER_CIRCLE_ENTITY} density="comfortable" />
+      <EntityCard entity={SILVER_CIRCLE_ENTITY} density="comfortable" />
       <div className="rounded-md border border-border bg-catalog-picker-row-surface">
         <EntityAnatomyHost entity={SILVER_CIRCLE_ENTITY} density="compact" />
       </div>

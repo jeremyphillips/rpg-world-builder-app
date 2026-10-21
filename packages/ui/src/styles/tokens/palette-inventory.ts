@@ -11,6 +11,7 @@ export const PALETTE_SURFACE_ELEVATION_STEPS = [
   'surface-subtle',
   'surface-muted',
   'surface-strong',
+  'surface-selected',
   'surface-panel',
   'surface-lift',
   'surface-sunken',
@@ -307,6 +308,7 @@ export const STATUS_ICON_SEMANTIC_ROLES = [
 export const INTERACTION_SEMANTIC_ROLES = [
   '--control-hover-bg',
   '--control-selected-bg',
+  '--ui-surface-selected-bg',
   '--row-hover-bg',
   '--row-selected-bg',
   '--row-selected-border',

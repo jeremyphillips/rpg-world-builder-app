@@ -19,7 +19,7 @@ describe('EquipmentStepTierSummary', () => {
     expect(tierName.parentElement?.parentElement).toHaveClass('text-sm')
     expect(screen.getByText('Level 1')).toHaveClass('font-normal', 'text-muted-foreground')
     expect(screen.getByText('No benefits')).toHaveClass('text-style-caption')
-    expect(tierName.closest('.bg-surface-faint')).toBeNull()
+    expect(tierName.closest('.ui-card')).toBeNull()
     expect(screen.queryByRole('button', { name: /Initiate tier/ })).not.toBeInTheDocument()
     expect(screen.queryByText('No additional starting resources')).not.toBeInTheDocument()
   })
@@ -46,15 +46,16 @@ describe('EquipmentStepTierSummary', () => {
     expect(trigger).toHaveClass('text-sm')
     expect(screen.getByText('Hero tier')).toHaveClass('font-medium', 'text-foreground')
     expect(screen.getByText('Levels 5–10')).toHaveClass('font-normal', 'text-muted-foreground')
-    expect(trigger.closest('.bg-surface-faint')).toBeNull()
+    expect(trigger.closest('.ui-card')).toBeNull()
     expect(screen.getByText('2 benefits')).toHaveClass('text-style-caption')
     expect(screen.queryByText('+637 GP 5 SP')).not.toBeInTheDocument()
 
     await user.click(trigger)
 
     const panel = screen.getByText('Starting gold bonus').parentElement
-    expect(panel).toHaveClass('border-border-faint', 'bg-surface-faint', 'gap-y-2', 'py-2.5')
-    expect(panel).not.toHaveClass('text-muted-foreground')
+    expect(panel).toBeTruthy()
+    expect(panel).toHaveClass('rounded-md', 'border', 'bg-surface-subtle', 'gap-y-2')
+    expect(panel).not.toHaveClass('ui-card', 'ui-card__content', 'text-muted-foreground')
     expect(screen.getByText('Starting gold bonus')).toHaveClass('text-muted-foreground')
     expect(screen.getByText('+637 GP 5 SP')).toHaveClass('text-foreground')
     expect(screen.getByText('Magic item choices')).toHaveClass('text-muted-foreground')

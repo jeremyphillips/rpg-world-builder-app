@@ -269,7 +269,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
     expect(screen.getAllByText('City Council')).toHaveLength(1)
     expect(screen.getByRole('button', { name: 'Replace organization' })).toBeDisabled()
 
-    await user.click(screen.getByRole('button', { name: 'Select' }))
+    await user.click(screen.getByRole('radio', { name: /Silver Circle/i }))
 
     expect(screen.getAllByText('City Council')).toHaveLength(1)
     expect(screen.getByRole('button', { name: 'Replace organization' })).toBeEnabled()
@@ -325,7 +325,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'Select' })).toBeDisabled()
+    expect(screen.getByRole('radio', { name: /Silver Circle/i })).toBeDisabled()
   })
 })
 

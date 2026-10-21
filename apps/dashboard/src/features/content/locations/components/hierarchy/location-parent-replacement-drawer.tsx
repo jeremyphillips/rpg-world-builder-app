@@ -17,7 +17,6 @@ import {
   resolveLocationRelationshipFilterLayout,
   useRelationshipCatalogFilters,
 } from '@/features/content'
-import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.types'
 import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section'
 import {
@@ -313,14 +312,13 @@ function LocationParentReplacementDrawerContent({
       getItemKey={(summary) => summary.id}
       getItemToolbarLabel={(summary) => summary.name}
       getSearchText={buildLocationEntitySummarySearchText}
+      selection={{
+        value: selectedParentId,
+        onValueChange: setSelectedParentId,
+      }}
       renderEntityRow={createCatalogEntityRowRenderer({
         buildSurface: (summary) => ({
           identity: buildLocationEntityCardModel(summary),
-          inlineAction: buildCatalogToggleSelectInlineAction({
-            isSelected: selectedParentId === summary.id,
-            onSelect: () => setSelectedParentId(summary.id),
-            onDeselect: () => setSelectedParentId(null),
-          }),
         }),
       })}
     />

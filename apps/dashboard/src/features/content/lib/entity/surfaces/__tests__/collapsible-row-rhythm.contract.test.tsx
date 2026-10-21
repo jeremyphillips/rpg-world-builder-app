@@ -8,13 +8,11 @@ import { describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
 import { HARBOR_DISTRICT_ENTITY } from '../../__tests__/entity.fixture'
-import { CatalogEntityRow } from '../catalog/catalog-entity-row'
-import { entityCardContentInsetVariants } from '../cards/content/entity-card-content.variants'
-import { ContentEntityCard } from '../cards/content/content-entity-card'
-import { DisclosureEntityCard } from '../cards/disclosure/disclosure-entity-card'
+import { CatalogCard } from '../catalog/catalog-card'
+import { EntityCard } from '../cards/content/entity-card'
 
 const compactHeaderRhythm = collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' })
-const compactContentInset = entityCardContentInsetVariants({ density: 'compact' })
+const ENTITY_CARD_CONTENT_CLASS = 'dash-entity-card__content'
 
 const catalogDomIds = {
   itemId: 'contract-catalog-item',
@@ -29,34 +27,36 @@ function headerRowFromGroup(label: RegExp | string): HTMLElement {
 
 function entityCardContentFromGroup(label: RegExp | string): HTMLElement {
   const shell = screen.getByRole('group', { name: label })
-  const contentInset = shell.querySelector('.pl-\\[var\\(--entity-surface-inline-start\\)\\]')
+  const contentInset = shell.querySelector(`.${ENTITY_CARD_CONTENT_CLASS}`)
   expect(contentInset).toBeTruthy()
   return contentInset as HTMLElement
 }
 
 describe('Entity card surface rhythm contract', () => {
-  it('keeps entity-card CLI header rows free of vertical padding', () => {
+  it('renders flat catalog rows without collapsible list chrome', () => {
     render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Dagger"
         domIds={catalogDomIds}
         entity={{ heading: 'Dagger', classification: 'Weapon' }}
       />,
     )
 
-    expect(headerRowFromGroup(/Dagger/)).not.toHaveClass(compactHeaderRhythm)
+    expect(screen.queryByRole('group')).toBeNull()
+    expect(document.querySelector('article .dash-entity-card__content')).toBeTruthy()
   })
 
-  it('applies shared compact content inset on CEC, DEC, and catalog rows', () => {
+  it('applies shared compact content inset on EntityCard static, disclosure, and catalog rows', () => {
     render(
       <MemoryRouter>
-        <ContentEntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />
+        <EntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />
       </MemoryRouter>,
     )
 
     render(
       <MemoryRouter>
-        <DisclosureEntityCard
+        <EntityCard
+          variant="disclosure"
           itemId="dec-item"
           toolbarAriaLabel="Feat choice"
           entity={HARBOR_DISTRICT_ENTITY}
@@ -64,12 +64,12 @@ describe('Entity card surface rhythm contract', () => {
           defaultCollapsed={false}
         >
           <p>Grant fields</p>
-        </DisclosureEntityCard>
+        </EntityCard>
       </MemoryRouter>,
     )
 
     render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Dagger"
         domIds={catalogDomIds}
         collapsible
@@ -80,10 +80,10 @@ describe('Entity card surface rhythm contract', () => {
     )
 
     const cecContent = document.querySelector('article > div') as HTMLElement
-    expect(cecContent).toHaveClass(compactContentInset)
+    expect(cecContent).toHaveClass(ENTITY_CARD_CONTENT_CLASS)
 
-    expect(entityCardContentFromGroup(/Harbor District/)).toHaveClass(compactContentInset)
-    expect(entityCardContentFromGroup(/Dagger/)).toHaveClass(compactContentInset)
+    expect(entityCardContentFromGroup(/Harbor District/)).toHaveClass(ENTITY_CARD_CONTENT_CLASS)
+    expect(entityCardContentFromGroup(/Dagger/)).toHaveClass(ENTITY_CARD_CONTENT_CLASS)
   })
 
   it('keeps default CLI header rhythm on non-entity-card form-array rows', () => {
@@ -104,10 +104,11 @@ describe('Entity card surface rhythm contract', () => {
     expect(headerRowFromGroup(/Damage/)).toHaveClass(compactHeaderRhythm)
   })
 
-  it('uses the shared body frame on DEC and catalog disclosure rows', () => {
+  it('uses the shared body frame on EntityCard disclosure and catalog disclosure rows', () => {
     render(
       <MemoryRouter>
-        <DisclosureEntityCard
+        <EntityCard
+          variant="disclosure"
           itemId="dec-body"
           toolbarAriaLabel="Feat choice"
           entity={HARBOR_DISTRICT_ENTITY}
@@ -115,12 +116,12 @@ describe('Entity card surface rhythm contract', () => {
           defaultCollapsed={false}
         >
           <p>Grant fields</p>
-        </DisclosureEntityCard>
+        </EntityCard>
       </MemoryRouter>,
     )
 
     render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Dagger"
         domIds={{
           itemId: 'contract-catalog-body',
@@ -145,7 +146,8 @@ describe('Entity card surface rhythm contract', () => {
   it('renders exactly one EntityCardContent inset region per entity-card host header', () => {
     const { container: decContainer } = render(
       <MemoryRouter>
-        <DisclosureEntityCard
+        <EntityCard
+          variant="disclosure"
           itemId="dec-single-inset"
           toolbarAriaLabel="Harbor District"
           entity={HARBOR_DISTRICT_ENTITY}
@@ -153,12 +155,12 @@ describe('Entity card surface rhythm contract', () => {
           defaultCollapsed={false}
         >
           <p>Body</p>
-        </DisclosureEntityCard>
+        </EntityCard>
       </MemoryRouter>,
     )
 
     const { container: catalogContainer } = render(
-      <CatalogEntityRow
+      <CatalogCard
         toolbarLabel="Flat row"
         domIds={{
           itemId: 'flat-row',
@@ -171,13 +173,7 @@ describe('Entity card surface rhythm contract', () => {
 
     for (const container of [decContainer, catalogContainer]) {
       const article = container.querySelector('article') as HTMLElement
-      const insetRegions = Array.from(article.querySelectorAll('*')).filter((element) => {
-        const className = element.getAttribute('class') ?? ''
-        return (
-          className.includes('pl-[var(--entity-surface-inline-start)]') &&
-          className.includes('py-2')
-        )
-      })
+      const insetRegions = article.querySelectorAll('.dash-entity-card__content')
       expect(insetRegions).toHaveLength(1)
     }
   })

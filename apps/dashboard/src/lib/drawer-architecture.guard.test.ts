@@ -127,6 +127,10 @@ const DRAWER_INVENTORY_ALLOWLIST: readonly { path: string; reason: string }[] = 
     path: 'apps/dashboard/src/features/content/lib/relationship/drawer/drawer-context.tsx',
     reason: 'Drawer context provider, not a surface.',
   },
+  {
+    path: 'apps/dashboard/src/features/content/lib/relationship/drawer/drawer-decision-summary.tsx',
+    reason: 'Decision summary fragment inside relationship drawers, not a surface.',
+  },
 ]
 
 const CHARACTER_PICKER_CHROME_IMPORT_FORBIDDEN = [

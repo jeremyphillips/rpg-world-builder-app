@@ -1,3 +1,7 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -6,15 +10,25 @@ import {
   radioCardVariants,
 } from './radio-card.variants'
 
+const radioCardCss = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), 'ui-radio-card.css'),
+  'utf8',
+)
+
 describe('radioCard surface establishment', () => {
   it('does not establish a plane on row variant', () => {
     expect(radioCardVariants({ variant: 'row' })).not.toContain('[--surface-current:')
   })
 
-  it('uses comfortable density card padding and typography', () => {
-    expect(radioCardVariants({ variant: 'card', density: 'default' })).toContain('px-4')
-    expect(radioCardVariants({ variant: 'card', density: 'default' })).toContain('py-3')
-    expect(radioCardVariants({ variant: 'card', density: 'default' })).not.toContain('pl-3')
+  it('uses comfortable density card content gap from ui-radio-card.css', () => {
+    expect(radioCardVariants({ variant: 'card', density: 'comfortable' })).not.toContain('gap-2')
+    expect(radioCardCss).toMatch(
+      /\.ui-radio-card--comfortable:not\(\.ui-radio-card--row\) \.ui-radio-card__body[\s\S]*gap: calc\(var\(--spacing\) \* 2\)/,
+    )
+    expect(radioCardCss).toMatch(
+      /\.ui-radio-card--compact:not\(\.ui-radio-card--row\) \.ui-radio-card__body[\s\S]*gap: calc\(var\(--spacing\) \* 1\)/,
+    )
+    expect(radioCardVariants({ variant: 'card', density: 'comfortable' })).not.toContain('px-4')
   })
 
   it('uses compact horizontal rhythm with semantic indicator-sm decoration', () => {
@@ -32,7 +46,9 @@ describe('radioCard group layout', () => {
 
   it('uses 8px gap between compact card options', () => {
     expect(radioCardGroupGapVariants({ variant: 'card', density: 'compact' })).toContain('gap-2')
-    expect(radioCardGroupGapVariants({ variant: 'card', density: 'default' })).toContain('gap-3')
+    expect(radioCardGroupGapVariants({ variant: 'card', density: 'comfortable' })).toContain(
+      'gap-3',
+    )
   })
 
   it('uses a responsive two-column grid when columns is two', () => {

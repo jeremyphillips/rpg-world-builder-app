@@ -56,7 +56,13 @@ export {
   inlineMetadataRootVariants,
   inlineMetadataSeparatorVariants,
 } from './components/ui/inline-metadata.variants'
-export { Alert, type AlertDensity, type AlertProps, type AlertVariant } from './components/ui/alert'
+export {
+  Alert,
+  type AlertAnnouncement,
+  type AlertDensity,
+  type AlertProps,
+  type AlertVariant,
+} from './components/ui/alert'
 export {
   alertVariants,
   alertTitleVariants,
@@ -169,7 +175,6 @@ export {
   identityFrameVariants,
   identityFrameImageVariants,
   identityFrameFallbackVariants,
-  identityHeadingBandVariants,
   identityInsetRowVariants,
 } from './components/ui/identity-frame.variants'
 export {
@@ -213,6 +218,11 @@ export {
   type SidebarNavSectionDisclosureProps,
 } from './components/ui/sidebar-nav-section-disclosure.client'
 export { Button, type ButtonForwardingProps, type ButtonProps } from './components/ui/button.client'
+export { ButtonLink, type ButtonLinkProps } from './components/ui/button-link'
+export {
+  resolveButtonAppearance,
+  type ResolveButtonAppearanceProps,
+} from './components/ui/resolve-button-appearance'
 export { ActionButton, type ActionButtonProps } from './components/ui/action-button.client'
 export {
   ChoiceSelectionCounter,
@@ -301,8 +311,64 @@ export {
   CardTitle,
   CardDescription,
   CardContent,
+  type CardHeaderModel,
+  type CardProps,
+  type NavigableCardProps,
+  type StaticCardProps,
 } from './components/ui/card'
-export { cardSurfaceClasses, cardSurfaceVariants } from './components/ui/card.variants'
+export { NavigationChevron } from './components/ui/card.lib'
+export { renderNavigableLinkRoot, composeRefs } from './components/ui/navigable-link-root.lib'
+export {
+  DestinationList,
+  DestinationItem,
+  type DestinationListAppearance,
+  type DestinationListDensity,
+  type DestinationListElevation,
+  type DestinationListTone,
+  type DestinationListProps,
+  type DestinationItemProps,
+  type DestinationItemRichProps,
+  type DestinationItemSimpleProps,
+} from './components/ui/destination-list'
+export {
+  CARD_CLASS_SPECS,
+  CARD_DENSITIES,
+  CARD_ELEVATIONS,
+  CARD_INSET_DENSITIES,
+  CARD_SURFACE_TONES,
+  cardDensityClassName,
+  cardSurfaceClasses,
+  cardSurfaceVariants,
+  resolveOptionCardSurfaceDensity,
+  UI_CARD_DESCRIPTION_CLASS,
+  UI_CARD_ELEVATION_RAISED_CLASS,
+  UI_CARD_ELEVATION_SUBTLE_CLASS,
+  UI_CONTENT_CARD_INSET_CLASS,
+  UI_CARD_DENSITY_COMPACT_CLASS,
+  UI_CARD_DENSITY_COMFORTABLE_CLASS,
+  UI_CARD_DENSITY_SPACIOUS_CLASS,
+  UI_CARD_TITLE_CLASS,
+  type CardClassSpec,
+  type CardDensity,
+  type CardElevation,
+  type CardInsetDensity,
+  type CardSurfaceTone,
+  type CardSurfaceVariantProps,
+  type CardTone,
+  type ContentCardInsetDensity,
+  type GenericCardDensity,
+} from './components/ui/card.variants'
+export { resolveSurfaceActionButtonSize } from './components/ui/surface-action-button-size.lib'
+export { resolveEntityRowInlineBadgeSize } from './components/ui/entity-row-inline-badge-size.lib'
+export { resolveHeadingAccessoryBadgeSize } from './components/ui/heading-accessory-size.lib'
+export {
+  SelectionTarget,
+  SelectionTargetRadio,
+  SelectionTargetRaised,
+  type SelectionTargetRadioProps,
+} from './components/ui/selection-target.client'
+export { DisclosureChevronTrigger } from './components/ui/disclosure-chevron-trigger.client'
+export { useRadioGroupItemSelected } from './components/ui/radio-group.client'
 
 export {
   fieldControlTriggerCursorClasses,
@@ -450,16 +516,6 @@ export {
   type RadioGroupFieldOption,
 } from './components/ui/radio-group-field'
 export {
-  optionCardCompactBodyInsetClasses,
-  optionCardCompactOptionBodyLayoutClasses,
-  optionCardCompactPanelPaddingClasses,
-  optionCardCompactPaddingRightClasses,
-  optionCardCompactPaddingXClasses,
-  optionCardCompactSummaryBodyLayoutClasses,
-  optionCardCompactSummaryContentGapClasses,
-  optionCardSelectedChromeClasses,
-} from './components/ui/selection-option-card.variants'
-export {
   SelectionOptionCard,
   SelectionOptionCardHeaderAction,
   type SelectionOptionCardDensity,
@@ -486,7 +542,6 @@ export {
 } from './components/ui/selection-option-card-anatomy.client'
 export {
   RadioOptionCard,
-  RadioOptionCardDetailsAction,
   RadioOptionCardTitleAdornment,
   type RadioOptionCardProps,
   type RadioOptionCardEmbeddedSlotTone,
@@ -494,7 +549,6 @@ export {
 export {
   RadioCard,
   radioCardVariants,
-  resolveRadioCardDetailsAriaLabel,
   type RadioCardVisualControl,
   type RadioCardVariant,
   type RadioCardEmbeddedSlotTone,
@@ -509,6 +563,13 @@ export {
   type AttentionFrameProps,
 } from './components/ui/attention-frame.client'
 export { attentionFrameVariants } from './components/ui/attention-frame.variants'
+export { DividedStack, type DividedStackProps } from './components/ui/divided-stack'
+export {
+  DIVIDED_STACK_DENSITIES,
+  dividedStackVariants,
+  type DividedStackDensity,
+  type DividedStackVariantProps,
+} from './components/ui/divided-stack.variants'
 export {
   InsetPanel,
   InsetPanelPassiveMessage,
@@ -727,10 +788,10 @@ export {
   IdentityRow,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
+  identityRowStackVariants,
   type IdentityRowHeadingLineProps,
-  type IdentityRowHeadingRecipe,
   type IdentityRowProps,
-  type IdentityRowSize,
+  type IdentityRowDensity,
   type IdentityRowSupportingProps,
 } from './components/ui/identity-row.client'
 export {
@@ -760,7 +821,6 @@ export {
   menuChoiceItemResetVariants,
   type InteractiveListSize,
 } from './components/ui/interactive-list.variants'
-export { identityRowSizeFromInteractiveListSize } from './components/ui/interactive-list.lib'
 export {
   PreviewRail,
   PreviewRailAction,
@@ -799,28 +859,13 @@ export {
   type PreviewRailStatusPanelVariant,
   type PreviewRailStatusTone,
 } from './components/preview-rail'
-export { ContentCard, type ContentCardProps } from './components/ui/content-card.client'
-export {
-  ContentCardBody,
-  type ContentCardBodyProps,
-} from './components/ui/content-card-body.client'
-export {
-  ContentCardHeading,
-  type ContentCardHeadingProps,
-} from './components/ui/content-card-heading.client'
 export {
   ContentCardHeadingAction,
-  ContentCardIconAction,
   type ContentCardHeadingActionProps,
-  type ContentCardIconActionProps,
 } from './components/ui/content-card-actions.client'
 export {
   ContentCardMedia,
-  ContentCardRemoveButton,
-  CONTENT_CARD_REMOVE_LABEL_PREFIX,
-  formatContentCardRemoveLabel,
   type ContentCardMediaProps,
-  type ContentCardRemoveButtonProps,
 } from './components/ui/content-card-parts.client'
 export {
   ContentDisplayFallbackIcon,
@@ -837,6 +882,7 @@ export {
   contentCardBodyVariants,
   contentCardDensityInsetVariants,
   contentCardHeadingLinkVariants,
+  contentCardHeadingScaleClass,
   contentCardHeadingRowVariants,
   contentCardMediaEndGapVariants,
   contentCardMediaVariants,
@@ -847,6 +893,7 @@ export {
   resolveContentCardBodyCrossAxis,
   resolveContentCardDensityInsetClasses,
   resolveContentCardIdentityColumnGapClasses,
+  CONTENT_CARD_DENSITIES,
   type ContentCardDensity,
   type ContentCardChrome,
   type ContentCardSurface,
@@ -1141,6 +1188,8 @@ export {
 } from './components/ui/collapsible-list-item'
 export {
   CatalogPickerSheet,
+  catalogPickerCardListClasses,
+  catalogPickerSheetListVariants,
   type CatalogPickerSheetProps,
   type CatalogPickerSearchStrategy,
   type CatalogPickerSheetActionsHelpers,

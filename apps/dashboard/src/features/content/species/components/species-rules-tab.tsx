@@ -1,7 +1,13 @@
 import { useEffect, useMemo } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { Heading, Text } from '@rpg/ui'
+import {
+  Heading,
+  InsetPanel,
+  Text,
+  emptyStateWellSupportingClasses,
+  emptyStateWellTitleLgClasses,
+} from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
 
 import { AvailabilityAlert, campaignSettingHref, resolveAvailability } from '@/lib/availability'
@@ -44,15 +50,15 @@ function RulesSectionDisabled({
   campaignId: string
 }) {
   return (
-    <section className="space-y-2 rounded-md border border-border bg-surface-muted p-4">
-      <Heading variant="subsection" as="h3">
+    <InsetPanel size="lg" className="flex flex-col gap-2">
+      <Heading variant="subsection" as="h3" className={emptyStateWellTitleLgClasses}>
         {title}
       </Heading>
-      <Text variant="muted" className="text-sm">
+      <Text as="p" className={emptyStateWellSupportingClasses}>
         {message}
       </Text>
       <RulesConfigLink campaignId={campaignId} />
-    </section>
+    </InsetPanel>
   )
 }
 
@@ -87,12 +93,12 @@ function SpeciesRulesEditor({ formCtx }: { formCtx: ContentFormCtx }) {
 
   if (!policyEnabled && !limitsEnabled) {
     return (
-      <div className="space-y-3 rounded-md border border-border bg-surface-muted p-4">
-        <Text variant="muted" className="text-sm">
+      <InsetPanel size="lg" className="flex flex-col gap-3">
+        <Text as="p" className={emptyStateWellSupportingClasses}>
           {`Enable ${getContentTypeMidSentenceLabel('species')} multiclass policy or ${getContentTypeMidSentenceLabel('species')} level limits in campaign rules to author ${getContentTypeMidSentenceLabel('species')}-specific multiclass data.`}
         </Text>
         <RulesConfigLink campaignId={campaignId} />
-      </div>
+      </InsetPanel>
     )
   }
 

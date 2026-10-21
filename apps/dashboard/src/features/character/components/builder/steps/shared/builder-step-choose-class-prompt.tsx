@@ -1,17 +1,9 @@
 import { Waypoints } from 'lucide-react'
 
-import { Button, IconContainer } from '@rpg/ui'
+import { Button, Card, CardContent, CardDescription, CardTitle, IconContainer } from '@rpg/ui'
 
 import { BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL } from '../../../../lib/builder/builder-step-choose-class-prompt.lib'
 import type { CharacterBuilderNavigateToStep } from '../../../../lib/builder/character-builder-navigation-options'
-import {
-  builderStepChooseClassPromptBodyClasses,
-  builderStepChooseClassPromptCardClasses,
-  builderStepChooseClassPromptContentClasses,
-  builderStepChooseClassPromptHeadingClasses,
-  builderStepChooseClassPromptSubheadingClasses,
-  builderStepChooseClassPromptTextStackClasses,
-} from './builder-step-choose-class-prompt.variants'
 
 export type BuilderStepChooseClassPromptProps = {
   heading: string
@@ -27,26 +19,26 @@ export function BuilderStepChooseClassPrompt({
   actionLabel = BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL,
 }: BuilderStepChooseClassPromptProps) {
   return (
-    <article className={builderStepChooseClassPromptCardClasses}>
-      <div className={builderStepChooseClassPromptBodyClasses}>
-        <IconContainer shape="circle">
-          <Waypoints aria-hidden />
-        </IconContainer>
-        <div className={builderStepChooseClassPromptContentClasses}>
-          <div className={builderStepChooseClassPromptTextStackClasses}>
-            <h2 className={builderStepChooseClassPromptHeadingClasses}>{heading}</h2>
-            <p className={builderStepChooseClassPromptSubheadingClasses}>{description}</p>
+    <Card tone="subtle" density="comfortable" className="w-full min-w-0">
+      <CardContent>
+        <div className="flex items-start gap-4">
+          <IconContainer shape="circle">
+            <Waypoints aria-hidden />
+          </IconContainer>
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <CardTitle>{heading}</CardTitle>
+            <CardDescription>{description}</CardDescription>
+            <Button
+              type="button"
+              variant="text"
+              tone="accent"
+              onClick={() => onNavigateToStep('class')}
+            >
+              {actionLabel}
+            </Button>
           </div>
-          <Button
-            type="button"
-            variant="text"
-            tone="accent"
-            onClick={() => onNavigateToStep('class')}
-          >
-            {actionLabel}
-          </Button>
         </div>
-      </div>
-    </article>
+      </CardContent>
+    </Card>
   )
 }

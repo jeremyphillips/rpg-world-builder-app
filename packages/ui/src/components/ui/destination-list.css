@@ -1,0 +1,169 @@
+/*
+ * Grouped destination hub list — panel chrome, list-owned inset dividers, density vars.
+ */
+@layer components {
+  .ui-destination-list {
+    margin: 0;
+    list-style: none;
+    padding: 0;
+    box-shadow: none;
+    --ui-destination-inset-inline: calc(var(--spacing) * 5);
+    --ui-destination-inset-block: calc(var(--spacing) * 2);
+    --ui-destination-title-size: var(--ui-copy-title-size, var(--text-base));
+    --ui-destination-title-line-height: var(--ui-copy-title-line-height, 1.375rem);
+    --ui-destination-description-size: var(--ui-copy-supporting-size, var(--text-sm));
+    --ui-destination-description-line-height: var(
+      --ui-copy-supporting-line-height,
+      var(--text-sm--line-height)
+    );
+    --ui-destination-metadata-size: var(--text-xs);
+    --ui-destination-metadata-line-height: var(--text-xs--line-height);
+  }
+
+  .ui-destination-list--panel {
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background-color: transparent;
+  }
+
+  .ui-destination-list--embedded {
+    overflow: visible;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+  }
+
+  .ui-destination-list--filled {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border);
+    background-color: transparent;
+  }
+
+  .ui-destination-list--filled.ui-destination-list--tone-strong {
+    --ui-surface-bg: var(--surface-strong);
+    --surface-current: var(--ui-surface-bg);
+    background-color: var(--ui-surface-bg);
+  }
+
+  .ui-destination-list--filled.ui-destination-list--tone-strong
+    .ui-interactive-row--hover-navigation {
+    --ui-row-bg-hover: var(--ui-surface-hover-bg);
+  }
+
+  .ui-destination-list--filled.ui-destination-list--tone-strong
+    .ui-interactive-row--hover-navigation:not(.ui-interactive-row--disabled):active {
+    background-color: var(--ui-surface-pressed-bg);
+  }
+
+  .ui-destination-list--elevation-subtle {
+    box-shadow: var(--shadow-surface-subtle);
+  }
+
+  .ui-destination-list--elevation-raised {
+    box-shadow: var(--shadow-surface-raised);
+  }
+
+  .ui-destination-list--filled .ui-destination-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-bottom: 1px solid var(--border-faint);
+    pointer-events: none;
+  }
+
+  .ui-destination-list--compact {
+    --ui-destination-inset-inline: calc(var(--spacing) * 4);
+    --ui-destination-inset-block: calc(var(--spacing) * 2);
+  }
+
+  .ui-destination-list--spacious {
+    --ui-destination-inset-inline: calc(var(--spacing) * 6);
+    --ui-destination-inset-block: calc(var(--spacing) * 5);
+  }
+
+  .ui-destination-item {
+    position: relative;
+  }
+
+  .ui-destination-list--panel .ui-destination-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: var(--ui-destination-inset-inline);
+    right: var(--ui-destination-inset-inline);
+    border-bottom: 1px solid var(--border-faint);
+    pointer-events: none;
+  }
+
+  .ui-destination-list--embedded .ui-destination-item + .ui-destination-item {
+    border-top: 1px solid var(--border-faint);
+  }
+
+  .ui-destination-item__link {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    gap: calc(var(--spacing) * 3);
+    padding-inline: var(--ui-destination-inset-inline);
+    padding-block: var(--ui-destination-inset-block);
+    color: var(--foreground);
+    text-decoration: none;
+  }
+
+  .ui-destination-item__main {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 0%;
+    flex-direction: column;
+    row-gap: var(--ui-anatomy-row-gap);
+    text-align: left;
+  }
+
+  .ui-destination-item__title {
+    font-size: var(--ui-destination-title-size);
+    line-height: var(--ui-destination-title-line-height);
+    font-weight: var(--font-weight-heading);
+    color: var(--foreground);
+  }
+
+  .ui-destination-item__description {
+    font-size: var(--ui-destination-description-size);
+    line-height: var(--ui-destination-description-line-height);
+    color: var(--muted-foreground);
+  }
+
+  .ui-destination-item__metadata {
+    font-size: var(--ui-destination-metadata-size);
+    line-height: var(--ui-destination-metadata-line-height);
+    color: var(--muted-foreground);
+  }
+
+  .ui-destination-item__identity-cluster {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 0%;
+    align-items: flex-start;
+    gap: var(--control-gap-sm);
+    text-align: left;
+  }
+
+  .ui-destination-item__trailing-info {
+    display: flex;
+    flex-shrink: 0;
+    align-self: center;
+    align-items: center;
+  }
+
+  .ui-destination-item__chevron {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    align-self: center;
+    color: var(--muted-foreground);
+  }
+}

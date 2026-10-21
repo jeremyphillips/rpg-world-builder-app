@@ -102,11 +102,9 @@ import {
   resolveQuickNpcStartingEquipmentPackageContext,
 } from '../../lib/quick-npc/quick-npc-starting-equipment.lib'
 import { useQuickNpcEditingLock } from './use-quick-npc-editing-lock'
+import { collectionPanelEmptyStateBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+
 import { QuickNpcPackageCustomizationPanel } from './quick-npc-package-customization-panel'
-import {
-  quickNpcPackageHeaderActionsClasses,
-  quickNpcPackageNoPackageClasses,
-} from './quick-npc-package-customization.variants'
 import {
   quickNpcAdditionalEquipmentQuantityClasses,
   quickNpcStartingChoiceAddControlClasses,
@@ -415,7 +413,7 @@ function QuickNpcStartingEquipmentPackageSection({
           }
           headerEndSlot={
             disclosureOpen ? null : (
-              <span className={quickNpcPackageHeaderActionsClasses}>
+              <span className="flex items-center gap-1">
                 {canChangePackage ? (
                   <SelectionOptionCardHeaderAction
                     label={EQUIPMENT_CHANGE_PACKAGE_LABEL}
@@ -493,7 +491,7 @@ function QuickNpcStartingEquipmentPackageSection({
         />
       ) : null}
       {effective.state === 'declined' && !isPackageChooserExpanded ? (
-        <div className={quickNpcPackageNoPackageClasses}>
+        <div className={collectionPanelEmptyStateBodyClasses}>
           <p className="text-sm font-body-emphasis">{QUICK_NPC_NO_STARTING_PACKAGE_HEADING}</p>
           <p className="text-style-caption">{QUICK_NPC_NO_STARTING_PACKAGE_BODY}</p>
           <Button

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { buttonVariants } from '@rpg/ui'
+import { ButtonLink } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { OverviewPageShell } from '@/components/layout/page/overview-page-shell'
@@ -48,12 +48,13 @@ export function NpcsOverview() {
   ])
   const actions = canManage ? (
     <div className="flex flex-wrap gap-2">
-      <Link
-        to={ROUTES.campaign.npcs.import(campaignId)}
-        className={buttonVariants({ size: 'sm', variant: 'outline' })}
+      <ButtonLink
+        link={<Link to={ROUTES.campaign.npcs.import(campaignId)} />}
+        size="sm"
+        variant="outline"
       >
         {formatCharacterTypeImportActionLabel('npc')}
-      </Link>
+      </ButtonLink>
       {context ? (
         <>
           <QuickNpcCreateModal

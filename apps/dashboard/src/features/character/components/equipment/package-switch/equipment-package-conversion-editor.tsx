@@ -12,26 +12,16 @@ import {
   type StartingPackageConversionPreview,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-import { Button, Checkbox, Eyebrow, Text } from '@rpg/ui'
+import { Button, Checkbox, cn, Eyebrow, Text } from '@rpg/ui'
 
-import { ContentEntityCard } from '@/features/content'
+import { EntityCard } from '@/features/content'
+import { collectionPanelComfortableInsetClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 import { useEquipmentSelectionFacts } from '../../../hooks/use-equipment-selection-facts'
 import { resolveEquipmentConversionItemPresentation } from '../../../lib/equipment/equipment-selection-facts.lib'
 import type { StartingPackageInventoryGroup } from '../../../lib/equipment/equipment-step.lib'
 import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-status'
 import { buildEquipmentInventoryRowEntity } from '../inventory/equipment-inventory-entity.lib'
 import { equipmentInventoryRowListClasses } from '../inventory/equipment-inventory.variants'
-import {
-  equipmentPackageConversionBudgetClasses,
-  equipmentPackageConversionCategoryClasses,
-  equipmentPackageConversionEditorActionsClasses,
-  equipmentPackageConversionEditorBodyClasses,
-  equipmentPackageConversionEditorClasses,
-  equipmentPackageConversionEditorDescriptionClasses,
-  equipmentPackageConversionEditorListClasses,
-  equipmentPackageConversionStatusClasses,
-} from '../starting-package/equipment-starting-package.variants'
-
 export type EquipmentPackageConversionEditorProps = {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
@@ -140,20 +130,20 @@ export function EquipmentPackageConversionEditor({
   }
 
   return (
-    <section id={resolvedEditorId} className={equipmentPackageConversionEditorClasses}>
-      <div ref={descriptionRef} tabIndex={-1} className="outline-none">
-        <Text as="p" className={equipmentPackageConversionEditorDescriptionClasses}>
+    <section id={resolvedEditorId} className="flex flex-col">
+      <div ref={descriptionRef} tabIndex={-1} className="outline-none px-4 pt-4">
+        <Text as="p" className="text-style-supporting">
           Choose which package items to keep as starting-gold purchases.
         </Text>
       </div>
 
-      <div className={equipmentPackageConversionEditorBodyClasses}>
-        <Text as="p" className={equipmentPackageConversionBudgetClasses}>
+      <div className={cn(collectionPanelComfortableInsetClasses, 'space-y-4')}>
+        <Text as="p" variant="caption">
           {formatConversionBudgetLine(preview)}
         </Text>
-        <div className={equipmentPackageConversionEditorListClasses}>
+        <div className="space-y-3">
           {groups.map((group) => (
-            <div key={group.groupLabel} className={equipmentPackageConversionCategoryClasses}>
+            <div key={group.groupLabel} className="space-y-1">
               <Eyebrow size="sm">{group.groupLabel}</Eyebrow>
               <ul className={equipmentInventoryRowListClasses}>
                 {group.items.map((item) => {
@@ -175,22 +165,25 @@ export function EquipmentPackageConversionEditor({
 
                   return (
                     <li key={item.packageItemKey}>
-                      <ContentEntityCard
+                      <EntityCard
                         entity={buildEquipmentInventoryRowEntity({
                           equipmentName: title,
                           stagedRemoval: !checked,
                           status,
                         })}
-                        leading={
-                          <Checkbox
-                            checked={checked}
-                            disabled={disabled}
-                            aria-label={title}
-                            onCheckedChange={(nextChecked) =>
-                              toggleItem(item.packageItemKey, nextChecked === true)
-                            }
-                          />
-                        }
+                        leading={{
+                          kind: 'title',
+                          content: (
+                            <Checkbox
+                              checked={checked}
+                              disabled={disabled}
+                              aria-label={title}
+                              onCheckedChange={(nextChecked) =>
+                                toggleItem(item.packageItemKey, nextChecked === true)
+                              }
+                            />
+                          ),
+                        }}
                         trailing={
                           valueLabel
                             ? { kind: 'indicator', variant: 'label', label: valueLabel }
@@ -209,12 +202,12 @@ export function EquipmentPackageConversionEditor({
       </div>
 
       {commitStatusMessage ? (
-        <div className={equipmentPackageConversionStatusClasses} role="status">
+        <Text as="p" className="px-4 py-2 text-sm text-foreground" role="status">
           {commitStatusMessage}
-        </div>
+        </Text>
       ) : null}
 
-      <div className={equipmentPackageConversionEditorActionsClasses}>
+      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border px-4 py-3">
         <Button type="button" variant="ghost" onClick={onCancel}>
           Cancel
         </Button>

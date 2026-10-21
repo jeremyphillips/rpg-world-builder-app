@@ -8,6 +8,9 @@ import { useContext } from 'react'
 
 import { pickEquipment, pickMonster, pickSkillProficiency } from '@/test/fixtures/pick'
 
+import type * as UseEquipmentModule from '../../equipment/hooks/use-equipment'
+import type * as UseSkillProficienciesModule from '../../skill-proficiencies/hooks/use-skill-proficiencies'
+
 vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
@@ -18,7 +21,7 @@ vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => true),
 }))
 vi.mock('../../equipment/hooks/use-equipment', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../equipment/hooks/use-equipment')>()
+  const actual = await importOriginal<typeof UseEquipmentModule>()
   return {
     ...actual,
     useEquipment: vi.fn(),
@@ -28,8 +31,7 @@ vi.mock('../hooks/use-monsters', () => ({
   useMonsters: vi.fn(),
 }))
 vi.mock('../../skill-proficiencies/hooks/use-skill-proficiencies', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../../skill-proficiencies/hooks/use-skill-proficiencies')>()
+  const actual = await importOriginal<typeof UseSkillProficienciesModule>()
   return {
     ...actual,
     useSkillProficiencies: vi.fn(),

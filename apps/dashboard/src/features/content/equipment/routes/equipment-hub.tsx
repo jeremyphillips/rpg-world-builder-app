@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { Card, CardHeader, CardTitle } from '@rpg/ui'
+import { Card } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { PageShell } from '@/components/layout/page/page-shell'
@@ -22,17 +22,15 @@ export function EquipmentHubContent({ campaignId }: EquipmentHubContentProps) {
       <PageHeader heading={getContentTypeCollectionLabel('equipment')} />
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {EQUIPMENT_FAMILY_PATHS.map((family) => (
-          <li key={family}>
-            <Link
-              to={ROUTES.content.equipment.family(campaignId, family)}
-              className="block h-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Card interactive className="h-full">
-                <CardHeader>
-                  <CardTitle>{getEquipmentFamilyLabel(family as EquipmentFamilyPath)}</CardTitle>
-                </CardHeader>
-              </Card>
-            </Link>
+          <li key={family} className="h-full">
+            <Card
+              link={<Link to={ROUTES.content.equipment.family(campaignId, family)} />}
+              stretch
+              className="h-full"
+              density="comfortable"
+              tone="strong"
+              header={{ title: getEquipmentFamilyLabel(family as EquipmentFamilyPath) }}
+            />
           </li>
         ))}
       </ul>

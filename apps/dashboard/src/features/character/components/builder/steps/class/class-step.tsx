@@ -100,7 +100,6 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
         density="compact"
         columns="three"
         copyWidth="content"
-        reserveSummaryBadgeRow
         value={draft.class.classId ?? ''}
         onValueChange={(classId) => {
           selectClass(classId)

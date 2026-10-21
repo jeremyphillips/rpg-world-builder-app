@@ -20,7 +20,7 @@ import {
 import { useFormContext } from 'react-hook-form'
 
 import { entityAnatomyTrailingGroupSecondaryVariants } from '../../../lib/entity/anatomy/entity-anatomy-trailing.variants'
-import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
+import { EntityCard } from '@/features/content'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   useMonsterCreatureDetailsSkillsSlot,
@@ -180,7 +180,8 @@ function MonsterSkillProficiencyRow({
     : undefined
 
   return (
-    <ContentFormEntitySelectionRow
+    <EntityCard
+      density="compact"
       entity={{
         heading: skillLabel,
         description: metadataLine,

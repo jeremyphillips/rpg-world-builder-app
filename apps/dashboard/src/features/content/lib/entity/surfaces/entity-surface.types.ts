@@ -5,7 +5,7 @@ import type {
   EntitySurfaceInlineAction,
 } from '../summary/entity-surface-identity.types'
 
-/** Config for CatalogEntityRow, ContentEntityCard, and DisclosureEntityCard compact identity. */
+/** Config for CatalogCard and EntityCard compact identity projection. */
 export type EntitySurfaceConfig = {
   identity: EntitySurfaceIdentity
   details?: ReactNode

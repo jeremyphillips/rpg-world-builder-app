@@ -22,6 +22,76 @@ const options = [
 ]
 
 describe('RadioCard', () => {
+  it('uses quiet tone chrome when tone is quiet', () => {
+    render(
+      <RadioCard
+        aria-label="Connection kind"
+        density="compact"
+        tone="quiet"
+        options={[{ label: 'Owner', value: 'owns', description: 'Controls the location' }]}
+      />,
+    )
+
+    const shell = screen.getByRole('radio', { name: /Owner/i }).closest('.ui-card')
+    expect(shell).toHaveClass('ui-card--quiet')
+    expect(shell).not.toHaveClass('ui-card--strong')
+  })
+
+  it('uses subtle tone chrome and title-line control alignment by default', () => {
+    render(
+      <RadioCard
+        aria-label="Edition preset"
+        options={[{ label: 'Modern 5e', value: '5e', description: 'Familiar modern fantasy.' }]}
+      />,
+    )
+
+    const radio = screen.getByRole('radio', { name: /Modern 5e/i })
+    const shell = radio.closest('.ui-card')
+    expect(shell).toHaveClass('ui-card--subtle', 'ui-card--interactive')
+    expect(shell).not.toHaveClass('ui-card--selected', 'ui-card--strong')
+
+    const titleLineAlign = radio.closest('.flex.shrink-0.items-center.self-start')
+    expect(titleLineAlign).toHaveClass('h-6')
+  })
+
+  it('matches title-end action height for compact cards with onDetails', () => {
+    render(
+      <RadioCard
+        aria-label="Class"
+        density="compact"
+        options={[
+          {
+            label: 'Fighter',
+            value: 'fighter',
+            description: 'A martial class.',
+            onDetails: () => {},
+          },
+        ]}
+      />,
+    )
+
+    const radio = screen.getByRole('radio', { name: /Fighter/i })
+    const titleLineAlign = radio.closest('.flex.shrink-0.items-center.self-start')
+    expect(titleLineAlign).toHaveClass('h-control-action-compact')
+    expect(titleLineAlign).not.toHaveClass('h-5')
+  })
+
+  it('applies density body padding inside the radio card shell', () => {
+    render(
+      <RadioCard
+        aria-label="Connection kind"
+        density="compact"
+        options={[{ label: 'Owner', value: 'owns' }]}
+      />,
+    )
+
+    const shell = screen.getByRole('radio', { name: /Owner/i }).closest('.ui-card')
+    const body = shell?.querySelector('.ui-radio-card__body')
+    expect(shell).toHaveClass('ui-card--compact')
+    expect(body).toHaveClass('ui-radio-card__body')
+    expect(body).not.toHaveClass('pl-3', 'px-4', 'py-2')
+  })
+
   it('selects an option on click', async () => {
     const user = userEvent.setup()
     const onValueChange = vi.fn()
@@ -89,9 +159,9 @@ describe('RadioCard', () => {
       />,
     )
 
-    const radio = screen.getByRole('radio', { name: /Elf/i })
-    expect(radio).toHaveTextContent('Elf')
-    expect(radio).toHaveTextContent('Heritage required')
+    expect(screen.getByRole('radio', { name: /Elf/i })).toBeInTheDocument()
+    expect(screen.getByText('Elf')).toBeInTheDocument()
+    expect(screen.getByText('Heritage required')).toBeInTheDocument()
   })
 
   it('renders stacked summary lines for dependent-choice cards', () => {
@@ -160,8 +230,8 @@ describe('RadioCard', () => {
       />,
     )
 
-    const shell = screen.getByRole('radio', { name: /Elf/i }).closest('[class*="rounded-card"]')
-    expect(shell).toHaveClass('bg-surface-strong')
+    const shell = screen.getByRole('radio', { name: /Elf/i }).closest('.ui-card--selected')
+    expect(shell).toHaveClass('ui-card--subtle')
     expect(shell).toHaveTextContent('Lineage picker')
   })
 
@@ -181,8 +251,8 @@ describe('RadioCard', () => {
     )
 
     expect(screen.getByText('Requires strength 13')).toBeInTheDocument()
-    const shell = screen.getByRole('radio', { name: /Dwarf/i }).closest('[class*="rounded-card"]')
-    expect(shell).toHaveClass('bg-surface-muted')
+    const shell = screen.getByRole('radio', { name: /Dwarf/i }).closest('.ui-card')
+    expect(shell).toHaveClass('ui-card--subtle')
   })
 
   it('renders embedded content inside the selected card shell', () => {
@@ -204,7 +274,7 @@ describe('RadioCard', () => {
       />,
     )
 
-    const elfCard = screen.getByRole('radio', { name: /Elf/i }).closest('[class*="rounded-card"]')
+    const elfCard = screen.getByRole('radio', { name: /Elf/i }).closest('.ui-radio-card')
     expect(elfCard).toHaveTextContent('Gnomish Lineage picker')
   })
 
@@ -251,12 +321,13 @@ describe('RadioCard', () => {
       />,
     )
 
-    const drow = screen.getByRole('radio', { name: /Drow/i })
-    expect(drow).toHaveClass('rounded-md')
-    expect(drow).not.toHaveClass('shadow-sm')
-    expect(drow).toHaveClass('border-0')
-    expect(drow).toHaveClass('ui-interactive-row--data-checked')
-    expect(drow).not.toHaveClass('data-[state=checked]:ring-1')
+    const drowRow = screen.getByRole('radio', { name: /Drow/i }).closest('.ui-radio-card--row')
+    expect(drowRow).toBeTruthy()
+    expect(drowRow).toHaveClass(
+      'ui-interactive-row--selected-bordered',
+      'ui-radio-card--row-compact',
+    )
+    expect(drowRow).not.toHaveClass('ui-card--selected', 'ui-card--compact')
   })
 
   it('renders embedded panel slot edge-to-edge inside the card shell', () => {
@@ -280,8 +351,8 @@ describe('RadioCard', () => {
 
     const panel = screen.getByText('Configuration panel').parentElement
     expect(panel).toHaveTextContent('Configuration panel')
-    expect(panel?.className).toContain('-mx-4')
-    expect(panel?.className).toContain('rounded-b-card')
+    expect(panel).toHaveClass('ui-option-card__embedded--panel')
+    expect(panel).not.toHaveClass('ui-option-card__embedded--in-flow')
   })
 
   itAxe('has no axe accessibility violations', async () => {
@@ -374,23 +445,8 @@ describe('RadioCard', () => {
     )
 
     const selected = screen.getByRole('radio', { name: /General table/i })
-    expect(selected).toHaveClass('data-[state=checked]:border-primary')
-    expect(selected).toHaveClass('data-[state=checked]:bg-surface-strong')
-  })
-
-  it('selects an option when controlPosition is right', async () => {
-    const user = userEvent.setup()
-    const onValueChange = vi.fn()
-    render(
-      <RadioCard
-        aria-label="Edition preset"
-        options={options}
-        controlPosition="right"
-        onValueChange={onValueChange}
-      />,
-    )
-    await user.click(screen.getByRole('radio', { name: /Modern 3e/i }))
-    expect(onValueChange).toHaveBeenCalledWith('3e')
+    expect(selected).toBeChecked()
+    expect(selected.closest('.ui-card--selected')).toBeTruthy()
   })
 
   it('opens details without selecting the card', async () => {
@@ -419,24 +475,6 @@ describe('RadioCard', () => {
     expect(onValueChange).not.toHaveBeenCalled()
   })
 
-  it('exposes a focusable details control in compact mode', () => {
-    render(
-      <RadioCard
-        aria-label="Species"
-        density="compact"
-        options={[
-          {
-            label: 'Dwarf',
-            value: 'dwarf',
-            onDetails: vi.fn(),
-            detailsAriaLabel: 'View Dwarf details',
-          },
-        ]}
-      />,
-    )
-    expect(screen.getByRole('button', { name: 'View Dwarf details' })).toBeInTheDocument()
-  })
-
   it('renders the details action inline with the title row', () => {
     render(
       <RadioCard
@@ -454,7 +492,7 @@ describe('RadioCard', () => {
     )
 
     const title = screen.getByText('Dwarf')
-    const titleRow = title.closest('.flex.min-w-0.items-center.justify-between')
+    const titleRow = title.closest('.ui-option-card__title-line')
     const detailsButton = screen.getByRole('button', { name: 'View Dwarf details' })
 
     expect(titleRow).toContainElement(title)

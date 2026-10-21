@@ -4,7 +4,7 @@ import {
   resolveCampaignInviteExpiryLabel,
   type CampaignInvitePublicResolution,
 } from '@rpg/contracts'
-import { Button, buttonVariants } from '@rpg/ui'
+import { Button, ButtonLink } from '@rpg/ui'
 
 import { INVITE_REVIEW_COPY } from './campaign-invite-review-copy'
 import { InviteMessageCard } from './invite-message-card'
@@ -21,9 +21,9 @@ export type CampaignInviteReviewNavigation = {
 
 export function InviteHomeAction({ homeHref }: { homeHref: string }) {
   return (
-    <a href={homeHref} className={buttonVariants({ variant: 'outline' })}>
+    <ButtonLink link={<a href={homeHref} />} variant="outline">
       {INVITE_REVIEW_COPY.home}
-    </a>
+    </ButtonLink>
   )
 }
 
@@ -33,9 +33,9 @@ export function InviteRevokedState({ navigation }: { navigation: CampaignInviteR
       title={INVITE_REVIEW_COPY.revoked.title}
       body={INVITE_REVIEW_COPY.revoked.body}
       action={
-        <a href={navigation.homeHref} className={buttonVariants()}>
+        <ButtonLink link={<a href={navigation.homeHref} />}>
           {INVITE_REVIEW_COPY.revoked.action}
-        </a>
+        </ButtonLink>
       }
     />
   )
@@ -47,9 +47,9 @@ export function InviteExpiredState({ navigation }: { navigation: CampaignInviteR
       title={INVITE_REVIEW_COPY.expired.title}
       body={INVITE_REVIEW_COPY.expired.body}
       action={
-        <a href={navigation.homeHref} className={buttonVariants()}>
+        <ButtonLink link={<a href={navigation.homeHref} />}>
           {INVITE_REVIEW_COPY.expired.action}
-        </a>
+        </ButtonLink>
       }
     />
   )
@@ -74,13 +74,13 @@ export function InviteCompletedState({
       }
       action={
         canOpenCampaign ? (
-          <a href={crossAppCampaignDetailPath(campaignId)} className={buttonVariants()}>
+          <ButtonLink link={<a href={crossAppCampaignDetailPath(campaignId)} />}>
             {INVITE_REVIEW_COPY.completed.openCampaign}
-          </a>
+          </ButtonLink>
         ) : (
-          <a href={buildAuthContinuationUrl('/login', returnTo)} className={buttonVariants()}>
+          <ButtonLink link={<a href={buildAuthContinuationUrl('/login', returnTo)} />}>
             {INVITE_REVIEW_COPY.completed.signIn}
-          </a>
+          </ButtonLink>
         )
       }
     />
@@ -165,18 +165,25 @@ export function InviteUnauthenticatedState({
       body={`${resolution.inviterDisplayName} invited you to join this campaign. ${INVITE_REVIEW_COPY.unauthenticated.bodySuffix}`}
       action={
         <>
-          <a
-            href={buildAuthContinuationUrl('/login', returnTo, email ? { email } : undefined)}
-            className={buttonVariants()}
+          <ButtonLink
+            link={
+              <a
+                href={buildAuthContinuationUrl('/login', returnTo, email ? { email } : undefined)}
+              />
+            }
           >
             {INVITE_REVIEW_COPY.unauthenticated.signIn}
-          </a>
-          <a
-            href={buildAuthContinuationUrl('/signup', returnTo, email ? { email } : undefined)}
-            className={buttonVariants({ variant: 'outline' })}
+          </ButtonLink>
+          <ButtonLink
+            link={
+              <a
+                href={buildAuthContinuationUrl('/signup', returnTo, email ? { email } : undefined)}
+              />
+            }
+            variant="outline"
           >
             {INVITE_REVIEW_COPY.unauthenticated.createAccount}
-          </a>
+          </ButtonLink>
         </>
       }
     />

@@ -11,7 +11,7 @@ dashboard IA and how the UI composes existing row controls.
 **Added Equipment** section and the monster **Equipment** tab both use them for
 section title, count badge, and kind-grouped rows (eyebrows only when more than
 one non-empty group). Row metadata uses `statusComposition: 'metadata'` on
-`ContentEntityCard` (Equipped, enhancement, properties, effects).
+`EntityCard` (Equipped, enhancement, properties, effects).
 
 Monster loadout editing uses the same stack model as the character inventory: plain-stack
 picker priority, scope splits, and stable `entryId`s. See

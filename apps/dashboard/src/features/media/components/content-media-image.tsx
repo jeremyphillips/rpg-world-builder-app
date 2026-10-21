@@ -43,7 +43,7 @@ export type ContentMediaFallbackProps = {
 function resolvePresentationSurface(
   frame: ContentMediaImageFrame,
 ): ContentImagePresentationSurface {
-  if (frame === 'square' || frame === 'insetSm') return 'thumbnail'
+  if (frame === 'square' || frame === 'insetSm' || frame === 'anatomyFill') return 'thumbnail'
   if (frame === 'builderCard') return 'builderCard'
   if (frame === 'builderSheetHero') return 'primary'
   return 'primary'

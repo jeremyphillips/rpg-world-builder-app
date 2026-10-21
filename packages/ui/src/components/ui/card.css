@@ -1,48 +1,271 @@
 /*
- * Card shell. Part padding lives here. Interactive hover is one modifier.
- * Source order: block → interactive → parts.
+ * Card shell — structure on `.ui-card`; tone (transparent|quiet|subtle|strong) owns fill/border;
+ * elevation (subtle|raised) owns depth. Selected/focus may replace shell shadow.
+ * Nest with the full class after `&` (`&.ui-card--quiet`). Gluing `&` to a
+ * modifier dash is rewritten into a selector that matches nothing.
  */
 @layer components {
+  /* Baseline inset + header copy ladder — published on shell; regions consume vars. */
+  .ui-card--compact {
+    --ui-card-inset-block: var(--ui-surface-inset-block);
+    --ui-card-inset-inline: var(--ui-surface-inset-inline);
+    --ui-card-title-size: var(--text-sm);
+    --ui-card-title-line-height: var(--text-sm--line-height);
+    --ui-card-description-size: var(--text-xs);
+    --ui-card-description-line-height: var(--text-xs--line-height);
+  }
+
+  .ui-card--comfortable {
+    --ui-card-inset-block: var(--ui-surface-inset-block);
+    --ui-card-inset-inline: var(--ui-surface-inset-inline);
+    --ui-card-title-size: var(--text-base);
+    --ui-card-title-line-height: 1.375rem;
+    --ui-card-description-size: var(--text-sm);
+    --ui-card-description-line-height: var(--text-sm--line-height);
+  }
+
+  .ui-card--spacious {
+    --ui-card-inset-block: var(--ui-surface-inset-block);
+    --ui-card-inset-inline: var(--ui-surface-inset-inline);
+    --ui-card-title-size: var(--text-heading-card);
+    --ui-card-title-line-height: 1.625rem;
+    --ui-card-description-size: var(--text-sm);
+    --ui-card-description-line-height: var(--text-sm--line-height);
+  }
+
   .ui-card {
-    border-radius: var(--radius-card);
-    border: 1px solid var(--card-border);
-    background-color: var(--card);
     color: var(--card-foreground);
-    box-shadow: var(--shadow-surface-raised);
+    border-radius: var(--radius-card);
+    box-shadow: none;
     --surface-current: var(--card);
+
+    &.ui-card--static,
+    &.ui-card--interactive {
+      transition-property: background-color, border-color, color, box-shadow;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 150ms;
+    }
+
+    &.ui-card--interactive:not(.ui-card--disabled) {
+      cursor: pointer;
+    }
+
+    &.ui-card--disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    &.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
+    &.ui-card--interactive:has(.ui-choice-control:focus-visible) {
+      outline: none;
+    }
+
+    /* Border-only on inherited surface; interaction mixes from transparent rest plane */
+    &.ui-card--transparent {
+      border: 1px solid var(--border);
+      --ui-surface-bg: transparent;
+      background-color: transparent;
+    }
+
+    /* Drawer / catalog entity rows */
+    &.ui-card--quiet {
+      border: 1px solid var(--border);
+      --ui-surface-bg: var(--surface-lift);
+      --surface-current: var(--surface-lift);
+      background-color: var(--ui-surface-bg);
+    }
+
+    /* Light wash between lift and strong */
+    &.ui-card--subtle {
+      border: 1px solid var(--border);
+      --ui-surface-bg: var(--surface-subtle);
+      --surface-current: var(--surface-subtle);
+      background-color: var(--ui-surface-bg);
+    }
+
+    /* Builder options, selection cards, default navigation chrome */
+    &.ui-card--strong {
+      border: 1px solid var(--border);
+      --ui-surface-bg: var(--surface-strong);
+      --surface-current: var(--surface-strong);
+      background-color: var(--ui-surface-bg);
+    }
+
+    &.ui-card--interactive:not(.ui-card--selected):not(.ui-card--disabled):hover:is(
+        .ui-card--transparent,
+        .ui-card--quiet,
+        .ui-card--subtle,
+        .ui-card--strong
+      ) {
+      background-color: var(--ui-surface-hover-bg);
+    }
+
+    &.ui-card--interactive:not(.ui-card--selected):not(.ui-card--disabled):active:is(
+        .ui-card--transparent,
+        .ui-card--quiet,
+        .ui-card--subtle,
+        .ui-card--strong
+      ) {
+      background-color: var(--ui-surface-pressed-bg);
+    }
+
+    &.ui-card--selected:is(
+        .ui-card--transparent,
+        .ui-card--quiet,
+        .ui-card--subtle,
+        .ui-card--strong
+      ),
+    &.ui-card--selected:hover:is(
+        .ui-card--transparent,
+        .ui-card--quiet,
+        .ui-card--subtle,
+        .ui-card--strong
+      ),
+    &.ui-card--selected:active:is(
+        .ui-card--transparent,
+        .ui-card--quiet,
+        .ui-card--subtle,
+        .ui-card--strong
+      ) {
+      background-color: var(--ui-surface-selected-bg);
+      border-color: var(--primary);
+      --surface-current: var(--ui-surface-selected-bg);
+    }
+
+    &.ui-card--strong.ui-card--interactive:not(.ui-card--selected):not(.ui-card--disabled):hover {
+      border-color: var(--primary);
+    }
+
+    &.ui-card--strong.ui-card--selected {
+      box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent);
+    }
+
+    &.ui-card--transparent.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
+    &.ui-card--transparent.ui-card--interactive:has(.ui-choice-control:focus-visible),
+    &.ui-card--quiet.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
+    &.ui-card--quiet.ui-card--interactive:has(.ui-choice-control:focus-visible),
+    &.ui-card--subtle.ui-card--interactive:has(.ui-selection-target__control:focus-visible),
+    &.ui-card--subtle.ui-card--interactive:has(.ui-choice-control:focus-visible) {
+      box-shadow: var(--ui-focus-ring-standalone);
+    }
+
+    &.ui-card--strong.ui-card--interactive:not(.ui-card--selected):has(
+        .ui-selection-target__control:focus-visible
+      ),
+    &.ui-card--strong.ui-card--interactive:not(.ui-card--selected):has(
+        .ui-choice-control:focus-visible
+      ) {
+      box-shadow: var(--ui-focus-ring-standalone);
+    }
+
+    &.ui-card--strong.ui-card--selected.ui-card--interactive:has(
+        .ui-selection-target__control:focus-visible
+      ),
+    &.ui-card--strong.ui-card--selected.ui-card--interactive:has(.ui-choice-control:focus-visible) {
+      box-shadow:
+        0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent),
+        var(--ui-focus-ring-standalone);
+    }
   }
 
-  .ui-card--static,
-  .ui-card--interactive {
-    transition-property: background-color, border-color, color;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
+  .ui-card--elevation-subtle {
+    box-shadow: var(--shadow-surface-subtle);
   }
 
-  .ui-card--static:hover {
-    background-color: var(--card);
+  .ui-card--elevation-raised {
+    box-shadow: var(--shadow-surface-raised);
   }
 
-  .ui-card--interactive:hover {
-    background-color: var(--row-hover-bg);
-  }
-
-  .ui-card__header {
+  .ui-card .ui-card__header {
     display: flex;
     flex-direction: column;
-    gap: calc(var(--spacing) * 1.5);
-    padding: calc(var(--spacing) * 6);
+    row-gap: var(--ui-anatomy-row-gap);
+    padding-block: var(--ui-card-inset-block);
+    padding-inline: var(--ui-card-inset-inline);
   }
 
-  .ui-card__content {
-    padding: calc(var(--spacing) * 6);
+  .ui-card .ui-card__content {
+    padding-inline: var(--ui-card-inset-inline);
+    padding-block-end: var(--ui-card-inset-block);
+    padding-top: var(--ui-card-inset-block);
+  }
+
+  .ui-card:has(.ui-card__header) .ui-card__content {
     padding-top: 0;
   }
 
-  .ui-card__footer {
+  .ui-card .ui-card__footer {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    padding: calc(var(--spacing) * 6);
+    gap: calc(var(--spacing) * 2);
+    padding-inline: var(--ui-card-inset-inline);
+    padding-block-end: var(--ui-card-inset-block);
+    padding-top: var(--ui-card-inset-block);
+  }
+
+  .ui-card:has(.ui-card__header) .ui-card__footer,
+  .ui-card:has(.ui-card__content) .ui-card__footer {
     padding-top: 0;
+  }
+
+  .ui-card .ui-card__title {
+    margin: 0;
+    font-size: var(--ui-card-title-size);
+    line-height: var(--ui-card-title-line-height);
+    font-weight: var(--font-weight-heading);
+    letter-spacing: var(--tracking-heading);
+  }
+
+  .ui-card .ui-card__description {
+    font-size: var(--ui-card-description-size);
+    line-height: var(--ui-card-description-line-height);
+    color: var(--muted-foreground);
+  }
+
+  .ui-card .ui-card__nav {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: calc(var(--spacing) * 3);
+  }
+
+  .ui-card .ui-card__nav-main {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .ui-card .ui-card__nav-chevron {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--muted-foreground);
+    padding-inline-end: var(--ui-card-inset-inline);
+  }
+
+  .ui-content-card-inset {
+    padding-block: var(--ui-card-inset-block);
+    padding-inline: var(--ui-card-inset-inline);
+  }
+
+  .ui-card--media {
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .ui-card__media {
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .ui-card--stretch {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+  }
+
+  .ui-card--stretch .ui-card__footer {
+    margin-top: auto;
   }
 }

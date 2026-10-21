@@ -3,13 +3,12 @@
 import * as React from 'react'
 
 import { CollapsibleListItem } from './collapsible-list-item'
+import { RadioGroup } from './radio-group.client'
 import type {
   CatalogPickerCollapsibleRowRenderArgs,
-  CatalogPickerRowLayout,
   CatalogPickerSheetProps,
+  CatalogPickerSheetSelection,
 } from './catalog-picker-sheet.types'
-import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
-import type { SurfaceConfig } from './visual-vocabulary.types'
 import { catalogPickerSheetListVariants } from './catalog-picker-sheet.variants'
 import { resolveCollapsibleListItemDomIds } from './collapsible-list-item/collapsible-list-item.variants'
 
@@ -42,12 +41,9 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemSummary,
   renderItemActions,
   renderItemDetails,
-  rowPreset,
-  rowLayout,
-  rowSurface = { elevation: 'flat' },
-  toolbarCompact = false,
   expandedItemId,
   onExpandedItemChange,
+  selection,
 }: {
   item: TItem
   itemKey: string
@@ -57,12 +53,9 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemSummary?: (item: TItem) => React.ReactNode
   renderItemActions?: (item: TItem) => React.ReactNode
   renderItemDetails?: (item: TItem) => React.ReactNode
-  rowPreset?: CollapsibleListItemShellPreset
-  rowLayout?: CatalogPickerRowLayout
-  rowSurface?: SurfaceConfig
-  toolbarCompact?: boolean
   expandedItemId?: string | null
   onExpandedItemChange?: (itemId: string | null) => void
+  selection?: CatalogPickerSheetSelection<TItem>
 }) {
   const { isExpanded, onToggleCollapse } = useCatalogPickerRowExpansion(
     itemKey,
@@ -75,7 +68,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
 
   if (renderCollapsibleRow) {
     return (
-      <div data-picker-item-key={itemKey}>
+      <>
         {renderCollapsibleRow({
           item,
           itemKey,
@@ -86,22 +79,28 @@ function CatalogPickerCollapsibleItemRow<TItem>({
           onToggleCollapse,
           summary: renderItemSummary?.(item),
           details,
+          selection: selection
+            ? {
+                value: itemKey,
+                disabled: selection.isItemDisabled?.(item) ?? false,
+              }
+            : undefined,
         })}
-      </div>
+      </>
     )
   }
 
   return (
-    <div data-picker-item-key={itemKey}>
+    <>
       <CollapsibleListItem
         itemId={domIds.itemId}
         titleId={domIds.titleId}
         bodyId={domIds.bodyId}
         toolbarAriaLabel={toolbarLabel}
-        preset={rowPreset}
-        rowLayout={rowLayout}
-        surface={rowSurface}
-        toolbarCompact={toolbarCompact}
+        preset="catalog"
+        rowLayout="default"
+        surface={{ elevation: 'flat' }}
+        toolbarCompact={false}
         collapsible={hasDetails}
         showDragHandle={false}
         collapsed={!isExpanded}
@@ -111,7 +110,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
         actions={renderItemActions?.(item)}
         body={details}
       />
-    </div>
+    </>
   )
 }
 
@@ -119,37 +118,58 @@ export function CatalogPickerSheetResults<TItem>({
   items,
   getItemKey,
   rowProps,
+  resultsLabel,
 }: {
   items: readonly TItem[]
   getItemKey: (item: TItem) => string
   rowProps: CatalogPickerSheetProps<TItem>
+  resultsLabel?: string
 }) {
-  return (
-    <div className={catalogPickerSheetListVariants()} role="list">
-      {items.map((item) => {
-        const itemKey = getItemKey(item)
+  const rows = items.map((item) => {
+    const itemKey = getItemKey(item)
 
-        return (
-          <div key={itemKey} role="listitem">
-            <CatalogPickerCollapsibleItemRow
-              item={item}
-              itemKey={itemKey}
-              toolbarLabel={rowProps.getItemToolbarLabel?.(item) ?? itemKey}
-              renderItemHeader={rowProps.renderItemHeader}
-              renderCollapsibleRow={rowProps.renderCollapsibleRow}
-              renderItemSummary={rowProps.renderItemSummary}
-              renderItemActions={rowProps.renderItemActions}
-              renderItemDetails={rowProps.renderItemDetails}
-              rowPreset={rowProps.rowPreset}
-              rowLayout={rowProps.rowLayout}
-              rowSurface={rowProps.rowSurface}
-              toolbarCompact={rowProps.toolbarCompact}
-              expandedItemId={rowProps.expandedItemId}
-              onExpandedItemChange={rowProps.onExpandedItemChange}
-            />
-          </div>
-        )
-      })}
+    return (
+      <div key={itemKey} data-picker-item-key={itemKey}>
+        <CatalogPickerCollapsibleItemRow
+          item={item}
+          itemKey={itemKey}
+          toolbarLabel={rowProps.getItemToolbarLabel?.(item) ?? itemKey}
+          renderItemHeader={rowProps.renderItemHeader}
+          renderCollapsibleRow={rowProps.renderCollapsibleRow}
+          renderItemSummary={rowProps.renderItemSummary}
+          renderItemActions={rowProps.renderItemActions}
+          renderItemDetails={rowProps.renderItemDetails}
+          expandedItemId={rowProps.expandedItemId}
+          onExpandedItemChange={rowProps.onExpandedItemChange}
+          selection={rowProps.selection}
+        />
+      </div>
+    )
+  })
+
+  const listClassName = catalogPickerSheetListVariants()
+
+  if (rowProps.selection) {
+    return (
+      <RadioGroup
+        className={listClassName}
+        aria-label={resultsLabel}
+        value={rowProps.selection.value ?? ''}
+        onValueChange={rowProps.selection.onValueChange}
+        data-picker-card-list=""
+      >
+        {rows}
+      </RadioGroup>
+    )
+  }
+
+  return (
+    <div className={listClassName} role="list" data-picker-card-list="">
+      {rows.map((row) => (
+        <div key={row.key} role="listitem">
+          {row}
+        </div>
+      ))}
     </div>
   )
 }

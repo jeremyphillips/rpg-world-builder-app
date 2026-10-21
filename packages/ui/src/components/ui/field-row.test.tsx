@@ -34,8 +34,8 @@ describe('FieldRow', () => {
       </FieldRow>,
     )
 
-    const fieldRoot = screen.getByLabelText('Kind').closest('.max-w-64')
-    expect(fieldRoot).toHaveClass('in-data-[field-row]:w-64')
+    const fieldRoot = screen.getByLabelText('Kind').closest('.ui-field-control--width-xl')
+    expect(fieldRoot).toHaveClass('ui-field-control--width-xl')
   })
 
   it('renders anatomy-grid layout for schema rows', () => {

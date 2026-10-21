@@ -8,15 +8,7 @@ import {
 
 type CatalogEntityPickerSheetBaseProps<TItem> = Omit<
   CatalogPickerSheetProps<TItem>,
-  | 'renderItemHeader'
-  | 'renderCollapsibleRow'
-  | 'rowLayout'
-  | 'rowPreset'
-  | 'rowSurface'
-  | 'toolbarCompact'
-  | 'headlineClassName'
-  | 'rowBodyClassName'
-  | 'rowShellClassName'
+  'renderItemHeader' | 'renderCollapsibleRow'
 >
 
 export type CatalogEntityPickerSheetProps<TItem> = CatalogEntityPickerSheetBaseProps<TItem> &
@@ -30,8 +22,6 @@ export function CatalogEntityPickerSheet<TItem>({
   ...props
 }: CatalogEntityPickerSheetProps<TItem>) {
   const sheetProps = {
-    rowPreset: 'catalog',
-    toolbarCompact: true,
     ...props,
     renderCollapsibleRow: renderEntityRow,
   } as CatalogPickerSheetProps<TItem>

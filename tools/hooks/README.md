@@ -5,11 +5,11 @@ Shell helpers invoked from [`.husky/`](../../.husky/). Package scripts in the ro
 
 ## Tiered gates
 
-| When       | Scope                      | Tests / types                        | Coverage / CRAP     |
-| ---------- | -------------------------- | ------------------------------------ | ------------------- |
-| Pre-commit | Staged + cheap repo checks | none (focused tests during dev)      | complexity only     |
-| Pre-push   | Since `origin/main` + full | `typecheck:ci`, `test:affected:gate` | via `pnpm coverage` |
-| CI         | Full                       | via `pnpm coverage`                  | coverage + CRAP     |
+| When       | Scope                      | Tests / types                           | Coverage / CRAP     |
+| ---------- | -------------------------- | --------------------------------------- | ------------------- |
+| Pre-commit | Staged + cheap repo checks | none (focused tests during dev)         | complexity only     |
+| Pre-push   | Since `origin/main` + full | `gate:ci:quality`, `test:affected:gate` | via `pnpm coverage` |
+| CI         | Full                       | via `pnpm coverage`                     | coverage + CRAP     |
 
 **Pre-commit** sequence (fast checkpoint):
 
@@ -25,7 +25,7 @@ pnpm lint-staged
 **Pre-push** (`pnpm gate:pre-push`):
 
 ```text
-pnpm typecheck:ci
+pnpm gate:ci:quality
 → pnpm test:affected:gate
 → pnpm coverage
 → pnpm gate:fallow-health:coverage

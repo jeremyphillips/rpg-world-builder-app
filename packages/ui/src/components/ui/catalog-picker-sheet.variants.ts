@@ -3,7 +3,13 @@ import { cva } from 'class-variance-authority'
 /** Catalog picker results body — default Sheet.Body scrollport; no extra top/bottom overrides. */
 export const catalogPickerSheetBodyVariants = cva('')
 
-export const catalogPickerSheetListVariants = cva('space-y-2')
+/**
+ * Vertical rhythm between sibling picker cards in sheet/drawer results.
+ * Gap-only — do not stack `space-y-*` or row `mb-*` on card hosts.
+ */
+export const catalogPickerCardListClasses = 'flex flex-col gap-2 w-full'
+
+export const catalogPickerSheetListVariants = cva(catalogPickerCardListClasses)
 
 export { insetPanelEmptyStateVariants as catalogPickerSheetEmptyVariants } from './inset-panel.variants'
 

@@ -2,12 +2,15 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
+import { withDashboardProviders } from '../../../../../.storybook/decorators'
+
 import { CampaignPicker } from '../campaign-picker'
 
 const meta = {
   title: 'Campaign/CampaignPicker',
   component: CampaignPicker,
   parameters: { layout: 'padded' },
+  decorators: [withDashboardProviders],
 } satisfies Meta<typeof CampaignPicker>
 
 export default meta

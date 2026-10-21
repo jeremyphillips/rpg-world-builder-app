@@ -18,6 +18,7 @@ export type TableBuilderInsetGateProps = {
   action?: ReactNode
 }
 
+// TODO(empty-well): promote this icon, title, supporting, and action stack into a shared well component.
 export function TableBuilderInsetGate({
   description,
   headline,

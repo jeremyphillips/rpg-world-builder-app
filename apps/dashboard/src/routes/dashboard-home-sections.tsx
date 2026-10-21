@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { buttonVariants, Text } from '@rpg/ui'
+import { ButtonLink, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import {
@@ -54,12 +54,9 @@ export function DashboardHomeSections({
       })}
 
       {showAllCampaignsLink ? (
-        <Link
-          to={ROUTES.campaign.list}
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
-        >
+        <ButtonLink link={<Link to={ROUTES.campaign.list} />} variant="outline" size="sm">
           View all campaigns
-        </Link>
+        </ButtonLink>
       ) : null}
     </>
   )

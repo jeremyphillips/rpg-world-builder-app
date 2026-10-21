@@ -7,10 +7,6 @@ import {
 } from '../../form/chrome/form-chrome.variants'
 import { cardRadiusClasses } from '../ui/card.variants'
 import { iconGlyphRootClasses } from '../ui/icon-glyph.variants'
-import {
-  identityHeadingBandVariants,
-  identityInsetRowVariants,
-} from '../ui/identity-frame.variants'
 import { establishSurfaceCurrent } from '../ui/surface-current.lib'
 
 /** Shared 12px muted copy below the preview header and in section chrome. */
@@ -79,14 +75,17 @@ export const previewRailIdentityStackClasses = 'flex flex-col gap-4'
 
 export const previewRailIdentitySectionContentClasses = 'pt-4'
 
-export const previewRailIdentityRowClasses = identityInsetRowVariants({
-  density: 'comfortable',
-  align: 'start',
-})
+/** Comfortable entity-row identity gap; publishes anatomy leading size via density class. */
+export const previewRailIdentityRowClasses = cn(
+  'ui-card--comfortable',
+  'flex min-w-0 items-start gap-4',
+)
 
-export const previewRailIdentityHeadingBandClasses = identityHeadingBandVariants({
-  density: 'comfortable',
-})
+export const previewRailIdentityHeadingBandClasses = 'flex min-w-0 items-center'
+
+export const previewRailLeadingMediaShellClasses = 'ui-anatomy-leading-media'
+
+export const previewRailLeadingMediaSlotClasses = 'size-full overflow-hidden [&>*]:size-full'
 
 /** Sections-only scroll body — header, identity, and footer stay put. */
 export const previewRailScrollRegionShellClasses = 'min-h-0 flex-1'

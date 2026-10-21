@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Link } from 'react-router-dom'
-import { buttonVariants } from '@rpg/ui'
+import { ButtonLink } from '@rpg/ui'
 
 import { IndexPageEmptyState, IndexPageIntro } from './index-page-intro'
 
@@ -15,9 +15,9 @@ export default meta
 type Story = StoryObj<typeof IndexPageIntro>
 
 const actions = (
-  <Link to="/campaigns/new" className={buttonVariants({ size: 'sm' })}>
+  <ButtonLink link={<Link to="/campaigns/new" />} size="sm">
     New campaign
-  </Link>
+  </ButtonLink>
 )
 
 export const WithHeaderActions: Story = {

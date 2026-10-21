@@ -30,7 +30,7 @@
     "gate:fallow-dupes": "fallow dupes --production --format human",
     "gate:fallow-health": "bash tools/hooks/fallow-health-gate.sh",
     "gate:fallow-health:coverage": "bash tools/hooks/fallow-health-gate.sh --coverage ./coverage/coverage-final.json",
-    "gate:pre-push": "pnpm typecheck:ci && pnpm test:affected:gate && pnpm coverage && pnpm gate:fallow-health:coverage && pnpm build",
+    "gate:pre-push": "pnpm gate:ci:quality && pnpm test:affected:gate && pnpm coverage && pnpm gate:fallow-health:coverage && pnpm build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "analyze": "fallow --format human || true",

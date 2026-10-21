@@ -19,6 +19,12 @@ export type CreatureCommunication = z.infer<typeof creatureCommunicationSchema>
 
 export const EMPTY_CREATURE_COMMUNICATION: CreatureCommunication = {}
 
+/** Display label for a stored telepathy range (`60 ft.`, `1 mile`). */
+export function formatTelepathyRange(feet: number): string {
+  if (feet === TELEPATHY_MILE_FEET) return '1 mile'
+  return `${feet} ft.`
+}
+
 /** Publish validation — telepathy is a sense-range preset or one mile. */
 export function refineCreatureTelepathyRange(
   telepathy: number | undefined,

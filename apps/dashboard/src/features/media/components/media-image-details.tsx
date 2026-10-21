@@ -206,6 +206,7 @@ export function MediaImageDetails({
             </section>
             {uploadImage ? (
               <section className={styles.detailsSection()}>
+                {/* TODO(disclosure): consolidate ad hoc collapsible trigger/caret with shared @rpg/ui disclosure primitives. */}
                 <Collapsible open={accessibilityOpen} onOpenChange={setAccessibilityOpen}>
                   <CollapsibleTrigger asChild>
                     <Button

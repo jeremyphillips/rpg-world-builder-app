@@ -95,7 +95,7 @@ field content aligned via `--content-inline-start`.
 Do not override neutral `item.surface` / `item.tone` per row unless a semantic callout is
 required — defaults avoid stacked-beige-card noise.
 
-**CollapsibleListItem rhythm contract** (form arrays, DEC, catalog — not `DetailEntityRow`):
+**CollapsibleListItem rhythm contract** (form arrays, disclosure `EntityCard`, catalog — not `DetailEntityRow`):
 
 - **Shared geometry:** header vertical padding (`density`: compact `py-2`, comfortable
   `py-3`), title→summary `gap-0.5`, body divider + `py-3` via `collapsibleListItemBodyFrameClasses`
@@ -161,12 +161,13 @@ title (off by default).
 When an array item represents a catalog entity (grants, starting-equipment items),
 replace default ArrayItem chrome with a custom shell via `item.renderShell`. The
 form layer still owns registration, validation, remove/reorder, and the trailing
-action rail; the shell owns card anatomy (dashboard: `DisclosureEntityCard`).
+action rail; the shell owns card anatomy (dashboard: `EntityCard` `variant="disclosure"` /
+`EntityCardDisclosureRenderer`).
 
 **Form-owned ≠ form-styled.** The form layer must not add card padding, leading
-indentation, or disclosure body inset — `DisclosureEntityCard` owns complete header/body
+indentation, or disclosure body inset — disclosure `EntityCard` owns complete header/body
 geometry when `CollapsibleListItem` uses `rowLayout="entity-card"`. See
-[dashboard entity presentation contract](../../../../apps/dashboard/docs/content-entity-card.md#disclosureentitycard).
+[dashboard entity surfaces contract](../../../../apps/dashboard/docs/entity-surfaces.md#entitycard--variantdisclosure) ([card-guide](../../../../apps/dashboard/docs/card-guide.md)).
 
 ```ts
 item: {

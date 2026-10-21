@@ -24,7 +24,6 @@ import {
   BUILDING_ORGANIZATIONS_PENDING_HEADING,
   BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL,
   BUILDING_ORGANIZATIONS_SEARCH_LABEL,
-  BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_TAB_DESCRIPTION,
   BUILDING_ORGANIZATIONS_TAB_HEADING,
 } from '../../lib/building-organizations/building-organizations-create-tab.lib'
@@ -103,13 +102,24 @@ async function chooseOwnerIntent(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('radio', { name: /Owner/i }))
 }
 
+async function selectDiscoveryOrganization(
+  user: ReturnType<typeof userEvent.setup>,
+  organizationName: string,
+) {
+  await user.click(
+    screen.getByRole('radio', {
+      name: new RegExp(organizationName, 'i'),
+    }),
+  )
+}
+
 async function addExistingOwner(
   user: ReturnType<typeof userEvent.setup>,
   controllerRef?: { current: BuildingOrganizationsCreateTabController | null },
 ) {
   await startComposing(user)
   await chooseOwnerIntent(user)
-  await user.click(screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!)
+  await selectDiscoveryOrganization(user, 'Copper Kettle Guild')
   if (controllerRef) {
     act(() => controllerRef.current?.commitComposer?.())
   }
@@ -121,10 +131,6 @@ function expectRelationshipSummary(value: string) {
 
 function expectNoRelationshipSummary() {
   expect(screen.queryByRole('button', { name: /Change relationship/i })).not.toBeInTheDocument()
-}
-
-function expectOrganizationSummary(value: string) {
-  expect(screen.getByRole('button', { name: `${value}, Change organization` })).toBeInTheDocument()
 }
 
 function expectNoOrganizationSummary() {
@@ -291,16 +297,14 @@ describe('BuildingOrganizationsCreateTab', () => {
     expect(screen.getByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: /Tenant/i }))
-    await user.click(
-      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[1]!,
-    )
+    await selectDiscoveryOrganization(user, 'Harbor Merchants Guild')
     act(() => controllerRef.current?.commitComposer?.())
     expect(screen.getByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).toBeInTheDocument()
     expect(screen.getByText('Copper Kettle Guild')).toBeInTheDocument()
     expect(screen.getByText('Harbor Merchants Guild')).toBeInTheDocument()
   })
 
-  it('disables Select when the chosen kind is not eligible for the organization', async () => {
+  it('disables organization radio when the chosen kind is not eligible', async () => {
     const user = userEvent.setup()
     render(
       <BuildingOrganizationsCreateTab
@@ -311,9 +315,7 @@ describe('BuildingOrganizationsCreateTab', () => {
     )
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
-    expect(
-      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0],
-    ).toBeDisabled()
+    expect(screen.getByRole('radio', { name: /Copper Kettle Guild/i })).toBeDisabled()
   })
 
   it('renders placeholder-only discovery search with a clear control when filtered', async () => {
@@ -408,13 +410,13 @@ describe('BuildingOrganizationsCreateTab', () => {
 
     await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
     expectRelationshipSummary('Headquarters')
-    expect(screen.queryByRole('radio')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('radiogroup', { name: BUILDING_ORGANIZATIONS_INTENT_PROMPT }),
+    ).not.toBeInTheDocument()
     expectNoOrganizationSummary()
     expect(onPlanChange).not.toHaveBeenCalled()
-    await user.click(
-      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!,
-    )
-    expectOrganizationSummary('Copper Kettle Guild · Commercial')
+    await selectDiscoveryOrganization(user, 'Copper Kettle Guild')
+    expectNoOrganizationSummary()
     act(() => controllerRef.current?.commitComposer?.())
     expect(onPlanChange).toHaveBeenCalledOnce()
     expect(onPlanChange.mock.calls[0]![0].relationships.at(-1)).toMatchObject({
@@ -439,11 +441,10 @@ describe('BuildingOrganizationsCreateTab', () => {
       screen.queryByRole('radiogroup', { name: BUILDING_ORGANIZATIONS_INTENT_PROMPT }),
     ).not.toBeInTheDocument()
 
-    await user.click(
-      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!,
-    )
+    await selectDiscoveryOrganization(user, 'Copper Kettle Guild')
     expectRelationshipSummary('Owner')
-    expectOrganizationSummary('Copper Kettle Guild · Commercial')
+    expectNoOrganizationSummary()
+    expect(screen.getByRole('radio', { name: /Copper Kettle Guild/i })).toBeChecked()
   })
 
   it('shows branch with relationship summary only and no placeholder organization row', async () => {
@@ -458,26 +459,23 @@ describe('BuildingOrganizationsCreateTab', () => {
     expectNoOrganizationSummary()
   })
 
-  it('reopens unpinned discovery when changing organization from review', async () => {
+  it('keeps discovery open and switches organization via radio selection', async () => {
     const user = userEvent.setup()
     render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
 
     await startComposing(user)
     await chooseOwnerIntent(user)
-    await user.click(
-      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!,
-    )
-    expectOrganizationSummary('Copper Kettle Guild · Commercial')
+    await selectDiscoveryOrganization(user, 'Copper Kettle Guild')
+    expectNoOrganizationSummary()
+    expect(screen.getByRole('radio', { name: /Copper Kettle Guild/i })).toBeChecked()
 
-    await user.click(screen.getByRole('button', { name: 'Change organization' }))
+    await selectDiscoveryOrganization(user, 'Harbor Merchants Guild')
     expectRelationshipSummary('Owner')
     expectNoOrganizationSummary()
+    expect(screen.getByRole('radio', { name: /Harbor Merchants Guild/i })).toBeChecked()
     expect(
       screen.getByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL }),
     ).toBeInTheDocument()
-    expect(
-      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL }).length,
-    ).toBeGreaterThan(0)
   })
 
   it('normalizes in-progress composer and attributed server issues through its panel controller', async () => {

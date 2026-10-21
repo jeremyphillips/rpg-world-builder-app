@@ -1,5 +1,5 @@
 import type { MagicItemAllowance, MagicItemGrantProgress } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
+import { Card, CardContent, CardHeader, CardTitle, Text } from '@rpg/ui'
 
 import {
   EQUIPMENT_MAGIC_ITEMS_BROWSE_LABEL,
@@ -14,11 +14,6 @@ import {
   resolveEquipmentAcquisitionGuidanceView,
   type EquipmentAcquisitionGuidanceAction,
 } from './equipment-acquisition-guidance.lib'
-import {
-  equipmentAcquisitionGuidanceCardClasses,
-  equipmentAcquisitionGuidanceGridClasses,
-} from './equipment-acquisition-guidance.variants'
-import { equipmentAcquisitionGuidanceCardDescriptionClasses } from './equipment-acquisition-panel.variants'
 import {
   EquipmentResourceSummary,
   type EquipmentResourceSummaryAction,
@@ -36,17 +31,19 @@ export type EquipmentAcquisitionGuidanceProps = {
 
 function EquipmentUnresolvedFundingCard({ pendingCostCp }: { pendingCostCp: number }) {
   return (
-    <article className={equipmentAcquisitionGuidanceCardClasses}>
-      <Heading variant="subsection" as="h3">
-        {EQUIPMENT_UNRESOLVED_FUNDING_HEADING}
-      </Heading>
-      <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
-        {EQUIPMENT_UNRESOLVED_FUNDING_DESCRIPTION}
-      </Text>
-      <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
-        {formatEquipmentUnresolvedFundingSelectedLabel(pendingCostCp)}
-      </Text>
-    </article>
+    <Card tone="subtle" density="comfortable">
+      <CardHeader>
+        <CardTitle>{EQUIPMENT_UNRESOLVED_FUNDING_HEADING}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex min-w-0 flex-col gap-3">
+        <Text as="p" variant="muted">
+          {EQUIPMENT_UNRESOLVED_FUNDING_DESCRIPTION}
+        </Text>
+        <Text as="p" variant="muted">
+          {formatEquipmentUnresolvedFundingSelectedLabel(pendingCostCp)}
+        </Text>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -112,7 +109,7 @@ export function EquipmentAcquisitionGuidance({
   const handlers = { onOpenPurchasePicker, onOpenMagicItemsPicker }
 
   return (
-    <section aria-label="Acquisition guidance" className={equipmentAcquisitionGuidanceGridClasses}>
+    <section aria-label="Acquisition guidance" className="grid grid-cols-1 gap-4">
       {view.unresolvedPendingCostCp !== undefined ? (
         <EquipmentUnresolvedFundingCard pendingCostCp={view.unresolvedPendingCostCp} />
       ) : null}

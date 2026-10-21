@@ -49,7 +49,7 @@ export function EquipmentOptionRow({
             </>
           ) : undefined
         }
-        size="sm"
+        density="compact"
       />
     </div>
   )

@@ -36,20 +36,17 @@ export {
   type CatalogMetadataSegment,
 } from './components/catalog'
 export {
-  ContentEntityCard,
-  ContentEntityCardViewLink,
-  type ContentEntityCardProps,
-} from './lib/entity/surfaces/cards/content/content-entity-card'
+  EntityCard,
+  type EntityCardDisclosureProps,
+  type EntityCardProps,
+  type EntityCardStaticProps,
+} from './lib/entity/surfaces/cards/content/entity-card'
+export { EntityCardUtilityFieldSizeProvider } from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.provider'
 export {
-  EntityCardUtilityFieldSizeProvider,
   resolveEntityCardUtilityFieldSize,
   useEntityCardUtilityFieldSize,
-} from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.context'
-export { useEntityCardUtilityControlSizes } from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
-export {
-  DisclosureEntityCard,
-  type DisclosureEntityCardProps,
-} from './lib/entity/surfaces/cards/disclosure/disclosure-entity-card'
+  useEntityCardUtilityControlSizes,
+} from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
 export {
   EntityDisclosureArrayItemShell,
   type EntityDisclosureArrayItemShellProps,
@@ -67,6 +64,11 @@ export type {
   EntitySummaryProvenanceItem,
   EntitySummaryProvenanceText,
 } from './lib/entity/summary/entity-summary-provenance.types'
+export type {
+  EntityAnatomyLeading,
+  EntityAnatomySelectionLeading,
+  EntityAnatomyTitleLeading,
+} from './lib/entity/anatomy/entity-anatomy-leading.types'
 export type {
   EntityAnatomyTrailing,
   EntityAnatomyTrailingSecondary,
@@ -108,8 +110,8 @@ export { DetailOverflowMenu, type DetailOverflowAction } from './lib/detail/deta
 export { DetailEntityRowActions } from './lib/detail/row/entity/detail-entity-row-actions'
 export { buildLocationConnectedPartyCharactersById } from './locations/lib/connected-parties/location-connected-party-character-options.lib'
 export type { CharacterPickerOption } from './locations/lib/connected-parties/location-connected-party-character-options.lib'
-export { CatalogEntityRow } from './lib/entity/surfaces/catalog/catalog-entity-row'
-export type { CatalogEntityRowProps } from './lib/entity/surfaces/catalog/catalog-entity-row'
+export { CatalogCard } from './lib/entity/surfaces/catalog/catalog-card'
+export type { CatalogCardProps } from './lib/entity/surfaces/catalog/catalog-card'
 export { CatalogEntitySurfaceRow } from './lib/entity/surfaces/catalog/catalog-entity-surface-row'
 export type { CatalogEntitySurfaceRowProps } from './lib/entity/surfaces/catalog/catalog-entity-surface-row'
 export { CatalogEntityPickerSheet } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
@@ -133,10 +135,7 @@ export {
 } from './lib/entity/surfaces/catalog/relationship-filters/location-relationship-filter-schema'
 export type { CatalogEntityPickerSheetProps } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
 export { createCatalogEntityRowRenderer } from './lib/entity/surfaces/catalog/catalog-entity-row-renderer'
-export { EntitySurfaceContentCard } from './lib/entity/surfaces/cards/content/entity-surface-content-card'
-export type { EntitySurfaceContentCardProps } from './lib/entity/surfaces/cards/content/entity-surface-content-card'
 export {
-  buildCatalogToggleSelectInlineAction,
   projectEntitySurfaceConfig,
   projectEntitySurfaceIdentityToSummaryModel,
 } from './lib/entity/surfaces/entity-surface-projection.lib'
@@ -210,6 +209,10 @@ export {
   EQUIPMENT_INSTANCE_MAGICAL_STATUS_LABEL,
   EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE,
   EQUIPMENT_INVENTORY_GROUP_LABELS,
+  EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,
+  equipmentInventoryRowListClasses,
+  equipmentPurchasedInventoryCategoryClasses,
+  equipmentPurchasedInventoryCategoryListClasses,
   mergeEquipmentInventoryCatalogReferenceStatus,
   EQUIPMENT_DETAILS_SECTION_TITLES,
   EQUIPMENT_STAT_LABELS,

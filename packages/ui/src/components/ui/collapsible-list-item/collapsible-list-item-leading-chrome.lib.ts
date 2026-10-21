@@ -106,7 +106,7 @@ export function buildCollapsibleListItemLeadingChromeStyle(
 }
 
 /**
- * Geometry tokens only — for entity-card hosts where an outer surface (DEC) owns
+ * Geometry tokens only — for entity-card hosts where an outer surface (disclosure EntityCard) owns
  * header/body inset and `--entity-leading-offset`. Omits content-column indent vars.
  */
 export function buildCollapsibleListItemGeometryStyle(

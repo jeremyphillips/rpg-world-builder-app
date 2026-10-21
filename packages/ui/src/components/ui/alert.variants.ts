@@ -4,9 +4,13 @@ export const ALERT_VARIANTS = ['default', 'info', 'success', 'warning', 'destruc
 
 export type AlertVariant = (typeof ALERT_VARIANTS)[number]
 
-export const ALERT_DENSITIES = ['comfortable', 'compact'] as const
+export const ALERT_DENSITIES = ['compact', 'comfortable', 'spacious'] as const
 
 export type AlertDensity = (typeof ALERT_DENSITIES)[number]
+
+export const ALERT_ANNOUNCEMENTS = ['alert', 'status', 'none'] as const
+
+export type AlertAnnouncement = (typeof ALERT_ANNOUNCEMENTS)[number]
 
 /** twMerge group — alert appearance modifiers. */
 export const UI_ALERT_APPEARANCE_CLASSES = ALERT_VARIANTS.map(
@@ -28,8 +32,9 @@ export const alertVariants = cva('ui-alert', {
       destructive: 'ui-alert--destructive',
     },
     density: {
-      comfortable: 'ui-alert--comfortable',
       compact: 'ui-alert--compact',
+      comfortable: 'ui-alert--comfortable',
+      spacious: 'ui-alert--spacious',
     },
   },
   defaultVariants: {
@@ -38,19 +43,9 @@ export const alertVariants = cva('ui-alert', {
   },
 })
 
-export const alertTitleVariants = cva('ui-alert__title', {
-  variants: {
-    density: {
-      comfortable: 'ui-alert__title--comfortable',
-      compact: 'ui-alert__title--compact',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
+export const alertTitleVariants = cva('ui-alert__title ui-copy-title')
 
-export const alertDescriptionVariants = cva('ui-alert__description')
+export const alertDescriptionVariants = cva('ui-alert__description ui-copy-supporting')
 
 export const ALERT_CLASS_SPECS = [
   {
@@ -62,7 +57,7 @@ export const ALERT_CLASS_SPECS = [
   {
     key: 'compact',
     className: alertVariants({ density: 'compact', variant: 'success' }),
-    keyValues: 'padding 10px 12px',
+    keyValues: 'shared surface inset vars',
     useCase: 'Compact confirmation',
   },
 ] as const

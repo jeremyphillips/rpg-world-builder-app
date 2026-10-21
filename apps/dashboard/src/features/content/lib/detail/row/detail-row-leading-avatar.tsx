@@ -15,7 +15,7 @@ export function DetailRowLeadingAvatar({
   name,
   src,
   shape = 'circle',
-  size = 'xs',
+  size,
 }: DetailRowLeadingAvatarProps) {
   return (
     <DetailRowLeadingMedia shape={shape} size={size}>

@@ -7,6 +7,8 @@ import { expectRowAnatomyAligned } from '../../../storybook/row-anatomy-geometry
 import { Badge } from '../badge'
 import { RowAnatomyCell } from './row-anatomy-cell'
 import type { RowAnatomyBand } from './row-anatomy.types'
+import { ClassReferenceTable } from '../../../stories/semantic-classes/class-reference-table'
+import { ROW_ANATOMY_CLASS_SPECS } from './ui-row-anatomy.styles'
 import { rowAnatomyRootProps, rowAnatomyTracksVariants } from './row-anatomy.variants'
 
 /** Demo host — owns its own columns and horizontal gap, as real hosts do. */
@@ -54,6 +56,7 @@ const meta = {
   title: 'UI/RowAnatomy',
   tags: ['autodocs'],
   parameters: {
+    semanticClasses: true,
     docs: {
       description: {
         component:
@@ -176,4 +179,25 @@ export const MediaXsBand: Story = {
     const [report] = await expectRowAnatomyAligned(canvasElement)
     await expect(report!.tracks.band).toBeCloseTo(32, 0)
   },
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={ROW_ANATOMY_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <div data-semantic-class-target className={spec.className}>
+            {spec.useCase}
+          </div>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
 }

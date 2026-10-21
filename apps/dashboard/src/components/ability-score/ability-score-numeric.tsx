@@ -62,6 +62,7 @@ export function AbilityScoreNumeric({
 
   useEffect(() => {
     if (!editing) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- keep edit draft aligned with committed value when not editing.
       setDraft(displayValue === null ? '' : String(displayValue))
     }
   }, [displayValue, editing])

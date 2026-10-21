@@ -1,0 +1,264 @@
+@layer components {
+  .ui-radio-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    text-align: left;
+    color: var(--card-foreground);
+  }
+
+  .ui-radio-card--comfortable {
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-radio-card--compact {
+    gap: calc(var(--spacing) * 1);
+  }
+
+  .ui-radio-card--media {
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .ui-radio-card--row {
+    width: 100%;
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .ui-radio-card__media {
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .ui-radio-card__body {
+    display: flex;
+    min-height: 0;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+
+  .ui-radio-card--comfortable:not(.ui-radio-card--row) .ui-radio-card__body {
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-radio-card--compact:not(.ui-radio-card--row) .ui-radio-card__body {
+    gap: calc(var(--spacing) * 1);
+  }
+
+  .ui-radio-card__footer {
+    margin-top: calc(var(--spacing) * 2);
+  }
+
+  .ui-radio-card--compact:not(.ui-radio-card--row) .ui-radio-card__footer,
+  .ui-radio-card--row-compact .ui-radio-card__footer {
+    margin-top: calc(var(--spacing) * 1);
+  }
+
+  .ui-option-card__body {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--ui-option-card-body-gap, calc(var(--spacing) * 0.5));
+  }
+
+  .ui-card--compact .ui-option-card__body,
+  .ui-radio-card--compact:not(.ui-radio-card--row) .ui-option-card__body,
+  .ui-radio-card--row-compact .ui-option-card__body,
+  .ui-selection-option-card__body .ui-option-card__body {
+    --ui-option-card-body-gap: 0;
+  }
+
+  .ui-selection-option-card__anatomy {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: flex-start;
+    gap: calc(var(--spacing) * 4);
+  }
+
+  .ui-card--compact .ui-selection-option-card__anatomy,
+  .ui-radio-card--compact:not(.ui-radio-card--row) .ui-selection-option-card__anatomy,
+  .ui-radio-card--row-compact .ui-selection-option-card__anatomy {
+    gap: calc(var(--spacing) * 3);
+  }
+
+  .ui-selection-option-card__anatomy--control-end {
+    flex-direction: row-reverse;
+  }
+
+  .ui-option-card__title-row {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-option-card__title-line {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-option-card__secondary {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .ui-option-card__secondary--content {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .ui-option-card__summary-lines {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 0.5);
+  }
+
+  .ui-option-card__summary-badge-row {
+    margin-top: auto;
+    padding-top: calc(var(--spacing) * 1);
+    min-height: 22px;
+  }
+
+  .ui-selection-option-card__header-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-selection-option-card__header-action-slot {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    min-height: var(--control-action-compact-height, 2rem);
+  }
+
+  .ui-option-card-embedded-panel {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 3);
+    padding: calc(var(--spacing) * 3);
+  }
+
+  .ui-option-card-embedded-panel__header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 3);
+  }
+
+  .ui-option-card-embedded-panel__list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ui-option-card-embedded-panel__row {
+    display: flex;
+    min-height: 2rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 3);
+    border-top: 1px solid var(--border-subtle);
+    padding-block: calc(var(--spacing) * 1.5);
+  }
+
+  .ui-option-card-embedded-panel__row-label {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .ui-option-card-embedded-panel__row-controls {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-radio-card:not(.ui-radio-card--row) .ui-radio-card__body {
+    padding-block: var(--ui-card-inset-block);
+    padding-inline: var(--ui-card-inset-inline);
+  }
+
+  .ui-radio-card--compact:not(.ui-radio-card--row) .ui-radio-card__body {
+    padding-inline-start: calc(var(--ui-card-inset-inline) - var(--spacing) * 1);
+    padding-inline-end: var(--ui-card-inset-inline);
+  }
+
+  .ui-selection-option-card__body {
+    padding-block: var(--ui-card-inset-block);
+    padding-inline: var(--ui-card-inset-inline);
+  }
+
+  .ui-radio-card__details {
+    padding-inline: var(--ui-card-inset-inline);
+    padding-block-end: var(--ui-card-inset-block);
+  }
+
+  .ui-radio-card__embedded,
+  .ui-radio-card__footer {
+    min-width: 0;
+  }
+
+  /* Title block → supporting copy. Region gaps stay on the body, footer, and panel. */
+  .ui-option-card__primary {
+    display: flex;
+    min-width: 0;
+    width: 100%;
+    flex-direction: column;
+    gap: var(--ui-anatomy-row-gap);
+  }
+
+  /* In-flow embedded slot. Indent is the card control column: indicator + anatomy gap. */
+  .ui-option-card__embedded--in-flow {
+    border-top: 1px solid var(--border);
+    margin-top: calc(var(--spacing) * 4);
+    padding-top: calc(var(--spacing) * 4);
+    padding-inline-start: calc(var(--control-choice-indicator-size-lg) + (var(--spacing) * 4));
+  }
+
+  .ui-card--compact .ui-option-card__embedded--in-flow,
+  .ui-radio-card--row-compact .ui-option-card__embedded--in-flow {
+    margin-top: calc(var(--spacing) * 2);
+    padding-top: calc(var(--spacing) * 2);
+    padding-inline-start: calc(var(--control-choice-indicator-size-sm) + (var(--spacing) * 3));
+  }
+
+  /* Panel tone breaks out to the card edge. No control-column indent. */
+  .ui-option-card__embedded--panel {
+    border-top: 1px solid var(--border);
+    margin-top: calc(var(--spacing) * 4);
+    margin-inline: calc(var(--spacing) * -5);
+    margin-bottom: calc(var(--spacing) * -3);
+    padding-top: calc(var(--spacing) * 4);
+    padding-bottom: calc(var(--spacing) * 3);
+    border-end-start-radius: var(--radius-card);
+    border-end-end-radius: var(--radius-card);
+  }
+
+  .ui-card--compact .ui-option-card__embedded--panel,
+  .ui-radio-card--row-compact .ui-option-card__embedded--panel {
+    margin-top: calc(var(--spacing) * 2);
+    margin-inline: calc(var(--spacing) * -4);
+    margin-bottom: calc(var(--spacing) * -2);
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .ui-option-card-embedded-panel__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-anatomy-row-gap);
+  }
+}

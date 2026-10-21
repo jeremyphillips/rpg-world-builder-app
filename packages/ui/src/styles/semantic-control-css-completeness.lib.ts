@@ -28,22 +28,65 @@ type ParsedRule = {
   properties: Set<string>
 }
 
-function parseCssRules(css: string): ParsedRule[] {
-  const stripped = css.replace(/\/\*[\s\S]*?\*\//g, '')
-  const rules: ParsedRule[] = []
-  const blockRe = /([^{]+)\{([^}]*)\}/g
-
-  for (const match of stripped.matchAll(blockRe)) {
-    const selector = match[1]!.trim()
-    const body = match[2]!
-    const properties = new Set<string>()
-    for (const decl of body.split(';')) {
-      const prop = decl.trim().split(':')[0]?.trim()
-      if (prop) properties.add(prop)
+function findMatchingBrace(css: string, openIndex: number): number {
+  let depth = 0
+  for (let i = openIndex; i < css.length; i++) {
+    if (css[i] === '{') depth += 1
+    else if (css[i] === '}') {
+      depth -= 1
+      if (depth === 0) return i
     }
-    rules.push({ selector, properties })
   }
+  return css.length
+}
 
+function stripNestedBlocks(body: string): string {
+  let result = ''
+  let index = 0
+  while (index < body.length) {
+    const open = body.indexOf('{', index)
+    if (open === -1) {
+      result += body.slice(index)
+      break
+    }
+    result += body.slice(index, open)
+    index = findMatchingBrace(body, open) + 1
+  }
+  return result
+}
+
+function directProperties(body: string): Set<string> {
+  const properties = new Set<string>()
+  for (const decl of stripNestedBlocks(body).split(';')) {
+    const trimmed = decl.trim()
+    const colon = trimmed.indexOf(':')
+    if (colon <= 0) continue
+    const prop = trimmed.slice(0, colon).trim()
+    if (prop && !prop.startsWith('@') && !prop.includes(' ')) properties.add(prop)
+  }
+  return properties
+}
+
+function collectRules(css: string, rules: ParsedRule[]) {
+  let index = 0
+  while (index < css.length) {
+    const open = css.indexOf('{', index)
+    if (open === -1) return
+    const selector = css.slice(index, open).trim()
+    const close = findMatchingBrace(css, open)
+    const body = css.slice(open + 1, close)
+    if (selector && !selector.startsWith('@')) {
+      const properties = directProperties(body)
+      if (properties.size > 0) rules.push({ selector, properties })
+    }
+    collectRules(body, rules)
+    index = close + 1
+  }
+}
+
+function parseCssRules(css: string): ParsedRule[] {
+  const rules: ParsedRule[] = []
+  collectRules(css.replace(/\/\*[\s\S]*?\*\//g, ''), rules)
   return rules
 }
 
@@ -51,13 +94,22 @@ function normalizeSelectorToken(token: string): string {
   return token.replace(/\\(.)/g, '$1')
 }
 
+function isBareModifierPart(part: string, className: string): boolean {
+  const trimmed = normalizeSelectorToken(part.trim())
+  return trimmed === className || trimmed === `&${className}`
+}
+
 function selectorTargetsModifier(selector: string, className: string): boolean {
   const normalizedClass = normalizeSelectorToken(className)
   return selector.split(',').some((part) => {
     const trimmed = normalizeSelectorToken(part.trim())
-    if (trimmed === normalizedClass) return true
-    if (trimmed.startsWith(`${normalizedClass}:`)) return true
-    if (trimmed.startsWith(`${normalizedClass}[`)) return true
+    if (isBareModifierPart(trimmed, normalizedClass)) return true
+    if (trimmed.startsWith(`${normalizedClass}:`) || trimmed.startsWith(`&${normalizedClass}:`)) {
+      return true
+    }
+    if (trimmed.startsWith(`${normalizedClass}[`) || trimmed.startsWith(`&${normalizedClass}[`)) {
+      return true
+    }
     return false
   })
 }
@@ -67,7 +119,7 @@ function modifiersForDimension(rules: ParsedRule[], modifierPrefix: string) {
   return rules.filter(
     (rule) =>
       selectorTargetsModifier(rule.selector, className) &&
-      rule.selector.split(',').some((part) => part.trim() === className),
+      rule.selector.split(',').some((part) => isBareModifierPart(part, className)),
   )
 }
 
@@ -468,12 +520,33 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
     filePath: cardCssPath,
     dimensions: [
       {
+        modifierPrefix: 'ui-card--compact',
+        requiredProperties: ['--ui-card-inset-block', '--ui-card-inset-inline'],
+      },
+      {
+        modifierPrefix: 'ui-card--comfortable',
+        requiredProperties: ['--ui-card-inset-block', '--ui-card-inset-inline'],
+      },
+      {
+        modifierPrefix: 'ui-card--spacious',
+        requiredProperties: [
+          '--ui-card-inset-block',
+          '--ui-card-inset-inline',
+          '--ui-card-title-size',
+          '--ui-card-description-size',
+        ],
+      },
+      {
         modifierPrefix: 'ui-card--static',
         requiredProperties: ['transition-property'],
       },
       {
         modifierPrefix: 'ui-card--interactive',
         requiredProperties: ['transition-property'],
+      },
+      {
+        modifierPrefix: 'ui-card--disabled',
+        requiredProperties: ['opacity', 'pointer-events'],
       },
     ],
   },
@@ -502,23 +575,13 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
         requiredProperties: ['border-color', 'background-color', 'color'] as const,
       })),
       {
-        modifierPrefix: 'ui-alert--comfortable',
-        requiredProperties: ['gap', 'padding'] as const,
+        modifierPrefix: 'ui-alert',
+        requiredProperties: ['padding-block', 'padding-inline', 'gap'] as const,
       },
       {
-        modifierPrefix: 'ui-alert--compact',
-        requiredProperties: ['gap', 'padding-inline', 'padding-block'] as const,
+        modifierPrefix: 'ui-alert__title',
+        requiredProperties: ['font-weight', 'color'] as const,
       },
-      ...(['comfortable', 'compact'] as const).map((density) => ({
-        modifierPrefix: `ui-alert__title--${density}`,
-        requiredProperties: [
-          'font-size',
-          'line-height',
-          'font-weight',
-          'letter-spacing',
-          'color',
-        ] as const,
-      })),
     ],
   },
   {

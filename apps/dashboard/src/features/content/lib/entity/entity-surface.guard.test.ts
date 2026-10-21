@@ -5,9 +5,8 @@ import { describe, expect, it } from 'vitest'
 
 const REPO_ROOT = join(__dirname, '../../../../../../..')
 const FEATURE_ROOT = join(REPO_ROOT, 'apps/dashboard/src/features')
-const INTERNAL_ENTITY_FILES = new Set([
-  'content/lib/entity/surfaces/cards/content/content-entity-card.tsx',
-  'content/lib/entity/summary/entity-summary.tsx',
+const INTERNAL_ENTITY_FRAME_FILES = new Set([
+  'content/lib/entity/surfaces/cards/content/entity-card-static-renderer.tsx',
 ])
 
 function sourceFiles(directory: string): string[] {
@@ -25,14 +24,12 @@ function featureImplementationFiles(): string[] {
 }
 
 describe('entity surface architecture guard', () => {
-  it('keeps ContentCardHeading and ContentCardBody internal to entity surfaces', () => {
+  it('does not import retired ContentCard shell components from @rpg/ui', () => {
     for (const path of featureImplementationFiles()) {
       const relativePath = relative(FEATURE_ROOT, path)
-      if (INTERNAL_ENTITY_FILES.has(relativePath)) continue
-
       const source = readFileSync(path, 'utf8')
-      expect(source, `${relativePath} must not compose entity heading internals`).not.toMatch(
-        /\bContentCardHeading\b|\bContentCardBody\b/,
+      expect(source, `${relativePath} must not import retired ContentCard shell`).not.toMatch(
+        /\bimport\s+\{[^}]*\b(?:ContentCard|ContentCardBody|ContentCardHeading)\b/,
       )
     }
   })
@@ -40,7 +37,10 @@ describe('entity surface architecture guard', () => {
   it('does not expose EntityCardFrame outside entity internals', () => {
     for (const path of featureImplementationFiles()) {
       const relativePath = relative(FEATURE_ROOT, path)
-      if (relativePath.startsWith('content/lib/entity/') || INTERNAL_ENTITY_FILES.has(relativePath))
+      if (
+        relativePath.startsWith('content/lib/entity/') ||
+        INTERNAL_ENTITY_FRAME_FILES.has(relativePath)
+      )
         continue
 
       const source = readFileSync(path, 'utf8')
@@ -65,14 +65,12 @@ describe('entity surface architecture guard', () => {
       expect(
         source,
         `${relativePath} must not target entity surfaces with descendants`,
-      ).not.toMatch(
-        /\[&_[^\]]*(?:entity-|EntityAnatomyHost|ContentEntityCard|DisclosureEntityCard)/,
-      )
+      ).not.toMatch(/\[&_[^\]]*(?:entity-|EntityAnatomyHost|EntityCard)/)
       expect(source, `${relativePath} must not use !important`).not.toMatch(/!important/)
     }
   })
 
-  it('keeps entity-backed grant arrays on DisclosureEntityCard shells', () => {
+  it('keeps entity-backed grant arrays on EntityCardDisclosureRenderer shells', () => {
     const grantFormFields = join(FEATURE_ROOT, 'content/lib/forms/grants/grant-form-fields.ts')
     const startingEquipmentFields = join(
       FEATURE_ROOT,
@@ -82,7 +80,7 @@ describe('entity surface architecture guard', () => {
     for (const path of [grantFormFields, startingEquipmentFields]) {
       const relativePath = relative(FEATURE_ROOT, path)
       const source = readFileSync(path, 'utf8')
-      expect(source, `${relativePath} must render entity-backed rows via DEC shell`).toMatch(
+      expect(source, `${relativePath} must render entity-backed rows via disclosure shell`).toMatch(
         /renderShell/,
       )
       expect(source, `${relativePath} must not compose ArrayItemShell`).not.toMatch(
@@ -93,7 +91,7 @@ describe('entity surface architecture guard', () => {
 
   it('does not use legacy entity trailing or heading link props in feature code', () => {
     const legacyPropPattern =
-      /\b(?:EntityAnatomyHost|ContentEntityCard|DisclosureEntityCard|DetailEntityRow)[^;\n]*\b(?:action=|href=|endSlot=)/
+      /\b(?:EntityAnatomyHost|EntityCard|DetailEntityRow)[^;\n]*\b(?:action=|href=|endSlot=)/
 
     for (const path of featureImplementationFiles()) {
       const relativePath = relative(FEATURE_ROOT, path)
@@ -109,8 +107,8 @@ describe('entity surface architecture guard', () => {
 
   it('does not import entity anatomy internals outside allowlist', () => {
     const allowlist = new Set([
-      'content/lib/entity/surfaces/cards/content/content-entity-card.tsx',
-      'content/lib/entity/surfaces/cards/disclosure/disclosure-entity-card.tsx',
+      'content/lib/entity/surfaces/cards/content/entity-card-static-renderer.tsx',
+      'content/lib/entity/surfaces/cards/disclosure/entity-card-disclosure-renderer.tsx',
       'content/lib/detail/row/entity/detail-entity-row.tsx',
       'content/lib/entity/surfaces/drawer/drawer-entity-block.tsx',
     ])

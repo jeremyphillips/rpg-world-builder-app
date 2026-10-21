@@ -1,15 +1,12 @@
 import { useId, useMemo, useState } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
-import { ActionButton, Button, ConfirmDialog, TextField } from '@rpg/ui'
+import { ActionButton, Button, cn, ConfirmDialog, TextField } from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 import type { SlotProgression } from '@rpg/contracts'
 
+import { collectionPanelNestedBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
-import {
-  DetailOverflowMenu,
-  FeatureTableRow,
-  featureTablesSectionBodyClasses,
-} from '@/lib/content-table-surface'
+import { DetailOverflowMenu, FeatureTableRow } from '@/lib/content-table-surface'
 
 import {
   applySlotProgressionDraft,
@@ -173,7 +170,7 @@ export function SlotProgressionsField() {
           }
           wrapper="none"
         />
-        <div className={featureTablesSectionBodyClasses}>
+        <div className="flex flex-col gap-2">
           {slotProgressions.map((progression) => (
             <FeatureTableRow
               key={progression.id}
@@ -203,7 +200,8 @@ export function SlotProgressionsField() {
       </section>
 
       {showCreateForm ? (
-        <div className="space-y-3 rounded-lg border border-border bg-card p-3">
+        <div className={cn(collectionPanelNestedBodyClasses, 'gap-3')}>
+          {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
           <TextField
             id={createLabelId}
             label="Progression label"

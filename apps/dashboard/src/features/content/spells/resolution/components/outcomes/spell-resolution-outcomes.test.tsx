@@ -30,11 +30,15 @@ function renderOutcomes(defaultResolution: ResolutionFormValues) {
   )
 }
 
+function outcomePanel(headingName: string | RegExp): HTMLElement {
+  const heading = screen.getByRole('heading', { name: headingName })
+  const panel = heading.closest('[aria-labelledby]')
+  expect(panel).toBeInstanceOf(HTMLElement)
+  return panel as HTMLElement
+}
+
 function hitSection() {
-  const heading = screen.getByRole('heading', { name: 'On hit' })
-  const section = heading.closest('section')
-  expect(section).not.toBeNull()
-  return section!
+  return outcomePanel('On hit')
 }
 
 describe('SpellResolutionOutcomes', () => {
@@ -57,10 +61,9 @@ describe('SpellResolutionOutcomes', () => {
       expect(screen.getByText(RESOLUTION_SECTION_LABELS.outcomeEmptySummary)).toBeInTheDocument()
     })
 
-    const missSection = screen.getByRole('heading', { name: 'On miss' }).closest('section')
-    expect(missSection).not.toBeNull()
+    const missSection = outcomePanel('On miss')
     expect(
-      within(missSection!).queryByLabelText(RESOLUTION_SECTION_LABELS.hitNote),
+      within(missSection).queryByLabelText(RESOLUTION_SECTION_LABELS.hitNote),
     ).not.toBeInTheDocument()
 
     await user.click(
@@ -68,17 +71,14 @@ describe('SpellResolutionOutcomes', () => {
     )
 
     await waitFor(() => {
-      const expandedMissSection = screen
-        .getByRole('heading', { name: 'On miss' })
-        .closest('section')
-      expect(expandedMissSection).not.toBeNull()
+      const expandedMissSection = outcomePanel('On miss')
       expect(
-        within(expandedMissSection!).getByRole('button', {
+        within(expandedMissSection).getByRole('button', {
           name: RESOLUTION_SECTION_LABELS.addOutcomeNote,
         }),
       ).toBeInTheDocument()
       expect(
-        within(expandedMissSection!).queryByLabelText(RESOLUTION_SECTION_LABELS.hitNote),
+        within(expandedMissSection).queryByLabelText(RESOLUTION_SECTION_LABELS.hitNote),
       ).not.toBeInTheDocument()
     })
   })
@@ -117,11 +117,11 @@ describe('SpellResolutionOutcomes', () => {
     renderOutcomes(resolution)
 
     const appliedSection = await screen.findByText(RESOLUTION_SECTION_LABELS.appliedEffects)
-    const section = appliedSection.closest('section')
-    expect(section).not.toBeNull()
+    const section = appliedSection.closest('[aria-labelledby]')
+    expect(section).toBeInstanceOf(HTMLElement)
 
     await user.click(
-      within(section!).getByRole('button', {
+      within(section as HTMLElement).getByRole('button', {
         name: RESOLUTION_SECTION_LABELS.addAppliedEffect,
       }),
     )

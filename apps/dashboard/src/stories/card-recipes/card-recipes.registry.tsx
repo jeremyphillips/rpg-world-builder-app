@@ -1,5 +1,5 @@
 import { composeStories } from '@storybook/react-vite'
-import { GripVertical, Trash2 } from 'lucide-react'
+import { GripVertical, Trash2, WandSparkles } from 'lucide-react'
 import { useState } from 'react'
 
 import {
@@ -7,7 +7,8 @@ import {
   Badge,
   Button,
   ComboboxOptionRow,
-  ContentCard,
+  Card,
+  CardHeader,
   CollapsibleListItem,
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,7 @@ import {
   Field,
   FieldLayout,
   IdentityRow,
+  IdentityRowHeadingLine,
   Input,
   InteractiveList,
   InteractiveListRow,
@@ -24,26 +26,38 @@ import {
   SelectionSummaryCard,
   SelectionSummaryChangeAction,
   Text,
+  RadioCard,
+  RadioGroup,
+  Sheet,
   iconGhostControlVariants,
 } from '@rpg/ui'
 import { ArrayItemAnatomyGrid } from '@rpg/ui/form'
 
 import {
-  CatalogEntityRow,
+  CatalogCard,
   CatalogEntitySurfaceRow,
-  ContentEntityCard,
+  EntityCard,
   DetailRowLeadingMedia,
-  DisclosureEntityCard,
   EntityAnatomyHost,
   EntityDisclosureArrayItemShell,
   EntityRowList,
-  EntitySurfaceContentCard,
   entitySurfaceMetadataFromText,
+  getContentTypeCollectionLabel,
 } from '@/features/content'
 import { DetailEntityRow } from '@/features/content/lib/detail/row/entity/detail-entity-row'
 import { DrawerEntityBlock } from '@/features/content/lib/entity/surfaces/drawer/drawer-entity-block'
+import { EquipmentAcquisitionGuidance } from '@/features/character/components/equipment/acquisition/equipment-acquisition-guidance'
+import { EquipmentResourceSummary } from '@/features/character/components/equipment/acquisition/equipment-resource-summary'
+import { BuilderStepChooseClassPrompt } from '@/features/character/components/builder/steps/shared/builder-step-choose-class-prompt'
+import { BuilderFactSummary } from '@/features/character/components/builder/steps/shared/fact-summary/builder-fact-summary'
+import { ChoiceSection } from '@/features/character/components/builder/steps/shared/choice-section/choice-section'
 import { ChoiceBlockRow } from '@/features/character/components/builder/steps/shared/choice-section/choice-block-row'
 import { createProficienciesStepRogueFixture } from '@/features/character/lib/proficiencies/proficiencies-step.fixtures'
+import {
+  PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE,
+  validationIssuesForProficiencyChoiceSet,
+  validationIssuesForProficiencySection,
+} from '@/features/character/lib/proficiencies/proficiencies-step.lib'
 import { QuickNpcStartingChoiceSelectedRow } from '@/features/character/npc/components/quick-npc/quick-npc-starting-choice-selected-row'
 import * as QuickNpcStartingChoicesStories from '@/features/character/npc/components/quick-npc/quick-npc-starting-choices.stories'
 
@@ -87,10 +101,11 @@ function SelectAction() {
   )
 }
 
-function DisclosureEntityCardRecipe() {
+function EntityCardDisclosureRecipe() {
   const [collapsed, setCollapsed] = useState(true)
   return (
-    <DisclosureEntityCard
+    <EntityCard
+      variant="disclosure"
       itemId="recipe-dec"
       toolbarAriaLabel="Harbor District"
       entity={{
@@ -105,7 +120,7 @@ function DisclosureEntityCardRecipe() {
       trailing={{ kind: 'utility', content: <RemoveUtility label="Harbor District" /> }}
     >
       <Text variant="muted">District notes live in the disclosed body.</Text>
-    </DisclosureEntityCard>
+    </EntityCard>
   )
 }
 
@@ -136,10 +151,10 @@ function ArrayItemShellRecipe() {
   )
 }
 
-function CatalogEntityRowRecipe() {
+function CatalogCardRecipe() {
   const [collapsed, setCollapsed] = useState(true)
   return (
-    <CatalogEntityRow
+    <CatalogCard
       toolbarLabel="Longsword"
       domIds={{
         itemId: 'recipe-catalog',
@@ -249,7 +264,7 @@ function ChoiceBlockRowRecipe() {
 function StepperRecipe() {
   const [quantity, setQuantity] = useState(2)
   return (
-    <ContentEntityCard
+    <EntityCard
       entity={{ heading: 'Javelin', classification: 'Simple weapon', description: '1d6 piercing' }}
       density="compact"
       trailing={{
@@ -275,17 +290,17 @@ const ENTITY_CHAIN = ['EntityCardFrame', 'EntityAnatomyHost', 'EntityAnatomy', '
 
 export const CARD_RECIPES: readonly CardRecipe[] = [
   {
-    name: 'Content entity card — action',
+    name: 'Entity card (static) — action',
     section: 'entity-surfaces',
-    component: 'ContentEntityCard',
-    chain: ['ContentEntityCard', ...ENTITY_CHAIN],
+    component: 'EntityCard',
+    chain: ['EntityCard', ...ENTITY_CHAIN],
     useWhen: 'Standalone entity identity with one labeled commit control.',
     density: 'compact',
     leading: 'none',
     trailing: 'action (band)',
     anatomy: 'row-track',
     render: () => (
-      <ContentEntityCard
+      <EntityCard
         entity={{
           heading: 'Harbor District',
           classification: 'Settlement',
@@ -297,24 +312,24 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     ),
   },
   {
-    name: 'Content entity card — media and status',
+    name: 'Entity card (static) — media and status',
     section: 'entity-surfaces',
-    component: 'ContentEntityCard',
-    chain: ['ContentEntityCard', ...ENTITY_CHAIN],
+    component: 'EntityCard',
+    chain: ['EntityCard', ...ENTITY_CHAIN],
     useWhen: 'Comfortable identity with leading media and a status lane.',
     density: 'comfortable',
     leading: 'none',
     trailing: 'indicator chevron (full)',
     anatomy: 'row-track',
     render: () => (
-      <ContentEntityCard
+      <EntityCard
         entity={{
           heading: 'Silver Circle',
           classification: 'Guild',
           description: 'Merchants of the Grey Coast',
           status: [{ kind: 'badge', label: 'Member', tone: 'success' }],
           media: (
-            <DetailRowLeadingMedia size="sm">
+            <DetailRowLeadingMedia>
               <span aria-hidden>SC</span>
             </DetailRowLeadingMedia>
           ),
@@ -325,10 +340,10 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     ),
   },
   {
-    name: 'Content entity card — stepper utility',
+    name: 'Entity card (static) — stepper utility',
     section: 'entity-surfaces',
-    component: 'ContentEntityCard',
-    chain: ['ContentEntityCard', ...ENTITY_CHAIN],
+    component: 'EntityCard',
+    chain: ['EntityCard', ...ENTITY_CHAIN],
     useWhen: 'Quantity editing on an inventory-style row; the 36px stepper centers on the row.',
     density: 'compact',
     leading: 'none',
@@ -337,16 +352,16 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     render: () => <StepperRecipe />,
   },
   {
-    name: 'Disclosure entity card — grip, caret, remove',
+    name: 'Entity card (disclosure) — grip, caret, remove',
     section: 'entity-surfaces',
-    component: 'DisclosureEntityCard',
-    chain: ['DisclosureEntityCard', 'CollapsibleListItem', ...ENTITY_CHAIN],
+    component: 'EntityCard',
+    chain: ['EntityCard', 'CollapsibleListItem', ...ENTITY_CHAIN],
     useWhen: 'Sortable, expandable entity rows with a trailing ghost utility.',
     density: 'compact',
     leading: 'grip + caret',
     trailing: 'utility remove (full)',
     anatomy: 'row-track',
-    render: () => <DisclosureEntityCardRecipe />,
+    render: () => <EntityCardDisclosureRecipe />,
   },
   {
     name: 'Entity anatomy host — embedded',
@@ -366,34 +381,219 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     ),
   },
   {
-    name: 'Entity surface content card — inline action',
-    section: 'entity-surfaces',
-    component: 'EntitySurfaceContentCard',
-    chain: ['EntitySurfaceContentCard', 'ContentEntityCard', ...ENTITY_CHAIN],
-    useWhen: 'Plain identity config (no JSX) projected onto a content card.',
-    density: 'compact',
-    leading: 'none',
+    name: 'Equipment acquisition resource panel',
+    section: 'ui-cards-form-rows',
+    component: 'EquipmentResourceSummary',
+    chain: ['DividedStack', 'EntityAnatomyHost', 'EntityAnatomy', 'RowAnatomyCell'],
+    useWhen:
+      'Builder equipment step and picker header: budget and magic-item grant rows in one ad hoc panel frame.',
+    density: 'fixed',
+    leading: 'resource media',
     trailing: 'action (band)',
     anatomy: 'row-track',
     render: () => (
-      <EntitySurfaceContentCard
-        surface={{
-          identity: {
-            heading: 'Wizard',
-            classification: 'Class',
-            metadata: entitySurfaceMetadataFromText('Intelligence spellcaster'),
-            fallback: 'class',
-          },
-          inlineAction: { label: 'Select', onClick: noop },
-        }}
-      />
+      <div className="flex max-w-md flex-col gap-8">
+        <EquipmentResourceSummary
+          density="comfortable"
+          currency={{
+            heading: '74 GP 6 SP remaining',
+            metadata: ['75 GP budget', '4 SP spent'],
+          }}
+          slots={[
+            {
+              rarity: 'common',
+              rarityMode: 'exact',
+              quantity: 2,
+              remaining: 2,
+              fulfilled: false,
+            },
+            {
+              rarity: 'uncommon',
+              rarityMode: 'maximum',
+              quantity: 1,
+              remaining: 0,
+              fulfilled: true,
+            },
+          ]}
+          currencyAction={{
+            label: 'Browse equipment',
+            variant: 'secondary',
+            onClick: noop,
+          }}
+          magicItemsAction={{
+            label: 'Browse magic items',
+            variant: 'secondary',
+            onClick: noop,
+          }}
+        />
+        <EquipmentResourceSummary
+          density="compact"
+          currency={{
+            heading: '40 GP remaining',
+            metadata: ['100 GP budget', '15 GP spent'],
+          }}
+        />
+        <EquipmentResourceSummary
+          density="comfortable"
+          slots={[
+            {
+              rarity: 'common',
+              rarityMode: 'exact',
+              quantity: 2,
+              remaining: 1,
+              fulfilled: false,
+            },
+            {
+              rarity: 'uncommon',
+              rarityMode: 'maximum',
+              quantity: 1,
+              remaining: 1,
+              fulfilled: false,
+            },
+            {
+              rarity: 'rare',
+              rarityMode: 'exact',
+              quantity: 1,
+              remaining: 0,
+              fulfilled: true,
+            },
+          ]}
+          magicItemsAction={{
+            label: 'Browse magic items',
+            variant: 'secondary',
+            onClick: noop,
+          }}
+        />
+      </div>
+    ),
+  },
+  {
+    name: 'Builder fact summary',
+    section: 'ui-cards-form-rows',
+    component: 'BuilderFactSummary',
+    chain: ['Card', 'CardContent', 'IconContainer'],
+    useWhen:
+      'Builder step readouts (spellcasting, granted proficiencies) — subtle Card shell with declarative header.',
+    density: 'comfortable',
+    leading: 'icon row (domain)',
+    trailing: 'none',
+    anatomy: 'different',
+    render: () => (
+      <div className="max-w-lg">
+        <BuilderFactSummary
+          heading="Spellcasting"
+          subhead="Your class determines spellcasting ability and how these values are calculated."
+          rows={[
+            {
+              id: 'ability',
+              label: 'Spellcasting ability',
+              value: 'Intelligence',
+              icon: 'spellcasting-ability',
+            },
+          ]}
+          rowIcons={{ 'spellcasting-ability': WandSparkles }}
+          showSourceColumn={false}
+        />
+      </div>
+    ),
+  },
+  {
+    name: 'Builder choice section',
+    section: 'ui-cards-form-rows',
+    component: 'ChoiceSection',
+    chain: ['collection panel shell', 'ChoiceSectionHeader', 'EntityCard'],
+    useWhen:
+      'Interactive builder choice wells — collection panel host (not Card) wraps header, dividers, and entity selected rows.',
+    density: 'comfortable',
+    leading: 'none',
+    trailing: 'add action (header)',
+    anatomy: 'different',
+    render: () => {
+      const { model } = createProficienciesStepRogueFixture()
+      const skills = model.sections.find((section) => section.kind === 'skills')
+      if (!skills) return null
+      return (
+        <div className="max-w-xl">
+          <ChoiceSection
+            section={skills}
+            sectionIdPrefix="card-recipe-choice"
+            overSelectionMessage={PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE}
+            validationIssuesForChoiceSet={validationIssuesForProficiencyChoiceSet}
+            validationIssuesForSection={validationIssuesForProficiencySection}
+            onOpenChoiceSet={noop}
+            onRemoveChoice={noop}
+          />
+        </div>
+      )
+    },
+  },
+  {
+    name: 'Builder choose-class prompt',
+    section: 'ui-cards-form-rows',
+    component: 'BuilderStepChooseClassPrompt',
+    chain: ['Card', 'CardContent', 'CardTitle', 'CardDescription'],
+    useWhen: 'Gated builder steps that send the player to an upstream prerequisite step.',
+    density: 'comfortable',
+    leading: 'IconContainer',
+    trailing: 'text action',
+    anatomy: 'different',
+    render: () => (
+      <div className="max-w-lg">
+        <BuilderStepChooseClassPrompt
+          heading="Choose a class first"
+          description="Select a class before configuring starting equipment."
+          onNavigateToStep={noop}
+        />
+      </div>
+    ),
+  },
+  {
+    name: 'Equipment acquisition guidance stack',
+    section: 'ui-cards-form-rows',
+    component: 'EquipmentAcquisitionGuidance',
+    chain: ['Card', 'EquipmentResourceSummary', 'Card', 'DividedStack', 'EntityAnatomyHost'],
+    useWhen:
+      'Equipment step header — unresolved funding subtle Card stacked with resource summary panel.',
+    density: 'comfortable',
+    leading: 'resource media (summary)',
+    trailing: 'browse / manage actions',
+    anatomy: 'row-track',
+    render: () => (
+      <div className="max-w-md">
+        <EquipmentAcquisitionGuidance
+          showPurchaseWorkflow={false}
+          fundingState={{ kind: 'unresolved', pendingCostCp: 50 }}
+          onOpenPurchasePicker={noop}
+          showMagicItemGrants
+          magicItemAllowances={[
+            {
+              id: 'allowance-common',
+              source: { kind: 'startingWealthTier', sourceId: 'table', tierId: 'hero' },
+              rarity: 'common',
+              count: 2,
+              requirement: 'exact',
+            },
+          ]}
+          magicItemProgress={[
+            {
+              allowanceId: 'allowance-common',
+              rarity: 'common',
+              capacity: 2,
+              selected: 1,
+              remainingCapacity: 1,
+              isFilled: false,
+            },
+          ]}
+          onOpenMagicItemsPicker={noop}
+        />
+      </div>
     ),
   },
   {
     name: 'Entity disclosure array item shell',
     section: 'entity-surfaces',
     component: 'EntityDisclosureArrayItemShell',
-    chain: ['EntityDisclosureArrayItemShell', 'DisclosureEntityCard', ...ENTITY_CHAIN],
+    chain: ['EntityDisclosureArrayItemShell', 'EntityCard', ...ENTITY_CHAIN],
     useWhen: 'Schema-driven form array items presented as entity disclosure cards.',
     density: 'compact',
     leading: 'caret',
@@ -402,22 +602,22 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     render: () => <ArrayItemShellRecipe />,
   },
   {
-    name: 'Catalog entity row — add with price',
+    name: 'Catalog card — add with price',
     section: 'picker-rows',
-    component: 'CatalogEntityRow',
-    chain: ['CatalogEntityRow', 'CollapsibleListItem', ...ENTITY_CHAIN],
+    component: 'CatalogCard',
+    chain: ['CatalogCard', 'CollapsibleListItem', ...ENTITY_CHAIN],
     useWhen: 'Catalog picker rows with a commit control and a secondary scalar.',
     density: 'compact',
     leading: 'caret',
     trailing: 'group: action (band) + price (meta)',
     anatomy: 'row-track',
-    render: () => <CatalogEntityRowRecipe />,
+    render: () => <CatalogCardRecipe />,
   },
   {
     name: 'Catalog entity surface row',
     section: 'picker-rows',
     component: 'CatalogEntitySurfaceRow',
-    chain: ['CatalogEntitySurfaceRow', 'CatalogEntityRow', ...ENTITY_CHAIN],
+    chain: ['CatalogEntitySurfaceRow', 'CatalogCard', ...ENTITY_CHAIN],
     useWhen: 'Catalog rows fed by plain identity config.',
     density: 'compact',
     leading: 'none',
@@ -602,22 +802,25 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     render: () => <CollapsibleListItemRecipe />,
   },
   {
-    name: 'Content card',
+    name: 'Generic card + identity heading',
     section: 'ui-cards-form-rows',
-    component: 'ContentCard',
-    chain: ['ContentCard', 'ContentCardBody'],
-    useWhen: '@rpg/ui consumers outside the dashboard entity family (e.g. public app).',
+    component: 'Card',
+    chain: ['Card', 'CardHeader', 'IdentityRowHeadingLine'],
+    useWhen: 'Hub and roster tiles — generic Card shell with shared identity heading anatomy.',
     density: 'comfortable',
-    leading: 'media',
-    trailing: 'endSlot',
+    leading: 'leadMedia (optional)',
+    trailing: 'CardFooter actions',
     anatomy: 'different',
     render: () => (
-      <ContentCard
-        heading="Harbor District"
-        subheading="Located in Grey Coast"
-        metadata="Settlement"
-        endSlot={<Badge tone="warning">Unavailable</Badge>}
-      />
+      <Card density="comfortable" className="max-w-sm">
+        <CardHeader>
+          <IdentityRowHeadingLine
+            heading="Harbor District"
+            classification="Settlement"
+            headingEnd={<Badge tone="warning">Unavailable</Badge>}
+          />
+        </CardHeader>
+      </Card>
     ),
   },
   {
@@ -687,7 +890,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     name: 'Quick NPC starting choice selected row',
     section: 'feature-grids',
     component: 'QuickNpcStartingChoiceSelectedRow',
-    chain: ['QuickNpcStartingChoiceSelectedRow', 'ContentEntityCard', ...ENTITY_CHAIN],
+    chain: ['QuickNpcStartingChoiceSelectedRow', 'EntityCard', ...ENTITY_CHAIN],
     useWhen: 'Selected starting choices with optional quantity and remove.',
     density: 'compact',
     leading: 'none',
@@ -714,10 +917,103 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     render: () => <QuickNpcStartingChoicesDemo />,
   },
   {
+    name: 'radio-card-strong',
+    section: 'ui-cards-form-rows',
+    component: 'RadioOptionCard',
+    chain: ['RadioCard', 'RadioOptionCard', 'SelectionTarget', 'SelectionTargetRadio'],
+    useWhen: 'Standalone builder or onboarding choices outside sheet hosts (strong tone default).',
+    density: 'compact',
+    leading: 'radio',
+    trailing: 'none',
+    anatomy: 'different',
+    render: () => (
+      <RadioCard
+        aria-label="Scope"
+        value="item"
+        density="compact"
+        options={[
+          { value: 'item', label: 'This item', description: 'Applies once' },
+          { value: 'all', label: 'All items', description: 'Applies to every copy' },
+        ]}
+      />
+    ),
+  },
+  {
+    name: 'radio-card-quiet-in-sheet',
+    section: 'ui-cards-form-rows',
+    component: 'RadioOptionCard',
+    chain: ['Sheet.Content', 'RadioCard tone=quiet', 'RadioOptionCard'],
+    useWhen: 'Footer-committed drawer kind fields pass tone="quiet" on RadioCard.',
+    density: 'compact',
+    leading: 'radio',
+    trailing: 'none',
+    anatomy: 'different',
+    render: () => (
+      <Sheet.Root open>
+        <Sheet.Content surface="background" size="lg">
+          <RadioCard
+            aria-label="Connection kind"
+            value="owns"
+            density="compact"
+            tone="quiet"
+            options={[
+              { value: 'owns', label: 'Owner', description: 'Controls the location' },
+              { value: 'tenant', label: 'Tenant', description: 'Occupies the location' },
+            ]}
+          />
+        </Sheet.Content>
+      </Sheet.Root>
+    ),
+  },
+  {
+    name: 'catalog-entity-row-radio',
+    section: 'picker-rows',
+    component: 'CatalogCard',
+    chain: [
+      'RadioGroup',
+      'CatalogCard',
+      'SelectionTarget',
+      'SelectionTargetRadio',
+      ...ENTITY_CHAIN,
+    ],
+    useWhen: 'Footer-committed catalog pickers with single-choice radio rows.',
+    density: 'compact',
+    leading: 'radio',
+    trailing: 'none',
+    anatomy: 'row-track',
+    render: () => (
+      <RadioGroup aria-label={getContentTypeCollectionLabel('organizations')} defaultValue="org-1">
+        <CatalogCard
+          toolbarLabel="City Council"
+          domIds={{
+            itemId: 'recipe-catalog-radio',
+            titleId: 'recipe-catalog-radio-title',
+            bodyId: 'recipe-catalog-radio-body',
+          }}
+          entity={{ heading: 'City Council', classification: 'Government' }}
+          selection={{ value: 'org-1' }}
+        />
+      </RadioGroup>
+    ),
+  },
+  {
+    name: 'catalog-entity-row-radio-disclosure',
+    section: 'picker-rows',
+    component: 'CatalogCard',
+    chain: ['CatalogCard', 'CollapsibleListItem', ...ENTITY_CHAIN],
+    useWhen:
+      'Spell/proficiency pickers keep leading caret disclosure; selection mode is flat rows.',
+    density: 'compact',
+    leading: 'caret',
+    trailing: 'action (band)',
+    anatomy: 'row-track',
+    render: () => <CatalogCardRecipe />,
+  },
+  {
     name: 'Choice block row',
     section: 'feature-grids',
     component: 'ChoiceBlockRow',
-    chain: ['ChoiceBlockRow', 'ChoiceSelectedRow', 'ContentEntityCard'],
+    chain: ['ChoiceBlockRow', 'ChoiceSelectedRow', 'EntityCard'],
     useWhen: 'Builder choice section header with add action and selected rows.',
     density: 'fixed',
     leading: 'none',

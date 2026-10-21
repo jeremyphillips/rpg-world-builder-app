@@ -1,17 +1,11 @@
 import { cva } from 'class-variance-authority'
 
-import { cn, establishSurfaceCurrent } from '@rpg/ui'
+import { cn } from '@rpg/ui'
 
 import { appStickyChromeBlockSizeVarFallback } from '@/components/layout/shell/app-shell.variants'
 
 /** Desktop in-page section rail column width (`lg:w-60` on the slot wrapper). */
 export const inPageSectionNavRailWidthClasses = 'w-60'
-
-/** Bordered faint shell for the desktop in-page section rail. */
-export const inPageSectionNavShellClasses = cn(
-  'rounded-lg border border-border-subtle bg-surface-faint p-4 text-foreground',
-  establishSurfaceCurrent('surface-faint'),
-)
 
 /**
  * Stretch column beside the main column — full row height, not sticky itself.

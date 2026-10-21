@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Link, MemoryRouter } from 'react-router-dom'
-import { buttonVariants } from '@rpg/ui'
+import { ButtonLink } from '@rpg/ui'
 
 import { IndexPageEmptyState, IndexPageIntro } from './index-page-intro'
 
@@ -13,11 +13,7 @@ describe('IndexPageIntro', () => {
           title="Campaigns"
           description="Create and manage shared game worlds."
           showActionsInHeader
-          actions={
-            <Link to="/campaigns/new" className={buttonVariants()}>
-              New campaign
-            </Link>
-          }
+          actions={<ButtonLink link={<Link to="/campaigns/new" />}>New campaign</ButtonLink>}
         />
       </MemoryRouter>,
     )
@@ -32,11 +28,7 @@ describe('IndexPageIntro', () => {
         <IndexPageIntro
           title="Campaigns"
           description="Create and manage shared game worlds."
-          actions={
-            <Link to="/campaigns/new" className={buttonVariants()}>
-              New campaign
-            </Link>
-          }
+          actions={<ButtonLink link={<Link to="/campaigns/new" />}>New campaign</ButtonLink>}
         />
       </MemoryRouter>,
     )
@@ -52,11 +44,7 @@ describe('IndexPageEmptyState', () => {
         <IndexPageEmptyState
           heading="You have not created or joined a campaign yet."
           body="Create one to invite players, organize sessions, and manage campaign content."
-          actions={
-            <Link to="/campaigns/new" className={buttonVariants()}>
-              New campaign
-            </Link>
-          }
+          actions={<ButtonLink link={<Link to="/campaigns/new" />}>New campaign</ButtonLink>}
         />
       </MemoryRouter>,
     )

@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { establishSurfaceCurrent } from '@rpg/ui'
 
 import { globalSearchPageResultsShellClasses } from '../../lib/global-search-surface.variants'
 import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../../lib/rank-global-search'
@@ -76,9 +75,7 @@ export const PageContext: Story = {
 export const PanelContext: Story = {
   decorators: [
     (Story) => (
-      <div
-        className={`w-96 border border-border bg-surface-lift ${establishSurfaceCurrent('surface-lift')}`}
-      >
+      <div className={`w-96 ${globalSearchPageResultsShellClasses}`}>
         <Story />
       </div>
     ),

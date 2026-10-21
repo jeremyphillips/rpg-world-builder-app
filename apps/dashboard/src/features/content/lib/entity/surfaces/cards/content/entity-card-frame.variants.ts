@@ -1,50 +1,28 @@
-import { cva } from 'class-variance-authority'
-
-import { cn, establishSurfaceCurrent } from '@rpg/ui'
+import { cn } from '@rpg/ui'
 
 import {
   ENTITY_SURFACE_DEFAULT_EDGES,
   type EntitySurfaceEdges,
 } from '../../../anatomy/entity-surface-edges.lib'
-import { entitySurfaceInsetVariants } from '../../entity-surface-inset.variants'
+import { entitySurfaceVariants } from '../../dash-entity-surface.variants'
 
-export type EntityCardSurface = 'card' | 'subtle' | 'catalogRow'
-
-const entityCardFrameShellVariants = cva(
-  'w-full min-w-0 overflow-hidden rounded-md border border-border',
-  {
-    variants: {
-      surface: {
-        card: 'bg-card',
-        subtle: cn('bg-surface-subtle', establishSurfaceCurrent('surface-subtle')),
-        catalogRow: 'bg-catalog-picker-row-surface',
-      },
-      disabled: {
-        true: 'opacity-60',
-        false: '',
-      },
-    },
-    defaultVariants: {
-      surface: 'card',
-      disabled: false,
-    },
-  },
-)
-
-/** Perimeter chrome only — publishes inset CSS vars; padding lives on EntityCardContent. */
+/** Perimeter modifiers — tone/state chrome comes from `cardSurfaceVariants` on the frame host. */
 export function entityCardFrameVariants({
   density,
-  surface = 'card',
-  disabled = false,
   edges = ENTITY_SURFACE_DEFAULT_EDGES,
+  leadingUtilityCount = 0,
 }: {
-  density: 'compact' | 'comfortable'
-  surface?: EntityCardSurface
-  disabled?: boolean
+  density: 'compact' | 'comfortable' | 'spacious'
   edges?: EntitySurfaceEdges
+  leadingUtilityCount?: number
 }) {
   return cn(
-    entityCardFrameShellVariants({ surface, disabled }),
-    entitySurfaceInsetVariants({ density, start: edges.start, end: edges.end }),
+    'dash-entity-card',
+    density === 'compact'
+      ? 'dash-entity-card--compact'
+      : density === 'spacious'
+        ? 'dash-entity-card--spacious'
+        : 'dash-entity-card--comfortable',
+    entitySurfaceVariants({ density, edges, leadingUtilityCount }),
   )
 }

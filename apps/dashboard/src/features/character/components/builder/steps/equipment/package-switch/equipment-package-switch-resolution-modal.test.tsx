@@ -27,7 +27,7 @@ import {
   selectionFactsWizardWithoutSpellbookClass,
 } from '../../../../../lib/equipment/equipment-selection-facts.fixtures'
 import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal'
-import { equipmentPackageSwitchResolutionModalInventoryScrollClasses } from './equipment-package-switch-resolution-modal.variants'
+import { packageSwitchModalInventoryScrollClasses } from './equipment-package-switch-resolution-modal-body'
 
 const rope = pickEquipment('rope')
 const dagger = pickEquipment('dagger')
@@ -184,9 +184,7 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
       .closest('section')?.parentElement
 
     expect(scrollRegion).not.toBeNull()
-    for (const className of equipmentPackageSwitchResolutionModalInventoryScrollClasses.split(
-      /\s+/,
-    )) {
+    for (const className of packageSwitchModalInventoryScrollClasses.split(/\s+/)) {
       expect(scrollRegion).toHaveClass(className)
     }
   })

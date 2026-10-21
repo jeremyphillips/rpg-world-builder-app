@@ -1,5 +1,5 @@
 import type { CharacterCampaignWarning, CharacterCampaignWarningCategory } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
+import { Card, CardContent, Heading, Text } from '@rpg/ui'
 
 import {
   groupWarningsByCategory,
@@ -70,8 +70,8 @@ export function CampaignCharacterWarningReview({
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted p-4">
-      {content}
-    </div>
+    <Card tone="subtle" density="comfortable">
+      <CardContent className="flex flex-col gap-3">{content}</CardContent>
+    </Card>
   )
 }

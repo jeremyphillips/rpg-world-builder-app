@@ -36,7 +36,6 @@ import {
   BUILDING_ORGANIZATIONS_EMPTY_STATE_LABEL,
   BUILDING_ORGANIZATIONS_OVERFLOW_LABEL,
   BUILDING_ORGANIZATIONS_PENDING_HEADING,
-  BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
 } from '../../lib/building-organizations/building-organizations-create-tab.lib'
 import type { LocationCreateIntent } from '../../lib/create/session/location-create-session'
@@ -357,7 +356,7 @@ async function openOrganizationsComposing(user: ReturnType<typeof userEvent.setu
 
 async function chooseOwnerAndSelectFirstOrganization(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('radio', { name: /Owner/i }))
-  await user.click(screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!)
+  await user.click(screen.getByRole('radio', { name: /Copper Kettle Guild/i }))
 }
 
 beforeAll(() => {
@@ -1262,10 +1261,12 @@ describe('LocationCreateModal', () => {
       screen.getByRole('radiogroup', { name: 'Political type' }),
     ).getAllByRole('radio')[0]
     expect(firstRegionType).toBeTruthy()
-    const firstRegionTypeName = within(firstRegionType!).getByText(
-      /^(Realm|Kingdom|Empire|Country|State|Province|Territory|Duchy|County|Frontier)$/,
-    ).textContent
-    expect(firstRegionTypeName).toBeTruthy()
+    const firstRegionTypeName =
+      firstRegionType!.getAttribute('aria-label') ??
+      firstRegionType!.textContent?.replace(/\s+/g, ' ').trim()
+    expect(firstRegionTypeName).toMatch(
+      /^(Realm|Kingdom|Empire|Country|State|Province|Territory|Duchy|County|Frontier)/,
+    )
     await user.click(firstRegionType!)
 
     expect(screen.getByText('Setup')).toBeInTheDocument()

@@ -1,7 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ActionIcon } from '@rpg/ui'
-
-import { pageChromeOutlineActionClasses } from '@/components/layout/page-chrome/page-chrome-action.variants'
+import { ActionIcon, ButtonLink } from '@rpg/ui'
 
 export interface ContentDetailEditActionProps {
   to: string
@@ -9,9 +7,15 @@ export interface ContentDetailEditActionProps {
 
 export function ContentDetailEditAction({ to }: ContentDetailEditActionProps) {
   return (
-    <Link to={to} className={pageChromeOutlineActionClasses}>
+    <ButtonLink
+      link={<Link to={to} />}
+      variant="outline"
+      size="sm"
+      density="compact"
+      className="inline-flex items-center"
+    >
       <ActionIcon action="edit" step="sm" aria-hidden />
       Edit
-    </Link>
+    </ButtonLink>
   )
 }

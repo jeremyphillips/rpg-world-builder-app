@@ -2,8 +2,6 @@ import { Check } from 'lucide-react'
 
 import { InlineMetadata, Text } from '@rpg/ui'
 
-import { spellPickerSelectionSummaryClasses } from './spell-picker-selection-summary.variants'
-
 export type SpellPickerSelectionSummaryProps = {
   complete?: boolean
   countText: string
@@ -25,7 +23,7 @@ export function SpellPickerSelectionSummary({
   metadata,
 }: SpellPickerSelectionSummaryProps) {
   return (
-    <Text as="span" variant="muted" className={spellPickerSelectionSummaryClasses}>
+    <Text as="span" variant="muted" className="text-sm">
       {metadata ? (
         <InlineMetadata role="supporting" density="compact">
           <InlineMetadata.Item>

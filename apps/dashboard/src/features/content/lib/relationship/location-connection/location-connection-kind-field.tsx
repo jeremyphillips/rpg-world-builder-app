@@ -43,6 +43,7 @@ export function LocationConnectionKindField({
       id={id}
       label={label}
       density="compact"
+      tone="quiet"
       disabled={disabled}
       value={value ?? ''}
       options={toLocationConnectionKindRadioOptions(options)}

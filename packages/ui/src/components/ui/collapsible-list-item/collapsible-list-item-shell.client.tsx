@@ -9,10 +9,7 @@ import {
   type SemanticSurfaceTone,
 } from '../field-surface.variants'
 import type { SurfaceConfig } from '../visual-vocabulary.types'
-import {
-  buildCollapsibleListItemGeometryStyle,
-  buildCollapsibleListItemLeadingChromeStyle,
-} from './collapsible-list-item-leading-chrome.lib'
+import { buildCollapsibleListItemLeadingChromeStyle } from './collapsible-list-item-leading-chrome.lib'
 import { CollapsibleListItemShellContent } from './collapsible-list-item-shell-content.client'
 import {
   resolveCollapsibleListItemHeaderActionsPaddingClasses,
@@ -101,7 +98,7 @@ export function CollapsibleListItemShell({
 
   const leadingChromeStyle =
     rowLayout === 'entity-card'
-      ? buildCollapsibleListItemGeometryStyle(leadingChrome)
+      ? undefined
       : buildCollapsibleListItemLeadingChromeStyle(leadingChrome)
 
   const shellLayout = resolveCollapsibleListItemShellLayout({
@@ -111,7 +108,8 @@ export function CollapsibleListItemShell({
   })
   const resolvedToolbar = toolbar ?? main
   const resolvedBody = toolbar !== undefined ? body : undefined
-  const chromeClasses = resolveShellChromeClasses({ preset, surface, tone })
+  const chromeClasses =
+    rowLayout === 'entity-card' ? '' : resolveShellChromeClasses({ preset, surface, tone })
   const headerActionsPaddingClasses = resolveCollapsibleListItemHeaderActionsPaddingClasses(
     shellLayout,
     collapsible,
@@ -124,13 +122,16 @@ export function CollapsibleListItemShell({
       aria-labelledby={titleId}
       data-array-item-prefix={itemPrefix}
       className={cn(
-        collapsibleListItemShellVariants({ layout: shellLayout, preset }),
+        collapsibleListItemShellVariants({
+          layout: shellLayout,
+          preset: rowLayout === 'entity-card' ? 'none' : preset,
+        }),
         headerActionsPaddingClasses,
         chromeClasses,
         dragging && collapsibleListItemDraggingClasses,
         className,
       )}
-      style={leadingChromeStyle}
+      style={leadingChromeStyle ?? undefined}
     >
       <CollapsibleListItemShellContent
         layout={layout}

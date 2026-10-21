@@ -9,8 +9,8 @@ import {
   getErrorMessage,
   registerInputSchema,
   validateAuthContinuationPath,
-  type RegisterInput,
 } from '@rpg/contracts'
+import type { RegisterInput } from '@rpg/contracts'
 import { CardFooter, FormCard, SubmitButton, Text, formCardContentClass } from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
 

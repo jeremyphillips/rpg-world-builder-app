@@ -1,8 +1,11 @@
 import { projectEntitySurfaceConfig } from '../entity-surface-projection.lib'
 import type { EntitySurfaceConfig } from '../entity-surface.types'
-import { CatalogEntityRow, type CatalogEntityRowProps } from './catalog-entity-row'
+import { CatalogCard, type CatalogCardProps } from './catalog-card'
 
-export type CatalogEntitySurfaceRowProps = Omit<CatalogEntityRowProps, 'entity' | 'trailing'> & {
+export type CatalogEntitySurfaceRowProps = Omit<
+  Extract<CatalogCardProps, { selection?: undefined }>,
+  'entity' | 'trailing'
+> & {
   surface: EntitySurfaceConfig
 }
 
@@ -14,7 +17,7 @@ export function CatalogEntitySurfaceRow({
   const projected = projectEntitySurfaceConfig(surface)
 
   return (
-    <CatalogEntityRow
+    <CatalogCard
       {...rowProps}
       entity={projected.entity}
       trailing={projected.trailing}

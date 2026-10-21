@@ -19,7 +19,7 @@ import {
 } from '@rpg/ui'
 import { FieldSeparatorWrapper } from '@rpg/ui/form'
 
-import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
+import { EntityCard } from '@/features/content'
 import type {
   EquipmentEditorAction,
   EquipmentEditorState,
@@ -125,7 +125,8 @@ function MagicalPropertiesSection({
               ])
               const showPresetDescription = row.definition.effects.length === 0
               return (
-                <ContentFormEntitySelectionRow
+                <EntityCard
+                  density="compact"
                   key={row.entry.propertyId}
                   entity={{
                     heading: row.definition.name,
@@ -165,7 +166,8 @@ function MagicalPropertiesSection({
               )
             })}
             {magic.custom.map((row) => (
-              <ContentFormEntitySelectionRow
+              <EntityCard
+                density="compact"
                 key={row.customId}
                 entity={{
                   heading: row.name,
@@ -247,7 +249,8 @@ function AdjustmentsSection({
       </Heading>
       <p className="text-style-caption">{equipmentAdjustmentsSectionDescription()}</p>
       {(draft.adjustments ?? []).map((row) => (
-        <ContentFormEntitySelectionRow
+        <EntityCard
+          density="compact"
           key={row.effectId}
           entity={{
             heading: effectTargetLabel(row.target),

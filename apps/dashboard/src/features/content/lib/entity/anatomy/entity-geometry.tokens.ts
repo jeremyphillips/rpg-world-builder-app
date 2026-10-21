@@ -19,9 +19,3 @@ export const ENTITY_BODY_INLINE_START_VALUE = `calc(var(${ENTITY_SURFACE_INLINE_
 export const ENTITY_BODY_INLINE_END_VAR = '--entity-body-inline-end'
 
 export const ENTITY_BODY_INLINE_END_VALUE = `var(${ENTITY_SURFACE_INSET_VAR})`
-
-/** @deprecated Alias during migration — prefer {@link ENTITY_CONTENT_OFFSET_VAR}. */
-export const ENTITY_LEADING_OFFSET_VAR = '--entity-leading-offset'
-
-/** @deprecated Alias during migration — prefer {@link ENTITY_CONTENT_OFFSET_VAR}. */
-export const ENTITY_CONTENT_INDENT_VAR = '--entity-content-indent'

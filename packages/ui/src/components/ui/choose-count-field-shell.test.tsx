@@ -41,10 +41,12 @@ describe('ChooseCountFieldShell', () => {
       </FieldRow>,
     )
 
-    const senseTypeRoot = screen.getByLabelText('Sense type').closest('.grow-\\[8\\]')
-    const rangeRoot = screen.getByLabelText('Range').closest('.grow-\\[4\\]')
+    const senseTypeRoot = screen
+      .getByLabelText('Sense type')
+      .closest('.ui-field-control--width-2\\/3')
+    const rangeRoot = screen.getByLabelText('Range').closest('.ui-field-control--width-1\\/3')
 
-    expect(senseTypeRoot).toHaveClass('max-w-2/3')
-    expect(rangeRoot).toHaveClass('max-w-1/3')
+    expect(senseTypeRoot).toHaveClass('ui-field-control--width-2/3')
+    expect(rangeRoot).toHaveClass('ui-field-control--width-1/3')
   })
 })

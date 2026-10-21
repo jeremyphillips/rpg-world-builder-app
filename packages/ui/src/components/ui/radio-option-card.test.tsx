@@ -3,9 +3,9 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { RadioGroup } from './radio-group.client'
-import { RadioOptionCard, RadioOptionCardDetailsAction } from './radio-option-card.client'
+import { RadioOptionCard } from './radio-option-card.client'
 
-describe('RadioOptionCard titleEndSlot interactions', () => {
+describe('RadioOptionCard trailing interactions', () => {
   it('opens details without selecting the card', async () => {
     const user = userEvent.setup()
     const onValueChange = vi.fn()
@@ -18,9 +18,7 @@ describe('RadioOptionCard titleEndSlot interactions', () => {
           label="Dwarf"
           description="Humanoid"
           density="compact"
-          titleEndSlot={
-            <RadioOptionCardDetailsAction ariaLabel="View Dwarf details" onDetails={onDetails} />
-          }
+          onDetails={onDetails}
         />
       </RadioGroup>,
     )
@@ -37,46 +35,13 @@ describe('RadioOptionCard titleEndSlot interactions', () => {
 
     render(
       <RadioGroup aria-label="Species" value="" onValueChange={onValueChange}>
-        <RadioOptionCard
-          value="dwarf"
-          label="Dwarf"
-          density="compact"
-          titleEndSlot={
-            <RadioOptionCardDetailsAction ariaLabel="View Dwarf details" onDetails={onDetails} />
-          }
-        />
+        <RadioOptionCard value="dwarf" label="Dwarf" density="compact" onDetails={onDetails} />
       </RadioGroup>,
     )
 
     const detailsButton = screen.getByRole('button', { name: 'View Dwarf details' })
     detailsButton.focus()
     await user.keyboard('{Enter}')
-
-    expect(onDetails).toHaveBeenCalledTimes(1)
-    expect(onValueChange).not.toHaveBeenCalled()
-  })
-
-  it('does not activate the radio item when Space is pressed on the details button', async () => {
-    const user = userEvent.setup()
-    const onValueChange = vi.fn()
-    const onDetails = vi.fn()
-
-    render(
-      <RadioGroup aria-label="Species" value="" onValueChange={onValueChange}>
-        <RadioOptionCard
-          value="dwarf"
-          label="Dwarf"
-          density="compact"
-          titleEndSlot={
-            <RadioOptionCardDetailsAction ariaLabel="View Dwarf details" onDetails={onDetails} />
-          }
-        />
-      </RadioGroup>,
-    )
-
-    const detailsButton = screen.getByRole('button', { name: 'View Dwarf details' })
-    detailsButton.focus()
-    await user.keyboard(' ')
 
     expect(onDetails).toHaveBeenCalledTimes(1)
     expect(onValueChange).not.toHaveBeenCalled()
@@ -93,9 +58,7 @@ describe('RadioOptionCard titleEndSlot interactions', () => {
           label="Dwarf"
           description="Humanoid"
           density="compact"
-          titleEndSlot={
-            <RadioOptionCardDetailsAction ariaLabel="View Dwarf details" onDetails={vi.fn()} />
-          }
+          onDetails={vi.fn()}
         />
       </RadioGroup>,
     )

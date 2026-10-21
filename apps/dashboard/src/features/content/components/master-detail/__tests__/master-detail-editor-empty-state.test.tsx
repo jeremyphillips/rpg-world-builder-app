@@ -19,7 +19,8 @@ describe('MasterDetailEditorEmptyState', () => {
       screen.getByText(masterDetailEmptySelectionSubhead(TRAIT_MASTER_DETAIL_ITEM_NOUN)),
     ).toBeInTheDocument()
     const status = screen.getByRole('status')
-    expect(status).toHaveClass('bg-sunken')
+    expect(status).toHaveClass('ui-inset-panel', 'ui-inset-panel--dashed')
+    expect(status).not.toHaveClass('ui-card')
     expect(
       screen.getByText(masterDetailEmptySelectionHeading(TRAIT_MASTER_DETAIL_ITEM_NOUN)),
     ).toHaveClass('text-muted-foreground')

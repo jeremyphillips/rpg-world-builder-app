@@ -4,6 +4,7 @@ import {
   Button,
   Heading,
   RadioCardField,
+  RadioGroup,
   SearchBar,
   Text,
   type RadioCardOption,
@@ -19,7 +20,7 @@ import {
   CREATE_FLOW_FORM_DENSITY,
 } from '@/lib/create-flow'
 
-import { EntitySurfaceContentCard } from '@/features/content/lib/entity/surfaces/cards/content/entity-surface-content-card'
+import { CatalogCard } from '@/features/content'
 import {
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,
@@ -48,7 +49,6 @@ import {
   BUILDING_ORGANIZATIONS_LOADING_LABEL,
   BUILDING_ORGANIZATIONS_SEARCH_LABEL,
   BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER,
-  BUILDING_ORGANIZATIONS_SELECT_LABEL,
 } from '../../lib/building-organizations/building-organizations-create-tab.lib'
 import type { UseBuildingOrganizationsCreateTabResult } from '../../hooks/use-building-organizations-create-tab'
 import type {
@@ -113,6 +113,7 @@ function BuildingOrganizationRelationshipKindField({
       }
       label={BUILDING_ORGANIZATIONS_INTENT_PROMPT}
       density="compact"
+      tone="quiet"
       value={rawKind ?? ''}
       options={toRelationshipRadioOptions(relationshipKindOptions)}
       onValueChange={(value) => handleKindChange(value as OrganizationLocationConnectionKind)}
@@ -120,15 +121,23 @@ function BuildingOrganizationRelationshipKindField({
   )
 }
 
+function resolveBuildingOrganizationDiscoveryDomIds(organizationId: string) {
+  const itemId = `building-organization-discovery-${organizationId}`
+  return {
+    itemId,
+    titleId: `${itemId}-title`,
+    bodyId: `${itemId}-body`,
+  }
+}
+
 function BuildingOrganizationDiscoveryRow({
   organization,
   kind,
   kindOptionsFor,
-  selectExistingOrganization,
   resolveBuildingOrganizationSelectState,
 }: Pick<
   UseBuildingOrganizationsCreateTabResult,
-  'kindOptionsFor' | 'selectExistingOrganization' | 'resolveBuildingOrganizationSelectState'
+  'kindOptionsFor' | 'resolveBuildingOrganizationSelectState'
 > & {
   organization: UseBuildingOrganizationsCreateTabResult['visibleOrganizations'][number]
   kind: OrganizationLocationConnectionKind | null
@@ -136,19 +145,17 @@ function BuildingOrganizationDiscoveryRow({
   const options = kindOptionsFor({ kind: 'existing', organizationId: organization.id })
   const selectState = resolveBuildingOrganizationSelectState({ kind, options })
   return (
-    <EntitySurfaceContentCard
-      density="compact"
-      surface={{
-        identity: buildOrganizationEntityCardModel(buildOrganizationEntitySummaryVm(organization), {
-          status: selectState.selectDisabledReason
-            ? [{ kind: 'text', label: selectState.selectDisabledReason }]
-            : undefined,
-        }),
-        inlineAction: {
-          label: BUILDING_ORGANIZATIONS_SELECT_LABEL,
-          onClick: () => selectExistingOrganization(organization.id),
-          disabled: selectState.selectDisabled,
-        },
+    <CatalogCard
+      toolbarLabel={organization.name}
+      domIds={resolveBuildingOrganizationDiscoveryDomIds(organization.id)}
+      entity={buildOrganizationEntityCardModel(buildOrganizationEntitySummaryVm(organization), {
+        status: selectState.selectDisabledReason
+          ? [{ kind: 'text', label: selectState.selectDisabledReason }]
+          : undefined,
+      })}
+      selection={{
+        value: organization.id,
+        disabled: selectState.selectDisabled,
       }}
     />
   )
@@ -167,9 +174,10 @@ function BuildingOrganizationDiscoveryBody({
     isError,
     visibleOrganizations,
     kindOptionsFor,
-    selectExistingOrganization,
     enterNewOrganizationBranch,
     resolveBuildingOrganizationSelectState,
+    selectedOrganization,
+    selectExistingOrganization,
   } = controller
 
   return (
@@ -202,16 +210,23 @@ function BuildingOrganizationDiscoveryBody({
         {!isPending && !isError && visibleOrganizations.length === 0 ? (
           <Text variant="muted">{BUILDING_ORGANIZATIONS_EMPTY_SEARCH_LABEL}</Text>
         ) : null}
-        {visibleOrganizations.map((organization) => (
-          <BuildingOrganizationDiscoveryRow
-            key={organization.id}
-            organization={organization}
-            kind={kind}
-            kindOptionsFor={kindOptionsFor}
-            selectExistingOrganization={selectExistingOrganization}
-            resolveBuildingOrganizationSelectState={resolveBuildingOrganizationSelectState}
-          />
-        ))}
+        <RadioGroup
+          aria-label={BUILDING_ORGANIZATIONS_DISCOVERY_HEADING}
+          value={
+            selectedOrganization?.kind === 'existing' ? selectedOrganization.organizationId : ''
+          }
+          onValueChange={selectExistingOrganization}
+        >
+          {visibleOrganizations.map((organization) => (
+            <BuildingOrganizationDiscoveryRow
+              key={organization.id}
+              organization={organization}
+              kind={kind}
+              kindOptionsFor={kindOptionsFor}
+              resolveBuildingOrganizationSelectState={resolveBuildingOrganizationSelectState}
+            />
+          ))}
+        </RadioGroup>
       </div>
     </div>
   )

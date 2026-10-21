@@ -29,7 +29,7 @@ describe('FormCard', () => {
         </form>
       </FormCard>,
     )
-    expect(container.firstElementChild).toHaveClass('shadow-surface-raised')
+    expect(container.firstElementChild).toHaveClass('ui-card', 'ui-card--comfortable')
     // Exactly the child form; FormCard adds none, so a nested <form> never occurs.
     expect(container.querySelectorAll('form')).toHaveLength(1)
   })

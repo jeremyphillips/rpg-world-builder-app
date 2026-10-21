@@ -6,7 +6,7 @@ import {
   type GlobalSearchDocument,
   type ViewerCharacterRelationships,
 } from '@rpg/contracts'
-import { IdentityRow, InteractiveListRow, cn, interactiveFocusVariants } from '@rpg/ui'
+import { DestinationItem, IdentityRow } from '@rpg/ui'
 
 import {
   entitySurfaceMetadataFromText,
@@ -22,7 +22,6 @@ export type SearchResultRowProps = {
   href: string
   campaignUnavailable?: boolean
   onActivate?: () => void
-  className?: string
   viewerCharacterRelationships?: ViewerCharacterRelationships
 }
 
@@ -31,7 +30,6 @@ export function SearchResultRow({
   href,
   campaignUnavailable = false,
   onActivate,
-  className,
   viewerCharacterRelationships,
 }: SearchResultRowProps) {
   const { title, secondary, typeLabel, target, displayImage } = document
@@ -62,7 +60,8 @@ export function SearchResultRow({
   })
 
   return (
-    <InteractiveListRow
+    <DestinationItem
+      link={<Link to={href} onClick={onActivate} aria-label={accessibleName} />}
       startSlot={presentation.startSlot}
       content={
         <IdentityRow
@@ -70,25 +69,16 @@ export function SearchResultRow({
           classification={presentation.classification}
           supporting={presentation.supporting}
           status={presentation.status}
-          size="md"
         />
       }
-      className={className}
-      trailingAction={
+      trailingInfo={
         viewerCharacterRelationships ? (
           <CharacterRelationshipIndicator
+            presentation="inlinePassive"
             viewerCharacterRelationships={viewerCharacterRelationships}
           />
         ) : undefined
       }
-      asChild
-    >
-      <Link
-        to={href}
-        className={cn(interactiveFocusVariants({ context: 'standalone' }))}
-        onClick={onActivate}
-        aria-label={accessibleName}
-      />
-    </InteractiveListRow>
+    />
   )
 }

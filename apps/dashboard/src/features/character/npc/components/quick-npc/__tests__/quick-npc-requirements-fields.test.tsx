@@ -67,7 +67,7 @@ describe('QuickNpcRequirementsFields', () => {
     render(<RequirementsFieldsHarness />)
 
     await user.click(screen.getByRole('combobox', { name: 'Spells' }))
-    await user.type(screen.getByRole('searchbox', { name: 'Search Spells' }), 'fire')
+    await user.type(screen.getByRole('searchbox', { name: 'Search spells…' }), 'fire')
 
     expect(screen.getByRole('option', { name: /Fire Bolt/i })).toBeInTheDocument()
   })

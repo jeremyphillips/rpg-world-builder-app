@@ -114,3 +114,34 @@ export const AllDensities: Story = {
     </div>
   ),
 }
+
+export const WithLeading: Story = {
+  args: {
+    variant: 'warning',
+    announcement: 'none',
+    title: 'Reconnect to Stormwatch',
+    description: 'Your campaign connection needs to be restored.',
+    actions: <Button size="sm">Reconnect character</Button>,
+  },
+  render: (args) => (
+    <Alert
+      {...args}
+      leading={
+        <span className="inline-flex size-5 items-center justify-center rounded-full bg-warning-subtle text-warning">
+          !
+        </span>
+      }
+    />
+  ),
+}
+
+export const PersistentDashboardWarning: Story = {
+  args: {
+    variant: 'warning',
+    density: 'comfortable',
+    announcement: 'none',
+    title: 'Stormwatch — connection needs restore',
+    description: 'Your campaign character connection needs to be restored.',
+    actions: <Button size="sm">Reconnect character</Button>,
+  },
+}

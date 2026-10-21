@@ -11,11 +11,12 @@ import { z } from 'zod'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
-  movementRowsToRecordForPreview,
   refineMovementRows,
   type MovementRowDraftFormValues,
 } from '../../lib/forms/fields/content-movement-form-fields'
+import { normalizeMonsterFormValues } from './normalize-monster-form-values'
 import { stripMonsterHitPointsAuthoringFields } from './statistics/monster-hit-points-form.lib'
+import type { MonsterFormValues } from './monster-form-values'
 
 function catalogLoadStatus(
   status: ContentFormCtx['equipmentCatalogStatus'],
@@ -41,10 +42,10 @@ function adaptMonsterFormMovementForBodySchema(input: unknown): unknown {
   const stripped = stripMonsterHitPointsAuthoringFields(input)
   const movement = stripped.movement
   if (!Array.isArray(movement)) return stripped
-  return {
-    ...stripped,
-    movement: movementRowsToRecordForPreview(movement as MovementRowDraftFormValues[]),
-  }
+  return normalizeMonsterFormValues({ ...stripped, movement } as MonsterFormValues, {
+    intent: 'draft',
+    mode: 'create',
+  })
 }
 
 /** Draft or publish body schema plus the shared catalog collector. */

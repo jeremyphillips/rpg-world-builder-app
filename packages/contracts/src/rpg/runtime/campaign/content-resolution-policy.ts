@@ -3,15 +3,19 @@ import {
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   type ResolvedContentCampaignAccess,
 } from '../../content/lib/campaign-access'
+import {
+  isContentCampaignEligible,
+  type ContentResolutionRow,
+} from '../../content/lib/content-resolution-policy'
 
 import type { ContentPlayActor } from './content-play-actor'
 import { isContentDiscoverableForViewer } from './content-viewer-discovery'
 
-/** Minimal row shape for content resolution predicates. */
-export type ContentResolutionRow = {
-  status?: string
-  campaignAccess?: ResolvedContentCampaignAccess
-}
+export {
+  isContentCampaignEligible,
+  isContentReferenceable,
+  type ContentResolutionRow,
+} from '../../content/lib/content-resolution-policy'
 
 function resolveCampaignAccess(row: ContentResolutionRow): ResolvedContentCampaignAccess {
   return row.campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS
@@ -31,21 +35,6 @@ export function isContentVisibleToViewer(
   }
 
   return isContentDiscoverableForViewer(resolveCampaignAccess(row), viewer)
-}
-
-/** Whether content is stable enough to create a new authored relationship. */
-export function isContentReferenceable(row: ContentResolutionRow): boolean {
-  return row.status !== 'draft'
-}
-
-/** Whether referenceable content is enabled for use in this campaign (availability on). */
-export function isContentCampaignEligible(row: ContentResolutionRow): boolean {
-  if (!isContentReferenceable(row)) {
-    return false
-  }
-
-  const access = resolveCampaignAccess(row)
-  return access.available !== false && access.effectiveAudience !== 'none'
 }
 
 /**

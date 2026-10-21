@@ -648,11 +648,11 @@ function ActionDetailPane({
   equipmentSelectRef: RefObject<HTMLSelectElement | null>
   descriptionId: string
 }) {
+  const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
+  const provider = useMemo(() => createMagicPropertyDefinitionProvider(rulesetId), [rulesetId])
   if (!located) return <p>{MONSTER_ACTION_DETAIL_EMPTY}</p>
   const values = form.getValues()
   const catalog = monsterEquipmentCatalog(ctx)
-  const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
-  const provider = useMemo(() => createMagicPropertyDefinitionProvider(rulesetId), [rulesetId])
   const advisories = collectMonsterFormAdvisories(values, catalog)
     .filter((advisory) => advisory.path.startsWith(`${located.section}.${located.index}`))
     .map((advisory) => advisory.message)

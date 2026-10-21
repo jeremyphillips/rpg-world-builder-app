@@ -68,7 +68,7 @@ describe('GlobalSearchGroupSection', () => {
 
     expect(screen.queryByRole('link', { name: /Show all/i })).not.toBeInTheDocument()
     expect(container.querySelector('section')).not.toHaveClass('pb-4')
-    expect(container.querySelector('[class*="[&>*+*]:border-t"]')).toBeInTheDocument()
+    expect(container.querySelector('.ui-destination-list--embedded')).toBeInTheDocument()
     expect(groupHeading('Game terms', 2)).toBeInTheDocument()
   })
 
@@ -83,12 +83,12 @@ describe('GlobalSearchGroupSection', () => {
 
     const { container } = renderSection(sections[0]!, 0, sections)
     const heading = groupHeading('Content', 1)
-    const list = container.querySelector('.bg-surface-lift')
+    const list = container.querySelector('.ui-destination-list--embedded')
     const row = rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))
 
-    expect(heading).toHaveClass('bg-surface-faint', 'pt-2')
-    expect(list).toHaveClass('[&>*+*]:border-t', '[&>*+*]:border-border-faint')
-    expect(row).toHaveClass('px-3', 'py-2')
+    expect(heading).toHaveClass('ui-interactive-list__heading--first', 'bg-surface-faint')
+    expect(list).toBeInTheDocument()
+    expect(row).toHaveClass('ui-destination-item__link', 'ui-interactive-row--hover-navigation')
   })
 
   it('renders truncated groups with show-all and bottom spacing', () => {
@@ -130,8 +130,7 @@ describe('GlobalSearchGroupSection', () => {
     renderSection(sections[1]!, 1, sections)
     const heading = groupHeading('Content', 14)
 
-    expect(heading.className).toContain('border-t')
-    expect(heading.className).toContain('border-border-subtle')
+    expect(heading).toHaveClass('ui-interactive-list__heading--follows-complete')
   })
 
   it('omits a top border when following a truncated group', () => {
@@ -151,7 +150,7 @@ describe('GlobalSearchGroupSection', () => {
     renderSection(sections[1]!, 1, sections)
     const heading = groupHeading('Game terms', 1)
 
-    expect(heading.className).not.toContain('border-t')
+    expect(heading.className).not.toContain('ui-interactive-list__heading--follows-complete')
   })
 
   itAxe('has no axe accessibility violations', async () => {

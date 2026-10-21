@@ -3,7 +3,7 @@ import type { ArrayItemShellRenderProps } from '@rpg/ui/form'
 import type { ReactElement } from 'react'
 
 import type { EntitySummaryStatusItem } from '../../../summary/entity-summary-status.types'
-import { DisclosureEntityCard } from './disclosure-entity-card'
+import { EntityCard } from '../content/entity-card'
 import { projectArrayItemEntitySummary } from './array-item-entity-summary.lib'
 
 export type EntityDisclosureArrayItemShellProps = ArrayItemShellRenderProps & {
@@ -20,7 +20,7 @@ export type EntityDisclosureArrayItemShellProps = ArrayItemShellRenderProps & {
 
 /**
  * Form-array presentation bridge: keeps RHF ownership (prefix, action rail,
- * field children) while DisclosureEntityCard owns card chrome and content-column
+ * field children) while EntityCardDisclosureRenderer owns card chrome and content-column
  * alignment. Do not wrap this in ArrayItemShell / local card chrome.
  */
 export function EntityDisclosureArrayItemShell({
@@ -48,7 +48,8 @@ export function EntityDisclosureArrayItemShell({
 
   return (
     <div data-array-item-prefix={itemPrefix}>
-      <DisclosureEntityCard
+      <EntityCard
+        variant="disclosure"
         itemId={itemId}
         toolbarAriaLabel={toolbarAriaLabel ?? header.ariaLabel}
         entity={entity}
@@ -67,7 +68,7 @@ export function EntityDisclosureArrayItemShell({
         density={density}
       >
         {children}
-      </DisclosureEntityCard>
+      </EntityCard>
     </div>
   )
 }

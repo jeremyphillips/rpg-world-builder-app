@@ -23,21 +23,22 @@ function spellDocument(overrides: Partial<GlobalSearchDocument> = {}): GlobalSea
   }
 }
 
-function rowShell(link: HTMLElement): HTMLElement {
-  return link.parentElement!
-}
-
 describe('SearchResultRow', () => {
-  it('uses selectable row-hover interaction on the list shell', () => {
+  it('uses navigation row-hover interaction on the destination link', () => {
     renderWithProviders(
       <SearchResultRow document={spellDocument()} href="/campaigns/c1/spells/fireball" />,
     )
 
     const link = screen.getByRole('link', { name: 'Fireball, Spell' })
-    const shell = rowShell(link)
-    expect(shell.className).toContain('ui-interactive-row--hover-list')
-    expect(shell.className).not.toContain('control-hover')
-    expect(shell.className).not.toContain('bg-accent')
+    expect(link.className).toContain('ui-interactive-row--hover-navigation')
+    expect(link.className).not.toContain('ui-interactive-row--hover-list')
+  })
+
+  it('renders a navigation chevron by default', () => {
+    const { container } = renderWithProviders(
+      <SearchResultRow document={spellDocument()} href="/campaigns/c1/spells/fireball" />,
+    )
+    expect(container.getElementsByClassName('ui-destination-item__chevron')).toHaveLength(1)
   })
 
   it('renders presentation fields and navigates via link', () => {
@@ -97,11 +98,14 @@ describe('SearchResultRow', () => {
 
     const name = screen.getByText('Fireball')
     const classification = screen.getByText('Spell')
-    const mixedHeadingRow = name.parentElement as HTMLElement
+    const mixedHeadingRow = name.parentElement?.parentElement as HTMLElement
 
-    expect(mixedHeadingRow).toContainElement(classification)
-    expect(mixedHeadingRow.textContent).toContain('Fireball')
-    expect(mixedHeadingRow.textContent).toContain('Spell')
+    expect(name.className).not.toMatch(/\bflex-1\b/)
+    expect(classification.className).toMatch(/\bshrink-0\b/)
+    expect(
+      mixedHeadingRow.querySelector('[data-inline-metadata-separator]')?.textContent,
+    ).toContain('·')
+    expect(mixedHeadingRow).toHaveTextContent('Fireball · Spell')
   })
 
   it('renders a semantic fallback icon for spell hits without displayImage', () => {
@@ -120,7 +124,7 @@ describe('SearchResultRow', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('renders relationship indicator outside the navigable link', () => {
+  it('exposes relationship copy on the link and passive indicator inside the link', () => {
     renderWithProviders(
       <SearchResultRow
         document={spellDocument({
@@ -145,9 +149,39 @@ describe('SearchResultRow', () => {
 
     const link = screen.getByRole('link', { name: 'Champion, Subclass of Aric, Subclass' })
     expect(link).toHaveAttribute('href', '/campaigns/c1/classes/fighter/subclasses/champion')
-    expect(screen.getByRole('img', { name: 'Subclass of Aric' })).toBeInTheDocument()
-    expect(link).not.toContainElement(screen.getByRole('img', { name: 'Subclass of Aric' }))
-    expect(rowShell(link)).toContainElement(screen.getByRole('img', { name: 'Subclass of Aric' }))
+    expect(screen.queryByRole('img', { name: 'Subclass of Aric' })).not.toBeInTheDocument()
+    const passiveIndicator = link.querySelector('span[aria-hidden="true"]')
+    expect(passiveIndicator).toBeTruthy()
+    expect(link).toContainElement(passiveIndicator as HTMLElement)
+  })
+
+  it('does not add a separate tab stop for the passive relationship indicator', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(
+      <SearchResultRow
+        document={spellDocument({
+          title: 'Champion',
+          typeLabel: 'Subclass',
+          target: { kind: 'class', id: 'champion' },
+        })}
+        href="/campaigns/c1/classes/fighter/subclasses/champion"
+        viewerCharacterRelationships={{
+          count: 1,
+          groups: [
+            {
+              kind: 'subclass',
+              count: 1,
+              relationships: [{ kind: 'subclass', characterId: '1', characterName: 'Aric' }],
+            },
+          ],
+        }}
+      />,
+    )
+
+    await user.tab()
+    expect(screen.getByRole('link')).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole('link')).not.toHaveFocus()
   })
 
   itAxe('has no axe accessibility violations with relationships', async () => {

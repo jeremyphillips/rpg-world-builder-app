@@ -26,7 +26,7 @@ import {
 } from '@rpg/contracts'
 import { dragHandleVariants } from '@rpg/ui'
 
-import { ContentEntityCard } from '@/features/content'
+import { EntityCard } from '@/features/content'
 import { resolveSortableArrayMove } from '../../../lib/utils/sortable-array-move.lib'
 
 export type SortableAbilityScoreOrderProps = {
@@ -71,23 +71,28 @@ function SortableAbilityScoreOrderRow({
 
   return (
     <div ref={setNodeRef} style={style} data-dragging={isDragging ? 'true' : undefined}>
-      <ContentEntityCard
+      <EntityCard
         density="compact"
         disabled={disabled}
         entity={{ heading: ABILITY_ENTRIES[ability].label }}
         headingEndValue={projectedScore}
         leading={
-          disabled ? null : (
-            <button
-              type="button"
-              className={dragHandleVariants({ visibility: 'always', dragging: isDragging })}
-              aria-label={`Drag to reorder ${ABILITY_ENTRIES[ability].label}`}
-              {...attributes}
-              {...listeners}
-            >
-              <GripVertical className="size-3.5" aria-hidden />
-            </button>
-          )
+          disabled
+            ? undefined
+            : {
+                kind: 'title',
+                content: (
+                  <button
+                    type="button"
+                    className={dragHandleVariants({ visibility: 'always', dragging: isDragging })}
+                    aria-label={`Drag to reorder ${ABILITY_ENTRIES[ability].label}`}
+                    {...attributes}
+                    {...listeners}
+                  >
+                    <GripVertical className="size-3.5" aria-hidden />
+                  </button>
+                ),
+              }
         }
       />
     </div>

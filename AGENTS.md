@@ -41,7 +41,7 @@ narrowest relevant Vitest paths → targeted typecheck/lint when useful → broa
 - **Affected graph:** use `pnpm test:affected`, `pnpm test:affected:local`, or
   `pnpm lint:affected` / `pnpm typecheck:affected` when shared packages, wide blast
   radius, or unclear regressions justify the cost—not as a routine end-of-task step.
-  Broad affected typecheck/tests run at **push** via `pnpm gate:pre-push`, not on every
+  Broad affected typecheck, lint, and tests run at **push** via `pnpm gate:pre-push`, not on every
   commit.
 - **`pnpm test:affected:gate`:** collect-all package tests on the `…[origin/main]` graph
   (`--continue=always`, failure summary, nonzero when any package fails). Invoked from
@@ -71,7 +71,7 @@ Commit message format is enforced in **commit-msg** (`commitlint`), after pre-co
 **Pre-push** (broad affected correctness before sharing; single script):
 
 ```text
-pnpm gate:pre-push   # typecheck:ci → test:affected:gate (…[origin/main]) → coverage → gate:fallow-health:coverage → build
+pnpm gate:pre-push   # gate:ci:quality → test:affected:gate (…[origin/main]) → coverage → gate:fallow-health:coverage → build
 ```
 
 `pnpm build` excludes `@rpg/bench` (internal dev tooling). Use `pnpm build:bench`
@@ -190,10 +190,11 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
   [apps/dashboard/docs/form-lib-conventions.md](apps/dashboard/docs/form-lib-conventions.md).
 - Entity surfaces: do not add consumer-local spacing, typography, border, radius,
   alignment, divider, or chrome overrides to `EntityAnatomyHost`,
-  `ContentEntityCard`, or `DisclosureEntityCard`. First determine whether the
-  change belongs to the shared surface; genuine domain layout remains inside DEC
-  children. Ownership hierarchy and per-primitive contracts →
-  [content-entity-card.md](apps/dashboard/docs/content-entity-card.md).
+  `EntityCardStaticRenderer`, or `EntityCardDisclosureRenderer`. First determine whether the
+  change belongs to the shared surface; genuine domain layout remains inside
+  disclosure body `children`. Surface selection →
+  [card-guide.md](apps/dashboard/docs/card-guide.md); ownership and enforcement →
+  [entity-surfaces.md](apps/dashboard/docs/entity-surfaces.md).
 
 ## Accessibility
 
