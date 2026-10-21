@@ -388,7 +388,9 @@ describe('EquipmentInventorySummary', () => {
       'aria-expanded',
       'false',
     )
-    expect(container.querySelector('.rounded-lg.border')).toBeInTheDocument()
+    const inventoryHost = container.firstElementChild
+    expect(inventoryHost).toHaveClass('overflow-hidden', 'rounded-lg', 'border-border')
+    expect(inventoryHost).not.toHaveClass('ui-card', 'bg-surface-subtle')
   })
 
   it('renders a title badge and outline panel when added inventory has entries', () => {
@@ -430,7 +432,9 @@ describe('EquipmentInventorySummary', () => {
 
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.getByText('Battleaxe')).toBeInTheDocument()
-    expect(container.querySelector('.rounded-lg.border')).toBeInTheDocument()
+    const inventoryHost = container.firstElementChild
+    expect(inventoryHost).toHaveClass('overflow-hidden', 'rounded-lg', 'border-border')
+    expect(inventoryHost).not.toHaveClass('ui-card', 'bg-surface-subtle')
   })
 
   it('counts only added purchases in the title badge when a package also provides the item', () => {

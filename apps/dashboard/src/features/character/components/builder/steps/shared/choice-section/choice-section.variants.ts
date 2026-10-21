@@ -25,9 +25,8 @@ export const choiceSectionHeaderDetailsClasses = 'col-span-2 row-start-2 min-w-0
 
 export const choiceSectionDividerClasses = 'border-t border-border'
 
-export const choiceSectionSelectedListClasses = `space-y-2 ${choiceSubsectionBodyMarginClasses}`
-
-export const choiceSectionGrantedListClasses = `space-y-2 ${choiceSubsectionBodyMarginClasses}`
+/** Selected and granted entity rows within a flat choice section. */
+export const choiceSectionEntityListClasses = `space-y-2 ${choiceSubsectionBodyMarginClasses}`
 
 export const choiceSectionChoiceBlocksClasses = 'space-y-4'
 

@@ -4,9 +4,8 @@ import { EmptyPanel, Text } from '@rpg/ui'
 import { ChoiceGrantedRow } from './choice-granted-row'
 import { ChoiceSelectedRow } from './choice-selected-row'
 import {
-  choiceSectionGrantedListClasses,
+  choiceSectionEntityListClasses,
   choiceSectionOverSelectionClasses,
-  choiceSectionSelectedListClasses,
   choiceSubsectionBodyMarginClasses,
 } from './choice-section.variants'
 
@@ -44,7 +43,7 @@ export function ChoiceSectionFlatBody({
       ) : null}
 
       {hasGrantedRows ? (
-        <ul className={choiceSectionGrantedListClasses}>
+        <ul className={choiceSectionEntityListClasses}>
           {section.grantedRows.map((row) => (
             <li key={row.id}>
               <ChoiceGrantedRow row={row} />
@@ -54,7 +53,7 @@ export function ChoiceSectionFlatBody({
       ) : null}
 
       {hasSelectedRows ? (
-        <ul className={choiceSectionSelectedListClasses}>
+        <ul className={choiceSectionEntityListClasses}>
           {section.selectedRows.map((row) => (
             <li key={`${row.choiceSetId}:${row.optionId}`}>
               <ChoiceSelectedRow

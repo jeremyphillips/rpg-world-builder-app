@@ -13,7 +13,6 @@ import { EquipmentPackageSwitchResolutionModal } from './package-switch/equipmen
 import { EquipmentPickerDrawer } from '../../../equipment/picker/drawer/equipment-picker-drawer'
 import { EquipmentSelectionFactsProvider } from '../../../equipment/selection-facts/equipment-selection-facts-provider'
 import { StartingEquipmentOptionSection } from '../../../equipment/starting-package/starting-equipment-option-section'
-import { equipmentStepSwitchConfirmHeadlineClasses } from './equipment-step-interactive.variants'
 import {
   EquipmentStepFallback,
   EquipmentStepInventorySection,
@@ -209,7 +208,7 @@ export function EquipmentStepInteractive({
           if (!open) setPendingSelection(null)
         }}
         headline={EQUIPMENT_STEP_SWITCH_CONFIRM_HEADLINE}
-        headlineClassName={equipmentStepSwitchConfirmHeadlineClasses}
+        headlineClassName="mb-3 heading-style-subsection"
         description={EQUIPMENT_STEP_SWITCH_CONFIRM_DESCRIPTION}
         confirmLabel="Switch equipment"
         cancelLabel="Keep current selection"

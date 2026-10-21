@@ -10,10 +10,11 @@ import {
   BuildCardRoleAttributeRow,
   BuildCardTemplateIdentity,
 } from './quick-npc-build-card-parts'
+import { collectionPanelLiftShellClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+
 import {
   quickNpcBuildCardAttributesShellClasses,
   quickNpcBuildCardSectionClasses,
-  quickNpcBuildCardShellClasses,
 } from './quick-npc-build-card.variants'
 
 export type QuickNpcBuildCardProps = {
@@ -50,7 +51,7 @@ export function QuickNpcBuildCard({
   return (
     <section className={className ?? quickNpcBuildCardSectionClasses}>
       <Eyebrow size="md">{model.sectionEyebrow}</Eyebrow>
-      <article className={quickNpcBuildCardShellClasses}>
+      <article className={collectionPanelLiftShellClasses}>
         {model.showTemplateIdentity && model.templateLabel ? (
           <BuildCardTemplateIdentity
             templateLabel={model.templateLabel}

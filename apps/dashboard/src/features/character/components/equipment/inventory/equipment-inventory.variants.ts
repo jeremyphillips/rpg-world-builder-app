@@ -1,7 +1,12 @@
-/** One bordered inventory card. Section inset is owned by the equipment feature. */
-export const equipmentInventoryPanelClasses = 'overflow-hidden rounded-lg border border-border'
+import { cn } from '@rpg/ui'
 
-export const equipmentInventorySectionClasses = 'space-y-3 px-4 py-4'
+import { collectionPanelComfortableInsetClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+
+/** Section inset inside the inventory collection host. */
+export const equipmentInventorySectionClasses = cn(
+  collectionPanelComfortableInsetClasses,
+  'space-y-3',
+)
 
 export {
   EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,
@@ -9,8 +14,6 @@ export {
   equipmentPurchasedInventoryCategoryClasses,
   equipmentPurchasedInventoryCategoryListClasses,
 } from '@/lib/equipment/equipment-inventory-list.variants'
-
-export const equipmentInventoryPanelDividerClasses = 'border-t border-border'
 
 export const equipmentInventoryRowQuantityClasses = 'flex items-center gap-1.5'
 

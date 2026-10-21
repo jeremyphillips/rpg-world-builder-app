@@ -1,6 +1,8 @@
 import type { EquipmentPackageSwitchEvaluation } from '@rpg/contracts'
 import { Text, cn } from '@rpg/ui'
 
+import { collectionPanelMutedSummaryClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+
 import {
   PACKAGE_SWITCH_BUDGET_AVAILABLE_LABEL,
   PACKAGE_SWITCH_BUDGET_CURRENT_PURCHASES_LABEL,
@@ -13,7 +15,6 @@ import {
   equipmentPackageSwitchResolutionBudgetRowClasses,
   equipmentPackageSwitchResolutionBudgetStatusRowClasses,
   equipmentPackageSwitchResolutionBudgetStatusVariants,
-  equipmentPackageSwitchResolutionBudgetSummaryClasses,
   equipmentPackageSwitchResolutionBudgetSummaryTitleClasses,
   equipmentPackageSwitchResolutionBudgetValueClasses,
 } from './equipment-package-switch-resolution-modal.variants'
@@ -64,7 +65,7 @@ export function PackageSwitchBudgetSummary({
     <section
       aria-live="polite"
       aria-label="Budget summary"
-      className={equipmentPackageSwitchResolutionBudgetSummaryClasses}
+      className={collectionPanelMutedSummaryClasses}
     >
       <Text as="p" className={equipmentPackageSwitchResolutionBudgetSummaryTitleClasses}>
         Budget summary

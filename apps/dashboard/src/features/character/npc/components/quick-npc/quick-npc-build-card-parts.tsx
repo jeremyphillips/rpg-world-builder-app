@@ -14,7 +14,7 @@ import {
   resolveQuickNpcBuildCardExpandActionLabel,
 } from '../../lib/quick-npc/quick-npc-build-card.lib'
 import {
-  quickNpcBuildCardDescriptionVariants,
+  quickNpcBuildCardDescriptionClasses,
   quickNpcBuildCardIdentityRowClasses,
   quickNpcBuildCardIdentityTitleClasses,
   quickNpcBuildCardLevelEditorClasses,
@@ -75,7 +75,7 @@ export function BuildCardTemplateIdentity({
         </Text>
       </div>
       {templateDescription ? (
-        <Text as="p" className={quickNpcBuildCardDescriptionVariants()}>
+        <Text as="p" className={quickNpcBuildCardDescriptionClasses}>
           {templateDescription}
         </Text>
       ) : null}

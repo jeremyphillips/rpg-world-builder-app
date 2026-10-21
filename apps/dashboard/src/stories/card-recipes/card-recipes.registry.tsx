@@ -46,8 +46,12 @@ import {
 } from '@/features/content'
 import { DetailEntityRow } from '@/features/content/lib/detail/row/entity/detail-entity-row'
 import { DrawerEntityBlock } from '@/features/content/lib/entity/surfaces/drawer/drawer-entity-block'
+import { AbilityRecommendationPanel } from '@/features/character/components/builder/steps/abilities/recommendation/ability-recommendation-panel'
+import { EquipmentStepTierSummary } from '@/features/character/components/builder/steps/equipment/equipment-step-tier-summary'
 import { EquipmentAcquisitionGuidance } from '@/features/character/components/equipment/acquisition/equipment-acquisition-guidance'
 import { EquipmentResourceSummary } from '@/features/character/components/equipment/acquisition/equipment-resource-summary'
+import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
+import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import { BuilderStepChooseClassPrompt } from '@/features/character/components/builder/steps/shared/builder-step-choose-class-prompt'
 import { BuilderFactSummary } from '@/features/character/components/builder/steps/shared/fact-summary/builder-fact-summary'
 import { ChoiceSection } from '@/features/character/components/builder/steps/shared/choice-section/choice-section'
@@ -508,9 +512,9 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     name: 'Builder choice section',
     section: 'ui-cards-form-rows',
     component: 'ChoiceSection',
-    chain: ['Card', 'CardContent', 'ChoiceSectionHeader', 'EntityCard'],
+    chain: ['collection panel shell', 'ChoiceSectionHeader', 'EntityCard'],
     useWhen:
-      'Interactive builder choice wells — subtle Card wraps section header, dividers, and entity selected rows.',
+      'Interactive builder choice wells — collection panel host (not Card) wraps header, dividers, and entity selected rows.',
     density: 'comfortable',
     leading: 'none',
     trailing: 'add action (header)',
@@ -592,6 +596,47 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
             },
           ]}
           onOpenMagicItemsPicker={noop}
+        />
+      </div>
+    ),
+  },
+  {
+    name: 'Equipment step tier summary',
+    section: 'ui-cards-form-rows',
+    component: 'EquipmentStepTierSummary',
+    chain: ['Collapsible', 'Card', 'CardContent'],
+    useWhen: 'Equipment step — collapsible tier benefits (Card body only; not a collection panel).',
+    density: 'compact',
+    leading: 'none',
+    trailing: 'disclosure caret',
+    anatomy: 'different',
+    render: () => (
+      <div className="max-w-md">
+        <EquipmentStepTierSummary
+          startingWealth={getStandardStartingWealthRules(DEFAULT_SYSTEM_RULESET_ID)}
+          startingLevel={5}
+          defaultOpen
+        />
+      </div>
+    ),
+  },
+  {
+    name: 'Ability recommendation callout',
+    section: 'ui-cards-form-rows',
+    component: 'AbilityRecommendationPanel',
+    chain: ['Card', 'CardContent', 'Button'],
+    useWhen: 'Abilities step advisory callout when class is missing or recommendations apply.',
+    density: 'compact',
+    leading: 'none',
+    trailing: 'text apply action',
+    anatomy: 'different',
+    render: () => (
+      <div className="max-w-lg">
+        <AbilityRecommendationPanel
+          classInput={null}
+          classStepApplicable
+          recommendation={null}
+          currentScores={{}}
         />
       </div>
     ),

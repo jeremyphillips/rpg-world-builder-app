@@ -8,6 +8,3 @@ export const quickNpcPackageCustomizationFooterActionsClasses = 'flex items-cent
 export const quickNpcPackageCustomizationLockClasses = 'text-style-caption'
 
 export const quickNpcPackageHeaderActionsClasses = 'flex items-center gap-1'
-
-export const quickNpcPackageNoPackageClasses =
-  'flex flex-col items-start gap-2 rounded-md border border-border bg-card p-3'

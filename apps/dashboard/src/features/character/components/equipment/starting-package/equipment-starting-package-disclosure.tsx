@@ -159,6 +159,7 @@ export function EquipmentStartingPackageDisclosure({
   }
 
   return (
+    // TODO(disclosure): consolidate ad hoc collapsible trigger/caret with shared @rpg/ui disclosure primitives.
     <Collapsible
       open={open}
       onOpenChange={(next) => {

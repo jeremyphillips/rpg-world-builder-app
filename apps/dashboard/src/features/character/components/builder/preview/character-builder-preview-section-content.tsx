@@ -3,9 +3,13 @@ import type { ReactNode } from 'react'
 import { cn } from '@rpg/ui'
 
 import {
-  characterBuilderPreviewSectionHintClasses,
+  collectionPanelComfortableInsetClasses,
+  collectionPanelShellClasses,
+} from '@/lib/collection-panel/collection-panel-shell.variants'
+
+import {
+  characterBuilderPreviewHintClasses,
   characterBuilderPreviewSubsectionClasses,
-  characterBuilderPreviewSubsectionHintClasses,
   characterBuilderPreviewSubsectionTitleClasses,
   characterBuilderPreviewSubsectionsGroupClasses,
 } from './character-builder-preview-section-content.variants'
@@ -33,8 +37,16 @@ export function CharacterBuilderPreviewSectionContent({
   if (layout === 'subsections') {
     return (
       <div className={cn('flex flex-col gap-3', className)}>
-        {hint ? <p className={characterBuilderPreviewSectionHintClasses}>{hint}</p> : null}
-        <div className={characterBuilderPreviewSubsectionsGroupClasses}>{children}</div>
+        {hint ? <p className={characterBuilderPreviewHintClasses}>{hint}</p> : null}
+        <div
+          className={cn(
+            collectionPanelShellClasses,
+            collectionPanelComfortableInsetClasses,
+            characterBuilderPreviewSubsectionsGroupClasses,
+          )}
+        >
+          {children}
+        </div>
       </div>
     )
   }
@@ -42,7 +54,7 @@ export function CharacterBuilderPreviewSectionContent({
   if (hint) {
     return (
       <div className={cn('flex flex-col gap-3', className)}>
-        <p className={characterBuilderPreviewSectionHintClasses}>{hint}</p>
+        <p className={characterBuilderPreviewHintClasses}>{hint}</p>
         {children}
       </div>
     )
@@ -75,5 +87,5 @@ export type CharacterBuilderPreviewSubsectionHintProps = {
 export function CharacterBuilderPreviewSubsectionHint({
   children,
 }: CharacterBuilderPreviewSubsectionHintProps) {
-  return <p className={characterBuilderPreviewSubsectionHintClasses}>{children}</p>
+  return <p className={characterBuilderPreviewHintClasses}>{children}</p>
 }

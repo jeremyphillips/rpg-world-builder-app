@@ -1,6 +1,11 @@
 import type { BuilderChoiceSectionModel } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { Card, CardContent } from '@rpg/ui'
+import { cn } from '@rpg/ui'
+
+import {
+  collectionPanelComfortableInsetClasses,
+  collectionPanelShellClasses,
+} from '@/lib/collection-panel/collection-panel-shell.variants'
 
 import { ChoiceBlockRow } from './choice-block-row'
 import { ChoiceSectionFlatBody } from './choice-section-flat-body'
@@ -51,8 +56,8 @@ export function ChoiceSection({
   const sectionValidationIssues = validationIssuesForSection(validationIssues, section)
 
   return (
-    <Card tone="subtle" density="comfortable" role="region" aria-labelledby={headingId}>
-      <CardContent className={choiceSectionBodyStackClasses}>
+    <section className={collectionPanelShellClasses} role="region" aria-labelledby={headingId}>
+      <div className={cn(collectionPanelComfortableInsetClasses, choiceSectionBodyStackClasses)}>
         <ChoiceSectionHeader
           section={section}
           headingId={headingId}
@@ -89,7 +94,7 @@ export function ChoiceSection({
             onRemoveChoice={onRemoveChoice}
           />
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   )
 }

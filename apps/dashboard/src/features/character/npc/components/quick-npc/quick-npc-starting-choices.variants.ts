@@ -26,15 +26,13 @@ export const quickNpcStartingChoiceRowActionsClasses =
 export const quickNpcStartingChoiceRowStatusSlotClasses =
   'flex size-2.5 shrink-0 items-center justify-center'
 
+// TODO(disclosure): consolidate caret rotation with shared collapsible caret CVA in @rpg/ui.
 export const quickNpcStartingChoiceRowCaretClasses =
   'size-4 shrink-0 text-muted-foreground transition-transform duration-200'
 
 export const quickNpcStartingChoiceRowCaretExpandedClasses = 'rotate-180'
 
 export const quickNpcStartingChoiceExpandedPanelClasses = 'col-span-3 px-3 pb-3'
-
-export const quickNpcStartingChoiceInnerPanelClasses =
-  'flex flex-col rounded-md border border-border bg-surface-faint p-3'
 
 export const quickNpcStartingChoiceInnerSectionClasses =
   'flex flex-col gap-y-2 border-b border-border pb-3 last:border-b-0 last:pb-0 [&:not(:first-child)]:pt-3'

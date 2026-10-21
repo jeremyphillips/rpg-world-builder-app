@@ -4,11 +4,6 @@ import { Button, Card, CardContent, CardDescription, CardTitle, IconContainer } 
 
 import { BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL } from '../../../../lib/builder/builder-step-choose-class-prompt.lib'
 import type { CharacterBuilderNavigateToStep } from '../../../../lib/builder/character-builder-navigation-options'
-import {
-  builderStepChooseClassPromptBodyClasses,
-  builderStepChooseClassPromptContentClasses,
-  builderStepChooseClassPromptTextStackClasses,
-} from './builder-step-choose-class-prompt.variants'
 
 export type BuilderStepChooseClassPromptProps = {
   heading: string
@@ -26,15 +21,13 @@ export function BuilderStepChooseClassPrompt({
   return (
     <Card tone="subtle" density="comfortable" className="w-full min-w-0">
       <CardContent>
-        <div className={builderStepChooseClassPromptBodyClasses}>
+        <div className="flex items-start gap-4">
           <IconContainer shape="circle">
             <Waypoints aria-hidden />
           </IconContainer>
-          <div className={builderStepChooseClassPromptContentClasses}>
-            <div className={builderStepChooseClassPromptTextStackClasses}>
-              <CardTitle>{heading}</CardTitle>
-              <CardDescription>{description}</CardDescription>
-            </div>
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <CardTitle>{heading}</CardTitle>
+            <CardDescription>{description}</CardDescription>
             <Button
               type="button"
               variant="text"

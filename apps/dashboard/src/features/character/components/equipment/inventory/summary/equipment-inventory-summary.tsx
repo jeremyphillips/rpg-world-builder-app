@@ -9,7 +9,7 @@ import type {
   ResolvedStartingEquipmentFunding,
   StartingPackageConversionPreview,
 } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import { DividedStack, Text } from '@rpg/ui'
 
 import { EquipmentInventorySectionHeader } from '@/features/content'
 
@@ -29,11 +29,9 @@ import {
   type AddedEquipmentCategoryGroup,
   type EquipmentInventoryStartingChannel,
 } from '../../../../lib/equipment/equipment-inventory-summary.lib'
-import {
-  equipmentInventoryPanelClasses,
-  equipmentInventoryPanelDividerClasses,
-  equipmentInventorySectionClasses,
-} from '../equipment-inventory.variants'
+import { equipmentCollectionPanelShellClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+
+import { equipmentInventorySectionClasses } from '../equipment-inventory.variants'
 import { useEquipmentSelectionFacts } from '../../../../hooks/use-equipment-selection-facts'
 
 export type EquipmentInventorySummaryProps = {
@@ -207,23 +205,26 @@ export function EquipmentInventorySummary({
     return <Text variant="muted">{emptyMessage}</Text>
   }
 
+  const addedBlock = (
+    <EquipmentAddedInventoryBlock
+      addedEquipment={viewModel.addedEquipment}
+      draft={draft}
+      context={context}
+      catalogIndex={catalogIndex}
+      budget={budget}
+      onRemoveItem={onRemoveItem}
+      onSetPurchaseQuantity={onSetPurchaseQuantity}
+      onReleaseGrant={onReleaseGrant ?? (() => undefined)}
+      onRemovePurchase={onRemovePurchase ?? (() => undefined)}
+      onApplyMagicItemAcquisition={onApplyMagicItemAcquisition ?? (() => false)}
+    />
+  )
+
   return (
-    <div className={equipmentInventoryPanelClasses}>
-      <EquipmentAddedInventoryBlock
-        addedEquipment={viewModel.addedEquipment}
-        draft={draft}
-        context={context}
-        catalogIndex={catalogIndex}
-        budget={budget}
-        onRemoveItem={onRemoveItem}
-        onSetPurchaseQuantity={onSetPurchaseQuantity}
-        onReleaseGrant={onReleaseGrant ?? (() => undefined)}
-        onRemovePurchase={onRemovePurchase ?? (() => undefined)}
-        onApplyMagicItemAcquisition={onApplyMagicItemAcquisition ?? (() => false)}
-      />
+    <div className={equipmentCollectionPanelShellClasses}>
       {viewModel.layout === 'split' ? (
-        <>
-          <div className={equipmentInventoryPanelDividerClasses} role="separator" />
+        <DividedStack density="comfortable">
+          {addedBlock}
           <EquipmentInventoryStartingSection
             startingEquipment={viewModel.startingEquipment}
             draft={draft}
@@ -238,8 +239,10 @@ export function EquipmentInventorySummary({
             onCancelConversion={onCancelConversion}
             onCommitConversion={onCommitConversion}
           />
-        </>
-      ) : null}
+        </DividedStack>
+      ) : (
+        addedBlock
+      )}
     </div>
   )
 }

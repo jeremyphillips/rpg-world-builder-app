@@ -1,11 +1,9 @@
-export const characterBuilderPreviewSectionHintClasses = 'text-style-caption'
+export const characterBuilderPreviewHintClasses = 'text-style-caption'
 
-/** Bordered subsection group — padding applies only here. */
+/** Inner layout for preview subsection frame (shell from collection panel tokens). */
 export const characterBuilderPreviewSubsectionsGroupClasses =
-  'flex flex-col gap-3 rounded-md border border-border pt-3 pb-3 pr-2 pl-2'
+  'flex flex-col gap-3 pt-3 pb-3 pr-2 pl-2'
 
 export const characterBuilderPreviewSubsectionClasses = 'flex flex-col gap-1'
 
 export const characterBuilderPreviewSubsectionTitleClasses = 'text-style-label text-foreground'
-
-export const characterBuilderPreviewSubsectionHintClasses = 'text-style-caption'

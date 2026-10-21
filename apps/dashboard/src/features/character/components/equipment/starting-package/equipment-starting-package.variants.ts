@@ -12,6 +12,7 @@ export const equipmentStartingPackageSubtitleClasses = 'text-style-supporting'
 /** Gold-path empty line — 8px below the Starting Package heading. */
 export const equipmentStartingPackageGoldSubtitleClasses = `${equipmentStartingPackageSubtitleClasses} mt-2`
 
+// TODO(disclosure): consolidate with shared collapsible caret CVA in @rpg/ui.
 export const equipmentStartingPackageChevronVariants = cva('size-4 shrink-0 transition-transform', {
   variants: {
     open: {

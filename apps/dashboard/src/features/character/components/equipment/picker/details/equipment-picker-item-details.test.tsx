@@ -8,7 +8,7 @@ import {
   equipmentPickerBudgetFixture,
   equipmentPickerItemsFixture,
 } from '../drawer/equipment-picker-drawer.fixtures'
-import { equipmentPickerInventorySummaryPanelClasses } from './equipment-picker-inventory-summary.variants'
+import { collectionPanelLedgerBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 import { EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL } from './equipment-picker-character-preview.lib'
 import { EQUIPMENT_PICKER_INVENTORY_SUMMARY_LABEL } from './equipment-picker-inventory-summary'
 import { EQUIPMENT_PICKER_INVENTORY_TOTAL_LABEL } from './equipment-picker-inventory-summary.lib'
@@ -77,7 +77,7 @@ describe('EquipmentPickerItemDetails', () => {
       name: EQUIPMENT_PICKER_INVENTORY_SUMMARY_LABEL,
     }).nextElementSibling
 
-    expect(panel).toHaveClass(equipmentPickerInventorySummaryPanelClasses)
+    expect(panel).toHaveClass(collectionPanelLedgerBodyClasses)
     expect(screen.getByText('Package')).toBeInTheDocument()
     expect(screen.getByText('×1 · 15 GP')).toBeInTheDocument()
     expect(screen.getByText(EQUIPMENT_PICKER_INVENTORY_TOTAL_LABEL)).toBeInTheDocument()
