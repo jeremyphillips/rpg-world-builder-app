@@ -70,7 +70,7 @@ export function LoginForm({ onSuccess, defaultEmail }: LoginFormProps) {
             <SubmitButton pending={form.formState.isSubmitting} pendingLabel="Logging in…">
               Log in
             </SubmitButton>
-            <Text variant="small" className="text-center">
+            <Text variant="supporting" className="text-center">
               No account?{' '}
               <Link
                 href={signupHref}

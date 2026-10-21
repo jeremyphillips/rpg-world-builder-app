@@ -51,6 +51,14 @@ describe('text-style-stack-ratchet.lib', () => {
     ).not.toBeNull()
   })
 
+  it('flags retired Text variant="small"', () => {
+    expect(textTagViolatesMigratedStacks('<Text variant="small">')).toMatch(/retired/)
+  })
+
+  it('flags retired text-style-small utility', () => {
+    expect(classStringViolatesMigratedStacks('text-style-small')).toMatch(/retired/)
+  })
+
   it('allows body + font-medium on Text (deferred)', () => {
     expect(
       textTagViolatesMigratedStacks('<Text variant="body" className="font-medium">'),

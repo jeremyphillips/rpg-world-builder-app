@@ -7,7 +7,7 @@ interface EpicRelatedCodeAreasProps {
 export function EpicRelatedCodeAreas({ areas }: EpicRelatedCodeAreasProps) {
   return (
     <div className="space-y-2">
-      <Text variant="small" className="font-medium">
+      <Text variant="label" className="text-foreground">
         Related code areas
       </Text>
       {areas.length === 0 ? (

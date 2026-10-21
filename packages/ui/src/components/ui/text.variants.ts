@@ -1,13 +1,9 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-/** Shared size token for secondary body copy (15px @ 16px root). */
-export const textSecondaryBodyClasses = 'text-md'
-
 export const TEXT_VARIANT_MAP = {
   body: 'text-style-body',
   muted: 'text-style-muted',
   supporting: 'text-style-supporting',
-  small: 'text-style-small',
   caption: 'text-style-caption',
   label: 'text-style-label',
   emphasis: 'text-style-emphasis',

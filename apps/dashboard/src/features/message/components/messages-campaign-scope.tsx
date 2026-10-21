@@ -46,7 +46,7 @@ function MessagesCampaignScopeUtility({
 
   return (
     <div className={messagesCampaignScopeUtilityClasses}>
-      <Text variant="small">{formatMessagesScopeSummary(scopedCount ?? 0, hiddenCount)}</Text>
+      <Text variant="supporting">{formatMessagesScopeSummary(scopedCount ?? 0, hiddenCount)}</Text>
       <Button type="button" variant="text" size="sm" onClick={onShowAll}>
         {MESSAGES_SCOPE_COPY.showAllLabel}
       </Button>
@@ -129,7 +129,7 @@ export function MessagesOutOfScopePin({
 }: MessagesOutOfScopePinProps) {
   return (
     <div className={`border-b border-border py-3 ${directListChromeInsetClasses}`}>
-      <Text variant="small" className="uppercase tracking-wide">
+      <Text variant="supporting" className="uppercase tracking-wide">
         {MESSAGES_SCOPE_COPY.outOfScopeEyebrow}
       </Text>
       <Link
@@ -138,7 +138,7 @@ export function MessagesOutOfScopePin({
         aria-current={isActive ? 'page' : undefined}
       >
         <Text variant="emphasis">{peerDisplayName}</Text>
-        <Text variant="small">{formatMessagesOutOfScopeSupporting(campaignName)}</Text>
+        <Text variant="supporting">{formatMessagesOutOfScopeSupporting(campaignName)}</Text>
       </Link>
     </div>
   )

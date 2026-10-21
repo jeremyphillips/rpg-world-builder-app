@@ -284,9 +284,5 @@ export function SelectionOptionCardAnatomy({
 
 /** Inline muted text immediately after the card title (e.g. dependent-choice status). */
 export function SelectionOptionCardTitleMeta({ children }: { children: string }) {
-  return (
-    <span className={cn(textVariants({ variant: 'small' }), 'text-muted-foreground')}>
-      {children}
-    </span>
-  )
+  return <span className={textVariants({ variant: 'supporting' })}>{children}</span>
 }

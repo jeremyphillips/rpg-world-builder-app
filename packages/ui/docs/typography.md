@@ -35,7 +35,6 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | `Text` `caption`                  | `p`    | 12      | 400                  | Small supplemental metadata                                                            |
 | `Text` `label`                    | `p`    | 14      | 500                  | Compact UI descriptor — not a native form `<label>`                                    |
 | `Text` `muted`                    | `p`    | inherit | 400                  | Color-only muted treatment (legacy — prefer `supporting` / `caption`)                  |
-| `Text` `small`                    | `p`    | 15      | 400                  | Legacy 15px muted scale (do not expand)                                                |
 | `Text` `lead`                     | `p`    | 18      | 400                  | Marketing subheads                                                                     |
 | `Text` `destructive`              | `p`    | 15      | 400                  | Inline errors — pair with `role="alert"`                                               |
 | `Eyebrow` `xs` / `sm` / `md`      | `p`    | 9–13    | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)                          |
@@ -84,7 +83,7 @@ variant sets every property (`muted` is color-only; `label` inherits color).
 | --------------------- | ------------------------------------------------ | --------------------------------------- |
 | Primary content roles | `body`, `supporting`, `caption`, `label`, `lead` | Preferred for new copy                  |
 | Contextual roles      | `option`                                         | Choice-row contexts                     |
-| Existing treatments   | `small`, `muted`, `emphasis`                     | Legacy — do not expand without an audit |
+| Existing treatments   | `muted`, `emphasis`                              | Legacy — do not expand without an audit |
 | Semantic state        | `info`, `success`, `warning`, `destructive`      | Status-colored copy at 15px             |
 
 Do not hand-roll stacks that duplicate a role (`text-sm text-muted-foreground` →
@@ -164,7 +163,7 @@ At 16px root, **`--text-md` is 15px** — one step between compact UI (`text-sm`
 | `RichTextContent` `size="md"` (`prose-md`)          | 15px via `.prose.prose-md`        |
 | `RichTextContent` `size="sm"` (`prose-sm`)          | 14px via `.prose.prose-sm`        |
 | `RichTextContent` `size="base"` (`prose`)           | 16px — primary body               |
-| `Text` `small`, `destructive`, `emphasis`, `option` | `text-md`                         |
+| `Text` `destructive`, `emphasis`, `option`          | `text-md`                         |
 | Generic `Card` `ui-card__description` (comfortable) | 14px (`text-sm` via shell var)    |
 | Rich-text editor (`size="md"`)                      | `prose-md` (matches catalog read) |
 | Rich-text editor (`size="sm"`)                      | `prose-sm`                        |

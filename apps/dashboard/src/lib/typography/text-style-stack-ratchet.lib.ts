@@ -49,7 +49,16 @@ function labelStackViolation(set: Set<string>, tokens: string[]): string | null 
   return 'text-sm + font-medium without color (use text-style-label)'
 }
 
+function retiredSmallUtility(classString: string): string | null {
+  if (/\btext-style-small\b/.test(classString)) {
+    return 'text-style-small retired (use text-style-supporting)'
+  }
+  return null
+}
+
 export function classStringViolatesMigratedStacks(classString: string): string | null {
+  const retired = retiredSmallUtility(classString)
+  if (retired) return retired
   const tokens = tokenizeClassString(classString)
   const set = new Set(tokens)
   return (
@@ -84,8 +93,15 @@ function mutedVariantSizeViolation(flags: ReturnType<typeof parseTextTagFlags>):
 
 function redundantMutedOnRoleVariant(flags: ReturnType<typeof parseTextTagFlags>): string | null {
   const { variant, hasMutedFg } = flags
-  if ((variant === 'small' || variant === 'caption') && hasMutedFg) {
-    return `Text variant="${variant}" + text-muted-foreground (redundant)`
+  if (variant === 'caption' && hasMutedFg) {
+    return 'Text variant="caption" + text-muted-foreground (redundant)'
+  }
+  return null
+}
+
+function retiredSmallVariant(flags: ReturnType<typeof parseTextTagFlags>): string | null {
+  if (flags.variant === 'small') {
+    return 'Text variant="small" retired (use variant="supporting")'
   }
   return null
 }
@@ -93,7 +109,11 @@ function redundantMutedOnRoleVariant(flags: ReturnType<typeof parseTextTagFlags>
 export function textTagViolatesMigratedStacks(tag: string): string | null {
   const flat = tag.replace(/\s+/g, ' ')
   const flags = parseTextTagFlags(flat)
-  return mutedVariantSizeViolation(flags) ?? redundantMutedOnRoleVariant(flags)
+  return (
+    retiredSmallVariant(flags) ??
+    mutedVariantSizeViolation(flags) ??
+    redundantMutedOnRoleVariant(flags)
+  )
 }
 
 /** `Text` owns roles via `variant` — not `text-style-*` utilities in `className`. */

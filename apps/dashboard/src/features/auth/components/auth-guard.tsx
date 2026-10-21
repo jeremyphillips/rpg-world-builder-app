@@ -37,7 +37,7 @@ export function AuthGuard() {
   if (unauthenticated || (!user && !isError)) {
     return (
       <FullScreenCenter>
-        <Text variant="small">Redirecting to login…</Text>
+        <Text variant="supporting">Redirecting to login…</Text>
       </FullScreenCenter>
     )
   }
@@ -45,7 +45,7 @@ export function AuthGuard() {
   if (!user) {
     return (
       <FullScreenCenter>
-        <Text variant="small">Could not reach the server.</Text>
+        <Text variant="supporting">Could not reach the server.</Text>
         <Button type="button" variant="outline" onClick={() => void refetch()}>
           Retry
         </Button>

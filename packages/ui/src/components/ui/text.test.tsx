@@ -22,11 +22,6 @@ describe('Text', () => {
     expect(alert).toHaveClass('text-style-destructive')
   })
 
-  it('applies variant classes', () => {
-    render(<Text variant="small">Hint</Text>)
-    expect(screen.getByText('Hint')).toHaveClass('text-style-small')
-  })
-
   it('applies supporting and label variant classes', () => {
     render(<Text variant="supporting">Supporting</Text>)
     expect(screen.getByText('Supporting')).toHaveClass('text-style-supporting')

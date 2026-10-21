@@ -75,7 +75,7 @@ export function FormFooterActions({
       <div className={formActionsBarPrimaryGroupClasses}>
         {resolvedSecondary}
         {isSuccess && successMessage ? (
-          <Text variant="small" role="status">
+          <Text variant="supporting" role="status">
             {successMessage}
           </Text>
         ) : null}

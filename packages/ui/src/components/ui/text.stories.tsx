@@ -32,13 +32,6 @@ export const Supporting: Story = {
   },
 }
 
-export const Small: Story = {
-  args: {
-    variant: 'small',
-    children: 'Legacy 15px muted treatment.',
-  },
-}
-
 export const Caption: Story = {
   args: {
     variant: 'caption',

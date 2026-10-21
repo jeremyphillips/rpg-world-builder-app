@@ -84,7 +84,7 @@ export function ConfirmDialog({
               {headline}
             </AlertDialogPrimitive.Title>
             {description ? (
-              <AlertDialogPrimitive.Description className={textVariants({ variant: 'small' })}>
+              <AlertDialogPrimitive.Description className={textVariants({ variant: 'supporting' })}>
                 {description}
               </AlertDialogPrimitive.Description>
             ) : null}

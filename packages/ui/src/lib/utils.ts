@@ -54,7 +54,6 @@ const TEXT_ACTION_UTILITIES = ['text-action-inline', 'text-action-standalone'] a
 const TEXT_STYLE_UTILITIES = [
   'text-style-body',
   'text-style-muted',
-  'text-style-small',
   'text-style-caption',
   'text-style-supporting',
   'text-style-label',

@@ -30,7 +30,7 @@ const insetPanelSizeClasses = {
 /** Default `Text` variant for each inset panel size. */
 export const insetPanelTextVariantBySize = {
   sm: 'caption',
-  md: 'small',
+  md: 'supporting',
   lg: 'muted',
 } satisfies Record<InsetPanelSize, NonNullable<TextVariantProps['variant']>>
 

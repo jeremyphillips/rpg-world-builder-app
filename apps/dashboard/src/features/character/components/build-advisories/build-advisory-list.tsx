@@ -15,7 +15,7 @@ export function BuildAdvisoryList({ advisories }: BuildAdvisoryListProps) {
     <ul className="list-disc space-y-1 pl-5">
       {presentBuildAdvisoryList(advisories).map((item) => (
         <li key={item.key}>
-          <Text variant="small">
+          <Text variant="supporting">
             {item.title ? `${item.title} — ` : null}
             {item.message}
           </Text>

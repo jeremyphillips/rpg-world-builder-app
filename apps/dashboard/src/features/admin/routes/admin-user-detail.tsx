@@ -57,8 +57,8 @@ export function AdminUserDetail() {
             </div>
             <Text variant="muted">{user.email}</Text>
             <AdminUserContextLine />
-            <Text variant="small">User ID: {user.id}</Text>
-            <Text variant="small">Joined {formatAdminUserDetailJoined(user.createdAt)}</Text>
+            <Text variant="supporting">User ID: {user.id}</Text>
+            <Text variant="supporting">Joined {formatAdminUserDetailJoined(user.createdAt)}</Text>
           </div>
 
           <RowActionsMenu

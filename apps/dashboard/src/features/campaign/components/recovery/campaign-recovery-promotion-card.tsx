@@ -54,7 +54,7 @@ export function CampaignRecoveryPromotionCard({ promotion }: CampaignRecoveryPro
     >
       {promotion.meta ? (
         <CardContent>
-          <Text variant="small">{promotion.meta}</Text>
+          <Text variant="supporting">{promotion.meta}</Text>
         </CardContent>
       ) : null}
     </Card>

@@ -833,12 +833,6 @@
   color: var(--muted-foreground);
 }
 
-@utility text-style-small {
-  font-size: var(--text-md);
-  line-height: var(--text-md--line-height);
-  color: var(--muted-foreground);
-}
-
 @utility text-style-caption {
   font-size: var(--text-xs);
   line-height: var(--text-xs--line-height);

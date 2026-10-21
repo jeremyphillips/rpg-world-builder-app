@@ -100,7 +100,7 @@ function DialogPanelHeaderTitleStack({
           {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
         </div>
         {description ? (
-          <DialogPrimitive.Description className={textVariants({ variant: 'small' })}>
+          <DialogPrimitive.Description className={textVariants({ variant: 'supporting' })}>
             {description}
           </DialogPrimitive.Description>
         ) : null}

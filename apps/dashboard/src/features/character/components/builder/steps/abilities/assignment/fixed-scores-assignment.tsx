@@ -274,7 +274,7 @@ function ScorePoolSection({
             />
           ))}
         </div>
-        <InsetPanel.Text as="p" variant="small" aria-live="polite">
+        <InsetPanel.Text as="p" variant="supporting" aria-live="polite">
           {abilitiesFormCopy.scoresRemaining(remainingCount)}
         </InsetPanel.Text>
       </InsetPanel>

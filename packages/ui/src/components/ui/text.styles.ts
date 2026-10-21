@@ -40,11 +40,6 @@ export const TEXT_VARIANT_CATALOG: Record<TextVariant, TextVariantCatalogRow> = 
     category: 'contextual',
     useCase: 'Choice row primary line',
   },
-  small: {
-    variant: 'small',
-    category: 'treatment',
-    useCase: 'Legacy muted scale — prefer supporting or caption for new copy',
-  },
   muted: {
     variant: 'muted',
     category: 'treatment',
