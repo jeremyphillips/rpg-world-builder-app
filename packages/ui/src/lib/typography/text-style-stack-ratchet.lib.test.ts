@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   classStringViolatesMigratedStacks,
   extractCnMergedClassStrings,
+  extractTemplateLiteralClassStrings,
   findTextStyleStackViolations,
   textTagUsesTextStyleUtility,
   textTagViolatesMigratedStacks,
@@ -33,6 +34,25 @@ describe('text-style-stack-ratchet.lib', () => {
     expect(classStringViolatesMigratedStacks(merged[0]!)).not.toBeNull()
   })
 
+  it('detects cn ternary branches merged with sibling literals', () => {
+    const merged = extractCnMergedClassStrings(
+      `className={cn(show ? 'text-sm' : 'hidden', 'text-muted-foreground')}`,
+    )
+    expect(merged.some((s) => classStringViolatesMigratedStacks(s))).toBe(true)
+  })
+
+  it('detects static template literal class strings', () => {
+    const literals = extractTemplateLiteralClassStrings(
+      'className={`text-sm text-muted-foreground`}',
+    )
+    expect(literals).toEqual(['text-sm text-muted-foreground'])
+    expect(classStringViolatesMigratedStacks(literals[0]!)).not.toBeNull()
+  })
+
+  it('skips template literals with interpolation', () => {
+    expect(extractTemplateLiteralClassStrings('className={`text-sm ${active}`}')).toEqual([])
+  })
+
   it('flags Text with text-style utility in className', () => {
     expect(
       textTagUsesTextStyleUtility('<Text as="p" className="mt-2 text-style-supporting">'),
@@ -48,6 +68,20 @@ describe('text-style-stack-ratchet.lib', () => {
   it('flags muted + text-sm on Text', () => {
     expect(
       textTagViolatesMigratedStacks('<Text variant="muted" className="text-sm">'),
+    ).not.toBeNull()
+  })
+
+  it('flags redundant muted on supporting', () => {
+    expect(
+      textTagViolatesMigratedStacks(
+        '<Text variant="supporting" className="text-muted-foreground">',
+      ),
+    ).toMatch(/redundant/)
+  })
+
+  it('reads braced string variant on Text', () => {
+    expect(
+      textTagViolatesMigratedStacks("<Text variant={'muted'} className='text-sm'>"),
     ).not.toBeNull()
   })
 

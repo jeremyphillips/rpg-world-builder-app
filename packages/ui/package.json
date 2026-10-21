@@ -19,6 +19,10 @@
       "types": "./src/lib/search-document.lib.ts",
       "default": "./src/lib/search-document.lib.ts"
     },
+    "./lib/typography/text-style-stack-ratchet": {
+      "types": "./src/lib/typography/text-style-stack-ratchet.lib.ts",
+      "default": "./src/lib/typography/text-style-stack-ratchet.lib.ts"
+    },
     "./form": {
       "types": "./src/form/index.ts",
       "default": "./src/form/index.ts"

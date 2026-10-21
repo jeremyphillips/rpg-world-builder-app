@@ -12,7 +12,11 @@ const COLOR_UTILITIES = new Set([
   'text-foreground-subtle',
 ])
 
+const STACK_SCAN_KEYWORD_RE = /\b(text-sm|text-xs|text-muted-foreground|font-medium)\b/
+
 const TEXT_STYLE_UTILITY_RE = /\btext-style-[a-z0-9-]+\b/
+
+const RATCHET_SELF_PATH_RE = /text-style-stack-ratchet/
 
 function tokenizeClassString(value: string): string[] {
   return value.split(/\s+/).filter(Boolean)
@@ -68,9 +72,19 @@ export function classStringViolatesMigratedStacks(classString: string): string |
 
 const TEXT_TAG_RE = /<Text\b[\s\S]*?>/g
 
+function parseVariantFromTag(flat: string): string {
+  const doubleQuoted = flat.match(/variant="([^"]+)"/)?.[1]
+  if (doubleQuoted) return doubleQuoted
+  const singleQuoted = flat.match(/variant='([^']+)'/)?.[1]
+  if (singleQuoted) return singleQuoted
+  const bracedLiteral = flat.match(/variant=\{['"`]([^'"`]+)['"`]\}/)?.[1]
+  if (bracedLiteral) return bracedLiteral
+  return 'body'
+}
+
 function parseTextTagFlags(flat: string) {
   return {
-    variant: flat.match(/variant="([^"]+)"/)?.[1] ?? 'body',
+    variant: parseVariantFromTag(flat),
     hasMed: /\bfont-medium\b/.test(flat),
     hasSemi: /\bfont-semibold\b/.test(flat),
     hasSm: /\btext-sm\b/.test(flat),
@@ -93,8 +107,9 @@ function mutedVariantSizeViolation(flags: ReturnType<typeof parseTextTagFlags>):
 
 function redundantMutedOnRoleVariant(flags: ReturnType<typeof parseTextTagFlags>): string | null {
   const { variant, hasMutedFg } = flags
-  if (variant === 'caption' && hasMutedFg) {
-    return 'Text variant="caption" + text-muted-foreground (redundant)'
+  if (!hasMutedFg) return null
+  if (variant === 'caption' || variant === 'supporting') {
+    return `Text variant="${variant}" + text-muted-foreground (redundant)`
   }
   return null
 }
@@ -123,17 +138,64 @@ export function textTagUsesTextStyleUtility(tag: string): string | null {
   return 'Text className includes text-style-* (use matching variant prop)'
 }
 
+function classFragmentLooksRelevant(fragment: string): boolean {
+  return STACK_SCAN_KEYWORD_RE.test(fragment)
+}
+
+function literalsFromFragment(fragment: string): string[] {
+  return [...fragment.matchAll(/['"`]([^'"`]+)['"`]/g)]
+    .map((m) => m[1])
+    .filter((literal): literal is string => literal != null && classFragmentLooksRelevant(literal))
+}
+
+function pushMergedLiteralStrings(out: string[], literals: string[]): void {
+  if (literals.length === 0) return
+  const merged = literals.join(' ')
+  if (classFragmentLooksRelevant(merged)) out.push(merged)
+}
+
 function extractQuotedClassStrings(source: string): string[] {
   const out: string[] = []
-  const re = /[`'"]([^`'"]{0,500})[`'"]/g
+  const re = /['"]([^'"]{0,500})['"]/g
   let match: RegExpExecArray | null
   while ((match = re.exec(source))) {
     const inner = match[1]
     if (inner == null) continue
-    if (/\b(text-sm|text-xs|text-muted-foreground|font-medium)\b/.test(inner)) {
-      out.push(inner)
-    }
+    if (classFragmentLooksRelevant(inner)) out.push(inner)
   }
+  return out
+}
+
+/** Static template literals (no `${` interpolation). */
+export function extractTemplateLiteralClassStrings(source: string): string[] {
+  const out: string[] = []
+  const re = /`([^`]{0,500})`/g
+  let match: RegExpExecArray | null
+  while ((match = re.exec(source))) {
+    const inner = match[1]
+    if (inner == null || inner.includes('${')) continue
+    if (classFragmentLooksRelevant(inner)) out.push(inner)
+  }
+  return out
+}
+
+function extractTernaryCnMergedStrings(inner: string): string[] {
+  const out: string[] = []
+  const segments: string[] = []
+  const withoutTernaries = inner.replace(/\?[^:]*:[^,)]*/g, (ternary) => {
+    const body = ternary.slice(1)
+    const colon = body.indexOf(':')
+    if (colon === -1) return ''
+    segments.push(body.slice(0, colon), body.slice(colon + 1))
+    return ''
+  })
+  segments.push(withoutTernaries)
+
+  for (const segment of segments) {
+    pushMergedLiteralStrings(out, literalsFromFragment(segment))
+  }
+
+  pushMergedLiteralStrings(out, literalsFromFragment(inner))
   return out
 }
 
@@ -145,15 +207,14 @@ export function extractCnMergedClassStrings(source: string): string[] {
   while ((match = cnRe.exec(source))) {
     const inner = match[1]
     if (inner == null) continue
-    if (inner.includes('?') || inner.includes(':')) continue
-    const literals = [...inner.matchAll(/['"`]([^'"`]+)['"`]/g)]
-      .map((m) => m[1])
-      .filter((literal): literal is string => literal != null)
-    if (literals.length === 0) continue
-    const merged = literals.join(' ')
-    if (/\b(text-sm|text-xs|text-muted-foreground|font-medium)\b/.test(merged)) {
-      out.push(merged)
+
+    if (inner.includes('?') && inner.includes(':')) {
+      out.push(...extractTernaryCnMergedStrings(inner))
+      continue
     }
+
+    const literals = literalsFromFragment(inner)
+    pushMergedLiteralStrings(out, literals)
   }
   return out
 }
@@ -163,12 +224,11 @@ export function findTextStyleStackViolations(
   filePath: string,
 ): { file: string; reason: string }[] {
   const hits: { file: string; reason: string }[] = []
-  if (filePath.endsWith('text-style-stack-ratchet.lib.ts')) return hits
-  if (filePath.endsWith('text-style-stack-ratchet.lib.test.ts')) return hits
-  if (filePath.endsWith('text-style-stack-ratchet.test.ts')) return hits
+  if (RATCHET_SELF_PATH_RE.test(filePath)) return hits
 
   const classStrings = [
     ...extractQuotedClassStrings(source),
+    ...extractTemplateLiteralClassStrings(source),
     ...extractCnMergedClassStrings(source),
   ]
 
