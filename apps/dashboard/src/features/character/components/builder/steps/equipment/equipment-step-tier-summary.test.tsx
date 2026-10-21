@@ -52,12 +52,10 @@ describe('EquipmentStepTierSummary', () => {
 
     await user.click(trigger)
 
-    const panel = screen.getByText('Starting gold bonus').closest('.ui-card')
+    const panel = screen.getByText('Starting gold bonus').parentElement
     expect(panel).toBeTruthy()
-    expect(panel).toHaveClass('ui-card--subtle')
-    const panelContent = screen.getByText('Starting gold bonus').parentElement
-    expect(panelContent).toHaveClass('ui-card__content', 'gap-y-2')
-    expect(panelContent).not.toHaveClass('py-2.5', 'mt-1', 'text-muted-foreground')
+    expect(panel).toHaveClass('rounded-md', 'border', 'bg-surface-subtle', 'gap-y-2')
+    expect(panel).not.toHaveClass('ui-card', 'ui-card__content', 'text-muted-foreground')
     expect(screen.getByText('Starting gold bonus')).toHaveClass('text-muted-foreground')
     expect(screen.getByText('+637 GP 5 SP')).toHaveClass('text-foreground')
     expect(screen.getByText('Magic item choices')).toHaveClass('text-muted-foreground')

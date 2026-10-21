@@ -1,6 +1,11 @@
 import type { ReactNode } from 'react'
 import type { CharacterNarrative } from '@rpg/contracts'
-import { Card, CardContent, Tabs, TabsContent, TabsList, TabsTrigger, Text } from '@rpg/ui'
+import { cn, Tabs, TabsContent, TabsList, TabsTrigger, Text } from '@rpg/ui'
+
+import {
+  collectionPanelComfortableInsetClasses,
+  collectionPanelShellClasses,
+} from '@/lib/collection-panel/collection-panel-shell.variants'
 
 import {
   CHARACTER_DETAIL_TAB_LABELS,
@@ -99,9 +104,10 @@ export function CharacterDetailTabs({
 
 function CharacterDetailTabPanel({ children }: { children: ReactNode }) {
   return (
-    <Card tone="subtle" density="comfortable">
-      <CardContent>{children}</CardContent>
-    </Card>
+    <div className={cn(collectionPanelShellClasses, collectionPanelComfortableInsetClasses)}>
+      {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+      {children}
+    </div>
   )
 }
 

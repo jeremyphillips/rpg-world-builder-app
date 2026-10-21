@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { FeatureTableRow } from './feature-table-row'
 
 describe('FeatureTableRow', () => {
-  it('insets the row at compact density and keeps the edit control clickable', async () => {
+  it('renders a compact entity row and keeps the edit control clickable', async () => {
     const user = userEvent.setup()
     const onEdit = vi.fn()
     render(
@@ -18,10 +18,10 @@ describe('FeatureTableRow', () => {
     )
 
     const title = screen.getByText('Rage')
-    const card = title.closest('.ui-card')
-    expect(card).not.toHaveClass('px-3', 'py-2.5')
-    expect(title.closest('.ui-card__content')).toHaveClass('ui-card__content')
-    expect(card).toHaveClass('ui-card--compact')
+    const row = title.closest('.ui-card')
+    expect(row).toHaveClass('ui-card--compact', 'dash-entity-card')
+    expect(row).not.toHaveClass('px-3', 'py-2.5')
+    expect(screen.getByText('Level progression')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Edit' }))
     expect(onEdit).toHaveBeenCalledOnce()

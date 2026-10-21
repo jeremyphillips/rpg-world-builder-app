@@ -7,8 +7,7 @@ import {
 } from '@/features/content'
 import {
   Button,
-  Card,
-  CardContent,
+  cn,
   DividedStack,
   IconContainer,
   resourceIcon,
@@ -16,6 +15,11 @@ import {
   type IconContainerSize,
   type ResourceIconRole,
 } from '@rpg/ui'
+
+import {
+  collectionPanelComfortableInsetClasses,
+  collectionPanelShellClasses,
+} from '@/lib/collection-panel/collection-panel-shell.variants'
 
 import {
   EQUIPMENT_MAGIC_ITEMS_RESOURCE_HEADING,
@@ -98,33 +102,37 @@ export function EquipmentResourceSummary({
   if (!currency && !showMagic) return null
 
   return (
-    <Card tone="transparent" density={density}>
-      <CardContent>
-        <DividedStack density={density}>
-          {currency ? (
-            <EntityAnatomyHost
-              density={density}
-              entity={{
-                heading: currency.heading,
-                supportingMetadata: currency.metadata,
-                media: <ResourceGlyph role="currency" density={density} />,
-              }}
-              trailing={resolveTrailingAction(currencyAction)}
-            />
-          ) : null}
-          {showMagic ? (
-            <EntityAnatomyHost
-              density={density}
-              entity={{
-                heading: EQUIPMENT_MAGIC_ITEMS_RESOURCE_HEADING,
-                status: magicSlots.map(mapMagicItemSlotToStatus),
-                media: <ResourceGlyph role="magicItem" density={density} />,
-              }}
-              trailing={resolveTrailingAction(magicItemsAction)}
-            />
-          ) : null}
-        </DividedStack>
-      </CardContent>
-    </Card>
+    <div
+      className={cn(
+        collectionPanelShellClasses,
+        density === 'compact' ? 'px-3 py-2' : collectionPanelComfortableInsetClasses,
+      )}
+    >
+      {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+      <DividedStack density={density}>
+        {currency ? (
+          <EntityAnatomyHost
+            density={density}
+            entity={{
+              heading: currency.heading,
+              supportingMetadata: currency.metadata,
+              media: <ResourceGlyph role="currency" density={density} />,
+            }}
+            trailing={resolveTrailingAction(currencyAction)}
+          />
+        ) : null}
+        {showMagic ? (
+          <EntityAnatomyHost
+            density={density}
+            entity={{
+              heading: EQUIPMENT_MAGIC_ITEMS_RESOURCE_HEADING,
+              status: magicSlots.map(mapMagicItemSlotToStatus),
+              media: <ResourceGlyph role="magicItem" density={density} />,
+            }}
+            trailing={resolveTrailingAction(magicItemsAction)}
+          />
+        ) : null}
+      </DividedStack>
+    </div>
   )
 }

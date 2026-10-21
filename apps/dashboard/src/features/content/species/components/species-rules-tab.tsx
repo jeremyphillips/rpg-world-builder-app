@@ -1,7 +1,13 @@
 import { useEffect, useMemo } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { Card, CardContent, Heading, Text } from '@rpg/ui'
+import {
+  Heading,
+  InsetPanel,
+  Text,
+  emptyStateWellSupportingClasses,
+  emptyStateWellTitleLgClasses,
+} from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
 
 import { AvailabilityAlert, campaignSettingHref, resolveAvailability } from '@/lib/availability'
@@ -44,18 +50,15 @@ function RulesSectionDisabled({
   campaignId: string
 }) {
   return (
-    // TODO(empty-well): model this disabled-rules gate as a shared well component.
-    <Card tone="subtle" density="comfortable">
-      <CardContent className="flex flex-col gap-2">
-        <Heading variant="subsection" as="h3">
-          {title}
-        </Heading>
-        <Text variant="muted" className="text-sm">
-          {message}
-        </Text>
-        <RulesConfigLink campaignId={campaignId} />
-      </CardContent>
-    </Card>
+    <InsetPanel size="lg" className="flex flex-col gap-2">
+      <Heading variant="subsection" as="h3" className={emptyStateWellTitleLgClasses}>
+        {title}
+      </Heading>
+      <Text as="p" className={emptyStateWellSupportingClasses}>
+        {message}
+      </Text>
+      <RulesConfigLink campaignId={campaignId} />
+    </InsetPanel>
   )
 }
 
@@ -90,15 +93,12 @@ function SpeciesRulesEditor({ formCtx }: { formCtx: ContentFormCtx }) {
 
   if (!policyEnabled && !limitsEnabled) {
     return (
-      // TODO(empty-well): model this rules gate as a shared well component.
-      <Card tone="subtle" density="comfortable">
-        <CardContent className="flex flex-col gap-3">
-          <Text variant="muted" className="text-sm">
-            {`Enable ${getContentTypeMidSentenceLabel('species')} multiclass policy or ${getContentTypeMidSentenceLabel('species')} level limits in campaign rules to author ${getContentTypeMidSentenceLabel('species')}-specific multiclass data.`}
-          </Text>
-          <RulesConfigLink campaignId={campaignId} />
-        </CardContent>
-      </Card>
+      <InsetPanel size="lg" className="flex flex-col gap-3">
+        <Text as="p" className={emptyStateWellSupportingClasses}>
+          {`Enable ${getContentTypeMidSentenceLabel('species')} multiclass policy or ${getContentTypeMidSentenceLabel('species')} level limits in campaign rules to author ${getContentTypeMidSentenceLabel('species')}-specific multiclass data.`}
+        </Text>
+        <RulesConfigLink campaignId={campaignId} />
+      </InsetPanel>
     )
   }
 

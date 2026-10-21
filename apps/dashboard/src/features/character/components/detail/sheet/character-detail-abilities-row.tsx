@@ -1,6 +1,11 @@
 import { ABILITY_SCORE_MIN, CHARACTER_ABILITY_SCORE_MAX, type Ability } from '@rpg/contracts'
 
-import { Card } from '@rpg/ui'
+import { cn } from '@rpg/ui'
+
+import {
+  collectionPanelComfortableInsetClasses,
+  collectionPanelShellClasses,
+} from '@/lib/collection-panel/collection-panel-shell.variants'
 
 import { AbilityScoreCard, AbilityScoreNumeric } from '@/components/ability-score'
 
@@ -24,8 +29,10 @@ export function CharacterDetailAbilitiesRow({
   abilityScoreEditor,
 }: CharacterDetailAbilitiesRowProps) {
   return (
-    // TODO(panel): replace this Card shell with panel treatment.
-    <Card tone="subtle" density="comfortable" className="w-fit p-3">
+    <div
+      className={cn(collectionPanelShellClasses, collectionPanelComfortableInsetClasses, 'w-fit')}
+    >
+      {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
       <div className={characterDetailAbilitiesRowClasses}>
         {abilities.map((ability) => {
           const abilityId = ability.id as Ability
@@ -59,6 +66,6 @@ export function CharacterDetailAbilitiesRow({
           )
         })}
       </div>
-    </Card>
+    </div>
   )
 }

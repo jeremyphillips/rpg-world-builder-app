@@ -20,7 +20,7 @@ const emptyProficiencies = {
 }
 
 describe('CharacterDetailCombatRow', () => {
-  it('insets an empty actions card', () => {
+  it('insets an empty actions ledger', () => {
     render(
       <CharacterDetailCombatRow
         actions={[]}
@@ -30,12 +30,12 @@ describe('CharacterDetailCombatRow', () => {
     )
 
     const empty = screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.actions)
-    expect(empty.closest('.ui-card__content')).toBeTruthy()
-    expect(empty.closest('.ui-card')).not.toHaveClass('space-y-3')
-    expect(screen.getByText('Dexterity').closest('.ui-card__content')).toBeTruthy()
+    expect(empty.closest('.border')).toHaveClass('rounded-md', 'bg-surface-subtle')
+    expect(empty.closest('.border')).not.toHaveClass('space-y-3', 'ui-card')
+    expect(screen.getByText('Dexterity').closest('.border')).toHaveClass('bg-surface-subtle')
     expect(
-      screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.proficiencies).closest('.ui-card__content'),
-    ).toBeTruthy()
+      screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.proficiencies).closest('.border'),
+    ).toHaveClass('bg-surface-subtle')
   })
 
   it('insets populated actions', () => {
@@ -47,7 +47,7 @@ describe('CharacterDetailCombatRow', () => {
       />,
     )
 
-    expect(screen.getByText('Longsword').closest('.ui-card__content')).toBeTruthy()
+    expect(screen.getByText('Longsword').closest('.border')).toHaveClass('bg-surface-subtle')
     expect(screen.getByText('Attack +5')).toBeInTheDocument()
   })
 })

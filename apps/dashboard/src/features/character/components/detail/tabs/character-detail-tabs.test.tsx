@@ -33,18 +33,18 @@ describe('CharacterDetailTabs', () => {
       />,
     )
 
-    expect(
-      screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.spells).closest('.ui-card__content'),
-    ).toBeTruthy()
+    expect(screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.spells).closest('.border')).toHaveClass(
+      'rounded-md',
+    )
 
     await user.click(
       screen.getByRole('tab', { name: CHARACTER_DETAIL_TAB_LABELS.featuresAndTraits }),
     )
-    expect(screen.getByText('Rage').closest('.ui-card__content')).toBeTruthy()
+    expect(screen.getByText('Rage').closest('.border')).toHaveClass('rounded-md')
 
     await user.click(screen.getByRole('tab', { name: CHARACTER_DETAIL_TAB_LABELS.narrative }))
-    expect(
-      screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.narrative).closest('.ui-card__content'),
-    ).toBeTruthy()
+    expect(screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.narrative).closest('.border')).toHaveClass(
+      'rounded-md',
+    )
   })
 })

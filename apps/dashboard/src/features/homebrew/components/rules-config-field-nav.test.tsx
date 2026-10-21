@@ -41,7 +41,8 @@ describe('RulesConfigFieldNav', () => {
       'lg:top-[var(--app-sticky-chrome-block-size,calc(3rem+2rem))]',
       'lg:self-start',
     )
-    expect(rail.querySelector('.ui-card')).toHaveClass('ui-card--subtle')
+    expect(rail.firstElementChild).toHaveClass('rounded-md', 'border')
+    expect(rail.querySelector('.ui-card')).toBeNull()
     expect(rail).toHaveTextContent('Creation')
     expect(rail).toHaveTextContent('Progression')
     expect(rail).not.toHaveTextContent('Starting level')

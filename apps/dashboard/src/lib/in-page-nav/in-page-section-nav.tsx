@@ -1,14 +1,10 @@
 import { useState } from 'react'
+import { cn, Eyebrow, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@rpg/ui'
+
 import {
-  Card,
-  CardContent,
-  Eyebrow,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@rpg/ui'
+  collectionPanelComfortableInsetClasses,
+  collectionPanelShellClasses,
+} from '@/lib/collection-panel/collection-panel-shell.variants'
 
 import {
   buildInPageMobileNavItems,
@@ -62,68 +58,73 @@ export function InPageSectionNav({
         aria-label={navLabel}
         {...{ [IN_PAGE_SECTION_NAV_PANEL_ATTR]: '' }}
       >
-        <Card tone="subtle" density="comfortable" className="text-foreground">
-          <CardContent>
-            <Eyebrow size="sm" className={inPageSectionNavEyebrowClasses}>
-              {eyebrowLabel}
-            </Eyebrow>
-            <ul className={inPageSectionNavSectionListClasses}>
-              {sections.map((section) => {
-                const sectionLinkState = resolveInPageSectionLinkState(
-                  section.id,
-                  activeSectionId,
-                  activeLeafId,
-                )
-                const leaves = section.leaves ?? []
-                const showLeaves =
-                  leaves.length > 0 &&
-                  (sectionLinkState !== 'inactive' || expandedSectionId === section.id)
+        <div
+          className={cn(
+            collectionPanelShellClasses,
+            collectionPanelComfortableInsetClasses,
+            'text-foreground',
+          )}
+        >
+          {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+          <Eyebrow size="sm" className={inPageSectionNavEyebrowClasses}>
+            {eyebrowLabel}
+          </Eyebrow>
+          <ul className={inPageSectionNavSectionListClasses}>
+            {sections.map((section) => {
+              const sectionLinkState = resolveInPageSectionLinkState(
+                section.id,
+                activeSectionId,
+                activeLeafId,
+              )
+              const leaves = section.leaves ?? []
+              const showLeaves =
+                leaves.length > 0 &&
+                (sectionLinkState !== 'inactive' || expandedSectionId === section.id)
 
-                return (
-                  <li key={section.id}>
-                    <a
-                      href={`#${section.id}`}
-                      onClick={(event) => {
-                        event.preventDefault()
-                        setExpandedSectionId(section.id)
-                        scrollToInPageNavAnchor(section.id)
-                      }}
-                      aria-current={sectionLinkState === 'active' ? 'location' : undefined}
-                      className={inPageSectionNavSectionLinkClasses({ state: sectionLinkState })}
+              return (
+                <li key={section.id}>
+                  <a
+                    href={`#${section.id}`}
+                    onClick={(event) => {
+                      event.preventDefault()
+                      setExpandedSectionId(section.id)
+                      scrollToInPageNavAnchor(section.id)
+                    }}
+                    aria-current={sectionLinkState === 'active' ? 'location' : undefined}
+                    className={inPageSectionNavSectionLinkClasses({ state: sectionLinkState })}
+                  >
+                    {section.label}
+                  </a>
+                  {showLeaves ? (
+                    <ul
+                      className={inPageSectionNavLeafListClasses({
+                        active: sectionLinkState !== 'inactive',
+                      })}
                     >
-                      {section.label}
-                    </a>
-                    {showLeaves ? (
-                      <ul
-                        className={inPageSectionNavLeafListClasses({
-                          active: sectionLinkState !== 'inactive',
-                        })}
-                      >
-                        {leaves.map((leaf) => (
-                          <li key={leaf.id}>
-                            <a
-                              href={`#${leaf.id}`}
-                              onClick={(event) => {
-                                event.preventDefault()
-                                scrollToInPageNavAnchor(leaf.id)
-                              }}
-                              aria-current={activeLeafId === leaf.id ? 'true' : undefined}
-                              className={inPageSectionNavLeafLinkClasses({
-                                active: activeLeafId === leaf.id,
-                              })}
-                            >
-                              {leaf.label}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </li>
-                )
-              })}
-            </ul>
-          </CardContent>
-        </Card>
+                      {leaves.map((leaf) => (
+                        <li key={leaf.id}>
+                          <a
+                            href={`#${leaf.id}`}
+                            onClick={(event) => {
+                              event.preventDefault()
+                              scrollToInPageNavAnchor(leaf.id)
+                            }}
+                            aria-current={activeLeafId === leaf.id ? 'true' : undefined}
+                            className={inPageSectionNavLeafLinkClasses({
+                              active: activeLeafId === leaf.id,
+                            })}
+                          >
+                            {leaf.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </li>
+              )
+            })}
+          </ul>
+        </div>
       </nav>
 
       <div className={inPageSectionNavMobileSelectSlotClasses}>

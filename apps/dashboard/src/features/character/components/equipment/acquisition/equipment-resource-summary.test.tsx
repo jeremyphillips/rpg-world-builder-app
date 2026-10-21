@@ -52,7 +52,7 @@ describe('EquipmentResourceSummary', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('uses a single card shell with embedded anatomy hosts', () => {
+  it('uses a single panel shell with embedded anatomy hosts', () => {
     const { container } = render(
       <EquipmentResourceSummary
         density="comfortable"
@@ -64,8 +64,8 @@ describe('EquipmentResourceSummary', () => {
       />,
     )
 
-    expect(container.querySelectorAll('.ui-card')).toHaveLength(1)
-    expect(container.querySelectorAll('.ui-card__content')).toHaveLength(1)
+    expect(container.querySelectorAll('.ui-card')).toHaveLength(0)
+    expect(container.firstElementChild).toHaveClass('rounded-md', 'border', 'overflow-hidden')
   })
 
   it('gives each resource section its own action inside a divided stack', () => {

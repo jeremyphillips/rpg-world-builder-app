@@ -1,9 +1,10 @@
 import { useId, useMemo, useState } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
-import { ActionButton, Button, Card, CardContent, ConfirmDialog, TextField } from '@rpg/ui'
+import { ActionButton, Button, cn, ConfirmDialog, TextField } from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 import type { SlotProgression } from '@rpg/contracts'
 
+import { collectionPanelNestedBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
 import { DetailOverflowMenu, FeatureTableRow } from '@/lib/content-table-surface'
 
@@ -199,49 +200,48 @@ export function SlotProgressionsField() {
       </section>
 
       {showCreateForm ? (
-        <Card tone="subtle" density="compact">
-          <CardContent className="flex flex-col gap-3">
-            <TextField
-              id={createLabelId}
-              label="Progression label"
-              value={createLabelDraft}
-              onChange={(event) => setCreateLabelDraft(event.target.value)}
+        <div className={cn(collectionPanelNestedBodyClasses, 'gap-3')}>
+          {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+          <TextField
+            id={createLabelId}
+            label="Progression label"
+            value={createLabelDraft}
+            onChange={(event) => setCreateLabelDraft(event.target.value)}
+            size="sm"
+            required
+          />
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
               size="sm"
-              required
-            />
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant={createKindDraft === 'leveled' ? 'default' : 'outline'}
-                onClick={() => setCreateKindDraft('leveled')}
-              >
-                Leveled
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant={createKindDraft === 'pact' ? 'default' : 'outline'}
-                onClick={() => setCreateKindDraft('pact')}
-              >
-                Pact
-              </Button>
-            </div>
-            <div className="flex gap-2">
-              <Button type="button" size="sm" onClick={handleCreateCustom}>
-                Continue
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowCreateForm(false)}
-              >
-                Cancel
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              variant={createKindDraft === 'leveled' ? 'default' : 'outline'}
+              onClick={() => setCreateKindDraft('leveled')}
+            >
+              Leveled
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={createKindDraft === 'pact' ? 'default' : 'outline'}
+              onClick={() => setCreateKindDraft('pact')}
+            >
+              Pact
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button type="button" size="sm" onClick={handleCreateCustom}>
+              Continue
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => setShowCreateForm(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
       ) : null}
 
       {modalState && hostConfig && initialDraft ? (

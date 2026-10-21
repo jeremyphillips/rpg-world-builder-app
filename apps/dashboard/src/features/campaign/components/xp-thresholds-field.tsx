@@ -1,17 +1,9 @@
 import { useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { resolveXpThresholdsSummary, type SystemRulesetId } from '@rpg/contracts'
-import { Table2 } from 'lucide-react'
-import {
-  ActionButton,
-  Card,
-  CardContent,
-  IconContainer,
-  InlineMetadata,
-  SemanticText,
-  Text,
-} from '@rpg/ui'
+import { InlineMetadata, SemanticText, Text } from '@rpg/ui'
 
+import { FeatureTableRow } from '@/lib/content-table-surface'
 import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
 
 import {
@@ -114,49 +106,31 @@ export function XpThresholdsField() {
 
   return (
     <>
-      <Card tone="subtle" density="compact">
-        <CardContent className="flex items-start gap-3">
-          <IconContainer>
-            <Table2 />
-          </IconContainer>
-          <div className="min-w-0 flex-1 space-y-1">
-            <Text as="div" className="text-style-label text-foreground">
-              Experience thresholds
-            </Text>
-            <div className="text-sm">
-              {summary.status === 'derived' ? (
-                <InlineMetadata role="supporting" density="compact" wrap={false}>
-                  <InlineMetadata.Item>
-                    <Text variant="muted" as="span">
-                      {summary.levelCount} levels
-                    </Text>
-                  </InlineMetadata.Item>
-                  <InlineMetadata.Item>
-                    <SemanticText tone="warning">
-                      {summary.derivedCount} threshold{summary.derivedCount === 1 ? '' : 's'}{' '}
-                      derived
-                    </SemanticText>
-                  </InlineMetadata.Item>
-                </InlineMetadata>
-              ) : (
+      <FeatureTableRow
+        title="Experience thresholds"
+        description={
+          summary.status === 'derived' ? (
+            <InlineMetadata role="supporting" density="compact" wrap={false}>
+              <InlineMetadata.Item>
                 <Text variant="muted" as="span">
-                  {summary.label}
+                  {summary.levelCount} levels
                 </Text>
-              )}
-            </div>
-          </div>
-          <div className="shrink-0">
-            <ActionButton
-              action="edit"
-              variant="outline"
-              size="sm"
-              onClick={() => setModalOpen(true)}
-            >
-              Edit table
-            </ActionButton>
-          </div>
-        </CardContent>
-      </Card>
+              </InlineMetadata.Item>
+              <InlineMetadata.Item>
+                <SemanticText tone="warning">
+                  {summary.derivedCount} threshold{summary.derivedCount === 1 ? '' : 's'} derived
+                </SemanticText>
+              </InlineMetadata.Item>
+            </InlineMetadata>
+          ) : (
+            <Text variant="muted" as="span">
+              {summary.label}
+            </Text>
+          )
+        }
+        editLabel="Edit table"
+        onEdit={() => setModalOpen(true)}
+      />
 
       <TableBuilderModal
         open={modalOpen}

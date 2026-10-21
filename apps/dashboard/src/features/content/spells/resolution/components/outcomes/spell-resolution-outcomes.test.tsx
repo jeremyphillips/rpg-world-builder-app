@@ -30,15 +30,15 @@ function renderOutcomes(defaultResolution: ResolutionFormValues) {
   )
 }
 
-function outcomeCard(headingName: string | RegExp): HTMLElement {
+function outcomePanel(headingName: string | RegExp): HTMLElement {
   const heading = screen.getByRole('heading', { name: headingName })
-  const card = heading.closest('.ui-card')
-  expect(card).toBeInstanceOf(HTMLElement)
-  return card as HTMLElement
+  const panel = heading.closest('[aria-labelledby]')
+  expect(panel).toBeInstanceOf(HTMLElement)
+  return panel as HTMLElement
 }
 
 function hitSection() {
-  return outcomeCard('On hit')
+  return outcomePanel('On hit')
 }
 
 describe('SpellResolutionOutcomes', () => {
@@ -61,7 +61,7 @@ describe('SpellResolutionOutcomes', () => {
       expect(screen.getByText(RESOLUTION_SECTION_LABELS.outcomeEmptySummary)).toBeInTheDocument()
     })
 
-    const missSection = outcomeCard('On miss')
+    const missSection = outcomePanel('On miss')
     expect(
       within(missSection).queryByLabelText(RESOLUTION_SECTION_LABELS.hitNote),
     ).not.toBeInTheDocument()
@@ -71,7 +71,7 @@ describe('SpellResolutionOutcomes', () => {
     )
 
     await waitFor(() => {
-      const expandedMissSection = outcomeCard('On miss')
+      const expandedMissSection = outcomePanel('On miss')
       expect(
         within(expandedMissSection).getByRole('button', {
           name: RESOLUTION_SECTION_LABELS.addOutcomeNote,
@@ -117,7 +117,7 @@ describe('SpellResolutionOutcomes', () => {
     renderOutcomes(resolution)
 
     const appliedSection = await screen.findByText(RESOLUTION_SECTION_LABELS.appliedEffects)
-    const section = appliedSection.closest('.ui-card')
+    const section = appliedSection.closest('[aria-labelledby]')
     expect(section).toBeInstanceOf(HTMLElement)
 
     await user.click(

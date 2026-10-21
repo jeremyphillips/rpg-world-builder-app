@@ -1,6 +1,8 @@
 import { getSpellResolutionOutcomeAuthoringLabel } from '@rpg/contracts'
-import { Card, CardContent, Heading } from '@rpg/ui'
+import { cn, Heading } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
+
+import { collectionPanelNestedBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 
 import { outcomeBranchBodyFields } from '../../lib/form/resolution-outcome-form-fields'
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
@@ -18,18 +20,17 @@ export function SpellResolutionOutcomeGroupBody({
   outcomeIndex,
 }: SpellResolutionOutcomeGroupBodyProps) {
   return (
-    <Card tone="subtle" density="compact" aria-labelledby={headingId}>
-      <CardContent className="flex flex-col gap-3">
-        <Heading variant="group" as="h3" id={headingId}>
-          {getSpellResolutionOutcomeAuthoringLabel(result)}
-        </Heading>
+    <div className={cn(collectionPanelNestedBodyClasses, 'gap-3')} aria-labelledby={headingId}>
+      {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+      <Heading variant="group" as="h3" id={headingId}>
+        {getSpellResolutionOutcomeAuthoringLabel(result)}
+      </Heading>
 
-        <FormItems
-          items={outcomeBranchBodyFields(outcomeIndex, true)}
-          idPrefix={`resolution-outcome-${outcomeIndex}`}
-          namePrefix={`${RESOLUTION_FIELD_NAME}.outcomes.${outcomeIndex}`}
-        />
-      </CardContent>
-    </Card>
+      <FormItems
+        items={outcomeBranchBodyFields(outcomeIndex, true)}
+        idPrefix={`resolution-outcome-${outcomeIndex}`}
+        namePrefix={`${RESOLUTION_FIELD_NAME}.outcomes.${outcomeIndex}`}
+      />
+    </div>
   )
 }

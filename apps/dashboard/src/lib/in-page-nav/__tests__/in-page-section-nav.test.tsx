@@ -17,9 +17,9 @@ const sections = [
 ] as const
 
 describe('InPageSectionNav', () => {
-  it('insets the desktop rail and keeps the mobile select outside the card', async () => {
+  it('insets the desktop rail and keeps the mobile select outside the panel', async () => {
     const user = userEvent.setup()
-    const { container } = render(
+    render(
       <InPageSectionNav
         sections={sections}
         eyebrowLabel="On this page"
@@ -30,15 +30,16 @@ describe('InPageSectionNav', () => {
       />,
     )
 
-    const card = container.querySelector('.ui-card')
-    expect(card).toHaveClass('text-foreground')
-    const content = card?.querySelector('.ui-card__content')
-    expect(content).toHaveTextContent('On this page')
-    expect(content).toHaveTextContent('Features')
-    expect(content).toHaveTextContent('Level 1')
+    const rail = screen.getByRole('navigation', { name: 'On this page sections' })
+    const panel = rail.firstElementChild
+    expect(panel).toHaveClass('rounded-md', 'border', 'text-foreground')
+    expect(panel).not.toHaveClass('ui-card')
+    expect(panel).toHaveTextContent('On this page')
+    expect(panel).toHaveTextContent('Features')
+    expect(panel).toHaveTextContent('Level 1')
 
     const select = screen.getByRole('combobox', { name: 'Section' })
-    expect(card?.contains(select)).toBe(false)
+    expect(panel?.contains(select)).toBe(false)
 
     await user.click(screen.getByRole('link', { name: 'Description' }))
     expect(screen.getByRole('link', { name: 'Description' })).toHaveAttribute(
