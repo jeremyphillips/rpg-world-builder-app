@@ -1,5 +1,5 @@
 import { composeStories } from '@storybook/react-vite'
-import { GripVertical, Trash2 } from 'lucide-react'
+import { GripVertical, Trash2, WandSparkles } from 'lucide-react'
 import { useState } from 'react'
 
 import {
@@ -46,9 +46,18 @@ import {
 } from '@/features/content'
 import { DetailEntityRow } from '@/features/content/lib/detail/row/entity/detail-entity-row'
 import { DrawerEntityBlock } from '@/features/content/lib/entity/surfaces/drawer/drawer-entity-block'
+import { EquipmentAcquisitionGuidance } from '@/features/character/components/equipment/acquisition/equipment-acquisition-guidance'
 import { EquipmentResourceSummary } from '@/features/character/components/equipment/acquisition/equipment-resource-summary'
+import { BuilderStepChooseClassPrompt } from '@/features/character/components/builder/steps/shared/builder-step-choose-class-prompt'
+import { BuilderFactSummary } from '@/features/character/components/builder/steps/shared/fact-summary/builder-fact-summary'
+import { ChoiceSection } from '@/features/character/components/builder/steps/shared/choice-section/choice-section'
 import { ChoiceBlockRow } from '@/features/character/components/builder/steps/shared/choice-section/choice-block-row'
 import { createProficienciesStepRogueFixture } from '@/features/character/lib/proficiencies/proficiencies-step.fixtures'
+import {
+  PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE,
+  validationIssuesForProficiencyChoiceSet,
+  validationIssuesForProficiencySection,
+} from '@/features/character/lib/proficiencies/proficiencies-step.lib'
 import { QuickNpcStartingChoiceSelectedRow } from '@/features/character/npc/components/quick-npc/quick-npc-starting-choice-selected-row'
 import * as QuickNpcStartingChoicesStories from '@/features/character/npc/components/quick-npc/quick-npc-starting-choices.stories'
 
@@ -461,6 +470,128 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
             variant: 'secondary',
             onClick: noop,
           }}
+        />
+      </div>
+    ),
+  },
+  {
+    name: 'Builder fact summary',
+    section: 'ui-cards-form-rows',
+    component: 'BuilderFactSummary',
+    chain: ['Card', 'CardContent', 'IconContainer'],
+    useWhen:
+      'Builder step readouts (spellcasting, granted proficiencies) — subtle Card shell with declarative header.',
+    density: 'comfortable',
+    leading: 'icon row (domain)',
+    trailing: 'none',
+    anatomy: 'different',
+    render: () => (
+      <div className="max-w-lg">
+        <BuilderFactSummary
+          heading="Spellcasting"
+          subhead="Your class determines spellcasting ability and how these values are calculated."
+          rows={[
+            {
+              id: 'ability',
+              label: 'Spellcasting ability',
+              value: 'Intelligence',
+              icon: 'spellcasting-ability',
+            },
+          ]}
+          rowIcons={{ 'spellcasting-ability': WandSparkles }}
+          showSourceColumn={false}
+        />
+      </div>
+    ),
+  },
+  {
+    name: 'Builder choice section',
+    section: 'ui-cards-form-rows',
+    component: 'ChoiceSection',
+    chain: ['Card', 'CardContent', 'ChoiceSectionHeader', 'EntityCard'],
+    useWhen:
+      'Interactive builder choice wells — subtle Card wraps section header, dividers, and entity selected rows.',
+    density: 'comfortable',
+    leading: 'none',
+    trailing: 'add action (header)',
+    anatomy: 'different',
+    render: () => {
+      const { model } = createProficienciesStepRogueFixture()
+      const skills = model.sections.find((section) => section.kind === 'skills')
+      if (!skills) return null
+      return (
+        <div className="max-w-xl">
+          <ChoiceSection
+            section={skills}
+            sectionIdPrefix="card-recipe-choice"
+            overSelectionMessage={PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE}
+            validationIssuesForChoiceSet={validationIssuesForProficiencyChoiceSet}
+            validationIssuesForSection={validationIssuesForProficiencySection}
+            onOpenChoiceSet={noop}
+            onRemoveChoice={noop}
+          />
+        </div>
+      )
+    },
+  },
+  {
+    name: 'Builder choose-class prompt',
+    section: 'ui-cards-form-rows',
+    component: 'BuilderStepChooseClassPrompt',
+    chain: ['Card', 'CardContent', 'CardTitle', 'CardDescription'],
+    useWhen: 'Gated builder steps that send the player to an upstream prerequisite step.',
+    density: 'comfortable',
+    leading: 'IconContainer',
+    trailing: 'text action',
+    anatomy: 'different',
+    render: () => (
+      <div className="max-w-lg">
+        <BuilderStepChooseClassPrompt
+          heading="Choose a class first"
+          description="Select a class before configuring starting equipment."
+          onNavigateToStep={noop}
+        />
+      </div>
+    ),
+  },
+  {
+    name: 'Equipment acquisition guidance stack',
+    section: 'ui-cards-form-rows',
+    component: 'EquipmentAcquisitionGuidance',
+    chain: ['Card', 'EquipmentResourceSummary', 'Card', 'DividedStack', 'EntityAnatomyHost'],
+    useWhen:
+      'Equipment step header — unresolved funding subtle Card stacked with resource summary panel.',
+    density: 'comfortable',
+    leading: 'resource media (summary)',
+    trailing: 'browse / manage actions',
+    anatomy: 'row-track',
+    render: () => (
+      <div className="max-w-md">
+        <EquipmentAcquisitionGuidance
+          showPurchaseWorkflow={false}
+          fundingState={{ kind: 'unresolved', pendingCostCp: 50 }}
+          onOpenPurchasePicker={noop}
+          showMagicItemGrants
+          magicItemAllowances={[
+            {
+              id: 'allowance-common',
+              source: { kind: 'startingWealthTier', sourceId: 'table', tierId: 'hero' },
+              rarity: 'common',
+              count: 2,
+              requirement: 'exact',
+            },
+          ]}
+          magicItemProgress={[
+            {
+              allowanceId: 'allowance-common',
+              rarity: 'common',
+              capacity: 2,
+              selected: 1,
+              remainingCapacity: 1,
+              isFilled: false,
+            },
+          ]}
+          onOpenMagicItemsPicker={noop}
         />
       </div>
     ),

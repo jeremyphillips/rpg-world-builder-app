@@ -1,5 +1,5 @@
 import type { MagicItemAllowance, MagicItemGrantProgress } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
+import { Card, Text } from '@rpg/ui'
 
 import {
   EQUIPMENT_MAGIC_ITEMS_BROWSE_LABEL,
@@ -15,8 +15,8 @@ import {
   type EquipmentAcquisitionGuidanceAction,
 } from './equipment-acquisition-guidance.lib'
 import {
-  equipmentAcquisitionGuidanceCardClasses,
   equipmentAcquisitionGuidanceGridClasses,
+  equipmentAcquisitionGuidanceUnresolvedBodyClasses,
 } from './equipment-acquisition-guidance.variants'
 import { equipmentAcquisitionGuidanceCardDescriptionClasses } from './equipment-acquisition-panel.variants'
 import {
@@ -36,17 +36,20 @@ export type EquipmentAcquisitionGuidanceProps = {
 
 function EquipmentUnresolvedFundingCard({ pendingCostCp }: { pendingCostCp: number }) {
   return (
-    <article className={equipmentAcquisitionGuidanceCardClasses}>
-      <Heading variant="subsection" as="h3">
-        {EQUIPMENT_UNRESOLVED_FUNDING_HEADING}
-      </Heading>
-      <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
-        {EQUIPMENT_UNRESOLVED_FUNDING_DESCRIPTION}
-      </Text>
-      <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
-        {formatEquipmentUnresolvedFundingSelectedLabel(pendingCostCp)}
-      </Text>
-    </article>
+    <Card
+      tone="subtle"
+      density="comfortable"
+      header={{ title: EQUIPMENT_UNRESOLVED_FUNDING_HEADING }}
+    >
+      <div className={equipmentAcquisitionGuidanceUnresolvedBodyClasses}>
+        <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
+          {EQUIPMENT_UNRESOLVED_FUNDING_DESCRIPTION}
+        </Text>
+        <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
+          {formatEquipmentUnresolvedFundingSelectedLabel(pendingCostCp)}
+        </Text>
+      </div>
+    </Card>
   )
 }
 

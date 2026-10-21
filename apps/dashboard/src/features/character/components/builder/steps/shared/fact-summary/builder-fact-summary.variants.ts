@@ -1,15 +1,13 @@
-import { cn, establishSurfaceCurrent } from '@rpg/ui'
+export const builderFactSummaryIconRowsClasses = 'space-y-0'
 
-export const builderFactSummaryClasses = cn(
-  'relative rounded-md border border-border bg-surface-faint p-4',
-  establishSurfaceCurrent('surface-faint'),
-)
+export const builderFactSummaryIconRowClasses =
+  'grid grid-cols-[auto_minmax(7.5rem,10rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2'
 
-export const builderFactSummaryHeaderClasses = 'space-y-1'
+export const builderFactSummaryIconRowLabelClasses = 'text-style-label text-foreground'
 
-export const builderFactSummarySubheadClasses = 'text-style-supporting'
+export const builderFactSummaryIconRowSetValueClasses = 'text-style-label text-foreground'
 
-export const builderFactSummaryDividerClasses = 'mt-4 mb-2 border-t border-border'
+export const builderFactSummaryIconRowUnsetValueClasses = 'text-sm italic text-muted-foreground'
 
 export const builderFactSummaryRowsClasses = 'grid gap-3 sm:grid-cols-2'
 
@@ -22,17 +20,6 @@ export const builderFactSummarySetValueClasses = 'text-style-label text-foregrou
 export const builderFactSummaryUnsetValueClasses = 'text-sm italic text-muted-foreground'
 
 export const builderFactSummarySimpleValueClasses = builderFactSummarySetValueClasses
-
-export const builderFactSummaryIconRowsClasses = 'space-y-0'
-
-export const builderFactSummaryIconRowClasses =
-  'grid grid-cols-[auto_minmax(7.5rem,10rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2'
-
-export const builderFactSummaryIconRowLabelClasses = 'text-style-label text-foreground'
-
-export const builderFactSummaryIconRowSetValueClasses = 'text-style-label text-foreground'
-
-export const builderFactSummaryIconRowUnsetValueClasses = builderFactSummaryUnsetValueClasses
 
 export const builderFactSummaryGrantedRowsClasses = 'space-y-0'
 

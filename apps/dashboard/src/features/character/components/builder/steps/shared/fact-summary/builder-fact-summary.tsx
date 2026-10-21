@@ -4,16 +4,14 @@ import type {
   GrantedProficiencySummaryRow,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-import { Heading, IconContainer } from '@rpg/ui'
+import { Card, IconContainer } from '@rpg/ui'
 import type { LucideIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 import {
   builderFactSummaryCategoryLabelClasses,
-  builderFactSummaryClasses,
-  builderFactSummaryDividerClasses,
   builderFactSummaryGrantedRowClasses,
   builderFactSummaryGrantedRowsClasses,
-  builderFactSummaryHeaderClasses,
   builderFactSummaryIconRowClasses,
   builderFactSummaryIconRowLabelClasses,
   builderFactSummaryIconRowSetValueClasses,
@@ -25,7 +23,6 @@ import {
   builderFactSummarySimpleLabelClasses,
   builderFactSummarySimpleRowClasses,
   builderFactSummarySimpleValueClasses,
-  builderFactSummarySubheadClasses,
   builderFactSummaryValueLabelsClasses,
 } from './builder-fact-summary.variants'
 
@@ -71,22 +68,34 @@ function FactSummaryValue({
   return null
 }
 
+type BuilderFactSummaryShellProps = {
+  heading: string
+  subhead?: string
+  children: ReactNode
+}
+
+function BuilderFactSummaryShell({ heading, subhead, children }: BuilderFactSummaryShellProps) {
+  return (
+    <Card
+      tone="subtle"
+      density="comfortable"
+      header={{
+        title: heading,
+        description: subhead,
+      }}
+    >
+      {children}
+    </Card>
+  )
+}
+
 function SimpleFactSummary({ heading, subhead, rows, rowIcons }: BuilderFactSummarySimpleProps) {
   if (rows.length === 0) return null
 
   const usesIconRows = rows.some((row) => row.icon && rowIcons?.[row.icon])
 
   return (
-    <section aria-labelledby="builder-fact-summary-heading" className={builderFactSummaryClasses}>
-      <div className={builderFactSummaryHeaderClasses}>
-        <Heading variant="subsection" as="h3" id="builder-fact-summary-heading">
-          {heading}
-        </Heading>
-        {subhead ? <p className={builderFactSummarySubheadClasses}>{subhead}</p> : null}
-      </div>
-
-      <div className={builderFactSummaryDividerClasses} role="presentation" aria-hidden />
-
+    <BuilderFactSummaryShell heading={heading} subhead={subhead}>
       {usesIconRows ? (
         <div className={builderFactSummaryIconRowsClasses}>
           {rows.map((row, index) => {
@@ -135,7 +144,7 @@ function SimpleFactSummary({ heading, subhead, rows, rowIcons }: BuilderFactSumm
           ))}
         </dl>
       )}
-    </section>
+    </BuilderFactSummaryShell>
   )
 }
 
@@ -160,16 +169,7 @@ function GrantedFactSummary({
   if (grantedRows.length === 0) return null
 
   return (
-    <section aria-labelledby="builder-fact-summary-heading" className={builderFactSummaryClasses}>
-      <div className={builderFactSummaryHeaderClasses}>
-        <Heading variant="subsection" as="h3" id="builder-fact-summary-heading">
-          {heading}
-        </Heading>
-        {subhead ? <p className={builderFactSummarySubheadClasses}>{subhead}</p> : null}
-      </div>
-
-      <div className={builderFactSummaryDividerClasses} role="presentation" aria-hidden />
-
+    <BuilderFactSummaryShell heading={heading} subhead={subhead}>
       <div className={builderFactSummaryGrantedRowsClasses}>
         {grantedRows.map((row, index) => {
           const Icon = categoryIcons[row.kind]
@@ -200,7 +200,7 @@ function GrantedFactSummary({
           )
         })}
       </div>
-    </section>
+    </BuilderFactSummaryShell>
   )
 }
 

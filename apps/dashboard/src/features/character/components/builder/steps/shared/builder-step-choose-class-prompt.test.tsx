@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { UI_CARD_DESCRIPTION_CLASS, UI_CARD_TITLE_CLASS } from '@rpg/ui'
 
 import { BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL } from '../../../../lib/builder/builder-step-choose-class-prompt.lib'
 import {
@@ -10,8 +11,6 @@ import {
 import { BuilderStepChooseClassPrompt } from './builder-step-choose-class-prompt'
 import {
   builderStepChooseClassPromptContentClasses,
-  builderStepChooseClassPromptHeadingClasses,
-  builderStepChooseClassPromptSubheadingClasses,
   builderStepChooseClassPromptTextStackClasses,
 } from './builder-step-choose-class-prompt.variants'
 
@@ -29,10 +28,10 @@ describe('BuilderStepChooseClassPrompt', () => {
     )
 
     expect(
-      screen.getByRole('heading', { level: 2, name: EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING }),
-    ).toHaveClass(builderStepChooseClassPromptHeadingClasses)
+      screen.getByRole('heading', { level: 3, name: EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING }),
+    ).toHaveClass(UI_CARD_TITLE_CLASS)
     expect(screen.getByText(EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION)).toHaveClass(
-      builderStepChooseClassPromptSubheadingClasses,
+      UI_CARD_DESCRIPTION_CLASS,
     )
     expect(screen.getByText(EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION).closest('div')).toHaveClass(
       builderStepChooseClassPromptTextStackClasses,

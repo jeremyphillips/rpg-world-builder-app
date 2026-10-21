@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { Shield, WandSparkles } from 'lucide-react'
+import { UI_CARD_DESCRIPTION_CLASS } from '@rpg/ui'
 import { describe, expect, it } from 'vitest'
 
 import { BuilderFactSummary } from './builder-fact-summary'
@@ -28,7 +29,7 @@ describe('BuilderFactSummary', () => {
       'Your class determines your spellcasting ability and how these values are calculated.',
     )
     expect(description).toBeInTheDocument()
-    expect(description).toHaveClass('text-style-supporting')
+    expect(description).toHaveClass(UI_CARD_DESCRIPTION_CLASS)
     expect(screen.getByText('Spellcasting ability')).toBeInTheDocument()
 
     const value = screen.getByText('Intelligence')

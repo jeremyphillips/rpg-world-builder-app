@@ -4,7 +4,7 @@ export const choiceSubsectionHintMarginClasses = 'mb-1'
 /** Top margin for empty wells and selected card lists within a subsection. */
 export const choiceSubsectionBodyMarginClasses = 'mt-2'
 
-export const choiceSectionClasses = 'space-y-4 rounded-md border border-border p-4'
+export const choiceSectionBodyStackClasses = 'space-y-4'
 
 export const choiceSectionHeaderClasses =
   'grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-1'
