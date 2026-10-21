@@ -129,6 +129,7 @@ function extractQuotedClassStrings(source: string): string[] {
   let match: RegExpExecArray | null
   while ((match = re.exec(source))) {
     const inner = match[1]
+    if (inner == null) continue
     if (/\b(text-sm|text-xs|text-muted-foreground|font-medium)\b/.test(inner)) {
       out.push(inner)
     }
@@ -143,8 +144,11 @@ export function extractCnMergedClassStrings(source: string): string[] {
   let match: RegExpExecArray | null
   while ((match = cnRe.exec(source))) {
     const inner = match[1]
+    if (inner == null) continue
     if (inner.includes('?') || inner.includes(':')) continue
-    const literals = [...inner.matchAll(/['"`]([^'"`]+)['"`]/g)].map((m) => m[1])
+    const literals = [...inner.matchAll(/['"`]([^'"`]+)['"`]/g)]
+      .map((m) => m[1])
+      .filter((literal): literal is string => literal != null)
     if (literals.length === 0) continue
     const merged = literals.join(' ')
     if (/\b(text-sm|text-xs|text-muted-foreground|font-medium)\b/.test(merged)) {
