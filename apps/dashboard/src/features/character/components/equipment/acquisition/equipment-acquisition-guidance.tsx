@@ -15,11 +15,6 @@ import {
   type EquipmentAcquisitionGuidanceAction,
 } from './equipment-acquisition-guidance.lib'
 import {
-  equipmentAcquisitionGuidanceGridClasses,
-  equipmentAcquisitionGuidanceUnresolvedBodyClasses,
-} from './equipment-acquisition-guidance.variants'
-import { equipmentAcquisitionGuidanceCardDescriptionClasses } from './equipment-acquisition-panel.variants'
-import {
   EquipmentResourceSummary,
   type EquipmentResourceSummaryAction,
 } from './equipment-resource-summary'
@@ -41,11 +36,11 @@ function EquipmentUnresolvedFundingCard({ pendingCostCp }: { pendingCostCp: numb
       density="comfortable"
       header={{ title: EQUIPMENT_UNRESOLVED_FUNDING_HEADING }}
     >
-      <div className={equipmentAcquisitionGuidanceUnresolvedBodyClasses}>
-        <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
+      <div className="flex min-w-0 flex-col gap-3">
+        <Text as="p" variant="muted">
           {EQUIPMENT_UNRESOLVED_FUNDING_DESCRIPTION}
         </Text>
-        <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
+        <Text as="p" variant="muted">
           {formatEquipmentUnresolvedFundingSelectedLabel(pendingCostCp)}
         </Text>
       </div>
@@ -115,7 +110,7 @@ export function EquipmentAcquisitionGuidance({
   const handlers = { onOpenPurchasePicker, onOpenMagicItemsPicker }
 
   return (
-    <section aria-label="Acquisition guidance" className={equipmentAcquisitionGuidanceGridClasses}>
+    <section aria-label="Acquisition guidance" className="grid grid-cols-1 gap-4">
       {view.unresolvedPendingCostCp !== undefined ? (
         <EquipmentUnresolvedFundingCard pendingCostCp={view.unresolvedPendingCostCp} />
       ) : null}
