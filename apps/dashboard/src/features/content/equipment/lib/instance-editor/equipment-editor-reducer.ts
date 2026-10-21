@@ -2,6 +2,7 @@ import type { EquipmentInstance } from '@rpg/contracts'
 
 import { applyEquipmentEditorAction, withSession } from './equipment-editor-reducer.handlers'
 import type {
+  EquipmentEditorAction,
   EquipmentEditorScope,
   EquipmentEditorSession,
   EquipmentEditorState,
@@ -36,7 +37,7 @@ export function createEquipmentEditorState(args: {
 
 export function equipmentEditorReducer(
   state: EquipmentEditorState,
-  action: import('./equipment-editor-types').EquipmentEditorAction,
+  action: EquipmentEditorAction,
 ): EquipmentEditorState {
   return applyEquipmentEditorAction(state, action)
 }

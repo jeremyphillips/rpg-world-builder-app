@@ -1,4 +1,4 @@
-import type { HomebrewSummaryContentType } from '@rpg/contracts'
+import type { HomebrewSummaryContentType } from '@rpg/contracts/content'
 
 export type CampaignSidebarContentSection = 'game-library' | 'world'
 

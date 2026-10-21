@@ -14,11 +14,11 @@ import {
   defaultHitPointsDiceForSize,
   hitPointsDiceAuthoringFields,
   hitPointsDiceFromFormValues,
-  MONSTER_HIT_POINTS_DICE_FIELD,
   MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD,
   MONSTER_HIT_POINTS_STASH_FIELD,
   MONSTER_HIT_POINTS_USE_FIXED_FIELD,
 } from './statistics/monster-hit-points-form.lib'
+import type { MONSTER_HIT_POINTS_DICE_FIELD } from './statistics/monster-hit-points-form.lib'
 import type { MonsterHitPointStash } from './statistics/monster-variant-transitions'
 
 import type { WeaponProficiencyMode } from '../../classes/lib/class-form-constants'

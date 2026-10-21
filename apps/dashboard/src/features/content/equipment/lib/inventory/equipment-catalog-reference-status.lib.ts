@@ -1,7 +1,8 @@
+import { EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE } from '@/lib/equipment/equipment-catalog-reference-status.lib'
+
 import type { EntitySummaryStatusItem } from '../../../lib/entity/summary/entity-summary-status.types'
 
-/** User-facing copy when a saved equipment id is not in the campaign catalog. */
-export const EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE = 'Equipment reference unavailable'
+export { EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE }
 
 export function equipmentCatalogReferenceUnavailableStatusItem(): EntitySummaryStatusItem {
   return {

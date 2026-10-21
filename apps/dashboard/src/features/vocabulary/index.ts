@@ -21,6 +21,7 @@ export { useVocabularySetMaps } from './hooks/use-vocabulary-set-maps'
 export * from './sets'
 export * from './fields'
 
+export { buildLabelDescriptionActiveVocabulary } from './lib/build-vocabulary-maps'
 export {
   VOCABULARY_SOURCE_BADGE,
   VOCABULARY_SOURCE_LABELS,

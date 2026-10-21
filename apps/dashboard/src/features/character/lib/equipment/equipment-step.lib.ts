@@ -54,9 +54,9 @@ import {
   type EffectiveStartingEquipmentPackageItem,
 } from '@rpg/contracts'
 
-import { EQUIPMENT_INVENTORY_GROUP_LABELS } from '../../../content/equipment/lib/inventory/equipment-inventory-group-labels.lib'
+import { EQUIPMENT_INVENTORY_GROUP_LABELS } from '@/lib/equipment/equipment-inventory-group-labels.lib'
 
-export { EQUIPMENT_INVENTORY_GROUP_LABELS } from '../../../content/equipment/lib/inventory/equipment-inventory-group-labels.lib'
+export { EQUIPMENT_INVENTORY_GROUP_LABELS } from '@/lib/equipment/equipment-inventory-group-labels.lib'
 
 import {
   enrichEquipmentPickerItemsWithSearchDocument,

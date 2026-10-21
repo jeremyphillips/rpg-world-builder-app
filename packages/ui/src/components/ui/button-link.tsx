@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 
 import { renderNavigableLinkRoot } from './navigable-link-root.lib'

@@ -331,16 +331,7 @@ function RadioOptionCardPrimaryRow(props: RadioOptionCardInteriorProps) {
 }
 
 function RadioOptionCardInterior(props: RadioOptionCardInteriorProps) {
-  const {
-    id,
-    density = 'comfortable',
-    variant = 'card',
-    media,
-    embedded,
-    footer,
-    embeddedTone,
-    selected,
-  } = props
+  const { id, variant = 'card', media, embedded, footer, embeddedTone, selected } = props
   const showCardMedia = Boolean(media && variant === 'card')
 
   return (

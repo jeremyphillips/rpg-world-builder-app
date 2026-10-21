@@ -1,4 +1,5 @@
 import { act, render, screen } from '@testing-library/react'
+import { useEffect } from 'react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
@@ -34,7 +35,9 @@ function Host({
   catalogEquipment?: ReturnType<typeof pickEquipment>[]
 }) {
   const form = useForm<MonsterFormValues>({ defaultValues })
-  if (formRef) formRef.current = form
+  useEffect(() => {
+    if (formRef) formRef.current = form
+  }, [form, formRef])
   const equipmentCatalogById = new Map(catalogEquipment.map((item) => [item.id, item]))
   return (
     <FormProvider {...form}>

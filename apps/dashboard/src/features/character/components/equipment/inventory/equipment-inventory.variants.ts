@@ -8,7 +8,7 @@ export {
   equipmentInventoryRowListClasses,
   equipmentPurchasedInventoryCategoryClasses,
   equipmentPurchasedInventoryCategoryListClasses,
-} from '@/features/content/equipment/components/inventory-list/equipment-inventory-list.variants'
+} from '@/lib/equipment/equipment-inventory-list.variants'
 
 export const equipmentInventoryPanelDividerClasses = 'border-t border-border'
 

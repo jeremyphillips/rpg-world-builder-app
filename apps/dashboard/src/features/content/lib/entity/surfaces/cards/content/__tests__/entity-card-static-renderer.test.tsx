@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { projectEntitySurfaceIdentityToSummaryModel } from '../../../entity-surface-projection.lib'
 import { EntityCardStaticRenderer } from '../entity-card-static-renderer'
-import { useEntityCardUtilityFieldSize } from '../entity-card-utility-field-size.context'
+import { useEntityCardUtilityFieldSize } from '../entity-card-utility-field-size.lib'
 
 function UtilityFieldSizeProbe() {
   const size = useEntityCardUtilityFieldSize()

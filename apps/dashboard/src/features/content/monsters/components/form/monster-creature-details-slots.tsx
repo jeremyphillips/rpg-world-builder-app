@@ -10,8 +10,7 @@ import {
 } from '@rpg/contracts'
 import { BooleanField, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
 
-import { buildLabelDescriptionActiveVocabulary } from '@/features/vocabulary/lib/build-vocabulary-maps'
-import { useVocabularySet } from '@/features/vocabulary/hooks/use-vocabulary-set'
+import { buildLabelDescriptionActiveVocabulary, useVocabularySet } from '@/features/vocabulary'
 
 import { useEntityCardUtilityControlSizes } from '../../../lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
 import { EntityCard } from '@/features/content'

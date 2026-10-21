@@ -1,4 +1,4 @@
-import { HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS } from '@rpg/contracts'
+import { HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS } from '@rpg/contracts/content'
 import { describe, expect, it } from 'vitest'
 
 import { CAMPAIGN_SIDEBAR_CONTENT_SECTION } from './campaign-sidebar-content-section'

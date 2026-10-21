@@ -43,12 +43,10 @@ describe('entity surface closed API', () => {
   })
 
   it('EntityCard static navigable rejects interactive slots', () => {
-    expectTypeOf<
-      Extract<
-        keyof EntityCardStaticNavigableProps,
-        'leading' | 'trailing' | 'headingInline' | 'disabled'
-      >
-    >().toEqualTypeOf<never>()
+    expectTypeOf<EntityCardStaticNavigableProps['leading']>().toEqualTypeOf<undefined>()
+    expectTypeOf<EntityCardStaticNavigableProps['trailing']>().toEqualTypeOf<undefined>()
+    expectTypeOf<EntityCardStaticNavigableProps['headingInline']>().toEqualTypeOf<undefined>()
+    expectTypeOf<EntityCardStaticNavigableProps['disabled']>().toEqualTypeOf<undefined>()
   })
 
   it('EntityCard disclosure rejects link', () => {

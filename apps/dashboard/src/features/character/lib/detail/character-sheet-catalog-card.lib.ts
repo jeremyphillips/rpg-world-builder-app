@@ -49,7 +49,7 @@ export type CatalogHeaderModelBase<TTone extends string = string> = {
   unavailableMessage?: string
 }
 
-import { EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE } from '../../../content/equipment/lib/inventory/equipment-catalog-reference-status.lib'
+import { EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE } from '@/lib/equipment/equipment-catalog-reference-status.lib'
 
 export const CHARACTER_SHEET_CATALOG_UNAVAILABLE_MESSAGES = {
   equipment: EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE,

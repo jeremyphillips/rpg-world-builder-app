@@ -41,12 +41,12 @@ export {
   type EntityCardProps,
   type EntityCardStaticProps,
 } from './lib/entity/surfaces/cards/content/entity-card'
+export { EntityCardUtilityFieldSizeProvider } from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.provider'
 export {
-  EntityCardUtilityFieldSizeProvider,
   resolveEntityCardUtilityFieldSize,
   useEntityCardUtilityFieldSize,
-} from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.context'
-export { useEntityCardUtilityControlSizes } from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
+  useEntityCardUtilityControlSizes,
+} from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
 export {
   EntityDisclosureArrayItemShell,
   type EntityDisclosureArrayItemShellProps,
@@ -209,6 +209,10 @@ export {
   EQUIPMENT_INSTANCE_MAGICAL_STATUS_LABEL,
   EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE,
   EQUIPMENT_INVENTORY_GROUP_LABELS,
+  EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,
+  equipmentInventoryRowListClasses,
+  equipmentPurchasedInventoryCategoryClasses,
+  equipmentPurchasedInventoryCategoryListClasses,
   mergeEquipmentInventoryCatalogReferenceStatus,
   EQUIPMENT_DETAILS_SECTION_TITLES,
   EQUIPMENT_STAT_LABELS,

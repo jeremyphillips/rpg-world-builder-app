@@ -128,10 +128,12 @@ describe('grant array EntityCardDisclosureRenderer shell', () => {
 
     const firstRow = getGrantRow('grants.0')
     expect(
-      within(firstRow).getByText('Spells', { selector: '.font-body-emphasis' }),
+      within(firstRow).getByText('Spells', { selector: '.ui-identity-row__title' }),
     ).toBeInTheDocument()
     expect(
-      within(firstRow).getByText('Speak with Animals', { selector: '.text-muted-foreground' }),
+      within(firstRow).getByText('Speak with Animals', {
+        selector: '.ui-identity-row__classification',
+      }),
     ).toBeInTheDocument()
     expect(
       within(firstRow).getByText('Character has Speak with Animals always prepared.'),
@@ -179,7 +181,7 @@ describe('grant array EntityCardDisclosureRenderer shell', () => {
     expect(shell.className).not.toContain('--entity-surface-inline-start')
 
     const headerWrap = within(firstRow)
-      .getByText('Spells', { selector: '.font-body-emphasis' })
+      .getByText('Spells', { selector: '.ui-identity-row__title' })
       .closest('.dash-entity-card__content') as HTMLElement
     expect(headerWrap).toHaveClass('dash-entity-card__content')
 

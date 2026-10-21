@@ -4,7 +4,7 @@ import { isContainer, type ComboboxFieldConfig, type DependentConfig } from '@rp
 
 import { assertComboboxOptionsMatchFilterDimensions } from '@/lib/forms/grant-sets/combobox-filter-option-metadata.lib'
 import { buildArmorProficiencyGrantComboboxFilters } from '@/lib/forms/grant-sets/armor-proficiency-combobox-filters.lib'
-import { referenceArmorComboboxFieldOptions } from '@/features/content/lib/form-options/content-field-option.lib'
+import { referenceArmorComboboxFieldOptions } from '@/features/content'
 import { pickArmor } from '@/test/fixtures/pick'
 
 import { LEVEL_ZERO_NPCS_ENABLED, levelZeroNpcsFields } from './level-zero-npc-form-fields'

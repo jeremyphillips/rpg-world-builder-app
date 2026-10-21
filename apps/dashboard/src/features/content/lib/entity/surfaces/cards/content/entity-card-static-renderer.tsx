@@ -9,10 +9,8 @@ import { resolveEntitySurfaceEdges } from '../../../anatomy/entity-surface-edges
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
 import { EntityCardContent } from './entity-card-content'
 import { EntityCardFrame } from './entity-card-frame'
-import {
-  EntityCardUtilityFieldSizeProvider,
-  resolveEntityCardUtilityFieldSize,
-} from './entity-card-utility-field-size.context'
+import { EntityCardUtilityFieldSizeProvider } from './entity-card-utility-field-size.provider'
+import { resolveEntityCardUtilityFieldSize } from './entity-card-utility-field-size.lib'
 
 type EntityCardStaticBase = {
   entity: EntitySummaryModel
