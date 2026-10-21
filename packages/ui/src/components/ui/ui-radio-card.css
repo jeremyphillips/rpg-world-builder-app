@@ -65,4 +65,55 @@
   .ui-radio-card__footer {
     min-width: 0;
   }
+
+  /* Title block → supporting copy. Region gaps stay on the body, footer, and panel. */
+  .ui-option-card__primary {
+    display: flex;
+    min-width: 0;
+    width: 100%;
+    flex-direction: column;
+    gap: var(--ui-anatomy-row-gap);
+  }
+
+  /* In-flow embedded slot. Indent is the card control column: indicator + anatomy gap. */
+  .ui-option-card__embedded--in-flow {
+    border-top: 1px solid var(--border);
+    margin-top: calc(var(--spacing) * 4);
+    padding-top: calc(var(--spacing) * 4);
+    padding-inline-start: calc(var(--control-choice-indicator-size-lg) + (var(--spacing) * 4));
+  }
+
+  .ui-card--compact .ui-option-card__embedded--in-flow,
+  .ui-radio-card--row-compact .ui-option-card__embedded--in-flow {
+    margin-top: calc(var(--spacing) * 2);
+    padding-top: calc(var(--spacing) * 2);
+    padding-inline-start: calc(var(--control-choice-indicator-size-sm) + (var(--spacing) * 3));
+  }
+
+  /* Panel tone breaks out to the card edge. No control-column indent. */
+  .ui-option-card__embedded--panel {
+    border-top: 1px solid var(--border);
+    margin-top: calc(var(--spacing) * 4);
+    margin-inline: calc(var(--spacing) * -5);
+    margin-bottom: calc(var(--spacing) * -3);
+    padding-top: calc(var(--spacing) * 4);
+    padding-bottom: calc(var(--spacing) * 3);
+    border-end-start-radius: var(--radius-card);
+    border-end-end-radius: var(--radius-card);
+  }
+
+  .ui-card--compact .ui-option-card__embedded--panel,
+  .ui-radio-card--row-compact .ui-option-card__embedded--panel {
+    margin-top: calc(var(--spacing) * 2);
+    margin-inline: calc(var(--spacing) * -4);
+    margin-bottom: calc(var(--spacing) * -2);
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .ui-option-card-embedded-panel__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-anatomy-row-gap);
+  }
 }

@@ -37,11 +37,12 @@ import {
 } from './selection-target.client'
 import {
   optionCardDensityContentGapVariants,
-  optionCardEmbeddedSlotVariants,
+  optionCardEmbeddedSlotClassName,
   optionCardFooterSlotVariants,
+  type OptionCardEmbeddedSlotTone,
 } from './selection-option-card.variants'
 
-export type RadioOptionCardEmbeddedSlotTone = 'divider' | 'panel' | 'plain'
+export type RadioOptionCardEmbeddedSlotTone = OptionCardEmbeddedSlotTone
 
 export type RadioOptionCardSummaryBadge = {
   label: string
@@ -176,6 +177,7 @@ function resolveRadioOptionCardShellClassName({
     return cn(
       radioCardGroupItemRowClasses({ density }),
       'group ui-radio-card ui-radio-card--row',
+      density === 'compact' ? 'ui-radio-card--row-compact' : 'ui-radio-card--row-comfortable',
       selected && 'ui-interactive-row--selected-bordered',
       disabled && 'opacity-50',
       className,
@@ -240,10 +242,7 @@ function RadioOptionCardBodyExtras({
     <>
       {selected && embedded ? (
         <div
-          className={cn(
-            'ui-radio-card__embedded',
-            optionCardEmbeddedSlotVariants({ density, tone: embeddedTone }),
-          )}
+          className={cn('ui-radio-card__embedded', optionCardEmbeddedSlotClassName(embeddedTone))}
         >
           {embedded}
         </div>

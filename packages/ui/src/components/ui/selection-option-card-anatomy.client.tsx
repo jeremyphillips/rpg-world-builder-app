@@ -5,24 +5,22 @@ import type { ReactNode } from 'react'
 import { cn } from '../../lib/utils'
 import { Eyebrow } from './eyebrow'
 import type { EyebrowVariantProps } from './eyebrow.variants'
+import { identityInsetRowVariants } from './identity-frame.variants'
 import { textVariants } from './text.variants'
 import {
   optionCardBodyVariants,
-  optionCardIdentityRowVariants,
   optionCardDescriptionClampVariants,
-  optionCardDescriptionVariants,
-  optionCardPrimaryCopyStackVariants,
   optionCardSummaryLinesVariants,
-  optionCardSummaryTitleVariants,
-  optionCardSummaryVariants,
+  optionCardSupportingClassName,
   optionCardTitleClampVariants,
+  optionCardTitleClassName,
   optionCardTitleRowVariants,
-  optionCardTitleVariants,
   selectionOptionCardAnatomyBodyVariants,
   optionCardSecondaryCopyStackVariants,
   optionCardSummaryBadgeRowVariants,
   optionCardTitleLineVariants,
   selectionOptionCardAnatomyRootVariants,
+  UI_OPTION_CARD_PRIMARY_CLASS,
 } from './selection-option-card.variants'
 
 export type SelectionOptionCardCopyWidth = 'fill' | 'content'
@@ -84,17 +82,11 @@ export type SelectionOptionCardAnatomyProps = {
   leadingMedia?: ReactNode
 }
 
-function SelectionOptionCardSummaryLines({
-  summaryLines,
-  density = 'comfortable',
-}: {
-  summaryLines: string[]
-  density?: SelectionOptionCardDensity
-}) {
+function SelectionOptionCardSummaryLines({ summaryLines }: { summaryLines: string[] }) {
   return (
     <div className={optionCardSummaryLinesVariants()}>
       {summaryLines.map((line) => (
-        <span key={line} className={optionCardSummaryVariants({ density })}>
+        <span key={line} className={optionCardSupportingClassName}>
           {line}
         </span>
       ))}
@@ -107,14 +99,12 @@ function SelectionOptionCardSecondaryContent({
   summaryText,
   summaryLines,
   summaryContent,
-  density = 'comfortable',
   clampDescription = false,
 }: {
   description?: string
   summaryText?: string
   summaryLines?: string[]
   summaryContent?: ReactNode
-  density?: SelectionOptionCardDensity
   clampDescription?: boolean
 }) {
   return (
@@ -122,19 +112,17 @@ function SelectionOptionCardSecondaryContent({
       {description ? (
         <span
           className={cn(
-            optionCardDescriptionVariants({ density }),
+            optionCardSupportingClassName,
             clampDescription && optionCardDescriptionClampVariants(),
           )}
         >
           {description}
         </span>
       ) : null}
-      {summaryText ? (
-        <span className={optionCardSummaryVariants({ density })}>{summaryText}</span>
-      ) : null}
+      {summaryText ? <span className={optionCardSupportingClassName}>{summaryText}</span> : null}
       {summaryContent}
       {summaryLines && summaryLines.length > 0 ? (
-        <SelectionOptionCardSummaryLines summaryLines={summaryLines} density={density} />
+        <SelectionOptionCardSummaryLines summaryLines={summaryLines} />
       ) : null}
     </>
   )
@@ -144,25 +132,22 @@ function SelectionOptionCardTitleRow({
   label,
   titleAdornment,
   titleClassName,
-  density,
   useSummaryTitle,
   clampDescription,
 }: {
   label: string
   titleAdornment?: ReactNode
   titleClassName?: string
-  density: SelectionOptionCardDensity
   useSummaryTitle: boolean
   clampDescription: boolean
 }) {
-  const titleVariants = useSummaryTitle ? optionCardSummaryTitleVariants : optionCardTitleVariants
   const TitleElement = useSummaryTitle ? 'h3' : 'span'
 
   return (
     <div className={optionCardTitleRowVariants()}>
       <TitleElement
         className={cn(
-          titleVariants({ density }),
+          optionCardTitleClassName,
           clampDescription && optionCardTitleClampVariants(),
           titleClassName,
         )}
@@ -175,7 +160,6 @@ function SelectionOptionCardTitleRow({
 }
 
 function SelectionOptionCardPrimaryCopy({
-  density,
   titleEndSlot,
   titleRow,
   description,
@@ -187,7 +171,6 @@ function SelectionOptionCardPrimaryCopy({
   summaryBadge,
   reserveSummaryBadgeRow,
 }: {
-  density: SelectionOptionCardDensity
   titleEndSlot?: ReactNode
   titleRow: ReactNode
   description?: string
@@ -202,14 +185,8 @@ function SelectionOptionCardPrimaryCopy({
   const showSummaryBadgeRow = reserveSummaryBadgeRow || summaryBadge != null
 
   return (
-    <div
-      className={cn(
-        optionCardPrimaryCopyStackVariants({ density }),
-        'min-w-0 w-full',
-        showSummaryBadgeRow && 'flex min-h-0 flex-1 flex-col',
-      )}
-    >
-      <div className={cn(showSummaryBadgeRow && 'flex min-h-0 flex-1 flex-col')}>
+    <div className={cn('flex min-w-0 w-full flex-col', showSummaryBadgeRow && 'min-h-0 flex-1')}>
+      <div className={cn(UI_OPTION_CARD_PRIMARY_CLASS, showSummaryBadgeRow && 'min-h-0 flex-1')}>
         {titleEndSlot ? (
           <div className={optionCardTitleLineVariants()}>
             <div className="min-w-0 shrink">{titleRow}</div>
@@ -218,13 +195,12 @@ function SelectionOptionCardPrimaryCopy({
         ) : (
           titleRow
         )}
-        <div className={optionCardSecondaryCopyStackVariants({ density, copyWidth })}>
+        <div className={optionCardSecondaryCopyStackVariants({ copyWidth })}>
           <SelectionOptionCardSecondaryContent
             description={description}
             summaryText={summaryText}
             summaryLines={summaryLines}
             summaryContent={summaryContent}
-            density={density}
             clampDescription={clampDescription}
           />
         </div>
@@ -265,7 +241,6 @@ export function SelectionOptionCardAnatomy({
       label={label}
       titleAdornment={titleAdornment}
       titleClassName={titleClassName}
-      density={density}
       useSummaryTitle={useSummaryTitle}
       clampDescription={clampDescription}
     />
@@ -273,7 +248,6 @@ export function SelectionOptionCardAnatomy({
 
   const primaryCopy = (
     <SelectionOptionCardPrimaryCopy
-      density={density}
       titleEndSlot={titleEndSlot}
       titleRow={titleRow}
       description={description}
@@ -297,7 +271,7 @@ export function SelectionOptionCardAnatomy({
     >
       {headerRow}
       {leadingMedia ? (
-        <div className={optionCardIdentityRowVariants({ density })}>
+        <div className={identityInsetRowVariants({ density, align: 'start' })}>
           <div className="shrink-0">{leadingMedia}</div>
           <div className="min-w-0 flex-1">{primaryCopy}</div>
         </div>

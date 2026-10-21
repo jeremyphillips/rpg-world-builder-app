@@ -45,10 +45,12 @@ describe('SelectionOptionCardEmbeddedPanel', () => {
       </SelectionOptionCardEmbeddedPanel>,
     )
 
-    expect(container.firstElementChild).toHaveClass('p-3')
-    expect(screen.getByRole('heading', { name: 'Customize Heavy Armor' })).toHaveClass('text-sm')
+    expect(container.firstElementChild).toHaveClass('p-3', 'ui-option-card-embedded-panel')
+    expect(screen.getByRole('heading', { name: 'Customize Heavy Armor' })).toHaveClass(
+      'ui-copy-title',
+    )
     expect(screen.getByText('Adjust what this NPC keeps from the selected package.')).toHaveClass(
-      'text-xs',
+      'ui-copy-supporting',
     )
     expect(screen.getByText('Removed')).toHaveClass('text-control-action-xs')
   })

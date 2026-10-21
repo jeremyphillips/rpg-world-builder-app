@@ -7,10 +7,7 @@ import {
   radioCardDecorativeControlClasses,
   resolveRadioCardIndicatorSize,
 } from './choice-control.variants'
-import {
-  optionCardDensityContentGapVariants,
-  optionCardSummaryBadgeRowVariants,
-} from './selection-option-card.variants'
+import { optionCardDensityContentGapVariants } from './selection-option-card.variants'
 
 const radioCardRowBase = cn(
   'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground',
@@ -155,9 +152,6 @@ export const radioCardIconControlVariants = cva(
 )
 
 export const radioCardDetailsActionVariants = cva('shrink-0 [&_svg]:size-4')
-
-/** Reserved third-row height for spellcasting badges in equal-height card grids. */
-export const radioCardSummaryBadgeRowVariants = optionCardSummaryBadgeRowVariants
 
 export const radioCardMediaSlotClasses = 'shrink-0 overflow-hidden'
 

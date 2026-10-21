@@ -140,7 +140,9 @@ describe('BuilderDependentChoiceSection', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Elven Lineage' })).toHaveClass('text-sm')
+    const heading = screen.getByRole('heading', { name: 'Elven Lineage' })
+    expect(heading).toHaveClass('ui-copy-title')
+    expect(heading.closest('.ui-option-card-embedded-panel')).toBeTruthy()
     expect(screen.getByText('Required')).toHaveClass('text-control-action-xs')
   })
 

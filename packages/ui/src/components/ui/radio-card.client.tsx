@@ -34,7 +34,7 @@ export type RadioCardVariant = 'card' | 'row'
 
 export type RadioCardVisualControl = 'radio' | 'icon'
 
-export type RadioCardEmbeddedSlotTone = 'divider' | 'panel' | 'plain'
+export type RadioCardEmbeddedSlotTone = 'divider' | 'panel'
 
 export type RadioCardColumns = 'one' | 'two' | 'three'
 

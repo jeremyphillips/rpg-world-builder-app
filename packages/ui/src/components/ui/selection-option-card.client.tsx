@@ -17,11 +17,12 @@ import {
   type CardElevation,
 } from './card.variants'
 import {
-  optionCardEmbeddedSlotVariants,
-  selectionOptionCardBodyVariants,
+  optionCardEmbeddedSlotClassName,
+  selectionOptionCardBodyClassName,
   selectionOptionCardHeaderActionClasses,
   selectionOptionCardHeaderActionSlotVariants,
   selectionOptionCardHeaderRowVariants,
+  type OptionCardEmbeddedSlotTone,
 } from './selection-option-card.variants'
 
 export type { SelectionOptionCardDensity } from './selection-option-card-anatomy.client'
@@ -55,10 +56,10 @@ export type SelectionOptionCardProps = {
   summaryContent?: ReactNode
   /**
    * Nested region below the description. The card owns the chrome via
-   * `optionCardEmbeddedSlotVariants`.
+   * `optionCardEmbeddedSlotClassName`.
    */
   embedded?: ReactNode
-  embeddedTone?: 'divider' | 'panel' | 'plain'
+  embeddedTone?: OptionCardEmbeddedSlotTone
   className?: string
 }
 
@@ -174,7 +175,7 @@ export function SelectionOptionCard({
       )}
       aria-disabled={disabled || undefined}
     >
-      <div className={selectionOptionCardBodyVariants()}>
+      <div className={selectionOptionCardBodyClassName}>
         <SelectionOptionCardAnatomy
           density={density}
           headerRow={headerRow}
@@ -185,9 +186,7 @@ export function SelectionOptionCard({
           summaryContent={summaryContent}
           embedded={
             embedded ? (
-              <div className={optionCardEmbeddedSlotVariants({ density, tone: embeddedTone })}>
-                {embedded}
-              </div>
+              <div className={optionCardEmbeddedSlotClassName(embeddedTone)}>{embedded}</div>
             ) : undefined
           }
           useSummaryTitle

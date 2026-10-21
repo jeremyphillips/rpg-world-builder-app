@@ -5,6 +5,8 @@
  * Supporting 12/16, 14/20, 14/20.
  * Anatomy titles use `ui-copy-title` for size, line-height, and --font-weight-heading.
  * A density class on the same element overrides an inherited value.
+ * Radio rows publish this ladder on `.ui-radio-card--row-compact|comfortable` (they are not `ui-card`).
+ * Embedded option panels are fixed at the compact step via `.ui-option-card-embedded-panel`.
  *
  * --ui-anatomy-row-gap: spacing between related stacked anatomy rows (title, supporting, status).
  * --ui-anatomy-leading-size: row-anatomy leading thumbnail (40px compact/comfortable, 60px spacious).
@@ -52,7 +54,9 @@
   .ui-interactive-list__main--sm,
   .dash-entity-anatomy--compact,
   .ui-identity-row--compact,
-  .ui-content-card-heading--compact {
+  .ui-content-card-heading--compact,
+  .ui-radio-card--row-compact,
+  .ui-option-card-embedded-panel {
     --ui-copy-title-size: var(--text-sm);
     --ui-copy-title-line-height: var(--text-sm--line-height);
     --ui-copy-supporting-size: var(--text-xs);
@@ -70,7 +74,8 @@
   .ui-destination-list--comfortable,
   .dash-entity-anatomy--comfortable,
   .ui-identity-row--comfortable,
-  .ui-content-card-heading--comfortable {
+  .ui-content-card-heading--comfortable,
+  .ui-radio-card--row-comfortable {
     --ui-copy-title-size: var(--text-base);
     --ui-copy-title-line-height: 1.375rem;
     --ui-copy-supporting-size: var(--text-sm);

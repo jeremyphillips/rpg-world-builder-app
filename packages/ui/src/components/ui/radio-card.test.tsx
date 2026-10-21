@@ -323,8 +323,11 @@ describe('RadioCard', () => {
 
     const drowRow = screen.getByRole('radio', { name: /Drow/i }).closest('.ui-radio-card--row')
     expect(drowRow).toBeTruthy()
-    expect(drowRow).toHaveClass('ui-interactive-row--selected-bordered')
-    expect(drowRow).not.toHaveClass('ui-card--selected')
+    expect(drowRow).toHaveClass(
+      'ui-interactive-row--selected-bordered',
+      'ui-radio-card--row-compact',
+    )
+    expect(drowRow).not.toHaveClass('ui-card--selected', 'ui-card--compact')
   })
 
   it('renders embedded panel slot edge-to-edge inside the card shell', () => {
@@ -348,8 +351,8 @@ describe('RadioCard', () => {
 
     const panel = screen.getByText('Configuration panel').parentElement
     expect(panel).toHaveTextContent('Configuration panel')
-    expect(panel?.className).toContain('-mx-4')
-    expect(panel?.className).toContain('rounded-b-card')
+    expect(panel).toHaveClass('ui-option-card__embedded--panel')
+    expect(panel).not.toHaveClass('ui-option-card__embedded--in-flow')
   })
 
   itAxe('has no axe accessibility violations', async () => {

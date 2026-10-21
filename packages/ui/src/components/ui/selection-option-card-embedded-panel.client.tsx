@@ -4,16 +4,16 @@ import type { ElementType, ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import {
-  optionCardDescriptionVariants,
   optionCardEmbeddedPanelContentClasses,
-  optionCardEmbeddedPanelHeaderClasses,
   optionCardEmbeddedPanelHeaderRowClasses,
   optionCardEmbeddedPanelListClasses,
   optionCardEmbeddedPanelRowClasses,
   optionCardEmbeddedPanelRowControlsClasses,
   optionCardEmbeddedPanelRowLabelClasses,
   optionCardEmbeddedPanelRowStatusClasses,
-  optionCardTitleVariants,
+  optionCardSupportingClassName,
+  optionCardTitleClassName,
+  UI_OPTION_CARD_EMBEDDED_PANEL_HEADER_CLASS,
 } from './selection-option-card.variants'
 
 export type SelectionOptionCardEmbeddedPanelProps = {
@@ -46,16 +46,14 @@ export function SelectionOptionCardEmbeddedPanelHeader({
   className,
 }: SelectionOptionCardEmbeddedPanelHeaderProps) {
   return (
-    <div className={cn(optionCardEmbeddedPanelHeaderClasses, className)}>
+    <div className={cn(UI_OPTION_CARD_EMBEDDED_PANEL_HEADER_CLASS, className)}>
       <div className={optionCardEmbeddedPanelHeaderRowClasses}>
-        <TitleTag id={titleId} className={optionCardTitleVariants({ density: 'compact' })}>
+        <TitleTag id={titleId} className={optionCardTitleClassName}>
           {title}
         </TitleTag>
         {endSlot}
       </div>
-      {description ? (
-        <p className={optionCardDescriptionVariants({ density: 'compact' })}>{description}</p>
-      ) : null}
+      {description ? <p className={optionCardSupportingClassName}>{description}</p> : null}
     </div>
   )
 }

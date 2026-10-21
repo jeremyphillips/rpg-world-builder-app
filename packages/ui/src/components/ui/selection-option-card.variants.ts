@@ -2,34 +2,8 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { COMPACT_LABEL_SM_MIN_HEIGHT_CLASS } from './compact-label.variants'
-import { cardSurfaceVariants } from './card.variants'
-import { fieldSurfaceRaisedShadowClasses } from './field-surface.variants'
-import { identityInsetRowVariants } from './identity-frame.variants'
 
-/** Shared selected-state chrome for static and radio option cards. */
-export const optionCardSelectedChromeClasses =
-  'border-card-selected-border bg-surface-strong ring-1 ring-primary/20 [--surface-current:var(--surface-strong)]'
-
-/** Compact option shell — 12px left when decorative control is present, 16px right, 8px vertical. */
-export const optionCardCompactOptionBodyLayoutClasses = 'pl-3 pr-4 py-2'
-
-/** Compact chooser summary — full 16px horizontal inset, 8px vertical (no control column). */
-export const optionCardCompactSummaryBodyLayoutClasses = 'px-4 py-2'
-
-/** Density-owned card body padding — compact option cards only; summaries use {@link optionCardCompactSummaryBodyLayoutClasses}. */
-export const optionCardDensityBodyLayoutVariants = cva('', {
-  variants: {
-    density: {
-      comfortable: 'px-4 py-3',
-      compact: optionCardCompactOptionBodyLayoutClasses,
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
-
-/** Density-owned vertical gap between card content blocks. */
+/** Density-owned vertical gap between card content blocks (primary row, embedded, footer). */
 export const optionCardDensityContentGapVariants = cva('', {
   variants: {
     density: {
@@ -42,9 +16,7 @@ export const optionCardDensityContentGapVariants = cva('', {
   },
 })
 
-/** Compact chooser summary — flush eyebrow→title (tighter than option-card content gap). */
-export const optionCardCompactSummaryContentGapClasses = 'gap-0'
-
+/** Header/eyebrow → title. Not the title → supporting gap. */
 export const optionCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
   variants: {
     density: {
@@ -57,36 +29,20 @@ export const optionCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
   },
 })
 
-/** Shared vertical gap between option/summary title and description — one token for both surfaces. */
-export const optionCardPrimaryCopyStackVariants = cva('flex flex-col', {
-  variants: {
-    density: {
-      comfortable: 'gap-0.5',
-      compact: 'gap-0',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
+/** Title → supporting copy. Spacing is `--ui-anatomy-row-gap` on `.ui-option-card__primary`. */
+export const UI_OPTION_CARD_PRIMARY_CLASS = 'ui-option-card__primary' as const
 
-/** Compact option metadata typography — tight line-height for card secondary copy. */
-export const optionCardCompactSecondaryTypographyClasses = 'text-xs leading-snug'
+export const optionCardSupportingClassName = 'ui-copy-supporting text-muted-foreground'
 
 /** Secondary copy stack under the title row. */
 export const optionCardSecondaryCopyStackVariants = cva('min-w-0', {
   variants: {
-    density: {
-      comfortable: '',
-      compact: optionCardCompactSecondaryTypographyClasses,
-    },
     copyWidth: {
       fill: 'w-full',
       content: 'w-fit max-w-full',
     },
   },
   defaultVariants: {
-    density: 'comfortable',
     copyWidth: 'fill',
   },
 })
@@ -96,52 +52,11 @@ export const optionCardTitleLineVariants = cva(
   'flex w-full min-w-0 items-center justify-between gap-2',
 )
 
-export const optionCardTitleVariants = cva('font-bold', {
-  variants: {
-    density: {
-      comfortable: 'text-base',
-      compact: 'text-sm',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
-
-/** Selected-summary title — same density scale as {@link optionCardTitleVariants}. */
-export const optionCardSummaryTitleVariants = cva('font-bold', {
-  variants: {
-    density: {
-      comfortable: 'text-base',
-      compact: 'text-sm',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
+export const optionCardTitleClassName = 'ui-copy-title'
 
 export const optionCardTitleRowVariants = cva('flex min-w-0 flex-wrap items-center gap-2')
 
-/** Inline muted copy immediately after the card title (e.g. dependent-choice status). */
-export const optionCardTitleMetaVariants = cva('text-muted-foreground')
-
 export const optionCardSummaryLinesVariants = cva('flex flex-col gap-0.5')
-
-/** Muted secondary copy under the card title (descriptions, summaries). */
-export const optionCardDescriptionVariants = cva('text-muted-foreground', {
-  variants: {
-    density: {
-      comfortable: 'text-sm',
-      compact: optionCardCompactSecondaryTypographyClasses,
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
-
-export const optionCardSummaryVariants = optionCardDescriptionVariants
 
 /** Reserved row for optional summary badges — matches Badge/Chip sm height. */
 export const optionCardSummaryBadgeRowVariants = cva(
@@ -154,65 +69,16 @@ export const optionCardDescriptionClampVariants = cva('line-clamp-2 min-h-[2lh]'
 /** Single-line clamp for compact card titles in equal-height grids. */
 export const optionCardTitleClampVariants = cva('line-clamp-1')
 
-/** Static resolved option shell — selected chrome only, no hover. */
-export const selectionOptionCardShellVariants = cva(
-  cn('relative overflow-hidden text-left text-card-foreground', fieldSurfaceRaisedShadowClasses),
-  {
-    variants: {
-      selected: {
-        true: cn(
-          cardSurfaceVariants({ tone: 'strong', selected: true, interactive: false }),
-          optionCardSelectedChromeClasses,
-        ),
-        false: cardSurfaceVariants({ tone: 'subtle', interactive: false }),
-      },
-      disabled: {
-        true: 'opacity-50',
-        false: '',
-      },
-    },
-    defaultVariants: {
-      selected: false,
-      disabled: false,
-    },
-  },
-)
-
 export const UI_SELECTION_OPTION_CARD_BODY_CLASS = 'ui-selection-option-card__body' as const
 
-export const selectionOptionCardBodyVariants = cva(
-  cn(UI_SELECTION_OPTION_CARD_BODY_CLASS, optionCardCompactSummaryContentGapClasses),
-  {
-    variants: {
-      density: {
-        comfortable: '',
-        compact: '',
-      },
-    },
-    defaultVariants: {
-      density: 'comfortable',
-    },
-  },
-)
+/** Summary shell body — flush eyebrow to title. */
+export const selectionOptionCardBodyClassName = cn(UI_SELECTION_OPTION_CARD_BODY_CLASS, 'gap-0')
 
 export const selectionOptionCardHeaderRowVariants = cva(
   'flex flex-wrap items-center justify-between gap-2',
 )
 
-/** Identity row inside the content column — inset-row geometry for optional leading media. */
-export const optionCardIdentityRowVariants = cva('flex min-w-0 items-start', {
-  variants: {
-    density: {
-      comfortable: identityInsetRowVariants({ density: 'comfortable', align: 'start' }),
-      compact: identityInsetRowVariants({ density: 'compact', align: 'start' }),
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
-
-/** Summary anatomy body — flush header row to title; title→description gap stays on primary copy stack. */
+/** Summary anatomy body — flush header row to title; title→supporting gap stays on the primary stack. */
 export const selectionOptionCardAnatomyBodyVariants = cva('flex min-w-0 flex-1 flex-col gap-0')
 
 /** Compact header action — pairs with Button text + sm + compact density. */
@@ -222,83 +88,20 @@ export const selectionOptionCardHeaderActionSlotVariants = cva(
   'flex shrink-0 items-center min-h-control-action-compact',
 )
 
-/** Horizontal padding for compact chooser summaries and symmetric breakout contexts. */
-export const optionCardCompactPaddingXClasses = 'px-4'
+export const UI_OPTION_CARD_EMBEDDED_IN_FLOW_CLASS = 'ui-option-card__embedded--in-flow' as const
 
-export const optionCardCompactPaddingRightClasses = 'pr-4'
+export const UI_OPTION_CARD_EMBEDDED_PANEL_CLASS = 'ui-option-card__embedded--panel' as const
 
-/**
- * Left inset aligning panel copy with the compact card body column
- * (option shell padding + radio control + column gap).
- */
-export const optionCardCompactBodyInsetClasses = 'pl-[calc(0.75rem+1rem+0.75rem)]'
+export type OptionCardEmbeddedSlotTone = 'divider' | 'panel'
 
-/**
- * Left inset for in-flow embedded slots (`divider`, `plain`).
- * The slot is already inside shell padding, so this is radio control width + column gap:
- * default `size-5` + `gap-4`, compact `size-4` + `gap-3`
- * (`radioCardControlVariants` card + `selectionOptionCardAnatomyRootVariants`).
- * Panel tone breaks out to the card edge and must not use these.
- */
-export const optionCardEmbeddedContentInsetClasses = {
-  comfortable: 'pl-[calc(1.25rem+1rem)]',
-  compact: 'pl-[calc(1rem+0.75rem)]',
-} as const
-
-/** Panel horizontal padding: body-column inset left, shell padding right. */
-export const optionCardCompactPanelPaddingClasses = `${optionCardCompactBodyInsetClasses} ${optionCardCompactPaddingRightClasses}`
-
-/** Slot below the primary card row when a selected option reveals nested content. */
-export const optionCardEmbeddedSlotVariants = cva('', {
-  variants: {
-    tone: {
-      divider: 'border-t border-border',
-      panel: 'border-t border-border',
-      /** No fill — nested copy sits on the card surface. */
-      plain: 'border-t border-border',
-    },
-    density: {
-      comfortable: '',
-      compact: '',
-    },
-  },
-  compoundVariants: [
-    {
-      tone: 'divider',
-      density: 'comfortable',
-      class: cn('mt-4 pt-4', optionCardEmbeddedContentInsetClasses.comfortable),
-    },
-    {
-      tone: 'divider',
-      density: 'compact',
-      class: cn('mt-2 pt-2', optionCardEmbeddedContentInsetClasses.compact),
-    },
-    {
-      tone: 'plain',
-      density: 'comfortable',
-      class: cn('mt-4 pt-4', optionCardEmbeddedContentInsetClasses.comfortable),
-    },
-    {
-      tone: 'plain',
-      density: 'compact',
-      class: cn('mt-2 pt-2', optionCardEmbeddedContentInsetClasses.compact),
-    },
-    {
-      tone: 'panel',
-      density: 'comfortable',
-      class: '-mx-5 -mb-3 mt-4 rounded-b-card pb-3 pt-4',
-    },
-    {
-      tone: 'panel',
-      density: 'compact',
-      class: '-mx-4 -mb-2 mt-2 rounded-b-card',
-    },
-  ],
-  defaultVariants: {
-    tone: 'divider',
-    density: 'comfortable',
-  },
-})
+/** In-flow indent and panel breakout live in `ui-radio-card.css`, keyed by the shell density class. */
+export function optionCardEmbeddedSlotClassName(
+  tone: OptionCardEmbeddedSlotTone = 'divider',
+): string {
+  return tone === 'panel'
+    ? UI_OPTION_CARD_EMBEDDED_PANEL_CLASS
+    : UI_OPTION_CARD_EMBEDDED_IN_FLOW_CLASS
+}
 
 /** Always-visible region below the primary shell row (e.g. validation reasons). */
 export const optionCardFooterSlotVariants = cva('min-w-0', {
@@ -313,10 +116,16 @@ export const optionCardFooterSlotVariants = cva('min-w-0', {
   },
 })
 
-/** Inner embedded panel body — symmetric 12px padding. */
-export const optionCardEmbeddedPanelContentClasses = 'flex flex-col gap-3 p-3'
+export const UI_OPTION_CARD_EMBEDDED_PANEL_CLASS_NAME = 'ui-option-card-embedded-panel' as const
 
-export const optionCardEmbeddedPanelHeaderClasses = 'flex flex-col gap-0.5'
+export const UI_OPTION_CARD_EMBEDDED_PANEL_HEADER_CLASS =
+  'ui-option-card-embedded-panel__header' as const
+
+/** Inner embedded panel body — symmetric 12px padding. Copy scale is the compact ladder. */
+export const optionCardEmbeddedPanelContentClasses = cn(
+  UI_OPTION_CARD_EMBEDDED_PANEL_CLASS_NAME,
+  'flex flex-col gap-3 p-3',
+)
 
 export const optionCardEmbeddedPanelHeaderRowClasses = 'flex items-start justify-between gap-3'
 
@@ -325,10 +134,7 @@ export const optionCardEmbeddedPanelListClasses = 'flex flex-col'
 export const optionCardEmbeddedPanelRowClasses =
   'flex min-h-8 items-center justify-between gap-3 border-t border-border-subtle py-1.5'
 
-export const optionCardEmbeddedPanelRowLabelClasses = cn(
-  'min-w-0 flex-1',
-  optionCardCompactSecondaryTypographyClasses,
-)
+export const optionCardEmbeddedPanelRowLabelClasses = 'min-w-0 flex-1 ui-copy-supporting'
 
 export const optionCardEmbeddedPanelRowControlsClasses = 'flex shrink-0 items-center gap-2'
 

@@ -515,16 +515,6 @@ export {
   type RadioGroupFieldOption,
 } from './components/ui/radio-group-field'
 export {
-  optionCardCompactBodyInsetClasses,
-  optionCardCompactOptionBodyLayoutClasses,
-  optionCardCompactPanelPaddingClasses,
-  optionCardCompactPaddingRightClasses,
-  optionCardCompactPaddingXClasses,
-  optionCardCompactSummaryBodyLayoutClasses,
-  optionCardCompactSummaryContentGapClasses,
-  optionCardSelectedChromeClasses,
-} from './components/ui/selection-option-card.variants'
-export {
   SelectionOptionCard,
   SelectionOptionCardHeaderAction,
   type SelectionOptionCardDensity,
