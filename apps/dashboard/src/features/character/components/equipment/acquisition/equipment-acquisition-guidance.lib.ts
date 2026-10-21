@@ -25,7 +25,7 @@ export function formatEquipmentUnresolvedFundingSelectedLabel(pendingCostCp: num
 
 export type EquipmentBudgetGuidanceCopy = {
   heading: string
-  subheading: string
+  metadata: readonly [string, string]
 }
 
 export function formatEquipmentBudgetGuidanceCopy(
@@ -33,10 +33,10 @@ export function formatEquipmentBudgetGuidanceCopy(
 ): EquipmentBudgetGuidanceCopy {
   return {
     heading: `${formatInlineWealth(budget.remaining)} remaining`,
-    subheading: joinInlineMetadata([
+    metadata: [
       `${formatInlineWealth(budget.starting)} budget`,
       `${formatInlineWealth(budget.spent)} spent`,
-    ]),
+    ],
   }
 }
 
@@ -76,10 +76,7 @@ export type EquipmentAcquisitionGuidanceAction = 'browse' | 'browse-magic' | 'ma
 
 export type EquipmentAcquisitionGuidanceView = {
   unresolvedPendingCostCp?: number
-  currency?: {
-    heading: string
-    subheading: string
-  }
+  currency?: EquipmentBudgetGuidanceCopy
   slots?: readonly EquipmentMagicItemSlot[]
   currencyAction?: Extract<EquipmentAcquisitionGuidanceAction, 'browse'>
   magicItemsAction?: Extract<EquipmentAcquisitionGuidanceAction, 'browse-magic' | 'manage-magic'>

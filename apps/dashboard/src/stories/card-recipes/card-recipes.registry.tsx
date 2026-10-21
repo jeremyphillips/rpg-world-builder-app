@@ -46,6 +46,7 @@ import {
 } from '@/features/content'
 import { DetailEntityRow } from '@/features/content/lib/detail/row/entity/detail-entity-row'
 import { DrawerEntityBlock } from '@/features/content/lib/entity/surfaces/drawer/drawer-entity-block'
+import { EquipmentResourceSummary } from '@/features/character/components/equipment/acquisition/equipment-resource-summary'
 import { ChoiceBlockRow } from '@/features/character/components/builder/steps/shared/choice-section/choice-block-row'
 import { createProficienciesStepRogueFixture } from '@/features/character/lib/proficiencies/proficiencies-step.fixtures'
 import { QuickNpcStartingChoiceSelectedRow } from '@/features/character/npc/components/quick-npc/quick-npc-starting-choice-selected-row'
@@ -368,6 +369,93 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
         entity={{ heading: 'Grey Coast', classification: 'Region' }}
         density="compact"
       />
+    ),
+  },
+  {
+    name: 'Equipment acquisition resource panel',
+    section: 'ui-cards-form-rows',
+    component: 'EquipmentResourceSummary',
+    chain: ['Card', 'CardContent', 'EntityAnatomyHost', 'EntityAnatomy', 'RowAnatomyCell'],
+    useWhen:
+      'Builder equipment step and picker header: budget and magic-item grant rows in one transparent Card shell.',
+    density: 'fixed',
+    leading: 'resource media',
+    trailing: 'action (band)',
+    anatomy: 'row-track',
+    render: () => (
+      <div className="flex max-w-md flex-col gap-8">
+        <EquipmentResourceSummary
+          density="comfortable"
+          currency={{
+            heading: '74 GP 6 SP remaining',
+            metadata: ['75 GP budget', '4 SP spent'],
+          }}
+          slots={[
+            {
+              rarity: 'common',
+              rarityMode: 'exact',
+              quantity: 2,
+              remaining: 2,
+              fulfilled: false,
+            },
+            {
+              rarity: 'uncommon',
+              rarityMode: 'maximum',
+              quantity: 1,
+              remaining: 0,
+              fulfilled: true,
+            },
+          ]}
+          currencyAction={{
+            label: 'Browse equipment',
+            variant: 'secondary',
+            onClick: noop,
+          }}
+          magicItemsAction={{
+            label: 'Browse magic items',
+            variant: 'secondary',
+            onClick: noop,
+          }}
+        />
+        <EquipmentResourceSummary
+          density="compact"
+          currency={{
+            heading: '40 GP remaining',
+            metadata: ['100 GP budget', '15 GP spent'],
+          }}
+        />
+        <EquipmentResourceSummary
+          density="comfortable"
+          slots={[
+            {
+              rarity: 'common',
+              rarityMode: 'exact',
+              quantity: 2,
+              remaining: 1,
+              fulfilled: false,
+            },
+            {
+              rarity: 'uncommon',
+              rarityMode: 'maximum',
+              quantity: 1,
+              remaining: 1,
+              fulfilled: false,
+            },
+            {
+              rarity: 'rare',
+              rarityMode: 'exact',
+              quantity: 1,
+              remaining: 0,
+              fulfilled: true,
+            },
+          ]}
+          magicItemsAction={{
+            label: 'Browse magic items',
+            variant: 'secondary',
+            onClick: noop,
+          }}
+        />
+      </div>
     ),
   },
   {

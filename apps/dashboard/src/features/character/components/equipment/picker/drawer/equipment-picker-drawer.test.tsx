@@ -89,8 +89,9 @@ describe('EquipmentPickerDrawer', () => {
     expect(cannotAffordBadge).toBeInTheDocument()
     expect(within(list).queryByText(/75 GP needed/i)).not.toBeInTheDocument()
     expect(within(list).queryByText(/40 GP remaining/i)).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
-    expect(screen.getByText('100 GP budget · 15 GP spent')).toBeInTheDocument()
+    expect(screen.getByText('40 GP remaining')).toBeInTheDocument()
+    expect(screen.getByText('100 GP budget')).toBeInTheDocument()
+    expect(screen.getByText('15 GP spent')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Browse equipment' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
 
@@ -652,8 +653,8 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
-    expect(screen.getByLabelText('Up to Uncommon · 1 available')).toBeInTheDocument()
+    expect(screen.getByText('Magic items')).toBeInTheDocument()
+    expect(screen.getByText('Up to Uncommon · 1 available')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Purchase' })).not.toBeInTheDocument()
   })
 
@@ -681,22 +682,20 @@ describe('EquipmentPickerDrawer', () => {
 
     render(<DualWorkflowDrawer />)
 
-    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Magic items' })).not.toBeInTheDocument()
+    expect(screen.getByText('40 GP remaining')).toBeInTheDocument()
+    expect(screen.queryByText('Up to Uncommon · 1 available')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Purchase' }).querySelector('svg')).not.toBeNull()
     expect(screen.getByRole('button', { name: 'Magic items' }).querySelector('svg')).not.toBeNull()
 
     await user.click(screen.getByRole('button', { name: 'Magic items' }))
 
-    expect(screen.queryByRole('heading', { name: '40 GP remaining' })).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
-    expect(screen.getByLabelText('Up to Uncommon · 1 available')).toBeInTheDocument()
+    expect(screen.queryByText('100 GP budget')).not.toBeInTheDocument()
+    expect(screen.getByText('Up to Uncommon · 1 available')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Purchase' }))
 
-    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Magic items' })).not.toBeInTheDocument()
-    expect(screen.queryByLabelText('Up to Uncommon · 1 available')).not.toBeInTheDocument()
+    expect(screen.getByText('40 GP remaining')).toBeInTheDocument()
+    expect(screen.queryByText('Up to Uncommon · 1 available')).not.toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

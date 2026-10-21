@@ -47,10 +47,11 @@ describe('EquipmentAcquisitionGuidance', () => {
     )
 
     expect(screen.getByRole('region', { name: 'Acquisition guidance' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
-    expect(screen.getByText('100 GP budget · 15 GP spent')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
-    expect(screen.getByLabelText('Common · 1 remaining')).toBeInTheDocument()
+    expect(screen.getByText('40 GP remaining')).toBeInTheDocument()
+    expect(screen.getByText('100 GP budget')).toBeInTheDocument()
+    expect(screen.getByText('15 GP spent')).toBeInTheDocument()
+    expect(screen.getByText('Magic items')).toBeInTheDocument()
+    expect(screen.getByText('Common · 1 remaining')).toBeInTheDocument()
 
     const browseEquipment = screen.getByRole('button', { name: 'Browse equipment' })
     const browseMagicItems = screen.getByRole('button', { name: 'Browse magic items' })
@@ -80,8 +81,8 @@ describe('EquipmentAcquisitionGuidance', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: /GP remaining/ })).not.toBeInTheDocument()
+    expect(screen.getByText('Magic items')).toBeInTheDocument()
+    expect(screen.queryByText(/GP remaining/)).not.toBeInTheDocument()
 
     const user = userEvent.setup()
     await user.click(screen.getByRole('button', { name: 'Browse magic items' }))
@@ -101,8 +102,8 @@ describe('EquipmentAcquisitionGuidance', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Magic items' })).not.toBeInTheDocument()
+    expect(screen.getByText('40 GP remaining')).toBeInTheDocument()
+    expect(screen.queryByText('Magic items')).not.toBeInTheDocument()
   })
 
   it('stacks unresolved funding with a magic-only summary', () => {
@@ -119,7 +120,7 @@ describe('EquipmentAcquisitionGuidance', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Starting funds not set' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
+    expect(screen.getByText('Magic items')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Browse magic items' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Browse equipment' })).not.toBeInTheDocument()
   })
