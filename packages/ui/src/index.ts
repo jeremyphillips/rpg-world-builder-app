@@ -175,7 +175,6 @@ export {
   identityFrameVariants,
   identityFrameImageVariants,
   identityFrameFallbackVariants,
-  identityHeadingBandVariants,
   identityInsetRowVariants,
 } from './components/ui/identity-frame.variants'
 export {

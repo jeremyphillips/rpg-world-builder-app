@@ -44,19 +44,6 @@ export const identityFrameFallbackVariants = cva(
   },
 )
 
-/** Heading-band min-height aligned to inset-row frame sizes. */
-export const identityHeadingBandVariants = cva('flex min-w-0 items-center', {
-  variants: {
-    density: {
-      compact: 'min-h-8',
-      comfortable: 'min-h-10',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
-
 /** Inset-row geometry — content-column gap and vertical alignment. */
 export const identityInsetRowVariants = cva('flex min-w-0', {
   variants: {

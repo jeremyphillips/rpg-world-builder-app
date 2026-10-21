@@ -2,9 +2,8 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { COMPACT_LABEL_SM_MIN_HEIGHT_CLASS } from './compact-label.variants'
-import { cardBorderClasses, cardRadiusClasses } from './card.variants'
+import { cardSurfaceVariants } from './card.variants'
 import { fieldSurfaceRaisedShadowClasses } from './field-surface.variants'
-import { establishSurfaceCurrent } from './surface-current.lib'
 import { identityInsetRowVariants } from './identity-frame.variants'
 
 /** Shared selected-state chrome for static and radio option cards. */
@@ -157,15 +156,15 @@ export const optionCardTitleClampVariants = cva('line-clamp-1')
 
 /** Static resolved option shell — selected chrome only, no hover. */
 export const selectionOptionCardShellVariants = cva(
-  cn(
-    `relative overflow-hidden ${cardRadiusClasses} ${cardBorderClasses} text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses}`,
-    establishSurfaceCurrent('surface-strong'),
-  ),
+  cn('relative overflow-hidden text-left text-card-foreground', fieldSurfaceRaisedShadowClasses),
   {
     variants: {
       selected: {
-        true: optionCardSelectedChromeClasses,
-        false: cn('bg-surface-subtle', establishSurfaceCurrent('surface-subtle')),
+        true: cn(
+          cardSurfaceVariants({ tone: 'strong', selected: true, interactive: false }),
+          optionCardSelectedChromeClasses,
+        ),
+        false: cardSurfaceVariants({ tone: 'subtle', interactive: false }),
       },
       disabled: {
         true: 'opacity-50',

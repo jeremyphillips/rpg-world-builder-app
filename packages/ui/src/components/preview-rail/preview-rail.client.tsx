@@ -16,9 +16,9 @@ import { ScrollBoundaryRegion } from '../ui/scroll-boundary-region.client'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button.client'
 import { IdentityRowHeadingLine } from '../ui/identity-row.client'
-import { ContentCardMedia } from '../ui/content-card-parts.client'
 import { IconContainer } from '../ui/icon-container.client'
-import { contentCardHeadingScaleClass, contentCardMediaVariants } from '../ui/content-card.variants'
+import { IdentityFrame } from '../ui/identity-frame.client'
+import { contentCardHeadingScaleClass } from '../ui/content-card.variants'
 import { Eyebrow } from '../ui/eyebrow'
 import { Heading } from '../ui/heading'
 import { SemanticText } from '../ui/semantic-text/semantic-text'
@@ -60,6 +60,8 @@ import {
   previewRailIdentityHeadingBandClasses,
   previewRailIdentitySubheadlineClasses,
   previewRailIdentityRowClasses,
+  previewRailLeadingMediaShellClasses,
+  previewRailLeadingMediaSlotClasses,
   previewRailIdentitySectionContentClasses,
   previewRailIdentitySectionShellClasses,
   previewRailIdentityStackClasses,
@@ -169,18 +171,32 @@ export type PreviewRailMediaProps = {
   fallbackIcon?: React.ReactNode
 }
 
+function PreviewRailLeadingMediaShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className={previewRailLeadingMediaShellClasses}
+      data-shape="box"
+      data-slot="preview-rail-leading-media"
+    >
+      <div className={previewRailLeadingMediaSlotClasses}>{children}</div>
+    </div>
+  )
+}
+
 function PreviewRailMedia({ imageSrc, imageAlt = '', fallbackIcon }: PreviewRailMediaProps) {
   if (imageSrc) {
     return (
-      <ContentCardMedia
-        src={imageSrc}
-        alt={imageAlt}
-        className={contentCardMediaVariants({ density: 'comfortable' })}
-      />
+      <PreviewRailLeadingMediaShell>
+        <IdentityFrame src={imageSrc} alt={imageAlt} shape="box" className="!size-full" />
+      </PreviewRailLeadingMediaShell>
     )
   }
 
-  return <IconContainer>{fallbackIcon}</IconContainer>
+  return (
+    <PreviewRailLeadingMediaShell>
+      <IconContainer className="!size-full">{fallbackIcon}</IconContainer>
+    </PreviewRailLeadingMediaShell>
+  )
 }
 
 export type PreviewRailAvailabilityLineProps = PreviewRailAvailability
