@@ -48,7 +48,7 @@ function formatTimestamp(iso: string): string {
 
 export function TicketMetaTimestamps({ ticket }: TicketMetaTimestampsProps) {
   return (
-    <Text variant="muted" className="text-xs">
+    <Text variant="caption">
       <InlineMetadata role="supporting" density="compact">
         <InlineMetadata.Item>
           Created {formatTimestamp(ticket.createdAt)} by {getTicketCreatedByLabel(ticket.createdBy)}

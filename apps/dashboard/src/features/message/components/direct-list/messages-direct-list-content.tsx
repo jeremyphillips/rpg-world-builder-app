@@ -39,7 +39,7 @@ function MessagesLoadedScopeHint({
   scopedCount: number
 }) {
   return (
-    <Text variant="small" className={`mb-2 text-muted-foreground ${directListChromeInsetClasses}`}>
+    <Text variant="supporting" className={`mb-2 ${directListChromeInsetClasses}`}>
       {formatMessagesLoadedScopeHint(loadedCount, scopedCount)}
     </Text>
   )

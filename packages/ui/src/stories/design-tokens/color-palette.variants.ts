@@ -33,5 +33,4 @@ export const colorPaletteOnSurfaceCellClasses = 'flex flex-col gap-3'
 
 export const colorPaletteOnSurfaceVisualClasses = 'h-14 w-full shrink-0 rounded-lg'
 
-export const colorPaletteMonoLabelClasses =
-  'font-mono text-xs leading-relaxed text-muted-foreground'
+export const colorPaletteMonoLabelClasses = 'font-mono leading-relaxed text-style-caption'

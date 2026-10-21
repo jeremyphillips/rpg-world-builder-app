@@ -12,7 +12,7 @@ export function CharacterVitalSummary({ vital }: CharacterVitalSummaryProps) {
   const presentation = resolveCharacterVitalStatusPresentation(vital.status)
 
   return (
-    <Text as="span" variant="muted" className="text-sm">
+    <Text as="span" variant="supporting">
       Vital: {presentation.label}
     </Text>
   )

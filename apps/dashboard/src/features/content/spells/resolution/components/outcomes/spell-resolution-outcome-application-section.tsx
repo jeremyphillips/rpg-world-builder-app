@@ -65,7 +65,7 @@ export function SpellResolutionOutcomeApplicationSection({
       ) : null}
 
       {chrome.showPrimaryEmptySummary ? (
-        <Text variant="muted" className="mt-2 mb-3 text-sm">
+        <Text variant="supporting" className="mt-2 mb-3">
           {RESOLUTION_SECTION_LABELS.outcomeEmptySummary}
         </Text>
       ) : null}

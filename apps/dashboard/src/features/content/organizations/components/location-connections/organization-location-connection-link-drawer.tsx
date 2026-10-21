@@ -656,13 +656,9 @@ function OrganizationLocationConnectionLinkDrawerContent({
               />
             ) : null}
             {instructionCopy ? (
-              <Text variant="muted" className="text-sm">
-                {instructionCopy}
-              </Text>
+              <Text variant="supporting">{instructionCopy}</Text>
             ) : familyAddDrawerHelper ? (
-              <Text variant="muted" className="text-sm">
-                {familyAddDrawerHelper}
-              </Text>
+              <Text variant="supporting">{familyAddDrawerHelper}</Text>
             ) : null}
             {showKindField ? (
               <LocationConnectionKindField
@@ -716,19 +712,17 @@ function OrganizationLocationConnectionLinkDrawerContent({
                   {targetFieldLabel}
                 </Heading>
                 {targetPresentation.targetHelp ? (
-                  <Text variant="muted" className="text-sm">
-                    {targetPresentation.targetHelp}
-                  </Text>
+                  <Text variant="supporting">{targetPresentation.targetHelp}</Text>
                 ) : null}
               </div>
             ) : null}
             {!showLocationPicker && mode === 'add' && !activeKind ? (
-              <Text variant="muted" className="text-sm" role="status">
+              <Text variant="supporting" role="status">
                 {ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE}
               </Text>
             ) : null}
             {showMutationEmptyState && mutationEmptyMessage ? (
-              <Text variant="muted" className="text-sm" role="status">
+              <Text variant="supporting" role="status">
                 {mutationEmptyMessage}
               </Text>
             ) : null}
@@ -736,7 +730,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
         }
         emptyState={
           showLocationPicker && mode === 'add' && !activeKind ? (
-            <Text variant="muted" className="text-sm" role="status">
+            <Text variant="supporting" role="status">
               {ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE}
             </Text>
           ) : undefined

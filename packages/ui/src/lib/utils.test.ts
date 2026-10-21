@@ -40,7 +40,7 @@ describe('cn', () => {
   })
 
   it('replaces sibling text-style composites and the stacks they absorb', () => {
-    expect(cn('text-style-small', 'text-style-caption')).toBe('text-style-caption')
+    expect(cn('text-style-supporting', 'text-style-caption')).toBe('text-style-caption')
     expect(cn('text-style-caption', 'text-style-caption')).toBe('text-style-caption')
     expect(cn('text-style-label', 'text-style-label')).toBe('text-style-label')
   })

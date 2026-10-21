@@ -92,7 +92,7 @@ const cardChromeClasses =
 function CircleOnCardRow({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-2">
-      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-style-caption">{label}</span>
       {children}
     </div>
   )
@@ -151,7 +151,7 @@ export const CircleExpandOnCard: Story = {
   render: () => (
     <div className="flex max-w-sm flex-col gap-3 rounded-lg border border-border bg-card p-4">
       <div className="flex min-w-0 items-center gap-1">
-        <span className="min-w-0 truncate text-sm font-medium">Battleaxe</span>
+        <span className="min-w-0 truncate text-style-label">Battleaxe</span>
         <Checkbox
           appearance="circle"
           tone="success"
@@ -161,10 +161,10 @@ export const CircleExpandOnCard: Story = {
           aria-label="Equipped: Battleaxe"
           defaultChecked
         />
-        <span className="ms-auto text-xs text-muted-foreground">Rest / hover</span>
+        <span className="ms-auto text-style-caption">Rest / hover</span>
       </div>
       <div className="flex min-w-0 items-center gap-1">
-        <span className="min-w-0 truncate text-sm font-medium">
+        <span className="min-w-0 truncate text-style-label">
           +1 Flaming Battleaxe of Very Long Names
         </span>
         <Checkbox
@@ -175,12 +175,12 @@ export const CircleExpandOnCard: Story = {
           expandLabelReserve="Unequip"
           aria-label="Equipped: +1 Flaming Battleaxe of Very Long Names"
         />
-        <button type="button" className="text-xs text-muted-foreground">
+        <button type="button" className="text-style-caption">
           Edit
         </button>
       </div>
       <div className="flex min-w-0 items-center justify-end gap-1">
-        <span className="min-w-0 truncate text-sm font-medium">Edge</span>
+        <span className="min-w-0 truncate text-style-label">Edge</span>
         <Checkbox
           appearance="circle"
           tone="success"
@@ -192,7 +192,7 @@ export const CircleExpandOnCard: Story = {
         />
       </div>
       <div className="flex min-w-0 items-center gap-1">
-        <span className="text-sm font-medium">Disabled</span>
+        <span className="text-style-label">Disabled</span>
         <Checkbox
           appearance="circle"
           tone="success"
@@ -221,7 +221,7 @@ export const CircleEmbeddedInHeading: Story = {
   render: () => (
     <div className={cardChromeClasses}>
       <div className="flex min-w-0 max-w-xs items-center gap-1">
-        <span className="min-w-0 truncate text-sm font-medium">
+        <span className="min-w-0 truncate text-style-label">
           +1 Flaming Battleaxe of Very Long Names
         </span>
         <span className="inline-flex shrink-0 self-center">
@@ -235,7 +235,7 @@ export const CircleEmbeddedInHeading: Story = {
         </span>
       </div>
       <div className="flex min-w-0 max-w-xs items-center gap-1">
-        <span className="min-w-0 truncate text-sm font-medium">
+        <span className="min-w-0 truncate text-style-label">
           +1 Flaming Battleaxe of Very Long Names
         </span>
         <span className="inline-flex shrink-0 self-center">

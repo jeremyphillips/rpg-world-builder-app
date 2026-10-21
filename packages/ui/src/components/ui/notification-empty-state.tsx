@@ -14,7 +14,7 @@ export function NotificationEmptyState({
       <Text as="p" className="text-sm font-body-emphasis text-foreground">
         {title}
       </Text>
-      <Text as="p" variant="muted" className="mt-1 text-sm">
+      <Text as="p" variant="supporting" className="mt-1">
         {description}
       </Text>
     </div>

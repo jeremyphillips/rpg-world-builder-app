@@ -80,7 +80,7 @@ export function SignupForm({ onSuccess, lockedEmail }: SignupFormProps) {
             <SubmitButton pending={form.formState.isSubmitting} pendingLabel="Creating account…">
               Create account
             </SubmitButton>
-            <Text variant="small" className="text-center">
+            <Text variant="supporting" className="text-center">
               Already have an account?{' '}
               <Link
                 href={loginHref}

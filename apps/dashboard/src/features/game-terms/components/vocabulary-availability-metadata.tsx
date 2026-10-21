@@ -12,7 +12,7 @@ export function VocabularyAvailabilityMetadata({ status }: VocabularyAvailabilit
   }
 
   return (
-    <div className="ml-auto flex items-center gap-1 text-xs leading-4 text-muted-foreground">
+    <div className="ml-auto flex items-center gap-1 leading-4 text-style-caption">
       <CircleSlash aria-hidden className="size-icon-inline shrink-0 text-semantic-warning" />
       <span className="text-semantic-warning">Unavailable</span>
     </div>

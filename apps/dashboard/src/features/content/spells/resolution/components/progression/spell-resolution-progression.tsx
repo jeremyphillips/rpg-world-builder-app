@@ -139,9 +139,7 @@ function ProgressionTrackCard({
           <Heading as="h4" variant="subsection" className="text-style-label">
             {heading}
           </Heading>
-          <Text variant="muted" className="text-sm">
-            {modeLabel}
-          </Text>
+          <Text variant="supporting">{modeLabel}</Text>
         </div>
         <Button
           type="button"
@@ -202,7 +200,7 @@ function ProgressionTrackCard({
             <dd>
               {track.incrementKind === 'count' ? (
                 <div className="flex items-center gap-2">
-                  <Text as="span" variant="muted" className="text-sm">
+                  <Text as="span" variant="supporting">
                     +
                   </Text>
                   <CompactNumberField
@@ -212,7 +210,7 @@ function ProgressionTrackCard({
                 </div>
               ) : (
                 <div className="flex flex-wrap items-center gap-2">
-                  <Text as="span" variant="muted" className="text-sm">
+                  <Text as="span" variant="supporting">
                     +
                   </Text>
                   <CompactNumberField
@@ -297,9 +295,7 @@ export function SpellResolutionProgression() {
 
   return (
     <div className="space-y-3">
-      <Text variant="muted" className="text-sm">
-        {RESOLUTION_SECTION_LABELS.progressionHint}
-      </Text>
+      <Text variant="supporting">{RESOLUTION_SECTION_LABELS.progressionHint}</Text>
 
       {!hasProgression ? (
         <InsetPanel borderStyle="dashed" size="lg" className="flex flex-col gap-3">

@@ -17,7 +17,7 @@ import { formatDiceFormula, type DiceFormulaValue } from '../components/ui/dice-
 function RecipePanel({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="space-y-3">
-      <Text variant="small" className="font-medium text-foreground">
+      <Text variant="label" className="text-foreground">
         {title}
       </Text>
       {children}
@@ -38,7 +38,7 @@ function WeaponDamageRecipe({ size }: { size?: FieldSize }) {
         value={value}
         onChange={setValue}
       />
-      <Text variant="small">
+      <Text variant="supporting">
         Preview:{' '}
         <span className="font-mono font-medium text-foreground">{formatDiceFormula(value)}</span>
       </Text>
@@ -60,7 +60,7 @@ function HitDieRecipe({ size }: { size?: FieldSize }) {
         value={value}
         onChange={setValue}
       />
-      <Text variant="small">
+      <Text variant="supporting">
         Preview:{' '}
         <span className="font-mono font-medium text-foreground">{formatDiceFormula(value)}</span>
       </Text>
@@ -85,7 +85,7 @@ function HealingRecipe({ size }: { size?: FieldSize }) {
         value={value}
         onChange={setValue}
       />
-      <Text variant="small">
+      <Text variant="supporting">
         Preview:{' '}
         <span className="font-mono font-medium text-foreground">{formatDiceFormula(value)}</span>
       </Text>

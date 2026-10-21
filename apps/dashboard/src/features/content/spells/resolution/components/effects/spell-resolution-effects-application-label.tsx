@@ -13,7 +13,7 @@ export function SpellResolutionEffectsApplicationLabel() {
   if (!resolution) return null
 
   return (
-    <Text as="p" variant="muted" className="text-sm" role="status">
+    <Text as="p" variant="supporting" role="status">
       {formatResolutionEffectsApplicationLabel({
         applicationPattern: applicationPatternFromForm(resolution),
       })}

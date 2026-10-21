@@ -13,7 +13,7 @@ const defaultArgs = {
   collapsed: true,
   onToggleCollapse: () => undefined,
   header: (
-    <Text as="span" className="truncate text-style-label">
+    <Text as="span" variant="label" className="truncate">
       Battle Axe · Weapon
     </Text>
   ),
@@ -47,7 +47,7 @@ function CollapsibleListItemDemo({
       collapsed={collapsed}
       onToggleCollapse={() => setCollapsed((current) => !current)}
       header={
-        <Text as="span" className="truncate text-style-label">
+        <Text as="span" variant="label" className="truncate">
           Battle Axe · Weapon
         </Text>
       }

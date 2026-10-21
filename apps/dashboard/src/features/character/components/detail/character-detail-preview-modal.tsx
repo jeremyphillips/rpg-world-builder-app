@@ -29,7 +29,7 @@ export function CharacterDetailPreviewModal({
   return (
     <DetailPreviewModal open={open} onOpenChange={onOpenChange} headline={headline}>
       {notice ? (
-        <Text variant="muted" className="mb-4 text-sm">
+        <Text variant="supporting" className="mb-4">
           {notice}
         </Text>
       ) : null}

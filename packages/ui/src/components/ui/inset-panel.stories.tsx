@@ -83,7 +83,7 @@ export const ScorePool: Story = {
     children: (
       <>
         <div className="flex min-h-16 flex-wrap items-center gap-3" />
-        <InsetPanel.Text as="p" variant="small" aria-live="polite">
+        <InsetPanel.Text as="p" variant="supporting" aria-live="polite">
           3 scores remaining
         </InsetPanel.Text>
       </>

@@ -36,7 +36,7 @@ describe('BuilderFactSummary', () => {
     expect(value).toBeInTheDocument()
     expect(value).toHaveClass('text-foreground')
     expect(value).not.toHaveClass('italic')
-    expect(value).not.toHaveClass('text-muted-foreground')
+    expect(value).not.toHaveClass('text-style-supporting')
     expect(screen.queryByText('Granted by')).not.toBeInTheDocument()
     const card = screen.getByRole('heading', { name: 'Spellcasting' }).closest('.ui-card')
     const content = card?.querySelectorAll('.ui-card__content')
@@ -69,12 +69,12 @@ describe('BuilderFactSummary', () => {
 
     const unset = screen.getByText('Calculated after ability scores')
     expect(unset).toHaveClass('italic')
-    expect(unset).toHaveClass('text-muted-foreground')
+    expect(unset).toHaveClass('text-style-supporting')
 
     const setValue = screen.getByText('+5')
     expect(setValue).toHaveClass('text-foreground')
     expect(setValue).not.toHaveClass('italic')
-    expect(setValue).not.toHaveClass('text-muted-foreground')
+    expect(setValue).not.toHaveClass('text-style-supporting')
   })
 
   it('omits unset placeholder styling when unsetText is not provided', () => {
@@ -137,6 +137,6 @@ describe('BuilderFactSummary', () => {
 
     const unset = screen.getByText('Calculated after ability scores')
     expect(unset).toHaveClass('italic')
-    expect(unset).toHaveClass('text-muted-foreground')
+    expect(unset).toHaveClass('text-style-supporting')
   })
 })

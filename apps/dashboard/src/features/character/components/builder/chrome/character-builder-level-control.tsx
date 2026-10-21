@@ -128,7 +128,7 @@ export function CharacterBuilderLevelControl({
   if (constraints.mode === 'fixed') {
     return (
       <div className="flex shrink-0 items-center gap-2">
-        <Text as="span" variant="muted" className="text-sm">
+        <Text as="span" variant="supporting">
           {formatFieldMessage(characterBuilderLevelMessages.fieldLabel())}
         </Text>
         <Badge appearance="soft" tone="neutral">

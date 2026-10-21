@@ -73,7 +73,7 @@ export function UsageReferenceGroupList({
         return (
           <section key={group.key} className="space-y-2">
             <div className="flex items-center justify-between gap-3">
-              <Text variant="small" className="font-medium text-foreground">
+              <Text variant="label" className="text-foreground">
                 <InlineMetadata role="heading" density="compact" wrap={false}>
                   <InlineMetadata.Item>{group.label}</InlineMetadata.Item>
                   <InlineMetadata.Item>{group.count}</InlineMetadata.Item>

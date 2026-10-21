@@ -34,7 +34,7 @@ export function adminUsersColumns(): ColumnDef<AdminUserListItem>[] {
             >
               {user.displayName}
             </Link>
-            <Text as="span" variant="muted" className="truncate text-xs">
+            <Text as="span" variant="caption" className="truncate">
               {user.email}
             </Text>
           </div>

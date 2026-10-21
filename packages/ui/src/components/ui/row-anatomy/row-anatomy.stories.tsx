@@ -130,7 +130,7 @@ export const TrailingGroupMetaParity: Story = {
         {compactActionBox('Add')}
       </RowAnatomyCell>
       <RowAnatomyCell cell={{ slot: 'meta', column: 'trailing' }}>
-        <div className="text-xs tabular-nums text-muted-foreground">15 GP</div>
+        <div className="tabular-nums text-style-caption">15 GP</div>
       </RowAnatomyCell>
     </DemoHost>
   ),

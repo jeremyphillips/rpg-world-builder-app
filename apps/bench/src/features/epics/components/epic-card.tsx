@@ -44,7 +44,7 @@ export function EpicCard({ epic, counts, recentlyActive, onSelectTicket }: EpicC
               {epic.title}
             </Link>
             {summary ? (
-              <Text variant="small" className="line-clamp-2 text-muted-foreground">
+              <Text variant="supporting" className="line-clamp-2">
                 {summary}
               </Text>
             ) : null}
@@ -53,11 +53,7 @@ export function EpicCard({ epic, counts, recentlyActive, onSelectTicket }: EpicC
         <div className="flex flex-wrap items-center gap-2">
           <EpicStatusBadge status={epic.status} />
           {epic.priority ? <PriorityBadge priority={epic.priority} /> : null}
-          {epic.area ? (
-            <Text variant="small" className="text-muted-foreground">
-              {epic.area}
-            </Text>
-          ) : null}
+          {epic.area ? <Text variant="supporting">{epic.area}</Text> : null}
         </div>
         <EpicTicketCounts counts={counts} />
         {recentlyActive.length > 0 ? (

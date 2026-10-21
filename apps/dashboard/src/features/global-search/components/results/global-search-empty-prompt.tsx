@@ -18,7 +18,7 @@ export function GlobalSearchEmptyPrompt({
       <Heading as="h2" variant="subsection">
         {title}
       </Heading>
-      <Text as="p" variant="muted" className="mx-auto mt-2 max-w-md text-sm">
+      <Text as="p" variant="supporting" className="mx-auto mt-2 max-w-md">
         {description}
       </Text>
     </div>

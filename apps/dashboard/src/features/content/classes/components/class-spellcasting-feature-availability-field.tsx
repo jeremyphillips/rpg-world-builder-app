@@ -36,12 +36,10 @@ export function ClassSpellcastingFeatureAvailabilityField({
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-col gap-0.5">
-            <Text as="span" className="text-style-label">
+            <Text as="span" variant="label">
               {CAMPAIGN_ACCESS_AVAILABLE_LABEL}
             </Text>
-            <Text variant="muted" className="text-sm">
-              {CAMPAIGN_ACCESS_AVAILABLE_HINT}
-            </Text>
+            <Text variant="supporting">{CAMPAIGN_ACCESS_AVAILABLE_HINT}</Text>
           </div>
           <Switch
             checked={available}

@@ -132,7 +132,7 @@ export function EquipmentPackageConversionEditor({
   return (
     <section id={resolvedEditorId} className="flex flex-col">
       <div ref={descriptionRef} tabIndex={-1} className="outline-none px-4 pt-4">
-        <Text as="p" className="text-style-supporting">
+        <Text as="p" variant="supporting">
           Choose which package items to keep as starting-gold purchases.
         </Text>
       </div>

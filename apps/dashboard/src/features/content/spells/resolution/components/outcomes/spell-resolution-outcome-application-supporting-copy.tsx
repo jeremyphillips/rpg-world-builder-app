@@ -12,28 +12,24 @@ export function SpellResolutionOutcomeApplicationSupportingCopy({
     case 'no-authored-effects':
       return (
         <>
-          <Text variant="muted" className="text-sm">
+          <Text variant="supporting">
             {RESOLUTION_SECTION_LABELS.outcomeNoAuthoredEffectsAvailable}
           </Text>
-          <Text variant="muted" className="text-sm">
-            {RESOLUTION_SECTION_LABELS.outcomeAuthorEffectsHint}
-          </Text>
+          <Text variant="supporting">{RESOLUTION_SECTION_LABELS.outcomeAuthorEffectsHint}</Text>
         </>
       )
     case 'all-incomplete':
       return (
         <>
-          <Text variant="muted" className="text-sm">
+          <Text variant="supporting">
             {RESOLUTION_SECTION_LABELS.outcomeNoCompleteEffectsAvailable}
           </Text>
-          <Text variant="muted" className="text-sm">
-            {RESOLUTION_SECTION_LABELS.outcomeCompleteEffectsHint}
-          </Text>
+          <Text variant="supporting">{RESOLUTION_SECTION_LABELS.outcomeCompleteEffectsHint}</Text>
         </>
       )
     case 'all-applied':
       return (
-        <Text variant="muted" className="my-2 text-sm">
+        <Text variant="supporting" className="my-2">
           {RESOLUTION_SECTION_LABELS.outcomeAllEffectsApplied}
         </Text>
       )

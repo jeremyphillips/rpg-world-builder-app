@@ -48,7 +48,7 @@ export function UsageBlockedList({ blockers, campaignId }: UsageBlockedListProps
                     {blocker.label}
                   </Link>
                 ) : (
-                  <Text variant="small">{blocker.label}</Text>
+                  <Text variant="supporting">{blocker.label}</Text>
                 )}
               </li>
             ))}
@@ -61,7 +61,7 @@ export function UsageBlockedList({ blockers, campaignId }: UsageBlockedListProps
           <ul className="space-y-2">
             {ruleBlockers.map((blocker) => (
               <li key={blocker.code}>
-                <Text variant="small">{blocker.message}</Text>
+                <Text variant="supporting">{blocker.message}</Text>
               </li>
             ))}
           </ul>

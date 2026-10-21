@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { Text } from './text'
+import { TextVariantCatalog } from './text-catalog'
 
 const meta = {
   title: 'Typography/Text',
@@ -24,10 +25,10 @@ export const Muted: Story = {
   },
 }
 
-export const Small: Story = {
+export const Supporting: Story = {
   args: {
-    variant: 'small',
-    children: 'Secondary hint or card description tone.',
+    variant: 'supporting',
+    children: 'Secondary explanatory copy (14px muted).',
   },
 }
 
@@ -35,6 +36,27 @@ export const Caption: Story = {
   args: {
     variant: 'caption',
     children: 'Form field hint — persistent guidance below a control.',
+  },
+}
+
+export const Label: Story = {
+  args: {
+    variant: 'label',
+    children: 'Compact UI descriptor — not a native form label.',
+  },
+}
+
+export const Emphasis: Story = {
+  args: {
+    variant: 'emphasis',
+    children: 'Medium-weight emphasis treatment.',
+  },
+}
+
+export const Option: Story = {
+  args: {
+    variant: 'option',
+    children: 'Choice row primary line.',
   },
 }
 
@@ -74,20 +96,6 @@ export const Warning: Story = {
   },
 }
 
-export const AllVariants: Story = {
-  render: () => (
-    <div className="space-y-3">
-      <Text variant="body">Body — default foreground copy.</Text>
-      <Text variant="muted">Muted — supplementary descriptions.</Text>
-      <Text variant="small">Small — hints and secondary metadata.</Text>
-      <Text variant="caption">Caption — form field hints.</Text>
-      <Text variant="lead">Lead — hero or intro paragraphs.</Text>
-      <Text variant="info">Info — informational status copy.</Text>
-      <Text variant="success">Success — positive status copy.</Text>
-      <Text variant="warning">Warning — cautionary status copy.</Text>
-      <Text variant="destructive" role="alert">
-        Destructive — inline error messages.
-      </Text>
-    </div>
-  ),
+export const RoleCatalog: Story = {
+  render: () => <TextVariantCatalog />,
 }

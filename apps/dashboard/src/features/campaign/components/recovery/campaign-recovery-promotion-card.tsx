@@ -54,14 +54,9 @@ export function CampaignRecoveryPromotionCard({ promotion }: CampaignRecoveryPro
     >
       {promotion.meta ? (
         <CardContent>
-          <Text variant="small" className="text-muted-foreground">
-            {promotion.meta}
-          </Text>
+          <Text variant="supporting">{promotion.meta}</Text>
         </CardContent>
       ) : null}
     </Card>
   )
 }
-
-/** @deprecated Use {@link CampaignRecoveryPromotionCard}. */
-export const FinishJoiningCampaignCard = CampaignRecoveryPromotionCard

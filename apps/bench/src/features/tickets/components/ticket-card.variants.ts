@@ -9,7 +9,7 @@ export const ticketCardHeaderClasses =
 
 export const ticketCardHeaderTrailClasses = 'flex min-w-0 flex-1 items-center gap-1'
 
-export const ticketCardKeyClasses = 'truncate font-mono text-xs text-muted-foreground'
+export const ticketCardKeyClasses = 'truncate font-mono text-style-caption'
 
 export const ticketCardHeaderChevronClasses = 'size-3 shrink-0 text-muted-foreground'
 
@@ -22,4 +22,4 @@ export const ticketCardTitleClasses = 'line-clamp-2 min-h-[2lh] font-medium'
 
 export const ticketCardFooterClasses = 'flex flex-wrap items-center gap-x-2 gap-y-1 p-0 pb-3 pt-3'
 
-export const ticketCardAreaClasses = 'text-xs text-muted-foreground'
+export const ticketCardAreaClasses = 'text-style-caption'

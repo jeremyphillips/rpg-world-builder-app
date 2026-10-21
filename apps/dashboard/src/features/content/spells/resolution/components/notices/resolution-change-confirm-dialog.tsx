@@ -14,7 +14,7 @@ import {
 } from '../../hooks/use-resolution-change-confirm'
 
 function ResolutionChangeConfirmBody({ copy }: { copy: ResolutionChangeDialogCopy }) {
-  const bodyClass = textVariants({ variant: 'small' })
+  const bodyClass = textVariants({ variant: 'supporting' })
 
   return (
     <div className="space-y-3">
@@ -25,7 +25,7 @@ function ResolutionChangeConfirmBody({ copy }: { copy: ResolutionChangeDialogCop
           ))}
         </ul>
       ) : null}
-      <Text variant="small" as="p">
+      <Text variant="supporting" as="p">
         {copy.footer}
       </Text>
     </div>

@@ -63,7 +63,7 @@ export function AdminUsersOverviewTable() {
 
       {pagination && pagination.totalPages > 1 ? (
         <div className="flex items-center justify-between gap-3">
-          <Text variant="muted" className="text-sm">
+          <Text variant="supporting">
             Page {pagination.page} of {pagination.totalPages}
           </Text>
           <div className="flex items-center gap-2">

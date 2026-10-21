@@ -43,7 +43,7 @@ export function ProfileSection() {
         <Heading variant="section" as="h2" id="profile-heading" className="mb-4">
           Profile
         </Heading>
-        <Text variant="small">Your public display name, email address, and avatar.</Text>
+        <Text variant="supporting">Your public display name, email address, and avatar.</Text>
       </div>
       {/* key forces a remount once the session loads so RHF initialises with the correct defaults */}
       <Form<AccountFormValues>

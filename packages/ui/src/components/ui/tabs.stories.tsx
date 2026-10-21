@@ -22,13 +22,13 @@ export const Line: Story = {
         <TabsTrigger value="flavor">Flavor</TabsTrigger>
       </TabsList>
       <TabsContent value="identity">
-        <Text variant="small">Identity tab content.</Text>
+        <Text variant="supporting">Identity tab content.</Text>
       </TabsContent>
       <TabsContent value="rules">
-        <Text variant="small">Rules tab content.</Text>
+        <Text variant="supporting">Rules tab content.</Text>
       </TabsContent>
       <TabsContent value="flavor">
-        <Text variant="small">Flavor tab content.</Text>
+        <Text variant="supporting">Flavor tab content.</Text>
       </TabsContent>
     </Tabs>
   ),
@@ -44,13 +44,13 @@ export const Pill: Story = {
         <TabsTrigger value="flavor">Flavor</TabsTrigger>
       </TabsList>
       <TabsContent value="identity">
-        <Text variant="small">Identity tab content.</Text>
+        <Text variant="supporting">Identity tab content.</Text>
       </TabsContent>
       <TabsContent value="rules">
-        <Text variant="small">Rules tab content.</Text>
+        <Text variant="supporting">Rules tab content.</Text>
       </TabsContent>
       <TabsContent value="flavor">
-        <Text variant="small">Flavor tab content.</Text>
+        <Text variant="supporting">Flavor tab content.</Text>
       </TabsContent>
     </Tabs>
   ),
@@ -68,13 +68,13 @@ export const Disabled: Story = {
         <TabsTrigger value="flavor">Flavor</TabsTrigger>
       </TabsList>
       <TabsContent value="identity">
-        <Text variant="small">Only identity is accessible.</Text>
+        <Text variant="supporting">Only identity is accessible.</Text>
       </TabsContent>
       <TabsContent value="rules">
-        <Text variant="small">Rules content.</Text>
+        <Text variant="supporting">Rules content.</Text>
       </TabsContent>
       <TabsContent value="flavor">
-        <Text variant="small">Flavor content.</Text>
+        <Text variant="supporting">Flavor content.</Text>
       </TabsContent>
     </Tabs>
   ),

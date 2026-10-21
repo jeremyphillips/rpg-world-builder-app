@@ -70,7 +70,7 @@ export function StartingEquipmentUnselectableReasons({ reasons }: { reasons: rea
   return (
     <div className="space-y-1">
       {reasons.map((reason) => (
-        <Text key={reason} variant="small" className="text-destructive">
+        <Text key={reason} variant="destructive">
           {reason}
         </Text>
       ))}
@@ -107,19 +107,11 @@ function IncludedToolField({
   })
 
   if (fieldState === 'invalid') {
-    return (
-      <Text variant="small" className="text-destructive">
-        {EQUIPMENT_INVALID_PROFICIENCY_LINK_MESSAGE}
-      </Text>
-    )
+    return <Text variant="destructive">{EQUIPMENT_INVALID_PROFICIENCY_LINK_MESSAGE}</Text>
   }
 
   if (!choiceSet) {
-    return (
-      <Text variant="small" className="text-destructive">
-        {EQUIPMENT_INVALID_PROFICIENCY_LINK_MESSAGE}
-      </Text>
-    )
+    return <Text variant="destructive">{EQUIPMENT_INVALID_PROFICIENCY_LINK_MESSAGE}</Text>
   }
 
   const selection = draft.choiceSelections[link.choiceSetId] ?? []

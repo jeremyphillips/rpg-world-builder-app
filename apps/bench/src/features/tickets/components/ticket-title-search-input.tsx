@@ -50,7 +50,7 @@ export function TicketTitleSearchInput({
 
   return (
     <div className="min-w-[12rem] flex-1 space-y-1">
-      <label htmlFor={id} className="text-xs text-muted-foreground">
+      <label htmlFor={id} className="text-style-caption">
         {label}
       </label>
       {input}

@@ -302,7 +302,7 @@ export function Wizard({
     <WizardContext.Provider value={ctxValue}>
       <div className={cn('space-y-6', className)}>
         <WizardStepNav />
-        {hint && <Text variant="small">{hint}</Text>}
+        {hint && <Text variant="supporting">{hint}</Text>}
         <div>{activeChild}</div>
       </div>
     </WizardContext.Provider>

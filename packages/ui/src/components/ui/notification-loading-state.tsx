@@ -9,7 +9,7 @@ export function NotificationLoadingState({
 }: NotificationLoadingStateProps) {
   return (
     <div className="px-4 py-8 text-center" aria-busy="true">
-      <Text as="p" variant="muted" className="text-sm">
+      <Text as="p" variant="supporting">
         {label}
       </Text>
     </div>

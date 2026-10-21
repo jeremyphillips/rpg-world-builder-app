@@ -41,9 +41,7 @@ export function UsageReferencesSection({
             Used by
           </Heading>
         ) : null}
-        <Text variant="muted" className="text-sm">
-          {summary}
-        </Text>
+        <Text variant="supporting">{summary}</Text>
       </div>
 
       {usedBy > 0 ? (

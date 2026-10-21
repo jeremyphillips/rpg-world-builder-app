@@ -70,7 +70,7 @@ export function PackageSwitchBudgetSummary({
       aria-label="Budget summary"
       className={collectionPanelMutedSummaryClasses}
     >
-      <Text as="p" className="mb-3 text-style-label text-foreground">
+      <Text as="p" variant="label" className="mb-3 text-foreground">
         Budget summary
       </Text>
       <div className="space-y-2">

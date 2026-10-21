@@ -15,9 +15,9 @@ export function CodeRefList({ codeRefs }: CodeRefListProps) {
       {codeRefs.map((ref, index) => (
         <li key={`${ref.path}-${index}`} className="rounded-md border border-border p-3 text-sm">
           <Text className="font-mono">{ref.path}</Text>
-          {ref.symbol ? <Text variant="small">Symbol: {ref.symbol}</Text> : null}
+          {ref.symbol ? <Text variant="supporting">Symbol: {ref.symbol}</Text> : null}
           {ref.lineStart != null ? (
-            <Text variant="small">
+            <Text variant="supporting">
               Lines: {ref.lineStart}
               {ref.lineEnd != null ? `–${ref.lineEnd}` : ''}
             </Text>

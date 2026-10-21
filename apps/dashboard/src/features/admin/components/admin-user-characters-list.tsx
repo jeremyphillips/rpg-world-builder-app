@@ -67,7 +67,7 @@ export function AdminUserCharactersPage() {
     <PageShell width="narrow" rhythm="list">
       <PageHeader heading="Characters" />
       <Text variant="muted">Player characters owned by this user.</Text>
-      <Text variant="muted" className="text-sm">
+      <Text variant="supporting">
         <InlineMetadata role="supporting" density="comfortable">
           <InlineMetadata.Item>{user.email}</InlineMetadata.Item>
           <InlineMetadata.Item>

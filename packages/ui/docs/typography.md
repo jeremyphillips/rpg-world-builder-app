@@ -16,31 +16,32 @@ styles, and list behavior on all descendants and fights layout utilities
 Document outline presets — pair each `variant` with the matching `as` level. Use **one
 h1 per page** (route title via `page`, or entity title via `display` on detail routes).
 
-| Variant / component               | `as`   | px    | Weight               | Use case                                                                               |
-| --------------------------------- | ------ | ----- | -------------------- | -------------------------------------------------------------------------------------- |
-| `Heading` `display`               | `h1`   | 42    | 700                  | Hero, content detail entity titles                                                     |
-| `Heading` `page`                  | `h1`   | 34    | 600                  | Route titles (`PageHeader`)                                                            |
-| `Heading` `heroTitle`             | `h1`   | 19→34 | 600                  | Page hero titles (`Hero`, campaign overview) — 19px mobile, 24px md, 34px lg+          |
-| `Heading` `section`               | `h2`   | 28    | 600                  | Top-level in-page sections                                                             |
-| `Heading` `subsection`            | `h3`   | 19    | 600                  | Nested blocks within a section                                                         |
-| `Heading` `group`                 | `h4`   | 16    | 500                  | Headings inside subsections                                                            |
-| `Heading` `card`                  | Radix  | 19    | 600                  | Legacy / non-card surfaces; **not** generic `Card` headers (see below)                 |
-| `Heading` `dialogTitle`           | Radix  | 19→24 | 600                  | `Modal.Header` / `Sheet.Header` default (19px mobile, 24px md+)                        |
-| `Heading` `confirmDialogTitle`    | Radix  | 19    | 600                  | `ConfirmDialog` title — compact, non-responsive                                        |
-| `Heading` `nav` / `brand`         | `span` | 16    | 600                  | Topbar title, sidebar product name                                                     |
-| `Heading` `alert`                 | Radix  | 16    | 600                  | Inline `Alert` titles                                                                  |
-| `Heading` `label`                 | `p`    | 16    | 500                  | Inline non-outline titles (trait names)                                                |
-| `Text` `body`                     | `p`    | 16    | 400                  | Default foreground copy                                                                |
-| `Text` `muted`                    | `p`    | 16    | 400                  | Non-catalog plain copy (hints, errors)                                                 |
-| `Text` `small`                    | `p`    | 15    | 400                  | Helper text, secondary metadata                                                        |
-| `Text` `caption`                  | `p`    | 12    | 400                  | Form field hints                                                                       |
-| `Text` `lead`                     | `p`    | 18    | 400                  | Marketing subheads                                                                     |
-| `Text` `destructive`              | `p`    | 15    | 400                  | Inline errors — pair with `role="alert"`                                               |
-| `Eyebrow` `xs` / `sm` / `md`      | `p`    | 9–13  | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)                          |
-| `RichTextContent` `size="md"`     | `div`  | 15    | 400                  | Catalog descriptions (TipTap / CMS HTML)                                               |
-| Generic `Card` header title       | `h3`   | 14–19 | 600 (`heading`)      | `ui-card__title` — size from `Card` `density`; weight from heading role                |
-| Anatomy title (`ui-copy-title`)   | varies | 14–19 | 600 (`heading`)      | 14/20, 16/22, 19/26 by density — [row-anatomy.md](./row-anatomy.md#anatomy-title-copy) |
-| Generic `Card` header description | `p`    | 12–14 | shell vars           | `ui-card__description` — comfortable/spacious 14px; compact 12px                       |
+| Variant / component               | `as`   | px      | Weight               | Use case                                                                               |
+| --------------------------------- | ------ | ------- | -------------------- | -------------------------------------------------------------------------------------- |
+| `Heading` `display`               | `h1`   | 42      | 700                  | Hero, content detail entity titles                                                     |
+| `Heading` `page`                  | `h1`   | 34      | 600                  | Route titles (`PageHeader`)                                                            |
+| `Heading` `heroTitle`             | `h1`   | 19→34   | 600                  | Page hero titles (`Hero`, campaign overview) — 19px mobile, 24px md, 34px lg+          |
+| `Heading` `section`               | `h2`   | 28      | 600                  | Top-level in-page sections                                                             |
+| `Heading` `subsection`            | `h3`   | 19      | 600                  | Nested blocks within a section                                                         |
+| `Heading` `group`                 | `h4`   | 16      | 500                  | Headings inside subsections                                                            |
+| `Heading` `card`                  | Radix  | 19      | 600                  | Legacy / non-card surfaces; **not** generic `Card` headers (see below)                 |
+| `Heading` `dialogTitle`           | Radix  | 19→24   | 600                  | `Modal.Header` / `Sheet.Header` default (19px mobile, 24px md+)                        |
+| `Heading` `confirmDialogTitle`    | Radix  | 19      | 600                  | `ConfirmDialog` title — compact, non-responsive                                        |
+| `Heading` `nav` / `brand`         | `span` | 16      | 600                  | Topbar title, sidebar product name                                                     |
+| `Heading` `alert`                 | Radix  | 16      | 600                  | Inline `Alert` titles                                                                  |
+| `Heading` `label`                 | `p`    | 16      | 500                  | Inline non-outline titles (trait names)                                                |
+| `Text` `body`                     | `p`    | 16      | 400                  | Default foreground copy                                                                |
+| `Text` `supporting`               | `p`    | 14      | 400                  | Secondary explanatory copy (preferred over `muted` + `text-sm`)                        |
+| `Text` `caption`                  | `p`    | 12      | 400                  | Small supplemental metadata                                                            |
+| `Text` `label`                    | `p`    | 14      | 500                  | Compact UI descriptor — not a native form `<label>`                                    |
+| `Text` `muted`                    | `p`    | inherit | 400                  | Color-only muted treatment (legacy — prefer `supporting` / `caption`)                  |
+| `Text` `lead`                     | `p`    | 18      | 400                  | Marketing subheads                                                                     |
+| `Text` `destructive`              | `p`    | 15      | 400                  | Inline errors — pair with `role="alert"`                                               |
+| `Eyebrow` `xs` / `sm` / `md`      | `p`    | 9–13    | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)                          |
+| `RichTextContent` `size="md"`     | `div`  | 15      | 400                  | Catalog descriptions (TipTap / CMS HTML)                                               |
+| Generic `Card` header title       | `h3`   | 14–19   | 600 (`heading`)      | `ui-card__title` — size from `Card` `density`; weight from heading role                |
+| Anatomy title (`ui-copy-title`)   | varies | 14–19   | 600 (`heading`)      | 14/20, 16/22, 19/26 by density — [row-anatomy.md](./row-anatomy.md#anatomy-title-copy) |
+| Generic `Card` header description | `p`    | 12–14   | shell vars           | `ui-card__description` — comfortable/spacious 14px; compact 12px                       |
 
 Preserve semantic headings and existing `id`s — content detail routes use
 `aria-labelledby` on sections.
@@ -68,11 +69,43 @@ import { Heading } from '@rpg/ui'
 
 ## `Text`
 
-Polymorphic via `as`. All Tailwind lives in `text.variants.ts`.
+Polymorphic via `as`. Each `variant` maps 1:1 to a `text-style-*` composite in
+[`text.variants.ts`](../src/components/ui/text.variants.ts). Storybook
+**Typography/Text → Role catalog** lists every variant (grouped by policy category).
+
+### Role contract
+
+A text role defines the intended typography for a communication purpose, including
+whichever of size, line height, weight, and default color are appropriate. Not every
+variant sets every property (`muted` is color-only; `label` inherits color).
+
+| Category              | Variants                                         | Policy                                  |
+| --------------------- | ------------------------------------------------ | --------------------------------------- |
+| Primary content roles | `body`, `supporting`, `caption`, `label`, `lead` | Preferred for new copy                  |
+| Contextual roles      | `option`                                         | Choice-row contexts                     |
+| Existing treatments   | `muted`, `emphasis`                              | Legacy — do not expand without an audit |
+| Semantic state        | `info`, `success`, `warning`, `destructive`      | Status-colored copy at 15px             |
+
+Do not hand-roll stacks that duplicate a role (`text-sm text-muted-foreground` →
+`supporting` or `text-style-supporting`). Do not invent combination names
+(`supporting-error`, `caption-success`).
+
+`Text variant="label"` is a visual descriptor on a `p`. Form labels, legends, hints,
+and errors use `text-style-field-*` and field components — not `Text` `label`.
+
+### Role versus tone
+
+`SemanticText` owns inline status tone (`neutral`, `info`, `success`, `warning`,
+`destructive`) and emphasis at 12px. `Text` state variants (`info`, `success`, …)
+are separate 15px treatments. There is no `tone` prop on `Text` yet; a future design
+may compose role + tone without new composite names.
+
+### Usage
 
 ```tsx
 import { Link, RichTextContent, Text } from '@rpg/ui'
 
+<Text variant="supporting">Secondary detail under a section title.</Text>
 <RichTextContent html={species.description} size="md" tone="muted" />
 <Text variant="destructive" role="alert">
   Could not load species.
@@ -80,8 +113,14 @@ import { Link, RichTextContent, Text } from '@rpg/ui'
 <Link href="/classes">← Classes</Link>
 ```
 
+Paragraph copy uses `<Text variant="…">`. Non-paragraph elements (`span`, `dt`, `dd`)
+and CVA branches use the matching `text-style-*` utility. `className` on `Text` is
+for layout (`truncate`, `mt-2`) and allowed color corrections on `label`
+(`text-foreground`, `text-destructive`) — never `text-style-*` utilities on `Text`
+(`packages/ui/src/lib/typography/text-style-stack-ratchet.repo.test.ts` enforces this).
+
 Form hints and errors inside `Field.*`, `Form`, and field wrappers already compose
-`Text` — do not re-add `text-sm text-muted-foreground` on those surfaces.
+field typography — do not re-add `text-sm text-muted-foreground` on those surfaces.
 
 ## `RichTextContent`
 
@@ -124,7 +163,7 @@ At 16px root, **`--text-md` is 15px** — one step between compact UI (`text-sm`
 | `RichTextContent` `size="md"` (`prose-md`)          | 15px via `.prose.prose-md`        |
 | `RichTextContent` `size="sm"` (`prose-sm`)          | 14px via `.prose.prose-sm`        |
 | `RichTextContent` `size="base"` (`prose`)           | 16px — primary body               |
-| `Text` `small`, `destructive`, `emphasis`, `option` | `text-md`                         |
+| `Text` `destructive`, `emphasis`, `option`          | `text-md`                         |
 | Generic `Card` `ui-card__description` (comfortable) | 14px (`text-sm` via shell var)    |
 | Rich-text editor (`size="md"`)                      | `prose-md` (matches catalog read) |
 | Rich-text editor (`size="sm"`)                      | `prose-sm`                        |

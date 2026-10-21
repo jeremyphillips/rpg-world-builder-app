@@ -603,13 +603,9 @@ function LocationInversePeopleConnectionLinkDrawerContent({
           />
         </div>
       ) : null}
-      {instructionCopy && !editingKind ? (
-        <Text variant="muted" className="text-sm">
-          {instructionCopy}
-        </Text>
-      ) : null}
+      {instructionCopy && !editingKind ? <Text variant="supporting">{instructionCopy}</Text> : null}
       {!activeSlotKey ? (
-        <Text variant="muted" className="text-sm" role="status">
+        <Text variant="supporting" role="status">
           {LOCATION_PEOPLE_SECTION_SURFACE_COPY.chooseKindMessage}
         </Text>
       ) : null}

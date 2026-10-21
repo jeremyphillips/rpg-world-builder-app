@@ -117,7 +117,7 @@ export const Default: StoryObj = {
     const [completed, setCompleted] = useState<Record<string, unknown> | null>(null)
 
     if (completed) {
-      return <Text variant="small">Submitted: {JSON.stringify(completed)}</Text>
+      return <Text variant="supporting">Submitted: {JSON.stringify(completed)}</Text>
     }
 
     return (
@@ -140,7 +140,7 @@ export const Midway: StoryObj = {
     const [completed, setCompleted] = useState<Record<string, unknown> | null>(null)
     // Render a pre-initialised Wizard at step 2 using a controlled key trick
     return completed ? (
-      <Text variant="small">Done</Text>
+      <Text variant="supporting">Done</Text>
     ) : (
       <Wizard steps={THREE_STEPS} onComplete={setCompleted}>
         <NameStep />

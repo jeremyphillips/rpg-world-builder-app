@@ -22,7 +22,7 @@ export function EquipmentPackageSwitchResolutionModalFooter({
   return (
     <div className="flex flex-col items-end gap-2">
       {helperMessage ? (
-        <Text as="p" className="text-style-supporting">
+        <Text as="p" variant="supporting">
           {helperMessage}
         </Text>
       ) : null}

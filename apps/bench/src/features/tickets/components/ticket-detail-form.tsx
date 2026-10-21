@@ -45,7 +45,7 @@ function AcceptanceCriteriaPasteHelper() {
 
   return (
     <div className="space-y-2 rounded-md border border-border p-3">
-      <Text variant="small" className="font-medium">
+      <Text variant="label" className="text-foreground">
         Paste bullets
       </Text>
       <Textarea

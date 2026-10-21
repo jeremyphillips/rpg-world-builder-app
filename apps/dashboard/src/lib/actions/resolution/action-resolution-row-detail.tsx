@@ -62,9 +62,7 @@ export function ActionResolutionRowDetail<TBlocker, TFailure extends ActionTarge
         <ul className={actionBlockerReferenceRowListClasses} role="list">
           {ruleMessages.map((blocker) => (
             <li key={blocker.key}>
-              <Text variant="muted" className="text-sm">
-                {blocker.message}
-              </Text>
+              <Text variant="supporting">{blocker.message}</Text>
             </li>
           ))}
         </ul>
@@ -73,11 +71,7 @@ export function ActionResolutionRowDetail<TBlocker, TFailure extends ActionTarge
   }
 
   if (row.state === 'failed' && row.failure) {
-    return (
-      <Text variant="muted" className="text-sm">
-        {row.failure.message}
-      </Text>
-    )
+    return <Text variant="supporting">{row.failure.message}</Text>
   }
 
   if (row.state === 'updated') {

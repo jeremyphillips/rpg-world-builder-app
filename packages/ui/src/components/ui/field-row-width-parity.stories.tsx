@@ -178,10 +178,10 @@ function ParityMatrix() {
             key={width}
             type="button"
             className={cn(
-              'rounded-md border px-2.5 py-1 text-sm',
+              'rounded-md border px-2.5 py-1',
               containerWidth === width
-                ? 'border-foreground bg-muted text-foreground'
-                : 'border-border text-muted-foreground',
+                ? 'border-foreground bg-muted text-sm text-foreground'
+                : 'border-border text-style-supporting',
             )}
             onClick={() => setContainerWidth(width)}
           >

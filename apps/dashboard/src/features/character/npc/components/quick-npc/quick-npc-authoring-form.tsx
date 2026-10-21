@@ -404,7 +404,7 @@ export function QuickNpcAuthoringForm({
             <>
               {showNarrativeRecovery ? (
                 <div className="flex flex-col gap-2 pb-2">
-                  <Text variant="muted" className="text-sm">
+                  <Text variant="supporting">
                     Narrative generation failed. Retry or create this NPC without a generated
                     narrative.
                   </Text>

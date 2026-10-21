@@ -37,7 +37,7 @@ function FilterSelect({
 }) {
   return (
     <div className="space-y-1">
-      <label htmlFor={id} className="text-xs text-muted-foreground">
+      <label htmlFor={id} className="text-style-caption">
         {label}
       </label>
       <Select value={value} onValueChange={onValueChange}>
@@ -63,7 +63,7 @@ export function EpicFilters({ filters, onChange }: EpicFiltersProps) {
 
   return (
     <div className="space-y-3 rounded-lg border border-border bg-card p-4">
-      <Text variant="small" className="font-medium">
+      <Text variant="label" className="text-foreground">
         Filters
       </Text>
       <div className="flex flex-wrap items-end gap-3">

@@ -30,9 +30,7 @@ export function LocationSettlementStartingDistrictsSlot() {
   return (
     <div className="space-y-3">
       {composition.districts.length === 0 ? (
-        <Text variant="muted" className="text-sm">
-          No starting districts yet.
-        </Text>
+        <Text variant="supporting">No starting districts yet.</Text>
       ) : (
         <ul className="space-y-2">
           {composition.districts.map((district, index) => {

@@ -498,7 +498,7 @@ function LocationStructureGroups({
               inset="parent"
             />
           ) : group.items.length === 0 ? (
-            <Text variant="muted" className="pt-1 text-sm">
+            <Text variant="supporting" className="pt-1">
               {group.emptyText}
             </Text>
           ) : (
@@ -634,7 +634,7 @@ export function LocationChildrenSection({
             onView={(href) => navigate(href)}
           />
         ) : !hasFlatContent ? (
-          <Text variant="muted" className="px-4 pb-2 pt-1 text-sm">
+          <Text variant="supporting" className="px-4 pb-2 pt-1">
             {emptyText}
           </Text>
         ) : (

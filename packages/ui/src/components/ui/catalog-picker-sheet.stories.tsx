@@ -96,7 +96,7 @@ export const Default: Story = {
           onOpenChange={setOpen}
           filterRow={{
             controls: (
-              <Text variant="muted" className="text-sm">
+              <Text variant="supporting">
                 Toolbar controls render here without the shell interpreting them.
               </Text>
             ),

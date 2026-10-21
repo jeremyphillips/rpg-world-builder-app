@@ -52,7 +52,7 @@ function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
               label={sub.name}
             >
               {sub.tagline ? (
-                <Text variant="small" className="italic">
+                <Text variant="supporting" className="italic">
                   {sub.tagline}
                 </Text>
               ) : null}

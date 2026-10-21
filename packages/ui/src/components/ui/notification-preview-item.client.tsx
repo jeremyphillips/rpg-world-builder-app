@@ -42,12 +42,12 @@ export function NotificationPreviewItem({
           >
             {title}
           </Text>
-          <Text as="span" variant="muted" className="shrink-0 text-xs">
+          <Text as="span" variant="caption" className="shrink-0">
             {timestamp}
           </Text>
         </div>
         {description ? (
-          <Text as="p" variant="muted" className="line-clamp-2 text-sm">
+          <Text as="p" variant="supporting" className="line-clamp-2">
             {description}
           </Text>
         ) : null}

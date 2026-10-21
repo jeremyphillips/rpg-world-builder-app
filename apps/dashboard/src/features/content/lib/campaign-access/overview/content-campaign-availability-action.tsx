@@ -57,7 +57,7 @@ export function ContentCampaignAvailabilityAction({
               <InlineInactiveStatus label={statusLabel} />
             )}
           </div>
-          <Text as="p" variant="muted" className="text-xs leading-snug">
+          <Text as="p" variant="caption" className="leading-snug">
             {helperCopy}
           </Text>
         </div>

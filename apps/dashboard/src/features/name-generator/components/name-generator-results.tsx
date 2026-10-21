@@ -59,9 +59,7 @@ export function NameGeneratorResults({
         role="alert"
         aria-live="assertive"
       >
-        <Text variant="muted" className="text-sm">
-          {error.description}
-        </Text>
+        <Text variant="supporting">{error.description}</Text>
       </Alert>
     )
   }
@@ -85,9 +83,7 @@ export function NameGeneratorResults({
             <div className="flex flex-col gap-1">
               <Text variant="emphasis">{resultsSummary.title}</Text>
               {resultsSummary.subtitle !== undefined ? (
-                <Text variant="muted" className="text-sm">
-                  {resultsSummary.subtitle}
-                </Text>
+                <Text variant="supporting">{resultsSummary.subtitle}</Text>
               ) : null}
             </div>
           ) : null}

@@ -29,7 +29,7 @@ function DiceFormulaPreview({ value, ...props }: ComponentProps<typeof DiceFormu
           action('onChange')(next)
         }}
       />
-      <Text variant="small">
+      <Text variant="supporting">
         Rolls{' '}
         <span className="font-mono font-medium text-foreground">
           {formatDiceFormula(

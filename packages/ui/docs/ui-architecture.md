@@ -45,7 +45,7 @@ Introduce a shared variant when it represents a stable, meaningful dimension of 
 
 - **Semantic CSS** is for a reusable component's appearance, sizing, geometry, and interaction states. Components use `ui-*` blocks in `@rpg/ui` and `dash-*` blocks for dashboard-owned shared compositions.
 - **Tailwind utilities** are for one-off composition and layout that the consumer intentionally owns (`flex items-center gap-2`). Do not replace utility sprawl with a parallel catalog of semantic classes for trivial layouts.
-- **Typography roles** stay single-class `@utility` composites (`heading-style-*`, and `text-style-*` once those land). They already meet the inspector goal and apply to arbitrary elements.
+- **Typography roles** stay single-class `@utility` composites (`heading-style-*`, `text-style-*`). They already meet the inspector goal and apply to arbitrary elements.
 
 ## Ownership registry
 

@@ -27,7 +27,7 @@ export function SpellEffectsPreview() {
 
   if (lines.length === 0) {
     return (
-      <Text variant="muted" className="text-sm" role="status">
+      <Text variant="supporting" role="status">
         Add effects to preview structured summaries here. Prose in the Basics tab remains the escape
         hatch.
       </Text>
@@ -40,7 +40,7 @@ export function SpellEffectsPreview() {
         <Text variant="emphasis" as="span" className="text-sm">
           {SPELL_EFFECTS_PREVIEW_LABEL}
         </Text>
-        <Text variant="muted" className="text-xs" as="span">
+        <Text variant="caption" as="span">
           {modelingLabel}
         </Text>
       </div>

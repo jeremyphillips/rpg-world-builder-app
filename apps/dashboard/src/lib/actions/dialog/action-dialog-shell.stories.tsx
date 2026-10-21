@@ -11,8 +11,8 @@ const meta = {
     onOpenChange: () => undefined,
     headline: 'Edit campaign availability',
     description: 'Apply changes to 3 selected items.',
-    configureSlot: <Text variant="small">Configure fields render here.</Text>,
-    summarySlot: <Text variant="small">2 items will change. 1 item unchanged.</Text>,
+    configureSlot: <Text variant="supporting">Configure fields render here.</Text>,
+    summarySlot: <Text variant="supporting">2 items will change. 1 item unchanged.</Text>,
   },
 } satisfies Meta<typeof ActionDialogShell>
 

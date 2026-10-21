@@ -283,11 +283,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       headerBelowDescription={
         <div className="space-y-4">
           <DrawerContext entities={drawerContextEntities} />
-          {instructionCopy ? (
-            <Text variant="muted" className="text-sm">
-              {instructionCopy}
-            </Text>
-          ) : null}
+          {instructionCopy ? <Text variant="supporting">{instructionCopy}</Text> : null}
           {showKindStep ? (
             <LocationConnectionKindField
               id="location-inverse-character-connection-kind"
@@ -301,7 +297,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       }
       emptyState={
         mode === 'add' && !selectedCharacterId ? (
-          <Text variant="muted" className="text-sm" role="status">
+          <Text variant="supporting" role="status">
             {LOCATION_INVERSE_CHARACTER_LINK_CHOOSE_SUBJECT_MESSAGE}
           </Text>
         ) : undefined

@@ -43,13 +43,13 @@ export const SectionVariantMultipleOpen: Story = {
       <AccordionItem value="identity" variant="section">
         <AccordionTrigger variant="section">Identity</AccordionTrigger>
         <AccordionContent>
-          <Text variant="small">Name, slug, and description fields would live here.</Text>
+          <Text variant="supporting">Name, slug, and description fields would live here.</Text>
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="traits" variant="section">
         <AccordionTrigger variant="section">Traits</AccordionTrigger>
         <AccordionContent>
-          <Text variant="small">Repeatable trait rows would live here.</Text>
+          <Text variant="supporting">Repeatable trait rows would live here.</Text>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
