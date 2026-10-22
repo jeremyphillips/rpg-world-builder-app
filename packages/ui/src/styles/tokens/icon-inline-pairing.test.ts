@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest'
 const globalsPath = join(fileURLToPath(import.meta.url), '../../../styles/globals.css')
 
 function ownersBlock(css: string): string {
-  const start = css.indexOf('@layer utilities {\n .text-xs {')
+  const start = css.indexOf('@layer utilities {\n  .text-xs {')
   const end = css.indexOf('@utility size-status-icon-slash-sm')
   expect(start).toBeGreaterThan(-1)
   expect(end).toBeGreaterThan(start)
@@ -32,8 +32,8 @@ describe('inline icon pairing', () => {
 
   it('maps body and compact type owners without restating font size', () => {
     const owners = ownersBlock(css)
-    expect(owners).toContain('.text-xs {\n --icon-inline: var(--icon-glyph-sm);')
-    expect(owners).toContain('.text-sm {\n --icon-inline: var(--icon-glyph-sm);')
+    expect(owners).toContain('.text-xs {\n    --icon-inline: var(--icon-glyph-sm);')
+    expect(owners).toContain('.text-sm {\n    --icon-inline: var(--icon-glyph-sm);')
     expect(owners).toContain('.text-md {\n    --icon-inline: var(--icon-glyph-md);')
     expect(owners).toContain('.text-base {\n    --icon-inline: var(--icon-glyph-md);')
     expect(owners).not.toMatch(/font-size|line-height|\.text-lg/)
