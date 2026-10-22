@@ -16,17 +16,17 @@ States are orthogonal. Lower layers do not replace the accent rail; highlight ad
 | State                           | Visual                        | Classes / tokens                                                                                                                                            |
 | ------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Rest                            | Transparent row on list shell | `--ui-row-bg: transparent`; shell publishes `--ui-surface-bg` (`--surface-lift` on `.ui-interactive-list`, `--background` on `.ui-interactive-list__panel`) |
-| Pointer hover (unselected)      | Surface hover mix             | `--hover-list` → `--ui-row-bg-hover: var(--ui-surface-hover-bg)`                                                                                            |
-| Pressed (unselected)            | Surface pressed mix           | `:active` on `.ui-interactive-row--hover-list` inside `.ui-interactive-list`                                                                                |
+| Pointer hover (unselected)      | Surface hover mix             | `--hover` → `--ui-row-bg-hover: var(--ui-surface-hover-bg)`                                                                                                 |
+| Pressed (unselected)            | Surface pressed mix           | `:active` on `.ui-interactive-row--hover`                                                                                                                   |
 | Keyboard highlight (unselected) | Hover fill + left rail        | `--highlight-list` + `--rail`                                                                                                                               |
 | Persistent selection            | Selected fill                 | `--fill-surface` → `--ui-row-bg: var(--ui-surface-selected-bg)`                                                                                             |
 | Keyboard highlight (selected)   | Selected fill + rail          | `--highlight-list-selected` + `--rail`                                                                                                                      |
-| Selected + pointer hover        | Selected hover token          | `--hover-selected` → `--ui-row-bg-hover: var(--ui-surface-selected-bg)`                                                                                     |
+| Selected + pointer hover        | Selected fill unchanged       | `--fill-surface` hover/active rules on `.ui-interactive-row--fill-surface`                                                                                  |
 | Disabled                        | Muted, no pointer             | `--state-disabled`                                                                                                                                          |
 
 **Highlight vs selection vs focus:** `highlighted` is the transient listbox/combobox cue (arrow keys, `mouseenter`). `selected` is the persisted value (`aria-selected` on options). Focus rings live on the interactive child (`button`, `a`) via `interactiveFocusVariants`, not on row fill.
 
-Surface hover and pressed mixes come from [surface-interaction.css](../src/components/ui/surface-interaction.css) on `.ui-interactive-list` and `.ui-interactive-list__panel` — the same 94% / 88% recipe as interactive cards, without composing `ui-card` chrome.
+Surface hover and pressed mixes come from [surface-interaction.css](../src/components/ui/surface-interaction.css) on painted publishers (list shell, panel, card, popover, canvas `:root`, …) — the same 94% / 88% recipe as interactive cards, without composing `ui-card` chrome.
 
 ## Menu item contract
 

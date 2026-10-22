@@ -73,7 +73,6 @@ export const destinationItemLinkVariants = cva(
     UI_DESTINATION_ITEM_LINK_CLASS,
     interactiveRowVariants({
       interaction: 'hoverable',
-      hoverFamily: 'navigation',
       hitTarget: 'pointer',
     }),
     interactiveFocusVariants({ context: 'embedded' }),

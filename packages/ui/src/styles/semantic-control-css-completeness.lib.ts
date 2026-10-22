@@ -335,20 +335,14 @@ const CHOICE_CONTROL_SWITCH_REQUIRED = ['width', 'height', 'border-radius'] as c
 
 const CHOICE_CONTROL_INDICATOR_REQUIRED = ['width', 'height'] as const
 
-const INTERACTIVE_ROW_HOVER_MODIFIERS = [
-  'hover-none',
-  'hover-selectable',
-  'hover-navigation',
-  'hover-selected',
-  'hover-surface',
-  'hover-list',
-] as const
+const INTERACTIVE_ROW_HOVER_MODIFIERS = ['hover-none', 'hover'] as const
 
 const INTERACTIVE_ROW_SELECTED_MODIFIERS = [
   'selected-none',
   'selected-fill',
   'selected-bordered',
   'fill-surface',
+  'emphasis-fill',
 ] as const
 
 const INTERACTIVE_ROW_STATE_MODIFIERS = [

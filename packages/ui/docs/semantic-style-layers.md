@@ -75,26 +75,19 @@ embedded focus. List-row removes use this primitive — features must not size r
 `hover: 'accent'` keeps `control-hover` (dense row chrome), not the toolbar accent fill from
 `ghostControlVisualStateClasses`.
 
-### `interactiveRowVariants({ interaction, state, hoverFamily, selected, … })`
+### `interactiveRowVariants({ interaction, state, selected, … })`
 
 Orthogonal row fills — not layout:
 
-| Axis            | Values                                                        |
-| --------------- | ------------------------------------------------------------- |
-| `interaction`   | `static` \| `hoverable`                                       |
-| `state`         | `default` \| `inactive` \| `disabled`                         |
-| `hoverFamily`   | `none` \| `selectable` \| `navigation`                        |
-| `selected`      | `none` \| `bordered` \| `fill`                                |
-| `selectedHover` | `none` \| `row`                                               |
-| `selectedData`  | `none` \| `selected` \| `checked`                             |
-| `hitTarget`     | `none` \| `pointer` (`cursor-pointer` on clickable row hosts) |
+| Axis           | Values                                                        |
+| -------------- | ------------------------------------------------------------- |
+| `interaction`  | `static` \| `hoverable` (applies `--hover` when unselected)   |
+| `state`        | `default` \| `inactive` \| `disabled`                         |
+| `selected`     | `none` \| `bordered` \| `fill`                                |
+| `selectedData` | `none` \| `selected` \| `checked`                             |
+| `hitTarget`    | `none` \| `pointer` (`cursor-pointer` on clickable row hosts) |
 
-| `hoverFamily` | Meaning                    | Hover token          |
-| ------------- | -------------------------- | -------------------- |
-| `selectable`  | Editor/selection list rows | `hover:bg-row-hover` |
-| `navigation`  | Destination/link hub rows  | `hover:bg-muted`     |
-
-`InteractiveList` rows use `--hover-list` and the shared surface ladder (`--ui-surface-hover-bg` / `--ui-surface-pressed-bg` / `--ui-surface-selected-bg`), not `ui-card` chrome. Action menus use `ui-menu-item` only — see [interactive-list-rows.md](./interactive-list-rows.md).
+Pointer hover and pressed mixes always use `--ui-surface-hover-bg` / `--ui-surface-pressed-bg` from the nearest painted publisher (`surface-interaction.css`). Persistent selection uses `--ui-surface-selected-bg`. `InteractiveList` listbox highlight and rail are separate modifiers — see [interactive-list-rows.md](./interactive-list-rows.md). Action menus use `ui-menu-item` only.
 
 Sortable drag opacity: `dragSurfaceVariants` on the wrapper — not `interactiveRowVariants`.
 

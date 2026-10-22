@@ -934,10 +934,6 @@ export {
   type NotificationErrorStateProps,
 } from './components/ui/notification-error-state'
 export {
-  notificationMenuFooterLinkVariants,
-  notificationMenuRowLinkVariants,
-} from './components/ui/notification-menu-row.variants'
-export {
   ButtonDropdown,
   type ButtonDropdownGroup,
   type ButtonDropdownItem,

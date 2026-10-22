@@ -47,12 +47,13 @@ For each migrated primitive, verify in Storybook DevTools:
 
 `ui-interactive-row` writes hover, data selection, and disabled treatment once. Modifiers only set `--ui-row-*`:
 
-| Dimension | Classes                                                                                                           | Custom properties                                       |
-| --------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Hover     | `--hover-none`, `--hover-selectable`, `--hover-navigation`, `--hover-selected`, `--hover-surface`, `--hover-list` | `--ui-row-bg-hover`                                     |
-| Selected  | `--selected-none`, `--selected-fill`, `--selected-bordered`, `--fill-surface`                                     | `--ui-row-bg`, `--ui-row-border`                        |
-| State     | `--state-default`, `--state-inactive`, `--state-disabled`                                                         | `--ui-row-border-style`, `--ui-row-state-border`        |
-| Data      | `--data-none`, `--data-selected`, `--data-checked`                                                                | `--ui-row-bg-data-selected`, `--ui-row-bg-data-checked` |
+| Dimension | Classes                                                                       | Custom properties                                       |
+| --------- | ----------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Hover     | `--hover-none`, `--hover`                                                     | `--ui-row-bg-hover` → `--ui-surface-hover-bg`           |
+| Emphasis  | `--emphasis-fill`                                                             | persistent `--ui-surface-selected-bg` (not selection)   |
+| Selected  | `--selected-none`, `--selected-fill`, `--selected-bordered`, `--fill-surface` | `--ui-row-bg`, `--ui-row-border`                        |
+| State     | `--state-default`, `--state-inactive`, `--state-disabled`                     | `--ui-row-border-style`, `--ui-row-state-border`        |
+| Data      | `--data-none`, `--data-selected`, `--data-checked`                            | `--ui-row-bg-data-selected`, `--ui-row-bg-data-checked` |
 
 `ui-interactive-list` owns the list surface, `--ui-surface-bg`, adjacent-sibling borders, and shared hover/pressed mixes (with `surface-interaction.css`). `__panel`, `__toolbar`, `__main--{sm,md,lg}` own panel chrome, toolbar chrome, and row padding. List rows use `--rail` for keyboard highlight only — not action menus. State precedence → [interactive-list-rows.md](./interactive-list-rows.md). `shadow-md` stays a utility on the panel. twMerge groups: `ui-interactive-row-hover`, `ui-interactive-row-selected`, `ui-interactive-list-row-size` (the size group also drops `px`/`py`/`p`).
 

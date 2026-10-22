@@ -41,7 +41,6 @@ describe('destination-list.css inset divider contract', () => {
     expect(css).toMatch(
       /\.ui-destination-list--filled\.ui-destination-list--tone-strong[^}]*--ui-surface-bg:\s*var\(--surface-strong\)/s,
     )
-    expect(css).toContain('--ui-row-bg-hover: var(--ui-surface-hover-bg)')
     expect(css).not.toMatch(
       /\.ui-destination-list--filled\.ui-destination-list--tone-strong[^}]*box-shadow:/s,
     )

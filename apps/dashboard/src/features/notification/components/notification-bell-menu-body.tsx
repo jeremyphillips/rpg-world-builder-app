@@ -6,14 +6,20 @@ import {
   NotificationLoadingState,
   NotificationPreviewList,
   cn,
-  notificationMenuFooterLinkVariants,
-  notificationMenuRowLinkVariants,
+  menuItemIconGlyphClasses,
+  standaloneTextActionClasses,
 } from '@rpg/ui'
 
 import { MESSAGES_ACTION_COPY } from '@/features/message'
 
 import type { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items'
 import { NOTIFICATION_COPY } from '../lib/notification-copy'
+
+const notificationFooterLinkClasses = cn(
+  'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm',
+  standaloneTextActionClasses(),
+  menuItemIconGlyphClasses,
+)
 
 type NotificationBellMenuFooterProps = {
   notificationsViewAllHref: string
@@ -28,17 +34,14 @@ function NotificationBellMenuFooter({
     <div>
       {campaignMessagesHref ? (
         <div className="p-1">
-          <Link to={campaignMessagesHref} className={notificationMenuRowLinkVariants()}>
+          <Link to={campaignMessagesHref} className={notificationFooterLinkClasses}>
             <MessageSquare aria-hidden />
             {MESSAGES_ACTION_COPY.viewForCampaign}
           </Link>
         </div>
       ) : null}
       <div className="border-t border-border bg-muted p-1">
-        <Link
-          to={notificationsViewAllHref}
-          className={cn(notificationMenuFooterLinkVariants({ emphasis: 'strong' }))}
-        >
+        <Link to={notificationsViewAllHref} className={notificationFooterLinkClasses}>
           {NOTIFICATION_COPY.viewAllNotifications}
         </Link>
       </div>

@@ -1,7 +1,7 @@
 /*
  * Interactive row — hover, selection, and disabled state written once.
- * Source order: base → hover modifiers → selected modifiers → state → data → highlight.
- * Hover modifiers set only `--ui-row-bg-hover`. Selected modifiers set `--ui-row-bg` and `--ui-row-border`.
+ * Source order: base → hover → selected → state → data → highlight → emphasis.
+ * Fills use --ui-surface-* from the nearest painted publisher (surface-interaction.css).
  */
 @layer components {
   .ui-interactive-row {
@@ -13,13 +13,12 @@
     transition-duration: 150ms;
   }
 
-  .ui-interactive-row--hover-none:hover,
-  .ui-interactive-row--hover-selectable:hover,
-  .ui-interactive-row--hover-navigation:hover,
-  .ui-interactive-row--hover-selected:hover,
-  .ui-interactive-row--hover-surface:hover,
-  .ui-interactive-row--hover-list:hover {
+  .ui-interactive-row--hover:hover {
     background-color: var(--ui-row-bg-hover);
+  }
+
+  .ui-interactive-row--hover:not(.ui-interactive-row--state-disabled):active {
+    background-color: var(--ui-surface-pressed-bg);
   }
 
   /* --- Hover (mutually exclusive) --- */
@@ -28,23 +27,7 @@
     --ui-row-bg-hover: var(--ui-row-bg, transparent);
   }
 
-  .ui-interactive-row--hover-selectable {
-    --ui-row-bg-hover: var(--row-hover-bg);
-  }
-
-  .ui-interactive-row--hover-navigation {
-    --ui-row-bg-hover: var(--muted);
-  }
-
-  .ui-interactive-row--hover-selected {
-    --ui-row-bg-hover: var(--ui-surface-selected-bg);
-  }
-
-  .ui-interactive-row--hover-surface {
-    --ui-row-bg-hover: var(--surface-subtle);
-  }
-
-  .ui-interactive-row--hover-list {
+  .ui-interactive-row--hover {
     --ui-row-bg-hover: var(--ui-surface-hover-bg);
   }
 
@@ -55,19 +38,38 @@
     --ui-row-border: var(--ui-row-state-border, transparent);
   }
 
-  .ui-interactive-row--selected-fill {
-    --ui-row-bg: var(--row-selected-bg);
-    --ui-row-border: var(--ui-row-state-border, transparent);
-  }
-
-  .ui-interactive-row--selected-bordered {
-    --ui-row-bg: var(--row-selected-bg);
-    --ui-row-border: var(--row-selected-border);
-  }
-
+  .ui-interactive-row--selected-fill,
   .ui-interactive-row--fill-surface {
     --ui-row-bg: var(--ui-surface-selected-bg);
     --ui-row-border: var(--ui-row-state-border, transparent);
+  }
+
+  .ui-interactive-row--selected-fill:hover,
+  .ui-interactive-row--selected-fill:active,
+  .ui-interactive-row--fill-surface:hover,
+  .ui-interactive-row--fill-surface:active {
+    background-color: var(--ui-surface-selected-bg);
+  }
+
+  .ui-interactive-row--selected-bordered {
+    --ui-row-bg: var(--ui-surface-selected-bg);
+    --ui-row-border: var(--row-selected-border);
+  }
+
+  .ui-interactive-row--selected-bordered:hover,
+  .ui-interactive-row--selected-bordered:active {
+    background-color: var(--ui-surface-selected-bg);
+  }
+
+  /* Persistent visual emphasis — not listbox selection (e.g. unread notification). */
+  .ui-interactive-row--emphasis-fill {
+    --ui-row-bg: var(--ui-surface-selected-bg);
+    --ui-row-border: var(--ui-row-state-border, transparent);
+  }
+
+  .ui-interactive-row--emphasis-fill:hover,
+  .ui-interactive-row--emphasis-fill:active {
+    background-color: var(--ui-surface-selected-bg);
   }
 
   /* --- State (mutually exclusive) --- */
@@ -101,13 +103,13 @@
   }
 
   .ui-interactive-row--data-selected {
-    --ui-row-bg-data-selected: var(--row-selected-bg);
+    --ui-row-bg-data-selected: var(--ui-surface-selected-bg);
     --ui-row-bg-data-checked: var(--ui-row-bg, transparent);
   }
 
   .ui-interactive-row--data-checked {
     --ui-row-bg-data-selected: var(--ui-row-bg, transparent);
-    --ui-row-bg-data-checked: var(--row-selected-bg);
+    --ui-row-bg-data-checked: var(--ui-surface-selected-bg);
   }
 
   .ui-interactive-row[data-state='selected'] {
@@ -116,6 +118,13 @@
 
   .ui-interactive-row[data-state='checked'] {
     background-color: var(--ui-row-bg-data-checked, var(--ui-row-bg, transparent));
+  }
+
+  .ui-interactive-row[data-state='selected']:hover,
+  .ui-interactive-row[data-state='selected']:active,
+  .ui-interactive-row[data-state='checked']:hover,
+  .ui-interactive-row[data-state='checked']:active {
+    background-color: var(--ui-surface-selected-bg);
   }
 
   /* --- Hit target --- */
@@ -128,10 +137,10 @@
     cursor: pointer;
   }
 
-  /* --- Highlight and menu rail --- */
+  /* --- Keyboard highlight (not pointer hover) --- */
 
   .ui-interactive-row--highlight {
-    background-color: var(--row-hover-bg);
+    background-color: var(--ui-surface-hover-bg);
   }
 
   .ui-interactive-row--highlight-list {
@@ -140,11 +149,6 @@
 
   .ui-interactive-row--highlight-list-selected {
     background-color: var(--ui-surface-selected-bg);
-  }
-
-  .ui-interactive-list
-    .ui-interactive-row--hover-list:not(.ui-interactive-row--state-disabled):active {
-    background-color: var(--ui-surface-pressed-bg);
   }
 
   .ui-interactive-row--rail {

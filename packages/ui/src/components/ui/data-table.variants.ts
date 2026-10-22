@@ -56,7 +56,7 @@ export const dataTablePaginationVariants = cva(
 
 /** Table container — elevated card plane on the page canvas. */
 export const dataTableTableWrapVariants = cva(
-  'overflow-hidden rounded-card border border-border bg-background text-foreground shadow-surface-raised',
+  'ui-data-table__table-wrap overflow-hidden rounded-card border border-border text-foreground shadow-surface-raised',
 )
 
 /**
@@ -76,7 +76,6 @@ export const dataTableRowVariants = cva(
     'group/row min-h-14 border-b border-border-subtle',
     interactiveRowVariants({
       interaction: 'hoverable',
-      hoverFamily: 'selectable',
       selectedData: 'selected',
     }),
   ),

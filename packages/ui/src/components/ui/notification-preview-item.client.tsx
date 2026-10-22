@@ -3,8 +3,10 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { interactiveFocusVariants } from './interactive-focus.variants'
+import { interactiveRowVariants } from './interactive-row.variants'
+import { UI_INTERACTIVE_ROW_EMPHASIS_FILL_CLASS } from './interactive-row.styles'
 import { Text } from './text'
-import { notificationPreviewItemVariants } from './notification-preview-item.variants'
 
 export type NotificationPreviewItemProps = {
   title: React.ReactNode
@@ -14,6 +16,14 @@ export type NotificationPreviewItemProps = {
   icon?: React.ReactNode
   onActivate?: () => void
   className?: string
+}
+
+function notificationPreviewButtonClasses(unread: boolean) {
+  return cn(
+    'w-full px-3 py-2.5 text-left transition-colors',
+    interactiveRowVariants({ interaction: unread ? 'static' : 'hoverable' }),
+    interactiveFocusVariants({ context: 'standalone' }),
+  )
 }
 
 export function NotificationPreviewItem({
@@ -71,7 +81,11 @@ export function NotificationPreviewItem({
       type="button"
       onClick={onActivate}
       aria-label={activateLabel}
-      className={cn(notificationPreviewItemVariants({ unread }), className)}
+      className={cn(
+        notificationPreviewButtonClasses(unread),
+        unread && UI_INTERACTIVE_ROW_EMPHASIS_FILL_CLASS,
+        className,
+      )}
     >
       {content}
     </button>

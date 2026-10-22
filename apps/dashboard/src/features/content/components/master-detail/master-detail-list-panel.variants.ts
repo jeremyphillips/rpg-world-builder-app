@@ -47,13 +47,11 @@ export function masterDetailListRowClasses(options: {
     interactiveRowVariants({
       interaction: 'hoverable',
       state: 'default',
-      hoverFamily: options.isSelected ? 'none' : 'selectable',
-      selected: 'none',
-      selectedHover: 'none',
+      selected: options.isSelected ? 'fill' : 'none',
       hitTarget: 'pointer',
     }),
     !active && 'text-muted-foreground',
-    options.isSelected && 'bg-surface-muted text-foreground hover:bg-surface-muted',
+    options.isSelected && 'text-foreground',
     options.isSelected &&
       'before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-primary',
   )

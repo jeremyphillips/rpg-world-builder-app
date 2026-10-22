@@ -21,7 +21,6 @@
   .ui-panel--transparent {
     border-color: var(--border-subtle);
     background-color: transparent;
-    --ui-surface-bg: transparent;
   }
 
   .ui-panel--quiet {

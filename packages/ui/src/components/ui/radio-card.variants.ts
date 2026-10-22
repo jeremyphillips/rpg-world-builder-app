@@ -11,7 +11,6 @@ const radioCardRowBase = cn(
   'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground',
   interactiveRowVariants({
     interaction: 'hoverable',
-    hoverFamily: 'selectable',
     selectedData: 'checked',
   }),
   interactiveFocusVariants({ context: 'standalone' }),

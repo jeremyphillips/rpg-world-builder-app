@@ -51,6 +51,7 @@ import {
   UI_INTERACTIVE_ROW_HOVER_CLASS,
   UI_INTERACTIVE_ROW_SELECTED_CLASS,
   UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS,
+  UI_INTERACTIVE_ROW_EMPHASIS_FILL_CLASS,
 } from '../components/ui/interactive-row.styles'
 import * as classGroups from './semantic-control-class-groups'
 
@@ -166,7 +167,11 @@ describe('semantic-control-class-groups sync', () => {
     )
     expectSameSet(
       UI_INTERACTIVE_ROW_SELECTED_CLASSES,
-      [...Object.values(UI_INTERACTIVE_ROW_SELECTED_CLASS), UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS],
+      [
+        ...Object.values(UI_INTERACTIVE_ROW_SELECTED_CLASS),
+        UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS,
+        UI_INTERACTIVE_ROW_EMPHASIS_FILL_CLASS,
+      ],
       'interactive row selected',
     )
   })

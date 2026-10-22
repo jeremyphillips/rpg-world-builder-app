@@ -24,6 +24,7 @@
     background-color: var(--popover);
     padding: 0;
     --surface-current: var(--popover);
+    --ui-surface-bg: var(--popover);
   }
 
   .ui-popover-content--tooltip {

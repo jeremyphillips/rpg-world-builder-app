@@ -4,7 +4,6 @@ import { cn } from '../../lib/utils'
 import {
   UI_INTERACTIVE_ROW_BLOCK_CLASS,
   UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS,
-  UI_INTERACTIVE_ROW_HOVER_CLASS,
   UI_INTERACTIVE_ROW_STATE_CLASS,
 } from './interactive-row.styles'
 import {
@@ -120,11 +119,6 @@ export const interactiveListRowChromeVariants = cva(
         interactive: true,
         selected: false,
         className: selectableRowListPointerHoverClasses,
-      },
-      {
-        selected: true,
-        interactive: true,
-        className: UI_INTERACTIVE_ROW_HOVER_CLASS.selected,
       },
     ],
     defaultVariants: {

@@ -1,0 +1,6 @@
+/* DataTable table card — publishes rest plane for body row interaction mixes. */
+@layer components {
+  .ui-data-table__table-wrap {
+    background-color: var(--background);
+  }
+}

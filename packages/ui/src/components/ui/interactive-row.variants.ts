@@ -17,7 +17,7 @@ import {
 /** Pointer hover for selectable rows. Hosts compose this; the wash lives in interactive-row.css. */
 export const selectableRowPointerHoverClasses = cn(
   UI_INTERACTIVE_ROW_BLOCK_CLASS,
-  UI_INTERACTIVE_ROW_HOVER_CLASS.selectable,
+  UI_INTERACTIVE_ROW_HOVER_CLASS.hover,
 )
 
 export const selectableRowHighlightFillClasses = UI_INTERACTIVE_ROW_HIGHLIGHT_CLASS
@@ -25,7 +25,7 @@ export const selectableRowHighlightFillClasses = UI_INTERACTIVE_ROW_HIGHLIGHT_CL
 /** Pointer hover for `InteractiveListRow` — mixes from the list shell `--ui-surface-bg`. */
 export const selectableRowListPointerHoverClasses = cn(
   UI_INTERACTIVE_ROW_BLOCK_CLASS,
-  UI_INTERACTIVE_ROW_HOVER_CLASS.list,
+  UI_INTERACTIVE_ROW_HOVER_CLASS.hover,
 )
 
 export const selectableRowListHighlightUnselectedClasses =
@@ -54,19 +54,10 @@ export const interactiveRowVariants = cva(UI_INTERACTIVE_ROW_BLOCK_CLASS, {
       inactive: UI_INTERACTIVE_ROW_STATE_CLASS.inactive,
       disabled: UI_INTERACTIVE_ROW_STATE_CLASS.disabled,
     },
-    hoverFamily: {
-      none: '',
-      selectable: '',
-      navigation: '',
-    },
     selected: {
       none: UI_INTERACTIVE_ROW_SELECTED_CLASS.none,
       bordered: UI_INTERACTIVE_ROW_SELECTED_CLASS.bordered,
       fill: UI_INTERACTIVE_ROW_SELECTED_CLASS.fill,
-    },
-    selectedHover: {
-      none: '',
-      row: '',
     },
     selectedData: {
       none: UI_INTERACTIVE_ROW_DATA_CLASS.none,
@@ -81,33 +72,14 @@ export const interactiveRowVariants = cva(UI_INTERACTIVE_ROW_BLOCK_CLASS, {
   compoundVariants: [
     {
       interaction: 'hoverable',
-      hoverFamily: 'selectable',
       selected: 'none',
-      class: UI_INTERACTIVE_ROW_HOVER_CLASS.selectable,
-    },
-    {
-      interaction: 'hoverable',
-      hoverFamily: 'navigation',
-      selected: 'none',
-      class: UI_INTERACTIVE_ROW_HOVER_CLASS.navigation,
-    },
-    {
-      selected: 'bordered',
-      selectedHover: 'row',
-      class: UI_INTERACTIVE_ROW_HOVER_CLASS.selected,
-    },
-    {
-      selected: 'fill',
-      selectedHover: 'row',
-      class: UI_INTERACTIVE_ROW_HOVER_CLASS.selected,
+      class: UI_INTERACTIVE_ROW_HOVER_CLASS.hover,
     },
   ],
   defaultVariants: {
     interaction: 'hoverable',
     state: 'default',
-    hoverFamily: 'selectable',
     selected: 'none',
-    selectedHover: 'none',
     selectedData: 'none',
     hitTarget: 'none',
   },

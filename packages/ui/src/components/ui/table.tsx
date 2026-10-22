@@ -49,7 +49,6 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
         'border-b border-border',
         interactiveRowVariants({
           interaction: 'hoverable',
-          hoverFamily: 'selectable',
           selectedData: 'selected',
         }),
         className,

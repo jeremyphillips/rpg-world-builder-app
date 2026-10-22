@@ -22,14 +22,12 @@ function assertNoForbiddenHoverTokens(className: string) {
 }
 
 function assertListRowRecipe(className: string) {
-  expect(className).toMatch(
-    /ui-interactive-row--(hover-list|highlight-list|highlight-list-selected)/,
-  )
+  expect(className).toMatch(/ui-interactive-row--(hover|highlight-list|highlight-list-selected)/)
   assertNoForbiddenHoverTokens(className)
 }
 
 function assertEditorRowRecipe(className: string) {
-  expect(className).toMatch(/ui-interactive-row--(hover-selectable|highlight)/)
+  expect(className).toMatch(/ui-interactive-row--(hover|highlight)/)
   assertNoForbiddenHoverTokens(className)
 }
 
@@ -69,11 +67,11 @@ describe('selectable row interaction recipe (hosts)', () => {
     expect(container.firstElementChild).toHaveClass('ui-interactive-row--fill-surface')
   })
 
-  it('InteractiveListRow uses selected hover (strong) when selected, not list pointer hover', () => {
+  it('InteractiveListRow uses selected fill when selected, not pointer hover', () => {
     const { container } = render(<InteractiveListRow name="Fireball" selected />)
     const shell = container.firstElementChild
-    expect(shell).toHaveClass('ui-interactive-row--hover-selected')
-    expect(shell).not.toHaveClass('ui-interactive-row--hover-list')
+    expect(shell).toHaveClass('ui-interactive-row--fill-surface')
+    expect(shell).not.toHaveClass('ui-interactive-row--hover')
   })
 
   it('ComboboxOptionRow shell uses list highlight when highlighted', () => {

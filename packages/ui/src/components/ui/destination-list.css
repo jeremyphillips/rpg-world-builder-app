@@ -47,16 +47,6 @@
     background-color: var(--ui-surface-bg);
   }
 
-  .ui-destination-list--filled.ui-destination-list--tone-strong
-    .ui-interactive-row--hover-navigation {
-    --ui-row-bg-hover: var(--ui-surface-hover-bg);
-  }
-
-  .ui-destination-list--filled.ui-destination-list--tone-strong
-    .ui-interactive-row--hover-navigation:not(.ui-interactive-row--disabled):active {
-    background-color: var(--ui-surface-pressed-bg);
-  }
-
   .ui-destination-list--elevation-subtle {
     box-shadow: var(--shadow-surface-subtle);
   }
