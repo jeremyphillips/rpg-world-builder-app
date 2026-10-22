@@ -11,7 +11,7 @@ Temporary tracker for inventory, classification, readiness, and status. Delete o
 - A stable public API, or an explicit migration plan for it.
 - Known consumer overrides, each with its intended behavior recorded. A legitimate feature-level override is allowed.
 
-A dedicated variants file, pre-existing stories and tests, and the removal of unrelated deprecated aliases are not prerequisites.
+A dedicated variants file, pre-existing stories and tests, and the removal of unrelated deprecated aliases are **not** prerequisites for architecture readiness.
 
 **Migration completion** must pass before the work counts as finished.
 
@@ -20,6 +20,55 @@ A dedicated variants file, pre-existing stories and tests, and the removal of un
 - Tests and visual parity, using the completeness guard and the parity harness.
 - Size and appearance modifiers documented in the component doc or [semantic-control-css.md](./semantic-control-css.md).
 - No obsolete styling paths for the migrated responsibility, including deprecated aliases for that responsibility.
+- **Styling ownership cleanup:** All styling modules and class aliases affected by the migration have been reviewed. Obsolete implementations, static indirection, and duplicate chrome have been removed.
+- **Variant-file disposition:** Every affected `*.variants.ts` file is retained, simplified, deleted, or explicitly deferred with a reason. Retention requires meaningful variant resolution, not merely reuse.
+- **No replacement indirection:** Do not replace deleted Tailwind aliases with equivalent constants, trivial wrappers, or one-to-one CSS selectors.
+- **Inspectable semantic styling:** Reusable appearance and anatomy resolve to meaningful semantic classes visible in DevTools. Feature-specific layout may remain inline.
+
+A migration cannot be marked **Complete** while unnecessary styling indirection remains within its approved scope.
+
+## Variant-file disposition
+
+### Principle
+
+`*.variants.ts` files exist to resolve genuine visual variation, not to store named Tailwind class strings.
+
+**Prefer semantic CSS for reusable appearance, inline utilities for simple local geometry, and CVA for meaningful variant resolution.**
+
+| Existing implementation                                    | Preferred disposition                                                                                         |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Genuine tone, size, density, state, or appearance resolver | Retain the variant contract                                                                                   |
+| CVA containing only static base classes                    | Remove CVA; move styling to its semantic or local owner                                                       |
+| Static component surface/anatomy classes                   | Replace with existing semantic primitive or meaningful BEM-style CSS                                          |
+| Static one-off layout constants                            | Move simple geometry to owning JSX                                                                            |
+| Shared static layout constants                             | Evaluate existing layout primitives or semantic component CSS; sharing alone does not justify a variants file |
+| Mixed file containing real variants and static aliases     | Retain genuine variants; remove unnecessary static exports                                                    |
+| Entire file made obsolete                                  | Delete the file and all imports                                                                               |
+| Specialized domain composition                             | Keep the composition; separately justify any remaining variants file                                          |
+
+### Evaluation rules
+
+For each affected file:
+
+1. Trace exports and consumers.
+2. Determine whether the file resolves actual variations in presentation or state.
+3. Identify static class aliases that merely hide Tailwind from the owning component.
+4. Reuse established semantic styling where appropriate.
+5. Keep simple feature-specific geometry close to JSX.
+6. Delete obsolete exports and delete the file when no meaningful contract remains.
+7. Avoid new abstraction layers introduced solely to relocate classes.
+
+**Using `cva()` does not itself justify a variants file.** A CVA with no meaningful variants is still a static styling alias.
+
+Do not convert every inline utility into BEM CSS. Semantic classes should represent meaningful component identity, anatomy, or state—not arbitrary utility combinations.
+
+## Scope control
+
+Variant-file cleanup is mandatory for the affected migration group and its direct styling dependencies.
+
+It does not require repository-wide elimination of all `*.variants.ts` files.
+
+Previously completed waves should receive a targeted residual-indirection audit when their files are next touched, or through a separately tracked cleanup pass. Do not silently reclassify unrelated legacy work as part of the current wave.
 
 ## Priority rubric
 
@@ -55,6 +104,11 @@ Effort and risk only break ties.
 
 Classify every implementation before migrating it. Shared borders and rounding alone do not imply shared ownership.
 
+For each migration group, record both:
+
+- **Component ownership:** Which shared component or domain composition owns the UI.
+- **Styling disposition:** What happens to the existing feature styling implementation.
+
 | Classification                      | Action                                                                                   |
 | ----------------------------------- | ---------------------------------------------------------------------------------------- |
 | Duplicate of an established pattern | Migrate to the shared component                                                          |
@@ -63,13 +117,37 @@ Classify every implementation before migrating it. Shared borders and rounding a
 | Genuinely unique surface            | Keep the local implementation; note it as an intentional exception                       |
 | Obsolete implementation             | Delete                                                                                   |
 
+**Styling disposition** (per affected `*.variants.ts` or styling module):
+
+| Disposition    | Meaning                                                   |
+| -------------- | --------------------------------------------------------- |
+| Retained       | Genuine variant resolver remains                          |
+| Simplified     | Meaningful variants retained; unnecessary exports removed |
+| Deleted        | Obsolete styling module eliminated                        |
+| Not applicable | No styling module involved                                |
+| Deferred       | Named follow-up with exact file and justification         |
+
+A domain-specific exception to shared-component adoption is **not** automatically an exception to variant-file cleanup. An implementation may remain a domain component while its static class aliases are removed.
+
 **Status lifecycle.** Each row moves through these statuses:
 
 - **discovered:** inventoried and grouped by likely pattern.
-- **classified:** examined and assigned one of the five classifications plus a reuse path.
+- **classified:** examined and assigned one of the five classifications plus a reuse path and styling disposition.
 - **ready:** the target owner exists and passes architecture readiness.
 - **migrating:** work is in progress.
 - **complete:** the migration completion gate has passed, or the row was deleted or recorded as an exception.
+
+A row may move to **complete** only when:
+
+- The semantic owner is established and adopted.
+- The migration completion tests and inspector requirements pass.
+- All obsolete styling paths for that responsibility are removed.
+- Affected variant files have terminal styling dispositions.
+- No unnecessary static class aliases remain within the migrated scope.
+
+A **deferred** styling disposition requires a named future wave or follow-up and a precise unresolved responsibility.
+
+An **exception** must justify why the existing implementation is architecturally appropriate. It cannot be used merely to preserve historical CSS organization.
 
 Classification is iterative. A row only needs deep classification when its group is next. Seed rows below are **discovered**. The classification column is a starting hypothesis.
 
@@ -79,7 +157,7 @@ Classification is iterative. A row only needs deep classification when its group
 | [`builder-fact-summary.variants.ts`](../../../apps/dashboard/src/features/character/components/builder/steps/shared/fact-summary/builder-fact-summary.variants.ts)                                                                                                                                                                                                                                   | Information panel        | complete  | Declarative `Card` + `CardContent`; layout consts in `builder-fact-summary.variants.ts` (`builder-fact-summary.tsx`)                                                                                                                               |
 | [`detail-collection-panel.variants.ts`](../../../apps/dashboard/src/features/content/lib/detail/collection/panel/detail-collection-panel.variants.ts)                                                                                                                                                                                                                                                | Information panel        | complete  | `Panel` + header/body bands (`detail-collection-panel.tsx`); not generic Card                                                                                                                                                                      |
 | [`media-manager.variants.ts`](../../../apps/dashboard/src/features/media/components/media-manager.variants.ts)                                                                                                                                                                                                                                                                                       | Domain layout            | exception | Media library table shell — domain layout, not Card/InsetPanel duplicate (`media-manager.variants.ts`)                                                                                                                                             |
-| [`global-search-results-panel.tsx`](../../../apps/dashboard/src/features/global-search/components/global-search-results-panel.tsx)                                                                                                                                                                                                                                                                   | Results panel            | exception | `GlobalSearchResultsPanel` — shared `Panel tone="quiet"` + `bleed` for page and topbar preview; placement stays local                                                                                                                              |
+| [`global-search-results-panel.tsx`](../../../apps/dashboard/src/features/global-search/components/global-search-results-panel.tsx)                                                                                                                                                                                                                                                                   | Results panel            | exception | `GlobalSearchResultsPanel` — shared `Panel tone="quiet"` + `bleed` for page and topbar preview; placement stays local; `global-search-surface.variants.ts` **deleted**                                                                             |
 | [`character-builder-validation-alert.tsx`](../../../apps/dashboard/src/features/character/components/builder/chrome/character-builder-validation-alert.tsx)                                                                                                                                                                                                                                          | Warning surface          | complete  | `Alert variant="destructive"` (`character-builder-validation-alert.tsx`)                                                                                                                                                                           |     |
 | [`campaign-character-eligibility-alert.tsx`](../../../apps/dashboard/src/features/campaign/components/onboarding/campaign-character-eligibility-alert.tsx)                                                                                                                                                                                                                                           | Warning surface          | complete  | `Alert variant="destructive"`; embedded `CampaignCharacterWarningReview` — no nested Alert (`campaign-character-eligibility-alert.test.tsx`)                                                                                                       |
 | [`spell-level-tabs.variants.ts`](../../../apps/dashboard/src/features/character/components/builder/steps/spells/spell-level-tabs.variants.ts)                                                                                                                                                                                                                                                        | Tabs                     | deferred  | **W10** — migrate to shared Tabs (`spell-level-tabs.variants.ts`)                                                                                                                                                                                  |
@@ -92,6 +170,23 @@ Classification is iterative. A row only needs deep classification when its group
 | [`link-badge.tsx`](../../../apps/dashboard/src/lib/link-badge.tsx) (`LinkBadge`, `StaticBadge`)                                                                                                                                                                                                                                                                                                      | Compact label navigation | complete  | Canonical `Badge asChild` + router `Link`; replaces `content-link-badge.tsx`                                                                                                                                                                       |
 | [`array-item-issue.client.tsx`](../src/form/renderers/array/array-item-issue.client.tsx) (`ArrayItemIssueButton`)                                                                                                                                                                                                                                                                                    | Compact label action     | complete  | `resolveCompactLabelClassName` on `button` — not `Badge asChild` (`array-item-issue.test.tsx`)                                                                                                                                                     |
 | [`notification-unread-badge.tsx`](../src/components/ui/notification-unread-badge.tsx)                                                                                                                                                                                                                                                                                                                | Overlay count            | exception | `ui-notification-unread-badge` — trigger overlay geometry, not `ui-compact-label`                                                                                                                                                                  |
+
+## Per-wave acceptance checklist
+
+Before marking a migration wave **Complete**:
+
+- [ ] All in-scope consumers are classified.
+- [ ] Semantic ownership and public APIs are established.
+- [ ] Affected `*.variants.ts` files and exports have been audited.
+- [ ] Static aliases replaced by semantic components or simple local layout have been removed.
+- [ ] Genuine variant resolvers are retained without obsolete branches.
+- [ ] Files with no remaining purpose have been deleted.
+- [ ] No equivalent styling indirection has been introduced elsewhere.
+- [ ] DevTools exposes clear semantic classes for reusable appearance and anatomy.
+- [ ] Tests, stories, and documentation reflect the new contract.
+- [ ] Remaining styling exceptions or deferrals are explicitly recorded.
+
+**The success metric is less unnecessary styling architecture, not merely more semantic CSS.**
 
 ## Compact-label consumers grouped in W3
 
@@ -143,7 +238,7 @@ Classification is iterative. A row only needs deep classification when its group
 | Master-detail / sidebar / preview rail shells and master-detail stories                 | deferred  | **W15** — preview rail uses `rounded-card` directly (`preview-rail.variants.ts`); modal border stays `cardBorderClasses` until **W7** (`modal.variants.ts`) |
 | `media-manager`                                                                         | exception | Domain table shell — `media-manager.variants.ts`                                                                                                            |
 | `table-builder` / `table-grid` (including modal preview stories)                        | exception | Domain table authoring surface — `table-grid.tsx`                                                                                                           |
-| `global-search-results-panel`                                                           | exception | Shared quiet results panel — `global-search-results-panel.tsx`                                                                                              |
+| `global-search-results-panel`                                                           | exception | Shared quiet results panel — `global-search-results-panel.tsx`; surface variants file deleted                                                               |
 | `equipment-inventory`                                                                   | exception | Inventory `Panel` plus entity rows — `equipment-inventory-summary.tsx`                                                                                      |
 | `global-search-topbar`                                                                  | exception | Search field and preview panel — `global-search-topbar.tsx`                                                                                                 |
 
