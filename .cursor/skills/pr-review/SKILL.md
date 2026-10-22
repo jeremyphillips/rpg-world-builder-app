@@ -77,11 +77,8 @@ or stale.
 - New env var, seed, or build/export gate omitted from setup/docs
 - Feature barrel (`index.ts`) not updated when cross-feature imports would break
 
-**Monorepo barrels:** all workspaces are private; `packages/*` have no external
-or npm consumers. Do **not** flag barrel reshuffles, export renames, or
-`index.ts` churn as semver or breaking-change risk when in-repo call sites align
-(typecheck catches misses). Flag barrels only for real wiring failures (items
-above), not API-stability theater.
+**Barrels:** in-repo only — do not flag `index.ts` churn as semver/breaking
+change; flag missing wiring only (bullets above). → [AGENTS.md § Project stage](../../../AGENTS.md#project-stage).
 
 Downgrade to Medium when the PR is explicitly single-layer scoped with
 documented follow-up (comment, ticket, or plan reference).
@@ -197,7 +194,6 @@ Do not add informational praise, coverage summaries, or duplicate merge-blocker 
 
 ## Guardrails
 
-- **Package and barrel exports:** in-repo workspaces only — see [AGENTS.md § Project stage](../../../AGENTS.md#project-stage). Do not treat `index.ts` edits as merge-blocking external API breaks.
 - No speculative risks without a demonstrable code path
 - Do not equate query failure with empty data
 - Do not confuse UI hiding with server authorization

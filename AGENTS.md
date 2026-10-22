@@ -12,11 +12,9 @@ etc.), prefer the direct, clean shape over backward-compatible migrations. Do
 not add migration scripts, versioned transforms, or dual-read paths unless the
 user explicitly asks.
 
-`packages/*` and apps are **private monorepo workspaces** with no published or
-external consumers. Prefer direct, clean export surfaces (`index.ts` barrels,
-subpath exports) over backward-compatible shims. Barrel reshuffles and export
-renames are not semver events — update in-repo importers and rely on
-typecheck/tests, not “preserve the public API” review noise.
+Workspaces are private (no external/npm consumers). Prefer clean barrels and
+subpath exports over shims; export renames are not semver — fix importers and
+typecheck.
 
 ## Quality gate
 
