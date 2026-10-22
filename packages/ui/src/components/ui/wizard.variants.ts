@@ -14,7 +14,7 @@ export const wizardStepBubbleVariants = cva('ui-wizard__bubble', {
   defaultVariants: { state: 'idle' },
 })
 
-export const wizardStepLabelVariants = cva('ui-wizard__label', {
+export const wizardStepLabelVariants = cva(cn('ui-wizard__label', 'text-style-label'), {
   variants: {
     state: {
       idle: 'ui-wizard__label--idle',

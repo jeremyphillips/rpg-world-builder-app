@@ -17,6 +17,7 @@ export const STYLING_INDIRECTION_SCAN_ROOTS = [
 
 /** W11 migrated filter modules — not under `components/` scan roots. */
 export const STYLING_INDIRECTION_EXTRA_FILES = [
+  'packages/ui/src/filters/filter-bar.client.tsx',
   'packages/ui/src/filters/filter-bar.variants.ts',
   'packages/ui/src/filters/catalog-filter-controls.client.tsx',
   'packages/ui/src/filters/filter-advanced-panel-body.client.tsx',

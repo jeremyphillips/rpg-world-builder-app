@@ -1,5 +1,6 @@
 'use client'
 
+import { cn } from '../../../lib/utils'
 import { SharedFilterSelect } from '../../../filters/shared-filter-select.client'
 import type { ComboboxFilterDimensionConfig } from '../../field-config'
 import {
@@ -24,11 +25,11 @@ export function ComboboxFilterToolbar({
   if (dimensionConfigs.length === 0) return null
 
   return (
-    <div className="flex w-full flex-wrap items-end gap-2">
+    <div className={cn('ui-catalog-filter-controls w-full')}>
       {dimensionConfigs.map((config) => {
         const dimensionValue = active[config.filterKey]
         return (
-          <div key={config.filterKey} className="min-w-0 flex-1 basis-0">
+          <div key={config.filterKey} className="ui-combobox-filter-toolbar__item">
             <SharedFilterSelect
               ariaLabel={config.ariaLabel}
               options={config.options}

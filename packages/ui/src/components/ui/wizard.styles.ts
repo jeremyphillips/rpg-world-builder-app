@@ -12,6 +12,12 @@ export const WIZARD_CLASS_SPECS = [
     useCase: 'Current step',
   },
   {
+    key: 'label-active',
+    className: 'ui-wizard__label ui-wizard__label--active text-style-label',
+    keyValues: 'text-style-label',
+    useCase: 'Current step title (sm+)',
+  },
+  {
     key: 'connector-complete',
     className: 'ui-wizard__connector ui-wizard__connector--complete',
     keyValues: '1px track',

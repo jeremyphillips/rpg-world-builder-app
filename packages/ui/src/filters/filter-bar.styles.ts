@@ -17,4 +17,10 @@ export const FILTER_BAR_CLASS_SPECS = [
     keyValues: '8px gap',
     useCase: 'Catalog filter chip row',
   },
+  {
+    key: 'combobox-filter-item',
+    className: 'ui-combobox-filter-toolbar__item',
+    keyValues: 'flex-1 equal columns',
+    useCase: 'Combobox panel dimension select column',
+  },
 ] as const

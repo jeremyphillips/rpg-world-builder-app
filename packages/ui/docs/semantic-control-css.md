@@ -108,11 +108,11 @@ Overlay notification counts use `ui-notification-unread-badge` (not compact-labe
 
 ## Wizard
 
-`ui-wizard__bubble`, `ui-wizard__label`, and `ui-wizard__connector` own shared geometry and transitions. State modifiers (`--idle`, `--active`, `--complete`) change paint only. Idle bubble and connector use `ui-border--default` for neutral structure; active and complete use primary.
+`ui-wizard__bubble`, `ui-wizard__label`, and `ui-wizard__connector` own shared geometry and transitions. Step labels pair `ui-wizard__label` with `text-style-label`; state modifiers (`--idle`, `--active`, `--complete`) change color only. Idle bubble and connector use `ui-border--default` for neutral structure; active and complete use primary.
 
 ## FilterBar and catalog filter chrome
 
-`ui-filter-bar--{horizontal|vertical}` owns bar orientation. `ui-filter-bar__control--*` owns control width bands. `ui-filter-bar__group--inline` and `ui-filter-bar__group--stacked-*` own field-group layout. `ui-filter-advanced-panel` and `__header` / `__inner` / `__footer` density modifiers own the advanced panel shell (`ui-border--default` perimeter, `ui-border--subtle` footer divider). `ui-catalog-filter-controls` is the catalog filter row only (0.5rem gap).
+`ui-filter-bar--{horizontal|vertical}` owns bar orientation. `ui-filter-bar__control--*` owns control width bands. `ui-filter-bar__group--inline` and `ui-filter-bar__group--stacked-*` own field-group layout. `ui-filter-advanced-panel` and `__header` / `__inner` / `__footer` density modifiers own the advanced panel shell (`overflow: hidden`, `ui-border--default` perimeter, `ui-border--subtle` footer divider). `ui-catalog-filter-controls` is the catalog filter row (0.5rem gap); combobox panel toolbars reuse it with `w-full` and `ui-combobox-filter-toolbar__item` for equal-width columns.
 
 ## CatalogToolbar
 

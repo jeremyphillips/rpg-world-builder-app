@@ -76,6 +76,7 @@
   }
 
   .ui-filter-advanced-panel {
+    overflow: hidden;
     border-radius: var(--radius-md);
     border-width: 1px;
     border-style: solid;
@@ -140,5 +141,11 @@
     flex-wrap: wrap;
     align-items: flex-end;
     gap: 0.5rem;
+  }
+
+  /** Equal-width columns in combobox panel filter rows (full-width catalog filter row). */
+  .ui-combobox-filter-toolbar__item {
+    min-width: 0;
+    flex: 1 1 0%;
   }
 }

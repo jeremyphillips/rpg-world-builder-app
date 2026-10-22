@@ -25,11 +25,11 @@ describe('ComboboxFilterToolbar', () => {
     )
 
     const row = container.firstElementChild
-    expect(row).toHaveClass('flex', 'w-full', 'flex-wrap', 'items-end', 'gap-2')
+    expect(row).toHaveClass('ui-catalog-filter-controls', 'w-full')
 
     const items = row?.children
     expect(items).toHaveLength(2)
-    expect(items?.[0]).toHaveClass('min-w-0', 'flex-1', 'basis-0')
+    expect(items?.[0]).toHaveClass('ui-combobox-filter-toolbar__item')
     expect(screen.getByRole('combobox', { name: 'Filter by category' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Filter by mode' })).toBeInTheDocument()
   })
