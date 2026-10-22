@@ -5,6 +5,7 @@ import type { UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
 
 import { cn } from '../../lib/utils'
+import { Text } from '../../components/ui/text'
 import type { FormItem } from '../field-config'
 import { Form } from '../shells/form.client'
 import {
@@ -196,11 +197,11 @@ export function MovementChromeStabilityHarness() {
 
   return (
     <div className="flex max-w-2xl flex-col gap-4">
-      <p className="text-style-supporting">
+      <Text variant="supporting">
         Species movement shape: hidden item header, mode + speed inline row, drag handle and remove
         on the shared anatomy grid. Step through validation growth — grip and delete should stay
         anchored to the control track.
-      </p>
+      </Text>
       <div className="flex flex-wrap gap-2">
         {MOVEMENT_STABILITY_STEPS.map((item) => (
           <button

@@ -224,7 +224,9 @@ export function EquipmentStartingPackageDisclosure({
           <>
             <EquipmentStartingPackageInventory packageGroup={packageGroup} />
             {packageGroup.customize.status === 'disabled' ? (
-              <p className="px-4 py-3 text-style-supporting">{packageGroup.customize.reason}</p>
+              <Text variant="supporting" className="px-4 py-3">
+                {packageGroup.customize.reason}
+              </Text>
             ) : (
               <div className="flex justify-end px-4 py-3">
                 <Button type="button" variant="secondary" size="sm" onClick={openCustomize}>

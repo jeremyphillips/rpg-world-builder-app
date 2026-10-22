@@ -10,6 +10,7 @@ import { MarkdownContent } from './markdown-content'
 import { RichTextContent } from './rich-text-content'
 import { looksLikeRichTextHtml } from './rich-text-html'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs.client'
+import { Text } from './text'
 import { Textarea } from './textarea.client'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
@@ -43,7 +44,7 @@ export interface MarkdownFieldProps
 function MarkdownFieldPreview({ value }: { value: string }) {
   const trimmed = value.trim()
   if (trimmed === '') {
-    return <p className="text-style-supporting">{MARKDOWN_PREVIEW_EMPTY}</p>
+    return <Text variant="supporting">{MARKDOWN_PREVIEW_EMPTY}</Text>
   }
 
   if (looksLikeRichTextHtml(trimmed)) {

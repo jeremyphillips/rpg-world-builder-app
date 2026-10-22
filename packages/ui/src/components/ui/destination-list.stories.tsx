@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent } from 'storybook/test'
+import { Text } from './text'
 
 import { InlineMetadata } from './inline-metadata'
 import { Card } from './card'
@@ -234,11 +235,11 @@ export const SurfaceInteractionParity: Story = {
   render: () => (
     <div className="grid gap-10">
       <section className="space-y-2" data-testid="parity-light">
-        <p className="text-style-label">Light</p>
+        <Text variant="label">Light</Text>
         <SurfaceInteractionParityBlock testIdPrefix="parity-light" />
       </section>
       <section className="dark space-y-2 rounded-lg bg-background p-4" data-testid="parity-dark">
-        <p className="text-style-label">Dark</p>
+        <Text variant="label">Dark</Text>
         <SurfaceInteractionParityBlock testIdPrefix="parity-dark" />
       </section>
     </div>
@@ -256,7 +257,9 @@ export const ComparedToNavigableCard: Story = {
   render: () => (
     <div className="grid max-w-md gap-6">
       <div className="space-y-2">
-        <p className="text-sm font-medium text-foreground">Grouped destination rows</p>
+        <Text variant="label" className="text-foreground">
+          Grouped destination rows
+        </Text>
         <DestinationList density="compact">
           <DestinationItem
             link={<a href="#weapons">nav</a>}
@@ -271,7 +274,9 @@ export const ComparedToNavigableCard: Story = {
         </DestinationList>
       </div>
       <div className="space-y-2">
-        <p className="text-sm font-medium text-foreground">Standalone navigable Card</p>
+        <Text variant="label" className="text-foreground">
+          Standalone navigable Card
+        </Text>
         <Card
           link={<a href="#armor">nav</a>}
           density="compact"

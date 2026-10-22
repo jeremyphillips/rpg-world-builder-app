@@ -6,6 +6,7 @@ import type {
   ActionTargetFailure,
 } from '@rpg/contracts'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
+import { Text } from '@rpg/ui'
 import { FormFieldStack } from '@rpg/ui/form'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
@@ -185,9 +186,9 @@ export function BulkVocabularyAvailabilityDialog({
         </FormProvider>
       }
       summarySlot={
-        <p className="text-style-supporting">
+        <Text variant="supporting">
           {previewCount} {previewCount === 1 ? 'entry' : 'entries'} will change.
-        </p>
+        </Text>
       }
       localError={lifecycle.localError}
       resolutionRows={lifecycle.resolutionRows}

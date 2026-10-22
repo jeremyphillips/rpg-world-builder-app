@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Text } from './text'
 
 import { COMPACT_LABEL_TONES } from './compact-label.lib'
 import { StatusDot } from './status-dot'
@@ -21,9 +22,9 @@ export const Default: Story = {}
 /** Labeled dots inherit typography from the host — wrap like production meta / summary rows. */
 export const WithLabel: Story = {
   render: (args) => (
-    <p className="text-style-caption">
+    <Text variant="caption">
       <StatusDot {...args} />
-    </p>
+    </Text>
   ),
   args: {
     label: 'Unread',
@@ -51,9 +52,9 @@ export const Sizes: Story = {
 
 export const Sunken: Story = {
   render: (args) => (
-    <p className="sm:text-sm text-style-caption">
+    <Text variant="caption" className="sm:text-sm">
       <StatusDot {...args} />
-    </p>
+    </Text>
   ),
   args: {
     tone: 'sunken',

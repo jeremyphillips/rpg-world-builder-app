@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '../../lib/utils'
+import { Text } from './text'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
 import { collectionSummaryCounterVariants } from './collection-summary.variants'
 import type { CollectionSummaryCellProps, CollectionSummaryItem } from './collection-summary.types'
@@ -87,7 +88,7 @@ export function CollectionSummaryCell({
           </button>
         </TooltipTrigger>
         <TooltipContent className="max-w-xs space-y-1 px-3 py-2">
-          <p className="font-medium">{heading}</p>
+          <Text variant="label">{heading}</Text>
           <ul className="space-y-0.5 text-sm">
             {visible.map((item) => (
               <li key={item.id}>{item.label}</li>

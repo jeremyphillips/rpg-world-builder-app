@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect } from 'storybook/test'
+import { Text } from './text'
 
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { cn } from '../../lib/utils'
@@ -80,7 +81,7 @@ export const ElevationComparison: Story = {
     <div className="grid max-w-4xl gap-6">
       {CARD_SURFACE_TONES.map((tone) => (
         <div key={tone} className="space-y-2">
-          <p className="text-style-label">{tone} tone</p>
+          <Text variant="label">{tone} tone</Text>
           <div className="grid gap-4 md:grid-cols-3">
             {(['flat', 'subtle', 'raised'] as const).map((elevation) => (
               <Card
@@ -125,7 +126,7 @@ export const NavigableCompact: Story = {
         description: 'Taxonomic classification shared by species and monsters.',
       }}
     >
-      <p className="text-style-caption">12 terms · 1 unavailable</p>
+      <Text variant="caption">12 terms · 1 unavailable</Text>
     </Card>
   ),
 }
@@ -274,8 +275,8 @@ function SurfaceMatrixCell({
       className={surfaceMatrixShellClassName(tone, state)}
     >
       <div className={UI_CARD_CONTENT_CLASS}>
-        <p className="text-style-label">{label}</p>
-        <p className="text-style-caption">{tone} · comfortable inset</p>
+        <Text variant="label">{label}</Text>
+        <Text variant="caption">{tone} · comfortable inset</Text>
       </div>
     </div>
   )
@@ -328,10 +329,10 @@ export const SurfaceInteractionMatrix: Story = {
     <div className="mx-auto flex max-w-5xl flex-col gap-10">
       <header className="space-y-1">
         <h2 className="text-style-label">Card surface interaction matrix</h2>
-        <p className="text-style-supporting">
+        <Text variant="supporting">
           Compare rest, hover, pressed, selected, disabled, and focus-visible fills on canvas and on
           a muted parent.
-        </p>
+        </Text>
       </header>
 
       <section className="space-y-3">
@@ -345,9 +346,9 @@ export const SurfaceInteractionMatrix: Story = {
         <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Nested on muted panel
         </h3>
-        <p className="text-style-supporting">
+        <Text variant="supporting">
           Quiet interactive rest vs hover — common entity-row context.
-        </p>
+        </Text>
         <div className="grid gap-4 md:grid-cols-2">
           <SurfaceMatrixCell tone="quiet" state="rest" label="Rest" />
           <SurfaceMatrixCell tone="quiet" state="hover" label="Hover" />
@@ -374,8 +375,8 @@ export const SurfaceInteractionMatrix: Story = {
               )}
             >
               <div className={UI_CARD_CONTENT_CLASS}>
-                <p className="text-style-label">{elevation}</p>
-                <p className="text-style-caption">strong · elevation</p>
+                <Text variant="label">{elevation}</Text>
+                <Text variant="caption">strong · elevation</Text>
               </div>
             </div>
           ))}

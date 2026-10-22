@@ -72,6 +72,13 @@ export function classStringViolatesMigratedStacks(classString: string): string |
 
 const TEXT_TAG_RE = /<Text\b[\s\S]*?>/g
 
+/** Opening `<p …>` — multiline attributes; respects quoted `className` strings. */
+const PTAG_OPEN_RE = /<p\b(?:[^>"']|"[^"]*"|'[^']*')*>/g
+
+const HEADING_STYLE_UTILITY_RE = /\bheading-style-[a-z0-9-]+\b/
+
+const P_TAG_CARD_DESCRIPTION_CLASS_RE = /\bUI_CARD_DESCRIPTION_CLASS\b/
+
 function parseVariantFromTag(flat: string): string {
   const doubleQuoted = flat.match(/variant="([^"]+)"/)?.[1]
   if (doubleQuoted) return doubleQuoted
@@ -131,11 +138,41 @@ export function textTagViolatesMigratedStacks(tag: string): string | null {
   )
 }
 
+function openingTagFlat(tag: string): string {
+  return tag.replace(/\s+/g, ' ')
+}
+
+function openingTagIncludesTextStyleUtility(flat: string): boolean {
+  return TEXT_STYLE_UTILITY_RE.test(flat)
+}
+
 /** `Text` owns roles via `variant` — not `text-style-*` utilities in `className`. */
 export function textTagUsesTextStyleUtility(tag: string): string | null {
-  const flat = tag.replace(/\s+/g, ' ')
-  if (!TEXT_STYLE_UTILITY_RE.test(flat)) return null
+  const flat = openingTagFlat(tag)
+  if (!openingTagIncludesTextStyleUtility(flat)) return null
   return 'Text className includes text-style-* (use matching variant prop)'
+}
+
+function pTagIsExempt(flat: string): boolean {
+  if (/\bsr-only\b/.test(flat)) return true
+  if (P_TAG_CARD_DESCRIPTION_CLASS_RE.test(flat)) return true
+  return false
+}
+
+/** Paragraph copy uses `<Text>` — not typography composites on raw `<p>`. */
+export function pTagViolatesTypographyOwnership(tag: string): string | null {
+  const flat = openingTagFlat(tag)
+  if (pTagIsExempt(flat)) return null
+  if (openingTagIncludesTextStyleUtility(flat)) {
+    return 'p className includes text-style-* (use <Text variant="…">)'
+  }
+  if (/\bfont-body-emphasis\b/.test(flat)) {
+    return 'p className includes font-body-emphasis (use <Text variant="emphasis">)'
+  }
+  if (HEADING_STYLE_UTILITY_RE.test(flat)) {
+    return 'p className includes heading-style-* (use <Heading variant="…"> or <Text>)'
+  }
+  return null
 }
 
 function classFragmentLooksRelevant(fragment: string): boolean {
@@ -245,6 +282,14 @@ export function findTextStyleStackViolations(
     if (migrated) hits.push({ file: filePath, reason: migrated })
     const textStyleOnText = textTagUsesTextStyleUtility(tag)
     if (textStyleOnText) hits.push({ file: filePath, reason: textStyleOnText })
+  }
+
+  let pMatch: RegExpExecArray | null
+  const pRe = new RegExp(PTAG_OPEN_RE.source, 'g')
+  while ((pMatch = pRe.exec(source))) {
+    const pTag = pMatch[0]
+    const pTypography = pTagViolatesTypographyOwnership(pTag)
+    if (pTypography) hits.push({ file: filePath, reason: pTypography })
   }
 
   return hits

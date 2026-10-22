@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Text } from './text'
 
 import { BooleanField } from './boolean-field.client'
 import type { ChoiceTone } from './choice-control.styles'
@@ -20,7 +21,9 @@ function Matrix({ density }: { density: 'compact' | 'comfortable' }) {
   return (
     <div className="flex flex-col gap-6">
       <section data-content-density={density} className={cardClass}>
-        <p className="mb-3 text-style-supporting">{density} card</p>
+        <Text variant="supporting" className="mb-3">
+          {density} card
+        </Text>
         <div className="flex flex-wrap gap-3">
           {tones.map((tone) => (
             <BooleanField key={`${tone}-off`} label={tone} tone={tone} />

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
+import { Text } from './text'
 
 import { EntityCard } from '../../entity/surfaces/cards/content/entity-card'
 import { projectArrayItemEntitySummary } from '../../entity/surfaces/cards/disclosure/array-item-entity-summary.lib'
@@ -92,7 +93,7 @@ function GrantRowPresentationDemo({ values }: { values: Record<string, unknown> 
       collapsed={collapsed}
       onToggleCollapse={() => setCollapsed((current) => !current)}
     >
-      <p className="text-style-supporting">Grant body fields render here when expanded.</p>
+      <Text variant="supporting">Grant body fields render here when expanded.</Text>
     </EntityCard>
   )
 }

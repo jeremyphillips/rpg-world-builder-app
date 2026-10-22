@@ -3,6 +3,7 @@
 import type { ElementType } from 'react'
 
 import { Button } from '../components/ui/button.client'
+import { Text } from '../components/ui/text'
 import { filterAdvancedPanelHeaderVariants } from './filter-bar.variants'
 import type { FilterDensity } from './filter-schema.types'
 
@@ -52,7 +53,11 @@ export function FilterAdvancedPanelHeader({
             {heading}
           </HeadingElement>
         ) : null}
-        {description ? <p className="mt-1 text-style-caption">{description}</p> : null}
+        {description ? (
+          <Text variant="caption" className="mt-1">
+            {description}
+          </Text>
+        ) : null}
       </div>
       <div className="flex shrink-0 items-center gap-1">
         {showReset && onReset ? (

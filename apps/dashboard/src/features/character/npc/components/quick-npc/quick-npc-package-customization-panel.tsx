@@ -8,6 +8,7 @@ import {
   SelectionOptionCardEmbeddedPanelList,
   SelectionOptionCardEmbeddedPanelRow,
   SelectionOptionCardEmbeddedPanelRowStatus,
+  Text,
 } from '@rpg/ui'
 
 import { EntitySummaryStatus } from '@/features/content'
@@ -136,18 +137,16 @@ export function QuickNpcPackageCustomizationPanel({
         })}
       </SelectionOptionCardEmbeddedPanelList>
       {wealthLabel && !everyItemRemoved ? (
-        <p className="text-style-caption">{quickNpcWealthNote(wealthLabel)}</p>
+        <Text variant="caption">{quickNpcWealthNote(wealthLabel)}</Text>
       ) : null}
       {everyItemRemoved ? (
-        <p className="text-style-caption">
+        <Text variant="caption">
           {wealthLabel
             ? quickNpcAllRemovedWithWealthNote(wealthLabel)
             : QUICK_NPC_ALL_REMOVED_WITHOUT_WEALTH_NOTE}
-        </p>
+        </Text>
       ) : null}
-      {showLockMessage ? (
-        <p className="text-style-caption">{QUICK_NPC_EDITING_LOCK_MESSAGE}</p>
-      ) : null}
+      {showLockMessage ? <Text variant="caption">{QUICK_NPC_EDITING_LOCK_MESSAGE}</Text> : null}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Button
           type="button"

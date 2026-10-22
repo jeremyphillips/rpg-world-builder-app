@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
-import { ConfirmDialog } from '@rpg/ui'
+import { ConfirmDialog, Text } from '@rpg/ui'
 
 import type { ResolvedSubclass } from '@rpg/contracts'
 
@@ -246,14 +246,14 @@ function ClassSubclassesTabBody({
       <div className="space-y-6">
         <SubclassesDisabledAlert campaignId={campaignId} formCtx={formCtx} />
         {saveError ? (
-          <p className="text-sm text-destructive" role="alert">
+          <Text variant="destructive" role="alert">
             {saveError}
-          </p>
+          </Text>
         ) : null}
         {campaignAccessDeferredError ? (
-          <p className="text-sm text-warning" role="status">
+          <Text variant="warning" role="status">
             {campaignAccessDeferredError}
-          </p>
+          </Text>
         ) : null}
 
         <NestedResourceMasterDetailEditor

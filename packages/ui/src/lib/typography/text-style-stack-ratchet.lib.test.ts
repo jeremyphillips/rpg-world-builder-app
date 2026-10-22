@@ -5,6 +5,7 @@ import {
   extractCnMergedClassStrings,
   extractTemplateLiteralClassStrings,
   findTextStyleStackViolations,
+  pTagViolatesTypographyOwnership,
   textTagUsesTextStyleUtility,
   textTagViolatesMigratedStacks,
 } from './text-style-stack-ratchet.lib'
@@ -101,5 +102,59 @@ describe('text-style-stack-ratchet.lib', () => {
 
   it('findTextStyleStackViolations skips its own test files', () => {
     expect(findTextStyleStackViolations('', 'text-style-stack-ratchet.lib.test.ts')).toEqual([])
+  })
+
+  it('flags p with text-style utility in className', () => {
+    expect(pTagViolatesTypographyOwnership('<p className="text-style-supporting">')).toMatch(
+      /text-style/,
+    )
+  })
+
+  it('flags p with font-body-emphasis', () => {
+    expect(pTagViolatesTypographyOwnership('<p className="text-sm font-body-emphasis">')).toMatch(
+      /emphasis/,
+    )
+  })
+
+  it('flags p with heading-style utility', () => {
+    expect(pTagViolatesTypographyOwnership('<p className="heading-style-card">')).toMatch(
+      /heading-style/,
+    )
+  })
+
+  it('allows p with layout-only className', () => {
+    expect(pTagViolatesTypographyOwnership('<p className="px-4 py-3 text-center">')).toBeNull()
+  })
+
+  it('allows Card description shell class on p', () => {
+    expect(
+      pTagViolatesTypographyOwnership('<p className={cn(UI_CARD_DESCRIPTION_CLASS, className)}>'),
+    ).toBeNull()
+  })
+
+  it('allows sr-only p', () => {
+    expect(pTagViolatesTypographyOwnership('<p className="sr-only">')).toBeNull()
+  })
+
+  it('flags p with cn text-style in className', () => {
+    expect(
+      findTextStyleStackViolations(
+        `<p className={cn('py-3 text-center text-style-supporting', inset)}>`,
+        'example.tsx',
+      ),
+    ).toEqual([
+      { file: 'example.tsx', reason: 'p className includes text-style-* (use <Text variant="…">)' },
+    ])
+  })
+
+  it('flags multiline p opening tag with text-style utility', () => {
+    expect(
+      findTextStyleStackViolations(
+        `<p\n  className="text-style-supporting"\n  id="hint"\n>`,
+        'example.tsx',
+      ),
+    ).toEqual([
+      { file: 'example.tsx', reason: 'p className includes text-style-* (use <Text variant="…">)' },
+    ])
   })
 })

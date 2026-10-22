@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState, type ReactNode } from 'react'
+import { Text } from './text'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import type { MasterDetailListItem } from '../master-detail-list-panel'
@@ -60,8 +61,7 @@ function EditorStory({
       }
       onDelete={() => undefined}
       renderDetail={
-        renderDetail ??
-        (({ rowId }) => <p className="text-style-supporting">Detail body for {rowId}</p>)
+        renderDetail ?? (({ rowId }) => <Text variant="supporting">Detail body for {rowId}</Text>)
       }
     />
   )
@@ -97,9 +97,9 @@ export const TallerDetailThanRail: Story = {
       renderDetail={() => (
         <div className="space-y-4">
           {Array.from({ length: 16 }, (_, index) => (
-            <p key={index} className="text-style-supporting">
+            <Text key={index} variant="supporting">
               Detail paragraph {index + 1} with enough copy to exceed the short list rail height.
-            </p>
+            </Text>
           ))}
         </div>
       )}

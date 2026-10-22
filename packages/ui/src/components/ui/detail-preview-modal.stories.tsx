@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Text } from './text'
 
 import { DetailPreviewModal } from './detail-preview-modal.client'
 
@@ -16,6 +17,6 @@ export const Default: Story = {
     open: true,
     headline: 'Preview fighter',
     onOpenChange: () => undefined,
-    children: <p className="text-style-supporting">Caller-owned preview body.</p>,
+    children: <Text variant="supporting">Caller-owned preview body.</Text>,
   },
 }

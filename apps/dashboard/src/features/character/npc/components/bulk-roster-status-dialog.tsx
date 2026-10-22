@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import type { CampaignNpcListItem } from '@rpg/contracts'
+import { Text } from '@rpg/ui'
 import { FormFieldStack } from '@rpg/ui/form'
 
 import {
@@ -137,9 +138,9 @@ export function BulkRosterStatusDialog({
         </FormProvider>
       }
       summarySlot={
-        <p className="text-style-supporting">
+        <Text variant="supporting">
           {preview.wouldChangeCount} will change, {preview.unchangedCount} already match.
-        </p>
+        </Text>
       }
       localError={lifecycle.localError}
       resolutionRows={lifecycle.resolutionRows}

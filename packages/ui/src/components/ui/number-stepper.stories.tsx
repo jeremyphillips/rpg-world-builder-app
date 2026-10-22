@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as React from 'react'
+import { Text } from './text'
 
 import { FormSectionProvider } from '../../form/context/form-section.context'
 import { NumberStepper } from './number-stepper.client'
@@ -85,7 +86,7 @@ export const RemoveAtMin: Story = {
   render: (args) => {
     const [value, setValue] = React.useState(2)
     if (value < 1) {
-      return <p className="text-style-supporting">Row removed.</p>
+      return <Text variant="supporting">Row removed.</Text>
     }
     return (
       <NumberStepper

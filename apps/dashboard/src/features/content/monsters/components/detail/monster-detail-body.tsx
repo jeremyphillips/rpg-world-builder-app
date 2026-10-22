@@ -39,12 +39,8 @@ type MonsterDetailBodyProps = {
 function ActionItemBody({ item }: { item: MonsterActionItemViewModel }) {
   return (
     <>
-      {item.attackLine ? (
-        <p className="text-style-body text-muted-foreground">{item.attackLine}</p>
-      ) : null}
-      {item.triggerLine ? (
-        <p className="text-style-body text-muted-foreground">{item.triggerLine}</p>
-      ) : null}
+      {item.attackLine ? <Text variant="muted">{item.attackLine}</Text> : null}
+      {item.triggerLine ? <Text variant="muted">{item.triggerLine}</Text> : null}
       {item.descriptionHtml ? (
         <RichTextContent html={item.descriptionHtml} size="md" tone="muted" />
       ) : null}

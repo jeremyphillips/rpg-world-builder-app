@@ -6,6 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Text,
 } from '@rpg/ui'
 import {
   ArrayFieldContext,
@@ -149,9 +150,9 @@ function OutcomeApplicationRowSummary({
   if (!statusDescription) return null
 
   return (
-    <p id={rowSummaryId} className="text-style-supporting" aria-live="polite">
+    <Text id={rowSummaryId} variant="supporting" aria-live="polite">
       {statusDescription}
-    </p>
+    </Text>
   )
 }
 

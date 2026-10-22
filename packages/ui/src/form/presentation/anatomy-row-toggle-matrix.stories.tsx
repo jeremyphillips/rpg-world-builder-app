@@ -1,4 +1,5 @@
 'use client'
+import { Text } from '../../components/ui/text'
 
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -136,10 +137,10 @@ function ToggleMatrixHarness() {
 
   return (
     <div className="flex max-w-3xl flex-col gap-4">
-      <p className="text-style-supporting">
+      <Text variant="supporting">
         Grant spellcasting row shape on the anatomy grid — stacked select beside inline checkbox.
         Step through hint and error growth; sibling control bands must not drift.
-      </p>
+      </Text>
       <div className="flex flex-wrap gap-2">
         {TOGGLE_MATRIX_STEPS.map((item) => (
           <button
@@ -273,9 +274,9 @@ function SelectChipsMatrixHarness() {
 
   return (
     <div className="flex max-w-3xl flex-col gap-4">
-      <p className="text-style-supporting">
+      <Text variant="supporting">
         Spell basics row shape — stacked select beside single-select chips on the anatomy grid.
-      </p>
+      </Text>
       <SelectChipsControlTopProbe />
       <Form<SpellBasicsRowValues>
         id="anatomy-row-select-chips-matrix"

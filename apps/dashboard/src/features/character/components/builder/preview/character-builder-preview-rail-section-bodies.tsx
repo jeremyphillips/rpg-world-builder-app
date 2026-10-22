@@ -57,7 +57,7 @@ function PreviewProficiencySubsectionContent({
 }) {
   return (
     <div className="space-y-1">
-      {resolvedText ? <p className="text-style-supporting">{resolvedText}</p> : null}
+      {resolvedText ? <Text variant="supporting">{resolvedText}</Text> : null}
       {emptyHint ? (
         <CharacterBuilderPreviewSubsectionHint>{emptyHint}</CharacterBuilderPreviewSubsectionHint>
       ) : null}
@@ -262,7 +262,7 @@ export function CharacterBuilderPreviewSpellsBody({
   return (
     <CharacterBuilderPreviewSectionContent>
       {subsection.resolvedText ? (
-        <p className="text-style-supporting">{subsection.resolvedText}</p>
+        <Text variant="supporting">{subsection.resolvedText}</Text>
       ) : subsection.emptyHint ? (
         <CharacterBuilderPreviewSubsectionHint>
           {subsection.emptyHint}

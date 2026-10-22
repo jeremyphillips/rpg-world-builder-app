@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import type { GlobalSearchDocument } from '@rpg/contracts'
-import { cn } from '@rpg/ui'
+import { cn, Text } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
 import {
@@ -33,18 +33,21 @@ function GlobalSearchPreviewStatus({
 }: GlobalSearchPreviewStatusProps) {
   if (isPending) {
     return (
-      <p className={cn('py-3 text-center text-style-supporting', globalSearchPreviewInsetClasses)}>
+      <Text
+        variant="supporting"
+        className={cn('py-3 text-center', globalSearchPreviewInsetClasses)}
+      >
         {GLOBAL_SEARCH_COPY.loadingCatalog}
-      </p>
+      </Text>
     )
   }
 
   if (isError) {
     return (
       <div className={cn('space-y-3 py-3 text-center', globalSearchPreviewInsetClasses)}>
-        <p className="text-style-supporting" role="alert">
+        <Text variant="supporting" role="alert">
           {GLOBAL_SEARCH_COPY.catalogLoadError}
-        </p>
+        </Text>
         <button
           type="button"
           className="text-sm text-foreground underline-offset-4 hover:underline"

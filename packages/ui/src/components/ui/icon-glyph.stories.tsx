@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Check, Info, TriangleAlert } from 'lucide-react'
+import { Text } from './text'
 
 import {
   ICON_GLYPH_STEPS,
@@ -56,11 +57,11 @@ export const NestedInlineInheritance: Story = {
 
 export const DecorativeXsPolicy: Story = {
   render: () => (
-    <p className="flex items-center gap-1 text-style-caption">
+    <Text variant="caption" className="flex items-center gap-1">
       <span className={iconGlyphDescendantClasses.xs}>
         <TriangleAlert aria-hidden />
       </span>
       xs is for tertiary/decorative leading icons — not icon-button glyphs
-    </p>
+    </Text>
   ),
 }

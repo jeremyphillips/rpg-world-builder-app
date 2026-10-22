@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-
 import { Button } from '../button.client'
 import { Text } from '../text'
 import { CollapsibleListItem, type CollapsibleListItemProps } from './collapsible-list-item.client'
@@ -64,12 +63,16 @@ function CollapsibleListItemDemo({
       body={
         <div className="space-y-3 text-style-supporting">
           <div>
-            <p className="font-medium text-foreground">Weapon details</p>
+            <Text variant="label" className="text-foreground">
+              Weapon details
+            </Text>
             <p>Category: Martial weapon</p>
             <p>Damage: 1d8 slashing</p>
           </div>
           <div>
-            <p className="font-medium text-foreground">Character preview</p>
+            <Text variant="label" className="text-foreground">
+              Character preview
+            </Text>
             <p>Attack: +4</p>
             <p>Damage: 1d8 +2</p>
           </div>
@@ -122,7 +125,7 @@ export const CompoundApi: Story = {
         summary={<span className="text-style-caption">Optional summary</span>}
       />
       <CollapsibleListItem.Body>
-        <p className="text-style-supporting">Compound body slot</p>
+        <Text variant="supporting">Compound body slot</Text>
       </CollapsibleListItem.Body>
     </CollapsibleListItem.Root>
   ),

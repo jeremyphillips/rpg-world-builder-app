@@ -2,7 +2,7 @@
 
 import { useId } from 'react'
 
-import { cn, RadioGroup, RadioGroupItem } from '@rpg/ui'
+import { cn, RadioGroup, RadioGroupItem, Text } from '@rpg/ui'
 
 import type { FixedScoreSelectOption } from './fixed-score-select-option.types'
 
@@ -42,9 +42,9 @@ export function AbilityScoreSelectScoreGrid({
 
   return (
     <div className="flex w-72 flex-col gap-2 p-3">
-      <p id={titleId} className="text-style-label">
+      <Text id={titleId} variant="label">
         Choose a score
-      </p>
+      </Text>
       <RadioGroup
         className="grid grid-cols-3 gap-2"
         orientation="horizontal"

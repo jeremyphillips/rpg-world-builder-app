@@ -22,6 +22,7 @@ import {
   SelectionOptionCardHeaderAction,
   type ComboboxFieldOption,
   type RowActionMenuItem,
+  Text,
 } from '@rpg/ui'
 
 import { EquipmentOptionRow } from '@/features/character/components/equipment/picker/equipment-option-row'
@@ -491,8 +492,8 @@ function QuickNpcStartingEquipmentPackageSection({
       ) : null}
       {effective.state === 'declined' && !isPackageChooserExpanded ? (
         <Panel tone="strong" density="compact">
-          <p className="text-sm font-body-emphasis">{QUICK_NPC_NO_STARTING_PACKAGE_HEADING}</p>
-          <p className="text-style-caption">{QUICK_NPC_NO_STARTING_PACKAGE_BODY}</p>
+          <Text variant="emphasis">{QUICK_NPC_NO_STARTING_PACKAGE_HEADING}</Text>
+          <Text variant="caption">{QUICK_NPC_NO_STARTING_PACKAGE_BODY}</Text>
           <Button
             type="button"
             size="xs"

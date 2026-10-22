@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useMemo, useState } from 'react'
+import { Text } from './text'
 
 import { countModifiedFilters } from '../../filters/filter-engine'
 import {
@@ -72,7 +73,7 @@ function FilterChromeDemo({
         advancedOpen={advancedOpen}
         onAdvancedFiltersOpenChange={setAdvancedOpen}
       />
-      <p className="text-style-caption">{modifiedCount} modified filter(s)</p>
+      <Text variant="caption">{modifiedCount} modified filter(s)</Text>
       <pre className="rounded-md border border-border bg-sunken p-3 text-style-caption">
         {JSON.stringify(state, null, 2)}
       </pre>

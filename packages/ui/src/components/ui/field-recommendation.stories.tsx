@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Text } from './text'
 
 import { FormSectionProvider } from '../../form/context/form-section.context'
 import {
@@ -82,7 +83,9 @@ export const CollectionGroupAboveEmptyState: Story = {
             ],
           }}
         />
-        <p className="text-style-caption italic">No equipment added yet.</p>
+        <Text variant="caption" className="italic">
+          No equipment added yet.
+        </Text>
       </div>
     </FormSectionProvider>
   ),
