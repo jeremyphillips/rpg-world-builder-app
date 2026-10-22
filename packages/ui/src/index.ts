@@ -320,7 +320,7 @@ export {
   type NavigableCardProps,
   type StaticCardProps,
 } from './components/ui/card'
-export { NavigationChevron } from './components/ui/card.lib'
+export { CardNavInterior, NavigationChevron } from './components/ui/card.lib'
 export {
   BORDER_STRENGTHS,
   borderStrength,
@@ -792,7 +792,6 @@ export {
   type InteractiveListPanelProps,
 } from './components/ui/interactive-list-panel.client'
 export {
-  IDENTITY_ROW_STACK_CLASS,
   IdentityRow,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
@@ -817,9 +816,7 @@ export {
   type RowColumn,
 } from './components/ui/row-anatomy'
 export {
-  interactiveListToolbarVariants,
   interactiveListGroupHeadingVariants,
-  interactiveListViewportVariants,
   interactiveListSurfaceClasses,
   interactiveListRowSeparatorClasses,
   interactiveListVariants,
@@ -1521,8 +1518,8 @@ export {
   dataTableCaptionVariants,
 } from './components/ui/data-table.variants'
 export {
-  dataTableRowUnavailableVariants,
-  dataTableRowUnavailableRailVariants,
+  dataTableUnavailableAppearance,
+  type DataTableUnavailableAppearance,
 } from './components/ui/data-table-band.lib'
 
 export {

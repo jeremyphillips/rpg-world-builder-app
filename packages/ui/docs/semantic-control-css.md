@@ -14,6 +14,13 @@ Interactive controls and buttons emit BEM-style classes (`ui-button ui-button--o
 | Modifier | `ui-button--sm`, `ui-button--outline` |
 | Element  | `ui-floating-label-field__label`      |
 
+## JSX and TypeScript
+
+- Apply block, element, and modifier strings on the node that owns them. Modifiers are conditional; anatomy classes are not exported as one-off aliases.
+- `ClassReference` and completeness specs may repeat selectors; do not import them to build `className`.
+- Export a semantic class from TypeScript only when it is part of a variant map or twMerge group in the same module. Empty `cva('ui-…')` and replacement `cn()` constants are indirection.
+- Element classes stay inside the component that renders the element. Cross-owner use requires a documented contract (see [ui-architecture.md](./ui-architecture.md)).
+
 ## Declaration styles
 
 1. **Size / geometry** — direct declarations in size modifiers (`height`, `padding-inline`, `gap`, `font-size`, …) using shared tokens (`--control-height-*`, `--control-gap-*`, `--field-padding-*`).

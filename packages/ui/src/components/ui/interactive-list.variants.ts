@@ -16,17 +16,6 @@ import {
 
 export type InteractiveListSize = 'sm' | 'md' | 'lg'
 
-/** Slot-based toolbar — search and optional filter rows; hosts own control state. */
-export const interactiveListToolbarVariants = cva(
-  cn('ui-interactive-list__toolbar', borderStrength()),
-)
-
-export const interactiveListToolbarSearchRowVariants = cva('ui-interactive-list__toolbar-search')
-
-export const interactiveListToolbarFilterRowVariants = cva(
-  cn('ui-interactive-list__toolbar-filter', borderStrength()),
-)
-
 /** Visual-only group heading; hosts own section / listbox group semantics. */
 export const interactiveListGroupHeadingVariants = cva(
   cn('ui-interactive-list__heading', borderStrength('subtle')),
@@ -49,9 +38,6 @@ export const interactiveListGroupHeadingVariants = cva(
   },
 )
 
-/** Bounded scrollport — toolbar stays fixed outside this region. */
-export const interactiveListViewportVariants = cva('ui-interactive-list__viewport')
-
 /** List surface. Adjacent-sibling borders live on `.ui-interactive-list`. */
 export const interactiveListSurfaceClasses = cn('ui-interactive-list', borderStrength('subtle'))
 
@@ -62,9 +48,6 @@ export const interactiveListRowSeparatorClasses = 'ui-interactive-list'
 export const interactiveListVariants = cva(
   cn(interactiveListSurfaceClasses, interactiveListRowSeparatorClasses),
 )
-
-/** Empty-state copy inside a list. */
-export const interactiveListEmptyVariants = cva('ui-interactive-list__empty')
 
 /** Shared panel shell for combobox popovers and choice menus (animation composed per host). */
 export const interactiveListPanelVariants = cva(

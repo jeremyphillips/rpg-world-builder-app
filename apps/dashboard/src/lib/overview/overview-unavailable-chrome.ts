@@ -1,9 +1,7 @@
-import { dataTableRowUnavailableRailVariants, dataTableRowUnavailableVariants } from '@rpg/ui'
-
-export { dataTableRowUnavailableVariants, dataTableRowUnavailableRailVariants }
+import { dataTableUnavailableAppearance } from '@rpg/ui'
 
 export function overviewUnavailableRowClassName(isAvailable: boolean): string | undefined {
-  return isAvailable ? undefined : dataTableRowUnavailableVariants()
+  return dataTableUnavailableAppearance(!isAvailable).rowClassName
 }
 
 export function overviewUnavailableNameCellClassName(
@@ -13,5 +11,5 @@ export function overviewUnavailableNameCellClassName(
 ): string | undefined {
   if (isAvailable) return undefined
   if (columnId !== nameColumnId) return undefined
-  return dataTableRowUnavailableRailVariants()
+  return dataTableUnavailableAppearance(true).nameCellRailClassName
 }

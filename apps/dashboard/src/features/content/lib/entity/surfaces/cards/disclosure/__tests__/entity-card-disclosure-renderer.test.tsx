@@ -6,7 +6,6 @@ import { MemoryRouter } from 'react-router-dom'
 import { ActionIcon, iconGhostControlVariants } from '@rpg/ui'
 
 import { EntityCardDisclosureRenderer } from '../entity-card-disclosure-renderer'
-import { DASH_ENTITY_CARD_BODY_CLASS } from '../../../dash-entity-surface.variants'
 import { HARBOR_DISTRICT_ENTITY } from '../../../../__tests__/entity.fixture'
 
 const mockDragHandleProps = {
@@ -74,8 +73,7 @@ describe('EntityCardDisclosureRenderer', () => {
 
     const body = screen.getByText('Expanded inventory details').parentElement
     expect(body).not.toHaveAttribute('hidden')
-    expect(body).toHaveClass('border-t', 'bg-background')
-    expect(body).toHaveClass(DASH_ENTITY_CARD_BODY_CLASS)
+    expect(body).toHaveClass('dash-entity-card__body', 'dash-entity-card__body--disclosure-wash')
 
     const article = container.querySelector('article') as HTMLElement
     expect(article).toHaveClass('dash-entity-surface--leading-1')
@@ -130,7 +128,7 @@ describe('EntityCardDisclosureRenderer', () => {
 
     const classNames = cases.map((entry) => bodyFor(entry.label).className)
     for (const className of classNames) {
-      expect(className).toContain(DASH_ENTITY_CARD_BODY_CLASS)
+      expect(className).toContain('dash-entity-card__body')
     }
     expect(new Set(classNames).size).toBe(1)
   })
@@ -155,7 +153,7 @@ describe('EntityCardDisclosureRenderer', () => {
     expect(article).toHaveClass('dash-entity-surface--start-utility')
     expect(article).toHaveClass('dash-entity-surface--end-utility')
     expect(shell.className).not.toContain('--entity-surface-inline-start')
-    expect(bodyFor('Compact body')).toHaveClass(DASH_ENTITY_CARD_BODY_CLASS)
+    expect(bodyFor('Compact body')).toHaveClass('dash-entity-card__body')
   })
 
   it('toggles collapse from the caret control', async () => {
@@ -353,7 +351,7 @@ describe('EntityCardDisclosureRenderer', () => {
     )
 
     const body = bodyFor('Isolated body')
-    expect(body).toHaveClass(DASH_ENTITY_CARD_BODY_CLASS)
+    expect(body).toHaveClass('dash-entity-card__body')
     expect(body.className).not.toContain('content-column-indent')
     expect(body.className).not.toContain('content-inline-start')
     expect(

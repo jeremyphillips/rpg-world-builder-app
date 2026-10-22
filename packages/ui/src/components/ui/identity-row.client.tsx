@@ -6,9 +6,6 @@ import { Slot } from '@radix-ui/react-slot'
 import { cn } from '../../lib/utils'
 
 import {
-  IDENTITY_ROW_STACK_CLASS,
-  identityRowClassificationVariants,
-  identityRowHeadingVariants,
   identityRowRootVariants,
   identityRowSupportingVariants,
   type IdentityRowDensity,
@@ -16,7 +13,9 @@ import {
 import { InlineMetadata } from './inline-metadata'
 
 export type { IdentityRowDensity } from './identity-row.variants'
-export { IDENTITY_ROW_STACK_CLASS } from './identity-row.variants'
+
+const identityRowTitleClassName =
+  'ui-identity-row__title ui-copy-title text-foreground min-w-0 truncate'
 
 export type IdentityRowProps = {
   heading?: ReactNode
@@ -46,8 +45,6 @@ function IdentityRowTitle({ heading, className }: { heading: ReactNode; classNam
   return <span className={className}>{heading}</span>
 }
 
-const identityRowTitleClassName = cn(identityRowHeadingVariants(), 'min-w-0 truncate')
-
 function classificationParts(classification?: ReactNode | readonly ReactNode[]): ReactNode[] {
   if (classification == null || classification === '' || classification === false) {
     return []
@@ -76,7 +73,7 @@ function IdentityRowHeadingContent({
   }
 
   if (!showHeading && parts.length === 1) {
-    return <span className={identityRowClassificationVariants()}>{parts[0]}</span>
+    return <span className="ui-identity-row__classification">{parts[0]}</span>
   }
 
   return (
@@ -90,13 +87,16 @@ function IdentityRowHeadingContent({
             </span>
           </InlineMetadata.Item>
         ) : (
-          <InlineMetadata.Item truncate className={identityRowHeadingVariants()}>
+          <InlineMetadata.Item
+            truncate
+            className="ui-identity-row__title ui-copy-title text-foreground"
+          >
             <IdentityRowTitle heading={heading} className={identityRowTitleClassName} />
           </InlineMetadata.Item>
         )
       ) : null}
       {parts.map((part, index) => (
-        <InlineMetadata.Item key={index} className={identityRowClassificationVariants()}>
+        <InlineMetadata.Item key={index} className="ui-identity-row__classification">
           {part}
         </InlineMetadata.Item>
       ))}
@@ -171,7 +171,7 @@ export function IdentityRow({
 
   return (
     <div className={cn(identityRowRootVariants({ density }), className)}>
-      <div className={IDENTITY_ROW_STACK_CLASS}>
+      <div className="ui-identity-row__stack">
         {showHeadingLine ? (
           <IdentityRowHeadingLine
             heading={heading}

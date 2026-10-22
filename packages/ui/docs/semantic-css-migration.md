@@ -27,6 +27,8 @@ A dedicated variants file, pre-existing stories and tests, and the removal of un
 
 A migration cannot be marked **Complete** while unnecessary styling indirection remains within its approved scope.
 
+**Styling-indirection audit (per wave):** remove static aliases and empty `cva()` / zero-argument class wrappers; inline fixed classes at the owning element; keep conditional resolvers; do not apply foreign element classes without a recorded contract; update ClassReference; record Deleted / Simplified / Retained / Deferred. Finishing semantic CSS does not close the separate Tailwind static-CVA backlog (`data-table.variants.ts` toolbar layout, `content-card.variants.ts`, form array helpers, W10/W14/W15). Permanent policy: [ui-architecture.md](./ui-architecture.md). Regression guard: `semantic-styling-indirection.test.ts` (scoped roots under `packages/ui/src/components`, `packages/ui/src/form`, dashboard entity surfaces, `apps/dashboard/src/lib/overview`).
+
 ## Variant-file disposition
 
 ### Principle

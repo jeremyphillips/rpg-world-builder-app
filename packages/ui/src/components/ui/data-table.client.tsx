@@ -58,15 +58,6 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { InfoTooltip } from './tooltip.client'
 import { Table, TableBody, TableCaption, TableHeader } from './table'
-import {
-  DATA_TABLE_CELL_CLASS,
-  DATA_TABLE_CELL_MUTED_CLASS,
-  DATA_TABLE_EMPTY_CLASS,
-  DATA_TABLE_EMPTY_ROW_CLASS,
-  DATA_TABLE_HEAD_CLASS,
-  DATA_TABLE_HEADER_ROW_CLASS,
-  DATA_TABLE_ROW_CLASS,
-} from './data-table-band.lib'
 import { interactiveRowVariants } from './interactive-row.variants'
 import { Badge, type BadgeAppearance, type BadgeTone } from './badge'
 import { dataTableWidthMeta } from './data-table-meta'
@@ -922,7 +913,7 @@ export function DataTable<TData>({
       {caption && <TableCaption className={dataTableCaptionVariants()}>{caption}</TableCaption>}
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id} className={DATA_TABLE_HEADER_ROW_CLASS}>
+          <tr key={headerGroup.id} className="ui-data-table__header-row">
             {headerGroup.headers.map((header) => {
               const sorted = header.column.getIsSorted()
               const canSort = header.column.getCanSort()
@@ -933,7 +924,7 @@ export function DataTable<TData>({
                 <th
                   key={header.id}
                   colSpan={header.colSpan}
-                  className={cn(!isSelectOrActions && DATA_TABLE_HEAD_CLASS, headerMetaClassName)}
+                  className={cn(!isSelectOrActions && 'ui-data-table__head', headerMetaClassName)}
                   aria-sort={
                     sorted === 'asc'
                       ? 'ascending'
@@ -959,7 +950,7 @@ export function DataTable<TData>({
             <tr
               key={row.id}
               className={cn(
-                DATA_TABLE_ROW_CLASS,
+                'ui-data-table__row',
                 interactiveRowVariants({
                   interaction: 'hoverable',
                   selectedData: 'selected',
@@ -977,10 +968,10 @@ export function DataTable<TData>({
                   <td
                     key={cell.id}
                     className={cn(
-                      DATA_TABLE_CELL_CLASS,
+                      'ui-data-table__cell',
                       !isSelectOrActions &&
                         (tone === 'data' || tone === 'source') &&
-                        DATA_TABLE_CELL_MUTED_CLASS,
+                        'ui-data-table__cell--muted',
                       meta?.cellClassName,
                       getCellClassName?.(cell),
                     )}
@@ -992,8 +983,8 @@ export function DataTable<TData>({
             </tr>
           ))
         ) : (
-          <tr className={DATA_TABLE_EMPTY_ROW_CLASS}>
-            <td colSpan={resolvedColumns.length} className={DATA_TABLE_EMPTY_CLASS}>
+          <tr className="ui-data-table__empty-row">
+            <td colSpan={resolvedColumns.length} className="ui-data-table__empty">
               {emptyState ? emptyState(emptyStateContext) : 'No results.'}
             </td>
           </tr>

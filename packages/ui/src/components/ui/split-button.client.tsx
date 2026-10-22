@@ -16,12 +16,7 @@ import {
 } from './dropdown-menu.client'
 import { MenuChoiceRow } from './menu-choice-row.client'
 import { dropdownMenuChoiceContentClasses } from './dropdown-menu-choice.variants'
-import {
-  splitButtonChevronIconClasses,
-  splitButtonChevronVariants,
-  splitButtonPrimaryVariants,
-  splitButtonRootVariants,
-} from './split-button.variants'
+import { iconGlyphRootClasses } from './icon-glyph.variants'
 
 export type SplitButtonMenuItem = {
   id: string
@@ -64,14 +59,14 @@ export function SplitButton({
   const resolvedMenuAriaLabel = menuAriaLabel ?? `${label} shortcuts`
 
   return (
-    <div className={cn(splitButtonRootVariants(), className)}>
+    <div className={cn('ui-split-button', className)}>
       <Button
         type="button"
         variant={variant}
         size={size}
         density={density}
         disabled={disabled}
-        className={hasMenu ? splitButtonPrimaryVariants() : undefined}
+        className={hasMenu ? 'ui-split-button__primary' : undefined}
         onClick={onPrimaryClick}
         {...props}
       >
@@ -87,10 +82,10 @@ export function SplitButton({
               size={size}
               density={density}
               disabled={disabled}
-              className={splitButtonChevronVariants()}
+              className="ui-split-button__menu"
               aria-label={resolvedMenuAriaLabel}
             >
-              <ChevronDown className={splitButtonChevronIconClasses} aria-hidden />
+              <ChevronDown className={cn(iconGlyphRootClasses.sm, 'opacity-80')} aria-hidden />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent

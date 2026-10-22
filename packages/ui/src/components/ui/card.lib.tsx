@@ -39,6 +39,24 @@ function CardNavigationChevron() {
   return <NavigationChevron />
 }
 
+/** Navigable card interior — main column plus optional trailing chevron. */
+export function CardNavInterior({
+  main,
+  showNavigationChevron = true,
+  mainClassName,
+}: {
+  main: React.ReactNode
+  showNavigationChevron?: boolean
+  mainClassName?: string
+}) {
+  return (
+    <div className="ui-card__nav">
+      <div className={cn('ui-card__nav-main', mainClassName)}>{main}</div>
+      {showNavigationChevron ? <CardNavigationChevron /> : null}
+    </div>
+  )
+}
+
 export function CardMedia({ leadMedia }: { leadMedia?: React.ReactNode }) {
   if (leadMedia == null) {
     return null
@@ -75,12 +93,7 @@ export function DeclarativeCardInterior({
     return <>{main}</>
   }
 
-  return (
-    <div className="ui-card__nav">
-      <div className="ui-card__nav-main">{main}</div>
-      {showNavigationChevron ? <CardNavigationChevron /> : null}
-    </div>
-  )
+  return <CardNavInterior main={main} showNavigationChevron={showNavigationChevron} />
 }
 
 export function resolveCardSurfaceClassName({

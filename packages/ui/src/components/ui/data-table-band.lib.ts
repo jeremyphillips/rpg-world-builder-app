@@ -1,22 +1,20 @@
-/** Unavailable overview row — applied via `getRowClassName`. */
-export function dataTableRowUnavailableVariants(): string {
-  return 'ui-data-table__row--unavailable'
+export type DataTableUnavailableAppearance = {
+  rowClassName?: string
+  nameCellRailClassName?: string
 }
 
-/** Leading name-cell accent for unavailable rows — applied via `getCellClassName`. */
-export function dataTableRowUnavailableRailVariants(): string {
-  return 'ui-data-table__cell--unavailable-rail'
+/** Row wash and name-cell rail for inactive overview rows — one decision, both classes. */
+export function dataTableUnavailableAppearance(
+  unavailable: boolean,
+): DataTableUnavailableAppearance {
+  if (!unavailable) {
+    return {}
+  }
+  return {
+    rowClassName: 'ui-data-table__row--unavailable',
+    nameCellRailClassName: 'ui-data-table__cell--unavailable-rail',
+  }
 }
-
-export const DATA_TABLE_HEAD_CLASS = 'ui-data-table__head'
-export const DATA_TABLE_HEADER_ROW_CLASS = 'ui-data-table__header-row'
-export const DATA_TABLE_ROW_CLASS = 'ui-data-table__row'
-export const DATA_TABLE_CELL_CLASS = 'ui-data-table__cell'
-export const DATA_TABLE_CELL_MUTED_CLASS = 'ui-data-table__cell--muted'
-export const DATA_TABLE_EMPTY_ROW_CLASS = 'ui-data-table__empty-row'
-export const DATA_TABLE_EMPTY_CLASS = 'ui-data-table__empty'
-export const DATA_TABLE_SELECT_CLASS = 'ui-data-table__select'
-export const DATA_TABLE_ACTIONS_CLASS = 'ui-data-table__actions'
 
 export type DataTableClassSpec = {
   key: string

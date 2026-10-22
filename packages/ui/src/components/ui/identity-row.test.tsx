@@ -5,10 +5,6 @@ import { fileURLToPath } from 'node:url'
 import { render, screen } from '@testing-library/react'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import {
-  identityRowClassificationVariants,
-  identityRowHeadingVariants,
-} from './identity-row.variants'
 import { IdentityRow, IdentityRowHeadingLine } from './identity-row.client'
 
 const copyScaleCss = readFileSync(
@@ -52,9 +48,9 @@ describe('IdentityRow', () => {
     const classification = screen.getByText('District')
 
     expect(heading).toHaveClass('truncate')
-    expect(heading.className).toContain(identityRowHeadingVariants())
+    expect(heading.className).toContain('ui-identity-row__title')
     expect(classification).toHaveClass('shrink-0')
-    expect(classification.className).toContain(identityRowClassificationVariants())
+    expect(classification.className).toContain('ui-identity-row__classification')
     expect(screen.getByText('District')).toBeInTheDocument()
   })
 
@@ -132,10 +128,6 @@ describe('IdentityRow', () => {
 
     expect(container.firstElementChild).toHaveClass('ui-identity-row--compact')
     expect(screen.getByText('Compact row')).toHaveClass('ui-identity-row__title', 'ui-copy-title')
-  })
-
-  it('keeps classification on the shared title class', () => {
-    expect(identityRowClassificationVariants()).toContain('ui-identity-row__classification')
   })
 
   describe('anatomy row gap', () => {

@@ -2,11 +2,7 @@ import { cardSurfaceVariants, cn } from '@rpg/ui'
 
 import { ENTITY_SURFACE_DEFAULT_EDGES } from '../anatomy/entity-surface-edges.lib'
 import { entityCardFrameClassName } from './cards/content/entity-card-frame.lib'
-import {
-  DASH_ENTITY_CARD_BODY_CLASS,
-  DASH_ENTITY_SURFACE_BLOCK,
-  entitySurfaceVariants,
-} from './dash-entity-surface.variants'
+import { entitySurfaceVariants } from './dash-entity-surface.variants'
 
 export type DashEntitySurfaceClassSpec = {
   key: string
@@ -71,13 +67,13 @@ export const DASH_ENTITY_SURFACE_CLASS_SPECS: readonly DashEntitySurfaceClassSpe
   },
   {
     key: 'body-wash',
-    className: DASH_ENTITY_CARD_BODY_CLASS,
+    className: 'dash-entity-card__body',
     keyValues: 'padding-inline-start: start + content-offset; end: base inset',
     useCase: 'Expanded disclosure body wash (EntityCard / catalog)',
   },
   {
     key: 'surface-block',
-    className: DASH_ENTITY_SURFACE_BLOCK,
+    className: 'dash-entity-surface',
     keyValues: '--leading-chrome-size; default inline edges',
     useCase: 'Token block before density / edge modifiers',
   },

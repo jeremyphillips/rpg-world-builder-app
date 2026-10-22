@@ -30,7 +30,7 @@ The rule prohibits duplicated styling ownership. It does not require identical c
 | Shared semantic styling primitive | Styling matches, but DOM structure or behavior differs                  |
 | Domain-specific implementation    | The pattern is genuinely unique (record it as an intentional exception) |
 
-Styling primitives must be exportable. Every owner whose styling may be reused without its component exposes its semantic classes through a function — for example `cardSurfaceVariants({ … })` returns `ui-card ui-card--…`. For **button-shaped navigation**, use `ButtonLink` (app supplies the router link via `link`); `resolveButtonAppearance()` and `buttonVariants()` remain for styling-only or non-navigation cases. See [button-link.md](./button-link.md).
+Reusable styling without the full component is exposed through **conditional** resolvers — for example `cardSurfaceVariants({ … })` returns `ui-card ui-card--…`. Fixed element classes stay on the owning JSX. For **button-shaped navigation**, use `ButtonLink` (app supplies the router link via `link`); `resolveButtonAppearance()` and `buttonVariants()` remain for styling-only or non-navigation cases. See [button-link.md](./button-link.md).
 
 `EntityCardFrame` shares the **inset** ladder (`--ui-card-inset-*` via `ui-card--compact|comfortable` on the frame) with generic `Card` and option cards. The legacy `ContentCard` article shell is retired. Generic `Card` also publishes shared copy vars (`--ui-copy-title-size` via `copy-scale.css`) and `spacious` inset; hub tiles can pair `Card` with `IdentityRowHeadingLine` without a separate density wrapper. Entity frames use `ContentCardDensity` only (no `spacious`, separate title typography via `contentCardHeadingScaleClass` on `EntitySummaryHeading`).
 
@@ -48,6 +48,14 @@ Introduce a shared variant when it represents a stable, meaningful dimension of 
 - **Semantic CSS** is for a reusable component's appearance, sizing, geometry, and interaction states. Components use `ui-*` blocks in `@rpg/ui` and `dash-*` blocks for dashboard-owned shared compositions.
 - **Tailwind utilities** are for one-off composition and layout that the consumer intentionally owns (`flex items-center gap-2`). Do not replace utility sprawl with a parallel catalog of semantic classes for trivial layouts.
 - **Typography roles** stay single-class `@utility` composites (`heading-style-*`, `text-style-*`). They already meet the inspector goal and apply to arbitrary elements.
+
+### Semantic class ownership
+
+- Fixed BEM anatomy and modifiers belong on the element the owning component renders. A static `cn()` constant is not a substitute for an empty `cva()`.
+- Do not apply another component’s element class from a consumer; compose the owner, use local layout, or record an explicit cross-owner contract in this document.
+- Export a function when arguments select modifiers, or when one state must apply several classes together (for example `cardSurfaceVariants`, `dataTableUnavailableAppearance`).
+- A `*.variants.ts` file requires a real variant axis. `ClassReference` specs and twMerge group lists are inspection metadata, not runtime class registries.
+- Styling primitives that may be reused without their component expose **conditional** classes through resolvers (`cardSurfaceVariants`, `interactiveRowVariants`) — not through zero-argument aliases of a single selector.
 
 ## Ownership registry
 

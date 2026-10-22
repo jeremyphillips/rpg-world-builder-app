@@ -6,12 +6,7 @@ import { FilterChromeProvider } from '../../filters/filter-chrome.context'
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { comboboxSearchRowVariants } from './combobox-field.variants'
 import { fieldControlVariants } from './field-control.variants'
-import {
-  FIELD_CONTROL_SIZE_SPECS,
-  UI_SEARCH_BAR_CLASS,
-  resolveSearchBarFieldInputClass,
-} from './field-control.styles'
-import { searchBarRootVariants } from './search-bar.variants'
+import { FIELD_CONTROL_SIZE_SPECS, resolveSearchBarFieldInputClass } from './field-control.styles'
 import { SearchBar } from './search-bar.client'
 
 const meta = {
@@ -21,7 +16,7 @@ const meta = {
     semanticClasses: true,
     docs: {
       description: {
-        component: `${UI_SEARCH_BAR_CLASS} parts and field input inset classes live in field-control.css.`,
+        component: '`ui-search-bar` parts and field input inset classes live in field-control.css.',
       },
     },
   },
@@ -142,7 +137,7 @@ export const ClassReference: Story = {
           />
         ),
         propsLabel: `size="${spec.size}"`,
-        className: `${searchBarRootVariants()} ${fieldControlVariants({ size: spec.size })} ${resolveSearchBarFieldInputClass(spec.size)}`,
+        className: `ui-search-bar ${fieldControlVariants({ size: spec.size })} ${resolveSearchBarFieldInputClass(spec.size)}`,
         keyValues: `control height: ${spec.controlHeight}`,
         useCase: spec.useCase,
       }))}

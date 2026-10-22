@@ -1,8 +1,4 @@
-import {
-  identityRowClassificationVariants,
-  identityRowHeadingVariants,
-  identityRowSupportingVariants,
-} from './identity-row.variants'
+import { identityRowSupportingVariants } from './identity-row.variants'
 
 export type IdentityRowClassSpec = {
   key: string
@@ -14,13 +10,13 @@ export type IdentityRowClassSpec = {
 export const IDENTITY_ROW_CLASS_SPECS: readonly IdentityRowClassSpec[] = [
   {
     key: 'title',
-    className: identityRowHeadingVariants(),
+    className: 'ui-identity-row__title ui-copy-title text-foreground',
     keyValues: 'ui-copy-title: size, line-height, and --font-weight-heading from copy-scale.css',
     useCase: 'Primary identity heading. Scale comes from density or the parent surface.',
   },
   {
     key: 'classification',
-    className: identityRowClassificationVariants(),
+    className: 'ui-identity-row__classification',
     keyValues:
       'font-size: var(--ui-copy-classification-size); line-height: var(--ui-copy-classification-line-height)',
     useCase: 'Classification beside the title on the heading line',

@@ -4,9 +4,6 @@ import type { ContentCardDensity } from './content-card.variants'
 
 export type IdentityRowDensity = ContentCardDensity
 
-/** Identity copy stack — spacing from `identity-row.css`. */
-export const IDENTITY_ROW_STACK_CLASS = 'ui-identity-row__stack' as const
-
 export const identityRowRootVariants = cva('min-w-0 flex-1', {
   variants: {
     density: {
@@ -16,12 +13,6 @@ export const identityRowRootVariants = cva('min-w-0 flex-1', {
     },
   },
 })
-
-export const identityRowHeadingVariants = cva(
-  'ui-identity-row__title ui-copy-title text-foreground',
-)
-
-export const identityRowClassificationVariants = cva('ui-identity-row__classification')
 
 export const identityRowSupportingVariants = cva('ui-identity-row__supporting', {
   variants: {

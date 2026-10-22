@@ -4,11 +4,6 @@ import { cn } from '../lib/utils'
 import { establishSurfaceCurrent } from '../components/ui/surface-current.lib'
 import { iconGlyphDescendantClasses } from '../components/ui/icon-glyph.variants'
 import { fieldCaptionTypographyVariants } from '../components/ui/field-caption.variants'
-import {
-  labelSizerBlockClasses,
-  labelSizerGhostClasses,
-  labelSizerLiveClasses,
-} from '../components/ui/label-sizer.styles'
 import type { FilterDensity } from './filter-schema.types'
 
 export const FILTER_SELECT_ALL_VALUE = '__all__'
@@ -63,11 +58,6 @@ export const filterBarControlVariants = cva('', {
 })
 
 export const filterBarResetButtonClasses = cn('gap-1 text-xs', iconGlyphDescendantClasses.sm)
-
-/** Widest-label sizer — semantic classes in `label-sizer.css`. */
-export const filterToolbarLabelSizerClasses = labelSizerBlockClasses()
-export const filterToolbarLabelSizerGhostClasses = labelSizerGhostClasses()
-export const filterToolbarLabelSizerLiveClasses = labelSizerLiveClasses()
 
 export const filterInlineFieldGroupVariants = cva('flex flex-col sm:flex-row sm:items-center', {
   variants: {

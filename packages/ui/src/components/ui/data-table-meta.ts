@@ -1,9 +1,4 @@
 import { dataTableCellTextVariants } from './data-table.variants'
-import {
-  DATA_TABLE_ACTIONS_CLASS,
-  DATA_TABLE_HEAD_CLASS,
-  DATA_TABLE_SELECT_CLASS,
-} from './data-table-band.lib'
 
 /** Shared `ColumnMeta.columnTone` values for DataTable body cell styling. */
 export const dataTableColumnMeta = {
@@ -63,10 +58,10 @@ export type DataTableColumnWidth = keyof typeof dataTableColumnWidths
 /** Body-cell layout for centered width presets — flex breaks table `align-middle`. */
 const dataTableCenteredBodyCellLayout = 'text-center [&>svg]:mx-auto [&>svg]:block'
 
-const dataTableActionsHeaderClassName = `${DATA_TABLE_HEAD_CLASS} ${DATA_TABLE_ACTIONS_CLASS}`
-const dataTableActionsCellClassName = DATA_TABLE_ACTIONS_CLASS
-const dataTableSelectHeaderClassName = `${DATA_TABLE_HEAD_CLASS} ${DATA_TABLE_SELECT_CLASS}`
-const dataTableSelectCellClassName = `${DATA_TABLE_SELECT_CLASS}`
+const dataTableActionsHeaderClassName = 'ui-data-table__head ui-data-table__actions'
+const dataTableActionsCellClassName = 'ui-data-table__actions'
+const dataTableSelectHeaderClassName = 'ui-data-table__head ui-data-table__select'
+const dataTableSelectCellClassName = 'ui-data-table__select'
 
 /** Applies a width preset to both header and body cells. */
 export function dataTableWidthMeta(width: DataTableColumnWidth) {

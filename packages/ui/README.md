@@ -339,7 +339,8 @@ index.ts            # barrel re-export
    [ui-architecture.md](docs/ui-architecture.md): reusable anatomy and state → BEM-style
    classes in co-located `<name>.css` (migrated controls) or meaningful CVA axes in
    `<name>.variants.ts`; simple layout (`flex`, `gap-*`, `min-w-0`) may stay in JSX.
-   Do not add `*.variants.ts` files that only rename static Tailwind strings. Use
+   `*.variants.ts` is optional and only for real variant axes; fixed semantic classes
+   belong on owning JSX. Do not add variant files that only rename static strings. Use
    design-token classes only; never hardcode color values or font sizes. Migrated
    buttons and form controls → [semantic-control-css.md](docs/semantic-control-css.md).
    The shadcn CLI can scaffold a starting point: `pnpm dlx shadcn@latest add <name>`

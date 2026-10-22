@@ -3,11 +3,9 @@ import type { CharacterRosterStatus } from '@rpg/contracts'
 import {
   Badge,
   ButtonLink,
-  cn,
   Card,
   CardFooter,
   CardHeader,
-  IDENTITY_ROW_STACK_CLASS,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   resolveSurfaceActionButtonSize,
@@ -58,28 +56,24 @@ function CharacterListCardHeader({
     ) : null
 
   return (
-    <CardHeader>
-      <div className={cn(IDENTITY_ROW_STACK_CLASS, 'min-w-0')}>
-        <IdentityRowHeadingLine
-          heading={<h3>{card.name}</h3>}
-          headingEnd={
-            rosterPresentation ? (
-              <Badge
-                appearance={rosterPresentation.appearance}
-                tone={rosterPresentation.tone}
-                size={headingAccessoryBadgeSize}
-              >
-                {rosterPresentation.label}
-              </Badge>
-            ) : undefined
-          }
-        />
-        <IdentityRowSupporting wrap>{card.summary}</IdentityRowSupporting>
-        {controllerLine ? (
-          <IdentityRowSupporting wrap>{controllerLine}</IdentityRowSupporting>
-        ) : null}
-        {campaignLine ? <IdentityRowSupporting wrap>{campaignLine}</IdentityRowSupporting> : null}
-      </div>
+    <CardHeader className="min-w-0">
+      <IdentityRowHeadingLine
+        heading={<h3>{card.name}</h3>}
+        headingEnd={
+          rosterPresentation ? (
+            <Badge
+              appearance={rosterPresentation.appearance}
+              tone={rosterPresentation.tone}
+              size={headingAccessoryBadgeSize}
+            >
+              {rosterPresentation.label}
+            </Badge>
+          ) : undefined
+        }
+      />
+      <IdentityRowSupporting wrap>{card.summary}</IdentityRowSupporting>
+      {controllerLine ? <IdentityRowSupporting wrap>{controllerLine}</IdentityRowSupporting> : null}
+      {campaignLine ? <IdentityRowSupporting wrap>{campaignLine}</IdentityRowSupporting> : null}
     </CardHeader>
   )
 }

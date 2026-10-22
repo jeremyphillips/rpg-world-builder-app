@@ -5,7 +5,6 @@ import { Text } from './text'
 import { InlineMetadata } from './inline-metadata'
 import { Card } from './card'
 import { DestinationList, DestinationItem } from './destination-list'
-import { UI_DESTINATION_ITEM_LINK_CLASS } from './destination-list.variants'
 import { IdentityRow } from './identity-row.client'
 
 const meta = {
@@ -193,7 +192,7 @@ async function assertSurfaceInteractionParity(canvasElement: ParentNode, testIdP
   const list = canvasElement.querySelector<HTMLElement>(
     `[data-testid="${testIdPrefix}-filled-strong-list"]`,
   )!
-  const link = canvasElement.querySelector<HTMLElement>(`.${UI_DESTINATION_ITEM_LINK_CLASS}`)!
+  const link = canvasElement.querySelector<HTMLElement>('.ui-destination-item__link')!
 
   expect(shellBackgroundColor(card)).toBe(shellBackgroundColor(list))
 

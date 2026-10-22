@@ -13,7 +13,6 @@ import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 import { EntityCardContent } from '../cards/content/entity-card-content'
 import { EntityCardFrame } from '../cards/content/entity-card-frame'
 import { DisclosureEntityCardHeader } from '../cards/disclosure/disclosure-entity-card-header'
-import { DASH_ENTITY_CARD_CATALOG_BODY_WASH_CLASSES } from '../dash-entity-surface.variants'
 
 type CatalogCardBaseProps = {
   toolbarLabel: string
@@ -153,7 +152,7 @@ function CatalogCardDisclosureBody({
         collapsed={collapsed}
         onToggleCollapse={onToggleCollapse}
         showDragHandle={false}
-        bodyClassName={DASH_ENTITY_CARD_CATALOG_BODY_WASH_CLASSES}
+        bodyClassName="dash-entity-card__body dash-entity-card__body--catalog-wash"
         header={
           <EntityCardContent>
             <DisclosureEntityCardHeader

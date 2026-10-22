@@ -13,7 +13,6 @@ import {
   detailEntityRowDisclosureButtonVariants,
   detailEntityRowDisclosureContentVariants,
   detailEntityRowDisclosureItemVariants,
-  detailEntityRowDisclosurePreviewOffsetVariants,
   detailEntityRowDisclosurePreviewGroupVariants,
   detailEntityRowDisclosureRowVariants,
   detailEntityRowVariants,
@@ -204,7 +203,7 @@ export function DetailEntityRow({
       </div>
       {disclosure.mode === 'expandable' && !collapsed ? (
         <div id={contentId} className={detailEntityRowDisclosureContentVariants({ inset })}>
-          <div className={detailEntityRowDisclosurePreviewOffsetVariants()}>
+          <div className="dash-entity-surface__disclosure-preview-offset">
             <div className={detailEntityRowDisclosurePreviewGroupVariants()}>
               {disclosure.content}
             </div>
