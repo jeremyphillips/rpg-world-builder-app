@@ -11,6 +11,7 @@ import {
   globalSearchPreviewInsetClasses,
 } from '../../lib/global-search-preview.variants'
 import type { GlobalSearchGroupSection } from '../../lib/rank-global-search'
+import { GlobalSearchResultsPanel } from '../global-search-results-panel'
 import { GlobalSearchEmptyPrompt } from '../results/global-search-empty-prompt'
 import { GlobalSearchGroupedResults } from '../results/global-search-result-lists'
 
@@ -126,7 +127,12 @@ export function GlobalSearchPreviewPanel({
   const showFooter = hasQuery && resultCount > 0
 
   return (
-    <div id={id} role="region" aria-label={GLOBAL_SEARCH_COPY.pageTitle} className={className}>
+    <GlobalSearchResultsPanel
+      id={id}
+      role="region"
+      aria-label={GLOBAL_SEARCH_COPY.pageTitle}
+      className={className}
+    >
       <div className={globalSearchPreviewBodyClasses}>
         <GlobalSearchPreviewStatus
           isPending={isPending}
@@ -150,6 +156,6 @@ export function GlobalSearchPreviewPanel({
       {showFooter ? (
         <GlobalSearchPreviewFooter viewAllHref={viewAllHref} onClose={onClose} />
       ) : null}
-    </div>
+    </GlobalSearchResultsPanel>
   )
 }

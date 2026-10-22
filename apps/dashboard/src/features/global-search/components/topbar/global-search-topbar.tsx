@@ -14,7 +14,7 @@ import { GlobalSearchTrigger } from './global-search-trigger'
 import { useGlobalSearchContext } from '../global-search-context'
 import {
   globalSearchTopbarInputWrapClasses,
-  globalSearchTopbarPreviewClasses,
+  globalSearchTopbarPreviewPlacementClasses,
   globalSearchTopbarRootClasses,
 } from './global-search-topbar.variants'
 
@@ -146,7 +146,7 @@ function GlobalSearchTopbarExpanded({
             }}
             resolveHref={resolveHref}
             showAllHref={showAllHref}
-            className={globalSearchTopbarPreviewClasses}
+            className={globalSearchTopbarPreviewPlacementClasses}
           />
         </div>
       ) : (
