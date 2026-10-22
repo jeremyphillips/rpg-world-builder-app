@@ -27,7 +27,7 @@ describe('resolveDependentNestRailClasses', () => {
     const classes = resolveDependentNestRailClasses()
     expect(classes).toContain('before:left-0')
     expect(classes).toContain('before:w-px')
-    expect(classes).toContain('before:bg-border-faint')
+    expect(classes).toContain('before:bg-border-subtle')
   })
 })
 

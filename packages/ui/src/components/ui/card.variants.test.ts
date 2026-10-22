@@ -15,6 +15,7 @@ describe('cardSurfaceVariants', () => {
     expect(defaults).toContain('ui-card--strong')
     expect(defaults).toContain('ui-card--comfortable')
     expect(defaults).toContain('ui-card--static')
+    expect(defaults).toContain('ui-border--default')
     expect(defaults).not.toContain('ui-card--interactive')
     expect(defaults).not.toContain('ui-card--elevation-subtle')
     expect(defaults).not.toContain('ui-card--elevation-raised')

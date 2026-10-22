@@ -1,11 +1,11 @@
 'use client'
 
-import type { FieldBorderLadderTone } from './field-border-ladder.variants'
+import type { BorderStrength } from './border-strength'
 import { fieldRowDividerVariants } from './field-row-divider.variants'
 import type { FieldRhythm } from './field.variants'
 
 export interface FieldRowDividerProps {
-  tone?: FieldBorderLadderTone
+  tone?: BorderStrength
   rhythm?: FieldRhythm
 }
 

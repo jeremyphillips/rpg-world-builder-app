@@ -17,7 +17,6 @@ const SURFACE_RELATIVE_UTILITY_NAMES = [
   'border-border-subtle',
   'border-border-strong',
   'border-card-selected-border',
-  'border-card-border',
   'border-interactive-outline',
   'bg-interactive-outline-hover',
   'bg-interactive-outline-active',
@@ -48,7 +47,6 @@ const UTILITY_INGREDIENT_OWNERSHIP = {
   'border-border-subtle': { mixSource: 'foreground', mixVar: '--mix-border-subtle' },
   'border-border-strong': { mixSource: 'foreground', mixVar: '--mix-border-strong' },
   'border-card-selected-border': { mixSource: 'foreground', mixVar: '--mix-border-selected' },
-  'border-card-border': { mixSource: 'primary', mixVar: '--mix-card-border' },
   'border-interactive-outline': {
     mixSource: 'foreground',
     mixVar: '--mix-interactive-outline-border',

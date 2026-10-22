@@ -1,8 +1,8 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { dialogPanelBodyVariants } from './dialog-panel.variants'
-import { establishSurfaceCurrent } from './surface-current.lib'
+import { borderStrength } from './border-strength'
+import { dialogPanelFill, dialogPanelGeometry } from './dialog-panel.variants'
 
 /**
  * Side panel built on Radix Dialog — reuses the modal overlay token and applies
@@ -10,34 +10,21 @@ import { establishSurfaceCurrent } from './surface-current.lib'
  */
 export const sheetContentVariants = cva(
   cn(
-    'fixed z-50 flex flex-col overflow-hidden shadow-lg data-[state=closed]:duration-150 data-[state=open]:duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out',
+    'ui-dialog-panel fixed z-50 shadow-lg data-[state=closed]:duration-150 data-[state=open]:duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out',
+    borderStrength(),
   ),
   {
     variants: {
       side: {
-        right:
-          'inset-y-0 right-0 h-full w-full border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
-        left: 'inset-y-0 left-0 h-full w-full border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
-        bottom:
-          'inset-x-0 bottom-0 h-[90dvh] max-h-[90dvh] w-full border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
+        right: `inset-y-0 right-0 h-full w-full ${dialogPanelGeometry('side-right')} data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right`,
+        left: `inset-y-0 left-0 h-full w-full ${dialogPanelGeometry('side-left')} data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left`,
+        bottom: `inset-x-0 bottom-0 h-[90dvh] max-h-[90dvh] w-full ${dialogPanelGeometry('side-bottom')} data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom`,
       },
       surface: {
-        card: cn(
-          'border-card-border bg-card text-card-foreground',
-          establishSurfaceCurrent('card'),
-        ),
-        background: cn(
-          'border-border bg-background text-foreground',
-          establishSurfaceCurrent('background'),
-        ),
-        'field-container': cn(
-          'border-border bg-field-container text-foreground',
-          establishSurfaceCurrent('field-container'),
-        ),
-        'surface-lift': cn(
-          'border-border bg-surface-lift text-foreground',
-          establishSurfaceCurrent('surface-lift'),
-        ),
+        card: dialogPanelFill('card'),
+        background: dialogPanelFill('background'),
+        'field-container': dialogPanelFill('field-container'),
+        'surface-lift': dialogPanelFill('surface-lift'),
       },
       size: {
         md: 'max-w-md',
@@ -57,9 +44,6 @@ export const sheetContentVariants = cva(
     },
   },
 )
-
-/** @deprecated Sheet.Body owns layout via {@link DialogPanelBody}; kept for class assertions. */
-export const sheetBodyVariants = cva(dialogPanelBodyVariants())
 
 /** Sheet-owned dock placement — no border, padding, or fill (see dialog-panel footer chrome). */
 export const sheetFooterDockClasses = 'shrink-0 z-20'

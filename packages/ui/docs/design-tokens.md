@@ -92,19 +92,22 @@ Empty-state wells (`EmptyPanel`, dashed `InsetPanel` gates) standardize on sunke
 
 ## Border ladder
 
-| Role    | Utility                | Meaning                                                                                 |
-| ------- | ---------------------- | --------------------------------------------------------------------------------------- |
-| Faint   | `border-border-faint`  | Extra-quiet separators and decorative shells                                            |
-| Subtle  | `border-border-subtle` | Quiet separators, low-emphasis shells (default for field separators and outline chrome) |
-| Default | `border-border`        | Normal component structure — also the inherited `*` safety-net via `var(--border)`      |
-| Card    | `border-card-border`   | Raised containing-surface stroke (Card, Modal, Sheet edge, Toast, elevated panels)      |
-| Strong  | `border-border-strong` | Selected or emphasized structure                                                        |
+| Role    | Semantic class       | Meaning                                                            |
+| ------- | -------------------- | ------------------------------------------------------------------ |
+| Subtle  | `ui-border--subtle`  | Quiet separators and low-emphasis shells                           |
+| Default | `ui-border--default` | Normal neutral component structure                                 |
+| Strong  | `ui-border--strong`  | Emphasized neutral structure; not a selected/status state override |
+
+The three classes compute against the painting element's current `--surface-current` and
+publish `--ui-border-color`. Width, style, edge placement, and radius remain component-owned.
+`--border-faint` is retained only for explicitly decorative effects; it is not part of the
+component strength vocabulary.
 
 Status borders stay status-specific (`border-destructive-muted`, …). Recipe borders (e.g.
 `border-row-selected-border`) may alias `--border-strong` or a brand/status role.
 
 The base `*` rule sets `border-color: var(--border)` as a **structural safety net** only.
-Components with semantic border ownership must set an explicit role utility — do not rely
+Components with semantic border ownership must set an explicit strength class — do not rely
 on the fallback as SSOT.
 
 ## Interaction recipes

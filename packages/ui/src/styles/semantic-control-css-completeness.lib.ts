@@ -210,6 +210,9 @@ const insetPanelCssPath = path.join(stylesDir, '../components/ui/inset-panel.css
 
 const panelCssPath = path.join(stylesDir, '../components/ui/panel.css')
 
+const uiBorderCssPath = path.join(stylesDir, '../components/ui/ui-border.css')
+const dialogPanelCssPath = path.join(stylesDir, '../components/ui/dialog-panel.css')
+
 const BUTTON_APPEARANCE_MODIFIERS = [
   'primary',
   'destructive',
@@ -383,6 +386,24 @@ const INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED = ['width', 'min-width'] as const
 
 /** Registry populated as component CSS ships (Button, field-control, …). */
 export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = [
+  {
+    filePath: dialogPanelCssPath,
+    dimensions: [
+      ...(['background', 'card', 'field-container', 'surface-lift'] as const).map((fill) => ({
+        modifierPrefix: `ui-dialog-panel--fill-${fill}`,
+        requiredProperties: ['--surface-current', 'background-color', 'color'] as const,
+      })),
+    ],
+  },
+  {
+    filePath: uiBorderCssPath,
+    dimensions: [
+      ...(['subtle', 'default', 'strong'] as const).map((strength) => ({
+        modifierPrefix: `ui-border--${strength}`,
+        requiredProperties: ['--ui-border-color', 'border-color'] as const,
+      })),
+    ],
+  },
   {
     filePath: buttonCssPath,
     dimensions: [
@@ -568,7 +589,7 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
     dimensions: [
       ...(['transparent', 'quiet', 'subtle', 'strong', 'faint'] as const).map((tone) => ({
         modifierPrefix: `ui-panel--${tone}`,
-        requiredProperties: ['border-color', 'background-color'] as const,
+        requiredProperties: ['background-color'] as const,
       })),
       {
         modifierPrefix: 'ui-panel--bleed',
@@ -579,7 +600,11 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
   {
     filePath: alertCssPath,
     dimensions: [
-      ...(['default', 'info', 'success', 'warning', 'destructive'] as const).map((tone) => ({
+      {
+        modifierPrefix: 'ui-alert--default',
+        requiredProperties: ['background-color', 'color'] as const,
+      },
+      ...(['info', 'success', 'warning', 'destructive'] as const).map((tone) => ({
         modifierPrefix: `ui-alert--${tone}`,
         requiredProperties: ['border-color', 'background-color', 'color'] as const,
       })),

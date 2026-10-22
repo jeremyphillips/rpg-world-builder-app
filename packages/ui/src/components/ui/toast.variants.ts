@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { establishSurfaceCurrent } from './surface-current.lib'
 import { TOAST_TONES } from './toast.constants'
 
@@ -21,7 +22,7 @@ export const toastVariants = cva(
     variants: {
       tone: {
         // Opaque panel fill — status *-subtle washes are translucent and show content behind floating toasts.
-        default: 'border-card-border bg-card text-foreground',
+        default: cn(borderStrength(), 'bg-card text-foreground'),
         success: 'border-success-muted bg-card text-foreground',
         warning: 'border-warning-muted bg-card text-foreground',
         destructive: 'border-destructive-muted bg-card text-foreground',

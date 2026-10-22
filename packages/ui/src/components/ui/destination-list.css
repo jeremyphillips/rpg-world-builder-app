@@ -23,7 +23,8 @@
   .ui-destination-list--panel {
     overflow: hidden;
     border-radius: var(--radius-md);
-    border: 1px solid var(--border);
+    border: 1px solid
+      color-mix(in oklch, var(--foreground) var(--mix-border-default), var(--surface-current));
     background-color: transparent;
   }
 
@@ -37,7 +38,8 @@
   .ui-destination-list--filled {
     overflow: hidden;
     border-radius: var(--radius-card);
-    border: 1px solid var(--border);
+    border: 1px solid
+      color-mix(in oklch, var(--foreground) var(--mix-border-default), var(--surface-current));
     background-color: transparent;
   }
 
@@ -61,7 +63,8 @@
     bottom: 0;
     left: 0;
     right: 0;
-    border-bottom: 1px solid var(--border-faint);
+    border-bottom: 1px solid
+      color-mix(in oklch, var(--foreground) var(--mix-border-subtle), var(--surface-current));
     pointer-events: none;
   }
 
@@ -85,12 +88,14 @@
     bottom: 0;
     left: var(--ui-destination-inset-inline);
     right: var(--ui-destination-inset-inline);
-    border-bottom: 1px solid var(--border-faint);
+    border-bottom: 1px solid
+      color-mix(in oklch, var(--foreground) var(--mix-border-subtle), var(--surface-current));
     pointer-events: none;
   }
 
   .ui-destination-list--embedded .ui-destination-item + .ui-destination-item {
-    border-top: 1px solid var(--border-faint);
+    border-top: 1px solid
+      color-mix(in oklch, var(--foreground) var(--mix-border-subtle), var(--surface-current));
   }
 
   .ui-destination-item__link {

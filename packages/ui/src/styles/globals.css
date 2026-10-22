@@ -5,6 +5,7 @@
 @import './tokens/palette-dark.css';
 @import './tokens/semantic-dark.css';
 @import './surface-relative-chrome.utilities.css';
+@import '../components/ui/ui-border.css';
 @import './form-scroll-body.utilities.css';
 @import './field-row-anatomy.utilities.css';
 @import './text-action.utilities.css';
@@ -16,6 +17,7 @@
 @import '../components/ui/field-group.css';
 @import '../components/ui/compact-control.css';
 @import '../components/ui/dialog-panel-header-nav-button.css';
+@import '../components/ui/dialog-panel.css';
 @import '../components/ui/choice-control.css';
 @import '../components/ui/boolean-field.css';
 @import '../components/ui/interactive-row.css';

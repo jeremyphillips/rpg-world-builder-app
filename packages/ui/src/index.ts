@@ -321,6 +321,13 @@ export {
   type StaticCardProps,
 } from './components/ui/card'
 export { NavigationChevron } from './components/ui/card.lib'
+export {
+  BORDER_STRENGTHS,
+  borderStrength,
+  DEFAULT_BORDER_STRENGTH,
+  UI_BORDER_STRENGTH_CLASSES,
+  type BorderStrength,
+} from './components/ui/border-strength'
 export { renderNavigableLinkRoot, composeRefs } from './components/ui/navigable-link-root.lib'
 export {
   DestinationList,
@@ -1060,7 +1067,7 @@ export {
   type ModalStableSize,
 } from './components/ui/modal.client'
 export {
-  modalOverlayVariants,
+  modalOverlayClasses,
   modalContentVariants,
   type ModalContentVariantProps,
   type ModalSize,
@@ -1241,7 +1248,6 @@ export {
   type InlineInactiveStatusProps,
 } from './components/ui/inline-inactive-status.client'
 export {
-  sheetBodyVariants,
   sheetContentVariants,
   sheetFooterDockClasses,
   type SheetContentVariantProps,

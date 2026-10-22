@@ -10,7 +10,7 @@ import {
   dialogDismissHandlers,
 } from './dialog-parts.client'
 import { handleDialogOpenAutoFocus } from './dialog-focus.lib'
-import { modalOverlayVariants } from './modal.variants'
+import { modalOverlayClasses } from './modal.variants'
 import { DialogPanelBody } from './dialog-panel-body.client'
 import { dialogContentFocusShellClasses, dialogPanelFooterClasses } from './dialog-panel.variants'
 import {
@@ -33,7 +33,7 @@ const SheetOverlay = React.forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay ref={ref} className={cn(modalOverlayVariants(), className)} {...props} />
+  <DialogPrimitive.Overlay ref={ref} className={cn(modalOverlayClasses, className)} {...props} />
 ))
 SheetOverlay.displayName = 'Sheet.Overlay'
 

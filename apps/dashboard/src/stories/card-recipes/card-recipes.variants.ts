@@ -7,7 +7,7 @@ export const cardRecipesSectionClasses = 'flex flex-col gap-4'
 export const cardRecipesGridClasses = 'grid grid-cols-1 gap-4 lg:grid-cols-2'
 
 export const cardRecipeTileClasses =
-  'flex min-w-0 flex-col gap-3 rounded-md border border-border-faint p-4'
+  'flex min-w-0 flex-col gap-3 rounded-md border border-border-subtle p-4'
 
 export const cardRecipeTileHeaderClasses =
   'flex min-w-0 flex-wrap items-center justify-between gap-2'
@@ -19,7 +19,7 @@ export const cardRecipeTileMetaTermClasses = 'font-medium text-foreground'
 
 export const cardRecipeTileChainClasses = 'flex min-w-0 flex-wrap gap-1'
 
-export const cardRecipeTilePreviewClasses = 'min-w-0 border-t border-border-faint pt-3'
+export const cardRecipeTilePreviewClasses = 'min-w-0 border-t border-border-subtle pt-3'
 
 /**
  * Debug outlines for the "Show anatomy" toolbar. Row-track roots, cells, and the legacy

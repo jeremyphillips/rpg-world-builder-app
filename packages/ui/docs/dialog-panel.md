@@ -2,7 +2,7 @@
 
 Shared chrome tokens for centered and edge dialogs in `@rpg/ui`. This is **panel
 presentation**, not a unified Overlay root — “overlay” in this codebase means the
-scrim (`modalOverlayVariants` / `bg-overlay`).
+scrim (`modalOverlayClasses` / `bg-overlay`).
 
 ## Ownership layers
 
@@ -10,9 +10,10 @@ scrim (`modalOverlayVariants` / `bg-overlay`).
 dialog-parts.client.tsx     Header, Close, dismiss handlers (header padding SSOT;
                             shared dialogTitle headline default for Modal + Sheet)
 dialog-panel-header-nav-button.client.tsx  Header back affordance (Modal/Sheet leadIcon)
-dialog-panel.variants.ts    Section inset, body, footer chrome, action row helper
-modal.variants.ts           ModalSize + centered panel shell (background only)
-sheet.variants.ts           SheetSize, SheetSurface, dock placement only
+dialog-panel.css            Shared fill, neutral strength consumer, and panel geometry
+dialog-panel.variants.ts    Fill/geometry resolvers, section inset, body/footer chrome
+modal.variants.ts           ModalSize + centered placement/motion
+sheet.variants.ts           SheetSize, physical side placement/motion, dock placement
 Modal.*                     Centered behavior (thin Header — inherits dialogTitle)
 Sheet.*                     Edge behavior (thin Header — inherits dialogTitle)
 ConfirmDialog               AlertDialog; confirmDialogTitle (19px); reuses modal panel tokens
@@ -61,7 +62,9 @@ media keep the pinned header + scrolling body anatomy unchanged.
 | `dialogPanelInnerScrollViewportClasses`        | Inner scrollport preset (`ps-1` + `pe-2.5` + `pb-6`) — below pinned chrome in section-inset shell                                              |
 | `dialogPanelInnerLeadingScrollViewportClasses` | Leading inner preset — inner scroll chrome + `pt-5` as first content below header border                                                       |
 | `dialogPanelScrollRegionClasses`               | Deprecated alias for inner scroll region layout + inner preset                                                                                 |
-| `dialogPanelSectionSeparatorBorderClasses`     | Shared faint separator color for header/footer section borders (`border-border-faint`)                                                         |
+| `dialogPanelFill`                              | Shared fill and local `--surface-current` publisher (`background`, `card`, `field-container`, `surface-lift`)                                  |
+| `dialogPanelGeometry`                          | Frame or one physical side stroke; Sheet `left`/`right` geometry follows its physical positioning contract, including RTL                      |
+| `dialogPanelSectionSeparatorBorderClasses`     | Shared subtle separator color for header/footer section borders (`ui-border--subtle`)                                                          |
 | `dialogPanelHeaderClasses`                     | Overlay header section chrome (`border-b` + separator token + `px-6 pt-6 pb-4`; title typography on `DialogPanelHeader`)                       |
 | `dialogPanelHeaderLeadRowClasses`              | Leading icon + copy row when `DialogPanelHeader.leadIcon` is set (`items-center`, `gap-4`)                                                     |
 | `DialogPanelHeaderNavButton`                   | Interactive header back control (shared `dialogPanelHeaderIconControlClasses` + responsive header glyph); decorative leads use `IconContainer` |
@@ -97,6 +100,10 @@ column layout.
 Overlay footer chrome does **not** set `bg-*`. The panel Content already established
 surface fill and `--surface-current`. Backdrop blur stays on page sticky
 `FormActionsBar` only — not on flex-docked overlay footers.
+
+Neutral strength is `ui-border--default`. Component states own `--ui-border-color` with
+owner-qualified selectors, so selected, invalid, and focus borders do not depend on import
+order. Fill, strength, and geometry are independently inspectable on Modal/Sheet content.
 
 Body / footer boundary:
 

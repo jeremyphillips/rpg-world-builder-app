@@ -1,0 +1,32 @@
+/*
+ * Neutral border contrast only. Formulas live on the painting element so a local
+ * --surface-current rebind participates in the computed color.
+ */
+@layer components {
+  .ui-border--subtle {
+    --ui-border-color: color-mix(
+      in oklch,
+      var(--foreground) var(--mix-border-subtle),
+      var(--surface-current)
+    );
+    border-color: var(--ui-border-color);
+  }
+
+  .ui-border--default {
+    --ui-border-color: color-mix(
+      in oklch,
+      var(--foreground) var(--mix-border-default),
+      var(--surface-current)
+    );
+    border-color: var(--ui-border-color);
+  }
+
+  .ui-border--strong {
+    --ui-border-color: color-mix(
+      in oklch,
+      var(--foreground) var(--mix-border-strong),
+      var(--surface-current)
+    );
+    border-color: var(--ui-border-color);
+  }
+}

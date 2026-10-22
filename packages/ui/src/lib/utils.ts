@@ -5,6 +5,9 @@ import {
   UI_BUTTON_APPEARANCE_CLASSES,
   UI_BUTTON_SIZE_CLASSES,
   UI_BUTTON_TEXT_GEOMETRY_CLASSES,
+  UI_BORDER_STRENGTH_CLASSES,
+  UI_DIALOG_PANEL_FILL_CLASSES,
+  UI_DIALOG_PANEL_GEOMETRY_CLASSES,
   UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,
   UI_FIELD_CONTROL_SIZE_CLASSES,
@@ -102,6 +105,9 @@ type TypographyClassGroupIds =
   | 'ui-button-size'
   | 'ui-button-appearance'
   | 'ui-button-text-geometry'
+  | 'ui-border-strength'
+  | 'ui-dialog-panel-fill'
+  | 'ui-dialog-panel-geometry'
   | 'ui-field-control-size'
   | 'ui-field-control-multiline-size'
   | 'ui-field-control-digits-size'
@@ -188,6 +194,9 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-button-size': [...UI_BUTTON_SIZE_CLASSES],
       'ui-button-appearance': [...UI_BUTTON_APPEARANCE_CLASSES],
       'ui-button-text-geometry': [...UI_BUTTON_TEXT_GEOMETRY_CLASSES],
+      'ui-border-strength': [...UI_BORDER_STRENGTH_CLASSES],
+      'ui-dialog-panel-fill': [...UI_DIALOG_PANEL_FILL_CLASSES],
+      'ui-dialog-panel-geometry': [...UI_DIALOG_PANEL_GEOMETRY_CLASSES],
       'ui-field-control-size': [...UI_FIELD_CONTROL_SIZE_CLASSES],
       'ui-field-control-multiline-size': [...UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES],
       'ui-field-control-digits-size': [...UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES],
@@ -217,6 +226,9 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-button-size': ['ui-button-size'],
       'ui-button-appearance': ['ui-button-appearance'],
       'ui-button-text-geometry': ['ui-button-text-geometry'],
+      'ui-border-strength': ['ui-border-strength'],
+      'ui-dialog-panel-fill': ['ui-dialog-panel-fill'],
+      'ui-dialog-panel-geometry': ['ui-dialog-panel-geometry'],
       'ui-field-control-size': ['ui-field-control-size'],
       'ui-field-control-multiline-size': ['ui-field-control-multiline-size'],
       'ui-field-control-digits-size': ['ui-field-control-digits-size'],

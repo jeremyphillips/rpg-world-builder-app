@@ -5,6 +5,7 @@ import {
   UI_ALERT_DENSITY_CLASSES,
 } from '../components/ui/alert.variants'
 import { UI_COMPACT_LABEL_APPEARANCE_CLASSES } from '../components/ui/badge-appearance.lib'
+import { UI_BORDER_STRENGTH_CLASSES } from '../components/ui/border-strength'
 import {
   UI_BUTTON_APPEARANCE_CLASSES,
   UI_BUTTON_SIZE_CLASSES,
@@ -61,6 +62,11 @@ function expectSameSet(actual: readonly string[], expected: readonly string[], l
 
 describe('semantic-control-class-groups sync', () => {
   it('re-exports twMerge groups from styling owners', () => {
+    expectSameSet(
+      classGroups.UI_BORDER_STRENGTH_CLASSES,
+      UI_BORDER_STRENGTH_CLASSES,
+      'border strength',
+    )
     expectSameSet(
       classGroups.UI_BUTTON_APPEARANCE_CLASSES,
       UI_BUTTON_APPEARANCE_CLASSES,

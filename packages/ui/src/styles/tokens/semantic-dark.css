@@ -16,7 +16,6 @@
   --mix-border-default: 12%;
   --mix-border-strong: 24%;
   --mix-border-selected: 30%;
-  --mix-card-border: 8%;
   --mix-sidebar-nav-item-fg: var(--mix-fg-muted);
   --mix-control-hover: 35%;
   --mix-control-selected: 22%;
@@ -116,7 +115,6 @@
   );
   --border-neutral-contrast: var(--palette-neutral-contrast);
   --border: var(--border-default);
-  --card-border: color-mix(in oklch, var(--primary) var(--mix-card-border), var(--surface-current));
   --card-selected-border: color-mix(
     in oklch,
     var(--foreground) var(--mix-border-selected),

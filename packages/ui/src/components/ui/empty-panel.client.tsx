@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 
 export type EmptyPanelProps = {
   children: ReactNode
@@ -15,5 +16,5 @@ export type EmptyPanelProps = {
  * `role="status"` or `aria-live` on a wrapper when announcement is intentional.
  */
 export function EmptyPanel({ children, className }: EmptyPanelProps) {
-  return <div className={cn('ui-empty-panel', className)}>{children}</div>
+  return <div className={cn('ui-empty-panel', borderStrength(), className)}>{children}</div>
 }

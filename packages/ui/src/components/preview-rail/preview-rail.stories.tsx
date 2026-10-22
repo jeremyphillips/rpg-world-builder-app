@@ -284,7 +284,7 @@ export const LongNameTruncation: Story = {
 export const SheetHost: Story = {
   name: 'Sheet host (plain chrome)',
   render: () => (
-    <div className="w-[21rem] rounded-md border border-card-border bg-card p-4">
+    <div className="ui-border--default w-[21rem] rounded-md border bg-card p-4">
       <PreviewRail chrome="plain">
         <PreviewRail.Identity
           media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}

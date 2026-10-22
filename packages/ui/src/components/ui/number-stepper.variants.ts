@@ -44,7 +44,7 @@ export const numberStepperButtonVariants = cva(
       appearance: {
         default: 'bg-input hover:bg-background active:bg-background',
         isolated:
-          'rounded-md border border-border-faint bg-transparent hover:bg-surface-faint active:bg-surface-subtle',
+          'rounded-md border border-border-subtle bg-transparent hover:bg-surface-faint active:bg-surface-subtle',
       },
       size: {
         xs: resolveCompactControlStepperButtonClasses('xs'),
@@ -68,7 +68,7 @@ export const numberStepperButtonVariants = cva(
 export const numberStepperInputVariants = cva(
   cn(
     'shrink-0 border-y-0 bg-input text-center text-foreground tabular-nums outline-none [appearance:textfield]',
-    'border-x border-border-faint',
+    'border-x border-border-subtle',
     '[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus-visible:ring-0',
   ),
   {

@@ -61,5 +61,6 @@ describe('insetPanelVariants', () => {
 
   it('keeps layout variants separate from surface config', () => {
     expect(insetPanelVariants({ size: 'md' })).toContain('ui-inset-panel--md')
+    expect(insetPanelClassNames({ size: 'md' })).toContain('ui-border--default')
   })
 })

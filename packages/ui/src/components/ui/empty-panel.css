@@ -2,7 +2,8 @@
 @layer components {
   .ui-empty-panel {
     border-radius: var(--radius-md);
-    border: 1px solid var(--border);
+    border-width: 1px;
+    border-style: solid;
     background-color: var(--sunken);
     color: var(--muted-foreground);
     padding-inline: calc(var(--spacing) * 3);

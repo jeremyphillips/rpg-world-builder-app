@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { resolveSurfaceClasses } from './surface.variants'
 import type { TextVariantProps } from './text.variants'
 import type { SurfaceConfig } from './visual-vocabulary.types'
@@ -89,6 +90,7 @@ export function insetPanelClassNames({
 }: InsetPanelVariantProps & { className?: string }): string {
   return cn(
     insetPanelVariants({ borderStyle, size, align }),
+    borderStrength(),
     resolveInsetPanelSurfaceClasses(surface),
     className,
   )

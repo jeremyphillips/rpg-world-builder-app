@@ -1,8 +1,5 @@
 import { cn } from '../../lib/utils'
-import {
-  resolveFieldBorderLadderToneClasses,
-  type FieldBorderLadderTone,
-} from './field-border-ladder.variants'
+import { borderStrength, type BorderStrength } from './border-strength'
 import {
   DEFAULT_DEPENDENT_SURFACE,
   resolveSurfaceClasses,
@@ -89,14 +86,14 @@ export function resolveOutlineBorderClasses(
     return OUTLINE_SEMANTIC_TONE_CLASS[tone as SemanticSurfaceTone]
   }
 
-  const ladderTone: FieldBorderLadderTone =
+  const ladderTone: BorderStrength =
     emphasis === 'faint'
-      ? 'faint'
+      ? 'subtle'
       : emphasis === 'default'
         ? 'default'
         : emphasis === 'strong'
           ? 'strong'
           : 'subtle'
 
-  return resolveFieldBorderLadderToneClasses(ladderTone)
+  return borderStrength(ladderTone)
 }

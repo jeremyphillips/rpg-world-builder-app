@@ -112,7 +112,7 @@ describe('NumberStepper', () => {
     expect(input).toHaveClass('text-foreground')
     expect(input).toHaveClass('w-[36px]')
     expect(input).toHaveClass('border-x')
-    expect(input).toHaveClass('border-border-faint')
+    expect(input).toHaveClass('border-border-subtle')
   })
 
   it('applies bordered pill styles by default', () => {

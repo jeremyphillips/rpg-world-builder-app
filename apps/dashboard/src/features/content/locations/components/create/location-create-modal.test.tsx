@@ -625,7 +625,7 @@ describe('LocationCreateModal', () => {
     const formScrollRegion = form?.querySelector('.overflow-y-auto')
     const footer = screen
       .getByRole('button', { name: 'Create building' })
-      .closest('.border-border-faint')
+      .closest('.ui-border--subtle')
 
     expect(visibilityWrapper).toHaveClass('flex', 'min-h-0', 'flex-1', 'flex-col')
     expect(form).toHaveClass('flex', 'min-h-0', 'flex-1', 'flex-col')

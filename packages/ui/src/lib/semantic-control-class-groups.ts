@@ -10,6 +10,20 @@ export {
   UI_BUTTON_SIZE_CLASSES,
   UI_BUTTON_TEXT_GEOMETRY_CLASSES,
 } from '../components/ui/button.styles'
+export { UI_BORDER_STRENGTH_CLASSES } from '../components/ui/border-strength'
+/** Inlined — `dialog-panel.variants` imports `cn()` and must not participate in the utils graph. */
+export const UI_DIALOG_PANEL_FILL_CLASSES = [
+  'ui-dialog-panel--fill-background',
+  'ui-dialog-panel--fill-card',
+  'ui-dialog-panel--fill-field-container',
+  'ui-dialog-panel--fill-surface-lift',
+] as const
+export const UI_DIALOG_PANEL_GEOMETRY_CLASSES = [
+  'ui-dialog-panel--frame',
+  'ui-dialog-panel--side-right',
+  'ui-dialog-panel--side-left',
+  'ui-dialog-panel--side-bottom',
+] as const
 /** Inlined — `card.variants` imports `cn()` and must not participate in the utils import graph. */
 export const UI_CARD_INTERACTION_CLASSES = ['ui-card--static', 'ui-card--interactive'] as const
 

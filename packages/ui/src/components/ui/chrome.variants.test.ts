@@ -12,7 +12,7 @@ import {
 
 const APPROVED_CHROME_SHELL_TOKENS = [
   'border',
-  'border-border-subtle',
+  'ui-border--subtle',
   'border-warning-muted',
   'bg-warning-faint',
   'bg-warning-subtle',
@@ -56,7 +56,7 @@ describe('chrome.variants', () => {
   it('resolves warning faint shell with neutral perimeter and faint wash', () => {
     const classes = resolveChromeShellClasses({ tone: 'warning', emphasis: 'faint' })
     expect(classes).toContain('bg-warning-faint')
-    expect(classes).toContain('border-border-subtle')
+    expect(classes).toContain('ui-border--subtle')
     expect(classes).not.toContain('bg-warning-subtle')
     expectOnlyApprovedTokens(classes, APPROVED_CHROME_SHELL_TOKENS)
   })

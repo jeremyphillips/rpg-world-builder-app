@@ -411,8 +411,8 @@ outline/panel/rail group chrome is redundant with the shared field container.
 ## Field separators
 
 `separator` on a leaf, row, or slot → trailing `border-b` before the next sibling.
-Tones follow the border ladder: `faint` (`border-border-faint`), `subtle` (`border-border-subtle`,
-default), `default` (`border-border`), `strong` (`border-border-strong`). Padding follows inherited
+Tones follow the shared border ladder: `subtle`, `default`, and `strong`. Field separators
+default to `subtle`; the legacy `faint` field option has been removed. Padding follows inherited
 stack rhythm: `pb-2` (8px) when `rhythm: 'compact'`, `pb-7` (28px) when `rhythm: 'comfortable'`.
 On a `stack` → trailing divider after the whole stack (controller + dependents region).
 Prefer stack-level `separator` for `layout: 'dependent'` blocks instead of putting it on the

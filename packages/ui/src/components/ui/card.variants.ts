@@ -1,8 +1,7 @@
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 
 /** @deprecated Dialog panel chrome — migrate to DialogPanel owner (W7). */
-export const cardBorderClasses = 'border border-card-border'
-
 export const CARD_SURFACE_TONES = ['transparent', 'quiet', 'subtle', 'strong'] as const
 export type CardSurfaceTone = (typeof CARD_SURFACE_TONES)[number]
 /** @alias CardSurfaceTone */
@@ -71,6 +70,7 @@ export function cardSurfaceVariants({
 }: CardSurfaceVariantProps = {}): string {
   return cn(
     'ui-card',
+    borderStrength(),
     cardDensityClassName(density),
     `ui-card--${tone}`,
     cardElevationClassName(elevation),

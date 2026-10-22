@@ -58,9 +58,8 @@ describe('Panel', () => {
 describe('panel.css', () => {
   it('keeps a subtle border and md radius on the transparent tone', () => {
     expect(panelCss).toMatch(/\.ui-panel\s*\{[^}]*border-radius:\s*var\(--radius-md\)/)
-    expect(panelCss).toMatch(
-      /\.ui-panel--transparent\s*\{[^}]*border-color:\s*var\(--border-subtle\)/,
-    )
+    render(<Panel>Transparent</Panel>)
+    expect(screen.getByText('Transparent')).toHaveClass('ui-border--subtle')
     expect(panelCss).not.toMatch(/--radius-card/)
   })
 

@@ -29,6 +29,6 @@ export function resolveFieldRailClasses(tone: FieldRailTone = 'border'): string 
 export function resolveDependentNestRailClasses(): string {
   return cn(
     'relative',
-    'before:absolute before:inset-y-0 before:left-0 before:w-px before:rounded-full before:bg-border-faint',
+    'before:absolute before:inset-y-0 before:left-0 before:w-px before:rounded-full before:bg-border-subtle',
   )
 }

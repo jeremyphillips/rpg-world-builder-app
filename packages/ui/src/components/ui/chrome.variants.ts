@@ -1,5 +1,6 @@
 import { cn } from '../../lib/utils'
 import { type AlertVariant, ALERT_VARIANTS } from './alert.variants'
+import { borderStrength } from './border-strength'
 import { compactLabelAppearanceToneClasses } from './compact-label.lib'
 import {
   fieldGroupBodyShellLayoutClasses,
@@ -22,10 +23,11 @@ const CHROME_ACCENT_RAIL_LAYOUT_CLASSES =
   'relative before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:rounded-full before:content-[""]'
 
 const CHROME_SHELL_RECIPE: Record<SupportedChromeKey, string> = {
-  'warning:faint': 'border border-border-subtle bg-warning-faint',
+  'warning:faint': cn('border bg-warning-faint', borderStrength('subtle')),
   'warning:subtle': 'border border-warning-muted bg-warning-subtle',
   'neutral:subtle': cn(
-    'border border-border-subtle bg-surface-muted',
+    'border bg-surface-muted',
+    borderStrength('subtle'),
     establishSurfaceCurrent('surface-muted'),
   ),
 }
@@ -37,7 +39,8 @@ const CHROME_ACCENT_RECIPE: Partial<Record<SupportedChromeKey, string>> = {
 
 const CALLOUT_ALERT_SURFACE: Record<AlertVariant, string> = {
   default: cn(
-    'border-border bg-surface-muted text-foreground',
+    borderStrength(),
+    'bg-surface-muted text-foreground',
     establishSurfaceCurrent('surface-muted'),
   ),
   info: 'border-info-muted bg-info-subtle text-foreground',

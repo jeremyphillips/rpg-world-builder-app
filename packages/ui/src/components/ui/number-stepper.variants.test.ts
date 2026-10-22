@@ -67,7 +67,7 @@ describe('numberStepperWidthVariants', () => {
   it('uses faint isolated chrome for ability score card steppers', () => {
     const classes = numberStepperButtonVariants({ appearance: 'isolated', size: 'xs' })
     expect(classes).toContain('bg-transparent')
-    expect(classes).toContain('border-border-faint')
+    expect(classes).toContain('border-border-subtle')
     expect(classes).toContain('hover:bg-surface-faint')
     expect(classes).toContain('active:bg-surface-subtle')
   })

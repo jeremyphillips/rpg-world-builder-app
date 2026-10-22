@@ -157,7 +157,7 @@ function resolveFieldContainerClasses(chrome: FieldContainerChrome): string {
     fieldShellLayoutClasses,
     'w-full',
     fieldChromePaddingContainerClasses,
-    'border-border-subtle bg-field-container',
+    'ui-border--subtle bg-field-container',
     establishSurfaceCurrent('field-container'),
   )
 }

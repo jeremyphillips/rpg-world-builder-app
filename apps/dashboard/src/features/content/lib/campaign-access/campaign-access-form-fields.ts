@@ -110,7 +110,7 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
     availabilityField: {
       kind: 'slot',
       name: 'available',
-      separator: 'faint',
+      separator: 'subtle',
       render: () =>
         createElement(CampaignAccessAvailableSwitch, {
           label: CAMPAIGN_ACCESS_AVAILABLE_LABEL,
