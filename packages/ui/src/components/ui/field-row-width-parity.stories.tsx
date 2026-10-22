@@ -1,4 +1,5 @@
 'use client'
+import { Text } from './text'
 
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -83,9 +84,9 @@ function WidthReadout({
   }, [containerRef, fieldIdsKey, revision])
 
   return (
-    <p className="font-mono text-style-caption">
+    <Text variant="caption" className="font-mono">
       widths: {widths.length ? widths.map((width) => `${width}px`).join(' · ') : '—'}
-    </p>
+    </Text>
   )
 }
 
@@ -115,10 +116,10 @@ function ParityPair({
     <section className="flex flex-col gap-3 rounded-md border border-border p-4">
       <header className="flex flex-col gap-1">
         <h3 className="text-style-label text-foreground">{title}</h3>
-        <p className="font-mono text-style-caption">
+        <Text variant="caption" className="font-mono">
           tokens: [{widths.join(', ')}] · strategy: {resolved.strategy} · tracks:{' '}
           {resolved.gridTemplateColumns}
-        </p>
+        </Text>
       </header>
 
       <div className="flex flex-col gap-2">
@@ -168,10 +169,10 @@ function ParityMatrix() {
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-style-supporting">
+      <Text variant="supporting">
         Compare measured field widths. Flex and anatomy-grid rows should match within a pixel or two
         at each container width. Phantom filler tracks are not used.
-      </p>
+      </Text>
       <div className="flex flex-wrap gap-2">
         {CONTAINER_WIDTHS.map((width) => (
           <button

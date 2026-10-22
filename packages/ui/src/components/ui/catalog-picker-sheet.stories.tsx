@@ -80,7 +80,7 @@ export const Default: Story = {
         </Button>
       </div>
     ),
-    renderItemDetails: (item) => <p className="text-style-supporting">{item.details}</p>,
+    renderItemDetails: (item) => <Text variant="supporting">{item.details}</Text>,
   },
   render: function Render(args) {
     const [open, setOpen] = useState(args.open)

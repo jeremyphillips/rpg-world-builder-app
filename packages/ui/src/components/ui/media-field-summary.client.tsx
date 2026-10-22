@@ -5,6 +5,7 @@ import { ImagePlus, Settings } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
+import { Text } from './text'
 import { ContentDisplayFallbackIcon } from './content-display-fallback-icon.client'
 import { MediaImage } from './media-image.client'
 import {
@@ -270,9 +271,9 @@ function ExpandedMediaFieldSummaryHeader({
       <div>
         <h3 className="font-medium">{label}</h3>
         {count ? (
-          <p className="text-style-supporting">
+          <Text variant="supporting">
             {count} of {maxItems} images
-          </p>
+          </Text>
         ) : null}
       </div>
       {canEdit ? (

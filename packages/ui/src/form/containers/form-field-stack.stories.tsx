@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Text } from '../components/ui/text'
 
 import { Button } from '../../components/ui/button.client'
 import { Modal } from '../../components/ui/modal.client'
@@ -41,9 +42,9 @@ function DetachedFormModalDemo() {
         <Modal.Body>
           <FormProvider {...form}>
             <FormFieldStack fields={fields} idPrefix={formId}>
-              <p className="mt-6 text-style-supporting">
+              <Text variant="supporting" className="mt-6">
                 Preview or helper copy can sit in the children slot.
-              </p>
+              </Text>
             </FormFieldStack>
           </FormProvider>
         </Modal.Body>

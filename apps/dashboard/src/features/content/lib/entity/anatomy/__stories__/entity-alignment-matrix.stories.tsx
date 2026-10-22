@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect } from 'storybook/test'
 import { useState, type ReactNode } from 'react'
+import { Text } from './text'
 
 import {
   ActionIcon,
@@ -171,7 +172,7 @@ function MatrixCard({
       onToggleCollapse={() => setCollapsed((current) => !current)}
       dragHandleProps={leading === 'grip-caret' ? mockDragHandleProps : undefined}
     >
-      <p className="text-style-supporting">Disclosed body.</p>
+      <Text variant="supporting">Disclosed body.</Text>
     </EntityCard>
   )
 }
@@ -280,7 +281,7 @@ function EdgeGeometryPair({ density }: { density: ContentCardDensity }) {
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed((current) => !current)}
         >
-          <p className="text-style-supporting">Disclosed body.</p>
+          <Text variant="supporting">Disclosed body.</Text>
         </EntityCard>
       </div>
     </div>
@@ -354,7 +355,7 @@ export const CatalogRowRadioLeading: Story = {
           entity={{ heading: 'Fireball', classification: 'Evocation' }}
           density="compact"
         >
-          <p className="text-style-supporting">Disclosed picker body.</p>
+          <Text variant="supporting">Disclosed picker body.</Text>
         </EntityCard>
       </div>
     </div>

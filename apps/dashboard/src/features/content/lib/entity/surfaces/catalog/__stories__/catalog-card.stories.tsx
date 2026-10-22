@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { Button, Text } from '@rpg/ui'
+import { Text } from './text'
 
 import { CatalogCard } from '../catalog-card'
 import { CatalogEntityPickerSheet } from '../catalog-entity-picker-sheet'
@@ -39,7 +40,7 @@ export const FlatAndDisclosureRhythm: Story = {
           description: 'Druidic Focus · 4 lb',
         }}
         trailing={{ kind: 'action', content: <Button type="button">Add</Button> }}
-        details={<p className="text-style-supporting">Spellcasting focus</p>}
+        details={<Text variant="supporting">Spellcasting focus</Text>}
       />
     </div>
   ),
@@ -126,7 +127,7 @@ export const DisclosureToggle: Story = {
             description: 'Druidic Focus · 0 lb',
           }}
           trailing={{ kind: 'action', content: <Button type="button">Add</Button> }}
-          details={<p className="text-style-supporting">Spellcasting focus</p>}
+          details={<Text variant="supporting">Spellcasting focus</Text>}
         />
       </div>
     )

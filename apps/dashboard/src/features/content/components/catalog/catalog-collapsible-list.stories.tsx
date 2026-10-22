@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { CollapsibleListItem } from '@rpg/ui'
+import { Text } from './text'
 
 import { CatalogCollapsibleList } from './catalog-collapsible-list'
 
@@ -29,7 +30,7 @@ export const Default: Story = {
           preset="catalog"
           collapsible
           header={<span className="font-medium capitalize">{item.id}</span>}
-          body={<p className="text-style-supporting">Expanded details</p>}
+          body={<Text variant="supporting">Expanded details</Text>}
         />
       )}
     />

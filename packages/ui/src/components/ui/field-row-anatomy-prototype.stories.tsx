@@ -1,4 +1,5 @@
 'use client'
+import { Text } from './text'
 
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -201,10 +202,10 @@ function StabilitySequenceHarness() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-style-supporting">
+      <Text variant="supporting">
         Invariant: control top edges move only when the shared label track grows (step 5). Hints and
         errors must not move sibling controls.
-      </p>
+      </Text>
       <div className="flex flex-wrap gap-2">
         {STABILITY_STEPS.map((item) => (
           <button

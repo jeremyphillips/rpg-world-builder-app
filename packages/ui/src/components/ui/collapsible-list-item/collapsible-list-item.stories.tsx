@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
+import { Text } from './text'
 
 import { Button } from '../button.client'
 import { Text } from '../text'
@@ -122,7 +123,7 @@ export const CompoundApi: Story = {
         summary={<span className="text-style-caption">Optional summary</span>}
       />
       <CollapsibleListItem.Body>
-        <p className="text-style-supporting">Compound body slot</p>
+        <Text variant="supporting">Compound body slot</Text>
       </CollapsibleListItem.Body>
     </CollapsibleListItem.Root>
   ),

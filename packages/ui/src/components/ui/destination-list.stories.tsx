@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent } from 'storybook/test'
+import { Text } from './text'
 
 import { InlineMetadata } from './inline-metadata'
 import { Card } from './card'
@@ -234,11 +235,11 @@ export const SurfaceInteractionParity: Story = {
   render: () => (
     <div className="grid gap-10">
       <section className="space-y-2" data-testid="parity-light">
-        <p className="text-style-label">Light</p>
+        <Text variant="label">Light</Text>
         <SurfaceInteractionParityBlock testIdPrefix="parity-light" />
       </section>
       <section className="dark space-y-2 rounded-lg bg-background p-4" data-testid="parity-dark">
-        <p className="text-style-label">Dark</p>
+        <Text variant="label">Dark</Text>
         <SurfaceInteractionParityBlock testIdPrefix="parity-dark" />
       </section>
     </div>

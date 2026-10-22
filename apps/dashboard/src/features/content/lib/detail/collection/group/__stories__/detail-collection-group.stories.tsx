@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Text } from './text'
 
 import { DetailEntityRow } from '../../../row/entity/detail-entity-row'
 import { DetailCollectionGroup } from '../detail-collection-group'
@@ -48,7 +49,7 @@ export const InsidePanel: Story = {
           </button>
         }
       >
-        <p className="text-style-supporting">No direct locations yet.</p>
+        <Text variant="supporting">No direct locations yet.</Text>
       </DetailCollectionGroup>
     </DetailCollectionPanel>
   ),

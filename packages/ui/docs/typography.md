@@ -117,7 +117,9 @@ Paragraph copy uses `<Text variant="…">`. Non-paragraph elements (`span`, `dt`
 and CVA branches use the matching `text-style-*` utility. `className` on `Text` is
 for layout (`truncate`, `mt-2`) and allowed color corrections on `label`
 (`text-foreground`, `text-destructive`) — never `text-style-*` utilities on `Text`
-(`packages/ui/src/lib/typography/text-style-stack-ratchet.repo.test.ts` enforces this).
+(`packages/ui/src/lib/typography/text-style-stack-ratchet.repo.test.ts` enforces this). Raw
+`<p>` tags must not carry `text-style-*`, `font-body-emphasis`, or `heading-style-*` in
+`className` — use `<Text>` or `<Heading>` instead (same ratchet).
 
 Form hints and errors inside `Field.*`, `Form`, and field wrappers already compose
 field typography — do not re-add `text-sm text-muted-foreground` on those surfaces.

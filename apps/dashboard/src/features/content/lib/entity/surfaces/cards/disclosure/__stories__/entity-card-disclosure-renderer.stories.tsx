@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
+import { Text } from './text'
 
 import { ActionIcon, iconGhostControlVariants } from '@rpg/ui'
 
@@ -144,9 +145,9 @@ export const BodyEndInsetInvariant: Story = {
           defaultCollapsed={false}
           trailing={entry.trailing}
         >
-          <p className="bg-surface-subtle text-style-supporting">
+          <Text variant="supporting" className="bg-surface-subtle">
             Domain content — right edge uses density inset only.
-          </p>
+          </Text>
         </EntityCardDisclosureRenderer>
       ))}
     </div>

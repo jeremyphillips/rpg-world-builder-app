@@ -1,4 +1,4 @@
-import { Alert, Button } from '@rpg/ui'
+import { Alert, Button, Text } from '@rpg/ui'
 import type { Notification } from '@rpg/contracts'
 import type { FilterSchema } from '@rpg/ui/filters'
 
@@ -37,7 +37,7 @@ export function NotificationInboxHeader({
 }: NotificationInboxHeaderProps) {
   return (
     <div className="space-y-3">
-      <p className="text-style-supporting">{NOTIFICATION_COPY.inboxDescription}</p>
+      <Text variant="supporting">{NOTIFICATION_COPY.inboxDescription}</Text>
 
       {invalidScopeNotice?.show ? (
         <Alert

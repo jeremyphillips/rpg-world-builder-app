@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { Heading } from './heading'
+import { Text } from './text'
+
 import { ScrollBoundaryRegion } from './scroll-boundary-region.client'
 
 const meta = {
@@ -17,8 +20,10 @@ function ScrollBoundaryRegionDemo() {
   return (
     <div className="flex w-[21rem] flex-col rounded-lg border border-border-subtle bg-field-container [--surface-current:var(--field-container)]">
       <div className="border-b border-border-subtle px-4 py-4">
-        <p className="heading-style-card">Header</p>
-        <p className="text-style-supporting">Fixed section above the scroll boundary.</p>
+        <Heading variant="card" as="p">
+          Header
+        </Heading>
+        <Text variant="supporting">Fixed section above the scroll boundary.</Text>
       </div>
       <ScrollBoundaryRegion className="max-h-48">
         <div className="space-y-3 px-4 py-4">
@@ -30,7 +35,9 @@ function ScrollBoundaryRegionDemo() {
         </div>
       </ScrollBoundaryRegion>
       <div className="border-t border-border-subtle px-4 py-4">
-        <p className="text-sm font-body-emphasis text-foreground">Footer</p>
+        <Text variant="emphasis" className="text-foreground">
+          Footer
+        </Text>
       </div>
     </div>
   )

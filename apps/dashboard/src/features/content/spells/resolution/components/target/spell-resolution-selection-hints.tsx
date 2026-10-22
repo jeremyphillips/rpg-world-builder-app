@@ -1,3 +1,4 @@
+import { Text } from '@rpg/ui'
 import { useWatch } from 'react-hook-form'
 
 import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
@@ -6,7 +7,7 @@ import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
 import { SPELL_AREA_GEOMETRY_NONE } from '../../../lib/spell-form-labels'
 
 function SelectionHint({ children }: { children: string }) {
-  return <p className="text-style-supporting">{children}</p>
+  return <Text variant="supporting">{children}</Text>
 }
 
 /** Mode-specific static copy for the Selection panel. */

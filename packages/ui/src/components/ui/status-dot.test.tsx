@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { StatusDot } from './status-dot'
+import { Text } from './text'
 
 describe('StatusDot', () => {
   it('renders a decorative dot by default', () => {
@@ -17,9 +18,9 @@ describe('StatusDot', () => {
 
   it('spaces dot and label with gap-1.5 and inherits label typography', () => {
     render(
-      <p className="text-style-caption">
+      <Text variant="caption">
         <StatusDot tone="success" label="Active" />
-      </p>,
+      </Text>,
     )
 
     const label = screen.getByText('Active')

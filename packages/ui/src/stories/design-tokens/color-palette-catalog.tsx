@@ -24,7 +24,6 @@ import {
   colorPaletteGroupHeaderClasses,
   colorPaletteGroupSectionClasses,
   colorPaletteHeaderClasses,
-  colorPaletteMonoLabelClasses,
   colorPaletteOnSurfaceCellClasses,
   colorPaletteOnSurfaceGridClasses,
   colorPaletteOnSurfacePageClasses,
@@ -130,9 +129,17 @@ function ColorSwatch({ token }: { token: ColorToken }) {
         <Text variant="body" className="text-base font-medium">
           {token.name}
         </Text>
-        <p className="font-mono text-sm leading-relaxed text-foreground">{token.cssVar}</p>
-        <p className={colorPaletteMonoLabelClasses}>{token.tailwind}</p>
-        {resolved ? <p className={colorPaletteMonoLabelClasses}>{resolved}</p> : null}
+        <Text variant="caption" className="font-mono text-sm leading-relaxed text-foreground">
+          {token.cssVar}
+        </Text>
+        <Text variant="caption" className="font-mono leading-relaxed">
+          {token.tailwind}
+        </Text>
+        {resolved ? (
+          <Text variant="caption" className="font-mono leading-relaxed">
+            {resolved}
+          </Text>
+        ) : null}
       </figcaption>
     </figure>
   )
@@ -226,7 +233,9 @@ function SurfacePanel({ surface, children }: { surface: SurfaceBackground; child
         <Heading variant="subsection" as="h3" id={`surface-${surface.id}`}>
           On {surface.label}
         </Heading>
-        <p className="font-mono text-style-supporting">{surface.cssVar}</p>
+        <Text variant="supporting" className="font-mono">
+          {surface.cssVar}
+        </Text>
       </div>
       <div
         className={cn(
@@ -262,7 +271,9 @@ function OnSurfaceSwatch({ token }: { token: ColorToken }) {
           )}
           style={{ borderColor: `var(${token.cssVar})` }}
         />
-        <p className={colorPaletteMonoLabelClasses}>{token.cssVar}</p>
+        <Text variant="caption" className="font-mono leading-relaxed">
+          {token.cssVar}
+        </Text>
       </div>
     )
   }
@@ -282,14 +293,17 @@ function OnSurfaceSwatch({ token }: { token: ColorToken }) {
               : undefined
           }
         >
-          <p
-            className={cn('truncate text-style-label', token.tailwind)}
+          <Text
+            variant="label"
+            className={cn('truncate', token.tailwind)}
             style={{ color: `var(${token.cssVar})` }}
           >
             {token.name}
-          </p>
+          </Text>
         </div>
-        <p className={colorPaletteMonoLabelClasses}>{token.cssVar}</p>
+        <Text variant="caption" className="font-mono leading-relaxed">
+          {token.cssVar}
+        </Text>
       </div>
     )
   }
@@ -304,7 +318,9 @@ function OnSurfaceSwatch({ token }: { token: ColorToken }) {
         )}
         style={{ backgroundColor: `var(${token.cssVar})` }}
       />
-      <p className={colorPaletteMonoLabelClasses}>{token.cssVar}</p>
+      <Text variant="caption" className="font-mono leading-relaxed">
+        {token.cssVar}
+      </Text>
     </div>
   )
 }

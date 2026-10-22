@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Text } from './text'
 
 import { DialogPanelScrollRegion } from './dialog-panel-scroll-region.client'
 import { dialogPanelHeaderClasses } from './dialog-panel.variants'
@@ -17,7 +18,7 @@ function OverlayScrollDemo() {
     <div className="flex h-64 w-full max-w-md flex-col overflow-hidden rounded-lg border bg-background">
       <div className={dialogPanelHeaderClasses}>
         <h2 className="text-lg font-semibold">Overlay header</h2>
-        <p className="text-style-supporting">Pinned above the scrollport.</p>
+        <Text variant="supporting">Pinned above the scrollport.</Text>
       </div>
       <DialogPanelScrollRegion>
         {Array.from({ length: 16 }, (_, index) => (

@@ -198,10 +198,12 @@ function SurfaceChromeMatrix() {
                 AV
               </div>
               <div className="space-y-1">
-                <p className="text-style-label text-foreground">Nearby label</p>
-                <p className="text-style-supporting">
+                <Text variant="label" className="text-foreground">
+                  Nearby label
+                </Text>
+                <Text variant="supporting">
                   Muted copy stays on card plane — avatar fill does not rebind.
-                </p>
+                </Text>
               </div>
             </div>
           </Card>
@@ -222,7 +224,7 @@ function SurfaceChromeMatrix() {
               text.
             </Text>
             <div className="rounded-md border border-border-subtle p-3">
-              <p className="text-style-supporting">Muted option label</p>
+              <Text variant="supporting">Muted option label</Text>
               <p className="text-sm text-foreground-subtle">Subtle helper copy</p>
             </div>
           </div>

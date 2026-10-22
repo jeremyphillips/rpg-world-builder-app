@@ -9,6 +9,7 @@ import {
 } from '@rpg/ui'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
+import { Text } from './text'
 
 import { DrawerShell } from './drawer-shell'
 import { drawerShellBodyVariants } from './drawer-shell.variants'
@@ -83,8 +84,8 @@ export const WithEntityContext: Story = {
       entityContext={
         <div className="flex min-w-0 items-center justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-style-body-emphasis">Shortsword</p>
-            <p className="text-style-caption text-muted-foreground">Simple · Melee</p>
+            <Text variant="emphasis">Shortsword</Text>
+            <Text variant="caption">Simple · Melee</Text>
           </div>
           <Text variant="muted">Qty 1</Text>
         </div>

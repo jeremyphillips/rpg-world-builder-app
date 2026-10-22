@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Text } from './text'
 
 import { DetailCollectionPanel } from '../detail-collection-panel'
 import { EntityRowList } from '../../../../entity/row-list/entity-row-list'
@@ -40,7 +41,9 @@ export const WithPanelAction: Story = {
         </button>
       }
     >
-      <p className="px-4 py-2 text-style-supporting">No contained locations yet.</p>
+      <Text variant="supporting" className="px-4 py-2">
+        No contained locations yet.
+      </Text>
     </DetailCollectionPanel>
   ),
 }

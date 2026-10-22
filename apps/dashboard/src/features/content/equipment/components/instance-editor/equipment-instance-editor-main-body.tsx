@@ -247,7 +247,7 @@ function AdjustmentsSection({
       <Heading variant="label" as="label">
         {EQUIPMENT_ADJUSTMENTS_SECTION_HEADING}
       </Heading>
-      <p className="text-style-caption">{equipmentAdjustmentsSectionDescription()}</p>
+      <Text variant="caption">{equipmentAdjustmentsSectionDescription()}</Text>
       {(draft.adjustments ?? []).map((row) => (
         <EntityCard
           density="compact"
