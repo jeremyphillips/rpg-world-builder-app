@@ -1364,7 +1364,6 @@ export {
 export { tableHeaderRowClasses, tableHeaderRowVariants } from './components/ui/table.variants'
 export {
   Badge,
-  badgeVariants,
   type BadgeAppearance,
   type BadgeProps,
   type BadgeSize,

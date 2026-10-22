@@ -76,7 +76,9 @@ For each migrated primitive, verify in Storybook DevTools:
 
 ## Compact label
 
-`ui-compact-label` is the Badge and Chip shell. The block border is 1px. `--{sm,md,lg}` set height and type. `--{outline|soft|strong}-{tone}` set `--ui-compact-label-bg`, `--ui-compact-label-fg`, and `--ui-compact-label-border` with the same longhand list. `--selected`, `--interactive`, and `--subdued` are states. Chip dismiss is `__remove`. twMerge groups: `ui-compact-label-size`, `ui-compact-label-appearance`.
+`ui-compact-label` is the Badge and Chip shell. The block border is 1px; block `gap` owns icon/text spacing. `--{sm,md,lg}` set height and type. `--{outline|soft|strong}-{tone}` set `--ui-compact-label-bg`, `--ui-compact-label-fg`, and `--ui-compact-label-border` with the same longhand list. `--subdued` mutes copy; `--selected` and `--interactive` are chip states (unselected interactive chips use dedicated hover rules in CSS). `--counter` tightens numeric badges; `--removable-{sm,md,lg}` adjust trailing padding for dismiss controls. Chip dismiss is `__remove`. ClassReference specs derive from `COMPACT_LABEL_CLASS_SPECS` / resolvers. twMerge groups: `ui-compact-label-size`, `ui-compact-label-appearance`.
+
+Overlay notification counts use `ui-notification-unread-badge` (not compact-label geometry).
 
 ## Alert
 

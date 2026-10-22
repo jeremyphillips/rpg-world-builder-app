@@ -2,7 +2,6 @@
 
 import { AlertTriangle } from 'lucide-react'
 
-import { cn } from '../../lib/utils'
 import { Badge } from './badge'
 
 export interface ValidationIssueCountBadgeProps {
@@ -22,7 +21,7 @@ export function ValidationIssueCountBadge({ count, className }: ValidationIssueC
       layout="counter"
       aria-hidden
       leadingIcon={<AlertTriangle aria-hidden />}
-      className={cn('gap-1', className)}
+      className={className}
     >
       {count}
     </Badge>

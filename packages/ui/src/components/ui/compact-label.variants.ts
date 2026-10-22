@@ -9,6 +9,7 @@ import {
   type CompactLabelSize,
   type CompactLabelTone,
 } from './compact-label.lib'
+import { badgeLayoutVariants } from './badge.variants'
 import {
   resolveCompactControlIconCompactSmClasses,
   resolveCompactControlRecipeClasses,
@@ -131,6 +132,107 @@ export function resolveCompactLabelClassName({
 }
 
 export type CompactLabelVariants = VariantProps<typeof compactLabelVariants>
+
+export type CompactLabelClassSpec = {
+  key: string
+  className: string
+  keyValues: string
+  useCase: string
+}
+
+export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
+  {
+    key: 'badge / outline / neutral / md',
+    className: resolveCompactLabelClassName({
+      size: 'md',
+      appearance: 'outline',
+      tone: 'neutral',
+    }),
+    keyValues: 'transparent fill, neutral outline foreground',
+    useCase: 'Default metadata badge',
+  },
+  {
+    key: 'badge / soft / destructive / sm',
+    className: resolveCompactLabelClassName({
+      size: 'sm',
+      appearance: 'soft',
+      tone: 'destructive',
+      filled: true,
+    }),
+    keyValues: 'semantic destructive soft fill',
+    useCase: 'Compact table or rail status',
+  },
+  {
+    key: 'badge / strong / info / md',
+    className: resolveCompactLabelClassName({
+      size: 'md',
+      appearance: 'strong',
+      tone: 'info',
+      filled: true,
+    }),
+    keyValues: 'semantic info strong fill',
+    useCase: 'High-emphasis classification',
+  },
+  {
+    key: 'badge / subdued / neutral soft / sm',
+    className: resolveCompactLabelClassName({
+      size: 'sm',
+      appearance: 'soft',
+      tone: 'neutral',
+      emphasis: 'subdued',
+      filled: true,
+    }),
+    keyValues: 'muted foreground, soft neutral well',
+    useCase: 'Exhausted or completed labels',
+  },
+  {
+    key: 'badge / counter / destructive soft / sm',
+    className: cn(
+      resolveCompactLabelClassName({
+        size: 'sm',
+        appearance: 'soft',
+        tone: 'destructive',
+        filled: true,
+      }),
+      badgeLayoutVariants({ layout: 'counter' }),
+    ),
+    keyValues: 'tabular nums, min-width, tight padding-inline',
+    useCase: 'Issue or validation counts',
+  },
+  {
+    key: 'chip / selectable / unselected / md',
+    className: resolveCompactLabelClassName({
+      size: 'md',
+      interactive: true,
+      selected: false,
+    }),
+    keyValues: 'interactive base; hover uses control-hover',
+    useCase: 'ChipsField toggle (off)',
+  },
+  {
+    key: 'chip / selectable / selected / md',
+    className: resolveCompactLabelClassName({
+      size: 'md',
+      interactive: true,
+      selected: true,
+      filled: true,
+    }),
+    keyValues: 'selected-control fill',
+    useCase: 'ChipsField toggle (on)',
+  },
+  {
+    key: 'chip / removable / neutral soft / md',
+    className: resolveCompactLabelClassName({
+      size: 'md',
+      appearance: 'soft',
+      tone: 'neutral',
+      filled: true,
+      removable: true,
+    }),
+    keyValues: 'removable padding-end; dismiss is __remove',
+    useCase: 'Combobox selected value',
+  },
+]
 
 export const chipRemoveButtonVariants = cva(
   cn(

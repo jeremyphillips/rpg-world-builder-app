@@ -34,6 +34,7 @@
 @import '../components/ui/panel.css';
 @import '../components/ui/empty-panel.css';
 @import '../components/ui/compact-label.css';
+@import '../components/ui/notification-unread-badge.css';
 @import '../components/ui/alert.css';
 
 @plugin '@tailwindcss/typography';

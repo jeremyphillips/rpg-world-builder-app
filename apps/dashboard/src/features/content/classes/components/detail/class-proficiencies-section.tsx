@@ -2,11 +2,8 @@ import { Heading, Text } from '@rpg/ui'
 import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import { LinkBadge, StaticBadge } from '@/lib/link-badge'
 
-import {
-  ContentLinkBadge,
-  ContentStaticBadge,
-} from '../../../lib/detail/metadata/content-link-badge'
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import { contentDetailSectionPanelContentHeadingClasses } from '../../../lib/detail/page/content-detail-section.variants'
 import {
@@ -83,11 +80,11 @@ function SkillChoiceLinks({
         return (
           <li key={slug}>
             {skill ? (
-              <ContentLinkBadge to={ROUTES.content.skillProficiencies.detail(campaignId, skill.id)}>
+              <LinkBadge to={ROUTES.content.skillProficiencies.detail(campaignId, skill.id)}>
                 {skill.name}
-              </ContentLinkBadge>
+              </LinkBadge>
             ) : (
-              <ContentStaticBadge>{slug}</ContentStaticBadge>
+              <StaticBadge>{slug}</StaticBadge>
             )}
           </li>
         )

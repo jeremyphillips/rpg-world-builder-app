@@ -13,7 +13,7 @@ import {
   ContentDetailSection,
   ContentDetailSectionItem,
 } from '../../lib/detail/page/content-detail-section'
-import { ContentLinkBadge, ContentStaticBadge } from '../../lib/detail/metadata/content-link-badge'
+import { LinkBadge, StaticBadge } from '@/lib/link-badge'
 import { SPELL_SECTION_LABELS, type SpellDetailViewModel } from '../lib/spell-display'
 
 const SPELL_CLASSES_HEADING_ID = 'spell-classes-heading'
@@ -48,11 +48,11 @@ function SpellClassesList({
             return (
               <li key={item.slug}>
                 {cls ? (
-                  <ContentLinkBadge to={ROUTES.content.classes.detail(campaignId, cls.id)}>
+                  <LinkBadge to={ROUTES.content.classes.detail(campaignId, cls.id)}>
                     {cls.name}
-                  </ContentLinkBadge>
+                  </LinkBadge>
                 ) : (
-                  <ContentStaticBadge>{item.label}</ContentStaticBadge>
+                  <StaticBadge>{item.label}</StaticBadge>
                 )}
               </li>
             )
@@ -73,7 +73,7 @@ function SpellTagsSection({
       <ul className="flex flex-wrap gap-2" role="list">
         {section.labels.map((label) => (
           <li key={label}>
-            <ContentStaticBadge>{label}</ContentStaticBadge>
+            <StaticBadge>{label}</StaticBadge>
           </li>
         ))}
       </ul>

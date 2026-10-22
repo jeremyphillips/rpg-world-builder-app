@@ -119,7 +119,6 @@ function CreateModalShellIssueBadge({ count }: { count: number | undefined }) {
           layout="counter"
           aria-hidden
           leadingIcon={<AlertTriangle aria-hidden />}
-          className="gap-1"
         >
           !
         </Badge>

@@ -1,7 +1,7 @@
 import { Heading, RichTextContent } from '@rpg/ui'
 
 import { RichTextWithTables } from '../../components/rich-text/rich-text-with-tables'
-import { ContentStaticBadge } from '../../lib/detail/metadata/content-link-badge'
+import { StaticBadge } from '@/lib/link-badge'
 import {
   ContentStatList,
   type ContentStatRowSize,
@@ -56,7 +56,7 @@ export function SpellDetailMetadata({
           <ul className="flex flex-wrap gap-2" role="list">
             {viewModel.tagLabels.map((label) => (
               <li key={label}>
-                <ContentStaticBadge>{label}</ContentStaticBadge>
+                <StaticBadge>{label}</StaticBadge>
               </li>
             ))}
           </ul>
@@ -71,7 +71,7 @@ export function SpellDetailMetadata({
           <ul className="flex flex-wrap gap-2" role="list">
             {viewModel.classLabels.map((label) => (
               <li key={label}>
-                <ContentStaticBadge>{label}</ContentStaticBadge>
+                <StaticBadge>{label}</StaticBadge>
               </li>
             ))}
           </ul>

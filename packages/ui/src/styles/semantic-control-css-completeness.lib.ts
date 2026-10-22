@@ -621,6 +621,40 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
           requiredProperties: ['background-color', 'color', 'border-color', 'font-weight'] as const,
         })),
       ),
+      {
+        modifierPrefix: 'ui-compact-label--subdued',
+        requiredProperties: ['color'] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--selected',
+        requiredProperties: ['border-color', 'background-color', 'color'] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--interactive',
+        requiredProperties: ['cursor'] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--counter',
+        requiredProperties: [
+          'min-width',
+          'justify-content',
+          'padding-inline',
+          'font-variant-numeric',
+          'line-height',
+        ] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--removable-sm',
+        requiredProperties: ['padding-inline-end'] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--removable-md',
+        requiredProperties: ['padding-inline-end'] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--removable-lg',
+        requiredProperties: ['padding-inline-end'] as const,
+      },
     ],
   },
 ]

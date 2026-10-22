@@ -2,8 +2,9 @@
 
 import { AlertTriangle } from 'lucide-react'
 
+import { badgeLayoutVariants } from '../../../components/ui/badge.variants'
+import { resolveCompactLabelClassName } from '../../../components/ui/compact-label.variants'
 import { cn } from '../../../lib/utils'
-import { Badge } from '../../../components/ui/badge'
 import type { ArrayItemIssueGroup } from '../../errors/form-issue.types'
 import {
   arrayItemIssueSummaryClasses,
@@ -24,7 +25,12 @@ function arrayLegendIssueLabel(issueCount: number, invalidRowCount: number): str
   return `${issueCountLabel(issueCount)} in ${rowLabel}`
 }
 
-export interface ArrayItemIssueBadgeProps {
+const arrayItemIssueButtonFocusClasses = cn(
+  'ui-focus-ring',
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+)
+
+export interface ArrayItemIssueButtonProps {
   issueCount: number
   rowLabel: string
   onPress?: () => void
@@ -32,36 +38,47 @@ export interface ArrayItemIssueBadgeProps {
   prominence?: ArrayItemIssueProminence
 }
 
-export function ArrayItemIssueBadge({
+/** Array row issue affordance — compact-label styling on a `button`, not `Badge`. */
+export function ArrayItemIssueButton({
   issueCount,
   rowLabel,
   onPress,
   compact = false,
   prominence: _prominence = 'nav',
-}: ArrayItemIssueBadgeProps) {
+}: ArrayItemIssueButtonProps) {
   if (issueCount <= 0) return null
 
   return (
-    <Badge
-      asChild
-      appearance="soft"
-      tone="destructive"
-      size="sm"
-      className={cn('h-6 shrink-0 gap-1', compact && 'mt-0')}
+    <button
+      type="button"
+      aria-label={`${issueCountLabel(issueCount)} in ${rowLabel}`}
+      onClick={onPress}
+      className={cn(
+        resolveCompactLabelClassName({
+          size: 'sm',
+          appearance: 'soft',
+          tone: 'destructive',
+          filled: true,
+          className: cn(
+            'shrink-0',
+            compact && 'mt-0',
+            badgeLayoutVariants({ layout: compact ? 'counter' : 'label' }),
+          ),
+        }),
+        arrayItemIssueButtonFocusClasses,
+      )}
     >
-      <button
-        type="button"
-        aria-label={`${issueCountLabel(issueCount)} in ${rowLabel}`}
-        onClick={onPress}
-      >
-        <AlertTriangle className="size-icon-inline" aria-hidden />
-        <span className={compact ? 'tabular-nums' : undefined}>
-          {compact ? issueCountCompactLabel(issueCount) : issueCountLabel(issueCount)}
-        </span>
-      </button>
-    </Badge>
+      <AlertTriangle className="size-icon-inline" aria-hidden />
+      <span className={compact ? 'tabular-nums' : undefined}>
+        {compact ? issueCountCompactLabel(issueCount) : issueCountLabel(issueCount)}
+      </span>
+    </button>
   )
 }
+
+/** @deprecated Use `ArrayItemIssueButton` */
+export const ArrayItemIssueBadge = ArrayItemIssueButton
+export type ArrayItemIssueBadgeProps = ArrayItemIssueButtonProps
 
 export interface ArrayItemIssueSummaryProps {
   group: Pick<ArrayItemIssueGroup, 'totalCount' | 'sortedIssues' | 'headerIssues' | 'fieldSummary'>

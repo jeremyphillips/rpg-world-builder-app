@@ -9,7 +9,6 @@ import { resolveCompactLabelClassName } from './compact-label.variants'
 import { badgeIconGlyphClasses } from './icon-glyph.variants'
 
 export {
-  badgeVariants,
   type BadgeAppearance,
   type BadgeLayout,
   type BadgeSize,
