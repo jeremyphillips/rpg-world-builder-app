@@ -94,9 +94,11 @@ Orthogonal row fills — not layout:
 | `selectable`  | Editor/selection list rows | `hover:bg-row-hover` |
 | `navigation`  | Destination/link hub rows  | `hover:bg-muted`     |
 
+`InteractiveList` rows use `--hover-list` and the shared surface ladder (`--ui-surface-hover-bg` / `--ui-surface-pressed-bg` / `--ui-surface-selected-bg`), not `ui-card` chrome. Action menus use `ui-menu-item` only — see [interactive-list-rows.md](./interactive-list-rows.md).
+
 Sortable drag opacity: `dragSurfaceVariants` on the wrapper — not `interactiveRowVariants`.
 
-Hosts keep inset, separators, border footprint, and left-rail accents locally.
+Hosts keep inset, separators, border footprint, and left-rail accents locally (list rows only for the accent rail).
 
 ### Drag
 

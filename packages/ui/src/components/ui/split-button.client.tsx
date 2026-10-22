@@ -14,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './dropdown-menu.client'
-import { InteractiveList } from './interactive-list.client'
 import { MenuChoiceRow } from './menu-choice-row.client'
 import { interactiveListChoiceMenuContentClasses } from './dropdown-menu-choice.variants'
 import {
@@ -104,18 +103,16 @@ export function SplitButton({
               <React.Fragment key={group.id}>
                 {groupIndex > 0 ? <DropdownMenuSeparator /> : null}
                 {group.label ? <DropdownMenuLabel>{group.label}</DropdownMenuLabel> : null}
-                <InteractiveList>
-                  {group.items.map((item) => (
-                    <MenuChoiceRow
-                      key={item.id}
-                      heading={item.label}
-                      supporting={item.description}
-                      supportingWrap={item.description != null}
-                      disabled={item.disabled}
-                      onSelect={() => item.onSelect()}
-                    />
-                  ))}
-                </InteractiveList>
+                {group.items.map((item) => (
+                  <MenuChoiceRow
+                    key={item.id}
+                    heading={item.label}
+                    supporting={item.description}
+                    supportingWrap={item.description != null}
+                    disabled={item.disabled}
+                    onSelect={() => item.onSelect()}
+                  />
+                ))}
               </React.Fragment>
             ))}
           </DropdownMenuContent>

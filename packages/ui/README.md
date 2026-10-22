@@ -187,7 +187,7 @@ Picker-like rows share one visual system (`InteractiveListSize` owns row geometr
 - **`InteractiveListRow`** — row frame, highlight/selected wash, `startSlot` / `endSlot` / `trailingAction`.
 - **`IdentityRow`** — heading, classification, supporting copy (typography subordinate to `InteractiveListSize`).
 - **`ComboboxOptionRow`** — `listbox` / `option` with required `selected` → `aria-selected`.
-- **`MenuChoiceRow`** — `menuitem`; highlight from Radix `data-[highlighted]` only (no `aria-selected`).
+- **`MenuChoiceRow`** — `menuitem` on `ui-menu-item`; optional description via `DropdownMenuItemContent`; not `InteractiveList`.
 - **`InteractiveListPanel`** — neutral scroll body; compositions set `listbox` or `menu` on the host.
 - **`InteractiveList`** — row-list surface + `interactiveListRowSeparatorClasses` (`[&>*+*]:border-t` + `border-border-faint`); wrap row adapters only, not headings/separators.
 

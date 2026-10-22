@@ -834,7 +834,6 @@ export {
   interactiveListVariants,
   interactiveListRowChromeVariants,
   interactiveListRowMainVariants,
-  menuChoiceItemResetVariants,
   type InteractiveListSize,
 } from './components/ui/interactive-list.variants'
 export {

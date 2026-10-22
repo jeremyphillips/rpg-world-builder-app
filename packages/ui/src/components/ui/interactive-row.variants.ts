@@ -9,9 +9,6 @@ import {
   UI_INTERACTIVE_ROW_HOVER_CLASS,
   UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_SELECTED_CLASS,
   UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_UNSELECTED_CLASS,
-  UI_INTERACTIVE_ROW_MENU_HIGHLIGHT_CLASS,
-  UI_INTERACTIVE_ROW_MENU_RAIL_CLASS,
-  UI_INTERACTIVE_ROW_MENU_RESET_CLASS,
   UI_INTERACTIVE_ROW_RAIL_CLASS,
   UI_INTERACTIVE_ROW_SELECTED_CLASS,
   UI_INTERACTIVE_ROW_STATE_CLASS,
@@ -25,7 +22,7 @@ export const selectableRowPointerHoverClasses = cn(
 
 export const selectableRowHighlightFillClasses = UI_INTERACTIVE_ROW_HIGHLIGHT_CLASS
 
-/** Pointer hover for `InteractiveListRow` — panel flush with `--background`. */
+/** Pointer hover for `InteractiveListRow` — mixes from the list shell `--ui-surface-bg`. */
 export const selectableRowListPointerHoverClasses = cn(
   UI_INTERACTIVE_ROW_BLOCK_CLASS,
   UI_INTERACTIVE_ROW_HOVER_CLASS.list,
@@ -37,22 +34,8 @@ export const selectableRowListHighlightUnselectedClasses =
 export const selectableRowListHighlightSelectedClasses =
   UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_SELECTED_CLASS
 
-export const selectableRowMenuHighlightFillClasses = UI_INTERACTIVE_ROW_MENU_HIGHLIGHT_CLASS
-
 /** Accent rail for keyboard/list highlight — independent of row-hover fill. */
 export const selectableRowHighlightRailClasses = UI_INTERACTIVE_ROW_RAIL_CLASS
-
-export const selectableRowMenuHighlightRailClasses = UI_INTERACTIVE_ROW_MENU_RAIL_CLASS
-
-/**
- * Clears generic menu-item chrome before selectable-row highlight.
- * Focus and hover utilities stay so they win over DropdownMenuItem via `cn()`.
- */
-export const menuChoiceRowItemResetClasses = cn(
-  UI_INTERACTIVE_ROW_MENU_RESET_CLASS,
-  'rounded-none shadow-none outline-none',
-  'focus:bg-transparent focus:text-foreground',
-)
 
 /**
  * Orthogonal row interaction policy — capability (hover), semantic state, and selection fills.

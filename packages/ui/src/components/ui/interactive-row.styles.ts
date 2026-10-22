@@ -43,9 +43,6 @@ export const UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_UNSELECTED_CLASS =
 export const UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_SELECTED_CLASS =
   'ui-interactive-row--highlight-list-selected' as const
 export const UI_INTERACTIVE_ROW_RAIL_CLASS = 'ui-interactive-row--rail' as const
-export const UI_INTERACTIVE_ROW_MENU_HIGHLIGHT_CLASS = 'ui-interactive-row--menu-highlight' as const
-export const UI_INTERACTIVE_ROW_MENU_RAIL_CLASS = 'ui-interactive-row--menu-rail' as const
-export const UI_INTERACTIVE_ROW_MENU_RESET_CLASS = 'ui-interactive-row--menu-reset' as const
 export const UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS = 'ui-interactive-row--fill-surface' as const
 
 export type InteractiveRowClassSpec = {

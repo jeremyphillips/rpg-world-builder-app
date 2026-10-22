@@ -3,15 +3,13 @@ import { describe, expect, it } from 'vitest'
 import {
   interactiveRowVariants,
   selectableRowHighlightFillClasses,
-  selectableRowMenuHighlightFillClasses,
   selectableRowPointerHoverClasses,
 } from './interactive-row.variants'
 
 describe('selectable row recipe constants', () => {
-  it('uses semantic row classes for pointer, highlight, and menu highlight fills', () => {
+  it('uses semantic row classes for pointer and highlight fills', () => {
     expect(selectableRowPointerHoverClasses).toContain('ui-interactive-row--hover-selectable')
     expect(selectableRowHighlightFillClasses).toBe('ui-interactive-row--highlight')
-    expect(selectableRowMenuHighlightFillClasses).toBe('ui-interactive-row--menu-highlight')
     expect(selectableRowPointerHoverClasses).not.toContain('control-hover')
   })
 })

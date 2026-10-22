@@ -6,7 +6,6 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-  InteractiveList,
   MenuChoiceRow,
   cn,
 } from '@rpg/ui'
@@ -69,18 +68,16 @@ export function EntityActionChoiceMenu({
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent align="end" className={cn(entityActionChoiceMenuContentClasses)}>
         {menuHeading ? <DropdownMenuLabel>{menuHeading}</DropdownMenuLabel> : null}
-        <InteractiveList>
-          {items.map((item) => (
-            <MenuChoiceRow
-              key={item.id}
-              heading={item.label}
-              supporting={item.description}
-              supportingWrap
-              disabled={item.disabled}
-              onSelect={() => item.onSelect()}
-            />
-          ))}
-        </InteractiveList>
+        {items.map((item) => (
+          <MenuChoiceRow
+            key={item.id}
+            heading={item.label}
+            supporting={item.description}
+            supportingWrap
+            disabled={item.disabled}
+            onSelect={() => item.onSelect()}
+          />
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   )

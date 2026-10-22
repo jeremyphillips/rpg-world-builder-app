@@ -66,7 +66,6 @@ export function InteractiveListRow({
   )
 
   const shellClassName = interactiveListRowChromeVariants({
-    host: 'row',
     highlighted,
     selected,
     disabled,

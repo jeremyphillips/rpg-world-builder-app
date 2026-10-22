@@ -68,13 +68,13 @@ Visual row recipes (`InteractiveListRow`, `InteractiveListSize`, slots) are shar
 primitives — not ad-hoc menu item class stacks. Menu rows derive highlight/wash from Radix
 `data-[highlighted]` only (no parallel `:hover` rail on `MenuChoiceRow`).
 
-| Mode                                    | Visual chrome                                                                        | Semantic host                                  | Text                                           |
-| --------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------- | ---------------------------------------------- |
-| Combobox / true single-select           | `InteractiveList` + `ComboboxOptionRow`                                              | `listbox` / `option`, truthful `aria-selected` | `IdentityRow`                                  |
-| Action choice menu / split-button items | `InteractiveList` + `MenuChoiceRow` inside `interactiveListChoiceMenuContentClasses` | `menu` / `menuitem`                            | `IdentityRow` when the item has identity copy  |
-| Search hit                              | `InteractiveListRow` slots                                                           | link                                           | `IdentityRow`                                  |
-| Detail / relationship section           | `DetailEntityRow` / `EntityRowList`                                                  | section row                                    | EntitySummary parts → `IdentityRowHeadingLine` |
-| Bordered catalog + disclosure           | `CatalogCard` / `EntityCard` disclosure                                              | card / disclosure                              | anatomy + card frame                           |
+| Mode                                    | Visual chrome                                                                                             | Semantic host                                  | Text                                           |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
+| Combobox / true single-select           | `InteractiveList` + `ComboboxOptionRow`                                                                   | `listbox` / `option`, truthful `aria-selected` | `IdentityRow`                                  |
+| Action choice menu / split-button items | `MenuChoiceRow` (`ui-menu-item` + optional description) in `dropdownMenuChoiceContentClasses` width shell | `menu` / `menuitem`                            | `DropdownMenuItemContent` label + description  |
+| Search hit                              | `InteractiveListRow` slots                                                                                | link                                           | `IdentityRow`                                  |
+| Detail / relationship section           | `DetailEntityRow` / `EntityRowList`                                                                       | section row                                    | EntitySummary parts → `IdentityRowHeadingLine` |
+| Bordered catalog + disclosure           | `CatalogCard` / `EntityCard` disclosure                                                                   | card / disclosure                              | anatomy + card frame                           |
 
 Campaign-unavailable search hits use entity `inactive` status in the identity status slot
 only — not a duplicate trailing badge.

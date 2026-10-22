@@ -1,22 +1,13 @@
-import { cva } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
 import { resolveCompactControlMenuItemClasses } from './compact-control.styles'
-import {
-  interactiveListMenuHostClasses,
-  interactiveListPanelVariants,
-} from './interactive-list.variants'
 
 /** Viewport-safe choice menu width — target ~300px, shrink on narrow viewports. */
 export const dropdownMenuChoiceContentClasses =
   'w-[min(var(--popover-choice-menu-width),calc(100vw-2rem))]'
 
-/** Choice menus — shared panel shell + viewport width (replaces `bg-field-container p-1`). */
-export const interactiveListChoiceMenuContentClasses = cn(
-  interactiveListPanelVariants({ triggerWidth: 'fit' }),
-  dropdownMenuChoiceContentClasses,
-  interactiveListMenuHostClasses,
-)
+/** Rich action menus (split-button chevron, entity choice menus). */
+export const interactiveListChoiceMenuContentClasses = dropdownMenuChoiceContentClasses
 
 export const dropdownMenuChoiceItemVariants = cva('h-auto items-start', {
   variants: {
@@ -30,6 +21,10 @@ export const dropdownMenuChoiceItemVariants = cva('h-auto items-start', {
     size: 'md',
   },
 })
+
+export type DropdownMenuChoiceItemVariantsProps = VariantProps<
+  typeof dropdownMenuChoiceItemVariants
+>
 
 /** @deprecated Prefer `dropdownMenuChoiceItemVariants({ size })`. */
 export const dropdownMenuChoiceItemClasses = dropdownMenuChoiceItemVariants({ size: 'md' })

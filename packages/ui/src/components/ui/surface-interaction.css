@@ -8,7 +8,9 @@
     .ui-card--subtle,
     .ui-card--strong
   ),
-  .ui-destination-list--filled.ui-destination-list--tone-strong {
+  .ui-destination-list--filled.ui-destination-list--tone-strong,
+  .ui-interactive-list,
+  .ui-interactive-list__panel {
     --ui-surface-hover-bg: color-mix(
       in oklch,
       var(--ui-surface-bg) 94%,

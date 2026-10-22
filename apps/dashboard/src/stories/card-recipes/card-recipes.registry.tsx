@@ -767,7 +767,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     name: 'Menu choice row',
     section: 'ui-list-rows',
     component: 'MenuChoiceRow',
-    chain: ['MenuChoiceRow', 'DropdownMenuItem', 'IdentityRow'],
+    chain: ['MenuChoiceRow', 'DropdownMenuItem', 'DropdownMenuItemContent'],
     useWhen: 'Action menus — open the trigger to inspect the row.',
     density: 'fixed',
     leading: 'none',
@@ -781,10 +781,8 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <InteractiveList>
-            <MenuChoiceRow heading="Fireball" supporting="Spell · Level 3" onSelect={noop} />
-            <MenuChoiceRow heading="Shield" supporting="Spell · Level 1" onSelect={noop} />
-          </InteractiveList>
+          <MenuChoiceRow heading="Fireball" supporting="Spell · Level 3" onSelect={noop} />
+          <MenuChoiceRow heading="Shield" supporting="Spell · Level 1" onSelect={noop} />
         </DropdownMenuContent>
       </DropdownMenu>
     ),

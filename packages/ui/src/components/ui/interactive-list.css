@@ -7,7 +7,9 @@
   .ui-interactive-list {
     margin: 0;
     list-style: none;
-    background-color: var(--surface-lift);
+    --ui-surface-bg: var(--surface-lift);
+    --surface-current: var(--ui-surface-bg);
+    background-color: var(--ui-surface-bg);
     padding: 0;
   }
 
@@ -49,11 +51,12 @@
     overflow: hidden;
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
-    background-color: var(--background);
+    --ui-surface-bg: var(--background);
+    --surface-current: var(--ui-surface-bg);
+    background-color: var(--ui-surface-bg);
     padding: 0;
     color: var(--foreground);
     outline: none;
-    --surface-current: var(--background);
   }
 
   .ui-interactive-list__panel--match {

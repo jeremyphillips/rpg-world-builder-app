@@ -8,13 +8,10 @@ import {
   UI_INTERACTIVE_ROW_STATE_CLASS,
 } from './interactive-row.styles'
 import {
-  menuChoiceRowItemResetClasses,
   selectableRowHighlightRailClasses,
   selectableRowListHighlightSelectedClasses,
   selectableRowListHighlightUnselectedClasses,
   selectableRowListPointerHoverClasses,
-  selectableRowMenuHighlightFillClasses,
-  selectableRowMenuHighlightRailClasses,
 } from './interactive-row.variants'
 
 export type InteractiveListSize = 'sm' | 'md' | 'lg'
@@ -88,14 +85,6 @@ export const interactiveListRowChromeVariants = cva(
   cn('ui-interactive-list__row', UI_INTERACTIVE_ROW_BLOCK_CLASS),
   {
     variants: {
-      host: {
-        row: '',
-        menuitem: cn(
-          'cursor-pointer outline-none',
-          selectableRowMenuHighlightFillClasses,
-          selectableRowMenuHighlightRailClasses,
-        ),
-      },
       highlighted: {
         true: '',
         false: '',
@@ -115,7 +104,6 @@ export const interactiveListRowChromeVariants = cva(
     },
     compoundVariants: [
       {
-        host: 'row',
         highlighted: true,
         selected: false,
         className: cn(
@@ -124,31 +112,22 @@ export const interactiveListRowChromeVariants = cva(
         ),
       },
       {
-        host: 'row',
         highlighted: true,
         selected: true,
         className: cn(selectableRowListHighlightSelectedClasses, selectableRowHighlightRailClasses),
       },
       {
-        host: 'row',
         interactive: true,
         selected: false,
         className: selectableRowListPointerHoverClasses,
       },
       {
-        host: 'row',
         selected: true,
         interactive: true,
         className: UI_INTERACTIVE_ROW_HOVER_CLASS.selected,
       },
-      {
-        host: 'menuitem',
-        interactive: true,
-        className: '',
-      },
     ],
     defaultVariants: {
-      host: 'row',
       highlighted: false,
       selected: false,
       disabled: false,
@@ -178,17 +157,6 @@ export const interactiveListRowMainVariants = cva('ui-interactive-list__main', {
 
 /** Trailing action column — sibling to the main hit area, never nested inside it. */
 export const interactiveListRowTrailingActionVariants = cva('ui-interactive-list__trailing')
-
-/**
- * Radix menuitem reset — clears default menuitem focus chrome.
- * Row padding comes from `ui-interactive-list__main--*`, which `cn()` prefers over `px`/`py`.
- */
-export const menuChoiceItemResetVariants = cva(
-  cn(
-    'h-auto w-full border-0 text-inherit [&_svg]:pointer-events-none [&_svg]:shrink-0',
-    menuChoiceRowItemResetClasses,
-  ),
-)
 
 export type InteractiveListGroupHeadingVariantProps = VariantProps<
   typeof interactiveListGroupHeadingVariants

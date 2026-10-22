@@ -37,7 +37,7 @@
   }
 
   .ui-interactive-row--hover-selected {
-    --ui-row-bg-hover: var(--row-selected-bg);
+    --ui-row-bg-hover: var(--ui-surface-selected-bg);
   }
 
   .ui-interactive-row--hover-surface {
@@ -45,7 +45,7 @@
   }
 
   .ui-interactive-row--hover-list {
-    --ui-row-bg-hover: var(--background);
+    --ui-row-bg-hover: var(--ui-surface-hover-bg);
   }
 
   /* --- Selected fill (mutually exclusive) --- */
@@ -66,7 +66,7 @@
   }
 
   .ui-interactive-row--fill-surface {
-    --ui-row-bg: var(--surface-subtle);
+    --ui-row-bg: var(--ui-surface-selected-bg);
     --ui-row-border: var(--ui-row-state-border, transparent);
   }
 
@@ -135,61 +135,28 @@
   }
 
   .ui-interactive-row--highlight-list {
-    background-color: var(--background);
+    background-color: var(--ui-surface-hover-bg);
   }
 
   .ui-interactive-row--highlight-list-selected {
-    background-color: var(--row-selected-bg);
+    background-color: var(--ui-surface-selected-bg);
   }
 
-  .ui-interactive-row--rail,
-  .ui-interactive-row--menu-rail {
+  .ui-interactive-list
+    .ui-interactive-row--hover-list:not(.ui-interactive-row--state-disabled):active {
+    background-color: var(--ui-surface-pressed-bg);
+  }
+
+  .ui-interactive-row--rail {
     position: relative;
   }
 
-  .ui-interactive-row--rail::before,
-  .ui-interactive-row--menu-rail::before {
+  .ui-interactive-row--rail::before {
     content: '';
     position: absolute;
     inset-block: 0;
     inset-inline-start: 0;
     width: 2px;
     background-color: var(--accent);
-  }
-
-  .ui-interactive-row--menu-rail::before {
-    background-color: transparent;
-  }
-
-  .ui-interactive-row--menu-rail[data-highlighted]::before {
-    background-color: var(--accent);
-  }
-
-  .ui-interactive-row--menu-highlight[data-highlighted],
-  .ui-interactive-row--menu-highlight[data-highlighted]:hover,
-  .ui-interactive-row--menu-highlight[data-highlighted]:focus {
-    background-color: var(--row-hover-bg);
-    color: var(--foreground);
-  }
-
-  .ui-interactive-row--menu-reset {
-    height: auto;
-    width: 100%;
-    border-width: 0;
-    border-radius: 0;
-    box-shadow: none;
-    outline: none;
-    color: inherit;
-  }
-
-  .ui-interactive-row--menu-reset:hover,
-  .ui-interactive-row--menu-reset:focus {
-    background-color: transparent;
-    color: var(--foreground);
-  }
-
-  .ui-interactive-row--menu-reset[data-highlighted]:focus {
-    background-color: var(--row-hover-bg);
-    color: var(--foreground);
   }
 }

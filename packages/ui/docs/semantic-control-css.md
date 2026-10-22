@@ -54,7 +54,7 @@ For each migrated primitive, verify in Storybook DevTools:
 | State     | `--state-default`, `--state-inactive`, `--state-disabled`                                                         | `--ui-row-border-style`, `--ui-row-state-border`        |
 | Data      | `--data-none`, `--data-selected`, `--data-checked`                                                                | `--ui-row-bg-data-selected`, `--ui-row-bg-data-checked` |
 
-`ui-interactive-list` owns the list surface and adjacent-sibling borders. `__panel`, `__toolbar`, `__main--{sm,md,lg}` own panel chrome, toolbar chrome, and row padding. `shadow-md` stays a utility on the panel. twMerge groups: `ui-interactive-row-hover`, `ui-interactive-row-selected`, `ui-interactive-list-row-size` (the size group also drops `px`/`py`/`p`).
+`ui-interactive-list` owns the list surface, `--ui-surface-bg`, adjacent-sibling borders, and shared hover/pressed mixes (with `surface-interaction.css`). `__panel`, `__toolbar`, `__main--{sm,md,lg}` own panel chrome, toolbar chrome, and row padding. List rows use `--rail` for keyboard highlight only — not action menus. State precedence → [interactive-list-rows.md](./interactive-list-rows.md). `shadow-md` stays a utility on the panel. twMerge groups: `ui-interactive-row-hover`, `ui-interactive-row-selected`, `ui-interactive-list-row-size` (the size group also drops `px`/`py`/`p`).
 
 ## Card, inset panel, and empty panel
 
@@ -90,7 +90,7 @@ Overlay notification counts use `ui-notification-unread-badge` (not compact-labe
 
 ## Popover content
 
-`ui-popover-content--{menu,popover,tooltip,filter}` owns fill, padding, and `--surface-current`. `ui-menu-item` owns menu row chrome, including focus and open highlight. Radix motion stays utilities (`popoverContentMotionClasses`, `tooltipContentMotionClasses`). Panel elevation stays `shadow-md` / `shadow-lg`.
+`ui-popover-content--{menu,popover,tooltip,filter}` owns fill, padding, and `--surface-current`. `ui-menu-item` owns action menu row chrome: optional icon, label, optional description (`__text`, `__label`, `__description`), `data-highlighted` / focus wash, and submenu `data-state="open"` accent. Not `InteractiveList` — see [interactive-list-rows.md](./interactive-list-rows.md). Radix motion stays utilities (`popoverContentMotionClasses`, `tooltipContentMotionClasses`). Panel elevation stays `shadow-md` / `shadow-lg`.
 
 ## When CVA vs CSS
 

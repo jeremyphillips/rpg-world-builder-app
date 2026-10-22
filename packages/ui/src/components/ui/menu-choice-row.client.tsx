@@ -3,15 +3,12 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { DropdownMenuItemContent } from './dropdown-menu-item-content'
 import { DropdownMenuItem } from './dropdown-menu.client'
-import { IdentityRow } from './identity-row.client'
-import { identityRowHeadingVariants } from './identity-row.variants'
-import type { InteractiveListSize } from './interactive-list.variants'
 import {
-  interactiveListRowChromeVariants,
-  interactiveListRowMainVariants,
-  menuChoiceItemResetVariants,
-} from './interactive-list.variants'
+  dropdownMenuChoiceItemVariants,
+  type DropdownMenuChoiceItemVariantsProps,
+} from './dropdown-menu-choice.variants'
 
 export type MenuChoiceRowProps = Omit<
   React.ComponentPropsWithoutRef<typeof DropdownMenuItem>,
@@ -20,10 +17,10 @@ export type MenuChoiceRowProps = Omit<
   heading: React.ReactNode
   supporting?: React.ReactNode
   supportingWrap?: boolean
-  size?: InteractiveListSize
+  size?: NonNullable<DropdownMenuChoiceItemVariantsProps['size']>
 }
 
-/** Action menu row — highlight from Radix `data-[highlighted]` only. Not for listboxes. */
+/** Action menu row with optional description — `ui-menu-item` only, not for listboxes. */
 export const MenuChoiceRow = React.forwardRef<
   React.ComponentRef<typeof DropdownMenuItem>,
   MenuChoiceRowProps
@@ -31,32 +28,18 @@ export const MenuChoiceRow = React.forwardRef<
   { heading, supporting, supportingWrap = false, size = 'md', className, disabled, ...props },
   ref,
 ) {
-  const hasIdentityCopy = supporting != null && supporting !== ''
-
   return (
     <DropdownMenuItem
       ref={ref}
       disabled={disabled}
-      className={cn(
-        menuChoiceItemResetVariants(),
-        interactiveListRowChromeVariants({ host: 'menuitem', interactive: false }),
-        interactiveListRowMainVariants({ size, interactive: false }),
-        className,
-      )}
+      className={cn(dropdownMenuChoiceItemVariants({ size }), className)}
       {...props}
     >
-      {hasIdentityCopy ? (
-        <IdentityRow
-          heading={heading}
-          supporting={supporting}
-          supportingWrap={supportingWrap}
-          className="min-w-0 flex-1 flex-none"
-        />
-      ) : (
-        <span className={cn('min-w-0 flex-1 truncate text-left', identityRowHeadingVariants())}>
-          {heading}
-        </span>
-      )}
+      <DropdownMenuItemContent
+        label={heading}
+        description={supporting}
+        descriptionWrap={supportingWrap}
+      />
     </DropdownMenuItem>
   )
 })
