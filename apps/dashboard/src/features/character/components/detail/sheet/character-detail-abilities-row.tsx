@@ -5,7 +5,10 @@ import { Panel } from '@rpg/ui'
 import { AbilityScoreCard, AbilityScoreNumeric } from '@/components/ability-score'
 
 import type { CharacterAbilityTile } from '../../../lib/display/character-display'
-import { characterDetailAbilitiesRowClasses } from './character-detail-sheet.variants'
+import {
+  characterDetailAbilitiesRowClasses,
+  characterDetailStatTileCompactWidthClasses,
+} from './character-detail-sheet.variants'
 
 export type CharacterDetailAbilityScoreEditor = {
   abilityScores: Partial<Record<Ability, number>>
@@ -33,7 +36,7 @@ export function CharacterDetailAbilitiesRow({
             typeof editorScore === 'number' ? editorScore : Number.parseInt(ability.score, 10)
 
           return (
-            <div key={ability.id} className="w-25 shrink-0">
+            <div key={ability.id} className={characterDetailStatTileCompactWidthClasses}>
               {abilityScoreEditor ? (
                 <AbilityScoreNumeric
                   ability={abilityId}

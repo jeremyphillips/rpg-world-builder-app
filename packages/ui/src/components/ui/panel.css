@@ -51,4 +51,10 @@
     --surface-current: var(--surface-faint);
     background-color: var(--ui-surface-bg);
   }
+
+  /** Inset for sections inside a bleed panel (inherits density vars from the host). */
+  .ui-panel-section-inset {
+    padding-block: var(--ui-surface-inset-block, calc(var(--spacing) * 3));
+    padding-inline: var(--ui-surface-inset-inline, calc(var(--spacing) * 5));
+  }
 }

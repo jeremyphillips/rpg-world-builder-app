@@ -45,7 +45,7 @@ export function QuickNpcBuildCard({
   return (
     <section className={className ?? 'flex flex-col gap-y-3'}>
       <Eyebrow size="md">{model.sectionEyebrow}</Eyebrow>
-      <Panel tone="quiet" density="comfortable" className="flex flex-col gap-y-4">
+      <Panel as="article" tone="quiet" density="comfortable" className="flex flex-col gap-y-4">
         {model.showTemplateIdentity && model.templateLabel ? (
           <BuildCardTemplateIdentity
             templateLabel={model.templateLabel}

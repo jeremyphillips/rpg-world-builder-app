@@ -75,6 +75,12 @@ describe('panel.css', () => {
     expect(panelCss).toMatch(/\.ui-panel--bleed\s*\{[^}]*padding-block:\s*0/)
   })
 
+  it('exposes section inset for bleed panel children', () => {
+    expect(panelCss).toMatch(
+      /\.ui-panel-section-inset\s*\{[^}]*padding-inline:\s*var\(--ui-surface-inset-inline/,
+    )
+  })
+
   it('publishes the shared density inset on panel density classes', () => {
     expect(copyScaleCss).toContain('.ui-panel--compact')
     expect(copyScaleCss).toContain('.ui-panel--comfortable')

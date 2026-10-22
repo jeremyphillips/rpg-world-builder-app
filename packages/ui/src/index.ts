@@ -575,6 +575,7 @@ export {
   PANEL_DENSITIES,
   PANEL_TONES,
   panelVariants,
+  panelSectionInsetClasses,
   type PanelDensity,
   type PanelTone,
   type PanelVariantProps,

@@ -33,3 +33,6 @@ export const panelVariants = cva('ui-panel', {
 })
 
 export type PanelVariantProps = VariantProps<typeof panelVariants>
+
+/** Padding for sections inside a bleed `Panel` (inherits `--ui-surface-inset-*` from host density). */
+export const panelSectionInsetClasses = 'ui-panel-section-inset'

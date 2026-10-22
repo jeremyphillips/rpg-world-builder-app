@@ -12,7 +12,7 @@ import {
   type StartingPackageConversionPreview,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-import { Button, Checkbox, Eyebrow, Text } from '@rpg/ui'
+import { Button, Checkbox, Eyebrow, panelSectionInsetClasses, Text, cn } from '@rpg/ui'
 
 import { EntityCard } from '@/features/content'
 import { useEquipmentSelectionFacts } from '../../../hooks/use-equipment-selection-facts'
@@ -136,7 +136,7 @@ export function EquipmentPackageConversionEditor({
         </Text>
       </div>
 
-      <div className="space-y-4 px-4 py-4">
+      <div className={cn(panelSectionInsetClasses, 'space-y-4')}>
         <Text as="p" variant="caption">
           {formatConversionBudgetLine(preview)}
         </Text>

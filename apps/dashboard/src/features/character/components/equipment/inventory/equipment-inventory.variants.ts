@@ -1,5 +1,7 @@
+import { cn, panelSectionInsetClasses } from '@rpg/ui'
+
 /** Section inset inside the bleed inventory panel. The host does not pad again. */
-export const equipmentInventorySectionClasses = 'space-y-3 px-4 py-4'
+export const equipmentInventorySectionClasses = cn(panelSectionInsetClasses, 'space-y-3')
 
 export {
   EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,
