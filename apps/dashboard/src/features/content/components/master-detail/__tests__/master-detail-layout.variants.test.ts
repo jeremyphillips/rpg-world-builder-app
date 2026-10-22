@@ -42,7 +42,16 @@ describe('master-detail layout variants', () => {
 
   it('keeps the detail shell content-sized', () => {
     expect(masterDetailEditorShellClasses).toContain('self-start')
+    expect(masterDetailEditorShellClasses).toContain('ui-panel--quiet')
+    expect(masterDetailEditorShellClasses).toContain('ui-panel--bleed')
     expect(masterDetailEditorShellClasses).not.toContain('h-full')
     expect(masterDetailEditorShellClasses).not.toContain('overflow-y-auto')
+    expect(masterDetailEditorShellClasses).not.toContain('bg-field-container')
+  })
+
+  it('uses a bleed quiet panel for the list shell', () => {
+    expect(masterDetailListShellClasses).toContain('ui-panel--quiet')
+    expect(masterDetailListShellClasses).toContain('ui-panel--bleed')
+    expect(masterDetailListShellClasses).not.toContain('bg-field-container')
   })
 })

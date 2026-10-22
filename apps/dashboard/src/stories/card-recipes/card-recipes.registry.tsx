@@ -384,9 +384,9 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     name: 'Equipment acquisition resource panel',
     section: 'ui-cards-form-rows',
     component: 'EquipmentResourceSummary',
-    chain: ['DividedStack', 'EntityAnatomyHost', 'EntityAnatomy', 'RowAnatomyCell'],
+    chain: ['Panel', 'DividedStack', 'EntityAnatomyHost', 'EntityAnatomy', 'RowAnatomyCell'],
     useWhen:
-      'Builder equipment step and picker header: budget and magic-item grant rows in one ad hoc panel frame.',
+      'Builder equipment step and picker header: budget and magic-item grant rows in one Panel. DividedStack owns the dividers.',
     density: 'fixed',
     leading: 'resource media',
     trailing: 'action (band)',
@@ -501,9 +501,9 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     name: 'Builder choice section',
     section: 'ui-cards-form-rows',
     component: 'ChoiceSection',
-    chain: ['collection panel shell', 'ChoiceSectionHeader', 'EntityCard'],
+    chain: ['Panel', 'ChoiceSectionHeader', 'EntityCard'],
     useWhen:
-      'Interactive builder choice wells — collection panel host (not Card) wraps header, dividers, and entity selected rows.',
+      'Interactive builder choice wells — Panel (not Card) wraps header, dividers, and entity selected rows.',
     density: 'comfortable',
     leading: 'none',
     trailing: 'add action (header)',

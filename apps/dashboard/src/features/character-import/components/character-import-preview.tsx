@@ -1,7 +1,5 @@
 import type { CharacterImportResult } from '@rpg/contracts/character-import'
-import { cn, Heading } from '@rpg/ui'
-
-import { collectionPanelLedgerBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+import { Heading, Panel } from '@rpg/ui'
 
 import {
   EXTRACTION_FIELD_KEYS,
@@ -27,8 +25,7 @@ export function CharacterImportPreview({ result }: CharacterImportPreviewProps) 
         <Heading variant="section" as="h2" id="character-import-extraction-heading">
           Extracted data
         </Heading>
-        <div className={cn(collectionPanelLedgerBodyClasses, 'mt-3')}>
-          {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+        <Panel tone="subtle" density="compact" className="mt-3">
           {EXTRACTION_FIELD_KEYS.map((field) => (
             <CharacterImportPreviewRow
               key={field}
@@ -42,7 +39,7 @@ export function CharacterImportPreview({ result }: CharacterImportPreviewProps) 
           <CharacterImportEquipmentPreviewSection result={result.extraction.equipment} />
           <CharacterImportSpellsPreviewSection result={result.extraction.spells} />
           <CharacterImportProficienciesPreviewSection result={result.extraction.proficiencies} />
-        </div>
+        </Panel>
       </section>
 
       <CharacterImportDispositionReport dispositions={result.dispositions} />

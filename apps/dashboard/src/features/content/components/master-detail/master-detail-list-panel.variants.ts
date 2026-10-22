@@ -1,8 +1,8 @@
 import {
   cn,
-  establishSurfaceCurrent,
   interactiveFocusVariants,
   interactiveRowVariants,
+  panelVariants,
   scrollBoundaryRegionRootClasses,
 } from '@rpg/ui'
 
@@ -17,9 +17,9 @@ export const masterDetailListChromeBlockSizeContractClasses =
 
 /** Bordered collection shell for the master rail. */
 export const masterDetailListShellClasses = cn(
-  'sticky top-[var(--rpg-form-sticky-tabs-block-size,0px)] flex min-h-[min(8rem,var(--master-detail-shell-max-block-size))] flex-col self-start overflow-hidden rounded-lg border bg-field-container text-foreground md:min-h-[min(12rem,var(--master-detail-shell-max-block-size))]',
+  panelVariants({ tone: 'quiet', density: 'comfortable', bleed: true }),
+  'sticky top-[var(--rpg-form-sticky-tabs-block-size,0px)] flex min-h-[min(8rem,var(--master-detail-shell-max-block-size))] flex-col self-start overflow-hidden text-foreground md:min-h-[min(12rem,var(--master-detail-shell-max-block-size))]',
   masterDetailRailBorderClasses,
-  establishSurfaceCurrent('field-container'),
   masterDetailListChromeBlockSizeContractClasses,
   'master-detail-list-shell-viewport-cap',
 )

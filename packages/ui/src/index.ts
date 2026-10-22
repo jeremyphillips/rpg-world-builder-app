@@ -570,6 +570,15 @@ export {
 } from './components/ui/attention-frame.client'
 export { attentionFrameVariants } from './components/ui/attention-frame.variants'
 export { DividedStack, type DividedStackProps } from './components/ui/divided-stack'
+export { Panel, type PanelElement, type PanelProps } from './components/ui/panel'
+export {
+  PANEL_DENSITIES,
+  PANEL_TONES,
+  panelVariants,
+  type PanelDensity,
+  type PanelTone,
+  type PanelVariantProps,
+} from './components/ui/panel.variants'
 export {
   DIVIDED_STACK_DENSITIES,
   dividedStackVariants,

@@ -1,4 +1,4 @@
-import { cn, establishSurfaceCurrent, interactiveFocusVariants } from '@rpg/ui'
+import { cn, interactiveFocusVariants, panelVariants } from '@rpg/ui'
 import { formTabbedPreviewRailCompactTriggerHiddenClasses } from '@rpg/ui/form'
 
 /**
@@ -121,8 +121,8 @@ export const characterBuilderStepRailItemLabelActiveClasses = 'font-semibold tex
 export const characterBuilderStepRailIconClasses = 'shrink-0'
 
 export const characterBuilderStepPanelClasses = cn(
-  'min-h-full min-w-0 space-y-4 rounded-lg border border-border bg-surface-lift p-6',
-  establishSurfaceCurrent('surface-lift'),
+  panelVariants({ tone: 'quiet', density: 'spacious' }),
+  'min-h-full min-w-0 space-y-4',
   characterBuilderStepPanelBelowHeaderOffsetClasses,
 )
 

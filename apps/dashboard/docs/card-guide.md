@@ -29,7 +29,7 @@ Use this guide to pick a surface. It covers generic `@rpg/ui` components and das
 | Inline / text navigation                                                                  | `Link` (`@rpg/ui`)                     | [button-link.md](../../../packages/ui/docs/button-link.md)                                                                                     |
 | Advisory callout                                                                          | `Alert`                                | [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md) — `announcement="none"` for persistent copy                                 |
 | Empty gate or placeholder well                                                            | `InsetPanel` / `EmptyPanel`            | [empty-state-containers.md](../../../packages/ui/docs/empty-state-containers.md)                                                               |
-| Bordered host, ledger, or nav rail                                                        | Collection-panel tokens                | [`collection-panel-shell.variants.ts`](../src/lib/collection-panel/collection-panel-shell.variants.ts) — ad hoc until a shared panel exists    |
+| Bordered host, ledger, or nav rail                                                        | `Panel` (`@rpg/ui`)                    | [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md) — structural grouping; not a Card, Alert, or `InsetPanel`                   |
 
 **Also common (links only):**
 
@@ -43,7 +43,7 @@ Use this guide to pick a surface. It covers generic `@rpg/ui` components and das
 
 ## Generic Card vs EntityCard
 
-**`Card`** — declarative `header` / `footer`, optional cover media, tone and elevation, whole-card `link`. The surface is one content object: a title with its body. A border, padding, and fill are not enough — a host, ledger, nav rail, empty gate, or list row belongs to collection-panel chrome, `InsetPanel`, `Alert`, or `EntityCard`. Use **`Alert`** for semantic status (warning, destructive, …), not Card tone. Density-aware heading badges, footer/actions, and Card vs Alert selection: [row-anatomy.md](../../../packages/ui/docs/row-anatomy.md#heading-accessories) and [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md#card-footer-labeled-actions).
+**`Card`** — declarative `header` / `footer`, optional cover media, tone and elevation, whole-card `link`. The surface is one content object: a title with its body. A border, padding, and fill are not enough — a host, ledger, or nav rail belongs to `Panel`. An empty gate belongs to `InsetPanel`. Status belongs to `Alert`. Entity identity belongs to `EntityCard`. Use **`Alert`** for semantic status (warning, destructive, …), not Card tone. Density-aware heading badges, footer/actions, and Card vs Alert selection: [row-anatomy.md](../../../packages/ui/docs/row-anatomy.md#heading-accessories) and [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md#card-footer-labeled-actions).
 
 **`EntityCard`** — `entity` model, optional semantic `leading` / `trailing` on non-navigable static cards. Optional whole-card `link` on static cards (no interactive slots). Disclosure supports optional `headingHref` on the title only. Static by default; set `variant="disclosure"` for expandable body content. Closed presentation API (no ad-hoc padding or class overrides).
 

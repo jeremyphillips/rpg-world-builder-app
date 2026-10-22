@@ -1,12 +1,5 @@
-import { cn } from '@rpg/ui'
-
-import { collectionPanelComfortableInsetClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
-
-/** Section inset inside the inventory collection host. */
-export const equipmentInventorySectionClasses = cn(
-  collectionPanelComfortableInsetClasses,
-  'space-y-3',
-)
+/** Section inset inside the bleed inventory panel. The host does not pad again. */
+export const equipmentInventorySectionClasses = 'space-y-3 px-4 py-4'
 
 export {
   EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,

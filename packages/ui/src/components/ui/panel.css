@@ -1,0 +1,54 @@
+/*
+ * Structural panel. Tone owns fill and border. Density inset is padding on
+ * `.ui-panel` itself (variables from copy-scale.css). No overflow clipping.
+ * Nest tone modifiers as `&.ui-panel--quiet`.
+ */
+@layer components {
+  .ui-panel {
+    border-radius: var(--radius-md);
+    border-style: solid;
+    border-width: 1px;
+    padding-block: var(--ui-surface-inset-block);
+    padding-inline: var(--ui-surface-inset-inline);
+    background-color: transparent;
+  }
+
+  .ui-panel--bleed {
+    padding-block: 0;
+    padding-inline: 0;
+  }
+
+  .ui-panel--transparent {
+    border-color: var(--border-subtle);
+    background-color: transparent;
+    --ui-surface-bg: transparent;
+  }
+
+  .ui-panel--quiet {
+    border-color: var(--border);
+    --ui-surface-bg: var(--surface-lift);
+    --surface-current: var(--surface-lift);
+    background-color: var(--ui-surface-bg);
+  }
+
+  .ui-panel--subtle {
+    border-color: var(--border);
+    --ui-surface-bg: var(--surface-subtle);
+    --surface-current: var(--surface-subtle);
+    background-color: var(--ui-surface-bg);
+  }
+
+  .ui-panel--strong {
+    border-color: var(--border);
+    --ui-surface-bg: var(--surface-strong);
+    --surface-current: var(--surface-strong);
+    background-color: var(--ui-surface-bg);
+  }
+
+  .ui-panel--faint {
+    border-color: var(--border);
+    --ui-surface-bg: var(--surface-faint);
+    --surface-current: var(--surface-faint);
+    background-color: var(--ui-surface-bg);
+  }
+}

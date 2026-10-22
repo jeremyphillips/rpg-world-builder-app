@@ -14,6 +14,7 @@ import { declineClassPackage, selectClassPackage, type ClassPackageChoice } from
 import {
   Badge,
   Button,
+  Panel,
   ComboboxField,
   SharedFilterSelect,
   ConfirmDialog,
@@ -102,8 +103,6 @@ import {
   resolveQuickNpcStartingEquipmentPackageContext,
 } from '../../lib/quick-npc/quick-npc-starting-equipment.lib'
 import { useQuickNpcEditingLock } from './use-quick-npc-editing-lock'
-import { collectionPanelEmptyStateBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
-
 import { QuickNpcPackageCustomizationPanel } from './quick-npc-package-customization-panel'
 import {
   quickNpcAdditionalEquipmentQuantityClasses,
@@ -491,7 +490,7 @@ function QuickNpcStartingEquipmentPackageSection({
         />
       ) : null}
       {effective.state === 'declined' && !isPackageChooserExpanded ? (
-        <div className={collectionPanelEmptyStateBodyClasses}>
+        <Panel tone="strong" density="compact">
           <p className="text-sm font-body-emphasis">{QUICK_NPC_NO_STARTING_PACKAGE_HEADING}</p>
           <p className="text-style-caption">{QUICK_NPC_NO_STARTING_PACKAGE_BODY}</p>
           <Button
@@ -511,7 +510,7 @@ function QuickNpcStartingEquipmentPackageSection({
               ? quickNpcUsePackageLabel(onlyPackage.label)
               : QUICK_NPC_CHOOSE_PACKAGE_LABEL}
           </Button>
-        </div>
+        </Panel>
       ) : null}
       {isPackageChooserExpanded || effective.state === 'unresolved' ? (
         <>

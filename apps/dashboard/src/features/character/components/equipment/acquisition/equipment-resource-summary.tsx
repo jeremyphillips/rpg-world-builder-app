@@ -7,19 +7,14 @@ import {
 } from '@/features/content'
 import {
   Button,
-  cn,
   DividedStack,
+  Panel,
   IconContainer,
   resourceIcon,
   type ContentCardDensity,
   type IconContainerSize,
   type ResourceIconRole,
 } from '@rpg/ui'
-
-import {
-  collectionPanelComfortableInsetClasses,
-  collectionPanelShellClasses,
-} from '@/lib/collection-panel/collection-panel-shell.variants'
 
 import {
   EQUIPMENT_MAGIC_ITEMS_RESOURCE_HEADING,
@@ -102,13 +97,7 @@ export function EquipmentResourceSummary({
   if (!currency && !showMagic) return null
 
   return (
-    <div
-      className={cn(
-        collectionPanelShellClasses,
-        density === 'compact' ? 'px-3 py-2' : collectionPanelComfortableInsetClasses,
-      )}
-    >
-      {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+    <Panel tone="transparent" density={density === 'compact' ? 'compact' : 'comfortable'}>
       <DividedStack density={density}>
         {currency ? (
           <EntityAnatomyHost
@@ -133,6 +122,6 @@ export function EquipmentResourceSummary({
           />
         ) : null}
       </DividedStack>
-    </div>
+    </Panel>
   )
 }

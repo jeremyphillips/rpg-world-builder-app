@@ -8,10 +8,10 @@ import {
   ActionIcon,
   Button,
   ButtonDropdown,
-  cn,
   Heading,
   InsetPanel,
   NumberInput,
+  Panel,
   Select,
   SelectContent,
   SelectItem,
@@ -20,8 +20,6 @@ import {
   Text,
   emptyStateWellSupportingClasses,
 } from '@rpg/ui'
-
-import { collectionPanelNestedBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 import type { ButtonDropdownItem } from '@rpg/ui'
 import { useFormContext, useWatch, useController } from 'react-hook-form'
 
@@ -132,8 +130,7 @@ function ProgressionTrackCard({
       : RESOLUTION_SECTION_LABELS.progressionLeveledMode
 
   return (
-    <div className={cn(collectionPanelNestedBodyClasses, 'gap-3')}>
-      {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+    <Panel tone="faint" density="comfortable" className="flex flex-col gap-3">
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
           <Heading as="h4" variant="subsection" className="text-style-label">
@@ -227,7 +224,7 @@ function ProgressionTrackCard({
           </div>
         ) : null}
       </dl>
-    </div>
+    </Panel>
   )
 }
 

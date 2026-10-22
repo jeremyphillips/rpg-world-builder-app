@@ -134,21 +134,24 @@
   }
 
   .ui-card--compact,
-  .ui-alert--compact {
+  .ui-alert--compact,
+  .ui-panel--compact {
     --ui-surface-inset-block: calc(var(--spacing) * 2);
     --ui-surface-inset-inline: calc(var(--spacing) * 4);
     --ui-surface-region-gap: calc(var(--spacing) * 2);
   }
 
   .ui-card--comfortable,
-  .ui-alert--comfortable {
+  .ui-alert--comfortable,
+  .ui-panel--comfortable {
     --ui-surface-inset-block: calc(var(--spacing) * 3);
     --ui-surface-inset-inline: calc(var(--spacing) * 5);
     --ui-surface-region-gap: calc(var(--spacing) * 3);
   }
 
   .ui-card--spacious,
-  .ui-alert--spacious {
+  .ui-alert--spacious,
+  .ui-panel--spacious {
     --ui-surface-inset-block: calc(var(--spacing) * 5);
     --ui-surface-inset-inline: calc(var(--spacing) * 6);
     --ui-surface-region-gap: calc(var(--spacing) * 3);

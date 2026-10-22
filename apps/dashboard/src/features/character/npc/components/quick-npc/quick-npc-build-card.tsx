@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { Eyebrow } from '@rpg/ui'
+import { Eyebrow, Panel } from '@rpg/ui'
 
 import type { QuickNpcBuildCardModel } from '../../lib/quick-npc/quick-npc-build-card.lib'
 import { useQuickNpcBuildCardExpandedAttribute } from '../../lib/quick-npc/quick-npc-build-card-expansion.lib'
@@ -10,7 +10,6 @@ import {
   BuildCardRoleAttributeRow,
   BuildCardTemplateIdentity,
 } from './quick-npc-build-card-parts'
-import { collectionPanelLiftShellClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 
 export type QuickNpcBuildCardProps = {
   model: QuickNpcBuildCardModel
@@ -46,7 +45,7 @@ export function QuickNpcBuildCard({
   return (
     <section className={className ?? 'flex flex-col gap-y-3'}>
       <Eyebrow size="md">{model.sectionEyebrow}</Eyebrow>
-      <article className={collectionPanelLiftShellClasses}>
+      <Panel tone="quiet" density="comfortable" className="flex flex-col gap-y-4">
         {model.showTemplateIdentity && model.templateLabel ? (
           <BuildCardTemplateIdentity
             templateLabel={model.templateLabel}
@@ -81,7 +80,7 @@ export function QuickNpcBuildCard({
             onClassChange={handleClassChange}
           />
         </div>
-      </article>
+      </Panel>
     </section>
   )
 }

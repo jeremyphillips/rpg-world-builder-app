@@ -1,10 +1,9 @@
 import { useId, useMemo, useState } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
-import { ActionButton, Button, cn, ConfirmDialog, TextField } from '@rpg/ui'
+import { ActionButton, Button, ConfirmDialog, Panel, TextField } from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 import type { SlotProgression } from '@rpg/contracts'
 
-import { collectionPanelNestedBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
 import { DetailOverflowMenu, FeatureTableRow } from '@/lib/content-table-surface'
 
@@ -200,8 +199,7 @@ export function SlotProgressionsField() {
       </section>
 
       {showCreateForm ? (
-        <div className={cn(collectionPanelNestedBodyClasses, 'gap-3')}>
-          {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+        <Panel tone="faint" density="comfortable" className="flex flex-col gap-3">
           <TextField
             id={createLabelId}
             label="Progression label"
@@ -241,7 +239,7 @@ export function SlotProgressionsField() {
               Cancel
             </Button>
           </div>
-        </div>
+        </Panel>
       ) : null}
 
       {modalState && hostConfig && initialDraft ? (

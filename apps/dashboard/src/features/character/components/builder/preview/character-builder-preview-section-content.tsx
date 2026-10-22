@@ -1,11 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { cn } from '@rpg/ui'
-
-import {
-  collectionPanelComfortableInsetClasses,
-  collectionPanelShellClasses,
-} from '@/lib/collection-panel/collection-panel-shell.variants'
+import { cn, Panel } from '@rpg/ui'
 
 import {
   characterBuilderPreviewHintClasses,
@@ -38,15 +33,13 @@ export function CharacterBuilderPreviewSectionContent({
     return (
       <div className={cn('flex flex-col gap-3', className)}>
         {hint ? <p className={characterBuilderPreviewHintClasses}>{hint}</p> : null}
-        <div
-          className={cn(
-            collectionPanelShellClasses,
-            collectionPanelComfortableInsetClasses,
-            characterBuilderPreviewSubsectionsGroupClasses,
-          )}
+        <Panel
+          tone="transparent"
+          density="comfortable"
+          className={characterBuilderPreviewSubsectionsGroupClasses}
         >
           {children}
-        </div>
+        </Panel>
       </div>
     )
   }

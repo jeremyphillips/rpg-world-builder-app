@@ -1,18 +1,12 @@
 import { cva } from 'class-variance-authority'
 
-import { cn, establishSurfaceCurrent } from '@rpg/ui'
-
-import { collectionPanelShellClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+import { cn, panelVariants } from '@rpg/ui'
 
 import { buildActionResolutionIssueRowVariantMap } from './action-resolution-row.lib'
 
-/** Scrollable resolution list panel inside action dialogs (collection host, not Card). */
+/** Scrollable resolution list inside action dialogs. Rows own their inset. */
 export const actionResolutionListVariants = cva(
-  cn(
-    collectionPanelShellClasses,
-    'max-h-[min(50vh,18rem)] overflow-y-auto bg-surface-subtle',
-    establishSurfaceCurrent('surface-subtle'),
-  ),
+  cn(panelVariants({ tone: 'subtle', bleed: true }), 'max-h-[min(50vh,18rem)] overflow-y-auto'),
 )
 
 export const actionResolutionRowVariants = cva('flex items-start gap-3 px-3 py-2.5 text-sm', {

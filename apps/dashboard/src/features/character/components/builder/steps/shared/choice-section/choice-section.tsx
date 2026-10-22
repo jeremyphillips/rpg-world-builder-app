@@ -1,11 +1,6 @@
 import type { BuilderChoiceSectionModel } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { cn } from '@rpg/ui'
-
-import {
-  collectionPanelComfortableInsetClasses,
-  collectionPanelShellClasses,
-} from '@/lib/collection-panel/collection-panel-shell.variants'
+import { Panel } from '@rpg/ui'
 
 import { ChoiceBlockRow } from './choice-block-row'
 import { ChoiceSectionFlatBody } from './choice-section-flat-body'
@@ -56,45 +51,47 @@ export function ChoiceSection({
   const sectionValidationIssues = validationIssuesForSection(validationIssues, section)
 
   return (
-    <section className={collectionPanelShellClasses} role="region" aria-labelledby={headingId}>
-      <div className={cn(collectionPanelComfortableInsetClasses, choiceSectionBodyStackClasses)}>
-        <ChoiceSectionHeader
+    <Panel
+      as="section"
+      tone="transparent"
+      density="comfortable"
+      className={choiceSectionBodyStackClasses}
+      role="region"
+      aria-labelledby={headingId}
+    >
+      <ChoiceSectionHeader
+        section={section}
+        headingId={headingId}
+        singleChoiceBlock={singleChoiceBlock}
+        sectionValidationIssues={sectionValidationIssues}
+        onOpenChoiceSet={onOpenChoiceSet}
+      />
+
+      {!isMultiBlockSection ? (
+        <div className={choiceSectionDividerClasses} role="presentation" aria-hidden />
+      ) : null}
+
+      {isMultiBlockSection ? (
+        <div className={choiceSectionChoiceBlocksClasses}>
+          {section.choiceBlocks.map((block) => (
+            <ChoiceBlockRow
+              key={block.choiceSet.id}
+              block={block}
+              selectedRows={selectedRowsForBlock(section, block)}
+              validationIssues={validationIssuesForChoiceSet(validationIssues, block.choiceSet.id)}
+              overSelectionMessage={overSelectionMessage}
+              onOpenDrawer={() => onOpenChoiceSet(block.choiceSet.id)}
+              onRemoveChoice={onRemoveChoice}
+            />
+          ))}
+        </div>
+      ) : (
+        <ChoiceSectionFlatBody
           section={section}
-          headingId={headingId}
-          singleChoiceBlock={singleChoiceBlock}
-          sectionValidationIssues={sectionValidationIssues}
-          onOpenChoiceSet={onOpenChoiceSet}
+          overSelectionMessage={overSelectionMessage}
+          onRemoveChoice={onRemoveChoice}
         />
-
-        {!isMultiBlockSection ? (
-          <div className={choiceSectionDividerClasses} role="presentation" aria-hidden />
-        ) : null}
-
-        {isMultiBlockSection ? (
-          <div className={choiceSectionChoiceBlocksClasses}>
-            {section.choiceBlocks.map((block) => (
-              <ChoiceBlockRow
-                key={block.choiceSet.id}
-                block={block}
-                selectedRows={selectedRowsForBlock(section, block)}
-                validationIssues={validationIssuesForChoiceSet(
-                  validationIssues,
-                  block.choiceSet.id,
-                )}
-                overSelectionMessage={overSelectionMessage}
-                onOpenDrawer={() => onOpenChoiceSet(block.choiceSet.id)}
-                onRemoveChoice={onRemoveChoice}
-              />
-            ))}
-          </div>
-        ) : (
-          <ChoiceSectionFlatBody
-            section={section}
-            overSelectionMessage={overSelectionMessage}
-            onRemoveChoice={onRemoveChoice}
-          />
-        )}
-      </div>
-    </section>
+      )}
+    </Panel>
   )
 }

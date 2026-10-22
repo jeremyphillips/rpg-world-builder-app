@@ -1,12 +1,12 @@
-import { cn, establishSurfaceCurrent } from '@rpg/ui'
+import { cn, panelVariants } from '@rpg/ui'
 
 import { masterDetailRailBorderClasses } from './master-detail-rail.variants'
 
 /** Single bordered surface for the detail rail. */
 export const masterDetailEditorShellClasses = cn(
-  'self-start overflow-hidden rounded-lg border bg-field-container text-foreground md:col-span-2',
+  panelVariants({ tone: 'quiet', density: 'comfortable', bleed: true }),
+  'self-start overflow-hidden text-foreground md:col-span-2',
   masterDetailRailBorderClasses,
-  establishSurfaceCurrent('field-container'),
 )
 
 export const masterDetailEditorIdentityClasses = cn(
