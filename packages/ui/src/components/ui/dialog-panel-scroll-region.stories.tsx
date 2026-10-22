@@ -22,9 +22,9 @@ function OverlayScrollDemo() {
       </div>
       <DialogPanelScrollRegion>
         {Array.from({ length: 16 }, (_, index) => (
-          <p key={index} className="mb-3 text-sm">
+          <Text key={index} variant="supporting" className="mb-3">
             Row {index + 1}: scroll to reveal boundary shadows below the header border.
-          </p>
+          </Text>
         ))}
       </DialogPanelScrollRegion>
     </div>

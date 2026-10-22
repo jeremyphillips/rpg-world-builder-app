@@ -123,7 +123,9 @@ function ParityPair({
       </header>
 
       <div className="flex flex-col gap-2">
-        <p className="text-xs font-medium text-muted-foreground">Flex FieldRow (current)</p>
+        <Text variant="caption" className="font-medium">
+          Flex FieldRow (current)
+        </Text>
         <div ref={flexRef}>
           <FieldRow>
             {widths.map((width, index) => (
@@ -140,7 +142,9 @@ function ParityPair({
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="text-xs font-medium text-muted-foreground">Anatomy grid (resolver)</p>
+        <Text variant="caption" className="font-medium">
+          Anatomy grid (resolver)
+        </Text>
         <div
           ref={gridRef}
           data-field-row-anatomy-prototype=""

@@ -257,7 +257,9 @@ export const ComparedToNavigableCard: Story = {
   render: () => (
     <div className="grid max-w-md gap-6">
       <div className="space-y-2">
-        <p className="text-sm font-medium text-foreground">Grouped destination rows</p>
+        <Text variant="label" className="text-foreground">
+          Grouped destination rows
+        </Text>
         <DestinationList density="compact">
           <DestinationItem
             link={<a href="#weapons">nav</a>}
@@ -272,7 +274,9 @@ export const ComparedToNavigableCard: Story = {
         </DestinationList>
       </div>
       <div className="space-y-2">
-        <p className="text-sm font-medium text-foreground">Standalone navigable Card</p>
+        <Text variant="label" className="text-foreground">
+          Standalone navigable Card
+        </Text>
         <Card
           link={<a href="#armor">nav</a>}
           density="compact"

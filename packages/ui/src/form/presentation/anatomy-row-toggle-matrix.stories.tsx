@@ -1,5 +1,5 @@
 'use client'
-import { Text } from '../components/ui/text'
+import { Text } from '../../components/ui/text'
 
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'

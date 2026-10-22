@@ -225,7 +225,9 @@ function SurfaceChromeMatrix() {
             </Text>
             <div className="rounded-md border border-border-subtle p-3">
               <Text variant="supporting">Muted option label</Text>
-              <p className="text-sm text-foreground-subtle">Subtle helper copy</p>
+              <Text variant="supporting" className="text-foreground-subtle">
+                Subtle helper copy
+              </Text>
             </div>
           </div>
         </div>

@@ -28,9 +28,9 @@ function ScrollBoundaryRegionDemo() {
       <ScrollBoundaryRegion className="max-h-48">
         <div className="space-y-3 px-4 py-4">
           {scrollItems.map((item) => (
-            <p key={item} className="text-sm text-foreground">
+            <Text key={item} variant="supporting" className="text-foreground">
               {item}
-            </p>
+            </Text>
           ))}
         </div>
       </ScrollBoundaryRegion>

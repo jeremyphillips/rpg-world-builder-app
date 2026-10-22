@@ -1,11 +1,11 @@
 'use client'
-import { Text } from '../components/ui/text'
 
 import * as React from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
 
 import { cn } from '../../lib/utils'
+import { Text } from '../../components/ui/text'
 import type { FormItem } from '../field-config'
 import { Form } from '../shells/form.client'
 import {

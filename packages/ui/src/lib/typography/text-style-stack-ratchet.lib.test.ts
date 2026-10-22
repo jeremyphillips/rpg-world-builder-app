@@ -146,4 +146,15 @@ describe('text-style-stack-ratchet.lib', () => {
       { file: 'example.tsx', reason: 'p className includes text-style-* (use <Text variant="…">)' },
     ])
   })
+
+  it('flags multiline p opening tag with text-style utility', () => {
+    expect(
+      findTextStyleStackViolations(
+        `<p\n  className="text-style-supporting"\n  id="hint"\n>`,
+        'example.tsx',
+      ),
+    ).toEqual([
+      { file: 'example.tsx', reason: 'p className includes text-style-* (use <Text variant="…">)' },
+    ])
+  })
 })

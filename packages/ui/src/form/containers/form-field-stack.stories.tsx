@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Text } from '../components/ui/text'
+import { Text } from '../../components/ui/text'
 
 import { Button } from '../../components/ui/button.client'
 import { Modal } from '../../components/ui/modal.client'
