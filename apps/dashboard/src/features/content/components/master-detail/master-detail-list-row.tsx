@@ -4,18 +4,9 @@ import type { RefObject } from 'react'
 
 import { masterDetailRowValidationStateLabel } from '../../lib/master-detail/master-detail-row-validation'
 import type { MasterDetailListItem } from './master-detail-list-panel'
-import {
-  masterDetailListRowAvailabilityClasses,
-  masterDetailListRowClasses,
-  masterDetailListRowContentClasses,
-  masterDetailListRowEndClasses,
-  masterDetailListRowEyebrowClasses,
-  masterDetailListRowMetadataClasses,
-  masterDetailListRowSourceClasses,
-  masterDetailListRowTitleClasses,
-} from './master-detail-list-panel.variants'
+import { masterDetailListRowClasses } from './master-detail-list-row.variants'
 
-export interface MasterDetailListRowProps {
+export type MasterDetailListRowProps = {
   item: MasterDetailListItem
   index: number
   isSelected: boolean
@@ -31,22 +22,19 @@ function MasterDetailListRowContent({
   issueCount: number
 }) {
   return (
-    <span className={masterDetailListRowContentClasses}>
+    <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
       {item.meta?.eyebrow ? (
-        <span className={masterDetailListRowEyebrowClasses}>{item.meta.eyebrow}</span>
+        <span className="min-w-0 truncate text-style-caption">{item.meta.eyebrow}</span>
       ) : null}
-      <span className={masterDetailListRowTitleClasses}>{item.title}</span>
+      <span className="min-w-0 truncate text-style-label text-foreground">{item.title}</span>
       {item.meta?.sourceLabel ? (
-        <span className={masterDetailListRowSourceClasses}>{item.meta.sourceLabel}</span>
+        <span className="min-w-0 truncate text-style-caption">{item.meta.sourceLabel}</span>
       ) : null}
       {item.availabilityStatusLabel ? (
-        <InlineInactiveStatus
-          label={item.availabilityStatusLabel}
-          className={masterDetailListRowAvailabilityClasses}
-        />
+        <InlineInactiveStatus label={item.availabilityStatusLabel} className="min-w-0" />
       ) : null}
       {issueCount > 0 ? (
-        <span className={masterDetailListRowMetadataClasses}>
+        <span className="flex min-w-0 items-center">
           <ValidationIssueCountBadge count={issueCount} />
         </span>
       ) : null}
@@ -74,7 +62,7 @@ export function MasterDetailListRow({
         className={masterDetailListRowClasses({ isSelected })}
       >
         <MasterDetailListRowContent item={item} issueCount={issueCount} />
-        <span className={masterDetailListRowEndClasses} aria-hidden>
+        <span className="flex shrink-0 self-center text-foreground" aria-hidden>
           <ChevronRight className="size-4" />
         </span>
         {issueCount > 0 ? (

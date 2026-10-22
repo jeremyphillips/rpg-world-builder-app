@@ -241,6 +241,7 @@ export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.cl
 export {
   inlineIconFlexSlotClasses,
   inlineIconTextClasses,
+  menuItemIconGlyphClasses,
 } from './components/ui/icon-glyph.variants'
 export {
   ACTION_ICONS,

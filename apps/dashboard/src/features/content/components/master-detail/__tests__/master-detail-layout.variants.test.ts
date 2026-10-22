@@ -2,11 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { masterDetailEditorShellClasses } from '../master-detail-editor-panel.variants'
 import { masterDetailGridClasses } from '../master-detail-grid.variants'
-import {
-  masterDetailListScrollRegionClasses,
-  masterDetailListScrollViewportClasses,
-  masterDetailListShellClasses,
-} from '../master-detail-list-panel.variants'
+import { masterDetailListLayoutClasses } from '../master-detail-list-panel'
 
 describe('master-detail layout variants', () => {
   it('aligns grid columns at the start and defines the list max-block-size token', () => {
@@ -15,29 +11,23 @@ describe('master-detail layout variants', () => {
   })
 
   it('caps the list shell with shared viewport utilities without restating raw lengths', () => {
-    expect(masterDetailListShellClasses).toContain('master-detail-list-shell-viewport-cap')
-    expect(masterDetailListShellClasses).toContain('sticky')
-    expect(masterDetailListShellClasses).toContain(
-      'top-[var(--rpg-form-sticky-tabs-block-size,0px)]',
-    )
-    expect(masterDetailListShellClasses).toContain(
-      'min-h-[min(8rem,var(--master-detail-shell-max-block-size))]',
-    )
-    expect(masterDetailListShellClasses).toContain(
-      'md:min-h-[min(12rem,var(--master-detail-shell-max-block-size))]',
-    )
-    expect(masterDetailListShellClasses).not.toContain('28rem')
-    expect(masterDetailListShellClasses).not.toContain('70dvh')
+    const { shell } = masterDetailListLayoutClasses
+    expect(shell).toContain('master-detail-list-shell-viewport-cap')
+    expect(shell).toContain('sticky')
+    expect(shell).toContain('top-[var(--rpg-form-sticky-tabs-block-size,0px)]')
+    expect(shell).toContain('min-h-[min(8rem,var(--master-detail-shell-max-block-size))]')
+    expect(shell).toContain('md:min-h-[min(12rem,var(--master-detail-shell-max-block-size))]')
+    expect(shell).not.toContain('28rem')
+    expect(shell).not.toContain('70dvh')
   })
 
   it('wraps list scroll in a boundary region without reserving scrollbar gutter space', () => {
-    expect(masterDetailListScrollRegionClasses).toContain('relative')
-    expect(masterDetailListScrollViewportClasses).toContain('overflow-y-auto')
-    expect(masterDetailListScrollViewportClasses).toContain('scrollbar-slim')
-    expect(masterDetailListScrollViewportClasses).toContain('pe-0')
-    expect(masterDetailListScrollViewportClasses).not.toContain(
-      'master-detail-list-shell-viewport-cap',
-    )
+    const { scrollRegion, scrollViewport } = masterDetailListLayoutClasses
+    expect(scrollRegion).toContain('relative')
+    expect(scrollViewport).toContain('overflow-y-auto')
+    expect(scrollViewport).toContain('scrollbar-slim')
+    expect(scrollViewport).toContain('pe-0')
+    expect(scrollViewport).not.toContain('master-detail-list-shell-viewport-cap')
   })
 
   it('keeps the detail shell content-sized', () => {
@@ -50,8 +40,9 @@ describe('master-detail layout variants', () => {
   })
 
   it('uses a bleed quiet panel for the list shell', () => {
-    expect(masterDetailListShellClasses).toContain('ui-panel--quiet')
-    expect(masterDetailListShellClasses).toContain('ui-panel--bleed')
-    expect(masterDetailListShellClasses).not.toContain('bg-field-container')
+    const { shell } = masterDetailListLayoutClasses
+    expect(shell).toContain('ui-panel--quiet')
+    expect(shell).toContain('ui-panel--bleed')
+    expect(shell).not.toContain('bg-field-container')
   })
 })

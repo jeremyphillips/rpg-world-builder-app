@@ -1,26 +1,34 @@
 import { useEffect, useRef, type ReactNode } from 'react'
-import { ActionButton, ScrollBoundaryRegion, Text, ValidationIssueCountBadge } from '@rpg/ui'
+import {
+  ActionButton,
+  cn,
+  panelVariants,
+  ScrollBoundaryRegion,
+  scrollBoundaryRegionRootClasses,
+  Text,
+  ValidationIssueCountBadge,
+} from '@rpg/ui'
 
 import { isElementOutsideScrollport } from '../../lib/master-detail/is-element-outside-scrollport'
 import type { MasterDetailItemMeta } from '../../lib/master-detail/master-detail-item-meta'
 import { MasterDetailListRow } from './master-detail-list-row'
 import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
-import {
-  masterDetailListCountSupplementClasses,
-  masterDetailListCountSupplementCopyClasses,
-  masterDetailListEmptyClasses,
-  masterDetailListHeaderClasses,
-  masterDetailListItemsClasses,
-  masterDetailListScrollRegionClasses,
-  masterDetailListScrollViewportClasses,
-  masterDetailListShellClasses,
-  masterDetailListTitleClasses,
-} from './master-detail-list-panel.variants'
+import { masterDetailRailBorderClasses } from './master-detail-rail.variants'
 
 export type { MasterDetailItemMeta }
 
-export interface MasterDetailListItem {
+const masterDetailListShellClasses = cn(
+  panelVariants({ tone: 'quiet', density: 'comfortable', bleed: true }),
+  'sticky top-[var(--rpg-form-sticky-tabs-block-size,0px)] flex min-h-[min(8rem,var(--master-detail-shell-max-block-size))] flex-col self-start overflow-hidden text-foreground md:min-h-[min(12rem,var(--master-detail-shell-max-block-size))]',
+  masterDetailRailBorderClasses,
+  '[--master-detail-list-chrome-block-size:5.5rem]',
+  'master-detail-list-shell-viewport-cap',
+)
+
+const masterDetailListScrollViewportClasses = 'min-h-0 flex-1 overflow-y-auto pe-0 scrollbar-slim'
+
+export type MasterDetailListItem = {
   /** Stable React key (use the RHF field id, not a domain id). */
   id: string
   /** Display label for the row. */
@@ -39,7 +47,7 @@ export interface MasterDetailListItem {
   availabilityStatusLabel?: 'Unavailable'
 }
 
-export interface MasterDetailListPanelProps {
+export type MasterDetailListPanelProps = {
   items: MasterDetailListItem[]
   selectedIndex: number | null
   /** Visible collection title in the list header. */
@@ -55,6 +63,13 @@ export interface MasterDetailListPanelProps {
   /** Count of visible list rows with validation issues (not total issue count). */
   invalidItemCount?: number
 }
+
+/** @internal Layout contract tests assert on shell and scroll class strings. */
+export const masterDetailListLayoutClasses = {
+  shell: masterDetailListShellClasses,
+  scrollRegion: scrollBoundaryRegionRootClasses,
+  scrollViewport: masterDetailListScrollViewportClasses,
+} as const
 
 function resolveSelectedItemId(
   items: MasterDetailListItem[],
@@ -72,7 +87,7 @@ function buildVisibleListProjection(items: readonly MasterDetailListItem[]): str
 
 /**
  * Generic sidebar for a master-detail editor: bordered collection shell with
- * list title + Add, and whole-row selection with tint and inset start accent.
+ * list title + Add, and card-style row selection in the scrollport.
  * Presentation only — selection and array mutation are owned by the parent.
  */
 export function MasterDetailListPanel({
@@ -123,36 +138,50 @@ export function MasterDetailListPanel({
     }
   }, [selectedItemId, visibleProjection])
 
+  const countSupplementRow =
+    countSupplement || invalidItemCount > 0
+      ? cn(
+          'flex shrink-0 items-center gap-2 border-b px-3 py-1.5 text-style-caption',
+          masterDetailRailBorderClasses,
+          countSupplement ? 'justify-between' : 'justify-end',
+        )
+      : null
+
   return (
     <nav aria-label={ariaLabel} className={masterDetailListShellClasses}>
-      <div className={masterDetailListHeaderClasses}>
-        <div className={masterDetailListTitleClasses}>{listTitle}</div>
+      <div
+        className={cn(
+          'flex shrink-0 items-center justify-between gap-3 border-b px-3 py-2.5',
+          masterDetailRailBorderClasses,
+        )}
+      >
+        <div className="min-w-0 text-lg font-medium text-foreground">{listTitle}</div>
         <ActionButton action="add" variant="outline" size="sm" onClick={onAdd}>
           {addLabel}
         </ActionButton>
       </div>
 
-      {countSupplement || invalidItemCount > 0 ? (
-        <div className={masterDetailListCountSupplementClasses({ hasCopy: !!countSupplement })}>
+      {countSupplementRow ? (
+        <div className={countSupplementRow}>
           {countSupplement ? (
-            <div className={masterDetailListCountSupplementCopyClasses}>{countSupplement}</div>
+            <div className="min-w-0 flex flex-wrap items-center gap-x-1">{countSupplement}</div>
           ) : null}
           {invalidItemCount > 0 ? <ValidationIssueCountBadge count={invalidItemCount} /> : null}
         </div>
       ) : null}
 
       {items.length === 0 ? (
-        <Text variant="muted" className={masterDetailListEmptyClasses}>
+        <Text variant="muted" className="px-3 py-4 text-style-supporting">
           {emptyLabel}
         </Text>
       ) : (
         <ScrollBoundaryRegion
-          className={masterDetailListScrollRegionClasses}
+          className={scrollBoundaryRegionRootClasses}
           viewportClassName={masterDetailListScrollViewportClasses}
           viewportRef={scrollRef}
           data-master-detail-list-scroll
         >
-          <ul className={masterDetailListItemsClasses} role="list">
+          <ul className="flex flex-col gap-2 p-2" role="list">
             {items.map((item, index) => (
               <MasterDetailListRow
                 key={item.id}
