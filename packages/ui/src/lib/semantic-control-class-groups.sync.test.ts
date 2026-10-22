@@ -7,6 +7,10 @@ import {
 import { UI_COMPACT_LABEL_APPEARANCE_CLASSES } from '../components/ui/badge-appearance.lib'
 import { UI_BORDER_STRENGTH_CLASSES } from '../components/ui/border-strength'
 import {
+  UI_DIALOG_PANEL_FILL_CLASSES,
+  UI_DIALOG_PANEL_GEOMETRY_CLASSES,
+} from '../components/ui/dialog-panel.variants'
+import {
   UI_BUTTON_APPEARANCE_CLASSES,
   UI_BUTTON_SIZE_CLASSES,
   UI_BUTTON_TEXT_GEOMETRY_CLASSES,
@@ -66,6 +70,16 @@ describe('semantic-control-class-groups sync', () => {
       classGroups.UI_BORDER_STRENGTH_CLASSES,
       UI_BORDER_STRENGTH_CLASSES,
       'border strength',
+    )
+    expectSameSet(
+      classGroups.UI_DIALOG_PANEL_FILL_CLASSES,
+      UI_DIALOG_PANEL_FILL_CLASSES,
+      'dialog panel fill',
+    )
+    expectSameSet(
+      classGroups.UI_DIALOG_PANEL_GEOMETRY_CLASSES,
+      UI_DIALOG_PANEL_GEOMETRY_CLASSES,
+      'dialog panel geometry',
     )
     expectSameSet(
       classGroups.UI_BUTTON_APPEARANCE_CLASSES,

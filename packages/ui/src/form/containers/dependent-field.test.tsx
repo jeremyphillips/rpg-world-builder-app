@@ -515,7 +515,7 @@ describe('dependent field', () => {
 
     const separator = container.querySelector('[data-field-separator]')
     expect(separator).toBeInTheDocument()
-    expect(separator).toHaveClass('border-b', 'border-border-subtle', 'pb-7')
+    expect(separator).toHaveClass('border-b', 'ui-border--subtle', 'pb-7')
     expect(separator).toContainElement(screen.getByLabelText('Class restrictions'))
     expect(separator).toContainElement(queryDependentsRegion(container) as HTMLElement)
     expect(container.querySelectorAll('[data-field-separator]')).toHaveLength(1)

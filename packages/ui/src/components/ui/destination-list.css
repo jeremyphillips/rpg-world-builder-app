@@ -23,8 +23,9 @@
   .ui-destination-list--panel {
     overflow: hidden;
     border-radius: var(--radius-md);
-    border: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-default), var(--surface-current));
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--ui-border-color);
     background-color: transparent;
   }
 
@@ -38,8 +39,9 @@
   .ui-destination-list--filled {
     overflow: hidden;
     border-radius: var(--radius-card);
-    border: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-default), var(--surface-current));
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--ui-border-color);
     background-color: transparent;
   }
 
@@ -63,8 +65,9 @@
     bottom: 0;
     left: 0;
     right: 0;
-    border-bottom: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-subtle), var(--surface-current));
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--ui-border-color);
     pointer-events: none;
   }
 
@@ -88,14 +91,16 @@
     bottom: 0;
     left: var(--ui-destination-inset-inline);
     right: var(--ui-destination-inset-inline);
-    border-bottom: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-subtle), var(--surface-current));
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--ui-border-color);
     pointer-events: none;
   }
 
   .ui-destination-list--embedded .ui-destination-item + .ui-destination-item {
-    border-top: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-subtle), var(--surface-current));
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--ui-border-color);
   }
 
   .ui-destination-item__link {

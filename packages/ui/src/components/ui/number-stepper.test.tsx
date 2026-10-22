@@ -112,15 +112,37 @@ describe('NumberStepper', () => {
     expect(input).toHaveClass('text-foreground')
     expect(input).toHaveClass('w-[36px]')
     expect(input).toHaveClass('border-x')
-    expect(input).toHaveClass('border-border-subtle')
+    expect(input).toHaveClass('border-y-0')
+    expect(input).toHaveClass('ui-border--subtle')
+    expect(input).not.toHaveClass('ui-field-control')
   })
 
-  it('applies bordered pill styles by default', () => {
+  it('uses the field perimeter on the shell and keeps segment separators inside', () => {
     const { container } = render(<Harness />)
     const root = container.firstElementChild
-    expect(root).toHaveClass('rounded-full')
-    expect(root).toHaveClass('border')
-    expect(root).toHaveClass('border-input')
+    expect(root).toHaveClass('rounded-full', 'ui-number-stepper--bordered')
+    expect(root).not.toHaveClass('border-input')
+    expect(root).not.toHaveClass('ui-border--default')
+    expect(root).not.toHaveClass('ui-border--subtle')
+  })
+
+  it('puts invalid and disabled field state on the shell', () => {
+    const { container, rerender } = render(
+      <NumberStepper
+        aria-label="Quantity"
+        aria-invalid="true"
+        value={2}
+        onChange={() => undefined}
+      />,
+    )
+    const root = container.firstElementChild
+    const input = screen.getByLabelText('Quantity')
+    expect(root).toHaveAttribute('aria-invalid', 'true')
+    expect(input).toHaveAttribute('aria-invalid', 'true')
+
+    rerender(<NumberStepper aria-label="Quantity" disabled value={2} onChange={() => undefined} />)
+    expect(screen.getByLabelText('Quantity')).toBeDisabled()
+    expect(container.firstElementChild).toHaveClass('ui-number-stepper--bordered')
   })
 
   it('defaults to md height outside form context', () => {

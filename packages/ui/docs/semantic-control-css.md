@@ -43,6 +43,8 @@ For each migrated primitive, verify in Storybook DevTools:
 - **`ui-field-control--width-*`** — exactly one width modifier per control composition (typically `Field.Root`, filter chrome wrapper, or standalone trigger when no outer owner exists). Fractions and intrinsic caps live in `field-control.css`; twMerge group `ui-field-control-width`.
 - **`ui-field-control--trigger-{fill|fit|segment}`** — mutually exclusive horizontal flow on select/combobox triggers only; twMerge group `ui-field-control-trigger-flow`. Width tokens do not belong on the trigger when an ancestor already owns `--width-*`.
 
+Bordered `NumberStepper` (`.ui-number-stepper--bordered` in `field-group.css`) uses that same perimeter: `--field-control-border` with hover, `:focus-within`, invalid, disabled, and readonly. The value slot's side borders are structural separators (`ui-border--subtle`, `border-y-0`). Step buttons do not paint a second perimeter. Isolated step buttons keep their hover, pressed, and focus-visible ring; their chrome is `ui-border--subtle`.
+
 ## Interactive row and list
 
 `ui-interactive-row` writes hover, data selection, and disabled treatment once. Modifiers only set `--ui-row-*`:

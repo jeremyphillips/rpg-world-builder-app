@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import {
   UI_INTERACTIVE_ROW_BLOCK_CLASS,
   UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS,
@@ -16,38 +17,45 @@ import {
 export type InteractiveListSize = 'sm' | 'md' | 'lg'
 
 /** Slot-based toolbar — search and optional filter rows; hosts own control state. */
-export const interactiveListToolbarVariants = cva('ui-interactive-list__toolbar')
+export const interactiveListToolbarVariants = cva(
+  cn('ui-interactive-list__toolbar', borderStrength()),
+)
 
 export const interactiveListToolbarSearchRowVariants = cva('ui-interactive-list__toolbar-search')
 
-export const interactiveListToolbarFilterRowVariants = cva('ui-interactive-list__toolbar-filter')
+export const interactiveListToolbarFilterRowVariants = cva(
+  cn('ui-interactive-list__toolbar-filter', borderStrength()),
+)
 
 /** Visual-only group heading; hosts own section / listbox group semantics. */
-export const interactiveListGroupHeadingVariants = cva('ui-interactive-list__heading', {
-  variants: {
-    first: {
-      true: 'ui-interactive-list__heading--first',
-      false: '',
+export const interactiveListGroupHeadingVariants = cva(
+  cn('ui-interactive-list__heading', borderStrength('subtle')),
+  {
+    variants: {
+      first: {
+        true: 'ui-interactive-list__heading--first',
+        false: '',
+      },
+      follows: {
+        none: '',
+        complete: 'ui-interactive-list__heading--follows-complete',
+        truncated: '',
+      },
     },
-    follows: {
-      none: '',
-      complete: 'ui-interactive-list__heading--follows-complete',
-      truncated: '',
+    defaultVariants: {
+      first: false,
+      follows: 'none',
     },
   },
-  defaultVariants: {
-    first: false,
-    follows: 'none',
-  },
-})
+)
 
 /** Bounded scrollport — toolbar stays fixed outside this region. */
 export const interactiveListViewportVariants = cva('ui-interactive-list__viewport')
 
 /** List surface. Adjacent-sibling borders live on `.ui-interactive-list`. */
-export const interactiveListSurfaceClasses = 'ui-interactive-list'
+export const interactiveListSurfaceClasses = cn('ui-interactive-list', borderStrength('subtle'))
 
-/** Faint top border on every direct row after the first — included in `.ui-interactive-list`. */
+/** Subtle top border on every direct row after the first — color from `ui-border--subtle` on the list. */
 export const interactiveListRowSeparatorClasses = 'ui-interactive-list'
 
 /** Row-list shell — wrap row adapters only (not labels/separators). */
@@ -59,17 +67,20 @@ export const interactiveListVariants = cva(
 export const interactiveListEmptyVariants = cva('ui-interactive-list__empty')
 
 /** Shared panel shell for combobox popovers and choice menus (animation composed per host). */
-export const interactiveListPanelVariants = cva('ui-interactive-list__panel shadow-md', {
-  variants: {
-    triggerWidth: {
-      match: 'ui-interactive-list__panel--match',
-      fit: 'ui-interactive-list__panel--fit',
+export const interactiveListPanelVariants = cva(
+  cn('ui-interactive-list__panel shadow-md', borderStrength()),
+  {
+    variants: {
+      triggerWidth: {
+        match: 'ui-interactive-list__panel--match',
+        fit: 'ui-interactive-list__panel--fit',
+      },
+    },
+    defaultVariants: {
+      triggerWidth: 'match',
     },
   },
-  defaultVariants: {
-    triggerWidth: 'match',
-  },
-})
+)
 
 /** Popover open/close animation — combobox and similar Popover hosts only. */
 export const interactiveListPopoverHostClasses =
@@ -150,7 +161,9 @@ export const interactiveListRowMainVariants = cva('ui-interactive-list__main', {
 })
 
 /** Trailing action column — sibling to the main hit area, never nested inside it. */
-export const interactiveListRowTrailingActionVariants = cva('ui-interactive-list__trailing')
+export const interactiveListRowTrailingActionVariants = cva(
+  cn('ui-interactive-list__trailing', borderStrength('subtle')),
+)
 
 export type InteractiveListGroupHeadingVariantProps = VariantProps<
   typeof interactiveListGroupHeadingVariants

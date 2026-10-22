@@ -1,7 +1,6 @@
 import { cn } from '../../lib/utils'
 import { borderStrength } from './border-strength'
 
-/** @deprecated Dialog panel chrome — migrate to DialogPanel owner (W7). */
 export const CARD_SURFACE_TONES = ['transparent', 'quiet', 'subtle', 'strong'] as const
 export type CardSurfaceTone = (typeof CARD_SURFACE_TONES)[number]
 /** @alias CardSurfaceTone */

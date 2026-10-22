@@ -393,6 +393,17 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
         modifierPrefix: `ui-dialog-panel--fill-${fill}`,
         requiredProperties: ['--surface-current', 'background-color', 'color'] as const,
       })),
+      ...(['frame', 'side-right', 'side-left', 'side-bottom'] as const).map((geometry) => ({
+        modifierPrefix: `ui-dialog-panel--${geometry}`,
+        requiredProperties: [
+          'border-style',
+          'border-left-width',
+          'border-right-width',
+          'border-top-width',
+          'border-bottom-width',
+          'border-radius',
+        ] as const,
+      })),
     ],
   },
   {

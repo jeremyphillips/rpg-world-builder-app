@@ -14,8 +14,9 @@
   }
 
   .ui-interactive-list > * + * {
-    border-top: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-subtle), var(--surface-current));
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--ui-border-color);
   }
 
   .ui-interactive-list__viewport {
@@ -33,8 +34,9 @@
   }
 
   .ui-interactive-list__heading {
-    border-bottom: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-subtle), var(--surface-current));
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--ui-border-color);
     background-color: var(--surface-faint);
     padding-inline: calc(var(--spacing) * 3);
     padding-block: calc(var(--spacing) * 1);
@@ -45,16 +47,18 @@
   }
 
   .ui-interactive-list__heading--follows-complete {
-    border-top: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-subtle), var(--surface-current));
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--ui-border-color);
   }
 
   .ui-interactive-list__panel {
     z-index: 50;
     overflow: hidden;
     border-radius: var(--radius-md);
-    border: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-default), var(--surface-current));
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--ui-border-color);
     --ui-surface-bg: var(--background);
     --surface-current: var(--ui-surface-bg);
     background-color: var(--ui-surface-bg);
@@ -74,8 +78,9 @@
   }
 
   .ui-interactive-list__toolbar {
-    border-bottom: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-default), var(--surface-current));
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--ui-border-color);
     background-color: var(--field-control-bg);
     color: var(--field-control-fg);
   }
@@ -88,8 +93,9 @@
   }
 
   .ui-interactive-list__toolbar-filter {
-    border-top: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-default), var(--surface-current));
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--ui-border-color);
     padding-inline: calc(var(--spacing) * 3);
     padding-block: calc(var(--spacing) * 2);
   }
@@ -137,8 +143,9 @@
     flex-shrink: 0;
     align-items: center;
     align-self: stretch;
-    border-inline-start: 1px solid
-      color-mix(in oklch, var(--foreground) var(--mix-border-subtle), var(--surface-current));
+    border-inline-start-width: 1px;
+    border-inline-start-style: solid;
+    border-inline-start-color: var(--ui-border-color);
     padding-inline: calc(var(--spacing) * 2);
   }
 }

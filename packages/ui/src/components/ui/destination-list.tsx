@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { NavigationChevron } from './card.lib'
 import { renderNavigableLinkRoot } from './navigable-link-root.lib'
 import {
@@ -166,5 +167,7 @@ export function DestinationItem(props: DestinationItemProps) {
     null,
   )
 
-  return <li className={UI_DESTINATION_ITEM_CLASS}>{navigableLink}</li>
+  return (
+    <li className={cn(UI_DESTINATION_ITEM_CLASS, borderStrength('subtle'))}>{navigableLink}</li>
+  )
 }

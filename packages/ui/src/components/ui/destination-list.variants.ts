@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import type { CardElevation } from './card.variants'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import { interactiveRowVariants } from './interactive-row.variants'
@@ -45,9 +46,9 @@ export const UI_DESTINATION_ITEM_TRAILING_INFO_CLASS = 'ui-destination-item__tra
 export const destinationListVariants = cva(UI_DESTINATION_LIST_CLASS, {
   variants: {
     appearance: {
-      panel: UI_DESTINATION_LIST_PANEL_CLASS,
+      panel: cn(UI_DESTINATION_LIST_PANEL_CLASS, borderStrength()),
       embedded: UI_DESTINATION_LIST_EMBEDDED_CLASS,
-      filled: UI_DESTINATION_LIST_FILLED_CLASS,
+      filled: cn(UI_DESTINATION_LIST_FILLED_CLASS, borderStrength()),
     },
     density: {
       compact: UI_DESTINATION_LIST_COMPACT_CLASS,

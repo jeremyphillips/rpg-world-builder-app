@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { resolveCompactControlStepperButtonClasses } from './compact-control.styles'
 import type { FieldSizeToken } from './field-sizing.variants'
 import { fieldControlSizeClasses } from './field-sizing.variants'
@@ -18,7 +19,7 @@ export const numberStepperRootVariants = cva('inline-flex items-center', {
       lg: 'h-10',
     },
     bordered: {
-      true: 'overflow-hidden rounded-full border border-input bg-transparent shadow-sm',
+      true: 'ui-number-stepper--bordered overflow-hidden rounded-full bg-transparent',
       false: '',
     },
     locked: {
@@ -43,8 +44,10 @@ export const numberStepperButtonVariants = cva(
     variants: {
       appearance: {
         default: 'bg-input hover:bg-background active:bg-background',
-        isolated:
-          'rounded-md border border-border-subtle bg-transparent hover:bg-surface-faint active:bg-surface-subtle',
+        isolated: cn(
+          'rounded-md border bg-transparent hover:bg-surface-faint active:bg-surface-subtle',
+          borderStrength('subtle'),
+        ),
       },
       size: {
         xs: resolveCompactControlStepperButtonClasses('xs'),
@@ -68,7 +71,8 @@ export const numberStepperButtonVariants = cva(
 export const numberStepperInputVariants = cva(
   cn(
     'shrink-0 border-y-0 bg-input text-center text-foreground tabular-nums outline-none [appearance:textfield]',
-    'border-x border-border-subtle',
+    'border-x',
+    borderStrength('subtle'),
     '[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus-visible:ring-0',
   ),
   {
