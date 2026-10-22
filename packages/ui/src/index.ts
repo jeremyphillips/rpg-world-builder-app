@@ -818,7 +818,6 @@ export {
 export {
   interactiveListGroupHeadingVariants,
   interactiveListSurfaceClasses,
-  interactiveListRowSeparatorClasses,
   interactiveListVariants,
   interactiveListRowChromeVariants,
   interactiveListRowMainVariants,

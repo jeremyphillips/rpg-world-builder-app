@@ -41,13 +41,10 @@ export const interactiveListGroupHeadingVariants = cva(
 /** List surface. Adjacent-sibling borders live on `.ui-interactive-list`. */
 export const interactiveListSurfaceClasses = cn('ui-interactive-list', borderStrength('subtle'))
 
-/** Subtle top border on every direct row after the first — color from `ui-border--subtle` on the list. */
-export const interactiveListRowSeparatorClasses = 'ui-interactive-list'
-
 /** Row-list shell — wrap row adapters only (not labels/separators). */
-export const interactiveListVariants = cva(
-  cn(interactiveListSurfaceClasses, interactiveListRowSeparatorClasses),
-)
+export function interactiveListVariants(): string {
+  return cn(interactiveListSurfaceClasses, 'ui-interactive-list')
+}
 
 /** Shared panel shell for combobox popovers and choice menus (animation composed per host). */
 export const interactiveListPanelVariants = cva(
@@ -142,11 +139,6 @@ export const interactiveListRowMainVariants = cva('ui-interactive-list__main', {
     interactive: true,
   },
 })
-
-/** Trailing action column — sibling to the main hit area, never nested inside it. */
-export const interactiveListRowTrailingActionVariants = cva(
-  cn('ui-interactive-list__trailing', borderStrength('subtle')),
-)
 
 export type InteractiveListGroupHeadingVariantProps = VariantProps<
   typeof interactiveListGroupHeadingVariants

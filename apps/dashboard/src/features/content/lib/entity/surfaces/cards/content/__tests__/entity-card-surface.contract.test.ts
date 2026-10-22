@@ -11,6 +11,7 @@ import {
   resolveEntitySurfaceEdges,
 } from '../../../../anatomy/entity-surface-edges.lib'
 import type { EntityAnatomyTrailing } from '../../../../anatomy/entity-anatomy-trailing.types'
+import { entityCardBodyClassName } from '../entity-card-body-class-name.lib'
 import { entityCardFrameClassName } from '../entity-card-frame.lib'
 
 const button = () => createElement('button', { type: 'button' })
@@ -162,12 +163,10 @@ describe('edge-aware surface inset', () => {
   })
 
   it('keeps body wash on dash-entity-card__body', () => {
-    for (const wash of [
-      'dash-entity-card__body dash-entity-card__body--disclosure-wash',
-      'dash-entity-card__body dash-entity-card__body--catalog-wash',
-    ]) {
-      expect(wash).toContain('dash-entity-card__body')
-      expect(wash).not.toContain('pr-[var(--entity-body-inline-end)]')
+    for (const wash of ['disclosure', 'catalog'] as const) {
+      const className = entityCardBodyClassName(wash)
+      expect(className).toContain('dash-entity-card__body')
+      expect(className).not.toContain('pr-[var(--entity-body-inline-end)]')
     }
   })
 })

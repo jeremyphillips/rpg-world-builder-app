@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect } from 'storybook/test'
 
 import { buildCharacterCardViewModel } from '../lib/display/character-display'
 import { CHARACTER_CONTROLLER_DISPLAY } from '../lib/display/character-display-labels'
@@ -7,7 +8,11 @@ import {
   createStandaloneBuilderCatalogIndexFixture,
 } from '../lib/fixtures/character-builder-fixtures'
 import { SAMPLE_PC } from '../lib/fixtures/character-fixtures'
-import { CharacterListCard } from './character-list-card'
+import {
+  CHARACTER_LIST_CARD_HEADER_COPY_CLASS,
+  CHARACTER_LIST_CARD_HEADER_COPY_TEST_ID,
+  CharacterListCard,
+} from './character-list-card'
 
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(
   createPopulatedStandaloneBuilderContextFixture(),
@@ -88,8 +93,21 @@ export const DensityComparison: Story = {
           detailHref="/campaigns/camp-1/characters/char-sample-1"
           rosterStatus="active"
           showCampaign={false}
+          controllerLine={CHARACTER_CONTROLLER_DISPLAY.playedByYou}
         />
       ))}
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const wrappers = canvasElement.querySelectorAll(
+      `[data-testid="${CHARACTER_LIST_CARD_HEADER_COPY_TEST_ID}"]`,
+    )
+    expect(wrappers.length).toBe(3)
+    for (const wrapper of wrappers) {
+      for (const className of CHARACTER_LIST_CARD_HEADER_COPY_CLASS.split(' ')) {
+        expect(wrapper).toHaveClass(className)
+      }
+      expect(wrapper.querySelector('.ui-identity-row__stack')).toBeNull()
+    }
+  },
 }

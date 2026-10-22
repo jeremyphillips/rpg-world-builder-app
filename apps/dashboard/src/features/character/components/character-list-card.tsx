@@ -18,6 +18,12 @@ import { CampaignDisplayName, buildCampaignDisplay } from '@/features/campaign'
 import { resolveCharacterRosterStatusPresentation } from '../lib/campaign-roster-presentation'
 import type { CharacterListCardData } from './character-list-card.lib'
 
+/** Local copy column — uses card density `--ui-anatomy-row-gap`, not IdentityRow stack BEM. */
+export const CHARACTER_LIST_CARD_HEADER_COPY_CLASS =
+  'flex min-w-0 flex-col [row-gap:var(--ui-anatomy-row-gap)]' as const
+
+export const CHARACTER_LIST_CARD_HEADER_COPY_TEST_ID = 'character-list-card-header-copy'
+
 export type CharacterListCardProps = {
   card: CharacterListCardData
   detailHref: string
@@ -56,24 +62,31 @@ function CharacterListCardHeader({
     ) : null
 
   return (
-    <CardHeader className="min-w-0">
-      <IdentityRowHeadingLine
-        heading={<h3>{card.name}</h3>}
-        headingEnd={
-          rosterPresentation ? (
-            <Badge
-              appearance={rosterPresentation.appearance}
-              tone={rosterPresentation.tone}
-              size={headingAccessoryBadgeSize}
-            >
-              {rosterPresentation.label}
-            </Badge>
-          ) : undefined
-        }
-      />
-      <IdentityRowSupporting wrap>{card.summary}</IdentityRowSupporting>
-      {controllerLine ? <IdentityRowSupporting wrap>{controllerLine}</IdentityRowSupporting> : null}
-      {campaignLine ? <IdentityRowSupporting wrap>{campaignLine}</IdentityRowSupporting> : null}
+    <CardHeader>
+      <div
+        data-testid={CHARACTER_LIST_CARD_HEADER_COPY_TEST_ID}
+        className={CHARACTER_LIST_CARD_HEADER_COPY_CLASS}
+      >
+        <IdentityRowHeadingLine
+          heading={<h3>{card.name}</h3>}
+          headingEnd={
+            rosterPresentation ? (
+              <Badge
+                appearance={rosterPresentation.appearance}
+                tone={rosterPresentation.tone}
+                size={headingAccessoryBadgeSize}
+              >
+                {rosterPresentation.label}
+              </Badge>
+            ) : undefined
+          }
+        />
+        <IdentityRowSupporting wrap>{card.summary}</IdentityRowSupporting>
+        {controllerLine ? (
+          <IdentityRowSupporting wrap>{controllerLine}</IdentityRowSupporting>
+        ) : null}
+        {campaignLine ? <IdentityRowSupporting wrap>{campaignLine}</IdentityRowSupporting> : null}
+      </div>
     </CardHeader>
   )
 }

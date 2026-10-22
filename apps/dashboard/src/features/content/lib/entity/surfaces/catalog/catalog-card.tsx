@@ -10,6 +10,7 @@ import { EntityAnatomyHost } from '../../anatomy/entity-anatomy'
 import type { EntityAnatomyTrailing } from '../../anatomy/entity-anatomy-trailing.types'
 import { resolveEntitySurfaceEdges } from '../../anatomy/entity-surface-edges.lib'
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
+import { entityCardBodyClassName } from '../cards/content/entity-card-body-class-name.lib'
 import { EntityCardContent } from '../cards/content/entity-card-content'
 import { EntityCardFrame } from '../cards/content/entity-card-frame'
 import { DisclosureEntityCardHeader } from '../cards/disclosure/disclosure-entity-card-header'
@@ -152,7 +153,7 @@ function CatalogCardDisclosureBody({
         collapsed={collapsed}
         onToggleCollapse={onToggleCollapse}
         showDragHandle={false}
-        bodyClassName="dash-entity-card__body dash-entity-card__body--catalog-wash"
+        bodyClassName={entityCardBodyClassName('catalog')}
         header={
           <EntityCardContent>
             <DisclosureEntityCardHeader

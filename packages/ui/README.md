@@ -189,7 +189,7 @@ Picker-like rows share one visual system (`InteractiveListSize` owns row geometr
 - **`ComboboxOptionRow`** — `listbox` / `option` with required `selected` → `aria-selected`.
 - **`MenuChoiceRow`** — `menuitem` on `ui-menu-item`; optional description via `DropdownMenuItemContent`; not `InteractiveList`.
 - **`InteractiveListPanel`** — neutral scroll body; compositions set `listbox` or `menu` on the host.
-- **`InteractiveList`** — row-list surface + `interactiveListRowSeparatorClasses` (adjacent-row `border-t` painted with the subtle surface-relative mix); wrap row adapters only, not headings/separators.
+- **`InteractiveList`** — row-list surface (`ui-interactive-list`; adjacent-row `border-t` painted with the subtle surface-relative mix); wrap row adapters only, not headings/separators.
 
 Do not use option/listbox semantics for action menus. Search hits and ordinary commands use link or button hosts instead.
 

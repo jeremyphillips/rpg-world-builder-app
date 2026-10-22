@@ -1,10 +1,18 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CHARACTER_CONTROLLER_DISPLAY } from '../lib/display/character-display-labels'
-import { CharacterListCard } from './character-list-card'
+import {
+  CHARACTER_LIST_CARD_HEADER_COPY_CLASS,
+  CHARACTER_LIST_CARD_HEADER_COPY_TEST_ID,
+  CharacterListCard,
+} from './character-list-card'
 
 const sampleCard = {
   id: 'char-1',
@@ -13,6 +21,107 @@ const sampleCard = {
 } as const
 
 describe('CharacterListCard', () => {
+  const copyScaleCss = readFileSync(
+    join(
+      dirname(fileURLToPath(import.meta.url)),
+      '../../../../../../packages/ui/src/components/ui/copy-scale.css',
+    ),
+    'utf8',
+  )
+    .replace('@layer components {', '')
+    .replace(/\n}\s*$/, '')
+  const SURFACE_TEST_TOKENS = `:root { --spacing: 4px; --text-xs: 12px; --text-sm: 14px; --text-base: 16px; --text-heading-card: 19px; --text-xs--line-height: --text-sm--line-height: 20px; --text-base--line-height: 24px; }`
+
+  function resolvedAnatomyRowGap(element: Element | null): string {
+    let node: Element | null = element
+    while (node) {
+      const specified = getComputedStyle(node).getPropertyValue('--ui-anatomy-row-gap').trim()
+      const multiplier = specified.match(/\*\s*([\d.]+)\)/)?.[1]
+      if (multiplier != null) {
+        return `${4 * Number.parseFloat(multiplier)}px`
+      }
+      node = node.parentElement
+    }
+    return '4px'
+  }
+
+  it('groups header copy in a local anatomy-gap column without identity-row stack BEM', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <CharacterListCard
+          card={{
+            ...sampleCard,
+            name: 'Very Long Character Name That Should Truncate Beside The Badge',
+            campaign: { id: 'camp-1', name: 'The Argent Road' },
+          }}
+          detailHref="/characters/char-1"
+          controllerLine={CHARACTER_CONTROLLER_DISPLAY.playedByYou}
+          rosterStatus="inactive"
+        />
+      </MemoryRouter>,
+    )
+
+    const wrapper = container.querySelector(
+      `[data-testid="${CHARACTER_LIST_CARD_HEADER_COPY_TEST_ID}"]`,
+    )
+    expect(wrapper).toHaveClass(...CHARACTER_LIST_CARD_HEADER_COPY_CLASS.split(' '))
+    expect(wrapper?.querySelector('.ui-identity-row__stack')).toBeNull()
+    expect(
+      screen.getByRole('heading', {
+        name: 'Very Long Character Name That Should Truncate Beside The Badge',
+      }),
+    ).toHaveClass('truncate')
+    expect(screen.getByText('Dwarf · Level 1 Fighter')).toHaveClass('ui-identity-row__supporting')
+    expect(screen.getByText(CHARACTER_CONTROLLER_DISPLAY.playedByYou)).toHaveClass(
+      'ui-identity-row__supporting',
+    )
+    expect(screen.getByText('The Argent Road')).toBeInTheDocument()
+  })
+
+  describe('header copy anatomy row gap', () => {
+    let styleEl: HTMLStyleElement
+
+    beforeAll(() => {
+      styleEl = document.createElement('style')
+      styleEl.textContent = `${SURFACE_TEST_TOKENS}\n${copyScaleCss}`
+      document.head.appendChild(styleEl)
+    })
+
+    afterAll(() => {
+      styleEl.remove()
+    })
+
+    it('resolves gap from card density on the local copy column', () => {
+      const { container: compactContainer } = render(
+        <MemoryRouter>
+          <CharacterListCard card={sampleCard} detailHref="/characters/char-1" density="compact" />
+        </MemoryRouter>,
+      )
+      const compactWrapper = compactContainer.querySelector(
+        `[data-testid="${CHARACTER_LIST_CARD_HEADER_COPY_TEST_ID}"]`,
+      )
+      expect(compactContainer.querySelector('.ui-card--compact')).not.toBeNull()
+      expect(resolvedAnatomyRowGap(compactWrapper)).toBe('2px')
+      expect(compactWrapper).not.toBeNull()
+
+      const { container: comfortableContainer } = render(
+        <MemoryRouter>
+          <CharacterListCard
+            card={sampleCard}
+            detailHref="/characters/char-1"
+            density="comfortable"
+          />
+        </MemoryRouter>,
+      )
+      const comfortableWrapper = comfortableContainer.querySelector(
+        `[data-testid="${CHARACTER_LIST_CARD_HEADER_COPY_TEST_ID}"]`,
+      )
+      expect(comfortableContainer.querySelector('.ui-card--comfortable')).not.toBeNull()
+      expect(resolvedAnatomyRowGap(comfortableWrapper)).toBe('4px')
+      expect(comfortableWrapper).not.toBeNull()
+    })
+  })
+
   it('renders the card summary and view link', () => {
     render(
       <MemoryRouter>
