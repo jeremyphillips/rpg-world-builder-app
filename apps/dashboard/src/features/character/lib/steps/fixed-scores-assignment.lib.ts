@@ -14,6 +14,10 @@ import type {
 
 export type { FixedScoreSelectOption, StandardArrayScoreOperation }
 
+/** Shared ability column grid for standard-array and manual assignment UIs. */
+export const ABILITY_SCORE_ASSIGNMENT_GRID_CLASSES =
+  'grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-6' as const
+
 export type ResolveStandardArrayScoreResult =
   | { operation: 'current' }
   | { operation: 'invalid' }

@@ -11,6 +11,7 @@ import { resolveEntitySurfaceEdges } from '../../../anatomy/entity-surface-edges
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
 import { EntityCardContent } from '../content/entity-card-content'
 import { EntityCardFrame } from '../content/entity-card-frame'
+import { DASH_ENTITY_CARD_DISCLOSURE_BODY_WASH_CLASSES } from '../../dash-entity-surface.variants'
 import { DisclosureEntityCardHeader } from './disclosure-entity-card-header'
 
 export type EntityCardDisclosureRendererProps = {
@@ -70,7 +71,7 @@ export function EntityCardDisclosureRenderer({
         density={density}
         toolbarCompact
         toolbarLeadingChrome="none"
-        bodyClassName="dash-entity-card__body dash-entity-card__body--disclosure-wash"
+        bodyClassName={DASH_ENTITY_CARD_DISCLOSURE_BODY_WASH_CLASSES}
         header={
           <EntityCardContent>
             <DisclosureEntityCardHeader

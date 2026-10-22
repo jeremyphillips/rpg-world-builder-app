@@ -1,16 +1,21 @@
 import { createElement } from 'react'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 import { validateSemanticControlCssCompleteness } from '@rpg/ui/test-utils'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 import {
   ENTITY_SURFACE_DEFAULT_EDGES,
   resolveEntitySurfaceEdges,
 } from '../../../../anatomy/entity-surface-edges.lib'
 import type { EntityAnatomyTrailing } from '../../../../anatomy/entity-anatomy-trailing.types'
-import { DASH_ENTITY_CARD_BODY_CLASS } from '../../../dash-entity-surface.variants'
+import {
+  DASH_ENTITY_CARD_BODY_CLASS,
+  DASH_ENTITY_CARD_CATALOG_BODY_WASH_CLASSES,
+  DASH_ENTITY_CARD_DISCLOSURE_BODY_WASH_CLASSES,
+} from '../../../dash-entity-surface.variants'
 import { entityCardFrameClassName } from '../entity-card-frame.lib'
 
 const button = () => createElement('button', { type: 'button' })
@@ -68,9 +73,25 @@ describe('entity card surface contract', () => {
           modifierPrefix: 'dash-entity-card__content',
           requiredProperties: ['padding-inline-start', 'padding-inline-end', 'padding-block'],
         },
+        {
+          modifierPrefix: 'dash-entity-card__body--disclosure-wash',
+          requiredProperties: ['border-top', 'background-color', '--surface-current'],
+        },
+        {
+          modifierPrefix: 'dash-entity-card__body--catalog-wash',
+          requiredProperties: ['border-top', 'background-color', '--surface-current'],
+        },
       ],
     })
     expect(failures).toEqual([])
+  })
+
+  it('fills the available header region for full-width entity anatomy', () => {
+    const css = readFileSync(dashEntityCardCssPath, 'utf8')
+    expect(css).toContain('.dash-entity-card__content')
+    expect(css).toContain('width: 100%')
+    expect(css).toContain('padding-block: var(--ui-card-inset-block)')
+    expect(css).toContain('.dash-entity-card__body')
   })
 
   it('registers dash-entity-surface semantic CSS completely', () => {
@@ -147,8 +168,8 @@ describe('edge-aware surface inset', () => {
 
   it('keeps body wash on dash-entity-card__body', () => {
     for (const wash of [
-      'dash-entity-card__body dash-entity-card__body--disclosure-wash',
-      'dash-entity-card__body dash-entity-card__body--catalog-wash',
+      DASH_ENTITY_CARD_DISCLOSURE_BODY_WASH_CLASSES,
+      DASH_ENTITY_CARD_CATALOG_BODY_WASH_CLASSES,
     ]) {
       expect(wash).toContain(DASH_ENTITY_CARD_BODY_CLASS)
       expect(wash).not.toContain('pr-[var(--entity-body-inline-end)]')

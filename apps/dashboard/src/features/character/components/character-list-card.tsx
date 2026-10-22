@@ -7,6 +7,7 @@ import {
   Card,
   CardFooter,
   CardHeader,
+  IDENTITY_ROW_STACK_CLASS,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   resolveSurfaceActionButtonSize,
@@ -58,7 +59,7 @@ function CharacterListCardHeader({
 
   return (
     <CardHeader>
-      <div className="ui-identity-row__stack min-w-0">
+      <div className={cn(IDENTITY_ROW_STACK_CLASS, 'min-w-0')}>
         <IdentityRowHeadingLine
           heading={<h3>{card.name}</h3>}
           headingEnd={

@@ -792,6 +792,7 @@ export {
   type InteractiveListPanelProps,
 } from './components/ui/interactive-list-panel.client'
 export {
+  IDENTITY_ROW_STACK_CLASS,
   IdentityRow,
   IdentityRowHeadingLine,
   IdentityRowSupporting,

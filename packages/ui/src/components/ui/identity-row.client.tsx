@@ -6,6 +6,7 @@ import { Slot } from '@radix-ui/react-slot'
 import { cn } from '../../lib/utils'
 
 import {
+  IDENTITY_ROW_STACK_CLASS,
   identityRowClassificationVariants,
   identityRowHeadingVariants,
   identityRowRootVariants,
@@ -15,6 +16,7 @@ import {
 import { InlineMetadata } from './inline-metadata'
 
 export type { IdentityRowDensity } from './identity-row.variants'
+export { IDENTITY_ROW_STACK_CLASS } from './identity-row.variants'
 
 export type IdentityRowProps = {
   heading?: ReactNode
@@ -169,7 +171,7 @@ export function IdentityRow({
 
   return (
     <div className={cn(identityRowRootVariants({ density }), className)}>
-      <div className="ui-identity-row__stack">
+      <div className={IDENTITY_ROW_STACK_CLASS}>
         {showHeadingLine ? (
           <IdentityRowHeadingLine
             heading={heading}

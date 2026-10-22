@@ -49,6 +49,7 @@ import { abilitiesFormCopy } from '../../../../../lib/steps/abilities-form-label
 import type { AbilitiesFormValues } from '../../../../../lib/steps/abilities-form-fields'
 import { buildAbilityPreferenceLabelsByAbility } from '../../../../../lib/steps/ability-preference-indicator.lib'
 import {
+  ABILITY_SCORE_ASSIGNMENT_GRID_CLASSES,
   buildFixedScoreSelectOptions,
   getFixedScoresRemainingCount,
   resolveStandardArrayScoreToAbility,
@@ -446,7 +447,7 @@ export function FixedScoresAssignment({
           />
 
           <div
-            className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-6"
+            className={ABILITY_SCORE_ASSIGNMENT_GRID_CLASSES}
             role="group"
             aria-labelledby={introId}
           >

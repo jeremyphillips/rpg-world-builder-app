@@ -164,7 +164,7 @@ export function ContentDetailLayout({
 
   const content = (
     <div className="w-full min-w-0 space-y-6">
-      <Card tone="subtle" className="overflow-hidden">
+      <Card tone="strong" className="overflow-hidden">
         <CardContent className="py-4 pr-4 pb-4 pl-6">
           <div className={contentDetailHeroGridClasses(mediaPresentation)}>
             <div className="flex min-w-0 flex-1 flex-col">
