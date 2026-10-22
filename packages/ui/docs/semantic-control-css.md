@@ -66,6 +66,8 @@ For each migrated primitive, verify in Storybook DevTools:
 
 `ui-row-anatomy` owns row tracks and `__cell--{slot}` / `__cell--{column}` placement. `dash-entity-anatomy` and `dash-entity-leading` (dashboard) own entity column gaps and leading-rail columns. `ui-collapsible-list-item--entity-card` resets CLI chrome for disclosure EntityCard / catalog rows. `ui-identity-row__*` size modifiers own identity type scale (`__title`, `__classification`, `__supporting`).
 
+`ui-panel` owns radius (`--radius-md`), border, fill, and root padding. Tones are `transparent` (`--border-subtle`, no `--surface-current`), `quiet` (`--surface-lift`), `subtle` (`--surface-subtle`), `strong` (`--surface-strong`), and `faint` (`--surface-faint`). Filled tones use `var(--border)`. `--compact`, `--comfortable`, and `--spacious` publish the shared `--ui-surface-inset-*` ladder from `copy-scale.css`; `.ui-panel` consumes it as `padding-block` and `padding-inline`. `--bleed` zeroes that padding; use `ui-panel-section-inset` (`panelSectionInsetClasses`) on direct children that need the host density inset. There is no overflow on the shell and no header, content, or footer region. Children are direct descendants.
+
 `ui-inset-panel--{sm,md,lg}` owns radius and padding. Border style and alignment are separate modifiers. Surface wash still comes from the visual-vocabulary resolver.
 
 `ui-empty-panel` owns the compact sunken well (radius, padding, italic muted type, sunken shadow).

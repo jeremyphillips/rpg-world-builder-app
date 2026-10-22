@@ -1,8 +1,11 @@
 import { cva } from 'class-variance-authority'
 
-import { collectionPanelShellClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+import { cn, panelVariants } from '@rpg/ui'
 
-export const detailCollectionPanelVariants = cva(collectionPanelShellClasses)
+/** Specialized split header/body frame; outer shell uses shared `Panel` chrome. */
+export const detailCollectionPanelVariants = cva(
+  cn(panelVariants({ tone: 'transparent', bleed: true }), 'overflow-hidden'),
+)
 
 export const detailCollectionPanelHeaderVariants = cva('border-b border-border-subtle px-4 py-3', {
   variants: {

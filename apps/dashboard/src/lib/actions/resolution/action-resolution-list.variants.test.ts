@@ -10,9 +10,11 @@ import {
 } from './action-resolution-list.variants'
 
 describe('actionResolutionListVariants', () => {
-  it('uses the lighter-than-modal surface token', () => {
-    expect(actionResolutionListVariants()).toContain('bg-surface-subtle')
-    expect(actionResolutionListVariants()).not.toContain('bg-sunken')
+  it('uses a subtle panel frame without a second inset', () => {
+    const classes = actionResolutionListVariants()
+    expect(classes).toContain('ui-panel--subtle')
+    expect(classes).toContain('ui-panel--bleed')
+    expect(classes).not.toContain('bg-sunken')
   })
 
   it('applies shared issue row chrome for every issue row state', () => {

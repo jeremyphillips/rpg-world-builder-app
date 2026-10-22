@@ -1,6 +1,4 @@
-import { Heading, Text } from '@rpg/ui'
-
-import { collectionPanelLedgerBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+import { Heading, Panel, Text } from '@rpg/ui'
 
 import type { EquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import {
@@ -47,7 +45,7 @@ export function EquipmentPickerInventorySummary({
         {EQUIPMENT_PICKER_INVENTORY_SUMMARY_LABEL}
       </Heading>
 
-      <div className={collectionPanelLedgerBodyClasses}>
+      <Panel tone="subtle" density="compact">
         <div className="space-y-2">
           {rows.map((row) => (
             <SummaryRow key={row.label} row={row} />
@@ -55,7 +53,7 @@ export function EquipmentPickerInventorySummary({
           <div className="border-b border-border" role="presentation" />
           <SummaryRow row={total} />
         </div>
-      </div>
+      </Panel>
     </section>
   )
 }

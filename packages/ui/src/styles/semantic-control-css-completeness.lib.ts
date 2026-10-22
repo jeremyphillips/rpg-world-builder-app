@@ -208,6 +208,8 @@ const cardCssPath = path.join(stylesDir, '../components/ui/card.css')
 
 const insetPanelCssPath = path.join(stylesDir, '../components/ui/inset-panel.css')
 
+const panelCssPath = path.join(stylesDir, '../components/ui/panel.css')
+
 const BUTTON_APPEARANCE_MODIFIERS = [
   'primary',
   'destructive',
@@ -565,6 +567,19 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
         modifierPrefix: `ui-inset-panel--${name}`,
         requiredProperties: ['text-align'] as const,
       })),
+    ],
+  },
+  {
+    filePath: panelCssPath,
+    dimensions: [
+      ...(['transparent', 'quiet', 'subtle', 'strong', 'faint'] as const).map((tone) => ({
+        modifierPrefix: `ui-panel--${tone}`,
+        requiredProperties: ['border-color', 'background-color'] as const,
+      })),
+      {
+        modifierPrefix: 'ui-panel--bleed',
+        requiredProperties: ['padding-block', 'padding-inline'] as const,
+      },
     ],
   },
   {

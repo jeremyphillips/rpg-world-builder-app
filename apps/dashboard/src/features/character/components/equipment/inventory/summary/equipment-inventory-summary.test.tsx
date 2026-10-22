@@ -389,7 +389,7 @@ describe('EquipmentInventorySummary', () => {
       'false',
     )
     const inventoryHost = container.firstElementChild
-    expect(inventoryHost).toHaveClass('overflow-hidden', 'rounded-lg', 'border-border')
+    expect(inventoryHost).toHaveClass('ui-panel', 'ui-panel--transparent', 'ui-panel--bleed')
     expect(inventoryHost).not.toHaveClass('ui-card', 'bg-surface-subtle')
   })
 
@@ -433,7 +433,7 @@ describe('EquipmentInventorySummary', () => {
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.getByText('Battleaxe')).toBeInTheDocument()
     const inventoryHost = container.firstElementChild
-    expect(inventoryHost).toHaveClass('overflow-hidden', 'rounded-lg', 'border-border')
+    expect(inventoryHost).toHaveClass('ui-panel', 'ui-panel--transparent', 'ui-panel--bleed')
     expect(inventoryHost).not.toHaveClass('ui-card', 'bg-surface-subtle')
   })
 

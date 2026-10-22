@@ -9,8 +9,8 @@ import {
 import {
   buildRulesConfigLayoutFields,
   buildRulesFieldsForSurface,
-  buildRulesSchemaForSurface,
   characterConfigurationValidationMessages,
+  rulesSchema,
 } from './character-configuration-form-fields'
 
 const defaultCreatureTypeOptions = buildActiveCreatureTypeFieldOptions(
@@ -31,10 +31,9 @@ export {
   type CreateWizardRuleFieldId,
   type RulesReviewRow,
   type RulesValues,
+  createRulesSchema,
+  rulesSchema,
 } from './character-configuration-form-fields'
-
-export const createRulesSchema = buildRulesSchemaForSurface('create')
-export const rulesSchema = buildRulesSchemaForSurface('config')
 
 export const createRulesFields = buildRulesFieldsForSurface('create', defaultCreatureTypeOptions)
 

@@ -28,7 +28,13 @@ describe('DetailCollectionPanel', () => {
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
     expect(screen.getByText('Body content')).toBeInTheDocument()
 
-    expect(section).toHaveClass('rounded-md', 'border', 'border-border-subtle', 'overflow-hidden')
+    expect(section).toHaveClass(
+      'ui-panel',
+      'ui-panel--transparent',
+      'ui-panel--comfortable',
+      'ui-panel--bleed',
+      'overflow-hidden',
+    )
 
     const header = section?.firstElementChild
     expect(header).toHaveClass('border-b', 'border-border-subtle', 'bg-card', 'px-4', 'py-3')

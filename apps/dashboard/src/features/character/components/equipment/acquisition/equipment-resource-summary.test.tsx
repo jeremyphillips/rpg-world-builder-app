@@ -65,7 +65,12 @@ describe('EquipmentResourceSummary', () => {
     )
 
     expect(container.querySelectorAll('.ui-card')).toHaveLength(0)
-    expect(container.firstElementChild).toHaveClass('rounded-md', 'border', 'overflow-hidden')
+    expect(container.firstElementChild).toHaveClass(
+      'ui-panel',
+      'ui-panel--transparent',
+      'ui-panel--comfortable',
+    )
+    expect(container.firstElementChild).not.toHaveClass('overflow-hidden')
   })
 
   it('gives each resource section its own action inside a divided stack', () => {

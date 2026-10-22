@@ -1,6 +1,4 @@
-import { Eyebrow, InlineMetadata, Text } from '@rpg/ui'
-
-import { collectionPanelLedgerBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
+import { Eyebrow, InlineMetadata, Panel, Text } from '@rpg/ui'
 
 import {
   CHARACTER_EMPTY_SECTION_TEXT,
@@ -44,8 +42,7 @@ function CharacterDetailActionsPanel({ actions }: { actions: CharacterActionRowV
   return (
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{CHARACTER_SECTION_LABELS.actions}</Eyebrow>
-      <div className={collectionPanelLedgerBodyClasses}>
-        {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+      <Panel tone="subtle" density="compact">
         {actions.length === 0 ? (
           <Text variant="muted">{CHARACTER_EMPTY_SECTION_TEXT.actions}</Text>
         ) : (
@@ -63,7 +60,7 @@ function CharacterDetailActionsPanel({ actions }: { actions: CharacterActionRowV
             ))}
           </ul>
         )}
-      </div>
+      </Panel>
     </div>
   )
 }
@@ -72,10 +69,9 @@ function CharacterDetailSavingThrowsPanel({ section }: { section: CharacterDetai
   return (
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{section.title}</Eyebrow>
-      <div className={collectionPanelLedgerBodyClasses}>
-        {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+      <Panel tone="subtle" density="compact">
         <CharacterDetailListItems items={section.items} emptyText={section.emptyText} />
-      </div>
+      </Panel>
     </div>
   )
 }
@@ -90,8 +86,7 @@ function CharacterDetailProficienciesPanel({
   return (
     <div className={characterDetailCombatColumnClasses}>
       <Eyebrow size="sm">{section.title}</Eyebrow>
-      <div className={collectionPanelLedgerBodyClasses}>
-        {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+      <Panel tone="subtle" density="compact">
         {!hasItems ? (
           <Text variant="muted">{section.emptyText}</Text>
         ) : (
@@ -104,7 +99,7 @@ function CharacterDetailProficienciesPanel({
             ))}
           </div>
         )}
-      </div>
+      </Panel>
     </div>
   )
 }

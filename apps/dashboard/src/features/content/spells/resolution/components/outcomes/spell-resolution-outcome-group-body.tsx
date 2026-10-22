@@ -1,8 +1,6 @@
 import { getSpellResolutionOutcomeAuthoringLabel } from '@rpg/contracts'
-import { cn, Heading } from '@rpg/ui'
+import { Heading, Panel } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
-
-import { collectionPanelNestedBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 
 import { outcomeBranchBodyFields } from '../../lib/form/resolution-outcome-form-fields'
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
@@ -20,8 +18,12 @@ export function SpellResolutionOutcomeGroupBody({
   outcomeIndex,
 }: SpellResolutionOutcomeGroupBodyProps) {
   return (
-    <div className={cn(collectionPanelNestedBodyClasses, 'gap-3')} aria-labelledby={headingId}>
-      {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+    <Panel
+      tone="faint"
+      density="comfortable"
+      className="flex flex-col gap-3"
+      aria-labelledby={headingId}
+    >
       <Heading variant="group" as="h3" id={headingId}>
         {getSpellResolutionOutcomeAuthoringLabel(result)}
       </Heading>
@@ -31,6 +33,6 @@ export function SpellResolutionOutcomeGroupBody({
         idPrefix={`resolution-outcome-${outcomeIndex}`}
         namePrefix={`${RESOLUTION_FIELD_NAME}.outcomes.${outcomeIndex}`}
       />
-    </div>
+    </Panel>
   )
 }

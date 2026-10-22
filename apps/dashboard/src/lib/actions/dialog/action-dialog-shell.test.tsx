@@ -49,7 +49,7 @@ describe('ActionDialogShell', () => {
     )
 
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
-    expect(document.querySelector('.bg-surface-subtle')).toBeInTheDocument()
+    expect(document.querySelector('.ui-panel--subtle')).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations in resolve phase', async () => {

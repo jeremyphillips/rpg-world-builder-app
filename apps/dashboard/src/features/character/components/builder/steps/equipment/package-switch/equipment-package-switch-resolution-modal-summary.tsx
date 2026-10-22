@@ -1,8 +1,6 @@
 import type { EquipmentPackageSwitchEvaluation } from '@rpg/contracts'
-import { Text, cn } from '@rpg/ui'
+import { Panel, Text, cn } from '@rpg/ui'
 import { cva } from 'class-variance-authority'
-
-import { collectionPanelMutedSummaryClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 
 import {
   PACKAGE_SWITCH_BUDGET_AVAILABLE_LABEL,
@@ -65,10 +63,12 @@ export function PackageSwitchBudgetSummary({
     : formatPackageSwitchWealth(budget.initialAmountOverBudgetCp)
 
   return (
-    <section
+    <Panel
+      as="section"
+      tone="subtle"
+      density="compact"
       aria-live="polite"
       aria-label="Budget summary"
-      className={collectionPanelMutedSummaryClasses}
     >
       <Text as="p" variant="label" className="mb-3 text-foreground">
         Budget summary
@@ -97,6 +97,6 @@ export function PackageSwitchBudgetSummary({
           className="border-t border-border pt-2"
         />
       </div>
-    </section>
+    </Panel>
   )
 }

@@ -4,9 +4,15 @@ import { useFormContext } from 'react-hook-form'
 
 import { EntityActionChoiceMenu } from '@/features/content'
 
-import { collectionPanelNestedBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
-
-import { Button, ChoiceSelectionCounter, ComboboxField, Eyebrow, StatusDot, cn } from '@rpg/ui'
+import {
+  Button,
+  ChoiceSelectionCounter,
+  ComboboxField,
+  Eyebrow,
+  Panel,
+  StatusDot,
+  cn,
+} from '@rpg/ui'
 
 import type {
   CharacterBuildContext,
@@ -435,7 +441,9 @@ function StartingChoiceCategoryRow({
       </button>
       {expanded ? (
         <div className={quickNpcStartingChoiceExpandedPanelClasses}>
-          <div className={collectionPanelNestedBodyClasses}>{panel}</div>
+          <Panel tone="faint" density="compact" className="flex flex-col">
+            {panel}
+          </Panel>
         </div>
       ) : null}
     </section>

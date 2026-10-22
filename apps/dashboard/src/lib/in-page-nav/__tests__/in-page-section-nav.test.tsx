@@ -32,7 +32,7 @@ describe('InPageSectionNav', () => {
 
     const rail = screen.getByRole('navigation', { name: 'On this page sections' })
     const panel = rail.firstElementChild
-    expect(panel).toHaveClass('rounded-md', 'border', 'text-foreground')
+    expect(panel).toHaveClass('ui-panel', 'ui-panel--transparent', 'text-foreground')
     expect(panel).not.toHaveClass('ui-card')
     expect(panel).toHaveTextContent('On this page')
     expect(panel).toHaveTextContent('Features')

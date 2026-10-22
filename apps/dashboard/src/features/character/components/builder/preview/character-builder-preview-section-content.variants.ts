@@ -1,8 +1,7 @@
 export const characterBuilderPreviewHintClasses = 'text-style-caption'
 
-/** Inner layout for preview subsection frame (shell from collection panel tokens). */
-export const characterBuilderPreviewSubsectionsGroupClasses =
-  'flex flex-col gap-3 pt-3 pb-3 pr-2 pl-2'
+/** Inner layout for the preview subsection panel. Inset belongs to `Panel`. */
+export const characterBuilderPreviewSubsectionsGroupClasses = 'flex flex-col gap-3'
 
 export const characterBuilderPreviewSubsectionClasses = 'flex flex-col gap-1'
 

@@ -1,16 +1,14 @@
 import { ABILITY_SCORE_MIN, CHARACTER_ABILITY_SCORE_MAX, type Ability } from '@rpg/contracts'
 
-import { cn } from '@rpg/ui'
-
-import {
-  collectionPanelComfortableInsetClasses,
-  collectionPanelShellClasses,
-} from '@/lib/collection-panel/collection-panel-shell.variants'
+import { Panel } from '@rpg/ui'
 
 import { AbilityScoreCard, AbilityScoreNumeric } from '@/components/ability-score'
 
 import type { CharacterAbilityTile } from '../../../lib/display/character-display'
-import { characterDetailAbilitiesRowClasses } from './character-detail-sheet.variants'
+import {
+  characterDetailAbilitiesRowClasses,
+  characterDetailStatTileCompactWidthClasses,
+} from './character-detail-sheet.variants'
 
 export type CharacterDetailAbilityScoreEditor = {
   abilityScores: Partial<Record<Ability, number>>
@@ -29,10 +27,7 @@ export function CharacterDetailAbilitiesRow({
   abilityScoreEditor,
 }: CharacterDetailAbilitiesRowProps) {
   return (
-    <div
-      className={cn(collectionPanelShellClasses, collectionPanelComfortableInsetClasses, 'w-fit')}
-    >
-      {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+    <Panel tone="transparent" density="comfortable" className="w-fit">
       <div className={characterDetailAbilitiesRowClasses}>
         {abilities.map((ability) => {
           const abilityId = ability.id as Ability
@@ -41,7 +36,7 @@ export function CharacterDetailAbilitiesRow({
             typeof editorScore === 'number' ? editorScore : Number.parseInt(ability.score, 10)
 
           return (
-            <div key={ability.id} className="w-[100px] shrink-0">
+            <div key={ability.id} className={characterDetailStatTileCompactWidthClasses}>
               {abilityScoreEditor ? (
                 <AbilityScoreNumeric
                   ability={abilityId}
@@ -66,6 +61,6 @@ export function CharacterDetailAbilitiesRow({
           )
         })}
       </div>
-    </div>
+    </Panel>
   )
 }

@@ -9,7 +9,7 @@ import type {
   ResolvedStartingEquipmentFunding,
   StartingPackageConversionPreview,
 } from '@rpg/contracts'
-import { DividedStack, Text } from '@rpg/ui'
+import { DividedStack, Panel, Text } from '@rpg/ui'
 
 import { EquipmentInventorySectionHeader } from '@/features/content'
 
@@ -29,8 +29,6 @@ import {
   type AddedEquipmentCategoryGroup,
   type EquipmentInventoryStartingChannel,
 } from '../../../../lib/equipment/equipment-inventory-summary.lib'
-import { equipmentCollectionPanelShellClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
-
 import { equipmentInventorySectionClasses } from '../equipment-inventory.variants'
 import { useEquipmentSelectionFacts } from '../../../../hooks/use-equipment-selection-facts'
 
@@ -221,7 +219,7 @@ export function EquipmentInventorySummary({
   )
 
   return (
-    <div className={equipmentCollectionPanelShellClasses}>
+    <Panel tone="transparent" bleed>
       {viewModel.layout === 'split' ? (
         <DividedStack density="comfortable">
           {addedBlock}
@@ -243,6 +241,6 @@ export function EquipmentInventorySummary({
       ) : (
         addedBlock
       )}
-    </div>
+    </Panel>
   )
 }

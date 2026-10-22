@@ -12,10 +12,9 @@ import {
   type StartingPackageConversionPreview,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-import { Button, Checkbox, cn, Eyebrow, Text } from '@rpg/ui'
+import { Button, Checkbox, Eyebrow, panelSectionInsetClasses, Text, cn } from '@rpg/ui'
 
 import { EntityCard } from '@/features/content'
-import { collectionPanelComfortableInsetClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 import { useEquipmentSelectionFacts } from '../../../hooks/use-equipment-selection-facts'
 import { resolveEquipmentConversionItemPresentation } from '../../../lib/equipment/equipment-selection-facts.lib'
 import type { StartingPackageInventoryGroup } from '../../../lib/equipment/equipment-step.lib'
@@ -137,7 +136,7 @@ export function EquipmentPackageConversionEditor({
         </Text>
       </div>
 
-      <div className={cn(collectionPanelComfortableInsetClasses, 'space-y-4')}>
+      <div className={cn(panelSectionInsetClasses, 'space-y-4')}>
         <Text as="p" variant="caption">
           {formatConversionBudgetLine(preview)}
         </Text>

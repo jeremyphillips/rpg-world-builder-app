@@ -17,9 +17,8 @@ import {
   InlineMetadata,
   interactiveFocusVariants,
   interactivePointerClasses,
+  Panel,
 } from '@rpg/ui'
-
-import { collectionPanelLedgerBodyClasses } from '@/lib/collection-panel/collection-panel-shell.variants'
 
 import { formatMagicItemChoiceGrantValue } from '../../../../lib/equipment/magic-item-choice-label.lib'
 import { StartingGoldBonusFormulaTooltip } from '../../../equipment/starting-package/starting-gold-bonus-tooltip'
@@ -102,13 +101,11 @@ export function EquipmentStepTierSummary({
         </button>
       </CollapsibleTrigger>
       <CollapsibleContent asChild>
-        <div
-          className={cn(
-            collectionPanelLedgerBodyClasses,
-            'mt-1 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 text-style-caption',
-          )}
+        <Panel
+          tone="subtle"
+          density="compact"
+          className="mt-1 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 text-style-caption"
         >
-          {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
           {hasBonusWealth ? (
             <>
               <span className="text-muted-foreground">{STARTING_GOLD_BONUS_LABEL}</span>
@@ -130,7 +127,7 @@ export function EquipmentStepTierSummary({
               </span>
             </>
           ) : null}
-        </div>
+        </Panel>
       </CollapsibleContent>
     </Collapsible>
   )

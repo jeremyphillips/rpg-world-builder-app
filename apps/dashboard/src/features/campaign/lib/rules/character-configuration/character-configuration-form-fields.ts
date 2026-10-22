@@ -47,7 +47,7 @@ import {
   type GroupFieldItem,
 } from '@rpg/ui/form'
 
-import { vocabularyComboboxFieldForTerm, vocabularyFieldLabel } from '@/features/vocabulary'
+import { vocabularyComboboxFieldForTerm, vocabularyFieldLabel } from '@/features/vocabulary/fields'
 
 import { ExtendedProgressionEffects } from '../../../components/extended-progression-effects'
 import { SpellcastingProgressionField } from '../../../components/spellcasting-progression-field'
@@ -179,6 +179,8 @@ type ConfigRulesValues = z.output<typeof configRulesObjectSchema>
 
 const configRulesSchema = configRulesObjectSchema.superRefine(configRulesSuperRefine)
 
+export const rulesSchema = configRulesSchema
+
 const createRulesSchema = z
   .object({
     startingLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL),
@@ -191,6 +193,8 @@ const createRulesSchema = z
       ])
     }
   })
+
+export { createRulesSchema }
 
 export type RulesValues = z.infer<typeof configRulesSchema>
 

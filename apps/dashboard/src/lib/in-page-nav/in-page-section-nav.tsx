@@ -1,10 +1,13 @@
 import { useState } from 'react'
-import { cn, Eyebrow, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@rpg/ui'
-
 import {
-  collectionPanelComfortableInsetClasses,
-  collectionPanelShellClasses,
-} from '@/lib/collection-panel/collection-panel-shell.variants'
+  Eyebrow,
+  Panel,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@rpg/ui'
 
 import {
   buildInPageMobileNavItems,
@@ -58,14 +61,7 @@ export function InPageSectionNav({
         aria-label={navLabel}
         {...{ [IN_PAGE_SECTION_NAV_PANEL_ATTR]: '' }}
       >
-        <div
-          className={cn(
-            collectionPanelShellClasses,
-            collectionPanelComfortableInsetClasses,
-            'text-foreground',
-          )}
-        >
-          {/* TODO(panel): replace this ad hoc shell with shared panel treatment. */}
+        <Panel tone="transparent" density="comfortable" className="text-foreground">
           <Eyebrow size="sm" className={inPageSectionNavEyebrowClasses}>
             {eyebrowLabel}
           </Eyebrow>
@@ -124,7 +120,7 @@ export function InPageSectionNav({
               )
             })}
           </ul>
-        </div>
+        </Panel>
       </nav>
 
       <div className={inPageSectionNavMobileSelectSlotClasses}>

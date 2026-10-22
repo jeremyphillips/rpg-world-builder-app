@@ -30,12 +30,12 @@ describe('CharacterDetailCombatRow', () => {
     )
 
     const empty = screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.actions)
-    expect(empty.closest('.border')).toHaveClass('rounded-md', 'bg-surface-subtle')
-    expect(empty.closest('.border')).not.toHaveClass('space-y-3', 'ui-card')
-    expect(screen.getByText('Dexterity').closest('.border')).toHaveClass('bg-surface-subtle')
+    expect(empty.closest('.ui-panel')).toHaveClass('ui-panel--subtle', 'ui-panel--compact')
+    expect(empty.closest('.ui-panel')).not.toHaveClass('space-y-3', 'ui-card')
+    expect(screen.getByText('Dexterity').closest('.ui-panel')).toHaveClass('ui-panel--subtle')
     expect(
-      screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.proficiencies).closest('.border'),
-    ).toHaveClass('bg-surface-subtle')
+      screen.getByText(CHARACTER_EMPTY_SECTION_TEXT.proficiencies).closest('.ui-panel'),
+    ).toHaveClass('ui-panel--subtle')
   })
 
   it('insets populated actions', () => {
@@ -47,7 +47,7 @@ describe('CharacterDetailCombatRow', () => {
       />,
     )
 
-    expect(screen.getByText('Longsword').closest('.border')).toHaveClass('bg-surface-subtle')
+    expect(screen.getByText('Longsword').closest('.ui-panel')).toHaveClass('ui-panel--subtle')
     expect(screen.getByText('Attack +5')).toBeInTheDocument()
   })
 })
