@@ -110,7 +110,7 @@ describe('filter-presentation.lib', () => {
 
     expect(presentation.type).toBe('select')
     if (presentation.type === 'select') {
-      expect(presentation.groupClassName).toContain('flex-col')
+      expect(presentation.groupClassName).toContain('ui-filter-bar__group--stacked')
       expect(presentation.labelClassName).toContain('text-style-caption')
     }
   })
@@ -121,7 +121,7 @@ describe('filter-presentation.lib', () => {
 
     expect(presentation.type).toBe('select')
     if (presentation.type === 'select') {
-      expect(presentation.groupClassName).toContain('sm:flex-row')
+      expect(presentation.groupClassName).toContain('ui-filter-bar__group--inline')
     }
   })
 

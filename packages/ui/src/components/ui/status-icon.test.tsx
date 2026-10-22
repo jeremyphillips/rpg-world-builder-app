@@ -9,17 +9,16 @@ import {
   STATUS_ICON_STROKE_WIDTH,
   STATUS_ICON_TOOLTIP_LABELS,
   STATUS_ICON_VARIANTS,
-  statusIconAlertRingHiddenClasses,
 } from './status-icon.variants'
 
 function getStatusIconDisc(container: HTMLElement) {
-  return container.querySelector('span.rounded-full')
+  return container.querySelector('span.ui-status-icon')
 }
 
 describe('StatusIcon', () => {
   it('renders a decorative icon when tooltips are disabled', () => {
     const { container } = render(<StatusIcon variant="ready" tooltip={false} />)
-    expect(getStatusIconDisc(container)).toHaveClass('rounded-full')
+    expect(getStatusIconDisc(container)).toHaveClass('ui-status-icon')
     expect(getStatusIconDisc(container)).toHaveAttribute('aria-hidden', 'true')
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
@@ -37,7 +36,7 @@ describe('StatusIcon', () => {
 
   it.each(STATUS_ICON_VARIANTS)('applies variant classes for %s', (variant) => {
     const { container } = render(<StatusIcon variant={variant} tooltip={false} />)
-    expect(getStatusIconDisc(container)).toHaveClass('rounded-full')
+    expect(getStatusIconDisc(container)).toHaveClass('ui-status-icon')
   })
 
   it('shows the variant tooltip when enabled', async () => {
@@ -62,10 +61,7 @@ describe('StatusIcon', () => {
 
   it('applies ready semantic strong fill', () => {
     const { container } = render(<StatusIcon variant="ready" tooltip={false} />)
-    expect(getStatusIconDisc(container)).toHaveClass(
-      'bg-semantic-success-strong',
-      'text-semantic-success-strong-foreground',
-    )
+    expect(getStatusIconDisc(container)).toHaveClass('ui-status-icon--ready')
   })
 
   it('uses distinct neutral disc recipes for off and incomplete', () => {
@@ -74,8 +70,8 @@ describe('StatusIcon', () => {
       <StatusIcon variant="incomplete" tooltip={false} />,
     )
 
-    expect(getStatusIconDisc(offContainer)).toHaveClass('bg-status-icon-idle')
-    expect(getStatusIconDisc(incompleteContainer)).toHaveClass('bg-status-icon-incomplete')
+    expect(getStatusIconDisc(offContainer)).toHaveClass('ui-status-icon--off')
+    expect(getStatusIconDisc(incompleteContainer)).toHaveClass('ui-status-icon--incomplete')
   })
 
   it('matches the neutral glyph foreground on grey discs', () => {
@@ -85,16 +81,14 @@ describe('StatusIcon', () => {
       <StatusIcon variant="incomplete" tooltip={false} />,
     )
 
-    expect(offContainer.querySelector('svg')).toHaveClass('text-status-icon-neutral-foreground')
-    expect(noneContainer.querySelector('svg')).toHaveClass('text-status-icon-neutral-foreground')
-    expect(incompleteContainer.querySelector('svg')).toHaveClass(
-      'text-status-icon-neutral-foreground',
-    )
+    expect(offContainer.querySelector('svg')).toHaveClass('ui-status-icon__glyph--neutral')
+    expect(noneContainer.querySelector('svg')).toHaveClass('ui-status-icon__glyph--neutral')
+    expect(incompleteContainer.querySelector('svg')).toHaveClass('ui-status-icon__glyph--neutral')
   })
 
   it('hides the CircleAlert outer ring on needsAttention', () => {
     const { container } = render(<StatusIcon variant="needsAttention" tooltip={false} />)
-    expect(container.querySelector('svg')).toHaveClass(statusIconAlertRingHiddenClasses)
+    expect(container.querySelector('svg')).toHaveClass('ui-status-icon__glyph--needs-attention')
   })
 
   it('uses the default stroke width on every glyph except off', () => {
@@ -146,14 +140,14 @@ describe('StatusIcon', () => {
       <StatusIcon variant="ready" size="lg" tooltip={false} />,
     )
 
-    expect(getStatusIconDisc(smContainer)).toHaveClass('size-3')
-    expect(getStatusIconDisc(mdContainer)).toHaveClass('size-4')
-    expect(getStatusIconDisc(lgContainer)).toHaveClass('size-5')
+    expect(getStatusIconDisc(smContainer)).toHaveClass('ui-status-icon--sm')
+    expect(getStatusIconDisc(mdContainer)).toHaveClass('ui-status-icon--md')
+    expect(getStatusIconDisc(lgContainer)).toHaveClass('ui-status-icon--lg')
   })
 
   it('defaults to md disc size when size is omitted', () => {
     const { container } = render(<StatusIcon variant="ready" tooltip={false} />)
-    expect(getStatusIconDisc(container)).toHaveClass('size-4')
+    expect(getStatusIconDisc(container)).toHaveClass('ui-status-icon--md')
   })
 
   itAxe('has no axe accessibility violations', async () => {

@@ -8,7 +8,7 @@ import { countModifiedFilters } from './filter-engine'
 import {
   filterAdvancedPanelFooterVariants,
   filterAdvancedPanelInnerVariants,
-  filterAdvancedPanelVariants,
+  filterAdvancedPanelClassName,
 } from './filter-bar.variants'
 import { FilterAdvancedPanelHeader } from './filter-advanced-panel-header.client'
 import type { FilterAdvancedPanelHeaderProps } from './filter-advanced-panel-header.client'
@@ -81,7 +81,7 @@ export function FilterAdvancedPanelBody<TData, TState extends Record<string, unk
   const modifiedCount = schema && state ? countModifiedFilters(schema, state, 'advanced') : 0
 
   return (
-    <div className={cn(filterAdvancedPanelVariants())}>
+    <div className={filterAdvancedPanelClassName()}>
       <FilterAdvancedPanelHeader
         {...headerProps}
         density={density}

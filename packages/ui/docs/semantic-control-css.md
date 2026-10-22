@@ -102,6 +102,22 @@ Overlay notification counts use `ui-notification-unread-badge` (not compact-labe
 
 `ui-alert--{default|info|success|warning|destructive}` owns fill, border, and foreground. `ui-alert--{comfortable|compact}` owns gap and padding. `__title--{comfortable|compact}` owns the title type. `__description` owns the supporting copy.
 
+## StatusIcon
+
+`ui-status-icon` owns the disc. `ui-status-icon--{sm|md|lg}` are disc diameters (12 / 16 / 20px). Tone modifiers set fill and foreground. `ui-status-icon__glyph` carries neutral glyph color and needs-attention ring suppression; ladder or slash size utilities stay on the svg.
+
+## Wizard
+
+`ui-wizard__bubble`, `ui-wizard__label`, and `ui-wizard__connector` own shared geometry and transitions. State modifiers (`--idle`, `--active`, `--complete`) change paint only. Idle bubble and connector use `ui-border--default` for neutral structure; active and complete use primary.
+
+## FilterBar and catalog filter chrome
+
+`ui-filter-bar--{horizontal|vertical}` owns bar orientation. `ui-filter-bar__control--*` owns control width bands. `ui-filter-bar__group--inline` and `ui-filter-bar__group--stacked-*` own field-group layout. `ui-filter-advanced-panel` and `__header` / `__inner` / `__footer` density modifiers own the advanced panel shell (`ui-border--default` perimeter, `ui-border--subtle` footer divider). `ui-catalog-filter-controls` is the catalog filter row only (0.5rem gap).
+
+## CatalogToolbar
+
+`ui-catalog-toolbar` and `__tab-row` / `__utility` / `__utility-content` / `__view-controls` / `__actions` own picker toolbar layout. `__utility` is an inline-size container. Tab-row divider uses `ui-border--subtle`.
+
 ## Text roles
 
 `text-style-*` utilities are the Text role ladder and the field label, legend, hint, and error maps. They are `@utility` composites, same as `heading-style-*`, and they share a twMerge group. SemanticText is not a Text role: it owns inline status tone, emphasis, and an optional icon.

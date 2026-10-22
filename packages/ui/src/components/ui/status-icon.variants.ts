@@ -36,47 +36,41 @@ export const STATUS_ICON_STROKE_WIDTH = 4
 /** Heavier stroke for the off slash — reads lighter at a smaller glyph size. */
 export const STATUS_ICON_OFF_SLASH_STROKE_WIDTH = 7
 
-/** Hides the redundant outer ring on Lucide CircleAlert when rendered on a solid disc. */
-export const statusIconAlertRingHiddenClasses = '[&>circle]:hidden'
+const STATUS_ICON_TONE_CLASS: Record<StatusIconVariant, string> = {
+  ready: 'ui-status-icon--ready',
+  needsAttention: 'ui-status-icon--needs-attention',
+  incomplete: 'ui-status-icon--incomplete',
+  off: 'ui-status-icon--off',
+  none: 'ui-status-icon--none',
+  notConfigured: 'ui-status-icon--not-configured',
+}
 
-const statusIconNeutralDiscClasses = 'bg-status-icon-idle text-status-icon-neutral-foreground'
+const STATUS_ICON_SIZE_CLASS = {
+  sm: 'ui-status-icon--sm',
+  md: 'ui-status-icon--md',
+  lg: 'ui-status-icon--lg',
+} as const
 
-const statusIconNeutralGlyphClasses = 'text-status-icon-neutral-foreground'
-
-export const statusIconVariants = cva(
-  'inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full',
-  {
-    variants: {
-      variant: {
-        ready: 'bg-semantic-success-strong text-semantic-success-strong-foreground',
-        needsAttention: 'bg-semantic-warning-strong text-semantic-warning-strong-foreground',
-        incomplete: 'bg-status-icon-incomplete text-status-icon-neutral-foreground',
-        off: statusIconNeutralDiscClasses,
-        none: statusIconNeutralDiscClasses,
-        notConfigured: statusIconNeutralDiscClasses,
-      },
-      size: {
-        sm: 'size-3',
-        md: 'size-4',
-        lg: 'size-5',
-      },
-    },
-    defaultVariants: {
-      variant: 'ready',
-      size: STATUS_ICON_DEFAULT_SIZE,
-    },
+export const statusIconVariants = cva('ui-status-icon', {
+  variants: {
+    variant: STATUS_ICON_TONE_CLASS,
+    size: STATUS_ICON_SIZE_CLASS,
   },
-)
+  defaultVariants: {
+    variant: 'ready',
+    size: STATUS_ICON_DEFAULT_SIZE,
+  },
+})
 
-export const statusIconGlyphVariants = cva('', {
+export const statusIconGlyphVariants = cva('ui-status-icon__glyph', {
   variants: {
     variant: {
       ready: '',
-      incomplete: statusIconNeutralGlyphClasses,
-      off: statusIconNeutralGlyphClasses,
-      none: statusIconNeutralGlyphClasses,
-      notConfigured: statusIconNeutralGlyphClasses,
-      needsAttention: statusIconAlertRingHiddenClasses,
+      incomplete: 'ui-status-icon__glyph--neutral',
+      off: 'ui-status-icon__glyph--neutral',
+      none: 'ui-status-icon__glyph--neutral',
+      notConfigured: 'ui-status-icon__glyph--neutral',
+      needsAttention: 'ui-status-icon__glyph--needs-attention',
     },
     size: {
       sm: '',
@@ -88,81 +82,21 @@ export const statusIconGlyphVariants = cva('', {
     { variant: 'ready', size: 'sm', class: iconGlyphRootClasses.xs },
     { variant: 'ready', size: 'md', class: iconGlyphRootClasses.xs },
     { variant: 'ready', size: 'lg', class: iconGlyphRootClasses.sm },
-    {
-      variant: 'incomplete',
-      size: 'sm',
-      class: iconGlyphRootClasses.xs,
-    },
-    {
-      variant: 'incomplete',
-      size: 'md',
-      class: iconGlyphRootClasses.xs,
-    },
-    {
-      variant: 'incomplete',
-      size: 'lg',
-      class: iconGlyphRootClasses.sm,
-    },
-    {
-      variant: 'none',
-      size: 'sm',
-      class: iconGlyphRootClasses.xs,
-    },
-    {
-      variant: 'none',
-      size: 'md',
-      class: iconGlyphRootClasses.xs,
-    },
-    {
-      variant: 'none',
-      size: 'lg',
-      class: iconGlyphRootClasses.sm,
-    },
-    {
-      variant: 'notConfigured',
-      size: 'sm',
-      class: iconGlyphRootClasses.xs,
-    },
-    {
-      variant: 'notConfigured',
-      size: 'md',
-      class: iconGlyphRootClasses.xs,
-    },
-    {
-      variant: 'notConfigured',
-      size: 'lg',
-      class: iconGlyphRootClasses.sm,
-    },
-    {
-      variant: 'needsAttention',
-      size: 'sm',
-      class: iconGlyphRootClasses.xs,
-    },
-    {
-      variant: 'needsAttention',
-      size: 'md',
-      class: iconGlyphRootClasses.xs,
-    },
-    {
-      variant: 'needsAttention',
-      size: 'lg',
-      class: iconGlyphRootClasses.sm,
-    },
-    {
-      variant: 'off',
-      size: 'sm',
-      class: 'size-status-icon-slash-sm',
-    },
-    {
-      variant: 'off',
-      size: 'md',
-      class: 'size-status-icon-slash-sm',
-    },
-    {
-      variant: 'off',
-      size: 'lg',
-      class: 'size-status-icon-slash-md',
-    },
+    { variant: 'incomplete', size: 'sm', class: iconGlyphRootClasses.xs },
+    { variant: 'incomplete', size: 'md', class: iconGlyphRootClasses.xs },
+    { variant: 'incomplete', size: 'lg', class: iconGlyphRootClasses.sm },
+    { variant: 'none', size: 'sm', class: iconGlyphRootClasses.xs },
+    { variant: 'none', size: 'md', class: iconGlyphRootClasses.xs },
+    { variant: 'none', size: 'lg', class: iconGlyphRootClasses.sm },
+    { variant: 'notConfigured', size: 'sm', class: iconGlyphRootClasses.xs },
+    { variant: 'notConfigured', size: 'md', class: iconGlyphRootClasses.xs },
+    { variant: 'notConfigured', size: 'lg', class: iconGlyphRootClasses.sm },
+    { variant: 'needsAttention', size: 'sm', class: iconGlyphRootClasses.xs },
+    { variant: 'needsAttention', size: 'md', class: iconGlyphRootClasses.xs },
+    { variant: 'needsAttention', size: 'lg', class: iconGlyphRootClasses.sm },
+    { variant: 'off', size: 'sm', class: 'size-status-icon-slash-sm' },
+    { variant: 'off', size: 'md', class: 'size-status-icon-slash-sm' },
+    { variant: 'off', size: 'lg', class: 'size-status-icon-slash-md' },
   ],
   defaultVariants: {
     variant: 'ready',

@@ -31,12 +31,6 @@
   "packages/ui/src/components/ui/catalog-picker-sheet.variants.ts:34:cva() without a variant config object",
   "packages/ui/src/components/ui/catalog-picker-sheet.variants.ts:37:cva() without a variant config object",
   "packages/ui/src/components/ui/catalog-picker-sheet.variants.ts:40:cva() without a variant config object",
-  "packages/ui/src/components/ui/catalog-toolbar.variants.ts:7:cva() without a variant config object",
-  "packages/ui/src/components/ui/catalog-toolbar.variants.ts:9:cva() without a variant config object",
-  "packages/ui/src/components/ui/catalog-toolbar.variants.ts:18:cva() without a variant config object",
-  "packages/ui/src/components/ui/catalog-toolbar.variants.ts:23:cva() without a variant config object",
-  "packages/ui/src/components/ui/catalog-toolbar.variants.ts:28:cva() without a variant config object",
-  "packages/ui/src/components/ui/catalog-toolbar.variants.ts:32:cva() without a variant config object",
   "packages/ui/src/components/ui/collapsible-list-item/collapsible-list-item.variants.ts:70:exported const collapsibleListItemEntityCardHeaderRowClasses is a single semantic class alias",
   "packages/ui/src/components/ui/collapsible-list-item/collapsible-list-item.variants.ts:72:exported const collapsibleListItemEntityCardHeaderStackClasses is a single semantic class alias",
   "packages/ui/src/components/ui/collapsible-list-item/collapsible-list-item.variants.ts:74:exported const collapsibleListItemEntityCardHeaderStackSummaryGapClasses is a single semantic class alias",
@@ -168,8 +162,5 @@
   "packages/ui/src/components/ui/toast.variants.ts:49:cva() without a variant config object",
   "packages/ui/src/components/ui/toast.variants.ts:51:cva() without a variant config object",
   "packages/ui/src/components/ui/toast.variants.ts:53:cva() without a variant config object",
-  "packages/ui/src/components/ui/wizard.variants.ts:44:cva() without a variant config object",
-  "packages/ui/src/form/renderers/array/array-item-anatomy-grid.variants.ts:53:cva() without a variant config object",
-  "packages/ui/src/form/renderers/fields/combobox-filter-toolbar.variants.ts:7:cva() without a variant config object",
-  "packages/ui/src/form/renderers/fields/combobox-filter-toolbar.variants.ts:10:cva() without a variant config object"
+  "packages/ui/src/form/renderers/array/array-item-anatomy-grid.variants.ts:53:cva() without a variant config object"
 ]

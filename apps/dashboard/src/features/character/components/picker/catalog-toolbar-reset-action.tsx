@@ -1,13 +1,9 @@
-import { ActionButton } from '@rpg/ui'
+import { ActionButton, cn } from '@rpg/ui'
 import { FilterToolbarLabelSizer } from '@rpg/ui/filters'
 
+import { RESULT_COUNT_TABULAR_CLASSES } from '@/lib/data-table/format-result-count.lib'
 import { ResultSummary } from '@/lib/data-table/overview-result-summary'
 
-import {
-  catalogPickerResultSummaryClasses,
-  catalogToolbarResetRowClasses,
-  catalogToolbarResetSlotReservedClasses,
-} from './catalog-picker-filter-toolbar.variants'
 import {
   CATALOG_TOOLBAR_RESET_VISIBLE_LABEL,
   catalogToolbarResetAccessibleName,
@@ -82,7 +78,7 @@ function CatalogToolbarResultCount({
   reserveLabels: readonly string[]
 }) {
   return (
-    <span className={catalogPickerResultSummaryClasses}>
+    <span className={cn('text-style-caption', RESULT_COUNT_TABULAR_CLASSES)}>
       <FilterToolbarLabelSizer labels={reserveLabels}>
         <ResultSummary visibleCount={visibleCount} />
       </FilterToolbarLabelSizer>
@@ -102,10 +98,7 @@ function CatalogToolbarResetControl({
   onClick: () => void
 }) {
   return (
-    <div
-      className={visible ? undefined : catalogToolbarResetSlotReservedClasses}
-      aria-hidden={visible ? undefined : true}
-    >
+    <div className={visible ? undefined : 'invisible'} aria-hidden={visible ? undefined : true}>
       <CatalogToolbarResetAction
         label={label}
         accessibleName={accessibleName}
@@ -142,7 +135,7 @@ export function CatalogToolbarResetSlot({
   if (!shouldMountCatalogToolbarResetSlot({ showSummary, visible, shouldReserve })) return null
 
   return (
-    <div className={catalogToolbarResetRowClasses}>
+    <div className="flex items-center justify-end gap-2">
       {showSummary ? (
         <CatalogToolbarResultCount
           visibleCount={summaryVisibleCount}

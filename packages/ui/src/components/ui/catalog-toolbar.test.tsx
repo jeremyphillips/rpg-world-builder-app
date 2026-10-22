@@ -8,10 +8,6 @@ import { FilterFieldCaption } from '../../filters/filter-field-caption.client'
 import { createEqualsFilter, createTextFilter } from '../../filters/filter-engine.helpers'
 import { createFilterSchema } from '../../filters/filter-schema.types'
 import { CatalogToolbar } from './catalog-toolbar.client'
-import {
-  catalogToolbarUtilityBandVariants,
-  catalogToolbarViewControlsVariants,
-} from './catalog-toolbar.variants'
 
 type DemoRow = { name: string; status: string }
 type DemoFilterState = { search?: string; status?: string }
@@ -162,13 +158,11 @@ describe('CatalogToolbar', () => {
   describe('utility band layout', () => {
     function expectContainerQueryBand() {
       const band = document.querySelector('[data-slot="catalog-toolbar-utility"]')
-      expect(band).toHaveClass(...catalogToolbarUtilityBandVariants().split(' '))
-      expect(catalogToolbarUtilityBandVariants()).toContain('flex-wrap')
-      expect(catalogToolbarUtilityBandVariants()).not.toContain('flex-col')
+      expect(band).toHaveClass('ui-catalog-toolbar__utility')
       expect(band?.className).not.toMatch(/\bsm:/)
-      expect(catalogToolbarViewControlsVariants()).toContain('items-end')
-      expect(catalogToolbarViewControlsVariants()).toContain('gap-2')
-      expect(catalogToolbarViewControlsVariants()).not.toMatch(/\bsm:/)
+      const viewControls = document.querySelector('[data-slot="catalog-toolbar-view-controls"]')
+      expect(viewControls).toHaveClass('ui-catalog-toolbar__view-controls')
+      expect(viewControls?.className).not.toMatch(/\bsm:/)
     }
 
     it('keeps primary filters, utility filters, and a sort/reset stack inside a narrow parent', () => {

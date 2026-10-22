@@ -7,11 +7,7 @@ import { cn } from '../lib/utils'
 import { Button } from '../components/ui/button.client'
 import { countModifiedFilters } from './filter-engine'
 import { getSchemaFieldsByPlacement } from './filter-bar.lib'
-import {
-  filterBarResetButtonClasses,
-  filterBarVariants,
-  type FilterBarOrientation,
-} from './filter-bar.variants'
+import { filterBarVariants, type FilterBarOrientation } from './filter-bar.variants'
 import {
   FilterChromeProvider,
   useFilterChrome,
@@ -70,11 +66,10 @@ export function FilterBar<TData, TState extends Record<string, unknown>>({
           type="button"
           variant="outline"
           size={resetButtonSize === 'md' ? 'default' : 'sm'}
-          className={filterBarResetButtonClasses}
           disabled={disabled}
           onClick={onReset}
         >
-          <RotateCcw aria-hidden className="size-3" />
+          <RotateCcw aria-hidden />
           {resetLabel}
         </Button>
       ) : null}

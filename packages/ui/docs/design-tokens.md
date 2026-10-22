@@ -333,17 +333,14 @@ Enforcement: `icon-glyph-sizing-ban.test.ts` — raw `[&_svg]:size-*` / inline L
 
 ### StatusIcon exceptions
 
-Module: [`status-icon.variants.ts`](../src/components/ui/status-icon.variants.ts)
+Module: [`status-icon.css`](../src/components/ui/status-icon.css) + [`status-icon.variants.ts`](../src/components/ui/status-icon.variants.ts)
 
-Neutral disc fills use dedicated Layer 2 recipes — not surface-relative ink roles:
+Disc tone and diameter use `ui-status-icon--{ready|needs-attention|incomplete|off|none|not-configured}` and `ui-status-icon--{sm|md|lg}` (12 / 16 / 20px discs — not icon-glyph `sm`/`md`).
 
-| Role                                    | Utility                               |
-| --------------------------------------- | ------------------------------------- |
-| Idle / off / none / not configured disc | `bg-status-icon-idle`                 |
-| Incomplete / validation disc            | `bg-status-icon-incomplete`           |
-| Neutral glyph on grey discs             | `text-status-icon-neutral-foreground` |
+Neutral disc fills use `--status-icon-idle-bg` and `--status-icon-incomplete-bg`. Grey-disc glyphs use `ui-status-icon__glyph--neutral`.
 
 The off-slash glyph is **not** on the 10/12/14/16 icon-glyph ladder. It uses
 `size-status-icon-slash-sm` (6px) and `size-status-icon-slash-md` (8px) with a heavier
-Lucide `strokeWidth` than other variants. Pair slash utilities with StatusIcon size:
+Lucide `strokeWidth` than other variants. Pair slash utilities with StatusIcon disc size:
 `sm` and `md` discs → `size-status-icon-slash-sm`; `lg` disc → `size-status-icon-slash-md`.
+Other glyphs use `size-icon-glyph-xs` or `size-icon-glyph-sm` on the svg.

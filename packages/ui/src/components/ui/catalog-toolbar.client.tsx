@@ -12,15 +12,9 @@ import type {
   CatalogToolbarTabs,
 } from './catalog-toolbar.types'
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
+import { dialogPanelSectionInsetXClasses } from './dialog-panel.variants'
 import { resolveCatalogToolbarLayout } from './catalog-toolbar.lib'
-import {
-  catalogToolbarStandaloneActionsVariants,
-  catalogToolbarTabRowVariants,
-  catalogToolbarUtilityBandVariants,
-  catalogToolbarUtilityContentVariants,
-  catalogToolbarVariants,
-  catalogToolbarViewControlsVariants,
-} from './catalog-toolbar.variants'
 import { FILTER_DENSITY_DEFAULT } from '../../filters/filter-bar.variants'
 import { FilterChromeProvider, useOptionalFilterChrome } from '../../filters/filter-chrome.context'
 import { resolveFilterChromePresentation } from '../../filters/filter-presentation.lib'
@@ -49,7 +43,7 @@ function CatalogToolbarTabRow({
   actions?: ReactNode
 }) {
   return (
-    <div className={catalogToolbarTabRowVariants()}>
+    <div className={cn('ui-catalog-toolbar__tab-row', borderStrength('subtle'))}>
       <Tabs value={tabs.activeId} onValueChange={tabs.onActiveIdChange} className="min-w-0 flex-1">
         <TabsList aria-label={tabs.ariaLabel ?? 'Catalog views'} className="w-full border-b-0">
           {tabs.items.map((tab) => (
@@ -105,20 +99,17 @@ function CatalogToolbarUtilityBand({
 }) {
   const viewControls =
     filterRow.actions || trailingActions ? (
-      <div
-        className={catalogToolbarViewControlsVariants()}
-        data-slot="catalog-toolbar-view-controls"
-      >
+      <div className="ui-catalog-toolbar__view-controls" data-slot="catalog-toolbar-view-controls">
         {filterRow.actions}
         {trailingActions}
       </div>
     ) : null
 
   return (
-    <div className={catalogToolbarUtilityBandVariants()} data-slot="catalog-toolbar-utility">
+    <div className="ui-catalog-toolbar__utility" data-slot="catalog-toolbar-utility">
       {filterRow.controls ? (
         <div
-          className={catalogToolbarUtilityContentVariants()}
+          className="ui-catalog-toolbar__utility-content"
           data-slot="catalog-toolbar-utility-content"
         >
           {filterRow.controls}
@@ -130,7 +121,7 @@ function CatalogToolbarUtilityBand({
 }
 
 function CatalogToolbarStandaloneActions({ actions }: { actions: ReactNode }) {
-  return <div className={catalogToolbarStandaloneActionsVariants()}>{actions}</div>
+  return <div className="ui-catalog-toolbar__actions">{actions}</div>
 }
 
 function CatalogToolbarLayoutContent({
@@ -151,7 +142,7 @@ function CatalogToolbarLayoutContent({
   filterRow?: CatalogToolbarProps['filterRow']
 }) {
   return (
-    <div className={cn(catalogToolbarVariants(), className)}>
+    <div className={cn('ui-catalog-toolbar', dialogPanelSectionInsetXClasses, className)}>
       {layout.tabsBeforeSearch ? tabRow : null}
       {search ? <CatalogToolbarSearchField search={search} controlSize={controlSize} /> : null}
       {layout.tabsAfterSearch ? tabRow : null}

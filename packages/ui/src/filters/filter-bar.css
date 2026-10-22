@@ -1,0 +1,144 @@
+/*
+ * FilterBar, field groups, and advanced panel chrome.
+ */
+@layer components {
+  .ui-filter-bar {
+    display: flex;
+    min-width: 0;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .ui-filter-bar--horizontal {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 0.75rem;
+  }
+
+  .ui-filter-bar--vertical {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .ui-filter-bar__control--text {
+    min-width: 0;
+    flex: 0 1 14rem;
+    max-width: 20rem;
+  }
+
+  .ui-filter-bar__control--select {
+    min-width: 0;
+    flex: 0 1 10rem;
+    max-width: 10rem;
+  }
+
+  .ui-filter-bar__control--select-long {
+    min-width: 0;
+    flex: 0 1 14rem;
+    max-width: 14rem;
+  }
+
+  .ui-filter-bar__control--boolean {
+    display: inline-flex;
+    width: auto;
+    min-width: 0;
+    max-width: 14rem;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .ui-filter-bar__group--inline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  @media (width >= 40rem) {
+    .ui-filter-bar__group--inline {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  .ui-filter-bar__group--stacked {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ui-filter-bar__group--stacked-compact {
+    gap: 0.125rem;
+  }
+
+  .ui-filter-bar__group--stacked-comfortable {
+    gap: 0.25rem;
+  }
+
+  .ui-filter-advanced-panel {
+    border-radius: var(--radius-md);
+    border-width: 1px;
+    border-style: solid;
+    background-color: var(--surface-muted);
+    --field-control-bg: var(--field-control-bg-on-muted);
+  }
+
+  .ui-filter-advanced-panel__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .ui-filter-advanced-panel__header--compact {
+    padding-inline: 1rem;
+    padding-block-start: 0.75rem;
+    padding-block-end: 0;
+  }
+
+  .ui-filter-advanced-panel__header--comfortable {
+    padding-inline: 1.25rem;
+    padding-block-start: 1rem;
+    padding-block-end: 0;
+  }
+
+  .ui-filter-advanced-panel__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .ui-filter-advanced-panel__inner--compact {
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .ui-filter-advanced-panel__inner--comfortable {
+    column-gap: 1.5rem;
+    row-gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .ui-filter-advanced-panel__footer {
+    border-top-width: 1px;
+    border-top-style: solid;
+  }
+
+  .ui-filter-advanced-panel__footer--compact {
+    padding-inline: 0.75rem;
+    padding-block: 0.5rem;
+  }
+
+  .ui-filter-advanced-panel__footer--comfortable {
+    padding-inline: 1rem;
+    padding-block: 0.75rem;
+  }
+
+  .ui-catalog-filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.5rem;
+  }
+}

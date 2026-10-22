@@ -23,7 +23,5 @@ export const ICON_GLYPH_SIZING_EXEMPT_FILES = new Set([
   'packages/ui/src/components/ui/toast.client.tsx',
   'packages/ui/src/components/ui/tooltip.client.tsx',
   'packages/ui/src/components/ui/user-menu-trigger.client.tsx',
-  'packages/ui/src/components/ui/wizard.client.tsx',
-  'packages/ui/src/filters/filter-bar.client.tsx',
   'packages/ui/src/form/shells/tabbed-form-error-summary.client.tsx',
 ])

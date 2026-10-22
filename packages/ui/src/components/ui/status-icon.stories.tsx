@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { StatusIcon } from './status-icon.client'
+import { STATUS_ICON_CLASS_SPECS } from './status-icon.styles'
 import { STATUS_ICON_DEFAULT_SIZE, STATUS_ICON_VARIANTS } from './status-icon.variants'
 
 const meta = {
@@ -95,5 +97,26 @@ export const SizeParity: Story = {
         </span>
       </div>
     </div>
+  ),
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={STATUS_ICON_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <span data-semantic-class-target className={spec.className}>
+            ·
+          </span>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
   ),
 }
