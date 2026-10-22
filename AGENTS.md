@@ -13,8 +13,8 @@ not add migration scripts, versioned transforms, or dual-read paths unless the
 user explicitly asks.
 
 Workspaces are private (no external/npm consumers). Prefer clean barrels and
-subpath exports over shims; export renames are not semver — fix importers and
-typecheck.
+subpath exports over shims; export renames are not semver — fix importers;
+typecheck and tests catch misses.
 
 ## Quality gate
 
