@@ -161,6 +161,11 @@
 
   /* --- Empty body --- */
 
+  /* Structural row only — presentation lives on `__empty`. */
+  .ui-data-table__empty-row {
+    border-bottom: 0;
+  }
+
   .ui-data-table__empty {
     height: 6rem;
     text-align: center;

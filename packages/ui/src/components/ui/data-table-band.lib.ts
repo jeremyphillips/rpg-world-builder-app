@@ -13,6 +13,7 @@ export const DATA_TABLE_HEADER_ROW_CLASS = 'ui-data-table__header-row'
 export const DATA_TABLE_ROW_CLASS = 'ui-data-table__row'
 export const DATA_TABLE_CELL_CLASS = 'ui-data-table__cell'
 export const DATA_TABLE_CELL_MUTED_CLASS = 'ui-data-table__cell--muted'
+export const DATA_TABLE_EMPTY_ROW_CLASS = 'ui-data-table__empty-row'
 export const DATA_TABLE_EMPTY_CLASS = 'ui-data-table__empty'
 export const DATA_TABLE_SELECT_CLASS = 'ui-data-table__select'
 export const DATA_TABLE_ACTIONS_CLASS = 'ui-data-table__actions'
@@ -92,9 +93,15 @@ export const DATA_TABLE_CLASS_SPECS: DataTableClassSpec[] = [
     useCase: 'Unsorted column affordance.',
   },
   {
+    key: 'empty-row',
+    className: 'ui-data-table__empty-row',
+    keyValues: 'structural only',
+    useCase: 'Placeholder row when the table has no data rows.',
+  },
+  {
     key: 'empty',
     className: 'ui-data-table__empty',
     keyValues: 'height 6rem, muted copy',
-    useCase: 'No results body cell.',
+    useCase: 'No-results cell chrome (spans all columns).',
   },
 ]

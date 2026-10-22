@@ -62,6 +62,7 @@ import {
   DATA_TABLE_CELL_CLASS,
   DATA_TABLE_CELL_MUTED_CLASS,
   DATA_TABLE_EMPTY_CLASS,
+  DATA_TABLE_EMPTY_ROW_CLASS,
   DATA_TABLE_HEAD_CLASS,
   DATA_TABLE_HEADER_ROW_CLASS,
   DATA_TABLE_ROW_CLASS,
@@ -991,7 +992,7 @@ export function DataTable<TData>({
             </tr>
           ))
         ) : (
-          <tr className={DATA_TABLE_ROW_CLASS}>
+          <tr className={DATA_TABLE_EMPTY_ROW_CLASS}>
             <td colSpan={resolvedColumns.length} className={DATA_TABLE_EMPTY_CLASS}>
               {emptyState ? emptyState(emptyStateContext) : 'No results.'}
             </td>

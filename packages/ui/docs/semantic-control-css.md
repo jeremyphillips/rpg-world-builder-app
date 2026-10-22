@@ -65,7 +65,7 @@ Bordered `NumberStepper` (`.ui-number-stepper--bordered` in `field-group.css`) u
 
 Body rows (`__row`) compose `ui-interactive-row` once and drive a single inherited `--ui-data-table-row-bg` (transparent rest; `--ui-surface-hover-bg` / `--ui-surface-pressed-bg` / `--ui-surface-selected-bg` for interaction; `__row--unavailable` wins with `--warning-faint` over every combination). Sticky `__actions` body cells read `--ui-data-table-row-bg` from the row; header `__actions` stays `--surface-strong`.
 
-`__cell--unavailable-rail` is conditional status on the name cell only (inset accent). `__sort-icon--idle` appears on `__head:hover` and `__head:focus-within`. ClassReference specs → `DATA_TABLE_CLASS_SPECS` / `data-table.stories.tsx`.
+`__cell--unavailable-rail` is conditional status on the name cell only (inset accent). `__sort-icon--idle` appears on `__head:hover` and `__head:focus-within`. Empty tables use `__empty-row` (structural) + `__empty` (cell chrome). ClassReference specs → `DATA_TABLE_CLASS_SPECS` / `data-table.stories.tsx`.
 
 ## Card, inset panel, and empty panel
 

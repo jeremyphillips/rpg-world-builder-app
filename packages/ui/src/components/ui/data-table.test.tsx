@@ -80,6 +80,10 @@ describe('DataTable — rendering', () => {
   it('renders empty-state row when data is empty', () => {
     renderTable({ data: [] })
     expect(screen.getByText('No results.')).toBeInTheDocument()
+    const emptyCell = screen.getByText('No results.').closest('td')
+    expect(emptyCell).toHaveClass('ui-data-table__empty')
+    expect(emptyCell?.closest('tr')).toHaveClass('ui-data-table__empty-row')
+    expect(emptyCell?.closest('tr')).not.toHaveClass('ui-data-table__row')
   })
 
   it('renders caption when provided', () => {
