@@ -11,7 +11,6 @@ import {
   AccordionTrigger,
 } from '../ui/accordion.client'
 import { Alert } from '../ui/alert'
-import { alertTitleVariants } from '../ui/alert.variants'
 import { ScrollBoundaryRegion } from '../ui/scroll-boundary-region.client'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button.client'
@@ -92,35 +91,18 @@ function usePreviewRailChrome() {
 export type PreviewRailProps = React.ComponentPropsWithoutRef<'aside'> & {
   chrome?: PreviewRailChrome
   layout?: PreviewRailLayout
-  /** @deprecated Use `layout="fill"` for viewport-bounded aside columns. */
-  sticky?: boolean
-}
-
-function resolvePreviewRailLayout(
-  layout: PreviewRailLayout | undefined,
-  sticky: boolean | undefined,
-): PreviewRailLayout {
-  if (layout) return layout
-  if (sticky) return 'fill'
-  return 'default'
 }
 
 function PreviewRailRoot({
   chrome = 'card',
-  layout,
-  sticky,
+  layout = 'default',
   className,
   children,
   ...props
 }: PreviewRailProps) {
-  const resolvedLayout = resolvePreviewRailLayout(layout, sticky)
-
   return (
     <PreviewRailContext.Provider value={chrome}>
-      <aside
-        className={cn(previewRailRootVariants({ chrome, layout: resolvedLayout }), className)}
-        {...props}
-      >
+      <aside className={cn(previewRailRootVariants({ chrome, layout }), className)} {...props}>
         {children}
       </aside>
     </PreviewRailContext.Provider>
@@ -492,7 +474,7 @@ function PreviewRailStatusPanel({
       <div className="flex w-full items-start gap-2">
         {resolvedIcon}
         <div className={previewRailStatusPanelContentClasses}>
-          <p className={alertTitleVariants()}>{title}</p>
+          <p className="ui-alert__title ui-copy-title">{title}</p>
           {description ? (
             <p className={previewRailStatusPanelDescriptionClasses}>{description}</p>
           ) : null}

@@ -43,10 +43,6 @@ export const alertVariants = cva('ui-alert', {
   },
 })
 
-export const alertTitleVariants = cva('ui-alert__title ui-copy-title')
-
-export const alertDescriptionVariants = cva('ui-alert__description ui-copy-supporting')
-
 export const ALERT_CLASS_SPECS = [
   {
     key: 'warning',

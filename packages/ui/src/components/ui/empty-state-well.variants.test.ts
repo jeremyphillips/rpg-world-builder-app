@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { emptyPanelVariants } from './empty-panel.variants'
 import {
   emptyStateWellPassiveMessageClasses,
   emptyStateWellIconLgClasses,
@@ -11,7 +10,7 @@ import {
   emptyStateWellTitleLgClasses,
   resolveEmptyStateWellIconClasses,
 } from './empty-state-well.variants'
-import { insetPanelEmptyStateClasses } from './inset-panel.variants'
+import { DEFAULT_INSET_PANEL_SURFACE, insetPanelClassNames } from './inset-panel.variants'
 
 describe('emptyStateWell variants', () => {
   it('keeps shell and content on the sunken muted contract', () => {
@@ -33,7 +32,13 @@ describe('emptyStateWell variants', () => {
   })
 
   it('keeps empty panel and inset presets aligned with the well contract', () => {
-    expect(emptyPanelVariants()).toContain('ui-empty-panel')
-    expect(insetPanelEmptyStateClasses).toContain('bg-sunken')
+    expect(
+      insetPanelClassNames({
+        borderStyle: 'dashed',
+        surface: DEFAULT_INSET_PANEL_SURFACE,
+        size: 'md',
+        align: 'center',
+      }),
+    ).toContain('bg-sunken')
   })
 })

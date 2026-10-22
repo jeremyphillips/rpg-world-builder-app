@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from './dropdown-menu.client'
 import { MenuChoiceRow } from './menu-choice-row.client'
-import { interactiveListChoiceMenuContentClasses } from './dropdown-menu-choice.variants'
+import { dropdownMenuChoiceContentClasses } from './dropdown-menu-choice.variants'
 import {
   splitButtonChevronIconClasses,
   splitButtonChevronVariants,
@@ -95,9 +95,7 @@ export function SplitButton({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className={
-              useChoiceMenuLayout ? cn(interactiveListChoiceMenuContentClasses) : undefined
-            }
+            className={useChoiceMenuLayout ? cn(dropdownMenuChoiceContentClasses) : undefined}
           >
             {menuGroups.map((group, groupIndex) => (
               <React.Fragment key={group.id}>

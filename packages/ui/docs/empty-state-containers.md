@@ -59,8 +59,7 @@ Pass `role="status"` on a well root only when the empty state is expected to upd
 | [`InsetPanel.Text`](../src/components/ui/inset-panel.client.tsx)           | Instructional gate / supporting copy                   | Roman; no default italic                                                           |
 | [`InsetPanel`](../src/components/ui/inset-panel.client.tsx)                | Larger dashed/centered gates                           | Default surface is sunken; use `borderStyle="dashed"` for picker/authoring empties |
 | Title/supporting class exports                                             | Structured title + supporting stacks                   | Table builder, master-detail, heritage                                             |
-| `insetPanelEmptyStateClasses`                                              | Class-only dashed empty preset                         | Same fill as gate preset                                                           |
-| `insetPanelGateClasses`                                                    | Large dashed authoring blockers                        | Reference implementation                                                           |
+| `insetPanelClassNames` (dashed md/center or lg gate presets)               | Dashed empty and authoring gates                       | See `INSET_PANEL_CLASS_SPECS` in `inset-panel.variants.ts`                         |
 
 Do **not** pass `surface={{}}` to suppress fill on empty wells — that escape hatch is for non-empty interactive shells only.
 

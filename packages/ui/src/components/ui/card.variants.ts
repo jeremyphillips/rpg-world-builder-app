@@ -11,38 +11,11 @@ export type CardTone = CardSurfaceTone
 export const CARD_ELEVATIONS = ['flat', 'subtle', 'raised'] as const
 export type CardElevation = (typeof CARD_ELEVATIONS)[number]
 
-export const UI_CARD_ELEVATION_SUBTLE_CLASS = 'ui-card--elevation-subtle' as const
-export const UI_CARD_ELEVATION_RAISED_CLASS = 'ui-card--elevation-raised' as const
-
-export const UI_CARD_CLASS = 'ui-card' as const
-
-export const UI_CARD_MEDIA_CLASS = 'ui-card__media' as const
-export const UI_CARD_MEDIA_MODIFIER_CLASS = 'ui-card--media' as const
-export const UI_CARD_STRETCH_CLASS = 'ui-card--stretch' as const
-export const UI_CARD_HEADER_CLASS = 'ui-card__header' as const
-export const UI_CARD_CONTENT_CLASS = 'ui-card__content' as const
-export const UI_CARD_FOOTER_CLASS = 'ui-card__footer' as const
-export const UI_CARD_TITLE_CLASS = 'ui-card__title' as const
-export const UI_CARD_DESCRIPTION_CLASS = 'ui-card__description' as const
-
-export const UI_CARD_NAV_CLASS = 'ui-card__nav' as const
-export const UI_CARD_NAV_MAIN_CLASS = 'ui-card__nav-main' as const
-export const UI_CARD_NAV_CHEVRON_CLASS = 'ui-card__nav-chevron' as const
-
 export const CARD_INSET_DENSITIES = ['compact', 'comfortable', 'spacious'] as const
 export type CardInsetDensity = (typeof CARD_INSET_DENSITIES)[number]
 
 /** Generic `Card` `density` prop — same values as {@link CardInsetDensity}. */
 export type GenericCardDensity = CardInsetDensity
-
-/** @deprecated Use {@link CARD_INSET_DENSITIES} / {@link CardInsetDensity}. */
-export const CARD_DENSITIES = CARD_INSET_DENSITIES
-/** @deprecated Use {@link CardInsetDensity} or {@link GenericCardDensity}. */
-export type CardDensity = CardInsetDensity
-
-export const UI_CARD_DENSITY_COMPACT_CLASS = 'ui-card--compact' as const
-export const UI_CARD_DENSITY_COMFORTABLE_CLASS = 'ui-card--comfortable' as const
-export const UI_CARD_DENSITY_SPACIOUS_CLASS = 'ui-card--spacious' as const
 
 export const UI_CONTENT_CARD_INSET_CLASS = 'ui-content-card-inset' as const
 
@@ -57,12 +30,12 @@ export function resolveOptionCardSurfaceDensity(
 
 export function cardDensityClassName(density: CardInsetDensity = 'comfortable'): string {
   if (density === 'compact') {
-    return UI_CARD_DENSITY_COMPACT_CLASS
+    return 'ui-card--compact'
   }
   if (density === 'spacious') {
-    return UI_CARD_DENSITY_SPACIOUS_CLASS
+    return 'ui-card--spacious'
   }
-  return UI_CARD_DENSITY_COMFORTABLE_CLASS
+  return 'ui-card--comfortable'
 }
 
 export type CardSurfaceVariantProps = {
@@ -79,10 +52,10 @@ export type CardSurfaceVariantProps = {
 
 function cardElevationClassName(elevation: CardElevation = 'flat'): string | undefined {
   if (elevation === 'subtle') {
-    return UI_CARD_ELEVATION_SUBTLE_CLASS
+    return 'ui-card--elevation-subtle'
   }
   if (elevation === 'raised') {
-    return UI_CARD_ELEVATION_RAISED_CLASS
+    return 'ui-card--elevation-raised'
   }
   return undefined
 }
@@ -97,7 +70,7 @@ export function cardSurfaceVariants({
   disabled = false,
 }: CardSurfaceVariantProps = {}): string {
   return cn(
-    UI_CARD_CLASS,
+    'ui-card',
     cardDensityClassName(density),
     `ui-card--${tone}`,
     cardElevationClassName(elevation),
@@ -106,9 +79,6 @@ export function cardSurfaceVariants({
     disabled && 'ui-card--disabled',
   )
 }
-
-/** Default card chrome. */
-export const cardSurfaceClasses = cardSurfaceVariants()
 
 export type CardClassSpec = {
   key: string

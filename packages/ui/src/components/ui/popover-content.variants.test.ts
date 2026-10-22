@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  menuItemClasses,
   overlayArrowHeight,
   overlayArrowPath,
   overlayArrowWidth,
@@ -14,10 +13,6 @@ describe('popoverContentVariants', () => {
     expect(popoverContentVariants({ tone: 'tooltip' })).toContain('ui-popover-content--tooltip')
     expect(popoverContentVariants({ tone: 'filter' })).toContain('ui-popover-content--filter')
     expect(popoverContentVariants()).toContain('ui-popover-content--popover')
-  })
-
-  it('exports the menu item class', () => {
-    expect(menuItemClasses).toBe('ui-menu-item')
   })
 })
 

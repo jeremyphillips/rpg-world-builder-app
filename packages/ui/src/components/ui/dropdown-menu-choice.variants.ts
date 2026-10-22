@@ -6,9 +6,6 @@ import { resolveCompactControlMenuItemClasses } from './compact-control.styles'
 export const dropdownMenuChoiceContentClasses =
   'w-[min(var(--popover-choice-menu-width),calc(100vw-2rem))]'
 
-/** Rich action menus (split-button chevron, entity choice menus). */
-export const interactiveListChoiceMenuContentClasses = dropdownMenuChoiceContentClasses
-
 export const dropdownMenuChoiceItemVariants = cva('h-auto items-start', {
   variants: {
     size: {
@@ -25,6 +22,3 @@ export const dropdownMenuChoiceItemVariants = cva('h-auto items-start', {
 export type DropdownMenuChoiceItemVariantsProps = VariantProps<
   typeof dropdownMenuChoiceItemVariants
 >
-
-/** @deprecated Prefer `dropdownMenuChoiceItemVariants({ size })`. */
-export const dropdownMenuChoiceItemClasses = dropdownMenuChoiceItemVariants({ size: 'md' })

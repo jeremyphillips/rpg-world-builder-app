@@ -10,7 +10,7 @@ describe('PreviewRail', () => {
     const user = userEvent.setup()
 
     render(
-      <PreviewRail sticky>
+      <PreviewRail layout="fill">
         <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
         <PreviewRail.Identity
           media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
@@ -158,16 +158,6 @@ describe('PreviewRail', () => {
       container.querySelector('[data-slot="preview-rail-identity"] .border-t'),
     ).toBeInTheDocument()
     expect(screen.getByText('Hit die')).toBeInTheDocument()
-  })
-
-  it('maps deprecated sticky to layout fill classes', () => {
-    render(
-      <PreviewRail sticky>
-        <PreviewRail.Header title="Class Preview" />
-      </PreviewRail>,
-    )
-
-    expect(screen.getByRole('complementary')).toHaveClass('flex-1', 'min-h-0')
   })
 
   it('applies layout fill inside a bounded flex column aside slot', () => {

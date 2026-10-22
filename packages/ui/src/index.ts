@@ -71,8 +71,6 @@ export {
 } from './components/ui/alert'
 export {
   alertVariants,
-  alertTitleVariants,
-  alertDescriptionVariants,
   ALERT_DENSITIES,
   ALERT_VARIANTS,
   type AlertVariantProps,
@@ -199,7 +197,6 @@ export {
   CollectionAddControl,
   type CollectionAddControlProps,
 } from './components/ui/collection-add-control.client'
-export { emptyPanelVariants } from './components/ui/empty-panel.variants'
 export {
   emptyStateWellBodyClasses,
   emptyStateWellIconInkClasses,
@@ -338,24 +335,14 @@ export {
 } from './components/ui/destination-list'
 export {
   CARD_CLASS_SPECS,
-  CARD_DENSITIES,
   CARD_ELEVATIONS,
   CARD_INSET_DENSITIES,
   CARD_SURFACE_TONES,
   cardDensityClassName,
-  cardSurfaceClasses,
   cardSurfaceVariants,
   resolveOptionCardSurfaceDensity,
-  UI_CARD_DESCRIPTION_CLASS,
-  UI_CARD_ELEVATION_RAISED_CLASS,
-  UI_CARD_ELEVATION_SUBTLE_CLASS,
   UI_CONTENT_CARD_INSET_CLASS,
-  UI_CARD_DENSITY_COMPACT_CLASS,
-  UI_CARD_DENSITY_COMFORTABLE_CLASS,
-  UI_CARD_DENSITY_SPACIOUS_CLASS,
-  UI_CARD_TITLE_CLASS,
   type CardClassSpec,
-  type CardDensity,
   type CardElevation,
   type CardInsetDensity,
   type CardSurfaceTone,
@@ -600,10 +587,6 @@ export {
   INSET_PANEL_BORDER_STYLES,
   INSET_PANEL_SIZES,
   insetPanelClassNames,
-  insetPanelEmptyStateClasses,
-  insetPanelEmptyStateVariants,
-  insetPanelGateClasses,
-  insetPanelGateVariants,
   insetPanelSunkenShadowClasses,
   insetPanelTextVariantBySize,
   insetPanelVariants,
@@ -1029,9 +1012,7 @@ export {
 } from './components/ui/dropdown-menu-item-content'
 export {
   dropdownMenuChoiceContentClasses,
-  dropdownMenuChoiceItemClasses,
   dropdownMenuChoiceItemVariants,
-  interactiveListChoiceMenuContentClasses,
 } from './components/ui/dropdown-menu-choice.variants'
 export {
   UserMenuTrigger,

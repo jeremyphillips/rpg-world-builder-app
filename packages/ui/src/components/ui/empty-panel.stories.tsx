@@ -39,6 +39,7 @@ export const Default = PassiveMessage
 export const ClassReference: Story = {
   tags: ['control-parity'],
   parameters: { semanticClasses: true },
+  args: { children: '' },
   render: () => (
     <ClassReferenceTable
       rows={EMPTY_PANEL_CLASS_SPECS.map((spec) => ({

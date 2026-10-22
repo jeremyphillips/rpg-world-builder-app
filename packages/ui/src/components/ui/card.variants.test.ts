@@ -4,19 +4,20 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-import { cardSurfaceClasses, cardSurfaceVariants } from './card.variants'
+import { cardSurfaceVariants } from './card.variants'
 
 const cardCssPath = join(dirname(fileURLToPath(import.meta.url)), 'card.css')
 
 describe('cardSurfaceVariants', () => {
   it('emits the card block for the default surface', () => {
-    expect(cardSurfaceClasses).toContain('ui-card')
-    expect(cardSurfaceClasses).toContain('ui-card--strong')
-    expect(cardSurfaceClasses).toContain('ui-card--comfortable')
-    expect(cardSurfaceClasses).toContain('ui-card--static')
-    expect(cardSurfaceClasses).not.toContain('ui-card--interactive')
-    expect(cardSurfaceClasses).not.toContain('ui-card--elevation-subtle')
-    expect(cardSurfaceClasses).not.toContain('ui-card--elevation-raised')
+    const defaults = cardSurfaceVariants()
+    expect(defaults).toContain('ui-card')
+    expect(defaults).toContain('ui-card--strong')
+    expect(defaults).toContain('ui-card--comfortable')
+    expect(defaults).toContain('ui-card--static')
+    expect(defaults).not.toContain('ui-card--interactive')
+    expect(defaults).not.toContain('ui-card--elevation-subtle')
+    expect(defaults).not.toContain('ui-card--elevation-raised')
   })
 
   it('emits elevation modifiers when requested', () => {

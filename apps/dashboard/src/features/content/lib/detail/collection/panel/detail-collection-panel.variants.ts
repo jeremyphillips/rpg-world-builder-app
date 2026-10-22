@@ -1,12 +1,5 @@
 import { cva } from 'class-variance-authority'
 
-import { cn, panelVariants } from '@rpg/ui'
-
-/** Specialized split header/body frame; outer shell uses shared `Panel` chrome. */
-export const detailCollectionPanelVariants = cva(
-  cn(panelVariants({ tone: 'transparent', bleed: true }), 'overflow-hidden'),
-)
-
 export const detailCollectionPanelHeaderVariants = cva('border-b border-border-subtle px-4 py-3', {
   variants: {
     surface: {

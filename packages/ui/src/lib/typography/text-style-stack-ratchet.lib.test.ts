@@ -128,7 +128,7 @@ describe('text-style-stack-ratchet.lib', () => {
 
   it('allows Card description shell class on p', () => {
     expect(
-      pTagViolatesTypographyOwnership('<p className={cn(UI_CARD_DESCRIPTION_CLASS, className)}>'),
+      pTagViolatesTypographyOwnership("<p className={cn('ui-card__description', className)}>"),
     ).toBeNull()
   })
 

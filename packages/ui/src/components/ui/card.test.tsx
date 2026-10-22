@@ -7,14 +7,12 @@ import userEvent from '@testing-library/user-event'
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './card'
 import { IdentityRowHeadingLine } from './identity-row.client'
-import {
-  UI_CARD_CONTENT_CLASS,
-  UI_CARD_DESCRIPTION_CLASS,
-  UI_CARD_FOOTER_CLASS,
-  UI_CARD_HEADER_CLASS,
-  UI_CARD_NAV_CHEVRON_CLASS,
-  UI_CARD_TITLE_CLASS,
-} from './card.variants'
+const UI_CARD_HEADER_CLASS = 'ui-card__header'
+const UI_CARD_TITLE_CLASS = 'ui-card__title'
+const UI_CARD_DESCRIPTION_CLASS = 'ui-card__description'
+const UI_CARD_CONTENT_CLASS = 'ui-card__content'
+const UI_CARD_FOOTER_CLASS = 'ui-card__footer'
+const UI_CARD_NAV_CHEVRON_CLASS = 'ui-card__nav-chevron'
 
 const SPACING_PX = 4
 

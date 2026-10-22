@@ -6,11 +6,7 @@ import { Check, ChevronRight, Circle } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { menuItemIconGlyphClasses } from './icon-glyph.variants'
-import {
-  menuItemClasses,
-  popoverContentMotionClasses,
-  popoverContentVariants,
-} from './popover-content.variants'
+import { popoverContentMotionClasses, popoverContentVariants } from './popover-content.variants'
 
 const DropdownMenu = DropdownMenuPrimitive.Root
 
@@ -33,7 +29,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      cn(menuItemClasses, menuItemIconGlyphClasses),
+      cn('ui-menu-item', menuItemIconGlyphClasses),
       inset && 'ui-menu-item--inset',
       className,
     )}
@@ -90,7 +86,7 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      cn(menuItemClasses, menuItemIconGlyphClasses),
+      cn('ui-menu-item', menuItemIconGlyphClasses),
       inset && 'ui-menu-item--inset',
       className,
     )}
@@ -105,7 +101,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
 >(({ className, children, checked, ...props }, ref) => (
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
-    className={cn(menuItemClasses, 'ui-menu-item--inset', className)}
+    className={cn('ui-menu-item', 'ui-menu-item--inset', className)}
     checked={checked}
     {...props}
   >
@@ -125,7 +121,7 @@ const DropdownMenuRadioItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
-    className={cn(menuItemClasses, 'ui-menu-item--inset', className)}
+    className={cn('ui-menu-item', 'ui-menu-item--inset', className)}
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">

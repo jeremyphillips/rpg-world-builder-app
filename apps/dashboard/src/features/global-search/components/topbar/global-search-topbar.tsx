@@ -12,11 +12,6 @@ import { GlobalSearchField } from '../global-search-field'
 import { GlobalSearchPreviewPanel } from './global-search-preview-panel'
 import { GlobalSearchTrigger } from './global-search-trigger'
 import { useGlobalSearchContext } from '../global-search-context'
-import {
-  globalSearchTopbarInputWrapClasses,
-  globalSearchTopbarPreviewPlacementClasses,
-  globalSearchTopbarRootClasses,
-} from './global-search-topbar.variants'
 
 const TOPBAR_SEARCH_FIELD_ID = 'global-search-topbar-field'
 const TOPBAR_SEARCH_PREVIEW_ID = 'global-search-topbar-preview'
@@ -62,7 +57,7 @@ export function GlobalSearchTopbar() {
 
   if (!campaignId) {
     return (
-      <div className={globalSearchTopbarRootClasses}>
+      <div className="relative shrink-0">
         <GlobalSearchTrigger disabled onOpen={() => undefined} />
       </div>
     )
@@ -117,9 +112,9 @@ function GlobalSearchTopbarExpanded({
   )
 
   return (
-    <div ref={containerRef} className={globalSearchTopbarRootClasses}>
+    <div ref={containerRef} className="relative shrink-0">
       {open ? (
-        <div className={globalSearchTopbarInputWrapClasses}>
+        <div className="w-[min(100vw-8rem,20rem)]">
           <GlobalSearchField
             id={TOPBAR_SEARCH_FIELD_ID}
             value={search.query}
@@ -146,7 +141,7 @@ function GlobalSearchTopbarExpanded({
             }}
             resolveHref={resolveHref}
             showAllHref={showAllHref}
-            className={globalSearchTopbarPreviewPlacementClasses}
+            className="absolute top-full right-0 z-50 mt-2 flex max-h-[min(70vh,28rem)] w-[min(100vw-2rem,24rem)] flex-col overflow-hidden shadow-md outline-none"
           />
         </div>
       ) : (

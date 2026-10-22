@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { EntityActionChoiceMenu } from './entity-action-choice-menu'
-import { entityActionChoiceMenuContentClasses } from './entity-action-choice-menu.variants'
+import { dropdownMenuChoiceContentClasses } from '@rpg/ui'
 
 describe('EntityActionChoiceMenu', () => {
   it('renders labeled trigger and invokes onSelect with descriptions visible', async () => {
@@ -47,6 +47,6 @@ describe('EntityActionChoiceMenu', () => {
     )
 
     await user.click(screen.getByRole('button', { name: /add/i }))
-    expect(screen.getByRole('menu')).toHaveClass(entityActionChoiceMenuContentClasses)
+    expect(screen.getByRole('menu')).toHaveClass(dropdownMenuChoiceContentClasses)
   })
 })

@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { UI_CARD_DESCRIPTION_CLASS, UI_CARD_TITLE_CLASS } from '@rpg/ui'
 
 import { BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL } from '../../../../lib/builder/builder-step-choose-class-prompt.lib'
 import {
@@ -25,9 +24,9 @@ describe('BuilderStepChooseClassPrompt', () => {
 
     expect(
       screen.getByRole('heading', { level: 3, name: EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING }),
-    ).toHaveClass(UI_CARD_TITLE_CLASS)
+    ).toHaveClass('ui-card__title')
     expect(screen.getByText(EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION)).toHaveClass(
-      UI_CARD_DESCRIPTION_CLASS,
+      'ui-card__description',
     )
     expect(screen.getByText(EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING).parentElement).toHaveClass(
       'flex',

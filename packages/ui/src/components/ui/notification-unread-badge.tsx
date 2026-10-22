@@ -1,6 +1,4 @@
 import { cn } from '../../lib/utils'
-import { notificationUnreadBadgeVariants } from './notification-unread-badge.variants'
-
 export type NotificationUnreadBadgeProps = {
   count: number
   className?: string
@@ -17,7 +15,10 @@ export function NotificationUnreadBadge({ count, className }: NotificationUnread
   if (count <= 0) return null
 
   return (
-    <span aria-hidden className={cn(notificationUnreadBadgeVariants({ tone: 'alert' }), className)}>
+    <span
+      aria-hidden
+      className={cn('ui-notification-unread-badge ui-notification-unread-badge--alert', className)}
+    >
       {formatUnreadCount(count)}
     </span>
   )

@@ -28,8 +28,6 @@ export function popoverContentVariants({
   return cn('ui-popover-content', `ui-popover-content--${tone}`, 'shadow-md')
 }
 
-export const menuItemClasses = 'ui-menu-item'
-
 export const POPOVER_CONTENT_CLASS_SPECS = [
   {
     key: 'menu',

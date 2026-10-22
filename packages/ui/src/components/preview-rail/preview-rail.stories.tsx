@@ -20,7 +20,7 @@ const identityFacts = [
 export const MockComposition: Story = {
   name: 'Mock composition (valid class)',
   render: () => (
-    <PreviewRail sticky>
+    <PreviewRail layout="fill">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
@@ -100,7 +100,7 @@ export const MockComposition: Story = {
 
 export const FreshCreate: Story = {
   render: () => (
-    <PreviewRail sticky>
+    <PreviewRail layout="fill">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
@@ -153,7 +153,7 @@ export const FreshCreate: Story = {
 
 export const PostSubmitAttention: Story = {
   render: () => (
-    <PreviewRail sticky>
+    <PreviewRail layout="fill">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
@@ -268,7 +268,7 @@ export const ViewportAsideFill: Story = {
 
 export const LongNameTruncation: Story = {
   render: () => (
-    <PreviewRail sticky>
+    <PreviewRail layout="fill">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
