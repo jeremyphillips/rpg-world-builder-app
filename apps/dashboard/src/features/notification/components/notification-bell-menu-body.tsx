@@ -6,6 +6,7 @@ import {
   NotificationLoadingState,
   NotificationPreviewList,
   cn,
+  interactiveFocusVariants,
   menuItemIconGlyphClasses,
   standaloneTextActionClasses,
 } from '@rpg/ui'
@@ -18,6 +19,7 @@ import { NOTIFICATION_COPY } from '../lib/notification-copy'
 const notificationFooterLinkClasses = cn(
   'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm',
   standaloneTextActionClasses(),
+  interactiveFocusVariants({ context: 'standalone' }),
   menuItemIconGlyphClasses,
 )
 

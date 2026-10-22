@@ -61,7 +61,6 @@ export function MasterDetailListRow({
   onSelect,
   selectedRowRef,
 }: MasterDetailListRowProps) {
-  const active = item.active !== false
   const issueCount = item.issueCount ?? 0
 
   return (
@@ -72,7 +71,7 @@ export function MasterDetailListRow({
         aria-current={isSelected ? 'true' : undefined}
         aria-invalid={item.hasError ? true : undefined}
         onClick={() => onSelect(index)}
-        className={masterDetailListRowClasses({ active, isSelected })}
+        className={masterDetailListRowClasses({ isSelected })}
       >
         <MasterDetailListRowContent item={item} issueCount={issueCount} />
         <span className={masterDetailListRowEndClasses} aria-hidden>

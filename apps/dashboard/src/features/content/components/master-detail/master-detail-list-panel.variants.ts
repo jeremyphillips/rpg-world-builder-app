@@ -1,15 +1,12 @@
 import {
+  cardSurfaceVariants,
   cn,
   interactiveFocusVariants,
-  interactiveRowVariants,
   panelVariants,
   scrollBoundaryRegionRootClasses,
 } from '@rpg/ui'
 
-import {
-  masterDetailRailBorderClasses,
-  masterDetailRailRowSeparatorClasses,
-} from './master-detail-rail.variants'
+import { masterDetailRailBorderClasses } from './master-detail-rail.variants'
 
 /** Fixed chrome above the item list — header row plus optional availability count. */
 export const masterDetailListChromeBlockSizeContractClasses =
@@ -32,28 +29,25 @@ export const masterDetailListHeaderClasses = cn(
 
 export const masterDetailListTitleClasses = 'min-w-0 text-lg font-medium text-foreground'
 
-/** Unpadded list section — rows bleed to shell edges. */
-export const masterDetailListItemsClasses = masterDetailRailRowSeparatorClasses
+/** Card nav stack inside the list scrollport. */
+export const masterDetailListItemsClasses = 'flex flex-col gap-2 p-2'
 
-export function masterDetailListRowClasses(options: {
-  active?: boolean
-  isSelected: boolean
-}): string {
-  const active = options.active !== false
+function masterDetailListRowCardSurface(options: { isSelected: boolean }): string {
+  return cardSurfaceVariants({
+    tone: 'quiet',
+    elevation: 'flat',
+    density: 'compact',
+    interactive: true,
+    selected: options.isSelected,
+  })
+}
 
+export function masterDetailListRowClasses(options: { isSelected: boolean }): string {
   return cn(
-    'relative flex w-full items-center gap-2 border-0 py-2.5 pl-5 pr-3 text-left transition-colors',
+    'flex w-full items-center gap-2 border-0 text-left text-foreground',
+    '[padding-block:var(--ui-card-inset-block)] [padding-inline:var(--ui-card-inset-inline)]',
+    masterDetailListRowCardSurface({ isSelected: options.isSelected }),
     interactiveFocusVariants({ context: 'standalone' }),
-    interactiveRowVariants({
-      interaction: 'hoverable',
-      state: 'default',
-      selected: options.isSelected ? 'fill' : 'none',
-      hitTarget: 'pointer',
-    }),
-    !active && 'text-muted-foreground',
-    options.isSelected && 'text-foreground',
-    options.isSelected &&
-      'before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-primary',
   )
 }
 
@@ -68,7 +62,7 @@ export const masterDetailListRowSourceClasses = 'min-w-0 truncate text-style-cap
 
 export const masterDetailListRowMetadataClasses = 'flex min-w-0 items-center'
 
-export const masterDetailListRowEndClasses = 'flex shrink-0 self-center text-muted-foreground'
+export const masterDetailListRowEndClasses = 'flex shrink-0 self-center text-foreground'
 
 /** @deprecated List rows render structured meta; detail identity still joins for subtitles. */
 export const masterDetailListRowMetaClasses = 'min-w-0 truncate text-style-caption'

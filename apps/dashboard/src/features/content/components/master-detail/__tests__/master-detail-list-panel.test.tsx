@@ -59,6 +59,17 @@ describe('MasterDetailListPanel', () => {
     expect(props.onAdd).toHaveBeenCalledOnce()
   })
 
+  it('uses interactive card selected chrome on the current row', () => {
+    render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
+
+    const selected = screen.getByRole('button', { name: /Rage/i })
+    const unselected = screen.getByRole('button', { name: /Unarmored Defense/i })
+
+    expect(selected).toHaveClass('ui-card', 'ui-card--interactive', 'ui-card--selected')
+    expect(unselected).toHaveClass('ui-card', 'ui-card--interactive')
+    expect(unselected).not.toHaveClass('ui-card--selected')
+  })
+
   it('calls onSelect with the row index when the whole row is clicked', async () => {
     const user = userEvent.setup()
     const props = baseProps()
