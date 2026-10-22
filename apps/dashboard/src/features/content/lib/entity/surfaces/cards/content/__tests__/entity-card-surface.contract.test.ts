@@ -5,12 +5,13 @@ import { validateSemanticControlCssCompleteness } from '@rpg/ui/test-utils'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { resolveEntitySurfaceEdges } from '../../../../anatomy/entity-surface-edges.lib'
+import {
+  ENTITY_SURFACE_DEFAULT_EDGES,
+  resolveEntitySurfaceEdges,
+} from '../../../../anatomy/entity-surface-edges.lib'
 import type { EntityAnatomyTrailing } from '../../../../anatomy/entity-anatomy-trailing.types'
 import { DASH_ENTITY_CARD_BODY_CLASS } from '../../../dash-entity-surface.variants'
-import { catalogCardBodyWashVariants } from '../../../catalog/catalog-card.variants'
-import { disclosureEntityCardBodyWashVariants } from '../../disclosure/entity-card-disclosure-renderer.variants'
-import { entityCardFrameVariants } from '../entity-card-frame.variants'
+import { entityCardFrameClassName } from '../entity-card-frame.lib'
 
 const button = () => createElement('button', { type: 'button' })
 const utilityTrailing: EntityAnatomyTrailing = { kind: 'utility', content: button() }
@@ -33,26 +34,27 @@ const dashEntitySurfaceCssPath = path.join(
 
 describe('entity card surface contract', () => {
   it('keeps perimeter and content inset as separate owners', () => {
-    const frame = entityCardFrameVariants({ density: 'compact' })
+    const frame = entityCardFrameClassName({
+      density: 'compact',
+      edges: ENTITY_SURFACE_DEFAULT_EDGES,
+      leadingUtilityCount: 0,
+    })
 
     expect(frame).not.toMatch(/\bpy-\d/)
     expect(frame).not.toMatch(/\bp[xytblr]-\d/)
     expect(frame).toContain('dash-entity-card')
-    expect(frame).toContain('dash-entity-card--compact')
     expect(frame).toContain('dash-entity-surface--compact')
+    expect(frame).not.toContain('dash-entity-card--compact')
     expect(frame).not.toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
     expect(frame).not.toMatch(/\[--entity-surface-inset:/)
   })
 
-  it('publishes block inset on the frame density modifier', () => {
-    expect(entityCardFrameVariants({ density: 'compact' })).toContain('dash-entity-card--compact')
-    expect(entityCardFrameVariants({ density: 'comfortable' })).toContain(
-      'dash-entity-card--comfortable',
-    )
-  })
-
   it('does not reference removed catalog row surface tokens', () => {
-    const frame = entityCardFrameVariants({ density: 'compact' })
+    const frame = entityCardFrameClassName({
+      density: 'compact',
+      edges: ENTITY_SURFACE_DEFAULT_EDGES,
+      leadingUtilityCount: 0,
+    })
     expect(frame).not.toContain('bg-catalog-picker-row-surface')
     expect(frame).not.toContain('surface=')
   })
@@ -123,9 +125,9 @@ describe('edge-aware surface inset', () => {
     ).toEqual({ start: 'utility', end: 'utility' })
 
     const edges = resolveEntitySurfaceEdges({ leadingUtilityCount: 0, trailing: utilityTrailing })
-    expect(entityCardFrameVariants({ density: 'compact', edges })).toContain(
-      'dash-entity-surface--end-utility',
-    )
+    expect(
+      entityCardFrameClassName({ density: 'compact', edges, leadingUtilityCount: 0 }),
+    ).toContain('dash-entity-surface--end-utility')
   })
 
   it('keeps the default end inset for action, group, and quantity trailing', () => {
@@ -137,14 +139,17 @@ describe('edge-aware surface inset', () => {
     ]) {
       const edges = resolveEntitySurfaceEdges({ leadingUtilityCount: 0, trailing })
       expect(edges.end).toBe('default')
-      expect(entityCardFrameVariants({ density: 'compact', edges })).toContain(
-        'dash-entity-surface--end-default',
-      )
+      expect(
+        entityCardFrameClassName({ density: 'compact', edges, leadingUtilityCount: 0 }),
+      ).toContain('dash-entity-surface--end-default')
     }
   })
 
   it('keeps body wash on dash-entity-card__body', () => {
-    for (const wash of [disclosureEntityCardBodyWashVariants(), catalogCardBodyWashVariants()]) {
+    for (const wash of [
+      'dash-entity-card__body dash-entity-card__body--disclosure-wash',
+      'dash-entity-card__body dash-entity-card__body--catalog-wash',
+    ]) {
       expect(wash).toContain(DASH_ENTITY_CARD_BODY_CLASS)
       expect(wash).not.toContain('pr-[var(--entity-body-inline-end)]')
     }

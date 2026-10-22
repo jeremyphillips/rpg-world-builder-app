@@ -22,12 +22,6 @@ import type { AbilitiesFormValues } from '../../../../../lib/steps/abilities-for
 import { buildAbilityPreferenceLabelsByAbility } from '../../../../../lib/steps/ability-preference-indicator.lib'
 import { scoresFromFormValues } from '../../../../../lib/steps/fixed-scores-assignment.lib'
 import { AbilityRecommendationPanel } from '../recommendation/ability-recommendation-panel'
-import {
-  fixedScoresAbilityGridClasses,
-  fixedScoresAssignmentIntroClasses,
-  fixedScoresAssignmentRootClasses,
-} from './fixed-scores-assignment.variants'
-
 export type ManualAbilitiesAssignmentProps = {
   showInvalidStates?: boolean
   classInput?: AbilityScoreRecommendationClassInput | null
@@ -69,14 +63,18 @@ export function ManualAbilitiesAssignment({
   )
 
   return (
-    <div className={fixedScoresAssignmentRootClasses}>
-      <div className={fixedScoresAssignmentIntroClasses}>
+    <div className="space-y-6">
+      <div className="space-y-1">
         <Text as="h3" id={introId} variant="label">
           {methodHeading}
         </Text>
       </div>
 
-      <div className={fixedScoresAbilityGridClasses} role="group" aria-labelledby={introId}>
+      <div
+        className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-6"
+        role="group"
+        aria-labelledby={introId}
+      >
         {ABILITY_IDS.map((ability) => {
           const assignedScore = scores[ability]
           const preferenceLabel = preferenceLabels[ability]

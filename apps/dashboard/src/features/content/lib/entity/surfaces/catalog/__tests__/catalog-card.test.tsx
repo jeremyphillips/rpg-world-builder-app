@@ -4,7 +4,6 @@ import { collapsibleListItemHeaderVerticalPaddingVariants, RadioGroup } from '@r
 import { describe, expect, it, vi } from 'vitest'
 
 import { CatalogCard } from '../catalog-card'
-import { catalogCardBodyWashVariants } from '../catalog-card.variants'
 import { DASH_ENTITY_CARD_BODY_CLASS } from '../../dash-entity-surface.variants'
 
 const domIds = {
@@ -144,7 +143,7 @@ describe('CatalogCard', () => {
     )
 
     const body = screen.getByText('Expanded details').parentElement
-    expect(body).toHaveClass(catalogCardBodyWashVariants())
+    expect(body).toHaveClass('dash-entity-card__body', 'dash-entity-card__body--catalog-wash')
     expect(body).toHaveClass(DASH_ENTITY_CARD_BODY_CLASS)
     expect(body).not.toHaveClass('-ml-2')
   })

@@ -5,14 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 import { cardSurfaceVariants } from './card.variants'
-import {
-  optionCardEmbeddedSlotClassName,
-  UI_OPTION_CARD_BODY_CLASS,
-  UI_OPTION_CARD_EMBEDDED_IN_FLOW_CLASS,
-  UI_OPTION_CARD_EMBEDDED_PANEL_CLASS,
-  UI_OPTION_CARD_PRIMARY_CLASS,
-  UI_SELECTION_OPTION_CARD_ANATOMY_CLASS,
-} from './selection-option-card.lib'
+import { optionCardEmbeddedSlotClassName } from './selection-option-card.lib'
 import { radioCardVariants } from './radio-card.variants'
 
 const radioCardCss = readFileSync(
@@ -43,7 +36,7 @@ describe('optionCard surface establishment', () => {
       expect(classes).not.toContain('bg-background')
       expect(classes).not.toContain('bg-surface-muted')
     }
-    expect(radioCardCss).toContain(`${UI_OPTION_CARD_EMBEDDED_IN_FLOW_CLASS}`)
+    expect(radioCardCss).toContain('ui-option-card__embedded--in-flow')
     expect(radioCardCss).toContain('border-top: 1px solid var(--border)')
   })
 
@@ -55,8 +48,8 @@ describe('optionCard surface establishment', () => {
   })
 
   it('derives in-flow embedded inset from the control size and column gap', () => {
-    expect(optionCardEmbeddedSlotClassName('divider')).toBe(UI_OPTION_CARD_EMBEDDED_IN_FLOW_CLASS)
-    expect(optionCardEmbeddedSlotClassName('panel')).toBe(UI_OPTION_CARD_EMBEDDED_PANEL_CLASS)
+    expect(optionCardEmbeddedSlotClassName('divider')).toBe('ui-option-card__embedded--in-flow')
+    expect(optionCardEmbeddedSlotClassName('panel')).toBe('ui-option-card__embedded--panel')
     expect(radioCardCss).toContain('var(--control-choice-indicator-size-lg) + (var(--spacing) * 4)')
     expect(radioCardCss).toContain('var(--control-choice-indicator-size-sm) + (var(--spacing) * 3)')
     expect(radioCardCss).toContain('padding-inline-start:')
@@ -76,11 +69,11 @@ describe('optionCard surface establishment', () => {
   })
 
   it('keeps region spacing in ui-radio-card.css instead of variant CVAs', () => {
-    expect(radioCardCss).toContain(`.${UI_OPTION_CARD_BODY_CLASS}`)
+    expect(radioCardCss).toContain('.ui-option-card__body')
     expect(radioCardCss).toContain('--ui-option-card-body-gap')
-    expect(radioCardCss).toContain(`.${UI_OPTION_CARD_PRIMARY_CLASS}`)
+    expect(radioCardCss).toContain('.ui-option-card__primary')
     expect(radioCardCss).toContain('gap: var(--ui-anatomy-row-gap)')
-    expect(radioCardCss).toContain(`.${UI_SELECTION_OPTION_CARD_ANATOMY_CLASS}`)
+    expect(radioCardCss).toContain('.ui-selection-option-card__anatomy')
     expect(radioCardCss).toContain('.ui-option-card__summary-badge-row')
     expect(radioCardCss).toContain('min-height: 22px')
     expect(radioCardCss).toContain('.ui-option-card__secondary--content')

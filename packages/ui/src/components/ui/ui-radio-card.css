@@ -261,4 +261,80 @@
     flex-direction: column;
     gap: var(--ui-anatomy-row-gap);
   }
+
+  .ui-radio-card__indicator {
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .group[data-state='checked'] .ui-radio-card__indicator,
+  .group:has([data-state='checked']) .ui-radio-card__indicator {
+    opacity: 1;
+  }
+
+  .ui-radio-card__icon-control {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-foreground);
+    transition-property: color;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ui-radio-card__icon-control--comfortable {
+    width: calc(var(--spacing) * 5);
+    height: calc(var(--spacing) * 5);
+  }
+
+  .ui-radio-card__icon-control--comfortable svg {
+    width: calc(var(--spacing) * 5);
+    height: calc(var(--spacing) * 5);
+  }
+
+  .ui-radio-card__icon-control--compact {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+  }
+
+  .ui-radio-card__icon-control--compact svg {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+  }
+
+  .group[data-state='checked'] .ui-radio-card__icon-control,
+  .group:has([data-state='checked']) .ui-radio-card__icon-control {
+    color: var(--primary);
+  }
+
+  .ui-radio-card__details-action {
+    flex-shrink: 0;
+  }
+
+  .ui-radio-card__details-action svg {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+  }
+
+  .ui-radio-card__leading-title-line {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    align-self: flex-start;
+  }
+
+  .ui-radio-card__leading-title-line--comfortable {
+    height: calc(var(--spacing) * 6);
+  }
+
+  .ui-radio-card__leading-title-line--compact {
+    height: calc(var(--spacing) * 5);
+  }
+
+  .ui-radio-card__leading-title-line--title-end {
+    height: var(--control-action-compact-height, 2rem);
+  }
 }

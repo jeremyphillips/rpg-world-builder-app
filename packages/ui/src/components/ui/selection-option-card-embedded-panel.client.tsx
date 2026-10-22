@@ -3,10 +3,6 @@
 import type { ElementType, ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
-import {
-  UI_OPTION_CARD_EMBEDDED_PANEL_CLASS_NAME,
-  UI_OPTION_CARD_EMBEDDED_PANEL_HEADER_CLASS,
-} from './selection-option-card.lib'
 
 const OPTION_CARD_SUPPORTING_CLASS = 'ui-copy-supporting text-muted-foreground'
 
@@ -19,7 +15,7 @@ export function SelectionOptionCardEmbeddedPanel({
   children,
   className,
 }: SelectionOptionCardEmbeddedPanelProps) {
-  return <div className={cn(UI_OPTION_CARD_EMBEDDED_PANEL_CLASS_NAME, className)}>{children}</div>
+  return <div className={cn('ui-option-card-embedded-panel', className)}>{children}</div>
 }
 
 export type SelectionOptionCardEmbeddedPanelHeaderProps = {
@@ -40,7 +36,7 @@ export function SelectionOptionCardEmbeddedPanelHeader({
   className,
 }: SelectionOptionCardEmbeddedPanelHeaderProps) {
   return (
-    <div className={cn(UI_OPTION_CARD_EMBEDDED_PANEL_HEADER_CLASS, className)}>
+    <div className={cn('ui-option-card-embedded-panel__header', className)}>
       <div className="ui-option-card-embedded-panel__header-row">
         <TitleTag id={titleId} className="ui-copy-title">
           {title}

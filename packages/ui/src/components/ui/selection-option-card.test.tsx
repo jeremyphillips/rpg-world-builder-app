@@ -16,11 +16,6 @@ import {
   SelectionOptionCardEmbeddedPanel,
   SelectionOptionCardEmbeddedPanelHeader,
 } from './selection-option-card-embedded-panel.client'
-import {
-  UI_OPTION_CARD_EMBEDDED_IN_FLOW_CLASS,
-  UI_OPTION_CARD_EMBEDDED_PANEL_CLASS,
-  UI_OPTION_CARD_PRIMARY_CLASS,
-} from './selection-option-card.lib'
 
 const uiDir = dirname(fileURLToPath(import.meta.url))
 
@@ -178,7 +173,7 @@ describe('SelectionOptionCard', () => {
     expect(description).toHaveClass('ui-copy-supporting')
     expect(resolvedCustomPx(title, '--ui-copy-title-size', '16px')).toBe('14px')
     expect(resolvedCustomPx(description, '--ui-copy-supporting-size', '14px')).toBe('12px')
-    expect(title.closest(`.${UI_OPTION_CARD_PRIMARY_CLASS}`)).toBeTruthy()
+    expect(title.closest('.ui-option-card__primary')).toBeTruthy()
     expect(screen.getByText('Selected package').className).toContain('eyebrow-style-xs')
 
     rerender(
@@ -227,9 +222,9 @@ describe('SelectionOptionCard', () => {
         '14px',
       ),
     ).toBe('12px')
-    const slot = panelTitle.closest(`.${UI_OPTION_CARD_EMBEDDED_PANEL_CLASS}`)
+    const slot = panelTitle.closest('.ui-option-card__embedded--panel')
     expect(slot).toBeTruthy()
-    expect(slot).not.toHaveClass(UI_OPTION_CARD_EMBEDDED_IN_FLOW_CLASS)
+    expect(slot).not.toHaveClass('ui-option-card__embedded--in-flow')
   })
 
   it('indents in-flow embedded content to the control column', () => {
@@ -244,7 +239,7 @@ describe('SelectionOptionCard', () => {
     )
 
     const slot = screen.getByText('Customize Heavy Armor').parentElement
-    expect(slot).toHaveClass(UI_OPTION_CARD_EMBEDDED_IN_FLOW_CLASS)
+    expect(slot).toHaveClass('ui-option-card__embedded--in-flow')
     expect(resolvedCalcPx(getComputedStyle(slot!).paddingInlineStart)).toBe(28)
     expect(slot?.closest('.ui-card')).toHaveClass('ui-card--compact')
     expect(slot?.closest('.ui-card')).not.toHaveClass('ui-radio-card--row-compact')

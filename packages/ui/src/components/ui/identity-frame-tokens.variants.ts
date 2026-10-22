@@ -11,15 +11,15 @@ export const IDENTITY_FRAME_FITS = ['cover', 'contain'] as const
 export type IdentityFrameFit = (typeof IDENTITY_FRAME_FITS)[number]
 
 export const identityFrameSizeClasses: Record<IdentityFrameSize, string> = {
-  xs: 'size-8',
-  sm: 'size-10',
-  md: 'size-[3.75rem]',
-  inline: 'size-5',
+  xs: 'ui-identity-frame--xs',
+  sm: 'ui-identity-frame--sm',
+  md: 'ui-identity-frame--md',
+  inline: 'ui-identity-frame--inline',
 }
 
 export const identityFrameShapeClasses: Record<IdentityFrameShape, string> = {
-  box: 'rounded-md',
-  circle: 'rounded-full',
+  box: 'ui-identity-frame--shape-box',
+  circle: 'ui-identity-frame--shape-circle',
 }
 
 /** Icon glyph sizing for fallback icons inside a frame at each density. */
@@ -31,6 +31,6 @@ export const identityFrameFallbackIconClasses: Record<IdentityFrameSize, string>
 }
 
 export const identityFrameFitClasses: Record<IdentityFrameFit, string> = {
-  cover: 'object-cover',
-  contain: 'object-contain',
+  cover: 'ui-identity-frame__image--cover',
+  contain: 'ui-identity-frame__image--contain',
 }

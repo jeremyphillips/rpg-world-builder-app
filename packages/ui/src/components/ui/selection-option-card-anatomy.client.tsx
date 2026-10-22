@@ -7,11 +7,7 @@ import { Eyebrow } from './eyebrow'
 import type { EyebrowVariantProps } from './eyebrow.variants'
 import { identityInsetRowVariants } from './identity-frame.variants'
 import { textVariants } from './text.variants'
-import {
-  selectionOptionCardAnatomyClassName,
-  UI_OPTION_CARD_BODY_CLASS,
-  UI_OPTION_CARD_PRIMARY_CLASS,
-} from './selection-option-card.lib'
+import { selectionOptionCardAnatomyClassName } from './selection-option-card.lib'
 
 export type SelectionOptionCardCopyWidth = 'fill' | 'content'
 
@@ -174,7 +170,7 @@ function SelectionOptionCardPrimaryCopy({
 
   return (
     <div className={cn('flex min-w-0 w-full flex-col', showSummaryBadgeRow && 'min-h-0 flex-1')}>
-      <div className={cn(UI_OPTION_CARD_PRIMARY_CLASS, showSummaryBadgeRow && 'min-h-0 flex-1')}>
+      <div className={cn('ui-option-card__primary', showSummaryBadgeRow && 'min-h-0 flex-1')}>
         {titleEndSlot ? (
           <div className="ui-option-card__title-line">
             <div className="min-w-0 shrink">{titleRow}</div>
@@ -255,7 +251,7 @@ export function SelectionOptionCardAnatomy({
   )
 
   const body = (
-    <div className={UI_OPTION_CARD_BODY_CLASS}>
+    <div className="ui-option-card__body">
       {headerRow}
       {leadingMedia ? (
         <div className={identityInsetRowVariants({ density, align: 'start' })}>

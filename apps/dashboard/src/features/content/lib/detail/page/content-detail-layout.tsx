@@ -19,25 +19,38 @@ import { ContentMediaFallback, ContentMediaImage } from './content-media-image'
 import { ContentDetailEditAction } from './content-detail-edit-action'
 import { ContentDetailStatRows } from './content-detail-stat-rows'
 import { DEFAULT_HERO_STAT_ROW_COLUMN_COUNT } from './partition-hero-stat-row-groups.lib'
-import {
-  contentDetailHeroCardClasses,
-  contentDetailHeroCardContentClasses,
-  contentDetailHeroDescriptionClasses,
-  contentDetailHeroGridClasses,
-  contentDetailHeroEyebrowClasses,
-  contentDetailHeroImageFrameClasses,
-  contentDetailHeroImageShellClasses,
-  contentDetailHeroMainClasses,
-  contentDetailHeroMetadataClasses,
-  contentDetailHeroTitleRowClasses,
-  contentDetailRootClasses,
-} from './content-detail-layout.variants'
 import type { ContentStatRowData } from '../metadata/content-stat-rows'
 import {
   DEFAULT_CONTENT_DETAIL_HERO_MEDIA_PRESENTATION,
   type ContentDetailHeroMediaPresentation,
 } from './content-detail-layout.types'
 import type { ContentMediaImageFrame } from '@/features/media'
+
+/** Shared hero eyebrow spacing for catalog detail and vocabulary surfaces. */
+export const contentDetailHeroEyebrowClasses = 'mb-1'
+
+function contentDetailHeroGridClasses(
+  presentation: ContentDetailHeroMediaPresentation = DEFAULT_CONTENT_DETAIL_HERO_MEDIA_PRESENTATION,
+): string {
+  const placement = presentation.placement ?? 'end'
+  const base = 'flex flex-col gap-8 md:flex-row md:items-start md:gap-10'
+  if (placement === 'start') {
+    return `${base} md:flex-row-reverse md:justify-between`
+  }
+  return `${base} md:justify-between`
+}
+
+function contentDetailHeroImageShellClasses(
+  presentation: ContentDetailHeroMediaPresentation = DEFAULT_CONTENT_DETAIL_HERO_MEDIA_PRESENTATION,
+): string {
+  if (presentation.size === 'emblem-lg') {
+    return 'mx-auto size-hero-emblem max-h-hero-emblem max-w-hero-emblem shrink-0 md:mx-0'
+  }
+  return 'mx-auto w-full max-w-sm shrink-0 md:mx-0 md:max-w-xs lg:max-w-sm'
+}
+
+const contentDetailHeroImageFrameClasses =
+  'overflow-hidden rounded-card border-2 border-background shadow-sm'
 
 export type ContentDetailLayoutProps = {
   /** Catalog content type — default hero classification label when `classificationLabel` is omitted. */
@@ -150,27 +163,27 @@ export function ContentDetailLayout({
   const hasBody = Boolean(descriptionContent || children)
 
   const content = (
-    <div className={contentDetailRootClasses}>
-      <Card className={contentDetailHeroCardClasses}>
-        <CardContent className={contentDetailHeroCardContentClasses}>
+    <div className="w-full min-w-0 space-y-6">
+      <Card tone="subtle" className="overflow-hidden">
+        <CardContent className="py-4 pr-4 pb-4 pl-6">
           <div className={contentDetailHeroGridClasses(mediaPresentation)}>
-            <div className={contentDetailHeroMainClasses}>
+            <div className="flex min-w-0 flex-1 flex-col">
               <Eyebrow size="sm" tone="muted" className={contentDetailHeroEyebrowClasses}>
                 {resolvedClassificationLabel}
               </Eyebrow>
-              <div className={contentDetailHeroTitleRowClasses}>
+              <div className="flex flex-wrap items-center gap-3">
                 <Heading variant="page" as="h1">
                   {name}
                 </Heading>
                 {nameBadge}
               </div>
               {heroDescriptionText ? (
-                <Text as="p" className={contentDetailHeroDescriptionClasses}>
+                <Text as="p" className="mt-2 line-clamp-3 text-base text-muted-foreground">
                   {heroDescriptionText}
                 </Text>
               ) : null}
               {heroMetadata ? (
-                <div className={contentDetailHeroMetadataClasses}>{heroMetadata}</div>
+                <div className="mt-3 border-t border-border-subtle pt-3">{heroMetadata}</div>
               ) : null}
             </div>
             {showHeroImage ? (

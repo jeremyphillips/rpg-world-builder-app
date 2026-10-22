@@ -14,7 +14,7 @@ import {
   ENTITY_SURFACE_DEFAULT_EDGES,
   type EntitySurfaceEdges,
 } from '../../../anatomy/entity-surface-edges.lib'
-import { entityCardFrameVariants } from './entity-card-frame.variants'
+import { entityCardFrameClassName } from './entity-card-frame.lib'
 
 const UI_CARD_NAV_CLASS = 'ui-card__nav' as const
 const UI_CARD_NAV_MAIN_CLASS = 'ui-card__nav-main' as const
@@ -51,7 +51,7 @@ function resolveFrameClassName({
 }): string {
   return cn(
     cardSurfaceVariants({ tone: 'quiet', density, interactive, selected, disabled }),
-    entityCardFrameVariants({ density, edges, leadingUtilityCount }),
+    entityCardFrameClassName({ density, edges, leadingUtilityCount }),
     navigable &&
       cn('block w-full min-w-0 no-underline', interactiveFocusVariants({ context: 'standalone' })),
   )

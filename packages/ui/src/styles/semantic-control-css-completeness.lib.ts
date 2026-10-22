@@ -206,6 +206,10 @@ const compactLabelCssPath = path.join(stylesDir, '../components/ui/compact-label
 
 const cardCssPath = path.join(stylesDir, '../components/ui/card.css')
 
+const radioCardCssPath = path.join(stylesDir, '../components/ui/ui-radio-card.css')
+
+const identityFrameCssPath = path.join(stylesDir, '../components/ui/ui-identity-frame.css')
+
 const insetPanelCssPath = path.join(stylesDir, '../components/ui/inset-panel.css')
 
 const panelCssPath = path.join(stylesDir, '../components/ui/panel.css')
@@ -541,6 +545,28 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       ...INTERACTIVE_LIST_PANEL_WIDTH_MODIFIERS.map((name) => ({
         modifierPrefix: `ui-interactive-list__panel--${name}`,
         requiredProperties: INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: radioCardCssPath,
+    dimensions: [
+      {
+        modifierPrefix: 'ui-radio-card--comfortable',
+        requiredProperties: ['gap'] as const,
+      },
+      {
+        modifierPrefix: 'ui-radio-card--compact',
+        requiredProperties: ['gap'] as const,
+      },
+    ],
+  },
+  {
+    filePath: identityFrameCssPath,
+    dimensions: [
+      ...(['xs', 'sm', 'md', 'inline'] as const).map((size) => ({
+        modifierPrefix: `ui-identity-frame--${size}`,
+        requiredProperties: ['width', 'height'] as const,
       })),
     ],
   },

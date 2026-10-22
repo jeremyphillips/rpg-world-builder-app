@@ -7,9 +7,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import {
   identityRowClassificationVariants,
-  identityRowHeadingEndVariants,
-  identityRowHeadingClusterVariants,
-  identityRowHeadingLineVariants,
   identityRowHeadingVariants,
 } from './identity-row.variants'
 import { IdentityRow, IdentityRowHeadingLine } from './identity-row.client'
@@ -124,7 +121,7 @@ describe('IdentityRow', () => {
     const quantity = screen.getByText('x2')
     expect(heading).toHaveClass('truncate')
     expect(quantity.parentElement).toHaveClass('shrink-0')
-    expect(quantity.parentElement?.className).toContain(identityRowHeadingEndVariants())
+    expect(quantity.parentElement?.className).toContain('text-style-caption')
     expect(screen.getByText('Weapon')).toHaveClass('shrink-0')
   })
 
@@ -203,8 +200,8 @@ describe('IdentityRowHeadingLine semantics', () => {
     )
 
     const line = container.firstElementChild
-    expect(line).toHaveClass(identityRowHeadingLineVariants())
-    expect(line?.firstElementChild).toHaveClass(identityRowHeadingClusterVariants())
+    expect(line).toHaveClass('flex', 'w-full', 'min-w-0', 'items-center')
+    expect(line?.firstElementChild).toHaveClass('flex', 'min-w-0', 'flex-1', 'items-baseline')
   })
 })
 

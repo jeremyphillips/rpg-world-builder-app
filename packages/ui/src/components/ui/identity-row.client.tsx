@@ -7,19 +7,14 @@ import { cn } from '../../lib/utils'
 
 import {
   identityRowClassificationVariants,
-  identityRowHeadingClusterVariants,
-  identityRowHeadingEndVariants,
-  identityRowHeadingLineVariants,
   identityRowHeadingVariants,
   identityRowRootVariants,
-  identityRowStackVariants,
   identityRowSupportingVariants,
   type IdentityRowDensity,
 } from './identity-row.variants'
 import { InlineMetadata } from './inline-metadata'
 
 export type { IdentityRowDensity } from './identity-row.variants'
-export { identityRowStackVariants } from './identity-row.variants'
 
 export type IdentityRowProps = {
   heading?: ReactNode
@@ -132,15 +127,13 @@ export function IdentityRowHeadingLine({
   const showHeadingEnd = isPresent(headingEnd)
 
   return (
-    <div className={identityRowHeadingLineVariants()}>
+    <div className="flex w-full min-w-0 items-center">
       {showHeadingEnd ? (
-        <div className={identityRowHeadingClusterVariants()}>{content}</div>
+        <div className="flex min-w-0 flex-1 items-baseline">{content}</div>
       ) : (
         content
       )}
-      {showHeadingEnd ? (
-        <span className={identityRowHeadingEndVariants()}>{headingEnd}</span>
-      ) : null}
+      {showHeadingEnd ? <span className="shrink-0 text-style-caption">{headingEnd}</span> : null}
     </div>
   )
 }
@@ -176,7 +169,7 @@ export function IdentityRow({
 
   return (
     <div className={cn(identityRowRootVariants({ density }), className)}>
-      <div className={identityRowStackVariants()}>
+      <div className="ui-identity-row__stack">
         {showHeadingLine ? (
           <IdentityRowHeadingLine
             heading={heading}

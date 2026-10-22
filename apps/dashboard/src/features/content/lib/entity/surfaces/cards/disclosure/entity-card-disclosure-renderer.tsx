@@ -12,10 +12,6 @@ import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
 import { EntityCardContent } from '../content/entity-card-content'
 import { EntityCardFrame } from '../content/entity-card-frame'
 import { DisclosureEntityCardHeader } from './disclosure-entity-card-header'
-import {
-  disclosureEntityCardBodyWashVariants,
-  disclosureEntityCardListItemVariants,
-} from './entity-card-disclosure-renderer.variants'
 
 export type EntityCardDisclosureRendererProps = {
   entity: EntitySummaryModel
@@ -74,8 +70,7 @@ export function EntityCardDisclosureRenderer({
         density={density}
         toolbarCompact
         toolbarLeadingChrome="none"
-        className={disclosureEntityCardListItemVariants()}
-        bodyClassName={disclosureEntityCardBodyWashVariants()}
+        bodyClassName="dash-entity-card__body dash-entity-card__body--disclosure-wash"
         header={
           <EntityCardContent>
             <DisclosureEntityCardHeader

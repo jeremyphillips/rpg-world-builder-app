@@ -2,7 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { action } from 'storybook/actions'
 import { ChartNoAxesColumn, Grid3x3 } from 'lucide-react'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Button } from './button.client'
+import { RADIO_CARD_CLASS_SPECS } from './radio-card.styles'
 import { NumberStepper } from './number-stepper.client'
 import { RadioCard } from './radio-card.client'
 import {
@@ -297,4 +299,25 @@ export const EmbeddedDependentChoice: Story = {
       },
     ],
   },
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={RADIO_CARD_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <div data-semantic-class-target className={spec.className}>
+            Sample
+          </div>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
 }

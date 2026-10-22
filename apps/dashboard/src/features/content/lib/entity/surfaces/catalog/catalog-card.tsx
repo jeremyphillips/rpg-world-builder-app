@@ -13,8 +13,6 @@ import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 import { EntityCardContent } from '../cards/content/entity-card-content'
 import { EntityCardFrame } from '../cards/content/entity-card-frame'
 import { DisclosureEntityCardHeader } from '../cards/disclosure/disclosure-entity-card-header'
-import { disclosureEntityCardListItemVariants } from '../cards/disclosure/entity-card-disclosure-renderer.variants'
-import { catalogCardBodyWashVariants } from './catalog-card.variants'
 
 type CatalogCardBaseProps = {
   toolbarLabel: string
@@ -154,8 +152,7 @@ function CatalogCardDisclosureBody({
         collapsed={collapsed}
         onToggleCollapse={onToggleCollapse}
         showDragHandle={false}
-        className={disclosureEntityCardListItemVariants()}
-        bodyClassName={catalogCardBodyWashVariants()}
+        bodyClassName="dash-entity-card__body dash-entity-card__body--catalog-wash"
         header={
           <EntityCardContent>
             <DisclosureEntityCardHeader

@@ -795,7 +795,6 @@ export {
   IdentityRow,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
-  identityRowStackVariants,
   type IdentityRowHeadingLineProps,
   type IdentityRowProps,
   type IdentityRowDensity,

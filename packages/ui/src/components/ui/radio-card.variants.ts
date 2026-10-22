@@ -7,6 +7,7 @@ import {
   radioCardDecorativeControlClasses,
   resolveRadioCardIndicatorSize,
 } from './choice-control.variants'
+
 const radioCardRowBase = cn(
   'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground',
   interactiveRowVariants({
@@ -51,30 +52,22 @@ export const radioCardVariants = cva('', {
   },
 })
 
-/** Card variant: vertically centers the leading control on the title line (text-base / text-sm). */
-export const radioCardLeadingControlTitleLineVariants = cva(
-  'flex shrink-0 items-center self-start',
-  {
-    variants: {
-      density: {
-        comfortable: '',
-        compact: '',
-      },
-      titleEnd: {
-        true: 'h-control-action-compact',
-        false: '',
-      },
-    },
-    compoundVariants: [
-      { density: 'comfortable', titleEnd: false, class: 'h-6' },
-      { density: 'compact', titleEnd: false, class: 'h-5' },
-    ],
-    defaultVariants: {
-      density: 'comfortable',
-      titleEnd: false,
-    },
-  },
-)
+export function radioCardLeadingControlTitleLineClassName({
+  density,
+  titleEnd,
+}: {
+  density: 'comfortable' | 'compact'
+  titleEnd: boolean
+}): string {
+  return cn(
+    'ui-radio-card__leading-title-line',
+    titleEnd && 'ui-radio-card__leading-title-line--title-end',
+    !titleEnd &&
+      (density === 'compact'
+        ? 'ui-radio-card__leading-title-line--compact'
+        : 'ui-radio-card__leading-title-line--comfortable'),
+  )
+}
 
 /** Decorative radio circle shown inside the card, synced to the parent item state. */
 export const radioCardControlVariants = cva('', {
@@ -117,30 +110,6 @@ export const radioCardControlVariants = cva('', {
 })
 
 export { resolveRadioCardIndicatorSize }
-
-export const radioCardIndicatorVariants = cva(
-  'opacity-0 transition-opacity group-data-[state=checked]:opacity-100',
-)
-
-/** Leading icon column when visualControl="icon" — muted by default, primary when selected. */
-export const radioCardIconControlVariants = cva(
-  'flex shrink-0 items-center justify-center text-muted-foreground transition-colors group-data-[state=checked]:text-primary',
-  {
-    variants: {
-      density: {
-        comfortable: 'size-5 [&_svg]:size-5',
-        compact: 'size-4 [&_svg]:size-4',
-      },
-    },
-    defaultVariants: {
-      density: 'comfortable',
-    },
-  },
-)
-
-export const radioCardDetailsActionVariants = cva('shrink-0 [&_svg]:size-4')
-
-export const radioCardMediaSlotClasses = 'shrink-0 overflow-hidden'
 
 /** Vertical gap between sibling radio options in a group. */
 export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 items-stretch', {

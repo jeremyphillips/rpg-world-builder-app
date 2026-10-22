@@ -1,7 +1,7 @@
 import { cardSurfaceVariants, cn } from '@rpg/ui'
 
 import { ENTITY_SURFACE_DEFAULT_EDGES } from '../anatomy/entity-surface-edges.lib'
-import { entityCardFrameVariants } from './cards/content/entity-card-frame.variants'
+import { entityCardFrameClassName } from './cards/content/entity-card-frame.lib'
 import {
   DASH_ENTITY_CARD_BODY_CLASS,
   DASH_ENTITY_SURFACE_BLOCK,
@@ -60,7 +60,7 @@ export const DASH_ENTITY_SURFACE_CLASS_SPECS: readonly DashEntitySurfaceClassSpe
     key: 'frame-quiet-compact',
     className: cn(
       cardSurfaceVariants({ tone: 'quiet', interactive: false }),
-      entityCardFrameVariants({
+      entityCardFrameClassName({
         density: 'compact',
         edges: { start: 'utility', end: 'default' },
         leadingUtilityCount: 1,

@@ -9,7 +9,6 @@ import {
   CardHeader,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
-  identityRowStackVariants,
   resolveSurfaceActionButtonSize,
   resolveEntityRowInlineBadgeSize,
   type GenericCardDensity,
@@ -59,7 +58,7 @@ function CharacterListCardHeader({
 
   return (
     <CardHeader>
-      <div className={cn(identityRowStackVariants(), 'min-w-0')}>
+      <div className="ui-identity-row__stack min-w-0">
         <IdentityRowHeadingLine
           heading={<h3>{card.name}</h3>}
           headingEnd={
