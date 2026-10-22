@@ -234,7 +234,7 @@ describe('DataTable — sorting', () => {
 
     expect(firstRowCells[0]).not.toHaveClass('bg-control-selected')
     expect(firstRowCells[0]).not.toHaveClass('text-muted-foreground')
-    expect(firstRowCells[1]).toHaveClass('text-muted-foreground')
+    expect(firstRowCells[1]).toHaveClass('ui-data-table__cell--muted')
     expect(firstRowCells[1]).not.toHaveClass('bg-surface-muted')
     expect(firstRowCells[2]).not.toHaveClass('bg-surface-muted')
     expect(firstRowCells[2]).not.toHaveClass('bg-control-selected')
@@ -267,8 +267,8 @@ describe('DataTable — row selection', () => {
     })
     const rowCheckbox = within(firstDataRow!).getByRole('checkbox', { name: 'Select row' })
 
-    expect(headerCheckbox.closest('th')).toHaveClass('[&:has([role=checkbox])]:!pr-3')
-    expect(rowCheckbox.closest('td')).toHaveClass('[&:has([role=checkbox])]:!pr-3')
+    expect(headerCheckbox.closest('th')).toHaveClass('ui-data-table__select')
+    expect(rowCheckbox.closest('td')).toHaveClass('ui-data-table__select')
   })
 
   it('renders per-row checkboxes when enableRowSelection is true', () => {

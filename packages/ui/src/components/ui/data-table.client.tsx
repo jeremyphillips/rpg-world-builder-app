@@ -57,15 +57,16 @@ import {
 } from './dropdown-menu.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { InfoTooltip } from './tooltip.client'
+import { Table, TableBody, TableCaption, TableHeader } from './table'
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from './table'
+  DATA_TABLE_CELL_CLASS,
+  DATA_TABLE_CELL_MUTED_CLASS,
+  DATA_TABLE_EMPTY_CLASS,
+  DATA_TABLE_HEAD_CLASS,
+  DATA_TABLE_HEADER_ROW_CLASS,
+  DATA_TABLE_ROW_CLASS,
+} from './data-table-band.lib'
+import { interactiveRowVariants } from './interactive-row.variants'
 import { Badge, type BadgeAppearance, type BadgeTone } from './badge'
 import { dataTableWidthMeta } from './data-table-meta'
 import {
@@ -88,15 +89,8 @@ import type {
   DataTableUtilityControls,
 } from './data-table.types'
 import {
-  dataTableBodyCellPaddingVariants,
-  dataTableBodyCellVariants,
   dataTableCaptionVariants,
-  dataTableEmptyStateVariants,
   dataTablePaginationVariants,
-  dataTableRowVariants,
-  dataTableSortIconVariants,
-  dataTableHeaderCellVariants,
-  dataTableHeaderRowVariants,
   dataTableImageVariants,
   dataTableNameCellVariants,
   dataTableRootVariants,
@@ -338,11 +332,20 @@ export function SortableHeader<TData, TValue>({
 
   const sortIcon =
     sorted === 'asc' ? (
-      <ChevronUp className={dataTableSortIconVariants({ state: 'asc' })} aria-hidden="true" />
+      <ChevronUp
+        className="ui-data-table__sort-icon ui-data-table__sort-icon--asc"
+        aria-hidden="true"
+      />
     ) : sorted === 'desc' ? (
-      <ChevronDown className={dataTableSortIconVariants({ state: 'desc' })} aria-hidden="true" />
+      <ChevronDown
+        className="ui-data-table__sort-icon ui-data-table__sort-icon--desc"
+        aria-hidden="true"
+      />
     ) : (
-      <ArrowUpDown className={dataTableSortIconVariants({ state: 'idle' })} aria-hidden="true" />
+      <ArrowUpDown
+        className="ui-data-table__sort-icon ui-data-table__sort-icon--idle"
+        aria-hidden="true"
+      />
     )
 
   if (info) {
@@ -918,18 +921,18 @@ export function DataTable<TData>({
       {caption && <TableCaption className={dataTableCaptionVariants()}>{caption}</TableCaption>}
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
-          <TableRow key={headerGroup.id} className={dataTableHeaderRowVariants()}>
+          <tr key={headerGroup.id} className={DATA_TABLE_HEADER_ROW_CLASS}>
             {headerGroup.headers.map((header) => {
               const sorted = header.column.getIsSorted()
               const canSort = header.column.getCanSort()
+              const headerMetaClassName = header.column.columnDef.meta?.headerClassName
+              const isSelectOrActions =
+                header.column.id === 'select' || header.column.id === 'actions'
               return (
-                <TableHead
+                <th
                   key={header.id}
                   colSpan={header.colSpan}
-                  className={cn(
-                    dataTableHeaderCellVariants(),
-                    header.column.columnDef.meta?.headerClassName,
-                  )}
+                  className={cn(!isSelectOrActions && DATA_TABLE_HEAD_CLASS, headerMetaClassName)}
                   aria-sort={
                     sorted === 'asc'
                       ? 'ascending'
@@ -943,46 +946,56 @@ export function DataTable<TData>({
                   {header.isPlaceholder
                     ? null
                     : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableHead>
+                </th>
               )
             })}
-          </TableRow>
+          </tr>
         ))}
       </TableHeader>
       <TableBody>
         {rows.length > 0 ? (
           rows.map((row) => (
-            <TableRow
+            <tr
               key={row.id}
-              className={cn(dataTableRowVariants(), getRowClassName?.(row))}
+              className={cn(
+                DATA_TABLE_ROW_CLASS,
+                interactiveRowVariants({
+                  interaction: 'hoverable',
+                  selectedData: 'selected',
+                }),
+                getRowClassName?.(row),
+              )}
               data-state={row.getIsSelected() ? 'selected' : undefined}
             >
               {row.getVisibleCells().map((cell) => {
                 const meta = cell.column.columnDef.meta
+                const tone = meta?.columnTone ?? 'neutral'
+                const isSelectOrActions =
+                  cell.column.id === 'select' || cell.column.id === 'actions'
                 return (
-                  <TableCell
+                  <td
                     key={cell.id}
                     className={cn(
-                      dataTableBodyCellVariants({
-                        tone: meta?.columnTone ?? 'neutral',
-                      }),
-                      dataTableBodyCellPaddingVariants(),
+                      DATA_TABLE_CELL_CLASS,
+                      !isSelectOrActions &&
+                        (tone === 'data' || tone === 'source') &&
+                        DATA_TABLE_CELL_MUTED_CLASS,
                       meta?.cellClassName,
                       getCellClassName?.(cell),
                     )}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+                  </td>
                 )
               })}
-            </TableRow>
+            </tr>
           ))
         ) : (
-          <TableRow>
-            <TableCell colSpan={resolvedColumns.length} className={dataTableEmptyStateVariants()}>
+          <tr className={DATA_TABLE_ROW_CLASS}>
+            <td colSpan={resolvedColumns.length} className={DATA_TABLE_EMPTY_CLASS}>
               {emptyState ? emptyState(emptyStateContext) : 'No results.'}
-            </TableCell>
-          </TableRow>
+            </td>
+          </tr>
         )}
       </TableBody>
     </Table>

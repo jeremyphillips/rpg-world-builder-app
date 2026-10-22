@@ -1510,7 +1510,6 @@ export {
   dataTableColumnItemVariants,
   dataTableColumnDragHandleVariants,
   dataTableEmptyPanelVariants,
-  dataTableEmptyStateVariants,
   dataTableFilterChipVariants,
   dataTableFilterNoticeVariants,
   dataTableLockedColumnVariants,
@@ -1519,15 +1518,12 @@ export {
   dataTableImageVariants,
   dataTableNameCellVariants,
   dataTableNameLinkCellVariants,
+  dataTableCaptionVariants,
+} from './components/ui/data-table.variants'
+export {
   dataTableRowUnavailableVariants,
   dataTableRowUnavailableRailVariants,
-  dataTableRowVariants,
-  dataTableBodyCellPaddingVariants,
-  dataTableBodyCellVariants,
-  dataTableCaptionVariants,
-  dataTableHeaderCellVariants,
-  dataTableSortIconVariants,
-} from './components/ui/data-table.variants'
+} from './components/ui/data-table-band.lib'
 
 export {
   mapAperturePointerToFocalPoint,

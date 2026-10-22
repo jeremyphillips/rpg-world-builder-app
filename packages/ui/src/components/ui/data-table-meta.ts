@@ -1,10 +1,9 @@
+import { dataTableCellTextVariants } from './data-table.variants'
 import {
-  dataTableActionsCellVariants,
-  dataTableActionsHeaderVariants,
-  dataTableCellTextVariants,
-  dataTableSelectCellVariants,
-  dataTableSelectHeaderVariants,
-} from './data-table.variants'
+  DATA_TABLE_ACTIONS_CLASS,
+  DATA_TABLE_HEAD_CLASS,
+  DATA_TABLE_SELECT_CLASS,
+} from './data-table-band.lib'
 
 /** Shared `ColumnMeta.columnTone` values for DataTable body cell styling. */
 export const dataTableColumnMeta = {
@@ -64,6 +63,11 @@ export type DataTableColumnWidth = keyof typeof dataTableColumnWidths
 /** Body-cell layout for centered width presets — flex breaks table `align-middle`. */
 const dataTableCenteredBodyCellLayout = 'text-center [&>svg]:mx-auto [&>svg]:block'
 
+const dataTableActionsHeaderClassName = `${DATA_TABLE_HEAD_CLASS} ${DATA_TABLE_ACTIONS_CLASS}`
+const dataTableActionsCellClassName = DATA_TABLE_ACTIONS_CLASS
+const dataTableSelectHeaderClassName = `${DATA_TABLE_HEAD_CLASS} ${DATA_TABLE_SELECT_CLASS}`
+const dataTableSelectCellClassName = `${DATA_TABLE_SELECT_CLASS}`
+
 /** Applies a width preset to both header and body cells. */
 export function dataTableWidthMeta(width: DataTableColumnWidth) {
   const className = dataTableColumnWidths[width]
@@ -75,14 +79,14 @@ export function dataTableWidthMeta(width: DataTableColumnWidth) {
   }
   if (width === 'actions') {
     return {
-      headerClassName: dataTableActionsHeaderVariants(),
-      cellClassName: dataTableActionsCellVariants(),
+      headerClassName: dataTableActionsHeaderClassName,
+      cellClassName: dataTableActionsCellClassName,
     } as const
   }
   if (width === 'select') {
     return {
-      headerClassName: dataTableSelectHeaderVariants(),
-      cellClassName: dataTableSelectCellVariants(),
+      headerClassName: dataTableSelectHeaderClassName,
+      cellClassName: dataTableSelectCellClassName,
     } as const
   }
   if (

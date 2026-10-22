@@ -1,8 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { iconGlyphDescendantClasses, iconGlyphRootClasses } from './icon-glyph.variants'
-import { interactiveRowVariants } from './interactive-row.variants'
+import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 import { establishSurfaceCurrent, portalPopoverSurfaceClasses } from './surface-current.lib'
 
 /** Outer wrapper for the entire DataTable — stacks toolbar, table, and pagination. */
@@ -65,94 +64,13 @@ export const dataTableTableWrapVariants = cva(
  */
 export const dataTableTableVariants = cva('w-full min-w-max text-table-body')
 
-/** Header row — recessed band; hover matches fill so sort controls stay stable. */
-export const dataTableHeaderRowVariants = cva(
-  'border-b border-border bg-surface-strong hover:bg-surface-strong data-[state=selected]:bg-surface-strong',
-)
-
-/** Body row — uniform fill with row-level hover and selection. */
-export const dataTableRowVariants = cva(
-  cn(
-    'group/row min-h-14 border-b border-border-subtle',
-    interactiveRowVariants({
-      interaction: 'hoverable',
-      selectedData: 'selected',
-    }),
-  ),
-)
-
 /** Catalog thumbnail sizing — 24px default, 32px at lg+. Pair with `dataTableWidthMeta('image')`. */
 export const dataTableImageVariants = cva('size-6 shrink-0 rounded-md object-cover lg:size-8')
-
-/** Unavailable / inactive row — faint warning wash (table-safe — no pseudo-elements on `<tr>`). */
-export const dataTableRowUnavailableVariants = cva('bg-warning-faint')
-
-/**
- * Leading-cell accent rail for unavailable rows — inset shadow is table-safe unlike `::before` on `<tr>`.
- * Apply to the first visible cell in an unavailable row.
- */
-export const dataTableRowUnavailableRailVariants = cva(
-  'shadow-[inset_2px_0_0_var(--color-semantic-warning-accent-faint)]',
-)
 
 /** Toolbar notice row below primary filters — hidden counts, filter actions. */
 export const dataTableFilterNoticeVariants = cva(
   'flex flex-wrap items-center gap-x-2 gap-y-1 text-style-caption',
 )
-
-/** Header cell — group context for sort icon hover/focus affordance. */
-export const dataTableHeaderCellVariants = cva(
-  'group/header h-10 bg-transparent text-xs font-semibold tracking-wide text-muted-foreground',
-)
-
-/** Sticky trailing actions header — stays visible during horizontal scroll. */
-export const dataTableActionsHeaderVariants = cva(
-  'sticky right-0 z-20 w-12 max-w-12 shrink-0 border-l border-border bg-surface-strong px-1 text-center',
-)
-
-/** Sticky trailing actions body cell — matches row hover, selection, and unavailable tones. */
-export const dataTableActionsCellVariants = cva(
-  'sticky right-0 z-10 w-12 max-w-12 shrink-0 border-l border-border bg-background px-1 text-center group-hover/row:bg-row-hover group-data-[state=selected]/row:bg-row-selected group-[.bg-warning-faint]/row:bg-warning-faint',
-)
-
-/** Row-selection header — fixed to `Checkbox` (size-4) + horizontal padding. */
-export const dataTableSelectHeaderVariants = cva(
-  'w-10 max-w-10 shrink-0 border-r border-border bg-surface-strong pl-3 text-center [&:has([role=checkbox])]:!pr-3',
-)
-
-/** Row-selection body cell — centers the checkbox control in the fixed-width column. */
-export const dataTableSelectCellVariants = cva(
-  'w-10 max-w-10 shrink-0 border-r border-border pl-3 text-center [&:has([role=checkbox])]:!pr-3 [&_[role=checkbox]]:mx-auto [&_[role=checkbox]]:block',
-)
-
-/** Tighter body cell padding than the base TableCell default. */
-export const dataTableBodyCellPaddingVariants = cva('px-3 py-2')
-
-/** Body cell tone — typography only; row supplies uniform background. */
-export const dataTableBodyCellVariants = cva('transition-colors', {
-  variants: {
-    tone: {
-      identity: '',
-      data: 'text-muted-foreground',
-      source: 'text-muted-foreground',
-      actions: '',
-      neutral: '',
-    },
-  },
-  defaultVariants: { tone: 'neutral' },
-})
-
-/** Sort icon visibility and size inside SortableHeader. */
-export const dataTableSortIconVariants = cva(cn('ml-1 shrink-0', iconGlyphRootClasses.sm), {
-  variants: {
-    state: {
-      asc: 'opacity-70',
-      desc: 'opacity-70',
-      idle: 'opacity-0 group-hover/header:opacity-50 group-focus-within/header:opacity-50',
-    },
-  },
-  defaultVariants: { state: 'idle' },
-})
 
 /** Body cell text roles — metadata, stats, and other opt-in typography. */
 export const dataTableCellTextVariants = cva('', {
@@ -193,9 +111,6 @@ export const dataTableColumnItemVariants = cva(
 export const dataTableColumnDragHandleVariants = cva(
   'flex cursor-grab items-center rounded p-0.5 text-muted-foreground hover:text-foreground active:cursor-grabbing',
 )
-
-/** Empty table body cell copy. */
-export const dataTableEmptyStateVariants = cva('h-24 text-center text-muted-foreground')
 
 /** Empty column panel search result. */
 export const dataTableEmptyPanelVariants = cva('px-3 py-2 text-style-supporting')
