@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest'
 import {
   actionBlockerReferenceFlatListClasses,
   actionBlockerReferenceRowListClasses,
-  actionBlockedFlatPanelClasses,
   formatActionBlockedUsageGroupSummary,
 } from './action-blocker-references.lib'
 
@@ -16,10 +15,6 @@ describe('action-blocker-references.lib', () => {
     expect(actionBlockerReferenceFlatListClasses).toContain('list-disc')
     expect(actionBlockerReferenceFlatListClasses).toContain('text-sm')
     expect(actionBlockerReferenceFlatListClasses).toContain('space-y-2')
-  })
-
-  it('uses subtle error panel chrome for flat single-blocked lists', () => {
-    expect(actionBlockedFlatPanelClasses).toContain('bg-destructive-subtle')
   })
 
   it('formats row summaries from semantic sourceKey', () => {

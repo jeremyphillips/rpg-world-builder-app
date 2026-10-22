@@ -117,3 +117,33 @@ export const insetPanelEmptyStateVariants = () => insetPanelEmptyStateClasses
 export const insetPanelGateVariants = () => insetPanelGateClasses
 
 export { insetPanelSunkenShadowClasses } from './field-surface.lib'
+
+export const INSET_PANEL_CLASS_SPECS = [
+  {
+    key: 'sm / solid / sunken',
+    className: insetPanelClassNames({
+      size: 'sm',
+      borderStyle: 'solid',
+      surface: DEFAULT_INSET_PANEL_SURFACE,
+    }),
+    keyValues: 'radius-md padding 12px; solid border; sunken surface',
+    useCase: 'Compact recessed readout',
+  },
+  {
+    key: 'md / dashed / center',
+    className: insetPanelClassNames({
+      size: 'md',
+      borderStyle: 'dashed',
+      align: 'center',
+      surface: DEFAULT_INSET_PANEL_SURFACE,
+    }),
+    keyValues: 'radius-md padding 16px; dashed border; centered copy',
+    useCase: 'Passive empty placeholder',
+  },
+  {
+    key: 'lg / dashed / gate',
+    className: insetPanelGateClasses,
+    keyValues: 'radius-lg padding 32px; dashed recessed gate',
+    useCase: 'Authoring blocker / instructional gate',
+  },
+] as const

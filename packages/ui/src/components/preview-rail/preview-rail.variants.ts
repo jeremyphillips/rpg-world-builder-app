@@ -5,7 +5,6 @@ import {
   formTabbedAsideCardMaxWidthAt2xlClasses,
   formTabbedAsideCardMaxWidthBelow2xlClasses,
 } from '../../form/chrome/form-chrome.variants'
-import { cardRadiusClasses } from '../ui/card.variants'
 import { iconGlyphRootClasses } from '../ui/icon-glyph.variants'
 import { establishSurfaceCurrent } from '../ui/surface-current.lib'
 
@@ -50,7 +49,7 @@ export const previewRailRootVariants = cva('flex min-w-0 flex-col', {
         'w-full border border-border-subtle bg-field-container text-card-foreground',
         formTabbedAsideCardMaxWidthBelow2xlClasses,
         formTabbedAsideCardMaxWidthAt2xlClasses,
-        cardRadiusClasses,
+        'rounded-card',
         establishSurfaceCurrent('field-container'),
       ),
       plain: 'w-full',

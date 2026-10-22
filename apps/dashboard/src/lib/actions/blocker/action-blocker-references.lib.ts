@@ -15,13 +15,7 @@ export const actionBlockerReferenceRowListClasses = usageReferenceRowListClasses
 /** Bulleted lists in single blocked dialogs (flat, outside rows). */
 export const actionBlockerReferenceFlatListClasses = usageReferenceFlatListClasses
 
-/** @deprecated Use actionBlockerReferenceRowListClasses or actionBlockerReferenceFlatListClasses. */
-export const actionBlockerReferenceListClasses = actionBlockerReferenceRowListClasses
-
 export const actionBlockerReferenceGroupClasses = 'space-y-1' as const
-
-/** Subtle error panel for flat single-blocked reference lists. */
-export const actionBlockedFlatPanelClasses = 'rounded-md bg-destructive-subtle px-3 py-2.5' as const
 
 export function formatActionBlockedUsageGroupSummary(input: {
   sourceKey: UsageBlockerSourceKey

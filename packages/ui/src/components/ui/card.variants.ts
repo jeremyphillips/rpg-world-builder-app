@@ -1,9 +1,6 @@
 import { cn } from '../../lib/utils'
 
-/** Shared with preview rail until that owner migrates. Card itself uses `ui-card`. */
-export const cardRadiusClasses = 'rounded-card'
-
-/** @deprecated Option shells migrated to `ui-card`; retained for preview rail. */
+/** @deprecated Dialog panel chrome — migrate to DialogPanel owner (W7). */
 export const cardBorderClasses = 'border border-card-border'
 
 export const CARD_SURFACE_TONES = ['transparent', 'quiet', 'subtle', 'strong'] as const

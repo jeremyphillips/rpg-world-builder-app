@@ -11,7 +11,7 @@ import { FieldRow } from './field-row'
 import { Input } from './input.client'
 import { TextField } from './text-field'
 import { resolveFieldRowColumnTracks } from './field-row-column-tracks.lib'
-import { resolveFieldRowAnatomyPrototypePresentation } from './field-row-anatomy-prototype.variants'
+import { resolveFieldRowAnatomyPresentation } from './field-row-anatomy.variants'
 import { cn } from '../../lib/utils'
 
 /**
@@ -104,7 +104,7 @@ function ParityPair({
   const flexRef = React.useRef<HTMLDivElement>(null)
   const gridRef = React.useRef<HTMLDivElement>(null)
   const resolved = resolveFieldRowColumnTracks(widths)
-  const presentation = resolveFieldRowAnatomyPrototypePresentation(widths)
+  const presentation = resolveFieldRowAnatomyPresentation(widths)
   const fieldIds = React.useMemo(
     () => widths.map((_, index) => `parity-${title}-${index}`),
     [widths, title],
