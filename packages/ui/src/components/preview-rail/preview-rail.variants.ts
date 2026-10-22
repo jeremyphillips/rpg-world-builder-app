@@ -160,11 +160,7 @@ export const previewRailSectionBodyDescriptionClasses = cn(
   previewRailCaptionTextClasses,
 )
 
-export const previewRailStatusPanelDescriptionClasses = previewRailCaptionTextClasses
-
 export const previewRailActionHelperTextClasses = previewRailCaptionTextClasses
-
-export const previewRailStatusPanelContentClasses = 'min-w-0 flex-1'
 
 export const previewRailActionStackClasses = 'flex flex-col gap-2'
 

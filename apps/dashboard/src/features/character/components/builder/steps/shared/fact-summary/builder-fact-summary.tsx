@@ -8,23 +8,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, IconContaine
 import type { LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-const builderFactSummaryIconRowsClasses = 'space-y-0'
-const builderFactSummaryIconRowClasses =
-  'grid grid-cols-[auto_minmax(7.5rem,10rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2'
-const builderFactSummaryIconRowLabelClasses = 'text-style-label text-foreground'
-const builderFactSummaryIconRowSetValueClasses = 'text-style-label text-foreground'
-const builderFactSummaryIconRowUnsetValueClasses = 'italic text-style-supporting'
-const builderFactSummaryRowsClasses = 'grid gap-3 sm:grid-cols-2'
-const builderFactSummarySimpleRowClasses = 'space-y-0.5'
-const builderFactSummarySimpleLabelClasses = 'text-style-caption'
-const builderFactSummaryUnsetValueClasses = 'italic text-style-supporting'
-const builderFactSummarySimpleValueClasses = 'text-style-label text-foreground'
-const builderFactSummaryGrantedRowsClasses = 'space-y-0'
-const builderFactSummaryGrantedRowClasses =
-  'grid grid-cols-[auto_minmax(7.5rem,10rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2'
-const builderFactSummaryCategoryLabelClasses = 'text-style-label text-foreground'
-const builderFactSummaryValueLabelsClasses = 'min-w-0 text-style-label text-foreground'
-const builderFactSummaryRowDividerClasses = 'my-2 border-t border-border'
+import {
+  builderFactSummaryCategoryLabelClasses,
+  builderFactSummaryGrantedRowClasses,
+  builderFactSummaryGrantedRowsClasses,
+  builderFactSummaryIconRowClasses,
+  builderFactSummaryIconRowLabelClasses,
+  builderFactSummaryIconRowSetValueClasses,
+  builderFactSummaryIconRowUnsetValueClasses,
+  builderFactSummaryIconRowsClasses,
+  builderFactSummaryRowDividerClasses,
+  builderFactSummaryRowsClasses,
+  builderFactSummarySimpleLabelClasses,
+  builderFactSummarySimpleRowClasses,
+  builderFactSummarySimpleValueClasses,
+  builderFactSummaryUnsetValueClasses,
+  builderFactSummaryValueLabelsClasses,
+} from './builder-fact-summary.variants'
 
 export type BuilderFactSummarySimpleProps = {
   heading: string

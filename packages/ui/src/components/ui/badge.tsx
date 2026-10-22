@@ -53,7 +53,6 @@ function Badge({
     appearance,
     tone,
     emphasis,
-    filled: appearance === 'soft' || appearance === 'strong',
     className: cn(badgeLayoutVariants({ layout }), className),
   })
 

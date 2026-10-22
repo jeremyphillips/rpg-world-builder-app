@@ -78,8 +78,6 @@ import {
   previewRailSectionTriggerClasses,
   previewRailCaptionTextClasses,
   previewRailSectionsHeaderClasses,
-  previewRailStatusPanelContentClasses,
-  previewRailStatusPanelDescriptionClasses,
 } from './preview-rail.variants'
 
 const PreviewRailContext = React.createContext<PreviewRailChrome>('card')
@@ -470,17 +468,13 @@ function PreviewRailStatusPanel({
   const resolvedIcon = icon ?? resolveStatusPanelIcon(variant)
 
   return (
-    <Alert variant={variant} density="compact">
-      <div className="flex w-full items-start gap-2">
-        {resolvedIcon}
-        <div className={previewRailStatusPanelContentClasses}>
-          <p className="ui-alert__title ui-copy-title">{title}</p>
-          {description ? (
-            <p className={previewRailStatusPanelDescriptionClasses}>{description}</p>
-          ) : null}
-        </div>
-      </div>
-    </Alert>
+    <Alert
+      variant={variant}
+      density="compact"
+      leading={resolvedIcon}
+      title={title}
+      description={description}
+    />
   )
 }
 

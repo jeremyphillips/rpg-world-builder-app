@@ -58,7 +58,6 @@ export function ArrayItemIssueButton({
           size: 'sm',
           appearance: 'soft',
           tone: 'destructive',
-          filled: true,
           className: cn(
             'shrink-0',
             compact && 'mt-0',

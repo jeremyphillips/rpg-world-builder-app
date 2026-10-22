@@ -21,7 +21,6 @@ export type CompactLabelVariantProps = {
   appearance?: CompactLabelAppearance
   tone?: CompactLabelTone
   emphasis?: CompactLabelEmphasis
-  filled?: boolean
   selected?: boolean
   interactive?: boolean
   removable?: boolean
@@ -117,7 +116,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
       size: 'sm',
       appearance: 'soft',
       tone: 'destructive',
-      filled: true,
     }),
     keyValues: 'semantic destructive soft fill',
     useCase: 'Compact table or rail status',
@@ -128,7 +126,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
       size: 'md',
       appearance: 'strong',
       tone: 'info',
-      filled: true,
     }),
     keyValues: 'semantic info strong fill',
     useCase: 'High-emphasis classification',
@@ -140,7 +137,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
       appearance: 'soft',
       tone: 'neutral',
       emphasis: 'subdued',
-      filled: true,
     }),
     keyValues: 'muted foreground, soft neutral well',
     useCase: 'Exhausted or completed labels',
@@ -152,7 +148,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
         size: 'sm',
         appearance: 'soft',
         tone: 'destructive',
-        filled: true,
       }),
       badgeLayoutVariants({ layout: 'counter' }),
     ),
@@ -175,7 +170,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
       size: 'md',
       interactive: true,
       selected: true,
-      filled: true,
     }),
     keyValues: 'selected-control fill',
     useCase: 'ChipsField toggle (on)',
@@ -186,7 +180,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
       size: 'md',
       appearance: 'soft',
       tone: 'neutral',
-      filled: true,
       removable: true,
     }),
     keyValues: 'removable padding-end; dismiss is __remove',
