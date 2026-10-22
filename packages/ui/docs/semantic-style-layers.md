@@ -4,6 +4,9 @@ Layered interaction and presentation policy for cards, rows, and dense controls.
 Features choose **semantic intent**; shared primitives own ring geometry, hit targets,
 hover fills, and drag chrome.
 
+Policy overview: [AGENTS.md](../../../AGENTS.md#styling-conventions) · ownership:
+[ui-architecture.md](./ui-architecture.md).
+
 ```text
 Layer 1 — foundational interaction policy (@rpg/ui)
         ↓

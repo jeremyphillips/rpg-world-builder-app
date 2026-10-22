@@ -1,5 +1,8 @@
 # Forms in `@rpg/ui`
 
+Styling policy for field chrome and controls: [AGENTS.md](../../../AGENTS.md#styling-conventions),
+[ui-architecture.md](./ui-architecture.md), [semantic-control-css.md](./semantic-control-css.md).
+
 The form system is two layers:
 
 1. **Field primitives** (`@rpg/ui`) — compound `Field.*`, prop-based wrappers (`TextField`,

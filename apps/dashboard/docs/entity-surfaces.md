@@ -128,9 +128,11 @@ Host/collection structure       (search rows, master-detail, detail sections, ca
 Feature/domain content          (form fields, section panels, domain rhythm)
 ```
 
-Foundational interaction policy is documented in
-[`packages/ui/docs/semantic-style-layers.md`](../../../packages/ui/docs/semantic-style-layers.md)
-and [`packages/ui/docs/design-tokens.md`](../../../packages/ui/docs/design-tokens.md).
+Foundational interaction and styling policy is documented in
+[AGENTS.md](../../../AGENTS.md#styling-conventions),
+[`packages/ui/docs/ui-architecture.md`](../../../packages/ui/docs/ui-architecture.md), and
+[`packages/ui/docs/semantic-style-layers.md`](../../../packages/ui/docs/semantic-style-layers.md).
+Color and surface tokens: [`packages/ui/docs/design-tokens.md`](../../../packages/ui/docs/design-tokens.md).
 Card primitives **consume** that policy; they do not redefine focus rings, hit targets,
 drag chrome, or interactive-row fills.
 

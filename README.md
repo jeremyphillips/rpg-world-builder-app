@@ -217,7 +217,7 @@ troubleshooting.
 - [apps/bench/README.md](apps/bench/README.md) — Dev Bench UI (`/bench/`)
 - [tools/bench/README.md](tools/bench/README.md) — Dev Bench agent CLI (`pnpm bench`)
 - [docs/dev-bench-agent-reference.md](docs/dev-bench-agent-reference.md) — ticket/epic field authoring for agents
-- Each app/package has its own README (see the [layout table](#monorepo-layout)); the dashboard documents its [feature conventions](apps/dashboard/docs/feature-conventions.md).
+- Each app/package has its own README (see the [layout table](#monorepo-layout)); agents and contributors follow [AGENTS.md](AGENTS.md) (including [styling conventions](AGENTS.md#styling-conventions)); the dashboard documents [feature conventions](apps/dashboard/docs/feature-conventions.md).
 
 ## Tech stack
 

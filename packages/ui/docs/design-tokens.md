@@ -3,6 +3,10 @@
 Color system for `@rpg/ui`. SSOT for Layer 1 inventory and parity rules:
 [`src/styles/tokens/palette-inventory.md`](../src/styles/tokens/palette-inventory.md).
 
+**When to use what** (inline layout vs BEM semantic CSS vs CVA, component ownership):
+[AGENTS.md](../../../AGENTS.md#styling-conventions) and [ui-architecture.md](./ui-architecture.md).
+This document covers token layers, surfaces, and color mechanics — not full styling policy.
+
 Storybook catalog: **Design tokens → Color palette** (`color-palette.stories.tsx`).
 
 Visual vocabulary (tone, emphasis, chrome): [visual-vocabulary.md](./visual-vocabulary.md).
@@ -13,7 +17,7 @@ Visual vocabulary (tone, emphasis, chrome): [visual-vocabulary.md](./visual-voca
 Layer 1  palette-light.css / palette-dark.css   --palette-*   (oklch SSOT)
 Layer 2  semantic-light.css / semantic-dark.css --background, --field-control-*, …
 Layer 3  globals.css @theme + custom utilities  bg-*, text-*, border-input, …
-         component *.variants.ts               CVA recipes
+         component *.variants.ts + *.css        CVA API; semantic presentation where migrated
 ```
 
 **Components consume Layer 2 / Tailwind utilities only** — never `--palette-*` in UI code.

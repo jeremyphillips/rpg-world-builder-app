@@ -1,6 +1,8 @@
 # Semantic control CSS
 
-Technical conventions for semantic classes. Composition rules and the ownership registry live in [ui-architecture.md](./ui-architecture.md). Inventory and wave status live in [semantic-css-migration.md](./semantic-css-migration.md).
+Technical conventions for semantic classes. Repo-wide policy: [AGENTS.md](../../../AGENTS.md#styling-conventions).
+Composition rules and the ownership registry live in [ui-architecture.md](./ui-architecture.md).
+Inventory and wave status live in [semantic-css-migration.md](./semantic-css-migration.md).
 
 Interactive controls and buttons emit BEM-style classes (`ui-button ui-button--outline ui-button--sm`) instead of long Tailwind utility lists in CVA output. CVA remains the public API; only the emitted class strings change. Dashboard-owned shared compositions use the `dash-` prefix with the same shape.
 

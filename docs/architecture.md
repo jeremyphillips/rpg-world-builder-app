@@ -26,6 +26,7 @@ packages/
   character-narrative-integrations/  # dashboard-facing narrative generation wiring
   ui/          # shadcn primitives, Tailwind v4 preset, design tokens
                # Storybook (:6006) for primitives, forms, recipes
+               # Styling policy → AGENTS.md § Styling conventions; depth → packages/ui/docs/
 tools/
   proxy/       # single-origin dev reverse proxy
   bench/       # @rpg/bench-cli — agent CLI (pnpm bench)

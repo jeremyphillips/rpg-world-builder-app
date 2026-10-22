@@ -113,6 +113,10 @@ tokens: **[docs/compact-labels.md](docs/compact-labels.md)**.
 Design tokens — layers, surfaces, field chrome, status vocabulary:
 **[docs/design-tokens.md](docs/design-tokens.md)**.
 
+Styling policy (semantic CSS vs inline layout vs CVA) — repo-wide:
+**[AGENTS.md](../../AGENTS.md#styling-conventions)**; depth in
+**[docs/ui-architecture.md](docs/ui-architecture.md)**.
+
 ```tsx
 import { Heading, Text, RichTextContent } from '@rpg/ui'
 
@@ -331,13 +335,15 @@ index.ts            # barrel re-export
 <name>.types.ts     # optional shared types
 ```
 
-1. Migrated **buttons and form controls** emit semantic classes from co-located
-   `<name>.css`; see [semantic-control-css.md](docs/semantic-control-css.md).
-   Ownership and when to add a class live in [ui-architecture.md](docs/ui-architecture.md).
-   Other primitives still put Tailwind in `<name>.variants.ts` via `cva` — prefer named
-   CVA variants over long inline strings. Use design-token classes only; never
-   hardcode color values or font sizes. The shadcn CLI can scaffold a starting
-   point: `pnpm dlx shadcn@latest add <name>` (config lives in `components.json`).
+1. Follow [AGENTS.md](../../AGENTS.md#styling-conventions) and
+   [ui-architecture.md](docs/ui-architecture.md): reusable anatomy and state → BEM-style
+   classes in co-located `<name>.css` (migrated controls) or meaningful CVA axes in
+   `<name>.variants.ts`; simple layout (`flex`, `gap-*`, `min-w-0`) may stay in JSX.
+   Do not add `*.variants.ts` files that only rename static Tailwind strings. Use
+   design-token classes only; never hardcode color values or font sizes. Migrated
+   buttons and form controls → [semantic-control-css.md](docs/semantic-control-css.md).
+   The shadcn CLI can scaffold a starting point: `pnpm dlx shadcn@latest add <name>`
+   (config lives in `components.json`).
 2. The component file composes classes with `cn` from `../../lib/utils` (match the
    new-york style of the existing primitives). If it is interactive, name it
    `<name>.client.tsx` and add `'use client'` at the top so Next.js RSC works; a
@@ -353,10 +359,11 @@ index.ts            # barrel re-export
    `color-contrast` disabled (jsdom has no canvas; contrast is covered by
    Storybook's addon-a11y in a real browser).
 
-> Note: all interactive primitives now follow these conventions — `*.client.tsx`
-> for client components (`button`, `input`, `avatar`, `dropdown-menu`,
-> `sidebar-trigger`) with their CVA classes in a `*.variants.ts` sibling. Non-
-> interactive (server) primitives correctly stay as plain `*.tsx` with no directive.
+> Note: interactive primitives use `*.client.tsx` + `'use client'` where required
+> (`button`, `input`, `avatar`, `dropdown-menu`, `sidebar-trigger`). Presentation
+> resolves through `*.variants.ts` (semantic `ui-*` modifiers and/or Tailwind) plus
+> co-located `*.css` when migrated. Non-interactive (server) primitives stay plain
+> `*.tsx` with no directive.
 
 ## Wizard pattern
 

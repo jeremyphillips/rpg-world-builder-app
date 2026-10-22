@@ -2,6 +2,8 @@
 
 Permanent rules for composing, extending, and owning UI. Semantic CSS is the inspectability layer on those owners. It is not the goal by itself.
 
+Repo-wide summary for agents: [AGENTS.md](../../../AGENTS.md#styling-conventions).
+
 The goal is to eliminate hand-rolled implementations of established UI patterns, while keeping feature-specific compositions and genuinely unique interfaces. A domain component such as `QuickNpcBuildCard` stays a domain component. It composes shared primitives for border, padding, hover, selection, and typography instead of implementing them itself.
 
 Migration inventory, classification, and wave status live in [semantic-css-migration.md](./semantic-css-migration.md) and leave this document when the migration ends. Technical class conventions live in [semantic-control-css.md](./semantic-control-css.md). Fine-grained presentation recipes live in [semantic-style-layers.md](./semantic-style-layers.md). Tone, emphasis, and elevation live in [visual-vocabulary.md](./visual-vocabulary.md).
