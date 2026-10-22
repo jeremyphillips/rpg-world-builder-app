@@ -441,7 +441,7 @@ function StartingChoiceCategoryRow({
       </button>
       {expanded ? (
         <div className={quickNpcStartingChoiceExpandedPanelClasses}>
-          <Panel tone="faint" density="comfortable" className="flex flex-col">
+          <Panel tone="faint" density="compact" className="flex flex-col">
             {panel}
           </Panel>
         </div>

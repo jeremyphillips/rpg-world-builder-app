@@ -66,7 +66,7 @@ export function PackageSwitchBudgetSummary({
     <Panel
       as="section"
       tone="subtle"
-      density="comfortable"
+      density="compact"
       aria-live="polite"
       aria-label="Budget summary"
     >
