@@ -1,5 +1,5 @@
-import type { UseMediaManagerBodyDropResult } from '../hooks/use-media-manager-body-drop'
-import type { MediaManagerProps } from '../lib/media-manager.types'
+import type { UseMediaManagerBodyDropResult } from '../../hooks/use-media-manager-body-drop'
+import type { MediaManagerProps } from '../../lib/media-manager.types'
 
 export type MediaManagerBodyDropOverlayState = 'active' | 'invalid'
 

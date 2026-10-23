@@ -1,12 +1,16 @@
 import { useId, useMemo, useState } from 'react'
 import {
+  borderStrength,
   Button,
   CheckboxField,
+  cn,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
   DialogPanelScrollRegion,
   FilenamePreview,
+  Panel,
+  Text,
   type ScrollBoundaryState,
 } from '@rpg/ui'
 import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
@@ -26,7 +30,6 @@ import {
   type MediaAsset,
   type MediaRole,
 } from '@rpg/contracts'
-import { mediaManagerStyles as styles } from './media-manager.variants'
 
 const altSchema = contentImageSchema.pick({ alt: true })
 const altFields: FormItem[] = [
@@ -102,34 +105,34 @@ export function MediaImageDetails({
     effectiveRoles.derivedRoles.length === 0
 
   return (
-    <aside className={styles.detailsColumn()} aria-label="Image details">
+    <aside className="media-manager__column" aria-label="Image details">
       <DialogPanelScrollRegion
         inset="innerLeading"
-        regionClassName={styles.columnScroll()}
-        viewportClassName={styles.columnScrollViewport()}
+        regionClassName="media-manager__column-scroll"
+        viewportClassName="media-manager__column-viewport"
         showTopBoundaryShadow={false}
         showBottomBoundaryShadow={false}
         onBoundaryStateChange={onScrollBoundaryChange}
       >
-        <div className={styles.details()}>
-          <h3 className={styles.subheading()}>Image details</h3>
+        <div className="min-w-0 space-y-4">
+          <h3 className="text-sm font-semibold">Image details</h3>
           {assignedSourceMissing ? (
-            <p className={styles.error()} role="alert">
+            <p className="text-sm text-destructive" role="alert">
               A saved role points at a missing image. The preview uses the fallback source until you
               reassign the role.
             </p>
           ) : null}
           {galleryOnlyUpload ? (
-            <p className={styles.muted()}>
+            <Text variant="supporting">
               Gallery only — assign a role to show this image on cards and detail pages.
-            </p>
+            </Text>
           ) : null}
-          <div className={styles.detailsPanel()}>
-            <section className={styles.detailsSection()} aria-labelledby={`${id}-roles-heading`}>
-              <h4 id={`${id}-roles-heading`} className={styles.subheading()}>
+          <Panel tone="quiet" bleed className="media-manager__details">
+            <section className="space-y-3 p-4" aria-labelledby={`${id}-roles-heading`}>
+              <h4 id={`${id}-roles-heading`} className="text-sm font-semibold">
                 Assign roles
               </h4>
-              <div className={styles.roles()} role="group" aria-labelledby={`${id}-roles-heading`}>
+              <div className="space-y-3" role="group" aria-labelledby={`${id}-roles-heading`}>
                 {/* fallow-ignore-next-line complexity */}
                 {policy.allowedRoles.map((role) => {
                   const assignment = media.roles[role]
@@ -165,33 +168,39 @@ export function MediaImageDetails({
                 })}
               </div>
             </section>
-            <section className={styles.detailsSection()} aria-labelledby={`${id}-file-heading`}>
-              <h4 id={`${id}-file-heading`} className={styles.subheading()}>
+            <section
+              className={cn('space-y-3 border-t p-4', borderStrength('subtle'))}
+              aria-labelledby={`${id}-file-heading`}
+            >
+              <h4 id={`${id}-file-heading`} className="text-sm font-semibold">
                 File
               </h4>
-              <dl className={styles.metadata()} aria-labelledby={`${id}-file-heading`}>
+              <dl
+                className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 text-style-caption"
+                aria-labelledby={`${id}-file-heading`}
+              >
                 {selectedAvailable.kind === 'system' ? (
                   <>
-                    <dt className={styles.metadataLabel()}>Source</dt>
-                    <dd className={styles.metadataValue()}>System artwork</dd>
-                    <dt className={styles.metadataLabel()}>Dimensions</dt>
-                    <dd className={styles.metadataValue()}>
+                    <dt className="text-muted-foreground">Source</dt>
+                    <dd className="m-0 min-w-0">System artwork</dd>
+                    <dt className="text-muted-foreground">Dimensions</dt>
+                    <dd className="m-0 min-w-0">
                       {selectedAvailable.sourceDimensions.width} ×{' '}
                       {selectedAvailable.sourceDimensions.height}
                     </dd>
                   </>
                 ) : asset ? (
                   <>
-                    <dt className={styles.metadataLabel()}>File name</dt>
-                    <dd className={styles.metadataValue()}>
+                    <dt className="text-muted-foreground">File name</dt>
+                    <dd className="m-0 min-w-0">
                       <FilenamePreview filename={asset.filename} density="metadata" />
                     </dd>
-                    <dt className={styles.metadataLabel()}>Dimensions</dt>
-                    <dd className={styles.metadataValue()}>
+                    <dt className="text-muted-foreground">Dimensions</dt>
+                    <dd className="m-0 min-w-0">
                       {asset.orientedWidth} × {asset.orientedHeight}
                     </dd>
-                    <dt className={styles.metadataLabel()}>File size</dt>
-                    <dd className={styles.metadataValue()}>
+                    <dt className="text-muted-foreground">File size</dt>
+                    <dd className="m-0 min-w-0">
                       {new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(
                         asset.byteSize / 1024,
                       )}{' '}
@@ -201,11 +210,11 @@ export function MediaImageDetails({
                 ) : null}
               </dl>
               {asset?.animated ? (
-                <p className={styles.muted()}>Animated source; still preview.</p>
+                <Text variant="supporting">Animated source; still preview.</Text>
               ) : null}
             </section>
             {uploadImage ? (
-              <section className={styles.detailsSection()}>
+              <section className={cn('space-y-3 border-t p-4', borderStrength('subtle'))}>
                 {/* TODO(disclosure): consolidate ad hoc collapsible trigger/caret with shared @rpg/ui disclosure primitives. */}
                 <Collapsible open={accessibilityOpen} onOpenChange={setAccessibilityOpen}>
                   <CollapsibleTrigger asChild>
@@ -213,17 +222,17 @@ export function MediaImageDetails({
                       type="button"
                       variant="text"
                       size="sm"
-                      className={styles.detailsDisclosureTrigger()}
+                      className="group h-auto w-full justify-between px-0 py-0 text-sm font-semibold"
                       aria-expanded={accessibilityOpen}
                     >
                       Accessibility & details
                       <ChevronDown
-                        className={styles.detailsDisclosureChevron({ open: accessibilityOpen })}
+                        className="size-4 shrink-0 transition-transform group-data-[state=open]:rotate-180"
                         aria-hidden="true"
                       />
                     </Button>
                   </CollapsibleTrigger>
-                  <CollapsibleContent className={styles.detailsDisclosureContent()}>
+                  <CollapsibleContent className="pt-3">
                     <Form
                       key={uploadImage.id}
                       schema={altSchema}
@@ -237,7 +246,7 @@ export function MediaImageDetails({
                 </Collapsible>
               </section>
             ) : null}
-          </div>
+          </Panel>
           {canRemove && onRemove ? (
             <Button type="button" variant="outline" onClick={onRemove}>
               Remove image

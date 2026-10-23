@@ -95,7 +95,7 @@
   "packages/ui/src/components/ui/field-derived-meta.variants.ts:19:cva() without a variant config object",
   "packages/ui/src/components/ui/field-derived-meta.variants.ts:21:cva() without a variant config object",
   "packages/ui/src/components/ui/field.variants.ts:159:cva() without a variant config object",
-  "packages/ui/src/components/ui/field.variants.ts:597:cva() without a variant config object",
+  "packages/ui/src/components/ui/field.variants.ts:594:cva() without a variant config object",
   "packages/ui/src/components/ui/file-dropzone.variants.ts:3:cva() without a variant config object",
   "packages/ui/src/components/ui/file-dropzone.variants.ts:5:cva() without a variant config object",
   "packages/ui/src/components/ui/file-dropzone.variants.ts:9:cva() without a variant config object",

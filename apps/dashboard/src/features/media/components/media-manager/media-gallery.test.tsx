@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { resolveAvailableContentMediaSources } from '@rpg/contracts'
 import { MediaGallery } from './media-gallery'
-import { mediaFixture, mediaFixtureAssets } from '../fixtures'
+import { mediaFixture, mediaFixtureAssets } from '../../fixtures'
 
 const fixtureSources = resolveAvailableContentMediaSources({
   media: mediaFixture,

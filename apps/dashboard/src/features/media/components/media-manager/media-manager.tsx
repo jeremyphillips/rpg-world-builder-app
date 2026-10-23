@@ -1,18 +1,26 @@
 import { useEffect, useRef } from 'react'
-import { Alert, Button, ConfirmDialog, Modal, ToastScopeProvider } from '@rpg/ui'
+import {
+  Alert,
+  Button,
+  cn,
+  ConfirmDialog,
+  Modal,
+  scrollBoundaryTopShadowClasses,
+  Text,
+  ToastScopeProvider,
+} from '@rpg/ui'
 import { formatFieldMessage } from '@rpg/contracts'
-import { useMediaManager } from '../hooks/use-media-manager'
-import { useMediaManagerBodyDrop } from '../hooks/use-media-manager-body-drop'
-import { useMediaManagerScrollBoundary } from '../hooks/use-media-manager-scroll-boundary'
-import type { MediaManagerProps } from '../lib/media-manager.types'
+import { useMediaManager } from '../../hooks/use-media-manager'
+import { useMediaManagerBodyDrop } from '../../hooks/use-media-manager-body-drop'
+import { useMediaManagerScrollBoundary } from '../../hooks/use-media-manager-scroll-boundary'
+import type { MediaManagerProps } from '../../lib/media-manager.types'
 import { MediaManagerBody } from './media-manager-body'
 import {
   resolveMediaManagerBodyDropOverlay,
   resolveMediaManagerFooterHint,
 } from './media-manager-session.lib'
-import { mediaManagerStyles as styles } from './media-manager.variants'
 
-export type { MediaManagerProps, MediaManagerSave } from '../lib/media-manager.types'
+export type { MediaManagerProps, MediaManagerSave } from '../../lib/media-manager.types'
 
 /** Mount one isolated session per opening; parent refreshes never overwrite a draft. */
 export function MediaManager(props: MediaManagerProps) {
@@ -31,7 +39,7 @@ function MediaManagerSession(props: MediaManagerProps) {
     >
       <Modal.Content size="media" layout="stable" stableSize="tall">
         <ToastScopeProvider>
-          <div className={styles.modalSession()}>
+          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
             <MediaManagerSessionContent {...props} dismissRef={dismissRef} />
           </div>
         </ToastScopeProvider>
@@ -81,11 +89,15 @@ function MediaManagerSessionContent({
   return (
     <>
       <Modal.Header
-        className={styles.header()}
+        className="media-manager__header"
         headline="Manage images"
         description={`Add, organize, and assign images for this ${label}.`}
       >
-        <div aria-hidden data-visible={headerScrolled} className={styles.headerScrollShadow()} />
+        <div
+          aria-hidden
+          data-visible={headerScrolled}
+          className={cn(scrollBoundaryTopShadowClasses, 'top-full')}
+        />
       </Modal.Header>
       <Modal.Body stableBody>
         <MediaManagerBody
@@ -107,9 +119,9 @@ function MediaManagerSessionContent({
         />
       </Modal.Body>
       <Modal.Footer>
-        <div className={styles.row()}>
-          <p className={styles.footerHint()}>{resolveMediaManagerFooterHint(props.mode, label)}</p>
-          <div className={styles.row()}>
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2">
+          <Text variant="caption">{resolveMediaManagerFooterHint(props.mode, label)}</Text>
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-2">
             {!saving && !validation.ok && validation.issues.length > 0 ? (
               <Alert
                 variant="warning"

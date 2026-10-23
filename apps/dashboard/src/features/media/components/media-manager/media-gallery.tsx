@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   Badge,
+  borderStrength,
   Button,
+  cn,
   DialogPanelScrollRegion,
   FilenamePreview,
+  Text,
   type ScrollBoundaryState,
 } from '@rpg/ui'
 import { Images } from 'lucide-react'
@@ -17,11 +20,10 @@ import {
   type MediaAsset,
   type MediaRole,
 } from '@rpg/contracts'
-import type { UploadEntry } from '../hooks/use-media-uploads'
-import { resolveUploadEntryStatusLabel } from '../hooks/use-media-uploads'
-import { mediaImageUrl, systemContentImageUrl } from '../lib/media-display'
-import { MEDIA_IMAGE_ACCEPT } from '../lib/media-upload.lib'
-import { mediaManagerStyles as styles } from './media-manager.variants'
+import type { UploadEntry } from '../../hooks/use-media-uploads'
+import { resolveUploadEntryStatusLabel } from '../../hooks/use-media-uploads'
+import { mediaImageUrl, systemContentImageUrl } from '../../lib/media-display'
+import { MEDIA_IMAGE_ACCEPT } from '../../lib/media-upload.lib'
 
 function readGalleryColumnStride(): number {
   if (typeof window.matchMedia !== 'function') return 1
@@ -108,17 +110,23 @@ export function MediaGallery({
   }, [])
 
   return (
-    <section className={styles.gallery()} aria-label="Images">
+    <section
+      className={cn(
+        'media-manager__column media-manager__column--separated',
+        borderStrength('subtle'),
+      )}
+      aria-label="Images"
+    >
       <DialogPanelScrollRegion
         inset="innerLeading"
-        regionClassName={styles.columnScroll()}
-        viewportClassName={styles.columnScrollViewport()}
+        regionClassName="media-manager__column-scroll"
+        viewportClassName="media-manager__column-viewport"
         showTopBoundaryShadow={false}
         showBottomBoundaryShadow={false}
         onBoundaryStateChange={onScrollBoundaryChange}
       >
-        <div className={styles.galleryHeaderRow()}>
-          <h2 className={styles.subheading()}>Images ({imageCount})</h2>
+        <div className="mb-3 flex shrink-0 flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold">Images ({imageCount})</h2>
           <Button
             type="button"
             variant="outline"
@@ -129,7 +137,7 @@ export function MediaGallery({
           </Button>
           <input
             ref={input}
-            className={styles.hidden()}
+            className="sr-only"
             type="file"
             aria-label="Upload images"
             multiple
@@ -143,19 +151,22 @@ export function MediaGallery({
         </div>
         {/* TODO(empty-well): model this gallery empty as a shared well component. */}
         {contextBlocked ? (
-          <div className={styles.galleryEmpty()} role="alert">
-            <Images className={styles.galleryEmptyIcon()} aria-hidden="true" />
-            <p className={styles.galleryEmptyTitle()}>Images unavailable</p>
-            <p className={styles.muted()}>{contextBlockedMessage}</p>
+          <div
+            className="flex min-h-48 flex-1 flex-col items-center justify-center gap-2 px-4 text-center md:min-h-0"
+            role="alert"
+          >
+            <Images className="size-8 text-muted-foreground" aria-hidden="true" />
+            <p className="text-sm font-semibold text-foreground">Images unavailable</p>
+            <Text variant="supporting">{contextBlockedMessage}</Text>
           </div>
         ) : !availableImages.length ? (
-          <div className={styles.galleryEmpty()}>
-            <Images className={styles.galleryEmptyIcon()} aria-hidden="true" />
-            <p className={styles.galleryEmptyTitle()}>No images yet</p>
-            <p className={styles.muted()}>Uploaded images will appear here.</p>
+          <div className="flex min-h-48 flex-1 flex-col items-center justify-center gap-2 px-4 text-center md:min-h-0">
+            <Images className="size-8 text-muted-foreground" aria-hidden="true" />
+            <p className="text-sm font-semibold text-foreground">No images yet</p>
+            <Text variant="supporting">Uploaded images will appear here.</Text>
           </div>
         ) : (
-          <div className={styles.grid()}>
+          <div className="flex gap-3 pb-2 md:grid md:grid-cols-2">
             {availableImages.map((image, index) => {
               const effective = resolveEffectiveImageRoles(
                 media,
@@ -170,7 +181,7 @@ export function MediaGallery({
                 <button
                   key={image.id}
                   type="button"
-                  className={styles.tile({ selected: selectedId === image.id })}
+                  className="media-manager__tile ui-focus-ring"
                   aria-pressed={selectedId === image.id}
                   aria-label={`${resolveGalleryImageLabel(image, index, assets)}${roleLabels.map((label) => `, ${label}`).join('')}`}
                   onClick={() => onSelect(image.id)}
@@ -192,14 +203,14 @@ export function MediaGallery({
                     buttons?.[next]?.focus()
                   }}
                 >
-                  <div className={styles.tileThumb()}>
+                  <div className="relative aspect-square overflow-hidden">
                     <img
-                      className={styles.thumbnail()}
+                      className="size-full object-cover"
                       src={resolveGalleryImageSrc(image, imageUrl, resolveSystemImageUrl)}
                       alt=""
                     />
                     {roles.length > 0 || galleryOnly ? (
-                      <div className={styles.tileBadges()}>
+                      <div className="absolute inset-x-1 bottom-1 flex flex-wrap gap-1">
                         {roles.map((role) => (
                           <Badge
                             key={role}
@@ -230,7 +241,10 @@ export function MediaGallery({
           </div>
         )}
         {entries.map((entry) => (
-          <div key={entry.id} className={styles.queue()}>
+          <div
+            key={entry.id}
+            className={cn('space-y-2 rounded-md border p-3 text-sm', borderStrength())}
+          >
             <p className="flex min-w-0 items-center gap-2">
               <FilenamePreview
                 filename={entry.file.name}
@@ -242,11 +256,11 @@ export function MediaGallery({
               </span>
             </p>
             {entry.error && (
-              <p role="alert" className={styles.error()}>
+              <p role="alert" className="text-sm text-destructive">
                 {entry.error}
               </p>
             )}
-            <div className={styles.row()}>
+            <div className="flex shrink-0 flex-wrap items-center justify-between gap-2">
               {entry.status === 'failed' && (
                 <Button type="button" variant="outline" onClick={() => onRetry(entry.id)}>
                   Retry

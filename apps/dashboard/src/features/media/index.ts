@@ -9,7 +9,7 @@ export {
   MediaManager,
   type MediaManagerProps,
   type MediaManagerSave,
-} from './components/media-manager'
+} from './components/media-manager/media-manager'
 export { ManagedMediaField, type ManagedMediaFieldProps } from './components/managed-media-field'
 export { DetailMediaField, type DetailMediaFieldProps } from './components/detail-media-field'
 export { createUploadSession, uploadMediaFile } from './api/media-api'

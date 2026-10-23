@@ -2,7 +2,7 @@ import { expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { getContentMediaPolicy, resolveAvailableContentMediaSources } from '@rpg/contracts'
 import { MediaImageDetails } from './media-image-details'
-import { mediaFixture, mediaFixtureAssets } from '../fixtures'
+import { mediaFixture, mediaFixtureAssets } from '../../fixtures'
 
 const uploadAvailable = {
   kind: 'upload' as const,

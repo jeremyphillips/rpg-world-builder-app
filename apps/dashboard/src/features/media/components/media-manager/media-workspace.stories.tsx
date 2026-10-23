@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useMediaManager } from '../hooks/use-media-manager'
-import { mediaFixture, mediaFixtureAssets, mediaFixtureImageUrl } from '../fixtures'
+import { useMediaManager } from '../../hooks/use-media-manager'
+import { mediaFixture, mediaFixtureAssets, mediaFixtureImageUrl } from '../../fixtures'
 import { MediaWorkspace } from './media-workspace'
 function WorkspaceExample() {
   const controller = useMediaManager({

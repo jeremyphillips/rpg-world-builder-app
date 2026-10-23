@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { resolveAvailableContentMediaSources } from '@rpg/contracts'
 import { MediaGallery } from './media-gallery'
-import { mediaFixture, mediaFixtureAssets, mediaFixtureImageUrl } from '../fixtures'
+import { mediaFixture, mediaFixtureAssets, mediaFixtureImageUrl } from '../../fixtures'
 
 const fixtureSources = resolveAvailableContentMediaSources({
   media: mediaFixture,

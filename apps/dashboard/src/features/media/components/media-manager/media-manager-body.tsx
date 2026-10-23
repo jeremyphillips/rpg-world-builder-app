@@ -1,15 +1,14 @@
 import type { ContentMedia, MediaAsset } from '@rpg/contracts'
-import { MEDIA_CONTEXT_INCOMPLETE_MESSAGE } from '../lib/resolve-media-content-availability.lib'
-import type { UseMediaManagerBodyDropResult } from '../hooks/use-media-manager-body-drop'
-import type { MediaManagerController } from '../hooks/use-media-manager'
-import type { UploadEntry } from '../hooks/use-media-uploads'
-import type { mediaImageUrl } from '../lib/media-display'
+import { MEDIA_CONTEXT_INCOMPLETE_MESSAGE } from '../../lib/resolve-media-content-availability.lib'
+import type { UseMediaManagerBodyDropResult } from '../../hooks/use-media-manager-body-drop'
+import type { MediaManagerController } from '../../hooks/use-media-manager'
+import type { UploadEntry } from '../../hooks/use-media-uploads'
+import type { mediaImageUrl } from '../../lib/media-display'
 import { MediaManagerBodyDropOverlay } from './media-manager-body-drop-overlay'
 import { MediaGallery } from './media-gallery'
 import { MediaImageDetails } from './media-image-details'
 import { MediaWorkspace } from './media-workspace'
 import type { MediaManagerBodyDropOverlayState } from './media-manager-session.lib'
-import { mediaManagerStyles as styles } from './media-manager.variants'
 
 export function MediaManagerBody({
   bodyDrop,
@@ -46,16 +45,13 @@ export function MediaManagerBody({
 
   return (
     <div
-      className={styles.bodyDropHost()}
+      className="relative flex min-h-0 flex-1 flex-col"
       onDragEnter={bodyDrop.onDragEnter}
       onDragLeave={bodyDrop.onDragLeave}
       onDragOver={bodyDrop.onDragOver}
       onDrop={bodyDrop.onDrop}
     >
-      <fieldset
-        disabled={saving}
-        className={styles.layout({ columns: showDetailsColumn ? 'three' : 'two' })}
-      >
+      <fieldset disabled={saving} className="media-manager">
         <MediaGallery
           imageUrl={imageUrl}
           systemImageUrl={controller.resolveSystemImageUrl}

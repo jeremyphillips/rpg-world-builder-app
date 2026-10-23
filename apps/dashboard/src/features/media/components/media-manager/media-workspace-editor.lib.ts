@@ -11,7 +11,7 @@ import {
   type SourceDimensions,
 } from '@rpg/contracts'
 
-import type { MediaManagerController } from '../hooks/use-media-manager'
+import type { MediaManagerController } from '../../hooks/use-media-manager'
 
 export function isStalePrimaryCrop(
   role: MediaRole,

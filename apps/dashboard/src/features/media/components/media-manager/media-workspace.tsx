@@ -1,4 +1,5 @@
 import {
+  borderStrength,
   Button,
   cn,
   DialogPanelScrollRegion,
@@ -6,15 +7,15 @@ import {
   resolveChromeCalloutClasses,
   resolveImageDropTargetDefaults,
   SegmentedControl,
+  Text,
   type ScrollBoundaryState,
 } from '@rpg/ui'
 import { Info } from 'lucide-react'
 import { mediaRoleSurfaceCopy, type MediaRole } from '@rpg/contracts'
 import type { UseQueryResult } from '@tanstack/react-query'
 
-import type { MediaManagerController } from '../hooks/use-media-manager'
-import { mediaImageUrl } from '../lib/media-display'
-import { mediaManagerStyles as styles } from './media-manager.variants'
+import type { MediaManagerController } from '../../hooks/use-media-manager'
+import { mediaImageUrl } from '../../lib/media-display'
 import { MediaWorkspaceSelection } from './media-workspace-selection'
 import { resolveMediaWorkspaceCopy, resolveMediaWorkspaceOnboarding } from './media-workspace.lib'
 
@@ -57,9 +58,9 @@ function MediaWorkspaceHeader({
   onPresentationChange: (role: MediaRole) => void
 }) {
   return (
-    <div className={styles.workspaceHeader()}>
-      <div className={styles.workspaceHeaderRow()}>
-        <h2 className={styles.heading()}>{copy.heading}</h2>
+    <div className="mb-4 shrink-0 space-y-1">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold">{copy.heading}</h2>
         {assignedRoles.length >= 2 ? (
           <SegmentedControl
             value={presentation}
@@ -74,7 +75,7 @@ function MediaWorkspaceHeader({
           />
         ) : null}
       </div>
-      <p className={styles.muted()}>{copy.description}</p>
+      <Text variant="supporting">{copy.description}</Text>
     </div>
   )
 }
@@ -98,11 +99,17 @@ export function MediaWorkspace({
   })
 
   return (
-    <section className={styles.previewColumn()} aria-label="Image preview">
+    <section
+      className={cn(
+        'media-manager__column media-manager__column--separated',
+        borderStrength('subtle'),
+      )}
+      aria-label="Image preview"
+    >
       <DialogPanelScrollRegion
         inset="innerLeading"
-        regionClassName={styles.columnScroll()}
-        viewportClassName={styles.columnScrollViewport()}
+        regionClassName="media-manager__column-scroll"
+        viewportClassName="media-manager__column-viewport"
         showTopBoundaryShadow={false}
         showBottomBoundaryShadow={false}
         onBoundaryStateChange={onScrollBoundaryChange}
@@ -113,7 +120,7 @@ export function MediaWorkspace({
           presentation={state.presentation}
           onPresentationChange={(role) => dispatch({ type: 'presentation', role })}
         />
-        <div className={styles.workspaceContent()}>
+        <div className="flex min-h-0 flex-1 flex-col">
           {selectedAvailable ? (
             <MediaWorkspaceSelection
               controller={controller}
@@ -125,7 +132,7 @@ export function MediaWorkspace({
             />
           ) : (
             <>
-              <div className={styles.empty()}>
+              <div className="flex min-h-48 flex-1 items-stretch">
                 <FileDropzone
                   {...resolveImageDropTargetDefaults(
                     uploads.maxUploadBytes !== undefined
@@ -140,15 +147,13 @@ export function MediaWorkspace({
               </div>
               <div
                 className={cn(
-                  styles.workspaceOnboarding(),
+                  'mt-4 shrink-0',
                   resolveChromeCalloutClasses({ variant: 'callout', tone: 'info' }),
                 )}
               >
-                <div className={styles.workspaceOnboardingContent()}>
-                  <Info className={styles.workspaceOnboardingIcon()} aria-hidden="true" />
-                  <p className={styles.workspaceOnboardingText()}>
-                    {resolveMediaWorkspaceOnboarding(policy.domain)}
-                  </p>
+                <div className="flex items-start gap-2">
+                  <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                  <p className="text-sm">{resolveMediaWorkspaceOnboarding(policy.domain)}</p>
                 </div>
               </div>
             </>

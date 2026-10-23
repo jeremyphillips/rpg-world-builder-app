@@ -3,13 +3,13 @@ import { resolveCropRelativeGuideLayout } from '@rpg/ui'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createUploadSession } from '../api/media-api'
-import type * as MediaApiModule from '../api/media-api'
+import { createUploadSession } from '../../api/media-api'
+import type * as MediaApiModule from '../../api/media-api'
 import { MediaManager } from './media-manager'
-import { mediaFixture, mediaFixtureAssets } from '../fixtures'
-import { resolveFramePresentation } from '../lib/content-media-image-frame.lib'
+import { mediaFixture, mediaFixtureAssets } from '../../fixtures'
+import { resolveFramePresentation } from '../../lib/content-media-image-frame.lib'
 
-vi.mock('../api/media-api', async (importOriginal) => {
+vi.mock('../../api/media-api', async (importOriginal) => {
   const actual = await importOriginal<typeof MediaApiModule>()
   return {
     ...actual,

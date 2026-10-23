@@ -1,4 +1,4 @@
-import { MediaCropEditor, MediaEmblemEditor } from '@rpg/ui'
+import { MediaCropEditor, MediaEmblemEditor, Text } from '@rpg/ui'
 import {
   asContainPresentation,
   asCropPresentation,
@@ -12,20 +12,23 @@ import {
   type SourceDimensions,
 } from '@rpg/contracts'
 
-import type { MediaManagerController } from '../hooks/use-media-manager'
-import { resolveFramePresentation } from '../lib/content-media-image-frame.lib'
-import { mediaImageUrl, MEDIA_SOURCE_CROP, systemContentImageUrl } from '../lib/media-display'
+import type { MediaManagerController } from '../../hooks/use-media-manager'
+import { resolveFramePresentation } from '../../lib/content-media-image-frame.lib'
+import { mediaImageUrl, MEDIA_SOURCE_CROP, systemContentImageUrl } from '../../lib/media-display'
 import {
   isStalePrimaryCrop,
   resolveWorkspaceEditorCrop,
   useCorrectStalePrimaryCrop,
 } from './media-workspace-editor.lib'
-import { mediaManagerStyles as styles } from './media-manager.variants'
 
 function MediaWorkspacePreviewFigure({ src, alt }: { src: string; alt: string }) {
   return (
-    <figure className={styles.previewCard()}>
-      <img className={styles.preview()} src={src} alt={alt} />
+    <figure className="min-w-0 space-y-2">
+      <img
+        className="aspect-square w-full rounded-md bg-sunken object-contain"
+        src={src}
+        alt={alt}
+      />
     </figure>
   )
 }
@@ -124,7 +127,7 @@ function MediaWorkspaceEditor({
 
   if (activeRole === 'emblem') {
     return (
-      <div className={styles.editorCrop()}>
+      <div className="min-w-0 max-w-full space-y-2">
         <MediaEmblemEditor
           src={src}
           source={source}
@@ -132,13 +135,13 @@ function MediaWorkspaceEditor({
           instructions={mediaRoleSurfaceCopy.emblem.instructions}
           onChange={(layout) => dispatch({ type: 'contain', layout, source })}
         />
-        {interaction ? <p className={styles.muted()}>{interaction}</p> : null}
+        {interaction ? <Text variant="supporting">{interaction}</Text> : null}
       </div>
     )
   }
 
   return (
-    <div className={styles.editorCrop()}>
+    <div className="min-w-0 max-w-full space-y-2">
       <MediaWorkspaceCropEditor
         controller={controller}
         src={src}
@@ -202,7 +205,7 @@ export function MediaWorkspaceSelection({
   })
 
   if (!context) {
-    return <div className={styles.empty()}>Loading image details…</div>
+    return <div className="flex min-h-48 flex-1 items-stretch">Loading image details…</div>
   }
 
   if (assignedRoles.length === 0) {

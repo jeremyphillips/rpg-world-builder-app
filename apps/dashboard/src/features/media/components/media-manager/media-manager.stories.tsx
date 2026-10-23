@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createUploadRoleAssignment } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 import { MediaManager, type MediaManagerProps } from './media-manager'
-import { mediaFixture, mediaFixtureAssets, mediaFixtureImageUrl } from '../fixtures'
+import { mediaFixture, mediaFixtureAssets, mediaFixtureImageUrl } from '../../fixtures'
 
 function Example(args: MediaManagerProps) {
   const [client] = useState(() => new QueryClient())

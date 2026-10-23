@@ -15,13 +15,23 @@ export const STYLING_INDIRECTION_SCAN_ROOTS = [
   'apps/dashboard/src/lib/overview',
 ] as const
 
-/** W11 migrated filter modules — not under `components/` scan roots. */
+/** Migrated modules outside the `components/` scan roots. */
 export const STYLING_INDIRECTION_EXTRA_FILES = [
   'packages/ui/src/filters/filter-bar.client.tsx',
   'packages/ui/src/filters/filter-bar.variants.ts',
   'packages/ui/src/filters/catalog-filter-controls.client.tsx',
   'packages/ui/src/filters/filter-advanced-panel-body.client.tsx',
   'packages/ui/src/filters/filter-advanced-panel-header.client.tsx',
+  'apps/dashboard/src/features/media/components/media-manager/media-gallery.tsx',
+  'apps/dashboard/src/features/media/components/media-manager/media-image-details.tsx',
+  'apps/dashboard/src/features/media/components/media-manager/media-manager-body-drop-overlay.tsx',
+  'apps/dashboard/src/features/media/components/media-manager/media-manager-body.tsx',
+  'apps/dashboard/src/features/media/components/media-manager/media-manager-session.lib.ts',
+  'apps/dashboard/src/features/media/components/media-manager/media-manager.tsx',
+  'apps/dashboard/src/features/media/components/media-manager/media-workspace-editor.lib.ts',
+  'apps/dashboard/src/features/media/components/media-manager/media-workspace-selection.tsx',
+  'apps/dashboard/src/features/media/components/media-manager/media-workspace.lib.ts',
+  'apps/dashboard/src/features/media/components/media-manager/media-workspace.tsx',
 ] as const
 
 function collectSourceFiles(dir: string, acc: string[] = []): string[] {

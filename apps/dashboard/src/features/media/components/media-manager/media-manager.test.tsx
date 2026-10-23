@@ -9,13 +9,13 @@ import {
   focalPointFromCropCenter,
   resetPrimaryCrop,
 } from '@rpg/contracts'
-import { createUploadSession } from '../api/media-api'
+import { createUploadSession } from '../../api/media-api'
 import { MediaManager, type MediaManagerProps } from './media-manager'
-import { mediaFixture, mediaFixtureAssets } from '../fixtures'
+import { mediaFixture, mediaFixtureAssets } from '../../fixtures'
 
-import type * as MediaApi from '../api/media-api'
+import type * as MediaApi from '../../api/media-api'
 
-vi.mock('../api/media-api', async (importOriginal) => {
+vi.mock('../../api/media-api', async (importOriginal) => {
   const actual = await importOriginal<typeof MediaApi>()
   return {
     ...actual,
@@ -285,7 +285,15 @@ describe('MediaManager', () => {
     mount({ value: { revision: 0, images: [], roles: {} } })
     expect(screen.queryByLabelText('Image details')).not.toBeInTheDocument()
     const fieldset = screen.getByLabelText('Images').closest('fieldset')
-    expect(fieldset?.className).toContain('md:grid-cols-[minmax(0,0.28fr)_minmax(0,0.72fr)]')
+    expect(fieldset).toHaveClass('media-manager')
+  })
+
+  it('keeps the details column in the manager grid without a column separator', () => {
+    mount()
+    const details = screen.getByLabelText('Image details')
+    expect(details).toHaveClass('media-manager__column')
+    expect(details).not.toHaveClass('media-manager__column--separated')
+    expect(details.closest('fieldset')).toHaveClass('media-manager')
   })
 
   it('shows the system class tile without remove image when media.images is empty', () => {
