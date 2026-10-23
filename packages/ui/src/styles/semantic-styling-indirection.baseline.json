@@ -135,8 +135,6 @@
   "packages/ui/src/components/ui/media-field-summary.variants.ts:19:cva() without a variant config object",
   "packages/ui/src/components/ui/media-field-summary.variants.ts:23:cva() without a variant config object",
   "packages/ui/src/components/ui/media-field-summary.variants.ts:39:cva() without a variant config object",
-  "packages/ui/src/components/ui/metadata-list.variants.ts:19:cva() without a variant config object",
-  "packages/ui/src/components/ui/metadata-list.variants.ts:21:cva() without a variant config object",
   "packages/ui/src/components/ui/number-input.variants.ts:14:cva() without a variant config object",
   "packages/ui/src/components/ui/number-stepper.variants.ts:235:cva() without a variant config object",
   "packages/ui/src/components/ui/number-stepper.variants.ts:237:cva() without a variant config object",

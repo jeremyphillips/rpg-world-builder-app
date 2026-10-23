@@ -5,6 +5,12 @@ export {
   UI_ALERT_DENSITY_CLASSES,
 } from '../components/ui/alert.variants'
 export {
+  UI_METADATA_LIST_COLUMN_GAP_CLASSES,
+  UI_METADATA_LIST_EMPHASIS_CLASSES,
+  UI_METADATA_LIST_SIZE_CLASSES,
+  UI_METADATA_LIST_VALUE_TRACK_CLASSES,
+} from '../components/ui/metadata-list.variants'
+export {
   UI_TABS_LIST_APPEARANCE_CLASSES,
   UI_TABS_TRIGGER_APPEARANCE_CLASSES,
 } from '../components/ui/tabs.variants'

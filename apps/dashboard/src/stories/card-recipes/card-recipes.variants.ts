@@ -12,11 +12,6 @@ export const cardRecipeTileClasses =
 export const cardRecipeTileHeaderClasses =
   'flex min-w-0 flex-wrap items-center justify-between gap-2'
 
-export const cardRecipeTileMetaListClasses =
-  'grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-1 text-style-caption'
-
-export const cardRecipeTileMetaTermClasses = 'font-medium text-foreground'
-
 export const cardRecipeTileChainClasses = 'flex min-w-0 flex-wrap gap-1'
 
 export const cardRecipeTilePreviewClasses = 'min-w-0 border-t border-border-subtle pt-3'

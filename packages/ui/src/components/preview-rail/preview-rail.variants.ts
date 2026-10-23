@@ -114,17 +114,6 @@ export const previewRailAvailabilityInactiveIconClasses = cn(
 
 export const previewRailAvailabilityDetailSeparatorClasses = 'text-muted-foreground'
 
-export const previewRailFactsGridClasses =
-  'grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-x-3 gap-y-2'
-
-export const previewRailFactsGridCompactClasses = 'gap-y-1.5'
-
-export const previewRailFactLabelClasses = 'text-style-supporting'
-
-export const previewRailFactValueClasses = 'text-sm text-foreground'
-
-export const previewRailFactCompactTextClasses = 'text-xs'
-
 export const previewRailSectionsHeaderClasses = 'flex flex-col gap-1'
 
 export const previewRailAccordionCardClasses =

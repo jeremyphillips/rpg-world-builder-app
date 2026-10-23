@@ -1,4 +1,4 @@
-import { Heading, Text, WizardFooter, useWizard } from '@rpg/ui'
+import { MetadataList, Text, WizardFooter, useWizard } from '@rpg/ui'
 
 import type { CampaignCreateValues } from '../../lib/settings/campaign-settings-form-values'
 import {
@@ -58,11 +58,11 @@ function ReviewSection({
       <h3 id={id} className="eyebrow-style-sm mb-3 text-foreground">
         {heading}
       </h3>
-      <dl className="space-y-2 text-sm">
-        {rows.map((row) => (
-          <ReviewRow key={row.label} label={row.label} value={row.value} />
-        ))}
-      </dl>
+      <MetadataList
+        divider={false}
+        emphasis="value"
+        items={rows.map((row) => ({ id: row.label, label: row.label, value: row.value }))}
+      />
     </section>
   )
 }
@@ -74,18 +74,5 @@ function ReviewErrorMessage({ error }: { error?: string | null }) {
     <Text variant="destructive" role="alert">
       {error}
     </Text>
-  )
-}
-
-function ReviewRow({ label, value }: ReviewRowData) {
-  return (
-    <div className="flex gap-2">
-      <Text variant="muted" as="dt" className="w-40 shrink-0">
-        {label}
-      </Text>
-      <Heading variant="label" as="dd">
-        {value}
-      </Heading>
-    </div>
   )
 }

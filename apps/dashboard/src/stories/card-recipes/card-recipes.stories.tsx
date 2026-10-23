@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect } from 'storybook/test'
 
-import { Badge, Heading, Text, type BadgeTone } from '@rpg/ui'
+import { Badge, Heading, MetadataList, Text, type BadgeTone } from '@rpg/ui'
 import {
   expectRowAnatomyAligned,
   waitForRowAnatomyLayout,
@@ -14,8 +14,6 @@ import {
   cardRecipeTileChainClasses,
   cardRecipeTileClasses,
   cardRecipeTileHeaderClasses,
-  cardRecipeTileMetaListClasses,
-  cardRecipeTileMetaTermClasses,
   cardRecipeTilePreviewClasses,
   cardRecipesGridClasses,
   cardRecipesPageClasses,
@@ -50,20 +48,27 @@ function CardRecipeTile({ recipe }: { recipe: CardRecipe }) {
         <Badge tone={badge.tone}>{badge.label}</Badge>
       </div>
       <Text variant="muted">{recipe.useWhen}</Text>
-      <dl className={cardRecipeTileMetaListClasses}>
-        <dt className={cardRecipeTileMetaTermClasses}>Chain</dt>
-        <dd className={cardRecipeTileChainClasses}>
-          {recipe.chain.map((step, index) => (
-            <code key={`${step}-${index}`}>{step}</code>
-          ))}
-        </dd>
-        <dt className={cardRecipeTileMetaTermClasses}>Density</dt>
-        <dd>{recipe.density}</dd>
-        <dt className={cardRecipeTileMetaTermClasses}>Leading</dt>
-        <dd>{recipe.leading}</dd>
-        <dt className={cardRecipeTileMetaTermClasses}>Trailing</dt>
-        <dd>{recipe.trailing}</dd>
-      </dl>
+      <MetadataList
+        size="xs"
+        valueTrack="fill"
+        divider={false}
+        items={[
+          {
+            id: 'chain',
+            label: 'Chain',
+            value: (
+              <span className={cardRecipeTileChainClasses}>
+                {recipe.chain.map((step, index) => (
+                  <code key={`${step}-${index}`}>{step}</code>
+                ))}
+              </span>
+            ),
+          },
+          { id: 'density', label: 'Density', value: recipe.density },
+          { id: 'leading', label: 'Leading', value: recipe.leading },
+          { id: 'trailing', label: 'Trailing', value: recipe.trailing },
+        ]}
+      />
       <div className={cardRecipeTilePreviewClasses}>{recipe.render()}</div>
     </article>
   )

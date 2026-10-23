@@ -102,6 +102,10 @@ Overlay notification counts use `ui-notification-unread-badge` (not compact-labe
 
 `ui-alert--{default|info|success|warning|destructive}` owns fill, border, and foreground. `ui-alert--{comfortable|compact}` owns gap and padding. `__title--{comfortable|compact}` owns the title type. `__description` owns the supporting copy.
 
+## MetadataList
+
+`ui-metadata-list` is an aligned read-only definition list (`__label`, `__value` are direct `dt`/`dd` children). `ui-metadata-list--{default|sm|xs}` owns font size, line height, and row gap. `ui-metadata-list--gap-{md|sm}` owns column gap (1.5rem / 0.75rem). `ui-metadata-list--track-content` sizes the value column to its text. `ui-metadata-list--track-fill` uses `fit-content(50%)` for the label and `minmax(0, 1fr)` for the value, so a long label wraps at half the list instead of squeezing the value. `ui-metadata-list--emphasis-{label|value}` owns label and value color and weight through `--ui-metadata-list-*` custom properties. `ui-metadata-list--ruled` plus `ui-border--subtle` owns the bottom rule. Defaults stay ruled, label emphasis, content track, gap `md`, size `default`.
+
 ## Tabs
 
 `ui-tabs__list--line` and `ui-tabs__trigger--line` own the horizontal rule and primary active indicator (`ui-border--default` on the list). `ui-tabs__list--pill` and `ui-tabs__trigger--pill` own the segmented track and raised active segment. `ui-tabs__trigger` (without an appearance modifier) and `ui-focus-ring` own cursor, disabled treatment, and focus for `variant="none"` compositions. `ui-tabs__content` owns panel spacing below the list. Domain tile grids (for example spell level tabs) keep layout and tile chrome outside shared appearances.

@@ -202,6 +202,8 @@ const interactiveListCssPath = path.join(stylesDir, '../components/ui/interactiv
 
 const alertCssPath = path.join(stylesDir, '../components/ui/alert.css')
 
+const metadataListCssPath = path.join(stylesDir, '../components/ui/metadata-list.css')
+
 const tabsCssPath = path.join(stylesDir, '../components/ui/tabs.css')
 
 const popoverContentCssPath = path.join(stylesDir, '../components/ui/popover-content.css')
@@ -674,6 +676,40 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       {
         modifierPrefix: 'ui-alert__title',
         requiredProperties: ['font-weight', 'color'] as const,
+      },
+    ],
+  },
+  {
+    filePath: metadataListCssPath,
+    dimensions: [
+      ...(['default', 'sm', 'xs'] as const).map((size) => ({
+        modifierPrefix: `ui-metadata-list--${size}`,
+        requiredProperties: ['font-size', 'line-height', 'row-gap'] as const,
+      })),
+      ...(['gap-md', 'gap-sm'] as const).map((gap) => ({
+        modifierPrefix: `ui-metadata-list--${gap}`,
+        requiredProperties: ['column-gap'] as const,
+      })),
+      ...(['track-content', 'track-fill'] as const).map((track) => ({
+        modifierPrefix: `ui-metadata-list--${track}`,
+        requiredProperties: ['grid-template-columns'] as const,
+      })),
+      ...(['emphasis-label', 'emphasis-value'] as const).map((emphasis) => ({
+        modifierPrefix: `ui-metadata-list--${emphasis}`,
+        requiredProperties: [
+          '--ui-metadata-list-label-color',
+          '--ui-metadata-list-value-color',
+          '--ui-metadata-list-label-weight',
+          '--ui-metadata-list-value-weight',
+        ] as const,
+      })),
+      {
+        modifierPrefix: 'ui-metadata-list--ruled',
+        requiredProperties: [
+          'border-bottom-width',
+          'border-bottom-style',
+          'padding-bottom',
+        ] as const,
       },
     ],
   },

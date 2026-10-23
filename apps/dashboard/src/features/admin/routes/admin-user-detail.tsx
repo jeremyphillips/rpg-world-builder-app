@@ -1,6 +1,15 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ActionIcon, Badge, ButtonLink, Heading, RowActionsMenu, Text } from '@rpg/ui'
+import {
+  ActionIcon,
+  Badge,
+  ButtonLink,
+  Heading,
+  MetadataList,
+  RowActionsMenu,
+  standaloneTextActionClasses,
+  Text,
+} from '@rpg/ui'
 import { PLATFORM_ROLE_ENTRIES } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
@@ -84,76 +93,99 @@ export function AdminUserDetail() {
         <Heading variant="section" as="h2">
           Account summary
         </Heading>
-        <dl className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <dt className="text-style-caption">Access</dt>
-            <dd className="text-style-label">{PLATFORM_ROLE_ENTRIES[user.platformRole].label}</dd>
-          </div>
-          <div>
-            <dt className="text-style-caption">Joined</dt>
-            <dd className="text-style-label">{formatAdminUserDetailJoined(user.createdAt)}</dd>
-          </div>
-          <div>
-            <dt className="text-style-caption">Last signed in</dt>
-            <dd className="text-style-label">
-              {formatAdminUserDetailTimestamp(user.lastSignedInAt)}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-style-caption">Last active</dt>
-            <dd className="text-style-label">
-              {formatAdminUserDetailLastActive(user.lastActiveAt)}
-            </dd>
-          </div>
-        </dl>
+        <MetadataList
+          size="sm"
+          divider={false}
+          emphasis="value"
+          valueTrack="fill"
+          items={[
+            {
+              id: 'access',
+              label: 'Access',
+              value: PLATFORM_ROLE_ENTRIES[user.platformRole].label,
+            },
+            {
+              id: 'joined',
+              label: 'Joined',
+              value: formatAdminUserDetailJoined(user.createdAt),
+            },
+            {
+              id: 'last-signed-in',
+              label: 'Last signed in',
+              value: formatAdminUserDetailTimestamp(user.lastSignedInAt),
+            },
+            {
+              id: 'last-active',
+              label: 'Last active',
+              value: formatAdminUserDetailLastActive(user.lastActiveAt),
+            },
+          ]}
+        />
       </section>
 
       <section className="space-y-3">
         <Heading variant="section" as="h2">
           Relationships
         </Heading>
-        <dl className="space-y-3">
-          <div>
-            <dt className="text-style-caption">Campaigns</dt>
-            <dd className="text-style-label">
-              {formatAdminUserCampaignCounts(user.campaignCounts)}
-            </dd>
-            <Link
-              to={ROUTES.admin.user.campaigns(user.id)}
-              className="text-sm text-primary underline-offset-4 hover:underline"
-            >
-              View campaigns
-            </Link>
-          </div>
-          <div>
-            <dt className="text-style-caption">Characters</dt>
-            <dd className="text-style-label">
-              {joinInlineMetadata([
-                `${user.characterCount} character${user.characterCount === 1 ? '' : 's'}`,
-                `${user.controlledCharacterCount} controlled in campaigns`,
-              ])}
-            </dd>
-            <Link
-              to={ROUTES.admin.user.characters(user.id)}
-              className="text-sm text-primary underline-offset-4 hover:underline"
-            >
-              View characters
-            </Link>
-          </div>
-          {showInvites ? (
-            <div>
-              <dt className="text-style-caption">Invitations</dt>
-              <dd className="space-y-1 text-style-label">
-                {user.pendingInviteCount > 0 ? (
-                  <span>Pending: {user.pendingInviteCount}</span>
-                ) : null}
-                {user.acceptedIncompleteInviteCount > 0 ? (
-                  <span>Accepted, incomplete: {user.acceptedIncompleteInviteCount}</span>
-                ) : null}
-              </dd>
-            </div>
-          ) : null}
-        </dl>
+        <MetadataList
+          size="sm"
+          divider={false}
+          emphasis="value"
+          valueTrack="fill"
+          items={[
+            {
+              id: 'campaigns',
+              label: 'Campaigns',
+              value: (
+                <>
+                  {formatAdminUserCampaignCounts(user.campaignCounts)}
+                  <Link
+                    to={ROUTES.admin.user.campaigns(user.id)}
+                    className={standaloneTextActionClasses('accent')}
+                  >
+                    View campaigns
+                  </Link>
+                </>
+              ),
+            },
+            {
+              id: 'characters',
+              label: 'Characters',
+              value: (
+                <>
+                  {joinInlineMetadata([
+                    `${user.characterCount} character${user.characterCount === 1 ? '' : 's'}`,
+                    `${user.controlledCharacterCount} controlled in campaigns`,
+                  ])}
+                  <Link
+                    to={ROUTES.admin.user.characters(user.id)}
+                    className={standaloneTextActionClasses('accent')}
+                  >
+                    View characters
+                  </Link>
+                </>
+              ),
+            },
+            ...(showInvites
+              ? [
+                  {
+                    id: 'invitations',
+                    label: 'Invitations',
+                    value: (
+                      <span className="flex flex-col gap-1">
+                        {user.pendingInviteCount > 0 ? (
+                          <span>Pending: {user.pendingInviteCount}</span>
+                        ) : null}
+                        {user.acceptedIncompleteInviteCount > 0 ? (
+                          <span>Accepted, incomplete: {user.acceptedIncompleteInviteCount}</span>
+                        ) : null}
+                      </span>
+                    ),
+                  },
+                ]
+              : []),
+          ]}
+        />
       </section>
 
       <div className="flex flex-wrap gap-2">

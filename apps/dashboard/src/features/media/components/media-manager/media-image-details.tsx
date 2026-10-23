@@ -9,6 +9,7 @@ import {
   CollapsibleTrigger,
   DialogPanelScrollRegion,
   FilenamePreview,
+  MetadataList,
   Panel,
   Text,
   type ScrollBoundaryState,
@@ -175,40 +176,44 @@ export function MediaImageDetails({
               <h4 id={`${id}-file-heading`} className="text-sm font-semibold">
                 File
               </h4>
-              <dl
-                className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 text-style-caption"
+              <MetadataList
                 aria-labelledby={`${id}-file-heading`}
-              >
-                {selectedAvailable.kind === 'system' ? (
-                  <>
-                    <dt className="text-muted-foreground">Source</dt>
-                    <dd className="m-0 min-w-0">System artwork</dd>
-                    <dt className="text-muted-foreground">Dimensions</dt>
-                    <dd className="m-0 min-w-0">
-                      {selectedAvailable.sourceDimensions.width} ×{' '}
-                      {selectedAvailable.sourceDimensions.height}
-                    </dd>
-                  </>
-                ) : asset ? (
-                  <>
-                    <dt className="text-muted-foreground">File name</dt>
-                    <dd className="m-0 min-w-0">
-                      <FilenamePreview filename={asset.filename} density="metadata" />
-                    </dd>
-                    <dt className="text-muted-foreground">Dimensions</dt>
-                    <dd className="m-0 min-w-0">
-                      {asset.orientedWidth} × {asset.orientedHeight}
-                    </dd>
-                    <dt className="text-muted-foreground">File size</dt>
-                    <dd className="m-0 min-w-0">
-                      {new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(
-                        asset.byteSize / 1024,
-                      )}{' '}
-                      KB
-                    </dd>
-                  </>
-                ) : null}
-              </dl>
+                size="xs"
+                columnGap="sm"
+                valueTrack="fill"
+                emphasis="value"
+                divider={false}
+                items={
+                  selectedAvailable.kind === 'system'
+                    ? [
+                        { id: 'source', label: 'Source', value: 'System artwork' },
+                        {
+                          id: 'dimensions',
+                          label: 'Dimensions',
+                          value: `${selectedAvailable.sourceDimensions.width} × ${selectedAvailable.sourceDimensions.height}`,
+                        },
+                      ]
+                    : asset
+                      ? [
+                          {
+                            id: 'file-name',
+                            label: 'File name',
+                            value: <FilenamePreview filename={asset.filename} density="metadata" />,
+                          },
+                          {
+                            id: 'dimensions',
+                            label: 'Dimensions',
+                            value: `${asset.orientedWidth} × ${asset.orientedHeight}`,
+                          },
+                          {
+                            id: 'file-size',
+                            label: 'File size',
+                            value: `${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(asset.byteSize / 1024)} KB`,
+                          },
+                        ]
+                      : []
+                }
+              />
               {asset?.animated ? (
                 <Text variant="supporting">Animated source; still preview.</Text>
               ) : null}

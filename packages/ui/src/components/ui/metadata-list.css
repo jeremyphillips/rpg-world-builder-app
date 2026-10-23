@@ -1,0 +1,89 @@
+/*
+ * MetadataList — aligned read-only label/value rows.
+ * Source order: block → size → column gap → value track → emphasis → rule.
+ * Each dimension owns one job. Size does not set column gap.
+ */
+@layer components {
+  .ui-metadata-list {
+    display: grid;
+    width: 100%;
+    align-items: baseline;
+  }
+
+  .ui-metadata-list--default {
+    font-size: var(--text-md);
+    line-height: var(--text-md--line-height);
+    row-gap: calc(var(--spacing) * 1.5);
+  }
+
+  .ui-metadata-list--sm {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    row-gap: calc(var(--spacing) * 1.5);
+  }
+
+  .ui-metadata-list--xs {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    row-gap: calc(var(--spacing) * 1.5);
+  }
+
+  .ui-metadata-list--gap-md {
+    column-gap: calc(var(--spacing) * 6);
+  }
+
+  .ui-metadata-list--gap-sm {
+    column-gap: calc(var(--spacing) * 3);
+  }
+
+  .ui-metadata-list--track-content {
+    grid-template-columns: max-content minmax(0, max-content);
+  }
+
+  /* Cap the label at half the list so a long label wraps instead of starving the value. */
+  .ui-metadata-list--track-fill {
+    grid-template-columns: fit-content(50%) minmax(0, 1fr);
+  }
+
+  .ui-metadata-list--emphasis-label {
+    --ui-metadata-list-label-color: var(--foreground);
+    --ui-metadata-list-value-color: var(--muted-foreground);
+    --ui-metadata-list-label-weight: var(--font-weight-body-emphasis);
+    --ui-metadata-list-value-weight: var(--font-weight-body-emphasis);
+  }
+
+  .ui-metadata-list--emphasis-value {
+    --ui-metadata-list-label-color: var(--muted-foreground);
+    --ui-metadata-list-value-color: var(--foreground);
+    --ui-metadata-list-label-weight: var(--font-weight-body);
+    --ui-metadata-list-value-weight: var(--font-weight-body-emphasis);
+  }
+
+  .ui-metadata-list--ruled {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    padding-bottom: calc(var(--spacing) * 4);
+  }
+
+  .ui-metadata-list__label,
+  .ui-metadata-list__value {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: calc(var(--spacing) * 1);
+    overflow-wrap: anywhere;
+  }
+
+  .ui-metadata-list__label {
+    color: var(--ui-metadata-list-label-color);
+    font-weight: var(--ui-metadata-list-label-weight);
+  }
+
+  .ui-metadata-list__value {
+    margin: 0;
+    justify-content: flex-start;
+    text-align: left;
+    color: var(--ui-metadata-list-value-color);
+    font-weight: var(--ui-metadata-list-value-weight);
+  }
+}

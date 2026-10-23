@@ -19,6 +19,10 @@ import {
   UI_COMPACT_LABEL_SIZE_CLASSES,
   UI_ALERT_APPEARANCE_CLASSES,
   UI_ALERT_DENSITY_CLASSES,
+  UI_METADATA_LIST_COLUMN_GAP_CLASSES,
+  UI_METADATA_LIST_EMPHASIS_CLASSES,
+  UI_METADATA_LIST_SIZE_CLASSES,
+  UI_METADATA_LIST_VALUE_TRACK_CLASSES,
   UI_TABS_LIST_APPEARANCE_CLASSES,
   UI_TABS_TRIGGER_APPEARANCE_CLASSES,
   UI_CARD_INTERACTION_CLASSES,
@@ -124,6 +128,10 @@ type TypographyClassGroupIds =
   | 'ui-compact-label-appearance'
   | 'ui-alert-appearance'
   | 'ui-alert-density'
+  | 'ui-metadata-list-size'
+  | 'ui-metadata-list-column-gap'
+  | 'ui-metadata-list-value-track'
+  | 'ui-metadata-list-emphasis'
   | 'ui-tabs-list-appearance'
   | 'ui-tabs-trigger-appearance'
   | 'ui-card-interaction'
@@ -212,6 +220,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-compact-label-appearance': [...UI_COMPACT_LABEL_APPEARANCE_CLASSES],
       'ui-alert-appearance': [...UI_ALERT_APPEARANCE_CLASSES],
       'ui-alert-density': [...UI_ALERT_DENSITY_CLASSES],
+      'ui-metadata-list-size': [...UI_METADATA_LIST_SIZE_CLASSES],
+      'ui-metadata-list-column-gap': [...UI_METADATA_LIST_COLUMN_GAP_CLASSES],
+      'ui-metadata-list-value-track': [...UI_METADATA_LIST_VALUE_TRACK_CLASSES],
+      'ui-metadata-list-emphasis': [...UI_METADATA_LIST_EMPHASIS_CLASSES],
       'ui-tabs-list-appearance': [...UI_TABS_LIST_APPEARANCE_CLASSES],
       'ui-tabs-trigger-appearance': [...UI_TABS_TRIGGER_APPEARANCE_CLASSES],
       'ui-card-interaction': [...UI_CARD_INTERACTION_CLASSES],
@@ -247,6 +259,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-compact-label-appearance': ['ui-compact-label-appearance'],
       'ui-alert-appearance': ['ui-alert-appearance'],
       'ui-alert-density': ['ui-alert-density'],
+      'ui-metadata-list-size': ['ui-metadata-list-size'],
+      'ui-metadata-list-column-gap': ['ui-metadata-list-column-gap'],
+      'ui-metadata-list-value-track': ['ui-metadata-list-value-track'],
+      'ui-metadata-list-emphasis': ['ui-metadata-list-emphasis'],
       'ui-card-interaction': ['ui-card-interaction'],
       'ui-inset-panel-size': ['ui-inset-panel-size'],
       'ui-interactive-row-hover': ['ui-interactive-row-hover'],

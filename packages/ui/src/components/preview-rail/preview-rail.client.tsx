@@ -25,7 +25,7 @@ import { StatusDot } from '../ui/status-dot'
 import { StatusIcon } from '../ui/status-icon.client'
 import type { StatusIconVariant } from '../ui/status-icon.variants'
 import { InlineMetadata } from '../ui/inline-metadata'
-import { Text } from '../ui/text'
+import { MetadataList } from '../ui/metadata-list'
 import type {
   PreviewRailAvailability,
   PreviewRailChrome,
@@ -47,11 +47,6 @@ import {
   previewRailDividerClasses,
   previewRailFooterClasses,
   previewRailFooterSectionShellClasses,
-  previewRailFactCompactTextClasses,
-  previewRailFactLabelClasses,
-  previewRailFactValueClasses,
-  previewRailFactsGridClasses,
-  previewRailFactsGridCompactClasses,
   previewRailHeaderRowClasses,
   previewRailHeaderSectionContentClasses,
   previewRailHeaderSectionShellClasses,
@@ -254,39 +249,15 @@ export type PreviewRailFactsProps = {
 }
 
 function PreviewRailFacts({ facts, density = 'comfortable' }: PreviewRailFactsProps) {
-  const compact = density === 'compact'
-
   return (
-    <dl
-      className={cn(
-        previewRailFactsGridClasses,
-        compact ? previewRailFactsGridCompactClasses : null,
-      )}
-    >
-      {facts.map((fact) => (
-        <React.Fragment key={fact.label}>
-          <Text
-            as="dt"
-            variant="muted"
-            className={cn(
-              previewRailFactLabelClasses,
-              compact ? previewRailFactCompactTextClasses : null,
-            )}
-          >
-            {fact.label}
-          </Text>
-          <Text
-            as="dd"
-            className={cn(
-              previewRailFactValueClasses,
-              compact ? previewRailFactCompactTextClasses : null,
-            )}
-          >
-            {fact.value}
-          </Text>
-        </React.Fragment>
-      ))}
-    </dl>
+    <MetadataList
+      items={facts.map((fact) => ({ id: fact.label, label: fact.label, value: fact.value }))}
+      size={density === 'compact' ? 'xs' : 'sm'}
+      columnGap="sm"
+      valueTrack="fill"
+      emphasis="value"
+      divider={false}
+    />
   )
 }
 

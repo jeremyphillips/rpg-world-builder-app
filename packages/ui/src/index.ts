@@ -236,7 +236,12 @@ export {
   type MetadataListItem,
   type MetadataListProps,
 } from './components/ui/metadata-list'
-export { type MetadataListSize } from './components/ui/metadata-list.variants'
+export {
+  type MetadataListColumnGap,
+  type MetadataListEmphasis,
+  type MetadataListSize,
+  type MetadataListValueTrack,
+} from './components/ui/metadata-list.variants'
 export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
 export {
   inlineIconFlexSlotClasses,
