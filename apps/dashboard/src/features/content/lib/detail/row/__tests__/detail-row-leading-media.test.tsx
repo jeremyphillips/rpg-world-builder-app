@@ -48,6 +48,6 @@ describe('DetailRowLeadingMedia', () => {
 
     const frame = container.querySelector('[data-detail-row-leading-media]')
     expect(frame).toHaveAttribute('data-size', 'xs')
-    expect(frame).toHaveClass('size-8')
+    expect(frame).toHaveClass('ui-identity-frame--xs')
   })
 })

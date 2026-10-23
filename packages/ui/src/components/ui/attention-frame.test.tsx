@@ -24,8 +24,8 @@ describe('AttentionFrame', () => {
       </AttentionFrame>,
     )
 
-    expect(container.firstChild).toHaveClass('border-primary')
-    expect(container.firstChild).toHaveClass('motion-safe:animate-attention-ring')
+    expect(container.firstChild).toHaveClass('ui-attention-frame', 'ui-attention-frame--active')
+    expect(container.firstChild).not.toHaveClass('border-primary')
   })
 
   it('calls onAttentionComplete after the default duration', () => {
@@ -80,8 +80,8 @@ describe('AttentionFrame', () => {
       </AttentionFrame>,
     )
 
-    expect(container.firstChild).toHaveClass('border-transparent')
-    expect(container.firstChild).not.toHaveClass('border-border')
+    expect(container.firstChild).toHaveClass('ui-attention-frame')
+    expect(container.firstChild).not.toHaveClass('ui-attention-frame--active')
   })
 
   itAxe('has no axe accessibility violations', async () => {

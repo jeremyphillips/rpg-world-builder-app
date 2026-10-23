@@ -32,7 +32,9 @@ describe('NotificationInboxHeader', () => {
     expect(screen.getByRole('combobox', { name: 'Campaign' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Type' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Clear campaign filter/i })).not.toBeInTheDocument()
-    expect(document.querySelector('.bg-surface-subtle')).toBeInTheDocument()
+    expect(
+      screen.getByRole('checkbox', { name: 'Unread only' }).closest('.ui-filter-bar'),
+    ).toBeInTheDocument()
   })
 
   it('renders active chips and clear-all when multiple filters are active', async () => {

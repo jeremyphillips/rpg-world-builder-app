@@ -28,6 +28,14 @@ type Story = StoryObj<typeof meta>
 /** Comfortable default with bordered pill container (md / 36px). */
 export const Default: Story = {}
 
+export const Invalid: Story = {
+  args: { 'aria-invalid': true },
+}
+
+export const Disabled: Story = {
+  args: { disabled: true },
+}
+
 export const ExtraSmall: Story = {
   args: { size: 'xs', min: 0, max: 8 },
 }
@@ -71,10 +79,6 @@ export const AdditionalQuantity: Story = {
 
 export const SingleDigit: Story = {
   args: { digits: 1, min: 1, max: 9 },
-}
-
-export const Disabled: Story = {
-  args: { disabled: true },
 }
 
 export const AtMax: Story = {

@@ -105,6 +105,17 @@ titles). Do not override heading typography with atomic `text-heading-*` classes
 Preserve semantic `as` values and section `id`s used by `aria-labelledby`. Full
 hierarchy and prose rules: [`packages/ui/docs/typography.md`](../../../packages/ui/docs/typography.md).
 
+## Styling
+
+Follow [AGENTS.md](../../../AGENTS.md#styling-conventions): prefer `@rpg/ui` primitives
+and dashboard shared surfaces (`EntityCard`, collection chrome, layout shells) over
+hand-rolled border, padding, and radius stacks. Simple layout utilities may stay in
+JSX; reusable feature chrome may use co-located `*.variants.ts` and optional `*.css`
+(`dash-*` where shared). Use CVA only for meaningful visual axes (density, tone, state) —
+not to hide static Tailwind. Entity and card ownership → [card-guide.md](./card-guide.md),
+[entity-surfaces.md](./entity-surfaces.md); generic primitives →
+[`packages/ui/docs/ui-architecture.md`](../../../packages/ui/docs/ui-architecture.md).
+
 ## Storybook
 
 Co-located `*.stories.tsx` files run in the **dashboard** Storybook instance

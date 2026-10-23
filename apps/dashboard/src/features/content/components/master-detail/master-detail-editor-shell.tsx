@@ -1,4 +1,5 @@
 import type { ReactNode, RefObject } from 'react'
+import { cn, panelVariants } from '@rpg/ui'
 
 import { DetailOverflowMenu } from '../../lib/detail/detail-overflow-menu'
 import { detailOverflowDeleteAction } from '../../lib/detail/detail-overflow-actions'
@@ -11,15 +12,6 @@ import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-de
 import type { MasterDetailAvailabilityPresentation } from '../../lib/master-detail/master-detail-availability.types'
 import { MasterDetailEditorEmptyState } from './master-detail-editor-empty-state'
 import { MasterDetailEditorStatusRow } from './master-detail-editor-status-row'
-import {
-  masterDetailEditorBodyClasses,
-  masterDetailEditorEmptyShellClasses,
-  masterDetailEditorIdentityClasses,
-  masterDetailEditorIdentityCopyClasses,
-  masterDetailEditorMetaClasses,
-  masterDetailEditorShellClassName,
-  masterDetailEditorTitleClasses,
-} from './master-detail-editor-panel.variants'
 
 export interface MasterDetailEditorIdentity {
   title: string
@@ -53,10 +45,10 @@ function MasterDetailEditorIdentityHeader({
   const itemNounLabel = masterDetailItemNounLabel(itemNoun)
 
   return (
-    <div className={masterDetailEditorIdentityClasses}>
-      <div className={masterDetailEditorIdentityCopyClasses}>
-        <div className={masterDetailEditorTitleClasses}>{identity.title}</div>
-        {metaLine ? <div className={masterDetailEditorMetaClasses}>{metaLine}</div> : null}
+    <div className="flex items-start justify-between gap-3 border-b ui-border--subtle px-4 py-3">
+      <div className="min-w-0 space-y-0.5">
+        <div className="truncate text-lg font-medium text-foreground">{identity.title}</div>
+        {metaLine ? <div className="truncate text-style-caption">{metaLine}</div> : null}
         <MasterDetailEditorStatusRow
           availability={identity.availability}
           onAvailabilityChange={identity.onAvailabilityChange}
@@ -89,7 +81,12 @@ export function MasterDetailEditorShell({
   return (
     <div
       className={
-        hasSelectedRow ? masterDetailEditorShellClassName() : masterDetailEditorEmptyShellClasses
+        hasSelectedRow
+          ? cn(
+              panelVariants({ tone: 'quiet', density: 'comfortable', bleed: true }),
+              'self-start overflow-hidden text-foreground md:col-span-2',
+            )
+          : 'flex min-h-48 flex-col self-start bg-transparent md:col-span-2'
       }
     >
       {hasSelectedRow && selectedIdentity ? (
@@ -99,7 +96,7 @@ export function MasterDetailEditorShell({
             itemNoun={itemNoun}
             onDelete={onDelete}
           />
-          <div ref={bodyRef} className={masterDetailEditorBodyClasses}>
+          <div ref={bodyRef} className="px-4 py-4">
             {children}
           </div>
         </>

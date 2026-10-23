@@ -192,6 +192,8 @@ const compactControlCssPath = path.join(stylesDir, '../components/ui/compact-con
 
 const fieldGroupCssPath = path.join(stylesDir, '../components/ui/field-group.css')
 
+const fieldGroupChromeCssPath = path.join(stylesDir, '../components/ui/field-group-chrome.css')
+
 const choiceControlCssPath = path.join(stylesDir, '../components/ui/choice-control.css')
 
 const interactiveRowCssPath = path.join(stylesDir, '../components/ui/interactive-row.css')
@@ -200,15 +202,32 @@ const interactiveListCssPath = path.join(stylesDir, '../components/ui/interactiv
 
 const alertCssPath = path.join(stylesDir, '../components/ui/alert.css')
 
+const metadataListCssPath = path.join(stylesDir, '../components/ui/metadata-list.css')
+
+const tabsCssPath = path.join(stylesDir, '../components/ui/tabs.css')
+
 const popoverContentCssPath = path.join(stylesDir, '../components/ui/popover-content.css')
 
 const compactLabelCssPath = path.join(stylesDir, '../components/ui/compact-label.css')
 
 const cardCssPath = path.join(stylesDir, '../components/ui/card.css')
 
+const radioCardCssPath = path.join(stylesDir, '../components/ui/ui-radio-card.css')
+
+const identityFrameCssPath = path.join(stylesDir, '../components/ui/ui-identity-frame.css')
+
 const insetPanelCssPath = path.join(stylesDir, '../components/ui/inset-panel.css')
 
 const panelCssPath = path.join(stylesDir, '../components/ui/panel.css')
+
+const avatarCssPath = path.join(stylesDir, '../components/ui/avatar.css')
+
+const toastCssPath = path.join(stylesDir, '../components/ui/toast.css')
+
+const semanticTextCssPath = path.join(stylesDir, '../components/ui/semantic-text/semantic-text.css')
+
+const uiBorderCssPath = path.join(stylesDir, '../components/ui/ui-border.css')
+const dialogPanelCssPath = path.join(stylesDir, '../components/ui/dialog-panel.css')
 
 const BUTTON_APPEARANCE_MODIFIERS = [
   'primary',
@@ -335,20 +354,14 @@ const CHOICE_CONTROL_SWITCH_REQUIRED = ['width', 'height', 'border-radius'] as c
 
 const CHOICE_CONTROL_INDICATOR_REQUIRED = ['width', 'height'] as const
 
-const INTERACTIVE_ROW_HOVER_MODIFIERS = [
-  'hover-none',
-  'hover-selectable',
-  'hover-navigation',
-  'hover-selected',
-  'hover-surface',
-  'hover-list',
-] as const
+const INTERACTIVE_ROW_HOVER_MODIFIERS = ['hover-none', 'hover'] as const
 
 const INTERACTIVE_ROW_SELECTED_MODIFIERS = [
   'selected-none',
   'selected-fill',
   'selected-bordered',
   'fill-surface',
+  'emphasis-fill',
 ] as const
 
 const INTERACTIVE_ROW_STATE_MODIFIERS = [
@@ -389,6 +402,35 @@ const INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED = ['width', 'min-width'] as const
 
 /** Registry populated as component CSS ships (Button, field-control, …). */
 export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = [
+  {
+    filePath: dialogPanelCssPath,
+    dimensions: [
+      ...(['background', 'card', 'surface-lift'] as const).map((fill) => ({
+        modifierPrefix: `ui-dialog-panel--fill-${fill}`,
+        requiredProperties: ['--surface-current', 'background-color', 'color'] as const,
+      })),
+      ...(['frame', 'side-right', 'side-left', 'side-bottom'] as const).map((geometry) => ({
+        modifierPrefix: `ui-dialog-panel--${geometry}`,
+        requiredProperties: [
+          'border-style',
+          'border-left-width',
+          'border-right-width',
+          'border-top-width',
+          'border-bottom-width',
+          'border-radius',
+        ] as const,
+      })),
+    ],
+  },
+  {
+    filePath: uiBorderCssPath,
+    dimensions: [
+      ...(['subtle', 'default', 'strong'] as const).map((strength) => ({
+        modifierPrefix: `ui-border--${strength}`,
+        requiredProperties: ['--ui-border-color', 'border-color'] as const,
+      })),
+    ],
+  },
   {
     filePath: buttonCssPath,
     dimensions: [
@@ -464,6 +506,24 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
     })),
   },
   {
+    filePath: fieldGroupChromeCssPath,
+    dimensions: [
+      ...(['rail-compact', 'rail-comfortable'] as const).map((name) => ({
+        modifierPrefix: `ui-field-group-chrome--${name}`,
+        requiredProperties: ['padding-inline-start'] as const,
+      })),
+      ...(['divider-top', 'divider-bottom'] as const).map((name) => ({
+        modifierPrefix: `ui-field-group-chrome--${name}`,
+        requiredProperties: [
+          'border-top-width',
+          'border-bottom-width',
+          'padding-top',
+          'padding-bottom',
+        ] as const,
+      })),
+    ],
+  },
+  {
     filePath: choiceControlCssPath,
     dimensions: [
       ...CHOICE_CONTROL_KIND_MODIFIERS.map((name) => ({
@@ -515,6 +575,28 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       ...INTERACTIVE_LIST_PANEL_WIDTH_MODIFIERS.map((name) => ({
         modifierPrefix: `ui-interactive-list__panel--${name}`,
         requiredProperties: INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: radioCardCssPath,
+    dimensions: [
+      {
+        modifierPrefix: 'ui-radio-card--comfortable',
+        requiredProperties: ['gap'] as const,
+      },
+      {
+        modifierPrefix: 'ui-radio-card--compact',
+        requiredProperties: ['gap'] as const,
+      },
+    ],
+  },
+  {
+    filePath: identityFrameCssPath,
+    dimensions: [
+      ...(['xs', 'sm', 'md', 'inline'] as const).map((size) => ({
+        modifierPrefix: `ui-identity-frame--${size}`,
+        requiredProperties: ['width', 'height'] as const,
       })),
     ],
   },
@@ -574,7 +656,7 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
     dimensions: [
       ...(['transparent', 'quiet', 'subtle', 'strong', 'faint'] as const).map((tone) => ({
         modifierPrefix: `ui-panel--${tone}`,
-        requiredProperties: ['border-color', 'background-color'] as const,
+        requiredProperties: ['background-color'] as const,
       })),
       {
         modifierPrefix: 'ui-panel--bleed',
@@ -585,7 +667,11 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
   {
     filePath: alertCssPath,
     dimensions: [
-      ...(['default', 'info', 'success', 'warning', 'destructive'] as const).map((tone) => ({
+      {
+        modifierPrefix: 'ui-alert--default',
+        requiredProperties: ['background-color', 'color'] as const,
+      },
+      ...(['info', 'success', 'warning', 'destructive'] as const).map((tone) => ({
         modifierPrefix: `ui-alert--${tone}`,
         requiredProperties: ['border-color', 'background-color', 'color'] as const,
       })),
@@ -596,6 +682,69 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       {
         modifierPrefix: 'ui-alert__title',
         requiredProperties: ['font-weight', 'color'] as const,
+      },
+    ],
+  },
+  {
+    filePath: metadataListCssPath,
+    dimensions: [
+      ...(['default', 'sm', 'xs'] as const).map((size) => ({
+        modifierPrefix: `ui-metadata-list--${size}`,
+        requiredProperties: ['font-size', 'line-height', 'row-gap'] as const,
+      })),
+      ...(['gap-md', 'gap-sm'] as const).map((gap) => ({
+        modifierPrefix: `ui-metadata-list--${gap}`,
+        requiredProperties: ['column-gap'] as const,
+      })),
+      {
+        modifierPrefix: 'ui-metadata-list--row-gap-md',
+        requiredProperties: ['row-gap'] as const,
+      },
+      ...(['track-content', 'track-fill'] as const).map((track) => ({
+        modifierPrefix: `ui-metadata-list--${track}`,
+        requiredProperties: ['grid-template-columns'] as const,
+      })),
+      ...(['emphasis-label', 'emphasis-value'] as const).map((emphasis) => ({
+        modifierPrefix: `ui-metadata-list--${emphasis}`,
+        requiredProperties: [
+          '--ui-metadata-list-label-color',
+          '--ui-metadata-list-value-color',
+          '--ui-metadata-list-label-weight',
+          '--ui-metadata-list-value-weight',
+        ] as const,
+      })),
+      {
+        modifierPrefix: 'ui-metadata-list--ruled',
+        requiredProperties: [
+          'border-bottom-width',
+          'border-bottom-style',
+          'padding-bottom',
+        ] as const,
+      },
+    ],
+  },
+  {
+    filePath: tabsCssPath,
+    dimensions: [
+      {
+        modifierPrefix: 'ui-tabs__list--line',
+        requiredProperties: ['display', 'border-bottom-width', 'border-bottom-style'] as const,
+      },
+      {
+        modifierPrefix: 'ui-tabs__list--pill',
+        requiredProperties: ['display', 'height', 'background-color', 'padding'] as const,
+      },
+      {
+        modifierPrefix: 'ui-tabs__trigger--line',
+        requiredProperties: ['display', 'height', 'padding-inline'] as const,
+      },
+      {
+        modifierPrefix: 'ui-tabs__trigger--pill',
+        requiredProperties: ['display', 'height', 'padding-inline', 'border-radius'] as const,
+      },
+      {
+        modifierPrefix: 'ui-tabs__content',
+        requiredProperties: ['margin-top'] as const,
       },
     ],
   },
@@ -621,6 +770,71 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
           requiredProperties: ['background-color', 'color', 'border-color', 'font-weight'] as const,
         })),
       ),
+      {
+        modifierPrefix: 'ui-compact-label--subdued',
+        requiredProperties: ['color'] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--selected',
+        requiredProperties: ['border-color', 'background-color', 'color'] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--interactive',
+        requiredProperties: ['cursor'] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--counter',
+        requiredProperties: [
+          'min-width',
+          'justify-content',
+          'padding-inline',
+          'font-variant-numeric',
+          'line-height',
+        ] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--removable-sm',
+        requiredProperties: ['padding-inline-end'] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--removable-md',
+        requiredProperties: ['padding-inline-end'] as const,
+      },
+      {
+        modifierPrefix: 'ui-compact-label--removable-lg',
+        requiredProperties: ['padding-inline-end'] as const,
+      },
+    ],
+  },
+  {
+    filePath: avatarCssPath,
+    dimensions: [
+      ...(['sm', 'md', 'lg'] as const).map((size) => ({
+        modifierPrefix: `ui-avatar--${size}`,
+        requiredProperties: ['width', 'height', 'font-size', 'line-height'] as const,
+      })),
+    ],
+  },
+  {
+    filePath: toastCssPath,
+    dimensions: [
+      ...(['success', 'warning', 'destructive'] as const).map((tone) => ({
+        modifierPrefix: `ui-toast--${tone}`,
+        requiredProperties: ['border-color'] as const,
+      })),
+    ],
+  },
+  {
+    filePath: semanticTextCssPath,
+    dimensions: [
+      ...(['neutral', 'info', 'success', 'warning', 'destructive'] as const).map((tone) => ({
+        modifierPrefix: `ui-semantic-text--${tone}`,
+        requiredProperties: ['color'] as const,
+      })),
+      ...(['low', 'medium', 'high'] as const).map((emphasis) => ({
+        modifierPrefix: `ui-semantic-text--emphasis-${emphasis}`,
+        requiredProperties: ['font-weight'] as const,
+      })),
     ],
   },
 ]

@@ -49,6 +49,15 @@ describe('SidebarNav', () => {
   it('renders global navigation on /characters even when preferredCampaignId is set', () => {
     renderWithProviders(<SidebarNav />, { initialEntries: ['/characters'] })
 
+    expect(screen.getByRole('navigation', { name: 'Primary' })).toHaveClass(
+      'overflow-y-auto',
+      'scrollbar-slim',
+      'pe-2.5',
+      'ps-3',
+      'pb-4',
+      'min-h-0',
+      'flex-1',
+    )
     expect(screen.getByRole('link', { name: 'Characters' })).toHaveAttribute(
       'href',
       ROUTES.characters.list,

@@ -1,14 +1,9 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../lib/utils'
+import { borderStrength } from '../components/ui/border-strength'
 import { establishSurfaceCurrent } from '../components/ui/surface-current.lib'
-import { iconGlyphDescendantClasses } from '../components/ui/icon-glyph.variants'
 import { fieldCaptionTypographyVariants } from '../components/ui/field-caption.variants'
-import {
-  labelSizerBlockClasses,
-  labelSizerGhostClasses,
-  labelSizerLiveClasses,
-} from '../components/ui/label-sizer.styles'
 import type { FilterDensity } from './filter-schema.types'
 
 export const FILTER_SELECT_ALL_VALUE = '__all__'
@@ -31,12 +26,11 @@ export const FILTER_DENSITY_DEFAULT: FilterDensity = 'compact'
 
 export type FilterBarOrientation = 'horizontal' | 'vertical'
 
-/** Primary filter bar row — single flex row; `min-w-0 w-full` for grid column shrink. */
-export const filterBarVariants = cva('flex min-w-0 w-full', {
+export const filterBarVariants = cva('ui-filter-bar', {
   variants: {
     orientation: {
-      horizontal: 'flex-wrap items-end gap-3',
-      vertical: 'flex-col items-start gap-2',
+      horizontal: 'ui-filter-bar--horizontal',
+      vertical: 'ui-filter-bar--vertical',
     },
   },
   defaultVariants: {
@@ -44,88 +38,67 @@ export const filterBarVariants = cva('flex min-w-0 w-full', {
   },
 })
 
-/** @deprecated Merged into {@link filterBarVariants} — kept for callers that still reference it. */
-export const filterBarFieldGroupVariants = cva('contents')
-
-/** Single filter control width constraints. */
 export const filterBarControlVariants = cva('', {
   variants: {
     type: {
-      text: 'min-w-0 flex-[0_1_14rem] max-w-[20rem]',
-      select: 'min-w-0 flex-[0_1_10rem] max-w-[10rem]',
-      selectLong: 'min-w-0 flex-[0_1_14rem] max-w-[14rem]',
-      boolean: 'inline-flex w-auto min-w-0 max-w-[14rem] shrink-0 items-center',
-      inlineSelect: 'min-w-0 flex-[0_1_10rem] max-w-[10rem]',
+      text: 'ui-filter-bar__control--text',
+      select: 'ui-filter-bar__control--select',
+      selectLong: 'ui-filter-bar__control--select-long',
+      boolean: 'ui-filter-bar__control--boolean',
+      inlineSelect: 'ui-filter-bar__control--select',
       chips: '',
       popover: '',
     },
   },
 })
 
-export const filterBarResetButtonClasses = cn('gap-1 text-xs', iconGlyphDescendantClasses.sm)
-
-/** Widest-label sizer — semantic classes in `label-sizer.css`. */
-export const filterToolbarLabelSizerClasses = labelSizerBlockClasses()
-export const filterToolbarLabelSizerGhostClasses = labelSizerGhostClasses()
-export const filterToolbarLabelSizerLiveClasses = labelSizerLiveClasses()
-
-export const filterInlineFieldGroupVariants = cva('flex flex-col sm:flex-row sm:items-center', {
+export const filterStackedFieldGroupVariants = cva('ui-filter-bar__group--stacked', {
   variants: {
     density: {
-      compact: 'gap-1 sm:gap-2',
-      comfortable: 'gap-1 sm:gap-2',
+      compact: 'ui-filter-bar__group--stacked-compact',
+      comfortable: 'ui-filter-bar__group--stacked-comfortable',
     },
   },
   defaultVariants: { density: FILTER_DENSITY_DEFAULT },
 })
 
-/** Label above control — used with `layout: 'stacked'` in inline field rows. */
-export const filterStackedFieldGroupVariants = cva('flex flex-col', {
-  variants: {
-    density: {
-      compact: 'gap-0.5',
-      comfortable: 'gap-1',
-    },
-  },
-  defaultVariants: { density: FILTER_DENSITY_DEFAULT },
-})
-
-/** Collapsible advanced-filters panel shell. */
-export const filterAdvancedPanelVariants = cva(
-  cn(
-    'overflow-hidden rounded-md border border-border bg-surface-muted [--field-control-bg:var(--field-control-bg-on-muted)]',
+export function filterAdvancedPanelClassName(): string {
+  return cn(
+    'ui-filter-advanced-panel',
+    borderStrength('default'),
     establishSurfaceCurrent('surface-muted'),
-  ),
+  )
+}
+
+export const filterAdvancedPanelHeaderVariants = cva('ui-filter-advanced-panel__header', {
+  variants: {
+    density: {
+      compact: 'ui-filter-advanced-panel__header--compact',
+      comfortable: 'ui-filter-advanced-panel__header--comfortable',
+    },
+  },
+  defaultVariants: { density: FILTER_DENSITY_DEFAULT },
+})
+
+export const filterAdvancedPanelInnerVariants = cva('ui-filter-advanced-panel__inner', {
+  variants: {
+    density: {
+      compact: 'ui-filter-advanced-panel__inner--compact',
+      comfortable: 'ui-filter-advanced-panel__inner--comfortable',
+    },
+  },
+  defaultVariants: { density: FILTER_DENSITY_DEFAULT },
+})
+
+export const filterAdvancedPanelFooterVariants = cva(
+  cn('ui-filter-advanced-panel__footer', borderStrength('subtle')),
+  {
+    variants: {
+      density: {
+        compact: 'ui-filter-advanced-panel__footer--compact',
+        comfortable: 'ui-filter-advanced-panel__footer--comfortable',
+      },
+    },
+    defaultVariants: { density: FILTER_DENSITY_DEFAULT },
+  },
 )
-
-/** Optional eyebrow header row inside the advanced panel. */
-export const filterAdvancedPanelHeaderVariants = cva('flex items-start justify-between gap-3', {
-  variants: {
-    density: {
-      compact: 'px-4 pt-3 pb-0',
-      comfortable: 'px-5 pt-4 pb-0',
-    },
-  },
-  defaultVariants: { density: FILTER_DENSITY_DEFAULT },
-})
-
-/** Inline row for advanced filter controls. */
-export const filterAdvancedPanelInnerVariants = cva('flex flex-wrap items-end', {
-  variants: {
-    density: {
-      compact: 'gap-x-4 gap-y-2 p-3',
-      comfortable: 'gap-x-6 gap-y-3 p-4',
-    },
-  },
-  defaultVariants: { density: FILTER_DENSITY_DEFAULT },
-})
-
-export const filterAdvancedPanelFooterVariants = cva('border-t border-border', {
-  variants: {
-    density: {
-      compact: 'px-3 py-2',
-      comfortable: 'px-4 py-3',
-    },
-  },
-  defaultVariants: { density: FILTER_DENSITY_DEFAULT },
-})

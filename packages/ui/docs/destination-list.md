@@ -65,13 +65,9 @@ derives `--ui-surface-hover-bg` and `--ui-surface-pressed-bg` with the same 94% 
 | Interactive `Card` (`transparent` / `quiet` / `subtle` / `strong`) | `--ui-surface-bg` on `.ui-card`                        |
 | `DestinationList` `appearance="filled"` + strong tone              | `--ui-surface-bg: var(--surface-strong)` on the `<ul>` |
 
-Filled strong lists wire navigation rows only inside that shell:
-
-- Hover: `--ui-row-bg-hover: var(--ui-surface-hover-bg)` on `.ui-interactive-row--hover-navigation`
-- Pressed: scoped `:active` on the row link uses `--ui-surface-pressed-bg` (not a global InteractiveRow change)
-
-Panel, embedded, and unfilled navigation rows keep `--ui-row-bg-hover: var(--muted)`. Row links stay
-transparent at rest; the list shell shows the strong wash. Cross-links:
+Filled strong lists publish `--ui-surface-bg` on the `<ul>`; navigation row links compose
+`interactiveRowVariants` (`--hover` → shared surface hover/pressed). Panel and embedded lists inherit
+the canvas or ancestor publisher — row links stay transparent at rest. Cross-links:
 [semantic-control-css.md](./semantic-control-css.md), [design-tokens.md](./design-tokens.md).
 
 ## Relationship indicator in search rows

@@ -17,7 +17,7 @@ describe('ContentStatRow', () => {
     render(<ContentStatRow label="Category" value="Martial" size="sm" />)
 
     const row = screen.getByText('Category').closest('dl')
-    expect(row).toHaveClass('text-sm')
+    expect(row).toHaveClass('ui-metadata-list--sm')
     expect(row).not.toHaveTextContent('Category:')
   })
 

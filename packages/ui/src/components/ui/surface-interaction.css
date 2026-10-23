@@ -2,13 +2,30 @@
  * Shared opaque surface hover/pressed — publishers set immutable --ui-surface-bg on the shell.
  */
 @layer components {
+  :root {
+    --ui-surface-bg: var(--background);
+  }
+
+  .ui-data-table__table-wrap {
+    --ui-surface-bg: var(--background);
+  }
+
+  :root,
   .ui-card--interactive:is(
     .ui-card--transparent,
     .ui-card--quiet,
     .ui-card--subtle,
     .ui-card--strong
   ),
-  .ui-destination-list--filled.ui-destination-list--tone-strong {
+  .ui-panel--quiet,
+  .ui-panel--subtle,
+  .ui-panel--strong,
+  .ui-panel--faint,
+  .ui-destination-list--filled.ui-destination-list--tone-strong,
+  .ui-interactive-list,
+  .ui-interactive-list__panel,
+  .ui-data-table__table-wrap,
+  .ui-popover-content--popover {
     --ui-surface-hover-bg: color-mix(
       in oklch,
       var(--ui-surface-bg) 94%,

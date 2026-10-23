@@ -62,7 +62,7 @@ describe('BuilderOptionDetailsSheet', () => {
     render(<BuilderOptionDetailsSheet {...baseProps} />)
     const dialog = screen.getByRole('dialog')
 
-    expect(dialog).toHaveClass('bg-background')
+    expect(dialog).toHaveClass('ui-dialog-panel--fill-background')
 
     expect(screen.getByRole('heading', { name: 'Dwarf' })).toHaveClass('heading-style-dialog-title')
     expect(screen.getByText('Species')).toHaveClass('eyebrow-style-xs')

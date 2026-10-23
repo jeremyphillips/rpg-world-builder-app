@@ -4,12 +4,36 @@ export {
   UI_ALERT_APPEARANCE_CLASSES,
   UI_ALERT_DENSITY_CLASSES,
 } from '../components/ui/alert.variants'
+export {
+  UI_METADATA_LIST_COLUMN_GAP_CLASSES,
+  UI_METADATA_LIST_EMPHASIS_CLASSES,
+  UI_METADATA_LIST_ROW_GAP_CLASSES,
+  UI_METADATA_LIST_SIZE_CLASSES,
+  UI_METADATA_LIST_VALUE_TRACK_CLASSES,
+} from '../components/ui/metadata-list.variants'
+export {
+  UI_TABS_LIST_APPEARANCE_CLASSES,
+  UI_TABS_TRIGGER_APPEARANCE_CLASSES,
+} from '../components/ui/tabs.variants'
 export { UI_COMPACT_LABEL_APPEARANCE_CLASSES } from '../components/ui/badge-appearance.lib'
 export {
   UI_BUTTON_APPEARANCE_CLASSES,
   UI_BUTTON_SIZE_CLASSES,
   UI_BUTTON_TEXT_GEOMETRY_CLASSES,
 } from '../components/ui/button.styles'
+export { UI_BORDER_STRENGTH_CLASSES } from '../components/ui/border-strength'
+/** Inlined — `dialog-panel.variants` imports `cn()` and must not participate in the utils graph. */
+export const UI_DIALOG_PANEL_FILL_CLASSES = [
+  'ui-dialog-panel--fill-background',
+  'ui-dialog-panel--fill-card',
+  'ui-dialog-panel--fill-surface-lift',
+] as const
+export const UI_DIALOG_PANEL_GEOMETRY_CLASSES = [
+  'ui-dialog-panel--frame',
+  'ui-dialog-panel--side-right',
+  'ui-dialog-panel--side-left',
+  'ui-dialog-panel--side-bottom',
+] as const
 /** Inlined — `card.variants` imports `cn()` and must not participate in the utils import graph. */
 export const UI_CARD_INTERACTION_CLASSES = ['ui-card--static', 'ui-card--interactive'] as const
 
@@ -48,3 +72,10 @@ export const UI_INTERACTIVE_LIST_ROW_SIZE_CLASSES = [
   'ui-interactive-list__main--md',
   'ui-interactive-list__main--lg',
 ] as const
+
+export { UI_AVATAR_SIZE_CLASSES } from '../components/ui/avatar.variants'
+export { UI_TOAST_TONE_CLASSES } from '../components/ui/toast.variants'
+export {
+  UI_SEMANTIC_TEXT_EMPHASIS_CLASSES,
+  UI_SEMANTIC_TEXT_TONE_CLASSES,
+} from '../components/ui/semantic-text/semantic-text.variants'

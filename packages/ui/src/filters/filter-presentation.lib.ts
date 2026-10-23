@@ -6,7 +6,6 @@ import type { FilterChromeContextValue, FilterSelectPresentation } from './filte
 import {
   filterBarControlVariants,
   filterFieldLabelVariants,
-  filterInlineFieldGroupVariants,
   filterStackedFieldGroupVariants,
   FILTER_DENSITY_DEFAULT,
 } from './filter-bar.variants'
@@ -94,7 +93,7 @@ function resolveFilterGroupExtras(
   if (field.type === 'select') {
     const layout = resolveFilterSelectFieldLayout(field, options)
     if (layout === 'inline') {
-      return filterInlineFieldGroupVariants({ density })
+      return 'ui-filter-bar__group--inline'
     }
     if (layout === 'stacked') {
       return filterStackedFieldGroupVariants({ density })

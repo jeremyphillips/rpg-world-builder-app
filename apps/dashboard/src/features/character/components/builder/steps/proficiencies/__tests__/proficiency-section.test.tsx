@@ -174,7 +174,7 @@ describe('ProficiencySection', () => {
     })
     const skills = model.sections.find((section) => section.kind === 'skills')!
 
-    const { container } = render(
+    render(
       <ProficiencySection
         section={skills}
         onOpenChoiceSet={() => undefined}
@@ -189,7 +189,7 @@ describe('ProficiencySection', () => {
     expect(within(skillsSection).getAllByText('2 / 2 chosen')[0]).toHaveClass(
       'text-semantic-success',
     )
-    expect(container.querySelector('.rounded-full.bg-semantic-success-strong')).toBeInTheDocument()
+    expect(skillsSection.querySelector('svg')).toBeInTheDocument()
     expect(manageButton).toBeInTheDocument()
     expect(manageButton.querySelector('svg')).toBeInTheDocument()
   })

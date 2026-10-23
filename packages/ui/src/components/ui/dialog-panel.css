@@ -1,0 +1,61 @@
+@layer components {
+  .ui-dialog-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .ui-dialog-panel--fill-background {
+    --surface-current: var(--background);
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  .ui-dialog-panel--fill-card {
+    --surface-current: var(--card);
+    background-color: var(--card);
+    color: var(--card-foreground);
+  }
+
+  .ui-dialog-panel--fill-surface-lift {
+    --surface-current: var(--surface-lift);
+    background-color: var(--surface-lift);
+    color: var(--foreground);
+  }
+
+  .ui-dialog-panel--frame {
+    border-style: solid;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-radius: var(--radius-lg);
+  }
+
+  .ui-dialog-panel--side-right {
+    border-style: solid;
+    border-left-width: 1px;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-radius: 0;
+  }
+
+  .ui-dialog-panel--side-left {
+    border-style: solid;
+    border-left-width: 0;
+    border-right-width: 1px;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-radius: 0;
+  }
+
+  .ui-dialog-panel--side-bottom {
+    border-style: solid;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 1px;
+    border-bottom-width: 0;
+    border-radius: 0;
+  }
+}

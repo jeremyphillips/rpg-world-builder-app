@@ -1,19 +1,22 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-export const avatarVariants = cva(
-  'relative inline-flex shrink-0 select-none items-center justify-center overflow-hidden rounded-full bg-muted font-medium text-muted-foreground',
-  {
-    variants: {
-      size: {
-        sm: 'size-7 text-xs',
-        md: 'size-9 text-sm',
-        lg: 'size-11 text-base',
-      },
-    },
-    defaultVariants: {
-      size: 'md',
+export const AVATAR_SIZES = ['sm', 'md', 'lg'] as const
+
+export type AvatarSize = (typeof AVATAR_SIZES)[number]
+
+export const UI_AVATAR_SIZE_CLASSES = AVATAR_SIZES.map((size) => `ui-avatar--${size}` as const)
+
+export const avatarVariants = cva('ui-avatar', {
+  variants: {
+    size: {
+      sm: 'ui-avatar--sm',
+      md: 'ui-avatar--md',
+      lg: 'ui-avatar--lg',
     },
   },
-)
+  defaultVariants: {
+    size: 'md',
+  },
+})
 
 export type AvatarVariantProps = VariantProps<typeof avatarVariants>

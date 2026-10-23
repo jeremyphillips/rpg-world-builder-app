@@ -28,5 +28,6 @@ export function compactLabelAppearanceToneClasses(
   appearance: CompactLabelAppearance,
   tone: CompactLabelTone,
 ): string {
-  return badgeAppearanceToneClasses(appearance, tone)
+  const appearanceClasses = badgeAppearanceToneClasses(appearance, tone)
+  return tone === 'neutral' ? `${appearanceClasses} ui-border--default` : appearanceClasses
 }

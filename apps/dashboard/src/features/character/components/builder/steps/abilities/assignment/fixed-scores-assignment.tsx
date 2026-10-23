@@ -49,6 +49,7 @@ import { abilitiesFormCopy } from '../../../../../lib/steps/abilities-form-label
 import type { AbilitiesFormValues } from '../../../../../lib/steps/abilities-form-fields'
 import { buildAbilityPreferenceLabelsByAbility } from '../../../../../lib/steps/ability-preference-indicator.lib'
 import {
+  ABILITY_SCORE_ASSIGNMENT_GRID_CLASSES,
   buildFixedScoreSelectOptions,
   getFixedScoresRemainingCount,
   resolveStandardArrayScoreToAbility,
@@ -68,16 +69,6 @@ import {
 import { AbilityRecommendationPanel } from '../recommendation/ability-recommendation-panel'
 import { AutoFillRemainingAction } from './auto-fill-remaining-action'
 import { ScoreToken } from './score-token'
-import {
-  fixedScoresAbilityGridClasses,
-  fixedScoresAssignmentIntroClasses,
-  fixedScoresAssignmentRootClasses,
-  fixedScoresScorePoolContainerDragOverClasses,
-  fixedScoresScorePoolContainerTokensClasses,
-  fixedScoresScorePoolHeaderClasses,
-  fixedScoresTokenPoolSectionClasses,
-} from './fixed-scores-assignment.variants'
-
 export type FixedScoresAssignmentProps = {
   scorePool: readonly number[]
   showInvalidStates?: boolean
@@ -237,8 +228,8 @@ function ScorePoolSection({
   })
 
   return (
-    <section aria-labelledby={poolId} className={fixedScoresTokenPoolSectionClasses}>
-      <div className={fixedScoresScorePoolHeaderClasses}>
+    <section aria-labelledby={poolId} className="space-y-2">
+      <div className="flex items-center justify-between gap-2">
         <Text as="h4" id={poolId} variant="label">
           {abilitiesFormCopy.availableScores}
         </Text>
@@ -253,10 +244,10 @@ function ScorePoolSection({
         size="md"
         className={cn(
           'flex flex-col gap-2 transition-colors',
-          isAssignedDrag && isOver && fixedScoresScorePoolContainerDragOverClasses,
+          isAssignedDrag && isOver && 'border-primary/50 bg-drop-target',
         )}
       >
-        <div className={fixedScoresScorePoolContainerTokensClasses}>
+        <div className="flex min-h-16 flex-wrap items-center gap-3">
           {availableScores.map((score) => (
             <ScoreToken
               key={score}
@@ -429,8 +420,8 @@ export function FixedScoresAssignment({
         : null
 
   return (
-    <div className={fixedScoresAssignmentRootClasses}>
-      <div className={fixedScoresAssignmentIntroClasses}>
+    <div className="space-y-6">
+      <div className="space-y-1">
         <Text as="h3" id={introId} variant="label">
           {methodHeading}
         </Text>
@@ -455,7 +446,11 @@ export function FixedScoresAssignment({
             onPoolAction={handlePoolAction}
           />
 
-          <div className={fixedScoresAbilityGridClasses} role="group" aria-labelledby={introId}>
+          <div
+            className={ABILITY_SCORE_ASSIGNMENT_GRID_CLASSES}
+            role="group"
+            aria-labelledby={introId}
+          >
             {ABILITY_IDS.map((ability) => (
               <FixedScoresAbilityCard
                 key={ability}

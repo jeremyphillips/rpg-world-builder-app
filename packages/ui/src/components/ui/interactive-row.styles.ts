@@ -2,12 +2,7 @@ export const UI_INTERACTIVE_ROW_BLOCK_CLASS = 'ui-interactive-row' as const
 
 export const UI_INTERACTIVE_ROW_HOVER_CLASS = {
   none: 'ui-interactive-row--hover-none',
-  selectable: 'ui-interactive-row--hover-selectable',
-  navigation: 'ui-interactive-row--hover-navigation',
-  selected: 'ui-interactive-row--hover-selected',
-  surface: 'ui-interactive-row--hover-surface',
-  /** Listbox / picker rows (`InteractiveListRow`) — unselected pointer hover. */
-  list: 'ui-interactive-row--hover-list',
+  hover: 'ui-interactive-row--hover',
 } as const
 
 export const UI_INTERACTIVE_ROW_SELECTED_CLASS = {
@@ -39,14 +34,13 @@ export const UI_INTERACTIVE_ROW_HIGHLIGHT_CLASS = 'ui-interactive-row--highlight
 export const UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_UNSELECTED_CLASS =
   'ui-interactive-row--highlight-list' as const
 
-/** Keyboard / pointer active option — selected list row (strong wash). */
+/** Keyboard / pointer active option — selected list row. */
 export const UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_SELECTED_CLASS =
   'ui-interactive-row--highlight-list-selected' as const
+
 export const UI_INTERACTIVE_ROW_RAIL_CLASS = 'ui-interactive-row--rail' as const
-export const UI_INTERACTIVE_ROW_MENU_HIGHLIGHT_CLASS = 'ui-interactive-row--menu-highlight' as const
-export const UI_INTERACTIVE_ROW_MENU_RAIL_CLASS = 'ui-interactive-row--menu-rail' as const
-export const UI_INTERACTIVE_ROW_MENU_RESET_CLASS = 'ui-interactive-row--menu-reset' as const
 export const UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS = 'ui-interactive-row--fill-surface' as const
+export const UI_INTERACTIVE_ROW_EMPHASIS_FILL_CLASS = 'ui-interactive-row--emphasis-fill' as const
 
 export type InteractiveRowClassSpec = {
   key: string
@@ -64,20 +58,15 @@ export const UI_INTERACTIVE_ROW_HOVER_CLASSES = Object.values(
 export const UI_INTERACTIVE_ROW_SELECTED_CLASSES = [
   ...Object.values(UI_INTERACTIVE_ROW_SELECTED_CLASS),
   UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS,
+  UI_INTERACTIVE_ROW_EMPHASIS_FILL_CLASS,
 ] as readonly string[]
 
 export const INTERACTIVE_ROW_CLASS_SPECS: readonly InteractiveRowClassSpec[] = [
   {
-    key: 'hover-selectable',
-    className: UI_INTERACTIVE_ROW_HOVER_CLASS.selectable,
-    keyValues: '--ui-row-bg-hover: --row-hover-bg',
-    useCase: 'Editor and selection rows',
-  },
-  {
-    key: 'hover-navigation',
-    className: UI_INTERACTIVE_ROW_HOVER_CLASS.navigation,
-    keyValues: '--ui-row-bg-hover: --muted',
-    useCase: 'Destination and link rows',
+    key: 'hover',
+    className: UI_INTERACTIVE_ROW_HOVER_CLASS.hover,
+    keyValues: '--ui-row-bg-hover: --ui-surface-hover-bg',
+    useCase: 'Pointer hover on interactive rows',
   },
   {
     key: 'selected-bordered',

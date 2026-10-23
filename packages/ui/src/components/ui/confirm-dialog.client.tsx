@@ -12,7 +12,7 @@ import {
 } from './dialog-panel.variants'
 import { handleDialogOpenAutoFocus } from './dialog-focus.lib'
 import { headingVariants } from './heading.variants'
-import { modalContentVariants, modalOverlayVariants } from './modal.variants'
+import { modalContentVariants, modalOverlayClasses } from './modal.variants'
 import { textVariants } from './text.variants'
 
 export interface ConfirmDialogProps {
@@ -66,7 +66,7 @@ export function ConfirmDialog({
   return (
     <AlertDialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <AlertDialogPrimitive.Portal>
-        <AlertDialogPrimitive.Overlay className={cn(modalOverlayVariants(), 'z-[60]')} />
+        <AlertDialogPrimitive.Overlay className={cn(modalOverlayClasses, 'z-[60]')} />
         <AlertDialogPrimitive.Content
           tabIndex={-1}
           className={cn(

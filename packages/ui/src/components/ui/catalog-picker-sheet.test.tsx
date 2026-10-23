@@ -522,12 +522,13 @@ describe('CatalogPickerSheet', () => {
       />,
     )
 
-    const toolbar = screen.getByRole('searchbox', { name: 'Search catalog' }).closest('.space-y-4')
+    const search = screen.getByRole('searchbox', { name: 'Search catalog' })
+    const headerChrome = search.closest('.gap-4')
+    const toolbar = search.closest('.px-0')
     const header = screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')
-    expect(header).toHaveClass('pb-2')
-    expect(header).toContainElement(toolbar as HTMLElement | null)
+    expect(header).toContainElement(headerChrome as HTMLElement | null)
     expect(toolbar).toHaveClass('px-0')
-    expect(toolbar).not.toHaveClass('pb-4')
+    expect(headerChrome).not.toHaveClass('pb-4')
   })
 
   it('keeps bottom padding on the auxiliary row when it follows the toolbar', () => {
@@ -548,13 +549,14 @@ describe('CatalogPickerSheet', () => {
       />,
     )
 
-    const toolbar = screen.getByRole('searchbox', { name: 'Search catalog' }).closest('.space-y-4')
+    const search = screen.getByRole('searchbox', { name: 'Search catalog' })
+    const headerChrome = search.closest('.gap-4')
+    const toolbar = search.closest('.px-0')
     const header = screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')
     const action = screen.getByRole('button', { name: 'Create item' })
-    expect(header).toHaveClass('pb-2')
     expect(header).toContainElement(action)
     expect(toolbar).toHaveClass('px-0')
-    expect(toolbar).not.toHaveClass('pb-4')
+    expect(headerChrome).not.toHaveClass('pb-4')
     expect(action.parentElement).toHaveClass('pb-4')
     expect(action.parentElement).not.toHaveClass('px-6')
   })

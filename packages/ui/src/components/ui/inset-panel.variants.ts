@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { resolveSurfaceClasses } from './surface.variants'
 import type { TextVariantProps } from './text.variants'
 import type { SurfaceConfig } from './visual-vocabulary.types'
@@ -89,31 +90,45 @@ export function insetPanelClassNames({
 }: InsetPanelVariantProps & { className?: string }): string {
   return cn(
     insetPanelVariants({ borderStyle, size, align }),
+    borderStrength(),
     resolveInsetPanelSurfaceClasses(surface),
     className,
   )
 }
 
-/** Dashed placeholder chrome shared by catalog pickers and similar empty views. */
-export const insetPanelEmptyStateClasses = insetPanelClassNames({
-  borderStyle: 'dashed',
-  surface: DEFAULT_INSET_PANEL_SURFACE,
-  size: 'md',
-  align: 'center',
-})
-
-/** Dashed recessed gate chrome for authoring blockers. */
-export const insetPanelGateClasses = insetPanelClassNames({
-  borderStyle: 'dashed',
-  surface: DEFAULT_INSET_PANEL_SURFACE,
-  size: 'lg',
-  align: 'center',
-})
-
-/** @deprecated Use `insetPanelEmptyStateClasses` — kept for cva-style call sites. */
-export const insetPanelEmptyStateVariants = () => insetPanelEmptyStateClasses
-
-/** @deprecated Use `insetPanelGateClasses`. */
-export const insetPanelGateVariants = () => insetPanelGateClasses
-
 export { insetPanelSunkenShadowClasses } from './field-surface.lib'
+
+export const INSET_PANEL_CLASS_SPECS = [
+  {
+    key: 'sm / solid / sunken',
+    className: insetPanelClassNames({
+      size: 'sm',
+      borderStyle: 'solid',
+      surface: DEFAULT_INSET_PANEL_SURFACE,
+    }),
+    keyValues: 'radius-md padding 12px; solid border; sunken surface',
+    useCase: 'Compact recessed readout',
+  },
+  {
+    key: 'md / dashed / center',
+    className: insetPanelClassNames({
+      size: 'md',
+      borderStyle: 'dashed',
+      align: 'center',
+      surface: DEFAULT_INSET_PANEL_SURFACE,
+    }),
+    keyValues: 'radius-md padding 16px; dashed border; centered copy',
+    useCase: 'Passive empty placeholder',
+  },
+  {
+    key: 'lg / dashed / gate',
+    className: insetPanelClassNames({
+      size: 'lg',
+      borderStyle: 'dashed',
+      align: 'center',
+      surface: DEFAULT_INSET_PANEL_SURFACE,
+    }),
+    keyValues: 'radius-lg padding 32px; dashed recessed gate',
+    useCase: 'Authoring blocker / instructional gate',
+  },
+] as const

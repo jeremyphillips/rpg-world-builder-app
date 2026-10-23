@@ -1,10 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import {
-  fieldBorderLadderToneClasses,
-  type FieldBorderLadderTone,
-} from './field-border-ladder.variants'
+import { borderStrength, type BorderStrength } from './border-strength'
 import { type FieldSizeToken } from './field-sizing.variants'
 
 /**
@@ -45,7 +42,7 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
  * - `fieldStackRhythmVariants` — vertical gap between stack siblings (`compact` | `comfortable`)
  * - `formDependentInsetSpacing` — total content inset by rhythm (compact 8 / comfortable 9)
- * - `fieldRailOffsetClasses` — rail position within gutter (`left-2` / 8px leading space)
+ * - `ui-field-rail` — rail position within gutter (inline-start offset in `field-rail.css`)
  * - `resolveDependentInsetClasses` — rhythm-derived content indentation (`pl-8` / `pl-9`)
  * - `resolveFieldRailClasses` — pseudo-element rail decoration (see `field-rail.variants.ts`)
  * - `fieldArrayItemListClasses` — gap between sibling array items (rhythm + section size)
@@ -436,9 +433,6 @@ export function resolveDependentInsetClasses(
   return inset ? fieldDependentInsetVariants({ rhythm }) : ''
 }
 
-/** @deprecated Use {@link fieldRailOffsetClasses} from `field-rail.variants.ts`. */
-export const formDependentInsetOffsetClasses = 'left-2'
-
 /**
  * Vertical gap between sibling array items (list + Add button).
  * Item body field stacks use {@link fieldStackRhythmVariants} instead.
@@ -479,11 +473,17 @@ export const fieldToggleDependentStackClasses = fieldStackRhythmVariants({ rhyth
 export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
 
 /** Trailing divider tone — maps to the global border ladder in design-tokens.md. */
-export type FieldSeparator = FieldBorderLadderTone
+export type FieldSeparator = BorderStrength
+
+const fieldSeparatorStrengthClasses = {
+  subtle: borderStrength('subtle'),
+  default: borderStrength(),
+  strong: borderStrength('strong'),
+} satisfies Record<FieldSeparator, string>
 
 export const fieldSeparatorVariants = cva('border-b', {
   variants: {
-    tone: fieldBorderLadderToneClasses,
+    tone: fieldSeparatorStrengthClasses,
     rhythm: {
       compact: 'pb-2',
       comfortable: 'pb-7',

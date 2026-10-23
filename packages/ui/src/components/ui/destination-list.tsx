@@ -1,19 +1,13 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { NavigationChevron } from './card.lib'
+import { interactiveFocusVariants } from './interactive-focus.variants'
+import { interactiveRowVariants } from './interactive-row.variants'
 import { renderNavigableLinkRoot } from './navigable-link-root.lib'
 import {
-  destinationItemLinkVariants,
   destinationListVariants,
-  UI_DESTINATION_ITEM_CHEVRON_CLASS,
-  UI_DESTINATION_ITEM_CLASS,
-  UI_DESTINATION_ITEM_DESCRIPTION_CLASS,
-  UI_DESTINATION_ITEM_IDENTITY_CLUSTER_CLASS,
-  UI_DESTINATION_ITEM_MAIN_CLASS,
-  UI_DESTINATION_ITEM_METADATA_CLASS,
-  UI_DESTINATION_ITEM_TITLE_CLASS,
-  UI_DESTINATION_ITEM_TRAILING_INFO_CLASS,
   type DestinationListAppearance,
   type DestinationListDensity,
   type DestinationListElevation,
@@ -111,12 +105,10 @@ function DestinationItemSimpleContent({
   metadata,
 }: DestinationItemSimpleProps) {
   return (
-    <span className={UI_DESTINATION_ITEM_MAIN_CLASS}>
-      <span className={UI_DESTINATION_ITEM_TITLE_CLASS}>{title}</span>
-      {description ? (
-        <span className={UI_DESTINATION_ITEM_DESCRIPTION_CLASS}>{description}</span>
-      ) : null}
-      {metadata ? <span className={UI_DESTINATION_ITEM_METADATA_CLASS}>{metadata}</span> : null}
+    <span className="ui-destination-item__main">
+      <span className="ui-destination-item__title">{title}</span>
+      {description ? <span className="ui-destination-item__description">{description}</span> : null}
+      {metadata ? <span className="ui-destination-item__metadata">{metadata}</span> : null}
     </span>
   )
 }
@@ -128,12 +120,12 @@ function DestinationItemRichContent({
 }: DestinationItemRichProps) {
   return (
     <>
-      <div className={UI_DESTINATION_ITEM_IDENTITY_CLUSTER_CLASS}>
+      <div className="ui-destination-item__identity-cluster">
         {startSlot ? <div className="shrink-0">{startSlot}</div> : null}
         <div className="min-w-0 flex-1">{content}</div>
       </div>
       {trailingInfo ? (
-        <div className={UI_DESTINATION_ITEM_TRAILING_INFO_CLASS}>{trailingInfo}</div>
+        <div className="ui-destination-item__trailing-info">{trailingInfo}</div>
       ) : null}
     </>
   )
@@ -153,18 +145,25 @@ export function DestinationItem(props: DestinationItemProps) {
     <>
       {content}
       {showNavigationChevron ? (
-        <NavigationChevron className={UI_DESTINATION_ITEM_CHEVRON_CLASS} />
+        <NavigationChevron className="ui-destination-item__chevron" />
       ) : null}
     </>
   )
 
   const navigableLink = renderNavigableLinkRoot(
     link,
-    destinationItemLinkVariants(),
+    cn(
+      'ui-destination-item__link',
+      interactiveRowVariants({
+        interaction: 'hoverable',
+        hitTarget: 'pointer',
+      }),
+      interactiveFocusVariants({ context: 'embedded' }),
+    ),
     interior,
     {},
     null,
   )
 
-  return <li className={UI_DESTINATION_ITEM_CLASS}>{navigableLink}</li>
+  return <li className={cn('ui-destination-item', borderStrength('subtle'))}>{navigableLink}</li>
 }

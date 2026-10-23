@@ -1,0 +1,61 @@
+@layer components {
+  .ui-identity-frame {
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .ui-identity-frame--xs {
+    width: calc(var(--spacing) * 8);
+    height: calc(var(--spacing) * 8);
+  }
+
+  .ui-identity-frame--sm {
+    width: calc(var(--spacing) * 10);
+    height: calc(var(--spacing) * 10);
+  }
+
+  .ui-identity-frame--md {
+    width: 3.75rem;
+    height: 3.75rem;
+  }
+
+  .ui-identity-frame--inline {
+    width: calc(var(--spacing) * 5);
+    height: calc(var(--spacing) * 5);
+  }
+
+  .ui-identity-frame--shape-box {
+    border-radius: var(--radius-md);
+  }
+
+  .ui-identity-frame--shape-circle {
+    border-radius: 9999px;
+  }
+
+  .ui-identity-frame__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    user-select: none;
+  }
+
+  .ui-identity-frame__image--cover {
+    object-fit: cover;
+  }
+
+  .ui-identity-frame__image--contain {
+    object-fit: contain;
+  }
+
+  .ui-identity-frame__fallback {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--surface-strong);
+    color: var(--muted-foreground);
+  }
+}

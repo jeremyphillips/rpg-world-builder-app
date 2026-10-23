@@ -60,7 +60,7 @@ describe('ToastViewport', () => {
         <span>App</span>
       </ToastProvider>,
     )
-    expect(screen.getByTestId('viewport')).toHaveClass('fixed', 'z-toast')
+    expect(screen.getByTestId('viewport')).toHaveClass('ui-toast-viewport')
   })
 })
 

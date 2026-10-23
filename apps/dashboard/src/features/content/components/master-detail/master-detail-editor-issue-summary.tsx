@@ -1,7 +1,5 @@
 import { AlertTriangle } from 'lucide-react'
 
-import { masterDetailEditorIssueSummaryClasses } from './master-detail-editor-panel.variants'
-
 function masterDetailEditorIssueCountLabel(count: number): string {
   return `${count} ${count === 1 ? 'issue' : 'issues'}`
 }
@@ -15,7 +13,7 @@ export function MasterDetailEditorIssueSummary({ count }: MasterDetailEditorIssu
   if (count <= 0) return null
 
   return (
-    <span className={masterDetailEditorIssueSummaryClasses}>
+    <span className="inline-flex min-w-0 items-center gap-1 text-style-label text-destructive-muted">
       <AlertTriangle className="size-icon-inline shrink-0" aria-hidden />
       {masterDetailEditorIssueCountLabel(count)}
     </span>

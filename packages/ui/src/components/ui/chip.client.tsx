@@ -70,7 +70,6 @@ function SelectableChip({
         size,
         selected,
         interactive: true,
-        filled: selected,
         className,
       })}
       onClick={() => onSelectedChange(!selected)}
@@ -99,7 +98,6 @@ function RemovableChip({
         size,
         appearance: 'soft',
         tone: 'neutral',
-        filled: true,
         interactive: false,
         removable: true,
         className,

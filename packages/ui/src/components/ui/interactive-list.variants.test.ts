@@ -1,13 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  interactiveListRowSeparatorClasses,
-  interactiveListVariants,
-} from './interactive-list.variants'
+import { interactiveListVariants } from './interactive-list.variants'
 
 describe('interactiveListVariants row separators', () => {
   it('uses the list block, whose CSS draws adjacent-sibling borders', () => {
-    expect(interactiveListRowSeparatorClasses).toBe('ui-interactive-list')
     expect(interactiveListVariants()).toContain('ui-interactive-list')
   })
 

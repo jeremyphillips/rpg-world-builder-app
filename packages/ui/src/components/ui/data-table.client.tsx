@@ -46,6 +46,7 @@ import { ArrowUpDown, Check, ChevronDown, ChevronUp, X } from 'lucide-react'
 import { ActionIcon } from './action-icon.client'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { Button } from './button.client'
 import { Checkbox } from './checkbox.client'
 import {
@@ -57,15 +58,8 @@ import {
 } from './dropdown-menu.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { InfoTooltip } from './tooltip.client'
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from './table'
+import { Table, TableBody, TableCaption, TableHeader } from './table'
+import { interactiveRowVariants } from './interactive-row.variants'
 import { Badge, type BadgeAppearance, type BadgeTone } from './badge'
 import { dataTableWidthMeta } from './data-table-meta'
 import {
@@ -87,25 +81,7 @@ import type {
   DataTableSelectionLabels,
   DataTableUtilityControls,
 } from './data-table.types'
-import {
-  dataTableBodyCellPaddingVariants,
-  dataTableBodyCellVariants,
-  dataTableCaptionVariants,
-  dataTableEmptyStateVariants,
-  dataTablePaginationVariants,
-  dataTableRowVariants,
-  dataTableSortIconVariants,
-  dataTableHeaderCellVariants,
-  dataTableHeaderRowVariants,
-  dataTableImageVariants,
-  dataTableNameCellVariants,
-  dataTableRootVariants,
-  dataTableRowActionItemClasses,
-  dataTableTableVariants,
-  dataTableTableWrapVariants,
-  dataTableToolbarVariants,
-  dataTableUtilityStripVariants,
-} from './data-table.variants'
+import { dataTableRowActionItemClasses } from './data-table.variants'
 import { arrayMove } from '@dnd-kit/sortable'
 
 // ---------------------------------------------------------------------------
@@ -238,7 +214,7 @@ interface DataTableToolbarProps<TData> {
 
 function DataTableToolbar<TData>({ table, onColumnChange }: DataTableToolbarProps<TData>) {
   return (
-    <div className={dataTableToolbarVariants()}>
+    <div className="flex flex-wrap items-center gap-2">
       <div className="flex-1" />
       <DataTableColumnPanel table={table} onColumnChange={onColumnChange} />
     </div>
@@ -263,7 +239,7 @@ function DataTablePagination<TData>({ table, onPageSizeChange }: DataTablePagina
   const end = Math.min((pageIndex + 1) * pageSize, totalRows)
 
   return (
-    <div className={dataTablePaginationVariants()}>
+    <div className="flex flex-wrap items-center justify-between gap-2 text-style-supporting">
       <span aria-live="polite" aria-atomic>
         {totalRows === 0 ? 'No results' : `${start}–${end} of ${totalRows}`}
       </span>
@@ -338,11 +314,20 @@ export function SortableHeader<TData, TValue>({
 
   const sortIcon =
     sorted === 'asc' ? (
-      <ChevronUp className={dataTableSortIconVariants({ state: 'asc' })} aria-hidden="true" />
+      <ChevronUp
+        className="ui-data-table__sort-icon ui-data-table__sort-icon--asc"
+        aria-hidden="true"
+      />
     ) : sorted === 'desc' ? (
-      <ChevronDown className={dataTableSortIconVariants({ state: 'desc' })} aria-hidden="true" />
+      <ChevronDown
+        className="ui-data-table__sort-icon ui-data-table__sort-icon--desc"
+        aria-hidden="true"
+      />
     ) : (
-      <ArrowUpDown className={dataTableSortIconVariants({ state: 'idle' })} aria-hidden="true" />
+      <ArrowUpDown
+        className="ui-data-table__sort-icon ui-data-table__sort-icon--idle"
+        aria-hidden="true"
+      />
     )
 
   if (info) {
@@ -408,7 +393,7 @@ export interface NameCellProps {
 }
 
 export function NameCell({ children }: NameCellProps) {
-  return <span className={dataTableNameCellVariants()}>{children}</span>
+  return <span className="font-data-name">{children}</span>
 }
 
 export interface DataTableImageCellProps {
@@ -423,7 +408,7 @@ export function DataTableImageCell({ src, alt = '' }: DataTableImageCellProps) {
       src={src}
       alt={alt}
       aria-hidden={alt === '' ? true : undefined}
-      className={dataTableImageVariants()}
+      className="ui-data-table__image"
     />
   )
 }
@@ -914,22 +899,26 @@ export function DataTable<TData>({
   }
 
   const tableElement = (
-    <Table className={dataTableTableVariants()}>
-      {caption && <TableCaption className={dataTableCaptionVariants()}>{caption}</TableCaption>}
+    <Table className="ui-data-table__table text-table-body">
+      {caption && (
+        <TableCaption className="pb-3 text-sm-meta italic text-muted-foreground">
+          {caption}
+        </TableCaption>
+      )}
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
-          <TableRow key={headerGroup.id} className={dataTableHeaderRowVariants()}>
+          <tr key={headerGroup.id} className={cn('ui-data-table__header-row', borderStrength())}>
             {headerGroup.headers.map((header) => {
               const sorted = header.column.getIsSorted()
               const canSort = header.column.getCanSort()
+              const headerMetaClassName = header.column.columnDef.meta?.headerClassName
+              const isSelectOrActions =
+                header.column.id === 'select' || header.column.id === 'actions'
               return (
-                <TableHead
+                <th
                   key={header.id}
                   colSpan={header.colSpan}
-                  className={cn(
-                    dataTableHeaderCellVariants(),
-                    header.column.columnDef.meta?.headerClassName,
-                  )}
+                  className={cn(!isSelectOrActions && 'ui-data-table__head', headerMetaClassName)}
                   aria-sort={
                     sorted === 'asc'
                       ? 'ascending'
@@ -943,62 +932,73 @@ export function DataTable<TData>({
                   {header.isPlaceholder
                     ? null
                     : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableHead>
+                </th>
               )
             })}
-          </TableRow>
+          </tr>
         ))}
       </TableHeader>
       <TableBody>
         {rows.length > 0 ? (
           rows.map((row) => (
-            <TableRow
+            <tr
               key={row.id}
-              className={cn(dataTableRowVariants(), getRowClassName?.(row))}
+              className={cn(
+                'ui-data-table__row',
+                borderStrength('subtle'),
+                interactiveRowVariants({
+                  interaction: 'hoverable',
+                  selectedData: 'selected',
+                }),
+                getRowClassName?.(row),
+              )}
               data-state={row.getIsSelected() ? 'selected' : undefined}
             >
               {row.getVisibleCells().map((cell) => {
                 const meta = cell.column.columnDef.meta
+                const tone = meta?.columnTone ?? 'neutral'
+                const isSelectOrActions =
+                  cell.column.id === 'select' || cell.column.id === 'actions'
                 return (
-                  <TableCell
+                  <td
                     key={cell.id}
                     className={cn(
-                      dataTableBodyCellVariants({
-                        tone: meta?.columnTone ?? 'neutral',
-                      }),
-                      dataTableBodyCellPaddingVariants(),
+                      'ui-data-table__cell',
+                      !isSelectOrActions &&
+                        (tone === 'data' || tone === 'source') &&
+                        'ui-data-table__cell--muted',
                       meta?.cellClassName,
                       getCellClassName?.(cell),
                     )}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+                  </td>
                 )
               })}
-            </TableRow>
+            </tr>
           ))
         ) : (
-          <TableRow>
-            <TableCell colSpan={resolvedColumns.length} className={dataTableEmptyStateVariants()}>
+          <tr className="ui-data-table__empty-row">
+            <td colSpan={resolvedColumns.length} className="ui-data-table__empty">
               {emptyState ? emptyState(emptyStateContext) : 'No results.'}
-            </TableCell>
-          </TableRow>
+            </td>
+          </tr>
         )}
       </TableBody>
     </Table>
   )
 
   return (
-    <div className={dataTableRootVariants()}>
+    <div className="flex w-full flex-col gap-3">
       {utilityStrip ? (
-        <div className={dataTableTableWrapVariants()}>
-          <div className={dataTableUtilityStripVariants()}>{utilityStrip(utilityControls)}</div>
+        <div className={cn('ui-data-table__table-wrap', borderStrength())}>
+          <div className="w-full">{utilityStrip(utilityControls)}</div>
           {tableElement}
         </div>
       ) : (
         <>
           <DataTableToolbar table={table} onColumnChange={onColumnChange} />
-          <div className={dataTableTableWrapVariants()}>{tableElement}</div>
+          <div className={cn('ui-data-table__table-wrap', borderStrength())}>{tableElement}</div>
         </>
       )}
 

@@ -5,13 +5,7 @@ import { ChevronDown } from 'lucide-react'
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible.client'
 import { Eyebrow } from './eyebrow'
-import {
-  sidebarNavSectionDisclosureCaretVariants,
-  sidebarNavSectionDisclosureContentClasses,
-  sidebarNavSectionDisclosureRootClasses,
-  sidebarNavSectionDisclosureStaticHeaderClasses,
-  sidebarNavSectionDisclosureTriggerClasses,
-} from './sidebar-nav-section-disclosure.variants'
+import { sidebarNavSectionDisclosureCaretVariants } from './sidebar-nav-section-disclosure.variants'
 
 export type SidebarNavSectionDisclosureProps = {
   label: string
@@ -36,17 +30,17 @@ export function SidebarNavSectionDisclosure({
     <Collapsible
       open={expanded}
       onOpenChange={disabled ? undefined : onExpandedChange}
-      className={sidebarNavSectionDisclosureRootClasses}
+      className="mb-2.5 flex flex-col gap-1"
     >
       {disabled ? (
-        <div className={sidebarNavSectionDisclosureStaticHeaderClasses}>
+        <div className="flex w-full items-center gap-2 px-3 pb-1 pt-3 text-left">
           <Eyebrow as="span">{label}</Eyebrow>
         </div>
       ) : (
         <CollapsibleTrigger asChild>
           <button
             type="button"
-            className={sidebarNavSectionDisclosureTriggerClasses}
+            className="flex w-full cursor-pointer items-center gap-2 rounded-md px-3 pb-1 pt-3 text-left transition-colors hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             aria-expanded={expanded}
             aria-controls={contentId}
           >
@@ -58,7 +52,7 @@ export function SidebarNavSectionDisclosure({
           </button>
         </CollapsibleTrigger>
       )}
-      <CollapsibleContent id={contentId} className={sidebarNavSectionDisclosureContentClasses}>
+      <CollapsibleContent id={contentId} className="flex flex-col gap-1">
         {children}
       </CollapsibleContent>
     </Collapsible>

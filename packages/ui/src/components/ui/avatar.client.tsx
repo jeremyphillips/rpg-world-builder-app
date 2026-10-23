@@ -28,12 +28,7 @@ export function Avatar({ name, src, size, className }: AvatarProps) {
   return (
     <span className={cn(avatarVariants({ size }), className)} aria-label={name}>
       {showImage ? (
-        <img
-          src={src}
-          alt={name}
-          className="size-full object-cover"
-          onError={() => setImgError(true)}
-        />
+        <img src={src} alt={name} className="ui-avatar__image" onError={() => setImgError(true)} />
       ) : (
         <span aria-hidden="true">{initials}</span>
       )}

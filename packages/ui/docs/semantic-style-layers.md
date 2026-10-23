@@ -4,6 +4,9 @@ Layered interaction and presentation policy for cards, rows, and dense controls.
 Features choose **semantic intent**; shared primitives own ring geometry, hit targets,
 hover fills, and drag chrome.
 
+Policy overview: [AGENTS.md](../../../AGENTS.md#styling-conventions) · ownership:
+[ui-architecture.md](./ui-architecture.md).
+
 ```text
 Layer 1 — foundational interaction policy (@rpg/ui)
         ↓
@@ -72,28 +75,23 @@ embedded focus. List-row removes use this primitive — features must not size r
 `hover: 'accent'` keeps `control-hover` (dense row chrome), not the toolbar accent fill from
 `ghostControlVisualStateClasses`.
 
-### `interactiveRowVariants({ interaction, state, hoverFamily, selected, … })`
+### `interactiveRowVariants({ interaction, state, selected, … })`
 
 Orthogonal row fills — not layout:
 
-| Axis            | Values                                                        |
-| --------------- | ------------------------------------------------------------- |
-| `interaction`   | `static` \| `hoverable`                                       |
-| `state`         | `default` \| `inactive` \| `disabled`                         |
-| `hoverFamily`   | `none` \| `selectable` \| `navigation`                        |
-| `selected`      | `none` \| `bordered` \| `fill`                                |
-| `selectedHover` | `none` \| `row`                                               |
-| `selectedData`  | `none` \| `selected` \| `checked`                             |
-| `hitTarget`     | `none` \| `pointer` (`cursor-pointer` on clickable row hosts) |
+| Axis           | Values                                                        |
+| -------------- | ------------------------------------------------------------- |
+| `interaction`  | `static` \| `hoverable` (applies `--hover` when unselected)   |
+| `state`        | `default` \| `inactive` \| `disabled`                         |
+| `selected`     | `none` \| `bordered` \| `fill`                                |
+| `selectedData` | `none` \| `selected` \| `checked`                             |
+| `hitTarget`    | `none` \| `pointer` (`cursor-pointer` on clickable row hosts) |
 
-| `hoverFamily` | Meaning                    | Hover token          |
-| ------------- | -------------------------- | -------------------- |
-| `selectable`  | Editor/selection list rows | `hover:bg-row-hover` |
-| `navigation`  | Destination/link hub rows  | `hover:bg-muted`     |
+Pointer hover and pressed mixes always use `--ui-surface-hover-bg` / `--ui-surface-pressed-bg` from the nearest painted publisher (`surface-interaction.css`). Persistent selection uses `--ui-surface-selected-bg`. `InteractiveList` listbox highlight and rail are separate modifiers — see [interactive-list-rows.md](./interactive-list-rows.md). Action menus use `ui-menu-item` only.
 
 Sortable drag opacity: `dragSurfaceVariants` on the wrapper — not `interactiveRowVariants`.
 
-Hosts keep inset, separators, border footprint, and left-rail accents locally.
+Hosts keep inset, separators, border footprint, and left-rail accents locally (list rows only for the accent rail).
 
 ### Drag
 
@@ -135,7 +133,6 @@ Cards and Rows**.
 | `supportingTextDensityVariants`                                                    | content-card | EntitySummary, ContentCard body                                                                                                                                                                                     |
 | `--ui-card-inset-*` + header copy vars (`ui-card--compact\|comfortable\|spacious`) | card.css     | Generic `Card` regions; entity/option inset only (`compact\|comfortable`; title/description vars generic-only)                                                                                                      |
 | `ui-card--{transparent,quiet,subtle,strong}` (tone) + `ui-card--elevation-*`       | card.css     | Fixed rest per tone (`transparent`, `lift`, `subtle`, `strong`), shared interaction mixes, `--ui-surface-selected-bg`; elevation owns shadow tokens. Filled `DestinationList` strong shell uses `--surface-strong`. |
-| `contentCardDensityInsetVariants` (deprecated)                                     | content-card | Legacy class helper for ContentCard                                                                                                                                                                                 |
 | `contentCardIdentityColumnGapVariants`                                             | content-card | ContentCard body, EntityAnatomy content                                                                                                                                                                             |
 | `ui-copy-title` / `ui-copy-supporting`                                             | copy-scale   | Canonical density title/supporting size, line-height; titles use `--font-weight-heading`                                                                                                                            |
 | `rowAnatomyTracksVariants` / `RowAnatomyCell`                                      | row-anatomy  | EntityAnatomy (row tracks + cells)                                                                                                                                                                                  |

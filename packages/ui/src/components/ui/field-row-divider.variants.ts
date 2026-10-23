@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { fieldBorderLadderToneClasses } from './field-border-ladder.variants'
+import { borderStrength, type BorderStrength } from './border-strength'
 import type { FieldRhythm } from './field.variants'
 
 /** Horizontal gutter on each side of an in-row pipe divider (`p-8` / `p-6` flanking). */
@@ -9,9 +9,15 @@ export const FIELD_ROW_DIVIDER_GUTTER_PX = {
   compact: 48,
 } as const satisfies Record<FieldRhythm, number>
 
+const fieldRowDividerStrengthClasses = {
+  subtle: borderStrength('subtle'),
+  default: borderStrength(),
+  strong: borderStrength('strong'),
+} satisfies Record<BorderStrength, string>
+
 export const fieldRowDividerVariants = cva('row-span-3 w-0 shrink-0 self-stretch border-l', {
   variants: {
-    tone: fieldBorderLadderToneClasses,
+    tone: fieldRowDividerStrengthClasses,
     rhythm: {
       comfortable: 'mx-8',
       compact: 'mx-6',

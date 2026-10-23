@@ -11,7 +11,6 @@ import { partitionRuleBlockers } from '@/lib/usage-references/map-content-usage-
 import { UsageReferenceRow } from '@/lib/usage-references/usage-reference-row'
 
 import {
-  actionBlockedFlatPanelClasses,
   actionBlockerReferenceFlatListClasses,
   actionBlockerReferenceGroupClasses,
   actionBlockerReferenceRowListClasses,
@@ -151,7 +150,7 @@ function ActionBlockerFlatReferences({
   }
 
   return (
-    <div className={actionBlockedFlatPanelClasses}>
+    <>
       {allReferences.length > 0 ? (
         <ActionBlockerReferenceLinks
           campaignId={campaignId}
@@ -168,7 +167,7 @@ function ActionBlockerFlatReferences({
           ))}
         </ul>
       ) : null}
-    </div>
+    </>
   )
 }
 

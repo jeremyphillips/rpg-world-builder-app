@@ -11,8 +11,7 @@ import {
 } from './surface.variants'
 
 const APPROVED_SURFACE_TOKENS = [
-  'border-border',
-  'border-card-border',
+  'ui-border--default',
   'bg-background',
   'bg-card',
   'bg-surface-faint',

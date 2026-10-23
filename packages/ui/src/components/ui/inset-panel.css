@@ -7,7 +7,6 @@
   .ui-inset-panel {
     min-width: 0;
     border-width: 1px;
-    border-color: var(--border);
   }
 
   .ui-inset-panel--sm {

@@ -10,7 +10,6 @@ import {
   wizardStepBubbleVariants,
   wizardStepLabelVariants,
   wizardConnectorVariants,
-  wizardFooterVariants,
 } from './wizard.variants'
 
 // ---------------------------------------------------------------------------
@@ -86,7 +85,7 @@ export function WizardStepNav() {
                 <div className={wizardStepBubbleVariants({ state })}>
                   {state === 'complete' ? (
                     <>
-                      <CheckIcon className="size-4" aria-hidden />
+                      <CheckIcon className="size-icon-glyph-lg" aria-hidden />
                       <span className="sr-only">Completed</span>
                     </>
                   ) : (
@@ -178,7 +177,7 @@ export function WizardFooter({
   const label = isLastStep ? submitLabel : nextLabel
 
   return (
-    <div className={cn(wizardFooterVariants(), className)}>
+    <div className={cn('flex items-center gap-2 pt-4', className)}>
       {!isFirstStep && (
         <Button type="button" variant="outline" onClick={retreat} disabled={pending}>
           Back

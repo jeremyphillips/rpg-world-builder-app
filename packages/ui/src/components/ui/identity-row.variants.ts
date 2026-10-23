@@ -14,37 +14,14 @@ export const identityRowRootVariants = cva('min-w-0 flex-1', {
   },
 })
 
-export const identityRowHeadingLineVariants = cva('flex w-full min-w-0 items-center')
-
-export const identityRowHeadingClusterVariants = cva('flex min-w-0 flex-1 items-baseline')
-
-export const identityRowHeadingEndVariants = cva('shrink-0 text-style-caption')
-
-export const identityRowHeadingVariants = cva(
-  'ui-identity-row__title ui-copy-title text-foreground',
-)
-
-export const identityRowSeparatorVariants = cva(
-  'ui-identity-row__classification shrink-0 font-normal text-muted-foreground',
-)
-
-export const identityRowClassificationVariants = cva(
-  'ui-identity-row__classification shrink-0 font-normal text-muted-foreground',
-)
-
-export const identityRowSupportingVariants = cva(
-  'ui-identity-row__supporting text-muted-foreground',
-  {
-    variants: {
-      wrap: {
-        true: 'ui-identity-row__supporting--wrap',
-        false: 'ui-identity-row__supporting--truncate',
-      },
-    },
-    defaultVariants: {
-      wrap: false,
+export const identityRowSupportingVariants = cva('ui-identity-row__supporting', {
+  variants: {
+    wrap: {
+      true: 'ui-identity-row__supporting--wrap',
+      false: 'ui-identity-row__supporting--truncate',
     },
   },
-)
-
-export const identityRowStackVariants = cva('ui-identity-row__stack')
+  defaultVariants: {
+    wrap: false,
+  },
+})

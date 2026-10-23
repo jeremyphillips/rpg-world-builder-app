@@ -11,7 +11,6 @@ import {
 import { Badge, Button, Eyebrow, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
-import { contentDetailHeroEyebrowClasses } from '@/features/content'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { PageShell } from '@/components/layout/page/page-shell'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
@@ -93,7 +92,7 @@ function VocabularyTermDetailBody({
       <div className={vocabularyTermDetailBodyClasses}>
         <div className="min-w-0 flex-1 space-y-3">
           <div>
-            <Eyebrow size="md" tone="muted" className={contentDetailHeroEyebrowClasses}>
+            <Eyebrow size="md" tone="muted" className="mb-1">
               {setLabel}
             </Eyebrow>
             <PageHeader

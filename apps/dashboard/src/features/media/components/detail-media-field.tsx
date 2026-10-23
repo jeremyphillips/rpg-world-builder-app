@@ -11,7 +11,7 @@ import { MediaFieldSummary } from '@rpg/ui'
 import { buildMediaFieldSummaryModel } from '../lib/build-media-field-summary-model'
 import type { MediaFieldConfig } from '../lib/media-field-config'
 import type { MediaManagerContentContext, MediaManagerSave } from '../lib/media-manager.types'
-import { MediaManager } from './media-manager'
+import { MediaManager } from './media-manager/media-manager'
 
 const CHARACTER_IMAGES_LABEL = 'Character images'
 

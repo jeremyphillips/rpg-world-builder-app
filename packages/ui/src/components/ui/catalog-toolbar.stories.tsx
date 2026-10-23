@@ -2,7 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
 import { Button } from './button.client'
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { CatalogToolbar } from './catalog-toolbar.client'
+import { CATALOG_TOOLBAR_CLASS_SPECS } from './catalog-toolbar.styles'
 import { CatalogFilterChips } from './catalog-filter-chips.client'
 
 const meta = {
@@ -86,4 +88,25 @@ export const WithoutSearch: Story = {
       </Button>
     ),
   },
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={CATALOG_TOOLBAR_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <div data-semantic-class-target className={spec.className}>
+            ·
+          </div>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
 }

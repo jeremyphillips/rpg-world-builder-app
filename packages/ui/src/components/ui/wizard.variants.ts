@@ -1,44 +1,36 @@
 import { cva } from 'class-variance-authority'
 
-export const wizardStepBubbleVariants = cva(
-  [
-    'flex size-8 shrink-0 items-center justify-center rounded-full',
-    'text-style-label transition-colors duration-150',
-  ],
-  {
-    variants: {
-      state: {
-        idle: 'border-2 border-border bg-background text-muted-foreground',
-        active: 'border-2 border-primary bg-primary text-primary-foreground',
-        complete: 'border-2 border-primary bg-surface-subtle text-primary',
-      },
-    },
-    defaultVariants: { state: 'idle' },
-  },
-)
+import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 
-export const wizardStepLabelVariants = cva(
-  'hidden text-style-label sm:block transition-colors duration-150',
-  {
-    variants: {
-      state: {
-        idle: 'text-muted-foreground',
-        active: 'text-foreground',
-        complete: 'text-muted-foreground',
-      },
-    },
-    defaultVariants: { state: 'idle' },
-  },
-)
-
-export const wizardConnectorVariants = cva('h-px flex-1 transition-colors duration-150', {
+export const wizardStepBubbleVariants = cva('ui-wizard__bubble', {
   variants: {
     state: {
-      idle: 'bg-border',
-      complete: 'bg-primary',
+      idle: cn('ui-wizard__bubble--idle', borderStrength('default')),
+      active: 'ui-wizard__bubble--active',
+      complete: 'ui-wizard__bubble--complete',
     },
   },
   defaultVariants: { state: 'idle' },
 })
 
-export const wizardFooterVariants = cva('flex items-center gap-2 pt-4')
+export const wizardStepLabelVariants = cva(cn('ui-wizard__label', 'text-style-label'), {
+  variants: {
+    state: {
+      idle: 'ui-wizard__label--idle',
+      active: 'ui-wizard__label--active',
+      complete: 'ui-wizard__label--complete',
+    },
+  },
+  defaultVariants: { state: 'idle' },
+})
+
+export const wizardConnectorVariants = cva('ui-wizard__connector', {
+  variants: {
+    state: {
+      idle: cn('ui-wizard__connector--idle', borderStrength('default')),
+      complete: 'ui-wizard__connector--complete',
+    },
+  },
+  defaultVariants: { state: 'idle' },
+})

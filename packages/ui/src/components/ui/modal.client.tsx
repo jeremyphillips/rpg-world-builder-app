@@ -16,7 +16,7 @@ import { dialogContentFocusShellClasses, dialogPanelFooterClasses } from './dial
 import {
   modalContentVariants,
   modalFooterDockClasses,
-  modalOverlayVariants,
+  modalOverlayClasses,
   type ModalContentLayout,
   type ModalSize,
   type ModalStableSize,
@@ -35,7 +35,7 @@ const ModalOverlay = React.forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay ref={ref} className={cn(modalOverlayVariants(), className)} {...props} />
+  <DialogPrimitive.Overlay ref={ref} className={cn(modalOverlayClasses, className)} {...props} />
 ))
 ModalOverlay.displayName = 'Modal.Overlay'
 

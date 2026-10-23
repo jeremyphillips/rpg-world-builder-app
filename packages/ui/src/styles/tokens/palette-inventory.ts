@@ -280,7 +280,6 @@ export const SURFACE_RELATIVE_CHROME_ROLES = [
   '--mix-border-default',
   '--mix-border-strong',
   '--mix-border-selected',
-  '--mix-card-border',
   '--mix-sidebar-nav-item-fg',
   ...SURFACE_RELATIVE_INTERACTION_MIX_WEIGHTS,
   ...INTERACTIVE_OUTLINE_MIX_WEIGHTS,
@@ -293,7 +292,6 @@ export const SURFACE_RELATIVE_CHROME_ROLES = [
   '--border-strong',
   '--border-neutral-contrast',
   '--border',
-  '--card-border',
   '--card-selected-border',
 ] as const
 

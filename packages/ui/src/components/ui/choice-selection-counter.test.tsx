@@ -25,7 +25,7 @@ describe('ChoiceSelectionCounter', () => {
     const { container } = render(<ChoiceSelectionCounter selectedCount={2} max={2} />)
 
     expect(container.querySelector('.text-sm.font-medium.text-semantic-success')).toBeTruthy()
-    expect(container.querySelector('.size-4.rounded-full')).toBeTruthy()
+    expect(container.querySelector('svg')).toBeTruthy()
   })
 
   it('does not treat a zero effective quota as complete', () => {
@@ -55,6 +55,6 @@ describe('ChoiceSelectionCounter', () => {
     const { container } = render(<ChoiceSelectionCounter selectedCount={2} max={2} size="sm" />)
 
     expect(container.querySelector('.text-xs.font-medium.text-semantic-success')).toBeTruthy()
-    expect(container.querySelector('.size-3.rounded-full')).toBeTruthy()
+    expect(container.querySelector('svg')).toBeTruthy()
   })
 })

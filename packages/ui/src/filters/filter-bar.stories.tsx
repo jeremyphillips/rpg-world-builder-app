@@ -9,7 +9,9 @@ import {
   createTextFilter,
 } from './filter-engine.helpers'
 import { createFilterSchema } from './filter-schema.types'
+import { ClassReferenceTable } from '../stories/semantic-classes/class-reference-table'
 import { FilterBar } from './filter-bar.client'
+import { FILTER_BAR_CLASS_SPECS } from './filter-bar.styles'
 import { useFilterState } from './use-filter-state.client'
 
 type DemoRow = {
@@ -381,4 +383,25 @@ function MixedFloatingToolbarDemo() {
 /** Floating select beside a checkbox and chips. Controls align on their bottom edge. */
 export const MixedFloatingToolbar: Story = {
   render: () => <MixedFloatingToolbarDemo />,
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={FILTER_BAR_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <div data-semantic-class-target className={spec.className}>
+            ·
+          </div>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
 }

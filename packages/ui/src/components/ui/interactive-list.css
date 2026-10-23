@@ -7,12 +7,16 @@
   .ui-interactive-list {
     margin: 0;
     list-style: none;
-    background-color: var(--surface-lift);
+    --ui-surface-bg: var(--surface-lift);
+    --surface-current: var(--ui-surface-bg);
+    background-color: var(--ui-surface-bg);
     padding: 0;
   }
 
   .ui-interactive-list > * + * {
-    border-top: 1px solid var(--border-faint);
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--ui-border-color);
   }
 
   .ui-interactive-list__viewport {
@@ -30,7 +34,9 @@
   }
 
   .ui-interactive-list__heading {
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--ui-border-color);
     background-color: var(--surface-faint);
     padding-inline: calc(var(--spacing) * 3);
     padding-block: calc(var(--spacing) * 1);
@@ -41,19 +47,24 @@
   }
 
   .ui-interactive-list__heading--follows-complete {
-    border-top: 1px solid var(--border-subtle);
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--ui-border-color);
   }
 
   .ui-interactive-list__panel {
     z-index: 50;
     overflow: hidden;
     border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    background-color: var(--background);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--ui-border-color);
+    --ui-surface-bg: var(--background);
+    --surface-current: var(--ui-surface-bg);
+    background-color: var(--ui-surface-bg);
     padding: 0;
     color: var(--foreground);
     outline: none;
-    --surface-current: var(--background);
   }
 
   .ui-interactive-list__panel--match {
@@ -67,7 +78,9 @@
   }
 
   .ui-interactive-list__toolbar {
-    border-bottom: 1px solid var(--border);
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--ui-border-color);
     background-color: var(--field-control-bg);
     color: var(--field-control-fg);
   }
@@ -80,7 +93,9 @@
   }
 
   .ui-interactive-list__toolbar-filter {
-    border-top: 1px solid var(--border);
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--ui-border-color);
     padding-inline: calc(var(--spacing) * 3);
     padding-block: calc(var(--spacing) * 2);
   }
@@ -128,7 +143,9 @@
     flex-shrink: 0;
     align-items: center;
     align-self: stretch;
-    border-inline-start: 1px solid var(--border-faint);
+    border-inline-start-width: 1px;
+    border-inline-start-style: solid;
+    border-inline-start-color: var(--ui-border-color);
     padding-inline: calc(var(--spacing) * 2);
   }
 }

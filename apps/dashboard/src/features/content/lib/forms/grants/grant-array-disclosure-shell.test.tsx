@@ -8,7 +8,6 @@ import { Form, type FormItem } from '@rpg/ui/form'
 import { createGrantArrayItemShell } from './grant-array-item-shell.lib'
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import { resolveGrantRowPresentation } from './grant-row-presentation.lib'
-import { DASH_ENTITY_CARD_BODY_CLASS } from '../../entity/surfaces/dash-entity-surface.variants'
 
 const grantRowSchema = z.object({
   grantType: z.literal('spells'),
@@ -165,10 +164,8 @@ describe('grant array EntityCardDisclosureRenderer shell', () => {
     expect(expand).toHaveAttribute('aria-expanded', 'true')
     const ability = within(firstRow).getByRole('textbox', { name: 'Spellcasting ability' })
     expect(ability.closest('[hidden]')).toBeNull()
-    const body = ability.closest('[class*="border-t"]')
-    expect(body).toHaveClass(DASH_ENTITY_CARD_BODY_CLASS)
-    expect(body).toHaveClass('border-t')
-    expect(body).toHaveClass('bg-background')
+    const body = ability.closest('.dash-entity-card__body')
+    expect(body).toHaveClass('dash-entity-card__body--disclosure-wash')
     expect(body?.className).not.toContain('content-column-indent')
     expect(body?.className).not.toContain('content-inline-start')
 

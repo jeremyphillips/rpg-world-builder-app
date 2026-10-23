@@ -18,7 +18,6 @@ import {
 } from './card.variants'
 import {
   optionCardEmbeddedSlotClassName,
-  UI_SELECTION_OPTION_CARD_BODY_CLASS,
   type OptionCardEmbeddedSlotTone,
 } from './selection-option-card.lib'
 
@@ -169,7 +168,7 @@ export function SelectionOptionCard({
       )}
       aria-disabled={disabled || undefined}
     >
-      <div className={UI_SELECTION_OPTION_CARD_BODY_CLASS}>
+      <div className="ui-selection-option-card__body">
         <SelectionOptionCardAnatomy
           density={density}
           headerRow={headerRow}

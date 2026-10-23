@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { Text } from './text'
+import { Text } from '@rpg/ui'
 
 import { EntityCard } from '../../entity/surfaces/cards/content/entity-card'
 import { projectArrayItemEntitySummary } from '../../entity/surfaces/cards/disclosure/array-item-entity-summary.lib'

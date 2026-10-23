@@ -1,4 +1,5 @@
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 
 /** Radix open/close motion. Stays utilities; not part of the content chrome. */
 export const popoverContentMotionClasses =
@@ -25,16 +26,14 @@ export const overlayArrowPath = 'M2.61 2.5 L10 9.5 L17.39 2.5'
 export function popoverContentVariants({
   tone = 'popover',
 }: { tone?: PopoverContentTone } = {}): string {
-  return cn('ui-popover-content', `ui-popover-content--${tone}`, 'shadow-md')
+  return cn('ui-popover-content', `ui-popover-content--${tone}`, borderStrength(), 'shadow-md')
 }
-
-export const menuItemClasses = 'ui-menu-item'
 
 export const POPOVER_CONTENT_CLASS_SPECS = [
   {
     key: 'menu',
     className: popoverContentVariants({ tone: 'menu' }),
-    keyValues: 'field-container, padding 4px',
+    keyValues: 'surface-lift, padding 4px',
     useCase: 'Dropdown menu',
   },
   {

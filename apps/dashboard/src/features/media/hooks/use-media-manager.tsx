@@ -31,7 +31,6 @@ import {
   resolveMediaContentAvailability,
 } from '../lib/resolve-media-content-availability.lib'
 import { mediaErrorMessage, mediaImageUrl, systemContentImageUrl } from '../lib/media-display'
-import { mediaManagerStyles } from '../components/media-manager.variants'
 import {
   MEDIA_MANAGER_TOAST_IDS,
   resolveMediaRemovedToastDuration,
@@ -364,7 +363,7 @@ export function useMediaManager({
       duration: resolveMediaRemovedToastDuration(),
       leading: (
         <img
-          className={mediaManagerStyles.undoToastThumbnail()}
+          className="size-10 rounded-md object-cover"
           src={mediaImageUrl(asset.id, 'gallery-thumbnail')}
           alt=""
         />

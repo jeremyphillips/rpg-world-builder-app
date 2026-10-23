@@ -4,28 +4,39 @@ import { boundedScrollRegionEndInsetClasses } from './bounded-scroll-region.vari
 import {
   dialogContentFocusShellClasses,
   dialogPanelActionRowClasses,
-  dialogPanelBodyVariants,
   dialogPanelFooterClasses,
   dialogPanelHeaderClasses,
   dialogPanelHeaderLeadRowClasses,
   dialogPanelHeaderPaddingClasses,
   dialogPanelInnerLeadingScrollViewportClasses,
   dialogPanelInnerScrollViewportClasses,
-  dialogPanelManagedBodyVariants,
   dialogPanelSectionScrollViewportClasses,
   dialogPanelSectionSeparatorBorderClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
-  dialogPanelStableBodyVariants,
   dialogPanelScrollRegionBottomInsetClasses,
   dialogPanelScrollRegionClasses,
   dialogPanelScrollRegionFocusClearanceClasses,
   dialogPanelScrollRegionTopInsetClasses,
   dialogPanelScrollRegionViewportClasses,
 } from './dialog-panel.variants'
-import { sheetBodyVariants, sheetFooterDockClasses } from './sheet.variants'
+import { sheetFooterDockClasses } from './sheet.variants'
+import { modalContentVariants, modalOverlayClasses } from './modal.variants'
 
 describe('dialog-panel variants', () => {
+  it('keeps fill, neutral strength, and frame geometry independently inspectable', () => {
+    const classes = modalContentVariants()
+    expect(classes).toContain('ui-dialog-panel')
+    expect(classes).toContain('ui-dialog-panel--fill-background')
+    expect(classes).toContain('ui-dialog-panel--frame')
+    expect(classes).toContain('ui-border--default')
+  })
+
+  it('keeps the shared overlay as a static motion token', () => {
+    expect(modalOverlayClasses).toContain('bg-overlay')
+    expect(modalOverlayClasses).toContain('data-[state=open]:fade-in-0')
+  })
+
   it('owns the canonical section inset vocabulary', () => {
     expect(dialogPanelSectionPaddingClasses).toBe('p-6')
   })
@@ -41,30 +52,6 @@ describe('dialog-panel variants', () => {
     expect(dialogPanelActionRowClasses.split(/\s+/)).not.toEqual(
       expect.arrayContaining([expect.stringMatching(/^(p|px|py|pt|pb|pl|pr|border|bg)-/)]),
     )
-  })
-
-  it('composes default body as a clip shell without self overflow', () => {
-    const bodyClasses = dialogPanelBodyVariants()
-    expect(bodyClasses).toContain('overflow-hidden')
-    expect(bodyClasses).toContain('flex-1')
-    expect(bodyClasses).not.toContain('overflow-y-auto')
-    expect(bodyClasses).not.toContain('p-6')
-  })
-
-  it('restores section horizontal inset on stable body shell', () => {
-    const stableBodyClasses = dialogPanelStableBodyVariants()
-    expect(stableBodyClasses).toContain('pb-0')
-    expect(stableBodyClasses).toContain('overflow-hidden')
-    expect(stableBodyClasses).toContain('flex-1')
-    expect(stableBodyClasses).toContain(dialogPanelSectionInsetXClasses)
-    expect(stableBodyClasses).not.toContain('overflow-y-auto')
-  })
-
-  it('uses managed body clip shell with p-0', () => {
-    const managedBodyClasses = dialogPanelManagedBodyVariants()
-    expect(managedBodyClasses).toContain('p-0')
-    expect(managedBodyClasses).toContain('overflow-hidden')
-    expect(managedBodyClasses).not.toContain('overflow-y-auto')
   })
 
   it('keeps section scrollport free of inner scroll chrome', () => {
@@ -121,17 +108,11 @@ describe('dialog-panel variants', () => {
     expect(dialogContentFocusShellClasses).toContain('outline-none')
     expect(dialogContentFocusShellClasses).toContain('focus-visible:outline-none')
   })
-
-  it('keeps sheet body variants aligned with dialog clip shell', () => {
-    expect(sheetBodyVariants()).toContain('overflow-hidden')
-    expect(sheetBodyVariants()).toContain('flex-1')
-    expect(sheetBodyVariants()).not.toContain('overflow-y-auto')
-  })
 })
 
 describe('overlay section separator borders', () => {
   it('syncs header and footer separator color via one token', () => {
-    expect(dialogPanelSectionSeparatorBorderClasses).toBe('border-border-faint')
+    expect(dialogPanelSectionSeparatorBorderClasses).toBe('ui-border--subtle')
     expect(dialogPanelHeaderClasses).toContain('border-b')
     expect(dialogPanelHeaderClasses).toContain(dialogPanelSectionSeparatorBorderClasses)
     expect(dialogPanelFooterClasses).toContain('border-t')

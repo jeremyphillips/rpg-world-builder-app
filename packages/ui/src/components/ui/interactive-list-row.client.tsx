@@ -3,12 +3,12 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { IdentityRow } from './identity-row.client'
 import type { InteractiveListSize } from './interactive-list.variants'
 import {
   interactiveListRowChromeVariants,
   interactiveListRowMainVariants,
-  interactiveListRowTrailingActionVariants,
 } from './interactive-list.variants'
 
 export type InteractiveListRowProps = {
@@ -66,7 +66,6 @@ export function InteractiveListRow({
   )
 
   const shellClassName = interactiveListRowChromeVariants({
-    host: 'row',
     highlighted,
     selected,
     disabled,
@@ -99,7 +98,9 @@ export function InteractiveListRow({
     <div className={shellClassName}>
       {main}
       {trailingAction ? (
-        <div className={interactiveListRowTrailingActionVariants()}>{trailingAction}</div>
+        <div className={cn('ui-interactive-list__trailing', borderStrength('subtle'))}>
+          {trailingAction}
+        </div>
       ) : null}
     </div>
   )

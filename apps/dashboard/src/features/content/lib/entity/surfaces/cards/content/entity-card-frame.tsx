@@ -2,10 +2,10 @@
 
 import type { ReactElement, ReactNode } from 'react'
 import {
+  CardNavInterior,
   cardSurfaceVariants,
   cn,
   interactiveFocusVariants,
-  NavigationChevron,
   renderNavigableLinkRoot,
 } from '@rpg/ui'
 import type { ContentCardDensity } from '@rpg/ui'
@@ -14,11 +14,7 @@ import {
   ENTITY_SURFACE_DEFAULT_EDGES,
   type EntitySurfaceEdges,
 } from '../../../anatomy/entity-surface-edges.lib'
-import { entityCardFrameVariants } from './entity-card-frame.variants'
-
-const UI_CARD_NAV_CLASS = 'ui-card__nav' as const
-const UI_CARD_NAV_MAIN_CLASS = 'ui-card__nav-main' as const
-const UI_CARD_NAV_CHEVRON_CLASS = 'ui-card__nav-chevron' as const
+import { entityCardFrameClassName } from './entity-card-frame.lib'
 
 type EntityCardFrameProps = {
   density?: ContentCardDensity
@@ -51,7 +47,7 @@ function resolveFrameClassName({
 }): string {
   return cn(
     cardSurfaceVariants({ tone: 'quiet', density, interactive, selected, disabled }),
-    entityCardFrameVariants({ density, edges, leadingUtilityCount }),
+    entityCardFrameClassName({ density, edges, leadingUtilityCount }),
     navigable &&
       cn('block w-full min-w-0 no-underline', interactiveFocusVariants({ context: 'standalone' })),
   )
@@ -101,10 +97,11 @@ export function EntityCardFrame({
 
   if (navigable) {
     const interior = (
-      <div className={UI_CARD_NAV_CLASS}>
-        <div className={cn(UI_CARD_NAV_MAIN_CLASS, 'min-w-0 flex-1')}>{children}</div>
-        {showNavigationChevron ? <NavigationChevron className={UI_CARD_NAV_CHEVRON_CLASS} /> : null}
-      </div>
+      <CardNavInterior
+        main={children}
+        showNavigationChevron={showNavigationChevron}
+        mainClassName="min-w-0 flex-1"
+      />
     )
     return renderNavigableLinkRoot(link, className, interior, dataProps, null)
   }

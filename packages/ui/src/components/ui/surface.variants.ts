@@ -1,4 +1,5 @@
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { establishSurfaceCurrent } from './surface-current.lib'
 import { fieldSurfaceRaisedShadowClasses, insetPanelSunkenShadowClasses } from './field-surface.lib'
 import type { SemanticTone, SurfaceConfig, VisualEmphasis } from './visual-vocabulary.types'
@@ -24,9 +25,9 @@ const SEMANTIC_SURFACE_SUBTLE_CLASSES: Record<SemanticSurfaceTone, string> = {
 }
 
 const NEUTRAL_EMPHASIS_CLASSES: Record<Exclude<VisualEmphasis, 'faint'>, string> = {
-  subtle: cn('border-border bg-surface-subtle', establishSurfaceCurrent('surface-subtle')),
-  default: cn('border-border bg-surface-muted', establishSurfaceCurrent('surface-muted')),
-  strong: cn('border-border bg-surface-strong', establishSurfaceCurrent('surface-strong')),
+  subtle: cn(borderStrength(), 'bg-surface-subtle', establishSurfaceCurrent('surface-subtle')),
+  default: cn(borderStrength(), 'bg-surface-muted', establishSurfaceCurrent('surface-muted')),
+  strong: cn(borderStrength(), 'bg-surface-strong', establishSurfaceCurrent('surface-strong')),
 }
 
 function resolveNeutralSurfaceClasses(config: SurfaceConfig): string {
@@ -34,7 +35,8 @@ function resolveNeutralSurfaceClasses(config: SurfaceConfig): string {
 
   if (elevation === 'raised') {
     return cn(
-      'border-card-border bg-card',
+      borderStrength(),
+      'bg-card',
       establishSurfaceCurrent('card'),
       fieldSurfaceRaisedShadowClasses,
     )
@@ -42,25 +44,26 @@ function resolveNeutralSurfaceClasses(config: SurfaceConfig): string {
 
   if (elevation === 'sunken') {
     return cn(
-      'border-border bg-sunken',
+      borderStrength(),
+      'bg-sunken',
       establishSurfaceCurrent('sunken'),
       insetPanelSunkenShadowClasses,
     )
   }
 
   if (elevation === 'canvas') {
-    return cn('border-border bg-background', establishSurfaceCurrent('background'))
+    return cn(borderStrength(), 'bg-background', establishSurfaceCurrent('background'))
   }
 
   if (emphasis === 'faint') {
-    return cn('border-border bg-surface-faint', establishSurfaceCurrent('surface-faint'))
+    return cn(borderStrength(), 'bg-surface-faint', establishSurfaceCurrent('surface-faint'))
   }
 
   if (emphasis) {
     return NEUTRAL_EMPHASIS_CLASSES[emphasis]
   }
 
-  return cn('border-border bg-background', establishSurfaceCurrent('background'))
+  return cn(borderStrength(), 'bg-background', establishSurfaceCurrent('background'))
 }
 
 /** Resolves border/background classes for neutral and semantic surface planes. */

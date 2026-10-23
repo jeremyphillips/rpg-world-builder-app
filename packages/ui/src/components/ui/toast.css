@@ -1,0 +1,93 @@
+/*
+ * Toast shell. Quiet lift fill; tone owns the border only.
+ * Radix swipe and enter/exit motion stay utilities on the node.
+ */
+@layer components {
+  .ui-toast {
+    pointer-events: auto;
+    position: relative;
+    display: flex;
+    width: 100%;
+    align-items: flex-start;
+    gap: calc(var(--spacing) * 3);
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    border-width: 1px;
+    border-style: solid;
+    padding: calc(var(--spacing) * 4);
+    box-shadow: var(--shadow-lg);
+    color: var(--foreground);
+    --ui-surface-bg: var(--surface-lift);
+    --surface-current: var(--surface-lift);
+    background-color: var(--ui-surface-bg);
+  }
+
+  .ui-toast--success {
+    border-color: var(--success-muted);
+  }
+
+  .ui-toast--warning {
+    border-color: var(--warning-muted);
+  }
+
+  .ui-toast--destructive {
+    border-color: var(--destructive-muted);
+  }
+
+  .ui-toast__close {
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    color: color-mix(in oklch, var(--foreground) var(--mix-fg-muted), var(--surface-current));
+    opacity: 0.7;
+    transition-property: opacity;
+    transition-duration: 150ms;
+  }
+
+  .ui-toast__close:hover {
+    opacity: 1;
+  }
+
+  .ui-toast-viewport {
+    position: fixed;
+    z-index: var(--z-toast);
+    display: flex;
+    max-height: 100vh;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 2);
+    outline: none;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-inline: calc(var(--spacing) * 4);
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (width >= 40rem) {
+    .ui-toast-viewport:not(.ui-toast-viewport--modal) {
+      bottom: auto;
+      left: auto;
+      top: calc(var(--spacing) * 4);
+      right: calc(var(--spacing) * 4);
+      width: min(100vw - 2rem, 26.25rem);
+      min-width: 22.5rem;
+      padding-inline: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  .ui-toast-viewport.ui-toast-viewport--modal {
+    position: absolute;
+    inset-inline: 0;
+    top: auto;
+    right: auto;
+    bottom: calc(var(--spacing) * 20);
+    left: auto;
+    z-index: var(--z-toast);
+    margin-inline: auto;
+    width: min(calc(100% - 2rem), 26.25rem);
+    min-width: 0;
+    max-height: none;
+    padding-inline: calc(var(--spacing) * 4);
+    padding-bottom: 0;
+  }
+}

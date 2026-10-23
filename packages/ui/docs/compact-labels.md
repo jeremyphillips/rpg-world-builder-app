@@ -5,18 +5,36 @@ Consumers use the public component APIs — not the internal CVA.
 
 ## Vocabulary
 
-| Primitive                  | Interaction                               | Use when                                                          |
-| -------------------------- | ----------------------------------------- | ----------------------------------------------------------------- |
-| `Badge`                    | None (presentational `<span>` by default) | Source labels, status, classification, link styling via `asChild` |
-| `Chip` `mode="selectable"` | Toggle `button` with `aria-checked`       | `ChipsField`, filter toggles                                      |
-| `Chip` `mode="removable"`  | `span` + remove `button`                  | Combobox selected values, tag removal                             |
+| Primitive                  | Interaction                               | Use when                                                |
+| -------------------------- | ----------------------------------------- | ------------------------------------------------------- |
+| `Badge`                    | None (presentational `<span>` by default) | Source labels, status, classification                   |
+| `Chip` `mode="selectable"` | Toggle `button` with `aria-checked`       | `ChipsField`, filter toggles                            |
+| `Chip` `mode="removable"`  | `span` + remove `button`                  | Combobox selected values, tag removal                   |
+| `Button`                   | Action (`ui-button`)                      | Primary actions, destructive submits, array issue jumps |
+| `Link` / router `Link`     | Navigation                                | Route changes; may wear badge chrome via composition    |
 
 `ChipGroup` is layout-only (`flex flex-wrap gap-2`). Semantic grouping belongs on a parent
 `<fieldset>`/`<legend>` or an opt-in `semanticRole` on `ChipGroup`.
 
-**Badge is not interactive.** It communicates classification or status. Dismissible,
-selectable, clickable, or togglable labels use **Chip** or **Button** instead. The
-`asChild` pattern remains for link-styled badges only.
+**Badge is not interactive.** It does not carry action semantics. Dismissible or togglable
+labels use **Chip**; actions use **Button**. Navigation uses **Link** (or `<a>`), optionally
+composed with badge presentation — not `Badge asChild` on a `<button>`.
+
+### Navigation badges (`Badge asChild` + link)
+
+Supported composition: **`Badge asChild`** wraps an **anchor** or app **`Link`**. The link owns
+navigation, focus, and keyboard activation; Badge supplies compact-label classes only. Allowed
+utilities on the link: underline / focus affordances — not pill shell geometry (`gap-*`, `h-*`,
+`rounded-*` on the label).
+
+Dashboard apps use **`LinkBadge`** (`apps/dashboard/src/lib/link-badge.tsx`) as the single owner
+of this stack — features must not duplicate `Badge asChild` + `Link`.
+
+Action surfaces that look like pills (for example array issue counts) apply
+`resolveCompactLabelClassName` on a **`button`** directly — see `ArrayItemIssueButton` in the
+form array renderer — without using the `Badge` component.
+
+`TableBadgeCell` is `Badge size="sm"` for data-table source/status columns.
 
 ## Tone vs appearance
 

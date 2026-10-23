@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '../../lib/utils'
-import { contentCardHeadingActionVariants } from './content-card.variants'
+import { resolveCompactControlRecipeClasses } from './compact-control.styles'
 
 export type ContentCardHeadingActionProps = React.HTMLAttributes<HTMLElement> & {
   asChild?: boolean
@@ -16,7 +16,11 @@ export function ContentCardHeadingAction({
   className,
   ...props
 }: ContentCardHeadingActionProps) {
-  const resolvedClassName = cn(contentCardHeadingActionVariants(), className)
+  const resolvedClassName = cn(
+    'inline-flex shrink-0 items-center rounded-sm pl-2 pr-0 text-sm text-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+    resolveCompactControlRecipeClasses('text-compact', { includeBlock: false }),
+    className,
+  )
   const Comp = asChild ? Slot : 'span'
 
   return <Comp className={resolvedClassName} data-content-card-heading-action="" {...props} />

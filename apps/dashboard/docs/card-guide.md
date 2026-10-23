@@ -9,7 +9,7 @@ Use this guide to pick a surface. It covers generic `@rpg/ui` components and das
 | `@rpg/ui`                | `Card`, `DestinationList`, `DestinationItem`, `IdentityRow`, `InteractiveListRow` |
 | `content` feature barrel | `EntityCard`, `CatalogCard`, `EntityAnatomyHost`, `DetailEntityRow`               |
 
-**Authoritative contracts:** [entity-surfaces.md](./entity-surfaces.md) (entity behavior and enforcement) · [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md) (generic `Card`) · [row-anatomy.md](../../../packages/ui/docs/row-anatomy.md) · [destination-list.md](../../../packages/ui/docs/destination-list.md)
+**Authoritative contracts:** [AGENTS.md](../../../AGENTS.md#styling-conventions) (styling policy) · [entity-surfaces.md](./entity-surfaces.md) (entity behavior and enforcement) · [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md) (generic `Card`) · [row-anatomy.md](../../../packages/ui/docs/row-anatomy.md) · [destination-list.md](../../../packages/ui/docs/destination-list.md)
 
 ---
 

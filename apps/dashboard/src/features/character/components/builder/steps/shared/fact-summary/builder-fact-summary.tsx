@@ -17,12 +17,12 @@ import {
   builderFactSummaryIconRowSetValueClasses,
   builderFactSummaryIconRowUnsetValueClasses,
   builderFactSummaryIconRowsClasses,
-  builderFactSummaryUnsetValueClasses,
   builderFactSummaryRowDividerClasses,
   builderFactSummaryRowsClasses,
   builderFactSummarySimpleLabelClasses,
   builderFactSummarySimpleRowClasses,
   builderFactSummarySimpleValueClasses,
+  builderFactSummaryUnsetValueClasses,
   builderFactSummaryValueLabelsClasses,
 } from './builder-fact-summary.variants'
 

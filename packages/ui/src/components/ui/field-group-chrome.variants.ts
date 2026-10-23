@@ -1,11 +1,9 @@
-import { cva } from 'class-variance-authority'
-
 import { cn } from '../../lib/utils'
-import type { CompactLabelTone } from './compact-label.lib'
+import type { BorderStrength } from './border-strength'
+import { borderStrength } from './border-strength'
 import { resolveChromeClasses } from './chrome.variants'
-import { isCompactLabelTone } from './field-surface.variants'
-import { resolveDependentInsetClasses, type FieldRhythm } from './field.variants'
-import { resolveFieldRailClasses } from './field-rail.variants'
+import type { FieldRhythm } from './field.variants'
+import { resolveFieldRailClasses, type FieldRailTone } from './field-rail.variants'
 import type {
   ChromeBorderAccent,
   ChromeConfig,
@@ -14,20 +12,22 @@ import type {
   VisualEmphasis,
 } from './visual-vocabulary.types'
 
-/** Left rail tone for group rail chrome. */
-export type FieldGroupRailTone = 'border' | 'primary'
+/** Neutral structural rail vs brand accent on the field stack. */
+export type FieldGroupRailTone = FieldRailTone
 
-/** @deprecated Use {@link FieldGroupRailTone}. */
-export type FieldGroupInsetTone = FieldGroupRailTone
+/** Divider border contrast — not a color tone. */
+export type FieldGroupDividerStrength = Extract<BorderStrength, 'default' | 'subtle'>
 
-/** Divider edge and tone for group section separation. */
+/** Divider edge for group section separation. */
 export type FieldGroupDividerEdge = 'top' | 'bottom'
-export type FieldGroupDividerTone = 'border' | 'muted'
 
 /** Accent edge placement for light group emphasis. */
 export type FieldGroupAccentEdge = 'top' | 'legendRail'
 
-export type FieldGroupAccentTone = 'border' | 'primary' | CompactLabelTone
+/** Status hues for accent chrome (neutral and primary use {@link FieldGroupRailTone}). */
+export type FieldGroupAccentStatusTone = Exclude<SemanticTone, 'neutral'>
+
+export type FieldGroupAccentTone = FieldGroupRailTone | FieldGroupAccentStatusTone
 
 export type FieldGroupPanelChrome = {
   variant: 'panel'
@@ -59,16 +59,15 @@ export interface FieldGroupRailChrome {
   tone?: FieldGroupRailTone
 }
 
-/** @deprecated Use {@link FieldGroupRailChrome} with `variant: 'rail'`. */
-export interface FieldGroupInsetChrome {
-  variant: 'inset'
-  tone?: FieldGroupRailTone
-}
+/** Rail stack chrome — `inset` is an alias with the same shape as `rail` (prefer `rail`). */
+type FieldGroupRailStackChrome =
+  | FieldGroupRailChrome
+  | { variant: 'inset'; tone?: FieldGroupRailTone }
 
 export interface FieldGroupDividerChrome {
   variant: 'divider'
   edge?: FieldGroupDividerEdge
-  tone?: FieldGroupDividerTone
+  strength?: FieldGroupDividerStrength
 }
 
 export interface FieldGroupAccentChrome {
@@ -80,102 +79,46 @@ export interface FieldGroupAccentChrome {
 /** Visual treatment for the field stack inside a group — variants are mutually exclusive. */
 export type FieldGroupChrome =
   | { variant: 'plain' }
-  | FieldGroupRailChrome
-  | FieldGroupInsetChrome
+  | FieldGroupRailStackChrome
   | FieldGroupDividerChrome
   | FieldGroupAccentChrome
   | FieldGroupComposableChrome
 
-/** Spacing above a top divider — 28px (`pt-7`). */
-export const fieldGroupDividerTopPaddingClasses = 'pt-7'
-/** Spacing below a bottom divider — 28px (`pb-7`). */
-export const fieldGroupDividerBottomPaddingClasses = 'pb-7'
+function resolveFieldGroupRailInsetClass(rhythm: FieldRhythm): string {
+  return rhythm === 'compact'
+    ? 'ui-field-group-chrome--rail-compact'
+    : 'ui-field-group-chrome--rail-comfortable'
+}
 
-const fieldGroupDividerContainerVariants = cva('', {
-  variants: {
-    edge: {
-      top: cn('border-t', fieldGroupDividerTopPaddingClasses),
-      bottom: cn('border-b', fieldGroupDividerBottomPaddingClasses),
-    },
-    tone: {
-      border: 'border-border',
-      muted: 'border-border-subtle',
-    },
-  },
-  defaultVariants: {
-    edge: 'top',
-    tone: 'border',
-  },
-})
-
-const fieldGroupAccentContainerVariants = cva('', {
-  variants: {
-    edge: {
-      top: 'border-t-2 pt-4',
-      legendRail: '',
-    },
-    tone: {
-      border: 'border-border',
-      primary: 'border-primary',
-      neutral: '',
-      info: '',
-      success: '',
-      warning: '',
-      destructive: '',
-    },
-  },
-  compoundVariants: [
-    { edge: 'top', tone: 'neutral', class: 'border-semantic-neutral-border' },
-    { edge: 'top', tone: 'info', class: 'border-semantic-info-border' },
-    { edge: 'top', tone: 'success', class: 'border-semantic-success-border' },
-    { edge: 'top', tone: 'warning', class: 'border-semantic-warning-border' },
-    { edge: 'top', tone: 'destructive', class: 'border-semantic-destructive-border' },
-  ],
-  defaultVariants: {
-    edge: 'top',
-    tone: 'border',
-  },
-})
-
-const fieldGroupAccentLegendRailVariants = cva('relative w-full', {
-  variants: {
-    tone: {
-      border: 'before:bg-border',
-      primary: 'before:bg-primary',
-      neutral: 'before:bg-semantic-neutral-border',
-      info: 'before:bg-semantic-info-border',
-      success: 'before:bg-semantic-success-border',
-      warning: 'before:bg-semantic-warning-border',
-      destructive: 'before:bg-semantic-destructive-border',
-    },
-  },
-  defaultVariants: {
-    tone: 'border',
-  },
-})
-
-export function resolveFieldGroupAccentLegendRailClasses(
-  tone: FieldGroupAccentTone = 'border',
-): string {
-  const resolvedTone = isCompactLabelTone(tone) ? tone : tone
+function resolveFieldGroupDividerFieldsetClasses(chrome: FieldGroupDividerChrome): string {
+  const edge = chrome.edge ?? 'top'
+  const strength = chrome.strength ?? 'default'
   return cn(
-    fieldGroupAccentLegendRailVariants({ tone: resolvedTone as FieldGroupAccentTone }),
-    'before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:rounded-full',
+    edge === 'top' ? 'ui-field-group-chrome--divider-top' : 'ui-field-group-chrome--divider-bottom',
+    borderStrength(strength),
   )
 }
 
-function resolveAccentTone(
-  tone: FieldGroupAccentTone | undefined,
-): NonNullable<Parameters<typeof fieldGroupAccentContainerVariants>[0]>['tone'] {
-  if (!tone || tone === 'border' || tone === 'primary') {
-    return tone ?? 'border'
+function resolveAccentTopFieldsetClasses(tone: FieldGroupAccentTone = 'neutral'): string {
+  const base = 'ui-field-group-chrome--accent-top'
+  if (tone === 'neutral') {
+    return cn(base, borderStrength('default'))
   }
-
-  if (isCompactLabelTone(tone)) {
-    return tone
+  if (tone === 'primary') {
+    return cn(base, 'ui-field-group-chrome--accent-top-tone-primary')
   }
+  return cn(base, `ui-field-group-chrome--accent-top-tone-${tone}`)
+}
 
-  return 'border'
+function resolveLegendRailClasses(tone: FieldGroupAccentTone = 'neutral'): string {
+  const base = 'ui-field-group-chrome__legend-rail'
+  if (tone === 'neutral') {
+    return cn(base, 'ui-border--default', 'ui-field-group-chrome__legend-rail--tone-neutral')
+  }
+  if (tone === 'primary') {
+    return cn(base, 'ui-field-group-chrome__legend-rail--tone-primary')
+  }
+  return cn(base, `ui-field-group-chrome__legend-rail--tone-${tone}`)
 }
 
 export interface FieldGroupChromeClassNames {
@@ -197,12 +140,12 @@ function withFieldGroupChrome(
 }
 
 function resolveGroupRailChrome(
-  chrome: FieldGroupRailChrome | FieldGroupInsetChrome,
+  chrome: FieldGroupRailStackChrome,
   rhythm: FieldRhythm,
 ): FieldGroupChromeClassNames {
-  const tone = chrome.tone ?? 'border'
+  const tone = chrome.tone ?? 'neutral'
   return withFieldGroupChrome({
-    body: cn(resolveFieldRailClasses(tone), resolveDependentInsetClasses(true, rhythm)),
+    body: cn(resolveFieldRailClasses(tone), resolveFieldGroupRailInsetClass(rhythm)),
   })
 }
 
@@ -214,19 +157,15 @@ function resolveComposableChrome(chrome: FieldGroupComposableChrome): FieldGroup
 
 function resolveDividerChrome(chrome: FieldGroupDividerChrome): FieldGroupChromeClassNames {
   return withFieldGroupChrome({
-    fieldset: fieldGroupDividerContainerVariants({
-      edge: chrome.edge ?? 'top',
-      tone: chrome.tone ?? 'border',
-    }),
+    fieldset: resolveFieldGroupDividerFieldsetClasses(chrome),
   })
 }
 
 function resolveAccentChrome(chrome: FieldGroupAccentChrome): FieldGroupChromeClassNames {
-  const tone = resolveAccentTone(chrome.tone)
+  const tone = chrome.tone ?? 'neutral'
   return withFieldGroupChrome({
-    fieldset: chrome.edge === 'top' ? fieldGroupAccentContainerVariants({ edge: 'top', tone }) : '',
-    legend:
-      chrome.edge === 'legendRail' ? resolveFieldGroupAccentLegendRailClasses(chrome.tone) : '',
+    fieldset: chrome.edge === 'top' ? resolveAccentTopFieldsetClasses(tone) : '',
+    legend: chrome.edge === 'legendRail' ? resolveLegendRailClasses(tone) : '',
   })
 }
 
@@ -242,8 +181,8 @@ type GroupChromeResolver = (
 
 const GROUP_CHROME_RESOLVERS: Partial<Record<FieldGroupChrome['variant'], GroupChromeResolver>> = {
   plain: () => PLAIN_FIELD_GROUP_CHROME,
-  rail: (chrome, rhythm) => resolveGroupRailChrome(chrome as FieldGroupRailChrome, rhythm),
-  inset: (chrome, rhythm) => resolveGroupRailChrome(chrome as FieldGroupInsetChrome, rhythm),
+  rail: (chrome, rhythm) => resolveGroupRailChrome(chrome as FieldGroupRailStackChrome, rhythm),
+  inset: (chrome, rhythm) => resolveGroupRailChrome(chrome as FieldGroupRailStackChrome, rhythm),
   panel: (chrome) => resolveComposableChrome(chrome as FieldGroupPanelChrome),
   outline: (chrome) => resolveComposableChrome(chrome as FieldGroupOutlineChrome),
   callout: (chrome) => resolveComposableChrome(chrome as FieldGroupCalloutChrome),

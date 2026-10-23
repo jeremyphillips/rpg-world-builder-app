@@ -68,13 +68,13 @@ Visual row recipes (`InteractiveListRow`, `InteractiveListSize`, slots) are shar
 primitives — not ad-hoc menu item class stacks. Menu rows derive highlight/wash from Radix
 `data-[highlighted]` only (no parallel `:hover` rail on `MenuChoiceRow`).
 
-| Mode                                    | Visual chrome                                                                        | Semantic host                                  | Text                                           |
-| --------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------- | ---------------------------------------------- |
-| Combobox / true single-select           | `InteractiveList` + `ComboboxOptionRow`                                              | `listbox` / `option`, truthful `aria-selected` | `IdentityRow`                                  |
-| Action choice menu / split-button items | `InteractiveList` + `MenuChoiceRow` inside `interactiveListChoiceMenuContentClasses` | `menu` / `menuitem`                            | `IdentityRow` when the item has identity copy  |
-| Search hit                              | `InteractiveListRow` slots                                                           | link                                           | `IdentityRow`                                  |
-| Detail / relationship section           | `DetailEntityRow` / `EntityRowList`                                                  | section row                                    | EntitySummary parts → `IdentityRowHeadingLine` |
-| Bordered catalog + disclosure           | `CatalogCard` / `EntityCard` disclosure                                              | card / disclosure                              | anatomy + card frame                           |
+| Mode                                    | Visual chrome                                                                                             | Semantic host                                  | Text                                           |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
+| Combobox / true single-select           | `InteractiveList` + `ComboboxOptionRow`                                                                   | `listbox` / `option`, truthful `aria-selected` | `IdentityRow`                                  |
+| Action choice menu / split-button items | `MenuChoiceRow` (`ui-menu-item` + optional description) in `dropdownMenuChoiceContentClasses` width shell | `menu` / `menuitem`                            | `DropdownMenuItemContent` label + description  |
+| Search hit                              | `InteractiveListRow` slots                                                                                | link                                           | `IdentityRow`                                  |
+| Detail / relationship section           | `DetailEntityRow` / `EntityRowList`                                                                       | section row                                    | EntitySummary parts → `IdentityRowHeadingLine` |
+| Bordered catalog + disclosure           | `CatalogCard` / `EntityCard` disclosure                                                                   | card / disclosure                              | anatomy + card frame                           |
 
 Campaign-unavailable search hits use entity `inactive` status in the identity status slot
 only — not a duplicate trailing badge.
@@ -128,9 +128,11 @@ Host/collection structure       (search rows, master-detail, detail sections, ca
 Feature/domain content          (form fields, section panels, domain rhythm)
 ```
 
-Foundational interaction policy is documented in
-[`packages/ui/docs/semantic-style-layers.md`](../../../packages/ui/docs/semantic-style-layers.md)
-and [`packages/ui/docs/design-tokens.md`](../../../packages/ui/docs/design-tokens.md).
+Foundational interaction and styling policy is documented in
+[AGENTS.md](../../../AGENTS.md#styling-conventions),
+[`packages/ui/docs/ui-architecture.md`](../../../packages/ui/docs/ui-architecture.md), and
+[`packages/ui/docs/semantic-style-layers.md`](../../../packages/ui/docs/semantic-style-layers.md).
+Color and surface tokens: [`packages/ui/docs/design-tokens.md`](../../../packages/ui/docs/design-tokens.md).
 Card primitives **consume** that policy; they do not redefine focus rings, hit targets,
 drag chrome, or interactive-row fills.
 

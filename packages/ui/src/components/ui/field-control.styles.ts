@@ -145,9 +145,6 @@ export const FIELD_CONTROL_DIGITS_SIZE_SPECS: readonly FieldControlDigitsSizeSpe
   },
 ] as const
 
-export const UI_SEARCH_BAR_CLASS = 'ui-search-bar' as const
-export const UI_SEARCH_BAR_EMBEDDED_HOST_CLASS = 'ui-search-bar--embedded-host' as const
-export const UI_SEARCH_BAR_EMBEDDED_INPUT_WRAP_CLASS = 'ui-search-bar__embedded-wrap' as const
 const UI_SEARCH_BAR_LEADING_ICON_CLASS = 'ui-search-bar__leading-icon' as const
 export const UI_SEARCH_BAR_EMBEDDED_LEADING_ICON_CLASS = 'ui-search-bar__embedded-icon' as const
 const UI_SEARCH_BAR_FIELD_INPUT_CLASS = 'ui-search-bar__field-input' as const

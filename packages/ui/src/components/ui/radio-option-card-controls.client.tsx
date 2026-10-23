@@ -6,8 +6,6 @@ import { Circle } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import {
   radioCardControlVariants,
-  radioCardIconControlVariants,
-  radioCardIndicatorVariants,
   type RadioCardVariant,
   type RadioCardVisualControl,
 } from './radio-card.variants'
@@ -33,7 +31,7 @@ function RadioOptionCardControl({
       )}
       aria-hidden="true"
     >
-      <span className={radioCardIndicatorVariants()}>
+      <span className="ui-radio-card__indicator">
         <Circle className={cn('fill-primary text-primary', indicatorSize)} />
       </span>
     </span>
@@ -50,7 +48,16 @@ function RadioOptionCardIconControl({
   className?: string
 }) {
   return (
-    <span className={cn(radioCardIconControlVariants({ density }), className)} aria-hidden="true">
+    <span
+      className={cn(
+        'ui-radio-card__icon-control',
+        density === 'compact'
+          ? 'ui-radio-card__icon-control--compact'
+          : 'ui-radio-card__icon-control--comfortable',
+        className,
+      )}
+      aria-hidden="true"
+    >
       {icon}
     </span>
   )

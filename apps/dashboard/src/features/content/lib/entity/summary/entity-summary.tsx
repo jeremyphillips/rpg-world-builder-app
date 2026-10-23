@@ -5,7 +5,6 @@ import {
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   InlineMetadata,
-  contentCardHeadingLinkVariants,
   contentCardHeadingScaleClass,
   type ContentCardDensity,
   type InlineMetadataDensity,
@@ -49,7 +48,7 @@ function resolveLinkedHeading(heading: ReactNode, headingHref: string | undefine
   }
 
   return (
-    <Link to={headingHref} className={contentCardHeadingLinkVariants()}>
+    <Link to={headingHref} className="text-link">
       {heading}
     </Link>
   )

@@ -59,6 +59,21 @@ describe('MasterDetailListPanel', () => {
     expect(props.onAdd).toHaveBeenCalledOnce()
   })
 
+  it('uses interactive card selected chrome on the current row', () => {
+    render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
+
+    const selected = screen.getByRole('button', { name: /Rage/i })
+    const unselected = screen.getByRole('button', { name: /Unarmored Defense/i })
+
+    expect(selected).toHaveClass('ui-card', 'ui-card--interactive', 'ui-card--selected')
+    expect(selected).not.toHaveClass('ui-interactive-list__row')
+    expect(unselected).toHaveClass('ui-card', 'ui-card--interactive')
+    expect(unselected).not.toHaveClass('ui-card--selected')
+    expect(screen.getByRole('navigation', { name: 'Features' })).not.toHaveClass(
+      'border-border-subtle',
+    )
+  })
+
   it('calls onSelect with the row index when the whole row is clicked', async () => {
     const user = userEvent.setup()
     const props = baseProps()
@@ -85,7 +100,6 @@ describe('MasterDetailListPanel', () => {
             id: 'a',
             title: 'Legacy Option',
             meta: { eyebrow: 'Level 5', sourceLabel: 'System' },
-            active: false,
             availabilityStatusLabel: 'Unavailable',
           },
         ]}

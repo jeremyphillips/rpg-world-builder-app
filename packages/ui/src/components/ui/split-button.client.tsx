@@ -14,15 +14,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './dropdown-menu.client'
-import { InteractiveList } from './interactive-list.client'
 import { MenuChoiceRow } from './menu-choice-row.client'
-import { interactiveListChoiceMenuContentClasses } from './dropdown-menu-choice.variants'
-import {
-  splitButtonChevronIconClasses,
-  splitButtonChevronVariants,
-  splitButtonPrimaryVariants,
-  splitButtonRootVariants,
-} from './split-button.variants'
+import { dropdownMenuChoiceContentClasses } from './dropdown-menu-choice.variants'
+import { iconGlyphRootClasses } from './icon-glyph.variants'
 
 export type SplitButtonMenuItem = {
   id: string
@@ -65,14 +59,14 @@ export function SplitButton({
   const resolvedMenuAriaLabel = menuAriaLabel ?? `${label} shortcuts`
 
   return (
-    <div className={cn(splitButtonRootVariants(), className)}>
+    <div className={cn('ui-split-button', className)}>
       <Button
         type="button"
         variant={variant}
         size={size}
         density={density}
         disabled={disabled}
-        className={hasMenu ? splitButtonPrimaryVariants() : undefined}
+        className={hasMenu ? 'ui-split-button__primary' : undefined}
         onClick={onPrimaryClick}
         {...props}
       >
@@ -88,34 +82,30 @@ export function SplitButton({
               size={size}
               density={density}
               disabled={disabled}
-              className={splitButtonChevronVariants()}
+              className="ui-split-button__menu"
               aria-label={resolvedMenuAriaLabel}
             >
-              <ChevronDown className={splitButtonChevronIconClasses} aria-hidden />
+              <ChevronDown className={cn(iconGlyphRootClasses.sm, 'opacity-80')} aria-hidden />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className={
-              useChoiceMenuLayout ? cn(interactiveListChoiceMenuContentClasses) : undefined
-            }
+            className={useChoiceMenuLayout ? cn(dropdownMenuChoiceContentClasses) : undefined}
           >
             {menuGroups.map((group, groupIndex) => (
               <React.Fragment key={group.id}>
                 {groupIndex > 0 ? <DropdownMenuSeparator /> : null}
                 {group.label ? <DropdownMenuLabel>{group.label}</DropdownMenuLabel> : null}
-                <InteractiveList>
-                  {group.items.map((item) => (
-                    <MenuChoiceRow
-                      key={item.id}
-                      heading={item.label}
-                      supporting={item.description}
-                      supportingWrap={item.description != null}
-                      disabled={item.disabled}
-                      onSelect={() => item.onSelect()}
-                    />
-                  ))}
-                </InteractiveList>
+                {group.items.map((item) => (
+                  <MenuChoiceRow
+                    key={item.id}
+                    heading={item.label}
+                    supporting={item.description}
+                    supportingWrap={item.description != null}
+                    disabled={item.disabled}
+                    onSelect={() => item.onSelect()}
+                  />
+                ))}
               </React.Fragment>
             ))}
           </DropdownMenuContent>

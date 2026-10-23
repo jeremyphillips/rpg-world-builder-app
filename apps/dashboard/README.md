@@ -108,6 +108,7 @@ Root shorthands: `pnpm storybook:dashboard`, `pnpm storybook` (UI + dashboard).
 
 ## Documentation
 
+- [AGENTS.md](../../AGENTS.md#styling-conventions) — styling policy (semantic CSS, tokens, CVA)
 - [card-guide.md](./docs/card-guide.md) — which card/row/entity surface to use (start here)
 - [entity-surfaces.md](./docs/entity-surfaces.md) — entity surface behavior, geometry, and enforcement
 - [feature-structure.md](./docs/feature-structure.md) — feature folder layout, `lib/` concern index, README template

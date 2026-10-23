@@ -2,15 +2,13 @@ import type { ReactNode } from 'react'
 
 import { Card } from './card'
 
-import { UI_CARD_CONTENT_CLASS } from './card.variants'
-
 /**
  * Padding for a form body rendered inside `FormCard` chrome — mirrors
  * `CardContent`. Pass to `<Form contentClassName={...}>` so the fields inset
  * from the card edge while the header/footer keep their own padding. (`<Form>`
  * owns the `<form>`; `FormCard` is pure chrome.)
  */
-export const formCardContentClass = UI_CARD_CONTENT_CLASS
+export const formCardContentClass = 'ui-card__content'
 
 interface FormCardProps {
   title: string

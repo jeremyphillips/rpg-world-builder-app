@@ -23,7 +23,9 @@
   .ui-destination-list--panel {
     overflow: hidden;
     border-radius: var(--radius-md);
-    border: 1px solid var(--border);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--ui-border-color);
     background-color: transparent;
   }
 
@@ -37,7 +39,9 @@
   .ui-destination-list--filled {
     overflow: hidden;
     border-radius: var(--radius-card);
-    border: 1px solid var(--border);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--ui-border-color);
     background-color: transparent;
   }
 
@@ -45,16 +49,6 @@
     --ui-surface-bg: var(--surface-strong);
     --surface-current: var(--ui-surface-bg);
     background-color: var(--ui-surface-bg);
-  }
-
-  .ui-destination-list--filled.ui-destination-list--tone-strong
-    .ui-interactive-row--hover-navigation {
-    --ui-row-bg-hover: var(--ui-surface-hover-bg);
-  }
-
-  .ui-destination-list--filled.ui-destination-list--tone-strong
-    .ui-interactive-row--hover-navigation:not(.ui-interactive-row--disabled):active {
-    background-color: var(--ui-surface-pressed-bg);
   }
 
   .ui-destination-list--elevation-subtle {
@@ -71,7 +65,9 @@
     bottom: 0;
     left: 0;
     right: 0;
-    border-bottom: 1px solid var(--border-faint);
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--ui-border-color);
     pointer-events: none;
   }
 
@@ -95,12 +91,16 @@
     bottom: 0;
     left: var(--ui-destination-inset-inline);
     right: var(--ui-destination-inset-inline);
-    border-bottom: 1px solid var(--border-faint);
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--ui-border-color);
     pointer-events: none;
   }
 
   .ui-destination-list--embedded .ui-destination-item + .ui-destination-item {
-    border-top: 1px solid var(--border-faint);
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--ui-border-color);
   }
 
   .ui-destination-item__link {

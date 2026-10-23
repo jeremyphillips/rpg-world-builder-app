@@ -6,6 +6,9 @@ import { DEFAULT_DEPENDENT_SURFACE } from './surface.variants'
 
 const APPROVED_SURFACE_TOKENS = [
   'border-border',
+  'ui-border--default',
+  'ui-border--subtle',
+  'ui-border--strong',
   'bg-background',
   'bg-card',
   'bg-surface-faint',

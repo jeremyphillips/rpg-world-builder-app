@@ -3,7 +3,6 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { interactiveListViewportVariants } from './interactive-list.variants'
 
 export interface InteractiveListViewportProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
@@ -16,7 +15,7 @@ export function InteractiveListViewport({
   ...props
 }: InteractiveListViewportProps) {
   return (
-    <div className={cn(interactiveListViewportVariants(), className)} {...props}>
+    <div className={cn('ui-interactive-list__viewport', className)} {...props}>
       {children}
     </div>
   )

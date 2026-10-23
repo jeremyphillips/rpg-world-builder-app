@@ -1,79 +1,66 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import {
   UI_INTERACTIVE_ROW_BLOCK_CLASS,
   UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS,
-  UI_INTERACTIVE_ROW_HOVER_CLASS,
   UI_INTERACTIVE_ROW_STATE_CLASS,
 } from './interactive-row.styles'
 import {
-  menuChoiceRowItemResetClasses,
   selectableRowHighlightRailClasses,
   selectableRowListHighlightSelectedClasses,
   selectableRowListHighlightUnselectedClasses,
   selectableRowListPointerHoverClasses,
-  selectableRowMenuHighlightFillClasses,
-  selectableRowMenuHighlightRailClasses,
 } from './interactive-row.variants'
 
 export type InteractiveListSize = 'sm' | 'md' | 'lg'
 
-/** Slot-based toolbar — search and optional filter rows; hosts own control state. */
-export const interactiveListToolbarVariants = cva('ui-interactive-list__toolbar')
-
-export const interactiveListToolbarSearchRowVariants = cva('ui-interactive-list__toolbar-search')
-
-export const interactiveListToolbarFilterRowVariants = cva('ui-interactive-list__toolbar-filter')
-
 /** Visual-only group heading; hosts own section / listbox group semantics. */
-export const interactiveListGroupHeadingVariants = cva('ui-interactive-list__heading', {
-  variants: {
-    first: {
-      true: 'ui-interactive-list__heading--first',
-      false: '',
+export const interactiveListGroupHeadingVariants = cva(
+  cn('ui-interactive-list__heading', borderStrength('subtle')),
+  {
+    variants: {
+      first: {
+        true: 'ui-interactive-list__heading--first',
+        false: '',
+      },
+      follows: {
+        none: '',
+        complete: 'ui-interactive-list__heading--follows-complete',
+        truncated: '',
+      },
     },
-    follows: {
-      none: '',
-      complete: 'ui-interactive-list__heading--follows-complete',
-      truncated: '',
+    defaultVariants: {
+      first: false,
+      follows: 'none',
     },
   },
-  defaultVariants: {
-    first: false,
-    follows: 'none',
-  },
-})
-
-/** Bounded scrollport — toolbar stays fixed outside this region. */
-export const interactiveListViewportVariants = cva('ui-interactive-list__viewport')
-
-/** List surface. Adjacent-sibling borders live on `.ui-interactive-list`. */
-export const interactiveListSurfaceClasses = 'ui-interactive-list'
-
-/** Faint top border on every direct row after the first — included in `.ui-interactive-list`. */
-export const interactiveListRowSeparatorClasses = 'ui-interactive-list'
-
-/** Row-list shell — wrap row adapters only (not labels/separators). */
-export const interactiveListVariants = cva(
-  cn(interactiveListSurfaceClasses, interactiveListRowSeparatorClasses),
 )
 
-/** Empty-state copy inside a list. */
-export const interactiveListEmptyVariants = cva('ui-interactive-list__empty')
+/** List surface. Adjacent-sibling borders live on `.ui-interactive-list`. */
+export const interactiveListSurfaceClasses = cn('ui-interactive-list', borderStrength('subtle'))
+
+/** Row-list shell — wrap row adapters only (not labels/separators). */
+export function interactiveListVariants(): string {
+  return cn(interactiveListSurfaceClasses, 'ui-interactive-list')
+}
 
 /** Shared panel shell for combobox popovers and choice menus (animation composed per host). */
-export const interactiveListPanelVariants = cva('ui-interactive-list__panel shadow-md', {
-  variants: {
-    triggerWidth: {
-      match: 'ui-interactive-list__panel--match',
-      fit: 'ui-interactive-list__panel--fit',
+export const interactiveListPanelVariants = cva(
+  cn('ui-interactive-list__panel shadow-md', borderStrength()),
+  {
+    variants: {
+      triggerWidth: {
+        match: 'ui-interactive-list__panel--match',
+        fit: 'ui-interactive-list__panel--fit',
+      },
+    },
+    defaultVariants: {
+      triggerWidth: 'match',
     },
   },
-  defaultVariants: {
-    triggerWidth: 'match',
-  },
-})
+)
 
 /** Popover open/close animation — combobox and similar Popover hosts only. */
 export const interactiveListPopoverHostClasses =
@@ -88,14 +75,6 @@ export const interactiveListRowChromeVariants = cva(
   cn('ui-interactive-list__row', UI_INTERACTIVE_ROW_BLOCK_CLASS),
   {
     variants: {
-      host: {
-        row: '',
-        menuitem: cn(
-          'cursor-pointer outline-none',
-          selectableRowMenuHighlightFillClasses,
-          selectableRowMenuHighlightRailClasses,
-        ),
-      },
       highlighted: {
         true: '',
         false: '',
@@ -115,7 +94,6 @@ export const interactiveListRowChromeVariants = cva(
     },
     compoundVariants: [
       {
-        host: 'row',
         highlighted: true,
         selected: false,
         className: cn(
@@ -124,31 +102,17 @@ export const interactiveListRowChromeVariants = cva(
         ),
       },
       {
-        host: 'row',
         highlighted: true,
         selected: true,
         className: cn(selectableRowListHighlightSelectedClasses, selectableRowHighlightRailClasses),
       },
       {
-        host: 'row',
         interactive: true,
         selected: false,
         className: selectableRowListPointerHoverClasses,
       },
-      {
-        host: 'row',
-        selected: true,
-        interactive: true,
-        className: UI_INTERACTIVE_ROW_HOVER_CLASS.selected,
-      },
-      {
-        host: 'menuitem',
-        interactive: true,
-        className: '',
-      },
     ],
     defaultVariants: {
-      host: 'row',
       highlighted: false,
       selected: false,
       disabled: false,
@@ -175,20 +139,6 @@ export const interactiveListRowMainVariants = cva('ui-interactive-list__main', {
     interactive: true,
   },
 })
-
-/** Trailing action column — sibling to the main hit area, never nested inside it. */
-export const interactiveListRowTrailingActionVariants = cva('ui-interactive-list__trailing')
-
-/**
- * Radix menuitem reset — clears default menuitem focus chrome.
- * Row padding comes from `ui-interactive-list__main--*`, which `cn()` prefers over `px`/`py`.
- */
-export const menuChoiceItemResetVariants = cva(
-  cn(
-    'h-auto w-full border-0 text-inherit [&_svg]:pointer-events-none [&_svg]:shrink-0',
-    menuChoiceRowItemResetClasses,
-  ),
-)
 
 export type InteractiveListGroupHeadingVariantProps = VariantProps<
   typeof interactiveListGroupHeadingVariants

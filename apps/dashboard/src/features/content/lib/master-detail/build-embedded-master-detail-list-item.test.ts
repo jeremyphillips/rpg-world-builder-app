@@ -24,7 +24,6 @@ describe('buildEmbeddedMasterDetailListItem', () => {
       meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
       deletable: false,
       hasError: false,
-      active: true,
     })
   })
 
@@ -62,7 +61,6 @@ describe('buildEmbeddedMasterDetailListItem', () => {
 
     expect(item.issueCount).toBe(2)
     expect(item.hasError).toBe(true)
-    expect(item.active).toBe(true)
     expect(item.meta).toEqual({ sourceLabel: 'Homebrew' })
     expect(getRowIssueCount).toHaveBeenCalledWith(0)
   })

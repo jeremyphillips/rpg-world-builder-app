@@ -1,0 +1,93 @@
+/*
+ * Media library composition.
+ *
+ * Coupled column scroll (do not split): the header stays opaque with overflow
+ * visible, one shadow hangs at top-full, each column region pulls up by
+ * 1.25rem, and each viewport doubles the top inset to 2.5rem. Rest position
+ * equals DialogPanelScrollRegion inset innerLeading pt-5. padding-top and
+ * padding-bottom use !important so they beat that preset's pt-5 and pb-6;
+ * the modal footer owns the bottom edge.
+ */
+@layer components {
+  .media-manager {
+    display: grid;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+    flex: 1;
+    align-items: start;
+    gap: calc(var(--spacing) * 6);
+  }
+
+  .media-manager__column {
+    display: flex;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+    flex-direction: column;
+  }
+
+  .media-manager__header {
+    position: relative;
+    z-index: 10;
+    overflow: visible;
+    background: var(--background);
+  }
+
+  .media-manager__column-scroll {
+    margin-top: -1.25rem;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .media-manager__column-viewport {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    padding-top: 2.5rem !important;
+    padding-bottom: 0 !important;
+  }
+
+  .media-manager__tile {
+    position: relative;
+    display: flex;
+    width: calc(var(--spacing) * 28);
+    flex-shrink: 0;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border-width: 2px;
+    border-style: solid;
+    border-color: transparent;
+    background: var(--sunken);
+  }
+
+  .media-manager__tile[aria-pressed='true'] {
+    border-color: var(--primary);
+  }
+
+  .ui-panel.media-manager__details {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+
+  @media (min-width: 48rem) {
+    .media-manager {
+      min-height: 24rem;
+      grid-template-columns: minmax(0, 0.28fr) minmax(0, 0.72fr);
+    }
+
+    .media-manager:has(> .media-manager__column:not(.media-manager__column--separated)) {
+      grid-template-columns: minmax(0, 0.28fr) minmax(0, 0.47fr) minmax(0, 0.25fr);
+    }
+
+    .media-manager__column--separated {
+      border-right-width: 1px;
+      padding-right: calc(var(--spacing) * 6);
+    }
+
+    .media-manager__tile {
+      width: 100%;
+    }
+  }
+}

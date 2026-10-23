@@ -9,13 +9,10 @@ import { resolveEntityLeadingUtilityCount } from '../../../anatomy/entity-leadin
 import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
 import { resolveEntitySurfaceEdges } from '../../../anatomy/entity-surface-edges.lib'
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
+import { entityCardBodyClassName } from '../content/entity-card-body-class-name.lib'
 import { EntityCardContent } from '../content/entity-card-content'
 import { EntityCardFrame } from '../content/entity-card-frame'
 import { DisclosureEntityCardHeader } from './disclosure-entity-card-header'
-import {
-  disclosureEntityCardBodyWashVariants,
-  disclosureEntityCardListItemVariants,
-} from './entity-card-disclosure-renderer.variants'
 
 export type EntityCardDisclosureRendererProps = {
   entity: EntitySummaryModel
@@ -74,8 +71,7 @@ export function EntityCardDisclosureRenderer({
         density={density}
         toolbarCompact
         toolbarLeadingChrome="none"
-        className={disclosureEntityCardListItemVariants()}
-        bodyClassName={disclosureEntityCardBodyWashVariants()}
+        bodyClassName={entityCardBodyClassName('disclosure')}
         header={
           <EntityCardContent>
             <DisclosureEntityCardHeader

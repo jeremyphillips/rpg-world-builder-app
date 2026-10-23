@@ -47,6 +47,9 @@ describe('RichTextLinkPicker', () => {
 
     expect(screen.getByText('Insert link')).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Internal' })).toHaveAttribute('aria-selected', 'true')
+
+    const tablist = screen.getByRole('tablist')
+    expect(tablist).toHaveClass('ui-tabs__list--pill', 'grid', 'grid-cols-2', 'w-full')
     expect(screen.getByRole('searchbox', { name: 'Search internal content' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Filter by content type' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Filter by content type' })).toHaveTextContent(

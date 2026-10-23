@@ -20,6 +20,11 @@ describe('DialogPanelBody', () => {
     expect(viewport).toHaveClass('overflow-y-auto')
     expect(viewport).toHaveClass('space-y-4')
     expect(viewport).toHaveClass('pt-5')
+    const shell = viewport.parentElement?.parentElement
+    expect(shell).toHaveClass('flex-1', 'overflow-hidden')
+    expect(shell).not.toHaveClass('overflow-y-auto')
+    expect(shell).not.toHaveClass('p-6')
+    expect(shell).not.toHaveClass('space-y-4')
   })
 
   it('keeps stable mode clip-only with attributes on the shell', () => {
@@ -34,6 +39,8 @@ describe('DialogPanelBody', () => {
     expect(countOverflowAutoRoots(container)).toBe(1)
     const shell = screen.getByTestId('stable-body')
     expect(shell).toHaveClass('overflow-hidden')
+    expect(shell).toHaveClass('flex-1')
+    expect(shell).toHaveClass('pb-0')
     expect(shell).not.toHaveClass('overflow-y-auto')
     expect(shell).toHaveClass('px-6')
   })
@@ -66,6 +73,22 @@ describe('DialogPanelBody', () => {
     expect(shell).toHaveClass('overflow-hidden')
     expect(shell).toHaveClass('p-0')
     expect(shell).not.toHaveClass('overflow-y-auto')
+  })
+
+  it('lets a later padding utility replace the shell inset', () => {
+    render(
+      <DialogPanelBody
+        mode="stable"
+        shellClassName="px-4"
+        className="px-0"
+        data-testid="stable-body"
+      />,
+    )
+
+    const shell = screen.getByTestId('stable-body')
+    expect(shell).toHaveClass('px-0')
+    expect(shell).not.toHaveClass('px-6')
+    expect(shell).not.toHaveClass('px-4')
   })
 
   it('forwards aria and event props to the scroll viewport in scroll mode', () => {

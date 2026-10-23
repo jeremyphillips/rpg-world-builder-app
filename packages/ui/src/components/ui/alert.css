@@ -15,7 +15,6 @@
   }
 
   .ui-alert--default {
-    border-color: var(--border);
     background-color: var(--surface-muted);
     color: var(--foreground);
     --surface-current: var(--surface-muted);

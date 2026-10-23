@@ -7,7 +7,7 @@ import { Button } from '../../components/ui/button.client'
 import { Card } from '../../components/ui/card'
 import { Heading } from '../../components/ui/heading'
 import { Text } from '../../components/ui/text'
-import { cardSurfaceClasses } from '../../components/ui/card.variants'
+import { cardSurfaceVariants } from '../../components/ui/card.variants'
 import { radioCardDecorativeControlClasses } from '../../components/ui/choice-control.variants'
 import { resolveSurfaceClasses } from '../../components/ui/surface.variants'
 import { establishSurfaceCurrent } from '../../components/ui/surface-current.lib'
@@ -157,7 +157,7 @@ function SurfaceChromeMatrix() {
               Card in card
             </Heading>
             <ChromeSampleGrid title="Outer card plane" />
-            <div className={cn(cardSurfaceClasses, 'space-y-3 p-4')}>
+            <div className={cn(cardSurfaceVariants(), 'space-y-3 p-4')}>
               <Text variant="muted">Inner card plane</Text>
               <ChromeSampleGrid />
             </div>
@@ -173,7 +173,7 @@ function SurfaceChromeMatrix() {
               Card in muted wash
             </Heading>
             <ChromeSampleGrid title="Outer muted wash keeps its plane" />
-            <div className={cn(cardSurfaceClasses, 'space-y-3 p-4')}>
+            <div className={cn(cardSurfaceVariants(), 'space-y-3 p-4')}>
               <Text variant="muted">Inner card re-establishes card plane</Text>
               <ChromeSampleGrid />
             </div>
@@ -210,7 +210,7 @@ function SurfaceChromeMatrix() {
 
           <div
             className={cn(
-              cardSurfaceClasses,
+              cardSurfaceVariants(),
               establishSurfaceCurrent('popover'),
               'space-y-4 p-6 lg:col-span-2',
             )}

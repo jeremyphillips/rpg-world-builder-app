@@ -239,7 +239,7 @@ describe('FilterBar', () => {
       <FilterBar schema={mixedPrimarySchema} state={{}} onValueChange={() => undefined} />,
     )
 
-    expect(container.firstChild).toHaveClass('items-end')
+    expect(container.firstChild).toHaveClass('ui-filter-bar--horizontal')
     const anchors = container.querySelectorAll('[data-field-align]')
     expect(anchors.length).toBeGreaterThanOrEqual(2)
 
@@ -288,8 +288,8 @@ describe('FilterBar', () => {
       />,
     )
 
-    expect(container.firstChild).toHaveClass('flex-col', 'items-start')
-    const searchControl = screen.getByLabelText('Search').closest('[class*="flex-[0_1"]')
+    expect(container.firstChild).toHaveClass('ui-filter-bar--vertical')
+    const searchControl = screen.getByLabelText('Search').closest('.ui-filter-bar__control--text')
     expect(searchControl).toBeTruthy()
   })
 })

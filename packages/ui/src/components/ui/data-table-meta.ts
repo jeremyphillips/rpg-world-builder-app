@@ -1,10 +1,5 @@
-import {
-  dataTableActionsCellVariants,
-  dataTableActionsHeaderVariants,
-  dataTableCellTextVariants,
-  dataTableSelectCellVariants,
-  dataTableSelectHeaderVariants,
-} from './data-table.variants'
+import { borderStrength } from './border-strength'
+import { dataTableCellTextVariants } from './data-table.variants'
 
 /** Shared `ColumnMeta.columnTone` values for DataTable body cell styling. */
 export const dataTableColumnMeta = {
@@ -18,7 +13,7 @@ export const dataTableColumnMeta = {
 /** Fixed-width presets for `ColumnMeta.headerClassName` / `cellClassName`. */
 export const dataTableColumnWidths = {
   /**
-   * Thumbnail column — fixed to `dataTableImageVariants` (+ horizontal padding).
+   * Thumbnail column — fixed to `.ui-data-table__image` (+ horizontal padding).
    * 24px image + 16px padding at default; 32px image + 16px padding at lg+.
    */
   image: 'w-10 max-w-10 shrink-0 px-2 lg:w-12 lg:max-w-12',
@@ -64,6 +59,12 @@ export type DataTableColumnWidth = keyof typeof dataTableColumnWidths
 /** Body-cell layout for centered width presets — flex breaks table `align-middle`. */
 const dataTableCenteredBodyCellLayout = 'text-center [&>svg]:mx-auto [&>svg]:block'
 
+const dataTableColumnEdgeBorderClass = borderStrength()
+const dataTableActionsHeaderClassName = `ui-data-table__head ui-data-table__actions ${dataTableColumnEdgeBorderClass}`
+const dataTableActionsCellClassName = `ui-data-table__actions ${dataTableColumnEdgeBorderClass}`
+const dataTableSelectHeaderClassName = `ui-data-table__head ui-data-table__select ${dataTableColumnEdgeBorderClass}`
+const dataTableSelectCellClassName = `ui-data-table__select ${dataTableColumnEdgeBorderClass}`
+
 /** Applies a width preset to both header and body cells. */
 export function dataTableWidthMeta(width: DataTableColumnWidth) {
   const className = dataTableColumnWidths[width]
@@ -75,14 +76,14 @@ export function dataTableWidthMeta(width: DataTableColumnWidth) {
   }
   if (width === 'actions') {
     return {
-      headerClassName: dataTableActionsHeaderVariants(),
-      cellClassName: dataTableActionsCellVariants(),
+      headerClassName: dataTableActionsHeaderClassName,
+      cellClassName: dataTableActionsCellClassName,
     } as const
   }
   if (width === 'select') {
     return {
-      headerClassName: dataTableSelectHeaderVariants(),
-      cellClassName: dataTableSelectCellVariants(),
+      headerClassName: dataTableSelectHeaderClassName,
+      cellClassName: dataTableSelectCellClassName,
     } as const
   }
   if (

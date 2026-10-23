@@ -11,22 +11,23 @@ import {
   AccordionTrigger,
 } from '../ui/accordion.client'
 import { Alert } from '../ui/alert'
-import { alertTitleVariants } from '../ui/alert.variants'
 import { ScrollBoundaryRegion } from '../ui/scroll-boundary-region.client'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button.client'
 import { IdentityRowHeadingLine } from '../ui/identity-row.client'
 import { IconContainer } from '../ui/icon-container.client'
 import { IdentityFrame } from '../ui/identity-frame.client'
+import { Panel } from '../ui/panel'
 import { contentCardHeadingScaleClass } from '../ui/content-card.variants'
 import { Eyebrow } from '../ui/eyebrow'
 import { Heading } from '../ui/heading'
+import { Text } from '../ui/text'
 import { SemanticText } from '../ui/semantic-text/semantic-text'
 import { StatusDot } from '../ui/status-dot'
 import { StatusIcon } from '../ui/status-icon.client'
 import type { StatusIconVariant } from '../ui/status-icon.variants'
 import { InlineMetadata } from '../ui/inline-metadata'
-import { Text } from '../ui/text'
+import { MetadataList } from '../ui/metadata-list'
 import type {
   PreviewRailAvailability,
   PreviewRailChrome,
@@ -36,52 +37,7 @@ import type {
   PreviewRailStatusPanelVariant,
   PreviewRailStatusTone,
 } from './preview-rail.types'
-import {
-  previewRailAccordionCardClasses,
-  previewRailAccordionContentClasses,
-  previewRailAccordionItemClasses,
-  previewRailActionButtonClasses,
-  previewRailActionHelperTextClasses,
-  previewRailActionStackClasses,
-  previewRailAvailabilityInactiveIconClasses,
-  previewRailAvailabilityRowClasses,
-  previewRailDividerClasses,
-  previewRailFooterClasses,
-  previewRailFooterSectionShellClasses,
-  previewRailFactCompactTextClasses,
-  previewRailFactLabelClasses,
-  previewRailFactValueClasses,
-  previewRailFactsGridClasses,
-  previewRailFactsGridCompactClasses,
-  previewRailHeaderRowClasses,
-  previewRailHeaderSectionContentClasses,
-  previewRailHeaderSectionShellClasses,
-  previewRailIdentityContentClasses,
-  previewRailIdentityHeadingBandClasses,
-  previewRailIdentitySubheadlineClasses,
-  previewRailIdentityRowClasses,
-  previewRailLeadingMediaShellClasses,
-  previewRailLeadingMediaSlotClasses,
-  previewRailIdentitySectionContentClasses,
-  previewRailIdentitySectionShellClasses,
-  previewRailIdentityStackClasses,
-  previewRailScrollRegionContentClasses,
-  previewRailScrollRegionShellClasses,
-  previewRailRootVariants,
-  previewRailSectionBodyClasses,
-  previewRailSectionBodyDescriptionClasses,
-  previewRailSectionInsetVariants,
-  previewRailSectionChevronSpacerClasses,
-  previewRailSectionLabelClasses,
-  previewRailSectionStaticRowClasses,
-  previewRailSectionStatusClasses,
-  previewRailSectionStatusSpacerClasses,
-  previewRailSectionTriggerClasses,
-  previewRailCaptionTextClasses,
-  previewRailSectionsHeaderClasses,
-  previewRailStatusPanelContentClasses,
-  previewRailStatusPanelDescriptionClasses,
-} from './preview-rail.variants'
+import { previewRailLayoutVariants, previewRailSectionInsetVariants } from './preview-rail.variants'
 
 const PreviewRailContext = React.createContext<PreviewRailChrome>('card')
 
@@ -92,37 +48,33 @@ function usePreviewRailChrome() {
 export type PreviewRailProps = React.ComponentPropsWithoutRef<'aside'> & {
   chrome?: PreviewRailChrome
   layout?: PreviewRailLayout
-  /** @deprecated Use `layout="fill"` for viewport-bounded aside columns. */
-  sticky?: boolean
-}
-
-function resolvePreviewRailLayout(
-  layout: PreviewRailLayout | undefined,
-  sticky: boolean | undefined,
-): PreviewRailLayout {
-  if (layout) return layout
-  if (sticky) return 'fill'
-  return 'default'
 }
 
 function PreviewRailRoot({
   chrome = 'card',
-  layout,
-  sticky,
+  layout = 'default',
   className,
   children,
   ...props
 }: PreviewRailProps) {
-  const resolvedLayout = resolvePreviewRailLayout(layout, sticky)
+  const classes = cn(
+    'ui-preview-rail flex min-w-0 w-full flex-col',
+    previewRailLayoutVariants({ layout }),
+    chrome === 'card' && 'text-card-foreground',
+    className,
+  )
 
   return (
     <PreviewRailContext.Provider value={chrome}>
-      <aside
-        className={cn(previewRailRootVariants({ chrome, layout: resolvedLayout }), className)}
-        {...props}
-      >
-        {children}
-      </aside>
+      {chrome === 'card' ? (
+        <Panel as="aside" tone="quiet" bleed className={classes} {...props}>
+          {children}
+        </Panel>
+      ) : (
+        <aside className={classes} {...props}>
+          {children}
+        </aside>
+      )}
     </PreviewRailContext.Provider>
   )
 }
@@ -136,12 +88,12 @@ function PreviewRailHeader({ title, badge }: PreviewRailHeaderProps) {
   const chrome = usePreviewRailChrome()
 
   return (
-    <div className={previewRailHeaderSectionShellClasses}>
+    <div className="ui-preview-rail__header ui-border--subtle">
       <div
         className={cn(
-          previewRailHeaderRowClasses,
+          'flex items-center justify-between gap-2',
           previewRailSectionInsetVariants({ chrome }),
-          previewRailHeaderSectionContentClasses,
+          'pt-4',
         )}
       >
         <Heading variant="card" as="h2" className="min-w-0 truncate">
@@ -174,11 +126,11 @@ export type PreviewRailMediaProps = {
 function PreviewRailLeadingMediaShell({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className={previewRailLeadingMediaShellClasses}
+      className="ui-anatomy-leading-media"
       data-shape="box"
       data-slot="preview-rail-leading-media"
     >
-      <div className={previewRailLeadingMediaSlotClasses}>{children}</div>
+      <div className="size-full overflow-hidden [&>*]:size-full">{children}</div>
     </div>
   )
 }
@@ -207,11 +159,11 @@ function PreviewRailAvailabilityLine({
   detail,
 }: PreviewRailAvailabilityLineProps) {
   return (
-    <p className={previewRailAvailabilityRowClasses}>
+    <Text as="p" variant="caption" className="mt-1 flex min-w-0 items-center gap-1.5">
       {available ? (
         <StatusDot tone="success" size="sm" />
       ) : (
-        <CircleSlash aria-hidden className={previewRailAvailabilityInactiveIconClasses} />
+        <CircleSlash aria-hidden className="size-icon-glyph-md shrink-0 text-semantic-warning" />
       )}
       <InlineMetadata role="supporting" density="compact" wrap={false} className="min-w-0 flex-1">
         <InlineMetadata.Item className="font-medium">{statusLabel}</InlineMetadata.Item>
@@ -221,7 +173,7 @@ function PreviewRailAvailabilityLine({
           </InlineMetadata.Item>
         ) : null}
       </InlineMetadata>
-    </p>
+    </Text>
   )
 }
 
@@ -237,28 +189,24 @@ function PreviewRailIdentity({ media, name, status, facts }: PreviewRailIdentity
   const chrome = usePreviewRailChrome()
 
   return (
-    <div className={previewRailIdentitySectionShellClasses} data-slot="preview-rail-identity">
+    <div className="ui-preview-rail__identity ui-border--subtle" data-slot="preview-rail-identity">
       <div
-        className={cn(
-          previewRailIdentityStackClasses,
-          previewRailSectionInsetVariants({ chrome }),
-          previewRailIdentitySectionContentClasses,
-        )}
+        className={cn('flex flex-col gap-4', previewRailSectionInsetVariants({ chrome }), 'pt-4')}
       >
-        <div className={previewRailIdentityRowClasses}>
+        <div className="ui-identity-row--comfortable flex min-w-0 items-start gap-4">
           {media}
-          <div className={previewRailIdentityContentClasses}>
-            <div className={previewRailIdentityHeadingBandClasses}>
+          <div className="min-w-0 flex-1">
+            <div className="flex min-w-0 items-center">
               <div className={cn(contentCardHeadingScaleClass('comfortable'), 'min-w-0')}>
                 <IdentityRowHeadingLine heading={name} />
               </div>
             </div>
-            {status ? <div className={previewRailIdentitySubheadlineClasses}>{status}</div> : null}
+            {status ? <Text variant="supporting">{status}</Text> : null}
           </div>
         </div>
         {facts && facts.length > 0 ? (
           <>
-            <div className={previewRailDividerClasses} />
+            <div className="border-t ui-border--subtle" />
             <PreviewRailFacts facts={facts} />
           </>
         ) : null}
@@ -274,39 +222,16 @@ export type PreviewRailFactsProps = {
 }
 
 function PreviewRailFacts({ facts, density = 'comfortable' }: PreviewRailFactsProps) {
-  const compact = density === 'compact'
-
   return (
-    <dl
-      className={cn(
-        previewRailFactsGridClasses,
-        compact ? previewRailFactsGridCompactClasses : null,
-      )}
-    >
-      {facts.map((fact) => (
-        <React.Fragment key={fact.label}>
-          <Text
-            as="dt"
-            variant="muted"
-            className={cn(
-              previewRailFactLabelClasses,
-              compact ? previewRailFactCompactTextClasses : null,
-            )}
-          >
-            {fact.label}
-          </Text>
-          <Text
-            as="dd"
-            className={cn(
-              previewRailFactValueClasses,
-              compact ? previewRailFactCompactTextClasses : null,
-            )}
-          >
-            {fact.value}
-          </Text>
-        </React.Fragment>
-      ))}
-    </dl>
+    <MetadataList
+      items={facts.map((fact) => ({ id: fact.label, label: fact.label, value: fact.value }))}
+      size={density === 'compact' ? 'xs' : 'sm'}
+      columnGap="sm"
+      rowGap={density === 'compact' ? 'sm' : 'md'}
+      valueTrack="fill"
+      emphasis="value"
+      divider={false}
+    />
   )
 }
 
@@ -329,11 +254,15 @@ function PreviewRailSections({
 }: PreviewRailSectionsProps) {
   return (
     <div className="flex flex-col gap-3">
-      <div className={previewRailSectionsHeaderClasses}>
+      <div className="flex flex-col gap-1">
         <Eyebrow as="h3" size="sm" tone="foreground">
           {title}
         </Eyebrow>
-        {description ? <p className={previewRailCaptionTextClasses}>{description}</p> : null}
+        {description ? (
+          <Text as="p" variant="caption">
+            {description}
+          </Text>
+        ) : null}
       </div>
       <Accordion
         type="single"
@@ -341,7 +270,7 @@ function PreviewRailSections({
         value={value}
         onValueChange={onValueChange}
         defaultValue={defaultValue}
-        className={previewRailAccordionCardClasses}
+        className="ui-preview-rail__accordion ui-border--subtle"
       >
         {children}
       </Accordion>
@@ -374,7 +303,7 @@ function PreviewRailSectionStatus({
   const emphasis = statusTone === 'neutral' ? 'low' : 'medium'
 
   return (
-    <SemanticText tone={statusTone} emphasis={emphasis} className={previewRailSectionStatusClasses}>
+    <SemanticText tone={statusTone} emphasis={emphasis} className="shrink-0">
       {status}
     </SemanticText>
   )
@@ -396,8 +325,8 @@ function PreviewRailSectionRowChrome({
   return (
     <>
       {marker ? <PreviewRailSectionMarker marker={marker} /> : null}
-      <span className={previewRailSectionLabelClasses}>{label}</span>
-      <span className={previewRailSectionStatusSpacerClasses} />
+      <span className="min-w-0 shrink-0">{label}</span>
+      <span className="min-w-0 flex-1" />
       {status ? <PreviewRailSectionStatus status={status} statusTone={statusTone} /> : null}
       {trailing}
     </>
@@ -415,14 +344,14 @@ function PreviewRailSection({
 }: PreviewRailSectionProps) {
   if (!expandable) {
     return (
-      <div className={previewRailAccordionItemClasses}>
-        <div className={previewRailSectionStaticRowClasses}>
+      <div className="ui-preview-rail__accordion-item ui-border--subtle">
+        <div className="flex w-full cursor-default items-center justify-start gap-2 px-3 py-2.5 text-left text-sm font-body-emphasis hover:text-inherit">
           <PreviewRailSectionRowChrome
             label={label}
             marker={marker}
             status={status}
             statusTone={statusTone}
-            trailing={<span aria-hidden className={previewRailSectionChevronSpacerClasses} />}
+            trailing={<span aria-hidden className="size-icon-glyph-md shrink-0" />}
           />
         </div>
       </div>
@@ -430,8 +359,8 @@ function PreviewRailSection({
   }
 
   return (
-    <AccordionItem value={id} className={previewRailAccordionItemClasses}>
-      <AccordionTrigger className={previewRailSectionTriggerClasses}>
+    <AccordionItem value={id} className="ui-preview-rail__accordion-item ui-border--subtle">
+      <AccordionTrigger className="flex flex-1 items-center justify-start gap-2 px-3 py-2.5 text-left text-sm font-body-emphasis hover:text-foreground/80 hover:no-underline">
         <PreviewRailSectionRowChrome
           label={label}
           marker={marker}
@@ -439,7 +368,9 @@ function PreviewRailSection({
           statusTone={statusTone}
         />
       </AccordionTrigger>
-      <AccordionContent className={previewRailAccordionContentClasses}>{children}</AccordionContent>
+      <AccordionContent className="[&>div]:px-3 [&>div]:pb-3 [&>div]:pt-1">
+        {children}
+      </AccordionContent>
     </AccordionItem>
   )
 }
@@ -452,9 +383,11 @@ export type PreviewRailSectionBodyProps = {
 
 function PreviewRailSectionBody({ description, facts, children }: PreviewRailSectionBodyProps) {
   return (
-    <div className={previewRailSectionBodyClasses}>
+    <div className="ui-preview-rail__section-body ui-border--subtle">
       {description ? (
-        <p className={previewRailSectionBodyDescriptionClasses}>{description}</p>
+        <Text as="p" variant="caption" className="line-clamp-2">
+          {description}
+        </Text>
       ) : null}
       {facts && facts.length > 0 ? <PreviewRailFacts facts={facts} density="compact" /> : null}
       {children}
@@ -488,17 +421,13 @@ function PreviewRailStatusPanel({
   const resolvedIcon = icon ?? resolveStatusPanelIcon(variant)
 
   return (
-    <Alert variant={variant} density="compact">
-      <div className="flex w-full items-start gap-2">
-        {resolvedIcon}
-        <div className={previewRailStatusPanelContentClasses}>
-          <p className={alertTitleVariants()}>{title}</p>
-          {description ? (
-            <p className={previewRailStatusPanelDescriptionClasses}>{description}</p>
-          ) : null}
-        </div>
-      </div>
-    </Alert>
+    <Alert
+      variant={variant}
+      density="compact"
+      leading={resolvedIcon}
+      title={title}
+      description={description}
+    />
   )
 }
 
@@ -512,18 +441,22 @@ export type PreviewRailActionProps = {
 
 function PreviewRailAction({ label, helperText, icon, onClick, disabled }: PreviewRailActionProps) {
   return (
-    <div className={previewRailActionStackClasses}>
+    <div className="flex flex-col gap-2">
       <Button
         type="button"
         variant="outline"
-        className={previewRailActionButtonClasses}
+        className="w-full"
         onClick={onClick}
         disabled={disabled}
       >
         {icon ? <span aria-hidden>{icon}</span> : null}
         {label}
       </Button>
-      {helperText ? <p className={previewRailActionHelperTextClasses}>{helperText}</p> : null}
+      {helperText ? (
+        <Text as="p" variant="caption">
+          {helperText}
+        </Text>
+      ) : null}
     </div>
   )
 }
@@ -537,11 +470,11 @@ function PreviewRailScrollRegion({
 
   return (
     <ScrollBoundaryRegion
-      className={cn(previewRailScrollRegionShellClasses, className)}
+      className={cn('min-h-0 flex-1', className)}
       viewportClassName={previewRailSectionInsetVariants({ chrome })}
       {...props}
     >
-      <div className={previewRailScrollRegionContentClasses}>{children}</div>
+      <div className="pb-4 pt-4">{children}</div>
     </ScrollBoundaryRegion>
   )
 }
@@ -554,10 +487,10 @@ function PreviewRailFooter({
   const chrome = usePreviewRailChrome()
 
   return (
-    <div className={previewRailFooterSectionShellClasses}>
+    <div className="ui-preview-rail__footer ui-border--subtle">
       <div
         className={cn(
-          previewRailFooterClasses,
+          'flex flex-col gap-4 py-4',
           previewRailSectionInsetVariants({ chrome }),
           className,
         )}

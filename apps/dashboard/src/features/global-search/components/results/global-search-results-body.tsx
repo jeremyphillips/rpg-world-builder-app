@@ -7,8 +7,8 @@ import {
   type SegmentedControlOption,
 } from '@rpg/ui'
 
+import { GlobalSearchResultsPanel } from '../global-search-results-panel'
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
-import { globalSearchPageResultsShellClasses } from '../../lib/global-search-surface.variants'
 import type { GlobalSearchGroupSection } from '../../lib/rank-global-search'
 import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt'
 import { GlobalSearchFlatResults, GlobalSearchGroupedResults } from './global-search-result-lists'
@@ -121,7 +121,7 @@ export function GlobalSearchResultsBody({
         </>
       ) : null}
 
-      <div className={globalSearchPageResultsShellClasses}>{resultsContent}</div>
+      <GlobalSearchResultsPanel>{resultsContent}</GlobalSearchResultsPanel>
     </div>
   )
 }

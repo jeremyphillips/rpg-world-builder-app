@@ -4,13 +4,9 @@ import type { GlobalSearchDocument } from '@rpg/contracts'
 import { cn, Text } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
-import {
-  globalSearchPreviewBodyClasses,
-  globalSearchPreviewFooterClasses,
-  globalSearchPreviewFooterLinkVariants,
-  globalSearchPreviewInsetClasses,
-} from '../../lib/global-search-preview.variants'
+import { globalSearchGroupContentInsetClasses } from '../../lib/global-search-group.variants'
 import type { GlobalSearchGroupSection } from '../../lib/rank-global-search'
+import { GlobalSearchResultsPanel } from '../global-search-results-panel'
 import { GlobalSearchEmptyPrompt } from '../results/global-search-empty-prompt'
 import { GlobalSearchGroupedResults } from '../results/global-search-result-lists'
 
@@ -35,7 +31,7 @@ function GlobalSearchPreviewStatus({
     return (
       <Text
         variant="supporting"
-        className={cn('py-3 text-center', globalSearchPreviewInsetClasses)}
+        className={cn('py-3 text-center', globalSearchGroupContentInsetClasses)}
       >
         {GLOBAL_SEARCH_COPY.loadingCatalog}
       </Text>
@@ -44,7 +40,7 @@ function GlobalSearchPreviewStatus({
 
   if (isError) {
     return (
-      <div className={cn('space-y-3 py-3 text-center', globalSearchPreviewInsetClasses)}>
+      <div className={cn('space-y-3 py-3 text-center', globalSearchGroupContentInsetClasses)}>
         <Text variant="supporting" role="alert">
           {GLOBAL_SEARCH_COPY.catalogLoadError}
         </Text>
@@ -60,13 +56,13 @@ function GlobalSearchPreviewStatus({
   }
 
   if (!hasQuery) {
-    return <GlobalSearchEmptyPrompt className={globalSearchPreviewInsetClasses} />
+    return <GlobalSearchEmptyPrompt className={globalSearchGroupContentInsetClasses} />
   }
 
   if (groupedSections.length === 0) {
     return (
       <GlobalSearchEmptyPrompt
-        className={globalSearchPreviewInsetClasses}
+        className={globalSearchGroupContentInsetClasses}
         title={GLOBAL_SEARCH_COPY.noResultsTitle}
         description={GLOBAL_SEARCH_COPY.noResultsDescription(query.trim(), 'all')}
       />
@@ -81,10 +77,16 @@ type GlobalSearchPreviewFooterProps = {
   onClose: () => void
 }
 
+const globalSearchPreviewFooterLinkClasses = cn(
+  'relative flex w-full cursor-pointer select-none outline-none transition-colors',
+  'hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground',
+  'items-center justify-center py-1.5 text-style-label',
+)
+
 function GlobalSearchPreviewFooter({ viewAllHref, onClose }: GlobalSearchPreviewFooterProps) {
   return (
-    <footer className={globalSearchPreviewFooterClasses}>
-      <Link to={viewAllHref} className={globalSearchPreviewFooterLinkVariants()} onClick={onClose}>
+    <footer className="shrink-0 border-t border-border">
+      <Link to={viewAllHref} className={globalSearchPreviewFooterLinkClasses} onClick={onClose}>
         {GLOBAL_SEARCH_COPY.viewAllResults}
       </Link>
     </footer>
@@ -126,8 +128,13 @@ export function GlobalSearchPreviewPanel({
   const showFooter = hasQuery && resultCount > 0
 
   return (
-    <div id={id} role="region" aria-label={GLOBAL_SEARCH_COPY.pageTitle} className={className}>
-      <div className={globalSearchPreviewBodyClasses}>
+    <GlobalSearchResultsPanel
+      id={id}
+      role="region"
+      aria-label={GLOBAL_SEARCH_COPY.pageTitle}
+      className={className}
+    >
+      <div className="min-h-0 flex-1 overflow-y-auto">
         <GlobalSearchPreviewStatus
           isPending={isPending}
           isError={isError}
@@ -150,6 +157,6 @@ export function GlobalSearchPreviewPanel({
       {showFooter ? (
         <GlobalSearchPreviewFooter viewAllHref={viewAllHref} onClose={onClose} />
       ) : null}
-    </div>
+    </GlobalSearchResultsPanel>
   )
 }

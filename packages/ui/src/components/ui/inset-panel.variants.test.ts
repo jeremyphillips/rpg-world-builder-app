@@ -3,10 +3,6 @@ import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_INSET_PANEL_SURFACE,
   insetPanelClassNames,
-  insetPanelEmptyStateClasses,
-  insetPanelEmptyStateVariants,
-  insetPanelGateClasses,
-  insetPanelGateVariants,
   insetPanelVariants,
   resolveInsetPanelTextVariant,
 } from './inset-panel.variants'
@@ -42,19 +38,29 @@ describe('insetPanelVariants', () => {
     expect(resolveInsetPanelTextVariant(size)).toBeTruthy()
   })
 
-  it('exposes shared empty and gate presets', () => {
-    expect(insetPanelEmptyStateVariants()).toContain('ui-inset-panel--dashed')
-    expect(insetPanelEmptyStateVariants()).toContain('bg-sunken')
-    expect(insetPanelEmptyStateVariants()).toContain('shadow-surface-sunken')
-    expect(insetPanelGateVariants()).toContain('bg-sunken')
-    expect(insetPanelGateVariants()).toContain('shadow-surface-sunken')
-    expect(insetPanelEmptyStateClasses).toContain('ui-inset-panel--dashed')
-    expect(insetPanelEmptyStateClasses).toContain('bg-sunken')
-    expect(insetPanelGateClasses).toContain('bg-sunken')
-    expect(insetPanelGateClasses).toContain('shadow-surface-sunken')
+  it('exposes dashed empty and gate presets via insetPanelClassNames', () => {
+    const empty = insetPanelClassNames({
+      borderStyle: 'dashed',
+      surface: DEFAULT_INSET_PANEL_SURFACE,
+      size: 'md',
+      align: 'center',
+    })
+    expect(empty).toContain('ui-inset-panel--dashed')
+    expect(empty).toContain('bg-sunken')
+    expect(empty).toContain('shadow-surface-sunken')
+
+    const gate = insetPanelClassNames({
+      borderStyle: 'dashed',
+      surface: DEFAULT_INSET_PANEL_SURFACE,
+      size: 'lg',
+      align: 'center',
+    })
+    expect(gate).toContain('bg-sunken')
+    expect(gate).toContain('shadow-surface-sunken')
   })
 
   it('keeps layout variants separate from surface config', () => {
     expect(insetPanelVariants({ size: 'md' })).toContain('ui-inset-panel--md')
+    expect(insetPanelClassNames({ size: 'md' })).toContain('ui-border--default')
   })
 })

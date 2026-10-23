@@ -1,0 +1,101 @@
+import type { ContentMedia, MediaAsset } from '@rpg/contracts'
+import { MEDIA_CONTEXT_INCOMPLETE_MESSAGE } from '../../lib/resolve-media-content-availability.lib'
+import type { UseMediaManagerBodyDropResult } from '../../hooks/use-media-manager-body-drop'
+import type { MediaManagerController } from '../../hooks/use-media-manager'
+import type { UploadEntry } from '../../hooks/use-media-uploads'
+import type { mediaImageUrl } from '../../lib/media-display'
+import { MediaManagerBodyDropOverlay } from './media-manager-body-drop-overlay'
+import { MediaGallery } from './media-gallery'
+import { MediaImageDetails } from './media-image-details'
+import { MediaWorkspace } from './media-workspace'
+import type { MediaManagerBodyDropOverlayState } from './media-manager-session.lib'
+
+export function MediaManagerBody({
+  bodyDrop,
+  bodyDropOverlay,
+  controller,
+  imageUrl,
+  media,
+  assets,
+  selectedId,
+  entries,
+  saving,
+  onSelect,
+  onGalleryBoundaryChange,
+  onPreviewBoundaryChange,
+  onDetailsBoundaryChange,
+}: {
+  bodyDrop: UseMediaManagerBodyDropResult
+  bodyDropOverlay?: MediaManagerBodyDropOverlayState
+  controller: MediaManagerController
+  imageUrl?: typeof mediaImageUrl
+  media: ContentMedia
+  assets: Record<string, MediaAsset>
+  selectedId?: string
+  entries: UploadEntry[]
+  saving: boolean
+  onSelect: (id: string) => void
+  onGalleryBoundaryChange: Parameters<typeof MediaGallery>[0]['onScrollBoundaryChange']
+  onPreviewBoundaryChange: Parameters<typeof MediaWorkspace>[0]['onScrollBoundaryChange']
+  onDetailsBoundaryChange: Parameters<typeof MediaImageDetails>[0]['onScrollBoundaryChange']
+}) {
+  const { selectedAvailable, asset, policy, onAlt, changeRole, remove, canRemove } = controller
+  const hasGalleryImages = controller.sessionAvailableImages.length > 0
+  const showDetailsColumn = hasGalleryImages && Boolean(selectedAvailable)
+
+  return (
+    <div
+      className="relative flex min-h-0 flex-1 flex-col"
+      onDragEnter={bodyDrop.onDragEnter}
+      onDragLeave={bodyDrop.onDragLeave}
+      onDragOver={bodyDrop.onDragOver}
+      onDrop={bodyDrop.onDrop}
+    >
+      <fieldset disabled={saving} className="media-manager">
+        <MediaGallery
+          imageUrl={imageUrl}
+          systemImageUrl={controller.resolveSystemImageUrl}
+          media={media}
+          availableImages={controller.sessionAvailableImages}
+          availableSources={controller.sessionSources}
+          assets={assets}
+          contextBlocked={controller.contextBlocked}
+          contextBlockedMessage={MEDIA_CONTEXT_INCOMPLETE_MESSAGE}
+          allowedRoles={controller.policy.allowedRoles}
+          selectedId={selectedId}
+          entries={entries}
+          onSelect={onSelect}
+          onAdd={controller.uploads.add}
+          onRetry={controller.uploads.retry}
+          onRemoveUpload={controller.uploads.remove}
+          onScrollBoundaryChange={onGalleryBoundaryChange}
+          mutationsLocked={controller.mutationsLocked}
+        />
+        <MediaWorkspace
+          controller={controller}
+          imageUrl={imageUrl}
+          onScrollBoundaryChange={onPreviewBoundaryChange}
+        />
+        {showDetailsColumn && selectedAvailable ? (
+          <MediaImageDetails
+            selectedAvailable={selectedAvailable}
+            availableSources={controller.sessionSources}
+            assignedSourceMissing={controller.assignedSourceMissing}
+            asset={asset}
+            media={media}
+            policy={policy}
+            assignedRoles={controller.assignedRolesForSelection}
+            onAlt={onAlt}
+            onRole={changeRole}
+            onRemove={remove}
+            canRemove={canRemove}
+            onScrollBoundaryChange={onDetailsBoundaryChange}
+          />
+        ) : null}
+      </fieldset>
+      {bodyDropOverlay ? (
+        <MediaManagerBodyDropOverlay invalid={bodyDropOverlay === 'invalid'} />
+      ) : null}
+    </div>
+  )
+}

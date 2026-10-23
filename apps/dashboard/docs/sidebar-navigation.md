@@ -25,9 +25,11 @@ sidebar/
 
 ## Viewport layout
 
-The aside is capped at `100dvh` (`sidebarAsideVariants`). Brand (`sidebarBrandClasses`)
-and campaign chrome (`CampaignSidebarChrome` in `sidebarNavChromeClasses`) stay fixed;
-primary sections scroll in `sidebarNavScrollClasses` (`flex-1 min-h-0 overflow-y-auto`).
+The aside is capped at `100dvh` (`sidebarAsideVariants`). The brand row and campaign chrome
+(`CampaignSidebarChrome`) stay fixed; primary sections scroll in the nav.
+That nav composes `boundedScrollRegionClasses` (`overflow-y-auto scrollbar-slim pe-2.5`)
+with local flex sizing (`flex-1 min-h-0`) and `ps-3 pb-4`, so `px-3` does not override the
+end inset.
 App shell root uses the same viewport height so the sidebar cannot grow the document.
 
 ## Scope ownership

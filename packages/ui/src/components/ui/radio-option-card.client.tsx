@@ -22,10 +22,8 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
 import { RadioOptionCardLeadingControl } from './radio-option-card-controls.client'
 import {
-  radioCardDetailsActionVariants,
   radioCardGroupItemRowClasses,
-  radioCardLeadingControlTitleLineVariants,
-  radioCardMediaSlotClasses,
+  radioCardLeadingControlTitleLineClassName,
   type RadioCardVariant,
   type RadioCardVisualControl,
 } from './radio-card.variants'
@@ -121,7 +119,7 @@ function RadioOptionCardDetailsAction({
               tone="neutral"
               size="sm"
               density="compact"
-              className={radioCardDetailsActionVariants()}
+              className="ui-radio-card__details-action"
               aria-label={ariaLabel}
               onClick={onDetails}
             >
@@ -304,7 +302,7 @@ function RadioOptionCardPrimaryRow(props: RadioOptionCardInteriorProps) {
       leadingControl={
         variant === 'card' ? (
           <div
-            className={radioCardLeadingControlTitleLineVariants({
+            className={radioCardLeadingControlTitleLineClassName({
               density,
               titleEnd: titleEndSlot != null,
             })}
@@ -336,9 +334,7 @@ function RadioOptionCardInterior(props: RadioOptionCardInteriorProps) {
 
   return (
     <SelectionTarget htmlFor={id}>
-      {showCardMedia ? (
-        <div className={cn('ui-radio-card__media', radioCardMediaSlotClasses)}>{media}</div>
-      ) : null}
+      {showCardMedia ? <div className="ui-radio-card__media">{media}</div> : null}
       <div className={cn('ui-radio-card__body', showCardMedia && 'flex min-h-0 flex-1 flex-col')}>
         <RadioOptionCardPrimaryRow {...props} />
         <RadioOptionCardBodyExtras

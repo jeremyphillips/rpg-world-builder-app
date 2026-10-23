@@ -80,6 +80,10 @@ describe('DataTable — rendering', () => {
   it('renders empty-state row when data is empty', () => {
     renderTable({ data: [] })
     expect(screen.getByText('No results.')).toBeInTheDocument()
+    const emptyCell = screen.getByText('No results.').closest('td')
+    expect(emptyCell).toHaveClass('ui-data-table__empty')
+    expect(emptyCell?.closest('tr')).toHaveClass('ui-data-table__empty-row')
+    expect(emptyCell?.closest('tr')).not.toHaveClass('ui-data-table__row')
   })
 
   it('renders caption when provided', () => {
@@ -234,7 +238,7 @@ describe('DataTable — sorting', () => {
 
     expect(firstRowCells[0]).not.toHaveClass('bg-control-selected')
     expect(firstRowCells[0]).not.toHaveClass('text-muted-foreground')
-    expect(firstRowCells[1]).toHaveClass('text-muted-foreground')
+    expect(firstRowCells[1]).toHaveClass('ui-data-table__cell--muted')
     expect(firstRowCells[1]).not.toHaveClass('bg-surface-muted')
     expect(firstRowCells[2]).not.toHaveClass('bg-surface-muted')
     expect(firstRowCells[2]).not.toHaveClass('bg-control-selected')
@@ -267,8 +271,8 @@ describe('DataTable — row selection', () => {
     })
     const rowCheckbox = within(firstDataRow!).getByRole('checkbox', { name: 'Select row' })
 
-    expect(headerCheckbox.closest('th')).toHaveClass('[&:has([role=checkbox])]:!pr-3')
-    expect(rowCheckbox.closest('td')).toHaveClass('[&:has([role=checkbox])]:!pr-3')
+    expect(headerCheckbox.closest('th')).toHaveClass('ui-data-table__select')
+    expect(rowCheckbox.closest('td')).toHaveClass('ui-data-table__select')
   })
 
   it('renders per-row checkboxes when enableRowSelection is true', () => {
@@ -423,7 +427,7 @@ describe('DataTable — utilityStrip', () => {
 
     const strip = screen.getByText('Custom strip')
     const table = screen.getByRole('table')
-    const cardShell = strip.closest('.rounded-card')
+    const cardShell = strip.closest('.ui-data-table__table-wrap')
 
     expect(cardShell).toBeInTheDocument()
     expect(cardShell).toContainElement(strip)

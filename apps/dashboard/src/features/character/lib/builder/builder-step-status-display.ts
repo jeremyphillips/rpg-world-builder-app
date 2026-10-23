@@ -30,19 +30,3 @@ export function getBuilderStepStatusLabel(
 
   return BUILDER_STEP_STATUS_LABELS[status]
 }
-
-export type BuilderStepStatusBadgeVariant = 'default' | 'secondary' | 'outline'
-
-export function builderStepStatusBadgeVariant(
-  status: BuilderStepStatus,
-): BuilderStepStatusBadgeVariant {
-  switch (status) {
-    case 'complete':
-      return 'secondary'
-    case 'active':
-      return 'default'
-    case 'incomplete':
-    case 'deferred':
-      return 'outline'
-  }
-}

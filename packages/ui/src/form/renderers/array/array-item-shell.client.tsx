@@ -12,7 +12,7 @@ import {
   arrayItemRemoveButtonClasses,
   type ArrayItemLeadingChromeOptions,
 } from './array-item-toolbar.variants'
-import { ArrayItemIssueBadge } from './array-item-issue.client'
+import { ArrayItemIssueButton } from './array-item-issue.client'
 import type { ArrayItemIssueProminence } from './array-item-issue.variants'
 
 export interface ArrayItemRemoveButtonProps {
@@ -72,7 +72,7 @@ export function ArrayItemActionsContent({
 }: Omit<ArrayItemActionsRailProps, 'embedded' | 'className'>) {
   return (
     <>
-      <ArrayItemIssueBadge
+      <ArrayItemIssueButton
         issueCount={issueCount}
         rowLabel={issueRowLabel ?? removeAriaLabel.replace(/^Remove\s+/, '')}
         onPress={onIssuePress}

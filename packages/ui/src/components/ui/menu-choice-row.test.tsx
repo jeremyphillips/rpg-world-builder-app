@@ -4,7 +4,6 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from './dropdown-menu.client'
 import { Button } from './button.client'
-import { InteractiveList } from './interactive-list.client'
 import { MenuChoiceRow } from './menu-choice-row.client'
 
 describe('MenuChoiceRow', () => {
@@ -32,9 +31,7 @@ describe('MenuChoiceRow', () => {
     expect(screen.getByRole('menuitem', { name: /Add parent/i })).not.toHaveAttribute(
       'aria-selected',
     )
-    expect(screen.getByRole('menuitem', { name: /Add parent/i }).className).toContain(
-      'ui-interactive-list__main--md',
-    )
+    expect(screen.getByRole('menuitem', { name: /Add parent/i })).toHaveClass('ui-menu-item')
 
     await user.keyboard('{ArrowDown}')
     await user.keyboard('{Enter}')
@@ -50,10 +47,8 @@ describe('MenuChoiceRow', () => {
           <Button type="button">Open menu</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <InteractiveList>
-            <MenuChoiceRow heading="First" onSelect={() => {}} />
-            <MenuChoiceRow heading="Second" supporting="Details" onSelect={onSecond} />
-          </InteractiveList>
+          <MenuChoiceRow heading="First" onSelect={() => {}} />
+          <MenuChoiceRow heading="Second" supporting="Details" onSelect={onSecond} />
         </DropdownMenuContent>
       </DropdownMenu>,
     )

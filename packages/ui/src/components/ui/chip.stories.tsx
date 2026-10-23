@@ -2,13 +2,17 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { action } from 'storybook/actions'
 import { useState } from 'react'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Chip } from './chip.client'
 import { ChipGroup } from './chip-group.client'
+import { COMPACT_LABEL_CLASS_SPECS } from './compact-label.variants'
+
+const CHIP_CLASS_SPECS = COMPACT_LABEL_CLASS_SPECS.filter((spec) => spec.key.startsWith('chip'))
 
 const meta = {
   title: 'Components/Chip',
   component: Chip,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', semanticClasses: true },
   args: {
     mode: 'selectable',
     selected: false,
@@ -104,4 +108,35 @@ export const ContrastMatrixSubtle: Story = {
   name: 'Contrast matrix / subtle surface',
   args: { mode: 'selectable', selected: false, children: 'Matrix' },
   render: () => <ChipSurfaceRow surface="subtle" />,
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={CHIP_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: spec.key.includes('removable') ? (
+          <Chip
+            data-semantic-class-target
+            mode="removable"
+            size="md"
+            removeLabel="Remove tag"
+            onRemove={() => undefined}
+          >
+            Tag
+          </Chip>
+        ) : (
+          <span data-semantic-class-target className={spec.className}>
+            {spec.useCase}
+          </span>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
 }

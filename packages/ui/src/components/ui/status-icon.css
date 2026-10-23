@@ -1,0 +1,58 @@
+/*
+ * StatusIcon — disc tone and size; glyph ladder utilities stay on the svg.
+ */
+@layer components {
+  .ui-status-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: calc(infinity * 1px);
+  }
+
+  .ui-status-icon--sm {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  .ui-status-icon--md {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .ui-status-icon--lg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .ui-status-icon--ready {
+    background-color: var(--semantic-success-strong-bg);
+    color: var(--semantic-success-strong-foreground);
+  }
+
+  .ui-status-icon--needs-attention {
+    background-color: var(--semantic-warning-strong-bg);
+    color: var(--semantic-warning-strong-foreground);
+  }
+
+  .ui-status-icon--incomplete {
+    background-color: var(--status-icon-incomplete-bg);
+    color: var(--status-icon-neutral-foreground);
+  }
+
+  .ui-status-icon--off,
+  .ui-status-icon--none,
+  .ui-status-icon--not-configured {
+    background-color: var(--status-icon-idle-bg);
+    color: var(--status-icon-neutral-foreground);
+  }
+
+  .ui-status-icon__glyph--neutral {
+    color: var(--status-icon-neutral-foreground);
+  }
+
+  .ui-status-icon__glyph--needs-attention > circle {
+    display: none;
+  }
+}

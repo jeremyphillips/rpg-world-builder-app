@@ -1,0 +1,77 @@
+/*
+ * Wizard step nav — bubble, label, connector.
+ */
+@layer components {
+  .ui-wizard__bubble {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: calc(infinity * 1px);
+    border-width: 2px;
+    border-style: solid;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    font-weight: var(--font-weight-medium);
+    transition-property: color, background-color, border-color;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ui-wizard__bubble--idle {
+    background-color: var(--background);
+    color: var(--muted-foreground);
+  }
+
+  .ui-wizard__bubble--active {
+    border-color: var(--primary);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .ui-wizard__bubble--complete {
+    border-color: var(--primary);
+    background-color: var(--surface-subtle);
+    color: var(--primary);
+  }
+
+  .ui-wizard__label {
+    display: none;
+    transition-property: color;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @media (width >= 40rem) {
+    .ui-wizard__label {
+      display: block;
+    }
+  }
+
+  .ui-wizard__label--idle,
+  .ui-wizard__label--complete {
+    color: var(--muted-foreground);
+  }
+
+  .ui-wizard__label--active {
+    color: var(--foreground);
+  }
+
+  .ui-wizard__connector {
+    height: 1px;
+    flex: 1 1 0%;
+    transition-property: background-color;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ui-wizard__connector--idle {
+    background-color: var(--ui-border-color);
+  }
+
+  .ui-wizard__connector--complete {
+    background-color: var(--primary);
+  }
+}

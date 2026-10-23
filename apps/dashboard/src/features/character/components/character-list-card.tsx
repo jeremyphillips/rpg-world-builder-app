@@ -3,13 +3,11 @@ import type { CharacterRosterStatus } from '@rpg/contracts'
 import {
   Badge,
   ButtonLink,
-  cn,
   Card,
   CardFooter,
   CardHeader,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
-  identityRowStackVariants,
   resolveSurfaceActionButtonSize,
   resolveEntityRowInlineBadgeSize,
   type GenericCardDensity,
@@ -19,6 +17,12 @@ import { BuilderOptionCardImage } from './builder/steps/shared/builder-option-ca
 import { CampaignDisplayName, buildCampaignDisplay } from '@/features/campaign'
 import { resolveCharacterRosterStatusPresentation } from '../lib/campaign-roster-presentation'
 import type { CharacterListCardData } from './character-list-card.lib'
+
+/** Local copy column — uses card density `--ui-anatomy-row-gap`, not IdentityRow stack BEM. */
+export const CHARACTER_LIST_CARD_HEADER_COPY_CLASS =
+  'flex min-w-0 flex-col [row-gap:var(--ui-anatomy-row-gap)]' as const
+
+export const CHARACTER_LIST_CARD_HEADER_COPY_TEST_ID = 'character-list-card-header-copy'
 
 export type CharacterListCardProps = {
   card: CharacterListCardData
@@ -59,7 +63,10 @@ function CharacterListCardHeader({
 
   return (
     <CardHeader>
-      <div className={cn(identityRowStackVariants(), 'min-w-0')}>
+      <div
+        data-testid={CHARACTER_LIST_CARD_HEADER_COPY_TEST_ID}
+        className={CHARACTER_LIST_CARD_HEADER_COPY_CLASS}
+      >
         <IdentityRowHeadingLine
           heading={<h3>{card.name}</h3>}
           headingEnd={

@@ -34,7 +34,6 @@ export function buildSubclassMasterDetailListItem({
         item.source === 'unsaved' || isDraftSubclassId(item.id) ? 'draft' : 'published',
       ),
     },
-    active: isAvailable,
     ...(isAvailable ? {} : { availabilityStatusLabel: 'Unavailable' as const }),
     deletable: isSubclassDeletable(SOURCE_FOR_DELETABLE[item.source], item.id),
   }

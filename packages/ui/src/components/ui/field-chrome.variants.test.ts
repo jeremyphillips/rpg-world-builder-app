@@ -25,7 +25,7 @@ describe('resolveFieldChromeClassNames', () => {
     expect(classes).toContain(fieldShellLayoutClasses)
     expect(classes).toContain(fieldChromePaddingContainerClasses)
     expect(classes).toContain('bg-field-container')
-    expect(classes).toContain('border-border-subtle')
+    expect(classes).toContain('ui-border--subtle')
     expect(classes).toContain('w-full')
   })
 
@@ -53,14 +53,14 @@ describe('resolveFieldChromeClassNames', () => {
   it('uses the subtle border ladder for the default outline tone', () => {
     const classes = resolveFieldChromeClassNames({ variant: 'outline' }, 'md')
     const tokens = classes.split(/\s+/).filter(Boolean)
-    expect(tokens).toContain('border-border-subtle')
+    expect(tokens).toContain('ui-border--subtle')
     expect(tokens).not.toContain('border-border-faint')
     expect(tokens).not.toContain('border-border')
   })
 
   it('maps outline emphasis to separator border utilities', () => {
     const faint = resolveFieldChromeClassNames({ variant: 'outline', emphasis: 'faint' }, 'md')
-    expect(faint).toContain('border-border-faint')
+    expect(faint).toContain('ui-border--subtle')
   })
 })
 

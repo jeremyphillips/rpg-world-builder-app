@@ -12,6 +12,10 @@ etc.), prefer the direct, clean shape over backward-compatible migrations. Do
 not add migration scripts, versioned transforms, or dual-read paths unless the
 user explicitly asks.
 
+Workspaces are private (no external/npm consumers). Prefer clean barrels and
+subpath exports over shims; export renames are not semver — fix importers;
+typecheck and tests catch misses.
+
 ## Quality gate
 
 Hook scripts define **repository checkpoints** ([`.husky/pre-commit`](.husky/pre-commit),
@@ -202,22 +206,39 @@ Target WCAG 2.2 AA. Vitest axe assertions (`itAxe` / `expectNoAxeViolations`)
 run in **CI only** (`CI=true` or local `FORCE_AXE=1`); Storybook's axe-playwright
 check and `eslint-plugin-jsx-a11y` run on every PR. Do not suppress axe rules globally.
 
-## Design tokens
+## Styling conventions
 
-Never hardcode color values or font sizes — use design-token classes. Tailwind
-classes belong in `*.variants.ts` via CVA, not long inline strings. Body copy roles
-use `Text` / `text-style-*` composites — see
-[packages/ui/docs/typography.md](packages/ui/docs/typography.md). Prefer primary
-roles (`supporting`, `caption`, `label`) for new copy; do not hand-roll
-`text-sm text-muted-foreground` or invent `role-state` combination names.
+Prefer **semantic, inspectable component styling** over abstracted Tailwind class
+strings.
 
-- Components consume Layer 2 / Tailwind utilities only — never `--palette-*`.
-- Prefer named surfaces (`bg-background`, `bg-muted`, `bg-sunken`, `bg-card`) over
-  opacity modifiers (`bg-muted/30`) in new code.
-- Field chrome: use `field-input-chrome.variants.ts`; do not ad-hoc disabled/muted stacks.
-- Status tones: `neutral | info | success | warning | destructive` (Badge, SemanticText, …).
+- **Design tokens:** Never hardcode colors or font sizes. Use established semantic
+  tokens and typography roles. Components consume Layer 2 / Tailwind utilities only —
+  never `--palette-*`. Prefer named surfaces (`bg-background`, `bg-muted`, `bg-sunken`,
+  `bg-card`) over opacity modifiers (`bg-muted/30`) in new code. Field chrome: use
+  `field-input-chrome.variants.ts`; do not ad-hoc disabled/muted stacks. Status tones:
+  `neutral | info | success | warning | destructive` (Badge, SemanticText, …). Detail:
+  [packages/ui/docs/design-tokens.md](packages/ui/docs/design-tokens.md).
+- **Semantic CSS:** Prefer descriptive BEM-style classes for reusable component anatomy,
+  appearance, and states (e.g. `ui-card`, `ui-card__content`, `ui-card--subtle`).
+  Keep definitions in the owning component's CSS or shared UI styles. Layer policy →
+  [packages/ui/docs/semantic-style-layers.md](packages/ui/docs/semantic-style-layers.md);
+  control migration shape →
+  [packages/ui/docs/semantic-control-css.md](packages/ui/docs/semantic-control-css.md).
+- **Inline Tailwind:** Simple, local layout utilities (`flex`, `gap-3`, `min-w-0`, grid
+  tracks, alignment) may remain directly in JSX when clearer than an abstraction.
+- **Variants:** Use CVA and `*.variants.ts` only when resolving meaningful visual variants
+  (tone, density, size, state, etc.). Do not create variant files merely to export static
+  Tailwind strings or rename utility combinations.
+- **Component ownership:** Prefer existing semantic primitives (`Card`, `Panel`, `Alert`,
+  etc.) over recreating their chrome with border, background, padding, and radius utilities.
+- **Typography:** Use `Text` / `text-style-*` roles rather than hand-rolled size, weight,
+  and color combinations — see
+  [packages/ui/docs/typography.md](packages/ui/docs/typography.md). Prefer established
+  roles such as `supporting`, `caption`, and `label`; do not invent role-state combinations.
 
-Detail: [packages/ui/docs/design-tokens.md](packages/ui/docs/design-tokens.md).
+**Avoid styling indirection without meaningful reuse or behavior.** A class name should
+communicate component purpose, anatomy, or state—not merely hide a Tailwind string in
+another file.
 
 ## Feature boundaries
 

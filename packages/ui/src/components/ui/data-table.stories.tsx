@@ -21,6 +21,8 @@ import {
   useFilterState,
 } from '../../filters'
 import { DataTableFilterChrome } from './data-table-filter-chrome.client'
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
+import { DATA_TABLE_CLASS_SPECS } from './data-table-band.lib'
 
 // ---------------------------------------------------------------------------
 // Shared fixture data + types
@@ -359,4 +361,26 @@ export const WithCaption: Story = {
     caption: 'SRD 5.2.1 character classes',
     defaultPageSize: 10,
   },
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { layout: 'padded', semanticClasses: true },
+  args: { columns: BASE_COLUMNS, data: [] },
+  render: () => (
+    <ClassReferenceTable
+      rows={DATA_TABLE_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <div data-semantic-class-target className={spec.className}>
+            {spec.useCase}
+          </div>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
 }

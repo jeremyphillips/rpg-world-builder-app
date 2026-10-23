@@ -11,35 +11,37 @@ describe('resolveFieldGroupChromeClassNames', () => {
     })
   })
 
-  it('applies pseudo rail and rhythm-scoped content inset on the body', () => {
+  it('applies semantic rail and rhythm-scoped content inset on the body', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'rail' })
-    expect(classes.body).toContain('before:left-2')
-    expect(classes.body).toContain('pl-9')
+    expect(classes.body).toContain('ui-field-rail')
+    expect(classes.body).toContain('ui-field-group-chrome--rail-comfortable')
+    expect(classes.body).toContain('ui-border--default')
+    expect(classes.body).toContain('ui-field-rail--tone-neutral')
     expect(classes.body).not.toContain('border-l-2')
   })
 
   it('applies compact content inset when rhythm is compact', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'rail' }, { rhythm: 'compact' })
-    expect(classes.body).toContain('pl-8')
-    expect(classes.body).not.toContain('pl-9')
+    expect(classes.body).toContain('ui-field-group-chrome--rail-compact')
+    expect(classes.body).not.toContain('ui-field-group-chrome--rail-comfortable')
   })
 
   it('applies inset body classes as a deprecated alias for rail', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'inset' })
-    expect(classes.body).toContain('before:left-2')
-    expect(classes.body).toContain('pl-9')
-    expect(classes.body).not.toContain('border-l-2')
+    expect(classes.body).toContain('ui-field-rail')
+    expect(classes.body).toContain('ui-field-group-chrome--rail-comfortable')
   })
 
   it('applies compact inset padding when rhythm is compact', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'inset' }, { rhythm: 'compact' })
-    expect(classes.body).toContain('pl-8')
-    expect(classes.body).not.toContain('pl-9')
+    expect(classes.body).toContain('ui-field-group-chrome--rail-compact')
+    expect(classes.body).not.toContain('ui-field-group-chrome--rail-comfortable')
   })
 
   it('applies primary rail tone', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'inset', tone: 'primary' })
-    expect(classes.body).toContain('before:bg-primary')
+    expect(classes.body).toContain('ui-field-rail--tone-primary')
+    expect(classes.body).not.toContain('ui-border--default')
     expect(classes.body).not.toContain('bg-surface-strong')
   })
 
@@ -67,7 +69,7 @@ describe('resolveFieldGroupChromeClassNames', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'outline' })
     expect(classes.fieldset).toBe('')
     expect(classes.body).toContain('rounded-md')
-    expect(classes.body).toContain('border-border-subtle')
+    expect(classes.body).toContain('ui-border--subtle')
     expect(classes.body).toContain('bg-transparent')
   })
 
@@ -79,16 +81,27 @@ describe('resolveFieldGroupChromeClassNames', () => {
     expect(classes.body).toContain('border-destructive')
   })
 
-  it('applies divider top padding and border', () => {
+  it('applies divider top chrome on the fieldset', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'divider', edge: 'top' })
-    expect(classes.fieldset).toContain('border-t')
-    expect(classes.fieldset).toContain('pt-7')
+    expect(classes.fieldset).toContain('ui-field-group-chrome--divider-top')
+    expect(classes.fieldset).toContain('ui-border--default')
+    expect(classes.fieldset).not.toContain('ui-field-group-chrome--divider-bottom')
   })
 
-  it('applies divider bottom padding and border', () => {
+  it('applies divider bottom chrome on the fieldset', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'divider', edge: 'bottom' })
-    expect(classes.fieldset).toContain('border-b')
-    expect(classes.fieldset).toContain('pb-7')
+    expect(classes.fieldset).toContain('ui-field-group-chrome--divider-bottom')
+    expect(classes.fieldset).toContain('ui-border--default')
+    expect(classes.fieldset).not.toContain('ui-field-group-chrome--divider-top')
+  })
+
+  it('applies subtle divider strength', () => {
+    const classes = resolveFieldGroupChromeClassNames({
+      variant: 'divider',
+      edge: 'top',
+      strength: 'subtle',
+    })
+    expect(classes.fieldset).toContain('ui-border--subtle')
   })
 
   it('applies callout info classes on the body', () => {
@@ -104,9 +117,19 @@ describe('resolveFieldGroupChromeClassNames', () => {
       edge: 'top',
       tone: 'primary',
     })
-    expect(classes.fieldset).toContain('border-t-2')
-    expect(classes.fieldset).toContain('border-primary')
-    expect(classes.fieldset).toContain('pt-4')
+    expect(classes.fieldset).toContain('ui-field-group-chrome--accent-top')
+    expect(classes.fieldset).toContain('ui-field-group-chrome--accent-top-tone-primary')
+  })
+
+  it('applies neutral accent top via border strength', () => {
+    const classes = resolveFieldGroupChromeClassNames({
+      variant: 'accent',
+      edge: 'top',
+      tone: 'neutral',
+    })
+    expect(classes.fieldset).toContain('ui-field-group-chrome--accent-top')
+    expect(classes.fieldset).toContain('ui-border--default')
+    expect(classes.fieldset).not.toContain('ui-field-group-chrome--accent-top-tone-primary')
   })
 
   it('applies accent legend rail classes', () => {
@@ -115,7 +138,26 @@ describe('resolveFieldGroupChromeClassNames', () => {
       edge: 'legendRail',
       tone: 'primary',
     })
-    expect(classes.legend).toContain('before:bg-primary')
-    expect(classes.legend).toContain('w-full')
+    expect(classes.legend).toContain('ui-field-group-chrome__legend-rail')
+    expect(classes.legend).toContain('ui-field-group-chrome__legend-rail--tone-primary')
+  })
+
+  it('applies neutral legend rail with border strength on host', () => {
+    const classes = resolveFieldGroupChromeClassNames({
+      variant: 'accent',
+      edge: 'legendRail',
+      tone: 'neutral',
+    })
+    expect(classes.legend).toContain('ui-border--default')
+    expect(classes.legend).toContain('ui-field-group-chrome__legend-rail--tone-neutral')
+  })
+
+  it('applies status accent on legend rail', () => {
+    const classes = resolveFieldGroupChromeClassNames({
+      variant: 'accent',
+      edge: 'legendRail',
+      tone: 'warning',
+    })
+    expect(classes.legend).toContain('ui-field-group-chrome__legend-rail--tone-warning')
   })
 })

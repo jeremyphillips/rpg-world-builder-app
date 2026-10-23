@@ -1,8 +1,8 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { cardBorderClasses } from './card.variants'
-import { establishSurfaceCurrent } from './surface-current.lib'
+import { borderStrength } from './border-strength'
+import { dialogPanelFill, dialogPanelGeometry } from './dialog-panel.variants'
 
 /**
  * The dimming scrim behind a modal. Uses the `--overlay` design token (never a
@@ -10,9 +10,8 @@ import { establishSurfaceCurrent } from './surface-current.lib'
  * Shared by the `Modal` and `ConfirmDialog` primitives so the backdrop stays
  * consistent.
  */
-export const modalOverlayVariants = cva(
-  'fixed inset-0 z-50 bg-overlay data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-)
+export const modalOverlayClasses =
+  'fixed inset-0 z-50 bg-overlay data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0'
 
 /**
  * Reserved block-size for `Modal.Content layout="stable" stableSize="default"`.
@@ -45,9 +44,10 @@ export const modalFooterDockClasses = 'shrink-0'
  */
 export const modalContentVariants = cva(
   cn(
-    'fixed left-1/2 top-1/2 z-50 flex max-h-[85vh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-lg bg-background text-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-    cardBorderClasses,
-    establishSurfaceCurrent('background'),
+    'ui-dialog-panel fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+    dialogPanelFill('background'),
+    dialogPanelGeometry('frame'),
+    borderStrength(),
   ),
   {
     variants: {

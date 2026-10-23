@@ -2,8 +2,6 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import {
-  alertDescriptionVariants,
-  alertTitleVariants,
   alertVariants,
   type AlertAnnouncement,
   type AlertDensity,
@@ -69,12 +67,12 @@ export function Alert({
         {hasCopy ? (
           <div className="ui-alert__copy">
             {title ? (
-              <p className={alertTitleVariants()} data-slot="alert-title">
+              <p className="ui-alert__title ui-copy-title" data-slot="alert-title">
                 {title}
               </p>
             ) : null}
             {description ? (
-              <p className={alertDescriptionVariants()} data-slot="alert-description">
+              <p className="ui-alert__description ui-copy-supporting" data-slot="alert-description">
                 {description}
               </p>
             ) : null}

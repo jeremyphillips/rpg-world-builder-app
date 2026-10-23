@@ -2,6 +2,8 @@
 
 Permanent rules for composing, extending, and owning UI. Semantic CSS is the inspectability layer on those owners. It is not the goal by itself.
 
+Repo-wide summary for agents: [AGENTS.md](../../../AGENTS.md#styling-conventions).
+
 The goal is to eliminate hand-rolled implementations of established UI patterns, while keeping feature-specific compositions and genuinely unique interfaces. A domain component such as `QuickNpcBuildCard` stays a domain component. It composes shared primitives for border, padding, hover, selection, and typography instead of implementing them itself.
 
 Migration inventory, classification, and wave status live in [semantic-css-migration.md](./semantic-css-migration.md) and leave this document when the migration ends. Technical class conventions live in [semantic-control-css.md](./semantic-control-css.md). Fine-grained presentation recipes live in [semantic-style-layers.md](./semantic-style-layers.md). Tone, emphasis, and elevation live in [visual-vocabulary.md](./visual-vocabulary.md).
@@ -28,7 +30,7 @@ The rule prohibits duplicated styling ownership. It does not require identical c
 | Shared semantic styling primitive | Styling matches, but DOM structure or behavior differs                  |
 | Domain-specific implementation    | The pattern is genuinely unique (record it as an intentional exception) |
 
-Styling primitives must be exportable. Every owner whose styling may be reused without its component exposes its semantic classes through a function — for example `cardSurfaceVariants({ … })` returns `ui-card ui-card--…`. For **button-shaped navigation**, use `ButtonLink` (app supplies the router link via `link`); `resolveButtonAppearance()` and `buttonVariants()` remain for styling-only or non-navigation cases. See [button-link.md](./button-link.md).
+Reusable styling without the full component is exposed through **conditional** resolvers — for example `cardSurfaceVariants({ … })` returns `ui-card ui-card--…`. Fixed element classes stay on the owning JSX. For **button-shaped navigation**, use `ButtonLink` (app supplies the router link via `link`); `resolveButtonAppearance()` and `buttonVariants()` remain for styling-only or non-navigation cases. See [button-link.md](./button-link.md).
 
 `EntityCardFrame` shares the **inset** ladder (`--ui-card-inset-*` via `ui-card--compact|comfortable` on the frame) with generic `Card` and option cards. The legacy `ContentCard` article shell is retired. Generic `Card` also publishes shared copy vars (`--ui-copy-title-size` via `copy-scale.css`) and `spacious` inset; hub tiles can pair `Card` with `IdentityRowHeadingLine` without a separate density wrapper. Entity frames use `ContentCardDensity` only (no `spacious`, separate title typography via `contentCardHeadingScaleClass` on `EntitySummaryHeading`).
 
@@ -46,6 +48,14 @@ Introduce a shared variant when it represents a stable, meaningful dimension of 
 - **Semantic CSS** is for a reusable component's appearance, sizing, geometry, and interaction states. Components use `ui-*` blocks in `@rpg/ui` and `dash-*` blocks for dashboard-owned shared compositions.
 - **Tailwind utilities** are for one-off composition and layout that the consumer intentionally owns (`flex items-center gap-2`). Do not replace utility sprawl with a parallel catalog of semantic classes for trivial layouts.
 - **Typography roles** stay single-class `@utility` composites (`heading-style-*`, `text-style-*`). They already meet the inspector goal and apply to arbitrary elements.
+
+### Semantic class ownership
+
+- Fixed BEM anatomy and modifiers belong on the element the owning component renders. A static `cn()` constant is not a substitute for an empty `cva()`.
+- Do not apply another component’s element class from a consumer; compose the owner, use local layout, or record an explicit cross-owner contract in this document.
+- Export a function when arguments select modifiers, or when one state must apply several classes together (for example `cardSurfaceVariants`, `dataTableUnavailableAppearance`).
+- A `*.variants.ts` file requires a real variant axis. `ClassReference` specs and twMerge group lists are inspection metadata, not runtime class registries.
+- Styling primitives that may be reused without their component expose **conditional** classes through resolvers (`cardSurfaceVariants`, `interactiveRowVariants`) — not through zero-argument aliases of a single selector.
 
 ## Ownership registry
 
@@ -101,12 +111,16 @@ The registry records gaps ("No owner yet") explicitly. It grows only when a fami
 | Surfaces   | Catalog picker single-choice rows | `CatalogCard` (`selection`)                       | Leading radio utility; mutually exclusive with trailing actions                                                                                                                                                                                            |
 | Surfaces   | Entity card perimeter (dashboard) | `EntityCardFrame`                                 | `cardSurfaceVariants` + `dash-entity-card` modifiers; publishes inset tokens                                                                                                                                                                               |
 | Surfaces   | Entity card (dashboard)           | `EntityCard` → static / disclosure renderers      | Public facade; internal `EntityCardStaticRenderer` / `EntityCardDisclosureRenderer` compose `EntityCardFrame`; `EntityCardContent` owns `dash-entity-card__content`                                                                                        |
-| Rows       | Interactive row states            | `InteractiveRow`                                  | Styling primitive for hover, selection, and disabled states                                                                                                                                                                                                |
-| Rows       | List container and rows           | `InteractiveList`                                 | Composes `InteractiveRow`                                                                                                                                                                                                                                  |
+| Rows       | Interactive row states            | `InteractiveRow`                                  | Styling primitive for hover, selection, and disabled fills (not layout)                                                                                                                                                                                    |
+| Rows       | Selection list container and rows | `InteractiveList` / `InteractiveListRow`          | Listbox, combobox, and picker rows — surface ladder + accent rail; not action menus                                                                                                                                                                        |
+| Rows       | Action menu row (rich)            | `MenuChoiceRow`                                   | `DropdownMenuItem` + `DropdownMenuItemContent`; optional description; no `InteractiveList`                                                                                                                                                                 |
 | Rows       | Identity row (media + title)      | `IdentityRow`                                     | Uses `IdentityFrame`; presentation only                                                                                                                                                                                                                    |
 | Typography | Headings / eyebrows               | `Heading` / `Eyebrow`                             | Single-class `@utility` composites                                                                                                                                                                                                                         |
 | Typography | Body and supporting text          | `Text`                                            | Role composites (`text-style-*`)                                                                                                                                                                                                                           |
 | Typography | Inline status tone                | `SemanticText`                                    | Tone, emphasis, and icon; not a Text role                                                                                                                                                                                                                  |
+| Surfaces   | Preview aside anatomy             | `PreviewRail`                                     | Card chrome composes `Panel` quiet bleed. Plain chrome defers the perimeter to `Sheet`. Width belongs to the placement column.                                                                                                                             |
+| Surfaces   | Master-detail shells              | `Panel`                                           | Quiet bleed on the list and editor. Rows are quiet interactive `Card`. The viewport cap stays `master-detail-list-scroll.utilities.css`.                                                                                                                   |
+| Navigation | App nav column                    | Dashboard `Sidebar` and bench `Sidebar`           | Separate shells. Items use `sidebarNavItemVariants`. Static sections use `NavSection`. Collapsible campaign sections use `SidebarNavSectionDisclosure`.                                                                                                    |
 | Typography | Links                             | `Link`                                            | Uses the `text-action-*` utilities                                                                                                                                                                                                                         |
 
 A `variant="selection"` request routes to `SelectionOptionCard`, not `Card`, so Card does not become one giant generic component. Treat Card's information-and-navigation scope as a hypothesis that classification may revise. Record those revisions here when ownership actually changes.
@@ -124,6 +138,25 @@ For labeled footer or Alert action controls, pass explicit `size` from `resolveS
 | spacious       | `default` (md tier)                           |
 
 Heading-line badge accessories use a parallel ladder with `Badge` sizes — see [row-anatomy.md](./row-anatomy.md#heading-accessories). Form submit footers, icon-only controls, and footers with caller-chosen sizes are out of scope for this resolver.
+
+## Surface-relative borders
+
+Neutral border color has one recipe: `ui-border--subtle`, `ui-border--default`, and `ui-border--strong` ([border ladder](./design-tokens.md#border-ladder)). Each class mixes on the element’s `--surface-current` and publishes `--ui-border-color`. Width, style, side, and radius stay on the component. JSX one-offs use the Tailwind utilities (`border-border`, `border-border-subtle`), which mix on the element the same way. Do not add a second recipe.
+
+**Contrast reference**
+
+- Perimeter of a painted plane: that plane. Set `--surface-current` to the fill on the same element as the strength class.
+- Line on a transparent child (table body row, entity row-list group): the inherited parent plane. Do not give the child a new surface.
+- Shared grid line over a state wash (row hover, selected, unavailable): the table plane, not the wash. Do not rebind `--surface-current` on those states.
+- A cell that paints its own fill (header select and actions) uses that fill even when the body cell in the same column uses the table plane.
+
+`var(--border*)` is legitimate only as the `:root` alias and the `*` safety net in `globals.css`. It is not legitimate in component rules.
+
+Component CSS must not set `border-color`, or a `border` shorthand that includes a color, on an element that also has `ui-border--*`. A later file of equal specificity would replace the strength color. State colors (primary selected, status tones) may override `--ui-border-color` or `border-color` in a more specific rule. That is the card selected pattern. When another owner already sets `border-color` on that element (interactive row defaults to transparent), keep the edge with a more specific side longhand of `var(--ui-border-color)`. That is the data-table body separator.
+
+When a component already owns `border-color` through its own variable (inactive interactive row), point that variable at `var(--ui-border-color)` and put the strength class on the element. Do not assign `var(--border-subtle)`.
+
+Header and body segments of one vertical rule may differ by a mix step because their fills differ. DataTable still owns bands. Filter region and utility bar still own their chrome. `DataTableFilterChrome` still owns filter presentation.
 
 ## Exception policy
 

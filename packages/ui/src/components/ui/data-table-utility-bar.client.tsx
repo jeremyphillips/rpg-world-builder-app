@@ -3,13 +3,7 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
-import {
-  dataTableUtilityBarActionsRowVariants,
-  dataTableUtilityBarLeadingVariants,
-  dataTableUtilityBarSummaryRowVariants,
-  dataTableUtilityBarTrailingVariants,
-  dataTableUtilityBarVariants,
-} from './data-table-utility-bar.variants'
+import { borderStrength } from './border-strength'
 
 export type DataTableUtilityBarProps = {
   summary?: ReactNode
@@ -40,22 +34,24 @@ export function DataTableUtilityBar({
   }
 
   return (
-    <div className={cn(dataTableUtilityBarVariants(), className)}>
+    <div className={cn('flex flex-col', className)}>
       {showSummaryRow ? (
-        <div className={dataTableUtilityBarSummaryRowVariants()}>{summary}</div>
+        <div className="ui-data-table__utility-summary text-style-supporting">{summary}</div>
       ) : null}
       {showActionsRow ? (
-        <div className={dataTableUtilityBarActionsRowVariants()}>
+        <div className={cn('ui-data-table__utility-actions', borderStrength())}>
           {hasRenderableContent(leadingActions) ? (
             <div
-              className={dataTableUtilityBarLeadingVariants()}
+              className="flex min-w-0 flex-wrap items-center gap-2"
               style={leadingInset ? { paddingInlineStart: leadingInset } : undefined}
             >
               {leadingActions}
             </div>
           ) : null}
           {hasRenderableContent(trailingActions) ? (
-            <div className={dataTableUtilityBarTrailingVariants()}>{trailingActions}</div>
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-1">
+              {trailingActions}
+            </div>
           ) : null}
         </div>
       ) : null}

@@ -9,11 +9,11 @@ export type PanelDensity = (typeof PANEL_DENSITIES)[number]
 export const panelVariants = cva('ui-panel', {
   variants: {
     tone: {
-      transparent: 'ui-panel--transparent',
-      quiet: 'ui-panel--quiet',
-      subtle: 'ui-panel--subtle',
-      strong: 'ui-panel--strong',
-      faint: 'ui-panel--faint',
+      transparent: 'ui-panel--transparent ui-border--subtle',
+      quiet: 'ui-panel--quiet ui-border--default',
+      subtle: 'ui-panel--subtle ui-border--default',
+      strong: 'ui-panel--strong ui-border--default',
+      faint: 'ui-panel--faint ui-border--default',
     },
     density: {
       compact: 'ui-panel--compact',

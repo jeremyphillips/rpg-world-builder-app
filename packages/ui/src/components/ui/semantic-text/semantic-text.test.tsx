@@ -13,8 +13,7 @@ describe('SemanticText', () => {
     render(<SemanticText tone={tone}>Label</SemanticText>)
     const el = screen.getByText('Label')
     expect(el.tagName).toBe('SPAN')
-    const expectedToneClass = tone === 'info' ? 'text-semantic-info' : `text-semantic-${tone}`
-    expect(el).toHaveClass(expectedToneClass)
+    expect(el).toHaveClass('ui-semantic-text', `ui-semantic-text--${tone}`)
   })
 
   it('uses info-muted for info low emphasis', () => {
@@ -24,8 +23,8 @@ describe('SemanticText', () => {
       </SemanticText>,
     )
     const el = screen.getByText('Standard gear')
-    expect(el).toHaveClass('text-semantic-info-muted', 'font-normal')
-    expect(el).not.toHaveClass('text-semantic-info')
+    expect(el).toHaveClass('ui-semantic-text--info', 'ui-semantic-text--emphasis-low')
+    expect(el).not.toHaveClass('ui-semantic-text--emphasis-medium')
   })
 
   it('keeps info token for medium and high emphasis', () => {
@@ -34,24 +33,45 @@ describe('SemanticText', () => {
         Spellcasting focus
       </SemanticText>,
     )
-    expect(screen.getByText('Spellcasting focus')).toHaveClass('text-semantic-info', 'font-medium')
+    expect(screen.getByText('Spellcasting focus')).toHaveClass(
+      'ui-semantic-text--info',
+      'ui-semantic-text--emphasis-medium',
+    )
 
     rerender(
       <SemanticText tone="info" emphasis="high">
         Essential
       </SemanticText>,
     )
-    expect(screen.getByText('Essential')).toHaveClass('text-semantic-info', 'font-semibold')
+    expect(screen.getByText('Essential')).toHaveClass(
+      'ui-semantic-text--info',
+      'ui-semantic-text--emphasis-high',
+    )
   })
 
   it.each(EMPHASES)('applies %s emphasis via font weight', (emphasis) => {
     render(<SemanticText emphasis={emphasis}>Label</SemanticText>)
     const weightClass =
-      emphasis === 'low' ? 'font-normal' : emphasis === 'medium' ? 'font-medium' : 'font-semibold'
+      emphasis === 'low'
+        ? 'ui-semantic-text--emphasis-low'
+        : emphasis === 'medium'
+          ? 'ui-semantic-text--emphasis-medium'
+          : 'ui-semantic-text--emphasis-high'
     expect(screen.getByText('Label')).toHaveClass(weightClass)
   })
 
-  it('wraps icons with leading-none and sizes descendant SVGs', () => {
+  it('keeps a text-sm override on the element', () => {
+    render(
+      <SemanticText tone="success" className="text-sm">
+        Updated
+      </SemanticText>,
+    )
+    const el = screen.getByText('Updated')
+    expect(el).toHaveClass('ui-semantic-text', 'text-sm')
+    expect(el).not.toHaveClass('ui-semantic-text--sm')
+  })
+
+  it('wraps icons in the semantic icon slot', () => {
     const { container } = render(
       <SemanticText icon={<TriangleAlert data-testid="icon" />} tone="warning">
         Warning
@@ -59,10 +79,10 @@ describe('SemanticText', () => {
     )
 
     const root = screen.getByText('Warning')
-    expect(root).toHaveClass('items-start', 'gap-2')
+    expect(root).toHaveClass('ui-semantic-text--with-icon')
 
     const iconWrapper = container.querySelector('[aria-hidden="true"]')
-    expect(iconWrapper).toHaveClass('leading-none', '[&>svg]:size-icon-inline')
+    expect(iconWrapper).toHaveClass('ui-semantic-text__icon')
     expect(screen.getByTestId('icon')).toBeInTheDocument()
   })
 

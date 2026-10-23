@@ -20,7 +20,7 @@ describe('DataTableFilterRegion', () => {
     )
 
     expect(screen.queryByRole('button', { name: /additional filters/i })).not.toBeInTheDocument()
-    const panel = screen.getByTestId('primary-field').closest('.bg-surface-subtle')
+    const panel = screen.getByTestId('primary-field').closest('.ui-data-table__filter-region')
     expect(panel?.querySelector('.border-b')).toBeNull()
     expect(container.querySelector('.bg-surface-muted')).toBeNull()
   })
@@ -53,13 +53,13 @@ describe('DataTableFilterRegion', () => {
     expect(screen.queryByRole('button', { name: 'Collapse' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /more filters/i })).not.toBeInTheDocument()
 
-    const panel = screen.getByTestId('primary-field').closest('.bg-surface-subtle')
+    const panel = screen.getByTestId('primary-field').closest('.ui-data-table__filter-region')
     expect(panel?.querySelector('.border-b')).toBeTruthy()
 
     await user.click(disclosure)
 
     const advancedField = screen.getByTestId('advanced-field')
-    expect(advancedField.closest('.bg-surface-subtle')).toBe(panel)
+    expect(advancedField.closest('.ui-data-table__filter-region')).toBe(panel)
     expect(advancedField.closest('.bg-surface-muted')).toBeNull()
     expect(screen.getByRole('button', { name: /additional filters/i })).toHaveAttribute(
       'aria-expanded',

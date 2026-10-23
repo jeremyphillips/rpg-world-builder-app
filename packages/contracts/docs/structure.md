@@ -321,8 +321,9 @@ Domain subfolders meet the stable-responsibility threshold; do not add `utils/` 
 `helpers/` under `lib/`.
 
 Domain-local short names inside folders (e.g. `character/eligibility-contracts.ts`);
-the `campaign/index.ts` barrel preserves external symbol names for
-`@rpg/contracts` consumers.
+the `campaign/index.ts` barrel re-exports stable names for in-repo apps (api,
+dashboard, …). “Consumers” means monorepo workspaces only — not a published npm
+API.
 
 Named authored RPG records share `authoredContentBodySchema` from
 `rpg/primitives/authored-content.ts` (`name`, optional rich-text `description`,

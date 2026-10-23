@@ -1,14 +1,27 @@
-import { cva } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
-import { resolveCompactControlTabsTriggerClasses } from './compact-control.styles'
+export const TABS_VARIANTS = ['line', 'pill', 'none'] as const
 
-export const tabsListVariants = cva('inline-flex items-center', {
+export type TabsVariant = (typeof TABS_VARIANTS)[number]
+
+/** twMerge group — tabs list appearance modifiers. */
+export const UI_TABS_LIST_APPEARANCE_CLASSES = [
+  'ui-tabs__list--line',
+  'ui-tabs__list--pill',
+] as const
+
+/** twMerge group — tabs trigger appearance modifiers. */
+export const UI_TABS_TRIGGER_APPEARANCE_CLASSES = [
+  'ui-tabs__trigger--line',
+  'ui-tabs__trigger--pill',
+] as const
+
+export const tabsListVariants = cva('ui-tabs__list', {
   variants: {
     variant: {
-      line: 'w-full border-b border-border gap-0 text-muted-foreground',
-      pill: 'h-9 rounded-lg bg-segmented-track p-1 gap-1',
-      plain: 'flex h-auto w-full flex-col gap-0 bg-transparent p-0 text-muted-foreground',
+      line: 'ui-tabs__list--line ui-border--default',
+      pill: 'ui-tabs__list--pill',
+      none: '',
     },
   },
   defaultVariants: {
@@ -16,27 +29,35 @@ export const tabsListVariants = cva('inline-flex items-center', {
   },
 })
 
-export const tabsTriggerVariants = cva(
-  'inline-flex cursor-pointer items-center justify-center whitespace-nowrap text-style-label transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-  {
-    variants: {
-      variant: {
-        line: 'relative h-9 px-4 pb-2 pt-1 text-muted-foreground hover:text-foreground data-[state=active]:text-foreground data-[state=active]:after:absolute data-[state=active]:after:inset-x-0 data-[state=active]:after:-bottom-px data-[state=active]:after:h-0.5 data-[state=active]:after:rounded-full data-[state=active]:after:bg-primary',
-        pill: cn(
-          resolveCompactControlTabsTriggerClasses('pill'),
-          'rounded-md text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
-        ),
-        plain:
-          'relative inline-flex h-auto whitespace-normal p-0 text-muted-foreground hover:text-foreground data-[state=active]:text-foreground',
-      },
-    },
-    defaultVariants: {
-      variant: 'line',
+export const tabsTriggerVariants = cva('ui-tabs__trigger ui-focus-ring', {
+  variants: {
+    variant: {
+      line: 'ui-tabs__trigger--line',
+      pill: 'ui-tabs__trigger--pill',
+      none: '',
     },
   },
-)
+  defaultVariants: {
+    variant: 'line',
+  },
+})
 
-export type TabsVariant = 'line' | 'pill' | 'plain'
+export const TABS_CLASS_SPECS = [
+  {
+    key: 'line',
+    listClassName: tabsListVariants({ variant: 'line' }),
+    triggerClassName: tabsTriggerVariants({ variant: 'line' }),
+    keyValues: 'full-width rule, primary active indicator',
+    useCase: 'Section navigation (detail, create modal)',
+  },
+  {
+    key: 'pill',
+    listClassName: tabsListVariants({ variant: 'pill' }),
+    triggerClassName: tabsTriggerVariants({ variant: 'pill' }),
+    keyValues: 'segmented track, raised active segment',
+    useCase: 'Compact mode switching (markdown, link picker)',
+  },
+] as const
 
-/** Space between the tab list and panel content. */
-export const tabsContentSpacingClasses = 'mt-6'
+export type TabsListVariantProps = VariantProps<typeof tabsListVariants>
+export type TabsTriggerVariantProps = VariantProps<typeof tabsTriggerVariants>

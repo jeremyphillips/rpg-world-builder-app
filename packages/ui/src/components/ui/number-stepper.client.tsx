@@ -48,6 +48,7 @@ function NumberStepperValueSlot({
   autoFocus,
   onBlur,
   onChange,
+  ariaInvalid,
 }: {
   signDisplay: NumberStepperSignDisplay
   resolvedValue: number
@@ -68,6 +69,7 @@ function NumberStepperValueSlot({
   autoFocus?: boolean
   onBlur?: React.FocusEventHandler<HTMLInputElement>
   onChange?: React.ChangeEventHandler<HTMLInputElement>
+  ariaInvalid?: React.AriaAttributes['aria-invalid']
 }) {
   const inputProps = {
     ref: inputRef,
@@ -76,6 +78,7 @@ function NumberStepperValueSlot({
     ...(ariaValueText ? { 'aria-valuetext': ariaValueText } : {}),
     disabled: stepperLocked,
     readOnly: stepperLocked,
+    'aria-invalid': ariaInvalid,
     tabIndex: stepperLocked ? (-1 as const) : undefined,
     autoFocus: stepperLocked ? undefined : autoFocus,
     onBlur,
@@ -144,6 +147,7 @@ function NumberStepperControl({
   ariaLabel,
   autoFocus,
   onBlur,
+  ariaInvalid,
 }: {
   value: number
   onChange: (value: number) => void
@@ -160,6 +164,7 @@ function NumberStepperControl({
   ariaLabel: string
   autoFocus?: boolean
   onBlur?: React.FocusEventHandler<HTMLInputElement>
+  ariaInvalid?: React.AriaAttributes['aria-invalid']
 }) {
   const fieldSize = useFieldControlSize()
   const resolvedSize = resolveNumberStepperSize(size, fieldSize)
@@ -188,6 +193,7 @@ function NumberStepperControl({
         numberStepperRootWidthClass(resolvedSize, digits, usesPrefix),
         className,
       )}
+      aria-invalid={ariaInvalid}
     >
       <NumberStepperDecreaseButton
         resolvedSize={resolvedSize}
@@ -210,6 +216,7 @@ function NumberStepperControl({
         autoFocus={autoFocus}
         onBlur={onBlur}
         onChange={interaction.handleInputChange}
+        ariaInvalid={ariaInvalid}
       />
 
       <NumberStepperIncreaseButton
@@ -243,6 +250,7 @@ export interface NumberStepperProps extends NumberStepperVariantProps {
   id?: string
   className?: string
   'aria-label': string
+  'aria-invalid'?: React.AriaAttributes['aria-invalid']
   autoFocus?: boolean
   onBlur?: React.FocusEventHandler<HTMLInputElement>
 }
@@ -263,6 +271,7 @@ export function NumberStepper({
   id,
   className,
   'aria-label': ariaLabel,
+  'aria-invalid': ariaInvalid,
   autoFocus,
   onBlur,
 }: NumberStepperProps) {
@@ -281,6 +290,7 @@ export function NumberStepper({
       signDisplay={signDisplay}
       className={className}
       ariaLabel={label ?? ariaLabel}
+      ariaInvalid={ariaInvalid}
       autoFocus={autoFocus}
       onBlur={onBlur}
     />

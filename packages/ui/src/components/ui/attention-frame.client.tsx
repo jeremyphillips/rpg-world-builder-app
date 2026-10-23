@@ -3,7 +3,6 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { attentionFrameVariants } from './attention-frame.variants'
 
 export const ATTENTION_FRAME_DURATION_MS = 1500
 export const ATTENTION_FRAME_REDUCED_MOTION_HOLD_MS = 100
@@ -46,7 +45,10 @@ export function AttentionFrame({
   }, [active, onAttentionComplete])
 
   return (
-    <div className={cn(attentionFrameVariants({ active }), className)} {...props}>
+    <div
+      className={cn('ui-attention-frame', active && 'ui-attention-frame--active', className)}
+      {...props}
+    >
       {children}
     </div>
   )

@@ -77,7 +77,7 @@ const PTAG_OPEN_RE = /<p\b(?:[^>"']|"[^"]*"|'[^']*')*>/g
 
 const HEADING_STYLE_UTILITY_RE = /\bheading-style-[a-z0-9-]+\b/
 
-const P_TAG_CARD_DESCRIPTION_CLASS_RE = /\bUI_CARD_DESCRIPTION_CLASS\b/
+const P_TAG_CARD_DESCRIPTION_CLASS_RE = /\bui-card__description\b/
 
 function parseVariantFromTag(flat: string): string {
   const doubleQuoted = flat.match(/variant="([^"]+)"/)?.[1]

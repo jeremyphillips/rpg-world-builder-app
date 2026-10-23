@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { globalSearchPageResultsShellClasses } from '../../lib/global-search-surface.variants'
 import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../../lib/rank-global-search'
+import { GlobalSearchResultsPanel } from '../global-search-results-panel'
 import { GlobalSearchGroupSection } from './global-search-group-section'
 
 const truncatedSection: GlobalSearchGroupSectionModel = {
@@ -57,9 +57,9 @@ export const PageContext: Story = {
   decorators: [
     (Story) => (
       <div className="mx-auto max-w-4xl">
-        <div className={globalSearchPageResultsShellClasses}>
+        <GlobalSearchResultsPanel>
           <Story />
-        </div>
+        </GlobalSearchResultsPanel>
       </div>
     ),
   ],
@@ -75,9 +75,9 @@ export const PageContext: Story = {
 export const PanelContext: Story = {
   decorators: [
     (Story) => (
-      <div className={`w-96 ${globalSearchPageResultsShellClasses}`}>
+      <GlobalSearchResultsPanel className="w-96">
         <Story />
-      </div>
+      </GlobalSearchResultsPanel>
     ),
   ],
   args: PageContext.args,

@@ -62,14 +62,16 @@
 
     /* Border-only on inherited surface; interaction mixes from transparent rest plane */
     &.ui-card--transparent {
-      border: 1px solid var(--border);
+      border-width: 1px;
+      border-style: solid;
       --ui-surface-bg: transparent;
       background-color: transparent;
     }
 
     /* Drawer / catalog entity rows */
     &.ui-card--quiet {
-      border: 1px solid var(--border);
+      border-width: 1px;
+      border-style: solid;
       --ui-surface-bg: var(--surface-lift);
       --surface-current: var(--surface-lift);
       background-color: var(--ui-surface-bg);
@@ -77,7 +79,8 @@
 
     /* Light wash between lift and strong */
     &.ui-card--subtle {
-      border: 1px solid var(--border);
+      border-width: 1px;
+      border-style: solid;
       --ui-surface-bg: var(--surface-subtle);
       --surface-current: var(--surface-subtle);
       background-color: var(--ui-surface-bg);
@@ -85,7 +88,8 @@
 
     /* Builder options, selection cards, default navigation chrome */
     &.ui-card--strong {
-      border: 1px solid var(--border);
+      border-width: 1px;
+      border-style: solid;
       --ui-surface-bg: var(--surface-strong);
       --surface-current: var(--surface-strong);
       background-color: var(--ui-surface-bg);
@@ -128,12 +132,12 @@
         .ui-card--strong
       ) {
       background-color: var(--ui-surface-selected-bg);
-      border-color: var(--primary);
+      --ui-border-color: var(--primary);
       --surface-current: var(--ui-surface-selected-bg);
     }
 
     &.ui-card--strong.ui-card--interactive:not(.ui-card--selected):not(.ui-card--disabled):hover {
-      border-color: var(--primary);
+      --ui-border-color: var(--primary);
     }
 
     &.ui-card--strong.ui-card--selected {

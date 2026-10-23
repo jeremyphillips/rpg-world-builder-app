@@ -1,16 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Table2 } from 'lucide-react'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import {
   emptyStateWellSupportingClasses,
   emptyStateWellTitleClasses,
 } from './empty-state-well.variants'
 import { InsetPanel } from './inset-panel.client'
+import { INSET_PANEL_CLASS_SPECS } from './inset-panel.variants'
 
 const meta = {
   title: 'Primitives/InsetPanel',
   component: InsetPanel,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', semanticClasses: true },
   args: {
     children: (
       <InsetPanel.Text>
@@ -129,3 +131,24 @@ export const DashedGate = InstructionalGate
 
 /** @deprecated Story alias — use PassiveMessageEmpty */
 export const DashedEmpty = PassiveMessageEmpty
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={INSET_PANEL_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <div data-semantic-class-target className={spec.className}>
+            {spec.useCase}
+          </div>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
+}

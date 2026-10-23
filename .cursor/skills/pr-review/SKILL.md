@@ -77,6 +77,9 @@ or stale.
 - New env var, seed, or build/export gate omitted from setup/docs
 - Feature barrel (`index.ts`) not updated when cross-feature imports would break
 
+**Barrels:** in-repo only — do not flag `index.ts` churn as semver/breaking
+change; flag missing wiring only (bullets above). → [AGENTS.md § Project stage](../../../AGENTS.md#project-stage).
+
 Downgrade to Medium when the PR is explicitly single-layer scoped with
 documented follow-up (comment, ticket, or plan reference).
 
@@ -84,17 +87,26 @@ documented follow-up (comment, ticket, or plan reference).
 
 Flag **changed code** that:
 
-- Overrides a semantic variant with utility classes
-- Repeats an established class stack instead of using variants
-- Bypasses an existing primitive
+- Overrides a semantic variant or `ui-*` / `dash-*` class with ad-hoc utility stacks
+- Repeats an established chrome or typography stack instead of the shared primitive,
+  semantic class, or `Text` / `text-style-*` role
+- Bypasses an existing primitive (`Card`, `Panel`, `Alert`, entity surfaces, field chrome)
 - Introduces raw color/font/spacing values where design tokens exist
-- Adds one-off styling where repo convention requires CVA/variants
+- Adds a new `*.variants.ts` (or equivalent) that only hides static Tailwind with no
+  meaningful variant axis
+- Duplicates styling ownership that [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md)
+  assigns to `@rpg/ui` or dashboard shared surfaces
 
-Do **not** flag every inline class — only when the PR introduces or expands a
-pattern that defeats established scaffolding. Downgrade to Medium when styling
-is strictly local (single call site, no second consumer expected).
+Do **not** flag every inline class — layout utilities (`flex`, `gap-*`, grid tracks)
+in JSX are expected per [AGENTS.md](../../../AGENTS.md#styling-conventions). Flag only
+when the PR introduces or expands a pattern that defeats established scaffolding.
+Downgrade to Medium when styling is strictly local (single call site, no second consumer
+expected).
 
-Detail → [`packages/ui/docs/design-tokens.md`](../../../packages/ui/docs/design-tokens.md).
+Detail → [AGENTS.md § Styling conventions](../../../AGENTS.md#styling-conventions),
+[ui-architecture.md](../../../packages/ui/docs/ui-architecture.md),
+[semantic-style-layers.md](../../../packages/ui/docs/semantic-style-layers.md),
+[design-tokens.md](../../../packages/ui/docs/design-tokens.md) (color and surfaces).
 
 ## Secondary lenses
 
@@ -191,8 +203,12 @@ Do not add informational praise, coverage summaries, or duplicate merge-blocker 
 
 ## Repo pointers
 
-- [`AGENTS.md`](../../../AGENTS.md) — types, tokens, feature boundaries, auth, quality gates
+- [`AGENTS.md`](../../../AGENTS.md) — types, feature boundaries, auth, quality gates;
+  [§ Styling conventions](../../../AGENTS.md#styling-conventions) for semantic CSS, CVA, and tokens
+- [`ui-architecture.md`](../../../packages/ui/docs/ui-architecture.md) — component ownership and reuse
+- [`semantic-style-layers.md`](../../../packages/ui/docs/semantic-style-layers.md) — layer policy (cards, rows, controls)
+- [`design-tokens.md`](../../../packages/ui/docs/design-tokens.md) — color layers, surfaces, field chrome (not full styling policy)
 - [`new-content-type`](../new-content-type/SKILL.md) — catalog type layer completeness
 - [`feature-structure.md`](../../../apps/dashboard/docs/feature-structure.md)
-- [`feature-conventions.md`](../../../apps/dashboard/docs/feature-conventions.md)
-- [`design-tokens.md`](../../../packages/ui/docs/design-tokens.md)
+- [`feature-conventions.md`](../../../apps/dashboard/docs/feature-conventions.md) — includes [§ Styling](../../../apps/dashboard/docs/feature-conventions.md#styling)
+- [`card-guide.md`](../../../apps/dashboard/docs/card-guide.md) — card vs row vs entity surface selection

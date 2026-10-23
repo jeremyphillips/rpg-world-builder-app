@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { Text } from './text'
-
-import { ActionIcon, iconGhostControlVariants } from '@rpg/ui'
+import { ActionIcon, iconGhostControlVariants, Text } from '@rpg/ui'
 
 import type { EntityAnatomyTrailing } from '../../../../anatomy/entity-anatomy-trailing.types'
 import { EntityCardDisclosureRenderer } from '../entity-card-disclosure-renderer'

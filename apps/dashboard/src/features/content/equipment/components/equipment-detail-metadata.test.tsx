@@ -43,7 +43,7 @@ describe('EquipmentDetailMetadata', () => {
       <EquipmentDetailMetadata viewModel={longswordDetail} omitSectionTitle statRowSize="sm" />,
     )
 
-    expect(screen.getByText(/^Category/).closest('dl')).toHaveClass('text-sm')
+    expect(screen.getByText(/^Category/).closest('dl')).toHaveClass('ui-metadata-list--sm')
   })
 
   it('renders picker disclosure descriptions at 14px and keeps detail pages at prose-md', () => {

@@ -46,7 +46,8 @@ describe('ActionBlockerReferences', () => {
     expect(screen.getByText('Morgran Stonebreaker')).toBeInTheDocument()
     expect(screen.getByText('Thorin Strakeln')).toBeInTheDocument()
     expect(screen.queryByText(/Used by \d+ active character/)).not.toBeInTheDocument()
-    expect(screen.getByRole('list').closest('div')).toHaveClass('bg-destructive-subtle')
+    expect(screen.getByRole('list')).toBeInTheDocument()
+    expect(document.querySelector('.bg-destructive-subtle')).toBeNull()
   })
 
   it('shows the first usage group by default and keeps later groups collapsed', () => {

@@ -320,7 +320,10 @@ must use `@rpg/ui` typography exports. See
 
 ## Adding copy in apps
 
-1. Reach for `Heading` / `Text` / `RichTextContent` first.
-2. If a new scale is needed, add a named variant to `*.variants.ts` in
-   `@rpg/ui` rather than inline classes in app code.
+1. Reach for `Heading` / `Text` / `RichTextContent` first; use existing
+   `text-style-*` composites before inventing new stacks.
+2. If a new **typography axis** is needed (a stable role the design system should
+   own), add a named variant or `@utility` in `@rpg/ui` — not one-off `text-*`
+   classes in app code. Do not add `*.variants.ts` entries that only rename static
+   utilities; see [AGENTS.md](../../../AGENTS.md#styling-conventions).
 3. Run Storybook (light + dark) when touching prose or rich-text spacing.

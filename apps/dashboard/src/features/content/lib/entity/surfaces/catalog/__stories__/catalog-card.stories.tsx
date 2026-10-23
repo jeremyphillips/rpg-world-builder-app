@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { Button, Text } from '@rpg/ui'
-import { Text } from './text'
 
 import { CatalogCard } from '../catalog-card'
 import { CatalogEntityPickerSheet } from '../catalog-entity-picker-sheet'

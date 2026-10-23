@@ -6,7 +6,6 @@ import * as ToastPrimitive from '@radix-ui/react-toast'
 import { cn } from '../../lib/utils'
 import { ToastList } from './toast-managed.client'
 import { createToastStore, type ToastStore } from './toast-manager.client'
-import { toastModalViewportVariants } from './toast.variants'
 import { TOAST_MAX_VISIBLE } from './toast.constants'
 
 const ToastScopeContext = React.createContext<ToastStore | null>(null)
@@ -42,7 +41,9 @@ export function ToastScopeProvider({
       <ToastPrimitive.Provider swipeDirection="right">
         {children}
         <ToastList store={store} maxVisible={maxVisible} />
-        <ToastPrimitive.Viewport className={cn(toastModalViewportVariants(), viewportClassName)} />
+        <ToastPrimitive.Viewport
+          className={cn('ui-toast-viewport ui-toast-viewport--modal', viewportClassName)}
+        />
       </ToastPrimitive.Provider>
     </ToastScopeContext.Provider>
   )

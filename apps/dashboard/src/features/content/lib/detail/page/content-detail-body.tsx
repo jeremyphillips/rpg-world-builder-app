@@ -7,10 +7,6 @@ import {
 } from './content-detail-nav.constants'
 import { ContentDetailSection } from './content-detail-section'
 import { ContentDetailSectionNav } from './content-detail-section-nav'
-import {
-  contentDetailBodyColumnClasses,
-  contentDetailBodyShellClasses,
-} from './content-detail-layout.variants'
 
 export type ContentDetailBodyProps = {
   descriptionContent?: ReactNode
@@ -20,9 +16,9 @@ export type ContentDetailBodyProps = {
 export function ContentDetailBody({ descriptionContent, children }: ContentDetailBodyProps) {
   return (
     <ContentDetailNavProvider>
-      <div className={contentDetailBodyShellClasses}>
+      <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-start">
         <ContentDetailSectionNav />
-        <div className={contentDetailBodyColumnClasses}>
+        <div className="min-w-0 w-full flex-1 space-y-6">
           {descriptionContent ? (
             <ContentDetailSection
               heading={CONTENT_DETAIL_DESCRIPTION_LABEL}

@@ -1,5 +1,5 @@
 import type { CharacterCampaignBlockingIssue, CharacterCampaignWarning } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import { Alert } from '@rpg/ui'
 
 import {
   formatBlockingReason,
@@ -23,18 +23,7 @@ export function CampaignCharacterEligibilityAlert({
   const summary = formatComboboxBlockingDescription(blockingIssues)
 
   return (
-    <div
-      role="alert"
-      className="rounded-md border border-destructive-muted bg-destructive-subtle px-4 py-3"
-    >
-      <Text variant="destructive" className="font-medium">
-        {heading}
-      </Text>
-      {summary ? (
-        <Text variant="destructive" className="mt-2 text-sm">
-          {summary}
-        </Text>
-      ) : null}
+    <Alert variant="destructive" title={heading} description={summary}>
       {blockingIssues.length > 1 ? (
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-destructive">
           {blockingIssues.map((issue) => (
@@ -53,6 +42,6 @@ export function CampaignCharacterEligibilityAlert({
           />
         </div>
       ) : null}
-    </div>
+    </Alert>
   )
 }

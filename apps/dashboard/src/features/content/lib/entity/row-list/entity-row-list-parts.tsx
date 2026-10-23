@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ActionButton, Eyebrow, Text, cn } from '@rpg/ui'
+import { ActionButton, Eyebrow, Text, borderStrength, cn } from '@rpg/ui'
 
 import {
   detailCollectionGroupHeaderVariants,
@@ -15,13 +15,6 @@ import {
   normalizeEntityRowListStatus,
   resolveEntityRowListOverflowTriggerLabel,
 } from './entity-row-list-projection.lib'
-import {
-  entityRowListEmptyVariants,
-  entityRowListFooterVariants,
-  entityRowListGroupVariants,
-  entityRowListRootVariants,
-  entityRowListSupplementaryVariants,
-} from './entity-row-list.variants'
 
 export type EntityRowListAction = {
   label: string
@@ -105,7 +98,10 @@ export type EntityRowListEmptyProps = {
 
 export function EntityRowListEmpty({ emptyLabel, action }: EntityRowListEmptyProps) {
   return (
-    <div className={entityRowListEmptyVariants()} data-slot="entity-row-list-empty">
+    <div
+      className="flex flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2"
+      data-slot="entity-row-list-empty"
+    >
       {emptyLabel ? <Text variant="supporting">{emptyLabel}</Text> : null}
       {action ? <EntityRowListHeaderAction action={action} /> : null}
     </div>
@@ -118,7 +114,10 @@ export type EntityRowListFooterProps = {
 
 export function EntityRowListFooter({ action }: EntityRowListFooterProps) {
   return (
-    <div className={entityRowListFooterVariants()} data-slot="entity-row-list-footer">
+    <div
+      className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border-subtle px-4 py-2"
+      data-slot="entity-row-list-footer"
+    >
       <EntityRowListHeaderAction action={action} />
     </div>
   )
@@ -130,7 +129,7 @@ export type EntityRowListSupplementaryProps = {
 
 export function EntityRowListSupplementary({ children }: EntityRowListSupplementaryProps) {
   return (
-    <div className={entityRowListSupplementaryVariants()} data-slot="entity-row-list-supplementary">
+    <div className="px-4 py-2" data-slot="entity-row-list-supplementary">
       {children}
     </div>
   )
@@ -156,7 +155,7 @@ export function EntityRowListRoot({
   }
 
   return (
-    <div className={entityRowListRootVariants()} data-slot="entity-row-list-root">
+    <div className="dash-entity-row-list" data-slot="entity-row-list-root">
       {children}
       {hasFooter && action ? <EntityRowListFooter action={action} /> : null}
     </div>
@@ -171,6 +170,8 @@ export type EntityRowListGroupProps = {
   children?: ReactNode
 }
 
+const entityRowListGroupClassName = cn('border-b-0 px-4 py-2', borderStrength('subtle'))
+
 export function EntityRowListGroup({
   label,
   itemCount,
@@ -183,7 +184,7 @@ export function EntityRowListGroup({
 
   if (itemCount === 0) {
     return (
-      <div data-slot="entity-row-list-group" className={entityRowListGroupVariants()}>
+      <div data-slot="entity-row-list-group" className={entityRowListGroupClassName}>
         {showHeader ? (
           <div
             className={detailCollectionGroupHeaderVariants()}
@@ -199,7 +200,7 @@ export function EntityRowListGroup({
   }
 
   return (
-    <div data-slot="entity-row-list-group" className={entityRowListGroupVariants()}>
+    <div data-slot="entity-row-list-group" className={entityRowListGroupClassName}>
       {showHeader ? (
         <div
           className={detailCollectionGroupHeaderVariants()}

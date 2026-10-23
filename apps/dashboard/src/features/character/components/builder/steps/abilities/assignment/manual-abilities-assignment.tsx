@@ -20,14 +20,11 @@ import {
 
 import type { AbilitiesFormValues } from '../../../../../lib/steps/abilities-form-fields'
 import { buildAbilityPreferenceLabelsByAbility } from '../../../../../lib/steps/ability-preference-indicator.lib'
-import { scoresFromFormValues } from '../../../../../lib/steps/fixed-scores-assignment.lib'
-import { AbilityRecommendationPanel } from '../recommendation/ability-recommendation-panel'
 import {
-  fixedScoresAbilityGridClasses,
-  fixedScoresAssignmentIntroClasses,
-  fixedScoresAssignmentRootClasses,
-} from './fixed-scores-assignment.variants'
-
+  ABILITY_SCORE_ASSIGNMENT_GRID_CLASSES,
+  scoresFromFormValues,
+} from '../../../../../lib/steps/fixed-scores-assignment.lib'
+import { AbilityRecommendationPanel } from '../recommendation/ability-recommendation-panel'
 export type ManualAbilitiesAssignmentProps = {
   showInvalidStates?: boolean
   classInput?: AbilityScoreRecommendationClassInput | null
@@ -69,14 +66,14 @@ export function ManualAbilitiesAssignment({
   )
 
   return (
-    <div className={fixedScoresAssignmentRootClasses}>
-      <div className={fixedScoresAssignmentIntroClasses}>
+    <div className="space-y-6">
+      <div className="space-y-1">
         <Text as="h3" id={introId} variant="label">
           {methodHeading}
         </Text>
       </div>
 
-      <div className={fixedScoresAbilityGridClasses} role="group" aria-labelledby={introId}>
+      <div className={ABILITY_SCORE_ASSIGNMENT_GRID_CLASSES} role="group" aria-labelledby={introId}>
         {ABILITY_IDS.map((ability) => {
           const assignedScore = scores[ability]
           const preferenceLabel = preferenceLabels[ability]

@@ -113,7 +113,6 @@ export function buildEmbeddedMasterDetailRows({
       formIndex,
       item: {
         ...listItem,
-        active: listItem.active !== false && isAvailable,
         ...(isAvailable ? {} : { availabilityStatusLabel: 'Unavailable' as const }),
       },
       availability,

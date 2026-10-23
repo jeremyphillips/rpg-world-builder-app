@@ -71,24 +71,12 @@ export {
 } from './components/ui/alert'
 export {
   alertVariants,
-  alertTitleVariants,
-  alertDescriptionVariants,
   ALERT_DENSITIES,
   ALERT_VARIANTS,
   type AlertVariantProps,
 } from './components/ui/alert.variants'
 export { Toast, ToastPresentation, type ToastProps } from './components/ui/toast.client'
-export {
-  toastVariants,
-  toastViewportVariants,
-  toastModalViewportVariants,
-  toastTitleVariants,
-  toastDescriptionVariants,
-  toastActionsVariants,
-  toastCloseVariants,
-  TOAST_TONES,
-  type ToastVariantProps,
-} from './components/ui/toast.variants'
+export { toastVariants, TOAST_TONES, type ToastVariantProps } from './components/ui/toast.variants'
 export { ToastViewport, type ToastViewportProps } from './components/ui/toast-viewport.client'
 export { ToastProvider, toast } from './components/ui/toast-provider.client'
 export {
@@ -142,6 +130,7 @@ export {
   RichTextTableEmbedHostRegistrar,
 } from './components/ui/rich-text-table-embed-host.client'
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
+export { avatarVariants, type AvatarVariantProps } from './components/ui/avatar.variants'
 export { MediaImage, type MediaImageProps } from './components/ui/media-image.client'
 export {
   mediaImageVariants,
@@ -199,7 +188,6 @@ export {
   CollectionAddControl,
   type CollectionAddControlProps,
 } from './components/ui/collection-add-control.client'
-export { emptyPanelVariants } from './components/ui/empty-panel.variants'
 export {
   emptyStateWellBodyClasses,
   emptyStateWellIconInkClasses,
@@ -239,11 +227,17 @@ export {
   type MetadataListItem,
   type MetadataListProps,
 } from './components/ui/metadata-list'
-export { type MetadataListSize } from './components/ui/metadata-list.variants'
+export {
+  type MetadataListColumnGap,
+  type MetadataListEmphasis,
+  type MetadataListRowGap,
+  type MetadataListSize,
+  type MetadataListValueTrack,
+} from './components/ui/metadata-list.variants'
 export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
 export {
-  inlineIconFlexSlotClasses,
   inlineIconTextClasses,
+  menuItemIconGlyphClasses,
 } from './components/ui/icon-glyph.variants'
 export {
   ACTION_ICONS,
@@ -322,7 +316,14 @@ export {
   type NavigableCardProps,
   type StaticCardProps,
 } from './components/ui/card'
-export { NavigationChevron } from './components/ui/card.lib'
+export { CardNavInterior, NavigationChevron } from './components/ui/card.lib'
+export {
+  BORDER_STRENGTHS,
+  borderStrength,
+  DEFAULT_BORDER_STRENGTH,
+  UI_BORDER_STRENGTH_CLASSES,
+  type BorderStrength,
+} from './components/ui/border-strength'
 export { renderNavigableLinkRoot, composeRefs } from './components/ui/navigable-link-root.lib'
 export {
   DestinationList,
@@ -338,24 +339,14 @@ export {
 } from './components/ui/destination-list'
 export {
   CARD_CLASS_SPECS,
-  CARD_DENSITIES,
   CARD_ELEVATIONS,
   CARD_INSET_DENSITIES,
   CARD_SURFACE_TONES,
   cardDensityClassName,
-  cardSurfaceClasses,
   cardSurfaceVariants,
   resolveOptionCardSurfaceDensity,
-  UI_CARD_DESCRIPTION_CLASS,
-  UI_CARD_ELEVATION_RAISED_CLASS,
-  UI_CARD_ELEVATION_SUBTLE_CLASS,
   UI_CONTENT_CARD_INSET_CLASS,
-  UI_CARD_DENSITY_COMPACT_CLASS,
-  UI_CARD_DENSITY_COMFORTABLE_CLASS,
-  UI_CARD_DENSITY_SPACIOUS_CLASS,
-  UI_CARD_TITLE_CLASS,
   type CardClassSpec,
-  type CardDensity,
   type CardElevation,
   type CardInsetDensity,
   type CardSurfaceTone,
@@ -568,7 +559,6 @@ export {
   ATTENTION_FRAME_REDUCED_MOTION_HOLD_MS,
   type AttentionFrameProps,
 } from './components/ui/attention-frame.client'
-export { attentionFrameVariants } from './components/ui/attention-frame.variants'
 export { DividedStack, type DividedStackProps } from './components/ui/divided-stack'
 export { Panel, type PanelElement, type PanelProps } from './components/ui/panel'
 export {
@@ -600,10 +590,6 @@ export {
   INSET_PANEL_BORDER_STYLES,
   INSET_PANEL_SIZES,
   insetPanelClassNames,
-  insetPanelEmptyStateClasses,
-  insetPanelEmptyStateVariants,
-  insetPanelGateClasses,
-  insetPanelGateVariants,
   insetPanelSunkenShadowClasses,
   insetPanelTextVariantBySize,
   insetPanelVariants,
@@ -669,7 +655,6 @@ export {
 } from './components/ui/chrome.variants'
 export {
   establishSurfaceCurrent,
-  portalDropdownSurfaceClasses,
   portalPopoverSurfaceClasses,
   SURFACE_CURRENT_PLANES,
   type SurfaceCurrentPlane,
@@ -711,7 +696,6 @@ export {
   fieldSettingsRowClasses,
   fieldToggleDependentStackClasses,
   formDependentInsetSpacing,
-  formDependentInsetOffsetClasses,
   resolveDependentInsetClasses,
   resolveFormInsetPaddingClasses,
   type FieldHintPosition,
@@ -751,7 +735,6 @@ export {
 export {
   resolveFieldDependentsChromeClasses,
   resolveFieldRailClasses,
-  fieldRailOffsetClasses,
   type FieldDependentsScope,
   type FieldRailTone,
 } from './components/ui/field-dependent.variants'
@@ -804,7 +787,6 @@ export {
   IdentityRow,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
-  identityRowStackVariants,
   type IdentityRowHeadingLineProps,
   type IdentityRowProps,
   type IdentityRowDensity,
@@ -826,15 +808,11 @@ export {
   type RowColumn,
 } from './components/ui/row-anatomy'
 export {
-  interactiveListToolbarVariants,
   interactiveListGroupHeadingVariants,
-  interactiveListViewportVariants,
   interactiveListSurfaceClasses,
-  interactiveListRowSeparatorClasses,
   interactiveListVariants,
   interactiveListRowChromeVariants,
   interactiveListRowMainVariants,
-  menuChoiceItemResetVariants,
   type InteractiveListSize,
 } from './components/ui/interactive-list.variants'
 export {
@@ -896,12 +874,9 @@ export {
 export {
   contentCardRootVariants,
   contentCardBodyVariants,
-  contentCardDensityInsetVariants,
-  contentCardHeadingLinkVariants,
   contentCardHeadingScaleClass,
   contentCardHeadingRowVariants,
   contentCardMediaEndGapVariants,
-  contentCardMediaVariants,
   contentCardMetadataVariants,
   contentCardSubheadingVariants,
   contentCardIdentityColumnGapVariants,
@@ -951,10 +926,6 @@ export {
   NotificationErrorState,
   type NotificationErrorStateProps,
 } from './components/ui/notification-error-state'
-export {
-  notificationMenuFooterLinkVariants,
-  notificationMenuRowLinkVariants,
-} from './components/ui/notification-menu-row.variants'
 export {
   ButtonDropdown,
   type ButtonDropdownGroup,
@@ -1030,9 +1001,7 @@ export {
 } from './components/ui/dropdown-menu-item-content'
 export {
   dropdownMenuChoiceContentClasses,
-  dropdownMenuChoiceItemClasses,
   dropdownMenuChoiceItemVariants,
-  interactiveListChoiceMenuContentClasses,
 } from './components/ui/dropdown-menu-choice.variants'
 export {
   UserMenuTrigger,
@@ -1083,7 +1052,7 @@ export {
   type ModalStableSize,
 } from './components/ui/modal.client'
 export {
-  modalOverlayVariants,
+  modalOverlayClasses,
   modalContentVariants,
   type ModalContentVariantProps,
   type ModalSize,
@@ -1114,10 +1083,6 @@ export {
 } from './components/ui/scroll-boundary-region.variants'
 export {
   dialogPanelActionRowClasses,
-  dialogPanelBodyVariants,
-  dialogPanelManagedBodyVariants,
-  dialogPanelStableBodyVariants,
-  dialogPanelStableBodyClipVariants,
   dialogPanelScrollRegionBottomInsetClasses,
   dialogPanelScrollRegionClasses,
   dialogPanelScrollRegionTopInsetClasses,
@@ -1264,7 +1229,6 @@ export {
   type InlineInactiveStatusProps,
 } from './components/ui/inline-inactive-status.client'
 export {
-  sheetBodyVariants,
   sheetContentVariants,
   sheetFooterDockClasses,
   type SheetContentVariantProps,
@@ -1364,7 +1328,6 @@ export {
 export { tableHeaderRowClasses, tableHeaderRowVariants } from './components/ui/table.variants'
 export {
   Badge,
-  badgeVariants,
   type BadgeAppearance,
   type BadgeProps,
   type BadgeSize,
@@ -1514,38 +1477,14 @@ export type {
 } from './components/ui/data-table.types'
 export type { ColumnDef } from '@tanstack/react-table'
 export {
-  dataTableRootVariants,
-  dataTableToolbarVariants,
-  dataTableUtilityStripVariants,
-  dataTableFilterGroupVariants,
   dataTableFilterControlVariants,
-  dataTableAdvancedPanelVariants,
   dataTableAdvancedInnerVariants,
-  dataTablePaginationVariants,
-  dataTableTableVariants,
-  dataTableTableWrapVariants,
-  dataTableColumnPanelVariants,
-  dataTableColumnItemVariants,
-  dataTableColumnDragHandleVariants,
-  dataTableEmptyPanelVariants,
-  dataTableEmptyStateVariants,
-  dataTableFilterChipVariants,
-  dataTableFilterNoticeVariants,
-  dataTableLockedColumnVariants,
-  dataTableResetColumnVariants,
   dataTableCellTextVariants,
-  dataTableImageVariants,
-  dataTableNameCellVariants,
-  dataTableNameLinkCellVariants,
-  dataTableRowUnavailableVariants,
-  dataTableRowUnavailableRailVariants,
-  dataTableRowVariants,
-  dataTableBodyCellPaddingVariants,
-  dataTableBodyCellVariants,
-  dataTableCaptionVariants,
-  dataTableHeaderCellVariants,
-  dataTableSortIconVariants,
 } from './components/ui/data-table.variants'
+export {
+  dataTableUnavailableAppearance,
+  type DataTableUnavailableAppearance,
+} from './components/ui/data-table-band.lib'
 
 export {
   mapAperturePointerToFocalPoint,

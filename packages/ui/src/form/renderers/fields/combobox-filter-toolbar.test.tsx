@@ -2,17 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
 import { ComboboxFilterToolbar } from './combobox-filter-toolbar.client'
-import {
-  comboboxFilterToolbarItemVariants,
-  comboboxFilterToolbarRowVariants,
-} from './combobox-filter-toolbar.variants'
-
-describe('comboboxFilterToolbar variants', () => {
-  it('keeps catalog filter gap and adds equal-width item columns', () => {
-    expect(comboboxFilterToolbarRowVariants()).toContain('gap-2')
-    expect(comboboxFilterToolbarItemVariants()).toContain('flex-1')
-  })
-})
 
 describe('ComboboxFilterToolbar', () => {
   it('wraps each dimension select in an equal-width flex item', () => {
@@ -36,11 +25,11 @@ describe('ComboboxFilterToolbar', () => {
     )
 
     const row = container.firstElementChild
-    expect(row).toHaveClass(...comboboxFilterToolbarRowVariants().split(/\s+/))
+    expect(row).toHaveClass('ui-catalog-filter-controls', 'w-full')
 
     const items = row?.children
     expect(items).toHaveLength(2)
-    expect(items?.[0]).toHaveClass(...comboboxFilterToolbarItemVariants().split(/\s+/))
+    expect(items?.[0]).toHaveClass('ui-combobox-filter-toolbar__item')
     expect(screen.getByRole('combobox', { name: 'Filter by category' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Filter by mode' })).toBeInTheDocument()
   })

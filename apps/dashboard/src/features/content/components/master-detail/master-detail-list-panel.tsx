@@ -1,5 +1,13 @@
 import { useEffect, useRef, type ReactNode } from 'react'
-import { ActionButton, ScrollBoundaryRegion, Text, ValidationIssueCountBadge } from '@rpg/ui'
+import {
+  ActionButton,
+  cn,
+  Heading,
+  ScrollBoundaryRegion,
+  scrollBoundaryRegionRootClasses,
+  Text,
+  ValidationIssueCountBadge,
+} from '@rpg/ui'
 
 import { isElementOutsideScrollport } from '../../lib/master-detail/is-element-outside-scrollport'
 import type { MasterDetailItemMeta } from '../../lib/master-detail/master-detail-item-meta'
@@ -7,20 +15,13 @@ import { MasterDetailListRow } from './master-detail-list-row'
 import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import {
-  masterDetailListCountSupplementClasses,
-  masterDetailListCountSupplementCopyClasses,
-  masterDetailListEmptyClasses,
-  masterDetailListHeaderClasses,
-  masterDetailListItemsClasses,
-  masterDetailListScrollRegionClasses,
   masterDetailListScrollViewportClasses,
   masterDetailListShellClasses,
-  masterDetailListTitleClasses,
-} from './master-detail-list-panel.variants'
+} from './master-detail-list-panel.layout'
 
 export type { MasterDetailItemMeta }
 
-export interface MasterDetailListItem {
+export type MasterDetailListItem = {
   /** Stable React key (use the RHF field id, not a domain id). */
   id: string
   /** Display label for the row. */
@@ -31,15 +32,13 @@ export interface MasterDetailListItem {
   issueCount?: number
   /** When true, surfaces a validation error indicator on the row. */
   hasError?: boolean
-  /** When false, row uses inactive styling. Defaults to `true`. */
-  active?: boolean
   /** When false, detail overflow hides delete. Not shown on list rows. */
   deletable?: boolean
   /** Broad campaign availability label rendered below the title when unavailable. */
   availabilityStatusLabel?: 'Unavailable'
 }
 
-export interface MasterDetailListPanelProps {
+export type MasterDetailListPanelProps = {
   items: MasterDetailListItem[]
   selectedIndex: number | null
   /** Visible collection title in the list header. */
@@ -72,7 +71,7 @@ function buildVisibleListProjection(items: readonly MasterDetailListItem[]): str
 
 /**
  * Generic sidebar for a master-detail editor: bordered collection shell with
- * list title + Add, and whole-row selection with tint and inset start accent.
+ * list title + Add, and card-style row selection in the scrollport.
  * Presentation only — selection and array mutation are owned by the parent.
  */
 export function MasterDetailListPanel({
@@ -123,36 +122,46 @@ export function MasterDetailListPanel({
     }
   }, [selectedItemId, visibleProjection])
 
+  const countSupplementRow =
+    countSupplement || invalidItemCount > 0
+      ? cn(
+          'flex shrink-0 items-center gap-2 border-b ui-border--subtle px-3 py-1.5 text-style-caption',
+          countSupplement ? 'justify-between' : 'justify-end',
+        )
+      : null
+
   return (
     <nav aria-label={ariaLabel} className={masterDetailListShellClasses}>
-      <div className={masterDetailListHeaderClasses}>
-        <div className={masterDetailListTitleClasses}>{listTitle}</div>
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b ui-border--subtle px-3 py-2.5">
+        <Heading as="div" variant="section" className="min-w-0">
+          {listTitle}
+        </Heading>
         <ActionButton action="add" variant="outline" size="sm" onClick={onAdd}>
           {addLabel}
         </ActionButton>
       </div>
 
-      {countSupplement || invalidItemCount > 0 ? (
-        <div className={masterDetailListCountSupplementClasses({ hasCopy: !!countSupplement })}>
+      {countSupplementRow ? (
+        <div className={countSupplementRow}>
           {countSupplement ? (
-            <div className={masterDetailListCountSupplementCopyClasses}>{countSupplement}</div>
+            <div className="min-w-0 flex flex-wrap items-center gap-x-1">{countSupplement}</div>
           ) : null}
           {invalidItemCount > 0 ? <ValidationIssueCountBadge count={invalidItemCount} /> : null}
         </div>
       ) : null}
 
       {items.length === 0 ? (
-        <Text variant="muted" className={masterDetailListEmptyClasses}>
+        <Text variant="supporting" className="px-3 py-4">
           {emptyLabel}
         </Text>
       ) : (
         <ScrollBoundaryRegion
-          className={masterDetailListScrollRegionClasses}
+          className={scrollBoundaryRegionRootClasses}
           viewportClassName={masterDetailListScrollViewportClasses}
           viewportRef={scrollRef}
           data-master-detail-list-scroll
         >
-          <ul className={masterDetailListItemsClasses} role="list">
+          <ul className="flex flex-col gap-2 p-2" role="list">
             {items.map((item, index) => (
               <MasterDetailListRow
                 key={item.id}

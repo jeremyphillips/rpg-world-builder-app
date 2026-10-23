@@ -7,7 +7,7 @@ import {
   identityFrameSizeClasses,
 } from './identity-frame-tokens.variants'
 
-export const identityFrameVariants = cva('relative shrink-0 overflow-hidden', {
+export const identityFrameVariants = cva('ui-identity-frame', {
   variants: {
     shape: identityFrameShapeClasses,
     size: identityFrameSizeClasses,
@@ -18,7 +18,7 @@ export const identityFrameVariants = cva('relative shrink-0 overflow-hidden', {
   },
 })
 
-export const identityFrameImageVariants = cva('block size-full max-w-none select-none', {
+export const identityFrameImageVariants = cva('ui-identity-frame__image', {
   variants: {
     fit: identityFrameFitClasses,
   },
@@ -27,22 +27,19 @@ export const identityFrameImageVariants = cva('block size-full max-w-none select
   },
 })
 
-export const identityFrameFallbackVariants = cva(
-  'flex size-full items-center justify-center bg-surface-strong text-muted-foreground',
-  {
-    variants: {
-      size: {
-        xs: identityFrameFallbackIconClasses.xs,
-        sm: identityFrameFallbackIconClasses.sm,
-        md: identityFrameFallbackIconClasses.md,
-        inline: identityFrameFallbackIconClasses.inline,
-      },
-    },
-    defaultVariants: {
-      size: 'sm',
+export const identityFrameFallbackVariants = cva('ui-identity-frame__fallback', {
+  variants: {
+    size: {
+      xs: identityFrameFallbackIconClasses.xs,
+      sm: identityFrameFallbackIconClasses.sm,
+      md: identityFrameFallbackIconClasses.md,
+      inline: identityFrameFallbackIconClasses.inline,
     },
   },
-)
+  defaultVariants: {
+    size: 'sm',
+  },
+})
 
 /** Inset-row geometry — content-column gap and vertical alignment. */
 export const identityInsetRowVariants = cva('flex min-w-0', {

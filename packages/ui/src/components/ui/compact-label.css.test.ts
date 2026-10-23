@@ -24,6 +24,7 @@ function expectSurfaceRelativeNeutralBorderMix(block: string): void {
 
 describe('compact-label.css neutral borders', () => {
   const compactLabelCss = readFileSync(join(uiDir, 'compact-label.css'), 'utf8')
+  const uiBorderCss = readFileSync(join(uiDir, 'ui-border.css'), 'utf8')
   const surfaceUtilitiesCss = readFileSync(
     join(stylesDir, 'surface-relative-chrome.utilities.css'),
     'utf8',
@@ -33,8 +34,8 @@ describe('compact-label.css neutral borders', () => {
     const utilityBlock = readUtilityBlock(surfaceUtilitiesCss, 'border-semantic-neutral-border')
     expectSurfaceRelativeNeutralBorderMix(utilityBlock)
 
-    expect(compactLabelCss).toContain('--ui-compact-label-border: color-mix(')
-    expectSurfaceRelativeNeutralBorderMix(compactLabelCss)
+    expectSurfaceRelativeNeutralBorderMix(uiBorderCss)
+    expect(compactLabelCss).toContain('--ui-compact-label-border: var(--ui-border-color)')
     expect(compactLabelCss).not.toContain('--color-semantic-neutral-border')
   })
 
@@ -46,7 +47,7 @@ describe('compact-label.css neutral borders', () => {
     ]) {
       const block = compactLabelCss.match(new RegExp(`\\.${modifier}\\s*\\{[^}]+\\}`))?.[0]
       expect(block, modifier).toBeDefined()
-      expectSurfaceRelativeNeutralBorderMix(block ?? '')
+      expect(block).toContain('--ui-compact-label-border: var(--ui-border-color)')
     }
   })
 })

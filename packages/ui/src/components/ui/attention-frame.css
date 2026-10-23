@@ -1,0 +1,27 @@
+/*
+ * Brief attention chrome. Idle border lives on the block.
+ * Active animation reuses --animate-attention-ring from globals.css.
+ */
+@layer components {
+  .ui-attention-frame {
+    border-radius: var(--radius-md);
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+    transition-property:
+      color, background-color, border-color, outline-color, text-decoration-color, fill, stroke;
+    transition-duration: 150ms;
+  }
+
+  .ui-attention-frame--active {
+    border-color: var(--primary);
+    background-color: var(--control-selected-bg);
+    box-shadow: 0 0 0 1px color-mix(in oklch, var(--primary) 20%, transparent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ui-attention-frame--active {
+      animation: var(--animate-attention-ring);
+    }
+  }
+}

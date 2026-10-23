@@ -9,7 +9,7 @@ describe('fieldRowDividerVariants', () => {
   it('maps comfortable rhythm to mx-8 gutter flanking the pipe', () => {
     expect(fieldRowDividerVariants({ rhythm: 'comfortable' })).toContain('mx-8')
     expect(fieldRowDividerVariants({ rhythm: 'comfortable' })).toContain('border-l')
-    expect(fieldRowDividerVariants({ rhythm: 'comfortable' })).toContain('border-border-subtle')
+    expect(fieldRowDividerVariants({ rhythm: 'comfortable' })).toContain('ui-border--subtle')
   })
 
   it('maps compact rhythm to mx-6 gutter flanking the pipe', () => {

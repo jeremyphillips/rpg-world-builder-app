@@ -229,7 +229,7 @@ describe('SlotFieldRenderer', () => {
 
     const separator = container.querySelector('[data-field-separator]')
     expect(separator).toBeInTheDocument()
-    expect(separator).toHaveClass('border-b', 'border-border-subtle', 'pb-7')
+    expect(separator).toHaveClass('border-b', 'ui-border--subtle', 'pb-7')
     expect(separator).toContainElement(screen.getByRole('textbox', { name: 'Notes' }))
     expect(separator).not.toContainElement(screen.getByRole('textbox', { name: 'Name' }))
   })
@@ -265,7 +265,7 @@ describe('SlotFieldRenderer', () => {
 
     const separator = container.querySelector('[data-field-separator]')
     expect(separator).toBeInTheDocument()
-    expect(separator).toHaveClass('border-b', 'border-border-subtle', 'pb-2')
+    expect(separator).toHaveClass('border-b', 'ui-border--subtle', 'pb-2')
     expect(separator).not.toHaveClass('pb-7')
   })
 

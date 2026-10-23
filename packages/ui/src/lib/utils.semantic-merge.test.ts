@@ -8,8 +8,8 @@ describe('cn semantic control groups', () => {
   })
 
   it('drops conflicting interactive row hover modifiers', () => {
-    expect(cn('ui-interactive-row--hover-selectable', 'ui-interactive-row--hover-surface')).toBe(
-      'ui-interactive-row--hover-surface',
+    expect(cn('ui-interactive-row--hover-none', 'ui-interactive-row--hover')).toBe(
+      'ui-interactive-row--hover',
     )
   })
 

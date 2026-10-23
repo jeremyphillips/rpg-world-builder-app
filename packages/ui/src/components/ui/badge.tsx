@@ -9,7 +9,6 @@ import { resolveCompactLabelClassName } from './compact-label.variants'
 import { badgeIconGlyphClasses } from './icon-glyph.variants'
 
 export {
-  badgeVariants,
   type BadgeAppearance,
   type BadgeLayout,
   type BadgeSize,
@@ -54,7 +53,6 @@ function Badge({
     appearance,
     tone,
     emphasis,
-    filled: appearance === 'soft' || appearance === 'strong',
     className: cn(badgeLayoutVariants({ layout }), className),
   })
 

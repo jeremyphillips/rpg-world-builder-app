@@ -11,7 +11,6 @@ import type {
   FilterFieldId,
   FilterSchema,
 } from './filter-schema.types'
-import { catalogFilterControlsVariants } from './catalog-filter-controls.variants'
 import { FilterChromeProvider, useOptionalFilterChrome } from './filter-chrome.context'
 import { FILTER_DENSITY_DEFAULT } from './filter-bar.variants'
 
@@ -53,7 +52,7 @@ function CatalogFilterControlsGroup<TData, TState extends Record<string, unknown
   }
 
   const content = (
-    <div className={cn(catalogFilterControlsVariants(), className)}>
+    <div className={cn('ui-catalog-filter-controls', className)}>
       <CatalogFilterFieldList
         schema={schema}
         fieldIds={fieldIds}

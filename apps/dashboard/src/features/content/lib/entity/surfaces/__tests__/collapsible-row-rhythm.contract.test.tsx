@@ -1,9 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import {
-  CollapsibleListItem,
-  collapsibleListItemBodyFrameClasses,
-  collapsibleListItemHeaderVerticalPaddingVariants,
-} from '@rpg/ui'
+import { CollapsibleListItem, collapsibleListItemHeaderVerticalPaddingVariants } from '@rpg/ui'
 import { describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -136,10 +132,12 @@ describe('Entity card surface rhythm contract', () => {
     )
 
     expect(screen.getByText('Grant fields').parentElement).toHaveClass(
-      collapsibleListItemBodyFrameClasses,
+      'dash-entity-card__body',
+      'dash-entity-card__body--disclosure-wash',
     )
     expect(screen.getByText('Catalog details').parentElement).toHaveClass(
-      collapsibleListItemBodyFrameClasses,
+      'dash-entity-card__body',
+      'dash-entity-card__body--catalog-wash',
     )
   })
 

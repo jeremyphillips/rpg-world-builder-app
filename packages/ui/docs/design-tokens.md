@@ -3,6 +3,10 @@
 Color system for `@rpg/ui`. SSOT for Layer 1 inventory and parity rules:
 [`src/styles/tokens/palette-inventory.md`](../src/styles/tokens/palette-inventory.md).
 
+**When to use what** (inline layout vs BEM semantic CSS vs CVA, component ownership):
+[AGENTS.md](../../../AGENTS.md#styling-conventions) and [ui-architecture.md](./ui-architecture.md).
+This document covers token layers, surfaces, and color mechanics — not full styling policy.
+
 Storybook catalog: **Design tokens → Color palette** (`color-palette.stories.tsx`).
 
 Visual vocabulary (tone, emphasis, chrome): [visual-vocabulary.md](./visual-vocabulary.md).
@@ -13,7 +17,7 @@ Visual vocabulary (tone, emphasis, chrome): [visual-vocabulary.md](./visual-voca
 Layer 1  palette-light.css / palette-dark.css   --palette-*   (oklch SSOT)
 Layer 2  semantic-light.css / semantic-dark.css --background, --field-control-*, …
 Layer 3  globals.css @theme + custom utilities  bg-*, text-*, border-input, …
-         component *.variants.ts               CVA recipes
+         component *.variants.ts + *.css        CVA API; semantic presentation where migrated
 ```
 
 **Components consume Layer 2 / Tailwind utilities only** — never `--palette-*` in UI code.
@@ -88,20 +92,24 @@ Empty-state wells (`EmptyPanel`, dashed `InsetPanel` gates) standardize on sunke
 
 ## Border ladder
 
-| Role    | Utility                | Meaning                                                                                 |
-| ------- | ---------------------- | --------------------------------------------------------------------------------------- |
-| Faint   | `border-border-faint`  | Extra-quiet separators and decorative shells                                            |
-| Subtle  | `border-border-subtle` | Quiet separators, low-emphasis shells (default for field separators and outline chrome) |
-| Default | `border-border`        | Normal component structure — also the inherited `*` safety-net via `var(--border)`      |
-| Card    | `border-card-border`   | Raised containing-surface stroke (Card, Modal, Sheet edge, Toast, elevated panels)      |
-| Strong  | `border-border-strong` | Selected or emphasized structure                                                        |
+| Role    | Semantic class       | Meaning                                                            |
+| ------- | -------------------- | ------------------------------------------------------------------ |
+| Subtle  | `ui-border--subtle`  | Quiet separators and low-emphasis shells                           |
+| Default | `ui-border--default` | Normal neutral component structure                                 |
+| Strong  | `ui-border--strong`  | Emphasized neutral structure; not a selected/status state override |
+
+The three classes compute against the painting element's current `--surface-current` and
+publish `--ui-border-color`. Width, style, edge placement, and radius remain component-owned.
+`--border-faint` is retained only for explicitly decorative effects; it is not part of the
+component strength vocabulary.
 
 Status borders stay status-specific (`border-destructive-muted`, …). Recipe borders (e.g.
 `border-row-selected-border`) may alias `--border-strong` or a brand/status role.
 
 The base `*` rule sets `border-color: var(--border)` as a **structural safety net** only.
-Components with semantic border ownership must set an explicit role utility — do not rely
-on the fallback as SSOT.
+Components with semantic border ownership must set an explicit strength class — do not rely
+on the fallback as SSOT. Which plane that mix uses is the contrast reference in
+[ui-architecture.md](./ui-architecture.md#surface-relative-borders).
 
 ## Interaction recipes
 
@@ -177,7 +185,7 @@ Schema-driven form fields default to a boxed container shell (`{ variant: 'conta
 
 - Layer 2 token: `--field-container` — lift plane in both themes (`--palette-surface-lift`); recessed wells use `--sunken` / `bg-sunken` instead.
 - Public utility: `bg-field-container` in `globals.css`.
-- Shells rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane.
+- **Form shells only:** schema-driven field containers rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane. Overlays, menus, sheets, preview rails, and other generic lifted shells use `--surface-lift` / `bg-surface-lift` — not the field-container alias.
 - Padding: 16px (`p-4`).
 - Fieldset leaves (`ChipsField`, choose-count shells) and schema `kind: 'group'` wrap a
   borderless `<fieldset>` in `FieldChromeShell` so `<legend>` cannot sit on the visible
@@ -276,9 +284,10 @@ buttons) and legacy Tailwind compositions:
 
 Label type for the xs tier: `text-control-action-xs` (10px) — control lane only, not general body type.
 
-**Not on semantic CSS yet:** `tabs` / `segmented-control` default segments (line tabs still
-use Tailwind geometry), field control bands (`field-control-band.variants.ts`), number-stepper
-geometry (`number-stepper.variants.ts`), spinner sizing.
+**Not on semantic CSS yet:** `segmented-control` default segments, field control bands
+(`field-control-band.variants.ts`), number-stepper geometry (`number-stepper.variants.ts`),
+spinner sizing. Tabs `line` / `pill` appearances live in `tabs.css`; pill trigger geometry no
+longer uses `ui-compact-control--tabs-pill`.
 
 ### Icon–label gap (labeled controls)
 
@@ -302,7 +311,7 @@ regression-tested in `control-action.variants.test.ts` and `icon-ghost-control.v
 
 ### Inline icons
 
-Inline icons inherit their glyph step from the nearest typography owner. Consumers use `size-icon-inline` (or `inlineIconTextClasses` / `inlineIconFlexSlotClasses`) and do not name a text size or a glyph step. The utility falls back to `--icon-glyph-md` when no owner is present.
+Inline icons inherit their glyph step from the nearest typography owner. Consumers use `size-icon-inline` or `inlineIconTextClasses` and do not name a text size or a glyph step. `SemanticText` publishes that step from `.ui-semantic-text` (and a `text-sm` override) onto `ui-semantic-text__icon`. The utility falls back to `--icon-glyph-md` when no owner is present.
 
 | Owner                      | Glyph |
 | -------------------------- | ----- |
@@ -326,17 +335,14 @@ Enforcement: `icon-glyph-sizing-ban.test.ts` — raw `[&_svg]:size-*` / inline L
 
 ### StatusIcon exceptions
 
-Module: [`status-icon.variants.ts`](../src/components/ui/status-icon.variants.ts)
+Module: [`status-icon.css`](../src/components/ui/status-icon.css) + [`status-icon.variants.ts`](../src/components/ui/status-icon.variants.ts)
 
-Neutral disc fills use dedicated Layer 2 recipes — not surface-relative ink roles:
+Disc tone and diameter use `ui-status-icon--{ready|needs-attention|incomplete|off|none|not-configured}` and `ui-status-icon--{sm|md|lg}` (12 / 16 / 20px discs — not icon-glyph `sm`/`md`).
 
-| Role                                    | Utility                               |
-| --------------------------------------- | ------------------------------------- |
-| Idle / off / none / not configured disc | `bg-status-icon-idle`                 |
-| Incomplete / validation disc            | `bg-status-icon-incomplete`           |
-| Neutral glyph on grey discs             | `text-status-icon-neutral-foreground` |
+Neutral disc fills use `--status-icon-idle-bg` and `--status-icon-incomplete-bg`. Grey-disc glyphs use `ui-status-icon__glyph--neutral`.
 
 The off-slash glyph is **not** on the 10/12/14/16 icon-glyph ladder. It uses
 `size-status-icon-slash-sm` (6px) and `size-status-icon-slash-md` (8px) with a heavier
-Lucide `strokeWidth` than other variants. Pair slash utilities with StatusIcon size:
+Lucide `strokeWidth` than other variants. Pair slash utilities with StatusIcon disc size:
 `sm` and `md` discs → `size-status-icon-slash-sm`; `lg` disc → `size-status-icon-slash-md`.
+Other glyphs use `size-icon-glyph-xs` or `size-icon-glyph-sm` on the svg.

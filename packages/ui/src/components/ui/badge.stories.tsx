@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Badge } from './badge'
 import { BADGE_APPEARANCES } from './badge-appearance.lib'
 import { COMPACT_LABEL_TONES } from './compact-label.lib'
+import { COMPACT_LABEL_CLASS_SPECS } from './compact-label.variants'
 import { establishSurfaceCurrent } from './surface-current.lib'
+
+const BADGE_CLASS_SPECS = COMPACT_LABEL_CLASS_SPECS.filter((spec) => spec.key.startsWith('badge'))
 
 const meta = {
   title: 'Components/Badge',
@@ -163,5 +167,26 @@ export const LegibilitySmWithIcon: Story = {
         </Badge>
       </div>
     </div>
+  ),
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={BADGE_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <span data-semantic-class-target className={spec.className}>
+            {spec.useCase}
+          </span>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
   ),
 }

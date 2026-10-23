@@ -50,8 +50,8 @@ describe('RadioCard', () => {
     expect(shell).toHaveClass('ui-card--subtle', 'ui-card--interactive')
     expect(shell).not.toHaveClass('ui-card--selected', 'ui-card--strong')
 
-    const titleLineAlign = radio.closest('.flex.shrink-0.items-center.self-start')
-    expect(titleLineAlign).toHaveClass('h-6')
+    const titleLineAlign = radio.closest('.ui-radio-card__leading-title-line')
+    expect(titleLineAlign).toHaveClass('ui-radio-card__leading-title-line--comfortable')
   })
 
   it('matches title-end action height for compact cards with onDetails', () => {
@@ -71,9 +71,9 @@ describe('RadioCard', () => {
     )
 
     const radio = screen.getByRole('radio', { name: /Fighter/i })
-    const titleLineAlign = radio.closest('.flex.shrink-0.items-center.self-start')
-    expect(titleLineAlign).toHaveClass('h-control-action-compact')
-    expect(titleLineAlign).not.toHaveClass('h-5')
+    const titleLineAlign = radio.closest('.ui-radio-card__leading-title-line')
+    expect(titleLineAlign).toHaveClass('ui-radio-card__leading-title-line--title-end')
+    expect(titleLineAlign).not.toHaveClass('ui-radio-card__leading-title-line--compact')
   })
 
   it('applies density body padding inside the radio card shell', () => {

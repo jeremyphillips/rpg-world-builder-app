@@ -178,7 +178,7 @@ export function CharacterBuilderPreviewSheet(props: CharacterBuilderPreviewRailP
         <Sheet.Content
           side={isMdUp ? 'right' : 'bottom'}
           size="lg"
-          surface="field-container"
+          surface="surface-lift"
           closeLabel="Close preview"
         >
           <Sheet.Header

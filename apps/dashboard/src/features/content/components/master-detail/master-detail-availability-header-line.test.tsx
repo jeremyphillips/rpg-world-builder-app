@@ -15,6 +15,12 @@ describe('MasterDetailAvailabilityHeaderLine', () => {
     )
 
     expect(screen.getByText('Available')).toBeInTheDocument()
+    expect(screen.getByText('Available').parentElement?.querySelector('[aria-hidden]')).toHaveClass(
+      'size-1.5',
+      'shrink-0',
+      'rounded-full',
+      'bg-semantic-success',
+    )
     expect(screen.queryByText(/All players/i)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
   })

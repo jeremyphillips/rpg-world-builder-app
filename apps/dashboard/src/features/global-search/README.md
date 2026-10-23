@@ -28,7 +28,8 @@ Campaign-scoped client-side search over the catalog snapshot from
 GlobalSearch
 ├── shared (components root)
 │   ├── GlobalSearchProvider   — public; topbar open state + ⌘K (mounted in app shell)
-│   └── GlobalSearchField      — shared input; topbar + results page
+│   ├── GlobalSearchField      — shared input; topbar + results page
+│   └── GlobalSearchResultsPanel — shared quiet bleed panel; page + topbar preview
 ├── topbar/
 │   ├── GlobalSearchTopbar     — public; composition root
 │   ├── GlobalSearchTrigger    — private topbar affordance
@@ -59,6 +60,7 @@ compositors; `GlobalSearchResultsBody` is the full-page results surface (filters
 - `routes/global-search-page.tsx` — full results page
 - `components/global-search-provider.tsx` — public shell entry; topbar open state + ⌘K
 - `components/global-search-field.tsx` — shared search input
+- `components/global-search-results-panel.tsx` — shared results panel chrome
 - `components/topbar/global-search-topbar.tsx` — public topbar composition root
 - `components/results/global-search-results-body.tsx` — page results surface
 - `components/results/global-search-result-lists.tsx` — grouped/flat result compositors

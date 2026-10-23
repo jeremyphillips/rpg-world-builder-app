@@ -9,7 +9,7 @@ import { IdentityRow } from './identity-row.client'
 import { InteractiveList } from './interactive-list.client'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { MenuChoiceRow } from './menu-choice-row.client'
-import { interactiveListChoiceMenuContentClasses } from './dropdown-menu-choice.variants'
+import { dropdownMenuChoiceContentClasses } from './dropdown-menu-choice.variants'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 
 const meta = {
@@ -75,16 +75,14 @@ export const RowSeparators: Story = {
             Menu with two rows
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className={cn(interactiveListChoiceMenuContentClasses)}>
-          <InteractiveList>
-            <MenuChoiceRow {...menuIdentityFixture} supportingWrap onSelect={() => {}} />
-            <MenuChoiceRow
-              heading="Magic Missile"
-              supporting="Spell · Level 1 · Evocation"
-              supportingWrap
-              onSelect={() => {}}
-            />
-          </InteractiveList>
+        <DropdownMenuContent className={cn(dropdownMenuChoiceContentClasses)}>
+          <MenuChoiceRow {...menuIdentityFixture} supportingWrap onSelect={() => {}} />
+          <MenuChoiceRow
+            heading="Magic Missile"
+            supporting="Spell · Level 1 · Evocation"
+            supportingWrap
+            onSelect={() => {}}
+          />
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -111,10 +109,8 @@ export const SameIdentityAcrossHosts: Story = {
             Menu choice
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className={cn(interactiveListChoiceMenuContentClasses)}>
-          <InteractiveList>
-            <MenuChoiceRow {...menuIdentityFixture} supportingWrap onSelect={() => {}} />
-          </InteractiveList>
+        <DropdownMenuContent className={cn(dropdownMenuChoiceContentClasses)}>
+          <MenuChoiceRow {...menuIdentityFixture} supportingWrap onSelect={() => {}} />
         </DropdownMenuContent>
       </DropdownMenu>
       <DemoPanel>

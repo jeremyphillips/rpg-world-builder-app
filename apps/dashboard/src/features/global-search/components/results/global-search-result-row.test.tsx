@@ -30,8 +30,7 @@ describe('SearchResultRow', () => {
     )
 
     const link = screen.getByRole('link', { name: 'Fireball, Spell' })
-    expect(link.className).toContain('ui-interactive-row--hover-navigation')
-    expect(link.className).not.toContain('ui-interactive-row--hover-list')
+    expect(link.className).toContain('ui-interactive-row--hover')
   })
 
   it('renders a navigation chevron by default', () => {

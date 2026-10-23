@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Field } from './field.client'
 import { FieldLayout } from './field-layout'
 import { Input } from './input.client'
-import { resolveFieldRowAnatomyPrototypePresentation } from './field-row-anatomy-prototype.variants'
+import { resolveFieldRowAnatomyPresentation } from './field-row-anatomy.variants'
 import { cn } from '../../lib/utils'
 
 /**
@@ -69,7 +69,7 @@ function AnatomyPrototypeRow({
   children: React.ReactNode
 }) {
   // Equal flexible columns — alignment prototype is not a width-parity fixture.
-  const presentation = resolveFieldRowAnatomyPrototypePresentation(['full', 'full'])
+  const presentation = resolveFieldRowAnatomyPresentation(['full', 'full'])
   return (
     <div
       data-field-row-anatomy-prototype=""

@@ -9,12 +9,9 @@ import { Input, type InputProps } from './input.client'
 import type { FieldSize } from './field.client'
 import {
   searchBarEmbeddedInputVariants,
-  searchBarEmbeddedInputWrapVariants,
   searchBarEmbeddedLeadingIconVariants,
-  searchBarEmbeddedRootVariants,
   searchBarFieldInputVariants,
   searchBarLeadingIconVariants,
-  searchBarRootVariants,
 } from './search-bar.variants'
 import { useSearchBarControlSize } from './use-search-bar-control-size.client'
 
@@ -114,12 +111,12 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
 
     if (appearance === 'embedded') {
       return (
-        <div className={cn(searchBarEmbeddedRootVariants(), className)}>
+        <div className={cn('ui-search-bar--embedded-host', className)}>
           <Search
             className={searchBarEmbeddedLeadingIconVariants({ disabled: Boolean(disabled) })}
             aria-hidden
           />
-          <div className={searchBarEmbeddedInputWrapVariants()}>
+          <div className="ui-search-bar__embedded-wrap">
             <input
               ref={setRefs}
               id={id}
@@ -144,7 +141,7 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
     }
 
     return (
-      <div className={cn(searchBarRootVariants(), className)}>
+      <div className={cn('ui-search-bar', className)}>
         <Search
           className={searchBarLeadingIconVariants({
             appearance: 'field',

@@ -1,13 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect } from 'storybook/test'
 import { useState, type ReactNode } from 'react'
-import { Text } from './text'
-
 import {
   ActionIcon,
   iconGhostControlVariants,
   NumberStepper,
   RadioGroup,
+  Text,
   type ContentCardDensity,
 } from '@rpg/ui'
 import {

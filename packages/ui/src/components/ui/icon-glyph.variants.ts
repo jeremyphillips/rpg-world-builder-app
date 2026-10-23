@@ -55,6 +55,3 @@ export function badgeIconGlyphClasses(size: 'sm' | 'md' | 'lg'): string {
 
 /** Icon in inline flow. Size comes from the nearest typography owner's --icon-inline. */
 export const inlineIconTextClasses = 'inline-block shrink-0 align-middle size-icon-inline'
-
-/** Flex status slot. Direct SVG child reads the same inherited step. */
-export const inlineIconFlexSlotClasses = 'shrink-0 leading-none [&>svg]:size-icon-inline'

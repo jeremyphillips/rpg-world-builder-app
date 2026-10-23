@@ -202,7 +202,7 @@ describe('dependent field', () => {
       const region = queryDependentsRegion(container)
       expect(region).toHaveAttribute('data-field-dependent-nest', '')
       expect(region).toHaveClass(dependentNestMarginClasses)
-      expect(region).toHaveClass('before:left-0')
+      expect(region).toHaveClass('ui-field-rail-nest')
       expect(region?.querySelector(':scope > [data-field-dependent-nest]')).toBeNull()
     })
   })
@@ -515,7 +515,7 @@ describe('dependent field', () => {
 
     const separator = container.querySelector('[data-field-separator]')
     expect(separator).toBeInTheDocument()
-    expect(separator).toHaveClass('border-b', 'border-border-subtle', 'pb-7')
+    expect(separator).toHaveClass('border-b', 'ui-border--subtle', 'pb-7')
     expect(separator).toContainElement(screen.getByLabelText('Class restrictions'))
     expect(separator).toContainElement(queryDependentsRegion(container) as HTMLElement)
     expect(container.querySelectorAll('[data-field-separator]')).toHaveLength(1)

@@ -1,0 +1,225 @@
+import { MediaCropEditor, MediaEmblemEditor, Text } from '@rpg/ui'
+import {
+  asContainPresentation,
+  asCropPresentation,
+  defaultEmblemPresentation,
+  mediaRoleSurfaceCopy,
+  resolveEffectiveImageRoles,
+  resolveMediaCropEditorConstraint,
+  type AvailableContentImage,
+  type MediaAsset,
+  type MediaRole,
+  type SourceDimensions,
+} from '@rpg/contracts'
+
+import type { MediaManagerController } from '../../hooks/use-media-manager'
+import { resolveFramePresentation } from '../../lib/content-media-image-frame.lib'
+import { mediaImageUrl, MEDIA_SOURCE_CROP, systemContentImageUrl } from '../../lib/media-display'
+import {
+  isStalePrimaryCrop,
+  resolveWorkspaceEditorCrop,
+  useCorrectStalePrimaryCrop,
+} from './media-workspace-editor.lib'
+
+function MediaWorkspacePreviewFigure({ src, alt }: { src: string; alt: string }) {
+  return (
+    <figure className="min-w-0 space-y-2">
+      <img
+        className="aspect-square w-full rounded-md bg-sunken object-contain"
+        src={src}
+        alt={alt}
+      />
+    </figure>
+  )
+}
+
+function MediaWorkspaceCropEditor({
+  controller,
+  src,
+  source,
+  activeRole,
+  cropPresentation,
+}: {
+  controller: MediaManagerController
+  src: string
+  source: SourceDimensions
+  activeRole: MediaRole
+  cropPresentation: ReturnType<typeof asCropPresentation>
+}) {
+  const { dispatch } = controller
+  const constraint = resolveMediaCropEditorConstraint(activeRole)
+  if (!constraint) return null
+
+  const stalePrimaryCrop = isStalePrimaryCrop(activeRole, source, cropPresentation)
+  const crop = resolveWorkspaceEditorCrop({
+    role: activeRole,
+    source,
+    cropPresentation,
+    stalePrimaryCrop,
+  })
+  const supportsFocalPoint = constraint.spec.supportsFocalPoint
+  const cardPresentation =
+    activeRole === 'primary'
+      ? resolveFramePresentation({
+          role: activeRole,
+          authoredCrop: crop,
+          focalPoint: cropPresentation?.focalPoint,
+          frame: 'builderCard',
+        })
+      : undefined
+  const effectiveCardCrop = cardPresentation?.effectiveCrop
+
+  return (
+    <MediaCropEditor
+      src={src}
+      source={source}
+      constraint={constraint}
+      crop={crop}
+      focalPoint={supportsFocalPoint ? cropPresentation?.focalPoint : undefined}
+      onFocalPointChange={
+        supportsFocalPoint
+          ? (focalPoint) => dispatch({ type: 'crop', crop, focalPoint })
+          : undefined
+      }
+      onChange={(nextCrop) =>
+        dispatch({ type: 'crop', crop: nextCrop, focalPoint: cropPresentation?.focalPoint })
+      }
+      effectiveCropGuide={
+        effectiveCardCrop ? { crop: effectiveCardCrop, label: 'Card crop' } : undefined
+      }
+    />
+  )
+}
+
+function MediaWorkspaceEditor({
+  controller,
+  src,
+  source,
+  activeRole,
+  isActiveForSelection,
+  interaction,
+}: {
+  controller: MediaManagerController
+  src: string
+  source: SourceDimensions
+  activeRole: MediaRole
+  isActiveForSelection: boolean
+  interaction?: string
+}) {
+  const { dispatch } = controller
+  const assignment = controller.state.media.roles[activeRole]
+  const cropPresentation = asCropPresentation(assignment?.presentation)
+  const containPresentation =
+    asContainPresentation(assignment?.presentation) ?? defaultEmblemPresentation()
+  const stalePrimaryCrop = isStalePrimaryCrop(activeRole, source, cropPresentation)
+
+  useCorrectStalePrimaryCrop({
+    dispatch,
+    stalePrimaryCrop,
+    isActiveForSelection,
+    source,
+    focalPoint: cropPresentation?.focalPoint,
+  })
+
+  if (!isActiveForSelection) {
+    return <MediaWorkspacePreviewFigure src={src} alt="" />
+  }
+
+  if (activeRole === 'emblem') {
+    return (
+      <div className="min-w-0 max-w-full space-y-2">
+        <MediaEmblemEditor
+          src={src}
+          source={source}
+          layout={containPresentation}
+          instructions={mediaRoleSurfaceCopy.emblem.instructions}
+          onChange={(layout) => dispatch({ type: 'contain', layout, source })}
+        />
+        {interaction ? <Text variant="supporting">{interaction}</Text> : null}
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-w-0 max-w-full space-y-2">
+      <MediaWorkspaceCropEditor
+        controller={controller}
+        src={src}
+        source={source}
+        activeRole={activeRole}
+        cropPresentation={cropPresentation}
+      />
+    </div>
+  )
+}
+
+function resolveSelectionContext(input: {
+  selectedAvailable: AvailableContentImage
+  asset?: MediaAsset
+  resolveSystemImageUrl: (srcPath: string) => string
+  imageUrl: typeof mediaImageUrl
+}): { src: string; source: SourceDimensions; alt: string } | undefined {
+  if (input.selectedAvailable.kind === 'system') {
+    return {
+      src: input.resolveSystemImageUrl(input.selectedAvailable.srcPath),
+      source: input.selectedAvailable.sourceDimensions,
+      alt: input.selectedAvailable.source.slug,
+    }
+  }
+  if (!input.asset) return undefined
+  return {
+    src: input.imageUrl(input.asset.id, 'artwork', MEDIA_SOURCE_CROP),
+    source: { width: input.asset.orientedWidth, height: input.asset.orientedHeight },
+    alt: input.selectedAvailable.attachment.alt ?? '',
+  }
+}
+
+export function MediaWorkspaceSelection({
+  controller,
+  imageUrl = mediaImageUrl,
+  selectedAvailable,
+  asset,
+  assignedRoles,
+  interaction,
+}: {
+  controller: MediaManagerController
+  imageUrl?: typeof mediaImageUrl
+  selectedAvailable: AvailableContentImage
+  asset?: MediaAsset
+  assignedRoles: MediaRole[]
+  interaction?: string
+}) {
+  const { state, resolveSystemImageUrl = systemContentImageUrl, sessionSources } = controller
+  const activeRole = state.presentation
+  const isActiveForSelection = resolveEffectiveImageRoles(
+    state.media,
+    selectedAvailable.id,
+    [activeRole],
+    sessionSources,
+  ).roles.includes(activeRole)
+  const context = resolveSelectionContext({
+    selectedAvailable,
+    asset,
+    resolveSystemImageUrl,
+    imageUrl,
+  })
+
+  if (!context) {
+    return <div className="flex min-h-48 flex-1 items-stretch">Loading image details…</div>
+  }
+
+  if (assignedRoles.length === 0) {
+    return <MediaWorkspacePreviewFigure src={context.src} alt={context.alt} />
+  }
+
+  return (
+    <MediaWorkspaceEditor
+      controller={controller}
+      src={context.src}
+      source={context.source}
+      activeRole={activeRole}
+      isActiveForSelection={isActiveForSelection}
+      interaction={interaction}
+    />
+  )
+}

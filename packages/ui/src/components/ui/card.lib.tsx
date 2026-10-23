@@ -7,17 +7,6 @@ import { interactiveFocusVariants } from './interactive-focus.variants'
 import type { CardHeaderModel, CardProps } from './card.types'
 import {
   cardSurfaceVariants,
-  UI_CARD_CONTENT_CLASS,
-  UI_CARD_DESCRIPTION_CLASS,
-  UI_CARD_FOOTER_CLASS,
-  UI_CARD_HEADER_CLASS,
-  UI_CARD_MEDIA_CLASS,
-  UI_CARD_MEDIA_MODIFIER_CLASS,
-  UI_CARD_STRETCH_CLASS,
-  UI_CARD_NAV_CHEVRON_CLASS,
-  UI_CARD_NAV_CLASS,
-  UI_CARD_NAV_MAIN_CLASS,
-  UI_CARD_TITLE_CLASS,
   type CardSurfaceVariantProps,
   type GenericCardDensity,
 } from './card.variants'
@@ -30,11 +19,9 @@ export { composeRefs } from './navigable-link-root.lib'
 
 function CardHeaderRegion({ header }: { header: CardHeaderModel }) {
   return (
-    <div className={UI_CARD_HEADER_CLASS}>
-      <h3 className={UI_CARD_TITLE_CLASS}>{header.title}</h3>
-      {header.description ? (
-        <p className={UI_CARD_DESCRIPTION_CLASS}>{header.description}</p>
-      ) : null}
+    <div className="ui-card__header">
+      <h3 className="ui-card__title">{header.title}</h3>
+      {header.description ? <p className="ui-card__description">{header.description}</p> : null}
     </div>
   )
 }
@@ -42,7 +29,7 @@ function CardHeaderRegion({ header }: { header: CardHeaderModel }) {
 /** Decorative trailing chevron for navigable Card and destination rows. */
 export function NavigationChevron({ className }: { className?: string }) {
   return (
-    <span className={cn(UI_CARD_NAV_CHEVRON_CLASS, className)} aria-hidden>
+    <span className={cn('ui-card__nav-chevron', className)} aria-hidden>
       <ChevronRight className="size-icon-glyph-md shrink-0" />
     </span>
   )
@@ -52,11 +39,29 @@ function CardNavigationChevron() {
   return <NavigationChevron />
 }
 
+/** Navigable card interior — main column plus optional trailing chevron. */
+export function CardNavInterior({
+  main,
+  showNavigationChevron = true,
+  mainClassName,
+}: {
+  main: React.ReactNode
+  showNavigationChevron?: boolean
+  mainClassName?: string
+}) {
+  return (
+    <div className="ui-card__nav">
+      <div className={cn('ui-card__nav-main', mainClassName)}>{main}</div>
+      {showNavigationChevron ? <CardNavigationChevron /> : null}
+    </div>
+  )
+}
+
 export function CardMedia({ leadMedia }: { leadMedia?: React.ReactNode }) {
   if (leadMedia == null) {
     return null
   }
-  return <div className={UI_CARD_MEDIA_CLASS}>{leadMedia}</div>
+  return <div className="ui-card__media">{leadMedia}</div>
 }
 
 type DeclarativeInteriorProps = {
@@ -79,8 +84,8 @@ export function DeclarativeCardInterior({
   const main = (
     <>
       {header ? <CardHeaderRegion header={header} /> : null}
-      {hasBody ? <div className={UI_CARD_CONTENT_CLASS}>{children}</div> : null}
-      {footer ? <div className={UI_CARD_FOOTER_CLASS}>{footer}</div> : null}
+      {hasBody ? <div className="ui-card__content">{children}</div> : null}
+      {footer ? <div className="ui-card__footer">{footer}</div> : null}
     </>
   )
 
@@ -88,12 +93,7 @@ export function DeclarativeCardInterior({
     return <>{main}</>
   }
 
-  return (
-    <div className={UI_CARD_NAV_CLASS}>
-      <div className={UI_CARD_NAV_MAIN_CLASS}>{main}</div>
-      {showNavigationChevron ? <CardNavigationChevron /> : null}
-    </div>
-  )
+  return <CardNavInterior main={main} showNavigationChevron={showNavigationChevron} />
 }
 
 export function resolveCardSurfaceClassName({
@@ -123,8 +123,8 @@ export function resolveCardSurfaceClassName({
     cardSurfaceVariants({ tone, elevation, density, interactive, selected, disabled }),
     navigable &&
       cn('block w-full min-w-0 no-underline', interactiveFocusVariants({ context: 'standalone' })),
-    stretch && UI_CARD_STRETCH_CLASS,
-    leadMedia && UI_CARD_MEDIA_MODIFIER_CLASS,
+    stretch && 'ui-card--stretch',
+    leadMedia && 'ui-card--media',
     className,
   )
 }

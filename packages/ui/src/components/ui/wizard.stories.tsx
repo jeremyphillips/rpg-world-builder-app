@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Wizard, WizardFooter, useWizard, type WizardStepDef } from './wizard.client'
+import { WIZARD_CLASS_SPECS } from './wizard.styles'
 import { cn } from '../../lib/utils'
 import { Text } from './text'
 import { fieldLabelVariants } from './field.variants'
@@ -169,4 +171,25 @@ export const FourSteps: StoryObj = {
       </Wizard>
     )
   },
+}
+
+export const ClassReference: StoryObj = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={WIZARD_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <span data-semantic-class-target className={spec.className}>
+            ·
+          </span>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
 }

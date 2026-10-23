@@ -11,8 +11,6 @@ export const catalogPickerCardListClasses = 'flex flex-col gap-2 w-full'
 
 export const catalogPickerSheetListVariants = cva(catalogPickerCardListClasses)
 
-export { insetPanelEmptyStateVariants as catalogPickerSheetEmptyVariants } from './inset-panel.variants'
-
 export const catalogPickerSheetLoadingVariants = cva('flex justify-center py-12')
 
 /**

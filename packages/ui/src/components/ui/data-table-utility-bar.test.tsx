@@ -16,11 +16,10 @@ describe('DataTableUtilityBar', () => {
       />,
     )
 
-    const rows = container.querySelectorAll('[class*="bg-surface-subtle"]')
+    const rows = container.querySelectorAll(
+      '.ui-data-table__utility-summary, .ui-data-table__utility-actions',
+    )
     expect(rows.length).toBeGreaterThanOrEqual(2)
-    for (const row of rows) {
-      expect(row).toHaveClass('[--surface-current:var(--surface-subtle)]')
-    }
   })
 
   it('omits empty rows independently', () => {
@@ -33,7 +32,7 @@ describe('DataTableUtilityBar', () => {
 
     expect(screen.getByText('12 results')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Columns' })).toBeInTheDocument()
-    expect(container.querySelectorAll('[class*="border-b"]').length).toBeGreaterThan(0)
+    expect(container.querySelector('.ui-data-table__utility-actions')).toBeInTheDocument()
   })
 
   it('returns null when all slots are empty', () => {

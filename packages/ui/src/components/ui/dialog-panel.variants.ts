@@ -1,7 +1,31 @@
-import { cva } from 'class-variance-authority'
-
 import { boundedScrollRegionEndInsetClasses } from './bounded-scroll-region.variants'
 import { cn } from '../../lib/utils'
+
+export const DIALOG_PANEL_FILLS = ['background', 'card', 'surface-lift'] as const
+export type DialogPanelFill = (typeof DIALOG_PANEL_FILLS)[number]
+
+export const DIALOG_PANEL_GEOMETRIES = ['frame', 'side-right', 'side-left', 'side-bottom'] as const
+export type DialogPanelGeometry = (typeof DIALOG_PANEL_GEOMETRIES)[number]
+
+export const UI_DIALOG_PANEL_FILL_CLASSES = DIALOG_PANEL_FILLS.map(
+  (fill) => `ui-dialog-panel--fill-${fill}` as const,
+)
+export const UI_DIALOG_PANEL_GEOMETRY_CLASSES = DIALOG_PANEL_GEOMETRIES.map(
+  (geometry) => `ui-dialog-panel--${geometry}` as const,
+)
+
+export function dialogPanelFill(fill: DialogPanelFill): string {
+  return `ui-dialog-panel--fill-${fill}`
+}
+
+export function dialogPanelGeometry(geometry: DialogPanelGeometry): string {
+  return `ui-dialog-panel--${geometry}`
+}
+
+export const DIALOG_PANEL_CLASS_SPECS = [
+  ...DIALOG_PANEL_FILLS.map((fill) => dialogPanelFill(fill)),
+  ...DIALOG_PANEL_GEOMETRIES.map((geometry) => dialogPanelGeometry(geometry)),
+] as const
 
 /**
  * Canonical dialog panel section inset. Shared by Modal/Sheet body+footer padding
@@ -15,43 +39,6 @@ export const dialogPanelSectionPaddingClasses = 'p-6'
  * Managed Form content and sheet form footers consume this — not a Form-owned padding SSOT.
  */
 export const dialogPanelSectionInsetXClasses = 'px-6'
-
-/**
- * Clip shell for default Modal/Sheet bodies — inner {@link DialogPanelScrollRegion}
- * owns overflow. Sheet adds `flex-1` via {@link sheetBodyVariants}.
- * DrawerShell `bodyMode="managed"` uses {@link dialogPanelManagedBodyVariants} instead.
- */
-export const dialogPanelBodyVariants = cva(
-  cn('flex min-h-0 flex-1 flex-col overflow-hidden text-sm'),
-)
-
-/**
- * Stable modal body shell — flex clip with section horizontal inset. A child
- * {@link DialogPanelScrollRegion} with `inset="inner"` owns scroll chrome only.
- * Pinned siblings may repeat {@link dialogPanelSectionInsetXClasses} for alignment.
- */
-export const dialogPanelStableBodyVariants = cva(
-  cn(
-    'flex min-h-0 flex-1 flex-col overflow-hidden pt-0 pb-0 text-sm',
-    dialogPanelSectionInsetXClasses,
-  ),
-)
-
-/**
- * Stable body clip shell without horizontal inset — section inset lives on child
- * scrollports (`inset="section"`) or pinned chrome wrappers (`CreateModalShell`).
- */
-export const dialogPanelStableBodyClipVariants = cva(
-  cn('flex min-h-0 flex-1 flex-col overflow-hidden pt-0 pb-0 text-sm'),
-)
-
-/**
- * Managed sheet/drawer body — caller supplies the overlay scrollport (Form externalFooter,
- * composed drawer content). No padding; no auto scroll region.
- */
-export const dialogPanelManagedBodyVariants = cva(
-  cn('flex min-h-0 flex-1 flex-col overflow-hidden p-0 text-sm'),
-)
 
 /** Top inset for overlay scroll viewports — 20px breathing room below the header border. */
 export const dialogPanelScrollRegionTopInsetClasses = 'pt-5'
@@ -121,10 +108,10 @@ export const dialogPanelScrollRegionClasses = cn(
 )
 
 /**
- * Faint separator color shared by overlay panel header and footer section borders.
+ * Subtle separator color shared by overlay panel header and footer section borders.
  * Pair with `border-t` on footers and `border-b` on headers.
  */
-export const dialogPanelSectionSeparatorBorderClasses = 'border-border-faint'
+export const dialogPanelSectionSeparatorBorderClasses = 'ui-border--subtle'
 
 /**
  * Overlay header section chrome — bottom separator, section inset, title stack rhythm.

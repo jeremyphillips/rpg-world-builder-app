@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react'
 
-import { masterDetailGridClasses } from './master-detail-grid.variants'
-
 export interface MasterDetailGridProps {
   children: ReactNode
 }
 
 /** Standard two-column master-detail layout: 1/3 list rail + 2/3 detail at md+. */
 export function MasterDetailGrid({ children }: MasterDetailGridProps) {
-  return <div className={masterDetailGridClasses}>{children}</div>
+  return (
+    <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-3 [--master-detail-list-max-block-size:28rem]">
+      {children}
+    </div>
+  )
 }

@@ -1,3 +1,5 @@
+/** Layout and typography for builder fact summary rows — dashboard-local, not `@rpg/ui`. */
+
 export const builderFactSummaryIconRowsClasses = 'space-y-0'
 
 export const builderFactSummaryIconRowClasses =
@@ -15,11 +17,9 @@ export const builderFactSummarySimpleRowClasses = 'space-y-0.5'
 
 export const builderFactSummarySimpleLabelClasses = 'text-style-caption'
 
-export const builderFactSummarySetValueClasses = 'text-style-label text-foreground'
-
 export const builderFactSummaryUnsetValueClasses = 'italic text-style-supporting'
 
-export const builderFactSummarySimpleValueClasses = builderFactSummarySetValueClasses
+export const builderFactSummarySimpleValueClasses = 'text-style-label text-foreground'
 
 export const builderFactSummaryGrantedRowsClasses = 'space-y-0'
 

@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { interactiveListEmptyVariants, interactiveListVariants } from './interactive-list.variants'
+import { interactiveListVariants } from './interactive-list.variants'
 
 export interface InteractiveListProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
@@ -26,5 +26,5 @@ export interface InteractiveListEmptyProps {
 }
 
 export function InteractiveListEmpty({ children, className }: InteractiveListEmptyProps) {
-  return <p className={cn(interactiveListEmptyVariants(), className)}>{children}</p>
+  return <p className={cn('ui-interactive-list__empty', className)}>{children}</p>
 }

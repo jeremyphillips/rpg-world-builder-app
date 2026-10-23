@@ -10,7 +10,6 @@ import './card-surface-interaction-matrix.css'
 import {
   CARD_CLASS_SPECS,
   CARD_SURFACE_TONES,
-  UI_CARD_CONTENT_CLASS,
   cardSurfaceVariants,
   type CardSurfaceTone,
 } from './card.variants'
@@ -274,7 +273,7 @@ function SurfaceMatrixCell({
       data-matrix-state={state}
       className={surfaceMatrixShellClassName(tone, state)}
     >
-      <div className={UI_CARD_CONTENT_CLASS}>
+      <div className={'ui-card__content'}>
         <Text variant="label">{label}</Text>
         <Text variant="caption">{tone} · comfortable inset</Text>
       </div>
@@ -374,7 +373,7 @@ export const SurfaceInteractionMatrix: Story = {
                 'min-h-[5.5rem] w-full',
               )}
             >
-              <div className={UI_CARD_CONTENT_CLASS}>
+              <div className={'ui-card__content'}>
                 <Text variant="label">{elevation}</Text>
                 <Text variant="caption">strong · elevation</Text>
               </div>
@@ -440,7 +439,7 @@ export const ClassReference: Story = {
         key: spec.key,
         sample: (
           <div data-semantic-class-target className={spec.className}>
-            <div className={UI_CARD_CONTENT_CLASS}>{spec.useCase}</div>
+            <div className={'ui-card__content'}>{spec.useCase}</div>
           </div>
         ),
         propsLabel: spec.key,

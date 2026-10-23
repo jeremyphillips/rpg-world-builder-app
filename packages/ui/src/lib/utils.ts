@@ -5,6 +5,9 @@ import {
   UI_BUTTON_APPEARANCE_CLASSES,
   UI_BUTTON_SIZE_CLASSES,
   UI_BUTTON_TEXT_GEOMETRY_CLASSES,
+  UI_BORDER_STRENGTH_CLASSES,
+  UI_DIALOG_PANEL_FILL_CLASSES,
+  UI_DIALOG_PANEL_GEOMETRY_CLASSES,
   UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,
   UI_FIELD_CONTROL_SIZE_CLASSES,
@@ -16,6 +19,13 @@ import {
   UI_COMPACT_LABEL_SIZE_CLASSES,
   UI_ALERT_APPEARANCE_CLASSES,
   UI_ALERT_DENSITY_CLASSES,
+  UI_METADATA_LIST_COLUMN_GAP_CLASSES,
+  UI_METADATA_LIST_EMPHASIS_CLASSES,
+  UI_METADATA_LIST_ROW_GAP_CLASSES,
+  UI_METADATA_LIST_SIZE_CLASSES,
+  UI_METADATA_LIST_VALUE_TRACK_CLASSES,
+  UI_TABS_LIST_APPEARANCE_CLASSES,
+  UI_TABS_TRIGGER_APPEARANCE_CLASSES,
   UI_CARD_INTERACTION_CLASSES,
   UI_INSET_PANEL_SIZE_CLASSES,
   UI_INTERACTIVE_LIST_ROW_SIZE_CLASSES,
@@ -25,6 +35,10 @@ import {
   UI_CHOICE_CONTROL_KIND_CLASSES,
   UI_FIELD_GROUP_LAYOUT_CLASSES,
   UI_FIELD_GROUP_SIZE_CLASSES,
+  UI_AVATAR_SIZE_CLASSES,
+  UI_TOAST_TONE_CLASSES,
+  UI_SEMANTIC_TEXT_EMPHASIS_CLASSES,
+  UI_SEMANTIC_TEXT_TONE_CLASSES,
 } from './semantic-control-class-groups'
 
 const HEADING_STYLE_UTILITIES = [
@@ -102,6 +116,9 @@ type TypographyClassGroupIds =
   | 'ui-button-size'
   | 'ui-button-appearance'
   | 'ui-button-text-geometry'
+  | 'ui-border-strength'
+  | 'ui-dialog-panel-fill'
+  | 'ui-dialog-panel-geometry'
   | 'ui-field-control-size'
   | 'ui-field-control-multiline-size'
   | 'ui-field-control-digits-size'
@@ -110,12 +127,23 @@ type TypographyClassGroupIds =
   | 'ui-field-control-width'
   | 'ui-floating-label-size'
   | 'ui-field-group-size'
+  | 'ui-avatar-size'
+  | 'ui-toast-tone'
+  | 'ui-semantic-text-tone'
+  | 'ui-semantic-text-emphasis'
   | 'ui-field-group-layout'
   | 'ui-compact-control-size'
   | 'ui-compact-label-size'
   | 'ui-compact-label-appearance'
   | 'ui-alert-appearance'
   | 'ui-alert-density'
+  | 'ui-metadata-list-size'
+  | 'ui-metadata-list-column-gap'
+  | 'ui-metadata-list-row-gap'
+  | 'ui-metadata-list-value-track'
+  | 'ui-metadata-list-emphasis'
+  | 'ui-tabs-list-appearance'
+  | 'ui-tabs-trigger-appearance'
   | 'ui-card-interaction'
   | 'ui-inset-panel-size'
   | 'ui-interactive-row-hover'
@@ -188,6 +216,9 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-button-size': [...UI_BUTTON_SIZE_CLASSES],
       'ui-button-appearance': [...UI_BUTTON_APPEARANCE_CLASSES],
       'ui-button-text-geometry': [...UI_BUTTON_TEXT_GEOMETRY_CLASSES],
+      'ui-border-strength': [...UI_BORDER_STRENGTH_CLASSES],
+      'ui-dialog-panel-fill': [...UI_DIALOG_PANEL_FILL_CLASSES],
+      'ui-dialog-panel-geometry': [...UI_DIALOG_PANEL_GEOMETRY_CLASSES],
       'ui-field-control-size': [...UI_FIELD_CONTROL_SIZE_CLASSES],
       'ui-field-control-multiline-size': [...UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES],
       'ui-field-control-digits-size': [...UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES],
@@ -199,6 +230,13 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-compact-label-appearance': [...UI_COMPACT_LABEL_APPEARANCE_CLASSES],
       'ui-alert-appearance': [...UI_ALERT_APPEARANCE_CLASSES],
       'ui-alert-density': [...UI_ALERT_DENSITY_CLASSES],
+      'ui-metadata-list-size': [...UI_METADATA_LIST_SIZE_CLASSES],
+      'ui-metadata-list-column-gap': [...UI_METADATA_LIST_COLUMN_GAP_CLASSES],
+      'ui-metadata-list-row-gap': [...UI_METADATA_LIST_ROW_GAP_CLASSES],
+      'ui-metadata-list-value-track': [...UI_METADATA_LIST_VALUE_TRACK_CLASSES],
+      'ui-metadata-list-emphasis': [...UI_METADATA_LIST_EMPHASIS_CLASSES],
+      'ui-tabs-list-appearance': [...UI_TABS_LIST_APPEARANCE_CLASSES],
+      'ui-tabs-trigger-appearance': [...UI_TABS_TRIGGER_APPEARANCE_CLASSES],
       'ui-card-interaction': [...UI_CARD_INTERACTION_CLASSES],
       'ui-inset-panel-size': [...UI_INSET_PANEL_SIZE_CLASSES],
       'ui-interactive-row-hover': [...UI_INTERACTIVE_ROW_HOVER_CLASSES],
@@ -208,6 +246,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-choice-control-indicator-size': [...UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES],
       'ui-field-group-size': [...UI_FIELD_GROUP_SIZE_CLASSES],
       'ui-field-group-layout': [...UI_FIELD_GROUP_LAYOUT_CLASSES],
+      'ui-avatar-size': [...UI_AVATAR_SIZE_CLASSES],
+      'ui-toast-tone': [...UI_TOAST_TONE_CLASSES],
+      'ui-semantic-text-tone': [...UI_SEMANTIC_TEXT_TONE_CLASSES],
+      'ui-semantic-text-emphasis': [...UI_SEMANTIC_TEXT_EMPHASIS_CLASSES],
     },
     conflictingClassGroups: {
       'heading-style': [...TYPOGRAPHY_CONFLICT_GROUPS],
@@ -217,6 +259,9 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-button-size': ['ui-button-size'],
       'ui-button-appearance': ['ui-button-appearance'],
       'ui-button-text-geometry': ['ui-button-text-geometry'],
+      'ui-border-strength': ['ui-border-strength', 'ui-toast-tone'],
+      'ui-dialog-panel-fill': ['ui-dialog-panel-fill'],
+      'ui-dialog-panel-geometry': ['ui-dialog-panel-geometry'],
       'ui-field-control-size': ['ui-field-control-size'],
       'ui-field-control-multiline-size': ['ui-field-control-multiline-size'],
       'ui-field-control-digits-size': ['ui-field-control-digits-size'],
@@ -229,6 +274,11 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-compact-label-appearance': ['ui-compact-label-appearance'],
       'ui-alert-appearance': ['ui-alert-appearance'],
       'ui-alert-density': ['ui-alert-density'],
+      'ui-metadata-list-size': ['ui-metadata-list-size'],
+      'ui-metadata-list-column-gap': ['ui-metadata-list-column-gap'],
+      'ui-metadata-list-row-gap': ['ui-metadata-list-row-gap'],
+      'ui-metadata-list-value-track': ['ui-metadata-list-value-track'],
+      'ui-metadata-list-emphasis': ['ui-metadata-list-emphasis'],
       'ui-card-interaction': ['ui-card-interaction'],
       'ui-inset-panel-size': ['ui-inset-panel-size'],
       'ui-interactive-row-hover': ['ui-interactive-row-hover'],
@@ -250,6 +300,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-choice-control-indicator-size': ['ui-choice-control-indicator-size'],
       'ui-field-group-size': ['ui-field-group-size'],
       'ui-field-group-layout': ['ui-field-group-layout'],
+      'ui-avatar-size': ['ui-avatar-size'],
+      'ui-toast-tone': ['ui-toast-tone', 'ui-border-strength'],
+      'ui-semantic-text-tone': ['ui-semantic-text-tone'],
+      'ui-semantic-text-emphasis': ['ui-semantic-text-emphasis'],
       'font-size': ['heading-style', 'eyebrow-style', 'text-style'],
       'font-weight': ['heading-style', 'eyebrow-style', 'text-style'],
       tracking: ['heading-style', 'eyebrow-style'],

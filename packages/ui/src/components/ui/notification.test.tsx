@@ -32,7 +32,10 @@ describe('NotificationUnreadBadge', () => {
 
   it('uses solid destructive alert styling', () => {
     const { container } = render(<NotificationUnreadBadge count={3} />)
-    expect(container.firstChild).toHaveClass('bg-destructive', 'text-destructive-foreground')
+    expect(container.firstChild).toHaveClass(
+      'ui-notification-unread-badge',
+      'ui-notification-unread-badge--alert',
+    )
   })
 })
 

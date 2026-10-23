@@ -35,7 +35,6 @@ export {
 export {
   resolveFieldRailClasses,
   resolveDependentNestRailClasses,
-  fieldRailOffsetClasses,
   type FieldRailTone,
 } from './field-rail.variants'
 
@@ -45,7 +44,6 @@ export type FieldDependentsScope = 'wrapper' | 'arrayItems'
 /** Internal form nesting plane — not author-facing. */
 export type FormSurfaceHost = 'field-container' | 'array-item'
 
-/** @deprecated Use {@link FieldRailTone}. */
 export type FieldGroupRailTone = FieldRailTone
 
 /** Nest horizontal offset from controller — 44px (`ml-11`). */
@@ -65,7 +63,7 @@ export function resolveFieldDependentsChromeClasses(options: FieldContainerChrom
 /** @deprecated Use {@link resolveDependentNestRailClasses}. */
 export function resolveDependentRailChromeClasses(
   _rhythm: FieldRhythm = 'comfortable',
-  tone: FieldRailTone = 'border',
+  tone: FieldRailTone = 'neutral',
 ): string {
   return resolveFieldRailClasses(tone)
 }

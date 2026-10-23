@@ -5,6 +5,11 @@ import {
   UI_ALERT_DENSITY_CLASSES,
 } from '../components/ui/alert.variants'
 import { UI_COMPACT_LABEL_APPEARANCE_CLASSES } from '../components/ui/badge-appearance.lib'
+import { UI_BORDER_STRENGTH_CLASSES } from '../components/ui/border-strength'
+import {
+  UI_DIALOG_PANEL_FILL_CLASSES,
+  UI_DIALOG_PANEL_GEOMETRY_CLASSES,
+} from '../components/ui/dialog-panel.variants'
 import {
   UI_BUTTON_APPEARANCE_CLASSES,
   UI_BUTTON_SIZE_CLASSES,
@@ -51,6 +56,7 @@ import {
   UI_INTERACTIVE_ROW_HOVER_CLASS,
   UI_INTERACTIVE_ROW_SELECTED_CLASS,
   UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS,
+  UI_INTERACTIVE_ROW_EMPHASIS_FILL_CLASS,
 } from '../components/ui/interactive-row.styles'
 import * as classGroups from './semantic-control-class-groups'
 
@@ -60,6 +66,21 @@ function expectSameSet(actual: readonly string[], expected: readonly string[], l
 
 describe('semantic-control-class-groups sync', () => {
   it('re-exports twMerge groups from styling owners', () => {
+    expectSameSet(
+      classGroups.UI_BORDER_STRENGTH_CLASSES,
+      UI_BORDER_STRENGTH_CLASSES,
+      'border strength',
+    )
+    expectSameSet(
+      classGroups.UI_DIALOG_PANEL_FILL_CLASSES,
+      UI_DIALOG_PANEL_FILL_CLASSES,
+      'dialog panel fill',
+    )
+    expectSameSet(
+      classGroups.UI_DIALOG_PANEL_GEOMETRY_CLASSES,
+      UI_DIALOG_PANEL_GEOMETRY_CLASSES,
+      'dialog panel geometry',
+    )
     expectSameSet(
       classGroups.UI_BUTTON_APPEARANCE_CLASSES,
       UI_BUTTON_APPEARANCE_CLASSES,
@@ -166,7 +187,11 @@ describe('semantic-control-class-groups sync', () => {
     )
     expectSameSet(
       UI_INTERACTIVE_ROW_SELECTED_CLASSES,
-      [...Object.values(UI_INTERACTIVE_ROW_SELECTED_CLASS), UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS],
+      [
+        ...Object.values(UI_INTERACTIVE_ROW_SELECTED_CLASS),
+        UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS,
+        UI_INTERACTIVE_ROW_EMPHASIS_FILL_CLASS,
+      ],
       'interactive row selected',
     )
   })

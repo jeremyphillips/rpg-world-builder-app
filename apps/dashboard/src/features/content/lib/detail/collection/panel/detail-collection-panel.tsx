@@ -1,13 +1,12 @@
 import type { ReactNode } from 'react'
 
-import { cn, establishSurfaceCurrent, Heading } from '@rpg/ui'
+import { cn, establishSurfaceCurrent, Heading, panelVariants } from '@rpg/ui'
 
 import {
   detailCollectionPanelBodyVariants,
   detailCollectionPanelHeaderHelperClasses,
   detailCollectionPanelHeaderRowVariants,
   detailCollectionPanelHeaderVariants,
-  detailCollectionPanelVariants,
 } from './detail-collection-panel.variants'
 
 export type DetailCollectionPanelProps = {
@@ -43,7 +42,14 @@ export function DetailCollectionPanel({
   className,
 }: DetailCollectionPanelProps) {
   return (
-    <section className={cn(detailCollectionPanelVariants(), className)} aria-labelledby={headingId}>
+    <section
+      className={cn(
+        panelVariants({ tone: 'transparent', bleed: true }),
+        'overflow-hidden',
+        className,
+      )}
+      aria-labelledby={headingId}
+    >
       <div className={detailCollectionPanelHeaderVariants({ surface: headerSurface })}>
         <div className={detailCollectionPanelHeaderRowVariants({ align: headerAlign })}>
           <div className="flex min-w-0 items-center gap-3">

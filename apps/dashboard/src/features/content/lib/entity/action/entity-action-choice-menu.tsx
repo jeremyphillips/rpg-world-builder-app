@@ -6,12 +6,10 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-  InteractiveList,
   MenuChoiceRow,
   cn,
+  dropdownMenuChoiceContentClasses,
 } from '@rpg/ui'
-
-import { entityActionChoiceMenuContentClasses } from './entity-action-choice-menu.variants'
 
 export type EntityActionChoiceMenuItem = {
   id: string
@@ -67,20 +65,18 @@ export function EntityActionChoiceMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className={cn(entityActionChoiceMenuContentClasses)}>
+      <DropdownMenuContent align="end" className={cn(dropdownMenuChoiceContentClasses)}>
         {menuHeading ? <DropdownMenuLabel>{menuHeading}</DropdownMenuLabel> : null}
-        <InteractiveList>
-          {items.map((item) => (
-            <MenuChoiceRow
-              key={item.id}
-              heading={item.label}
-              supporting={item.description}
-              supportingWrap
-              disabled={item.disabled}
-              onSelect={() => item.onSelect()}
-            />
-          ))}
-        </InteractiveList>
+        {items.map((item) => (
+          <MenuChoiceRow
+            key={item.id}
+            heading={item.label}
+            supporting={item.description}
+            supportingWrap
+            disabled={item.disabled}
+            onSelect={() => item.onSelect()}
+          />
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   )

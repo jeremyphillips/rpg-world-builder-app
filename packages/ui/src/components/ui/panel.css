@@ -19,34 +19,28 @@
   }
 
   .ui-panel--transparent {
-    border-color: var(--border-subtle);
     background-color: transparent;
-    --ui-surface-bg: transparent;
   }
 
   .ui-panel--quiet {
-    border-color: var(--border);
     --ui-surface-bg: var(--surface-lift);
     --surface-current: var(--surface-lift);
     background-color: var(--ui-surface-bg);
   }
 
   .ui-panel--subtle {
-    border-color: var(--border);
     --ui-surface-bg: var(--surface-subtle);
     --surface-current: var(--surface-subtle);
     background-color: var(--ui-surface-bg);
   }
 
   .ui-panel--strong {
-    border-color: var(--border);
     --ui-surface-bg: var(--surface-strong);
     --surface-current: var(--surface-strong);
     background-color: var(--ui-surface-bg);
   }
 
   .ui-panel--faint {
-    border-color: var(--border);
     --ui-surface-bg: var(--surface-faint);
     --surface-current: var(--surface-faint);
     background-color: var(--ui-surface-bg);

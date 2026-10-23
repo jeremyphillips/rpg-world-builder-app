@@ -4,7 +4,6 @@ import {
   TableBadgeCell,
   Text,
   dataTableColumnMeta,
-  dataTableNameLinkCellVariants,
   dataTableWidthMeta,
 } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
@@ -30,7 +29,7 @@ export function adminUsersColumns(): ColumnDef<AdminUserListItem>[] {
           <div className="flex min-w-0 flex-col gap-0.5">
             <Link
               to={ROUTES.admin.user.detail(user.id)}
-              className={dataTableNameLinkCellVariants({ className: 'truncate font-medium' })}
+              className="truncate font-medium font-data-name hover:underline focus-visible:underline"
             >
               {user.displayName}
             </Link>

@@ -25,7 +25,7 @@ export const UI_ALERT_DENSITY_CLASSES = ALERT_DENSITIES.map(
 export const alertVariants = cva('ui-alert', {
   variants: {
     variant: {
-      default: 'ui-alert--default',
+      default: 'ui-alert--default ui-border--default',
       info: 'ui-alert--info',
       success: 'ui-alert--success',
       warning: 'ui-alert--warning',
@@ -42,10 +42,6 @@ export const alertVariants = cva('ui-alert', {
     density: 'comfortable',
   },
 })
-
-export const alertTitleVariants = cva('ui-alert__title ui-copy-title')
-
-export const alertDescriptionVariants = cva('ui-alert__description ui-copy-supporting')
 
 export const ALERT_CLASS_SPECS = [
   {

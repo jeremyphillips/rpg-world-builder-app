@@ -89,18 +89,18 @@ Container chrome uses `surface?: SurfaceConfig` and `tone?: SemanticSurfaceTone`
 
 ## Migration map (Phase 1 + 2)
 
-| Current                                 | Intent               | Target                                                                        |
-| --------------------------------------- | -------------------- | ----------------------------------------------------------------------------- |
-| `FieldSurfaceVariant.base`              | untreated flat plane | `{ variant: 'plain' }` + `SurfaceConfig { elevation: 'flat' }` when migrating |
-| `...raised`                             | card elevation       | `SurfaceConfig { elevation: 'raised' }`                                       |
-| `...subtle`                             | light wash           | `emphasis: 'subtle'`, `elevation: 'flat'`                                     |
-| `...muted`                              | secondary panel      | `emphasis: 'subtle'` on `bg-surface-muted` recipe                             |
-| `...strong`                             | dense chrome         | `emphasis: 'strong'`                                                          |
-| `SemanticSurfaceTone` + container       | semantic callout     | `{ tone, emphasis: 'subtle' }`                                                |
-| `FieldBorderLadderTone`                 | border intensity     | maps to `VisualEmphasis` on border channel                                    |
-| `FieldGroupSummary.surface: 'inactive'` | warning accent shell | `chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' }`           |
-| `status.indicator: 'inactive'`          | icon shape           | keep as **indicator**, not state vocabulary                                   |
-| `status.tone: 'positive'`               | success status       | `tone: 'success'`                                                             |
+| Current                                 | Intent                   | Target                                                                        |
+| --------------------------------------- | ------------------------ | ----------------------------------------------------------------------------- | ------- | ------------------ |
+| `FieldSurfaceVariant.base`              | untreated flat plane     | `{ variant: 'plain' }` + `SurfaceConfig { elevation: 'flat' }` when migrating |
+| `...raised`                             | card elevation           | `SurfaceConfig { elevation: 'raised' }`                                       |
+| `...subtle`                             | light wash               | `emphasis: 'subtle'`, `elevation: 'flat'`                                     |
+| `...muted`                              | secondary panel          | `emphasis: 'subtle'` on `bg-surface-muted` recipe                             |
+| `...strong`                             | dense chrome             | `emphasis: 'strong'`                                                          |
+| `SemanticSurfaceTone` + container       | semantic callout         | `{ tone, emphasis: 'subtle' }`                                                |
+| `BorderStrength`                        | neutral border intensity | shared `subtle                                                                | default | strong` vocabulary |
+| `FieldGroupSummary.surface: 'inactive'` | warning accent shell     | `chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' }`           |
+| `status.indicator: 'inactive'`          | icon shape               | keep as **indicator**, not state vocabulary                                   |
+| `status.tone: 'positive'`               | success status           | `tone: 'success'`                                                             |
 
 ## Reference case — campaign availability (unavailable)
 
