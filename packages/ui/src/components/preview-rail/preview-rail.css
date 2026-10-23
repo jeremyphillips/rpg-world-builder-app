@@ -1,0 +1,51 @@
+/*
+ * PreviewRail bands. Perimeter is Panel when chrome is card.
+ * Separators use ui-border--subtle on the element.
+ */
+@layer components {
+  .ui-preview-rail__header,
+  .ui-preview-rail__identity {
+    flex-shrink: 0;
+    padding-bottom: calc(var(--spacing) * 2.5);
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+  }
+
+  .ui-preview-rail__header:has(+ [data-slot='preview-rail-identity']) {
+    border-bottom-width: 0;
+    padding-bottom: 0;
+  }
+
+  .ui-preview-rail__footer {
+    flex-shrink: 0;
+    border-top-width: 1px;
+    border-top-style: solid;
+  }
+
+  .ui-preview-rail__accordion {
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  .ui-preview-rail__accordion-item {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+  }
+
+  .ui-preview-rail__accordion-item:last-child {
+    border-bottom-width: 0;
+  }
+
+  .ui-preview-rail__section-body {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 3);
+    border-radius: var(--radius-md);
+    border-width: 1px;
+    border-style: solid;
+    padding: calc(var(--spacing) * 3);
+    background-color: var(--surface-faint);
+  }
+}

@@ -1,7 +1,6 @@
 import type { MasterDetailAvailabilityPresentation } from '../../lib/master-detail/master-detail-availability.types'
 import { MasterDetailAvailabilityHeaderLine } from './master-detail-availability-header-line'
 import { MasterDetailEditorIssueSummary } from './master-detail-editor-issue-summary'
-import { masterDetailEditorStatusRowClasses } from './master-detail-editor-panel.variants'
 
 export interface MasterDetailEditorStatusRowProps {
   availability?: MasterDetailAvailabilityPresentation
@@ -21,7 +20,7 @@ export function MasterDetailEditorStatusRow({
   if (!showAvailability && !showIssues) return null
 
   return (
-    <div className={masterDetailEditorStatusRowClasses}>
+    <div className="flex flex-wrap items-center gap-x-6 pt-0.5 text-style-caption">
       {showAvailability && availability && onAvailabilityChange ? (
         <MasterDetailAvailabilityHeaderLine
           availability={availability}

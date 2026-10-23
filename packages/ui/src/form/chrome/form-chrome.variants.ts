@@ -18,12 +18,6 @@ export const formTabbedAsideGridColsBelow2xlClasses = `xl:grid-cols-[minmax(0,1f
 /** TabbedForm grid tracks when the persistent preview rail is visible at `2xl` and above. */
 export const formTabbedAsideGridColsAt2xlClasses = `2xl:grid-cols-[minmax(0,1fr)_${formTabbedAsideWidthAt2xl}]`
 
-/** PreviewRail card max width below `2xl` — matches the aside column. */
-export const formTabbedAsideCardMaxWidthBelow2xlClasses = `max-w-[${formTabbedAsideWidthBelow2xl}]`
-
-/** PreviewRail card max width at `2xl` and above. */
-export const formTabbedAsideCardMaxWidthAt2xlClasses = `2xl:max-w-[${formTabbedAsideWidthAt2xl}]`
-
 /** Sticky tab list wrapper — keeps section tabs visible while scrolling long panels. */
 export const formStickyTabsClasses =
   'sticky top-0 z-20 bg-background supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'

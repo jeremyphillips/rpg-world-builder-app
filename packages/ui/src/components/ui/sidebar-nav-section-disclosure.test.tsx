@@ -22,6 +22,10 @@ describe('SidebarNavSectionDisclosure', () => {
       'aria-expanded',
       'true',
     )
+    expect(screen.getByRole('button', { name: 'Campaign' })).toHaveClass('hover:text-foreground/80')
+    expect(screen.getByRole('button', { name: 'Campaign' }).className).not.toContain(
+      'hover:bg-accent',
+    )
   })
 
   it('calls onExpandedChange when toggled', async () => {

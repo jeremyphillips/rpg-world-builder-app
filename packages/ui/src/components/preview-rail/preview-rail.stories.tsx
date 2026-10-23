@@ -20,7 +20,7 @@ const identityFacts = [
 export const MockComposition: Story = {
   name: 'Mock composition (valid class)',
   render: () => (
-    <PreviewRail layout="fill">
+    <PreviewRail layout="fill" className="w-[280px]">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
@@ -100,7 +100,7 @@ export const MockComposition: Story = {
 
 export const FreshCreate: Story = {
   render: () => (
-    <PreviewRail layout="fill">
+    <PreviewRail layout="fill" className="w-[280px]">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
@@ -153,7 +153,7 @@ export const FreshCreate: Story = {
 
 export const PostSubmitAttention: Story = {
   render: () => (
-    <PreviewRail layout="fill">
+    <PreviewRail layout="fill" className="w-[280px]">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
@@ -196,7 +196,7 @@ export const ViewportAsideFill: Story = {
       <div className="mx-auto flex min-h-0 w-full max-w-[calc(56rem+1.5rem+280px)] flex-1 xl:grid xl:grid-cols-[minmax(0,1fr)_280px] xl:grid-rows-[minmax(0,1fr)] xl:gap-6">
         <div className="min-h-0 rounded-md border border-dashed border-border-subtle bg-muted" />
         <div className="hidden min-h-0 xl:flex xl:flex-col">
-          <PreviewRail layout="fill">
+          <PreviewRail layout="fill" className="w-[280px]">
             <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
             <PreviewRail.Identity
               media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
@@ -268,7 +268,7 @@ export const ViewportAsideFill: Story = {
 
 export const LongNameTruncation: Story = {
   render: () => (
-    <PreviewRail layout="fill">
+    <PreviewRail layout="fill" className="w-[280px]">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
@@ -305,7 +305,7 @@ export const SheetHost: Story = {
 
 export const UnavailableIdentity: Story = {
   render: () => (
-    <PreviewRail>
+    <PreviewRail className="w-[280px]">
       <PreviewRail.Header title="Class Preview" />
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
@@ -339,7 +339,7 @@ export const PlainChrome: Story = {
 export const WithIdentityMetadata: Story = {
   name: 'With identity metadata',
   render: () => (
-    <PreviewRail>
+    <PreviewRail className="w-[280px]">
       <PreviewRail.Header title="Class Preview" />
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}

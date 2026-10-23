@@ -60,7 +60,21 @@ describe('PreviewRail', () => {
       </PreviewRail>,
     )
 
-    expect(screen.getByRole('complementary')).toHaveClass('flex-1', 'min-h-0', 'min-w-0', 'w-full')
+    expect(screen.getByRole('complementary')).toHaveClass(
+      'flex-1',
+      'min-h-0',
+      'min-w-0',
+      'w-full',
+      'ui-panel',
+      'ui-panel--quiet',
+      'ui-panel--bleed',
+      'ui-border--default',
+    )
+    expect(screen.getByRole('complementary')).not.toHaveClass(
+      'border-border-subtle',
+      'rounded-card',
+    )
+    expect(screen.getByRole('complementary').className).not.toContain('max-w-')
     expect(screen.getByTestId('preview-rail-scroll')).toHaveClass('overflow-y-auto')
     expect(screen.getByTestId('preview-rail-scroll').className).toContain('pe-2.5')
     expect(screen.getByRole('heading', { name: 'Class Preview' })).toBeInTheDocument()
@@ -75,23 +89,33 @@ describe('PreviewRail', () => {
 
     const basicsTrigger = screen.getByRole('button', { name: /Basics/ })
     expect(basicsTrigger).toHaveAttribute('aria-expanded', 'true')
-    expect(
-      basicsTrigger.querySelector('.rounded-full.bg-semantic-success-strong'),
-    ).toBeInTheDocument()
+    expect(basicsTrigger.querySelector('.ui-status-icon--ready')).toBeInTheDocument()
     expect(
       screen
         .getByText('Spellcasting')
-        .closest('[class*="border-b"]')
-        ?.querySelector('.rounded-full.bg-status-icon-idle'),
+        .closest('.ui-preview-rail__accordion-item')
+        ?.querySelector('.ui-status-icon--off'),
     ).toBeInTheDocument()
     expect(
       screen
         .getByText('Ready to publish')
         .closest('[role="alert"]')
-        ?.querySelector('.rounded-full.bg-semantic-success-strong.size-5'),
+        ?.querySelector('.ui-status-icon--ready.ui-status-icon--lg'),
     ).toBeInTheDocument()
     await user.click(basicsTrigger)
     expect(basicsTrigger).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('leaves the perimeter to the host when chrome is plain', () => {
+    render(
+      <PreviewRail chrome="plain">
+        <PreviewRail.Header title="Class Preview" />
+      </PreviewRail>,
+    )
+
+    const rail = screen.getByRole('complementary')
+    expect(rail).not.toHaveClass('ui-panel', 'ui-panel--quiet')
+    expect(rail).toHaveClass('ui-preview-rail')
   })
 
   it('sizes preview identity media with the anatomy leading shell', () => {
@@ -109,7 +133,9 @@ describe('PreviewRail', () => {
       'ui-anatomy-leading-media',
     )
     expect(
-      container.querySelector('.ui-card--comfortable [data-slot="preview-rail-leading-media"]'),
+      container.querySelector(
+        '.ui-identity-row--comfortable [data-slot="preview-rail-leading-media"]',
+      ),
     ).toBeTruthy()
   })
 

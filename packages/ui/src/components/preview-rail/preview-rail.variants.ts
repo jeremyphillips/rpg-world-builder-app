@@ -1,16 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
-import {
-  formTabbedAsideCardMaxWidthAt2xlClasses,
-  formTabbedAsideCardMaxWidthBelow2xlClasses,
-} from '../../form/chrome/form-chrome.variants'
-import { iconGlyphRootClasses } from '../ui/icon-glyph.variants'
-import { establishSurfaceCurrent } from '../ui/surface-current.lib'
-
-/** Shared 12px muted copy below the preview header and in section chrome. */
-export const previewRailCaptionTextClasses = 'text-style-caption'
-
+/** Horizontal inset for card chrome. Plain chrome leaves padding to the host. */
 export const previewRailSectionInsetVariants = cva('', {
   variants: {
     chrome: {
@@ -23,139 +13,15 @@ export const previewRailSectionInsetVariants = cva('', {
   },
 })
 
-/** Inset below header content, above the full-width section border. */
-export const previewRailHeaderSectionBottomInsetClasses = 'pb-2.5'
-
-/** Full-width shell below the title row; border omitted when Identity follows. */
-export const previewRailHeaderSectionShellClasses = cn(
-  'shrink-0 border-b border-border-subtle',
-  previewRailHeaderSectionBottomInsetClasses,
-  'has-[+[data-slot=preview-rail-identity]]:border-b-0 has-[+[data-slot=preview-rail-identity]]:pb-0',
-)
-
-/** Full-width shell terminating the header block (identity + optional title). */
-export const previewRailIdentitySectionShellClasses = cn(
-  'shrink-0 border-b border-border-subtle',
-  previewRailHeaderSectionBottomInsetClasses,
-)
-
-/** Full-width shell above footer actions. */
-export const previewRailFooterSectionShellClasses = 'shrink-0 border-t border-border-subtle'
-
-export const previewRailRootVariants = cva('flex min-w-0 flex-col', {
+/** Fills a viewport-bounded aside column; internal scroll owns overflow. */
+export const previewRailLayoutVariants = cva('', {
   variants: {
-    chrome: {
-      card: cn(
-        'w-full border border-border-subtle bg-surface-lift text-card-foreground',
-        formTabbedAsideCardMaxWidthBelow2xlClasses,
-        formTabbedAsideCardMaxWidthAt2xlClasses,
-        'rounded-card',
-        establishSurfaceCurrent('surface-lift'),
-      ),
-      plain: 'w-full',
-    },
     layout: {
       default: '',
-      /** Fills a viewport-bounded aside column; internal ScrollRegion owns overflow. */
       fill: 'min-h-0 w-full min-w-0 flex-1 overflow-hidden',
     },
   },
   defaultVariants: {
-    chrome: 'card',
     layout: 'default',
   },
 })
-
-export const previewRailHeaderRowClasses = 'flex items-center justify-between gap-2'
-
-export const previewRailHeaderSectionContentClasses = 'pt-4'
-
-export const previewRailIdentityStackClasses = 'flex flex-col gap-4'
-
-export const previewRailIdentitySectionContentClasses = 'pt-4'
-
-/** Comfortable entity-row identity gap; publishes anatomy leading size via density class. */
-export const previewRailIdentityRowClasses = cn(
-  'ui-card--comfortable',
-  'flex min-w-0 items-start gap-4',
-)
-
-export const previewRailIdentityHeadingBandClasses = 'flex min-w-0 items-center'
-
-export const previewRailLeadingMediaShellClasses = 'ui-anatomy-leading-media'
-
-export const previewRailLeadingMediaSlotClasses = 'size-full overflow-hidden [&>*]:size-full'
-
-/** Sections-only scroll body — header, identity, and footer stay put. */
-export const previewRailScrollRegionShellClasses = 'min-h-0 flex-1'
-
-export const previewRailScrollRegionContentClasses = 'pb-4 pt-4'
-
-export const previewRailFooterClasses = 'flex flex-col gap-4 py-4'
-
-export const previewRailIdentityContentClasses = 'min-w-0 flex-1'
-
-export const previewRailIdentitySubheadlineClasses = 'text-style-supporting'
-
-export const previewRailDividerClasses = 'border-t border-border-subtle'
-
-export { iconContainerVariants as previewRailMediaFallbackVariants } from '../ui/icon-container.variants'
-export { iconContainerGlyphClasses as previewRailMediaIconClasses } from '../ui/icon-container.variants'
-
-export const previewRailAvailabilityRowClasses = cn(
-  'mt-1 flex min-w-0 items-center gap-1.5',
-  previewRailCaptionTextClasses,
-)
-
-export const previewRailAvailabilityInactiveIconClasses = cn(
-  iconGlyphRootClasses.md,
-  'shrink-0 text-semantic-warning',
-)
-
-export const previewRailAvailabilityDetailSeparatorClasses = 'text-muted-foreground'
-
-export const previewRailSectionsHeaderClasses = 'flex flex-col gap-1'
-
-export const previewRailAccordionCardClasses =
-  'overflow-hidden rounded-md border border-border-subtle'
-
-export const previewRailAccordionItemClasses = 'border-b border-border-subtle last:border-b-0'
-
-/** Tight inset for grouped-list accordion bodies (overrides default AccordionContent inner padding). */
-export const previewRailAccordionContentClasses = '[&>div]:px-3 [&>div]:pb-3 [&>div]:pt-1'
-
-export const previewRailSectionTriggerClasses =
-  'flex flex-1 items-center justify-start gap-2 px-3 py-2.5 text-left text-sm font-body-emphasis hover:text-foreground/80 hover:no-underline'
-
-/** Reserves chevron width on static section rows so status text aligns with expandable rows. */
-export const previewRailSectionChevronSpacerClasses = 'size-4 shrink-0'
-
-export const previewRailSectionStaticRowClasses = cn(
-  previewRailSectionTriggerClasses,
-  'w-full cursor-default hover:text-inherit',
-)
-
-export const previewRailSectionLabelClasses = 'min-w-0 shrink-0'
-
-export const previewRailSectionStatusSpacerClasses = 'min-w-0 flex-1'
-
-export const previewRailSectionStatusClasses = 'shrink-0'
-
-export const previewRailSectionBodyClasses =
-  'flex flex-col gap-3 rounded-md border border-border-subtle bg-surface-faint p-3'
-
-export const previewRailSectionBodyDescriptionClasses = cn(
-  'line-clamp-2',
-  previewRailCaptionTextClasses,
-)
-
-export const previewRailActionHelperTextClasses = previewRailCaptionTextClasses
-
-export const previewRailActionStackClasses = 'flex flex-col gap-2'
-
-export const previewRailActionButtonClasses = 'w-full'
-
-export type PreviewRailRootVariantProps = {
-  chrome?: 'card' | 'plain'
-  layout?: 'default' | 'fill'
-}

@@ -3,12 +3,6 @@ import { ActionIcon, Button, InlineInactiveStatus } from '@rpg/ui'
 import { OverviewResultSummaryDotSeparator } from '@/lib/data-table/overview-result-summary-dot-separator'
 import { CAMPAIGN_ACCESS_CHANGE_LABEL } from '../../lib/campaign-access/campaign-access-labels'
 import type { MasterDetailAvailabilityPresentation } from '../../lib/master-detail/master-detail-availability.types'
-import {
-  masterDetailAvailabilityAvailableDotClasses,
-  masterDetailAvailabilityAvailableStatusClasses,
-  masterDetailAvailabilityHeaderLineClasses,
-  masterDetailAvailabilityHeaderStatusClasses,
-} from './master-detail-availability-header-line.variants'
 
 export interface MasterDetailAvailabilityHeaderLineProps {
   availability: MasterDetailAvailabilityPresentation
@@ -25,14 +19,11 @@ export function MasterDetailAvailabilityHeaderLine({
   disabled = false,
 }: MasterDetailAvailabilityHeaderLineProps) {
   return (
-    <div className={masterDetailAvailabilityHeaderLineClasses}>
-      <span className={masterDetailAvailabilityHeaderStatusClasses}>
+    <div className="flex flex-wrap items-center gap-x-1 text-style-caption">
+      <span className="flex min-w-0 items-center gap-1.5">
         {availability.isAvailable ? (
-          <span className={masterDetailAvailabilityAvailableStatusClasses}>
-            <span
-              aria-hidden
-              className={masterDetailAvailabilityAvailableDotClasses({ tone: 'success' })}
-            />
+          <span className="inline-flex min-w-0 items-center gap-1 text-style-label">
+            <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-semantic-success" />
             {availability.statusLabel}
           </span>
         ) : (

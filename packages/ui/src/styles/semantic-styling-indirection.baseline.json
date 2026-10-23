@@ -13,7 +13,6 @@
   "apps/dashboard/src/features/content/lib/entity/summary/picker-selection-state-line.variants.ts:19:cva() without a variant config object",
   "apps/dashboard/src/features/content/lib/entity/summary/picker-selection-state-line.variants.ts:21:cva() without a variant config object",
   "apps/dashboard/src/features/content/lib/entity/surfaces/drawer/drawer-entity.variants.ts:4:cva() without a variant config object",
-  "packages/ui/src/components/preview-rail/preview-rail.variants.ts:85:exported const previewRailLeadingMediaShellClasses is a single semantic class alias",
   "packages/ui/src/components/ui/accordion.variants.ts:37:cva() without a variant config object",
   "packages/ui/src/components/ui/builder-option-details-sheet.variants.ts:6:cva() without a variant config object",
   "packages/ui/src/components/ui/builder-option-details-sheet.variants.ts:8:cva() without a variant config object",

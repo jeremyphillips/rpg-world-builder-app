@@ -2,11 +2,7 @@ import { APP_NAME } from '@rpg/contracts/shared'
 import { Heading } from '@rpg/ui'
 
 import { SidebarNav } from './sidebar-nav'
-import {
-  sidebarAsideVariants,
-  sidebarBrandClasses,
-  sidebarOverlayVariants,
-} from './sidebar.variants'
+import { sidebarAsideVariants, sidebarOverlayVariants } from './sidebar.variants'
 
 interface SidebarProps {
   isOpen: boolean
@@ -23,7 +19,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       />
 
       <aside className={sidebarAsideVariants({ open: isOpen })}>
-        <div className={sidebarBrandClasses}>
+        <div className="flex h-16 shrink-0 items-center px-6">
           <Heading variant="brand" as="span">
             {APP_NAME}
           </Heading>

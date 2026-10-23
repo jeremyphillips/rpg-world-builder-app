@@ -1,13 +1,23 @@
+import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { masterDetailEditorShellClasses } from '../master-detail-editor-panel.variants'
-import { masterDetailGridClasses } from '../master-detail-grid.variants'
+import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
+import { MasterDetailEditorShell } from '../master-detail-editor-shell'
+import { MasterDetailGrid } from '../master-detail-grid'
 import { masterDetailListLayoutClasses } from '../master-detail-list-panel'
+
+const itemNoun = defineMasterDetailItemNoun({ label: 'Trait', singular: 'trait' })
 
 describe('master-detail layout variants', () => {
   it('aligns grid columns at the start and defines the list max-block-size token', () => {
-    expect(masterDetailGridClasses).toContain('items-start')
-    expect(masterDetailGridClasses).toContain('[--master-detail-list-max-block-size:28rem]')
+    const { container } = render(
+      <MasterDetailGrid>
+        <div>List</div>
+      </MasterDetailGrid>,
+    )
+    const grid = container.firstElementChild
+    expect(grid).toHaveClass('items-start')
+    expect(grid?.className).toContain('[--master-detail-list-max-block-size:28rem]')
   })
 
   it('caps the list shell with shared viewport utilities without restating raw lengths', () => {
@@ -19,6 +29,7 @@ describe('master-detail layout variants', () => {
     expect(shell).toContain('md:min-h-[min(12rem,var(--master-detail-shell-max-block-size))]')
     expect(shell).not.toContain('28rem')
     expect(shell).not.toContain('70dvh')
+    expect(shell).not.toContain('border-border-subtle')
   })
 
   it('wraps list scroll in a boundary region without reserving scrollbar gutter space', () => {
@@ -31,12 +42,17 @@ describe('master-detail layout variants', () => {
   })
 
   it('keeps the detail shell content-sized', () => {
-    expect(masterDetailEditorShellClasses).toContain('self-start')
-    expect(masterDetailEditorShellClasses).toContain('ui-panel--quiet')
-    expect(masterDetailEditorShellClasses).toContain('ui-panel--bleed')
-    expect(masterDetailEditorShellClasses).not.toContain('h-full')
-    expect(masterDetailEditorShellClasses).not.toContain('overflow-y-auto')
-    expect(masterDetailEditorShellClasses).not.toContain('bg-field-container')
+    const { container } = render(
+      <MasterDetailEditorShell itemNoun={itemNoun} selectedIdentity={{ title: 'Keen senses' }} />,
+    )
+    const shell = container.firstElementChild
+    expect(shell).toHaveClass('self-start', 'ui-panel--quiet', 'ui-panel--bleed')
+    expect(shell).not.toHaveClass(
+      'border-border-subtle',
+      'h-full',
+      'overflow-y-auto',
+      'bg-field-container',
+    )
   })
 
   it('uses a bleed quiet panel for the list shell', () => {

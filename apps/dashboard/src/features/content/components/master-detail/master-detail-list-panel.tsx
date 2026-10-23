@@ -14,14 +14,12 @@ import type { MasterDetailItemMeta } from '../../lib/master-detail/master-detail
 import { MasterDetailListRow } from './master-detail-list-row'
 import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
-import { masterDetailRailBorderClasses } from './master-detail-rail.variants'
 
 export type { MasterDetailItemMeta }
 
 const masterDetailListShellClasses = cn(
   panelVariants({ tone: 'quiet', density: 'comfortable', bleed: true }),
   'sticky top-[var(--rpg-form-sticky-tabs-block-size,0px)] flex min-h-[min(8rem,var(--master-detail-shell-max-block-size))] flex-col self-start overflow-hidden text-foreground md:min-h-[min(12rem,var(--master-detail-shell-max-block-size))]',
-  masterDetailRailBorderClasses,
   '[--master-detail-list-chrome-block-size:5.5rem]',
   'master-detail-list-shell-viewport-cap',
 )
@@ -141,20 +139,14 @@ export function MasterDetailListPanel({
   const countSupplementRow =
     countSupplement || invalidItemCount > 0
       ? cn(
-          'flex shrink-0 items-center gap-2 border-b px-3 py-1.5 text-style-caption',
-          masterDetailRailBorderClasses,
+          'flex shrink-0 items-center gap-2 border-b ui-border--subtle px-3 py-1.5 text-style-caption',
           countSupplement ? 'justify-between' : 'justify-end',
         )
       : null
 
   return (
     <nav aria-label={ariaLabel} className={masterDetailListShellClasses}>
-      <div
-        className={cn(
-          'flex shrink-0 items-center justify-between gap-3 border-b px-3 py-2.5',
-          masterDetailRailBorderClasses,
-        )}
-      >
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b ui-border--subtle px-3 py-2.5">
         <div className="min-w-0 text-lg font-medium text-foreground">{listTitle}</div>
         <ActionButton action="add" variant="outline" size="sm" onClick={onAdd}>
           {addLabel}
