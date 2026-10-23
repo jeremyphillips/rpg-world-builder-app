@@ -1,28 +1,36 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-export const semanticTextVariants = cva('inline-flex items-center gap-1 text-xs', {
+export const SEMANTIC_TEXT_TONES = ['neutral', 'info', 'success', 'warning', 'destructive'] as const
+
+export const SEMANTIC_TEXT_EMPHASES = ['low', 'medium', 'high'] as const
+
+export const UI_SEMANTIC_TEXT_TONE_CLASSES = SEMANTIC_TEXT_TONES.map(
+  (tone) => `ui-semantic-text--${tone}` as const,
+)
+
+export const UI_SEMANTIC_TEXT_EMPHASIS_CLASSES = SEMANTIC_TEXT_EMPHASES.map(
+  (emphasis) => `ui-semantic-text--emphasis-${emphasis}` as const,
+)
+
+export const semanticTextVariants = cva('ui-semantic-text', {
   variants: {
     tone: {
-      neutral: 'text-semantic-neutral',
-      info: 'text-semantic-info',
-      success: 'text-semantic-success',
-      warning: 'text-semantic-warning',
-      destructive: 'text-semantic-destructive',
+      neutral: 'ui-semantic-text--neutral',
+      info: 'ui-semantic-text--info',
+      success: 'ui-semantic-text--success',
+      warning: 'ui-semantic-text--warning',
+      destructive: 'ui-semantic-text--destructive',
     },
     emphasis: {
-      low: 'font-normal',
-      medium: 'font-medium',
-      high: 'font-semibold',
+      low: 'ui-semantic-text--emphasis-low',
+      medium: 'ui-semantic-text--emphasis-medium',
+      high: 'ui-semantic-text--emphasis-high',
     },
   },
-  compoundVariants: [
-    {
-      tone: 'info',
-      emphasis: 'low',
-      class: 'text-semantic-info-muted',
-    },
-  ],
-  defaultVariants: { tone: 'neutral', emphasis: 'medium' },
+  defaultVariants: {
+    tone: 'neutral',
+    emphasis: 'medium',
+  },
 })
 
 export type SemanticTextVariantProps = VariantProps<typeof semanticTextVariants>

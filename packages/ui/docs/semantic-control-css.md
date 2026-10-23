@@ -132,6 +132,22 @@ Overlay notification counts use `ui-notification-unread-badge` (not compact-labe
 
 `ui-catalog-toolbar` and `__tab-row` / `__utility` / `__utility-content` / `__view-controls` / `__actions` own picker toolbar layout. `__utility` is an inline-size container. Tab-row divider uses `ui-border--subtle`.
 
+## Avatar
+
+`ui-avatar` owns the circle, muted fill, and initials color. `ui-avatar--{sm|md|lg}` own width, height, font-size, and line-height (28 / 36 / 44px). `__image` fills the circle. A detail-row leading frame may pass `size-full rounded-none`; that utility override stays, and no second fit API is added.
+
+## Toast
+
+`ui-toast` owns radius, padding, gap, `shadow-lg`, foreground, and the quiet fill (`--surface-lift`, with `--surface-current` rebound to that plane). `default` uses `ui-border--default` and is not a toast tone modifier. `ui-toast--{success|warning|destructive}` own `border-color` only (`--success-muted`, `--warning-muted`, `--destructive-muted`) and are in a twMerge group with `ui-border--default`. `__close` owns cursor, opacity, and hover; focus is `ui-focus-ring ui-focus-ring--embedded`. `ui-toast-viewport` and `ui-toast-viewport--modal` own placement. Radix swipe and enter/exit stay utilities (`toastMotionClasses`), same exception as popover motion.
+
+## Attention frame
+
+`ui-attention-frame` owns radius, a transparent border, and the color transition. `ui-attention-frame--active` is applied from the component when `active` is true. It owns the primary border, selected fill, rest ring, and `animation: var(--animate-attention-ring)` when motion is allowed. Keyframes stay in `globals.css`. There is no variants file. Padding stays on the caller.
+
+## Semantic text
+
+`ui-semantic-text` is inline status copy, not a Text role. The block owns xs type and `--icon-inline`. `--{neutral|info|success|warning|destructive}` set `color` only. Neutral uses the muted foreground mix. `--emphasis-{low|medium|high}` set `font-weight` only. `info` plus `emphasis-low` sets `--semantic-info-muted` and is not its own tone. `--with-icon` is a conditional class for alignment and gap. `__icon > svg` reads `--icon-inline`. A `text-sm` utility on the element overrides font size and the icon variable. `shrink-0` on a preview-rail status line stays local layout.
+
 ## Text roles
 
 `text-style-*` utilities are the Text role ladder and the field label, legend, hint, and error maps. They are `@utility` composites, same as `heading-style-*`, and they share a twMerge group. SemanticText is not a Text role: it owns inline status tone, emphasis, and an optional icon.

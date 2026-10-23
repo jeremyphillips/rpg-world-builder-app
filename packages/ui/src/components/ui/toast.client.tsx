@@ -6,14 +6,7 @@ import { X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { TOAST_DISMISS_LABEL } from './toast.constants'
-import {
-  toastActionsVariants,
-  toastCloseVariants,
-  toastDescriptionVariants,
-  toastTitleVariants,
-  toastVariants,
-  type ToastVariantProps,
-} from './toast.variants'
+import { toastVariants, type ToastVariantProps } from './toast.variants'
 
 export type { ToastTone } from './toast.constants'
 
@@ -42,7 +35,11 @@ const ToastAction = React.forwardRef<
   React.ComponentRef<typeof ToastPrimitive.Action>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitive.Action>
 >(({ className, ...props }, ref) => (
-  <ToastPrimitive.Action ref={ref} className={cn(toastActionsVariants(), className)} {...props} />
+  <ToastPrimitive.Action
+    ref={ref}
+    className={cn('flex shrink-0 items-center gap-2', className)}
+    {...props}
+  />
 ))
 ToastAction.displayName = 'Toast.Action'
 
@@ -52,7 +49,7 @@ const ToastClose = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitive.Close
     ref={ref}
-    className={cn(toastCloseVariants(), className)}
+    className={cn('ui-toast__close ui-focus-ring ui-focus-ring--embedded', className)}
     toast-close=""
     {...props}
   >
@@ -65,7 +62,11 @@ const ToastTitle = React.forwardRef<
   React.ComponentRef<typeof ToastPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <ToastPrimitive.Title ref={ref} className={cn(toastTitleVariants(), className)} {...props} />
+  <ToastPrimitive.Title
+    ref={ref}
+    className={cn('text-style-label text-foreground', className)}
+    {...props}
+  />
 ))
 ToastTitle.displayName = 'Toast.Title'
 
@@ -75,7 +76,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitive.Description
     ref={ref}
-    className={cn(toastDescriptionVariants(), className)}
+    className={cn('text-style-supporting', className)}
     {...props}
   />
 ))
@@ -114,17 +115,17 @@ export function ToastPresentation({
       ) : null}
       {hasCopy ? (
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          {title ? <p className={toastTitleVariants()}>{title}</p> : null}
-          {description ? <p className={toastDescriptionVariants()}>{description}</p> : null}
+          {title ? <p className="text-style-label text-foreground">{title}</p> : null}
+          {description ? <p className="text-style-supporting">{description}</p> : null}
         </div>
       ) : null}
-      <div className={toastActionsVariants()}>
+      <div className="flex shrink-0 items-center gap-2">
         {action}
         {dismissible ? (
           <button
             type="button"
             aria-label={TOAST_DISMISS_LABEL}
-            className={toastCloseVariants()}
+            className="ui-toast__close ui-focus-ring ui-focus-ring--embedded"
             onClick={onDismiss}
           >
             <X className="size-4" />

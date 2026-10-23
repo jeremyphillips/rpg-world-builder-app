@@ -72,3 +72,10 @@ export const UI_INTERACTIVE_LIST_ROW_SIZE_CLASSES = [
   'ui-interactive-list__main--md',
   'ui-interactive-list__main--lg',
 ] as const
+
+export { UI_AVATAR_SIZE_CLASSES } from '../components/ui/avatar.variants'
+export { UI_TOAST_TONE_CLASSES } from '../components/ui/toast.variants'
+export {
+  UI_SEMANTIC_TEXT_EMPHASIS_CLASSES,
+  UI_SEMANTIC_TEXT_TONE_CLASSES,
+} from '../components/ui/semantic-text/semantic-text.variants'

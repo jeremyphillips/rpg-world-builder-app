@@ -50,6 +50,10 @@
 @import '../components/ui/wizard.css';
 @import '../filters/filter-bar.css';
 @import '../components/ui/catalog-toolbar.css';
+@import '../components/ui/avatar.css';
+@import '../components/ui/toast.css';
+@import '../components/ui/attention-frame.css';
+@import '../components/ui/semantic-text/semantic-text.css';
 
 @plugin '@tailwindcss/typography';
 

@@ -310,7 +310,7 @@ regression-tested in `control-action.variants.test.ts` and `icon-ghost-control.v
 
 ### Inline icons
 
-Inline icons inherit their glyph step from the nearest typography owner. Consumers use `size-icon-inline` (or `inlineIconTextClasses` / `inlineIconFlexSlotClasses`) and do not name a text size or a glyph step. The utility falls back to `--icon-glyph-md` when no owner is present.
+Inline icons inherit their glyph step from the nearest typography owner. Consumers use `size-icon-inline` or `inlineIconTextClasses` and do not name a text size or a glyph step. `SemanticText` publishes that step from `.ui-semantic-text` (and a `text-sm` override) onto `ui-semantic-text__icon`. The utility falls back to `--icon-glyph-md` when no owner is present.
 
 | Owner                      | Glyph |
 | -------------------------- | ----- |

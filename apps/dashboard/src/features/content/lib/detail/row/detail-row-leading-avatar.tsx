@@ -10,7 +10,7 @@ export type DetailRowLeadingAvatarProps = {
   size?: DetailRowLeadingMediaProps['size']
 }
 
-/** Avatar in the canonical detail-row leading frame — no separate size system. */
+/** Avatar inside the detail-row leading frame. IdentityFrame owns the slot; `size-full rounded-none` is the recorded override and wins over `ui-avatar--*` because utilities follow the components layer. */
 export function DetailRowLeadingAvatar({
   name,
   src,

@@ -95,11 +95,5 @@
   "packages/ui/src/components/ui/sheet-media-scroll.variants.ts:38:cva() without a variant config object",
   "packages/ui/src/components/ui/sheet-media-scroll.variants.ts:48:cva() without a variant config object",
   "packages/ui/src/components/ui/table.variants.ts:4:cva() without a variant config object",
-  "packages/ui/src/components/ui/toast.variants.ts:37:cva() without a variant config object",
-  "packages/ui/src/components/ui/toast.variants.ts:43:cva() without a variant config object",
-  "packages/ui/src/components/ui/toast.variants.ts:47:cva() without a variant config object",
-  "packages/ui/src/components/ui/toast.variants.ts:49:cva() without a variant config object",
-  "packages/ui/src/components/ui/toast.variants.ts:51:cva() without a variant config object",
-  "packages/ui/src/components/ui/toast.variants.ts:53:cva() without a variant config object",
   "packages/ui/src/form/renderers/array/array-item-anatomy-grid.variants.ts:53:cva() without a variant config object"
 ]

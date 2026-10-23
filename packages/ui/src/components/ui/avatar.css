@@ -1,0 +1,46 @@
+/*
+ * Avatar circle. Size modifiers own width, height, and initials type.
+ * A leading frame may pass size-full rounded-none; utilities beat this layer.
+ */
+@layer components {
+  .ui-avatar {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 9999px;
+    background-color: var(--muted);
+    font-weight: var(--font-weight-medium);
+    color: color-mix(in oklch, var(--foreground) var(--mix-fg-muted), var(--surface-current));
+    user-select: none;
+  }
+
+  .ui-avatar--sm {
+    width: calc(var(--spacing) * 7);
+    height: calc(var(--spacing) * 7);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  .ui-avatar--md {
+    width: calc(var(--spacing) * 9);
+    height: calc(var(--spacing) * 9);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+  }
+
+  .ui-avatar--lg {
+    width: calc(var(--spacing) * 11);
+    height: calc(var(--spacing) * 11);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
+
+  .ui-avatar__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}

@@ -35,6 +35,10 @@ import {
   UI_CHOICE_CONTROL_KIND_CLASSES,
   UI_FIELD_GROUP_LAYOUT_CLASSES,
   UI_FIELD_GROUP_SIZE_CLASSES,
+  UI_AVATAR_SIZE_CLASSES,
+  UI_TOAST_TONE_CLASSES,
+  UI_SEMANTIC_TEXT_EMPHASIS_CLASSES,
+  UI_SEMANTIC_TEXT_TONE_CLASSES,
 } from './semantic-control-class-groups'
 
 const HEADING_STYLE_UTILITIES = [
@@ -123,6 +127,10 @@ type TypographyClassGroupIds =
   | 'ui-field-control-width'
   | 'ui-floating-label-size'
   | 'ui-field-group-size'
+  | 'ui-avatar-size'
+  | 'ui-toast-tone'
+  | 'ui-semantic-text-tone'
+  | 'ui-semantic-text-emphasis'
   | 'ui-field-group-layout'
   | 'ui-compact-control-size'
   | 'ui-compact-label-size'
@@ -238,6 +246,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-choice-control-indicator-size': [...UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES],
       'ui-field-group-size': [...UI_FIELD_GROUP_SIZE_CLASSES],
       'ui-field-group-layout': [...UI_FIELD_GROUP_LAYOUT_CLASSES],
+      'ui-avatar-size': [...UI_AVATAR_SIZE_CLASSES],
+      'ui-toast-tone': [...UI_TOAST_TONE_CLASSES],
+      'ui-semantic-text-tone': [...UI_SEMANTIC_TEXT_TONE_CLASSES],
+      'ui-semantic-text-emphasis': [...UI_SEMANTIC_TEXT_EMPHASIS_CLASSES],
     },
     conflictingClassGroups: {
       'heading-style': [...TYPOGRAPHY_CONFLICT_GROUPS],
@@ -247,7 +259,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-button-size': ['ui-button-size'],
       'ui-button-appearance': ['ui-button-appearance'],
       'ui-button-text-geometry': ['ui-button-text-geometry'],
-      'ui-border-strength': ['ui-border-strength'],
+      'ui-border-strength': ['ui-border-strength', 'ui-toast-tone'],
       'ui-dialog-panel-fill': ['ui-dialog-panel-fill'],
       'ui-dialog-panel-geometry': ['ui-dialog-panel-geometry'],
       'ui-field-control-size': ['ui-field-control-size'],
@@ -288,6 +300,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-choice-control-indicator-size': ['ui-choice-control-indicator-size'],
       'ui-field-group-size': ['ui-field-group-size'],
       'ui-field-group-layout': ['ui-field-group-layout'],
+      'ui-avatar-size': ['ui-avatar-size'],
+      'ui-toast-tone': ['ui-toast-tone', 'ui-border-strength'],
+      'ui-semantic-text-tone': ['ui-semantic-text-tone'],
+      'ui-semantic-text-emphasis': ['ui-semantic-text-emphasis'],
       'font-size': ['heading-style', 'eyebrow-style', 'text-style'],
       'font-weight': ['heading-style', 'eyebrow-style', 'text-style'],
       tracking: ['heading-style', 'eyebrow-style'],

@@ -220,6 +220,12 @@ const insetPanelCssPath = path.join(stylesDir, '../components/ui/inset-panel.css
 
 const panelCssPath = path.join(stylesDir, '../components/ui/panel.css')
 
+const avatarCssPath = path.join(stylesDir, '../components/ui/avatar.css')
+
+const toastCssPath = path.join(stylesDir, '../components/ui/toast.css')
+
+const semanticTextCssPath = path.join(stylesDir, '../components/ui/semantic-text/semantic-text.css')
+
 const uiBorderCssPath = path.join(stylesDir, '../components/ui/ui-border.css')
 const dialogPanelCssPath = path.join(stylesDir, '../components/ui/dialog-panel.css')
 
@@ -798,6 +804,37 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
         modifierPrefix: 'ui-compact-label--removable-lg',
         requiredProperties: ['padding-inline-end'] as const,
       },
+    ],
+  },
+  {
+    filePath: avatarCssPath,
+    dimensions: [
+      ...(['sm', 'md', 'lg'] as const).map((size) => ({
+        modifierPrefix: `ui-avatar--${size}`,
+        requiredProperties: ['width', 'height', 'font-size', 'line-height'] as const,
+      })),
+    ],
+  },
+  {
+    filePath: toastCssPath,
+    dimensions: [
+      ...(['success', 'warning', 'destructive'] as const).map((tone) => ({
+        modifierPrefix: `ui-toast--${tone}`,
+        requiredProperties: ['border-color'] as const,
+      })),
+    ],
+  },
+  {
+    filePath: semanticTextCssPath,
+    dimensions: [
+      ...(['neutral', 'info', 'success', 'warning', 'destructive'] as const).map((tone) => ({
+        modifierPrefix: `ui-semantic-text--${tone}`,
+        requiredProperties: ['color'] as const,
+      })),
+      ...(['low', 'medium', 'high'] as const).map((emphasis) => ({
+        modifierPrefix: `ui-semantic-text--emphasis-${emphasis}`,
+        requiredProperties: ['font-weight'] as const,
+      })),
     ],
   },
 ]

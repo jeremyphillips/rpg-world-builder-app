@@ -6,7 +6,6 @@ import {
   type SemanticTextEmphasis,
   type SemanticTextTone,
 } from './semantic-text.variants'
-import { inlineIconFlexSlotClasses } from '../icon-glyph.variants'
 
 export type { SemanticTextEmphasis, SemanticTextTone } from './semantic-text.variants'
 export { semanticTextVariants } from './semantic-text.variants'
@@ -30,12 +29,12 @@ export function SemanticText({ tone, emphasis, icon, children, className }: Sema
     <span
       className={cn(
         semanticTextVariants({ tone, emphasis }),
-        icon ? 'items-start gap-2' : undefined,
+        icon ? 'ui-semantic-text--with-icon' : undefined,
         className,
       )}
     >
       {icon ? (
-        <span aria-hidden="true" className={inlineIconFlexSlotClasses}>
+        <span aria-hidden="true" className="ui-semantic-text__icon">
           {icon}
         </span>
       ) : null}

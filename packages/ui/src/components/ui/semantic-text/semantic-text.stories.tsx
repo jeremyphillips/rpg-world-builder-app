@@ -1,10 +1,10 @@
 import { TriangleAlert } from 'lucide-react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { ClassReferenceTable } from '../../../stories/semantic-classes/class-reference-table'
 import { SemanticText } from './semantic-text'
+import { SEMANTIC_TEXT_CLASS_SPECS } from './semantic-text.styles'
 import type { SemanticTextEmphasis, SemanticTextTone } from './semantic-text.variants'
-
-// TODO(semantic-text): add full Storybook matrix — Tone × Emphasis × Surface × Theme
 
 const meta = {
   title: 'Typography/SemanticText',
@@ -119,4 +119,25 @@ export const EquipmentCalloutsBaseSurface: Story = {
 /** Equipment picker callout severities on `bg-surface-muted` row shells (dark theme recommended). */
 export const EquipmentCalloutsSubtleSurface: Story = {
   render: () => <EquipmentCalloutComparison surface="subtle" />,
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={SEMANTIC_TEXT_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <span data-semantic-class-target className={spec.className}>
+            Status
+          </span>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
 }

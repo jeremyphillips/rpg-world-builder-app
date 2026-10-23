@@ -1,0 +1,66 @@
+/*
+ * Inline status copy. Tone owns color, emphasis owns weight.
+ * The block owns xs type and --icon-inline. info + low is a compound color.
+ * Not a Text role.
+ */
+@layer components {
+  .ui-semantic-text {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 1);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    --icon-inline: var(--icon-glyph-sm);
+  }
+
+  .ui-semantic-text--neutral {
+    color: color-mix(in oklch, var(--foreground) var(--mix-fg-muted), var(--surface-current));
+  }
+
+  .ui-semantic-text--info {
+    color: var(--semantic-info);
+  }
+
+  .ui-semantic-text--success {
+    color: var(--semantic-success);
+  }
+
+  .ui-semantic-text--warning {
+    color: var(--semantic-warning);
+  }
+
+  .ui-semantic-text--destructive {
+    color: var(--semantic-destructive);
+  }
+
+  .ui-semantic-text--info.ui-semantic-text--emphasis-low {
+    color: var(--semantic-info-muted);
+  }
+
+  .ui-semantic-text--emphasis-low {
+    font-weight: var(--font-weight-normal);
+  }
+
+  .ui-semantic-text--emphasis-medium {
+    font-weight: var(--font-weight-medium);
+  }
+
+  .ui-semantic-text--emphasis-high {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .ui-semantic-text--with-icon {
+    align-items: flex-start;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-semantic-text__icon {
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .ui-semantic-text__icon > svg {
+    width: var(--icon-inline);
+    height: var(--icon-inline);
+  }
+}

@@ -76,17 +76,7 @@ export {
   type AlertVariantProps,
 } from './components/ui/alert.variants'
 export { Toast, ToastPresentation, type ToastProps } from './components/ui/toast.client'
-export {
-  toastVariants,
-  toastViewportVariants,
-  toastModalViewportVariants,
-  toastTitleVariants,
-  toastDescriptionVariants,
-  toastActionsVariants,
-  toastCloseVariants,
-  TOAST_TONES,
-  type ToastVariantProps,
-} from './components/ui/toast.variants'
+export { toastVariants, TOAST_TONES, type ToastVariantProps } from './components/ui/toast.variants'
 export { ToastViewport, type ToastViewportProps } from './components/ui/toast-viewport.client'
 export { ToastProvider, toast } from './components/ui/toast-provider.client'
 export {
@@ -140,6 +130,7 @@ export {
   RichTextTableEmbedHostRegistrar,
 } from './components/ui/rich-text-table-embed-host.client'
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
+export { avatarVariants, type AvatarVariantProps } from './components/ui/avatar.variants'
 export { MediaImage, type MediaImageProps } from './components/ui/media-image.client'
 export {
   mediaImageVariants,
@@ -245,7 +236,6 @@ export {
 } from './components/ui/metadata-list.variants'
 export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
 export {
-  inlineIconFlexSlotClasses,
   inlineIconTextClasses,
   menuItemIconGlyphClasses,
 } from './components/ui/icon-glyph.variants'
@@ -569,7 +559,6 @@ export {
   ATTENTION_FRAME_REDUCED_MOTION_HOLD_MS,
   type AttentionFrameProps,
 } from './components/ui/attention-frame.client'
-export { attentionFrameVariants } from './components/ui/attention-frame.variants'
 export { DividedStack, type DividedStackProps } from './components/ui/divided-stack'
 export { Panel, type PanelElement, type PanelProps } from './components/ui/panel'
 export {

@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Button } from './button.client'
 import { ToastPresentation } from './toast.client'
 import { ToastProvider, toast } from './toast-provider.client'
 import { ToastViewport } from './toast-viewport.client'
+import { TOAST_CLASS_SPECS } from './toast.styles'
 import { TOAST_TONES } from './toast.constants'
 
 const meta = {
@@ -117,5 +119,26 @@ export const ImperativeDemo: Story = {
         </Button>
       </div>
     </ToastProvider>
+  ),
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={TOAST_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <div data-semantic-class-target className={spec.className}>
+            {spec.useCase}
+          </div>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
   ),
 }
