@@ -19,7 +19,6 @@ export { UI_BORDER_STRENGTH_CLASSES } from '../components/ui/border-strength'
 export const UI_DIALOG_PANEL_FILL_CLASSES = [
   'ui-dialog-panel--fill-background',
   'ui-dialog-panel--fill-card',
-  'ui-dialog-panel--fill-field-container',
   'ui-dialog-panel--fill-surface-lift',
 ] as const
 export const UI_DIALOG_PANEL_GEOMETRY_CLASSES = [

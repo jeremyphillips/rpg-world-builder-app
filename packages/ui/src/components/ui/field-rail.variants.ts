@@ -1,34 +1,25 @@
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 
-/** Left rail tone for decorative boundaries. */
-export type FieldRailTone = 'border' | 'primary'
-
-/** Horizontal offset of a group-field decorative rail within its gutter — 8px (`left-2`). */
-export const fieldRailOffsetClasses = 'left-2'
-
-const fieldRailToneVariants = {
-  border: 'before:bg-border',
-  primary: 'before:bg-primary',
-} satisfies Record<FieldRailTone, string>
+/** Neutral structural rail vs brand accent. */
+export type FieldRailTone = 'neutral' | 'primary'
 
 /**
- * Decorative left rail for group field stacks — absolutely positioned at
- * {@link fieldRailOffsetClasses}. Does not shift dependent content.
+ * Decorative left rail for group field stacks — absolutely positioned with
+ * inline-start gutter offset. Does not shift dependent content.
  */
-export function resolveFieldRailClasses(tone: FieldRailTone = 'border'): string {
+export function resolveFieldRailClasses(tone: FieldRailTone = 'neutral'): string {
   return cn(
-    'relative',
-    'before:absolute before:inset-y-0 before:left-2 before:w-0.5 before:rounded-full',
-    fieldRailToneVariants[tone],
+    'ui-field-rail',
+    tone === 'primary'
+      ? 'ui-field-rail--tone-primary'
+      : cn('ui-border--default', 'ui-field-rail--tone-neutral'),
   )
 }
 
 /**
- * Weaker decorative rail for default dependent nests — flush left (`before:left-0`).
+ * Weaker decorative rail for default dependent nests — flush inline-start.
  */
 export function resolveDependentNestRailClasses(): string {
-  return cn(
-    'relative',
-    'before:absolute before:inset-y-0 before:left-0 before:w-px before:rounded-full before:bg-border-subtle',
-  )
+  return cn('ui-field-rail-nest', borderStrength('subtle'))
 }

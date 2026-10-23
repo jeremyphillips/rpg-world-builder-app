@@ -17,12 +17,6 @@
     color: var(--card-foreground);
   }
 
-  .ui-dialog-panel--fill-field-container {
-    --surface-current: var(--field-container);
-    background-color: var(--field-container);
-    color: var(--foreground);
-  }
-
   .ui-dialog-panel--fill-surface-lift {
     --surface-current: var(--surface-lift);
     background-color: var(--surface-lift);

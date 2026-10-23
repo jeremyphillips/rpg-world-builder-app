@@ -184,7 +184,7 @@ Schema-driven form fields default to a boxed container shell (`{ variant: 'conta
 
 - Layer 2 token: `--field-container` — lift plane in both themes (`--palette-surface-lift`); recessed wells use `--sunken` / `bg-sunken` instead.
 - Public utility: `bg-field-container` in `globals.css`.
-- Shells rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane.
+- **Form shells only:** schema-driven field containers rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane. Overlays, menus, sheets, preview rails, and other generic lifted shells use `--surface-lift` / `bg-surface-lift` — not the field-container alias.
 - Padding: 16px (`p-4`).
 - Fieldset leaves (`ChipsField`, choose-count shells) and schema `kind: 'group'` wrap a
   borderless `<fieldset>` in `FieldChromeShell` so `<legend>` cannot sit on the visible

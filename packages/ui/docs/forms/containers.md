@@ -85,13 +85,13 @@ exclusive** — omit for plain fieldset behavior.
 
 | `variant` | Use                                                                                                                                                                                                                                                                           |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rail`    | Left rail on the **field stack** only — legend stays outside. Pseudo rail at `left-2` (8px); total content inset (`compact`: `pl-8`; `comfortable`: `pl-9`). Tones: `border` (default), `primary`.                                                                            |
+| `rail`    | Left rail on the **field stack** only — legend stays outside. Pseudo rail at `left-2` (8px); total content inset (`compact`: `pl-8`; `comfortable`: `pl-9`). `tone`: `neutral` (default), `primary`.                                                                          |
 | `inset`   | **Deprecated alias** for `rail` — same shared inset spacing as `rail`. Prefer `variant: 'rail'` for new authoring.                                                                                                                                                            |
 | `panel`   | Rounded border box around the **field stack** only. Default: `{ variant: 'panel' }` → subtle wash. `emphasis`: `subtle` (default), `default` (muted), `strong`. `elevation`: `flat` (default), `raised`. `tone`: semantic wash (`info`, `success`, `warning`, `destructive`). |
 | `outline` | Border-only box around the **field stack** — no background wash. `emphasis` maps to border ladder (`faint`, `subtle`, `default`, `strong`). `tone`: semantic border. `borderAccent`: `primary` for brand perimeter.                                                           |
-| `divider` | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                                                                                                             |
+| `divider` | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`. `strength`: `default` (default) or `subtle` — border contrast, not a color tone.                                                            |
 | `callout` | Alert-shaped surface on the **field stack** only. `tone`: `info` (default), `success`, `warning`, `destructive`, `neutral`, or `default`.                                                                                                                                     |
-| `accent`  | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                                                                                                            |
+| `accent`  | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (legend rail). `tone`: `neutral` (default), `primary`, or status (`info`, `success`, `warning`, `destructive`).                                                                                    |
 
 `chrome` composes with `disclosure` — e.g. `outline` surface on the field stack inside an
 inline-disclosure group.
@@ -162,7 +162,7 @@ for non-FieldGroup headings. `<legend>` is `w-full` and sits **outside** panel, 
 callout **group chrome** boxes. The default
 field container wraps the whole fieldset, including the legend and description — see
 [Field container chrome](#field-container-chrome-default). Divider and accent-top chrome
-apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
+apply to the `<fieldset>`. Section chrome classes live in `field-group-chrome.css`; props map in `field-group-chrome.variants.ts`.
 
 ## Rows
 

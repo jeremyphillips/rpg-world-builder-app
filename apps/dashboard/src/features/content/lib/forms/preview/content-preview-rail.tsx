@@ -335,7 +335,7 @@ export function ContentPreviewRail(props: ContentPreviewRailProps) {
         <Sheet.Content
           side={isMdUp ? 'right' : 'bottom'}
           size="lg"
-          surface="field-container"
+          surface="surface-lift"
           closeLabel="Close preview"
         >
           <Sheet.Header

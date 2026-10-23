@@ -18,7 +18,7 @@ const scrollItems = Array.from({ length: 12 }, (_, index) => `Scroll item ${inde
 
 function ScrollBoundaryRegionDemo() {
   return (
-    <div className="flex w-[21rem] flex-col rounded-lg border border-border-subtle bg-field-container [--surface-current:var(--field-container)]">
+    <div className="flex w-[21rem] flex-col rounded-lg border border-border-subtle bg-surface-lift [--surface-current:var(--surface-lift)]">
       <div className="border-b border-border-subtle px-4 py-4">
         <Heading variant="card" as="p">
           Header

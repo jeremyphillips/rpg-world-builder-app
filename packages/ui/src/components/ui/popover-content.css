@@ -15,9 +15,9 @@
 
   .ui-popover-content--menu {
     min-width: 8rem;
-    background-color: var(--field-container);
+    background-color: var(--surface-lift);
     padding: calc(var(--spacing) * 1);
-    --surface-current: var(--field-container);
+    --surface-current: var(--surface-lift);
   }
 
   .ui-popover-content--popover {

@@ -23,12 +23,6 @@ describe('sheetContentVariants', () => {
     expect(sheetContentVariants({ size: 'lg' })).toContain('max-w-[550px]')
   })
 
-  it('supports field-container surface', () => {
-    expect(sheetContentVariants({ surface: 'field-container' })).toContain(
-      'ui-dialog-panel--fill-field-container',
-    )
-  })
-
   it('slides with the enter animation only', () => {
     const classes = sheetContentVariants()
     expect(classes).toContain('data-[state=open]:duration-200')

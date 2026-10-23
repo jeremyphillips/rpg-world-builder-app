@@ -1,0 +1,95 @@
+/*
+ * FieldGroup section chrome — rail inset, fieldset divider, fieldset accent, legend rail.
+ */
+@layer components {
+  .ui-field-group-chrome--rail-comfortable {
+    padding-inline-start: calc(var(--spacing) * 9);
+  }
+
+  .ui-field-group-chrome--rail-compact {
+    padding-inline-start: calc(var(--spacing) * 8);
+  }
+
+  .ui-field-group-chrome--divider-top {
+    border-style: solid;
+    border-top-width: 1px;
+    border-bottom-width: 0;
+    padding-top: calc(var(--spacing) * 7);
+    padding-bottom: 0;
+  }
+
+  .ui-field-group-chrome--divider-bottom {
+    border-style: solid;
+    border-top-width: 0;
+    border-bottom-width: 1px;
+    padding-top: 0;
+    padding-bottom: calc(var(--spacing) * 7);
+  }
+
+  .ui-field-group-chrome--accent-top {
+    border-style: solid;
+    border-top-width: 2px;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    padding-top: calc(var(--spacing) * 4);
+  }
+
+  .ui-field-group-chrome--accent-top-tone-primary {
+    border-top-color: var(--primary);
+  }
+
+  .ui-field-group-chrome--accent-top-tone-info {
+    border-top-color: var(--semantic-info-border);
+  }
+
+  .ui-field-group-chrome--accent-top-tone-success {
+    border-top-color: var(--semantic-success-border);
+  }
+
+  .ui-field-group-chrome--accent-top-tone-warning {
+    border-top-color: var(--semantic-warning-border);
+  }
+
+  .ui-field-group-chrome--accent-top-tone-destructive {
+    border-top-color: var(--semantic-destructive-border);
+  }
+
+  .ui-field-group-chrome__legend-rail {
+    position: relative;
+    width: 100%;
+  }
+
+  .ui-field-group-chrome__legend-rail::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 2px;
+    border-radius: 9999px;
+  }
+
+  .ui-field-group-chrome__legend-rail--tone-neutral::before {
+    background-color: var(--ui-border-color);
+  }
+
+  .ui-field-group-chrome__legend-rail--tone-primary::before {
+    background-color: var(--primary);
+  }
+
+  .ui-field-group-chrome__legend-rail--tone-info::before {
+    background-color: var(--semantic-info-border);
+  }
+
+  .ui-field-group-chrome__legend-rail--tone-success::before {
+    background-color: var(--semantic-success-border);
+  }
+
+  .ui-field-group-chrome__legend-rail--tone-warning::before {
+    background-color: var(--semantic-warning-border);
+  }
+
+  .ui-field-group-chrome__legend-rail--tone-destructive::before {
+    background-color: var(--semantic-destructive-border);
+  }
+}

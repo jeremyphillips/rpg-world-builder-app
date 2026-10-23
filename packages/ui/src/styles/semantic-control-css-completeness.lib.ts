@@ -192,6 +192,8 @@ const compactControlCssPath = path.join(stylesDir, '../components/ui/compact-con
 
 const fieldGroupCssPath = path.join(stylesDir, '../components/ui/field-group.css')
 
+const fieldGroupChromeCssPath = path.join(stylesDir, '../components/ui/field-group-chrome.css')
+
 const choiceControlCssPath = path.join(stylesDir, '../components/ui/choice-control.css')
 
 const interactiveRowCssPath = path.join(stylesDir, '../components/ui/interactive-row.css')
@@ -395,7 +397,7 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
   {
     filePath: dialogPanelCssPath,
     dimensions: [
-      ...(['background', 'card', 'field-container', 'surface-lift'] as const).map((fill) => ({
+      ...(['background', 'card', 'surface-lift'] as const).map((fill) => ({
         modifierPrefix: `ui-dialog-panel--fill-${fill}`,
         requiredProperties: ['--surface-current', 'background-color', 'color'] as const,
       })),
@@ -494,6 +496,24 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       modifierPrefix: `ui-field-group--${name}`,
       requiredProperties: FIELD_GROUP_SIZE_REQUIRED,
     })),
+  },
+  {
+    filePath: fieldGroupChromeCssPath,
+    dimensions: [
+      ...(['rail-compact', 'rail-comfortable'] as const).map((name) => ({
+        modifierPrefix: `ui-field-group-chrome--${name}`,
+        requiredProperties: ['padding-inline-start'] as const,
+      })),
+      ...(['divider-top', 'divider-bottom'] as const).map((name) => ({
+        modifierPrefix: `ui-field-group-chrome--${name}`,
+        requiredProperties: [
+          'border-top-width',
+          'border-bottom-width',
+          'padding-top',
+          'padding-bottom',
+        ] as const,
+      })),
+    ],
   },
   {
     filePath: choiceControlCssPath,

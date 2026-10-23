@@ -19,7 +19,6 @@ type Story = StoryObj<typeof meta>
 const FILL_USE: Record<string, string> = {
   background: 'Modal and background sheets',
   card: 'Default sheet surface',
-  'field-container': 'Field-colored sheet',
   'surface-lift': 'Lifted sheet',
 }
 
@@ -28,7 +27,7 @@ export const ClassReference: Story = {
   render: () => (
     <ClassReferenceTable
       rows={[
-        ...(['background', 'card', 'field-container', 'surface-lift'] as const).map((fill) => ({
+        ...(['background', 'card', 'surface-lift'] as const).map((fill) => ({
           key: `fill-${fill}`,
           sample: (
             <div

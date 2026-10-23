@@ -9,25 +9,24 @@ import {
   resolveDependentNestShellClasses,
   resolveDependentPresentation,
 } from './field-dependent.variants'
-import { fieldRailOffsetClasses, resolveFieldRailClasses } from './field-rail.variants'
+import { resolveFieldRailClasses } from './field-rail.variants'
 
 describe('resolveFieldRailClasses', () => {
   it('positions a group rail without content padding', () => {
     const classes = resolveFieldRailClasses()
-    expect(classes).toContain('relative')
-    expect(classes).toContain('before:left-2')
-    expect(classes).toContain(fieldRailOffsetClasses)
+    expect(classes).toContain('ui-field-rail')
+    expect(classes).toContain('ui-border--default')
+    expect(classes).toContain('ui-field-rail--tone-neutral')
     expect(classes).not.toContain('pl-9')
     expect(classes).not.toContain('border-l-2')
   })
 })
 
 describe('resolveDependentNestRailClasses', () => {
-  it('uses a weaker flush-left rail for default dependent nests', () => {
+  it('uses a weaker flush-start rail for default dependent nests', () => {
     const classes = resolveDependentNestRailClasses()
-    expect(classes).toContain('before:left-0')
-    expect(classes).toContain('before:w-px')
-    expect(classes).toContain('before:bg-border-subtle')
+    expect(classes).toContain('ui-field-rail-nest')
+    expect(classes).toContain('ui-border--subtle')
   })
 })
 
@@ -36,7 +35,7 @@ describe('resolveDependentPresentation', () => {
     const presentation = resolveDependentPresentation({}, 'comfortable')
     expect(presentation.chrome).toBe(DEFAULT_DEPENDENT_CHROME)
     expect(presentation.showNest).toBe(true)
-    expect(presentation.railClassName).toContain('before:left-0')
+    expect(presentation.railClassName).toContain('ui-field-rail-nest')
     expect(presentation.nestShellClassName).toContain(dependentNestMarginClasses)
   })
 

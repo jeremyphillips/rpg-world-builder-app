@@ -32,7 +32,7 @@ export const POPOVER_CONTENT_CLASS_SPECS = [
   {
     key: 'menu',
     className: popoverContentVariants({ tone: 'menu' }),
-    keyValues: 'field-container, padding 4px',
+    keyValues: 'surface-lift, padding 4px',
     useCase: 'Dropdown menu',
   },
   {

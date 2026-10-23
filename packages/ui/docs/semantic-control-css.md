@@ -114,6 +114,12 @@ Overlay notification counts use `ui-notification-unread-badge` (not compact-labe
 
 `ui-wizard__bubble`, `ui-wizard__label`, and `ui-wizard__connector` own shared geometry and transitions. Step labels pair `ui-wizard__label` with `text-style-label`; state modifiers (`--idle`, `--active`, `--complete`) change color only. Idle bubble and connector use `ui-border--default` for neutral structure; active and complete use primary.
 
+## FieldGroup section chrome
+
+`ui-field-rail` and `ui-field-rail-nest` own decorative pseudo-element rails. Neutral fills read `--ui-border-color` from `ui-border--default` or `ui-border--subtle` on the host (border width stays 0). Primary rails set `::before` to `var(--primary)`. The offset field rail uses inline-start gutter `calc(var(--spacing) * 2)`; the nest rail is flush inline-start at 1px. Rail `tone` is `neutral | primary` (color), not border strength.
+
+`ui-field-group-chrome--rail-{compact|comfortable}` owns field-stack `padding-inline-start` beside a group rail. `ui-field-group-chrome--divider-{top|bottom}` owns fieldset separators (each modifier resets both edge widths and both paddings). Divider `strength` is `default | subtle` via `ui-border--*`. `ui-field-group-chrome--accent-top` owns a 2px fieldset top border; neutral top edges use `ui-border--default`. Legend emphasis uses `ui-field-group-chrome__legend-rail`; neutral legend rails use `ui-border--default` on the host and `--ui-border-color` on `::before`. Accent `tone` is `neutral | primary |` status hues. Panel, outline, and callout group chrome still delegate to shared `resolveChromeClasses` — not these blocks.
+
 ## FilterBar and catalog filter chrome
 
 `ui-filter-bar--{horizontal|vertical}` owns bar orientation. `ui-filter-bar__control--*` owns control width bands. `ui-filter-bar__group--inline` and `ui-filter-bar__group--stacked-*` own field-group layout. `ui-filter-advanced-panel` and `__header` / `__inner` / `__footer` density modifiers own the advanced panel shell (`overflow: hidden`, `ui-border--default` perimeter, `ui-border--subtle` footer divider). `ui-catalog-filter-controls` is the catalog filter row (0.5rem gap); combobox panel toolbars reuse it with `w-full` and `ui-combobox-filter-toolbar__item` for equal-width columns.
@@ -128,7 +134,7 @@ Overlay notification counts use `ui-notification-unread-badge` (not compact-labe
 
 ## Popover content
 
-`ui-popover-content--{menu,popover,tooltip,filter}` owns fill, padding, and `--surface-current`. `ui-menu-item` owns action menu row chrome: optional icon, label, optional description (`__text`, `__label`, `__description`), `data-highlighted` / focus wash, and submenu `data-state="open"` accent. Not `InteractiveList` — see [interactive-list-rows.md](./interactive-list-rows.md). Radix motion stays utilities (`popoverContentMotionClasses`, `tooltipContentMotionClasses`). Panel elevation stays `shadow-md` / `shadow-lg`.
+`ui-popover-content--{menu,popover,tooltip,filter}` owns fill, padding, and `--surface-current`. Menu tone publishes `--surface-lift` (not the form `--field-container` alias). `ui-menu-item` owns action menu row chrome: optional icon, label, optional description (`__text`, `__label`, `__description`), `data-highlighted` / focus wash, and submenu `data-state="open"` accent. Not `InteractiveList` — see [interactive-list-rows.md](./interactive-list-rows.md). Radix motion stays utilities (`popoverContentMotionClasses`, `tooltipContentMotionClasses`). Panel elevation stays `shadow-md` / `shadow-lg`.
 
 ## When CVA vs CSS
 

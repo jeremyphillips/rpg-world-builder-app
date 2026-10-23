@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm, type Control, type FieldValues } from 'react-hook-form'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { FieldGroup } from './field-group'
+import { FIELD_GROUP_CHROME_CLASS_SPECS } from './field-group-chrome.styles'
 import { SelectField } from './select-field'
 import { TextField } from './text-field'
 
@@ -356,6 +358,24 @@ export const ResolutionLayout: Story = {
         </FieldGroup>
       </FieldGroup>
     </div>
+  ),
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  args: { legend: 'Section chrome', children: null },
+  render: () => (
+    <ClassReferenceTable
+      rows={FIELD_GROUP_CHROME_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: <div data-semantic-class-target className={spec.className} />,
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
   ),
 }
 

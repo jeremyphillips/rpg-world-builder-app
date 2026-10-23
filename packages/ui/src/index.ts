@@ -660,7 +660,6 @@ export {
 } from './components/ui/chrome.variants'
 export {
   establishSurfaceCurrent,
-  portalDropdownSurfaceClasses,
   portalPopoverSurfaceClasses,
   SURFACE_CURRENT_PLANES,
   type SurfaceCurrentPlane,
@@ -702,7 +701,6 @@ export {
   fieldSettingsRowClasses,
   fieldToggleDependentStackClasses,
   formDependentInsetSpacing,
-  formDependentInsetOffsetClasses,
   resolveDependentInsetClasses,
   resolveFormInsetPaddingClasses,
   type FieldHintPosition,
@@ -742,7 +740,6 @@ export {
 export {
   resolveFieldDependentsChromeClasses,
   resolveFieldRailClasses,
-  fieldRailOffsetClasses,
   type FieldDependentsScope,
   type FieldRailTone,
 } from './components/ui/field-dependent.variants'

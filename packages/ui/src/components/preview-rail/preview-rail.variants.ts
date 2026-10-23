@@ -46,11 +46,11 @@ export const previewRailRootVariants = cva('flex min-w-0 flex-col', {
   variants: {
     chrome: {
       card: cn(
-        'w-full border border-border-subtle bg-field-container text-card-foreground',
+        'w-full border border-border-subtle bg-surface-lift text-card-foreground',
         formTabbedAsideCardMaxWidthBelow2xlClasses,
         formTabbedAsideCardMaxWidthAt2xlClasses,
         'rounded-card',
-        establishSurfaceCurrent('field-container'),
+        establishSurfaceCurrent('surface-lift'),
       ),
       plain: 'w-full',
     },

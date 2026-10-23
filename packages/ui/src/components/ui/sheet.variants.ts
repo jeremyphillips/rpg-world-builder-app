@@ -23,7 +23,6 @@ export const sheetContentVariants = cva(
       surface: {
         card: dialogPanelFill('card'),
         background: dialogPanelFill('background'),
-        'field-container': dialogPanelFill('field-container'),
         'surface-lift': dialogPanelFill('surface-lift'),
       },
       size: {

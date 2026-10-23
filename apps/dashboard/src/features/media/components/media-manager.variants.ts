@@ -61,8 +61,8 @@ export const mediaManagerStyles = {
   details: cva('min-w-0 space-y-4'),
   detailsPanel: cva(
     cn(
-      'divide-y divide-border-subtle overflow-hidden rounded-lg border bg-field-container text-foreground',
-      establishSurfaceCurrent('field-container'),
+      'divide-y divide-border-subtle overflow-hidden rounded-lg border bg-surface-lift text-foreground',
+      establishSurfaceCurrent('surface-lift'),
     ),
   ),
   detailsSection: cva('space-y-3 p-4'),

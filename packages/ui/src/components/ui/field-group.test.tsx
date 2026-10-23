@@ -214,7 +214,11 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
     const stack = fieldStack(screen.getByRole('group', { name: /Effects/ }))
-    expect(stack).toHaveClass('before:left-2', 'pl-9')
+    expect(stack).toHaveClass(
+      'ui-field-rail',
+      'ui-field-group-chrome--rail-comfortable',
+      'ui-border--default',
+    )
     expect(stack).not.toHaveClass('border-l-2')
   })
 
@@ -224,7 +228,10 @@ describe('FieldGroup', () => {
         <TextField id="weapon-mode" label="Mode" />
       </FieldGroup>,
     )
-    expect(screen.getByRole('group', { name: /Weapons/ })).toHaveClass('border-t', 'pt-7')
+    expect(screen.getByRole('group', { name: /Weapons/ })).toHaveClass(
+      'ui-field-group-chrome--divider-top',
+      'ui-border--default',
+    )
   })
 
   it('renders a non-interactive legend accessory without changing the group name', () => {

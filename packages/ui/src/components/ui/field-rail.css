@@ -1,0 +1,42 @@
+/*
+ * Decorative field rails — offset stack rail, dependent nest rail.
+ * Neutral fills read --ui-border-color from ui-border--* on the host.
+ */
+@layer components {
+  .ui-field-rail {
+    position: relative;
+    border-width: 0;
+  }
+
+  .ui-field-rail::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc(var(--spacing) * 2);
+    width: 2px;
+    border-radius: 9999px;
+  }
+
+  .ui-field-rail--tone-neutral::before {
+    background-color: var(--ui-border-color);
+  }
+
+  .ui-field-rail--tone-primary::before {
+    background-color: var(--primary);
+  }
+
+  .ui-field-rail-nest {
+    position: relative;
+    border-width: 0;
+  }
+
+  .ui-field-rail-nest::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 1px;
+    border-radius: 9999px;
+    background-color: var(--ui-border-color);
+  }
+}

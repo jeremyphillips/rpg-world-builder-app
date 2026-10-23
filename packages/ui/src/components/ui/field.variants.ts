@@ -42,7 +42,7 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
  * - `fieldStackRhythmVariants` — vertical gap between stack siblings (`compact` | `comfortable`)
  * - `formDependentInsetSpacing` — total content inset by rhythm (compact 8 / comfortable 9)
- * - `fieldRailOffsetClasses` — rail position within gutter (`left-2` / 8px leading space)
+ * - `ui-field-rail` — rail position within gutter (inline-start offset in `field-rail.css`)
  * - `resolveDependentInsetClasses` — rhythm-derived content indentation (`pl-8` / `pl-9`)
  * - `resolveFieldRailClasses` — pseudo-element rail decoration (see `field-rail.variants.ts`)
  * - `fieldArrayItemListClasses` — gap between sibling array items (rhythm + section size)
@@ -432,9 +432,6 @@ export function resolveDependentInsetClasses(
 ): string {
   return inset ? fieldDependentInsetVariants({ rhythm }) : ''
 }
-
-/** @deprecated Use {@link fieldRailOffsetClasses} from `field-rail.variants.ts`. */
-export const formDependentInsetOffsetClasses = 'left-2'
 
 /**
  * Vertical gap between sibling array items (list + Add button).

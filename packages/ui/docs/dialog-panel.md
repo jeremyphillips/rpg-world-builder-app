@@ -62,7 +62,7 @@ media keep the pinned header + scrolling body anatomy unchanged.
 | `dialogPanelInnerScrollViewportClasses`        | Inner scrollport preset (`ps-1` + `pe-2.5` + `pb-6`) — below pinned chrome in section-inset shell                                              |
 | `dialogPanelInnerLeadingScrollViewportClasses` | Leading inner preset — inner scroll chrome + `pt-5` as first content below header border                                                       |
 | `dialogPanelScrollRegionClasses`               | Deprecated alias for inner scroll region layout + inner preset                                                                                 |
-| `dialogPanelFill`                              | Shared fill and local `--surface-current` publisher (`background`, `card`, `field-container`, `surface-lift`)                                  |
+| `dialogPanelFill`                              | Shared fill and local `--surface-current` publisher (`background`, `card`, `surface-lift`)                                                     |
 | `dialogPanelGeometry`                          | Frame or one physical side stroke; Sheet `left`/`right` geometry follows its physical positioning contract, including RTL                      |
 | `dialogPanelSectionSeparatorBorderClasses`     | Shared subtle separator color for header/footer section borders (`ui-border--subtle`)                                                          |
 | `dialogPanelHeaderClasses`                     | Overlay header section chrome (`border-b` + separator token + `px-6 pt-6 pb-4`; title typography on `DialogPanelHeader`)                       |

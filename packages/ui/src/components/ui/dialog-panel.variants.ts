@@ -3,7 +3,7 @@ import { cva } from 'class-variance-authority'
 import { boundedScrollRegionEndInsetClasses } from './bounded-scroll-region.variants'
 import { cn } from '../../lib/utils'
 
-export const DIALOG_PANEL_FILLS = ['background', 'card', 'field-container', 'surface-lift'] as const
+export const DIALOG_PANEL_FILLS = ['background', 'card', 'surface-lift'] as const
 export type DialogPanelFill = (typeof DIALOG_PANEL_FILLS)[number]
 
 export const DIALOG_PANEL_GEOMETRIES = ['frame', 'side-right', 'side-left', 'side-bottom'] as const
