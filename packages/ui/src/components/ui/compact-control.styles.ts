@@ -13,8 +13,6 @@ export type CompactControlRecipeKey =
 
 export type CompactControlSegmentSizeKey = 'sm'
 
-export type CompactControlTabsTriggerKey = 'pill'
-
 export type CompactControlMenuItemSizeKey = 'sm' | 'md' | 'lg'
 
 export type CompactControlStepperButtonSizeKey = 'xs' | 'sm' | 'md' | 'lg'
@@ -99,10 +97,6 @@ const COMPACT_CONTROL_SEGMENT_CLASS: Record<CompactControlSegmentSizeKey, string
   sm: 'ui-compact-control--segment-sm',
 }
 
-const COMPACT_CONTROL_TABS_TRIGGER_CLASS: Record<CompactControlTabsTriggerKey, string> = {
-  pill: 'ui-compact-control--tabs-pill',
-}
-
 const COMPACT_CONTROL_MENU_ITEM_CLASS: Record<CompactControlMenuItemSizeKey, string> = {
   sm: 'ui-compact-control--menu-item-sm',
   md: 'ui-compact-control--menu-item-md',
@@ -137,12 +131,6 @@ export function resolveCompactControlSegmentClasses(size: CompactControlSegmentS
   return `${UI_COMPACT_CONTROL_BLOCK_CLASS} ${COMPACT_CONTROL_SEGMENT_CLASS[size]}`
 }
 
-export function resolveCompactControlTabsTriggerClasses(
-  variant: CompactControlTabsTriggerKey,
-): string {
-  return `${UI_COMPACT_CONTROL_BLOCK_CLASS} ${COMPACT_CONTROL_TABS_TRIGGER_CLASS[variant]}`
-}
-
 export function resolveCompactControlMenuItemClasses(size: CompactControlMenuItemSizeKey): string {
   return COMPACT_CONTROL_MENU_ITEM_CLASS[size]
 }
@@ -162,7 +150,6 @@ export const UI_COMPACT_CONTROL_SIZE_CLASSES = [
   ...COMPACT_CONTROL_RECIPE_SPECS.map((spec) => spec.className),
   UI_COMPACT_CONTROL_ICON_COMPACT_SM_CLASS,
   ...Object.values(COMPACT_CONTROL_SEGMENT_CLASS),
-  ...Object.values(COMPACT_CONTROL_TABS_TRIGGER_CLASS),
   ...Object.values(COMPACT_CONTROL_MENU_ITEM_CLASS),
   ...Object.values(COMPACT_CONTROL_STEPPER_BUTTON_CLASS),
   ...Object.values(COMPACT_CONTROL_GAP_CLASS),

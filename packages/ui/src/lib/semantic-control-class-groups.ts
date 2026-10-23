@@ -4,6 +4,10 @@ export {
   UI_ALERT_APPEARANCE_CLASSES,
   UI_ALERT_DENSITY_CLASSES,
 } from '../components/ui/alert.variants'
+export {
+  UI_TABS_LIST_APPEARANCE_CLASSES,
+  UI_TABS_TRIGGER_APPEARANCE_CLASSES,
+} from '../components/ui/tabs.variants'
 export { UI_COMPACT_LABEL_APPEARANCE_CLASSES } from '../components/ui/badge-appearance.lib'
 export {
   UI_BUTTON_APPEARANCE_CLASSES,

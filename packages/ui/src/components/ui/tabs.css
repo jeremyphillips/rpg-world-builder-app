@@ -1,0 +1,104 @@
+/*
+ * Tabs list, trigger, and content.
+ * Source order: list base → list appearance → trigger base → trigger appearance → content.
+ */
+@layer components {
+  .ui-tabs__list--line {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    gap: 0;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    color: var(--muted-foreground);
+  }
+
+  .ui-tabs__list--pill {
+    display: inline-flex;
+    align-items: center;
+    height: var(--control-height-md);
+    gap: calc(var(--spacing) * 1);
+    border-radius: var(--radius-lg);
+    background-color: var(--segmented-track-bg);
+    padding: calc(var(--spacing) * 1);
+  }
+
+  .ui-tabs__trigger {
+    cursor: pointer;
+  }
+
+  .ui-tabs__trigger:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .ui-tabs__trigger--line {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    font-weight: var(--font-weight-medium);
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+    position: relative;
+    height: var(--control-height-md);
+    padding-inline: calc(var(--spacing) * 4);
+    padding-top: calc(var(--spacing) * 1);
+    padding-bottom: calc(var(--spacing) * 2);
+    color: var(--muted-foreground);
+  }
+
+  .ui-tabs__trigger--line:hover {
+    color: var(--foreground);
+  }
+
+  .ui-tabs__trigger--line[data-state='active'] {
+    color: var(--foreground);
+  }
+
+  .ui-tabs__trigger--line[data-state='active']::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -1px;
+    height: 2px;
+    border-radius: 9999px;
+    background-color: var(--primary);
+  }
+
+  .ui-tabs__trigger--pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    font-weight: var(--font-weight-medium);
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+    height: var(--control-height-xs);
+    padding-inline: calc(var(--spacing) * 3);
+    border-radius: var(--radius-md);
+    color: var(--foreground);
+  }
+
+  .ui-tabs__trigger--pill[data-state='active'] {
+    background-color: var(--background);
+    color: var(--foreground);
+    box-shadow:
+      0 1px 3px 0 rgb(0 0 0 / 0.1),
+      0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+
+  .ui-tabs__content {
+    margin-top: calc(var(--spacing) * 6);
+  }
+
+  .ui-tabs__content:focus-visible {
+    outline: none;
+  }
+}

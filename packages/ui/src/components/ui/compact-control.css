@@ -105,13 +105,6 @@
     line-height: var(--text-xs--line-height);
   }
 
-  /* --- Tabs (pill variant trigger) --- */
-
-  .ui-compact-control--tabs-pill {
-    height: var(--control-height-xs);
-    padding-inline: calc(var(--spacing) * 3);
-  }
-
   /* --- Dropdown / choice menu items --- */
 
   .ui-compact-control--menu-item-sm {

@@ -102,6 +102,10 @@ Overlay notification counts use `ui-notification-unread-badge` (not compact-labe
 
 `ui-alert--{default|info|success|warning|destructive}` owns fill, border, and foreground. `ui-alert--{comfortable|compact}` owns gap and padding. `__title--{comfortable|compact}` owns the title type. `__description` owns the supporting copy.
 
+## Tabs
+
+`ui-tabs__list--line` and `ui-tabs__trigger--line` own the horizontal rule and primary active indicator (`ui-border--default` on the list). `ui-tabs__list--pill` and `ui-tabs__trigger--pill` own the segmented track and raised active segment. `ui-tabs__trigger` (without an appearance modifier) and `ui-focus-ring` own cursor, disabled treatment, and focus for `variant="none"` compositions. `ui-tabs__content` owns panel spacing below the list. Domain tile grids (for example spell level tabs) keep layout and tile chrome outside shared appearances.
+
 ## StatusIcon
 
 `ui-status-icon` owns the disc. `ui-status-icon--{sm|md|lg}` are disc diameters (12 / 16 / 20px). Tone modifiers set fill and foreground. `ui-status-icon__glyph` carries neutral glyph color and needs-attention ring suppression; ladder or slash size utilities stay on the svg.

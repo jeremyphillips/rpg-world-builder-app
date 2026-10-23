@@ -283,9 +283,10 @@ buttons) and legacy Tailwind compositions:
 
 Label type for the xs tier: `text-control-action-xs` (10px) — control lane only, not general body type.
 
-**Not on semantic CSS yet:** `tabs` / `segmented-control` default segments (line tabs still
-use Tailwind geometry), field control bands (`field-control-band.variants.ts`), number-stepper
-geometry (`number-stepper.variants.ts`), spinner sizing.
+**Not on semantic CSS yet:** `segmented-control` default segments, field control bands
+(`field-control-band.variants.ts`), number-stepper geometry (`number-stepper.variants.ts`),
+spinner sizing. Tabs `line` / `pill` appearances live in `tabs.css`; pill trigger geometry no
+longer uses `ui-compact-control--tabs-pill`.
 
 ### Icon–label gap (labeled controls)
 

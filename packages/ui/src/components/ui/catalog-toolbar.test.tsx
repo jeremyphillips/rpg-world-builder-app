@@ -68,6 +68,21 @@ describe('CatalogToolbar', () => {
     expect(tablist.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
+  it('suppresses the line tab list bottom border so the toolbar row owns the divider', () => {
+    render(
+      <CatalogToolbar
+        tabs={{
+          items: [{ id: 'featured', label: 'Featured', count: 1 }],
+          activeId: 'featured',
+          onActiveIdChange: vi.fn(),
+        }}
+      />,
+    )
+
+    const tablist = screen.getByRole('tablist')
+    expect(tablist).toHaveClass('ui-tabs__list--line', 'border-b-0')
+  })
+
   it('renders tabs after search when position is after-search', () => {
     render(
       <CatalogToolbar

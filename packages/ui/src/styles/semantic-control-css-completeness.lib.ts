@@ -200,6 +200,8 @@ const interactiveListCssPath = path.join(stylesDir, '../components/ui/interactiv
 
 const alertCssPath = path.join(stylesDir, '../components/ui/alert.css')
 
+const tabsCssPath = path.join(stylesDir, '../components/ui/tabs.css')
+
 const popoverContentCssPath = path.join(stylesDir, '../components/ui/popover-content.css')
 
 const compactLabelCssPath = path.join(stylesDir, '../components/ui/compact-label.css')
@@ -652,6 +654,31 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       {
         modifierPrefix: 'ui-alert__title',
         requiredProperties: ['font-weight', 'color'] as const,
+      },
+    ],
+  },
+  {
+    filePath: tabsCssPath,
+    dimensions: [
+      {
+        modifierPrefix: 'ui-tabs__list--line',
+        requiredProperties: ['display', 'border-bottom-width', 'border-bottom-style'] as const,
+      },
+      {
+        modifierPrefix: 'ui-tabs__list--pill',
+        requiredProperties: ['display', 'height', 'background-color', 'padding'] as const,
+      },
+      {
+        modifierPrefix: 'ui-tabs__trigger--line',
+        requiredProperties: ['display', 'height', 'padding-inline'] as const,
+      },
+      {
+        modifierPrefix: 'ui-tabs__trigger--pill',
+        requiredProperties: ['display', 'height', 'padding-inline', 'border-radius'] as const,
+      },
+      {
+        modifierPrefix: 'ui-tabs__content',
+        requiredProperties: ['margin-top'] as const,
       },
     ],
   },
