@@ -15,10 +15,11 @@ exports[`Actions/ActionBlockedDialog Default smoke-test 1`] = `
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

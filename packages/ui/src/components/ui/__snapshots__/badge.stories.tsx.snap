@@ -77,6 +77,17 @@ exports[`Components/Badge Small smoke-test 1`] = `
 ]
 `;
 
+exports[`Components/Badge SoftInformative smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
 exports[`Components/Badge SubduedEmphasis smoke-test 1`] = `
 [
   {

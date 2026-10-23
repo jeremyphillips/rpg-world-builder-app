@@ -5,20 +5,22 @@ exports[`Character Builder/EquipmentAcquisitionGuidance DualWorkflow smoke-test 
   {
     "height": "16px",
     "identity": "coins",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "16px",
     "identity": "gem",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
-    "height": "10px",
+    "height": "14px",
     "identity": "check",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "14px",
   },
   {
     "height": "auto",
@@ -34,14 +36,15 @@ exports[`Character Builder/EquipmentAcquisitionGuidance MagicItemsOnly smoke-tes
   {
     "height": "16px",
     "identity": "gem",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
-    "height": "10px",
+    "height": "14px",
     "identity": "check",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "14px",
   },
   {
     "height": "auto",
@@ -57,6 +60,7 @@ exports[`Character Builder/EquipmentAcquisitionGuidance PurchaseOnly smoke-test 
   {
     "height": "16px",
     "identity": "coins",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -85,14 +89,15 @@ exports[`Character Builder/EquipmentAcquisitionGuidance UnresolvedFundingWithMag
   {
     "height": "16px",
     "identity": "gem",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
-    "height": "10px",
+    "height": "14px",
     "identity": "check",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "14px",
   },
   {
     "height": "auto",

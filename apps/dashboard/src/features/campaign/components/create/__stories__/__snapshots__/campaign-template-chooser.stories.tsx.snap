@@ -5,6 +5,7 @@ exports[`Campaign/CampaignTemplateChooser Interactive smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -22,6 +23,7 @@ exports[`Campaign/CampaignTemplateChooser LoadFailure smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },

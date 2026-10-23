@@ -3,16 +3,18 @@
 exports[`Filters/ActiveFilterChips Default smoke-test 1`] = `
 [
   {
-    "height": "12px",
+    "height": "14px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "14px",
   },
   {
-    "height": "12px",
+    "height": "14px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "14px",
   },
   {
     "height": "auto",

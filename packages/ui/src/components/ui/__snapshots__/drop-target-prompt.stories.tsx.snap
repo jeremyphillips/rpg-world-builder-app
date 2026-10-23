@@ -5,6 +5,7 @@ exports[`Primitives/DropTargetPrompt ActiveCover smoke-test 1`] = `
   {
     "height": "40px",
     "identity": "cloud-upload",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "40px",
   },
@@ -22,6 +23,7 @@ exports[`Primitives/DropTargetPrompt ActiveInline smoke-test 1`] = `
   {
     "height": "40px",
     "identity": "cloud-upload",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "40px",
   },
@@ -39,14 +41,15 @@ exports[`Primitives/DropTargetPrompt ComfortableIdle smoke-test 1`] = `
   {
     "height": "40px",
     "identity": "image",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "40px",
   },
   {
-    "height": "16px",
+    "height": "12px",
     "identity": "upload",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "12px",
   },
   {
     "height": "auto",
@@ -62,14 +65,15 @@ exports[`Primitives/DropTargetPrompt IdleComfortable smoke-test 1`] = `
   {
     "height": "40px",
     "identity": "image",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "40px",
   },
   {
-    "height": "16px",
+    "height": "12px",
     "identity": "upload",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "12px",
   },
   {
     "height": "auto",
@@ -85,6 +89,7 @@ exports[`Primitives/DropTargetPrompt InvalidCover smoke-test 1`] = `
   {
     "height": "40px",
     "identity": "image",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "40px",
   },

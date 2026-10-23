@@ -5,6 +5,7 @@ exports[`Character/OrganizationMembershipTitleField Default smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },

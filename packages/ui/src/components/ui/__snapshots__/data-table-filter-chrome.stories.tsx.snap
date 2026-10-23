@@ -5,6 +5,7 @@ exports[`Components/DataTableFilterChrome Default smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -28,6 +29,7 @@ exports[`Components/DataTableFilterChrome WithActiveFilters smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -40,6 +42,7 @@ exports[`Components/DataTableFilterChrome WithActiveFilters smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

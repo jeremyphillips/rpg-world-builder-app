@@ -1,6 +1,28 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`Content/Overview/ContentOverviewNameCell ManagerDraft smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
 exports[`Content/Overview/ContentOverviewNameCell ManagerSpecificPlayers smoke-test 1`] = `[]`;
+
+exports[`Content/Overview/ContentOverviewNameCell ManagerUnavailable smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
 
 exports[`Content/Overview/ContentOverviewNameCell PlayerRow smoke-test 1`] = `
 [

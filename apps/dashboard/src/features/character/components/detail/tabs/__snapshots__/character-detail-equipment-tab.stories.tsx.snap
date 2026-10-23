@@ -16,18 +16,21 @@ exports[`Character/Detail/CharacterDetailEquipmentTab WithEquipment smoke-test 1
   {
     "height": "12px",
     "identity": "arrow-down-up",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

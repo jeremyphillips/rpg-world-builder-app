@@ -60,6 +60,7 @@ exports[`Character/CharacterListCard WithCampaign smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "castle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },

@@ -5,6 +5,7 @@ exports[`Character Builder/Connections/OrganizationPickerDrawer Default smoke-te
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -17,6 +18,7 @@ exports[`Character Builder/Connections/OrganizationPickerDrawer Default smoke-te
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -35,6 +37,7 @@ exports[`Character Builder/Connections/OrganizationPickerDrawer Default smoke-te
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -71,14 +74,16 @@ exports[`Character Builder/Connections/OrganizationPickerDrawer Default smoke-te
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -94,14 +99,16 @@ exports[`Character Builder/Connections/OrganizationPickerDrawer Empty smoke-test
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

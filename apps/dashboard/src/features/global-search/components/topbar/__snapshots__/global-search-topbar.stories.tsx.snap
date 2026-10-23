@@ -5,6 +5,7 @@ exports[`GlobalSearch/GlobalSearchTopbar Collapsed smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

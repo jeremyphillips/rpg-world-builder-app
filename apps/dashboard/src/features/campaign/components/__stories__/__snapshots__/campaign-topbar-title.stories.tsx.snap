@@ -16,6 +16,7 @@ exports[`Campaign/CampaignTopbarTitle LongNameTruncation smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "castle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -33,6 +34,7 @@ exports[`Campaign/CampaignTopbarTitle Missing smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "castle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -50,6 +52,7 @@ exports[`Campaign/CampaignTopbarTitle Resolved smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "castle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },

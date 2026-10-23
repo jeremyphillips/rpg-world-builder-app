@@ -3,10 +3,10 @@
 exports[`UI/IconContainer Box smoke-test 1`] = `
 [
   {
-    "height": "16px",
-    "identity": "table2",
+    "height": "24px",
+    "identity": "table",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "24px",
   },
   {
     "height": "auto",
@@ -20,10 +20,10 @@ exports[`UI/IconContainer Box smoke-test 1`] = `
 exports[`UI/IconContainer Circle smoke-test 1`] = `
 [
   {
-    "height": "16px",
-    "identity": "table2",
+    "height": "24px",
+    "identity": "table",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "24px",
   },
   {
     "height": "auto",
@@ -38,7 +38,7 @@ exports[`UI/IconContainer Medium smoke-test 1`] = `
 [
   {
     "height": "24px",
-    "identity": "table2",
+    "identity": "table",
     "strokeWidth": "2px",
     "width": "24px",
   },

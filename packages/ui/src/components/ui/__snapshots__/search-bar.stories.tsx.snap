@@ -5,24 +5,28 @@ exports[`Forms/SearchBar ClassReference smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "14px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -40,6 +44,7 @@ exports[`Forms/SearchBar Compact smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -57,6 +62,7 @@ exports[`Forms/SearchBar Disabled smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -74,6 +80,7 @@ exports[`Forms/SearchBar EmbeddedInHostRow smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -97,6 +104,7 @@ exports[`Forms/SearchBar FilterChromeComfortable smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -114,6 +122,7 @@ exports[`Forms/SearchBar FormSectionCompact smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -131,6 +140,7 @@ exports[`Forms/SearchBar WithValue smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },

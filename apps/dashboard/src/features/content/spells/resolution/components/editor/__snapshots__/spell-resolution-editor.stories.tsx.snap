@@ -51,10 +51,10 @@ exports[`Content/Spells/SpellResolutionEditor BurningHands smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -64,7 +64,7 @@ exports[`Content/Spells/SpellResolutionEditor BurningHands smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -112,7 +112,7 @@ exports[`Content/Spells/SpellResolutionEditor BurningHands smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -130,7 +130,7 @@ exports[`Content/Spells/SpellResolutionEditor BurningHands smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -200,10 +200,10 @@ exports[`Content/Spells/SpellResolutionEditor ChillTouchWithNote smoke-test 1`] 
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -213,7 +213,7 @@ exports[`Content/Spells/SpellResolutionEditor ChillTouchWithNote smoke-test 1`] 
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -261,7 +261,7 @@ exports[`Content/Spells/SpellResolutionEditor ChillTouchWithNote smoke-test 1`] 
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -337,10 +337,10 @@ exports[`Content/Spells/SpellResolutionEditor EldritchBlast smoke-test 1`] = `
     "width": "10px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -350,7 +350,7 @@ exports[`Content/Spells/SpellResolutionEditor EldritchBlast smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -398,7 +398,7 @@ exports[`Content/Spells/SpellResolutionEditor EldritchBlast smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -461,10 +461,10 @@ exports[`Content/Spells/SpellResolutionEditor FalseLife smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -474,7 +474,7 @@ exports[`Content/Spells/SpellResolutionEditor FalseLife smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -528,7 +528,7 @@ exports[`Content/Spells/SpellResolutionEditor FalseLife smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -610,10 +610,10 @@ exports[`Content/Spells/SpellResolutionEditor Fireball smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -623,7 +623,7 @@ exports[`Content/Spells/SpellResolutionEditor Fireball smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -671,7 +671,7 @@ exports[`Content/Spells/SpellResolutionEditor Fireball smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -689,7 +689,7 @@ exports[`Content/Spells/SpellResolutionEditor Fireball smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -753,10 +753,10 @@ exports[`Content/Spells/SpellResolutionEditor InflictWounds smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -766,7 +766,7 @@ exports[`Content/Spells/SpellResolutionEditor InflictWounds smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -814,7 +814,7 @@ exports[`Content/Spells/SpellResolutionEditor InflictWounds smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -832,7 +832,7 @@ exports[`Content/Spells/SpellResolutionEditor InflictWounds smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -914,10 +914,10 @@ exports[`Content/Spells/SpellResolutionEditor MagicMissile smoke-test 1`] = `
     "width": "10px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -927,7 +927,7 @@ exports[`Content/Spells/SpellResolutionEditor MagicMissile smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -993,7 +993,7 @@ exports[`Content/Spells/SpellResolutionEditor MagicMissile smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -1081,10 +1081,10 @@ exports[`Content/Spells/SpellResolutionEditor MassHealingWord smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -1094,7 +1094,7 @@ exports[`Content/Spells/SpellResolutionEditor MassHealingWord smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -1130,7 +1130,7 @@ exports[`Content/Spells/SpellResolutionEditor MassHealingWord smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },

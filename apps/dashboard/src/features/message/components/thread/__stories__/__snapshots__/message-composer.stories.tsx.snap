@@ -5,6 +5,7 @@ exports[`Message/MessageComposer Default smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "send",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -22,6 +23,7 @@ exports[`Message/MessageComposer Submitting smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "send",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

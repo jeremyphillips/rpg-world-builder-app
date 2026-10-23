@@ -5,6 +5,7 @@ exports[`Character/Detail/Connections/CharacterConnectionsAddMenu Default smoke-
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -28,6 +29,7 @@ exports[`Character/Detail/Connections/CharacterConnectionsAddMenu Disabled smoke
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

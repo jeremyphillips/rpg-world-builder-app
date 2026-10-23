@@ -38,12 +38,14 @@ exports[`Dashboard/Name Generator/Results PartialBatch smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "copy",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "16px",
     "identity": "copy",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -61,12 +63,14 @@ exports[`Dashboard/Name Generator/Results Success smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "copy",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "16px",
     "identity": "copy",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

@@ -5,6 +5,7 @@ exports[`Content/Locations/LocationConnectedPartiesSection ManagerEmptyPeople sm
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -28,12 +29,14 @@ exports[`Content/Locations/LocationConnectedPartiesSection TerritorialAuthority 
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

@@ -14,10 +14,10 @@ exports[`Layout/Hero InlineMark smoke-test 1`] = `
 exports[`Layout/Hero WithMediaAndOverlapMark smoke-test 1`] = `
 [
   {
-    "height": "16px",
+    "height": "24px",
     "identity": "ellipsis",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "24px",
   },
   {
     "height": "auto",

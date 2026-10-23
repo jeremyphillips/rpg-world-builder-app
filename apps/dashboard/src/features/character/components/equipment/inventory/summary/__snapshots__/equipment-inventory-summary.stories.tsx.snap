@@ -16,12 +16,14 @@ exports[`Character Builder/EquipmentInventorySummary GoldPurchasesWithStackableQ
   {
     "height": "12px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -45,12 +47,14 @@ exports[`Character Builder/EquipmentInventorySummary MixedSourceMagicItem smoke-
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -63,6 +67,7 @@ exports[`Character Builder/EquipmentInventorySummary MixedSourceMagicItem smoke-
   {
     "height": "16px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -86,30 +91,35 @@ exports[`Character Builder/EquipmentInventorySummary PackageCustomizationOpen sm
   {
     "height": "16px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -133,30 +143,35 @@ exports[`Character Builder/EquipmentInventorySummary PackageCustomizationOverBud
   {
     "height": "16px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -180,6 +195,7 @@ exports[`Character Builder/EquipmentInventorySummary PackageReviewStatus smoke-t
   {
     "height": "16px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -203,6 +219,7 @@ exports[`Character Builder/EquipmentInventorySummary PackageWithInvalidItem smok
   {
     "height": "16px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -226,6 +243,7 @@ exports[`Character Builder/EquipmentInventorySummary PackageWithLinkedProficienc
   {
     "height": "16px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -243,12 +261,14 @@ exports[`Character Builder/EquipmentInventorySummary PendingRetainedPurchases sm
   {
     "height": "12px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -272,6 +292,7 @@ exports[`Character Builder/EquipmentInventorySummary StandardPackageOnly smoke-t
   {
     "height": "16px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -289,12 +310,14 @@ exports[`Character Builder/EquipmentInventorySummary StandardPackageWithPurchase
   {
     "height": "12px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -307,6 +330,7 @@ exports[`Character Builder/EquipmentInventorySummary StandardPackageWithPurchase
   {
     "height": "16px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

@@ -22,7 +22,7 @@ exports[`Content/Organizations/OrganizationEditMembershipTitlesField Default smo
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -40,7 +40,7 @@ exports[`Content/Organizations/OrganizationEditMembershipTitlesField Default smo
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },

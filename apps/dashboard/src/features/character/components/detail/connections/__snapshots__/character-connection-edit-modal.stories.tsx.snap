@@ -17,14 +17,16 @@ exports[`Character/Detail/Connections/CharacterConnectionEditModal EditOrganizat
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -68,10 +70,11 @@ exports[`Character/Detail/Connections/CharacterConnectionEditModal EditPersonRel
     "width": "16px",
   },
   {
-    "height": "12px",
+    "height": "14px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "14px",
   },
   {
     "height": "16px",
@@ -80,10 +83,11 @@ exports[`Character/Detail/Connections/CharacterConnectionEditModal EditPersonRel
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -117,6 +121,7 @@ exports[`Character/Detail/Connections/CharacterConnectionEditModal EditResidence
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -127,10 +132,11 @@ exports[`Character/Detail/Connections/CharacterConnectionEditModal EditResidence
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

@@ -5,12 +5,14 @@ exports[`Character Builder/ProficiencySection MultiChoiceSets smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -28,6 +30,7 @@ exports[`Character Builder/ProficiencySection Skills smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

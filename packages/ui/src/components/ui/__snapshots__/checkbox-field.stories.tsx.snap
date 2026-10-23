@@ -5,6 +5,7 @@ exports[`Forms/CheckboxField Checked smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -33,6 +34,7 @@ exports[`Forms/CheckboxField Disabled smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },

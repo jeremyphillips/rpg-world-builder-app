@@ -22,6 +22,7 @@ exports[`Content/Entity/EntityActionChoiceMenu Labeled smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

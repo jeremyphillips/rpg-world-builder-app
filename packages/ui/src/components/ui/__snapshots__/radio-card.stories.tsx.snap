@@ -16,20 +16,21 @@ exports[`Forms/Controls/RadioCard Compact smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
-    "height": "16px",
+    "height": "24px",
     "identity": "info",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "24px",
   },
   {
-    "height": "16px",
+    "height": "24px",
     "identity": "info",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "24px",
   },
   {
     "height": "auto",
@@ -56,6 +57,7 @@ exports[`Forms/Controls/RadioCard DependentChoice smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -73,6 +75,7 @@ exports[`Forms/Controls/RadioCard Disabled smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -90,20 +93,21 @@ exports[`Forms/Controls/RadioCard EmbeddedDependentChoice smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
-    "height": "16px",
+    "height": "24px",
     "identity": "info",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "24px",
   },
   {
-    "height": "16px",
+    "height": "24px",
     "identity": "info",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "24px",
   },
   {
     "height": "auto",
@@ -117,16 +121,16 @@ exports[`Forms/Controls/RadioCard EmbeddedDependentChoice smoke-test 1`] = `
 exports[`Forms/Controls/RadioCard IconControlTwoColumnGrid smoke-test 1`] = `
 [
   {
-    "height": "16px",
+    "height": "24px",
     "identity": "chart-no-axes-column",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "24px",
   },
   {
-    "height": "16px",
-    "identity": "grid3x3",
+    "height": "24px",
+    "identity": "grid-3x3",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "24px",
   },
   {
     "height": "auto",
@@ -142,14 +146,15 @@ exports[`Forms/Controls/RadioCard ParentChoiceTitleMeta smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
-    "height": "16px",
+    "height": "24px",
     "identity": "info",
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "24px",
   },
   {
     "height": "auto",
@@ -165,6 +170,7 @@ exports[`Forms/Controls/RadioCard RadioOnRightTwoColumnGrid smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -182,6 +188,7 @@ exports[`Forms/Controls/RadioCard RowVariant smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -210,6 +217,7 @@ exports[`Forms/Controls/RadioCard WithSelection smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },

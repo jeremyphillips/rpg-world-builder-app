@@ -16,6 +16,7 @@ exports[`Content/Detail/DetailEntityRow WithDisclosure smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },

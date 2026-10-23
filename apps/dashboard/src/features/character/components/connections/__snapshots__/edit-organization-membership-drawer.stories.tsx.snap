@@ -11,14 +11,16 @@ exports[`Character/EditOrganizationMembershipDrawer Default smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -40,14 +42,16 @@ exports[`Character/EditOrganizationMembershipDrawer HistoricalTitle smoke-test 1
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

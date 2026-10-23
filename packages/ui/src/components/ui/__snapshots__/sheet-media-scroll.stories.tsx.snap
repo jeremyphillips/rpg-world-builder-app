@@ -3,10 +3,11 @@
 exports[`Overlays/SheetMediaScroll StickyHeaderWithHeroMedia smoke-test 1`] = `
 [
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

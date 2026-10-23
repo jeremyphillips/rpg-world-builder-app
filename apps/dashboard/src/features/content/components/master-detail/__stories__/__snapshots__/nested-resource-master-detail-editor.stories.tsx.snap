@@ -5,6 +5,7 @@ exports[`Content/NestedResourceMasterDetailEditor ConstrainedViewport smoke-test
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -148,12 +149,14 @@ exports[`Content/NestedResourceMasterDetailEditor Empty smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "40px",
     "identity": "sparkles",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "40px",
   },
@@ -171,6 +174,7 @@ exports[`Content/NestedResourceMasterDetailEditor LongCollection smoke-test 1`] 
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -314,6 +318,7 @@ exports[`Content/NestedResourceMasterDetailEditor TallerDetailThanRail smoke-tes
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -343,6 +348,7 @@ exports[`Content/NestedResourceMasterDetailEditor WithRows smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

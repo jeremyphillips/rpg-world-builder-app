@@ -5,18 +5,21 @@ exports[`UI/ContentCardMedia FallbackDensities smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "sparkles",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "16px",
     "identity": "sparkles",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "16px",
     "identity": "map-pin",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

@@ -3,16 +3,17 @@
 exports[`Create Flow/CreateModalShell OptionalRelationshipTabs smoke-test 1`] = `
 [
   {
-    "height": "10px",
+    "height": "24px",
     "identity": "triangle-alert",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "24px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -26,10 +27,11 @@ exports[`Create Flow/CreateModalShell OptionalRelationshipTabs smoke-test 1`] = 
 exports[`Create Flow/CreateModalShell SinglePanel smoke-test 1`] = `
 [
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

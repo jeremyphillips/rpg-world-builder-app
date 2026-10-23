@@ -5,6 +5,7 @@ exports[`Content/Entity/Surfaces/Drawer/Replacement/EntityReplacementSection Loc
   {
     "height": "16px",
     "identity": "castle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -22,6 +23,7 @@ exports[`Content/Entity/Surfaces/Drawer/Replacement/EntityReplacementSection Org
   {
     "height": "16px",
     "identity": "castle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

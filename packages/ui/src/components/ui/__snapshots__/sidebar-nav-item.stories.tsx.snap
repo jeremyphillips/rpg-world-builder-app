@@ -3,10 +3,11 @@
 exports[`Navigation/SidebarNavItem Active smoke-test 1`] = `
 [
   {
-    "height": "18px",
+    "height": "16px",
     "identity": "layout-dashboard",
+    "ownerSizeResolved": true,
     "strokeWidth": "1.75px",
-    "width": "18px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -20,10 +21,11 @@ exports[`Navigation/SidebarNavItem Active smoke-test 1`] = `
 exports[`Navigation/SidebarNavItem Inactive smoke-test 1`] = `
 [
   {
-    "height": "18px",
+    "height": "16px",
     "identity": "castle",
+    "ownerSizeResolved": true,
     "strokeWidth": "1.75px",
-    "width": "18px",
+    "width": "16px",
   },
   {
     "height": "auto",

@@ -5,6 +5,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer Default smoke-test
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -17,6 +18,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer Default smoke-test
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -35,6 +37,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer Default smoke-test
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -53,6 +56,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer Default smoke-test
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -105,10 +109,11 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer Default smoke-test
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -124,6 +129,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer MemberStatusBadges
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -136,6 +142,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer MemberStatusBadges
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -154,6 +161,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer MemberStatusBadges
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -172,6 +180,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer MemberStatusBadges
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -224,10 +233,11 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer MemberStatusBadges
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -243,14 +253,16 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer NoCandidates smoke
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -266,6 +278,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer QuickNpcCreationUn
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -278,6 +291,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer QuickNpcCreationUn
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -296,6 +310,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer QuickNpcCreationUn
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -314,6 +329,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer QuickNpcCreationUn
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -366,10 +382,11 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer QuickNpcCreationUn
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -385,6 +402,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer WithQuickNpcCreati
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -397,6 +415,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer WithQuickNpcCreati
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -421,6 +440,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer WithQuickNpcCreati
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -439,6 +459,7 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer WithQuickNpcCreati
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -491,10 +512,11 @@ exports[`Content/Organizations/OrganizationMemberPickerDrawer WithQuickNpcCreati
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

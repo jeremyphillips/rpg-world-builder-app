@@ -5,6 +5,7 @@ exports[`GlobalSearch/GlobalSearchTrigger Disabled smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -22,6 +23,7 @@ exports[`GlobalSearch/GlobalSearchTrigger Enabled smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

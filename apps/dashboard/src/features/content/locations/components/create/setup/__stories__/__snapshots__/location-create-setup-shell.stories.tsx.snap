@@ -3,10 +3,11 @@
 exports[`Content/Locations/LocationCreateSetup SingleChoiceSet smoke-test 1`] = `
 [
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -20,10 +21,11 @@ exports[`Content/Locations/LocationCreateSetup SingleChoiceSet smoke-test 1`] = 
 exports[`Content/Locations/LocationCreateSetup TwoChoiceSets smoke-test 1`] = `
 [
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -37,10 +39,11 @@ exports[`Content/Locations/LocationCreateSetup TwoChoiceSets smoke-test 1`] = `
 exports[`Content/Locations/LocationCreateSetup WithDefaultSubhead smoke-test 1`] = `
 [
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

@@ -11,6 +11,7 @@ exports[`UI/RichTextLinkPicker Default smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -40,6 +41,7 @@ exports[`UI/RichTextLinkPicker EditExistingInternalLink smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -75,6 +77,7 @@ exports[`UI/RichTextLinkPicker ExternalTab smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },

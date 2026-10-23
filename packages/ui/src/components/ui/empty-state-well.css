@@ -12,6 +12,6 @@
   }
 
   .ui-empty-state-well__icon--lg {
-    --icon-size: var(--empty-state-well-icon-lg);
+    --icon-size: 2.5rem;
   }
 }

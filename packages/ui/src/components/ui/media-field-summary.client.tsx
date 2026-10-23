@@ -162,7 +162,7 @@ function CompactMediaFieldSummary({
           aria-label={MEDIA_FIELD_SUMMARY_MANAGE_IMAGES_LABEL}
           onClick={openManager}
         >
-          <Icon name="settings" size="owner" className={mediaSummaryCompactGearIconVariants()} />
+          <Icon name="settings" size="md" />
         </button>
       ) : null}
     </div>

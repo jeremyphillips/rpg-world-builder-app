@@ -3,10 +3,10 @@
 exports[`Form/FormSectionHeader FieldLabelWithAction smoke-test 1`] = `
 [
   {
-    "height": "12px",
+    "height": "24px",
     "identity": "plus",
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "24px",
   },
   {
     "height": "auto",
@@ -20,10 +20,10 @@ exports[`Form/FormSectionHeader FieldLabelWithAction smoke-test 1`] = `
 exports[`Form/FormSectionHeader NoHintWithAction smoke-test 1`] = `
 [
   {
-    "height": "12px",
+    "height": "24px",
     "identity": "plus",
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "24px",
   },
   {
     "height": "auto",
@@ -37,10 +37,10 @@ exports[`Form/FormSectionHeader NoHintWithAction smoke-test 1`] = `
 exports[`Form/FormSectionHeader OneLineHintWithAction smoke-test 1`] = `
 [
   {
-    "height": "12px",
+    "height": "24px",
     "identity": "plus",
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "24px",
   },
   {
     "height": "auto",
@@ -54,10 +54,10 @@ exports[`Form/FormSectionHeader OneLineHintWithAction smoke-test 1`] = `
 exports[`Form/FormSectionHeader TwoLineHintWithAction smoke-test 1`] = `
 [
   {
-    "height": "12px",
+    "height": "24px",
     "identity": "plus",
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "24px",
   },
   {
     "height": "auto",

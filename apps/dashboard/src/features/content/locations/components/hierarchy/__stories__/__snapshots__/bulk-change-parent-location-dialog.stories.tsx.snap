@@ -9,10 +9,11 @@ exports[`Content/Locations/BulkChangeParentLocationDialog AllBlockedSelection sm
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -32,10 +33,11 @@ exports[`Content/Locations/BulkChangeParentLocationDialog ConfigureAllUnchanged 
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -55,10 +57,11 @@ exports[`Content/Locations/BulkChangeParentLocationDialog ConfigureClearParent s
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -78,10 +81,11 @@ exports[`Content/Locations/BulkChangeParentLocationDialog ConfigureSetParent smo
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -101,10 +105,11 @@ exports[`Content/Locations/BulkChangeParentLocationDialog PartialBlockedSelectio
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

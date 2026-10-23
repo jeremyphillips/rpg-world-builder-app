@@ -9,10 +9,11 @@ exports[`Content/Classes/ClassSpellcastingRecommendationsField WithRecommendatio
     "width": "16px",
   },
   {
-    "height": "12px",
+    "height": "14px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "14px",
   },
   {
     "height": "16px",
@@ -21,10 +22,11 @@ exports[`Content/Classes/ClassSpellcastingRecommendationsField WithRecommendatio
     "width": "16px",
   },
   {
-    "height": "12px",
+    "height": "14px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "14px",
   },
   {
     "height": "auto",

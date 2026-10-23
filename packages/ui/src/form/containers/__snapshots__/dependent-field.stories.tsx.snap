@@ -32,14 +32,14 @@ exports[`Forms/Form/Dependent DependentField smoke-test 1`] = `
 exports[`Forms/Form/Dependent DependentFieldArrayItemsScope smoke-test 1`] = `
 [
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -126,12 +126,14 @@ exports[`Forms/Form/Dependent RadioGrantSet smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -159,10 +161,11 @@ exports[`Forms/Form/Dependent SelectDependentField smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "12px",
+    "height": "14px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "14px",
   },
   {
     "height": "auto",

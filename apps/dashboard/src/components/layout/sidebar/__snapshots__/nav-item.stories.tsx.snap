@@ -5,6 +5,7 @@ exports[`Layout/Sidebar/NavItem Active smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "layout-dashboard",
+    "ownerSizeResolved": true,
     "strokeWidth": "1.75px",
     "width": "16px",
   },
@@ -22,6 +23,7 @@ exports[`Layout/Sidebar/NavItem Inactive smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "castle",
+    "ownerSizeResolved": true,
     "strokeWidth": "1.75px",
     "width": "16px",
   },

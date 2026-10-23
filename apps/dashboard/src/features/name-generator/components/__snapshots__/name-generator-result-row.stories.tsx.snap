@@ -5,6 +5,7 @@ exports[`Dashboard/Name Generator/Result Row Default smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "copy",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

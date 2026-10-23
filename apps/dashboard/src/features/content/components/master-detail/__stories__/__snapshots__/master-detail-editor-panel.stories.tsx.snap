@@ -5,6 +5,7 @@ exports[`Content/MasterDetailEditorPanel EmptySelection smoke-test 1`] = `
   {
     "height": "40px",
     "identity": "sparkles",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "40px",
   },

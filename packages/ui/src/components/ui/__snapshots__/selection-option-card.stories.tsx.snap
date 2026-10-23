@@ -5,6 +5,7 @@ exports[`Forms/Controls/SelectionOptionCard CompactStateTransition smoke-test 1`
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -44,12 +45,14 @@ exports[`Forms/Controls/SelectionOptionCard SelectedWithEmbedded smoke-test 1`] 
   {
     "height": "10px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
     "height": "10px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -78,6 +81,7 @@ exports[`Forms/Controls/SelectionOptionCard VisualParityComparison smoke-test 1`
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },

@@ -5,6 +5,7 @@ exports[`Content/MasterDetailListPanel ConstrainedViewport smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -142,6 +143,7 @@ exports[`Content/MasterDetailListPanel Default smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -177,6 +179,7 @@ exports[`Content/MasterDetailListPanel Empty smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -194,6 +197,7 @@ exports[`Content/MasterDetailListPanel LongCollection smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -331,6 +335,7 @@ exports[`Content/MasterDetailListPanel WithProtectedSystemRow smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -372,6 +377,7 @@ exports[`Content/MasterDetailListPanel WithStickyFormFooter smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -509,14 +515,15 @@ exports[`Content/MasterDetailListPanel WithValidationIssues smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
-    "height": "10px",
+    "height": "24px",
     "identity": "triangle-alert",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "24px",
   },
   {
     "height": "16px",

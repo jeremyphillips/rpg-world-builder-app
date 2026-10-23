@@ -5,6 +5,7 @@ exports[`Content/Locations/LocationChildrenSection ContainedRows smoke-test 1`] 
   {
     "height": "14px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -22,6 +23,7 @@ exports[`Content/Locations/LocationChildrenSection Empty smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -39,12 +41,14 @@ exports[`Content/Locations/LocationChildrenSection ManagedWithMove smoke-test 1`
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "14px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -63,6 +67,7 @@ exports[`Content/Locations/LocationChildrenSection ManagedWithMove smoke-test 1`
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

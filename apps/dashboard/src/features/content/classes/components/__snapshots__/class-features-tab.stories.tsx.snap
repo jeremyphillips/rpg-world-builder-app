@@ -5,12 +5,14 @@ exports[`Content/Classes/ClassFeaturesTab Empty smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "40px",
     "identity": "sparkles",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "40px",
   },
@@ -28,6 +30,7 @@ exports[`Content/Classes/ClassFeaturesTab HomebrewWithFeatures smoke-test 1`] = 
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -94,6 +97,7 @@ exports[`Content/Classes/ClassFeaturesTab HomebrewWithFeatures smoke-test 1`] = 
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -106,6 +110,7 @@ exports[`Content/Classes/ClassFeaturesTab HomebrewWithFeatures smoke-test 1`] = 
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -123,6 +128,7 @@ exports[`Content/Classes/ClassFeaturesTab SystemClassLockedFeatures smoke-test 1
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -201,6 +207,7 @@ exports[`Content/Classes/ClassFeaturesTab SystemClassLockedFeatures smoke-test 1
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -213,6 +220,7 @@ exports[`Content/Classes/ClassFeaturesTab SystemClassLockedFeatures smoke-test 1
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

@@ -3,14 +3,14 @@
 exports[`Campaign Create/InviteMembersStep Default smoke-test 1`] = `
 [
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },

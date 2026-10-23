@@ -5,12 +5,14 @@ exports[`Character Builder/EquipmentQuantityStepper Disabled smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -28,12 +30,14 @@ exports[`Character Builder/EquipmentQuantityStepper InventoryRow smoke-test 1`] 
   {
     "height": "12px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

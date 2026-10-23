@@ -116,7 +116,7 @@ exports[`Components/DataTable EmptyState smoke-test 1`] = `
 [
   {
     "height": "14px",
-    "identity": "columns3",
+    "identity": "columns-3",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -129,12 +129,14 @@ exports[`Components/DataTable EmptyState smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "arrow-up-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "arrow-up-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

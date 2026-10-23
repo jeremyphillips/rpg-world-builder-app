@@ -16,12 +16,14 @@ exports[`Character Builder/ChoiceSetField OriginLanguages smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

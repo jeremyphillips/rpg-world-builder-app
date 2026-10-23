@@ -3,10 +3,10 @@
 exports[`Character Builder/StartingEquipmentTierContribution HeroTier smoke-test 1`] = `
 [
   {
-    "height": "10px",
+    "height": "14px",
     "identity": "info",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "14px",
   },
   {
     "height": "auto",
@@ -20,16 +20,16 @@ exports[`Character Builder/StartingEquipmentTierContribution HeroTier smoke-test
 exports[`Character Builder/StartingEquipmentTierContribution PackageRadioCards smoke-test 1`] = `
 [
   {
-    "height": "10px",
+    "height": "14px",
     "identity": "info",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "14px",
   },
   {
-    "height": "10px",
+    "height": "14px",
     "identity": "info",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "14px",
   },
   {
     "height": "auto",

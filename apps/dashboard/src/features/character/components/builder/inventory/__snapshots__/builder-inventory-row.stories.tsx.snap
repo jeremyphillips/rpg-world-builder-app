@@ -15,7 +15,7 @@ exports[`Character Builder/BuilderSelectedEntityCard WithMetaAndRemove smoke-tes
 [
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },

@@ -10,3 +10,7 @@ exports[`Character Builder/IdentityStep WithNarrative smoke-test 1`] = `
   },
 ]
 `;
+
+exports[`Character Builder/IdentityStep WithSpeciesNameGeneration smoke-test 1`] = `[]`;
+
+exports[`Character Builder/IdentityStep WithValidationIssues smoke-test 1`] = `[]`;

@@ -28,7 +28,7 @@ exports[`Content/TableBuilder/TableBuilderModal ConstrainedLevels smoke-test 1`]
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -46,7 +46,7 @@ exports[`Content/TableBuilder/TableBuilderModal ConstrainedLevels smoke-test 1`]
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -58,7 +58,7 @@ exports[`Content/TableBuilder/TableBuilderModal ConstrainedLevels smoke-test 1`]
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -69,10 +69,11 @@ exports[`Content/TableBuilder/TableBuilderModal ConstrainedLevels smoke-test 1`]
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -87,7 +88,8 @@ exports[`Content/TableBuilder/TableBuilderModal CreateEmpty smoke-test 1`] = `
 [
   {
     "height": "32px",
-    "identity": "table2",
+    "identity": "table",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "32px",
   },
@@ -99,15 +101,17 @@ exports[`Content/TableBuilder/TableBuilderModal CreateEmpty smoke-test 1`] = `
   },
   {
     "height": "32px",
-    "identity": "table2",
+    "identity": "table",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "32px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -128,13 +132,14 @@ exports[`Content/TableBuilder/TableBuilderModal CreateWithKindSelection smoke-te
   },
   {
     "height": "16px",
-    "identity": "grid3x3",
+    "identity": "grid-3x3",
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "32px",
-    "identity": "table2",
+    "identity": "table",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "32px",
   },
@@ -146,15 +151,17 @@ exports[`Content/TableBuilder/TableBuilderModal CreateWithKindSelection smoke-te
   },
   {
     "height": "32px",
-    "identity": "table2",
+    "identity": "table",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "32px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -187,7 +194,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditMartialArtsDice smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -211,7 +218,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditMartialArtsDice smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -229,7 +236,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditMartialArtsDice smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -247,7 +254,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditMartialArtsDice smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -259,15 +266,17 @@ exports[`Content/TableBuilder/TableBuilderModal EditMartialArtsDice smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -306,7 +315,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditMixedColumnTypes smoke-test 
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -330,7 +339,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditMixedColumnTypes smoke-test 
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -354,7 +363,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditMixedColumnTypes smoke-test 
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -378,7 +387,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditMixedColumnTypes smoke-test 
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -390,15 +399,17 @@ exports[`Content/TableBuilder/TableBuilderModal EditMixedColumnTypes smoke-test 
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -437,7 +448,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditRageProgression smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -467,7 +478,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditRageProgression smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -485,7 +496,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditRageProgression smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -497,7 +508,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditRageProgression smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -509,7 +520,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditRageProgression smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -521,7 +532,7 @@ exports[`Content/TableBuilder/TableBuilderModal EditRageProgression smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -533,15 +544,17 @@ exports[`Content/TableBuilder/TableBuilderModal EditRageProgression smoke-test 1
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -580,7 +593,7 @@ exports[`Content/TableBuilder/TableBuilderModal LongWrappedLabels smoke-test 1`]
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -598,7 +611,7 @@ exports[`Content/TableBuilder/TableBuilderModal LongWrappedLabels smoke-test 1`]
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -609,10 +622,11 @@ exports[`Content/TableBuilder/TableBuilderModal LongWrappedLabels smoke-test 1`]
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -651,7 +665,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -669,7 +683,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -681,7 +695,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -693,7 +707,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -705,7 +719,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -717,7 +731,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -729,7 +743,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -741,7 +755,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -753,7 +767,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -765,7 +779,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -777,7 +791,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -789,7 +803,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -801,7 +815,7 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
   },
   {
     "height": "16px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -812,10 +826,11 @@ exports[`Content/TableBuilder/TableBuilderModal ManyRows smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

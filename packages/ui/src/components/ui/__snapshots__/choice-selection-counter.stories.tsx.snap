@@ -5,6 +5,7 @@ exports[`Primitives/ChoiceSelectionCounter CompactComplete smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "4px",
     "width": "10px",
   },
@@ -33,6 +34,7 @@ exports[`Primitives/ChoiceSelectionCounter Complete smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "4px",
     "width": "10px",
   },

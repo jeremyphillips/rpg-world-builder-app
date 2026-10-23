@@ -5,6 +5,7 @@ exports[`UI/ActionButton AddWithLabel smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -22,6 +23,7 @@ exports[`UI/ActionButton EditIconOnly smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "pencil",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

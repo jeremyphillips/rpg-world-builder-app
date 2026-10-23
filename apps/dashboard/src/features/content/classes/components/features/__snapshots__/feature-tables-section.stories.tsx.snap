@@ -5,6 +5,7 @@ exports[`Content/Classes/FeatureTablesSection Empty smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -22,18 +23,21 @@ exports[`Content/Classes/FeatureTablesSection PopulatedRows smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "16px",
-    "identity": "table2",
+    "identity": "table",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "12px",
     "identity": "pencil",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -51,6 +55,7 @@ exports[`Content/Classes/FeatureTablesSection WiredField smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

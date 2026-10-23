@@ -16,12 +16,13 @@ exports[`Content/RequirementEditor Grappler smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -34,12 +35,13 @@ exports[`Content/RequirementEditor Grappler smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -57,7 +59,7 @@ exports[`Content/RequirementEditor Grappler smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -75,7 +77,7 @@ exports[`Content/RequirementEditor Grappler smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -93,12 +95,13 @@ exports[`Content/RequirementEditor MediumScale smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -111,12 +114,13 @@ exports[`Content/RequirementEditor MediumScale smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -134,7 +138,7 @@ exports[`Content/RequirementEditor MediumScale smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -152,7 +156,7 @@ exports[`Content/RequirementEditor MediumScale smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -170,12 +174,13 @@ exports[`Content/RequirementEditor SpellRecall smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -187,7 +192,7 @@ exports[`Content/RequirementEditor SpellRecall smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -199,7 +204,7 @@ exports[`Content/RequirementEditor SpellRecall smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },

@@ -3,16 +3,10 @@
 exports[`UI/IdentityFrame FallbackSizes smoke-test 1`] = `
 [
   {
-    "height": "12px",
+    "height": "24px",
     "identity": "castle",
     "strokeWidth": "2px",
-    "width": "12px",
-  },
-  {
-    "height": "16px",
-    "identity": "castle",
-    "strokeWidth": "2px",
-    "width": "16px",
+    "width": "24px",
   },
   {
     "height": "24px",
@@ -21,10 +15,16 @@ exports[`UI/IdentityFrame FallbackSizes smoke-test 1`] = `
     "width": "24px",
   },
   {
-    "height": "10px",
+    "height": "24px",
     "identity": "castle",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "castle",
+    "strokeWidth": "2px",
+    "width": "24px",
   },
   {
     "height": "auto",

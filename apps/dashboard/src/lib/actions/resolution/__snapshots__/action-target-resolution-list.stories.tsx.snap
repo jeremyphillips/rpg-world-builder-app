@@ -5,6 +5,7 @@ exports[`Actions/ActionTargetResolutionList ResolveRows smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },

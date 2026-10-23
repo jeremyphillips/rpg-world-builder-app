@@ -63,6 +63,7 @@ exports[`UI/InlineSentenceField WithBelowChips smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

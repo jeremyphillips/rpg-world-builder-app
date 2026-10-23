@@ -4,7 +4,7 @@ exports[`Features/Character/Quick NPC/Starting choice selected row Default smoke
 [
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -21,7 +21,7 @@ exports[`Features/Character/Quick NPC/Starting choice selected row WithQuantity 
 [
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -38,7 +38,7 @@ exports[`Features/Character/Quick NPC/Starting choice selected row WithSuggestio
 [
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },

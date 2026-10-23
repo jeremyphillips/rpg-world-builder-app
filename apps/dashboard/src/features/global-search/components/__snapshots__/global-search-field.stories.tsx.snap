@@ -5,6 +5,7 @@ exports[`GlobalSearch/GlobalSearchField Default smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -22,6 +23,7 @@ exports[`GlobalSearch/GlobalSearchField WithQuery smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },

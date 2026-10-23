@@ -23,6 +23,7 @@ exports[`Content/Locations/LocationDetail DistrictWithAncestry smoke-test 1`] = 
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -64,12 +65,14 @@ exports[`Content/Locations/LocationDetail SettlementWithChildren smoke-test 1`] 
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "14px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -88,6 +91,7 @@ exports[`Content/Locations/LocationDetail SettlementWithChildren smoke-test 1`] 
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

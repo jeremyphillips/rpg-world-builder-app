@@ -4,13 +4,15 @@ exports[`Content/Classes/FeatureTableRow Default smoke-test 1`] = `
 [
   {
     "height": "16px",
-    "identity": "table2",
+    "identity": "table",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "12px",
     "identity": "pencil",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

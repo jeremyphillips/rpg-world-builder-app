@@ -5,6 +5,7 @@ exports[`Content/Spells/SpellResolutionOutcomes AllIncompleteEffects smoke-test 
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -33,7 +34,7 @@ exports[`Content/Spells/SpellResolutionOutcomes ChillTouch smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -56,7 +57,7 @@ exports[`Content/Spells/SpellResolutionOutcomes EldritchBlast smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -85,7 +86,7 @@ exports[`Content/Spells/SpellResolutionOutcomes IncompleteApplicationRow smoke-t
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -114,7 +115,7 @@ exports[`Content/Spells/SpellResolutionOutcomes InflictWounds smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -132,7 +133,7 @@ exports[`Content/Spells/SpellResolutionOutcomes InflictWounds smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -161,7 +162,7 @@ exports[`Content/Spells/SpellResolutionOutcomes MagicMissile smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },

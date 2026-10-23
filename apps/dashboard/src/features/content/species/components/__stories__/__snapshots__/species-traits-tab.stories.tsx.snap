@@ -5,12 +5,14 @@ exports[`Content/Species/SpeciesTraitsTab Empty smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "40px",
     "identity": "sparkles",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "40px",
   },
@@ -28,6 +30,7 @@ exports[`Content/Species/SpeciesTraitsTab SystemSpeciesLockedTraits smoke-test 1
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -76,6 +79,7 @@ exports[`Content/Species/SpeciesTraitsTab SystemSpeciesLockedTraits smoke-test 1
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

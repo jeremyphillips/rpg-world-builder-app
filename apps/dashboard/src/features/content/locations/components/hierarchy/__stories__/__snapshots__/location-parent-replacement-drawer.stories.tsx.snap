@@ -5,12 +5,14 @@ exports[`Content/Locations/LocationParentReplacementDrawer ChangeParent smoke-te
   {
     "height": "16px",
     "identity": "map-pin",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -21,10 +23,11 @@ exports[`Content/Locations/LocationParentReplacementDrawer ChangeParent smoke-te
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -40,12 +43,14 @@ exports[`Content/Locations/LocationParentReplacementDrawer MoveLocation smoke-te
   {
     "height": "16px",
     "identity": "map-pin",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -56,10 +61,11 @@ exports[`Content/Locations/LocationParentReplacementDrawer MoveLocation smoke-te
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -75,6 +81,7 @@ exports[`Content/Locations/LocationParentReplacementDrawer SetParent smoke-test 
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -85,10 +92,11 @@ exports[`Content/Locations/LocationParentReplacementDrawer SetParent smoke-test 
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

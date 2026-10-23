@@ -5,6 +5,7 @@ exports[`UI/ChipsField ContainerChrome smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -22,6 +23,7 @@ exports[`UI/ChipsField Disabled smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -39,12 +41,14 @@ exports[`UI/ChipsField MultiSelect smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -62,6 +66,7 @@ exports[`UI/ChipsField SingleSelect smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -79,6 +84,7 @@ exports[`UI/ChipsField SizeLarge smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -96,6 +102,7 @@ exports[`UI/ChipsField SizeSmall smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },

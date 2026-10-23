@@ -11,12 +11,14 @@ exports[`Character Builder/EquipmentInventoryManageDisclosureCard GrantOnly smok
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -40,12 +42,14 @@ exports[`Character Builder/EquipmentInventoryManageDisclosureCard MixedSource sm
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },

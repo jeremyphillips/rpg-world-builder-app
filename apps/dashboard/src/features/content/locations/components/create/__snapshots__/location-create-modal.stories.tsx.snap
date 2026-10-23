@@ -3,10 +3,11 @@
 exports[`Content/Locations/LocationCreateModal BuildingSetup smoke-test 1`] = `
 [
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -20,10 +21,11 @@ exports[`Content/Locations/LocationCreateModal BuildingSetup smoke-test 1`] = `
 exports[`Content/Locations/LocationCreateModal RegionSetup smoke-test 1`] = `
 [
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -37,10 +39,11 @@ exports[`Content/Locations/LocationCreateModal RegionSetup smoke-test 1`] = `
 exports[`Content/Locations/LocationCreateModal SettlementSetup smoke-test 1`] = `
 [
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

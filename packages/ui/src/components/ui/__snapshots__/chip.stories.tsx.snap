@@ -3,10 +3,11 @@
 exports[`Components/Chip ClassReference smoke-test 1`] = `
 [
   {
-    "height": "12px",
+    "height": "14px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "14px",
   },
   {
     "height": "auto",
@@ -22,14 +23,16 @@ exports[`Components/Chip ContrastMatrixBase smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
-    "height": "12px",
+    "height": "14px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "14px",
   },
   {
     "height": "auto",
@@ -45,14 +48,16 @@ exports[`Components/Chip ContrastMatrixSubtle smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
-    "height": "12px",
+    "height": "14px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "14px",
   },
   {
     "height": "auto",
@@ -66,10 +71,11 @@ exports[`Components/Chip ContrastMatrixSubtle smoke-test 1`] = `
 exports[`Components/Chip RemovableLg smoke-test 1`] = `
 [
   {
-    "height": "14px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -83,10 +89,11 @@ exports[`Components/Chip RemovableLg smoke-test 1`] = `
 exports[`Components/Chip RemovableMd smoke-test 1`] = `
 [
   {
-    "height": "12px",
+    "height": "14px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "14px",
   },
   {
     "height": "auto",
@@ -102,9 +109,21 @@ exports[`Components/Chip SelectableSelected smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/Chip SelectableUnselected smoke-test 1`] = `
+[
   {
     "height": "auto",
     "identity": null,

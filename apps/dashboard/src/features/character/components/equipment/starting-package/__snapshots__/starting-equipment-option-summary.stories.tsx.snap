@@ -16,12 +16,14 @@ exports[`Character Builder/StartingEquipmentOptionSummary PackageCustomizationEm
   {
     "height": "10px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
     "height": "10px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -48,10 +50,10 @@ exports[`Character Builder/StartingEquipmentOptionSummary StartingGold smoke-tes
 exports[`Character Builder/StartingEquipmentOptionSummary StartingGoldHeroTier smoke-test 1`] = `
 [
   {
-    "height": "10px",
+    "height": "14px",
     "identity": "info",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "14px",
   },
   {
     "height": "auto",

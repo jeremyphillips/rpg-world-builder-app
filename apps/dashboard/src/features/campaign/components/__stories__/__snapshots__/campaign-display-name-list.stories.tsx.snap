@@ -5,6 +5,7 @@ exports[`Campaign/CampaignDisplayNameList InlineMuted smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "castle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -22,6 +23,7 @@ exports[`Campaign/CampaignDisplayNameList ThreeCampaigns smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "castle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },

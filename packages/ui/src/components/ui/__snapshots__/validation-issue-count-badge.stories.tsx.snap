@@ -3,10 +3,10 @@
 exports[`UI/ValidationIssueCountBadge MultipleIssues smoke-test 1`] = `
 [
   {
-    "height": "10px",
+    "height": "24px",
     "identity": "triangle-alert",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "24px",
   },
   {
     "height": "auto",
@@ -20,10 +20,10 @@ exports[`UI/ValidationIssueCountBadge MultipleIssues smoke-test 1`] = `
 exports[`UI/ValidationIssueCountBadge SingleIssue smoke-test 1`] = `
 [
   {
-    "height": "10px",
+    "height": "24px",
     "identity": "triangle-alert",
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "24px",
   },
   {
     "height": "auto",

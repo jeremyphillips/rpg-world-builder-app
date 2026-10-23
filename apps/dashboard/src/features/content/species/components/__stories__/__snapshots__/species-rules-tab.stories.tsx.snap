@@ -21,20 +21,9 @@ exports[`Content/Species/SpeciesRulesTab Editable smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "12px",
-    "identity": "x",
-    "strokeWidth": "2px",
-    "width": "12px",
-  },
-  {
-    "height": "16px",
-    "identity": "chevron-down",
-    "strokeWidth": "2px",
-    "width": "16px",
-  },
-  {
     "height": "14px",
-    "identity": "grip-vertical",
+    "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -45,8 +34,20 @@ exports[`Content/Species/SpeciesRulesTab Editable smoke-test 1`] = `
     "width": "16px",
   },
   {
+    "height": "24px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -97,10 +98,10 @@ exports[`Content/Species/SpeciesRulesTab PolicySectionDisabled smoke-test 1`] = 
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -110,7 +111,7 @@ exports[`Content/Species/SpeciesRulesTab PolicySectionDisabled smoke-test 1`] = 
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },

@@ -5,6 +5,7 @@ exports[`Character Builder/StartingEquipmentOptionDensityParity CompactChooserTo
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },

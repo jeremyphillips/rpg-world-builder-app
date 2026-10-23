@@ -11,6 +11,7 @@ exports[`Internal/Forms/Layout/AnatomyRowToggleMatrix SelectChipsMatrix smoke-te
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

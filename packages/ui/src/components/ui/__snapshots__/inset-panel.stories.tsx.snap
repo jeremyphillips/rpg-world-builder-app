@@ -92,7 +92,7 @@ exports[`Primitives/InsetPanel StructuredTitleSupporting smoke-test 1`] = `
 [
   {
     "height": "32px",
-    "identity": "table2",
+    "identity": "table",
     "strokeWidth": "2px",
     "width": "32px",
   },

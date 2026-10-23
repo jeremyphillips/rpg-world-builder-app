@@ -5,12 +5,14 @@ exports[`Dashboard/Character/QuickNpcBuildCard BuildMode smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -28,12 +30,14 @@ exports[`Dashboard/Character/QuickNpcBuildCard RecommendedBuild smoke-test 1`] =
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -51,12 +55,14 @@ exports[`Dashboard/Character/QuickNpcBuildCard UnresolvedClass smoke-test 1`] = 
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },

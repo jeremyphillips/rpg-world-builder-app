@@ -5,6 +5,7 @@ exports[`Filters/FilterBar AdvancedOpen smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -97,6 +98,7 @@ exports[`Filters/FilterBar DenseFilters smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -144,6 +146,7 @@ exports[`Filters/FilterBar Disabled smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -201,6 +204,7 @@ exports[`Filters/FilterBar WithSelections smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

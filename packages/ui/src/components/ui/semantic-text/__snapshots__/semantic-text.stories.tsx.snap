@@ -14,10 +14,10 @@ exports[`Typography/SemanticText BaseSurface smoke-test 1`] = `
 exports[`Typography/SemanticText Caution smoke-test 1`] = `
 [
   {
-    "height": "12px",
+    "height": "24px",
     "identity": "triangle-alert",
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "24px",
   },
   {
     "height": "auto",
@@ -75,10 +75,10 @@ exports[`Typography/SemanticText Informative smoke-test 1`] = `
 exports[`Typography/SemanticText Negative smoke-test 1`] = `
 [
   {
-    "height": "12px",
+    "height": "24px",
     "identity": "triangle-alert",
     "strokeWidth": "2px",
-    "width": "12px",
+    "width": "24px",
   },
   {
     "height": "auto",

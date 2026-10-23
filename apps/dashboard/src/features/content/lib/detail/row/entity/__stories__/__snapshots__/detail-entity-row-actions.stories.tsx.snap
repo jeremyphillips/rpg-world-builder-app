@@ -5,6 +5,7 @@ exports[`Content/Detail/DetailEntityRowActions UtilityAndOverflow smoke-test 1`]
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },

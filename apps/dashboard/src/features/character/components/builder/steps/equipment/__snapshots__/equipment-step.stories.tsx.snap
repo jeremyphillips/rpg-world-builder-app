@@ -16,6 +16,7 @@ exports[`Character Builder/EquipmentStep GoldShopping smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "coins",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -39,12 +40,14 @@ exports[`Character Builder/EquipmentStep MagicItemGrants smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "coins",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "16px",
     "identity": "gem",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -62,12 +65,14 @@ exports[`Character Builder/EquipmentStep MonkLinkedGrantPending smoke-test 1`] =
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
     "height": "16px",
     "identity": "coins",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -80,6 +85,7 @@ exports[`Character Builder/EquipmentStep MonkLinkedGrantPending smoke-test 1`] =
   {
     "height": "16px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -97,6 +103,7 @@ exports[`Character Builder/EquipmentStep MonkLinkedGrantResolved smoke-test 1`] 
   {
     "height": "16px",
     "identity": "coins",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -109,6 +116,7 @@ exports[`Character Builder/EquipmentStep MonkLinkedGrantResolved smoke-test 1`] 
   {
     "height": "16px",
     "identity": "chevron-down",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -126,6 +134,7 @@ exports[`Character Builder/EquipmentStep NoClass smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "waypoints",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

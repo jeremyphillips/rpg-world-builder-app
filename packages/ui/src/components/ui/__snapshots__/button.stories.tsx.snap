@@ -70,7 +70,8 @@ exports[`Primitives/Button IconExtraSmall smoke-test 1`] = `
 [
   {
     "height": "10px",
-    "identity": "trash2",
+    "identity": "trash",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -165,6 +166,7 @@ exports[`Primitives/Button TextAccentWithIcon smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "arrow-right",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -182,6 +184,7 @@ exports[`Primitives/Button TextCompactAdd smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

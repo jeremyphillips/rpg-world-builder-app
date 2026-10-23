@@ -5,6 +5,7 @@ exports[`Primitives/CatalogPickerSheet AuxiliaryActionWithFooter smoke-test 1`] 
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -15,10 +16,11 @@ exports[`Primitives/CatalogPickerSheet AuxiliaryActionWithFooter smoke-test 1`] 
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -34,14 +36,16 @@ exports[`Primitives/CatalogPickerSheet BodyReplacement smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -57,6 +61,7 @@ exports[`Primitives/CatalogPickerSheet Default smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -79,10 +84,11 @@ exports[`Primitives/CatalogPickerSheet Default smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -98,14 +104,16 @@ exports[`Primitives/CatalogPickerSheet Empty smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -121,14 +129,16 @@ exports[`Primitives/CatalogPickerSheet Loading smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -144,6 +154,7 @@ exports[`Primitives/CatalogPickerSheet WithAuxiliaryAction smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -154,10 +165,11 @@ exports[`Primitives/CatalogPickerSheet WithAuxiliaryAction smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -173,6 +185,7 @@ exports[`Primitives/CatalogPickerSheet WithAuxiliaryActionEmpty smoke-test 1`] =
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -183,10 +196,11 @@ exports[`Primitives/CatalogPickerSheet WithAuxiliaryActionEmpty smoke-test 1`] =
     "width": "16px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",
@@ -202,14 +216,16 @@ exports[`Primitives/CatalogPickerSheet WithAuxiliaryActionUnavailable smoke-test
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
-    "height": "24px",
+    "height": "16px",
     "identity": "x",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "24px",
+    "width": "16px",
   },
   {
     "height": "auto",

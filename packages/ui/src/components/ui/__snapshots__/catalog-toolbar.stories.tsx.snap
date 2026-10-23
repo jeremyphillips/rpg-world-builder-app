@@ -16,6 +16,7 @@ exports[`Primitives/CatalogToolbar FiltersWithoutTabs smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -33,6 +34,7 @@ exports[`Primitives/CatalogToolbar WithSearchAndTabs smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "search",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

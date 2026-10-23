@@ -5,6 +5,7 @@ exports[`Content/Entity/EntityRowList PopulatedWithFooter smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -22,6 +23,7 @@ exports[`Content/Entity/EntityRowList SectionEmpty smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

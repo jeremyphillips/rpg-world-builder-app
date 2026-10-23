@@ -5,12 +5,14 @@ exports[`Character Builder/EquipmentResourceSummary Default smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "coins",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "16px",
     "identity": "gem",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

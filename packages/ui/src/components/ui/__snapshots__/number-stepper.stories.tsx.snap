@@ -5,12 +5,14 @@ exports[`Forms/NumberStepper AtMax smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -28,12 +30,14 @@ exports[`Forms/NumberStepper CompactBorderless smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -51,12 +55,14 @@ exports[`Forms/NumberStepper Default smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -74,12 +80,14 @@ exports[`Forms/NumberStepper Disabled smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -97,12 +105,14 @@ exports[`Forms/NumberStepper ExtraSmall smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
   {
     "height": "10px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -120,12 +130,14 @@ exports[`Forms/NumberStepper FromCompactFormContext smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -143,12 +155,14 @@ exports[`Forms/NumberStepper Invalid smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -166,12 +180,14 @@ exports[`Forms/NumberStepper Large smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -189,12 +205,14 @@ exports[`Forms/NumberStepper Medium smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -212,12 +230,14 @@ exports[`Forms/NumberStepper RemoveAtMin smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -235,12 +255,14 @@ exports[`Forms/NumberStepper SingleDigit smoke-test 1`] = `
   {
     "height": "14px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
   {
     "height": "14px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -258,12 +280,14 @@ exports[`Forms/NumberStepper Small smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "minus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

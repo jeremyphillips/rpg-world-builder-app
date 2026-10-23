@@ -15,7 +15,8 @@ exports[`Content/Classes/ClassSpellcastingFeatureField WithGrantingFeature smoke
 [
   {
     "height": "16px",
-    "identity": "table2",
+    "identity": "table",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },

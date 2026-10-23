@@ -22,6 +22,7 @@ exports[`Dashboard/Species/SpeciesPersonalNameComponentsField Expanded smoke-tes
   {
     "height": "12px",
     "identity": "check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

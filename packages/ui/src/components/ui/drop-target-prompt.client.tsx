@@ -73,7 +73,7 @@ function DropTargetPromptIdleChrome({
           className={preservedHiddenClass}
           onClick={onBrowse}
         >
-          <Icon name="upload" size="owner" />
+          <Icon name="upload" size="sm" />
           Browse files
         </Button>
       ) : null}
@@ -113,7 +113,7 @@ function DropTargetPromptIcon({
       size={density === 'compact' ? '3xl' : 'owner'}
       className={cn(
         dropTargetIconVariants({ density, state }),
-        density === 'comfortable' && 'h-10 w-10',
+        density === 'comfortable' && 'ui-empty-state-well__icon--lg',
       )}
     />
   )

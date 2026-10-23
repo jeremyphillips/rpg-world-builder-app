@@ -5,6 +5,7 @@ exports[`Character Builder/SpellsStep NoClass smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "waypoints",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
@@ -33,30 +34,35 @@ exports[`Character Builder/SpellsStep Wizard smoke-test 1`] = `
   {
     "height": "16px",
     "identity": "wand-sparkles",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "16px",
     "identity": "shield-check",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "16px",
     "identity": "crosshair",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "16px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

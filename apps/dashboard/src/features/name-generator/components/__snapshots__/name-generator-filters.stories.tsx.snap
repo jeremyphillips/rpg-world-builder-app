@@ -41,6 +41,7 @@ exports[`Dashboard/Name Generator/Filters ElvishContext smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
@@ -129,6 +130,7 @@ exports[`Dashboard/Name Generator/Filters SettlementSubject smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },

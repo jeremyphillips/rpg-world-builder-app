@@ -4,7 +4,8 @@ exports[`Content/TableBuilder/TableBuilderInsetGate Default smoke-test 1`] = `
 [
   {
     "height": "32px",
-    "identity": "table2",
+    "identity": "table",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "32px",
   },

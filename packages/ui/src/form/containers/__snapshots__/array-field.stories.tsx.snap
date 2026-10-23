@@ -20,14 +20,14 @@ exports[`Forms/ArrayField BoundedArray smoke-test 1`] = `
 exports[`Forms/ArrayField CompactRow smoke-test 1`] = `
 [
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -79,7 +79,7 @@ exports[`Forms/ArrayField DetailedCollapsible smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -97,7 +97,7 @@ exports[`Forms/ArrayField DetailedCollapsible smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -126,7 +126,7 @@ exports[`Forms/ArrayField DragReorder smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -138,7 +138,7 @@ exports[`Forms/ArrayField DragReorder smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -150,7 +150,7 @@ exports[`Forms/ArrayField DragReorder smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -172,14 +172,14 @@ exports[`Forms/ArrayField DragReorder smoke-test 1`] = `
 exports[`Forms/ArrayField ExamplesUnlabeledInlineRow smoke-test 1`] = `
 [
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -214,7 +214,7 @@ exports[`Forms/ArrayField ExpandedRowIssueSummary play-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -232,7 +232,7 @@ exports[`Forms/ArrayField ExpandedRowIssueSummary play-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -271,10 +271,10 @@ exports[`Forms/ArrayField MovementChromeStabilitySequence smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "12px",
@@ -290,7 +290,7 @@ exports[`Forms/ArrayField MovementChromeStabilitySequence smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -306,10 +306,10 @@ exports[`Forms/ArrayField MovementChromeStabilitySequence smoke-test 1`] = `
 exports[`Forms/ArrayField NestedCompact smoke-test 1`] = `
 [
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -319,7 +319,7 @@ exports[`Forms/ArrayField NestedCompact smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -331,7 +331,7 @@ exports[`Forms/ArrayField NestedCompact smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -343,7 +343,7 @@ exports[`Forms/ArrayField NestedCompact smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -377,10 +377,10 @@ exports[`Forms/ArrayField NestedErrorRollup play-test 1`] = `
     "width": "12px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -390,7 +390,7 @@ exports[`Forms/ArrayField NestedErrorRollup play-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -401,14 +401,14 @@ exports[`Forms/ArrayField NestedErrorRollup play-test 1`] = `
     "width": "12px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -430,10 +430,10 @@ exports[`Forms/ArrayField NestedErrorRollup play-test 1`] = `
 exports[`Forms/ArrayField PresentationMatrixDisclosureStacked smoke-test 1`] = `
 [
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "16px",
@@ -443,7 +443,7 @@ exports[`Forms/ArrayField PresentationMatrixDisclosureStacked smoke-test 1`] = `
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -471,14 +471,14 @@ exports[`Forms/ArrayField PresentationMatrixFlatInlineBareText smoke-test 1`] = 
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -500,14 +500,14 @@ exports[`Forms/ArrayField PresentationMatrixFlatInlineRowWrap smoke-test 1`] = `
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -529,10 +529,10 @@ exports[`Forms/ArrayField PresentationMatrixFlatInlineSentence smoke-test 1`] = 
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "12px",
@@ -548,7 +548,7 @@ exports[`Forms/ArrayField PresentationMatrixFlatInlineSentence smoke-test 1`] = 
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -570,14 +570,14 @@ exports[`Forms/ArrayField PresentationMatrixFlatStackedTwoFields smoke-test 1`] 
     "width": "16px",
   },
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },
@@ -593,14 +593,14 @@ exports[`Forms/ArrayField PresentationMatrixFlatStackedTwoFields smoke-test 1`] 
 exports[`Forms/ArrayField PresentationMatrixFlatWithHeader smoke-test 1`] = `
 [
   {
-    "height": "14px",
+    "height": "24px",
     "identity": "grip-vertical",
     "strokeWidth": "2px",
-    "width": "14px",
+    "width": "24px",
   },
   {
     "height": "14px",
-    "identity": "trash2",
+    "identity": "trash",
     "strokeWidth": "2px",
     "width": "14px",
   },

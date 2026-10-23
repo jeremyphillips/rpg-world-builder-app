@@ -16,6 +16,7 @@ exports[`Forms/RadioGroupField Disabled smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },
@@ -44,6 +45,7 @@ exports[`Forms/RadioGroupField WithSelection smoke-test 1`] = `
   {
     "height": "10px",
     "identity": "circle",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "10px",
   },

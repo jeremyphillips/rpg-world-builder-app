@@ -4,7 +4,7 @@ exports[`Components/DataTableColumnsMenu Default smoke-test 1`] = `
 [
   {
     "height": "14px",
-    "identity": "columns3",
+    "identity": "columns-3",
     "strokeWidth": "2px",
     "width": "14px",
   },

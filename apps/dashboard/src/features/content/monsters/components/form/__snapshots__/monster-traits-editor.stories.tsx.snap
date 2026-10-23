@@ -5,12 +5,14 @@ exports[`Dashboard/Content/Monsters/MonsterTraitsEditor Empty smoke-test 1`] = `
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "40px",
     "identity": "sparkles",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "40px",
   },
@@ -28,12 +30,14 @@ exports[`Dashboard/Content/Monsters/MonsterTraitsEditor Narrow smoke-test 1`] = 
   {
     "height": "12px",
     "identity": "plus",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "12px",
   },
   {
     "height": "40px",
     "identity": "sparkles",
+    "ownerSizeResolved": true,
     "strokeWidth": "2px",
     "width": "40px",
   },
