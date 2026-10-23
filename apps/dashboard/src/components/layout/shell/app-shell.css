@@ -1,0 +1,65 @@
+@layer components {
+  .dash-app-shell {
+    display: flex;
+    min-height: 100dvh;
+    background-color: var(--background);
+    --app-sticky-chrome-block-size: calc(3rem + 2rem);
+  }
+
+  .dash-app-shell__column {
+    display: flex;
+    min-height: 100dvh;
+    min-width: 0;
+    flex: 1 1 0%;
+    flex-direction: column;
+  }
+
+  .dash-app-shell__column:has([data-viewport-fill='workspace']) {
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .dash-app-shell__chrome {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    flex-shrink: 0;
+    background-color: var(--background);
+  }
+
+  .dash-app-shell__main {
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 0%;
+    flex-direction: column;
+    padding-inline: calc(var(--spacing) * 4);
+    --rpg-content-top-inset: var(--app-sticky-chrome-block-size);
+  }
+
+  @media (width >= 40rem) {
+    .dash-app-shell__main {
+      padding-inline: calc(var(--spacing) * 6);
+    }
+  }
+
+  .dash-app-shell__main:has([data-viewport-fill='workspace']) {
+    height: 0;
+    overflow: hidden;
+  }
+
+  .dash-app-shell__breadcrumb-rail {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--border);
+    padding-inline: calc(var(--spacing) * 4);
+  }
+
+  @media (width >= 40rem) {
+    .dash-app-shell__breadcrumb-rail {
+      padding-inline: calc(var(--spacing) * 6);
+    }
+  }
+}

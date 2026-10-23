@@ -1,9 +1,5 @@
 {
   "temporary": {
-    "apps/dashboard/src/components/layout/shell/app-shell.variants.ts": {
-      "--app-sticky-chrome-block-size": 1,
-      "--rpg-content-top-inset": 1
-    },
     "apps/dashboard/src/features/character/components/builder/character-builder-shell.variants.ts": {
       "--character-builder-header-rail-gap": 1
     },
@@ -12,9 +8,6 @@
     },
     "apps/dashboard/src/features/content/components/master-detail/master-detail-list-panel.layout.ts": {
       "--master-detail-list-chrome-block-size": 1
-    },
-    "apps/dashboard/src/features/content/lib/forms/shells/layout/content-form-page-shell.variants.ts": {
-      "--rpg-content-top-inset": 1
     }
   },
   "approved": {

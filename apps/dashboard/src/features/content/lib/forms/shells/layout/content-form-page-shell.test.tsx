@@ -63,7 +63,13 @@ describe('ContentFormPageShell', () => {
     expect(widthShell).not.toHaveClass('max-w-page-narrow', 'max-w-page-wide')
 
     const body = widthShell?.firstElementChild
-    expect(body).toHaveClass(...contentFormPageShellBodyClasses.split(/\s+/))
+    expect(body).toHaveClass(
+      contentFormPageShellBodyClasses,
+      'flex',
+      'min-h-0',
+      'flex-1',
+      'flex-col',
+    )
     expect(body?.textContent).toBe('Form body')
   })
 })
