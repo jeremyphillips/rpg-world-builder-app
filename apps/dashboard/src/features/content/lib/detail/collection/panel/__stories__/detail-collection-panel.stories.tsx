@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Text } from './text'
+import { Text } from '@rpg/ui'
 
 import { DetailCollectionPanel } from '../detail-collection-panel'
 import { EntityRowList } from '../../../../entity/row-list/entity-row-list'

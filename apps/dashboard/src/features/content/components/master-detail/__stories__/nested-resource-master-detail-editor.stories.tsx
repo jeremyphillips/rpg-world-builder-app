@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState, type ReactNode } from 'react'
-import { Text } from './text'
+import { Text } from '@rpg/ui'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import type { MasterDetailListItem } from '../master-detail-list-panel'

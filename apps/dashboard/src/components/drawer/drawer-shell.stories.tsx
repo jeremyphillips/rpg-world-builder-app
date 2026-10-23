@@ -9,7 +9,6 @@ import {
 } from '@rpg/ui'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import { Text } from './text'
 
 import { DrawerShell } from './drawer-shell'
 import { drawerShellBodyVariants } from './drawer-shell.variants'

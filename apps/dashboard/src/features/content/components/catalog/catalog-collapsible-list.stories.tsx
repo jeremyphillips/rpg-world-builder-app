@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { CollapsibleListItem } from '@rpg/ui'
-import { Text } from './text'
+import { CollapsibleListItem, Text } from '@rpg/ui'
 
 import { CatalogCollapsibleList } from './catalog-collapsible-list'
 
