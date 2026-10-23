@@ -1,8 +1,7 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
-import { FileIcon, ImageIcon, Upload, UploadCloudIcon } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { resolveDropTargetCopy, resolveDropTargetRequirements } from './drop-target-copy.lib'
@@ -14,7 +13,6 @@ import {
 } from './drop-target-prompt.lib'
 import {
   dropTargetActionsVariants,
-  dropTargetBrowseIconVariants,
   dropTargetDescriptionVariants,
   dropTargetIconVariants,
   dropTargetLayoutPreserveHiddenVariants,
@@ -75,7 +73,7 @@ function DropTargetPromptIdleChrome({
           className={preservedHiddenClass}
           onClick={onBrowse}
         >
-          <Upload className={dropTargetBrowseIconVariants()} aria-hidden="true" />
+          <Icon name="upload" size="owner" />
           Browse files
         </Button>
       ) : null}
@@ -91,6 +89,14 @@ function DropTargetPromptIdleChrome({
   )
 }
 
+function resolveDropTargetPromptIconName(
+  state: DropTargetPromptState,
+  useImageIcon: boolean,
+): 'cloud-upload' | 'image' | 'file' {
+  if (state === 'active') return 'cloud-upload'
+  return useImageIcon ? 'image' : 'file'
+}
+
 function DropTargetPromptIcon({
   state,
   density,
@@ -100,8 +106,17 @@ function DropTargetPromptIcon({
   density: 'compact' | 'comfortable'
   useImageIcon: boolean
 }) {
-  const Icon = state === 'active' ? UploadCloudIcon : useImageIcon ? ImageIcon : FileIcon
-  return <Icon className={cn(dropTargetIconVariants({ density, state }))} aria-hidden="true" />
+  const name = resolveDropTargetPromptIconName(state, useImageIcon)
+  return (
+    <Icon
+      name={name}
+      size={density === 'compact' ? '3xl' : 'owner'}
+      className={cn(
+        dropTargetIconVariants({ density, state }),
+        density === 'comfortable' && 'h-10 w-10',
+      )}
+    />
+  )
 }
 
 export function DropTargetPrompt({

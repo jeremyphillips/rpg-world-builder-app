@@ -4,13 +4,13 @@ import {
   cn,
   DialogPanelScrollRegion,
   FileDropzone,
+  Icon,
   resolveChromeCalloutClasses,
   resolveImageDropTargetDefaults,
   SegmentedControl,
   Text,
   type ScrollBoundaryState,
 } from '@rpg/ui'
-import { Info } from 'lucide-react'
 import { mediaRoleSurfaceCopy, type MediaRole } from '@rpg/contracts'
 import type { UseQueryResult } from '@tanstack/react-query'
 
@@ -152,7 +152,7 @@ export function MediaWorkspace({
                 )}
               >
                 <div className="flex items-start gap-2">
-                  <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                  <Icon name="info" size="lg" className="mt-0.5 shrink-0" />
                   <p className="text-sm">{resolveMediaWorkspaceOnboarding(policy.domain)}</p>
                 </div>
               </div>

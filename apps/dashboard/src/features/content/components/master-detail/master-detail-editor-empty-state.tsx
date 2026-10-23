@@ -1,8 +1,7 @@
-import { Sparkles } from 'lucide-react'
 import {
+  Icon,
   InsetPanel,
   Text,
-  emptyStateWellIconLgClasses,
   emptyStateWellSupportingLgClasses,
   emptyStateWellTitleLgClasses,
 } from '@rpg/ui'
@@ -26,7 +25,11 @@ export function MasterDetailEditorEmptyState({ itemNoun }: MasterDetailEditorEmp
       className="flex flex-1 flex-col items-center justify-center gap-3"
       role="status"
     >
-      <Sparkles aria-hidden className={emptyStateWellIconLgClasses} />
+      <Icon
+        name="sparkles"
+        size="owner"
+        className="ui-empty-state-well__icon ui-empty-state-well__icon--lg shrink-0"
+      />
       <Text as="p" className={emptyStateWellTitleLgClasses}>
         {masterDetailEmptySelectionHeading(itemNoun)}
       </Text>

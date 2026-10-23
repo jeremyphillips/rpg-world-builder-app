@@ -13,6 +13,6 @@ describe('ValidationIssueCountBadge', () => {
     render(<ValidationIssueCountBadge count={3} />)
 
     expect(screen.getByText('3')).toBeInTheDocument()
-    expect(document.querySelector('.lucide-triangle-alert')).toBeInTheDocument()
+    expect(document.querySelector('[data-icon="triangle-alert"]')).toBeInTheDocument()
   })
 })

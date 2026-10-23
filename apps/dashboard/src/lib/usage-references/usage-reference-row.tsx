@@ -1,6 +1,6 @@
 import type { VocabularyUsageReference } from '@rpg/contracts'
-import { ExternalLink } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { Icon } from '@rpg/ui'
 
 import { GAME_TERMS_ROUTES } from '@/app/game-terms-routes'
 import { resolveContentUsageReferenceHref } from '@/features/content/lib/delete/resolve-content-usage-href'
@@ -51,7 +51,7 @@ export function UsageReferenceRow({ reference, campaignId }: UsageReferenceRowPr
       className="inline-flex items-center gap-1.5 text-style-label text-primary underline-offset-4 hover:underline"
     >
       <span>{reference.label}</span>
-      <ExternalLink aria-hidden className="size-icon-inline shrink-0" />
+      <Icon name="external-link" size="inline" className="shrink-0" />
       <span className="sr-only">Opens in new tab</span>
     </Link>
   )

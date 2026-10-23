@@ -1,4 +1,4 @@
-import { BookOpen, Eye } from 'lucide-react'
+import { Icon } from '../ui/icon/icon'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -13,7 +13,7 @@ describe('PreviewRail', () => {
       <PreviewRail layout="fill">
         <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
         <PreviewRail.Identity
-          media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+          media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
           name="Fighter"
           status={
             <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
@@ -54,7 +54,7 @@ describe('PreviewRail', () => {
           <PreviewRail.Action
             label="Preview as player"
             helperText="See how this class will appear to players in your campaign."
-            icon={<Eye />}
+            icon={<Icon name="eye" size="2xl" />}
           />
         </PreviewRail.Footer>
       </PreviewRail>,
@@ -122,7 +122,7 @@ describe('PreviewRail', () => {
     const { container } = render(
       <PreviewRail>
         <PreviewRail.Identity
-          media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+          media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
           name="Fighter"
           status="Level 1"
         />
@@ -143,7 +143,7 @@ describe('PreviewRail', () => {
     const { container } = render(
       <PreviewRail>
         <PreviewRail.Identity
-          media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+          media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
           name="Fighter"
           status={
             <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />

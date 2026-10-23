@@ -41,8 +41,6 @@ import {
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import { Check, X } from 'lucide-react'
-
 import { ActionIcon } from './action-icon.client'
 
 import { cn } from '../../lib/utils'
@@ -382,9 +380,13 @@ export interface BooleanCellProps {
 export function BooleanCell({ value, icons = true }: BooleanCellProps) {
   if (!icons) return <>{value ? 'Yes' : '—'}</>
   return value ? (
-    <Check className="size-4" aria-label="Yes" />
+    <span aria-label="Yes" className="inline-flex">
+      <Icon name="check" size="lg" />
+    </span>
   ) : (
-    <X className="size-4 opacity-30" aria-label="No" />
+    <span aria-label="No" className="inline-flex">
+      <Icon name="x" size="lg" className="opacity-30" />
+    </span>
   )
 }
 

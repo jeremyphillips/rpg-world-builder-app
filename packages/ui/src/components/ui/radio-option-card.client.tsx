@@ -1,8 +1,7 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
-import { Info } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { Badge } from './badge'
 import { Button } from './button.client'
@@ -123,7 +122,7 @@ function RadioOptionCardDetailsAction({
               aria-label={ariaLabel}
               onClick={onDetails}
             >
-              <Info aria-hidden="true" />
+              <Icon name="info" size="2xl" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>View details</TooltipContent>

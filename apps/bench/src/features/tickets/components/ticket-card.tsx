@@ -13,8 +13,8 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  Icon,
 } from '@rpg/ui'
-import { AlertTriangle, ChevronRight } from 'lucide-react'
 
 import { BLOCKED_TICKET_ARIA_LABEL, BLOCKED_TICKET_TOOLTIP } from '../lib/ticket-card-labels'
 import { EpicBadge } from './epic-badge'
@@ -38,7 +38,7 @@ import {
 function BlockedIndicator({ interactive }: { interactive: boolean }) {
   const icon = (
     <span className="inline-flex shrink-0 text-destructive" aria-hidden>
-      <AlertTriangle className="size-4" />
+      <Icon name="triangle-alert" size="lg" />
     </span>
   )
 
@@ -63,7 +63,7 @@ function BlockedIndicator({ interactive }: { interactive: boolean }) {
           onClick={(event) => event.stopPropagation()}
           onKeyDown={(event) => event.stopPropagation()}
         >
-          <AlertTriangle className="size-4" aria-hidden />
+          <Icon name="triangle-alert" size="lg" />
         </button>
       </TooltipTrigger>
       <TooltipContent side="top">{BLOCKED_TICKET_TOOLTIP}</TooltipContent>
@@ -140,7 +140,7 @@ export function TicketCard({
         <CardHeader className={ticketCardHeaderClasses}>
           <div className={ticketCardHeaderTrailClasses}>
             <EpicBadge epic={epic ?? null} stopActivation className="min-w-0 shrink" />
-            <ChevronRight className={ticketCardHeaderChevronClasses} aria-hidden />
+            <Icon name="chevron-right" size="owner" className={ticketCardHeaderChevronClasses} />
             <span className={ticketCardKeyClasses}>{ticket.key}</span>
           </div>
           {headerActions ? (

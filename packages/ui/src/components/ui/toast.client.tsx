@@ -1,9 +1,8 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as ToastPrimitive from '@radix-ui/react-toast'
-import { X } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { Text } from './text'
 import { TOAST_DISMISS_LABEL } from './toast.constants'
@@ -54,7 +53,7 @@ const ToastClose = React.forwardRef<
     toast-close=""
     {...props}
   >
-    <X className="size-4" />
+    <Icon name="x" size="lg" />
   </ToastPrimitive.Close>
 ))
 ToastClose.displayName = 'Toast.Close'
@@ -137,7 +136,7 @@ export function ToastPresentation({
             className="ui-toast__close ui-focus-ring ui-focus-ring--embedded"
             onClick={onDismiss}
           >
-            <X className="size-4" />
+            <Icon name="x" size="lg" />
           </button>
         ) : null}
       </div>

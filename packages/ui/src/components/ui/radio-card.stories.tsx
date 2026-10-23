@@ -1,7 +1,6 @@
+import { Icon } from './icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { action } from 'storybook/actions'
-import { ChartNoAxesColumn, Grid3x3 } from 'lucide-react'
-
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Button } from './button.client'
 import { RADIO_CARD_CLASS_SPECS } from './radio-card.styles'
@@ -113,13 +112,13 @@ const iconControlTableTypeOptions = [
     label: 'Level progression',
     value: 'levelProgression',
     description: 'Values by character level',
-    icon: <ChartNoAxesColumn aria-hidden />,
+    icon: <Icon name="chart-no-axes-column" size="2xl" />,
   },
   {
     label: 'General table',
     value: 'general',
     description: 'Custom rows and columns',
-    icon: <Grid3x3 aria-hidden />,
+    icon: <Icon name="grid-3x3" size="2xl" />,
   },
 ]
 

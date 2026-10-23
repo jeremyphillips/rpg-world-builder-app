@@ -1,9 +1,8 @@
 'use client'
+import { Icon } from '../../../components/ui/icon/icon'
 
 import type { DraggableAttributes } from '@dnd-kit/core'
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
-import { GripVertical } from 'lucide-react'
-
 import { cn } from '../../../lib/utils'
 import { ArrayItemDragHandle } from './array-item-header.client'
 import { arrayItemDragHandleClasses } from './array-item-toolbar.variants'
@@ -51,7 +50,7 @@ export function ArrayItemDragHandleSlot({
       )}
       aria-hidden
     >
-      <GripVertical aria-hidden />
+      <Icon name="grip-vertical" size="2xl" />
     </span>
   )
 }

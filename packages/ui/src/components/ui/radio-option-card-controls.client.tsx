@@ -1,8 +1,7 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import type * as React from 'react'
-import { Circle } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import {
   radioCardControlVariants,
@@ -32,7 +31,11 @@ function RadioOptionCardControl({
       aria-hidden="true"
     >
       <span className="ui-radio-card__indicator">
-        <Circle className={cn('fill-primary text-primary', indicatorSize)} />
+        <Icon
+          name="circle"
+          size="owner"
+          className={cn('fill-primary text-primary', indicatorSize)}
+        />
       </span>
     </span>
   )

@@ -1,9 +1,8 @@
-import { Table2 } from 'lucide-react'
 import { isValidElement, type ReactElement, type ReactNode } from 'react'
 
 import type { EntityAnatomyTrailing } from '@/features/content/lib/entity/anatomy/entity-anatomy-trailing.types'
 import { EntityCard } from '@/features/content/lib/entity/surfaces/cards/content/entity-card'
-import { ActionButton, IconContainer } from '@rpg/ui'
+import { ActionButton, Icon, IconContainer } from '@rpg/ui'
 
 import { DetailEntityRowActions } from '../../../lib/detail/row/entity/detail-entity-row-actions'
 
@@ -78,7 +77,7 @@ export function FeatureTableRow({
         description,
         media: (
           <IconContainer>
-            <Table2 />
+            <Icon name="table" size="owner" />
           </IconContainer>
         ),
         status: typeLabel

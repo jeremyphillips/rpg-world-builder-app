@@ -1,5 +1,4 @@
-import { ChevronRight } from 'lucide-react'
-import { InlineInactiveStatus, ValidationIssueCountBadge } from '@rpg/ui'
+import { Icon, InlineInactiveStatus, ValidationIssueCountBadge } from '@rpg/ui'
 import type { RefObject } from 'react'
 
 import { masterDetailRowValidationStateLabel } from '../../lib/master-detail/master-detail-row-validation'
@@ -63,7 +62,7 @@ export function MasterDetailListRow({
       >
         <MasterDetailListRowContent item={item} issueCount={issueCount} />
         <span className="flex shrink-0 self-center text-foreground" aria-hidden>
-          <ChevronRight className="size-4" />
+          <Icon name="chevron-right" size="lg" />
         </span>
         {issueCount > 0 ? (
           <span className="sr-only">, {masterDetailRowValidationStateLabel(issueCount)}</span>

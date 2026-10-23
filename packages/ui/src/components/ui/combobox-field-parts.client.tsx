@@ -1,9 +1,8 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { ChevronDown, Check, Lock, X } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { Chip } from './chip.client'
 import { Field, type FieldSize } from './field.client'
@@ -105,7 +104,7 @@ export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTrigg
               {loading ? (
                 <Spinner size="sm" variant="muted" />
               ) : (
-                <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+                <Icon name="chevron-down" size="lg" className="shrink-0 opacity-50" />
               )}
             </SelectLikeCaretSlot>
           </button>
@@ -130,14 +129,14 @@ interface ComboboxOptionItemProps {
 
 function comboboxSelectionEndSlot(multiple: boolean, isSelected: boolean, isHighlighted: boolean) {
   if (!multiple || !isSelected) return undefined
-  const Icon = isHighlighted ? X : Check
-  return <Icon className="size-4 shrink-0" aria-hidden />
+  const iconName = isHighlighted ? 'x' : 'check'
+  return <Icon name={iconName} size="lg" className="shrink-0" />
 }
 
 function comboboxDisabledReasonEndSlot(reason: string) {
   return (
     <span className="flex shrink-0 items-center gap-1.5">
-      <Lock className="size-3.5 shrink-0 opacity-60" aria-hidden />
+      <Icon name="lock" size="md" className="shrink-0 opacity-60" />
       <span className={selectOptionItemReasonVariants()}>{reason}</span>
     </span>
   )

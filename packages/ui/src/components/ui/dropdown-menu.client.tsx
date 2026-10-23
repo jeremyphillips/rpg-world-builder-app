@@ -1,11 +1,9 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
-import { Check, ChevronRight, Circle } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
-import { menuItemIconGlyphClasses } from './icon-glyph.variants'
 import { popoverContentMotionClasses, popoverContentVariants } from './popover-content.variants'
 
 const DropdownMenu = DropdownMenuPrimitive.Root
@@ -28,15 +26,11 @@ const DropdownMenuSubTrigger = React.forwardRef<
 >(({ className, inset, children, ...props }, ref) => (
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
-    className={cn(
-      cn('ui-menu-item', menuItemIconGlyphClasses),
-      inset && 'ui-menu-item--inset',
-      className,
-    )}
+    className={cn('ui-menu-item', inset && 'ui-menu-item--inset', className)}
     {...props}
   >
     {children}
-    <ChevronRight className="ml-auto" />
+    <Icon name="chevron-right" size="owner" className="ml-auto" />
   </DropdownMenuPrimitive.SubTrigger>
 ))
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName
@@ -85,11 +79,7 @@ const DropdownMenuItem = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={cn(
-      cn('ui-menu-item', menuItemIconGlyphClasses),
-      inset && 'ui-menu-item--inset',
-      className,
-    )}
+    className={cn('ui-menu-item', inset && 'ui-menu-item--inset', className)}
     {...props}
   />
 ))
@@ -107,7 +97,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
+        <Icon name="check" size="lg" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -126,7 +116,7 @@ const DropdownMenuRadioItem = React.forwardRef<
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <Circle className="h-2 w-2 fill-current" />
+        <Icon name="circle" size="owner" className="h-2 w-2 fill-current" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}

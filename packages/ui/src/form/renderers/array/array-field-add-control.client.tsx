@@ -1,4 +1,5 @@
 'use client'
+import { Icon } from '../../../components/ui/icon/icon'
 
 import * as React from 'react'
 
@@ -9,8 +10,6 @@ import * as React from 'react'
  * `ArrayConfig.addActionMenu` is configured. When append is blocked, the control
  * stays visible and disabled with an accessible explanation.
  */
-import { Plus } from 'lucide-react'
-
 import type { ButtonVariantProps } from '../../../components/ui/button.variants'
 import { CollectionAddControl } from '../../../components/ui/collection-add-control.client'
 import { ButtonDropdown } from '../../../components/ui/button-dropdown.client'
@@ -136,7 +135,7 @@ export function ArrayFieldAddControl({
   const buttonSize = resolveArrayAddButtonSize(size, addActionSize, addActionLayout)
   const buttonDensity = resolveArrayAddButtonDensity(addActionLayout, addActionVariant)
   const triggerClassName = cn(addActionLayout === 'inline' && 'shrink-0')
-  const leadingIcon = showAddIcon ? <Plus aria-hidden /> : undefined
+  const leadingIcon = showAddIcon ? <Icon name="plus" size="owner" /> : undefined
   const disabledReasonId = React.useId()
 
   if (!showAddControl) return null

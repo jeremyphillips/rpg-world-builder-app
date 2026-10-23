@@ -1,6 +1,5 @@
-import { UserRound } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Text } from '@rpg/ui'
+import { Icon, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
@@ -13,7 +12,7 @@ import {
 export function PersonalWorkspaceTopbarTitle() {
   return (
     <Link to={ROUTES.home} className={personalWorkspaceTopbarTitleClasses.root}>
-      <UserRound aria-hidden className={personalWorkspaceTopbarTitleClasses.icon} />
+      <Icon name="user-round" size="lg" className={personalWorkspaceTopbarTitleClasses.icon} />
       <Text as="span" className={personalWorkspaceTopbarTitleClasses.label}>
         {PERSONAL_WORKSPACE_TOPBAR_LABEL}
       </Text>

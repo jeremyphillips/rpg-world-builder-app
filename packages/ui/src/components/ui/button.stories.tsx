@@ -1,6 +1,5 @@
+import { Icon } from './icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ArrowRight, Plus, Trash2 } from 'lucide-react'
-
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { semanticClassSelectArgType } from '../../stories/semantic-classes/semantic-class-arg-types.lib'
 import { Button } from './button.client'
@@ -95,7 +94,7 @@ export const TextDanger: Story = {
 export const TextCompactAdd: Story = {
   render: () => (
     <Button variant="text" density="compact">
-      <Plus aria-hidden />
+      <Icon name="plus" size="owner" />
       Add relationship
     </Button>
   ),
@@ -105,7 +104,7 @@ export const TextAccentWithIcon: Story = {
   render: () => (
     <Button variant="text" tone="accent">
       Choose class
-      <ArrowRight aria-hidden />
+      <Icon name="arrow-right" size="owner" />
     </Button>
   ),
 }
@@ -167,7 +166,7 @@ export const ExtraSmallDensityComparison: Story = {
 export const IconExtraSmall: Story = {
   render: () => (
     <Button size="icon-xs" variant="ghost" aria-label="Remove">
-      <Trash2 aria-hidden />
+      <Icon name="trash" size="owner" />
     </Button>
   ),
 }

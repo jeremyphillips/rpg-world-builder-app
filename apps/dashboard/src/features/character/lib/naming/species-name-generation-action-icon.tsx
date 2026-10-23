@@ -1,3 +1,3 @@
-import { Wand2 } from 'lucide-react'
+import { Icon } from '@rpg/ui'
 
-export const generateNameActionIcon = <Wand2 aria-hidden />
+export const generateNameActionIcon = <Icon name="wand-sparkles" size="2xl" />

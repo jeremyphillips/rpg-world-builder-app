@@ -65,7 +65,7 @@ export function NotificationPreviewItem({
       {unread ? (
         <span
           aria-hidden="true"
-          className="mt-2 size-2 shrink-0 rounded-full bg-primary"
+          className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary"
           title="Unread"
         />
       ) : null}

@@ -1,7 +1,7 @@
 'use client'
+import { Icon } from '../icon/icon'
 
 import * as React from 'react'
-import { ChevronDown, GripVertical } from 'lucide-react'
 import type { DraggableAttributes } from '@dnd-kit/core'
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 
@@ -40,7 +40,7 @@ export function CollapsibleListItemDragHandle({
       {...attributes}
       {...listeners}
     >
-      <GripVertical className="size-3.5" aria-hidden />
+      <Icon name="grip-vertical" size="md" />
     </button>
   )
 }
@@ -67,9 +67,10 @@ export function CollapsibleListItemCollapseButton({
       aria-label={`${collapsed ? 'Expand' : 'Collapse'} ${ariaLabel}`}
       onClick={onToggleCollapse}
     >
-      <ChevronDown
-        className={cn('size-4 transition-transform', collapsed && '-rotate-90')}
-        aria-hidden
+      <Icon
+        name="chevron-down"
+        size="lg"
+        className="transition-transform collapsed && -rotate-90"
       />
     </button>
   )
@@ -86,7 +87,7 @@ function CollapsibleListItemDragHandlePlaceholder({ compact = false }: { compact
           'pointer-events-none opacity-0',
         )}
       >
-        <GripVertical aria-hidden />
+        <Icon name="grip-vertical" size="2xl" />
       </span>
     </div>
   )

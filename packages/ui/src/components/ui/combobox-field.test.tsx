@@ -660,7 +660,7 @@ describe('ComboboxField', () => {
     await user.click(screen.getByRole('combobox', { name: 'Specific weapons' }))
     const dagger = screen.getByRole('option', { name: 'Dagger' })
     expect(within(dagger).getByTestId('custom-interior')).toBeInTheDocument()
-    expect(dagger.querySelector('.lucide-check')).toBeNull()
+    expect(dagger.querySelector('[data-icon="check"]')).toBeNull()
     expect(dagger.querySelector('span.size-4.shrink-0')).toBeNull()
   })
 

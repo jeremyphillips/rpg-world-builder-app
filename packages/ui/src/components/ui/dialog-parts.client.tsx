@@ -1,19 +1,15 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { X } from 'lucide-react'
-
 import {
   dialogPanelHeaderClasses,
   dialogPanelHeaderCopyStackClasses,
   dialogPanelHeaderHeadlineStackClasses,
   dialogPanelHeaderLeadRowClasses,
 } from './dialog-panel.variants'
-import {
-  dialogPanelHeaderGlyphSizeClasses,
-  dialogPanelHeaderIconControlClasses,
-} from './dialog-panel-header-icon-control.lib'
+import { dialogPanelHeaderIconControlClasses } from './dialog-panel-header-icon-control.lib'
 import { headingVariants } from './heading.variants'
 import { textVariants } from './text.variants'
 import { cn } from '../../lib/utils'
@@ -45,7 +41,7 @@ export function dialogDismissHandlers(
 export function DialogCloseButton({ closeLabel }: { closeLabel: string }) {
   return (
     <DialogPrimitive.Close aria-label={closeLabel} className={dialogCloseButtonClasses}>
-      <X aria-hidden className={dialogPanelHeaderGlyphSizeClasses} />
+      <Icon name="x" size="owner" />
     </DialogPrimitive.Close>
   )
 }

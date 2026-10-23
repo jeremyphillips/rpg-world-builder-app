@@ -1,8 +1,7 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
-import { ArrowDownUp, ChevronDown } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import {
@@ -139,11 +138,11 @@ export function SortMenu<T extends string>({
           className={cn(sortMenuTriggerIconClasses, className)}
         >
           <span className={sortMenuTriggerContentClasses()}>
-            <ArrowDownUp aria-hidden />
+            <Icon name="arrow-down-up" size="owner" />
             {triggerLabel != null ? (
               <SortMenuTriggerSizer labels={sizingLabels}>{triggerLabel}</SortMenuTriggerSizer>
             ) : null}
-            <ChevronDown aria-hidden />
+            <Icon name="chevron-down" size="owner" />
           </span>
         </Button>
       </DropdownMenuTrigger>

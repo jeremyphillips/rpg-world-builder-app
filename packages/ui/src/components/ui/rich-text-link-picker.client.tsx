@@ -1,9 +1,8 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { X } from 'lucide-react'
-
 import { Button } from './button.client'
 import { cn } from '../../lib/utils'
 import { portalPopoverSurfaceClasses } from './surface-current.lib'
@@ -174,11 +173,11 @@ function RichTextLinkPickerForm({
           type="button"
           variant="ghost"
           size="icon"
-          className="size-7"
+          className="h-7 w-7"
           aria-label="Close link picker"
           onClick={handleCancel}
         >
-          <X className="size-4" />
+          <Icon name="x" size="lg" />
         </Button>
       </div>
 
@@ -239,11 +238,11 @@ function RichTextLinkPickerForm({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="size-7"
+                        className="h-7 w-7"
                         aria-label="Clear selected internal link"
                         onClick={() => setSelectedOptionId(null)}
                       >
-                        <X className="size-3.5" />
+                        <Icon name="x" size="md" />
                       </Button>
                     }
                   />

@@ -1,8 +1,7 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
-import { CheckIcon } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { Text } from './text'
@@ -85,7 +84,7 @@ export function WizardStepNav() {
                 <div className={wizardStepBubbleVariants({ state })}>
                   {state === 'complete' ? (
                     <>
-                      <CheckIcon className="size-icon-glyph-lg" aria-hidden />
+                      <Icon name="check" size="lg" />
                       <span className="sr-only">Completed</span>
                     </>
                   ) : (

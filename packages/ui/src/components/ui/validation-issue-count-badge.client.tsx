@@ -1,6 +1,5 @@
 'use client'
-
-import { AlertTriangle } from 'lucide-react'
+import { Icon } from './icon/icon'
 
 import { Badge } from './badge'
 
@@ -20,7 +19,7 @@ export function ValidationIssueCountBadge({ count, className }: ValidationIssueC
       size="sm"
       layout="counter"
       aria-hidden
-      leadingIcon={<AlertTriangle aria-hidden />}
+      leadingIcon={<Icon name="triangle-alert" size="2xl" />}
       className={className}
     >
       {count}

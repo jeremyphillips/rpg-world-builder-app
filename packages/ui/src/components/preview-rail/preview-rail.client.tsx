@@ -1,8 +1,7 @@
 'use client'
+import { Icon } from '../ui/icon/icon'
 
 import * as React from 'react'
-import { CircleSlash } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import {
   Accordion,
@@ -163,7 +162,7 @@ function PreviewRailAvailabilityLine({
       {available ? (
         <StatusDot tone="success" size="sm" />
       ) : (
-        <CircleSlash aria-hidden className="size-icon-glyph-md shrink-0 text-semantic-warning" />
+        <Icon name="circle-slash" size="md" className="shrink-0 text-semantic-warning" />
       )}
       <InlineMetadata role="supporting" density="compact" wrap={false} className="min-w-0 flex-1">
         <InlineMetadata.Item className="font-medium">{statusLabel}</InlineMetadata.Item>

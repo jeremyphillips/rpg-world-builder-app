@@ -112,7 +112,7 @@ describe('SearchResultRow', () => {
       <SearchResultRow document={spellDocument()} href="/campaigns/c1/spells/fireball" />,
     )
 
-    expect(container.querySelector('.lucide-sparkles')).toBeInTheDocument()
+    expect(container.querySelector('[data-icon="sparkles"]')).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

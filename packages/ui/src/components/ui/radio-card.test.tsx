@@ -1,7 +1,7 @@
+import { Icon } from './icon/icon'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ChartNoAxesColumn, Grid3x3 } from 'lucide-react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { RadioCard } from './radio-card.client'
@@ -372,20 +372,20 @@ describe('RadioCard', () => {
             label: 'Level progression',
             value: 'levelProgression',
             description: 'Values by character level',
-            icon: <ChartNoAxesColumn data-testid="level-progression-icon" aria-hidden />,
+            icon: <Icon name="chart-no-axes-column" size="2xl" />,
           },
           {
             label: 'General table',
             value: 'general',
             description: 'Custom rows and columns',
-            icon: <Grid3x3 data-testid="general-table-icon" aria-hidden />,
+            icon: <Icon name="grid-3x3" size="2xl" />,
           },
         ]}
       />,
     )
 
-    expect(screen.getByTestId('level-progression-icon')).toBeInTheDocument()
-    expect(screen.getByTestId('general-table-icon')).toBeInTheDocument()
+    expect(container.querySelector('[data-icon="chart-no-axes-column"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-icon="grid-3x3"]')).toBeInTheDocument()
     expect(container.querySelector('[class*="rounded-full"]')).toBeNull()
   })
 
@@ -401,12 +401,12 @@ describe('RadioCard', () => {
           {
             label: 'Level progression',
             value: 'levelProgression',
-            icon: <ChartNoAxesColumn aria-hidden />,
+            icon: <Icon name="chart-no-axes-column" size="2xl" />,
           },
           {
             label: 'General table',
             value: 'general',
-            icon: <Grid3x3 aria-hidden />,
+            icon: <Icon name="grid-3x3" size="2xl" />,
           },
         ]}
         onValueChange={onValueChange}
@@ -433,12 +433,12 @@ describe('RadioCard', () => {
           {
             label: 'Level progression',
             value: 'levelProgression',
-            icon: <ChartNoAxesColumn aria-hidden />,
+            icon: <Icon name="chart-no-axes-column" size="2xl" />,
           },
           {
             label: 'General table',
             value: 'general',
-            icon: <Grid3x3 aria-hidden />,
+            icon: <Icon name="grid-3x3" size="2xl" />,
           },
         ]}
       />,
@@ -513,7 +513,7 @@ describe('RadioCard', () => {
       />,
     )
 
-    expect(container.querySelector('svg.lucide-info')).toBeInTheDocument()
+    expect(container.querySelector('[data-icon="info"]')).toBeInTheDocument()
   })
 
   it('renders a media slot above the card body', () => {

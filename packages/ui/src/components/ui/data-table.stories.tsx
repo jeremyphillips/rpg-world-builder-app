@@ -1,8 +1,7 @@
+import { Icon } from './icon/icon'
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Pencil } from 'lucide-react'
-
 import {
   BooleanCell,
   DataTable,
@@ -324,7 +323,7 @@ function ClassRowActions({ row }: { row: CharacterClass }) {
           id: 'edit',
           label: 'Edit',
           href: `/classes/${row.id}/edit`,
-          icon: <Pencil />,
+          icon: <Icon name="pencil" size="2xl" />,
         },
         {
           kind: 'action',

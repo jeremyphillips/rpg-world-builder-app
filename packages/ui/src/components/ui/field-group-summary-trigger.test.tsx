@@ -1,8 +1,8 @@
+import { Icon } from './icon/icon'
 import { describe, expect, it, vi } from 'vitest'
 import { createElement } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Pencil } from 'lucide-react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { FieldGroupSummaryTrigger } from './field-group-summary-trigger.client'
@@ -154,7 +154,7 @@ describe('FieldGroupSummaryTrigger', () => {
           status: { label: 'Available', tone: 'success', indicator: 'dot' },
           detail: 'All players',
         }}
-        openLabel={createElement(Pencil, { 'aria-hidden': true, className: 'size-3.5' })}
+        openLabel={createElement(Icon, { name: 'pencil', size: 'md' })}
         unsavedSuffix=" · Unsaved"
         showDirtySuffix={false}
         disabled={false}

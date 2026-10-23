@@ -35,6 +35,6 @@ describe('DetailMediaField', () => {
       />,
     )
 
-    expect(container.querySelector('.lucide-user-round')).toBeInTheDocument()
+    expect(container.querySelector('[data-icon="user-round"]')).toBeInTheDocument()
   })
 })

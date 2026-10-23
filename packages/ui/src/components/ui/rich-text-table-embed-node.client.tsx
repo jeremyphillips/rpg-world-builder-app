@@ -1,9 +1,9 @@
 'use client'
 
 import { NodeViewWrapper, type NodeViewProps } from '@tiptap/react'
-import { Pencil, Table2, Trash2 } from 'lucide-react'
 
 import { Button } from './button.client'
+import { Icon } from './icon/icon'
 import { Text } from './text'
 import { getRichTextTableEmbedHost } from './rich-text-table-embed-host.client'
 import {
@@ -15,8 +15,6 @@ import {
   richTextTableEmbedCardTitleClasses,
   richTextTableEmbedCardActionsClasses,
   richTextTableEmbedCardIconClasses,
-  richTextTableEmbedEditIconClasses,
-  richTextTableEmbedRemoveIconClasses,
   richTextTableEmbedRemoveButtonClasses,
 } from './rich-text-table-embed-node.variants'
 
@@ -35,7 +33,7 @@ export function RichTextTableEmbedNode({ node, deleteNode, selected }: NodeViewP
       <div className={richTextTableEmbedCardClasses({ selected: Boolean(selected) })}>
         <div className={richTextTableEmbedCardContentClasses}>
           <div className={richTextTableEmbedCardHeaderClasses}>
-            <Table2 className={richTextTableEmbedCardIconClasses} aria-hidden />
+            <Icon name="table" size="md" className={richTextTableEmbedCardIconClasses} />
             <div className={richTextTableEmbedCardTitleStackClasses}>
               <Text as="p" className={richTextTableEmbedCardTitleClasses}>
                 {title}
@@ -55,7 +53,7 @@ export function RichTextTableEmbedNode({ node, deleteNode, selected }: NodeViewP
                 if (tableId) host?.onEditTable(tableId)
               }}
             >
-              <Pencil className={richTextTableEmbedEditIconClasses} aria-hidden />
+              <Icon name="pencil" size="owner" />
               Edit table
             </Button>
             <Button
@@ -66,7 +64,7 @@ export function RichTextTableEmbedNode({ node, deleteNode, selected }: NodeViewP
               aria-label={`Remove table ${title}`}
               onClick={() => deleteNode()}
             >
-              <Trash2 className={richTextTableEmbedRemoveIconClasses} aria-hidden />
+              <Icon name="trash" size="owner" />
             </Button>
           </div>
         </div>

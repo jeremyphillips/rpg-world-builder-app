@@ -1,6 +1,5 @@
+import { Icon } from './icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Table2 } from 'lucide-react'
-
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import {
   emptyStateWellSupportingClasses,
@@ -67,7 +66,7 @@ export const StructuredTitleSupporting: Story = {
     ...insetPanelGateStoryProps(),
     children: (
       <div className="flex flex-col items-center gap-2">
-        <Table2 className="size-8 shrink-0 text-muted-foreground opacity-50" aria-hidden />
+        <Icon name="table" size="3xl" className="shrink-0 text-muted-foreground opacity-50" />
         <p className={emptyStateWellTitleClasses}>No heritage group yet</p>
         <p className={emptyStateWellSupportingClasses}>
           Create a set of heritage choices players can select during character creation.

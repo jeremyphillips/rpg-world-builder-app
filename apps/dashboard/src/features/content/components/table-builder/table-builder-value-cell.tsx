@@ -1,6 +1,5 @@
 import * as React from 'react'
 import type { ComponentProps } from 'react'
-import { Info } from 'lucide-react'
 import {
   Controller,
   useFormContext,
@@ -12,6 +11,7 @@ import {
 import { DIE_FACES, formatFieldMessage } from '@rpg/contracts'
 import {
   Badge,
+  Icon,
   Input,
   NumberInput,
   Select,
@@ -72,7 +72,12 @@ function DerivedBadge() {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Badge appearance="soft" tone="info" size="sm" leadingIcon={<Info aria-hidden />}>
+          <Badge
+            appearance="soft"
+            tone="info"
+            size="sm"
+            leadingIcon={<Icon name="info" size="inline" />}
+          >
             Derived
           </Badge>
         </TooltipTrigger>

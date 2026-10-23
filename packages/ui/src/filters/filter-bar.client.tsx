@@ -1,6 +1,6 @@
 'use client'
+import { Icon } from '../components/ui/icon/icon'
 
-import { RotateCcw } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { cn } from '../lib/utils'
@@ -69,7 +69,7 @@ export function FilterBar<TData, TState extends Record<string, unknown>>({
           disabled={disabled}
           onClick={onReset}
         >
-          <RotateCcw aria-hidden />
+          <Icon name="rotate-ccw" size="owner" />
           {resetLabel}
         </Button>
       ) : null}

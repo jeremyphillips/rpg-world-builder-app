@@ -9,13 +9,13 @@ import {
   CollapsibleTrigger,
   DialogPanelScrollRegion,
   FilenamePreview,
+  Icon,
   MetadataList,
   Panel,
   Text,
   type ScrollBoundaryState,
 } from '@rpg/ui'
 import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
-import { ChevronDown } from 'lucide-react'
 import {
   MEDIA_ROLE_ENTRIES,
   asCropPresentation,
@@ -231,9 +231,10 @@ export function MediaImageDetails({
                       aria-expanded={accessibilityOpen}
                     >
                       Accessibility & details
-                      <ChevronDown
-                        className="size-4 shrink-0 transition-transform group-data-[state=open]:rotate-180"
-                        aria-hidden="true"
+                      <Icon
+                        name="chevron-down"
+                        size="lg"
+                        className="shrink-0 transition-transform group-data-[state=open]:rotate-180"
                       />
                     </Button>
                   </CollapsibleTrigger>

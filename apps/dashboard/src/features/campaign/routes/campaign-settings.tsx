@@ -1,7 +1,6 @@
 import { useMemo, type ReactNode } from 'react'
-import { Globe, IdCard, Palette } from 'lucide-react'
 import { useParams } from 'react-router-dom'
-import { Heading, Spinner, Text } from '@rpg/ui'
+import { Heading, Icon, Spinner, Text } from '@rpg/ui'
 import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
 
 import { PageShell } from '@/components/layout/page/page-shell'
@@ -46,7 +45,7 @@ export function CampaignSettings() {
         {
           id: 'identity',
           label: 'Identity',
-          leadingIcon: <IdCard aria-hidden />,
+          leadingIcon: <Icon name="settings-sliders" size="sm" />,
           fields: settingsIdentityFields,
         },
       ]
@@ -56,19 +55,19 @@ export function CampaignSettings() {
       {
         id: 'identity',
         label: 'Identity',
-        leadingIcon: <IdCard aria-hidden />,
+        leadingIcon: <Icon name="settings-sliders" size="sm" />,
         fields: buildSettingsIdentityTabFields(campaignId),
       },
       {
         id: 'flavor',
         label: 'Flavor',
-        leadingIcon: <Palette aria-hidden />,
+        leadingIcon: <Icon name="palette" size="sm" />,
         fields: flavorFields,
       },
       {
         id: 'world',
         label: 'World',
-        leadingIcon: <Globe aria-hidden />,
+        leadingIcon: <Icon name="globe" size="sm" />,
         fields: buildWorldSettingsFields(locations),
       },
     ]

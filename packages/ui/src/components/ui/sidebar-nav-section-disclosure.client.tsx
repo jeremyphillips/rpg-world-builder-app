@@ -1,11 +1,10 @@
 'use client'
 
 import { useId } from 'react'
-import { ChevronDown } from 'lucide-react'
 
+import { DisclosureIndicator } from './disclosure-indicator.client'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible.client'
 import { Eyebrow } from './eyebrow'
-import { sidebarNavSectionDisclosureCaretVariants } from './sidebar-nav-section-disclosure.variants'
 
 export type SidebarNavSectionDisclosureProps = {
   label: string
@@ -45,10 +44,7 @@ export function SidebarNavSectionDisclosure({
             aria-controls={contentId}
           >
             <Eyebrow as="span">{label}</Eyebrow>
-            <ChevronDown
-              aria-hidden
-              className={sidebarNavSectionDisclosureCaretVariants({ expanded })}
-            />
+            <DisclosureIndicator size="lg" className="ml-auto shrink-0 text-muted-foreground" />
           </button>
         </CollapsibleTrigger>
       )}

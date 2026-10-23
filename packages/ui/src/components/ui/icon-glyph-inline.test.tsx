@@ -1,14 +1,14 @@
+import { Icon } from './icon/icon'
 import { render, screen } from '@testing-library/react'
-import { Check } from 'lucide-react'
 import { describe, expect, it } from 'vitest'
 
 describe('nested inline icon inheritance', () => {
   it('uses size-icon-inline under each typography owner without a glyph step', () => {
     const { container } = render(
       <div className="text-base">
-        Base <Check aria-hidden className="size-icon-inline" />
+        Base <Icon name="check" size="inline" className="size-icon-inline" />
         <span className="text-xs">
-          Small <Check aria-hidden className="size-icon-inline" />
+          Small <Icon name="check" size="inline" className="size-icon-inline" />
         </span>
       </div>,
     )

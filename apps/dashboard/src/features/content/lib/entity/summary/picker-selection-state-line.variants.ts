@@ -1,5 +1,4 @@
 import { cva } from 'class-variance-authority'
-import { cn, inlineIconTextClasses } from '@rpg/ui'
 
 /** Selection-state line. Density matches supporting copy; the status cell owns the offset. */
 export const pickerSelectionStateLineVariants = cva('ui-copy-supporting min-w-0', {
@@ -17,5 +16,3 @@ export const pickerSelectionStateLineVariants = cva('ui-copy-supporting min-w-0'
  * The icon aligns to the x-height and does not become the line's baseline.
  */
 export const pickerSelectionStateWordVariants = cva('text-foreground font-body-emphasis')
-
-export const pickerSelectionStateIconVariants = cva(cn('me-1', inlineIconTextClasses))

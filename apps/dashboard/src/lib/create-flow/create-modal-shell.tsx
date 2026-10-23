@@ -1,7 +1,5 @@
 import * as React from 'react'
 
-import { AlertTriangle } from 'lucide-react'
-
 import {
   Badge,
   cn,
@@ -13,6 +11,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  Icon,
   ValidationIssueCountBadge,
   dialogPanelSectionInsetXClasses,
   type ModalContentProps,
@@ -118,7 +117,7 @@ function CreateModalShellIssueBadge({ count }: { count: number | undefined }) {
           size="sm"
           layout="counter"
           aria-hidden
-          leadingIcon={<AlertTriangle aria-hidden />}
+          leadingIcon={<Icon name="triangle-alert" size="inline" />}
         >
           !
         </Badge>

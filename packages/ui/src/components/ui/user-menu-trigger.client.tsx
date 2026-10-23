@@ -1,6 +1,5 @@
 'use client'
-
-import { ChevronDown } from 'lucide-react'
+import { Icon } from './icon/icon'
 
 import { getAssetUrl } from '@rpg/contracts'
 
@@ -21,7 +20,7 @@ export function UserMenuTrigger({ displayName, avatarKey }: UserMenuTriggerProps
     <DropdownMenuTrigger className={userMenuTriggerClassName}>
       <Avatar name={displayName} src={avatarKey ? getAssetUrl(avatarKey) : undefined} size="sm" />
       <span className="max-w-[160px] truncate font-medium">{displayName}</span>
-      <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+      <Icon name="chevron-down" size="lg" className="shrink-0 text-muted-foreground" />
     </DropdownMenuTrigger>
   )
 }

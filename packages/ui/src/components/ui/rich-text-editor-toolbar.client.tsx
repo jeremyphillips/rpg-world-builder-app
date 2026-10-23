@@ -1,8 +1,6 @@
 'use client'
 
 import type { Editor } from '@tiptap/react'
-import { Link as LinkIcon, Table2 } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { Icon } from './icon/icon'
@@ -92,7 +90,7 @@ function RichTextFormatButtons({
       key={label}
       variant="ghost"
       size="icon"
-      className={cn('size-7', editor && isActive(editor) && 'bg-accent text-accent-foreground')}
+      className={cn('h-7 w-7', editor && isActive(editor) && 'bg-accent text-accent-foreground')}
       aria-label={label}
       aria-pressed={editor ? isActive(editor) : false}
       disabled={disabled || !editor}
@@ -143,12 +141,12 @@ export function RichTextEditorToolbar({
         <Button
           variant="ghost"
           size="icon"
-          className="size-7"
+          className="h-7 w-7"
           aria-label="Table"
           disabled={disabled || !editor}
           onClick={() => editor?.commands.beginTableEmbedCreate()}
         >
-          <Table2 className="size-4" />
+          <Icon name="table" size="lg" />
         </Button>
       ) : null}
       {linkable ? (
@@ -172,14 +170,14 @@ export function RichTextEditorToolbar({
               variant="ghost"
               size="icon"
               className={cn(
-                'size-7',
+                'h-7 w-7',
                 editor?.isActive('link') && 'bg-accent text-accent-foreground',
               )}
               aria-label="Link"
               aria-pressed={editor?.isActive('link') ?? false}
               disabled={disabled || !editor}
             >
-              <LinkIcon className="size-4" />
+              <Icon name="link" size="lg" />
             </Button>
           }
         />

@@ -1,9 +1,8 @@
 'use client'
 
-import { Star } from 'lucide-react'
 import { useCallback, useState } from 'react'
 
-import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@rpg/ui'
+import { cn, Icon, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@rpg/ui'
 
 export type AbilityScoreRecommendationIndicatorProps = {
   label: string
@@ -46,7 +45,7 @@ export function AbilityScoreRecommendationIndicator({
             }}
             onClick={() => setOpen((current) => !current)}
           >
-            <Star aria-hidden className="size-3" />
+            <Icon name="star" size="sm" />
           </button>
         </TooltipTrigger>
         <TooltipContent>{label}</TooltipContent>

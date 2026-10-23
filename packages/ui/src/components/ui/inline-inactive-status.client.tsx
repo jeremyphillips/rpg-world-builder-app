@@ -1,6 +1,5 @@
 'use client'
-
-import { CircleSlash } from 'lucide-react'
+import { Icon } from './icon/icon'
 
 import { cn } from '../../lib/utils'
 import {
@@ -17,8 +16,9 @@ export type InlineInactiveStatusProps = {
 export function InlineInactiveStatus({ label, className }: InlineInactiveStatusProps) {
   return (
     <span className={cn('inline-flex shrink-0 items-center gap-1 text-xs', className)}>
-      <CircleSlash
-        aria-hidden
+      <Icon
+        name="circle-slash"
+        size="md"
         className={fieldGroupSummaryStatusIndicatorVariants({
           indicator: 'inactive',
           tone: 'warning',

@@ -1,6 +1,5 @@
+import { Icon } from './icon/icon'
 import * as React from 'react'
-import { ChevronRight } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { renderNavigableLinkRoot } from './navigable-link-root.lib'
 import { interactiveFocusVariants } from './interactive-focus.variants'
@@ -30,7 +29,7 @@ function CardHeaderRegion({ header }: { header: CardHeaderModel }) {
 export function NavigationChevron({ className }: { className?: string }) {
   return (
     <span className={cn('ui-card__nav-chevron', className)} aria-hidden>
-      <ChevronRight className="size-icon-glyph-md shrink-0" />
+      <Icon name="chevron-right" size="md" className="shrink-0" />
     </span>
   )
 }

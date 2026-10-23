@@ -1,6 +1,5 @@
 'use client'
-
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { Icon } from './icon/icon'
 
 import { cn } from '../../lib/utils'
 import {
@@ -46,7 +45,7 @@ export function NumberInputSteppers({
         onMouseDown={(event) => event.preventDefault()}
         onClick={() => onBump('up')}
       >
-        <ChevronUp aria-hidden />
+        <Icon name="chevron-up" size="owner" />
       </button>
       <button
         type="button"
@@ -57,7 +56,7 @@ export function NumberInputSteppers({
         onMouseDown={(event) => event.preventDefault()}
         onClick={() => onBump('down')}
       >
-        <ChevronDown aria-hidden />
+        <Icon name="chevron-down" size="owner" />
       </button>
     </div>
   )

@@ -1,5 +1,4 @@
-import { Link } from 'lucide-react'
-import { Button, Text } from '@rpg/ui'
+import { Button, Icon, Text } from '@rpg/ui'
 
 export type ProficiencyEquipmentLinkCueProps = {
   message: string
@@ -16,7 +15,7 @@ export function ProficiencyEquipmentLinkCue({
 
   return (
     <div className="flex items-start gap-2 text-sm">
-      <Link className="mt-0.5 size-icon-inline shrink-0 text-muted-foreground" aria-hidden />
+      <Icon name="link" size="inline" className="mt-0.5 shrink-0 text-muted-foreground" />
       <div className="space-y-1">
         <Text variant="supporting">{message}</Text>
         {onNavigate ? (

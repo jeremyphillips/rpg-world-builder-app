@@ -1,15 +1,14 @@
 'use client'
+import { Icon } from '../../components/ui/icon/icon'
 
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Plus } from 'lucide-react'
-
 import { Button } from '../../components/ui/button.client'
 import { ArrayLegendIssueLink } from '../renderers/array/array-item-issue.client'
 import { ArrayLikeSectionHeader } from './array-like-section-header.client'
 
 const addAction = (
   <Button type="button" variant="outline" size="sm">
-    <Plus aria-hidden />
+    <Icon name="plus" size="2xl" />
     Add grant
   </Button>
 )
@@ -64,7 +63,7 @@ export const StandaloneSection: Story = {
     id: 'feature-tables-section-heading',
     action: (
       <Button type="button" variant="outline" size="sm">
-        <Plus aria-hidden />
+        <Icon name="plus" size="2xl" />
         Add table
       </Button>
     ),

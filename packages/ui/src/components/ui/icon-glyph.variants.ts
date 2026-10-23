@@ -1,15 +1,6 @@
 export const ICON_GLYPH_STEPS = ['xs', 'sm', 'md', 'lg', '3xl'] as const
 export type IconGlyphStep = (typeof ICON_GLYPH_STEPS)[number]
 
-/** CSS utilities: size-icon-glyph-{step} — backed by --icon-glyph-{step} in globals.css */
-export const iconGlyphRootClasses: Record<IconGlyphStep, string> = {
-  xs: 'size-icon-glyph-xs',
-  sm: 'size-icon-glyph-sm',
-  md: 'size-icon-glyph-md',
-  lg: 'size-icon-glyph-lg',
-  '3xl': 'size-icon-glyph-3xl',
-}
-
 /** For wrappers that contain an svg child */
 export const iconGlyphDescendantClasses: Record<IconGlyphStep, string> = {
   xs: '[&_svg]:size-icon-glyph-xs',
@@ -30,9 +21,6 @@ export const iconGlyphDirectChildClasses: Record<IconGlyphStep, string> = {
 
 /** Preferred export — pick root vs descendant at call site */
 export const iconGlyphSizeClasses = iconGlyphDescendantClasses
-
-/** Menu row icons — glyph lg only, no hit target */
-export const menuItemIconGlyphClasses = iconGlyphDescendantClasses.lg
 
 /** Icon in inline flow. Size comes from the nearest typography owner's --icon-inline. */
 export const inlineIconTextClasses = 'inline-block shrink-0 align-middle size-icon-inline'

@@ -1,6 +1,5 @@
+import { Icon } from './icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Check } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { ComboboxOptionRow } from './combobox-option-row.client'
@@ -98,7 +97,7 @@ export const SameIdentityAcrossHosts: Story = {
             optionId="fireball-option"
             {...FIXTURE}
             selected
-            endSlot={<Check className="size-4 shrink-0" aria-hidden />}
+            endSlot={<Icon name="check" size="lg" className="shrink-0" />}
             onSelect={() => {}}
           />
         </InteractiveList>

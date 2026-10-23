@@ -1,8 +1,5 @@
 import { cva } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
-import { iconGlyphDirectChildClasses, iconGlyphRootClasses } from './icon-glyph.variants'
-
 export const richTextTableEmbedCardClasses = cva(
   'rounded-md border bg-card px-3 py-2 shadow-sm transition-colors',
   {
@@ -31,13 +28,6 @@ export const richTextTableEmbedCardMetadataClasses = 'truncate text-sm'
 
 export const richTextTableEmbedCardActionsClasses = 'flex shrink-0 items-center gap-1'
 
-export const richTextTableEmbedCardIconClasses = cn(
-  'shrink-0 text-muted-foreground',
-  iconGlyphRootClasses.md,
-)
-
-export const richTextTableEmbedEditIconClasses = iconGlyphDirectChildClasses.sm
-
-export const richTextTableEmbedRemoveIconClasses = iconGlyphDirectChildClasses.md
+export const richTextTableEmbedCardIconClasses = 'shrink-0 text-muted-foreground'
 
 export const richTextTableEmbedRemoveButtonClasses = 'size-8'

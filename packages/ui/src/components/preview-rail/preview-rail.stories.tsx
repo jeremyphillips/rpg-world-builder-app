@@ -1,6 +1,5 @@
+import { Icon } from '../ui/icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { BookOpen, Eye } from 'lucide-react'
-
 import { PreviewRail } from './preview-rail.client'
 
 const meta = {
@@ -23,7 +22,7 @@ export const MockComposition: Story = {
     <PreviewRail layout="fill" className="w-[280px]">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
-        media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+        media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
         name="Fighter"
         status={
           <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
@@ -91,7 +90,7 @@ export const MockComposition: Story = {
         <PreviewRail.Action
           label="Preview as player"
           helperText="See how this class will appear to players in your campaign."
-          icon={<Eye />}
+          icon={<Icon name="eye" size="2xl" />}
         />
       </PreviewRail.Footer>
     </PreviewRail>
@@ -103,7 +102,7 @@ export const FreshCreate: Story = {
     <PreviewRail layout="fill" className="w-[280px]">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
-        media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+        media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
         name="Unnamed Class"
         status={
           <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
@@ -144,7 +143,7 @@ export const FreshCreate: Story = {
         <PreviewRail.Action
           label="Preview as player"
           helperText="See how this class will appear to players in your campaign."
-          icon={<Eye />}
+          icon={<Icon name="eye" size="2xl" />}
         />
       </PreviewRail.Footer>
     </PreviewRail>
@@ -156,7 +155,7 @@ export const PostSubmitAttention: Story = {
     <PreviewRail layout="fill" className="w-[280px]">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
-        media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+        media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
         name="Unnamed Class"
         status={
           <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
@@ -182,7 +181,7 @@ export const PostSubmitAttention: Story = {
       </PreviewRail.ScrollRegion>
       <PreviewRail.Footer>
         <PreviewRail.StatusPanel variant="warning" title="2 sections need attention." />
-        <PreviewRail.Action label="Preview as player" icon={<Eye />} />
+        <PreviewRail.Action label="Preview as player" icon={<Icon name="eye" size="2xl" />} />
       </PreviewRail.Footer>
     </PreviewRail>
   ),
@@ -199,7 +198,7 @@ export const ViewportAsideFill: Story = {
           <PreviewRail layout="fill" className="w-[280px]">
             <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
             <PreviewRail.Identity
-              media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+              media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
               name="Fighter"
               status={
                 <PreviewRail.AvailabilityLine
@@ -257,7 +256,7 @@ export const ViewportAsideFill: Story = {
                 title="Ready to publish"
                 description="Required configuration is complete."
               />
-              <PreviewRail.Action label="Preview as player" icon={<Eye />} />
+              <PreviewRail.Action label="Preview as player" icon={<Icon name="eye" size="2xl" />} />
             </PreviewRail.Footer>
           </PreviewRail>
         </div>
@@ -271,7 +270,7 @@ export const LongNameTruncation: Story = {
     <PreviewRail layout="fill" className="w-[280px]">
       <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
       <PreviewRail.Identity
-        media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+        media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
         name="The Order of the Radiant Banner and Eternal Vigil"
         status={
           <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
@@ -287,7 +286,7 @@ export const SheetHost: Story = {
     <div className="ui-border--default w-[21rem] rounded-md border bg-card p-4">
       <PreviewRail chrome="plain">
         <PreviewRail.Identity
-          media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+          media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
           name="Fighter"
           status={
             <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
@@ -308,7 +307,7 @@ export const UnavailableIdentity: Story = {
     <PreviewRail className="w-[280px]">
       <PreviewRail.Header title="Class Preview" />
       <PreviewRail.Identity
-        media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+        media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
         name="Fighter"
         status={
           <PreviewRail.AvailabilityLine
@@ -326,7 +325,7 @@ export const PlainChrome: Story = {
   render: () => (
     <PreviewRail chrome="plain">
       <PreviewRail.Identity
-        media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+        media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
         name="Fighter"
         status={
           <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
@@ -342,7 +341,7 @@ export const WithIdentityMetadata: Story = {
     <PreviewRail className="w-[280px]">
       <PreviewRail.Header title="Class Preview" />
       <PreviewRail.Identity
-        media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+        media={<PreviewRail.Media fallbackIcon={<Icon name="book-open" size="2xl" />} />}
         name="Fighter"
         status={
           <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />

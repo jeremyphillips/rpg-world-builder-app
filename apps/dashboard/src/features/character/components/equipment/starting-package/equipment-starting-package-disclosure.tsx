@@ -7,7 +7,6 @@ import type {
   StartingPackageConversionPreview,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-import { ChevronDown } from 'lucide-react'
 import {
   Button,
   Collapsible,
@@ -15,6 +14,7 @@ import {
   CollapsibleTrigger,
   Eyebrow,
   Heading,
+  Icon,
   Text,
 } from '@rpg/ui'
 
@@ -197,8 +197,9 @@ export function EquipmentStartingPackageDisclosure({
               density="compact"
               aria-label={open ? 'Collapse starting package' : 'Expand starting package'}
             >
-              <ChevronDown
-                aria-hidden
+              <Icon
+                name="chevron-down"
+                size="owner"
                 className={equipmentStartingPackageChevronVariants({ open })}
               />
             </Button>

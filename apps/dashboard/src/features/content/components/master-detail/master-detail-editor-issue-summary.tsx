@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react'
+import { Icon } from '@rpg/ui'
 
 function masterDetailEditorIssueCountLabel(count: number): string {
   return `${count} ${count === 1 ? 'issue' : 'issues'}`
@@ -14,7 +14,7 @@ export function MasterDetailEditorIssueSummary({ count }: MasterDetailEditorIssu
 
   return (
     <span className="inline-flex min-w-0 items-center gap-1 text-style-label text-destructive-muted">
-      <AlertTriangle className="size-icon-inline shrink-0" aria-hidden />
+      <Icon name="triangle-alert" size="inline" className="shrink-0" />
       {masterDetailEditorIssueCountLabel(count)}
     </span>
   )

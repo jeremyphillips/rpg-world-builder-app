@@ -5,11 +5,11 @@ import {
   Button,
   cn,
   DialogPanelScrollRegion,
+  Icon,
   FilenamePreview,
   Text,
   type ScrollBoundaryState,
 } from '@rpg/ui'
-import { Images } from 'lucide-react'
 import {
   MEDIA_GALLERY_ONLY_LABEL,
   mediaRoleSurfaceCopy,
@@ -155,13 +155,13 @@ export function MediaGallery({
             className="flex min-h-48 flex-1 flex-col items-center justify-center gap-2 px-4 text-center md:min-h-0"
             role="alert"
           >
-            <Images className="size-8 text-muted-foreground" aria-hidden="true" />
+            <Icon name="images" size="3xl" className="text-muted-foreground" />
             <p className="text-sm font-semibold text-foreground">Images unavailable</p>
             <Text variant="supporting">{contextBlockedMessage}</Text>
           </div>
         ) : !availableImages.length ? (
           <div className="flex min-h-48 flex-1 flex-col items-center justify-center gap-2 px-4 text-center md:min-h-0">
-            <Images className="size-8 text-muted-foreground" aria-hidden="true" />
+            <Icon name="images" size="3xl" className="text-muted-foreground" />
             <p className="text-sm font-semibold text-foreground">No images yet</p>
             <Text variant="supporting">Uploaded images will appear here.</Text>
           </div>

@@ -1,6 +1,4 @@
-import { Check } from 'lucide-react'
-
-import { InlineMetadata, Text } from '@rpg/ui'
+import { Icon, InlineMetadata, Text } from '@rpg/ui'
 
 export type SpellPickerSelectionSummaryProps = {
   complete?: boolean
@@ -11,7 +9,7 @@ export type SpellPickerSelectionSummaryProps = {
 function SelectionCount({ complete, countText }: { complete: boolean; countText: string }) {
   return (
     <span className={complete ? 'inline-flex items-center gap-1 text-success' : undefined}>
-      {complete ? <Check aria-hidden className="size-icon-inline shrink-0" /> : null}
+      {complete ? <Icon name="check" size="inline" className="shrink-0" /> : null}
       <span>{countText}</span>
     </span>
   )

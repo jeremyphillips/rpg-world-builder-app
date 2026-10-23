@@ -1,7 +1,7 @@
+import { Icon } from './icon/icon'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ArrowRight, Plus } from 'lucide-react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Button } from './button.client'
@@ -86,7 +86,7 @@ describe('Button', () => {
   it('applies tier gap for leading icon, trailing icon, and spinner compositions', () => {
     const { rerender } = render(
       <Button size="xs" variant="outline">
-        <Plus aria-hidden />
+        <Icon name="plus" size="owner" />
         Reset
       </Button>,
     )
@@ -95,7 +95,7 @@ describe('Button', () => {
     rerender(
       <Button size="sm" variant="outline">
         Next
-        <ArrowRight aria-hidden />
+        <Icon name="arrow-right" size="owner" />
       </Button>,
     )
     expect(screen.getByRole('button', { name: 'Next' })).toHaveClass('ui-button--sm')
@@ -103,7 +103,7 @@ describe('Button', () => {
     rerender(
       <Button size="default" variant="default" disabled>
         <Spinner size="sm" />
-        <Plus aria-hidden />
+        <Icon name="plus" size="owner" />
         Saving
       </Button>,
     )

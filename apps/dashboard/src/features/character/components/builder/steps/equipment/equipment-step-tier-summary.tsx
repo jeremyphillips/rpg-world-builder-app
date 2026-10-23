@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
-
 import {
   formatInlineWealth,
   formatLevelRangeLabel,
@@ -11,6 +9,7 @@ import {
 import {
   cn,
   Collapsible,
+  Icon,
   CollapsibleContent,
   CollapsibleTrigger,
   InfoTooltip,
@@ -90,10 +89,11 @@ export function EquipmentStepTierSummary({
           {heading}
           <span className="ml-auto inline-flex shrink-0 items-center gap-1">
             <span className="shrink-0 text-style-caption">{benefitLabel}</span>
-            <ChevronDown
-              aria-hidden
+            <Icon
+              name="chevron-down"
+              size="sm"
               className={cn(
-                'size-icon-glyph-sm shrink-0 text-muted-foreground transition-transform',
+                'shrink-0 text-muted-foreground transition-transform',
                 open && 'rotate-180',
               )}
             />

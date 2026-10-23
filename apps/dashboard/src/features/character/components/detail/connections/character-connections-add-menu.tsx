@@ -1,5 +1,3 @@
-import { ChevronDown } from 'lucide-react'
-
 import {
   ActionButton,
   Icon,
@@ -31,7 +29,7 @@ export function CharacterConnectionsAddMenu({
       <DropdownMenuTrigger asChild>
         <ActionButton type="button" variant="outline" size="sm" action="add" disabled={disabled}>
           Add connection
-          <ChevronDown className="size-4" aria-hidden />
+          <Icon name="chevron-down" size="lg" />
         </ActionButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

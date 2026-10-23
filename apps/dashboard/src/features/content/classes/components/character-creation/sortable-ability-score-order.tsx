@@ -17,14 +17,13 @@ import {
 } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical } from 'lucide-react'
 import {
   ABILITY_ENTRIES,
   type Ability,
   type AbilityScoreOrder,
   type StandardArray,
 } from '@rpg/contracts'
-import { dragHandleVariants } from '@rpg/ui'
+import { dragHandleVariants, Icon } from '@rpg/ui'
 
 import { EntityCard } from '@/features/content'
 import { resolveSortableArrayMove } from '../../../lib/utils/sortable-array-move.lib'
@@ -89,7 +88,7 @@ function SortableAbilityScoreOrderRow({
                     {...attributes}
                     {...listeners}
                   >
-                    <GripVertical className="size-3.5" aria-hidden />
+                    <Icon name="grip-vertical" size="md" />
                   </button>
                 ),
               }

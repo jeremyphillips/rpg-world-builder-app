@@ -49,8 +49,8 @@ export const dropTargetSurfaceVariants = cva(
 export const dropTargetIconVariants = cva('', {
   variants: {
     density: {
-      compact: 'size-8',
-      comfortable: 'size-10',
+      compact: '',
+      comfortable: '',
     },
     state: {
       idle: 'text-muted-foreground',

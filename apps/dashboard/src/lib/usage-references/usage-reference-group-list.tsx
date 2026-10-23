@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Button, InlineMetadata, Text } from '@rpg/ui'
-import { ChevronDown } from 'lucide-react'
+import { Button, Icon, InlineMetadata, Text } from '@rpg/ui'
 import type { VocabularyUsageReference } from '@rpg/contracts'
 
 import { UsageReferenceRow } from './usage-reference-row'
@@ -93,9 +92,10 @@ export function UsageReferenceGroupList({
                 }
               >
                 {expanded ? 'Hide' : 'Show'}
-                <ChevronDown
-                  aria-hidden
-                  className={`size-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
+                <Icon
+                  name="chevron-down"
+                  size="lg"
+                  className={`transition-transform ${expanded ? 'rotate-180' : ''}`}
                 />
               </Button>
             </div>

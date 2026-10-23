@@ -1,4 +1,4 @@
-import { CircleSlash } from 'lucide-react'
+import { Icon } from './icon/icon'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
@@ -111,8 +111,9 @@ function FieldGroupSummaryStatusRow({
       {status.indicator === 'inactive' ? (
         <InlineMetadata.Item className={fieldGroupSummaryStatusLabelItemClasses(tone)}>
           <span className="inline-flex items-center gap-1.5">
-            <CircleSlash
-              aria-hidden
+            <Icon
+              name="circle-slash"
+              size="md"
               className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'inactive', tone })}
             />
             <span>{status.label}</span>

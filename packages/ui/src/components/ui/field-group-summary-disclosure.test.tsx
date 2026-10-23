@@ -195,7 +195,7 @@ describe('FieldGroup inline disclosure', () => {
     expect(secondary).not.toHaveClass('text-semantic-warning')
 
     expect(screen.getByText('DM only')).toBeInTheDocument()
-    expect(container.querySelector('[aria-hidden].lucide-circle-slash')).toBeInTheDocument()
+    expect(container.querySelector('[data-icon="circle-slash"]')).toBeInTheDocument()
   })
 
   it('marks decorative status indicators as aria-hidden', () => {

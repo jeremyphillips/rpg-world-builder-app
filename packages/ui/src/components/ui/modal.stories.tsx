@@ -1,3 +1,4 @@
+import { Icon } from './icon/icon'
 import { useState } from 'react'
 import { action } from 'storybook/actions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -5,7 +6,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Modal } from './modal.client'
 import { Button } from './button.client'
 import { IconContainer } from './icon-container.client'
-import { BookOpen } from 'lucide-react'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { Input } from './input.client'
 import { DialogPanelScrollRegion } from './dialog-panel-scroll-region.client'
@@ -59,7 +59,7 @@ export const LeadIcon: Story = {
         <Modal.Header
           leadIcon={
             <IconContainer size="md">
-              <BookOpen aria-hidden />
+              <Icon name="book-open" size="2xl" />
             </IconContainer>
           }
           headline="Edit spellbook acquisition"

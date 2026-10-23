@@ -1,6 +1,5 @@
+import { Icon } from './icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Ellipsis } from 'lucide-react'
-
 import { Badge } from './badge'
 import { Button } from './button.client'
 import { Heading } from './heading'
@@ -77,7 +76,7 @@ export const WithMediaAndOverlapMark: Story = {
       }
       actions={
         <Button type="button" variant="outline" size="icon" aria-label="Open actions">
-          <Ellipsis aria-hidden />
+          <Icon name="ellipsis" size="2xl" />
         </Button>
       }
       meta={

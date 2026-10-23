@@ -1,6 +1,5 @@
+import { Icon } from './icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Check } from 'lucide-react'
-
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { ComboboxOptionRow } from './combobox-option-row.client'
 import { InteractiveList } from './interactive-list.client'
@@ -43,7 +42,7 @@ export const RowStates: Story = {
             classification="Spell"
             supporting="Level 1 · Evocation"
             selected
-            endSlot={<Check className="size-4 shrink-0" aria-hidden />}
+            endSlot={<Icon name="check" size="lg" className="shrink-0" />}
             onSelect={() => {}}
           />
         </InteractiveList>

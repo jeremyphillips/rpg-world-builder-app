@@ -1,8 +1,7 @@
 'use client'
 
-import { Minus, Plus } from 'lucide-react'
-
 import { Button, type ButtonProps } from './button.client'
+import { Icon } from './icon/icon'
 
 /** Flip to hide plus/minus glyphs on every picker row action. */
 export const CATALOG_PICKER_ROW_ACTION_ICONS = true
@@ -30,7 +29,7 @@ export function CatalogPickerActionButton({
   className,
   tabIndex,
 }: CatalogPickerActionButtonProps) {
-  const Icon = intent === 'remove' ? Minus : Plus
+  const iconName = intent === 'remove' ? 'minus' : 'plus'
 
   return (
     <Button
@@ -43,7 +42,7 @@ export function CatalogPickerActionButton({
       tabIndex={tabIndex}
       onClick={onClick}
     >
-      {CATALOG_PICKER_ROW_ACTION_ICONS ? <Icon aria-hidden /> : null}
+      {CATALOG_PICKER_ROW_ACTION_ICONS ? <Icon name={iconName} size="owner" /> : null}
       {children}
     </Button>
   )
