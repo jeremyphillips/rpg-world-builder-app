@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { COMPACT_MEDIA_FIELD_PRESENTATION } from '../lib/media-field-config'
 import { DetailMediaField } from './detail-media-field'
 
-vi.mock('./media-manager', () => ({
+vi.mock('./media-manager/media-manager', () => ({
   MediaManager: ({ open }: { open: boolean }) =>
     open ? <div role="dialog">Media manager</div> : null,
 }))

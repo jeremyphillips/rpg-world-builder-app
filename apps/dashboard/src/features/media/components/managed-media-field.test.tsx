@@ -11,7 +11,7 @@ const mediaManagerMock = vi.hoisted(() => ({
   props: undefined as MediaManagerProps | undefined,
 }))
 
-vi.mock('./media-manager', () => ({
+vi.mock('./media-manager/media-manager', () => ({
   MediaManager: (props: MediaManagerProps) => {
     mediaManagerMock.props = props
     return null

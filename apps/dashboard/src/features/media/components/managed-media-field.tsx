@@ -12,7 +12,7 @@ import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } fro
 import { buildMediaFieldSummaryModel } from '../lib/build-media-field-summary-model'
 import { resolveMediaFieldCapacity, type MediaFieldConfig } from '../lib/media-field-config'
 import type { MediaManagerContentContext } from '../lib/media-manager.types'
-import { MediaManager } from './media-manager'
+import { MediaManager } from './media-manager/media-manager'
 
 const MEDIA_FIELD_ADD_IMAGES_LABEL = 'Add images'
 const MEDIA_FIELD_MANAGE_LABEL = 'Manage'
