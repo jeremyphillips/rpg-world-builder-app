@@ -71,11 +71,21 @@ describe('entity card surface contract', () => {
         },
         {
           modifierPrefix: 'dash-entity-card__body--disclosure-wash',
-          requiredProperties: ['border-top', 'background-color', '--surface-current'],
+          requiredProperties: [
+            'border-top-width',
+            'border-top-style',
+            'background-color',
+            '--surface-current',
+          ],
         },
         {
           modifierPrefix: 'dash-entity-card__body--catalog-wash',
-          requiredProperties: ['border-top', 'background-color', '--surface-current'],
+          requiredProperties: [
+            'border-top-width',
+            'border-top-style',
+            'background-color',
+            '--surface-current',
+          ],
         },
       ],
     })

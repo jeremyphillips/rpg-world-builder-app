@@ -37,7 +37,9 @@ describe('optionCard surface establishment', () => {
       expect(classes).not.toContain('bg-surface-muted')
     }
     expect(radioCardCss).toContain('ui-option-card__embedded--in-flow')
-    expect(radioCardCss).toContain('border-top: 1px solid var(--border)')
+    expect(radioCardCss).toContain('border-top-width: 1px')
+    expect(radioCardCss).toContain('border-top-style: solid')
+    expect(radioCardCss).not.toContain('var(--border')
   })
 
   it('leaves card body padding on ui-card and ui-radio-card', () => {
@@ -48,8 +50,12 @@ describe('optionCard surface establishment', () => {
   })
 
   it('derives in-flow embedded inset from the control size and column gap', () => {
-    expect(optionCardEmbeddedSlotClassName('divider')).toBe('ui-option-card__embedded--in-flow')
-    expect(optionCardEmbeddedSlotClassName('panel')).toBe('ui-option-card__embedded--panel')
+    expect(optionCardEmbeddedSlotClassName('divider')).toBe(
+      'ui-option-card__embedded--in-flow ui-border--default',
+    )
+    expect(optionCardEmbeddedSlotClassName('panel')).toBe(
+      'ui-option-card__embedded--panel ui-border--default',
+    )
     expect(radioCardCss).toContain('var(--control-choice-indicator-size-lg) + (var(--spacing) * 4)')
     expect(radioCardCss).toContain('var(--control-choice-indicator-size-sm) + (var(--spacing) * 3)')
     expect(radioCardCss).toContain('padding-inline-start:')

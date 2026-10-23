@@ -145,6 +145,8 @@ describe('EntityRowList divider mechanics', () => {
     expect(root).toHaveClass('dash-entity-row-list')
     const groups = container.querySelectorAll('[data-slot="entity-row-list-group"]')
     expect(groups).toHaveLength(2)
+    expect(groups[0]).toHaveClass('ui-border--subtle')
+    expect(groups[1]).toHaveClass('ui-border--subtle')
     expect(groups[0]?.nextElementSibling).toBe(groups[1])
   })
 

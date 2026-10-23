@@ -139,6 +139,25 @@ For labeled footer or Alert action controls, pass explicit `size` from `resolveS
 
 Heading-line badge accessories use a parallel ladder with `Badge` sizes — see [row-anatomy.md](./row-anatomy.md#heading-accessories). Form submit footers, icon-only controls, and footers with caller-chosen sizes are out of scope for this resolver.
 
+## Surface-relative borders
+
+Neutral border color has one recipe: `ui-border--subtle`, `ui-border--default`, and `ui-border--strong` ([border ladder](./design-tokens.md#border-ladder)). Each class mixes on the element’s `--surface-current` and publishes `--ui-border-color`. Width, style, side, and radius stay on the component. JSX one-offs use the Tailwind utilities (`border-border`, `border-border-subtle`), which mix on the element the same way. Do not add a second recipe.
+
+**Contrast reference**
+
+- Perimeter of a painted plane: that plane. Set `--surface-current` to the fill on the same element as the strength class.
+- Line on a transparent child (table body row, entity row-list group): the inherited parent plane. Do not give the child a new surface.
+- Shared grid line over a state wash (row hover, selected, unavailable): the table plane, not the wash. Do not rebind `--surface-current` on those states.
+- A cell that paints its own fill (header select and actions) uses that fill even when the body cell in the same column uses the table plane.
+
+`var(--border*)` is legitimate only as the `:root` alias and the `*` safety net in `globals.css`. It is not legitimate in component rules.
+
+Component CSS must not set `border-color`, or a `border` shorthand that includes a color, on an element that also has `ui-border--*`. A later file of equal specificity would replace the strength color. State colors (primary selected, status tones) may override `--ui-border-color` or `border-color` in a more specific rule. That is the card selected pattern. When another owner already sets `border-color` on that element (interactive row defaults to transparent), keep the edge with a more specific side longhand of `var(--ui-border-color)`. That is the data-table body separator.
+
+When a component already owns `border-color` through its own variable (inactive interactive row), point that variable at `var(--ui-border-color)` and put the strength class on the element. Do not assign `var(--border-subtle)`.
+
+Header and body segments of one vertical rule may differ by a mix step because their fills differ. DataTable still owns bands. Filter region and utility bar still own their chrome. `DataTableFilterChrome` still owns filter presentation.
+
 ## Exception policy
 
 An exception gets a one-line comment at the implementation, or a note in the component's doc, explaining why the surface is unique. While [semantic-css-migration.md](./semantic-css-migration.md) exists, classified exceptions are also recorded there. Do not copy that inventory into this document.

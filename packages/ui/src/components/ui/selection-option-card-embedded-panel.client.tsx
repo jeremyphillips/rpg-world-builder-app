@@ -3,6 +3,7 @@
 import type { ElementType, ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 
 const OPTION_CARD_SUPPORTING_CLASS = 'ui-copy-supporting text-muted-foreground'
 
@@ -72,7 +73,7 @@ export function SelectionOptionCardEmbeddedPanelRow({
   className,
 }: SelectionOptionCardEmbeddedPanelRowProps) {
   return (
-    <li className={cn('ui-option-card-embedded-panel__row', className)}>
+    <li className={cn('ui-option-card-embedded-panel__row', borderStrength('subtle'), className)}>
       <span className="ui-option-card-embedded-panel__row-label ui-copy-supporting">{label}</span>
       <span className="ui-option-card-embedded-panel__row-controls">{children}</span>
     </li>

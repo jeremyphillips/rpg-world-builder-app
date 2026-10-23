@@ -13,6 +13,7 @@ describe('popoverContentVariants', () => {
     expect(popoverContentVariants({ tone: 'tooltip' })).toContain('ui-popover-content--tooltip')
     expect(popoverContentVariants({ tone: 'filter' })).toContain('ui-popover-content--filter')
     expect(popoverContentVariants()).toContain('ui-popover-content--popover')
+    expect(popoverContentVariants()).toContain('ui-border--default')
   })
 })
 

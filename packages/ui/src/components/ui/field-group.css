@@ -173,14 +173,15 @@
     min-width: 1px;
     flex-shrink: 0;
     align-self: stretch;
+    border-width: 0;
   }
 
   .ui-field-group__divider--primary {
-    background-color: var(--border);
+    background-color: var(--ui-border-color);
   }
 
   .ui-field-group__divider--subtle {
-    background-color: var(--border-subtle);
+    background-color: var(--ui-border-color);
   }
 
   /* --- Segment shells --- */

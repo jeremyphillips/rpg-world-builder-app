@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom'
+import { boundedScrollRegionClasses, cn } from '@rpg/ui'
 
 import { CampaignSidebarChrome, CampaignSidebarNavSections } from './campaign-sidebar-nav'
 import { GlobalSidebarNav } from './global-sidebar-nav'
@@ -16,7 +17,7 @@ export function SidebarNav() {
         </div>
       ) : null}
       <nav
-        className="scrollbar-slim flex min-h-0 flex-1 flex-col overflow-y-auto px-3 pb-4"
+        className={cn('flex min-h-0 flex-1 flex-col ps-3 pb-4', boundedScrollRegionClasses)}
         aria-label="Primary"
       >
         {scope.kind === 'campaign' ? (

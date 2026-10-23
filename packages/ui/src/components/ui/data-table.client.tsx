@@ -46,6 +46,7 @@ import { ArrowUpDown, Check, ChevronDown, ChevronUp, X } from 'lucide-react'
 import { ActionIcon } from './action-icon.client'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { Button } from './button.client'
 import { Checkbox } from './checkbox.client'
 import {
@@ -906,7 +907,7 @@ export function DataTable<TData>({
       )}
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id} className="ui-data-table__header-row">
+          <tr key={headerGroup.id} className={cn('ui-data-table__header-row', borderStrength())}>
             {headerGroup.headers.map((header) => {
               const sorted = header.column.getIsSorted()
               const canSort = header.column.getCanSort()
@@ -944,6 +945,7 @@ export function DataTable<TData>({
               key={row.id}
               className={cn(
                 'ui-data-table__row',
+                borderStrength('subtle'),
                 interactiveRowVariants({
                   interaction: 'hoverable',
                   selectedData: 'selected',
@@ -989,14 +991,14 @@ export function DataTable<TData>({
   return (
     <div className="flex w-full flex-col gap-3">
       {utilityStrip ? (
-        <div className="ui-data-table__table-wrap">
+        <div className={cn('ui-data-table__table-wrap', borderStrength())}>
           <div className="w-full">{utilityStrip(utilityControls)}</div>
           {tableElement}
         </div>
       ) : (
         <>
           <DataTableToolbar table={table} onColumnChange={onColumnChange} />
-          <div className="ui-data-table__table-wrap">{tableElement}</div>
+          <div className={cn('ui-data-table__table-wrap', borderStrength())}>{tableElement}</div>
         </>
       )}
 

@@ -50,6 +50,7 @@ describe('interactiveRowVariants', () => {
     expect(interactiveRowVariants({ state: 'inactive' })).toContain(
       'ui-interactive-row--state-inactive',
     )
+    expect(interactiveRowVariants({ state: 'inactive' })).toContain('ui-border--subtle')
   })
 
   it('applies pointer cursor when the row is an explicit hit target', () => {

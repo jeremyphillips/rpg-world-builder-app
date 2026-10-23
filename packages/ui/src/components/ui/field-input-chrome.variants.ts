@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { UI_FIELD_CONTROL_BLOCK_CLASS } from './field-control.styles'
 import {
   UI_FIELD_GROUP_BLOCK_CLASS,
@@ -44,8 +45,8 @@ export const fieldGroupedDividerBaseClasses = 'ui-field-group__divider'
 export const groupedDividerVariants = cva(fieldGroupedDividerBaseClasses, {
   variants: {
     strength: {
-      primary: UI_FIELD_GROUP_DIVIDER_PRIMARY_CLASS,
-      subtle: UI_FIELD_GROUP_DIVIDER_SUBTLE_CLASS,
+      primary: cn(UI_FIELD_GROUP_DIVIDER_PRIMARY_CLASS, borderStrength()),
+      subtle: cn(UI_FIELD_GROUP_DIVIDER_SUBTLE_CLASS, borderStrength('subtle')),
     },
   },
   defaultVariants: {

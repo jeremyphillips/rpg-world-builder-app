@@ -100,7 +100,6 @@ describe('MasterDetailListPanel', () => {
             id: 'a',
             title: 'Legacy Option',
             meta: { eyebrow: 'Level 5', sourceLabel: 'System' },
-            active: false,
             availabilityStatusLabel: 'Unavailable',
           },
         ]}

@@ -40,14 +40,18 @@ describe('dataTableWidthMeta', () => {
     const meta = dataTableWidthMeta('actions')
     expect(meta.headerClassName).toContain('ui-data-table__actions')
     expect(meta.headerClassName).toContain('ui-data-table__head')
+    expect(meta.headerClassName).toContain('ui-border--default')
     expect(meta.cellClassName).toContain('ui-data-table__actions')
+    expect(meta.cellClassName).toContain('ui-border--default')
   })
 
   it('sizes select column for checkbox control and centers it', () => {
     const meta = dataTableWidthMeta('select')
     expect(dataTableColumnWidths.select).toContain('w-10')
     expect(meta.headerClassName).toContain('ui-data-table__select')
+    expect(meta.headerClassName).toContain('ui-border--default')
     expect(meta.cellClassName).toContain('ui-data-table__select')
+    expect(meta.cellClassName).toContain('ui-border--default')
   })
 
   it('includes compact center alignment preset', () => {

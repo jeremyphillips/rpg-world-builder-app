@@ -6,6 +6,7 @@
   .dash-entity-row-list
     > [data-slot='entity-row-list-group']
     + [data-slot='entity-row-list-group'] {
-    border-top: 1px solid var(--border-subtle);
+    border-top-width: 1px;
+    border-top-style: solid;
   }
 }

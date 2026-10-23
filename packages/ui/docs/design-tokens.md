@@ -108,7 +108,8 @@ Status borders stay status-specific (`border-destructive-muted`, …). Recipe bo
 
 The base `*` rule sets `border-color: var(--border)` as a **structural safety net** only.
 Components with semantic border ownership must set an explicit strength class — do not rely
-on the fallback as SSOT.
+on the fallback as SSOT. Which plane that mix uses is the contrast reference in
+[ui-architecture.md](./ui-architecture.md#surface-relative-borders).
 
 ## Interaction recipes
 

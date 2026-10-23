@@ -32,8 +32,6 @@ export type MasterDetailListItem = {
   issueCount?: number
   /** When true, surfaces a validation error indicator on the row. */
   hasError?: boolean
-  /** When false, row uses inactive styling. Defaults to `true`. */
-  active?: boolean
   /** When false, detail overflow hides delete. Not shown on list rows. */
   deletable?: boolean
   /** Broad campaign availability label rendered below the title when unavailable. */

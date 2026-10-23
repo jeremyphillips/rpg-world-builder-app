@@ -26,9 +26,6 @@ import {
 } from './content-detail-layout.types'
 import type { ContentMediaImageFrame } from '@/features/media'
 
-/** Shared hero eyebrow spacing for catalog detail and vocabulary surfaces. */
-export const contentDetailHeroEyebrowClasses = 'mb-1'
-
 function contentDetailHeroGridClasses(
   presentation: ContentDetailHeroMediaPresentation = DEFAULT_CONTENT_DETAIL_HERO_MEDIA_PRESENTATION,
 ): string {
@@ -168,7 +165,7 @@ export function ContentDetailLayout({
         <CardContent className="py-4 pr-4 pb-4 pl-6">
           <div className={contentDetailHeroGridClasses(mediaPresentation)}>
             <div className="flex min-w-0 flex-1 flex-col">
-              <Eyebrow size="sm" tone="muted" className={contentDetailHeroEyebrowClasses}>
+              <Eyebrow size="sm" tone="muted" className="mb-1">
                 {resolvedClassificationLabel}
               </Eyebrow>
               <div className="flex flex-wrap items-center gap-3">

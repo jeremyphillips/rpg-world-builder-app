@@ -170,7 +170,8 @@
     align-items: center;
     justify-content: space-between;
     gap: calc(var(--spacing) * 3);
-    border-top: 1px solid var(--border-subtle);
+    border-top-width: 1px;
+    border-top-style: solid;
     padding-block: calc(var(--spacing) * 1.5);
   }
 
@@ -222,7 +223,8 @@
 
   /* In-flow embedded slot. Indent is the card control column: indicator + anatomy gap. */
   .ui-option-card__embedded--in-flow {
-    border-top: 1px solid var(--border);
+    border-top-width: 1px;
+    border-top-style: solid;
     margin-top: calc(var(--spacing) * 4);
     padding-top: calc(var(--spacing) * 4);
     padding-inline-start: calc(var(--control-choice-indicator-size-lg) + (var(--spacing) * 4));
@@ -237,7 +239,8 @@
 
   /* Panel tone breaks out to the card edge. No control-column indent. */
   .ui-option-card__embedded--panel {
-    border-top: 1px solid var(--border);
+    border-top-width: 1px;
+    border-top-style: solid;
     margin-top: calc(var(--spacing) * 4);
     margin-inline: calc(var(--spacing) * -5);
     margin-bottom: calc(var(--spacing) * -3);

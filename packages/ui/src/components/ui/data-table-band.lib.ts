@@ -26,14 +26,14 @@ export type DataTableClassSpec = {
 export const DATA_TABLE_CLASS_SPECS: DataTableClassSpec[] = [
   {
     key: 'table-wrap',
-    className: 'ui-data-table__table-wrap',
-    keyValues: 'bg --background, --ui-surface-bg',
+    className: 'ui-data-table__table-wrap ui-border--default',
+    keyValues: 'bg --background, --surface-current --background, ui-border--default',
     useCase: 'Card plane around the grid.',
   },
   {
     key: 'header-row',
-    className: 'ui-data-table__header-row',
-    keyValues: 'bg --surface-strong, border --border',
+    className: 'ui-data-table__header-row ui-border--default',
+    keyValues: 'bg --surface-strong, --surface-current --surface-strong, ui-border--default',
     useCase: 'Header band; not an interactive row.',
   },
   {
@@ -44,8 +44,8 @@ export const DATA_TABLE_CLASS_SPECS: DataTableClassSpec[] = [
   },
   {
     key: 'row',
-    className: 'ui-data-table__row ui-interactive-row',
-    keyValues: '--ui-data-table-row-bg',
+    className: 'ui-data-table__row ui-interactive-row ui-border--subtle',
+    keyValues: '--ui-data-table-row-bg, ui-border--subtle',
     useCase: 'Body row; composes interactive row once.',
   },
   {
@@ -74,14 +74,14 @@ export const DATA_TABLE_CLASS_SPECS: DataTableClassSpec[] = [
   },
   {
     key: 'select',
-    className: 'ui-data-table__select',
-    keyValues: 'width 2.5rem, checkbox column',
+    className: 'ui-data-table__select ui-border--default',
+    keyValues: 'width 2.5rem, checkbox column, ui-border--default',
     useCase: 'Row selection column.',
   },
   {
     key: 'actions',
-    className: 'ui-data-table__actions',
-    keyValues: 'sticky end, --ui-data-table-row-bg on body',
+    className: 'ui-data-table__actions ui-border--default',
+    keyValues: 'sticky end, --ui-data-table-row-bg on body, ui-border--default',
     useCase: 'Trailing actions column.',
   },
   {

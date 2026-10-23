@@ -7,6 +7,7 @@ import { Badge } from './badge'
 import { iconGlyphRootClasses } from './icon-glyph.variants'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import { filterBarVariants } from '../../filters/filter-bar.variants'
 
 export type DataTableFilterRegionLabels = {
@@ -49,7 +50,7 @@ export function DataTableFilterRegion({
   const showActiveBadge = activeAdditionalFilterCount > 0
 
   return (
-    <div className={cn('ui-data-table__filter-region', className)}>
+    <div className={cn('ui-data-table__filter-region', borderStrength(), className)}>
       <div className={cn('min-w-0', hasAdditionalFilters && 'border-b border-border pb-3')}>
         {primaryFilters}
       </div>

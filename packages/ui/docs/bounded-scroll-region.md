@@ -29,6 +29,7 @@ across overlay scrollbar platforms.
 | [`PreviewRail` scroll region](../src/components/preview-rail/preview-rail.client.tsx)   | `min-h-0 flex-1` via [`ScrollBoundaryRegion`](../src/components/ui/scroll-boundary-region.client.tsx) |
 | [`FormStickyScrollBody`](../src/form/chrome/form-sticky-scroll-body.client.tsx)         | clip slot (`form-scroll-body-container`, `overflow-hidden`) + inner scroller                          |
 | [`formStickyScrollBodyScrollerClasses`](../src/form/chrome/form-chrome.variants.ts)     | inner scroller — `overflow-y-auto`, end-of-scroll padding                                             |
+| Dashboard `SidebarNav` primary `<nav>`                                                  | `ps-3 pb-4` plus local `min-h-0 flex-1`; the primitive owns scroll and the end inset                  |
 
 ## Environmental bottom inset
 
@@ -71,5 +72,5 @@ Storybook: **Primitives/ScrollBoundaryRegion**.
 
 ## Follow-up adopters
 
-Sidebar nav, messages workspace panes, and character-builder columns still use ad
-hoc `scrollbar-slim` — migrate to the primitive when touching those surfaces.
+Messages workspace panes and character-builder columns still use ad hoc `scrollbar-slim` —
+migrate to the primitive when touching those surfaces.

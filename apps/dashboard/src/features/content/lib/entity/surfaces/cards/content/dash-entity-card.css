@@ -23,14 +23,16 @@
   }
 
   .dash-entity-card__body--disclosure-wash {
-    border-top: 1px solid var(--border-subtle);
+    border-top-width: 1px;
+    border-top-style: solid;
     padding-block: calc(var(--spacing) * 3);
     background-color: var(--background);
     --surface-current: var(--background);
   }
 
   .dash-entity-card__body--catalog-wash {
-    border-top: 1px solid var(--border-subtle);
+    border-top-width: 1px;
+    border-top-style: solid;
     padding-block: calc(var(--spacing) * 3);
     background-color: var(--surface-subtle);
     --surface-current: var(--surface-subtle);

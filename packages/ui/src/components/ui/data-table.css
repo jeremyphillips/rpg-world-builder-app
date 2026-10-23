@@ -3,10 +3,12 @@
   .ui-data-table__table-wrap {
     overflow: hidden;
     border-radius: var(--radius-card);
-    border: 1px solid var(--border);
+    border-width: 1px;
+    border-style: solid;
     background-color: var(--background);
     color: var(--foreground);
     box-shadow: var(--shadow-surface-raised);
+    --surface-current: var(--background);
   }
 
   .ui-data-table__table {
@@ -36,7 +38,8 @@
     flex-direction: column;
     gap: calc(var(--spacing) * 3);
     border-radius: var(--radius-md);
-    border: 1px solid var(--border);
+    border-width: 1px;
+    border-style: solid;
     background-color: var(--surface-subtle);
     padding: calc(var(--spacing) * 3);
     --surface-current: var(--surface-subtle);
@@ -57,7 +60,8 @@
     align-items: center;
     gap: calc(var(--spacing) * 2);
     min-height: calc(var(--spacing) * 9);
-    border-bottom: 1px solid var(--border);
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
     background-color: var(--surface-subtle);
     padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
     --surface-current: var(--surface-subtle);
@@ -66,8 +70,10 @@
   /* --- Header band (not an interactive row) --- */
 
   .ui-data-table__header-row {
-    border-bottom: 1px solid var(--border);
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
     background-color: var(--surface-strong);
+    --surface-current: var(--surface-strong);
   }
 
   .ui-data-table__header-row:hover,
@@ -94,9 +100,12 @@
 
   /* --- Body row — one background variable for row + sticky actions --- */
 
+  /* Interactive row owns border-color (transparent by default). The separator reads the strength variable. */
   .ui-data-table__row.ui-interactive-row {
     min-height: 3.5rem;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--ui-border-color);
     --ui-data-table-row-bg: transparent;
     background-color: var(--ui-data-table-row-bg);
   }
@@ -154,13 +163,15 @@
     width: 2.5rem;
     max-width: 2.5rem;
     flex-shrink: 0;
-    border-inline-end: 1px solid var(--border);
+    border-inline-end-width: 1px;
+    border-inline-end-style: solid;
     padding-inline-start: 0.75rem;
     text-align: center;
   }
 
   .ui-data-table__select:is(th) {
     background-color: var(--surface-strong);
+    --surface-current: var(--surface-strong);
   }
 
   .ui-data-table__select:has([role='checkbox']) {
@@ -180,7 +191,8 @@
     flex-shrink: 0;
     position: sticky;
     inset-inline-end: 0;
-    border-inline-start: 1px solid var(--border);
+    border-inline-start-width: 1px;
+    border-inline-start-style: solid;
     padding-inline: 0.25rem;
     text-align: center;
     background-color: var(--ui-data-table-row-bg, transparent);
@@ -189,6 +201,7 @@
   .ui-data-table__actions:is(th) {
     z-index: 20;
     background-color: var(--surface-strong);
+    --surface-current: var(--surface-strong);
   }
 
   .ui-data-table__actions:is(td) {

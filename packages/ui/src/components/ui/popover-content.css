@@ -8,7 +8,8 @@
     z-index: 50;
     overflow: hidden;
     border-radius: var(--radius-md);
-    border: 1px solid var(--border);
+    border-width: 1px;
+    border-style: solid;
     color: var(--foreground);
     outline: none;
   }

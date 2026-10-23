@@ -1,4 +1,5 @@
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 
 export type OptionCardEmbeddedSlotTone = 'divider' | 'panel'
 
@@ -17,5 +18,7 @@ export function selectionOptionCardAnatomyClassName({
 export function optionCardEmbeddedSlotClassName(
   tone: OptionCardEmbeddedSlotTone = 'divider',
 ): string {
-  return tone === 'panel' ? 'ui-option-card__embedded--panel' : 'ui-option-card__embedded--in-flow'
+  return tone === 'panel'
+    ? cn('ui-option-card__embedded--panel', borderStrength())
+    : cn('ui-option-card__embedded--in-flow', borderStrength())
 }

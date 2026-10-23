@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ActionButton, Eyebrow, Text, cn } from '@rpg/ui'
+import { ActionButton, Eyebrow, Text, borderStrength, cn } from '@rpg/ui'
 
 import {
   detailCollectionGroupHeaderVariants,
@@ -170,6 +170,8 @@ export type EntityRowListGroupProps = {
   children?: ReactNode
 }
 
+const entityRowListGroupClassName = cn('border-b-0 px-4 py-2', borderStrength('subtle'))
+
 export function EntityRowListGroup({
   label,
   itemCount,
@@ -182,7 +184,7 @@ export function EntityRowListGroup({
 
   if (itemCount === 0) {
     return (
-      <div data-slot="entity-row-list-group" className="border-b-0 px-4 py-2">
+      <div data-slot="entity-row-list-group" className={entityRowListGroupClassName}>
         {showHeader ? (
           <div
             className={detailCollectionGroupHeaderVariants()}
@@ -198,7 +200,7 @@ export function EntityRowListGroup({
   }
 
   return (
-    <div data-slot="entity-row-list-group" className="border-b-0 px-4 py-2">
+    <div data-slot="entity-row-list-group" className={entityRowListGroupClassName}>
       {showHeader ? (
         <div
           className={detailCollectionGroupHeaderVariants()}

@@ -85,7 +85,7 @@
     opacity: 1;
     pointer-events: auto;
     --ui-row-border-style: dashed;
-    --ui-row-state-border: var(--border-subtle);
+    --ui-row-state-border: var(--ui-border-color);
   }
 
   .ui-interactive-row--state-disabled {

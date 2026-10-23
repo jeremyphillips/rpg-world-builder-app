@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 import {
   UI_INTERACTIVE_ROW_BLOCK_CLASS,
   UI_INTERACTIVE_ROW_DATA_CLASS,
@@ -51,7 +52,7 @@ export const interactiveRowVariants = cva(UI_INTERACTIVE_ROW_BLOCK_CLASS, {
     },
     state: {
       default: UI_INTERACTIVE_ROW_STATE_CLASS.default,
-      inactive: UI_INTERACTIVE_ROW_STATE_CLASS.inactive,
+      inactive: cn(UI_INTERACTIVE_ROW_STATE_CLASS.inactive, borderStrength('subtle')),
       disabled: UI_INTERACTIVE_ROW_STATE_CLASS.disabled,
     },
     selected: {

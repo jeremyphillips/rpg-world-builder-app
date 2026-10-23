@@ -14,7 +14,9 @@ describe('dash-entity-row-list CSS', () => {
       ".dash-entity-row-list > [data-slot='entity-row-list-group'] + [data-slot='entity-row-list-group']",
     )
     const rule = css.slice(css.indexOf('.dash-entity-row-list'))
-    expect(rule).toContain('border-top: 1px solid var(--border-subtle)')
+    expect(rule).toContain('border-top-width: 1px')
+    expect(rule).toContain('border-top-style: solid')
+    expect(rule).not.toContain('var(--border')
     expect(rule).not.toMatch(/margin|padding/)
   })
 })

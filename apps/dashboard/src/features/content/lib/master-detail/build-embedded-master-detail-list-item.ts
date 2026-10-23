@@ -47,6 +47,5 @@ export function buildEmbeddedMasterDetailListItem({
     deletable: showDelete && rowMeta.deletable,
     issueCount,
     hasError: issueCount > 0,
-    active: rowMeta.availability.status === 'active',
   }
 }

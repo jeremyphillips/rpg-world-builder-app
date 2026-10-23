@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
+import { borderStrength } from './border-strength'
 
 export type DataTableUtilityBarProps = {
   summary?: ReactNode
@@ -38,7 +39,7 @@ export function DataTableUtilityBar({
         <div className="ui-data-table__utility-summary text-style-supporting">{summary}</div>
       ) : null}
       {showActionsRow ? (
-        <div className="ui-data-table__utility-actions">
+        <div className={cn('ui-data-table__utility-actions', borderStrength())}>
           {hasRenderableContent(leadingActions) ? (
             <div
               className="flex min-w-0 flex-wrap items-center gap-2"

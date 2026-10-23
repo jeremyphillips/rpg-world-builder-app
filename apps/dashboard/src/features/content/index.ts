@@ -95,7 +95,6 @@ export type {
 } from './lib/entity/row-list/entity-row-list'
 export { DetailCollectionPanel } from './lib/detail/collection/panel/detail-collection-panel'
 export type { DetailCollectionPanelProps } from './lib/detail/collection/panel/detail-collection-panel'
-export { contentDetailHeroEyebrowClasses } from './lib/detail/page/content-detail-layout'
 export {
   ContentDetailSection,
   ContentDetailSectionItem,
