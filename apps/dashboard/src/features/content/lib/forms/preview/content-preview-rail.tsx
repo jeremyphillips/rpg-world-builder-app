@@ -248,7 +248,7 @@ function ContentPreviewRailView({
           <PreviewRail.Action
             label={CONTENT_PREVIEW_AS_PLAYER_LABEL}
             helperText={contentPreviewAsPlayerHelper(term)}
-            icon={<ActionIcon action="view" />}
+            icon={<ActionIcon action="view" size="lg" />}
             onClick={onPreviewAsPlayer}
           />
         ) : null}

@@ -205,7 +205,7 @@ export function TableBuilderColumns() {
             columnList
           )}
           <button type="button" className={tableBuilderAddActionClasses} onClick={handleAddColumn}>
-            <ActionIcon action="add" step="md" />
+            <ActionIcon action="add" size="md" />
             {TABLE_BUILDER_ADD_COLUMN_LABEL}
           </button>
         </div>

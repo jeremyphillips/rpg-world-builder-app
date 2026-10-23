@@ -64,7 +64,7 @@ export function CampaignOverviewInviteRow({ campaignId, invite }: CampaignOvervi
             {
               id: 'revoke',
               label: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokePending,
-              icon: <ActionIcon action="remove" />,
+              icon: <ActionIcon action="remove" size="lg" />,
               destructive: true,
               separatorBefore: true,
               disabled: isPending,

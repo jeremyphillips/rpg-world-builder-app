@@ -41,7 +41,7 @@ import {
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import { ArrowUpDown, Check, ChevronDown, ChevronUp, X } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 
 import { ActionIcon } from './action-icon.client'
 
@@ -49,6 +49,7 @@ import { cn } from '../../lib/utils'
 import { borderStrength } from './border-strength'
 import { Button } from './button.client'
 import { Checkbox } from './checkbox.client'
+import { Icon } from './icon/icon'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -314,19 +315,22 @@ export function SortableHeader<TData, TValue>({
 
   const sortIcon =
     sorted === 'asc' ? (
-      <ChevronUp
+      <Icon
+        name="chevron-up"
+        size="owner"
         className="ui-data-table__sort-icon ui-data-table__sort-icon--asc"
-        aria-hidden="true"
       />
     ) : sorted === 'desc' ? (
-      <ChevronDown
+      <Icon
+        name="chevron-down"
+        size="owner"
         className="ui-data-table__sort-icon ui-data-table__sort-icon--desc"
-        aria-hidden="true"
       />
     ) : (
-      <ArrowUpDown
+      <Icon
+        name="arrow-up-down"
+        size="owner"
         className="ui-data-table__sort-icon ui-data-table__sort-icon--idle"
-        aria-hidden="true"
       />
     )
 
@@ -544,7 +548,7 @@ export function RowActionsMenu({
           aria-label={triggerLabel}
           disabled={disabled}
         >
-          <ActionIcon action="overflowMenu" step="md" />
+          <ActionIcon action="overflowMenu" size="md" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className={contentClassName}>

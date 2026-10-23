@@ -70,7 +70,7 @@ export function SplitButton({
         onClick={onPrimaryClick}
         {...props}
       >
-        {showLeadingIcon ? <ActionIcon action="add" /> : null}
+        {showLeadingIcon ? <ActionIcon action="add" size="lg" /> : null}
         {label}
       </Button>
       {hasMenu ? (

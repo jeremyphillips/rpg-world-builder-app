@@ -67,7 +67,7 @@ export function CampaignOverviewHero({
             kind: 'action' as const,
             id: 'invite-member',
             label: 'Invite member',
-            icon: <ActionIcon action="invite" step="md" />,
+            icon: <ActionIcon action="invite" size="md" />,
             onSelect: onInviteMember,
           },
         ]

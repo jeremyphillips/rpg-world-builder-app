@@ -1,0 +1,20 @@
+/*
+ * Icon container glyph scale — matches the identity-frame fallback steps.
+ */
+@layer components {
+  .ui-icon-container--xs {
+    --icon-size: var(--icon-glyph-sm);
+  }
+
+  .ui-icon-container--sm {
+    --icon-size: var(--icon-glyph-lg);
+  }
+
+  .ui-icon-container--md {
+    --icon-size: var(--icon-glyph-2xl);
+  }
+
+  .ui-icon-container--inline {
+    --icon-size: var(--icon-glyph-xs);
+  }
+}

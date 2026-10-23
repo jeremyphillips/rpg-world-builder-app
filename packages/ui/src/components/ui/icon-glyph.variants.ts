@@ -1,5 +1,3 @@
-import { cn } from '../../lib/utils'
-
 export const ICON_GLYPH_STEPS = ['xs', 'sm', 'md', 'lg', '3xl'] as const
 export type IconGlyphStep = (typeof ICON_GLYPH_STEPS)[number]
 
@@ -35,23 +33,6 @@ export const iconGlyphSizeClasses = iconGlyphDescendantClasses
 
 /** Menu row icons — glyph lg only, no hit target */
 export const menuItemIconGlyphClasses = iconGlyphDescendantClasses.lg
-
-/** Compact label / badge leading icon slot */
-export function compactLabelIconGlyphClasses(size: 'sm' | 'md' | 'lg'): string {
-  const step: IconGlyphStep = size === 'sm' ? 'xs' : size === 'lg' ? 'md' : 'sm'
-  return iconGlyphDescendantClasses[step]
-}
-
-/** Chip selectable leading check — root Lucide class */
-export function chipLeadingIconGlyphClasses(size: 'sm' | 'md' | 'lg'): string {
-  const step: IconGlyphStep = size === 'sm' ? 'xs' : size === 'lg' ? 'md' : 'sm'
-  return iconGlyphRootClasses[step]
-}
-
-/** Badge icon slot wrapper */
-export function badgeIconGlyphClasses(size: 'sm' | 'md' | 'lg'): string {
-  return cn('inline-flex shrink-0 leading-none', compactLabelIconGlyphClasses(size))
-}
 
 /** Icon in inline flow. Size comes from the nearest typography owner's --icon-inline. */
 export const inlineIconTextClasses = 'inline-block shrink-0 align-middle size-icon-inline'

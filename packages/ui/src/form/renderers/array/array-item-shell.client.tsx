@@ -34,7 +34,7 @@ export function ArrayItemRemoveButton({
       aria-label={ariaLabel}
       onClick={onRemove}
     >
-      <ActionIcon action="remove" step="md" />
+      <ActionIcon action="remove" size="md" />
     </button>
   )
 }

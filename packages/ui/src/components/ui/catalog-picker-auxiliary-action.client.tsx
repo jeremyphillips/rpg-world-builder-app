@@ -35,7 +35,7 @@ export function CatalogPickerAuxiliaryActionSlot({
               density="compact"
               disabled={action.disabled}
             >
-              <ActionIcon action="add" />
+              <ActionIcon action="add" size="lg" />
               {action.label}
             </Button>
           </DropdownMenuTrigger>
@@ -60,7 +60,7 @@ export function CatalogPickerAuxiliaryActionSlot({
           disabled={action.disabled}
           onClick={action.onAction}
         >
-          <ActionIcon action="add" />
+          <ActionIcon action="add" size="lg" />
           {action.label}
         </Button>
       )}

@@ -8,7 +8,7 @@ const globalsPath = join(fileURLToPath(import.meta.url), '../../../styles/global
 
 function ownersBlock(css: string): string {
   const start = css.indexOf('@layer utilities {\n  .text-xs {')
-  const end = css.indexOf('@utility size-status-icon-slash-sm')
+  const end = css.indexOf('@utility bg-status-icon-idle')
   expect(start).toBeGreaterThan(-1)
   expect(end).toBeGreaterThan(start)
   return css.slice(start, end)

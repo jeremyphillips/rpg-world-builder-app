@@ -3,7 +3,7 @@ import type {
   CharacterRelationshipDraftEdge,
   CharacterRelationshipDraftEdges,
 } from '@rpg/contracts'
-import { ActionIcon, IconContainer, SplitButton } from '@rpg/ui'
+import { ActionIcon, Icon, IconContainer, SplitButton } from '@rpg/ui'
 
 import { DetailCollectionPanel, EntityRowList, type DetailOverflowAction } from '@/features/content'
 
@@ -51,7 +51,7 @@ function buildConnectionOverflowActions(input: {
         {
           id: 'edit',
           label: 'Edit relationship',
-          icon: <ActionIcon action="edit" />,
+          icon: <ActionIcon action="edit" size="lg" />,
           onSelect: () => input.onEditEdge(input.edge.id),
         },
       ]
@@ -62,7 +62,7 @@ function buildConnectionOverflowActions(input: {
     {
       id: 'view',
       label: 'View connected record',
-      icon: <ActionIcon action="view" />,
+      icon: <ActionIcon action="view" size="lg" />,
       disabled: !input.presentation.canViewRecord,
       onSelect: () => {
         if (input.presentation.headingHref) {
@@ -73,7 +73,7 @@ function buildConnectionOverflowActions(input: {
     {
       id: 'remove',
       label: 'Remove connection',
-      icon: <ActionIcon action="remove" />,
+      icon: <ActionIcon action="remove" size="lg" />,
       destructive: true,
       separatorBefore: true,
       onSelect: () =>
@@ -94,7 +94,7 @@ export function ConnectionsStepSection({
   const navigate = useNavigate()
   const section = CONNECTION_SECTION_CATALOG[sectionId]
   const sectionEdges = filterDraftEdgesBySection(relationshipEdges, sectionId)
-  const SectionIcon = CONNECTION_SECTION_ICONS[sectionId]
+  const sectionIcon = CONNECTION_SECTION_ICONS[sectionId]
   const locationsReady = stepData.locationsQueryStatus.status === 'success'
 
   const addAction = resolveConnectionsStepSectionAddAction({
@@ -116,7 +116,7 @@ export function ConnectionsStepSection({
       bodySurface="transparent"
       icon={
         <IconContainer size="sm">
-          <SectionIcon className="size-4" aria-hidden />
+          <Icon name={sectionIcon} size="lg" />
         </IconContainer>
       }
       action={

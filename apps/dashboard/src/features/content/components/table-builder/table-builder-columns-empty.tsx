@@ -26,7 +26,11 @@ export function TableBuilderColumnsEmpty({ onAddColumn }: TableBuilderColumnsEmp
           className={tableBuilderColumnsEmptyAddActionClasses}
           onClick={onAddColumn}
         >
-          <ActionIcon action="add" className={tableBuilderColumnsEmptyAddActionIconClasses} />
+          <ActionIcon
+            action="add"
+            className={tableBuilderColumnsEmptyAddActionIconClasses}
+            size="lg"
+          />
           {TABLE_BUILDER_ADD_COLUMN_LABEL}
         </button>
       }

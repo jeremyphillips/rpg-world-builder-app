@@ -45,7 +45,7 @@ export function NumberStepperDecreaseButton({
       onClick={onClick}
     >
       {showRemoveAtMin ? (
-        <ActionIcon action="remove" step={resolveNumberStepperLeftIconStep(resolvedSize)} />
+        <ActionIcon action="remove" size={resolveNumberStepperLeftIconStep(resolvedSize)} />
       ) : (
         <Minus aria-hidden />
       )}

@@ -48,7 +48,7 @@ export function OptionalFieldDisclosure({
         aria-expanded={false}
         onClick={() => onOpenChange(true)}
       >
-        <ActionIcon action="add" />
+        <ActionIcon action="add" size="lg" />
         {addLabel}
       </Button>
     )

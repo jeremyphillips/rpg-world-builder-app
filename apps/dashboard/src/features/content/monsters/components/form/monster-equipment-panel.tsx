@@ -357,7 +357,7 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
                             setEditorEntryId(entry.entryId)
                           }}
                         >
-                          <ActionIcon action="edit" />
+                          <ActionIcon action="edit" size="lg" />
                         </button>
                       )}
                     </div>

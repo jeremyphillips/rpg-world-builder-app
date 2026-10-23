@@ -2,16 +2,19 @@
 
 import * as React from 'react'
 
-import { cn } from '../../lib/utils'
 import { ACTION_ICONS, type ActionIconVerb } from './action-icons.map'
 import { Button, type ButtonProps } from './button.client'
-import { iconGlyphRootClasses, type IconGlyphStep } from './icon-glyph.variants'
-import { resolveButtonIconGlyphStep } from './resolve-button-icon-glyph-step'
+import { Icon } from './icon/icon'
+import type { IconSize } from './icon/icon.types'
 
 export type ActionButtonProps = Omit<ButtonProps, 'children'> & {
   action: ActionIconVerb
   children?: React.ReactNode
-  iconStep?: IconGlyphStep
+  /**
+   * Explicit glyph step. Omit it to let the button owner publish `--icon-size`.
+   * Kept where a caller already rendered a step that differs from that owner.
+   */
+  iconStep?: IconSize
 }
 
 /**
@@ -21,16 +24,14 @@ export type ActionButtonProps = Omit<ButtonProps, 'children'> & {
 export function ActionButton({
   action,
   children,
-  iconStep: iconStepProp,
+  iconStep,
   className,
   variant,
   size,
   density,
   ...buttonProps
 }: ActionButtonProps) {
-  const Icon = ACTION_ICONS[action]
   const hasLabel = children != null && children !== ''
-  const iconStep = iconStepProp ?? resolveButtonIconGlyphStep(size, density, variant)
 
   return (
     <Button
@@ -41,7 +42,7 @@ export function ActionButton({
       density={density}
       {...(buttonProps as ButtonProps)}
     >
-      <Icon aria-hidden className={cn(iconGlyphRootClasses[iconStep], hasLabel && 'shrink-0')} />
+      <Icon name={ACTION_ICONS[action]} size={iconStep ?? 'owner'} />
       {hasLabel ? children : null}
     </Button>
   )

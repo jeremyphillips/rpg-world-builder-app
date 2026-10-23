@@ -34,7 +34,7 @@ export function ContentCardMedia({
       shape="box"
       size={frameSize}
       className={className}
-      fallback={<ContentDisplayFallbackIcon fallback={fallback} size={frameSize} />}
+      fallback={<ContentDisplayFallbackIcon fallback={fallback} size="owner" />}
     />
   )
 }

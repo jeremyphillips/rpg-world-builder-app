@@ -89,7 +89,7 @@ describe('DrawerShell', () => {
         description="Task guidance"
         headerLeading={
           <span data-testid="back-icon">
-            <ActionIcon action="back" />
+            <ActionIcon action="back" size="lg" />
           </span>
         }
         entityContext={<p data-testid="entity-band">Shortsword</p>}

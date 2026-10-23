@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { cn, IdentityFrame, Text, contentIdentityIcon } from '@rpg/ui'
+import { cn, Icon, IdentityFrame, Text, contentIdentityIcon } from '@rpg/ui'
 
 import type { CampaignDisplayVM } from '../lib/campaign-display'
 import {
@@ -9,8 +9,6 @@ import {
   campaignDisplayNameTextVariants,
   type CampaignDisplayListSurface,
 } from './campaign-display-name.variants'
-
-const CampaignIdentityIcon = contentIdentityIcon('campaign')
 
 export type CampaignDisplayNameListProps = {
   displays: readonly CampaignDisplayVM[]
@@ -40,7 +38,7 @@ export function CampaignDisplayNameList({
         shape="box"
         size="inline"
         fit="contain"
-        fallback={<CampaignIdentityIcon aria-hidden />}
+        fallback={<Icon name={contentIdentityIcon('campaign')} size="owner" />}
       />
       <span className="inline-flex min-w-0 flex-wrap items-center">
         {displays.map((display, index) => (

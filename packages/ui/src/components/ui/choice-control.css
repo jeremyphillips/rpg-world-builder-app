@@ -76,9 +76,8 @@
     border-color: var(--field-control-border-invalid);
   }
 
-  .ui-choice-control--checkbox .ui-choice-control__mark svg {
-    width: var(--icon-glyph-md);
-    height: var(--icon-glyph-md);
+  .ui-choice-control--checkbox .ui-choice-control__mark {
+    --icon-size: var(--icon-glyph-md);
   }
 
   /* --- Checkbox appearance: circle (24px target, 16px indicator) --- */
@@ -141,9 +140,11 @@
     grid-area: 1 / 1;
   }
 
+  .ui-choice-control--checkbox.ui-choice-control--circle .ui-choice-control__mark {
+    --icon-size: var(--icon-glyph-xs);
+  }
+
   .ui-choice-control--checkbox.ui-choice-control--circle .ui-choice-control__mark svg {
-    width: var(--icon-glyph-xs);
-    height: var(--icon-glyph-xs);
     color: currentColor;
   }
 
@@ -241,9 +242,11 @@
     border-radius: 9999px;
   }
 
+  .ui-choice-control--radio .ui-choice-control__mark {
+    --icon-size: var(--icon-glyph-xs);
+  }
+
   .ui-choice-control--radio .ui-choice-control__mark svg {
-    width: 0.625rem;
-    height: 0.625rem;
     fill: currentColor;
   }
 

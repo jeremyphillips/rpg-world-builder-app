@@ -16,7 +16,7 @@ type AbilityScoreSelectChoosePromptProps = {
 export function AbilityScoreSelectChoosePrompt({ className }: AbilityScoreSelectChoosePromptProps) {
   return (
     <span aria-hidden className={cn(abilityScoreCardChooseTriggerClasses, className)}>
-      <ActionIcon action="add" step="sm" />
+      <ActionIcon action="add" size="sm" />
       {ABILITY_SCORE_SELECT_CHOOSE_LABEL}
     </span>
   )

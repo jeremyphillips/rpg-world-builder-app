@@ -158,7 +158,7 @@ function MagicalPropertiesSection({
                           })
                         }
                       >
-                        <ActionIcon action="remove" />
+                        <ActionIcon action="remove" size="lg" />
                       </button>
                     ),
                   }}
@@ -200,7 +200,7 @@ function MagicalPropertiesSection({
                         })
                       }
                     >
-                      <ActionIcon action="edit" />
+                      <ActionIcon action="edit" size="lg" />
                     </button>
                   ),
                 }}
@@ -284,7 +284,7 @@ function AdjustmentsSection({
                   })
                 }
               >
-                <ActionIcon action="edit" />
+                <ActionIcon action="edit" size="lg" />
               </button>
             ),
           }}

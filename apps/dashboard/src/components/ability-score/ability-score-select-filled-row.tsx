@@ -70,7 +70,7 @@ export function AbilityScoreSelectFilledRow({
           )}
           aria-label={`Change ${fullName} score`}
         >
-          <ActionIcon action="edit" step="sm" />
+          <ActionIcon action="edit" size="sm" />
         </button>
       </PopoverTrigger>
     </div>

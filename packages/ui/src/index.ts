@@ -255,7 +255,6 @@ export {
   resourceIcon,
   type ResourceIconRole,
 } from './components/ui/resource-icons.map'
-export { type AppIcon } from './components/ui/app-icon.types'
 export { buttonVariants } from './components/ui/button.variants'
 export { Link, type LinkProps } from './components/ui/link'
 export {
@@ -873,10 +872,6 @@ export {
   type ContentDisplayFallbackIconProps,
 } from './components/ui/content-display-fallback-icon.client'
 export {
-  contentDisplayFallbackIconVariants,
-  type ContentDisplayFallbackIconSize,
-} from './components/ui/content-display-fallback-icon.variants'
-export {
   contentCardRootVariants,
   contentCardBodyVariants,
   contentCardHeadingScaleClass,
@@ -1374,7 +1369,6 @@ export {
 } from './components/ui/status-icon.client'
 export {
   statusIconVariants,
-  statusIconGlyphVariants,
   STATUS_ICON_DEFAULT_SIZE,
   STATUS_ICON_VARIANTS,
   STATUS_ICON_TOOLTIP_LABELS,

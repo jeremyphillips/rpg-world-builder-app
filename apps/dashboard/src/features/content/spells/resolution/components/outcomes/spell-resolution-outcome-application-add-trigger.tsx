@@ -46,7 +46,7 @@ export function SpellResolutionOutcomeApplicationAddTrigger({
   return (
     <ButtonDropdown
       label={label}
-      leadingIcon={<ActionIcon action="add" />}
+      leadingIcon={<ActionIcon action="add" size="lg" />}
       width="fit"
       items={items}
       groups={groups}

@@ -79,7 +79,7 @@ export function AdminUserDetail() {
                 kind: 'action',
                 id: 'delete-user',
                 label: 'Delete user',
-                icon: <ActionIcon action="delete" />,
+                icon: <ActionIcon action="delete" size="lg" />,
                 destructive: true,
                 disabled: deleteDisabled,
                 disabledReason: deleteReason,

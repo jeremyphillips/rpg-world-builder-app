@@ -40,7 +40,7 @@ export function DetailOverflowMenu({
           density="compact"
           aria-label={triggerLabel}
         >
-          <ActionIcon action={triggerAction} step="md" />
+          <ActionIcon action={triggerAction} size="md" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

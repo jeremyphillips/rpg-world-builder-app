@@ -1,23 +1,4 @@
-import {
-  ArrowLeft,
-  Ellipsis,
-  Eye,
-  GripVertical,
-  ImagePlus,
-  MoreHorizontal,
-  MoreVertical,
-  Pencil,
-  Plus,
-  RotateCcw,
-  SquarePen,
-  Trash2,
-  UserPlus,
-  Waypoints,
-  X,
-  type LucideIcon,
-} from 'lucide-react'
-
-import type { AppIcon } from './app-icon.types'
+import type { IconName } from './icon/icon-glyphs'
 
 export const ACTION_ICON_VERBS = [
   'back',
@@ -41,23 +22,23 @@ export const ACTION_ICON_VERBS = [
 
 export type ActionIconVerb = (typeof ACTION_ICON_VERBS)[number]
 
-/** Closed action-verb → glyph map (Lucide today; mixed custom later). */
+/** Closed action-verb → canonical glyph name. */
 export const ACTION_ICONS = {
-  back: ArrowLeft,
-  add: Plus,
-  edit: Pencil,
-  remove: Trash2,
-  delete: Trash2,
-  reset: RotateCcw,
-  view: Eye,
-  close: X,
-  clear: X,
-  drag: GripVertical,
-  invite: UserPlus,
-  addMedia: ImagePlus,
-  compose: SquarePen,
-  overflow: MoreHorizontal,
-  overflowVertical: MoreVertical,
-  overflowMenu: Ellipsis,
-  waypoints: Waypoints,
-} as const satisfies Record<ActionIconVerb, LucideIcon & AppIcon>
+  back: 'arrow-left',
+  add: 'plus',
+  edit: 'pencil',
+  remove: 'trash',
+  delete: 'trash',
+  reset: 'rotate-ccw',
+  view: 'eye',
+  close: 'x',
+  clear: 'x',
+  drag: 'grip-vertical',
+  invite: 'user-plus',
+  addMedia: 'image-plus',
+  compose: 'square-pen',
+  overflow: 'ellipsis',
+  overflowVertical: 'ellipsis-vertical',
+  overflowMenu: 'ellipsis',
+  waypoints: 'waypoints',
+} as const satisfies Record<ActionIconVerb, IconName>

@@ -12,9 +12,10 @@ export const STATUS_ICON_CLASS_SPECS = [
     useCase: 'Compact incomplete tone',
   },
   {
-    key: 'glyph-neutral',
-    className: 'ui-status-icon__glyph ui-status-icon__glyph--neutral size-icon-glyph-xs',
-    keyValues: '10px glyph on grey disc',
-    useCase: 'Neutral glyph on idle/incomplete discs',
+    key: 'optical-reduced-heavy',
+    className:
+      'ui-status-icon ui-status-icon--sm ui-status-icon--off ui-status-icon--optical-reduced-heavy',
+    keyValues: '6px slash at stroke 7',
+    useCase: 'Off slash on the compact disc',
   },
 ] as const

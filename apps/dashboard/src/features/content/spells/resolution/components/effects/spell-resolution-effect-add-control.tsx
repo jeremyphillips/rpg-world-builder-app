@@ -34,7 +34,7 @@ export function SpellResolutionEffectAddControl() {
   return (
     <ButtonDropdown
       label={RESOLUTION_SECTION_LABELS.addAuthoredEffect}
-      leadingIcon={<ActionIcon action="add" />}
+      leadingIcon={<ActionIcon action="add" size="lg" />}
       width="fit"
       items={menuItems}
       groups={[{ id: 'effects', label: 'Effects' }]}

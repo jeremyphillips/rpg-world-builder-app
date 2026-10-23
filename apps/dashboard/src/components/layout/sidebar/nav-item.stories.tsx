@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Castle, LayoutDashboard } from 'lucide-react'
 
 import { NavItem } from './nav-item'
 
@@ -16,7 +15,7 @@ export const Inactive: Story = {
   args: {
     to: '/campaigns',
     label: 'Campaigns',
-    icon: Castle,
+    icon: 'castle',
   },
   render: (args) => (
     <div className="w-60 bg-sidebar p-3">
@@ -29,7 +28,7 @@ export const Active: Story = {
   args: {
     to: '/',
     label: 'Dashboard',
-    icon: LayoutDashboard,
+    icon: 'layout-dashboard',
     end: true,
   },
   render: (args) => (

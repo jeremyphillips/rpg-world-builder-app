@@ -1,16 +1,16 @@
-import { Dices, Hash, Type, type LucideIcon } from 'lucide-react'
 import {
   TABLE_COLUMN_VALUE_TYPES,
   TABLE_COLUMN_VALUE_TYPE_ENTRIES,
   type TableColumnValueType,
 } from '@rpg/contracts'
+import type { IconName } from '@rpg/ui'
 
-/** Lucide icon per column value type — shared by the type select trigger and items. */
-export const TABLE_COLUMN_VALUE_TYPE_ICONS: Record<TableColumnValueType, LucideIcon> = {
-  number: Hash,
-  dice: Dices,
-  text: Type,
-}
+/** Glyph per column value type — shared by the type select trigger and items. */
+export const TABLE_COLUMN_VALUE_TYPE_ICONS = {
+  number: 'hash',
+  dice: 'dices',
+  text: 'type',
+} as const satisfies Record<TableColumnValueType, IconName>
 
 export const TABLE_COLUMN_VALUE_TYPE_OPTIONS = TABLE_COLUMN_VALUE_TYPES.map((valueType) => ({
   value: valueType,

@@ -22,7 +22,7 @@ export function BuilderInventoryRemoveAction({
       aria-label={removeAriaLabel ?? formatBuilderInventoryRemoveLabel(itemLabel)}
       onClick={onRemove}
     >
-      <ActionIcon action="remove" step="md" />
+      <ActionIcon action="remove" size="md" />
     </button>
   )
 }

@@ -27,7 +27,7 @@ function CollectionAddTriggerLabel({
 
   return (
     <>
-      <ActionIcon action="add" />
+      <ActionIcon action="add" size="lg" />
       {label}
     </>
   )

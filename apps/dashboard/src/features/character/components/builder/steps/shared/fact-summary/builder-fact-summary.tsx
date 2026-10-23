@@ -4,8 +4,16 @@ import type {
   GrantedProficiencySummaryRow,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, IconContainer } from '@rpg/ui'
-import type { LucideIcon } from 'lucide-react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Icon,
+  IconContainer,
+  type IconName,
+} from '@rpg/ui'
 import type { ReactNode } from 'react'
 
 import {
@@ -30,7 +38,7 @@ export type BuilderFactSummarySimpleProps = {
   heading: string
   subhead?: string
   rows: readonly BuilderFactSummaryRow[]
-  rowIcons?: Partial<Record<BuilderFactSummaryIconKey, LucideIcon>>
+  rowIcons?: Partial<Record<BuilderFactSummaryIconKey, IconName>>
   showSourceColumn?: false
 }
 
@@ -39,7 +47,7 @@ export type BuilderFactSummaryGrantedProps = {
   subhead?: string
   grantedRows: readonly GrantedProficiencySummaryRow[]
   showSourceColumn: true
-  categoryIcons: Record<GrantedProficiencySummaryRow['kind'], LucideIcon>
+  categoryIcons: Record<GrantedProficiencySummaryRow['kind'], IconName>
 }
 
 export type BuilderFactSummaryProps = BuilderFactSummarySimpleProps | BuilderFactSummaryGrantedProps
@@ -96,14 +104,14 @@ function SimpleFactSummary({ heading, subhead, rows, rowIcons }: BuilderFactSumm
       {usesIconRows ? (
         <div className={builderFactSummaryIconRowsClasses}>
           {rows.map((row, index) => {
-            const Icon = row.icon ? rowIcons?.[row.icon] : undefined
-            if (!Icon) return null
+            const iconName = row.icon ? rowIcons?.[row.icon] : undefined
+            if (!iconName) return null
 
             return (
               <div key={row.id}>
                 <div className={builderFactSummaryIconRowClasses}>
                   <IconContainer shape="circle">
-                    <Icon aria-hidden />
+                    <Icon name={iconName} size="owner" />
                   </IconContainer>
                   <p className={builderFactSummaryIconRowLabelClasses}>{row.label}</p>
                   <FactSummaryValue
@@ -169,14 +177,14 @@ function GrantedFactSummary({
     <BuilderFactSummaryShell heading={heading} subhead={subhead}>
       <div className={builderFactSummaryGrantedRowsClasses}>
         {grantedRows.map((row, index) => {
-          const Icon = categoryIcons[row.kind]
+          const iconName = categoryIcons[row.kind]
           const display = grantedRowDisplay(row)
 
           return (
             <div key={row.kind}>
               <div className={builderFactSummaryGrantedRowClasses}>
                 <IconContainer shape="circle">
-                  <Icon aria-hidden />
+                  <Icon name={iconName} size="owner" />
                 </IconContainer>
                 <p className={builderFactSummaryCategoryLabelClasses}>{row.label}</p>
                 <FactSummaryValue

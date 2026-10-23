@@ -384,7 +384,7 @@ function ConditionSentenceRow({
             aria-label={removeConditionLabel(setIndex, conditionIndex)}
             onClick={onRemove}
           >
-            <ActionIcon action="remove" step="md" />
+            <ActionIcon action="remove" size="md" />
           </Button>
         ) : null}
       </div>
@@ -466,7 +466,7 @@ function ConditionSetEditor({
           aria-label={removeConditionSetLabel(setIndex)}
           onClick={onRemove}
         >
-          <ActionIcon action="remove" step="md" />
+          <ActionIcon action="remove" size="md" />
         </Button>
       </div>
 

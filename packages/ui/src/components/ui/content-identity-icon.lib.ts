@@ -1,9 +1,9 @@
 import type { ContentDisplayFallback } from '@rpg/contracts'
 
-import type { AppIcon } from './app-icon.types'
 import { CONTENT_DISPLAY_FALLBACK_ICONS } from './content-display-fallback-icon.map'
+import type { IconName } from './icon/icon-glyphs'
 
-/** Canonical glyph for a catalog identity role — use for semantic aliases, not coincidental shares. */
-export function contentIdentityIcon(key: ContentDisplayFallback): AppIcon {
+/** Canonical glyph name for a catalog identity role — use for semantic aliases, not coincidental shares. */
+export function contentIdentityIcon(key: ContentDisplayFallback): IconName {
   return CONTENT_DISPLAY_FALLBACK_ICONS[key]
 }

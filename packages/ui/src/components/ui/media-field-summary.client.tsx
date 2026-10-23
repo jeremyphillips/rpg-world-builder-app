@@ -86,7 +86,7 @@ function resolveCompactEmptyPreview(input: {
     return <ImagePlus aria-hidden />
   }
   if (input.emptyFallback) {
-    return <ContentDisplayFallbackIcon fallback={input.emptyFallback} size="md" />
+    return <ContentDisplayFallbackIcon fallback={input.emptyFallback} size="2xl" />
   }
   return <ImagePlus aria-hidden />
 }

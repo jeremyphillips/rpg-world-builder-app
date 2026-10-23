@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Castle, LayoutDashboard } from 'lucide-react'
 
+import { Icon } from './icon/icon'
 import { sidebarNavItemVariants } from './sidebar-nav-item.variants'
 
 const meta = {
@@ -17,7 +17,7 @@ export const Active: Story = {
   render: () => (
     <div className="w-60 bg-sidebar p-3">
       <a href="#active" className={sidebarNavItemVariants({ active: true })} aria-current="page">
-        <LayoutDashboard className="size-4.5 shrink-0" size={18} strokeWidth={1.75} aria-hidden />
+        <Icon name="layout-dashboard" size="owner" />
         Dashboard
       </a>
     </div>
@@ -28,7 +28,7 @@ export const Inactive: Story = {
   render: () => (
     <div className="w-60 bg-sidebar p-3">
       <a href="#inactive" className={sidebarNavItemVariants({ active: false })}>
-        <Castle className="size-4.5 shrink-0" size={18} strokeWidth={1.75} aria-hidden />
+        <Icon name="castle" size="owner" />
         Campaigns
       </a>
     </div>

@@ -2,6 +2,7 @@ import { ChevronDown } from 'lucide-react'
 
 import {
   ActionButton,
+  Icon,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -36,12 +37,10 @@ export function CharacterConnectionsAddMenu({
       <DropdownMenuContent align="end">
         {CONNECTION_TOP_LEVEL_SECTION_IDS.map((sectionId) => {
           const section = CONNECTION_SECTION_CATALOG[sectionId]
-          const SectionIcon = getConnectionSectionIcon(sectionId)
-
           return (
             <DropdownMenuItem key={sectionId} onSelect={() => onSelectSection(sectionId)}>
               <IconContainer size="sm">
-                <SectionIcon className="size-3.5" aria-hidden />
+                <Icon name={getConnectionSectionIcon(sectionId)} size="md" />
               </IconContainer>
               Add {section.singularAddLabel}
             </DropdownMenuItem>

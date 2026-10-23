@@ -14,8 +14,6 @@ import {
   resolveCompactControlIconCompactSmClasses,
   resolveCompactControlRecipeClasses,
 } from './compact-control.styles'
-import { compactLabelIconGlyphClasses } from './icon-glyph.variants'
-
 export type CompactLabelVariantProps = {
   size?: CompactLabelSize
   appearance?: CompactLabelAppearance
@@ -30,12 +28,6 @@ const compactLabelRemovablePaddingClasses: Record<CompactLabelSize, string> = {
   sm: 'ui-compact-label--removable-sm',
   md: 'ui-compact-label--removable-md',
   lg: 'ui-compact-label--removable-lg',
-}
-
-const compactLabelIconSizeClasses: Record<CompactLabelSize, string> = {
-  sm: compactLabelIconGlyphClasses('sm'),
-  md: compactLabelIconGlyphClasses('md'),
-  lg: compactLabelIconGlyphClasses('lg'),
 }
 
 /** Internal CVA — not exported from `@rpg/ui`. */
@@ -81,7 +73,6 @@ export function resolveCompactLabelClassName({
       selected,
       interactive,
     }),
-    compactLabelIconSizeClasses[size],
     appearanceClasses,
     compactLabelEmphasisClasses(emphasis),
     removable ? compactLabelRemovablePaddingClasses[size] : null,

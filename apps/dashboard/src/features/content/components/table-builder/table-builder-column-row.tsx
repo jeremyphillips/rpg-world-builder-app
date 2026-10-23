@@ -11,6 +11,7 @@ import {
 } from '@rpg/contracts'
 import {
   ActionIcon,
+  Icon,
   Input,
   Select,
   SelectContent,
@@ -93,7 +94,7 @@ export function TableBuilderColumnRow({
           {...attributes}
           {...listeners}
         >
-          <ActionIcon action="drag" step="sm" />
+          <ActionIcon action="drag" size="sm" />
         </button>
       </div>
 
@@ -122,17 +123,14 @@ export function TableBuilderColumnRow({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {TABLE_COLUMN_VALUE_TYPE_OPTIONS.map((option) => {
-            const Icon = option.icon
-            return (
-              <SelectItem key={option.value} value={option.value}>
-                <span className={tableBuilderColumnTypeOptionClasses}>
-                  <Icon className={tableBuilderColumnTypeIconClasses} aria-hidden />
-                  {option.label}
-                </span>
-              </SelectItem>
-            )
-          })}
+          {TABLE_COLUMN_VALUE_TYPE_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              <span className={tableBuilderColumnTypeOptionClasses}>
+                <Icon name={option.icon} size="md" className={tableBuilderColumnTypeIconClasses} />
+                {option.label}
+              </span>
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
@@ -170,7 +168,7 @@ export function TableBuilderColumnRow({
           aria-label={`Delete ${displayName}`}
           onClick={() => onRemove(index)}
         >
-          <ActionIcon action="delete" />
+          <ActionIcon action="delete" size="lg" />
         </button>
       </div>
     </div>

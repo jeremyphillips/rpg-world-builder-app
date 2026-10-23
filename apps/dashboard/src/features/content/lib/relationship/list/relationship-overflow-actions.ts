@@ -28,7 +28,7 @@ const RELATIONSHIP_OVERFLOW_ACTION_ICON: Record<RelationshipOverflowActionId, Ac
 function relationshipOverflowActionIcon(id: RelationshipOverflowActionId) {
   return createElement(ActionIcon, {
     action: RELATIONSHIP_OVERFLOW_ACTION_ICON[id],
-    step: OVERFLOW_MENU_ICON_STEP,
+    size: OVERFLOW_MENU_ICON_STEP,
   })
 }
 

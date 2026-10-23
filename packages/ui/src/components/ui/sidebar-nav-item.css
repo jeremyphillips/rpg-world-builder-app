@@ -1,0 +1,9 @@
+/*
+ * Sidebar nav item — publishes glyph size and stroke for owner-mode icons.
+ */
+@layer components {
+  .ui-sidebar-nav-item {
+    --icon-size: var(--icon-glyph-lg);
+    --icon-stroke-width: var(--sidebar-nav-icon-stroke);
+  }
+}

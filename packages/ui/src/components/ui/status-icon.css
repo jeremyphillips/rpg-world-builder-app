@@ -1,5 +1,5 @@
 /*
- * StatusIcon — disc tone and size; glyph ladder utilities stay on the svg.
+ * StatusIcon — disc tone and size. The glyph reads --icon-size and --icon-stroke-width.
  */
 @layer components {
   .ui-status-icon {
@@ -9,21 +9,34 @@
     justify-content: center;
     overflow: hidden;
     border-radius: calc(infinity * 1px);
+    --icon-size: var(--status-icon-glyph-size);
+    --icon-stroke-width: var(--status-icon-stroke);
   }
 
   .ui-status-icon--sm {
     width: 0.75rem;
     height: 0.75rem;
+    --status-icon-glyph-size: var(--icon-glyph-xs);
+    --status-icon-glyph-reduced-size: var(--status-icon-slash-sm);
   }
 
   .ui-status-icon--md {
     width: 1rem;
     height: 1rem;
+    --status-icon-glyph-size: var(--icon-glyph-xs);
+    --status-icon-glyph-reduced-size: var(--status-icon-slash-sm);
   }
 
   .ui-status-icon--lg {
     width: 1.25rem;
     height: 1.25rem;
+    --status-icon-glyph-size: var(--icon-glyph-sm);
+    --status-icon-glyph-reduced-size: var(--status-icon-slash-md);
+  }
+
+  .ui-status-icon--optical-reduced-heavy {
+    --icon-size: var(--status-icon-glyph-reduced-size);
+    --icon-stroke-width: var(--status-icon-stroke-reduced);
   }
 
   .ui-status-icon--ready {
@@ -46,13 +59,5 @@
   .ui-status-icon--not-configured {
     background-color: var(--status-icon-idle-bg);
     color: var(--status-icon-neutral-foreground);
-  }
-
-  .ui-status-icon__glyph--neutral {
-    color: var(--status-icon-neutral-foreground);
-  }
-
-  .ui-status-icon__glyph--needs-attention > circle {
-    display: none;
   }
 }

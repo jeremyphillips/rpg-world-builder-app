@@ -54,7 +54,7 @@ export function EntityActionChoiceMenu({
         density="compact"
         aria-label={triggerProps.triggerLabel}
       >
-        <ActionIcon action="add" />
+        <ActionIcon action="add" size="lg" />
       </Button>
     ) : (
       <ActionButton action="add" variant="text" size="sm" density="compact">

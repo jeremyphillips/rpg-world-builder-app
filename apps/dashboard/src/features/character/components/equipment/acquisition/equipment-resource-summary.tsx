@@ -9,6 +9,7 @@ import {
   Button,
   DividedStack,
   Panel,
+  Icon,
   IconContainer,
   resourceIcon,
   type ContentCardDensity,
@@ -41,13 +42,10 @@ const RESOURCE_ICON_SIZE: Record<ContentCardDensity, IconContainerSize> = {
   spacious: 'sm',
 }
 
-const CurrencyIcon = resourceIcon('currency')
-const MagicItemIcon = resourceIcon('magicItem')
-
 function ResourceGlyph({ role, density }: { role: ResourceIconRole; density: ContentCardDensity }) {
   return (
     <IconContainer shape="box" size={RESOURCE_ICON_SIZE[density]}>
-      {role === 'currency' ? <CurrencyIcon /> : <MagicItemIcon />}
+      <Icon name={resourceIcon(role)} size="owner" />
     </IconContainer>
   )
 }

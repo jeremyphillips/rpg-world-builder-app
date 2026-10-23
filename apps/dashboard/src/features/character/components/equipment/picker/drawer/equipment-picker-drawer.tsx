@@ -5,7 +5,7 @@ import {
   formatChoiceSetDrawerHeading,
   formatEquipmentLoadoutPickerHeading,
 } from '@rpg/contracts'
-import { resourceIcon, SegmentedControl, type ResourceIconRole } from '@rpg/ui'
+import { Icon, resourceIcon, SegmentedControl, type ResourceIconRole } from '@rpg/ui'
 
 import { CatalogEntityPickerSheet } from '@/features/content'
 import { CatalogSortControl } from '../../../picker/sort/catalog-sort-control'
@@ -164,11 +164,10 @@ export function EquipmentPickerDrawer({
         onValueChange={(value) => onWorkflowModeChange(value as EquipmentPickerWorkflowMode)}
         options={workflowModes.map((mode) => {
           const iconRole = mode === 'loadout' ? 'currency' : EQUIPMENT_PICKER_MODE_ICON_ROLES[mode]
-          const Icon = resourceIcon(iconRole)
           return {
             value: mode,
             label: EQUIPMENT_PICKER_MODE_LABELS[mode],
-            leadingIcon: <Icon />,
+            leadingIcon: <Icon name={resourceIcon(iconRole)} size="sm" />,
           }
         })}
         aria-label={EQUIPMENT_PICKER_WORKFLOW_GROUP_LABEL}

@@ -1,13 +1,12 @@
-import { BadgeCheck, Languages, Shield, Swords, Wrench } from 'lucide-react'
-import { contentIdentityIcon, type AppIcon } from '@rpg/ui'
+import { contentIdentityIcon, type IconName } from '@rpg/ui'
 
 import type { ProficiencyStepSectionKind } from '@rpg/contracts'
 
 export const proficiencyCategoryIcons = {
-  savingThrows: BadgeCheck,
+  savingThrows: 'badge-check',
   skills: contentIdentityIcon('skill-proficiency'),
-  weapons: Swords,
-  armor: Shield,
-  tools: Wrench,
-  languages: Languages,
-} satisfies Record<ProficiencyStepSectionKind, AppIcon>
+  weapons: 'swords',
+  armor: 'shield',
+  tools: 'wrench',
+  languages: 'languages',
+} satisfies Record<ProficiencyStepSectionKind, IconName>

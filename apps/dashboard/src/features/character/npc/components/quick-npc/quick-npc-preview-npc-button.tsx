@@ -77,7 +77,7 @@ export function QuickNpcPreviewNpcButton({
         disabled={disabled}
         onClick={handleOpen}
       >
-        <ActionIcon action="view" />
+        <ActionIcon action="view" size="lg" />
         {QUICK_NPC_PREVIEW_NPC_LABEL}
       </Button>
       {preview ? (

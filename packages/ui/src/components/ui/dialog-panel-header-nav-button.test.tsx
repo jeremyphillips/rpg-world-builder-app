@@ -19,10 +19,10 @@ const navButtonCss = readFileSync(
 describe('DialogPanelHeaderNavButton', () => {
   it('defines responsive glyph sizing on the dialog title scale (19px base, 24px from md)', () => {
     expect(navButtonCss).toMatch(
-      /@utility size-dialog-panel-header-glyph \{[\s\S]*?width: var\(--text-heading-dialog-title\)/,
+      /@utility size-dialog-panel-header-glyph \{[\s\S]*?--icon-size: var\(--text-heading-dialog-title\)/,
     )
     expect(navButtonCss).toMatch(
-      /@media \(width >= 48rem\) \{[\s\S]*?width: var\(--text-heading-dialog-title-md\)/,
+      /@media \(width >= 48rem\) \{[\s\S]*?--icon-size: var\(--text-heading-dialog-title-md\)/,
     )
   })
 

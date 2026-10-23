@@ -122,7 +122,7 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
         />
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => navigate(ROUTES.campaign.create)}>
-          <ActionIcon action="add" step="md" />
+          <ActionIcon action="add" size="md" />
           Create campaign
         </DropdownMenuItem>
       </DropdownMenuContent>

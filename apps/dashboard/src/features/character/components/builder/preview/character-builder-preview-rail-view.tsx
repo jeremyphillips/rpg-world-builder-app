@@ -162,7 +162,7 @@ export function CharacterBuilderPreviewRailView({
           <PreviewRail.Action
             label={BUILDER_PREVIEW_CHARACTER_SHEET_LABEL}
             helperText={BUILDER_PREVIEW_CHARACTER_SHEET_HELPER}
-            icon={<ActionIcon action="view" />}
+            icon={<ActionIcon action="view" size="lg" />}
             onClick={onPreviewCharacterSheet}
           />
         ) : null}

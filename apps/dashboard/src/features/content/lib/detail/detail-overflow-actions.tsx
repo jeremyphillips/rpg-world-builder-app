@@ -22,7 +22,7 @@ export function detailOverflowDeleteAction(
   return {
     id: 'delete',
     label,
-    icon: <ActionIcon action="delete" step={OVERFLOW_MENU_ICON_STEP} />,
+    icon: <ActionIcon action="delete" size={OVERFLOW_MENU_ICON_STEP} />,
     destructive: true,
     onSelect,
   }
@@ -35,7 +35,7 @@ export function detailOverflowViewAction(
   return {
     id: 'view',
     label,
-    icon: <ActionIcon action="view" step={OVERFLOW_MENU_ICON_STEP} />,
+    icon: <ActionIcon action="view" size={OVERFLOW_MENU_ICON_STEP} />,
     onSelect,
   }
 }
@@ -47,7 +47,7 @@ export function detailOverflowMoveAction(
   return {
     id: 'move',
     label,
-    icon: <ActionIcon action="waypoints" step={OVERFLOW_MENU_ICON_STEP} />,
+    icon: <ActionIcon action="waypoints" size={OVERFLOW_MENU_ICON_STEP} />,
     onSelect,
   }
 }

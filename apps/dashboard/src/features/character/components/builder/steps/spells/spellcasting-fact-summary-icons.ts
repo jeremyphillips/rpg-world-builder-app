@@ -1,8 +1,8 @@
 import type { BuilderFactSummaryIconKey } from '@rpg/contracts'
-import { Crosshair, ShieldCheck, WandSparkles, type LucideIcon } from 'lucide-react'
+import type { IconName } from '@rpg/ui'
 
 export const spellcastingFactSummaryRowIcons = {
-  'spellcasting-ability': WandSparkles,
-  'spell-save-dc': ShieldCheck,
-  'spell-attack': Crosshair,
-} satisfies Record<BuilderFactSummaryIconKey, LucideIcon>
+  'spellcasting-ability': 'wand-sparkles',
+  'spell-save-dc': 'shield-check',
+  'spell-attack': 'crosshair',
+} satisfies Record<BuilderFactSummaryIconKey, IconName>

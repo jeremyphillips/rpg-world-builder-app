@@ -57,10 +57,6 @@
   .ui-semantic-text__icon {
     flex-shrink: 0;
     line-height: 1;
-  }
-
-  .ui-semantic-text__icon > svg {
-    width: var(--icon-inline);
-    height: var(--icon-inline);
+    --icon-size: var(--icon-inline);
   }
 }

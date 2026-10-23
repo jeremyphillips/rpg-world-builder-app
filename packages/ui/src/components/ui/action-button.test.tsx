@@ -12,7 +12,7 @@ describe('ActionButton', () => {
     )
 
     expect(screen.getByRole('button', { name: /add row/i })).toBeInTheDocument()
-    expect(container.querySelector('svg.lucide-plus')).toBeTruthy()
+    expect(container.querySelector('svg')).toHaveAttribute('data-icon', 'plus')
   })
 
   it('forwards aria-label for icon-only buttons', () => {
@@ -29,8 +29,8 @@ describe('ActionButton', () => {
     )
 
     const svg = container.querySelector('svg')
-    expect(svg).toHaveClass('size-icon-glyph-xs')
-    expect(svg).not.toHaveClass('size-icon-glyph-lg')
+    expect(svg).toHaveClass('ui-icon--owner')
+    expect(svg).not.toHaveClass('ui-icon--lg')
   })
 
   it('allows type="submit" to override the default button type', () => {

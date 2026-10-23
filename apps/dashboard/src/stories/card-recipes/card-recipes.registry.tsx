@@ -1,5 +1,5 @@
 import { composeStories } from '@storybook/react-vite'
-import { GripVertical, Trash2, WandSparkles } from 'lucide-react'
+import { GripVertical, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import {
@@ -88,7 +88,7 @@ function RemoveUtility({ label }: { label: string }) {
       className={iconGhostControlVariants({ hover: 'accent', layout: 'flex' })}
       aria-label={`Remove ${label}`}
     >
-      <ActionIcon action="remove" step="md" />
+      <ActionIcon action="remove" size="md" />
     </button>
   )
 }
@@ -491,7 +491,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
               icon: 'spellcasting-ability',
             },
           ]}
-          rowIcons={{ 'spellcasting-ability': WandSparkles }}
+          rowIcons={{ 'spellcasting-ability': 'wand-sparkles' }}
           showSourceColumn={false}
         />
       </div>

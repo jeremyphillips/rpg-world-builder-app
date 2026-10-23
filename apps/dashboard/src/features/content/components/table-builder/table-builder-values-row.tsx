@@ -128,7 +128,7 @@ function TableBuilderValuesRowRestoreButton({
             aria-label={restoreAction.ariaLabel}
             onClick={onRestore}
           >
-            <ActionIcon action="reset" step="sm" />
+            <ActionIcon action="reset" size="sm" />
           </button>
         </TooltipTrigger>
         <TooltipContent>{restoreAction.tooltip}</TooltipContent>
@@ -158,7 +158,7 @@ function TableBuilderValuesRowDeleteButton({
         }
         onClick={() => onRemove(index)}
       >
-        <ActionIcon action="delete" />
+        <ActionIcon action="delete" size="lg" />
       </button>
     </div>
   )

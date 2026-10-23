@@ -52,7 +52,7 @@ function InventoryRemoveIconButton({
       aria-label={removeLabel}
       onClick={onRemove}
     >
-      <ActionIcon action="remove" />
+      <ActionIcon action="remove" size="lg" />
     </button>
   )
 }

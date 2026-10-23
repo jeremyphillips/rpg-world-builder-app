@@ -58,7 +58,7 @@ function buildMemberOverflowActions(input: {
     actions.push({
       id: 'edit-membership',
       label: ORGANIZATION_MEMBER_EDIT_LABEL,
-      icon: <ActionIcon action="edit" step="md" />,
+      icon: <ActionIcon action="edit" size="md" />,
       disabled: input.isPending,
       onSelect: () => input.onEditMembership?.(input.row),
     })
