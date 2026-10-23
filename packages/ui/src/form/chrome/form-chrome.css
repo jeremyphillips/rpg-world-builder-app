@@ -1,0 +1,167 @@
+@layer components {
+  .ui-tabbed-form {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 0%;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  @media (width >= 80rem) {
+    .ui-tabbed-form {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr);
+      align-items: stretch;
+      gap: calc(var(--spacing) * 6);
+      grid-template-columns: minmax(0, 1fr) 280px;
+    }
+  }
+
+  @media (width >= 96rem) {
+    .ui-tabbed-form {
+      grid-template-columns: minmax(0, 1fr) 21rem;
+    }
+  }
+
+  .ui-tabbed-form__body {
+    display: flex;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex-direction: column;
+  }
+
+  @media (width >= 80rem) {
+    .ui-tabbed-form__body {
+      grid-column-start: 1;
+      grid-row-start: 1;
+      height: 100%;
+    }
+  }
+
+  .ui-tabbed-form__aside {
+    display: none;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  @media (width >= 80rem) {
+    .ui-tabbed-form__aside {
+      display: flex;
+      grid-column-start: 2;
+      grid-row-start: 1;
+      height: 100%;
+      flex-direction: column;
+      padding-top: calc(var(--spacing) * 8);
+      padding-bottom: calc(var(--spacing) * 4);
+    }
+  }
+
+  .ui-form-docked-shell {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 0%;
+    flex-direction: column;
+    --rpg-content-floor-gap: 1rem;
+    --rpg-form-viewport-scroll-body-top-inset: 2rem;
+    --rpg-form-identity-header-block-size: 8rem;
+    --rpg-form-sticky-tabs-block-size: 3rem;
+    --rpg-form-docked-scroll-top-chrome-inset: calc(
+      var(--rpg-form-viewport-scroll-body-top-inset) + var(--rpg-form-identity-header-block-size) +
+        var(--rpg-form-sticky-tabs-block-size)
+    );
+    --rpg-content-bottom-inset: calc(
+      var(--rpg-form-docked-actions-bar-block-size) + var(--rpg-content-floor-gap)
+    );
+    /* F1: self-referencing cycle — see semantic-css-migration.md */
+    --rpg-content-top-inset: calc(
+      var(--rpg-content-top-inset, 0px) + var(--rpg-form-docked-scroll-top-chrome-inset)
+    );
+  }
+
+  .ui-form-docked-shell,
+  .ui-form-actions-bar--docked {
+    --rpg-form-docked-actions-bar-block-size: 69px;
+  }
+
+  .ui-form-sticky-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: var(--background);
+  }
+
+  @supports (backdrop-filter: blur(0)) {
+    .ui-form-sticky-tabs {
+      background-color: color-mix(in oklab, var(--background) 95%, transparent);
+      backdrop-filter: blur(4px);
+    }
+  }
+
+  .ui-form-sticky-tabs--transparent {
+    background-color: transparent;
+    backdrop-filter: none;
+  }
+
+  @supports (backdrop-filter: blur(0)) {
+    .ui-form-sticky-tabs--transparent {
+      background-color: transparent;
+    }
+  }
+
+  .ui-form-actions-bar--sticky {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--border);
+    background-color: var(--background);
+    padding-top: calc(var(--spacing) * 4);
+    padding-bottom: calc(var(--spacing) * 4);
+  }
+
+  @supports (backdrop-filter: blur(0)) {
+    .ui-form-actions-bar--sticky {
+      background-color: color-mix(in oklab, var(--background) 95%, transparent);
+      backdrop-filter: blur(4px);
+    }
+  }
+
+  .ui-form-actions-bar--sticky.ui-form-actions-bar--transparent {
+    background-color: transparent;
+    backdrop-filter: none;
+  }
+
+  @supports (backdrop-filter: blur(0)) {
+    .ui-form-actions-bar--sticky.ui-form-actions-bar--transparent {
+      background-color: transparent;
+    }
+  }
+
+  .ui-form-actions-bar--docked {
+    z-index: 20;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--border);
+    background-color: var(--background);
+    min-height: var(--rpg-form-docked-actions-bar-block-size);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: calc(var(--spacing) * 4);
+    padding-bottom: calc(var(--spacing) * 4);
+  }
+
+  @supports (backdrop-filter: blur(0)) {
+    .ui-form-actions-bar--docked {
+      background-color: color-mix(in oklab, var(--background) 95%, transparent);
+      backdrop-filter: blur(4px);
+    }
+  }
+}

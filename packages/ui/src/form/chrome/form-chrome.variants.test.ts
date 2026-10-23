@@ -1,97 +1,31 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  formDockedActionsBarBlockSizeContractClasses,
   formDockedActionsBarClasses,
-  formDockedFooterFloorGapContractClasses,
-  formDockedScrollTopChromeBlockSizeContractClasses,
   formStickyScrollBodyClipClasses,
   formStickyScrollBodyScrollerClasses,
-  formStickyScrollShellClasses,
   formStickyScrollShellWithDockedFooterClasses,
+  formStickyTabsClasses,
   formTabbedAsideBodyClasses,
   formTabbedAsideGridClasses,
-  formTabbedAsideGridColsAt2xlClasses,
-  formTabbedAsideGridColsBelow2xlClasses,
   formTabbedAsideSlotClasses,
-  formTabbedAsideSlotBottomInsetClasses,
-  formTabbedAsideSlotTopInsetClasses,
   formViewportScrollBodyTopInsetClasses,
-  RPG_CONTENT_BOTTOM_INSET_VAR,
-  RPG_CONTENT_FLOOR_GAP_VAR,
-  RPG_CONTENT_TOP_INSET_VAR,
-  RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR,
 } from './form-chrome.variants'
 
-describe('formTabbedAside layout tokens', () => {
-  it('bounds the xl grid row to the viewport flex shell', () => {
-    expect(formTabbedAsideGridClasses).toContain('xl:grid-rows-[minmax(0,1fr)]')
-    expect(formTabbedAsideGridClasses).toContain('flex-1')
-    expect(formTabbedAsideGridClasses).toContain('min-h-0')
-    expect(formTabbedAsideGridClasses).toContain('overflow-hidden')
+describe('form chrome semantic blocks', () => {
+  it('maps tabbed-form aside layout to ui-tabbed-form blocks', () => {
+    expect(formTabbedAsideGridClasses).toBe('ui-tabbed-form')
+    expect(formTabbedAsideBodyClasses).toBe('ui-tabbed-form__body')
+    expect(formTabbedAsideSlotClasses).toBe('ui-tabbed-form__aside')
   })
 
-  it('uses a narrower preview-rail column below 2xl', () => {
-    expect(formTabbedAsideGridClasses).toContain(formTabbedAsideGridColsBelow2xlClasses)
-    expect(formTabbedAsideGridClasses).toContain(formTabbedAsideGridColsAt2xlClasses)
+  it('maps docked footer shell and actions bar to semantic classes', () => {
+    expect(formStickyScrollShellWithDockedFooterClasses).toBe('ui-form-docked-shell')
+    expect(formDockedActionsBarClasses).toContain('ui-form-actions-bar--docked')
+    expect(formStickyTabsClasses).toBe('ui-form-sticky-tabs')
   })
 
-  it('fills the page shell without an inner page max-width cap', () => {
-    expect(formTabbedAsideGridClasses).toContain('w-full')
-    expect(formTabbedAsideGridClasses).toContain('min-w-0')
-    expect(formTabbedAsideGridClasses).not.toContain('max-w-4xl')
-    expect(formTabbedAsideGridClasses).not.toContain('mx-auto')
-  })
-
-  it('fills grid cells for scroll + docked footer columns', () => {
-    expect(formTabbedAsideBodyClasses).toContain('min-h-0')
-    expect(formTabbedAsideBodyClasses).toContain('xl:h-full')
-    expect(formTabbedAsideBodyClasses).toContain('flex-col')
-    expect(formTabbedAsideSlotClasses).toContain('min-h-0')
-    expect(formTabbedAsideSlotClasses).toContain('xl:flex')
-    expect(formTabbedAsideSlotClasses).toContain('xl:flex-col')
-    expect(formTabbedAsideSlotClasses).toContain('xl:h-full')
-  })
-
-  it('applies top and bottom inset on the preview-rail column (form footer stays flush)', () => {
-    expect(formTabbedAsideSlotTopInsetClasses).toBe('xl:pt-8')
-    expect(formTabbedAsideSlotBottomInsetClasses).toBe('xl:pb-4')
-    expect(formTabbedAsideSlotClasses).toContain(formTabbedAsideSlotTopInsetClasses)
-    expect(formTabbedAsideSlotClasses).toContain(formTabbedAsideSlotBottomInsetClasses)
-    expect(formTabbedAsideSlotClasses).not.toContain('xl:pb-8')
-  })
-
-  it('defines scroll-body top inset that scrolls with form content', () => {
-    expect(formViewportScrollBodyTopInsetClasses).toBe('pt-8')
-  })
-})
-
-describe('docked form footer geometry', () => {
-  it('keeps the base sticky scroll shell free of bottom inset publishing', () => {
-    expect(formStickyScrollShellClasses).not.toContain(RPG_CONTENT_BOTTOM_INSET_VAR)
-    expect(formStickyScrollShellClasses).not.toContain(RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR)
-  })
-
-  it('publishes bottom inset only on the docked-footer shell composition', () => {
-    expect(formStickyScrollShellWithDockedFooterClasses).toContain(
-      formDockedActionsBarBlockSizeContractClasses,
-    )
-    expect(formStickyScrollShellWithDockedFooterClasses).toContain(
-      formDockedFooterFloorGapContractClasses,
-    )
-    expect(formStickyScrollShellWithDockedFooterClasses).toContain(
-      formDockedScrollTopChromeBlockSizeContractClasses,
-    )
-    expect(formStickyScrollShellWithDockedFooterClasses).toContain(
-      `[${RPG_CONTENT_BOTTOM_INSET_VAR}:calc(var(${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR})+var(${RPG_CONTENT_FLOOR_GAP_VAR}))]`,
-    )
-    expect(formStickyScrollShellWithDockedFooterClasses).toContain(RPG_CONTENT_TOP_INSET_VAR)
-    expect(formDockedActionsBarBlockSizeContractClasses).toContain(
-      `[${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR}:69px]`,
-    )
-  })
-
-  it('splits the sticky scroll slot into a clip container and inner scroller', () => {
+  it('keeps scroll-body clip and scroller responsibilities split', () => {
     expect(formStickyScrollBodyClipClasses).toContain('form-scroll-body-container')
     expect(formStickyScrollBodyClipClasses).toContain('overflow-hidden')
     expect(formStickyScrollBodyClipClasses).not.toContain('overflow-y-auto')
@@ -99,10 +33,7 @@ describe('docked form footer geometry', () => {
     expect(formStickyScrollBodyScrollerClasses).not.toContain('form-scroll-body-container')
   })
 
-  it('derives docked actions bar min-height from the shared block-size contract', () => {
-    expect(formDockedActionsBarClasses).toContain(formDockedActionsBarBlockSizeContractClasses)
-    expect(formDockedActionsBarClasses).toContain(
-      `min-h-[var(${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR})]`,
-    )
+  it('defines scroll-body top inset that scrolls with form content', () => {
+    expect(formViewportScrollBodyTopInsetClasses).toBe('pt-8')
   })
 })

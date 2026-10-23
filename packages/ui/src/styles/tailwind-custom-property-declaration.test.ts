@@ -61,7 +61,8 @@ describe('tailwind custom-property declaration ratchet', () => {
 
     for (const filePath of Object.keys(actualByFile)) {
       if (!baselineFiles.has(filePath)) {
-        for (const [customProperty, count] of Object.entries(actualByFile[filePath])) {
+        const fileCounts = actualByFile[filePath] ?? {}
+        for (const [customProperty, count] of Object.entries(fileCounts)) {
           violations.push(`Unbucketed declaration: ${filePath} ${customProperty} (count ${count})`)
         }
       }

@@ -1,15 +1,5 @@
 {
   "temporary": {
-    "packages/ui/src/form/chrome/form-chrome.variants.ts": {
-      "--rpg-content-bottom-inset": 1,
-      "--rpg-content-floor-gap": 1,
-      "--rpg-content-top-inset": 1,
-      "--rpg-form-docked-actions-bar-block-size": 1,
-      "--rpg-form-docked-scroll-top-chrome-inset": 1,
-      "--rpg-form-identity-header-block-size": 1,
-      "--rpg-form-sticky-tabs-block-size": 1,
-      "--rpg-form-viewport-scroll-body-top-inset": 1
-    },
     "apps/dashboard/src/components/layout/shell/app-shell.variants.ts": {
       "--app-sticky-chrome-block-size": 1,
       "--rpg-content-top-inset": 1

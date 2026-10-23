@@ -9,6 +9,7 @@
 @import './surface-relative-chrome.utilities.css';
 @import '../components/ui/ui-border.css';
 @import './form-scroll-body.utilities.css';
+@import '../form/chrome/form-chrome.css';
 @import './field-row-anatomy.utilities.css';
 @import './text-action.utilities.css';
 @import './ui-focus-ring.css';
