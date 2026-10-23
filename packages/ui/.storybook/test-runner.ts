@@ -1,6 +1,11 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import {
+  assertResolvedOwnerIconSizes,
+  collectIconGeometryCensus,
+  snapshotIconGeometryCensus,
+} from '@rpg/config/storybook/icon-geometry-census'
 import type { Page } from '@playwright/test'
 import type { TestRunnerConfig } from '@storybook/test-runner'
 
@@ -50,9 +55,14 @@ const config: TestRunnerConfig = {
     exclude: ['storybook-test-runner-skip', 'phase-7-building-flows'],
   },
   async postVisit(page, context) {
+    if (context.hasFailure) return
     const tags: string[] = context.tags ?? []
-    if (!tags.includes('control-parity')) return
-    await snapshotControlParity(page, context.id)
+    if (tags.includes('control-parity')) {
+      await snapshotControlParity(page, context.id)
+    }
+    const census = await collectIconGeometryCensus(page)
+    assertResolvedOwnerIconSizes(census)
+    snapshotIconGeometryCensus(census)
   },
 }
 

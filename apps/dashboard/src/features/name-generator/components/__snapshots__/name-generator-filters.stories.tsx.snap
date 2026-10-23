@@ -1,0 +1,142 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Dashboard/Name Generator/Filters ElvishContext smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "rotate-ccw",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Dashboard/Name Generator/Filters PersonDefaults smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Dashboard/Name Generator/Filters SettlementSubject smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "rotate-ccw",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

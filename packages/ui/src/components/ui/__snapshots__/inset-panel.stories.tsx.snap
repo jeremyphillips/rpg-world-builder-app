@@ -1,0 +1,106 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Primitives/InsetPanel ClassReference smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/InsetPanel DashedEmpty smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/InsetPanel DashedGate smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/InsetPanel InstructionalGate smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/InsetPanel OnFieldContainer smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/InsetPanel PassiveMessageEmpty smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/InsetPanel ScorePool smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/InsetPanel SolidSunkenDefault smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/InsetPanel StructuredTitleSupporting smoke-test 1`] = `
+[
+  {
+    "height": "32px",
+    "identity": "table2",
+    "strokeWidth": "2px",
+    "width": "32px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

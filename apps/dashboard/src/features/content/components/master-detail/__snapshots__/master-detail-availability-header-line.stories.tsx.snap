@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Content/MasterDetail/MasterDetailAvailabilityHeaderLine Available smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "pencil",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/MasterDetail/MasterDetailAvailabilityHeaderLine Unavailable smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "circle-slash",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "pencil",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

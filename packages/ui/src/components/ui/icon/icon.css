@@ -1,0 +1,49 @@
+/*
+ * Icon — the only rule that sets glyph width, height, and stroke-width.
+ * A step sets --icon-size on the icon. inline reads --icon-inline.
+ * owner declares nothing: the enclosing or same-element owner publishes --icon-size.
+ */
+@layer components {
+  .ui-icon {
+    width: var(--icon-size);
+    height: var(--icon-size);
+    flex-shrink: 0;
+    stroke-width: var(--icon-stroke-width, var(--icon-glyph-stroke));
+  }
+
+  .ui-icon.ui-icon--xs {
+    --icon-size: var(--icon-glyph-xs);
+  }
+
+  .ui-icon.ui-icon--sm {
+    --icon-size: var(--icon-glyph-sm);
+  }
+
+  .ui-icon.ui-icon--md {
+    --icon-size: var(--icon-glyph-md);
+  }
+
+  .ui-icon.ui-icon--lg {
+    --icon-size: var(--icon-glyph-lg);
+  }
+
+  .ui-icon.ui-icon--xl {
+    --icon-size: var(--icon-glyph-xl);
+  }
+
+  .ui-icon.ui-icon--2xl {
+    --icon-size: var(--icon-glyph-2xl);
+  }
+
+  .ui-icon.ui-icon--3xl {
+    --icon-size: var(--icon-glyph-3xl);
+  }
+
+  .ui-icon.ui-icon--inline {
+    --icon-size: var(--icon-inline);
+  }
+
+  .ui-icon.ui-icon--owner {
+    /* Census and CSS-gate marker. No fallback when --icon-size is missing. */
+  }
+}

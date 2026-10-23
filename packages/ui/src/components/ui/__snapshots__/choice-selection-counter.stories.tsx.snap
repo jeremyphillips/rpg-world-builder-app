@@ -1,0 +1,57 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Primitives/ChoiceSelectionCounter CompactComplete smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/ChoiceSelectionCounter CompactIncomplete smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/ChoiceSelectionCounter Complete smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/ChoiceSelectionCounter Incomplete smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

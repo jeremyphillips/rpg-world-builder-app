@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`UI/IdentityFrame FallbackSizes smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "castle",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "castle",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "24px",
+    "identity": "castle",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "10px",
+    "identity": "castle",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

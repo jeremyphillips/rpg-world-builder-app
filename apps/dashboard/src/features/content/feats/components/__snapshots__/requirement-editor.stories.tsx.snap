@@ -1,0 +1,213 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Content/RequirementEditor Empty smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/RequirementEditor Grappler smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "circle",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "10px",
+    "identity": "circle",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/RequirementEditor MediumScale smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "circle",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "10px",
+    "identity": "circle",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/RequirementEditor SpellRecall smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "circle",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

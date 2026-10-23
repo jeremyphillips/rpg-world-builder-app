@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Navigation/SidebarNavItem Active smoke-test 1`] = `
+[
+  {
+    "height": "18px",
+    "identity": "layout-dashboard",
+    "strokeWidth": "1.75px",
+    "width": "18px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Navigation/SidebarNavItem Inactive smoke-test 1`] = `
+[
+  {
+    "height": "18px",
+    "identity": "castle",
+    "strokeWidth": "1.75px",
+    "width": "18px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

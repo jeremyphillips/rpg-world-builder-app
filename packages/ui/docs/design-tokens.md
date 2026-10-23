@@ -252,13 +252,15 @@ Two independent SSOT axes in `@rpg/ui` — compose separately or use named pairi
 
 Module: [`icon-glyph.variants.ts`](../src/components/ui/icon-glyph.variants.ts)
 
-| Step | px  | Utility              | Role                                             |
-| ---- | --- | -------------------- | ------------------------------------------------ |
-| xs   | 10  | `size-icon-glyph-xs` | Tertiary/decorative only — badge/chip sm leading |
-| sm   | 12  | `size-icon-glyph-sm` | Dense inline — semantic text, filter reset       |
-| md   | 14  | `size-icon-glyph-md` | Breadcrumbs, compact icon-button glyph (pairing) |
-| lg   | 16  | `size-icon-glyph-lg` | Menus, default button icons                      |
-| xl   | 32  | `size-icon-glyph-xl` | Large empty-state glyphs (detail hero fallbacks) |
+| Step | px  | Utility               | Role                                                             |
+| ---- | --- | --------------------- | ---------------------------------------------------------------- |
+| xs   | 10  | `size-icon-glyph-xs`  | Tertiary/decorative only — badge/chip sm leading                 |
+| sm   | 12  | `size-icon-glyph-sm`  | Dense inline — semantic text, filter reset                       |
+| md   | 14  | `size-icon-glyph-md`  | Breadcrumbs, compact icon-button glyph (pairing)                 |
+| lg   | 16  | `size-icon-glyph-lg`  | Menus, default button icons                                      |
+| xl   | 20  | `--icon-glyph-xl`     | Shared 20px step (`Icon` size `xl`). No legacy utility.          |
+| 2xl  | 24  | `--icon-glyph-2xl`    | Shared 24px step (`Icon` size `2xl`). No legacy utility.         |
+| 3xl  | 32  | `size-icon-glyph-3xl` | Large empty-state glyphs (detail hero fallbacks). Formerly `xl`. |
 
 Use `iconGlyphRootClasses` on root Lucide nodes; `iconGlyphDescendantClasses` /
 `iconGlyphDirectChildClasses` on wrappers.
@@ -325,7 +327,7 @@ Inline icons inherit their glyph step from the nearest typography owner. Consume
 
 Button glyphs stay on `resolveButtonIconGlyphStep`. Do not route them through `size-icon-inline`. Their step follows hit target and density, not the label's font size.
 
-Centered decorative stacks (a large glyph above a heading and description, including `size-icon-glyph-xl`) are not this pairing.
+Centered decorative stacks (a large glyph above a heading and description, including `size-icon-glyph-3xl`) are not this pairing.
 
 Storybook: **Design tokens → Icon glyph** (including nested `text-base` / `text-xs`) and **Control action**.
 

@@ -1,0 +1,86 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Primitives/CollapsibleListItem CollapsedAndExpanded smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/CollapsibleListItem CompoundApi smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/CollapsibleListItem Default smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/CollapsibleListItem Expanded smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/CollapsibleListItem NotCollapsible smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

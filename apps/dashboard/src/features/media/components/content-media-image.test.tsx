@@ -162,7 +162,7 @@ describe('ContentMediaImage', () => {
     expect(frame).toHaveClass('aspect-[4/3]')
     expect(frame).toHaveClass('rounded-card')
     expect(frame).toHaveAttribute('data-content-media-fallback', 'equipment')
-    expect(container.querySelector('svg')).toHaveClass('size-icon-glyph-xl')
+    expect(container.querySelector('svg')).toHaveClass('size-icon-glyph-3xl')
   })
 
   it('uses contain presentation for emblem hero frames without a crop', () => {

@@ -1,0 +1,387 @@
+{
+  "apps/bench/src/features/bench/components/ticket-card-move-menu.tsx": ["MoreHorizontal"],
+  "apps/bench/src/features/tickets/components/ticket-card-backlog-menu.tsx": ["MoreHorizontal"],
+  "apps/bench/src/features/tickets/components/ticket-card.tsx": ["AlertTriangle", "ChevronRight"],
+  "apps/bench/src/features/tickets/components/ticket-link-selected-preview.tsx": ["X"],
+  "apps/bench/src/features/tickets/components/ticket-meta.tsx": ["ExternalLink"],
+  "apps/bench/src/features/tickets/lib/ticket-form-def.ts": [
+    "CircleCheck",
+    "Code",
+    "FileText",
+    "Link"
+  ],
+  "apps/dashboard/src/components/ability-score/ability-score-recommendation-indicator.tsx": [
+    "Star"
+  ],
+  "apps/dashboard/src/components/layout/breadcrumb/app-breadcrumb.tsx": ["House"],
+  "apps/dashboard/src/components/layout/sidebar/all-campaigns-link.tsx": ["ChevronLeft"],
+  "apps/dashboard/src/components/layout/sidebar/lib/sidebar-nav-icons.ts": [
+    "CalendarDays",
+    "Dices",
+    "FlaskConical",
+    "LayoutDashboard",
+    "LucideIcon",
+    "MessageSquare",
+    "Settings2",
+    "ShieldCheck",
+    "Users"
+  ],
+  "apps/dashboard/src/components/layout/sidebar/lib/sidebar-nav-model.ts": ["LucideIcon"],
+  "apps/dashboard/src/components/layout/sidebar/nav-item.stories.tsx": [
+    "Castle",
+    "LayoutDashboard"
+  ],
+  "apps/dashboard/src/components/layout/sidebar/nav-item.tsx": ["LucideIcon"],
+  "apps/dashboard/src/components/layout/topbar/personal-workspace-topbar-title.tsx": ["UserRound"],
+  "apps/dashboard/src/features/campaign/components/campaign-switcher.tsx": [
+    "Check",
+    "ChevronsUpDown"
+  ],
+  "apps/dashboard/src/features/campaign/components/overview/campaign-overview-invite-row.tsx": [
+    "Link2"
+  ],
+  "apps/dashboard/src/features/campaign/routes/campaign-settings.tsx": [
+    "Globe",
+    "IdCard",
+    "Palette"
+  ],
+  "apps/dashboard/src/features/character/components/builder/steps/equipment/equipment-step-tier-summary.tsx": [
+    "ChevronDown"
+  ],
+  "apps/dashboard/src/features/character/components/builder/steps/proficiencies/proficiency-category-icons.ts": [
+    "BadgeCheck",
+    "Languages",
+    "Shield",
+    "Swords",
+    "Wrench"
+  ],
+  "apps/dashboard/src/features/character/components/builder/steps/shared/builder-step-choose-class-prompt.tsx": [
+    "Waypoints"
+  ],
+  "apps/dashboard/src/features/character/components/builder/steps/shared/choice-section/granted-choice-leading-icon.tsx": [
+    "BadgeCheck"
+  ],
+  "apps/dashboard/src/features/character/components/builder/steps/shared/fact-summary/builder-fact-summary.test.tsx": [
+    "Shield",
+    "WandSparkles"
+  ],
+  "apps/dashboard/src/features/character/components/builder/steps/shared/fact-summary/builder-fact-summary.tsx": [
+    "LucideIcon"
+  ],
+  "apps/dashboard/src/features/character/components/builder/steps/spells/spellcasting-fact-summary-icons.ts": [
+    "Crosshair",
+    "LucideIcon",
+    "ShieldCheck",
+    "WandSparkles"
+  ],
+  "apps/dashboard/src/features/character/components/detail/connections/character-connections-add-menu.tsx": [
+    "ChevronDown"
+  ],
+  "apps/dashboard/src/features/character/components/equipment/picker/status/equipment-unaffordable-affordance-tooltip.tsx": [
+    "CircleAlert"
+  ],
+  "apps/dashboard/src/features/character/components/equipment/starting-package/equipment-starting-package-disclosure.tsx": [
+    "ChevronDown"
+  ],
+  "apps/dashboard/src/features/character/components/equipment/starting-package/starting-equipment-tier-contribution.tsx": [
+    "Info"
+  ],
+  "apps/dashboard/src/features/character/components/spells/picker/spell-picker-selection-summary.tsx": [
+    "Check"
+  ],
+  "apps/dashboard/src/features/character/lib/naming/species-name-generation-action-icon.tsx": [
+    "Wand2"
+  ],
+  "apps/dashboard/src/features/character/lib/relationship/connection-section-icons.tsx": ["House"],
+  "apps/dashboard/src/features/character/npc/components/quick-npc/quick-npc-starting-choices.tsx": [
+    "ChevronDown"
+  ],
+  "apps/dashboard/src/features/character/npc/lib/quick-npc/quick-npc-form-fields.ts": [
+    "ClipboardList",
+    "ListTodo"
+  ],
+  "apps/dashboard/src/features/content/classes/components/character-creation/sortable-ability-score-order.tsx": [
+    "GripVertical"
+  ],
+  "apps/dashboard/src/features/content/classes/components/class-spellbook-acquisition-modal.tsx": [
+    "BookOpen",
+    "Info"
+  ],
+  "apps/dashboard/src/features/content/classes/components/features/feature-table-row.tsx": [
+    "Table2"
+  ],
+  "apps/dashboard/src/features/content/components/master-detail/master-detail-editor-empty-state.tsx": [
+    "Sparkles"
+  ],
+  "apps/dashboard/src/features/content/components/master-detail/master-detail-editor-issue-summary.tsx": [
+    "AlertTriangle"
+  ],
+  "apps/dashboard/src/features/content/components/master-detail/master-detail-list-row.tsx": [
+    "ChevronRight"
+  ],
+  "apps/dashboard/src/features/content/components/table-builder/table-builder-column-type.ts": [
+    "Dices",
+    "Hash",
+    "LucideIcon",
+    "Type"
+  ],
+  "apps/dashboard/src/features/content/components/table-builder/table-builder-inset-gate.tsx": [
+    "Table2"
+  ],
+  "apps/dashboard/src/features/content/components/table-builder/table-builder-value-cell.tsx": [
+    "Info"
+  ],
+  "apps/dashboard/src/features/content/lib/campaign-access/overview/content-access-metadata.tsx": [
+    "CircleSlash",
+    "Lock",
+    "Users"
+  ],
+  "apps/dashboard/src/features/content/lib/detail/row/entity/__stories__/detail-entity-row-actions.stories.tsx": [
+    "Plus"
+  ],
+  "apps/dashboard/src/features/content/lib/detail/row/entity/detail-entity-row.tsx": [
+    "ChevronDown"
+  ],
+  "apps/dashboard/src/features/content/lib/entity/anatomy/entity-anatomy-trailing.tsx": [
+    "ChevronRight"
+  ],
+  "apps/dashboard/src/features/content/lib/entity/summary/entity-summary-status.tsx": [
+    "AlertCircle",
+    "Check",
+    "TriangleAlert"
+  ],
+  "apps/dashboard/src/features/content/lib/entity/summary/picker-selection-state-line.tsx": [
+    "Check"
+  ],
+  "apps/dashboard/src/features/content/lib/forms/content-form-tab-icons.ts": [
+    "BookOpen",
+    "Clock",
+    "Flag",
+    "Gauge",
+    "Network",
+    "Scale",
+    "Sparkle",
+    "Swords",
+    "Target",
+    "Trees"
+  ],
+  "apps/dashboard/src/features/content/lib/forms/grants/proficiency/proficiency-equipment-link-cue.tsx": [
+    "Link"
+  ],
+  "apps/dashboard/src/features/content/lib/table-builder/table-builder-kind-options.lib.tsx": [
+    "ChartNoAxesColumn",
+    "Grid3x3",
+    "LucideIcon"
+  ],
+  "apps/dashboard/src/features/game-terms/components/vocabulary-availability-metadata.tsx": [
+    "CircleSlash"
+  ],
+  "apps/dashboard/src/features/global-search/components/topbar/global-search-trigger.tsx": [
+    "Search"
+  ],
+  "apps/dashboard/src/features/media/components/card-image-instance-matrix.test.tsx": ["User"],
+  "apps/dashboard/src/features/media/components/media-manager/media-gallery.tsx": ["Images"],
+  "apps/dashboard/src/features/media/components/media-manager/media-image-details.tsx": [
+    "ChevronDown"
+  ],
+  "apps/dashboard/src/features/media/components/media-manager/media-workspace.tsx": ["Info"],
+  "apps/dashboard/src/features/message/components/thread/message-composer.tsx": ["Send"],
+  "apps/dashboard/src/features/name-generator/components/name-generator-result-row.tsx": [
+    "Check",
+    "Copy"
+  ],
+  "apps/dashboard/src/features/notification/components/notification-bell-menu-body.tsx": [
+    "MessageSquare"
+  ],
+  "apps/dashboard/src/features/notification/lib/resolve-notification-preview-icon.tsx": [
+    "Mail",
+    "Users"
+  ],
+  "apps/dashboard/src/lib/actions/blocker/action-blocker-references.tsx": ["ChevronDown"],
+  "apps/dashboard/src/lib/character-relationships/character-relationship-indicator.tsx": [
+    "UserRoundCheck"
+  ],
+  "apps/dashboard/src/lib/create-flow/create-modal-shell.tsx": ["AlertTriangle"],
+  "apps/dashboard/src/lib/data-table/overview-selection-cluster.tsx": ["ListChecks"],
+  "apps/dashboard/src/lib/overview/overview-bulk-actions-menu.tsx": ["ChevronDown", "Layers"],
+  "apps/dashboard/src/lib/usage-references/usage-reference-group-list.tsx": ["ChevronDown"],
+  "apps/dashboard/src/lib/usage-references/usage-reference-row.tsx": ["ExternalLink"],
+  "apps/dashboard/src/stories/card-recipes/card-recipes.registry.tsx": [
+    "GripVertical",
+    "Trash2",
+    "WandSparkles"
+  ],
+  "packages/ui/src/components/preview-rail/preview-rail.client.tsx": ["CircleSlash"],
+  "packages/ui/src/components/preview-rail/preview-rail.stories.tsx": ["BookOpen", "Eye"],
+  "packages/ui/src/components/preview-rail/preview-rail.test.tsx": ["BookOpen", "Eye"],
+  "packages/ui/src/components/ui/accordion.client.tsx": ["ChevronDown"],
+  "packages/ui/src/components/ui/action-icons.map.ts": [
+    "ArrowLeft",
+    "Ellipsis",
+    "Eye",
+    "GripVertical",
+    "ImagePlus",
+    "LucideIcon",
+    "MoreHorizontal",
+    "MoreVertical",
+    "Pencil",
+    "Plus",
+    "RotateCcw",
+    "SquarePen",
+    "Trash2",
+    "UserPlus",
+    "Waypoints",
+    "X"
+  ],
+  "packages/ui/src/components/ui/app-icon.types.ts": ["LucideIcon"],
+  "packages/ui/src/components/ui/breadcrumb.client.tsx": ["ChevronRight", "MoreHorizontal"],
+  "packages/ui/src/components/ui/button-dropdown.client.tsx": ["ChevronDown"],
+  "packages/ui/src/components/ui/button.stories.tsx": ["ArrowRight", "Plus", "Trash2"],
+  "packages/ui/src/components/ui/button.test.tsx": ["ArrowRight", "Plus"],
+  "packages/ui/src/components/ui/card.lib.tsx": ["ChevronRight"],
+  "packages/ui/src/components/ui/catalog-picker-action-button.client.tsx": ["Minus", "Plus"],
+  "packages/ui/src/components/ui/checkbox.client.tsx": ["Check"],
+  "packages/ui/src/components/ui/chip.client.tsx": ["Check", "X"],
+  "packages/ui/src/components/ui/collapsible-list-item/collapsible-list-item-toolbar.client.tsx": [
+    "ChevronDown",
+    "GripVertical"
+  ],
+  "packages/ui/src/components/ui/combobox-field-parts.client.tsx": [
+    "Check",
+    "ChevronDown",
+    "Lock",
+    "X"
+  ],
+  "packages/ui/src/components/ui/compact-control.stories.tsx": ["Plus", "Settings"],
+  "packages/ui/src/components/ui/content-display-fallback-icon.map.ts": [
+    "Backpack",
+    "BookOpen",
+    "Castle",
+    "Dna",
+    "Drama",
+    "Landmark",
+    "ListChecks",
+    "MapPin",
+    "Medal",
+    "Skull",
+    "Sparkles",
+    "Tags",
+    "UserRound"
+  ],
+  "packages/ui/src/components/ui/data-table-columns-menu.client.tsx": [
+    "ChevronDown",
+    "Columns3",
+    "GripVertical",
+    "Lock",
+    "RotateCcw"
+  ],
+  "packages/ui/src/components/ui/data-table-filter-region.client.tsx": [
+    "ChevronDown",
+    "ChevronRight"
+  ],
+  "packages/ui/src/components/ui/data-table.client.tsx": [
+    "ArrowUpDown",
+    "Check",
+    "ChevronDown",
+    "ChevronUp",
+    "X"
+  ],
+  "packages/ui/src/components/ui/data-table.stories.tsx": ["Pencil"],
+  "packages/ui/src/components/ui/dialog-parts.client.tsx": ["X"],
+  "packages/ui/src/components/ui/disclosure-chevron-trigger.client.tsx": ["ChevronDown"],
+  "packages/ui/src/components/ui/drop-target-prompt.client.tsx": [
+    "FileIcon",
+    "ImageIcon",
+    "Upload",
+    "UploadCloudIcon"
+  ],
+  "packages/ui/src/components/ui/dropdown-menu.client.tsx": ["Check", "ChevronRight", "Circle"],
+  "packages/ui/src/components/ui/field-clear-affordance.client.tsx": ["X"],
+  "packages/ui/src/components/ui/field-group-legend.client.tsx": ["ChevronDown"],
+  "packages/ui/src/components/ui/field-group-summary-trigger.client.tsx": ["CircleSlash"],
+  "packages/ui/src/components/ui/field-group-summary-trigger.test.tsx": ["Pencil"],
+  "packages/ui/src/components/ui/file-dropzone.client.tsx": ["FileIcon", "X"],
+  "packages/ui/src/components/ui/hero.stories.tsx": ["Ellipsis"],
+  "packages/ui/src/components/ui/icon-container.stories.tsx": ["Table2"],
+  "packages/ui/src/components/ui/icon-glyph-inline.test.tsx": ["Check"],
+  "packages/ui/src/components/ui/icon-glyph.stories.tsx": ["Check", "Info", "TriangleAlert"],
+  "packages/ui/src/components/ui/identity-frame.stories.tsx": ["Castle"],
+  "packages/ui/src/components/ui/inline-inactive-status.client.tsx": ["CircleSlash"],
+  "packages/ui/src/components/ui/input-select-field.client.tsx": ["Check"],
+  "packages/ui/src/components/ui/inset-panel.stories.tsx": ["Table2"],
+  "packages/ui/src/components/ui/interactive-list-parity.stories.tsx": ["Check"],
+  "packages/ui/src/components/ui/interactive-list.stories.tsx": ["Check"],
+  "packages/ui/src/components/ui/media-field-summary.client.tsx": ["ImagePlus", "Settings"],
+  "packages/ui/src/components/ui/modal.stories.tsx": ["BookOpen"],
+  "packages/ui/src/components/ui/notification-bell.client.tsx": ["Bell"],
+  "packages/ui/src/components/ui/number-input-steppers.client.tsx": ["ChevronDown", "ChevronUp"],
+  "packages/ui/src/components/ui/number-stepper-controls.client.tsx": ["Minus", "Plus"],
+  "packages/ui/src/components/ui/radio-card.stories.tsx": ["ChartNoAxesColumn", "Grid3x3"],
+  "packages/ui/src/components/ui/radio-card.test.tsx": ["ChartNoAxesColumn", "Grid3x3"],
+  "packages/ui/src/components/ui/radio-group.client.tsx": ["Circle"],
+  "packages/ui/src/components/ui/radio-option-card-controls.client.tsx": ["Circle"],
+  "packages/ui/src/components/ui/radio-option-card.client.tsx": ["Info"],
+  "packages/ui/src/components/ui/resource-icons.map.ts": ["Coins", "Gem"],
+  "packages/ui/src/components/ui/resource-icons.test.ts": ["Coins", "Gem"],
+  "packages/ui/src/components/ui/rich-text-editor-toolbar.client.tsx": [
+    "Bold",
+    "Code",
+    "Italic",
+    "Link",
+    "List",
+    "ListOrdered",
+    "LucideIcon",
+    "SquareCode",
+    "Table2"
+  ],
+  "packages/ui/src/components/ui/rich-text-link-picker.client.tsx": ["X"],
+  "packages/ui/src/components/ui/rich-text-table-embed-node.client.tsx": [
+    "Pencil",
+    "Table2",
+    "Trash2"
+  ],
+  "packages/ui/src/components/ui/search-bar.client.tsx": ["Search"],
+  "packages/ui/src/components/ui/segmented-control.stories.tsx": [
+    "BookOpen",
+    "Flag",
+    "ListChecks",
+    "Sparkles"
+  ],
+  "packages/ui/src/components/ui/select-like-trigger-slots.client.tsx": ["ChevronDown"],
+  "packages/ui/src/components/ui/select.client.tsx": ["Check", "ChevronDown", "ChevronUp"],
+  "packages/ui/src/components/ui/semantic-text/semantic-text.stories.tsx": ["TriangleAlert"],
+  "packages/ui/src/components/ui/semantic-text/semantic-text.test.tsx": ["TriangleAlert"],
+  "packages/ui/src/components/ui/sidebar-nav-item.stories.tsx": ["Castle", "LayoutDashboard"],
+  "packages/ui/src/components/ui/sidebar-nav-section-disclosure.client.tsx": ["ChevronDown"],
+  "packages/ui/src/components/ui/sidebar-trigger.client.tsx": ["Menu", "X"],
+  "packages/ui/src/components/ui/sort-menu-radio-item.client.tsx": ["Check"],
+  "packages/ui/src/components/ui/sort-menu.client.tsx": ["ArrowDownUp", "ChevronDown"],
+  "packages/ui/src/components/ui/spinner.tsx": ["Loader2Icon"],
+  "packages/ui/src/components/ui/split-button.client.tsx": ["ChevronDown"],
+  "packages/ui/src/components/ui/status-icon.client.tsx": [
+    "Check",
+    "CircleAlert",
+    "Ellipsis",
+    "Minus",
+    "Slash"
+  ],
+  "packages/ui/src/components/ui/text-field.test.tsx": ["Wand2"],
+  "packages/ui/src/components/ui/theme-switch.client.tsx": ["Moon", "Sun"],
+  "packages/ui/src/components/ui/toast-managed.client.tsx": ["AlertTriangle", "Check", "XCircle"],
+  "packages/ui/src/components/ui/toast.client.tsx": ["X"],
+  "packages/ui/src/components/ui/tooltip.client.tsx": ["Info"],
+  "packages/ui/src/components/ui/user-menu-trigger.client.tsx": ["ChevronDown"],
+  "packages/ui/src/components/ui/validation-issue-count-badge.client.tsx": ["AlertTriangle"],
+  "packages/ui/src/components/ui/wizard.client.tsx": ["CheckIcon"],
+  "packages/ui/src/filters/filter-bar.client.tsx": ["RotateCcw"],
+  "packages/ui/src/form/presentation/array-like-section-header.stories.tsx": ["Plus"],
+  "packages/ui/src/form/presentation/form-section-header.stories.tsx": ["Plus"],
+  "packages/ui/src/form/renderers/array/array-field-add-control.client.tsx": ["Plus"],
+  "packages/ui/src/form/renderers/array/array-item-anatomy-grid.test.tsx": [
+    "GripVertical",
+    "Trash2"
+  ],
+  "packages/ui/src/form/renderers/array/array-item-drag-handle-slot.client.tsx": ["GripVertical"],
+  "packages/ui/src/form/renderers/array/array-item-issue.client.tsx": ["AlertTriangle"],
+  "packages/ui/src/form/shells/tabbed-form-error-summary.client.tsx": ["AlertTriangle"]
+}

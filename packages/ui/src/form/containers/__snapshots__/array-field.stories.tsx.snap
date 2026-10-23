@@ -1,0 +1,620 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Forms/ArrayField BoundedArray smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField CompactRow smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField ConditionalItemFields smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField DetailedCollapsible smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField DragReorder smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField ExamplesUnlabeledInlineRow smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField ExpandedRowIssueSummary play-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+]
+`;
+
+exports[`Forms/ArrayField FlatArray smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField MovementChromeStabilitySequence smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField NestedCompact smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField NestedErrorRollup play-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "triangle-alert",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "triangle-alert",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+]
+`;
+
+exports[`Forms/ArrayField PresentationMatrixDisclosureStacked smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField PresentationMatrixFlatInlineBareText smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField PresentationMatrixFlatInlineRowWrap smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField PresentationMatrixFlatInlineSentence smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField PresentationMatrixFlatStackedTwoFields smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/ArrayField PresentationMatrixFlatWithHeader smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

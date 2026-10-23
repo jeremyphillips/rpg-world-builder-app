@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Components/DataTableFilterChrome Default smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "search",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-right",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/DataTableFilterChrome WithActiveFilters smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "search",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "rotate-ccw",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-right",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

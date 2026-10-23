@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Components/PreviewRail PlainChrome smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "book-open",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/PreviewRail SheetHost smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "book-open",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/PreviewRail UnavailableIdentity smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "book-open",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "circle-slash",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/PreviewRail WithIdentityMetadata smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "book-open",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

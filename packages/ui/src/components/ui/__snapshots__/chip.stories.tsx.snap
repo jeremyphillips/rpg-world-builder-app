@@ -1,0 +1,115 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Components/Chip ClassReference smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/Chip ContrastMatrixBase smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/Chip ContrastMatrixSubtle smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/Chip RemovableLg smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/Chip RemovableMd smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/Chip SelectableSelected smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

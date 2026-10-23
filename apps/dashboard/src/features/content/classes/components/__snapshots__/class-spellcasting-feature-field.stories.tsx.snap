@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Content/Classes/ClassSpellcastingFeatureField MissingGrantingFeature smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/Classes/ClassSpellcastingFeatureField WithGrantingFeature smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "table2",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

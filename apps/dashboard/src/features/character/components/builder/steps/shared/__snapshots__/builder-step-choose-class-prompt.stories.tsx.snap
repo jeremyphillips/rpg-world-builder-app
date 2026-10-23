@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Character Builder/BuilderStepChooseClassPrompt Equipment smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "waypoints",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Character Builder/BuilderStepChooseClassPrompt Proficiencies smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "waypoints",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Character Builder/BuilderStepChooseClassPrompt Spells smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "waypoints",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

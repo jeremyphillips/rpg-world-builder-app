@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Primitives/FileField Default smoke-test 1`] = `
+[
+  {
+    "height": "40px",
+    "identity": "image",
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "16px",
+    "identity": "upload",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/FileField MultipleFiles smoke-test 1`] = `
+[
+  {
+    "height": "40px",
+    "identity": "image",
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "16px",
+    "identity": "upload",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/FileField WithError smoke-test 1`] = `
+[
+  {
+    "height": "40px",
+    "identity": "image",
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "16px",
+    "identity": "upload",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

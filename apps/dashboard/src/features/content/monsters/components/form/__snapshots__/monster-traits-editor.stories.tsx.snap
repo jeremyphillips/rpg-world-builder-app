@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Dashboard/Content/Monsters/MonsterTraitsEditor Empty smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "40px",
+    "identity": "sparkles",
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Dashboard/Content/Monsters/MonsterTraitsEditor Narrow smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "40px",
+    "identity": "sparkles",
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

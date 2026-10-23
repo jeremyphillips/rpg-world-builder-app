@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Components/MediaFieldSummary CompactEmpty smoke-test 1`] = `
+[
+  {
+    "height": "24px",
+    "identity": "image-plus",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/MediaFieldSummary CompactEmptySingle smoke-test 1`] = `
+[
+  {
+    "height": "24px",
+    "identity": "image-plus",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/MediaFieldSummary CompactPopulated smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "settings",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/MediaFieldSummary CompactPopulatedSingle smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "settings",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/MediaFieldSummary ExpandedEmpty smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/MediaFieldSummary ExpandedOverflow smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/MediaFieldSummary ReadOnly smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

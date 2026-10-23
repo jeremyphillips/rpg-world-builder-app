@@ -1,0 +1,167 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Dashboard/Content/Monsters/MonsterStatisticsPanel Default smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Dashboard/Content/Monsters/MonsterStatisticsPanel Narrow smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

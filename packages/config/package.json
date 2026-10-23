@@ -14,11 +14,13 @@
     "./tsconfig/react.json": "./tsconfig/react.json",
     "./tsconfig/node.json": "./tsconfig/node.json",
     "./storybook/main-base": "./src/storybook/main-base.ts",
-    "./storybook/preview-base": "./src/storybook/preview-base.ts"
+    "./storybook/preview-base": "./src/storybook/preview-base.ts",
+    "./storybook/icon-geometry-census": "./src/storybook/icon-geometry-census.ts"
   },
   "scripts": {
     "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
   },
   "peerDependencies": {
     "@storybook/addon-a11y": "^10.4.2",
@@ -50,6 +52,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "storybook": "^10.4.2",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
   }
 }

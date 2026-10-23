@@ -161,10 +161,15 @@ export {
   type IconContainerShape,
   type IconContainerSize,
 } from './components/ui/icon-container.client'
+export { iconContainerVariants } from './components/ui/icon-container.variants'
+export { Icon } from './components/ui/icon/icon'
 export {
-  iconContainerVariants,
-  iconContainerGlyphClasses,
-} from './components/ui/icon-container.variants'
+  ICON_SIZES,
+  type IconName,
+  type IconProps,
+  type IconSize,
+  type IconSizeMode,
+} from './components/ui/icon/icon.types'
 export { IdentityFrame, type IdentityFrameProps } from './components/ui/identity-frame.client'
 export {
   identityFrameVariants,

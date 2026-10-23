@@ -1,0 +1,138 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Layout/Sidebar/CampaignSidebarNav Default smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-left",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevrons-up-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "layout-dashboard",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "user-round",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "calendar-days",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "message-square",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "drama",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "landmark",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "map-pin",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "book-open",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "sparkles",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "dna",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "medal",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "backpack",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "list-checks",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "skull",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "tags",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "flask-conical",
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

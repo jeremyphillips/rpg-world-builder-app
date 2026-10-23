@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Content/Entity/CatalogCard DisclosureToggle smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/Entity/CatalogCard FlatAndDisclosureRhythm smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/Entity/CatalogCard LocationPickerDrawerContext smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "search",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "24px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

@@ -1,7 +1,6 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { iconGlyphDirectChildClasses } from './icon-glyph.variants'
 import { establishSurfaceCurrent } from './surface-current.lib'
 import {
   identityFrameFallbackIconClasses,
@@ -33,6 +32,3 @@ export const iconContainerVariants = cva(
     },
   },
 )
-
-/** @deprecated Icon glyphs are sized on the container via direct-child selectors. */
-export const iconContainerGlyphClasses = iconGlyphDirectChildClasses.lg

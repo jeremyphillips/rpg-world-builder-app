@@ -1,0 +1,142 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Character/Detail/Connections/CharacterConnectionEditModal EditOrganizationMembership smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "10px",
+    "identity": "circle",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "24px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Character/Detail/Connections/CharacterConnectionEditModal EditPersonRelationship smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "24px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Character/Detail/Connections/CharacterConnectionEditModal EditResidence smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "24px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

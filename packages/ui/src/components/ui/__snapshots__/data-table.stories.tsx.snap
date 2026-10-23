@@ -1,0 +1,630 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Components/DataTable Basic smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "columns3",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/DataTable ClassReference smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/DataTable EmptyState smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "columns3",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/DataTable WithCaption smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "columns3",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/DataTable WithExternalFilters smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-right",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "columns3",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/DataTable WithRowActions smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "columns3",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/DataTable WithRowSelection smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "columns3",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "arrow-up-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

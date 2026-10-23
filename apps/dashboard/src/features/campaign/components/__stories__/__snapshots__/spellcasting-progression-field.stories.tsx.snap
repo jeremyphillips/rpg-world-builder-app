@@ -1,0 +1,107 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Dashboard/Campaign/SpellcastingProgressionField ExtendedProgression smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "table2",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "pencil",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "table2",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "pencil",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "table2",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "pencil",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Dashboard/Campaign/SpellcastingProgressionField SystemDefault smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "table2",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "pencil",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "table2",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "pencil",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "table2",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "pencil",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

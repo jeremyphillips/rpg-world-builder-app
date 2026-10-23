@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Content/MasterDetailEditorPanel EmptySelection smoke-test 1`] = `
+[
+  {
+    "height": "40px",
+    "identity": "sparkles",
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/MasterDetailEditorPanel SelectedRow smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

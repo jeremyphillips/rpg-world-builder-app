@@ -1,0 +1,100 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Content/Locations/LocationParentReplacementDrawer ChangeParent smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "map-pin",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "search",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "map-pin",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "24px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/Locations/LocationParentReplacementDrawer MoveLocation smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "map-pin",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "12px",
+    "identity": "search",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "map-pin",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "24px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/Locations/LocationParentReplacementDrawer SetParent smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "search",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "map-pin",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "24px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

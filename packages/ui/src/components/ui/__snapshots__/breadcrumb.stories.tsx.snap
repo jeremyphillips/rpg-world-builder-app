@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`UI/Breadcrumb ThreeLevels smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "chevron-right",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "chevron-right",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/Breadcrumb TwoLevels smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "chevron-right",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/Breadcrumb WithEllipsis smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "chevron-right",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "chevron-right",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

@@ -1,0 +1,151 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Forms/TabbedForm CollapsedArrayValidation smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash2",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/TabbedForm Default smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/TabbedForm LongContent smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/TabbedForm ValidationErrors smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/TabbedForm WithAside smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/TabbedForm WithFormError smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

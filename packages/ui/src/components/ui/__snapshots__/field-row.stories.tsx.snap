@@ -1,0 +1,175 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Forms/Layout/FieldRow EvenSplit smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Layout/FieldRow FixedPlusFull smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Layout/FieldRow LabeledRowWithDiceFormula smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Layout/FieldRow LabeledRowWithInputSelect smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Layout/FieldRow LabeledRowWithInputUnit smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Layout/FieldRow MixedStackedInlineWithError smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Shared/CharacterRelationshipIndicator ClassRelationship smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "user-round-check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Shared/CharacterRelationshipIndicator MixedSpellRelationships smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "user-round-check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

@@ -1,0 +1,145 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`UI/InlineChooseCountField Default smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/InlineChooseCountField WalkSpeed smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/InlineChooseCountField WithError smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/InlineChooseCountField WithHint smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/InlineChooseCountField WithTrailingSelect smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/InlineChooseCountField WithVisibleLabel smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "chevron-up",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

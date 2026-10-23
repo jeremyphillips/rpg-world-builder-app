@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Primitives/Spinner Default smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "loader-circle",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/Spinner Foreground smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "loader-circle",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/Spinner Large smoke-test 1`] = `
+[
+  {
+    "height": "32px",
+    "identity": "loader-circle",
+    "strokeWidth": "2px",
+    "width": "32px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

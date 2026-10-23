@@ -1,0 +1,274 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Primitives/StatusIcon ClassReference smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/StatusIcon CustomTooltip smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/StatusIcon Default smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/StatusIcon SizeParity smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "12px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "12px",
+  },
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/StatusIcon Sizes smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "12px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/StatusIcon Variants smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "12px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "12px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "12px",
+    "identity": "ellipsis",
+    "strokeWidth": "4px",
+    "width": "12px",
+  },
+  {
+    "height": "6px",
+    "identity": "slash",
+    "strokeWidth": "7px",
+    "width": "6px",
+  },
+  {
+    "height": "6px",
+    "identity": "slash",
+    "strokeWidth": "7px",
+    "width": "6px",
+  },
+  {
+    "height": "8px",
+    "identity": "slash",
+    "strokeWidth": "7px",
+    "width": "8px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "minus",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "12px",
+    "identity": "minus",
+    "strokeWidth": "4px",
+    "width": "12px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "12px",
+    "identity": "ellipsis",
+    "strokeWidth": "4px",
+    "width": "12px",
+  },
+  {
+    "height": "10px",
+    "identity": "circle-alert",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "circle-alert",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "12px",
+    "identity": "circle-alert",
+    "strokeWidth": "4px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/StatusIcon WithLabel smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/StatusIcon WithTooltip smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/StatusIcon WithoutTooltip smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

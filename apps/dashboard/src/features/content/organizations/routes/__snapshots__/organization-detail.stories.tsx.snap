@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Content/Organizations/OrganizationDetail Academic smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "32px",
+    "identity": "landmark",
+    "strokeWidth": "2px",
+    "width": "32px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/Organizations/OrganizationDetail Government smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "32px",
+    "identity": "landmark",
+    "strokeWidth": "2px",
+    "width": "32px",
+  },
+  {
+    "height": "16px",
+    "identity": "chevron-down",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

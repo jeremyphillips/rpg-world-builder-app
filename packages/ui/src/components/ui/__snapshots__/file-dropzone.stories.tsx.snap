@@ -1,0 +1,139 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Primitives/FileDropzone AcceptPdf smoke-test 1`] = `
+[
+  {
+    "height": "40px",
+    "identity": "file",
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "16px",
+    "identity": "upload",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/FileDropzone Comfortable smoke-test 1`] = `
+[
+  {
+    "height": "40px",
+    "identity": "image",
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "16px",
+    "identity": "upload",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/FileDropzone Default smoke-test 1`] = `
+[
+  {
+    "height": "40px",
+    "identity": "image",
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "16px",
+    "identity": "upload",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/FileDropzone MultipleFiles smoke-test 1`] = `
+[
+  {
+    "height": "40px",
+    "identity": "image",
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "16px",
+    "identity": "upload",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/FileDropzone WithExistingImage smoke-test 1`] = `
+[
+  {
+    "height": "40px",
+    "identity": "image",
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "16px",
+    "identity": "upload",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/FileDropzone WithFile smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

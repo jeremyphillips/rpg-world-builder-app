@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Campaign/CampaignTopbarTitle Loading smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Campaign/CampaignTopbarTitle LongNameTruncation smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "castle",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Campaign/CampaignTopbarTitle Missing smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "castle",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Campaign/CampaignTopbarTitle Resolved smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "castle",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

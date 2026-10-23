@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Campaign/CampaignOverviewHero OverflowFlavorBadges smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Campaign/CampaignOverviewHero PlayerViewer smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Campaign/CampaignOverviewHero WithBannerAndEmblem smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Campaign/CampaignOverviewHero WithoutMedia smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

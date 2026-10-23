@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Character Builder/SpellPickerDrawer NoOptions smoke-test 1`] = `[]`;
+
+exports[`Character Builder/SpellPickerDrawer Prepared smoke-test 1`] = `[]`;
+
+exports[`Character Builder/SpellPickerDrawer Recommended smoke-test 1`] = `[]`;
+
+exports[`Character Builder/SpellPickerDrawer SelectionFull smoke-test 1`] = `[]`;
