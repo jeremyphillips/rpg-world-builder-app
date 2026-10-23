@@ -22,14 +22,15 @@ across overlay scrollbar platforms.
 
 ## Composition
 
-| Consumer                                                                                | Composition                                                                                           |
-| --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| [`DialogPanelScrollRegion`](../src/components/ui/dialog-panel-scroll-region.client.tsx) | Overlay Modal/Sheet/Drawer column scrollport — SBR + `px-6` / `pt-5` / `pb-6` viewport inset          |
-| [`dialogPanelScrollRegionClasses`](../src/components/ui/dialog-panel.variants.ts)       | Deprecated class alias — prefer `DialogPanelScrollRegion`                                             |
-| [`PreviewRail` scroll region](../src/components/preview-rail/preview-rail.client.tsx)   | `min-h-0 flex-1` via [`ScrollBoundaryRegion`](../src/components/ui/scroll-boundary-region.client.tsx) |
-| [`FormStickyScrollBody`](../src/form/chrome/form-sticky-scroll-body.client.tsx)         | clip slot (`form-scroll-body-container`, `overflow-hidden`) + inner scroller                          |
-| [`formStickyScrollBodyScrollerClasses`](../src/form/chrome/form-chrome.variants.ts)     | inner scroller — `overflow-y-auto`, end-of-scroll padding                                             |
-| Dashboard `SidebarNav` primary `<nav>`                                                  | `ps-3 pb-4` plus local `min-h-0 flex-1`; the primitive owns scroll and the end inset                  |
+| Consumer                                                                                  | Composition                                                                                                                                    |
+| ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`DialogPanelScrollRegion`](../src/components/ui/dialog-panel-scroll-region.client.tsx)   | Overlay Modal/Sheet/Drawer column scrollport — SBR + `px-6` / `pt-5` / `pb-6` viewport inset                                                   |
+| [`dialogPanelScrollRegionClasses`](../src/components/ui/dialog-panel.variants.ts)         | Deprecated class alias — prefer `DialogPanelScrollRegion`                                                                                      |
+| [`PreviewRail` scroll region](../src/components/preview-rail/preview-rail.client.tsx)     | `min-h-0 flex-1` via [`ScrollBoundaryRegion`](../src/components/ui/scroll-boundary-region.client.tsx)                                          |
+| [`FormStickyScrollBody`](../src/form/chrome/form-sticky-scroll-body.client.tsx)           | clip slot (`form-scroll-body-container`, `overflow-hidden`) + [`ScrollBoundaryRegion`](../src/components/ui/scroll-boundary-region.client.tsx) |
+| [`formStickyScrollBodyScrollViewportClasses`](../src/form/chrome/form-chrome.variants.ts) | live scroller — classes on the `ScrollBoundaryRegion` viewport (`h-full min-h-0`, end-of-scroll padding)                                       |
+| [`formStickyScrollBodyScrollerClasses`](../src/form/chrome/form-chrome.variants.ts)       | legacy alias of the old inner-scroller tokens. The runtime does not apply it                                                                   |
+| Dashboard `SidebarNav` primary `<nav>`                                                    | `ps-3 pb-4` plus local `min-h-0 flex-1`; the primitive owns scroll and the end inset                                                           |
 
 ## Environmental bottom inset
 
@@ -50,7 +51,8 @@ fallback is `min(content-cap, 100dvh - top-inset - bottom-inset)`. Inside the co
 `max-height` tightens with `min(fallback, 100cqh - docked-scroll-top-chrome - floor-gap)` only
 — never raw `100cqh` alone and never a second `min()` that can invalidate the fallback when
 `cqh` is unreliable. Docked forms split the scroll slot: `FormStickyScrollBody` clip
-(`overflow-hidden` size container) + inner scroller so sticky rails cannot paint into the footer
+(`overflow-hidden` size container) + `ScrollBoundaryRegion` (viewport classes from
+`formStickyScrollBodyScrollViewportClasses`) so sticky rails cannot paint into the footer
 sibling even when caps underestimate. Slight **under-fill is preferable to overlap**;
 `--rpg-content-bottom-inset` applies to the **dvh fallback only**. The list scroll body does
 not compose `boundedScrollRegionEndInsetClasses` — no inline-end gutter reserve.
@@ -68,7 +70,7 @@ shadows at the top and bottom edges:
 
 Storybook: **Primitives/ScrollBoundaryRegion**.
 
-[`DialogPanelScrollRegion`](../src/components/ui/dialog-panel-scroll-region.client.tsx) is **overlay-only** — do not use it for page `FormStickyScrollBody` (`pt-8` spacer), PreviewRail, master-detail list rails, or nested `max-h-*` lists inside overlay bodies. Overlay top inset is `pt-5` on the scroll viewport; page shell inset stays `pt-8`.
+[`DialogPanelScrollRegion`](../src/components/ui/dialog-panel-scroll-region.client.tsx) is **overlay-only** — do not use it for page `FormStickyScrollBody` (`pt-8` spacer), PreviewRail, master-detail list rails, or nested `max-h-*` lists inside overlay bodies. Overlay top inset is `pt-5` on the scroll viewport. The page form scroll-body inset is `pt-8`. Dashboard page-shell top inset (`pageShellInsetTopClasses`) is `pt-6`.
 
 ## Follow-up adopters
 

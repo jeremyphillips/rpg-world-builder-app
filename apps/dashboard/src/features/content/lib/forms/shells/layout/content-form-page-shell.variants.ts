@@ -8,5 +8,8 @@ export const contentViewportFormFillClasses = 'flex min-h-0 flex-1 flex-col over
 export const contentFormPageShellBodyClasses =
   'flex min-h-0 flex-1 flex-col [--rpg-content-top-inset:calc(var(--rpg-content-top-inset,0px)+4rem)]'
 
-/** Page heading row above the form — keep out of the bounded scroll column. */
+/**
+ * Unused. Nothing applies this class. The page heading row has no styling
+ * owner here; do not treat this export as that row's contract.
+ */
 export const contentFormPageShellHeadingClasses = 'shrink-0'

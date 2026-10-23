@@ -51,13 +51,15 @@ export const formTabbedAsideBodyClasses =
 /**
  * Top inset for viewport-bound form scroll bodies — apply via
  * {@link FormViewportScrollTopInset} as the first child inside the scroll region
- * (not on the scroll container itself) so sticky tabs can reach `top-0`. Matches
- * dashboard `pageShellInsetTopClasses`.
+ * (not on the scroll container itself) so sticky tabs can reach `top-0`.
+ * This is `pt-8` (2rem). Dashboard `pageShellInsetTopClasses` is `pt-6`.
  */
 export const formViewportScrollBodyTopInsetClasses = 'pt-8'
 
 /**
- * Top inset for the preview-rail column — matches dashboard `pageShellInsetTopClasses`.
+ * Top inset for the preview-rail column. `xl:pt-8` (2rem), same as
+ * {@link formViewportScrollBodyTopInsetClasses}. Dashboard
+ * `pageShellInsetTopClasses` is `pt-6`.
  */
 export const formTabbedAsideSlotTopInsetClasses = 'xl:pt-8'
 

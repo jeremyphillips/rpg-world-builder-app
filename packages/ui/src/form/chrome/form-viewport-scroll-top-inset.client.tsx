@@ -14,7 +14,7 @@ export function FormScrollBodyTopInset({ className }: FormScrollBodyTopInsetProp
   return <div className={cn(className, 'shrink-0')} aria-hidden="true" />
 }
 
-/** Preset scroll-away inset matching dashboard `pageShellInsetTopClasses`. */
+/** Preset scroll-away inset (`pt-8`). Dashboard `pageShellInsetTopClasses` is `pt-6`. */
 export function FormViewportScrollTopInset() {
   return <FormScrollBodyTopInset className={formViewportScrollBodyTopInsetClasses} />
 }

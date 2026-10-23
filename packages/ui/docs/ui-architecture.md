@@ -57,6 +57,18 @@ Introduce a shared variant when it represents a stable, meaningful dimension of 
 - A `*.variants.ts` file requires a real variant axis. `ClassReference` specs and twMerge group lists are inspection metadata, not runtime class registries.
 - Styling primitives that may be reused without their component expose **conditional** classes through resolvers (`cardSurfaceVariants`, `interactiveRowVariants`) — not through zero-argument aliases of a single selector.
 
+## Inspecting UI
+
+Dev CSS source maps are on in the dashboard Vite config, the bench Vite config, and `createStorybookMainConfig` (`css.devSourcemap: true`). `@tailwindcss/vite` emits them only when that flag is set. JavaScript source maps stay on in dev by default.
+
+Use both maps together. Restart the dev server or Storybook after pulling this change so the Styles pane links resolve.
+
+1. **Owning component.** In React DevTools, pick the element, then open its source. The fiber tree names the component that rendered the node, including through fragments, providers, component-only roots, and conditional returns.
+2. **Owning rule.** In the Styles pane, follow the source link on a semantic rule. It opens the CSS file and line that declared that rule.
+3. **Live modifiers.** Add or remove a semantic modifier on the element (`ui-card--quiet`, and the same pattern on other blocks) and confirm the appearance changes without a reload.
+
+Shell ownership and the form-chrome block boundaries for the shell migration are frozen in [semantic-css-migration.md](./semantic-css-migration.md#shell-ownership-frozen-at-p0).
+
 ## Cascade layers
 
 Tailwind emits layers lowest-first: `properties`, `theme`, `base`, `components`, `utilities`. `properties` belongs to Tailwind. Every designated stylesheet starts with this statement, before any `@import`:

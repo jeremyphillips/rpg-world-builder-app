@@ -159,10 +159,11 @@ may own vertical scrolling.
 
 **ViewportWorkspace consumers** (bounded routes — no document scrollbar):
 
-| Consumer                                                                                              | Route pattern                                        |
-| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Preview catalog create/edit (`scrollMode: viewport`) |
-| [`MessagesWorkspaceShell`](../src/features/message/components/workspace/messages-workspace-shell.tsx) | `/messages`                                          |
+| Consumer                                                                                                     | Route pattern                                                                   |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx)        | Preview catalog create/edit (`scrollMode: viewport`)                            |
+| [`CharacterBuilderPageShell`](../src/features/character/components/builder/character-builder-page-shell.tsx) | `/characters/new`, `/campaigns/:id/npcs/new`, campaign onboarding new character |
+| [`MessagesWorkspaceShell`](../src/features/message/components/workspace/messages-workspace-shell.tsx)        | `/messages`                                                                     |
 
 `AppShell` publishes `--app-sticky-chrome-block-size` (sticky topbar + breadcrumb)
 for workspace bounds and chrome-aware sticky rails; `<main>` aliases

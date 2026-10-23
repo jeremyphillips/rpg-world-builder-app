@@ -7,6 +7,8 @@ import tailwindcss from '@tailwindcss/vite'
 // Router basename so client routes resolve under `/bench`.
 export default defineConfig({
   base: '/bench/',
+  // Tailwind emits CSS source maps only when this is on. It defaults to false.
+  css: { devSourcemap: true },
   plugins: [react(), tailwindcss()],
   server: {
     port: 5174,
