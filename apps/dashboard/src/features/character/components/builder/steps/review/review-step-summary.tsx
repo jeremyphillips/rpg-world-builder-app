@@ -7,7 +7,6 @@ import { getOrganizationDomainLabel } from '@rpg/contracts'
 import { Alert, Text } from '@rpg/ui'
 
 import { getContentTypeItemLabel } from '@/features/content'
-import { characterBuilderPreviewStatGridClasses } from '../../character-builder-shell.variants'
 import { UNAVAILABLE_ORGANIZATION_LABEL } from '../../../../lib/display/character-display'
 import { resolveBuilderModelingAdvisories } from '../../../../lib/builder-preview/builder-review-advisories.lib'
 import { getGenderLabel } from '@rpg/contracts'
@@ -81,7 +80,7 @@ export function ReviewStepSummary({ context, draft, preview }: ReviewStepSummary
           <Text as="p" variant="body" className="font-medium">
             Final preview
           </Text>
-          <dl className={characterBuilderPreviewStatGridClasses}>
+          <dl className="grid grid-cols-3 gap-3">
             <ReviewStat
               label="Proficiency"
               value={formatSignedNumber(preview.proficiencyBonus, '+')}

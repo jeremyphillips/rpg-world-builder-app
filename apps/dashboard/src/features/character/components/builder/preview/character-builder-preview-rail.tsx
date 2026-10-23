@@ -11,7 +11,14 @@ import type {
   CharacterBuilderStepId,
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
-import { ActionButton, PreviewRail, Sheet, useMediaMinWidth, VIEWPORT_MD_MIN_QUERY } from '@rpg/ui'
+import {
+  ActionButton,
+  cn,
+  PreviewRail,
+  Sheet,
+  useMediaMinWidth,
+  VIEWPORT_MD_MIN_QUERY,
+} from '@rpg/ui'
 
 import type { CharacterBuilderPreviewSectionId } from '../../../lib/builder-preview/character-builder-preview-panel.lib'
 import { projectBuilderPreviewRail } from '../../../lib/builder-preview/builder-preview-projection.lib'
@@ -24,7 +31,7 @@ import { projectCharacterBuilderDraftDetailPreview } from '../../../lib/display/
 import { BUILDER_PREVIEW_CHARACTER_SHEET_LABEL } from '../../../lib/builder-preview/builder-preview-rail-copy'
 import { CharacterBuilderPreviewRailPlaceholder } from './character-builder-preview-rail-section-bodies'
 import { CharacterBuilderPreviewRailView } from './character-builder-preview-rail-view'
-import { characterBuilderPreviewCompactTriggerClasses } from '../character-builder-shell.variants'
+import { formTabbedPreviewRailCompactTriggerHiddenClasses } from '@rpg/ui/form'
 
 export type CharacterBuilderPreviewRailProps = {
   draft: CharacterBuilderDraft
@@ -158,7 +165,7 @@ export function CharacterBuilderPreviewCompactTrigger({ onOpen }: { onOpen: () =
       action="view"
       variant="outline"
       size="sm"
-      className={characterBuilderPreviewCompactTriggerClasses}
+      className={cn('shrink-0', formTabbedPreviewRailCompactTriggerHiddenClasses)}
       onClick={onOpen}
     >
       {BUILDER_PREVIEW_COMPACT_LABEL}

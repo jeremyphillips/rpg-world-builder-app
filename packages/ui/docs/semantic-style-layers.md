@@ -148,7 +148,7 @@ self-align or offset; see [row-anatomy.md](./row-anatomy.md).
 - No raw `hover:bg-row-*` / `border-row-selected-*` in feature variants — `interactiveRowVariants`.
 - No local `cursor-grab` drag-handle recipes (score-token bench product only).
 
-Allowlisted host accents: `character-builder-shell.variants.ts` (F9 navigation rail).
+Host navigation accent (F9): `character-builder-shell.css` (`dash-character-builder__step`).
 
 ## Follow-up status
 

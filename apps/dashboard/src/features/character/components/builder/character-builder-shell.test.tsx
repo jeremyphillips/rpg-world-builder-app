@@ -210,7 +210,7 @@ describe('CharacterBuilderShell', () => {
     await screen.findByRole('button', { name: 'Continue' })
 
     const footer = screen.getByRole('toolbar', { name: 'Form actions' })
-    expect(footer.closest('[class*="overflow-hidden"]')).toBeTruthy()
+    expect(footer.closest('.dash-character-builder__form')).toBeTruthy()
     expect(
       screen.getByRole('navigation', { name: 'Character builder steps' }),
     ).not.toContainElement(footer)

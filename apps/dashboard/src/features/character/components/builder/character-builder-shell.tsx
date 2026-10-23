@@ -83,10 +83,12 @@ import {
   characterBuilderShellNavColumnClasses,
   characterBuilderShellPreviewColumnClasses,
   characterBuilderShellRootClasses,
-  characterBuilderNavScrollViewportClasses,
 } from './character-builder-shell.variants'
 import { CharacterBuilderStepContent } from './character-builder-step-content'
 import { CharacterBuilderStepRail } from './chrome/character-builder-step-rail'
+
+const characterBuilderNavScrollViewportClasses =
+  'min-h-0 flex-1 overflow-y-auto scrollbar-slim pe-0 ps-0'
 
 function resolveBuildAcquisition(context: CharacterBuildContext): CharacterBuildAcquisition {
   if (isCampaignBuildContext(context)) {

@@ -28,20 +28,11 @@ import {
   CharacterBuilderPreviewSubsection,
   CharacterBuilderPreviewSubsectionHint,
 } from './character-builder-preview-section-content'
-import {
-  characterBuilderPreviewAbilityGridClasses,
-  characterBuilderPreviewCombatGridClasses,
-  characterBuilderPreviewCombatStackClasses,
-  characterBuilderPreviewStatClasses,
-  characterBuilderPreviewStatLabelClasses,
-  characterBuilderPreviewStatValueClasses,
-} from '../character-builder-shell.variants'
-
 function PreviewStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className={characterBuilderPreviewStatClasses}>
-      <dt className={characterBuilderPreviewStatLabelClasses}>{label}</dt>
-      <dd className={characterBuilderPreviewStatValueClasses}>{value}</dd>
+    <div className="rounded-md border border-border px-2 py-1.5">
+      <dt className="text-style-caption">{label}</dt>
+      <dd className="text-style-label">{value}</dd>
     </div>
   )
 }
@@ -118,8 +109,8 @@ export function CharacterBuilderPreviewNarrativeBody({
 export function CharacterBuilderPreviewCombatBody({ preview }: { preview: CharacterBuildPreview }) {
   return (
     <CharacterBuilderPreviewSectionContent>
-      <div className={characterBuilderPreviewCombatStackClasses}>
-        <dl className={characterBuilderPreviewCombatGridClasses}>
+      <div className="flex flex-col gap-3">
+        <dl className="grid grid-cols-2 gap-3">
           <PreviewStat label="HP" value={formatPreviewOptionalNumber(preview.maxHp)} />
           <PreviewStat label="AC" value={formatPreviewOptionalNumber(preview.ac)} />
         </dl>
@@ -141,7 +132,7 @@ export function CharacterBuilderPreviewAbilitiesBody({
 }) {
   return (
     <CharacterBuilderPreviewSectionContent>
-      <dl className={characterBuilderPreviewAbilityGridClasses}>
+      <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {ABILITY_IDS.map((ability) => {
           const entry = preview.abilityScores[ability]
           return (

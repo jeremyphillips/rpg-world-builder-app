@@ -1,8 +1,5 @@
 {
   "temporary": {
-    "apps/dashboard/src/features/character/components/builder/character-builder-shell.variants.ts": {
-      "--character-builder-header-rail-gap": 1
-    },
     "apps/dashboard/src/features/content/components/master-detail/master-detail-grid.tsx": {
       "--master-detail-list-max-block-size": 1
     },
