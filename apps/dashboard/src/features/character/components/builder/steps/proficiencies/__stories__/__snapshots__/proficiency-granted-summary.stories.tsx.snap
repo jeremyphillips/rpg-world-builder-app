@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Character Builder/ProficiencyGrantedSummary Rogue smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "badge-check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "swords",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "shield",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

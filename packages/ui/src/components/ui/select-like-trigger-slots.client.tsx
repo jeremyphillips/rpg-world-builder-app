@@ -1,11 +1,11 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { ChevronDown } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
-import { fieldSelectInlineCaretIconClasses } from './select-caret.variants'
+import { Icon } from './icon/icon'
+import { fieldSelectInlineCaretIconSize } from './select-caret.variants'
 import {
   groupedValueSlotClasses,
   selectCaretSlotClasses,
@@ -113,8 +113,10 @@ export function SelectLikeCaretSlot({
       className={selectCaretSlotClasses(size, { groupedStart })}
     >
       {children ?? (
-        <ChevronDown
-          className={cn(fieldSelectInlineCaretIconClasses(size), 'block shrink-0 opacity-50')}
+        <Icon
+          name="chevron-down"
+          size={fieldSelectInlineCaretIconSize(size)}
+          className="block shrink-0 opacity-50"
         />
       )}
     </span>

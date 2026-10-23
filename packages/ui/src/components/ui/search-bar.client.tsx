@@ -1,9 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { Search } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { Icon } from './icon/icon'
 import { FieldClearAffordanceButton } from './field-clear-affordance.client'
 import { Input, type InputProps } from './input.client'
 import type { FieldSize } from './field.client'
@@ -112,9 +112,10 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
     if (appearance === 'embedded') {
       return (
         <div className={cn('ui-search-bar--embedded-host', className)}>
-          <Search
+          <Icon
+            name="search"
+            size="owner"
             className={searchBarEmbeddedLeadingIconVariants({ disabled: Boolean(disabled) })}
-            aria-hidden
           />
           <div className="ui-search-bar__embedded-wrap">
             <input
@@ -142,13 +143,14 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
 
     return (
       <div className={cn('ui-search-bar', className)}>
-        <Search
+        <Icon
+          name="search"
+          size="owner"
           className={searchBarLeadingIconVariants({
             appearance: 'field',
             size: resolvedSize,
             disabled: Boolean(disabled),
           })}
-          aria-hidden
         />
         <Input
           ref={setRefs}

@@ -1,7 +1,8 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { iconGlyphDescendantClasses } from './icon-glyph.variants'
+
+export const UI_DATA_TABLE_ROW_ACTION_ITEM_CLASS = 'ui-data-table__row-action-item' as const
 
 /** A single filter control wrapper (constrains width). */
 export const dataTableFilterControlVariants = cva('', {
@@ -45,7 +46,7 @@ export const dataTableCellTextVariants = cva('', {
 export function dataTableRowActionItemClasses(destructive?: boolean): string {
   return cn(
     'text-xs',
-    iconGlyphDescendantClasses.sm,
+    UI_DATA_TABLE_ROW_ACTION_ITEM_CLASS,
     destructive && 'text-destructive focus:text-destructive',
   )
 }

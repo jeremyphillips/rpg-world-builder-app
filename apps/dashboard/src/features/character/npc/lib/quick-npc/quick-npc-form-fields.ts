@@ -1,5 +1,5 @@
 import { createElement, type ReactNode } from 'react'
-import { ClipboardList, ListTodo } from 'lucide-react'
+import { Icon } from '@rpg/ui'
 
 import { z } from 'zod'
 
@@ -401,7 +401,7 @@ export function buildQuickNpcTabs(args: {
     {
       id: QUICK_NPC_DETAILS_TAB_ID,
       label: 'Details',
-      leadingIcon: createElement(ClipboardList, { 'aria-hidden': true }),
+      leadingIcon: createElement(Icon, { name: 'clipboard-list', size: 'sm' }),
       fields: args.detailsFields,
       errorPaths: ['gender', 'name'],
       resolverFields: [
@@ -422,7 +422,7 @@ export function buildQuickNpcTabs(args: {
     tabs.push({
       id: QUICK_NPC_REQUIREMENTS_TAB_ID,
       label: QUICK_NPC_STARTING_CHOICES_TAB_LABEL,
-      leadingIcon: createElement(ListTodo, { 'aria-hidden': true }),
+      leadingIcon: createElement(Icon, { name: 'list-todo', size: 'sm' }),
       fields: args.requirementsFields,
       ...(args.requirementsHeader ? { header: args.requirementsHeader } : {}),
     })

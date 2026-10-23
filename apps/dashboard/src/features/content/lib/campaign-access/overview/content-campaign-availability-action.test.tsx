@@ -33,7 +33,7 @@ describe('ContentCampaignAvailabilityAction', () => {
       'text-semantic-warning',
     )
     expect(screen.getByText(CAMPAIGN_ACCESS_PLAYER_ACCESS_PRESERVED_HINT)).toBeInTheDocument()
-    expect(document.querySelector('[aria-hidden].lucide-circle-slash')).toBeInTheDocument()
+    expect(document.querySelector('[data-icon="circle-slash"]')).toBeInTheDocument()
   })
 
   it('renders available state with StatusDot sm sizing', () => {

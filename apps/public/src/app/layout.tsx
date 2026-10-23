@@ -1,9 +1,10 @@
+// First stylesheet to name a cascade layer fixes order for the page.
+import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { APP_NAME } from '@rpg/contracts'
 
 import { AppProviders } from './providers.client'
-import './globals.css'
 
 // Exposed as a CSS variable consumed by the @rpg/ui --font-sans / --font-display tokens.
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' })

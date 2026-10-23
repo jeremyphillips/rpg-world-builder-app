@@ -1,4 +1,3 @@
-import { MessageSquare } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {
   NotificationEmptyState,
@@ -7,7 +6,7 @@ import {
   NotificationPreviewList,
   cn,
   interactiveFocusVariants,
-  menuItemIconGlyphClasses,
+  Icon,
   standaloneTextActionClasses,
 } from '@rpg/ui'
 
@@ -20,7 +19,6 @@ const notificationFooterLinkClasses = cn(
   'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm',
   standaloneTextActionClasses(),
   interactiveFocusVariants({ context: 'standalone' }),
-  menuItemIconGlyphClasses,
 )
 
 type NotificationBellMenuFooterProps = {
@@ -37,7 +35,7 @@ function NotificationBellMenuFooter({
       {campaignMessagesHref ? (
         <div className="p-1">
           <Link to={campaignMessagesHref} className={notificationFooterLinkClasses}>
-            <MessageSquare aria-hidden />
+            <Icon name="message-square" size="lg" />
             {MESSAGES_ACTION_COPY.viewForCampaign}
           </Link>
         </div>

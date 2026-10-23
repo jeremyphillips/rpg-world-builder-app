@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { ChevronDown } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
 
 import { EntityActionChoiceMenu } from '@/features/content'
@@ -9,6 +8,7 @@ import {
   ChoiceSelectionCounter,
   ComboboxField,
   Eyebrow,
+  Icon,
   Panel,
   StatusDot,
   cn,
@@ -430,12 +430,13 @@ function StartingChoiceCategoryRow({
               <StatusDot tone="warning" size="md" />
             ) : null}
           </span>
-          <ChevronDown
+          <Icon
+            name="chevron-down"
+            size="lg"
             className={cn(
               quickNpcStartingChoiceRowCaretClasses,
               expanded && quickNpcStartingChoiceRowCaretExpandedClasses,
             )}
-            aria-hidden
           />
         </span>
       </button>

@@ -1,0 +1,105 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Content/Locations/LocationDetail DistrictWithAncestry smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "waypoints",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "32px",
+    "identity": "map-pin",
+    "strokeWidth": "2px",
+    "width": "32px",
+  },
+  {
+    "height": "12px",
+    "identity": "plus",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/Locations/LocationDetail SettlementWithChildren smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "waypoints",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "32px",
+    "identity": "map-pin",
+    "strokeWidth": "2px",
+    "width": "32px",
+  },
+  {
+    "height": "12px",
+    "identity": "plus",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "chevron-down",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "14px",
+    "identity": "ellipsis",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "12px",
+    "identity": "plus",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

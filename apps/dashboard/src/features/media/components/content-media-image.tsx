@@ -16,7 +16,7 @@ import {
 import {
   contentMediaImageCoverClasses,
   contentMediaImageCropClasses,
-  contentMediaImageFallbackIconClasses,
+  CONTENT_MEDIA_IMAGE_FALLBACK_ICON_SIZES,
   contentMediaImageFallbackWellClasses,
   contentMediaImageFrameVariants,
   contentMediaImageEmblemClasses,
@@ -129,8 +129,7 @@ export function ContentMediaFallback({
       <div className={contentMediaImageFallbackWellClasses}>
         <ContentDisplayFallbackIcon
           fallback={fallback}
-          size="sm"
-          className={contentMediaImageFallbackIconClasses[frame]}
+          size={CONTENT_MEDIA_IMAGE_FALLBACK_ICON_SIZES[frame]}
         />
       </div>
     </div>

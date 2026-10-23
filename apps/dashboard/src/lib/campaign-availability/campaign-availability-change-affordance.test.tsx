@@ -7,7 +7,7 @@ describe('CampaignAvailabilityChangeAffordance', () => {
   it('sizes the edit glyph from the action step', () => {
     const { container } = render(<CampaignAvailabilityChangeAffordance />)
     const icon = container.querySelector('svg')
-    expect(icon).toHaveClass('size-icon-glyph-md')
+    expect(icon).toHaveClass('ui-icon--md')
     expect(icon).not.toHaveClass('size-3.5')
   })
 })

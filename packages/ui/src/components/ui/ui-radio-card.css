@@ -291,21 +291,13 @@
   .ui-radio-card__icon-control--comfortable {
     width: calc(var(--spacing) * 5);
     height: calc(var(--spacing) * 5);
-  }
-
-  .ui-radio-card__icon-control--comfortable svg {
-    width: calc(var(--spacing) * 5);
-    height: calc(var(--spacing) * 5);
+    --icon-size: var(--icon-glyph-xl);
   }
 
   .ui-radio-card__icon-control--compact {
     width: calc(var(--spacing) * 4);
     height: calc(var(--spacing) * 4);
-  }
-
-  .ui-radio-card__icon-control--compact svg {
-    width: calc(var(--spacing) * 4);
-    height: calc(var(--spacing) * 4);
+    --icon-size: var(--icon-glyph-lg);
   }
 
   .group[data-state='checked'] .ui-radio-card__icon-control,
@@ -315,11 +307,7 @@
 
   .ui-radio-card__details-action {
     flex-shrink: 0;
-  }
-
-  .ui-radio-card__details-action svg {
-    width: calc(var(--spacing) * 4);
-    height: calc(var(--spacing) * 4);
+    --icon-size: var(--icon-glyph-lg);
   }
 
   .ui-radio-card__leading-title-line {

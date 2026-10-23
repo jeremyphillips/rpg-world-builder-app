@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`GlobalSearch/GlobalSearchField Default smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "search",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`GlobalSearch/GlobalSearchField WithQuery smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "search",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "14px",
+    "identity": "x",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

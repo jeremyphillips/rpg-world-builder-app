@@ -1,6 +1,5 @@
 'use client'
-
-import { Menu, X } from 'lucide-react'
+import { Icon } from './icon/icon'
 
 import { Button, type ButtonForwardingProps } from './button.client'
 
@@ -17,7 +16,7 @@ export function SidebarTrigger({ isOpen = false, ...props }: SidebarTriggerProps
       aria-expanded={isOpen}
       {...props}
     >
-      {isOpen ? <X /> : <Menu />}
+      {isOpen ? <Icon name="x" size="owner" /> : <Icon name="menu" size="owner" />}
     </Button>
   )
 }

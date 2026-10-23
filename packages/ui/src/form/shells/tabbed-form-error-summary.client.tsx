@@ -1,7 +1,7 @@
 'use client'
+import { Icon } from '../../components/ui/icon/icon'
 
 import * as React from 'react'
-import { AlertTriangle } from 'lucide-react'
 import { useFormContext, useFormState } from 'react-hook-form'
 
 import { cn } from '../../lib/utils'
@@ -64,7 +64,7 @@ export function TabbedFormErrorSummary({
       data-tabbed-form-error-summary
     >
       <div className="flex items-start gap-2">
-        <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
+        <Icon name="triangle-alert" size="lg" className="mt-0.5 shrink-0" />
         <div className="min-w-0 space-y-2">
           <p className={tabbedFormErrorSummaryMessageClasses}>
             {buildTabbedFormErrorSummaryMessage(invalidTabs.map((tab) => tab.label))}

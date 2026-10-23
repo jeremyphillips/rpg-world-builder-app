@@ -1,0 +1,106 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Design tokens/Compact control ButtonIntegration smoke-test 1`] = `
+[
+  {
+    "height": "24px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "settings",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "settings",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "settings",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Design tokens/Compact control ClassReference smoke-test 1`] = `
+[
+  {
+    "height": "24px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Design tokens/Compact control HitTargetPairings smoke-test 1`] = `
+[
+  {
+    "height": "24px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "settings",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "settings",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "settings",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

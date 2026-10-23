@@ -1,3 +1,5 @@
+@layer theme, base, components, utilities;
+
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import './tokens/palette-light.css';
@@ -48,6 +50,11 @@
 @import '../components/ui/metadata-list.css';
 @import '../components/ui/tabs.css';
 @import '../components/ui/status-icon.css';
+@import '../components/ui/icon/icon.css';
+@import '../components/ui/sidebar-nav-item.css';
+@import '../components/ui/segmented-control.css';
+@import '../components/ui/empty-state-well.css';
+@import '../components/ui/icon-container.css';
 @import '../components/ui/wizard.css';
 @import '../filters/filter-bar.css';
 @import '../components/ui/catalog-toolbar.css';
@@ -403,11 +410,18 @@
   --icon-glyph-sm: 0.75rem;
   --icon-glyph-md: 0.875rem;
   --icon-glyph-lg: 1rem;
-  --icon-glyph-xl: 2rem;
+  --icon-glyph-xl: 1.25rem; /* 20px */
+  --icon-glyph-2xl: 1.5rem; /* 24px */
+  --icon-glyph-3xl: 2rem; /* 32px — formerly --icon-glyph-xl */
+  --icon-glyph-stroke: 2;
+  --sidebar-nav-icon-stroke: 1.75;
+  --empty-state-well-icon-lg: 2.5rem;
 
   /* StatusIcon off-slash — smaller than the icon-glyph ladder (Lucide slash reads heavier). */
   --status-icon-slash-sm: 0.375rem;
   --status-icon-slash-md: 0.5rem;
+  --status-icon-stroke: 4;
+  --status-icon-stroke-reduced: 7;
 
   /*
    * Shared control geometry ladder — semantic CSS for buttons and fields.
@@ -496,36 +510,6 @@
   height: var(--control-action-lg-height);
 }
 
-@utility size-icon-glyph-xs {
-  width: var(--icon-glyph-xs);
-  height: var(--icon-glyph-xs);
-}
-
-@utility size-icon-glyph-sm {
-  width: var(--icon-glyph-sm);
-  height: var(--icon-glyph-sm);
-}
-
-@utility size-icon-glyph-md {
-  width: var(--icon-glyph-md);
-  height: var(--icon-glyph-md);
-}
-
-@utility size-icon-glyph-lg {
-  width: var(--icon-glyph-lg);
-  height: var(--icon-glyph-lg);
-}
-
-@utility size-icon-glyph-xl {
-  width: var(--icon-glyph-xl);
-  height: var(--icon-glyph-xl);
-}
-
-@utility size-icon-inline {
-  width: var(--icon-inline, var(--icon-glyph-md));
-  height: var(--icon-inline, var(--icon-glyph-md));
-}
-
 /*
  * Inline icon owners. Sidecar only — do not restate font-size or line-height.
  * text-lg and larger are not owners.
@@ -546,16 +530,6 @@
   .text-base {
     --icon-inline: var(--icon-glyph-md);
   }
-}
-
-@utility size-status-icon-slash-sm {
-  width: var(--status-icon-slash-sm);
-  height: var(--status-icon-slash-sm);
-}
-
-@utility size-status-icon-slash-md {
-  width: var(--status-icon-slash-md);
-  height: var(--status-icon-slash-md);
 }
 
 @utility bg-status-icon-idle {

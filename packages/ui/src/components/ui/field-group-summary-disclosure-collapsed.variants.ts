@@ -1,7 +1,5 @@
 import { cva } from 'class-variance-authority'
 
-import { iconGlyphRootClasses } from './icon-glyph.variants'
-
 export {
   fieldGroupSummaryDisclosureLegendVariants,
   fieldGroupSummaryPrimaryVariants,
@@ -33,7 +31,7 @@ export const fieldGroupSummaryStatusLabelVariants = cva('font-medium', {
 export const fieldGroupSummaryStatusIndicatorVariants = cva('shrink-0', {
   variants: {
     indicator: {
-      inactive: iconGlyphRootClasses.md,
+      inactive: '',
     },
     tone: {
       neutral: '',

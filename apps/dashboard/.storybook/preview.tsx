@@ -1,3 +1,5 @@
+// First stylesheet to name a cascade layer fixes order for the page.
+import './preview.css'
 import type { Decorator } from '@storybook/react-vite'
 import { createStorybookPreview } from '@rpg/config/storybook/preview-base'
 import { withSemanticClassCaption } from '@rpg/ui/storybook/semantic-class-caption'
@@ -9,8 +11,6 @@ import {
   rowAnatomyOutlineInitialGlobals,
   withRowAnatomyOutline,
 } from '../src/stories/card-recipes/with-row-anatomy-outline'
-
-import '../src/index.css'
 
 const withMemoryRouter: Decorator = (Story) => (
   <MemoryRouter>

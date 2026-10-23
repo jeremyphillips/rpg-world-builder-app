@@ -1,7 +1,6 @@
-import type { LucideIcon } from 'lucide-react'
 import { NavLink, useLocation } from 'react-router-dom'
 
-import { sidebarNavItemVariants } from '@rpg/ui'
+import { Icon, sidebarNavItemVariants, type IconName } from '@rpg/ui'
 
 import { matchSidebarNavHref } from './lib/match-sidebar-nav-href'
 import type { SidebarNavItem } from './lib/sidebar-nav-model'
@@ -9,12 +8,12 @@ import type { SidebarNavItem } from './lib/sidebar-nav-model'
 export interface NavItemProps {
   to: string
   label: string
-  icon: LucideIcon
+  icon: IconName
   end?: boolean
   isActive?: SidebarNavItem['isActive']
 }
 
-export function NavItem({ to, label, icon: Icon, end, isActive: isActiveOverride }: NavItemProps) {
+export function NavItem({ to, label, icon, end, isActive: isActiveOverride }: NavItemProps) {
   const { pathname } = useLocation()
   const item: SidebarNavItem = {
     id: to,
@@ -22,7 +21,7 @@ export function NavItem({ to, label, icon: Icon, end, isActive: isActiveOverride
     href: to,
     end,
     isActive: isActiveOverride,
-    icon: Icon,
+    icon,
   }
 
   return (
@@ -32,7 +31,7 @@ export function NavItem({ to, label, icon: Icon, end, isActive: isActiveOverride
       className={() => sidebarNavItemVariants({ active: matchSidebarNavHref(pathname, item) })}
       aria-current={matchSidebarNavHref(pathname, item) ? 'page' : undefined}
     >
-      <Icon className="size-4 shrink-0" size={16} strokeWidth={1.75} aria-hidden />
+      <Icon name={icon} size="owner" />
       {label}
     </NavLink>
   )

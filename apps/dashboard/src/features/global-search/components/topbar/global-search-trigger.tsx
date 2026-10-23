@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { Search } from 'lucide-react'
 
-import { Button, cn } from '@rpg/ui'
+import { Button, cn, Icon } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
 
@@ -36,11 +35,11 @@ export const GlobalSearchTrigger = React.forwardRef<HTMLButtonElement, GlobalSea
         disabled={disabled}
         onClick={onOpen}
         className={cn(
-          'relative shrink-0 hover:bg-accent hover:text-accent-foreground md:w-auto md:min-w-[7.5rem] md:justify-start md:gap-2 md:px-3 md:[&_svg]:size-4',
+          'relative shrink-0 hover:bg-accent hover:text-accent-foreground md:w-auto md:min-w-[7.5rem] md:justify-start md:gap-2 md:px-3',
           className,
         )}
       >
-        <Search aria-hidden className="size-5" />
+        <Icon name="search" size="owner" className="dash-global-search-trigger__icon" />
         <span className="hidden text-sm md:inline">{GLOBAL_SEARCH_COPY.triggerLabel}</span>
         <span className="hidden text-style-caption md:inline">
           {GLOBAL_SEARCH_COPY.triggerShortcutHint}

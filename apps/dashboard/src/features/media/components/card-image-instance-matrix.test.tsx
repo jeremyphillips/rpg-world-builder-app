@@ -5,8 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { CampaignDisplayName, CampaignDisplayNameList } from '@/features/campaign'
 import { CharacterListCard } from '@/features/character'
 import { CONTENT_IMAGE_PRESENTATION_DEFAULTS, ContentPreviewRailMedia } from '@/features/content'
-import { User } from 'lucide-react'
-import { IdentityFrame } from '@rpg/ui'
+import { Icon, IdentityFrame } from '@rpg/ui'
 
 import { ContentMediaImage } from './content-media-image'
 
@@ -139,7 +138,7 @@ describe('card image instance matrix', () => {
           shape="box"
           size="inline"
           fit="contain"
-          fallback={<User aria-hidden />}
+          fallback={<Icon name="user-round" size="owner" />}
         />
       ),
       assert: (container: HTMLElement) => {

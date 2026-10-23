@@ -11,7 +11,8 @@ export const ticketCardHeaderTrailClasses = 'flex min-w-0 flex-1 items-center ga
 
 export const ticketCardKeyClasses = 'truncate font-mono text-style-caption'
 
-export const ticketCardHeaderChevronClasses = 'size-3 shrink-0 text-muted-foreground'
+export const ticketCardHeaderChevronClasses =
+  'shrink-0 text-muted-foreground [--icon-size:var(--icon-glyph-sm)]'
 
 export const ticketCardHeaderActionsClasses =
   'shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 has-[[data-state=open]]:opacity-100'

@@ -1,6 +1,5 @@
 'use client'
-
-import { Minus, Plus } from 'lucide-react'
+import { Icon } from './icon/icon'
 
 import { ActionIcon } from './action-icon.client'
 import {
@@ -8,9 +7,9 @@ import {
   type NumberStepperButtonAppearance,
   type NumberStepperSize,
 } from './number-stepper.variants'
-import type { IconGlyphStep } from './icon-glyph.variants'
+import type { IconSize } from './icon/icon.types'
 
-function resolveNumberStepperLeftIconStep(size: NumberStepperSize): IconGlyphStep {
+function resolveNumberStepperLeftIconSize(size: NumberStepperSize): IconSize {
   if (size === 'xs' || size === 'sm') return 'sm'
   return 'md'
 }
@@ -45,9 +44,9 @@ export function NumberStepperDecreaseButton({
       onClick={onClick}
     >
       {showRemoveAtMin ? (
-        <ActionIcon action="remove" step={resolveNumberStepperLeftIconStep(resolvedSize)} />
+        <ActionIcon action="remove" size={resolveNumberStepperLeftIconSize(resolvedSize)} />
       ) : (
-        <Minus aria-hidden />
+        <Icon name="minus" size="owner" />
       )}
     </button>
   )
@@ -115,7 +114,7 @@ export function NumberStepperIncreaseButton({
       onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}
     >
-      <Plus aria-hidden />
+      <Icon name="plus" size="owner" />
     </button>
   )
 }

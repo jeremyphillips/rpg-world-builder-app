@@ -39,7 +39,7 @@ export function MasterDetailAvailabilityHeaderLine({
         onClick={onAvailabilityChange}
         aria-label={changeLabel}
       >
-        <ActionIcon action="edit" step="sm" className="text-muted-foreground" />
+        <ActionIcon action="edit" size="sm" className="text-muted-foreground" />
       </Button>
     </div>
   )

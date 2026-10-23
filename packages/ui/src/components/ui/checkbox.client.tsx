@@ -1,9 +1,8 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
-import { Check } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import type { ChoiceTone } from './choice-control.styles'
 import {
@@ -64,7 +63,7 @@ const Checkbox = React.forwardRef<React.ComponentRef<typeof CheckboxPrimitive.Ro
         data-choice-tone={tone}
       >
         <CheckboxPrimitive.Indicator className={cn(UI_CHOICE_CONTROL_MARK_CLASS)}>
-          <Check aria-hidden />
+          <Icon name="check" size="owner" />
         </CheckboxPrimitive.Indicator>
         {expands ? (
           <span className={UI_CHOICE_CONTROL_EXPAND_CLIP_CLASS}>

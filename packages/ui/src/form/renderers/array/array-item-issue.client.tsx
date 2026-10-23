@@ -1,6 +1,5 @@
 'use client'
-
-import { AlertTriangle } from 'lucide-react'
+import { Icon } from '../../../components/ui/icon/icon'
 
 import { badgeLayoutVariants } from '../../../components/ui/badge.variants'
 import { resolveCompactLabelClassName } from '../../../components/ui/compact-label.variants'
@@ -67,7 +66,7 @@ export function ArrayItemIssueButton({
         arrayItemIssueButtonFocusClasses,
       )}
     >
-      <AlertTriangle className="size-icon-inline" aria-hidden />
+      <Icon name="triangle-alert" size="inline" />
       <span className={compact ? 'tabular-nums' : undefined}>
         {compact ? issueCountCompactLabel(issueCount) : issueCountLabel(issueCount)}
       </span>
@@ -130,7 +129,7 @@ export function ArrayItemIssueSummary({
       className={cn(arrayItemIssueSummaryClasses({ placement }), className)}
       data-array-item-issue-summary
     >
-      <AlertTriangle className="size-icon-inline shrink-0" aria-hidden />
+      <Icon name="triangle-alert" size="inline" className="shrink-0" />
       <button type="button" onClick={onPrimaryPress}>
         {firstIssue.message}
       </button>
@@ -186,7 +185,7 @@ export function ArrayLegendIssueLink({
       aria-label={`Review ${label} in ${sectionLabel}`}
       onClick={onPress}
     >
-      <AlertTriangle className="size-icon-inline" aria-hidden />
+      <Icon name="triangle-alert" size="inline" />
       {label}
     </button>
   )

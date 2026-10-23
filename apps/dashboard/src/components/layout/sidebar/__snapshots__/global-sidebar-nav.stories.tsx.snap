@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Layout/Sidebar/GlobalSidebarNav Default smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "layout-dashboard",
+    "ownerSizeResolved": true,
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "castle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "user-round",
+    "ownerSizeResolved": true,
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "message-square",
+    "ownerSizeResolved": true,
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "dices",
+    "ownerSizeResolved": true,
+    "strokeWidth": "1.75px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

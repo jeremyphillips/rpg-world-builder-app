@@ -53,7 +53,7 @@ export function CampaignOverviewMemberRow({ campaignId, member }: CampaignOvervi
           {
             id: 'remove-member',
             label: CAMPAIGN_MEMBER_ROW_ACTION_COPY.removeIncomplete,
-            icon: <ActionIcon action="remove" />,
+            icon: <ActionIcon action="remove" size="lg" />,
             destructive: true,
             disabled: removeMutation.isPending,
             onSelect: () => setRemoveOpen(true),

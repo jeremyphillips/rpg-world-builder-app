@@ -1,6 +1,5 @@
 'use client'
-
-import { Moon, Sun } from 'lucide-react'
+import { Icon } from './icon/icon'
 
 import { useTheme } from '../../providers/theme-provider.client'
 import { Switch } from './switch.client'
@@ -18,9 +17,9 @@ export function ThemeSwitch() {
     <div className="flex w-full items-center justify-between gap-2">
       <div className="flex items-center gap-1.5">
         {isDark ? (
-          <Moon className="size-4 text-muted-foreground" aria-hidden="true" />
+          <Icon name="moon" size="lg" className="text-muted-foreground" />
         ) : (
-          <Sun className="size-4 text-muted-foreground" aria-hidden="true" />
+          <Icon name="sun" size="lg" className="text-muted-foreground" />
         )}
         <span className="text-sm">Dark mode</span>
       </div>

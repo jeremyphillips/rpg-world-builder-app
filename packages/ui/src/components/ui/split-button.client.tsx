@@ -1,8 +1,7 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
-import { ChevronDown } from 'lucide-react'
-
 import { ActionIcon } from './action-icon.client'
 
 import { cn } from '../../lib/utils'
@@ -16,8 +15,6 @@ import {
 } from './dropdown-menu.client'
 import { MenuChoiceRow } from './menu-choice-row.client'
 import { dropdownMenuChoiceContentClasses } from './dropdown-menu-choice.variants'
-import { iconGlyphRootClasses } from './icon-glyph.variants'
-
 export type SplitButtonMenuItem = {
   id: string
   label: string
@@ -70,7 +67,7 @@ export function SplitButton({
         onClick={onPrimaryClick}
         {...props}
       >
-        {showLeadingIcon ? <ActionIcon action="add" /> : null}
+        {showLeadingIcon ? <ActionIcon action="add" size="lg" /> : null}
         {label}
       </Button>
       {hasMenu ? (
@@ -85,7 +82,7 @@ export function SplitButton({
               className="ui-split-button__menu"
               aria-label={resolvedMenuAriaLabel}
             >
-              <ChevronDown className={cn(iconGlyphRootClasses.sm, 'opacity-80')} aria-hidden />
+              <Icon name="chevron-down" size="sm" className="opacity-80" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent

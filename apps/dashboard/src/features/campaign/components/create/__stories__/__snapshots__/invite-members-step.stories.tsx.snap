@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Campaign Create/InviteMembersStep Default smoke-test 1`] = `
+[
+  {
+    "height": "24px",
+    "identity": "grip-vertical",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "14px",
+    "identity": "trash",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

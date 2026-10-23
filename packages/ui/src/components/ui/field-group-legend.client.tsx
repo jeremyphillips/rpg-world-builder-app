@@ -1,6 +1,5 @@
 'use client'
-
-import { ChevronDown } from 'lucide-react'
+import { Icon } from './icon/icon'
 
 import { cn } from '../../lib/utils'
 import {
@@ -161,9 +160,10 @@ function CollapsibleFieldGroupLegend({
         className={fieldGroupLegendDisclosureTriggerVariants({ rhythm })}
       >
         {legendContent}
-        <ChevronDown
-          className={cn('size-4 shrink-0 text-muted-foreground', open && 'rotate-180')}
-          aria-hidden
+        <Icon
+          name="chevron-down"
+          size="lg"
+          className="shrink-0 text-muted-foreground open && rotate-180"
         />
       </button>
       {legendAccessory ? <span className="shrink-0 pt-0.5">{legendAccessory}</span> : null}

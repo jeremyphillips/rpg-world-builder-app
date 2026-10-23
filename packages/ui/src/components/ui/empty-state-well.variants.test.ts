@@ -8,7 +8,6 @@ import {
   emptyStateWellSurfaceClasses,
   emptyStateWellTitleClasses,
   emptyStateWellTitleLgClasses,
-  resolveEmptyStateWellIconClasses,
 } from './empty-state-well.variants'
 import { DEFAULT_INSET_PANEL_SURFACE, insetPanelClassNames } from './inset-panel.variants'
 
@@ -25,10 +24,11 @@ describe('emptyStateWell variants', () => {
     expect(emptyStateWellTitleLgClasses).not.toContain('italic')
     expect(emptyStateWellSupportingClasses).toContain('text-style-supporting')
     expect(emptyStateWellSupportingClasses).not.toContain('italic')
+    expect(emptyStateWellIconMdClasses).toContain('ui-empty-state-well__icon--md')
     expect(emptyStateWellIconMdClasses).toContain('text-muted-foreground')
     expect(emptyStateWellIconMdClasses).toContain('opacity-50')
+    expect(emptyStateWellIconLgClasses).toContain('ui-empty-state-well__icon--lg')
     expect(emptyStateWellIconLgClasses).toContain('opacity-50')
-    expect(resolveEmptyStateWellIconClasses('md')).toContain('opacity-50')
   })
 
   it('keeps empty panel and inset presets aligned with the well contract', () => {

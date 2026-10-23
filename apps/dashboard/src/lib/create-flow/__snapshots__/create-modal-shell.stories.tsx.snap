@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Create Flow/CreateModalShell OptionalRelationshipTabs smoke-test 1`] = `
+[
+  {
+    "height": "24px",
+    "identity": "triangle-alert",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Create Flow/CreateModalShell SinglePanel smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "x",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

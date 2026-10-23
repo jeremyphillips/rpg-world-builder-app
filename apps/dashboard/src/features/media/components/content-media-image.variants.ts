@@ -64,15 +64,15 @@ export const contentMediaImageWhitePaperKnockoutClasses = 'mix-blend-multiply da
 export const contentMediaImageFallbackWellClasses =
   'flex size-full items-center justify-center bg-surface-strong text-muted-foreground'
 
-/** Lucide root sizing for semantic fallback icons — keyed to {@link ContentMediaImageFrame}. */
-export const contentMediaImageFallbackIconClasses: Record<ContentMediaImageFrame, string> = {
-  square: 'size-icon-glyph-xs',
-  insetSm: 'size-icon-glyph-sm',
-  anatomyFill: 'size-icon-glyph-sm',
-  builderCard: 'size-icon-glyph-lg',
-  primary: 'size-icon-glyph-xl',
-  builderSheetHero: 'size-icon-glyph-xl',
-  intrinsic: 'size-icon-glyph-xl',
-  emblem: 'size-icon-glyph-xl',
-  emblemHero: 'size-icon-glyph-xl',
-}
+/** Fallback glyph step for each media frame. */
+export const CONTENT_MEDIA_IMAGE_FALLBACK_ICON_SIZES = {
+  square: 'xs',
+  insetSm: 'sm',
+  anatomyFill: 'sm',
+  builderCard: 'lg',
+  primary: '3xl',
+  builderSheetHero: '3xl',
+  intrinsic: '3xl',
+  emblem: '3xl',
+  emblemHero: '3xl',
+} as const satisfies Record<ContentMediaImageFrame, 'xs' | 'sm' | 'lg' | '3xl'>

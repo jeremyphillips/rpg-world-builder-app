@@ -1,0 +1,231 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Forms/Controls/RadioCard ClassReference smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Controls/RadioCard Compact smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "circle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "24px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Controls/RadioCard Default smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Controls/RadioCard DependentChoice smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "circle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Controls/RadioCard Disabled smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "circle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Controls/RadioCard EmbeddedDependentChoice smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "circle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "24px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Controls/RadioCard IconControlTwoColumnGrid smoke-test 1`] = `
+[
+  {
+    "height": "24px",
+    "identity": "chart-no-axes-column",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "24px",
+    "identity": "grid-3x3",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Controls/RadioCard ParentChoiceTitleMeta smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "circle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "24px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Controls/RadioCard RadioOnRightTwoColumnGrid smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "circle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Controls/RadioCard RowVariant smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "circle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Controls/RadioCard SingleOption smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Forms/Controls/RadioCard WithSelection smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "circle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

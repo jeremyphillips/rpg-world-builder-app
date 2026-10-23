@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { Shield, WandSparkles } from 'lucide-react'
 import { describe, expect, it } from 'vitest'
 
 import { BuilderFactSummary } from './builder-fact-summary'
@@ -18,7 +17,7 @@ describe('BuilderFactSummary', () => {
             icon: 'spellcasting-ability',
           },
         ]}
-        rowIcons={{ 'spellcasting-ability': WandSparkles }}
+        rowIcons={{ 'spellcasting-ability': 'wand-sparkles' }}
         showSourceColumn={false}
       />,
     )
@@ -61,7 +60,7 @@ describe('BuilderFactSummary', () => {
             icon: 'spell-attack',
           },
         ]}
-        rowIcons={{ 'spell-save-dc': Shield, 'spell-attack': Shield }}
+        rowIcons={{ 'spell-save-dc': 'shield', 'spell-attack': 'shield' }}
         showSourceColumn={false}
       />,
     )
@@ -89,12 +88,12 @@ describe('BuilderFactSummary', () => {
         ]}
         showSourceColumn
         categoryIcons={{
-          savingThrows: Shield,
-          skills: Shield,
-          tools: Shield,
-          languages: Shield,
-          weapons: Shield,
-          armor: Shield,
+          savingThrows: 'shield',
+          skills: 'shield',
+          tools: 'shield',
+          languages: 'shield',
+          weapons: 'shield',
+          armor: 'shield',
         }}
       />,
     )
@@ -124,12 +123,12 @@ describe('BuilderFactSummary', () => {
         ]}
         showSourceColumn
         categoryIcons={{
-          savingThrows: Shield,
-          skills: Shield,
-          tools: Shield,
-          languages: Shield,
-          weapons: Shield,
-          armor: Shield,
+          savingThrows: 'shield',
+          skills: 'shield',
+          tools: 'shield',
+          languages: 'shield',
+          weapons: 'shield',
+          armor: 'shield',
         }}
       />,
     )

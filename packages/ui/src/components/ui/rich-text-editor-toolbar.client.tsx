@@ -1,20 +1,10 @@
 'use client'
 
 import type { Editor } from '@tiptap/react'
-import type { LucideIcon } from 'lucide-react'
-import {
-  Bold,
-  Code,
-  Italic,
-  Link as LinkIcon,
-  List,
-  ListOrdered,
-  SquareCode,
-  Table2,
-} from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
+import { Icon } from './icon/icon'
+import type { IconName } from './icon/icon.types'
 import { RichTextLinkPicker } from './rich-text-link-picker.client'
 import type {
   RichTextLinkPickerContentTypeOption,
@@ -25,7 +15,7 @@ import type { RichTextLinkContext } from './rich-text-editor-link.lib'
 
 interface RichTextFormatAction {
   label: string
-  icon: LucideIcon
+  icon: IconName
   isActive: (editor: Editor) => boolean
   run: (editor: Editor) => void
 }
@@ -33,7 +23,7 @@ interface RichTextFormatAction {
 const FORMAT_ACTIONS: RichTextFormatAction[] = [
   {
     label: 'Bold',
-    icon: Bold,
+    icon: 'bold',
     isActive: (editor) => editor.isActive('bold'),
     run: (editor) => {
       editor.chain().focus().toggleBold().run()
@@ -41,7 +31,7 @@ const FORMAT_ACTIONS: RichTextFormatAction[] = [
   },
   {
     label: 'Italic',
-    icon: Italic,
+    icon: 'italic',
     isActive: (editor) => editor.isActive('italic'),
     run: (editor) => {
       editor.chain().focus().toggleItalic().run()
@@ -49,7 +39,7 @@ const FORMAT_ACTIONS: RichTextFormatAction[] = [
   },
   {
     label: 'Bulleted list',
-    icon: List,
+    icon: 'list',
     isActive: (editor) => editor.isActive('bulletList'),
     run: (editor) => {
       editor.chain().focus().toggleBulletList().run()
@@ -57,7 +47,7 @@ const FORMAT_ACTIONS: RichTextFormatAction[] = [
   },
   {
     label: 'Ordered list',
-    icon: ListOrdered,
+    icon: 'list-ordered',
     isActive: (editor) => editor.isActive('orderedList'),
     run: (editor) => {
       editor.chain().focus().toggleOrderedList().run()
@@ -68,7 +58,7 @@ const FORMAT_ACTIONS: RichTextFormatAction[] = [
 const CODE_ACTIONS: RichTextFormatAction[] = [
   {
     label: 'Inline code',
-    icon: Code,
+    icon: 'code',
     isActive: (editor) => editor.isActive('code'),
     run: (editor) => {
       editor.chain().focus().toggleCode().run()
@@ -76,7 +66,7 @@ const CODE_ACTIONS: RichTextFormatAction[] = [
   },
   {
     label: 'Code block',
-    icon: SquareCode,
+    icon: 'square-code',
     isActive: (editor) => editor.isActive('codeBlock'),
     run: (editor) => {
       editor.chain().focus().toggleCodeBlock().run()
@@ -95,18 +85,18 @@ function RichTextFormatButtons({
 }) {
   const actions = codeBlocks ? [...FORMAT_ACTIONS, ...CODE_ACTIONS] : FORMAT_ACTIONS
 
-  return actions.map(({ label, icon: Icon, isActive, run }) => (
+  return actions.map(({ label, icon, isActive, run }) => (
     <Button
       key={label}
       variant="ghost"
       size="icon"
-      className={cn('size-7', editor && isActive(editor) && 'bg-accent text-accent-foreground')}
+      className={cn('h-7 w-7', editor && isActive(editor) && 'bg-accent text-accent-foreground')}
       aria-label={label}
       aria-pressed={editor ? isActive(editor) : false}
       disabled={disabled || !editor}
       onClick={() => editor && run(editor)}
     >
-      <Icon className="size-4" />
+      <Icon name={icon} size="lg" />
     </Button>
   ))
 }
@@ -151,12 +141,12 @@ export function RichTextEditorToolbar({
         <Button
           variant="ghost"
           size="icon"
-          className="size-7"
+          className="h-7 w-7"
           aria-label="Table"
           disabled={disabled || !editor}
           onClick={() => editor?.commands.beginTableEmbedCreate()}
         >
-          <Table2 className="size-4" />
+          <Icon name="table" size="lg" />
         </Button>
       ) : null}
       {linkable ? (
@@ -180,14 +170,14 @@ export function RichTextEditorToolbar({
               variant="ghost"
               size="icon"
               className={cn(
-                'size-7',
+                'h-7 w-7',
                 editor?.isActive('link') && 'bg-accent text-accent-foreground',
               )}
               aria-label="Link"
               aria-pressed={editor?.isActive('link') ?? false}
               disabled={disabled || !editor}
             >
-              <LinkIcon className="size-4" />
+              <Icon name="link" size="lg" />
             </Button>
           }
         />

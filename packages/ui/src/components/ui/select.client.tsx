@@ -1,9 +1,8 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as SelectPrimitive from '@radix-ui/react-select'
-import { Check, ChevronDown, ChevronUp } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { establishSurfaceCurrent } from './surface-current.lib'
 import { SelectLayerPortal } from './layer-portal-container.client'
@@ -110,7 +109,7 @@ const SelectScrollUpButton = React.forwardRef<
     className={cn('flex cursor-pointer items-center justify-center py-1', className)}
     {...props}
   >
-    <ChevronUp className="size-4" />
+    <Icon name="chevron-up" size="lg" />
   </SelectPrimitive.ScrollUpButton>
 ))
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
@@ -124,7 +123,7 @@ const SelectScrollDownButton = React.forwardRef<
     className={cn('flex cursor-pointer items-center justify-center py-1', className)}
     {...props}
   >
-    <ChevronDown className="size-4" />
+    <Icon name="chevron-down" size="lg" />
   </SelectPrimitive.ScrollDownButton>
 ))
 SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName
@@ -186,9 +185,9 @@ const SelectItem = React.forwardRef<
     )}
     {...props}
   >
-    <span className="absolute right-2 flex size-3.5 items-center justify-center">
+    <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check className="size-4" />
+        <Icon name="check" size="lg" />
       </SelectPrimitive.ItemIndicator>
     </span>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>

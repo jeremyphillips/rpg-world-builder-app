@@ -1,7 +1,5 @@
 import { Link } from 'react-router-dom'
-import { cn, IdentityFrame, Text, contentIdentityIcon } from '@rpg/ui'
-
-const CampaignIdentityIcon = contentIdentityIcon('campaign')
+import { cn, Icon, IdentityFrame, Text, contentIdentityIcon } from '@rpg/ui'
 
 import type { CampaignDisplayVM } from '../lib/campaign-display'
 import {
@@ -33,7 +31,7 @@ export function CampaignDisplayName({
       shape="box"
       size="inline"
       fit="contain"
-      fallback={<CampaignIdentityIcon aria-hidden />}
+      fallback={<Icon name={contentIdentityIcon('campaign')} size="owner" />}
     />
   )
 

@@ -1,6 +1,5 @@
+import { Icon } from './icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Table2 } from 'lucide-react'
-
 import { IconContainer } from './icon-container.client'
 
 const meta = {
@@ -8,7 +7,7 @@ const meta = {
   component: IconContainer,
   parameters: { layout: 'centered' },
   args: {
-    children: <Table2 aria-hidden />,
+    children: <Icon name="table" size="2xl" />,
   },
 } satisfies Meta<typeof IconContainer>
 

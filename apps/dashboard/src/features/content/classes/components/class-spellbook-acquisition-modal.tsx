@@ -1,6 +1,5 @@
 import { useId, useMemo, useState, type FormEvent } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { BookOpen, Info } from 'lucide-react'
 import { FormProvider, useForm, useFormState, useWatch, type Resolver } from 'react-hook-form'
 import type { FieldPath } from 'react-hook-form'
 import { z } from 'zod'
@@ -9,6 +8,7 @@ import {
   Alert,
   Button,
   DialogPanelScrollRegion,
+  Icon,
   IconContainer,
   Modal,
   RadioCard,
@@ -290,7 +290,7 @@ function ClassSpellbookAcquisitionModalContent({
           <Modal.Header
             leadIcon={
               <IconContainer size="md">
-                <BookOpen aria-hidden />
+                <Icon name="book-open" size="owner" />
               </IconContainer>
             }
             headline={MODAL_HEADLINE}
@@ -337,7 +337,7 @@ function ClassSpellbookAcquisitionModalContent({
                         </FormProvider>
                         {regularAlert ? (
                           <Alert variant="default" density="compact">
-                            <SemanticText tone="neutral" icon={<Info aria-hidden />}>
+                            <SemanticText tone="neutral" icon={<Icon name="info" size="owner" />}>
                               {regularAlert}
                             </SemanticText>
                           </Alert>
@@ -359,7 +359,7 @@ function ClassSpellbookAcquisitionModalContent({
                           chrome="bare"
                         />
                         <Alert variant="default" density="compact">
-                          <SemanticText tone="neutral" icon={<Info aria-hidden />}>
+                          <SemanticText tone="neutral" icon={<Icon name="info" size="owner" />}>
                             {VARIABLE_ALERT}
                           </SemanticText>
                         </Alert>

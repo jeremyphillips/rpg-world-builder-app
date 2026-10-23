@@ -6,7 +6,6 @@ import { ClassReferenceTable } from '../../stories/semantic-classes/class-refere
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { Card, CardHeader } from './card'
-import './card-surface-interaction-matrix.css'
 import {
   CARD_CLASS_SPECS,
   CARD_SURFACE_TONES,

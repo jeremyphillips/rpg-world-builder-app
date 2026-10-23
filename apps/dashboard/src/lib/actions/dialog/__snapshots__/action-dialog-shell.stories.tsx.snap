@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Actions/ActionDialogShell Configure smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "x",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Actions/ActionDialogShell Resolve smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "external-link",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Actions/ActionDialogShell Result smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "x",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

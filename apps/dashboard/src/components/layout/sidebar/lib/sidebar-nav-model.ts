@@ -1,3 +1,5 @@
+import type { IconName } from '@rpg/ui'
+
 export type SidebarSectionId =
   | 'main'
   | 'personal'
@@ -20,15 +22,13 @@ export type CollapsibleSidebarSectionId = (typeof COLLAPSIBLE_SIDEBAR_SECTION_ID
 
 export type StaticSidebarSectionId = 'main' | 'personal' | 'tools' | 'admin'
 
-import type { LucideIcon } from 'lucide-react'
-
 export type SidebarNavItem = {
   id: string
   label: string
   href: string
   end?: boolean
   isActive?: (pathname: string) => boolean
-  icon: LucideIcon
+  icon: IconName
 }
 
 export type StaticSidebarNavSection = {

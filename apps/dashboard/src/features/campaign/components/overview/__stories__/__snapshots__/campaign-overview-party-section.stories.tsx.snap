@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Campaign/CampaignOverviewPartySection Empty smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Campaign/CampaignOverviewPartySection PlayedByYou smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "user-round",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Campaign/CampaignOverviewPartySection Unassigned smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "user-round",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Campaign/CampaignOverviewPartySection WithPartyPc smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "user-round",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

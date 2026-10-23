@@ -29,7 +29,7 @@ describe('TicketMeta', () => {
 
     const link = screen.getByRole('link', { name: `Open ${sampleTicket.key} full page` })
     expect(link).toHaveAttribute('href', `/bench/tickets/${sampleTicket.id}`)
-    expect(link.querySelector('svg')).toHaveClass('size-icon-inline')
+    expect(link.querySelector('svg')).toHaveClass('ui-icon--inline')
     expect(link.querySelector('svg')).not.toHaveClass('size-3.5')
   })
 

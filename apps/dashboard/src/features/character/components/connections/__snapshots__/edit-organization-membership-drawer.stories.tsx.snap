@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Character/EditOrganizationMembershipDrawer Default smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "landmark",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "10px",
+    "identity": "circle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Character/EditOrganizationMembershipDrawer HistoricalTitle smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "landmark",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "10px",
+    "identity": "circle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

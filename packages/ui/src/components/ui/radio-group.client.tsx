@@ -1,9 +1,8 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
-import { Circle } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import {
   UI_CHOICE_CONTROL_MARK_CLASS,
@@ -55,7 +54,7 @@ const RadioGroupItem = React.forwardRef<
       {...props}
     >
       <RadioGroupPrimitive.Indicator className={UI_CHOICE_CONTROL_MARK_CLASS}>
-        <Circle aria-hidden />
+        <Icon name="circle" size="owner" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   )

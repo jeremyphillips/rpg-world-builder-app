@@ -1,9 +1,8 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { ChevronDown } from 'lucide-react'
-
 import { resolveComboboxSearchFieldSizeForButtonSize } from '../../components/ui/field-sizing.variants'
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
@@ -168,7 +167,7 @@ export function ButtonDropdown({
         >
           {leadingIcon}
           {label}
-          <ChevronDown className="size-4 opacity-50" aria-hidden />
+          <Icon name="chevron-down" size="lg" className="opacity-50" />
         </Button>
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>

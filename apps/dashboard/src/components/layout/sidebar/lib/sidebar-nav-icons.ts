@@ -1,33 +1,21 @@
-import {
-  CalendarDays,
-  Dices,
-  FlaskConical,
-  LayoutDashboard,
-  MessageSquare,
-  Settings2,
-  ShieldCheck,
-  Users,
-  type LucideIcon,
-} from 'lucide-react'
-
-import { contentIdentityIcon } from '@rpg/ui'
+import { contentIdentityIcon, type IconName } from '@rpg/ui'
 
 import type { SidebarNavItem } from './sidebar-nav-model'
 
 export const SIDEBAR_NAV_ICONS = {
-  dashboard: LayoutDashboard,
+  dashboard: 'layout-dashboard',
   campaigns: contentIdentityIcon('campaign'),
-  messages: MessageSquare,
+  messages: 'message-square',
   characters: contentIdentityIcon('character'),
-  'name-generator': Dices,
-  overview: LayoutDashboard,
-  sessions: CalendarDays,
+  'name-generator': 'dices',
+  overview: 'layout-dashboard',
+  sessions: 'calendar-days',
   npcs: contentIdentityIcon('npc'),
   organizations: contentIdentityIcon('organization'),
   locations: contentIdentityIcon('location'),
-  homebrew: FlaskConical,
+  homebrew: 'flask-conical',
   'game-terms': contentIdentityIcon('game-term'),
-  'campaign-settings': Settings2,
+  'campaign-settings': 'settings-sliders',
   classes: contentIdentityIcon('class'),
   spells: contentIdentityIcon('spell'),
   species: contentIdentityIcon('species'),
@@ -35,9 +23,9 @@ export const SIDEBAR_NAV_ICONS = {
   equipment: contentIdentityIcon('equipment'),
   'skill-proficiencies': contentIdentityIcon('skill-proficiency'),
   monsters: contentIdentityIcon('monster'),
-  'admin-users': Users,
-  'admin-settings': ShieldCheck,
-} as const satisfies Record<string, LucideIcon>
+  'admin-users': 'users',
+  'admin-settings': 'shield-check',
+} as const satisfies Record<string, IconName>
 
 export type SidebarNavIconId = keyof typeof SIDEBAR_NAV_ICONS
 

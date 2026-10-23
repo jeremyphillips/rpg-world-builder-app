@@ -319,26 +319,22 @@
 
   .ui-search-bar__leading-icon--xs {
     inset-inline-start: var(--field-padding-xs);
-    width: var(--icon-glyph-xs);
-    height: var(--icon-glyph-xs);
+    --icon-size: var(--icon-glyph-xs);
   }
 
   .ui-search-bar__leading-icon--sm {
     inset-inline-start: calc(var(--spacing) * 2.5);
-    width: var(--icon-glyph-sm);
-    height: var(--icon-glyph-sm);
+    --icon-size: var(--icon-glyph-sm);
   }
 
   .ui-search-bar__leading-icon--md {
     inset-inline-start: var(--field-padding-md);
-    width: var(--icon-glyph-md);
-    height: var(--icon-glyph-md);
+    --icon-size: var(--icon-glyph-md);
   }
 
   .ui-search-bar__leading-icon--lg {
     inset-inline-start: var(--field-padding-md);
-    width: var(--icon-glyph-md);
-    height: var(--icon-glyph-md);
+    --icon-size: var(--icon-glyph-md);
   }
 
   .ui-search-bar__leading-icon--disabled {
@@ -348,8 +344,7 @@
   .ui-search-bar__embedded-icon {
     pointer-events: none;
     flex-shrink: 0;
-    width: var(--icon-glyph-md);
-    height: var(--icon-glyph-md);
+    --icon-size: var(--icon-glyph-md);
     color: var(--muted-foreground);
   }
 

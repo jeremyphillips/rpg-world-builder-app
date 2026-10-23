@@ -140,7 +140,7 @@ describe('MasterDetailListPanel', () => {
   it('renders a decorative chevron in each row end region', () => {
     render(<MasterDetailListPanel {...baseProps()} />)
 
-    expect(document.querySelectorAll('[aria-hidden] svg.lucide-chevron-right')).toHaveLength(2)
+    expect(document.querySelectorAll('[data-icon="chevron-right"]')).toHaveLength(2)
   })
 
   it('does not render row delete or drag controls', () => {

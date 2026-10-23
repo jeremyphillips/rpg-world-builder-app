@@ -1,0 +1,106 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Primitives/Icon Default smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/Icon Inline smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/Icon Owner smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Primitives/Icon Sizes smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "12px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "14px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "16px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "20px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "20px",
+  },
+  {
+    "height": "24px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "24px",
+  },
+  {
+    "height": "32px",
+    "identity": "check",
+    "strokeWidth": "2px",
+    "width": "32px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

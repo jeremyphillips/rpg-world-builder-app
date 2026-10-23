@@ -1,9 +1,7 @@
-import { Check } from 'lucide-react'
-import { InlineMetadata, type ContentCardDensity } from '@rpg/ui'
+import { Icon, InlineMetadata, type ContentCardDensity } from '@rpg/ui'
 
 import type { PickerSelectionStateLineModel } from './picker-selection-state-line.types'
 import {
-  pickerSelectionStateIconVariants,
   pickerSelectionStateLineVariants,
   pickerSelectionStateWordVariants,
 } from './picker-selection-state-line.variants'
@@ -26,7 +24,7 @@ export function PickerSelectionStateLine({ model, density }: PickerSelectionStat
       >
         <InlineMetadata.Item>
           <span className={pickerSelectionStateWordVariants()}>
-            <Check aria-hidden className={pickerSelectionStateIconVariants()} />
+            <Icon name="check" size="inline" className="me-1" />
             {model.label}
           </span>
         </InlineMetadata.Item>

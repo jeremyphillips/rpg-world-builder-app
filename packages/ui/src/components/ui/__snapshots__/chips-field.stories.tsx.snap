@@ -1,0 +1,138 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`UI/ChipsField ContainerChrome smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/ChipsField Disabled smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/ChipsField MultiSelect smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "12px",
+    "identity": "check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/ChipsField SingleSelect smoke-test 1`] = `
+[
+  {
+    "height": "12px",
+    "identity": "check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "12px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/ChipsField SizeLarge smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/ChipsField SizeSmall smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/ChipsField WithError smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/ChipsField WithHint smoke-test 1`] = `
+[
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

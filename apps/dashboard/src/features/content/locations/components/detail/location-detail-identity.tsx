@@ -53,7 +53,7 @@ export function LocationDetailIdentity({
               aria-label={LOCATION_PARENT_REPLACEMENT_ACTION_LABELS[parentReplacementAction]}
               onClick={onParentReplacementAction}
             >
-              <ActionIcon action="waypoints" step="md" />
+              <ActionIcon action="waypoints" size="md" />
             </Button>
           ) : null}
         </>

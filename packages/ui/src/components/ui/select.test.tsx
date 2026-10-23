@@ -145,7 +145,7 @@ describe('Select', () => {
 
     const caret = caretSlot(trigger)
     expect(caret).toHaveClass('ui-field-group__caret-slot')
-    expect(caret?.querySelector('svg')).toHaveClass('size-icon-glyph-lg')
+    expect(caret?.querySelector('svg')).toHaveClass('ui-icon--lg')
   })
 
   it('applies grouped start caret inset without changing caret slot width', () => {
@@ -352,7 +352,7 @@ describe('Select', () => {
       </Select>,
     )
     const inlineCaret = caretSlot(screen.getByLabelText('Inline'))?.querySelector('svg')
-    expect(inlineCaret).toHaveClass('size-icon-glyph-lg')
+    expect(inlineCaret).toHaveClass('ui-icon--lg')
     unmountInline()
 
     render(
@@ -366,7 +366,7 @@ describe('Select', () => {
       </Select>,
     )
     const digitCaret = caretSlot(screen.getByLabelText('Digit'))?.querySelector('svg')
-    expect(digitCaret).toHaveClass('size-icon-glyph-lg')
+    expect(digitCaret).toHaveClass('ui-icon--lg')
   })
 
   itAxe('has no axe accessibility violations (closed)', async () => {

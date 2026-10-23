@@ -2,10 +2,9 @@
 
 import * as React from 'react'
 import * as AccordionPrimitive from '@radix-ui/react-accordion'
-import { ChevronDown } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { iconGlyphRootClasses } from './icon-glyph.variants'
+import { DisclosureIndicator } from './disclosure-indicator.client'
 import {
   accordionContentVariants,
   accordionContentInnerVariants,
@@ -73,12 +72,7 @@ const AccordionTrigger = React.forwardRef<
         {...props}
       >
         {children}
-        <ChevronDown
-          className={cn(
-            iconGlyphRootClasses.lg,
-            'shrink-0 text-muted-foreground transition-transform duration-200',
-          )}
-        />
+        <DisclosureIndicator size="lg" className="shrink-0 text-muted-foreground duration-200" />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   )

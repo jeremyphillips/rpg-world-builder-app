@@ -250,18 +250,19 @@ Two independent SSOT axes in `@rpg/ui` — compose separately or use named pairi
 
 ### Glyph scale (general UI)
 
-Module: [`icon-glyph.variants.ts`](../src/components/ui/icon-glyph.variants.ts)
+Module: [`icon/icon.types.ts`](../src/components/ui/icon/icon.types.ts), [`icon/icon.css`](../src/components/ui/icon/icon.css). Full guide: [icon-registry.md](./icon-registry.md).
 
-| Step | px  | Utility              | Role                                             |
-| ---- | --- | -------------------- | ------------------------------------------------ |
-| xs   | 10  | `size-icon-glyph-xs` | Tertiary/decorative only — badge/chip sm leading |
-| sm   | 12  | `size-icon-glyph-sm` | Dense inline — semantic text, filter reset       |
-| md   | 14  | `size-icon-glyph-md` | Breadcrumbs, compact icon-button glyph (pairing) |
-| lg   | 16  | `size-icon-glyph-lg` | Menus, default button icons                      |
-| xl   | 32  | `size-icon-glyph-xl` | Large empty-state glyphs (detail hero fallbacks) |
+| Step | px  | `Icon` `size` | Role                                              |
+| ---- | --- | ------------- | ------------------------------------------------- |
+| xs   | 10  | `xs`          | Tertiary/decorative — badge/chip sm leading       |
+| sm   | 12  | `sm`          | Dense inline — semantic text, filter reset        |
+| md   | 14  | `md`          | Breadcrumbs, compact icon-button glyph pairing    |
+| lg   | 16  | `lg`          | Menus, default button icons                       |
+| xl   | 20  | `xl`          | Notification bell, responsive search (below `md`) |
+| 2xl  | 24  | `2xl`         | Identity fallbacks, spinner `lg`, media compact   |
+| 3xl  | 32  | `3xl`         | Large empty-state and media hero fallbacks        |
 
-Use `iconGlyphRootClasses` on root Lucide nodes; `iconGlyphDescendantClasses` /
-`iconGlyphDirectChildClasses` on wrappers.
+Token source: `--icon-glyph-*` in `globals.css`. Only `.ui-icon` sets `width`, `height`, and `stroke-width` on glyphs.
 
 ### Hit-target scale (control chrome)
 
@@ -311,7 +312,7 @@ regression-tested in `control-action.variants.test.ts` and `icon-ghost-control.v
 
 ### Inline icons
 
-Inline icons inherit their glyph step from the nearest typography owner. Consumers use `size-icon-inline` or `inlineIconTextClasses` and do not name a text size or a glyph step. `SemanticText` publishes that step from `.ui-semantic-text` (and a `text-sm` override) onto `ui-semantic-text__icon`. The utility falls back to `--icon-glyph-md` when no owner is present.
+Inline icons use `size="inline"` and read `--icon-inline` from the nearest typography owner. `SemanticText` publishes that step from `.ui-semantic-text` (and a `text-sm` override) onto `ui-semantic-text__icon`.
 
 | Owner                      | Glyph |
 | -------------------------- | ----- |
@@ -321,17 +322,13 @@ Inline icons inherit their glyph step from the nearest typography owner. Consume
 | `prose`, `.prose.prose-md` | md    |
 | `.prose.prose-sm`          | sm    |
 
-`text-lg` and larger, heading utilities, eyebrow type, and compact-label type are not owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons stay on `compactLabelIconGlyphClasses`.
+`text-lg` and larger, heading utilities, eyebrow type, and compact-label type are not owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `compact-label` CSS.
 
-Button glyphs stay on `resolveButtonIconGlyphStep`. Do not route them through `size-icon-inline`. Their step follows hit target and density, not the label's font size.
+Button and `ActionButton` glyphs use `size="owner"`; `button.css` publishes `--icon-size` per variant.
 
-Centered decorative stacks (a large glyph above a heading and description, including `size-icon-glyph-xl`) are not this pairing.
+Storybook: **Components → Icon** and **Control action**.
 
-Storybook: **Design tokens → Icon glyph** (including nested `text-base` / `text-xs`) and **Control action**.
-
-Enforcement: `icon-glyph-sizing-ban.test.ts` — raw `[&_svg]:size-*` / inline Lucide
-`size-*` in component implementations is forbidden (grandfather list in
-`icon-glyph-sizing-exempt-files.ts` shrinks as inline Lucide migrates to icon-glyph utilities).
+Enforcement: `icon-glyph-sizing-ban.test.ts` (UI, dashboard, bench), ESLint `rpg-icons/*`, and the Storybook geometry census.
 
 ### StatusIcon exceptions
 

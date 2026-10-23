@@ -6,8 +6,6 @@ import type { BadgeAppearance, BadgeLayout, BadgeSize, BadgeTone } from './badge
 import { badgeLayoutVariants } from './badge.variants'
 import type { CompactLabelEmphasis } from './compact-label.lib'
 import { resolveCompactLabelClassName } from './compact-label.variants'
-import { badgeIconGlyphClasses } from './icon-glyph.variants'
-
 export {
   type BadgeAppearance,
   type BadgeLayout,
@@ -27,9 +25,9 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   asChild?: boolean
 }
 
-function BadgeIconSlot({ icon, size }: { icon: React.ReactNode; size: BadgeSize }) {
+function BadgeIconSlot({ icon }: { icon: React.ReactNode }) {
   return (
-    <span aria-hidden className={badgeIconGlyphClasses(size)}>
+    <span aria-hidden className="inline-flex shrink-0 leading-none">
       {icon}
     </span>
   )
@@ -66,9 +64,9 @@ function Badge({
 
   return (
     <span className={resolvedClassName} {...props}>
-      {leadingIcon ? <BadgeIconSlot icon={leadingIcon} size={size} /> : null}
+      {leadingIcon ? <BadgeIconSlot icon={leadingIcon} /> : null}
       {children}
-      {trailingIcon ? <BadgeIconSlot icon={trailingIcon} size={size} /> : null}
+      {trailingIcon ? <BadgeIconSlot icon={trailingIcon} /> : null}
     </span>
   )
 }

@@ -1,5 +1,4 @@
 import { Fragment } from 'react'
-import { House } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import {
   Breadcrumb,
@@ -8,6 +7,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
+  Icon,
 } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -32,7 +32,7 @@ export function AppBreadcrumb({ crumbs }: AppBreadcrumbProps) {
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
                 <Link to={campaignOverviewHref} aria-label="Campaign overview">
-                  <House aria-hidden className="size-4" />
+                  <Icon name="house" size="lg" />
                 </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>

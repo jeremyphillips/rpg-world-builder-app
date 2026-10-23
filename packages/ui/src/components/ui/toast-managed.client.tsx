@@ -1,8 +1,7 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
-import { AlertTriangle, Check, XCircle } from 'lucide-react'
-
 import { Button } from './button.client'
 import { Toast } from './toast.client'
 import {
@@ -17,11 +16,11 @@ import {
 function ToastToneIcon({ tone }: { tone: ToastTone }) {
   switch (tone) {
     case 'success':
-      return <Check className="size-4 text-semantic-success" aria-hidden />
+      return <Icon name="check" size="lg" className="text-semantic-success" />
     case 'warning':
-      return <AlertTriangle className="size-4 text-semantic-warning" aria-hidden />
+      return <Icon name="triangle-alert" size="lg" className="text-semantic-warning" />
     case 'destructive':
-      return <XCircle className="size-4 text-semantic-destructive" aria-hidden />
+      return <Icon name="circle-x" size="lg" className="text-semantic-destructive" />
     default:
       return null
   }

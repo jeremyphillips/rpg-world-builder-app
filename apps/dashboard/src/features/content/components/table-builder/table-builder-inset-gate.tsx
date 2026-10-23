@@ -1,12 +1,10 @@
 import type { ReactNode } from 'react'
-import { Table2 } from 'lucide-react'
-import { InsetPanel } from '@rpg/ui'
+import { Icon, InsetPanel } from '@rpg/ui'
 
 import {
   tableBuilderInsetGateCopyClasses,
   tableBuilderInsetGateDescriptionClasses,
   tableBuilderInsetGateHeadlineClasses,
-  tableBuilderInsetGateIconClasses,
   tableBuilderInsetGateIntroClasses,
   tableBuilderInsetGatePanelClasses,
 } from './table-builder-inset-gate.variants'
@@ -34,7 +32,13 @@ export function TableBuilderInsetGate({
       className={tableBuilderInsetGatePanelClasses}
     >
       <div className={tableBuilderInsetGateIntroClasses}>
-        {icon ?? <Table2 className={tableBuilderInsetGateIconClasses} aria-hidden />}
+        {icon ?? (
+          <Icon
+            name="table"
+            size="owner"
+            className="ui-empty-state-well__icon ui-empty-state-well__icon--md shrink-0"
+          />
+        )}
         <div className={tableBuilderInsetGateCopyClasses}>
           {headline ? <p className={tableBuilderInsetGateHeadlineClasses}>{headline}</p> : null}
           <p className={tableBuilderInsetGateDescriptionClasses}>{description}</p>

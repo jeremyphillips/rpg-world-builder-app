@@ -1,7 +1,6 @@
-import { ChevronDown } from 'lucide-react'
 import { useId, useState, type ReactNode } from 'react'
 
-import { cn } from '@rpg/ui'
+import { cn, Icon } from '@rpg/ui'
 
 import { EntityAnatomy } from '../../../entity/anatomy/entity-anatomy'
 import type { EntityAnatomyTrailing } from '../../../entity/anatomy/entity-anatomy-trailing.types'
@@ -62,9 +61,10 @@ function DetailEntityRowDisclosureUtility({
         aria-label={toggleLabel}
         onClick={onToggle}
       >
-        <ChevronDown
+        <Icon
+          name="chevron-down"
+          size="owner"
           className={cn('transition-transform', collapsed && '-rotate-90')}
-          aria-hidden
         />
       </button>
     )

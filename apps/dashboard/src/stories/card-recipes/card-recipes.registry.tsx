@@ -1,5 +1,4 @@
 import { composeStories } from '@storybook/react-vite'
-import { GripVertical, Trash2, WandSparkles } from 'lucide-react'
 import { useState } from 'react'
 
 import {
@@ -15,6 +14,7 @@ import {
   DropdownMenuTrigger,
   Field,
   FieldLayout,
+  Icon,
   IdentityRow,
   IdentityRowHeadingLine,
   Input,
@@ -88,7 +88,7 @@ function RemoveUtility({ label }: { label: string }) {
       className={iconGhostControlVariants({ hover: 'accent', layout: 'flex' })}
       aria-label={`Remove ${label}`}
     >
-      <ActionIcon action="remove" step="md" />
+      <ActionIcon action="remove" size="md" />
     </button>
   )
 }
@@ -214,12 +214,12 @@ function ArrayItemAnatomyGridRecipe() {
       fieldWidths={['md', 'auto']}
       grip={
         <button type="button" aria-label="Drag to reorder">
-          <GripVertical aria-hidden />
+          <Icon name="grip-vertical" size="owner" />
         </button>
       }
       actions={
         <button type="button" aria-label="Remove item">
-          <Trash2 aria-hidden />
+          <Icon name="trash" size="owner" />
         </button>
       }
     >
@@ -491,7 +491,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
               icon: 'spellcasting-ability',
             },
           ]}
-          rowIcons={{ 'spellcasting-ability': WandSparkles }}
+          rowIcons={{ 'spellcasting-ability': 'wand-sparkles' }}
           showSourceColumn={false}
         />
       </div>

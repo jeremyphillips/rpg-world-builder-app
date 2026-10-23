@@ -1,5 +1,3 @@
-import { iconGlyphDirectChildClasses } from './icon-glyph.variants'
-
 export const breadcrumbListVariants =
   'flex flex-wrap items-center gap-1.5 break-words text-style-caption sm:gap-2.5'
 
@@ -9,6 +7,6 @@ export const breadcrumbLinkVariants = 'cursor-pointer transition-colors hover:te
 
 export const breadcrumbPageVariants = 'font-normal text-foreground'
 
-export const breadcrumbSeparatorVariants = iconGlyphDirectChildClasses.md
+export const breadcrumbSeparatorVariants = ''
 
 export const breadcrumbEllipsisVariants = 'flex h-9 w-9 items-center justify-center'

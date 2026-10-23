@@ -1,4 +1,4 @@
-import { TriangleAlert } from 'lucide-react'
+import { Icon } from '../icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ClassReferenceTable } from '../../../stories/semantic-classes/class-reference-table'
@@ -89,7 +89,7 @@ export const Caution: Story = {
   args: {
     tone: 'warning',
     emphasis: 'medium',
-    icon: <TriangleAlert aria-hidden />,
+    icon: <Icon name="triangle-alert" size="2xl" />,
     children: 'Not proficient',
   },
 }
@@ -98,7 +98,7 @@ export const Negative: Story = {
   args: {
     tone: 'destructive',
     emphasis: 'high',
-    icon: <TriangleAlert aria-hidden />,
+    icon: <Icon name="triangle-alert" size="2xl" />,
     children: 'Cannot afford',
   },
 }

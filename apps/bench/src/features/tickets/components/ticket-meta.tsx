@@ -2,8 +2,7 @@ import { Link } from 'react-router-dom'
 
 import type { Ticket } from '@rpg/contracts/dev-bench'
 import { getTicketCreatedByLabel } from '@rpg/contracts/dev-bench'
-import { InlineMetadata, Text } from '@rpg/ui'
-import { ExternalLink } from 'lucide-react'
+import { Icon, InlineMetadata, Text } from '@rpg/ui'
 
 import {
   ticketMetaDetailLinkClasses,
@@ -31,7 +30,7 @@ export function TicketMetaKicker({ ticket, detailHref }: TicketMetaKickerProps) 
           className={ticketMetaDetailLinkClasses}
           aria-label={`Open ${ticket.key} full page`}
         >
-          <ExternalLink className={ticketMetaDetailLinkIconClasses} aria-hidden />
+          <Icon name="external-link" size="inline" className={ticketMetaDetailLinkIconClasses} />
         </Link>
       ) : null}
     </div>

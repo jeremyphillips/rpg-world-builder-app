@@ -5,8 +5,8 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { StatusIcon } from './status-icon.client'
 import {
-  STATUS_ICON_OFF_SLASH_STROKE_WIDTH,
-  STATUS_ICON_STROKE_WIDTH,
+  STATUS_ICON_DEFINITIONS,
+  STATUS_ICON_OPTICAL_REDUCED_HEAVY_CLASS,
   STATUS_ICON_TOOLTIP_LABELS,
   STATUS_ICON_VARIANTS,
 } from './status-icon.variants'
@@ -74,59 +74,26 @@ describe('StatusIcon', () => {
     expect(getStatusIconDisc(incompleteContainer)).toHaveClass('ui-status-icon--incomplete')
   })
 
-  it('matches the neutral glyph foreground on grey discs', () => {
-    const { container: offContainer } = render(<StatusIcon variant="off" tooltip={false} />)
-    const { container: noneContainer } = render(<StatusIcon variant="none" tooltip={false} />)
-    const { container: incompleteContainer } = render(
-      <StatusIcon variant="incomplete" tooltip={false} />,
-    )
-
-    expect(offContainer.querySelector('svg')).toHaveClass('ui-status-icon__glyph--neutral')
-    expect(noneContainer.querySelector('svg')).toHaveClass('ui-status-icon__glyph--neutral')
-    expect(incompleteContainer.querySelector('svg')).toHaveClass('ui-status-icon__glyph--neutral')
-  })
-
-  it('hides the CircleAlert outer ring on needsAttention', () => {
-    const { container } = render(<StatusIcon variant="needsAttention" tooltip={false} />)
-    expect(container.querySelector('svg')).toHaveClass('ui-status-icon__glyph--needs-attention')
-  })
-
-  it('uses the default stroke width on every glyph except off', () => {
+  it('renders the canonical glyph for each variant', () => {
     for (const variant of STATUS_ICON_VARIANTS) {
-      if (variant === 'off') {
-        continue
-      }
-
       const { container } = render(<StatusIcon variant={variant} tooltip={false} />)
-      expect(container.querySelector('svg')?.getAttribute('stroke-width')).toBe(
-        String(STATUS_ICON_STROKE_WIDTH),
+      expect(container.querySelector('svg')).toHaveAttribute(
+        'data-icon',
+        STATUS_ICON_DEFINITIONS[variant].icon,
       )
+      expect(container.querySelector('svg')).toHaveClass('ui-icon--owner')
     }
   })
 
-  it('sizes and strokes the off slash lighter than other glyphs', () => {
-    const { container: smContainer } = render(
-      <StatusIcon variant="off" size="sm" tooltip={false} />,
-    )
-    const { container: mdContainer } = render(
-      <StatusIcon variant="off" size="md" tooltip={false} />,
-    )
-    const { container: lgContainer } = render(
-      <StatusIcon variant="off" size="lg" tooltip={false} />,
-    )
+  it('applies the reduced-heavy optical treatment only to off', () => {
+    const { container: offContainer } = render(<StatusIcon variant="off" tooltip={false} />)
+    const { container: readyContainer } = render(<StatusIcon variant="ready" tooltip={false} />)
 
-    expect(smContainer.querySelector('svg')).toHaveClass('size-status-icon-slash-sm')
-    expect(smContainer.querySelector('svg')?.getAttribute('stroke-width')).toBe(
-      String(STATUS_ICON_OFF_SLASH_STROKE_WIDTH),
+    expect(getStatusIconDisc(offContainer)).toHaveClass(STATUS_ICON_OPTICAL_REDUCED_HEAVY_CLASS)
+    expect(getStatusIconDisc(readyContainer)).not.toHaveClass(
+      STATUS_ICON_OPTICAL_REDUCED_HEAVY_CLASS,
     )
-    expect(mdContainer.querySelector('svg')).toHaveClass('size-status-icon-slash-sm')
-    expect(mdContainer.querySelector('svg')?.getAttribute('stroke-width')).toBe(
-      String(STATUS_ICON_OFF_SLASH_STROKE_WIDTH),
-    )
-    expect(lgContainer.querySelector('svg')).toHaveClass('size-status-icon-slash-md')
-    expect(lgContainer.querySelector('svg')?.getAttribute('stroke-width')).toBe(
-      String(STATUS_ICON_OFF_SLASH_STROKE_WIDTH),
-    )
+    expect(offContainer.querySelector('svg')).toHaveAttribute('data-icon', 'slash')
   })
 
   it('applies size variants', () => {

@@ -1,9 +1,8 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
-import { Info } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { OverlayArrowSvg, overlayArrowHeight, overlayArrowWidth } from './overlay-arrow.client'
 import { popoverContentVariants, tooltipContentMotionClasses } from './popover-content.variants'
@@ -99,7 +98,7 @@ export function InfoTooltip({ 'aria-label': ariaLabel, children, className }: In
               className,
             )}
           >
-            <Info className="size-3.5" aria-hidden="true" />
+            <Icon name="info" size="md" />
           </button>
         </TooltipTrigger>
         <TooltipContent>{children}</TooltipContent>

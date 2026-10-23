@@ -1,10 +1,9 @@
 'use client'
+import { Icon } from './icon/icon'
 
-import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useId, type ReactNode } from 'react'
 
 import { Badge } from './badge'
-import { iconGlyphRootClasses } from './icon-glyph.variants'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import { cn } from '../../lib/utils'
 import { borderStrength } from './border-strength'
@@ -71,9 +70,9 @@ export function DataTableFilterRegion({
             onClick={() => onAdditionalFiltersOpenChange(!additionalFiltersOpen)}
           >
             {additionalFiltersOpen ? (
-              <ChevronDown className={iconGlyphRootClasses.sm} aria-hidden />
+              <Icon name="chevron-down" size="sm" />
             ) : (
-              <ChevronRight className={iconGlyphRootClasses.sm} aria-hidden />
+              <Icon name="chevron-right" size="sm" />
             )}
             {labels.additionalFilters}
             {showActiveBadge ? (

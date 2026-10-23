@@ -22,6 +22,7 @@
     padding-inline: calc(var(--spacing) * 2);
     font-size: var(--text-compact-label-sm);
     line-height: var(--text-compact-label-sm--line-height);
+    --icon-size: var(--icon-glyph-xs);
   }
 
   .ui-compact-label--md {
@@ -29,6 +30,7 @@
     padding-inline: calc(var(--spacing) * 3);
     font-size: var(--text-compact-label-md);
     line-height: var(--text-compact-label-md--line-height);
+    --icon-size: var(--icon-glyph-sm);
   }
 
   .ui-compact-label--lg {
@@ -36,6 +38,7 @@
     padding-inline: calc(var(--spacing) * 4);
     font-size: var(--text-compact-label-lg);
     line-height: var(--text-compact-label-lg--line-height);
+    --icon-size: var(--icon-glyph-md);
   }
 
   .ui-compact-label--removable-sm,

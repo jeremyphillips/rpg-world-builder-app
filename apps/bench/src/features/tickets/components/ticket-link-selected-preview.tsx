@@ -1,7 +1,6 @@
 import type { Ticket } from '@rpg/contracts/dev-bench'
 import type { ComboboxFieldOption } from '@rpg/ui'
-import { cn, Text } from '@rpg/ui'
-import { X } from 'lucide-react'
+import { cn, Icon, Text } from '@rpg/ui'
 
 import { benchTicketPath } from '@/app/routes'
 
@@ -79,7 +78,7 @@ export function TicketLinkSelectedPreview({
           onRemove()
         }}
       >
-        <X className="size-4" aria-hidden />
+        <Icon name="x" size="lg" />
       </button>
     </div>
   )

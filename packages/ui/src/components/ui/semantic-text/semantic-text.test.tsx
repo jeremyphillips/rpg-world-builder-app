@@ -1,4 +1,4 @@
-import { TriangleAlert } from 'lucide-react'
+import { Icon } from '../icon/icon'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
@@ -73,7 +73,7 @@ describe('SemanticText', () => {
 
   it('wraps icons in the semantic icon slot', () => {
     const { container } = render(
-      <SemanticText icon={<TriangleAlert data-testid="icon" />} tone="warning">
+      <SemanticText icon={<Icon name="triangle-alert" size="2xl" />} tone="warning">
         Warning
       </SemanticText>,
     )
@@ -88,7 +88,11 @@ describe('SemanticText', () => {
 
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
-      <SemanticText tone="destructive" emphasis="high" icon={<TriangleAlert aria-hidden />}>
+      <SemanticText
+        tone="destructive"
+        emphasis="high"
+        icon={<Icon name="triangle-alert" size="2xl" />}
+      >
         Cannot afford
       </SemanticText>,
     )

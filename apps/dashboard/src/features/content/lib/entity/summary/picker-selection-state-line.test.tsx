@@ -17,7 +17,7 @@ describe('PickerSelectionStateLine', () => {
     expect(word).not.toHaveClass('inline-flex', 'items-center')
     const icon = word.querySelector('svg')
     expect(icon).toHaveAttribute('aria-hidden', 'true')
-    expect(icon).toHaveClass('inline-block', 'align-middle', 'size-icon-inline')
+    expect(icon).toHaveClass('ui-icon--inline')
     expect(icon).not.toHaveClass('size-3.5')
     expect(word.closest('[data-picker-selection-state]')).toHaveClass('text-style-caption')
 

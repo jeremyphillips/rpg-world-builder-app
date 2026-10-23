@@ -1,15 +1,14 @@
-import { House } from 'lucide-react'
-import { contentIdentityIcon, type AppIcon } from '@rpg/ui'
+import { contentIdentityIcon, type IconName } from '@rpg/ui'
 
 import type { ConnectionTopLevelSectionId } from './connection-section-catalog'
 
-export const CONNECTION_SECTION_ICONS: Record<ConnectionTopLevelSectionId, AppIcon> = {
+export const CONNECTION_SECTION_ICONS: Record<ConnectionTopLevelSectionId, IconName> = {
   people: contentIdentityIcon('character'),
   organizations: contentIdentityIcon('organization'),
   places: contentIdentityIcon('location'),
-  property: House,
+  property: 'house',
 }
 
-export function getConnectionSectionIcon(sectionId: ConnectionTopLevelSectionId): AppIcon {
+export function getConnectionSectionIcon(sectionId: ConnectionTopLevelSectionId): IconName {
   return CONNECTION_SECTION_ICONS[sectionId]
 }

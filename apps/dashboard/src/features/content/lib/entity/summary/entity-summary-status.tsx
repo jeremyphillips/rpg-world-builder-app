@@ -1,10 +1,9 @@
-import { Check, TriangleAlert } from 'lucide-react'
-import { AlertCircle } from 'lucide-react'
-
 import {
   Badge,
+  Icon,
   InlineInactiveStatus,
   resolveEntityRowInlineBadgeSize,
+  StatusIcon,
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -16,8 +15,8 @@ import type { EntitySummaryStatusItem } from './entity-summary-status.types'
 import { entitySummaryStatusVariants } from './entity-summary.variants'
 
 function resolveStatusLeadingIcon(icon: 'check' | 'warning' | undefined) {
-  if (icon === 'check') return <Check aria-hidden />
-  if (icon === 'warning') return <TriangleAlert aria-hidden />
+  if (icon === 'check') return <Icon name="check" size="inline" />
+  if (icon === 'warning') return <Icon name="triangle-alert" size="inline" />
   return undefined
 }
 
@@ -81,7 +80,7 @@ export function EntitySummaryStatusItemView({
     case 'validationError':
       return (
         <span className="inline-flex items-center gap-1">
-          <AlertCircle className="size-icon-inline shrink-0 text-destructive" aria-hidden />
+          <StatusIcon variant="needsAttention" size="sm" tooltip={false} className="shrink-0" />
           <span className="sr-only">Has validation errors</span>
         </span>
       )

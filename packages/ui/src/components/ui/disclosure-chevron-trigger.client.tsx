@@ -1,11 +1,10 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronDown } from 'lucide-react'
 
-import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { CollapsibleTrigger } from './collapsible.client'
+import { DisclosureIndicator } from './disclosure-indicator.client'
 import { SelectionTargetRaised } from './selection-target.client'
 
 export function DisclosureChevronTrigger({ label }: { label: string }): React.JSX.Element {
@@ -20,11 +19,7 @@ export function DisclosureChevronTrigger({ label }: { label: string }): React.JS
           className="shrink-0 p-0"
           aria-label={label}
         >
-          <ChevronDown
-            className={cn(
-              'size-icon-glyph-md transition-transform [[data-state=open]_&]:rotate-180',
-            )}
-          />
+          <DisclosureIndicator size="md" />
         </Button>
       </CollapsibleTrigger>
     </SelectionTargetRaised>

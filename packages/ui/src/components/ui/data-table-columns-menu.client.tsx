@@ -1,4 +1,5 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 
@@ -21,8 +22,6 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { ChevronDown, Columns3, GripVertical, Lock, RotateCcw } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { matchesPrimaryTextQuery } from '../../lib/search-document.lib'
 import { Button } from './button.client'
@@ -99,7 +98,7 @@ function SortableColumnRow({ item, onVisibilityChange }: SortableColumnRowProps)
         {...attributes}
         {...listeners}
       >
-        <GripVertical className="size-3.5" />
+        <Icon name="grip-vertical" size="md" />
       </button>
       <Checkbox
         id={`column-visibility-${item.id}`}
@@ -123,7 +122,7 @@ function LockedColumnRow({ item }: LockedColumnRowProps) {
   return (
     <div className="flex cursor-default items-center gap-2 px-2 py-1.5 text-style-supporting">
       <span className="flex shrink-0 items-center justify-center rounded p-0.5">
-        <Lock className="size-3.5" aria-hidden />
+        <Icon name="lock" size="md" />
       </span>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -237,7 +236,7 @@ function DataTableColumnsMenuPanel({
             onClick={onReset}
             className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-style-supporting hover:bg-accent hover:text-accent-foreground"
           >
-            <RotateCcw className="size-3.5" />
+            <Icon name="rotate-ccw" size="md" />
             {labels.resetColumns}
           </button>
         </div>
@@ -260,8 +259,8 @@ export function DataTableColumnsMenu({
 
   const trigger = (
     <Button variant="outline" size="sm" aria-label={labels.chooseColumns}>
-      <Columns3 className="size-3.5" aria-hidden />
-      <ChevronDown className="size-3.5 opacity-60" aria-hidden />
+      <Icon name="columns-3" size="md" />
+      <Icon name="chevron-down" size="md" className="opacity-60" />
     </Button>
   )
 

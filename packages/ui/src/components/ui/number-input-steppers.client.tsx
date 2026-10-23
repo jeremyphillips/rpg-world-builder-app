@@ -1,6 +1,6 @@
 'use client'
-
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { Icon } from './icon/icon'
+import type { IconSize } from './icon/icon.types'
 
 import { cn } from '../../lib/utils'
 import {
@@ -11,6 +11,16 @@ import {
 
 const INCREMENT_LABEL = 'Increment'
 const DECREMENT_LABEL = 'Decrement'
+
+const NUMBER_INPUT_STEPPER_ICON_SIZE: Record<
+  NonNullable<NumberInputSteppersProps['size']>,
+  IconSize
+> = {
+  xs: 'xs',
+  sm: 'xs',
+  md: 'xs',
+  lg: 'md',
+}
 
 interface NumberInputSteppersProps extends Pick<NumberInputVariantProps, 'size' | 'grouped'> {
   disabled?: boolean
@@ -46,7 +56,7 @@ export function NumberInputSteppers({
         onMouseDown={(event) => event.preventDefault()}
         onClick={() => onBump('up')}
       >
-        <ChevronUp aria-hidden />
+        <Icon name="chevron-up" size={NUMBER_INPUT_STEPPER_ICON_SIZE[size ?? 'md']} />
       </button>
       <button
         type="button"
@@ -57,7 +67,7 @@ export function NumberInputSteppers({
         onMouseDown={(event) => event.preventDefault()}
         onClick={() => onBump('down')}
       >
-        <ChevronDown aria-hidden />
+        <Icon name="chevron-down" size={NUMBER_INPUT_STEPPER_ICON_SIZE[size ?? 'md']} />
       </button>
     </div>
   )

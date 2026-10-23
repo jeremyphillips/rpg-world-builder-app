@@ -14,14 +14,14 @@ describe('Spinner', () => {
     render(<Spinner />)
     const spinner = screen.getByRole('status', { name: 'Loading' })
     expect(spinner).toHaveClass('text-muted-foreground')
-    expect(spinner).toHaveClass('size-4')
+    expect(spinner.querySelector('svg')).toHaveClass('ui-icon--lg')
   })
 
   it('applies variant and size props', () => {
     render(<Spinner variant="foreground" size="xl" />)
     const spinner = screen.getByRole('status', { name: 'Loading' })
     expect(spinner).toHaveClass('text-foreground')
-    expect(spinner).toHaveClass('size-8')
+    expect(spinner.querySelector('svg')).toHaveClass('ui-icon--3xl')
   })
 
   it('merges custom className', () => {

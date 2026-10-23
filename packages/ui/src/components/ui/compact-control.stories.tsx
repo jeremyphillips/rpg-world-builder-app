@@ -1,6 +1,5 @@
+import { Icon } from './icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Plus, Settings } from 'lucide-react'
-
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Button } from './button.client'
 import {
@@ -32,7 +31,7 @@ export const HitTargetPairings: Story = {
         aria-label="Compact icon"
         className={resolveCompactControlRecipeClasses('icon-compact')}
       >
-        <Plus aria-hidden />
+        <Icon name="plus" size="2xl" />
       </button>
       <button type="button" className={resolveCompactControlRecipeClasses('text-compact')}>
         View
@@ -41,7 +40,7 @@ export const HitTargetPairings: Story = {
         type="button"
         className={resolveCompactControlRecipeClasses('text-with-icon-compact')}
       >
-        <Settings aria-hidden />
+        <Icon name="settings" size="2xl" />
         Compact text
       </button>
       <button
@@ -49,14 +48,14 @@ export const HitTargetPairings: Story = {
         aria-label="Default icon"
         className={resolveCompactControlRecipeClasses('icon-default')}
       >
-        <Settings aria-hidden />
+        <Icon name="settings" size="2xl" />
       </button>
       <button
         type="button"
         aria-label="Large icon"
         className={resolveCompactControlRecipeClasses('icon-lg')}
       >
-        <Settings aria-hidden />
+        <Icon name="settings" size="2xl" />
       </button>
     </div>
   ),
@@ -66,17 +65,17 @@ export const ButtonIntegration: Story = {
   render: () => (
     <div className="flex items-center gap-3">
       <Button size="icon" density="compact" aria-label="Remove">
-        <Plus aria-hidden />
+        <Icon name="plus" size="2xl" />
       </Button>
       <Button size="sm" density="compact">
-        <Settings aria-hidden />
+        <Icon name="settings" size="2xl" />
         Compact
       </Button>
       <Button size="icon" aria-label="Settings">
-        <Settings aria-hidden />
+        <Icon name="settings" size="2xl" />
       </Button>
       <Button size="icon-lg" aria-label="Settings large">
-        <Settings aria-hidden />
+        <Icon name="settings" size="2xl" />
       </Button>
     </div>
   ),
@@ -96,7 +95,7 @@ export const ClassReference: Story = {
             className={resolveCompactControlRecipeClasses(spec.recipe)}
             data-semantic-class-target
           >
-            {spec.recipe.startsWith('icon') ? <Plus aria-hidden /> : spec.recipe}
+            {spec.recipe.startsWith('icon') ? <Icon name="plus" size="2xl" /> : spec.recipe}
           </button>
         ),
         propsLabel: spec.recipe,

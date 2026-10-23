@@ -1,6 +1,5 @@
 'use client'
-
-import { X } from 'lucide-react'
+import { Icon } from './icon/icon'
 
 import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
@@ -38,7 +37,7 @@ export function FieldClearAffordanceButton({
       aria-label={accessibleName}
       onClick={onClear}
     >
-      <X className="size-icon-glyph-md" aria-hidden />
+      <Icon name="x" size="md" />
     </button>
   )
 }

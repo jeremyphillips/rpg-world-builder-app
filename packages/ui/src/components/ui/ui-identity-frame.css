@@ -58,4 +58,20 @@
     background-color: var(--surface-strong);
     color: var(--muted-foreground);
   }
+
+  .ui-identity-frame__fallback--xs {
+    --icon-size: var(--icon-glyph-sm);
+  }
+
+  .ui-identity-frame__fallback--sm {
+    --icon-size: var(--icon-glyph-lg);
+  }
+
+  .ui-identity-frame__fallback--md {
+    --icon-size: var(--icon-glyph-2xl);
+  }
+
+  .ui-identity-frame__fallback--inline {
+    --icon-size: var(--icon-glyph-xs);
+  }
 }

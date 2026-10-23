@@ -33,7 +33,7 @@ function GhostRemoveUtility({ label }: { label: string }) {
       className={iconGhostControlVariants({ hover: 'accent', layout: 'flex' })}
       aria-label={`Remove ${label}`}
     >
-      <ActionIcon action="remove" step="md" />
+      <ActionIcon action="remove" size="md" />
     </button>
   )
 }

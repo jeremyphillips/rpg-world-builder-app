@@ -1,4 +1,4 @@
-import { CircleSlash } from 'lucide-react'
+import { Icon } from '@rpg/ui'
 import type { VocabularyOptionStatus } from '@rpg/contracts'
 
 type VocabularyAvailabilityMetadataProps = {
@@ -13,7 +13,7 @@ export function VocabularyAvailabilityMetadata({ status }: VocabularyAvailabilit
 
   return (
     <div className="ml-auto flex items-center gap-1 leading-4 text-style-caption">
-      <CircleSlash aria-hidden className="size-icon-inline shrink-0 text-semantic-warning" />
+      <Icon name="circle-slash" size="inline" className="shrink-0 text-semantic-warning" />
       <span className="text-semantic-warning">Unavailable</span>
     </div>
   )

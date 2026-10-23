@@ -16,7 +16,7 @@ export const Verbs: Story = {
     <ul className="flex flex-wrap gap-4">
       {ACTION_ICON_VERBS.map((action) => (
         <li key={action} className="flex flex-col items-center gap-1 text-xs">
-          <ActionIcon action={action} />
+          <ActionIcon action={action} size="lg" />
           <span>{action}</span>
         </li>
       ))}

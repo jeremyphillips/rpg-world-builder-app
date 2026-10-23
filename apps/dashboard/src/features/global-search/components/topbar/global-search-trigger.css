@@ -1,0 +1,11 @@
+@layer components {
+  .dash-global-search-trigger__icon {
+    --icon-size: var(--icon-glyph-xl);
+  }
+
+  @media (min-width: 768px) {
+    .dash-global-search-trigger__icon {
+      --icon-size: var(--icon-glyph-lg);
+    }
+  }
+}

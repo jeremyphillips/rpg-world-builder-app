@@ -1,9 +1,8 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { Check } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
@@ -239,9 +238,9 @@ function SearchableUnitSelect({
                       selected={isSelected}
                       endSlot={
                         isSelected ? (
-                          <Check className="size-4 shrink-0" aria-hidden />
+                          <Icon name="check" size="lg" className="shrink-0" />
                         ) : (
-                          <span className="size-4 shrink-0" aria-hidden />
+                          <span className="h-4 w-4 shrink-0" aria-hidden />
                         )
                       }
                       asChild

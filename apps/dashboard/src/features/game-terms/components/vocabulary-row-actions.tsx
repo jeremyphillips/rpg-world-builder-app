@@ -73,7 +73,7 @@ export function VocabularyRowActions({
           kind: 'action' as const,
           id: 'delete',
           label: 'Delete',
-          icon: <ActionIcon action="delete" />,
+          icon: <ActionIcon action="delete" size="lg" />,
           destructive: true,
           onSelect: () => setConfirmDeleteOpen(true),
         },

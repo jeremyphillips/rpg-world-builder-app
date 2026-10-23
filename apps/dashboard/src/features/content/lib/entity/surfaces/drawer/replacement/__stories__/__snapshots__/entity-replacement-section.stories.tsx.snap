@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Content/Entity/Surfaces/Drawer/Replacement/EntityReplacementSection LocationReplacement smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "castle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Content/Entity/Surfaces/Drawer/Replacement/EntityReplacementSection OrganizationReplacementUnavailable smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "castle",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

@@ -14,7 +14,7 @@ export function ContentDetailEditAction({ to }: ContentDetailEditActionProps) {
       density="compact"
       className="inline-flex items-center"
     >
-      <ActionIcon action="edit" step="sm" aria-hidden />
+      <ActionIcon action="edit" size="sm" />
       Edit
     </ButtonLink>
   )

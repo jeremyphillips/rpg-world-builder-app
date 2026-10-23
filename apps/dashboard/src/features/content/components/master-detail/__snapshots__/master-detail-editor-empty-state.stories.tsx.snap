@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Content/MasterDetail/MasterDetailEditorEmptyState Default smoke-test 1`] = `
+[
+  {
+    "height": "40px",
+    "identity": "sparkles",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "40px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

@@ -7,12 +7,12 @@ import type {
   StartingPackageConversionPreview,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-import { ChevronDown } from 'lucide-react'
 import {
   Button,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
+  DisclosureIndicator,
   Eyebrow,
   Heading,
   Text,
@@ -40,13 +40,6 @@ import {
   equipmentInventoryRowListClasses,
 } from '../inventory/equipment-inventory.variants'
 import { EquipmentPackageConversionEditor } from '../package-switch/equipment-package-conversion-editor'
-import {
-  equipmentStartingPackageCategoryClasses,
-  equipmentStartingPackageChevronVariants,
-  equipmentStartingPackageHeaderActionsClasses,
-  equipmentStartingPackageHeaderClasses,
-  equipmentStartingPackageHeaderCopyClasses,
-} from './equipment-starting-package.variants'
 
 export type EquipmentStartingPackageDisclosureProps = {
   packageGroup: StartingPackageInventoryGroup
@@ -70,8 +63,8 @@ function packageItemCount(packageGroup: StartingPackageInventoryGroup): number {
 
 export function EquipmentStartingPackageGoldHeader({ optionLabel }: { optionLabel: string }) {
   return (
-    <div className={equipmentStartingPackageHeaderClasses}>
-      <div className={equipmentStartingPackageHeaderCopyClasses}>
+    <div className="flex items-center justify-between gap-3 px-4 py-3">
+      <div className="min-w-0 flex-1 text-left">
         <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
           {EQUIPMENT_STARTING_PACKAGE_TITLE}
         </Heading>
@@ -91,7 +84,7 @@ function EquipmentStartingPackageInventory({
   return (
     <>
       {packageGroup.categoryGroups.map((category) => (
-        <div key={category.groupLabel} className={equipmentStartingPackageCategoryClasses}>
+        <div key={category.groupLabel} className="space-y-1 px-4 py-3 first:pt-4 last:pb-4">
           <Eyebrow size="sm">{category.groupLabel}</Eyebrow>
           <ul className={equipmentInventoryRowListClasses}>
             {category.rows.map((row: EquipmentInventoryRow) => (
@@ -153,7 +146,6 @@ export function EquipmentStartingPackageDisclosure({
   }
 
   return (
-    // TODO(disclosure): consolidate ad hoc collapsible trigger/caret with shared @rpg/ui disclosure primitives.
     <Collapsible
       open={open}
       onOpenChange={(next) => {
@@ -161,9 +153,9 @@ export function EquipmentStartingPackageDisclosure({
         setExpanded(next)
       }}
     >
-      <div className={equipmentStartingPackageHeaderClasses}>
+      <div className="flex items-center justify-between gap-3 px-4 py-3">
         <CollapsibleTrigger asChild>
-          <button type="button" className={equipmentStartingPackageHeaderCopyClasses}>
+          <button type="button" className="min-w-0 flex-1 text-left">
             <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
               {EQUIPMENT_STARTING_PACKAGE_TITLE}
             </Heading>
@@ -172,7 +164,7 @@ export function EquipmentStartingPackageDisclosure({
             </Text>
           </button>
         </CollapsibleTrigger>
-        <div className={equipmentStartingPackageHeaderActionsClasses}>
+        <div className="flex shrink-0 items-center gap-1">
           <DetailOverflowMenu
             triggerLabel={`Actions for ${packageGroup.optionLabel}`}
             actions={[
@@ -197,10 +189,7 @@ export function EquipmentStartingPackageDisclosure({
               density="compact"
               aria-label={open ? 'Collapse starting package' : 'Expand starting package'}
             >
-              <ChevronDown
-                aria-hidden
-                className={equipmentStartingPackageChevronVariants({ open })}
-              />
+              <DisclosureIndicator size="owner" className="size-4 shrink-0" />
             </Button>
           </CollapsibleTrigger>
         </div>

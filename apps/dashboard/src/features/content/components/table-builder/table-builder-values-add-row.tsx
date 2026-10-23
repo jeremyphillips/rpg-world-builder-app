@@ -34,7 +34,7 @@ export function TableBuilderValuesAddRow({
         disabled={addRowDisabled}
         title={addRowDisabled ? TABLE_BUILDER_ALL_LEVELS_USED_REASON : undefined}
       >
-        <ActionIcon action="add" className={tableBuilderAddActionIconClasses} />
+        <ActionIcon action="add" className={tableBuilderAddActionIconClasses} size="lg" />
         {addRowLabel}
         {includeLevel && addRowDisabled ? (
           <span className="sr-only">{TABLE_BUILDER_ALL_LEVELS_USED_REASON}</span>

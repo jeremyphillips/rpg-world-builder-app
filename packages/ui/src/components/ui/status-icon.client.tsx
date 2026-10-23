@@ -1,28 +1,19 @@
 'use client'
 
 import * as React from 'react'
-import { Check, CircleAlert, Ellipsis, Minus, Slash } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { Icon } from './icon/icon'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
 import {
   STATUS_ICON_DEFAULT_SIZE,
-  STATUS_ICON_OFF_SLASH_STROKE_WIDTH,
-  STATUS_ICON_STROKE_WIDTH,
+  STATUS_ICON_DEFINITIONS,
+  STATUS_ICON_OPTICAL_REDUCED_HEAVY_CLASS,
   STATUS_ICON_TOOLTIP_LABELS,
-  statusIconGlyphVariants,
   statusIconVariants,
   type StatusIconVariant,
   type StatusIconVariantProps,
 } from './status-icon.variants'
-
-function resolveStatusIconStrokeWidth(variant: StatusIconVariant): number {
-  if (variant === 'off') {
-    return STATUS_ICON_OFF_SLASH_STROKE_WIDTH
-  }
-
-  return STATUS_ICON_STROKE_WIDTH
-}
 
 function resolveStatusIconTooltipLabel(
   variant: StatusIconVariant,
@@ -34,20 +25,6 @@ function resolveStatusIconTooltipLabel(
 
   return STATUS_ICON_TOOLTIP_LABELS[variant]
 }
-
-type StatusIconGlyphComponent = React.ComponentType<{
-  className?: string
-  strokeWidth?: number
-}>
-
-const STATUS_ICON_GLYPHS = {
-  ready: Check,
-  incomplete: Ellipsis,
-  off: Slash,
-  none: Minus,
-  notConfigured: Ellipsis,
-  needsAttention: CircleAlert,
-} as const satisfies Record<StatusIconVariant, StatusIconGlyphComponent>
 
 export type { StatusIconVariant } from './status-icon.variants'
 
@@ -67,31 +44,24 @@ type ResolvedStatusIconVariantProps = {
   size: NonNullable<StatusIconVariantProps['size']>
 }
 
-function StatusIconGlyph({
-  variant,
-  size,
-  className,
-}: ResolvedStatusIconVariantProps & { className?: string }) {
-  const Glyph = STATUS_ICON_GLYPHS[variant]
-
-  return (
-    <Glyph
-      aria-hidden
-      strokeWidth={resolveStatusIconStrokeWidth(variant)}
-      className={cn(statusIconGlyphVariants({ variant, size }), className)}
-    />
-  )
-}
-
 function StatusIconDisc({
   variant,
   size,
   className,
   ...props
 }: ResolvedStatusIconVariantProps & Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'>) {
+  const definition = STATUS_ICON_DEFINITIONS[variant]
+
   return (
-    <span className={cn(statusIconVariants({ variant, size }), className)} {...props}>
-      <StatusIconGlyph variant={variant} size={size} />
+    <span
+      className={cn(
+        statusIconVariants({ variant, size }),
+        'optical' in definition && STATUS_ICON_OPTICAL_REDUCED_HEAVY_CLASS,
+        className,
+      )}
+      {...props}
+    >
+      <Icon name={definition.icon} size="owner" />
     </span>
   )
 }

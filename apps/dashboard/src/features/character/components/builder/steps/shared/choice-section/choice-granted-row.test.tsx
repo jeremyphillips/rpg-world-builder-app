@@ -17,9 +17,9 @@ describe('ChoiceGrantedRow', () => {
 
     expect(screen.getByText("Thieves' Tools")).toBeInTheDocument()
     expect(screen.getByText('Granted by Rogue')).toBeInTheDocument()
-    const icon = document.querySelector('svg.lucide-badge-check')
+    const icon = document.querySelector('[data-icon="badge-check"]')
     expect(icon).toBeTruthy()
-    expect(icon).toHaveClass('size-6')
+    expect(icon).toHaveClass('ui-icon--2xl')
     expect(icon?.closest('[data-entity-item-slot="leading"]')).toBeTruthy()
     expect(document.querySelector('[class*="size-10"]')).toBeNull()
   })

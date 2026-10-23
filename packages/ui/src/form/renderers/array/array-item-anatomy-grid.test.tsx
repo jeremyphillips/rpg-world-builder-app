@@ -1,6 +1,6 @@
+import { Icon } from '../../../components/ui/icon/icon'
 import type { CSSProperties } from 'react'
 import { render, screen } from '@testing-library/react'
-import { GripVertical, Trash2 } from 'lucide-react'
 import { describe, expect, it } from 'vitest'
 
 import { Field } from '../../../components/ui/field.client'
@@ -70,12 +70,12 @@ describe('ArrayItemAnatomyGrid', () => {
         fieldWidths={['md', 'auto']}
         grip={
           <button type="button" aria-label="Drag to reorder">
-            <GripVertical aria-hidden />
+            <Icon name="grip-vertical" size="2xl" />
           </button>
         }
         actions={
           <button type="button" aria-label="Remove item">
-            <Trash2 aria-hidden />
+            <Icon name="trash" size="2xl" />
           </button>
         }
       >
@@ -129,12 +129,12 @@ describe('ArrayItemAnatomyGrid', () => {
         fieldWidths={['md', 'auto']}
         grip={
           <button type="button" aria-label="Drag to reorder">
-            <GripVertical aria-hidden />
+            <Icon name="grip-vertical" size="2xl" />
           </button>
         }
         actions={
           <button type="button" aria-label="Remove item">
-            <Trash2 aria-hidden />
+            <Icon name="trash" size="2xl" />
           </button>
         }
       >
@@ -195,12 +195,12 @@ describe('ArrayItemAnatomyGrid', () => {
         fieldWidths={['md', 'auto']}
         grip={
           <button type="button" aria-label="Drag to reorder">
-            <GripVertical aria-hidden />
+            <Icon name="grip-vertical" size="2xl" />
           </button>
         }
         actions={
           <button type="button" aria-label="Remove item">
-            <Trash2 aria-hidden />
+            <Icon name="trash" size="2xl" />
           </button>
         }
       >

@@ -1,7 +1,7 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import type { ContentDisplayFallback } from '@rpg/contracts'
-import { ImagePlus, Settings } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
@@ -83,12 +83,12 @@ function resolveCompactEmptyPreview(input: {
     return input.emptyContent
   }
   if (input.canEdit) {
-    return <ImagePlus aria-hidden />
+    return <Icon name="image-plus" size="2xl" />
   }
   if (input.emptyFallback) {
-    return <ContentDisplayFallbackIcon fallback={input.emptyFallback} size="md" />
+    return <ContentDisplayFallbackIcon fallback={input.emptyFallback} size="2xl" />
   }
-  return <ImagePlus aria-hidden />
+  return <Icon name="image-plus" size="2xl" />
 }
 
 function CompactPreviewWell({
@@ -162,7 +162,7 @@ function CompactMediaFieldSummary({
           aria-label={MEDIA_FIELD_SUMMARY_MANAGE_IMAGES_LABEL}
           onClick={openManager}
         >
-          <Settings aria-hidden="true" className={mediaSummaryCompactGearIconVariants()} />
+          <Icon name="settings" size="md" />
         </button>
       ) : null}
     </div>

@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Send } from 'lucide-react'
 import {
   Button,
+  Icon,
   TextareaField,
   Tooltip,
   TooltipContent,
@@ -77,7 +77,7 @@ export function MessageComposer({
               aria-label={MESSAGES_ACTION_COPY.send}
               disabled={isDisabled}
             >
-              <Send />
+              <Icon name="send" size="owner" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>{MESSAGES_ACTION_COPY.sendMessageTooltip}</TooltipContent>

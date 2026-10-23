@@ -203,12 +203,12 @@ describe('DataTable — sorting', () => {
     const { container } = renderTable()
 
     const sortButton = screen.getByRole('button', { name: /sort by name/i })
-    expect(sortButton.querySelector('.lucide-chevron-up')).not.toBeInTheDocument()
+    expect(sortButton.querySelector('[data-icon="chevron-up"]')).not.toBeInTheDocument()
 
     await user.click(sortButton)
 
-    expect(sortButton.querySelector('.lucide-chevron-up')).toBeInTheDocument()
-    expect(container.querySelector('.lucide-arrow-up-down')).not.toBeInTheDocument()
+    expect(sortButton.querySelector('[data-icon="chevron-up"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-icon="arrow-up-down"]')).not.toBeInTheDocument()
   })
 
   it('applies column tone classes to body cells', () => {

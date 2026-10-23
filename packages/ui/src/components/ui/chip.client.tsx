@@ -1,12 +1,10 @@
 'use client'
+import { Icon } from './icon/icon'
 
-import { Check, X } from 'lucide-react'
 import * as React from 'react'
 
-import { cn } from '../../lib/utils'
 import type { CompactLabelSize } from './compact-label.lib'
 import { chipRemoveButtonVariants, resolveCompactLabelClassName } from './compact-label.variants'
-import { chipLeadingIconGlyphClasses } from './icon-glyph.variants'
 
 export type { CompactLabelSize as ChipSize }
 
@@ -41,8 +39,8 @@ export type ChipRemovableProps = ChipBaseProps & {
 
 export type ChipProps = ChipSelectableProps | ChipRemovableProps
 
-function ChipLeadingCheck({ size }: { size: CompactLabelSize }) {
-  return <Check aria-hidden className={cn('shrink-0', chipLeadingIconGlyphClasses(size))} />
+function ChipLeadingCheck() {
+  return <Icon name="check" size="owner" className="shrink-0" />
 }
 
 function SelectableChip({
@@ -57,7 +55,7 @@ function SelectableChip({
   leadingIcon,
 }: ChipSelectableProps) {
   const resolvedLeadingIcon =
-    selected && leadingIcon === undefined ? <ChipLeadingCheck size={size} /> : leadingIcon
+    selected && leadingIcon === undefined ? <ChipLeadingCheck /> : leadingIcon
 
   return (
     <button
@@ -114,7 +112,7 @@ function RemovableChip({
           onRemove()
         }}
       >
-        <X aria-hidden />
+        <Icon name="x" size="owner" />
       </button>
     </span>
   )

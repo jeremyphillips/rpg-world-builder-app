@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useId, useState } from 'react'
-import { Check, Copy } from 'lucide-react'
-
-import { Button, Text } from '@rpg/ui'
+import { Button, Icon, Text } from '@rpg/ui'
 
 import type { GeneratedName } from '@rpg/contracts/name-generator'
 
@@ -62,7 +60,7 @@ export function NameGeneratorResultRow({ result, rowKey }: NameGeneratorResultRo
             void handleCopy()
           }}
         >
-          {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
+          {copied ? <Icon name="check" size="owner" /> : <Icon name="copy" size="owner" />}
           <span className="sr-only">{copied ? 'Copied' : 'Copy'}</span>
         </Button>
       </div>

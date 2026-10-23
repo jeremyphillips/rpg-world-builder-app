@@ -1,8 +1,7 @@
-import { Info } from 'lucide-react'
-
 import type { CharacterWealth, StartingEquipmentOptionSummary, TierBonusGold } from '@rpg/contracts'
 import {
   Badge,
+  Icon,
   InlineMetadata,
   Tooltip,
   TooltipContent,
@@ -31,7 +30,12 @@ function StartingGoldBonusTierBadge({
       <Tooltip>
         <TooltipTrigger asChild>
           <span className="inline-flex">
-            <Badge appearance="soft" tone="neutral" size="sm" trailingIcon={<Info />}>
+            <Badge
+              appearance="soft"
+              tone="neutral"
+              size="sm"
+              trailingIcon={<Icon name="info" size="inline" />}
+            >
               {tierLabel} tier
             </Badge>
           </span>

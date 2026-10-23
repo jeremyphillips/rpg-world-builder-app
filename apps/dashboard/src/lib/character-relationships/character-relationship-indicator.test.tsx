@@ -49,7 +49,9 @@ describe('CharacterRelationshipIndicator', () => {
     )
 
     expect(screen.queryByRole('img', { name: 'Class of Aric' })).not.toBeInTheDocument()
-    expect(document.querySelector('span[aria-hidden="true"] .lucide-user-round-check')).toBeTruthy()
+    expect(
+      document.querySelector('span[aria-hidden="true"] [data-icon="user-round-check"]'),
+    ).toBeTruthy()
   })
 
   itAxe('has no axe violations', async () => {

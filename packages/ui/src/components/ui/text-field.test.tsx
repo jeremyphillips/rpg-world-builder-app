@@ -1,6 +1,6 @@
+import { Icon } from './icon/icon'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Wand2 } from 'lucide-react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { TextField } from './text-field'
@@ -29,7 +29,7 @@ describe('TextField trailingAction', () => {
         label="Name"
         trailingAction={{
           label: 'Generate',
-          icon: <Wand2 aria-hidden data-testid="generate-icon" />,
+          icon: <Icon name="wand-sparkles" size="2xl" />,
           onAction: vi.fn(),
         }}
       />,

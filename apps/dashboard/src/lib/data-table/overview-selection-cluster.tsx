@@ -1,6 +1,5 @@
-import { ListChecks } from 'lucide-react'
 import { useRef, type ReactNode } from 'react'
-import { Button } from '@rpg/ui'
+import { Button, Icon } from '@rpg/ui'
 
 import {
   resolvePageSelectionActionLabel,
@@ -56,7 +55,7 @@ export function OverviewSelectionCluster({
         aria-pressed={false}
         onClick={onEnterSelectionMode}
       >
-        <ListChecks className="size-3.5" aria-hidden />
+        <Icon name="list-checks" size="md" />
         Select
       </Button>
     )

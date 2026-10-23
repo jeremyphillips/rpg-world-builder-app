@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Components/NotificationBell Default smoke-test 1`] = `
+[
+  {
+    "height": "20px",
+    "identity": "bell",
+    "strokeWidth": "2px",
+    "width": "20px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Components/NotificationBell WithUnread smoke-test 1`] = `
+[
+  {
+    "height": "20px",
+    "identity": "bell",
+    "strokeWidth": "2px",
+    "width": "20px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

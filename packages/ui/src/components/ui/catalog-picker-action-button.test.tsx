@@ -15,8 +15,8 @@ describe('CatalogPickerActionButton', () => {
     )
 
     const addButton = screen.getByRole('button', { name: 'Prepare' })
-    expect(addButton.querySelector('svg')).toHaveClass('lucide-plus')
-    expect(addButton.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
+    expect(addButton.querySelector('[data-icon="plus"]')).toBeInTheDocument()
+    expect(addButton.querySelector('[data-icon="plus"]')).toHaveAttribute('aria-hidden', 'true')
 
     rerender(
       <CatalogPickerActionButton intent="remove" onClick={vi.fn()}>
@@ -25,6 +25,6 @@ describe('CatalogPickerActionButton', () => {
     )
 
     const removeButton = screen.getByRole('button', { name: 'Unprepare' })
-    expect(removeButton.querySelector('svg')).toHaveClass('lucide-minus')
+    expect(removeButton.querySelector('[data-icon="minus"]')).toBeInTheDocument()
   })
 })

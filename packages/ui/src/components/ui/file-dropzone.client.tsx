@@ -1,8 +1,7 @@
 'use client'
+import { Icon } from './icon/icon'
 
 import * as React from 'react'
-import { FileIcon, X } from 'lucide-react'
-
 import { DropTargetPrompt } from './drop-target-prompt.client'
 import {
   resolveFileDropzonePromptState,
@@ -205,7 +204,7 @@ function ExistingImageRow({
           className={removeButtonVariants()}
           disabled={disabled}
         >
-          <X className="size-4" aria-hidden="true" />
+          <Icon name="x" size="lg" />
         </button>
       ) : null}
     </li>
@@ -233,7 +232,7 @@ function FileList({
               <img src={previewUrl} alt={file.name} className={fileThumbnailVariants()} />
             ) : (
               <span className={fileIconVariants()} aria-hidden="true">
-                <FileIcon className="size-5" />
+                <Icon name="file" size="xl" />
               </span>
             )}
             <div className="min-w-0 flex-1">
@@ -251,7 +250,7 @@ function FileList({
               className={removeButtonVariants()}
               disabled={disabled}
             >
-              <X className="size-4" aria-hidden="true" />
+              <Icon name="x" size="lg" />
             </button>
           </li>
         )

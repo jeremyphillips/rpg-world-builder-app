@@ -16,7 +16,7 @@ export function MonsterCreatureDetailsRemoveRowButton({
       aria-label={`${MONSTER_REMOVE_LABEL} ${label}`}
       onClick={onRemove}
     >
-      <ActionIcon action="remove" />
+      <ActionIcon action="remove" size="lg" />
     </button>
   )
 }

@@ -1,7 +1,6 @@
 import { cva } from 'class-variance-authority'
 
 import {
-  identityFrameFallbackIconClasses,
   identityFrameFitClasses,
   identityFrameShapeClasses,
   identityFrameSizeClasses,
@@ -30,10 +29,10 @@ export const identityFrameImageVariants = cva('ui-identity-frame__image', {
 export const identityFrameFallbackVariants = cva('ui-identity-frame__fallback', {
   variants: {
     size: {
-      xs: identityFrameFallbackIconClasses.xs,
-      sm: identityFrameFallbackIconClasses.sm,
-      md: identityFrameFallbackIconClasses.md,
-      inline: identityFrameFallbackIconClasses.inline,
+      xs: 'ui-identity-frame__fallback--xs',
+      sm: 'ui-identity-frame__fallback--sm',
+      md: 'ui-identity-frame__fallback--md',
+      inline: 'ui-identity-frame__fallback--inline',
     },
   },
   defaultVariants: {

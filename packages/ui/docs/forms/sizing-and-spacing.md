@@ -82,7 +82,7 @@ stacked fields remains in `fieldSizeTypographyClasses` (`sm | md | lg`).
 | `fieldDigitSizeClasses`            | Digit-width control padding                                                                      |
 | `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns                                                          |
 | `fieldDigitTrailingColumnClasses`  | Trailing column width                                                                            |
-| `fieldDigitTrailingIconClasses`    | Trailing icon sizing — uses `icon-glyph` SSOT (`xs`/`md`; sm≡xs for digit chrome)                |
+| Number input stepper icons         | Explicit `Icon` `size` (`xs`/`md` by field tier) — no descendant sizing helpers                  |
 | `fieldSizeToChipSize`              | Combobox multi-select removable chips — 1:1 with field `size`; sm remove uses compact hit target |
 
 ### `size` — control height + type scale

@@ -1,0 +1,269 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Character Builder/CharacterBuilderStepRail AbilitiesActive smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "check",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Character Builder/CharacterBuilderStepRail DraftIssuesBeforeValidationVisible smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Character Builder/CharacterBuilderStepRail IdentityActive smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`Character Builder/CharacterBuilderStepRail IdentityValidationVisible smoke-test 1`] = `
+[
+  {
+    "height": "10px",
+    "identity": "exclamation",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "10px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "4px",
+    "width": "10px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;

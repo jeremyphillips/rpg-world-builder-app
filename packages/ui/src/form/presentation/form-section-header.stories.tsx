@@ -1,14 +1,13 @@
 'use client'
+import { Icon } from '../../components/ui/icon/icon'
 
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Plus } from 'lucide-react'
-
 import { Button } from '../../components/ui/button.client'
 import { FormSectionHeader } from './form-section-header.client'
 
 const addAction = (
   <Button type="button" variant="outline" size="sm">
-    <Plus aria-hidden />
+    <Icon name="plus" size="2xl" />
     Add item
   </Button>
 )

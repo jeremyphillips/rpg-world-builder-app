@@ -49,6 +49,7 @@
   }
 
   .ui-menu-item {
+    --icon-size: var(--icon-glyph-lg);
     position: relative;
     display: flex;
     cursor: pointer;

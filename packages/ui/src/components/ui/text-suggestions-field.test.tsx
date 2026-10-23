@@ -63,7 +63,7 @@ describe('TextSuggestionsField', () => {
         onValueChange={() => {}}
       />,
     )
-    expect(container.querySelector('.lucide-chevron-down')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-icon="chevron-down"]')).not.toBeInTheDocument()
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
   })
 

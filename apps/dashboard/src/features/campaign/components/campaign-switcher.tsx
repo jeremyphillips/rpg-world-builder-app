@@ -1,11 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import type { CampaignListItem } from '@rpg/contracts'
-import { Check, ChevronsUpDown } from 'lucide-react'
-
 import { ROUTES } from '@/app/routes'
 import {
   ActionIcon,
   cn,
+  Icon,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -54,7 +53,7 @@ function CampaignSwitcherList({ campaigns, activeId, onSelect }: CampaignSwitche
             className="justify-between gap-2"
           >
             <CampaignDisplayName display={buildCampaignDisplay(campaign)} surface="menuItem" />
-            {isActive ? <Check className="size-4 shrink-0" /> : null}
+            {isActive ? <Icon name="check" size="lg" className="shrink-0" /> : null}
           </DropdownMenuItem>
         )
       })}
@@ -111,7 +110,7 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
             </span>
           )}
         </span>
-        <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
+        <Icon name="chevrons-up-down" size="lg" className="shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className={campaignSwitcherDropdownContentClasses}>
         <DropdownMenuLabel>Campaigns</DropdownMenuLabel>
@@ -122,7 +121,7 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
         />
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => navigate(ROUTES.campaign.create)}>
-          <ActionIcon action="add" step="md" />
+          <ActionIcon action="add" size="md" />
           Create campaign
         </DropdownMenuItem>
       </DropdownMenuContent>

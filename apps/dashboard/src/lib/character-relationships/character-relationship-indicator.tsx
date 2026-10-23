@@ -1,11 +1,9 @@
 import type { MouseEvent } from 'react'
-import { UserRoundCheck } from 'lucide-react'
-
 import {
   formatViewerCharacterRelationshipTooltip,
   type ViewerCharacterRelationships,
 } from '@rpg/contracts'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@rpg/ui'
+import { Icon, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@rpg/ui'
 
 import { characterRelationshipIndicatorVariants } from './character-relationship-indicator.variants'
 
@@ -48,7 +46,7 @@ export function CharacterRelationshipIndicator({
                 })}
             className={characterRelationshipIndicatorVariants()}
           >
-            <UserRoundCheck className="size-4" aria-hidden="true" />
+            <Icon name="user-round-check" size="lg" />
           </span>
         </TooltipTrigger>
         <TooltipContent>{tooltip}</TooltipContent>

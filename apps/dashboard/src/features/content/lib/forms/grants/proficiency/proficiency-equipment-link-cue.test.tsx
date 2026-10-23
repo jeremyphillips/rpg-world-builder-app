@@ -15,7 +15,7 @@ describe('ProficiencyEquipmentLinkCue', () => {
     expect(
       screen.getByText('Linked to "Artisan\'s Tools or Musical Instrument" below'),
     ).toBeInTheDocument()
-    expect(document.querySelector('svg')).toHaveClass('size-icon-inline')
+    expect(document.querySelector('svg')).toHaveClass('ui-icon--inline')
     expect(document.querySelector('svg')).not.toHaveClass('size-4')
   })
 

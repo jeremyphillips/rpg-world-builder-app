@@ -145,7 +145,7 @@ function ProgressionTrackCard({
           onClick={onRemove}
           aria-label="Remove track"
         >
-          <ActionIcon action="remove" step="md" />
+          <ActionIcon action="remove" size="md" />
         </Button>
       </div>
 
@@ -321,7 +321,7 @@ export function SpellResolutionProgression() {
           {menuItems.some((item) => !item.disabled) ? (
             <ButtonDropdown
               label={RESOLUTION_SECTION_LABELS.addProgressionTrack}
-              leadingIcon={<ActionIcon action="add" />}
+              leadingIcon={<ActionIcon action="add" size="lg" />}
               width="fit"
               size="sm"
               items={menuItems}

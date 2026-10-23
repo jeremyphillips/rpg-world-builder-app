@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Plus } from 'lucide-react'
 
-import { Button } from '@rpg/ui'
+import { Button, Icon } from '@rpg/ui'
 
 import { DetailEntityRow } from '../detail-entity-row'
 import { DetailEntityRowActions } from '../detail-entity-row-actions'
@@ -33,7 +32,7 @@ export const UtilityAndOverflow: Story = {
               density="compact"
               aria-label="Add location to Dock Ward"
             >
-              <Plus aria-hidden />
+              <Icon name="plus" size="owner" />
             </Button>
             <DetailOverflowMenu
               triggerLabel="Actions for Dock Ward"

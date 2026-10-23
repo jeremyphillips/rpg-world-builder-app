@@ -4,29 +4,25 @@ import type { ContentDisplayFallback } from '@rpg/contracts'
 
 import { cn } from '../../lib/utils'
 import { CONTENT_DISPLAY_FALLBACK_ICONS } from './content-display-fallback-icon.map'
-import {
-  contentDisplayFallbackIconVariants,
-  type ContentDisplayFallbackIconSize,
-} from './content-display-fallback-icon.variants'
+import { Icon } from './icon/icon'
+import type { IconSizeMode } from './icon/icon.types'
 
 export { CONTENT_DISPLAY_FALLBACK_ICONS } from './content-display-fallback-icon.map'
 export { contentIdentityIcon } from './content-identity-icon.lib'
 
 export type ContentDisplayFallbackIconProps = {
   fallback: ContentDisplayFallback
-  size?: ContentDisplayFallbackIconSize
+  size: IconSizeMode
   className?: string
 }
 
-/** Maps semantic {@link ContentDisplayFallback} keys to Lucide icons. */
+/** Maps semantic {@link ContentDisplayFallback} keys to registry glyphs. */
 export function ContentDisplayFallbackIcon({
   fallback,
-  size = 'sm',
+  size,
   className,
 }: ContentDisplayFallbackIconProps) {
-  const Icon = CONTENT_DISPLAY_FALLBACK_ICONS[fallback] ?? CONTENT_DISPLAY_FALLBACK_ICONS.generic
+  const name = CONTENT_DISPLAY_FALLBACK_ICONS[fallback] ?? CONTENT_DISPLAY_FALLBACK_ICONS.generic
 
-  return (
-    <Icon aria-hidden className={cn(contentDisplayFallbackIconVariants({ size }), className)} />
-  )
+  return <Icon name={name} size={size} className={cn('text-muted-foreground', className)} />
 }

@@ -37,7 +37,7 @@ export function DialogPanelHeaderNavButton({
       aria-label={ariaLabel}
       onClick={onClick}
     >
-      <ActionIcon action="back" step={false} className={dialogPanelHeaderGlyphSizeClasses} />
+      <ActionIcon action="back" size="owner" className={dialogPanelHeaderGlyphSizeClasses} />
     </button>
   )
 }

@@ -1,10 +1,10 @@
+import { Icon } from './icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import {
   getContentTypeTerm,
   getSpellCollectionKindLabel,
   vocabularyTermLabel,
 } from '@rpg/contracts'
-import { BookOpen, Flag, ListChecks, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 
 import { SegmentedControl } from './segmented-control.client'
@@ -62,10 +62,18 @@ export const LeadingIcons: Story = {
     value: 'basics',
     fullWidth: true,
     options: [
-      { value: 'basics', label: 'Basics', leadingIcon: <BookOpen aria-hidden /> },
-      { value: 'proficiencies', label: 'Proficiencies', leadingIcon: <ListChecks aria-hidden /> },
-      { value: 'spellcasting', label: 'Spellcasting', leadingIcon: <Sparkles aria-hidden /> },
-      { value: 'features', label: 'Features', leadingIcon: <Flag aria-hidden /> },
+      { value: 'basics', label: 'Basics', leadingIcon: <Icon name="book-open" size="2xl" /> },
+      {
+        value: 'proficiencies',
+        label: 'Proficiencies',
+        leadingIcon: <Icon name="list-checks" size="2xl" />,
+      },
+      {
+        value: 'spellcasting',
+        label: 'Spellcasting',
+        leadingIcon: <Icon name="sparkles" size="2xl" />,
+      },
+      { value: 'features', label: 'Features', leadingIcon: <Icon name="flag" size="2xl" /> },
     ],
     onValueChange: () => undefined,
   },

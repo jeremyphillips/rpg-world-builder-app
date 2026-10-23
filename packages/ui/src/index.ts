@@ -161,10 +161,19 @@ export {
   type IconContainerShape,
   type IconContainerSize,
 } from './components/ui/icon-container.client'
+export { iconContainerVariants } from './components/ui/icon-container.variants'
+export { Icon } from './components/ui/icon/icon'
 export {
-  iconContainerVariants,
-  iconContainerGlyphClasses,
-} from './components/ui/icon-container.variants'
+  DisclosureIndicator,
+  type DisclosureIndicatorProps,
+} from './components/ui/disclosure-indicator.client'
+export {
+  ICON_SIZES,
+  type IconName,
+  type IconProps,
+  type IconSize,
+  type IconSizeMode,
+} from './components/ui/icon/icon.types'
 export { IdentityFrame, type IdentityFrameProps } from './components/ui/identity-frame.client'
 export {
   identityFrameVariants,
@@ -200,7 +209,6 @@ export {
   emptyStateWellSurfaceClasses,
   emptyStateWellTitleClasses,
   emptyStateWellTitleLgClasses,
-  resolveEmptyStateWellIconClasses,
 } from './components/ui/empty-state-well.variants'
 export { NavSection, type NavSectionProps } from './components/ui/nav-section'
 export {
@@ -236,10 +244,6 @@ export {
 } from './components/ui/metadata-list.variants'
 export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
 export {
-  inlineIconTextClasses,
-  menuItemIconGlyphClasses,
-} from './components/ui/icon-glyph.variants'
-export {
   ACTION_ICONS,
   ACTION_ICON_VERBS,
   type ActionIconVerb,
@@ -250,7 +254,6 @@ export {
   resourceIcon,
   type ResourceIconRole,
 } from './components/ui/resource-icons.map'
-export { type AppIcon } from './components/ui/app-icon.types'
 export { buttonVariants } from './components/ui/button.variants'
 export { Link, type LinkProps } from './components/ui/link'
 export {
@@ -382,7 +385,6 @@ export {
   fieldControlSizeClasses,
   fieldDigitSizeClasses,
   fieldDigitTrailingColumnClasses,
-  fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
   fieldGroupedControlHeightClasses,
   fieldGroupedControlSizeClasses,
@@ -868,10 +870,6 @@ export {
   type ContentDisplayFallbackIconProps,
 } from './components/ui/content-display-fallback-icon.client'
 export {
-  contentDisplayFallbackIconVariants,
-  type ContentDisplayFallbackIconSize,
-} from './components/ui/content-display-fallback-icon.variants'
-export {
   contentCardRootVariants,
   contentCardBodyVariants,
   contentCardHeadingScaleClass,
@@ -1345,6 +1343,7 @@ export {
 } from './components/ui/chip.client'
 export { ChipGroup, type ChipGroupProps } from './components/ui/chip-group.client'
 export { Spinner, type SpinnerProps } from './components/ui/spinner'
+export { SPINNER_ICON_SIZES } from './components/ui/spinner.lib'
 export { spinnerVariants, type SpinnerVariantProps } from './components/ui/spinner.variants'
 export { StatusDot, type StatusDotProps } from './components/ui/status-dot'
 export { statusDotVariants, type StatusDotVariantProps } from './components/ui/status-dot.variants'
@@ -1369,7 +1368,6 @@ export {
 } from './components/ui/status-icon.client'
 export {
   statusIconVariants,
-  statusIconGlyphVariants,
   STATUS_ICON_DEFAULT_SIZE,
   STATUS_ICON_VARIANTS,
   STATUS_ICON_TOOLTIP_LABELS,

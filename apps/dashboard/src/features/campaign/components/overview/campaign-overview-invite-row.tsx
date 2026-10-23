@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { CampaignInviteAdminListItem } from '@rpg/contracts'
-import { ActionIcon, ConfirmDialog } from '@rpg/ui'
-import { Link2 } from 'lucide-react'
+import { ActionIcon, ConfirmDialog, Icon } from '@rpg/ui'
 
 import { EntityRowList } from '@/features/content'
 
@@ -57,14 +56,14 @@ export function CampaignOverviewInviteRow({ campaignId, invite }: CampaignOvervi
             {
               id: 'share-link',
               label: CAMPAIGN_INVITE_ROW_ACTION_COPY.shareLink,
-              icon: <Link2 />,
+              icon: <Icon name="link-horizontal" size="lg" />,
               disabled: isPending,
               onSelect: () => setShareOpen(true),
             },
             {
               id: 'revoke',
               label: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokePending,
-              icon: <ActionIcon action="remove" />,
+              icon: <ActionIcon action="remove" size="lg" />,
               destructive: true,
               separatorBefore: true,
               disabled: isPending,

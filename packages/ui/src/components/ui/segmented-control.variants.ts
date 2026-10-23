@@ -1,7 +1,8 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { resolveCompactControlSegmentClasses } from './compact-control.styles'
-import { iconGlyphDescendantClasses } from './icon-glyph.variants'
+
+export const UI_SEGMENTED_CONTROL_LEADING_ICON_CLASS = 'ui-segmented-control__leading-icon' as const
 
 export type SegmentedControlSize = NonNullable<
   VariantProps<typeof segmentedControlSegmentVariants>['size']
@@ -71,14 +72,6 @@ export const segmentedControlMetadataVariants = cva('text-xs tabular-nums', {
   },
 })
 
-export const segmentedControlLeadingIconVariants = cva('inline-flex shrink-0 leading-none', {
-  variants: {
-    size: {
-      default: iconGlyphDescendantClasses.sm,
-      sm: iconGlyphDescendantClasses.sm,
-    },
-  },
-  defaultVariants: {
-    size: 'default',
-  },
-})
+export const segmentedControlLeadingIconVariants = cva(
+  `inline-flex shrink-0 leading-none ${UI_SEGMENTED_CONTROL_LEADING_ICON_CLASS}`,
+)

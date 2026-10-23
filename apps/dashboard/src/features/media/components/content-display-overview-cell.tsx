@@ -21,7 +21,7 @@ export function ContentDisplayOverviewCell({
     <IdentityFrame
       shape="box"
       size="xs"
-      fallback={<ContentDisplayFallbackIcon fallback={resolved.fallback} size="xs" />}
+      fallback={<ContentDisplayFallbackIcon fallback={resolved.fallback} size="owner" />}
     />
   )
 }

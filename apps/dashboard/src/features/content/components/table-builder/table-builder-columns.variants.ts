@@ -24,7 +24,7 @@ export const tableBuilderColumnTypeTriggerClasses = 'w-32 shrink-0'
 
 export const tableBuilderColumnTypeOptionClasses = 'flex items-center gap-1.5'
 
-export const tableBuilderColumnTypeIconClasses = 'size-3.5 shrink-0 text-muted-foreground'
+export const tableBuilderColumnTypeIconClasses = 'text-muted-foreground'
 
 export const tableBuilderColumnLeadingSlotClasses = 'flex h-8 items-center'
 

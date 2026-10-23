@@ -5,8 +5,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Icon,
 } from '@rpg/ui'
-import { MoreHorizontal } from 'lucide-react'
 
 import { ADD_TO_BENCH_MENU_LABEL } from '../lib/ticket-card-labels'
 
@@ -34,7 +34,7 @@ export function TicketCardBacklogMenu({
           onClick={(event) => event.stopPropagation()}
           onKeyDown={(event) => event.stopPropagation()}
         >
-          <MoreHorizontal className="size-4" aria-hidden />
+          <Icon name="ellipsis" size="lg" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>

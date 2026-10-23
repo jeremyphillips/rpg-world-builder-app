@@ -7,8 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Icon,
 } from '@rpg/ui'
-import { MoreHorizontal } from 'lucide-react'
 
 import { getMoveStatusMenuLabel } from '../lib/move-status-labels'
 
@@ -38,7 +38,7 @@ export function TicketCardMoveMenu({ ticket, onMove, isPending = false }: Ticket
           onClick={(event) => event.stopPropagation()}
           onKeyDown={(event) => event.stopPropagation()}
         >
-          <MoreHorizontal className="size-4" aria-hidden />
+          <Icon name="ellipsis" size="lg" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>

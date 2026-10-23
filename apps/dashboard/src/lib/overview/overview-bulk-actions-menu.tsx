@@ -4,8 +4,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Icon,
 } from '@rpg/ui'
-import { ChevronDown, Layers } from 'lucide-react'
 
 export type OverviewBulkAction = {
   id: string
@@ -24,9 +24,9 @@ export function OverviewBulkActionsMenu({ menuLabel, actions }: OverviewBulkActi
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button type="button" variant="outline" size="sm">
-          <Layers className="size-3.5" aria-hidden />
+          <Icon name="layers" size="md" />
           {menuLabel}
-          <ChevronDown className="size-3.5 opacity-60" aria-hidden />
+          <Icon name="chevron-down" size="md" className="opacity-60" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

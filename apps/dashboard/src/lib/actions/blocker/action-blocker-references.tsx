@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { ContentUsageBlocker } from '@rpg/contracts'
-import { Button, Text } from '@rpg/ui'
-import { ChevronDown } from 'lucide-react'
+import { Button, Icon, Text } from '@rpg/ui'
 
 import {
   groupUsageBlockersBySourceKey,
@@ -116,9 +115,10 @@ function ActionBlockerReferenceGroup({
           onClick={() => setExpanded((current) => !current)}
         >
           {expanded ? 'Hide' : 'Show'}
-          <ChevronDown
-            aria-hidden
-            className={`size-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
+          <Icon
+            name="chevron-down"
+            size="lg"
+            className={`transition-transform ${expanded ? 'rotate-180' : ''}`}
           />
         </Button>
       </div>
