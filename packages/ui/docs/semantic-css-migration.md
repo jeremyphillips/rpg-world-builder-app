@@ -386,6 +386,26 @@ The traits `nav` resolves `--master-detail-shell-max-block-size` to `min(calc(28
 
 F1 is a known functional defect. It needs its own resolution decision. Later waves move each self-referencing declaration verbatim. The parity baseline records these values, so a change in either direction shows up. Candidate fix, not part of this freeze: per-layer variables (`--rpg-app-chrome-inset`, `--rpg-page-heading-inset`, `--rpg-form-chrome-inset`, each defaulting to `0px`), summed once into the output variable. The missing `--app-sticky-chrome-block-size` declaration is part of the same observed gap: `<main>` is not 5rem.
 
+### Tailwind custom-property utility ratchet (G)
+
+Occurrence-level guard for Tailwind arbitrary-property declarations (`[--name:value]`) in `packages/ui/src`, `apps/dashboard/src`, and `apps/bench/src` (excluding `*.test.*`, `*.stories.*`, and CSS). `var(--x)` reads and inline `style` objects are out of scope.
+
+Regression: `tailwind-custom-property-declaration.test.ts` with `tailwind-custom-property-declaration.baseline.json`.
+
+| Bucket        | Policy                                                                                                                        |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **temporary** | Shell migration utilities (B1–B4). Counts may shrink as waves land; update the baseline when they do. Must be empty after B4. |
+| **approved**  | Frozen exceptions (owner file, category, reason, count). Counts must not grow; new entries require an explicit baseline edit. |
+
+**Approved exceptions:**
+
+| File                                | Variable(s)                                                 | Category         |
+| ----------------------------------- | ----------------------------------------------------------- | ---------------- |
+| `surface-current.lib.ts`            | `--surface-current`                                         | variant-resolver |
+| `field-control-surface.variants.ts` | `--field-control-bg`                                        | variant-resolver |
+| `rich-text-content.variants.ts`     | `--tw-prose-body`, `--tw-prose-headings`, `--tw-prose-bold` | plugin-api       |
+| `ticket-card.variants.ts` (bench)   | `--icon-size`                                               | local-layout     |
+
 ### Parity baseline
 
 Capture script, surface list, and `p0-baseline.json` live in `.tmp/shell-parity/` and are not committed. Rendering: light theme, `prefers-reduced-motion: reduce`, DPR 1, viewport height 900px, sidebar default. Viewports 390, 768, 1280, and 1536. Each capture is at scrollTop 0 and at the active scrollport's maximum.
