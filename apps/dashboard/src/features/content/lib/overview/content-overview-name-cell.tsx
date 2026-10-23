@@ -5,7 +5,6 @@ import type {
   ResolvedContentCampaignAccess,
   ViewerCharacterRelationships,
 } from '@rpg/contracts'
-import { dataTableNameLinkCellVariants } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import type { DuplicateContentSource } from '../duplication/duplicate-content-dialog'
@@ -52,7 +51,7 @@ export function ContentOverviewNameCell({
     <div className="flex min-w-0 flex-col gap-0.5">
       <span className="inline-flex items-center gap-2">
         {nameHref ? (
-          <Link to={nameHref} className={dataTableNameLinkCellVariants()}>
+          <Link to={nameHref} className="font-data-name hover:underline focus-visible:underline">
             {name}
           </Link>
         ) : (

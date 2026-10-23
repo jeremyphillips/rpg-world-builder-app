@@ -11,7 +11,8 @@ dialog-parts.client.tsx     Header, Close, dismiss handlers (header padding SSOT
                             shared dialogTitle headline default for Modal + Sheet)
 dialog-panel-header-nav-button.client.tsx  Header back affordance (Modal/Sheet leadIcon)
 dialog-panel.css            Shared fill, neutral strength consumer, and panel geometry
-dialog-panel.variants.ts    Fill/geometry resolvers, section inset, body/footer chrome
+dialog-panel.variants.ts    Fill/geometry resolvers and section inset tokens (header, footer, scroll)
+dialog-panel-body.client.tsx  Body clip shells; utilities stay overridable via cn() order
 modal.variants.ts           ModalSize + centered placement/motion
 sheet.variants.ts           SheetSize, physical side placement/motion, dock placement
 Modal.*                     Centered behavior (thin Header — inherits dialogTitle)
@@ -55,9 +56,8 @@ media keep the pinned header + scrolling body anatomy unchanged.
 | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | `dialogPanelSectionPaddingClasses`             | Canonical `p-6` section inset                                                                                                                  |
 | `dialogPanelSectionInsetXClasses`              | Horizontal slice (`px-6`) for managed Form content                                                                                             |
-| `dialogPanelBodyVariants`                      | Clip shell — inner `DialogPanelScrollRegion` owns scroll                                                                                       |
-| `dialogPanelStableBodyVariants`                | Stable shell (`px-6`, clip) — child uses `inset="inner"` or `inset="innerLeading"`                                                             |
-| `dialogPanelStableBodyClipVariants`            | Stable clip shell without `px-6` — section inset on child scrollports or pinned chrome wrappers (`CreateModalShell`)                           |
+| `dialogPanelSectionInsetXClasses`              | Horizontal slice (`px-6`) for managed Form content and the stable body shell                                                                   |
+| `DialogPanelBody`                              | Clip shells (`scroll`, `stable`, `stableClip`, `managed`). `className` follows `shellClassName` so padding utilities still win                 |
 | `dialogPanelSectionScrollViewportClasses`      | Section scrollport preset (`px-6` + `pt-5` + `pb-6`) — default Body / `externalFooter`                                                         |
 | `dialogPanelInnerScrollViewportClasses`        | Inner scrollport preset (`ps-1` + `pe-2.5` + `pb-6`) — below pinned chrome in section-inset shell                                              |
 | `dialogPanelInnerLeadingScrollViewportClasses` | Leading inner preset — inner scroll chrome + `pt-5` as first content below header border                                                       |

@@ -27,14 +27,7 @@ import { Button } from './button.client'
 import { SearchBar } from './search-bar.client'
 import { Checkbox } from './checkbox.client'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
-import {
-  dataTableColumnDragHandleVariants,
-  dataTableColumnItemVariants,
-  dataTableColumnPanelVariants,
-  dataTableEmptyPanelVariants,
-  dataTableLockedColumnVariants,
-  dataTableResetColumnVariants,
-} from './data-table.variants'
+import { popoverContentVariants } from './popover-content.variants'
 
 const POINTER_SENSOR_ACTIVATION_DISTANCE_PX = 8
 
@@ -92,10 +85,14 @@ function SortableColumnRow({ item, onVisibilityChange }: SortableColumnRowProps)
   }
 
   return (
-    <div ref={setNodeRef} style={style} className={dataTableColumnItemVariants()}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+    >
       <button
         type="button"
-        className={dataTableColumnDragHandleVariants()}
+        className="flex cursor-grab items-center rounded p-0.5 text-muted-foreground hover:text-foreground active:cursor-grabbing"
         aria-label={`Drag to reorder ${item.label}`}
         {...attributes}
         {...listeners}
@@ -122,7 +119,7 @@ function LockedColumnRow({ item }: LockedColumnRowProps) {
   const reasonId = React.useId()
 
   return (
-    <div className={dataTableLockedColumnVariants()}>
+    <div className="flex cursor-default items-center gap-2 px-2 py-1.5 text-style-supporting">
       <span className="flex shrink-0 items-center justify-center rounded p-0.5">
         <Lock className="size-3.5" aria-hidden />
       </span>
@@ -222,7 +219,7 @@ function DataTableColumnsMenuPanel({
                   />
                 ))
               ) : filteredLocked.length === 0 ? (
-                <p className={dataTableEmptyPanelVariants()}>No columns found.</p>
+                <p className="px-3 py-2 text-style-supporting">No columns found.</p>
               ) : null}
             </div>
           </SortableContext>
@@ -231,7 +228,11 @@ function DataTableColumnsMenuPanel({
 
       {canReset && onReset ? (
         <div className="border-t border-border px-1 py-1.5">
-          <button type="button" onClick={onReset} className={dataTableResetColumnVariants()}>
+          <button
+            type="button"
+            onClick={onReset}
+            className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-style-supporting hover:bg-accent hover:text-accent-foreground"
+          >
             <RotateCcw className="size-3.5" />
             {labels.resetColumns}
           </button>
@@ -267,7 +268,7 @@ export function DataTableColumnsMenu({
         <PopoverPrimitive.Content
           align="end"
           sideOffset={4}
-          className={cn(dataTableColumnPanelVariants())}
+          className={cn(popoverContentVariants({ tone: 'popover' }), 'w-[240px]')}
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
           <DataTableColumnsMenuPanel

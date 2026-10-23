@@ -9,7 +9,8 @@ import {
   type SourceDimensions,
 } from '@rpg/contracts'
 import { Button } from './button.client'
-import { mediaCropStyles as styles } from './media-crop-editor.variants'
+import { interactiveFocusVariants } from './interactive-focus.variants'
+import { cn } from '../../lib/utils'
 
 export type MediaCropEditorConstraint = {
   aspectRatio: number
@@ -42,7 +43,7 @@ type FrameLayout = {
   offsetY: number
 }
 
-/** Matches uniform inset percentages in media-crop-editor.variants.ts aperture styles. */
+/** Matches the 12.5% inset on `.ui-media-crop-editor__aperture`. */
 const APERTURE_LAYOUT: FrameLayout = {
   scaleX: 0.75,
   scaleY: 0.75,
@@ -184,9 +185,12 @@ export function MediaCropEditor({
     : undefined
 
   return (
-    <div className={styles.root()}>
+    <div className="flex min-w-0 max-w-full flex-col gap-4">
       <div
-        className={styles.viewport()}
+        className={cn(
+          'ui-media-crop-editor__viewport',
+          interactiveFocusVariants({ context: 'embedded' }),
+        )}
         style={{ aspectRatio: constraint.aspectRatio }}
         role="group"
         aria-label={constraint.positionLabel}
@@ -260,13 +264,13 @@ export function MediaCropEditor({
           draggable={false}
           key={attempt}
           onError={() => setFailed(true)}
-          className={styles.image()}
+          className="ui-media-crop-editor__image"
           style={imageStyle(layout)}
         />
-        <div ref={apertureRef} className={styles.aperture()} data-media-crop-aperture>
+        <div ref={apertureRef} className="ui-media-crop-editor__aperture" data-media-crop-aperture>
           {effectiveCropGuide && effectiveCropGuideLayout ? (
             <div
-              className={styles.effectiveCropGuide()}
+              className="ui-media-crop-editor__effective-guide"
               style={{
                 left: `${effectiveCropGuideLayout.leftPercent}%`,
                 top: `${effectiveCropGuideLayout.topPercent}%`,
@@ -276,17 +280,19 @@ export function MediaCropEditor({
               aria-hidden
               data-effective-crop-guide
             >
-              <span className={styles.effectiveCropGuideLabel()}>{effectiveCropGuide.label}</span>
+              <span className="ui-media-crop-editor__effective-guide-label">
+                {effectiveCropGuide.label}
+              </span>
             </div>
           ) : (
-            <div className={styles.guides()} />
+            <div className="ui-media-crop-editor__guides" />
           )}
           {focalPoint && onFocalPointChange && (
             <button
               type="button"
               data-focal-handle="true"
               aria-label="Focal point"
-              className={styles.focalPoint()}
+              className="ui-media-crop-editor__focal-point"
               style={{
                 left: `${((focalPoint.x - crop.x) / crop.width) * 100}%`,
                 top: `${((focalPoint.y - crop.y) / crop.height) * 100}%`,
@@ -315,10 +321,10 @@ export function MediaCropEditor({
           </Button>
         </p>
       )}
-      <p id={`${id}-instructions`} className={styles.label()}>
+      <p id={`${id}-instructions`} className="text-style-caption">
         {constraint.instructions}
       </p>
-      <div className={styles.row()}>
+      <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
         <Button
           type="button"
           variant="outline"
@@ -330,7 +336,7 @@ export function MediaCropEditor({
         <label htmlFor={`${id}-zoom`}>Zoom</label>
         <input
           id={`${id}-zoom`}
-          className={styles.slider()}
+          className="min-w-0 flex-1 accent-primary"
           type="range"
           min={1}
           max={maxZoom}
@@ -352,18 +358,23 @@ export function MediaCropEditor({
         </Button>
       </div>
       {constraint.showPortraitPreviews && (
-        <div className={styles.previews()}>
+        <div className="flex flex-wrap gap-4">
           {[false, true].map((circle) => (
             <figure key={String(circle)}>
-              <div className={styles.preview({ circle })}>
+              <div
+                className={cn(
+                  'ui-media-crop-editor__preview',
+                  circle ? 'rounded-full' : 'rounded-md',
+                )}
+              >
                 <img
                   src={src}
                   alt=""
-                  className={styles.image()}
+                  className="ui-media-crop-editor__image"
                   style={imageStyle({ scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0 })}
                 />
               </div>
-              <figcaption className={styles.label()}>
+              <figcaption className="text-style-caption">
                 {circle ? 'Circular avatar preview' : 'Square portrait'}
               </figcaption>
             </figure>

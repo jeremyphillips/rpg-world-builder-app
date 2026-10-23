@@ -80,18 +80,7 @@ import type {
   DataTableSelectionLabels,
   DataTableUtilityControls,
 } from './data-table.types'
-import {
-  dataTableCaptionVariants,
-  dataTablePaginationVariants,
-  dataTableImageVariants,
-  dataTableNameCellVariants,
-  dataTableRootVariants,
-  dataTableRowActionItemClasses,
-  dataTableTableVariants,
-  dataTableTableWrapVariants,
-  dataTableToolbarVariants,
-  dataTableUtilityStripVariants,
-} from './data-table.variants'
+import { dataTableRowActionItemClasses } from './data-table.variants'
 import { arrayMove } from '@dnd-kit/sortable'
 
 // ---------------------------------------------------------------------------
@@ -224,7 +213,7 @@ interface DataTableToolbarProps<TData> {
 
 function DataTableToolbar<TData>({ table, onColumnChange }: DataTableToolbarProps<TData>) {
   return (
-    <div className={dataTableToolbarVariants()}>
+    <div className="flex flex-wrap items-center gap-2">
       <div className="flex-1" />
       <DataTableColumnPanel table={table} onColumnChange={onColumnChange} />
     </div>
@@ -249,7 +238,7 @@ function DataTablePagination<TData>({ table, onPageSizeChange }: DataTablePagina
   const end = Math.min((pageIndex + 1) * pageSize, totalRows)
 
   return (
-    <div className={dataTablePaginationVariants()}>
+    <div className="flex flex-wrap items-center justify-between gap-2 text-style-supporting">
       <span aria-live="polite" aria-atomic>
         {totalRows === 0 ? 'No results' : `${start}–${end} of ${totalRows}`}
       </span>
@@ -403,7 +392,7 @@ export interface NameCellProps {
 }
 
 export function NameCell({ children }: NameCellProps) {
-  return <span className={dataTableNameCellVariants()}>{children}</span>
+  return <span className="font-data-name">{children}</span>
 }
 
 export interface DataTableImageCellProps {
@@ -418,7 +407,7 @@ export function DataTableImageCell({ src, alt = '' }: DataTableImageCellProps) {
       src={src}
       alt={alt}
       aria-hidden={alt === '' ? true : undefined}
-      className={dataTableImageVariants()}
+      className="ui-data-table__image"
     />
   )
 }
@@ -909,8 +898,12 @@ export function DataTable<TData>({
   }
 
   const tableElement = (
-    <Table className={dataTableTableVariants()}>
-      {caption && <TableCaption className={dataTableCaptionVariants()}>{caption}</TableCaption>}
+    <Table className="ui-data-table__table text-table-body">
+      {caption && (
+        <TableCaption className="pb-3 text-sm-meta italic text-muted-foreground">
+          {caption}
+        </TableCaption>
+      )}
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id} className="ui-data-table__header-row">
@@ -994,16 +987,16 @@ export function DataTable<TData>({
   )
 
   return (
-    <div className={dataTableRootVariants()}>
+    <div className="flex w-full flex-col gap-3">
       {utilityStrip ? (
-        <div className={dataTableTableWrapVariants()}>
-          <div className={dataTableUtilityStripVariants()}>{utilityStrip(utilityControls)}</div>
+        <div className="ui-data-table__table-wrap">
+          <div className="w-full">{utilityStrip(utilityControls)}</div>
           {tableElement}
         </div>
       ) : (
         <>
           <DataTableToolbar table={table} onColumnChange={onColumnChange} />
-          <div className={dataTableTableWrapVariants()}>{tableElement}</div>
+          <div className="ui-data-table__table-wrap">{tableElement}</div>
         </>
       )}
 

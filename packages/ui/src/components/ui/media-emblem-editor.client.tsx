@@ -14,7 +14,6 @@ import {
 } from '@rpg/contracts'
 import { Button } from './button.client'
 import { resolveOffsetFromDragDelta } from './media-emblem-editor.lib'
-import { mediaEmblemStyles as styles } from './media-emblem-editor.variants'
 
 export type MediaEmblemEditorProps = {
   src: string
@@ -43,9 +42,9 @@ export function MediaEmblemEditor({
   }
 
   return (
-    <div className={styles.root()}>
+    <div className="flex min-w-0 flex-col gap-4">
       <div
-        className={styles.viewport()}
+        className="ui-media-emblem-editor__viewport"
         role="group"
         aria-label="Emblem layout"
         aria-describedby={`${id}-instructions`}
@@ -81,12 +80,12 @@ export function MediaEmblemEditor({
           emitLayout({ ...layout, offset })
         }}
       >
-        <div className={styles.checkerboard()} aria-hidden="true" />
+        <div className="ui-media-emblem-editor__checkerboard" aria-hidden="true" />
         <img
           src={src}
           alt=""
           draggable={false}
-          className={styles.image()}
+          className="ui-media-emblem-editor__image"
           style={{
             left: `${(metrics.left / canvasSize) * 100}%`,
             top: `${(metrics.top / canvasSize) * 100}%`,
@@ -98,11 +97,11 @@ export function MediaEmblemEditor({
       <p id={`${id}-instructions`} className="sr-only">
         {instructions}
       </p>
-      <div className={styles.controls()}>
+      <div className="flex flex-wrap items-center gap-2">
         <label htmlFor={`${id}-size`}>Artwork size</label>
         <input
           id={`${id}-size`}
-          className={styles.slider()}
+          className="min-w-0 flex-1 accent-primary"
           type="range"
           min={CONTENT_MEDIA_EMBLEM_SCALE_MIN}
           max={1}
@@ -112,7 +111,7 @@ export function MediaEmblemEditor({
         />
         <output htmlFor={`${id}-size`}>{Math.round(layout.scale * 100)}%</output>
       </div>
-      <div className={styles.actions()}>
+      <div className="flex flex-wrap items-center gap-2">
         <Button
           type="button"
           variant="outline"
@@ -121,7 +120,7 @@ export function MediaEmblemEditor({
         >
           Center
         </Button>
-        <span aria-hidden="true" className={styles.actionSeparator()}>
+        <span aria-hidden="true" className="text-muted-foreground">
           ·
         </span>
         <Button

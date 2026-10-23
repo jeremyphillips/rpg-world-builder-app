@@ -427,7 +427,7 @@ describe('DataTable — utilityStrip', () => {
 
     const strip = screen.getByText('Custom strip')
     const table = screen.getByRole('table')
-    const cardShell = strip.closest('.rounded-card')
+    const cardShell = strip.closest('.ui-data-table__table-wrap')
 
     expect(cardShell).toBeInTheDocument()
     expect(cardShell).toContainElement(strip)

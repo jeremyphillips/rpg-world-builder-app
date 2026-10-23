@@ -12,7 +12,7 @@ export const dataTableColumnMeta = {
 /** Fixed-width presets for `ColumnMeta.headerClassName` / `cellClassName`. */
 export const dataTableColumnWidths = {
   /**
-   * Thumbnail column — fixed to `dataTableImageVariants` (+ horizontal padding).
+   * Thumbnail column — fixed to `.ui-data-table__image` (+ horizontal padding).
    * 24px image + 16px padding at default; 32px image + 16px padding at lg+.
    */
   image: 'w-10 max-w-10 shrink-0 px-2 lg:w-12 lg:max-w-12',

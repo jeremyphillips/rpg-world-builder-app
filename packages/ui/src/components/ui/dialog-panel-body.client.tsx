@@ -4,12 +4,7 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { DialogPanelScrollRegion } from './dialog-panel-scroll-region.client'
-import {
-  dialogPanelBodyVariants,
-  dialogPanelManagedBodyVariants,
-  dialogPanelStableBodyClipVariants,
-  dialogPanelStableBodyVariants,
-} from './dialog-panel.variants'
+import { dialogPanelSectionInsetXClasses } from './dialog-panel.variants'
 
 export type DialogPanelBodyMode = 'scroll' | 'stable' | 'stableClip' | 'managed'
 
@@ -27,11 +22,17 @@ export interface DialogPanelBodyProps extends React.HTMLAttributes<HTMLDivElemen
 export const DialogPanelBody = React.forwardRef<HTMLDivElement, DialogPanelBodyProps>(
   ({ className, shellClassName, mode = 'scroll', children, ...props }, ref) => {
     if (mode === 'stable' || mode === 'stableClip') {
-      const stableBodyVariants =
-        mode === 'stableClip' ? dialogPanelStableBodyClipVariants : dialogPanelStableBodyVariants
-
       return (
-        <div ref={ref} className={cn(stableBodyVariants(), shellClassName, className)} {...props}>
+        <div
+          ref={ref}
+          className={cn(
+            'flex min-h-0 flex-1 flex-col overflow-hidden pt-0 pb-0 text-sm',
+            mode === 'stable' && dialogPanelSectionInsetXClasses,
+            shellClassName,
+            className,
+          )}
+          {...props}
+        >
           {children}
         </div>
       )
@@ -41,7 +42,11 @@ export const DialogPanelBody = React.forwardRef<HTMLDivElement, DialogPanelBodyP
       return (
         <div
           ref={ref}
-          className={cn(dialogPanelManagedBodyVariants(), shellClassName, className)}
+          className={cn(
+            'flex min-h-0 flex-1 flex-col overflow-hidden p-0 text-sm',
+            shellClassName,
+            className,
+          )}
           {...props}
         >
           {children}
@@ -50,7 +55,7 @@ export const DialogPanelBody = React.forwardRef<HTMLDivElement, DialogPanelBodyP
     }
 
     return (
-      <div className={cn(dialogPanelBodyVariants(), shellClassName)}>
+      <div className={cn('flex min-h-0 flex-1 flex-col overflow-hidden text-sm', shellClassName)}>
         <DialogPanelScrollRegion inset="section" ref={ref} viewportClassName={className} {...props}>
           {children}
         </DialogPanelScrollRegion>

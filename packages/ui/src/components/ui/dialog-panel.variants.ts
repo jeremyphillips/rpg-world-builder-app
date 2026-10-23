@@ -1,5 +1,3 @@
-import { cva } from 'class-variance-authority'
-
 import { boundedScrollRegionEndInsetClasses } from './bounded-scroll-region.variants'
 import { cn } from '../../lib/utils'
 
@@ -41,43 +39,6 @@ export const dialogPanelSectionPaddingClasses = 'p-6'
  * Managed Form content and sheet form footers consume this — not a Form-owned padding SSOT.
  */
 export const dialogPanelSectionInsetXClasses = 'px-6'
-
-/**
- * Clip shell for default Modal/Sheet bodies — inner {@link DialogPanelScrollRegion}
- * owns overflow. The shared body already supplies `flex-1` for Modal and Sheet.
- * DrawerShell `bodyMode="managed"` uses {@link dialogPanelManagedBodyVariants} instead.
- */
-export const dialogPanelBodyVariants = cva(
-  cn('flex min-h-0 flex-1 flex-col overflow-hidden text-sm'),
-)
-
-/**
- * Stable modal body shell — flex clip with section horizontal inset. A child
- * {@link DialogPanelScrollRegion} with `inset="inner"` owns scroll chrome only.
- * Pinned siblings may repeat {@link dialogPanelSectionInsetXClasses} for alignment.
- */
-export const dialogPanelStableBodyVariants = cva(
-  cn(
-    'flex min-h-0 flex-1 flex-col overflow-hidden pt-0 pb-0 text-sm',
-    dialogPanelSectionInsetXClasses,
-  ),
-)
-
-/**
- * Stable body clip shell without horizontal inset — section inset lives on child
- * scrollports (`inset="section"`) or pinned chrome wrappers (`CreateModalShell`).
- */
-export const dialogPanelStableBodyClipVariants = cva(
-  cn('flex min-h-0 flex-1 flex-col overflow-hidden pt-0 pb-0 text-sm'),
-)
-
-/**
- * Managed sheet/drawer body — caller supplies the overlay scrollport (Form externalFooter,
- * composed drawer content). No padding; no auto scroll region.
- */
-export const dialogPanelManagedBodyVariants = cva(
-  cn('flex min-h-0 flex-1 flex-col overflow-hidden p-0 text-sm'),
-)
 
 /** Top inset for overlay scroll viewports — 20px breathing room below the header border. */
 export const dialogPanelScrollRegionTopInsetClasses = 'pt-5'

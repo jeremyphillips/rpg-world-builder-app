@@ -1,7 +1,66 @@
 /* DataTable bands — header and body rows; W1 surface tokens on .ui-data-table__table-wrap. */
 @layer components {
   .ui-data-table__table-wrap {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border);
     background-color: var(--background);
+    color: var(--foreground);
+    box-shadow: var(--shadow-surface-raised);
+  }
+
+  .ui-data-table__table {
+    width: 100%;
+    min-width: max-content;
+  }
+
+  .ui-data-table__image {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+  }
+
+  @media (min-width: 64rem) {
+    .ui-data-table__image {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  .ui-data-table__filter-region {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background-color: var(--surface-subtle);
+    padding: calc(var(--spacing) * 3);
+    --surface-current: var(--surface-subtle);
+  }
+
+  .ui-data-table__utility-summary {
+    display: flex;
+    align-items: center;
+    background-color: var(--surface-subtle);
+    padding-block: calc(var(--spacing) * 2.5) calc(var(--spacing) * 1.5);
+    padding-inline: calc(var(--spacing) * 3);
+    --surface-current: var(--surface-subtle);
+  }
+
+  .ui-data-table__utility-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    min-height: calc(var(--spacing) * 9);
+    border-bottom: 1px solid var(--border);
+    background-color: var(--surface-subtle);
+    padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
+    --surface-current: var(--surface-subtle);
   }
 
   /* --- Header band (not an interactive row) --- */

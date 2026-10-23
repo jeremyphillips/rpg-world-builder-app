@@ -1,0 +1,11 @@
+/*
+ * Group separator only. DividedStack also adds sibling margin and would rule the
+ * footer. Record separators stay on the group ul (li + li).
+ */
+@layer components {
+  .dash-entity-row-list
+    > [data-slot='entity-row-list-group']
+    + [data-slot='entity-row-list-group'] {
+    border-top: 1px solid var(--border-subtle);
+  }
+}

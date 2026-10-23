@@ -10,7 +10,6 @@ import type {
 import {
   CollectionSummaryCell,
   dataTableColumnMeta,
-  dataTableNameLinkCellVariants,
   dataTableWidthMeta,
   NameCell,
   SortableHeader,
@@ -64,7 +63,10 @@ export function buildNameColumn<T>({
     cell: nameHref
       ? ({ row }) => (
           <span className="inline-flex items-center gap-2">
-            <Link to={nameHref(row.original)} className={dataTableNameLinkCellVariants()}>
+            <Link
+              to={nameHref(row.original)}
+              className="font-data-name hover:underline focus-visible:underline"
+            >
               {row.getValue<string>(accessorKey)}
             </Link>
             {nameSuffix?.(row.original)}

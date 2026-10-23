@@ -5,14 +5,9 @@ import { useId, type ReactNode } from 'react'
 
 import { Badge } from './badge'
 import { iconGlyphRootClasses } from './icon-glyph.variants'
+import { interactiveFocusVariants } from './interactive-focus.variants'
 import { cn } from '../../lib/utils'
-import {
-  dataTableFilterRegionAdditionalRowVariants,
-  dataTableFilterRegionDisclosureRowVariants,
-  dataTableFilterRegionDisclosureVariants,
-  dataTableFilterRegionPrimaryRowVariants,
-  dataTableFilterRegionVariants,
-} from './data-table-filter-region.variants'
+import { filterBarVariants } from '../../filters/filter-bar.variants'
 
 export type DataTableFilterRegionLabels = {
   additionalFilters?: string
@@ -54,19 +49,24 @@ export function DataTableFilterRegion({
   const showActiveBadge = activeAdditionalFilterCount > 0
 
   return (
-    <div className={cn(dataTableFilterRegionVariants(), className)}>
-      <div className={dataTableFilterRegionPrimaryRowVariants({ divided: hasAdditionalFilters })}>
+    <div className={cn('ui-data-table__filter-region', className)}>
+      <div className={cn('min-w-0', hasAdditionalFilters && 'border-b border-border pb-3')}>
         {primaryFilters}
       </div>
 
       {hasAdditionalFilters ? (
-        <div className={dataTableFilterRegionDisclosureRowVariants()}>
+        <div className="flex min-w-0">
           <button
             type="button"
             disabled={disabled}
             aria-expanded={additionalFiltersOpen}
             aria-controls={additionalFiltersOpen ? panelId : undefined}
-            className={dataTableFilterRegionDisclosureVariants()}
+            className={cn(
+              'inline-flex w-fit items-center gap-1.5 rounded-md text-style-label text-foreground',
+              'hover:text-foreground/80',
+              'disabled:pointer-events-none disabled:opacity-50',
+              interactiveFocusVariants({ context: 'embedded' }),
+            )}
             onClick={() => onAdditionalFiltersOpenChange(!additionalFiltersOpen)}
           >
             {additionalFiltersOpen ? (
@@ -85,7 +85,7 @@ export function DataTableFilterRegion({
       ) : null}
 
       {hasAdditionalFilters && additionalFiltersOpen ? (
-        <div id={panelId} className={dataTableFilterRegionAdditionalRowVariants()}>
+        <div id={panelId} className={filterBarVariants()}>
           {additionalFilterFields}
         </div>
       ) : null}

@@ -4,19 +4,16 @@ import { boundedScrollRegionEndInsetClasses } from './bounded-scroll-region.vari
 import {
   dialogContentFocusShellClasses,
   dialogPanelActionRowClasses,
-  dialogPanelBodyVariants,
   dialogPanelFooterClasses,
   dialogPanelHeaderClasses,
   dialogPanelHeaderLeadRowClasses,
   dialogPanelHeaderPaddingClasses,
   dialogPanelInnerLeadingScrollViewportClasses,
   dialogPanelInnerScrollViewportClasses,
-  dialogPanelManagedBodyVariants,
   dialogPanelSectionScrollViewportClasses,
   dialogPanelSectionSeparatorBorderClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
-  dialogPanelStableBodyVariants,
   dialogPanelScrollRegionBottomInsetClasses,
   dialogPanelScrollRegionClasses,
   dialogPanelScrollRegionFocusClearanceClasses,
@@ -55,30 +52,6 @@ describe('dialog-panel variants', () => {
     expect(dialogPanelActionRowClasses.split(/\s+/)).not.toEqual(
       expect.arrayContaining([expect.stringMatching(/^(p|px|py|pt|pb|pl|pr|border|bg)-/)]),
     )
-  })
-
-  it('composes default body as a clip shell without self overflow', () => {
-    const bodyClasses = dialogPanelBodyVariants()
-    expect(bodyClasses).toContain('overflow-hidden')
-    expect(bodyClasses).toContain('flex-1')
-    expect(bodyClasses).not.toContain('overflow-y-auto')
-    expect(bodyClasses).not.toContain('p-6')
-  })
-
-  it('restores section horizontal inset on stable body shell', () => {
-    const stableBodyClasses = dialogPanelStableBodyVariants()
-    expect(stableBodyClasses).toContain('pb-0')
-    expect(stableBodyClasses).toContain('overflow-hidden')
-    expect(stableBodyClasses).toContain('flex-1')
-    expect(stableBodyClasses).toContain(dialogPanelSectionInsetXClasses)
-    expect(stableBodyClasses).not.toContain('overflow-y-auto')
-  })
-
-  it('uses managed body clip shell with p-0', () => {
-    const managedBodyClasses = dialogPanelManagedBodyVariants()
-    expect(managedBodyClasses).toContain('p-0')
-    expect(managedBodyClasses).toContain('overflow-hidden')
-    expect(managedBodyClasses).not.toContain('overflow-y-auto')
   })
 
   it('keeps section scrollport free of inner scroll chrome', () => {

@@ -2,21 +2,6 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { cardDensityClassName, UI_CONTENT_CARD_INSET_CLASS } from './card.variants'
-import { resolveCompactControlRecipeClasses } from './compact-control.styles'
-
-/** @deprecated Prefer {@link cardDensityClassName} + {@link UI_CONTENT_CARD_INSET_CLASS}. */
-export const contentCardDensityInsetVariants = cva('', {
-  variants: {
-    density: {
-      compact: cn(cardDensityClassName('compact'), UI_CONTENT_CARD_INSET_CLASS),
-      comfortable: cn(cardDensityClassName('comfortable'), UI_CONTENT_CARD_INSET_CLASS),
-      spacious: cn(cardDensityClassName('spacious'), UI_CONTENT_CARD_INSET_CLASS),
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
 
 export const contentCardRootVariants = cva('w-full min-w-0 rounded-md', {
   variants: {
@@ -128,31 +113,6 @@ export const supportingTextDensityVariants = cva('truncate text-muted-foreground
 export const contentCardSubheadingVariants = supportingTextDensityVariants
 
 export const contentCardMetadataVariants = supportingTextDensityVariants
-
-/** Heading-row actions stay compact regardless of card density. Link actions use pr-0. */
-export const contentCardHeadingActionVariants = cva(
-  cn(
-    'inline-flex shrink-0 items-center rounded-sm pl-2 pr-0 text-sm text-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-    resolveCompactControlRecipeClasses('text-compact', { includeBlock: false }),
-  ),
-)
-
-/** Linked entity headings — link color only; no hover underline. */
-export const contentCardHeadingLinkVariants = cva('text-link')
-
-/** @deprecated Prefer {@link IdentityFrame} via {@link ContentCardMedia}. */
-export const contentCardMediaVariants = cva('shrink-0', {
-  variants: {
-    density: {
-      compact: '',
-      comfortable: '',
-      spacious: '',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
 
 export const CONTENT_CARD_DENSITIES = ['compact', 'comfortable', 'spacious'] as const
 export type ContentCardDensity = (typeof CONTENT_CARD_DENSITIES)[number]

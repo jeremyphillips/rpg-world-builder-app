@@ -18,4 +18,14 @@ describe('data-table band CSS', () => {
       /\.ui-data-table__row--unavailable\[data-state='selected'\][\s\S]*--warning-faint/,
     )
   })
+
+  it('owns table wrap, thumbnail, filter region, and utility band surfaces', () => {
+    expect(dataTableCss).toContain('.ui-data-table__table-wrap')
+    expect(dataTableCss).toContain('box-shadow: var(--shadow-surface-raised)')
+    expect(dataTableCss).toContain('.ui-data-table__image')
+    expect(dataTableCss).toContain('.ui-data-table__filter-region')
+    expect(dataTableCss).toContain('--surface-current: var(--surface-subtle)')
+    expect(dataTableCss).toContain('.ui-data-table__utility-actions')
+    expect(dataTableCss).toContain('border-bottom: 1px solid var(--border)')
+  })
 })

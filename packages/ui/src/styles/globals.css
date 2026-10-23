@@ -29,6 +29,8 @@
 @import '../components/ui/card.css';
 @import '../components/ui/destination-list.css';
 @import '../components/ui/data-table.css';
+@import '../components/ui/media-crop-editor.css';
+@import '../components/ui/media-emblem-editor.css';
 @import '../components/ui/copy-scale.css';
 @import '../components/ui/row-anatomy/ui-row-anatomy.css';
 @import '../components/ui/collapsible-list-item/ui-collapsible-list-item.css';

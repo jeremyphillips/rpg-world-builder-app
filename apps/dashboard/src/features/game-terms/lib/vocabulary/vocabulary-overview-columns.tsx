@@ -1,9 +1,4 @@
-import {
-  SortableHeader,
-  dataTableColumnMeta,
-  dataTableNameLinkCellVariants,
-  dataTableWidthMeta,
-} from '@rpg/ui'
+import { SortableHeader, dataTableColumnMeta, dataTableWidthMeta } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import type {
   VocabularyOptionWithUsage,
@@ -104,7 +99,7 @@ export function vocabularyColumns(
           <div className="flex min-w-0 flex-col gap-0.5">
             <span className="inline-flex items-center gap-2">
               {href ? (
-                <Link to={href} className={dataTableNameLinkCellVariants()}>
+                <Link to={href} className="font-data-name hover:underline focus-visible:underline">
                   {label}
                 </Link>
               ) : (

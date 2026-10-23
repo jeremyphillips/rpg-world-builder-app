@@ -885,12 +885,9 @@ export {
 export {
   contentCardRootVariants,
   contentCardBodyVariants,
-  contentCardDensityInsetVariants,
-  contentCardHeadingLinkVariants,
   contentCardHeadingScaleClass,
   contentCardHeadingRowVariants,
   contentCardMediaEndGapVariants,
-  contentCardMediaVariants,
   contentCardMetadataVariants,
   contentCardSubheadingVariants,
   contentCardIdentityColumnGapVariants,
@@ -1097,10 +1094,6 @@ export {
 } from './components/ui/scroll-boundary-region.variants'
 export {
   dialogPanelActionRowClasses,
-  dialogPanelBodyVariants,
-  dialogPanelManagedBodyVariants,
-  dialogPanelStableBodyVariants,
-  dialogPanelStableBodyClipVariants,
   dialogPanelScrollRegionBottomInsetClasses,
   dialogPanelScrollRegionClasses,
   dialogPanelScrollRegionTopInsetClasses,
@@ -1495,29 +1488,9 @@ export type {
 } from './components/ui/data-table.types'
 export type { ColumnDef } from '@tanstack/react-table'
 export {
-  dataTableRootVariants,
-  dataTableToolbarVariants,
-  dataTableUtilityStripVariants,
-  dataTableFilterGroupVariants,
   dataTableFilterControlVariants,
-  dataTableAdvancedPanelVariants,
   dataTableAdvancedInnerVariants,
-  dataTablePaginationVariants,
-  dataTableTableVariants,
-  dataTableTableWrapVariants,
-  dataTableColumnPanelVariants,
-  dataTableColumnItemVariants,
-  dataTableColumnDragHandleVariants,
-  dataTableEmptyPanelVariants,
-  dataTableFilterChipVariants,
-  dataTableFilterNoticeVariants,
-  dataTableLockedColumnVariants,
-  dataTableResetColumnVariants,
   dataTableCellTextVariants,
-  dataTableImageVariants,
-  dataTableNameCellVariants,
-  dataTableNameLinkCellVariants,
-  dataTableCaptionVariants,
 } from './components/ui/data-table.variants'
 export {
   dataTableUnavailableAppearance,

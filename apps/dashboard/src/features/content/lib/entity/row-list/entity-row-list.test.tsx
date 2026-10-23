@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { EntityRowList } from './entity-row-list'
-import { entityRowListFooterVariants, entityRowListRootVariants } from './entity-row-list.variants'
 
 describe('EntityRowList layout mechanics', () => {
   it('renders section Empty without Footer when itemCount is 0', () => {
@@ -143,7 +142,10 @@ describe('EntityRowList divider mechanics', () => {
     )
 
     const root = container.querySelector('[data-slot="entity-row-list-root"]')
-    expect(root).toHaveClass(entityRowListRootVariants())
+    expect(root).toHaveClass('dash-entity-row-list')
+    const groups = container.querySelectorAll('[data-slot="entity-row-list-group"]')
+    expect(groups).toHaveLength(2)
+    expect(groups[0]?.nextElementSibling).toBe(groups[1])
   })
 
   it('uses Footer as the sole content-to-footer structural divider', () => {
@@ -156,8 +158,17 @@ describe('EntityRowList divider mechanics', () => {
     )
 
     const footer = container.querySelector('[data-slot="entity-row-list-footer"]')
-    expect(footer).toHaveClass(entityRowListFooterVariants())
-    expect(footer).toHaveClass('border-t')
+    expect(footer).toHaveClass(
+      'flex',
+      'flex-wrap',
+      'items-center',
+      'gap-x-6',
+      'gap-y-2',
+      'border-t',
+      'border-border-subtle',
+      'px-4',
+      'py-2',
+    )
   })
 })
 
