@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
 import { MasterDetailEditorShell } from '../master-detail-editor-shell'
 import { MasterDetailGrid } from '../master-detail-grid'
-import { masterDetailListLayoutClasses } from '../master-detail-list-panel'
+import { masterDetailListLayoutClasses } from '../master-detail-list-panel.layout'
 
 const itemNoun = defineMasterDetailItemNoun({ label: 'Trait', singular: 'trait' })
 

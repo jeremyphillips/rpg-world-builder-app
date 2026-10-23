@@ -3,14 +3,14 @@ import { describe, expect, it } from 'vitest'
 import { iconContainerVariants } from './icon-container.variants'
 
 describe('iconContainerVariants', () => {
-  it('uses rounded-md for box shape by default', () => {
-    expect(iconContainerVariants()).toContain('rounded-md')
-    expect(iconContainerVariants({ shape: 'box' })).toContain('rounded-md')
+  it('uses box shape modifiers by default', () => {
+    expect(iconContainerVariants()).toContain('ui-identity-frame--shape-box')
+    expect(iconContainerVariants({ shape: 'box' })).toContain('ui-identity-frame--shape-box')
   })
 
-  it('uses rounded-full for circle shape', () => {
-    expect(iconContainerVariants({ shape: 'circle' })).toContain('rounded-full')
-    expect(iconContainerVariants({ shape: 'circle' })).not.toContain('rounded-md')
+  it('uses circle shape modifiers', () => {
+    expect(iconContainerVariants({ shape: 'circle' })).toContain('ui-identity-frame--shape-circle')
+    expect(iconContainerVariants({ shape: 'circle' })).not.toContain('ui-identity-frame--shape-box')
   })
 
   it('uses the strong surface plane by default', () => {
@@ -19,11 +19,11 @@ describe('iconContainerVariants', () => {
   })
 
   it('defaults to the compact sm footprint', () => {
-    expect(iconContainerVariants()).toContain('size-10')
+    expect(iconContainerVariants()).toContain('ui-identity-frame--sm')
   })
 
   it('supports the larger md footprint', () => {
-    expect(iconContainerVariants({ size: 'md' })).toContain('size-[3.75rem]')
+    expect(iconContainerVariants({ size: 'md' })).toContain('ui-identity-frame--md')
     expect(iconContainerVariants({ size: 'md' })).toContain('[&>svg]:size-6')
   })
 })

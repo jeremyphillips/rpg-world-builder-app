@@ -1,6 +1,8 @@
 'use client'
 
 import * as React from 'react'
+
+import { Text } from './text'
 import {
   DndContext,
   KeyboardSensor,
@@ -219,7 +221,9 @@ function DataTableColumnsMenuPanel({
                   />
                 ))
               ) : filteredLocked.length === 0 ? (
-                <p className="px-3 py-2 text-style-supporting">No columns found.</p>
+                <Text as="p" variant="supporting" className="px-3 py-2">
+                  No columns found.
+                </Text>
               ) : null}
             </div>
           </SortableContext>

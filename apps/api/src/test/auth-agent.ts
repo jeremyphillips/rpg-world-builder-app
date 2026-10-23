@@ -10,10 +10,21 @@ export const defaultTestCredentials = {
 }
 
 /** A supertest agent that persists cookies, primed with a CSRF token. */
+async function readCsrfToken(agent: Agent): Promise<string> {
+  const res = await agent.get('/api/auth/csrf').expect(200)
+  const token = res.body?.csrfToken
+  if (typeof token !== 'string' || token.length === 0) {
+    throw new Error(
+      `CSRF response missing csrfToken (status ${res.status}, body ${JSON.stringify(res.body)})`,
+    )
+  }
+  return token
+}
+
 export async function newAuthAgent(app: Express): Promise<{ agent: Agent; csrfToken: string }> {
   const agent = request.agent(app)
-  const res = await agent.get('/api/auth/csrf')
-  return { agent, csrfToken: res.body.csrfToken as string }
+  const csrfToken = await readCsrfToken(agent)
+  return { agent, csrfToken }
 }
 
 export type AuthAgentSession = {
@@ -53,15 +64,15 @@ export async function registerAndLoginTestUser(
   app: Express,
   credentials = defaultTestCredentials,
 ): Promise<AuthAgentSession> {
-  const { agent } = await newAuthAgent(app)
-  const csrfForRegister = (await agent.get('/api/auth/csrf')).body.csrfToken as string
+  const agent = request.agent(app)
+  const csrfForRegister = await readCsrfToken(agent)
   await agent
     .post('/api/auth/register')
     .set(CSRF_HEADER, csrfForRegister)
     .send(credentials)
     .expect(201)
 
-  const csrfForLogin = (await agent.get('/api/auth/csrf')).body.csrfToken as string
+  const csrfForLogin = await readCsrfToken(agent)
   const loginRes = await agent
     .post('/api/auth/login')
     .set(CSRF_HEADER, csrfForLogin)
@@ -73,10 +84,9 @@ export async function registerAndLoginTestUser(
     throw new Error(formatAuthBodyError('Login', loginRes.status, loginRes.body))
   }
 
+  const loginCsrf = loginRes.body?.csrfToken
   const csrfToken =
-    typeof loginRes.body.csrfToken === 'string'
-      ? loginRes.body.csrfToken
-      : ((await agent.get('/api/auth/csrf')).body.csrfToken as string)
+    typeof loginCsrf === 'string' && loginCsrf.length > 0 ? loginCsrf : await readCsrfToken(agent)
 
   return { agent, csrfToken, userId }
 }

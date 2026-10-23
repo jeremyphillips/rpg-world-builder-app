@@ -10,7 +10,7 @@ const css = readFileSync(
 
 describe('dash-entity-row-list CSS', () => {
   it('rules only consecutive groups', () => {
-    expect(css).toContain(
+    expect(css.replace(/\s+/g, ' ')).toContain(
       ".dash-entity-row-list > [data-slot='entity-row-list-group'] + [data-slot='entity-row-list-group']",
     )
     const rule = css.slice(css.indexOf('.dash-entity-row-list'))

@@ -5,6 +5,7 @@ import * as ToastPrimitive from '@radix-ui/react-toast'
 import { X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { Text } from './text'
 import { TOAST_DISMISS_LABEL } from './toast.constants'
 import { toastVariants, type ToastVariantProps } from './toast.variants'
 
@@ -115,8 +116,16 @@ export function ToastPresentation({
       ) : null}
       {hasCopy ? (
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          {title ? <p className="text-style-label text-foreground">{title}</p> : null}
-          {description ? <p className="text-style-supporting">{description}</p> : null}
+          {title ? (
+            <Text as="p" variant="label" className="text-foreground">
+              {title}
+            </Text>
+          ) : null}
+          {description ? (
+            <Text as="p" variant="supporting">
+              {description}
+            </Text>
+          ) : null}
         </div>
       ) : null}
       <div className="flex shrink-0 items-center gap-2">

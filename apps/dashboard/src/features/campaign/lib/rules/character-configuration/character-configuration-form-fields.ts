@@ -47,7 +47,7 @@ import {
   type GroupFieldItem,
 } from '@rpg/ui/form'
 
-import { vocabularyComboboxFieldForTerm, vocabularyFieldLabel } from '@/features/vocabulary/fields'
+import { vocabularyComboboxFieldForTerm, vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { ExtendedProgressionEffects } from '../../../components/extended-progression-effects'
 import { SpellcastingProgressionField } from '../../../components/spellcasting-progression-field'

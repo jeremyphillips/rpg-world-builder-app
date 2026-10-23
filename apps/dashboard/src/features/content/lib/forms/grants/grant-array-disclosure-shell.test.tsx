@@ -164,10 +164,8 @@ describe('grant array EntityCardDisclosureRenderer shell', () => {
     expect(expand).toHaveAttribute('aria-expanded', 'true')
     const ability = within(firstRow).getByRole('textbox', { name: 'Spellcasting ability' })
     expect(ability.closest('[hidden]')).toBeNull()
-    const body = ability.closest('[class*="border-t"]')
-    expect(body).toHaveClass('dash-entity-card__body')
-    expect(body).toHaveClass('border-t')
-    expect(body).toHaveClass('bg-background')
+    const body = ability.closest('.dash-entity-card__body')
+    expect(body).toHaveClass('dash-entity-card__body--disclosure-wash')
     expect(body?.className).not.toContain('content-column-indent')
     expect(body?.className).not.toContain('content-inline-start')
 

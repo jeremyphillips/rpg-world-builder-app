@@ -24,7 +24,7 @@ describe('CampaignTopbarTitle', () => {
     expect(link).toHaveAttribute('href', '/campaigns/camp_1')
     expect(link).toHaveClass('min-w-0', 'text-foreground-subtle')
     expect(link.querySelector('.truncate')).toBeTruthy()
-    expect(link.querySelector('.size-5.rounded-md')).toBeTruthy()
+    expect(link.querySelector('.ui-identity-frame--inline')).toBeTruthy()
   })
 
   it('renders the unknown name for missing campaigns', () => {

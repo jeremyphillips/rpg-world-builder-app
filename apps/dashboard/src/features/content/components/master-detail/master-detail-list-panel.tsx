@@ -2,7 +2,7 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import {
   ActionButton,
   cn,
-  panelVariants,
+  Heading,
   ScrollBoundaryRegion,
   scrollBoundaryRegionRootClasses,
   Text,
@@ -14,17 +14,12 @@ import type { MasterDetailItemMeta } from '../../lib/master-detail/master-detail
 import { MasterDetailListRow } from './master-detail-list-row'
 import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
+import {
+  masterDetailListScrollViewportClasses,
+  masterDetailListShellClasses,
+} from './master-detail-list-panel.layout'
 
 export type { MasterDetailItemMeta }
-
-const masterDetailListShellClasses = cn(
-  panelVariants({ tone: 'quiet', density: 'comfortable', bleed: true }),
-  'sticky top-[var(--rpg-form-sticky-tabs-block-size,0px)] flex min-h-[min(8rem,var(--master-detail-shell-max-block-size))] flex-col self-start overflow-hidden text-foreground md:min-h-[min(12rem,var(--master-detail-shell-max-block-size))]',
-  '[--master-detail-list-chrome-block-size:5.5rem]',
-  'master-detail-list-shell-viewport-cap',
-)
-
-const masterDetailListScrollViewportClasses = 'min-h-0 flex-1 overflow-y-auto pe-0 scrollbar-slim'
 
 export type MasterDetailListItem = {
   /** Stable React key (use the RHF field id, not a domain id). */
@@ -61,13 +56,6 @@ export type MasterDetailListPanelProps = {
   /** Count of visible list rows with validation issues (not total issue count). */
   invalidItemCount?: number
 }
-
-/** @internal Layout contract tests assert on shell and scroll class strings. */
-export const masterDetailListLayoutClasses = {
-  shell: masterDetailListShellClasses,
-  scrollRegion: scrollBoundaryRegionRootClasses,
-  scrollViewport: masterDetailListScrollViewportClasses,
-} as const
 
 function resolveSelectedItemId(
   items: MasterDetailListItem[],
@@ -147,7 +135,9 @@ export function MasterDetailListPanel({
   return (
     <nav aria-label={ariaLabel} className={masterDetailListShellClasses}>
       <div className="flex shrink-0 items-center justify-between gap-3 border-b ui-border--subtle px-3 py-2.5">
-        <div className="min-w-0 text-lg font-medium text-foreground">{listTitle}</div>
+        <Heading as="div" variant="section" className="min-w-0">
+          {listTitle}
+        </Heading>
         <ActionButton action="add" variant="outline" size="sm" onClick={onAdd}>
           {addLabel}
         </ActionButton>
@@ -163,7 +153,7 @@ export function MasterDetailListPanel({
       ) : null}
 
       {items.length === 0 ? (
-        <Text variant="muted" className="px-3 py-4 text-style-supporting">
+        <Text variant="supporting" className="px-3 py-4">
           {emptyLabel}
         </Text>
       ) : (

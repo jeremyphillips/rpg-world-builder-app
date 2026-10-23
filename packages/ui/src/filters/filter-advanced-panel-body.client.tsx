@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react'
 
 import { Button } from '../components/ui/button.client'
-import { cn } from '../lib/utils'
 import { countModifiedFilters } from './filter-engine'
 import {
   filterAdvancedPanelFooterVariants,

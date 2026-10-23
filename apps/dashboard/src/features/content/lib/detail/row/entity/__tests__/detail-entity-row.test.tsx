@@ -65,7 +65,7 @@ describe('DetailEntityRow', () => {
 
     const name = screen.getByRole('link', { name: 'Verna Stormcaller' })
     const nameSpan = name.parentElement as HTMLElement
-    const suffix = container.querySelector('[class*="shrink-0"][class*="text-muted-foreground"]')
+    const suffix = container.querySelector('.ui-identity-row__classification')
 
     expect(name).toHaveClass('text-link')
     expect(nameSpan).toHaveClass('min-w-0', 'shrink', 'truncate')

@@ -21,6 +21,7 @@ import { Panel } from '../ui/panel'
 import { contentCardHeadingScaleClass } from '../ui/content-card.variants'
 import { Eyebrow } from '../ui/eyebrow'
 import { Heading } from '../ui/heading'
+import { Text } from '../ui/text'
 import { SemanticText } from '../ui/semantic-text/semantic-text'
 import { StatusDot } from '../ui/status-dot'
 import { StatusIcon } from '../ui/status-icon.client'
@@ -158,7 +159,7 @@ function PreviewRailAvailabilityLine({
   detail,
 }: PreviewRailAvailabilityLineProps) {
   return (
-    <p className="mt-1 flex min-w-0 items-center gap-1.5 text-style-caption">
+    <Text as="p" variant="caption" className="mt-1 flex min-w-0 items-center gap-1.5">
       {available ? (
         <StatusDot tone="success" size="sm" />
       ) : (
@@ -172,7 +173,7 @@ function PreviewRailAvailabilityLine({
           </InlineMetadata.Item>
         ) : null}
       </InlineMetadata>
-    </p>
+    </Text>
   )
 }
 
@@ -200,7 +201,7 @@ function PreviewRailIdentity({ media, name, status, facts }: PreviewRailIdentity
                 <IdentityRowHeadingLine heading={name} />
               </div>
             </div>
-            {status ? <div className="text-style-supporting">{status}</div> : null}
+            {status ? <Text variant="supporting">{status}</Text> : null}
           </div>
         </div>
         {facts && facts.length > 0 ? (
@@ -257,7 +258,11 @@ function PreviewRailSections({
         <Eyebrow as="h3" size="sm" tone="foreground">
           {title}
         </Eyebrow>
-        {description ? <p className="text-style-caption">{description}</p> : null}
+        {description ? (
+          <Text as="p" variant="caption">
+            {description}
+          </Text>
+        ) : null}
       </div>
       <Accordion
         type="single"
@@ -346,7 +351,7 @@ function PreviewRailSection({
             marker={marker}
             status={status}
             statusTone={statusTone}
-            trailing={<span aria-hidden className="size-4 shrink-0" />}
+            trailing={<span aria-hidden className="size-icon-glyph-md shrink-0" />}
           />
         </div>
       </div>
@@ -379,7 +384,11 @@ export type PreviewRailSectionBodyProps = {
 function PreviewRailSectionBody({ description, facts, children }: PreviewRailSectionBodyProps) {
   return (
     <div className="ui-preview-rail__section-body ui-border--subtle">
-      {description ? <p className="line-clamp-2 text-style-caption">{description}</p> : null}
+      {description ? (
+        <Text as="p" variant="caption" className="line-clamp-2">
+          {description}
+        </Text>
+      ) : null}
       {facts && facts.length > 0 ? <PreviewRailFacts facts={facts} density="compact" /> : null}
       {children}
     </div>
@@ -443,7 +452,11 @@ function PreviewRailAction({ label, helperText, icon, onClick, disabled }: Previ
         {icon ? <span aria-hidden>{icon}</span> : null}
         {label}
       </Button>
-      {helperText ? <p className="text-style-caption">{helperText}</p> : null}
+      {helperText ? (
+        <Text as="p" variant="caption">
+          {helperText}
+        </Text>
+      ) : null}
     </div>
   )
 }

@@ -75,7 +75,9 @@ describe('DrawerShell', () => {
       </DrawerShell>,
     )
 
-    expect(screen.getByRole('dialog', { name: 'Add item' })).toHaveClass('bg-background')
+    expect(screen.getByRole('dialog', { name: 'Add item' })).toHaveClass(
+      'ui-dialog-panel--fill-background',
+    )
   })
 
   it('renders entityContext in a band below the title row and keeps description', () => {
@@ -110,7 +112,11 @@ describe('DrawerShell', () => {
       </DrawerShell>,
     )
 
-    expect(screen.getByRole('dialog', { name: 'Add item' })).toHaveClass('bg-surface-lift')
-    expect(screen.getByRole('dialog', { name: 'Add item' })).not.toHaveClass('bg-background')
+    expect(screen.getByRole('dialog', { name: 'Add item' })).toHaveClass(
+      'ui-dialog-panel--fill-surface-lift',
+    )
+    expect(screen.getByRole('dialog', { name: 'Add item' })).not.toHaveClass(
+      'ui-dialog-panel--fill-background',
+    )
   })
 })

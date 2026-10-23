@@ -9,6 +9,7 @@ import {
   type SourceDimensions,
 } from '@rpg/contracts'
 import { Button } from './button.client'
+import { Text } from './text'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import { cn } from '../../lib/utils'
 
@@ -321,9 +322,9 @@ export function MediaCropEditor({
           </Button>
         </p>
       )}
-      <p id={`${id}-instructions`} className="text-style-caption">
+      <Text as="p" id={`${id}-instructions`} variant="caption">
         {constraint.instructions}
-      </p>
+      </Text>
       <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
         <Button
           type="button"

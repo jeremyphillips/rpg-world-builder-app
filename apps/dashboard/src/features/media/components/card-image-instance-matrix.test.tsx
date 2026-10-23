@@ -70,7 +70,7 @@ describe('card image instance matrix', () => {
         />
       ),
       assert: (container: HTMLElement) => {
-        expect(container.firstElementChild).toHaveClass('size-8')
+        expect(container.firstElementChild).toHaveClass('ui-identity-frame--xs')
         expect(container.querySelector('img')?.style.width).toBe('200%')
       },
     },
@@ -83,9 +83,9 @@ describe('card image instance matrix', () => {
         />
       ),
       assert: (container: HTMLElement) => {
-        const frame = container.querySelector('.size-5')
+        const frame = container.querySelector('.ui-identity-frame--inline')
         expect(frame).toBeTruthy()
-        expect(container.querySelector('img')).toHaveClass('object-contain')
+        expect(container.querySelector('img')).toHaveClass('ui-identity-frame__image--contain')
       },
     },
     {
@@ -118,7 +118,7 @@ describe('card image instance matrix', () => {
         />
       ),
       assert: (container: HTMLElement) => {
-        expect(container.firstElementChild).toHaveClass('size-10')
+        expect(container.firstElementChild).toHaveClass('ui-identity-frame--sm')
         expect(container.querySelector('img')?.style.width).toBe('200%')
       },
     },
@@ -126,7 +126,7 @@ describe('card image instance matrix', () => {
       name: 'character builder preview rail fallback user icon',
       render: () => <ContentPreviewRailMedia fallback="character" />,
       assert: (container: HTMLElement) => {
-        expect(container.firstElementChild).toHaveClass('size-10')
+        expect(container.firstElementChild).toHaveClass('ui-identity-frame--sm')
         expect(container.querySelector('img')).toBeNull()
       },
     },
@@ -143,7 +143,10 @@ describe('card image instance matrix', () => {
         />
       ),
       assert: (container: HTMLElement) => {
-        expect(container.firstElementChild).toHaveClass('size-5', 'rounded-md')
+        expect(container.firstElementChild).toHaveClass(
+          'ui-identity-frame--inline',
+          'ui-identity-frame--shape-box',
+        )
       },
     },
   ])('$name', ({ render: renderCase, assert }) => {

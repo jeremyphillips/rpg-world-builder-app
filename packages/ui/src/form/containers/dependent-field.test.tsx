@@ -202,7 +202,7 @@ describe('dependent field', () => {
       const region = queryDependentsRegion(container)
       expect(region).toHaveAttribute('data-field-dependent-nest', '')
       expect(region).toHaveClass(dependentNestMarginClasses)
-      expect(region).toHaveClass('before:left-0')
+      expect(region).toHaveClass('ui-field-rail-nest')
       expect(region?.querySelector(':scope > [data-field-dependent-nest]')).toBeNull()
     })
   })

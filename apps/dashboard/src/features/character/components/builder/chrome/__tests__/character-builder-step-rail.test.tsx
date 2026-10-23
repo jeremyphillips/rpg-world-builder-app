@@ -59,8 +59,8 @@ describe('CharacterBuilderStepRail', () => {
       />,
     )
 
-    expect(container.querySelector('.rounded-full.bg-semantic-success-strong')).toBeInTheDocument()
-    expect(container.querySelector('.rounded-full.bg-status-icon-incomplete')).toBeInTheDocument()
+    expect(container.querySelector('.ui-status-icon--ready')).toBeInTheDocument()
+    expect(container.querySelector('.ui-status-icon--incomplete')).toBeInTheDocument()
   })
 
   it('keeps the complete icon when revisiting a finished step', () => {

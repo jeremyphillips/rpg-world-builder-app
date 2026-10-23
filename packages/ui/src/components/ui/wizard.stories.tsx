@@ -173,7 +173,7 @@ export const FourSteps: StoryObj = {
   },
 }
 
-export const ClassReference: Story = {
+export const ClassReference: StoryObj = {
   tags: ['control-parity'],
   parameters: { semanticClasses: true },
   render: () => (

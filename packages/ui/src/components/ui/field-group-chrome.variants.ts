@@ -181,8 +181,8 @@ type GroupChromeResolver = (
 
 const GROUP_CHROME_RESOLVERS: Partial<Record<FieldGroupChrome['variant'], GroupChromeResolver>> = {
   plain: () => PLAIN_FIELD_GROUP_CHROME,
-  rail: (chrome, rhythm) => resolveGroupRailChrome(chrome, rhythm),
-  inset: (chrome, rhythm) => resolveGroupRailChrome(chrome, rhythm),
+  rail: (chrome, rhythm) => resolveGroupRailChrome(chrome as FieldGroupRailStackChrome, rhythm),
+  inset: (chrome, rhythm) => resolveGroupRailChrome(chrome as FieldGroupRailStackChrome, rhythm),
   panel: (chrome) => resolveComposableChrome(chrome as FieldGroupPanelChrome),
   outline: (chrome) => resolveComposableChrome(chrome as FieldGroupOutlineChrome),
   callout: (chrome) => resolveComposableChrome(chrome as FieldGroupCalloutChrome),
