@@ -1,16 +1,8 @@
-import { iconGlyphDescendantClasses, type IconGlyphStep } from './icon-glyph.variants'
 import { selectCaretSlotClasses } from './select-compact-trigger.variants'
 import type { FieldSizeToken } from './field-sizing.variants'
 import type { IconSize } from './icon/icon.types'
 
 /** Select caret glyph step per field size — inline and digit-column share this map. */
-const FIELD_SELECT_CARET_GLYPH: Record<FieldSizeToken, IconGlyphStep> = {
-  xs: 'xs',
-  sm: 'sm',
-  md: 'lg',
-  lg: 'lg',
-}
-
 const FIELD_SELECT_CARET_ICON_SIZE: Record<FieldSizeToken, IconSize> = {
   xs: 'xs',
   sm: 'sm',
@@ -21,17 +13,6 @@ const FIELD_SELECT_CARET_ICON_SIZE: Record<FieldSizeToken, IconSize> = {
 /** Inline select caret — Icon `size` inside SelectPrimitive.Icon / select-like caret slot. */
 export function fieldSelectInlineCaretIconSize(size: FieldSizeToken): IconSize {
   return FIELD_SELECT_CARET_ICON_SIZE[size]
-}
-
-/** @deprecated Use {@link fieldSelectInlineCaretIconSize}. */
-export function fieldSelectInlineCaretIconClasses(size: FieldSizeToken): string {
-  const step = FIELD_SELECT_CARET_GLYPH[size]
-  return `size-icon-glyph-${step}`
-}
-
-/** Digit-column select caret — descendant sizing on the trailing column wrapper. */
-export function fieldSelectDigitColumnCaretDescendantClasses(size: FieldSizeToken): string {
-  return iconGlyphDescendantClasses[FIELD_SELECT_CARET_GLYPH[size]]
 }
 
 /**

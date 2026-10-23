@@ -105,10 +105,7 @@ function TextFieldTrailingActionControl({
           >
             <span className="inline-flex items-center gap-1.5">
               {trailingAction.icon ? (
-                <span
-                  className="inline-flex shrink-0 [&_svg]:size-icon-glyph-lg"
-                  aria-hidden="true"
-                >
+                <span className="inline-flex shrink-0" aria-hidden="true">
                   {trailingAction.icon}
                 </span>
               ) : null}

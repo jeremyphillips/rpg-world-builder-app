@@ -64,7 +64,7 @@ function BreadcrumbSeparator({ children, className, ...props }: React.ComponentP
       className={cn(breadcrumbSeparatorVariants, className)}
       {...props}
     >
-      {children ?? <Icon name="chevron-right" size="2xl" />}
+      {children ?? <Icon name="chevron-right" size="md" />}
     </li>
   )
 }

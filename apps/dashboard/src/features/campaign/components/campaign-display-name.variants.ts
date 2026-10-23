@@ -43,23 +43,6 @@ export const campaignDisplayNameTextVariants = cva('min-w-0', {
   },
 })
 
-export const campaignDisplayNameIconVariants = cva('shrink-0', {
-  variants: {
-    surface: {
-      topbar: 'size-4 text-foreground-subtle',
-      card: 'size-4 text-muted-foreground',
-      row: 'size-4 text-muted-foreground',
-      inlineMuted: 'size-icon-inline text-muted-foreground',
-      switcherTrigger: 'size-4 text-muted-foreground',
-      menuItem: 'size-4 text-muted-foreground',
-      page: 'size-5 text-muted-foreground',
-    },
-  },
-  defaultVariants: {
-    surface: 'card',
-  },
-})
-
 export type CampaignDisplayNameVariantProps = VariantProps<typeof campaignDisplayNameVariants>
 
 /** One leading icon with comma-separated linked names (e.g. thread header shared campaigns). */

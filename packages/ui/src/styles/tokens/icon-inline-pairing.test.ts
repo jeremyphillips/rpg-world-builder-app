@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 const globalsPath = join(fileURLToPath(import.meta.url), '../../../styles/globals.css')
+const iconCssPath = join(fileURLToPath(import.meta.url), '../../../components/ui/icon/icon.css')
 
 function ownersBlock(css: string): string {
   const start = css.indexOf('@layer utilities {\n  .text-xs {')
@@ -16,13 +17,11 @@ function ownersBlock(css: string): string {
 
 describe('inline icon pairing', () => {
   const css = readFileSync(globalsPath, 'utf8')
+  const iconCss = readFileSync(iconCssPath, 'utf8')
 
-  it('falls back to the md glyph when no owner is present', () => {
-    expect(css).toContain(
-      `@utility size-icon-inline {
-  width: var(--icon-inline, var(--icon-glyph-md));
-  height: var(--icon-inline, var(--icon-glyph-md));
-}`,
+  it('maps inline mode to --icon-inline on the icon element', () => {
+    expect(iconCss).toMatch(
+      /\.ui-icon\.ui-icon--inline\s*\{[^}]*--icon-size:\s*var\(--icon-inline\)/,
     )
   })
 

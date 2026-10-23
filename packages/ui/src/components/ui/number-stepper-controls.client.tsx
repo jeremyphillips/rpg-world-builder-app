@@ -7,9 +7,9 @@ import {
   type NumberStepperButtonAppearance,
   type NumberStepperSize,
 } from './number-stepper.variants'
-import type { IconGlyphStep } from './icon-glyph.variants'
+import type { IconSize } from './icon/icon.types'
 
-function resolveNumberStepperLeftIconStep(size: NumberStepperSize): IconGlyphStep {
+function resolveNumberStepperLeftIconSize(size: NumberStepperSize): IconSize {
   if (size === 'xs' || size === 'sm') return 'sm'
   return 'md'
 }
@@ -44,7 +44,7 @@ export function NumberStepperDecreaseButton({
       onClick={onClick}
     >
       {showRemoveAtMin ? (
-        <ActionIcon action="remove" size={resolveNumberStepperLeftIconStep(resolvedSize)} />
+        <ActionIcon action="remove" size={resolveNumberStepperLeftIconSize(resolvedSize)} />
       ) : (
         <Icon name="minus" size="owner" />
       )}

@@ -1,36 +1,46 @@
-# Icon registry
+# Icon guide
 
-Lucide remains the default glyph set. **One owner per semantic role** — character, spell, edit, and similar named roles each have a single registry entry. The same Lucide component may represent unrelated roles; alias only when the section _is_ that role.
+Glyphs render through `<Icon name="…" size="…" />` in `@rpg/ui`. Lucide (and one custom glyph) live only in `icon-glyphs.lucide.ts` and `icon-glyphs.custom.tsx`.
 
-## Layers
+## Size modes (required)
 
-| Layer          | Owner                                                                          | Consumer API                                                                             |
-| -------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| Identity       | `CONTENT_DISPLAY_FALLBACK_ICONS` + contracts `ContentDisplayFallback` keys     | `contentIdentityIcon(key)`, `ContentDisplayFallbackIcon`                                 |
-| Surface policy | `resolveContentDisplayFallback`, `resolveContentDisplayFallbackForContentType` | Chooses which identity key (or `generic`) a surface uses                                 |
-| Section        | Feature-local maps (form tabs, connections, builder facts)                     | `contentIdentityIcon` for semantic aliases; direct Lucide for section-owned glyphs       |
-| Granted choice | `GrantedChoiceLeadingIcon` (builder choice-section)                            | `BadgeCheck` leading affordance on granted `EntityCard` rows — not an action verb        |
-| Action         | `ACTION_ICONS`                                                                 | `ActionIcon`, `ActionButton`, remove/add wrappers                                        |
-| Resource       | `RESOURCE_ICONS`                                                               | `resourceIcon('currency' \| 'magicItem')` — Coins and Gem; not content identity or verbs |
+| `size`     | Who sets geometry                                                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------------ |
+| `xs`…`3xl` | The icon — `.ui-icon--{step}` sets `--icon-size` from `--icon-glyph-*` tokens.                         |
+| `inline`   | Typography owners (`body`, `.text-*`, `prose`, `.ui-semantic-text`) via `--icon-inline`.               |
+| `owner`    | A BEM owner on the icon or an ancestor publishes `--icon-size` (and optionally `--icon-stroke-width`). |
 
-`campaign` and `generic` may share a component today but are separate map entries — do not alias one to the other.
+There is no default: `owner` without a declaring owner fails the Storybook geometry census.
 
-**Preview rail / form chrome:** `resolveContentDisplayFallbackForContentType` uses `resolveContentMediaDomainForContentType` for media-opted types (class/species stay on `generic` for `surface: 'field'`). Non-media catalog types (spells, feats, skill-proficiencies) use identity keys (`spell`, `feat`, `skill-proficiency`), not `generic`.
+Precedence: explicit step beats `inline` and `owner`; `inline` reads only `--icon-inline`; `owner` reads `--icon-size` from the element class or the nearest ancestor owner.
 
-## Actions
+## Semantic maps
 
-`ActionButton` accepts only `action` (closed verb) plus normal `Button` props. It does not accept custom glyphs, `icon`, or destructive styling for `remove`. Use `ArrayItemRemoveButton` or explicit `variant` on the button.
+Domain maps (`ACTION_ICONS`, `CONTENT_DISPLAY_FALLBACK_ICONS`, feature tab maps, etc.) store canonical `IconName` strings, not components. Wrappers (`ActionIcon`, `ActionButton`, `ContentDisplayFallbackIcon`, `contentIdentityIcon`, `resourceIcon`) render `Icon`.
 
-Domain verbs (`invite`, `addMedia`, `compose`) are explicit keys, not overloads of `add`.
+| Layer          | Owner                                             | Consumer API                                                                    |
+| -------------- | ------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Identity       | `CONTENT_DISPLAY_FALLBACK_ICONS` + contracts keys | `contentIdentityIcon(key)`, `ContentDisplayFallbackIcon`                        |
+| Surface policy | `resolveContentDisplayFallback*`                  | Chooses identity key per surface                                                |
+| Section        | Feature-local maps                                | `IconName` in config; slot renders `Icon` with `size="owner"` where appropriate |
+| Action         | `ACTION_ICONS`                                    | `ActionIcon`, `ActionButton`                                                    |
+| Resource       | `RESOURCE_ICONS`                                  | `resourceIcon('currency' \| 'magicItem')`                                       |
 
-**`remove`** vs **`delete`** — detach from a collection vs destructive record removal; may share `Trash2` but stay separate verb keys.
+`ActionButton` accepts only `action` (closed verb) plus normal `Button` props. Overflow triggers use `overflow`, `overflowVertical`, or `overflowMenu`.
 
-Overflow triggers: **`overflow`**, **`overflowVertical`**, **`overflowMenu`**.
+## Accessibility
 
-## Guards
+`Icon` is always decorative (`aria-hidden="true"`). Names belong on interactive controls (`aria-label` on buttons, links, etc.). `Spinner` keeps `role="status"` on its wrapper span.
 
-`icon-registry-ban.test.ts` (`@rpg/ui` action wrappers), `icon-registry-scope-ban.test.ts` and `icon-registry-identity-ban.test.ts` (dashboard) block raw Lucide verbs and direct identity imports in migrated paths.
+Callers cannot pass `aria-*`, `data-*`, `role`, `title`, or `style` on `Icon`. Tests assert glyph identity with `[data-icon="…"]`.
 
-## Custom icons later
+## Enforcement
 
-Maps store `AppIcon` components. Swap one registry entry (Lucide → custom) without changing call sites that use `contentIdentityIcon`, `resourceIcon`, or `ACTION_ICONS`.
+- ESLint `rpg-icons/no-icon-provider-import` — provider imports only in the Lucide adapter (and its test).
+- ESLint `rpg-icons/no-inline-svg` — raw `<svg>` only in `icon-glyphs.custom.tsx` and `overlay-arrow.client.tsx`.
+- Vitest `icon-glyph-sizing-ban.test.ts` — no legacy `size-icon-glyph-*`, `size-icon-inline`, or `[&_svg]:size-*` in app/UI implementation files.
+- Storybook test-runner geometry census — computed width, height, and stroke-width snapshots in both Storybooks.
+
+## Naming
+
+`IconName` is kebab-case, provider-neutral, one name per distinct glyph. Renames are typed refactors across the registry and maps.

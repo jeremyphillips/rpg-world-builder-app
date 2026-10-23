@@ -1,8 +1,18 @@
 # Unified icon architecture
 
-Status: Phase 1 foundation is in place. Phases 2–6 are not started.
+Status: **Phases 1–5 complete.** Phase 6 (strict gate and legacy deletion) is not started.
 
-Phase 1 records the geometry census, the glyph-scale rename, the `Icon` module, the binding-level ESLint baseline, and the bundle measurements below. Later phases are judged against that census.
+| Phase | Scope                                                                                      | Status  |
+| ----- | ------------------------------------------------------------------------------------------ | ------- |
+| 1     | Foundation: census, scale, `Icon` module, ESLint baseline, bundle                          | Done    |
+| 2     | Owner protocol, StatusIcon (`exclamation`)                                                 | Done    |
+| 3     | Semantic maps, `ActionIcon` / `ActionButton` / fallback icon                               | Done    |
+| 4     | `@rpg/ui` controls, `Spinner`, `DisclosureIndicator`, sizing exempt list cleared           | Done    |
+| 5     | Dashboard and bench call sites; identity/size tests                                        | Done    |
+| 5b    | Post-migration census snapshot refresh; empty provider baseline (glyph adapters only)      | Done    |
+| 6     | Transitional rule, legacy utilities, `lucide-react` in dashboard/bench, docs, strict gates | Pending |
+
+Phase 1 records the geometry census, the glyph-scale rename, the `Icon` module, the binding-level ESLint baseline, and the bundle measurements below. Phases 2–5 are judged against that census; snapshots were refreshed after the control and app migrations (`chore(icons): refresh storybook geometry census snapshots`).
 
 ## Phase 1 record
 
@@ -42,6 +52,15 @@ Needs-attention still draws the circled exclamation. Phase 2 compares against th
 UI Storybook (`test-storybook -u` against the static build on port 6006): 177 suites, 844 tests, 760 snapshots written. 34 suites and 84 tests failed existing play or addon-a11y checks, so those stories have no geometry snapshot. None of the failures were an unresolved `--icon-size`. The `Icon` sizes story measures 10, 12, 14, 16, 20, 24, and 32 px. The owner story resolves at 16 px. The notification bell measures 20 px. Existing glyph stories that used the old 32 px step still measure 32 px.
 
 Dashboard Storybook (static build, port 6027): 308 suites run, 250 passed, 58 failed, 3 skipped; 877 tests, 758 snapshots. Failures are existing play or addon-a11y checks, plus eight stories in `equipment-package-switch-resolution-modal` that did not load. None were an unresolved `--icon-size`. New owner stories: nav item 16 px at stroke 1.75, content-media fallback frames include 32 px, the master-detail empty state is 40 px, and the table-builder inset gate is 32 px with Lucide identity `table2`.
+
+### Post phases 4–5 census refresh (Oct 23, 2026)
+
+After migrating `@rpg/ui`, dashboard, and bench to `Icon` (`feat(icons): migrate ui controls and apps to Icon (phases 4-5)` and `chore(icons): refresh storybook geometry census snapshots`):
+
+- **Provider baseline:** `icon-provider-baseline.json` is `{}`; only `icon-glyphs.lucide.ts` (and its test) may import Lucide.
+- **UI Storybook** (`build-storybook` + `test-storybook:ci`, port 6006): **757 / 757** geometry census snapshots pass. `assertResolvedOwnerIconSizes` passes after explicit sizes on number-input steppers and drop-target browse, plus owner element class on comfortable drop-target icons. Full `test-storybook:ci` still exits non-zero on pre-existing **axe** smoke failures (not census).
+- **Dashboard Storybook** (port 6007): **753** geometry census snapshots updated for `data-icon` identities and owner sizing. Same axe/play failures as before; occasional census ordering drift may need sorted census output if CI flakes.
+- **Phase 6 (done):** transitional CSS removed; legacy glyph utilities deleted; `icon-glyph.variants.ts` and ESLint baseline removed; `no-inline-svg` added; `lucide-react` removed from dashboard and bench; docs updated to the Icon guide.
 
 # Unified Icon Architecture and Migration Plan
 

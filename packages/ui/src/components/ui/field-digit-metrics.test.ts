@@ -5,7 +5,6 @@ import {
   fieldControlSizeClasses,
   fieldDigitSizeClasses,
   fieldDigitTrailingColumnClasses,
-  fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
   fieldGroupedControlSizeClasses,
 } from './field-sizing.variants'
@@ -31,6 +30,5 @@ describe('fieldDigitWidthVariants', () => {
     expect(fieldDigitTrailingPaddingClasses.md).toBe('pe-6')
     expect(fieldDigitSizeClasses.md).toBe('ui-field-control--digits-md')
     expect(fieldDigitTrailingColumnClasses.md).toBe('w-5')
-    expect(fieldDigitTrailingIconClasses.md).toBe('[&_svg]:size-icon-glyph-xs')
   })
 })

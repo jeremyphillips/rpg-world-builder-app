@@ -4,14 +4,18 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-import { ICON_GLYPH_SIZING_EXEMPT_FILES } from './icon-glyph-sizing-exempt-files'
-
 const repoRoot = join(fileURLToPath(import.meta.url), '../../../../../..')
-const scanRoot = join(repoRoot, 'packages/ui/src')
+
+const SCAN_ROOTS = [
+  join(repoRoot, 'packages/ui/src'),
+  join(repoRoot, 'apps/dashboard/src'),
+  join(repoRoot, 'apps/bench/src'),
+] as const
 
 const BANNED_ICON_SIZING_PATTERNS: RegExp[] = [
-  /\[(?:&_svg|&>svg)\]:size-(?!icon-glyph)[\w.-]+/g,
-  /\bclassName=(?:\{cn\([^)]*\)|"[^"]*)\bsize-[0-9][\w.-]*/g,
+  /\bsize-icon-glyph-/g,
+  /\bsize-icon-inline\b/g,
+  /\[(?:&_svg|&>svg)\]:size-/g,
 ]
 
 function collectComponentFiles(dir: string, files: string[] = []): string[] {
@@ -41,30 +45,31 @@ function findBannedIconSizing(content: string): string[] {
 
   for (const pattern of BANNED_ICON_SIZING_PATTERNS) {
     for (const match of content.matchAll(pattern)) {
-      const utility = match[0]!
-      if (!utility.includes('icon-glyph')) {
-        violations.add(utility.slice(0, 80))
-      }
+      violations.add(match[0]!.slice(0, 80))
     }
+  }
+
+  const iconClassPattern =
+    /<Icon\b[^>]*\bclassName=(?:\{cn\([^)]*\)|"[^"]*)[^>]*\b(?:size-[0-9][\w.-]*|size-icon)/g
+  for (const match of content.matchAll(iconClassPattern)) {
+    violations.add(match[0]!.slice(0, 80))
   }
 
   return [...violations].sort()
 }
 
 describe('icon glyph sizing ban', () => {
-  const files = collectComponentFiles(scanRoot)
+  const files = SCAN_ROOTS.flatMap((root) => collectComponentFiles(root))
 
-  it('scans UI component implementation sources', () => {
-    expect(files.length).toBeGreaterThan(50)
+  it('scans UI and app component implementation sources', () => {
+    expect(files.length).toBeGreaterThan(100)
   })
 
-  it('forbids raw svg/lucide sizing outside grandfathered files and variant modules', () => {
+  it('forbids legacy glyph utilities and raw svg sizing outside variant modules', () => {
     const failures: string[] = []
 
     for (const file of files) {
       const relPath = relative(repoRoot, file)
-      if (ICON_GLYPH_SIZING_EXEMPT_FILES.has(relPath)) continue
-
       const violations = findBannedIconSizing(readFileSync(file, 'utf8'))
       if (violations.length > 0) {
         failures.push(`${relPath}: ${violations.join(', ')}`)

@@ -24,7 +24,6 @@ import type { SortMenuProps, SortMenuSection } from './sort-menu.types'
 import {
   sortMenuContentClasses,
   sortMenuTriggerContentClasses,
-  sortMenuTriggerIconClasses,
   SORT_MENU_SIZING_LABEL_ATTR,
   sortMenuTriggerSizerGhostClasses,
   sortMenuTriggerSizerGridClasses,
@@ -135,7 +134,7 @@ export function SortMenu<T extends string>({
           disabled={triggerDisabled}
           aria-label={accessibleName}
           title={triggerLabel ?? undefined}
-          className={cn(sortMenuTriggerIconClasses, className)}
+          className={className}
         >
           <span className={sortMenuTriggerContentClasses()}>
             <Icon name="arrow-down-up" size="owner" />

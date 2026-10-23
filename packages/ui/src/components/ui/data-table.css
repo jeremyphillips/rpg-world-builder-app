@@ -213,6 +213,11 @@
   .ui-data-table__sort-icon {
     margin-inline-start: 0.25rem;
     flex-shrink: 0;
+    --icon-size: var(--icon-glyph-lg);
+  }
+
+  .ui-data-table__row-action-item {
+    --icon-size: var(--icon-glyph-sm);
   }
 
   .ui-data-table__sort-icon--idle {

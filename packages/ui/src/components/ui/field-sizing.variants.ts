@@ -16,7 +16,6 @@ import {
   resolveFieldGroupSizeClass,
 } from './field-group.styles'
 import type { CompactLabelSize } from './compact-label.lib'
-import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 import type { InteractiveListSize } from './interactive-list.variants'
 
 export type FieldSizeToken = 'xs' | 'sm' | 'md' | 'lg'
@@ -183,14 +182,6 @@ export function resolveInteractiveListSizeForFieldSize(
 ): InteractiveListSize {
   return fieldSizeToInteractiveListSize[fieldSize]
 }
-
-/** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. sm≡xs for digit chrome. */
-export const fieldDigitTrailingIconClasses = {
-  xs: iconGlyphDescendantClasses.xs,
-  sm: iconGlyphDescendantClasses.xs,
-  md: iconGlyphDescendantClasses.xs,
-  lg: iconGlyphDescendantClasses.md,
-} as const satisfies Record<FieldSizeToken, string>
 
 /** Resolves grouped shell size modifier for composite roots. */
 export function resolveFieldGroupedShellSizeClass(size: FieldSizeToken = 'md'): string {

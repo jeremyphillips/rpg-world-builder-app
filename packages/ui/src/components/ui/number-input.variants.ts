@@ -6,7 +6,6 @@ import { resolveFieldControlDigitsSizeClass } from './field-control.styles'
 import { fieldDigitWidthVariants } from './field-digit-metrics'
 import {
   fieldDigitTrailingColumnClasses,
-  fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
   fieldGroupedControlSizeClasses,
 } from './field-sizing.variants'
@@ -118,10 +117,10 @@ export const numberInputStepperButtonVariants = cva(
   {
     variants: {
       size: {
-        xs: fieldDigitTrailingIconClasses.xs,
-        sm: fieldDigitTrailingIconClasses.sm,
-        md: fieldDigitTrailingIconClasses.md,
-        lg: fieldDigitTrailingIconClasses.lg,
+        xs: '',
+        sm: '',
+        md: '',
+        lg: '',
       },
     },
     defaultVariants: {

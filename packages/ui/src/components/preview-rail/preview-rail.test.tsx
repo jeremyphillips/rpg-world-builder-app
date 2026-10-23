@@ -245,6 +245,8 @@ describe('PreviewRail', () => {
 
     expect(screen.queryByRole('button', { name: /Spellcasting/i })).not.toBeInTheDocument()
     expect(screen.getByText('Off')).toBeInTheDocument()
-    expect(document.querySelector('[aria-hidden].size-icon-glyph-md.shrink-0')).toBeInTheDocument()
+    expect(
+      document.querySelector('[aria-hidden].size-\\[length\\:var\\(--icon-glyph-md\\)\\].shrink-0'),
+    ).toBeInTheDocument()
   })
 })

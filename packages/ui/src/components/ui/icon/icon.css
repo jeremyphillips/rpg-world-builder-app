@@ -46,27 +46,4 @@
   .ui-icon.ui-icon--owner {
     /* Census and CSS-gate marker. No fallback when --icon-size is missing. */
   }
-
-  /*
-   * Sizes raw Lucide svgs under owners that now publish --icon-size.
-   * Removed in Phase 6, once those call sites render Icon.
-   * Compact-label and icon-container are included because their glyph
-   * helpers moved onto these owners in the same change.
-   */
-  :where(
-      .ui-button,
-      .ui-compact-control,
-      .ui-choice-control__mark,
-      .ui-radio-card__icon-control,
-      .ui-radio-card__details-action,
-      .ui-semantic-text__icon,
-      .ui-identity-frame__fallback,
-      .ui-icon-container,
-      .ui-compact-label,
-      .ui-sidebar-nav-item
-    )
-    svg:not(.ui-icon) {
-    width: var(--icon-size);
-    height: var(--icon-size);
-  }
 }

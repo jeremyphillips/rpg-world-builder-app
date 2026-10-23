@@ -50,6 +50,7 @@
 @import '../components/ui/status-icon.css';
 @import '../components/ui/icon/icon.css';
 @import '../components/ui/sidebar-nav-item.css';
+@import '../components/ui/segmented-control.css';
 @import '../components/ui/empty-state-well.css';
 @import '../components/ui/icon-container.css';
 @import '../components/ui/wizard.css';
@@ -505,36 +506,6 @@
 @utility size-control-action-lg {
   width: var(--control-action-lg-height);
   height: var(--control-action-lg-height);
-}
-
-@utility size-icon-glyph-xs {
-  width: var(--icon-glyph-xs);
-  height: var(--icon-glyph-xs);
-}
-
-@utility size-icon-glyph-sm {
-  width: var(--icon-glyph-sm);
-  height: var(--icon-glyph-sm);
-}
-
-@utility size-icon-glyph-md {
-  width: var(--icon-glyph-md);
-  height: var(--icon-glyph-md);
-}
-
-@utility size-icon-glyph-lg {
-  width: var(--icon-glyph-lg);
-  height: var(--icon-glyph-lg);
-}
-
-@utility size-icon-glyph-3xl {
-  width: var(--icon-glyph-3xl);
-  height: var(--icon-glyph-3xl);
-}
-
-@utility size-icon-inline {
-  width: var(--icon-inline, var(--icon-glyph-md));
-  height: var(--icon-inline, var(--icon-glyph-md));
 }
 
 /*

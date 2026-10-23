@@ -101,6 +101,7 @@ export default [
     plugins: { 'rpg-icons': rpgIconsPlugin },
     rules: {
       'rpg-icons/no-icon-provider-import': 'error',
+      'rpg-icons/no-inline-svg': 'error',
     },
   },
 ]

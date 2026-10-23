@@ -350,7 +350,7 @@ function PreviewRailSection({
             marker={marker}
             status={status}
             statusTone={statusTone}
-            trailing={<span aria-hidden className="size-icon-glyph-md shrink-0" />}
+            trailing={<span aria-hidden className="size-[length:var(--icon-glyph-md)] shrink-0" />}
           />
         </div>
       </div>

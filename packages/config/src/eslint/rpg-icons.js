@@ -1,14 +1,13 @@
-import { readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const baselinePath = join(dirname(fileURLToPath(import.meta.url)), 'icon-provider-baseline.json')
-const defaultBaseline = JSON.parse(readFileSync(baselinePath, 'utf8'))
-
 /** Files that may import an icon provider. Paths are repo-relative. */
 export const ICON_PROVIDER_ALLOWLIST = new Set([
   'packages/ui/src/components/ui/icon/icon-glyphs.lucide.ts',
   'packages/ui/src/components/ui/icon/icon-glyphs.lucide.test.ts',
+])
+
+/** Production modules that may render a raw `<svg>`. Paths are repo-relative. */
+export const INLINE_SVG_ALLOWLIST = new Set([
+  'packages/ui/src/components/ui/icon/icon-glyphs.custom.tsx',
+  'packages/ui/src/components/ui/overlay-arrow.client.tsx',
 ])
 
 const PROMISE_METHODS = new Set(['then', 'catch', 'finally'])
@@ -220,33 +219,39 @@ export function collectIconProviderBindings(program) {
   return found
 }
 
+function isInlineSvgScope(relativePath) {
+  if (!relativePath.endsWith('.tsx')) return false
+  if (relativePath.endsWith('.test.tsx') || relativePath.endsWith('.stories.tsx')) return false
+  if (
+    !relativePath.startsWith('packages/ui/') &&
+    !relativePath.startsWith('apps/dashboard/') &&
+    !relativePath.startsWith('apps/bench/') &&
+    !relativePath.startsWith('apps/public/')
+  ) {
+    return false
+  }
+  return true
+}
+
+function jsxElementName(node) {
+  if (!node?.name) return null
+  if (node.name.type === 'JSXIdentifier') return node.name.name
+  if (node.name.type === 'JSXMemberExpression' && node.name.property?.type === 'JSXIdentifier') {
+    return node.name.property.name
+  }
+  return null
+}
+
 export const noIconProviderImport = {
   meta: {
     type: 'problem',
     docs: {
-      description:
-        'Block icon-provider imports outside the binding baseline and the Lucide adapter.',
+      description: 'Block icon-provider imports outside the Lucide adapter allowlist.',
     },
-    schema: [
-      {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          baseline: {
-            type: 'object',
-            additionalProperties: {
-              type: 'array',
-              items: { type: 'string' },
-            },
-          },
-        },
-      },
-    ],
+    schema: [],
     messages: {
-      unlisted:
-        "Importing '{{name}}' from an icon provider is outside the baseline. Use Icon from @rpg/ui, or add the binding to icon-provider-baseline.json.",
-      stale:
-        "Baseline lists '{{name}}' for this file, but it is no longer imported. Remove it from icon-provider-baseline.json.",
+      forbidden:
+        "Importing '{{name}}' from an icon provider is not allowed. Use Icon from @rpg/ui.",
     },
   },
   create(context) {
@@ -254,22 +259,39 @@ export const noIconProviderImport = {
     const relativePath = repoRelativePath(filename)
     if (ICON_PROVIDER_ALLOWLIST.has(relativePath)) return {}
 
-    const configured = context.options[0]?.baseline ?? defaultBaseline
-    const allowed = new Set(configured[relativePath] ?? [])
-
     return {
       'Program:exit'(program) {
         const found = collectIconProviderBindings(program)
         for (const [name, node] of found) {
-          if (!allowed.has(name)) {
-            context.report({ node, messageId: 'unlisted', data: { name } })
-          }
+          context.report({ node, messageId: 'forbidden', data: { name } })
         }
-        for (const name of allowed) {
-          if (!found.has(name)) {
-            context.report({ node: program, messageId: 'stale', data: { name } })
-          }
-        }
+      },
+    }
+  },
+}
+
+export const noInlineSvg = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Block raw inline <svg> outside the custom glyph and overlay arrow adapters.',
+    },
+    schema: [],
+    messages: {
+      forbidden: 'Use <Icon> instead of a raw <svg> element.',
+    },
+  },
+  create(context) {
+    const filename = context.filename ?? context.getFilename()
+    const relativePath = repoRelativePath(filename)
+    if (!isInlineSvgScope(relativePath) || INLINE_SVG_ALLOWLIST.has(relativePath)) {
+      return {}
+    }
+
+    return {
+      JSXOpeningElement(node) {
+        if (jsxElementName(node) !== 'svg') return
+        context.report({ node, messageId: 'forbidden' })
       },
     }
   },
@@ -279,5 +301,6 @@ export const rpgIconsPlugin = {
   meta: { name: 'rpg-icons' },
   rules: {
     'no-icon-provider-import': noIconProviderImport,
+    'no-inline-svg': noInlineSvg,
   },
 }

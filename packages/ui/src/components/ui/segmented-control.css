@@ -1,0 +1,5 @@
+@layer components {
+  .ui-segmented-control__leading-icon {
+    --icon-size: var(--icon-glyph-sm);
+  }
+}

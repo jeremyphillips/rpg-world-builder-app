@@ -243,7 +243,6 @@ export {
   type MetadataListValueTrack,
 } from './components/ui/metadata-list.variants'
 export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
-export { inlineIconTextClasses } from './components/ui/icon-glyph.variants'
 export {
   ACTION_ICONS,
   ACTION_ICON_VERBS,
@@ -386,7 +385,6 @@ export {
   fieldControlSizeClasses,
   fieldDigitSizeClasses,
   fieldDigitTrailingColumnClasses,
-  fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
   fieldGroupedControlHeightClasses,
   fieldGroupedControlSizeClasses,
