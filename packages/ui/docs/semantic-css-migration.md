@@ -372,6 +372,17 @@ Consumers: `master-detail-list-scroll.utilities.css` (top and bottom inset, floo
 
 **Not a block.** The scroll clip and viewport stay `FormStickyScrollBody` plus `ScrollBoundaryRegion`. `form-scroll-body-container` stays a `@utility` because master-detail's `@container form-scroll-body` depends on it. The non-docked `formStickyScrollShellClasses` is anonymous layout and is inlined.
 
+### B4 master-detail defaults (complete)
+
+Static contract defaults moved into `master-detail-list-scroll.utilities.css`:
+
+- `--master-detail-list-chrome-block-size: 5.5rem` on `@utility master-detail-list-shell-viewport-cap` (same element as before: the list `nav` shell).
+- `--master-detail-list-max-block-size: 28rem` on `@utility master-detail-grid`, applied by `MasterDetailGrid`.
+
+Inventory: production declares `28rem` only on `MasterDetailGrid`. Story wrappers set `12rem` on an ancestor, but the grid's self-declaration shadows that ancestor, so stories still resolve `28rem` until hosts stop using the grid default. A utility fallback (`var(--master-detail-list-max-block-size, 28rem)` on the viewport cap only) would let ancestor overrides win and would change story parity; the grid-scoped utility preserves observed behavior.
+
+Deleted: Tailwind arbitrary-property strings for those defaults, `masterDetailListLayoutClasses` (tests import the shell and scroll constants directly). The temporary ratchet bucket is empty after B4.
+
 ### Inset defect (`--rpg-content-top-inset`)
 
 `--rpg-content-top-inset: calc(var(--rpg-content-top-inset, 0px) + …)` is declared on the same element on the content-form wide body and on the docked shell. A self-reference is a dependency cycle under the CSS Custom Properties spec. The property becomes guaranteed-invalid at computed-value time. It does not read the inherited value. Descendants then see the invalid value, so their `var()` fallbacks apply. No `@property` registration exists. No test asserts the computed accumulation.

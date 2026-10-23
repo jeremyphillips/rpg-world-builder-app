@@ -5,7 +5,13 @@
  * slot without redefining the fallback custom property (invalid 100cqh must not wipe it).
  */
 
+@utility master-detail-grid {
+  --master-detail-list-max-block-size: 28rem;
+}
+
 @utility master-detail-list-shell-viewport-cap {
+  --master-detail-list-chrome-block-size: 5.5rem;
+
   --master-detail-shell-max-block-size: min(
     calc(
       var(--master-detail-list-max-block-size) + var(--master-detail-list-chrome-block-size, 0px)

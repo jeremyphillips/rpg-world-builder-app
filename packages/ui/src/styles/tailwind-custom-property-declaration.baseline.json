@@ -1,12 +1,5 @@
 {
-  "temporary": {
-    "apps/dashboard/src/features/content/components/master-detail/master-detail-grid.tsx": {
-      "--master-detail-list-max-block-size": 1
-    },
-    "apps/dashboard/src/features/content/components/master-detail/master-detail-list-panel.layout.ts": {
-      "--master-detail-list-chrome-block-size": 1
-    }
-  },
+  "temporary": {},
   "approved": {
     "apps/bench/src/features/tickets/components/ticket-card.variants.ts": {
       "--icon-size": {
