@@ -4,6 +4,8 @@ export const METADATA_LIST_SIZES = ['default', 'sm', 'xs'] as const
 
 export const METADATA_LIST_COLUMN_GAPS = ['md', 'sm'] as const
 
+export const METADATA_LIST_ROW_GAPS = ['sm', 'md'] as const
+
 export const METADATA_LIST_VALUE_TRACKS = ['content', 'fill'] as const
 
 export const METADATA_LIST_EMPHASES = ['label', 'value'] as const
@@ -11,6 +13,8 @@ export const METADATA_LIST_EMPHASES = ['label', 'value'] as const
 export type MetadataListSize = (typeof METADATA_LIST_SIZES)[number]
 
 export type MetadataListColumnGap = (typeof METADATA_LIST_COLUMN_GAPS)[number]
+
+export type MetadataListRowGap = (typeof METADATA_LIST_ROW_GAPS)[number]
 
 export type MetadataListValueTrack = (typeof METADATA_LIST_VALUE_TRACKS)[number]
 
@@ -28,6 +32,9 @@ export const UI_METADATA_LIST_COLUMN_GAP_CLASSES = [
   'ui-metadata-list--gap-md',
   'ui-metadata-list--gap-sm',
 ] as const
+
+/** twMerge group — metadata list row gap override (`md` relaxes comfortable-density stacks). */
+export const UI_METADATA_LIST_ROW_GAP_CLASSES = ['ui-metadata-list--row-gap-md'] as const
 
 /** twMerge group — metadata list value column track. */
 export const UI_METADATA_LIST_VALUE_TRACK_CLASSES = [
@@ -53,6 +60,10 @@ export const metadataListVariants = cva('', {
       md: 'ui-metadata-list--gap-md',
       sm: 'ui-metadata-list--gap-sm',
     },
+    rowGap: {
+      sm: '',
+      md: 'ui-metadata-list--row-gap-md',
+    },
     valueTrack: {
       content: 'ui-metadata-list--track-content',
       fill: 'ui-metadata-list--track-fill',
@@ -69,6 +80,7 @@ export const metadataListVariants = cva('', {
   defaultVariants: {
     size: 'default',
     columnGap: 'md',
+    rowGap: 'sm',
     valueTrack: 'content',
     emphasis: 'label',
     divider: true,

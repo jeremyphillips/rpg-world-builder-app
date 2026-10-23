@@ -254,6 +254,7 @@ function PreviewRailFacts({ facts, density = 'comfortable' }: PreviewRailFactsPr
       items={facts.map((fact) => ({ id: fact.label, label: fact.label, value: fact.value }))}
       size={density === 'compact' ? 'xs' : 'sm'}
       columnGap="sm"
+      rowGap={density === 'compact' ? 'sm' : 'md'}
       valueTrack="fill"
       emphasis="value"
       divider={false}

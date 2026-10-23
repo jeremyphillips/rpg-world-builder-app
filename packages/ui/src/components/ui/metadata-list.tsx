@@ -5,6 +5,7 @@ import {
   metadataListVariants,
   type MetadataListColumnGap,
   type MetadataListEmphasis,
+  type MetadataListRowGap,
   type MetadataListSize,
   type MetadataListValueTrack,
 } from './metadata-list.variants'
@@ -21,6 +22,8 @@ export type MetadataListProps = {
   size?: MetadataListSize
   /** Horizontal space between the label and value columns. */
   columnGap?: MetadataListColumnGap
+  /** Vertical space between rows. `md` matches legacy comfortable preview-rail spacing. */
+  rowGap?: MetadataListRowGap
   /** `content` sizes the value column to its text. `fill` gives it the remaining width. */
   valueTrack?: MetadataListValueTrack
   /** Which side carries foreground color and emphasis weight. */
@@ -34,6 +37,7 @@ export function MetadataList({
   items,
   size = 'default',
   columnGap = 'md',
+  rowGap = 'sm',
   valueTrack = 'content',
   emphasis = 'label',
   divider = true,
@@ -46,7 +50,7 @@ export function MetadataList({
       aria-labelledby={ariaLabelledBy}
       className={cn(
         'ui-metadata-list',
-        metadataListVariants({ size, columnGap, valueTrack, emphasis, divider }),
+        metadataListVariants({ size, columnGap, rowGap, valueTrack, emphasis, divider }),
       )}
     >
       {items.map((item, index) => (

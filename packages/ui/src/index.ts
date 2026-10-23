@@ -239,6 +239,7 @@ export {
 export {
   type MetadataListColumnGap,
   type MetadataListEmphasis,
+  type MetadataListRowGap,
   type MetadataListSize,
   type MetadataListValueTrack,
 } from './components/ui/metadata-list.variants'

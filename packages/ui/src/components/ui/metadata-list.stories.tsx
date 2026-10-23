@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
-import { Text } from './text'
+import { InlineMetadata } from './inline-metadata'
 import { MetadataList } from './metadata-list'
+import { Text } from './text'
+import { standaloneTextActionClasses } from './text-action.variants'
 import { METADATA_LIST_CLASS_SPECS } from './metadata-list.styles'
 
 const spellItems = [
@@ -24,7 +26,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Aligned read-only metadata. size sets type and row gap. columnGap sets the column gap. valueTrack sets the columns. emphasis sets label/value color and weight. divider sets the bottom rule. Defaults match content stat lists: ruled, label emphasis, content track.',
+          'Aligned read-only metadata. size sets type and default row gap. rowGap can relax vertical spacing. columnGap sets the column gap. valueTrack sets the columns. emphasis sets label/value color and weight. divider sets the bottom rule. Defaults match content stat lists: ruled, label emphasis, content track.',
       },
     },
   },
@@ -44,6 +46,7 @@ export const RailFacts: Story = {
   args: {
     size: 'sm',
     columnGap: 'sm',
+    rowGap: 'md',
     valueTrack: 'fill',
     emphasis: 'value',
     divider: false,
@@ -73,6 +76,7 @@ export const FileMetadata: Story = {
 
 export const CampaignReview: Story = {
   args: {
+    size: 'sm',
     emphasis: 'value',
     divider: false,
     items: [
@@ -107,10 +111,14 @@ export const RichValue: Story = {
       {
         label: 'Campaigns',
         value: (
-          <>
-            2 owned, 1 joined
-            <a href="#campaigns">View campaigns</a>
-          </>
+          <InlineMetadata role="supporting" density="compact">
+            <InlineMetadata.Item>2 owned, 1 joined</InlineMetadata.Item>
+            <InlineMetadata.Item>
+              <a href="#campaigns" className={standaloneTextActionClasses('accent')}>
+                View campaigns
+              </a>
+            </InlineMetadata.Item>
+          </InlineMetadata>
         ),
       },
       {

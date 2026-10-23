@@ -1,6 +1,6 @@
 /*
  * MetadataList — aligned read-only label/value rows.
- * Source order: block → size → column gap → value track → emphasis → rule.
+ * Source order: block → size → row gap → column gap → value track → emphasis → rule.
  * Each dimension owns one job. Size does not set column gap.
  */
 @layer components {
@@ -34,6 +34,10 @@
 
   .ui-metadata-list--gap-sm {
     column-gap: calc(var(--spacing) * 3);
+  }
+
+  .ui-metadata-list--row-gap-md {
+    row-gap: calc(var(--spacing) * 2);
   }
 
   .ui-metadata-list--track-content {

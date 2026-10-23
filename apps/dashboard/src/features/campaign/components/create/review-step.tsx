@@ -59,6 +59,7 @@ function ReviewSection({
         {heading}
       </h3>
       <MetadataList
+        size="sm"
         divider={false}
         emphasis="value"
         items={rows.map((row) => ({ id: row.label, label: row.label, value: row.value }))}

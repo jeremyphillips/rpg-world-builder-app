@@ -4,7 +4,9 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import { InlineMetadata } from './inline-metadata'
 import { MetadataList } from './metadata-list'
+import { standaloneTextActionClasses } from './text-action.variants'
 
 describe('MetadataList', () => {
   it('aligns labels and values without colons', () => {
@@ -41,7 +43,13 @@ describe('MetadataList', () => {
     ).toBe(true)
   })
 
-  it('forwards aria-labelledby and keeps links and stacked copy inside one dd', () => {
+  it('applies relaxed row gap when rowGap is md', () => {
+    render(<MetadataList rowGap="md" divider={false} items={[{ label: 'Level', value: '1st' }]} />)
+
+    expect(screen.getByText('Level').closest('dl')).toHaveClass('ui-metadata-list--row-gap-md')
+  })
+
+  it('forwards aria-labelledby and keeps inline metadata actions inside one dd', () => {
     render(
       <MetadataList
         aria-labelledby="file-heading"
@@ -51,7 +59,16 @@ describe('MetadataList', () => {
         items={[
           {
             label: 'Campaigns',
-            value: <a href="/campaigns">View campaigns</a>,
+            value: (
+              <InlineMetadata role="supporting" density="compact">
+                <InlineMetadata.Item>2 owned, 1 joined</InlineMetadata.Item>
+                <InlineMetadata.Item>
+                  <a href="/campaigns" className={standaloneTextActionClasses('accent')}>
+                    View campaigns
+                  </a>
+                </InlineMetadata.Item>
+              </InlineMetadata>
+            ),
           },
           {
             label: 'Invitations',
@@ -72,8 +89,10 @@ describe('MetadataList', () => {
     expect(list).toHaveClass('ui-metadata-list--emphasis-value', 'ui-metadata-list--track-fill')
 
     const link = screen.getByRole('link', { name: 'View campaigns' })
-    expect(link.closest('dd')?.tagName).toBe('DD')
-    expect(link.parentElement?.tagName).toBe('DD')
+    const campaignsValue = link.closest('dd')
+    expect(campaignsValue?.tagName).toBe('DD')
+    expect(campaignsValue).toHaveTextContent('2 owned, 1 joined')
+    expect(campaignsValue?.querySelector('[data-inline-metadata-separator]')).toBeInTheDocument()
 
     const invitations = screen.getByText('Pending: 1').closest('dd')
     expect(invitations).toHaveTextContent('Accepted, incomplete: 2')

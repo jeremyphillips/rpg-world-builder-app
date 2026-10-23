@@ -21,6 +21,7 @@ import {
   UI_ALERT_DENSITY_CLASSES,
   UI_METADATA_LIST_COLUMN_GAP_CLASSES,
   UI_METADATA_LIST_EMPHASIS_CLASSES,
+  UI_METADATA_LIST_ROW_GAP_CLASSES,
   UI_METADATA_LIST_SIZE_CLASSES,
   UI_METADATA_LIST_VALUE_TRACK_CLASSES,
   UI_TABS_LIST_APPEARANCE_CLASSES,
@@ -130,6 +131,7 @@ type TypographyClassGroupIds =
   | 'ui-alert-density'
   | 'ui-metadata-list-size'
   | 'ui-metadata-list-column-gap'
+  | 'ui-metadata-list-row-gap'
   | 'ui-metadata-list-value-track'
   | 'ui-metadata-list-emphasis'
   | 'ui-tabs-list-appearance'
@@ -222,6 +224,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-alert-density': [...UI_ALERT_DENSITY_CLASSES],
       'ui-metadata-list-size': [...UI_METADATA_LIST_SIZE_CLASSES],
       'ui-metadata-list-column-gap': [...UI_METADATA_LIST_COLUMN_GAP_CLASSES],
+      'ui-metadata-list-row-gap': [...UI_METADATA_LIST_ROW_GAP_CLASSES],
       'ui-metadata-list-value-track': [...UI_METADATA_LIST_VALUE_TRACK_CLASSES],
       'ui-metadata-list-emphasis': [...UI_METADATA_LIST_EMPHASIS_CLASSES],
       'ui-tabs-list-appearance': [...UI_TABS_LIST_APPEARANCE_CLASSES],
@@ -261,6 +264,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-alert-density': ['ui-alert-density'],
       'ui-metadata-list-size': ['ui-metadata-list-size'],
       'ui-metadata-list-column-gap': ['ui-metadata-list-column-gap'],
+      'ui-metadata-list-row-gap': ['ui-metadata-list-row-gap'],
       'ui-metadata-list-value-track': ['ui-metadata-list-value-track'],
       'ui-metadata-list-emphasis': ['ui-metadata-list-emphasis'],
       'ui-card-interaction': ['ui-card-interaction'],

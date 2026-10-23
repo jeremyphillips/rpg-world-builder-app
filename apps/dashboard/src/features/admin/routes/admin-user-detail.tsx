@@ -5,6 +5,7 @@ import {
   Badge,
   ButtonLink,
   Heading,
+  InlineMetadata,
   MetadataList,
   RowActionsMenu,
   standaloneTextActionClasses,
@@ -137,33 +138,41 @@ export function AdminUserDetail() {
               id: 'campaigns',
               label: 'Campaigns',
               value: (
-                <>
-                  {formatAdminUserCampaignCounts(user.campaignCounts)}
-                  <Link
-                    to={ROUTES.admin.user.campaigns(user.id)}
-                    className={standaloneTextActionClasses('accent')}
-                  >
-                    View campaigns
-                  </Link>
-                </>
+                <InlineMetadata role="supporting" density="compact">
+                  <InlineMetadata.Item>
+                    {formatAdminUserCampaignCounts(user.campaignCounts)}
+                  </InlineMetadata.Item>
+                  <InlineMetadata.Item>
+                    <Link
+                      to={ROUTES.admin.user.campaigns(user.id)}
+                      className={standaloneTextActionClasses('accent')}
+                    >
+                      View campaigns
+                    </Link>
+                  </InlineMetadata.Item>
+                </InlineMetadata>
               ),
             },
             {
               id: 'characters',
               label: 'Characters',
               value: (
-                <>
-                  {joinInlineMetadata([
-                    `${user.characterCount} character${user.characterCount === 1 ? '' : 's'}`,
-                    `${user.controlledCharacterCount} controlled in campaigns`,
-                  ])}
-                  <Link
-                    to={ROUTES.admin.user.characters(user.id)}
-                    className={standaloneTextActionClasses('accent')}
-                  >
-                    View characters
-                  </Link>
-                </>
+                <InlineMetadata role="supporting" density="compact">
+                  <InlineMetadata.Item>
+                    {joinInlineMetadata([
+                      `${user.characterCount} character${user.characterCount === 1 ? '' : 's'}`,
+                      `${user.controlledCharacterCount} controlled in campaigns`,
+                    ])}
+                  </InlineMetadata.Item>
+                  <InlineMetadata.Item>
+                    <Link
+                      to={ROUTES.admin.user.characters(user.id)}
+                      className={standaloneTextActionClasses('accent')}
+                    >
+                      View characters
+                    </Link>
+                  </InlineMetadata.Item>
+                </InlineMetadata>
               ),
             },
             ...(showInvites

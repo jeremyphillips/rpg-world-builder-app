@@ -690,6 +690,10 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
         modifierPrefix: `ui-metadata-list--${gap}`,
         requiredProperties: ['column-gap'] as const,
       })),
+      {
+        modifierPrefix: 'ui-metadata-list--row-gap-md',
+        requiredProperties: ['row-gap'] as const,
+      },
       ...(['track-content', 'track-fill'] as const).map((track) => ({
         modifierPrefix: `ui-metadata-list--${track}`,
         requiredProperties: ['grid-template-columns'] as const,
