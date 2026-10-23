@@ -57,6 +57,58 @@ Introduce a shared variant when it represents a stable, meaningful dimension of 
 - A `*.variants.ts` file requires a real variant axis. `ClassReference` specs and twMerge group lists are inspection metadata, not runtime class registries.
 - Styling primitives that may be reused without their component expose **conditional** classes through resolvers (`cardSurfaceVariants`, `interactiveRowVariants`) — not through zero-argument aliases of a single selector.
 
+## Cascade layers
+
+Tailwind emits layers lowest-first: `properties`, `theme`, `base`, `components`, `utilities`. `properties` belongs to Tailwind. Every designated stylesheet starts with this statement, before any `@import`:
+
+```css
+@layer theme, base, components, utilities;
+```
+
+The first stylesheet to name a layer fixes that layer's order for the page. A later statement cannot reorder a layer that already exists. Registering `components` before this statement lets Preflight (`@layer base`) paint over semantic padding, borders, and the other properties Preflight resets. Heights, custom properties, and utilities still apply, so the control looks half-styled.
+
+### Stylesheet entries
+
+Runtime code imports CSS only from these modules, and that import is the first runtime import in the file:
+
+| Entry                                   | Stylesheet                              |
+| --------------------------------------- | --------------------------------------- |
+| `apps/dashboard/src/main.tsx`           | `apps/dashboard/src/index.css`          |
+| `apps/bench/src/main.tsx`               | `apps/bench/src/index.css`              |
+| `apps/public/src/app/layout.tsx`        | `apps/public/src/app/globals.css`       |
+| `apps/dashboard/.storybook/preview.tsx` | `apps/dashboard/.storybook/preview.css` |
+| `packages/ui/.storybook/preview.tsx`    | `packages/ui/.storybook/preview.css`    |
+
+`packages/ui/src/styles/globals.css` (`@rpg/ui/styles.css`) is the shared sheet those entries import. Semantic component and feature CSS lives beside the component (`ui-*` in `@rpg/ui`, `dash-*` in the dashboard) and enters through `@import` from `globals.css`, the app entry, or a Storybook preview entry. A component, story, or other module does not import that CSS. A JS import is a separate stylesheet: it can register `components` too early, and unlayered rules in it override every layered declaration.
+
+### Unlayered styles
+
+Unlayered author CSS beats every cascade layer, including utilities.
+
+Rules that only set custom properties (tokens on `:root` and theme selectors) stay unlayered so they can override layered theme variables.
+
+`globals.css` has two unlayered selectors that set real properties. They size prose and beat typography utilities on the same element:
+
+- `.prose.prose-sm` sets `font-size`, `line-height`, and `--icon-inline`
+- `.prose.prose-md` sets `font-size`, `line-height`, and `--icon-inline`
+
+Further unlayered rules that set layout or chrome fail the ownership test. Component appearance goes in `@layer components`. One-off utilities go in `@utility` or `@layer utilities`.
+
+### Third-party CSS and code splitting
+
+These packages are `@import`ed from the CSS entries:
+
+- `tailwindcss` and `tw-animate-css` compile into the layers above
+- `@fontsource-variable/inter` is unlayered `@font-face` only and does not set component chrome
+
+`next/font` in the public root layout is the JS font exception. It follows `globals.css` and publishes `--font-body`. It does not set padding, borders, or other component properties.
+
+Storybook also injects its own unlayered preview sheets (`@font-face` and `.sb-*` chrome) ahead of the app sheet. Those selectors do not style product components. The app sheet still opens with `properties`, then `theme`, `base`, `components`, `utilities`.
+
+CSS modules and route-level CSS chunks are separate stylesheets, so their rules are unlayered or ordered on their own. Semantic CSS stays in the entry graph. There is no approved CSS-module or code-split exception.
+
+`packages/ui/src/styles/css-layer-ownership.test.ts` checks entry imports, `@import` reachability, unlayered rules, and computed styles for the dev compiler output and the production minify of every entry.
+
 ## Ownership registry
 
 The registry maps each UI responsibility to the component that owns it. Unambiguous responsibilities are a flat list. Families where ownership overlaps get a short hierarchy with a composition column, so a change goes to the component that owns the visual responsibility. Fine-grained recipes stay in [semantic-style-layers.md](./semantic-style-layers.md).

@@ -1,0 +1,5 @@
+@layer theme, base, components, utilities;
+
+@import '@fontsource-variable/inter';
+@import '../src/styles/globals.css';
+@import '../src/components/ui/card-surface-interaction-matrix.css';

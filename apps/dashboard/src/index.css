@@ -1,3 +1,5 @@
+@layer theme, base, components, utilities;
+
 /*
  * Pull in the shared @rpg/ui preset (Tailwind + design tokens + base layer).
  * Tailwind ignores node_modules by default, so explicitly register the UI
@@ -16,4 +18,5 @@
 @import './features/content/components/master-detail/master-detail-list-scroll.utilities.css';
 @import './features/character/components/builder/steps/spells/spell-level-tabs.css';
 @import './features/media/components/media-manager/media-manager.css';
+@import './features/global-search/components/topbar/global-search-trigger.css';
 @source "../node_modules/@rpg/ui/src";

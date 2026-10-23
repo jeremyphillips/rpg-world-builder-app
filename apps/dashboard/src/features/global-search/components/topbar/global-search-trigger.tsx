@@ -3,7 +3,6 @@ import * as React from 'react'
 import { Button, cn, Icon } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
-import './global-search-trigger.css'
 
 export type GlobalSearchTriggerProps = {
   disabled?: boolean

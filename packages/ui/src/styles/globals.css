@@ -1,3 +1,5 @@
+@layer theme, base, components, utilities;
+
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import './tokens/palette-light.css';
