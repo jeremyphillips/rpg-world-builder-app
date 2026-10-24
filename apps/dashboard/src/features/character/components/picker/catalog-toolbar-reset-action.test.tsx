@@ -18,7 +18,7 @@ describe('CatalogToolbarResetSlot', () => {
     expect(button).toHaveTextContent(CATALOG_TOOLBAR_RESET_VISIBLE_LABEL)
     expect(button).toHaveAttribute('title', CATALOG_TOOLBAR_RESET_WITH_SORT_NAME)
     expect(button).toHaveClass('ui-button__text--sm-compact')
-    expect(button.querySelector('svg')).toHaveClass('ui-icon--sm')
+    expect(button.querySelector('svg')).toHaveClass('ui-icon--owner')
   })
 
   it('omits sorting from the accessible name when the toolbar has no sort', () => {

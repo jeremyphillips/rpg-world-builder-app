@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import { cn } from '@rpg/ui'
+
 import { PageShell } from '@/components/layout/page/page-shell'
 import { ViewportWorkspace } from '@/components/layout/page/viewport-workspace'
 import { viewportWorkspacePaneClasses } from '@/components/layout/page/viewport-workspace.variants'
@@ -31,7 +33,9 @@ export function ContentFormPageShell({
     <ViewportWorkspace className={className}>
       <PageShell width={pageWidth} spacing="none" className={viewportWorkspacePaneClasses}>
         {pageWidth === 'wide' ? (
-          <div className={contentFormPageShellBodyClasses}>{children}</div>
+          <div className={cn(contentFormPageShellBodyClasses, 'flex min-h-0 flex-1 flex-col')}>
+            {children}
+          </div>
         ) : (
           children
         )}

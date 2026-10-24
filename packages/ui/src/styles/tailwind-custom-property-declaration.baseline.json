@@ -1,0 +1,43 @@
+{
+  "temporary": {},
+  "approved": {
+    "apps/bench/src/features/tickets/components/ticket-card.variants.ts": {
+      "--icon-size": {
+        "category": "local-layout",
+        "reason": "Sets icon glyph size on the ticket status icon element.",
+        "count": 1
+      }
+    },
+    "packages/ui/src/components/ui/field-control-surface.variants.ts": {
+      "--field-control-bg": {
+        "category": "variant-resolver",
+        "reason": "Maps field surface tone to the control background custom property.",
+        "count": 2
+      }
+    },
+    "packages/ui/src/components/ui/rich-text-content.variants.ts": {
+      "--tw-prose-body": {
+        "category": "plugin-api",
+        "reason": "Overrides @tailwindcss/typography prose color variables.",
+        "count": 1
+      },
+      "--tw-prose-bold": {
+        "category": "plugin-api",
+        "reason": "Overrides @tailwindcss/typography prose color variables.",
+        "count": 1
+      },
+      "--tw-prose-headings": {
+        "category": "plugin-api",
+        "reason": "Overrides @tailwindcss/typography prose color variables.",
+        "count": 1
+      }
+    },
+    "packages/ui/src/components/ui/surface-current.lib.ts": {
+      "--surface-current": {
+        "category": "variant-resolver",
+        "reason": "Maps a semantic surface plane to inherited --surface-current.",
+        "count": 1
+      }
+    }
+  }
+}

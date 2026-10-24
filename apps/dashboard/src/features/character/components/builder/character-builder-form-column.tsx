@@ -4,9 +4,11 @@ import { FormStickyScrollBody, formStickyScrollShellWithDockedFooterClasses } fr
 
 import {
   characterBuilderFormCompactPreviewSlotClasses,
-  characterBuilderFormScrollViewportClasses,
   characterBuilderShellFormColumnClasses,
 } from './character-builder-shell.variants'
+
+const characterBuilderFormScrollViewportClasses =
+  'h-full min-h-0 overflow-y-auto scrollbar-slim pe-0 ps-0 pb-6'
 
 export type CharacterBuilderFormColumnProps = {
   scrollContent: ReactNode

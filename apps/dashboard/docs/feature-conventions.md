@@ -159,14 +159,16 @@ may own vertical scrolling.
 
 **ViewportWorkspace consumers** (bounded routes — no document scrollbar):
 
-| Consumer                                                                                              | Route pattern                                        |
-| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Preview catalog create/edit (`scrollMode: viewport`) |
-| [`MessagesWorkspaceShell`](../src/features/message/components/workspace/messages-workspace-shell.tsx) | `/messages`                                          |
+| Consumer                                                                                                     | Route pattern                                                                   |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx)        | Preview catalog create/edit (`scrollMode: viewport`)                            |
+| [`CharacterBuilderPageShell`](../src/features/character/components/builder/character-builder-page-shell.tsx) | `/characters/new`, `/campaigns/:id/npcs/new`, campaign onboarding new character |
+| [`MessagesWorkspaceShell`](../src/features/message/components/workspace/messages-workspace-shell.tsx)        | `/messages`                                                                     |
 
 `AppShell` publishes `--app-sticky-chrome-block-size` (sticky topbar + breadcrumb)
-for workspace bounds and chrome-aware sticky rails; `<main>` aliases
-`--rpg-content-top-inset` from that variable. `<main>` is horizontal gutter
+for workspace bounds and chrome-aware sticky rails. The master-detail list is the
+only place that resolves `--rpg-content-top-inset`, from that variable plus any
+page-heading and form-chrome contributions in scope. `<main>` is horizontal gutter
 only (`min-w-0 flex-1`) for document-scroll routes — not a height contract or
 scrollport. When a descendant mounts `data-viewport-fill="workspace"`, AppShell
 `:has()` caps the content column at one viewport height and main at `h-0`.

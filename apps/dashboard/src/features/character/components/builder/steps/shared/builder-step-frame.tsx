@@ -9,7 +9,7 @@ import type {
   CharacterBuilderStepId,
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
-import { Heading, Text } from '@rpg/ui'
+import { cn, Heading, panelVariants, Text } from '@rpg/ui'
 
 import { CharacterBuilderValidationAlert } from '../../chrome/character-builder-validation-alert'
 import { characterBuilderStepPanelClasses } from '../../character-builder-shell.variants'
@@ -37,7 +37,11 @@ export function BuilderStepFrame({
   return (
     <section
       aria-labelledby="character-builder-step-heading"
-      className={characterBuilderStepPanelClasses}
+      className={cn(
+        characterBuilderStepPanelClasses,
+        panelVariants({ tone: 'quiet', density: 'spacious' }),
+        'space-y-4',
+      )}
     >
       <div className="space-y-1">
         <Heading variant="section" as="h2" id="character-builder-step-heading">

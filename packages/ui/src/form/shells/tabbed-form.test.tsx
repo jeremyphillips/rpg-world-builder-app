@@ -170,12 +170,12 @@ describe('TabbedForm', () => {
     )
 
     const sectionsNav = getSectionsNav()
-    expect(sectionsNav.parentElement).toHaveClass('sticky')
+    expect(sectionsNav.parentElement).toHaveClass('ui-form-sticky-tabs')
     const toolbar = screen.getByRole('toolbar', { name: 'Form actions' })
-    expect(toolbar).toHaveClass('shrink-0')
-    expect(toolbar).not.toHaveClass('sticky')
+    expect(toolbar).toHaveClass('ui-form-actions-bar--docked')
+    expect(toolbar).not.toHaveClass('ui-form-actions-bar--sticky')
     expect(toolbar.closest('.overflow-y-auto')).toBeNull()
-    expect(toolbar.parentElement).toHaveClass('flex', 'flex-col')
+    expect(toolbar.parentElement).toHaveClass('ui-form-docked-shell')
 
     const scrollRegion = sectionsNav.closest('.overflow-y-auto')
     expect(scrollRegion?.className).toContain('scrollbar-slim')
@@ -206,13 +206,13 @@ describe('TabbedForm', () => {
     )
 
     const sectionsNav = getSectionsNav()
-    expect(sectionsNav.parentElement).toHaveClass('sticky')
+    expect(sectionsNav.parentElement).toHaveClass('ui-form-sticky-tabs')
     expect(container.querySelector('.form-scroll-body-container')).toBeNull()
     expect(sectionsNav.closest('.overflow-y-auto')).toBeNull()
 
     const toolbar = screen.getByRole('toolbar', { name: 'Form actions' })
-    expect(toolbar).toHaveClass('sticky')
-    expect(toolbar).not.toHaveClass('shrink-0')
+    expect(toolbar).toHaveClass('ui-form-actions-bar--sticky')
+    expect(toolbar).not.toHaveClass('ui-form-actions-bar--docked')
   })
 
   it('renders scrollBodyClassName as a scroll-away inset inside the scroll region', () => {
@@ -250,9 +250,13 @@ describe('TabbedForm', () => {
     )
 
     const sectionsNav = getSectionsNav()
-    expect(sectionsNav.parentElement).toHaveClass('sticky', 'bg-transparent')
-    expect(sectionsNav.parentElement).not.toHaveClass('bg-background')
-    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('bg-transparent')
+    expect(sectionsNav.parentElement).toHaveClass(
+      'ui-form-sticky-tabs',
+      'ui-form-sticky-tabs--transparent',
+    )
+    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass(
+      'ui-form-actions-bar--transparent',
+    )
   })
 
   it('renders an aside in an xl grid and keeps the footer in the form column', () => {
@@ -272,22 +276,10 @@ describe('TabbedForm', () => {
     const toolbar = screen.getByRole('toolbar', { name: 'Form actions' })
     const formColumn = toolbar.parentElement
 
-    expect(slot).toHaveClass(
-      'min-h-0',
-      'xl:col-start-2',
-      'xl:flex-col',
-      'xl:h-full',
-      'xl:row-start-1',
-    )
-    expect(formColumn).toHaveClass('xl:h-full', 'flex-col')
-    expect(grid).toHaveClass(
-      'w-full',
-      'min-w-0',
-      'xl:grid-cols-[minmax(0,1fr)_280px]',
-      '2xl:grid-cols-[minmax(0,1fr)_21rem]',
-    )
+    expect(slot).toHaveClass('ui-tabbed-form__aside')
+    expect(formColumn).toHaveClass('ui-tabbed-form__body')
+    expect(grid).toHaveClass('ui-tabbed-form')
     expect(grid).not.toHaveClass('max-w-4xl', 'mx-auto')
-    expect(formColumn).toHaveClass('xl:col-start-1')
     expect(grid).toContainElement(formColumn)
     expect(grid?.childElementCount).toBe(2)
     expect(screen.getByRole('textbox', { name: /Campaign name/i })).toBeInTheDocument()
@@ -305,7 +297,7 @@ describe('TabbedForm', () => {
 
     const preview = screen.getByRole('button', { name: 'Preview' })
     const tabRow = preview.parentElement
-    expect(tabRow).toHaveClass('sticky')
+    expect(tabRow).toHaveClass('ui-form-sticky-tabs')
     expect(tabRow).toContainElement(getSectionsNav())
   })
 
@@ -342,7 +334,7 @@ describe('TabbedForm', () => {
     )
 
     const sectionsNav = getSectionsNav()
-    expect(sectionsNav.parentElement).not.toHaveClass('sticky')
+    expect(sectionsNav.parentElement).not.toHaveClass('ui-form-sticky-tabs')
     expect(screen.queryByRole('toolbar', { name: 'Form actions' })).not.toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
   })

@@ -4,7 +4,11 @@ import { describe, expect, it } from 'vitest'
 import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
 import { MasterDetailEditorShell } from '../master-detail-editor-shell'
 import { MasterDetailGrid } from '../master-detail-grid'
-import { masterDetailListLayoutClasses } from '../master-detail-list-panel.layout'
+import {
+  masterDetailListScrollRegionClasses,
+  masterDetailListScrollViewportClasses,
+  masterDetailListShellClasses,
+} from '../master-detail-list-panel.layout'
 
 const itemNoun = defineMasterDetailItemNoun({ label: 'Trait', singular: 'trait' })
 
@@ -17,28 +21,35 @@ describe('master-detail layout variants', () => {
     )
     const grid = container.firstElementChild
     expect(grid).toHaveClass('items-start')
-    expect(grid?.className).toContain('[--master-detail-list-max-block-size:28rem]')
+    expect(grid).toHaveClass('master-detail-grid')
   })
 
   it('caps the list shell with shared viewport utilities without restating raw lengths', () => {
-    const { shell } = masterDetailListLayoutClasses
-    expect(shell).toContain('master-detail-list-shell-viewport-cap')
-    expect(shell).toContain('sticky')
-    expect(shell).toContain('top-[var(--rpg-form-sticky-tabs-block-size,0px)]')
-    expect(shell).toContain('min-h-[min(8rem,var(--master-detail-shell-max-block-size))]')
-    expect(shell).toContain('md:min-h-[min(12rem,var(--master-detail-shell-max-block-size))]')
-    expect(shell).not.toContain('28rem')
-    expect(shell).not.toContain('70dvh')
-    expect(shell).not.toContain('border-border-subtle')
+    expect(masterDetailListShellClasses).toContain('master-detail-list-shell-viewport-cap')
+    expect(masterDetailListShellClasses).toContain('sticky')
+    expect(masterDetailListShellClasses).toContain(
+      'top-[var(--rpg-form-sticky-tabs-block-size,0px)]',
+    )
+    expect(masterDetailListShellClasses).toContain(
+      'min-h-[min(8rem,var(--master-detail-shell-max-block-size))]',
+    )
+    expect(masterDetailListShellClasses).toContain(
+      'md:min-h-[min(12rem,var(--master-detail-shell-max-block-size))]',
+    )
+    expect(masterDetailListShellClasses).not.toContain('28rem')
+    expect(masterDetailListShellClasses).not.toContain('5.5rem')
+    expect(masterDetailListShellClasses).not.toContain('70dvh')
+    expect(masterDetailListShellClasses).not.toContain('border-border-subtle')
   })
 
   it('wraps list scroll in a boundary region without reserving scrollbar gutter space', () => {
-    const { scrollRegion, scrollViewport } = masterDetailListLayoutClasses
-    expect(scrollRegion).toContain('relative')
-    expect(scrollViewport).toContain('overflow-y-auto')
-    expect(scrollViewport).toContain('scrollbar-slim')
-    expect(scrollViewport).toContain('pe-0')
-    expect(scrollViewport).not.toContain('master-detail-list-shell-viewport-cap')
+    expect(masterDetailListScrollRegionClasses).toContain('relative')
+    expect(masterDetailListScrollViewportClasses).toContain('overflow-y-auto')
+    expect(masterDetailListScrollViewportClasses).toContain('scrollbar-slim')
+    expect(masterDetailListScrollViewportClasses).toContain('pe-0')
+    expect(masterDetailListScrollViewportClasses).not.toContain(
+      'master-detail-list-shell-viewport-cap',
+    )
   })
 
   it('keeps the detail shell content-sized', () => {
@@ -56,9 +67,8 @@ describe('master-detail layout variants', () => {
   })
 
   it('uses a bleed quiet panel for the list shell', () => {
-    const { shell } = masterDetailListLayoutClasses
-    expect(shell).toContain('ui-panel--quiet')
-    expect(shell).toContain('ui-panel--bleed')
-    expect(shell).not.toContain('bg-field-container')
+    expect(masterDetailListShellClasses).toContain('ui-panel--quiet')
+    expect(masterDetailListShellClasses).toContain('ui-panel--bleed')
+    expect(masterDetailListShellClasses).not.toContain('bg-field-container')
   })
 })

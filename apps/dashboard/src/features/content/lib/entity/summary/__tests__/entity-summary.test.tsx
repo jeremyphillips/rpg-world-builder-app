@@ -319,7 +319,7 @@ describe('EntitySummaryStatus', () => {
       )
 
       expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
-      expect(container.querySelector('.text-destructive')).toBeInTheDocument()
+      expect(screen.getByText('Has validation errors')).toHaveClass('sr-only')
     })
 
     it('renders nothing when status is empty', () => {

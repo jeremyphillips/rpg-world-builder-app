@@ -10,7 +10,7 @@ import type {
   CharacterBuilderStepId,
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
-import { cn, StatusIcon, Text } from '@rpg/ui'
+import { cn, interactiveFocusVariants, StatusIcon, Text } from '@rpg/ui'
 
 import {
   resolveStepRailKeyboardDirection,
@@ -22,11 +22,9 @@ import {
   stepStatusAriaLabel,
 } from '../../../lib/builder/builder-step-visual-status'
 import {
-  characterBuilderStepRailClasses,
   characterBuilderStepRailIconClasses,
   characterBuilderStepRailItemActiveClasses,
   characterBuilderStepRailItemClasses,
-  characterBuilderStepRailItemLabelActiveClasses,
   characterBuilderStepRailNavClasses,
 } from '../character-builder-shell.variants'
 
@@ -90,7 +88,7 @@ export function CharacterBuilderStepRail({
       className={characterBuilderStepRailNavClasses}
       onKeyDown={handleStepRailKeyDown}
     >
-      <ol className={characterBuilderStepRailClasses}>
+      <ol>
         {effectiveSteps.map((step, index) => {
           const visualStatus = resolveStepVisualStatus({
             stepId: step.id,
@@ -116,6 +114,7 @@ export function CharacterBuilderStepRail({
                 aria-label={stepStatusAriaLabel(step.label, visualStatus)}
                 className={cn(
                   characterBuilderStepRailItemClasses,
+                  interactiveFocusVariants({ context: 'standalone' }),
                   isActive && characterBuilderStepRailItemActiveClasses,
                 )}
                 onClick={() => onStepSelect(step.id)}
@@ -128,10 +127,7 @@ export function CharacterBuilderStepRail({
                 <Text
                   as="span"
                   variant="body"
-                  className={cn(
-                    'min-w-0 font-medium',
-                    isActive && characterBuilderStepRailItemLabelActiveClasses,
-                  )}
+                  className="dash-character-builder__step-label min-w-0 font-medium"
                 >
                   {step.label}
                 </Text>

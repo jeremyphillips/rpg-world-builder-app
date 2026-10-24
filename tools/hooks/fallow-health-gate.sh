@@ -9,6 +9,7 @@ if [[ "${1:-}" == "--coverage" ]]; then
     echo "usage: fallow-health-gate.sh [--coverage <coverage-final.json>]" >&2
     exit 2
   fi
+  node "$(dirname "$0")/../scripts/sanitize-coverage-final.mjs" "$2"
   cmd+=(--coverage "$2")
 fi
 

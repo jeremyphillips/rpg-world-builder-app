@@ -26,22 +26,21 @@ import {
  * ViewportWorkspace is the bounded exception for multi-pane editors.
  */
 describe('AppShell route scroll ownership', () => {
-  it('does not lock the document on the app shell root', () => {
-    expect(appShellRootClasses).toContain('min-h-dvh')
-    expect(appShellRootClasses).not.toContain('overflow-hidden')
-    expect(appShellRootClasses).not.toMatch(/(?:^|\s)h-dvh(?:\s|$)/)
-    expect(appShellRootClasses).not.toContain('max-h-dvh')
+  it('maps the app shell to dash-app-shell blocks', () => {
+    expect(appShellRootClasses).toBe('dash-app-shell')
+    expect(appShellContentColumnClasses).toBe('dash-app-shell__column')
+    expect(appShellMainClasses).toBe('dash-app-shell__main')
   })
 
   it('main is a flex column participant but not a scrollport', () => {
-    expect(appShellMainClasses).toContain('min-w-0')
-    expect(appShellMainClasses).toContain('flex-1')
-    expect(appShellMainClasses).toContain('flex-col')
-    expect(appShellMainClasses).toContain('min-h-0')
-    expect(appShellMainClasses).not.toContain('overflow-y-auto')
-    expect(appShellMainClasses).toContain('has-[[data-viewport-fill=workspace]]:overflow-hidden')
-    expect(appShellMainClasses).not.toContain('min-h-full')
-    expect(appShellMainClasses).not.toContain('h-full')
+    const { container } = render(
+      <main className={appShellMainClasses}>
+        <p>Body</p>
+      </main>,
+    )
+    const main = container.querySelector('main')
+    expect(main).toHaveClass('dash-app-shell__main')
+    expect(main).not.toHaveClass('overflow-y-auto')
   })
 
   it('html, body, and #root are not viewport-locked in the dashboard mount', () => {
@@ -87,14 +86,9 @@ describe('AppShell route scroll ownership', () => {
     expect(widthShell).not.toHaveClass('pt-8', 'pb-8')
   })
 
-  it('defines :has() viewport lock tokens for ViewportWorkspace routes', () => {
-    expect(appShellContentColumnClasses).toContain('has-[[data-viewport-fill=workspace]]:h-dvh')
-    expect(appShellContentColumnClasses).toContain('has-[[data-viewport-fill=workspace]]:max-h-dvh')
-    expect(appShellContentColumnClasses).toContain(
-      'has-[[data-viewport-fill=workspace]]:overflow-hidden',
-    )
-    expect(appShellMainClasses).toContain('has-[[data-viewport-fill=workspace]]:h-0')
-    expect(appShellContentColumnClasses).not.toMatch(/(?:^|\s)h-dvh(?:\s|$)/)
+  it('defines viewport lock on dash-app-shell column and main for ViewportWorkspace routes', () => {
+    expect(appShellContentColumnClasses).toBe('dash-app-shell__column')
+    expect(appShellMainClasses).toBe('dash-app-shell__main')
   })
 
   it('documents messages workspace as a ViewportWorkspace pane', () => {

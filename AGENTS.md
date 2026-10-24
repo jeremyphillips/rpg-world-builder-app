@@ -224,6 +224,10 @@ strings.
   [packages/ui/docs/semantic-style-layers.md](packages/ui/docs/semantic-style-layers.md);
   control migration shape →
   [packages/ui/docs/semantic-control-css.md](packages/ui/docs/semantic-control-css.md).
+  Static layout custom-property contracts (`--rpg-*`, `--app-*`, master-detail caps) belong
+  on the owning block or utility rule in that CSS — not as parallel Tailwind arbitrary-property
+  stacks. Shell publisher table →
+  [packages/ui/docs/semantic-css-migration.md#shell-ownership-frozen-at-p0](packages/ui/docs/semantic-css-migration.md#shell-ownership-frozen-at-p0).
 - **Inline Tailwind:** Simple, local layout utilities (`flex`, `gap-3`, `min-w-0`, grid
   tracks, alignment) may remain directly in JSX when clearer than an abstraction.
 - **Variants:** Use CVA and `*.variants.ts` only when resolving meaningful visual variants

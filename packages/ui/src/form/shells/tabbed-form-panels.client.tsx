@@ -25,9 +25,6 @@ import {
   formFooterSpacingClasses,
   formStickyTabsClasses,
   formTabbedInactivePanelClasses,
-  formTabbedNavControlWrapClasses,
-  formTabbedNavOverflowClasses,
-  formTabbedNavWithTrailingClasses,
 } from '../chrome/form-chrome.variants'
 import { warnHeaderOnlyTabValidationWiring } from './warn-header-only-tab-validation-wiring'
 import { collectTabbedFormResolverItems, type TabbedFormTab } from './tabbed-form-panels.lib'
@@ -197,14 +194,14 @@ export function TabbedFormPanels({
     <div className={fieldStackRhythmVariants({ rhythm })}>
       <div
         className={cn(
-          tabRowTrailing ? formTabbedNavWithTrailingClasses : formTabbedNavOverflowClasses,
+          tabRowTrailing ? 'flex items-center gap-2' : 'min-w-0 overflow-x-auto',
           stickyChrome ? formStickyTabsClasses : undefined,
           stickyTabsClassName,
         )}
       >
         {tabRowTrailing ? (
           <>
-            <div className={formTabbedNavControlWrapClasses}>{sectionControl}</div>
+            <div className="min-w-0 flex-1 overflow-x-auto">{sectionControl}</div>
             {tabRowTrailing}
           </>
         ) : (

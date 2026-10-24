@@ -324,3 +324,106 @@ Selection-card shells wait for the option-card owner (**W8**). Entity preview fr
 | Disclosure variants         | simplified | Caret `expanded` only. Campaign sections stay off `NavSection`          |
 | Bench sidebar               | exception  | Separate static column. No overlay and no `w-sidebar` in this close-out |
 | Sidebar scroll              | deferred   | Ad hoc `scrollbar-slim`. Bounded scroll adds `pe-2.5`                   |
+
+## Shell ownership (frozen at P0)
+
+Frozen 2026-10-23. Do not reopen a **(settled)** boundary or a B1 block split without new evidence. Dispositions below are the contract for later waves. This section does not apply those class names yet.
+
+Precedence used for every later relocation: within the established cascade layers, utility declarations override component declarations when targeting the same property on the same element. Custom-property inheritance, element scope, inline styles, and specificity within a layer remain relevant. Moving a declaration from `@layer utilities` into `@layer components` lowers its precedence on that element. A custom property is inherited only by descendants of the element that declares it. Portaled content (Radix `Sheet`, `Dialog`, popovers) inherits from `body`, not from the page tree.
+
+### Ownership matrix
+
+| Owner                                                   | What it owns                                                                                                                                                                                                                                                                                                                                                  | Disposition                                                                                                                                                                             |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **AppShell** (`app-shell.variants.ts`, `app-shell.tsx`) | Frame, content column, sticky chrome, `<main>`, breadcrumb rail. Document scroll by default; `<main>` is never a scrollport **(settled, feature-conventions)**. `sm` gutter. `:has([data-viewport-fill=workspace])` height lock. Publishes `--app-sticky-chrome-block-size`. The list utility resolves `--rpg-content-top-inset`; `<main>` does not alias it. | `dash-app-shell` block                                                                                                                                                                  |
+| **PageShell and page spacing**                          | Width, inset, and rhythm prop resolvers **(settled, feature-conventions; ui-architecture)**.                                                                                                                                                                                                                                                                  | Retained. No block. Delete only the unused `page-top` inset key.                                                                                                                        |
+| **ViewportWorkspace**                                   | Anonymous flex fill plus the `data-viewport-fill` marker.                                                                                                                                                                                                                                                                                                     | Retained. No block. Delete the dead `APP_STICKY_CHROME_BLOCK_SIZE_VAR`.                                                                                                                 |
+| **ContentFormPageShell**                                | `PageShell` root stays `PageShell`. The styled element this shell owns is the wide-only body `<div>` (React decides when it renders). That body owns one contract: `--rpg-page-heading-inset: 4rem`.                                                                                                                                                          | Minimal `dash-content-form-page` block on that existing body. Block CSS carries only the contract. Anonymous `flex min-h-0 flex-1 flex-col` stays inline. No new elements or modifiers. |
+| **Form chrome** (`@rpg/ui/form`)                        | Four blocks, frozen below.                                                                                                                                                                                                                                                                                                                                    | See B1 boundaries.                                                                                                                                                                      |
+| **CharacterBuilderPageShell**                           | Route host. Owns `ViewportWorkspace` plus `PageShell` exactly once **(settled, character README; ownership test)**.                                                                                                                                                                                                                                           | No block. Inline its one class at the owner and delete the variants file.                                                                                                               |
+| **CharacterBuilderShell**                               | 3-column grid, header, `--character-builder-header-rail-gap` (consumed only inside this shell), and the step-rail accent, which stays host-owned **(settled, semantic-style-layers)**.                                                                                                                                                                        | `dash-character-builder` block, separate from the page shell.                                                                                                                           |
+| **Master-detail**                                       | Panel quiet bleed, the viewport cap in `master-detail-list-scroll.utilities.css`, and retained rows **(settled, W15B)**.                                                                                                                                                                                                                                      | No block. Static defaults move into the existing utilities CSS.                                                                                                                         |
+| **Out of scope**                                        | Messages workspace, DrawerShell **(settled, drawer-shell.md)**, DetailPageHeader, in-page section nav (reads variables only).                                                                                                                                                                                                                                 | Deletions only, where the deletion inventory names them.                                                                                                                                |
+
+`contentFormPageShellHeadingClasses` is unused. It is not the page heading's styling owner.
+
+`formViewportScrollBodyTopInsetClasses` is `pt-8`. Dashboard `pageShellInsetTopClasses` is `pt-6`. The viewport-bound form scroller is `ScrollBoundaryRegion` plus `formStickyScrollBodyScrollViewportClasses`. `formStickyScrollBodyScrollerClasses` is a legacy alias the runtime does not apply.
+
+### B1 block boundaries
+
+**1. `ui-tabbed-form`.** Renders from `TabbedForm` only when `aside && !externalFooter`. Grid → `ui-tabbed-form`. Form column → `__body`. Aside slot → `__aside`. Owns the two-column composition (`xl` / `2xl` tracks, aside hidden until `xl`, aside insets). Publishes and consumes no variables. No nesting observed; dashboard content forms render the aside. Separate because this is layout beside a rail, not scrolling or the footer. In docked mode, `__body` also carries `ui-form-docked-shell`. Both rules sit in `@layer components`. Their only overlap is `display: flex; flex-direction: column`, with identical values. Keep that overlap identical.
+
+**2. `ui-form-docked-shell`.** One shared contract. The same class constant, `formStickyScrollShellWithDockedFooterClasses`, is applied at three owners: `TabbedForm` (one column wrapper — `ui-tabbed-form__body` plus the shell when `aside` is set, shell only otherwise), `FormShellChildren` (the `Form` docked path), and `CharacterBuilderFormColumn` (dashboard). Owns the flex column (scroll body above, docked bar below) and publishes:
+
+- `--rpg-form-docked-actions-bar-block-size: 69px`
+- `--rpg-content-floor-gap: 1rem`
+- `--rpg-form-viewport-scroll-body-top-inset: 2rem`
+- `--rpg-form-identity-header-block-size: 8rem`
+- `--rpg-form-sticky-tabs-block-size: 3rem`
+- `--rpg-form-docked-scroll-top-chrome-inset` (the sum of the three above)
+- `--rpg-content-bottom-inset`
+
+Consumers: `master-detail-list-scroll.utilities.css` (bottom inset, floor gap, and docked top-chrome inset; the list resolves the viewport top total itself); `master-detail-list-panel.layout.ts` (`top-[var(--rpg-form-sticky-tabs-block-size,0px)]`); the docked actions bar's `min-height`. The tabs block size lives on this shell because master-detail lists render inside panels that are siblings of the tab row. One CSS rule; the three owners are consumers. `TabbedForm` shares one `formColumnContent` fragment for aside and non-aside layouts. `CharacterBuilderFormColumn` applying a `ui-*` block from the dashboard is a documented cross-owner contract. No wrapper component. A nested docked shell re-declares the same absolute values, including form scroll chrome, so the list's viewport total counts that chrome once. Forms inside `Sheet` / `Dialog` are portaled, so they do not inherit page contracts (`--rpg-content-*` falls back to `0px`). P0 did not find a docked shell inside a portal. The content-form drawer story renders a dialog and does not apply the docked-shell contract (`externalFooter`). Player-character create applies the docked shell in the page tree, outside `AppShell`. The local bench had no tickets, so the portaled ticket sheet was not captured.
+
+**3. `ui-form-sticky-tabs`.** Renders from `TabbedFormPanels`, on the tab-row `<div>` when `stickyChrome` is set. Anonymous nav-overflow and with-trailing layout stay inlined on that element. `stickyTabsClassName` is the consumer override; the bench ticket sheet passes the transparent preset, which becomes the `--transparent` modifier. Owns sticky `top-0`, `z-20`, the backdrop fill, and the transparent variant. Publishes and consumes no variables. Sticky positioning resolves against the nearest scrollport (the docked scroll viewport in docked mode, otherwise the document). Separate because a different component renders it and it has its own variant. It does not depend on docked mode.
+
+**4. `ui-form-actions-bar`.** Renders from `FormActionsBar`, on its `<div role="toolbar">`. `placement` selects `--sticky` or `--docked`. The existing `className` passthrough stays. Owns border, fill, padding, and sticky versus docked behavior. `--docked` reads `min-height: var(--rpg-form-docked-actions-bar-block-size)`. Today the bar also re-declares the 69px value on itself. To keep one value, declare it once in a selector list: `.ui-form-docked-shell, .ui-form-actions-bar--docked { --rpg-form-docked-actions-bar-block-size: 69px }`. The docked bar is a direct child of a docked shell at every mount, including `CharacterBuilderFooter`. Separate because `FormActionsBar` renders it in both sticky and docked modes.
+
+**Not a block.** The scroll clip and viewport stay `FormStickyScrollBody` plus `ScrollBoundaryRegion`. `form-scroll-body-container` stays a `@utility` because master-detail's `@container form-scroll-body` depends on it. The non-docked `formStickyScrollShellClasses` is anonymous layout and is inlined.
+
+### B4 master-detail defaults (complete)
+
+Static contract defaults moved into `master-detail-list-scroll.utilities.css`:
+
+- `--master-detail-list-chrome-block-size: 5.5rem` on `@utility master-detail-list-shell-viewport-cap` (same element as before: the list `nav` shell).
+- `--master-detail-list-max-block-size: 28rem` on `@utility master-detail-grid`, applied by `MasterDetailGrid`.
+
+Inventory: production declares `28rem` only on `MasterDetailGrid`. Story wrappers set `12rem` on an ancestor, but the grid's self-declaration shadows that ancestor, so stories still resolve `28rem` until hosts stop using the grid default. A utility fallback (`var(--master-detail-list-max-block-size, 28rem)` on the viewport cap only) would let ancestor overrides win and would change story parity; the grid-scoped utility preserves observed behavior.
+
+Deleted: Tailwind arbitrary-property strings for those defaults, `masterDetailListLayoutClasses` (tests import the shell and scroll constants directly). The temporary ratchet bucket is empty after B4.
+
+### Content top inset (resolved)
+
+Owners publish contributions. The master-detail list utility is the only declaration of `--rpg-content-top-inset`. That value is the layout-viewport total a `100dvh` cap subtracts: `--app-sticky-chrome-block-size` + `--rpg-page-heading-inset` + `--rpg-form-docked-scroll-top-chrome-inset`, each falling back to `0px`. It is not a coordinate inside a nested scrollport.
+
+| Contribution       | Variable                                    | Where it is published                                        |
+| ------------------ | ------------------------------------------- | ------------------------------------------------------------ |
+| App chrome         | `--app-sticky-chrome-block-size`            | `.dash-app-shell` (`calc(3rem + 2rem)`)                      |
+| Page heading       | `--rpg-page-heading-inset`                  | `.dash-content-form-page` (`4rem`), wide viewport forms only |
+| Form scroll chrome | `--rpg-form-docked-scroll-top-chrome-inset` | `.ui-form-docked-shell` (`2rem + 8rem + 3rem`)               |
+
+`--rpg-content-bottom-inset` stays on the docked shell. Outside `form-scroll-body`, list `max-height` is `min(content cap, 100dvh - top total - bottom inset)`. Inside the container, used `max-height` is `min(content cap, 100cqh - form scroll chrome - floor gap)` and does not subtract the viewport total or the bottom inset. The clip is already below app chrome and above the docked bar. Min-height floors still read `--master-detail-shell-max-block-size`.
+
+**Before the fix** (2026-10-23, after B2, `xl` 1280×900, Kobold Warrior edit). `<main>` computed `calc(3rem + 2rem)`. The wide body and docked shell each declared `--rpg-content-top-inset` in terms of itself, so the property was guaranteed-invalid there and on the traits list. The dvh term used `0px` for the top inset. Bottom inset and form scroll chrome still resolved. Inside the form scroll container, used `max-height` was the container path (526px at 900px viewport height, 106px at 480px). Outside the container at 480px, the dvh branch beat the 536px content cap (395px) while still ignoring form chrome.
+
+A source scan rejects any declaration of `--rpg-content-top-inset` whose value reads `var(--rpg-content-top-inset`. Geometry is covered by `master-detail-content-top-inset.contract.test.ts` (Playwright Chromium via `@rpg/ui/test-utils` `launchHeadlessChromium`).
+
+### Tailwind custom-property utility ratchet (G)
+
+Occurrence-level guard for Tailwind arbitrary-property declarations (`[--name:value]`) in `packages/ui/src`, `apps/dashboard/src`, and `apps/bench/src` (excluding `*.test.*`, `*.stories.*`, and CSS). `var(--x)` reads and inline `style` objects are out of scope.
+
+Regression: `tailwind-custom-property-declaration.test.ts` with `tailwind-custom-property-declaration.baseline.json`.
+
+| Bucket        | Policy                                                                                                                        |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **temporary** | Shell migration utilities (B1–B4). Counts may shrink as waves land; update the baseline when they do. Must be empty after B4. |
+| **approved**  | Frozen exceptions (owner file, category, reason, count). Counts must not grow; new entries require an explicit baseline edit. |
+
+**Approved exceptions:**
+
+| File                                | Variable(s)                                                 | Category         |
+| ----------------------------------- | ----------------------------------------------------------- | ---------------- |
+| `surface-current.lib.ts`            | `--surface-current`                                         | variant-resolver |
+| `field-control-surface.variants.ts` | `--field-control-bg`                                        | variant-resolver |
+| `rich-text-content.variants.ts`     | `--tw-prose-body`, `--tw-prose-headings`, `--tw-prose-bold` | plugin-api       |
+| `ticket-card.variants.ts` (bench)   | `--icon-size`                                               | local-layout     |
+
+### Parity baseline
+
+Capture script, surface list, and JSON baselines live in `.tmp/shell-parity/` and are not committed. Rendering: light theme, `prefers-reduced-motion: reduce`, DPR 1, viewport height 900px, sidebar default. Viewports 390, 768, 1280, and 1536. Each capture is at scrollTop 0 and at the active scrollport's maximum.
+
+- **`p0-baseline.json`** — frozen pre-BEM / pre-F1 snapshot (historical).
+- **`post-f1-baseline.json`** — current gate after F1 inset resolution (2026-10-24 re-capture). Compare fresh captures with `node regress.mjs post-f1-baseline.json regression-capture.json`.
+- **`regress.mjs`** third argument: `strict` (computed + variables + rects + behavior) or `geometry` (presence, tag, rects, docked-shell counts, behavior). Expect **strict** and **geometry** to fail vs `p0-baseline.json` on inset contract fields; **0** rect diffs is the layout bar. Post-F1 summary: `post-f1-parity-summary.json`.
+
+Captured: fighter edit (preview rail), Kobold Warrior traits and actions, PC create, NPC create, campaign settings, messages, nested-resource master-detail story, Character builder shell story, and the content-form drawer story. At `xl` and `2xl` the preview rail is visible (280px, then 336px) and the compact Preview control is `display: none`. Below `xl` the rail box is 0×0 and the compact control is visible. Not captured: campaign onboarding (the agent campaign's `viewerState.kind` is `ready`) and the bench ticket sheet (no local tickets). PC create is mounted outside `AppShell`.

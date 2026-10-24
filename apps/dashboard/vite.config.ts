@@ -33,6 +33,8 @@ function manualChunks(id: string): string | undefined {
 // Router basename so client routes resolve under `/app`.
 export default defineConfig({
   base: '/app/',
+  // Tailwind emits CSS source maps only when this is on. It defaults to false.
+  css: { devSourcemap: true },
   plugins: [
     react(),
     tailwindcss(),

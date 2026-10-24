@@ -1,6 +1,18 @@
 import type { StorybookConfig } from '@storybook/react-vite'
 import tailwindcss from '@tailwindcss/vite'
 
+type ViteConfigWithCss = {
+  css?: {
+    devSourcemap?: boolean
+  }
+}
+
+/** Tailwind emits CSS source maps only when Vite's `css.devSourcemap` is true. */
+function enableCssDevSourcemap<T extends ViteConfigWithCss>(viteConfig: T): T {
+  viteConfig.css = { ...viteConfig.css, devSourcemap: true }
+  return viteConfig
+}
+
 export type CreateStorybookMainConfigOptions = {
   stories: NonNullable<StorybookConfig['stories']>
   viteFinal?: StorybookConfig['viteFinal']
@@ -24,12 +36,13 @@ export function createStorybookMainConfig(
     viteFinal: async (viteConfig, viteOptions) => {
       viteConfig.plugins ??= []
       viteConfig.plugins.push(tailwindcss())
+      enableCssDevSourcemap(viteConfig)
 
-      if (options.viteFinal) {
-        return options.viteFinal(viteConfig, viteOptions)
+      if (!options.viteFinal) {
+        return viteConfig
       }
 
-      return viteConfig
+      return enableCssDevSourcemap(await options.viteFinal(viteConfig, viteOptions))
     },
   }
 }

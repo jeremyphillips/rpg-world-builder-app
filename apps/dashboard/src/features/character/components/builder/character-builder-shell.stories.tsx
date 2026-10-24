@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { withDashboardProviders } from '../../../../../.storybook/decorators'
+
 import {
   createStandaloneBuilderCatalogIndexFixture,
   createPopulatedStandaloneBuilderContextFixture,
@@ -10,6 +12,7 @@ const meta = {
   title: 'Character Builder/CharacterBuilderShell',
   component: CharacterBuilderShell,
   parameters: { layout: 'fullscreen' },
+  decorators: [withDashboardProviders],
 } satisfies Meta<typeof CharacterBuilderShell>
 
 export default meta

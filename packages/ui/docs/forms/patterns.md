@@ -15,9 +15,11 @@ column; `FormActionsBar` docks below a bounded scroll body
 (`formStickyScrollShellWithDockedFooterClasses` + `FormStickyScrollBody`) so save actions
 stay at the bottom of the viewport on long page forms. The docked-footer shell composition
 publishes `--rpg-content-bottom-inset` (standard docked actions bar footprint via
-`--rpg-form-docked-actions-bar-block-size`) and augments `--rpg-content-top-inset` with
-conservative scroll-chrome contracts for bounded inner panels that subtract them from
-viewport-relative fallback caps — not remaining content height. `--rpg-content-bottom-inset` is
+`--rpg-form-docked-actions-bar-block-size`) and `--rpg-form-docked-scroll-top-chrome-inset`
+(viewport scroll padding + identity header + sticky tabs). It does not publish
+`--rpg-content-top-inset`. The master-detail list resolves that viewport total from the
+app, page-heading, and form-chrome contributions. The lengths are reserved chrome, not
+remaining content height. `--rpg-content-bottom-inset` is
 for the **dvh fallback only**; slight under-fill is preferable to overlap with the docked
 footer. Master-detail list rails offset sticky `top` with
 `var(--rpg-form-sticky-tabs-block-size)` and cap via one resolved
@@ -35,9 +37,8 @@ footer (flush to the viewport bottom). Non-preview catalog routes and settings-s
 it never selects scroll ownership; pass explicit `boundedScroll` or use the docked-footer shell path.
 Top inset scrolls away via `scrollBodyClassName` (typically `formViewportScrollBodyTopInsetClasses`)
 as the first child inside the scroll region — not as padding on the scroll container — so sticky
-tabs can reach `top-0`; preview-rail top
-gutter lives on `formTabbedAsideSlotTopInsetClasses`; bottom breathing room on
-`formTabbedAsideSlotBottomInsetClasses` (`xl:pb-4` — intentional inset so preview content clears
+tabs can reach `top-0`. Preview-rail aside insets live on `ui-tabbed-form__aside` in
+`form-chrome.css` (`padding-top` from `xl`, `padding-bottom` on `xl` so preview content clears
 the docked form footer; the form-column footer itself stays flush). Plain `<Form>` with docked
 sticky footer passes `boundedScroll` on the scroll body when `usesDockedStickyFooter`.
 Inner scroll regions compose [`boundedScrollRegionClasses`](../bounded-scroll-region.md) for
@@ -48,6 +49,20 @@ place `<FormShellFooterSlot />` inside for semantic footer content. Use `FormShe
 for submit actions rendered outside the `<form>` element.
 
 Presets: `formStickyTabsTransparentClasses`, `formStickyActionsBarTransparentClasses`.
+
+### Docked shell (`ui-form-docked-shell`)
+
+One CSS contract; `formStickyScrollShellWithDockedFooterClasses` mounts it at three owners:
+
+1. `TabbedForm` form column (`ui-form-docked-shell` on the column wrapper, or mixed with `ui-tabbed-form__body` when an aside is present)
+2. `FormShellChildren` when `<Form stickyFooter>` is docked (`documentScroll` and `externalFooter` false)
+3. Dashboard `CharacterBuilderFormColumn` (documented cross-owner use of the `ui-*` block)
+
+The shell publishes form scroll chrome, floor gap, docked bar block size, and
+`--rpg-content-bottom-inset`. It does not publish `--rpg-content-top-inset`; the master-detail list
+utility resolves that viewport total from app chrome, page heading, and form chrome in scope.
+`TabbedForm` with `externalFooter` (drawer, dialog) skips the docked shell; footer chrome is
+portaled, so page `--rpg-*` contracts do not apply inside the overlay.
 
 Optional `aside` (inside `FormProvider`) + `tabRowTrailing` for a compact tab-row action. At `xl`
 the body is a full-width two-column grid (form `minmax(0, 1fr)` + aside `280px`; at `2xl` the same

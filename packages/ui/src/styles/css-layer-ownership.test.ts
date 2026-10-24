@@ -3,7 +3,8 @@ import { createRequire } from 'node:module'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { chromium, type Browser } from 'playwright'
+import type { Browser } from 'playwright'
+import { launchHeadlessChromium } from '../test-utils/launch-headless-chromium.lib'
 import ts from 'typescript'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
@@ -528,7 +529,7 @@ describe('css layer ownership', () => {
       }
     }
     expect(violations).toEqual([])
-  })
+  }, 15_000)
 
   it('keeps semantic CSS inside the entry graph and named layers', () => {
     const graph = stylesheetGraph()
@@ -583,18 +584,7 @@ describe('css cascade in a browser', () => {
       const dev = compiler.build(['p-0', 'border-0', 'text-xs'])
       built.push({ name: sheet, dev, prod: tailwind.optimize(dev, { minify: true }).code })
     }
-    try {
-      browser = await chromium.launch({ channel: 'chrome', headless: true })
-    } catch (chromeError) {
-      try {
-        browser = await chromium.launch({ headless: true })
-      } catch (bundledError) {
-        throw new Error(
-          `Cascade checks need Chrome or Playwright's Chromium.\n${String(chromeError)}\n${String(bundledError)}`,
-          { cause: bundledError },
-        )
-      }
-    }
+    browser = await launchHeadlessChromium()
   }, 180_000)
 
   afterAll(async () => {

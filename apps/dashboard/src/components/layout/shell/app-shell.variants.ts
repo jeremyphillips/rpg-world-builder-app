@@ -7,12 +7,6 @@
  */
 export const appShellHorizontalPaddingClasses = 'px-4 sm:px-6'
 
-/** Breadcrumb rail row height (matches `h-8` / 32px). */
-export const appBreadcrumbRailBlockSize = '2rem'
-
-/** Sticky topbar + breadcrumb block size — sticky rail offsets and layout tokens. */
-export const appStickyChromeBlockSize = `calc(3rem + ${appBreadcrumbRailBlockSize})`
-
 /**
  * Fallback inside Tailwind `var(--app-sticky-chrome-block-size, …)` when the
  * custom property is unset (no spaces — valid in arbitrary properties).
@@ -23,29 +17,16 @@ export const appStickyChromeBlockSizeVarFallback = 'calc(3rem+2rem)'
 export const appStickyChromeBlockSizeFallbackPx = 80
 
 /** Outer authenticated workspace frame — document scroll; no viewport lock. */
-export const appShellRootClasses = `flex min-h-dvh bg-background [--app-sticky-chrome-block-size:${appStickyChromeBlockSize}]`
+export const appShellRootClasses = 'dash-app-shell'
 
-/**
- * Content column beside the sidebar — grows with document-scroll routes.
- * `:has([data-viewport-fill=workspace])` caps height when a ViewportWorkspace is mounted.
- */
-export const appShellContentColumnClasses =
-  'flex min-h-dvh min-w-0 flex-1 flex-col has-[[data-viewport-fill=workspace]]:h-dvh has-[[data-viewport-fill=workspace]]:max-h-dvh has-[[data-viewport-fill=workspace]]:min-h-0 has-[[data-viewport-fill=workspace]]:overflow-hidden'
+/** Content column beside the sidebar. */
+export const appShellContentColumnClasses = 'dash-app-shell__column'
 
-/**
- * Sticky dashboard chrome (topbar + breadcrumb) pinned while the document scrolls.
- * Publishes `--app-sticky-chrome-block-size` for sticky rail offsets.
- */
-export const appShellStickyChromeClasses = 'sticky top-0 z-30 shrink-0 bg-background'
+/** Sticky dashboard chrome (topbar + breadcrumb). */
+export const appShellStickyChromeClasses = 'dash-app-shell__chrome'
 
-/**
- * Primary routed content column — flex participant for ViewportWorkspace fill;
- * still grows with content for ordinary document-scroll routes.
- */
-export const appShellMainClasses = `${appShellHorizontalPaddingClasses} flex min-h-0 min-w-0 flex-1 flex-col [--rpg-content-top-inset:var(--app-sticky-chrome-block-size)] has-[[data-viewport-fill=workspace]]:h-0 has-[[data-viewport-fill=workspace]]:overflow-hidden`
-
-export const APP_SHELL_CONTENT_COLUMN_ATTR = 'data-app-shell-content-column'
-export const APP_SHELL_MAIN_ATTR = 'data-app-shell-main'
+/** Primary routed content column. */
+export const appShellMainClasses = 'dash-app-shell__main'
 
 /** Breadcrumb rail — shares horizontal gutter with main content. */
-export const appShellBreadcrumbRailClasses = `border-b border-border ${appShellHorizontalPaddingClasses}`
+export const appShellBreadcrumbRailClasses = 'dash-app-shell__breadcrumb-rail'

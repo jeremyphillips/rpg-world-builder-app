@@ -20,8 +20,6 @@ import {
   formTabbedAsideBodyClasses,
   formTabbedAsideGridClasses,
   formTabbedAsideSlotClasses,
-  formTabbedChromeRhythmStackClasses,
-  formStickyScrollShellClasses,
   formStickyScrollShellWithDockedFooterClasses,
 } from '../chrome/form-chrome.variants'
 import { FormStickyScrollBody } from '../chrome/form-sticky-scroll-body.client'
@@ -260,7 +258,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
 
   const externalFooterBody = (
     <DialogPanelScrollRegion inset="section">
-      <FormRhythmStack className={formTabbedChromeRhythmStackClasses}>
+      <FormRhythmStack className="gap-4">
         {resolvedHeader}
         {panels}
         {validationSummary}
@@ -287,24 +285,24 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       {scrollBodyClassName && !usesDockedScrollBody ? (
         <FormScrollBodyTopInset className={scrollBodyClassName} />
       ) : null}
-      <FormRhythmStack className={formTabbedChromeRhythmStackClasses}>
+      <FormRhythmStack className="gap-4">
         {resolvedHeader}
         {contentWrapper ? contentWrapper(panels) : panels}
       </FormRhythmStack>
     </>
   )
 
-  const stickyScrollShellClasses = usesDockedScrollBody
+  const dockedShellClass = usesDockedScrollBody
     ? formStickyScrollShellWithDockedFooterClasses
-    : formStickyScrollShellClasses
+    : undefined
 
-  const columnBody = usesDockedScrollBody ? (
-    <div className={stickyScrollShellClasses}>
+  const formColumnContent = usesDockedScrollBody ? (
+    <>
       <FormStickyScrollBody scrollBodyClassName={scrollBodyClassName} boundedScroll>
         {scrollableBody}
       </FormStickyScrollBody>
       {footerRegion}
-    </div>
+    </>
   ) : (
     <>
       {scrollableBody}
@@ -312,33 +310,25 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     </>
   )
 
+  const formColumnWrapperClasses = cn(
+    aside && !externalFooter ? formTabbedAsideBodyClasses : null,
+    dockedShellClass,
+  )
+
+  const formColumn = formColumnWrapperClasses ? (
+    <div className={formColumnWrapperClasses}>{formColumnContent}</div>
+  ) : (
+    formColumnContent
+  )
+
   const defaultLayout =
     aside && !externalFooter ? (
       <div className={formTabbedAsideGridClasses}>
-        <div
-          className={cn(
-            formTabbedAsideBodyClasses,
-            usesDockedScrollBody && stickyScrollShellClasses,
-          )}
-        >
-          {usesDockedScrollBody ? (
-            <>
-              <FormStickyScrollBody scrollBodyClassName={scrollBodyClassName} boundedScroll>
-                {scrollableBody}
-              </FormStickyScrollBody>
-              {footerRegion}
-            </>
-          ) : (
-            <>
-              {scrollableBody}
-              {footerRegion}
-            </>
-          )}
-        </div>
+        {formColumn}
         <div className={formTabbedAsideSlotClasses}>{aside}</div>
       </div>
     ) : (
-      columnBody
+      formColumn
     )
 
   return (

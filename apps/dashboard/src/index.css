@@ -19,4 +19,7 @@
 @import './features/character/components/builder/steps/spells/spell-level-tabs.css';
 @import './features/media/components/media-manager/media-manager.css';
 @import './features/global-search/components/topbar/global-search-trigger.css';
+@import './components/layout/shell/app-shell.css';
+@import './features/character/components/builder/character-builder-shell.css';
+@import './features/content/lib/forms/shells/layout/content-form-page-shell.css';
 @source "../node_modules/@rpg/ui/src";

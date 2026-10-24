@@ -1,0 +1,5 @@
+@layer components {
+  .dash-content-form-page {
+    --rpg-page-heading-inset: 4rem;
+  }
+}
