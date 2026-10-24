@@ -1,4 +1,3 @@
-import { cva } from 'class-variance-authority'
 import type { CSSProperties } from 'react'
 
 import type { FieldWidth } from '../../../components/ui/field-control.variants'
@@ -50,9 +49,8 @@ export const arrayItemAnatomyChromeColumnClasses = cn(
  * Do not nest a second `[grid-template-rows:auto_auto_auto]` grid for fields — that
  * duplicates track sizing and drifts when labels wrap or messages grow.
  */
-export const arrayItemAnatomyGridVariants = cva(
-  '@container/array-item array-item-anatomy-grid grid min-w-0 grid-rows-[auto_auto_auto]',
-)
+export const arrayItemAnatomyGridVariants =
+  '@container/array-item array-item-anatomy-grid grid min-w-0 grid-rows-[auto_auto_auto]'
 
 /**
  * Array inline rows use intrinsic-aware `auto` tracks so digit controls keep their
@@ -120,7 +118,7 @@ export function resolveArrayItemAnatomyGridPresentation(
   const fieldGapClass = resolveArrayItemFieldGapClass(fieldGap)
 
   return {
-    className: cn(arrayItemAnatomyGridVariants(), ARRAY_ITEM_CHROME_GAP_CLASS),
+    className: cn(arrayItemAnatomyGridVariants, ARRAY_ITEM_CHROME_GAP_CLASS),
     style: {
       ...buildCollapsibleListItemLeadingChromeStyle({
         showDragHandle: showGrip,

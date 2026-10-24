@@ -26,9 +26,9 @@ export function DetailCollectionGroup({
   const showHeader = Boolean(label || action)
 
   return (
-    <div className={cn(detailCollectionGroupVariants(), className)}>
+    <div className={cn(detailCollectionGroupVariants, className)}>
       {showHeader ? (
-        <div className={detailCollectionGroupHeaderVariants()}>
+        <div className={detailCollectionGroupHeaderVariants}>
           {label ? <Eyebrow size="sm">{label}</Eyebrow> : null}
           {action ? <div className="shrink-0">{action}</div> : null}
         </div>

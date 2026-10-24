@@ -190,8 +190,8 @@ function ExistingImageRow({
   onRemove?: () => void
 }) {
   return (
-    <li className={fileItemVariants()}>
-      <img src={url} alt={label} className={fileThumbnailVariants()} />
+    <li className={fileItemVariants}>
+      <img src={url} alt={label} className={fileThumbnailVariants} />
       <div className="min-w-0 flex-1">
         <FilenamePreview filename={label} density="compact" className={fileNameVariants()} />
         <p className={fileMetaVariants()}>Saved</p>
@@ -201,7 +201,7 @@ function ExistingImageRow({
           type="button"
           onClick={onRemove}
           aria-label={`Remove ${label}`}
-          className={removeButtonVariants()}
+          className={removeButtonVariants}
           disabled={disabled}
         >
           <Icon name="x" size="lg" />
@@ -227,11 +227,11 @@ function FileList({
       {files.map((file, index) => {
         const previewUrl = getPreviewUrl(file)
         return (
-          <li key={`${file.name}-${index}`} className={fileItemVariants()}>
+          <li key={`${file.name}-${index}`} className={fileItemVariants}>
             {previewUrl ? (
-              <img src={previewUrl} alt={file.name} className={fileThumbnailVariants()} />
+              <img src={previewUrl} alt={file.name} className={fileThumbnailVariants} />
             ) : (
-              <span className={fileIconVariants()} aria-hidden="true">
+              <span className={fileIconVariants} aria-hidden="true">
                 <Icon name="file" size="xl" />
               </span>
             )}
@@ -247,7 +247,7 @@ function FileList({
               type="button"
               onClick={() => onRemove(file)}
               aria-label={`Remove ${file.name}`}
-              className={removeButtonVariants()}
+              className={removeButtonVariants}
               disabled={disabled}
             >
               <Icon name="x" size="lg" />
@@ -359,7 +359,7 @@ export function FileDropzone(props: FileDropzoneProps) {
       ) : null}
 
       {visibility.showFileList ? (
-        <ul className={fileListVariants()} aria-label="Selected files">
+        <ul className={fileListVariants} aria-label="Selected files">
           {visibility.showExistingImage ? (
             <ExistingImageRow
               url={existingImageUrl!}

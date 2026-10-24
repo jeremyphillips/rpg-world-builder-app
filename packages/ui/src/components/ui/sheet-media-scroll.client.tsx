@@ -73,21 +73,21 @@ export function SheetMediaScroll({ media, header, children, className }: SheetMe
   const showHeaderBoundaryShadow = stuck && boundaryState.showTopShadow
 
   return (
-    <div className={sheetMediaScrollRootVariants()}>
+    <div className={sheetMediaScrollRootVariants}>
       <div
         ref={viewportRef}
         tabIndex={0}
-        className={cn(sheetMediaScrollViewportVariants(), className)}
+        className={cn(sheetMediaScrollViewportVariants, className)}
       >
-        <div className={sheetMediaScrollMediaVariants()}>{media}</div>
+        <div className={sheetMediaScrollMediaVariants}>{media}</div>
         <div
           ref={sentinelRef}
-          className={sheetMediaScrollSentinelVariants()}
+          className={sheetMediaScrollSentinelVariants}
           aria-hidden
           data-testid="sheet-sticky-header-sentinel"
         />
         <div
-          className={sheetMediaScrollStickyHeaderVariants()}
+          className={sheetMediaScrollStickyHeaderVariants}
           data-stuck={stuck ? 'true' : undefined}
           data-testid="sheet-sticky-header-shell"
         >
@@ -96,10 +96,10 @@ export function SheetMediaScroll({ media, header, children, className }: SheetMe
             aria-hidden
             data-visible={showHeaderBoundaryShadow}
             data-testid="sheet-sticky-header-boundary-shadow"
-            className={sheetMediaScrollStickyHeaderShadowVariants()}
+            className={sheetMediaScrollStickyHeaderShadowVariants}
           />
         </div>
-        <div className={sheetMediaScrollBodyVariants()}>{children}</div>
+        <div className={sheetMediaScrollBodyVariants}>{children}</div>
       </div>
       <div
         aria-hidden

@@ -2,7 +2,6 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import {
-  fieldGroupedDividerClasses,
   fieldGroupedShellClasses,
   fieldGroupedShellStretchLayoutClasses,
   fieldInputInvalidClasses,
@@ -42,7 +41,8 @@ export const inputActionGroupVariants = cva(
   },
 )
 
-export const inputActionGroupDividerVariants = cva(fieldGroupedDividerClasses)
+export const inputActionGroupDividerVariants =
+  'ui-field-group__divider ui-field-group__divider--primary ui-border--default'
 
 /**
  * Action segment shell — height and clip only. Padding, radius, and interactive

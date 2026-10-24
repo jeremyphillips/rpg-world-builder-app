@@ -139,7 +139,7 @@ export function EntityAnatomy({
           cell={{ slot: 'status', column: 'content' }}
           data-entity-item-slot="status"
         >
-          <div className={entitySummaryStatusLaneVariants()}>
+          <div className={entitySummaryStatusLaneVariants}>
             {entity.selectionState ? (
               <PickerSelectionStateLine model={entity.selectionState} density={density} />
             ) : null}
@@ -168,7 +168,7 @@ export function EntityAnatomyHost({
   descriptionWrap,
 }: EntityAnatomyHostProps) {
   return (
-    <div className={entityAnatomyHostRootVariants()}>
+    <div className={entityAnatomyHostRootVariants}>
       <EntityAnatomy
         entity={entity}
         headingHref={headingHref}

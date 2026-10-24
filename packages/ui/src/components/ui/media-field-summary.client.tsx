@@ -129,10 +129,10 @@ function CompactMediaFieldSummary({
   const openManager = () => onOpen(representative?.id)
 
   return (
-    <div className={mediaSummaryCompactInteractiveRootVariants()} role="group" aria-label={label}>
+    <div className={mediaSummaryCompactInteractiveRootVariants} role="group" aria-label={label}>
       <button
         type="button"
-        className={mediaSummaryCompactPreviewButtonVariants()}
+        className={mediaSummaryCompactPreviewButtonVariants}
         disabled={!canEdit}
         onClick={openManager}
         aria-label={`${label}: ${copy.previewAriaLabel}`}
@@ -146,18 +146,18 @@ function CompactMediaFieldSummary({
         {canEdit || galleryCount > 0 ? (
           <div
             className={cn(
-              mediaSummaryCompactOverlayVariants(),
+              mediaSummaryCompactOverlayVariants,
               copy.showManageGear && canEdit && 'pr-6',
             )}
           >
-            <span className={mediaSummaryCompactCountVariants()}>{copy.countLabel}</span>
+            <span className={mediaSummaryCompactCountVariants}>{copy.countLabel}</span>
           </div>
         ) : null}
       </button>
       {copy.showManageGear && canEdit ? (
         <button
           type="button"
-          className={mediaSummaryCompactGearButtonVariants()}
+          className={mediaSummaryCompactGearButtonVariants}
           aria-label={MEDIA_FIELD_SUMMARY_MANAGE_IMAGES_LABEL}
           onClick={openManager}
         >
@@ -217,7 +217,7 @@ function ExpandedMediaFieldSummaryTiles({
           key={item.id}
           type="button"
           className={cn(
-            mediaSummaryTileButtonVariants(),
+            mediaSummaryTileButtonVariants,
             mediaSummaryWellVariants({ layout: 'tile' }),
           )}
           disabled={!canEdit}
@@ -231,7 +231,7 @@ function ExpandedMediaFieldSummaryTiles({
         <button
           type="button"
           className={cn(
-            mediaSummaryTileButtonVariants(),
+            mediaSummaryTileButtonVariants,
             mediaSummaryWellVariants({ layout: 'tile' }),
             'text-lg font-medium',
           )}

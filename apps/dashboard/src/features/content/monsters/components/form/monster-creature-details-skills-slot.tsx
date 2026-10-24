@@ -81,7 +81,7 @@ function resolveMonsterSkillModifierDisplay(
 }
 
 function monsterSkillModifierClassName(): string {
-  return cn(entityAnatomyTrailingGroupSecondaryVariants(), 'mr-1 text-sm')
+  return cn(entityAnatomyTrailingGroupSecondaryVariants, 'mr-1 text-sm')
 }
 
 function MonsterSkillProficiencyModifier({ display }: { display: MonsterSkillModifierDisplay }) {

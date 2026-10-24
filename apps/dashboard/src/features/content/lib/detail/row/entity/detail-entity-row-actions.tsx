@@ -15,5 +15,5 @@ export type DetailEntityRowActionsProps = {
  * Callers must not mount this with zero meaningful children.
  */
 export function DetailEntityRowActions({ children, className }: DetailEntityRowActionsProps) {
-  return <div className={cn(detailEntityRowActionsVariants(), className)}>{children}</div>
+  return <div className={cn(detailEntityRowActionsVariants, className)}>{children}</div>
 }

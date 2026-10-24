@@ -156,7 +156,7 @@ function EditableGridSelectCell({
     >
       <SelectTrigger
         size="sm"
-        className={editableGridControlVariants()}
+        className={editableGridControlVariants}
         aria-label={cellAriaLabel(column.label, rowIndex)}
       >
         <SelectValue />
@@ -190,7 +190,7 @@ function EditableGridNumberCell({
   return (
     <NumberInput
       size="sm"
-      className={editableGridControlVariants()}
+      className={editableGridControlVariants}
       min={column.min}
       max={column.max}
       value={formatNumberCell(cell)}
@@ -217,7 +217,7 @@ function EditableGridColumnHeader({
   const hasTemplates = Boolean(templates?.length)
 
   return (
-    <div className={editableGridColumnHeaderVariants()}>
+    <div className={editableGridColumnHeaderVariants}>
       <span>{column.label}</span>
       {hasTemplates ? (
         <DropdownMenu>
@@ -289,14 +289,14 @@ export function EditableGrid({
   ) : null
 
   const table = (
-    <Table className={editableGridTableVariants()}>
+    <Table className={editableGridTableVariants}>
       <TableHeader>
         <TableRow>
-          <TableHead scope="col" className={editableGridStickyHeaderVariants()}>
+          <TableHead scope="col" className={editableGridStickyHeaderVariants}>
             {ROW_LABEL_HEADER}
           </TableHead>
           {columns.map((column) => (
-            <TableHead key={column.key} scope="col" className={editableGridHeaderCellVariants()}>
+            <TableHead key={column.key} scope="col" className={editableGridHeaderCellVariants}>
               <EditableGridColumnHeader
                 column={column}
                 templates={templates?.[column.key]}
@@ -318,14 +318,14 @@ export function EditableGrid({
           <TableRow key={rowIndex} className="group">
             <TableHead
               scope="row"
-              className={cn(editableGridStickyCellVariants(), 'text-center font-medium')}
+              className={cn(editableGridStickyCellVariants, 'text-center font-medium')}
             >
               {rowLabel(rowIndex)}
             </TableHead>
             {columns.map((column) => {
               const cell = value[column.key]?.[rowIndex] ?? null
               return (
-                <TableCell key={column.key} className={editableGridDataCellVariants()}>
+                <TableCell key={column.key} className={editableGridDataCellVariants}>
                   {column.control === 'select' ? (
                     <EditableGridSelectCell
                       column={column}

@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority'
 
 import type { ContentTone } from './visual-vocabulary.types'
 
-export const emphasisDetailLineRootVariants = cva('')
+export const emphasisDetailLineRootVariants = ''
 
 export const emphasisDetailLinePrimaryVariants = cva('font-body-emphasis tabular-nums', {
   variants: {

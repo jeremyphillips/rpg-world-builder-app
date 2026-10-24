@@ -10,7 +10,7 @@ import {
   fieldGroupedControlSizeClasses,
 } from './field-sizing.variants'
 
-export const numberInputRootVariants = cva('group relative inline-flex')
+export const numberInputRootVariants = 'group relative inline-flex'
 
 /** Root classes when embedded inside a composite input shell (e.g. table-builder derived badge). */
 export const numberInputCompositeShellRootClasses =

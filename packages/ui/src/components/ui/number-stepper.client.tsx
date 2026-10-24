@@ -115,17 +115,17 @@ function NumberStepperValueSlot({
       className={cn(
         numberStepperInputVariants({ size: resolvedSize, locked: stepperLocked }),
         numberStepperPrefixedInputSlotWidthClasses[resolvedSize][digits],
-        numberStepperPrefixedSlotVariants(),
+        numberStepperPrefixedSlotVariants,
       )}
     >
-      <span aria-hidden className={numberStepperValuePrefixVariants()}>
+      <span aria-hidden className={numberStepperValuePrefixVariants}>
         {prefixChar}
       </span>
       <input
         {...inputProps}
         type="text"
         value={centerValue}
-        className={numberStepperPrefixedInputVariants()}
+        className={numberStepperPrefixedInputVariants}
       />
     </div>
   )

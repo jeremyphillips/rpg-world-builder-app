@@ -36,7 +36,7 @@ export function DetailRowLeadingMedia({
       data-shape={shape}
       {...(size != null ? { 'data-size': size } : {})}
     >
-      <div className={detailRowLeadingMediaChildSlotVariants()}>{children}</div>
+      <div className={detailRowLeadingMediaChildSlotVariants}>{children}</div>
     </div>
   )
 }

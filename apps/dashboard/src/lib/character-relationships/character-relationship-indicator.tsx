@@ -44,7 +44,7 @@ export function CharacterRelationshipIndicator({
                   'aria-label': tooltip,
                   onClick: (event: MouseEvent) => event.stopPropagation(),
                 })}
-            className={characterRelationshipIndicatorVariants()}
+            className={characterRelationshipIndicatorVariants}
           >
             <Icon name="user-round-check" size="lg" />
           </span>

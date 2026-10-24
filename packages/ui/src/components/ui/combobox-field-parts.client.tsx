@@ -87,7 +87,7 @@ export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTrigg
               }),
               UI_FIELD_CONTROL_TRIGGER_FILL_CLASS,
               'items-stretch',
-              open && hideWhenOpen && comboboxTriggerOpenVariants(),
+              open && hideWhenOpen && comboboxTriggerOpenVariants,
             )}
           >
             <SelectLikeValueSlot size={size} position="standalone" trailingSlot prose>
@@ -416,8 +416,8 @@ export function ComboboxSelectedItems({
 
   const chipSize = fieldSizeToChipSize[size]
   const listClassName = renderSelectedItem
-    ? comboboxSelectedListVariants()
-    : comboboxSelectedItemsRowVariants()
+    ? comboboxSelectedListVariants
+    : comboboxSelectedItemsRowVariants
 
   return (
     <div className={listClassName} role="list" aria-label={`Selected ${label}`}>

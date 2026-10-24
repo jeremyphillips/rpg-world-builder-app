@@ -30,7 +30,5 @@ export function DetailCollectionFlushItemStackItem({
   children,
   className,
 }: DetailCollectionFlushItemStackItemProps) {
-  return (
-    <div className={cn(detailCollectionFlushItemStackItemVariants(), className)}>{children}</div>
-  )
+  return <div className={cn(detailCollectionFlushItemStackItemVariants, className)}>{children}</div>
 }

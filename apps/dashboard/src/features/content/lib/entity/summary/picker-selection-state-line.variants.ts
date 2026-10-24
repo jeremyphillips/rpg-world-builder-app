@@ -15,4 +15,4 @@ export const pickerSelectionStateLineVariants = cva('ui-copy-supporting min-w-0'
  * State word stays in inline flow so its baseline matches provenance.
  * The icon aligns to the x-height and does not become the line's baseline.
  */
-export const pickerSelectionStateWordVariants = cva('text-foreground font-body-emphasis')
+export const pickerSelectionStateWordVariants = 'text-foreground font-body-emphasis'

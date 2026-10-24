@@ -14,9 +14,8 @@ import {
 } from './field-control.styles'
 
 /** Chromeless inner search input — host row (combobox panel, list toolbar) owns border/height. */
-export const searchBarEmbeddedChromeInputVariants = cva(
-  'min-w-0 flex-1 border-0 bg-transparent shadow-none rounded-none dark:bg-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
-)
+export const searchBarEmbeddedChromeInputVariants =
+  'min-w-0 flex-1 border-0 bg-transparent shadow-none rounded-none dark:bg-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
 
 export const searchBarLeadingIconVariants = cva(
   cn('ui-search-bar__leading-icon ui-search-bar__leading-icon--field'),
@@ -82,7 +81,7 @@ export const searchBarFieldInputVariants = cva('', {
   },
 })
 
-export const searchBarEmbeddedInputVariants = cva(searchBarEmbeddedChromeInputVariants(), {
+export const searchBarEmbeddedInputVariants = cva(searchBarEmbeddedChromeInputVariants, {
   variants: {
     size: {
       xs: resolveSearchBarEmbeddedInputClass('xs'),

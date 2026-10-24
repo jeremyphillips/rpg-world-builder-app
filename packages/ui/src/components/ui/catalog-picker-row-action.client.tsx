@@ -124,7 +124,7 @@ export function CatalogPickerRowAction({
   )
 
   return (
-    <div className={catalogPickerRowActionVariants()}>
+    <div className={catalogPickerRowActionVariants}>
       {showTooltip && tooltip ? (
         <TooltipProvider delayDuration={0}>
           <Tooltip>
@@ -132,7 +132,7 @@ export function CatalogPickerRowAction({
               <span
                 tabIndex={0}
                 aria-label={tooltipAccessibleName(actionLabel, tooltip)}
-                className={catalogPickerRowActionTooltipTriggerVariants()}
+                className={catalogPickerRowActionTooltipTriggerVariants}
                 onClick={(event) => {
                   event.preventDefault()
                   event.stopPropagation()
@@ -154,7 +154,7 @@ export function CatalogPickerRowAction({
         <Text
           as="span"
           variant="destructive"
-          className={catalogPickerRowActionFailureVariants()}
+          className={catalogPickerRowActionFailureVariants}
           role="status"
           aria-live="polite"
         >

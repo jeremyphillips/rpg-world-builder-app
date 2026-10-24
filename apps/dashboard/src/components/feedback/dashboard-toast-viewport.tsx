@@ -29,8 +29,8 @@ export function DashboardToastViewport() {
   }
 
   return createPortal(
-    <div className={dashboardToastPortalVariants()}>
-      <ToastViewport className={dashboardToastViewportVariants()} />
+    <div className={dashboardToastPortalVariants}>
+      <ToastViewport className={dashboardToastViewportVariants} />
     </div>,
     document.body,
   )

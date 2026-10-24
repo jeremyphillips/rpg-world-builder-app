@@ -41,7 +41,7 @@ export function CatalogPickerSheetHeaderChrome({
         {headerExtra}
         {headerBelowDescription}
         {showPickerChrome ? (
-          <div className={catalogPickerHeaderFilterClusterVariants()}>
+          <div className={catalogPickerHeaderFilterClusterVariants}>
             <CatalogToolbar className={catalogPickerHeaderToolbarVariants()} {...toolbarProps} />
             {auxiliaryAction ? <CatalogPickerAuxiliaryActionSlot action={auxiliaryAction} /> : null}
           </div>
@@ -69,12 +69,12 @@ export function CatalogPickerSheetScrollBody({
   bodyContent,
 }: CatalogPickerSheetScrollBodyProps) {
   if (bodyReplacement !== undefined) {
-    return <Sheet.Body className={catalogPickerSheetBodyVariants()}>{bodyReplacement}</Sheet.Body>
+    return <Sheet.Body className={catalogPickerSheetBodyVariants}>{bodyReplacement}</Sheet.Body>
   }
 
   if (!pickerEnabled) {
     return null
   }
 
-  return <Sheet.Body className={catalogPickerSheetBodyVariants()}>{bodyContent}</Sheet.Body>
+  return <Sheet.Body className={catalogPickerSheetBodyVariants}>{bodyContent}</Sheet.Body>
 }

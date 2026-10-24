@@ -19,7 +19,7 @@ export function SelectOptionItem({
   return (
     <SelectItem value={itemValue} disabled={option.disabled}>
       {reason ? (
-        <span className={selectOptionItemContentVariants()}>
+        <span className={selectOptionItemContentVariants}>
           <span>{option.label}</span>
           <span className={selectOptionItemReasonVariants()}>{reason}</span>
         </span>

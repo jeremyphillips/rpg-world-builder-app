@@ -124,7 +124,7 @@ function resolveCatalogPickerSheetBodyContent({
 }): React.ReactNode {
   if (loading || deferResults) {
     return (
-      <div className={catalogPickerSheetLoadingVariants()}>
+      <div className={catalogPickerSheetLoadingVariants}>
         <Spinner size="lg" />
       </div>
     )

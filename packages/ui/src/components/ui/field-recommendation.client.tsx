@@ -86,7 +86,7 @@ function FieldRecommendationActionButton({ action }: { action: FieldRecommendati
       size={buttonScale.size}
       density={buttonScale.density}
       aria-label={action.ariaLabel}
-      className={cn(fieldRecommendationActionVariants(), 'shrink-0')}
+      className={cn(fieldRecommendationActionVariants, 'shrink-0')}
       onClick={action.onClick}
     >
       {action.label}

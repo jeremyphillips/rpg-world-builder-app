@@ -52,7 +52,7 @@ function DropTargetPromptIdleChrome({
   hideInPlace,
   onBrowse,
 }: DropTargetPromptIdleChromeProps) {
-  const preservedHiddenClass = hideInPlace ? dropTargetLayoutPreserveHiddenVariants() : undefined
+  const preservedHiddenClass = hideInPlace ? dropTargetLayoutPreserveHiddenVariants : undefined
 
   return (
     <>
@@ -156,7 +156,7 @@ export function DropTargetPrompt({
       {...props}
     >
       <DropTargetPromptIcon state={state} density={density} useImageIcon={copy.useImageIcon} />
-      <div className={dropTargetActionsVariants()}>
+      <div className={dropTargetActionsVariants}>
         <p className={dropTargetTitleVariants({ density, state })}>{title}</p>
         {showIdleChrome ? (
           <DropTargetPromptIdleChrome

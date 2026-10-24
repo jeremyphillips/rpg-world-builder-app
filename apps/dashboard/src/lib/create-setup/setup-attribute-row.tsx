@@ -24,7 +24,7 @@ export type SetupAttributeRowProps = {
 }
 
 function SetupAttributeRowHelper({ helper }: { helper: string }) {
-  return <p className={cn(selectionSummaryCardRowHelperVariants(), 'mt-0.5')}>{helper}</p>
+  return <p className={cn(selectionSummaryCardRowHelperVariants, 'mt-0.5')}>{helper}</p>
 }
 
 function SetupAttributeRowCollapsedValue({ value }: { value: ReactNode }) {

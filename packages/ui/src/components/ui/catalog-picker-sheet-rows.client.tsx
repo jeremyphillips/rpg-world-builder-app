@@ -147,7 +147,7 @@ export function CatalogPickerSheetResults<TItem>({
     )
   })
 
-  const listClassName = catalogPickerSheetListVariants()
+  const listClassName = catalogPickerSheetListVariants
 
   if (rowProps.selection) {
     return (

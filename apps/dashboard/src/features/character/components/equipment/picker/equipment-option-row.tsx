@@ -33,9 +33,9 @@ export function EquipmentOptionRow({
   const trailing = presentation.trailingState
 
   return (
-    <div className={equipmentOptionRowVariants()} title={presentation.secondaryTitle}>
+    <div className={equipmentOptionRowVariants} title={presentation.secondaryTitle}>
       <IdentityRow
-        className={equipmentOptionRowIdentityVariants()}
+        className={equipmentOptionRowIdentityVariants}
         heading={presentation.identity}
         classification={classification || undefined}
         supporting={inline || undefined}

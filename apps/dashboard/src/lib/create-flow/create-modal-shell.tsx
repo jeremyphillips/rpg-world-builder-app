@@ -191,11 +191,9 @@ function CreateModalShellTabs({
       defaultValue={defaultActiveTabId ?? fallbackTabId}
       onValueChange={onActiveTabChange}
       variant="line"
-      className={createModalShellTabsVariants()}
+      className={createModalShellTabsVariants}
     >
-      <div
-        className={cn(createModalShellTabsListRegionVariants(), dialogPanelSectionInsetXClasses)}
-      >
+      <div className={cn(createModalShellTabsListRegionVariants, dialogPanelSectionInsetXClasses)}>
         <TabsList aria-label="Create sections">
           {tabs.map((tab) => {
             return (

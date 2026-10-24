@@ -1,9 +1,6 @@
-import { cva } from 'class-variance-authority'
-
 /** Result summary row — compact utility-bar copy. */
-export const overviewResultSummaryVariants = cva(
-  'flex min-w-0 flex-wrap items-center gap-y-1 text-style-caption',
-)
+export const overviewResultSummaryVariants =
+  'flex min-w-0 flex-wrap items-center gap-y-1 text-style-caption'
 
 /** Middle-dot separator before Show/Hide actions. */
-export const overviewResultSummaryDotVariants = cva('px-2 text-muted-foreground')
+export const overviewResultSummaryDotVariants = 'px-2 text-muted-foreground'

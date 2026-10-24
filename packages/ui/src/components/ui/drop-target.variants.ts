@@ -88,9 +88,9 @@ export const dropTargetDescriptionVariants = cva('text-style-supporting')
 
 export const dropTargetRequirementsVariants = cva('text-style-caption')
 
-export const dropTargetActionsVariants = cva('flex flex-col items-center gap-2')
+export const dropTargetActionsVariants = 'flex flex-col items-center gap-2'
 
 export const dropTargetBrowseIconVariants = cva('size-4')
 
 /** Hides idle chrome in place so inline drop targets keep stable height during active/invalid. */
-export const dropTargetLayoutPreserveHiddenVariants = cva('invisible pointer-events-none')
+export const dropTargetLayoutPreserveHiddenVariants = 'invisible pointer-events-none'

@@ -78,7 +78,7 @@ function InputActionGroupRoot({
         {...props}
       >
         <div className={fieldGroupedInputColumnClasses}>{inputChild}</div>
-        <div aria-hidden className={inputActionGroupDividerVariants()} />
+        <div aria-hidden className={inputActionGroupDividerVariants} />
         {actionChild}
       </div>
     </InputActionGroupContext.Provider>

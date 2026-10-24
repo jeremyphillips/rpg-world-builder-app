@@ -21,8 +21,8 @@ import {
 
 describe('array-item-anatomy-grid', () => {
   it('owns a three-row track template on one parent grid', () => {
-    expect(arrayItemAnatomyGridVariants()).toContain('grid-rows-[auto_auto_auto]')
-    expect(arrayItemAnatomyGridVariants()).toContain('array-item-anatomy-grid')
+    expect(arrayItemAnatomyGridVariants).toContain('grid-rows-[auto_auto_auto]')
+    expect(arrayItemAnatomyGridVariants).toContain('array-item-anatomy-grid')
   })
 
   it('resolves parent chrome column indices for two-tier layout', () => {

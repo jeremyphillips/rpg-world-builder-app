@@ -69,7 +69,7 @@ export function EntitySummaryHeading({
   const resolvedHeading = resolveLinkedHeading(heading, headingHref)
 
   return (
-    <div className={cn(entitySummaryHeadingRowVariants(), contentCardHeadingScaleClass(density))}>
+    <div className={cn(entitySummaryHeadingRowVariants, contentCardHeadingScaleClass(density))}>
       <IdentityRowHeadingLine
         heading={resolvedHeading}
         classification={classification}
@@ -154,7 +154,7 @@ export function EntitySummaryStatus({
           <InlineMetadata.Item key={`status-${index}`}>
             <span data-entity-summary-status>
               {segment.kind === 'badge-group' ? (
-                <span className={entitySummaryStatusBadgeGroupVariants()}>
+                <span className={entitySummaryStatusBadgeGroupVariants}>
                   {segment.badges.map((badge, badgeIndex) => (
                     <EntitySummaryStatusItemView
                       key={
@@ -183,7 +183,7 @@ export function EntitySummaryStatus({
   }
 
   return (
-    <div className={entitySummaryStatusRowVariants()} data-entity-summary-status-row>
+    <div className={entitySummaryStatusRowVariants} data-entity-summary-status-row>
       {items.map((status, index) => (
         <EntitySummaryStatusItemView key={index} item={status} density={density} />
       ))}

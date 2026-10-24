@@ -148,7 +148,7 @@ export function StandardFieldGroupBody({
       ) : null}
       {collapsible ? (
         <Collapsible open={open} onOpenChange={onOpenChange} className="min-w-0">
-          <CollapsibleContent forceMount className={fieldGroupLegendDisclosureContentVariants()}>
+          <CollapsibleContent forceMount className={fieldGroupLegendDisclosureContentVariants}>
             {bodyWithGap}
           </CollapsibleContent>
         </Collapsible>

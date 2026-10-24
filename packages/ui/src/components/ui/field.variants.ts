@@ -156,7 +156,7 @@ export const fieldRecommendationRowClasses = 'mt-1 flex flex-wrap items-center g
 /** Caption scale with foreground ink — same size as field hints, not muted. */
 export const fieldRecommendationSupportingTextClasses = 'text-style-caption text-foreground'
 /** Decoration overrides for recommendation text actions — geometry stays on `Button` text tokens. */
-export const fieldRecommendationActionVariants = cva('no-underline hover:no-underline')
+export const fieldRecommendationActionVariants = 'no-underline hover:no-underline'
 
 /** Field recommendation group — internal layout only; field band spacing is `fieldRecommendationRowClasses`. */
 export const fieldRecommendationFieldGroupClasses =
@@ -591,13 +591,8 @@ export const fieldGroupLegendDisclosureTriggerVariants = cva(
 )
 
 /** Collapsible panel for legend disclosure — animation only; spacing comes from the field stack. */
-export const fieldGroupLegendDisclosureContentVariants = cva([
-  'overflow-hidden',
-  'data-[state=open]:overflow-visible',
-  'data-[state=closed]:h-0 data-[state=closed]:animate-accordion-up',
-  'data-[state=open]:animate-accordion-down',
-  'data-[state=closed]:pointer-events-none data-[state=closed]:inert',
-])
+export const fieldGroupLegendDisclosureContentVariants =
+  'overflow-hidden data-[state=open]:overflow-visible data-[state=closed]:h-0 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down data-[state=closed]:pointer-events-none data-[state=closed]:inert'
 
 export const fieldGroupLegendVariants = cva('', {
   variants: {

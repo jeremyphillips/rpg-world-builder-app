@@ -56,6 +56,29 @@ Introduce a shared variant when it represents a stable, meaningful dimension of 
 - Export a function when arguments select modifiers, or when one state must apply several classes together (for example `cardSurfaceVariants`, `dataTableUnavailableAppearance`).
 - A `*.variants.ts` file requires a real variant axis. `ClassReference` specs and twMerge group lists are inspection metadata, not runtime class registries.
 - Styling primitives that may be reused without their component expose **conditional** classes through resolvers (`cardSurfaceVariants`, `interactiveRowVariants`) — not through zero-argument aliases of a single selector.
+- A local JSX ternary is allowed. It is not a reason to add a resolver. `style={{}}` is for a measured or per-instance value only.
+
+## Styling change types
+
+These edits are not interchangeable.
+
+1. **Dead export removal.** The symbol has no references. No class string moves.
+2. **Static alias inlining.** A one-token class constant is replaced by that same token at the consumer. The CSS owner does not change.
+3. **Type 3A — mechanical CVA removal.** A zero-argument `cva()` with no `variants` and no `compoundVariants` becomes the same class string. Call sites change from `name()` to that string. Emitted classes and the export name stay. If any consumer passes arguments or passes the function, that export stays a function. Type 3A does not inline the string, rename `*Variants` to `*Classes`, move it into CSS, or add a BEM block.
+4. **Styling ownership transfer.** Classes move into a named CSS owner. Requires the owner, a reason, and a cascade check.
+5. **Duplicate-owner consolidation.** Two modules currently own one decision.
+
+Type 3A and the string's later disposition are separate. After type 3A the export is still the named string. Inlining it, renaming it, or moving it into CSS waits on its own approval.
+
+The styling-indirection ratchet (`semantic-styling-indirection.test.ts`) keys temporary debt by file, exported symbol, and violation type (`empty-cva`, `single-semantic-alias`, `single-utility-alias`). A file may lose keys. A new key fails, including when it replaces an old key in the same file. `panelSectionInsetClasses` is the permanent exception (`semantic-styling-indirection.allowlist.json`), not baseline debt.
+
+## Approved decisions
+
+- Shell and form one-token alias inlines are deferred. Those publishers stay frozen.
+- Page width (`PageShell`), page rhythm, and viewport workspace stay resolvers. Do not invent BEM for those utilities.
+- `panelSectionInsetClasses` stays the named inset class for `Panel` children when `bleed` drops host padding.
+
+Decision-required families (const-only modules, radio-card row CSS, sticky-column ownership) stay open until a later review approves a disposition.
 
 ## Inspecting UI
 
@@ -75,9 +98,10 @@ Shell ownership and the form-chrome block boundaries for the shell migration are
 component declarations when targeting the same property on the same element. Custom-property
 inheritance, element scope, inline styles, and specificity within a layer remain relevant.
 Relocating a rule from `@layer utilities` into `@layer components` lowers precedence on that
-element. A custom property is inherited only by descendants of the element that declares it.
-Portaled content (Radix `Sheet`, `Dialog`, popovers) inherits from `body`, not from the page
-tree, so page-level contracts do not reach it.
+element. A custom property is inherited from the element's DOM ancestors. A portal inherits
+from the node it is mounted under. Radix `Sheet`, `Dialog`, and popovers in this repo use the
+default container, which is `document.body`, so page-level variables do not reach them. A
+portal given another container inherits from that container instead.
 
 Tailwind emits layers lowest-first: `properties`, `theme`, `base`, `components`, `utilities`. `properties` belongs to Tailwind. Every designated stylesheet starts with this statement, before any `@import`:
 

@@ -179,7 +179,7 @@ export function BuilderOptionDetailsSheet({
       >
         {hasMedia ? (
           <Sheet.MediaScroll
-            media={<div className={builderOptionDetailsHeroImageVariants()}>{heroImage}</div>}
+            media={<div className={builderOptionDetailsHeroImageVariants}>{heroImage}</div>}
             header={header}
           >
             <div className="space-y-6">{bodyContent}</div>

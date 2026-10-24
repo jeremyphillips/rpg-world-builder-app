@@ -36,9 +36,9 @@ export function OrganizationMembershipTitlesSummary({
   const sorted = sortOrganizationMembershipTitleDefinitionsForDisplay(catalog)
 
   return (
-    <ol className={organizationMembershipTitlesListVariants()} data-testid={`${idPrefix}-list`}>
+    <ol className={organizationMembershipTitlesListVariants} data-testid={`${idPrefix}-list`}>
       {sorted.map((entry) => (
-        <li key={entry.id} className={organizationMembershipTitlesItemVariants()}>
+        <li key={entry.id} className={organizationMembershipTitlesItemVariants}>
           {entry.label}
         </li>
       ))}

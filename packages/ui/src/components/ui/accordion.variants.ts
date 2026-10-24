@@ -33,14 +33,9 @@ export const accordionTriggerVariants = cva(
   },
 )
 
-export const accordionContentVariants = cva([
-  'overflow-hidden text-sm',
-  'data-[state=open]:overflow-visible',
-  'data-[state=closed]:h-0 data-[state=closed]:animate-accordion-up',
-  'data-[state=open]:animate-accordion-down',
-  // forceMount keeps RHF fields registered; block interaction/focus when visually closed.
-  'data-[state=closed]:pointer-events-none data-[state=closed]:inert',
-])
+// forceMount keeps RHF fields registered; block interaction/focus when visually closed.
+export const accordionContentVariants =
+  'overflow-hidden text-sm data-[state=open]:overflow-visible data-[state=closed]:h-0 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down data-[state=closed]:pointer-events-none data-[state=closed]:inert'
 
 export const accordionContentInnerVariants = cva('', {
   variants: {

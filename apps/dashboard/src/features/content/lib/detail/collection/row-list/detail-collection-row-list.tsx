@@ -16,8 +16,8 @@ export type DetailCollectionRowListProps = {
 
 function resolveSeparatorVariants(separator: DetailCollectionRowListSeparatorKind) {
   return separator === 'structural'
-    ? detailCollectionRowListStructuralSeparatorVariants()
-    : detailCollectionRecordSeparatorVariants()
+    ? detailCollectionRowListStructuralSeparatorVariants
+    : detailCollectionRecordSeparatorVariants
 }
 
 export function DetailCollectionRowList({

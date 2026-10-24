@@ -26,7 +26,7 @@ export function ActionTargetResolutionList<TBlocker, TFailure extends ActionTarg
   return (
     <div className="space-y-2">
       {legend ? <Text variant="supporting">{legend}</Text> : null}
-      <ul className={actionResolutionListVariants()} aria-label={legend ?? 'Action targets'}>
+      <ul className={actionResolutionListVariants} aria-label={legend ?? 'Action targets'}>
         {rows.map((row) => (
           <ActionTargetResolutionRow
             key={row.targetId}

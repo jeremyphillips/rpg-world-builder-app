@@ -232,13 +232,12 @@ export function numberStepperRootWidthClass(
   return table[size][digits]
 }
 
-export const numberStepperValuePrefixVariants = cva('pointer-events-none shrink-0 tabular-nums')
+export const numberStepperValuePrefixVariants = 'pointer-events-none shrink-0 tabular-nums'
 
-export const numberStepperPrefixedSlotVariants = cva('flex items-center justify-center')
+export const numberStepperPrefixedSlotVariants = 'flex items-center justify-center'
 
-export const numberStepperPrefixedInputVariants = cva(
-  'min-w-0 flex-1 border-0 bg-transparent p-0 text-center text-inherit outline-none [appearance:textfield] focus-visible:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-)
+export const numberStepperPrefixedInputVariants =
+  'min-w-0 flex-1 border-0 bg-transparent p-0 text-center text-inherit outline-none [appearance:textfield] focus-visible:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
 
 export type NumberStepperDigits = keyof (typeof numberStepperWidthVariants)['md']
 

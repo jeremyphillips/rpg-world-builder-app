@@ -38,7 +38,7 @@ function EntityAnatomyTrailingQuantityLabel({
   if (!label) return null
 
   return (
-    <Text as="span" variant="muted" className={entityAnatomyTrailingQuantityLabelVariants()}>
+    <Text as="span" variant="muted" className={entityAnatomyTrailingQuantityLabelVariants}>
       {label}
     </Text>
   )
@@ -66,7 +66,7 @@ function EntityAnatomyTrailingMeta({ meta }: { meta?: string }) {
   if (!meta) return null
 
   return (
-    <Text as="span" variant="muted" className={entityAnatomyTrailingMetaVariants()}>
+    <Text as="span" variant="muted" className={entityAnatomyTrailingMetaVariants}>
       {meta}
     </Text>
   )
@@ -77,16 +77,16 @@ function EntityAnatomyTrailingPrimary({ trailing }: { trailing: EntityAnatomyTra
     case 'action':
     case 'utility':
       return (
-        <div className={entityAnatomyTrailingActionVariants()}>
+        <div className={entityAnatomyTrailingActionVariants}>
           <EntityAnatomyTrailingMeta meta={trailing.meta} />
           {trailing.content}
         </div>
       )
     case 'indicator':
       return (
-        <div className={entityAnatomyTrailingIndicatorVariants()}>
+        <div className={entityAnatomyTrailingIndicatorVariants}>
           {trailing.variant === 'label' ? (
-            <Text as="span" variant="muted" className={entityAnatomyTrailingMetaVariants()}>
+            <Text as="span" variant="muted" className={entityAnatomyTrailingMetaVariants}>
               {trailing.label}
             </Text>
           ) : (
@@ -106,10 +106,10 @@ function EntityAnatomyTrailingPrimary({ trailing }: { trailing: EntityAnatomyTra
       )
     case 'group':
       return (
-        <div className={entityAnatomyTrailingActionVariants()}>
+        <div className={entityAnatomyTrailingActionVariants}>
           {trailing.secondary ? (
             <span
-              className={entityAnatomyTrailingGroupSecondaryVariants()}
+              className={entityAnatomyTrailingGroupSecondaryVariants}
               data-entity-item-slot="trailing-secondary"
             >
               <EntityAnatomyTrailingSecondaryView secondary={trailing.secondary} />

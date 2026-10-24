@@ -20,7 +20,7 @@ export function CatalogPickerAuxiliaryActionSlot({
   action,
 }: CatalogPickerAuxiliaryActionSlotProps) {
   return (
-    <div className={catalogPickerAuxiliaryActionRowVariants()}>
+    <div className={catalogPickerAuxiliaryActionRowVariants}>
       {action.state === 'unavailable' ? (
         <Text variant="destructive" className="text-right text-sm">
           {action.message}

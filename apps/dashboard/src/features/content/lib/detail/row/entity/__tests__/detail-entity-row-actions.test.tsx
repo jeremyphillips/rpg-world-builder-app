@@ -24,6 +24,6 @@ describe('DetailEntityRowActions', () => {
       </DetailEntityRowActions>,
     )
 
-    expect(container.firstChild).toHaveClass(...detailEntityRowActionsVariants().split(' '))
+    expect(container.firstChild).toHaveClass(...detailEntityRowActionsVariants.split(' '))
   })
 })

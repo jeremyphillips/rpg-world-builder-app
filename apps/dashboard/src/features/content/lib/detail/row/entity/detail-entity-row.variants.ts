@@ -1,7 +1,5 @@
 import { cva } from 'class-variance-authority'
 
-import { iconGhostControlVariants } from '@rpg/ui'
-
 export const detailEntityRowVariants = cva('min-w-0 py-1', {
   variants: {
     inset: {
@@ -30,9 +28,8 @@ export const detailEntityRowDisclosureRowVariants = cva('min-w-0 py-1', {
   },
 })
 
-export const detailEntityRowDisclosureButtonVariants = cva(
-  iconGhostControlVariants({ hover: 'text', layout: 'flex' }),
-)
+export const detailEntityRowDisclosureButtonVariants =
+  'inline-flex shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground cursor-pointer ui-compact-control ui-compact-control--icon-compact ui-focus-ring ui-focus-ring--embedded hover:text-foreground flex'
 
 /** Expanded preview — start follows the header edge; end always uses the base inset. */
 export const detailEntityRowDisclosureContentVariants = cva('mb-2', {
@@ -48,9 +45,7 @@ export const detailEntityRowDisclosureContentVariants = cva('mb-2', {
 })
 
 /** Left rail wrapping disclosure preview child rows. */
-export const detailEntityRowDisclosurePreviewGroupVariants = cva(
-  'border-l border-border-subtle pl-3',
-)
+export const detailEntityRowDisclosurePreviewGroupVariants = 'border-l border-border-subtle pl-3'
 
 export type DetailEntityRowDisclosurePreviewRowEdge = 'first' | 'middle' | 'last' | 'only'
 

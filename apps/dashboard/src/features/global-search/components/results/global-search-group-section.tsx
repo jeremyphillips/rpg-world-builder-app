@@ -45,7 +45,7 @@ export function GlobalSearchGroupSection({
   const showAllTarget = showAllHref?.(section.filterGroup) ?? `#show-all-${section.filterGroup}`
   const showAllLabel = `${GLOBAL_SEARCH_COPY.showAllInGroup(section.totalCount, groupLabel)} →`
   const showAllClassName = cn(
-    globalSearchGroupShowAllLinkVariants(),
+    globalSearchGroupShowAllLinkVariants,
     globalSearchGroupContentInsetClasses,
   )
   const headingId = `global-search-group-${section.filterGroup}`

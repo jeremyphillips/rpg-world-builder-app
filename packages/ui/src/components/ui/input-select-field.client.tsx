@@ -188,7 +188,7 @@ function SearchableUnitSelect({
             groupedSelectSegmentShellClasses(size, 'end', { surfaceRole: 'unit' }),
             inputSelectSearchableUnitShellWidthVariants({ size }),
             !unit && 'text-muted-foreground',
-            open && comboboxTriggerOpenVariants(),
+            open && comboboxTriggerOpenVariants,
           )}
         >
           <SelectLikeValueSlot

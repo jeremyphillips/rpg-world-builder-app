@@ -49,7 +49,7 @@ export function SelectionSummaryRow({
       <button
         type="button"
         className={cn(
-          selectionSummaryCardRowValueVariants(),
+          selectionSummaryCardRowValueVariants,
           selectionSummaryCardRowValueButtonClasses,
         )}
         aria-label={buildSelectionSummaryValueAriaLabel(value, valueActionAriaLabel)}
@@ -58,7 +58,7 @@ export function SelectionSummaryRow({
         {value}
       </button>
     ) : (
-      <span className={selectionSummaryCardRowValueVariants()}>{value}</span>
+      <span className={selectionSummaryCardRowValueVariants}>{value}</span>
     )
 
   return (
@@ -71,7 +71,7 @@ export function SelectionSummaryRow({
       <dt className={selectionSummaryCardRowLabelVariants()}>{label}</dt>
       <dd className={selectionSummaryCardRowValueCellClasses}>{valueContent}</dd>
       <dd className={selectionSummaryCardRowActionColumnClasses}>{action ?? null}</dd>
-      {helper ? <dd className={selectionSummaryCardRowHelperVariants()}>{helper}</dd> : null}
+      {helper ? <dd className={selectionSummaryCardRowHelperVariants}>{helper}</dd> : null}
     </div>
   )
 }

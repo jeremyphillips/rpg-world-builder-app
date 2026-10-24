@@ -72,6 +72,5 @@ export const segmentedControlMetadataVariants = cva('text-xs tabular-nums', {
   },
 })
 
-export const segmentedControlLeadingIconVariants = cva(
-  `inline-flex shrink-0 leading-none ${UI_SEGMENTED_CONTROL_LEADING_ICON_CLASS}`,
-)
+export const segmentedControlLeadingIconVariants =
+  'inline-flex shrink-0 leading-none ui-segmented-control__leading-icon'

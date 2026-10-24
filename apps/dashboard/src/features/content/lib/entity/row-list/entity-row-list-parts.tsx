@@ -187,7 +187,7 @@ export function EntityRowListGroup({
       <div data-slot="entity-row-list-group" className={entityRowListGroupClassName}>
         {showHeader ? (
           <div
-            className={detailCollectionGroupHeaderVariants()}
+            className={detailCollectionGroupHeaderVariants}
             data-slot="entity-row-list-group-header"
           >
             {label ? <Eyebrow size="sm">{label}</Eyebrow> : null}
@@ -203,14 +203,14 @@ export function EntityRowListGroup({
     <div data-slot="entity-row-list-group" className={entityRowListGroupClassName}>
       {showHeader ? (
         <div
-          className={detailCollectionGroupHeaderVariants()}
+          className={detailCollectionGroupHeaderVariants}
           data-slot="entity-row-list-group-header"
         >
           {label ? <Eyebrow size="sm">{label}</Eyebrow> : null}
           {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
         </div>
       ) : null}
-      <ul className={cn(detailCollectionRecordSeparatorVariants())}>{children}</ul>
+      <ul className={cn(detailCollectionRecordSeparatorVariants)}>{children}</ul>
     </div>
   )
 }

@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority'
 import { cn, textActionVariants } from '@rpg/ui'
 
 /** Fills the anatomy content cell. The heading line owns end alignment. */
-export const entitySummaryHeadingRowVariants = cva('flex min-w-0 w-full flex-1')
+export const entitySummaryHeadingRowVariants = 'flex min-w-0 w-full flex-1'
 
 export const entitySummaryHeadingEndValueVariants = cva(
   'ui-copy-title shrink-0 tabular-nums font-body-emphasis text-muted-foreground',
@@ -47,15 +47,14 @@ export const entitySummaryStatusVariants = cva('ui-copy-supporting', {
 })
 
 /** Status items wrap within the lane; the row-anatomy status cell owns the top offset. */
-export const entitySummaryStatusRowVariants = cva('flex min-w-0 flex-wrap gap-x-2 gap-y-1')
+export const entitySummaryStatusRowVariants = 'flex min-w-0 flex-wrap gap-x-2 gap-y-1'
 
 /** Consecutive badges inside one metadata line — spacing only, no middle-dot separators. */
-export const entitySummaryStatusBadgeGroupVariants = cva(
-  'inline-flex min-w-0 max-w-full flex-wrap items-center gap-x-2 gap-y-1',
-)
+export const entitySummaryStatusBadgeGroupVariants =
+  'inline-flex min-w-0 max-w-full flex-wrap items-center gap-x-2 gap-y-1'
 
 /** Selection-state line stacked above status and provenance actions inside the status cell. */
-export const entitySummaryStatusLaneVariants = cva('flex min-w-0 flex-col gap-1')
+export const entitySummaryStatusLaneVariants = 'flex min-w-0 flex-col gap-1'
 
 /** Provenance segment copy — foreground source labels on the third line, beside status. */
 export const entitySummaryProvenanceTextVariants = cva('ui-copy-supporting text-foreground', {

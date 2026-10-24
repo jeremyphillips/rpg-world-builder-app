@@ -50,7 +50,7 @@ export function ResultSummary({ visibleCount, primaryLabel, supplements }: Resul
 
   return (
     <div
-      className={overviewResultSummaryVariants()}
+      className={overviewResultSummaryVariants}
       role="status"
       aria-live="polite"
       aria-atomic="true"

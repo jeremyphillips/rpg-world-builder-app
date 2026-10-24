@@ -1,6 +1,2 @@
-import { cva } from 'class-variance-authority'
-
 /** Inner slot — child fills geometry owned by the outer IdentityFrame shell. */
-export const detailRowLeadingMediaChildSlotVariants = cva(
-  'size-full overflow-hidden [&>*]:size-full',
-)
+export const detailRowLeadingMediaChildSlotVariants = 'size-full overflow-hidden [&>*]:size-full'
