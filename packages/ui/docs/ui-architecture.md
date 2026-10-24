@@ -71,6 +71,14 @@ Shell ownership and the form-chrome block boundaries for the shell migration are
 
 ## Cascade layers
 
+**Precedence rule:** within the established cascade layers, utility declarations override
+component declarations when targeting the same property on the same element. Custom-property
+inheritance, element scope, inline styles, and specificity within a layer remain relevant.
+Relocating a rule from `@layer utilities` into `@layer components` lowers precedence on that
+element. A custom property is inherited only by descendants of the element that declares it.
+Portaled content (Radix `Sheet`, `Dialog`, popovers) inherits from `body`, not from the page
+tree, so page-level contracts do not reach it.
+
 Tailwind emits layers lowest-first: `properties`, `theme`, `base`, `components`, `utilities`. `properties` belongs to Tailwind. Every designated stylesheet starts with this statement, before any `@import`:
 
 ```css

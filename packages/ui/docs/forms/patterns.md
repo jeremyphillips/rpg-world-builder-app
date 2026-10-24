@@ -51,6 +51,21 @@ for submit actions rendered outside the `<form>` element.
 
 Presets: `formStickyTabsTransparentClasses`, `formStickyActionsBarTransparentClasses`.
 
+### Docked shell (`ui-form-docked-shell`)
+
+One CSS contract; `formStickyScrollShellWithDockedFooterClasses` mounts it at four sites:
+
+1. `TabbedForm` without an aside (`columnBody`)
+2. `TabbedForm` with an aside (mixed onto `ui-tabbed-form__body`)
+3. `FormShellChildren` when `<Form stickyFooter>` is docked (`documentScroll` and `externalFooter` false)
+4. Dashboard `CharacterBuilderFormColumn` (documented cross-owner use of the `ui-*` block)
+
+The shell publishes form scroll chrome, floor gap, docked bar block size, and
+`--rpg-content-bottom-inset`. It does not publish `--rpg-content-top-inset`; the master-detail list
+utility resolves that viewport total from app chrome, page heading, and form chrome in scope.
+`TabbedForm` with `externalFooter` (drawer, dialog) skips the docked shell; footer chrome is
+portaled, so page `--rpg-*` contracts do not apply inside the overlay.
+
 Optional `aside` (inside `FormProvider`) + `tabRowTrailing` for a compact tab-row action. At `xl`
 the body is a full-width two-column grid (form `minmax(0, 1fr)` + aside `280px`; at `2xl` the same
 form track + aside `21rem`); the footer stays in the form column below the scroll body
