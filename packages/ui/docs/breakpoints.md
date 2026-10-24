@@ -27,6 +27,7 @@ These lengths are not breakpoints, even when the number matches:
 - `--max-width-page-wide` (80rem) and `--max-width-page-narrow` (56rem) are page caps.
 - Dialog heights, the sidebar width, preview column tracks, and the master-detail list cap are component geometry.
 - `100dvh` / `100cqh` math stays on its own tokens.
+- The master-detail list cap uses `@container form-scroll-body (min-height: 0)`. That height query stays a container query. The page grid still switches on viewport `md`.
 
 ## Container scale
 
@@ -118,4 +119,6 @@ The colon form matches `md:hover:…` in JSX.
 
 ## JavaScript
 
-There is no JavaScript copy of the scale. The one runtime query is `VIEWPORT_MD_MIN_QUERY` (`(width >= 48rem)`), and it must match the compiled `md:` condition. `matchMedia` uses the same initial font size as CSS. Do not add `sm` / `lg` / `xl` / `2xl` query constants until a runtime consumer exists.
+**Runtime breakpoint queries.** `breakpoints.css` is the authoritative breakpoint source. JavaScript consumers cannot directly interpolate Tailwind theme variables into `matchMedia`. A runtime query constant is permitted when a responsive behavior cannot reasonably be implemented through CSS alone. Each runtime query must match the compiled Tailwind variant through an automated contract test. Consumers must reuse the existing constant rather than introducing new literal breakpoint values. Do not create a parallel JavaScript breakpoint scale or generalized resolver without demonstrated need.
+
+`VIEWPORT_MD_MIN_QUERY` is that constant. `useMediaMinWidth` reads it. `FORM_COLUMNS_WIDE_MEDIA_QUERY` is an alias of the same constant. Form-column order, media-gallery column stride, and preview sheet side are the consumers. `matchMedia` uses the same initial font size as CSS.

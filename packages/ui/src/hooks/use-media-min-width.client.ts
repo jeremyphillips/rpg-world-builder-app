@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
-/** Compiled viewport `md`: `@media (width >= 48rem)`. */
-export const VIEWPORT_MD_MIN_QUERY = '(width >= 48rem)'
+/** Viewport `md` query. Must equal the compiled `md:` condition. */
+export const VIEWPORT_MD_MIN_QUERY = '(width >= 48rem)' // 768px
 
 export function useMediaMinWidth(query: string): boolean {
   const [matches, setMatches] = useState(() => {

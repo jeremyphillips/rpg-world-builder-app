@@ -8,6 +8,7 @@ import {
   Icon,
   FilenamePreview,
   Text,
+  VIEWPORT_MD_MIN_QUERY,
   type ScrollBoundaryState,
 } from '@rpg/ui'
 import {
@@ -27,7 +28,7 @@ import { MEDIA_IMAGE_ACCEPT } from '../../lib/media-upload.lib'
 
 function readGalleryColumnStride(): number {
   if (typeof window.matchMedia !== 'function') return 1
-  return window.matchMedia('(min-width: 768px)').matches ? 2 : 1
+  return window.matchMedia(VIEWPORT_MD_MIN_QUERY).matches ? 2 : 1
 }
 
 export type MediaGalleryProps = {
@@ -98,7 +99,7 @@ export function MediaGallery({
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return
 
-    const mediaQuery = window.matchMedia('(min-width: 768px)')
+    const mediaQuery = window.matchMedia(VIEWPORT_MD_MIN_QUERY)
     const syncColumnStride = () =>
       setColumnStride((current) => {
         const next = mediaQuery.matches ? 2 : 1

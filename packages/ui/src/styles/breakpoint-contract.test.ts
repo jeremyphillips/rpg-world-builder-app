@@ -117,6 +117,33 @@ function expectCompiled(css: string, selector: string, atRule: string) {
   expect(css.slice(start, start + 240), selector).toContain(atRule)
 }
 
+function authoredBreakpointMd(): string {
+  const source = readFileSync(breakpointFile, 'utf8')
+  const value = source.match(/--breakpoint-md:\s*([^;]+);/)?.[1]?.trim()
+  expect(value, 'breakpoints.css must declare --breakpoint-md').toBeTruthy()
+  return value ?? ''
+}
+
+/** Condition inside the generated `md:` rule. The length comes from `breakpoints.css`. */
+function compiledMdMediaCondition(css: string): string {
+  const selector = '.md\\:flex'
+  const start = css.indexOf(selector)
+  expect(start, `missing selector ${selector}`).toBeGreaterThanOrEqual(0)
+  const condition = css.slice(start, start + 240).match(/@media\s*(\([^)]+\))/)?.[1]
+  expect(condition, 'compiled md: rule must include a media condition').toBeTruthy()
+  return condition ?? ''
+}
+
+const APPROVED_RUNTIME_QUERY_FILE = join(stylesDir, '../hooks/use-media-min-width.client.ts')
+
+/** Parenthesized width queries with a length, such as `(width >= 48rem)`. */
+const RUNTIME_WIDTH_QUERY =
+  /\(\s*(?:min-width|max-width|width)\s*(?:[<>]=?|:)\s*[\d.]+(?:px|rem|em)\s*\)/g
+
+function stripSourceComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^\\])\/\/.*$/gm, '$1')
+}
+
 describe('breakpoint contract', () => {
   it('compiles viewport and container variants from breakpoints.css', async () => {
     const tailwind = loadTailwindNode()
@@ -126,17 +153,18 @@ describe('breakpoint contract', () => {
     })
     const css = compiled.build(['md:flex', 'xl:grid', '@lg:block', '@3xl:inline', 'probe-utility'])
 
-    expectCompiled(css, '.md\\:flex', '@media (width >= 48rem)')
+    const compiledMdMediaConditionText = compiledMdMediaCondition(css)
+    expect(compiledMdMediaConditionText).toContain(authoredBreakpointMd())
+    expect(VIEWPORT_MD_MIN_QUERY).toBe(compiledMdMediaConditionText)
+    expectCompiled(css, '.md\\:flex', `@media ${compiledMdMediaConditionText}`)
+    expectCompiled(css, '.probe-utility', `@media ${compiledMdMediaConditionText}`)
+
     expectCompiled(css, '.xl\\:grid', '@media (width >= 80rem)')
     expectCompiled(css, '.\\@lg\\:block', '@container (width >= 32rem)')
     expectCompiled(css, '.\\@3xl\\:inline', '@container (width >= 48rem)')
-    expectCompiled(css, '.probe-utility', '@media (width >= 48rem)')
     expectCompiled(css, '.probe-component', '@media (width >= 80rem)')
     expectCompiled(css, '.probe-base', '@media (width >= 40rem)')
     expectCompiled(css, '.probe-root', '@media (width >= 80rem)')
-
-    expect(VIEWPORT_MD_MIN_QUERY).toBe('(width >= 48rem)')
-    expect(css).toContain(`@media ${VIEWPORT_MD_MIN_QUERY}`)
   })
 
   it('resets only the viewport breakpoint namespace', () => {
@@ -170,6 +198,29 @@ describe('breakpoint contract', () => {
       const queries = viewportWidthMedia(readFileSync(file, 'utf8'))
       if (queries.length === 0) continue
       violations.push(`${relative(repoRoot, file)}: ${queries.join(' | ')}`)
+    }
+    expect(violations, violations.join('\n')).toEqual([])
+  })
+
+  it('rejects runtime breakpoint queries outside VIEWPORT_MD_MIN_QUERY', () => {
+    const violations: string[] = []
+    for (const file of SCAN_ROOTS.flatMap((root) => collectSourceFiles(root))) {
+      if (!file.endsWith('.ts') && !file.endsWith('.tsx')) continue
+      const text = stripSourceComments(readFileSync(file, 'utf8'))
+      const queries = [...text.matchAll(RUNTIME_WIDTH_QUERY)].map((match) => match[0])
+      if (queries.length === 0) continue
+
+      if (file === APPROVED_RUNTIME_QUERY_FILE) {
+        const approved = text.match(/VIEWPORT_MD_MIN_QUERY\s*=\s*(['"`])(\([^'"`]+\))\1/)?.[2]
+        const extras = queries.filter((query) => query !== approved)
+        if (approved && queries.length === 1 && extras.length === 0) continue
+        violations.push(
+          `${relative(repoRoot, file)}: ${queries.join(', ')} (approved definition ${approved ?? 'missing'})`,
+        )
+        continue
+      }
+
+      violations.push(`${relative(repoRoot, file)}: ${queries.join(', ')}`)
     }
     expect(violations, violations.join('\n')).toEqual([])
   })

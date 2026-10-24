@@ -212,7 +212,7 @@ Side-by-side **vertical stacks** of mixed form items (`kind: 'columns'`). Not a 
 are wrapping leaf siblings on one control band. Columns is layout-only: no fieldset, no
 shared field container. Each child stays a top-level chrome unit.
 
-Wide (`md` / 768px+): CSS grid of independent `FormRhythmStack`s. Optional `widths`:
+Wide (viewport `md`): CSS grid of independent `FormRhythmStack`s. Optional `widths`:
 `'equal'` (default, `md:grid-cols-2`) or `'primary-detail'`
 (`md:grid-cols-[2fr_minmax(18rem,1fr)]`) — a primary column with a supporting control.
 Ignored for three-or-more column layouts. Narrow default: the same stacks in

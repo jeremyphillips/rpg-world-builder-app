@@ -2,6 +2,7 @@ import { beforeEach, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { resolveAvailableContentMediaSources } from '@rpg/contracts'
+import { VIEWPORT_MD_MIN_QUERY } from '@rpg/ui'
 import { MediaGallery } from './media-gallery'
 import { mediaFixture, mediaFixtureAssets } from '../../fixtures'
 
@@ -71,7 +72,7 @@ it('calls onAdd from the gallery picker', async () => {
 it('moves keyboard selection vertically by the visible column stride', () => {
   const onSelect = vi.fn()
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
-    matches: query === '(min-width: 768px)',
+    matches: query === VIEWPORT_MD_MIN_QUERY,
     media: query,
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
