@@ -10,6 +10,7 @@ import { VIEWPORT_MD_MIN_QUERY } from '../hooks/use-media-min-width.client'
 const stylesDir = dirname(fileURLToPath(import.meta.url))
 const repoRoot = join(stylesDir, '../../../..')
 const breakpointFile = join(stylesDir, 'breakpoints.css')
+const globalsFile = join(stylesDir, 'globals.css')
 
 const SCAN_ROOTS = [
   join(repoRoot, 'packages/ui/src'),
@@ -167,6 +168,11 @@ describe('breakpoint contract', () => {
     expectCompiled(css, '.probe-root', '@media (width >= 80rem)')
   })
 
+  it('imports breakpoints.css from globals.css immediately after tailwindcss', () => {
+    const source = readFileSync(globalsFile, 'utf8')
+    expect(source).toMatch(/@import 'tailwindcss';\s*@import '\.\/breakpoints\.css';/)
+  })
+
   it('resets only the viewport breakpoint namespace', () => {
     const source = readFileSync(breakpointFile, 'utf8')
     expect(source).toContain('--breakpoint-*: initial;')
@@ -175,7 +181,7 @@ describe('breakpoint contract', () => {
     expect(source).toContain('--breakpoint-lg: 64rem;')
     expect(source).toContain('--breakpoint-xl: 80rem;')
     expect(source).toContain('--breakpoint-2xl: 96rem;')
-    const theme = source.match(/@theme\s*\{([^}]*)\}/)?.[1] ?? ''
+    const theme = stripSourceComments(source).match(/@theme\s*\{([^}]*)\}/)?.[1] ?? ''
     expect(theme).not.toContain('--container-')
   })
 
