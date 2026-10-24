@@ -310,8 +310,13 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     </>
   )
 
-  const columnBody = dockedShellClass ? (
-    <div className={dockedShellClass}>{formColumnContent}</div>
+  const formColumnWrapperClasses = cn(
+    aside && !externalFooter ? formTabbedAsideBodyClasses : null,
+    dockedShellClass,
+  )
+
+  const formColumn = formColumnWrapperClasses ? (
+    <div className={formColumnWrapperClasses}>{formColumnContent}</div>
   ) : (
     formColumnContent
   )
@@ -319,11 +324,11 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   const defaultLayout =
     aside && !externalFooter ? (
       <div className={formTabbedAsideGridClasses}>
-        <div className={cn(formTabbedAsideBodyClasses, dockedShellClass)}>{formColumnContent}</div>
+        {formColumn}
         <div className={formTabbedAsideSlotClasses}>{aside}</div>
       </div>
     ) : (
-      columnBody
+      formColumn
     )
 
   return (

@@ -37,9 +37,8 @@ footer (flush to the viewport bottom). Non-preview catalog routes and settings-s
 it never selects scroll ownership; pass explicit `boundedScroll` or use the docked-footer shell path.
 Top inset scrolls away via `scrollBodyClassName` (typically `formViewportScrollBodyTopInsetClasses`)
 as the first child inside the scroll region — not as padding on the scroll container — so sticky
-tabs can reach `top-0`; preview-rail top
-gutter lives on `formTabbedAsideSlotTopInsetClasses`; bottom breathing room on
-`formTabbedAsideSlotBottomInsetClasses` (`xl:pb-4` — intentional inset so preview content clears
+tabs can reach `top-0`. Preview-rail aside insets live on `ui-tabbed-form__aside` in
+`form-chrome.css` (`padding-top` from `xl`, `padding-bottom` on `xl` so preview content clears
 the docked form footer; the form-column footer itself stays flush). Plain `<Form>` with docked
 sticky footer passes `boundedScroll` on the scroll body when `usesDockedStickyFooter`.
 Inner scroll regions compose [`boundedScrollRegionClasses`](../bounded-scroll-region.md) for
@@ -53,12 +52,11 @@ Presets: `formStickyTabsTransparentClasses`, `formStickyActionsBarTransparentCla
 
 ### Docked shell (`ui-form-docked-shell`)
 
-One CSS contract; `formStickyScrollShellWithDockedFooterClasses` mounts it at four sites:
+One CSS contract; `formStickyScrollShellWithDockedFooterClasses` mounts it at three owners:
 
-1. `TabbedForm` without an aside (`columnBody`)
-2. `TabbedForm` with an aside (mixed onto `ui-tabbed-form__body`)
-3. `FormShellChildren` when `<Form stickyFooter>` is docked (`documentScroll` and `externalFooter` false)
-4. Dashboard `CharacterBuilderFormColumn` (documented cross-owner use of the `ui-*` block)
+1. `TabbedForm` form column (`ui-form-docked-shell` on the column wrapper, or mixed with `ui-tabbed-form__body` when an aside is present)
+2. `FormShellChildren` when `<Form stickyFooter>` is docked (`documentScroll` and `externalFooter` false)
+3. Dashboard `CharacterBuilderFormColumn` (documented cross-owner use of the `ui-*` block)
 
 The shell publishes form scroll chrome, floor gap, docked bar block size, and
 `--rpg-content-bottom-inset`. It does not publish `--rpg-content-top-inset`; the master-detail list

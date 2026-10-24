@@ -3,7 +3,8 @@ import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { chromium, type Browser, type Page } from 'playwright'
+import type { Browser, Page } from 'playwright'
+import { launchHeadlessChromium } from '@rpg/ui/test-utils'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../../../../../../..')
@@ -136,18 +137,7 @@ describe('master-detail content top inset', () => {
       'master-detail-grid',
       'form-scroll-body-container',
     ])
-    try {
-      browser = await chromium.launch({ channel: 'chrome', headless: true })
-    } catch (chromeError) {
-      try {
-        browser = await chromium.launch({ headless: true })
-      } catch (bundledError) {
-        throw new Error(
-          `Inset contract checks need Chrome or Playwright's Chromium.\n${String(chromeError)}\n${String(bundledError)}`,
-          { cause: bundledError },
-        )
-      }
-    }
+    browser = await launchHeadlessChromium()
   }, 180_000)
 
   afterAll(async () => {
