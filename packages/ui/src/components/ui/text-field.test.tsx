@@ -36,7 +36,7 @@ describe('TextField trailingAction', () => {
     )
 
     const button = screen.getByRole('button', { name: 'Generate' })
-    expect(button.querySelector('[data-testid="generate-icon"]')).toBeInTheDocument()
+    expect(button.querySelector('svg[data-icon="wand-sparkles"]')).toBeInTheDocument()
   })
 
   it('fires the trailing action callback', async () => {

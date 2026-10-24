@@ -2,7 +2,6 @@
 import { Icon } from './icon/icon'
 
 import * as React from 'react'
-import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import {
   DropdownMenu,

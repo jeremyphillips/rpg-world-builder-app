@@ -83,7 +83,7 @@ describe('SemanticText', () => {
 
     const iconWrapper = container.querySelector('[aria-hidden="true"]')
     expect(iconWrapper).toHaveClass('ui-semantic-text__icon')
-    expect(screen.getByTestId('icon')).toBeInTheDocument()
+    expect(container.querySelector('svg[data-icon="triangle-alert"]')).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

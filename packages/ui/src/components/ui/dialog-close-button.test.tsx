@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 
-import { dialogPanelHeaderGlyphSizeClasses } from './dialog-panel-header-icon-control.lib'
 import { DialogCloseButton } from './dialog-parts.client'
 
 function CloseInDialog() {
@@ -27,8 +26,7 @@ describe('DialogCloseButton', () => {
     expect(button).toHaveClass('ui-compact-control--icon-default')
 
     const glyph = button.querySelector('svg')
-    expect(glyph).toHaveClass(dialogPanelHeaderGlyphSizeClasses)
-    expect(glyph).not.toHaveClass('size-4')
+    expect(glyph).toHaveClass('ui-icon', 'ui-icon--owner')
 
     await user.click(button)
   })

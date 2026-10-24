@@ -24,6 +24,6 @@ describe('iconContainerVariants', () => {
 
   it('supports the larger md footprint', () => {
     expect(iconContainerVariants({ size: 'md' })).toContain('ui-identity-frame--md')
-    expect(iconContainerVariants({ size: 'md' })).toContain('[&>svg]:size-6')
+    expect(iconContainerVariants({ size: 'md' })).toContain('ui-icon-container--md')
   })
 })

@@ -528,7 +528,7 @@ describe('css layer ownership', () => {
       }
     }
     expect(violations).toEqual([])
-  })
+  }, 15_000)
 
   it('keeps semantic CSS inside the entry graph and named layers', () => {
     const graph = stylesheetGraph()

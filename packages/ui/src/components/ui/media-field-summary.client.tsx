@@ -15,7 +15,6 @@ import {
 import {
   mediaSummaryCompactCountVariants,
   mediaSummaryCompactGearButtonVariants,
-  mediaSummaryCompactGearIconVariants,
   mediaSummaryCompactInteractiveRootVariants,
   mediaSummaryCompactOverlayVariants,
   mediaSummaryCompactPreviewButtonVariants,
