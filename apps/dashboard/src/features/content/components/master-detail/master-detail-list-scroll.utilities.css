@@ -1,8 +1,16 @@
 /*
- * Master-detail list shell viewport cap — publishes `--master-detail-shell-max-block-size`
- * once for the always-valid dvh + content fallback; consumers read that var for min-height
- * floors. Inside `form-scroll-body-container`, tighten max-height against the definite clip
- * slot without redefining the fallback custom property (invalid 100cqh must not wipe it).
+ * Master-detail list shell viewport cap.
+ *
+ * `--rpg-content-top-inset` is resolved here, and only here. It is the layout-viewport
+ * total (app chrome + page heading + form scroll chrome) that a `100dvh` cap subtracts.
+ * Owners publish those contributions under their own names. This rule does not read
+ * `--rpg-content-top-inset` while declaring it.
+ *
+ * `--master-detail-shell-max-block-size` is that viewport fallback. Min-height floors
+ * read it. Inside `form-scroll-body-container`, used `max-height` uses the container's
+ * own box (`100cqh` minus in-container form chrome and the floor gap), capped by the
+ * same content length. It does not subtract the viewport total or the bottom inset:
+ * the clip is already below app chrome and above the docked bar.
  */
 
 @utility master-detail-grid {
@@ -11,6 +19,11 @@
 
 @utility master-detail-list-shell-viewport-cap {
   --master-detail-list-chrome-block-size: 5.5rem;
+
+  --rpg-content-top-inset: calc(
+    var(--app-sticky-chrome-block-size, 0px) + var(--rpg-page-heading-inset, 0px) +
+      var(--rpg-form-docked-scroll-top-chrome-inset, 0px)
+  );
 
   --master-detail-shell-max-block-size: min(
     calc(
@@ -26,7 +39,9 @@
 
   @container form-scroll-body (min-height: 0) {
     max-height: min(
-      var(--master-detail-shell-max-block-size),
+      calc(
+        var(--master-detail-list-max-block-size) + var(--master-detail-list-chrome-block-size, 0px)
+      ),
       max(
         0px,
         calc(

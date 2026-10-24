@@ -36,7 +36,6 @@
     flex: 1 1 0%;
     flex-direction: column;
     padding-inline: calc(var(--spacing) * 4);
-    --rpg-content-top-inset: var(--app-sticky-chrome-block-size);
   }
 
   @media (width >= 40rem) {

@@ -76,10 +76,6 @@
     --rpg-content-bottom-inset: calc(
       var(--rpg-form-docked-actions-bar-block-size) + var(--rpg-content-floor-gap)
     );
-    /* F1: self-referencing cycle — see semantic-css-migration.md */
-    --rpg-content-top-inset: calc(
-      var(--rpg-content-top-inset, 0px) + var(--rpg-form-docked-scroll-top-chrome-inset)
-    );
   }
 
   .ui-form-docked-shell,

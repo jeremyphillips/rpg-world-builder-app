@@ -1,6 +1,5 @@
 @layer components {
   .dash-content-form-page {
-    /* F1: self-referencing cycle — see semantic-css-migration.md */
-    --rpg-content-top-inset: calc(var(--rpg-content-top-inset, 0px) + 4rem);
+    --rpg-page-heading-inset: 4rem;
   }
 }

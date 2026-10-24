@@ -15,9 +15,11 @@ column; `FormActionsBar` docks below a bounded scroll body
 (`formStickyScrollShellWithDockedFooterClasses` + `FormStickyScrollBody`) so save actions
 stay at the bottom of the viewport on long page forms. The docked-footer shell composition
 publishes `--rpg-content-bottom-inset` (standard docked actions bar footprint via
-`--rpg-form-docked-actions-bar-block-size`) and augments `--rpg-content-top-inset` with
-conservative scroll-chrome contracts for bounded inner panels that subtract them from
-viewport-relative fallback caps — not remaining content height. `--rpg-content-bottom-inset` is
+`--rpg-form-docked-actions-bar-block-size`) and `--rpg-form-docked-scroll-top-chrome-inset`
+(viewport scroll padding + identity header + sticky tabs). It does not publish
+`--rpg-content-top-inset`. The master-detail list resolves that viewport total from the
+app, page-heading, and form-chrome contributions. The lengths are reserved chrome, not
+remaining content height. `--rpg-content-bottom-inset` is
 for the **dvh fallback only**; slight under-fill is preferable to overlap with the docked
 footer. Master-detail list rails offset sticky `top` with
 `var(--rpg-form-sticky-tabs-block-size)` and cap via one resolved
