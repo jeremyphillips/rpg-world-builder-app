@@ -17,11 +17,7 @@ import type { EntitySummaryModel } from '../summary/entity-summary.types'
 import { entitySummaryStatusLaneVariants } from '../summary/entity-summary.variants'
 import { PickerSelectionStateLine } from '../summary/picker-selection-state-line'
 import { wrapEntityAnatomyLeadingMedia } from './entity-leading-media-shell.lib'
-import {
-  entityAnatomyHostRootVariants,
-  entityAnatomyMediaContentSpanClasses,
-  entityAnatomyVariants,
-} from './entity-anatomy.variants'
+import { entityAnatomyHostRootVariants, entityAnatomyVariants } from './entity-anatomy.variants'
 
 export type { EntityAnatomyLeading } from './entity-anatomy-leading.types'
 export type { EntityAnatomyTrailing } from './entity-anatomy-trailing.types'
@@ -99,7 +95,7 @@ export function EntityAnatomy({
           cell={{ slot: 'stretch', column: 'media' }}
           data-entity-item-slot="media"
         >
-          <div className={entityAnatomyMediaContentSpanClasses}>
+          <div className="flex h-full items-start">
             {wrapEntityAnatomyLeadingMedia(entity.media)}
           </div>
         </RowAnatomyCell>

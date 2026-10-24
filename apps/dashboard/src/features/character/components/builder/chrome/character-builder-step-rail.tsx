@@ -21,13 +21,6 @@ import {
   resolveStepVisualStatus,
   stepStatusAriaLabel,
 } from '../../../lib/builder/builder-step-visual-status'
-import {
-  characterBuilderStepRailIconClasses,
-  characterBuilderStepRailItemActiveClasses,
-  characterBuilderStepRailItemClasses,
-  characterBuilderStepRailNavClasses,
-} from '../character-builder-shell.variants'
-
 export type CharacterBuilderStepRailProps = {
   draft: CharacterBuilderDraft
   currentStepId: CharacterBuilderStepId
@@ -85,7 +78,7 @@ export function CharacterBuilderStepRail({
   return (
     <nav
       aria-label="Character builder steps"
-      className={characterBuilderStepRailNavClasses}
+      className="dash-character-builder__step-rail"
       onKeyDown={handleStepRailKeyDown}
     >
       <ol>
@@ -113,16 +106,16 @@ export function CharacterBuilderStepRail({
                 aria-current={isActive ? 'step' : undefined}
                 aria-label={stepStatusAriaLabel(step.label, visualStatus)}
                 className={cn(
-                  characterBuilderStepRailItemClasses,
+                  'dash-character-builder__step',
                   interactiveFocusVariants({ context: 'standalone' }),
-                  isActive && characterBuilderStepRailItemActiveClasses,
+                  isActive && 'dash-character-builder__step--active',
                 )}
                 onClick={() => onStepSelect(step.id)}
               >
                 <StatusIcon
                   variant={resolveStepStatusIconVariant(visualStatus)}
                   size="md"
-                  className={characterBuilderStepRailIconClasses}
+                  className="dash-character-builder__step-icon"
                 />
                 <Text
                   as="span"

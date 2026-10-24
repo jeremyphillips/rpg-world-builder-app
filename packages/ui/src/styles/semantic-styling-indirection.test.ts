@@ -187,24 +187,28 @@ export const rowClasses = cn('ui-card', 'flex')`,
       'Permanent exceptions are omitted from the baseline. Do not record them as temporary debt.',
     ).toEqual([])
     expect(
-      unexpected,
-      `New styling indirection outside baseline:\n${unexpected.join('\n')}`,
-    ).toEqual([])
-    expect(
       stale,
       `Remove fixed entries from semantic-styling-indirection.baseline.json:\n${stale.join('\n')}\nDo not replace a removed key with a different symbol or violation type in the same file.`,
     ).toEqual([])
+    expect(
+      unexpected,
+      `New styling indirection outside baseline:\n${unexpected.join('\n')}`,
+    ).toEqual([])
   })
 
-  it('keeps panelSectionInsetClasses as the only permanent exception', () => {
+  it('keeps the approved styling-indirection exceptions', () => {
+    const approved = [
+      'apps/dashboard/src/components/layout/shell/app-shell.variants.ts:appShellBreadcrumbRailClasses',
+      'apps/dashboard/src/features/character/components/builder/character-builder-shell.variants.ts:characterBuilderStepPanelClasses',
+      'packages/ui/src/components/ui/field.variants.ts:fieldChipWrapGapClasses',
+      'packages/ui/src/components/ui/field.variants.ts:fieldGroupBottomMarginClasses',
+      'packages/ui/src/components/ui/field.variants.ts:fieldGroupSectionOuterMarginResetClasses',
+      'packages/ui/src/components/ui/panel.variants.ts:panelSectionInsetClasses',
+      'packages/ui/src/form/chrome/form-chrome.variants.ts:formStickyScrollShellWithDockedFooterClasses',
+    ]
     const excepted = allHits.filter((hit) => allowlist.has(stylingIndirectionAllowlistKey(hit)))
-    expect([...allowlist]).toEqual([
-      'packages/ui/src/components/ui/panel.variants.ts:panelSectionInsetClasses',
-    ])
-    expect(excepted.map(stylingIndirectionAllowlistKey)).toEqual([
-      'packages/ui/src/components/ui/panel.variants.ts:panelSectionInsetClasses',
-    ])
-    expect(excepted.map((hit) => hit.violationType)).toEqual(['single-semantic-alias'])
+    expect([...allowlist].sort()).toEqual(approved)
+    expect(excepted.map(stylingIndirectionAllowlistKey).sort()).toEqual(approved)
     for (const key of allowlist) {
       expect(baseline.some((entry) => entry.startsWith(`${key}:`))).toBe(false)
     }

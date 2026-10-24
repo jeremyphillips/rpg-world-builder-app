@@ -15,9 +15,13 @@ import {
   CreateCompositionComposer,
   CreateCompositionStage,
   CreateCompositionSummary,
-  createCompositionStageSubheadingClasses,
-  useCreateFlowFormDensity,
   CREATE_FLOW_FORM_DENSITY,
+  createCompositionStageSubheadingClasses,
+  createTabDiscoveryBodyClasses,
+  createTabDiscoveryControlsClasses,
+  createTabDiscoveryCreateActionClasses,
+  createTabDiscoveryListClasses,
+  useCreateFlowFormDensity,
 } from '@/lib/create-flow'
 
 import { CatalogCard } from '@/features/content'
@@ -55,12 +59,6 @@ import type {
   BuildingOrganizationRelationshipDraft,
   BuildingOrganizationRelationshipKindOption,
 } from '../../lib/building-organizations/building-organization-create-drafts'
-import {
-  buildingOrganizationsDiscoveryBodyClasses,
-  buildingOrganizationsDiscoveryControlsClasses,
-  buildingOrganizationsDiscoveryCreateActionClasses,
-  buildingOrganizationsDiscoveryListClasses,
-} from './building-organizations-create-tab.variants'
 import { OrganizationAuthoringFormShell } from '../../../organizations/components/create/organization-authoring-form-shell'
 import { OrganizationAuthoringPresetBridge } from '../../../organizations/components/create/organization-authoring-preset-bridge'
 import { useOrganizationAuthoringContext } from '../../../organizations/components/authoring/use-organization-authoring-context'
@@ -181,8 +179,8 @@ function BuildingOrganizationDiscoveryBody({
   } = controller
 
   return (
-    <div className={buildingOrganizationsDiscoveryBodyClasses}>
-      <div className={buildingOrganizationsDiscoveryControlsClasses}>
+    <div className={createTabDiscoveryBodyClasses}>
+      <div className={createTabDiscoveryControlsClasses}>
         <SearchBar
           id="building-organization-search"
           placeholder={BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER}
@@ -190,7 +188,7 @@ function BuildingOrganizationDiscoveryBody({
           value={searchQuery}
           onValueChange={setSearchQuery}
         />
-        <div className={buildingOrganizationsDiscoveryCreateActionClasses}>
+        <div className={createTabDiscoveryCreateActionClasses}>
           <Button
             type="button"
             variant="text"
@@ -202,7 +200,7 @@ function BuildingOrganizationDiscoveryBody({
           </Button>
         </div>
       </div>
-      <div className={buildingOrganizationsDiscoveryListClasses}>
+      <div className={createTabDiscoveryListClasses}>
         {isError ? (
           <Alert variant="destructive" title={BUILDING_ORGANIZATIONS_LOAD_ERROR_TITLE} />
         ) : null}

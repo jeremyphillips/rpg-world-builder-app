@@ -22,7 +22,6 @@ import type {
   ComboboxRenderSelectedItem,
 } from './combobox-field.types'
 import { SearchBar } from './search-bar.client'
-import { selectOptionItemReasonVariants } from './select-option-item.variants'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxTriggerValueTextClasses,
@@ -137,7 +136,7 @@ function comboboxDisabledReasonEndSlot(reason: string) {
   return (
     <span className="flex shrink-0 items-center gap-1.5">
       <Icon name="lock" size="md" className="shrink-0 opacity-60" />
-      <span className={selectOptionItemReasonVariants()}>{reason}</span>
+      <span className="text-style-caption">{reason}</span>
     </span>
   )
 }

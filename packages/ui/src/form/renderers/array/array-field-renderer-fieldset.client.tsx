@@ -1,7 +1,6 @@
 'use client'
 
 import {
-  arrayFieldStackedAddActionSpacingClasses,
   fieldGroupBottomMarginClasses,
   fieldGroupSectionOuterMarginResetClasses,
   fieldSetChromeContainClasses,
@@ -128,13 +127,7 @@ export function ArrayFieldRendererFieldset({
           </>
         )}
         {!inlineAddInLegend ? (
-          <div
-            className={
-              state.addActionLayout === 'stacked'
-                ? arrayFieldStackedAddActionSpacingClasses
-                : undefined
-            }
-          >
+          <div className={state.addActionLayout === 'stacked' ? 'mt-4' : undefined}>
             {addControl}
           </div>
         ) : null}

@@ -1,7 +1,6 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { fieldGroupLegendTypographyClasses } from './field.variants'
 
 export const accordionItemVariants = cva('', {
   variants: {
@@ -24,7 +23,7 @@ export const accordionTriggerVariants = cva(
     variants: {
       variant: {
         default: 'py-4 font-medium hover:underline',
-        section: cn('w-full py-2 hover:text-foreground/80', fieldGroupLegendTypographyClasses),
+        section: cn('w-full py-2 hover:text-foreground/80', 'text-style-field-legend'),
       },
     },
     defaultVariants: {

@@ -4,7 +4,6 @@ import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import {
-  fieldGroupDescriptionTypographyClasses,
   fieldGroupLegendHeaderStackClasses,
   fieldLabelHintStackClasses,
   fieldLabelVariants,
@@ -58,7 +57,7 @@ function renderHint(hint: string | FieldHintConfig | undefined, tier: FormHeadin
     return <Text variant="caption">{normalized.text}</Text>
   }
   return (
-    <Text as="span" className={fieldGroupDescriptionTypographyClasses}>
+    <Text as="span" className="text-style-field-group-description">
       {normalized.text}
     </Text>
   )

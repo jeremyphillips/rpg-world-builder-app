@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { DetailEntityRowActions } from '../detail-entity-row-actions'
-import { detailEntityRowActionsVariants } from '../detail-entity-row-actions.variants'
 
 describe('DetailEntityRowActions', () => {
   it('renders children in order without altering their roles', () => {
@@ -24,6 +23,6 @@ describe('DetailEntityRowActions', () => {
       </DetailEntityRowActions>,
     )
 
-    expect(container.firstChild).toHaveClass(...detailEntityRowActionsVariants.split(' '))
+    expect(container.firstChild).toHaveClass('flex', 'shrink-0', 'items-center', 'gap-0.5')
   })
 })

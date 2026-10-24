@@ -37,8 +37,6 @@ import { findGameTermsCategory } from '../lib/hub/vocabulary-set-registry'
 import { GameTermDetailMediaField } from '../components/game-term-detail-media-field'
 import { shouldShowGameTermMediaField } from '../lib/vocabulary/vocabulary-term-detail-page.lib'
 import type { MediaManagerSave } from '@/features/media'
-import { vocabularyTermDetailBodyClasses } from './vocabulary-term-detail-content.variants'
-
 type VocabularyTermDetailBodyProps = {
   campaignId: string
   setId: VocabularyOptionSetId
@@ -89,7 +87,7 @@ function VocabularyTermDetailBody({
 
   return (
     <>
-      <div className={vocabularyTermDetailBodyClasses}>
+      <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0 flex-1 space-y-3">
           <div>
             <Eyebrow size="md" tone="muted" className="mb-1">

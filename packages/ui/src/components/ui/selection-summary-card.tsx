@@ -6,15 +6,12 @@ import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { Eyebrow } from './eyebrow'
 import {
-  selectionSummaryCardChangeActionClasses,
   selectionSummaryCardListClasses,
   selectionSummaryCardRowActionColumnClasses,
   selectionSummaryCardRowGroupClasses,
   selectionSummaryCardRowGroupDividerClasses,
   selectionSummaryCardRowHelperVariants,
-  selectionSummaryCardRowLabelVariants,
   selectionSummaryCardRowValueButtonClasses,
-  selectionSummaryCardRowValueCellClasses,
   selectionSummaryCardRowValueVariants,
   selectionSummaryCardSectionClasses,
   selectionSummaryCardShellClasses,
@@ -68,8 +65,8 @@ export function SelectionSummaryRow({
         showDivider ? selectionSummaryCardRowGroupDividerClasses : undefined,
       )}
     >
-      <dt className={selectionSummaryCardRowLabelVariants()}>{label}</dt>
-      <dd className={selectionSummaryCardRowValueCellClasses}>{valueContent}</dd>
+      <dt className="text-style-supporting">{label}</dt>
+      <dd className="min-w-0">{valueContent}</dd>
       <dd className={selectionSummaryCardRowActionColumnClasses}>{action ?? null}</dd>
       {helper ? <dd className={selectionSummaryCardRowHelperVariants}>{helper}</dd> : null}
     </div>
@@ -126,7 +123,7 @@ export function SelectionSummaryChangeAction({
       variant="text"
       size="sm"
       density="compact"
-      className={selectionSummaryCardChangeActionClasses}
+      className="shrink-0"
       aria-label={ariaLabel}
       onClick={onChange}
     >

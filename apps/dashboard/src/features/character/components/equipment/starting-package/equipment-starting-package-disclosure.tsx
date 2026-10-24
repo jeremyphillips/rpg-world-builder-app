@@ -38,7 +38,7 @@ import { EquipmentInventoryRowItem } from '../inventory/row/equipment-inventory-
 import {
   EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,
   equipmentInventoryRowListClasses,
-} from '../inventory/equipment-inventory.variants'
+} from '@/lib/equipment/equipment-inventory-list.variants'
 import { EquipmentPackageConversionEditor } from '../package-switch/equipment-package-conversion-editor'
 
 export type EquipmentStartingPackageDisclosureProps = {

@@ -16,17 +16,8 @@ export const appStickyChromeBlockSizeVarFallback = 'calc(3rem+2rem)'
 /** Named px fallback when `--app-sticky-chrome-block-size` is unavailable (document scroll spy). */
 export const appStickyChromeBlockSizeFallbackPx = 80
 
-/** Outer authenticated workspace frame — document scroll; no viewport lock. */
-export const appShellRootClasses = 'dash-app-shell'
-
-/** Content column beside the sidebar. */
-export const appShellContentColumnClasses = 'dash-app-shell__column'
-
-/** Sticky dashboard chrome (topbar + breadcrumb). */
-export const appShellStickyChromeClasses = 'dash-app-shell__chrome'
-
-/** Primary routed content column. */
-export const appShellMainClasses = 'dash-app-shell__main'
-
-/** Breadcrumb rail — shares horizontal gutter with main content. */
+/**
+ * Breadcrumb rail — shares horizontal gutter with main content.
+ * Applied by the shell rail and by the detail-page header rail.
+ */
 export const appShellBreadcrumbRailClasses = 'dash-app-shell__breadcrumb-rail'

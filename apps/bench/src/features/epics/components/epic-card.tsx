@@ -10,13 +10,9 @@ import { epicBadgeBackgroundColor, PriorityBadge } from '@/features/tickets'
 
 import { EpicStatusBadge } from './epic-status-badge'
 import { EpicTicketCounts } from './epic-ticket-counts'
-import {
-  epicCardAccentStripeClasses,
-  epicCardHeaderBodyClasses,
-  epicCardHeaderClasses,
-  epicCardRecentItemClasses,
-  epicCardRecentSectionLabelClasses,
-} from './epic-card.variants'
+
+const epicCardRecentItemClasses =
+  'block w-full truncate rounded-sm text-left hover:text-foreground hover:underline ui-focus-ring text-style-caption'
 
 interface EpicCardProps {
   epic: Epic
@@ -33,13 +29,13 @@ export function EpicCard({ epic, counts, recentlyActive, onSelectTicket }: EpicC
   return (
     <Card>
       <CardContent className="space-y-3 p-4">
-        <div className={epicCardHeaderClasses}>
+        <div className="flex gap-3">
           <div
-            className={epicCardAccentStripeClasses}
+            className="w-1 shrink-0 self-stretch rounded-full"
             style={{ backgroundColor: accentColor }}
             aria-hidden
           />
-          <div className={epicCardHeaderBodyClasses}>
+          <div className="min-w-0 flex-1 space-y-1">
             <Link to={benchEpicPath(epic.id)} className="font-medium hover:underline">
               {epic.title}
             </Link>
@@ -58,7 +54,7 @@ export function EpicCard({ epic, counts, recentlyActive, onSelectTicket }: EpicC
         <EpicTicketCounts counts={counts} />
         {recentlyActive.length > 0 ? (
           <div className="space-y-1">
-            <Text className={epicCardRecentSectionLabelClasses}>Recently active</Text>
+            <Text className="text-xs font-medium">Recently active</Text>
             <ul className="space-y-0.5">
               {recentlyActive.map((ticket) => (
                 <li key={ticket.id}>

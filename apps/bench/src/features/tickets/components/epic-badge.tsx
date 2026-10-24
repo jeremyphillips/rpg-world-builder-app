@@ -5,8 +5,6 @@ import { DEFAULT_EPIC_BADGE_COLOR } from '@rpg/contracts/dev-bench'
 import { Badge, cn } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
-import { epicBadgeLinkClasses } from './epic-badge.variants'
-
 const NO_EPIC_BADGE_LABEL = 'No epic'
 
 interface EpicBadgeProps {
@@ -37,7 +35,7 @@ export function EpicBadge({ epic, className, stopActivation = false }: EpicBadge
   return (
     <Link
       to={benchEpicPath(epic.id)}
-      className={cn(epicBadgeLinkClasses, className)}
+      className={cn('inline-flex max-w-full rounded-md ui-focus-ring', className)}
       aria-label={`Open epic ${epic.title}`}
       onClick={stopActivation ? stopCardActivation : undefined}
       onKeyDown={stopActivation ? stopCardActivation : undefined}

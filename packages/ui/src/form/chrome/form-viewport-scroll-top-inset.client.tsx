@@ -1,5 +1,4 @@
 import { cn } from '../../lib/utils'
-import { formViewportScrollBodyTopInsetClasses } from './form-chrome.variants'
 
 type FormScrollBodyTopInsetProps = {
   className: string
@@ -14,7 +13,11 @@ export function FormScrollBodyTopInset({ className }: FormScrollBodyTopInsetProp
   return <div className={cn(className, 'shrink-0')} aria-hidden="true" />
 }
 
-/** Preset scroll-away inset (`pt-8`). Dashboard `pageShellInsetTopClasses` is `pt-6`. */
+/**
+ * Preset scroll-away inset (`pt-8`, 2rem). Apply as the first child inside the scroll
+ * region, not on the scroll container, so sticky tabs can reach `top-0`.
+ * Dashboard `pageShellInsetTopClasses` is `pt-6`.
+ */
 export function FormViewportScrollTopInset() {
-  return <FormScrollBodyTopInset className={formViewportScrollBodyTopInsetClasses} />
+  return <FormScrollBodyTopInset className="pt-8" />
 }

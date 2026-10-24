@@ -10,7 +10,6 @@ import {
   catalogPickerHeaderChromeVariants,
   catalogPickerHeaderFilterClusterVariants,
   catalogPickerHeaderToolbarVariants,
-  catalogPickerSheetBodyVariants,
 } from './catalog-picker-sheet.variants'
 import { Sheet } from './sheet.client'
 
@@ -42,7 +41,7 @@ export function CatalogPickerSheetHeaderChrome({
         {headerBelowDescription}
         {showPickerChrome ? (
           <div className={catalogPickerHeaderFilterClusterVariants}>
-            <CatalogToolbar className={catalogPickerHeaderToolbarVariants()} {...toolbarProps} />
+            <CatalogToolbar className={catalogPickerHeaderToolbarVariants} {...toolbarProps} />
             {auxiliaryAction ? <CatalogPickerAuxiliaryActionSlot action={auxiliaryAction} /> : null}
           </div>
         ) : null}
@@ -69,12 +68,12 @@ export function CatalogPickerSheetScrollBody({
   bodyContent,
 }: CatalogPickerSheetScrollBodyProps) {
   if (bodyReplacement !== undefined) {
-    return <Sheet.Body className={catalogPickerSheetBodyVariants}>{bodyReplacement}</Sheet.Body>
+    return <Sheet.Body>{bodyReplacement}</Sheet.Body>
   }
 
   if (!pickerEnabled) {
     return null
   }
 
-  return <Sheet.Body className={catalogPickerSheetBodyVariants}>{bodyContent}</Sheet.Body>
+  return <Sheet.Body>{bodyContent}</Sheet.Body>
 }

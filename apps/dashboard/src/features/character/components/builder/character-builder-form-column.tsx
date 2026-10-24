@@ -2,11 +2,6 @@ import type { ReactNode } from 'react'
 
 import { FormStickyScrollBody, formStickyScrollShellWithDockedFooterClasses } from '@rpg/ui/form'
 
-import {
-  characterBuilderFormCompactPreviewSlotClasses,
-  characterBuilderShellFormColumnClasses,
-} from './character-builder-shell.variants'
-
 const characterBuilderFormScrollViewportClasses =
   'h-full min-h-0 overflow-y-auto scrollbar-slim pe-0 ps-0 pb-6'
 
@@ -23,14 +18,14 @@ export function CharacterBuilderFormColumn({
   compactPreview,
 }: CharacterBuilderFormColumnProps) {
   return (
-    <div className={characterBuilderShellFormColumnClasses}>
+    <div className="dash-character-builder__form">
       <div className={formStickyScrollShellWithDockedFooterClasses}>
         <FormStickyScrollBody
           boundedScroll
           scrollViewportClassName={characterBuilderFormScrollViewportClasses}
         >
           {compactPreview ? (
-            <div className={characterBuilderFormCompactPreviewSlotClasses}>{compactPreview}</div>
+            <div className="dash-character-builder__compact-preview">{compactPreview}</div>
           ) : null}
           {scrollContent}
         </FormStickyScrollBody>

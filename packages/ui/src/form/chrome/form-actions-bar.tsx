@@ -2,8 +2,6 @@ import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import { Text } from '../../components/ui/text'
-import { formDockedActionsBarClasses, formStickyActionsBarClasses } from './form-chrome.variants'
-
 export type FormActionsBarPlacement = 'sticky' | 'docked'
 
 export interface FormActionsBarProps {
@@ -33,7 +31,9 @@ export function FormActionsBar({
   }
 
   const placementClasses =
-    placement === 'docked' ? formDockedActionsBarClasses : formStickyActionsBarClasses
+    placement === 'docked'
+      ? 'ui-form-actions-bar ui-form-actions-bar--docked'
+      : 'ui-form-actions-bar ui-form-actions-bar--sticky'
 
   return (
     <div role="toolbar" aria-label="Form actions" className={cn(placementClasses, className)}>

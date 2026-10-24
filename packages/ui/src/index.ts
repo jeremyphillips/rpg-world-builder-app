@@ -1136,7 +1136,7 @@ export {
   type BuilderOptionDetailsSection,
   type BuilderOptionDetailsSectionItem,
 } from './components/ui/builder-option-details-sheet.client'
-export type { BuilderOptionPrimaryActionPlacement } from './components/ui/builder-option-details-sheet.variants'
+export type { BuilderOptionPrimaryActionPlacement } from './components/ui/builder-option-details-sheet.client'
 export {
   CollapsibleListItem,
   CollapsibleListItemActions,
@@ -1168,7 +1168,6 @@ export {
 export {
   CatalogPickerSheet,
   catalogPickerCardListClasses,
-  catalogPickerSheetListVariants,
   type CatalogPickerSheetProps,
   type CatalogPickerSearchStrategy,
   type CatalogPickerSheetActionsHelpers,
@@ -1323,7 +1322,7 @@ export {
   TableCell,
   TableCaption,
 } from './components/ui/table'
-export { tableHeaderRowClasses, tableHeaderRowVariants } from './components/ui/table.variants'
+export { tableHeaderRowVariants } from './components/ui/table.variants'
 export {
   Badge,
   type BadgeAppearance,

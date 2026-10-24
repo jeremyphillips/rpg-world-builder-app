@@ -26,7 +26,6 @@ import {
 import { CreateFlowFormDensityRoot } from './create-flow-form-density'
 import { resolveActiveCreateTabId } from './resolve-active-create-tab'
 import {
-  createModalShellBodyVariants,
   createModalShellContentVariants,
   createModalShellTabContentVariants,
   createModalShellTabContentViewportClasses,
@@ -293,12 +292,7 @@ export function CreateModalShell({
         {...(description == null ? { 'aria-describedby': undefined } : {})}
       >
         <Modal.Header headline={headline} description={description} />
-        <Modal.Body
-          stableBody
-          stableBodyClip
-          data-create-modal-body
-          className={createModalShellBodyVariants()}
-        >
+        <Modal.Body stableBody stableBodyClip data-create-modal-body className="gap-4">
           <CreateFlowFormDensityRoot>
             {setupSummary ? (
               <div className={dialogPanelSectionInsetXClasses}>

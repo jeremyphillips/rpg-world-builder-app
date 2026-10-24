@@ -70,15 +70,23 @@ These edits are not interchangeable.
 
 Type 3A and the string's later disposition are separate. After type 3A the export is still the named string. Inlining it, renaming it, or moving it into CSS waits on its own approval.
 
-The styling-indirection ratchet (`semantic-styling-indirection.test.ts`) keys temporary debt by file, exported symbol, and violation type (`empty-cva`, `single-semantic-alias`, `single-utility-alias`). A file may lose keys. A new key fails, including when it replaces an old key in the same file. `panelSectionInsetClasses` is the permanent exception (`semantic-styling-indirection.allowlist.json`), not baseline debt.
+The styling-indirection ratchet (`semantic-styling-indirection.test.ts`) keys temporary debt by file, exported symbol, and violation type (`empty-cva`, `single-semantic-alias`, `single-utility-alias`). A file may lose keys. A new key fails, including when it replaces an old key in the same file. Permanent exceptions live in `semantic-styling-indirection.allowlist.json`, not the baseline. Consumer count is evidence for an exception. It is not a reason by itself.
 
-## Approved decisions
+This cleanup does not add a BEM block to retire a variants file. **Approved Keep** means the module stays for this cleanup because inlining would harm readability and a CSS move is out of scope. It is not a ruling that the styling belongs in TypeScript.
 
-- Shell and form one-token alias inlines are deferred. Those publishers stay frozen.
-- Page width (`PageShell`), page rhythm, and viewport workspace stay resolvers. Do not invent BEM for those utilities.
-- `panelSectionInsetClasses` stays the named inset class for `Panel` children when `bleed` drops host padding.
+## Approved exceptions
 
-Decision-required families (const-only modules, radio-card row CSS, sticky-column ownership) stay open until a later review approves a disposition.
+Each symbol is allowlisted on its own. Membership in a shell or the field hub is not a reason.
+
+- `panelSectionInsetClasses` — named inset for `Panel` children when `bleed` drops host padding.
+- `formStickyScrollShellWithDockedFooterClasses` — `ui-form-docked-shell`, applied by `TabbedForm`, `FormShellChildren`, and `CharacterBuilderFormColumn`.
+- `appShellBreadcrumbRailClasses` — `dash-app-shell__breadcrumb-rail`, applied by the shell and by the detail-page header rail.
+- `characterBuilderStepPanelClasses` — `dash-character-builder__step-panel`, applied by the step panel and by the step frame.
+- `fieldGroupBottomMarginClasses` — shared `mb-8` under standalone field groups, omitted when parent rhythm owns the gap.
+- `fieldGroupSectionOuterMarginResetClasses` — shared `mb-0` that cancels that margin when a group is nested.
+- `fieldChipWrapGapClasses` — shared `gap-2` for chip pills in chips field and text-suggestions.
+
+Page width (`PageShell`), page rhythm, and viewport workspace stay resolvers. Do not invent BEM for those utilities. Radio-card rows compose `InteractiveRow`. The two sticky recipes (document sticky actions and the docked-footer shell) are not one contract. `table-builder` / `table-grid` stays the domain exception.
 
 ## Inspecting UI
 

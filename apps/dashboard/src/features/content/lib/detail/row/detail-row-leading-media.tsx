@@ -3,8 +3,6 @@ import type { ReactNode } from 'react'
 import { cn, identityFrameVariants } from '@rpg/ui'
 import type { IdentityFrameShape, IdentityFrameSize } from '@rpg/ui'
 
-import { detailRowLeadingMediaChildSlotVariants } from './detail-row-leading-media.variants'
-
 export type DetailRowLeadingMediaProps = {
   children: ReactNode
   /** Outer clip shape — same lane dimensions for box vs circle. */
@@ -36,7 +34,7 @@ export function DetailRowLeadingMedia({
       data-shape={shape}
       {...(size != null ? { 'data-size': size } : {})}
     >
-      <div className={detailRowLeadingMediaChildSlotVariants}>{children}</div>
+      <div className="size-full overflow-hidden [&>*]:size-full">{children}</div>
     </div>
   )
 }

@@ -5,8 +5,6 @@ import {
 } from '@rpg/contracts'
 import { Icon, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@rpg/ui'
 
-import { characterRelationshipIndicatorVariants } from './character-relationship-indicator.variants'
-
 export type CharacterRelationshipIndicatorPresentation = 'standalone' | 'inlinePassive'
 
 export type CharacterRelationshipIndicatorProps = {
@@ -44,7 +42,7 @@ export function CharacterRelationshipIndicator({
                   'aria-label': tooltip,
                   onClick: (event: MouseEvent) => event.stopPropagation(),
                 })}
-            className={characterRelationshipIndicatorVariants}
+            className="size-4 shrink-0 text-foreground-subtle group-hover:text-foreground group-focus-within:text-foreground"
           >
             <Icon name="user-round-check" size="lg" />
           </span>

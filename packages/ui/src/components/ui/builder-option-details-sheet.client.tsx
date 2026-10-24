@@ -12,11 +12,8 @@ import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-import {
-  builderOptionDetailsHeroImageVariants,
-  builderOptionDetailsSectionVariants,
-  type BuilderOptionPrimaryActionPlacement,
-} from './builder-option-details-sheet.variants'
+
+export type BuilderOptionPrimaryActionPlacement = 'header' | 'footer'
 
 export type BuilderOptionDetailsMetadata = {
   label: string
@@ -98,7 +95,7 @@ function DetailsSection({ section }: { section: BuilderOptionDetailsSection }) {
   const hasItems = section.items && section.items.length > 0
 
   return (
-    <section className={builderOptionDetailsSectionVariants()}>
+    <section className="space-y-2">
       <Heading variant="sheetSection" as="h2" className="mb-2">
         {section.title}
       </Heading>
@@ -179,7 +176,7 @@ export function BuilderOptionDetailsSheet({
       >
         {hasMedia ? (
           <Sheet.MediaScroll
-            media={<div className={builderOptionDetailsHeroImageVariants}>{heroImage}</div>}
+            media={<div className="shrink-0 w-full overflow-hidden">{heroImage}</div>}
             header={header}
           >
             <div className="space-y-6">{bodyContent}</div>

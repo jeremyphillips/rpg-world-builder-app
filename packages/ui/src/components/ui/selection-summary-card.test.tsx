@@ -71,7 +71,10 @@ describe('SelectionSummaryCard', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Guildmaster, Change title' }))
+    const valueButton = screen.getByRole('button', { name: 'Guildmaster, Change title' })
+    expect(valueButton).toHaveClass('ui-focus-ring')
+    expect(valueButton.className).not.toContain('focus-visible:ring-2')
+    await user.click(valueButton)
     expect(onChangeTitle).toHaveBeenCalledOnce()
   })
 

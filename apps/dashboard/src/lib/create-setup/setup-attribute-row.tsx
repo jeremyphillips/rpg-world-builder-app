@@ -3,11 +3,6 @@ import type { ReactNode } from 'react'
 import { cn, selectionSummaryCardRowHelperVariants } from '@rpg/ui'
 
 import { EyebrowActionHeader } from './eyebrow-action-header'
-import {
-  setupAttributeRowBodyClasses,
-  setupAttributeRowClasses,
-  setupAttributeRowValueClasses,
-} from './setup-attribute-row.variants'
 
 export type SetupAttributeRowProps = {
   eyebrow: string
@@ -28,7 +23,7 @@ function SetupAttributeRowHelper({ helper }: { helper: string }) {
 }
 
 function SetupAttributeRowCollapsedValue({ value }: { value: ReactNode }) {
-  return <div className={setupAttributeRowValueClasses}>{value}</div>
+  return <div className="text-base font-body-emphasis text-foreground">{value}</div>
 }
 
 export function SetupAttributeRow({
@@ -46,9 +41,14 @@ export function SetupAttributeRow({
   const showCollapsedValue = !editing && value !== undefined && value !== null && value !== ''
 
   return (
-    <div className={className ?? setupAttributeRowClasses}>
+    <div
+      className={
+        className ??
+        'flex flex-col border-b border-border pb-2.5 mb-2.5 last:border-b-0 last:mb-0 last:pb-0'
+      }
+    >
       <EyebrowActionHeader eyebrow={eyebrow} actionLabel={changeLabel} onAction={onChange} />
-      {editing ? <div className={setupAttributeRowBodyClasses}>{children}</div> : null}
+      {editing ? <div className="flex flex-col gap-y-3">{children}</div> : null}
       {showCollapsedValue ? <SetupAttributeRowCollapsedValue value={value} /> : null}
       {showHelper ? <SetupAttributeRowHelper helper={helper} /> : null}
     </div>

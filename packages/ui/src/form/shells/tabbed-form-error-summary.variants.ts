@@ -12,5 +12,5 @@ export const tabbedFormErrorSummaryActionsClasses = 'flex flex-wrap gap-2'
 export const tabbedFormErrorSummaryReviewButtonClasses = cn(
   'inline-flex items-center rounded-sm px-1.5 py-0.5',
   'text-style-label underline-offset-2 hover:underline',
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+  'ui-focus-ring',
 )

@@ -1,5 +1,3 @@
-import { cva } from 'class-variance-authority'
-
 export const fileListVariants = 'mt-4 w-full space-y-2'
 
 export const fileItemVariants =
@@ -13,6 +11,6 @@ export const fileIconVariants =
 export const removeButtonVariants =
   'ml-auto shrink-0 cursor-pointer rounded-sm p-1 text-muted-foreground opacity-70 transition-opacity hover:opacity-100 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1'
 
-export const fileNameVariants = cva('text-style-label')
+export const fileNameVariants = 'text-style-label'
 
-export const fileMetaVariants = cva('text-style-caption')
+export const fileMetaVariants = 'text-style-caption'

@@ -112,6 +112,6 @@ co-located drawer tests. InvOrg/InvChar stay composition-only. Persistence stays
 
 `EntityRowList.Group` imports group header and record separator tokens from
 [`detail/collection/detail-collection-chrome.variants.ts`](../detail/collection/detail-collection-chrome.variants.ts)
-— the same public contract used by grouped collection body primitives. Do not import
-private `detail-collection-group.variants.ts` or `detail-collection-row-list.variants.ts`
+— the same public contract used by grouped collection body primitives. Do not copy
+`DetailCollectionGroup` body classes or import `detail-collection-row-list.variants.ts`
 from relationship code. Detail: [detail/README.md](../detail/README.md).

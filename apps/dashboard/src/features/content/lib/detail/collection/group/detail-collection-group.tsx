@@ -3,7 +3,6 @@ import type { ReactNode } from 'react'
 import { cn, Eyebrow } from '@rpg/ui'
 
 import { detailCollectionGroupHeaderVariants } from '../detail-collection-chrome.variants'
-import { detailCollectionGroupVariants } from './detail-collection-group.variants'
 
 export type DetailCollectionGroupProps = {
   label?: string
@@ -26,7 +25,7 @@ export function DetailCollectionGroup({
   const showHeader = Boolean(label || action)
 
   return (
-    <div className={cn(detailCollectionGroupVariants, className)}>
+    <div className={cn('border-b border-border-subtle px-4 py-2 last:border-b-0', className)}>
       {showHeader ? (
         <div className={detailCollectionGroupHeaderVariants}>
           {label ? <Eyebrow size="sm">{label}</Eyebrow> : null}

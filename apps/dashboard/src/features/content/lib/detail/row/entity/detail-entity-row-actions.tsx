@@ -2,8 +2,6 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
-import { detailEntityRowActionsVariants } from './detail-entity-row-actions.variants'
-
 export type DetailEntityRowActionsProps = {
   children: ReactNode
   className?: string
@@ -15,5 +13,5 @@ export type DetailEntityRowActionsProps = {
  * Callers must not mount this with zero meaningful children.
  */
 export function DetailEntityRowActions({ children, className }: DetailEntityRowActionsProps) {
-  return <div className={cn(detailEntityRowActionsVariants, className)}>{children}</div>
+  return <div className={cn('flex shrink-0 items-center gap-0.5', className)}>{children}</div>
 }

@@ -193,8 +193,8 @@ function ExistingImageRow({
     <li className={fileItemVariants}>
       <img src={url} alt={label} className={fileThumbnailVariants} />
       <div className="min-w-0 flex-1">
-        <FilenamePreview filename={label} density="compact" className={fileNameVariants()} />
-        <p className={fileMetaVariants()}>Saved</p>
+        <FilenamePreview filename={label} density="compact" className={fileNameVariants} />
+        <p className={fileMetaVariants}>Saved</p>
       </div>
       {onRemove ? (
         <button
@@ -239,9 +239,9 @@ function FileList({
               <FilenamePreview
                 filename={file.name}
                 density="compact"
-                className={fileNameVariants()}
+                className={fileNameVariants}
               />
-              <p className={fileMetaVariants()}>{(file.size / 1024).toFixed(1)} KB</p>
+              <p className={fileMetaVariants}>{(file.size / 1024).toFixed(1)} KB</p>
             </div>
             <button
               type="button"

@@ -1,9 +1,6 @@
 import { cva } from 'class-variance-authority'
 import { cn, establishSurfaceCurrent } from '@rpg/ui'
 
-/** Horizontal inset co-located with chrome that owns background, border, or hover fill. */
-export const globalSearchGroupContentInsetClasses = 'px-3'
-
 /** Faint band for group headings inside transparent search panels (matches {@code .ui-interactive-list__heading}). */
 export const globalSearchGroupHeadingClasses = cn(
   'bg-surface-faint',

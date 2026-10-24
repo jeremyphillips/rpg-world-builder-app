@@ -37,6 +37,11 @@ describe('TicketLinkSelectedPreview', () => {
 
     const link = screen.getByRole('link', { name: `Open ${sampleTicket.key} in new tab` })
     expect(link).toHaveAttribute('href', `/tickets/${sampleTicket.id}`)
+    expect(link).toHaveClass('ui-focus-ring')
+    expect(link.className).not.toContain('focus-visible:ring-2')
+    const remove = screen.getByRole('button', { name: `Remove ${sampleTicket.key}` })
+    expect(remove).toHaveClass('ui-focus-ring')
+    expect(remove.className).not.toContain('focus-visible:ring-2')
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')
   })
@@ -58,6 +63,29 @@ describe('TicketLinkSelectedPreview', () => {
 
     await user.click(screen.getByRole('button', { name: `Remove ${sampleTicket.key}` }))
     expect(onRemove).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps the remove control disabled without the hand-rolled ring', () => {
+    render(
+      <TicketLinkSelectedPreview
+        option={{
+          value: sampleTicket.id,
+          label: `${sampleTicket.key} — ${sampleTicket.title}`,
+        }}
+        ticket={sampleTicket}
+        onRemove={vi.fn()}
+        disabled
+      />,
+    )
+
+    const remove = screen.getByRole('button', { name: `Remove ${sampleTicket.key}` })
+    expect(remove).toBeDisabled()
+    expect(remove).toHaveClass(
+      'ui-focus-ring',
+      'disabled:pointer-events-none',
+      'disabled:opacity-50',
+    )
+    expect(remove.className).not.toContain('focus-visible:ring-2')
   })
 
   it('falls back gracefully for stale selections', () => {

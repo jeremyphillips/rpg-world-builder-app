@@ -31,8 +31,6 @@ import { projectCharacterBuilderDraftDetailPreview } from '../../../lib/display/
 import { BUILDER_PREVIEW_CHARACTER_SHEET_LABEL } from '../../../lib/builder-preview/builder-preview-rail-copy'
 import { CharacterBuilderPreviewRailPlaceholder } from './character-builder-preview-rail-section-bodies'
 import { CharacterBuilderPreviewRailView } from './character-builder-preview-rail-view'
-import { formTabbedPreviewRailCompactTriggerHiddenClasses } from '@rpg/ui/form'
-
 export type CharacterBuilderPreviewRailProps = {
   draft: CharacterBuilderDraft
   context: CharacterBuildContext
@@ -165,7 +163,7 @@ export function CharacterBuilderPreviewCompactTrigger({ onOpen }: { onOpen: () =
       action="view"
       variant="outline"
       size="sm"
-      className={cn('shrink-0', formTabbedPreviewRailCompactTriggerHiddenClasses)}
+      className={cn('shrink-0 xl:hidden')}
       onClick={onOpen}
     >
       {BUILDER_PREVIEW_COMPACT_LABEL}

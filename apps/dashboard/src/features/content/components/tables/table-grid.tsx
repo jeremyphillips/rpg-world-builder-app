@@ -5,7 +5,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  tableHeaderRowClasses,
+  tableHeaderRowVariants,
 } from '@rpg/ui'
 
 import {
@@ -58,7 +58,7 @@ export function TableGrid({
     <>
       {heading ? <caption className="sr-only">{heading}</caption> : null}
       <TableHeader>
-        <TableRow className={tableHeaderRowClasses}>
+        <TableRow className={tableHeaderRowVariants}>
           {showRowHeader ? (
             <TableHead scope="col" className={tableGridRowHeaderHeaderClasses}>
               {rowHeaderLabel}

@@ -2,13 +2,6 @@ import type { ReactNode } from 'react'
 
 import { cn, Panel } from '@rpg/ui'
 
-import {
-  characterBuilderPreviewHintClasses,
-  characterBuilderPreviewSubsectionClasses,
-  characterBuilderPreviewSubsectionTitleClasses,
-  characterBuilderPreviewSubsectionsGroupClasses,
-} from './character-builder-preview-section-content.variants'
-
 export type CharacterBuilderPreviewSectionLayout = 'default' | 'subsections'
 
 export type CharacterBuilderPreviewSectionContentProps = {
@@ -32,12 +25,8 @@ export function CharacterBuilderPreviewSectionContent({
   if (layout === 'subsections') {
     return (
       <div className={cn('flex flex-col gap-3', className)}>
-        {hint ? <p className={characterBuilderPreviewHintClasses}>{hint}</p> : null}
-        <Panel
-          tone="transparent"
-          density="comfortable"
-          className={characterBuilderPreviewSubsectionsGroupClasses}
-        >
+        {hint ? <p className="text-style-caption">{hint}</p> : null}
+        <Panel tone="transparent" density="comfortable" className="flex flex-col gap-3">
           {children}
         </Panel>
       </div>
@@ -47,7 +36,7 @@ export function CharacterBuilderPreviewSectionContent({
   if (hint) {
     return (
       <div className={cn('flex flex-col gap-3', className)}>
-        <p className={characterBuilderPreviewHintClasses}>{hint}</p>
+        <p className="text-style-caption">{hint}</p>
         {children}
       </div>
     )
@@ -66,8 +55,8 @@ export function CharacterBuilderPreviewSubsection({
   children,
 }: CharacterBuilderPreviewSubsectionProps) {
   return (
-    <div className={characterBuilderPreviewSubsectionClasses}>
-      <p className={characterBuilderPreviewSubsectionTitleClasses}>{title}</p>
+    <div className="flex flex-col gap-1">
+      <p className="text-style-label text-foreground">{title}</p>
       {children}
     </div>
   )
@@ -80,5 +69,5 @@ export type CharacterBuilderPreviewSubsectionHintProps = {
 export function CharacterBuilderPreviewSubsectionHint({
   children,
 }: CharacterBuilderPreviewSubsectionHintProps) {
-  return <p className={characterBuilderPreviewHintClasses}>{children}</p>
+  return <p className="text-style-caption">{children}</p>
 }

@@ -7,8 +7,6 @@ import { ViewportWorkspace } from '@/components/layout/page/viewport-workspace'
 import { viewportWorkspacePaneClasses } from '@/components/layout/page/viewport-workspace.variants'
 
 import type { ContentFormPageWidth, ContentFormScrollMode } from './content-form-layout.lib'
-import { contentFormPageShellBodyClasses } from './content-form-page-shell.variants'
-
 export type { ContentFormPageWidth } from './content-form-layout.lib'
 
 export interface ContentFormPageShellProps {
@@ -33,7 +31,7 @@ export function ContentFormPageShell({
     <ViewportWorkspace className={className}>
       <PageShell width={pageWidth} spacing="none" className={viewportWorkspacePaneClasses}>
         {pageWidth === 'wide' ? (
-          <div className={cn(contentFormPageShellBodyClasses, 'flex min-h-0 flex-1 flex-col')}>
+          <div className={cn('dash-content-form-page', 'flex min-h-0 flex-1 flex-col')}>
             {children}
           </div>
         ) : (

@@ -43,7 +43,10 @@ describe('EpicCard', () => {
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('button', { name: /BENCH-001: Species picker/i }))
+    const recent = screen.getByRole('button', { name: /BENCH-001: Species picker/i })
+    expect(recent).toHaveClass('ui-focus-ring')
+    expect(recent.className).not.toContain('focus-visible:ring-2')
+    await user.click(recent)
     expect(onSelectTicket).toHaveBeenCalledWith(firstRecentTicket.id)
   })
 
@@ -58,10 +61,10 @@ describe('EpicCard', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('link', { name: /BENCH-001: Species picker/i })).toHaveAttribute(
-      'href',
-      `/tickets/${firstRecentTicket.id}`,
-    )
+    const recent = screen.getByRole('link', { name: /BENCH-001: Species picker/i })
+    expect(recent).toHaveAttribute('href', `/tickets/${firstRecentTicket.id}`)
+    expect(recent).toHaveClass('ui-focus-ring')
+    expect(recent.className).not.toContain('focus-visible:ring-2')
   })
 
   it('renders accent stripe from epic badge color', () => {

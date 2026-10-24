@@ -14,7 +14,7 @@ import {
   equipmentInventoryRowListClasses,
   equipmentPurchasedInventoryCategoryClasses,
   equipmentPurchasedInventoryCategoryListClasses,
-} from '../equipment-inventory.variants'
+} from '@/lib/equipment/equipment-inventory-list.variants'
 
 export type EquipmentPurchasedInventorySectionProps = {
   /** Items carry status already resolved for the trim modal's `reconciliation` context. */

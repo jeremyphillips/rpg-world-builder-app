@@ -1,8 +1,0 @@
-import { cva } from 'class-variance-authority'
-
-export type BuilderOptionPrimaryActionPlacement = 'header' | 'footer'
-
-/** Full-bleed hero slot above padded sheet header/body. */
-export const builderOptionDetailsHeroImageVariants = 'shrink-0 w-full overflow-hidden'
-
-export const builderOptionDetailsSectionVariants = cva('space-y-2')

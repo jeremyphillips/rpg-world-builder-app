@@ -12,11 +12,8 @@ import { FormShellSubmitButton } from '../chrome/form-shell-submit-button'
 import { FormItems } from '../containers/form-items.client'
 import { submitAndExpectPayload } from '../test-utils'
 import {
-  formStickyActionsBarTransparentClasses,
   formStickyScrollBodyClipClasses,
   formStickyScrollBodyScrollerClasses,
-  formStickyTabsTransparentClasses,
-  formViewportScrollBodyTopInsetClasses,
 } from '../chrome/form-chrome.variants'
 
 const schema = z.object({
@@ -221,7 +218,7 @@ describe('TabbedForm', () => {
         schema={schema}
         tabs={tabs}
         onSubmit={vi.fn()}
-        scrollBodyClassName={formViewportScrollBodyTopInsetClasses}
+        scrollBodyClassName="pt-8"
       />,
     )
 
@@ -243,8 +240,8 @@ describe('TabbedForm', () => {
         schema={schema}
         tabs={tabs}
         onSubmit={vi.fn()}
-        stickyTabsClassName={formStickyTabsTransparentClasses}
-        stickyActionsBarClassName={formStickyActionsBarTransparentClasses}
+        stickyTabsClassName="ui-form-sticky-tabs--transparent"
+        stickyActionsBarClassName="ui-form-actions-bar--transparent"
         footer={<button type="submit">Save changes</button>}
       />,
     )
@@ -838,7 +835,9 @@ describe('TabbedForm', () => {
         'Some fields need attention. Errors were found in Notes.',
       )
     })
-    expect(screen.getByRole('button', { name: 'Review Notes' })).toBeInTheDocument()
+    const review = screen.getByRole('button', { name: 'Review Notes' })
+    expect(review).toHaveClass('ui-focus-ring')
+    expect(review.className).not.toContain('focus-visible:ring-2')
   })
 
   it('Review summary buttons switch tabs and focus the tab-scoped control', async () => {

@@ -65,7 +65,7 @@ exports group header layout and record list separators. Both grouped collection 
 and `EntityRowList.Group` import this file — an explicit cross-grammar contract,
 not accidental DRY through private component variants.
 
-`EntityRowList` must **not** import `detail-collection-group.variants.ts` or
+`EntityRowList` must **not** copy `DetailCollectionGroup` body classes or import
 `detail-collection-row-list.variants.ts` directly.
 
 ## Entity row grammar (separate)

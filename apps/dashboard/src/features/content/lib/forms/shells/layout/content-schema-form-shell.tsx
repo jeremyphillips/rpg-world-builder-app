@@ -5,7 +5,6 @@ import {
   Form,
   TabbedForm,
   collectTabbedFormResolverItems,
-  formViewportScrollBodyTopInsetClasses,
   type FormIssue,
   type FormItem,
   type FormValueSync,
@@ -249,7 +248,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
               footer={footer}
               documentScroll={!isViewport}
               className={isViewport ? contentViewportFormFillClasses : undefined}
-              scrollBodyClassName={isViewport ? formViewportScrollBodyTopInsetClasses : undefined}
+              scrollBodyClassName={isViewport ? 'pt-8' : undefined}
               hasAttemptedPublish={hasAttemptedPublish}
               onMarkPublishAttempted={markPublishAttempted}
               publishPresentationIssues={publishPresentationIssues}
@@ -284,7 +283,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
             stickyFooter
             documentScroll={!isViewport}
             className={isViewport ? contentViewportFormFillClasses : undefined}
-            scrollBodyClassName={isViewport ? formViewportScrollBodyTopInsetClasses : undefined}
+            scrollBodyClassName={isViewport ? 'pt-8' : undefined}
             header={header}
             footer={footer}
           />

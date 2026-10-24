@@ -40,6 +40,7 @@ describe('choiceControlClasses', () => {
 
   it('defaults checkbox focus to standalone and allows embedded for dense inline chrome', () => {
     expect(checkboxControlClasses()).not.toContain('ui-focus-ring--embedded')
+    expect(checkboxControlClasses()).not.toContain('border-input')
 
     const embedded = checkboxControlClasses({ focusContext: 'embedded' })
     expect(embedded).toContain('ui-focus-ring')

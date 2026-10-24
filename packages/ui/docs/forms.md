@@ -88,7 +88,7 @@ sticky footer stays in the form column. Below `xl` the aside is
 hidden. `tabRowTrailing` places a compact action on the sticky tab row (dashboard uses this
 for **Preview**). `TabbedFormChromeContext` exposes `activeTabId`.
 
-Classes: `formTabbedAsideGridClasses` and siblings in `form-chrome.variants.ts`. PreviewRail
+Classes: `ui-tabbed-form`, `ui-tabbed-form__body`, and `ui-tabbed-form__aside` on `TabbedForm`. PreviewRail
 primitives live in `@rpg/ui` (`PreviewRail`).
 
 Content catalog examples: `buildSpeciesTabs` and `buildClassTabs` in the dashboard

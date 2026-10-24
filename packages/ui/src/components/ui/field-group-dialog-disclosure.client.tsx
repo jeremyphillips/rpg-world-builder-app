@@ -10,7 +10,6 @@ import { Field, type FieldSize } from './field.client'
 import { FieldLabelContent } from './field-label-content'
 import { FieldLayout } from './field-layout'
 import type { FieldGroupDialogDisclosure as FieldGroupDialogDisclosureConfig } from './field-group-disclosure.types'
-import { fieldGroupDialogDisclosureFieldsetClasses } from './field-group-dialog-disclosure.variants'
 import { FieldGroupSummaryTrigger } from './field-group-summary-trigger.client'
 import {
   DEFAULT_SUMMARY_CLOSE_LABEL,
@@ -101,9 +100,7 @@ export function FieldGroupDialogDisclosure<TFieldValues extends FieldValues = Fi
         <Modal.Content size={disclosure.dialogSize ?? 'md'}>
           <Modal.Header headline={headline} description={disclosure.dialogDescription} />
           <Modal.Body>
-            <fieldset
-              className={cn(fieldSetResetClasses, fieldGroupDialogDisclosureFieldsetClasses)}
-            >
+            <fieldset className={cn(fieldSetResetClasses, 'min-w-0 border-0 p-0')}>
               <legend className="sr-only">{legend}</legend>
               <div id={panelId} className={fieldStackRhythmVariants({ rhythm })}>
                 {children}
