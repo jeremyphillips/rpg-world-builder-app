@@ -36,10 +36,8 @@
     flex: 1 1 0%;
     flex-direction: column;
     padding-inline: calc(var(--spacing) * 4);
-  }
 
-  @media (width >= 40rem) {
-    .dash-app-shell__main {
+    @variant sm {
       padding-inline: calc(var(--spacing) * 6);
     }
   }
@@ -54,10 +52,8 @@
     border-bottom-style: solid;
     border-bottom-color: var(--border);
     padding-inline: calc(var(--spacing) * 4);
-  }
 
-  @media (width >= 40rem) {
-    .dash-app-shell__breadcrumb-rail {
+    @variant sm {
       padding-inline: calc(var(--spacing) * 6);
     }
   }

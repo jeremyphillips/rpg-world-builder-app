@@ -1,0 +1,13 @@
+/*
+ * Viewport breakpoints for every Tailwind compilation that imports this file
+ * through globals.css. Container steps stay on Tailwind's `--container-*` scale.
+ * Roles, `@variant` syntax, and the label collisions: packages/ui/docs/breakpoints.md.
+ */
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
+}

@@ -11,6 +11,8 @@ Storybook catalog: **Design tokens → Color palette** (`color-palette.stories.t
 
 Visual vocabulary (tone, emphasis, chrome): [visual-vocabulary.md](./visual-vocabulary.md).
 
+Viewport and container breakpoints, including `@variant`: [breakpoints.md](./breakpoints.md).
+
 ## Three layers
 
 ```text

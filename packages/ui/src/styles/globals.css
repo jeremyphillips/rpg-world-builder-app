@@ -1,6 +1,7 @@
 @layer theme, base, components, utilities;
 
 @import 'tailwindcss';
+@import './breakpoints.css';
 @import 'tw-animate-css';
 @import './tokens/palette-light.css';
 @import './tokens/semantic-light.css';
@@ -751,7 +752,7 @@
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--tracking-heading);
 
-  @media (width >= 48rem) {
+  @variant md {
     font-size: var(--text-heading-dialog-title-md);
     line-height: var(--text-heading-dialog-title-md--line-height);
   }
@@ -1038,16 +1039,12 @@
   :root {
     --image-preview-size: 7.5rem; /* 120px — compact media preview default and lg+ */
     --hero-emblem-size: 12.1875rem; /* 195px spell school emblem hero (max width and height) */
-  }
 
-  @media (width >= 40rem) {
-    :root {
+    @variant sm {
       --image-preview-size: 5.625rem; /* 90px — sm through below lg */
     }
-  }
 
-  @media (width >= 64rem) {
-    :root {
+    @variant lg {
       --image-preview-size: 7.5rem; /* 120px — large breakpoints */
     }
   }

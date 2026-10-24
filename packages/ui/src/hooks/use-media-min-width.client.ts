@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
-import { FORM_COLUMNS_WIDE_MEDIA_QUERY } from '../form/containers/form-columns.variants'
+/** Compiled viewport `md`: `@media (width >= 48rem)`. */
+export const VIEWPORT_MD_MIN_QUERY = '(width >= 48rem)'
 
 export function useMediaMinWidth(query: string): boolean {
   const [matches, setMatches] = useState(() => {
@@ -24,5 +25,3 @@ export function useMediaMinWidth(query: string): boolean {
 
   return matches
 }
-
-export const VIEWPORT_MD_MIN_QUERY = FORM_COLUMNS_WIDE_MEDIA_QUERY

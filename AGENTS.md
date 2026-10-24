@@ -218,6 +218,9 @@ strings.
   `field-input-chrome.variants.ts`; do not ad-hoc disabled/muted stacks. Status tones:
   `neutral | info | success | warning | destructive` (Badge, SemanticText, …). Detail:
   [packages/ui/docs/design-tokens.md](packages/ui/docs/design-tokens.md).
+- **Breakpoints:** Use the viewport scale and `@variant` syntax in
+  [packages/ui/docs/breakpoints.md](packages/ui/docs/breakpoints.md); container
+  steps such as `@lg` are a separate scale from `sm:` / `md:` / `lg:` / `xl:` / `2xl:`.
 - **Semantic CSS:** Prefer descriptive BEM-style classes for reusable component anatomy,
   appearance, and states (e.g. `ui-card`, `ui-card__content`, `ui-card--subtle`).
   Keep definitions in the owning component's CSS or shared UI styles. Layer policy →

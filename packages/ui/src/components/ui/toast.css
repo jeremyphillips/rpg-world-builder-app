@@ -62,7 +62,7 @@
     padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
   }
 
-  @media (width >= 40rem) {
+  @variant sm {
     .ui-toast-viewport:not(.ui-toast-viewport--modal) {
       bottom: auto;
       left: auto;
