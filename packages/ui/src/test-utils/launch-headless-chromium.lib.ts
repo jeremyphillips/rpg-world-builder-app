@@ -6,13 +6,13 @@ import { chromium, type Browser } from 'playwright'
 export async function launchHeadlessChromium(): Promise<Browser> {
   try {
     return await chromium.launch({ headless: true })
-  } catch (bundledError) {
+  } catch {
     try {
       return await chromium.launch({ channel: 'chrome', headless: true })
     } catch (chromeError) {
       throw new Error(
         'Browser checks need Playwright Chromium (`pnpm --filter <pkg> playwright:install`) or a local Chrome install.',
-        { cause: bundledError instanceof Error ? bundledError : chromeError },
+        { cause: chromeError },
       )
     }
   }

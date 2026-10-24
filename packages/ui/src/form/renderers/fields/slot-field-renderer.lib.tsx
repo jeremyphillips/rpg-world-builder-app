@@ -45,7 +45,7 @@ export function buildSlotFieldBody(
 
   return (
     <FormRhythmStack className={config.className}>
-      <Text as="span" className="text-style-field-group-description">
+      <Text as="span" variant="supporting">
         {config.hint}
       </Text>
       {content}

@@ -271,6 +271,11 @@ function propertyNameText(name: ts.PropertyName): string | undefined {
   return undefined
 }
 
+function jsxAttributeNameText(name: ts.JsxAttributeName): string | undefined {
+  if (ts.isIdentifier(name)) return name.text
+  return undefined
+}
+
 function objectHasVariantAxis(config: ts.ObjectLiteralExpression): boolean {
   let hasSpread = false
   for (const property of config.properties) {
@@ -371,7 +376,9 @@ function valueIsPassedToStylingApi(sourceFile: ts.SourceFile, name: string): boo
         return ts.isIdentifier(callee) && (callee.text === 'cn' || callee.text === 'cva')
       })
       const passedToClassName = nodeIsInside(node, (candidate) => {
-        if (ts.isJsxAttribute(candidate) && candidate.name.text === 'className') return true
+        if (ts.isJsxAttribute(candidate) && jsxAttributeNameText(candidate.name) === 'className') {
+          return true
+        }
         if (
           ts.isPropertyAssignment(candidate) &&
           propertyNameText(candidate.name) === 'className'

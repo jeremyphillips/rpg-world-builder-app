@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { cn, Panel } from '@rpg/ui'
+import { cn, Panel, Text } from '@rpg/ui'
 
 export type CharacterBuilderPreviewSectionLayout = 'default' | 'subsections'
 
@@ -25,7 +25,7 @@ export function CharacterBuilderPreviewSectionContent({
   if (layout === 'subsections') {
     return (
       <div className={cn('flex flex-col gap-3', className)}>
-        {hint ? <p className="text-style-caption">{hint}</p> : null}
+        {hint ? <Text variant="caption">{hint}</Text> : null}
         <Panel tone="transparent" density="comfortable" className="flex flex-col gap-3">
           {children}
         </Panel>
@@ -36,7 +36,7 @@ export function CharacterBuilderPreviewSectionContent({
   if (hint) {
     return (
       <div className={cn('flex flex-col gap-3', className)}>
-        <p className="text-style-caption">{hint}</p>
+        <Text variant="caption">{hint}</Text>
         {children}
       </div>
     )
@@ -56,7 +56,9 @@ export function CharacterBuilderPreviewSubsection({
 }: CharacterBuilderPreviewSubsectionProps) {
   return (
     <div className="flex flex-col gap-1">
-      <p className="text-style-label text-foreground">{title}</p>
+      <Text variant="label" className="text-foreground">
+        {title}
+      </Text>
       {children}
     </div>
   )
@@ -69,5 +71,5 @@ export type CharacterBuilderPreviewSubsectionHintProps = {
 export function CharacterBuilderPreviewSubsectionHint({
   children,
 }: CharacterBuilderPreviewSubsectionHintProps) {
-  return <p className="text-style-caption">{children}</p>
+  return <Text variant="caption">{children}</Text>
 }

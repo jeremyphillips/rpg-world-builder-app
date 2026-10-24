@@ -4,6 +4,7 @@ import {
   RichTextContent,
   RICH_TEXT_TABLE_EMBED_ATTR,
   sanitizeHtml,
+  Text,
   type RichTextContentProps,
 } from '@rpg/ui'
 import { GeneralTableView } from '../tables/general-table-view'
@@ -66,9 +67,9 @@ export function RichTextWithTables({
         const table = tableById.get(segment.tableId)
         if (!table) {
           return (
-            <p key={`missing-${segment.tableId}`} className="text-style-supporting">
+            <Text key={`missing-${segment.tableId}`} variant="supporting">
               {TABLE_UNAVAILABLE_LABEL}
-            </p>
+            </Text>
           )
         }
 
