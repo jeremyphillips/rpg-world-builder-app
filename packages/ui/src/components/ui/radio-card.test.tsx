@@ -596,6 +596,6 @@ describe('RadioCard', () => {
       />,
     )
 
-    expect(container.firstElementChild).toHaveClass('@min-[48rem]:grid-cols-3')
+    expect(container.firstElementChild).toHaveClass('@3xl:grid-cols-3')
   })
 })

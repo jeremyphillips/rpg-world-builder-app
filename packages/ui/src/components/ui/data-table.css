@@ -22,10 +22,8 @@
     flex-shrink: 0;
     border-radius: var(--radius-md);
     object-fit: cover;
-  }
 
-  @media (min-width: 64rem) {
-    .ui-data-table__image {
+    @variant lg {
       width: 2rem;
       height: 2rem;
     }

@@ -5,7 +5,8 @@ Features choose **semantic intent**; shared primitives own ring geometry, hit ta
 hover fills, and drag chrome.
 
 Policy overview: [AGENTS.md](../../../AGENTS.md#styling-conventions) · ownership:
-[ui-architecture.md](./ui-architecture.md).
+[ui-architecture.md](./ui-architecture.md). Viewport and container steps, and `@variant`
+syntax: [breakpoints.md](./breakpoints.md).
 
 ```text
 Layer 1 — foundational interaction policy (@rpg/ui)

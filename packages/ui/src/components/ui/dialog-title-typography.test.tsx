@@ -41,7 +41,7 @@ describe('dialog title typography ownership', () => {
     expect(globalsCss).toMatch(/--text-heading-dialog-title:\s*var\(--text-heading-subsection\)/)
     expect(globalsCss).toMatch(/--text-heading-dialog-title-md:\s*var\(--text-heading-3-md\)/)
     expect(globalsCss).toMatch(
-      /@utility heading-style-dialog-title \{[\s\S]*?@media \(width >= 48rem\) \{[\s\S]*?--text-heading-dialog-title-md/,
+      /@utility heading-style-dialog-title \{[\s\S]*?@variant md \{[\s\S]*?--text-heading-dialog-title-md/,
     )
   })
 

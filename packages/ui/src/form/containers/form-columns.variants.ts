@@ -1,12 +1,13 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import type { FieldRhythm } from '../../components/ui/field.variants'
+import { VIEWPORT_MD_MIN_QUERY } from '../../hooks/use-media-min-width.client'
 
 export const FORM_COLUMNS_WIDTH_EQUAL = 'equal' as const
 export const FORM_COLUMNS_WIDTH_PRIMARY_DETAIL = 'primary-detail' as const
 
-/** Tailwind `md` — two independent stacks from this breakpoint up. */
-export const FORM_COLUMNS_WIDE_MEDIA_QUERY = '(min-width: 768px)'
+/** Alias of `VIEWPORT_MD_MIN_QUERY`. Two independent stacks from viewport `md` up. */
+export const FORM_COLUMNS_WIDE_MEDIA_QUERY = VIEWPORT_MD_MIN_QUERY
 
 export const formColumnsGridVariants = cva('grid min-w-0', {
   variants: {

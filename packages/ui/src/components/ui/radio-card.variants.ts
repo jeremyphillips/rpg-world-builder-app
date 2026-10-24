@@ -124,8 +124,8 @@ export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 ite
     },
     columns: {
       one: 'grid-cols-1',
-      two: 'grid-cols-1 @min-[32rem]:grid-cols-2',
-      three: 'grid-cols-1 @min-[32rem]:grid-cols-2 @min-[48rem]:grid-cols-3',
+      two: 'grid-cols-1 @lg:grid-cols-2',
+      three: 'grid-cols-1 @lg:grid-cols-2 @3xl:grid-cols-3',
     },
   },
   compoundVariants: [

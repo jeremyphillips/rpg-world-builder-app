@@ -4,7 +4,7 @@
 @utility size-dialog-panel-header-glyph {
   --icon-size: var(--text-heading-dialog-title);
 
-  @media (width >= 48rem) {
+  @variant md {
     --icon-size: var(--text-heading-dialog-title-md);
   }
 }

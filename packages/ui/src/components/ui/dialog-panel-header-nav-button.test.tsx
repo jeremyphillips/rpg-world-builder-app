@@ -22,7 +22,7 @@ describe('DialogPanelHeaderNavButton', () => {
       /@utility size-dialog-panel-header-glyph \{[\s\S]*?--icon-size: var\(--text-heading-dialog-title\)/,
     )
     expect(navButtonCss).toMatch(
-      /@media \(width >= 48rem\) \{[\s\S]*?--icon-size: var\(--text-heading-dialog-title-md\)/,
+      /@variant md \{[\s\S]*?--icon-size: var\(--text-heading-dialog-title-md\)/,
     )
   })
 
