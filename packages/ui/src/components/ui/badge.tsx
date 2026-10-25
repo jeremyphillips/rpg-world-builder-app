@@ -46,13 +46,16 @@ function Badge({
   children,
   ...props
 }: BadgeProps) {
-  const resolvedClassName = resolveCompactLabelClassName({
-    size,
-    appearance,
-    tone,
-    emphasis,
-    className: cn(badgeLayoutVariants({ layout }), className),
-  })
+  const resolvedClassName = cn(
+    'ui-badge',
+    resolveCompactLabelClassName({
+      size,
+      appearance,
+      tone,
+      emphasis,
+      className: cn(badgeLayoutVariants({ layout }), className),
+    }),
+  )
 
   if (asChild) {
     return (

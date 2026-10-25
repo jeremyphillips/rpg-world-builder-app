@@ -3,6 +3,18 @@
 `Badge` and `Chip` share an internal compact-label recipe (`compact-label.variants.ts`).
 Consumers use the public component APIs — not the internal CVA.
 
+## Identity
+
+`ui-badge` and `ui-chip` are root identity classes. They mark which component owns the element. They do not restyle it.
+
+`ui-compact-label` is the stable shared styling contract: size, geometry, tone, and the existing state modifiers. `Badge`, `Chip`, and other compact-label consumers (today `ArrayItemIssueButton`) keep using it. Sharing that foundation does not make those consumers Badge or Chip.
+
+Do not add `ui-badge--compact` or `ui-chip--compact`. Compact is the foundation, not a selectable variant of either component. `ArrayItemIssueButton`'s `compact` prop only switches counter versus label layout.
+
+`ui-badge` and `ui-chip` are extension points for a later, real visual difference. A single identity class is less specific than existing shared selectors such as `.ui-compact-label--interactive:not(.ui-compact-label--selected)`. When Badge or Chip diverges, move or specialize that one responsibility. Do not copy the compact-label matrix under the identity class.
+
+`ChipGroup` stays layout-only. The removable chip's dismiss control stays `ui-compact-label__remove` and does not carry `ui-chip`.
+
 ## Vocabulary
 
 | Primitive                  | Interaction                               | Use when                                                |
@@ -23,7 +35,7 @@ composed with badge presentation — not `Badge asChild` on a `<button>`.
 ### Navigation badges (`Badge asChild` + link)
 
 Supported composition: **`Badge asChild`** wraps an **anchor** or app **`Link`**. The link owns
-navigation, focus, and keyboard activation; Badge supplies compact-label classes only. Allowed
+navigation, focus, and keyboard activation; Badge supplies `ui-badge` plus compact-label classes. Allowed
 utilities on the link: underline / focus affordances — not pill shell geometry (`gap-*`, `h-*`,
 `rounded-*` on the label).
 

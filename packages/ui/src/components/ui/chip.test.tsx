@@ -17,6 +17,7 @@ describe('Chip', () => {
       'false',
     )
     expect(screen.getByRole('checkbox', { name: 'Option' })).toHaveClass(
+      'ui-chip',
       'ui-compact-label--interactive',
     )
   })
@@ -53,11 +54,10 @@ describe('Chip', () => {
       </Chip>,
     )
     const chip = screen.getByText('Tag').closest('.ui-compact-label')
-    expect(chip).toHaveClass('ui-compact-label--sm', 'ui-compact-label--removable-sm')
-    expect(screen.getByRole('button', { name: 'Remove Tag' })).toHaveClass(
-      'ui-compact-label__remove',
-      'ui-compact-control--icon-compact-sm',
-    )
+    expect(chip).toHaveClass('ui-chip', 'ui-compact-label--sm', 'ui-compact-label--removable-sm')
+    const remove = screen.getByRole('button', { name: 'Remove Tag' })
+    expect(remove).toHaveClass('ui-compact-label__remove', 'ui-compact-control--icon-compact-sm')
+    expect(remove).not.toHaveClass('ui-chip')
   })
 
   it('removable calls onRemove from dismiss button', async () => {

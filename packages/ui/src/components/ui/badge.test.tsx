@@ -16,12 +16,24 @@ describe('Badge', () => {
 
   it('applies appearance and tone classes', () => {
     render(
-      <Badge appearance="outline" tone="warning" size="sm">
+      <Badge appearance="outline" tone="warning" size="sm" className="caller-badge">
         Stale
       </Badge>,
     )
     const el = screen.getByText('Stale')
-    expect(el).toHaveClass('ui-compact-label--outline-warning', 'ui-compact-label--sm')
+    expect(el).toHaveClass('ui-badge', 'ui-compact-label--outline-warning', 'ui-compact-label--sm')
+    expect(el).toHaveClass('caller-badge')
+  })
+
+  it('forwards ui-badge onto an asChild root', () => {
+    render(
+      <Badge asChild appearance="outline" tone="neutral">
+        <a href="/spells/1">Fireball</a>
+      </Badge>,
+    )
+    const link = screen.getByRole('link', { name: 'Fireball' })
+    expect(link.tagName).toBe('A')
+    expect(link).toHaveClass('ui-badge', 'ui-compact-label--outline-neutral')
   })
 
   it('uses token-owned soft destructive foreground', () => {
