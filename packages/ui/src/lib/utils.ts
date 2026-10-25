@@ -162,9 +162,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
   extend: {
     theme: {
       text: [
-        '2xs-meta',
-        'xs-meta',
-        'sm-meta',
+        'fine-2xs',
+        'fine-xs',
+        'fine-sm',
+        'fine-md',
         'md',
         'eyebrow-xs',
         'eyebrow-sm',

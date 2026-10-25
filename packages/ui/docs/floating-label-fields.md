@@ -38,7 +38,7 @@ Browser autofill is visual only. `:autofill` forces the floated treatment so tex
 
 ## Geometry
 
-- Compact (`sm`) is `h-8`. Resting label is `text-xs` (12px). Floated label is `--field-floating-label-sm`: `max(--text-xs-meta, --text-xs - 2px)` (11px floor).
+- Compact (`sm`) is `h-8`. Resting label is `text-xs` (12px). Floated label is `--field-floating-label-sm`: `max(--text-fine-sm, --text-xs - 2px)` (11px floor).
 - Comfortable (`md`) is `h-9`. Resting label is `text-md` (15px). Floated label is `--field-floating-label-md` (`--text-md - 2px`, 13px). Weight stays `font-normal` (400) in both densities.
 - Font-size, translate, and colour share `--floating-label-move` (~150ms). There is no `scale()` step.
 - The floated label hangs outside the shell. The shell height is the control height, so toolbar rows align the control with neighboring inline controls.

@@ -48,7 +48,7 @@ describe('floating-label-field.lib', () => {
     expect(css).not.toContain('--floating-label-scale-md')
 
     const xs = readTokenRem(css, '--text-xs')
-    const xsMeta = readTokenRem(css, '--text-xs-meta')
+    const xsMeta = readTokenRem(css, '--text-fine-sm')
     const md = readTokenRem(css, '--text-md')
     const reduction = readTokenRem(css, '--field-floating-label-reduction')
 

@@ -19,17 +19,21 @@ describe('cn', () => {
     )
   })
 
-  it('keeps eyebrow and meta font-size utilities alongside text color classes', () => {
+  it('keeps eyebrow and fine font-size utilities alongside text color classes', () => {
     expect(cn('text-muted-foreground', 'text-eyebrow-sm tracking-eyebrow')).toBe(
       'text-muted-foreground text-eyebrow-sm tracking-eyebrow',
     )
-    expect(cn('text-foreground', 'text-xs-meta font-light')).toBe(
-      'text-foreground text-xs-meta font-light',
+    expect(cn('text-foreground', 'text-fine-sm font-light')).toBe(
+      'text-foreground text-fine-sm font-light',
     )
   })
 
-  it('keeps text-xs-meta beside a color utility without a heading font-size class', () => {
-    expect(cn('text-foreground', 'text-xs-meta')).toBe('text-foreground text-xs-meta')
+  it('merges fine sizes with the standard scale and keeps them beside color', () => {
+    expect(cn('text-sm', 'text-fine-sm')).toBe('text-fine-sm')
+    expect(cn('text-fine-sm', 'text-sm')).toBe('text-sm')
+    expect(cn('text-foreground', 'text-fine-sm')).toBe('text-foreground text-fine-sm')
+    expect(cn('text-sm', 'text-control-action-xs')).toBe('text-control-action-xs')
+    expect(cn('text-control-action-xs', 'text-sm')).toBe('text-sm')
     expect(cn('text-foreground', 'text-heading-page')).toBe('text-heading-page')
   })
 

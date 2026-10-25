@@ -182,6 +182,10 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 
 | Token / utility | px @ 16px root | Typical use                                      |
 | --------------- | -------------- | ------------------------------------------------ |
+| `text-fine-2xs` | 9              | Eyebrow `xs`                                     |
+| `text-fine-xs`  | 10             | Compact control-action labels                    |
+| `text-fine-sm`  | 11             | Eyebrow `sm`, compact label `sm`                 |
+| `text-fine-md`  | 13             | Eyebrow `md`, compact label `md`, table body     |
 | `text-xs`       | 12             | Captions, table stat columns                     |
 | `text-sm`       | 14             | Compact UI chrome (buttons, menus, data tables)  |
 | `text-md`       | 15             | Secondary body (`Text` small, `prose-md`, …)     |
@@ -192,7 +196,7 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 | `text-3xl`      | 28             | Section headings (curated; not the 30px default) |
 | `text-4xl`      | 34             | Page headings (curated; not the 36px default)    |
 
-The scale stops at `text-4xl`. Larger Tailwind steps are not declared.
+Fine (9–13px) and standard (`text-xs` through `text-4xl`) are one scale. Nothing above `text-4xl` is declared. Fine sizes have no line-height companion.
 
 ## Form legend tokens
 
@@ -267,25 +271,26 @@ Primitive weights and role aliases live in [`styles/globals.css`](../src/styles/
 | `font-data-name`                | 600                  | Data-table name cells                                             |
 | `font-data-stat`                | 500                  | Data-table stat columns                                           |
 
-## Meta typography tokens
+## Fine sizes
 
-Secondary copy sizes sit one step below the Tailwind text scale (at 16px root):
+Fine sizes are the small end of the same primitive scale, not a metadata tier. They have no line-height companions. A role can share a fine size and keep its own line height, weight, and spacing.
 
-| Token / utility       | px @ 16px root | Use                                                               |
-| --------------------- | -------------- | ----------------------------------------------------------------- |
-| `text-2xs-meta`       | 9              | Ultra-compact meta; aliased by `text-eyebrow-xs`                  |
-| `text-xs-meta`        | 11             | Shared meta base; aliased by `text-eyebrow-sm`                    |
-| `text-sm-meta`        | 13             | Shared meta base; aliased by `text-eyebrow-md`, `text-table-body` |
-| `text-md`             | 15             | Compact label `lg` (`Badge` / `Chip`); aliases `--text-md`        |
-| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                          |
-| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`            |
+| Token / utility       | px @ 16px root | Shared by                                                        |
+| --------------------- | -------------- | ---------------------------------------------------------------- |
+| `text-fine-2xs`       | 9              | `text-eyebrow-xs`                                                |
+| `text-fine-xs`        | 10             | `text-control-action-xs` (line-height stays 14px)                |
+| `text-fine-sm`        | 11             | `text-eyebrow-sm`, compact label `sm`, floating-label `sm` floor |
+| `text-fine-md`        | 13             | `text-eyebrow-md`, compact label `md`, `text-table-body`         |
+| `text-md`             | 15             | Compact label `lg` (`Badge` / `Chip`)                            |
+| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                         |
+| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`           |
+
+The standard group above runs `text-xs` (12px) through `text-4xl` (34px).
 
 Compact-label vocabulary (`appearance`, `tone`, selected-control vs semantic soft) →
 [compact-labels.md](./compact-labels.md).
 
-Prefer `eyebrow-style-*` composites or `<Eyebrow>` for uppercase section labels; use
-semantic aliases (`text-eyebrow-sm`) only when a composite is not appropriate; use
-`text-xs-meta` / `text-sm-meta` directly for role-based typography (e.g. data-table meta).
+Prefer `eyebrow-style-*` composites or `<Eyebrow>` for uppercase section labels. Use `text-fine-*` when the call site is choosing a size directly and no semantic role already owns it.
 
 Detail-page subgroup labels (for example Districts under City structure, or Governed by
 under Territorial Authority) use `<Eyebrow size="sm">` with the default muted tone.

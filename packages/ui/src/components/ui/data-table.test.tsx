@@ -90,7 +90,7 @@ describe('DataTable — rendering', () => {
     renderTable({ caption: 'All items' })
     const caption = screen.getByText('All items')
     expect(caption).toBeInTheDocument()
-    expect(caption).toHaveClass('text-sm-meta', 'italic', 'text-muted-foreground')
+    expect(caption).toHaveClass('text-fine-md', 'italic', 'text-muted-foreground')
   })
 
   it('renders the Columns button', () => {

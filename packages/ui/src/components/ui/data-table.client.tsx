@@ -907,7 +907,7 @@ export function DataTable<TData>({
   const tableElement = (
     <Table className="ui-data-table__table text-table-body">
       {caption && (
-        <TableCaption className="pb-3 text-sm-meta italic text-muted-foreground">
+        <TableCaption className="pb-3 text-fine-md italic text-muted-foreground">
           {caption}
         </TableCaption>
       )}

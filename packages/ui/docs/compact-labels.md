@@ -91,8 +91,8 @@ chrome overrides (`gap-*`, `size-*`, `rounded-*`, `py-*`) to make a Badge fit.
 
 | Size | Height | Font                  | Typical use                          |
 | ---- | ------ | --------------------- | ------------------------------------ |
-| `sm` | 22px   | 11px (`text-xs-meta`) | Table cells, compact metadata        |
-| `md` | 31px   | 13px (`text-sm-meta`) | Default field chips, removable chips |
+| `sm` | 22px   | 11px (`text-fine-sm`) | Table cells, compact metadata        |
+| `md` | 31px   | 13px (`text-fine-md`) | Default field chips, removable chips |
 | `lg` | 41px   | 15px (`text-md`)      | Prominent removable chips            |
 
 `sm` is not valid for `Chip mode="removable"`.
@@ -123,7 +123,7 @@ Role tokens live in [`globals.css`](../src/styles/globals.css):
 
 Status chrome (`--info-subtle`, …) vs inline text (`--semantic-info`, …): [design-tokens.md](./design-tokens.md#status-namespaces).
 
-Typography aliases: `text-xs-meta`, `text-sm-meta` (see [typography.md](./typography.md)).
+Typography: compact label `sm` / `md` use `text-fine-sm` / `text-fine-md` (see [typography.md](./typography.md)).
 
 ## Further reading
 

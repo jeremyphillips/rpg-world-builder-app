@@ -21,12 +21,14 @@ const SOURCE_EXTENSIONS = ['.ts', '.tsx', '.css', '.md']
 const NUMBERED_HEADING = /--text-heading-[1-5]\b/
 const HEADING_3_MD = '--text-heading-' + '3-md'
 const OVERSIZED_STEP = /(?:--|\b)text-[5-9]xl\b/
+const RETIRED_META_SIZE = new RegExp('text-' + '(?:2xs|xs|sm)' + '-' + 'meta' + '\\b')
 
 const REQUIRED_THEME_TOKENS = [
   '--text-md:',
-  '--text-2xs-meta:',
-  '--text-xs-meta:',
-  '--text-sm-meta:',
+  '--text-fine-2xs:',
+  '--text-fine-xs:',
+  '--text-fine-sm:',
+  '--text-fine-md:',
   '--text-eyebrow-xs:',
   '--text-eyebrow-sm:',
   '--text-eyebrow-md:',
@@ -60,6 +62,7 @@ function violationsIn(source: string): string[] {
   if (NUMBERED_HEADING.test(source)) hits.push('numbered heading token')
   if (source.includes(HEADING_3_MD)) hits.push('heading-3-md token')
   if (OVERSIZED_STEP.test(source)) hits.push('text-5xl+ step')
+  if (RETIRED_META_SIZE.test(source)) hits.push('retired meta font size')
   return hits
 }
 
