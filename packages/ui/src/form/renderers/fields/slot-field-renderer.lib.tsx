@@ -8,7 +8,6 @@ import {
 import { fieldWidthVariants } from '../../../components/ui/field-control.variants'
 import type { FieldSize } from '../../../components/ui/field.client'
 import type { FieldRhythm } from '../../../components/ui/field.variants'
-import { fieldGroupDescriptionClasses } from '../../../components/ui/field.variants'
 import { Text } from '../../../components/ui/text'
 import { FormRhythmStack } from '../../context/form-section.context'
 import type { SlotConfig } from '../../field-config'
@@ -46,7 +45,7 @@ export function buildSlotFieldBody(
 
   return (
     <FormRhythmStack className={config.className}>
-      <Text as="span" className={fieldGroupDescriptionClasses}>
+      <Text as="span" variant="supporting">
         {config.hint}
       </Text>
       {content}

@@ -41,13 +41,6 @@ import {
   buildClassSpellbookAcquisitionHostConfig,
   mapClassSpellbookAcquisitionDraftToProgression,
 } from '../lib/class-spellbook-acquisition-field.lib'
-import {
-  spellbookAcquisitionModalColumnClasses,
-  spellbookAcquisitionModalGainModeColumnClasses,
-  spellbookAcquisitionModalGainModeHeaderClasses,
-  spellbookAcquisitionModalLayoutClasses,
-} from './class-spellbook-acquisition-modal.variants'
-
 const MODAL_HEADLINE = 'Edit spellbook acquisition'
 const MODAL_DESCRIPTION = 'Define how this class adds spells to its spellbook.'
 const GAIN_MODE_LABEL = 'How are spells gained?'
@@ -299,11 +292,11 @@ function ClassSpellbookAcquisitionModalContent({
           <Modal.Body stableBody>
             <DialogPanelScrollRegion inset="innerLeading">
               <form id={formId} onSubmit={handleSubmit} noValidate>
-                <div className={spellbookAcquisitionModalLayoutClasses}>
-                  <div className={spellbookAcquisitionModalGainModeColumnClasses}>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]">
+                  <div className="flex min-w-0 flex-col gap-3">
                     <FormSectionHeader
                       id={gainModeHeadingId}
-                      className={spellbookAcquisitionModalGainModeHeaderClasses}
+                      className="[&_p]:!text-sm"
                       label={GAIN_MODE_LABEL}
                       hint={GAIN_MODE_HINT}
                       labelPresentation="field-label"
@@ -319,7 +312,7 @@ function ClassSpellbookAcquisitionModalContent({
                     />
                   </div>
 
-                  <div className={spellbookAcquisitionModalColumnClasses}>
+                  <div className="flex min-w-0 flex-col gap-4">
                     {gainMode === SPELLBOOK_GAIN_MODE_REGULAR ? (
                       <>
                         <FormSectionHeader

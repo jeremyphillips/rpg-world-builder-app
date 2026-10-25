@@ -3,8 +3,7 @@
  * Source order: block → layout → sizes → dividers → segments → value slots → caret → aliases.
  */
 @layer components {
-  .ui-field-group,
-  .ui-field-control-shell--grouped {
+  .ui-field-group {
     display: grid;
     align-items: center;
     width: 100%;
@@ -21,13 +20,11 @@
   }
 
   .ui-field-group:hover:not(:has(:disabled)),
-  .ui-field-control-shell--grouped:hover:not(:has(:disabled)),
   .ui-number-stepper--bordered:hover:not(:has(input:disabled)) {
     border-color: var(--field-control-border-hover);
   }
 
   .ui-field-group:focus-within,
-  .ui-field-control-shell--grouped:focus-within,
   .ui-number-stepper--bordered:focus-within {
     outline: none;
     border-color: var(--field-control-border-focus);
@@ -37,13 +34,11 @@
   }
 
   .ui-field-group--invalid,
-  .ui-field-control-shell--grouped-invalid,
   .ui-number-stepper--bordered[aria-invalid='true'] {
     border-color: var(--field-control-border-invalid);
   }
 
   .ui-field-group--invalid:focus-within,
-  .ui-field-control-shell--grouped-invalid:focus-within,
   .ui-number-stepper--bordered[aria-invalid='true']:focus-within {
     box-shadow:
       0 0 0 2px var(--background),

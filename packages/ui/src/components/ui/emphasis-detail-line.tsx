@@ -41,7 +41,7 @@ export function EmphasisDetailLine<T extends React.ElementType = 'span'>({
   const Comp = as ?? 'span'
 
   return (
-    <Comp className={cn(emphasisDetailLineRootVariants(), className)} {...props}>
+    <Comp className={cn(emphasisDetailLineRootVariants, className)} {...props}>
       {prefix ? <>{prefix} </> : null}
       {secondary ? (
         <InlineMetadata role="supporting" density="comfortable" wrap={false}>

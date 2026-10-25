@@ -138,7 +138,7 @@ export function SegmentedControl<TValue extends string>({
             onKeyDown={(event) => handleKeyDown(event, index)}
           >
             {option.leadingIcon ? (
-              <span aria-hidden className={segmentedControlLeadingIconVariants()}>
+              <span aria-hidden className={segmentedControlLeadingIconVariants}>
                 {option.leadingIcon}
               </span>
             ) : null}

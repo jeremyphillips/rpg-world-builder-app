@@ -5,7 +5,6 @@ import { Text } from '../../components/ui/text'
 import { FormItems } from '../containers/form-items.client'
 import { FormRhythmStack } from '../context/form-section.context'
 import { FormActionsBar, type FormActionsBarPlacement } from '../chrome/form-actions-bar'
-import { formFooterSpacingClasses } from '../chrome/form-chrome.variants'
 import { FormStickyScrollBody } from '../chrome/form-sticky-scroll-body.client'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormItem, FormValueSync } from '../field-config'
@@ -126,5 +125,5 @@ export function FormFooterRegion({
     return null
   }
 
-  return <div className={formFooterSpacingClasses}>{footer}</div>
+  return <div className="pt-4">{footer}</div>
 }

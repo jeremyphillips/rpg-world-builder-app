@@ -1,10 +1,5 @@
 import { Input, cn } from '@rpg/ui'
 
-import {
-  ticketTitleSearchInputClasses,
-  ticketTitleSearchInputCompactClasses,
-} from './ticket-title-search-input.variants'
-
 interface TicketTitleSearchInputProps {
   id?: string
   /** Visible label; omit in compact toolbar layouts and rely on `aria-label`. */
@@ -37,10 +32,7 @@ export function TicketTitleSearchInput({
       onChange={(event) => onValueChange(event.target.value)}
       placeholder={placeholder}
       aria-label={label ? undefined : ariaLabel}
-      className={cn(
-        compact ? ticketTitleSearchInputCompactClasses : ticketTitleSearchInputClasses,
-        className,
-      )}
+      className={cn(compact ? 'h-9 w-48 sm:w-56' : 'h-8', className)}
     />
   )
 

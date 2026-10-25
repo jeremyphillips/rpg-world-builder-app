@@ -9,7 +9,6 @@ import {
   deriveGlobalSearchPreviewGroupState,
 } from '../../lib/global-search-preview-group'
 import {
-  globalSearchGroupContentInsetClasses,
   globalSearchGroupHeadingClasses,
   globalSearchGroupHeadingCountClasses,
   globalSearchGroupSectionVariants,
@@ -44,10 +43,7 @@ export function GlobalSearchGroupSection({
   const showGroupAction = state === 'truncated'
   const showAllTarget = showAllHref?.(section.filterGroup) ?? `#show-all-${section.filterGroup}`
   const showAllLabel = `${GLOBAL_SEARCH_COPY.showAllInGroup(section.totalCount, groupLabel)} →`
-  const showAllClassName = cn(
-    globalSearchGroupShowAllLinkVariants(),
-    globalSearchGroupContentInsetClasses,
-  )
+  const showAllClassName = cn(globalSearchGroupShowAllLinkVariants, 'px-3')
   const headingId = `global-search-group-${section.filterGroup}`
 
   return (

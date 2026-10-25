@@ -10,7 +10,6 @@ import type { ClassFeatureDetailItem } from '../../lib/class-display'
 import {
   classFeatureLevelTableBodyClasses,
   classFeatureLevelTableClasses,
-  classFeatureLevelTableContentCellClasses,
   classFeatureLevelTableFeatureBlockClasses,
   classFeatureLevelTableLevelCellClasses,
   classFeatureLevelTableRowClasses,
@@ -56,7 +55,7 @@ function ClassFeatureLevelGroupRows({ group }: { group: LevelGroup }) {
             Level {group.level}
           </TableCell>
         ) : null}
-        <TableCell className={classFeatureLevelTableContentCellClasses}>
+        <TableCell className="align-top">
           <div className={classFeatureLevelTableFeatureBlockClasses}>
             <Heading
               variant="subsection"

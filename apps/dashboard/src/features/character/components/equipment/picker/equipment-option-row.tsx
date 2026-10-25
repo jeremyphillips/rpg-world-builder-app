@@ -5,11 +5,6 @@ import {
   equipmentOptionInlineClauses,
   type EquipmentOptionRowPresentation,
 } from '../../../lib/equipment/equipment-option-row-presentation.lib'
-import {
-  equipmentOptionQuantityAccessibleVariants,
-  equipmentOptionRowIdentityVariants,
-  equipmentOptionRowVariants,
-} from './equipment-option-row.variants'
 
 export type EquipmentOptionRowProps = {
   presentation: EquipmentOptionRowPresentation
@@ -33,9 +28,9 @@ export function EquipmentOptionRow({
   const trailing = presentation.trailingState
 
   return (
-    <div className={equipmentOptionRowVariants()} title={presentation.secondaryTitle}>
+    <div className="flex w-full min-w-0" title={presentation.secondaryTitle}>
       <IdentityRow
-        className={equipmentOptionRowIdentityVariants()}
+        className="min-w-0 flex-1"
         heading={presentation.identity}
         classification={classification || undefined}
         supporting={inline || undefined}
@@ -43,9 +38,7 @@ export function EquipmentOptionRow({
           trailing ? (
             <>
               <span aria-hidden="true">{trailing.label}</span>
-              <span className={equipmentOptionQuantityAccessibleVariants()}>
-                {trailing.accessibleLabel}
-              </span>
+              <span className="sr-only">{trailing.accessibleLabel}</span>
             </>
           ) : undefined
         }

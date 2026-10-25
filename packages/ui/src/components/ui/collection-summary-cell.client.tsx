@@ -82,7 +82,7 @@ export function CollectionSummaryCell({
           <button
             type="button"
             aria-label={ariaLabel}
-            className={cn(collectionSummaryCounterVariants())}
+            className={cn(collectionSummaryCounterVariants)}
           >
             {displayCount}
           </button>

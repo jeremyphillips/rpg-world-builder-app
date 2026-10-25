@@ -23,7 +23,7 @@ export function PickerSelectionStateLine({ model, density }: PickerSelectionStat
         wrap
       >
         <InlineMetadata.Item>
-          <span className={pickerSelectionStateWordVariants()}>
+          <span className={pickerSelectionStateWordVariants}>
             <Icon name="check" size="inline" className="me-1" />
             {model.label}
           </span>

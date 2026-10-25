@@ -36,10 +36,7 @@ export type {
   CatalogToolbarTab,
   CatalogToolbarTabs,
 } from './catalog-toolbar.types'
-export {
-  catalogPickerCardListClasses,
-  catalogPickerSheetListVariants,
-} from './catalog-picker-sheet.variants'
+export { catalogPickerCardListClasses } from './catalog-picker-sheet.variants'
 
 const DEFAULT_SEARCH_PLACEHOLDER = 'Search catalog'
 const DEFAULT_NO_RESULTS_MESSAGE = 'No items match your search.'
@@ -124,7 +121,7 @@ function resolveCatalogPickerSheetBodyContent({
 }): React.ReactNode {
   if (loading || deferResults) {
     return (
-      <div className={catalogPickerSheetLoadingVariants()}>
+      <div className={catalogPickerSheetLoadingVariants}>
         <Spinner size="lg" />
       </div>
     )

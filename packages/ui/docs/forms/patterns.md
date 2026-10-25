@@ -35,7 +35,7 @@ the app main column without document scroll; TabbedForm owns the bounded scroll 
 footer (flush to the viewport bottom). Non-preview catalog routes and settings-style pages use
 `scrollMode: 'document'` (`PageShell` + `documentScroll`). `scrollBodyClassName` is inset-only —
 it never selects scroll ownership; pass explicit `boundedScroll` or use the docked-footer shell path.
-Top inset scrolls away via `scrollBodyClassName` (typically `formViewportScrollBodyTopInsetClasses`)
+Top inset scrolls away via `scrollBodyClassName` (typically `pt-8` from `FormViewportScrollTopInset`)
 as the first child inside the scroll region — not as padding on the scroll container — so sticky
 tabs can reach `top-0`. Preview-rail aside insets live on `ui-tabbed-form__aside` in
 `form-chrome.css` (`padding-top` from `xl`, `padding-bottom` on `xl` so preview content clears
@@ -48,7 +48,7 @@ Overlay owners render shell chrome (`Modal.Footer`, `Sheet.Footer`, `DrawerShell
 place `<FormShellFooterSlot />` inside for semantic footer content. Use `FormShellSubmitButton`
 for submit actions rendered outside the `<form>` element.
 
-Presets: `formStickyTabsTransparentClasses`, `formStickyActionsBarTransparentClasses`.
+Presets: `ui-form-sticky-tabs--transparent`, `ui-form-actions-bar--transparent`.
 
 ### Docked shell (`ui-form-docked-shell`)
 

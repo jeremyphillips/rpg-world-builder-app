@@ -1,8 +1,6 @@
 import { Fragment } from 'react'
 import { Link, type LinkProps } from 'react-router-dom'
 
-import { contentStatRowInlineLinkClasses } from './content-stat-row-inline-links.variants'
-
 export type ContentStatRowInlineLinkItem = {
   to: LinkProps['to']
   label: string
@@ -23,7 +21,10 @@ export function ContentStatRowInlineLinks({
       {items.map((item, index) => (
         <Fragment key={String(item.to)}>
           {index > 0 ? ', ' : null}
-          <Link to={item.to} className={contentStatRowInlineLinkClasses}>
+          <Link
+            to={item.to}
+            className="text-muted-foreground hover:underline focus-visible:underline"
+          >
             {item.label}
           </Link>
         </Fragment>

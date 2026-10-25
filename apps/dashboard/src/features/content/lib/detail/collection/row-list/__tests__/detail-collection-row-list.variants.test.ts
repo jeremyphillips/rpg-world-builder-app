@@ -5,8 +5,8 @@ import { detailCollectionRowListStructuralSeparatorVariants } from '../detail-co
 
 describe('detailCollectionRowListStructuralSeparatorVariants', () => {
   it('applies structural sibling dividers', () => {
-    expect(detailCollectionRowListStructuralSeparatorVariants()).toContain('[&>*+*]:border-t')
-    expect(detailCollectionRowListStructuralSeparatorVariants()).toContain(
+    expect(detailCollectionRowListStructuralSeparatorVariants).toContain('[&>*+*]:border-t')
+    expect(detailCollectionRowListStructuralSeparatorVariants).toContain(
       '[&>*+*]:border-border-subtle',
     )
   })
@@ -14,7 +14,7 @@ describe('detailCollectionRowListStructuralSeparatorVariants', () => {
 
 describe('detailCollectionRecordSeparatorVariants', () => {
   it('applies record list-item dividers', () => {
-    expect(detailCollectionRecordSeparatorVariants()).toContain('[&>li+li]:border-t')
-    expect(detailCollectionRecordSeparatorVariants()).toContain('[&>li+li]:border-border-subtle')
+    expect(detailCollectionRecordSeparatorVariants).toContain('[&>li+li]:border-t')
+    expect(detailCollectionRecordSeparatorVariants).toContain('[&>li+li]:border-border-subtle')
   })
 })

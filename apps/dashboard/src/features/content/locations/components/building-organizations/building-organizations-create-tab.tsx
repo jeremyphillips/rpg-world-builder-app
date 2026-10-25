@@ -4,6 +4,8 @@ import { Alert, Heading, Text } from '@rpg/ui'
 
 import {
   AddPendingWorkflow,
+  createTabIntroClasses,
+  createTabPanelStackClasses,
   type CreateCompositionChildWorkflowView,
   type CreateWorkflowPanelStatus,
 } from '@/lib/create-flow'
@@ -31,11 +33,6 @@ import {
 import { useBuildingOrganizationsCreateTab } from '../../hooks/use-building-organizations-create-tab'
 import type { BuildingOrganizationsCreateTabController } from '../../hooks/use-building-organizations-create-tab'
 import { BuildingOrganizationComposer } from './building-organizations-composer'
-import {
-  buildingOrganizationsCreateTabClasses,
-  buildingOrganizationsIssueListClasses,
-  buildingOrganizationsTabIntroClasses,
-} from './building-organizations-create-tab.variants'
 
 export type { BuildingOrganizationComposerStage } from '../../lib/building-organizations/building-organizations-create-tab-controller.lib'
 
@@ -61,7 +58,7 @@ function BuildingOrganizationDraftIssues({
   if (issues.length === 0) return null
   return (
     <Alert variant="destructive" title="Review Organization relationships">
-      <ul className={buildingOrganizationsIssueListClasses}>
+      <ul className="list-disc space-y-1 pl-5 text-sm text-destructive">
         {issues.map((issue, index) => (
           <li
             key={`${issue.relationshipDraftId ?? issue.organizationDraftId ?? 'panel'}-${index}`}
@@ -78,7 +75,7 @@ function BuildingOrganizationDraftIssues({
 
 function BuildingOrganizationsTabIntro() {
   return (
-    <div className={buildingOrganizationsTabIntroClasses}>
+    <div className={createTabIntroClasses}>
       <Heading as="h2" variant="subsection">
         {BUILDING_ORGANIZATIONS_TAB_HEADING}
       </Heading>
@@ -103,7 +100,7 @@ export function BuildingOrganizationsCreateTab(props: BuildingOrganizationsCreat
   } = controller
 
   return (
-    <div ref={rootRef} className={buildingOrganizationsCreateTabClasses}>
+    <div ref={rootRef} className={createTabPanelStackClasses}>
       <BuildingOrganizationDraftIssues issues={visibleIssues} />
       {composerMode === 'resting' ? <BuildingOrganizationsTabIntro /> : null}
       <AddPendingWorkflow

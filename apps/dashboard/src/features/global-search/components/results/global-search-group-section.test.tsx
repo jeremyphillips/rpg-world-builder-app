@@ -5,7 +5,6 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { renderWithProviders } from '@/test/render'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
-import { globalSearchGroupContentInsetClasses } from '../../lib/global-search-group.variants'
 import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../../lib/rank-global-search'
 import { GlobalSearchGroupSection } from './global-search-group-section'
 
@@ -108,9 +107,7 @@ describe('GlobalSearchGroupSection', () => {
       }),
     ).toBeInTheDocument()
     expect(container.querySelector('section')).toHaveClass('pb-4')
-    expect(screen.getByRole('link', { name: /Show all/i })).toHaveClass(
-      globalSearchGroupContentInsetClasses,
-    )
+    expect(screen.getByRole('link', { name: /Show all/i })).toHaveClass('px-3')
   })
 
   it('adds a top border when following a complete group', () => {

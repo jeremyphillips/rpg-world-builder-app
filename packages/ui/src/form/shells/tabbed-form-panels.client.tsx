@@ -21,11 +21,6 @@ import { useTabbedFormTabValidationState } from '../hooks/use-tabbed-form-tab-va
 import { FormActionsBar, type FormActionsBarPlacement } from '../chrome/form-actions-bar'
 import { getTabPanelElementId, getTabPanelIdPrefix } from './tabbed-form-id.lib'
 import { TabbedFormTabIssueBadge } from './tabbed-form-tab-issue-badge.client'
-import {
-  formFooterSpacingClasses,
-  formStickyTabsClasses,
-  formTabbedInactivePanelClasses,
-} from '../chrome/form-chrome.variants'
 import { warnHeaderOnlyTabValidationWiring } from './warn-header-only-tab-validation-wiring'
 import { collectTabbedFormResolverItems, type TabbedFormTab } from './tabbed-form-panels.lib'
 
@@ -123,7 +118,7 @@ function TabbedFormTabPanel({
       aria-label={tab.label}
       data-tab-panel={tab.id}
       data-state={isActive ? 'active' : 'inactive'}
-      className={cn(!isActive && formTabbedInactivePanelClasses)}
+      className={cn(!isActive && 'hidden')}
     >
       <ArrayItemPresentationContext.Provider
         value={{ suppressFieldErrorText: !isActive, rowSummaryId: undefined }}
@@ -195,7 +190,7 @@ export function TabbedFormPanels({
       <div
         className={cn(
           tabRowTrailing ? 'flex items-center gap-2' : 'min-w-0 overflow-x-auto',
-          stickyChrome ? formStickyTabsClasses : undefined,
+          stickyChrome ? 'ui-form-sticky-tabs' : undefined,
           stickyTabsClassName,
         )}
       >
@@ -239,7 +234,7 @@ function TabbedFormFlatFooter({
         </Text>
       ) : null}
       {validationSummary}
-      {resolvedFooter ? <div className={formFooterSpacingClasses}>{resolvedFooter}</div> : null}
+      {resolvedFooter ? <div className="pt-4">{resolvedFooter}</div> : null}
     </>
   )
 }

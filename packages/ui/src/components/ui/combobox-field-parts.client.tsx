@@ -22,7 +22,6 @@ import type {
   ComboboxRenderSelectedItem,
 } from './combobox-field.types'
 import { SearchBar } from './search-bar.client'
-import { selectOptionItemReasonVariants } from './select-option-item.variants'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxTriggerValueTextClasses,
@@ -87,7 +86,7 @@ export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTrigg
               }),
               UI_FIELD_CONTROL_TRIGGER_FILL_CLASS,
               'items-stretch',
-              open && hideWhenOpen && comboboxTriggerOpenVariants(),
+              open && hideWhenOpen && comboboxTriggerOpenVariants,
             )}
           >
             <SelectLikeValueSlot size={size} position="standalone" trailingSlot prose>
@@ -137,7 +136,7 @@ function comboboxDisabledReasonEndSlot(reason: string) {
   return (
     <span className="flex shrink-0 items-center gap-1.5">
       <Icon name="lock" size="md" className="shrink-0 opacity-60" />
-      <span className={selectOptionItemReasonVariants()}>{reason}</span>
+      <span className="text-style-caption">{reason}</span>
     </span>
   )
 }
@@ -416,8 +415,8 @@ export function ComboboxSelectedItems({
 
   const chipSize = fieldSizeToChipSize[size]
   const listClassName = renderSelectedItem
-    ? comboboxSelectedListVariants()
-    : comboboxSelectedItemsRowVariants()
+    ? comboboxSelectedListVariants
+    : comboboxSelectedItemsRowVariants
 
   return (
     <div className={listClassName} role="list" aria-label={`Selected ${label}`}>

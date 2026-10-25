@@ -11,7 +11,7 @@ import {
 
 describe('actionResolutionListVariants', () => {
   it('uses a subtle panel frame without a second inset', () => {
-    const classes = actionResolutionListVariants()
+    const classes = actionResolutionListVariants
     expect(classes).toContain('ui-panel--subtle')
     expect(classes).toContain('ui-panel--bleed')
     expect(classes).not.toContain('bg-sunken')

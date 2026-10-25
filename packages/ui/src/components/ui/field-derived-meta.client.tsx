@@ -32,11 +32,11 @@ export function FieldDerivedMeta({ id, className }: FieldDerivedMetaProps) {
     >
       {rows.map((row, index) =>
         row.label ? (
-          <div key={row.label} className={fieldDerivedMetaRowVariants()}>
-            <Text variant="caption" as="span" className={fieldDerivedMetaLabelVariants()}>
+          <div key={row.label} className={fieldDerivedMetaRowVariants}>
+            <Text variant="caption" as="span" className={fieldDerivedMetaLabelVariants}>
               {row.label}
             </Text>
-            <Text variant="caption" as="span" className={fieldDerivedMetaValueVariants()}>
+            <Text variant="caption" as="span" className={fieldDerivedMetaValueVariants}>
               {row.value}
             </Text>
           </div>
@@ -45,7 +45,7 @@ export function FieldDerivedMeta({ id, className }: FieldDerivedMetaProps) {
             key={`value-${index}`}
             variant="caption"
             as="span"
-            className={fieldDerivedMetaValueVariants()}
+            className={fieldDerivedMetaValueVariants}
           >
             {row.value}
           </Text>

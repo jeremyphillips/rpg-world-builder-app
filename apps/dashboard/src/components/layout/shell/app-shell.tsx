@@ -9,12 +9,6 @@ import { PageChromeActionsProvider } from '@/components/layout/page-chrome/page-
 import { Sidebar } from '@/components/layout/sidebar'
 import { Topbar } from '@/components/layout/topbar/topbar'
 
-import {
-  appShellContentColumnClasses,
-  appShellMainClasses,
-  appShellRootClasses,
-  appShellStickyChromeClasses,
-} from './app-shell.variants'
 import { usePathnameScrollReset } from './use-pathname-scroll-reset'
 
 function AppShellBreadcrumbRail() {
@@ -31,17 +25,17 @@ export function AppShell() {
     <BreadcrumbLabelProvider>
       <PageChromeActionsProvider>
         <GlobalSearchProvider>
-          <div className={appShellRootClasses}>
+          <div className="dash-app-shell">
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-            <div className={appShellContentColumnClasses}>
-              <div className={appShellStickyChromeClasses} data-app-sticky-chrome>
+            <div className="dash-app-shell__column">
+              <div className="dash-app-shell__chrome" data-app-sticky-chrome>
                 <Topbar
                   sidebarOpen={sidebarOpen}
                   onToggleSidebar={() => setSidebarOpen((o) => !o)}
                 />
                 <AppShellBreadcrumbRail />
               </div>
-              <main className={appShellMainClasses}>
+              <main className="dash-app-shell__main">
                 <Outlet />
               </main>
             </div>

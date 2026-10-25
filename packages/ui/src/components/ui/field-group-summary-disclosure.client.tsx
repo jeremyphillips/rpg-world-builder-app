@@ -243,7 +243,7 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
         onOpenChange={onOpenChange}
       />
 
-      <CollapsibleContent forceMount className={accordionContentVariants()}>
+      <CollapsibleContent forceMount className={accordionContentVariants}>
         <div id={panelId} hidden={!open} className={panelClasses}>
           <FieldGroupSummaryDisclosurePanel
             size={size}

@@ -33,7 +33,10 @@ describe('CollectionSummaryCell', () => {
       />,
     )
 
-    expect(screen.getByRole('button', { name: /3 subclasses/i })).toHaveTextContent('3')
+    const counter = screen.getByRole('button', { name: /3 subclasses/i })
+    expect(counter).toHaveTextContent('3')
+    expect(counter).toHaveClass('ui-focus-ring')
+    expect(counter.className).not.toContain('focus-visible:ring-2')
     expect(screen.queryByText('[')).not.toBeInTheDocument()
     expect(screen.queryByText(']')).not.toBeInTheDocument()
   })

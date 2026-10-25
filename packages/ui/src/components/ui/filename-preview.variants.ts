@@ -14,4 +14,4 @@ export const filenamePreviewVariants = cva('min-w-0 max-w-full whitespace-nowrap
   },
 })
 
-export const filenamePreviewFullVariants = cva('block min-w-0 max-w-full break-words')
+export const filenamePreviewFullVariants = 'block min-w-0 max-w-full break-words'

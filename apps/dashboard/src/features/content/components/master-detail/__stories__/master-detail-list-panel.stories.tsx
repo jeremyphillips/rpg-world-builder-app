@@ -1,11 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from '@rpg/ui'
-import {
-  formDockedActionsBarClasses,
-  FormStickyScrollBody,
-  formStickyScrollShellWithDockedFooterClasses,
-  formStickyTabsClasses,
-} from '@rpg/ui/form'
+import { FormStickyScrollBody, formStickyScrollShellWithDockedFooterClasses } from '@rpg/ui/form'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import { MasterDetailGrid } from '../master-detail-grid'
@@ -96,9 +91,7 @@ export const WithStickyFormFooter: Story = {
       <div className={formStickyScrollShellWithDockedFooterClasses}>
         <FormStickyScrollBody>
           <div className="p-6">
-            <div
-              className={`${formStickyTabsClasses} mb-4 flex h-[var(--rpg-form-sticky-tabs-block-size,3rem)] items-center rounded-md border border-border px-3 text-style-supporting`}
-            >
+            <div className="ui-form-sticky-tabs mb-4 flex h-[var(--rpg-form-sticky-tabs-block-size,3rem)] items-center rounded-md border border-border px-3 text-style-supporting">
               Dummy section tabs
             </div>
             <MasterDetailGrid>
@@ -109,7 +102,7 @@ export const WithStickyFormFooter: Story = {
             </MasterDetailGrid>
           </div>
         </FormStickyScrollBody>
-        <div className={formDockedActionsBarClasses}>
+        <div className="ui-form-actions-bar ui-form-actions-bar--docked">
           <div className="flex justify-end px-6">
             <Button type="button">Save changes</Button>
           </div>

@@ -16,12 +16,7 @@ import type { ValidateSilently } from '../context/form-ui.context'
 import { TabbedFormErrorSummary } from './tabbed-form-error-summary.client'
 import { FormRhythmStack } from '../context/form-section.context'
 import { DialogPanelScrollRegion } from '../../components/ui/dialog-panel-scroll-region.client'
-import {
-  formTabbedAsideBodyClasses,
-  formTabbedAsideGridClasses,
-  formTabbedAsideSlotClasses,
-  formStickyScrollShellWithDockedFooterClasses,
-} from '../chrome/form-chrome.variants'
+import { formStickyScrollShellWithDockedFooterClasses } from '../chrome/form-chrome.variants'
 import { FormStickyScrollBody } from '../chrome/form-sticky-scroll-body.client'
 import { FormScrollBodyTopInset } from '../chrome/form-viewport-scroll-top-inset.client'
 import { cn } from '../../lib/utils'
@@ -311,7 +306,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   )
 
   const formColumnWrapperClasses = cn(
-    aside && !externalFooter ? formTabbedAsideBodyClasses : null,
+    aside && !externalFooter ? 'ui-tabbed-form__body' : null,
     dockedShellClass,
   )
 
@@ -323,9 +318,9 @@ export function TabbedForm<TFieldValues extends FieldValues>({
 
   const defaultLayout =
     aside && !externalFooter ? (
-      <div className={formTabbedAsideGridClasses}>
+      <div className="ui-tabbed-form">
         {formColumn}
-        <div className={formTabbedAsideSlotClasses}>{aside}</div>
+        <div className="ui-tabbed-form__aside">{aside}</div>
       </div>
     ) : (
       formColumn

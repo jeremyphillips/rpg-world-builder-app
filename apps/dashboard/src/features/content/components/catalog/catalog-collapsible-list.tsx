@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { cn } from '@rpg/ui'
-
-import { catalogCollapsibleListClasses } from './catalog-collapsible-list.variants'
+import { catalogPickerCardListClasses, cn } from '@rpg/ui'
 
 export type CatalogCollapsibleListProps<TCard> = {
   items: readonly TCard[]
@@ -19,7 +17,7 @@ export function CatalogCollapsibleList<TCard>({
   className,
 }: CatalogCollapsibleListProps<TCard>) {
   return (
-    <ul className={cn(catalogCollapsibleListClasses, className)}>
+    <ul className={cn(catalogPickerCardListClasses, className)}>
       {items.map((item) => (
         <li key={getItemId(item)}>{renderItem(item)}</li>
       ))}

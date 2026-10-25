@@ -5,7 +5,7 @@ export const ticketLinkSelectedPreviewBodyClasses = 'min-w-0 flex-1 space-y-0.5'
 
 export const ticketLinkSelectedPreviewLinkClasses = [
   ticketLinkSelectedPreviewBodyClasses,
-  'rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+  'rounded-sm hover:underline ui-focus-ring',
 ].join(' ')
 
 export const ticketLinkSelectedPreviewKeyClasses = 'font-mono text-style-caption'
@@ -13,4 +13,4 @@ export const ticketLinkSelectedPreviewKeyClasses = 'font-mono text-style-caption
 export const ticketLinkSelectedPreviewTitleClasses = 'truncate text-sm'
 
 export const ticketLinkSelectedPreviewRemoveClasses =
-  'inline-flex shrink-0 rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50'
+  'inline-flex shrink-0 rounded-sm text-muted-foreground transition-colors hover:text-foreground ui-focus-ring disabled:pointer-events-none disabled:opacity-50'

@@ -55,7 +55,7 @@ function DetailEntityRowDisclosureUtility({
     return (
       <button
         type="button"
-        className={detailEntityRowDisclosureButtonVariants()}
+        className={detailEntityRowDisclosureButtonVariants}
         aria-expanded={!collapsed}
         aria-controls={contentId}
         aria-label={toggleLabel}
@@ -204,7 +204,7 @@ export function DetailEntityRow({
       {disclosure.mode === 'expandable' && !collapsed ? (
         <div id={contentId} className={detailEntityRowDisclosureContentVariants({ inset })}>
           <div className="dash-entity-surface__disclosure-preview-offset">
-            <div className={detailEntityRowDisclosurePreviewGroupVariants()}>
+            <div className={detailEntityRowDisclosurePreviewGroupVariants}>
               {disclosure.content}
             </div>
           </div>

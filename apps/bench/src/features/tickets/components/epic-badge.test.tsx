@@ -15,10 +15,10 @@ describe('EpicBadge', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('link', { name: `Open epic ${sampleEpic.title}` })).toHaveAttribute(
-      'href',
-      `/epics/${sampleEpic.id}`,
-    )
+    const link = screen.getByRole('link', { name: `Open epic ${sampleEpic.title}` })
+    expect(link).toHaveAttribute('href', `/epics/${sampleEpic.id}`)
+    expect(link).toHaveClass('ui-focus-ring')
+    expect(link.className).not.toContain('focus-visible:ring-2')
   })
 
   it('renders a gray badge when no epic is assigned', () => {

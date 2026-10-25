@@ -3,8 +3,6 @@ import { cn } from '@rpg/ui'
 import { EntityAnatomy } from '../../anatomy/entity-anatomy'
 import { projectEntitySummaryModel } from '../../summary/entity-summary-projection.lib'
 import type { DrawerEntityBlockModel } from './drawer-entity.types'
-import { drawerEntityVariants } from './drawer-entity.variants'
-
 export type DrawerEntityBlockProps = DrawerEntityBlockModel & {
   className?: string
 }
@@ -19,7 +17,7 @@ export function DrawerEntityBlock({
   className,
 }: DrawerEntityBlockProps) {
   return (
-    <div className={cn(drawerEntityVariants(), className)}>
+    <div className={cn('min-w-0', className)}>
       <EntityAnatomy
         entity={projectEntitySummaryModel({
           heading,

@@ -7,12 +7,6 @@ import {
   ORGANIZATION_MEMBERSHIP_TITLES_EMPTY_SUPPORT,
 } from '../../lib/organization-display'
 
-import {
-  organizationMembershipTitlesEmptyVariants,
-  organizationMembershipTitlesItemVariants,
-  organizationMembershipTitlesListVariants,
-} from './organization-membership-titles-summary.variants'
-
 export type OrganizationMembershipTitlesSummaryProps = {
   titles?: readonly OrganizationMembershipTitleDefinition[]
   idPrefix?: string
@@ -26,7 +20,7 @@ export function OrganizationMembershipTitlesSummary({
   const catalog = titles ?? []
   if (catalog.length === 0) {
     return (
-      <div className={organizationMembershipTitlesEmptyVariants()}>
+      <div className="space-y-1">
         <Text variant="muted">{ORGANIZATION_EMPTY_SECTION_TEXT.membershipTitles}</Text>
         <Text variant="muted">{ORGANIZATION_MEMBERSHIP_TITLES_EMPTY_SUPPORT}</Text>
       </div>
@@ -36,9 +30,9 @@ export function OrganizationMembershipTitlesSummary({
   const sorted = sortOrganizationMembershipTitleDefinitionsForDisplay(catalog)
 
   return (
-    <ol className={organizationMembershipTitlesListVariants()} data-testid={`${idPrefix}-list`}>
+    <ol className="list-none space-y-1" data-testid={`${idPrefix}-list`}>
       {sorted.map((entry) => (
-        <li key={entry.id} className={organizationMembershipTitlesItemVariants()}>
+        <li key={entry.id} className="text-sm text-foreground">
           {entry.label}
         </li>
       ))}

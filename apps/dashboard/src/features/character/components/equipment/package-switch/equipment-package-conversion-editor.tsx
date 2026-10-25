@@ -20,7 +20,7 @@ import { resolveEquipmentConversionItemPresentation } from '../../../lib/equipme
 import type { StartingPackageInventoryGroup } from '../../../lib/equipment/equipment-step.lib'
 import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-status'
 import { buildEquipmentInventoryRowEntity } from '../inventory/equipment-inventory-entity.lib'
-import { equipmentInventoryRowListClasses } from '../inventory/equipment-inventory.variants'
+import { equipmentInventoryRowListClasses } from '@/lib/equipment/equipment-inventory-list.variants'
 export type EquipmentPackageConversionEditorProps = {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex

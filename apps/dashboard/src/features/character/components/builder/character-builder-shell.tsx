@@ -76,14 +76,6 @@ import {
   CharacterBuilderPreviewRail,
   CharacterBuilderPreviewSheet,
 } from './preview/character-builder-preview-rail'
-import {
-  characterBuilderShellBodyClasses,
-  characterBuilderShellHeaderClasses,
-  characterBuilderShellHeaderTitleRowClasses,
-  characterBuilderShellNavColumnClasses,
-  characterBuilderShellPreviewColumnClasses,
-  characterBuilderShellRootClasses,
-} from './character-builder-shell.variants'
 import { CharacterBuilderStepContent } from './character-builder-step-content'
 import { CharacterBuilderStepRail } from './chrome/character-builder-step-rail'
 
@@ -502,9 +494,9 @@ export function CharacterBuilderShell({
         />
       ) : null}
 
-      <div className={characterBuilderShellRootClasses}>
-        <header className={characterBuilderShellHeaderClasses}>
-          <div className={characterBuilderShellHeaderTitleRowClasses}>
+      <div className="dash-character-builder">
+        <header className="dash-character-builder__header">
+          <div className="dash-character-builder__title-row">
             <Heading variant="page" as="h1" className="shrink-0">
               {chrome.pageHeading}
             </Heading>
@@ -532,8 +524,8 @@ export function CharacterBuilderShell({
           </div>
         </header>
 
-        <div className={characterBuilderShellBodyClasses}>
-          <div className={characterBuilderShellNavColumnClasses}>
+        <div className="dash-character-builder__body">
+          <div className="dash-character-builder__nav">
             <ScrollBoundaryRegion viewportClassName={characterBuilderNavScrollViewportClasses}>
               <CharacterBuilderStepRail
                 draft={draft}
@@ -611,7 +603,7 @@ export function CharacterBuilderShell({
               />
             }
           />
-          <div className={characterBuilderShellPreviewColumnClasses}>
+          <div className="dash-character-builder__preview">
             <CharacterBuilderPreviewRail
               draft={draft}
               context={context}

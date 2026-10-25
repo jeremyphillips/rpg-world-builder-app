@@ -6,7 +6,7 @@ import {
   equipmentInventoryRowListClasses,
   equipmentPurchasedInventoryCategoryClasses,
   equipmentPurchasedInventoryCategoryListClasses,
-} from './equipment-inventory-list.variants'
+} from '@/lib/equipment/equipment-inventory-list.variants'
 
 export type EquipmentCategoryGroup<T> = {
   groupLabel: string

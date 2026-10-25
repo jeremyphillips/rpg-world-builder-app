@@ -1,8 +1,6 @@
 import { Button, InlineMetadata } from '@rpg/ui'
 
 import { formatResultCount } from './format-result-count.lib'
-import { overviewResultSummaryVariants } from './overview-result-summary.variants'
-
 export type ResultSummarySupplement = {
   label: string
   action?: {
@@ -50,7 +48,7 @@ export function ResultSummary({ visibleCount, primaryLabel, supplements }: Resul
 
   return (
     <div
-      className={overviewResultSummaryVariants()}
+      className="flex min-w-0 flex-wrap items-center gap-y-1 text-style-caption"
       role="status"
       aria-live="polite"
       aria-atomic="true"

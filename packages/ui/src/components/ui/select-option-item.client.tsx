@@ -1,10 +1,6 @@
 'use client'
 
 import { SelectItem } from './select.client'
-import {
-  selectOptionItemContentVariants,
-  selectOptionItemReasonVariants,
-} from './select-option-item.variants'
 import type { FieldOption } from '../../form/field-config'
 
 export function SelectOptionItem({
@@ -19,9 +15,9 @@ export function SelectOptionItem({
   return (
     <SelectItem value={itemValue} disabled={option.disabled}>
       {reason ? (
-        <span className={selectOptionItemContentVariants()}>
+        <span className="flex w-full items-center justify-between gap-3">
           <span>{option.label}</span>
-          <span className={selectOptionItemReasonVariants()}>{reason}</span>
+          <span className="text-style-caption">{reason}</span>
         </span>
       ) : (
         option.label

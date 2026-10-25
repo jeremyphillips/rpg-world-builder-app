@@ -6,7 +6,7 @@ import {
   type EquipmentInventoryRemoveTarget,
 } from '../../../../../lib/equipment/equipment-step.lib'
 
-import { EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT } from '../../../../equipment/inventory/equipment-inventory.variants'
+import { EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT } from '@/lib/equipment/equipment-inventory-list.variants'
 import { EquipmentPurchasedInventorySection } from '../../../../equipment/inventory/purchased/equipment-purchased-inventory-section'
 import {
   PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE,

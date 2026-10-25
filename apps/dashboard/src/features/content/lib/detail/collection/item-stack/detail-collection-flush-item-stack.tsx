@@ -2,11 +2,6 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
-import {
-  detailCollectionFlushItemStackItemVariants,
-  detailCollectionFlushItemStackVariants,
-} from './detail-collection-flush-item-stack.variants'
-
 export type DetailCollectionFlushItemStackProps = {
   children: ReactNode
   className?: string
@@ -17,7 +12,7 @@ export function DetailCollectionFlushItemStack({
   children,
   className,
 }: DetailCollectionFlushItemStackProps) {
-  return <div className={cn(detailCollectionFlushItemStackVariants(), className)}>{children}</div>
+  return <div className={cn('pt-4', className)}>{children}</div>
 }
 
 export type DetailCollectionFlushItemStackItemProps = {
@@ -31,6 +26,13 @@ export function DetailCollectionFlushItemStackItem({
   className,
 }: DetailCollectionFlushItemStackItemProps) {
   return (
-    <div className={cn(detailCollectionFlushItemStackItemVariants(), className)}>{children}</div>
+    <div
+      className={cn(
+        'border-b border-border-subtle px-4 pb-4 mb-4 last:mb-0 last:border-b-0',
+        className,
+      )}
+    >
+      {children}
+    </div>
   )
 }

@@ -4,7 +4,6 @@ import type { GlobalSearchDocument } from '@rpg/contracts'
 import { cn, Text } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
-import { globalSearchGroupContentInsetClasses } from '../../lib/global-search-group.variants'
 import type { GlobalSearchGroupSection } from '../../lib/rank-global-search'
 import { GlobalSearchResultsPanel } from '../global-search-results-panel'
 import { GlobalSearchEmptyPrompt } from '../results/global-search-empty-prompt'
@@ -29,10 +28,7 @@ function GlobalSearchPreviewStatus({
 }: GlobalSearchPreviewStatusProps) {
   if (isPending) {
     return (
-      <Text
-        variant="supporting"
-        className={cn('py-3 text-center', globalSearchGroupContentInsetClasses)}
-      >
+      <Text variant="supporting" className={cn('py-3 text-center', 'px-3')}>
         {GLOBAL_SEARCH_COPY.loadingCatalog}
       </Text>
     )
@@ -40,7 +36,7 @@ function GlobalSearchPreviewStatus({
 
   if (isError) {
     return (
-      <div className={cn('space-y-3 py-3 text-center', globalSearchGroupContentInsetClasses)}>
+      <div className={cn('space-y-3 py-3 text-center', 'px-3')}>
         <Text variant="supporting" role="alert">
           {GLOBAL_SEARCH_COPY.catalogLoadError}
         </Text>
@@ -56,13 +52,13 @@ function GlobalSearchPreviewStatus({
   }
 
   if (!hasQuery) {
-    return <GlobalSearchEmptyPrompt className={globalSearchGroupContentInsetClasses} />
+    return <GlobalSearchEmptyPrompt className={'px-3'} />
   }
 
   if (groupedSections.length === 0) {
     return (
       <GlobalSearchEmptyPrompt
-        className={globalSearchGroupContentInsetClasses}
+        className={'px-3'}
         title={GLOBAL_SEARCH_COPY.noResultsTitle}
         description={GLOBAL_SEARCH_COPY.noResultsDescription(query.trim(), 'all')}
       />

@@ -25,14 +25,12 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `fieldSetChromeContainClasses` — column stack for borderless leaf fieldset anatomy
  * - `fieldSetInFlowLegendClasses` — reset UA legend padding on chip / choose-count captions
  * - `formSectionStackClasses` — vertical gap between top-level form sections
- * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
- * - `fieldRowLayoutClasses` — deprecated alias; prefer `resolveFieldRowClasses`
+ * - `fieldRowLayoutClasses` — deprecated alias (`gap-6`); prefer `resolveFieldRowClasses`
  * - `fieldChipWrapGapClasses` — chip pill row gap only (no vertical pad) inside `ChipsField`
- * - `fieldGroupDescriptionClasses` — group/section hint typography (spacing lives on the legend header)
+ * - group/section hint typography is `text-style-field-group-description` (spacing lives on the legend header)
  * - `fieldGroupLegendHeaderStackClasses` — vertical gap between a group legend and its hint
  * - `fieldGroupLegendHeaderMarginVariants` — legacy legend bottom margin (HeadingPresentation, editable-grid — not FieldGroup body spacing)
  * - `fieldGroupBodyGapVariants` / `resolveFieldGroupBodyGap` — legend→body spacing scale for FieldGroup (applied on the body relationship)
- * - `fieldGroupLegendSpacingClasses` — section legend header bottom margin (`mb-5` / 20px)
  * - `fieldArrayItemVariants` — chrome around one repeatable array item
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
  * - `fieldInlineControlRowClasses` — inline label + control rows
@@ -156,7 +154,7 @@ export const fieldRecommendationRowClasses = 'mt-1 flex flex-wrap items-center g
 /** Caption scale with foreground ink — same size as field hints, not muted. */
 export const fieldRecommendationSupportingTextClasses = 'text-style-caption text-foreground'
 /** Decoration overrides for recommendation text actions — geometry stays on `Button` text tokens. */
-export const fieldRecommendationActionVariants = cva('no-underline hover:no-underline')
+export const fieldRecommendationActionVariants = 'no-underline hover:no-underline'
 
 /** Field recommendation group — internal layout only; field band spacing is `fieldRecommendationRowClasses`. */
 export const fieldRecommendationFieldGroupClasses =
@@ -182,16 +180,8 @@ export const fieldGroupBottomMarginClasses = 'mb-8'
 export const fieldGroupSectionOuterMarginResetClasses = 'mb-0'
 export const fieldGroupFlexStackClasses = 'flex flex-col gap-8'
 export const formSectionStackClasses = 'flex flex-col gap-7'
-export const fieldRowGapClasses = 'gap-6'
 /** Horizontal + wrap gap between chip pills — vertical label→chips spacing is the anatomy token. */
 export const fieldChipWrapGapClasses = 'gap-2'
-/** Comfortable group/subgroup legend description — explicit scale (not leaf field hints). */
-export const fieldGroupDescriptionTypographyClasses = 'text-style-field-group-description'
-/** Compact group legend description — 12px caption scale. */
-export const fieldGroupDescriptionCompactTypographyClasses =
-  'text-style-field-group-description-compact'
-/** Group/subgroup hint copy — legend→body spacing lives on FieldGroup body wrapper. */
-export const fieldGroupDescriptionClasses = fieldGroupDescriptionTypographyClasses
 /** Vertical gap between a group legend and its optional hint. */
 export const fieldGroupLegendHeaderStackVariants = cva('flex flex-col', {
   variants: {
@@ -209,16 +199,6 @@ export const fieldGroupLegendHeaderStackVariants = cva('flex flex-col', {
 export const fieldGroupLegendHeaderStackClasses = fieldGroupLegendHeaderStackVariants({
   rhythm: 'comfortable',
 })
-/** Section-level legend header bottom margin (20px). */
-export const fieldGroupLegendSpacingClasses = 'mb-5'
-/** Subgroup legend header bottom margin (16px). */
-export const fieldSubgroupLegendSpacingClasses = 'mb-4'
-/** Shared legend typography — field groups and array section legends. */
-export const fieldGroupLegendTypographyClasses = 'text-style-field-legend'
-/** Nested subgroup legend typography — smaller scale for groups inside another group. */
-export const fieldSubgroupLegendTypographyClasses = 'text-style-field-legend-sub'
-/** Compact section/subgroup legend typography — 15px heading scale. */
-export const fieldGroupLegendCompactTypographyClasses = 'text-style-field-legend-compact'
 /** Repeatable array section legend — matches leaf field label typography. */
 export const fieldLabelTypographyVariants = cva('', {
   variants: {
@@ -254,12 +234,6 @@ export function resolveArrayLegendClassName(size: FieldSizeToken = 'md'): string
   return cn(fieldLabelTypographyVariants({ size }), fieldArrayLegendSpacingVariants({ size }))
 }
 
-/** @deprecated Use {@link resolveArrayLegendClassName} — retained for class drift tests. */
-export const fieldArrayLegendSpacingClasses = 'mb-1.5'
-/** @deprecated Use {@link fieldLabelTypographyVariants}. */
-export const fieldArrayLegendTypographyClasses = 'text-style-field-label-md'
-/** @deprecated Use {@link fieldLabelTypographyVariants}. */
-export const fieldArrayLegendSmTypographyClasses = 'text-style-field-label-sm'
 /**
  * @deprecated Prefer {@link formSectionHeaderActionLayoutClasses} from form presentation.
  * Retained for class drift tests only.
@@ -331,8 +305,8 @@ export function resolveFieldGroupDescriptionTypography(
   rhythm: FieldRhythm = 'comfortable',
 ): string {
   return rhythm === 'compact'
-    ? fieldGroupDescriptionCompactTypographyClasses
-    : fieldGroupDescriptionTypographyClasses
+    ? 'text-style-field-group-description-compact'
+    : 'text-style-field-group-description'
 }
 
 export const fieldStackRhythmVariants = cva('flex flex-col', {
@@ -464,9 +438,6 @@ export function fieldArrayItemListClasses(
   return cn('flex flex-col', 'gap-3')
 }
 
-/** Spacing above a stacked array add action — 16px (`mt-4`), owned by the action boundary. */
-export const arrayFieldStackedAddActionSpacingClasses = 'mt-4'
-
 /** Compact toggle-dependent stack rhythm — prefer `fieldStackRhythmVariants` for configurable stacks. */
 export const fieldToggleDependentStackClasses = fieldStackRhythmVariants({ rhythm: 'compact' })
 
@@ -503,7 +474,7 @@ export type FieldSeparatorVariantProps = VariantProps<typeof fieldSeparatorVaria
  * @deprecated Prefer `resolveFieldRowClasses({ layout: 'flow', align: 'control-edge', gap: 'form' })`
  * from `field-row-presentation.lib.ts`. Kept as a sync’d alias (`items-end` control-edge).
  */
-export const fieldRowLayoutClasses = cn('flex flex-wrap items-end', fieldRowGapClasses)
+export const fieldRowLayoutClasses = cn('flex flex-wrap items-end', 'gap-6')
 
 /** Where helper text renders relative to the label and control. */
 export type FieldHintPosition = 'below-label' | 'below-control'
@@ -591,13 +562,8 @@ export const fieldGroupLegendDisclosureTriggerVariants = cva(
 )
 
 /** Collapsible panel for legend disclosure — animation only; spacing comes from the field stack. */
-export const fieldGroupLegendDisclosureContentVariants = cva([
-  'overflow-hidden',
-  'data-[state=open]:overflow-visible',
-  'data-[state=closed]:h-0 data-[state=closed]:animate-accordion-up',
-  'data-[state=open]:animate-accordion-down',
-  'data-[state=closed]:pointer-events-none data-[state=closed]:inert',
-])
+export const fieldGroupLegendDisclosureContentVariants =
+  'overflow-hidden data-[state=open]:overflow-visible data-[state=closed]:h-0 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down data-[state=closed]:pointer-events-none data-[state=closed]:inert'
 
 export const fieldGroupLegendVariants = cva('', {
   variants: {
@@ -616,10 +582,10 @@ export const fieldGroupLegendVariants = cva('', {
     },
   },
   compoundVariants: [
-    { size: 'section', rhythm: 'comfortable', class: fieldGroupLegendTypographyClasses },
-    { size: 'subsection', rhythm: 'comfortable', class: fieldSubgroupLegendTypographyClasses },
-    { size: 'section', rhythm: 'compact', class: fieldGroupLegendCompactTypographyClasses },
-    { size: 'subsection', rhythm: 'compact', class: fieldGroupLegendCompactTypographyClasses },
+    { size: 'section', rhythm: 'comfortable', class: 'text-style-field-legend' },
+    { size: 'subsection', rhythm: 'comfortable', class: 'text-style-field-legend-sub' },
+    { size: 'section', rhythm: 'compact', class: 'text-style-field-legend-compact' },
+    { size: 'subsection', rhythm: 'compact', class: 'text-style-field-legend-compact' },
   ],
   defaultVariants: {
     size: 'section',
@@ -637,7 +603,7 @@ export const fieldGroupLegendHeaderMarginVariants = cva('', {
     size: {
       section: '',
       subsection: '',
-      array: fieldArrayLegendSpacingClasses,
+      array: 'mb-1.5',
     },
     rhythm: {
       comfortable: '',
@@ -645,8 +611,8 @@ export const fieldGroupLegendHeaderMarginVariants = cva('', {
     },
   },
   compoundVariants: [
-    { size: 'section', rhythm: 'comfortable', class: fieldGroupLegendSpacingClasses },
-    { size: 'subsection', rhythm: 'comfortable', class: fieldSubgroupLegendSpacingClasses },
+    { size: 'section', rhythm: 'comfortable', class: 'mb-5' },
+    { size: 'subsection', rhythm: 'comfortable', class: 'mb-4' },
     { size: 'section', rhythm: 'compact', class: 'mb-3' },
     { size: 'subsection', rhythm: 'compact', class: 'mb-3' },
   ],

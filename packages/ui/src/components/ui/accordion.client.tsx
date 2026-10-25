@@ -88,7 +88,7 @@ const AccordionContent = React.forwardRef<
     <AccordionPrimitive.Content
       ref={ref}
       forceMount={forceMount}
-      className={cn(accordionContentVariants(), className)}
+      className={cn(accordionContentVariants, className)}
       {...props}
     >
       <div className={accordionContentInnerVariants({ variant: ctxVariant })}>{children}</div>

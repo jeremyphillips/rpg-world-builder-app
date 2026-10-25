@@ -236,6 +236,11 @@ strings.
 - **Variants:** Use CVA and `*.variants.ts` only when resolving meaningful visual variants
   (tone, density, size, state, etc.). Do not create variant files merely to export static
   Tailwind strings or rename utility combinations.
+- **Dashboard ESLint styling bans:** `apps/dashboard/eslint.config.js`
+  (`dashboardSemanticStyleLayerGuards`, the picker action-row guard, and the drag-handle
+  guard) blocks feature-level row-hover stacks, focus-ring stacks, remove-button class
+  constants, and copied picker action-row literals. See
+  [packages/ui/docs/semantic-style-layers.md](packages/ui/docs/semantic-style-layers.md).
 - **Component ownership:** Prefer existing semantic primitives (`Card`, `Panel`, `Alert`,
   etc.) over recreating their chrome with border, background, padding, and radius utilities.
 - **Typography:** Use `Text` / `text-style-*` roles rather than hand-rolled size, weight,

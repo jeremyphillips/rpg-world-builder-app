@@ -4,13 +4,10 @@ import {
   RichTextContent,
   RICH_TEXT_TABLE_EMBED_ATTR,
   sanitizeHtml,
+  Text,
   type RichTextContentProps,
 } from '@rpg/ui'
 import { GeneralTableView } from '../tables/general-table-view'
-import {
-  richTextWithTablesMissingTableClasses,
-  richTextWithTablesStackClasses,
-} from './rich-text-with-tables.variants'
 
 const TABLE_UNAVAILABLE_LABEL = 'Table unavailable'
 
@@ -61,7 +58,7 @@ export function RichTextWithTables({
   if (segments.length === 0) return null
 
   return (
-    <div className={richTextWithTablesStackClasses}>
+    <div className="space-y-4">
       {segments.map((segment, index) => {
         if (segment.kind === 'html') {
           return <RichTextContent key={`html-${index}`} html={segment.html} {...contentProps} />
@@ -70,9 +67,9 @@ export function RichTextWithTables({
         const table = tableById.get(segment.tableId)
         if (!table) {
           return (
-            <p key={`missing-${segment.tableId}`} className={richTextWithTablesMissingTableClasses}>
+            <Text key={`missing-${segment.tableId}`} variant="supporting">
               {TABLE_UNAVAILABLE_LABEL}
-            </p>
+            </Text>
           )
         }
 

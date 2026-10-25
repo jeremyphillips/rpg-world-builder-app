@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 
@@ -12,14 +15,13 @@ import { PageShell } from '../page/page-shell'
 import { viewportWorkspaceClasses } from '../page/viewport-workspace.variants'
 import { ViewportWorkspace } from '../page/viewport-workspace'
 import {
-  appShellContentColumnClasses,
-  appShellMainClasses,
-  appShellRootClasses,
-} from './app-shell.variants'
-import {
   VIEWPORT_WORKSPACE_FILL_ATTR,
   VIEWPORT_WORKSPACE_FILL_VALUE,
 } from '../page/viewport-workspace.variants'
+
+function appShellSource(): string {
+  return readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'app-shell.tsx'), 'utf8')
+}
 
 /**
  * Document scroll is the default. Ordinary routes never establish a vertical scrollport.
@@ -27,14 +29,14 @@ import {
  */
 describe('AppShell route scroll ownership', () => {
   it('maps the app shell to dash-app-shell blocks', () => {
-    expect(appShellRootClasses).toBe('dash-app-shell')
-    expect(appShellContentColumnClasses).toBe('dash-app-shell__column')
-    expect(appShellMainClasses).toBe('dash-app-shell__main')
+    expect(appShellSource()).toContain('className="dash-app-shell"')
+    expect(appShellSource()).toContain('className="dash-app-shell__column"')
+    expect(appShellSource()).toContain('className="dash-app-shell__main"')
   })
 
   it('main is a flex column participant but not a scrollport', () => {
     const { container } = render(
-      <main className={appShellMainClasses}>
+      <main className="dash-app-shell__main">
         <p>Body</p>
       </main>,
     )
@@ -87,8 +89,8 @@ describe('AppShell route scroll ownership', () => {
   })
 
   it('defines viewport lock on dash-app-shell column and main for ViewportWorkspace routes', () => {
-    expect(appShellContentColumnClasses).toBe('dash-app-shell__column')
-    expect(appShellMainClasses).toBe('dash-app-shell__main')
+    expect(appShellSource()).toContain('dash-app-shell__column')
+    expect(appShellSource()).toContain('dash-app-shell__main')
   })
 
   it('documents messages workspace as a ViewportWorkspace pane', () => {

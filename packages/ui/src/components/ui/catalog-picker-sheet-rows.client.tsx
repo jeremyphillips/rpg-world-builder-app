@@ -9,7 +9,7 @@ import type {
   CatalogPickerSheetProps,
   CatalogPickerSheetSelection,
 } from './catalog-picker-sheet.types'
-import { catalogPickerSheetListVariants } from './catalog-picker-sheet.variants'
+import { catalogPickerCardListClasses } from './catalog-picker-sheet.variants'
 import { resolveCollapsibleListItemDomIds } from './collapsible-list-item/collapsible-list-item.variants'
 
 function useCatalogPickerRowExpansion(
@@ -147,7 +147,7 @@ export function CatalogPickerSheetResults<TItem>({
     )
   })
 
-  const listClassName = catalogPickerSheetListVariants()
+  const listClassName = catalogPickerCardListClasses
 
   if (rowProps.selection) {
     return (

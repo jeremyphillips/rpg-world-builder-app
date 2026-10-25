@@ -3,9 +3,9 @@ import { Button, Heading } from '@rpg/ui'
 
 import { resolveAddPendingMode, type AddPendingWorkflowMode } from './add-pending-workflow.lib'
 import {
-  addPendingWorkflowPendingListClasses,
-  addPendingWorkflowStackClasses,
-} from './add-pending-workflow.variants'
+  createTabPanelStackClasses,
+  createTabPendingListClasses,
+} from './create-tab-content.variants'
 
 export type { AddPendingWorkflowMode }
 
@@ -63,11 +63,11 @@ export function AddPendingWorkflow({
   const addLabel = hasPendingItems ? addAnotherLabel : (addFirstLabel ?? addAnotherLabel)
 
   return (
-    <div className={addPendingWorkflowStackClasses} data-add-pending-mode={resolvedMode}>
+    <div className={createTabPanelStackClasses} data-add-pending-mode={resolvedMode}>
       {resolvedMode === 'pending' ? (
         hasPendingItems ? (
           <>
-            <div className={addPendingWorkflowPendingListClasses}>
+            <div className={createTabPendingListClasses}>
               {pendingHeading ? (
                 <Heading as="h3" variant="subsection">
                   {pendingHeading}

@@ -1,11 +1,10 @@
-import { cva } from 'class-variance-authority'
-
 import { cn, rowAnatomyTracksVariants, type ContentCardDensity } from '@rpg/ui'
 
 /** Embedded EntityAnatomyHost host — anatomy only; collection inset owned by the host. */
-export const entityAnatomyHostRootVariants = cva('w-full min-w-0')
+export const entityAnatomyHostRootVariants = 'w-full min-w-0'
 
-export const entityAnatomyMediaContentSpanClasses = 'flex h-full items-start'
+/** Stretch media cell inner row — top-aligns media within the stretch track. */
+export const entityAnatomyMediaCellInnerVariants = 'flex h-full items-start'
 
 export function entityAnatomyVariants({ density }: { density?: ContentCardDensity } = {}) {
   return cn(

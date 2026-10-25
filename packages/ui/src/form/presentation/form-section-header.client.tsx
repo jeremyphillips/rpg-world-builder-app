@@ -5,13 +5,7 @@ import type { ReactNode } from 'react'
 import { FieldLabelContent } from '../../components/ui/field-label-content'
 import { shouldShowVisibleRequiredMarker } from '../../components/ui/field-required.lib'
 import type { FieldSize } from '../../components/ui/field.client'
-import {
-  fieldGroupDescriptionTypographyClasses,
-  fieldGroupLegendTypographyClasses,
-  fieldLabelHintStackClasses,
-  fieldLabelVariants,
-  fieldSubgroupLegendTypographyClasses,
-} from '../../components/ui/field.variants'
+import { fieldLabelHintStackClasses, fieldLabelVariants } from '../../components/ui/field.variants'
 import { Text } from '../../components/ui/text'
 import { cn } from '../../lib/utils'
 import type { FieldHintConfig } from '../field-config'
@@ -50,11 +44,7 @@ function renderFieldLabelHint(hint: string | FieldHintConfig | undefined): React
   if (!hint) return null
   const normalized = normalizeFieldHint(hint)
   if (!normalized.text) return null
-  return (
-    <Text variant="caption" className={fieldGroupDescriptionTypographyClasses}>
-      {normalized.text}
-    </Text>
-  )
+  return <Text variant="supporting">{normalized.text}</Text>
 }
 
 function renderSectionHint(
@@ -65,14 +55,10 @@ function renderSectionHint(
   const normalized = normalizeFieldHint(hint)
   if (!normalized.text) return null
   if (tier === 'leaf') {
-    return (
-      <Text variant="caption" className={fieldGroupDescriptionTypographyClasses}>
-        {normalized.text}
-      </Text>
-    )
+    return <Text variant="supporting">{normalized.text}</Text>
   }
   return (
-    <Text as="span" className={fieldGroupDescriptionTypographyClasses}>
+    <Text as="span" variant="supporting">
       {normalized.text}
     </Text>
   )
@@ -93,11 +79,7 @@ function renderHeadingLabelLine({
       </div>
     ) : (
       <span
-        className={
-          tier === 'section'
-            ? fieldGroupLegendTypographyClasses
-            : fieldSubgroupLegendTypographyClasses
-        }
+        className={tier === 'section' ? 'text-style-field-legend' : 'text-style-field-legend-sub'}
       >
         {label}
       </span>

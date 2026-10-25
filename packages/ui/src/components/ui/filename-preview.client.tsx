@@ -36,7 +36,7 @@ export function FilenamePreview({
   const preparedFilename = prepareFilenameForDisplay(filename)
 
   if (full) {
-    return <span className={cn(filenamePreviewFullVariants(), className)}>{preparedFilename}</span>
+    return <span className={cn(filenamePreviewFullVariants, className)}>{preparedFilename}</span>
   }
 
   const resolvedMaxLength = resolveFilenamePreviewMaxLength(density, maxLength)

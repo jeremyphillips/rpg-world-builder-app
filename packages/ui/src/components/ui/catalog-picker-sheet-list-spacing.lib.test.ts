@@ -20,6 +20,6 @@ describe('catalog picker card list spacing SSOT', () => {
   it('marks results list hosts for drift checks', () => {
     const rowsSource = readFileSync(rowsPath, 'utf8')
     expect(rowsSource).toContain('data-picker-card-list')
-    expect(rowsSource).toContain('catalogPickerSheetListVariants')
+    expect(rowsSource).toContain('catalogPickerCardListClasses')
   })
 })

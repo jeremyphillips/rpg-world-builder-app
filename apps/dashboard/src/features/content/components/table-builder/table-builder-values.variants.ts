@@ -1,5 +1,4 @@
-import { cn } from '@rpg/ui'
-import { tableHeaderRowClasses } from '@rpg/ui'
+import { cn, tableHeaderRowVariants } from '@rpg/ui'
 
 // ---------------------------------------------------------------------------
 // Values grid — a bordered group that reads as a real table. The outer
@@ -13,9 +12,9 @@ export const tableBuilderValuesScrollClasses = 'overflow-x-auto'
 
 export const tableBuilderValuesGridClasses = 'min-w-fit'
 
-/** Authoring header row — matches {@link tableHeaderRowClasses} from `@rpg/ui`. */
+/** Authoring header row — matches {@link tableHeaderRowVariants} from `@rpg/ui`. */
 export const tableBuilderValuesHeaderRowClasses = cn(
-  tableHeaderRowClasses,
+  tableHeaderRowVariants,
   'grid items-center gap-2 px-2.5 py-2 text-style-label text-muted-foreground',
 )
 

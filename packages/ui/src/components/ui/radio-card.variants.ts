@@ -3,10 +3,7 @@ import { cva } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import { interactiveRowVariants } from './interactive-row.variants'
-import {
-  radioCardDecorativeControlClasses,
-  resolveRadioCardIndicatorSize,
-} from './choice-control.variants'
+import { radioCardDecorativeControlClasses } from './choice-control.variants'
 
 const radioCardRowBase = cn(
   'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground',
@@ -108,8 +105,6 @@ export const radioCardControlVariants = cva('', {
     density: 'comfortable',
   },
 })
-
-export { resolveRadioCardIndicatorSize }
 
 /** Vertical gap between sibling radio options in a group. */
 export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 items-stretch', {

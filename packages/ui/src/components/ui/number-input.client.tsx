@@ -96,7 +96,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     return (
       <div
         className={cn(
-          numberInputRootVariants(),
+          numberInputRootVariants,
           digits ? resolveDigitInlineSizeClasses(digits, resolvedSize) : 'w-full',
           compositeShell && numberInputCompositeShellRootClasses,
           rootClassName,

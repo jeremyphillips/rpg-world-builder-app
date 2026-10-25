@@ -27,7 +27,6 @@ import {
 
 import { EquipmentOptionRow } from '@/features/character/components/equipment/picker/equipment-option-row'
 import type { EquipmentOptionRowPresentation } from '@/features/character/lib/equipment/equipment-option-row-presentation.lib'
-import { equipmentOptionQuantityAccessibleVariants } from '@/features/character/components/equipment/picker/equipment-option-row.variants'
 import { StartingEquipmentOptionCards } from '@/features/character/components/equipment/starting-package/starting-equipment-option-cards'
 import { StartingEquipmentOptionSummaryCard } from '@/features/character/components/equipment/starting-package/starting-equipment-option-summary'
 import {
@@ -678,7 +677,7 @@ function AdditionalEquipmentSelectedList({
           manualLabel !== undefined ? (
             <span className={quickNpcAdditionalEquipmentQuantityClasses}>
               <span aria-hidden="true">{manualLabel}</span>
-              <span className={equipmentOptionQuantityAccessibleVariants()}>
+              <span className="sr-only">
                 {formatManualEquipmentQuantityAccessibleLabel(manualQuantity)}
               </span>
             </span>

@@ -130,6 +130,9 @@ describe('CreateModalShell', () => {
     await user.type(nameInput, 'North Gate')
     await user.click(screen.getByRole('tab', { name: /Organizations \(optional\)/ }))
 
+    const organizationsPanel = document.querySelector('[data-create-tab-panel="organizations"]')
+    expect(organizationsPanel).toHaveClass('ui-focus-ring')
+    expect(organizationsPanel?.className ?? '').not.toContain('focus-visible:ring-2')
     expect(screen.getByText('Relationship drafts')).toBeVisible()
     expect(nameInput).toBeInTheDocument()
     expect(nameInput).toHaveValue('North Gate')

@@ -19,7 +19,7 @@ import { PickerSelectionStateLine } from '../summary/picker-selection-state-line
 import { wrapEntityAnatomyLeadingMedia } from './entity-leading-media-shell.lib'
 import {
   entityAnatomyHostRootVariants,
-  entityAnatomyMediaContentSpanClasses,
+  entityAnatomyMediaCellInnerVariants,
   entityAnatomyVariants,
 } from './entity-anatomy.variants'
 
@@ -99,7 +99,7 @@ export function EntityAnatomy({
           cell={{ slot: 'stretch', column: 'media' }}
           data-entity-item-slot="media"
         >
-          <div className={entityAnatomyMediaContentSpanClasses}>
+          <div className={entityAnatomyMediaCellInnerVariants}>
             {wrapEntityAnatomyLeadingMedia(entity.media)}
           </div>
         </RowAnatomyCell>
@@ -139,7 +139,7 @@ export function EntityAnatomy({
           cell={{ slot: 'status', column: 'content' }}
           data-entity-item-slot="status"
         >
-          <div className={entitySummaryStatusLaneVariants()}>
+          <div className={entitySummaryStatusLaneVariants}>
             {entity.selectionState ? (
               <PickerSelectionStateLine model={entity.selectionState} density={density} />
             ) : null}
@@ -168,7 +168,7 @@ export function EntityAnatomyHost({
   descriptionWrap,
 }: EntityAnatomyHostProps) {
   return (
-    <div className={entityAnatomyHostRootVariants()}>
+    <div className={entityAnatomyHostRootVariants}>
       <EntityAnatomy
         entity={entity}
         headingHref={headingHref}

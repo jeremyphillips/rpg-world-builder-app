@@ -8,7 +8,6 @@ import {
   FormFooterActions,
   FormShellSubmitButton,
   TabbedForm,
-  formStickyTabsTransparentClasses,
   type ComboboxRenderSelectedItem,
 } from '@rpg/ui/form'
 
@@ -157,7 +156,7 @@ export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormPr
       onSubmit={onSubmit}
       formError={formError}
       className={isSheetLayout ? 'flex min-h-0 flex-1 flex-col' : undefined}
-      stickyTabsClassName={isSheetLayout ? formStickyTabsTransparentClasses : undefined}
+      stickyTabsClassName={isSheetLayout ? 'ui-form-sticky-tabs--transparent' : undefined}
       externalFooter={isSheetLayout}
       header={isSheetLayout ? <TicketMetaTimestamps ticket={ticket} /> : undefined}
       contentWrapper={

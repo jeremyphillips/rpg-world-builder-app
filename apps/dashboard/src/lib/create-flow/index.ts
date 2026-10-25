@@ -76,5 +76,4 @@ export {
   createCompositionStageHeadingRowClasses,
   createCompositionStageStackClasses,
   createCompositionStageSubheadingClasses,
-  createCompositionSummaryRowsClasses,
 } from './create-composition.variants'

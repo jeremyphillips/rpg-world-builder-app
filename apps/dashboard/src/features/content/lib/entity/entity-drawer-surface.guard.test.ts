@@ -11,7 +11,6 @@ const RELATIONSHIP_DRAWER_ROOT = join(FEATURE_ROOT, 'content/lib/relationship/dr
 const RELATIONSHIP_DRAWER_GENERIC_CONTEXT_FILES = new Set([
   'drawer-context.tsx',
   'drawer-context.types.ts',
-  'drawer-context.variants.ts',
   'relationship-drawer-subject-field.tsx',
   'relationship-drawer-field-labels.ts',
 ])

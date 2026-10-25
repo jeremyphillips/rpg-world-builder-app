@@ -8,9 +8,9 @@ const composerPath = fileURLToPath(
     import.meta.url,
   ),
 )
-const variantsPath = fileURLToPath(
+const createTabPath = fileURLToPath(
   new URL(
-    '../../components/building-organizations/building-organizations-create-tab.variants.ts',
+    '../../components/building-organizations/building-organizations-create-tab.tsx',
     import.meta.url,
   ),
 )
@@ -34,7 +34,7 @@ describe('building organizations composer structural drift', () => {
 
   it('uses shared create-flow composition presentation instead of local layout anatomy', () => {
     const source = readFileSync(composerPath, 'utf8')
-    const variants = readFileSync(variantsPath, 'utf8')
+    const createTab = readFileSync(createTabPath, 'utf8')
 
     expect(source).toContain('CreateCompositionComposer')
     expect(source).toContain('CreateCompositionSummary')
@@ -44,9 +44,12 @@ describe('building organizations composer structural drift', () => {
     expect(source).not.toContain('SelectionSummaryRow')
     expect(source).not.toContain('SelectionSummaryChangeAction')
     expect(source).toContain('mapBuildingOrganizationCompositionSummaryRows')
-    expect(variants).not.toContain('buildingOrganizationsStageSubheadingClasses')
-    expect(variants).not.toContain('buildingOrganizationsComposerClasses')
-    expect(variants).not.toContain('gap-2.5')
+    expect(createTab).toContain('createTabPanelStackClasses')
+    expect(createTab).toContain('list-disc space-y-1 pl-5 text-sm text-destructive')
+    expect(source).toContain('createTabDiscoveryListClasses')
+    expect(source).not.toContain('buildingOrganizationsStageSubheadingClasses')
+    expect(source).not.toContain('buildingOrganizationsComposerClasses')
+    expect(createTab).not.toContain('gap-2.5')
     expect(source).not.toMatch(/\bspace-y-\d/)
     expect(source).toContain('createCompositionStageSubheadingClasses')
     // Policy: apps/dashboard/docs/create-flow.md §Nested composition presentation

@@ -84,7 +84,7 @@ function DiceFormulaControlCell({
   children: ReactNode
 }) {
   return (
-    <div className={diceFormulaControlCellVariants()}>
+    <div className={diceFormulaControlCellVariants}>
       <label htmlFor={id} className="sr-only">
         {label}
       </label>
@@ -135,8 +135,8 @@ function DiceFormulaCountControl({
         disabled={disabled}
         aria-invalid={hasError || undefined}
         digits={digits}
-        rootClassName={diceFormulaGroupedCountRootVariants()}
-        className={diceFormulaCountInputVariants()}
+        rootClassName={diceFormulaGroupedCountRootVariants}
+        className={diceFormulaCountInputVariants}
         value={resolved.count}
         onChange={(event) => {
           onUpdate({ count: parseInputInt(event.target.value, resolved.count, countMin, countMax) })
@@ -396,8 +396,8 @@ function DiceFormulaModifierAmountSegment({
         disabled={disabled}
         aria-invalid={hasError || undefined}
         digits={fieldDigitsForMax(modifierMax)}
-        rootClassName={diceFormulaGroupedModifierRootVariants()}
-        className={diceFormulaModifierInputVariants()}
+        rootClassName={diceFormulaGroupedModifierRootVariants}
+        className={diceFormulaModifierInputVariants}
         value={resolved.modifier?.amount ?? 1}
         onChange={(event) => {
           onUpdate({

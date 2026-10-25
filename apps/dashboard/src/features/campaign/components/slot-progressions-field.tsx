@@ -21,7 +21,6 @@ import {
   isSeedSlotProgressionId,
   type SpellcastingProgressionFormState,
 } from '../lib/rules/character-configuration/spellcasting-progression-form-values'
-import { spellcastingSubsectionClasses } from './spellcasting-progression-field.variants'
 type SlotModalState =
   | { mode: 'edit'; id: string }
   | { mode: 'create'; label: string; kind: SlotProgressionTableKind }
@@ -148,10 +147,7 @@ export function SlotProgressionsField() {
 
   return (
     <>
-      <section
-        className={spellcastingSubsectionClasses}
-        aria-labelledby="slot-progressions-heading"
-      >
+      <section className="space-y-3" aria-labelledby="slot-progressions-heading">
         <ArrayLikeSectionHeader
           id="slot-progressions-heading"
           label="Slot progressions"

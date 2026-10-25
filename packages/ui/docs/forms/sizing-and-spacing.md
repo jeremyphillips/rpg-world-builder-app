@@ -10,7 +10,7 @@ only. Decision rules live in the [forms hub](../forms.md#form-density).
 with `resolveFormDensity` directly.
 
 Source of truth: [`form-density.ts`](../../src/form/form-density.ts),
-[`field-stack.variants.ts`](../../src/components/ui/field-stack.variants.ts),
+[`field.variants.ts`](../../src/components/ui/field.variants.ts),
 [`field-sizing.variants.ts`](../../src/components/ui/field-sizing.variants.ts),
 [`field-control-band.variants.ts`](../../src/components/ui/field-control-band.variants.ts),
 [`field-row-presentation.lib.ts`](../../src/components/ui/field-row-presentation.lib.ts),

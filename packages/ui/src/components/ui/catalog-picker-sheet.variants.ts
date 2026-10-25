@@ -1,17 +1,12 @@
 import { cva } from 'class-variance-authority'
 
-/** Catalog picker results body — default Sheet.Body scrollport; no extra top/bottom overrides. */
-export const catalogPickerSheetBodyVariants = cva('')
-
 /**
  * Vertical rhythm between sibling picker cards in sheet/drawer results.
  * Gap-only — do not stack `space-y-*` or row `mb-*` on card hosts.
  */
 export const catalogPickerCardListClasses = 'flex flex-col gap-2 w-full'
 
-export const catalogPickerSheetListVariants = cva(catalogPickerCardListClasses)
-
-export const catalogPickerSheetLoadingVariants = cva('flex justify-center py-12')
+export const catalogPickerSheetLoadingVariants = 'flex justify-center py-12'
 
 /**
  * Pinned chrome under the title, inside `Sheet.Header`.
@@ -31,10 +26,10 @@ export const catalogPickerHeaderChromeVariants = cva('flex flex-col gap-4 pt-4',
 })
 
 /** Toolbar plus optional auxiliary action. Gap replaces the auxiliary row's old top padding. */
-export const catalogPickerHeaderFilterClusterVariants = cva('flex flex-col gap-2')
+export const catalogPickerHeaderFilterClusterVariants = 'flex flex-col gap-2'
 
-/** Toolbar nested in the header. Header owns `px-6`. The reset strip is the bottom inset. */
-export const catalogPickerHeaderToolbarVariants = cva('px-0')
+/** Toolbar nested in the header. Header owns `px-6`. `px-0` resets that inset. */
+export const catalogPickerHeaderToolbarVariants = 'px-0'
 
 /** Last pinned row above the header border. Header owns horizontal inset. */
-export const catalogPickerAuxiliaryActionRowVariants = cva('flex justify-end pb-4')
+export const catalogPickerAuxiliaryActionRowVariants = 'flex justify-end pb-4'

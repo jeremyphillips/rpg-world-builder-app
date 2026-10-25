@@ -10,7 +10,7 @@ import {
 
 describe('mediaSummaryCompactInteractiveRootVariants', () => {
   it('keeps the compact preview in a fixed square hover group container', () => {
-    const classes = mediaSummaryCompactInteractiveRootVariants()
+    const classes = mediaSummaryCompactInteractiveRootVariants
     expect(classes).toContain('group')
     expect(classes).toContain('relative')
     expect(classes).toContain('block')
@@ -30,7 +30,7 @@ describe('mediaSummaryWellVariants', () => {
 
 describe('mediaSummaryCompactPreviewButtonVariants', () => {
   it('exposes focus ring chrome and pointer cursor on the preview control', () => {
-    const classes = mediaSummaryCompactPreviewButtonVariants()
+    const classes = mediaSummaryCompactPreviewButtonVariants
     expect(classes).toContain('focus-visible:ring-2')
     expect(classes).toContain('enabled:cursor-pointer')
   })
@@ -38,7 +38,7 @@ describe('mediaSummaryCompactPreviewButtonVariants', () => {
 
 describe('mediaSummaryCompactOverlayVariants', () => {
   it('anchors count copy over a translucent sunken bar', () => {
-    const classes = mediaSummaryCompactOverlayVariants()
+    const classes = mediaSummaryCompactOverlayVariants
     expect(classes).toContain('absolute')
     expect(classes).toContain('bottom-px')
     expect(classes).toContain('inset-x-px')
@@ -50,7 +50,7 @@ describe('mediaSummaryCompactOverlayVariants', () => {
 
 describe('mediaSummaryCompactGearButtonVariants', () => {
   it('exposes focus ring chrome and trailing inset on the manage control', () => {
-    const classes = mediaSummaryCompactGearButtonVariants()
+    const classes = mediaSummaryCompactGearButtonVariants
     expect(classes).toContain('absolute')
     expect(classes).toContain('bottom-px')
     expect(classes).toContain('right-px')

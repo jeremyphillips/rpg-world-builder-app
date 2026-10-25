@@ -8,10 +8,6 @@ import type { FieldSize } from './field.client'
 import { FieldLabelContent } from './field-label-content'
 import { fieldAnatomyStackVariants, fieldLabelVariants } from './field.variants'
 import { cn } from '../../lib/utils'
-import {
-  optionalFieldDisclosureActionButtonClasses,
-  optionalFieldDisclosureHeaderClasses,
-} from './optional-field-disclosure.variants'
 
 export type OptionalFieldDisclosureProps = {
   controlId: string
@@ -43,7 +39,7 @@ export function OptionalFieldDisclosure({
         type="button"
         variant="text"
         size="sm"
-        className={cn(optionalFieldDisclosureActionButtonClasses, 'w-fit justify-start')}
+        className={cn('font-normal', 'w-fit justify-start')}
         aria-controls={controlId}
         aria-expanded={false}
         onClick={() => onOpenChange(true)}
@@ -56,7 +52,7 @@ export function OptionalFieldDisclosure({
 
   return (
     <div className={fieldAnatomyStackVariants({ size })}>
-      <div className={optionalFieldDisclosureHeaderClasses}>
+      <div className="flex items-center justify-between gap-2">
         <label htmlFor={controlId} className={cn(fieldLabelVariants({ size }))}>
           <FieldLabelContent label={fieldLabel} />
         </label>
@@ -64,7 +60,7 @@ export function OptionalFieldDisclosure({
           type="button"
           variant="text"
           size="sm"
-          className={optionalFieldDisclosureActionButtonClasses}
+          className="font-normal"
           aria-label={`${removeLabel} ${fieldLabel}`}
           onClick={onRemove}
         >

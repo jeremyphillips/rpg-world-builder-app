@@ -7,7 +7,6 @@ import { useSetPageChromeActions } from '@/components/layout/page-chrome/use-set
 import { withDashboardProviders } from '../../../../.storybook/decorators'
 
 import { DetailPageHeader } from './detail-page-header'
-import { detailPageHeaderClasses } from './detail-page-header.variants'
 
 function RegisteredEditAction() {
   useSetPageChromeActions(<ContentDetailEditAction to="/campaigns/demo/classes/fighter/edit" />)
@@ -44,7 +43,7 @@ export const ActionsOnly: Story = {
 
 export const ChromeShell: Story = {
   render: () => (
-    <div className={detailPageHeaderClasses}>
+    <div className="flex h-8 shrink-0 items-center justify-between gap-4">
       <div className="min-w-0 flex-1 text-style-supporting">Breadcrumb slot (route-driven)</div>
       <div className="flex shrink-0 items-center gap-2">
         <Button variant="outline" size="sm" density="compact">
