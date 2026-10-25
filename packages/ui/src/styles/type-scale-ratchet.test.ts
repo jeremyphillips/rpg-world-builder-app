@@ -22,10 +22,10 @@ const NUMBERED_HEADING = /--text-heading-[1-5]\b/
 const HEADING_3_MD = '--text-heading-' + '3-md'
 const OVERSIZED_STEP = /(?:--|\b)text-[5-9]xl\b/
 const RETIRED_META_SIZE = new RegExp('text-' + '(?:2xs|xs|sm)' + '-' + 'meta' + '\\b')
+const RETIRED_FINE_2XS = new RegExp('--text-fine-' + '2xs\\b|text-fine-' + '2xs\\b')
 
 const REQUIRED_THEME_TOKENS = [
   '--text-md:',
-  '--text-fine-2xs:',
   '--text-fine-xs:',
   '--text-fine-sm:',
   '--text-fine-md:',
@@ -63,6 +63,7 @@ function violationsIn(source: string): string[] {
   if (source.includes(HEADING_3_MD)) hits.push('heading-3-md token')
   if (OVERSIZED_STEP.test(source)) hits.push('text-5xl+ step')
   if (RETIRED_META_SIZE.test(source)) hits.push('retired meta font size')
+  if (RETIRED_FINE_2XS.test(source)) hits.push('retired fine 2xs token')
   return hits
 }
 

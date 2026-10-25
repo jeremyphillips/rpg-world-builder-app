@@ -182,8 +182,7 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 
 | Token / utility | px @ 16px root | Typical use                                      |
 | --------------- | -------------- | ------------------------------------------------ |
-| `text-fine-2xs` | 9              | Eyebrow `xs`                                     |
-| `text-fine-xs`  | 10             | Compact control-action labels                    |
+| `text-fine-xs`  | 10             | Eyebrow `xs`, compact control-action labels      |
 | `text-fine-sm`  | 11             | Eyebrow `sm`, compact label `sm`                 |
 | `text-fine-md`  | 13             | Eyebrow `md`, compact label `md`, table body     |
 | `text-xs`       | 12             | Captions, table stat columns                     |
@@ -196,7 +195,7 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 | `text-3xl`      | 28             | Section headings (curated; not the 30px default) |
 | `text-4xl`      | 34             | Page headings (curated; not the 36px default)    |
 
-Fine (9–13px) and standard (`text-xs` through `text-4xl`) are one scale. Nothing above `text-4xl` is declared. Fine sizes have no line-height companion.
+Fine (10–13px) and standard (`text-xs` through `text-4xl`) are one scale. Nothing above `text-4xl` is declared. Fine sizes have no line-height companion.
 
 ## Form legend tokens
 
@@ -277,8 +276,7 @@ Fine sizes are the small end of the same primitive scale, not a metadata tier. T
 
 | Token / utility       | px @ 16px root | Shared by                                                        |
 | --------------------- | -------------- | ---------------------------------------------------------------- |
-| `text-fine-2xs`       | 9              | `text-eyebrow-xs`                                                |
-| `text-fine-xs`        | 10             | `text-control-action-xs` (line-height stays 14px)                |
+| `text-fine-xs`        | 10             | `text-eyebrow-xs`, `text-control-action-xs` (line-height 14px)   |
 | `text-fine-sm`        | 11             | `text-eyebrow-sm`, compact label `sm`, floating-label `sm` floor |
 | `text-fine-md`        | 13             | `text-eyebrow-md`, compact label `md`, `text-table-body`         |
 | `text-md`             | 15             | Compact label `lg` (`Badge` / `Chip`)                            |

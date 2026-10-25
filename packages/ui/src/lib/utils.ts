@@ -162,7 +162,6 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
   extend: {
     theme: {
       text: [
-        'fine-2xs',
         'fine-xs',
         'fine-sm',
         'fine-md',
