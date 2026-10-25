@@ -28,10 +28,9 @@ describe('cn', () => {
     )
   })
 
-  it('keeps heading role font-size utilities alongside text color classes', () => {
-    expect(cn('text-foreground', 'text-heading-page font-heading')).toBe(
-      'text-foreground text-heading-page font-heading',
-    )
+  it('keeps text-xs-meta beside a color utility without a heading font-size class', () => {
+    expect(cn('text-foreground', 'text-xs-meta')).toBe('text-foreground text-xs-meta')
+    expect(cn('text-foreground', 'text-heading-page')).toBe('text-heading-page')
   })
 
   it('merges conflicting semantic font-weight utilities', () => {
@@ -50,7 +49,7 @@ describe('cn', () => {
   })
 
   it('drops atomic heading typography when a composite follows', () => {
-    expect(cn('text-heading-display font-heading tracking-tight', 'heading-style-page')).toBe(
+    expect(cn('text-4xl font-heading tracking-tight', 'heading-style-page')).toBe(
       'heading-style-page',
     )
   })

@@ -16,8 +16,8 @@ export const headingVariants = cva('', {
       nav: 'heading-style-nav',
       brand: 'heading-style-brand',
       label: 'heading-style-label',
-      /** Hero title — 19px mobile, 24px md, page (34px) from lg up. */
-      heroTitle: 'heading-style-subsection md:heading-style-sheet-section lg:heading-style-page',
+      /** Hero title — 18px mobile, 20px md, 34px from lg up. */
+      heroTitle: 'heading-style-hero-title',
     },
   },
   defaultVariants: {

@@ -91,7 +91,7 @@ export const Sizes: Story = {
         supporting="Supporting"
       />
       <IdentityRow
-        heading="Spacious (19px)"
+        heading="Spacious (18px)"
         classification="spacious"
         density="spacious"
         supporting="Supporting"

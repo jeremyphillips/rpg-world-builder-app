@@ -78,12 +78,11 @@
  * toggling the `.dark` class on a root element. The `@theme inline` block
  * maps those variables to Tailwind color utilities (e.g. `bg-primary`).
  *
- * Type scale: `--text-xs` … `--text-9xl` in `@theme inline` are the SSOT for
- * Tailwind `text-*` font sizes (defaults at 16px root). `--text-md` (15px) is
- * secondary body for prose-md and `Text` small/destructive/emphasis. Heading tiers
- * (`--text-heading-1` … `--text-heading-5`) and role aliases
- * (`--text-heading-display`, …) map variants to that scale. Font-weight roles
- * (`--font-weight-heading`, …) mirror the same pattern. Meta/semantic aliases
+ * Type scale: `--text-xs` … `--text-4xl` in `@theme inline` are the SSOT for
+ * Tailwind `text-*` font sizes (@ 16px root). `3xl` is 28px and `4xl` is 34px.
+ * `--text-md` (15px) is secondary body for prose-md and `Text` small/destructive/emphasis.
+ * Heading and form-legend roles live on `:root` and do not emit `text-*` utilities.
+ * Font-weight roles (`--font-weight-heading`, …) stay in `@theme`. Meta aliases
  * (`--text-xs-meta`, `--text-eyebrow-sm`, …) sit below the type scale.
  *
  * Theme palette: role-named Layer 1 roles (`surface-*`, `field-*`, `fg-*`,
@@ -252,91 +251,33 @@
   --max-width-page-narrow: 56rem; /* ~896px — aligns with legacy max-w-4xl */
 
   /*
-   * Type scale — SSOT for Tailwind `text-*` utilities (@ 16px root).
-   * Values match Tailwind v4 defaults; retune the app by editing here.
+   * Type scale — curated primitives for Tailwind `text-*` utilities (@ 16px root).
+   * `--text-*: initial` drops Tailwind defaults, including steps above 4xl.
+   * Heading, specialty numeral, and form-legend roles live on `:root`.
    */
+  --text-*: initial;
+
+  /* Primitive font sizes */
   --text-xs: 0.75rem; /* 12px */
-  --text-xs--line-height: 1rem; /* 16px */
   --text-sm: 0.875rem; /* 14px */
-  --text-sm--line-height: 1.25rem; /* 20px */
   --text-md: 0.9375rem; /* 15px — secondary body (prose-md, Text small, …) */
-  --text-md--line-height: 1.375rem; /* 22px */
   --text-base: 1rem; /* 16px */
-  --text-base--line-height: 1.5rem; /* 24px */
   --text-lg: 1.125rem; /* 18px */
-  --text-lg--line-height: 1.75rem; /* 28px */
   --text-xl: 1.25rem; /* 20px */
+  --text-2xl: 1.5rem; /* 24px — form group legends */
+  --text-3xl: 1.75rem; /* 28px — section metric */
+  --text-4xl: 2.125rem; /* 34px — page metric */
+
+  /* Primitive line heights */
+  --text-xs--line-height: 1rem; /* 16px */
+  --text-sm--line-height: 1.25rem; /* 20px */
+  --text-md--line-height: 1.375rem; /* 22px */
+  --text-base--line-height: 1.5rem; /* 24px */
+  --text-lg--line-height: 1.75rem; /* 28px */
   --text-xl--line-height: 1.75rem; /* 28px */
-  --text-2xl: 1.5rem; /* 24px */
   --text-2xl--line-height: 2rem; /* 32px */
-  --text-3xl: 1.875rem; /* 30px */
-  --text-3xl--line-height: 2.25rem; /* 36px */
-  --text-4xl: 2.25rem; /* 36px */
-  --text-4xl--line-height: 2.5rem; /* 40px */
-  --text-5xl: 3rem; /* 48px */
-  --text-5xl--line-height: 1;
-  --text-6xl: 3.75rem; /* 60px */
-  --text-6xl--line-height: 1;
-  --text-7xl: 4.5rem; /* 72px */
-  --text-7xl--line-height: 1;
-  --text-8xl: 6rem; /* 96px */
-  --text-8xl--line-height: 1;
-  --text-9xl: 8rem; /* 128px */
-  --text-9xl--line-height: 1;
-
-  /*
-   * Heading visual tiers (@ 16px root). Not HTML h1–h5 — use with Heading
-   * `variant` + polymorphic `as`. Retune the document ladder here only.
-   */
-  --text-heading-1: 2.625rem; /* 42px */
-  --text-heading-1--line-height: 2.875rem; /* 46px */
-  --text-heading-2: 2.125rem; /* 34px */
-  --text-heading-2--line-height: 2.4375rem; /* 39px */
-  --text-heading-3: 1.75rem; /* 28px */
-  --text-heading-3--line-height: 2.125rem; /* 34px */
-  --text-ability-score-md: 2rem; /* 32px — ability score card numerals (md) */
-  --text-ability-score-md--line-height: 2.25rem; /* 36px */
-  --text-heading-3-md: var(--text-xl); /* 20px */
-  --text-heading-3-md--line-height: var(--text-xl--line-height);
-  --text-heading-4: var(--text-lg); /* 18px */
-  --text-heading-4--line-height: var(--text-lg--line-height);
-  --text-heading-5: 1rem; /* 16px */
-  --text-heading-5--line-height: var(--text-base--line-height);
-
-  /* Heading role aliases — retune hierarchy without touching variants. */
-  --text-heading-display: var(--text-heading-1);
-  --text-heading-display--line-height: var(--text-heading-1--line-height);
-  --text-heading-page: var(--text-heading-2);
-  --text-heading-page--line-height: var(--text-heading-2--line-height);
-  --text-heading-section: var(--text-heading-3);
-  --text-heading-section--line-height: var(--text-heading-3--line-height);
-  --text-heading-subsection: var(--text-heading-4);
-  --text-heading-subsection--line-height: var(--text-heading-4--line-height);
-  --text-heading-group: var(--text-heading-5);
-  --text-heading-group--line-height: var(--text-heading-5--line-height);
-  --text-heading-card: var(--text-heading-subsection);
-  --text-heading-card--line-height: var(--text-heading-subsection--line-height);
-  /* Dialog/Modal/Sheet titles: 18px mobile → 20px from md. */
-  --text-heading-dialog-title: var(--text-heading-subsection);
-  --text-heading-dialog-title--line-height: var(--text-heading-subsection--line-height);
-  --text-heading-dialog-title-md: var(--text-heading-3-md);
-  --text-heading-dialog-title-md--line-height: var(--text-heading-3-md--line-height);
-  --text-heading-confirm-dialog-title: var(--text-heading-subsection);
-  --text-heading-confirm-dialog-title--line-height: var(--text-heading-subsection--line-height);
-  --text-heading-sheet-section: var(--text-heading-3-md);
-  --text-heading-sheet-section--line-height: var(--text-heading-3-md--line-height);
-  --text-heading-compact: var(--text-heading-5);
-  --text-heading-compact--line-height: var(--text-heading-5--line-height);
-  --text-heading-label: var(--text-heading-group);
-  --text-heading-label--line-height: var(--text-heading-group--line-height);
-
-  /* Form chrome — group/section legend type scale. */
-  --text-field-group-legend: var(--text-2xl);
-  --text-field-group-legend--line-height: var(--text-2xl--line-height);
-  --text-field-subgroup-legend: var(--text-xl);
-  --text-field-subgroup-legend--line-height: var(--text-xl--line-height);
-  --text-field-array-legend: var(--text-lg);
-  --text-field-array-legend--line-height: var(--text-lg--line-height);
+  --text-3xl--line-height: 2.125rem; /* 34px — current section metric */
+  --text-4xl--line-height: 2.4375rem; /* 39px — current page metric */
 
   --tracking-heading: -0.025em;
   --leading-none: 1;
@@ -465,6 +406,63 @@
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-attention-ring: attention-ring 1.5s ease-out;
+}
+
+/*
+ * Semantic type roles. Not in `@theme`, so they do not emit `text-*` utilities.
+ * Roles that match a primitive share that size and line-height pair.
+ */
+:root {
+  /* Heading font sizes */
+  --text-heading-display: 2.625rem; /* 42px — literal; only owner */
+  --text-heading-page: var(--text-4xl);
+  --text-heading-section: var(--text-3xl);
+  --text-heading-subsection: var(--text-lg);
+  --text-heading-group: var(--text-base);
+
+  /* Heading line heights */
+  --text-heading-display--line-height: 2.875rem; /* 46px */
+  --text-heading-page--line-height: var(--text-4xl--line-height);
+  --text-heading-section--line-height: var(--text-3xl--line-height);
+  --text-heading-subsection--line-height: var(--text-lg--line-height);
+  --text-heading-group--line-height: var(--text-base--line-height);
+
+  /* Heading chrome font sizes */
+  --text-heading-label: var(--text-base);
+  --text-heading-card: var(--text-lg);
+  --text-heading-dialog-title: var(--text-lg);
+  --text-heading-dialog-title-md: var(--text-xl);
+  --text-heading-confirm-dialog-title: var(--text-lg);
+  --text-heading-sheet-section: var(--text-xl);
+
+  /* Heading chrome line heights */
+  --text-heading-label--line-height: var(--text-base--line-height);
+  --text-heading-dialog-title--line-height: var(--text-lg--line-height);
+  --text-heading-dialog-title-md--line-height: var(--text-xl--line-height);
+  --text-heading-confirm-dialog-title--line-height: var(--text-lg--line-height);
+  --text-heading-sheet-section--line-height: var(--text-xl--line-height);
+
+  /* Specialty numeric font sizes */
+  --text-ability-score-sm: var(--text-3xl);
+  --text-ability-score-md: 2rem; /* 32px — literal; only owner */
+  --text-score-token-value: var(--text-4xl);
+  --text-character-stat-value: var(--text-4xl);
+
+  /* Specialty numeric line heights */
+  --text-ability-score-sm--line-height: var(--text-3xl--line-height);
+  --text-ability-score-md--line-height: 2.25rem; /* 36px */
+  --text-score-token-value--line-height: var(--text-4xl--line-height);
+  --text-character-stat-value--line-height: var(--text-4xl--line-height);
+
+  /* Form legend font sizes */
+  --text-field-group-legend: var(--text-2xl);
+  --text-field-subgroup-legend: var(--text-xl);
+  --text-field-array-legend: var(--text-lg);
+
+  /* Form legend line heights */
+  --text-field-group-legend--line-height: var(--text-2xl--line-height);
+  --text-field-subgroup-legend--line-height: var(--text-xl--line-height);
+  --text-field-array-legend--line-height: var(--text-lg--line-height);
 }
 
 /**
@@ -772,23 +770,40 @@
   letter-spacing: var(--tracking-heading);
 }
 
+@utility heading-style-hero-title {
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+
+  @variant md {
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
+  }
+
+  @variant lg {
+    font-size: var(--text-4xl);
+    line-height: var(--text-4xl--line-height);
+  }
+}
+
 @utility heading-style-alert {
-  font-size: var(--text-heading-compact);
+  font-size: var(--text-base);
   line-height: var(--leading-none);
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--tracking-heading);
 }
 
 @utility heading-style-nav {
-  font-size: var(--text-heading-compact);
-  line-height: var(--text-heading-compact--line-height);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--tracking-heading);
 }
 
 @utility heading-style-brand {
-  font-size: var(--text-heading-compact);
-  line-height: var(--text-heading-compact--line-height);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--tracking-heading);
 }

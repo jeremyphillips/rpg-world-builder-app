@@ -22,7 +22,7 @@ export interface ConfirmDialogProps {
   onOpenChange: (open: boolean) => void
   /** Required title — maps to `AlertDialog.Title`. */
   headline: React.ReactNode
-  /** Merged onto the title — defaults to confirmDialogTitle (19px). */
+  /** Merged onto the title — defaults to confirmDialogTitle (18px). */
   headlineClassName?: string
   /** Optional supporting copy — maps to `AlertDialog.Description`. */
   description?: React.ReactNode

@@ -54,7 +54,7 @@ selectors as cards, entity anatomy, and `ui-identity-row--*`). Comfortable defau
 | ----------- | ----------------- | -------------------------- | ---------------------- |
 | compact     | 14px / 20px       | 12px / 16px                | 12px / 16px            |
 | comfortable | 16px / 22px       | 14px / 20px                | 14px / 20px            |
-| spacious    | 19px / 26px       | 16px / 22px                | 14px / 20px            |
+| spacious    | 18px / 26px       | 16px / 22px                | 14px / 20px            |
 
 Titles use `ui-copy-title` (weight `--font-weight-heading`). Classification on
 `IdentityRowHeadingLine` uses `.ui-identity-row__classification` (normal weight, muted

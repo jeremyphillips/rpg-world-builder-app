@@ -10,7 +10,7 @@ export type HeadingStyleSpec = {
   useCase: string
 }
 
-/** Static catalog rows for Storybook — update when @theme heading tokens change. */
+/** Static catalog rows for Storybook — update when :root heading tokens change. */
 export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
   {
     variant: 'display',
@@ -18,7 +18,7 @@ export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
     level: 'h1',
     px: 42,
     weight: 700,
-    useCase: 'Hero (future) and content detail entity titles',
+    useCase: 'Public hero and content detail entity titles',
   },
   {
     variant: 'page',
@@ -30,11 +30,11 @@ export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
   },
   {
     variant: 'heroTitle',
-    utility: 'heading-style-subsection md:heading-style-sheet-section lg:heading-style-page',
+    utility: 'heading-style-hero-title',
     level: 'h1',
-    px: 19,
+    px: 18,
     weight: 600,
-    useCase: 'Hero titles — 19px mobile, 24px md, 34px lg+',
+    useCase: 'Hero titles — 18px mobile, 20px md, 34px lg+',
   },
   {
     variant: 'section',
@@ -48,7 +48,7 @@ export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
     variant: 'subsection',
     utility: 'heading-style-subsection',
     level: 'h3',
-    px: 19,
+    px: 18,
     weight: 600,
     useCase: 'Nested blocks within a section',
   },
@@ -64,7 +64,7 @@ export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
     variant: 'card',
     utility: 'heading-style-card',
     level: '—',
-    px: 19,
+    px: 18,
     weight: 600,
     useCase: 'Card titles (chrome)',
   },
@@ -72,23 +72,23 @@ export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
     variant: 'dialogTitle',
     utility: 'heading-style-dialog-title',
     level: '—',
-    px: 19,
+    px: 18,
     weight: 600,
-    useCase: 'Modal/Sheet titles — 19px mobile, 24px from md (DialogPanelHeader default)',
+    useCase: 'Modal/Sheet titles — 18px mobile, 20px from md (DialogPanelHeader default)',
   },
   {
     variant: 'confirmDialogTitle',
     utility: 'heading-style-confirm-dialog-title',
     level: '—',
-    px: 19,
+    px: 18,
     weight: 600,
-    useCase: 'ConfirmDialog titles — 19px at all sizes',
+    useCase: 'ConfirmDialog titles — 18px at all sizes',
   },
   {
     variant: 'sheetSection',
     utility: 'heading-style-sheet-section',
     level: 'h2',
-    px: 24,
+    px: 20,
     weight: 600,
     useCase: 'Builder option detail sheet section headings',
   },

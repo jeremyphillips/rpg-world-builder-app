@@ -22,11 +22,11 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | `Heading` `page`                  | `h1`   | 34      | 600                  | Route titles (`PageHeader`)                                                            |
 | `Heading` `heroTitle`             | `h1`   | 18→34   | 600                  | Page hero titles (`Hero`, campaign overview) — 18px mobile, 20px md, 34px lg+          |
 | `Heading` `section`               | `h2`   | 28      | 600                  | Top-level in-page sections                                                             |
-| `Heading` `subsection`            | `h3`   | 19      | 600                  | Nested blocks within a section                                                         |
+| `Heading` `subsection`            | `h3`   | 18      | 600                  | Nested blocks within a section                                                         |
 | `Heading` `group`                 | `h4`   | 16      | 500                  | Headings inside subsections                                                            |
-| `Heading` `card`                  | Radix  | 19      | 600                  | Legacy / non-card surfaces; **not** generic `Card` headers (see below)                 |
+| `Heading` `card`                  | Radix  | 18      | 600                  | Legacy / non-card surfaces; **not** generic `Card` headers (see below)                 |
 | `Heading` `dialogTitle`           | Radix  | 18→20   | 600                  | `Modal.Header` / `Sheet.Header` default (18px mobile, 20px md+)                        |
-| `Heading` `confirmDialogTitle`    | Radix  | 19      | 600                  | `ConfirmDialog` title — compact, non-responsive                                        |
+| `Heading` `confirmDialogTitle`    | Radix  | 18      | 600                  | `ConfirmDialog` title — compact, non-responsive                                        |
 | `Heading` `nav` / `brand`         | `span` | 16      | 600                  | Topbar title, sidebar product name                                                     |
 | `Heading` `alert`                 | Radix  | 16      | 600                  | Inline `Alert` titles                                                                  |
 | `Heading` `label`                 | `p`    | 16      | 500                  | Inline non-outline titles (trait names)                                                |
@@ -39,8 +39,8 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | `Text` `destructive`              | `p`    | 15      | 400                  | Inline errors — pair with `role="alert"`                                               |
 | `Eyebrow` `xs` / `sm` / `md`      | `p`    | 9–13    | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)                          |
 | `RichTextContent` `size="md"`     | `div`  | 15      | 400                  | Catalog descriptions (TipTap / CMS HTML)                                               |
-| Generic `Card` header title       | `h3`   | 14–19   | 600 (`heading`)      | `ui-card__title` — size from `Card` `density`; weight from heading role                |
-| Anatomy title (`ui-copy-title`)   | varies | 14–19   | 600 (`heading`)      | 14/20, 16/22, 19/26 by density — [row-anatomy.md](./row-anatomy.md#anatomy-title-copy) |
+| Generic `Card` header title       | `h3`   | 14–18   | 600 (`heading`)      | `ui-card__title` — size from `Card` `density`; weight from heading role                |
+| Anatomy title (`ui-copy-title`)   | varies | 14–18   | 600 (`heading`)      | 14/20, 16/22, 18/26 by density — [row-anatomy.md](./row-anatomy.md#anatomy-title-copy) |
 | Generic `Card` header description | `p`    | 12–14   | shell vars           | `ui-card__description` — comfortable/spacious 14px; compact 12px                       |
 
 Preserve semantic headings and existing `id`s — content detail routes use
@@ -180,41 +180,45 @@ Primitive sizes live in [`styles/globals.css`](../src/styles/globals.css) `@them
 They override Tailwind’s built-in `text-*` utilities — components keep using `text-sm`,
 `text-2xl`, etc.; the CSS variables are the single source of truth (@ 16px root):
 
-| Token / utility       | px @ 16px root | Typical use                                     |
-| --------------------- | -------------- | ----------------------------------------------- |
-| `text-xs`             | 12             | Captions, table stat columns                    |
-| `text-sm`             | 14             | Compact UI chrome (buttons, menus, data tables) |
-| `text-md`             | 15             | Secondary body (`Text` small, `prose-md`, …)    |
-| `text-base`           | 16             | Primary body default                            |
-| `text-lg`             | 18             | Lead copy (`Text` lead)                         |
-| `text-xl`             | 20             | Section headings                                |
-| `text-2xl`            | 24             | Page titles                                     |
-| `text-3xl`            | 30             | Content detail titles                           |
-| `text-4xl`            | 36             | Marketing display (e.g. public hero)            |
-| `text-5xl`            | 48             | Marketing display (responsive hero)             |
-| `text-6xl`–`text-9xl` | 60–128         | Reserved; defined for completeness              |
+| Token / utility | px @ 16px root | Typical use                                      |
+| --------------- | -------------- | ------------------------------------------------ |
+| `text-xs`       | 12             | Captions, table stat columns                     |
+| `text-sm`       | 14             | Compact UI chrome (buttons, menus, data tables)  |
+| `text-md`       | 15             | Secondary body (`Text` small, `prose-md`, …)     |
+| `text-base`     | 16             | Primary body default                             |
+| `text-lg`       | 18             | Lead copy; subsection and card headings          |
+| `text-xl`       | 20             | Dialog title from `md`; sheet section headings   |
+| `text-2xl`      | 24             | Form group legends (`--text-field-group-legend`) |
+| `text-3xl`      | 28             | Section headings (curated; not the 30px default) |
+| `text-4xl`      | 34             | Page headings (curated; not the 36px default)    |
 
-## Form role aliases
+The scale stops at `text-4xl`. Larger Tailwind steps are not declared.
 
-| Role alias / utility         | px @ 16px root | Typical use                                                 |
-| ---------------------------- | -------------- | ----------------------------------------------------------- |
-| `text-field-group-legend`    | 24             | Top-level form group legends, collapsible section triggers  |
-| `text-field-subgroup-legend` | 20             | Nested `kind: 'group'` legends (`legendSize: 'subsection'`) |
-| `text-field-array-legend`    | 18             | Repeatable `kind: 'array'` section legends (default)        |
+## Form legend tokens
+
+Legend sizes live on `:root` and are read by `text-style-field-legend` composites. They do not emit `text-field-*` utilities.
+
+| Token                          | px @ 16px root | Typical use                                                 |
+| ------------------------------ | -------------- | ----------------------------------------------------------- |
+| `--text-field-group-legend`    | 24             | Top-level form group legends, collapsible section triggers  |
+| `--text-field-subgroup-legend` | 20             | Nested `kind: 'group'` legends (`legendSize: 'subsection'`) |
+| `--text-field-array-legend`    | 18             | Repeatable `kind: 'array'` section legends (default)        |
 
 ## Heading size tokens
 
-Visual tiers and role aliases live in [`styles/globals.css`](../src/styles/globals.css).
-Retune the document ladder via `--text-heading-1` … `--text-heading-5` (@ 16px root):
+Role tokens live on `:root` in [`styles/globals.css`](../src/styles/globals.css). They share a primitive pair (size and line-height). Display (42px) and ability-score `md` (32px) are the only off-scale literals. Retune a role by pointing it at another primitive, not by adding a numbered heading token.
 
-| Visual tier | Role alias                  | `Heading` variant                               | px    |
-| ----------- | --------------------------- | ----------------------------------------------- | ----- |
-| heading-1   | `--text-heading-display`    | `display`                                       | 42    |
-| heading-2   | `--text-heading-page`       | `page`                                          | 34    |
-| —           | responsive composite        | `heroTitle` (subsection → sheet-section → page) | 18→34 |
-| heading-3   | `--text-heading-section`    | `section`                                       | 28    |
-| heading-4   | `--text-heading-subsection` | `subsection`, `card` (chrome)                   | 18    |
-| heading-5   | `--text-heading-group`      | `group`, `label`, `nav`, `brand`, `alert`       | 16    |
+| Role token                  | Points at                                          | `Heading` variant / utility              | px    |
+| --------------------------- | -------------------------------------------------- | ---------------------------------------- | ----- |
+| `--text-heading-display`    | literal                                            | `display`                                | 42    |
+| `--text-heading-page`       | `text-4xl`                                         | `page`                                   | 34    |
+| —                           | `text-lg` → `text-xl` at `md` → `text-4xl` at `lg` | `heroTitle` (`heading-style-hero-title`) | 18→34 |
+| `--text-heading-section`    | `text-3xl`                                         | `section`                                | 28    |
+| `--text-heading-subsection` | `text-lg`                                          | `subsection`                             | 18    |
+| `--text-heading-card`       | `text-lg`                                          | `card` (line-height is `--leading-none`) | 18    |
+| `--text-heading-group`      | `text-base`                                        | `group`                                  | 16    |
+| `--text-heading-label`      | `text-base`                                        | `label`                                  | 16    |
+| `--text-base`               | primitive                                          | `nav`, `brand`, `alert`                  | 16    |
 
 `variant` controls appearance; `as` controls document semantics. Match the hierarchy
 table above in app code.
@@ -237,12 +241,13 @@ Shared by `Hero` mark frames and `MediaFieldSummary` compact previews.
 Each `Heading` / `Eyebrow` variant maps to one `@utility` composite (e.g.
 `heading-style-page`) that bundles size, line-height, weight, tracking, and (for
 eyebrow) case. Color is set via `Eyebrow` `tone` (`text-muted-foreground`,
-`text-foreground`, `text-primary`). Composites reference `@theme` variables only.
+`text-foreground`, `text-primary`). Heading composites read `:root` role tokens.
+Weight utilities still come from `@theme`.
 
-Visual reference: Storybook **`Typography/Composites`**.
+Visual reference: Storybook **`Typography/Composites`** (variants) and **`Typography/Scale`**
+(primitives and which token each role points at).
 
-Atomic `text-heading-*` / `font-heading-*` utilities remain generated from `@theme`
-for token inspection and docs — components use composites via `headingVariants()`.
+Components use composites via `headingVariants()`. Heading roles are not `text-heading-*` utilities.
 
 ## Font weight tokens
 

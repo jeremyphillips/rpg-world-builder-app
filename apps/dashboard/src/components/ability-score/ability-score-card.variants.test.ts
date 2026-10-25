@@ -9,8 +9,8 @@ import {
 } from './ability-score-card.variants'
 
 describe('abilityScoreCardScoreValueClassesFor', () => {
-  it('uses heading-3 scale for sm and ability-score-md for md', () => {
-    expect(abilityScoreCardScoreValueClassesFor('sm')).toContain('var(--text-heading-3)')
+  it('uses ability-score-sm for sm and ability-score-md for md', () => {
+    expect(abilityScoreCardScoreValueClassesFor('sm')).toContain('var(--text-ability-score-sm)')
     expect(abilityScoreCardScoreValueClassesFor('md')).toContain('var(--text-ability-score-md)')
   })
 })
@@ -51,7 +51,7 @@ describe('abilityScoreCardSelectFilledClusterClasses', () => {
 describe('abilityScoreCardScoreSlotMinHeightClassesFor', () => {
   it('ties min height to score typography line heights', () => {
     expect(abilityScoreCardScoreSlotMinHeightClassesFor('sm')).toContain(
-      '--text-heading-3--line-height',
+      '--text-ability-score-sm--line-height',
     )
     expect(abilityScoreCardScoreSlotMinHeightClassesFor('md')).toContain(
       '--text-ability-score-md--line-height',

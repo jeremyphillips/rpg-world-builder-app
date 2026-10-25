@@ -2,7 +2,7 @@ import { cn } from '../../lib/utils'
 import { resolveCompactControlRecipeClasses } from './compact-control.styles'
 import { interactiveFocusVariants, interactivePointerClasses } from './interactive-focus.variants'
 
-/** Responsive glyph sizing for dialog panel header icon controls (19px → 24px from md). */
+/** Responsive glyph sizing for dialog panel header icon controls (18px → 20px from md). */
 export const dialogPanelHeaderGlyphSizeClasses = 'size-dialog-panel-header-glyph' as const
 
 /** @deprecated Use {@link dialogPanelHeaderGlyphSizeClasses}. */
