@@ -17,7 +17,7 @@ modal.variants.ts           ModalSize + centered placement/motion
 sheet.variants.ts           SheetSize, physical side placement/motion, dock placement
 Modal.*                     Centered behavior (thin Header — inherits dialogTitle)
 Sheet.*                     Edge behavior (thin Header — inherits dialogTitle)
-ConfirmDialog               AlertDialog; confirmDialogTitle (19px); reuses modal panel tokens
+ConfirmDialog               AlertDialog; confirmDialogTitle (18px); reuses modal panel tokens
 dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 Sheet.MediaScroll           Optional media + sticky identity header in one scrollport
 ```

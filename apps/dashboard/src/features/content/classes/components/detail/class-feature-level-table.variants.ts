@@ -11,4 +11,4 @@ export const classFeatureLevelTableRowClasses = 'border-border-subtle hover:bg-t
 export const classFeatureLevelTableLevelCellClasses =
   'w-20 border-r border-border-subtle align-top font-medium text-foreground'
 
-export const classFeatureLevelTableFeatureBlockClasses = 'space-y-2 py-1'
+export const classFeatureLevelTableFeatureBlockClasses = 'space-y-2'

@@ -20,4 +20,4 @@ export const contentDetailSectionProseBodyFlushFollowClasses = cn(
 export const contentDetailSectionItemStackClasses = 'space-y-4'
 
 /** Spacing for in-panel titles — pair with `Heading variant="subsection"`. */
-export const contentDetailSectionPanelContentHeadingClasses = 'mb-2.5'
+export const contentDetailSectionPanelContentHeadingClasses = 'mb-1.5'

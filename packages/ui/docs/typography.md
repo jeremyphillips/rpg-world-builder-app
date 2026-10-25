@@ -20,12 +20,12 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | --------------------------------- | ------ | ------- | -------------------- | -------------------------------------------------------------------------------------- |
 | `Heading` `display`               | `h1`   | 42      | 700                  | Hero, content detail entity titles                                                     |
 | `Heading` `page`                  | `h1`   | 34      | 600                  | Route titles (`PageHeader`)                                                            |
-| `Heading` `heroTitle`             | `h1`   | 19→34   | 600                  | Page hero titles (`Hero`, campaign overview) — 19px mobile, 24px md, 34px lg+          |
+| `Heading` `heroTitle`             | `h1`   | 18→34   | 600                  | Page hero titles (`Hero`, campaign overview) — 18px mobile, 20px md, 34px lg+          |
 | `Heading` `section`               | `h2`   | 28      | 600                  | Top-level in-page sections                                                             |
 | `Heading` `subsection`            | `h3`   | 19      | 600                  | Nested blocks within a section                                                         |
 | `Heading` `group`                 | `h4`   | 16      | 500                  | Headings inside subsections                                                            |
 | `Heading` `card`                  | Radix  | 19      | 600                  | Legacy / non-card surfaces; **not** generic `Card` headers (see below)                 |
-| `Heading` `dialogTitle`           | Radix  | 19→24   | 600                  | `Modal.Header` / `Sheet.Header` default (19px mobile, 24px md+)                        |
+| `Heading` `dialogTitle`           | Radix  | 18→20   | 600                  | `Modal.Header` / `Sheet.Header` default (18px mobile, 20px md+)                        |
 | `Heading` `confirmDialogTitle`    | Radix  | 19      | 600                  | `ConfirmDialog` title — compact, non-responsive                                        |
 | `Heading` `nav` / `brand`         | `span` | 16      | 600                  | Topbar title, sidebar product name                                                     |
 | `Heading` `alert`                 | Radix  | 16      | 600                  | Inline `Alert` titles                                                                  |
@@ -211,9 +211,9 @@ Retune the document ladder via `--text-heading-1` … `--text-heading-5` (@ 16px
 | ----------- | --------------------------- | ----------------------------------------------- | ----- |
 | heading-1   | `--text-heading-display`    | `display`                                       | 42    |
 | heading-2   | `--text-heading-page`       | `page`                                          | 34    |
-| —           | responsive composite        | `heroTitle` (subsection → sheet-section → page) | 19→34 |
+| —           | responsive composite        | `heroTitle` (subsection → sheet-section → page) | 18→34 |
 | heading-3   | `--text-heading-section`    | `section`                                       | 28    |
-| heading-4   | `--text-heading-subsection` | `subsection`, `card` (chrome)                   | 19    |
+| heading-4   | `--text-heading-subsection` | `subsection`, `card` (chrome)                   | 18    |
 | heading-5   | `--text-heading-group`      | `group`, `label`, `nav`, `brand`, `alert`       | 16    |
 
 `variant` controls appearance; `as` controls document semantics. Match the hierarchy
@@ -306,9 +306,9 @@ When a Radix primitive requires a specific element (`Dialog.Title`,
 ```
 
 Dialog chrome defaults: standard `Modal.Header` and `Sheet.Header` titles inherit
-the shared `dialogTitle` style from `DialogPanelHeader` — **19px on mobile**,
-**24px from the `md` breakpoint (48rem)**. Compact `ConfirmDialog` titles use
-`confirmDialogTitle` (19px at all sizes) on a separate AlertDialog path.
+the shared `dialogTitle` style from `DialogPanelHeader` — **18px on mobile**,
+**20px from the `md` breakpoint (48rem)**. Compact `ConfirmDialog` titles use
+`confirmDialogTitle` (18px at all sizes) on a separate AlertDialog path.
 Both Modal and Sheet accept `headlineClassName` as the escape hatch for genuine
 deviations; do not pass a heading class merely to get normal overlay typography.
 

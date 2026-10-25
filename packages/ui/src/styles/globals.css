@@ -296,10 +296,10 @@
   --text-heading-3--line-height: 2.125rem; /* 34px */
   --text-ability-score-md: 2rem; /* 32px — ability score card numerals (md) */
   --text-ability-score-md--line-height: 2.25rem; /* 36px */
-  --text-heading-3-md: var(--text-2xl); /* 24px — between heading-3 and heading-4 */
-  --text-heading-3-md--line-height: var(--text-2xl--line-height);
-  --text-heading-4: 1.1875rem; /* 19px */
-  --text-heading-4--line-height: 1.5625rem; /* 25px */
+  --text-heading-3-md: var(--text-xl); /* 20px */
+  --text-heading-3-md--line-height: var(--text-xl--line-height);
+  --text-heading-4: var(--text-lg); /* 18px */
+  --text-heading-4--line-height: var(--text-lg--line-height);
   --text-heading-5: 1rem; /* 16px */
   --text-heading-5--line-height: var(--text-base--line-height);
 
@@ -316,7 +316,7 @@
   --text-heading-group--line-height: var(--text-heading-5--line-height);
   --text-heading-card: var(--text-heading-subsection);
   --text-heading-card--line-height: var(--text-heading-subsection--line-height);
-  /* Dialog/Modal/Sheet titles: 19px mobile → 24px from md. */
+  /* Dialog/Modal/Sheet titles: 18px mobile → 20px from md. */
   --text-heading-dialog-title: var(--text-heading-subsection);
   --text-heading-dialog-title--line-height: var(--text-heading-subsection--line-height);
   --text-heading-dialog-title-md: var(--text-heading-3-md);
