@@ -9,6 +9,8 @@ import { CharacterIdentityConnectionsSupplement } from '../../components/detail/
 import { NpcStatusEditAction } from '../components/npc-status-edit-action'
 import { useNpcDetailPage } from '../hooks/use-npc-detail-page'
 
+const EMPTY_ABILITY_SCORES = {}
+
 /** Campaign NPC detail — reuses {@link CharacterDetailContent}; see its growth comment for the PC/NPC boundary. */
 export function NpcDetail() {
   const {
@@ -25,7 +27,7 @@ export function NpcDetail() {
   const abilityScoreEditor = useCampaignCharacterAbilityScoreEditor(
     campaignId,
     npcDetail?.character.id,
-    npcDetail?.character.abilityScores ?? {},
+    npcDetail?.character.abilityScores ?? EMPTY_ABILITY_SCORES,
   )
 
   return (

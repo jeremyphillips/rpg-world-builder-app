@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Ability, CampaignCharacterGetResponse } from '@rpg/contracts'
 
@@ -7,22 +7,42 @@ import type { CharacterDetailAbilityScoreEditor } from '@/features/character'
 import { patchCampaignCharacterAbilityScore } from '../api/campaign-character-client'
 import { campaignCharacterQueryKey } from './use-campaign-character'
 
+const EMPTY_ABILITY_SCORES: Partial<Record<Ability, number>> = {}
+
+function areAbilityScoresEqual(
+  left: Partial<Record<Ability, number>>,
+  right: Partial<Record<Ability, number>>,
+): boolean {
+  const leftKeys = Object.keys(left) as Ability[]
+  const rightKeys = Object.keys(right) as Ability[]
+  if (leftKeys.length !== rightKeys.length) {
+    return false
+  }
+  return leftKeys.every((key) => left[key] === right[key])
+}
+
 export function useCampaignCharacterAbilityScoreEditor(
   campaignId: string | undefined,
   characterId: string | undefined,
-  initialAbilityScores: Partial<Record<Ability, number>>,
+  initialAbilityScores: Partial<Record<Ability, number>> = EMPTY_ABILITY_SCORES,
 ): CharacterDetailAbilityScoreEditor | undefined {
   const queryClient = useQueryClient()
   const [abilityScores, setAbilityScores] =
     useState<Partial<Record<Ability, number>>>(initialAbilityScores)
-  const [syncedInitialAbilityScores, setSyncedInitialAbilityScores] = useState(initialAbilityScores)
+  const syncedInitialAbilityScoresRef = useRef(initialAbilityScores)
   const [pendingAbilities, setPendingAbilities] = useState<Set<Ability>>(() => new Set())
   const requestGenerationRef = useRef<Partial<Record<Ability, number>>>({})
 
-  if (initialAbilityScores !== syncedInitialAbilityScores) {
-    setSyncedInitialAbilityScores(initialAbilityScores)
+  useEffect(() => {
+    if (!characterId) {
+      return
+    }
+    if (areAbilityScoresEqual(initialAbilityScores, syncedInitialAbilityScoresRef.current)) {
+      return
+    }
+    syncedInitialAbilityScoresRef.current = initialAbilityScores
     setAbilityScores(initialAbilityScores)
-  }
+  }, [characterId, initialAbilityScores])
 
   const mutation = useMutation({
     mutationFn: (input: { ability: Ability; score: number; generation: number }) =>
