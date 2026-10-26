@@ -164,17 +164,19 @@ primitive that needs a new slot, variant, or override to fit is a different anat
 
 Density for identity copy is published on ancestors (`.ui-card--*`, `ui-destination-list--*`, `ui-identity-row--*`, `ui-content-card-heading--*`, `dash-entity-anatomy--*`) via [`copy-scale.css`](../src/components/ui/copy-scale.css). Anatomy titles use `ui-copy-title` (or equivalent shell rules) for **size and `--font-weight-heading` (600)** at every density — density does not switch titles to body-emphasis. Generic **`Card`** + `IdentityRowHeadingLine` inside `CardHeader` inherits title size from the card shell without `contentCardHeadingScaleClass`.
 
-| Card / identity density | Title copy | Title weight | Badge or `StatusIcon` beside the title line (`headingEnd`)    |
-| ----------------------- | ---------: | ------------ | ------------------------------------------------------------- |
-| compact                 |    14 / 20 | 600          | `sm` — set explicitly on `Badge` / `StatusIcon` at call sites |
-| comfortable             |    16 / 22 | 600          | `sm`                                                          |
-| spacious                |    19 / 26 | 600          | `md`                                                          |
+| Card / identity density | Title copy | Title weight | Badge or `StatusIcon` beside the title line (`headingEnd`) |
+| ----------------------- | ---------: | ------------ | ---------------------------------------------------------- |
+| compact                 |    14 / 20 | 600          | `sm` via `headingBadge` / `EntityRowInlineBadge`           |
+| comfortable             |    16 / 22 | 600          | `sm`                                                       |
+| spacious                |    19 / 26 | 600          | `md`                                                       |
 
 The same ladder applies to entity **status-lane** badges on `EntitySummary.status` — see [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
 
-Do not add contextual Badge CSS or wrapper components that override an explicit `size` prop.
+Managed inline badges do not take `size`. `IdentityRowHeadingLine` `headingBadge` and `EntitySummary` status items render `EntityRowInlineBadge`, which reads density from `EntityRowInlineDensityProvider` and maps it with `resolveEntityRowInlineBadgeSize` (`compact` / `comfortable` → `sm`, `spacious` → `md`). `headingEnd` stays a free-form slot for non-badge accessories (price, count, plain text). Do not pass a pre-sized `Badge` through `headingEnd` or `headingBadge`.
 
-`IdentityRowHeadingLine` uses `items-center` on the outer flex row (title cluster vs `headingEnd`) and
+Standalone `Badge` is unchanged. It still defaults to `md` and honors `size`. Card and row shells do not clamp badge CSS.
+
+`IdentityRowHeadingLine` uses `items-center` on the outer flex row (title cluster vs the end slot) and
 `items-baseline` inside the cluster for title + classification via `InlineMetadata`.
 
-Use `resolveEntityRowInlineBadgeSize` from `@rpg/ui` at call sites (title accessories and status items). `resolveHeadingAccessoryBadgeSize` is a deprecated alias. Card **footer** and Alert **actions** labeled-control sizing: [ui-architecture.md](./ui-architecture.md#card-footer-labeled-actions) (`resolveSurfaceActionButtonSize`).
+Card **footer** and Alert **actions** labeled-control sizing: [ui-architecture.md](./ui-architecture.md#card-footer-labeled-actions) (`resolveSurfaceActionButtonSize`).

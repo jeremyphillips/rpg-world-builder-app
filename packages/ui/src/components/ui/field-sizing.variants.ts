@@ -82,14 +82,6 @@ export const fieldDigitTrailingColumnClasses = {
   lg: 'w-7',
 } as const satisfies Record<FieldSizeToken, string>
 
-/** Maps field control size to badge size (`Badge` defines `sm` | `md` | `lg`). */
-export const fieldSizeToBadgeSize = {
-  xs: 'sm',
-  sm: 'sm',
-  md: 'md',
-  lg: 'lg',
-} as const satisfies Record<FieldSizeToken, 'sm' | 'md' | 'lg'>
-
 export const fieldSizeToAttachedButtonSize = {
   xs: 'xs',
   sm: 'sm',

@@ -61,25 +61,25 @@ export const SizeLadder: Story = {
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col items-start gap-1">
-          <span className="text-style-caption">xs (24px)</span>
+          <span className="text-style-caption">xs (24px, 12px glyph)</span>
           <ActionButton action="add" variant="outline" size="xs">
             Add
           </ActionButton>
         </div>
         <div className="flex flex-col items-start gap-1">
-          <span className="text-style-caption">sm (32px)</span>
+          <span className="text-style-caption">sm (32px, 14px glyph)</span>
           <ActionButton action="add" variant="outline" size="sm">
             Add
           </ActionButton>
         </div>
         <div className="flex flex-col items-start gap-1">
-          <span className="text-style-caption">default (36px)</span>
+          <span className="text-style-caption">default (36px, 14px glyph)</span>
           <ActionButton action="add" variant="outline">
             Add
           </ActionButton>
         </div>
         <div className="flex flex-col items-start gap-1">
-          <span className="text-style-caption">lg (40px)</span>
+          <span className="text-style-caption">lg (40px, 16px glyph)</span>
           <ActionButton action="add" variant="outline" size="lg">
             Add
           </ActionButton>
@@ -87,19 +87,19 @@ export const SizeLadder: Story = {
       </div>
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col items-start gap-1">
-          <span className="text-style-caption">icon-xs (24px)</span>
+          <span className="text-style-caption">icon-xs (24px, 14px glyph)</span>
           <ActionButton action="edit" variant="ghost" size="icon-xs" aria-label="Edit" />
         </div>
         <div className="flex flex-col items-start gap-1">
-          <span className="text-style-caption">icon-sm (32px)</span>
+          <span className="text-style-caption">icon-sm (32px, 16px glyph)</span>
           <ActionButton action="edit" variant="ghost" size="icon-sm" aria-label="Edit" />
         </div>
         <div className="flex flex-col items-start gap-1">
-          <span className="text-style-caption">icon (36px)</span>
+          <span className="text-style-caption">icon (36px, 20px glyph)</span>
           <ActionButton action="edit" variant="ghost" size="icon" aria-label="Edit" />
         </div>
         <div className="flex flex-col items-start gap-1">
-          <span className="text-style-caption">icon-lg (40px)</span>
+          <span className="text-style-caption">icon-lg (40px, 24px glyph)</span>
           <ActionButton action="edit" variant="ghost" size="icon-lg" aria-label="Edit" />
         </div>
       </div>

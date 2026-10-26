@@ -117,4 +117,34 @@ describe('buttonVariants matrix', () => {
     const classes = classesFor({ size: 'icon-sm' })
     expect(classes).toContain('ui-button--icon-sm')
   })
+
+  it('publishes one owner icon token per size modifier', () => {
+    const source = readFileSync(join(__dirname, 'button.css'), 'utf8')
+    const tokens = {
+      '.ui-button--xs': '--icon-glyph-sm',
+      '.ui-button--sm': '--icon-glyph-md',
+      '.ui-button--md': '--icon-glyph-md',
+      '.ui-button--lg': '--icon-glyph-lg',
+      '.ui-button__text--xs': '--icon-glyph-sm',
+      '.ui-button__text--sm': '--icon-glyph-md',
+      '.ui-button__text--default': '--icon-glyph-md',
+      '.ui-button__text--lg': '--icon-glyph-lg',
+      '.ui-button--attached-xs': '--icon-glyph-sm',
+      '.ui-button--attached-sm': '--icon-glyph-md',
+      '.ui-button--attached-md': '--icon-glyph-md',
+      '.ui-button--attached-lg': '--icon-glyph-lg',
+      '.ui-button--icon-xs': '--icon-glyph-md',
+      '.ui-button--icon-sm': '--icon-glyph-lg',
+      '.ui-button--icon-md': '--icon-glyph-xl',
+      '.ui-button--icon-lg': '--icon-glyph-2xl',
+    } as const
+
+    for (const [modifier, token] of Object.entries(tokens)) {
+      const start = source.indexOf(`${modifier} {`)
+      expect(start, modifier).toBeGreaterThanOrEqual(0)
+      const block = source.slice(start, source.indexOf('}', start))
+      expect(block.match(/--icon-size:/g), modifier).toHaveLength(1)
+      expect(block, modifier).toContain(`--icon-size: var(${token})`)
+    }
+  })
 })

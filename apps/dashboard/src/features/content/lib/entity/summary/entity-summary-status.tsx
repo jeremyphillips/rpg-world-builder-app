@@ -1,8 +1,7 @@
 import {
-  Badge,
+  EntityRowInlineBadge,
   Icon,
   InlineInactiveStatus,
-  resolveEntityRowInlineBadgeSize,
   StatusIcon,
   Tooltip,
   TooltipContent,
@@ -33,15 +32,14 @@ export function EntitySummaryStatusItemView({
   switch (item.kind) {
     case 'badge': {
       const badge = (
-        <Badge
+        <EntityRowInlineBadge
           appearance={item.appearance}
           tone={item.tone}
-          size={resolveEntityRowInlineBadgeSize(density)}
           leadingIcon={resolveStatusLeadingIcon(item.leadingIcon)}
           title={item.tooltip ? undefined : item.title}
         >
           {item.label}
-        </Badge>
+        </EntityRowInlineBadge>
       )
 
       if (!item.tooltip) {

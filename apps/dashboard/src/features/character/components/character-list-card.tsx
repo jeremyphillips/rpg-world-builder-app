@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { CharacterRosterStatus } from '@rpg/contracts'
 import {
-  Badge,
   ButtonLink,
   Card,
   CardFooter,
@@ -9,7 +8,6 @@ import {
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   resolveSurfaceActionButtonSize,
-  resolveEntityRowInlineBadgeSize,
   type GenericCardDensity,
 } from '@rpg/ui'
 
@@ -48,7 +46,6 @@ function CharacterListCardHeader({
   rosterPresentation,
   density,
 }: CharacterListCardHeaderProps) {
-  const headingAccessoryBadgeSize = resolveEntityRowInlineBadgeSize(density)
   const campaignLine =
     showCampaign && card.campaign ? (
       <CampaignDisplayName
@@ -69,16 +66,15 @@ function CharacterListCardHeader({
       >
         <IdentityRowHeadingLine
           heading={<h3>{card.name}</h3>}
-          headingEnd={
-            rosterPresentation ? (
-              <Badge
-                appearance={rosterPresentation.appearance}
-                tone={rosterPresentation.tone}
-                size={headingAccessoryBadgeSize}
-              >
-                {rosterPresentation.label}
-              </Badge>
-            ) : undefined
+          density={density}
+          headingBadge={
+            rosterPresentation
+              ? {
+                  appearance: rosterPresentation.appearance,
+                  tone: rosterPresentation.tone,
+                  children: rosterPresentation.label,
+                }
+              : undefined
           }
         />
         <IdentityRowSupporting wrap>{card.summary}</IdentityRowSupporting>

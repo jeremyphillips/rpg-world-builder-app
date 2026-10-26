@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import {
   cn,
+  EntityRowInlineDensityProvider,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   InlineMetadata,
@@ -131,9 +132,8 @@ export function EntitySummaryStatus({
   composition?: EntitySummaryStatusComposition
 }) {
   const provenanceItems = provenance ?? []
-
-  if (composition === 'metadata' || provenanceItems.length > 0) {
-    return (
+  const body =
+    composition === 'metadata' || provenanceItems.length > 0 ? (
       <InlineMetadata
         role="supporting"
         density={inlineMetadataDensity(density)}
@@ -179,14 +179,17 @@ export function EntitySummaryStatus({
           </InlineMetadata.Item>
         ))}
       </InlineMetadata>
+    ) : (
+      <div className={entitySummaryStatusRowVariants} data-entity-summary-status-row>
+        {items.map((status, index) => (
+          <EntitySummaryStatusItemView key={index} item={status} density={density} />
+        ))}
+      </div>
     )
-  }
 
   return (
-    <div className={entitySummaryStatusRowVariants} data-entity-summary-status-row>
-      {items.map((status, index) => (
-        <EntitySummaryStatusItemView key={index} item={status} density={density} />
-      ))}
-    </div>
+    <EntityRowInlineDensityProvider density={density ?? 'comfortable'}>
+      {body}
+    </EntityRowInlineDensityProvider>
   )
 }

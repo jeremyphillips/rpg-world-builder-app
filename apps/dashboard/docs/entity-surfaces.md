@@ -652,9 +652,9 @@ Character builder selection rows always use `metadata` and get their items from
 `resolveSelectionRowStatusItems`. Do not build them by hand. See
 [character-builder-picker-chrome.md](./character-builder-picker-chrome.md#selection-row-status-guidance-and-context-policy).
 
-EntitySummary owns badge presentation in the **status lane**. Badge size follows the shared entity-row inline ladder: **compact / comfortable → `sm`**, **spacious → `md`** (`resolveEntityRowInlineBadgeSize` from `@rpg/ui`). Consumers must not pass hand-built `<Badge size="…">` or local `mt-1` around entity status.
+EntitySummary owns badge presentation in the **status lane**. Those badges render through `EntityRowInlineBadge`: **compact / comfortable → `sm`**, **spacious → `md`**. The status descriptor has no `size`. Consumers must not pass a hand-built `<Badge size="…">` or local `mt-1` around entity status.
 
-Title-line **heading accessories** (badges beside `IdentityRowHeadingLine.headingEnd` on generic `Card` stacks) use the same resolver. See [packages/ui/docs/row-anatomy.md](../../../packages/ui/docs/row-anatomy.md#heading-accessories). Generic `Card` footer labeled actions: [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md#card-footer-labeled-actions). **`headingEndValue`** numerals keep title-scale emphasis and are not badge accessories.
+Title-line badges use `IdentityRowHeadingLine` `headingBadge` with the row `density`. `headingEnd` remains for non-badge accessories. Standalone `Badge` outside these slots keeps its own `size`. See [packages/ui/docs/row-anatomy.md](../../../packages/ui/docs/row-anatomy.md#heading-accessories). Generic `Card` footer labeled actions: [ui-architecture.md](../../../packages/ui/docs/ui-architecture.md#card-footer-labeled-actions). **`headingEndValue`** numerals keep title-scale emphasis and are not badge accessories.
 
 ---
 

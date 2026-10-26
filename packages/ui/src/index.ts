@@ -360,7 +360,11 @@ export {
 } from './components/ui/card.variants'
 export { resolveSurfaceActionButtonSize } from './components/ui/surface-action-button-size.lib'
 export { resolveEntityRowInlineBadgeSize } from './components/ui/entity-row-inline-badge-size.lib'
-export { resolveHeadingAccessoryBadgeSize } from './components/ui/heading-accessory-size.lib'
+export {
+  EntityRowInlineBadge,
+  EntityRowInlineDensityProvider,
+  type EntityRowInlineBadgeProps,
+} from './components/ui/entity-row-inline-badge.client'
 export {
   SelectionTarget,
   SelectionTargetRadio,
@@ -398,7 +402,6 @@ export {
   INLINE_HEADER_ACTION_BUTTON_SIZE,
   resolveArrayAddButtonSize,
   resolveAttachedButtonSize,
-  fieldSizeToBadgeSize,
   fieldSizeTypographyClasses,
   fieldTextareaSizeClasses,
   type FieldSizeToken,

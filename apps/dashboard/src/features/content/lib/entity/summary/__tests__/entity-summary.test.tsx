@@ -162,6 +162,18 @@ describe('EntitySummaryStatus', () => {
     expect(screen.getByText('Equipped')).toHaveClass('ui-badge--sm')
   })
 
+  it('renders spacious status badges at md density', () => {
+    render(
+      <EntitySummaryStatus
+        density="spacious"
+        items={[{ kind: 'badge', label: 'Member', tone: 'neutral' }]}
+      />,
+    )
+
+    expect(screen.getByText('Member')).toHaveClass('ui-badge--md')
+    expect(screen.getByText('Member')).not.toHaveClass('ui-badge--sm')
+  })
+
   it('defaults to the wrapped cluster without separators', () => {
     const { container } = render(
       <EntitySummaryStatus
