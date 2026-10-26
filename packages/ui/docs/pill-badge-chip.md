@@ -10,7 +10,7 @@ Size lives on the component (`ui-badge--sm|md|lg`, `ui-chip--xs|sm|md|lg`). Badg
 
 Chip owns `ui-chip--selected`, `ui-chip--interactive`, and `ui-chip__remove`. Removable chips use `ui-chip--removable` for the neutral-soft fill. They do not take a Badge tone class. `ChipGroup` stays layout-only. The dismiss control does not carry `ui-chip`.
 
-`ArrayItemIssueButton` is a `button`, not a Badge or Chip. It uses `ui-pill` plus `ui-array-item-issue-count` for its 24px destructive-soft box. `compact` adds `ui-array-item-issue-count--compact`. It does not use `ui-badge--counter`.
+`ArrayItemIssueButton` composes `Badge asChild` on a native `button` (`appearance="soft"` `tone="destructive"` `size="sm"`). `compact` sets `layout="counter"`; the full label uses `layout="label"`. Counter alert icons use `Icon size="owner"` so the glyph follows the badge size ladder (`ui-badge--sm` → `--icon-glyph-xs`). `layout="counter"` does not publish its own `--icon-size`; it composes with the size modifier on the same host.
 
 Do not add `ui-badge--compact` or `ui-chip--compact`. Do not add a Chip appearance or tone prop.
 
@@ -41,9 +41,9 @@ utilities on the link: underline / focus affordances — not pill shell geometry
 Dashboard apps use **`LinkBadge`** (`apps/dashboard/src/lib/link-badge.tsx`) as the single owner
 of this stack — features must not duplicate `Badge asChild` + `Link`.
 
-Action surfaces that look like pills (for example array issue counts) apply
-`ui-pill` and their own surface class on a **`button`** directly — see `ArrayItemIssueButton` in the
-form array renderer — without using the `Badge` component.
+Interactive issue counts (for example `ArrayItemIssueButton`) use **`Badge asChild`** on a native
+`button` so they share the badge size ladder and counter layout with presentational counters such as
+`ValidationIssueCountBadge`.
 
 `TableBadgeCell` is `Badge size="sm"` for data-table source/status columns.
 
@@ -140,7 +140,6 @@ Role tokens live in [`globals.css`](../src/styles/globals.css):
 - `--semantic-*-outline-foreground`, `--semantic-*-soft-foreground`, `--semantic-*-strong-foreground` — badge copy
 - `--selected-control`, `--selected-control-foreground`, `--selected-control-border` — chip selection
 - `--text-chip-sm|md|lg` — Chip sm/md/lg type (aliases `text-fine-sm` / `text-fine-md` / `text-md`)
-- `--text-array-item-issue-count` — aliases `--text-chip-sm` for `ArrayItemIssueButton`
 
 Status chrome (`--info-subtle`, …) vs inline text (`--semantic-info`, …): [design-tokens.md](./design-tokens.md#status-namespaces).
 

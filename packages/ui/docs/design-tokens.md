@@ -324,9 +324,9 @@ Inline icons use `size="inline"` and read `--icon-inline` from the nearest typog
 | `prose`, `.prose.prose-md` | md    |
 | `.prose.prose-sm`          | sm    |
 
-`text-lg` and larger, heading utilities, and eyebrow type are not inline-icon owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `badge.css` and `chip.css`.
+`text-lg` and larger, heading utilities, and eyebrow type are not inline-icon owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `badge.css` and `chip.css`. `layout="counter"` composes with the badge size modifier on the same host for `--icon-size`; counter alert icons (`ValidationIssueCountBadge`, `ArrayItemIssueButton`, create-modal issue badges) use `size="owner"`, not `inline` or fixed glyph steps.
 
-**Chip type scale** (`--text-chip-sm|md|lg` in `globals.css`) maps Chip `sm`/`md`/`lg` to `text-fine-sm` / `text-fine-md` / `text-md`. Badge sizes use `--text-fine-xs`, `--text-xs`, and `--text-sm` on `ui-badge--*` modifiers. `--text-array-item-issue-count` aliases `--text-chip-sm` for `ArrayItemIssueButton`.
+**Chip type scale** (`--text-chip-sm|md|lg` in `globals.css`) maps Chip `sm`/`md`/`lg` to `text-fine-sm` / `text-fine-md` / `text-md`. Badge sizes use `--text-fine-xs`, `--text-xs`, and `--text-sm` on `ui-badge--*` modifiers.
 
 `Button`, `ButtonLink`, and `ActionButton` glyphs use `size="owner"`. `size` selects the ladder; `button.css` publishes `--icon-size` on the host. Labeled `xs` / `sm` / `default` / `lg` use `--icon-glyph-sm` / `md` / `md` / `lg` (12 / 14 / 14 / 16px). Icon-only `icon-xs` / `icon-sm` / `icon` / `icon-lg` use `--icon-glyph-md` / `lg` / `xl` / `2xl` (14 / 16 / 20 / 24px). Text and attached variants use the labeled ladder. `children` does not select the glyph.
 

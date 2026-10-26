@@ -278,7 +278,6 @@ function OutcomeApplicationRowBody({
           issueCount={rowState.showIssueChrome ? rowState.issueGroup.totalCount : 0}
           issueRowLabel={rowState.rowLabel}
           onIssuePress={rowState.focusIssue}
-          badgeProminence={rowState.badgeProminence}
           compact
           embedded
         />

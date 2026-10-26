@@ -139,7 +139,6 @@ export function useArrayFieldItemContentState({
     leadingChrome,
     rowLabel,
     focusIssue: rowState.focusIssue,
-    badgeProminence: rowState.badgeProminence,
     issueSummary: rowState.issueSummary,
     normalizedContent,
     chromeProps,

@@ -314,10 +314,6 @@
   --text-chip-lg: var(--text-md);
   --text-chip-lg--line-height: var(--text-md--line-height);
 
-  /* Array issue count matches Chip sm type (alias, not a second scale). */
-  --text-array-item-issue-count: var(--text-chip-sm);
-  --text-array-item-issue-count--line-height: var(--text-chip-sm--line-height);
-
   --text-table-body: var(--text-fine-md);
   --text-table-stat: var(--text-xs);
 

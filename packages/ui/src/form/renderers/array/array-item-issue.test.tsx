@@ -11,29 +11,39 @@ import {
 
 describe('array-item-issue', () => {
   it('renders badge with semantic negative styling', () => {
-    const { rerender } = render(
-      <ArrayItemIssueButton issueCount={2} rowLabel="Hero" prominence="action" />,
-    )
+    render(<ArrayItemIssueButton issueCount={2} rowLabel="Hero" />)
 
     const badge = screen.getByRole('button', { name: '2 issues in Hero' })
-    expect(badge).toHaveClass('ui-pill', 'ui-array-item-issue-count')
-    expect(badge).not.toHaveClass('ui-badge--soft-destructive', 'ui-badge--counter')
-    expect(badge).not.toHaveClass('ui-badge', 'ui-chip')
+    expect(badge).toHaveClass('ui-badge', 'ui-badge--sm', 'ui-badge--soft-destructive')
+    expect(badge).not.toHaveClass('ui-badge--counter', 'ui-chip')
     expect(badge).toHaveTextContent('2 issues')
-    expect(badge.querySelector('svg')).toHaveClass('ui-icon--inline')
-
-    rerender(<ArrayItemIssueButton issueCount={2} rowLabel="Hero" prominence="aggregate" />)
-    expect(screen.getByRole('button', { name: '2 issues in Hero' })).toHaveClass('ui-pill')
+    expect(badge.querySelector('svg')).toHaveClass('ui-icon--owner')
+    expect(badge.querySelector('svg')).not.toHaveClass('ui-icon--inline', 'ui-icon--2xl')
+    expect(badge.querySelector('button')).toBeNull()
   })
 
   it('shows compact count-only badge text with full aria-label', () => {
-    render(<ArrayItemIssueButton issueCount={2} rowLabel="Grant 1" compact prominence="action" />)
+    render(<ArrayItemIssueButton issueCount={2} rowLabel="Grant 1" compact />)
 
     const badge = screen.getByRole('button', { name: '2 issues in Grant 1' })
     expect(badge).toHaveTextContent('2')
     expect(badge).not.toHaveTextContent('issues')
-    expect(badge).toHaveClass('ui-array-item-issue-count--compact', 'ui-array-item-issue-count')
-    expect(badge).not.toHaveClass('ui-badge', 'ui-badge--counter')
+    expect(badge).toHaveClass('ui-badge--counter', 'ui-badge--sm', 'ui-badge--soft-destructive')
+  })
+
+  it('activates on click and Enter', async () => {
+    const user = userEvent.setup()
+    const onPress = vi.fn()
+
+    render(<ArrayItemIssueButton issueCount={1} rowLabel="Row" onPress={onPress} compact />)
+
+    const badge = screen.getByRole('button', { name: '1 issue in Row' })
+    await user.click(badge)
+    expect(onPress).toHaveBeenCalledOnce()
+
+    badge.focus()
+    await user.keyboard('{Enter}')
+    expect(onPress).toHaveBeenCalledTimes(2)
   })
 
   it('renders compact field summary text', () => {

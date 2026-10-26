@@ -116,7 +116,7 @@ function CreateModalShellIssueBadge({ count }: { count: number | undefined }) {
           size="sm"
           layout="counter"
           aria-hidden
-          leadingIcon={<Icon name="triangle-alert" size="inline" />}
+          leadingIcon={<Icon name="triangle-alert" size="owner" />}
         >
           !
         </Badge>

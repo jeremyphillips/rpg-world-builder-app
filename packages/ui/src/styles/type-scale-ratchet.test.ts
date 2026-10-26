@@ -38,7 +38,6 @@ const REQUIRED_THEME_TOKENS = [
   '--text-chip-sm:',
   '--text-chip-md:',
   '--text-chip-lg:',
-  '--text-array-item-issue-count:',
   '--text-table-body:',
   '--text-table-stat:',
   '--text-control-action-xs:',

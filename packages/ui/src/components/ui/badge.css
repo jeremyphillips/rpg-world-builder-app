@@ -123,10 +123,11 @@
   }
 
   .ui-badge--counter {
-    min-width: calc(var(--spacing) * 5);
+    min-width: 31px;
     justify-content: center;
     padding-inline: calc(var(--spacing) * 1);
     font-variant-numeric: tabular-nums;
     line-height: 1;
+    row-gap: calc(var(--spacing) * 0.5);
   }
 }

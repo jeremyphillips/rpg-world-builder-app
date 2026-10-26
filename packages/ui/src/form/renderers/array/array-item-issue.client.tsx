@@ -1,4 +1,5 @@
 'use client'
+import { Badge } from '../../../components/ui/badge'
 import { Icon } from '../../../components/ui/icon/icon'
 
 import { cn } from '../../../lib/utils'
@@ -32,35 +33,35 @@ export interface ArrayItemIssueButtonProps {
   rowLabel: string
   onPress?: () => void
   compact?: boolean
-  prominence?: ArrayItemIssueProminence
 }
 
-/** Array row issue affordance — pill styling on a `button`, not `Badge`. */
+/** Array row issue affordance — destructive-soft `Badge` on a native `button`. */
 export function ArrayItemIssueButton({
   issueCount,
   rowLabel,
   onPress,
   compact = false,
-  prominence: _prominence = 'nav',
 }: ArrayItemIssueButtonProps) {
   if (issueCount <= 0) return null
 
   return (
-    <button
-      type="button"
-      aria-label={`${issueCountLabel(issueCount)} in ${rowLabel}`}
-      onClick={onPress}
-      className={cn(
-        'ui-pill ui-array-item-issue-count shrink-0',
-        compact && 'ui-array-item-issue-count--compact mt-0',
-        arrayItemIssueButtonFocusClasses,
-      )}
+    <Badge
+      asChild
+      appearance="soft"
+      tone="destructive"
+      size="sm"
+      layout={compact ? 'counter' : 'label'}
+      className={cn('shrink-0', arrayItemIssueButtonFocusClasses)}
     >
-      <Icon name="triangle-alert" size="inline" />
-      <span className={compact ? 'tabular-nums' : undefined}>
-        {compact ? formatIssueCountCompact(issueCount) : issueCountLabel(issueCount)}
-      </span>
-    </button>
+      <button
+        type="button"
+        aria-label={`${issueCountLabel(issueCount)} in ${rowLabel}`}
+        onClick={onPress}
+      >
+        <Icon name="triangle-alert" size="owner" />
+        <span>{compact ? formatIssueCountCompact(issueCount) : issueCountLabel(issueCount)}</span>
+      </button>
+    </Badge>
   )
 }
 

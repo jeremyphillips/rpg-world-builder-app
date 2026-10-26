@@ -19,7 +19,7 @@ export function ValidationIssueCountBadge({ count, className }: ValidationIssueC
       size="sm"
       layout="counter"
       aria-hidden
-      leadingIcon={<Icon name="triangle-alert" size="2xl" />}
+      leadingIcon={<Icon name="triangle-alert" size="owner" />}
       className={className}
     >
       {count}

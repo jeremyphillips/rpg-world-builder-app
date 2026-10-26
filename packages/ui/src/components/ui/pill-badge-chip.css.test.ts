@@ -70,18 +70,4 @@ describe('pill and badge surfaces', () => {
       expect(block).toContain('--ui-pill-border: var(--ui-border-color)')
     }
   })
-
-  it('keeps the issue-count compact rule after its size rule', () => {
-    const sizeAt = formChromeCss.indexOf('.ui-array-item-issue-count {')
-    const compactAt = formChromeCss.indexOf('.ui-array-item-issue-count--compact {')
-    expect(sizeAt).toBeGreaterThan(-1)
-    expect(compactAt).toBeGreaterThan(sizeAt)
-    const compactBlock = formChromeCss.slice(compactAt, formChromeCss.indexOf('}', compactAt))
-    expect(compactBlock).toContain('min-width:')
-    expect(compactBlock).toContain('justify-content: center')
-    expect(compactBlock).toContain('padding-inline:')
-    expect(compactBlock).toContain('font-variant-numeric: tabular-nums')
-    expect(compactBlock).toContain('line-height: 1')
-    expect(formChromeCss).toContain('.ui-pill.ui-array-item-issue-count')
-  })
 })
