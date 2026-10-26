@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Text } from './text'
 
-import { COMPACT_LABEL_TONES } from './compact-label.lib'
 import { StatusDot } from './status-dot'
+import { STATUS_DOT_TONES } from './status-dot.variants'
 
 const meta = {
   title: 'Primitives/StatusDot',
@@ -34,7 +34,7 @@ export const WithLabel: Story = {
 export const Tones: Story = {
   render: () => (
     <div className="flex items-center gap-3">
-      {COMPACT_LABEL_TONES.map((tone) => (
+      {STATUS_DOT_TONES.map((tone) => (
         <StatusDot key={tone} tone={tone} />
       ))}
     </div>

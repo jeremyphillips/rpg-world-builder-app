@@ -9,7 +9,7 @@ import {
   type CompactControlStepperButtonSizeKey,
 } from './compact-control.styles'
 import { badgeSizeVariants } from './badge.variants'
-import { chipSizeClass, type ChipSize } from './compact-label.lib'
+import { chipSizeClass, type ChipSize } from './chip.lib'
 import { identityFrameFallbackVariants } from './identity-frame.variants'
 import { searchBarLeadingIconVariants } from './search-bar.variants'
 import { statusIconVariants } from './status-icon.variants'

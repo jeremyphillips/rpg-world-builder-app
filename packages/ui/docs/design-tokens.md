@@ -324,7 +324,7 @@ Inline icons use `size="inline"` and read `--icon-inline` from the nearest typog
 | `prose`, `.prose.prose-md` | md    |
 | `.prose.prose-sm`          | sm    |
 
-`text-lg` and larger, heading utilities, eyebrow type, and compact-label type are not owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `compact-label` CSS.
+`text-lg` and larger, heading utilities, eyebrow type, and compact-label type are not owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `badge.css` and `chip.css`.
 
 Button and `ActionButton` glyphs use `size="owner"`; `button.css` publishes `--icon-size` per variant.
 

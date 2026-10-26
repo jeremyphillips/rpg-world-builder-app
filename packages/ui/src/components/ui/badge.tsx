@@ -2,12 +2,19 @@ import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '../../lib/utils'
-import type { BadgeAppearance, BadgeLayout, BadgeSize, BadgeTone } from './badge.variants'
-import { badgeLayoutVariants, badgeSizeVariants } from './badge.variants'
-import type { CompactLabelEmphasis } from './compact-label.lib'
-import { resolveCompactLabelClassName } from './compact-label.variants'
+import { badgeSurfaceClasses } from './badge-appearance.lib'
+import type {
+  BadgeAppearance,
+  BadgeEmphasis,
+  BadgeLayout,
+  BadgeSize,
+  BadgeTone,
+} from './badge.variants'
+import { badgeEmphasisClass, badgeLayoutVariants, badgeSizeVariants } from './badge.variants'
+
 export {
   type BadgeAppearance,
+  type BadgeEmphasis,
   type BadgeLayout,
   type BadgeSize,
   type BadgeTone,
@@ -19,7 +26,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   size?: BadgeSize
   layout?: BadgeLayout
   /** Muted weight. Orthogonal to tone; not a disabled state. */
-  emphasis?: CompactLabelEmphasis
+  emphasis?: BadgeEmphasis
   leadingIcon?: React.ReactNode
   trailingIcon?: React.ReactNode
   asChild?: boolean
@@ -47,14 +54,13 @@ function Badge({
   ...props
 }: BadgeProps) {
   const resolvedClassName = cn(
+    'ui-pill',
     'ui-badge',
     badgeSizeVariants({ size }),
-    resolveCompactLabelClassName({
-      appearance,
-      tone,
-      emphasis,
-      className: cn(badgeLayoutVariants({ layout }), className),
-    }),
+    badgeSurfaceClasses(appearance, tone),
+    badgeEmphasisClass(emphasis),
+    badgeLayoutVariants({ layout }),
+    className,
   )
 
   if (asChild) {

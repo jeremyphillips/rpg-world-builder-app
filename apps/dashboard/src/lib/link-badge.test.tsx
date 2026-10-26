@@ -13,13 +13,13 @@ describe('LinkBadge', () => {
     )
 
     const link = screen.getByRole('link', { name: 'Fireball' })
-    expect(link).toHaveClass('ui-badge', 'ui-compact-label--outline-neutral', 'hover:underline')
+    expect(link).toHaveClass('ui-badge', 'ui-badge--outline-neutral', 'hover:underline')
   })
 })
 
 describe('StaticBadge', () => {
   it('renders outline neutral badge', () => {
     render(<StaticBadge>Slug</StaticBadge>)
-    expect(screen.getByText('Slug')).toHaveClass('ui-badge', 'ui-compact-label--outline-neutral')
+    expect(screen.getByText('Slug')).toHaveClass('ui-badge', 'ui-badge--outline-neutral')
   })
 })

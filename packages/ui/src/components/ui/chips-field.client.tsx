@@ -317,4 +317,4 @@ export function ChipsFormField(props: ChipsFieldProps) {
   )
 }
 
-export type { ChipSize } from './compact-label.lib'
+export type { ChipSize } from './chip.lib'

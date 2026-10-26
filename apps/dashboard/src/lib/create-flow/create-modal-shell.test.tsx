@@ -137,7 +137,7 @@ describe('CreateModalShell', () => {
     expect(nameInput).toBeInTheDocument()
     expect(nameInput).toHaveValue('North Gate')
     expect(screen.getByRole('tab', { name: /2 issues need attention/ })).toBeInTheDocument()
-    expect(screen.getByText('2', { selector: '.ui-compact-label' })).toBeInTheDocument()
+    expect(screen.getByText('2', { selector: '.ui-badge' })).toBeInTheDocument()
   })
 
   it('disables tab triggers when requested', () => {

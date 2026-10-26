@@ -4,12 +4,8 @@ import { Icon } from './icon/icon'
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import type { ChipSize } from './compact-label.lib'
-import {
-  chipRemoveButtonVariants,
-  resolveChipSizeClassName,
-  resolveCompactLabelClassName,
-} from './compact-label.variants'
+import type { ChipSize } from './chip.lib'
+import { chipRemoveButtonVariants, resolveChipSizeClassName } from './chip.variants'
 
 export type { ChipSize }
 
@@ -70,13 +66,12 @@ function SelectableChip({
       aria-checked={selected}
       disabled={disabled}
       className={cn(
+        'ui-pill',
         'ui-chip',
         resolveChipSizeClassName(size),
-        resolveCompactLabelClassName({
-          selected,
-          interactive: true,
-          className,
-        }),
+        'ui-chip--interactive ui-focus-ring',
+        selected && 'ui-chip--selected',
+        className,
       )}
       onClick={() => onSelectedChange(!selected)}
     >
@@ -101,15 +96,12 @@ function RemovableChip({
   return (
     <span
       className={cn(
+        'ui-pill',
         'ui-chip',
+        'ui-chip--removable',
+        'ui-border--default',
         resolveChipSizeClassName(size, true),
-        resolveCompactLabelClassName({
-          appearance: 'soft',
-          tone: 'neutral',
-          interactive: false,
-          removable: true,
-          className,
-        }),
+        className,
       )}
     >
       <span className="truncate pl-0.5">{children}</span>

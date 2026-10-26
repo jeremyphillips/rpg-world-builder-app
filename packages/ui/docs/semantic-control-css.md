@@ -94,9 +94,9 @@ Body rows (`__row`) compose `ui-interactive-row` once and drive a single inherit
 
 ## Compact label
 
-`ui-compact-label` is the shared Badge and Chip pill: 1px border, gap, and the tone matrix. It does not set size. `ui-badge--{sm,md,lg}` and `ui-chip--{xs,sm,md,lg}` own height, padding, and type. `--{outline|soft|strong}-{tone}` set `--ui-compact-label-bg`, `--ui-compact-label-fg`, and `--ui-compact-label-border` with the same longhand list. `--subdued` mutes copy. `--selected` and `--interactive` are chip states that still live on this block (eventual owner: Chip). `--counter` is the shared numeric layout used by Badge and `ArrayItemIssueButton`. `ui-chip--removable-*` adjusts trailing padding. Chip dismiss is `__remove`, with `ui-chip__remove--xs` for the 24px shell. twMerge groups: `ui-badge-size`, `ui-chip-size`, `ui-compact-label-appearance`.
+`ui-pill` is the shared pill: inline-flex, gap, radius, 1px border, and `--ui-pill-bg`, `--ui-pill-fg`, `--ui-pill-border`. It resets those variables on every pill. `ui-badge--{sm,md,lg}` owns Badge height and type (`sm` 22px/10px, `md` 26px/12px, `lg` 32px/14px). `ui-badge--{outline|soft|strong}-{tone}` assigns the pill variables. `ui-badge--subdued` mutes copy. `ui-badge--counter` is Badge numeric layout. `ui-chip--{xs,sm,md,lg}` owns Chip height and type. `ui-chip--selected` and `ui-chip--interactive` own selection. `ui-chip--removable` is the neutral-soft removable fill. `ui-chip--removable-*` adjusts trailing padding. Chip dismiss is `ui-chip__remove`, with `ui-chip__remove--xs` for the 24px shell. `ArrayItemIssueButton` uses `ui-pill` and `ui-array-item-issue-count`, not Badge counter. twMerge groups: `ui-badge-size`, `ui-badge-appearance`, `ui-chip-size`.
 
-Overlay notification counts use `ui-notification-unread-badge` (not compact-label geometry).
+Overlay notification counts use `ui-notification-unread-badge` (not pill geometry).
 
 ## Alert
 

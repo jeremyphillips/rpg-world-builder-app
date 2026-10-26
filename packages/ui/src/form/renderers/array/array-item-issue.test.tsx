@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import {
-  ArrayItemIssueBadge,
+  ArrayItemIssueButton,
   ArrayItemIssueSummary,
   ArrayLegendIssueLink,
   arrayLegendIssueLabel,
@@ -12,33 +12,28 @@ import {
 describe('array-item-issue', () => {
   it('renders badge with semantic negative styling', () => {
     const { rerender } = render(
-      <ArrayItemIssueBadge issueCount={2} rowLabel="Hero" prominence="action" />,
+      <ArrayItemIssueButton issueCount={2} rowLabel="Hero" prominence="action" />,
     )
 
     const badge = screen.getByRole('button', { name: '2 issues in Hero' })
-    expect(badge).toHaveClass(
-      'ui-compact-label',
-      'ui-compact-label--soft-destructive',
-      'ui-array-item-issue-count',
-    )
+    expect(badge).toHaveClass('ui-pill', 'ui-array-item-issue-count')
+    expect(badge).not.toHaveClass('ui-badge--soft-destructive', 'ui-badge--counter')
     expect(badge).not.toHaveClass('ui-badge', 'ui-chip')
     expect(badge).toHaveTextContent('2 issues')
     expect(badge.querySelector('svg')).toHaveClass('ui-icon--inline')
 
-    rerender(<ArrayItemIssueBadge issueCount={2} rowLabel="Hero" prominence="aggregate" />)
-    expect(screen.getByRole('button', { name: '2 issues in Hero' })).toHaveClass(
-      'ui-compact-label--soft-destructive',
-    )
+    rerender(<ArrayItemIssueButton issueCount={2} rowLabel="Hero" prominence="aggregate" />)
+    expect(screen.getByRole('button', { name: '2 issues in Hero' })).toHaveClass('ui-pill')
   })
 
   it('shows compact count-only badge text with full aria-label', () => {
-    render(<ArrayItemIssueBadge issueCount={2} rowLabel="Grant 1" compact prominence="action" />)
+    render(<ArrayItemIssueButton issueCount={2} rowLabel="Grant 1" compact prominence="action" />)
 
     const badge = screen.getByRole('button', { name: '2 issues in Grant 1' })
     expect(badge).toHaveTextContent('2')
     expect(badge).not.toHaveTextContent('issues')
-    expect(badge).toHaveClass('ui-compact-label--counter', 'ui-array-item-issue-count')
-    expect(badge).not.toHaveClass('ui-badge')
+    expect(badge).toHaveClass('ui-array-item-issue-count--compact', 'ui-array-item-issue-count')
+    expect(badge).not.toHaveClass('ui-badge', 'ui-badge--counter')
   })
 
   it('renders compact field summary text', () => {

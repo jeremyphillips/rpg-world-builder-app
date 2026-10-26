@@ -13,7 +13,7 @@ export function useEntityCardUtilityFieldSize(): FieldSize {
   return useContext(EntityCardUtilityFieldSizeContext) ?? 'md'
 }
 
-/** Field + compact-label sizes for controls rendered in a compact card trailing utility band. */
+/** Field and chip sizes for controls rendered in a compact card trailing utility band. */
 export function useEntityCardUtilityControlSizes(): {
   fieldSize: FieldSize
   chipSize: FieldSize

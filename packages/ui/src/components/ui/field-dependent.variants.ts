@@ -26,7 +26,6 @@ export {
   DEFAULT_DEPENDENT_SURFACE,
   DEFAULT_PANEL_SURFACE,
   fieldGroupBodyShellLayoutClasses,
-  isCompactLabelTone,
   resolveFieldContainerChromeClasses,
   resolveOutlineBorderClasses,
   resolveSurfaceClasses,

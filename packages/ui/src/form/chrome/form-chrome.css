@@ -153,12 +153,26 @@
     }
   }
 
-  /* Issue count pill. Not a Badge or Chip; keeps the former compact-label sm box (24px). */
+  /* Issue count pill. Not a Badge or Chip. 24px box, destructive-soft surface. */
   .ui-array-item-issue-count {
     height: var(--control-height-compact);
     padding-inline: calc(var(--spacing) * 2);
     font-size: var(--text-compact-label-sm);
     line-height: var(--text-compact-label-sm--line-height);
     --icon-size: var(--icon-glyph-xs);
+  }
+
+  .ui-pill.ui-array-item-issue-count {
+    --ui-pill-bg: var(--semantic-destructive-soft-bg);
+    --ui-pill-fg: var(--semantic-destructive-soft-foreground);
+    --ui-pill-border: var(--semantic-destructive-border);
+  }
+
+  .ui-array-item-issue-count--compact {
+    min-width: calc(var(--spacing) * 5);
+    justify-content: center;
+    padding-inline: calc(var(--spacing) * 1);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
   }
 }

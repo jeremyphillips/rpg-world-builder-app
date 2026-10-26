@@ -4,7 +4,7 @@ import {
   UI_ALERT_APPEARANCE_CLASSES,
   UI_ALERT_DENSITY_CLASSES,
 } from '../components/ui/alert.variants'
-import { UI_COMPACT_LABEL_APPEARANCE_CLASSES } from '../components/ui/badge-appearance.lib'
+import { UI_BADGE_APPEARANCE_CLASSES } from '../components/ui/badge-appearance.lib'
 import { UI_BORDER_STRENGTH_CLASSES } from '../components/ui/border-strength'
 import {
   UI_DIALOG_PANEL_FILL_CLASSES,
@@ -31,7 +31,7 @@ import {
   COMPACT_CONTROL_RECIPE_SPECS,
 } from '../components/ui/compact-control.styles'
 import { UI_BADGE_SIZE_CLASSES } from '../components/ui/badge.variants'
-import { CHIP_SIZES, UI_CHIP_SIZE_CLASSES } from '../components/ui/compact-label.lib'
+import { CHIP_SIZES, UI_CHIP_SIZE_CLASSES } from '../components/ui/chip.lib'
 import {
   UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,
@@ -96,9 +96,9 @@ describe('semantic-control-class-groups sync', () => {
       'field size',
     )
     expectSameSet(
-      classGroups.UI_COMPACT_LABEL_APPEARANCE_CLASSES,
-      UI_COMPACT_LABEL_APPEARANCE_CLASSES,
-      'compact label appearance',
+      classGroups.UI_BADGE_APPEARANCE_CLASSES,
+      UI_BADGE_APPEARANCE_CLASSES,
+      'badge appearance',
     )
   })
 

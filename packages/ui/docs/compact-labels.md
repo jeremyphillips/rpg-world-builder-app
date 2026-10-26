@@ -1,19 +1,18 @@
 # Compact labels
 
-`Badge` and `Chip` share an internal compact-label recipe (`compact-label.variants.ts`).
-Consumers use the public component APIs — not the internal CVA.
+`Badge` and `Chip` compose an internal pill (`ui-pill` in `pill.css`). Consumers use the public component APIs.
 
 ## Identity
 
-`ui-badge` and `ui-chip` are root identity classes. Size modifiers live on those classes (`ui-badge--sm|md|lg`, `ui-chip--xs|sm|md|lg`). They are not restyled by `ui-compact-label`.
+`ui-badge` and `ui-chip` are root identity classes. `ui-pill` owns shared geometry only: inline-flex, alignment, gap, pill radius, a 1px border, medium weight, and the `--ui-pill-bg`, `--ui-pill-fg`, and `--ui-pill-border` variables. Each pill resets those variables so a nested pill does not inherit the outer surface.
 
-`ui-compact-label` keeps the shared pill (inline-flex, radius, border, gap) and the tone matrix. It does not set component height or type. `ArrayItemIssueButton` uses that foundation plus `ui-array-item-issue-count` for its own 24px box. Its `compact` prop only switches the shared `ui-compact-label--counter` layout. That counter class stays shared because the issue button is not a Badge.
+Size lives on the component (`ui-badge--sm|md|lg`, `ui-chip--xs|sm|md|lg`). Badge appearance lives on `ui-badge--{outline|soft|strong}-{tone}`. Those modifiers assign the pill variables. They do not repeat the paint longhands. Neutral badges also use `ui-border--default`. Emphasis is `ui-badge--subdued`. Numeric layout is `ui-badge--counter`.
 
-Do not add `ui-badge--compact` or `ui-chip--compact`.
+Chip owns `ui-chip--selected`, `ui-chip--interactive`, and `ui-chip__remove`. Removable chips use `ui-chip--removable` for the neutral-soft fill. They do not take a Badge tone class. `ChipGroup` stays layout-only. The dismiss control does not carry `ui-chip`.
 
-Selected, interactive, and `ui-compact-label__remove` stay on `ui-compact-label` for now. Their eventual owner is Chip. Do not copy the tone matrix onto Badge or Chip.
+`ArrayItemIssueButton` is a `button`, not a Badge or Chip. It uses `ui-pill` plus `ui-array-item-issue-count` for its 24px destructive-soft box. `compact` adds `ui-array-item-issue-count--compact`. It does not use `ui-badge--counter`.
 
-`ChipGroup` stays layout-only. The removable chip's dismiss control stays `ui-compact-label__remove` and does not carry `ui-chip`.
+Do not add `ui-badge--compact` or `ui-chip--compact`. Do not add a Chip appearance or tone prop.
 
 ## Vocabulary
 
@@ -35,7 +34,7 @@ composed with badge presentation — not `Badge asChild` on a `<button>`.
 ### Navigation badges (`Badge asChild` + link)
 
 Supported composition: **`Badge asChild`** wraps an **anchor** or app **`Link`**. The link owns
-navigation, focus, and keyboard activation; Badge supplies `ui-badge` plus compact-label classes. Allowed
+navigation, focus, and keyboard activation; Badge supplies `ui-pill`, `ui-badge`, and its appearance classes. Allowed
 utilities on the link: underline / focus affordances — not pill shell geometry (`gap-*`, `h-*`,
 `rounded-*` on the label).
 
@@ -43,7 +42,7 @@ Dashboard apps use **`LinkBadge`** (`apps/dashboard/src/lib/link-badge.tsx`) as 
 of this stack — features must not duplicate `Badge asChild` + `Link`.
 
 Action surfaces that look like pills (for example array issue counts) apply
-`resolveCompactLabelClassName` on a **`button`** directly — see `ArrayItemIssueButton` in the
+`ui-pill` and their own surface class on a **`button`** directly — see `ArrayItemIssueButton` in the
 form array renderer — without using the `Badge` component.
 
 `TableBadgeCell` is `Badge size="sm"` for data-table source/status columns.
@@ -70,8 +69,8 @@ prop. Pass `emphasis="subdued"` for completed or exhausted labels.
 
 - **Selected chips** use **selected-control** tokens (`bg-selected-control`, …), not `tone="success"`.
 - **Selectable chip hover** — unselected chips use `--control-hover-bg` on hover/active (styled in
-  `compact-label.css`, not Tailwind `bg-*`, so hover is not overridden). Selected chips keep the
-  selected-control surface with **no** hover/active change.
+  `chip.css`, not Tailwind `bg-*`, so hover is not overridden). Selected chips keep the
+  selected-control surface with **no** hover/active change. Weight stays medium on the pill.
 - **Semantic soft badges** (`appearance="soft"`) are not the same surface as a selected chip.
 
 Shared tone names align with [`SemanticText`](./semantic-text.md) but render bordered pill
@@ -79,10 +78,12 @@ surfaces instead of inline copy.
 
 Theme tokens own light/dark differences for each role (`--semantic-info-outline-foreground`,
 `--semantic-info-soft-bg`, `--semantic-info-strong-bg`, …). Badge maps tone × appearance to
-one stable utility class per role — no `dark:` policy in component recipes.
+one stable class per role and reads those tokens directly. Do not point the pill variables at
+the `@theme` `--color-semantic-*` aliases: those are computed on `:root` and stay on the light
+value inside `.dark`.
 
 **Neutral borders** use the same surface-relative `color-mix` as `border-semantic-neutral-border`,
-declared in `compact-label.css` on the label (not via `@theme`) so `--surface-current` from card,
+declared in `ui-border.css` and applied by neutral badge and removable chip modifiers (not via `@theme`) so `--surface-current` from card,
 popover, and other establishing shells resolves at use time.
 
 ## Badge anatomy
@@ -106,8 +107,8 @@ Badge and Chip do not share a size ladder. Chip heights use the field-control to
 | Component | Size | Height                          | Font                                      |
 | --------- | ---- | ------------------------------- | ----------------------------------------- |
 | Badge     | `sm` | 22px                            | 10px (`--text-fine-xs`)                   |
-| Badge     | `md` | 31px                            | 13px (`--text-compact-label-md`)          |
-| Badge     | `lg` | 41px                            | 15px (`--text-compact-label-lg`)          |
+| Badge     | `md` | 26px                            | 12px (`--text-xs`)                        |
+| Badge     | `lg` | 32px                            | 14px (`--text-sm`)                        |
 | Chip      | `xs` | `--control-height-compact` 24px | 10px (`--text-fine-xs`), 14px line-height |
 | Chip      | `sm` | `--control-height-sm` 32px      | 11px (`--text-compact-label-sm`)          |
 | Chip      | `md` | `--control-height-md` 36px      | 13px (`--text-compact-label-md`)          |
@@ -125,11 +126,11 @@ Field `lg` is `--control-height-xl`, not the 40px button `--control-height-lg`.
 
 ## Chip states
 
-| Mode / state              | Surface                                                   |
-| ------------------------- | --------------------------------------------------------- |
-| `selectable` / unselected | `background`, `border-border`, weight 300                 |
-| `selectable` / selected   | `selected-control` fill, auto leading `Check`, weight 500 |
-| `removable`               | neutral filled surface, trailing remove control           |
+| Mode / state              | Surface                                                      |
+| ------------------------- | ------------------------------------------------------------ |
+| `selectable` / unselected | `background`, `border-border`, medium weight                 |
+| `selectable` / selected   | `selected-control` fill, auto leading `Check`, medium weight |
+| `removable`               | neutral filled surface, trailing remove control              |
 
 ## Tokens
 

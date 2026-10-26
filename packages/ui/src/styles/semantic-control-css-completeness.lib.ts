@@ -208,7 +208,11 @@ const tabsCssPath = path.join(stylesDir, '../components/ui/tabs.css')
 
 const popoverContentCssPath = path.join(stylesDir, '../components/ui/popover-content.css')
 
-const compactLabelCssPath = path.join(stylesDir, '../components/ui/compact-label.css')
+const pillCssPath = path.join(stylesDir, '../components/ui/pill.css')
+
+const badgeCssPath = path.join(stylesDir, '../components/ui/badge.css')
+
+const chipCssPath = path.join(stylesDir, '../components/ui/chip.css')
 
 const cardCssPath = path.join(stylesDir, '../components/ui/card.css')
 
@@ -758,36 +762,40 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
     ],
   },
   {
-    filePath: compactLabelCssPath,
+    filePath: pillCssPath,
+    dimensions: [
+      {
+        modifierPrefix: 'ui-pill',
+        requiredProperties: [
+          '--ui-pill-bg',
+          '--ui-pill-fg',
+          '--ui-pill-border',
+          'background-color',
+          'color',
+          'border-color',
+        ] as const,
+      },
+    ],
+  },
+  {
+    filePath: badgeCssPath,
     dimensions: [
       ...(['sm', 'md', 'lg'] as const).map((name) => ({
         modifierPrefix: `ui-badge--${name}`,
         requiredProperties: ['height', 'padding-inline', 'font-size', 'line-height'] as const,
       })),
-      ...(['xs', 'sm', 'md', 'lg'] as const).map((name) => ({
-        modifierPrefix: `ui-chip--${name}`,
-        requiredProperties: ['height', 'padding-inline', 'font-size', 'line-height'] as const,
-      })),
       ...(['outline', 'soft', 'strong'] as const).flatMap((appearance) =>
         (['neutral', 'info', 'success', 'warning', 'destructive'] as const).map((tone) => ({
-          modifierPrefix: `ui-compact-label--${appearance}-${tone}`,
-          requiredProperties: ['background-color', 'color', 'border-color', 'font-weight'] as const,
+          modifierPrefix: `ui-badge--${appearance}-${tone}`,
+          requiredProperties: ['--ui-pill-bg', '--ui-pill-fg', '--ui-pill-border'] as const,
         })),
       ),
       {
-        modifierPrefix: 'ui-compact-label--subdued',
-        requiredProperties: ['color'] as const,
+        modifierPrefix: 'ui-badge--subdued',
+        requiredProperties: ['--ui-pill-fg'] as const,
       },
       {
-        modifierPrefix: 'ui-compact-label--selected',
-        requiredProperties: ['border-color', 'background-color', 'color'] as const,
-      },
-      {
-        modifierPrefix: 'ui-compact-label--interactive',
-        requiredProperties: ['cursor'] as const,
-      },
-      {
-        modifierPrefix: 'ui-compact-label--counter',
+        modifierPrefix: 'ui-badge--counter',
         requiredProperties: [
           'min-width',
           'justify-content',
@@ -795,6 +803,27 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
           'font-variant-numeric',
           'line-height',
         ] as const,
+      },
+    ],
+  },
+  {
+    filePath: chipCssPath,
+    dimensions: [
+      ...(['xs', 'sm', 'md', 'lg'] as const).map((name) => ({
+        modifierPrefix: `ui-chip--${name}`,
+        requiredProperties: ['height', 'padding-inline', 'font-size', 'line-height'] as const,
+      })),
+      {
+        modifierPrefix: 'ui-chip--removable',
+        requiredProperties: ['--ui-pill-bg', '--ui-pill-fg', '--ui-pill-border'] as const,
+      },
+      {
+        modifierPrefix: 'ui-chip--selected',
+        requiredProperties: ['border-color', 'background-color', 'color'] as const,
+      },
+      {
+        modifierPrefix: 'ui-chip--interactive',
+        requiredProperties: ['cursor'] as const,
       },
       {
         modifierPrefix: 'ui-chip--removable-xs',

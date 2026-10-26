@@ -1,8 +1,6 @@
 'use client'
 import { Icon } from '../../../components/ui/icon/icon'
 
-import { badgeLayoutVariants } from '../../../components/ui/badge.variants'
-import { resolveCompactLabelClassName } from '../../../components/ui/compact-label.variants'
 import { cn } from '../../../lib/utils'
 import type { ArrayItemIssueGroup } from '../../errors/form-issue.types'
 import {
@@ -37,7 +35,7 @@ export interface ArrayItemIssueButtonProps {
   prominence?: ArrayItemIssueProminence
 }
 
-/** Array row issue affordance — compact-label styling on a `button`, not `Badge`. */
+/** Array row issue affordance — pill styling on a `button`, not `Badge`. */
 export function ArrayItemIssueButton({
   issueCount,
   rowLabel,
@@ -53,15 +51,8 @@ export function ArrayItemIssueButton({
       aria-label={`${issueCountLabel(issueCount)} in ${rowLabel}`}
       onClick={onPress}
       className={cn(
-        resolveCompactLabelClassName({
-          appearance: 'soft',
-          tone: 'destructive',
-          className: cn(
-            'ui-array-item-issue-count shrink-0',
-            compact && 'mt-0',
-            badgeLayoutVariants({ layout: compact ? 'counter' : 'label' }),
-          ),
-        }),
+        'ui-pill ui-array-item-issue-count shrink-0',
+        compact && 'ui-array-item-issue-count--compact mt-0',
         arrayItemIssueButtonFocusClasses,
       )}
     >
@@ -72,10 +63,6 @@ export function ArrayItemIssueButton({
     </button>
   )
 }
-
-/** @deprecated Use `ArrayItemIssueButton` */
-export const ArrayItemIssueBadge = ArrayItemIssueButton
-export type ArrayItemIssueBadgeProps = ArrayItemIssueButtonProps
 
 export interface ArrayItemIssueSummaryProps {
   group: Pick<ArrayItemIssueGroup, 'totalCount' | 'sortedIssues' | 'headerIssues' | 'fieldSummary'>

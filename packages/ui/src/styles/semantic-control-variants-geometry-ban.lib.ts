@@ -8,7 +8,7 @@ export const MIGRATED_SEMANTIC_CONTROL_VARIANT_FILES = [
   'packages/ui/src/components/ui/button.variants.ts',
   'packages/ui/src/components/ui/card.variants.ts',
   'packages/ui/src/components/ui/choice-control.variants.ts',
-  'packages/ui/src/components/ui/compact-label.variants.ts',
+  'packages/ui/src/components/ui/chip.variants.ts',
   'packages/ui/src/components/ui/drag-handle.variants.ts',
   'packages/ui/src/components/ui/dropdown-menu-choice.variants.ts',
   'packages/ui/src/components/ui/empty-panel.variants.ts',

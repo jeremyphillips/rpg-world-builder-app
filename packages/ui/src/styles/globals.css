@@ -46,7 +46,9 @@
 @import '../components/ui/panel.css';
 @import '../components/preview-rail/preview-rail.css';
 @import '../components/ui/empty-panel.css';
-@import '../components/ui/compact-label.css';
+@import '../components/ui/pill.css';
+@import '../components/ui/badge.css';
+@import '../components/ui/chip.css';
 @import '../components/ui/notification-unread-badge.css';
 @import '../components/ui/alert.css';
 @import '../components/ui/metadata-list.css';

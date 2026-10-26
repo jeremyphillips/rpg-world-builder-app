@@ -1275,7 +1275,7 @@ export {
   ChooseFromChipsField,
   type ChooseFromChipsFieldProps,
 } from './components/ui/choose-from-chips-field.client'
-export type { ChipSize } from './components/ui/compact-label.lib'
+export type { ChipSize } from './components/ui/chip.lib'
 export {
   ComboboxField,
   type ComboboxFieldProps,

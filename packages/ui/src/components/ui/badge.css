@@ -1,0 +1,132 @@
+/*
+ * Badge size, appearance, emphasis, and counter.
+ * Appearance modifiers only assign --ui-pill-* . The pill base paints them.
+ * Source order: size, then appearance, then subdued, then counter.
+ */
+@layer components {
+  .ui-badge--sm {
+    height: 1.375rem; /* 22px */
+    padding-inline: calc(var(--spacing) * 2);
+    font-size: var(--text-fine-xs);
+    line-height: var(--text-xs--line-height);
+    --icon-size: var(--icon-glyph-xs);
+  }
+
+  .ui-badge--md {
+    height: 1.625rem; /* 26px */
+    padding-inline: calc(var(--spacing) * 3);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    --icon-size: var(--icon-glyph-sm);
+  }
+
+  .ui-badge--lg {
+    height: 2rem; /* 32px */
+    padding-inline: calc(var(--spacing) * 4);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    --icon-size: var(--icon-glyph-md);
+  }
+
+  .ui-badge--outline-neutral {
+    --ui-pill-bg: transparent;
+    --ui-pill-fg: var(--semantic-neutral-outline-foreground);
+    --ui-pill-border: var(--ui-border-color);
+  }
+
+  .ui-badge--outline-info {
+    --ui-pill-bg: transparent;
+    --ui-pill-fg: var(--semantic-info-outline-foreground);
+    --ui-pill-border: var(--semantic-info-border);
+  }
+
+  .ui-badge--outline-success {
+    --ui-pill-bg: transparent;
+    --ui-pill-fg: var(--semantic-success-outline-foreground);
+    --ui-pill-border: var(--semantic-success-border);
+  }
+
+  .ui-badge--outline-warning {
+    --ui-pill-bg: transparent;
+    --ui-pill-fg: var(--semantic-warning-outline-foreground);
+    --ui-pill-border: var(--semantic-warning-border);
+  }
+
+  .ui-badge--outline-destructive {
+    --ui-pill-bg: transparent;
+    --ui-pill-fg: var(--semantic-destructive-outline-foreground);
+    --ui-pill-border: var(--semantic-destructive-border);
+  }
+
+  .ui-badge--soft-neutral {
+    --ui-pill-bg: var(--semantic-neutral-soft-bg);
+    --ui-pill-fg: var(--semantic-neutral-soft-foreground);
+    --ui-pill-border: var(--ui-border-color);
+  }
+
+  .ui-badge--soft-info {
+    --ui-pill-bg: var(--semantic-info-soft-bg);
+    --ui-pill-fg: var(--semantic-info-soft-foreground);
+    --ui-pill-border: var(--semantic-info-border);
+  }
+
+  .ui-badge--soft-success {
+    --ui-pill-bg: var(--semantic-success-soft-bg);
+    --ui-pill-fg: var(--semantic-success-soft-foreground);
+    --ui-pill-border: var(--semantic-success-border);
+  }
+
+  .ui-badge--soft-warning {
+    --ui-pill-bg: var(--semantic-warning-soft-bg);
+    --ui-pill-fg: var(--semantic-warning-soft-foreground);
+    --ui-pill-border: var(--semantic-warning-border);
+  }
+
+  .ui-badge--soft-destructive {
+    --ui-pill-bg: var(--semantic-destructive-soft-bg);
+    --ui-pill-fg: var(--semantic-destructive-soft-foreground);
+    --ui-pill-border: var(--semantic-destructive-border);
+  }
+
+  .ui-badge--strong-neutral {
+    --ui-pill-bg: var(--semantic-neutral-strong-bg);
+    --ui-pill-fg: var(--semantic-neutral-strong-foreground);
+    --ui-pill-border: var(--ui-border-color);
+  }
+
+  .ui-badge--strong-info {
+    --ui-pill-bg: var(--semantic-info-strong-bg);
+    --ui-pill-fg: var(--semantic-info-strong-foreground);
+    --ui-pill-border: var(--semantic-info-border);
+  }
+
+  .ui-badge--strong-success {
+    --ui-pill-bg: var(--semantic-success-strong-bg);
+    --ui-pill-fg: var(--semantic-success-strong-foreground);
+    --ui-pill-border: var(--semantic-success-border);
+  }
+
+  .ui-badge--strong-warning {
+    --ui-pill-bg: var(--semantic-warning-strong-bg);
+    --ui-pill-fg: var(--semantic-warning-strong-foreground);
+    --ui-pill-border: var(--semantic-warning-border);
+  }
+
+  .ui-badge--strong-destructive {
+    --ui-pill-bg: var(--semantic-destructive-strong-bg);
+    --ui-pill-fg: var(--semantic-destructive-strong-foreground);
+    --ui-pill-border: var(--semantic-destructive-border);
+  }
+
+  .ui-badge--subdued {
+    --ui-pill-fg: var(--muted-foreground);
+  }
+
+  .ui-badge--counter {
+    min-width: calc(var(--spacing) * 5);
+    justify-content: center;
+    padding-inline: calc(var(--spacing) * 1);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+}

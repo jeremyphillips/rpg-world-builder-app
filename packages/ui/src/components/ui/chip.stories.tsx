@@ -5,9 +5,27 @@ import { useState } from 'react'
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Chip } from './chip.client'
 import { ChipGroup } from './chip-group.client'
-import { COMPACT_LABEL_CLASS_SPECS } from './compact-label.variants'
 
-const CHIP_CLASS_SPECS = COMPACT_LABEL_CLASS_SPECS.filter((spec) => spec.key.startsWith('chip'))
+const CHIP_CLASS_SPECS = [
+  {
+    key: 'chip / selectable / unselected / md',
+    className: 'ui-pill ui-chip--interactive ui-focus-ring',
+    keyValues: 'interactive base; hover uses control-hover',
+    useCase: 'ChipsField toggle (off)',
+  },
+  {
+    key: 'chip / selectable / selected / md',
+    className: 'ui-pill ui-chip--interactive ui-chip--selected ui-focus-ring',
+    keyValues: 'selected-control fill',
+    useCase: 'ChipsField toggle (on)',
+  },
+  {
+    key: 'chip / removable / neutral soft / md',
+    className: 'ui-pill ui-chip--removable ui-border--default',
+    keyValues: 'removable padding-end; dismiss is __remove',
+    useCase: 'Combobox selected value',
+  },
+] as const
 
 const meta = {
   title: 'Components/Chip',

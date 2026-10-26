@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export type { BadgeAppearance, BadgeTone } from './badge-appearance.lib'
-export { BADGE_APPEARANCES } from './badge-appearance.lib'
+export { BADGE_APPEARANCES, BADGE_TONES } from './badge-appearance.lib'
 
 export type BadgeSize = 'sm' | 'md' | 'lg'
 
@@ -26,10 +26,19 @@ export const badgeLayoutVariants = cva('', {
   variants: {
     layout: {
       label: '',
-      counter: 'ui-compact-label--counter',
+      counter: 'ui-badge--counter',
     },
   },
   defaultVariants: {
     layout: 'label',
   },
 })
+
+export const BADGE_EMPHASES = ['default', 'subdued'] as const
+
+export type BadgeEmphasis = (typeof BADGE_EMPHASES)[number]
+
+/** Visual weight, orthogonal to tone. Subdued is muted copy, not a disabled control. */
+export function badgeEmphasisClass(emphasis: BadgeEmphasis = 'default'): string | null {
+  return emphasis === 'subdued' ? 'ui-badge--subdued' : null
+}

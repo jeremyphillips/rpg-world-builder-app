@@ -8,8 +8,7 @@ const repoRoot = join(uiDir, '../../../../..')
 
 /** Files that still bake a root border token, with the reason each stays. */
 const BORDER_TOKEN_ALLOWLIST: Record<string, string> = {
-  'compact-label.css':
-    'Unselected chips paint --background, so a root-baked border matches that fill.',
+  'chip.css': 'Unselected chips paint --background, so a root-baked border matches that fill.',
   'button.css': 'Split and expanded var(--border) are control seams, not surface planes.',
   'boolean-field.css': 'Boolean hover uses the choice-control recipe.',
   'media-crop-editor.css': 'Crop guides do not establish a semantic plane.',

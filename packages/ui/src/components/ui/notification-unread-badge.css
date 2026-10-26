@@ -1,4 +1,4 @@
-/* Overlay unread count on notification triggers — not ui-compact-label geometry. */
+/* Overlay unread count on notification triggers — not ui-pill geometry. */
 @layer components {
   .ui-notification-unread-badge {
     position: absolute;

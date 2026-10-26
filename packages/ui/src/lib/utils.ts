@@ -15,7 +15,7 @@ import {
   UI_FIELD_CONTROL_WIDTH_CLASSES,
   UI_FLOATING_LABEL_SIZE_CLASSES,
   UI_COMPACT_CONTROL_SIZE_CLASSES,
-  UI_COMPACT_LABEL_APPEARANCE_CLASSES,
+  UI_BADGE_APPEARANCE_CLASSES,
   UI_BADGE_SIZE_CLASSES,
   UI_CHIP_SIZE_CLASSES,
   UI_ALERT_APPEARANCE_CLASSES,
@@ -137,7 +137,7 @@ type TypographyClassGroupIds =
   | 'ui-compact-control-size'
   | 'ui-badge-size'
   | 'ui-chip-size'
-  | 'ui-compact-label-appearance'
+  | 'ui-badge-appearance'
   | 'ui-alert-appearance'
   | 'ui-alert-density'
   | 'ui-metadata-list-size'
@@ -211,7 +211,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-compact-control-size': [...UI_COMPACT_CONTROL_SIZE_CLASSES],
       'ui-badge-size': [...UI_BADGE_SIZE_CLASSES],
       'ui-chip-size': [...UI_CHIP_SIZE_CLASSES],
-      'ui-compact-label-appearance': [...UI_COMPACT_LABEL_APPEARANCE_CLASSES],
+      'ui-badge-appearance': [...UI_BADGE_APPEARANCE_CLASSES],
       'ui-alert-appearance': [...UI_ALERT_APPEARANCE_CLASSES],
       'ui-alert-density': [...UI_ALERT_DENSITY_CLASSES],
       'ui-metadata-list-size': [...UI_METADATA_LIST_SIZE_CLASSES],
@@ -256,7 +256,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-compact-control-size': ['ui-compact-control-size'],
       'ui-badge-size': ['ui-badge-size'],
       'ui-chip-size': ['ui-chip-size'],
-      'ui-compact-label-appearance': ['ui-compact-label-appearance'],
+      'ui-badge-appearance': ['ui-badge-appearance'],
       'ui-alert-appearance': ['ui-alert-appearance'],
       'ui-alert-density': ['ui-alert-density'],
       'ui-metadata-list-size': ['ui-metadata-list-size'],
