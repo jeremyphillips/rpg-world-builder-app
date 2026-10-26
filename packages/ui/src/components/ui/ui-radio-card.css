@@ -307,7 +307,6 @@
 
   .ui-radio-card__details-action {
     flex-shrink: 0;
-    --icon-size: var(--icon-glyph-lg);
   }
 
   .ui-radio-card__leading-title-line {

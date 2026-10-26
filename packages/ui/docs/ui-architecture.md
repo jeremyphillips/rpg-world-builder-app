@@ -245,6 +245,8 @@ For labeled footer or Alert action controls, pass explicit `size` from `resolveS
 
 Heading-line badge accessories use a parallel ladder with `Badge` sizes — see [row-anatomy.md](./row-anatomy.md#heading-accessories). Form submit footers, icon-only controls, and footers with caller-chosen sizes are out of scope for this resolver.
 
+Title-line icon actions use a different map: `resolveEntityRowInlineIconActionButtonSize` inside `@rpg/ui` (`compact` and `comfortable` → `icon-xs`, `spacious` → `icon-sm`). `RadioOptionCard` details is the current caller. That resolver is separate from labeled footer `resolveSurfaceActionButtonSize` and stays unexported until a consumer outside this package needs it.
+
 ## Surface-relative borders
 
 Neutral border color has one recipe: `ui-border--subtle`, `ui-border--default`, and `ui-border--strong` ([border ladder](./design-tokens.md#border-ladder)). Each class mixes on the element’s `--surface-current` and publishes `--ui-border-color`. Width, style, side, and radius stay on the component. JSX one-offs use the Tailwind utilities (`border-border`, `border-border-subtle`), which mix on the element the same way. Do not add a second recipe.

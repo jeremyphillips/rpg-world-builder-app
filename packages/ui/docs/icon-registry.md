@@ -28,6 +28,13 @@ Domain maps (`ACTION_ICONS`, `CONTENT_DISPLAY_FALLBACK_ICONS`, feature tab maps,
 
 `ActionButton` accepts only `action` (closed verb) plus normal `Button` props. Overflow triggers use `overflow`, `overflowVertical`, or `overflowMenu`.
 
+| Verb      | Glyph  | Meaning                                        |
+| --------- | ------ | ---------------------------------------------- |
+| `details` | `info` | Reveal more information about the current item |
+| `view`    | `eye`  | Open or navigate to a resource                 |
+
+Icon-only `ActionButton` with `action="details"` uses the accessible name `View details` when `aria-label` is omitted. Callers that name a specific item still pass `aria-label`.
+
 ## Accessibility
 
 `Icon` is always decorative (`aria-hidden="true"`). Names belong on interactive controls (`aria-label` on buttons, links, etc.). `Spinner` keeps `role="status"` on its wrapper span.

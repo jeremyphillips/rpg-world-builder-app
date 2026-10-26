@@ -45,6 +45,12 @@ function resolveLabeledSizeKey(size: ButtonSize): 'default' | 'xs' | 'sm' | 'lg'
   return 'default'
 }
 
+function isIconOnlyButtonSize(
+  size: ButtonSize,
+): size is 'icon' | 'icon-xs' | 'icon-sm' | 'icon-lg' {
+  return size === 'icon' || size === 'icon-xs' || size === 'icon-sm' || size === 'icon-lg'
+}
+
 function resolveButtonSizeClasses({
   variant,
   size = 'default',
@@ -53,6 +59,9 @@ function resolveButtonSizeClasses({
   size?: ButtonSize
 }): string | null {
   if (variant === 'text') {
+    if (isIconOnlyButtonSize(size)) {
+      return cn(UI_BUTTON_TEXT_SIZE_CLASS, resolveButtonChromeSizeClass(size))
+    }
     return cn(UI_BUTTON_TEXT_SIZE_CLASS, resolveTextButtonGeometryClass(resolveTextSizeKey(size)))
   }
 
@@ -65,7 +74,7 @@ function resolveButtonSizeClasses({
     )
   }
 
-  if (size === 'icon' || size === 'icon-xs' || size === 'icon-sm' || size === 'icon-lg') {
+  if (isIconOnlyButtonSize(size)) {
     return resolveButtonChromeSizeClass(size)
   }
 

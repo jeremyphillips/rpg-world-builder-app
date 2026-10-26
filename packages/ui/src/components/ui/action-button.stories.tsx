@@ -36,6 +36,16 @@ export const EditIconOnly: Story = {
   },
 }
 
+/** Title-line details affordance: neutral text chrome, icon-xs, default accessible name. */
+export const DetailsTextIcon: Story = {
+  args: {
+    action: 'details',
+    variant: 'text',
+    tone: 'neutral',
+    size: 'icon-xs',
+  },
+}
+
 /** Every verb in `ACTION_ICON_VERBS` — ghost icon buttons with registry glyphs. */
 export const ActionVerbs: Story = {
   render: () => (

@@ -18,7 +18,6 @@ import {
   BUTTON_SIZE_SPECS,
   TEXT_BUTTON_SIZE_CLASS,
   UI_BUTTON_ATTACHED_SIZE_CLASS,
-  UI_BUTTON_TEXT_SIZE_CLASS,
 } from '../components/ui/button.styles'
 import {
   UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES,
@@ -110,11 +109,7 @@ describe('semantic-control-class-groups sync', () => {
     )
     expectSameSet(
       UI_BUTTON_SIZE_CLASSES,
-      [
-        ...BUTTON_SIZE_SPECS.map((spec) => spec.className),
-        UI_BUTTON_TEXT_SIZE_CLASS,
-        UI_BUTTON_ATTACHED_SIZE_CLASS,
-      ],
+      [...BUTTON_SIZE_SPECS.map((spec) => spec.className), UI_BUTTON_ATTACHED_SIZE_CLASS],
       'button size specs',
     )
     expectSameSet(

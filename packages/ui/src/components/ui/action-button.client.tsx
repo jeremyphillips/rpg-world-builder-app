@@ -2,7 +2,11 @@
 
 import * as React from 'react'
 
-import { ACTION_ICONS, type ActionIconVerb } from './action-icons.map'
+import {
+  ACTION_DETAILS_DEFAULT_ARIA_LABEL,
+  ACTION_ICONS,
+  type ActionIconVerb,
+} from './action-icons.map'
 import { Button, type ButtonProps } from './button.client'
 import { Icon } from './icon/icon'
 
@@ -21,9 +25,15 @@ export function ActionButton({
   className,
   variant,
   size,
+  'aria-label': ariaLabel,
   ...buttonProps
 }: ActionButtonProps) {
   const hasLabel = children != null && children !== ''
+  const resolvedAriaLabel = ariaLabel
+    ? ariaLabel
+    : !hasLabel && action === 'details'
+      ? ACTION_DETAILS_DEFAULT_ARIA_LABEL
+      : undefined
 
   return (
     <Button
@@ -32,6 +42,7 @@ export function ActionButton({
       variant={variant}
       size={size}
       {...(buttonProps as ButtonProps)}
+      aria-label={resolvedAriaLabel}
     >
       <Icon name={ACTION_ICONS[action]} size="owner" />
       {hasLabel ? children : null}

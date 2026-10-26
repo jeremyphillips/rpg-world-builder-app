@@ -8,6 +8,7 @@ export const ACTION_ICON_VERBS = [
   'delete',
   'reset',
   'view',
+  'details',
   'close',
   'clear',
   'drag',
@@ -31,6 +32,7 @@ export const ACTION_ICONS = {
   delete: 'trash',
   reset: 'rotate-ccw',
   view: 'eye',
+  details: 'info',
   close: 'x',
   clear: 'x',
   drag: 'grip-vertical',
@@ -42,3 +44,6 @@ export const ACTION_ICONS = {
   overflowMenu: 'ellipsis',
   waypoints: 'waypoints',
 } as const satisfies Record<ActionIconVerb, IconName>
+
+/** Accessible name for icon-only `action="details"` when `aria-label` is omitted. */
+export const ACTION_DETAILS_DEFAULT_ARIA_LABEL = 'View details'

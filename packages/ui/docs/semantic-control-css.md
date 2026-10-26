@@ -31,7 +31,7 @@ Interactive controls and buttons emit BEM-style classes (`ui-button ui-button--o
 
 Within one dimension (size, appearance), every modifier declares the **same** property list. Source order in each `*.css` file is fixed; when two modifiers from the same dimension are present, the later rule wins. Geometry families at `(0,2,0)` (e.g. `.ui-button.ui-button--text`) win over chrome appearances as documented per file.
 
-`cn()` registers twMerge groups (`ui-button-size`, `ui-button-appearance`, …) so React composition matches DevTools.
+`cn()` registers twMerge groups (`ui-button-size`, `ui-button-appearance`, …) so React composition matches DevTools. `ui-button--text` is a family treatment and is not in `ui-button-size`, so it composes with icon-only sizes. Compound rules in `button.css` (`.ui-button--text.ui-button--icon-*`) keep the square hit target.
 
 ## Inspector acceptance
 

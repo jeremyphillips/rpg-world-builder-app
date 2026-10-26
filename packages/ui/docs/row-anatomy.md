@@ -176,6 +176,16 @@ Managed inline badges do not take `size`. `IdentityRowHeadingLine` `headingBadge
 
 Standalone `Badge` is unchanged. It still defaults to `md` and honors `size`. Card and row shells do not clamp badge CSS.
 
+Title-line **icon actions** use a separate ladder. `resolveEntityRowInlineIconActionButtonSize` (package-internal, same `EntityRowInline*` heading-accessory vocabulary as `resolveEntityRowInlineBadgeSize`) maps density to an `ActionButton` icon size. The host publishes `--icon-size`; the glyph uses `size="owner"`.
+
+| Card / identity density | Inline icon action size | Glyph                    |
+| ----------------------- | ----------------------- | ------------------------ |
+| compact                 | `icon-xs`               | 14px (`--icon-glyph-md`) |
+| comfortable             | `icon-xs`               | 14px                     |
+| spacious                | `icon-sm`               | 16px (`--icon-glyph-lg`) |
+
+`RadioOptionCard` details uses this map (`ActionButton` `action="details"`). The resolver stays inside `@rpg/ui` until another package needs it.
+
 `IdentityRowHeadingLine` uses `items-center` on the outer flex row (title cluster vs the end slot) and
 `items-baseline` inside the cluster for title + classification via `InlineMetadata`.
 

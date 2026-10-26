@@ -208,6 +208,24 @@
     background-color: transparent;
   }
 
+  /* Text chrome composes with icon-only sizes. The family rule's fit-content width
+     would otherwise shrink the square hit target. */
+  .ui-button--text.ui-button--icon-xs {
+    width: var(--control-height-compact);
+  }
+
+  .ui-button--text.ui-button--icon-sm {
+    width: var(--control-height-sm);
+  }
+
+  .ui-button--text.ui-button--icon-md {
+    width: var(--control-height-md);
+  }
+
+  .ui-button--text.ui-button--icon-lg {
+    width: var(--control-height-lg);
+  }
+
   .ui-button__text--default {
     height: var(--control-height-sm);
     gap: var(--control-gap-md);

@@ -53,6 +53,13 @@ exports[`UI/ActionButton ActionVerbs smoke-test 1`] = `
   },
   {
     "height": "20px",
+    "identity": "info",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "20px",
+  },
+  {
+    "height": "20px",
     "identity": "x",
     "ownerSizeResolved": true,
     "strokeWidth": "2px",
@@ -150,6 +157,24 @@ exports[`UI/ActionButton AddWithLabel smoke-test 1`] = `
 
 exports[`UI/ActionButton SizeLadder smoke-test 1`] = `
 [
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/ActionButton DetailsTextIcon smoke-test 1`] = `
+[
+  {
+    "height": "14px",
+    "identity": "info",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "14px",
+  },
   {
     "height": "auto",
     "identity": null,

@@ -1,10 +1,9 @@
 'use client'
-import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import { cn } from '../../lib/utils'
+import { ActionButton } from './action-button.client'
 import { Badge } from './badge'
-import { Button } from './button.client'
 import {
   cardSurfaceVariants,
   resolveOptionCardSurfaceDensity,
@@ -36,6 +35,7 @@ import {
   optionCardEmbeddedSlotClassName,
   type OptionCardEmbeddedSlotTone,
 } from './selection-option-card.lib'
+import { resolveEntityRowInlineIconActionButtonSize } from './entity-row-inline-icon-action-button-size.lib'
 
 export type RadioOptionCardEmbeddedSlotTone = OptionCardEmbeddedSlotTone
 
@@ -102,9 +102,11 @@ function RadioOptionCardSummaryBadgeSlot({ badge }: { badge: RadioOptionCardSumm
 
 function RadioOptionCardDetailsAction({
   ariaLabel,
+  density,
   onDetails,
 }: {
   ariaLabel: string
+  density: SelectionOptionCardDensity
   onDetails: () => void
 }) {
   return (
@@ -112,17 +114,15 @@ function RadioOptionCardDetailsAction({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger interactive asChild>
-            <Button
-              type="button"
+            <ActionButton
+              action="details"
               variant="text"
               tone="neutral"
-              size="xs"
+              size={resolveEntityRowInlineIconActionButtonSize(density)}
               className="ui-radio-card__details-action"
               aria-label={ariaLabel}
               onClick={onDetails}
-            >
-              <Icon name="info" size="2xl" />
-            </Button>
+            />
           </TooltipTrigger>
           <TooltipContent>View details</TooltipContent>
         </Tooltip>
@@ -135,6 +135,7 @@ function resolveRadioOptionCardTitleEndSlot(
   label: string,
   details: React.ReactNode | undefined,
   onDetails: (() => void) | undefined,
+  density: SelectionOptionCardDensity,
 ): React.ReactNode {
   if (details) {
     return <DisclosureChevronTrigger label={`${label} details`} />
@@ -143,6 +144,7 @@ function resolveRadioOptionCardTitleEndSlot(
     return (
       <RadioOptionCardDetailsAction
         ariaLabel={resolveRadioCardDetailsAriaLabel(label)}
+        density={density}
         onDetails={onDetails}
       />
     )
@@ -280,7 +282,7 @@ function RadioOptionCardPrimaryRow(props: RadioOptionCardInteriorProps) {
       />
     ) : undefined
 
-  const titleEndSlot = resolveRadioOptionCardTitleEndSlot(label, details, onDetails)
+  const titleEndSlot = resolveRadioOptionCardTitleEndSlot(label, details, onDetails, density)
 
   const leadingControl = (
     <SelectionTargetRadio

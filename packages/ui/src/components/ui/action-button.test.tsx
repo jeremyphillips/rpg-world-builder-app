@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { ActionButton } from './action-button.client'
+import { ACTION_ICONS } from './action-icons.map'
 import type { ButtonSize } from './button.variants'
 
 const EXPLICIT_ICON_STEPS = [
@@ -39,6 +40,34 @@ describe('ActionButton', () => {
 
     expect(screen.getByRole('button', { name: /add row/i })).toBeInTheDocument()
     expect(container.querySelector('svg')).toHaveAttribute('data-icon', 'plus')
+  })
+
+  it('maps details to the info glyph', () => {
+    expect(ACTION_ICONS.details).toBe('info')
+  })
+
+  it('names icon-only details as View details when aria-label is omitted', () => {
+    render(<ActionButton action="details" variant="text" tone="neutral" size="icon-xs" />)
+
+    const button = screen.getByRole('button', { name: 'View details' })
+    expect(button).toHaveAttribute('type', 'button')
+    button.focus()
+    expect(button).toHaveFocus()
+  })
+
+  it('keeps an explicit details aria-label', () => {
+    render(
+      <ActionButton
+        action="details"
+        variant="text"
+        tone="neutral"
+        size="icon-xs"
+        aria-label="View Dwarf details"
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'View Dwarf details' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'View details' })).not.toBeInTheDocument()
   })
 
   it('forwards aria-label for icon-only buttons', () => {

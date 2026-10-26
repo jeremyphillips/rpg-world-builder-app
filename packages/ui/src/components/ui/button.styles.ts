@@ -163,10 +163,12 @@ export const UI_BUTTON_APPEARANCE_CLASSES = BUTTON_APPEARANCE_SPECS.map(
   (spec) => spec.className,
 ) as readonly string[]
 
-/** twMerge group — labeled, icon, text, and attached block modifiers. */
+/**
+ * twMerge group — labeled, icon-only, and attached size modifiers.
+ * `ui-button--text` stays out of this group so text chrome can compose with icon-only sizes.
+ */
 export const UI_BUTTON_SIZE_CLASSES = [
   ...BUTTON_SIZE_SPECS.map((spec) => spec.className),
-  UI_BUTTON_TEXT_SIZE_CLASS,
   UI_BUTTON_ATTACHED_SIZE_CLASS,
 ] as readonly string[]
 

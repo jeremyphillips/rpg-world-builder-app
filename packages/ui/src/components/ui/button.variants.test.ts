@@ -93,6 +93,20 @@ describe('buttonVariants matrix', () => {
     expect(classes).toContain('ui-button__text--lg')
   })
 
+  it('maps text icon-xs to text chrome plus the icon-xs host', () => {
+    const classes = classesFor({ variant: 'text', size: 'icon-xs' })
+    expect(classes).toContain(UI_BUTTON_TEXT_SIZE_CLASS)
+    expect(classes).toContain('ui-button--icon-xs')
+    expect(classes).not.toContain('ui-button__text--default')
+  })
+
+  it('maps text icon-sm to text chrome plus the icon-sm host', () => {
+    const classes = classesFor({ variant: 'text', size: 'icon-sm' })
+    expect(classes).toContain(UI_BUTTON_TEXT_SIZE_CLASS)
+    expect(classes).toContain('ui-button--icon-sm')
+    expect(classes).not.toContain('ui-button__text--default')
+  })
+
   it('normalizes attached xs to attached-sm size tier', () => {
     const attachedSm = classesFor({ variant: 'attached', size: 'sm' })
     const attachedXs = classesFor({ variant: 'attached', size: 'xs' })
