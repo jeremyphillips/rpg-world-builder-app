@@ -157,8 +157,8 @@
   .ui-array-item-issue-count {
     height: var(--control-height-compact);
     padding-inline: calc(var(--spacing) * 2);
-    font-size: var(--text-compact-label-sm);
-    line-height: var(--text-compact-label-sm--line-height);
+    font-size: var(--text-array-item-issue-count);
+    line-height: var(--text-array-item-issue-count--line-height);
     --icon-size: var(--icon-glyph-xs);
   }
 

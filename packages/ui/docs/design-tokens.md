@@ -228,7 +228,7 @@ Review in Storybook (both modes) without pixel-matching:
 ## Shared tone enum
 
 `neutral | info | success | warning | destructive` across `SemanticText`, `Badge`, `Chip`,
-field group accents, and app status call sites. See [compact-labels.md](./compact-labels.md) and
+field group accents, and app status call sites. See [pill-badge-chip.md](./pill-badge-chip.md) and
 [semantic-text.md](./semantic-text.md).
 
 ## Enforcement
@@ -324,7 +324,9 @@ Inline icons use `size="inline"` and read `--icon-inline` from the nearest typog
 | `prose`, `.prose.prose-md` | md    |
 | `.prose.prose-sm`          | sm    |
 
-`text-lg` and larger, heading utilities, eyebrow type, and compact-label type are not owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `badge.css` and `chip.css`.
+`text-lg` and larger, heading utilities, and eyebrow type are not inline-icon owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `badge.css` and `chip.css`.
+
+**Chip type scale** (`--text-chip-sm|md|lg` in `globals.css`) maps Chip `sm`/`md`/`lg` to `text-fine-sm` / `text-fine-md` / `text-md`. Badge sizes use `--text-fine-xs`, `--text-xs`, and `--text-sm` on `ui-badge--*` modifiers. `--text-array-item-issue-count` aliases `--text-chip-sm` for `ArrayItemIssueButton`.
 
 Button and `ActionButton` glyphs use `size="owner"`; `button.css` publishes `--icon-size` per variant.
 

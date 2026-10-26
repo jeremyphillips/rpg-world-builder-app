@@ -152,7 +152,7 @@ describe('semantic-control-class-groups sync', () => {
     )
   })
 
-  it('derives compact label, field group, and floating label classes from specs', () => {
+  it('derives badge, chip, field group, and floating label classes from specs', () => {
     expectSameSet(
       UI_BADGE_SIZE_CLASSES,
       ['ui-badge--sm', 'ui-badge--md', 'ui-badge--lg'],

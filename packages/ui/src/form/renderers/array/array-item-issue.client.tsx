@@ -13,7 +13,7 @@ function issueCountLabel(count: number): string {
   return `${count} ${count === 1 ? 'issue' : 'issues'}`
 }
 
-function issueCountCompactLabel(count: number): string {
+function formatIssueCountCompact(count: number): string {
   return String(count)
 }
 
@@ -58,7 +58,7 @@ export function ArrayItemIssueButton({
     >
       <Icon name="triangle-alert" size="inline" />
       <span className={compact ? 'tabular-nums' : undefined}>
-        {compact ? issueCountCompactLabel(issueCount) : issueCountLabel(issueCount)}
+        {compact ? formatIssueCountCompact(issueCount) : issueCountLabel(issueCount)}
       </span>
     </button>
   )
@@ -177,4 +177,4 @@ export function ArrayLegendIssueLink({
   )
 }
 
-export { issueCountLabel, issueCountCompactLabel, arrayLegendIssueLabel }
+export { issueCountLabel, formatIssueCountCompact, arrayLegendIssueLabel }

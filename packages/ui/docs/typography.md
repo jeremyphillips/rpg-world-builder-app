@@ -183,8 +183,8 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 | Token / utility | px @ 16px root | Typical use                                      |
 | --------------- | -------------- | ------------------------------------------------ |
 | `text-fine-xs`  | 10             | Eyebrow `xs`, compact control-action labels      |
-| `text-fine-sm`  | 11             | Eyebrow `sm`, compact label `sm`                 |
-| `text-fine-md`  | 13             | Eyebrow `md`, compact label `md`, table body     |
+| `text-fine-sm`  | 11             | Eyebrow `sm`, Chip `sm` (`--text-chip-sm`)       |
+| `text-fine-md`  | 13             | Eyebrow `md`, Chip `md`, table body              |
 | `text-xs`       | 12             | Captions, table stat columns                     |
 | `text-sm`       | 14             | Compact UI chrome (buttons, menus, data tables)  |
 | `text-md`       | 15             | Secondary body (`Text` small, `prose-md`, …)     |
@@ -274,19 +274,19 @@ Primitive weights and role aliases live in [`styles/globals.css`](../src/styles/
 
 Fine sizes are the small end of the same primitive scale, not a metadata tier. They have no line-height companions. A role can share a fine size and keep its own line height, weight, and spacing.
 
-| Token / utility       | px @ 16px root | Shared by                                                        |
-| --------------------- | -------------- | ---------------------------------------------------------------- |
-| `text-fine-xs`        | 10             | `text-eyebrow-xs`, `text-control-action-xs` (line-height 14px)   |
-| `text-fine-sm`        | 11             | `text-eyebrow-sm`, compact label `sm`, floating-label `sm` floor |
-| `text-fine-md`        | 13             | `text-eyebrow-md`, compact label `md`, `text-table-body`         |
-| `text-md`             | 15             | Compact label `lg` (`Badge` / `Chip`)                            |
-| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                         |
-| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`           |
+| Token / utility       | px @ 16px root | Shared by                                                      |
+| --------------------- | -------------- | -------------------------------------------------------------- |
+| `text-fine-xs`        | 10             | `text-eyebrow-xs`, `text-control-action-xs` (line-height 14px) |
+| `text-fine-sm`        | 11             | `text-eyebrow-sm`, `--text-chip-sm`, floating-label `sm` floor |
+| `text-fine-md`        | 13             | `text-eyebrow-md`, `--text-chip-md`, `text-table-body`         |
+| `text-md`             | 15             | Chip `lg` (`--text-chip-lg`)                                   |
+| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                       |
+| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`         |
 
 The standard group above runs `text-xs` (12px) through `text-4xl` (34px).
 
-Compact-label vocabulary (`appearance`, `tone`, selected-control vs semantic soft) →
-[compact-labels.md](./compact-labels.md).
+Badge and Chip (`appearance`, `tone`, selected-control vs semantic soft) →
+[pill-badge-chip.md](./pill-badge-chip.md).
 
 Prefer `eyebrow-style-*` composites or `<Eyebrow>` for uppercase section labels. Use `text-fine-*` when the call site is choosing a size directly and no semantic role already owns it.
 

@@ -3,12 +3,12 @@
 `SemanticText` renders **inline** status copy — table cells, picker metadata, import preview
 values. It always renders a `<span>`.
 
-For bordered pill surfaces use [`Badge`](./compact-labels.md). For full alert/callout panels use
+For bordered pill surfaces use [`Badge`](./pill-badge-chip.md). For full alert/callout panels use
 `Alert` or group `chrome: { variant: 'callout' }`.
 
 ## Tone
 
-`neutral | info | success | warning | destructive` — same enum as compact labels.
+`neutral | info | success | warning | destructive` — same enum as `Badge` and `Chip` tones.
 
 | Tone          | Typical use                                 |
 | ------------- | ------------------------------------------- |

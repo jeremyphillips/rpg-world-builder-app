@@ -1,4 +1,4 @@
-# Compact labels
+# Pill, Badge, and Chip
 
 `Badge` and `Chip` compose an internal pill (`ui-pill` in `pill.css`). Consumers use the public component APIs.
 
@@ -110,9 +110,9 @@ Badge and Chip do not share a size ladder. Chip heights use the field-control to
 | Badge     | `md` | 26px                            | 12px (`--text-xs`)                        |
 | Badge     | `lg` | 32px                            | 14px (`--text-sm`)                        |
 | Chip      | `xs` | `--control-height-compact` 24px | 10px (`--text-fine-xs`), 14px line-height |
-| Chip      | `sm` | `--control-height-sm` 32px      | 11px (`--text-compact-label-sm`)          |
-| Chip      | `md` | `--control-height-md` 36px      | 13px (`--text-compact-label-md`)          |
-| Chip      | `lg` | `--control-height-xl` 44px      | 15px (`--text-compact-label-lg`)          |
+| Chip      | `sm` | `--control-height-sm` 32px      | 11px (`--text-chip-sm`)                   |
+| Chip      | `md` | `--control-height-md` 36px      | 13px (`--text-chip-md`)                   |
+| Chip      | `lg` | `--control-height-xl` 44px      | 15px (`--text-chip-lg`)                   |
 
 Field `lg` is `--control-height-xl`, not the 40px button `--control-height-lg`.
 
@@ -139,10 +139,12 @@ Role tokens live in [`globals.css`](../src/styles/globals.css):
 - `--semantic-*-border`, `--semantic-*-soft-bg`, `--semantic-*-strong-bg` — badge surfaces
 - `--semantic-*-outline-foreground`, `--semantic-*-soft-foreground`, `--semantic-*-strong-foreground` — badge copy
 - `--selected-control`, `--selected-control-foreground`, `--selected-control-border` — chip selection
+- `--text-chip-sm|md|lg` — Chip sm/md/lg type (aliases `text-fine-sm` / `text-fine-md` / `text-md`)
+- `--text-array-item-issue-count` — aliases `--text-chip-sm` for `ArrayItemIssueButton`
 
 Status chrome (`--info-subtle`, …) vs inline text (`--semantic-info`, …): [design-tokens.md](./design-tokens.md#status-namespaces).
 
-Typography: compact label `sm` / `md` use `text-fine-sm` / `text-fine-md` (see [typography.md](./typography.md)).
+Typography detail: [typography.md](./typography.md).
 
 ## Further reading
 

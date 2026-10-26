@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { LinkBadge, StaticBadge } from './link-badge'
 
 describe('LinkBadge', () => {
-  it('renders a link with compact-label outline classes', () => {
+  it('renders a link with badge outline classes', () => {
     render(
       <MemoryRouter>
         <LinkBadge to="/spells/1">Fireball</LinkBadge>

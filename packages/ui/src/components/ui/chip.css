@@ -16,24 +16,24 @@
   .ui-chip--sm {
     height: var(--control-height-sm);
     padding-inline: calc(var(--spacing) * 2);
-    font-size: var(--text-compact-label-sm);
-    line-height: var(--text-compact-label-sm--line-height);
+    font-size: var(--text-chip-sm);
+    line-height: var(--text-chip-sm--line-height);
     --icon-size: var(--icon-glyph-xs);
   }
 
   .ui-chip--md {
     height: var(--control-height-md);
     padding-inline: calc(var(--spacing) * 3);
-    font-size: var(--text-compact-label-md);
-    line-height: var(--text-compact-label-md--line-height);
+    font-size: var(--text-chip-md);
+    line-height: var(--text-chip-md--line-height);
     --icon-size: var(--icon-glyph-sm);
   }
 
   .ui-chip--lg {
     height: var(--control-height-xl);
     padding-inline: calc(var(--spacing) * 4);
-    font-size: var(--text-compact-label-lg);
-    line-height: var(--text-compact-label-lg--line-height);
+    font-size: var(--text-chip-lg);
+    line-height: var(--text-chip-lg--line-height);
     --icon-size: var(--icon-glyph-md);
   }
 

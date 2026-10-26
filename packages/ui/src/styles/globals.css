@@ -305,13 +305,17 @@
   --text-badge-sm: var(--text-xs);
   --text-badge-md: var(--text-md);
 
-  /* Compact label type scale — Badge + Chip (11 / 13 / 15px). */
-  --text-compact-label-sm: var(--text-fine-sm);
-  --text-compact-label-sm--line-height: var(--text-xs--line-height);
-  --text-compact-label-md: var(--text-fine-md);
-  --text-compact-label-md--line-height: var(--text-sm--line-height);
-  --text-compact-label-lg: var(--text-md);
-  --text-compact-label-lg--line-height: var(--text-md--line-height);
+  /* Chip type scale (11 / 13 / 15px on sm / md / lg). */
+  --text-chip-sm: var(--text-fine-sm);
+  --text-chip-sm--line-height: var(--text-xs--line-height);
+  --text-chip-md: var(--text-fine-md);
+  --text-chip-md--line-height: var(--text-sm--line-height);
+  --text-chip-lg: var(--text-md);
+  --text-chip-lg--line-height: var(--text-md--line-height);
+
+  /* Array issue count matches Chip sm type (alias, not a second scale). */
+  --text-array-item-issue-count: var(--text-chip-sm);
+  --text-array-item-issue-count--line-height: var(--text-chip-sm--line-height);
 
   --text-table-body: var(--text-fine-md);
   --text-table-stat: var(--text-xs);

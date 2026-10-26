@@ -189,7 +189,7 @@ The registry records gaps ("No owner yet") explicitly. It grows only when a fami
 
 ### Families with overlapping ownership
 
-Shared styling foundations do not replace component identity. `Badge` (`ui-badge`) and `Chip` (`ui-chip`) compose `ui-pill` for geometry. Appearance stays on Badge. Selection and removal stay on Chip. See [compact-labels.md](./compact-labels.md#identity).
+Shared styling foundations do not replace component identity. `Badge` (`ui-badge`) and `Chip` (`ui-chip`) compose `ui-pill` for geometry. Appearance stays on Badge. Selection and removal stay on Chip. See [pill-badge-chip.md](./pill-badge-chip.md#identity).
 
 | Family     | Responsibility                    | Canonical owner                                   | Composition relationship                                                                                                                                                                                                                                   |
 | ---------- | --------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
