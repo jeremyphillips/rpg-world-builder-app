@@ -1,9 +1,4 @@
-import {
-  fieldSizeToBadgeSize,
-  fieldSizeToChipSize,
-  type ContentCardDensity,
-  type FieldSize,
-} from '@rpg/ui'
+import { fieldSizeToBadgeSize, type ContentCardDensity, type FieldSize } from '@rpg/ui'
 import { useContext } from 'react'
 
 import { EntityCardUtilityFieldSizeContext } from './entity-card-utility-field-size.context'
@@ -21,13 +16,13 @@ export function useEntityCardUtilityFieldSize(): FieldSize {
 /** Field + compact-label sizes for controls rendered in a compact card trailing utility band. */
 export function useEntityCardUtilityControlSizes(): {
   fieldSize: FieldSize
-  chipSize: (typeof fieldSizeToChipSize)[FieldSize]
+  chipSize: FieldSize
   badgeSize: (typeof fieldSizeToBadgeSize)[FieldSize]
 } {
   const fieldSize = useEntityCardUtilityFieldSize()
   return {
     fieldSize,
-    chipSize: fieldSizeToChipSize[fieldSize],
+    chipSize: fieldSize,
     badgeSize: fieldSizeToBadgeSize[fieldSize],
   }
 }

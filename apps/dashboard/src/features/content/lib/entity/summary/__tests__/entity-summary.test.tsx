@@ -148,7 +148,7 @@ describe('EntitySummaryStatus', () => {
 
     const statusRow = container.querySelector('[data-entity-summary-status-row]')
     expect(statusRow).not.toHaveClass('mt-1')
-    expect(screen.getByText('Spellcasting focus')).toHaveClass('ui-compact-label--sm')
+    expect(screen.getByText('Spellcasting focus')).toHaveClass('ui-badge--sm')
   })
 
   it('renders comfortable status badges at sm density', () => {
@@ -159,7 +159,7 @@ describe('EntitySummaryStatus', () => {
       />,
     )
 
-    expect(screen.getByText('Equipped')).toHaveClass('ui-compact-label--sm')
+    expect(screen.getByText('Equipped')).toHaveClass('ui-badge--sm')
   })
 
   it('defaults to the wrapped cluster without separators', () => {

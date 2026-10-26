@@ -54,10 +54,23 @@ describe('Chip', () => {
       </Chip>,
     )
     const chip = screen.getByText('Tag').closest('.ui-compact-label')
-    expect(chip).toHaveClass('ui-chip', 'ui-compact-label--sm', 'ui-compact-label--removable-sm')
+    expect(chip).toHaveClass('ui-chip', 'ui-chip--sm', 'ui-chip--removable-sm')
     const remove = screen.getByRole('button', { name: 'Remove Tag' })
     expect(remove).toHaveClass('ui-compact-label__remove', 'ui-compact-control--icon-compact-sm')
     expect(remove).not.toHaveClass('ui-chip')
+  })
+
+  it('keeps the xs removable shell at the compact control height', () => {
+    render(
+      <Chip mode="removable" size="xs" removeLabel="Remove Tag" onRemove={vi.fn()}>
+        Tag
+      </Chip>,
+    )
+    const chip = screen.getByText('Tag').closest('.ui-chip')
+    expect(chip).toHaveClass('ui-chip--xs', 'ui-chip--removable-xs')
+    const remove = screen.getByRole('button', { name: 'Remove Tag' })
+    expect(remove).toHaveClass('ui-chip__remove--xs', 'ui-compact-label__remove')
+    expect(remove).not.toHaveClass('ui-compact-control--icon-compact-sm', 'ui-chip')
   })
 
   it('removable calls onRemove from dismiss button', async () => {

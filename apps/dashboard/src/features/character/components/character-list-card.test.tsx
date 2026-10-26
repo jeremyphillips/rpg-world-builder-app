@@ -170,7 +170,7 @@ describe('CharacterListCard', () => {
     const heading = screen.getByRole('heading', { name: 'Verna', level: 3 })
     expect(screen.getByText('Inactive')).toBeInTheDocument()
     expect(heading).not.toContainElement(screen.getByText('Inactive'))
-    expect(screen.getByText('Inactive')).toHaveClass('ui-compact-label--md')
+    expect(screen.getByText('Inactive')).toHaveClass('ui-badge--md')
   })
 
   it('uses sm footer action and badge at comfortable density', () => {
@@ -186,7 +186,7 @@ describe('CharacterListCard', () => {
     )
 
     expect(screen.getByRole('link', { name: 'View' })).toHaveClass('ui-button--sm')
-    expect(screen.getByText('Inactive')).toHaveClass('ui-compact-label--sm')
+    expect(screen.getByText('Inactive')).toHaveClass('ui-badge--sm')
   })
 
   it('uses sm footer action at compact density', () => {

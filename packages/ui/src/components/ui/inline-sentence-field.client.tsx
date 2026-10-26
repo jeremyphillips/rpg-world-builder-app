@@ -6,12 +6,11 @@ import { useMemo } from 'react'
 import { isFieldOptionGroup, type FieldOption } from '../../form/field-config'
 import { ChipsFieldOptions } from './chips-field.client'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
-import type { CompactLabelSize } from './compact-label.lib'
+import type { ChipSize } from './compact-label.lib'
 import { cn } from '../../lib/utils'
 import { ChooseCountFieldShell } from './choose-count-field-shell.client'
 import { FieldAnatomyRowShell } from './field-anatomy-row-shell.client'
 import type { FieldSize } from './field.client'
-import { fieldSizeToChipSize } from './field-sizing.variants'
 import { fieldHasValidationError } from './field-validation-props'
 import { FieldLabelContent } from './field-label-content'
 import { useFieldRowParticipation } from './field-row-anatomy.context'
@@ -81,7 +80,7 @@ export interface InlineSentenceFieldProps {
   width?: FieldWidth
   chrome?: FieldChrome
   labelVisibility?: FieldLabelVisibility
-  chipSize?: CompactLabelSize
+  chipSize?: ChipSize
 }
 
 function renderSelectOption(option: FieldOption) {
@@ -488,7 +487,7 @@ function InlineSentenceFieldBody({
   sentenceClassName: string
   below: InlineSentenceFieldProps['below']
   belowControl: InlineSentenceFieldProps['belowControl']
-  resolvedChipSize: CompactLabelSize
+  resolvedChipSize: ChipSize
   labelledBy?: string
 }) {
   return (
@@ -602,7 +601,7 @@ export function InlineSentenceField({
   const inAnatomyRow = useFieldRowParticipation()
   const fieldName = fieldNameProp ?? id
   const controlByName = useMemo(() => indexInlineSentenceControls(controls), [controls])
-  const resolvedChipSize = chipSize ?? fieldSizeToChipSize[below?.chipSize ?? size]
+  const resolvedChipSize = chipSize ?? below?.chipSize ?? size
   const sentenceClassName = inAnatomyRow
     ? fieldInlineSentenceRowClasses
     : fieldInlineSentenceClasses

@@ -4,11 +4,10 @@ import * as React from 'react'
 
 import type { FieldOption } from '../../form/field-config'
 import type { FieldSize } from './field.client'
-import { fieldSizeToChipSize } from './field-sizing.variants'
 import type { FieldChrome } from './field-chrome.variants'
 import type { FieldWidth } from './field-control.variants'
 import { ChipsFieldOptions } from './chips-field.client'
-import type { CompactLabelSize } from './compact-label.lib'
+import type { ChipSize } from './compact-label.lib'
 import { fieldInlineSentenceClasses, type FieldHintPosition } from './field.variants'
 import { NumberInput } from './number-input.client'
 import { Text } from './text'
@@ -38,7 +37,7 @@ export interface ChooseFromChipsFieldProps {
   required?: boolean
   disabled?: boolean
   size?: FieldSize
-  chipSize?: CompactLabelSize
+  chipSize?: ChipSize
   width?: FieldWidth
   chrome?: FieldChrome
 }
@@ -71,7 +70,7 @@ export function ChooseFromChipsField({
   width,
   chrome,
 }: ChooseFromChipsFieldProps) {
-  const resolvedChipSize = chipSize ?? fieldSizeToChipSize[size]
+  const resolvedChipSize = chipSize ?? size
   return (
     <ChooseCountFieldShell
       id={id}

@@ -399,7 +399,6 @@ export {
   resolveArrayAddButtonSize,
   resolveAttachedButtonSize,
   fieldSizeToBadgeSize,
-  fieldSizeToChipSize,
   fieldSizeTypographyClasses,
   fieldTextareaSizeClasses,
   type FieldSizeToken,
@@ -1276,7 +1275,7 @@ export {
   ChooseFromChipsField,
   type ChooseFromChipsFieldProps,
 } from './components/ui/choose-from-chips-field.client'
-export type { CompactLabelSize as ChipSize } from './components/ui/compact-label.lib'
+export type { ChipSize } from './components/ui/compact-label.lib'
 export {
   ComboboxField,
   type ComboboxFieldProps,

@@ -21,7 +21,7 @@ describe('Badge', () => {
       </Badge>,
     )
     const el = screen.getByText('Stale')
-    expect(el).toHaveClass('ui-badge', 'ui-compact-label--outline-warning', 'ui-compact-label--sm')
+    expect(el).toHaveClass('ui-badge', 'ui-badge--sm', 'ui-compact-label--outline-warning')
     expect(el).toHaveClass('caller-badge')
   })
 
@@ -73,7 +73,7 @@ describe('Badge', () => {
         2
       </Badge>,
     )
-    expect(screen.getByText('2')).toHaveClass('ui-compact-label--counter', 'ui-compact-label--sm')
+    expect(screen.getByText('2')).toHaveClass('ui-badge--sm', 'ui-compact-label--counter')
   })
 
   it('has no accessibility violations', async () => {

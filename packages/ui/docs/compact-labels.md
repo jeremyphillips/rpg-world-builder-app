@@ -5,13 +5,13 @@ Consumers use the public component APIs — not the internal CVA.
 
 ## Identity
 
-`ui-badge` and `ui-chip` are root identity classes. They mark which component owns the element. They do not restyle it.
+`ui-badge` and `ui-chip` are root identity classes. Size modifiers live on those classes (`ui-badge--sm|md|lg`, `ui-chip--xs|sm|md|lg`). They are not restyled by `ui-compact-label`.
 
-`ui-compact-label` is the stable shared styling contract: size, geometry, tone, and the existing state modifiers. `Badge`, `Chip`, and other compact-label consumers (today `ArrayItemIssueButton`) keep using it. Sharing that foundation does not make those consumers Badge or Chip.
+`ui-compact-label` keeps the shared pill (inline-flex, radius, border, gap) and the tone matrix. It does not set component height or type. `ArrayItemIssueButton` uses that foundation plus `ui-array-item-issue-count` for its own 24px box. Its `compact` prop only switches the shared `ui-compact-label--counter` layout. That counter class stays shared because the issue button is not a Badge.
 
-Do not add `ui-badge--compact` or `ui-chip--compact`. Compact is the foundation, not a selectable variant of either component. `ArrayItemIssueButton`'s `compact` prop only switches counter versus label layout.
+Do not add `ui-badge--compact` or `ui-chip--compact`.
 
-`ui-badge` and `ui-chip` are extension points for a later, real visual difference. A single identity class is less specific than existing shared selectors such as `.ui-compact-label--interactive:not(.ui-compact-label--selected)`. When Badge or Chip diverges, move or specialize that one responsibility. Do not copy the compact-label matrix under the identity class.
+Selected, interactive, and `ui-compact-label__remove` stay on `ui-compact-label` for now. Their eventual owner is Chip. Do not copy the tone matrix onto Badge or Chip.
 
 `ChipGroup` stays layout-only. The removable chip's dismiss control stays `ui-compact-label__remove` and does not carry `ui-chip`.
 
@@ -101,13 +101,19 @@ chrome overrides (`gap-*`, `size-*`, `rounded-*`, `py-*`) to make a Badge fit.
 
 ## Size scale
 
-| Size | Height | Font                  | Typical use                          |
-| ---- | ------ | --------------------- | ------------------------------------ |
-| `sm` | 22px   | 11px (`text-fine-sm`) | Table cells, compact metadata        |
-| `md` | 31px   | 13px (`text-fine-md`) | Default field chips, removable chips |
-| `lg` | 41px   | 15px (`text-md`)      | Prominent removable chips            |
+Badge and Chip do not share a size ladder. Chip heights use the field-control tokens. Pass the field `size` through; there is no chip remap.
 
-`sm` is not valid for `Chip mode="removable"`.
+| Component | Size | Height                          | Font                                      |
+| --------- | ---- | ------------------------------- | ----------------------------------------- |
+| Badge     | `sm` | 22px                            | 10px (`--text-fine-xs`)                   |
+| Badge     | `md` | 31px                            | 13px (`--text-compact-label-md`)          |
+| Badge     | `lg` | 41px                            | 15px (`--text-compact-label-lg`)          |
+| Chip      | `xs` | `--control-height-compact` 24px | 10px (`--text-fine-xs`), 14px line-height |
+| Chip      | `sm` | `--control-height-sm` 32px      | 11px (`--text-compact-label-sm`)          |
+| Chip      | `md` | `--control-height-md` 36px      | 13px (`--text-compact-label-md`)          |
+| Chip      | `lg` | `--control-height-xl` 44px      | 15px (`--text-compact-label-lg`)          |
+
+Field `lg` is `--control-height-xl`, not the 40px button `--control-height-lg`.
 
 ## Badge appearances
 

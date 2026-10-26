@@ -3,7 +3,7 @@ import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '../../lib/utils'
 import type { BadgeAppearance, BadgeLayout, BadgeSize, BadgeTone } from './badge.variants'
-import { badgeLayoutVariants } from './badge.variants'
+import { badgeLayoutVariants, badgeSizeVariants } from './badge.variants'
 import type { CompactLabelEmphasis } from './compact-label.lib'
 import { resolveCompactLabelClassName } from './compact-label.variants'
 export {
@@ -48,8 +48,8 @@ function Badge({
 }: BadgeProps) {
   const resolvedClassName = cn(
     'ui-badge',
+    badgeSizeVariants({ size }),
     resolveCompactLabelClassName({
-      size,
       appearance,
       tone,
       emphasis,

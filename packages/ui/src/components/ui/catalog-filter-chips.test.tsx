@@ -82,7 +82,7 @@ describe('CatalogFilterChips', () => {
       />,
     )
 
-    expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('ui-compact-label--md')
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('ui-chip--md')
   })
 
   it('accepts an optional chipSize override', () => {
@@ -98,7 +98,7 @@ describe('CatalogFilterChips', () => {
       />,
     )
 
-    expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('ui-compact-label--sm')
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('ui-chip--sm')
   })
 
   it('associates the chip group with the visible label', () => {
@@ -163,7 +163,7 @@ describe('CatalogFilterChips', () => {
     const caption = screen.getByText('Category')
     expect(caption).toHaveClass('text-style-caption')
     expect(caption).not.toHaveClass('text-lg')
-    expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('ui-compact-label--sm')
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('ui-chip--sm')
   })
 
   itAxe('has no axe accessibility violations', async () => {

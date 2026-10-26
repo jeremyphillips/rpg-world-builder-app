@@ -94,7 +94,7 @@ Body rows (`__row`) compose `ui-interactive-row` once and drive a single inherit
 
 ## Compact label
 
-`ui-compact-label` is the Badge and Chip shell. The block border is 1px; block `gap` owns icon/text spacing. `--{sm,md,lg}` set height and type. `--{outline|soft|strong}-{tone}` set `--ui-compact-label-bg`, `--ui-compact-label-fg`, and `--ui-compact-label-border` with the same longhand list. `--subdued` mutes copy; `--selected` and `--interactive` are chip states (unselected interactive chips use dedicated hover rules in CSS). `--counter` tightens numeric badges; `--removable-{sm,md,lg}` adjust trailing padding for dismiss controls. Chip dismiss is `__remove`. ClassReference specs derive from `COMPACT_LABEL_CLASS_SPECS` / resolvers. twMerge groups: `ui-compact-label-size`, `ui-compact-label-appearance`.
+`ui-compact-label` is the shared Badge and Chip pill: 1px border, gap, and the tone matrix. It does not set size. `ui-badge--{sm,md,lg}` and `ui-chip--{xs,sm,md,lg}` own height, padding, and type. `--{outline|soft|strong}-{tone}` set `--ui-compact-label-bg`, `--ui-compact-label-fg`, and `--ui-compact-label-border` with the same longhand list. `--subdued` mutes copy. `--selected` and `--interactive` are chip states that still live on this block (eventual owner: Chip). `--counter` is the shared numeric layout used by Badge and `ArrayItemIssueButton`. `ui-chip--removable-*` adjusts trailing padding. Chip dismiss is `__remove`, with `ui-chip__remove--xs` for the 24px shell. twMerge groups: `ui-badge-size`, `ui-chip-size`, `ui-compact-label-appearance`.
 
 Overlay notification counts use `ui-notification-unread-badge` (not compact-label geometry).
 

@@ -39,6 +39,23 @@ describe('compact-label.css neutral borders', () => {
     expect(compactLabelCss).not.toContain('--color-semantic-neutral-border')
   })
 
+  it('keeps badge and chip size heights on their own modifiers', () => {
+    expect(compactLabelCss).toContain('.ui-badge--sm')
+    expect(compactLabelCss).toContain('height: 1.375rem; /* 22px */')
+    expect(compactLabelCss).toContain('font-size: var(--text-fine-xs);')
+    expect(compactLabelCss).toContain('.ui-badge--md')
+    expect(compactLabelCss).toContain('height: 31px;')
+    expect(compactLabelCss).toContain('.ui-badge--lg')
+    expect(compactLabelCss).toContain('height: 41px;')
+    expect(compactLabelCss).toContain('height: var(--control-height-compact);')
+    expect(compactLabelCss).toContain('height: var(--control-height-sm);')
+    expect(compactLabelCss).toContain('height: var(--control-height-md);')
+    expect(compactLabelCss).toContain('height: var(--control-height-xl);')
+    expect(compactLabelCss).not.toContain('.ui-compact-label--sm')
+    expect(compactLabelCss).not.toContain('.ui-compact-label--md')
+    expect(compactLabelCss).not.toContain('.ui-compact-label--lg')
+  })
+
   it('applies the surface-relative neutral border mix on each neutral appearance modifier', () => {
     for (const modifier of [
       'ui-compact-label--outline-neutral',

@@ -8,7 +8,8 @@ import {
   type CompactControlRecipeKey,
   type CompactControlStepperButtonSizeKey,
 } from './compact-control.styles'
-import { resolveCompactLabelClassName } from './compact-label.variants'
+import { badgeSizeVariants } from './badge.variants'
+import { chipSizeClass, type ChipSize } from './compact-label.lib'
 import { identityFrameFallbackVariants } from './identity-frame.variants'
 import { searchBarLeadingIconVariants } from './search-bar.variants'
 import { statusIconVariants } from './status-icon.variants'
@@ -53,11 +54,9 @@ const COMPACT_CONTROL_ICON_SIZE_CLASSES = [
   'ui-compact-control--stepper-button-lg',
 ]
 
-const COMPACT_LABEL_ICON_SIZE_CLASSES = [
-  'ui-compact-label--sm',
-  'ui-compact-label--md',
-  'ui-compact-label--lg',
-]
+const BADGE_ICON_SIZE_CLASSES = ['ui-badge--sm', 'ui-badge--md', 'ui-badge--lg']
+
+const CHIP_ICON_SIZE_CLASSES = ['ui-chip--xs', 'ui-chip--sm', 'ui-chip--md', 'ui-chip--lg']
 
 const IDENTITY_FRAME_FALLBACK_ICON_SIZE_CLASSES = [
   'ui-identity-frame__fallback--xs',
@@ -164,11 +163,16 @@ describe('icon owner class exclusivity', () => {
     }
   })
 
-  it('emits one compact-label icon-size class per size', () => {
+  it('emits one badge and one chip icon-size class per size', () => {
     for (const size of ['sm', 'md', 'lg'] as const) {
-      expect(
-        matchingClasses(resolveCompactLabelClassName({ size }), COMPACT_LABEL_ICON_SIZE_CLASSES),
-      ).toEqual([`ui-compact-label--${size}`])
+      expect(matchingClasses(badgeSizeVariants({ size }), BADGE_ICON_SIZE_CLASSES)).toEqual([
+        `ui-badge--${size}`,
+      ])
+    }
+    for (const size of ['xs', 'sm', 'md', 'lg'] as const satisfies readonly ChipSize[]) {
+      expect(matchingClasses(chipSizeClass(size), CHIP_ICON_SIZE_CLASSES)).toEqual([
+        `ui-chip--${size}`,
+      ])
     }
   })
 

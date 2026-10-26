@@ -30,7 +30,7 @@ export function TextSuggestionsActions({
           <Chip
             key={term}
             mode="selectable"
-            size="sm"
+            size="xs"
             selected={false}
             disabled={disabled}
             leadingIcon={null}

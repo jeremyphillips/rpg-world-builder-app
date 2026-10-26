@@ -761,7 +761,11 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
     filePath: compactLabelCssPath,
     dimensions: [
       ...(['sm', 'md', 'lg'] as const).map((name) => ({
-        modifierPrefix: `ui-compact-label--${name}`,
+        modifierPrefix: `ui-badge--${name}`,
+        requiredProperties: ['height', 'padding-inline', 'font-size', 'line-height'] as const,
+      })),
+      ...(['xs', 'sm', 'md', 'lg'] as const).map((name) => ({
+        modifierPrefix: `ui-chip--${name}`,
         requiredProperties: ['height', 'padding-inline', 'font-size', 'line-height'] as const,
       })),
       ...(['outline', 'soft', 'strong'] as const).flatMap((appearance) =>
@@ -793,15 +797,19 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
         ] as const,
       },
       {
-        modifierPrefix: 'ui-compact-label--removable-sm',
+        modifierPrefix: 'ui-chip--removable-xs',
         requiredProperties: ['padding-inline-end'] as const,
       },
       {
-        modifierPrefix: 'ui-compact-label--removable-md',
+        modifierPrefix: 'ui-chip--removable-sm',
         requiredProperties: ['padding-inline-end'] as const,
       },
       {
-        modifierPrefix: 'ui-compact-label--removable-lg',
+        modifierPrefix: 'ui-chip--removable-md',
+        requiredProperties: ['padding-inline-end'] as const,
+      },
+      {
+        modifierPrefix: 'ui-chip--removable-lg',
         requiredProperties: ['padding-inline-end'] as const,
       },
     ],

@@ -48,7 +48,8 @@ export {
   UI_CHOICE_CONTROL_KIND_CLASSES,
 } from '../components/ui/choice-control.styles'
 export { UI_COMPACT_CONTROL_SIZE_CLASSES } from '../components/ui/compact-control.styles'
-export { UI_COMPACT_LABEL_SIZE_CLASSES } from '../components/ui/compact-label.lib'
+export { UI_BADGE_SIZE_CLASSES } from '../components/ui/badge.variants'
+export { UI_CHIP_SIZE_CLASSES } from '../components/ui/compact-label.lib'
 export {
   UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,

@@ -4,10 +4,14 @@ import { Icon } from './icon/icon'
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import type { CompactLabelSize } from './compact-label.lib'
-import { chipRemoveButtonVariants, resolveCompactLabelClassName } from './compact-label.variants'
+import type { ChipSize } from './compact-label.lib'
+import {
+  chipRemoveButtonVariants,
+  resolveChipSizeClassName,
+  resolveCompactLabelClassName,
+} from './compact-label.variants'
 
-export type { CompactLabelSize as ChipSize }
+export type { ChipSize }
 
 type ChipBaseProps = {
   children: React.ReactNode
@@ -20,7 +24,7 @@ type ChipBaseProps = {
 
 export type ChipSelectableProps = ChipBaseProps & {
   mode: 'selectable'
-  size?: CompactLabelSize
+  size?: ChipSize
   selected: boolean
   onSelectedChange: (selected: boolean) => void
   selectionRole?: 'checkbox' | 'radio'
@@ -32,7 +36,7 @@ export type ChipRemovableProps = ChipBaseProps & {
   mode: 'removable'
   onRemove: () => void
   removeLabel: string
-  size?: CompactLabelSize
+  size?: ChipSize
   selected?: never
   onSelectedChange?: never
   selectionRole?: never
@@ -67,8 +71,8 @@ function SelectableChip({
       disabled={disabled}
       className={cn(
         'ui-chip',
+        resolveChipSizeClassName(size),
         resolveCompactLabelClassName({
-          size,
           selected,
           interactive: true,
           className,
@@ -98,8 +102,8 @@ function RemovableChip({
     <span
       className={cn(
         'ui-chip',
+        resolveChipSizeClassName(size, true),
         resolveCompactLabelClassName({
-          size,
           appearance: 'soft',
           tone: 'neutral',
           interactive: false,

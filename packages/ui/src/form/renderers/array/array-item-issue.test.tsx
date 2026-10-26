@@ -16,8 +16,12 @@ describe('array-item-issue', () => {
     )
 
     const badge = screen.getByRole('button', { name: '2 issues in Hero' })
-    expect(badge).toHaveClass('ui-compact-label', 'ui-compact-label--soft-destructive')
-    expect(badge).not.toHaveClass('ui-badge')
+    expect(badge).toHaveClass(
+      'ui-compact-label',
+      'ui-compact-label--soft-destructive',
+      'ui-array-item-issue-count',
+    )
+    expect(badge).not.toHaveClass('ui-badge', 'ui-chip')
     expect(badge).toHaveTextContent('2 issues')
     expect(badge.querySelector('svg')).toHaveClass('ui-icon--inline')
 
@@ -33,6 +37,8 @@ describe('array-item-issue', () => {
     const badge = screen.getByRole('button', { name: '2 issues in Grant 1' })
     expect(badge).toHaveTextContent('2')
     expect(badge).not.toHaveTextContent('issues')
+    expect(badge).toHaveClass('ui-compact-label--counter', 'ui-array-item-issue-count')
+    expect(badge).not.toHaveClass('ui-badge')
   })
 
   it('renders compact field summary text', () => {

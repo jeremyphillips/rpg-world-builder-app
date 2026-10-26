@@ -2,11 +2,13 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import {
+  chipRemovablePaddingClass,
+  chipSizeClass,
   compactLabelAppearanceToneClasses,
   compactLabelEmphasisClasses,
+  type ChipSize,
   type CompactLabelAppearance,
   type CompactLabelEmphasis,
-  type CompactLabelSize,
   type CompactLabelTone,
 } from './compact-label.lib'
 import { badgeLayoutVariants } from './badge.variants'
@@ -15,7 +17,6 @@ import {
   resolveCompactControlRecipeClasses,
 } from './compact-control.styles'
 export type CompactLabelVariantProps = {
-  size?: CompactLabelSize
   appearance?: CompactLabelAppearance
   tone?: CompactLabelTone
   emphasis?: CompactLabelEmphasis
@@ -24,20 +25,9 @@ export type CompactLabelVariantProps = {
   removable?: boolean
 }
 
-const compactLabelRemovablePaddingClasses: Record<CompactLabelSize, string> = {
-  sm: 'ui-compact-label--removable-sm',
-  md: 'ui-compact-label--removable-md',
-  lg: 'ui-compact-label--removable-lg',
-}
-
-/** Internal CVA — not exported from `@rpg/ui`. */
+/** Internal CVA — not exported from `@rpg/ui`. Size is not a shared axis. */
 export const compactLabelVariants = cva('ui-compact-label', {
   variants: {
-    size: {
-      sm: 'ui-compact-label--sm',
-      md: 'ui-compact-label--md',
-      lg: 'ui-compact-label--lg',
-    },
     selected: {
       true: 'ui-compact-label--selected',
       false: '',
@@ -48,14 +38,12 @@ export const compactLabelVariants = cva('ui-compact-label', {
     },
   },
   defaultVariants: {
-    size: 'md',
     selected: false,
     interactive: false,
   },
 })
 
 export function resolveCompactLabelClassName({
-  size = 'md',
   appearance = 'outline',
   tone = 'neutral',
   emphasis = 'default',
@@ -69,16 +57,18 @@ export function resolveCompactLabelClassName({
 
   return cn(
     compactLabelVariants({
-      size,
       selected,
       interactive,
     }),
     appearanceClasses,
     compactLabelEmphasisClasses(emphasis),
-    removable ? compactLabelRemovablePaddingClasses[size] : null,
     removable && !selected ? 'ui-compact-label--soft-neutral' : null,
     className,
   )
+}
+
+export function resolveChipSizeClassName(size: ChipSize, removable = false): string {
+  return cn(chipSizeClass(size), removable ? chipRemovablePaddingClass(size) : null)
 }
 
 export type CompactLabelVariants = VariantProps<typeof compactLabelVariants>
@@ -94,7 +84,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
   {
     key: 'badge / outline / neutral / md',
     className: resolveCompactLabelClassName({
-      size: 'md',
       appearance: 'outline',
       tone: 'neutral',
     }),
@@ -104,7 +93,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
   {
     key: 'badge / soft / destructive / sm',
     className: resolveCompactLabelClassName({
-      size: 'sm',
       appearance: 'soft',
       tone: 'destructive',
     }),
@@ -114,7 +102,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
   {
     key: 'badge / strong / info / md',
     className: resolveCompactLabelClassName({
-      size: 'md',
       appearance: 'strong',
       tone: 'info',
     }),
@@ -124,7 +111,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
   {
     key: 'badge / subdued / neutral soft / sm',
     className: resolveCompactLabelClassName({
-      size: 'sm',
       appearance: 'soft',
       tone: 'neutral',
       emphasis: 'subdued',
@@ -136,7 +122,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
     key: 'badge / counter / destructive soft / sm',
     className: cn(
       resolveCompactLabelClassName({
-        size: 'sm',
         appearance: 'soft',
         tone: 'destructive',
       }),
@@ -148,7 +133,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
   {
     key: 'chip / selectable / unselected / md',
     className: resolveCompactLabelClassName({
-      size: 'md',
       interactive: true,
       selected: false,
     }),
@@ -158,7 +142,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
   {
     key: 'chip / selectable / selected / md',
     className: resolveCompactLabelClassName({
-      size: 'md',
       interactive: true,
       selected: true,
     }),
@@ -168,7 +151,6 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
   {
     key: 'chip / removable / neutral soft / md',
     className: resolveCompactLabelClassName({
-      size: 'md',
       appearance: 'soft',
       tone: 'neutral',
       removable: true,
@@ -181,6 +163,7 @@ export const COMPACT_LABEL_CLASS_SPECS: readonly CompactLabelClassSpec[] = [
 export const chipRemoveButtonVariants = cva('ui-compact-label__remove ui-focus-ring', {
   variants: {
     size: {
+      xs: 'ui-chip__remove--xs',
       sm: resolveCompactControlIconCompactSmClasses(),
       md: resolveCompactControlRecipeClasses('icon-compact'),
       lg: resolveCompactControlRecipeClasses('icon-default'),

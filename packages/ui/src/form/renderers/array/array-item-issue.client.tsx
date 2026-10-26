@@ -54,11 +54,10 @@ export function ArrayItemIssueButton({
       onClick={onPress}
       className={cn(
         resolveCompactLabelClassName({
-          size: 'sm',
           appearance: 'soft',
           tone: 'destructive',
           className: cn(
-            'shrink-0',
+            'ui-array-item-issue-count shrink-0',
             compact && 'mt-0',
             badgeLayoutVariants({ layout: compact ? 'counter' : 'label' }),
           ),

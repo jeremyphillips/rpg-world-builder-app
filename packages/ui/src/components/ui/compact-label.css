@@ -1,6 +1,7 @@
 /*
  * Compact label (Badge and Chip). Appearance × tone modifiers share one property list.
- * Source order: block → size → appearance → state → remove.
+ * Size lives on ui-badge and ui-chip. Source order: block → appearance → state → remove.
+ * Selected, interactive, and __remove stay here for this pass; their eventual owner is Chip.
  */
 @layer components {
   .ui-compact-label {
@@ -17,15 +18,15 @@
     font-weight: var(--font-weight-medium);
   }
 
-  .ui-compact-label--sm {
-    height: var(--control-height-compact);
+  .ui-badge--sm {
+    height: 1.375rem; /* 22px */
     padding-inline: calc(var(--spacing) * 2);
-    font-size: var(--text-compact-label-sm);
-    line-height: var(--text-compact-label-sm--line-height);
+    font-size: var(--text-fine-xs);
+    line-height: var(--text-xs--line-height);
     --icon-size: var(--icon-glyph-xs);
   }
 
-  .ui-compact-label--md {
+  .ui-badge--md {
     height: 31px;
     padding-inline: calc(var(--spacing) * 3);
     font-size: var(--text-compact-label-md);
@@ -33,7 +34,7 @@
     --icon-size: var(--icon-glyph-sm);
   }
 
-  .ui-compact-label--lg {
+  .ui-badge--lg {
     height: 41px;
     padding-inline: calc(var(--spacing) * 4);
     font-size: var(--text-compact-label-lg);
@@ -41,13 +42,54 @@
     --icon-size: var(--icon-glyph-md);
   }
 
-  .ui-compact-label--removable-sm,
-  .ui-compact-label--removable-md {
+  .ui-chip--xs {
+    height: var(--control-height-compact);
+    padding-inline: calc(var(--spacing) * 1.5);
+    padding-block: 2px;
+    font-size: var(--text-fine-xs);
+    line-height: 0.875rem; /* 14px */
+    --icon-size: var(--icon-glyph-xs);
+  }
+
+  .ui-chip--sm {
+    height: var(--control-height-sm);
+    padding-inline: calc(var(--spacing) * 2);
+    font-size: var(--text-compact-label-sm);
+    line-height: var(--text-compact-label-sm--line-height);
+    --icon-size: var(--icon-glyph-xs);
+  }
+
+  .ui-chip--md {
+    height: var(--control-height-md);
+    padding-inline: calc(var(--spacing) * 3);
+    font-size: var(--text-compact-label-md);
+    line-height: var(--text-compact-label-md--line-height);
+    --icon-size: var(--icon-glyph-sm);
+  }
+
+  .ui-chip--lg {
+    height: var(--control-height-xl);
+    padding-inline: calc(var(--spacing) * 4);
+    font-size: var(--text-compact-label-lg);
+    line-height: var(--text-compact-label-lg--line-height);
+    --icon-size: var(--icon-glyph-md);
+  }
+
+  .ui-chip--removable-xs,
+  .ui-chip--removable-sm,
+  .ui-chip--removable-md {
     padding-inline-end: calc(var(--spacing) * 0.5);
   }
 
-  .ui-compact-label--removable-lg {
+  .ui-chip--removable-lg {
     padding-inline-end: calc(var(--spacing) * 1);
+  }
+
+  /* xs dismiss sits inside the 24px shell. Glyph is smaller than the hit target. */
+  .ui-chip__remove--xs {
+    width: 1rem;
+    height: 1rem;
+    --icon-size: var(--icon-glyph-xs);
   }
 
   .ui-compact-label--outline-neutral {

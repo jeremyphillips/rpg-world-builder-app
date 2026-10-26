@@ -16,7 +16,8 @@ import {
   UI_FLOATING_LABEL_SIZE_CLASSES,
   UI_COMPACT_CONTROL_SIZE_CLASSES,
   UI_COMPACT_LABEL_APPEARANCE_CLASSES,
-  UI_COMPACT_LABEL_SIZE_CLASSES,
+  UI_BADGE_SIZE_CLASSES,
+  UI_CHIP_SIZE_CLASSES,
   UI_ALERT_APPEARANCE_CLASSES,
   UI_ALERT_DENSITY_CLASSES,
   UI_METADATA_LIST_COLUMN_GAP_CLASSES,
@@ -134,7 +135,8 @@ type TypographyClassGroupIds =
   | 'ui-semantic-text-emphasis'
   | 'ui-field-group-layout'
   | 'ui-compact-control-size'
-  | 'ui-compact-label-size'
+  | 'ui-badge-size'
+  | 'ui-chip-size'
   | 'ui-compact-label-appearance'
   | 'ui-alert-appearance'
   | 'ui-alert-density'
@@ -207,7 +209,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-field-control-width': [...UI_FIELD_CONTROL_WIDTH_CLASSES],
       'ui-floating-label-size': [...UI_FLOATING_LABEL_SIZE_CLASSES],
       'ui-compact-control-size': [...UI_COMPACT_CONTROL_SIZE_CLASSES],
-      'ui-compact-label-size': [...UI_COMPACT_LABEL_SIZE_CLASSES],
+      'ui-badge-size': [...UI_BADGE_SIZE_CLASSES],
+      'ui-chip-size': [...UI_CHIP_SIZE_CLASSES],
       'ui-compact-label-appearance': [...UI_COMPACT_LABEL_APPEARANCE_CLASSES],
       'ui-alert-appearance': [...UI_ALERT_APPEARANCE_CLASSES],
       'ui-alert-density': [...UI_ALERT_DENSITY_CLASSES],
@@ -251,7 +254,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-field-control-width': ['ui-field-control-width'],
       'ui-floating-label-size': ['ui-floating-label-size'],
       'ui-compact-control-size': ['ui-compact-control-size'],
-      'ui-compact-label-size': ['ui-compact-label-size'],
+      'ui-badge-size': ['ui-badge-size'],
+      'ui-chip-size': ['ui-chip-size'],
       'ui-compact-label-appearance': ['ui-compact-label-appearance'],
       'ui-alert-appearance': ['ui-alert-appearance'],
       'ui-alert-density': ['ui-alert-density'],

@@ -30,10 +30,8 @@ import {
   UI_COMPACT_CONTROL_SIZE_CLASSES,
   COMPACT_CONTROL_RECIPE_SPECS,
 } from '../components/ui/compact-control.styles'
-import {
-  UI_COMPACT_LABEL_SIZE_CLASSES,
-  COMPACT_LABEL_SIZES,
-} from '../components/ui/compact-label.lib'
+import { UI_BADGE_SIZE_CLASSES } from '../components/ui/badge.variants'
+import { CHIP_SIZES, UI_CHIP_SIZE_CLASSES } from '../components/ui/compact-label.lib'
 import {
   UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,
@@ -156,9 +154,14 @@ describe('semantic-control-class-groups sync', () => {
 
   it('derives compact label, field group, and floating label classes from specs', () => {
     expectSameSet(
-      UI_COMPACT_LABEL_SIZE_CLASSES,
-      COMPACT_LABEL_SIZES.map((size) => `ui-compact-label--${size}`),
-      'compact label sizes',
+      UI_BADGE_SIZE_CLASSES,
+      ['ui-badge--sm', 'ui-badge--md', 'ui-badge--lg'],
+      'badge sizes',
+    )
+    expectSameSet(
+      UI_CHIP_SIZE_CLASSES,
+      CHIP_SIZES.map((size) => `ui-chip--${size}`),
+      'chip sizes',
     )
     expectSameSet(
       UI_FIELD_GROUP_SIZE_CLASSES,
