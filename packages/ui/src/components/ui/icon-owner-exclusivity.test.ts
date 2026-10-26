@@ -2,38 +2,30 @@ import { describe, expect, it } from 'vitest'
 
 import { buttonVariants } from './button.variants'
 import {
-  resolveCompactControlIconCompactSmClasses,
   resolveCompactControlRecipeClasses,
   resolveCompactControlStepperButtonClasses,
   type CompactControlRecipeKey,
   type CompactControlStepperButtonSizeKey,
 } from './compact-control.styles'
-import { resolveCompactLabelClassName } from './compact-label.variants'
+import { badgeSizeVariants } from './badge.variants'
+import { chipSizeClass, type ChipSize } from './chip.lib'
 import { identityFrameFallbackVariants } from './identity-frame.variants'
 import { searchBarLeadingIconVariants } from './search-bar.variants'
 import { statusIconVariants } from './status-icon.variants'
 
 const BUTTON_ICON_SIZE_CLASSES = [
   'ui-button--md',
-  'ui-button--md-compact',
   'ui-button--xs',
-  'ui-button--xs-compact',
   'ui-button--sm',
-  'ui-button--sm-compact',
   'ui-button--lg',
-  'ui-button--lg-compact',
   'ui-button--icon-md',
-  'ui-button--icon-compact',
   'ui-button--icon-xs',
+  'ui-button--icon-sm',
   'ui-button--icon-lg',
   'ui-button__text--default',
-  'ui-button__text--default-compact',
   'ui-button__text--sm',
-  'ui-button__text--sm-compact',
   'ui-button__text--xs',
-  'ui-button__text--xs-compact',
   'ui-button__text--lg',
-  'ui-button__text--lg-compact',
   'ui-button--attached-xs',
   'ui-button--attached-sm',
   'ui-button--attached-md',
@@ -42,7 +34,6 @@ const BUTTON_ICON_SIZE_CLASSES = [
 
 const COMPACT_CONTROL_ICON_SIZE_CLASSES = [
   'ui-compact-control--icon-compact',
-  'ui-compact-control--icon-compact-sm',
   'ui-compact-control--icon-xs',
   'ui-compact-control--icon-default',
   'ui-compact-control--icon-lg',
@@ -53,11 +44,9 @@ const COMPACT_CONTROL_ICON_SIZE_CLASSES = [
   'ui-compact-control--stepper-button-lg',
 ]
 
-const COMPACT_LABEL_ICON_SIZE_CLASSES = [
-  'ui-compact-label--sm',
-  'ui-compact-label--md',
-  'ui-compact-label--lg',
-]
+const BADGE_ICON_SIZE_CLASSES = ['ui-badge--sm', 'ui-badge--md', 'ui-badge--lg']
+
+const CHIP_ICON_SIZE_CLASSES = ['ui-chip--xs', 'ui-chip--sm', 'ui-chip--md', 'ui-chip--lg']
 
 const IDENTITY_FRAME_FALLBACK_ICON_SIZE_CLASSES = [
   'ui-identity-frame__fallback--xs',
@@ -94,15 +83,21 @@ describe('icon owner class exclusivity', () => {
     'text',
     'attached',
   ] as const
-  const buttonSizes = ['default', 'xs', 'sm', 'lg', 'icon', 'icon-xs', 'icon-lg'] as const
-  const densities = ['default', 'compact'] as const
+  const buttonSizes = [
+    'default',
+    'xs',
+    'sm',
+    'lg',
+    'icon',
+    'icon-xs',
+    'icon-sm',
+    'icon-lg',
+  ] as const
 
   it('emits at most one button icon-size class', () => {
     for (const variant of buttonVariantsInputs) {
       for (const size of buttonSizes) {
-        for (const density of densities) {
-          expectAtMostOne(buttonVariants({ variant, size, density }), BUTTON_ICON_SIZE_CLASSES)
-        }
+        expectAtMostOne(buttonVariants({ variant, size }), BUTTON_ICON_SIZE_CLASSES)
       }
     }
   })
@@ -141,13 +136,6 @@ describe('icon owner class exclusivity', () => {
         ),
       ).toHaveLength(1)
     }
-    expect(
-      matchingClasses(
-        resolveCompactControlIconCompactSmClasses(),
-        COMPACT_CONTROL_ICON_SIZE_CLASSES,
-      ),
-    ).toEqual(['ui-compact-control--icon-compact-sm'])
-
     const stepperSizes = [
       'xs',
       'sm',
@@ -164,11 +152,16 @@ describe('icon owner class exclusivity', () => {
     }
   })
 
-  it('emits one compact-label icon-size class per size', () => {
+  it('emits one badge and one chip icon-size class per size', () => {
     for (const size of ['sm', 'md', 'lg'] as const) {
-      expect(
-        matchingClasses(resolveCompactLabelClassName({ size }), COMPACT_LABEL_ICON_SIZE_CLASSES),
-      ).toEqual([`ui-compact-label--${size}`])
+      expect(matchingClasses(badgeSizeVariants({ size }), BADGE_ICON_SIZE_CLASSES)).toEqual([
+        `ui-badge--${size}`,
+      ])
+    }
+    for (const size of ['xs', 'sm', 'md', 'lg'] as const satisfies readonly ChipSize[]) {
+      expect(matchingClasses(chipSizeClass(size), CHIP_ICON_SIZE_CLASSES)).toEqual([
+        `ui-chip--${size}`,
+      ])
     }
   })
 

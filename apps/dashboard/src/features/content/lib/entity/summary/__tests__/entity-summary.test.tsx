@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
+import { EntityRowInlineDensityProvider, type ContentCardDensity } from '@rpg/ui'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
@@ -9,6 +10,7 @@ import {
   EntitySummaryStatus,
   EntitySummarySupportingMetadata,
 } from '../entity-summary'
+import { EntitySummaryStatusItemView } from '../entity-summary-status'
 
 describe('EntitySummaryHeading', () => {
   it('keeps classification immediately adjacent for short titles', () => {
@@ -148,7 +150,7 @@ describe('EntitySummaryStatus', () => {
 
     const statusRow = container.querySelector('[data-entity-summary-status-row]')
     expect(statusRow).not.toHaveClass('mt-1')
-    expect(screen.getByText('Spellcasting focus')).toHaveClass('ui-compact-label--sm')
+    expect(screen.getByText('Spellcasting focus')).toHaveClass('ui-badge--sm')
   })
 
   it('renders comfortable status badges at sm density', () => {
@@ -159,7 +161,19 @@ describe('EntitySummaryStatus', () => {
       />,
     )
 
-    expect(screen.getByText('Equipped')).toHaveClass('ui-compact-label--sm')
+    expect(screen.getByText('Equipped')).toHaveClass('ui-badge--sm')
+  })
+
+  it('renders spacious status badges at md density', () => {
+    render(
+      <EntitySummaryStatus
+        density="spacious"
+        items={[{ kind: 'badge', label: 'Member', tone: 'neutral' }]}
+      />,
+    )
+
+    expect(screen.getByText('Member')).toHaveClass('ui-badge--md')
+    expect(screen.getByText('Member')).not.toHaveClass('ui-badge--sm')
   })
 
   it('defaults to the wrapped cluster without separators', () => {
@@ -426,5 +440,116 @@ describe('EntitySummaryStatus', () => {
       )
       await expectNoAxeViolations(container)
     })
+  })
+})
+
+const BADGE_GLYPH_CSS = `
+  :root {
+    --icon-glyph-xs: 10px;
+    --icon-glyph-sm: 12px;
+  }
+  .ui-badge--sm { --icon-size: var(--icon-glyph-xs); }
+  .ui-badge--md { --icon-size: var(--icon-glyph-sm); }
+  .ui-icon { width: var(--icon-size); height: var(--icon-size); }
+`
+
+function installBadgeGlyphStyles(): HTMLStyleElement {
+  const style = document.createElement('style')
+  style.setAttribute('data-test', 'status-badge-glyph')
+  style.textContent = BADGE_GLYPH_CSS
+  document.head.appendChild(style)
+  return style
+}
+
+function px(value: string): number {
+  return Number.parseFloat(value)
+}
+
+/** jsdom keeps `width: var(--icon-size)` specified. Resolve that variable to the root glyph token. */
+function resolvedGlyphPx(badge: Element, glyph: Element): number {
+  expect(getComputedStyle(glyph).width).toBe('var(--icon-size)')
+  expect(getComputedStyle(glyph).height).toBe('var(--icon-size)')
+  const iconSize = getComputedStyle(badge).getPropertyValue('--icon-size').trim()
+  const token = iconSize.match(/^var\((--[\w-]+)\)$/)?.[1]
+  expect(token, iconSize).toBeTruthy()
+  return px(getComputedStyle(document.documentElement).getPropertyValue(token!).trim())
+}
+
+describe('EntitySummaryStatusItemView badge density', () => {
+  afterEach(() => {
+    document.querySelector('[data-test="status-badge-glyph"]')?.remove()
+  })
+
+  it.each([
+    { density: 'compact' as const, badgeClass: 'ui-badge--sm', glyphPx: 10 },
+    { density: 'comfortable' as const, badgeClass: 'ui-badge--sm', glyphPx: 10 },
+    { density: 'spacious' as const, badgeClass: 'ui-badge--md', glyphPx: 12 },
+  ])('sizes $density from the view prop', ({ density, badgeClass, glyphPx }) => {
+    installBadgeGlyphStyles()
+    render(
+      <EntitySummaryStatusItemView
+        density={density}
+        item={{ kind: 'badge', label: 'Unavailable', tone: 'warning', leadingIcon: 'warning' }}
+      />,
+    )
+
+    const badge = screen.getByText('Unavailable')
+    expect(badge).toHaveClass(badgeClass)
+    const glyph = badge.querySelector('svg')
+    expect(glyph).toHaveClass('ui-icon--owner')
+    expect(resolvedGlyphPx(badge, glyph!)).toBe(glyphPx)
+  })
+
+  it('defaults omitted density to comfortable', () => {
+    installBadgeGlyphStyles()
+    render(
+      <EntitySummaryStatusItemView
+        item={{ kind: 'badge', label: 'Unavailable', leadingIcon: 'check' }}
+      />,
+    )
+
+    const badge = screen.getByText('Unavailable')
+    expect(badge).toHaveClass('ui-badge--sm')
+    expect(resolvedGlyphPx(badge, badge.querySelector('svg')!)).toBe(10)
+  })
+
+  it('keeps an ancestor provider from overriding the view density', () => {
+    render(
+      <EntityRowInlineDensityProvider density="spacious">
+        <EntitySummaryStatusItemView
+          density="compact"
+          item={{ kind: 'badge', label: 'Unavailable' }}
+        />
+      </EntityRowInlineDensityProvider>,
+    )
+
+    expect(screen.getByText('Unavailable')).toHaveClass('ui-badge--sm')
+    expect(screen.getByText('Unavailable')).not.toHaveClass('ui-badge--md')
+  })
+
+  it('passes EntitySummaryStatus density through to the badge', () => {
+    render(
+      <EntitySummaryStatus
+        density={'spacious' satisfies ContentCardDensity}
+        items={[{ kind: 'badge', label: 'Outer' }]}
+      />,
+    )
+
+    expect(screen.getByText('Outer')).toHaveClass('ui-badge--md')
+  })
+
+  it('renders text, inactive, and validation status without a badge', () => {
+    render(
+      <>
+        <EntitySummaryStatusItemView item={{ kind: 'text', label: 'Capacity full' }} />
+        <EntitySummaryStatusItemView item={{ kind: 'inactive', label: 'Inactive' }} />
+        <EntitySummaryStatusItemView item={{ kind: 'validationError' }} />
+      </>,
+    )
+
+    expect(screen.getByText('Capacity full')).not.toHaveClass('ui-badge')
+    expect(screen.getByText('Inactive').closest('.ui-badge')).toBeNull()
+    expect(screen.getByText('Has validation errors')).toBeInTheDocument()
+    expect(screen.queryByText('Has validation errors')?.closest('.ui-badge')).toBeNull()
   })
 })

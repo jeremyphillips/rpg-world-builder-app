@@ -87,7 +87,11 @@ export function OrganizationLocationConnectionsSection({
 
   return (
     <div className="space-y-4">
-      {mutationError ? <SemanticText tone="destructive">{mutationError}</SemanticText> : null}
+      {mutationError ? (
+        <Text as="span" variant="supporting">
+          <SemanticText tone="destructive">{mutationError}</SemanticText>
+        </Text>
+      ) : null}
 
       {isPending ? (
         <Text variant="muted">Loading…</Text>

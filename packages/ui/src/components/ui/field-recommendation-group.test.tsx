@@ -50,7 +50,7 @@ describe('FieldRecommendationGroupView', () => {
   it('uses sm compact outline buttons for collection actions', () => {
     renderGroup('compact')
     const addButton = screen.getByRole('button', { name: 'Add Dagger' })
-    expect(addButton).toHaveClass('ui-button--outline', 'ui-button--sm-compact')
+    expect(addButton).toHaveClass('ui-button--outline', 'ui-button--xs')
   })
 
   it('does not show bulk add for two or fewer actionable items', () => {
@@ -98,7 +98,7 @@ describe('FieldRecommendationGroupView', () => {
 
     const bulkButton = screen.getByRole('button', { name: 'Add all 3 recommended weapons' })
     expect(bulkButton).toHaveTextContent('Add all')
-    expect(bulkButton).toHaveClass('ui-button--ghost', 'ui-button--sm-compact')
+    expect(bulkButton).toHaveClass('ui-button--ghost', 'ui-button--xs')
     expect(bulkButton).toHaveAttribute('data-field-recommendation-bulk', '')
     const header = bulkButton.parentElement
     expect(header).toHaveClass('flex', 'flex-wrap', 'items-center')
@@ -244,7 +244,7 @@ describe('FieldRecommendationInline parity', () => {
     )
 
     const addButton = screen.getByRole('button', { name: 'Add Draconic' })
-    expect(addButton).toHaveClass('ui-button__text--sm-compact', 'text-primary')
+    expect(addButton).toHaveClass('ui-button__text--xs', 'text-primary')
     expect(screen.getByText(/Recommended for this creature type/)).toBeInTheDocument()
   })
 })

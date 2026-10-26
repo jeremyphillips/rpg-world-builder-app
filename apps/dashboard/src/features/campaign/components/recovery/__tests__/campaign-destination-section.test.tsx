@@ -48,7 +48,7 @@ describe('CampaignDestinationSection', () => {
 
     const anatomy = container.querySelector('.dash-entity-anatomy')
     expect(anatomy).toHaveClass('dash-entity-anatomy--spacious')
-    expect(screen.getByText('Setup incomplete')).toHaveClass('ui-compact-label--md')
+    expect(screen.getByText('Setup incomplete')).toHaveClass('ui-badge--md')
   })
 
   it('wraps destination supporting copy', () => {

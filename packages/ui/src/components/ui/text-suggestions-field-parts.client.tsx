@@ -6,7 +6,7 @@ import { ChipGroup } from './chip-group.client'
 import { fieldAnatomyStackClasses, fieldChipWrapGapClasses } from './field.variants'
 import { formatTextSuggestionLabel } from './text-suggestions-field.lib'
 
-const RECOMMENDED_LABEL_CLASS = 'text-xs-meta font-medium text-muted-foreground'
+const RECOMMENDED_LABEL_CLASS = 'text-fine-sm font-medium text-muted-foreground'
 
 interface TextSuggestionsActionsProps {
   suggestions: readonly string[]
@@ -30,7 +30,7 @@ export function TextSuggestionsActions({
           <Chip
             key={term}
             mode="selectable"
-            size="sm"
+            size="xs"
             selected={false}
             disabled={disabled}
             leadingIcon={null}

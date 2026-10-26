@@ -4,7 +4,6 @@ import { textActionVariants, type TextActionTone } from './text-action.variants'
 
 type ButtonAppearanceShared = {
   size?: ButtonVariantProps['size']
-  density?: ButtonVariantProps['density']
   className?: string
 }
 
@@ -24,14 +23,13 @@ type ResolveButtonAppearanceInput = ButtonAppearanceShared & {
 export function resolveButtonAppearance({
   variant = 'default',
   size,
-  density,
   tone,
   className,
 }: ResolveButtonAppearanceInput = {}): string {
   const resolvedVariant = variant ?? 'default'
 
   return cn(
-    buttonVariants({ variant: resolvedVariant, size, density }),
+    buttonVariants({ variant: resolvedVariant, size }),
     resolvedVariant === 'text' ? textActionVariants({ context: 'standalone', tone }) : null,
     className,
   )

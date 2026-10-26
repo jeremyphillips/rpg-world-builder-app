@@ -1,0 +1,133 @@
+/*
+ * Chip size, removable fill, selection, and dismiss.
+ * Selectable surfaces use longhands so they beat the pill variables.
+ * Unselected hover stays in this layer — Tailwind bg-* utilities would override it.
+ */
+@layer components {
+  .ui-chip--xs {
+    height: var(--control-height-compact);
+    padding-inline: calc(var(--spacing) * 1.5);
+    padding-block: 2px;
+    font-size: var(--text-fine-xs);
+    line-height: var(--text-fine-xs--line-height);
+    --icon-size: var(--icon-glyph-xs);
+  }
+
+  .ui-chip--sm {
+    height: var(--control-height-sm);
+    padding-inline: calc(var(--spacing) * 2);
+    font-size: var(--text-chip-sm);
+    line-height: var(--text-chip-sm--line-height);
+    --icon-size: var(--icon-glyph-xs);
+  }
+
+  .ui-chip--md {
+    height: var(--control-height-md);
+    padding-inline: calc(var(--spacing) * 3);
+    font-size: var(--text-chip-md);
+    line-height: var(--text-chip-md--line-height);
+    --icon-size: var(--icon-glyph-sm);
+  }
+
+  .ui-chip--lg {
+    height: var(--control-height-xl);
+    padding-inline: calc(var(--spacing) * 4);
+    font-size: var(--text-chip-lg);
+    line-height: var(--text-chip-lg--line-height);
+    --icon-size: var(--icon-glyph-md);
+  }
+
+  .ui-chip--removable {
+    --ui-pill-bg: var(--semantic-neutral-soft-bg);
+    --ui-pill-fg: var(--semantic-neutral-soft-foreground);
+    --ui-pill-border: var(--ui-border-color);
+  }
+
+  .ui-chip--removable-xs,
+  .ui-chip--removable-sm,
+  .ui-chip--removable-md {
+    padding-inline-end: calc(var(--spacing) * 0.5);
+  }
+
+  .ui-chip--removable-lg {
+    padding-inline-end: calc(var(--spacing) * 1);
+  }
+
+  /* Dismiss geometry is chip-owned. Glyph follows this box, not the chip shell. */
+  .ui-chip__remove--xs {
+    width: 1rem;
+    height: 1rem;
+    --icon-size: var(--icon-glyph-xs);
+  }
+
+  .ui-chip__remove--sm {
+    width: var(--control-action-compact-height);
+    height: var(--control-action-compact-height);
+    --icon-size: var(--icon-glyph-sm);
+  }
+
+  .ui-chip__remove--md {
+    width: var(--control-action-compact-height);
+    height: var(--control-action-compact-height);
+    --icon-size: var(--icon-glyph-md);
+  }
+
+  .ui-chip__remove--lg {
+    width: var(--control-action-default-height);
+    height: var(--control-action-default-height);
+    --icon-size: var(--icon-glyph-lg);
+  }
+
+  .ui-chip--selected {
+    border-color: var(--color-selected-control-border);
+    background-color: var(--color-selected-control);
+    color: var(--color-selected-control-foreground);
+  }
+
+  .ui-chip--interactive {
+    cursor: pointer;
+  }
+
+  .ui-chip--interactive:not(.ui-chip--selected) {
+    border-color: var(--border);
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  .ui-chip--interactive:not(.ui-chip--selected):hover {
+    background-color: var(--color-control-hover);
+  }
+
+  .ui-chip--interactive:not(.ui-chip--selected):active {
+    background-color: color-mix(in oklch, var(--color-control-hover) 88%, var(--foreground) 12%);
+  }
+
+  .ui-chip--interactive:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .ui-chip__remove {
+    display: inline-flex;
+    flex-shrink: 0;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    border-radius: calc(infinity * 1px);
+    color: var(--muted-foreground);
+  }
+
+  .ui-chip__remove svg {
+    pointer-events: none;
+  }
+
+  .ui-chip__remove:hover {
+    background-color: var(--color-control-hover);
+    color: var(--foreground);
+  }
+
+  .ui-chip__remove:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}

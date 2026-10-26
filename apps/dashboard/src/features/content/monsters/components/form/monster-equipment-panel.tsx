@@ -20,6 +20,7 @@ import {
   FieldRecommendationGroupView,
   InsetPanel,
   SemanticText,
+  Text,
   iconGhostControlVariants,
 } from '@rpg/ui'
 
@@ -231,9 +232,11 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
   return (
     <div data-form-focus="equipment" tabIndex={-1} className="flex flex-col gap-4">
       {gateReason ? (
-        <SemanticText tone={status === 'error' ? 'destructive' : 'warning'}>
-          {gateReason}
-        </SemanticText>
+        <Text as="span" variant="supporting">
+          <SemanticText tone={status === 'error' ? 'destructive' : 'warning'}>
+            {gateReason}
+          </SemanticText>
+        </Text>
       ) : null}
 
       <EquipmentInventorySectionHeader

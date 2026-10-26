@@ -1,12 +1,12 @@
-import { SemanticText, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 import type {
   CharacterImportFieldResult,
   RecognizedEquipmentItem,
 } from '@rpg/contracts/character-import'
 
+import { CharacterImportSemanticText } from './character-import-semantic-text'
 import {
   EXTRACTION_UNSET_DISPLAY_VALUE,
-  PREVIEW_VALUE_TEXT_CLASS,
   extractionIssueTone,
   extractionValueEmphasis,
   extractionValueTone,
@@ -33,46 +33,37 @@ export function CharacterImportEquipmentPreviewSection({
       <Text variant="emphasis">Equipment</Text>
       {isUnset || !equipment ? (
         <>
-          <SemanticText
+          <CharacterImportSemanticText
             tone={extractionValueTone(result)}
             emphasis={extractionValueEmphasis(result)}
-            className={PREVIEW_VALUE_TEXT_CLASS}
           >
             {EXTRACTION_UNSET_DISPLAY_VALUE}
-          </SemanticText>
+          </CharacterImportSemanticText>
           {shouldShowExtractionIssue(result) ? (
-            <SemanticText
-              tone={extractionIssueTone(result)}
-              emphasis="low"
-              className={PREVIEW_VALUE_TEXT_CLASS}
-            >
+            <CharacterImportSemanticText tone={extractionIssueTone(result)} emphasis="low">
               {result.issues.join(' ')}
-            </SemanticText>
+            </CharacterImportSemanticText>
           ) : null}
         </>
       ) : (
         <>
-          <SemanticText tone="neutral" emphasis="medium" className={PREVIEW_VALUE_TEXT_CLASS}>
+          <CharacterImportSemanticText tone="neutral" emphasis="medium">
             {supported.length > 0
               ? formatSupportedEquipmentValue(supported)
               : EXTRACTION_UNSET_DISPLAY_VALUE}
-          </SemanticText>
+          </CharacterImportSemanticText>
           {unsupported.length > 0 ? (
             <div className="grid gap-1">
               <Text variant="emphasis">Unsupported:</Text>
-              <SemanticText tone="warning" emphasis="medium" className={PREVIEW_VALUE_TEXT_CLASS}>
+              <CharacterImportSemanticText tone="warning" emphasis="medium">
                 {unsupported.map((entry) => formatEquipmentItemLabel(entry)).join(', ')}
-              </SemanticText>
+              </CharacterImportSemanticText>
             </div>
           ) : null}
           {shouldShowExtractionIssue(result) ? (
-            <SemanticText
-              tone={extractionIssueTone(result)}
-              emphasis="low"
-              className={PREVIEW_VALUE_TEXT_CLASS}
-            >
+            <CharacterImportSemanticText tone={extractionIssueTone(result)} emphasis="low">
               {result.issues.join(' ')}
-            </SemanticText>
+            </CharacterImportSemanticText>
           ) : null}
         </>
       )}

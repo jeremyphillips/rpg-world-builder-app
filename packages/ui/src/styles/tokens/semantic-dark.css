@@ -158,7 +158,7 @@
 
   /*
    * Selected compact control — inverted fill for chosen options.
-   * Affects: selectable Chip, compact-label selected appearance (`bg-selected-control`, …).
+   * Affects: selectable Chip (`ui-chip--selected`).
    */
   --selected-control: var(--foreground);
   --selected-control-foreground: var(--background);

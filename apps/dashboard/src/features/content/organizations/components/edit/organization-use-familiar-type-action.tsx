@@ -27,7 +27,6 @@ export function OrganizationUseFamiliarTypeAction() {
       variant="text"
       tone="neutral"
       size={INLINE_HEADER_ACTION_BUTTON_SIZE}
-      density="compact"
       className="shrink-0"
       onClick={openEditFamiliarType}
     >

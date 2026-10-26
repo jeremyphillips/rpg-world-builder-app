@@ -13,6 +13,9 @@ describe('ValidationIssueCountBadge', () => {
     render(<ValidationIssueCountBadge count={3} />)
 
     expect(screen.getByText('3')).toBeInTheDocument()
-    expect(document.querySelector('[data-icon="triangle-alert"]')).toBeInTheDocument()
+    const icon = document.querySelector('[data-icon="triangle-alert"]')
+    expect(icon).toBeInTheDocument()
+    expect(icon).toHaveClass('ui-icon--owner')
+    expect(icon).not.toHaveClass('ui-icon--2xl', 'ui-icon--inline')
   })
 })

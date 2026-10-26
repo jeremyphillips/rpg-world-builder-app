@@ -50,7 +50,7 @@ describe('text-style stack ratchet (repo)', () => {
     for (const file of collect(dashboardSrc)) {
       if (!file.endsWith('.variants.ts')) continue
       const source = readSource(file)
-      if (FORBIDDEN_VARIANTS_TEXT_XS.test(source) && !source.includes('text-xs-meta')) {
+      if (FORBIDDEN_VARIANTS_TEXT_XS.test(source)) {
         hits.push(file)
       }
     }

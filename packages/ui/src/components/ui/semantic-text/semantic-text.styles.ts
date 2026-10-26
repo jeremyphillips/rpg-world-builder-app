@@ -4,7 +4,7 @@ export const SEMANTIC_TEXT_CLASS_SPECS = [
   {
     key: 'neutral',
     className: semanticTextVariants({ tone: 'neutral' }),
-    keyValues: 'muted mix, medium weight, text-xs on the block',
+    keyValues: 'muted mix, medium weight — typography from owner',
     useCase: 'Secondary metadata',
   },
   {

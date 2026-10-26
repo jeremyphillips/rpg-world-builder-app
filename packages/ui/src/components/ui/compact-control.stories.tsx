@@ -64,10 +64,10 @@ export const HitTargetPairings: Story = {
 export const ButtonIntegration: Story = {
   render: () => (
     <div className="flex items-center gap-3">
-      <Button size="icon" density="compact" aria-label="Remove">
+      <Button size="icon-xs" aria-label="Remove">
         <Icon name="plus" size="2xl" />
       </Button>
-      <Button size="sm" density="compact">
+      <Button size="xs">
         <Icon name="settings" size="2xl" />
         Compact
       </Button>

@@ -31,7 +31,7 @@ export const Display: Story = {
   },
 }
 
-/** Page hero titles — 19px mobile, 24px md, 34px lg+. */
+/** Page hero titles — 18px mobile, 20px md, 34px lg+. */
 export const HeroTitle: Story = {
   args: {
     variant: 'heroTitle',
@@ -76,7 +76,7 @@ export const Card: Story = {
   },
 }
 
-/** Modal/Sheet titles — 19px mobile, 24px from md. */
+/** Modal/Sheet titles — 18px mobile, 20px from md. */
 export const DialogTitle: Story = {
   args: {
     variant: 'dialogTitle',
@@ -85,7 +85,7 @@ export const DialogTitle: Story = {
   },
 }
 
-/** ConfirmDialog titles — 19px at all sizes. */
+/** ConfirmDialog titles — 18px at all sizes. */
 export const ConfirmDialogTitle: Story = {
   args: {
     variant: 'confirmDialogTitle',

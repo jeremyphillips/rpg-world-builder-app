@@ -496,7 +496,6 @@ function QuickNpcStartingEquipmentPackageSection({
           <Button
             type="button"
             size="xs"
-            density="compact"
             onClick={() => {
               if (onlyPackage) {
                 writeExplicitPackage(onlyPackage.optionId, {})
@@ -546,7 +545,6 @@ function QuickNpcStartingEquipmentPackageSection({
               type="button"
               variant="text"
               size="xs"
-              density="compact"
               onClick={() => {
                 setIsPackageChooserExpanded(false)
                 setChooserFromDeclined(false)

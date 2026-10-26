@@ -3,7 +3,6 @@ import { useState } from 'react'
 
 import {
   ActionIcon,
-  Badge,
   Button,
   ComboboxOptionRow,
   Card,
@@ -95,7 +94,7 @@ function RemoveUtility({ label }: { label: string }) {
 
 function SelectAction() {
   return (
-    <Button type="button" variant="text" size="sm" density="compact">
+    <Button type="button" variant="text" size="xs">
       Select
     </Button>
   )
@@ -172,7 +171,7 @@ function CatalogCardRecipe() {
       trailing={{
         kind: 'group',
         primary: (
-          <Button type="button" variant="text" size="sm" density="compact">
+          <Button type="button" variant="text" size="xs">
             Add
           </Button>
         ),
@@ -815,7 +814,8 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
           <IdentityRowHeadingLine
             heading="Harbor District"
             classification="Settlement"
-            headingEnd={<Badge tone="warning">Unavailable</Badge>}
+            density="comfortable"
+            headingBadge={{ tone: 'warning', children: 'Unavailable' }}
           />
         </CardHeader>
       </Card>

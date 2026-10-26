@@ -12,7 +12,7 @@ export function ChoiceAddAction({ compactAddLabel, isFull, onClick }: ChoiceAddA
       action={isFull ? 'edit' : 'add'}
       variant="text"
       tone="accent"
-      density="compact"
+      size="xs"
       onClick={onClick}
     >
       {compactAddLabel}

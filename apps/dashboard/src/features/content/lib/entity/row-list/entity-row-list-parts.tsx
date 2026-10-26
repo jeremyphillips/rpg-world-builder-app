@@ -70,7 +70,6 @@ function EntityRowListHeaderAction({ action }: { action: EntityRowListAction }) 
       action="add"
       variant="text"
       size="sm"
-      density="compact"
       disabled={action.disabled}
       onClick={action.onSelect}
     >

@@ -113,7 +113,6 @@ export function SelectionOptionCardHeaderAction({
       type="button"
       variant="text"
       size={buttonSize}
-      density="compact"
       className={cn('shrink-0', density === 'compact' && 'text-control-action-xs')}
       aria-label={ariaLabel}
       onClick={onClick}

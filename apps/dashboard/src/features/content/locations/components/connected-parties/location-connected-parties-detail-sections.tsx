@@ -103,7 +103,9 @@ function LocationConnectedPartiesSections({
   return (
     <div className="space-y-8">
       {detail.mutationError ? (
-        <SemanticText tone="destructive">{detail.mutationError}</SemanticText>
+        <Text as="span" variant="supporting">
+          <SemanticText tone="destructive">{detail.mutationError}</SemanticText>
+        </Text>
       ) : null}
 
       {detail.showTerritorialSection ? (

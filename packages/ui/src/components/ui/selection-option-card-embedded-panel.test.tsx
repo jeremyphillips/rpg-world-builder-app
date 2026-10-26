@@ -29,7 +29,7 @@ describe('SelectionOptionCardEmbeddedPanel', () => {
               value={6}
               onChange={() => undefined}
             />
-            <Button type="button" variant="text" size="xs" density="compact">
+            <Button type="button" variant="text" size="xs">
               Remove
             </Button>
           </SelectionOptionCardEmbeddedPanelRow>
@@ -37,7 +37,7 @@ describe('SelectionOptionCardEmbeddedPanel', () => {
             <SelectionOptionCardEmbeddedPanelRowStatus>
               Removed
             </SelectionOptionCardEmbeddedPanelRowStatus>
-            <Button type="button" variant="text" size="xs" density="compact">
+            <Button type="button" variant="text" size="xs">
               Restore
             </Button>
           </SelectionOptionCardEmbeddedPanelRow>

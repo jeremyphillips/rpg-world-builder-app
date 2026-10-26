@@ -271,7 +271,7 @@ export const EmbeddedDependentChoice: Story = {
             />
             <SelectionOptionCardEmbeddedPanelList>
               <SelectionOptionCardEmbeddedPanelRow label="Forest Gnome">
-                <Button type="button" variant="text" size="xs" density="compact">
+                <Button type="button" variant="text" size="xs">
                   Select
                 </Button>
               </SelectionOptionCardEmbeddedPanelRow>

@@ -113,7 +113,6 @@ export function QuickNpcPackageCustomizationPanel({
                   type="button"
                   variant="text"
                   size="xs"
-                  density="compact"
                   aria-label={quickNpcRemoveAriaLabel(row.label, packageLabel)}
                   onClick={() => onRemove(row.entryId, row.packageQuantity)}
                 >
@@ -125,7 +124,6 @@ export function QuickNpcPackageCustomizationPanel({
                   type="button"
                   variant="text"
                   size="xs"
-                  density="compact"
                   aria-label={quickNpcRestoreAriaLabel(row.label)}
                   onClick={() => onRestore(row.entryId)}
                 >
@@ -152,24 +150,16 @@ export function QuickNpcPackageCustomizationPanel({
           type="button"
           variant="text"
           size="xs"
-          density="compact"
           disabled={allDefaults}
           onClick={onRestoreAll}
         >
           {QUICK_NPC_RESTORE_ALL_LABEL}
         </Button>
         <div className="flex items-center gap-2">
-          <Button type="button" variant="text" size="xs" density="compact" onClick={onCancel}>
+          <Button type="button" variant="text" size="xs" onClick={onCancel}>
             {QUICK_NPC_CANCEL_LABEL}
           </Button>
-          <Button
-            ref={saveButtonRef}
-            type="button"
-            size="xs"
-            density="compact"
-            disabled={!dirty}
-            onClick={onSave}
-          >
+          <Button ref={saveButtonRef} type="button" size="xs" disabled={!dirty} onClick={onSave}>
             {QUICK_NPC_SAVE_CUSTOMIZATION_LABEL}
           </Button>
         </div>

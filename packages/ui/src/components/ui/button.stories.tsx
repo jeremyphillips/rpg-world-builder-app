@@ -13,7 +13,7 @@ const meta = {
     semanticClasses: true,
     docs: {
       description: {
-        component: `${UI_BUTTON_BLOCK_CLASS} owns labeled, icon, text, and attached geometry in CSS. Appearances use semantic modifiers; compact density maps to \`--compact\` size modifiers.`,
+        component: `${UI_BUTTON_BLOCK_CLASS} owns labeled, icon, text, and attached geometry in CSS. Appearances use semantic modifiers; \`size="xs"\` is the 24px micro tier.`,
       },
     },
   },
@@ -37,18 +37,11 @@ const meta = {
       options: ['default', 'xs', 'sm', 'lg', 'icon', 'icon-xs', 'icon-lg'],
       ...semanticClassSelectArgType(
         BUTTON_SIZE_SPECS.map((spec) => ({
-          value:
-            spec.size === 'default' && spec.density === 'default'
-              ? 'default'
-              : `${spec.size}${spec.density === 'compact' ? ' compact' : ''}`,
+          value: spec.size === 'default' ? 'default' : spec.size,
           className: spec.className,
         })),
         'size',
       ),
-    },
-    density: {
-      control: 'select',
-      options: ['default', 'compact'],
     },
     tone: {
       control: 'select',
@@ -91,9 +84,9 @@ export const TextDanger: Story = {
   args: { variant: 'text', tone: 'danger', children: 'Delete draft' },
 }
 
-export const TextCompactAdd: Story = {
+export const TextXsAdd: Story = {
   render: () => (
-    <Button variant="text" density="compact">
+    <Button variant="text" size="xs">
       <Icon name="plus" size="owner" />
       Add relationship
     </Button>
@@ -109,10 +102,7 @@ export const TextAccentWithIcon: Story = {
   ),
 }
 
-/**
- * Desktop-dense micro-actions (10px labels, 28px / 24px chrome). Avoid as primary
- * touch targets on mobile without review.
- */
+/** Desktop-dense micro-actions (11px labels, 24px chrome). Review touch targets on mobile. */
 export const ExtraSmallMicroActions: Story = {
   render: () => (
     <div className="flex flex-wrap items-center gap-2">
@@ -122,7 +112,7 @@ export const ExtraSmallMicroActions: Story = {
       <Button size="xs" variant="ghost">
         Reset
       </Button>
-      <Button size="xs" density="compact" variant="ghost">
+      <Button size="xs" variant="ghost">
         Remove
       </Button>
       <Button size="xs" variant="text">
@@ -132,18 +122,12 @@ export const ExtraSmallMicroActions: Story = {
   ),
 }
 
-export const ExtraSmallDensityComparison: Story = {
+export const SizeLadder: Story = {
   render: () => (
     <div className="flex flex-wrap items-end gap-4">
       <div className="flex flex-col items-start gap-1">
-        <span className="text-style-caption">xs default (28px)</span>
+        <span className="text-style-caption">xs (24px)</span>
         <Button size="xs" variant="outline">
-          Reset
-        </Button>
-      </div>
-      <div className="flex flex-col items-start gap-1">
-        <span className="text-style-caption">xs compact (24px)</span>
-        <Button size="xs" density="compact" variant="outline">
           Reset
         </Button>
       </div>
@@ -154,10 +138,8 @@ export const ExtraSmallDensityComparison: Story = {
         </Button>
       </div>
       <div className="flex flex-col items-start gap-1">
-        <span className="text-style-caption">sm compact (24px)</span>
-        <Button size="sm" density="compact" variant="outline">
-          Reset
-        </Button>
+        <span className="text-style-caption">default (36px)</span>
+        <Button variant="outline">Reset</Button>
       </div>
     </div>
   ),
@@ -175,8 +157,8 @@ export const Small: Story = {
   args: { size: 'sm' },
 }
 
-export const SmallCompact: Story = {
-  args: { size: 'sm', density: 'compact' },
+export const ExtraSmall: Story = {
+  args: { size: 'xs' },
 }
 
 export const Large: Story = {
@@ -201,22 +183,20 @@ export const ClassReference: Story = {
   render: () => (
     <ClassReferenceTable
       rows={BUTTON_SIZE_SPECS.map((spec) => ({
-        key: `${spec.size}-${spec.density}`,
+        key: spec.size,
         sample: (
           <Button
             variant="outline"
             size={spec.size as NonNullable<ButtonVariantProps['size']>}
-            density={spec.density}
             data-semantic-class-target
           >
             {spec.size}
           </Button>
         ),
-        propsLabel: `size="${spec.size}" density="${spec.density}"`,
+        propsLabel: `size="${spec.size}"`,
         className: buttonVariants({
           variant: 'outline',
           size: spec.size as NonNullable<ButtonVariantProps['size']>,
-          density: spec.density,
         }),
         keyValues: `control height: ${spec.controlHeight}`,
         useCase: spec.useCase,

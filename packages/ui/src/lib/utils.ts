@@ -15,8 +15,10 @@ import {
   UI_FIELD_CONTROL_WIDTH_CLASSES,
   UI_FLOATING_LABEL_SIZE_CLASSES,
   UI_COMPACT_CONTROL_SIZE_CLASSES,
-  UI_COMPACT_LABEL_APPEARANCE_CLASSES,
-  UI_COMPACT_LABEL_SIZE_CLASSES,
+  UI_BADGE_APPEARANCE_CLASSES,
+  UI_BADGE_SIZE_CLASSES,
+  UI_CHIP_REMOVE_SIZE_CLASSES,
+  UI_CHIP_SIZE_CLASSES,
   UI_ALERT_APPEARANCE_CLASSES,
   UI_ALERT_DENSITY_CLASSES,
   UI_METADATA_LIST_COLUMN_GAP_CLASSES,
@@ -51,6 +53,7 @@ const HEADING_STYLE_UTILITIES = [
   'heading-style-dialog-title',
   'heading-style-confirm-dialog-title',
   'heading-style-sheet-section',
+  'heading-style-hero-title',
   'heading-style-alert',
   'heading-style-nav',
   'heading-style-brand',
@@ -69,6 +72,7 @@ const TEXT_STYLE_UTILITIES = [
   'text-style-body',
   'text-style-muted',
   'text-style-caption',
+  'text-style-micro',
   'text-style-supporting',
   'text-style-label',
   'text-style-emphasis',
@@ -133,8 +137,10 @@ type TypographyClassGroupIds =
   | 'ui-semantic-text-emphasis'
   | 'ui-field-group-layout'
   | 'ui-compact-control-size'
-  | 'ui-compact-label-size'
-  | 'ui-compact-label-appearance'
+  | 'ui-badge-size'
+  | 'ui-chip-size'
+  | 'ui-chip-remove-size'
+  | 'ui-badge-appearance'
   | 'ui-alert-appearance'
   | 'ui-alert-density'
   | 'ui-metadata-list-size'
@@ -161,26 +167,9 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
   extend: {
     theme: {
       text: [
-        'heading-1',
-        'heading-2',
-        'heading-3',
-        'heading-4',
-        'heading-5',
-        'heading-display',
-        'heading-page',
-        'heading-section',
-        'heading-subsection',
-        'heading-group',
-        'heading-card',
-        'heading-dialog-title',
-        'heading-dialog-title-md',
-        'heading-confirm-dialog-title',
-        'heading-sheet-section',
-        'heading-compact',
-        'heading-label',
-        '2xs-meta',
-        'xs-meta',
-        'sm-meta',
+        'fine-xs',
+        'fine-sm',
+        'fine-md',
         'md',
         'eyebrow-xs',
         'eyebrow-sm',
@@ -189,9 +178,6 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
         'badge-md',
         'table-body',
         'table-stat',
-        'field-group-legend',
-        'field-subgroup-legend',
-        'field-array-legend',
         'control-action-xs',
       ],
       'font-weight': [
@@ -226,8 +212,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-field-control-width': [...UI_FIELD_CONTROL_WIDTH_CLASSES],
       'ui-floating-label-size': [...UI_FLOATING_LABEL_SIZE_CLASSES],
       'ui-compact-control-size': [...UI_COMPACT_CONTROL_SIZE_CLASSES],
-      'ui-compact-label-size': [...UI_COMPACT_LABEL_SIZE_CLASSES],
-      'ui-compact-label-appearance': [...UI_COMPACT_LABEL_APPEARANCE_CLASSES],
+      'ui-badge-size': [...UI_BADGE_SIZE_CLASSES],
+      'ui-chip-size': [...UI_CHIP_SIZE_CLASSES],
+      'ui-chip-remove-size': [...UI_CHIP_REMOVE_SIZE_CLASSES],
+      'ui-badge-appearance': [...UI_BADGE_APPEARANCE_CLASSES],
       'ui-alert-appearance': [...UI_ALERT_APPEARANCE_CLASSES],
       'ui-alert-density': [...UI_ALERT_DENSITY_CLASSES],
       'ui-metadata-list-size': [...UI_METADATA_LIST_SIZE_CLASSES],
@@ -270,8 +258,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-field-control-width': ['ui-field-control-width'],
       'ui-floating-label-size': ['ui-floating-label-size'],
       'ui-compact-control-size': ['ui-compact-control-size'],
-      'ui-compact-label-size': ['ui-compact-label-size'],
-      'ui-compact-label-appearance': ['ui-compact-label-appearance'],
+      'ui-badge-size': ['ui-badge-size'],
+      'ui-chip-size': ['ui-chip-size'],
+      'ui-chip-remove-size': ['ui-chip-remove-size'],
+      'ui-badge-appearance': ['ui-badge-appearance'],
       'ui-alert-appearance': ['ui-alert-appearance'],
       'ui-alert-density': ['ui-alert-density'],
       'ui-metadata-list-size': ['ui-metadata-list-size'],

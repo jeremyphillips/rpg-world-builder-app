@@ -46,6 +46,12 @@ exports[`Primitives/ActionIcon Verbs smoke-test 1`] = `
   },
   {
     "height": "16px",
+    "identity": "info",
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
     "identity": "x",
     "strokeWidth": "2px",
     "width": "16px",

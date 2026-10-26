@@ -31,7 +31,7 @@ export const COMPACT_CONTROL_RECIPE_SPECS: readonly CompactControlRecipeSpec[] =
     className: 'ui-compact-control--icon-compact',
     hitTarget: '24px',
     iconGlyph: 'md (14px)',
-    useCase: 'Icon ghosts, chip remove md, drag handles',
+    useCase: 'Icon ghosts, drag handles',
   },
   {
     recipe: 'icon-xs',
@@ -45,7 +45,7 @@ export const COMPACT_CONTROL_RECIPE_SPECS: readonly CompactControlRecipeSpec[] =
     className: 'ui-compact-control--icon-default',
     hitTarget: '36px',
     iconGlyph: 'lg (16px)',
-    useCase: 'Default icon buttons, chip remove lg',
+    useCase: 'Default icon buttons',
   },
   {
     recipe: 'icon-lg',
@@ -110,10 +110,6 @@ const COMPACT_CONTROL_STEPPER_BUTTON_CLASS: Record<CompactControlStepperButtonSi
   lg: 'ui-compact-control--stepper-button-lg',
 }
 
-/** Chip remove sm — compact square + sm glyph (not the md icon-compact pairing). */
-export const UI_COMPACT_CONTROL_ICON_COMPACT_SM_CLASS =
-  'ui-compact-control--icon-compact-sm' as const
-
 export function resolveCompactControlRecipeClasses(
   recipe: CompactControlRecipeKey,
   options: { includeBlock?: boolean } = {},
@@ -141,14 +137,9 @@ export function resolveCompactControlStepperButtonClasses(
   return `${UI_COMPACT_CONTROL_BLOCK_CLASS} ${COMPACT_CONTROL_STEPPER_BUTTON_CLASS[size]}`
 }
 
-export function resolveCompactControlIconCompactSmClasses(): string {
-  return `${UI_COMPACT_CONTROL_BLOCK_CLASS} ${UI_COMPACT_CONTROL_ICON_COMPACT_SM_CLASS}`
-}
-
 /** twMerge group — compact control geometry modifiers. */
 export const UI_COMPACT_CONTROL_SIZE_CLASSES = [
   ...COMPACT_CONTROL_RECIPE_SPECS.map((spec) => spec.className),
-  UI_COMPACT_CONTROL_ICON_COMPACT_SM_CLASS,
   ...Object.values(COMPACT_CONTROL_SEGMENT_CLASS),
   ...Object.values(COMPACT_CONTROL_MENU_ITEM_CLASS),
   ...Object.values(COMPACT_CONTROL_STEPPER_BUTTON_CLASS),

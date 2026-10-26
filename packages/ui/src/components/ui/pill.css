@@ -1,0 +1,23 @@
+/*
+ * Shared pill geometry for Badge, Chip, and other local pill shells.
+ * Does not own size, tone, selection, or removal.
+ * Each pill resets its variables so a nested pill does not inherit the outer surface.
+ */
+@layer components {
+  .ui-pill {
+    display: inline-flex;
+    max-width: 100%;
+    align-items: center;
+    gap: calc(var(--spacing) * 1);
+    border-radius: calc(infinity * 1px);
+    border-style: solid;
+    border-width: 1px;
+    --ui-pill-bg: transparent;
+    --ui-pill-fg: ;
+    --ui-pill-border: transparent;
+    border-color: var(--ui-pill-border);
+    background-color: var(--ui-pill-bg);
+    color: var(--ui-pill-fg, inherit);
+    font-weight: var(--font-weight-medium);
+  }
+}

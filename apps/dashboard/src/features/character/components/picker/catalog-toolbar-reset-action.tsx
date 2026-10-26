@@ -17,14 +17,13 @@ export type CatalogToolbarResetActionProps = {
 }
 
 /**
- * Drawer reset chrome. Variant, size, density, and the reset glyph are fixed
+ * Drawer reset chrome. Variant, size, and the reset glyph are fixed
  * here so callers cannot restyle the control.
  */
 const CATALOG_TOOLBAR_RESET_CHROME = {
   action: 'reset',
   variant: 'text',
-  size: 'sm',
-  density: 'compact',
+  size: 'xs',
 } as const
 
 export function CatalogToolbarResetAction({
@@ -38,7 +37,6 @@ export function CatalogToolbarResetAction({
       action={CATALOG_TOOLBAR_RESET_CHROME.action}
       variant={CATALOG_TOOLBAR_RESET_CHROME.variant}
       size={CATALOG_TOOLBAR_RESET_CHROME.size}
-      density={CATALOG_TOOLBAR_RESET_CHROME.density}
       aria-label={accessibleName}
       title={accessibleName}
       onClick={onClick}

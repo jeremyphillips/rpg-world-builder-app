@@ -20,27 +20,28 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | --------------------------------- | ------ | ------- | -------------------- | -------------------------------------------------------------------------------------- |
 | `Heading` `display`               | `h1`   | 42      | 700                  | Hero, content detail entity titles                                                     |
 | `Heading` `page`                  | `h1`   | 34      | 600                  | Route titles (`PageHeader`)                                                            |
-| `Heading` `heroTitle`             | `h1`   | 19→34   | 600                  | Page hero titles (`Hero`, campaign overview) — 19px mobile, 24px md, 34px lg+          |
+| `Heading` `heroTitle`             | `h1`   | 18→34   | 600                  | Page hero titles (`Hero`, campaign overview) — 18px mobile, 20px md, 34px lg+          |
 | `Heading` `section`               | `h2`   | 28      | 600                  | Top-level in-page sections                                                             |
-| `Heading` `subsection`            | `h3`   | 19      | 600                  | Nested blocks within a section                                                         |
+| `Heading` `subsection`            | `h3`   | 18      | 600                  | Nested blocks within a section                                                         |
 | `Heading` `group`                 | `h4`   | 16      | 500                  | Headings inside subsections                                                            |
-| `Heading` `card`                  | Radix  | 19      | 600                  | Legacy / non-card surfaces; **not** generic `Card` headers (see below)                 |
-| `Heading` `dialogTitle`           | Radix  | 19→24   | 600                  | `Modal.Header` / `Sheet.Header` default (19px mobile, 24px md+)                        |
-| `Heading` `confirmDialogTitle`    | Radix  | 19      | 600                  | `ConfirmDialog` title — compact, non-responsive                                        |
+| `Heading` `card`                  | Radix  | 18      | 600                  | Legacy / non-card surfaces; **not** generic `Card` headers (see below)                 |
+| `Heading` `dialogTitle`           | Radix  | 18→20   | 600                  | `Modal.Header` / `Sheet.Header` default (18px mobile, 20px md+)                        |
+| `Heading` `confirmDialogTitle`    | Radix  | 18      | 600                  | `ConfirmDialog` title — compact, non-responsive                                        |
 | `Heading` `nav` / `brand`         | `span` | 16      | 600                  | Topbar title, sidebar product name                                                     |
 | `Heading` `alert`                 | Radix  | 16      | 600                  | Inline `Alert` titles                                                                  |
 | `Heading` `label`                 | `p`    | 16      | 500                  | Inline non-outline titles (trait names)                                                |
 | `Text` `body`                     | `p`    | 16      | 400                  | Default foreground copy                                                                |
 | `Text` `supporting`               | `p`    | 14      | 400                  | Secondary explanatory copy (preferred over `muted` + `text-sm`)                        |
 | `Text` `caption`                  | `p`    | 12      | 400                  | Small supplemental metadata                                                            |
+| `Text` `micro`                    | `span` | 10      | 400                  | Fine metadata owner — pair with `SemanticText` for toned inline status (PreviewRail)   |
 | `Text` `label`                    | `p`    | 14      | 500                  | Compact UI descriptor — not a native form `<label>`                                    |
 | `Text` `muted`                    | `p`    | inherit | 400                  | Color-only muted treatment (legacy — prefer `supporting` / `caption`)                  |
 | `Text` `lead`                     | `p`    | 18      | 400                  | Marketing subheads                                                                     |
 | `Text` `destructive`              | `p`    | 15      | 400                  | Inline errors — pair with `role="alert"`                                               |
 | `Eyebrow` `xs` / `sm` / `md`      | `p`    | 9–13    | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)                          |
 | `RichTextContent` `size="md"`     | `div`  | 15      | 400                  | Catalog descriptions (TipTap / CMS HTML)                                               |
-| Generic `Card` header title       | `h3`   | 14–19   | 600 (`heading`)      | `ui-card__title` — size from `Card` `density`; weight from heading role                |
-| Anatomy title (`ui-copy-title`)   | varies | 14–19   | 600 (`heading`)      | 14/20, 16/22, 19/26 by density — [row-anatomy.md](./row-anatomy.md#anatomy-title-copy) |
+| Generic `Card` header title       | `h3`   | 14–18   | 600 (`heading`)      | `ui-card__title` — size from `Card` `density`; weight from heading role                |
+| Anatomy title (`ui-copy-title`)   | varies | 14–18   | 600 (`heading`)      | 14/20, 16/22, 18/26 by density — [row-anatomy.md](./row-anatomy.md#anatomy-title-copy) |
 | Generic `Card` header description | `p`    | 12–14   | shell vars           | `ui-card__description` — comfortable/spacious 14px; compact 12px                       |
 
 Preserve semantic headings and existing `id`s — content detail routes use
@@ -79,12 +80,12 @@ A text role defines the intended typography for a communication purpose, includi
 whichever of size, line height, weight, and default color are appropriate. Not every
 variant sets every property (`muted` is color-only; `label` inherits color).
 
-| Category              | Variants                                         | Policy                                  |
-| --------------------- | ------------------------------------------------ | --------------------------------------- |
-| Primary content roles | `body`, `supporting`, `caption`, `label`, `lead` | Preferred for new copy                  |
-| Contextual roles      | `option`                                         | Choice-row contexts                     |
-| Existing treatments   | `muted`, `emphasis`                              | Legacy — do not expand without an audit |
-| Semantic state        | `info`, `success`, `warning`, `destructive`      | Status-colored copy at 15px             |
+| Category              | Variants                                                  | Policy                                  |
+| --------------------- | --------------------------------------------------------- | --------------------------------------- |
+| Primary content roles | `body`, `supporting`, `caption`, `micro`, `label`, `lead` | Preferred for new copy                  |
+| Contextual roles      | `option`                                                  | Choice-row contexts                     |
+| Existing treatments   | `muted`, `emphasis`                                       | Legacy — do not expand without an audit |
+| Semantic state        | `info`, `success`, `warning`, `destructive`               | Status-colored copy at 15px             |
 
 Do not hand-roll stacks that duplicate a role (`text-sm text-muted-foreground` →
 `supporting` or `text-style-supporting`). Do not invent combination names
@@ -96,9 +97,14 @@ and errors use `text-style-field-*` and field components — not `Text` `label`.
 ### Role versus tone
 
 `SemanticText` owns inline status tone (`neutral`, `info`, `success`, `warning`,
-`destructive`) and emphasis at 12px. `Text` state variants (`info`, `success`, …)
-are separate 15px treatments. There is no `tone` prop on `Text` yet; a future design
-may compose role + tone without new composite names.
+`destructive`) and emphasis only. A **typography owner** must establish font size,
+line height, and `--icon-inline` for inline glyphs — usually `Text` (`caption`,
+`supporting`, `micro`, …) or a parent with `text-style-*`. Compose
+`Text variant="micro"` + `SemanticText` for fine (10px) toned status copy (PreviewRail).
+
+`Text` state variants (`info`, `success`, …) are separate 15px treatments. There is
+no `tone` prop on `Text` yet; a future design may compose role + tone without new
+composite names.
 
 ### Usage
 
@@ -180,41 +186,48 @@ Primitive sizes live in [`styles/globals.css`](../src/styles/globals.css) `@them
 They override Tailwind’s built-in `text-*` utilities — components keep using `text-sm`,
 `text-2xl`, etc.; the CSS variables are the single source of truth (@ 16px root):
 
-| Token / utility       | px @ 16px root | Typical use                                     |
-| --------------------- | -------------- | ----------------------------------------------- |
-| `text-xs`             | 12             | Captions, table stat columns                    |
-| `text-sm`             | 14             | Compact UI chrome (buttons, menus, data tables) |
-| `text-md`             | 15             | Secondary body (`Text` small, `prose-md`, …)    |
-| `text-base`           | 16             | Primary body default                            |
-| `text-lg`             | 18             | Lead copy (`Text` lead)                         |
-| `text-xl`             | 20             | Section headings                                |
-| `text-2xl`            | 24             | Page titles                                     |
-| `text-3xl`            | 30             | Content detail titles                           |
-| `text-4xl`            | 36             | Marketing display (e.g. public hero)            |
-| `text-5xl`            | 48             | Marketing display (responsive hero)             |
-| `text-6xl`–`text-9xl` | 60–128         | Reserved; defined for completeness              |
+| Token / utility | px @ 16px root | Typical use                                      |
+| --------------- | -------------- | ------------------------------------------------ |
+| `text-fine-xs`  | 10             | Eyebrow `xs`, compact control-action labels      |
+| `text-fine-sm`  | 11             | Eyebrow `sm`, Chip `sm` (`--text-chip-sm`)       |
+| `text-fine-md`  | 13             | Eyebrow `md`, Chip `md`, table body              |
+| `text-xs`       | 12             | Captions, table stat columns                     |
+| `text-sm`       | 14             | Compact UI chrome (buttons, menus, data tables)  |
+| `text-md`       | 15             | Secondary body (`Text` small, `prose-md`, …)     |
+| `text-base`     | 16             | Primary body default                             |
+| `text-lg`       | 18             | Lead copy; subsection and card headings          |
+| `text-xl`       | 20             | Dialog title from `md`; sheet section headings   |
+| `text-2xl`      | 24             | Form group legends (`--text-field-group-legend`) |
+| `text-3xl`      | 28             | Section headings (curated; not the 30px default) |
+| `text-4xl`      | 34             | Page headings (curated; not the 36px default)    |
 
-## Form role aliases
+Fine (10–13px) and standard (`text-xs` through `text-4xl`) are one scale. Nothing above `text-4xl` is declared. Most fine sizes have no line-height companion; `--text-fine-xs--line-height` (14px) backs `Text` `micro` and Chip `xs`.
 
-| Role alias / utility         | px @ 16px root | Typical use                                                 |
-| ---------------------------- | -------------- | ----------------------------------------------------------- |
-| `text-field-group-legend`    | 24             | Top-level form group legends, collapsible section triggers  |
-| `text-field-subgroup-legend` | 20             | Nested `kind: 'group'` legends (`legendSize: 'subsection'`) |
-| `text-field-array-legend`    | 18             | Repeatable `kind: 'array'` section legends (default)        |
+## Form legend tokens
+
+Legend sizes live on `:root` and are read by `text-style-field-legend` composites. They do not emit `text-field-*` utilities.
+
+| Token                          | px @ 16px root | Typical use                                                 |
+| ------------------------------ | -------------- | ----------------------------------------------------------- |
+| `--text-field-group-legend`    | 24             | Top-level form group legends, collapsible section triggers  |
+| `--text-field-subgroup-legend` | 20             | Nested `kind: 'group'` legends (`legendSize: 'subsection'`) |
+| `--text-field-array-legend`    | 18             | Repeatable `kind: 'array'` section legends (default)        |
 
 ## Heading size tokens
 
-Visual tiers and role aliases live in [`styles/globals.css`](../src/styles/globals.css).
-Retune the document ladder via `--text-heading-1` … `--text-heading-5` (@ 16px root):
+Role tokens live on `:root` in [`styles/globals.css`](../src/styles/globals.css). They share a primitive pair (size and line-height). Display (42px) and ability-score `md` (32px) are the only off-scale literals. Retune a role by pointing it at another primitive, not by adding a numbered heading token.
 
-| Visual tier | Role alias                  | `Heading` variant                               | px    |
-| ----------- | --------------------------- | ----------------------------------------------- | ----- |
-| heading-1   | `--text-heading-display`    | `display`                                       | 42    |
-| heading-2   | `--text-heading-page`       | `page`                                          | 34    |
-| —           | responsive composite        | `heroTitle` (subsection → sheet-section → page) | 19→34 |
-| heading-3   | `--text-heading-section`    | `section`                                       | 28    |
-| heading-4   | `--text-heading-subsection` | `subsection`, `card` (chrome)                   | 19    |
-| heading-5   | `--text-heading-group`      | `group`, `label`, `nav`, `brand`, `alert`       | 16    |
+| Role token                  | Points at                                          | `Heading` variant / utility              | px    |
+| --------------------------- | -------------------------------------------------- | ---------------------------------------- | ----- |
+| `--text-heading-display`    | literal                                            | `display`                                | 42    |
+| `--text-heading-page`       | `text-4xl`                                         | `page`                                   | 34    |
+| —                           | `text-lg` → `text-xl` at `md` → `text-4xl` at `lg` | `heroTitle` (`heading-style-hero-title`) | 18→34 |
+| `--text-heading-section`    | `text-3xl`                                         | `section`                                | 28    |
+| `--text-heading-subsection` | `text-lg`                                          | `subsection`                             | 18    |
+| `--text-heading-card`       | `text-lg`                                          | `card` (line-height is `--leading-none`) | 18    |
+| `--text-heading-group`      | `text-base`                                        | `group`                                  | 16    |
+| `--text-heading-label`      | `text-base`                                        | `label`                                  | 16    |
+| `--text-base`               | primitive                                          | `nav`, `brand`, `alert`                  | 16    |
 
 `variant` controls appearance; `as` controls document semantics. Match the hierarchy
 table above in app code.
@@ -237,12 +250,13 @@ Shared by `Hero` mark frames and `MediaFieldSummary` compact previews.
 Each `Heading` / `Eyebrow` variant maps to one `@utility` composite (e.g.
 `heading-style-page`) that bundles size, line-height, weight, tracking, and (for
 eyebrow) case. Color is set via `Eyebrow` `tone` (`text-muted-foreground`,
-`text-foreground`, `text-primary`). Composites reference `@theme` variables only.
+`text-foreground`, `text-primary`). Heading composites read `:root` role tokens.
+Weight utilities still come from `@theme`.
 
-Visual reference: Storybook **`Typography/Composites`**.
+Visual reference: Storybook **`Typography/Composites`** (variants) and **`Typography/Scale`**
+(primitives and which token each role points at).
 
-Atomic `text-heading-*` / `font-heading-*` utilities remain generated from `@theme`
-for token inspection and docs — components use composites via `headingVariants()`.
+Components use composites via `headingVariants()`. Heading roles are not `text-heading-*` utilities.
 
 ## Font weight tokens
 
@@ -262,25 +276,25 @@ Primitive weights and role aliases live in [`styles/globals.css`](../src/styles/
 | `font-data-name`                | 600                  | Data-table name cells                                             |
 | `font-data-stat`                | 500                  | Data-table stat columns                                           |
 
-## Meta typography tokens
+## Fine sizes
 
-Secondary copy sizes sit one step below the Tailwind text scale (at 16px root):
+Fine sizes are the small end of the same primitive scale, not a metadata tier. A role can share a fine size and keep its own line height, weight, and spacing.
 
-| Token / utility       | px @ 16px root | Use                                                               |
-| --------------------- | -------------- | ----------------------------------------------------------------- |
-| `text-2xs-meta`       | 9              | Ultra-compact meta; aliased by `text-eyebrow-xs`                  |
-| `text-xs-meta`        | 11             | Shared meta base; aliased by `text-eyebrow-sm`                    |
-| `text-sm-meta`        | 13             | Shared meta base; aliased by `text-eyebrow-md`, `text-table-body` |
-| `text-md`             | 15             | Compact label `lg` (`Badge` / `Chip`); aliases `--text-md`        |
-| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                          |
-| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`            |
+| Token / utility       | px @ 16px root | Shared by                                                                                                        |
+| --------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `text-fine-xs`        | 10             | `Text` `micro`, `text-eyebrow-xs`, `text-control-action-xs` (14px line-height via `--text-fine-xs--line-height`) |
+| `text-fine-sm`        | 11             | `text-eyebrow-sm`, `--text-chip-sm`, floating-label `sm` floor                                                   |
+| `text-fine-md`        | 13             | `text-eyebrow-md`, `--text-chip-md`, `text-table-body`                                                           |
+| `text-md`             | 15             | Chip `lg` (`--text-chip-lg`)                                                                                     |
+| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                                                                         |
+| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`                                                           |
 
-Compact-label vocabulary (`appearance`, `tone`, selected-control vs semantic soft) →
-[compact-labels.md](./compact-labels.md).
+The standard group above runs `text-xs` (12px) through `text-4xl` (34px).
 
-Prefer `eyebrow-style-*` composites or `<Eyebrow>` for uppercase section labels; use
-semantic aliases (`text-eyebrow-sm`) only when a composite is not appropriate; use
-`text-xs-meta` / `text-sm-meta` directly for role-based typography (e.g. data-table meta).
+Badge and Chip (`appearance`, `tone`, selected-control vs semantic soft) →
+[pill-badge-chip.md](./pill-badge-chip.md).
+
+Prefer `eyebrow-style-*` composites or `<Eyebrow>` for uppercase section labels. Use `text-fine-*` when the call site is choosing a size directly and no semantic role already owns it.
 
 Detail-page subgroup labels (for example Districts under City structure, or Governed by
 under Territorial Authority) use `<Eyebrow size="sm">` with the default muted tone.
@@ -306,9 +320,9 @@ When a Radix primitive requires a specific element (`Dialog.Title`,
 ```
 
 Dialog chrome defaults: standard `Modal.Header` and `Sheet.Header` titles inherit
-the shared `dialogTitle` style from `DialogPanelHeader` — **19px on mobile**,
-**24px from the `md` breakpoint (48rem)**. Compact `ConfirmDialog` titles use
-`confirmDialogTitle` (19px at all sizes) on a separate AlertDialog path.
+the shared `dialogTitle` style from `DialogPanelHeader` — **18px on mobile**,
+**20px from the `md` breakpoint (48rem)**. Compact `ConfirmDialog` titles use
+`confirmDialogTitle` (18px at all sizes) on a separate AlertDialog path.
 Both Modal and Sheet accept `headlineClassName` as the escape hatch for genuine
 deviations; do not pass a heading class merely to get normal overlay typography.
 

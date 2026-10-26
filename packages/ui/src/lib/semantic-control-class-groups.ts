@@ -15,7 +15,7 @@ export {
   UI_TABS_LIST_APPEARANCE_CLASSES,
   UI_TABS_TRIGGER_APPEARANCE_CLASSES,
 } from '../components/ui/tabs.variants'
-export { UI_COMPACT_LABEL_APPEARANCE_CLASSES } from '../components/ui/badge-appearance.lib'
+export { UI_BADGE_APPEARANCE_CLASSES } from '../components/ui/badge-appearance.lib'
 export {
   UI_BUTTON_APPEARANCE_CLASSES,
   UI_BUTTON_SIZE_CLASSES,
@@ -48,7 +48,8 @@ export {
   UI_CHOICE_CONTROL_KIND_CLASSES,
 } from '../components/ui/choice-control.styles'
 export { UI_COMPACT_CONTROL_SIZE_CLASSES } from '../components/ui/compact-control.styles'
-export { UI_COMPACT_LABEL_SIZE_CLASSES } from '../components/ui/compact-label.lib'
+export { UI_BADGE_SIZE_CLASSES } from '../components/ui/badge.variants'
+export { UI_CHIP_REMOVE_SIZE_CLASSES, UI_CHIP_SIZE_CLASSES } from '../components/ui/chip.lib'
 export {
   UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,

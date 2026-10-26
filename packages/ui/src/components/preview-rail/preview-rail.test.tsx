@@ -89,6 +89,9 @@ describe('PreviewRail', () => {
 
     const basicsTrigger = screen.getByRole('button', { name: /Basics/ })
     expect(basicsTrigger).toHaveAttribute('aria-expanded', 'true')
+    const readyStatus = screen.getByText('Ready')
+    expect(readyStatus).toHaveClass('ui-semantic-text', 'ui-semantic-text--success')
+    expect(readyStatus.parentElement).toHaveClass('text-style-micro', 'shrink-0')
     expect(basicsTrigger.querySelector('.ui-status-icon--ready')).toBeInTheDocument()
     expect(
       screen
@@ -226,6 +229,28 @@ describe('PreviewRail', () => {
 
     expect(screen.getByRole('button', { name: 'Basics' })).toBeInTheDocument()
     expect(screen.queryByLabelText(/complete/i)).not.toBeInTheDocument()
+  })
+
+  it('keeps section status on the Text micro owner inside accordion triggers', () => {
+    render(
+      <PreviewRail>
+        <PreviewRail.Sections defaultValue="basics">
+          <PreviewRail.Section
+            id="basics"
+            label="Basics"
+            marker="ready"
+            status="Needs attention for a very long status label"
+            statusTone="warning"
+          />
+        </PreviewRail.Sections>
+      </PreviewRail>,
+    )
+
+    const trigger = screen.getByRole('button', { name: /Basics/ })
+    expect(trigger).toHaveClass('flex', 'items-center')
+    const status = screen.getByText('Needs attention for a very long status label')
+    expect(status.parentElement).toHaveClass('text-style-micro', 'shrink-0')
+    expect(status).toHaveClass('ui-semantic-text--warning', 'ui-semantic-text--emphasis-medium')
   })
 
   it('renders non-expandable sections as static rows without a chevron', () => {

@@ -39,7 +39,7 @@ export type SegmentedControlProps<TValue extends string> = {
   fullWidth?: boolean
   /** `equal` stretches segments and truncates labels; `auto` sizes each segment to its label. */
   segmentWidth?: SegmentedControlSegmentWidth
-  /** `sm` mirrors Button `size="sm"` + `density="compact"`. */
+  /** `sm` mirrors Button `size="xs"` (24px micro tier). */
   size?: SegmentedControlSize
   'aria-label'?: string
   className?: string

@@ -1,8 +1,8 @@
-import { SemanticText, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 import type { CharacterImportFieldResult } from '@rpg/contracts/character-import'
 
+import { CharacterImportSemanticText } from './character-import-semantic-text'
 import {
-  PREVIEW_VALUE_TEXT_CLASS,
   extractionIssueTone,
   extractionValueEmphasis,
   extractionValueTone,
@@ -25,21 +25,16 @@ export function CharacterImportPreviewRow({
   return (
     <div className="grid gap-1 border-b border-border-subtle py-3 last:border-b-0">
       <Text variant="emphasis">{label}</Text>
-      <SemanticText
+      <CharacterImportSemanticText
         tone={extractionValueTone(result)}
         emphasis={extractionValueEmphasis(result)}
-        className={PREVIEW_VALUE_TEXT_CLASS}
       >
         {displayValue}
-      </SemanticText>
+      </CharacterImportSemanticText>
       {shouldShowExtractionIssue(result) ? (
-        <SemanticText
-          tone={extractionIssueTone(result)}
-          emphasis="low"
-          className={PREVIEW_VALUE_TEXT_CLASS}
-        >
+        <CharacterImportSemanticText tone={extractionIssueTone(result)} emphasis="low">
           {result.issues.join(' ')}
-        </SemanticText>
+        </CharacterImportSemanticText>
       ) : null}
     </div>
   )

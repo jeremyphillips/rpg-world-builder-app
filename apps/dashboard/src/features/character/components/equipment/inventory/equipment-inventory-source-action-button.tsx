@@ -10,12 +10,11 @@ export type EquipmentInventorySourceActionButtonProps = ButtonForwardingProps & 
 export function EquipmentInventorySourceActionButton({
   children,
   variant = 'ghost',
-  size = 'sm',
-  density = 'compact',
+  size = 'xs',
   ...props
 }: EquipmentInventorySourceActionButtonProps) {
   return (
-    <Button type="button" variant={variant} size={size} density={density} {...props}>
+    <Button type="button" variant={variant} size={size} {...props}>
       {children}
     </Button>
   )

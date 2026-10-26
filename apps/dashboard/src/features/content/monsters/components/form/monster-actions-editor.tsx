@@ -527,9 +527,15 @@ function MonsterActionDetail({
           onToggleAddWeapon={onToggleAddWeapon}
         />
       ) : null}
-      {notice ? <SemanticText>{notice}</SemanticText> : null}
+      {notice ? (
+        <Text as="span" variant="supporting">
+          <SemanticText>{notice}</SemanticText>
+        </Text>
+      ) : null}
       {advisories.map((message) => (
-        <SemanticText key={message}>{message}</SemanticText>
+        <Text key={message} as="span" variant="supporting">
+          <SemanticText>{message}</SemanticText>
+        </Text>
       ))}
       <label>
         {MONSTER_ACTION_NAME_LABEL}

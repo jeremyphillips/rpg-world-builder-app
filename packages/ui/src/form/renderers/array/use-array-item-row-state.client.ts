@@ -10,8 +10,6 @@ import {
   useArrayItemIssues,
   useFormValidationPresentation,
 } from '../../hooks/use-form-validation-presentation.client'
-import { resolveIssueProminence } from '../../errors/resolve-issue-prominence'
-import type { FormIssueScope } from '../../errors/form-issue.types'
 import { resolveArrayItemIssueSummary } from './array-field-item-issue-summary.lib'
 import { resolveShowArrayItemIssueBadge } from './resolve-show-array-item-issue-badge.lib'
 import { useArrayItemFocusIssue } from './use-array-item-focus-issue.client'
@@ -87,9 +85,6 @@ export function useArrayItemRowState({
     arrayPattern,
   })
 
-  const issueScope: FormIssueScope = variant === 'compact' ? 'field' : 'item'
-  const issueVisibility = variant === 'compact' || !collapsed ? 'visible' : 'collapsed'
-  const badgeProminence = resolveIssueProminence(issueScope, issueVisibility)
   const issueSummary = resolveArrayItemIssueSummary({
     showIssueChrome,
     variant,
@@ -115,7 +110,6 @@ export function useArrayItemRowState({
     arrayContext,
     suppressFieldErrorText,
     focusIssue,
-    badgeProminence,
     issueSummary: issueSummary as ArrayItemIssueSummaryProps | undefined,
     showIssueChrome,
     showIssueBadge,

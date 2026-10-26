@@ -311,9 +311,7 @@ describe('ChipsField', () => {
         value={[]}
       />,
     )
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass(
-      'ui-compact-label--md',
-    )
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('ui-chip--md')
   })
 
   it('applies sm pill classes when chipSize is sm', () => {
@@ -327,9 +325,7 @@ describe('ChipsField', () => {
         chipSize="sm"
       />,
     )
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass(
-      'ui-compact-label--sm',
-    )
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('ui-chip--sm')
   })
 
   it('derives chipSize from field size when chipSize is omitted', () => {
@@ -343,9 +339,7 @@ describe('ChipsField', () => {
         size="lg"
       />,
     )
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass(
-      'ui-compact-label--lg',
-    )
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('ui-chip--lg')
   })
 
   it('uses md label type scale on the inner label line by default', () => {

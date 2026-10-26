@@ -24,7 +24,7 @@ export function MessagesWorkspaceHeader({
             {MESSAGES_ACTION_COPY.cancel}
           </Button>
         ) : (
-          <ActionButton action="compose" iconStep="md" onClick={onNewMessage}>
+          <ActionButton action="compose" onClick={onNewMessage}>
             {MESSAGES_ACTION_COPY.newMessage}
           </ActionButton>
         )

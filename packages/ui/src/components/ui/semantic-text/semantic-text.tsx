@@ -22,7 +22,7 @@ export type SemanticTextProps = {
 /**
  * Inline status copy with a tone, emphasis, and optional icon.
  * Stays separate from `Text`: Text owns the body role ladder (`text-style-*`);
- * SemanticText owns semantic status color and does not take a Text role.
+ * SemanticText owns tone and emphasis; pair with a typography owner (`Text` or `text-style-*`).
  */
 export function SemanticText({ tone, emphasis, icon, children, className }: SemanticTextProps) {
   return (

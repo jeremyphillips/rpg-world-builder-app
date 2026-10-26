@@ -13,7 +13,7 @@ export const EYEBROW_STYLE_SPECS: EyebrowStyleSpec[] = [
   {
     size: 'xs',
     utility: 'eyebrow-style-xs',
-    px: 9,
+    px: 10,
     weight: 300,
     useCase: 'Dense preview cards and compact metadata',
   },

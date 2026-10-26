@@ -448,7 +448,7 @@ const PROBE_HTML = `<!doctype html>
   <body>
     <button id="outline" class="ui-button ui-button--outline ui-button--sm">Import</button>
     <button id="utility" class="ui-button ui-button--outline ui-button--sm p-0 border-0">Reset</button>
-    <span id="badge" class="ui-compact-label ui-compact-label--sm">Active</span>
+    <span id="badge" class="ui-badge ui-badge--sm">Active</span>
     <div id="prose-only" class="prose prose-sm">Size</div>
     <div id="prose" class="prose prose-sm text-xs">Size</div>
     <div id="xs" class="text-xs">Size</div>

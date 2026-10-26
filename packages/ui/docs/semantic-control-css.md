@@ -31,14 +31,14 @@ Interactive controls and buttons emit BEM-style classes (`ui-button ui-button--o
 
 Within one dimension (size, appearance), every modifier declares the **same** property list. Source order in each `*.css` file is fixed; when two modifiers from the same dimension are present, the later rule wins. Geometry families at `(0,2,0)` (e.g. `.ui-button.ui-button--text`) win over chrome appearances as documented per file.
 
-`cn()` registers twMerge groups (`ui-button-size`, `ui-button-appearance`, …) so React composition matches DevTools.
+`cn()` registers twMerge groups (`ui-button-size`, `ui-button-appearance`, …) so React composition matches DevTools. `ui-button--text` is a family treatment and is not in `ui-button-size`, so it composes with icon-only sizes. Compound rules in `button.css` (`.ui-button--text.ui-button--icon-*`) keep the square hit target.
 
 ## Inspector acceptance
 
 For each migrated primitive, verify in Storybook DevTools:
 
 1. Swap size — one class edit; no leftover geometry from the old size.
-2. Swap density (Button only) — one resolved class (`ui-button--md-compact`).
+2. Swap size — micro actions use `ui-button--xs` (24px); no separate density axis on Button.
 3. Swap appearance or field invalid/disabled state; exercise `:hover`, `:active`, `:focus-visible`.
 4. Add a second modifier from the same dimension — result is wholly one modifier, never a blend.
 5. Untick one declaration in a size block — only that property changes.
@@ -92,11 +92,11 @@ Body rows (`__row`) compose `ui-interactive-row` once and drive a single inherit
 
 `ui-empty-panel` owns the compact sunken well (radius, padding, italic muted type, sunken shadow).
 
-## Compact label
+## Pill, Badge, and Chip
 
-`ui-compact-label` is the Badge and Chip shell. The block border is 1px; block `gap` owns icon/text spacing. `--{sm,md,lg}` set height and type. `--{outline|soft|strong}-{tone}` set `--ui-compact-label-bg`, `--ui-compact-label-fg`, and `--ui-compact-label-border` with the same longhand list. `--subdued` mutes copy; `--selected` and `--interactive` are chip states (unselected interactive chips use dedicated hover rules in CSS). `--counter` tightens numeric badges; `--removable-{sm,md,lg}` adjust trailing padding for dismiss controls. Chip dismiss is `__remove`. ClassReference specs derive from `COMPACT_LABEL_CLASS_SPECS` / resolvers. twMerge groups: `ui-compact-label-size`, `ui-compact-label-appearance`.
+`ui-pill` is the shared pill: inline-flex, gap, radius, 1px border, and `--ui-pill-bg`, `--ui-pill-fg`, `--ui-pill-border`. It resets those variables on every pill. `ui-badge--{sm,md,lg}` owns Badge height, type, and `--icon-size` for owner glyphs (`sm` 22px/`--icon-glyph-xs`, `md` 26px/`--icon-glyph-sm`, `lg` 32px/`--icon-glyph-md`). `ui-badge--{outline|soft|strong}-{tone}` assigns the pill variables. `ui-badge--subdued` mutes copy. `ui-badge--counter` is Badge numeric layout only; counter icons use `Icon size="owner"`. `ui-chip--{xs,sm,md,lg}` owns Chip height and type. `ui-chip--selected` and `ui-chip--interactive` own selection. `ui-chip--removable` is the neutral-soft removable fill. `ui-chip--removable-*` adjusts trailing padding. Chip dismiss is `ui-chip__remove` plus `ui-chip__remove--{xs,sm,md,lg}` (hit target and `--icon-size`, independent of CompactControl). `ArrayItemIssueButton` is `Badge asChild` on a `button`. twMerge groups: `ui-badge-size`, `ui-badge-appearance`, `ui-chip-size`, `ui-chip-remove-size`.
 
-Overlay notification counts use `ui-notification-unread-badge` (not compact-label geometry).
+Overlay notification counts use `ui-notification-unread-badge` (not pill geometry).
 
 ## Alert
 
@@ -158,7 +158,7 @@ Overlay notification counts use `ui-notification-unread-badge` (not compact-labe
 
 ## When CVA vs CSS
 
-- **CVA** — prop mapping, compound logic (Button size × density lookup), and non-visual layout utilities where documented.
+- **CVA** — prop mapping, compound logic (Button size lookup), and non-visual layout utilities where documented.
 - **CSS** — all repeatable size, appearance, and state presentation.
 
 Storybook helpers live in `src/stories/semantic-classes/` (`ClassReferenceTable`, `SemanticClassCaption`, `semanticClassArgTypes`).

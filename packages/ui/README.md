@@ -19,8 +19,8 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 | `Button`, `buttonVariants`, `ButtonProps`       | component  | Variants include `text` (standalone text actions with optional `tone`: `accent` \| `neutral` \| `danger`); `tone` only type-checks on `variant="text"`; 4 sizes                                                                                             |
 | `ButtonLink`, `resolveButtonAppearance`         | component  | Button-shaped navigation — app supplies `link` (`<a>`, router `Link`); shares visual recipe with `Button`. See [button-link.md](docs/button-link.md).                                                                                                       |
 | `Link`, `textActionVariants`                    | component  | Design-system `<a>` — inline accent by default; `context="standalone"` for hover-underline text actions. Router links: `standaloneTextActionClasses()` from `@rpg/ui`                                                                                       |
-| `Badge`                                         | component  | Static compact label (`appearance` + `tone`); `asChild` for link/button styling                                                                                                                                                                             |
-| `Chip`, `ChipGroup`                             | component  | Interactive compact labels — `mode="selectable"` (toggle) or `mode="removable"` (dismiss)                                                                                                                                                                   |
+| `Badge`                                         | component  | Presentational pill label (`appearance` + `tone`); `asChild` for link styling                                                                                                                                                                               |
+| `Chip`, `ChipGroup`                             | component  | Interactive pills — `mode="selectable"` (toggle) or `mode="removable"` (dismiss)                                                                                                                                                                            |
 | `Input`                                         | component  | Styled text input                                                                                                                                                                                                                                           |
 | `SearchBar`                                     | component  | Search field (`appearance`: bordered `field` or popover `embedded`) with icon + clear; requires `ariaLabel`                                                                                                                                                 |
 | `NumberInput`                                   | component  | Numeric input with hover/focus stepper controls; hides native browser spinners                                                                                                                                                                              |
@@ -107,8 +107,8 @@ for sanitized HTML. Do not wrap whole pages in `prose`.
 Full guide — hierarchy table, `RichTextContent` contract, dark mode, and internal
 primitive rules: **[docs/typography.md](docs/typography.md)**.
 
-Compact labels (`Badge`, `Chip`) — tone vs appearance, size scale, selected-control
-tokens: **[docs/compact-labels.md](docs/compact-labels.md)**.
+Pill, Badge, and Chip — tone vs appearance, size scale, selected-control tokens:
+**[docs/pill-badge-chip.md](docs/pill-badge-chip.md)**.
 
 Design tokens — layers, surfaces, field chrome, status vocabulary:
 **[docs/design-tokens.md](docs/design-tokens.md)**.

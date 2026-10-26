@@ -20,7 +20,6 @@ import { TextField } from '../../components/ui/text-field'
 import { MarkdownField } from '../../components/ui/markdown-field.client'
 import type { FieldHintPosition } from '../../components/ui/field.variants'
 import type { FieldSize } from '../../components/ui/field.client'
-import { fieldSizeToChipSize } from '../../components/ui/field-sizing.variants'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
 import { resolveFieldConfigBoundNames } from '../field-config'
@@ -492,7 +491,7 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       size={controlSize}
-      chipSize={config.chipSize ? fieldSizeToChipSize[config.chipSize] : undefined}
+      chipSize={config.chipSize}
       width={config.width}
       disabled={config.disabled}
       value={field.value ?? fieldDefaultValue(config)}

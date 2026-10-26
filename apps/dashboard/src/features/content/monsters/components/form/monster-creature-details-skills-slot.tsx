@@ -12,6 +12,7 @@ import {
   cn,
   ComboboxField,
   SemanticText,
+  Text,
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -38,9 +39,20 @@ import type { MonsterFormValues } from '../../lib/monster-form-values'
 import { MonsterCreatureDetailsRemoveRowButton } from './monster-creature-details-slot-parts'
 
 function SkillCatalogStatusMessages({ status }: { status: ContentFormCtx['skillCatalogStatus'] }) {
-  if (status === 'pending') return <SemanticText>{MONSTER_SKILL_LOADING}</SemanticText>
-  if (status === 'error')
-    return <SemanticText tone="destructive">{MONSTER_SKILL_ERROR}</SemanticText>
+  if (status === 'pending') {
+    return (
+      <Text as="span" variant="supporting">
+        <SemanticText>{MONSTER_SKILL_LOADING}</SemanticText>
+      </Text>
+    )
+  }
+  if (status === 'error') {
+    return (
+      <Text as="span" variant="supporting">
+        <SemanticText tone="destructive">{MONSTER_SKILL_ERROR}</SemanticText>
+      </Text>
+    )
+  }
   return null
 }
 

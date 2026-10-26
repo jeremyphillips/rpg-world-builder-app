@@ -409,7 +409,7 @@ export type IconSizeMode = IconSize | 'inline' | 'owner'
 - **Today, leakage is worse.** The 42 descendant `svg` rules (for example `.ui-button--md svg`, `.ui-compact-control--icon-xs svg`) size every nested svg, including icons in nested components.
 - **Under the contract, inheritance affects only `owner`-mode icons.**
   - Step and `inline` icons are immune.
-  - Nested owners (Badge/compact-label, StatusIcon) re-declare.
+  - Nested owners (Badge/pill, StatusIcon) re-declare.
   - Portals break inheritance, and portal content (menus, popovers) owns its own items.
 - **Owners declare on the leaf control or slot element, never on layout containers.** The census catches the residual case: an `owner` icon inside a non-owner component that is itself nested in an owner.
 
@@ -719,7 +719,7 @@ const STATUS_ICON_DEFINITIONS = {
 - **Ancestor owners (CSS):**
   - `button.css` (replaces `resolveButtonIconGlyphStep`; `ActionButton` renders `size="owner"`)
   - `compact-control.css`, `choice-control.css`, `ui-radio-card.css` (comfortable → `xl`)
-  - the compact-label CSS (Badge, Chip)
+  - `badge.css` and `chip.css` (Badge, Chip)
   - `ui-identity-frame.css` (`__fallback` size modifiers: xs → `sm`, sm → `lg`, md → `2xl`, inline → `xs`)
   - `semantic-text.css` (its slot renders `size="inline"`)
   - **new** `sidebar-nav-item.css`: `ui-sidebar-nav-item` is added to the `sidebarNavItemVariants` base, with `--icon-size: var(--icon-glyph-lg)` and `--icon-stroke-width: var(--sidebar-nav-icon-stroke)` (1.75).
@@ -879,7 +879,7 @@ Checkpoints: commit at the end of each phase; push/PR after Phase 2 and after Ph
     - the StatusIcon internals
     - the `size-status-icon-slash-*` utilities
     - `identityFrameFallbackIconClasses`
-    - the compact-label, chip and badge glyph helpers
+    - the pill, chip, and badge glyph helpers
   - **Risk:** layer and specificity changes in every control.
   - **Done when:** the census is unchanged, apart from the exclamation identity, and the screenshots match in both themes.
 - **Phase 3: semantic maps** (depends on Phase 2).

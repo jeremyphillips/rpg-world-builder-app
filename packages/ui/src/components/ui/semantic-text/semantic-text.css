@@ -1,16 +1,12 @@
 /*
  * Inline status copy. Tone owns color, emphasis owns weight.
- * The block owns xs type and --icon-inline. info + low is a compound color.
- * Not a Text role.
+ * Typography (size, line-height, --icon-inline) comes from an owner — Text or text-style-*.
  */
 @layer components {
   .ui-semantic-text {
     display: inline-flex;
     align-items: center;
     gap: calc(var(--spacing) * 1);
-    font-size: var(--text-xs);
-    line-height: var(--text-xs--line-height);
-    --icon-inline: var(--icon-glyph-sm);
   }
 
   .ui-semantic-text--neutral {

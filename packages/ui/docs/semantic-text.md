@@ -3,12 +3,12 @@
 `SemanticText` renders **inline** status copy — table cells, picker metadata, import preview
 values. It always renders a `<span>`.
 
-For bordered pill surfaces use [`Badge`](./compact-labels.md). For full alert/callout panels use
+For bordered pill surfaces use [`Badge`](./pill-badge-chip.md). For full alert/callout panels use
 `Alert` or group `chrome: { variant: 'callout' }`.
 
 ## Tone
 
-`neutral | info | success | warning | destructive` — same enum as compact labels.
+`neutral | info | success | warning | destructive` — same enum as `Badge` and `Chip` tones.
 
 | Tone          | Typical use                                 |
 | ------------- | ------------------------------------------- |
@@ -22,7 +22,11 @@ For bordered pill surfaces use [`Badge`](./compact-labels.md). For full alert/ca
 
 `low | medium | high` — font weight only. `info` + `low` uses `--semantic-info-muted`.
 
-Default type is the xs metrics on `.ui-semantic-text`, including `--icon-inline`. A `text-sm` class on the element still overrides font size because utilities follow the components layer, and that utility also sets `--icon-inline`. Do not add a second size prop.
+`SemanticText` does not own font size, line height, or `--icon-inline`. Pair it with a
+typography owner — `Text` (`caption`, `supporting`, `micro`, …) or a parent with
+`text-style-*`. Example: `Text as="span" variant="micro"` for PreviewRail section status.
+Do not add size props or utility overrides on `SemanticText` for scale; fix the owner.
+See [typography.md](./typography.md#role-versus-tone).
 
 ```tsx
 import { SemanticText } from '@rpg/ui'
@@ -31,7 +35,9 @@ import { SemanticText } from '@rpg/ui'
 <SemanticText tone="warning" emphasis="medium" icon={<TriangleAlert aria-hidden />}>
   Not proficient
 </SemanticText>
-<SemanticText tone="success" className="text-sm">Updated</SemanticText>
+<Text as="span" variant="supporting">
+  <SemanticText tone="success">Updated</SemanticText>
+</Text>
 ```
 
 ## Tokens

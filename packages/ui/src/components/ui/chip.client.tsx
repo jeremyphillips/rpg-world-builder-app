@@ -3,10 +3,11 @@ import { Icon } from './icon/icon'
 
 import * as React from 'react'
 
-import type { CompactLabelSize } from './compact-label.lib'
-import { chipRemoveButtonVariants, resolveCompactLabelClassName } from './compact-label.variants'
+import { cn } from '../../lib/utils'
+import type { ChipSize } from './chip.lib'
+import { chipRemoveButtonVariants, resolveChipSizeClassName } from './chip.variants'
 
-export type { CompactLabelSize as ChipSize }
+export type { ChipSize }
 
 type ChipBaseProps = {
   children: React.ReactNode
@@ -19,7 +20,7 @@ type ChipBaseProps = {
 
 export type ChipSelectableProps = ChipBaseProps & {
   mode: 'selectable'
-  size?: CompactLabelSize
+  size?: ChipSize
   selected: boolean
   onSelectedChange: (selected: boolean) => void
   selectionRole?: 'checkbox' | 'radio'
@@ -31,7 +32,7 @@ export type ChipRemovableProps = ChipBaseProps & {
   mode: 'removable'
   onRemove: () => void
   removeLabel: string
-  size?: CompactLabelSize
+  size?: ChipSize
   selected?: never
   onSelectedChange?: never
   selectionRole?: never
@@ -64,12 +65,14 @@ function SelectableChip({
       role={selectionRole}
       aria-checked={selected}
       disabled={disabled}
-      className={resolveCompactLabelClassName({
-        size,
-        selected,
-        interactive: true,
+      className={cn(
+        'ui-pill',
+        'ui-chip',
+        resolveChipSizeClassName(size),
+        'ui-chip--interactive ui-focus-ring',
+        selected && 'ui-chip--selected',
         className,
-      })}
+      )}
       onClick={() => onSelectedChange(!selected)}
     >
       {resolvedLeadingIcon ? (
@@ -92,14 +95,14 @@ function RemovableChip({
 }: ChipRemovableProps) {
   return (
     <span
-      className={resolveCompactLabelClassName({
-        size,
-        appearance: 'soft',
-        tone: 'neutral',
-        interactive: false,
-        removable: true,
+      className={cn(
+        'ui-pill',
+        'ui-chip',
+        'ui-chip--removable',
+        'ui-border--default',
+        resolveChipSizeClassName(size, true),
         className,
-      })}
+      )}
     >
       <span className="truncate pl-0.5">{children}</span>
       <button

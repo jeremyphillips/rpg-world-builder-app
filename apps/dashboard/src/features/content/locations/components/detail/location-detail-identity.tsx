@@ -49,7 +49,6 @@ export function LocationDetailIdentity({
               type="button"
               variant="ghost"
               size="icon"
-              density="compact"
               aria-label={LOCATION_PARENT_REPLACEMENT_ACTION_LABELS[parentReplacementAction]}
               onClick={onParentReplacementAction}
             >

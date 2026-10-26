@@ -28,14 +28,8 @@ export function CatalogPickerAuxiliaryActionSlot({
       ) : action.state === 'menu' ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              density="compact"
-              disabled={action.disabled}
-            >
-              <ActionIcon action="add" size="lg" />
+            <Button type="button" variant="ghost" size="xs" disabled={action.disabled}>
+              <ActionIcon action="add" size="owner" />
               {action.label}
             </Button>
           </DropdownMenuTrigger>
@@ -55,12 +49,11 @@ export function CatalogPickerAuxiliaryActionSlot({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
-          density="compact"
+          size="xs"
           disabled={action.disabled}
           onClick={action.onAction}
         >
-          <ActionIcon action="add" size="lg" />
+          <ActionIcon action="add" size="owner" />
           {action.label}
         </Button>
       )}

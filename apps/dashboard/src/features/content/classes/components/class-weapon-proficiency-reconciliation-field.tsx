@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import { SemanticText } from '@rpg/ui'
+import { SemanticText, Text } from '@rpg/ui'
 
 import { WEAPON_PROFICIENCY_PERSISTED_MIXED_RECONCILIATION_MESSAGE } from '@/lib/forms/grant-sets/weapon-proficiency-grant-form-labels'
 
@@ -27,8 +27,10 @@ export function ClassWeaponProficiencyReconciliationField() {
   if (!pending) return null
 
   return (
-    <SemanticText tone="warning">
-      {WEAPON_PROFICIENCY_PERSISTED_MIXED_RECONCILIATION_MESSAGE}
-    </SemanticText>
+    <Text as="span" variant="supporting">
+      <SemanticText tone="warning">
+        {WEAPON_PROFICIENCY_PERSISTED_MIXED_RECONCILIATION_MESSAGE}
+      </SemanticText>
+    </Text>
   )
 }

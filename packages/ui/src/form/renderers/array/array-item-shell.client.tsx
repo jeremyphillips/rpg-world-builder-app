@@ -13,7 +13,6 @@ import {
   type ArrayItemLeadingChromeOptions,
 } from './array-item-toolbar.variants'
 import { ArrayItemIssueButton } from './array-item-issue.client'
-import type { ArrayItemIssueProminence } from './array-item-issue.variants'
 
 export interface ArrayItemRemoveButtonProps {
   ariaLabel: string
@@ -50,7 +49,6 @@ export interface ArrayItemActionsRailProps {
   issueCount?: number
   issueRowLabel?: string
   onIssuePress?: () => void
-  badgeProminence?: ArrayItemIssueProminence
   compact?: boolean
   /** When true, rail is inside the compact row grid (no shell corner nudge). */
   embedded?: boolean
@@ -67,7 +65,6 @@ export function ArrayItemActionsContent({
   issueCount = 0,
   issueRowLabel,
   onIssuePress,
-  badgeProminence = 'nav',
   compact = false,
 }: Omit<ArrayItemActionsRailProps, 'embedded' | 'className'>) {
   return (
@@ -77,7 +74,6 @@ export function ArrayItemActionsContent({
         rowLabel={issueRowLabel ?? removeAriaLabel.replace(/^Remove\s+/, '')}
         onPress={onIssuePress}
         compact={compact}
-        prominence={badgeProminence}
       />
       {customRemove}
       {showDefaultRemove ? (
@@ -103,7 +99,6 @@ export function ArrayItemActionsRail({
   issueCount = 0,
   issueRowLabel,
   onIssuePress,
-  badgeProminence = 'nav',
   compact = false,
   embedded = false,
   className,
@@ -123,7 +118,6 @@ export function ArrayItemActionsRail({
         issueCount={issueCount}
         issueRowLabel={issueRowLabel}
         onIssuePress={onIssuePress}
-        badgeProminence={badgeProminence}
         compact={compact}
       />
     </div>

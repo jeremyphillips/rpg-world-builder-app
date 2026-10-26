@@ -46,7 +46,7 @@ export const ChromeShell: Story = {
     <div className="flex h-8 shrink-0 items-center justify-between gap-4">
       <div className="min-w-0 flex-1 text-style-supporting">Breadcrumb slot (route-driven)</div>
       <div className="flex shrink-0 items-center gap-2">
-        <Button variant="outline" size="sm" density="compact">
+        <Button variant="outline" size="xs">
           Edit
         </Button>
       </div>

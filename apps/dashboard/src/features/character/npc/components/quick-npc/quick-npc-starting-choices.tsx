@@ -641,7 +641,6 @@ function StartingChoiceEditor({
                   type="button"
                   variant="text"
                   size="sm"
-                  density="compact"
                   onClick={() => {
                     const next = { ...overrides }
                     delete next[choiceSetId]

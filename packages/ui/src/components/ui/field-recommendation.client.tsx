@@ -42,7 +42,6 @@ function FieldRecommendationGroupItemButton({ item }: { item: FieldRecommendatio
       type="button"
       variant="outline"
       size={buttonScale.size}
-      density={buttonScale.density}
       aria-label={item.action.ariaLabel}
       className="max-w-full shrink-0"
       data-field-recommendation-item=""
@@ -63,7 +62,6 @@ function FieldRecommendationGroupBulkButton({ action }: { action: FieldRecommend
       type="button"
       variant="ghost"
       size={buttonScale.size}
-      density={buttonScale.density}
       aria-label={action.ariaLabel}
       className="shrink-0"
       data-field-recommendation-bulk=""
@@ -84,7 +82,6 @@ function FieldRecommendationActionButton({ action }: { action: FieldRecommendati
       variant="text"
       tone="accent"
       size={buttonScale.size}
-      density={buttonScale.density}
       aria-label={action.ariaLabel}
       className={cn(fieldRecommendationActionVariants, 'shrink-0')}
       onClick={action.onClick}

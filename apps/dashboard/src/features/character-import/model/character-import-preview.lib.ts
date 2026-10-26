@@ -32,9 +32,6 @@ import type { SemanticTextEmphasis, SemanticTextTone } from '@rpg/ui'
 /** Display copy when a source field has no mapped value. */
 export const EXTRACTION_UNSET_DISPLAY_VALUE = 'Not set'
 
-/** One step above default SemanticText (`text-xs`) for preview values. */
-export const PREVIEW_VALUE_TEXT_CLASS = 'text-sm'
-
 export const EXTRACTION_FIELD_LABELS = {
   name: 'Name',
   species: getContentTypeItemLabel('species'),

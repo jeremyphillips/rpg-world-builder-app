@@ -16,6 +16,6 @@ export const fieldDerivedMetaRegionVariants = cva('', {
 /** Key/value row — label column sizes to content, value fills remainder. */
 export const fieldDerivedMetaRowVariants = 'grid grid-cols-[max-content_1fr] gap-x-3 gap-y-0'
 
-export const fieldDerivedMetaLabelVariants = 'text-xs-meta text-muted-foreground'
+export const fieldDerivedMetaLabelVariants = 'text-fine-sm text-muted-foreground'
 
-export const fieldDerivedMetaValueVariants = 'text-xs-meta text-foreground font-body-emphasis'
+export const fieldDerivedMetaValueVariants = 'text-fine-sm text-foreground font-body-emphasis'

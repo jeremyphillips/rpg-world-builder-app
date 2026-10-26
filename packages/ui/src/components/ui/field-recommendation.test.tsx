@@ -82,7 +82,7 @@ describe('FieldLayout recommendation', () => {
       'text-action-standalone',
       'text-primary',
       'no-underline',
-      'ui-button__text--sm-compact',
+      'ui-button__text--xs',
     )
     expect(addButton).toHaveTextContent('+ Add')
     expect(addButton.querySelector('span')).toBeNull()

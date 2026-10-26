@@ -14,7 +14,6 @@ export type CollectionAddControlProps = {
   disabledReason?: string
   variant?: NonNullable<ButtonVariantProps['variant']>
   size?: NonNullable<ButtonVariantProps['size']>
-  density?: ButtonVariantProps['density']
   showIcon?: boolean
   className?: string
 }
@@ -27,7 +26,7 @@ function CollectionAddTriggerLabel({
 
   return (
     <>
-      <ActionIcon action="add" size="lg" />
+      <ActionIcon action="add" size="owner" />
       {label}
     </>
   )
@@ -57,7 +56,6 @@ export function CollectionAddControl({
   disabledReason,
   variant = 'outline',
   size = 'sm',
-  density,
   showIcon = true,
   className,
 }: CollectionAddControlProps) {
@@ -70,7 +68,6 @@ export function CollectionAddControl({
         type="button"
         variant={variant}
         size={size}
-        density={density}
         className={className}
         onClick={enabled ? onClick : undefined}
         aria-label={label}

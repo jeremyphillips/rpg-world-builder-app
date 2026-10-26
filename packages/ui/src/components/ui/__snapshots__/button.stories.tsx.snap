@@ -33,7 +33,7 @@ exports[`Primitives/Button Disabled smoke-test 1`] = `
 ]
 `;
 
-exports[`Primitives/Button ExtraSmallDensityComparison smoke-test 1`] = `
+exports[`Primitives/Button SizeLadder smoke-test 1`] = `
 [
   {
     "height": "auto",
@@ -69,11 +69,11 @@ exports[`Primitives/Button Ghost smoke-test 1`] = `
 exports[`Primitives/Button IconExtraSmall smoke-test 1`] = `
 [
   {
-    "height": "10px",
+    "height": "14px",
     "identity": "trash",
     "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "10px",
+    "width": "14px",
   },
   {
     "height": "auto",
@@ -139,7 +139,7 @@ exports[`Primitives/Button Small smoke-test 1`] = `
 ]
 `;
 
-exports[`Primitives/Button SmallCompact smoke-test 1`] = `
+exports[`Primitives/Button ExtraSmall smoke-test 1`] = `
 [
   {
     "height": "auto",
@@ -164,11 +164,11 @@ exports[`Primitives/Button TextAccent smoke-test 1`] = `
 exports[`Primitives/Button TextAccentWithIcon smoke-test 1`] = `
 [
   {
-    "height": "16px",
+    "height": "14px",
     "identity": "arrow-right",
     "ownerSizeResolved": true,
     "strokeWidth": "2px",
-    "width": "16px",
+    "width": "14px",
   },
   {
     "height": "auto",
@@ -179,7 +179,7 @@ exports[`Primitives/Button TextAccentWithIcon smoke-test 1`] = `
 ]
 `;
 
-exports[`Primitives/Button TextCompactAdd smoke-test 1`] = `
+exports[`Primitives/Button TextXsAdd smoke-test 1`] = `
 [
   {
     "height": "12px",

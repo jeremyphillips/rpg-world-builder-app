@@ -31,7 +31,7 @@ export function ClassFeatureItem({ feature }: ClassFeatureItemProps) {
         {heading}
       </Heading>
       {hasFeatureDescription(feature.description) && (
-        <RichTextContent html={feature.description} size="md" tone="muted" />
+        <RichTextContent html={feature.description} size="sm" tone="muted" />
       )}
       {inlineTables.length > 0 ? (
         <div className="space-y-4">

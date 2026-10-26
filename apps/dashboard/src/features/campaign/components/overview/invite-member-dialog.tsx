@@ -66,7 +66,7 @@ export function InviteMemberDialog({
     <Modal.Root open={open} onOpenChange={handleOpenChange}>
       {showTrigger ? (
         <Modal.Trigger asChild>
-          <ActionButton action="invite" variant="outline" size="sm" iconStep="md">
+          <ActionButton action="invite" variant="outline" size="sm">
             Invite member
           </ActionButton>
         </Modal.Trigger>

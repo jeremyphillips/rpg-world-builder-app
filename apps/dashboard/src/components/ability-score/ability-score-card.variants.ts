@@ -98,7 +98,7 @@ export const abilityScoreCardScoreRowVariants = cva('flex w-full min-w-0 items-c
 /** Locks score-row height so modifiers align across numerals, prompts, and display dashes. */
 export function abilityScoreCardScoreSlotMinHeightClassesFor(size: 'sm' | 'md'): string {
   return size === 'sm'
-    ? 'min-h-[length:var(--text-heading-3--line-height)]'
+    ? 'min-h-[length:var(--text-ability-score-sm--line-height)]'
     : 'min-h-[length:var(--text-ability-score-md--line-height)]'
 }
 
@@ -155,12 +155,12 @@ export const abilityScoreCardStepperStackClasses = 'flex shrink-0 flex-col items
 
 const abilityScoreCardScoreValueBaseClasses = 'font-semibold tabular-nums text-foreground'
 
-/** Score numerals — sm ~28px (heading-3), md ~32px. */
+/** Score numerals — sm 28px (`--text-ability-score-sm`), md 32px. */
 export function abilityScoreCardScoreValueClassesFor(size: 'sm' | 'md'): string {
   return cn(
     abilityScoreCardScoreValueBaseClasses,
     size === 'sm'
-      ? 'text-[length:var(--text-heading-3)] leading-[length:var(--text-heading-3--line-height)]'
+      ? 'text-[length:var(--text-ability-score-sm)] leading-[length:var(--text-ability-score-sm--line-height)]'
       : 'text-[length:var(--text-ability-score-md)] leading-[length:var(--text-ability-score-md--line-height)]',
   )
 }
@@ -180,7 +180,7 @@ export const abilityScoreCardFooterCheckboxClasses =
 
 /** Entire footer row — outline hover/active, padding, and card bottom radius (no inner button chrome). */
 export const abilityScoreCardFooterClasses = cn(
-  'ui-button ui-button--outline ui-button--xs-compact font-body',
+  'ui-button ui-button--outline ui-button--xs font-body',
   interactiveFocusVariants({ context: 'standalone' }),
   'flex w-full cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap border-0 border-t border-border-subtle px-2 py-[2px] shadow-none',
   'rounded-none rounded-b-md',

@@ -4,7 +4,7 @@ import {
   UI_ALERT_APPEARANCE_CLASSES,
   UI_ALERT_DENSITY_CLASSES,
 } from '../components/ui/alert.variants'
-import { UI_COMPACT_LABEL_APPEARANCE_CLASSES } from '../components/ui/badge-appearance.lib'
+import { UI_BADGE_APPEARANCE_CLASSES } from '../components/ui/badge-appearance.lib'
 import { UI_BORDER_STRENGTH_CLASSES } from '../components/ui/border-strength'
 import {
   UI_DIALOG_PANEL_FILL_CLASSES,
@@ -18,7 +18,6 @@ import {
   BUTTON_SIZE_SPECS,
   TEXT_BUTTON_SIZE_CLASS,
   UI_BUTTON_ATTACHED_SIZE_CLASS,
-  UI_BUTTON_TEXT_SIZE_CLASS,
 } from '../components/ui/button.styles'
 import {
   UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES,
@@ -30,10 +29,12 @@ import {
   UI_COMPACT_CONTROL_SIZE_CLASSES,
   COMPACT_CONTROL_RECIPE_SPECS,
 } from '../components/ui/compact-control.styles'
+import { UI_BADGE_SIZE_CLASSES } from '../components/ui/badge.variants'
 import {
-  UI_COMPACT_LABEL_SIZE_CLASSES,
-  COMPACT_LABEL_SIZES,
-} from '../components/ui/compact-label.lib'
+  CHIP_SIZES,
+  UI_CHIP_REMOVE_SIZE_CLASSES,
+  UI_CHIP_SIZE_CLASSES,
+} from '../components/ui/chip.lib'
 import {
   UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,
@@ -98,9 +99,9 @@ describe('semantic-control-class-groups sync', () => {
       'field size',
     )
     expectSameSet(
-      classGroups.UI_COMPACT_LABEL_APPEARANCE_CLASSES,
-      UI_COMPACT_LABEL_APPEARANCE_CLASSES,
-      'compact label appearance',
+      classGroups.UI_BADGE_APPEARANCE_CLASSES,
+      UI_BADGE_APPEARANCE_CLASSES,
+      'badge appearance',
     )
   })
 
@@ -112,16 +113,12 @@ describe('semantic-control-class-groups sync', () => {
     )
     expectSameSet(
       UI_BUTTON_SIZE_CLASSES,
-      [
-        ...BUTTON_SIZE_SPECS.map((spec) => spec.className),
-        UI_BUTTON_TEXT_SIZE_CLASS,
-        UI_BUTTON_ATTACHED_SIZE_CLASS,
-      ],
+      [...BUTTON_SIZE_SPECS.map((spec) => spec.className), UI_BUTTON_ATTACHED_SIZE_CLASS],
       'button size specs',
     )
     expectSameSet(
       UI_BUTTON_TEXT_GEOMETRY_CLASSES,
-      Object.values(TEXT_BUTTON_SIZE_CLASS).flatMap((byDensity) => Object.values(byDensity)),
+      Object.values(TEXT_BUTTON_SIZE_CLASS),
       'button text geometry map',
     )
   })
@@ -154,11 +151,21 @@ describe('semantic-control-class-groups sync', () => {
     )
   })
 
-  it('derives compact label, field group, and floating label classes from specs', () => {
+  it('derives badge, chip, field group, and floating label classes from specs', () => {
     expectSameSet(
-      UI_COMPACT_LABEL_SIZE_CLASSES,
-      COMPACT_LABEL_SIZES.map((size) => `ui-compact-label--${size}`),
-      'compact label sizes',
+      UI_BADGE_SIZE_CLASSES,
+      ['ui-badge--sm', 'ui-badge--md', 'ui-badge--lg'],
+      'badge sizes',
+    )
+    expectSameSet(
+      UI_CHIP_SIZE_CLASSES,
+      CHIP_SIZES.map((size) => `ui-chip--${size}`),
+      'chip sizes',
+    )
+    expectSameSet(
+      UI_CHIP_REMOVE_SIZE_CLASSES,
+      CHIP_SIZES.map((size) => `ui-chip__remove--${size}`),
+      'chip remove sizes',
     )
     expectSameSet(
       UI_FIELD_GROUP_SIZE_CLASSES,

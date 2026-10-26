@@ -37,9 +37,9 @@ describe('dialog title typography ownership', () => {
     expect(globalsCss).not.toContain('--font-weight-heading-section')
   })
 
-  it('defines dialogTitle as 19px base with 24px from the md breakpoint', () => {
-    expect(globalsCss).toMatch(/--text-heading-dialog-title:\s*var\(--text-heading-subsection\)/)
-    expect(globalsCss).toMatch(/--text-heading-dialog-title-md:\s*var\(--text-heading-3-md\)/)
+  it('defines dialogTitle as 18px base with 20px from the md breakpoint', () => {
+    expect(globalsCss).toMatch(/--text-heading-dialog-title:\s*var\(--text-lg\)/)
+    expect(globalsCss).toMatch(/--text-heading-dialog-title-md:\s*var\(--text-xl\)/)
     expect(globalsCss).toMatch(
       /@utility heading-style-dialog-title \{[\s\S]*?@variant md \{[\s\S]*?--text-heading-dialog-title-md/,
     )

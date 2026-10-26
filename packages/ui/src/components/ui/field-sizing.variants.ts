@@ -15,7 +15,6 @@ import {
   resolveFieldGroupInputSegmentClasses,
   resolveFieldGroupSizeClass,
 } from './field-group.styles'
-import type { CompactLabelSize } from './compact-label.lib'
 import type { InteractiveListSize } from './interactive-list.variants'
 
 export type FieldSizeToken = 'xs' | 'sm' | 'md' | 'lg'
@@ -83,22 +82,6 @@ export const fieldDigitTrailingColumnClasses = {
   lg: 'w-7',
 } as const satisfies Record<FieldSizeToken, string>
 
-/** Maps field control size to badge size (`Badge` defines `sm` | `md` | `lg`). */
-export const fieldSizeToBadgeSize = {
-  xs: 'sm',
-  sm: 'sm',
-  md: 'md',
-  lg: 'lg',
-} as const satisfies Record<FieldSizeToken, 'sm' | 'md' | 'lg'>
-
-/** Maps field control size to removable chip size (1:1 with control scale). */
-export const fieldSizeToChipSize = {
-  xs: 'sm',
-  sm: 'sm',
-  md: 'md',
-  lg: 'lg',
-} as const satisfies Record<FieldSizeToken, CompactLabelSize>
-
 export const fieldSizeToAttachedButtonSize = {
   xs: 'xs',
   sm: 'sm',
@@ -136,8 +119,10 @@ export function resolveArrayAddButtonSize(
   sectionSize: FieldSizeToken,
   override?: ArrayAddButtonSize,
   layout: 'inline' | 'stacked' = 'stacked',
+  variant?: NonNullable<ButtonVariantProps['variant']>,
 ): ArrayAddButtonSize {
   if (override) return override
+  if (layout === 'inline' && variant === 'text') return 'xs'
   if (layout === 'inline') return INLINE_HEADER_ACTION_BUTTON_SIZE
   return fieldSizeToArrayAddButtonSize[sectionSize]
 }

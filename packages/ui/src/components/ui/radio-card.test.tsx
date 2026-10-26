@@ -503,6 +503,7 @@ describe('RadioCard', () => {
     const { container } = render(
       <RadioCard
         aria-label="Classes"
+        density="compact"
         options={[
           {
             label: 'Fighter',
@@ -513,7 +514,14 @@ describe('RadioCard', () => {
       />,
     )
 
-    expect(container.querySelector('[data-icon="info"]')).toBeInTheDocument()
+    const detailsButton = screen.getByRole('button', { name: 'View Fighter details' })
+    expect(detailsButton).toHaveClass('ui-button--text', 'ui-button--icon-xs')
+    expect(detailsButton).toHaveAttribute('type', 'button')
+
+    const icon = container.querySelector('[data-icon="info"]')
+    expect(icon).toBeInTheDocument()
+    expect(icon).toHaveClass('ui-icon--owner')
+    expect(icon).not.toHaveClass('ui-icon--2xl')
   })
 
   it('renders a media slot above the card body', () => {

@@ -25,6 +25,12 @@ export const TEXT_VARIANT_CATALOG: Record<TextVariant, TextVariantCatalogRow> = 
     category: 'primary',
     useCase: 'Small supplemental metadata',
   },
+  micro: {
+    variant: 'micro',
+    category: 'primary',
+    useCase:
+      'Fine 10px metadata — typography owner for toned inline status (e.g. PreviewRail section status)',
+  },
   label: {
     variant: 'label',
     category: 'primary',

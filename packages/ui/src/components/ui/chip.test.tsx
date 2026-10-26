@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
+import { cn } from '../../lib/utils'
 import { Chip } from './chip.client'
 
 describe('Chip', () => {
@@ -17,7 +18,9 @@ describe('Chip', () => {
       'false',
     )
     expect(screen.getByRole('checkbox', { name: 'Option' })).toHaveClass(
-      'ui-compact-label--interactive',
+      'ui-pill',
+      'ui-chip',
+      'ui-chip--interactive',
     )
   })
 
@@ -29,7 +32,7 @@ describe('Chip', () => {
     )
     const button = screen.getByRole('checkbox', { name: 'Selected' })
     expect(button).toHaveAttribute('aria-checked', 'true')
-    expect(button).toHaveClass('ui-compact-label--selected')
+    expect(button).toHaveClass('ui-chip--selected')
     expect(button.querySelector('svg')).toBeInTheDocument()
   })
 
@@ -52,12 +55,31 @@ describe('Chip', () => {
         Tag
       </Chip>,
     )
-    const chip = screen.getByText('Tag').closest('.ui-compact-label')
-    expect(chip).toHaveClass('ui-compact-label--sm', 'ui-compact-label--removable-sm')
-    expect(screen.getByRole('button', { name: 'Remove Tag' })).toHaveClass(
-      'ui-compact-label__remove',
-      'ui-compact-control--icon-compact-sm',
+    const chip = screen.getByText('Tag').closest('.ui-chip')
+    expect(chip).toHaveClass(
+      'ui-pill',
+      'ui-chip',
+      'ui-chip--sm',
+      'ui-chip--removable',
+      'ui-chip--removable-sm',
     )
+    const remove = screen.getByRole('button', { name: 'Remove Tag' })
+    expect(remove).toHaveClass('ui-chip__remove', 'ui-chip__remove--sm')
+    expect(remove.querySelector('svg')).toHaveClass('ui-icon--owner')
+    expect(remove).not.toHaveClass('ui-compact-control', 'ui-chip')
+  })
+
+  it('keeps the xs removable shell at the compact control height', () => {
+    render(
+      <Chip mode="removable" size="xs" removeLabel="Remove Tag" onRemove={vi.fn()}>
+        Tag
+      </Chip>,
+    )
+    const chip = screen.getByText('Tag').closest('.ui-chip')
+    expect(chip).toHaveClass('ui-chip--xs', 'ui-chip--removable-xs')
+    const remove = screen.getByRole('button', { name: 'Remove Tag' })
+    expect(remove).toHaveClass('ui-chip__remove--xs', 'ui-chip__remove')
+    expect(remove).not.toHaveClass('ui-compact-control', 'ui-chip')
   })
 
   it('removable calls onRemove from dismiss button', async () => {
@@ -71,6 +93,22 @@ describe('Chip', () => {
 
     await user.click(screen.getByRole('button', { name: 'Remove Dagger' }))
     expect(onRemove).toHaveBeenCalledOnce()
+  })
+
+  it('keeps chip state and size independently mergeable', () => {
+    const together = cn(
+      'ui-chip--sm',
+      'ui-chip--interactive',
+      'ui-chip--selected',
+      'ui-chip--removable-sm',
+    )
+    expect(together).toContain('ui-chip--sm')
+    expect(together).toContain('ui-chip--interactive')
+    expect(together).toContain('ui-chip--selected')
+    expect(together).toContain('ui-chip--removable-sm')
+    expect(cn('ui-chip--sm', 'ui-chip--md')).toBe('ui-chip--md')
+    expect(cn('ui-chip__remove--sm', 'ui-chip__remove--md')).toBe('ui-chip__remove--md')
+    expect(cn('ui-chip--sm', 'ui-chip__remove--sm')).toBe('ui-chip--sm ui-chip__remove--sm')
   })
 
   it('has no accessibility violations for selectable chip', async () => {

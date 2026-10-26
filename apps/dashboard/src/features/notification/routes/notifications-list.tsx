@@ -42,7 +42,6 @@ export function NotificationsList() {
               type="button"
               variant="ghost"
               size="sm"
-              density="compact"
               onClick={handleMarkAllRead}
               disabled={unreadCount === 0 || markAllReadPending}
             >

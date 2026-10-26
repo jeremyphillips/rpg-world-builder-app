@@ -117,9 +117,11 @@ export function XpThresholdsField() {
                 </Text>
               </InlineMetadata.Item>
               <InlineMetadata.Item>
-                <SemanticText tone="warning">
-                  {summary.derivedCount} threshold{summary.derivedCount === 1 ? '' : 's'} derived
-                </SemanticText>
+                <Text as="span" variant="supporting">
+                  <SemanticText tone="warning">
+                    {summary.derivedCount} threshold{summary.derivedCount === 1 ? '' : 's'} derived
+                  </SemanticText>
+                </Text>
               </InlineMetadata.Item>
             </InlineMetadata>
           ) : (

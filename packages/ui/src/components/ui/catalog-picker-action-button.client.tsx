@@ -19,7 +19,7 @@ export type CatalogPickerActionButtonProps = {
   tabIndex?: number
 }
 
-/** Shared picker header action chrome — outline, sm, compact density (not overridable). */
+/** Shared picker header action chrome — outline xs (not overridable). */
 export function CatalogPickerActionButton({
   children,
   intent,
@@ -35,8 +35,7 @@ export function CatalogPickerActionButton({
     <Button
       type="button"
       variant={variant}
-      size="sm"
-      density="compact"
+      size="xs"
       className={className}
       disabled={disabled}
       tabIndex={tabIndex}

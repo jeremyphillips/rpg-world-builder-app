@@ -189,13 +189,7 @@ function BuildingOrganizationDiscoveryBody({
           onValueChange={setSearchQuery}
         />
         <div className={createTabDiscoveryCreateActionClasses}>
-          <Button
-            type="button"
-            variant="text"
-            size="sm"
-            density="compact"
-            onClick={enterNewOrganizationBranch}
-          >
+          <Button type="button" variant="text" size="sm" onClick={enterNewOrganizationBranch}>
             {BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL}
           </Button>
         </div>
@@ -304,13 +298,7 @@ export function BuildingOrganizationRelationshipReview({
           heading={BUILDING_ORGANIZATIONS_BRANCH_HEADING}
           helper={BUILDING_ORGANIZATIONS_BRANCH_HELPER}
           action={
-            <Button
-              type="button"
-              variant="text"
-              size="sm"
-              density="compact"
-              onClick={returnToDiscovery}
-            >
+            <Button type="button" variant="text" size="sm" onClick={returnToDiscovery}>
               {BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL}
             </Button>
           }

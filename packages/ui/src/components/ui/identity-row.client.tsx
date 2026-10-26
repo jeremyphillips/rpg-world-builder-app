@@ -6,11 +6,17 @@ import { Slot } from '@radix-ui/react-slot'
 import { cn } from '../../lib/utils'
 
 import {
+  EntityRowInlineBadge,
+  EntityRowInlineDensityProvider,
+  type EntityRowInlineBadgeProps,
+} from './entity-row-inline-badge.client'
+import {
   identityRowRootVariants,
   identityRowSupportingVariants,
   type IdentityRowDensity,
 } from './identity-row.variants'
 import { InlineMetadata } from './inline-metadata'
+import type { GenericCardDensity } from './card.variants'
 
 export type { IdentityRowDensity } from './identity-row.variants'
 
@@ -104,13 +110,24 @@ function IdentityRowHeadingContent({
   )
 }
 
-export type IdentityRowHeadingLineProps = {
+type IdentityRowHeadingLineBaseProps = {
   heading?: ReactNode
   classification?: ReactNode | readonly ReactNode[]
+  /** Non-badge end slot (price, count, plain text). Badges use `headingBadge`. */
   headingEnd?: ReactNode
   /** Intrinsic-width slot immediately after the title (not `headingEnd`). */
   headingInline?: ReactNode
 }
+
+export type IdentityRowHeadingLineProps = IdentityRowHeadingLineBaseProps &
+  (
+    | {
+        /** Managed inline badge. Size follows `density`; the descriptor has no size prop. */
+        headingBadge: EntityRowInlineBadgeProps
+        density: GenericCardDensity
+      }
+    | { headingBadge?: undefined; density?: GenericCardDensity }
+  )
 
 /** Heading + classification line — row-track hosts place it in their band cell. */
 export function IdentityRowHeadingLine({
@@ -118,6 +135,8 @@ export function IdentityRowHeadingLine({
   classification,
   headingEnd,
   headingInline,
+  headingBadge,
+  density,
 }: IdentityRowHeadingLineProps) {
   const content = (
     <IdentityRowHeadingContent
@@ -126,7 +145,7 @@ export function IdentityRowHeadingLine({
       headingInline={headingInline}
     />
   )
-  const showHeadingEnd = isPresent(headingEnd)
+  const showHeadingEnd = isPresent(headingEnd) || headingBadge != null
 
   return (
     <div className="flex w-full min-w-0 items-center">
@@ -135,7 +154,16 @@ export function IdentityRowHeadingLine({
       ) : (
         content
       )}
-      {showHeadingEnd ? <span className="shrink-0 text-style-caption">{headingEnd}</span> : null}
+      {showHeadingEnd ? (
+        <span className="shrink-0 text-style-caption">
+          {headingEnd}
+          {headingBadge != null && density != null ? (
+            <EntityRowInlineDensityProvider density={density}>
+              <EntityRowInlineBadge {...headingBadge} />
+            </EntityRowInlineDensityProvider>
+          ) : null}
+        </span>
+      ) : null}
     </div>
   )
 }

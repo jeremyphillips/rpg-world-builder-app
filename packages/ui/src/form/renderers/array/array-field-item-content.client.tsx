@@ -10,7 +10,6 @@ import type { ResolvedArrayItemHeader } from '../../config/array/array-item-conf
 import type { ArrayConfig, ArrayItemConfig } from '../../field-config'
 import { FormSectionContext, useFormSectionContext } from '../../context/form-section.context'
 import { NestedFormItems } from '../../containers/form-item-node.client'
-import type { ArrayItemIssueProminence } from './array-item-issue.variants'
 import { CollapsibleListItem } from '../../../components/ui/collapsible-list-item'
 import { resolveArrayItemShellSurface } from '../../config/array/resolve-array-item-shell-surface.lib'
 import { ArrayItemHeaderContent, ArrayItemHeaderSummary } from './array-item-header.client'
@@ -63,7 +62,6 @@ interface ArrayFieldItemActionsRailProps {
   issueCount: number
   rowLabel: string
   onFocusIssue: () => void
-  badgeProminence: ArrayItemIssueProminence
   variant: 'compact' | 'detailed'
   embedded: boolean
 }
@@ -78,7 +76,6 @@ function ArrayFieldItemActionsRailSlot({
   issueCount,
   rowLabel,
   onFocusIssue,
-  badgeProminence,
   variant,
   embedded,
   bare = false,
@@ -92,7 +89,6 @@ function ArrayFieldItemActionsRailSlot({
     issueCount: showIssueBadge ? issueCount : 0,
     issueRowLabel: rowLabel,
     onIssuePress: onFocusIssue,
-    badgeProminence: showIssueBadge ? badgeProminence : 'nav',
     compact: variant === 'compact',
   }
 
@@ -328,7 +324,6 @@ export function ArrayFieldItemContent({
     leadingChrome,
     rowLabel,
     focusIssue,
-    badgeProminence,
     issueSummary,
     normalizedContent,
     chromeProps,
@@ -388,7 +383,6 @@ export function ArrayFieldItemContent({
       issueCount={issueGroup.totalCount}
       rowLabel={rowLabel}
       onFocusIssue={focusIssue}
-      badgeProminence={badgeProminence}
       variant={variant}
       embedded={actionsEmbedded}
       bare={(anatomy === 'disclosure' || anatomy === 'flatWithHeader') && !itemConfig.renderShell}

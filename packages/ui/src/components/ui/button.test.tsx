@@ -42,36 +42,20 @@ describe('Button', () => {
     expect(screen.getByRole('button', { name: 'Remove' })).toHaveClass('ui-button--icon-xs')
   })
 
-  it('applies compact density size modifiers', () => {
+  it('maps micro sizes to xs and icon-xs modifiers', () => {
     const { rerender } = render(
-      <Button size="sm" density="compact">
-        Compact
+      <Button size="xs" variant="outline">
+        Micro
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('ui-button--sm-compact')
+    expect(screen.getByRole('button', { name: 'Micro' })).toHaveClass('ui-button--xs')
 
     rerender(
-      <Button size="default" density="compact">
-        Compact
-      </Button>,
-    )
-    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('ui-button--md-compact')
-
-    rerender(
-      <Button size="lg" density="compact">
-        Compact
-      </Button>,
-    )
-    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('ui-button--lg-compact')
-
-    rerender(
-      <Button size="icon" density="compact" aria-label="Icon action">
+      <Button size="icon-xs" aria-label="Icon action">
         <span aria-hidden>+</span>
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Icon action' })).toHaveClass(
-      'ui-button--icon-compact',
-    )
+    expect(screen.getByRole('button', { name: 'Icon action' })).toHaveClass('ui-button--icon-xs')
 
     rerender(
       <Button size="icon-lg" aria-label="Large icon action">
@@ -152,15 +136,13 @@ describe('Button', () => {
     expect(button).not.toHaveClass('ui-button--primary')
   })
 
-  it('applies compact text variant geometry', () => {
+  it('applies xs text variant geometry', () => {
     render(
-      <Button variant="text" density="compact">
+      <Button variant="text" size="xs">
         Compact text
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Compact text' })).toHaveClass(
-      'ui-button__text--default-compact',
-    )
+    expect(screen.getByRole('button', { name: 'Compact text' })).toHaveClass('ui-button__text--xs')
   })
 
   it('applies accent tone on text variant when requested', () => {

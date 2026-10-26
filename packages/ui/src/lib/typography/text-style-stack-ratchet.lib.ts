@@ -40,7 +40,7 @@ function supportingStackViolation(set: Set<string>): string | null {
 
 function captionStackViolation(set: Set<string>): string | null {
   if (!withoutEmphasisWeight(set)) return null
-  const hasXs = set.has('text-xs') && !set.has('text-xs-meta')
+  const hasXs = set.has('text-xs')
   if (hasXs && set.has('text-muted-foreground')) {
     return 'text-xs + text-muted-foreground (use text-style-caption)'
   }
@@ -95,7 +95,7 @@ function parseTextTagFlags(flat: string) {
     hasMed: /\bfont-medium\b/.test(flat),
     hasSemi: /\bfont-semibold\b/.test(flat),
     hasSm: /\btext-sm\b/.test(flat),
-    hasXs: /\btext-xs\b/.test(flat) && !/\btext-xs-meta\b/.test(flat),
+    hasXs: /\btext-xs\b/.test(flat),
     hasMutedFg: /\btext-muted-foreground\b/.test(flat),
   }
 }

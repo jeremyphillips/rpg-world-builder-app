@@ -40,7 +40,9 @@ describe('RadioOptionCard trailing interactions', () => {
     )
 
     const detailsButton = screen.getByRole('button', { name: 'View Dwarf details' })
+    expect(detailsButton).toHaveAttribute('type', 'button')
     detailsButton.focus()
+    expect(detailsButton).toHaveFocus()
     await user.keyboard('{Enter}')
 
     expect(onDetails).toHaveBeenCalledTimes(1)

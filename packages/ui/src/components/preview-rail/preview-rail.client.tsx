@@ -302,9 +302,11 @@ function PreviewRailSectionStatus({
   const emphasis = statusTone === 'neutral' ? 'low' : 'medium'
 
   return (
-    <SemanticText tone={statusTone} emphasis={emphasis} className="shrink-0">
-      {status}
-    </SemanticText>
+    <Text as="span" variant="micro" className="shrink-0">
+      <SemanticText tone={statusTone} emphasis={emphasis}>
+        {status}
+      </SemanticText>
+    </Text>
   )
 }
 

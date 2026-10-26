@@ -9,10 +9,7 @@ import { Field, type FieldSize } from './field.client'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import { UI_FIELD_CONTROL_TRIGGER_FILL_CLASS } from './field-control.styles'
 import { selectTriggerShellClasses } from './select-compact-trigger.variants'
-import {
-  fieldSizeToChipSize,
-  resolveInteractiveListSizeForFieldSize,
-} from './field-sizing.variants'
+import { resolveInteractiveListSizeForFieldSize } from './field-sizing.variants'
 import { ComboboxOptionRow } from './combobox-option-row.client'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
@@ -413,7 +410,7 @@ export function ComboboxSelectedItems({
 }: ComboboxSelectedItemsProps) {
   if (options.length === 0) return null
 
-  const chipSize = fieldSizeToChipSize[size]
+  const chipSize = size
   const listClassName = renderSelectedItem
     ? comboboxSelectedListVariants
     : comboboxSelectedItemsRowVariants

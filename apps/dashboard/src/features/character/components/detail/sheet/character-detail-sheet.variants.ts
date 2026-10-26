@@ -16,8 +16,10 @@ export const characterDetailStatTileVariants = cva(
   },
 )
 
-export const characterDetailStatTileValueClasses =
-  'heading-style-page font-semibold tabular-nums text-foreground'
+const characterDetailStatValueTypeClasses =
+  'text-[length:var(--text-character-stat-value)] leading-[length:var(--text-character-stat-value--line-height)] font-semibold tabular-nums'
+
+export const characterDetailStatTileValueClasses = `${characterDetailStatValueTypeClasses} text-foreground`
 
 export const characterDetailStatTileCompactWidthClasses = 'w-[100px] shrink-0'
 
@@ -30,7 +32,7 @@ export const characterDetailStatTileFooterClasses =
   'flex h-5 w-full shrink-0 items-center justify-center'
 
 export const characterDetailStatTileFooterMetaClasses =
-  'heading-style-subsection font-body-emphasis text-muted-foreground'
+  'text-lg font-body-emphasis text-muted-foreground'
 
 export const characterDetailStatTileFooterLabelClasses = 'origin-top scale-[0.92]'
 
@@ -40,11 +42,9 @@ export const characterDetailStatTileHitPointsGridClasses =
 export const characterDetailStatTileHitPointsPairClasses =
   'relative inline-flex items-center justify-center'
 
-export const characterDetailStatTileHitPointsSlashClasses =
-  'absolute left-1/2 -translate-x-1/2 heading-style-page font-semibold text-muted-foreground'
+export const characterDetailStatTileHitPointsSlashClasses = `absolute left-1/2 -translate-x-1/2 ${characterDetailStatValueTypeClasses} text-muted-foreground`
 
-export const characterDetailStatTileHitPointsNumberClasses =
-  'heading-style-page font-semibold tabular-nums text-foreground px-3'
+export const characterDetailStatTileHitPointsNumberClasses = `${characterDetailStatValueTypeClasses} text-foreground px-3`
 
 export const characterDetailAbilitiesStatsSectionClasses = 'flex flex-wrap items-start gap-2'
 

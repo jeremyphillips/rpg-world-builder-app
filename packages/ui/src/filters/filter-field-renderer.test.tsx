@@ -187,7 +187,7 @@ describe('FilterFieldRenderer boolean', () => {
 })
 
 describe('FilterFieldRenderer chrome', () => {
-  it('uses compact label sizing by default for stacked select', () => {
+  it('uses chip sizing by default for stacked select', () => {
     render(<RendererHarness fieldId="status" />)
     const caption = screen.getByText('Status')
     expect(caption.tagName).toBe('LABEL')
@@ -251,7 +251,7 @@ describe('FilterFieldRenderer chrome', () => {
     expect(trigger).toHaveTextContent('Casting')
   })
 
-  it('renders catalog chips with compact label sizing under default chrome', () => {
+  it('renders catalog chips with default chip sizing under default chrome', () => {
     render(<RendererHarness fieldId="levels" />)
     expect(screen.getByText('Levels')).toHaveClass('text-style-caption')
   })

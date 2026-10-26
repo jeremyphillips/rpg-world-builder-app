@@ -145,7 +145,7 @@ export const CopyScale: Story = {
       </DestinationList>
       <Card
         density="spacious"
-        header={{ title: 'Spacious card', description: '19px title, 14px supporting' }}
+        header={{ title: 'Spacious card', description: '18px title, 14px supporting' }}
       >
         <IdentityRow heading="Inherited spacious" supporting="Title follows the card" />
       </Card>

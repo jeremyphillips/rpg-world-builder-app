@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { LinkBadge, StaticBadge } from './link-badge'
 
 describe('LinkBadge', () => {
-  it('renders a link with compact-label outline classes', () => {
+  it('renders a link with badge outline classes', () => {
     render(
       <MemoryRouter>
         <LinkBadge to="/spells/1">Fireball</LinkBadge>
@@ -13,13 +13,13 @@ describe('LinkBadge', () => {
     )
 
     const link = screen.getByRole('link', { name: 'Fireball' })
-    expect(link).toHaveClass('ui-compact-label--outline-neutral', 'hover:underline')
+    expect(link).toHaveClass('ui-badge', 'ui-badge--outline-neutral', 'hover:underline')
   })
 })
 
 describe('StaticBadge', () => {
   it('renders outline neutral badge', () => {
     render(<StaticBadge>Slug</StaticBadge>)
-    expect(screen.getByText('Slug')).toHaveClass('ui-compact-label--outline-neutral')
+    expect(screen.getByText('Slug')).toHaveClass('ui-badge', 'ui-badge--outline-neutral')
   })
 })

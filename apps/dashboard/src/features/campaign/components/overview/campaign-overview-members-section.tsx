@@ -33,13 +33,7 @@ export function CampaignOverviewMembersSection({
       bodySurface="transparent"
       action={
         canManage && onInviteMember ? (
-          <ActionButton
-            action="invite"
-            variant="text"
-            size="sm"
-            iconStep="md"
-            onClick={onInviteMember}
-          >
+          <ActionButton action="invite" variant="text" size="sm" onClick={onInviteMember}>
             Invite member
           </ActionButton>
         ) : undefined

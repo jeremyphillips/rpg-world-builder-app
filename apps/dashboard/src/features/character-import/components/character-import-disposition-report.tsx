@@ -1,6 +1,7 @@
-import { Alert, SemanticText, Text } from '@rpg/ui'
+import { Alert, Text } from '@rpg/ui'
 import type { CharacterImportDispositionEntry } from '@rpg/contracts/character-import'
 
+import { CharacterImportSemanticText } from './character-import-semantic-text'
 import {
   formatDispositionSummary,
   partitionDispositionEntries,
@@ -21,9 +22,9 @@ function DispositionList({
     return (
       <div>
         <Text variant="emphasis">{title}</Text>
-        <SemanticText tone="neutral" emphasis="low">
+        <CharacterImportSemanticText typography="caption" tone="neutral" emphasis="low">
           none
-        </SemanticText>
+        </CharacterImportSemanticText>
       </div>
     )
   }
@@ -34,12 +35,12 @@ function DispositionList({
       <ul className="mt-2 flex flex-col gap-2">
         {entries.map((entry) => (
           <li key={`${entry.sourcePath}:${entry.sourceValue}`}>
-            <SemanticText tone="neutral" emphasis="medium">
+            <CharacterImportSemanticText typography="caption" tone="neutral" emphasis="medium">
               {formatDispositionSummary(entry)}
-            </SemanticText>
-            <SemanticText tone="neutral" emphasis="low">
+            </CharacterImportSemanticText>
+            <CharacterImportSemanticText typography="caption" tone="neutral" emphasis="low">
               {entry.message}
-            </SemanticText>
+            </CharacterImportSemanticText>
           </li>
         ))}
       </ul>

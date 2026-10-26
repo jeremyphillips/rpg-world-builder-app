@@ -1,13 +1,48 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
+import { cn } from '../../lib/utils'
 import { Badge } from './badge'
-import { BADGE_APPEARANCES } from './badge-appearance.lib'
-import { COMPACT_LABEL_TONES } from './compact-label.lib'
-import { COMPACT_LABEL_CLASS_SPECS } from './compact-label.variants'
+import { BADGE_APPEARANCES, BADGE_TONES, badgeSurfaceClasses } from './badge-appearance.lib'
+import { badgeEmphasisClass, badgeLayoutVariants } from './badge.variants'
 import { establishSurfaceCurrent } from './surface-current.lib'
 
-const BADGE_CLASS_SPECS = COMPACT_LABEL_CLASS_SPECS.filter((spec) => spec.key.startsWith('badge'))
+const BADGE_CLASS_SPECS = [
+  {
+    key: 'badge / outline / neutral / md',
+    className: cn('ui-pill', badgeSurfaceClasses('outline', 'neutral')),
+    keyValues: 'transparent fill, neutral outline foreground',
+    useCase: 'Default metadata badge',
+  },
+  {
+    key: 'badge / soft / destructive / sm',
+    className: cn('ui-pill', badgeSurfaceClasses('soft', 'destructive')),
+    keyValues: 'semantic destructive soft fill',
+    useCase: 'Compact table or rail status',
+  },
+  {
+    key: 'badge / strong / info / md',
+    className: cn('ui-pill', badgeSurfaceClasses('strong', 'info')),
+    keyValues: 'semantic info strong fill',
+    useCase: 'High-emphasis classification',
+  },
+  {
+    key: 'badge / subdued / neutral soft / sm',
+    className: cn('ui-pill', badgeSurfaceClasses('soft', 'neutral'), badgeEmphasisClass('subdued')),
+    keyValues: 'muted foreground, soft neutral well',
+    useCase: 'Exhausted or completed labels',
+  },
+  {
+    key: 'badge / counter / destructive soft / sm',
+    className: cn(
+      'ui-pill',
+      badgeSurfaceClasses('soft', 'destructive'),
+      badgeLayoutVariants({ layout: 'counter' }),
+    ),
+    keyValues: 'tabular nums, min-width, tight padding-inline',
+    useCase: 'Issue or validation counts',
+  },
+] as const
 
 const meta = {
   title: 'Components/Badge',
@@ -114,7 +149,7 @@ function SurfaceMatrix({ surface, size }: { surface: 'base' | 'subtle'; size: 's
         <section key={appearance}>
           <h3 className="mb-2 text-style-label capitalize">{appearance}</h3>
           <div className={`flex flex-wrap gap-2 rounded-lg p-4 ${surfaceClass}`}>
-            {COMPACT_LABEL_TONES.map((tone) => (
+            {BADGE_TONES.map((tone) => (
               <Badge key={`${appearance}-${tone}`} appearance={appearance} tone={tone} size={size}>
                 {tone}
               </Badge>

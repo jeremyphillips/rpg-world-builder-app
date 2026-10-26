@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '../../../lib/utils'
 
-export type ArrayItemIssueProminence = 'action' | 'structural' | 'nav' | 'aggregate'
+export type ArrayItemIssueProminence = 'nav' | 'aggregate'
 
 export const arrayItemIssueSummaryClasses = cva(
   cn(

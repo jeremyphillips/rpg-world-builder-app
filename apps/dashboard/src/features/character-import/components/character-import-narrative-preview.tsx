@@ -1,13 +1,13 @@
-import { SemanticText, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 import type {
   CharacterImportFieldResult,
   CharacterNarrativePreview,
 } from '@rpg/contracts/character-import'
 
+import { CharacterImportSemanticText } from './character-import-semantic-text'
 import {
   NARRATIVE_FIELD_KEYS,
   NARRATIVE_FIELD_LABELS,
-  PREVIEW_VALUE_TEXT_CLASS,
   formatNarrativeFieldValue,
   narrativeFieldTone,
   type NarrativeFieldKey,
@@ -29,13 +29,12 @@ function NarrativeFieldRow({
   return (
     <div className="grid gap-1">
       <Text variant="emphasis">{NARRATIVE_FIELD_LABELS[field]}</Text>
-      <SemanticText
+      <CharacterImportSemanticText
         tone={narrativeFieldTone(isUnset)}
         emphasis={isUnset ? 'low' : 'medium'}
-        className={PREVIEW_VALUE_TEXT_CLASS}
       >
         {displayValue}
-      </SemanticText>
+      </CharacterImportSemanticText>
     </div>
   )
 }

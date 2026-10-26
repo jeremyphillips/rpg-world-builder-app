@@ -1,7 +1,6 @@
 import { cn } from '../../lib/utils'
 import { type AlertVariant, ALERT_VARIANTS } from './alert.variants'
 import { borderStrength } from './border-strength'
-import { compactLabelAppearanceToneClasses } from './compact-label.lib'
 import {
   fieldGroupBodyShellLayoutClasses,
   fieldShellLayoutClasses,
@@ -97,7 +96,10 @@ function resolveCalloutShellClasses(chrome: ChromeConfig): string {
   const tone = chrome.tone ?? 'info'
 
   if (tone === 'neutral') {
-    return compactLabelAppearanceToneClasses('soft', 'neutral')
+    return cn(
+      'bg-semantic-neutral-soft text-semantic-neutral-soft-foreground font-medium',
+      borderStrength(),
+    )
   }
 
   if (isAlertVariant(tone)) {

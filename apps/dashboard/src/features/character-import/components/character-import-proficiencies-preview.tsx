@@ -1,13 +1,13 @@
-import { SemanticText, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 import { getProficiencyDomainCompactLabel } from '@rpg/contracts'
 import type {
   CharacterImportFieldResult,
   CharacterImportProficienciesPreview,
 } from '@rpg/contracts/character-import'
 
+import { CharacterImportSemanticText } from './character-import-semantic-text'
 import {
   EXTRACTION_UNSET_DISPLAY_VALUE,
-  PREVIEW_VALUE_TEXT_CLASS,
   extractionIssueTone,
   extractionValueEmphasis,
   extractionValueTone,
@@ -26,13 +26,12 @@ function ProficiencyGroup({ label, values }: { label: string; values: string[] }
   return (
     <div className="grid gap-1">
       <Text variant="emphasis">{label}</Text>
-      <SemanticText
+      <CharacterImportSemanticText
         tone={isUnset ? 'info' : 'neutral'}
         emphasis={isUnset ? 'low' : 'medium'}
-        className={PREVIEW_VALUE_TEXT_CLASS}
       >
         {isUnset ? EXTRACTION_UNSET_DISPLAY_VALUE : values.join(', ')}
-      </SemanticText>
+      </CharacterImportSemanticText>
     </div>
   )
 }
@@ -48,21 +47,16 @@ export function CharacterImportProficienciesPreviewSection({
       <Text variant="emphasis">Proficiencies</Text>
       {isUnset || !preview ? (
         <>
-          <SemanticText
+          <CharacterImportSemanticText
             tone={extractionValueTone(result)}
             emphasis={extractionValueEmphasis(result)}
-            className={PREVIEW_VALUE_TEXT_CLASS}
           >
             {EXTRACTION_UNSET_DISPLAY_VALUE}
-          </SemanticText>
+          </CharacterImportSemanticText>
           {shouldShowExtractionIssue(result) ? (
-            <SemanticText
-              tone={extractionIssueTone(result)}
-              emphasis="low"
-              className={PREVIEW_VALUE_TEXT_CLASS}
-            >
+            <CharacterImportSemanticText tone={extractionIssueTone(result)} emphasis="low">
               {result.issues.join(' ')}
-            </SemanticText>
+            </CharacterImportSemanticText>
           ) : null}
         </>
       ) : (
@@ -73,13 +67,9 @@ export function CharacterImportProficienciesPreviewSection({
           />
           <ProficiencyGroup label="Tools" values={formatProficienciesPreviewValue(preview.tools)} />
           {shouldShowExtractionIssue(result) ? (
-            <SemanticText
-              tone={extractionIssueTone(result)}
-              emphasis="low"
-              className={PREVIEW_VALUE_TEXT_CLASS}
-            >
+            <CharacterImportSemanticText tone={extractionIssueTone(result)} emphasis="low">
               {result.issues.join(' ')}
-            </SemanticText>
+            </CharacterImportSemanticText>
           ) : null}
         </>
       )}

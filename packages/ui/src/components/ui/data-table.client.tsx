@@ -545,7 +545,6 @@ export function RowActionsMenu({
           ref={triggerRef}
           variant={triggerVariant === 'outline-icon' ? 'outline' : 'ghost'}
           size={triggerSize === 'compact' ? 'icon-xs' : 'sm'}
-          density={triggerSize === 'compact' ? 'compact' : 'default'}
           className={triggerClassName}
           aria-label={triggerLabel}
           disabled={disabled}
@@ -907,7 +906,7 @@ export function DataTable<TData>({
   const tableElement = (
     <Table className="ui-data-table__table text-table-body">
       {caption && (
-        <TableCaption className="pb-3 text-sm-meta italic text-muted-foreground">
+        <TableCaption className="pb-3 text-fine-md italic text-muted-foreground">
           {caption}
         </TableCaption>
       )}

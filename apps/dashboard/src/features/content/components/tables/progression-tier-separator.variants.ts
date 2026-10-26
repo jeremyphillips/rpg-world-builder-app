@@ -7,7 +7,7 @@ export const progressionTierSeparatorLabelVariants = cva('text-center font-mediu
     variant: {
       preview: 'border-border border-y bg-surface-muted py-2 text-sm',
       values:
-        'my-1 border-border border-y bg-surface-subtle py-1.5 text-xs-meta leading-none text-muted-foreground',
+        'my-1 border-border border-y bg-surface-subtle py-1.5 text-fine-sm leading-none text-muted-foreground',
     },
   },
   defaultVariants: {

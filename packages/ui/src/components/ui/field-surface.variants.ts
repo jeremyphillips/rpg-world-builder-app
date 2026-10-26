@@ -53,18 +53,6 @@ export function resolveFieldContainerChromeClasses(
   return resolveSurfaceClasses({ ...surface, tone })
 }
 
-import type { CompactLabelTone } from './compact-label.lib'
-
-export function isCompactLabelTone(value: string): value is CompactLabelTone {
-  return (
-    value === 'neutral' ||
-    value === 'info' ||
-    value === 'success' ||
-    value === 'warning' ||
-    value === 'destructive'
-  )
-}
-
 const OUTLINE_SEMANTIC_TONE_CLASS: Record<SemanticSurfaceTone, string> = {
   info: 'border-info-muted',
   success: 'border-success-muted',

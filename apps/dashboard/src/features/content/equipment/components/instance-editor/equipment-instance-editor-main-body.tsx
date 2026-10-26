@@ -222,9 +222,11 @@ function MagicalPropertiesSection({
             </ActionButton>
           </div>
         ) : propertyCount > 0 ? (
-          <SemanticText tone="warning">
-            {formatMagicalPropertiesRemovalWarning(propertyCount)}
-          </SemanticText>
+          <Text as="span" variant="supporting">
+            <SemanticText tone="warning">
+              {formatMagicalPropertiesRemovalWarning(propertyCount)}
+            </SemanticText>
+          </Text>
         ) : null}
       </div>
     </FieldSeparatorWrapper>

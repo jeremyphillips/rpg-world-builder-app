@@ -228,7 +228,7 @@ Review in Storybook (both modes) without pixel-matching:
 ## Shared tone enum
 
 `neutral | info | success | warning | destructive` across `SemanticText`, `Badge`, `Chip`,
-field group accents, and app status call sites. See [compact-labels.md](./compact-labels.md) and
+field group accents, and app status call sites. See [pill-badge-chip.md](./pill-badge-chip.md) and
 [semantic-text.md](./semantic-text.md).
 
 ## Enforcement
@@ -254,15 +254,15 @@ Two independent SSOT axes in `@rpg/ui` — compose separately or use named pairi
 
 Module: [`icon/icon.types.ts`](../src/components/ui/icon/icon.types.ts), [`icon/icon.css`](../src/components/ui/icon/icon.css). Full guide: [icon-registry.md](./icon-registry.md).
 
-| Step | px  | `Icon` `size` | Role                                              |
-| ---- | --- | ------------- | ------------------------------------------------- |
-| xs   | 10  | `xs`          | Tertiary/decorative — badge/chip sm leading       |
-| sm   | 12  | `sm`          | Dense inline — semantic text, filter reset        |
-| md   | 14  | `md`          | Breadcrumbs, compact icon-button glyph pairing    |
-| lg   | 16  | `lg`          | Menus, default button icons                       |
-| xl   | 20  | `xl`          | Notification bell, responsive search (below `md`) |
-| 2xl  | 24  | `2xl`         | Identity fallbacks, spinner `lg`, media compact   |
-| 3xl  | 32  | `3xl`         | Large empty-state and media hero fallbacks        |
+| Step | px  | `Icon` `size` | Role                                                 |
+| ---- | --- | ------------- | ---------------------------------------------------- |
+| xs   | 10  | `xs`          | Tertiary/decorative — badge/chip sm leading          |
+| sm   | 12  | `sm`          | Dense inline — semantic text, filter reset           |
+| md   | 14  | `md`          | Breadcrumbs, labeled default button icons            |
+| lg   | 16  | `lg`          | Menus, labeled large button icons                    |
+| xl   | 20  | `xl`          | Icon-only default buttons, notification bell         |
+| 2xl  | 24  | `2xl`         | Icon-only large buttons, spinner `lg`, media compact |
+| 3xl  | 32  | `3xl`         | Large empty-state and media hero fallbacks           |
 
 Token source: `--icon-glyph-*` in `globals.css`. Only `.ui-icon` sets `width`, `height`, and `stroke-width` on glyphs.
 
@@ -278,14 +278,15 @@ ratcheted by `semantic-control-variants-geometry-ban.test.ts` (no raw `h-*`, `px
 Layer 2 utilities remain for **non-migrated** dense chrome (for example number-stepper side
 buttons) and legacy Tailwind compositions:
 
-| Step    | px  | Utility                       | Role                          |
-| ------- | --- | ----------------------------- | ----------------------------- |
-| xs      | 28  | `h-control-action-xs`         | Residual Tailwind hit targets |
-| compact | 24  | `size-control-action-compact` | Residual compact squares      |
-| default | 36  | `size-control-action-default` | Residual default icon targets |
-| lg      | 40  | `size-control-action-lg`      | Residual large icon targets   |
+| Step    | px  | Utility                                 | Role                                    |
+| ------- | --- | --------------------------------------- | --------------------------------------- |
+| xs      | 24  | `ui-button--xs` / `h-control-action-xs` | Button micro tier (11px `text-fine-sm`) |
+| compact | 24  | `size-control-action-compact`           | Residual compact squares                |
+| default | 36  | `size-control-action-default`           | Residual default icon targets           |
+| lg      | 40  | `size-control-action-lg`                | Residual large icon targets             |
 
-Label type for the xs tier: `text-control-action-xs` (10px) — control lane only, not general body type.
+Labeled Button `size="xs"` uses `--text-fine-sm` / `--text-fine-sm--line-height` (11px / 14px) on
+`ui-button--xs`. `text-control-action-xs` (10px) remains for residual Tailwind dense chrome only.
 
 **Not on semantic CSS yet:** `segmented-control` default segments, field control bands
 (`field-control-band.variants.ts`), number-stepper geometry (`number-stepper.variants.ts`),
@@ -304,10 +305,9 @@ Gap tiers for labeled buttons map to compact-control modifiers
 | sm           | `ui-compact-control--gap-sm` | 6   |
 | md           | `ui-compact-control--gap-md` | 8   |
 
-Labeled `Button` derives gap from the **same effective tier** as glyph and height — see
-`resolveControlActionMetricsTier()` in
-[`control-action.variants.ts`](../src/components/ui/control-action.variants.ts). Do not set
-raw `gap-*` on migrated buttons.
+Labeled `Button` gap follows `resolveControlActionMetricsTier()` in
+[`control-action.variants.ts`](../src/components/ui/control-action.variants.ts). Glyph size is a
+separate ladder in `button.css`. Do not set raw `gap-*` on migrated buttons.
 
 Compact icon pairing (24px hit + 14px md glyph) lives in `compact-control.css` and is
 regression-tested in `control-action.variants.test.ts` and `icon-ghost-control.variants.test.ts`.
@@ -324,9 +324,11 @@ Inline icons use `size="inline"` and read `--icon-inline` from the nearest typog
 | `prose`, `.prose.prose-md` | md    |
 | `.prose.prose-sm`          | sm    |
 
-`text-lg` and larger, heading utilities, eyebrow type, and compact-label type are not owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `compact-label` CSS.
+`text-lg` and larger, heading utilities, and eyebrow type are not inline-icon owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `badge.css` and `chip.css`. `layout="counter"` composes with the badge size modifier on the same host for `--icon-size`; counter alert icons (`ValidationIssueCountBadge`, `ArrayItemIssueButton`, create-modal issue badges) use `size="owner"`, not `inline` or fixed glyph steps.
 
-Button and `ActionButton` glyphs use `size="owner"`; `button.css` publishes `--icon-size` per variant.
+**Chip type scale** (`--text-chip-sm|md|lg` in `globals.css`) maps Chip `sm`/`md`/`lg` to `text-fine-sm` / `text-fine-md` / `text-md`. Badge sizes use `--text-fine-xs`, `--text-xs`, and `--text-sm` on `ui-badge--*` modifiers.
+
+`Button`, `ButtonLink`, and `ActionButton` glyphs use `size="owner"`. `size` selects the ladder; `button.css` publishes `--icon-size` on the host. Labeled `xs` / `sm` / `default` / `lg` use `--icon-glyph-sm` / `md` / `md` / `lg` (12 / 14 / 14 / 16px). Icon-only `icon-xs` / `icon-sm` / `icon` / `icon-lg` use `--icon-glyph-md` / `lg` / `xl` / `2xl` (14 / 16 / 20 / 24px). Text and attached variants use the labeled ladder. `children` does not select the glyph.
 
 Storybook: **Components → Icon** and **Control action**.
 

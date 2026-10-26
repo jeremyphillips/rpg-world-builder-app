@@ -22,10 +22,7 @@ import { cn } from '../../../lib/utils'
 import { resolveFormDensity } from '../../form-density'
 import { useFormSectionContext } from '../../context/form-section.context'
 import type { ArrayAddActionConfig, ArrayAddActionLayout } from '../../field-config'
-import {
-  resolveArrayAddButtonDensity,
-  resolveArrayAddDisabledProps,
-} from './array-field-add-control.lib'
+import { resolveArrayAddDisabledProps } from './array-field-add-control.lib'
 
 type ArrayFieldAddControlProps = {
   showAddControl: boolean
@@ -55,7 +52,6 @@ type ArrayFieldAddMenuControlProps = Pick<
   | 'onAppendFromMenu'
 > & {
   buttonSize: NonNullable<ButtonVariantProps['size']>
-  buttonDensity?: ButtonVariantProps['density']
   triggerClassName?: string
   disabledReasonId: string
   leadingIcon?: React.ReactNode
@@ -72,7 +68,6 @@ function ArrayFieldAddMenuControl({
   addActionMenuItems,
   onAppendFromMenu,
   buttonSize,
-  buttonDensity,
   triggerClassName,
   disabledReasonId,
   leadingIcon,
@@ -91,7 +86,6 @@ function ArrayFieldAddMenuControl({
         disabledReason={addDisabledReason}
         variant={addActionVariant}
         size={buttonSize}
-        density={buttonDensity}
         showIcon={showAddIcon}
         className={triggerClassName}
       />
@@ -107,7 +101,6 @@ function ArrayFieldAddMenuControl({
       enableSearch={addActionMenu!.enableSearch}
       variant={addActionVariant}
       size={buttonSize}
-      density={buttonDensity}
       width={addActionLayout === 'inline' ? 'fit' : 'full'}
       className={triggerClassName}
       onSelectItem={onAppendFromMenu}
@@ -132,8 +125,12 @@ export function ArrayFieldAddControl({
 }: ArrayFieldAddControlProps) {
   const { density } = useFormSectionContext()
   const { size } = resolveFormDensity(density)
-  const buttonSize = resolveArrayAddButtonSize(size, addActionSize, addActionLayout)
-  const buttonDensity = resolveArrayAddButtonDensity(addActionLayout, addActionVariant)
+  const buttonSize = resolveArrayAddButtonSize(
+    size,
+    addActionSize,
+    addActionLayout,
+    addActionVariant,
+  )
   const triggerClassName = cn(addActionLayout === 'inline' && 'shrink-0')
   const leadingIcon = showAddIcon ? <Icon name="plus" size="owner" /> : undefined
   const disabledReasonId = React.useId()
@@ -153,7 +150,6 @@ export function ArrayFieldAddControl({
         addActionMenuItems={addActionMenuItems}
         onAppendFromMenu={onAppendFromMenu}
         buttonSize={buttonSize}
-        buttonDensity={buttonDensity}
         triggerClassName={triggerClassName}
         disabledReasonId={disabledReasonId}
         leadingIcon={leadingIcon}
@@ -169,7 +165,6 @@ export function ArrayFieldAddControl({
       disabledReason={addDisabledReason}
       variant={addActionVariant}
       size={buttonSize}
-      density={buttonDensity}
       showIcon={showAddIcon}
       className={triggerClassName}
     />
