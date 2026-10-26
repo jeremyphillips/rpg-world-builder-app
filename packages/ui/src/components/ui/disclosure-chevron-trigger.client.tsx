@@ -14,8 +14,7 @@ export function DisclosureChevronTrigger({ label }: { label: string }): React.JS
         <Button
           type="button"
           variant="ghost"
-          size="sm"
-          density="compact"
+          size="icon-xs"
           className="shrink-0 p-0"
           aria-label={label}
         >

@@ -29,12 +29,11 @@ export function resolveFieldRecommendationGroupBulkAction(
   return group.bulkAction
 }
 
-/** Text-button scale for field recommendation actions — sm + compact at every form density. */
+/** Text-button scale for field recommendation actions — xs at every form density. */
 export function resolveFieldRecommendationButtonScale(_formDensity: FormDensity = 'comfortable'): {
   size: NonNullable<ButtonVariantProps['size']>
-  density: NonNullable<ButtonVariantProps['density']>
 } {
-  return { size: 'sm', density: 'compact' }
+  return { size: 'xs' }
 }
 
 /** Field recommendations render above the control regardless of hint placement. */

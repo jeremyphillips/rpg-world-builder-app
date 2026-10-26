@@ -18,7 +18,6 @@ export type SortMenuProps<T extends string = string> = {
   label?: string
   variant?: 'ghost' | 'outline'
   size?: 'default' | 'sm'
-  density?: 'default' | 'compact'
   disabled?: boolean
   className?: string
 }

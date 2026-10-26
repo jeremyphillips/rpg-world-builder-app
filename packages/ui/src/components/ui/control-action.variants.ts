@@ -1,54 +1,35 @@
+import type { ButtonSize, ButtonVariantProps } from './button.variants'
+
 export type ControlActionMetricsTier = 'xs' | 'sm' | 'md'
 
-type LabeledButtonSize = 'default' | 'xs' | 'sm' | 'lg'
-type LabeledButtonDensity = 'default' | 'compact'
-type LabeledButtonVariant =
-  | 'default'
-  | 'destructive'
-  | 'warning'
-  | 'outline'
-  | 'secondary'
-  | 'ghost'
-  | 'text'
-  | 'attached'
+type ButtonVariant = NonNullable<ButtonVariantProps['variant']>
 
-function resolveTextMetricsTier(
-  size: LabeledButtonSize,
-  density: LabeledButtonDensity,
-): ControlActionMetricsTier {
-  if (size === 'xs' && density === 'compact') return 'xs'
-  if (size === 'xs') return 'sm'
-  if (density === 'compact') return 'xs'
-  if (size === 'sm') return 'sm'
-  return 'md'
-}
-
-function resolveAttachedMetricsTier(size: LabeledButtonSize): ControlActionMetricsTier {
-  if (size === 'sm') return 'sm'
+function resolveAttachedMetricsTier(size: ButtonSize): ControlActionMetricsTier {
   if (size === 'xs') return 'xs'
+  if (size === 'sm') return 'sm'
   return 'md'
 }
 
-function resolveChromeMetricsTier(
-  size: LabeledButtonSize,
-  density: LabeledButtonDensity,
-): ControlActionMetricsTier {
-  if (size === 'lg') return 'md'
-  if (size === 'sm') return density === 'compact' ? 'xs' : 'sm'
-  return density === 'compact' ? 'sm' : 'md'
+function resolveTextMetricsTier(size: ButtonSize): ControlActionMetricsTier {
+  if (size === 'xs') return 'xs'
+  return 'sm'
+}
+
+function resolveChromeMetricsTier(size: ButtonSize): ControlActionMetricsTier {
+  if (size === 'xs' || size === 'icon-xs') return 'xs'
+  if (size === 'sm' || size === 'icon-sm') return 'sm'
+  return 'md'
 }
 
 /**
  * Effective control-action tier for labeled actions (glyph + gap + height recipes).
- * Icon-only button sizes are omitted — flex gap has no effect with a single child.
+ * Icon-only button sizes map to tiers for completeness; flex gap has no effect with a single child.
  */
 export function resolveControlActionMetricsTier(
-  size: LabeledButtonSize = 'default',
-  density: LabeledButtonDensity = 'default',
-  variant: LabeledButtonVariant = 'default',
+  size: ButtonSize = 'default',
+  variant: ButtonVariant = 'default',
 ): ControlActionMetricsTier {
-  if (variant === 'text') return resolveTextMetricsTier(size, density)
-  if (size === 'xs') return 'xs'
+  if (variant === 'text') return resolveTextMetricsTier(size)
   if (variant === 'attached') return resolveAttachedMetricsTier(size)
-  return resolveChromeMetricsTier(size, density)
+  return resolveChromeMetricsTier(size)
 }

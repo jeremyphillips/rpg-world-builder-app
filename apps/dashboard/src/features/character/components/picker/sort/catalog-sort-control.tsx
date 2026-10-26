@@ -88,7 +88,6 @@ export function CatalogSortControl<TMode extends string = string>(
       sections={menuSections}
       onValueChange={onValueChange}
       size={sortMenuSize}
-      density="default"
     />
   )
 }

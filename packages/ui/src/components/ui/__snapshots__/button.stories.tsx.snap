@@ -33,7 +33,7 @@ exports[`Primitives/Button Disabled smoke-test 1`] = `
 ]
 `;
 
-exports[`Primitives/Button ExtraSmallDensityComparison smoke-test 1`] = `
+exports[`Primitives/Button SizeLadder smoke-test 1`] = `
 [
   {
     "height": "auto",
@@ -139,7 +139,7 @@ exports[`Primitives/Button Small smoke-test 1`] = `
 ]
 `;
 
-exports[`Primitives/Button SmallCompact smoke-test 1`] = `
+exports[`Primitives/Button ExtraSmall smoke-test 1`] = `
 [
   {
     "height": "auto",
@@ -179,7 +179,7 @@ exports[`Primitives/Button TextAccentWithIcon smoke-test 1`] = `
 ]
 `;
 
-exports[`Primitives/Button TextCompactAdd smoke-test 1`] = `
+exports[`Primitives/Button TextXsAdd smoke-test 1`] = `
 [
   {
     "height": "12px",

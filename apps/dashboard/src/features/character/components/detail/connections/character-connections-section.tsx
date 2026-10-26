@@ -115,7 +115,6 @@ export function CharacterConnectionsSection({
                                         action="edit"
                                         variant="ghost"
                                         size="icon"
-                                        iconStep="md"
                                         aria-label={`${editCopy.editLabel} for ${presentation.heading}`}
                                         onClick={() => sheet.setEditingRow(row)}
                                       />

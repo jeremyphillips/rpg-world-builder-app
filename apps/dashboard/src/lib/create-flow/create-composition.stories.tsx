@@ -46,7 +46,7 @@ export const StageBranch: Story = {
       heading="New organization"
       helper="This organization will be created when you create the building."
       action={
-        <Button type="button" variant="ghost" size="sm" density="compact">
+        <Button type="button" variant="ghost" size="xs">
           Choose existing
         </Button>
       }

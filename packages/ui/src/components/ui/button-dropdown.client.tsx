@@ -116,7 +116,6 @@ export function ButtonDropdown({
   onSelectItem,
   variant = 'outline',
   size = 'sm',
-  density,
   leadingIcon,
   width = 'full',
   className,
@@ -159,7 +158,6 @@ export function ButtonDropdown({
           type="button"
           variant={variant ?? 'default'}
           size={size}
-          density={density}
           className={cn(width === 'fit' && 'w-fit shrink-0', className)}
           aria-haspopup="menu"
           aria-expanded={open}

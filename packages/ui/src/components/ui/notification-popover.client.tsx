@@ -76,8 +76,7 @@ export function NotificationPopoverHeader({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
-          density="compact"
+          size="xs"
           onClick={onAction}
           disabled={actionDisabled}
         >

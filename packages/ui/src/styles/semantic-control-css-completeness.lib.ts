@@ -242,18 +242,9 @@ const BUTTON_APPEARANCE_MODIFIERS = [
   'ghost',
 ] as const
 
-const BUTTON_LABELED_SIZE_MODIFIERS = [
-  'xs',
-  'xs-compact',
-  'sm',
-  'sm-compact',
-  'md',
-  'md-compact',
-  'lg',
-  'lg-compact',
-] as const
+const BUTTON_LABELED_SIZE_MODIFIERS = ['xs', 'sm', 'md', 'lg'] as const
 
-const BUTTON_ICON_SIZE_MODIFIERS = ['icon-xs', 'icon-compact', 'icon-md', 'icon-lg'] as const
+const BUTTON_ICON_SIZE_MODIFIERS = ['icon-xs', 'icon-md', 'icon-lg'] as const
 
 const BUTTON_APPEARANCE_REQUIRED = ['background-color', 'color'] as const
 const BUTTON_LABELED_SIZE_REQUIRED = ['height', 'gap'] as const

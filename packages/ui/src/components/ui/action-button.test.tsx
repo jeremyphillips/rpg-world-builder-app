@@ -23,7 +23,7 @@ describe('ActionButton', () => {
 
   it('sizes the glyph for dense text xs actions', () => {
     const { container } = render(
-      <ActionButton action="reset" variant="text" size="xs" density="compact">
+      <ActionButton action="reset" variant="text" size="xs">
         Reset
       </ActionButton>,
     )

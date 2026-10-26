@@ -111,7 +111,6 @@ export function SortMenu<T extends string>({
   label = SORT_MENU_DEFAULT_LABEL,
   variant = 'outline',
   size = 'sm',
-  density = 'default',
   disabled,
   className,
 }: SortMenuProps<T>) {
@@ -129,7 +128,6 @@ export function SortMenu<T extends string>({
           type="button"
           variant={variant}
           size={size}
-          density={density}
           disabled={triggerDisabled}
           aria-label={accessibleName}
           title={triggerLabel ?? undefined}

@@ -72,7 +72,7 @@ export const SelectedWithEmbedded: Story = {
               aria-label="Quantity of Javelin kept from Heavy Armor"
               onChange={() => undefined}
             />
-            <Button type="button" variant="text" size="xs" density="compact">
+            <Button type="button" variant="text" size="xs">
               Remove
             </Button>
           </SelectionOptionCardEmbeddedPanelRow>
@@ -80,7 +80,7 @@ export const SelectedWithEmbedded: Story = {
             <SelectionOptionCardEmbeddedPanelRowStatus>
               Removed
             </SelectionOptionCardEmbeddedPanelRowStatus>
-            <Button type="button" variant="text" size="xs" density="compact">
+            <Button type="button" variant="text" size="xs">
               Restore
             </Button>
           </SelectionOptionCardEmbeddedPanelRow>

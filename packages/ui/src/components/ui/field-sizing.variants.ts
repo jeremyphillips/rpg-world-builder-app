@@ -127,8 +127,10 @@ export function resolveArrayAddButtonSize(
   sectionSize: FieldSizeToken,
   override?: ArrayAddButtonSize,
   layout: 'inline' | 'stacked' = 'stacked',
+  variant?: NonNullable<ButtonVariantProps['variant']>,
 ): ArrayAddButtonSize {
   if (override) return override
+  if (layout === 'inline' && variant === 'text') return 'xs'
   if (layout === 'inline') return INLINE_HEADER_ACTION_BUTTON_SIZE
   return fieldSizeToArrayAddButtonSize[sectionSize]
 }

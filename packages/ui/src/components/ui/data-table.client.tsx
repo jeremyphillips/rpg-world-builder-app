@@ -545,7 +545,6 @@ export function RowActionsMenu({
           ref={triggerRef}
           variant={triggerVariant === 'outline-icon' ? 'outline' : 'ghost'}
           size={triggerSize === 'compact' ? 'icon-xs' : 'sm'}
-          density={triggerSize === 'compact' ? 'compact' : 'default'}
           className={triggerClassName}
           aria-label={triggerLabel}
           disabled={disabled}

@@ -180,7 +180,7 @@ export const abilityScoreCardFooterCheckboxClasses =
 
 /** Entire footer row — outline hover/active, padding, and card bottom radius (no inner button chrome). */
 export const abilityScoreCardFooterClasses = cn(
-  'ui-button ui-button--outline ui-button--xs-compact font-body',
+  'ui-button ui-button--outline ui-button--xs font-body',
   interactiveFocusVariants({ context: 'standalone' }),
   'flex w-full cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap border-0 border-t border-border-subtle px-2 py-[2px] shadow-none',
   'rounded-none rounded-b-md',

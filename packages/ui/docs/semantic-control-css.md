@@ -38,7 +38,7 @@ Within one dimension (size, appearance), every modifier declares the **same** pr
 For each migrated primitive, verify in Storybook DevTools:
 
 1. Swap size — one class edit; no leftover geometry from the old size.
-2. Swap density (Button only) — one resolved class (`ui-button--md-compact`).
+2. Swap size — micro actions use `ui-button--xs` (24px); no separate density axis on Button.
 3. Swap appearance or field invalid/disabled state; exercise `:hover`, `:active`, `:focus-visible`.
 4. Add a second modifier from the same dimension — result is wholly one modifier, never a blend.
 5. Untick one declaration in a size block — only that property changes.
@@ -158,7 +158,7 @@ Overlay notification counts use `ui-notification-unread-badge` (not pill geometr
 
 ## When CVA vs CSS
 
-- **CVA** — prop mapping, compound logic (Button size × density lookup), and non-visual layout utilities where documented.
+- **CVA** — prop mapping, compound logic (Button size lookup), and non-visual layout utilities where documented.
 - **CSS** — all repeatable size, appearance, and state presentation.
 
 Storybook helpers live in `src/stories/semantic-classes/` (`ClassReferenceTable`, `SemanticClassCaption`, `semanticClassArgTypes`).

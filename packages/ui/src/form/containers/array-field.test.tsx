@@ -362,7 +362,7 @@ describe('ArrayFieldRenderer', () => {
     expect(legend).toHaveClass('w-full')
     expect(addButton).toHaveClass(
       'ui-button--text',
-      'ui-button__text--sm-compact',
+      'ui-button__text--xs',
       'text-action-standalone',
       'text-foreground',
     )

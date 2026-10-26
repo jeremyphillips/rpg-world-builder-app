@@ -91,8 +91,7 @@ export function resolveOrganizationMembershipApiTrailing(
         <ActionButton
           action="edit"
           variant="ghost"
-          size="icon"
-          iconStep="md"
+          size="icon-xs"
           aria-label={`Edit membership in ${label}`}
           onClick={() => {
             const resolved = resolveApiOrganizationMembership(membership, context)

@@ -12,7 +12,6 @@ type ButtonLinkSharedProps = {
   children: React.ReactNode
   className?: string
   size?: ButtonVariantProps['size']
-  density?: ButtonVariantProps['density']
 }
 
 export type ButtonLinkProps = ButtonLinkSharedProps &
@@ -36,12 +35,12 @@ function warnButtonLinkProps(link: React.ReactElement) {
 }
 
 const ButtonLink = React.forwardRef<HTMLElement, ButtonLinkProps>(
-  ({ link, children, className, variant, size, density, tone }, ref) => {
+  ({ link, children, className, variant, size, tone }, ref) => {
     warnButtonLinkProps(link)
 
     return renderNavigableLinkRoot(
       link,
-      resolveButtonAppearance({ variant, size, density, tone, className }),
+      resolveButtonAppearance({ variant, size, tone, className }),
       children,
       {},
       ref,

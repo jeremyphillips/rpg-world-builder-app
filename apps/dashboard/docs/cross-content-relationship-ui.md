@@ -38,7 +38,7 @@ Default populated row:
 
 `EntityRowList.Row` accepts optional **`description`** when the feature decides disambiguation helps. Shared code must **not** auto-derive generic entity-type labels ("Organization", "Location", …).
 
-Compact list presentation — no card border/background on relationship rows. Row chrome uses compact action density (`Button density="compact"` on overflow triggers and inline add actions).
+Compact list presentation — no card border/background on relationship rows. Row chrome uses micro action sizing (`Button size="xs"` or `size="icon-xs"` on overflow triggers and inline add actions).
 
 ### Entity summary field mapping (detail / relationship lane)
 
@@ -196,7 +196,7 @@ Group-level disclosure (e.g. collapsing the entire `DISTRICTS · N` block) is a 
 | How multiple controls align  | `DetailEntityRowActions` (gap / align / shrink only)                                  |
 | Primary utility              | Feature — high-frequency contextual action (District icon `+` → Add location chooser) |
 | Overflow                     | `DetailOverflowMenu` — management / secondary actions                                 |
-| Control chrome               | Each primitive (`ghost` + `icon` + `compact` for icon buttons) — not the cluster      |
+| Control chrome               | Each primitive (`ghost` + `icon-xs` / `icon` for icon buttons) — not the cluster      |
 
 Relationship rows opt in only when product semantics warrant a utility action. `EntityRowList.Row`:
 
@@ -236,7 +236,7 @@ Rules:
   section into the labeled layout.
 - **`EntityRowList` owns empty copy, footer add, and slot-empty placement** — features pass
   `itemCount`, `emptyLabel`, and typed `action` / `headerAction` only.
-- One Add chrome everywhere: `Button variant="text" size="sm" density="compact"` + Lucide `Plus`
+- One Add chrome everywhere: `Button variant="text" size="xs"` + Lucide `Plus` (`size="owner"`)
   - feature-owned label (neutral tone — omit `tone`). No literal `+ ` text prefixes.
 - Horizontal inset/measure is owned by the route `PageShell` width and detail collection primitives
   (`DetailCollectionGroup` `px-4`). Features must not position actions with local page-level

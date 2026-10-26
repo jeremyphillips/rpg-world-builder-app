@@ -8,7 +8,6 @@ import {
   UI_BUTTON_TEXT_SIZE_CLASS,
   resolveButtonChromeSizeClass,
   resolveTextButtonGeometryClass,
-  type ButtonDensityKey,
   type ButtonTextSizeKey,
 } from './button.styles'
 
@@ -22,7 +21,7 @@ type ButtonVariant =
   | 'text'
   | 'attached'
 
-type ButtonSize = 'default' | 'xs' | 'sm' | 'lg' | 'icon' | 'icon-xs' | 'icon-lg'
+export type ButtonSize = 'default' | 'xs' | 'sm' | 'lg' | 'icon' | 'icon-xs' | 'icon-sm' | 'icon-lg'
 
 const ATTACHED_TIER_CLASS = {
   xs: 'ui-button--attached-xs',
@@ -49,17 +48,12 @@ function resolveLabeledSizeKey(size: ButtonSize): 'default' | 'xs' | 'sm' | 'lg'
 function resolveButtonSizeClasses({
   variant,
   size = 'default',
-  density = 'default',
 }: {
   variant: ButtonVariant
   size?: ButtonSize
-  density?: ButtonDensityKey
 }): string | null {
   if (variant === 'text') {
-    return cn(
-      UI_BUTTON_TEXT_SIZE_CLASS,
-      resolveTextButtonGeometryClass(resolveTextSizeKey(size), density),
-    )
+    return cn(UI_BUTTON_TEXT_SIZE_CLASS, resolveTextButtonGeometryClass(resolveTextSizeKey(size)))
   }
 
   if (variant === 'attached') {
@@ -71,11 +65,11 @@ function resolveButtonSizeClasses({
     )
   }
 
-  if (size === 'icon' || size === 'icon-xs' || size === 'icon-lg') {
-    return resolveButtonChromeSizeClass(size, density)
+  if (size === 'icon' || size === 'icon-xs' || size === 'icon-sm' || size === 'icon-lg') {
+    return resolveButtonChromeSizeClass(size)
   }
 
-  return resolveButtonChromeSizeClass(resolveLabeledSizeKey(size), density)
+  return resolveButtonChromeSizeClass(resolveLabeledSizeKey(size))
 }
 
 function resolveButtonAppearanceClass(variant: ButtonVariant): string | null {
@@ -91,23 +85,20 @@ function resolveButtonAppearanceClass(variant: ButtonVariant): string | null {
 export function buttonVariants({
   variant = 'default',
   size = 'default',
-  density = 'default',
 }: {
   variant?: ButtonVariant
   size?: ButtonSize
-  density?: ButtonDensityKey
 } = {}) {
   return cn(
     UI_BUTTON_BLOCK_CLASS,
     'font-body-emphasis',
     interactiveFocusVariants({ context: 'standalone' }),
     resolveButtonAppearanceClass(variant),
-    resolveButtonSizeClasses({ variant, size, density }),
+    resolveButtonSizeClasses({ variant, size }),
   )
 }
 
 export type ButtonVariantProps = {
   variant?: ButtonVariant
   size?: ButtonSize
-  density?: ButtonDensityKey
 }

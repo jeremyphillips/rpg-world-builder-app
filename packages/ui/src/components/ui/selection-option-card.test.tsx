@@ -124,7 +124,7 @@ describe('SelectionOptionCard', () => {
 
     const action = screen.getByRole('button', { name: 'Change package' })
     expect(action.className).toContain('shrink-0')
-    expect(action.className).toContain('ui-button__text--sm-compact')
+    expect(action.className).toContain('ui-button__text--sm')
     expect(action.className).toContain('text-action-standalone')
     expect(action.className).not.toContain('text-control-action-xs')
     expect(action.className).not.toContain('h-auto')
@@ -148,7 +148,7 @@ describe('SelectionOptionCard', () => {
 
     const action = screen.getByRole('button', { name: 'Change package' })
     expect(action.className).toContain('text-control-action-xs')
-    expect(action.className).toContain('ui-button__text--xs-compact')
+    expect(action.className).toContain('ui-button__text--xs')
     expect(action.className).not.toMatch(/\btext-sm\b/)
     expect(action.className).not.toMatch(/\btext-xs\b/)
   })

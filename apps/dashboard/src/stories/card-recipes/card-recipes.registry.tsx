@@ -95,7 +95,7 @@ function RemoveUtility({ label }: { label: string }) {
 
 function SelectAction() {
   return (
-    <Button type="button" variant="text" size="sm" density="compact">
+    <Button type="button" variant="text" size="xs">
       Select
     </Button>
   )
@@ -172,7 +172,7 @@ function CatalogCardRecipe() {
       trailing={{
         kind: 'group',
         primary: (
-          <Button type="button" variant="text" size="sm" density="compact">
+          <Button type="button" variant="text" size="xs">
             Add
           </Button>
         ),

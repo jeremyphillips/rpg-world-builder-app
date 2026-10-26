@@ -1,5 +1,135 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`UI/ActionButton ActionVerbs smoke-test 1`] = `
+[
+  {
+    "height": "16px",
+    "identity": "arrow-left",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "plus",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "pencil",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "trash",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "trash",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "rotate-ccw",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "eye",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "x",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "grip-vertical",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "user-plus",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "image-plus",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "square-pen",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "ellipsis-vertical",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "ellipsis",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "16px",
+    "identity": "waypoints",
+    "ownerSizeResolved": true,
+    "strokeWidth": "2px",
+    "width": "16px",
+  },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
 exports[`UI/ActionButton AddWithLabel smoke-test 1`] = `
 [
   {
@@ -9,6 +139,17 @@ exports[`UI/ActionButton AddWithLabel smoke-test 1`] = `
     "strokeWidth": "2px",
     "width": "12px",
   },
+  {
+    "height": "auto",
+    "identity": null,
+    "strokeWidth": "1px",
+    "width": "auto",
+  },
+]
+`;
+
+exports[`UI/ActionButton SizeLadder smoke-test 1`] = `
+[
   {
     "height": "auto",
     "identity": null,

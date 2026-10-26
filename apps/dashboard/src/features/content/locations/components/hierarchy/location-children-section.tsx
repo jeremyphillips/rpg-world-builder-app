@@ -456,7 +456,6 @@ function LocationStructureGroups({
           action="add"
           variant="text"
           size="sm"
-          density="compact"
           onClick={() => onSelectAuthoringType(group.structuralAuthoringType!)}
         >
           {formatLocationAuthoringTypeAddHeading(group.structuralAuthoringType, { parentKind })}

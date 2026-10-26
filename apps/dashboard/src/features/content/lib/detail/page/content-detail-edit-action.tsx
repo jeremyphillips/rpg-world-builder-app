@@ -10,11 +10,10 @@ export function ContentDetailEditAction({ to }: ContentDetailEditActionProps) {
     <ButtonLink
       link={<Link to={to} />}
       variant="outline"
-      size="sm"
-      density="compact"
+      size="xs"
       className="inline-flex items-center"
     >
-      <ActionIcon action="edit" size="sm" />
+      <ActionIcon action="edit" size="owner" />
       Edit
     </ButtonLink>
   )

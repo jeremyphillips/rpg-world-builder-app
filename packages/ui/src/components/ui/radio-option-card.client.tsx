@@ -116,8 +116,7 @@ function RadioOptionCardDetailsAction({
               type="button"
               variant="text"
               tone="neutral"
-              size="sm"
-              density="compact"
+              size="xs"
               className="ui-radio-card__details-action"
               aria-label={ariaLabel}
               onClick={onDetails}

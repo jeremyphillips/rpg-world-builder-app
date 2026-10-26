@@ -119,7 +119,7 @@ describe('semantic-control-class-groups sync', () => {
     )
     expectSameSet(
       UI_BUTTON_TEXT_GEOMETRY_CLASSES,
-      Object.values(TEXT_BUTTON_SIZE_CLASS).flatMap((byDensity) => Object.values(byDensity)),
+      Object.values(TEXT_BUTTON_SIZE_CLASS),
       'button text geometry map',
     )
   })

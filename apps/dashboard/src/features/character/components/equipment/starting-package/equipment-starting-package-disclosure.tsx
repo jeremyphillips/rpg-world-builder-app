@@ -186,7 +186,6 @@ export function EquipmentStartingPackageDisclosure({
               type="button"
               variant="ghost"
               size="icon"
-              density="compact"
               aria-label={open ? 'Collapse starting package' : 'Expand starting package'}
             >
               <DisclosureIndicator size="owner" className="size-4 shrink-0" />

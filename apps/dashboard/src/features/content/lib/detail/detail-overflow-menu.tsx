@@ -33,13 +33,7 @@ export function DetailOverflowMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          density="compact"
-          aria-label={triggerLabel}
-        >
+        <Button type="button" variant="ghost" size="icon" aria-label={triggerLabel}>
           <ActionIcon action={triggerAction} size="md" />
         </Button>
       </DropdownMenuTrigger>

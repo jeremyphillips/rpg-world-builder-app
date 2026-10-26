@@ -8,7 +8,6 @@ import { type TextActionTone } from './text-action.variants'
 
 type ButtonSharedProps = {
   size?: ButtonVariantProps['size']
-  density?: ButtonVariantProps['density']
 }
 
 /** Props for wrappers that forward `variant` without exposing `tone`. */
@@ -25,12 +24,12 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
   )
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, density, type = 'button', tone, ...props }, ref) => {
+  ({ className, variant, size, type = 'button', tone, ...props }, ref) => {
     return (
       <button
         ref={ref}
         type={type}
-        className={resolveButtonAppearance({ variant, size, density, tone, className })}
+        className={resolveButtonAppearance({ variant, size, tone, className })}
         {...props}
       />
     )

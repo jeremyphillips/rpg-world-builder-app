@@ -16,25 +16,17 @@ import { statusIconVariants } from './status-icon.variants'
 
 const BUTTON_ICON_SIZE_CLASSES = [
   'ui-button--md',
-  'ui-button--md-compact',
   'ui-button--xs',
-  'ui-button--xs-compact',
   'ui-button--sm',
-  'ui-button--sm-compact',
   'ui-button--lg',
-  'ui-button--lg-compact',
   'ui-button--icon-md',
-  'ui-button--icon-compact',
   'ui-button--icon-xs',
+  'ui-button--icon-sm',
   'ui-button--icon-lg',
   'ui-button__text--default',
-  'ui-button__text--default-compact',
   'ui-button__text--sm',
-  'ui-button__text--sm-compact',
   'ui-button__text--xs',
-  'ui-button__text--xs-compact',
   'ui-button__text--lg',
-  'ui-button__text--lg-compact',
   'ui-button--attached-xs',
   'ui-button--attached-sm',
   'ui-button--attached-md',
@@ -93,15 +85,21 @@ describe('icon owner class exclusivity', () => {
     'text',
     'attached',
   ] as const
-  const buttonSizes = ['default', 'xs', 'sm', 'lg', 'icon', 'icon-xs', 'icon-lg'] as const
-  const densities = ['default', 'compact'] as const
+  const buttonSizes = [
+    'default',
+    'xs',
+    'sm',
+    'lg',
+    'icon',
+    'icon-xs',
+    'icon-sm',
+    'icon-lg',
+  ] as const
 
   it('emits at most one button icon-size class', () => {
     for (const variant of buttonVariantsInputs) {
       for (const size of buttonSizes) {
-        for (const density of densities) {
-          expectAtMostOne(buttonVariants({ variant, size, density }), BUTTON_ICON_SIZE_CLASSES)
-        }
+        expectAtMostOne(buttonVariants({ variant, size }), BUTTON_ICON_SIZE_CLASSES)
       }
     }
   })

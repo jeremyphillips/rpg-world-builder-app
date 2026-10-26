@@ -45,7 +45,6 @@ export function SplitButton({
   menuAriaLabel,
   variant = 'outline',
   size = 'sm',
-  density,
   disabled,
   className,
   ...props
@@ -61,7 +60,6 @@ export function SplitButton({
         type="button"
         variant={variant}
         size={size}
-        density={density}
         disabled={disabled}
         className={hasMenu ? 'ui-split-button__primary' : undefined}
         onClick={onPrimaryClick}
@@ -77,7 +75,6 @@ export function SplitButton({
               type="button"
               variant={variant}
               size={size}
-              density={density}
               disabled={disabled}
               className="ui-split-button__menu"
               aria-label={resolvedMenuAriaLabel}

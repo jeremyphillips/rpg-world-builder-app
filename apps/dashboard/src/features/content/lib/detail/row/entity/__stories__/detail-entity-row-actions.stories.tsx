@@ -29,7 +29,6 @@ export const UtilityAndOverflow: Story = {
               type="button"
               variant="ghost"
               size="icon"
-              density="compact"
               aria-label="Add location to Dock Ward"
             >
               <Icon name="plus" size="owner" />

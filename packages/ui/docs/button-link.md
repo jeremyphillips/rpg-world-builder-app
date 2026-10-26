@@ -23,7 +23,7 @@ Source: `packages/ui/src/components/ui/button-link.tsx`, `resolve-button-appeara
 
 - **`link`** (required): a single React element (`<a>`, React Router `Link`, Next.js `Link`, …). Put `href` / `to`, `aria-label`, `onClick`, and refs on this element — not on `ButtonLink`.
 - **`children`**: visible label (replaces any children on `link`).
-- **Visual props**: `variant`, `size`, `density`, and `tone` (only when `variant="text"`) — same as `Button`.
+- **Visual props**: `variant`, `size`, and `tone` (only when `variant="text"`) — same as `Button`.
 - **`className`**: merged onto the link root after button chrome.
 
 `ButtonLink` does not support `type`, `disabled`, or button-only handlers on the wrapper. When navigation is unavailable, omit the control instead of faking a disabled anchor.

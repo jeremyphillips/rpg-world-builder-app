@@ -15,14 +15,12 @@ const sample: FieldRecommendation = {
 }
 
 describe('resolveFieldRecommendationButtonScale', () => {
-  it('uses compact sm text button for every form density', () => {
+  it('uses xs text button for every form density', () => {
     expect(resolveFieldRecommendationButtonScale('comfortable')).toEqual({
-      size: 'sm',
-      density: 'compact',
+      size: 'xs',
     })
     expect(resolveFieldRecommendationButtonScale('compact')).toEqual({
-      size: 'sm',
-      density: 'compact',
+      size: 'xs',
     })
   })
 })

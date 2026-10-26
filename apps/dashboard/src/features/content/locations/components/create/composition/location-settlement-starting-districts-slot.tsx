@@ -63,7 +63,7 @@ export function LocationSettlementStartingDistrictsSlot() {
           })}
         </ul>
       )}
-      <ActionButton action="add" variant="ghost" size="sm" density="compact" onClick={addDistrict}>
+      <ActionButton action="add" variant="ghost" size="xs" onClick={addDistrict}>
         {SETTLEMENT_STARTING_DISTRICTS_ADD_LABEL}
       </ActionButton>
     </div>

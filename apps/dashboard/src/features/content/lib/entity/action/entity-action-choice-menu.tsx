@@ -47,17 +47,11 @@ export function EntityActionChoiceMenu({
   const labeledText = triggerProps.triggerLabel ?? 'Add'
   const trigger =
     appearance === 'icon' ? (
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        density="compact"
-        aria-label={triggerProps.triggerLabel}
-      >
-        <ActionIcon action="add" size="lg" />
+      <Button type="button" variant="ghost" size="icon-xs" aria-label={triggerProps.triggerLabel}>
+        <ActionIcon action="add" size="owner" />
       </Button>
     ) : (
-      <ActionButton action="add" variant="text" size="sm" density="compact">
+      <ActionButton action="add" variant="text" size="xs">
         {labeledText}
       </ActionButton>
     )

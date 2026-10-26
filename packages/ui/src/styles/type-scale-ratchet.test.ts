@@ -28,6 +28,7 @@ const REQUIRED_THEME_TOKENS = [
   '--text-md:',
   '--text-fine-xs:',
   '--text-fine-sm:',
+  '--text-fine-sm--line-height:',
   '--text-fine-md:',
   '--text-eyebrow-xs:',
   '--text-eyebrow-sm:',

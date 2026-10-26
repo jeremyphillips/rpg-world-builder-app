@@ -278,14 +278,15 @@ ratcheted by `semantic-control-variants-geometry-ban.test.ts` (no raw `h-*`, `px
 Layer 2 utilities remain for **non-migrated** dense chrome (for example number-stepper side
 buttons) and legacy Tailwind compositions:
 
-| Step    | px  | Utility                       | Role                          |
-| ------- | --- | ----------------------------- | ----------------------------- |
-| xs      | 28  | `h-control-action-xs`         | Residual Tailwind hit targets |
-| compact | 24  | `size-control-action-compact` | Residual compact squares      |
-| default | 36  | `size-control-action-default` | Residual default icon targets |
-| lg      | 40  | `size-control-action-lg`      | Residual large icon targets   |
+| Step    | px  | Utility                                 | Role                                    |
+| ------- | --- | --------------------------------------- | --------------------------------------- |
+| xs      | 24  | `ui-button--xs` / `h-control-action-xs` | Button micro tier (11px `text-fine-sm`) |
+| compact | 24  | `size-control-action-compact`           | Residual compact squares                |
+| default | 36  | `size-control-action-default`           | Residual default icon targets           |
+| lg      | 40  | `size-control-action-lg`                | Residual large icon targets             |
 
-Label type for the xs tier: `text-control-action-xs` (10px) — control lane only, not general body type.
+Labeled Button `size="xs"` uses `--text-fine-sm` / `--text-fine-sm--line-height` (11px / 14px) on
+`ui-button--xs`. `text-control-action-xs` (10px) remains for residual Tailwind dense chrome only.
 
 **Not on semantic CSS yet:** `segmented-control` default segments, field control bands
 (`field-control-band.variants.ts`), number-stepper geometry (`number-stepper.variants.ts`),

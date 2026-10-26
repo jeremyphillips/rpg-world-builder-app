@@ -121,8 +121,7 @@ export function SelectionSummaryChangeAction({
     <Button
       type="button"
       variant="text"
-      size="sm"
-      density="compact"
+      size="xs"
       className="shrink-0"
       aria-label={ariaLabel}
       onClick={onChange}

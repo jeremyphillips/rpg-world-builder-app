@@ -18,75 +18,55 @@ function classesFor(props: Parameters<typeof buttonVariants>[0]): string {
 
 describe('buttonVariants matrix', () => {
   it('emits semantic chrome classes for xs sizes', () => {
-    const defaultClasses = classesFor({
+    const classes = classesFor({
       variant: 'outline',
       size: 'xs',
-      density: 'default',
     })
-    expect(defaultClasses).toContain('ui-button--xs')
-    expect(defaultClasses).toContain('ui-button--outline')
-    expect(defaultClasses).not.toContain('ui-button--md')
-
-    const compactClasses = classesFor({
-      variant: 'ghost',
-      size: 'xs',
-      density: 'compact',
-    })
-    expect(compactClasses).toContain('ui-button--xs-compact')
-    expect(compactClasses).toContain('ui-button--ghost')
+    expect(classes).toContain('ui-button--xs')
+    expect(classes).toContain('ui-button--outline')
+    expect(classes).not.toContain('ui-button--md')
   })
 
-  it('derives icon-label gap tier from size and density (control-action metrics)', () => {
+  it('derives icon-label gap tier from size (control-action metrics)', () => {
     const cases = [
       {
-        props: { variant: 'outline' as const, size: 'xs' as const, density: 'default' as const },
+        props: { variant: 'outline' as const, size: 'xs' as const },
         tier: 'xs' as const,
       },
       {
-        props: { variant: 'outline' as const, size: 'sm' as const, density: 'compact' as const },
-        tier: 'xs' as const,
-      },
-      {
-        props: { variant: 'outline' as const, size: 'sm' as const, density: 'default' as const },
+        props: { variant: 'outline' as const, size: 'sm' as const },
         tier: 'sm' as const,
       },
       {
         props: {
           variant: 'default' as const,
           size: 'default' as const,
-          density: 'default' as const,
         },
         tier: 'md' as const,
       },
     ] as const
 
     for (const { props, tier } of cases) {
-      expect(resolveControlActionMetricsTier(props.size, props.density, props.variant)).toBe(tier)
+      expect(resolveControlActionMetricsTier(props.size, props.variant)).toBe(tier)
       expect(resolveControlActionGapClass(tier)).toBeTruthy()
     }
   })
 
   it('maps default chrome to ui-button--md and appearance primary', () => {
-    const classes = classesFor({ variant: 'default', size: 'default', density: 'default' })
+    const classes = classesFor({ variant: 'default', size: 'default' })
     expect(classes).toContain('ui-button--primary')
     expect(classes).toContain('ui-button--md')
   })
 
   it('maps sm chrome to ui-button--sm', () => {
-    const classes = classesFor({ variant: 'outline', size: 'sm', density: 'default' })
+    const classes = classesFor({ variant: 'outline', size: 'sm' })
     expect(classes).toContain('ui-button--sm')
     expect(classes).toContain('ui-button--outline')
   })
 
-  it('keeps every sm modifier at text-xs so compact, text, and attached do not inherit 14px', () => {
+  it('keeps every sm modifier at text-xs so text and attached do not inherit 14px', () => {
     const source = readFileSync(join(__dirname, 'button.css'), 'utf8')
-    const modifiers = [
-      '.ui-button--sm {',
-      '.ui-button--sm-compact {',
-      '.ui-button__text--sm {',
-      '.ui-button__text--sm-compact {',
-      '.ui-button--attached-sm {',
-    ]
+    const modifiers = ['.ui-button--sm {', '.ui-button__text--sm {', '.ui-button--attached-sm {']
 
     for (const modifier of modifiers) {
       const start = source.indexOf(modifier)
@@ -95,28 +75,22 @@ describe('buttonVariants matrix', () => {
     }
   })
 
-  it('maps text xs compact to semantic text geometry', () => {
-    const compactClasses = classesFor({ variant: 'text', size: 'xs', density: 'compact' })
-    expect(compactClasses).toContain(UI_BUTTON_TEXT_SIZE_CLASS)
-    expect(compactClasses).toContain(TEXT_BUTTON_SIZE_CLASS.xs.compact)
+  it('maps text xs to semantic text geometry', () => {
+    const classes = classesFor({ variant: 'text', size: 'xs' })
+    expect(classes).toContain(UI_BUTTON_TEXT_SIZE_CLASS)
+    expect(classes).toContain(TEXT_BUTTON_SIZE_CLASS.xs)
   })
 
-  it('maps text sm compact without lg glyph classes', () => {
-    const classes = classesFor({ variant: 'text', size: 'sm', density: 'compact' })
-    expect(classes).toContain(TEXT_BUTTON_SIZE_CLASS.sm.compact)
+  it('maps text sm without lg glyph classes', () => {
+    const classes = classesFor({ variant: 'text', size: 'sm' })
+    expect(classes).toContain(TEXT_BUTTON_SIZE_CLASS.sm)
     expect(classes).not.toContain('ui-button--md')
   })
 
-  it('maps text xs default density to general text geometry', () => {
-    const classes = classesFor({ variant: 'text', size: 'xs', density: 'default' })
-    expect(classes).toContain(TEXT_BUTTON_SIZE_CLASS.xs.default)
-    expect(classes).not.toContain(TEXT_BUTTON_SIZE_CLASS.xs.compact)
-  })
-
-  it('fixes text lg compact geometry', () => {
-    expect(resolveTextButtonGeometryClass('lg', 'compact')).toBe('ui-button__text--lg-compact')
-    const classes = classesFor({ variant: 'text', size: 'lg', density: 'compact' })
-    expect(classes).toContain('ui-button__text--lg-compact')
+  it('maps text lg geometry', () => {
+    expect(resolveTextButtonGeometryClass('lg')).toBe('ui-button__text--lg')
+    const classes = classesFor({ variant: 'text', size: 'lg' })
+    expect(classes).toContain('ui-button__text--lg')
   })
 
   it('normalizes attached xs to attached-sm size tier', () => {
@@ -129,16 +103,18 @@ describe('buttonVariants matrix', () => {
     expect(attachedXs).not.toContain('ui-button--xs')
   })
 
-  it('keeps icon-xs geometry identical across density', () => {
-    const defaultClasses = classesFor({ size: 'icon-xs', density: 'default' })
-    const compactClasses = classesFor({ size: 'icon-xs', density: 'compact' })
-
-    expect(defaultClasses).toContain('ui-button--icon-xs')
-    expect(compactClasses).toBe(defaultClasses)
+  it('maps icon size to ui-button--icon-md', () => {
+    const classes = classesFor({ size: 'icon' })
+    expect(classes).toContain('ui-button--icon-md')
   })
 
-  it('maps icon compact density to ui-button--icon-compact', () => {
-    const classes = classesFor({ size: 'icon', density: 'compact' })
-    expect(classes).toContain('ui-button--icon-compact')
+  it('maps icon-xs to ui-button--icon-xs', () => {
+    const classes = classesFor({ size: 'icon-xs' })
+    expect(classes).toContain('ui-button--icon-xs')
+  })
+
+  it('maps icon-sm to ui-button--icon-sm', () => {
+    const classes = classesFor({ size: 'icon-sm' })
+    expect(classes).toContain('ui-button--icon-sm')
   })
 })

@@ -41,7 +41,7 @@ function NotificationsListPagePreview() {
         <PageHeader
           heading={NOTIFICATION_COPY.title}
           actions={
-            <Button type="button" variant="ghost" size="sm" density="compact">
+            <Button type="button" variant="ghost" size="xs">
               {NOTIFICATION_COPY.markAllAsRead}
             </Button>
           }
