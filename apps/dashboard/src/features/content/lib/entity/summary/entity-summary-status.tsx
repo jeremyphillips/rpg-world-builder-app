@@ -1,5 +1,6 @@
 import {
   EntityRowInlineBadge,
+  EntityRowInlineDensityProvider,
   Icon,
   InlineInactiveStatus,
   StatusIcon,
@@ -14,8 +15,8 @@ import type { EntitySummaryStatusItem } from './entity-summary-status.types'
 import { entitySummaryStatusVariants } from './entity-summary.variants'
 
 function resolveStatusLeadingIcon(icon: 'check' | 'warning' | undefined) {
-  if (icon === 'check') return <Icon name="check" size="inline" />
-  if (icon === 'warning') return <Icon name="triangle-alert" size="inline" />
+  if (icon === 'check') return <Icon name="check" size="owner" />
+  if (icon === 'warning') return <Icon name="triangle-alert" size="owner" />
   return undefined
 }
 
@@ -32,14 +33,16 @@ export function EntitySummaryStatusItemView({
   switch (item.kind) {
     case 'badge': {
       const badge = (
-        <EntityRowInlineBadge
-          appearance={item.appearance}
-          tone={item.tone}
-          leadingIcon={resolveStatusLeadingIcon(item.leadingIcon)}
-          title={item.tooltip ? undefined : item.title}
-        >
-          {item.label}
-        </EntityRowInlineBadge>
+        <EntityRowInlineDensityProvider density={density ?? 'comfortable'}>
+          <EntityRowInlineBadge
+            appearance={item.appearance}
+            tone={item.tone}
+            leadingIcon={resolveStatusLeadingIcon(item.leadingIcon)}
+            title={item.tooltip ? undefined : item.title}
+          >
+            {item.label}
+          </EntityRowInlineBadge>
+        </EntityRowInlineDensityProvider>
       )
 
       if (!item.tooltip) {

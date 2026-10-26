@@ -64,8 +64,9 @@ describe('Chip', () => {
       'ui-chip--removable-sm',
     )
     const remove = screen.getByRole('button', { name: 'Remove Tag' })
-    expect(remove).toHaveClass('ui-chip__remove', 'ui-compact-control--icon-compact-sm')
-    expect(remove).not.toHaveClass('ui-chip')
+    expect(remove).toHaveClass('ui-chip__remove', 'ui-chip__remove--sm')
+    expect(remove.querySelector('svg')).toHaveClass('ui-icon--owner')
+    expect(remove).not.toHaveClass('ui-compact-control', 'ui-chip')
   })
 
   it('keeps the xs removable shell at the compact control height', () => {
@@ -78,7 +79,7 @@ describe('Chip', () => {
     expect(chip).toHaveClass('ui-chip--xs', 'ui-chip--removable-xs')
     const remove = screen.getByRole('button', { name: 'Remove Tag' })
     expect(remove).toHaveClass('ui-chip__remove--xs', 'ui-chip__remove')
-    expect(remove).not.toHaveClass('ui-compact-control--icon-compact-sm', 'ui-chip')
+    expect(remove).not.toHaveClass('ui-compact-control', 'ui-chip')
   })
 
   it('removable calls onRemove from dismiss button', async () => {
@@ -106,6 +107,8 @@ describe('Chip', () => {
     expect(together).toContain('ui-chip--selected')
     expect(together).toContain('ui-chip--removable-sm')
     expect(cn('ui-chip--sm', 'ui-chip--md')).toBe('ui-chip--md')
+    expect(cn('ui-chip__remove--sm', 'ui-chip__remove--md')).toBe('ui-chip__remove--md')
+    expect(cn('ui-chip--sm', 'ui-chip__remove--sm')).toBe('ui-chip--sm ui-chip__remove--sm')
   })
 
   it('has no accessibility violations for selectable chip', async () => {

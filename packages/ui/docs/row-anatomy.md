@@ -170,9 +170,9 @@ Density for identity copy is published on ancestors (`.ui-card--*`, `ui-destinat
 | comfortable             |    16 / 22 | 600          | `sm`                                                       |
 | spacious                |    19 / 26 | 600          | `md`                                                       |
 
-The same ladder applies to entity **status-lane** badges on `EntitySummary.status` — see [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
+The same ladder applies to entity **status-lane** badges. [`EntitySummaryStatusItemView`](../../../apps/dashboard/src/features/content/lib/entity/summary/entity-summary-status.tsx) owns that density: its `density` prop (default `comfortable`) is authoritative, including search-hit status. Leading check and warning icons use `Icon size="owner"` so they follow the badge glyph (`sm` → 10px, `md` → 12px). See [entity-surfaces.md](../../../apps/dashboard/docs/entity-surfaces.md). Passive numeric **`headingEndValue`** on entity cards uses title-scale emphasis, not accessory sizing.
 
-Managed inline badges do not take `size`. `IdentityRowHeadingLine` `headingBadge` and `EntitySummary` status items render `EntityRowInlineBadge`, which reads density from `EntityRowInlineDensityProvider` and maps it with `resolveEntityRowInlineBadgeSize` (`compact` / `comfortable` → `sm`, `spacious` → `md`). `headingEnd` stays a free-form slot for non-badge accessories (price, count, plain text). Do not pass a pre-sized `Badge` through `headingEnd` or `headingBadge`.
+Managed inline badges do not take `size`. `IdentityRowHeadingLine` `headingBadge` requires `density` on that line and publishes `EntityRowInlineDensityProvider` for the badge. `EntitySummary` status items render `EntityRowInlineBadge` from the view's density prop (`compact` / `comfortable` → `sm`, `spacious` → `md`). `headingEnd` stays a free-form slot for non-badge accessories (price, count, plain text). Do not pass a pre-sized `Badge` through `headingEnd` or `headingBadge`.
 
 Standalone `Badge` is unchanged. It still defaults to `md` and honors `size`. Card and row shells do not clamp badge CSS.
 

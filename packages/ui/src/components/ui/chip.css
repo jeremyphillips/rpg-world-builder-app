@@ -9,7 +9,7 @@
     padding-inline: calc(var(--spacing) * 1.5);
     padding-block: 2px;
     font-size: var(--text-fine-xs);
-    line-height: 0.875rem; /* 14px */
+    line-height: var(--text-fine-xs--line-height);
     --icon-size: var(--icon-glyph-xs);
   }
 
@@ -53,11 +53,29 @@
     padding-inline-end: calc(var(--spacing) * 1);
   }
 
-  /* xs dismiss sits inside the 24px shell. Glyph is smaller than the hit target. */
+  /* Dismiss geometry is chip-owned. Glyph follows this box, not the chip shell. */
   .ui-chip__remove--xs {
     width: 1rem;
     height: 1rem;
     --icon-size: var(--icon-glyph-xs);
+  }
+
+  .ui-chip__remove--sm {
+    width: var(--control-action-compact-height);
+    height: var(--control-action-compact-height);
+    --icon-size: var(--icon-glyph-sm);
+  }
+
+  .ui-chip__remove--md {
+    width: var(--control-action-compact-height);
+    height: var(--control-action-compact-height);
+    --icon-size: var(--icon-glyph-md);
+  }
+
+  .ui-chip__remove--lg {
+    width: var(--control-action-default-height);
+    height: var(--control-action-default-height);
+    --icon-size: var(--icon-glyph-lg);
   }
 
   .ui-chip--selected {
@@ -97,6 +115,10 @@
     justify-content: center;
     border-radius: calc(infinity * 1px);
     color: var(--muted-foreground);
+  }
+
+  .ui-chip__remove svg {
+    pointer-events: none;
   }
 
   .ui-chip__remove:hover {

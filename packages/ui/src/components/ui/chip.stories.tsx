@@ -74,6 +74,26 @@ export const SelectableSelected: Story = {
   },
 }
 
+export const RemovableXs: Story = {
+  args: {
+    mode: 'removable',
+    size: 'xs',
+    removeLabel: 'Remove Dart',
+    onRemove: action('onRemove'),
+    children: 'Dart',
+  },
+}
+
+export const RemovableSm: Story = {
+  args: {
+    mode: 'removable',
+    size: 'sm',
+    removeLabel: 'Remove Club',
+    onRemove: action('onRemove'),
+    children: 'Club',
+  },
+}
+
 export const RemovableMd: Story = {
   args: {
     mode: 'removable',
@@ -91,6 +111,17 @@ export const RemovableLg: Story = {
     removeLabel: 'Remove Rapier',
     onRemove: action('onRemove'),
     children: 'Rapier',
+  },
+}
+
+export const RemovableDisabled: Story = {
+  args: {
+    mode: 'removable',
+    size: 'md',
+    disabled: true,
+    removeLabel: 'Remove Dagger',
+    onRemove: action('onRemove'),
+    children: 'Dagger',
   },
 }
 

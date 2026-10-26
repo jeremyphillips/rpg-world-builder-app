@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import {
   cn,
-  EntityRowInlineDensityProvider,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   InlineMetadata,
@@ -187,9 +186,5 @@ export function EntitySummaryStatus({
       </div>
     )
 
-  return (
-    <EntityRowInlineDensityProvider density={density ?? 'comfortable'}>
-      {body}
-    </EntityRowInlineDensityProvider>
-  )
+  return body
 }

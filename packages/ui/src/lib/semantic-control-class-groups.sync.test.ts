@@ -30,7 +30,11 @@ import {
   COMPACT_CONTROL_RECIPE_SPECS,
 } from '../components/ui/compact-control.styles'
 import { UI_BADGE_SIZE_CLASSES } from '../components/ui/badge.variants'
-import { CHIP_SIZES, UI_CHIP_SIZE_CLASSES } from '../components/ui/chip.lib'
+import {
+  CHIP_SIZES,
+  UI_CHIP_REMOVE_SIZE_CLASSES,
+  UI_CHIP_SIZE_CLASSES,
+} from '../components/ui/chip.lib'
 import {
   UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,
@@ -157,6 +161,11 @@ describe('semantic-control-class-groups sync', () => {
       UI_CHIP_SIZE_CLASSES,
       CHIP_SIZES.map((size) => `ui-chip--${size}`),
       'chip sizes',
+    )
+    expectSameSet(
+      UI_CHIP_REMOVE_SIZE_CLASSES,
+      CHIP_SIZES.map((size) => `ui-chip__remove--${size}`),
+      'chip remove sizes',
     )
     expectSameSet(
       UI_FIELD_GROUP_SIZE_CLASSES,

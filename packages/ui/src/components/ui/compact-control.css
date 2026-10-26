@@ -16,12 +16,6 @@
     --icon-size: var(--icon-glyph-md);
   }
 
-  .ui-compact-control--icon-compact-sm {
-    width: var(--control-action-compact-height);
-    height: var(--control-action-compact-height);
-    --icon-size: var(--icon-glyph-sm);
-  }
-
   .ui-compact-control--icon-xs {
     width: var(--control-action-compact-height);
     height: var(--control-action-compact-height);

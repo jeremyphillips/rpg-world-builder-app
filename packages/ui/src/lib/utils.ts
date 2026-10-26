@@ -17,6 +17,7 @@ import {
   UI_COMPACT_CONTROL_SIZE_CLASSES,
   UI_BADGE_APPEARANCE_CLASSES,
   UI_BADGE_SIZE_CLASSES,
+  UI_CHIP_REMOVE_SIZE_CLASSES,
   UI_CHIP_SIZE_CLASSES,
   UI_ALERT_APPEARANCE_CLASSES,
   UI_ALERT_DENSITY_CLASSES,
@@ -138,6 +139,7 @@ type TypographyClassGroupIds =
   | 'ui-compact-control-size'
   | 'ui-badge-size'
   | 'ui-chip-size'
+  | 'ui-chip-remove-size'
   | 'ui-badge-appearance'
   | 'ui-alert-appearance'
   | 'ui-alert-density'
@@ -212,6 +214,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-compact-control-size': [...UI_COMPACT_CONTROL_SIZE_CLASSES],
       'ui-badge-size': [...UI_BADGE_SIZE_CLASSES],
       'ui-chip-size': [...UI_CHIP_SIZE_CLASSES],
+      'ui-chip-remove-size': [...UI_CHIP_REMOVE_SIZE_CLASSES],
       'ui-badge-appearance': [...UI_BADGE_APPEARANCE_CLASSES],
       'ui-alert-appearance': [...UI_ALERT_APPEARANCE_CLASSES],
       'ui-alert-density': [...UI_ALERT_DENSITY_CLASSES],
@@ -257,6 +260,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-compact-control-size': ['ui-compact-control-size'],
       'ui-badge-size': ['ui-badge-size'],
       'ui-chip-size': ['ui-chip-size'],
+      'ui-chip-remove-size': ['ui-chip-remove-size'],
       'ui-badge-appearance': ['ui-badge-appearance'],
       'ui-alert-appearance': ['ui-alert-appearance'],
       'ui-alert-density': ['ui-alert-density'],

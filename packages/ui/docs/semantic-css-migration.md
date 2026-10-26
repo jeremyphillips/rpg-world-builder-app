@@ -217,21 +217,21 @@ Before marking a migration wave **Complete**:
 
 **W3 close-out (2026-10-22):** 12 **complete**, 0 **remediated** (named), 1 **exception**, 0 **deferred**.
 
-| Surface / file                                       | Status    | Owner / evidence                                                                            |
-| ---------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------- |
-| `Badge` / `Chip` / `ChipGroup`                       | complete  | `ui-pill` + `ClassReference` — `badge.stories.tsx`, `chip.stories.tsx`                      |
-| `TableBadgeCell`                                     | complete  | `Badge size="sm"` — `data-table.client.tsx`                                                 |
-| `ValidationIssueCountBadge`                          | complete  | `Badge` counter layout; redundant `gap-1` removed — `validation-issue-count-badge.test.tsx` |
-| `CatalogFilterChips` / `ChipsField` / combobox chips | complete  | `Chip` + `ui-chip--*` tests                                                                 |
-| `PreviewRailDraftBadge`                              | complete  | `Badge` — `preview-rail.client.tsx`                                                         |
-| `AvailabilityBadge`                                  | complete  | `Badge` — `availability-badge.tsx`                                                          |
-| `ContentStatusNameBadge`                             | complete  | `TableBadgeCell` — `content-status-name-badge.tsx`                                          |
-| `ContentEditHeadingBadges`                           | complete  | `Badge` — `content-edit-heading-badges.tsx`                                                 |
-| `EntitySummaryStatusItemView`                        | complete  | `Badge` + `resolveEntityRowInlineBadgeSize` — `entity-summary-status.tsx`                   |
-| `LinkBadge` / `StaticBadge`                          | complete  | Dashboard navigation metadata — `link-badge.tsx`, `link-badge.test.tsx`                     |
-| `ArrayItemIssueButton`                               | complete  | `Badge asChild` — `array-item-issue.test.tsx`                                               |
-| `ArrayLegendIssueLink`                               | complete  | Text destructive control (not Badge) — `array-item-issue.client.tsx`                        |
-| `notification-unread-badge`                          | exception | `ui-notification-unread-badge.css` — bell trigger count                                     |
+| Surface / file                                       | Status    | Owner / evidence                                                                                                                |
+| ---------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `Badge` / `Chip` / `ChipGroup`                       | complete  | `ui-pill` + `ClassReference` — `badge.stories.tsx`, `chip.stories.tsx`                                                          |
+| `TableBadgeCell`                                     | complete  | `Badge size="sm"` — `data-table.client.tsx`                                                                                     |
+| `ValidationIssueCountBadge`                          | complete  | `Badge` counter layout; redundant `gap-1` removed — `validation-issue-count-badge.test.tsx`                                     |
+| `CatalogFilterChips` / `ChipsField` / combobox chips | complete  | `Chip` + `ui-chip--*` tests                                                                                                     |
+| `PreviewRailDraftBadge`                              | complete  | `Badge` — `preview-rail.client.tsx`                                                                                             |
+| `AvailabilityBadge`                                  | complete  | `Badge` — `availability-badge.tsx`                                                                                              |
+| `ContentStatusNameBadge`                             | complete  | `TableBadgeCell` — `content-status-name-badge.tsx`                                                                              |
+| `ContentEditHeadingBadges`                           | complete  | `Badge` — `content-edit-heading-badges.tsx`                                                                                     |
+| `EntitySummaryStatusItemView`                        | complete  | View-owned density (`comfortable` default) + `EntityRowInlineBadge`; leading icons `size="owner"` — `entity-summary-status.tsx` |
+| `LinkBadge` / `StaticBadge`                          | complete  | Dashboard navigation metadata — `link-badge.tsx`, `link-badge.test.tsx`                                                         |
+| `ArrayItemIssueButton`                               | complete  | `Badge asChild` — `array-item-issue.test.tsx`                                                                                   |
+| `ArrayLegendIssueLink`                               | complete  | Text destructive control (not Badge) — `array-item-issue.client.tsx`                                                            |
+| `notification-unread-badge`                          | exception | `ui-notification-unread-badge.css` — bell trigger count                                                                         |
 
 ## Card-like shells grouped in W2
 

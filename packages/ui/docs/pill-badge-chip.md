@@ -8,7 +8,7 @@
 
 Size lives on the component (`ui-badge--sm|md|lg`, `ui-chip--xs|sm|md|lg`). Badge appearance lives on `ui-badge--{outline|soft|strong}-{tone}`. Those modifiers assign the pill variables. They do not repeat the paint longhands. Neutral badges also use `ui-border--default`. Emphasis is `ui-badge--subdued`. Numeric layout is `ui-badge--counter`.
 
-Chip owns `ui-chip--selected`, `ui-chip--interactive`, and `ui-chip__remove`. Removable chips use `ui-chip--removable` for the neutral-soft fill. They do not take a Badge tone class. `ChipGroup` stays layout-only. The dismiss control does not carry `ui-chip`.
+Chip owns `ui-chip--selected`, `ui-chip--interactive`, and `ui-chip__remove`. Removable chips use `ui-chip--removable` for the neutral-soft fill. They do not take a Badge tone class. `ChipGroup` stays layout-only. The dismiss control does not carry `ui-chip`. Dismiss geometry is `ui-chip__remove` plus `ui-chip__remove--xs|sm|md|lg`. Those modifiers own the hit target and `--icon-size`. They do not use CompactControl. The dismiss icon is `Icon size="owner"` and reads that `--icon-size`, not the chip shell's icon size.
 
 `ArrayItemIssueButton` composes `Badge asChild` on a native `button` (`appearance="soft"` `tone="destructive"` `size="sm"`). `compact` sets `layout="counter"`; the full label uses `layout="label"`. Counter alert icons use `Icon size="owner"` so the glyph follows the badge size ladder (`ui-badge--sm` → `--icon-glyph-xs`). `layout="counter"` does not publish its own `--icon-size`; it composes with the size modifier on the same host.
 
@@ -27,9 +27,14 @@ Do not add `ui-badge--compact` or `ui-chip--compact`. Do not add a Chip appearan
 `ChipGroup` is layout-only (`flex flex-wrap gap-2`). Semantic grouping belongs on a parent
 `<fieldset>`/`<legend>` or an opt-in `semanticRole` on `ChipGroup`.
 
-**Badge is not interactive.** It does not carry action semantics. Dismissible or togglable
-labels use **Chip**; actions use **Button**. Navigation uses **Link** (or `<a>`), optionally
-composed with badge presentation — not `Badge asChild` on a `<button>`.
+**Badge is presentational by default.** It renders a `<span>` and does not carry action
+semantics. `asChild` lets the child own interaction, focus, and keyboard behavior. Badge only
+supplies pill and appearance classes. Dismissible or togglable labels use **Chip**. Actions use
+**Button**. Navigation uses **Link** (or `<a>`).
+
+`Badge asChild` on a native `button` is limited to issue counts (`ArrayItemIssueButton`), so
+they share the badge size ladder and counter layout with `ValidationIssueCountBadge`. Navigation
+badges use `Badge asChild` on a link, owned by dashboard `LinkBadge`.
 
 ### Navigation badges (`Badge asChild` + link)
 
@@ -40,10 +45,6 @@ utilities on the link: underline / focus affordances — not pill shell geometry
 
 Dashboard apps use **`LinkBadge`** (`apps/dashboard/src/lib/link-badge.tsx`) as the single owner
 of this stack — features must not duplicate `Badge asChild` + `Link`.
-
-Interactive issue counts (for example `ArrayItemIssueButton`) use **`Badge asChild`** on a native
-`button` so they share the badge size ladder and counter layout with presentational counters such as
-`ValidationIssueCountBadge`.
 
 `TableBadgeCell` is `Badge size="sm"` for data-table source/status columns.
 

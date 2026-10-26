@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import { buttonVariants } from './button.variants'
 import {
-  resolveCompactControlIconCompactSmClasses,
   resolveCompactControlRecipeClasses,
   resolveCompactControlStepperButtonClasses,
   type CompactControlRecipeKey,
@@ -35,7 +34,6 @@ const BUTTON_ICON_SIZE_CLASSES = [
 
 const COMPACT_CONTROL_ICON_SIZE_CLASSES = [
   'ui-compact-control--icon-compact',
-  'ui-compact-control--icon-compact-sm',
   'ui-compact-control--icon-xs',
   'ui-compact-control--icon-default',
   'ui-compact-control--icon-lg',
@@ -138,13 +136,6 @@ describe('icon owner class exclusivity', () => {
         ),
       ).toHaveLength(1)
     }
-    expect(
-      matchingClasses(
-        resolveCompactControlIconCompactSmClasses(),
-        COMPACT_CONTROL_ICON_SIZE_CLASSES,
-      ),
-    ).toEqual(['ui-compact-control--icon-compact-sm'])
-
     const stepperSizes = [
       'xs',
       'sm',

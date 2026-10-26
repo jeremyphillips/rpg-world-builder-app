@@ -49,7 +49,7 @@ export {
 } from '../components/ui/choice-control.styles'
 export { UI_COMPACT_CONTROL_SIZE_CLASSES } from '../components/ui/compact-control.styles'
 export { UI_BADGE_SIZE_CLASSES } from '../components/ui/badge.variants'
-export { UI_CHIP_SIZE_CLASSES } from '../components/ui/chip.lib'
+export { UI_CHIP_REMOVE_SIZE_CLASSES, UI_CHIP_SIZE_CLASSES } from '../components/ui/chip.lib'
 export {
   UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,

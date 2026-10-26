@@ -310,7 +310,6 @@ const FIELD_CONTROL_WIDTH_FRACTION_REQUIRED = [
 
 const COMPACT_CONTROL_ICON_MODIFIERS = [
   'icon-compact',
-  'icon-compact-sm',
   'icon-xs',
   'icon-default',
   'icon-lg',

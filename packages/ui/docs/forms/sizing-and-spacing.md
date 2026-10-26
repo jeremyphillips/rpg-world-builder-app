@@ -73,17 +73,17 @@ Single-line control **height, padding, and in-control type** come from
 uses `field-group.css` via `field-group.styles` resolvers. Label type scale for standard
 stacked fields remains in `fieldSizeTypographyClasses` (`sm | md | lg`).
 
-| Map                                | Use                                                                                                                  |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `fieldSizeTypographyClasses`       | Label + non-floating control type scale (stacked fields)                                                             |
-| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …) — semantic `ui-field-control--*` modifiers                               |
-| `fieldGroupedControlSizeClasses`   | One segment in grouped shells (`InputSelectField`, `InputUnitField`, `DiceFormulaField`, …)                          |
-| `fieldTextareaSizeClasses`         | Multi-line controls                                                                                                  |
-| `fieldDigitSizeClasses`            | Digit-width control padding                                                                                          |
-| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns                                                                              |
-| `fieldDigitTrailingColumnClasses`  | Trailing column width                                                                                                |
-| Number input stepper icons         | Explicit `Icon` `size` (`xs`/`md` by field tier) — no descendant sizing helpers                                      |
-| Chip `size`                        | Same `xs \| sm \| md \| lg` as the field. Pass `size` through; do not remap. `xs` remove uses `ui-chip__remove--xs`. |
+| Map                                | Use                                                                                                                                                         |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fieldSizeTypographyClasses`       | Label + non-floating control type scale (stacked fields)                                                                                                    |
+| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …) — semantic `ui-field-control--*` modifiers                                                                      |
+| `fieldGroupedControlSizeClasses`   | One segment in grouped shells (`InputSelectField`, `InputUnitField`, `DiceFormulaField`, …)                                                                 |
+| `fieldTextareaSizeClasses`         | Multi-line controls                                                                                                                                         |
+| `fieldDigitSizeClasses`            | Digit-width control padding                                                                                                                                 |
+| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns                                                                                                                     |
+| `fieldDigitTrailingColumnClasses`  | Trailing column width                                                                                                                                       |
+| Number input stepper icons         | Explicit `Icon` `size` (`xs`/`md` by field tier) — no descendant sizing helpers                                                                             |
+| Chip `size`                        | Same `xs \| sm \| md \| lg` as the field. Pass `size` through; do not remap. Dismiss hit targets are `ui-chip__remove--xs\|sm\|md\|lg`, not CompactControl. |
 
 ### `size` — control height + type scale
 

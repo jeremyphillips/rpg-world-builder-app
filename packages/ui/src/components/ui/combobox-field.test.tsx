@@ -234,9 +234,7 @@ describe('ComboboxField', () => {
 
     const chip = screen.getByText('Dagger').closest('.ui-chip')
     expect(chip).toHaveClass('ui-chip--sm')
-    expect(screen.getByRole('button', { name: 'Remove Dagger' })).toHaveClass(
-      'ui-compact-control--icon-compact-sm',
-    )
+    expect(screen.getByRole('button', { name: 'Remove Dagger' })).toHaveClass('ui-chip__remove--sm')
   })
 
   it('opens with a chromeless search row that replaces the trigger', async () => {
