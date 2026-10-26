@@ -59,4 +59,10 @@
     line-height: 1;
     --icon-size: var(--icon-inline);
   }
+
+  /* Phase 1 transitional — removed in Phase 2 with SemanticText typography strip. */
+  .text-style-micro .ui-semantic-text {
+    font-size: inherit;
+    line-height: inherit;
+  }
 }

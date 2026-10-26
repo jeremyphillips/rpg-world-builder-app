@@ -23,7 +23,7 @@ type SpecialtyRow = {
 }
 
 const PRIMITIVES: PrimitiveRow[] = [
-  { key: 'text-fine-xs', className: 'text-fine-xs', px: 10, lineHeight: '—' },
+  { key: 'text-fine-xs', className: 'text-fine-xs', px: 10, lineHeight: 14 },
   { key: 'text-fine-sm', className: 'text-fine-sm', px: 11, lineHeight: 14 },
   { key: 'text-fine-md', className: 'text-fine-md', px: 13, lineHeight: '—' },
   { key: 'text-xs', className: 'text-xs', px: 12, lineHeight: '16px' },

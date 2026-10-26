@@ -71,6 +71,7 @@ const TEXT_STYLE_UTILITIES = [
   'text-style-body',
   'text-style-muted',
   'text-style-caption',
+  'text-style-micro',
   'text-style-supporting',
   'text-style-label',
   'text-style-emphasis',

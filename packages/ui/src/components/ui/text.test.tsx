@@ -29,6 +29,16 @@ describe('Text', () => {
     expect(screen.getByText('Label')).toHaveClass('text-style-label')
   })
 
+  it('applies micro variant classes on span owners', () => {
+    render(
+      <Text as="span" variant="micro">
+        Status
+      </Text>,
+    )
+    expect(screen.getByText('Status')).toHaveClass('text-style-micro')
+    expect(screen.getByText('Status').tagName).toBe('SPAN')
+  })
+
   it('applies status variant classes', () => {
     render(<Text variant="warning">Caution</Text>)
     expect(screen.getByText('Caution')).toHaveClass('text-style-warning')

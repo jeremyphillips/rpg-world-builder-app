@@ -5,6 +5,7 @@ export const TEXT_VARIANT_MAP = {
   muted: 'text-style-muted',
   supporting: 'text-style-supporting',
   caption: 'text-style-caption',
+  micro: 'text-style-micro',
   label: 'text-style-label',
   emphasis: 'text-style-emphasis',
   option: 'text-style-option',

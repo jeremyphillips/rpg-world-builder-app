@@ -33,6 +33,7 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | `Text` `body`                     | `p`    | 16      | 400                  | Default foreground copy                                                                |
 | `Text` `supporting`               | `p`    | 14      | 400                  | Secondary explanatory copy (preferred over `muted` + `text-sm`)                        |
 | `Text` `caption`                  | `p`    | 12      | 400                  | Small supplemental metadata                                                            |
+| `Text` `micro`                    | `span` | 10      | 400                  | Fine metadata owner — pair with `SemanticText` for toned inline status (PreviewRail)   |
 | `Text` `label`                    | `p`    | 14      | 500                  | Compact UI descriptor — not a native form `<label>`                                    |
 | `Text` `muted`                    | `p`    | inherit | 400                  | Color-only muted treatment (legacy — prefer `supporting` / `caption`)                  |
 | `Text` `lead`                     | `p`    | 18      | 400                  | Marketing subheads                                                                     |
@@ -79,12 +80,12 @@ A text role defines the intended typography for a communication purpose, includi
 whichever of size, line height, weight, and default color are appropriate. Not every
 variant sets every property (`muted` is color-only; `label` inherits color).
 
-| Category              | Variants                                         | Policy                                  |
-| --------------------- | ------------------------------------------------ | --------------------------------------- |
-| Primary content roles | `body`, `supporting`, `caption`, `label`, `lead` | Preferred for new copy                  |
-| Contextual roles      | `option`                                         | Choice-row contexts                     |
-| Existing treatments   | `muted`, `emphasis`                              | Legacy — do not expand without an audit |
-| Semantic state        | `info`, `success`, `warning`, `destructive`      | Status-colored copy at 15px             |
+| Category              | Variants                                                  | Policy                                  |
+| --------------------- | --------------------------------------------------------- | --------------------------------------- |
+| Primary content roles | `body`, `supporting`, `caption`, `micro`, `label`, `lead` | Preferred for new copy                  |
+| Contextual roles      | `option`                                                  | Choice-row contexts                     |
+| Existing treatments   | `muted`, `emphasis`                                       | Legacy — do not expand without an audit |
+| Semantic state        | `info`, `success`, `warning`, `destructive`               | Status-colored copy at 15px             |
 
 Do not hand-roll stacks that duplicate a role (`text-sm text-muted-foreground` →
 `supporting` or `text-style-supporting`). Do not invent combination names
@@ -96,9 +97,16 @@ and errors use `text-style-field-*` and field components — not `Text` `label`.
 ### Role versus tone
 
 `SemanticText` owns inline status tone (`neutral`, `info`, `success`, `warning`,
-`destructive`) and emphasis at 12px. `Text` state variants (`info`, `success`, …)
-are separate 15px treatments. There is no `tone` prop on `Text` yet; a future design
-may compose role + tone without new composite names.
+`destructive`) and emphasis. A **typography owner** must establish font size and
+line height — usually `Text` (`caption`, `supporting`, `micro`, …) or a parent with
+`text-style-*`. Compose `Text variant="micro"` + `SemanticText` for fine (10px) toned
+status copy (PreviewRail section status). Until Phase 2 strips fixed metrics from
+`.ui-semantic-text`, the narrow `.text-style-micro .ui-semantic-text` rule lets nested
+`SemanticText` inherit micro scale; unowned `SemanticText` elsewhere stays on 12px.
+
+`Text` state variants (`info`, `success`, …) are separate 15px treatments. There is
+no `tone` prop on `Text` yet; a future design may compose role + tone without new
+composite names.
 
 ### Usage
 
@@ -195,7 +203,7 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 | `text-3xl`      | 28             | Section headings (curated; not the 30px default) |
 | `text-4xl`      | 34             | Page headings (curated; not the 36px default)    |
 
-Fine (10–13px) and standard (`text-xs` through `text-4xl`) are one scale. Nothing above `text-4xl` is declared. Fine sizes have no line-height companion.
+Fine (10–13px) and standard (`text-xs` through `text-4xl`) are one scale. Nothing above `text-4xl` is declared. Most fine sizes have no line-height companion; `--text-fine-xs--line-height` (14px) backs `Text` `micro` and Chip `xs`.
 
 ## Form legend tokens
 
@@ -272,16 +280,16 @@ Primitive weights and role aliases live in [`styles/globals.css`](../src/styles/
 
 ## Fine sizes
 
-Fine sizes are the small end of the same primitive scale, not a metadata tier. They have no line-height companions. A role can share a fine size and keep its own line height, weight, and spacing.
+Fine sizes are the small end of the same primitive scale, not a metadata tier. A role can share a fine size and keep its own line height, weight, and spacing.
 
-| Token / utility       | px @ 16px root | Shared by                                                      |
-| --------------------- | -------------- | -------------------------------------------------------------- |
-| `text-fine-xs`        | 10             | `text-eyebrow-xs`, `text-control-action-xs` (line-height 14px) |
-| `text-fine-sm`        | 11             | `text-eyebrow-sm`, `--text-chip-sm`, floating-label `sm` floor |
-| `text-fine-md`        | 13             | `text-eyebrow-md`, `--text-chip-md`, `text-table-body`         |
-| `text-md`             | 15             | Chip `lg` (`--text-chip-lg`)                                   |
-| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                       |
-| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`         |
+| Token / utility       | px @ 16px root | Shared by                                                                                                        |
+| --------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `text-fine-xs`        | 10             | `Text` `micro`, `text-eyebrow-xs`, `text-control-action-xs` (14px line-height via `--text-fine-xs--line-height`) |
+| `text-fine-sm`        | 11             | `text-eyebrow-sm`, `--text-chip-sm`, floating-label `sm` floor                                                   |
+| `text-fine-md`        | 13             | `text-eyebrow-md`, `--text-chip-md`, `text-table-body`                                                           |
+| `text-md`             | 15             | Chip `lg` (`--text-chip-lg`)                                                                                     |
+| `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                                                                         |
+| `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`                                                           |
 
 The standard group above runs `text-xs` (12px) through `text-4xl` (34px).
 

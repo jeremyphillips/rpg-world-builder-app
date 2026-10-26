@@ -27,6 +27,7 @@ const RETIRED_FINE_2XS = new RegExp('--text-fine-' + '2xs\\b|text-fine-' + '2xs\
 const REQUIRED_THEME_TOKENS = [
   '--text-md:',
   '--text-fine-xs:',
+  '--text-fine-xs--line-height:',
   '--text-fine-sm:',
   '--text-fine-sm--line-height:',
   '--text-fine-md:',
