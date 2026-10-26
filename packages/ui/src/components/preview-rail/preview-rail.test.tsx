@@ -89,6 +89,7 @@ describe('PreviewRail', () => {
 
     const basicsTrigger = screen.getByRole('button', { name: /Basics/ })
     expect(basicsTrigger).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByText('Ready')).toHaveClass('ui-preview-rail__section-status')
     expect(basicsTrigger.querySelector('.ui-status-icon--ready')).toBeInTheDocument()
     expect(
       screen

@@ -48,4 +48,10 @@
     padding: calc(var(--spacing) * 3);
     background-color: var(--surface-faint);
   }
+
+  /* Beat .ui-semantic-text xs scale (source order would otherwise keep 12px). */
+  .ui-preview-rail__section-status.ui-semantic-text {
+    font-size: var(--text-fine-xs);
+    line-height: var(--text-control-action-xs--line-height);
+  }
 }
