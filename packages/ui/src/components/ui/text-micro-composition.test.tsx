@@ -19,36 +19,20 @@ function readUtilityBlock(css: string, utilityName: string): string {
   return next === -1 ? css.slice(start) : css.slice(start, next)
 }
 
-const COMPOSITION_TEST_CSS = `
-  :root {
-    --text-fine-xs: 10px;
-    --text-fine-xs--line-height: 14px;
-    --text-xs: 12px;
-    --text-xs--line-height: 16px;
-    --font-weight-normal: 400;
-    --muted-foreground: #666666;
-  }
+const PREVIEW_RAIL_COMPOSITION_CSS = `
   .text-style-micro {
     font-size: 10px;
     line-height: 14px;
-    font-weight: 400;
-    color: #666666;
   }
   .ui-semantic-text {
     display: inline-flex;
-    font-size: 12px;
-    line-height: 16px;
-  }
-  .text-style-micro .ui-semantic-text {
-    font-size: inherit;
-    line-height: inherit;
   }
 `
 
-function installCompositionStyles(): HTMLStyleElement {
+function installPreviewRailStyles(): HTMLStyleElement {
   const style = document.createElement('style')
-  style.setAttribute('data-test', 'text-micro-composition')
-  style.textContent = COMPOSITION_TEST_CSS
+  style.setAttribute('data-test', 'preview-rail-micro')
+  style.textContent = PREVIEW_RAIL_COMPOSITION_CSS
   document.head.appendChild(style)
   return style
 }
@@ -57,7 +41,7 @@ function px(value: string): number {
   return Number.parseFloat(value)
 }
 
-describe('Text micro + SemanticText composition (Phase 1)', () => {
+describe('Text micro + SemanticText (PreviewRail composition)', () => {
   let styleEl: HTMLStyleElement | undefined
 
   afterEach(() => {
@@ -65,45 +49,35 @@ describe('Text micro + SemanticText composition (Phase 1)', () => {
     styleEl = undefined
   })
 
-  it('defines text-style-micro and fine-xs line-height in globals', () => {
+  it('defines text-style-micro with fine-xs metrics in globals', () => {
     const globals = readFileSync(globalsCss, 'utf8')
     expect(globals).toContain('--text-fine-xs--line-height: 0.875rem')
 
     const block = readUtilityBlock(globals, 'text-style-micro')
     expect(block).toContain('font-size: var(--text-fine-xs)')
     expect(block).toContain('line-height: var(--text-fine-xs--line-height)')
-    expect(block).toContain('font-weight: var(--font-weight-normal)')
-    expect(block).toContain('color: var(--muted-foreground)')
     expect(block).toContain('--icon-inline: var(--icon-glyph-xs)')
   })
 
-  it('keeps the micro-scoped inherit rule and standalone xs block on SemanticText', () => {
+  it('does not use rail-specific or micro inheritance overrides in semantic-text.css', () => {
     const css = readFileSync(semanticTextCss, 'utf8')
-    expect(css).toContain('.text-style-micro .ui-semantic-text')
-    expect(css).toMatch(/\.ui-semantic-text\s*\{[^}]*font-size:\s*var\(--text-xs\)/)
-    expect(css).not.toMatch(/text-style-caption\s+\.ui-semantic-text/)
+    expect(css).not.toContain('.text-style-micro .ui-semantic-text')
+    expect(css).not.toMatch(/\.ui-semantic-text\s*\{[^}]*font-size:/)
   })
 
-  it('inherits micro metrics on nested SemanticText and keeps 12px when unowned', () => {
-    styleEl = installCompositionStyles()
-
-    const { rerender } = render(
-      <Text as="span" variant="micro" data-testid="owner">
+  it('composes PreviewRail section status with micro owner typography', () => {
+    styleEl = installPreviewRailStyles()
+    render(
+      <Text as="span" variant="micro" className="shrink-0" data-testid="owner">
         <SemanticText tone="success" emphasis="medium">
           Ready
         </SemanticText>
       </Text>,
     )
-
     const owner = screen.getByTestId('owner')
-    const nested = screen.getByText('Ready')
-    expect(nested).toHaveClass('ui-semantic-text')
+    expect(owner).toHaveClass('text-style-micro', 'shrink-0')
     expect(px(getComputedStyle(owner).fontSize)).toBe(10)
     expect(px(getComputedStyle(owner).lineHeight)).toBe(14)
-
-    rerender(<SemanticText tone="neutral">Standalone</SemanticText>)
-    const standalone = screen.getByText('Standalone')
-    expect(px(getComputedStyle(standalone).fontSize)).toBe(12)
-    expect(px(getComputedStyle(standalone).lineHeight)).toBe(16)
+    expect(screen.getByText('Ready')).toHaveClass('ui-semantic-text--success')
   })
 })

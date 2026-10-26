@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { UseFormReturn, FieldValues } from 'react-hook-form'
 import { useFormState } from 'react-hook-form'
-import { Button, SemanticText } from '@rpg/ui'
+import { Button, SemanticText, Text } from '@rpg/ui'
 import { FormFooterActions, useFormUiContext, useSchemaFormSubmit } from '@rpg/ui/form'
 
 import {
@@ -216,7 +216,9 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
         renderDialog={false}
       />
       {strictWriteGateReason ? (
-        <SemanticText tone="warning">{strictWriteGateReason}</SemanticText>
+        <Text as="span" variant="supporting">
+          <SemanticText tone="warning">{strictWriteGateReason}</SemanticText>
+        </Text>
       ) : null}
       <FormFooterActions
         secondary={secondary}

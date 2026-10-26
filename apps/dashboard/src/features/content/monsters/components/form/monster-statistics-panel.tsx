@@ -8,7 +8,7 @@ import {
   CREATURE_ARMOR_CLASS_KINDS,
   getCreatureArmorClassKindLabel,
 } from '@rpg/contracts'
-import { Button, SegmentedControl, SemanticText } from '@rpg/ui'
+import { Button, SegmentedControl, SemanticText, Text } from '@rpg/ui'
 import { flattenFormIssues, useFormValidationPresentation, useTabbedFormChrome } from '@rpg/ui/form'
 
 import { AbilityScoreNumeric } from '@/components/ability-score'
@@ -68,9 +68,11 @@ function StatisticsIssueList() {
   return (
     <div>
       {issues.map((issue) => (
-        <SemanticText key={issue.path} tone="destructive">
-          {`${statisticsIssueLabel(issue.path)}: ${issue.message}`}
-        </SemanticText>
+        <Text key={issue.path} as="span" variant="supporting">
+          <SemanticText tone="destructive">
+            {`${statisticsIssueLabel(issue.path)}: ${issue.message}`}
+          </SemanticText>
+        </Text>
       ))}
     </div>
   )
@@ -208,11 +210,13 @@ function ArmorClassSection({
     <section>
       <h3>{MONSTER_ARMOR_CLASS_HEADING}</h3>
       {ctx.equipmentCatalogStatus !== 'ready' ? (
-        <SemanticText tone="warning">
-          {ctx.equipmentCatalogStatus === 'error'
-            ? MONSTER_EQUIPMENT_CATALOG_ERROR
-            : MONSTER_LOADING_EQUIPMENT}
-        </SemanticText>
+        <Text as="span" variant="supporting">
+          <SemanticText tone="warning">
+            {ctx.equipmentCatalogStatus === 'error'
+              ? MONSTER_EQUIPMENT_CATALOG_ERROR
+              : MONSTER_LOADING_EQUIPMENT}
+          </SemanticText>
+        </Text>
       ) : (
         <>
           <SegmentedControl
@@ -303,7 +307,11 @@ function ArmorClassStatus({
   const kind = values.armorClass.kind
   if (derived?.ac.status === 'unavailable' && derived.ac.reason === 'conflict') {
     return (
-      <SemanticText tone="warning">{monsterBodyArmorConflictMessage(bodyArmorNames)}</SemanticText>
+      <Text as="span" variant="supporting">
+        <SemanticText tone="warning">
+          {monsterBodyArmorConflictMessage(bodyArmorNames)}
+        </SemanticText>
+      </Text>
     )
   }
   if (
@@ -313,7 +321,9 @@ function ArmorClassStatus({
   ) {
     return (
       <div>
-        <SemanticText>{monsterChooseBodyArmorMessage()}</SemanticText>
+        <Text as="span" variant="supporting">
+          <SemanticText>{monsterChooseBodyArmorMessage()}</SemanticText>
+        </Text>
         <Button type="button" variant="outline" onClick={onGoToEquipment}>
           {monsterGoToEquipmentLabel()}
         </Button>
@@ -322,9 +332,11 @@ function ArmorClassStatus({
   }
   if ((kind === 'natural' || kind === 'unarmored') && bodyArmorNames.length > 0) {
     return (
-      <SemanticText tone="warning">
-        {monsterBodyArmorIgnoredMessage(bodyArmorNames[0]!)}
-      </SemanticText>
+      <Text as="span" variant="supporting">
+        <SemanticText tone="warning">
+          {monsterBodyArmorIgnoredMessage(bodyArmorNames[0]!)}
+        </SemanticText>
+      </Text>
     )
   }
   if (derived?.ac.status === 'resolved') {

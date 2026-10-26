@@ -322,7 +322,9 @@ function ScopeModeBody({
         variant="card"
       />
       {scope === 'one' && referencedByLabel ? (
-        <SemanticText tone="info">{referencedByLabel}</SemanticText>
+        <Text as="span" variant="supporting">
+          <SemanticText tone="info">{referencedByLabel}</SemanticText>
+        </Text>
       ) : null}
     </div>
   )

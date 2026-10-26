@@ -855,6 +855,7 @@
   font-size: var(--text-xs);
   line-height: var(--text-xs--line-height);
   color: var(--muted-foreground);
+  --icon-inline: var(--icon-glyph-sm);
 }
 
 @utility text-style-micro {
@@ -869,6 +870,7 @@
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
   color: var(--muted-foreground);
+  --icon-inline: var(--icon-glyph-sm);
 }
 
 @utility text-style-label {

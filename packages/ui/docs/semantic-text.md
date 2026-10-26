@@ -22,15 +22,10 @@ For bordered pill surfaces use [`Badge`](./pill-badge-chip.md). For full alert/c
 
 `low | medium | high` — font weight only. `info` + `low` uses `--semantic-info-muted`.
 
-Default type is the xs metrics on `.ui-semantic-text`, including `--icon-inline`. A `text-sm` class on the element still overrides font size because utilities follow the components layer, and that utility also sets `--icon-inline`. Do not add a second size prop.
-
-### Typography owner (Phase 1)
-
-`SemanticText` does not own font size or line height long term. Wrap copy in a typography
-owner when you need a scale other than the interim 12px block — for example
-`Text as="span" variant="micro"` around `SemanticText` for 10px PreviewRail section
-status. Phase 2 removes fixed typography from `.ui-semantic-text` and the transitional
-`.text-style-micro .ui-semantic-text` inherit rule; every call site must have an owner.
+`SemanticText` does not own font size, line height, or `--icon-inline`. Pair it with a
+typography owner — `Text` (`caption`, `supporting`, `micro`, …) or a parent with
+`text-style-*`. Example: `Text as="span" variant="micro"` for PreviewRail section status.
+Do not add size props or utility overrides on `SemanticText` for scale; fix the owner.
 See [typography.md](./typography.md#role-versus-tone).
 
 ```tsx
@@ -40,7 +35,9 @@ import { SemanticText } from '@rpg/ui'
 <SemanticText tone="warning" emphasis="medium" icon={<TriangleAlert aria-hidden />}>
   Not proficient
 </SemanticText>
-<SemanticText tone="success" className="text-sm">Updated</SemanticText>
+<Text as="span" variant="supporting">
+  <SemanticText tone="success">Updated</SemanticText>
+</Text>
 ```
 
 ## Tokens

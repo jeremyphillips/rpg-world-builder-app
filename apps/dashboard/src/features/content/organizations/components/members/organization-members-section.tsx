@@ -161,7 +161,11 @@ export function OrganizationMembersSection({
       heading={ORGANIZATION_SECTION_LABELS.members}
       headingId={ORGANIZATION_MEMBERS_HEADING_ID}
     >
-      {mutationError ? <SemanticText tone="destructive">{mutationError}</SemanticText> : null}
+      {mutationError ? (
+        <Text as="span" variant="supporting">
+          <SemanticText tone="destructive">{mutationError}</SemanticText>
+        </Text>
+      ) : null}
 
       {isPending ? (
         <Text variant="muted">Loading…</Text>

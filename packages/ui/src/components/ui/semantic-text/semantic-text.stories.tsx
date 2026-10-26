@@ -2,6 +2,7 @@ import { Icon } from '../icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ClassReferenceTable } from '../../../stories/semantic-classes/class-reference-table'
+import { Text } from '../text'
 import { SemanticText } from './semantic-text'
 import { SEMANTIC_TEXT_CLASS_SPECS } from './semantic-text.styles'
 import type { SemanticTextEmphasis, SemanticTextTone } from './semantic-text.variants'
@@ -13,6 +14,16 @@ const meta = {
     children: 'Semantic label',
     emphasis: 'medium',
   },
+  decorators: [
+    (Story, context) =>
+      context.parameters.semanticClasses ? (
+        <Story />
+      ) : (
+        <Text as="span" variant="caption">
+          <Story />
+        </Text>
+      ),
+  ],
 } satisfies Meta<typeof SemanticText>
 
 export default meta
@@ -44,8 +55,8 @@ function SurfaceMatrix({ surface }: { surface: 'base' | 'subtle' }) {
     <div
       className={
         surface === 'subtle'
-          ? 'space-y-3 rounded-md bg-surface-muted p-4'
-          : 'space-y-3 rounded-md border border-border p-4'
+          ? 'space-y-3 rounded-md bg-surface-muted p-4 text-style-caption'
+          : 'space-y-3 rounded-md border border-border p-4 text-style-caption'
       }
     >
       {TONES.map((tone) => (
@@ -60,8 +71,8 @@ function EquipmentCalloutComparison({ surface }: { surface: 'base' | 'subtle' })
     <div
       className={
         surface === 'subtle'
-          ? 'space-y-2 rounded-md bg-surface-muted p-4'
-          : 'space-y-2 rounded-md border border-border bg-background p-4'
+          ? 'space-y-2 rounded-md bg-surface-muted p-4 text-style-caption'
+          : 'space-y-2 rounded-md border border-border bg-background p-4 text-style-caption'
       }
     >
       {EQUIPMENT_CALLOUT_SAMPLES.map((sample) => (

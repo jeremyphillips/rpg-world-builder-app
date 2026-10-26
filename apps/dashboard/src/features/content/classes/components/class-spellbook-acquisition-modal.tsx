@@ -13,6 +13,7 @@ import {
   Modal,
   RadioCard,
   SemanticText,
+  Text,
 } from '@rpg/ui'
 import {
   FormItems,
@@ -330,9 +331,11 @@ function ClassSpellbookAcquisitionModalContent({
                         </FormProvider>
                         {regularAlert ? (
                           <Alert variant="default" density="compact">
-                            <SemanticText tone="neutral" icon={<Icon name="info" size="owner" />}>
-                              {regularAlert}
-                            </SemanticText>
+                            <Text as="span" variant="supporting">
+                              <SemanticText tone="neutral" icon={<Icon name="info" size="owner" />}>
+                                {regularAlert}
+                              </SemanticText>
+                            </Text>
                           </Alert>
                         ) : null}
                       </>
@@ -352,9 +355,11 @@ function ClassSpellbookAcquisitionModalContent({
                           chrome="bare"
                         />
                         <Alert variant="default" density="compact">
-                          <SemanticText tone="neutral" icon={<Icon name="info" size="owner" />}>
-                            {VARIABLE_ALERT}
-                          </SemanticText>
+                          <Text as="span" variant="supporting">
+                            <SemanticText tone="neutral" icon={<Icon name="info" size="owner" />}>
+                              {VARIABLE_ALERT}
+                            </SemanticText>
+                          </Text>
                         </Alert>
                       </>
                     )}

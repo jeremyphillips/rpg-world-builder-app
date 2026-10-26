@@ -298,9 +298,8 @@ Selection-card shells landed with the option-card owner (W8). Entity preview fra
 | `toast.variants`            | simplified | Quiet fill. Default is `ui-border--default`. Status tones own border color. Six static CVAs deleted |
 | Toast motion                | exception  | `toastMotionClasses` stays utilities (Radix swipe variables)                                        |
 | `attention-frame.variants`  | deleted    | `ui-attention-frame` plus conditional `--active` on the element                                     |
-| `semantic-text.variants`    | simplified | Tone and emphasis only. Xs type and `--icon-inline` live on the block                               |
-| SemanticText `text-sm`      | exception  | Utility override on the element, including character-import previews                                |
-| Preview-rail status         | exception  | `shrink-0` stays local layout, not a size                                                           |
+| `semantic-text.variants`    | simplified | Tone and emphasis only; typography from `Text` / `text-style-*` owners                              |
+| Preview-rail section status | migrated   | `Text variant="micro"` + `SemanticText`; no rail-specific type override                             |
 | `inlineIconFlexSlotClasses` | deleted    | Icon slot is `ui-semantic-text__icon`                                                               |
 
 ## Preview rail, master-detail, and app sidebars grouped in W15

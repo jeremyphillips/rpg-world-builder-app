@@ -97,12 +97,10 @@ and errors use `text-style-field-*` and field components — not `Text` `label`.
 ### Role versus tone
 
 `SemanticText` owns inline status tone (`neutral`, `info`, `success`, `warning`,
-`destructive`) and emphasis. A **typography owner** must establish font size and
-line height — usually `Text` (`caption`, `supporting`, `micro`, …) or a parent with
-`text-style-*`. Compose `Text variant="micro"` + `SemanticText` for fine (10px) toned
-status copy (PreviewRail section status). Until Phase 2 strips fixed metrics from
-`.ui-semantic-text`, the narrow `.text-style-micro .ui-semantic-text` rule lets nested
-`SemanticText` inherit micro scale; unowned `SemanticText` elsewhere stays on 12px.
+`destructive`) and emphasis only. A **typography owner** must establish font size,
+line height, and `--icon-inline` for inline glyphs — usually `Text` (`caption`,
+`supporting`, `micro`, …) or a parent with `text-style-*`. Compose
+`Text variant="micro"` + `SemanticText` for fine (10px) toned status copy (PreviewRail).
 
 `Text` state variants (`info`, `success`, …) are separate 15px treatments. There is
 no `tone` prop on `Text` yet; a future design may compose role + tone without new

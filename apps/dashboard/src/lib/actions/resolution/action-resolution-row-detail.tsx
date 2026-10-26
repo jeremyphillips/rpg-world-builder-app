@@ -76,9 +76,9 @@ export function ActionResolutionRowDetail<TBlocker, TFailure extends ActionTarge
 
   if (row.state === 'updated') {
     return (
-      <SemanticText tone="success" className="text-sm">
-        Updated
-      </SemanticText>
+      <Text as="span" variant="supporting">
+        <SemanticText tone="success">Updated</SemanticText>
+      </Text>
     )
   }
 
