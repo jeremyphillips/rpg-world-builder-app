@@ -17,10 +17,15 @@ import { IconContainer } from './icon-container.client'
 import { Modal } from './modal.client'
 import { Sheet } from './sheet.client'
 
-const globalsCss = readFileSync(
-  join(dirname(fileURLToPath(import.meta.url)), '../../styles/globals.css'),
+const typographyRolesCss = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), '../../styles/tokens/typography-roles.css'),
   'utf8',
 )
+const typographyUtilitiesCss = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), '../../styles/typography.utilities.css'),
+  'utf8',
+)
+const dialogTitleSourceCss = `${typographyRolesCss}\n${typographyUtilitiesCss}`
 
 describe('dialog title typography ownership', () => {
   it('maps dialogTitle to the shared responsive utility', () => {
@@ -28,19 +33,19 @@ describe('dialog title typography ownership', () => {
   })
 
   it('uses standard heading weight for section and sheet section titles', () => {
-    expect(globalsCss).toMatch(
+    expect(dialogTitleSourceCss).toMatch(
       /@utility heading-style-section \{[\s\S]*?font-weight: var\(--font-weight-heading\)/,
     )
-    expect(globalsCss).toMatch(
+    expect(dialogTitleSourceCss).toMatch(
       /@utility heading-style-sheet-section \{[\s\S]*?font-weight: var\(--font-weight-heading\)/,
     )
-    expect(globalsCss).not.toContain('--font-weight-heading-section')
+    expect(dialogTitleSourceCss).not.toContain('--font-weight-heading-section')
   })
 
   it('defines dialogTitle as 18px base with 20px from the md breakpoint', () => {
-    expect(globalsCss).toMatch(/--text-heading-dialog-title:\s*var\(--text-lg\)/)
-    expect(globalsCss).toMatch(/--text-heading-dialog-title-md:\s*var\(--text-xl\)/)
-    expect(globalsCss).toMatch(
+    expect(dialogTitleSourceCss).toMatch(/--text-heading-dialog-title:\s*var\(--text-lg\)/)
+    expect(dialogTitleSourceCss).toMatch(/--text-heading-dialog-title-md:\s*var\(--text-xl\)/)
+    expect(dialogTitleSourceCss).toMatch(
       /@utility heading-style-dialog-title \{[\s\S]*?@variant md \{[\s\S]*?--text-heading-dialog-title-md/,
     )
   })

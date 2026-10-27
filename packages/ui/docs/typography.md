@@ -51,7 +51,7 @@ Preserve semantic headings and existing `id`s — content detail routes use
 ## `Heading`
 
 Polymorphic via `as`. Each `variant` maps to one **composite utility** in
-[`styles/globals.css`](../src/styles/globals.css) (e.g. `heading-style-section`).
+[`styles/typography.utilities.css`](../src/styles/typography.utilities.css) (e.g. `heading-style-section`).
 Size and weight tokens live in `@theme`; variants reference composites via
 [`heading.variants.ts`](../src/components/ui/heading.variants.ts).
 
@@ -163,8 +163,11 @@ prose config.
 ## Prose theme and dark mode
 
 The `@tailwindcss/typography` plugin is registered once in
-[`styles/globals.css`](../src/styles/globals.css). Token overrides on `@utility
-prose` map `--tw-prose-*` variables to design tokens (`--color-foreground`,
+[`styles/globals.css`](../src/styles/globals.css) (after the utility partial imports).
+Token overrides on `@utility prose` live in
+[`styles/prose.utilities.css`](../src/styles/prose.utilities.css); unlayered
+`.prose.prose-sm` / `.prose.prose-md` size overrides are in the same file. Together
+they map `--tw-prose-*` variables to design tokens (`--color-foreground`,
 `--color-primary`, `--color-muted-foreground`, …).
 
 Light and dark themes share the same class names — switching the `dark` class on
@@ -192,24 +195,24 @@ Compact UI chrome (buttons, menus, data tables) stays on **`text-sm` (14px)**.
 
 ## Type scale
 
-Primitive sizes live in [`styles/globals.css`](../src/styles/globals.css) `@theme inline`.
+Primitive sizes live in [`styles/tokens/tailwind-theme.css`](../src/styles/tokens/tailwind-theme.css) `@theme inline`.
 They override Tailwind’s built-in `text-*` utilities — components keep using `text-sm`,
 `text-2xl`, etc.; the CSS variables are the single source of truth (@ 16px root):
 
-| Token / utility | px @ 16px root | Typical use                                      |
-| --------------- | -------------- | ------------------------------------------------ |
-| `text-fine-xs`  | 10             | Eyebrow `xs`, compact control-action labels      |
-| `text-fine-sm`  | 11             | Eyebrow `sm`, Chip `sm` (`--text-chip-sm`)       |
-| `text-fine-md`  | 13             | Eyebrow `md`, Chip `md`, table body              |
-| `text-xs`       | 12             | Captions, table stat columns                     |
-| `text-sm`       | 14             | Compact UI chrome (buttons, menus, data tables)  |
-| `text-md`       | 15             | Secondary body (`prose-md`, emphasis, option)    |
-| `text-base`     | 16             | Primary body default                             |
-| `text-lg`       | 18             | Lead copy; subsection and card headings          |
-| `text-xl`       | 20             | Dialog title from `md`; sheet section headings   |
-| `text-2xl`      | 24             | Form group legends (`--text-field-group-legend`) |
-| `text-3xl`      | 28             | Section headings (curated; not the 30px default) |
-| `text-4xl`      | 34             | Page headings (curated; not the 36px default)    |
+| Token / utility | px @ 16px root | Typical use                                                                |
+| --------------- | -------------- | -------------------------------------------------------------------------- |
+| `text-fine-xs`  | 10             | Eyebrow `xs`, compact control-action labels                                |
+| `text-fine-sm`  | 11             | Eyebrow `sm`, Chip `sm` (via `--text-chip-sm` on `.ui-chip` in `chip.css`) |
+| `text-fine-md`  | 13             | Eyebrow `md`, Chip `md`, table body                                        |
+| `text-xs`       | 12             | Captions, table stat columns                                               |
+| `text-sm`       | 14             | Compact UI chrome (buttons, menus, data tables)                            |
+| `text-md`       | 15             | Secondary body (`prose-md`, emphasis, option)                              |
+| `text-base`     | 16             | Primary body default                                                       |
+| `text-lg`       | 18             | Lead copy; subsection and card headings                                    |
+| `text-xl`       | 20             | Dialog title from `md`; sheet section headings                             |
+| `text-2xl`      | 24             | Form group legends (`--text-field-group-legend`)                           |
+| `text-3xl`      | 28             | Section headings (curated; not the 30px default)                           |
+| `text-4xl`      | 34             | Page headings (curated; not the 36px default)                              |
 
 Fine (10–13px) and standard (`text-xs` through `text-4xl`) are one scale. Nothing above `text-4xl` is declared. Most fine sizes have no line-height companion; `--text-fine-xs--line-height` (14px) backs `Text` `micro` and Chip `xs`.
 
@@ -225,7 +228,7 @@ Legend sizes live on `:root` and are read by `text-style-field-legend` composite
 
 ## Heading size tokens
 
-Role tokens live on `:root` in [`styles/globals.css`](../src/styles/globals.css). They share a primitive pair (size and line-height). Display (42px) and ability-score `md` (32px) are the only off-scale literals. Retune a role by pointing it at another primitive, not by adding a numbered heading token.
+Role tokens live on `:root` in [`styles/tokens/typography-roles.css`](../src/styles/tokens/typography-roles.css). They share a primitive pair (size and line-height). Display (42px) and ability-score `md` (32px) are the only off-scale literals. Retune a role by pointing it at another primitive, not by adding a numbered heading token.
 
 | Role token                  | Points at                                          | `Heading` variant / utility              | px    |
 | --------------------------- | -------------------------------------------------- | ---------------------------------------- | ----- |
@@ -244,8 +247,10 @@ table above in app code.
 
 ## Media preview size
 
-`size-image-preview` maps to `--spacing-image-preview` → `--image-preview-size` in
-[`styles/globals.css`](../src/styles/globals.css):
+`size-image-preview` is generated from `--spacing-image-preview` in
+[`styles/tokens/tailwind-theme.css`](../src/styles/tokens/tailwind-theme.css), which
+aliases responsive `--image-preview-size` on `:root` in
+[`styles/base.css`](../src/styles/base.css):
 
 | Viewport        | Size  |
 | --------------- | ----- |
@@ -270,7 +275,7 @@ Components use composites via `headingVariants()`. Heading roles are not `text-h
 
 ## Font weight tokens
 
-Primitive weights and role aliases live in [`styles/globals.css`](../src/styles/globals.css).
+Primitive weights and role aliases live in [`styles/tokens/tailwind-theme.css`](../src/styles/tokens/tailwind-theme.css).
 
 | Role utility / token            | Value                | Typical use                                                       |
 | ------------------------------- | -------------------- | ----------------------------------------------------------------- |
@@ -293,9 +298,9 @@ Fine sizes are the small end of the same primitive scale, not a metadata tier. A
 | Token / utility       | px @ 16px root | Shared by                                                                                                        |
 | --------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `text-fine-xs`        | 10             | `Text` `micro`, `text-eyebrow-xs`, `text-control-action-xs` (14px line-height via `--text-fine-xs--line-height`) |
-| `text-fine-sm`        | 11             | `text-eyebrow-sm`, `--text-chip-sm`, floating-label `sm` floor                                                   |
-| `text-fine-md`        | 13             | `text-eyebrow-md`, `--text-chip-md`, `text-table-body`                                                           |
-| `text-md`             | 15             | Chip `lg` (`--text-chip-lg`)                                                                                     |
+| `text-fine-sm`        | 11             | `text-eyebrow-sm`, Chip `sm` (`chip.css`), floating-label `sm` floor                                             |
+| `text-fine-md`        | 13             | `text-eyebrow-md`, Chip `md` (`chip.css`), `text-table-body`                                                     |
+| `text-md`             | 15             | Chip `lg` (`chip.css`)                                                                                           |
 | `tracking-eyebrow-xs` | 1.2px          | Letter-spacing for `Eyebrow` `size="xs"`                                                                         |
 | `tracking-eyebrow`    | 1.6px          | Letter-spacing for `Eyebrow` `size="sm"` / `size="md"`                                                           |
 

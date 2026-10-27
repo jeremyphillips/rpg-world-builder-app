@@ -10,6 +10,13 @@
     --floating-label-move: 150ms;
     --floating-label-placeholder-fade: 100ms;
     --floating-label-mask-pad: 0.25rem;
+    /* Floated label sizes — derived from resting control type; compact floor is --text-fine-sm. */
+    --field-floating-label-reduction: 0.125rem; /* 2px @ 16px root */
+    --field-floating-label-sm: max(
+      var(--text-fine-sm),
+      calc(var(--text-xs) - var(--field-floating-label-reduction))
+    );
+    --field-floating-label-md: calc(var(--text-md) - var(--field-floating-label-reduction));
   }
 
   .ui-floating-label-field > button,

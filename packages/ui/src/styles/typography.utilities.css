@@ -1,0 +1,285 @@
+/* Heading composite utilities — bundle role tokens; variants map 1:1. */
+@utility heading-style-display {
+  font-size: var(--text-heading-display);
+  line-height: var(--text-heading-display--line-height);
+  font-weight: var(--font-weight-heading-display);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-page {
+  font-size: var(--text-heading-page);
+  line-height: var(--text-heading-page--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-section {
+  font-size: var(--text-heading-section);
+  line-height: var(--text-heading-section--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-subsection {
+  font-size: var(--text-heading-subsection);
+  line-height: var(--text-heading-subsection--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-group {
+  font-size: var(--text-heading-group);
+  line-height: var(--text-heading-group--line-height);
+  font-weight: var(--font-weight-heading-group);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-card {
+  font-size: var(--text-heading-card);
+  line-height: var(--leading-none);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-dialog-title {
+  font-size: var(--text-heading-dialog-title);
+  line-height: var(--text-heading-dialog-title--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+
+  @variant md {
+    font-size: var(--text-heading-dialog-title-md);
+    line-height: var(--text-heading-dialog-title-md--line-height);
+  }
+}
+
+@utility heading-style-confirm-dialog-title {
+  font-size: var(--text-heading-confirm-dialog-title);
+  line-height: var(--text-heading-confirm-dialog-title--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-sheet-section {
+  font-size: var(--text-heading-sheet-section);
+  line-height: var(--text-heading-sheet-section--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-hero-title {
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+
+  @variant md {
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
+  }
+
+  @variant lg {
+    font-size: var(--text-4xl);
+    line-height: var(--text-4xl--line-height);
+  }
+}
+
+@utility heading-style-alert {
+  font-size: var(--text-base);
+  line-height: var(--leading-none);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-nav {
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-brand {
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility heading-style-label {
+  font-size: var(--text-heading-label);
+  line-height: var(--text-heading-label--line-height);
+  font-weight: var(--font-weight-heading-label);
+  letter-spacing: var(--tracking-heading);
+}
+
+@utility eyebrow-style-xs {
+  font-size: var(--text-eyebrow-xs);
+  font-weight: var(--font-weight-eyebrow);
+  letter-spacing: var(--tracking-eyebrow-xs);
+  text-transform: uppercase;
+}
+
+@utility eyebrow-style-sm {
+  font-size: var(--text-eyebrow-sm);
+  font-weight: var(--font-weight-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+@utility eyebrow-style-md {
+  font-size: var(--text-eyebrow-md);
+  font-weight: var(--font-weight-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+/* Text role composites — Text variants and field type maps resolve 1:1. */
+@utility text-style-body {
+  color: var(--foreground);
+}
+
+@utility text-style-muted {
+  color: var(--muted-foreground);
+}
+
+@utility text-style-caption {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  color: var(--muted-foreground);
+  --icon-inline: var(--icon-glyph-sm);
+}
+
+@utility text-style-micro {
+  font-size: var(--text-fine-xs);
+  line-height: var(--text-fine-xs--line-height);
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+  --icon-inline: var(--icon-glyph-xs);
+}
+
+@utility text-style-supporting {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  color: var(--muted-foreground);
+  --icon-inline: var(--icon-glyph-sm);
+}
+
+@utility text-style-body-compact {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  color: var(--foreground);
+  --icon-inline: var(--icon-glyph-sm);
+}
+
+@utility text-style-label {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  font-weight: var(--font-weight-medium);
+}
+
+@utility text-style-emphasis {
+  font-size: var(--text-md);
+  line-height: var(--text-md--line-height);
+  font-weight: var(--font-weight-body-emphasis);
+}
+
+@utility text-style-option {
+  font-size: var(--text-md);
+  line-height: 1;
+  font-weight: var(--font-weight-body);
+}
+
+@utility text-style-lead {
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
+  color: var(--muted-foreground);
+}
+
+/* Color only. Size, line height, and weight inherit. The 15px tone lock is retired. */
+@utility text-style-info {
+  color: var(--info);
+}
+
+@utility text-style-success {
+  color: var(--success);
+}
+
+@utility text-style-warning {
+  color: var(--warning);
+}
+
+@utility text-style-destructive {
+  color: var(--destructive);
+}
+
+@utility text-style-field-label-sm {
+  font-size: var(--text-xs);
+  line-height: 1;
+  font-weight: var(--font-weight-field-label);
+}
+
+@utility text-style-field-label-md {
+  font-size: var(--text-md);
+  line-height: 1;
+  font-weight: var(--font-weight-field-label);
+}
+
+@utility text-style-field-label-lg {
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  font-weight: var(--font-weight-field-label);
+}
+
+@utility text-style-field-legend {
+  font-size: var(--text-field-group-legend);
+  line-height: 1;
+  font-weight: var(--font-weight-heading);
+  color: var(--foreground);
+}
+
+@utility text-style-field-legend-sub {
+  font-size: var(--text-field-subgroup-legend);
+  line-height: 1;
+  font-weight: var(--font-weight-heading);
+  color: var(--foreground);
+}
+
+@utility text-style-field-legend-compact {
+  font-size: var(--text-md);
+  line-height: 1;
+  font-weight: var(--font-weight-heading);
+  color: var(--foreground);
+}
+
+@utility text-style-field-hint {
+  font-weight: var(--font-weight-normal);
+  line-height: var(--leading-normal);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-field-hint-compact {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-field-group-description {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-field-group-description-compact {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-field-error {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  color: var(--destructive);
+}

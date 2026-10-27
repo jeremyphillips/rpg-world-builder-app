@@ -18,7 +18,7 @@ Viewport and container breakpoints, including `@variant`: [breakpoints.md](./bre
 ```text
 Layer 1  palette-light.css / palette-dark.css   --palette-*   (oklch SSOT)
 Layer 2  semantic-light.css / semantic-dark.css --background, --field-control-*, …
-Layer 3  globals.css @theme + custom utilities  bg-*, text-*, border-input, …
+Layer 3  globals.css (import order) + tokens/tailwind-theme.css @theme + *.utilities.css  bg-*, text-*, border-input, …
          component *.variants.ts + *.css        CVA API; semantic presentation where migrated
 ```
 
@@ -169,12 +169,12 @@ Do not merge text-tuned values onto solid status hues.
 ## Field control chrome
 
 - Layer 2: `--field-control-*` matrix in `semantic-*.css`.
-- Public utilities: `border-input`, `bg-input`, and state variants in `globals.css`.
+- Public utilities: `border-input`, `bg-input`, and state variants in `shared.utilities.css`.
 - **Global fill:** `--field-control-bg` → `--palette-surface-lift` everywhere. No
-  parent-scoped re-scoping in `globals.css` under `.bg-card` / `.bg-surface-*`.
+  parent-scoped re-scoping in `shared.utilities.css` under `.bg-card` / `.bg-surface-*`.
 - **Rare overrides:** set `--field-control-bg` locally in the component that creates an
   unusual shell context — e.g. `resolveFieldControlSurfaceClasses('default' | 'onMuted')`
-  on a region wrapper (`field-control-surface.variants.ts`). Do not add globals.css parent
+  on a region wrapper (`field-control-surface.variants.ts`). Do not add shared.utilities.css parent
   cascade rules under `.bg-surface-*`.
 - **Single recipe owner:** [`field-input-chrome.variants.ts`](../src/components/ui/field-input-chrome.variants.ts).
 - Individual controls import that recipe; do not reconstruct field chrome with ad-hoc opacity stacks.
@@ -186,7 +186,7 @@ Switch unchecked track uses `--switch-track*` — separate from field border own
 Schema-driven form fields default to a boxed container shell (`{ variant: 'container' }`):
 
 - Layer 2 token: `--field-container` — lift plane in both themes (`--palette-surface-lift`); recessed wells use `--sunken` / `bg-sunken` instead.
-- Public utility: `bg-field-container` in `globals.css`.
+- Public utility: `bg-field-container` in `shared.utilities.css`.
 - **Form shells only:** schema-driven field containers rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane. Overlays, menus, sheets, preview rails, and other generic lifted shells use `--surface-lift` / `bg-surface-lift` — not the field-container alias.
 - Padding: 16px (`p-4`).
 - Fieldset leaves (`ChipsField`, choose-count shells) and schema `kind: 'group'` wrap a
@@ -199,8 +199,9 @@ unit is suppressed automatically (including nested groups and nested dependents)
 item cards keep their own shell model.
 
 **Choice indicators** (radio, checkbox, RadioCard decorative control) use
-`border-choice-control` (`--choice-control-border`), composed toward `--surface-current` — not
-`border-input`. Checkbox `tone` (`default`, `success`, `warning`, `destructive`) sets
+`var(--choice-control-border)` in `choice-control.css`, composed toward `--surface-current` — not
+`border-input`. There is no `border-choice-control` utility (removed as unused); semantic
+`--choice-control-border` / `--color-choice-control-border` remain. Checkbox `tone` (`default`, `success`, `warning`, `destructive`) sets
 `--choice-indicator-*` from `[data-choice-tone]` in `choice-control.css`. `BooleanField`
 paints every tone through the same roles: `--boolean-bg`, `--boolean-hover-bg`,
 `--boolean-checked-bg`, and the matching border roles. The neutral checked fill is
@@ -264,7 +265,7 @@ Module: [`icon/icon.types.ts`](../src/components/ui/icon/icon.types.ts), [`icon/
 | 2xl  | 24  | `2xl`         | Icon-only large buttons, spinner `lg`, media compact |
 | 3xl  | 32  | `3xl`         | Large empty-state and media hero fallbacks           |
 
-Token source: `--icon-glyph-*` in `globals.css`. Only `.ui-icon` sets `width`, `height`, and `stroke-width` on glyphs.
+Token source: `--icon-glyph-*` in `tokens/tailwind-theme.css`. Only `.ui-icon` sets `width`, `height`, and `stroke-width` on glyphs.
 
 ### Hit-target scale (control chrome)
 
@@ -326,7 +327,7 @@ Inline icons use `size="inline"` and read `--icon-inline` from the nearest typog
 
 `text-lg` and larger, heading utilities, and eyebrow type are not inline-icon owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `badge.css` and `chip.css`. `layout="counter"` composes with the badge size modifier on the same host for `--icon-size`; counter alert icons (`ValidationIssueCountBadge`, `ArrayItemIssueButton`, create-modal issue badges) use `size="owner"`, not `inline` or fixed glyph steps.
 
-**Chip type scale** (`--text-chip-sm|md|lg` in `globals.css`) maps Chip `sm`/`md`/`lg` to `text-fine-sm` / `text-fine-md` / `text-md`. Badge sizes use `--text-fine-xs`, `--text-xs`, and `--text-sm` on `ui-badge--*` modifiers.
+**Chip type scale** (`--text-chip-sm|md|lg` on `.ui-chip` in `chip.css`) maps Chip `sm`/`md`/`lg` to `text-fine-sm` / `text-fine-md` / `text-md`. Badge sizes use `--text-fine-xs`, `--text-xs`, and `--text-sm` on `ui-badge--*` modifiers.
 
 `Button`, `ButtonLink`, and `ActionButton` glyphs use `size="owner"`. `size` selects the ladder; `button.css` publishes `--icon-size` on the host. Labeled `xs` / `sm` / `default` / `lg` use `--icon-glyph-sm` / `md` / `md` / `lg` (12 / 14 / 14 / 16px). Icon-only `icon-xs` / `icon-sm` / `icon` / `icon-lg` use `--icon-glyph-md` / `lg` / `xl` / `2xl` (14 / 16 / 20 / 24px). Text and attached variants use the labeled ladder. `children` does not select the glyph.
 
@@ -340,7 +341,10 @@ Module: [`status-icon.css`](../src/components/ui/status-icon.css) + [`status-ico
 
 Disc tone and diameter use `ui-status-icon--{ready|needs-attention|incomplete|off|none|not-configured}` and `ui-status-icon--{sm|md|lg}` (12 / 16 / 20px discs — not icon-glyph `sm`/`md`).
 
-Neutral disc fills use `--status-icon-idle-bg` and `--status-icon-incomplete-bg`. Grey-disc glyphs use `ui-status-icon__glyph--neutral`.
+Neutral disc fills use `--status-icon-idle-bg` and `--status-icon-incomplete-bg` in
+`status-icon.css` tone modifiers — not removed `bg-status-icon-*` / `text-status-icon-*`
+utilities or `--color-status-icon-*` theme keys (those were unused duplicates). Grey-disc
+glyphs use `ui-status-icon__glyph--neutral`.
 
 The off-slash glyph is **not** on the 10/12/14/16 icon-glyph ladder. It uses
 `size-status-icon-slash-sm` (6px) and `size-status-icon-slash-md` (8px) with a heavier

@@ -4,6 +4,16 @@
  * Unselected hover stays in this layer — Tailwind bg-* utilities would override it.
  */
 @layer components {
+  .ui-chip {
+    /* Chip type scale (11 / 13 / 15px on sm / md / lg) — component-owned, not @theme text-* keys. */
+    --text-chip-sm: var(--text-fine-sm);
+    --text-chip-sm--line-height: var(--text-xs--line-height);
+    --text-chip-md: var(--text-fine-md);
+    --text-chip-md--line-height: var(--text-sm--line-height);
+    --text-chip-lg: var(--text-md);
+    --text-chip-lg--line-height: var(--text-md--line-height);
+  }
+
   .ui-chip--xs {
     height: var(--control-height-compact);
     padding-inline: calc(var(--spacing) * 1.5);

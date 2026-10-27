@@ -8,7 +8,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { RichTextContent } from './rich-text-content'
 
 const stylesDir = join(dirname(fileURLToPath(import.meta.url)), '../../styles')
-const globalsCss = readFileSync(join(stylesDir, 'globals.css'), 'utf8')
+const proseUtilitiesCss = readFileSync(join(stylesDir, 'prose.utilities.css'), 'utf8')
 const textActionCss = readFileSync(join(stylesDir, 'text-action.utilities.css'), 'utf8')
 
 describe('RichTextContent', () => {
@@ -64,7 +64,7 @@ describe('RichTextContent', () => {
 
   it('wires prose anchors to the shared inline text-action CSS rule', () => {
     expect(textActionCss).toMatch(/@utility text-action-inline/)
-    expect(globalsCss).toMatch(
+    expect(proseUtilitiesCss).toMatch(
       /:where\(a\) \{[\s\S]*@apply underline decoration-from-font underline-offset-2 hover:decoration-2 text-primary/,
     )
 

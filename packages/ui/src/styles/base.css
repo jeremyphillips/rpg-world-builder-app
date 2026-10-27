@@ -1,0 +1,53 @@
+@layer base {
+  :root {
+    --image-preview-size: 7.5rem; /* 120px — compact media preview default and lg+ */
+    --hero-emblem-size: 12.1875rem; /* 195px spell school emblem hero (max width and height) */
+
+    @variant sm {
+      --image-preview-size: 5.625rem; /* 90px — sm through below lg */
+    }
+
+    @variant lg {
+      --image-preview-size: 7.5rem; /* 120px — large breakpoints */
+    }
+  }
+
+  /* Structural default only — semantic shells must set an explicit border role utility. */
+  * {
+    border-color: var(--border);
+    outline-color: color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+
+  body {
+    --icon-inline: var(--icon-glyph-md);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  /* Tailwind v4 preflight sets `cursor: default` on buttons — restore pointer on actionable controls. */
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  ::selection {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+
+  /* Collapse tw-animate-css enter/exit animations and transitions for users
+     who opt out of motion (WCAG 2.3.3). */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

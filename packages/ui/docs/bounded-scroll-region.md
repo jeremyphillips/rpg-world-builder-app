@@ -16,7 +16,7 @@ or unrelated padding. [`boundedScrollRegionEndInsetClasses`](../src/components/u
 (`pe-2.5`, `calc(var(--spacing) * 2.5)`) reserves inline-end space so content ends
 before the scrollbar thumb.
 
-[`scrollbar-gutter-stable`](../src/styles/globals.css) remains available as an optional
+[`scrollbar-gutter-stable`](../src/styles/misc.utilities.css) remains available as an optional
 utility but is not composed into the primitive — explicit end inset is more reliable
 across overlay scrollbar platforms.
 

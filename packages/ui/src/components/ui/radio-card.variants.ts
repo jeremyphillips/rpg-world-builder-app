@@ -22,9 +22,9 @@ export type RadioCardVisualControl = 'radio' | 'icon'
 export function radioCardGroupItemRowClasses({
   density,
 }: {
-  density: 'comfortable' | 'compact'
+  density: 'comfortable' | 'compact' | 'spacious'
 }): string {
-  return cn(radioCardRowBase, density === 'comfortable' ? 'gap-1 px-0 py-2' : 'gap-0.5 px-0 py-2')
+  return cn(radioCardRowBase, density === 'compact' ? 'gap-0.5 px-0 py-2' : 'gap-1 px-0 py-2')
 }
 
 /** Card-style radio option density padding (applied inside ui-radio-card body). */
@@ -37,11 +37,13 @@ export const radioCardVariants = cva('', {
     density: {
       comfortable: '',
       compact: '',
+      spacious: '',
     },
   },
   compoundVariants: [
     { variant: 'row', density: 'comfortable', class: 'gap-1 px-0 py-2' },
     { variant: 'row', density: 'compact', class: 'gap-0.5 px-0 py-2' },
+    { variant: 'row', density: 'spacious', class: 'gap-1 px-0 py-2' },
   ],
   defaultVariants: {
     variant: 'card',
@@ -53,7 +55,7 @@ export function radioCardLeadingControlTitleLineClassName({
   density,
   titleEnd,
 }: {
-  density: 'comfortable' | 'compact'
+  density: 'comfortable' | 'compact' | 'spacious'
   titleEnd: boolean
 }): string {
   return cn(
@@ -76,6 +78,7 @@ export const radioCardControlVariants = cva('', {
     density: {
       comfortable: '',
       compact: '',
+      spacious: '',
     },
   },
   compoundVariants: [
@@ -90,6 +93,11 @@ export const radioCardControlVariants = cva('', {
       class: radioCardDecorativeControlClasses({ indicatorSize: 'sm' }),
     },
     {
+      variant: 'card',
+      density: 'spacious',
+      class: radioCardDecorativeControlClasses({ indicatorSize: 'lg' }),
+    },
+    {
       variant: 'row',
       density: 'comfortable',
       class: radioCardDecorativeControlClasses({ indicatorSize: 'sm' }),
@@ -97,6 +105,11 @@ export const radioCardControlVariants = cva('', {
     {
       variant: 'row',
       density: 'compact',
+      class: radioCardDecorativeControlClasses({ indicatorSize: 'sm' }),
+    },
+    {
+      variant: 'row',
+      density: 'spacious',
       class: radioCardDecorativeControlClasses({ indicatorSize: 'sm' }),
     },
   ],
@@ -116,6 +129,7 @@ export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 ite
     density: {
       comfortable: '',
       compact: '',
+      spacious: '',
     },
     columns: {
       one: 'grid-cols-1',
@@ -126,6 +140,7 @@ export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 ite
   compoundVariants: [
     { variant: 'card', density: 'comfortable', class: 'gap-3' },
     { variant: 'card', density: 'compact', class: 'gap-2' },
+    { variant: 'card', density: 'spacious', class: 'gap-4' },
   ],
   defaultVariants: {
     variant: 'card',

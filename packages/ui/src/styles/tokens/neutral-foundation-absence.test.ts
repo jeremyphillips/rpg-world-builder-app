@@ -19,6 +19,8 @@ function readTokenSources(): string {
     'semantic-light.css',
     'semantic-dark.css',
     '../globals.css',
+    'tailwind-theme.css',
+    '../shared.utilities.css',
   ]
     .map((file) => readFileSync(join(tokensDir, file), 'utf8'))
     .join('\n')
@@ -62,12 +64,12 @@ describe('neutral foundation reset — absence of deprecated tokens', () => {
     }
   })
 
-  it('does not scope field-control fills under container surface utilities in globals.css', () => {
-    const globals = readFileSync(join(tokensDir, '../globals.css'), 'utf8')
-    expect(globals).not.toMatch(/\.bg-card[\s\S]*--field-control-bg:/)
-    expect(globals).not.toMatch(/\.bg-surface-subtle[\s\S]*--field-control-bg:/)
-    expect(globals).not.toMatch(/\.bg-surface-muted[\s\S]*--field-control-bg:/)
-    expect(globals).not.toMatch(/\.bg-surface-strong[\s\S]*--field-control-bg:/)
+  it('does not scope field-control fills under container surface utilities in shared.utilities.css', () => {
+    const sharedUtilities = readFileSync(join(tokensDir, '../shared.utilities.css'), 'utf8')
+    expect(sharedUtilities).not.toMatch(/\.bg-card[\s\S]*--field-control-bg:/)
+    expect(sharedUtilities).not.toMatch(/\.bg-surface-subtle[\s\S]*--field-control-bg:/)
+    expect(sharedUtilities).not.toMatch(/\.bg-surface-muted[\s\S]*--field-control-bg:/)
+    expect(sharedUtilities).not.toMatch(/\.bg-surface-strong[\s\S]*--field-control-bg:/)
   })
 
   it('composes interaction recipes at Layer 2 without palette interaction paints', () => {

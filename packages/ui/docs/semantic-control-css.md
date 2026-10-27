@@ -142,7 +142,7 @@ Overlay notification counts use `ui-notification-unread-badge` (not pill geometr
 
 ## Attention frame
 
-`ui-attention-frame` owns radius, a transparent border, and the color transition. `ui-attention-frame--active` is applied from the component when `active` is true. It owns the primary border, selected fill, rest ring, and `animation: var(--animate-attention-ring)` when motion is allowed. Keyframes stay in `globals.css`. There is no variants file. Padding stays on the caller.
+`ui-attention-frame` owns radius, a transparent border, and the color transition. `ui-attention-frame--active` is applied from the component when `active` is true. It owns the primary border, selected fill, rest ring, and `animation: var(--animate-attention-ring)` when motion is allowed. Keyframes stay in `misc.utilities.css` (imported from `globals.css`). There is no variants file. Padding stays on the caller.
 
 ## Semantic text
 

@@ -1,0 +1,273 @@
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-action-primary: var(--action-primary-bg);
+  --color-action-primary-foreground: var(--action-primary-fg);
+  --color-action-secondary: var(--action-secondary-bg);
+  --color-action-secondary-foreground: var(--action-secondary-fg);
+  --color-muted: var(--muted);
+  --color-sunken: var(--sunken);
+  --color-surface-faint: var(--surface-faint);
+  --color-surface-lift: var(--surface-lift);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-strong: var(--surface-strong);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-muted: var(--destructive-muted);
+  --color-destructive-subtle: var(--destructive-subtle);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-muted: var(--info-muted);
+  --color-info-subtle: var(--info-subtle);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-muted: var(--success-muted);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-muted: var(--warning-muted);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-faint: var(--warning-faint);
+  --color-choice-control-border: var(--choice-control-border);
+  /* No `--color-input` — `border-input` / `bg-input` are custom utilities (see below). */
+  --color-input-invalid: var(--field-control-border-invalid);
+  --color-input-invalid-subtle: var(--field-control-bg-invalid);
+  --color-switch-track: var(--switch-track);
+  --color-switch-track-hover: var(--switch-track-hover);
+  --color-switch-track-disabled: var(--switch-track-disabled);
+  --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
+  --color-semantic-info: var(--semantic-info);
+  --color-semantic-info-muted: var(--semantic-info-muted);
+  --color-semantic-success: var(--semantic-success);
+  --color-semantic-warning: var(--semantic-warning);
+  --color-semantic-destructive: var(--semantic-destructive);
+  --color-semantic-destructive-on-subtle: var(--semantic-destructive-on-subtle);
+  --color-semantic-neutral-subtle: var(--semantic-neutral-subtle);
+  --color-semantic-info-border: var(--semantic-info-border);
+  --color-semantic-info-subtle: var(--semantic-info-subtle);
+  --color-semantic-success-border: var(--semantic-success-border);
+  --color-semantic-success-subtle: var(--semantic-success-subtle);
+  --color-semantic-warning-border: var(--semantic-warning-border);
+  --color-semantic-warning-subtle: var(--semantic-warning-subtle);
+  --color-semantic-warning-accent-faint: var(--semantic-warning-accent-faint);
+  --color-semantic-destructive-border: var(--semantic-destructive-border);
+  --color-semantic-destructive-subtle: var(--semantic-destructive-subtle);
+  --color-semantic-neutral-soft: var(--semantic-neutral-soft-bg);
+  --color-semantic-neutral-soft-foreground: var(--semantic-neutral-soft-foreground);
+  --color-semantic-neutral-strong: var(--semantic-neutral-strong-bg);
+  --color-semantic-neutral-strong-foreground: var(--semantic-neutral-strong-foreground);
+  --color-semantic-neutral-outline-foreground: var(--semantic-neutral-outline-foreground);
+  --color-semantic-info-soft: var(--semantic-info-soft-bg);
+  --color-semantic-info-soft-foreground: var(--semantic-info-soft-foreground);
+  --color-semantic-info-strong: var(--semantic-info-strong-bg);
+  --color-semantic-info-strong-foreground: var(--semantic-info-strong-foreground);
+  --color-semantic-info-outline-foreground: var(--semantic-info-outline-foreground);
+  --color-semantic-success-soft: var(--semantic-success-soft-bg);
+  --color-semantic-success-soft-foreground: var(--semantic-success-soft-foreground);
+  --color-semantic-success-strong: var(--semantic-success-strong-bg);
+  --color-semantic-success-strong-foreground: var(--semantic-success-strong-foreground);
+  --color-semantic-success-outline-foreground: var(--semantic-success-outline-foreground);
+  --color-semantic-warning-soft: var(--semantic-warning-soft-bg);
+  --color-semantic-warning-soft-foreground: var(--semantic-warning-soft-foreground);
+  --color-semantic-warning-strong: var(--semantic-warning-strong-bg);
+  --color-semantic-warning-strong-foreground: var(--semantic-warning-strong-foreground);
+  --color-semantic-warning-outline-foreground: var(--semantic-warning-outline-foreground);
+  --color-semantic-destructive-soft: var(--semantic-destructive-soft-bg);
+  --color-semantic-destructive-soft-foreground: var(--semantic-destructive-soft-foreground);
+  --color-semantic-destructive-strong: var(--semantic-destructive-strong-bg);
+  --color-semantic-destructive-strong-foreground: var(--semantic-destructive-strong-foreground);
+  --color-semantic-destructive-outline-foreground: var(--semantic-destructive-outline-foreground);
+  --color-selected-control: var(--selected-control);
+  --color-selected-control-foreground: var(--selected-control-foreground);
+  --color-selected-control-border: var(--selected-control-border);
+  --color-catalog-picker-row-surface: var(--catalog-picker-row-surface);
+  --color-sidebar: var(--sidebar);
+  --spacing-sidebar: var(--sidebar-width);
+  --spacing-image-preview: var(--image-preview-size);
+  --spacing-hero-emblem: var(--hero-emblem-size);
+  --z-index-toast: var(--z-toast);
+  --color-control-hover: var(--control-hover-bg);
+  --color-control-selected: var(--control-selected-bg);
+  --color-row-hover: var(--row-hover-bg);
+  --color-row-selected: var(--row-selected-bg);
+  --color-row-selected-border: var(--row-selected-border);
+  --color-drop-target: var(--drop-target-bg);
+  --color-drop-target-overlay: var(--drop-target-overlay-bg);
+  --color-drop-target-overlay-foreground: var(--drop-target-overlay-fg);
+  --color-drop-target-overlay-foreground-muted: var(--drop-target-overlay-fg-muted);
+  --color-drop-target-overlay-border: var(--drop-target-overlay-border);
+  --color-drop-target-overlay-invalid: var(--drop-target-overlay-invalid-bg);
+  --color-drop-target-overlay-invalid-foreground: var(--drop-target-overlay-invalid-fg);
+  --color-drop-target-border: var(--drop-target-border);
+  --color-segmented-track: var(--segmented-track-bg);
+  --color-message-bubble-self: var(--message-bubble-self-bg);
+  --color-message-bubble-self-foreground: var(--message-bubble-self-fg);
+  --color-message-bubble-peer: var(--message-bubble-peer-bg);
+  --color-message-bubble-peer-foreground: var(--message-bubble-peer-fg);
+
+  --shadow-surface-subtle: var(--surface-subtle-shadow);
+  --shadow-surface-raised: var(--surface-raised-shadow);
+  --shadow-surface-sunken: var(--surface-sunken-shadow);
+
+  --font-sans: var(--font-body, 'Inter Variable'), 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display:
+    var(--font-heading, var(--font-body, 'Inter Variable')), 'Inter', ui-sans-serif, system-ui,
+    sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-card: var(--radius-card);
+
+  /* Layout — dashboard page shells (one cap per route via PageShell). */
+  --max-width-page-wide: 80rem; /* ~1280px — Tailwind max-w-7xl */
+  --max-width-page-narrow: 56rem; /* ~896px — aligns with legacy max-w-4xl */
+
+  /*
+   * Type scale — curated primitives for Tailwind `text-*` utilities (@ 16px root).
+   * `--text-*: initial` drops Tailwind defaults, including steps above 4xl.
+   * Heading, specialty numeral, and form-legend roles live on `:root`.
+   */
+  --text-*: initial;
+
+  /* Primitive font sizes — standard */
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-md: 0.9375rem; /* 15px — prose-md, emphasis, option. The 15px tone lock is retired. */
+  --text-base: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-2xl: 1.5rem; /* 24px — form group legends */
+  --text-3xl: 1.75rem; /* 28px — section metric */
+  --text-4xl: 2.125rem; /* 34px — page metric */
+
+  /* Primitive font sizes — fine. Same scale; no line-height companions. */
+  --text-fine-xs: 0.625rem; /* 10px */
+  --text-fine-xs--line-height: 0.875rem; /* 14px — Text micro, Chip xs */
+  --text-fine-sm: 0.6875rem; /* 11px */
+  --text-fine-md: 0.8125rem; /* 13px */
+  --text-fine-sm--line-height: 0.875rem; /* 14px — Button xs labeled copy */
+
+  /* Primitive line heights — standard only */
+  --text-xs--line-height: 1rem; /* 16px */
+  --text-sm--line-height: 1.25rem; /* 20px */
+  --text-md--line-height: 1.375rem; /* 22px */
+  --text-base--line-height: 1.5rem; /* 24px */
+  --text-lg--line-height: 1.75rem; /* 28px */
+  --text-xl--line-height: 1.75rem; /* 28px */
+  --text-2xl--line-height: 2rem; /* 32px */
+  --text-3xl--line-height: 2.125rem; /* 34px — current section metric */
+  --text-4xl--line-height: 2.4375rem; /* 39px — current page metric */
+
+  --tracking-heading: -0.025em;
+  --leading-none: 1;
+
+  --text-eyebrow-xs: var(--text-fine-xs);
+  --text-eyebrow-sm: var(--text-fine-sm);
+  --text-eyebrow-md: var(--text-fine-md);
+
+  /* Badge type scale — sm aligns with field sm; md aligns with field control body (`text-md`). */
+  --text-badge-sm: var(--text-xs);
+  --text-badge-md: var(--text-md);
+
+  --text-table-body: var(--text-fine-md);
+  --text-table-stat: var(--text-xs);
+
+  /*
+   * Font weights — SSOT for Tailwind `font-*` weight utilities.
+   * Values match Tailwind v4 defaults (Inter Variable supports 300–700).
+   */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Heading weight roles */
+  --font-weight-heading-display: var(--font-weight-bold);
+  --font-weight-heading: var(--font-weight-semibold);
+  --font-weight-heading-group: var(--font-weight-medium);
+  --font-weight-heading-label: var(--font-weight-medium);
+
+  /* Body / UI weight roles */
+  --font-weight-body: var(--font-weight-normal);
+  --font-weight-body-emphasis: var(--font-weight-medium);
+  --font-weight-field-label: var(--font-weight-semibold);
+  --font-weight-meta: var(--font-weight-light);
+  --font-weight-data-name: var(--font-weight-semibold);
+  --font-weight-data-stat: var(--font-weight-medium);
+
+  --tracking-eyebrow-xs: 0.075rem; /* 1.2px @ 16px root */
+  --tracking-eyebrow: 0.1rem; /* 1.6px @ 16px root */
+
+  /* Labeled choice menus (add-type rows) — capped in CSS via min(..., 100vw). */
+  --popover-choice-menu-width: 18.75rem; /* 300px */
+
+  /*
+   * Icon glyph scale — general UI SSOT (decorative, inline, control icons).
+   */
+  --icon-glyph-xs: 0.625rem; /* 10px */
+  --icon-glyph-sm: 0.75rem; /* 12px */
+  --icon-glyph-md: 0.875rem; /* 14px */
+  --icon-glyph-lg: 1rem; /* 16px */
+  --icon-glyph-xl: 1.25rem; /* 20px */
+  --icon-glyph-2xl: 1.5rem; /* 24px */
+  --icon-glyph-3xl: 2rem; /* 32px */
+  --icon-glyph-stroke: 2;
+
+  /*
+   * Shared control geometry ladder — semantic CSS for buttons and fields.
+   * Button lg (40px) and field lg (44px) intentionally diverge at `--control-height-lg` vs `--control-height-xl`.
+   */
+  --control-height-compact: 1.5rem; /* 24px */
+  --control-height-xs: 1.75rem; /* 28px */
+  --control-height-sm: 2rem; /* 32px */
+  --control-height-md: 2.25rem; /* 36px */
+  --control-height-lg: 2.5rem; /* 40px — Button lg */
+  --control-height-xl: 2.75rem; /* 44px — field lg */
+  --control-choice-indicator-size-sm: 1rem; /* 16px — checkbox, radio, switch thumb */
+  --control-choice-indicator-size-lg: 1.25rem; /* 20px — RadioCard default decoration */
+  --control-choice-switch-width: 2.25rem; /* 36px track */
+  --control-choice-switch-height: 1.25rem; /* 20px track */
+  --control-choice-switch-thumb-travel: 1rem;
+  --control-gap-xs: calc(var(--spacing) * 1); /* 4px */
+  --control-gap-sm: calc(var(--spacing) * 1.5); /* 6px */
+  --control-gap-md: calc(var(--spacing) * 2); /* 8px */
+  --field-padding-xs: calc(var(--spacing) * 2); /* 8px */
+  --field-padding-sm: calc(var(--spacing) * 2.5); /* 10px */
+  --field-padding-md: calc(var(--spacing) * 3); /* 12px */
+  --field-padding-lg: calc(var(--spacing) * 4); /* 16px */
+
+  --ui-focus-ring-standalone: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
+  --ui-focus-ring-embedded: 0 0 0 2px var(--ring);
+
+  /*
+   * Control action hit targets — generic control chrome (icon buttons, row actions).
+   * Field control bands remain in field-sizing; number-stepper aligns to field height.
+   */
+  --control-action-xs-height: var(--control-height-xs);
+  --text-control-action-xs: var(
+    --text-fine-xs
+  ); /* 10px — compact control labels; not general body type */
+  --text-control-action-xs--line-height: 0.875rem; /* 14px */
+  --control-action-compact-height: var(--control-height-compact);
+  --control-action-default-height: var(--control-height-md);
+  --control-action-lg-height: var(--control-height-lg);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-attention-ring: attention-ring 1.5s ease-out;
+}

@@ -139,7 +139,7 @@ Unlayered author CSS beats every cascade layer, including utilities.
 
 Rules that only set custom properties (tokens on `:root` and theme selectors) stay unlayered so they can override layered theme variables.
 
-`globals.css` has two unlayered selectors that set real properties. They size prose and beat typography utilities on the same element:
+`prose.utilities.css` (imported from `globals.css`) has two unlayered selectors that set real properties. They size prose and beat typography utilities on the same element:
 
 - `.prose.prose-sm` sets `font-size`, `line-height`, and `--icon-inline`
 - `.prose.prose-md` sets `font-size`, `line-height`, and `--icon-inline`
@@ -258,7 +258,7 @@ Neutral border color has one recipe: `ui-border--subtle`, `ui-border--default`, 
 - Shared grid line over a state wash (row hover, selected, unavailable): the table plane, not the wash. Do not rebind `--surface-current` on those states.
 - A cell that paints its own fill (header select and actions) uses that fill even when the body cell in the same column uses the table plane.
 
-`var(--border*)` is legitimate only as the `:root` alias and the `*` safety net in `globals.css`. It is not legitimate in component rules.
+`var(--border*)` is legitimate only as the `:root` alias and the `*` safety net in `base.css` (imported from `globals.css`). It is not legitimate in component rules.
 
 Component CSS must not set `border-color`, or a `border` shorthand that includes a color, on an element that also has `ui-border--*`. A later file of equal specificity would replace the strength color. State colors (primary selected, status tones) may override `--ui-border-color` or `border-color` in a more specific rule. That is the card selected pattern. When another owner already sets `border-color` on that element (interactive row defaults to transparent), keep the edge with a more specific side longhand of `var(--ui-border-color)`. That is the data-table body separator.
 

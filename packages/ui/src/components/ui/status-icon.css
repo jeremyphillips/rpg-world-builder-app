@@ -11,6 +11,9 @@
     border-radius: calc(infinity * 1px);
     --icon-size: var(--status-icon-glyph-size);
     --icon-stroke-width: var(--status-icon-stroke);
+    /* Off-slash geometry — smaller than the icon-glyph ladder (Lucide slash reads heavier). */
+    --status-icon-stroke: 4;
+    --status-icon-stroke-reduced: 7;
   }
 
   .ui-status-icon--sm {
@@ -18,6 +21,7 @@
     height: 0.75rem;
     --status-icon-glyph-size: var(--icon-glyph-xs);
     --status-icon-glyph-reduced-size: var(--status-icon-slash-sm);
+    --status-icon-slash-sm: 0.375rem;
   }
 
   .ui-status-icon--md {
@@ -25,6 +29,7 @@
     height: 1rem;
     --status-icon-glyph-size: var(--icon-glyph-xs);
     --status-icon-glyph-reduced-size: var(--status-icon-slash-sm);
+    --status-icon-slash-sm: 0.375rem;
   }
 
   .ui-status-icon--lg {
@@ -32,6 +37,7 @@
     height: 1.25rem;
     --status-icon-glyph-size: var(--icon-glyph-sm);
     --status-icon-glyph-reduced-size: var(--status-icon-slash-md);
+    --status-icon-slash-md: 0.5rem;
   }
 
   .ui-status-icon--optical-reduced-heavy {
