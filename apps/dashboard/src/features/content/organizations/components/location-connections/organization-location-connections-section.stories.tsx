@@ -4,10 +4,7 @@ import { buildLocationsById } from '../../../locations/lib/location-display'
 import { GREYSHORE } from '../../../locations/fixtures'
 import { buildOrganizationLocationConnectionCards } from '../../lib/location-connections/build-organization-location-connection-cards'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../../lib/organization-display'
-import {
-  ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
-  OrganizationLocationConnectionsSection,
-} from './organization-location-connections-section'
+import { OrganizationLocationConnectionsSection } from './organization-location-connections-section'
 
 const meta = {
   title: 'Content/Organizations/OrganizationLocationConnectionsSection',
@@ -71,7 +68,6 @@ export const PopulatedWithoutAdd: Story = {
 export const Error: Story = {
   args: {
     locationConnections: sampleLocationConnections,
-    isError: true,
-    errorText: ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
+    isLoadingError: true,
   },
 }

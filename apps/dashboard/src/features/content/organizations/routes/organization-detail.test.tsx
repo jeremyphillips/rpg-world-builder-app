@@ -1,13 +1,17 @@
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 import { makeOrganization } from '@/test/fixtures/factories/organization'
+import { makeSpecies } from '@/test/fixtures/factories/species'
 import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
-import { CITY_COUNCIL } from '../fixtures'
+import { useClasses } from '../../classes/hooks/use-classes'
+import { useSpecies } from '../../species/hooks/use-species'
+import { CITY_COUNCIL, CRAFT_GUILD } from '../fixtures'
 import { OrganizationDetailContent } from './organization-detail'
 
 vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
@@ -29,6 +33,38 @@ vi.mock('../components/members/organization-members-detail-section', () => ({
     <div data-testid="organization-detail-section">Members</div>
   ),
 }))
+vi.mock('../../classes/hooks/use-classes', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../classes/hooks/use-classes')>()
+  return { ...actual, useClasses: vi.fn() }
+})
+vi.mock('../../species/hooks/use-species', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../species/hooks/use-species')>()
+  return { ...actual, useSpecies: vi.fn() }
+})
+
+const useClassesMock = vi.mocked(useClasses)
+const useSpeciesMock = vi.mocked(useSpecies)
+
+function catalogQuery<T>(overrides: {
+  data?: T
+  isPending?: boolean
+  isError?: boolean
+  isLoadingError?: boolean
+  isRefetchError?: boolean
+  isSuccess?: boolean
+  isFetching?: boolean
+}) {
+  return {
+    data: overrides.data,
+    isPending: overrides.isPending ?? false,
+    isError: overrides.isError ?? false,
+    isLoadingError: overrides.isLoadingError ?? false,
+    isRefetchError: overrides.isRefetchError ?? false,
+    isSuccess: overrides.isSuccess ?? false,
+    isFetching: overrides.isFetching ?? false,
+    error: null,
+  }
+}
 
 function renderDetail(organization = CITY_COUNCIL) {
   const queryClient = makeTestQueryClient()
@@ -42,6 +78,15 @@ function renderDetail(organization = CITY_COUNCIL) {
 }
 
 describe('OrganizationDetailContent', () => {
+  beforeEach(() => {
+    useClassesMock.mockReturnValue(
+      catalogQuery({ data: [], isSuccess: true }) as ReturnType<typeof useClasses>,
+    )
+    useSpeciesMock.mockReturnValue(
+      catalogQuery({ data: [], isSuccess: true }) as ReturnType<typeof useSpecies>,
+    )
+  })
+
   it('renders kind metadata and the authored description', () => {
     renderDetail()
     expect(screen.getByText('Government')).toBeInTheDocument()
@@ -86,6 +131,67 @@ describe('OrganizationDetailContent', () => {
     )
     const list = screen.getByTestId('organization-membership-titles-list')
     expect(within(list).getByRole('listitem')).toHaveTextContent('Member')
+  })
+
+  it('replaces only the class affinity cell when classes fail their initial load', () => {
+    useClassesMock.mockReturnValue(
+      catalogQuery({
+        data: undefined,
+        isError: true,
+        isLoadingError: true,
+        isRefetchError: false,
+        isSuccess: false,
+      }) as ReturnType<typeof useClasses>,
+    )
+    useSpeciesMock.mockReturnValue(
+      catalogQuery({
+        data: [makeSpecies({ id: 'species-elf', slug: 'elf', name: 'Elf' })],
+        isSuccess: true,
+      }) as ReturnType<typeof useSpecies>,
+    )
+
+    renderDetail({
+      ...CRAFT_GUILD,
+      members: {
+        ...CRAFT_GUILD.members,
+        classAffinityIds: ['class-fighter'],
+        speciesAffinityIds: ['species-elf'],
+      },
+    })
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not load classes.')
+    expect(screen.queryByText('Could not load species.')).not.toBeInTheDocument()
+    expect(screen.getByText('Elf')).toBeInTheDocument()
+    expect(screen.getByText('Occupational')).toBeInTheDocument()
+    expect(screen.getByText('Standards · Training')).toBeInTheDocument()
+  })
+
+  it('keeps class affinity labels when a classes refetch fails', () => {
+    useClassesMock.mockReturnValue(
+      catalogQuery({
+        data: [makeCharacterClass({ id: 'class-fighter', slug: 'fighter', name: 'Fighter' })],
+        isError: true,
+        isLoadingError: false,
+        isRefetchError: true,
+        isSuccess: false,
+      }) as ReturnType<typeof useClasses>,
+    )
+    useSpeciesMock.mockReturnValue(
+      catalogQuery({ data: [], isSuccess: true }) as ReturnType<typeof useSpecies>,
+    )
+
+    renderDetail({
+      ...CRAFT_GUILD,
+      members: {
+        ...CRAFT_GUILD.members,
+        classAffinityIds: ['class-fighter', 'class-missing'],
+        speciesAffinityIds: [],
+      },
+    })
+
+    expect(screen.getByText('Fighter · Class Missing · Unresolved reference')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.getByText('Guild')).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

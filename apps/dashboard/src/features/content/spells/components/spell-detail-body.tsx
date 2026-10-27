@@ -6,6 +6,7 @@ import { RichTextWithTables } from '../../components/rich-text/rich-text-with-ta
 
 import { ROUTES } from '@/app/routes'
 import { useClasses } from '../../classes/hooks/use-classes'
+import { ContentDetailQueryStatus } from '../../lib/detail/page/content-detail-query-status'
 import { contentDetailProseProps } from '../../lib/detail/page/content-detail-prose'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
 import type { ContentDetailHeroMediaPresentation } from '../../lib/detail/page/content-detail-layout.types'
@@ -35,13 +36,15 @@ function SpellClassesList({
   campaignId: string
   section: NonNullable<SpellDetailViewModel['classesSection']>
 }) {
-  const { data: classes = [], isPending } = useClasses(campaignId)
-  const classesBySlug = new Map(classes.map((cls) => [cls.slug, cls]))
+  const { data: classes, isPending, isLoadingError } = useClasses(campaignId)
+  const classesBySlug = new Map((classes ?? []).map((cls) => [cls.slug, cls]))
 
   return (
     <ContentDetailSection heading={section.title} headingId={SPELL_CLASSES_HEADING_ID}>
-      {isPending ? (
-        <Text variant="supporting">Loading…</Text>
+      {isLoadingError ? (
+        <ContentDetailQueryStatus status="error" subject="classes" />
+      ) : isPending ? (
+        <ContentDetailQueryStatus status="pending" />
       ) : (
         <ul className="flex flex-wrap gap-2" role="list">
           {section.items.map((item) => {

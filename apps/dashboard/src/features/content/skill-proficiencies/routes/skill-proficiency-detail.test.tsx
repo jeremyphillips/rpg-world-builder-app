@@ -139,11 +139,50 @@ describe('SkillDetailContent class skill choices', () => {
     expect(screen.queryByRole('link', { name: 'Fighter' })).not.toBeInTheDocument()
   })
 
-  it('shows a load error in hero metadata when the classes query fails', () => {
-    mockClassesQuery({ isError: true, data: undefined })
+  it('shows a load error in hero metadata when the classes query never succeeds', () => {
+    mockClassesQuery({
+      isError: true,
+      isLoadingError: true,
+      isRefetchError: false,
+      isSuccess: false,
+      data: undefined,
+    })
 
     renderSkillDetail(ATHLETICS)
 
-    expect(screen.getByText('Could not load classes.')).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not load classes.')
+    expect(screen.getAllByText('Could not load classes.')).toHaveLength(1)
+    expect(screen.getByText('Governing Ability')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Fighter' })).not.toBeInTheDocument()
+  })
+
+  it('keeps class links when a refetch fails and the class list is still cached', () => {
+    mockClassesQuery({
+      data: [FIGHTER],
+      isError: true,
+      isLoadingError: false,
+      isRefetchError: true,
+      isSuccess: false,
+      isFetching: false,
+    })
+
+    renderSkillDetail(ATHLETICS)
+
+    expect(screen.getByRole('link', { name: 'Fighter' })).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('does not mount the pending notice while a loaded class list refetches', () => {
+    mockClassesQuery({
+      data: [FIGHTER],
+      isPending: false,
+      isFetching: true,
+      isSuccess: true,
+    })
+
+    renderSkillDetail(ATHLETICS)
+
+    expect(screen.getByRole('link', { name: 'Fighter' })).toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 })

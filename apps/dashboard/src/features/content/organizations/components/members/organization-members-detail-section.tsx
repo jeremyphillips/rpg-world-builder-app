@@ -21,7 +21,7 @@ export function OrganizationMembersDetailSection({
         emptyText={detail.emptyText}
         canManage={detail.canManage}
         isPending={detail.membersQuery.isPending}
-        isError={detail.membersQuery.isError}
+        isLoadingError={detail.membersQuery.isLoadingError}
         mutationError={detail.mutationError}
         pendingCharacterId={detail.pendingCharacterId}
         onAddMember={detail.canManage ? detail.openAddDrawer : undefined}

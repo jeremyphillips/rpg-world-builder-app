@@ -9,6 +9,7 @@ import {
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { buildSeedCreatureTypeVocabulary, getCreatureTypeLabel } from '@/features/vocabulary'
 import { useEquipment } from '../../equipment/hooks/use-equipment'
+import type { NonEmptyContentTypeKeys } from '../../lib/detail/page/content-detail-query-status'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import {
@@ -30,6 +31,18 @@ import { useMonsters } from '../hooks/use-monsters'
 
 const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
 
+function failedMonsterCatalogSubjects(
+  equipmentLoadingError: boolean,
+  skillsLoadingError: boolean,
+): NonEmptyContentTypeKeys | undefined {
+  if (equipmentLoadingError && skillsLoadingError) {
+    return ['equipment', 'skill-proficiencies']
+  }
+  if (equipmentLoadingError) return ['equipment']
+  if (skillsLoadingError) return ['skill-proficiencies']
+  return undefined
+}
+
 type MonsterDetailContentProps = {
   monster: Monster
   campaignId: string
@@ -43,22 +56,26 @@ export function MonsterDetailContent({
 }: MonsterDetailContentProps) {
   useSetBreadcrumbLabel(monster.name)
 
-  const {
-    data: equipment = [],
-    isPending: equipmentPending,
-    isError: equipmentError,
-  } = useEquipment(campaignId)
-  const {
-    data: skillProficiencies = [],
-    isPending: skillsPending,
-    isError: skillsError,
-  } = useSkillProficiencies(campaignId)
+  const equipmentQuery = useEquipment(campaignId)
+  const skillsQuery = useSkillProficiencies(campaignId)
+  const equipment = equipmentQuery.data ?? []
+  const skillProficiencies = skillsQuery.data ?? []
 
   const catalogState: MonsterCatalogLoadState = useMemo(() => {
-    if (equipmentPending || skillsPending) return 'pending'
-    if (equipmentError || skillsError) return 'error'
+    if (equipmentQuery.isPending || skillsQuery.isPending) return 'pending'
+    if (equipmentQuery.isLoadingError || skillsQuery.isLoadingError) return 'error'
     return 'ready'
-  }, [equipmentError, equipmentPending, skillsError, skillsPending])
+  }, [
+    equipmentQuery.isLoadingError,
+    equipmentQuery.isPending,
+    skillsQuery.isLoadingError,
+    skillsQuery.isPending,
+  ])
+
+  const catalogLoadErrors =
+    catalogState === 'error'
+      ? failedMonsterCatalogSubjects(equipmentQuery.isLoadingError, skillsQuery.isLoadingError)
+      : undefined
 
   const derived = useMemo(() => {
     if (catalogState !== 'ready') return null
@@ -89,6 +106,7 @@ export function MonsterDetailContent({
       campaignId={campaignId}
       editHref={contentEditHref('monsters', campaignId, monsterId)}
       viewModel={viewModel}
+      catalogLoadErrors={catalogLoadErrors}
       descriptionHtml={monster.description}
       usageSection={
         <ContentUsageReferencesSection

@@ -30,6 +30,9 @@ import { resolveOrganizationMemberClassAffinityDisplayLabel } from './members/or
 import { resolveOrganizationMemberSpeciesAffinityDisplayLabel } from './members/organization-member-species-chip-options.lib'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
+export const ORGANIZATION_MEMBER_CLASS_AFFINITIES_LABEL = 'Member class affinities'
+export const ORGANIZATION_MEMBER_SPECIES_AFFINITIES_LABEL = 'Member species affinities'
+
 export const ORGANIZATION_SECTION_LABELS = {
   members: 'Members',
   membershipTitles: 'Membership titles',
@@ -139,14 +142,46 @@ export function formatLocationConnectionsCount(total: number): string {
   return `${total} location connection${total === 1 ? '' : 's'}`
 }
 
+function memberClassAffinityValue(
+  organization: Organization,
+  catalogClasses: readonly CharacterClass[] | undefined,
+): string {
+  if (catalogClasses === undefined) return ''
+
+  const campaignUseClasses = buildContentPurposeSelectors(catalogClasses).forCampaignUse()
+  return joinInlineMetadata(
+    organization.members.classAffinityIds.map((classId) =>
+      resolveOrganizationMemberClassAffinityDisplayLabel(classId, {
+        selectableClasses: campaignUseClasses,
+        catalogClasses,
+      }),
+    ),
+  )
+}
+
+function memberSpeciesAffinityValue(
+  organization: Organization,
+  catalogSpecies: readonly Species[] | undefined,
+): string {
+  if (catalogSpecies === undefined) return ''
+
+  const campaignUseSpecies = buildContentPurposeSelectors(catalogSpecies).forCampaignUse()
+  return joinInlineMetadata(
+    organization.members.speciesAffinityIds.map((speciesId) =>
+      resolveOrganizationMemberSpeciesAffinityDisplayLabel(speciesId, {
+        selectableSpecies: campaignUseSpecies,
+        catalogSpecies,
+      }),
+    ),
+  )
+}
+
 export function buildOrganizationDetailViewModel(
   organization: Organization,
   locationConnections: OrganizationLocationConnectionsViewModel,
-  catalogClasses: readonly CharacterClass[] = [],
-  catalogSpecies: readonly Species[] = [],
+  catalogClasses?: readonly CharacterClass[],
+  catalogSpecies?: readonly Species[],
 ): OrganizationDetailViewModel {
-  const campaignUseClasses = buildContentPurposeSelectors(catalogClasses).forCampaignUse()
-  const campaignUseSpecies = buildContentPurposeSelectors(catalogSpecies).forCampaignUse()
   const domainLabel = getOrganizationDomainLabel(organization.organizationDomain)
   const form =
     organization.organizationForm !== undefined
@@ -194,30 +229,16 @@ export function buildOrganizationDetailViewModel(
       ...(organization.members.classAffinityIds.length > 0
         ? [
             {
-              label: 'Member class affinities',
-              value: joinInlineMetadata(
-                organization.members.classAffinityIds.map((classId) =>
-                  resolveOrganizationMemberClassAffinityDisplayLabel(classId, {
-                    selectableClasses: campaignUseClasses,
-                    catalogClasses,
-                  }),
-                ),
-              ),
+              label: ORGANIZATION_MEMBER_CLASS_AFFINITIES_LABEL,
+              value: memberClassAffinityValue(organization, catalogClasses),
             },
           ]
         : []),
       ...(organization.members.speciesAffinityIds.length > 0
         ? [
             {
-              label: 'Member species affinities',
-              value: joinInlineMetadata(
-                organization.members.speciesAffinityIds.map((speciesId) =>
-                  resolveOrganizationMemberSpeciesAffinityDisplayLabel(speciesId, {
-                    selectableSpecies: campaignUseSpecies,
-                    catalogSpecies,
-                  }),
-                ),
-              ),
+              label: ORGANIZATION_MEMBER_SPECIES_AFFINITIES_LABEL,
+              value: memberSpeciesAffinityValue(organization, catalogSpecies),
             },
           ]
         : []),

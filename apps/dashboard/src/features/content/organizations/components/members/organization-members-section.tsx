@@ -1,5 +1,6 @@
 import { ActionIcon, SemanticText, Text } from '@rpg/ui'
 
+import { ContentDetailQueryStatus } from '../../../lib/detail/page/content-detail-query-status'
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import { type DetailOverflowAction } from '../../../lib/detail/detail-overflow-menu'
 import { detailOverflowDeleteAction } from '../../../lib/detail/detail-overflow-actions'
@@ -13,7 +14,6 @@ import {
   ORGANIZATION_MEMBER_EDIT_LABEL,
   ORGANIZATION_MEMBER_REMOVE_LABEL,
   ORGANIZATION_MEMBERS_ADD_LABEL,
-  ORGANIZATION_MEMBERS_LOAD_ERROR,
 } from '../../lib/members/organization-members.constants'
 
 export const ORGANIZATION_MEMBERS_HEADING_ID = 'organization-members-heading'
@@ -34,8 +34,7 @@ export type OrganizationMembersSectionProps = {
    */
   canManage?: boolean
   isPending?: boolean
-  isError?: boolean
-  errorText?: string
+  isLoadingError?: boolean
   mutationError?: string | null
   pendingCharacterId?: string
   onAddMember?: () => void
@@ -147,8 +146,7 @@ export function OrganizationMembersSection({
   emptyText,
   canManage = false,
   isPending = false,
-  isError = false,
-  errorText = ORGANIZATION_MEMBERS_LOAD_ERROR,
+  isLoadingError = false,
   mutationError = null,
   pendingCharacterId,
   onAddMember,
@@ -168,9 +166,9 @@ export function OrganizationMembersSection({
       ) : null}
 
       {isPending ? (
-        <Text variant="muted">Loading…</Text>
-      ) : isError ? (
-        <Text variant="muted">{errorText}</Text>
+        <ContentDetailQueryStatus status="pending" />
+      ) : isLoadingError ? (
+        <ContentDetailQueryStatus status="error" subject="members" />
       ) : (
         <OrganizationMembersRosterBody
           rows={rows}

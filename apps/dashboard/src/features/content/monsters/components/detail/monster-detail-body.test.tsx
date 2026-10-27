@@ -79,3 +79,48 @@ describe('MonsterDetailBody details section', () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 })
+
+describe('MonsterDetailBody catalog footer', () => {
+  it('keeps the derivation sentence when both catalogs loaded', () => {
+    const { monster, viewModel } = buildKoboldViewModel()
+
+    render(
+      <MemoryRouter>
+        <MonsterDetailBody
+          name={monster.name}
+          imageName={monster.name}
+          campaignId="camp_1"
+          viewModel={{ ...viewModel, catalogState: 'error', abilities: [], statRows: [] }}
+          pageShell={false}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(
+      screen.getByText('Some mechanical details could not be resolved from campaign catalogs.'),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('names only the catalogs passed for an initial load failure', () => {
+    const { monster, viewModel } = buildKoboldViewModel()
+
+    render(
+      <MemoryRouter>
+        <MonsterDetailBody
+          name={monster.name}
+          imageName={monster.name}
+          campaignId="camp_1"
+          viewModel={{ ...viewModel, catalogState: 'error', abilities: [], statRows: [] }}
+          catalogLoadErrors={['equipment']}
+          pageShell={false}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not load equipment.')
+    expect(
+      screen.queryByText('Some mechanical details could not be resolved from campaign catalogs.'),
+    ).not.toBeInTheDocument()
+  })
+})

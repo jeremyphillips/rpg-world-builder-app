@@ -7,6 +7,7 @@ import { LinkBadge, StaticBadge } from '@/lib/link-badge'
 
 import { ContentStatList } from '../../../lib/detail/metadata/content-stat-row'
 import type { ContentStatRowData } from '../../../lib/detail/metadata/content-stat-rows'
+import { ContentDetailQueryStatus } from '../../../lib/detail/page/content-detail-query-status'
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import { contentDetailSectionPanelContentHeadingClasses } from '../../../lib/detail/page/content-detail-section.variants'
 import {
@@ -23,6 +24,7 @@ type ClassProficienciesSectionProps = {
   campaignId: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
+  skillsLoadingError?: boolean
   vocabulary: ClassDisplayVocabulary
 }
 
@@ -41,14 +43,20 @@ function SkillChoiceLinks({
   optionSlugs,
   skillProficiencies,
   isPending,
+  isLoadingError,
 }: {
   campaignId: string
   optionSlugs: string[]
-  skillProficiencies: SkillProficiency[]
+  skillProficiencies: readonly SkillProficiency[]
   isPending: boolean
+  isLoadingError: boolean
 }) {
+  if (isLoadingError) {
+    return <ContentDetailQueryStatus status="error" subject="skill-proficiencies" />
+  }
+
   if (isPending) {
-    return <Text variant="supporting">Loading…</Text>
+    return <ContentDetailQueryStatus status="pending" />
   }
 
   const skillsBySlug = new Map(skillProficiencies.map((skill) => [skill.slug, skill]))
@@ -93,6 +101,7 @@ function proficiencyChoiceRowData(
   campaignId: string,
   skillProficiencies: SkillProficiency[],
   skillsPending: boolean,
+  skillsLoadingError: boolean,
   vocabulary: ClassDisplayVocabulary,
 ): ContentStatRowData {
   const isEmpty = row.optionSlugs.length === 0
@@ -112,6 +121,7 @@ function proficiencyChoiceRowData(
           optionSlugs={row.optionSlugs}
           skillProficiencies={skillProficiencies}
           isPending={skillsPending}
+          isLoadingError={skillsLoadingError}
         />
       </div>
     )
@@ -163,18 +173,27 @@ function ProficiencyChoicesGroup({
   campaignId,
   skillProficiencies,
   skillsPending,
+  skillsLoadingError,
   vocabulary,
 }: {
   choices: ClassProficienciesViewModel['choices']
   campaignId: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
+  skillsLoadingError: boolean
   vocabulary: ClassDisplayVocabulary
 }) {
   if (choices.length === 0) return null
 
   const rows = choices.map((row) =>
-    proficiencyChoiceRowData(row, campaignId, skillProficiencies, skillsPending, vocabulary),
+    proficiencyChoiceRowData(
+      row,
+      campaignId,
+      skillProficiencies,
+      skillsPending,
+      skillsLoadingError,
+      vocabulary,
+    ),
   )
 
   return (
@@ -196,6 +215,7 @@ export function ClassProficienciesSection({
   campaignId,
   skillProficiencies,
   skillsPending,
+  skillsLoadingError = false,
   vocabulary,
 }: ClassProficienciesSectionProps) {
   return (
@@ -207,6 +227,7 @@ export function ClassProficienciesSection({
           campaignId={campaignId}
           skillProficiencies={skillProficiencies}
           skillsPending={skillsPending}
+          skillsLoadingError={skillsLoadingError}
           vocabulary={vocabulary}
         />
       </div>

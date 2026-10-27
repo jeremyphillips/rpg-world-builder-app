@@ -7,6 +7,7 @@ import type {
 } from '@rpg/contracts'
 import { ConfirmDialog, SemanticText, Text } from '@rpg/ui'
 
+import { ContentDetailQueryStatus } from '../../../lib/detail/page/content-detail-query-status'
 import { LocationConnectedPartiesDrawers } from './location-connected-parties-drawers'
 import { LocationConnectedPartiesSection } from './location-connected-parties-section'
 import { useLocationConnectedPartiesDetail } from '../../hooks/use-location-connected-parties-detail'
@@ -26,11 +27,11 @@ type PendingTerritorialRemove = {
 
 function LocationConnectedPartiesQueryState({ detail }: { detail: DetailState }) {
   if (detail.connectedPartiesQuery.isPending) {
-    return <Text variant="supporting">Loading connected parties…</Text>
+    return <ContentDetailQueryStatus status="pending" />
   }
 
-  if (detail.connectedPartiesQuery.isError) {
-    return <Text variant="supporting">Could not load connected parties for this location.</Text>
+  if (detail.connectedPartiesQuery.isLoadingError) {
+    return <ContentDetailQueryStatus status="error" subject="connected-parties" />
   }
 
   return null
@@ -170,7 +171,7 @@ export function LocationConnectedPartiesDetailSections({
 }) {
   const detail = useLocationConnectedPartiesDetail(campaignId, location)
 
-  if (detail.connectedPartiesQuery.isPending || detail.connectedPartiesQuery.isError) {
+  if (detail.connectedPartiesQuery.isPending || detail.connectedPartiesQuery.isLoadingError) {
     return <LocationConnectedPartiesQueryState detail={detail} />
   }
 

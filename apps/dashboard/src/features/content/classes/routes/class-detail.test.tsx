@@ -138,7 +138,26 @@ describe('ClassDetailContent proficiencies', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText('Loading…')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('Loading…')
+    expect(screen.queryByRole('link', { name: 'Acrobatics' })).not.toBeInTheDocument()
+  })
+
+  it('shows a skill load error instead of unresolved skill badges', () => {
+    render(
+      <MemoryRouter>
+        <ClassDetailContent
+          characterClass={FIGHTER}
+          campaignId={STORY_CAMPAIGN_ID}
+          classId={FIGHTER.id}
+          subclasses={[]}
+          skillProficiencies={[]}
+          skillsPending={false}
+          skillsLoadingError
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not load skill proficiencies.')
   })
 
   it('hides the progression table when showProgressionTable is false', () => {

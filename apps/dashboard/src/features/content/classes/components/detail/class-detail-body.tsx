@@ -9,6 +9,7 @@ import {
 
 import { DetailNavFlushStack } from '../../../lib/detail/collection/item-stack/detail-nav-flush-stack'
 import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-layout'
+import { ContentDetailQueryStatus } from '../../../lib/detail/page/content-detail-query-status'
 import { contentDetailProseProps } from '../../../lib/detail/page/content-detail-prose'
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import { ClassFeatureLevelTable } from './class-feature-level-table'
@@ -37,7 +38,31 @@ function SubclassFeaturesList({ features }: { features: Subclass['features'] }) 
   )
 }
 
-function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
+function SubclassesList({
+  subclasses,
+  isPending,
+  isLoadingError,
+}: {
+  subclasses: readonly Subclass[]
+  isPending: boolean
+  isLoadingError: boolean
+}) {
+  if (isLoadingError) {
+    return (
+      <ContentDetailSection heading="Subclasses" headingId={SUBCLASSES_HEADING_ID}>
+        <ContentDetailQueryStatus status="error" subject="subclasses" />
+      </ContentDetailSection>
+    )
+  }
+
+  if (isPending) {
+    return (
+      <ContentDetailSection heading="Subclasses" headingId={SUBCLASSES_HEADING_ID}>
+        <ContentDetailQueryStatus status="pending" />
+      </ContentDetailSection>
+    )
+  }
+
   if (subclasses.length === 0) return null
 
   return (
@@ -85,12 +110,14 @@ function ClassDetailSections({
   campaignId,
   skillProficiencies,
   skillsPending,
+  skillsLoadingError,
   vocabulary,
 }: {
   sections: ClassDetailViewModel['sections']
   campaignId: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
+  skillsLoadingError: boolean
   vocabulary: ClassDisplayVocabulary
 }) {
   return (
@@ -103,6 +130,7 @@ function ClassDetailSections({
             campaignId={campaignId}
             skillProficiencies={skillProficiencies}
             skillsPending={skillsPending}
+            skillsLoadingError={skillsLoadingError}
             vocabulary={vocabulary}
           />
         ) : (
@@ -121,10 +149,13 @@ export type ClassDetailBodyProps = {
   imageName: string
   viewModel: ClassDetailViewModel
   subclasses: Subclass[]
+  subclassesPending?: boolean
+  subclassesLoadingError?: boolean
   subclassingEnabled: boolean
   campaignId: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
+  skillsLoadingError?: boolean
   vocabulary: ClassDisplayVocabulary
   editHref?: string
   progressionTable?: ReactNode
@@ -141,10 +172,13 @@ export function ClassDetailBody({
   imageName,
   viewModel,
   subclasses,
+  subclassesPending = false,
+  subclassesLoadingError = false,
   subclassingEnabled,
   campaignId,
   skillProficiencies,
   skillsPending,
+  skillsLoadingError = false,
   vocabulary,
   editHref,
   progressionTable,
@@ -175,9 +209,16 @@ export function ClassDetailBody({
         campaignId={campaignId}
         skillProficiencies={skillProficiencies}
         skillsPending={skillsPending}
+        skillsLoadingError={skillsLoadingError}
         vocabulary={vocabulary}
       />
-      {subclassingEnabled ? <SubclassesList subclasses={subclasses} /> : null}
+      {subclassingEnabled ? (
+        <SubclassesList
+          subclasses={subclasses}
+          isPending={subclassesPending}
+          isLoadingError={subclassesLoadingError}
+        />
+      ) : null}
       {progressionTable}
       {children}
     </ContentDetailLayout>

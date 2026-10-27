@@ -81,4 +81,73 @@ describe('ClassDetailBody', () => {
       expect(screen.getByRole('link', { name: 'Champion' })).toBeInTheDocument()
     })
   })
+
+  it('shows subclasses pending and the initial load error', () => {
+    const viewModel = buildClassDetailViewModel(FIGHTER, vocabulary, { surface: 'content-detail' })
+    const { rerender } = render(
+      <MemoryRouter>
+        <ClassDetailBody
+          name={FIGHTER.name}
+          displayFallback="generic"
+          imageName={FIGHTER.name}
+          viewModel={viewModel}
+          subclasses={[]}
+          subclassesPending
+          subclassingEnabled
+          campaignId="camp_1"
+          skillProficiencies={[]}
+          skillsPending={false}
+          vocabulary={vocabulary}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Subclasses' })).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('Loading…')
+
+    rerender(
+      <MemoryRouter>
+        <ClassDetailBody
+          name={FIGHTER.name}
+          displayFallback="generic"
+          imageName={FIGHTER.name}
+          viewModel={viewModel}
+          subclasses={[]}
+          subclassesLoadingError
+          subclassingEnabled
+          campaignId="camp_1"
+          skillProficiencies={[]}
+          skillsPending={false}
+          vocabulary={vocabulary}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not load subclasses.')
+    expect(screen.queryByRole('link', { name: 'Champion' })).not.toBeInTheDocument()
+  })
+
+  it('omits subclasses when the snapshot is empty, including after that empty list fails to refetch', () => {
+    render(
+      <MemoryRouter>
+        <ClassDetailBody
+          name={FIGHTER.name}
+          displayFallback="generic"
+          imageName={FIGHTER.name}
+          viewModel={buildClassDetailViewModel(FIGHTER, vocabulary, { surface: 'content-detail' })}
+          subclasses={[]}
+          subclassesPending={false}
+          subclassesLoadingError={false}
+          subclassingEnabled
+          campaignId="camp_1"
+          skillProficiencies={[]}
+          skillsPending={false}
+          vocabulary={vocabulary}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.queryByRole('heading', { name: 'Subclasses' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
 })

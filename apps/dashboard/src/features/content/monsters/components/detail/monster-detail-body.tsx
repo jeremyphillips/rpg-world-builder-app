@@ -3,6 +3,10 @@ import { RichTextContent, Spinner, Text } from '@rpg/ui'
 import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
 
 import { DetailNavFlushStack } from '../../../lib/detail/collection/item-stack/detail-nav-flush-stack'
+import {
+  ContentDetailQueryStatus,
+  type NonEmptyContentTypeKeys,
+} from '../../../lib/detail/page/content-detail-query-status'
 import { ContentStatList } from '../../../lib/detail/metadata/content-stat-row'
 import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-layout'
 import { contentDetailProseProps } from '../../../lib/detail/page/content-detail-prose'
@@ -28,6 +32,8 @@ type MonsterDetailBodyProps = {
   campaignId: string
   editHref?: string
   viewModel: MonsterDetailViewModel
+  /** Catalogs whose initial load failed. Empty when the error is derivation-only. */
+  catalogLoadErrors?: NonEmptyContentTypeKeys
   descriptionHtml?: string
   usageSection?: ReactNode
   pageShell?: boolean
@@ -157,6 +163,7 @@ export function MonsterDetailBody({
   campaignId,
   editHref,
   viewModel,
+  catalogLoadErrors,
   descriptionHtml,
   usageSection,
   pageShell,
@@ -232,7 +239,11 @@ export function MonsterDetailBody({
 
       {usageSection}
 
-      {viewModel.catalogState === 'error' ? (
+      {catalogLoadErrors ? (
+        <div className={contentDetailSectionProseBodyFlushFollowClasses}>
+          <ContentDetailQueryStatus status="error" subject={catalogLoadErrors} />
+        </div>
+      ) : viewModel.catalogState === 'error' ? (
         <div className={contentDetailSectionProseBodyFlushFollowClasses}>
           <Text variant="destructive" role="status">
             Some mechanical details could not be resolved from campaign catalogs.

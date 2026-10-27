@@ -12,6 +12,7 @@ import {
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
+import { ContentDetailQueryStatus } from '../../lib/detail/page/content-detail-query-status'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
 import { contentDetailProseProps } from '../../lib/detail/page/content-detail-prose'
 import { ContentDetailSection } from '../../lib/detail/page/content-detail-section'
@@ -61,11 +62,11 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
   useSetBreadcrumbLabel(skill.name)
   const viewModel = buildSkillProficiencyDetailViewModel(skill)
   const {
-    data: classes = [],
+    data: classes,
     isPending: classesPending,
-    isError: classesError,
+    isLoadingError: classesLoadingError,
   } = useClasses(campaignId)
-  const offeringClasses = classesOfferingSkillChoice(skill.slug, classes)
+  const offeringClasses = classesOfferingSkillChoice(skill.slug, classes ?? [])
 
   const statRows = useMemo((): ContentStatRowData[] => {
     const rows = buildSkillProficiencyHeroStatRows(viewModel.governingAbilityLabel)
@@ -73,12 +74,14 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
     if (classesPending) {
       rows.push({
         label: SKILL_PROFICIENCY_DETAIL_STAT_LABELS.classSkillChoices,
-        value: 'Loading…',
+        value: '',
+        valueContent: <ContentDetailQueryStatus status="pending" />,
       })
-    } else if (classesError) {
+    } else if (classesLoadingError) {
       rows.push({
         label: SKILL_PROFICIENCY_DETAIL_STAT_LABELS.classSkillChoices,
-        value: formatContentListLoadErrorMessage('classes'),
+        value: '',
+        valueContent: <ContentDetailQueryStatus status="error" subject="classes" />,
       })
     } else if (offeringClasses.length > 0) {
       rows.push({
@@ -96,7 +99,13 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
     }
 
     return rows
-  }, [campaignId, classesError, classesPending, offeringClasses, viewModel.governingAbilityLabel])
+  }, [
+    campaignId,
+    classesLoadingError,
+    classesPending,
+    offeringClasses,
+    viewModel.governingAbilityLabel,
+  ])
 
   return (
     <ContentDetailLayout
