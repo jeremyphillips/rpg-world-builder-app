@@ -9,7 +9,8 @@ import { SemanticText } from './semantic-text/semantic-text'
 import { Text } from './text'
 
 const uiDir = dirname(fileURLToPath(import.meta.url))
-const globalsCss = join(uiDir, '../../styles/globals.css')
+const tailwindThemeCss = join(uiDir, '../../styles/tokens/tailwind-theme.css')
+const typographyUtilitiesCss = join(uiDir, '../../styles/typography.utilities.css')
 const semanticTextCss = join(uiDir, 'semantic-text/semantic-text.css')
 
 function readUtilityBlock(css: string, utilityName: string): string {
@@ -49,11 +50,12 @@ describe('Text micro + SemanticText (PreviewRail composition)', () => {
     styleEl = undefined
   })
 
-  it('defines text-style-micro with fine-xs metrics in globals', () => {
-    const globals = readFileSync(globalsCss, 'utf8')
-    expect(globals).toContain('--text-fine-xs--line-height: 0.875rem')
+  it('defines text-style-micro with fine-xs metrics in typography utilities', () => {
+    const theme = readFileSync(tailwindThemeCss, 'utf8')
+    const typography = readFileSync(typographyUtilitiesCss, 'utf8')
+    expect(theme).toContain('--text-fine-xs--line-height: 0.875rem')
 
-    const block = readUtilityBlock(globals, 'text-style-micro')
+    const block = readUtilityBlock(typography, 'text-style-micro')
     expect(block).toContain('font-size: var(--text-fine-xs)')
     expect(block).toContain('line-height: var(--text-fine-xs--line-height)')
     expect(block).toContain('--icon-inline: var(--icon-glyph-xs)')

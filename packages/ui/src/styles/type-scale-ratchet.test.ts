@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 const REPO_ROOT = fileURLToPath(new URL('../../../..', import.meta.url))
-const GLOBALS_CSS = join(REPO_ROOT, 'packages/ui/src/styles/globals.css')
+const TAILWIND_THEME_CSS = join(REPO_ROOT, 'packages/ui/src/styles/tokens/tailwind-theme.css')
 
 const SCAN_ROOTS = ['apps', 'packages'].map((segment) => join(REPO_ROOT, segment))
 const SKIP_DIRECTORIES = new Set([
@@ -85,10 +85,10 @@ describe('curated type scale ratchet', () => {
   })
 
   it('keeps class-backed font sizes in @theme after the scale reset', () => {
-    const globals = readFileSync(GLOBALS_CSS, 'utf8')
-    const resetAt = globals.indexOf('--text-*: initial')
+    const theme = readFileSync(TAILWIND_THEME_CSS, 'utf8')
+    const resetAt = theme.indexOf('--text-*: initial')
     expect(resetAt).toBeGreaterThan(-1)
-    const afterReset = globals.slice(resetAt)
+    const afterReset = theme.slice(resetAt)
     const missing = REQUIRED_THEME_TOKENS.filter((token) => !afterReset.includes(token))
     expect(missing).toEqual([])
   })

@@ -1,0 +1,56 @@
+/*
+ * Semantic type roles. Not in `@theme`, so they do not emit `text-*` utilities.
+ * Roles that match a primitive share that size and line-height pair.
+ */
+:root {
+  /* Heading font sizes */
+  --text-heading-display: 2.625rem; /* 42px — literal; only owner */
+  --text-heading-page: var(--text-4xl);
+  --text-heading-section: var(--text-3xl);
+  --text-heading-subsection: var(--text-lg);
+  --text-heading-group: var(--text-base);
+
+  /* Heading line heights */
+  --text-heading-display--line-height: 2.875rem; /* 46px */
+  --text-heading-page--line-height: var(--text-4xl--line-height);
+  --text-heading-section--line-height: var(--text-3xl--line-height);
+  --text-heading-subsection--line-height: var(--text-lg--line-height);
+  --text-heading-group--line-height: var(--text-base--line-height);
+
+  /* Heading chrome font sizes */
+  --text-heading-label: var(--text-base);
+  --text-heading-card: var(--text-lg);
+  --text-heading-dialog-title: var(--text-lg);
+  --text-heading-dialog-title-md: var(--text-xl);
+  --text-heading-confirm-dialog-title: var(--text-lg);
+  --text-heading-sheet-section: var(--text-xl);
+
+  /* Heading chrome line heights */
+  --text-heading-label--line-height: var(--text-base--line-height);
+  --text-heading-dialog-title--line-height: var(--text-lg--line-height);
+  --text-heading-dialog-title-md--line-height: var(--text-xl--line-height);
+  --text-heading-confirm-dialog-title--line-height: var(--text-lg--line-height);
+  --text-heading-sheet-section--line-height: var(--text-xl--line-height);
+
+  /* Specialty numeric font sizes */
+  --text-ability-score-sm: var(--text-3xl);
+  --text-ability-score-md: 2rem; /* 32px — literal; only owner */
+  --text-score-token-value: var(--text-4xl);
+  --text-character-stat-value: var(--text-4xl);
+
+  /* Specialty numeric line heights */
+  --text-ability-score-sm--line-height: var(--text-3xl--line-height);
+  --text-ability-score-md--line-height: 2.25rem; /* 36px */
+  --text-score-token-value--line-height: var(--text-4xl--line-height);
+  --text-character-stat-value--line-height: var(--text-4xl--line-height);
+
+  /* Form legend font sizes */
+  --text-field-group-legend: var(--text-2xl);
+  --text-field-subgroup-legend: var(--text-xl);
+  --text-field-array-legend: var(--text-lg);
+
+  /* Form legend line heights */
+  --text-field-group-legend--line-height: var(--text-2xl--line-height);
+  --text-field-subgroup-legend--line-height: var(--text-xl--line-height);
+  --text-field-array-legend--line-height: var(--text-lg--line-height);
+}

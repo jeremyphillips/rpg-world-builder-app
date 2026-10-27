@@ -129,14 +129,17 @@ describe('chrome.variants', () => {
 
 describe('warning-faint semantic tokens', () => {
   const tokensDir = join(dirname(fileURLToPath(import.meta.url)), '../../styles/tokens')
-  const globalsCss = join(dirname(fileURLToPath(import.meta.url)), '../../styles/globals.css')
+  const tailwindThemeCss = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../styles/tokens/tailwind-theme.css',
+  )
 
-  it('declares warning-faint tokens in semantic themes and globals', () => {
+  it('declares warning-faint tokens in semantic themes and the tailwind theme bridge', () => {
     const semanticLight = readFileSync(join(tokensDir, 'semantic-light.css'), 'utf8')
     const semanticDark = readFileSync(join(tokensDir, 'semantic-dark.css'), 'utf8')
-    const globals = readFileSync(globalsCss, 'utf8')
+    const theme = readFileSync(tailwindThemeCss, 'utf8')
 
-    for (const css of [semanticLight, semanticDark, globals]) {
+    for (const css of [semanticLight, semanticDark, theme]) {
       expect(css).toContain('--warning-faint')
       expect(css).toContain('--semantic-warning-accent-faint')
     }

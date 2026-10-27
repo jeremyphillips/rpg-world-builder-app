@@ -81,6 +81,9 @@ describe('surface-relative chrome utilities', () => {
     'utf8',
   )
   const globalsCss = readFileSync(join(stylesDir, 'globals.css'), 'utf8')
+  const componentsCss = readFileSync(join(stylesDir, 'components.css'), 'utf8')
+  const tailwindThemeCss = readFileSync(join(stylesDir, 'tokens/tailwind-theme.css'), 'utf8')
+  const baseCss = readFileSync(join(stylesDir, 'base.css'), 'utf8')
 
   it.each(SURFACE_RELATIVE_UTILITY_NAMES)(
     'defines %s with a per-element color-mix toward --surface-current',
@@ -100,21 +103,21 @@ describe('surface-relative chrome utilities', () => {
   })
 
   it('uses live var(--border) in the base safety-net rule without --color-border', () => {
-    const baseRule = globalsCss.match(
+    const baseRule = baseCss.match(
       /@layer base\s*\{[\s\S]*?\*[\s\S]*?border-color:\s*([^;]+);/,
     )?.[1]
     expect(baseRule?.trim()).toBe('var(--border)')
-    expect(globalsCss).not.toMatch(/--color-border:/)
-    expect(globalsCss).not.toMatch(/border-color:\s*var\(--color-border\)/)
+    expect(tailwindThemeCss).not.toMatch(/--color-border:/)
+    expect(baseCss).not.toMatch(/border-color:\s*var\(--color-border\)/)
   })
 
   it('does not bridge surface-relative chrome through @theme --color-* aliases', () => {
-    expect(globalsCss).not.toMatch(/--color-muted-foreground:/)
-    expect(globalsCss).not.toMatch(/--color-foreground-subtle:/)
-    expect(globalsCss).not.toMatch(/--color-border-subtle:/)
-    expect(globalsCss).not.toMatch(/--color-interactive-outline-border:/)
-    expect(globalsCss).not.toMatch(/--color-interactive-outline-hover:/)
-    expect(globalsCss).not.toMatch(/--color-interactive-outline-active:/)
+    expect(tailwindThemeCss).not.toMatch(/--color-muted-foreground:/)
+    expect(tailwindThemeCss).not.toMatch(/--color-foreground-subtle:/)
+    expect(tailwindThemeCss).not.toMatch(/--color-border-subtle:/)
+    expect(tailwindThemeCss).not.toMatch(/--color-interactive-outline-border:/)
+    expect(tailwindThemeCss).not.toMatch(/--color-interactive-outline-hover:/)
+    expect(tailwindThemeCss).not.toMatch(/--color-interactive-outline-active:/)
   })
 
   it.each(Object.entries(UTILITY_INGREDIENT_OWNERSHIP))(
@@ -129,8 +132,12 @@ describe('surface-relative chrome utilities', () => {
 
   it('imports surface-relative utility definitions after semantic tokens', () => {
     const paletteImport = globalsCss.indexOf("import './tokens/palette-light.css'")
-    const utilitiesImport = globalsCss.indexOf("import './surface-relative-chrome.utilities.css'")
+    const componentsImport = globalsCss.indexOf("import './components.css'")
+    const utilitiesImport = componentsCss.indexOf(
+      "import './surface-relative-chrome.utilities.css'",
+    )
     expect(paletteImport).toBeGreaterThan(-1)
-    expect(utilitiesImport).toBeGreaterThan(paletteImport)
+    expect(componentsImport).toBeGreaterThan(paletteImport)
+    expect(utilitiesImport).toBeGreaterThan(-1)
   })
 })

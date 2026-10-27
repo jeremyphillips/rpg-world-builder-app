@@ -1,0 +1,72 @@
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes attention-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-primary) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-primary) 35%, transparent);
+  }
+}
+
+@utility animate-attention-ring {
+  animation: var(--animate-attention-ring);
+}
+
+/** Slim overlay-style scrollbars for scrollable panels (Chrome/Safari + Firefox). */
+@utility scrollbar-slim {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(
+      in oklab,
+      color-mix(in oklch, var(--foreground) var(--mix-fg-muted), var(--surface-current)) 35%,
+      transparent
+    )
+    transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: color-mix(
+      in oklab,
+      color-mix(in oklch, var(--foreground) var(--mix-fg-muted), var(--surface-current)) 35%,
+      transparent
+    );
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(
+      in oklab,
+      color-mix(in oklch, var(--foreground) var(--mix-fg-muted), var(--surface-current)) 55%,
+      transparent
+    );
+  }
+}
+
+@utility scrollbar-gutter-stable {
+  scrollbar-gutter: stable;
+}

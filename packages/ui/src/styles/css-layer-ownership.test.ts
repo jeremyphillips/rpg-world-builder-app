@@ -53,8 +53,8 @@ const FONTSOURCE = '@fontsource-variable/inter'
  * non-custom property fails. Custom-property-only rules (tokens) are allowed.
  */
 const UNLAYERED_CHROME: Record<string, readonly string[]> = {
-  'packages/ui/src/styles/globals.css .prose.prose-sm': ['font-size', 'line-height'],
-  'packages/ui/src/styles/globals.css .prose.prose-md': ['font-size', 'line-height'],
+  'packages/ui/src/styles/prose.utilities.css .prose.prose-sm': ['font-size', 'line-height'],
+  'packages/ui/src/styles/prose.utilities.css .prose.prose-md': ['font-size', 'line-height'],
 }
 
 const SOURCE_EXT = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.mts', '.cts'])

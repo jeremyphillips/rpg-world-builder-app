@@ -20,9 +20,9 @@ const fieldGroupCssPath = path.resolve(
   'field-group.css',
 )
 
-const stylesDir = path.resolve(
+const tailwindThemeCssPath = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  '../../styles/globals.css',
+  '../../styles/tokens/tailwind-theme.css',
 )
 
 function readTokenRem(css: string, name: string): number {
@@ -41,7 +41,7 @@ describe('floating-label-field.lib', () => {
   })
 
   it('derives floated label sizes from the type scale with an 11px compact floor', () => {
-    const css = readFileSync(stylesDir, 'utf8')
+    const css = readFileSync(tailwindThemeCssPath, 'utf8')
     expect(css).toContain('--field-floating-label-reduction')
     expect(css).toContain('--field-floating-label-sm')
     expect(css).toContain('--field-floating-label-md')

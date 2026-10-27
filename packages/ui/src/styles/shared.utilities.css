@@ -1,0 +1,139 @@
+/**
+ * Field chrome — `border-input` and `bg-input` are separate utilities because
+ * Tailwind maps one `--color-*` token to every utility prefix (`bg-`, `border-`, …).
+ * State variants swap `--field-control-*` roles via the chrome recipe.
+ */
+@utility w-sidebar {
+  width: var(--sidebar-width);
+}
+
+@utility z-toast {
+  z-index: var(--z-toast);
+}
+
+@utility text-control-action-xs {
+  font-size: var(--text-control-action-xs);
+  line-height: var(--text-control-action-xs--line-height);
+}
+
+@utility h-control-action-xs {
+  height: var(--control-action-xs-height);
+}
+
+@utility h-control-action-compact {
+  height: var(--control-action-compact-height);
+}
+
+@utility min-h-control-action-compact {
+  min-height: var(--control-action-compact-height);
+}
+
+@utility size-control-action-compact {
+  width: var(--control-action-compact-height);
+  height: var(--control-action-compact-height);
+}
+
+@utility size-control-action-default {
+  width: var(--control-action-default-height);
+  height: var(--control-action-default-height);
+}
+
+@utility size-control-action-lg {
+  width: var(--control-action-lg-height);
+  height: var(--control-action-lg-height);
+}
+
+/*
+ * Inline icon owners. Sidecar only — do not restate font-size or line-height.
+ * text-lg and larger are not owners.
+ */
+@layer utilities {
+  .text-xs {
+    --icon-inline: var(--icon-glyph-sm);
+  }
+
+  .text-sm {
+    --icon-inline: var(--icon-glyph-sm);
+  }
+
+  .text-md {
+    --icon-inline: var(--icon-glyph-md);
+  }
+
+  .text-base {
+    --icon-inline: var(--icon-glyph-md);
+  }
+}
+
+@utility bg-status-icon-idle {
+  background-color: var(--status-icon-idle-bg);
+}
+
+@utility bg-status-icon-incomplete {
+  background-color: var(--status-icon-incomplete-bg);
+}
+
+@utility text-status-icon-neutral-foreground {
+  color: var(--status-icon-neutral-foreground);
+}
+
+@utility border-input {
+  border-color: var(--field-control-border);
+}
+
+@utility border-choice-control {
+  border-color: var(--choice-control-border);
+}
+
+@utility bg-input {
+  background-color: var(--field-control-bg);
+  color: var(--field-control-fg);
+}
+
+@utility bg-field-container {
+  background-color: var(--field-container);
+}
+
+@utility border-input-hover {
+  border-color: var(--field-control-border-hover);
+}
+
+@utility border-input-focus {
+  border-color: var(--field-control-border-focus);
+}
+
+@utility border-input-readonly {
+  border-color: var(--field-control-border-readonly);
+}
+
+@utility bg-input-readonly {
+  background-color: var(--field-control-bg-readonly);
+  color: var(--field-control-fg-readonly);
+}
+
+@utility border-input-disabled {
+  border-color: var(--field-control-border-disabled);
+}
+
+@utility bg-input-disabled {
+  background-color: var(--field-control-bg-disabled);
+  color: var(--field-control-fg-disabled);
+}
+
+@utility text-input-disabled {
+  color: var(--field-control-fg-disabled);
+}
+
+@utility text-input-placeholder {
+  color: var(--field-control-placeholder);
+}
+
+@utility bg-input-invalid-subtle {
+  background-color: var(--field-control-bg-invalid);
+}
+
+/*
+ * Field control fills resolve globally via `--field-control-bg` in semantic-*.css
+ * (`--palette-surface-lift`). Rare shell overrides set `--field-control-bg` locally
+ * in the component that creates an unusual parent context — no global parent matrix.
+ */

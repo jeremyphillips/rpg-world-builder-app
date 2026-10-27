@@ -192,7 +192,7 @@ Compact UI chrome (buttons, menus, data tables) stays on **`text-sm` (14px)**.
 
 ## Type scale
 
-Primitive sizes live in [`styles/globals.css`](../src/styles/globals.css) `@theme inline`.
+Primitive sizes live in [`styles/tokens/tailwind-theme.css`](../src/styles/tokens/tailwind-theme.css) `@theme inline`.
 They override Tailwind’s built-in `text-*` utilities — components keep using `text-sm`,
 `text-2xl`, etc.; the CSS variables are the single source of truth (@ 16px root):
 
@@ -225,7 +225,7 @@ Legend sizes live on `:root` and are read by `text-style-field-legend` composite
 
 ## Heading size tokens
 
-Role tokens live on `:root` in [`styles/globals.css`](../src/styles/globals.css). They share a primitive pair (size and line-height). Display (42px) and ability-score `md` (32px) are the only off-scale literals. Retune a role by pointing it at another primitive, not by adding a numbered heading token.
+Role tokens live on `:root` in [`styles/tokens/typography-roles.css`](../src/styles/tokens/typography-roles.css). They share a primitive pair (size and line-height). Display (42px) and ability-score `md` (32px) are the only off-scale literals. Retune a role by pointing it at another primitive, not by adding a numbered heading token.
 
 | Role token                  | Points at                                          | `Heading` variant / utility              | px    |
 | --------------------------- | -------------------------------------------------- | ---------------------------------------- | ----- |

@@ -270,42 +270,61 @@ function findAttackLine(
   return derived?.attacks.find((line) => line.section === section && line.id === actionId)
 }
 
+function resolveActionName(
+  action: MonsterAction,
+  attack: DerivedMonsterAttackLine | undefined,
+): string {
+  if (action.kind === 'special' || action.kind === 'natural-weapon') {
+    return action.name
+  }
+  return action.name ?? attack?.name ?? action.id
+}
+
+function resolveActionAttackLine(
+  catalogState: MonsterCatalogLoadState,
+  attack: DerivedMonsterAttackLine | undefined,
+): string | undefined {
+  if (catalogState === 'ready' && attack) {
+    return formatAttackLine(attack)
+  }
+  if (catalogState === 'error' || (catalogState === 'ready' && !attack)) {
+    return MONSTER_UNRESOLVED_CATALOG_REFERENCE
+  }
+  return undefined
+}
+
+function mapActionItem(
+  action: MonsterAction,
+  section: DerivedMonsterAttackLine['section'],
+  derived: DerivedMonsterStatBlock | null | undefined,
+  catalogState: MonsterCatalogLoadState,
+): MonsterActionItemViewModel {
+  const attack = findAttackLine(derived, section, action.id)
+  const name = resolveActionName(action, attack)
+
+  if (action.kind === 'special') {
+    return {
+      id: action.id,
+      name,
+      descriptionHtml: action.description,
+    }
+  }
+
+  return {
+    id: action.id,
+    name,
+    attackLine: resolveActionAttackLine(catalogState, attack),
+    descriptionHtml: action.description,
+  }
+}
+
 function mapActionItems(
   actions: readonly MonsterAction[],
   section: DerivedMonsterAttackLine['section'],
   derived: DerivedMonsterStatBlock | null | undefined,
   catalogState: MonsterCatalogLoadState,
 ): MonsterActionItemViewModel[] {
-  return actions.map((action) => {
-    const attack = findAttackLine(derived, section, action.id)
-
-    const name =
-      action.kind === 'special' || action.kind === 'natural-weapon'
-        ? action.name
-        : (action.name ?? attack?.name ?? action.id)
-
-    if (action.kind === 'special') {
-      return {
-        id: action.id,
-        name,
-        descriptionHtml: action.description,
-      }
-    }
-
-    let attackLine: string | undefined
-    if (catalogState === 'ready' && attack) {
-      attackLine = formatAttackLine(attack)
-    } else if (catalogState === 'error' || (catalogState === 'ready' && !attack)) {
-      attackLine = MONSTER_UNRESOLVED_CATALOG_REFERENCE
-    }
-
-    return {
-      id: action.id,
-      name,
-      attackLine,
-      descriptionHtml: action.description,
-    }
-  })
+  return actions.map((action) => mapActionItem(action, section, derived, catalogState))
 }
 
 function mapReactionItems(

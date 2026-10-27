@@ -19,6 +19,8 @@ describe('palette primitive usage', () => {
     'semantic-light.css',
     'semantic-dark.css',
     '../globals.css',
+    'tailwind-theme.css',
+    '../shared.utilities.css',
   ]
     .map((file) => readFileSync(join(tokensDir, file), 'utf8'))
     .join('\n')

@@ -62,7 +62,9 @@ describe('text-style stack ratchet (repo)', () => {
   })
 
   it('keeps status tone utilities free of font-size and line-height', () => {
-    const globals = readSource(join(REPO_ROOT, 'packages/ui/src/styles/globals.css'))
-    expect(toneUtilitySizeViolation(globals)).toBeNull()
+    const typographyUtilities = readSource(
+      join(REPO_ROOT, 'packages/ui/src/styles/typography.utilities.css'),
+    )
+    expect(toneUtilitySizeViolation(typographyUtilities)).toBeNull()
   })
 })
