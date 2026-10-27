@@ -23,7 +23,6 @@ import {
   choiceBlockRowOverSelectionClasses,
   choiceBlockRowPoolDescriptionClasses,
   choiceBlockRowSelectedListClasses,
-  choiceBlockRowSourceLineClasses,
 } from './choice-block-row.variants'
 import { choiceSubsectionBodyMarginClasses } from './choice-section.variants'
 
@@ -84,9 +83,7 @@ export function ChoiceBlockRow({
             </div>
           ) : null}
           <div className={choiceBlockRowDetailsGridClasses}>
-            {block.sourceLine ? (
-              <Text className={choiceBlockRowSourceLineClasses}>{block.sourceLine}</Text>
-            ) : null}
+            {block.sourceLine ? <Text variant="body-compact">{block.sourceLine}</Text> : null}
             <Text variant="caption" className={choiceBlockRowPoolDescriptionClasses}>
               {block.poolDescription}
             </Text>

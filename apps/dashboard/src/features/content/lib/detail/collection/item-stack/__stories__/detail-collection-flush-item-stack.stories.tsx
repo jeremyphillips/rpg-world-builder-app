@@ -27,14 +27,14 @@ export const InsideFlushSection: Story = {
         <DetailCollectionFlushItemStack>
           <DetailCollectionFlushItemStackItem>
             <ContentDetailSectionItem id="trait-a" label="Keen Senses">
-              <Text as="p" variant="supporting">
+              <Text as="p" variant="body-compact">
                 Advantage on Perception checks that rely on sight or smell.
               </Text>
             </ContentDetailSectionItem>
           </DetailCollectionFlushItemStackItem>
           <DetailCollectionFlushItemStackItem>
             <ContentDetailSectionItem id="trait-b" label="Fleet of Foot">
-              <Text as="p" variant="supporting">
+              <Text as="p" variant="body-compact">
                 Base walking speed increases by 5 feet.
               </Text>
             </ContentDetailSectionItem>

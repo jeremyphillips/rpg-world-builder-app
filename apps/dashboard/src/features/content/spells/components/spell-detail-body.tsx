@@ -99,7 +99,9 @@ function SpellResolutionSection({
             <ul className="list-inside list-disc space-y-1" role="list">
               {subsection.lines.map((line) => (
                 <li key={`${subsection.heading}-${line}`}>
-                  <Text as="span">{line}</Text>
+                  <Text as="span" variant="body-compact">
+                    {line}
+                  </Text>
                 </li>
               ))}
             </ul>

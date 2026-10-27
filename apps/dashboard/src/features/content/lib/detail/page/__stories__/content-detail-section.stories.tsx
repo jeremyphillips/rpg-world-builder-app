@@ -17,7 +17,7 @@ export const ProseSection: Story = {
   render: () => (
     <ContentDetailBody>
       <ContentDetailSection heading="Description" headingId="description-heading">
-        <Text as="p" variant="supporting">
+        <Text as="p" variant="body-compact">
           Catalog detail sections register with the in-page nav and use faint panel chrome.
         </Text>
       </ContentDetailSection>
@@ -30,7 +30,7 @@ export const WithNavLeaves: Story = {
     <ContentDetailBody>
       <ContentDetailSection heading="Traits" headingId="traits-heading">
         <ContentDetailSectionItem id="trait-darkvision" label="Darkvision">
-          <Text as="p" variant="supporting">
+          <Text as="p" variant="body-compact">
             See in dim light out to 60 feet.
           </Text>
         </ContentDetailSectionItem>

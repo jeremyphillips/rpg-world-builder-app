@@ -21,7 +21,7 @@ export function SkillProficiencyDetailMetadata({
       />
 
       {viewModel.summarySentence ? (
-        <Text variant="supporting">{viewModel.summarySentence}</Text>
+        <Text variant="body-compact">{viewModel.summarySentence}</Text>
       ) : null}
 
       {viewModel.examples.length > 0 ? (
@@ -32,7 +32,7 @@ export function SkillProficiencyDetailMetadata({
           <ul className="list-disc space-y-1 pl-5" role="list">
             {viewModel.examples.map((example) => (
               <li key={example}>
-                <Text variant="supporting">{example}</Text>
+                <Text variant="body-compact">{example}</Text>
               </li>
             ))}
           </ul>
