@@ -13,6 +13,7 @@ import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadc
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
+import { contentDetailProseProps } from '../../lib/detail/page/content-detail-prose'
 import { ContentDetailSection } from '../../lib/detail/page/content-detail-section'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
@@ -109,7 +110,7 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
       statRows={statRows}
       descriptionContent={
         skill.description ? (
-          <RichTextContent html={skill.description} size="md" tone="muted" />
+          <RichTextContent html={skill.description} {...contentDetailProseProps} />
         ) : undefined
       }
     >

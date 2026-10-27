@@ -154,9 +154,9 @@ domain tables, badge lists, …). Navigable flush item stacks share
 section wrapper; the parent owns heading, empty hide, and loading.
 
 - Array item headings: `ContentDetailSectionItem` (`Heading variant="group"`, `as="h3"`).
-- Detail HTML size: spread `contentDetailProseProps` (`size: 'sm'` only); tone per consumer.
-- Class proficiencies: [`ClassProficienciesSection`](../../classes/components/detail/class-proficiencies-section.tsx) owns the sole proficiencies `ContentDetailSection`; body uses `ContentStatList`.
-- Monster **Details** metadata: `ContentStatList` inside the Details section — not scroll-spy leaves. Legacy hash ids (`MONSTER_DETAIL_DETAILS_LEAF_IDS`) stay on metadata row `dd` elements for deep links.
+- Detail HTML: spread `contentDetailProseProps` (`size: 'sm'`; default tone).
+- Class proficiencies: [`ClassProficienciesSection`](../../classes/components/detail/class-proficiencies-section.tsx) owns the sole proficiencies `ContentDetailSection`. Granted and choice groups are subheadings without anchors.
+- Monster **Details** metadata: `ContentStatList` inside the Details section. The section heading is the nav target. Metadata rows are not anchors.
 
 **Do not use `DetailCollectionPanel` directly for:** prose blocks, stat/metadata rows,
 forms, metric grids, single-value fields, arbitrary card layouts — prefer

@@ -8,7 +8,7 @@ import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-lay
 import { contentDetailProseProps } from '../../../lib/detail/page/content-detail-prose'
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import {
-  contentDetailSectionFlushVerticalInsetClasses,
+  contentDetailSectionFlushInsetClasses,
   contentDetailSectionProseBodyFlushFollowClasses,
 } from '../../../lib/detail/page/content-detail-section.variants'
 import { buildDetailsStatRows } from '../../lib/monster-details-stat-rows'
@@ -93,7 +93,7 @@ function AbilitiesSection({ viewModel }: { viewModel: MonsterDetailViewModel }) 
       headingId={MONSTER_DETAIL_SECTION_IDS.abilities}
       bodyLayout="flush"
     >
-      <div className={contentDetailSectionFlushVerticalInsetClasses}>
+      <div className={contentDetailSectionFlushInsetClasses}>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[20rem] text-left text-style-body">
             <thead>

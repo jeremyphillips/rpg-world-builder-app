@@ -10,6 +10,7 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
+import { contentDetailProseProps } from '../../lib/detail/page/content-detail-prose'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import {
   getContentDisplayImage,
@@ -68,7 +69,7 @@ export function LocationDetailContent({
       heroDescription={false}
       descriptionContent={
         viewModel.description ? (
-          <RichTextContent html={viewModel.description} size="md" tone="muted" />
+          <RichTextContent html={viewModel.description} {...contentDetailProseProps} />
         ) : undefined
       }
     >

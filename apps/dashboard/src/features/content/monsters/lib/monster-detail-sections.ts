@@ -7,11 +7,3 @@ export const MONSTER_DETAIL_SECTION_IDS = {
   bonusActions: 'monster-bonus-actions-heading',
   reactions: 'monster-reactions-heading',
 } as const
-
-export const MONSTER_DETAIL_DETAILS_LEAF_IDS = {
-  skills: 'monster-details-skills',
-  senses: 'monster-details-senses',
-  languages: 'monster-details-languages',
-  defenses: 'monster-details-defenses',
-  gear: 'monster-details-gear',
-} as const

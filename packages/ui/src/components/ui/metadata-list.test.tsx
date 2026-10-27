@@ -99,13 +99,47 @@ describe('MetadataList', () => {
     expect(invitations?.parentElement?.tagName).toBe('DL')
   })
 
-  it('sets optional row id on the value cell for deep links', () => {
-    render(
+  it('keeps row id off the document, including when it matches the label', () => {
+    const { container } = render(
       <MetadataList
-        items={[{ id: 'monster-details-skills', label: 'Skills', value: 'Perception +2' }]}
+        items={[
+          { id: 'skills', label: 'Skills', value: 'Perception +2' },
+          { id: 'Skills', label: 'Skills', value: 'Stealth +4' },
+        ]}
       />,
     )
 
+    expect(container.querySelector('[id]')).toBeNull()
+    expect(screen.getAllByText('Skills')).toHaveLength(2)
+  })
+
+  it('sets a document id only from anchorId', () => {
+    render(
+      <MetadataList
+        items={[
+          {
+            id: 'row-key',
+            anchorId: 'monster-details-skills',
+            label: 'Skills',
+            value: 'Perception +2',
+          },
+        ]}
+      />,
+    )
+
+    expect(document.getElementById('row-key')).toBeNull()
     expect(document.getElementById('monster-details-skills')).toHaveTextContent('Perception +2')
+  })
+
+  it('does not publish a document id when two lists reuse the same row id', () => {
+    const { container } = render(
+      <>
+        <MetadataList items={[{ id: 'tools', label: 'Granted tools', value: "Thieves' Tools" }]} />
+        <MetadataList items={[{ id: 'tools', label: 'Tool choices', value: 'Choose 1' }]} />
+      </>,
+    )
+
+    expect(container.querySelectorAll('#tools')).toHaveLength(0)
+    expect(container.querySelector('[id]')).toBeNull()
   })
 })

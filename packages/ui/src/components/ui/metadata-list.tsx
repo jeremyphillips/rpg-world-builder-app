@@ -11,7 +11,10 @@ import {
 } from './metadata-list.variants'
 
 export type MetadataListItem = {
+  /** React key only. Never written to the DOM. */
   id?: string
+  /** Document id for an intentional deep link. Omitted rows are not anchors. */
+  anchorId?: string
   label: ReactNode
   value: ReactNode
 }
@@ -56,7 +59,7 @@ export function MetadataList({
       {items.map((item, index) => (
         <Fragment key={item.id ?? index}>
           <dt className="ui-metadata-list__label">{item.label}</dt>
-          <dd id={item.id} className="ui-metadata-list__value">
+          <dd id={item.anchorId} className="ui-metadata-list__value">
             {item.value}
           </dd>
         </Fragment>

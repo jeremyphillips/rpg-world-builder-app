@@ -64,7 +64,7 @@ export function EquipmentPackageSwitchResolutionModalBody({
 
           <div className={packageSwitchModalInventoryScrollClasses}>
             <section className="space-y-3">
-              <Text as="h4" variant="label">
+              <Text as="h3" variant="label">
                 {PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE}
               </Text>
               <EquipmentPurchasedInventorySection

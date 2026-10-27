@@ -10,7 +10,7 @@ vi.mock('@/features/campaign', () => ({
 
 import { ContentDetailBody } from '../../../lib/detail/page/content-detail-body'
 import { buildMonsterDetailViewModel, tryDeriveMonsterStatBlock } from '../../lib/monster-display'
-import { MONSTER_DETAIL_DETAILS_LEAF_IDS } from '../../lib/monster-detail-sections'
+import { MONSTER_DETAIL_SECTION_IDS } from '../../lib/monster-detail-sections'
 import { MonsterDetailBody } from './monster-detail-body'
 
 beforeAll(() => {
@@ -65,15 +65,17 @@ describe('MonsterDetailBody details section', () => {
     expect(screen.queryByRole('link', { name: 'Senses' })).not.toBeInTheDocument()
   })
 
-  it('preserves legacy hash ids on detail metadata rows', () => {
-    const { viewModel } = renderMonsterBody()
+  it('keeps Details as the only metadata anchor', () => {
+    const { container, viewModel } = renderMonsterBody()
 
-    for (const leaf of viewModel.detailsLeaves) {
-      const domId =
-        MONSTER_DETAIL_DETAILS_LEAF_IDS[leaf.id as keyof typeof MONSTER_DETAIL_DETAILS_LEAF_IDS] ??
-        `monster-details-${leaf.id}`
-      expect(document.getElementById(domId)).toBeInTheDocument()
-    }
     expect(viewModel.detailsLeaves.length).toBeGreaterThan(0)
+    expect(document.getElementById(MONSTER_DETAIL_SECTION_IDS.details)).toBeInTheDocument()
+    for (const leaf of viewModel.detailsLeaves) {
+      expect(document.getElementById(leaf.id)).toBeNull()
+      expect(document.getElementById(`monster-details-${leaf.id}`)).toBeNull()
+    }
+
+    const ids = [...container.querySelectorAll('[id]')].map((element) => element.id)
+    expect(new Set(ids).size).toBe(ids.length)
   })
 })
