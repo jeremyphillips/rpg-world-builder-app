@@ -4,6 +4,6 @@
 @layer components {
   .ui-sidebar-nav-item {
     --icon-size: var(--icon-glyph-lg);
-    --icon-stroke-width: var(--sidebar-nav-icon-stroke);
+    --icon-stroke-width: 1.75;
   }
 }

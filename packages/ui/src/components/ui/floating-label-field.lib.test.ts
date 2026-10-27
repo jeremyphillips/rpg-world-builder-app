@@ -41,16 +41,17 @@ describe('floating-label-field.lib', () => {
   })
 
   it('derives floated label sizes from the type scale with an 11px compact floor', () => {
-    const css = readFileSync(tailwindThemeCssPath, 'utf8')
-    expect(css).toContain('--field-floating-label-reduction')
-    expect(css).toContain('--field-floating-label-sm')
-    expect(css).toContain('--field-floating-label-md')
-    expect(css).not.toContain('--floating-label-scale-md')
+    const fieldCss = readFileSync(floatingLabelCssPath, 'utf8')
+    const themeCss = readFileSync(tailwindThemeCssPath, 'utf8')
+    expect(fieldCss).toContain('--field-floating-label-reduction')
+    expect(fieldCss).toContain('--field-floating-label-sm')
+    expect(fieldCss).toContain('--field-floating-label-md')
+    expect(fieldCss).not.toContain('--floating-label-scale-md')
 
-    const xs = readTokenRem(css, '--text-xs')
-    const xsMeta = readTokenRem(css, '--text-fine-sm')
-    const md = readTokenRem(css, '--text-md')
-    const reduction = readTokenRem(css, '--field-floating-label-reduction')
+    const xs = readTokenRem(themeCss, '--text-xs')
+    const xsMeta = readTokenRem(themeCss, '--text-fine-sm')
+    const md = readTokenRem(themeCss, '--text-md')
+    const reduction = readTokenRem(fieldCss, '--field-floating-label-reduction')
 
     const expectedSm = Math.max(xsMeta, xs - reduction)
     const expectedMd = md - reduction

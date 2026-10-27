@@ -199,7 +199,7 @@ unit is suppressed automatically (including nested groups and nested dependents)
 item cards keep their own shell model.
 
 **Choice indicators** (radio, checkbox, RadioCard decorative control) use
-`border-choice-control` (`--choice-control-border`), composed toward `--surface-current` — not
+`var(--choice-control-border)` in `choice-control.css`, composed toward `--surface-current` — not
 `border-input`. Checkbox `tone` (`default`, `success`, `warning`, `destructive`) sets
 `--choice-indicator-*` from `[data-choice-tone]` in `choice-control.css`. `BooleanField`
 paints every tone through the same roles: `--boolean-bg`, `--boolean-hover-bg`,
@@ -326,7 +326,7 @@ Inline icons use `size="inline"` and read `--icon-inline` from the nearest typog
 
 `text-lg` and larger, heading utilities, and eyebrow type are not inline-icon owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `badge.css` and `chip.css`. `layout="counter"` composes with the badge size modifier on the same host for `--icon-size`; counter alert icons (`ValidationIssueCountBadge`, `ArrayItemIssueButton`, create-modal issue badges) use `size="owner"`, not `inline` or fixed glyph steps.
 
-**Chip type scale** (`--text-chip-sm|md|lg` in `tokens/tailwind-theme.css`) maps Chip `sm`/`md`/`lg` to `text-fine-sm` / `text-fine-md` / `text-md`. Badge sizes use `--text-fine-xs`, `--text-xs`, and `--text-sm` on `ui-badge--*` modifiers.
+**Chip type scale** (`--text-chip-sm|md|lg` on `.ui-chip` in `chip.css`) maps Chip `sm`/`md`/`lg` to `text-fine-sm` / `text-fine-md` / `text-md`. Badge sizes use `--text-fine-xs`, `--text-xs`, and `--text-sm` on `ui-badge--*` modifiers.
 
 `Button`, `ButtonLink`, and `ActionButton` glyphs use `size="owner"`. `size` selects the ladder; `button.css` publishes `--icon-size` on the host. Labeled `xs` / `sm` / `default` / `lg` use `--icon-glyph-sm` / `md` / `md` / `lg` (12 / 14 / 14 / 16px). Icon-only `icon-xs` / `icon-sm` / `icon` / `icon-lg` use `--icon-glyph-md` / `lg` / `xl` / `2xl` (14 / 16 / 20 / 24px). Text and attached variants use the labeled ladder. `children` does not select the glyph.
 

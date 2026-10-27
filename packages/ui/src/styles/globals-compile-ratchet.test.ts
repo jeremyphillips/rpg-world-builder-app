@@ -41,7 +41,6 @@ const CANDIDATE_UTILITIES = [
   'border-input',
   'bg-input',
   'bg-field-container',
-  'border-choice-control',
   'w-sidebar',
   'z-toast',
   'size-image-preview',
@@ -53,7 +52,6 @@ const CANDIDATE_UTILITIES = [
   'animate-attention-ring',
   'scrollbar-slim',
   'bg-message-bubble-self',
-  'bg-status-icon-idle',
   'shadow-surface-raised',
   'max-w-page-narrow',
 ] as const

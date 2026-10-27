@@ -65,24 +65,8 @@
   }
 }
 
-@utility bg-status-icon-idle {
-  background-color: var(--status-icon-idle-bg);
-}
-
-@utility bg-status-icon-incomplete {
-  background-color: var(--status-icon-incomplete-bg);
-}
-
-@utility text-status-icon-neutral-foreground {
-  color: var(--status-icon-neutral-foreground);
-}
-
 @utility border-input {
   border-color: var(--field-control-border);
-}
-
-@utility border-choice-control {
-  border-color: var(--choice-control-border);
 }
 
 @utility bg-input {

@@ -135,12 +135,7 @@ Field `lg` is `--control-height-xl`, not the 40px button `--control-height-lg`.
 
 ## Tokens
 
-Role tokens live in [`tokens/tailwind-theme.css`](../src/styles/tokens/tailwind-theme.css):
-
-- `--semantic-*-border`, `--semantic-*-soft-bg`, `--semantic-*-strong-bg` — badge surfaces
-- `--semantic-*-outline-foreground`, `--semantic-*-soft-foreground`, `--semantic-*-strong-foreground` — badge copy
-- `--selected-control`, `--selected-control-foreground`, `--selected-control-border` — chip selection
-- `--text-chip-sm|md|lg` — Chip sm/md/lg type (aliases `text-fine-sm` / `text-fine-md` / `text-md`)
+Badge role tokens live in [`tokens/tailwind-theme.css`](../src/styles/tokens/tailwind-theme.css) and semantic CSS. Chip selection uses `--selected-control*`. Chip sm/md/lg type (`--text-chip-sm|md|lg`, aliases `text-fine-sm` / `text-fine-md` / `text-md`) is declared on `.ui-chip` in [`chip.css`](../src/components/ui/chip.css).
 
 Status chrome (`--info-subtle`, …) vs inline text (`--semantic-info`, …): [design-tokens.md](./design-tokens.md#status-namespaces).
 

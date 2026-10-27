@@ -74,7 +74,7 @@
 
   .ui-interactive-list__panel--fit {
     width: max-content;
-    min-width: var(--popover-menu-min-width);
+    min-width: 15.625rem; /* 250px — minimum readable width when the trigger is fit-sized */
   }
 
   .ui-interactive-list__toolbar {

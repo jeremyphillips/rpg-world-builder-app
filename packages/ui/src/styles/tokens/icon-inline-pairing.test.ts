@@ -12,7 +12,7 @@ const iconCssPath = join(stylesDir, '../components/ui/icon/icon.css')
 
 function ownersBlock(css: string): string {
   const start = css.indexOf('@layer utilities {\n  .text-xs {')
-  const end = css.indexOf('@utility bg-status-icon-idle')
+  const end = css.indexOf('@utility border-input')
   expect(start).toBeGreaterThan(-1)
   expect(end).toBeGreaterThan(start)
   return css.slice(start, end)
