@@ -518,7 +518,7 @@ export function Icon({ name, size, className }: IconProps) {
   - **Phase 1 first** renames the legacy token, utility and step from `xl` to `3xl`: `--icon-glyph-xl`, `size-icon-glyph-xl`, `ICON_GLYPH_STEPS`, the media map, 1 test and 2 doc refs (about 12 refs). The census must not change.
   - **Then** it adds `--icon-glyph-xl: 1.25rem` and `--icon-glyph-2xl: 1.5rem`.
 - **40px has 1 owner** (the master-detail editor empty state), so it stays **owner-specific**. [preserves behavior]
-  - The token is `--empty-state-well-icon-lg: 2.5rem`, applied through the owner element class `ui-empty-state-well__icon--lg`.
+  - `ui-empty-state-well__icon--lg` sets `--icon-size: 2.5rem` in `empty-state-well.css` (no global `@theme` token).
   - There's no shared step, because 1 consumer doesn't justify one.
 
 **Owner-specific mappings that are preserved, not normalized:**
@@ -722,7 +722,7 @@ const STATUS_ICON_DEFINITIONS = {
   - `badge.css` and `chip.css` (Badge, Chip)
   - `ui-identity-frame.css` (`__fallback` size modifiers: xs → `sm`, sm → `lg`, md → `2xl`, inline → `xs`)
   - `semantic-text.css` (its slot renders `size="inline"`)
-  - **new** `sidebar-nav-item.css`: `ui-sidebar-nav-item` is added to the `sidebarNavItemVariants` base, with `--icon-size: var(--icon-glyph-lg)` and `--icon-stroke-width: var(--sidebar-nav-icon-stroke)` (1.75).
+  - **new** `sidebar-nav-item.css`: `ui-sidebar-nav-item` is added to the `sidebarNavItemVariants` base, with `--icon-size: var(--icon-glyph-lg)` and `--icon-stroke-width: 1.75` on the owner class.
     - Its two production consumers both use `sidebarNavItemVariants`: `nav-item.tsx` and `all-campaigns-link.tsx`. [resolves the former open question 2]
 - **Owner element classes (on the icon):**
   - `ui-data-table__sort-icon`

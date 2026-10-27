@@ -200,7 +200,8 @@ item cards keep their own shell model.
 
 **Choice indicators** (radio, checkbox, RadioCard decorative control) use
 `var(--choice-control-border)` in `choice-control.css`, composed toward `--surface-current` — not
-`border-input`. Checkbox `tone` (`default`, `success`, `warning`, `destructive`) sets
+`border-input`. There is no `border-choice-control` utility (removed as unused); semantic
+`--choice-control-border` / `--color-choice-control-border` remain. Checkbox `tone` (`default`, `success`, `warning`, `destructive`) sets
 `--choice-indicator-*` from `[data-choice-tone]` in `choice-control.css`. `BooleanField`
 paints every tone through the same roles: `--boolean-bg`, `--boolean-hover-bg`,
 `--boolean-checked-bg`, and the matching border roles. The neutral checked fill is
@@ -340,7 +341,10 @@ Module: [`status-icon.css`](../src/components/ui/status-icon.css) + [`status-ico
 
 Disc tone and diameter use `ui-status-icon--{ready|needs-attention|incomplete|off|none|not-configured}` and `ui-status-icon--{sm|md|lg}` (12 / 16 / 20px discs — not icon-glyph `sm`/`md`).
 
-Neutral disc fills use `--status-icon-idle-bg` and `--status-icon-incomplete-bg`. Grey-disc glyphs use `ui-status-icon__glyph--neutral`.
+Neutral disc fills use `--status-icon-idle-bg` and `--status-icon-incomplete-bg` in
+`status-icon.css` tone modifiers — not removed `bg-status-icon-*` / `text-status-icon-*`
+utilities or `--color-status-icon-*` theme keys (those were unused duplicates). Grey-disc
+glyphs use `ui-status-icon__glyph--neutral`.
 
 The off-slash glyph is **not** on the 10/12/14/16 icon-glyph ladder. It uses
 `size-status-icon-slash-sm` (6px) and `size-status-icon-slash-md` (8px) with a heavier
