@@ -1,13 +1,20 @@
 import type { ReactNode } from 'react'
 
-import { Badge } from '@rpg/ui'
-import { FormSectionHeader } from '@rpg/ui/form'
+import { Badge, Heading } from '@rpg/ui'
 
 export type EquipmentInventorySectionHeaderProps = {
   title: string
   count?: number
   action?: ReactNode
 }
+
+const equipmentInventorySectionHeaderLabelRowClasses = 'flex min-w-0 items-center gap-2'
+
+const equipmentInventorySectionHeaderActionLayoutClasses =
+  'grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-4 items-center'
+
+const equipmentInventorySectionHeaderActionSlotClasses =
+  'flex shrink-0 items-center justify-self-end'
 
 /** Presentation-only inventory section chrome — title, optional count badge, optional action. */
 export function EquipmentInventorySectionHeader({
@@ -22,13 +29,23 @@ export function EquipmentInventorySectionHeader({
       </Badge>
     ) : undefined
 
+  const titleBlock = (
+    <div className={equipmentInventorySectionHeaderLabelRowClasses}>
+      <Heading variant="subsection" as="h3" className="min-w-0">
+        {title}
+      </Heading>
+      {countBadge}
+    </div>
+  )
+
+  if (!action) {
+    return titleBlock
+  }
+
   return (
-    <FormSectionHeader
-      label={title}
-      tier="subsection"
-      labelPresentation="heading"
-      labelAccessory={countBadge}
-      action={action}
-    />
+    <div className={equipmentInventorySectionHeaderActionLayoutClasses}>
+      {titleBlock}
+      <div className={equipmentInventorySectionHeaderActionSlotClasses}>{action}</div>
+    </div>
   )
 }
