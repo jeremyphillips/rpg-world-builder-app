@@ -20,6 +20,11 @@ export const TEXT_VARIANT_CATALOG: Record<TextVariant, TextVariantCatalogRow> = 
     category: 'primary',
     useCase: 'Secondary explanatory copy',
   },
+  'body-compact': {
+    variant: 'body-compact',
+    category: 'primary',
+    useCase: '14px primary foreground plain copy (mechanical lines, dense non-HTML prose)',
+  },
   caption: {
     variant: 'caption',
     category: 'primary',

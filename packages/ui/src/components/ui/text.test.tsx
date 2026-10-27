@@ -22,6 +22,11 @@ describe('Text', () => {
     expect(alert).toHaveClass('text-style-destructive')
   })
 
+  it('applies body-compact variant classes', () => {
+    render(<Text variant="body-compact">Mechanics</Text>)
+    expect(screen.getByText('Mechanics')).toHaveClass('text-style-body-compact')
+  })
+
   it('applies supporting and label variant classes', () => {
     render(<Text variant="supporting">Supporting</Text>)
     expect(screen.getByText('Supporting')).toHaveClass('text-style-supporting')

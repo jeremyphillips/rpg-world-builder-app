@@ -98,4 +98,14 @@ describe('MetadataList', () => {
     expect(invitations).toHaveTextContent('Accepted, incomplete: 2')
     expect(invitations?.parentElement?.tagName).toBe('DL')
   })
+
+  it('sets optional row id on the value cell for deep links', () => {
+    render(
+      <MetadataList
+        items={[{ id: 'monster-details-skills', label: 'Skills', value: 'Perception +2' }]}
+      />,
+    )
+
+    expect(document.getElementById('monster-details-skills')).toHaveTextContent('Perception +2')
+  })
 })

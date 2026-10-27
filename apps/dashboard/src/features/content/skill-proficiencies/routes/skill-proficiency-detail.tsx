@@ -42,7 +42,7 @@ function SkillExamplesList({
       <ul className="list-disc space-y-1 pl-5" role="list">
         {examples.map((example) => (
           <li key={example}>
-            <Text variant="muted">{example}</Text>
+            <Text variant="supporting">{example}</Text>
           </li>
         ))}
       </ul>

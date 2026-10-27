@@ -4,6 +4,7 @@ export const TEXT_VARIANT_MAP = {
   body: 'text-style-body',
   muted: 'text-style-muted',
   supporting: 'text-style-supporting',
+  'body-compact': 'text-style-body-compact',
   caption: 'text-style-caption',
   micro: 'text-style-micro',
   label: 'text-style-label',

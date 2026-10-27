@@ -56,7 +56,9 @@ export function MetadataList({
       {items.map((item, index) => (
         <Fragment key={item.id ?? index}>
           <dt className="ui-metadata-list__label">{item.label}</dt>
-          <dd className="ui-metadata-list__value">{item.value}</dd>
+          <dd id={item.id} className="ui-metadata-list__value">
+            {item.value}
+          </dd>
         </Fragment>
       ))}
     </dl>

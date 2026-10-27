@@ -19,5 +19,8 @@ export const contentDetailSectionProseBodyFlushFollowClasses = cn(
 /** Vertical rhythm between array items inside a section panel. */
 export const contentDetailSectionItemStackClasses = 'space-y-4'
 
-/** Spacing for in-panel titles — pair with `Heading variant="subsection"`. */
+/** Spacing for in-panel titles — pair with `Heading variant="group"`. */
 export const contentDetailSectionPanelContentHeadingClasses = 'mb-1.5'
+
+/** Vertical inset for flush sections whose body is not a flush item stack (e.g. tables). */
+export const contentDetailSectionFlushVerticalInsetClasses = 'px-4 py-4'

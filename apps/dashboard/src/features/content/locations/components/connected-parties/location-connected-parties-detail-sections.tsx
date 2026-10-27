@@ -26,11 +26,11 @@ type PendingTerritorialRemove = {
 
 function LocationConnectedPartiesQueryState({ detail }: { detail: DetailState }) {
   if (detail.connectedPartiesQuery.isPending) {
-    return <Text variant="muted">Loading connected parties…</Text>
+    return <Text variant="supporting">Loading connected parties…</Text>
   }
 
   if (detail.connectedPartiesQuery.isError) {
-    return <Text variant="muted">Could not load connected parties for this location.</Text>
+    return <Text variant="supporting">Could not load connected parties for this location.</Text>
   }
 
   return null

@@ -38,6 +38,14 @@ function supportingStackViolation(set: Set<string>): string | null {
   return null
 }
 
+function bodyCompactStackViolation(set: Set<string>): string | null {
+  if (!withoutEmphasisWeight(set)) return null
+  if (set.has('text-sm') && set.has('text-foreground')) {
+    return 'text-sm + text-foreground (use text-style-body-compact or Text variant="body-compact")'
+  }
+  return null
+}
+
 function captionStackViolation(set: Set<string>): string | null {
   if (!withoutEmphasisWeight(set)) return null
   const hasXs = set.has('text-xs')
@@ -66,7 +74,10 @@ export function classStringViolatesMigratedStacks(classString: string): string |
   const tokens = tokenizeClassString(classString)
   const set = new Set(tokens)
   return (
-    supportingStackViolation(set) ?? captionStackViolation(set) ?? labelStackViolation(set, tokens)
+    supportingStackViolation(set) ??
+    bodyCompactStackViolation(set) ??
+    captionStackViolation(set) ??
+    labelStackViolation(set, tokens)
   )
 }
 

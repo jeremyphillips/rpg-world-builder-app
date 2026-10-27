@@ -2,21 +2,17 @@ import type { ReactNode } from 'react'
 import { RichTextContent, Spinner, Text } from '@rpg/ui'
 import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
 
-import {
-  DetailCollectionFlushItemStack,
-  DetailCollectionFlushItemStackItem,
-} from '../../../lib/detail/collection/item-stack/detail-collection-flush-item-stack'
+import { DetailNavFlushStack } from '../../../lib/detail/collection/item-stack/detail-nav-flush-stack'
+import { ContentStatList } from '../../../lib/detail/metadata/content-stat-row'
 import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-layout'
-import { contentDetailNavItemId } from '../../../lib/detail/page/content-detail-nav-anchor-id'
+import { contentDetailProseProps } from '../../../lib/detail/page/content-detail-prose'
+import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import {
-  ContentDetailSection,
-  ContentDetailSectionItem,
-} from '../../../lib/detail/page/content-detail-section'
-import { contentDetailSectionProseBodyFlushFollowClasses } from '../../../lib/detail/page/content-detail-section.variants'
-import {
-  MONSTER_DETAIL_DETAILS_LEAF_IDS,
-  MONSTER_DETAIL_SECTION_IDS,
-} from '../../lib/monster-detail-sections'
+  contentDetailSectionFlushVerticalInsetClasses,
+  contentDetailSectionProseBodyFlushFollowClasses,
+} from '../../../lib/detail/page/content-detail-section.variants'
+import { buildDetailsStatRows } from '../../lib/monster-details-stat-rows'
+import { MONSTER_DETAIL_SECTION_IDS } from '../../lib/monster-detail-sections'
 import {
   formatMonsterAbilityHeader,
   type MonsterActionItemViewModel,
@@ -34,15 +30,16 @@ type MonsterDetailBodyProps = {
   viewModel: MonsterDetailViewModel
   descriptionHtml?: string
   usageSection?: ReactNode
+  pageShell?: boolean
 }
 
 function ActionItemBody({ item }: { item: MonsterActionItemViewModel }) {
   return (
     <>
-      {item.attackLine ? <Text variant="muted">{item.attackLine}</Text> : null}
-      {item.triggerLine ? <Text variant="muted">{item.triggerLine}</Text> : null}
+      {item.attackLine ? <Text variant="body-compact">{item.attackLine}</Text> : null}
+      {item.triggerLine ? <Text variant="body-compact">{item.triggerLine}</Text> : null}
       {item.descriptionHtml ? (
-        <RichTextContent html={item.descriptionHtml} size="md" tone="muted" />
+        <RichTextContent html={item.descriptionHtml} {...contentDetailProseProps} />
       ) : null}
     </>
   )
@@ -63,18 +60,12 @@ function ActionSection({
 
   return (
     <ContentDetailSection heading={heading} headingId={headingId} bodyLayout="flush">
-      <DetailCollectionFlushItemStack>
-        {items.map((item) => (
-          <DetailCollectionFlushItemStackItem key={item.id}>
-            <ContentDetailSectionItem
-              id={contentDetailNavItemId(navPrefix, item.id)}
-              label={item.name}
-            >
-              <ActionItemBody item={item} />
-            </ContentDetailSectionItem>
-          </DetailCollectionFlushItemStackItem>
-        ))}
-      </DetailCollectionFlushItemStack>
+      <DetailNavFlushStack
+        navPrefix={navPrefix}
+        items={items}
+        getLabel={(item) => item.name}
+        renderItem={(item) => <ActionItemBody item={item} />}
+      />
     </ContentDetailSection>
   )
 }
@@ -102,33 +93,37 @@ function AbilitiesSection({ viewModel }: { viewModel: MonsterDetailViewModel }) 
       headingId={MONSTER_DETAIL_SECTION_IDS.abilities}
       bodyLayout="flush"
     >
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[20rem] text-left text-style-body">
-          <thead>
-            <tr className="text-muted-foreground">
-              <th className="pb-2 pr-4 font-medium">Ability</th>
-              <th className="pb-2 pr-4 font-medium">Score</th>
-              <th className="pb-2 pr-4 font-medium">Mod</th>
-              <th className="pb-2 font-medium">Save</th>
-            </tr>
-          </thead>
-          <tbody>
-            {viewModel.abilities.map((row) => (
-              <tr key={row.ability}>
-                <td className="py-1 pr-4 font-medium">{formatMonsterAbilityHeader(row.ability)}</td>
-                <td className="py-1 pr-4 tabular-nums">{row.score}</td>
-                <td className="py-1 pr-4 tabular-nums">{row.modifierLabel}</td>
-                <td className="py-1 tabular-nums">
-                  {row.saveProficient ? (
-                    <span className="font-medium">{row.saveLabel}</span>
-                  ) : (
-                    row.saveLabel
-                  )}
-                </td>
+      <div className={contentDetailSectionFlushVerticalInsetClasses}>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[20rem] text-left text-style-body">
+            <thead>
+              <tr className="text-muted-foreground">
+                <th className="pb-2 pr-4 font-medium">Ability</th>
+                <th className="pb-2 pr-4 font-medium">Score</th>
+                <th className="pb-2 pr-4 font-medium">Mod</th>
+                <th className="pb-2 font-medium">Save</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {viewModel.abilities.map((row) => (
+                <tr key={row.ability}>
+                  <td className="py-1 pr-4 font-medium">
+                    {formatMonsterAbilityHeader(row.ability)}
+                  </td>
+                  <td className="py-1 pr-4 tabular-nums">{row.score}</td>
+                  <td className="py-1 pr-4 tabular-nums">{row.modifierLabel}</td>
+                  <td className="py-1 tabular-nums">
+                    {row.saveProficient ? (
+                      <span className="font-medium">{row.saveLabel}</span>
+                    ) : (
+                      row.saveLabel
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </ContentDetailSection>
   )
@@ -139,32 +134,16 @@ function DetailsSection({ viewModel }: { viewModel: MonsterDetailViewModel }) {
     return null
   }
 
+  const statRows =
+    viewModel.catalogState === 'ready' ? buildDetailsStatRows(viewModel.detailsLeaves) : []
+
   return (
-    <ContentDetailSection
-      heading="Details"
-      headingId={MONSTER_DETAIL_SECTION_IDS.details}
-      bodyLayout="flush"
-    >
+    <ContentDetailSection heading="Details" headingId={MONSTER_DETAIL_SECTION_IDS.details}>
       {viewModel.catalogState === 'pending' ? (
         <Spinner />
-      ) : (
-        <DetailCollectionFlushItemStack>
-          {viewModel.detailsLeaves.map((leaf) => (
-            <DetailCollectionFlushItemStackItem key={leaf.id}>
-              <ContentDetailSectionItem
-                id={
-                  MONSTER_DETAIL_DETAILS_LEAF_IDS[
-                    leaf.id as keyof typeof MONSTER_DETAIL_DETAILS_LEAF_IDS
-                  ] ?? `monster-details-${leaf.id}`
-                }
-                label={leaf.label}
-              >
-                <Text variant="muted">{leaf.body}</Text>
-              </ContentDetailSectionItem>
-            </DetailCollectionFlushItemStackItem>
-          ))}
-        </DetailCollectionFlushItemStack>
-      )}
+      ) : statRows.length > 0 ? (
+        <ContentStatList rows={statRows} />
+      ) : null}
     </ContentDetailSection>
   )
 }
@@ -180,6 +159,7 @@ export function MonsterDetailBody({
   viewModel,
   descriptionHtml,
   usageSection,
+  pageShell,
 }: MonsterDetailBodyProps) {
   const statRows =
     viewModel.catalogState === 'pending'
@@ -209,6 +189,7 @@ export function MonsterDetailBody({
       }
       heroDescription={Boolean(descriptionHtml)}
       descriptionHtml={descriptionHtml}
+      pageShell={pageShell}
     >
       {viewModel.traits.length > 0 ? (
         <ContentDetailSection
@@ -216,18 +197,14 @@ export function MonsterDetailBody({
           headingId={MONSTER_DETAIL_SECTION_IDS.traits}
           bodyLayout="flush"
         >
-          <DetailCollectionFlushItemStack>
-            {viewModel.traits.map((trait) => (
-              <DetailCollectionFlushItemStackItem key={trait.id}>
-                <ContentDetailSectionItem
-                  id={contentDetailNavItemId('trait', trait.id)}
-                  label={trait.name}
-                >
-                  <RichTextContent html={trait.descriptionHtml} size="md" tone="muted" />
-                </ContentDetailSectionItem>
-              </DetailCollectionFlushItemStackItem>
-            ))}
-          </DetailCollectionFlushItemStack>
+          <DetailNavFlushStack
+            navPrefix="trait"
+            items={viewModel.traits}
+            getLabel={(trait) => trait.name}
+            renderItem={(trait) => (
+              <RichTextContent html={trait.descriptionHtml} {...contentDetailProseProps} />
+            )}
+          />
         </ContentDetailSection>
       ) : null}
 

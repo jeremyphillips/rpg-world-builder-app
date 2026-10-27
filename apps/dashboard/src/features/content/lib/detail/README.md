@@ -146,7 +146,17 @@ records or entities (optionally divided into semantic groups).
 Use [`ContentDetailSection`](page/content-detail-section.tsx) on **catalog detail**
 routes for headed body regions (prose, lists, tables, relationship rosters). It
 defaults to subtle header + faint body and registers with the layout scroll-spy nav.
-Array items use `ContentDetailSectionItem` for nested nav leaves.
+
+**Composition path:** one section shell + one content primitive (`ContentStatList`,
+`RichTextContent` with [`contentDetailProseProps`](page/content-detail-prose.ts),
+domain tables, badge lists, …). Navigable flush item stacks share
+[`DetailNavFlushStack`](collection/item-stack/detail-nav-flush-stack.tsx) — not a
+section wrapper; the parent owns heading, empty hide, and loading.
+
+- Array item headings: `ContentDetailSectionItem` (`Heading variant="group"`, `as="h3"`).
+- Detail HTML size: spread `contentDetailProseProps` (`size: 'sm'` only); tone per consumer.
+- Class proficiencies: [`ClassProficienciesSection`](../../classes/components/detail/class-proficiencies-section.tsx) owns the sole proficiencies `ContentDetailSection`; body uses `ContentStatList`.
+- Monster **Details** metadata: `ContentStatList` inside the Details section — not scroll-spy leaves. Legacy hash ids (`MONSTER_DETAIL_DETAILS_LEAF_IDS`) stay on metadata row `dd` elements for deep links.
 
 **Do not use `DetailCollectionPanel` directly for:** prose blocks, stat/metadata rows,
 forms, metric grids, single-value fields, arbitrary card layouts — prefer

@@ -31,6 +31,7 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | `Heading` `alert`                 | Radix  | 16      | 600                  | Inline `Alert` titles                                                                  |
 | `Heading` `label`                 | `p`    | 16      | 500                  | Inline non-outline titles (trait names)                                                |
 | `Text` `body`                     | `p`    | 16      | 400                  | Default foreground copy                                                                |
+| `Text` `body-compact`             | `p`    | 14      | 400                  | Primary foreground plain copy at detail density (mechanical lines, non-HTML prose)     |
 | `Text` `supporting`               | `p`    | 14      | 400                  | Secondary explanatory copy (preferred over `muted` + `text-sm`)                        |
 | `Text` `caption`                  | `p`    | 12      | 400                  | Small supplemental metadata                                                            |
 | `Text` `micro`                    | `span` | 10      | 400                  | Fine metadata owner — pair with `SemanticText` for toned inline status (PreviewRail)   |
@@ -80,12 +81,12 @@ A text role defines the intended typography for a communication purpose, includi
 whichever of size, line height, weight, and default color are appropriate. Not every
 variant sets every property (`muted` is color-only; `label` inherits color).
 
-| Category              | Variants                                                  | Policy                                  |
-| --------------------- | --------------------------------------------------------- | --------------------------------------- |
-| Primary content roles | `body`, `supporting`, `caption`, `micro`, `label`, `lead` | Preferred for new copy                  |
-| Contextual roles      | `option`                                                  | Choice-row contexts                     |
-| Existing treatments   | `muted`, `emphasis`                                       | Legacy — do not expand without an audit |
-| Semantic state        | `info`, `success`, `warning`, `destructive`               | Status-colored copy at 15px             |
+| Category              | Variants                                                                  | Policy                                  |
+| --------------------- | ------------------------------------------------------------------------- | --------------------------------------- |
+| Primary content roles | `body`, `body-compact`, `supporting`, `caption`, `micro`, `label`, `lead` | Preferred for new copy                  |
+| Contextual roles      | `option`                                                                  | Choice-row contexts                     |
+| Existing treatments   | `muted`, `emphasis`                                                       | Legacy — do not expand without an audit |
+| Semantic state        | `info`, `success`, `warning`, `destructive`                               | Status-colored copy at 15px             |
 
 Do not hand-roll stacks that duplicate a role (`text-sm text-muted-foreground` →
 `supporting` or `text-style-supporting`). Do not invent combination names
@@ -112,7 +113,8 @@ composite names.
 import { Link, RichTextContent, Text } from '@rpg/ui'
 
 <Text variant="supporting">Secondary detail under a section title.</Text>
-<RichTextContent html={species.description} size="md" tone="muted" />
+<Text variant="body-compact">+5 to hit, reach 5 ft., one target.</Text>
+<RichTextContent html={species.description} size="sm" />
 <Text variant="destructive" role="alert">
   Could not load species.
 </Text>

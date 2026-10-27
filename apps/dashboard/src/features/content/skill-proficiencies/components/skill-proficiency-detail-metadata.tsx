@@ -1,7 +1,6 @@
 import { Heading, Text } from '@rpg/ui'
 
 import { ContentStatRow, type ContentStatRowSize } from '../../lib/detail/metadata/content-stat-row'
-import { pickerDisclosureDescriptionTextClasses } from '../../lib/detail/metadata/picker-disclosure-description'
 import { type SkillProficiencyDetailViewModel } from '../lib/skill-proficiency-display'
 
 export type SkillProficiencyDetailMetadataProps = {
@@ -22,9 +21,7 @@ export function SkillProficiencyDetailMetadata({
       />
 
       {viewModel.summarySentence ? (
-        <Text variant="muted" className={pickerDisclosureDescriptionTextClasses}>
-          {viewModel.summarySentence}
-        </Text>
+        <Text variant="supporting">{viewModel.summarySentence}</Text>
       ) : null}
 
       {viewModel.examples.length > 0 ? (
@@ -35,7 +32,7 @@ export function SkillProficiencyDetailMetadata({
           <ul className="list-disc space-y-1 pl-5" role="list">
             {viewModel.examples.map((example) => (
               <li key={example}>
-                <Text variant="muted">{example}</Text>
+                <Text variant="supporting">{example}</Text>
               </li>
             ))}
           </ul>

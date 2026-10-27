@@ -92,7 +92,7 @@ export function ContentDetailSectionItem({
   return (
     <div className={className ?? contentDetailSectionItemStackClasses}>
       <Heading
-        variant="subsection"
+        variant="group"
         as="h3"
         id={id}
         className={contentDetailSectionPanelContentHeadingClasses}

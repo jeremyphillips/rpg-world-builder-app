@@ -873,6 +873,13 @@
   --icon-inline: var(--icon-glyph-sm);
 }
 
+@utility text-style-body-compact {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  color: var(--foreground);
+  --icon-inline: var(--icon-glyph-sm);
+}
+
 @utility text-style-label {
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);

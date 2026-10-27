@@ -6,6 +6,7 @@ import { RichTextWithTables } from '../../components/rich-text/rich-text-with-ta
 
 import { ROUTES } from '@/app/routes'
 import { useClasses } from '../../classes/hooks/use-classes'
+import { contentDetailProseProps } from '../../lib/detail/page/content-detail-prose'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
 import type { ContentDetailHeroMediaPresentation } from '../../lib/detail/page/content-detail-layout.types'
 import { contentDetailNavItemId } from '../../lib/detail/page/content-detail-nav-anchor-id'
@@ -40,7 +41,7 @@ function SpellClassesList({
   return (
     <ContentDetailSection heading={section.title} headingId={SPELL_CLASSES_HEADING_ID}>
       {isPending ? (
-        <Text variant="muted">Loading…</Text>
+        <Text variant="supporting">Loading…</Text>
       ) : (
         <ul className="flex flex-wrap gap-2" role="list">
           {section.items.map((item) => {
@@ -122,7 +123,7 @@ function SpellProseSection({
 
   return (
     <ContentDetailSection heading={title} headingId={headingId}>
-      <RichTextContent html={bodyHtml} size="md" tone="muted" />
+      <RichTextContent html={bodyHtml} {...contentDetailProseProps} />
     </ContentDetailSection>
   )
 }
@@ -216,11 +217,10 @@ export function SpellDetailBody({
             <RichTextWithTables
               html={viewModel.descriptionHtml}
               tables={viewModel.descriptionTables}
-              size="md"
-              tone="muted"
+              {...contentDetailProseProps}
             />
           ) : (
-            <RichTextContent html={viewModel.descriptionHtml} size="md" tone="muted" />
+            <RichTextContent html={viewModel.descriptionHtml} {...contentDetailProseProps} />
           )
         ) : undefined
       }
