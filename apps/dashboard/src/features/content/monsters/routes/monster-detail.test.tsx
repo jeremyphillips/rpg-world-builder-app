@@ -85,6 +85,146 @@ describe('MonsterDetailContent authoring', () => {
       `/campaigns/camp_1/monsters/${monster.id}/edit`,
     )
     expect(screen.getByText(/Pack Tactics/)).toBeInTheDocument()
+    expect(screen.getByText('Initiative')).toBeInTheDocument()
+  })
+
+  it('shows one notice for catalogs that never loaded and keeps the other stats blank', () => {
+    useEquipmentMock.mockReturnValue({
+      data: [pickEquipment('dagger')],
+      isPending: false,
+      isError: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: true,
+    } as ReturnType<typeof useEquipment>)
+    useSkillProficienciesMock.mockReturnValue({
+      data: undefined,
+      isPending: false,
+      isError: true,
+      isLoadingError: true,
+      isRefetchError: false,
+      isSuccess: false,
+    } as ReturnType<typeof useSkillProficiencies>)
+
+    render(
+      <MemoryRouter>
+        <MonsterDetailContent
+          monster={pickMonster('kobold-warrior')}
+          campaignId="camp_1"
+          monsterId="kobold"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not load skill proficiencies.')
+    expect(
+      screen.queryByText('Some mechanical details could not be resolved from campaign catalogs.'),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Initiative')).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Abilities' })).not.toBeInTheDocument()
+  })
+
+  it('names every catalog whose initial load failed', () => {
+    useEquipmentMock.mockReturnValue({
+      data: undefined,
+      isPending: false,
+      isError: true,
+      isLoadingError: true,
+      isRefetchError: false,
+      isSuccess: false,
+    } as ReturnType<typeof useEquipment>)
+    useSkillProficienciesMock.mockReturnValue({
+      data: undefined,
+      isPending: false,
+      isError: true,
+      isLoadingError: true,
+      isRefetchError: false,
+      isSuccess: false,
+    } as ReturnType<typeof useSkillProficiencies>)
+
+    render(
+      <MemoryRouter>
+        <MonsterDetailContent
+          monster={pickMonster('kobold-warrior')}
+          campaignId="camp_1"
+          monsterId="kobold"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Could not load equipment or skill proficiencies.',
+    )
+  })
+
+  it('keeps derived content when a catalog refetch fails', () => {
+    useEquipmentMock.mockReturnValue({
+      data: [pickEquipment('dagger')],
+      isPending: false,
+      isError: true,
+      isLoadingError: false,
+      isRefetchError: true,
+      isSuccess: false,
+      isFetching: false,
+    } as ReturnType<typeof useEquipment>)
+    useSkillProficienciesMock.mockReturnValue({
+      data: [pickSkillProficiency('perception')],
+      isPending: false,
+      isError: true,
+      isLoadingError: false,
+      isRefetchError: true,
+      isSuccess: false,
+      isFetching: false,
+    } as ReturnType<typeof useSkillProficiencies>)
+
+    render(
+      <MemoryRouter>
+        <MonsterDetailContent
+          monster={pickMonster('kobold-warrior')}
+          campaignId="camp_1"
+          monsterId="kobold"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Initiative')).toBeInTheDocument()
+    expect(screen.getByText(/Pack Tactics/)).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Some mechanical details could not be resolved from campaign catalogs.'),
+    ).not.toBeInTheDocument()
+  })
+
+  it('does not mount the pending notice while a loaded catalog refetches', () => {
+    useEquipmentMock.mockReturnValue({
+      data: [pickEquipment('dagger')],
+      isPending: false,
+      isFetching: true,
+      isError: false,
+      isLoadingError: false,
+      isSuccess: true,
+    } as ReturnType<typeof useEquipment>)
+    useSkillProficienciesMock.mockReturnValue({
+      data: [pickSkillProficiency('perception')],
+      isPending: false,
+      isFetching: true,
+      isError: false,
+      isLoadingError: false,
+      isSuccess: true,
+    } as ReturnType<typeof useSkillProficiencies>)
+
+    render(
+      <MemoryRouter>
+        <MonsterDetailContent
+          monster={pickMonster('kobold-warrior')}
+          campaignId="camp_1"
+          monsterId="kobold"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Initiative')).toBeInTheDocument()
+    expect(screen.queryByText('Loading…')).not.toBeInTheDocument()
   })
 })
 

@@ -14,15 +14,13 @@ import type {
   OrganizationLocationConnectionMutationContext,
 } from '../../lib/location-connections/organization-location-connection-mutation-context'
 import { OrganizationLocationConnectionListRow } from './organization-location-connection-list-row'
+import { ContentDetailQueryStatus } from '../../../lib/detail/page/content-detail-query-status'
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
 import {
   relationshipGroupUsesRootFamilyAdd,
   resolveOrganizationLocationConnectionFamilyPresentation,
 } from '../../../lib/relationship/list/relationship-group-presentation'
-
-export const ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR =
-  'Could not load organization location connections.'
 
 export type OrganizationLocationConnectionsSectionProps = {
   locationConnections: OrganizationLocationConnectionsViewModel
@@ -31,8 +29,7 @@ export type OrganizationLocationConnectionsSectionProps = {
   canManage?: boolean
   showEmptySection?: boolean
   isPending?: boolean
-  isError?: boolean
-  errorText?: string
+  isLoadingError?: boolean
   mutationError?: string | null
   isMutationPending?: boolean
   pendingConnectionId?: string
@@ -50,8 +47,7 @@ export function OrganizationLocationConnectionsSection({
   canManage = false,
   showEmptySection = true,
   isPending = false,
-  isError = false,
-  errorText = ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
+  isLoadingError = false,
   mutationError = null,
   isMutationPending = false,
   pendingConnectionId,
@@ -81,7 +77,7 @@ export function OrganizationLocationConnectionsSection({
     return ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER.filter((family) => familySet.has(family))
   }, [canManage, populatedFamilies, visibleFamilies])
 
-  if (!showEmptySection && total === 0) {
+  if (!showEmptySection && total === 0 && !isPending && !isLoadingError) {
     return null
   }
 
@@ -94,12 +90,12 @@ export function OrganizationLocationConnectionsSection({
       ) : null}
 
       {isPending ? (
-        <Text variant="muted">Loading…</Text>
-      ) : isError ? (
-        <Text variant="muted">{errorText}</Text>
+        <ContentDetailQueryStatus status="pending" />
+      ) : isLoadingError ? (
+        <ContentDetailQueryStatus status="error" subject="location-connections" />
       ) : familiesToRender.length === 0 ? (
         canManage ? (
-          <Text variant="muted">{emptyText}</Text>
+          <Text variant="supporting">{emptyText}</Text>
         ) : null
       ) : (
         <div className="space-y-4">

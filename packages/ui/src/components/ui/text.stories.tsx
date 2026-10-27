@@ -32,6 +32,13 @@ export const Supporting: Story = {
   },
 }
 
+export const BodyCompact: Story = {
+  args: {
+    variant: 'body-compact',
+    children: 'Primary mechanical line at detail density (14px foreground).',
+  },
+}
+
 export const Caption: Story = {
   args: {
     variant: 'caption',

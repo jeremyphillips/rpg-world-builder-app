@@ -13,15 +13,22 @@ export type SelectionOptionCardCopyWidth = 'fill' | 'content'
 
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
-export type SelectionOptionCardDensity = 'comfortable' | 'compact'
+export type SelectionOptionCardDensity = 'compact' | 'comfortable' | 'spacious'
 
 const OPTION_CARD_SUPPORTING_CLASS = 'ui-copy-supporting text-muted-foreground'
 
-/** Default card eyebrow is `sm`; compact density steps down one size. */
+/** Compact and comfortable use `xs`; spacious uses `sm`. */
 export function resolveSelectionOptionCardEyebrowSize(
   density: SelectionOptionCardDensity,
 ): NonNullable<EyebrowVariantProps['size']> {
-  return density === 'compact' ? 'xs' : 'sm'
+  return density === 'spacious' ? 'sm' : 'xs'
+}
+
+/** Inline header actions follow the same size ladder as {@link resolveSelectionOptionCardEyebrowSize}. */
+export function resolveSelectionOptionCardHeaderActionSize(
+  density: SelectionOptionCardDensity,
+): 'xs' | 'sm' {
+  return density === 'spacious' ? 'sm' : 'xs'
 }
 
 export type SelectionOptionCardHeaderEyebrowProps = {

@@ -89,7 +89,7 @@ function toMetadataListItem(
   ) : null
 
   return {
-    id: row.id ?? row.label,
+    id: row.id,
     label: (
       <>
         {row.label}

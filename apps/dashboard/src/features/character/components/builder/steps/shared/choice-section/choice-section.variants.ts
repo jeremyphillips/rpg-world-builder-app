@@ -19,8 +19,6 @@ export const choiceSectionSubheadClasses = 'text-style-supporting'
 
 export const choiceSectionIdentityLineClasses = 'text-foreground'
 
-export const choiceSectionSourceLineClasses = 'text-sm text-foreground'
-
 export const choiceSectionHeaderDetailsClasses = 'col-span-2 row-start-2 min-w-0 space-y-1'
 
 export const choiceSectionDividerClasses = 'border-t border-border'

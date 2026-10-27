@@ -189,6 +189,25 @@ describe('PreviewRail', () => {
     expect(screen.getByText('Hit die')).toBeInTheDocument()
   })
 
+  it('does not turn repeated fact labels into document ids', () => {
+    const facts = [{ label: 'Hit die', value: 'd8' }]
+    const { container } = render(
+      <>
+        <PreviewRail>
+          <PreviewRail.Identity name="Fighter" facts={facts} />
+        </PreviewRail>
+        <PreviewRail>
+          <PreviewRail.Identity name="Rogue" facts={[{ label: 'Hit die', value: 'd8' }]} />
+        </PreviewRail>
+      </>,
+    )
+
+    expect(screen.getAllByText('Hit die')).toHaveLength(2)
+    expect(container.querySelector('[id="Hit die"]')).toBeNull()
+    const ids = [...container.querySelectorAll('[id]')].map((element) => element.id)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
   it('applies layout fill inside a bounded flex column aside slot', () => {
     render(
       <div className="flex h-64 flex-col overflow-hidden">

@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../../lib/organization-display'
-import { ORGANIZATION_MEMBERS_LOAD_ERROR } from '../../lib/members/organization-members.constants'
 import { ORGANIZATION_MEMBER_ROWS } from './organization-members-section.fixtures'
 import { OrganizationMembersSection } from './organization-members-section'
 
@@ -39,7 +38,7 @@ export const Loading: Story = {
 }
 
 export const Error: Story = {
-  args: { rows: [], isError: true, errorText: ORGANIZATION_MEMBERS_LOAD_ERROR },
+  args: { rows: [], isLoadingError: true },
 }
 
 export const MutationError: Story = {

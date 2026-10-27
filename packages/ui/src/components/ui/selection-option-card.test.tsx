@@ -111,7 +111,7 @@ describe('SelectionOptionCard', () => {
     expect(screen.getByText('Gold: 10 gp')).toBeInTheDocument()
   })
 
-  it('renders comfortable-density header actions at sm compact control size', () => {
+  it('renders comfortable-density header actions at xs control-action typography', () => {
     render(
       <SelectionOptionCard
         selected
@@ -124,10 +124,31 @@ describe('SelectionOptionCard', () => {
 
     const action = screen.getByRole('button', { name: 'Change package' })
     expect(action.className).toContain('shrink-0')
+    expect(action.className).toContain('ui-button__text--xs')
+    expect(action.className).toContain('text-control-action-xs')
+    expect(action.className).not.toContain('ui-button__text--sm')
+  })
+
+  it('renders spacious-density header actions at sm control size', () => {
+    render(
+      <SelectionOptionCard
+        selected
+        density="spacious"
+        headerEndSlot={
+          <SelectionOptionCardHeaderAction
+            label="Change package"
+            density="spacious"
+            onClick={() => undefined}
+          />
+        }
+        label="Selected package"
+      />,
+    )
+
+    const action = screen.getByRole('button', { name: 'Change package' })
     expect(action.className).toContain('ui-button__text--sm')
     expect(action.className).toContain('text-action-standalone')
     expect(action.className).not.toContain('text-control-action-xs')
-    expect(action.className).not.toContain('h-auto')
   })
 
   it('renders compact-density header actions at xs control-action typography', () => {
@@ -180,6 +201,7 @@ describe('SelectionOptionCard', () => {
       <SelectionOptionCard
         selected
         density="comfortable"
+        headerEyebrow="Selected package"
         label="Equipment package A"
         description="Includes shield and sword."
       />,
@@ -191,6 +213,22 @@ describe('SelectionOptionCard', () => {
     expect(resolvedCustomPx(comfortableDescription, '--ui-copy-supporting-size', '14px')).toBe(
       '14px',
     )
+    expect(screen.getByText('Selected package').className).toContain('eyebrow-style-xs')
+
+    rerender(
+      <SelectionOptionCard
+        selected
+        density="spacious"
+        headerEyebrow="Selected package"
+        label="Equipment package A"
+        description="Includes shield and sword."
+      />,
+    )
+
+    expect(screen.getByText('Selected package').className).toContain('eyebrow-style-sm')
+    expect(
+      screen.getByRole('heading', { name: 'Equipment package A' }).closest('.ui-card'),
+    ).toHaveClass('ui-card--spacious')
   })
 
   it('keeps embedded panel titles on the compact copy step inside a comfortable card', () => {

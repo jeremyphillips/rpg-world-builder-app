@@ -277,12 +277,12 @@ function mapActionItems(
   catalogState: MonsterCatalogLoadState,
 ): MonsterActionItemViewModel[] {
   return actions.map((action) => {
+    const attack = findAttackLine(derived, section, action.id)
+
     const name =
-      action.kind === 'special'
+      action.kind === 'special' || action.kind === 'natural-weapon'
         ? action.name
-        : action.kind === 'natural-weapon'
-          ? action.name
-          : (action.name ?? action.id)
+        : (action.name ?? attack?.name ?? action.id)
 
     if (action.kind === 'special') {
       return {
@@ -292,7 +292,6 @@ function mapActionItems(
       }
     }
 
-    const attack = findAttackLine(derived, section, action.id)
     let attackLine: string | undefined
     if (catalogState === 'ready' && attack) {
       attackLine = formatAttackLine(attack)

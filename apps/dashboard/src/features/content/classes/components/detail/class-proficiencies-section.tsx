@@ -1,9 +1,13 @@
+import type { ReactNode } from 'react'
 import { Heading, Text } from '@rpg/ui'
 import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { LinkBadge, StaticBadge } from '@/lib/link-badge'
 
+import { ContentStatList } from '../../../lib/detail/metadata/content-stat-row'
+import type { ContentStatRowData } from '../../../lib/detail/metadata/content-stat-rows'
+import { ContentDetailQueryStatus } from '../../../lib/detail/page/content-detail-query-status'
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import { contentDetailSectionPanelContentHeadingClasses } from '../../../lib/detail/page/content-detail-section.variants'
 import {
@@ -20,39 +24,18 @@ type ClassProficienciesSectionProps = {
   campaignId: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
+  skillsLoadingError?: boolean
   vocabulary: ClassDisplayVocabulary
 }
 
-function GrantedProficienciesGroup({
-  granted,
-}: {
-  granted: ClassProficienciesViewModel['granted']
-}) {
-  if (granted.length === 0) return null
-
-  return (
-    <div className="space-y-3">
-      <Heading
-        variant="subsection"
-        as="h3"
-        className={contentDetailSectionPanelContentHeadingClasses}
-      >
-        {CLASS_PROFICIENCY_GROUP_LABELS.granted}
-      </Heading>
-      <dl className="space-y-3">
-        {granted.map((row) => (
-          <div key={row.id} className="space-y-1">
-            <Heading variant="label" as="dt">
-              {row.label}
-            </Heading>
-            <Text variant="muted" as="dd">
-              {row.value}
-            </Text>
-          </div>
-        ))}
-      </dl>
-    </div>
-  )
+function grantedProficiencyRows(
+  granted: ClassProficienciesViewModel['granted'],
+): ContentStatRowData[] {
+  return granted.map((row) => ({
+    id: row.id,
+    label: row.label,
+    value: row.value,
+  }))
 }
 
 function SkillChoiceLinks({
@@ -60,14 +43,20 @@ function SkillChoiceLinks({
   optionSlugs,
   skillProficiencies,
   isPending,
+  isLoadingError,
 }: {
   campaignId: string
   optionSlugs: string[]
-  skillProficiencies: SkillProficiency[]
+  skillProficiencies: readonly SkillProficiency[]
   isPending: boolean
+  isLoadingError: boolean
 }) {
+  if (isLoadingError) {
+    return <ContentDetailQueryStatus status="error" subject="skill-proficiencies" />
+  }
+
   if (isPending) {
-    return <Text variant="muted">Loading…</Text>
+    return <ContentDetailQueryStatus status="pending" />
   }
 
   const skillsBySlug = new Map(skillProficiencies.map((skill) => [skill.slug, skill]))
@@ -101,66 +90,80 @@ function ToolChoiceLabels({
   vocabulary: ClassDisplayVocabulary
 }) {
   return (
-    <Text variant="muted" as="span">
+    <Text variant="supporting" as="span">
       {optionSlugs.map((slug) => vocabulary.resolveToolLabel(slug)).join(', ')}
     </Text>
   )
 }
 
-function ProficiencyChoiceRow({
-  row,
-  campaignId,
-  skillProficiencies,
-  skillsPending,
-  vocabulary,
-}: {
-  row: ClassProficienciesViewModel['choices'][number]
-  campaignId: string
-  skillProficiencies: SkillProficiency[]
-  skillsPending: boolean
-  vocabulary: ClassDisplayVocabulary
-}) {
+function proficiencyChoiceRowData(
+  row: ClassProficienciesViewModel['choices'][number],
+  campaignId: string,
+  skillProficiencies: SkillProficiency[],
+  skillsPending: boolean,
+  skillsLoadingError: boolean,
+  vocabulary: ClassDisplayVocabulary,
+): ContentStatRowData {
   const isEmpty = row.optionSlugs.length === 0
 
+  let valueContent: ReactNode
+  if (isEmpty) {
+    valueContent =
+      row.compactSummary !== CLASS_DISPLAY_NONE ? row.compactSummary : CLASS_DISPLAY_NONE
+  } else if (row.id === 'skills') {
+    valueContent = (
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+        <Text variant="supporting" as="span">
+          {row.choicePrefix}
+        </Text>
+        <SkillChoiceLinks
+          campaignId={campaignId}
+          optionSlugs={row.optionSlugs}
+          skillProficiencies={skillProficiencies}
+          isPending={skillsPending}
+          isLoadingError={skillsLoadingError}
+        />
+      </div>
+    )
+  } else if (row.id === 'tools' && row.optionSlugs.length > 0) {
+    valueContent = (
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+        <Text variant="supporting" as="span">
+          {row.choicePrefix}
+        </Text>
+        <ToolChoiceLabels optionSlugs={row.optionSlugs} vocabulary={vocabulary} />
+      </div>
+    )
+  } else {
+    valueContent = row.compactSummary
+  }
+
+  return {
+    id: row.id,
+    label: row.label,
+    value: row.compactSummary,
+    valueContent,
+  }
+}
+
+function GrantedProficienciesGroup({
+  granted,
+}: {
+  granted: ClassProficienciesViewModel['granted']
+}) {
+  const rows = grantedProficiencyRows(granted)
+  if (rows.length === 0) return null
+
   return (
-    <div className="space-y-1">
-      <Heading variant="label" as="dt">
-        {row.label}
+    <div className="space-y-3">
+      <Heading
+        variant="subsection"
+        as="h3"
+        className={contentDetailSectionPanelContentHeadingClasses}
+      >
+        {CLASS_PROFICIENCY_GROUP_LABELS.granted}
       </Heading>
-      <dd className="space-y-2">
-        {isEmpty ? (
-          row.compactSummary !== CLASS_DISPLAY_NONE ? (
-            <Text variant="muted">{row.compactSummary}</Text>
-          ) : (
-            <Text variant="muted">{CLASS_DISPLAY_NONE}</Text>
-          )
-        ) : row.id === 'skills' ? (
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-            <Text variant="muted" as="span">
-              {row.choicePrefix}
-            </Text>
-            <SkillChoiceLinks
-              campaignId={campaignId}
-              optionSlugs={row.optionSlugs}
-              skillProficiencies={skillProficiencies}
-              isPending={skillsPending}
-            />
-          </div>
-        ) : row.id === 'tools' ? (
-          row.optionSlugs.length > 0 ? (
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-              <Text variant="muted" as="span">
-                {row.choicePrefix}
-              </Text>
-              <ToolChoiceLabels optionSlugs={row.optionSlugs} vocabulary={vocabulary} />
-            </div>
-          ) : (
-            <Text variant="muted">{row.compactSummary}</Text>
-          )
-        ) : (
-          <Text variant="muted">{row.compactSummary}</Text>
-        )}
-      </dd>
+      <ContentStatList rows={rows} />
     </div>
   )
 }
@@ -170,15 +173,28 @@ function ProficiencyChoicesGroup({
   campaignId,
   skillProficiencies,
   skillsPending,
+  skillsLoadingError,
   vocabulary,
 }: {
   choices: ClassProficienciesViewModel['choices']
   campaignId: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
+  skillsLoadingError: boolean
   vocabulary: ClassDisplayVocabulary
 }) {
   if (choices.length === 0) return null
+
+  const rows = choices.map((row) =>
+    proficiencyChoiceRowData(
+      row,
+      campaignId,
+      skillProficiencies,
+      skillsPending,
+      skillsLoadingError,
+      vocabulary,
+    ),
+  )
 
   return (
     <div className="space-y-3">
@@ -189,18 +205,7 @@ function ProficiencyChoicesGroup({
       >
         {CLASS_PROFICIENCY_GROUP_LABELS.choices}
       </Heading>
-      <dl className="space-y-3">
-        {choices.map((row) => (
-          <ProficiencyChoiceRow
-            key={row.id}
-            row={row}
-            campaignId={campaignId}
-            skillProficiencies={skillProficiencies}
-            skillsPending={skillsPending}
-            vocabulary={vocabulary}
-          />
-        ))}
-      </dl>
+      <ContentStatList rows={rows} />
     </div>
   )
 }
@@ -210,6 +215,7 @@ export function ClassProficienciesSection({
   campaignId,
   skillProficiencies,
   skillsPending,
+  skillsLoadingError = false,
   vocabulary,
 }: ClassProficienciesSectionProps) {
   return (
@@ -221,6 +227,7 @@ export function ClassProficienciesSection({
           campaignId={campaignId}
           skillProficiencies={skillProficiencies}
           skillsPending={skillsPending}
+          skillsLoadingError={skillsLoadingError}
           vocabulary={vocabulary}
         />
       </div>

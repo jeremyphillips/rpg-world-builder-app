@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../../lib/organization-display'
-import { ORGANIZATION_MEMBERS_LOAD_ERROR } from '../../lib/members/organization-members.constants'
 import { ORGANIZATION_MEMBER_ROWS } from './organization-members-section.fixtures'
 import {
   OrganizationMembersSection,
@@ -116,19 +115,30 @@ describe('OrganizationMembersSection', () => {
     expect(screen.queryByText(/Showing \d+ of \d+ members\./)).not.toBeInTheDocument()
   })
 
-  it('renders loading and error copy in place of the roster', () => {
-    const { unmount } = renderSection({ isPending: true })
-    expect(screen.getByText('Loading…')).toBeInTheDocument()
+  it('renders loading and the initial error in place of the roster', () => {
+    const { unmount } = renderSection({ isPending: true, rows: [] })
+    expect(screen.getByRole('status')).toHaveTextContent('Loading…')
     expect(screen.queryByRole('link', { name: 'Circle Envoy' })).not.toBeInTheDocument()
+    expect(screen.queryByText(ORGANIZATION_EMPTY_SECTION_TEXT.members)).not.toBeInTheDocument()
     unmount()
 
-    renderSection({ isError: true })
-    expect(screen.getByText(ORGANIZATION_MEMBERS_LOAD_ERROR)).toBeInTheDocument()
+    renderSection({ isLoadingError: true, rows: [] })
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not load members.')
+    expect(screen.queryByText(ORGANIZATION_EMPTY_SECTION_TEXT.members)).not.toBeInTheDocument()
+  })
+
+  it('keeps the roster when a later refetch fails', () => {
+    renderSection({ rows: ORGANIZATION_MEMBER_ROWS })
+
+    expect(screen.getByRole('link', { name: 'Circle Envoy' })).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
   it('surfaces mutation errors above the roster', () => {
     renderSection({ canManage: true, mutationError: 'Nope.' })
     expect(screen.getByText('Nope.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Circle Envoy' })).toBeInTheDocument()
   })
 
   it('disables row actions while that member is pending', async () => {

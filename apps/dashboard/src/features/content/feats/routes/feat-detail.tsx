@@ -9,6 +9,7 @@ import {
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useFeats } from '../hooks/use-feats'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
+import { contentDetailProseProps } from '../../lib/detail/page/content-detail-prose'
 import { ContentDetailSection } from '../../lib/detail/page/content-detail-section'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
@@ -39,13 +40,13 @@ export function FeatDetailContent({ feat, campaignId }: FeatDetailContentProps) 
       heroDescription={false}
       descriptionContent={
         viewModel.description ? (
-          <RichTextContent html={viewModel.description} size="md" tone="muted" />
+          <RichTextContent html={viewModel.description} {...contentDetailProseProps} />
         ) : undefined
       }
     >
       {viewModel.repeatableNotes ? (
         <ContentDetailSection heading="Repeatable" headingId={FEAT_REPEATABLE_HEADING_ID}>
-          <RichTextContent html={viewModel.repeatableNotes} size="md" tone="muted" />
+          <RichTextContent html={viewModel.repeatableNotes} {...contentDetailProseProps} />
         </ContentDetailSection>
       ) : null}
       <ContentUsageReferencesSection campaignId={campaignId} routeKey="feats" entityId={feat.id} />

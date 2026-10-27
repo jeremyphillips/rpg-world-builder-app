@@ -23,8 +23,6 @@ export const choiceBlockRowHeadingGroupClasses =
 
 export const choiceBlockRowDetailsGridClasses = 'col-span-2 row-start-2 min-w-0 space-y-1'
 
-export const choiceBlockRowSourceLineClasses = 'text-sm text-foreground'
-
 export const choiceBlockRowPoolDescriptionClasses = choiceSubsectionHintMarginClasses
 
 export const choiceBlockRowOverSelectionClasses = 'text-sm text-destructive'

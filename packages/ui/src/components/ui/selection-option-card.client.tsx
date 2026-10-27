@@ -8,6 +8,7 @@ import { Button } from './button.client'
 import {
   SelectionOptionCardAnatomy,
   SelectionOptionCardHeaderEyebrow,
+  resolveSelectionOptionCardHeaderActionSize,
   type SelectionOptionCardDensity,
 } from './selection-option-card-anatomy.client'
 import type { EyebrowVariantProps } from './eyebrow.variants'
@@ -95,7 +96,7 @@ export type SelectionOptionCardHeaderActionProps = {
   label: string
   onClick: () => void
   ariaLabel?: string
-  /** Match the parent card density — compact cards use the xs control-action label size. */
+  /** Match the parent card density — compact/comfortable use xs; spacious uses sm. */
   density?: SelectionOptionCardDensity
 }
 
@@ -106,14 +107,14 @@ export function SelectionOptionCardHeaderAction({
   ariaLabel,
   density = 'comfortable',
 }: SelectionOptionCardHeaderActionProps) {
-  const buttonSize = density === 'compact' ? 'xs' : 'sm'
+  const buttonSize = resolveSelectionOptionCardHeaderActionSize(density)
 
   return (
     <Button
       type="button"
       variant="text"
       size={buttonSize}
-      className={cn('shrink-0', density === 'compact' && 'text-control-action-xs')}
+      className={cn('shrink-0', density !== 'spacious' && 'text-control-action-xs')}
       aria-label={ariaLabel}
       onClick={onClick}
     >

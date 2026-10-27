@@ -539,6 +539,7 @@ export {
   SelectionOptionCardHeaderEyebrow,
   SelectionOptionCardTitleMeta,
   resolveSelectionOptionCardEyebrowSize,
+  resolveSelectionOptionCardHeaderActionSize,
   type SelectionOptionCardHeaderEyebrowProps,
 } from './components/ui/selection-option-card-anatomy.client'
 export {

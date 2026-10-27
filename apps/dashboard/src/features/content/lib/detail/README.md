@@ -146,7 +146,17 @@ records or entities (optionally divided into semantic groups).
 Use [`ContentDetailSection`](page/content-detail-section.tsx) on **catalog detail**
 routes for headed body regions (prose, lists, tables, relationship rosters). It
 defaults to subtle header + faint body and registers with the layout scroll-spy nav.
-Array items use `ContentDetailSectionItem` for nested nav leaves.
+
+**Composition path:** one section shell + one content primitive (`ContentStatList`,
+`RichTextContent` with [`contentDetailProseProps`](page/content-detail-prose.ts),
+domain tables, badge lists, …). Navigable flush item stacks share
+[`DetailNavFlushStack`](collection/item-stack/detail-nav-flush-stack.tsx) — not a
+section wrapper; the parent owns heading, empty hide, and loading.
+
+- Array item headings: `ContentDetailSectionItem` (`Heading variant="group"`, `as="h3"`).
+- Detail HTML: spread `contentDetailProseProps` (`size: 'sm'`; default tone).
+- Class proficiencies: [`ClassProficienciesSection`](../../classes/components/detail/class-proficiencies-section.tsx) owns the sole proficiencies `ContentDetailSection`. Granted and choice groups are subheadings without anchors.
+- Monster **Details** metadata: `ContentStatList` inside the Details section. The section heading is the nav target. Metadata rows are not anchors.
 
 **Do not use `DetailCollectionPanel` directly for:** prose blocks, stat/metadata rows,
 forms, metric grids, single-value fields, arbitrary card layouts — prefer
@@ -159,6 +169,35 @@ forms, metric grids, single-value fields, arbitrary card layouts — prefer
 - No feature-local copy of Group/RowList layout anatomy
 - No moving `EntityAnatomy` ownership into `collection/`
 - No forcing EntityRowList surfaces through `DetailCollectionGroup` / `DetailCollectionRowList`
+
+## Secondary query status
+
+Secondary queries enrich an entity the page shell has already loaded.
+[`ContentDetailQueryStatus`](page/content-detail-query-status.tsx) owns the pending and
+initial-error sentences. The consumer owns the TanStack Query flags and which branch
+to render. [`ContentDetailSection`](page/content-detail-section.tsx) does not take query
+props. Domain content and empty copy stay in the section. API clients keep their own
+transport strings and do not import the display formatter.
+
+Branch on TanStack Query v5 flags at the call site:
+
+- **Initial pending** (`isPending`, no data): pending notice. Do not default `data` to `[]` first.
+- **Initial load error** (`isLoadingError`): error notice. Do not fall through to empty copy or static badges.
+- **Success with data:** domain content from that snapshot.
+- **Success with an empty snapshot:** the domain empty treatment, or omit the optional block.
+- **Unresolved reference:** a static badge or unresolved label only when a catalog snapshot exists and the id or slug is absent from it.
+- **Background refetch** (`isFetching` while data is already present): keep the snapshot. Do not mount the notice.
+- **Refetch failure** (`isRefetchError` with retained `data`, including a cached empty list): keep that snapshot. Do not mount the notice.
+
+`isError` stays true on a refetch failure. It is not the signal for the notice.
+
+Placements:
+
+- **Inline cell** — hero or stat `valueContent`. The notice renders as a span so it is not a paragraph inside the value span.
+- **Section body** — the notice replaces the list.
+- **Blocking block** — the section renders only the notice while the snapshot is missing (subclasses, connected parties).
+
+Subject keys: a `ContentTypeKey` uses `formatContentListLoadErrorMessage`. A nonempty tuple of those keys joins with "or" and includes only catalogs whose initial load failed. When that tuple would be empty, render no query-error notice. Non-catalog section queries use a closed map: `subclasses`, `members`, `location-connections`, `connected-parties`. There is no message override.
 
 ## Guards
 

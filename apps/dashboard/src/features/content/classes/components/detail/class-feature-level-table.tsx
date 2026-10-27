@@ -2,6 +2,7 @@ import { cn, Heading, RichTextContent, Table, TableBody, TableCell, TableRow } f
 import type { ContentTable } from '@rpg/contracts'
 
 import { ContentTableView } from '../../../components/tables/content-table-view'
+import { contentDetailProseProps } from '../../../lib/detail/page/content-detail-prose'
 import { contentDetailNavItemId } from '../../../lib/detail/page/content-detail-nav-anchor-id'
 import { contentDetailSectionPanelContentHeadingClasses } from '../../../lib/detail/page/content-detail-section.variants'
 import { useContentDetailSectionNavLeaf } from '../../../lib/detail/page/use-content-detail-section-nav-leaf'
@@ -65,7 +66,9 @@ function ClassFeatureLevelGroupRows({ group }: { group: LevelGroup }) {
             >
               {item.title}
             </Heading>
-            {item.bodyHtml ? <RichTextContent html={item.bodyHtml} size="md" tone="muted" /> : null}
+            {item.bodyHtml ? (
+              <RichTextContent html={item.bodyHtml} {...contentDetailProseProps} />
+            ) : null}
             {inlineTables.length > 0 ? (
               <div className="space-y-4">
                 {inlineTables.map((table: ContentTable) => (

@@ -6,6 +6,8 @@ import { RichTextWithTables } from '../../components/rich-text/rich-text-with-ta
 
 import { ROUTES } from '@/app/routes'
 import { useClasses } from '../../classes/hooks/use-classes'
+import { ContentDetailQueryStatus } from '../../lib/detail/page/content-detail-query-status'
+import { contentDetailProseProps } from '../../lib/detail/page/content-detail-prose'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
 import type { ContentDetailHeroMediaPresentation } from '../../lib/detail/page/content-detail-layout.types'
 import { contentDetailNavItemId } from '../../lib/detail/page/content-detail-nav-anchor-id'
@@ -34,13 +36,15 @@ function SpellClassesList({
   campaignId: string
   section: NonNullable<SpellDetailViewModel['classesSection']>
 }) {
-  const { data: classes = [], isPending } = useClasses(campaignId)
-  const classesBySlug = new Map(classes.map((cls) => [cls.slug, cls]))
+  const { data: classes, isPending, isLoadingError } = useClasses(campaignId)
+  const classesBySlug = new Map((classes ?? []).map((cls) => [cls.slug, cls]))
 
   return (
     <ContentDetailSection heading={section.title} headingId={SPELL_CLASSES_HEADING_ID}>
-      {isPending ? (
-        <Text variant="muted">Loading…</Text>
+      {isLoadingError ? (
+        <ContentDetailQueryStatus status="error" subject="classes" />
+      ) : isPending ? (
+        <ContentDetailQueryStatus status="pending" />
       ) : (
         <ul className="flex flex-wrap gap-2" role="list">
           {section.items.map((item) => {
@@ -98,7 +102,9 @@ function SpellResolutionSection({
             <ul className="list-inside list-disc space-y-1" role="list">
               {subsection.lines.map((line) => (
                 <li key={`${subsection.heading}-${line}`}>
-                  <Text as="span">{line}</Text>
+                  <Text as="span" variant="body-compact">
+                    {line}
+                  </Text>
                 </li>
               ))}
             </ul>
@@ -122,7 +128,7 @@ function SpellProseSection({
 
   return (
     <ContentDetailSection heading={title} headingId={headingId}>
-      <RichTextContent html={bodyHtml} size="md" tone="muted" />
+      <RichTextContent html={bodyHtml} {...contentDetailProseProps} />
     </ContentDetailSection>
   )
 }
@@ -216,11 +222,10 @@ export function SpellDetailBody({
             <RichTextWithTables
               html={viewModel.descriptionHtml}
               tables={viewModel.descriptionTables}
-              size="md"
-              tone="muted"
+              {...contentDetailProseProps}
             />
           ) : (
-            <RichTextContent html={viewModel.descriptionHtml} size="md" tone="muted" />
+            <RichTextContent html={viewModel.descriptionHtml} {...contentDetailProseProps} />
           )
         ) : undefined
       }

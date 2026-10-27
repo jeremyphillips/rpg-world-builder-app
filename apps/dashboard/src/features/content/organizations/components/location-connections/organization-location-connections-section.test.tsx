@@ -11,10 +11,7 @@ import {
 
 import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 
-import {
-  OrganizationLocationConnectionsSection,
-  ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
-} from './organization-location-connections-section'
+import { OrganizationLocationConnectionsSection } from './organization-location-connections-section'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../../lib/organization-display'
 import { buildOrganizationLocationConnectionCards } from '../../lib/location-connections/build-organization-location-connection-cards'
 import { buildLocationsById } from '../../../locations/lib/location-display'
@@ -144,7 +141,7 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(screen.queryByRole('button', { name: 'Add owned location' })).not.toBeInTheDocument()
   })
 
-  it('renders error states and hides section when showEmptySection is false', () => {
+  it('hides an empty section from a reader, including after a failed refetch of that empty snapshot', () => {
     const { rerender } = render(
       <MemoryRouter>
         <OrganizationLocationConnectionsSection
@@ -159,18 +156,87 @@ describe('OrganizationLocationConnectionsSection', () => {
     )
 
     expect(screen.queryByText('Royal Mint')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
 
     rerender(
       <MemoryRouter>
         <OrganizationLocationConnectionsSection
-          locationConnections={sampleLocationConnections}
-          isError
-          errorText={ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR}
+          locationConnections={{
+            previewItems: [],
+            total: 0,
+            emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
+          }}
+          showEmptySection={false}
+          isLoadingError={false}
+          isPending={false}
         />
       </MemoryRouter>,
     )
 
-    expect(screen.getByText(ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR)).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('shows initial pending and load error to a reader before any connections arrive', () => {
+    const emptyConnections = {
+      previewItems: [],
+      total: 0,
+      emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
+    }
+    const { rerender } = render(
+      <MemoryRouter>
+        <OrganizationLocationConnectionsSection
+          locationConnections={emptyConnections}
+          showEmptySection={false}
+          isPending
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent('Loading…')
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+
+    rerender(
+      <MemoryRouter>
+        <OrganizationLocationConnectionsSection
+          locationConnections={emptyConnections}
+          showEmptySection={false}
+          isLoadingError
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not load location connections.')
+    expect(screen.queryByText('Royal Mint')).not.toBeInTheDocument()
+  })
+
+  it('keeps connection rows when the load error flag is clear', () => {
+    render(
+      <MemoryRouter>
+        <OrganizationLocationConnectionsSection
+          locationConnections={sampleLocationConnections}
+          isLoadingError={false}
+          isPending={false}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Royal Mint')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  it('keeps a mutation error above a successful connection list', () => {
+    render(
+      <MemoryRouter>
+        <OrganizationLocationConnectionsSection
+          locationConnections={sampleLocationConnections}
+          mutationError="Could not update the connection."
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Could not update the connection.')).toBeInTheDocument()
+    expect(screen.getByText('Royal Mint')).toBeInTheDocument()
   })
 
   it('invokes family add and change-kind callbacks for managers when alternatives exist', async () => {

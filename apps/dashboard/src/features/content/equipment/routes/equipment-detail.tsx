@@ -12,6 +12,7 @@ import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
+import { contentDetailProseProps } from '../../lib/detail/page/content-detail-prose'
 import {
   getContentDisplayImage,
   resolveDashboardDetailDisplayFallback,
@@ -52,7 +53,7 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
       heroDescription={false}
       descriptionContent={
         viewModel.description ? (
-          <RichTextContent html={viewModel.description} size="md" tone="muted" />
+          <RichTextContent html={viewModel.description} {...contentDetailProseProps} />
         ) : undefined
       }
     >

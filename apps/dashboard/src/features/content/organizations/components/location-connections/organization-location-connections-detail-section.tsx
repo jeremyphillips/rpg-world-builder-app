@@ -1,10 +1,7 @@
 import type { Location, Organization } from '@rpg/contracts'
 
 import { OrganizationLocationConnectionLinkDrawer } from './organization-location-connection-link-drawer'
-import {
-  OrganizationLocationConnectionsSection,
-  ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
-} from './organization-location-connections-section'
+import { OrganizationLocationConnectionsSection } from './organization-location-connections-section'
 import { useOrganizationLocationConnectionsDetail } from '../../hooks/use-organization-location-connections-detail'
 
 // fallow-ignore-next-line complexity
@@ -26,8 +23,7 @@ export function OrganizationLocationConnectionsDetailSection({
         canManage={detail.canManage}
         showEmptySection={detail.canManage || detail.locationConnections.total > 0}
         isPending={detail.locationReferencesQuery.isPending}
-        isError={detail.locationReferencesQuery.isError}
-        errorText={ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR}
+        isLoadingError={detail.locationReferencesQuery.isLoadingError}
         mutationError={detail.mutationError}
         isMutationPending={detail.mutations.isPending}
         pendingConnectionId={detail.mutations.pendingConnectionId}

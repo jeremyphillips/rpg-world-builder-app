@@ -82,7 +82,8 @@
  *
  * Type scale: `--text-xs` … `--text-4xl` in `@theme inline` are the SSOT for
  * Tailwind `text-*` font sizes (@ 16px root). `3xl` is 28px and `4xl` is 34px.
- * `--text-md` (15px) is secondary body for prose-md and `Text` small/destructive/emphasis.
+ * `--text-md` (15px) is secondary body for prose-md, `text-style-emphasis`, and
+ * `text-style-option`. Status tones are color-only; the 15px tone lock is retired.
  * Heading and form-legend roles live on `:root` and do not emit `text-*` utilities.
  * Font-weight roles (`--font-weight-heading`, …) stay in `@theme`. Fine sizes
  * (`--text-fine-xs` … `--text-fine-md`) are the same primitive scale.
@@ -262,7 +263,7 @@
   /* Primitive font sizes — standard */
   --text-xs: 0.75rem; /* 12px */
   --text-sm: 0.875rem; /* 14px */
-  --text-md: 0.9375rem; /* 15px — secondary body (prose-md, Text small, …) */
+  --text-md: 0.9375rem; /* 15px — prose-md, emphasis, option. The 15px tone lock is retired. */
   --text-base: 1rem; /* 16px */
   --text-lg: 1.125rem; /* 18px */
   --text-xl: 1.25rem; /* 20px */
@@ -873,6 +874,13 @@
   --icon-inline: var(--icon-glyph-sm);
 }
 
+@utility text-style-body-compact {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  color: var(--foreground);
+  --icon-inline: var(--icon-glyph-sm);
+}
+
 @utility text-style-label {
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
@@ -897,27 +905,20 @@
   color: var(--muted-foreground);
 }
 
+/* Color only. Size, line height, and weight inherit. The 15px tone lock is retired. */
 @utility text-style-info {
-  font-size: var(--text-md);
-  line-height: var(--text-md--line-height);
   color: var(--info);
 }
 
 @utility text-style-success {
-  font-size: var(--text-md);
-  line-height: var(--text-md--line-height);
   color: var(--success);
 }
 
 @utility text-style-warning {
-  font-size: var(--text-md);
-  line-height: var(--text-md--line-height);
   color: var(--warning);
 }
 
 @utility text-style-destructive {
-  font-size: var(--text-md);
-  line-height: var(--text-md--line-height);
   color: var(--destructive);
 }
 

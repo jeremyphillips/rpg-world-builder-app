@@ -201,7 +201,7 @@ export function EquipmentPackageConversionEditor({
       </div>
 
       {commitStatusMessage ? (
-        <Text as="p" className="px-4 py-2 text-sm text-foreground" role="status">
+        <Text as="p" variant="body-compact" className="px-4 py-2" role="status">
           {commitStatusMessage}
         </Text>
       ) : null}

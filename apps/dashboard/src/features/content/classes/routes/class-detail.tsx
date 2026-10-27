@@ -32,8 +32,11 @@ type ClassDetailContentProps = {
   campaignId: string
   classId: string
   subclasses: Subclass[]
+  subclassesPending?: boolean
+  subclassesLoadingError?: boolean
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
+  skillsLoadingError?: boolean
   showProgressionTable?: boolean
 }
 
@@ -42,8 +45,11 @@ export function ClassDetailContent({
   campaignId,
   classId,
   subclasses,
+  subclassesPending = false,
+  subclassesLoadingError = false,
   skillProficiencies,
   skillsPending,
+  skillsLoadingError = false,
   showProgressionTable = true,
 }: ClassDetailContentProps) {
   useSetBreadcrumbLabel(characterClass.name)
@@ -86,10 +92,13 @@ export function ClassDetailContent({
       imageName={characterClass.name}
       viewModel={viewModel}
       subclasses={subclasses}
+      subclassesPending={subclassesPending}
+      subclassesLoadingError={subclassesLoadingError}
       subclassingEnabled={subclassingEnabled}
       campaignId={campaignId}
       skillProficiencies={skillProficiencies}
       skillsPending={skillsPending}
+      skillsLoadingError={skillsLoadingError}
       vocabulary={vocabulary}
       editHref={contentEditHref('classes', campaignId, classId)}
       progressionTable={
@@ -120,9 +129,8 @@ export function ClassDetailContent({
 export function ClassDetail() {
   const { campaignId = '', classId = '' } = useParams<{ campaignId: string; classId: string }>()
   const { data: classes = [], isPending, isError } = useClasses(campaignId)
-  const { data: subclasses = [] } = useSubclasses(campaignId, classId)
-  const { data: skillProficiencies = [], isPending: skillsPending } =
-    useSkillProficiencies(campaignId)
+  const subclassesQuery = useSubclasses(campaignId, classId)
+  const skillsQuery = useSkillProficiencies(campaignId)
 
   return (
     <ContentDetailResolver
@@ -138,9 +146,12 @@ export function ClassDetail() {
           characterClass={characterClass}
           campaignId={campaignId}
           classId={classId}
-          subclasses={subclasses}
-          skillProficiencies={skillProficiencies}
-          skillsPending={skillsPending}
+          subclasses={subclassesQuery.data ?? []}
+          subclassesPending={subclassesQuery.isPending}
+          subclassesLoadingError={subclassesQuery.isLoadingError}
+          skillProficiencies={skillsQuery.data ?? []}
+          skillsPending={skillsQuery.isPending}
+          skillsLoadingError={skillsQuery.isLoadingError}
         />
       )}
     </ContentDetailResolver>

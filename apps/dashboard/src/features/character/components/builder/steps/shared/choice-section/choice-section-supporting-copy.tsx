@@ -3,7 +3,6 @@ import { Heading, Text } from '@rpg/ui'
 
 import {
   choiceSectionIdentityLineClasses,
-  choiceSectionSourceLineClasses,
   choiceSectionSubheadClasses,
 } from './choice-section.variants'
 
@@ -31,7 +30,7 @@ export function ChoiceSectionSupportingCopy({
         ))}
         {section.subhead ? <p className={choiceSectionSubheadClasses}>{section.subhead}</p> : null}
         {singleChoiceBlock.sourceLine ? (
-          <Text className={choiceSectionSourceLineClasses}>{singleChoiceBlock.sourceLine}</Text>
+          <Text variant="body-compact">{singleChoiceBlock.sourceLine}</Text>
         ) : null}
       </>
     )

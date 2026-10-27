@@ -7,12 +7,11 @@ import {
   type Subclass,
 } from '@rpg/contracts'
 
+import { DetailNavFlushStack } from '../../../lib/detail/collection/item-stack/detail-nav-flush-stack'
 import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-layout'
-import { contentDetailNavItemId } from '../../../lib/detail/page/content-detail-nav-anchor-id'
-import {
-  ContentDetailSection,
-  ContentDetailSectionItem,
-} from '../../../lib/detail/page/content-detail-section'
+import { ContentDetailQueryStatus } from '../../../lib/detail/page/content-detail-query-status'
+import { contentDetailProseProps } from '../../../lib/detail/page/content-detail-prose'
+import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import { ClassFeatureLevelTable } from './class-feature-level-table'
 import { ClassProficienciesSection } from './class-proficiencies-section'
 import { type ClassDetailViewModel, type ClassDisplayVocabulary } from '../../lib/class-display'
@@ -31,7 +30,7 @@ function SubclassFeaturesList({ features }: { features: Subclass['features'] }) 
             {`Level ${feature.level}: ${feature.name}`}
           </Heading>
           {feature.description ? (
-            <RichTextContent html={feature.description} size="md" tone="muted" />
+            <RichTextContent html={feature.description} {...contentDetailProseProps} />
           ) : null}
         </li>
       ))}
@@ -39,31 +38,53 @@ function SubclassFeaturesList({ features }: { features: Subclass['features'] }) 
   )
 }
 
-function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
+function SubclassesList({
+  subclasses,
+  isPending,
+  isLoadingError,
+}: {
+  subclasses: readonly Subclass[]
+  isPending: boolean
+  isLoadingError: boolean
+}) {
+  if (isLoadingError) {
+    return (
+      <ContentDetailSection heading="Subclasses" headingId={SUBCLASSES_HEADING_ID}>
+        <ContentDetailQueryStatus status="error" subject="subclasses" />
+      </ContentDetailSection>
+    )
+  }
+
+  if (isPending) {
+    return (
+      <ContentDetailSection heading="Subclasses" headingId={SUBCLASSES_HEADING_ID}>
+        <ContentDetailQueryStatus status="pending" />
+      </ContentDetailSection>
+    )
+  }
+
   if (subclasses.length === 0) return null
 
   return (
-    <ContentDetailSection heading="Subclasses" headingId={SUBCLASSES_HEADING_ID}>
-      <ul className="space-y-6" role="list">
-        {subclasses.map((sub) => (
-          <li key={sub.id}>
-            <ContentDetailSectionItem
-              id={contentDetailNavItemId('subclass', sub.id)}
-              label={sub.name}
-            >
-              {sub.tagline ? (
-                <Text variant="supporting" className="italic">
-                  {sub.tagline}
-                </Text>
-              ) : null}
-              {sub.description ? (
-                <RichTextContent html={sub.description} size="md" tone="muted" />
-              ) : null}
-              <SubclassFeaturesList features={sub.features} />
-            </ContentDetailSectionItem>
-          </li>
-        ))}
-      </ul>
+    <ContentDetailSection heading="Subclasses" headingId={SUBCLASSES_HEADING_ID} bodyLayout="flush">
+      <DetailNavFlushStack
+        navPrefix="subclass"
+        items={subclasses}
+        getLabel={(sub) => sub.name}
+        renderItem={(sub) => (
+          <>
+            {sub.tagline ? (
+              <Text variant="supporting" className="italic">
+                {sub.tagline}
+              </Text>
+            ) : null}
+            {sub.description ? (
+              <RichTextContent html={sub.description} {...contentDetailProseProps} />
+            ) : null}
+            <SubclassFeaturesList features={sub.features} />
+          </>
+        )}
+      />
     </ContentDetailSection>
   )
 }
@@ -89,12 +110,14 @@ function ClassDetailSections({
   campaignId,
   skillProficiencies,
   skillsPending,
+  skillsLoadingError,
   vocabulary,
 }: {
   sections: ClassDetailViewModel['sections']
   campaignId: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
+  skillsLoadingError: boolean
   vocabulary: ClassDisplayVocabulary
 }) {
   return (
@@ -107,6 +130,7 @@ function ClassDetailSections({
             campaignId={campaignId}
             skillProficiencies={skillProficiencies}
             skillsPending={skillsPending}
+            skillsLoadingError={skillsLoadingError}
             vocabulary={vocabulary}
           />
         ) : (
@@ -125,10 +149,13 @@ export type ClassDetailBodyProps = {
   imageName: string
   viewModel: ClassDetailViewModel
   subclasses: Subclass[]
+  subclassesPending?: boolean
+  subclassesLoadingError?: boolean
   subclassingEnabled: boolean
   campaignId: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
+  skillsLoadingError?: boolean
   vocabulary: ClassDisplayVocabulary
   editHref?: string
   progressionTable?: ReactNode
@@ -145,10 +172,13 @@ export function ClassDetailBody({
   imageName,
   viewModel,
   subclasses,
+  subclassesPending = false,
+  subclassesLoadingError = false,
   subclassingEnabled,
   campaignId,
   skillProficiencies,
   skillsPending,
+  skillsLoadingError = false,
   vocabulary,
   editHref,
   progressionTable,
@@ -170,7 +200,7 @@ export function ClassDetailBody({
       heroDescription={false}
       descriptionContent={
         viewModel.descriptionHtml ? (
-          <RichTextContent html={viewModel.descriptionHtml} size="md" tone="muted" />
+          <RichTextContent html={viewModel.descriptionHtml} {...contentDetailProseProps} />
         ) : undefined
       }
     >
@@ -179,9 +209,16 @@ export function ClassDetailBody({
         campaignId={campaignId}
         skillProficiencies={skillProficiencies}
         skillsPending={skillsPending}
+        skillsLoadingError={skillsLoadingError}
         vocabulary={vocabulary}
       />
-      {subclassingEnabled ? <SubclassesList subclasses={subclasses} /> : null}
+      {subclassingEnabled ? (
+        <SubclassesList
+          subclasses={subclasses}
+          isPending={subclassesPending}
+          isLoadingError={subclassesLoadingError}
+        />
+      ) : null}
       {progressionTable}
       {children}
     </ContentDetailLayout>

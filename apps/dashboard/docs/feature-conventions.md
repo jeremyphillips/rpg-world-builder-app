@@ -368,7 +368,10 @@ Walk speed, weapon range, and spell distance use [`feetInputUnitField`](../src/f
 Detail route shells use [`ContentDetailResolver`](../src/features/content/lib/detail/page/content-detail-resolver.tsx)
 for loading, error, and not-found states (parallel to
 [`ContentOverviewShell`](../src/features/content/lib/overview/content-overview-shell.tsx)
-on list pages).
+on list pages). Secondary queries on those pages use
+[`ContentDetailQueryStatus`](../src/features/content/lib/detail/page/content-detail-query-status.tsx)
+for pending and initial-load errors. A refetch that still has data keeps that snapshot.
+Contract and placement rules: [detail README](../src/features/content/lib/detail/README.md#secondary-query-status).
 
 For route shells that need TanStack Query (loading, error, not-found), add
 `withDashboardProviders` from

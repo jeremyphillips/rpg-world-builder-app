@@ -38,6 +38,14 @@ function supportingStackViolation(set: Set<string>): string | null {
   return null
 }
 
+function bodyCompactStackViolation(set: Set<string>): string | null {
+  if (!withoutEmphasisWeight(set)) return null
+  if (set.has('text-sm') && set.has('text-foreground')) {
+    return 'text-sm + text-foreground (use text-style-body-compact or Text variant="body-compact")'
+  }
+  return null
+}
+
 function captionStackViolation(set: Set<string>): string | null {
   if (!withoutEmphasisWeight(set)) return null
   const hasXs = set.has('text-xs')
@@ -53,6 +61,26 @@ function labelStackViolation(set: Set<string>, tokens: string[]): string | null 
   return 'text-sm + font-medium without color (use text-style-label)'
 }
 
+const TONE_TEXT_STYLE_UTILITIES = [
+  'text-style-info',
+  'text-style-success',
+  'text-style-warning',
+  'text-style-destructive',
+] as const
+
+/** Status tones are color-only. Font size or line height on these utilities is a regression. */
+export function toneUtilitySizeViolation(css: string): string | null {
+  for (const name of TONE_TEXT_STYLE_UTILITIES) {
+    const match = css.match(new RegExp(`@utility ${name}\\s*\\{([^}]*)\\}`))
+    const body = match?.[1]
+    if (body == null) return `${name} is missing`
+    if (/\bfont-size\s*:/.test(body) || /\bline-height\s*:/.test(body)) {
+      return `${name} declares font-size or line-height`
+    }
+  }
+  return null
+}
+
 function retiredSmallUtility(classString: string): string | null {
   if (/\btext-style-small\b/.test(classString)) {
     return 'text-style-small retired (use text-style-supporting)'
@@ -66,7 +94,10 @@ export function classStringViolatesMigratedStacks(classString: string): string |
   const tokens = tokenizeClassString(classString)
   const set = new Set(tokens)
   return (
-    supportingStackViolation(set) ?? captionStackViolation(set) ?? labelStackViolation(set, tokens)
+    supportingStackViolation(set) ??
+    bodyCompactStackViolation(set) ??
+    captionStackViolation(set) ??
+    labelStackViolation(set, tokens)
   )
 }
 

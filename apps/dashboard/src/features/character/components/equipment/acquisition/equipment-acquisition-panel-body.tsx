@@ -46,7 +46,7 @@ function OwnedSourceRow({
 }) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-start gap-x-3">
-      <Text as="span" className="text-sm text-foreground">
+      <Text as="span" variant="body-compact">
         {source.label}
       </Text>
       <div className="min-w-0">
@@ -120,7 +120,7 @@ function AcquisitionNextActionQuantityRow({
 
   return (
     <div className="flex items-center justify-between gap-3">
-      <Text as="span" className="text-sm text-foreground">
+      <Text as="span" variant="body-compact">
         {nextAction.quantityLabel}
       </Text>
       <NumberStepper
