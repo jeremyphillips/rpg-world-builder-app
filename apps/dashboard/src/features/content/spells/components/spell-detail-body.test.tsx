@@ -2,11 +2,13 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type * as UseClassesModule from '../../classes/hooks/use-classes'
+
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
 }))
 vi.mock('../../classes/hooks/use-classes', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../classes/hooks/use-classes')>()
+  const actual = await importOriginal<typeof UseClassesModule>()
   return { ...actual, useClasses: vi.fn() }
 })
 

@@ -9,7 +9,7 @@ import {
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { buildSeedCreatureTypeVocabulary, getCreatureTypeLabel } from '@/features/vocabulary'
 import { useEquipment } from '../../equipment/hooks/use-equipment'
-import type { NonEmptyContentTypeKeys } from '../../lib/detail/page/content-detail-query-status'
+import type { NonEmptyContentTypeKeys } from '../../lib/detail/page/content-detail-query-status.lib'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import {
@@ -58,8 +58,8 @@ export function MonsterDetailContent({
 
   const equipmentQuery = useEquipment(campaignId)
   const skillsQuery = useSkillProficiencies(campaignId)
-  const equipment = equipmentQuery.data ?? []
-  const skillProficiencies = skillsQuery.data ?? []
+  const equipment = equipmentQuery.data
+  const skillProficiencies = skillsQuery.data
 
   const catalogState: MonsterCatalogLoadState = useMemo(() => {
     if (equipmentQuery.isPending || skillsQuery.isPending) return 'pending'
@@ -79,10 +79,10 @@ export function MonsterDetailContent({
 
   const derived = useMemo(() => {
     if (catalogState !== 'ready') return null
-    return tryDeriveMonsterStatBlock(monster, equipment, skillProficiencies)
+    return tryDeriveMonsterStatBlock(monster, equipment ?? [], skillProficiencies ?? [])
   }, [catalogState, equipment, monster, skillProficiencies])
 
-  const equipmentById = useMemo(() => buildMonsterEquipmentCatalog(equipment), [equipment])
+  const equipmentById = useMemo(() => buildMonsterEquipmentCatalog(equipment ?? []), [equipment])
 
   const viewModel = useMemo(
     () =>

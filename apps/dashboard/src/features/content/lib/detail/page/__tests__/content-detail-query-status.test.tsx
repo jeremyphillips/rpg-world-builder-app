@@ -1,10 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import {
-  ContentDetailQueryStatus,
-  formatContentDetailQueryError,
-} from '../content-detail-query-status'
+import { ContentDetailQueryStatus } from '../content-detail-query-status'
+import { formatContentDetailQueryError } from '../content-detail-query-status.lib'
 
 describe('formatContentDetailQueryError', () => {
   it('uses the catalog list sentence for a content type', () => {

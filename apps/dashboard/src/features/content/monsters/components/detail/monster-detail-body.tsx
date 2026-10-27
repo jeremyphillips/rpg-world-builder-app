@@ -3,10 +3,8 @@ import { RichTextContent, Spinner, Text } from '@rpg/ui'
 import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
 
 import { DetailNavFlushStack } from '../../../lib/detail/collection/item-stack/detail-nav-flush-stack'
-import {
-  ContentDetailQueryStatus,
-  type NonEmptyContentTypeKeys,
-} from '../../../lib/detail/page/content-detail-query-status'
+import { ContentDetailQueryStatus } from '../../../lib/detail/page/content-detail-query-status'
+import type { NonEmptyContentTypeKeys } from '../../../lib/detail/page/content-detail-query-status.lib'
 import { ContentStatList } from '../../../lib/detail/metadata/content-stat-row'
 import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-layout'
 import { contentDetailProseProps } from '../../../lib/detail/page/content-detail-prose'

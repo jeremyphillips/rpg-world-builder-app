@@ -9,6 +9,8 @@ import { makeOrganization } from '@/test/fixtures/factories/organization'
 import { makeSpecies } from '@/test/fixtures/factories/species'
 import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
+import type * as UseClassesModule from '../../classes/hooks/use-classes'
+import type * as UseSpeciesModule from '../../species/hooks/use-species'
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useSpecies } from '../../species/hooks/use-species'
 import { CITY_COUNCIL, CRAFT_GUILD } from '../fixtures'
@@ -34,11 +36,11 @@ vi.mock('../components/members/organization-members-detail-section', () => ({
   ),
 }))
 vi.mock('../../classes/hooks/use-classes', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../classes/hooks/use-classes')>()
+  const actual = await importOriginal<typeof UseClassesModule>()
   return { ...actual, useClasses: vi.fn() }
 })
 vi.mock('../../species/hooks/use-species', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../species/hooks/use-species')>()
+  const actual = await importOriginal<typeof UseSpeciesModule>()
   return { ...actual, useSpecies: vi.fn() }
 })
 
