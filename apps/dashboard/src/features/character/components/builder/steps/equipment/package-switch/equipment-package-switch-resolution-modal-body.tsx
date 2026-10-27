@@ -1,12 +1,11 @@
 import type { EquipmentPackageSwitchEvaluation } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../../../../lib/equipment/equipment-step.lib'
 
-import { EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT } from '@/lib/equipment/equipment-inventory-list.variants'
 import { EquipmentPurchasedInventorySection } from '../../../../equipment/inventory/purchased/equipment-purchased-inventory-section'
 import {
   PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE,
@@ -65,9 +64,9 @@ export function EquipmentPackageSwitchResolutionModalBody({
 
           <div className={packageSwitchModalInventoryScrollClasses}>
             <section className="space-y-3">
-              <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
+              <Text as="h4" variant="label">
                 {PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE}
-              </Heading>
+              </Text>
               <EquipmentPurchasedInventorySection
                 purchased={purchasedGroups}
                 showGroupHeadings={false}

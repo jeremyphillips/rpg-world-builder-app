@@ -14,11 +14,10 @@ import {
   CollapsibleTrigger,
   DisclosureIndicator,
   Eyebrow,
-  Heading,
   Text,
 } from '@rpg/ui'
 
-import { DetailOverflowMenu } from '@/features/content'
+import { DetailOverflowMenu, EquipmentInventorySectionHeader } from '@/features/content'
 import {
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT,
   EQUIPMENT_PACKAGE_CHANGE_OPTION_MENU_LABEL,
@@ -35,10 +34,7 @@ import {
   resolveSelectionRowStatusItems,
 } from '../../../lib/selection-row-status'
 import { EquipmentInventoryRowItem } from '../inventory/row/equipment-inventory-row'
-import {
-  EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,
-  equipmentInventoryRowListClasses,
-} from '@/lib/equipment/equipment-inventory-list.variants'
+import { equipmentInventoryRowListClasses } from '@/lib/equipment/equipment-inventory-list.variants'
 import { EquipmentPackageConversionEditor } from '../package-switch/equipment-package-conversion-editor'
 
 export type EquipmentStartingPackageDisclosureProps = {
@@ -65,9 +61,7 @@ export function EquipmentStartingPackageGoldHeader({ optionLabel }: { optionLabe
   return (
     <div className="flex items-center justify-between gap-3 px-4 py-3">
       <div className="min-w-0 flex-1 text-left">
-        <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
-          {EQUIPMENT_STARTING_PACKAGE_TITLE}
-        </Heading>
+        <EquipmentInventorySectionHeader title={EQUIPMENT_STARTING_PACKAGE_TITLE} />
         <Text as="p" variant="supporting" className="mt-2">
           {joinInlineMetadata([EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT, optionLabel])}
         </Text>
@@ -156,9 +150,7 @@ export function EquipmentStartingPackageDisclosure({
       <div className="flex items-center justify-between gap-3 px-4 py-3">
         <CollapsibleTrigger asChild>
           <button type="button" className="min-w-0 flex-1 text-left">
-            <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
-              {EQUIPMENT_STARTING_PACKAGE_TITLE}
-            </Heading>
+            <EquipmentInventorySectionHeader title={EQUIPMENT_STARTING_PACKAGE_TITLE} />
             <Text as="p" variant="supporting">
               {subtitle}
             </Text>

@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 
 import { Badge, Heading } from '@rpg/ui'
 
+import { EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT } from '@/lib/equipment/equipment-inventory-list.variants'
+
 export type EquipmentInventorySectionHeaderProps = {
   title: string
   count?: number
@@ -31,7 +33,7 @@ export function EquipmentInventorySectionHeader({
 
   const titleBlock = (
     <div className={equipmentInventorySectionHeaderLabelRowClasses}>
-      <Heading variant="subsection" as="h3" className="min-w-0">
+      <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3" className="min-w-0">
         {title}
       </Heading>
       {countBadge}

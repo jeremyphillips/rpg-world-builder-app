@@ -1,4 +1,4 @@
-/** Shared inventory list chrome for character builder and content loadout surfaces. */
+/** Inventory panel section siblings (Starting Package, Added Equipment) and shared list chrome. */
 export const EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT = 'subsection' as const
 
 export const equipmentPurchasedInventoryCategoryListClasses =
