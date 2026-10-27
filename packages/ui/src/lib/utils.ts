@@ -68,20 +68,16 @@ const EYEBROW_STYLE_UTILITIES = [
 
 const TEXT_ACTION_UTILITIES = ['text-action-inline', 'text-action-standalone'] as const
 
+/** Size-setting roles. Conflicts with font size, weight, and leading — not text color. */
 const TEXT_STYLE_UTILITIES = [
-  'text-style-body',
-  'text-style-muted',
   'text-style-caption',
   'text-style-micro',
   'text-style-supporting',
+  'text-style-body-compact',
   'text-style-label',
   'text-style-emphasis',
   'text-style-option',
   'text-style-lead',
-  'text-style-info',
-  'text-style-success',
-  'text-style-warning',
-  'text-style-destructive',
   'text-style-field-label-sm',
   'text-style-field-label-md',
   'text-style-field-label-lg',
@@ -93,6 +89,16 @@ const TEXT_STYLE_UTILITIES = [
   'text-style-field-group-description',
   'text-style-field-group-description-compact',
   'text-style-field-error',
+] as const
+
+/** Color-only roles. Conflicts with text color in both directions. */
+const TEXT_STYLE_COLOR_UTILITIES = [
+  'text-style-body',
+  'text-style-muted',
+  'text-style-info',
+  'text-style-success',
+  'text-style-warning',
+  'text-style-destructive',
 ] as const
 
 const EYEBROW_STYLE_CONFLICT_GROUPS = [
@@ -112,10 +118,20 @@ const TYPOGRAPHY_CONFLICT_GROUPS = [
   'text-transform',
 ] as const
 
+const TEXT_STYLE_SIZE_CONFLICT_GROUPS = [
+  'font-size',
+  'font-weight',
+  'tracking',
+  'leading',
+  'font-family',
+  'text-transform',
+] as const
+
 type TypographyClassGroupIds =
   | 'heading-style'
   | 'eyebrow-style'
   | 'text-style'
+  | 'text-style-color'
   | 'text-action'
   | 'ui-button-size'
   | 'ui-button-appearance'
@@ -198,6 +214,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'heading-style': [...HEADING_STYLE_UTILITIES],
       'eyebrow-style': [...EYEBROW_STYLE_UTILITIES],
       'text-style': [...TEXT_STYLE_UTILITIES],
+      'text-style-color': [...TEXT_STYLE_COLOR_UTILITIES],
       'text-action': [...TEXT_ACTION_UTILITIES],
       'ui-button-size': [...UI_BUTTON_SIZE_CLASSES],
       'ui-button-appearance': [...UI_BUTTON_APPEARANCE_CLASSES],
@@ -242,7 +259,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
     conflictingClassGroups: {
       'heading-style': [...TYPOGRAPHY_CONFLICT_GROUPS],
       'eyebrow-style': [...EYEBROW_STYLE_CONFLICT_GROUPS],
-      'text-style': [...TYPOGRAPHY_CONFLICT_GROUPS],
+      'text-style': [...TEXT_STYLE_SIZE_CONFLICT_GROUPS],
+      'text-style-color': ['text-color'],
       'text-action': ['text-action'],
       'ui-button-size': ['ui-button-size'],
       'ui-button-appearance': ['ui-button-appearance'],
@@ -298,6 +316,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'font-weight': ['heading-style', 'eyebrow-style', 'text-style'],
       tracking: ['heading-style', 'eyebrow-style'],
       leading: ['heading-style', 'text-style'],
+      'text-color': ['text-style-color'],
       'font-family': ['heading-style'],
       'text-transform': ['heading-style', 'eyebrow-style'],
     },

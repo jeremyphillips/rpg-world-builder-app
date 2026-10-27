@@ -61,6 +61,26 @@ function labelStackViolation(set: Set<string>, tokens: string[]): string | null 
   return 'text-sm + font-medium without color (use text-style-label)'
 }
 
+const TONE_TEXT_STYLE_UTILITIES = [
+  'text-style-info',
+  'text-style-success',
+  'text-style-warning',
+  'text-style-destructive',
+] as const
+
+/** Status tones are color-only. Font size or line height on these utilities is a regression. */
+export function toneUtilitySizeViolation(css: string): string | null {
+  for (const name of TONE_TEXT_STYLE_UTILITIES) {
+    const match = css.match(new RegExp(`@utility ${name}\\s*\\{([^}]*)\\}`))
+    const body = match?.[1]
+    if (body == null) return `${name} is missing`
+    if (/\bfont-size\s*:/.test(body) || /\bline-height\s*:/.test(body)) {
+      return `${name} declares font-size or line-height`
+    }
+  }
+  return null
+}
+
 function retiredSmallUtility(classString: string): string | null {
   if (/\btext-style-small\b/.test(classString)) {
     return 'text-style-small retired (use text-style-supporting)'

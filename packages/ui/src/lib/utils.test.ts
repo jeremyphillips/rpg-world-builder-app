@@ -46,6 +46,57 @@ describe('cn', () => {
     expect(cn('text-style-supporting', 'text-style-caption')).toBe('text-style-caption')
     expect(cn('text-style-caption', 'text-style-caption')).toBe('text-style-caption')
     expect(cn('text-style-label', 'text-style-label')).toBe('text-style-label')
+    expect(cn('text-style-supporting', 'text-style-body-compact')).toBe('text-style-body-compact')
+    expect(cn('text-style-body-compact', 'font-semibold')).toBe('font-semibold')
+    expect(cn('font-semibold', 'text-style-body-compact')).toBe('text-style-body-compact')
+    expect(cn('text-style-body-compact', 'leading-tight')).toBe('leading-tight')
+  })
+
+  it('keeps a color-only tone beside a size utility in either order', () => {
+    expect(cn('text-style-destructive', 'text-sm')).toBe('text-style-destructive text-sm')
+    expect(cn('text-sm', 'text-style-destructive')).toBe('text-sm text-style-destructive')
+    expect(cn('text-style-warning', 'text-xs')).toBe('text-style-warning text-xs')
+    expect(cn('text-xs', 'text-style-warning')).toBe('text-xs text-style-warning')
+    expect(cn('text-style-destructive', 'font-semibold')).toBe(
+      'text-style-destructive font-semibold',
+    )
+    expect(cn('text-style-destructive', 'leading-tight')).toBe(
+      'text-style-destructive leading-tight',
+    )
+    expect(cn('text-style-info', 'text-style-destructive')).toBe('text-style-destructive')
+    expect(cn('text-style-destructive', 'text-style-warning')).toBe('text-style-warning')
+  })
+
+  it('keeps tone classes on the sized call-site strings', () => {
+    expect(cn('text-style-destructive', 'text-right text-sm')).toBe(
+      'text-style-destructive text-right text-sm',
+    )
+    expect(cn('text-style-warning', 'flex items-start gap-1.5 text-xs')).toBe(
+      'text-style-warning flex items-start gap-1.5 text-xs',
+    )
+    expect(cn('text-style-destructive', 'absolute top-full mt-1 text-end text-xs')).toBe(
+      'text-style-destructive absolute top-full mt-1 text-end text-xs',
+    )
+  })
+
+  it('lets the later color class win between a color-only role and a text color', () => {
+    expect(cn('text-style-body', 'text-destructive')).toBe('text-destructive')
+    expect(cn('text-destructive', 'text-style-body')).toBe('text-style-body')
+    expect(cn('text-style-muted', 'text-warning')).toBe('text-warning')
+    expect(cn('text-warning', 'text-style-muted')).toBe('text-style-muted')
+    expect(cn('text-style-body', 'text-sm text-destructive')).toBe('text-sm text-destructive')
+    expect(cn('text-style-body', 'text-sm')).toBe('text-style-body text-sm')
+  })
+
+  it('keeps a size-setting role beside a text color in either order', () => {
+    expect(cn('text-style-body-compact', 'text-destructive')).toBe(
+      'text-style-body-compact text-destructive',
+    )
+    expect(cn('text-destructive', 'text-style-body-compact')).toBe(
+      'text-destructive text-style-body-compact',
+    )
+    expect(cn('text-style-caption', 'text-destructive')).toBe('text-style-caption text-destructive')
+    expect(cn('text-destructive', 'text-style-caption')).toBe('text-destructive text-style-caption')
   })
 
   it('replaces sibling heading-style composites', () => {

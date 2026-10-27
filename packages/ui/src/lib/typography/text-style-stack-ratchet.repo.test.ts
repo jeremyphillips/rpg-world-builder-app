@@ -4,7 +4,11 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-import { findTextStyleStackViolations, readSource } from './text-style-stack-ratchet.lib'
+import {
+  findTextStyleStackViolations,
+  readSource,
+  toneUtilitySizeViolation,
+} from './text-style-stack-ratchet.lib'
 
 const REPO_ROOT = fileURLToPath(new URL('../../../../..', import.meta.url))
 
@@ -55,5 +59,10 @@ describe('text-style stack ratchet (repo)', () => {
       }
     }
     expect(hits).toEqual([])
+  })
+
+  it('keeps status tone utilities free of font-size and line-height', () => {
+    const globals = readSource(join(REPO_ROOT, 'packages/ui/src/styles/globals.css'))
+    expect(toneUtilitySizeViolation(globals)).toBeNull()
   })
 })

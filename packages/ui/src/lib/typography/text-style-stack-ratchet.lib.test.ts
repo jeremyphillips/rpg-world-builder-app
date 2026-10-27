@@ -8,6 +8,7 @@ import {
   pTagViolatesTypographyOwnership,
   textTagUsesTextStyleUtility,
   textTagViolatesMigratedStacks,
+  toneUtilitySizeViolation,
 } from './text-style-stack-ratchet.lib'
 
 describe('text-style-stack-ratchet.lib', () => {
@@ -92,6 +93,47 @@ describe('text-style-stack-ratchet.lib', () => {
 
   it('flags retired text-style-small utility', () => {
     expect(classStringViolatesMigratedStacks('text-style-small')).toMatch(/retired/)
+  })
+
+  it('does not flag a size utility beside a status color', () => {
+    expect(classStringViolatesMigratedStacks('text-sm text-destructive')).toBeNull()
+    expect(classStringViolatesMigratedStacks('text-xs text-warning')).toBeNull()
+    expect(classStringViolatesMigratedStacks('text-sm text-success')).toBeNull()
+    expect(classStringViolatesMigratedStacks('text-xs text-info')).toBeNull()
+    expect(
+      textTagViolatesMigratedStacks('<Text variant="destructive" className="text-sm">'),
+    ).toBeNull()
+    expect(textTagViolatesMigratedStacks('<Text variant="warning" className="text-xs">')).toBeNull()
+  })
+
+  it('flags font-size or line-height on a status tone utility', () => {
+    expect(
+      toneUtilitySizeViolation(`
+        @utility text-style-info { color: var(--info); }
+        @utility text-style-success { color: var(--success); }
+        @utility text-style-warning { color: var(--warning); }
+        @utility text-style-destructive { color: var(--destructive); }
+      `),
+    ).toBeNull()
+    expect(
+      toneUtilitySizeViolation(`
+        @utility text-style-info {
+          font-size: var(--text-md);
+          color: var(--info);
+        }
+        @utility text-style-success { color: var(--success); }
+        @utility text-style-warning { color: var(--warning); }
+        @utility text-style-destructive { color: var(--destructive); }
+      `),
+    ).toMatch(/text-style-info/)
+    expect(
+      toneUtilitySizeViolation(`
+        @utility text-style-info { color: var(--info); }
+        @utility text-style-success { color: var(--success); }
+        @utility text-style-warning { line-height: var(--text-md--line-height); color: var(--warning); }
+        @utility text-style-destructive { color: var(--destructive); }
+      `),
+    ).toMatch(/text-style-warning/)
   })
 
   it('allows body + font-medium on Text (deferred)', () => {

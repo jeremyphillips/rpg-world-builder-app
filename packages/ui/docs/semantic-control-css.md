@@ -150,7 +150,7 @@ Overlay notification counts use `ui-notification-unread-badge` (not pill geometr
 
 ## Text roles
 
-`text-style-*` utilities are the Text role ladder and the field label, legend, hint, and error maps. They are `@utility` composites, same as `heading-style-*`, and they share a twMerge group. SemanticText is not a Text role: it owns inline status tone, emphasis, and an optional icon.
+`text-style-*` utilities are the Text role ladder and the field label, legend, hint, and error maps. They are `@utility` composites, same as `heading-style-*`. Size-setting roles share the `text-style` twMerge group and conflict with font size, weight, and leading. Color-only roles (`text-style-body`, `text-style-muted`, and the status tones) share `text-style-color`, which conflicts with text color only. SemanticText is not a Text role: it owns emphasis weight, the icon slot, and the `--semantic-*` readability palette.
 
 ## Popover content
 

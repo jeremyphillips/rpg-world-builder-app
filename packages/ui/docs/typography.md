@@ -30,7 +30,7 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | `Heading` `nav` / `brand`         | `span` | 16      | 600                  | Topbar title, sidebar product name                                                     |
 | `Heading` `alert`                 | Radix  | 16      | 600                  | Inline `Alert` titles                                                                  |
 | `Heading` `label`                 | `p`    | 16      | 500                  | Inline non-outline titles (trait names)                                                |
-| `Text` `body`                     | `p`    | 16      | 400                  | Default foreground copy                                                                |
+| `Text` `body`                     | `p`    | inherit | inherit              | Foreground color only. Size and line height inherit (16px / 24px at the document root) |
 | `Text` `body-compact`             | `p`    | 14      | 400                  | Primary foreground plain copy at detail density (mechanical lines, non-HTML prose)     |
 | `Text` `supporting`               | `p`    | 14      | 400                  | Secondary explanatory copy (preferred over `muted` + `text-sm`)                        |
 | `Text` `caption`                  | `p`    | 12      | 400                  | Small supplemental metadata                                                            |
@@ -38,7 +38,7 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | `Text` `label`                    | `p`    | 14      | 500                  | Compact UI descriptor — not a native form `<label>`                                    |
 | `Text` `muted`                    | `p`    | inherit | 400                  | Color-only muted treatment (legacy — prefer `supporting` / `caption`)                  |
 | `Text` `lead`                     | `p`    | 18      | 400                  | Marketing subheads                                                                     |
-| `Text` `destructive`              | `p`    | 15      | 400                  | Inline errors — pair with `role="alert"`                                               |
+| `Text` `destructive`              | `p`    | inherit | inherit              | Status color only. Size, line height, and weight inherit — pair with `role="alert"`    |
 | `Eyebrow` `xs` / `sm` / `md`      | `p`    | 9–13    | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)                          |
 | `RichTextContent` `size="md"`     | `div`  | 15      | 400                  | Catalog descriptions (TipTap / CMS HTML)                                               |
 | Generic `Card` header title       | `h3`   | 14–18   | 600 (`heading`)      | `ui-card__title` — size from `Card` `density`; weight from heading role                |
@@ -77,16 +77,23 @@ Polymorphic via `as`. Each `variant` maps 1:1 to a `text-style-*` composite in
 
 ### Role contract
 
-A text role defines the intended typography for a communication purpose, including
-whichever of size, line height, weight, and default color are appropriate. Not every
-variant sets every property (`muted` is color-only; `label` inherits color).
+A typography role (`body-compact`, `caption`, `supporting`, `label`, and the other
+size-setting `text-style-*` roles) establishes the typography contract: size, line
+height, and any default color or weight that role declares.
 
-| Category              | Variants                                                                  | Policy                                  |
-| --------------------- | ------------------------------------------------------------------------- | --------------------------------------- |
-| Primary content roles | `body`, `body-compact`, `supporting`, `caption`, `micro`, `label`, `lead` | Preferred for new copy                  |
-| Contextual roles      | `option`                                                                  | Choice-row contexts                     |
-| Existing treatments   | `muted`, `emphasis`                                                       | Legacy — do not expand without an audit |
-| Semantic state        | `info`, `success`, `warning`, `destructive`                               | Status-colored copy at 15px             |
+A tone-only variant (`info`, `success`, `warning`, `destructive`) establishes color.
+It does not establish size or weight. `muted` and `body` are already color-only.
+`body` inherits size and line height. It does not specify 16px. At the document root
+that inheritance computes to 16px / 24px. The 15px tone lock is retired on purpose:
+a size-less tone inherits from its parent, and a `text-sm` or `text-xs` on the same
+element keeps both the size and the tone color.
+
+| Category              | Variants                                                                  | Policy                                     |
+| --------------------- | ------------------------------------------------------------------------- | ------------------------------------------ |
+| Primary content roles | `body`, `body-compact`, `supporting`, `caption`, `micro`, `label`, `lead` | Preferred for new copy                     |
+| Contextual roles      | `option`                                                                  | Choice-row contexts                        |
+| Existing treatments   | `muted`, `emphasis`                                                       | Legacy — do not expand without an audit    |
+| Semantic state        | `info`, `success`, `warning`, `destructive`                               | Status color only; size and weight inherit |
 
 Do not hand-roll stacks that duplicate a role (`text-sm text-muted-foreground` →
 `supporting` or `text-style-supporting`). Do not invent combination names
@@ -97,15 +104,16 @@ and errors use `text-style-field-*` and field components — not `Text` `label`.
 
 ### Role versus tone
 
-`SemanticText` owns inline status tone (`neutral`, `info`, `success`, `warning`,
-`destructive`) and emphasis only. A **typography owner** must establish font size,
-line height, and `--icon-inline` for inline glyphs — usually `Text` (`caption`,
-`supporting`, `micro`, …) or a parent with `text-style-*`. Compose
-`Text variant="micro"` + `SemanticText` for fine (10px) toned status copy (PreviewRail).
+`SemanticText` is a separate contract: emphasis weight, the icon slot, and the
+`--semantic-*` readability palette. It is not the color mechanism for a tone `Text`.
+A **typography owner** must establish font size, line height, and `--icon-inline`
+for inline glyphs — usually `Text` (`caption`, `supporting`, `micro`, …) or a parent
+with a size-setting `text-style-*`. Compose `Text variant="micro"` + `SemanticText`
+for fine (10px) toned status copy (PreviewRail).
 
-`Text` state variants (`info`, `success`, …) are separate 15px treatments. There is
-no `tone` prop on `Text` yet; a future design may compose role + tone without new
-composite names.
+`Text` state variants (`info`, `success`, `warning`, `destructive`) set status color
+and inherit size and weight. Pass `text-sm` or `text-xs` when that tone needs a
+specific size. There is no `tone` prop on `Text`.
 
 ### Usage
 
@@ -173,7 +181,7 @@ At 16px root, **`--text-md` is 15px** — one step between compact UI (`text-sm`
 | `RichTextContent` `size="md"` (`prose-md`)          | 15px via `.prose.prose-md`        |
 | `RichTextContent` `size="sm"` (`prose-sm`)          | 14px via `.prose.prose-sm`        |
 | `RichTextContent` `size="base"` (`prose`)           | 16px — primary body               |
-| `Text` `destructive`, `emphasis`, `option`          | `text-md`                         |
+| `Text` `emphasis`, `option`                         | `text-md`                         |
 | Generic `Card` `ui-card__description` (comfortable) | 14px (`text-sm` via shell var)    |
 | Rich-text editor (`size="md"`)                      | `prose-md` (matches catalog read) |
 | Rich-text editor (`size="sm"`)                      | `prose-sm`                        |
@@ -195,7 +203,7 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 | `text-fine-md`  | 13             | Eyebrow `md`, Chip `md`, table body              |
 | `text-xs`       | 12             | Captions, table stat columns                     |
 | `text-sm`       | 14             | Compact UI chrome (buttons, menus, data tables)  |
-| `text-md`       | 15             | Secondary body (`Text` small, `prose-md`, …)     |
+| `text-md`       | 15             | Secondary body (`prose-md`, emphasis, option)    |
 | `text-base`     | 16             | Primary body default                             |
 | `text-lg`       | 18             | Lead copy; subsection and card headings          |
 | `text-xl`       | 20             | Dialog title from `md`; sheet section headings   |

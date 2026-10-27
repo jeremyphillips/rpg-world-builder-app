@@ -49,6 +49,59 @@ describe('Text', () => {
     expect(screen.getByText('Caution')).toHaveClass('text-style-warning')
   })
 
+  it('keeps a tone class when className sets a size', () => {
+    render(
+      <Text variant="destructive" className="text-sm">
+        Sized error
+      </Text>,
+    )
+    const error = screen.getByText('Sized error')
+    expect(error).toHaveClass('text-style-destructive', 'text-sm')
+
+    render(
+      <Text variant="warning" className="text-xs">
+        Sized caution
+      </Text>,
+    )
+    expect(screen.getByText('Sized caution')).toHaveClass('text-style-warning', 'text-xs')
+  })
+
+  it('lets a later color utility replace a color-only role', () => {
+    render(
+      <Text variant="body" className="text-destructive">
+        Recolored
+      </Text>,
+    )
+    const recolored = screen.getByText('Recolored')
+    expect(recolored).toHaveClass('text-destructive')
+    expect(recolored).not.toHaveClass('text-style-body')
+
+    render(
+      <Text variant="body" className="text-sm text-destructive">
+        Sized recolor
+      </Text>,
+    )
+    const sized = screen.getByText('Sized recolor')
+    expect(sized).toHaveClass('text-sm', 'text-destructive')
+    expect(sized).not.toHaveClass('text-style-body')
+  })
+
+  it('keeps a size-setting role beside a text color', () => {
+    render(
+      <Text variant="body-compact" className="text-destructive">
+        Compact
+      </Text>,
+    )
+    expect(screen.getByText('Compact')).toHaveClass('text-style-body-compact', 'text-destructive')
+
+    render(
+      <Text variant="caption" className="text-destructive">
+        Caption
+      </Text>,
+    )
+    expect(screen.getByText('Caption')).toHaveClass('text-style-caption', 'text-destructive')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<Text variant="body">Body copy.</Text>)
     await expectNoAxeViolations(container)
