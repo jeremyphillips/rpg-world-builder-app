@@ -51,7 +51,7 @@ Preserve semantic headings and existing `id`s — content detail routes use
 ## `Heading`
 
 Polymorphic via `as`. Each `variant` maps to one **composite utility** in
-[`styles/globals.css`](../src/styles/globals.css) (e.g. `heading-style-section`).
+[`styles/typography.utilities.css`](../src/styles/typography.utilities.css) (e.g. `heading-style-section`).
 Size and weight tokens live in `@theme`; variants reference composites via
 [`heading.variants.ts`](../src/components/ui/heading.variants.ts).
 
@@ -163,7 +163,7 @@ prose config.
 ## Prose theme and dark mode
 
 The `@tailwindcss/typography` plugin is registered once in
-[`styles/globals.css`](../src/styles/globals.css). Token overrides on `@utility
+[`styles/typography.utilities.css`](../src/styles/typography.utilities.css). Token overrides on `@utility
 prose` map `--tw-prose-*` variables to design tokens (`--color-foreground`,
 `--color-primary`, `--color-muted-foreground`, …).
 
@@ -245,7 +245,7 @@ table above in app code.
 ## Media preview size
 
 `size-image-preview` maps to `--spacing-image-preview` → `--image-preview-size` in
-[`styles/globals.css`](../src/styles/globals.css):
+[`styles/typography.utilities.css`](../src/styles/typography.utilities.css):
 
 | Viewport        | Size  |
 | --------------- | ----- |
@@ -270,7 +270,7 @@ Components use composites via `headingVariants()`. Heading roles are not `text-h
 
 ## Font weight tokens
 
-Primitive weights and role aliases live in [`styles/globals.css`](../src/styles/globals.css).
+Primitive weights and role aliases live in [`styles/tokens/tailwind-theme.css`](../src/styles/tokens/tailwind-theme.css).
 
 | Role utility / token            | Value                | Typical use                                                       |
 | ------------------------------- | -------------------- | ----------------------------------------------------------------- |

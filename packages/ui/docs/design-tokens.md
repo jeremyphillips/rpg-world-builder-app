@@ -169,12 +169,12 @@ Do not merge text-tuned values onto solid status hues.
 ## Field control chrome
 
 - Layer 2: `--field-control-*` matrix in `semantic-*.css`.
-- Public utilities: `border-input`, `bg-input`, and state variants in `globals.css`.
+- Public utilities: `border-input`, `bg-input`, and state variants in `shared.utilities.css`.
 - **Global fill:** `--field-control-bg` → `--palette-surface-lift` everywhere. No
-  parent-scoped re-scoping in `globals.css` under `.bg-card` / `.bg-surface-*`.
+  parent-scoped re-scoping in `shared.utilities.css` under `.bg-card` / `.bg-surface-*`.
 - **Rare overrides:** set `--field-control-bg` locally in the component that creates an
   unusual shell context — e.g. `resolveFieldControlSurfaceClasses('default' | 'onMuted')`
-  on a region wrapper (`field-control-surface.variants.ts`). Do not add globals.css parent
+  on a region wrapper (`field-control-surface.variants.ts`). Do not add shared.utilities.css parent
   cascade rules under `.bg-surface-*`.
 - **Single recipe owner:** [`field-input-chrome.variants.ts`](../src/components/ui/field-input-chrome.variants.ts).
 - Individual controls import that recipe; do not reconstruct field chrome with ad-hoc opacity stacks.
@@ -186,7 +186,7 @@ Switch unchecked track uses `--switch-track*` — separate from field border own
 Schema-driven form fields default to a boxed container shell (`{ variant: 'container' }`):
 
 - Layer 2 token: `--field-container` — lift plane in both themes (`--palette-surface-lift`); recessed wells use `--sunken` / `bg-sunken` instead.
-- Public utility: `bg-field-container` in `globals.css`.
+- Public utility: `bg-field-container` in `shared.utilities.css`.
 - **Form shells only:** schema-driven field containers rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane. Overlays, menus, sheets, preview rails, and other generic lifted shells use `--surface-lift` / `bg-surface-lift` — not the field-container alias.
 - Padding: 16px (`p-4`).
 - Fieldset leaves (`ChipsField`, choose-count shells) and schema `kind: 'group'` wrap a
@@ -264,7 +264,7 @@ Module: [`icon/icon.types.ts`](../src/components/ui/icon/icon.types.ts), [`icon/
 | 2xl  | 24  | `2xl`         | Icon-only large buttons, spinner `lg`, media compact |
 | 3xl  | 32  | `3xl`         | Large empty-state and media hero fallbacks           |
 
-Token source: `--icon-glyph-*` in `globals.css`. Only `.ui-icon` sets `width`, `height`, and `stroke-width` on glyphs.
+Token source: `--icon-glyph-*` in `tokens/tailwind-theme.css`. Only `.ui-icon` sets `width`, `height`, and `stroke-width` on glyphs.
 
 ### Hit-target scale (control chrome)
 
@@ -326,7 +326,7 @@ Inline icons use `size="inline"` and read `--icon-inline` from the nearest typog
 
 `text-lg` and larger, heading utilities, and eyebrow type are not inline-icon owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons use `size="owner"` with `badge.css` and `chip.css`. `layout="counter"` composes with the badge size modifier on the same host for `--icon-size`; counter alert icons (`ValidationIssueCountBadge`, `ArrayItemIssueButton`, create-modal issue badges) use `size="owner"`, not `inline` or fixed glyph steps.
 
-**Chip type scale** (`--text-chip-sm|md|lg` in `globals.css`) maps Chip `sm`/`md`/`lg` to `text-fine-sm` / `text-fine-md` / `text-md`. Badge sizes use `--text-fine-xs`, `--text-xs`, and `--text-sm` on `ui-badge--*` modifiers.
+**Chip type scale** (`--text-chip-sm|md|lg` in `tokens/tailwind-theme.css`) maps Chip `sm`/`md`/`lg` to `text-fine-sm` / `text-fine-md` / `text-md`. Badge sizes use `--text-fine-xs`, `--text-xs`, and `--text-sm` on `ui-badge--*` modifiers.
 
 `Button`, `ButtonLink`, and `ActionButton` glyphs use `size="owner"`. `size` selects the ladder; `button.css` publishes `--icon-size` on the host. Labeled `xs` / `sm` / `default` / `lg` use `--icon-glyph-sm` / `md` / `md` / `lg` (12 / 14 / 14 / 16px). Icon-only `icon-xs` / `icon-sm` / `icon` / `icon-lg` use `--icon-glyph-md` / `lg` / `xl` / `2xl` (14 / 16 / 20 / 24px). Text and attached variants use the labeled ladder. `children` does not select the glyph.
 

@@ -135,7 +135,7 @@ Field `lg` is `--control-height-xl`, not the 40px button `--control-height-lg`.
 
 ## Tokens
 
-Role tokens live in [`globals.css`](../src/styles/globals.css):
+Role tokens live in [`tokens/tailwind-theme.css`](../src/styles/tokens/tailwind-theme.css):
 
 - `--semantic-*-border`, `--semantic-*-soft-bg`, `--semantic-*-strong-bg` — badge surfaces
 - `--semantic-*-outline-foreground`, `--semantic-*-soft-foreground`, `--semantic-*-strong-foreground` — badge copy
