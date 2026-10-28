@@ -27,8 +27,10 @@ import {
   EQUIPMENT_PICKER_SORT_AXES,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_PRESETS,
+  type EquipmentPickerAcquisitionDrawerProps,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
+  type EquipmentPickerSelectionDrawerProps,
 } from './equipment-picker-drawer.types'
 import { EquipmentResourceSummary } from '../../acquisition/equipment-resource-summary'
 import { resolveEquipmentPickerHeaderResource } from './equipment-picker-header-resource.lib'
@@ -36,6 +38,7 @@ import { EquipmentPickerItemDetails } from '../details/equipment-picker-item-det
 import { EquipmentPickerDisclosureRow } from '../browse/equipment-picker-disclosure-row'
 import { getEquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import { useEquipmentPickerController } from './use-equipment-picker-controller'
+import { resolveVisibleEquipmentPickerWorkflowSwitcher } from './equipment-picker-workflow-switcher.lib'
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 
 const equipmentNoun = catalogNounFromContentType('equipment')
@@ -54,7 +57,18 @@ const EQUIPMENT_PICKER_MODE_ICON_ROLES = {
   magic_items: 'magicItem',
 } as const satisfies Record<'purchase' | 'magic_items', ResourceIconRole>
 
-export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
+export type {
+  EquipmentPickerAcquisitionDrawerProps,
+  EquipmentPickerDrawerProps,
+  EquipmentPickerSelectionDrawerProps,
+  EquipmentPickerWorkflowSwitcher,
+} from './equipment-picker-drawer.types'
+
+function isEquipmentPickerSelectionDrawer(
+  props: EquipmentPickerDrawerProps,
+): props is EquipmentPickerSelectionDrawerProps {
+  return props.selection != null
+}
 
 function EquipmentPickerToolbarActions({
   sortMode,
@@ -93,36 +107,38 @@ function EquipmentPickerToolbarActions({
 
 /** Equipment catalog drawer — domain composition over `CatalogEntityPickerSheet`. */
 // fallow-ignore-next-line complexity
-export function EquipmentPickerDrawer({
-  open,
-  onOpenChange,
-  title,
-  description,
-  items,
-  browseSortContext,
-  budget,
-  allowedKinds,
-  showCharacterPreview = false,
-  characterPreviewContext,
-  ownership,
-  workflowMode = 'purchase',
-  workflowModes = ['purchase'],
-  onWorkflowModeChange,
-  magicItemGrantProgress,
-  magicItemAllowances,
-  focusedAllowanceId,
-  onFocusedAllowanceIdChange,
-  matchesMagicItemAllowance,
-  isGoldShoppingPath = false,
-  resolveRowActionViewModel,
-  onCommitAdd,
-  onSetPurchasedQuantity,
-  onSetRowQuantity,
-  onReleaseChoice,
-  onRemovePurchaseOne,
-  selection,
-  footer,
-}: EquipmentPickerDrawerProps) {
+export function EquipmentPickerDrawer(props: EquipmentPickerDrawerProps) {
+  const selection = isEquipmentPickerSelectionDrawer(props) ? props.selection : undefined
+  const acquisition: EquipmentPickerAcquisitionDrawerProps | undefined =
+    isEquipmentPickerSelectionDrawer(props) ? undefined : props
+  const {
+    open,
+    onOpenChange,
+    title,
+    description,
+    items,
+    browseSortContext,
+    budget,
+    allowedKinds,
+    showCharacterPreview = false,
+    characterPreviewContext,
+    ownership,
+    workflowMode = 'purchase',
+    workflowSwitcher,
+    magicItemGrantProgress,
+    magicItemAllowances,
+    focusedAllowanceId,
+    onFocusedAllowanceIdChange,
+    matchesMagicItemAllowance,
+    isGoldShoppingPath = false,
+    resolveRowActionViewModel,
+    footer,
+  } = props
+  const onCommitAdd = acquisition?.onCommitAdd
+  const onSetPurchasedQuantity = acquisition?.onSetPurchasedQuantity
+  const onSetRowQuantity = acquisition?.onSetRowQuantity
+  const onReleaseChoice = acquisition?.onReleaseChoice
+  const onRemovePurchaseOne = acquisition?.onRemovePurchaseOne
   const setRowQuantity = onSetRowQuantity ?? onSetPurchasedQuantity
   const resolvedTitle =
     title ??
@@ -144,7 +160,7 @@ export function EquipmentPickerDrawer({
     focusedAllowanceId,
     onFocusedAllowanceIdChange,
     matchesMagicItemAllowance,
-    onCommitAdd,
+    ...(onCommitAdd ? { onCommitAdd } : {}),
   })
 
   const headerResource = resolveEquipmentPickerHeaderResource({
@@ -159,23 +175,26 @@ export function EquipmentPickerDrawer({
     ) : headerResource?.kind === 'magicItems' ? (
       <EquipmentResourceSummary density="compact" slots={headerResource.slots} />
     ) : null
-  const workflowSegment =
-    workflowModes.length === 2 && onWorkflowModeChange ? (
-      <SegmentedControl
-        value={workflowMode}
-        onValueChange={(value) => onWorkflowModeChange(value as EquipmentPickerWorkflowMode)}
-        options={workflowModes.map((mode) => {
-          const iconRole = mode === 'loadout' ? 'currency' : EQUIPMENT_PICKER_MODE_ICON_ROLES[mode]
-          return {
-            value: mode,
-            label: EQUIPMENT_PICKER_MODE_LABELS[mode],
-            leadingIcon: <Icon name={resourceIcon(iconRole)} size="sm" />,
-          }
-        })}
-        aria-label={EQUIPMENT_PICKER_WORKFLOW_GROUP_LABEL}
-        fullWidth
-      />
-    ) : null
+  const visibleSwitcher = resolveVisibleEquipmentPickerWorkflowSwitcher({
+    workflowMode,
+    workflowSwitcher,
+  })
+  const workflowSegment = visibleSwitcher ? (
+    <SegmentedControl
+      value={workflowMode}
+      onValueChange={(value) => visibleSwitcher.onChange(value as EquipmentPickerWorkflowMode)}
+      options={visibleSwitcher.modes.map((mode) => {
+        const iconRole = mode === 'loadout' ? 'currency' : EQUIPMENT_PICKER_MODE_ICON_ROLES[mode]
+        return {
+          value: mode,
+          label: EQUIPMENT_PICKER_MODE_LABELS[mode],
+          leadingIcon: <Icon name={resourceIcon(iconRole)} size="sm" />,
+        }
+      })}
+      aria-label={EQUIPMENT_PICKER_WORKFLOW_GROUP_LABEL}
+      fullWidth
+    />
+  ) : null
 
   const resolveRowVm = React.useCallback(
     (
@@ -277,6 +296,7 @@ export function EquipmentPickerDrawer({
           budget: picker.effectiveBudget,
           magicItemGrantProgress,
         })
+        const commitHeader = picker.handleHeaderCommit
 
         return (
           <EquipmentPickerDisclosureRow
@@ -285,10 +305,23 @@ export function EquipmentPickerDrawer({
             workflowMode={workflowMode}
             isGoldShoppingPath={isGoldShoppingPath}
             budget={picker.effectiveBudget}
-            onCommitAdd={() => picker.handleHeaderCommit(item)}
-            onSetPurchasedQuantity={(total) => setRowQuantity?.(item, total)}
-            onReleaseChoice={(allowanceId) => onReleaseChoice?.(item, allowanceId)}
-            onRemovePurchaseOne={() => onRemovePurchaseOne?.(item)}
+            {...(selection || !commitHeader
+              ? {}
+              : {
+                  onCommitAdd: () => commitHeader(item),
+                  ...(setRowQuantity
+                    ? { onSetPurchasedQuantity: (total: number) => setRowQuantity(item, total) }
+                    : {}),
+                  ...(onReleaseChoice
+                    ? {
+                        onReleaseChoice: (allowanceId: string) =>
+                          onReleaseChoice(item, allowanceId),
+                      }
+                    : {}),
+                  ...(onRemovePurchaseOne
+                    ? { onRemovePurchaseOne: () => onRemovePurchaseOne(item) }
+                    : {}),
+                })}
           />
         )
       }}

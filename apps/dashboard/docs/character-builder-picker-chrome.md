@@ -286,9 +286,9 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 
 ### EquipmentPickerDrawer
 
-**May know:** equipment domain; browse workflow mode for **presentation** (filters/sorts/budget/status line); row/detail composition; quantity UI; grant manage **callbacks**; documented pass-through of grant/acquisition context to details until acquisition VM is weaned off draft.
+**May know:** equipment domain; browse workflow mode for **presentation** (filters/sorts/budget/status line); an optional `workflowSwitcher` when the caller enables exactly two workflows; row/detail composition; quantity UI on the acquisition interaction; radio `selection` as a separate interaction; grant manage **callbacks**; documented pass-through of grant/acquisition context to details until acquisition VM is weaned off draft.
 
-**Must not know:** how a purchase is persisted; how a magic-item grant is applied; character-step mutation implementation; purchase-vs-grant routing on the add path (consumer maps `onCommitAdd`).
+**Must not know:** how a purchase is persisted; how a magic-item grant is applied; character-step mutation implementation; purchase-vs-grant routing on the add path (consumer maps `onCommitAdd`). A missing `workflowSwitcher` means `workflowMode` is fixed (default `purchase`). Radio selection uses `selection` and a footer commit; it does not take `onCommitAdd` or quantity, release, or removal callbacks.
 
 ### SpellPickerDrawer
 

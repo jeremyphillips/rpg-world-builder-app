@@ -212,7 +212,6 @@ export function MonsterArmorSlotAction({
         items={items}
         allowedKinds={['armor']}
         workflowMode="loadout"
-        workflowModes={['loadout']}
         showCharacterPreview={false}
         selection={{ value: pendingId, onValueChange: setPendingId }}
         footer={
@@ -220,7 +219,6 @@ export function MonsterArmorSlotAction({
             {copy.select}
           </Button>
         }
-        onCommitAdd={() => false}
       />
       <ArmorSlotReplaceDialog
         pendingId={pendingId}

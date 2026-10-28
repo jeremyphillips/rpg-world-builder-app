@@ -93,6 +93,7 @@ describe('EquipmentPickerDrawer', () => {
     expect(screen.getByText('100 GP budget')).toBeInTheDocument()
     expect(screen.getByText('15 GP spent')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Browse equipment' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Purchase' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
 
     await user.hover(cannotAffordBadge)
@@ -646,7 +647,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerMagicItemsFixture}
         workflowMode="magic_items"
-        workflowModes={['magic_items']}
         magicItemAllowances={equipmentPickerMagicItemAllowancesFixture}
         magicItemGrantProgress={equipmentPickerMagicItemProgressFixture}
         onCommitAdd={vi.fn()}
@@ -671,8 +671,10 @@ describe('EquipmentPickerDrawer', () => {
           items={equipmentPickerItemsFixture}
           budget={workflowMode === 'purchase' ? equipmentPickerBudgetFixture : undefined}
           workflowMode={workflowMode}
-          workflowModes={['purchase', 'magic_items']}
-          onWorkflowModeChange={setWorkflowMode}
+          workflowSwitcher={{
+            modes: ['purchase', 'magic_items'],
+            onChange: setWorkflowMode,
+          }}
           magicItemAllowances={equipmentPickerMagicItemAllowancesFixture}
           magicItemGrantProgress={equipmentPickerMagicItemProgressFixture}
           onCommitAdd={vi.fn()}
@@ -696,6 +698,27 @@ describe('EquipmentPickerDrawer', () => {
 
     expect(screen.getByText('40 GP remaining')).toBeInTheDocument()
     expect(screen.queryByText('Up to Uncommon · 1 available')).not.toBeInTheDocument()
+  })
+
+  it('keeps purchase fixed when the switcher omits the active mode', () => {
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerItemsFixture}
+        budget={equipmentPickerBudgetFixture}
+        workflowMode="purchase"
+        workflowSwitcher={{
+          modes: ['magic_items', 'loadout'],
+          onChange: vi.fn(),
+        }}
+        onCommitAdd={vi.fn()}
+      />,
+    )
+
+    expect(screen.queryByRole('button', { name: 'Magic items' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Loadout' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBeGreaterThan(0)
   })
 
   itAxe('has no axe accessibility violations', async () => {

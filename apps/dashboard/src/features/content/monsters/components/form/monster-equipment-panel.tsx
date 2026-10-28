@@ -147,7 +147,6 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
           preferMartialWeaponBrowseOrder: false,
         }}
         workflowMode="loadout"
-        workflowModes={['loadout']}
         showCharacterPreview={false}
         resolveRowActionViewModel={({ equipment: row }) =>
           buildEquipmentLoadoutRowViewModel(row.id, equipment)

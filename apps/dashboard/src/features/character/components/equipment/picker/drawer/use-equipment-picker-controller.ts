@@ -22,7 +22,8 @@ import {
   EQUIPMENT_PICKER_MODE_MAGIC_ITEMS,
   EQUIPMENT_PICKER_RARITY_ALL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
-  type EquipmentPickerDrawerProps,
+  type EquipmentPickerCommitAdd,
+  type EquipmentPickerDrawerBaseProps,
   type EquipmentPickerItem,
   type EquipmentPickerRow,
   type EquipmentPickerKindFilter,
@@ -33,8 +34,8 @@ import {
   resolveEquipmentPickerAvailableSortModes,
 } from './equipment-picker-sort-sections.lib'
 
-export type UseEquipmentPickerControllerArgs = Pick<
-  EquipmentPickerDrawerProps,
+type UseEquipmentPickerControllerBrowseArgs = Pick<
+  EquipmentPickerDrawerBaseProps,
   | 'items'
   | 'browseSortContext'
   | 'budget'
@@ -44,8 +45,10 @@ export type UseEquipmentPickerControllerArgs = Pick<
   | 'focusedAllowanceId'
   | 'onFocusedAllowanceIdChange'
   | 'matchesMagicItemAllowance'
-> & {
-  onCommitAdd: EquipmentPickerDrawerProps['onCommitAdd']
+>
+
+export type UseEquipmentPickerControllerArgs = UseEquipmentPickerControllerBrowseArgs & {
+  onCommitAdd?: EquipmentPickerCommitAdd
 }
 
 export function useEquipmentPickerController({
@@ -225,7 +228,14 @@ export function useEquipmentPickerController({
   }, [onFocusedAllowanceIdChange])
 
   const handleHeaderCommit = React.useCallback(
-    (item: EquipmentPickerItem): boolean => onCommitAdd(item) !== false,
+    (item: EquipmentPickerItem): boolean => {
+      if (!onCommitAdd) {
+        throw new Error(
+          'Equipment picker header commit requires an acquisition onCommitAdd callback',
+        )
+      }
+      return onCommitAdd(item) !== false
+    },
     [onCommitAdd],
   )
 
@@ -247,6 +257,6 @@ export function useEquipmentPickerController({
     setSortMode,
     handleFilterStateChange,
     resetBrowseView,
-    handleHeaderCommit,
+    handleHeaderCommit: onCommitAdd ? handleHeaderCommit : undefined,
   }
 }

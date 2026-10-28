@@ -44,12 +44,27 @@ describe('useEquipmentPickerController', () => {
       }),
     )
 
+    const commitHeader = result.current.handleHeaderCommit
+    expect(commitHeader).toBeTypeOf('function')
+    if (!commitHeader) return
+
     let applied = true
     act(() => {
-      applied = result.current.handleHeaderCommit(ropeRow)
+      applied = commitHeader(ropeRow)
     })
 
     expect(onCommitAdd).toHaveBeenCalledWith(ropeRow)
     expect(applied).toBe(false)
+  })
+
+  it('does not expose header commit without an acquisition callback', () => {
+    const { result } = renderHook(() =>
+      useEquipmentPickerController({
+        items: equipmentPickerItemsFixture,
+        budget: undefined,
+      }),
+    )
+
+    expect(result.current.handleHeaderCommit).toBeUndefined()
   })
 })

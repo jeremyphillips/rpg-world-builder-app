@@ -31,6 +31,8 @@ describe('EquipmentPickerDrawer loadout mode', () => {
     )
     expect(screen.getByRole('heading', { name: 'Add equipment' })).toBeInTheDocument()
     expect(screen.queryByText(EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Purchase' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Loadout' })).not.toBeInTheDocument()
   })
 
   it('renders Owned once for a plain stack and adds customized metadata without a purchase price', () => {
@@ -98,7 +100,6 @@ describe('EquipmentPickerDrawer loadout mode', () => {
                 Select armor
               </button>
             }
-            onCommitAdd={vi.fn()}
           />
           <div data-testid="committed">{committed}</div>
         </>
@@ -113,6 +114,8 @@ describe('EquipmentPickerDrawer loadout mode', () => {
       within(group).getByRole('radio', { name: equipmentPickerLongswordFixture.name }),
     ).toBeChecked()
     expect(within(group).queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Select armor' })).toBeDisabled()
 
     await user.click(screen.getByRole('radio', { name: equipmentPickerChainMailFixture.name }))
