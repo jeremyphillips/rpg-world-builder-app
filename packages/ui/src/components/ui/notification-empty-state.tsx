@@ -11,7 +11,7 @@ export function NotificationEmptyState({
 }: NotificationEmptyStateProps) {
   return (
     <div className="px-4 py-8 text-center">
-      <Text as="p" className="text-sm font-body-emphasis text-foreground">
+      <Text as="p" variant="body-compact" className="font-body-emphasis">
         {title}
       </Text>
       <Text as="p" variant="supporting" className="mt-1">

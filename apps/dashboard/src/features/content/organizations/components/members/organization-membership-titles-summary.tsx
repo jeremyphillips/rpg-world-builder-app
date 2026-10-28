@@ -32,7 +32,7 @@ export function OrganizationMembershipTitlesSummary({
   return (
     <ol className="list-none space-y-1" data-testid={`${idPrefix}-list`}>
       {sorted.map((entry) => (
-        <li key={entry.id} className="text-sm text-foreground">
+        <li key={entry.id} className="text-style-body-compact">
           {entry.label}
         </li>
       ))}

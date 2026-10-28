@@ -185,7 +185,7 @@ function ParityMatrix() {
             className={cn(
               'rounded-md border px-2.5 py-1',
               containerWidth === width
-                ? 'border-foreground bg-muted text-sm text-foreground'
+                ? 'border-foreground bg-muted text-style-body-compact'
                 : 'border-border text-style-supporting',
             )}
             onClick={() => setContainerWidth(width)}

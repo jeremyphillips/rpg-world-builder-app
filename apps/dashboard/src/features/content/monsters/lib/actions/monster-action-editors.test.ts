@@ -1,5 +1,6 @@
-import type { Equipment } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
+
+import { pickEquipment } from '@/test/fixtures/pick'
 
 import {
   reconcileMonsterActionKind,
@@ -139,13 +140,7 @@ describe('monster form advisories', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.equipment = [{ entryId: 'bow', equipmentId: 'shortbow', quantity: 1, equipped: false }]
     values.actions = [{ id: 'shot', kind: 'weapon', equipmentEntryId: 'bow' }]
-    const shortbow = {
-      id: 'shortbow',
-      kind: 'weapon',
-      name: 'Shortbow',
-      category: 'martial',
-      mode: 'ranged',
-    } as Equipment
+    const shortbow = pickEquipment('shortbow')
     const advisories = collectMonsterFormAdvisories(values, new Map([['shortbow', shortbow]]))
     expect(advisories.map((advisory) => advisory.code)).toEqual(
       expect.arrayContaining(['weapon-not-equipped', 'weapon-not-proficient']),

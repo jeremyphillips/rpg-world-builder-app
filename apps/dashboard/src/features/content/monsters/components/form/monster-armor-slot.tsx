@@ -146,7 +146,8 @@ export function MonsterArmorSlotAction({
   const form = useFormContext<MonsterFormValues>()
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const catalog = monsterEquipmentCatalog(ctx)
-  const equipment = values?.equipment ?? []
+  const equipmentSource = values?.equipment
+  const equipment = useMemo(() => equipmentSource ?? [], [equipmentSource])
   const owned = slotEntries(equipment, catalog, slot)
   const currentId = ownedArmorSlotId(owned)
   const copy = getMonsterArmorSlotUiCopy(slot)
@@ -155,19 +156,17 @@ export function MonsterArmorSlotAction({
   const [pendingReplace, setPendingReplace] = useState<MonsterEquipmentFormEntry | null>(null)
 
   const weaponGrants = useMemo(() => resolveMonsterFormWeaponGrants(values), [values])
-  const referenceOptions = ctx.options?.equipment?.forReference() ?? []
-  const items = useMemo(
-    () =>
-      armorSlotPickerItems(
-        buildMonsterLoadoutPickerItems({
-          referenceOptions,
-          weaponGrants,
-          equipment,
-        }),
-        slot,
-      ),
-    [equipment, referenceOptions, slot, weaponGrants],
-  )
+  const items = useMemo(() => {
+    const referenceOptions = ctx.options?.equipment?.forReference() ?? []
+    return armorSlotPickerItems(
+      buildMonsterLoadoutPickerItems({
+        referenceOptions,
+        weaponGrants,
+        equipment,
+      }),
+      slot,
+    )
+  }, [ctx.options?.equipment, equipment, slot, weaponGrants])
   const unchanged = armorSlotSelectionUnchanged(pendingId, owned, currentId)
   const catalogReady = ctx.equipmentCatalogStatus === 'ready'
   const provider = monsterMagicPropertyProvider(ctx)
@@ -246,7 +245,8 @@ export function MonsterArmorSlotBody({
   const equipmentEntrySurface = useMonsterEquipmentEntryActions(ctx)
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const catalog = monsterEquipmentCatalog(ctx)
-  const equipment = values?.equipment ?? []
+  const equipmentSource = values?.equipment
+  const equipment = useMemo(() => equipmentSource ?? [], [equipmentSource])
   const owned = slotEntries(equipment, catalog, slot)
   const entry = owned[0]
   if (!entry) {

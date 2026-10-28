@@ -8,4 +8,4 @@ export const equipmentInventoryRowQuantityClasses = 'flex items-center gap-1.5'
 export const equipmentInventoryRowActionsClasses = 'flex shrink-0 items-center'
 
 /** Read-only quantity — 14px, matching the trailing price label. */
-export const equipmentInventoryRowQtyLabelClasses = 'shrink-0 text-sm tabular-nums text-foreground'
+export const equipmentInventoryRowQtyLabelClasses = 'shrink-0 text-style-body-compact tabular-nums'

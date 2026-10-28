@@ -42,7 +42,7 @@ function GlobalSearchPreviewStatus({
         </Text>
         <button
           type="button"
-          className="text-sm text-foreground underline-offset-4 hover:underline"
+          className="text-style-body-compact underline-offset-4 hover:underline"
           onClick={onRetry}
         >
           {GLOBAL_SEARCH_COPY.tryAgain}

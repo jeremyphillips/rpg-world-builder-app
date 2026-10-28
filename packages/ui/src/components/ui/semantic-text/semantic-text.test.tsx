@@ -171,11 +171,11 @@ describe('SemanticText', () => {
     it('inherits scale from an independent text-style-field-hint-compact parent', () => {
       styleEl = installInheritanceStyles()
       render(
-        <p className="text-style-field-hint-compact" data-testid="owner">
+        <div className="text-style-field-hint-compact" data-testid="owner">
           <SemanticText tone="neutral" emphasis="low">
             Hint status
           </SemanticText>
-        </p>,
+        </div>,
       )
       expect(px(getComputedStyle(screen.getByTestId('owner')).fontSize)).toBe(12)
       expect(px(getComputedStyle(screen.getByTestId('owner')).lineHeight)).toBe(16)

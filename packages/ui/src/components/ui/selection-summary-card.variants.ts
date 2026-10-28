@@ -13,7 +13,7 @@ export const selectionSummaryCardRowGroupClasses =
 
 export const selectionSummaryCardRowGroupDividerClasses = 'border-t border-border-subtle pt-0.5'
 
-export const selectionSummaryCardRowValueVariants = 'text-sm font-body-emphasis text-foreground'
+export const selectionSummaryCardRowValueVariants = 'text-style-body-compact font-body-emphasis'
 
 export const selectionSummaryCardRowValueButtonClasses =
   'cursor-pointer border-0 bg-transparent p-0 text-left transition-colors hover:text-foreground/80 ui-focus-ring rounded-sm'

@@ -48,6 +48,10 @@ export const DetailsTextIcon: Story = {
 
 /** Every verb in `ACTION_ICON_VERBS` — ghost icon buttons with registry glyphs. */
 export const ActionVerbs: Story = {
+  args: {
+    action: 'add',
+    children: 'Add',
+  },
   render: () => (
     <ul className="flex flex-wrap gap-4">
       {ACTION_ICON_VERBS.map((action) => (
@@ -67,6 +71,10 @@ export const ActionVerbs: Story = {
 
 /** Labeled and icon-only sizes — owner glyph from button host `--icon-size`. */
 export const SizeLadder: Story = {
+  args: {
+    action: 'add',
+    children: 'Add',
+  },
   render: () => (
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-end gap-4">

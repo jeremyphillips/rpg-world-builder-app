@@ -15,7 +15,7 @@ type Story = StoryObj<typeof meta>
 export const BudgetHeader: Story = {
   args: {
     as: 'p',
-    className: 'text-sm text-foreground',
+    className: 'text-style-body-compact',
     prefix: <span className="font-medium">Budget:</span>,
     primary: '5 GP remaining',
     secondary: '100 GP starting · 95 GP spent',

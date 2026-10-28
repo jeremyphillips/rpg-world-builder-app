@@ -149,7 +149,7 @@ function ToggleMatrixHarness() {
             className={cn(
               'rounded-md border px-2.5 py-1',
               step === item.id
-                ? 'border-foreground bg-muted text-sm text-foreground'
+                ? 'border-foreground bg-muted text-style-body-compact'
                 : 'border-border text-style-supporting',
             )}
             onClick={() => setStep(item.id === 'clear' ? 'clean' : item.id)}
