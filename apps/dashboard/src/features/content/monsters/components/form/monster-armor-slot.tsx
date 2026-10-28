@@ -6,6 +6,7 @@ import {
   type CreatureArmorSlot,
 } from '@rpg/contracts'
 import {
+  ActionButton,
   Button,
   ConfirmDialog,
   InsetPanel,
@@ -191,20 +192,35 @@ export function MonsterArmorSlotAction({
     applyReplacement(decision.equipmentId)
   }
 
+  const openPicker = () => {
+    setPendingId(currentId ?? null)
+    setOpen(true)
+  }
+  const actionLabel = owned.length > 0 ? copy.change : copy.add
+
   return (
     <>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        disabled={!catalogReady}
-        onClick={() => {
-          setPendingId(currentId ?? null)
-          setOpen(true)
-        }}
-      >
-        {owned.length > 0 ? copy.change : copy.add}
-      </Button>
+      {owned.length > 0 ? (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!catalogReady}
+          onClick={openPicker}
+        >
+          {actionLabel}
+        </Button>
+      ) : (
+        <ActionButton
+          action="add"
+          variant="outline"
+          size="sm"
+          disabled={!catalogReady}
+          onClick={openPicker}
+        >
+          {actionLabel}
+        </ActionButton>
+      )}
       <EquipmentPickerDrawer
         open={open}
         onOpenChange={setOpen}

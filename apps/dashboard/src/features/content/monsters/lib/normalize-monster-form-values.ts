@@ -87,7 +87,7 @@ function normalizeAction(
 
 function normalizeArmorClass(armorClass: MonsterFormValues['armorClass']): Record<string, unknown> {
   const next: Record<string, unknown> = {}
-  if (armorClass.naturalArmor && typeof armorClass.naturalArmorBonus === 'number') {
+  if (typeof armorClass.naturalArmorBonus === 'number' && armorClass.naturalArmorBonus > 0) {
     next.naturalArmorBonus = armorClass.naturalArmorBonus
   }
   if (armorClass.useFixedAc && typeof armorClass.fixedValue === 'number') {

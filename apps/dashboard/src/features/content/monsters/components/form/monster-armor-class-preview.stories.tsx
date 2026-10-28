@@ -42,7 +42,7 @@ export const NaturalArmor: Story = {
     values: {
       ...resolveMonsterCreateDefaultValues(),
       abilityScores: { ...resolveMonsterCreateDefaultValues().abilityScores, dex: 15 },
-      armorClass: { naturalArmor: true, naturalArmorBonus: 2, useFixedAc: false },
+      armorClass: { naturalArmorBonus: 2, useFixedAc: false },
     },
   },
 }

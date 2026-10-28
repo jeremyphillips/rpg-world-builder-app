@@ -27,7 +27,10 @@ import {
   type MagicPropertyDefinitionProvider,
 } from '@rpg/contracts'
 
-import { monsterArmorClassCaption } from './statistics/monster-armor-class-presentation'
+import {
+  monsterArmorClassCaption,
+  monsterArmorClassCompactLabel,
+} from './statistics/monster-armor-class-presentation'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 
@@ -107,7 +110,7 @@ export function monsterUnavailableReasonCopy(
 function formatAcStatRow(derived: DerivedMonsterStatBlock): ContentStatRowData {
   return {
     id: 'ac',
-    label: 'AC',
+    label: monsterArmorClassCompactLabel(),
     value: joinInlineMetadata([String(derived.ac), monsterArmorClassCaption(derived.acResolution)]),
   }
 }

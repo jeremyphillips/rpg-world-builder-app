@@ -1,6 +1,8 @@
 import {
+  CREATURE_ARMOR_CLASS_KIND_TERM,
   formatSignedModifier,
   getCreatureArmorClassKindLabel,
+  getTermCompactLabel,
   type MonsterArmorClassAlternative,
   type MonsterArmorClassResolution,
   type MonsterArmorClassRow,
@@ -24,10 +26,15 @@ export function monsterArmorClassCaption(resolution: MonsterArmorClassResolution
   return resolution.shield ? `${body} + ${resolution.shield.label}` : body
 }
 
+/** Compact Armor Class label from vocabulary (`AC`). */
+export function monsterArmorClassCompactLabel(): string {
+  return getTermCompactLabel(CREATURE_ARMOR_CLASS_KIND_TERM)
+}
+
 function rowLabel(row: MonsterArmorClassRow): string {
   switch (row.kind) {
     case 'ruleset-base':
-      return 'Ruleset base'
+      return `Base ${monsterArmorClassCompactLabel()}`
     case 'armor-base':
       return `${row.label} (base)`
     case 'dex':
@@ -72,7 +79,9 @@ export function monsterArmorClassAlternativeMessages(
 ): string[] {
   const messages = resolution.alternatives.map(alternativeSentence)
   if (resolution.calculatedAc !== undefined) {
-    messages.push(`Calculated AC without override: ${resolution.calculatedAc}`)
+    messages.push(
+      `Calculated ${monsterArmorClassCompactLabel()} without override: ${resolution.calculatedAc}`,
+    )
   }
   return messages
 }

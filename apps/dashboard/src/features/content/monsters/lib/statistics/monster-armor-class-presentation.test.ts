@@ -6,6 +6,7 @@ import {
   monsterArmorClassAlternativeMessages,
   monsterArmorClassBreakdownRows,
   monsterArmorClassCaption,
+  monsterArmorClassCompactLabel,
 } from './monster-armor-class-presentation'
 
 const chainAndShield: MonsterArmorClassResolution = {
@@ -49,7 +50,18 @@ describe('monster armor class presentation', () => {
       })[0],
     ).toMatchObject({ label: 'DEX modifier (max +2)', value: '+2' })
     expect(monsterArmorClassAlternativeMessages(resolution)).toEqual([
-      'Calculated AC without override: 18',
+      `Calculated ${monsterArmorClassCompactLabel()} without override: 18`,
     ])
+  })
+
+  it('labels the ruleset base with the armor class compact term', () => {
+    const rows = monsterArmorClassBreakdownRows({
+      ac: 10,
+      source: 'unarmored',
+      rows: [{ kind: 'ruleset-base', value: 10 }],
+      alternatives: [],
+    })
+    expect(rows[0]).toMatchObject({ label: `Base ${monsterArmorClassCompactLabel()}` })
+    expect(monsterArmorClassCompactLabel()).toBe('AC')
   })
 })

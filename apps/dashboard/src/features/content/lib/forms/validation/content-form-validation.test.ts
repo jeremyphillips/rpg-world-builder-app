@@ -359,7 +359,7 @@ function invalidValueFor(routeKey: string): unknown {
         creatureType: 'humanoid',
         alignment: 'n',
         abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
-        armorClass: { naturalArmor: false, useFixedAc: false },
+        armorClass: { naturalArmorBonus: 0, useFixedAc: false },
         hitPoints: { kind: 'hit-dice', count: 1 },
         movement: [{ mode: 'walk', feet: 30 }],
         communication: {},

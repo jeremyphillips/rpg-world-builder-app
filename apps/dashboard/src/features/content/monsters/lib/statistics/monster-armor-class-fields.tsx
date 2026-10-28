@@ -1,4 +1,8 @@
-import { getContentTypeTerm, getNaturalArmorBonusFieldLabel } from '@rpg/contracts'
+import {
+  CREATURE_ARMOR_CLASS_KIND_ENTRIES,
+  getContentTypeTerm,
+  getNaturalArmorBonusFieldLabel,
+} from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -15,9 +19,9 @@ import {
   MONSTER_SHIELD_SLOT_HINT,
 } from '../monster-form-labels'
 
-const NATURAL_ARMOR_LABEL = 'Natural armor'
-const NATURAL_ARMOR_HINT =
-  'Adds to unarmored Armor Class. Worn armor is used instead when it is higher.'
+const NATURAL_ARMOR_LEGEND = `${CREATURE_ARMOR_CLASS_KIND_ENTRIES.natural.label} armor`
+const NATURAL_ARMOR_DESCRIPTION =
+  "Increase the creature's natural protection. The higher of natural armor and equipped armor is used."
 const FIXED_ARMOR_CLASS_LABEL = 'Fixed Armor Class'
 const USE_FIXED_ARMOR_CLASS_LABEL = 'Use fixed Armor Class'
 const USE_FIXED_ARMOR_CLASS_HINT =
@@ -37,67 +41,46 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
           render: () => <MonsterArmorClassPreview ctx={ctx} />,
         },
         {
-          kind: 'dependent',
-          separator: 'subtle',
-          controller: {
-            type: 'checkbox',
-            name: 'armorClass.naturalArmor',
-            label: NATURAL_ARMOR_LABEL,
-            hint: NATURAL_ARMOR_HINT,
-            defaultValue: false,
-          },
-          dependents: {
-            visibility: {
-              dependsOn: ['armorClass.naturalArmor'],
-              visibleWhen: (watched) => watched['armorClass.naturalArmor'] === true,
+          kind: 'group',
+          legend: NATURAL_ARMOR_LEGEND,
+          description: NATURAL_ARMOR_DESCRIPTION,
+          fields: [
+            {
+              type: 'number',
+              name: 'armorClass.naturalArmorBonus',
+              label: getNaturalArmorBonusFieldLabel(),
+              labelPosition: 'settings',
+              control: 'stepper',
+              min: 0,
+              defaultValue: 0,
+              digits: 2,
+              separator: 'subtle',
             },
-            fields: [
-              {
-                type: 'number',
-                name: 'armorClass.naturalArmorBonus',
-                label: getNaturalArmorBonusFieldLabel(),
-                labelPosition: 'settings',
-                control: 'stepper',
-                min: 1,
-                defaultValue: 1,
-                digits: 2,
-              },
-            ],
-          },
+          ],
         },
         {
           kind: 'group',
           legend: getContentTypeTerm('equipment').label,
           fields: [
             {
-              kind: 'group',
+              kind: 'slot',
+              name: 'armorClass.bodyArmor',
               heading: {
                 label: MONSTER_BODY_ARMOR_SLOT_HEADING,
                 hint: MONSTER_BODY_ARMOR_SLOT_HINT,
                 action: <MonsterArmorSlotAction slot="body-armor" ctx={ctx} />,
               },
-              fields: [
-                {
-                  kind: 'slot',
-                  name: 'armorClass.bodyArmor',
-                  render: () => <MonsterArmorSlotBody slot="body-armor" ctx={ctx} />,
-                },
-              ],
+              render: () => <MonsterArmorSlotBody slot="body-armor" ctx={ctx} />,
             },
             {
-              kind: 'group',
+              kind: 'slot',
+              name: 'armorClass.shield',
               heading: {
                 label: MONSTER_SHIELD_SLOT_HEADING,
                 hint: MONSTER_SHIELD_SLOT_HINT,
                 action: <MonsterArmorSlotAction slot="shield" ctx={ctx} />,
               },
-              fields: [
-                {
-                  kind: 'slot',
-                  name: 'armorClass.shield',
-                  render: () => <MonsterArmorSlotBody slot="shield" ctx={ctx} />,
-                },
-              ],
+              render: () => <MonsterArmorSlotBody slot="shield" ctx={ctx} />,
             },
           ],
         },

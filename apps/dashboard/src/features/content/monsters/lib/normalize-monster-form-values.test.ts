@@ -8,7 +8,7 @@ import { buildMonsterInput } from './monster-form-values'
 describe('normalizeMonsterFormValues', () => {
   it('strips inactive variants and never emits a zero hit-dice count', () => {
     const values = resolveMonsterCreateDefaultValues()
-    values.armorClass = { naturalArmor: true, naturalArmorBonus: 2, useFixedAc: false }
+    values.armorClass = { naturalArmorBonus: 2, useFixedAc: false }
     values.hitPoints = { kind: 'hit-dice', count: 0 }
     values.actions = [
       { id: 'claw', kind: 'natural-weapon', name: 'Claw', damage: { flat: 1 }, mode: 'melee' },

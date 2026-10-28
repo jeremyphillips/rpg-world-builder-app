@@ -36,4 +36,24 @@ describe('CompositeGroup', () => {
     const labelLine = screen.getByText('Suggested ability scores').closest('div')
     expect(labelLine).toHaveClass(...fieldLabelVariants({ size: 'md' }).split(/\s+/))
   })
+
+  it('places a trailing action beside a leaf label and hint', () => {
+    render(
+      <CompositeGroup
+        heading={{
+          label: 'Armor',
+          hint: 'One suit of body armor.',
+          action: <button type="button">Add armor</button>,
+        }}
+        useFieldset={false}
+      >
+        <div>empty</div>
+      </CompositeGroup>,
+    )
+
+    const action = screen.getByRole('button', { name: 'Add armor' })
+    expect(action.parentElement).toHaveClass('justify-self-end')
+    expect(screen.getByRole('group', { name: /Armor/ })).toBeInTheDocument()
+    expect(screen.getByText('One suit of body armor.')).toBeInTheDocument()
+  })
 })

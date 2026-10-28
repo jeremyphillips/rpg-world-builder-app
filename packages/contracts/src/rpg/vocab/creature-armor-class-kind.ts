@@ -3,6 +3,7 @@ import type { GameTermEntry, VocabularyTerm } from './types'
 
 export const CREATURE_ARMOR_CLASS_KIND_TERM = {
   label: 'Armor Class',
+  compactLabel: 'AC',
   description: 'How a creature’s Armor Class is calculated.',
   sentence: {
     singular: 'Armor Class source',

@@ -27,30 +27,32 @@ function renderArmorClassForm(onSubmit: (values: MonsterFormValues) => void) {
 }
 
 describe('monster armor class fields', () => {
-  it('clears a natural bonus when unchecked and restores the default when checked again', async () => {
+  it('shows natural armor as a bonus stepper that defaults to 0', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
     renderArmorClassForm(onSubmit)
 
-    expect(screen.queryByLabelText('Natural armor bonus')).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('checkbox', { name: 'Natural armor' }))
-    expect(screen.getByLabelText('Natural armor bonus')).toHaveValue(1)
+    expect(screen.queryByRole('checkbox', { name: 'Natural armor' })).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Add armor' }).querySelector('[data-icon="plus"]'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Add shield' }).querySelector('[data-icon="plus"]'),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/Increase the creature's natural protection/)).toBeInTheDocument()
+    const bonus = screen.getByLabelText('Natural armor bonus')
+    expect(bonus).toHaveValue(0)
 
     await user.click(screen.getByRole('button', { name: 'Save' }))
     expect(onSubmit).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        armorClass: expect.objectContaining({ naturalArmor: true, naturalArmorBonus: 1 }),
+        armorClass: expect.objectContaining({ naturalArmorBonus: 0 }),
       }),
       expect.anything(),
     )
 
-    await user.click(screen.getByRole('checkbox', { name: 'Natural armor' }))
-    expect(screen.queryByLabelText('Natural armor bonus')).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Save' }))
-    const cleared = onSubmit.mock.calls.at(-1)?.[0] as MonsterFormValues
-    expect(cleared.armorClass.naturalArmor).toBe(false)
-    expect(cleared.armorClass.naturalArmorBonus).toBeUndefined()
+    await user.click(screen.getByRole('button', { name: 'Increase Natural armor bonus' }))
+    expect(bonus).toHaveValue(1)
   })
 
   it('keeps a fixed override when the advanced disclosure is collapsed', async () => {

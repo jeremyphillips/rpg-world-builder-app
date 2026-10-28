@@ -9,6 +9,7 @@ import type {
 import { deriveMonsterFormDraft } from './monster-form-derivation'
 import { MONSTER_HP_MINIMUM_NOTE } from './monster-form-labels'
 import { monsterUnavailableReasonCopy } from './monster-display'
+import { monsterArmorClassCompactLabel } from './statistics/monster-armor-class-presentation'
 import { MONSTER_FORM_TAB } from './monster-form-view'
 import type { MonsterFormValues } from './monster-form-values'
 
@@ -75,7 +76,12 @@ export function buildMonsterPreviewSections(
 
   const statistics: ContentPreviewSection = {
     derivedKind: 'ready',
-    facts: [fact('AC', ac), fact('HP', hp), fact('Initiative', initiative), fact('CR', challenge)],
+    facts: [
+      fact(monsterArmorClassCompactLabel(), ac),
+      fact('HP', hp),
+      fact('Initiative', initiative),
+      fact('CR', challenge),
+    ],
   }
 
   return {

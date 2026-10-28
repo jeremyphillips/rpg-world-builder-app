@@ -1,5 +1,5 @@
 import { useFormContext, useWatch } from 'react-hook-form'
-import { InsetPanel, SemanticText, Text } from '@rpg/ui'
+import { cn, InsetPanel, SemanticText, Text } from '@rpg/ui'
 
 import { abilityScoreCardScoreValueClassesFor } from '@/components/ability-score/ability-score-card.variants'
 
@@ -44,45 +44,47 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
 
   return (
     <InsetPanel size="sm">
-      <div className="flex flex-col gap-4 md:flex-row md:items-start">
-        <div className="flex flex-col gap-1">
-          <p className={abilityScoreCardScoreValueClassesFor('md')}>
+      <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-0">
+        <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 text-center md:w-[220px] md:border-r md:border-border md:pr-4">
+          <p className={cn(abilityScoreCardScoreValueClassesFor('md'), 'text-center')}>
             {resolution ? resolution.ac : '—'}
           </p>
-          <Text as="p" variant="supporting">
+          <Text as="p" variant="caption" className="text-center">
             {resolution ? monsterArmorClassCaption(resolution) : (unavailable ?? 'Not set')}
           </Text>
         </div>
         {resolution ? (
-          <dl className="flex min-w-0 flex-1 flex-col gap-1">
-            {monsterArmorClassBreakdownRows(resolution).map((row) => (
-              <div key={row.id} className="flex items-baseline justify-between gap-3">
-                <dt>
-                  <Text as="span" variant="supporting">
-                    {row.label}
-                  </Text>
-                </dt>
-                <dd>
-                  <Text as="span" variant="supporting">
-                    {row.value}
-                  </Text>
-                </dd>
-              </div>
-            ))}
-            <div className="flex items-baseline justify-between gap-3">
+          <dl className="flex h-[132px] min-w-0 flex-1 flex-col md:pl-4">
+            <div className="flex flex-col gap-0.5">
+              {monsterArmorClassBreakdownRows(resolution).map((row) => (
+                <div key={row.id} className="flex items-baseline justify-between gap-3 leading-4">
+                  <dt>
+                    <Text as="span" variant="caption">
+                      {row.label}
+                    </Text>
+                  </dt>
+                  <dd>
+                    <Text as="span" variant="caption">
+                      {row.value}
+                    </Text>
+                  </dd>
+                </div>
+              ))}
+            </div>
+            <div className="mt-1 flex items-baseline justify-between gap-3 border-t border-border pt-1 leading-4">
               <dt>
-                <Text as="span" variant="label">
+                <Text as="span" className="text-xs font-semibold">
                   Total
                 </Text>
               </dt>
               <dd>
-                <Text as="span" variant="label">
+                <Text as="span" className="text-xs font-semibold">
                   {resolution.ac}
                 </Text>
               </dd>
             </div>
             {monsterArmorClassAlternativeMessages(resolution).map((message) => (
-              <Text key={message} as="p" variant="supporting">
+              <Text key={message} as="p" variant="caption">
                 {message}
               </Text>
             ))}
