@@ -496,6 +496,11 @@ export interface NumberFieldConfig extends BaseFieldConfig {
   digits?: FieldDigits
   /** `above` (default) — label over control. `settings` — label + hint left, control right. */
   labelPosition?: FieldLabelPosition
+  /**
+   * `input` (default) keeps the text number field.
+   * `stepper` renders the shared `NumberStepper` for small bounded integers.
+   */
+  control?: 'input' | 'stepper'
 }
 
 export interface TextareaFieldConfig extends BaseFieldConfig {

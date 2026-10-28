@@ -1,4 +1,9 @@
-import type { Equipment, EquipmentInstanceSummary } from '@rpg/contracts'
+import {
+  PROFICIENCY_RANK_ENTRIES,
+  resolveCreatureArmorSlot,
+  type Equipment,
+  type EquipmentInstanceSummary,
+} from '@rpg/contracts'
 
 import { resolveCreatureEquipmentInventoryRowStatus } from '../../../equipment/lib/inventory/resolve-creature-equipment-inventory-row-status.lib'
 import type { EntitySummaryStatusItem } from '../../../lib/entity/summary/entity-summary-status.types'
@@ -17,8 +22,22 @@ export function resolveMonsterEquipmentRowStatus(args: {
   statusComposition: 'metadata'
   status: readonly EntitySummaryStatusItem[]
 } {
-  return resolveCreatureEquipmentInventoryRowStatus({
+  const resolved = resolveCreatureEquipmentInventoryRowStatus({
     ...args,
     equippedStatusPresentation: 'omit',
   })
+  if (!args.catalogItem || !args.isProficient || !resolveCreatureArmorSlot(args.catalogItem)) {
+    return resolved
+  }
+  return {
+    statusComposition: 'metadata',
+    status: [
+      ...resolved.status,
+      {
+        kind: 'badge',
+        label: PROFICIENCY_RANK_ENTRIES.proficient.label,
+        tone: 'success',
+      },
+    ],
+  }
 }

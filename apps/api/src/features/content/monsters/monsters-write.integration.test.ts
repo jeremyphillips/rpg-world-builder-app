@@ -23,31 +23,33 @@ useIntegrationDb()
 const FIGHTER_CLASS_ID = 'srd-cc-5.2.1:fighter'
 
 describe('monster write validation', () => {
-  it('promotes only when equipment Armor Class has equipped body armor', async () => {
+  it('rejects a draft that owns two body armors', async () => {
     const campaign = await makeTestCampaign()
-    const created = await createHomebrewContent(
-      monstersWriteConfig,
-      campaign.id,
-      {
-        ...minimalHomebrewMonsterInput,
-        slug: 'equipment-ac-draft',
-        armorClass: { kind: 'equipment' },
-        equipment: [],
-        actions: [],
-        proficiencies: {
-          savingThrows: [],
-          skills: [],
-          languages: [],
-          weapons: [],
-        },
-      },
-      { status: 'draft' },
-    )
-    expect(created.status).toBe('draft')
-
+    const chainId = 'srd-cc-5.2.1:chain-shirt'
+    const leatherId = 'srd-cc-5.2.1:leather-armor'
     try {
-      await promoteContentToPublished(monstersWriteConfig, campaign.id, created.id)
-      throw new Error('expected promotion to fail')
+      await createHomebrewContent(
+        monstersWriteConfig,
+        campaign.id,
+        {
+          ...minimalHomebrewMonsterInput,
+          slug: 'two-armors',
+          armorClass: { naturalArmorBonus: 1 },
+          equipment: [
+            { entryId: 'leather', equipmentId: leatherId, quantity: 1, equipped: true },
+            { entryId: 'chain', equipmentId: chainId, quantity: 1, equipped: false },
+          ],
+          actions: [],
+          proficiencies: {
+            savingThrows: [],
+            skills: [],
+            languages: [],
+            weapons: [],
+          },
+        },
+        { status: 'draft' },
+      )
+      throw new Error('expected draft write to fail')
     } catch (error) {
       expect(error).toBeInstanceOf(HttpError)
       const httpError = error as HttpError
@@ -56,12 +58,9 @@ describe('monster write validation', () => {
       expect(isApiValidationDetails(httpError.details)).toBe(true)
       if (!isApiValidationDetails(httpError.details)) return
       expect(httpError.details.issues).toEqual([
-        expect.objectContaining({ path: 'armorClass.kind', code: expect.any(String) }),
+        expect.objectContaining({ path: 'equipment.1', code: expect.any(String) }),
       ])
     }
-
-    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    expect(catalog.find((row) => row.id === created.id)?.status).toBe('draft')
   })
 
   it('returns 400 for unknown equipment, a non-weapon reaction, a bad modifier, and two body armors', async () => {
@@ -95,13 +94,13 @@ describe('monster write validation', () => {
         path: 'equipment.0.adjustments',
       },
       {
-        armorClass: { kind: 'natural', bonus: 1 },
+        armorClass: { naturalArmorBonus: 1 },
         equipment: [
           { entryId: 'leather', equipmentId: leatherId, quantity: 1, equipped: true },
           { entryId: 'chain', equipmentId: chainId, quantity: 1, equipped: true },
         ],
         actions: [],
-        path: 'equipment.1.equipped',
+        path: 'equipment.1',
       },
     ] as const
 
@@ -402,7 +401,7 @@ describe('monster write validation', () => {
         },
         normalized: {},
         effectiveBody: {
-          armorClass: { kind: 'unarmored' },
+          armorClass: {},
           equipment: [],
           actions: [],
           bonusActions: [],

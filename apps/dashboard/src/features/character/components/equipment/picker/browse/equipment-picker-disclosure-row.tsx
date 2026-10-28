@@ -122,6 +122,36 @@ export function EquipmentPickerDisclosureRow({
           ...(presentation.priceSlot ? { secondary: presentation.priceSlot } : {}),
         }
 
+  const entity = {
+    heading: row.name,
+    ...(workflowMode === 'magic_items' ? {} : { classification: row.kindLabel }),
+    description: (
+      <CatalogMetadataRenderer
+        density="compact"
+        lines={mapEquipmentCompactSummaryToMetadataLines({
+          kindLabel: row.kindLabel,
+          comparisonGroups: row.comparisonGroups,
+        })}
+      />
+    ),
+    ...(selectionState ? { selectionState } : {}),
+    ...(status.length > 0 ? { status } : {}),
+    ...(provenance.length > 0 ? { provenance } : {}),
+    statusComposition: 'metadata' as const,
+  }
+
+  if (rowArgs.selection) {
+    return (
+      <CatalogCard
+        toolbarLabel={rowArgs.toolbarLabel}
+        domIds={rowArgs.domIds}
+        collapsible={false}
+        entity={entity}
+        selection={rowArgs.selection}
+      />
+    )
+  }
+
   return (
     <CatalogCard
       toolbarLabel={rowArgs.toolbarLabel}
@@ -131,23 +161,7 @@ export function EquipmentPickerDisclosureRow({
       onToggleCollapse={rowArgs.onToggleCollapse}
       summary={rowArgs.summary}
       details={rowArgs.details}
-      entity={{
-        heading: row.name,
-        ...(workflowMode === 'magic_items' ? {} : { classification: row.kindLabel }),
-        description: (
-          <CatalogMetadataRenderer
-            density="compact"
-            lines={mapEquipmentCompactSummaryToMetadataLines({
-              kindLabel: row.kindLabel,
-              comparisonGroups: row.comparisonGroups,
-            })}
-          />
-        ),
-        ...(selectionState ? { selectionState } : {}),
-        ...(status.length > 0 ? { status } : {}),
-        ...(provenance.length > 0 ? { provenance } : {}),
-        statusComposition: 'metadata',
-      }}
+      entity={entity}
       trailing={trailing}
     />
   )

@@ -1,5 +1,8 @@
 import type { Equipment } from '../../content/equipment'
 import { isArmorEquipment } from '../../content/equipment'
+import type { ArmorCategory } from '../../vocab/armor/category'
+import { ARMOR_CATEGORIES } from '../../vocab/armor/category'
+import { resolveCreatureArmorSlot } from '../../content/equipment/armor-slot'
 import type {
   CreatureWeaponProficiencies,
   CreatureWeaponProficiencyTarget,
@@ -233,6 +236,23 @@ function dedupeToolsByEquipmentId(tools: readonly Equipment[]): Equipment[] {
   }
 
   return deduped
+}
+
+/**
+ * Armor categories implied by owned body armor and shields.
+ * Equipped state does not matter, and nothing is stored on the monster.
+ */
+export function resolveMonsterArmorProficiencyCategories(
+  equipment: readonly { equipmentId: string }[],
+  catalog: CreatureEquipmentCatalog,
+): ArmorCategory[] {
+  const owned = new Set<ArmorCategory>()
+  for (const entry of equipment) {
+    const item = catalog.get(entry.equipmentId)
+    if (!item || !isArmorEquipment(item) || !resolveCreatureArmorSlot(item)) continue
+    owned.add(item.category)
+  }
+  return ARMOR_CATEGORIES.filter((category) => owned.has(category))
 }
 
 /** Returns catalog armor equipment rows matching an armor training grant pool. */

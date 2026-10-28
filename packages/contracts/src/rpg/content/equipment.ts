@@ -597,3 +597,4 @@ export function isArmorEquipment(e: Equipment): e is ArmorEquipment {
 }
 
 export { isEquipmentStackable } from './equipment/stackable'
+export { resolveCreatureArmorSlot, type CreatureArmorSlot } from './equipment/armor-slot'

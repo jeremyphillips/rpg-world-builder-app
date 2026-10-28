@@ -8,14 +8,14 @@ import { buildMonsterInput } from './monster-form-values'
 describe('normalizeMonsterFormValues', () => {
   it('strips inactive variants and never emits a zero hit-dice count', () => {
     const values = resolveMonsterCreateDefaultValues()
-    values.armorClass = { kind: 'natural', bonus: 2 }
+    values.armorClass = { naturalArmor: true, naturalArmorBonus: 2, useFixedAc: false }
     values.hitPoints = { kind: 'hit-dice', count: 0 }
     values.actions = [
       { id: 'claw', kind: 'natural-weapon', name: 'Claw', damage: { flat: 1 }, mode: 'melee' },
     ]
 
     const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
-    expect(normalized.armorClass).toEqual({ kind: 'natural', bonus: 2 })
+    expect(normalized.armorClass).toEqual({ naturalArmorBonus: 2 })
     expect(normalized.hitPoints).toEqual({ kind: 'hit-dice' })
     expect(JSON.stringify(normalized)).not.toContain('"count":0')
     expect(normalized).not.toHaveProperty('hover')
@@ -82,7 +82,7 @@ describe('normalizeMonsterFormValues', () => {
       equipmentCatalogById: new Map(),
     })
     expect(sections.statistics?.facts?.some((fact) => fact.label === 'AC')).toBe(true)
-    expect(fromPreview.armorClass).toEqual({ kind: 'unarmored' })
+    expect(fromPreview.armorClass).toEqual({})
     expect(buildMonsterInput(values, undefined, 'draft').name).toContain('Scout')
   })
 })

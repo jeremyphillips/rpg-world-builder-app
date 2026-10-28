@@ -630,76 +630,21 @@
       "maximum": 30
     },
     "__schema21": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "kind": {
-              "type": "string",
-              "const": "unarmored",
-              "description": "unarmored"
-            }
-          },
-          "required": [
-            "kind"
-          ],
-          "additionalProperties": false
+      "default": {},
+      "type": "object",
+      "properties": {
+        "naturalArmorBonus": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
         },
-        {
-          "type": "object",
-          "properties": {
-            "kind": {
-              "type": "string",
-              "const": "natural",
-              "description": "natural"
-            },
-            "bonus": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 9007199254740991
-            }
-          },
-          "required": [
-            "kind",
-            "bonus"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "kind": {
-              "type": "string",
-              "const": "equipment",
-              "description": "equipment"
-            }
-          },
-          "required": [
-            "kind"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "kind": {
-              "type": "string",
-              "const": "fixed",
-              "description": "fixed"
-            },
-            "value": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991
-            }
-          },
-          "required": [
-            "kind",
-            "value"
-          ],
-          "additionalProperties": false
+        "fixedValue": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
         }
-      ]
+      },
+      "additionalProperties": false
     },
     "__schema22": {
       "oneOf": [

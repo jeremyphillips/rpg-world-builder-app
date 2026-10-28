@@ -12,6 +12,7 @@ import {
   isWeaponProficient,
   isWeaponProficientFromGrantSet,
   listArmorMatchingPool,
+  resolveMonsterArmorProficiencyCategories,
   listSkillsMatchingPool,
   listToolsMatchingPool,
   listWeaponsMatchingPool,
@@ -297,5 +298,30 @@ describe('creature weapon proficiency grant set helpers', () => {
     expect(isWeaponProficientFromGrantSet(dagger, { categories: ['martial'], items: [] })).toBe(
       false,
     )
+  })
+})
+
+describe('resolveMonsterArmorProficiencyCategories', () => {
+  it('includes owned body armor and shields whether or not they are equipped', () => {
+    const shield = {
+      id: 'srd-cc-5.2.1:shield',
+      kind: 'armor',
+      category: 'shields',
+    } as Equipment
+    const catalog = new Map<string, Equipment>([
+      [leatherArmor.id, leatherArmor],
+      [shield.id, shield],
+      [longsword.id, longsword],
+    ])
+    expect(
+      resolveMonsterArmorProficiencyCategories(
+        [
+          { equipmentId: leatherArmor.id },
+          { equipmentId: shield.id },
+          { equipmentId: longsword.id },
+        ],
+        catalog,
+      ),
+    ).toEqual(['light', 'shields'])
   })
 })

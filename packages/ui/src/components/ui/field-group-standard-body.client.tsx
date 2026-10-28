@@ -126,7 +126,13 @@ export function StandardFieldGroupBody({
     <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeClasses.body)}>{children}</div>
   )
 
-  const bodyWithGap = wrapFieldGroupBody(body, bodyGapClass)
+  // Keep one wrapper element across open and closed. Adding the gap div only
+  // while open remounts the body, and `shouldUnregister` then clears values.
+  const bodyWithGap = collapsible ? (
+    <div className={bodyGapClass}>{body}</div>
+  ) : (
+    wrapFieldGroupBody(body, bodyGapClass)
+  )
 
   const Wrapper = legend ? 'fieldset' : 'div'
 

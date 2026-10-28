@@ -22,8 +22,7 @@
       "cha": 8
     },
     "armorClass": {
-      "kind": "natural",
-      "bonus": 2
+      "naturalArmorBonus": 2
     },
     "hitPoints": {
       "kind": "hit-dice",
@@ -104,8 +103,7 @@
       "cha": 5
     },
     "armorClass": {
-      "kind": "natural",
-      "bonus": 1
+      "naturalArmorBonus": 1
     },
     "hitPoints": {
       "kind": "hit-dice",

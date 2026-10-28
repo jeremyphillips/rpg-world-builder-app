@@ -63,10 +63,12 @@ export type MonsterFormValues = FieldValues & {
   creatureType?: Monster['creatureType']
   alignment?: Monster['alignment']
   abilityScores: Monster['abilityScores']
-  armorClass:
-    | Monster['armorClass']
-    | { kind: 'fixed'; value?: number }
-    | { kind: 'natural'; bonus?: number }
+  armorClass: {
+    naturalArmor: boolean
+    naturalArmorBonus?: number
+    useFixedAc: boolean
+    fixedValue?: number
+  }
   hitPoints: Monster['hitPoints'] | { kind: 'fixed'; average?: number; formula?: string }
   movement: MovementRowDraftFormValues[]
   hover?: boolean
@@ -94,7 +96,7 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
   return {
     name: '',
     abilityScores: neutralAbilityScores(),
-    armorClass: { kind: 'unarmored' },
+    armorClass: { naturalArmor: false, useFixedAc: false },
     hitPoints: { kind: 'hit-dice', count: authoringHitDice.count },
     [MONSTER_HIT_POINTS_USE_FIXED_FIELD]: false,
     ...hitPointsDiceAuthoringFields(authoringHitDice),
@@ -158,7 +160,16 @@ export function monsterToFormValues(entity: Monster): MonsterFormValues {
     creatureType: entity.creatureType,
     alignment: entity.alignment,
     abilityScores: entity.abilityScores,
-    armorClass: entity.armorClass,
+    armorClass: {
+      naturalArmor: entity.armorClass.naturalArmorBonus !== undefined,
+      ...(entity.armorClass.naturalArmorBonus !== undefined
+        ? { naturalArmorBonus: entity.armorClass.naturalArmorBonus }
+        : {}),
+      useFixedAc: entity.armorClass.fixedValue !== undefined,
+      ...(entity.armorClass.fixedValue !== undefined
+        ? { fixedValue: entity.armorClass.fixedValue }
+        : {}),
+    },
     hitPoints: entity.hitPoints,
     ...hitPointsAuthoringFromEntity(entity),
     movement: movementRecordToRows(entity.movement),

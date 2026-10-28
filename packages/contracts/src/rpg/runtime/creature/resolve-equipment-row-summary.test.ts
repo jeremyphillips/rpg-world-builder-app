@@ -222,7 +222,7 @@ describe('resolveEquipmentRowSummary', () => {
       creatureType: 'humanoid',
       alignment: 'n',
       abilityScores: scores,
-      armorClass: { kind: 'natural', bonus: 2 },
+      armorClass: { naturalArmorBonus: 2 },
       hitPoints: { kind: 'hit-dice', count: 2 },
       movement: { walk: 30 },
       senses: [],
@@ -250,6 +250,7 @@ describe('resolveEquipmentRowSummary', () => {
       monster,
       equipmentCatalog: new Map([[battleaxe.id, battleaxe]]),
       skillCatalog: new Map(),
+      acBase: 10,
       magicPropertyProvider: emptyProvider,
     }).attacks[0]
 

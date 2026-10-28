@@ -4,7 +4,6 @@ import {
   formatSignedModifier,
   getAbilityCompactLabel,
   getChallengeRatingLabel,
-  getCreatureArmorClassKindLabel,
   getCreatureSizeLabel,
   getDamageTypeLabel,
   getEffectConditionLabel,
@@ -20,11 +19,15 @@ import {
   type MonsterReaction,
   type SkillProficiency,
   deriveMonsterStatBlock,
+  resolveMechanicsPatch,
+  type ArmorClassBase,
   type DerivedMonsterAttackLine,
   type DerivedFieldReason,
   type DerivedMonsterStatBlock,
-  type MonsterArmorClassBreakdown,
+  type MagicPropertyDefinitionProvider,
 } from '@rpg/contracts'
+
+import { monsterArmorClassCaption } from './statistics/monster-armor-class-presentation'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 
@@ -94,109 +97,18 @@ export function monsterUnavailableReasonCopy(
   reason: DerivedFieldReason,
   subject: 'generic' | 'challenge' | 'armor',
 ): string {
-  if (reason === 'conflict') return 'Two body armors equipped'
-  if (reason === 'missing-reference' && subject === 'armor') return 'Choose armor in Equipment'
+  if (reason === 'conflict') return 'More than one armor or shield is equipped'
+  if (reason === 'missing-reference' && subject === 'armor') return 'Missing armor reference'
   if (reason === 'missing-input' && subject === 'challenge')
     return 'Set a challenge rating to calculate'
   return 'Not set'
 }
 
-export function describeEquipmentArmorContribution(
-  entryId: string,
-  input: {
-    acKind: Monster['armorClass']['kind']
-    breakdown?: MonsterArmorClassBreakdown
-    role: 'body-armor' | 'shield' | 'other'
-  },
-): {
-  participation: 'current' | 'not-used' | 'none'
-  contributionLabel?: string
-  notUsedReason?: string
-} {
-  const { acKind, breakdown, role } = input
-  if (role === 'other') return { participation: 'none' }
-  const notUsedReason = `Not used for current Armor Class (AC source: ${getCreatureArmorClassKindLabel(acKind)})`
-  if (!breakdown) return { participation: 'not-used', notUsedReason }
-
-  if (role === 'shield')
-    return describeShieldContribution(entryId, acKind, breakdown, notUsedReason)
-  if (breakdown.bodyArmor?.entryId === entryId && acKind === 'equipment') {
-    return {
-      participation: 'current',
-      contributionLabel: bodyArmorContributionLabel(breakdown.bodyArmor),
-    }
-  }
-
-  return { participation: 'not-used', notUsedReason }
-}
-
-function describeShieldContribution(
-  entryId: string,
-  acKind: Monster['armorClass']['kind'],
-  breakdown: MonsterArmorClassBreakdown,
-  notUsedReason: string,
-): ReturnType<typeof describeEquipmentArmorContribution> {
-  const shield = breakdown.shields.find((entry) => entry.entryId === entryId)
-  if (acKind === 'fixed' || !shield) {
-    return {
-      participation: 'not-used',
-      contributionLabel: unusedShieldAdjustment(shield?.adjustment),
-      notUsedReason,
-    }
-  }
-  return { participation: 'current', contributionLabel: activeShieldLabel(shield) }
-}
-
-function unusedShieldAdjustment(adjustment: number | undefined): string | undefined {
-  if (!adjustment) return undefined
-  return `${adjustment > 0 ? '+' : ''}${adjustment} shield adjustment`
-}
-
-function activeShieldLabel(shield: MonsterArmorClassBreakdown['shields'][number]): string {
-  const bonus = shield.acBonus + shield.adjustment
-  if (shield.adjustment === 0) return `+${shield.acBonus} shield`
-  const signed = `${shield.adjustment > 0 ? '+' : ''}${shield.adjustment}`
-  return `+${bonus} AC (+${shield.acBonus} shield, ${signed} adjustment)`
-}
-
-function bodyArmorContributionLabel(
-  body: NonNullable<MonsterArmorClassBreakdown['bodyArmor']>,
-): string {
-  const adjustment =
-    body.adjustment === 0 ? '' : ` ${body.adjustment > 0 ? '+' : ''}${body.adjustment} adjustment`
-  const maxDex = body.maxDexBonus !== undefined ? ` (max ${body.maxDexBonus})` : ''
-  return `${body.label} ${body.base} + ${body.dex} DEX${maxDex}${adjustment}`
-}
-
-function formatAcSource(monster: Monster, equipmentById: Map<string, Equipment>): string {
-  switch (monster.armorClass.kind) {
-    case 'natural':
-    case 'fixed':
-    case 'unarmored':
-      return getCreatureArmorClassKindLabel(monster.armorClass.kind)
-    case 'equipment': {
-      const names = monster.equipment
-        .filter((entry) => entry.equipped)
-        .map((entry) => {
-          const item = equipmentById.get(entry.equipmentId)
-          return entry.customName ?? item?.name
-        })
-        .filter(Boolean)
-      return names.length > 0 ? names.join(', ') : getCreatureArmorClassKindLabel('equipment')
-    }
-  }
-}
-
-function formatAcStatRow(
-  monster: Monster,
-  derived: DerivedMonsterStatBlock,
-  equipmentById: Map<string, Equipment>,
-): ContentStatRowData {
-  const source = formatAcSource(monster, equipmentById)
+function formatAcStatRow(derived: DerivedMonsterStatBlock): ContentStatRowData {
   return {
     id: 'ac',
     label: 'AC',
-    value: joinInlineMetadata([String(derived.ac), source]) || String(derived.ac),
+    value: joinInlineMetadata([String(derived.ac), monsterArmorClassCaption(derived.acResolution)]),
   }
 }
 
@@ -486,7 +398,7 @@ export function buildMonsterDetailViewModel({
   const statRows: ContentStatRowData[] = []
   if (catalogState === 'ready' && derived) {
     statRows.push(
-      formatAcStatRow(monster, derived, equipmentById),
+      formatAcStatRow(derived),
       formatHpStatRow(derived),
       formatSpeedStatRow(monster),
       {
@@ -526,6 +438,10 @@ export function tryDeriveMonsterStatBlock(
   monster: Monster,
   equipment: Equipment[],
   skillProficiencies: SkillProficiency[],
+  options?: {
+    acBase?: ArmorClassBase
+    magicPropertyProvider?: MagicPropertyDefinitionProvider
+  },
 ): DerivedMonsterStatBlock | null {
   try {
     const equipmentCatalog = buildMonsterEquipmentCatalog(equipment)
@@ -534,6 +450,8 @@ export function tryDeriveMonsterStatBlock(
       monster,
       equipmentCatalog,
       skillCatalog,
+      acBase: options?.acBase ?? resolveMechanicsPatch().armorClass.base,
+      magicPropertyProvider: options?.magicPropertyProvider ?? (() => undefined),
     })
   } catch (error) {
     console.error('deriveMonsterStatBlock failed', { monsterId: monster.id, error })

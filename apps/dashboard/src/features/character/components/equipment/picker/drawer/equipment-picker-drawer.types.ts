@@ -138,4 +138,14 @@ export type EquipmentPickerDrawerProps = {
   onSetRowQuantity?: (item: EquipmentPickerItem, total: number) => void
   onReleaseChoice?: (item: EquipmentPickerItem, allowanceId: string) => void
   onRemovePurchaseOne?: (item: EquipmentPickerItem) => void
+  /**
+   * Single-select mode. Rows stay flat (no expandable details) and the footer
+   * commits the pending choice.
+   */
+  selection?: {
+    value: string | null
+    onValueChange: (itemKey: string) => void
+    isItemDisabled?: (item: EquipmentPickerRow) => boolean
+  }
+  footer?: ReactNode
 }

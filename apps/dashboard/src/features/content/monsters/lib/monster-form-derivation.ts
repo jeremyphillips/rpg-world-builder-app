@@ -1,13 +1,27 @@
+import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import {
   deriveMonsterDraftStatBlock,
+  resolveMechanicsPatch,
+  type ArmorClassBase,
   type DerivedMonsterDraftStatBlock,
   type Equipment,
+  type MagicPropertyDefinitionProvider,
   type SkillProficiency,
+  type SystemRulesetId,
 } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import type { MonsterFormValues } from './monster-form-values'
 import { normalizeMonsterFormValues } from './normalize-monster-form-values'
+
+export function monsterArmorClassBase(ctx: ContentFormCtx): ArmorClassBase {
+  return ctx.armorClassBase ?? resolveMechanicsPatch().armorClass.base
+}
+
+export function monsterMagicPropertyProvider(ctx: ContentFormCtx): MagicPropertyDefinitionProvider {
+  const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
+  return createMagicPropertyDefinitionProvider(rulesetId)
+}
 
 export function monsterSkillCatalog(ctx: ContentFormCtx): Map<string, SkillProficiency> {
   const skills = ctx.options?.skills?.visible ?? []
@@ -29,5 +43,7 @@ export function deriveMonsterFormDraft(
     monster: normalized,
     equipmentCatalog: monsterEquipmentCatalog(ctx),
     skillCatalog: monsterSkillCatalog(ctx),
+    acBase: monsterArmorClassBase(ctx),
+    magicPropertyProvider: monsterMagicPropertyProvider(ctx),
   })
 }

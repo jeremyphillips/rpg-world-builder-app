@@ -3,6 +3,8 @@ import {
   findCanonicalPlainEntry,
   inventoryBucketForEquipment,
   normalizeEquipmentInstance,
+  resolveCreatureArmorSlot,
+  type CreatureArmorSlot,
   type Equipment,
 } from '@rpg/contracts'
 
@@ -70,6 +72,22 @@ export function incrementMonsterPlainStack(
     current + 1,
     plain ? undefined : createOptions,
   )
+}
+
+/**
+ * Drops every owned entry in `slot` and appends one equipped quantity-1 entry.
+ * Weapons and other gear stay in place.
+ */
+export function replaceMonsterArmorSlotEntry(
+  entries: readonly MonsterEquipmentFormEntry[],
+  slot: CreatureArmorSlot,
+  equipmentId: string,
+  catalog: ReadonlyMap<string, Equipment>,
+): MonsterEquipmentFormEntry[] {
+  const kept = entries.filter(
+    (entry) => resolveCreatureArmorSlot(catalog.get(entry.equipmentId)) !== slot,
+  )
+  return [...kept, createPlainMonsterEquipmentEntry(equipmentId, { equipped: true })]
 }
 
 /** Applies {@link incrementMonsterPlainStack} for each id in order — one coordinated loadout update. */

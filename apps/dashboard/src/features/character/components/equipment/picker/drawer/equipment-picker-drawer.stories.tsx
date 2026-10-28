@@ -301,6 +301,20 @@ export const AbilityScoreRequirements: Story = {
   },
 }
 
+export const Selection: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    title: 'Select armor',
+    items: equipmentPickerItemsFixture.slice(0, 2),
+    workflowMode: 'loadout',
+    workflowModes: ['loadout'],
+    selection: { value: null, onValueChange: () => undefined },
+    footer: <Button>Select armor</Button>,
+    onCommitAdd: () => undefined,
+  },
+}
+
 export const MagicItemsWorkflow: Story = {
   args: {
     open: true,

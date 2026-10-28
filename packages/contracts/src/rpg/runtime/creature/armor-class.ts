@@ -1,5 +1,10 @@
 import type { ArmorEquipmentKindFields } from '../../content/equipment/armor-variant'
 import type { Equipment } from '../../content/equipment'
+
+export {
+  resolveCreatureArmorSlot,
+  type CreatureArmorSlot,
+} from '../../content/equipment/armor-slot'
 import type { EquipmentInstance } from '../../content/equipment/instance/instance'
 import type { EquipmentModifier } from '../../content/equipment/instance/modifier'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'

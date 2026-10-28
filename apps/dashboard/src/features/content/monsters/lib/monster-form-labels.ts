@@ -11,7 +11,6 @@ import {
   getMonsterActionKindFieldLabel,
   getMonsterReactionFieldLabel,
   getMonsterTraitSectionLabel,
-  getNaturalArmorBonusFieldLabel,
   getProficiencyDomainCollectionLabel,
   joinInlineMetadata,
   getProficiencyGrantCompactAddLabel,
@@ -64,9 +63,6 @@ export const MONSTER_AWARDS_ZERO_XP_HINT =
 export const MONSTER_FIXED_AVERAGE_LABEL = getAverageHitPointsLabel()
 export const MONSTER_FIXED_FORMULA_LABEL = 'Formula'
 export const MONSTER_FIXED_FORMULA_HINT = 'Optional. Shown as written.'
-export const MONSTER_NATURAL_BONUS_LABEL = getNaturalArmorBonusFieldLabel()
-export const MONSTER_FIXED_AC_LABEL = `${armorClassLabel} value`
-export const MONSTER_FIXED_AC_HINT = 'Ignores ability scores and equipment.'
 export const MONSTER_SENSES_HINT = 'Add special senses and their ranges.'
 export const MONSTER_TELEPATHY_HINT =
   "Specify the range of this creature's telepathic communication."
@@ -95,7 +91,6 @@ export const MONSTER_EQUIPPED_LABEL = 'Equipped'
 export const MONSTER_CUSTOMIZATION_LABEL = 'Customization'
 export const MONSTER_CUSTOM_NAME_LABEL = 'Custom name'
 export const MONSTER_CUSTOM_DESCRIPTION_LABEL = 'Custom description'
-export const MONSTER_AC_ADJUSTMENT_LABEL = `${armorClassLabel} adjustment`
 export const MONSTER_REMOVE_LABEL = 'Remove'
 export const MONSTER_CANCEL_LABEL = 'Cancel'
 export const MONSTER_LOADING_EQUIPMENT = `Loading ${getContentTypeMidSentenceLabel('equipment')}…`
@@ -107,22 +102,6 @@ export const MONSTER_BLANK_CHALLENGE_HINT =
   'Required to publish. Values that use proficiency bonus show "—" until set.'
 export const MONSTER_SKILL_MODIFIER_UNAVAILABLE_TOOLTIP =
   'Set a Challenge Rating to determine the proficiency bonus.'
-
-export function monsterGoToEquipmentLabel(): string {
-  return `Go to ${getContentTypeItemLabel('equipment')}`
-}
-
-export function monsterChooseBodyArmorMessage(): string {
-  return `Choose and equip body armor in ${getContentTypeItemLabel('equipment')} to calculate ${armorClassLabel}.`
-}
-
-export function monsterBodyArmorConflictMessage(names: readonly string[]): string {
-  return `Two body armors are equipped: ${names.join(', ')}. Unequip one in ${getContentTypeItemLabel('equipment')} to calculate ${armorClassLabel}.`
-}
-
-export function monsterBodyArmorIgnoredMessage(name: string): string {
-  return `Equipped ${name} does not contribute to ${armorClassLabel}.`
-}
 
 export function monsterSkillSectionLabel(): string {
   return getContentTypeItemLabel('skill-proficiencies')

@@ -120,6 +120,8 @@ export function EquipmentPickerDrawer({
   onSetRowQuantity,
   onReleaseChoice,
   onRemovePurchaseOne,
+  selection,
+  footer,
 }: EquipmentPickerDrawerProps) {
   const setRowQuantity = onSetRowQuantity ?? onSetPurchasedQuantity
   const resolvedTitle =
@@ -262,6 +264,8 @@ export function EquipmentPickerDrawer({
           />
         ),
       }}
+      selection={selection}
+      footer={footer}
       renderEntityRow={(rowArgs) => {
         const item = rowArgs.item
         const itemOwnership = getEquipmentOwnership(ownership, item.equipment.id)
@@ -288,16 +292,20 @@ export function EquipmentPickerDrawer({
           />
         )
       }}
-      renderItemDetails={(item) => (
-        <EquipmentPickerItemDetails
-          equipment={item.equipment}
-          itemState={item.state}
-          budget={picker.effectiveBudget}
-          ownership={getEquipmentOwnership(ownership, item.equipment.id)}
-          showCharacterPreview={showCharacterPreview}
-          characterPreviewContext={characterPreviewContext}
-        />
-      )}
+      {...(selection
+        ? {}
+        : {
+            renderItemDetails: (item: EquipmentPickerItem) => (
+              <EquipmentPickerItemDetails
+                equipment={item.equipment}
+                itemState={item.state}
+                budget={picker.effectiveBudget}
+                ownership={getEquipmentOwnership(ownership, item.equipment.id)}
+                showCharacterPreview={showCharacterPreview}
+                characterPreviewContext={characterPreviewContext}
+              />
+            ),
+          })}
     />
   )
 }

@@ -11,7 +11,10 @@ import {
 import { CheckboxField } from '../../components/ui/checkbox-field'
 import { ChipsField } from '../../components/ui/chips-field.client'
 import { ComboboxFieldRenderer } from './fields/combobox-field-renderer.client'
+import { FormField } from '../../components/ui/form-field'
 import { NumberField } from '../../components/ui/number-field'
+import { NumberStepper } from '../../components/ui/number-stepper.client'
+import { resolveNumberStepperSizeFromFieldSize } from '../../components/ui/number-stepper.variants'
 import { RadioCardField } from '../../components/ui/radio-card-field'
 import { RadioGroupField } from '../../components/ui/radio-group-field'
 import { SwitchField } from '../../components/ui/switch-field'
@@ -181,33 +184,66 @@ const fieldRenderers: {
     hintPosition,
     labelVisibility,
     ...validation
-  }) => (
-    <NumberField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      {...fieldValidationProps(validation)}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      inputWidth={config.inputWidth}
-      size={controlSize}
-      placeholder={config.placeholder}
-      disabled={config.disabled}
-      step={config.step}
-      stepperMin={config.min}
-      stepperMax={config.max}
-      digits={config.digits}
-      labelPosition={config.labelPosition}
-      ref={field.ref}
-      value={field.value ?? ''}
-      onChange={(event) => field.onChange(parseNumber(event.target.value))}
-      onBlur={field.onBlur}
-    />
-  ),
+  }) =>
+    config.control === 'stepper' ? (
+      <FormField
+        id={id}
+        {...pickFieldChromeProps(config)}
+        label={config.label}
+        labelVisibility={labelVisibility}
+        labelPosition={config.labelPosition}
+        {...fieldValidationProps(validation)}
+        hint={hint}
+        hintPosition={hintPosition}
+        info={config.info}
+        required={config.required}
+        width={config.width}
+        size={controlSize}
+      >
+        <NumberStepper
+          id={id}
+          value={
+            typeof field.value === 'number' ? field.value : (config.defaultValue ?? config.min ?? 0)
+          }
+          onChange={field.onChange}
+          min={config.min}
+          max={config.max}
+          step={config.step}
+          digits={config.digits}
+          size={resolveNumberStepperSizeFromFieldSize(controlSize)}
+          disabled={config.disabled}
+          aria-label={config.label}
+          aria-invalid={validation.invalid || undefined}
+          onBlur={field.onBlur}
+        />
+      </FormField>
+    ) : (
+      <NumberField
+        id={id}
+        {...pickFieldChromeProps(config)}
+        label={config.label}
+        labelVisibility={labelVisibility}
+        {...fieldValidationProps(validation)}
+        hint={hint}
+        hintPosition={hintPosition}
+        info={config.info}
+        required={config.required}
+        width={config.width}
+        inputWidth={config.inputWidth}
+        size={controlSize}
+        placeholder={config.placeholder}
+        disabled={config.disabled}
+        step={config.step}
+        stepperMin={config.min}
+        stepperMax={config.max}
+        digits={config.digits}
+        labelPosition={config.labelPosition}
+        ref={field.ref}
+        value={field.value ?? ''}
+        onChange={(event) => field.onChange(parseNumber(event.target.value))}
+        onBlur={field.onBlur}
+      />
+    ),
   textarea: ({
     config,
     controlSize,

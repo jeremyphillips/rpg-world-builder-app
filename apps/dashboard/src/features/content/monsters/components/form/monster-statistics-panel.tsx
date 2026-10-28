@@ -5,37 +5,13 @@ import {
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
   NEUTRAL_ABILITY_SCORE,
-  CREATURE_ARMOR_CLASS_KINDS,
-  getCreatureArmorClassKindLabel,
 } from '@rpg/contracts'
-import { Button, SegmentedControl, SemanticText, Text } from '@rpg/ui'
-import { flattenFormIssues, useFormValidationPresentation, useTabbedFormChrome } from '@rpg/ui/form'
+import { SemanticText, Text } from '@rpg/ui'
+import { flattenFormIssues, useFormValidationPresentation } from '@rpg/ui/form'
 
 import { AbilityScoreNumeric } from '@/components/ability-score'
 
-import { focusFormPath } from '../../../lib/forms/shells/submit/content-form-submit'
-import { useMonsterVariantStash } from '../../hooks/use-monster-variant-stash'
-import { deriveMonsterFormDraft } from '../../lib/monster-form-derivation'
-import {
-  MONSTER_ABILITY_SCORES_HEADING,
-  MONSTER_ARMOR_CLASS_HEADING,
-  MONSTER_EQUIPMENT_CATALOG_ERROR,
-  MONSTER_FIXED_AC_HINT,
-  MONSTER_FIXED_AC_LABEL,
-  MONSTER_LOADING_EQUIPMENT,
-  MONSTER_NATURAL_BONUS_LABEL,
-  monsterBodyArmorConflictMessage,
-  monsterBodyArmorIgnoredMessage,
-  monsterChooseBodyArmorMessage,
-  monsterGoToEquipmentLabel,
-} from '../../lib/monster-form-labels'
-import {
-  equipmentArmorRole,
-  equipmentEntryBaseName,
-} from '../../lib/equipment/monster-equipment-labels'
-import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
-import { monsterUnavailableReasonCopy } from '../../lib/monster-display'
-import { resolveMonsterFormViewForPath } from '../../lib/monster-form-view'
+import { MONSTER_ABILITY_SCORES_HEADING } from '../../lib/monster-form-labels'
 import {
   statisticsFieldIsInvalid,
   statisticsIssueLabel,
@@ -78,49 +54,17 @@ function StatisticsIssueList() {
   )
 }
 
-export function MonsterStatisticsPanel({ ctx }: { ctx: ContentFormCtx }) {
+export function MonsterStatisticsPanel({ ctx: _ctx }: { ctx: ContentFormCtx }) {
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
-  const { switchArmorClass } = useMonsterVariantStash(ctx.entityId)
-  const chrome = useTabbedFormChrome()
-  const derived = values ? deriveMonsterFormDraft(values as MonsterFormValues, ctx) : null
-  const catalog = monsterEquipmentCatalog(ctx)
-  const armorClass = values?.armorClass
   const statisticsIssues = useStatisticsIssues()
 
-  if (!values || !armorClass) return null
-
-  const equippedBodyArmor = (values.equipment ?? [])
-    .filter((entry) => entry.equipped)
-    .map((entry) => ({ entry, item: catalog.get(entry.equipmentId) }))
-    .filter((row) => equipmentArmorRole(row.item) === 'body-armor')
-
-  const goToEquipment = () => {
-    focusFormPath('equipment', {
-      formId: chrome?.formId ?? 'monster-form',
-      resolveViewForPath: resolveMonsterFormViewForPath,
-      activateView: (viewId) => chrome?.setActiveTabId(viewId),
-    })
-  }
-
-  const calculatedAc = derived?.ac.status === 'resolved' ? derived.ac.value.ac : undefined
+  if (!values) return null
 
   return (
     <StatisticsIssuesContext.Provider value={statisticsIssues}>
       <div className="flex flex-col gap-6">
         <StatisticsIssueList />
-        <AbilityScoresSection values={values as MonsterFormValues} />
-        <ArmorClassSection
-          ctx={ctx}
-          values={values as MonsterFormValues}
-          armorClass={armorClass}
-          calculatedAc={calculatedAc}
-          derived={derived}
-          bodyArmorNames={equippedBodyArmor.map((row) =>
-            equipmentEntryBaseName(row.entry, catalog),
-          )}
-          onSwitch={switchArmorClass}
-          onGoToEquipment={goToEquipment}
-        />
+        <AbilityScoresSection values={values} />
       </div>
     </StatisticsIssuesContext.Provider>
   )
@@ -182,168 +126,4 @@ function AbilityScoreField({
       }}
     />
   )
-}
-
-function ArmorClassSection({
-  ctx,
-  values,
-  armorClass,
-  calculatedAc,
-  derived,
-  bodyArmorNames,
-  onSwitch,
-  onGoToEquipment,
-}: {
-  ctx: ContentFormCtx
-  values: MonsterFormValues
-  armorClass: MonsterFormValues['armorClass']
-  calculatedAc: number | undefined
-  derived: ReturnType<typeof deriveMonsterFormDraft>
-  bodyArmorNames: string[]
-  onSwitch: (
-    kind: MonsterFormValues['armorClass']['kind'],
-    calculatedAc: number | undefined,
-  ) => void
-  onGoToEquipment: () => void
-}) {
-  return (
-    <section>
-      <h3>{MONSTER_ARMOR_CLASS_HEADING}</h3>
-      {ctx.equipmentCatalogStatus !== 'ready' ? (
-        <Text as="span" variant="supporting">
-          <SemanticText tone="warning">
-            {ctx.equipmentCatalogStatus === 'error'
-              ? MONSTER_EQUIPMENT_CATALOG_ERROR
-              : MONSTER_LOADING_EQUIPMENT}
-          </SemanticText>
-        </Text>
-      ) : (
-        <>
-          <SegmentedControl
-            aria-label={MONSTER_ARMOR_CLASS_HEADING}
-            value={armorClass.kind}
-            options={CREATURE_ARMOR_CLASS_KINDS.map((kind) => ({
-              value: kind,
-              label: getCreatureArmorClassKindLabel(kind),
-            }))}
-            onValueChange={(kind) =>
-              onSwitch(kind as MonsterFormValues['armorClass']['kind'], calculatedAc)
-            }
-          />
-          <NaturalArmorBonus armorClass={armorClass} />
-          <FixedArmorValue armorClass={armorClass} />
-          <ArmorClassStatus
-            values={values}
-            derived={derived}
-            bodyArmorNames={bodyArmorNames}
-            onGoToEquipment={onGoToEquipment}
-          />
-        </>
-      )}
-    </section>
-  )
-}
-
-function NaturalArmorBonus({ armorClass }: { armorClass: MonsterFormValues['armorClass'] }) {
-  const form = useFormContext<MonsterFormValues>()
-  const issues = useContext(StatisticsIssuesContext)
-  if (armorClass.kind !== 'natural') return null
-  return (
-    <label>
-      {MONSTER_NATURAL_BONUS_LABEL}
-      <input
-        aria-label={MONSTER_NATURAL_BONUS_LABEL}
-        aria-invalid={statisticsInvalid('armorClass', issues) || undefined}
-        type="number"
-        min={1}
-        value={armorClass.bonus ?? 1}
-        onChange={(event) =>
-          form.setValue(
-            'armorClass',
-            { kind: 'natural', bonus: Number(event.target.value) },
-            { shouldDirty: true },
-          )
-        }
-      />
-    </label>
-  )
-}
-
-function FixedArmorValue({ armorClass }: { armorClass: MonsterFormValues['armorClass'] }) {
-  const form = useFormContext<MonsterFormValues>()
-  if (armorClass.kind !== 'fixed') return null
-  return (
-    <label>
-      {MONSTER_FIXED_AC_LABEL}
-      <input
-        aria-label={MONSTER_FIXED_AC_LABEL}
-        type="number"
-        value={armorClass.value ?? ''}
-        onChange={(event) => {
-          const raw = event.target.value
-          form.setValue(
-            'armorClass',
-            raw === '' ? { kind: 'fixed' } : { kind: 'fixed', value: Number(raw) },
-            { shouldDirty: true },
-          )
-        }}
-      />
-      <span>{MONSTER_FIXED_AC_HINT}</span>
-    </label>
-  )
-}
-
-function ArmorClassStatus({
-  values,
-  derived,
-  bodyArmorNames,
-  onGoToEquipment,
-}: {
-  values: MonsterFormValues
-  derived: ReturnType<typeof deriveMonsterFormDraft>
-  bodyArmorNames: string[]
-  onGoToEquipment: () => void
-}) {
-  const kind = values.armorClass.kind
-  if (derived?.ac.status === 'unavailable' && derived.ac.reason === 'conflict') {
-    return (
-      <Text as="span" variant="supporting">
-        <SemanticText tone="warning">
-          {monsterBodyArmorConflictMessage(bodyArmorNames)}
-        </SemanticText>
-      </Text>
-    )
-  }
-  if (
-    derived?.ac.status === 'unavailable' &&
-    derived.ac.reason === 'missing-reference' &&
-    kind === 'equipment'
-  ) {
-    return (
-      <div>
-        <Text as="span" variant="supporting">
-          <SemanticText>{monsterChooseBodyArmorMessage()}</SemanticText>
-        </Text>
-        <Button type="button" variant="outline" onClick={onGoToEquipment}>
-          {monsterGoToEquipmentLabel()}
-        </Button>
-      </div>
-    )
-  }
-  if ((kind === 'natural' || kind === 'unarmored') && bodyArmorNames.length > 0) {
-    return (
-      <Text as="span" variant="supporting">
-        <SemanticText tone="warning">
-          {monsterBodyArmorIgnoredMessage(bodyArmorNames[0]!)}
-        </SemanticText>
-      </Text>
-    )
-  }
-  if (derived?.ac.status === 'resolved') {
-    return <p>AC {derived.ac.value.ac}</p>
-  }
-  if (derived?.ac.status === 'unavailable') {
-    return <p>AC — {monsterUnavailableReasonCopy(derived.ac.reason, 'armor')}</p>
-  }
-  return null
 }

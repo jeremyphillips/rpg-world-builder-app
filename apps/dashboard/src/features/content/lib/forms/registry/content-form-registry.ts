@@ -3,6 +3,7 @@ import type { ZodType } from 'zod'
 import type { FormItem, FormValueSync, TabbedFormTab } from '@rpg/ui/form'
 
 import type {
+  ArmorClassBase,
   ContentMediaDomain,
   ContentSource,
   ContentValidationIntent,
@@ -78,6 +79,8 @@ export type ContentFormCtx = {
   equipmentCatalogStatus?: 'pending' | 'ready' | 'error'
   /** `ready` once `skillCatalogBySlug` is the campaign's effective catalog. */
   skillCatalogStatus?: 'pending' | 'ready' | 'error'
+  /** Campaign ruleset Armor Class base. Falls back to resolved default mechanics. */
+  armorClassBase?: ArmorClassBase
   /** Selected member class affinity ids for orphan chip union on edit load. */
   organizationMemberClassAffinitySeedIds?: readonly string[]
   /** Selected member species affinity ids for orphan chip union on edit load. */

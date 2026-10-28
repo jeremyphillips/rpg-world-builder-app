@@ -17,7 +17,42 @@ import { resolveWeaponAttackAbilityModifier } from '../creature/weapon-attack'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { normalizeEquipmentInstance } from '../../content/equipment/instance/normalize-equipment-instance'
 import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
-import { deriveMonsterDraftStatBlock, deriveMonsterStatBlock } from './stat-block'
+import { DEFAULT_ARMOR_CLASS_BASE } from '../../campaign/patches/campaign-mechanics-patch'
+import {
+  deriveMonsterDraftStatBlock as deriveMonsterDraftStatBlockRaw,
+  deriveMonsterStatBlock as deriveMonsterStatBlockRaw,
+} from './stat-block'
+
+const EMPTY_MAGIC_PROVIDER: MagicPropertyDefinitionProvider = () => undefined
+
+function deriveMonsterStatBlock(
+  input: Omit<Parameters<typeof deriveMonsterStatBlockRaw>[0], 'acBase' | 'magicPropertyProvider'> &
+    Partial<
+      Pick<Parameters<typeof deriveMonsterStatBlockRaw>[0], 'acBase' | 'magicPropertyProvider'>
+    >,
+) {
+  return deriveMonsterStatBlockRaw({
+    acBase: DEFAULT_ARMOR_CLASS_BASE,
+    magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    ...input,
+  })
+}
+
+function deriveMonsterDraftStatBlock(
+  input: Omit<
+    Parameters<typeof deriveMonsterDraftStatBlockRaw>[0],
+    'acBase' | 'magicPropertyProvider'
+  > &
+    Partial<
+      Pick<Parameters<typeof deriveMonsterDraftStatBlockRaw>[0], 'acBase' | 'magicPropertyProvider'>
+    >,
+) {
+  return deriveMonsterDraftStatBlockRaw({
+    acBase: DEFAULT_ARMOR_CLASS_BASE,
+    magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    ...input,
+  })
+}
 
 const RULESET = 'srd-cc-5.2.1'
 
@@ -124,7 +159,7 @@ const kobold = monsterSchema.parse({
   creatureType: 'dragon',
   alignment: 'n',
   abilityScores: { str: 7, dex: 15, con: 9, int: 8, wis: 7, cha: 8 },
-  armorClass: { kind: 'natural', bonus: 2 },
+  armorClass: { naturalArmorBonus: 2 },
   hitPoints: { kind: 'hit-dice', count: 3 },
   movement: { walk: 30 },
   senses: [{ type: 'darkvision', range: 60 }],
@@ -163,7 +198,7 @@ const skeleton = monsterSchema.parse({
   creatureType: 'undead',
   alignment: 'le',
   abilityScores: { str: 10, dex: 16, con: 15, int: 6, wis: 8, cha: 5 },
-  armorClass: { kind: 'natural', bonus: 1 },
+  armorClass: { naturalArmorBonus: 1 },
   hitPoints: { kind: 'hit-dice', count: 2 },
   movement: { walk: 30 },
   senses: [{ type: 'darkvision', range: 60 }],
@@ -275,7 +310,7 @@ describe('modifiedArmorFixture parity', () => {
       const monsterBlock = deriveMonsterStatBlock({
         monster: {
           ...kobold,
-          armorClass: { kind: 'equipment' },
+          armorClass: {},
           equipment: [armorEntry],
           actions: [],
         },
@@ -310,19 +345,22 @@ describe('modifiedArmorFixture parity', () => {
     const monsterBlock = deriveMonsterStatBlock({
       monster: {
         ...kobold,
-        armorClass: { kind: 'equipment' },
+        armorClass: {},
         equipment: [modifiedArmorFixture],
         actions: [],
       },
       equipmentCatalog,
       skillCatalog,
     })
-    expect(monsterBlock.acBreakdown.bodyArmor).toMatchObject({
-      base: 13,
-      dex: 2,
-      adjustment: -1,
-    })
-    expect(monsterBlock.acBreakdown.shields).toEqual([])
+    expect(monsterBlock.acResolution.source).toBe('armor')
+    expect(monsterBlock.acResolution.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'armor-base', value: 13 }),
+        expect.objectContaining({ kind: 'dex', value: 2, cap: 2 }),
+        expect.objectContaining({ kind: 'enhancement', target: 'armor', value: -1 }),
+      ]),
+    )
+    expect(monsterBlock.acResolution.shield).toBeUndefined()
     expect(
       resolveEquippedArmorClass({
         acBase: 10,
@@ -341,7 +379,7 @@ describe('modifiedArmorFixture parity', () => {
     ).toBe(14)
   })
 
-  it('ignores equipped body armor AC under natural armor class', () => {
+  it('uses worn armor when it beats natural armor, including the armor enhancement', () => {
     const armorEnhancementProvider: MagicPropertyDefinitionProvider = (id) =>
       id === `${RULESET}:armor-enhancement-1`
         ? {
@@ -375,8 +413,14 @@ describe('modifiedArmorFixture parity', () => {
       magicPropertyProvider: armorEnhancementProvider,
     })
 
-    expect(withBody.ac).toBe(withoutBody.ac)
-    expect(withBody.acBreakdown.bodyArmor).toBeUndefined()
+    expect(withoutBody.ac).toBe(14)
+    expect(withBody.ac).toBe(16)
+    expect(withBody.acResolution.source).toBe('armor')
+    expect(withBody.acResolution.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'enhancement', target: 'armor', value: 1 }),
+      ]),
+    )
   })
 
   it('counts a shield under natural armor as its own contribution', () => {
@@ -419,10 +463,15 @@ describe('modifiedArmorFixture parity', () => {
       skillCatalog,
     })
     expect(block.ac).toBe(17)
-    expect(block.acBreakdown.shields).toEqual([
-      { entryId: 'shield', label: 'Shield', acBonus: 2, adjustment: 1 },
-    ])
-    expect(block.acBreakdown.bodyArmor).toBeUndefined()
+    expect(block.acResolution.source).toBe('natural')
+    expect(block.acResolution.shield).toEqual({ entryId: 'shield', label: 'Shield' })
+    expect(block.acResolution.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'shield', value: 2 }),
+        expect.objectContaining({ kind: 'enhancement', target: 'shield', value: 1 }),
+      ]),
+    )
+    expect(block.acResolution.bodyArmor).toBeUndefined()
   })
 })
 
@@ -440,17 +489,20 @@ describe('deriveMonsterDraftStatBlock', () => {
     expect(blankCr.passivePerception).toEqual({ status: 'unavailable', reason: 'missing-input' })
     expect(blankCr.attacks[0]?.result).toEqual({ status: 'unavailable', reason: 'missing-input' })
 
-    const missingArmor = deriveMonsterDraftStatBlock({
-      monster: { ...kobold, armorClass: { kind: 'equipment' }, equipment: [] },
+    const missingDex = deriveMonsterDraftStatBlock({
+      monster: {
+        ...kobold,
+        abilityScores: { ...kobold.abilityScores, dex: undefined as unknown as number },
+      },
       equipmentCatalog,
       skillCatalog,
     })
-    expect(missingArmor.ac).toEqual({ status: 'unavailable', reason: 'missing-reference' })
+    expect(missingDex.ac).toEqual({ status: 'unavailable', reason: 'missing-input' })
 
     const conflict = deriveMonsterDraftStatBlock({
       monster: {
         ...kobold,
-        armorClass: { kind: 'equipment' },
+        armorClass: {},
         equipment: [
           {
             entryId: 'a',
@@ -492,7 +544,23 @@ describe('deriveMonsterDraftStatBlock', () => {
   it('throws from the strict wrapper when an invariant is broken', () => {
     expect(() =>
       deriveMonsterStatBlock({
-        monster: { ...kobold, armorClass: { kind: 'equipment' }, equipment: [] },
+        monster: {
+          ...kobold,
+          equipment: [
+            {
+              entryId: 'a',
+              equipmentId: `${RULESET}:chain-shirt`,
+              quantity: 1,
+              equipped: true,
+            },
+            {
+              entryId: 'b',
+              equipmentId: `${RULESET}:chain-shirt`,
+              quantity: 1,
+              equipped: true,
+            },
+          ],
+        },
         equipmentCatalog,
         skillCatalog,
       }),
@@ -666,7 +734,7 @@ describe('equipment effect derivation (ship P0)', () => {
     const legacyBlock = deriveMonsterStatBlock({
       monster: {
         ...kobold,
-        armorClass: { kind: 'equipment' },
+        armorClass: {},
         equipment: [fixture],
         actions: [],
       },
@@ -676,7 +744,7 @@ describe('equipment effect derivation (ship P0)', () => {
     const normalizedBlock = deriveMonsterStatBlock({
       monster: {
         ...kobold,
-        armorClass: { kind: 'equipment' },
+        armorClass: {},
         equipment: [normalized],
         actions: [],
       },
@@ -697,7 +765,7 @@ describe('equipment effect derivation (ship P0)', () => {
     const block = deriveMonsterStatBlock({
       monster: {
         ...kobold,
-        armorClass: { kind: 'fixed', value: 17 },
+        armorClass: { naturalArmorBonus: 2, fixedValue: 17 },
         equipment: [fixture],
         actions: [],
       },
