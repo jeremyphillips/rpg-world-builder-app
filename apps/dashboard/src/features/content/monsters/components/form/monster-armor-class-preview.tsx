@@ -41,54 +41,61 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
     derived?.ac.status === 'unavailable'
       ? monsterUnavailableReasonCopy(derived.ac.reason, 'armor')
       : undefined
+  const comparisonMessages = resolution ? monsterArmorClassAlternativeMessages(resolution) : []
 
   return (
     <InsetPanel size="sm">
-      <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-0">
-        <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 text-center md:w-[220px] md:border-r md:border-border md:pr-4">
-          <p className={cn(abilityScoreCardScoreValueClassesFor('md'), 'text-center')}>
-            {resolution ? resolution.ac : '—'}
-          </p>
-          <Text as="p" variant="caption" className="text-center">
-            {resolution ? monsterArmorClassCaption(resolution) : (unavailable ?? 'Not set')}
-          </Text>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-0">
+          <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 text-center md:w-[220px] md:border-r md:border-border md:pr-4">
+            <p className={cn(abilityScoreCardScoreValueClassesFor('md'), 'text-center')}>
+              {resolution ? resolution.ac : '—'}
+            </p>
+            <Text as="p" variant="caption" className="text-center">
+              {resolution ? monsterArmorClassCaption(resolution) : (unavailable ?? 'Not set')}
+            </Text>
+          </div>
+          {resolution ? (
+            <dl className="flex min-w-0 flex-1 flex-col md:pl-4">
+              <div className="flex flex-col gap-0.5">
+                {monsterArmorClassBreakdownRows(resolution).map((row) => (
+                  <div key={row.id} className="flex items-baseline justify-between gap-3 leading-4">
+                    <dt>
+                      <Text as="span" variant="caption">
+                        {row.label}
+                      </Text>
+                    </dt>
+                    <dd>
+                      <Text as="span" variant="caption">
+                        {row.value}
+                      </Text>
+                    </dd>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-1 flex items-baseline justify-between gap-3 border-t border-border pt-1 leading-4">
+                <dt>
+                  <Text as="span" className="text-xs font-semibold">
+                    Total
+                  </Text>
+                </dt>
+                <dd>
+                  <Text as="span" className="text-xs font-semibold">
+                    {resolution.ac}
+                  </Text>
+                </dd>
+              </div>
+            </dl>
+          ) : null}
         </div>
-        {resolution ? (
-          <dl className="flex h-[132px] min-w-0 flex-1 flex-col md:pl-4">
-            <div className="flex flex-col gap-0.5">
-              {monsterArmorClassBreakdownRows(resolution).map((row) => (
-                <div key={row.id} className="flex items-baseline justify-between gap-3 leading-4">
-                  <dt>
-                    <Text as="span" variant="caption">
-                      {row.label}
-                    </Text>
-                  </dt>
-                  <dd>
-                    <Text as="span" variant="caption">
-                      {row.value}
-                    </Text>
-                  </dd>
-                </div>
-              ))}
-            </div>
-            <div className="mt-1 flex items-baseline justify-between gap-3 border-t border-border pt-1 leading-4">
-              <dt>
-                <Text as="span" className="text-xs font-semibold">
-                  Total
-                </Text>
-              </dt>
-              <dd>
-                <Text as="span" className="text-xs font-semibold">
-                  {resolution.ac}
-                </Text>
-              </dd>
-            </div>
-            {monsterArmorClassAlternativeMessages(resolution).map((message) => (
+        {comparisonMessages.length > 0 ? (
+          <div className="flex flex-col gap-0.5">
+            {comparisonMessages.map((message) => (
               <Text key={message} as="p" variant="caption">
                 {message}
               </Text>
             ))}
-          </dl>
+          </div>
         ) : null}
       </div>
     </InsetPanel>

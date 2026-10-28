@@ -14,15 +14,18 @@ export type MonsterArmorClassPresentationRow = {
   value: string
 }
 
+/** Body source that beat the other candidate. Fixed overrides are not a comparison winner. */
+function comparisonWinnerLabel(resolution: MonsterArmorClassResolution): string | undefined {
+  if (resolution.source === 'armor') return resolution.bodyArmor?.label ?? 'Armor'
+  if (resolution.source === 'natural') return 'Natural armor'
+  if (resolution.source === 'unarmored') return getCreatureArmorClassKindLabel('unarmored')
+  return undefined
+}
+
 /** Caption beside the Armor Class total: worn pieces, natural armor, or a fixed override. */
 export function monsterArmorClassCaption(resolution: MonsterArmorClassResolution): string {
   if (resolution.source === 'fixed') return 'Fixed override'
-  const body =
-    resolution.source === 'armor'
-      ? (resolution.bodyArmor?.label ?? 'Armor')
-      : resolution.source === 'natural'
-        ? 'Natural armor'
-        : getCreatureArmorClassKindLabel('unarmored')
+  const body = comparisonWinnerLabel(resolution) ?? getCreatureArmorClassKindLabel('unarmored')
   return resolution.shield ? `${body} + ${resolution.shield.label}` : body
 }
 
@@ -68,16 +71,21 @@ export function monsterArmorClassBreakdownRows(
   }))
 }
 
-function alternativeSentence(alternative: MonsterArmorClassAlternative): string {
-  if (alternative.source === 'natural') return `Natural armor would provide ${alternative.ac}.`
-  if (alternative.source === 'unarmored') return `Unarmored would provide ${alternative.ac}.`
-  return `${alternative.label} would provide ${alternative.ac}.`
+function alternativeSentence(
+  resolution: MonsterArmorClassResolution,
+  alternative: MonsterArmorClassAlternative,
+): string {
+  const loser = `${alternative.label}: ${alternative.ac}.`
+  const winner = comparisonWinnerLabel(resolution)
+  return winner ? `${winner} wins. ${loser}` : loser
 }
 
 export function monsterArmorClassAlternativeMessages(
   resolution: MonsterArmorClassResolution,
 ): string[] {
-  const messages = resolution.alternatives.map(alternativeSentence)
+  const messages = resolution.alternatives.map((alternative) =>
+    alternativeSentence(resolution, alternative),
+  )
   if (resolution.calculatedAc !== undefined) {
     messages.push(
       `Calculated ${monsterArmorClassCompactLabel()} without override: ${resolution.calculatedAc}`,

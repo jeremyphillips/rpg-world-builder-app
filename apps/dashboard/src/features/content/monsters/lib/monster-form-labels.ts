@@ -58,10 +58,6 @@ export const MONSTER_ARMOR_CLASS_HEADING = armorClassLabel
 
 export const MONSTER_BODY_ARMOR_SLOT_HEADING = getCreatureArmorClassKindLabel('armor')
 export const MONSTER_SHIELD_SLOT_HEADING = getArmorCategoryLabel('shields')
-export const MONSTER_BODY_ARMOR_SLOT_HINT =
-  'One suit of body armor. It replaces unarmored or natural Armor Class when it is higher.'
-export const MONSTER_SHIELD_SLOT_HINT =
-  'Adds to Armor Class whether or not the creature wears armor.'
 
 export const MONSTER_HIT_POINTS_HEADING = vocabularyFieldLabel(HIT_POINTS_TERM, { plural: true })
 export const MONSTER_CHALLENGE_HEADING = vocabularyFieldLabel(CHALLENGE_RATING_TERM)

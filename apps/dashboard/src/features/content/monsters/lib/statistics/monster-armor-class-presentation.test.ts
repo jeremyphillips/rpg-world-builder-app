@@ -29,8 +29,19 @@ describe('monster armor class presentation', () => {
       { id: 'shield-1', label: 'Shield', value: '+2' },
     ])
     expect(monsterArmorClassAlternativeMessages(chainAndShield)).toEqual([
-      'Natural armor would provide 15.',
+      'Chain mail wins. Natural armor: 15.',
     ])
+  })
+
+  it('names the winning body source before the losing armor total', () => {
+    expect(
+      monsterArmorClassAlternativeMessages({
+        ac: 15,
+        source: 'natural',
+        rows: [{ kind: 'natural', value: 2 }],
+        alternatives: [{ source: 'armor', label: 'Studded Leather', ac: 14 }],
+      }),
+    ).toEqual(['Natural armor wins. Studded Leather: 14.'])
   })
 
   it('labels a dex cap and a fixed override separately from the calculated total', () => {

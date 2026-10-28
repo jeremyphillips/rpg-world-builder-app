@@ -34,17 +34,28 @@ describe('monster armor class fields', () => {
 
     expect(screen.queryByRole('group', { name: 'Natural armor' })).not.toBeInTheDocument()
     expect(screen.queryByRole('checkbox', { name: 'Natural armor' })).not.toBeInTheDocument()
+    expect(screen.getByText("Adds to the creature's unarmored AC.")).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Armor & shield' })).toBeInTheDocument()
+    expect(document.querySelector('[data-form-columns]')).toHaveClass('md:grid-cols-2')
+    expect(
+      screen.queryByText(
+        'One suit of body armor. It replaces unarmored or natural Armor Class when it is higher.',
+      ),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Adds to Armor Class whether or not the creature wears armor.'),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('Armor Class')).toHaveClass('text-style-field-legend')
+    expect(screen.getByRole('button', { name: /Manual AC override/ })).toHaveTextContent(
+      'Manual AC override',
+    )
+    expect(screen.getByText('Manual AC override')).toHaveClass('text-style-field-label-md')
+    expect(screen.getByText('Manual AC override').className).not.toMatch(/text-style-field-legend/)
     expect(
       screen.getByText(
-        'Increases natural protection. The higher of natural and equipped armor AC is used.',
+        "Use when the normal calculation doesn't apply. Replaces the calculated result.",
       ),
     ).toBeInTheDocument()
-    expect(screen.getByText('Armor Class')).toHaveClass('text-style-field-legend')
-    expect(screen.getByRole('button', { name: 'Advanced options' })).toHaveTextContent(
-      'Advanced options',
-    )
-    expect(screen.getByText('Advanced options')).toHaveClass('text-style-field-label-md')
-    expect(screen.getByText('Advanced options').className).not.toMatch(/text-style-field-legend/)
     expect(
       screen.getByRole('button', { name: 'Add armor' }).querySelector('[data-icon="plus"]'),
     ).toBeInTheDocument()
@@ -71,12 +82,12 @@ describe('monster armor class fields', () => {
     const onSubmit = vi.fn()
     renderArmorClassForm(onSubmit)
 
-    await user.click(screen.getByRole('button', { name: 'Advanced options' }))
+    await user.click(screen.getByRole('button', { name: /Manual AC override/ }))
     const fixed = screen.getByRole('checkbox', { name: 'Use fixed Armor Class' })
     await user.click(fixed)
     expect(fixed).toBeChecked()
     expect(screen.getByLabelText('Fixed Armor Class')).toHaveValue(10)
-    await user.click(screen.getByRole('button', { name: 'Advanced options' }))
+    await user.click(screen.getByRole('button', { name: /Manual AC override/ }))
     expect(screen.getByRole('checkbox', { name: 'Use fixed Armor Class' })).toBeChecked()
     await user.click(screen.getByRole('button', { name: 'Save' }))
 

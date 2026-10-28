@@ -1,4 +1,4 @@
-import { getContentTypeTerm, getNaturalArmorBonusFieldLabel } from '@rpg/contracts'
+import { getNaturalArmorBonusFieldLabel } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -10,17 +10,16 @@ import {
 import {
   MONSTER_ARMOR_CLASS_HEADING,
   MONSTER_BODY_ARMOR_SLOT_HEADING,
-  MONSTER_BODY_ARMOR_SLOT_HINT,
   MONSTER_SHIELD_SLOT_HEADING,
-  MONSTER_SHIELD_SLOT_HINT,
 } from '../monster-form-labels'
 
-const NATURAL_ARMOR_BONUS_HINT =
-  'Increases natural protection. The higher of natural and equipped armor AC is used.'
+const NATURAL_ARMOR_BONUS_HINT = "Adds to the creature's unarmored AC."
+const ARMOR_AND_SHIELD_LEGEND = 'Armor & shield'
+const MANUAL_AC_OVERRIDE_LABEL = 'Manual AC override'
+const MANUAL_AC_OVERRIDE_HINT =
+  "Use when the normal calculation doesn't apply. Replaces the calculated result."
 const FIXED_ARMOR_CLASS_LABEL = 'Fixed Armor Class'
 const USE_FIXED_ARMOR_CLASS_LABEL = 'Use fixed Armor Class'
-const USE_FIXED_ARMOR_CLASS_HINT =
-  'Replaces the calculated result. The calculated total stays visible for reference.'
 
 export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
   return [
@@ -49,33 +48,44 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
         },
         {
           kind: 'group',
-          legend: getContentTypeTerm('equipment').label,
+          legend: ARMOR_AND_SHIELD_LEGEND,
           fields: [
             {
-              kind: 'slot',
-              name: 'armorClass.bodyArmor',
-              heading: {
-                label: MONSTER_BODY_ARMOR_SLOT_HEADING,
-                hint: MONSTER_BODY_ARMOR_SLOT_HINT,
-                action: <MonsterArmorSlotAction slot="body-armor" ctx={ctx} />,
-              },
-              render: () => <MonsterArmorSlotBody slot="body-armor" ctx={ctx} />,
-            },
-            {
-              kind: 'slot',
-              name: 'armorClass.shield',
-              heading: {
-                label: MONSTER_SHIELD_SLOT_HEADING,
-                hint: MONSTER_SHIELD_SLOT_HINT,
-                action: <MonsterArmorSlotAction slot="shield" ctx={ctx} />,
-              },
-              render: () => <MonsterArmorSlotBody slot="shield" ctx={ctx} />,
+              kind: 'columns',
+              columns: [
+                {
+                  fields: [
+                    {
+                      kind: 'slot',
+                      name: 'armorClass.bodyArmor',
+                      heading: {
+                        label: MONSTER_BODY_ARMOR_SLOT_HEADING,
+                        action: <MonsterArmorSlotAction slot="body-armor" ctx={ctx} />,
+                      },
+                      render: () => <MonsterArmorSlotBody slot="body-armor" ctx={ctx} />,
+                    },
+                  ],
+                },
+                {
+                  fields: [
+                    {
+                      kind: 'slot',
+                      name: 'armorClass.shield',
+                      heading: {
+                        label: MONSTER_SHIELD_SLOT_HEADING,
+                        action: <MonsterArmorSlotAction slot="shield" ctx={ctx} />,
+                      },
+                      render: () => <MonsterArmorSlotBody slot="shield" ctx={ctx} />,
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },
         {
           kind: 'group',
-          heading: { label: 'Advanced options' },
+          heading: { label: MANUAL_AC_OVERRIDE_LABEL, hint: MANUAL_AC_OVERRIDE_HINT },
           headingScale: 'field',
           disclosure: {
             variant: 'legend',
@@ -89,7 +99,6 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
                 type: 'checkbox',
                 name: 'armorClass.useFixedAc',
                 label: USE_FIXED_ARMOR_CLASS_LABEL,
-                hint: USE_FIXED_ARMOR_CLASS_HINT,
                 defaultValue: false,
               },
               dependents: {
