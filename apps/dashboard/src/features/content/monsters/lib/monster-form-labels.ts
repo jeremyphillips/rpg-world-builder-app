@@ -3,10 +3,15 @@ import {
   ABILITY_SCORE_TERM,
   type Ability,
   CHALLENGE_RATING_TERM,
+  CREATURE_ARMOR_CLASS_KIND_ENTRIES,
   CREATURE_ARMOR_CLASS_KIND_TERM,
   getActionEconomyLabel,
+  getArmorCategoryCollectionLabel,
+  getArmorCategoryLabel,
+  getArmorCategorySentenceForm,
   getAverageHitPointsLabel,
   getContentTypeSentenceForm,
+  getCreatureArmorClassKindLabel,
   getCreatureLanguageFluencyLabel,
   getMonsterActionKindFieldLabel,
   getMonsterReactionFieldLabel,
@@ -14,6 +19,7 @@ import {
   getProficiencyDomainCollectionLabel,
   joinInlineMetadata,
   getProficiencyGrantCompactAddLabel,
+  getTermLabelSingular,
   HIT_POINTS_TERM,
   LANGUAGE_TERM,
   PASSIVE_PERCEPTION_TERM,
@@ -21,6 +27,7 @@ import {
   SAVING_THROW_SHORT_LABEL,
   SAVING_THROW_TERM,
   SENSE_TERM,
+  type CreatureArmorSlot,
 } from '@rpg/contracts'
 
 export { formatEquipmentCustomizationRemovalSummary } from './equipment/equipment-entry-customization.lib'
@@ -48,6 +55,14 @@ export const MONSTER_ABILITY_SCORES_HEADING = vocabularyFieldLabel(ABILITY_SCORE
   plural: true,
 })
 export const MONSTER_ARMOR_CLASS_HEADING = armorClassLabel
+
+export const MONSTER_BODY_ARMOR_SLOT_HEADING = getCreatureArmorClassKindLabel('armor')
+export const MONSTER_SHIELD_SLOT_HEADING = getArmorCategoryLabel('shields')
+export const MONSTER_BODY_ARMOR_SLOT_HINT =
+  'One suit of body armor. It replaces unarmored or natural Armor Class when it is higher.'
+export const MONSTER_SHIELD_SLOT_HINT =
+  'Adds to Armor Class whether or not the creature wears armor.'
+
 export const MONSTER_HIT_POINTS_HEADING = vocabularyFieldLabel(HIT_POINTS_TERM, { plural: true })
 export const MONSTER_CHALLENGE_HEADING = vocabularyFieldLabel(CHALLENGE_RATING_TERM)
 export const MONSTER_SAVE_LABEL = SAVING_THROW_SHORT_LABEL
@@ -147,6 +162,52 @@ export const MONSTER_ACTIONS_EMPTY = 'No actions yet.'
 export const MONSTER_SECTION_EMPTY = 'None'
 export const MONSTER_ACTION_DETAIL_EMPTY = 'Select or add an action to edit it.'
 export const MONSTER_ADD_LABEL = 'Add'
+
+function monsterArmorSlotMidSentenceNoun(slot: CreatureArmorSlot): string {
+  if (slot === 'shield') return getArmorCategorySentenceForm('shields', 1)
+  return getTermLabelSingular(getCreatureArmorClassKindLabel('armor'))
+}
+
+export function formatMonsterArmorSlotAddLabel(slot: CreatureArmorSlot): string {
+  return `${MONSTER_ADD_LABEL} ${monsterArmorSlotMidSentenceNoun(slot)}`
+}
+
+export function formatMonsterArmorSlotChangeLabel(slot: CreatureArmorSlot): string {
+  return `Change ${monsterArmorSlotMidSentenceNoun(slot)}`
+}
+
+export function formatMonsterArmorSlotSelectLabel(slot: CreatureArmorSlot): string {
+  return `Select ${monsterArmorSlotMidSentenceNoun(slot)}`
+}
+
+export function formatMonsterArmorSlotEmptyTitle(slot: CreatureArmorSlot): string {
+  return `No ${monsterArmorSlotMidSentenceNoun(slot)} selected`
+}
+
+export function formatMonsterArmorSlotEmptySupporting(slot: CreatureArmorSlot): string {
+  if (slot === 'shield') {
+    return `${getArmorCategoryCollectionLabel('shields')} add to ${armorClassLabel}.`
+  }
+  const naturalArmor = `${getTermLabelSingular(CREATURE_ARMOR_CLASS_KIND_ENTRIES.natural.label)} armor`
+  return `${formatMonsterArmorSlotAddLabel('body-armor')} or rely on ${naturalArmor}.`
+}
+
+export function getMonsterArmorSlotUiCopy(slot: CreatureArmorSlot): {
+  add: string
+  change: string
+  select: string
+  emptyTitle: string
+  emptySupporting: string
+} {
+  return {
+    add: formatMonsterArmorSlotAddLabel(slot),
+    change: formatMonsterArmorSlotChangeLabel(slot),
+    select: formatMonsterArmorSlotSelectLabel(slot),
+    emptyTitle: formatMonsterArmorSlotEmptyTitle(slot),
+    emptySupporting: formatMonsterArmorSlotEmptySupporting(slot),
+  }
+}
+
 export const MONSTER_KIND_LABEL = getMonsterActionKindFieldLabel()
 export const MONSTER_ACTION_NAME_LABEL = 'Name'
 export const MONSTER_TRIGGER_LABEL = getMonsterReactionFieldLabel('trigger')

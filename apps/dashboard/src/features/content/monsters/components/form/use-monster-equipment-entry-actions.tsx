@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, type ReactElement, type ReactNode } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import {
@@ -11,7 +11,7 @@ import {
 } from '@rpg/contracts'
 import { ConfirmDialog } from '@rpg/ui'
 
-import { EquipmentInstanceEditorDrawer } from '@/features/content'
+import { EquipmentInstanceEditorDrawer } from '../../../equipment/components/instance-editor/equipment-instance-editor-drawer'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
@@ -37,6 +37,18 @@ import { MonsterEquipmentEntryCard } from './monster-equipment-entry-card'
 
 type PendingRemove = {
   entryId: string
+}
+
+export type MonsterEquipmentEntryActions = {
+  values: MonsterFormValues | undefined
+  equipment: readonly MonsterEquipmentFormEntry[]
+  catalog: ReturnType<typeof monsterEquipmentCatalog>
+  weaponGrants: ReturnType<typeof resolveMonsterFormWeaponGrants>
+  rulesetId: SystemRulesetId
+  updateEquipment: (next: MonsterEquipmentFormEntry[]) => void
+  removeEntry: (entryId: string) => void
+  entryCard: (entry: MonsterEquipmentFormEntry) => ReactNode
+  dialogs: ReactElement
 }
 
 function monsterEntryIsProficient(
@@ -284,7 +296,7 @@ function MonsterEquipmentEntryDialogs({
   )
 }
 
-export function useMonsterEquipmentEntryActions(ctx: ContentFormCtx) {
+export function useMonsterEquipmentEntryActions(ctx: ContentFormCtx): MonsterEquipmentEntryActions {
   const form = useFormContext<MonsterFormValues>()
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const [editorEntryId, setEditorEntryId] = useState<string | null>(null)

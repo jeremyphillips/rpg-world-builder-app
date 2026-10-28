@@ -7,14 +7,17 @@ import {
   MonsterArmorSlotAction,
   MonsterArmorSlotBody,
 } from '../../components/form/monster-armor-slot'
-import { MONSTER_ARMOR_CLASS_HEADING } from '../monster-form-labels'
+import {
+  MONSTER_ARMOR_CLASS_HEADING,
+  MONSTER_BODY_ARMOR_SLOT_HEADING,
+  MONSTER_BODY_ARMOR_SLOT_HINT,
+  MONSTER_SHIELD_SLOT_HEADING,
+  MONSTER_SHIELD_SLOT_HINT,
+} from '../monster-form-labels'
 
 const NATURAL_ARMOR_LABEL = 'Natural armor'
 const NATURAL_ARMOR_HINT =
   'Adds to unarmored Armor Class. Worn armor is used instead when it is higher.'
-const ARMOR_HINT =
-  'One suit of body armor. It replaces unarmored or natural Armor Class when it is higher.'
-const SHIELD_HINT = 'Adds to Armor Class whether or not the creature wears armor.'
 const FIXED_ARMOR_CLASS_LABEL = 'Fixed Armor Class'
 const USE_FIXED_ARMOR_CLASS_LABEL = 'Use fixed Armor Class'
 const USE_FIXED_ARMOR_CLASS_HINT =
@@ -69,8 +72,8 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
             {
               kind: 'group',
               heading: {
-                label: 'Armor',
-                hint: ARMOR_HINT,
+                label: MONSTER_BODY_ARMOR_SLOT_HEADING,
+                hint: MONSTER_BODY_ARMOR_SLOT_HINT,
                 action: <MonsterArmorSlotAction slot="body-armor" ctx={ctx} />,
               },
               fields: [
@@ -84,8 +87,8 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
             {
               kind: 'group',
               heading: {
-                label: 'Shield',
-                hint: SHIELD_HINT,
+                label: MONSTER_SHIELD_SLOT_HEADING,
+                hint: MONSTER_SHIELD_SLOT_HINT,
                 action: <MonsterArmorSlotAction slot="shield" ctx={ctx} />,
               },
               fields: [

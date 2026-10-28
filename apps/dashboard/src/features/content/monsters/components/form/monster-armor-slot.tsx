@@ -17,7 +17,10 @@ import {
 import { EquipmentPickerDrawer } from '@/features/character'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
+import {
+  monsterEquipmentCatalog,
+  monsterMagicPropertyProvider,
+} from '../../lib/monster-form-derivation'
 import { replaceMonsterArmorSlotEntry } from '../../lib/equipment/monster-equipment-loadout.lib'
 import {
   buildMonsterLoadoutPickerItems,
@@ -27,39 +30,10 @@ import { resolveEquipmentRemovalDecision } from '../../lib/equipment/resolve-equ
 import {
   formatEquipmentCustomizationRemovalSummary,
   formatEquipmentRemovalConfirmCopy,
+  getMonsterArmorSlotUiCopy,
 } from '../../lib/monster-form-labels'
-import { monsterMagicPropertyProvider } from '../../lib/monster-form-derivation'
 import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../../lib/monster-form-values'
 import { useMonsterEquipmentEntryActions } from './use-monster-equipment-entry-actions'
-
-const SLOT_COPY = {
-  'body-armor': {
-    noun: 'armor',
-    add: 'Add armor',
-    change: 'Change armor',
-    select: 'Select armor',
-    emptyTitle: 'No armor selected',
-    emptySupporting: 'Add armor or rely on natural armor.',
-  },
-  shield: {
-    noun: 'shield',
-    add: 'Add shield',
-    change: 'Change shield',
-    select: 'Select shield',
-    emptyTitle: 'No shield selected',
-    emptySupporting: 'Shields add to Armor Class.',
-  },
-} as const satisfies Record<
-  CreatureArmorSlot,
-  {
-    noun: string
-    add: string
-    change: string
-    select: string
-    emptyTitle: string
-    emptySupporting: string
-  }
->
 
 function slotEntries(
   equipment: readonly MonsterEquipmentFormEntry[],
@@ -175,7 +149,7 @@ export function MonsterArmorSlotAction({
   const equipment = values?.equipment ?? []
   const owned = slotEntries(equipment, catalog, slot)
   const currentId = ownedArmorSlotId(owned)
-  const copy = SLOT_COPY[slot]
+  const copy = getMonsterArmorSlotUiCopy(slot)
   const [open, setOpen] = useState(false)
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [pendingReplace, setPendingReplace] = useState<MonsterEquipmentFormEntry | null>(null)
@@ -269,11 +243,14 @@ export function MonsterArmorSlotBody({
   slot: CreatureArmorSlot
   ctx: ContentFormCtx
 }) {
-  const actions = useMonsterEquipmentEntryActions(ctx)
-  const owned = slotEntries(actions.equipment, actions.catalog, slot)
+  const equipmentEntrySurface = useMonsterEquipmentEntryActions(ctx)
+  const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
+  const catalog = monsterEquipmentCatalog(ctx)
+  const equipment = values?.equipment ?? []
+  const owned = slotEntries(equipment, catalog, slot)
   const entry = owned[0]
   if (!entry) {
-    const copy = SLOT_COPY[slot]
+    const copy = getMonsterArmorSlotUiCopy(slot)
     return (
       <InsetPanel borderStyle="dashed" size="sm" align="center" className="gap-1">
         <Text as="p" className={emptyStateWellTitleClasses}>
@@ -287,8 +264,8 @@ export function MonsterArmorSlotBody({
   }
   return (
     <>
-      {actions.entryCard(entry)}
-      {actions.dialogs}
+      {equipmentEntrySurface.entryCard(entry)}
+      {equipmentEntrySurface.dialogs}
     </>
   )
 }
