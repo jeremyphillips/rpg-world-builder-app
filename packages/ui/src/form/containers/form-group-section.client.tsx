@@ -222,6 +222,7 @@ export function GroupFieldSection({
       legendAccessory={heading?.accessory}
       legendAction={heading?.action}
       legendSize={legendSize}
+      headingScale={item.headingScale}
       rhythm={groupRhythm}
       size={groupSize}
       description={description}

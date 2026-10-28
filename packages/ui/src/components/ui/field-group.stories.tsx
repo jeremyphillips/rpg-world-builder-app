@@ -46,6 +46,41 @@ export const WithDescription: Story = {
   },
 }
 
+/** Field-scale subgroup — legend and description match field label and hint type. */
+export const FieldScale: Story = {
+  args: {
+    legend: 'Weapon',
+    children: null,
+  },
+  render: () => (
+    <FieldGroup legend="Weapon">
+      <TextField id="weapon-name-field-scale" label="Name" placeholder="Longsword" />
+      <FieldGroup
+        legend="Damage"
+        description="Primary damage dice."
+        legendSize="subsection"
+        headingScale="field"
+        size="md"
+      >
+        <TextField id="damage-dice-field-scale" label="Dice" placeholder="1d8" />
+      </FieldGroup>
+    </FieldGroup>
+  ),
+}
+
+/** Collapsible field-scale subgroup — same type scale, legend disclosure unchanged. */
+export const FieldScaleCollapsible: Story = {
+  args: {
+    legend: 'Advanced options',
+    description: 'Optional tuning for power users.',
+    legendSize: 'subsection',
+    headingScale: 'field',
+    size: 'md',
+    disclosure: { variant: 'legend', defaultOpen: false },
+    children: sampleFields,
+  },
+}
+
 /** Nested subgroup — smaller legend for groups inside another group. */
 export const NestedSubgroup: Story = {
   args: {

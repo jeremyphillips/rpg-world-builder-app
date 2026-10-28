@@ -60,6 +60,7 @@ import type {
   FieldHintPosition,
   FieldLabelPosition,
   FieldSeparator,
+  GroupHeadingScale,
 } from '../components/ui/field.variants'
 import type { FieldLayoutRecommendation } from '../components/ui/field-recommendation.types'
 import type { FormDensity } from './form-density'
@@ -1224,7 +1225,7 @@ export interface DependentConfig {
  * Named fieldset subsection (`kind: 'group'`).
  *
  * Common options: `legend`, `fields`, `density`, `chrome`, `disclosure`,
- * `description`, `visibility`.
+ * `description`, `headingScale`, `visibility`.
  * Use `defineGroupField()` for completion.
  *
  * @example
@@ -1243,6 +1244,13 @@ export interface GroupConfig {
   /** When omitted, renders as a layout/visibility wrapper without a legend. */
   legend?: string
   description?: string
+  /**
+   * When `'field'`, legend and description use this group's field label and hint
+   * type scale. Omit for structural legend type from nesting depth. Typography
+   * only — spacing, disclosure, and legend semantics stay unchanged. There is
+   * no separate legend or description size.
+   */
+  headingScale?: GroupHeadingScale
   fields: GroupFieldItem[]
   className?: string
   /** Optional DOM id on the fieldset — for in-page scroll anchors. */

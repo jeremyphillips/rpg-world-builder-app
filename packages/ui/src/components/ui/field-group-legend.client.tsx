@@ -12,6 +12,7 @@ import {
   fieldGroupLegendHeaderStackVariants,
   resolveFieldGroupDescriptionTypography,
   type FieldRhythm,
+  type GroupHeadingScale,
 } from './field.variants'
 import { Text } from './text'
 
@@ -26,6 +27,8 @@ export type FieldGroupLegendProps = {
   legendAction?: React.ReactNode
   /** Resolved title scale — applied to the label only, not the `<legend>` wrapper. */
   legendTypography: string
+  /** When `'field'`, description uses field-hint type instead of group description type. */
+  headingScale?: GroupHeadingScale
   legendChromeClassName: string
   collapsible: boolean
   rhythm?: FieldRhythm
@@ -78,6 +81,7 @@ type LegendContentOptions = {
   rhythm: FieldRhythm
   legendTypography: string
   descriptionTypography: string
+  headingScale?: GroupHeadingScale
 }
 
 function resolveLegendPrimaryLabel(options: LegendContentOptions): React.ReactNode {
@@ -93,7 +97,7 @@ function LegendTitle({ typography, children }: { typography: string; children: R
 }
 
 function resolveLegendContent(options: LegendContentOptions): React.ReactNode {
-  const { description, rhythm, legendTypography, descriptionTypography } = options
+  const { description, rhythm, legendTypography, descriptionTypography, headingScale } = options
   const title = (
     <LegendTitle typography={legendTypography}>{resolveLegendPrimaryLabel(options)}</LegendTitle>
   )
@@ -105,7 +109,11 @@ function resolveLegendContent(options: LegendContentOptions): React.ReactNode {
   return (
     <span className={fieldGroupLegendHeaderStackVariants({ rhythm })}>
       {title}
-      <Text as="span" className={descriptionTypography}>
+      <Text
+        as="span"
+        variant={headingScale === 'field' ? 'caption' : undefined}
+        className={headingScale === 'field' ? undefined : descriptionTypography}
+      >
         {description}
       </Text>
     </span>
@@ -185,13 +193,14 @@ export function FieldGroupLegend({
   legendAccessory,
   legendAction,
   legendTypography,
+  headingScale,
   legendChromeClassName,
   collapsible,
   rhythm = 'comfortable',
   open,
   onToggle,
 }: FieldGroupLegendProps) {
-  const descriptionTypography = resolveFieldGroupDescriptionTypography(rhythm)
+  const descriptionTypography = resolveFieldGroupDescriptionTypography(rhythm, headingScale)
 
   const contentOptions: LegendContentOptions = {
     legend,
@@ -201,6 +210,7 @@ export function FieldGroupLegend({
     rhythm,
     legendTypography,
     descriptionTypography,
+    headingScale,
   }
   const legendContent = resolveLegendContent(contentOptions)
   const hasStackedHint = Boolean(description)

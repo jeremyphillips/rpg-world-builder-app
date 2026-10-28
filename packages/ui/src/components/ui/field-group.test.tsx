@@ -154,6 +154,97 @@ describe('FieldGroup', () => {
     )
   })
 
+  it('replaces subsection type with comfortable field label and hint type', () => {
+    render(
+      <FieldGroup
+        legend="Advanced options"
+        description="Optional tuning."
+        legendSize="subsection"
+        headingScale="field"
+        size="md"
+      >
+        <TextField id="note" label="Note" />
+      </FieldGroup>,
+    )
+
+    const title = legendTitleTypographyNode('Advanced options')
+    expect(title).toHaveClass('text-style-field-label-md')
+    expect(title.className).not.toMatch(/text-style-field-legend/)
+    const description = screen.getByText('Optional tuning.')
+    expect(description).toHaveClass('text-style-caption')
+    expect(description).not.toHaveClass(
+      'text-style-field-group-description',
+      'text-style-field-group-description-compact',
+      'text-style-body',
+    )
+    const legend = screen.getByText('Advanced options').closest('legend')
+    expect(legend?.firstElementChild).toHaveClass('gap-2')
+    const fieldset = screen.getByRole('group', { name: /Advanced options/ })
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-4')
+  })
+
+  it('replaces subsection type with compact field label and hint type', () => {
+    render(
+      <FieldGroup
+        legend="Advanced options"
+        description="Optional tuning."
+        legendSize="subsection"
+        headingScale="field"
+        size="sm"
+        rhythm="compact"
+      >
+        <TextField id="note-compact" label="Note" size="sm" />
+      </FieldGroup>,
+    )
+
+    const title = legendTitleTypographyNode('Advanced options')
+    expect(title).toHaveClass('text-style-field-label-sm')
+    expect(title.className).not.toMatch(/text-style-field-legend/)
+    const description = screen.getByText('Optional tuning.')
+    expect(description).toHaveClass('text-style-caption')
+    expect(description).not.toHaveClass('text-style-field-group-description-compact')
+    const legend = screen.getByText('Advanced options').closest('legend')
+    expect(legend?.firstElementChild).toHaveClass('gap-1')
+    const fieldset = screen.getByRole('group', { name: /Advanced options/ })
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-3')
+  })
+
+  it('keeps disclosure affordances when a collapsible legend uses field scale', async () => {
+    const user = userEvent.setup()
+    render(
+      <FieldGroup
+        legend="Advanced options"
+        description="Optional tuning."
+        legendSize="subsection"
+        headingScale="field"
+        size="md"
+        disclosure={{ variant: 'legend', defaultOpen: false }}
+      >
+        <TextField id="note-disclosure" label="Note" />
+      </FieldGroup>,
+    )
+
+    const title = legendTitleTypographyNode('Advanced options')
+    expect(title).toHaveClass('text-style-field-label-md')
+    expect(title.className).not.toMatch(/text-style-field-legend/)
+    expect(screen.getByText('Optional tuning.')).toHaveClass('text-style-caption')
+    const trigger = screen.getByRole('button', { name: /Advanced options/i })
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    expect(trigger).toHaveClass(
+      'focus-visible:outline-none',
+      'focus-visible:ring-2',
+      'focus-visible:ring-ring',
+      'focus-visible:ring-offset-2',
+    )
+    expect(trigger.querySelector('[data-icon="chevron-down"]')).toBeTruthy()
+    const fieldset = screen.getByRole('group', { name: /Advanced options/ })
+    expect(bodyRelationshipWrapper(fieldset)).toBeNull()
+
+    await user.click(trigger)
+    expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-4')
+  })
+
   it('applies array body gap outside array legend typography', () => {
     render(
       <FieldGroup legend="Grants" legendSize="array" size="md">

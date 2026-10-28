@@ -484,6 +484,7 @@ export {
   type FieldGroupLegendSize,
   type FieldSeparator,
   type FieldRhythm,
+  type GroupHeadingScale,
 } from '../components/ui/field.variants'
 export {
   FieldRowAnatomyProvider,

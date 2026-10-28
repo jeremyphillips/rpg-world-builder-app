@@ -32,14 +32,25 @@ describe('monster armor class fields', () => {
     const onSubmit = vi.fn()
     renderArmorClassForm(onSubmit)
 
+    expect(screen.queryByRole('group', { name: 'Natural armor' })).not.toBeInTheDocument()
     expect(screen.queryByRole('checkbox', { name: 'Natural armor' })).not.toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Increases natural protection. The higher of natural and equipped armor AC is used.',
+      ),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Armor Class')).toHaveClass('text-style-field-legend')
+    expect(screen.getByRole('button', { name: 'Advanced options' })).toHaveTextContent(
+      'Advanced options',
+    )
+    expect(screen.getByText('Advanced options')).toHaveClass('text-style-field-label-md')
+    expect(screen.getByText('Advanced options').className).not.toMatch(/text-style-field-legend/)
     expect(
       screen.getByRole('button', { name: 'Add armor' }).querySelector('[data-icon="plus"]'),
     ).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Add shield' }).querySelector('[data-icon="plus"]'),
     ).toBeInTheDocument()
-    expect(screen.getByText(/Increase the creature's natural protection/)).toBeInTheDocument()
     const bonus = screen.getByLabelText('Natural armor bonus')
     expect(bonus).toHaveValue(0)
 

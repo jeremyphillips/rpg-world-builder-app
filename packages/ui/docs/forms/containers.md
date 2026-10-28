@@ -49,7 +49,11 @@ use the legend row for disclosure, and nested interactives corrupt fieldset nami
 
 Row, array, and slot headings ignore `accessory` and `action`.
 Nested named groups derive subsection typography from nesting depth — no `legendSize`
-override. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-3`) owns sibling
+override. `headingScale: 'field'` is the only authored type opt-in: it replaces that
+structural legend and description type with the field label and hint scale for the group's
+density (comfortable label `md`, compact label `sm`; description matches `Field.Hint`).
+Spacing, disclosure, and legend semantics stay unchanged. There is no separate legend or
+description size. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-3`) owns sibling
 spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
 `mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-3`) owns sibling spacing.
 Standalone `FormItems` outside `<Form>` need rhythm from either `<Form>` (which wraps

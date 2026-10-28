@@ -1,8 +1,4 @@
-import {
-  CREATURE_ARMOR_CLASS_KIND_ENTRIES,
-  getContentTypeTerm,
-  getNaturalArmorBonusFieldLabel,
-} from '@rpg/contracts'
+import { getContentTypeTerm, getNaturalArmorBonusFieldLabel } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -19,9 +15,8 @@ import {
   MONSTER_SHIELD_SLOT_HINT,
 } from '../monster-form-labels'
 
-const NATURAL_ARMOR_LEGEND = `${CREATURE_ARMOR_CLASS_KIND_ENTRIES.natural.label} armor`
-const NATURAL_ARMOR_DESCRIPTION =
-  "Increase the creature's natural protection. The higher of natural armor and equipped armor is used."
+const NATURAL_ARMOR_BONUS_HINT =
+  'Increases natural protection. The higher of natural and equipped armor AC is used.'
 const FIXED_ARMOR_CLASS_LABEL = 'Fixed Armor Class'
 const USE_FIXED_ARMOR_CLASS_LABEL = 'Use fixed Armor Class'
 const USE_FIXED_ARMOR_CLASS_HINT =
@@ -41,22 +36,16 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
           render: () => <MonsterArmorClassPreview ctx={ctx} />,
         },
         {
-          kind: 'group',
-          legend: NATURAL_ARMOR_LEGEND,
-          description: NATURAL_ARMOR_DESCRIPTION,
-          fields: [
-            {
-              type: 'number',
-              name: 'armorClass.naturalArmorBonus',
-              label: getNaturalArmorBonusFieldLabel(),
-              labelPosition: 'settings',
-              control: 'stepper',
-              min: 0,
-              defaultValue: 0,
-              digits: 2,
-              separator: 'subtle',
-            },
-          ],
+          type: 'number',
+          name: 'armorClass.naturalArmorBonus',
+          label: getNaturalArmorBonusFieldLabel(),
+          hint: NATURAL_ARMOR_BONUS_HINT,
+          labelPosition: 'settings',
+          control: 'stepper',
+          min: 0,
+          defaultValue: 0,
+          digits: 2,
+          separator: 'subtle',
         },
         {
           kind: 'group',
@@ -87,6 +76,7 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'group',
           heading: { label: 'Advanced options' },
+          headingScale: 'field',
           disclosure: {
             variant: 'legend',
             defaultOpen: false,

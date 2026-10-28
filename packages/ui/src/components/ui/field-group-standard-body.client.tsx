@@ -21,6 +21,7 @@ import {
   resolveFieldGroupBodyGap,
   type FieldGroupLegendSize,
   type FieldRhythm,
+  type GroupHeadingScale,
 } from './field.variants'
 
 function useGroupCollapseState(options: {
@@ -68,6 +69,7 @@ export type StandardFieldGroupBodyProps = {
   legendAccessory?: React.ReactNode
   legendAction?: React.ReactNode
   legendSize: FieldGroupLegendSize
+  headingScale?: GroupHeadingScale
   legendTypography: string
   fieldSize: FieldSizeToken
   rhythm: FieldRhythm
@@ -88,6 +90,7 @@ export function StandardFieldGroupBody({
   legendAccessory,
   legendAction,
   legendSize,
+  headingScale,
   legendTypography,
   fieldSize,
   rhythm,
@@ -145,6 +148,7 @@ export function StandardFieldGroupBody({
           legendAccessory={legendAccessory}
           legendAction={legendAction}
           legendTypography={legendTypography}
+          headingScale={headingScale}
           rhythm={rhythm}
           legendChromeClassName={chromeClasses.legend}
           collapsible={collapsible}
