@@ -171,7 +171,10 @@ function CollapsibleFieldGroupLegend({
         <Icon
           name="chevron-down"
           size="lg"
-          className="shrink-0 text-muted-foreground open && rotate-180"
+          className={cn(
+            'shrink-0 text-muted-foreground transition-transform',
+            open && 'rotate-180',
+          )}
         />
       </button>
       {legendAccessory ? <span className="shrink-0 pt-0.5">{legendAccessory}</span> : null}

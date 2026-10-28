@@ -236,12 +236,15 @@ describe('FieldGroup', () => {
       'focus-visible:ring-ring',
       'focus-visible:ring-offset-2',
     )
-    expect(trigger.querySelector('[data-icon="chevron-down"]')).toBeTruthy()
+    const chevron = trigger.querySelector('[data-icon="chevron-down"]')
+    expect(chevron).toBeTruthy()
+    expect(chevron).not.toHaveClass('rotate-180')
     const fieldset = screen.getByRole('group', { name: /Advanced options/ })
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
 
     await user.click(trigger)
     expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    expect(chevron).toHaveClass('rotate-180')
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-4')
   })
 
