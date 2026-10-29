@@ -4,6 +4,7 @@ import {
   defaultCampaignMechanicsPatch,
   mechanicsDriftFromPreset,
   resolveMechanicsPatch,
+  systemDefaultArmorClassRules,
   updateCampaignMechanicsInputSchema,
 } from './campaign-mechanics-patch'
 import { getEditionPresetMechanics } from '../../vocab/mechanics'
@@ -97,6 +98,12 @@ describe('defaultCampaignMechanicsPatch', () => {
   })
 })
 
+describe('systemDefaultArmorClassRules', () => {
+  it('selects the 5e preset bundle', () => {
+    expect(systemDefaultArmorClassRules()).toEqual(getEditionPresetMechanics('5e').armorClass)
+  })
+})
+
 describe('updateCampaignMechanicsInputSchema', () => {
   it('accepts partial knob updates without server-managed fields', () => {
     expect(
@@ -116,6 +123,20 @@ describe('updateCampaignMechanicsInputSchema', () => {
         },
       }).success,
     ).toBe(false)
+  })
+
+  it('rejects armor class bases outside the scale', () => {
+    expect(updateCampaignMechanicsInputSchema.safeParse({ armorClass: { base: 8 } }).success).toBe(
+      false,
+    )
+    expect(updateCampaignMechanicsInputSchema.safeParse({ armorClass: { base: 11 } }).success).toBe(
+      false,
+    )
+    expect(
+      updateCampaignMechanicsInputSchema.safeParse({
+        armorClass: { mode: 'ascending', base: 9 },
+      }).success,
+    ).toBe(true)
   })
 
   it('rejects unknown fields', () => {

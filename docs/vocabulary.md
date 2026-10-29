@@ -318,7 +318,15 @@ Reference copy for edition presets includes `meta` chip strings in
 
 Mechanics values persist on `CampaignRulesetPatch.mechanics` via
 `PATCH /api/campaigns/:campaignId/ruleset-patch/mechanics` (not the vocabulary
-patch routes).
+patch routes). Armor Class `mode` and `base` are written together when they
+differ from the selected preset, and unset when they match it. Equipment keeps
+protection offsets (`baseAcOffset`, `fixedAcOffset`, vehicle `acOffset`).
+Displayed AC is `armorClassFromProtection` under the server-resolved rules from
+`GET /ruleset-patch`. Changing the base does not rewrite those offsets. With
+base 9 ascending, plate (offset 8) displays as 17. The mechanics form hint
+computes that plate example through the scale. Dashboard readers share
+`rulesetPatchQueryKey`; a mechanics save invalidates that query and the global
+search catalog snapshot. Search itself resolves rules on each request.
 
 ---
 

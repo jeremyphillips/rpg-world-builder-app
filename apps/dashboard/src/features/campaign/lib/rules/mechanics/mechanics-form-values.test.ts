@@ -38,3 +38,20 @@ describe('defaultMechanicsValues', () => {
     )
   })
 })
+
+describe('buildMechanicsPatchInput', () => {
+  it('sends mode and base together for a base 9 ascending campaign', () => {
+    expect(
+      buildMechanicsPatchInput({
+        editionPresetId: '5e',
+        armorClassMode: 'ascending',
+        armorClassBase: '9',
+        attackResolutionMode: 'proficiency_attack_vs_ac',
+      }),
+    ).toEqual({
+      editionPreset: { id: '5e' },
+      armorClass: { mode: 'ascending', base: 9 },
+      attackResolution: { mode: 'proficiency_attack_vs_ac' },
+    })
+  })
+})

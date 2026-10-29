@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { systemDefaultArmorClassRules } from '../../campaign/patches/campaign-mechanics-patch'
 import { equipmentSchema, type Equipment } from '../../content/equipment'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { dexModifierForArmor, resolveCreatureArmorSlot } from '../creature/armor-class'
@@ -130,10 +131,11 @@ function resolve(input: {
   /** Absolute AC under the chosen ascending base. Converted to an offset. */
   fixedValue?: number
   equipment?: ReturnType<typeof entry>[]
-  acBase?: 9 | 10
+  /** Ascending base used to turn an absolute `fixedValue` into an offset. */
+  base?: 9 | 10
   provider?: MagicPropertyDefinitionProvider
 }) {
-  const base = input.acBase ?? 10
+  const base = input.base ?? systemDefaultArmorClassRules().base
   return resolveMonsterArmorClass({
     monster: {
       abilityScores: input.dex === undefined ? {} : { dex: input.dex },
@@ -177,8 +179,8 @@ describe('resolveMonsterArmorClass', () => {
       ],
       alternatives: resolvedField([]),
     })
-    expect(resolved({ dex: 10, acBase: 9 }).ac).toBe(9)
-    expect(resolved({ dex: 10, acBase: 10 }).ac).toBe(10)
+    expect(resolved({ dex: 10, base: 9 }).ac).toBe(9)
+    expect(resolved({ dex: 10, base: 10 }).ac).toBe(10)
   })
 
   it('keeps a Dexterity row for +0 and negative modifiers', () => {
