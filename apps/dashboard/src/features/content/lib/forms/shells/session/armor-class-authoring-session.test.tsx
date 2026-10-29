@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
+import type { ArmorClassRules } from '@rpg/contracts'
 
 import {
   ArmorClassAuthoringNotice,
@@ -16,7 +17,7 @@ import {
 const ASCENDING_TEN = { mode: 'ascending' as const, base: 10 as const }
 const ASCENDING_NINE = { mode: 'ascending' as const, base: 9 as const }
 
-function SessionProbe({ sensitive, live }: { sensitive: boolean; live: typeof ASCENDING_TEN }) {
+function SessionProbe({ sensitive, live }: { sensitive: boolean; live: ArmorClassRules }) {
   const form = useForm({ defaultValues: { baseAc: 18 } })
   const [liveRules, setLiveRules] = useState(live)
   const liveSession = useArmorClassAuthoringSession(sensitive, liveRules)
