@@ -58,7 +58,12 @@ describe('unarmored base lifecycle', () => {
     const catalog = await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaignId)
     const resolvedPlate = catalog.find((item) => item.slug === 'plate-armor')
     const resolvedHomebrew = catalog.find((item) => item.slug === HOMEBREW_SLUG)
-    if (!isArmorEquipment(resolvedPlate) || !isArmorEquipment(resolvedHomebrew)) {
+    if (
+      resolvedPlate === undefined ||
+      resolvedHomebrew === undefined ||
+      !isArmorEquipment(resolvedPlate) ||
+      !isArmorEquipment(resolvedHomebrew)
+    ) {
       throw new Error('expected armor rows')
     }
     expect(resolvedPlate.baseAcOffset).toBe(PLATE_OFFSET)
