@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Text } from '@rpg/ui'
 
@@ -23,6 +24,20 @@ describe('PageLoadState', () => {
       </PageLoadState>,
     )
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
+  })
+
+  it('retries from the error state', async () => {
+    const user = userEvent.setup()
+    const onRetry = vi.fn()
+    render(
+      <PageLoadState isPending={false} isError errorLabel="Something went wrong." onRetry={onRetry}>
+        <Text>Ready content</Text>
+      </PageLoadState>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(onRetry).toHaveBeenCalledOnce()
+    expect(screen.queryByText('Ready content')).not.toBeInTheDocument()
   })
 
   it('renders children when ready', () => {

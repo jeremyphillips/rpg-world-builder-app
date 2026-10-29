@@ -38,6 +38,43 @@ export function isContentVisibleToViewer(
 }
 
 /**
+ * Whether a row may be resolved on a read-only character sheet.
+ * Managers see every row. Other viewers are limited to draft status and
+ * visibility mode. Availability and audience are acquisition policy and are ignored.
+ * This predicate never authorizes acquisition or play.
+ */
+export function isContentReferenceVisibleToViewer(
+  row: ContentResolutionRow,
+  viewer: ContentViewer,
+): boolean {
+  if (viewer.kind === 'manage') {
+    return true
+  }
+
+  if (row.status === 'draft') {
+    return false
+  }
+
+  const access = resolveCampaignAccess(row)
+
+  switch (access.visibilityMode) {
+    case 'all_players':
+      return true
+    case 'dm_only':
+      return false
+    case 'specific_players':
+      return (
+        viewer.kind === 'pc' &&
+        viewer.characterIds.some((characterId) => access.participantIds.includes(characterId))
+      )
+    default: {
+      const _exhaustive: never = access.visibilityMode
+      return _exhaustive
+    }
+  }
+}
+
+/**
  * Whether campaign-eligible content may be consumed in character play for the
  * given play actor. Manage privilege does not bypass this predicate.
  */

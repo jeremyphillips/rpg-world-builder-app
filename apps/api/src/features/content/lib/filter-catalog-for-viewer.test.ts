@@ -1,6 +1,10 @@
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
-import { filterCatalogForMembership, filterCatalogForPlayActor } from './filter-catalog-for-viewer'
+import {
+  filterCatalogForMembership,
+  filterCatalogForPlayActor,
+  filterCatalogForReference,
+} from './filter-catalog-for-viewer'
 
 describe('filterCatalogForMembership', () => {
   const baseRow = {
@@ -163,5 +167,44 @@ describe('filterCatalogForPlayActor', () => {
         playActor: { kind: 'new_pc' },
       }),
     ).toEqual(rows)
+  })
+})
+
+describe('filterCatalogForReference', () => {
+  const baseRow = {
+    id: 'item-1',
+    status: 'published' as const,
+    campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  }
+
+  it('keeps unavailable rows for players and hides drafts and dm_only', () => {
+    const unavailable = {
+      ...baseRow,
+      id: 'unavailable',
+      campaignAccess: {
+        ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+        available: false,
+        effectiveAudience: 'none' as const,
+      },
+    }
+    const draft = { ...baseRow, id: 'draft', status: 'draft' as const }
+    const dmOnly = {
+      ...baseRow,
+      id: 'dm-only',
+      campaignAccess: {
+        ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+        visibilityMode: 'dm_only' as const,
+      },
+    }
+    const rows = [baseRow, unavailable, draft, dmOnly]
+    const player = { campaignRole: 'pc', pcCharacterIds: ['pc-1'] }
+
+    expect(filterCatalogForReference(rows, player).map((row) => row.id)).toEqual([
+      'item-1',
+      'unavailable',
+    ])
+    expect(filterCatalogForReference(rows, { campaignRole: 'owner', pcCharacterIds: [] })).toEqual(
+      rows,
+    )
   })
 })

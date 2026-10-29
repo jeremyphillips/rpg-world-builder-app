@@ -1,7 +1,9 @@
 import { useParams } from 'react-router-dom'
 
+import { Text } from '@rpg/ui'
+
 import { useSession } from '@/features/auth'
-import { CharacterSheetDetailShell } from '@/features/character'
+import { campaignSheetUnavailableMessage, CharacterSheetDetailShell } from '@/features/character'
 
 import { useCampaignCharacterDetail } from '../hooks/use-campaign-character-detail'
 import { useCampaignCharacterNavigationContext } from '../hooks/use-campaign-character-navigation-context'
@@ -25,6 +27,7 @@ export function CampaignCharacterDetail() {
           campaignCharacter: detail.campaignCharacter,
         }
       : null
+  const unavailableMessage = campaignSheetUnavailableMessage(detail.unavailable)
 
   return (
     <CharacterSheetDetailShell
@@ -33,7 +36,15 @@ export function CampaignCharacterDetail() {
       isPending={detail.isPending}
       isError={detail.isError}
       errorLabel={detail.errorLabel}
+      onRetry={
+        detail.isError
+          ? () => {
+              void detail.refetch()
+            }
+          : undefined
+      }
     >
+      {unavailableMessage ? <Text role="status">{unavailableMessage}</Text> : null}
       {ready ? (
         <CampaignCharacterDetailBody
           campaignId={ready.campaignId}

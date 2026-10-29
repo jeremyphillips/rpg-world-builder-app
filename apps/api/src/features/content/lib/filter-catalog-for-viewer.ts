@@ -5,6 +5,7 @@ import {
   type ResolvedContentCampaignAccess,
   buildContentViewerFromCampaignContext,
   isContentPlayableFor,
+  isContentReferenceVisibleToViewer,
   isContentVisibleToViewer,
   resolveCatalogFilterPcCharacterIds,
 } from '@rpg/contracts'
@@ -54,6 +55,22 @@ export function filterCatalogForMembership<T extends CatalogListRow>(
   )
 
   return items.filter((item) => isContentVisibleToViewer(item, viewer))
+}
+
+/**
+ * Reference-catalog filter — viewer visibility only.
+ * Availability and playability are ignored. This result must not authorize acquisition.
+ */
+export function filterCatalogForReference<T extends CatalogListRow>(
+  items: T[],
+  membership: CatalogMembershipFilterInput,
+): T[] {
+  const viewer = buildContentViewerFromCampaignContext({
+    campaignRole: membership.campaignRole,
+    pcCharacterIds: membership.pcCharacterIds,
+  })
+
+  return items.filter((item) => isContentReferenceVisibleToViewer(item, viewer))
 }
 
 /** Play-catalog filter — uses playable policy only; manage role does not bypass visibility. */

@@ -33,6 +33,24 @@ function resolveCampaignPcPlayActor(
   return { kind: 'new_pc' }
 }
 
+/** Campaign character-creation rules and spellcasting progression from a resolved patch. */
+export function resolveCampaignBuildRules(patch: RulesetPatchRead, rulesetId: SystemRulesetId) {
+  return {
+    characterCreationRules: {
+      ...patch.characterCreation,
+      abilityGeneration: {
+        ...DEFAULT_ABILITY_GENERATION_RULES,
+        standardArray: [...patch.characterCreation.standardArray],
+      },
+      armorClass: patch.mechanics.armorClass,
+    },
+    spellcastingProgression: resolveCampaignSpellcastingProgression(
+      rulesetId,
+      patch.characterCreation.progression.spellcasting,
+    ),
+  }
+}
+
 /** Assembles a campaign build context from loaded patch + catalog data. */
 export function resolveCampaignBuildContext(
   input: CampaignBuildContextSource,
@@ -49,6 +67,7 @@ export function resolveCampaignBuildContext(
   } = input
 
   const rulesScope = { type: 'campaign' as const, campaignId, rulesetId }
+  const rules = resolveCampaignBuildRules(patch, rulesetId)
   const shared = {
     channel: 'build' as const,
     surface: 'dashboard' as const,
@@ -57,18 +76,8 @@ export function resolveCampaignBuildContext(
     rulesScope,
     rulesetId,
     catalog,
-    characterCreationRules: {
-      ...patch.characterCreation,
-      abilityGeneration: {
-        ...DEFAULT_ABILITY_GENERATION_RULES,
-        standardArray: [...patch.characterCreation.standardArray],
-      },
-      armorClass: patch.mechanics.armorClass,
-    },
-    spellcastingProgression: resolveCampaignSpellcastingProgression(
-      rulesetId,
-      patch.characterCreation.progression.spellcasting,
-    ),
+    characterCreationRules: rules.characterCreationRules,
+    spellcastingProgression: rules.spellcastingProgression,
     permissions: { canCreateCharacter: true },
   }
 

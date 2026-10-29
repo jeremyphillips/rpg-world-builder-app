@@ -25,11 +25,16 @@ export {
 export { useBuildContext, type BuildContextResult } from './hooks/use-build-context'
 export {
   useCampaignBuildContext,
+  useCampaignBuildFoundation,
   useCampaignCharacterBuildContext,
   useCampaignNpcBuildContext,
   useCampaignPcOnboardingBuildContext,
   type CampaignBuildContextResult,
+  type CampaignBuildFoundationResult,
 } from './hooks/use-campaign-build-context'
+export { campaignSheetUnavailableMessage } from './lib/detail/character-sheet-error-labels'
+export { resolveCampaignDetailUnavailable } from './lib/campaign-context/resolve-campaign-detail-unavailable.lib'
+export type { CampaignDetailUnavailable } from './lib/campaign-context/resolve-campaign-detail-unavailable.lib'
 export {
   campaignBuildContextQueryKey,
   fetchCampaignBuilderCatalog,

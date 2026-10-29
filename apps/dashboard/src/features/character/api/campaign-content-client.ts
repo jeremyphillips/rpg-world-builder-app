@@ -1,5 +1,6 @@
 import {
   CONTENT_CATALOG_PLAY_SCOPE,
+  CONTENT_CATALOG_REFERENCE_SCOPE,
   CONTENT_CATALOG_SCOPE_QUERY,
   serializePlayActorQuery,
   type ContentPlayActor,
@@ -45,21 +46,34 @@ function buildPlayCatalogQuery(playActor: ContentPlayActor): string {
   return `?${params.toString()}`
 }
 
+function buildReferenceCatalogQuery(): string {
+  const params = new URLSearchParams()
+  params.set(CONTENT_CATALOG_SCOPE_QUERY, CONTENT_CATALOG_REFERENCE_SCOPE)
+  return `?${params.toString()}`
+}
+
+export type FetchCampaignBuilderCatalogOptions =
+  | { scope: 'play'; playActor: ContentPlayActor }
+  | { scope: 'reference' }
+
+function buildCatalogScopeQuery(options: FetchCampaignBuilderCatalogOptions): string {
+  if (options.scope === 'reference') {
+    return buildReferenceCatalogQuery()
+  }
+  return buildPlayCatalogQuery(options.playActor)
+}
+
 async function listCampaignContent<T>(
   campaignId: string,
   config: CampaignContentConfig,
-  playActor: ContentPlayActor,
+  options: FetchCampaignBuilderCatalogOptions,
 ): Promise<T[]> {
   const body = await request<Record<string, T[]>>(
-    `/api/campaigns/${campaignId}/content/${config.routeKey}${buildPlayCatalogQuery(playActor)}`,
+    `/api/campaigns/${campaignId}/content/${config.routeKey}${buildCatalogScopeQuery(options)}`,
     undefined,
     CAMPAIGN_CONTENT_ERROR,
   )
   return body[config.responseKey] as T[]
-}
-
-export type FetchCampaignBuilderCatalogOptions = {
-  playActor: ContentPlayActor
 }
 
 /** Campaign-scoped catalog lists for the character builder (homebrew + system). */
@@ -68,25 +82,31 @@ export async function fetchCampaignBuilderCatalog(
   rulesetId: SystemRulesetId,
   options: FetchCampaignBuilderCatalogOptions,
 ): Promise<BuilderCatalogLists> {
-  const { playActor } = options
-
   const [species, classes, spells, equipment, skillProficiencies, organizations, languages] =
     await Promise.all([
-      listCampaignContent<Species>(campaignId, CAMPAIGN_CATALOG_CONTENT[0], playActor),
-      listCampaignContent<CharacterClass>(campaignId, CAMPAIGN_CATALOG_CONTENT[1], playActor),
-      listCampaignContent<Spell>(campaignId, CAMPAIGN_CATALOG_CONTENT[2], playActor),
-      listCampaignContent<Equipment>(campaignId, CAMPAIGN_CATALOG_CONTENT[3], playActor),
-      listCampaignContent<SkillProficiency>(campaignId, CAMPAIGN_CATALOG_CONTENT[4], playActor),
-      listCampaignContent<Organization>(campaignId, CAMPAIGN_CATALOG_CONTENT[5], playActor),
+      listCampaignContent<Species>(campaignId, CAMPAIGN_CATALOG_CONTENT[0], options),
+      listCampaignContent<CharacterClass>(campaignId, CAMPAIGN_CATALOG_CONTENT[1], options),
+      listCampaignContent<Spell>(campaignId, CAMPAIGN_CATALOG_CONTENT[2], options),
+      listCampaignContent<Equipment>(campaignId, CAMPAIGN_CATALOG_CONTENT[3], options),
+      listCampaignContent<SkillProficiency>(campaignId, CAMPAIGN_CATALOG_CONTENT[4], options),
+      listCampaignContent<Organization>(campaignId, CAMPAIGN_CATALOG_CONTENT[5], options),
       listRulesetLanguages(rulesetId),
     ])
 
   return { species, classes, spells, equipment, skillProficiencies, organizations, languages }
 }
 
-export function campaignBuildContextQueryKey(campaignId: string, playActor: ContentPlayActor) {
-  const actorKey = playActor.kind === 'pc' ? playActor.characterId : playActor.kind
-  return ['campaigns', campaignId, 'character-builder-context', actorKey] as const
+export function campaignBuildContextQueryKey(
+  campaignId: string,
+  options: FetchCampaignBuilderCatalogOptions,
+) {
+  if (options.scope === 'reference') {
+    return ['campaigns', campaignId, 'character-builder-context', 'reference'] as const
+  }
+
+  const actorKey =
+    options.playActor.kind === 'pc' ? options.playActor.characterId : options.playActor.kind
+  return ['campaigns', campaignId, 'character-builder-context', 'play', actorKey] as const
 }
 
 export type { BuilderCatalogLists, CharacterBuildLanguageOption }
