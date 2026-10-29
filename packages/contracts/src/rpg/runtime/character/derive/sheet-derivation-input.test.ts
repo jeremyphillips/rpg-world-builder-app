@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { indexCharacterBuildCatalog } from '../../character-builder/context'
 import { builderTestCatalog, builderTestRules } from '../../character-builder/test-fixtures'
 import type { PcCharacter } from '../sheet'
+import { resolvedField } from '../../creature/derived-field'
 import { deriveCharacterProfile } from './profile'
 import { toCharacterSheetDerivationInput } from './sheet-derivation-input'
 
@@ -50,6 +51,6 @@ describe('toCharacterSheetDerivationInput', () => {
     const profile = deriveCharacterProfile(input)
     expect(profile.proficiencyBonus).toBe(2)
     expect(profile.maxHp).toBe(11)
-    expect(profile.ac).toBe(12)
+    expect(profile.ac).toEqual(resolvedField(12))
   })
 })

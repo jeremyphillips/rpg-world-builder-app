@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   equipmentSchema,
+  resolvedField,
   resolveMonsterArmorClass,
   type Equipment,
   type MonsterArmorClassResolution,
@@ -15,6 +16,14 @@ import {
   monsterArmorClassDexAdvisory,
 } from './monster-armor-class-presentation'
 
+const missingCalculation: MonsterArmorClassResolution = {
+  ac: 16,
+  source: 'fixed',
+  rows: [{ kind: 'fixed', value: 16 }],
+  alternatives: { status: 'unavailable', reason: 'missing-reference' },
+  calculatedAc: { status: 'unavailable', reason: 'missing-reference' },
+}
+
 const chainAndShield: MonsterArmorClassResolution = {
   ac: 18,
   source: 'armor',
@@ -22,7 +31,7 @@ const chainAndShield: MonsterArmorClassResolution = {
     { kind: 'armor-base', entryId: 'mail', label: 'Chain mail', value: 16 },
     { kind: 'shield', entryId: 'shield', label: 'Shield', value: 2 },
   ],
-  alternatives: [{ source: 'natural', label: 'Natural armor', ac: 15 }],
+  alternatives: resolvedField([{ source: 'natural', label: 'Natural armor', ac: 15 }]),
   bodyArmor: { entryId: 'mail', label: 'Chain mail' },
   shield: { entryId: 'shield', label: 'Shield' },
 }
@@ -39,13 +48,19 @@ describe('monster armor class presentation', () => {
     ])
   })
 
+  it('shows a missing armor reference when a fixed override cannot calculate alternatives', () => {
+    expect(monsterArmorClassAlternativeMessages(missingCalculation)).toEqual([
+      'Missing armor reference',
+    ])
+  })
+
   it('names the winning body source before the losing armor total', () => {
     expect(
       monsterArmorClassAlternativeMessages({
         ac: 15,
         source: 'natural',
         rows: [{ kind: 'natural', value: 2 }],
-        alternatives: [{ source: 'armor', label: 'Studded Leather', ac: 14 }],
+        alternatives: resolvedField([{ source: 'armor', label: 'Studded Leather', ac: 14 }]),
       }),
     ).toEqual(['Natural armor wins: 15 vs. 14 with studded leather.'])
   })
@@ -56,7 +71,7 @@ describe('monster armor class presentation', () => {
         ac: 14,
         source: 'armor',
         rows: [{ kind: 'armor-base', entryId: 'leather', label: 'Studded Leather', value: 12 }],
-        alternatives: [{ source: 'unarmored', label: 'Unarmored', ac: 10 }],
+        alternatives: resolvedField([{ source: 'unarmored', label: 'Unarmored', ac: 10 }]),
         bodyArmor: { entryId: 'leather', label: 'Studded Leather' },
       }),
     ).toEqual([])
@@ -65,7 +80,7 @@ describe('monster armor class presentation', () => {
         ac: 14,
         source: 'armor',
         rows: [],
-        alternatives: [{ source: 'unarmored', label: 'Unarmored', ac: 10 }],
+        alternatives: resolvedField([{ source: 'unarmored', label: 'Unarmored', ac: 10 }]),
         bodyArmor: { entryId: 'leather', label: 'Studded Leather' },
       }),
     ).toBe('Studded Leather')
@@ -76,8 +91,8 @@ describe('monster armor class presentation', () => {
       ac: 17,
       source: 'fixed',
       rows: [{ kind: 'fixed', value: 17 }],
-      alternatives: [],
-      calculatedAc: 18,
+      alternatives: resolvedField([]),
+      calculatedAc: resolvedField(18),
     }
     expect(monsterArmorClassCaption(resolution)).toBe('Fixed override')
     expect(
@@ -90,7 +105,7 @@ describe('monster armor class presentation', () => {
     expect(
       monsterArmorClassAlternativeMessages({
         ...resolution,
-        alternatives: [{ source: 'natural', label: 'Natural armor', ac: 15 }],
+        alternatives: resolvedField([{ source: 'natural', label: 'Natural armor', ac: 15 }]),
         dexRestriction: {
           mode: 'capped',
           abilityModifier: 4,
@@ -109,7 +124,7 @@ describe('monster armor class presentation', () => {
         ac: 18,
         source: 'armor',
         rows: [],
-        alternatives: [{ source: 'natural', label: 'Natural armor', ac: 18 }],
+        alternatives: resolvedField([{ source: 'natural', label: 'Natural armor', ac: 18 }]),
         bodyArmor: { entryId: 'leather', label: 'Studded Leather' },
       }),
     ).toEqual(['Natural armor and studded leather both provide 18.'])
@@ -127,7 +142,7 @@ describe('monster armor class presentation', () => {
         { kind: 'enhancement', target: 'armor', entryId: 'plate', label: 'Enhancement', value: 0 },
         { kind: 'dex', value: -1 },
       ],
-      alternatives: [],
+      alternatives: resolvedField([]),
     })
     expect(rows.map((row) => row.label)).toEqual(['Plate (base)', 'DEX modifier'])
     expect(rows[1]).toMatchObject({ value: '-1' })
@@ -138,7 +153,7 @@ describe('monster armor class presentation', () => {
       ac: 10,
       source: 'unarmored',
       rows: [{ kind: 'ruleset-base', value: 10 }],
-      alternatives: [],
+      alternatives: resolvedField([]),
     })
     expect(rows[0]).toMatchObject({ label: `Base ${monsterArmorClassCompactLabel()}` })
     expect(monsterArmorClassCompactLabel()).toBe('AC')

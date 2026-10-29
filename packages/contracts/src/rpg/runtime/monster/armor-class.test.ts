@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { equipmentSchema, type Equipment } from '../../content/equipment'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { dexModifierForArmor, resolveCreatureArmorSlot } from '../creature/armor-class'
+import { resolvedField, unavailableField } from './derived-field'
 import { resolveMonsterArmorClass, type MonsterArmorClassResolution } from './armor-class'
 
 const RULESET = 'srd-cc-5.2.1'
@@ -172,7 +173,7 @@ describe('resolveMonsterArmorClass', () => {
         { kind: 'ruleset-base', value: 10 },
         { kind: 'dex', value: 2 },
       ],
-      alternatives: [],
+      alternatives: resolvedField([]),
     })
     expect(resolved({ dex: 10, acBase: 9 }).ac).toBe(9)
     expect(resolved({ dex: 10, acBase: 10 }).ac).toBe(10)
@@ -202,7 +203,9 @@ describe('resolveMonsterArmorClass', () => {
       { kind: 'dex', value: 2 },
       { kind: 'natural', value: 4 },
     ])
-    expect(ac.alternatives).toEqual([{ source: 'armor', label: 'Leather armor', ac: 13 }])
+    expect(ac.alternatives).toEqual(
+      resolvedField([{ source: 'armor', label: 'Leather armor', ac: 13 }]),
+    )
     expect(ac.bodyArmor).toEqual({ entryId: 'leather-armor', label: 'Leather armor' })
   })
 
@@ -233,7 +236,9 @@ describe('resolveMonsterArmorClass', () => {
     })
     expect(ac.source).toBe('armor')
     expect(ac.ac).toBe(13)
-    expect(ac.alternatives).toEqual([{ source: 'natural', label: 'Natural armor', ac: 13 }])
+    expect(ac.alternatives).toEqual(
+      resolvedField([{ source: 'natural', label: 'Natural armor', ac: 13 }]),
+    )
   })
 
   it('applies an armor enhancement only when armor wins, and always applies a shield enhancement', () => {
@@ -261,7 +266,9 @@ describe('resolveMonsterArmorClass', () => {
         value: 1,
       },
     ])
-    expect(naturalWins.alternatives).toEqual([{ source: 'armor', label: 'Leather armor', ac: 17 }])
+    expect(naturalWins.alternatives).toEqual(
+      resolvedField([{ source: 'armor', label: 'Leather armor', ac: 17 }]),
+    )
 
     const armorWins = resolved({
       dex: 14,
@@ -306,9 +313,11 @@ describe('resolveMonsterArmorClass', () => {
       ac: 17,
       source: 'fixed',
       rows: [{ kind: 'fixed', value: 17 }],
-      calculatedAc: 15,
+      calculatedAc: resolvedField(15),
     })
-    expect(overridden.alternatives).toEqual([{ source: 'natural', label: 'Natural armor', ac: 15 }])
+    expect(overridden.alternatives).toEqual(
+      resolvedField([{ source: 'natural', label: 'Natural armor', ac: 15 }]),
+    )
 
     const open = resolved({
       dex: 14,
@@ -365,7 +374,9 @@ describe('resolveMonsterArmorClass', () => {
     })
     expect(ac.source).toBe('natural')
     expect(ac.ac).toBe(18)
-    expect(ac.alternatives).toEqual([{ source: 'armor', label: 'Chain shirt', ac: 17 }])
+    expect(ac.alternatives).toEqual(
+      resolvedField([{ source: 'armor', label: 'Chain shirt', ac: 17 }]),
+    )
     expect(ac.dexRestriction).toEqual({
       mode: 'capped',
       abilityModifier: 4,
@@ -382,7 +393,9 @@ describe('resolveMonsterArmorClass', () => {
       equipment: [entry(chainShirt), entry(shield)],
     })
     expect(ac.ac).toBe(19)
-    expect(ac.alternatives).toEqual([{ source: 'armor', label: 'Chain shirt', ac: 17 }])
+    expect(ac.alternatives).toEqual(
+      resolvedField([{ source: 'armor', label: 'Chain shirt', ac: 17 }]),
+    )
     expect(ac.dexRestriction?.affectsOutcome).toBe(true)
   })
 
@@ -456,7 +469,9 @@ describe('resolveMonsterArmorClass', () => {
       equipment: [entry(chainShirt, { adjustment: 1 })],
     })
     expect(ac.ac).toBe(17)
-    expect(ac.alternatives).toEqual([{ source: 'armor', label: 'Chain shirt', ac: 16 }])
+    expect(ac.alternatives).toEqual(
+      resolvedField([{ source: 'armor', label: 'Chain shirt', ac: 16 }]),
+    )
     expect(ac.rows.some((row) => row.kind === 'enhancement')).toBe(false)
     expect(ac.dexRestriction?.affectsOutcome).toBe(true)
   })
@@ -483,10 +498,12 @@ describe('resolveMonsterArmorClass', () => {
     expect(overridden).toMatchObject({
       source: 'fixed',
       ac: 20,
-      calculatedAc: 18,
+      calculatedAc: resolvedField(18),
     })
     expect(overridden.dexRestriction).toBeUndefined()
-    expect(overridden.alternatives).toEqual([{ source: 'armor', label: 'Chain shirt', ac: 17 }])
+    expect(overridden.alternatives).toEqual(
+      resolvedField([{ source: 'armor', label: 'Chain shirt', ac: 17 }]),
+    )
 
     const stowed = resolved({
       dex: 18,
@@ -495,5 +512,53 @@ describe('resolveMonsterArmorClass', () => {
     })
     expect(stowed.bodyArmor).toBeUndefined()
     expect(stowed.dexRestriction).toBeUndefined()
+  })
+
+  it('treats an equipped missing catalog item as a missing armor reference', () => {
+    const missing = resolveMonsterArmorClass({
+      monster: {
+        abilityScores: { dex: 14 },
+        armorClass: {},
+        equipment: [{ entryId: 'gone', equipmentId: 'missing-armor', quantity: 1, equipped: true }],
+      },
+      equipmentCatalog: catalog,
+      acBase: 10,
+      magicPropertyProvider: emptyProvider,
+    })
+
+    expect(missing).toEqual(unavailableField('missing-reference'))
+
+    const stowed = resolved({
+      dex: 14,
+      equipment: [
+        {
+          entryId: 'stowed-missing',
+          equipmentId: 'missing-armor',
+          quantity: 1,
+          equipped: false,
+        } as ReturnType<typeof entry>,
+      ],
+    })
+    expect(stowed.ac).toBe(12)
+    expect(stowed.source).toBe('unarmored')
+  })
+
+  it('keeps a fixed override when an equipped armor reference is missing', () => {
+    const overridden = resolveMonsterArmorClass({
+      monster: {
+        abilityScores: { dex: 14 },
+        armorClass: { fixedValue: 16 },
+        equipment: [{ entryId: 'gone', equipmentId: 'missing-armor', quantity: 1, equipped: true }],
+      },
+      equipmentCatalog: catalog,
+      acBase: 10,
+      magicPropertyProvider: emptyProvider,
+    })
+
+    expect(overridden.status).toBe('resolved')
+    if (overridden.status !== 'resolved') return
+    expect(overridden.value.ac).toBe(16)
+    expect(overridden.value.alternatives).toEqual(unavailableField('missing-reference'))
+    expect(overridden.value.calculatedAc).toEqual(unavailableField('missing-reference'))
   })
 })

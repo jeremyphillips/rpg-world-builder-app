@@ -3,6 +3,7 @@ import {
   formatSignedModifier,
   getCreatureArmorClassKindLabel,
   getTermCompactLabel,
+  type DerivedFieldReason,
   type MonsterArmorClassAlternative,
   type MonsterArmorClassResolution,
   type MonsterArmorClassRow,
@@ -144,16 +145,28 @@ export function monsterArmorClassDexAdvisory(
   return `${name} ignores the ${original} DEX modifier.`
 }
 
+function unavailableArmorCopy(reason: DerivedFieldReason): string {
+  if (reason === 'missing-reference') return 'Missing armor reference'
+  if (reason === 'conflict') {
+    return 'Only one body armor and one shield can be owned, each with quantity 1.'
+  }
+  return 'Not set'
+}
+
 export function monsterArmorClassAlternativeMessages(
   resolution: MonsterArmorClassResolution,
 ): string[] {
-  const messages = resolution.alternatives.flatMap((alternative) => {
+  if (resolution.alternatives.status === 'unavailable') {
+    return [unavailableArmorCopy(resolution.alternatives.reason)]
+  }
+
+  const messages = resolution.alternatives.value.flatMap((alternative) => {
     const sentence = alternativeSentence(resolution, alternative)
     return sentence ? [sentence] : []
   })
-  if (resolution.calculatedAc !== undefined) {
+  if (resolution.calculatedAc?.status === 'resolved') {
     messages.push(
-      `Calculated ${monsterArmorClassCompactLabel()} without override: ${resolution.calculatedAc}`,
+      `Calculated ${monsterArmorClassCompactLabel()} without override: ${resolution.calculatedAc.value}`,
     )
   }
   return messages

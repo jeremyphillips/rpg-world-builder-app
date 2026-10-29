@@ -98,7 +98,7 @@ const STEP_TO_PREVIEW_SECTION = {
 function isCombatReady(preview: CharacterBuildPreview): boolean {
   return (
     preview.maxHp !== undefined &&
-    preview.ac !== undefined &&
+    preview.ac.status === 'resolved' &&
     preview.proficiencyBonus !== undefined
   )
 }

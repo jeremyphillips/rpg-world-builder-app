@@ -278,6 +278,41 @@ describe('useCampaignCharacterDetail', () => {
     )
   })
 
+  it('shows a missing armor reference instead of unarmored AC', async () => {
+    const equipped = makePcCharacter({
+      equipment: {
+        weapons: [],
+        armor: [
+          {
+            entryId: 'a1',
+            equipmentId: 'gone-armor',
+            quantity: 1,
+            equipped: true,
+            sources: [],
+          },
+        ],
+        tools: [],
+        gear: [],
+        magicItems: [],
+        vehicles: [],
+        mounts: [],
+      },
+    })
+    mockUseCampaignCharacter.mockReturnValue(
+      settledQuery({ character: equipped }) as unknown as ReturnType<typeof useCampaignCharacter>,
+    )
+
+    const { result } = renderHook(() => useCampaignCharacterDetail('camp-1', equipped.id), {
+      wrapper: makeQueryWrapper(),
+    })
+
+    await waitFor(() => expect(result.current.viewModel).not.toBeNull())
+
+    expect(result.current.viewModel?.stats.find((stat) => stat.id === 'ac')?.value).toBe(
+      'Missing armor reference',
+    )
+  })
+
   it('stays pending while the ruleset patch is loading', () => {
     mockUseRulesetPatch.mockReturnValue({
       data: undefined,

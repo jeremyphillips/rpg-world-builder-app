@@ -50,7 +50,8 @@ export function toCharacterDerivationInput(
       characterCreationRules: rules,
     }),
     skillProficiencies: Array.from(catalogIndex.skillProficiencies.values()),
-    equippedArmor: equippedArmor.length > 0 ? equippedArmor : undefined,
+    equippedArmor: equippedArmor.pieces.length > 0 ? equippedArmor.pieces : undefined,
+    unresolvedEquippedArmor: equippedArmor.unresolvedEntryIds.length > 0,
     spellcastingProgression,
   }
 }

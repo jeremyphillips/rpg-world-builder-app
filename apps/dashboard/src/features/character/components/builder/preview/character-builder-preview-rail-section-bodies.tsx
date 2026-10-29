@@ -17,6 +17,7 @@ import {
   formatPreviewToolsSubsection,
 } from '../../../lib/builder-preview/format-preview-proficiency-subsection.lib'
 import {
+  formatDerivedArmorClass,
   formatPreviewAbilityCell,
   formatPreviewOptionalNumber,
   formatPreviewSpellsSubsection,
@@ -112,7 +113,7 @@ export function CharacterBuilderPreviewCombatBody({ preview }: { preview: Charac
       <div className="flex flex-col gap-3">
         <dl className="grid grid-cols-2 gap-3">
           <PreviewStat label="HP" value={formatPreviewOptionalNumber(preview.maxHp)} />
-          <PreviewStat label="AC" value={formatPreviewOptionalNumber(preview.ac)} />
+          <PreviewStat label="AC" value={formatDerivedArmorClass(preview.ac)} />
         </dl>
         <dl>
           <PreviewStat

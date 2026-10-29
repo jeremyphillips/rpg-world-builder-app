@@ -45,9 +45,9 @@ export type MonsterArmorClassResolution = {
   source: MonsterArmorClassSource
   /** Rows that contribute to `ac`. Fixed overrides replace the calculated rows. */
   rows: MonsterArmorClassRow[]
-  alternatives: MonsterArmorClassAlternative[]
+  alternatives: DerivedField<MonsterArmorClassAlternative[]>
   /** Calculated total while a fixed override is active. */
-  calculatedAc?: number
+  calculatedAc?: DerivedField<number>
   bodyArmor?: { entryId: string; label: string }
   shield?: { entryId: string; label: string }
   /**
@@ -94,22 +94,28 @@ function equippedArmorRows(
   monster: ResolveMonsterArmorClassInput['monster'],
   equipmentCatalog: CreatureEquipmentCatalog,
   magicPropertyProvider: MagicPropertyDefinitionProvider,
-): ArmorContributionRow[] {
-  return (monster.equipment ?? [])
-    .filter((entry) => entry.equipped)
-    .flatMap((entry) => {
-      const item = equipmentCatalog.get(entry.equipmentId)
-      if (!item || !isArmorEquipment(item) || !resolveCreatureArmorSlot(item)) return []
-      return [
-        {
-          entryId: entry.entryId,
-          label: entry.customName ?? item.name,
-          item,
-          entry,
-          piece: toEquippedArmorPieceForEntry(item, entry, item, magicPropertyProvider),
-        },
-      ]
+): { rows: ArmorContributionRow[]; unresolved: boolean } {
+  const rows: ArmorContributionRow[] = []
+  let unresolved = false
+
+  for (const entry of monster.equipment ?? []) {
+    if (!entry.equipped) continue
+    const item = equipmentCatalog.get(entry.equipmentId)
+    if (!item) {
+      unresolved = true
+      continue
+    }
+    if (!isArmorEquipment(item) || !resolveCreatureArmorSlot(item)) continue
+    rows.push({
+      entryId: entry.entryId,
+      label: entry.customName ?? item.name,
+      item,
+      entry,
+      piece: toEquippedArmorPieceForEntry(item, entry, item, magicPropertyProvider),
     })
+  }
+
+  return { rows, unresolved }
 }
 
 function enhancementRow(
@@ -258,7 +264,7 @@ function calculateArmorClass(input: {
     ac: winner.bodyAc + bonus,
     source: winner.source,
     rows: appendShield(winner.rows, shield, provider),
-    alternatives,
+    alternatives: resolvedField(alternatives),
     ...optionalPiece('bodyArmor', pieceRef(bodyArmor)),
     ...optionalPiece('shield', pieceRef(shield)),
     ...(dexRestriction ? { dexRestriction } : {}),
@@ -315,10 +321,20 @@ function fixedResolution(
     ac: fixedValue,
     source: 'fixed',
     rows: [{ kind: 'fixed', value: fixedValue }],
-    alternatives: calculated?.alternatives ?? [],
-    ...(calculated ? { calculatedAc: calculated.ac } : {}),
+    alternatives: calculated?.alternatives ?? resolvedField([]),
+    ...(calculated ? { calculatedAc: resolvedField(calculated.ac) } : {}),
     ...(calculated?.bodyArmor ? { bodyArmor: calculated.bodyArmor } : {}),
     ...(calculated?.shield ? { shield: calculated.shield } : {}),
+  }
+}
+
+function fixedResolutionMissingReference(fixedValue: number): MonsterArmorClassResolution {
+  return {
+    ac: fixedValue,
+    source: 'fixed',
+    rows: [{ kind: 'fixed', value: fixedValue }],
+    alternatives: unavailableField('missing-reference'),
+    calculatedAc: unavailableField('missing-reference'),
   }
 }
 
@@ -333,11 +349,18 @@ export function resolveMonsterArmorClass(
     return unavailableField('conflict')
   }
 
-  const rows = equippedArmorRows(monster, equipmentCatalog, magicPropertyProvider)
-  const bodyArmor = rows.filter((row) => resolveCreatureArmorSlot(row.item) === 'body-armor')
-  const shields = rows.filter((row) => resolveCreatureArmorSlot(row.item) === 'shield')
-
+  const equipped = equippedArmorRows(monster, equipmentCatalog, magicPropertyProvider)
   const fixedValue = monster.armorClass?.fixedValue
+  if (equipped.unresolved) {
+    if (fixedValue === undefined) return unavailableField('missing-reference')
+    return resolvedField(fixedResolutionMissingReference(fixedValue))
+  }
+
+  const bodyArmor = equipped.rows.filter(
+    (row) => resolveCreatureArmorSlot(row.item) === 'body-armor',
+  )
+  const shields = equipped.rows.filter((row) => resolveCreatureArmorSlot(row.item) === 'shield')
+
   const dexScore = monster.abilityScores?.dex
   if (dexScore === undefined) {
     if (fixedValue === undefined) return unavailableField('missing-input')

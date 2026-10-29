@@ -4,6 +4,8 @@ import type {
   CharacterBuildContext,
 } from '@rpg/contracts'
 import { getOrganizationDomainLabel } from '@rpg/contracts'
+
+import { formatDerivedArmorClass } from '../../../../lib/builder-preview/character-builder-preview-panel.lib'
 import { Alert, Text } from '@rpg/ui'
 
 import { getContentTypeItemLabel } from '@/features/content'
@@ -86,7 +88,7 @@ export function ReviewStepSummary({ context, draft, preview }: ReviewStepSummary
               value={formatSignedNumber(preview.proficiencyBonus, '+')}
             />
             <ReviewStat label="Max HP" value={formatOptionalNumber(preview.maxHp)} />
-            <ReviewStat label="AC" value={formatOptionalNumber(preview.ac)} />
+            <ReviewStat label="AC" value={formatDerivedArmorClass(preview.ac)} />
           </dl>
         </div>
       ) : null}

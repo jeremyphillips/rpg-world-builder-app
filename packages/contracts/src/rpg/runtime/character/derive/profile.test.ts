@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { resolvedField, unavailableField } from '../../creature/derived-field'
 import type { ClassStored } from '../../../content/classes/class'
 import type { SkillProficiency } from '../../../content/skill-proficiency'
 import {
@@ -87,7 +88,7 @@ describe('deriveCharacterProfile', () => {
 
     expect(profile.proficiencyBonus).toBe(2)
     expect(profile.maxHp).toBeUndefined()
-    expect(profile.ac).toBe(12)
+    expect(profile.ac).toEqual(resolvedField(12))
   })
 
   it('derives ruleset base AC with neutral DEX modifier when dex is unset', () => {
@@ -98,7 +99,7 @@ describe('deriveCharacterProfile', () => {
     })
 
     expect(profile.proficiencyBonus).toBe(2)
-    expect(profile.ac).toBe(10)
+    expect(profile.ac).toEqual(resolvedField(10))
   })
 
   it('derives hit die max HP with neutral CON modifier when con is unset', () => {
@@ -117,7 +118,7 @@ describe('deriveCharacterProfile', () => {
 
     expect(profile.proficiencyBonus).toBe(2)
     expect(profile.maxHp).toBe(11)
-    expect(profile.ac).toBe(12)
+    expect(profile.ac).toEqual(resolvedField(12))
     expect(profile.abilityScores.str).toEqual({ score: 15, modifier: 2 })
     expect(profile.savingThrows.find((save) => save.ability === 'str')).toMatchObject({
       proficient: true,
@@ -128,6 +129,18 @@ describe('deriveCharacterProfile', () => {
       rank: 'proficient',
     })
     expect(profile.spellcasting).toBeNull()
+  })
+
+  it('does not fall back to unarmored AC when equipped armor is unresolved', () => {
+    const profile = deriveCharacterProfile({
+      level: 1,
+      abilityScores: { dex: 14 },
+      proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
+      skillProficiencies: [],
+      unresolvedEquippedArmor: true,
+    })
+
+    expect(profile.ac).toEqual(unavailableField('missing-reference'))
   })
 })
 

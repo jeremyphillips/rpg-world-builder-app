@@ -333,11 +333,11 @@ describe('modifiedArmorFixture parity', () => {
         proficiencies: { weapons: [], armor: [], tools: [], skills: [], languages: [] },
         skillProficiencies: [],
         abilityScores: { dex: dexScore },
-        equippedArmor: characterPieces,
+        equippedArmor: characterPieces.pieces,
       }).ac
 
       expect(monsterBlock.ac).toBe(14)
-      expect(characterAc).toBe(14)
+      expect(characterAc).toEqual({ status: 'resolved', value: 14 })
     }
 
     const monsterBlock = deriveMonsterStatBlock({

@@ -23,6 +23,7 @@ import {
   spellSaveDc,
 } from './index'
 import { resolveMaxHpAtLevel } from './hit-points-at-level'
+import { resolvedField, unavailableField, type DerivedField } from '../../creature/derived-field'
 import { resolveEquippedArmorClass } from './armor-class'
 
 // ---------------------------------------------------------------------------
@@ -43,6 +44,8 @@ export type CharacterDerivationInput = {
   skillProficiencies: readonly SkillProficiency[]
   /** Equipped armor variants for equipment-based AC; omit for unarmored preview. */
   equippedArmor?: readonly EquippedArmorPiece[]
+  /** Equipped armor-bucket entry is missing or is not armor. Do not fall back to unarmored AC. */
+  unresolvedEquippedArmor?: boolean
   /** Resolved spellcasting progression config; required when deriving spell slots. */
   spellcastingProgression?: ResolvedSpellcastingProgressionConfig
 }
@@ -77,7 +80,7 @@ export type CharacterDerivedProfile = {
   abilityScores: Partial<Record<Ability, CharacterDerivedAbilityScore>>
   proficiencyBonus: number | undefined
   maxHp: number | undefined
-  ac: number | undefined
+  ac: DerivedField<number>
   savingThrows: CharacterDerivedSavingThrow[]
   skills: CharacterDerivedSkill[]
   spellcasting: CharacterDerivedSpellcasting | null
@@ -187,6 +190,25 @@ export function deriveSpellcastingStats(
   }
 }
 
+function deriveArmorClass(
+  input: CharacterDerivationInput,
+  acBase: ArmorClassBase,
+): DerivedField<number> {
+  if (input.unresolvedEquippedArmor) return unavailableField('missing-reference')
+
+  const dexScore = input.abilityScores?.dex
+  const value =
+    input.equippedArmor && input.equippedArmor.length > 0
+      ? resolveEquippedArmorClass({
+          acBase,
+          dexModifier: typeof dexScore === 'number' ? abilityModifier(dexScore) : 0,
+          equippedArmor: input.equippedArmor,
+        })
+      : resolveUnarmoredAc({ acBase, dexScore })
+
+  return resolvedField(value)
+}
+
 /**
  * Derives ability modifiers, defenses, skills, and spellcasting from partial
  * character-like input. Tolerant of missing class or ability scores.
@@ -195,7 +217,6 @@ export function deriveCharacterProfile(input: CharacterDerivationInput): Charact
   const acBase = input.armorClassBase ?? DEFAULT_ARMOR_CLASS_BASE
   const profBonus = input.proficiencyBonusOverride ?? proficiencyBonus(input.level)
   const conScore = input.abilityScores?.con
-  const dexScore = input.abilityScores?.dex
 
   return {
     abilityScores: deriveAbilityScores(input.abilityScores),
@@ -213,14 +234,7 @@ export function deriveCharacterProfile(input: CharacterDerivationInput): Charact
             method: 'average',
           })
       : undefined,
-    ac:
-      input.equippedArmor && input.equippedArmor.length > 0
-        ? resolveEquippedArmorClass({
-            acBase,
-            dexModifier: typeof dexScore === 'number' ? abilityModifier(dexScore) : 0,
-            equippedArmor: input.equippedArmor,
-          })
-        : resolveUnarmoredAc({ acBase, dexScore }),
+    ac: deriveArmorClass(input, acBase),
     savingThrows: deriveSavingThrows(input, profBonus),
     skills: deriveSkillModifiers(input, profBonus),
     spellcasting: deriveSpellcastingStats(input, profBonus),

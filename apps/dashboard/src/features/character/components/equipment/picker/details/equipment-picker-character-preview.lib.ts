@@ -63,7 +63,7 @@ export function resolveEquipmentPickerCharacterPreviewContext(args: {
     level: draft.class.level,
     armorClassBase: characterCreationRules.armorClass.base,
     abilityScores: draft.abilities.scores,
-    equippedArmor,
+    equippedArmor: equippedArmor.pieces,
     budget,
   }
 }
