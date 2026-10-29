@@ -3,10 +3,8 @@ import {
   ABILITY_SCORE_TERM,
   type Ability,
   CHALLENGE_RATING_TERM,
-  CREATURE_ARMOR_CLASS_KIND_ENTRIES,
   CREATURE_ARMOR_CLASS_KIND_TERM,
   getActionEconomyLabel,
-  getArmorCategoryCollectionLabel,
   getArmorCategoryLabel,
   getArmorCategorySentenceForm,
   getAverageHitPointsLabel,
@@ -176,31 +174,17 @@ export function formatMonsterArmorSlotSelectLabel(slot: CreatureArmorSlot): stri
   return `Select ${monsterArmorSlotMidSentenceNoun(slot)}`
 }
 
-export function formatMonsterArmorSlotEmptyTitle(slot: CreatureArmorSlot): string {
-  return `No ${monsterArmorSlotMidSentenceNoun(slot)} selected`
-}
-
-export function formatMonsterArmorSlotEmptySupporting(slot: CreatureArmorSlot): string {
-  if (slot === 'shield') {
-    return `${getArmorCategoryCollectionLabel('shields')} add to ${armorClassLabel}.`
-  }
-  const naturalArmor = `${getTermLabelSingular(CREATURE_ARMOR_CLASS_KIND_ENTRIES.natural.label)} armor`
-  return `${formatMonsterArmorSlotAddLabel('body-armor')} or rely on ${naturalArmor}.`
-}
+export const MONSTER_ARMOR_SLOT_EMPTY_LABEL = 'None selected'
 
 export function getMonsterArmorSlotUiCopy(slot: CreatureArmorSlot): {
   add: string
   change: string
   select: string
-  emptyTitle: string
-  emptySupporting: string
 } {
   return {
     add: formatMonsterArmorSlotAddLabel(slot),
     change: formatMonsterArmorSlotChangeLabel(slot),
     select: formatMonsterArmorSlotSelectLabel(slot),
-    emptyTitle: formatMonsterArmorSlotEmptyTitle(slot),
-    emptySupporting: formatMonsterArmorSlotEmptySupporting(slot),
   }
 }
 

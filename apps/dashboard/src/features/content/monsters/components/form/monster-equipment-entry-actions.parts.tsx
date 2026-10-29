@@ -78,6 +78,7 @@ export function MonsterEquipmentEntryCardView({
   })
   const supportingMetadata = buildCreatureEquipmentRowSupportingMetadata({
     rowSummary,
+    catalogItem: item,
     leadingSegments: shouldShowUnmodifiedEquipmentQualifier(entry, unmodifiedContext)
       ? [EQUIPMENT_ROW_UNMODIFIED_SUPPORTING_SEGMENT]
       : undefined,

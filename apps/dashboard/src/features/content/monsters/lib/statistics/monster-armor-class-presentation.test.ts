@@ -44,6 +44,27 @@ describe('monster armor class presentation', () => {
     ).toEqual(['Natural armor wins. Studded Leather: 14.'])
   })
 
+  it('omits the wins line when the other candidate is unarmored', () => {
+    expect(
+      monsterArmorClassAlternativeMessages({
+        ac: 14,
+        source: 'armor',
+        rows: [{ kind: 'armor-base', entryId: 'leather', label: 'Studded Leather', value: 12 }],
+        alternatives: [{ source: 'unarmored', label: 'Unarmored', ac: 10 }],
+        bodyArmor: { entryId: 'leather', label: 'Studded Leather' },
+      }),
+    ).toEqual([])
+    expect(
+      monsterArmorClassCaption({
+        ac: 14,
+        source: 'armor',
+        rows: [],
+        alternatives: [{ source: 'unarmored', label: 'Unarmored', ac: 10 }],
+        bodyArmor: { entryId: 'leather', label: 'Studded Leather' },
+      }),
+    ).toBe('Studded Leather')
+  })
+
   it('labels a dex cap and a fixed override separately from the calculated total', () => {
     const resolution: MonsterArmorClassResolution = {
       ac: 17,
@@ -63,6 +84,24 @@ describe('monster armor class presentation', () => {
     expect(monsterArmorClassAlternativeMessages(resolution)).toEqual([
       `Calculated ${monsterArmorClassCompactLabel()} without override: 18`,
     ])
+  })
+
+  it('omits zero optional modifiers and keeps a non-zero dex contribution', () => {
+    const rows = monsterArmorClassBreakdownRows({
+      ac: 16,
+      source: 'armor',
+      rows: [
+        { kind: 'armor-base', entryId: 'plate', label: 'Plate', value: 18 },
+        { kind: 'dex', value: 0, cap: 2 },
+        { kind: 'natural', value: 0 },
+        { kind: 'shield', entryId: 'buckler', label: 'Buckler', value: 0 },
+        { kind: 'enhancement', target: 'armor', entryId: 'plate', label: 'Enhancement', value: 0 },
+        { kind: 'dex', value: -1 },
+      ],
+      alternatives: [],
+    })
+    expect(rows.map((row) => row.label)).toEqual(['Plate (base)', 'DEX modifier'])
+    expect(rows[1]).toMatchObject({ value: '-1' })
   })
 
   it('labels the ruleset base with the armor class compact term', () => {

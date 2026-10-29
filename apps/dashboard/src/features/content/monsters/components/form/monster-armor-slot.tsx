@@ -5,15 +5,7 @@ import {
   resolveEquipmentInstanceSummary,
   type CreatureArmorSlot,
 } from '@rpg/contracts'
-import {
-  ActionButton,
-  Button,
-  ConfirmDialog,
-  InsetPanel,
-  Text,
-  emptyStateWellSupportingClasses,
-  emptyStateWellTitleClasses,
-} from '@rpg/ui'
+import { ActionButton, Button, ConfirmDialog, InsetPanel } from '@rpg/ui'
 
 import { EquipmentPickerDrawer } from '@/features/character'
 
@@ -32,6 +24,7 @@ import {
   formatEquipmentCustomizationRemovalSummary,
   formatEquipmentRemovalConfirmCopy,
   getMonsterArmorSlotUiCopy,
+  MONSTER_ARMOR_SLOT_EMPTY_LABEL,
 } from '../../lib/monster-form-labels'
 import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../../lib/monster-form-values'
 import { useMonsterEquipmentEntryActions } from './use-monster-equipment-entry-actions'
@@ -264,15 +257,9 @@ export function MonsterArmorSlotBody({
   const owned = slotEntries(equipment, catalog, slot)
   const entry = owned[0]
   if (!entry) {
-    const copy = getMonsterArmorSlotUiCopy(slot)
     return (
-      <InsetPanel borderStyle="dashed" size="sm" align="center" className="gap-1">
-        <Text as="p" className={emptyStateWellTitleClasses}>
-          {copy.emptyTitle}
-        </Text>
-        <Text as="p" className={emptyStateWellSupportingClasses}>
-          {copy.emptySupporting}
-        </Text>
+      <InsetPanel borderStyle="dashed" size="sm" align="center" surface={{}}>
+        <InsetPanel.Text>{MONSTER_ARMOR_SLOT_EMPTY_LABEL}</InsetPanel.Text>
       </InsetPanel>
     )
   }

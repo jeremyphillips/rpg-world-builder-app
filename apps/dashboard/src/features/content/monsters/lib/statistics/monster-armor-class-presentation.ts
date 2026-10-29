@@ -61,31 +61,60 @@ function rowValue(row: MonsterArmorClassRow): string {
   return formatSignedModifier(row.value)
 }
 
+/**
+ * Optional add-ons. A zero here does not change the total, so the compact
+ * preview omits it. The resolver still records a zero DEX contribution
+ * separately from armor that does not apply DEX at all.
+ */
+function isZeroOptionalModifier(row: MonsterArmorClassRow): boolean {
+  return (
+    (row.kind === 'dex' ||
+      row.kind === 'natural' ||
+      row.kind === 'shield' ||
+      row.kind === 'enhancement') &&
+    row.value === 0
+  )
+}
+
 export function monsterArmorClassBreakdownRows(
   resolution: MonsterArmorClassResolution,
 ): MonsterArmorClassPresentationRow[] {
-  return resolution.rows.map((row, index) => ({
-    id: `${row.kind}-${index}`,
-    label: rowLabel(row),
-    value: rowValue(row),
-  }))
+  return resolution.rows
+    .filter((row) => !isZeroOptionalModifier(row))
+    .map((row, index) => ({
+      id: `${row.kind}-${index}`,
+      label: rowLabel(row),
+      value: rowValue(row),
+    }))
+}
+
+/** Wins copy is only for natural armor against worn armor. Unarmored stays in the caption. */
+function isNaturalVersusArmor(
+  resolution: MonsterArmorClassResolution,
+  alternative: MonsterArmorClassAlternative,
+): boolean {
+  const sources = [resolution.source, alternative.source]
+  return sources.includes('natural') && sources.includes('armor')
 }
 
 function alternativeSentence(
   resolution: MonsterArmorClassResolution,
   alternative: MonsterArmorClassAlternative,
-): string {
+): string | undefined {
   const loser = `${alternative.label}: ${alternative.ac}.`
   const winner = comparisonWinnerLabel(resolution)
-  return winner ? `${winner} wins. ${loser}` : loser
+  if (!winner) return loser
+  if (!isNaturalVersusArmor(resolution, alternative)) return undefined
+  return `${winner} wins. ${loser}`
 }
 
 export function monsterArmorClassAlternativeMessages(
   resolution: MonsterArmorClassResolution,
 ): string[] {
-  const messages = resolution.alternatives.map((alternative) =>
-    alternativeSentence(resolution, alternative),
-  )
+  const messages = resolution.alternatives.flatMap((alternative) => {
+    const sentence = alternativeSentence(resolution, alternative)
+    return sentence ? [sentence] : []
+  })
   if (resolution.calculatedAc !== undefined) {
     messages.push(
       `Calculated ${monsterArmorClassCompactLabel()} without override: ${resolution.calculatedAc}`,

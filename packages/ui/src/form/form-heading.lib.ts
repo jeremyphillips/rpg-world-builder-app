@@ -19,6 +19,8 @@ export type FormHeadingTier = 'section' | 'subsection' | 'leaf'
 export type FormHeading = {
   label: string
   hint?: string | FieldHintConfig
+  /** Screen-reader-only group legends keep the accessible name without a visible heading. */
+  labelVisibility?: FieldLabelVisibility
   accessory?: ReactNode
   action?: ReactNode
 }

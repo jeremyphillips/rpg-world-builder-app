@@ -27,6 +27,8 @@ export type { FieldGroupLegendSize, GroupHeadingScale }
 export interface FieldGroupProps {
   /** Group heading rendered as the fieldset legend. Omit for layout-only wrappers. */
   legend?: string
+  /** Keep the legend as the group name without showing it. */
+  legendSrOnly?: boolean
   /** Non-interactive status beside the legend label (badges, static text). */
   legendAccessory?: ReactNode
   /** Trailing header action aligned to the legend row end (compact inline controls). */
@@ -77,6 +79,7 @@ export interface FieldGroupProps {
  */
 export function FieldGroup({
   legend,
+  legendSrOnly = false,
   legendAccessory,
   legendAction,
   legendSize = 'section',
@@ -151,6 +154,7 @@ export function FieldGroup({
     <StandardFieldGroupBody
       id={id}
       legend={legend}
+      legendSrOnly={legendSrOnly}
       description={description}
       legendAccessory={legendAccessory}
       legendAction={legendAction}

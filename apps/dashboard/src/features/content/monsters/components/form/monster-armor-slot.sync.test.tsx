@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
+import { buildEquipmentCompactSummary } from '@rpg/contracts'
 
 import { pickEquipment } from '@/test/fixtures/pick'
 
@@ -43,6 +44,9 @@ describe('monster armor slot and equipment tab', () => {
     expect(toggles).toHaveLength(2)
     expect(toggles[0]).toBeChecked()
     expect(toggles[1]).toBeChecked()
+    for (const segment of buildEquipmentCompactSummary(leather).comparisonGroups) {
+      expect(screen.getAllByText(segment).length).toBeGreaterThan(0)
+    }
 
     await user.click(toggles[0]!)
     expect(
@@ -53,6 +57,6 @@ describe('monster armor slot and equipment tab', () => {
     expect(
       screen.queryByRole('checkbox', { name: `Equipped: ${leather.name}` }),
     ).not.toBeInTheDocument()
-    expect(screen.getByText('No armor selected')).toBeInTheDocument()
+    expect(screen.getByText('None selected')).toBeInTheDocument()
   })
 })

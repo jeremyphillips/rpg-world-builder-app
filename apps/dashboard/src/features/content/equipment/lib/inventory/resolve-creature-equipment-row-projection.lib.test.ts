@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { buildEquipmentCompactSummary } from '@rpg/contracts'
 
 import { pickEquipment } from '@/test/fixtures/pick'
 
@@ -48,5 +49,26 @@ describe('buildCreatureEquipmentRowSupportingMetadata', () => {
     expect(buildCreatureEquipmentRowSupportingMetadata({ rowSummary })).toEqual(
       rowSummary?.supportingMetadata,
     )
+    expect(
+      buildCreatureEquipmentRowSupportingMetadata({ rowSummary, catalogItem: greataxe }),
+    ).toEqual(rowSummary?.supportingMetadata)
+  })
+
+  it('uses the compact armor summary for body armor and shields', () => {
+    const plate = pickEquipment('plate-armor')
+    const shield = pickEquipment('shield')
+
+    expect(buildCreatureEquipmentRowSupportingMetadata({ catalogItem: plate })).toEqual([
+      ...buildEquipmentCompactSummary(plate).comparisonGroups,
+    ])
+    expect(buildCreatureEquipmentRowSupportingMetadata({ catalogItem: shield })).toEqual([
+      ...buildEquipmentCompactSummary(shield).comparisonGroups,
+    ])
+    expect(
+      buildCreatureEquipmentRowSupportingMetadata({
+        catalogItem: plate,
+        leadingSegments: [EQUIPMENT_ROW_UNMODIFIED_SUPPORTING_SEGMENT],
+      })[0],
+    ).toBe(EQUIPMENT_ROW_UNMODIFIED_SUPPORTING_SEGMENT)
   })
 })

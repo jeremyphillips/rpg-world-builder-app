@@ -20,6 +20,7 @@ const legendChromeClasses = 'w-full min-w-0'
 
 export type FieldGroupLegendProps = {
   legend: string
+  legendSrOnly?: boolean
   description?: string
   /** Non-interactive status/decoration beside the legend label (group headings only). */
   legendAccessory?: React.ReactNode
@@ -120,19 +121,26 @@ function resolveLegendContent(options: LegendContentOptions): React.ReactNode {
   )
 }
 
+function legendClassName(legendChromeClassName: string, legendSrOnly: boolean): string {
+  if (legendSrOnly) return 'sr-only'
+  return cn(legendChromeClasses, legendChromeClassName)
+}
+
 function StaticFieldGroupLegend({
   legendChromeClassName,
+  legendSrOnly,
   legendContent,
   legendAction,
   hasStackedHint,
 }: {
   legendChromeClassName: string
+  legendSrOnly: boolean
   legendContent: React.ReactNode
   legendAction?: React.ReactNode
   hasStackedHint: boolean
 }) {
   return (
-    <legend className={cn(legendChromeClasses, legendChromeClassName)}>
+    <legend className={legendClassName(legendChromeClassName, legendSrOnly)}>
       <LegendHeaderActionLayout action={legendAction} hasStackedHint={hasStackedHint}>
         {legendContent}
       </LegendHeaderActionLayout>
@@ -142,6 +150,7 @@ function StaticFieldGroupLegend({
 
 function CollapsibleFieldGroupLegend({
   legendChromeClassName,
+  legendSrOnly,
   legendContent,
   legendAccessory,
   legendAction,
@@ -151,6 +160,7 @@ function CollapsibleFieldGroupLegend({
   onToggle,
 }: {
   legendChromeClassName: string
+  legendSrOnly: boolean
   legendContent: React.ReactNode
   legendAccessory?: React.ReactNode
   legendAction?: React.ReactNode
@@ -182,7 +192,7 @@ function CollapsibleFieldGroupLegend({
   )
 
   return (
-    <legend className={cn(legendChromeClasses, legendChromeClassName)}>
+    <legend className={legendClassName(legendChromeClassName, legendSrOnly)}>
       <LegendHeaderActionLayout action={legendAction} hasStackedHint={hasStackedHint}>
         {toggleRow}
       </LegendHeaderActionLayout>
@@ -192,6 +202,7 @@ function CollapsibleFieldGroupLegend({
 
 export function FieldGroupLegend({
   legend,
+  legendSrOnly = false,
   description,
   legendAccessory,
   legendAction,
@@ -222,6 +233,7 @@ export function FieldGroupLegend({
     return (
       <StaticFieldGroupLegend
         legendChromeClassName={legendChromeClassName}
+        legendSrOnly={legendSrOnly}
         legendContent={legendContent}
         legendAction={legendAction}
         hasStackedHint={hasStackedHint}
@@ -232,6 +244,7 @@ export function FieldGroupLegend({
   return (
     <CollapsibleFieldGroupLegend
       legendChromeClassName={legendChromeClassName}
+      legendSrOnly={legendSrOnly}
       legendContent={legendContent}
       legendAccessory={legendAccessory}
       legendAction={legendAction}

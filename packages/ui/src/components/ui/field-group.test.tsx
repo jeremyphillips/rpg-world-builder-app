@@ -62,6 +62,18 @@ describe('FieldGroup', () => {
     )
   })
 
+  it('keeps an sr-only legend as the group name', () => {
+    render(
+      <FieldGroup legend="Armor & shield" legendSrOnly>
+        <TextField id="armor" label="Armor" />
+      </FieldGroup>,
+    )
+    const legend = screen.getByText('Armor & shield').closest('legend')
+    expect(screen.getByRole('group', { name: 'Armor & shield' })).toBeInTheDocument()
+    expect(legend).toHaveClass('sr-only')
+    expect(legend).not.toHaveClass('w-full')
+  })
+
   it('renders an optional description', () => {
     render(
       <FieldGroup legend="Character basics" description="Shown on your sheet.">

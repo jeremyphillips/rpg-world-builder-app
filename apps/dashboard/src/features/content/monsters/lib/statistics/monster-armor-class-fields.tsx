@@ -16,18 +16,17 @@ import {
 const NATURAL_ARMOR_BONUS_HINT = "Adds to the creature's unarmored AC."
 const ARMOR_AND_SHIELD_LEGEND = 'Armor & shield'
 const MANUAL_AC_OVERRIDE_LABEL = 'Manual AC override'
-const MANUAL_AC_OVERRIDE_HINT =
-  "Use when the normal calculation doesn't apply. Replaces the calculated result."
 const FIXED_ARMOR_CLASS_LABEL = 'Fixed Armor Class'
 const USE_FIXED_ARMOR_CLASS_LABEL = 'Use fixed Armor Class'
+const USE_FIXED_ARMOR_CLASS_HINT =
+  "Use when the normal calculation doesn't apply. Replaces the calculated result."
 
 export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'group',
       legend: MONSTER_ARMOR_CLASS_HEADING,
-      description:
-        'The highest of natural armor and worn armor, plus a shield. A fixed value replaces the result.',
+      description: "Configure the creature's defenses and Armor Class.",
       fields: [
         {
           kind: 'slot',
@@ -48,7 +47,7 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
         },
         {
           kind: 'group',
-          legend: ARMOR_AND_SHIELD_LEGEND,
+          heading: { label: ARMOR_AND_SHIELD_LEGEND, labelVisibility: 'srOnly' },
           fields: [
             {
               kind: 'columns',
@@ -85,7 +84,7 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
         },
         {
           kind: 'group',
-          heading: { label: MANUAL_AC_OVERRIDE_LABEL, hint: MANUAL_AC_OVERRIDE_HINT },
+          heading: { label: MANUAL_AC_OVERRIDE_LABEL },
           headingScale: 'field',
           disclosure: {
             variant: 'legend',
@@ -99,6 +98,7 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
                 type: 'checkbox',
                 name: 'armorClass.useFixedAc',
                 label: USE_FIXED_ARMOR_CLASS_LABEL,
+                hint: USE_FIXED_ARMOR_CLASS_HINT,
                 defaultValue: false,
               },
               dependents: {

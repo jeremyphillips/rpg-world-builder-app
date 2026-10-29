@@ -36,6 +36,9 @@ describe('monster armor class fields', () => {
     expect(screen.queryByRole('checkbox', { name: 'Natural armor' })).not.toBeInTheDocument()
     expect(screen.getByText("Adds to the creature's unarmored AC.")).toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Armor & shield' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('group', { name: 'Armor & shield' }).querySelector('legend'),
+    ).toHaveClass('sr-only')
     expect(document.querySelector('[data-form-columns]')).toHaveClass('md:grid-cols-2')
     expect(
       screen.queryByText(
@@ -46,7 +49,11 @@ describe('monster armor class fields', () => {
       screen.queryByText('Adds to Armor Class whether or not the creature wears armor.'),
     ).not.toBeInTheDocument()
     expect(screen.getByText('Armor Class')).toHaveClass('text-style-field-legend')
-    expect(screen.getByRole('button', { name: /Manual AC override/ })).toHaveTextContent(
+    expect(
+      screen.getByText("Configure the creature's defenses and Armor Class."),
+    ).toBeInTheDocument()
+    expect(screen.getAllByText('None selected')).toHaveLength(2)
+    expect(screen.getByRole('button', { name: 'Manual AC override' })).toHaveTextContent(
       'Manual AC override',
     )
     expect(screen.getByText('Manual AC override')).toHaveClass('text-style-field-label-md')
