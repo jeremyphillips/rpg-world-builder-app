@@ -43,6 +43,8 @@ function NumberStepperValueSlot({
   stepperLocked,
   inputRef,
   fieldBinding,
+  inputId,
+  ariaDescribedBy,
   ariaLabel,
   ariaValueText,
   autoFocus,
@@ -56,6 +58,8 @@ function NumberStepperValueSlot({
   digits: NumberStepperDigits
   stepperLocked: boolean
   inputRef: React.Ref<HTMLInputElement>
+  inputId?: string
+  ariaDescribedBy?: string
   fieldBinding: {
     type: 'text' | 'number'
     inputMode: 'decimal' | 'numeric'
@@ -73,8 +77,10 @@ function NumberStepperValueSlot({
 }) {
   const inputProps = {
     ref: inputRef,
+    id: inputId,
     inputMode: 'numeric' as const,
     'aria-label': ariaLabel,
+    'aria-describedby': ariaDescribedBy,
     ...(ariaValueText ? { 'aria-valuetext': ariaValueText } : {}),
     disabled: stepperLocked,
     readOnly: stepperLocked,
@@ -133,6 +139,7 @@ function NumberStepperValueSlot({
 
 function NumberStepperControl({
   value,
+  unbound = false,
   onChange,
   min,
   max,
@@ -145,11 +152,14 @@ function NumberStepperControl({
   signDisplay,
   className,
   ariaLabel,
+  inputId,
+  ariaDescribedBy,
   autoFocus,
   onBlur,
   ariaInvalid,
 }: {
   value: number
+  unbound?: boolean
   onChange: (value: number) => void
   min: number
   max: number
@@ -162,6 +172,8 @@ function NumberStepperControl({
   signDisplay?: NumberStepperSignDisplay
   className?: string
   ariaLabel: string
+  inputId?: string
+  ariaDescribedBy?: string
   autoFocus?: boolean
   onBlur?: React.FocusEventHandler<HTMLInputElement>
   ariaInvalid?: React.AriaAttributes['aria-invalid']
@@ -170,6 +182,7 @@ function NumberStepperControl({
   const resolvedSize = resolveNumberStepperSize(size, fieldSize)
   const interaction = useNumberStepperInteraction({
     value,
+    unbound,
     onChange,
     min,
     max,
@@ -211,6 +224,8 @@ function NumberStepperControl({
         stepperLocked={interaction.stepperLocked}
         inputRef={interaction.inputRef}
         fieldBinding={interaction.fieldBinding}
+        inputId={inputId}
+        ariaDescribedBy={ariaDescribedBy}
         ariaLabel={ariaLabel}
         ariaValueText={interaction.valueSlotAriaValueText}
         autoFocus={autoFocus}
@@ -233,6 +248,11 @@ export type { NumberStepperMinAction, NumberStepperSignDisplay }
 
 export interface NumberStepperProps extends NumberStepperVariantProps {
   value: number
+  /**
+   * Blank value. The numeric `value` is ignored for display. Decrement is disabled,
+   * and increment seeds from an empty `stepNumber` call.
+   */
+  unbound?: boolean
   onChange: (value: number) => void
   min?: number
   max?: number
@@ -250,6 +270,7 @@ export interface NumberStepperProps extends NumberStepperVariantProps {
   id?: string
   className?: string
   'aria-label': string
+  'aria-describedby'?: string
   'aria-invalid'?: React.AriaAttributes['aria-invalid']
   autoFocus?: boolean
   onBlur?: React.FocusEventHandler<HTMLInputElement>
@@ -257,6 +278,7 @@ export interface NumberStepperProps extends NumberStepperVariantProps {
 
 export function NumberStepper({
   value,
+  unbound = false,
   onChange,
   min = 1,
   max = Number.MAX_SAFE_INTEGER,
@@ -271,6 +293,7 @@ export function NumberStepper({
   id,
   className,
   'aria-label': ariaLabel,
+  'aria-describedby': ariaDescribedBy,
   'aria-invalid': ariaInvalid,
   autoFocus,
   onBlur,
@@ -278,6 +301,7 @@ export function NumberStepper({
   const control = (
     <NumberStepperControl
       value={value}
+      unbound={unbound}
       onChange={onChange}
       min={min}
       max={max}
@@ -290,6 +314,8 @@ export function NumberStepper({
       signDisplay={signDisplay}
       className={className}
       ariaLabel={label ?? ariaLabel}
+      inputId={label ? undefined : id}
+      ariaDescribedBy={ariaDescribedBy}
       ariaInvalid={ariaInvalid}
       autoFocus={autoFocus}
       onBlur={onBlur}

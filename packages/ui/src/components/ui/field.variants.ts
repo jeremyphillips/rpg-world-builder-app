@@ -300,10 +300,18 @@ export const fieldSettingsRowClasses =
 /** Vertical gap between siblings in a stack or dependents region. */
 export type FieldRhythm = 'compact' | 'comfortable'
 
+/**
+ * Closed group heading opt-in. `'field'` replaces structural legend and description
+ * type with the field label and hint scale. It is not a size token.
+ */
+export type GroupHeadingScale = 'field'
+
 /** Group legend description typography — follows form density (`rhythm`), not legend title scale. */
 export function resolveFieldGroupDescriptionTypography(
   rhythm: FieldRhythm = 'comfortable',
+  headingScale?: GroupHeadingScale,
 ): string {
+  if (headingScale === 'field') return 'text-style-caption'
   return rhythm === 'compact'
     ? 'text-style-field-group-description-compact'
     : 'text-style-field-group-description'

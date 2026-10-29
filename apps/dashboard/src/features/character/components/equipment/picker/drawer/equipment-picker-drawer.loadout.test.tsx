@@ -1,8 +1,14 @@
-import { render, screen } from '@testing-library/react'
+import { useState } from 'react'
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { EquipmentPickerDrawer } from './equipment-picker-drawer'
-import { equipmentPickerItemsFixture } from './equipment-picker-drawer.fixtures'
+import {
+  equipmentPickerChainMailFixture,
+  equipmentPickerItemsFixture,
+  equipmentPickerLongswordFixture,
+} from './equipment-picker-drawer.fixtures'
 import { EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL } from './equipment-picker-drawer.types'
 
 describe('EquipmentPickerDrawer loadout mode', () => {
@@ -25,6 +31,8 @@ describe('EquipmentPickerDrawer loadout mode', () => {
     )
     expect(screen.getByRole('heading', { name: 'Add equipment' })).toBeInTheDocument()
     expect(screen.queryByText(EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Purchase' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Loadout' })).not.toBeInTheDocument()
   })
 
   it('renders Owned once for a plain stack and adds customized metadata without a purchase price', () => {
@@ -66,5 +74,52 @@ describe('EquipmentPickerDrawer loadout mode', () => {
     expect(screen.getByText('Owned')).toBeInTheDocument()
     expect(screen.getByText('1 customized')).toBeInTheDocument()
     expect(screen.queryByText('Owned · Owned')).not.toBeInTheDocument()
+  })
+
+  it('commits a single radio choice from the footer without row details', async () => {
+    const user = userEvent.setup()
+    const items = equipmentPickerItemsFixture.slice(0, 2)
+    function Host() {
+      const [value, setValue] = useState<string | null>(equipmentPickerLongswordFixture.id)
+      const [committed, setCommitted] = useState<string | null>(null)
+      return (
+        <>
+          <EquipmentPickerDrawer
+            open
+            onOpenChange={vi.fn()}
+            title="Select armor"
+            items={items}
+            workflowMode="loadout"
+            selection={{ value, onValueChange: setValue }}
+            footer={
+              <button
+                type="button"
+                disabled={value === equipmentPickerLongswordFixture.id}
+                onClick={() => setCommitted(value)}
+              >
+                Select armor
+              </button>
+            }
+          />
+          <div data-testid="committed">{committed}</div>
+        </>
+      )
+    }
+
+    render(<Host />)
+    const group = screen.getByRole('radiogroup', { name: 'Select armor' })
+    const radios = within(group).getAllByRole('radio')
+    expect(radios).toHaveLength(2)
+    expect(
+      within(group).getByRole('radio', { name: equipmentPickerLongswordFixture.name }),
+    ).toBeChecked()
+    expect(within(group).queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Select armor' })).toBeDisabled()
+
+    await user.click(screen.getByRole('radio', { name: equipmentPickerChainMailFixture.name }))
+    await user.click(screen.getByRole('button', { name: 'Select armor' }))
+    expect(screen.getByTestId('committed')).toHaveTextContent(equipmentPickerChainMailFixture.id)
   })
 })

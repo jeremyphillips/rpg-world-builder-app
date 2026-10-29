@@ -1,6 +1,10 @@
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { FormItem } from '@rpg/ui/form'
+import { Form } from '@rpg/ui/form'
 import type { Equipment } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 
 import { equipmentFormDef } from '../../lib/equipment-form-def'
 import {
@@ -118,6 +122,76 @@ describe('armor ability-score requirement form values', () => {
   })
 })
 
+describe('armor base AC hint', () => {
+  it('follows the category, stays on the field, and keeps an entered value', async () => {
+    const user = userEvent.setup()
+    render(
+      <Form
+        schema={z.object({
+          armorCategory: z.string().optional(),
+          material: z.string().optional(),
+          baseAc: z.number().optional(),
+          acBonus: z.number().optional(),
+          stealthDisadvantage: z.boolean().optional(),
+          hasMinimumStrengthRequirement: z.boolean().optional(),
+        })}
+        fields={[armorFormFieldGroup()]}
+        defaultValues={{ armorCategory: 'light', stealthDisadvantage: false }}
+        onSubmit={() => undefined}
+      />,
+    )
+
+    expect(screen.queryByText('Add Dex modifier')).not.toBeInTheDocument()
+    expect(screen.queryByText('Max Dex bonus')).not.toBeInTheDocument()
+
+    const baseAc = screen.getByRole('spinbutton', { name: 'Base AC' })
+    expect(baseAc).toHaveValue(null)
+    expect(screen.getByRole('button', { name: 'Decrease Base AC' })).toBeDisabled()
+
+    const hint = screen.getByText('Adds the full DEX modifier.')
+    expect(hint.querySelector('[data-icon="info"]')).toBeInTheDocument()
+    expect(baseAc).toHaveAttribute('aria-describedby', hint.id)
+
+    await user.click(screen.getByRole('button', { name: 'Increase Base AC' }))
+    expect(baseAc).toHaveValue(1)
+
+    const category = document.querySelector('select[name="armorCategory"]')
+    if (!(category instanceof HTMLSelectElement)) throw new Error('missing category select')
+    await user.selectOptions(category, 'medium')
+    expect(baseAc).toHaveValue(1)
+    expect(screen.getByText('Adds the DEX modifier, up to +2.')).toBeInTheDocument()
+
+    await user.selectOptions(category, 'heavy')
+    expect(baseAc).toHaveValue(1)
+    expect(screen.getByText('DEX modifier does not apply.')).toBeInTheDocument()
+  })
+
+  it('uses the same stepper for shield AC bonus', async () => {
+    const user = userEvent.setup()
+    render(
+      <Form
+        schema={z.object({
+          armorCategory: z.string().optional(),
+          material: z.string().optional(),
+          baseAc: z.number().optional(),
+          acBonus: z.number().optional(),
+          stealthDisadvantage: z.boolean().optional(),
+          hasMinimumStrengthRequirement: z.boolean().optional(),
+        })}
+        fields={[armorFormFieldGroup()]}
+        defaultValues={{ armorCategory: 'shields', stealthDisadvantage: false }}
+        onSubmit={() => undefined}
+      />,
+    )
+
+    const acBonus = screen.getByRole('spinbutton', { name: 'AC bonus' })
+    expect(acBonus).toHaveValue(null)
+    expect(screen.getByRole('button', { name: 'Decrease AC bonus' })).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: 'Increase AC bonus' }))
+    expect(acBonus).toHaveValue(0)
+  })
+})
+
 describe('armor form round-trips', () => {
   for (const item of ARMOR_SEEDS) {
     it(`${item.slug}: toFormValues → toInput → schema.parse`, () => {
@@ -130,8 +204,12 @@ describe('armor form round-trips', () => {
       expect(formValues.armorCategory).toBe(item.category)
       expect(formValues.baseAc).toBe(item.baseAc)
       expect(formValues.acBonus).toBe(item.acBonus)
-      expect(formValues.addDexModifier).toBe(item.addDexModifier)
+      expect(formValues).not.toHaveProperty('addDexModifier')
+      expect(formValues).not.toHaveProperty('maxDexBonus')
       expect(formValues.stealthDisadvantage).toBe(item.stealthDisadvantage)
+      const input = toInputWith(item, {})
+      expect(input).not.toHaveProperty('addDexModifier')
+      expect(input).not.toHaveProperty('maxDexBonus')
     })
   }
 })

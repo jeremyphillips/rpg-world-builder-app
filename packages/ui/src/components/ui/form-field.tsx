@@ -36,6 +36,8 @@ export interface FormFieldProps {
   describedBy?: string
   hint?: string
   hintPosition?: FieldHintPosition
+  /** Info icon rendered inside the hint element. */
+  hintIcon?: 'info'
   recommendation?: FieldLayoutRecommendation | null
   /** Optional info-icon content rendered as an `[i]` tooltip beside the label. */
   info?: ReactNode
@@ -83,6 +85,7 @@ export function FormField({
   describedBy,
   hint,
   hintPosition,
+  hintIcon,
   recommendation,
   info,
   required,
@@ -139,6 +142,7 @@ export function FormField({
         describedBy={describedBy}
         hint={hint}
         hintPosition={hintPosition}
+        hintIcon={hintIcon}
         required={required}
         size={size}
         width={rootWidth}
@@ -156,6 +160,7 @@ export function FormField({
       describedBy={describedBy}
       hint={hint}
       hintPosition={hintPosition}
+      hintIcon={hintIcon}
       required={required}
       size={size}
       width={rootWidth}

@@ -6,18 +6,17 @@ import {
   type Equipment,
 } from '@rpg/contracts'
 
-import { equipmentArmorRole, equipmentEntryBaseName } from './equipment/monster-equipment-labels'
+import { equipmentEntryBaseName } from './equipment/monster-equipment-labels'
 import { coerceCreatureWeaponProficienciesForForm } from './creature-details/monster-weapon-proficiencies-form.lib'
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from './actions/monster-action-equipment-references'
-import { monsterBodyArmorIgnoredMessage } from './monster-form-labels'
 import type { MonsterActionDraftRow } from './actions/monster-action-presets'
 import type { MonsterFormValues } from './monster-form-values'
 
 export type MonsterFormAdvisory = {
-  code: 'weapon-not-equipped' | 'weapon-not-proficient' | 'body-armor-ignored'
+  code: 'weapon-not-equipped' | 'weapon-not-proficient'
   message: string
   path: string
 }
@@ -35,20 +34,6 @@ export function collectMonsterFormAdvisories(
   equipmentById: ReadonlyMap<string, Equipment>,
 ): MonsterFormAdvisory[] {
   const advisories: MonsterFormAdvisory[] = []
-  const kind = values.armorClass?.kind
-  if (kind === 'natural' || kind === 'unarmored') {
-    const bodyArmor = (values.equipment ?? []).find((entry) => {
-      if (!entry.equipped) return false
-      return equipmentArmorRole(equipmentById.get(entry.equipmentId)) === 'body-armor'
-    })
-    if (bodyArmor) {
-      advisories.push({
-        code: 'body-armor-ignored',
-        message: monsterBodyArmorIgnoredMessage(equipmentEntryBaseName(bodyArmor, equipmentById)),
-        path: 'armorClass.kind',
-      })
-    }
-  }
 
   for (const section of MONSTER_ACTION_SECTIONS) {
     sectionRows(values, section).forEach((action, index) => {

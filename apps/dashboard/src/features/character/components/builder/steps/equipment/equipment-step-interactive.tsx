@@ -187,8 +187,14 @@ export function EquipmentStepInteractive({
         characterPreviewContext={characterPreviewContext}
         ownership={pickerAcquisition.ownership}
         workflowMode={step.pickerWorkflowMode}
-        workflowModes={step.pickerWorkflowModes}
-        onWorkflowModeChange={step.setPickerWorkflowMode}
+        workflowSwitcher={
+          step.pickerWorkflowModes.length === 2
+            ? {
+                modes: step.pickerWorkflowModes,
+                onChange: step.setPickerWorkflowMode,
+              }
+            : undefined
+        }
         magicItemGrantProgress={step.showMagicItemGrants ? step.acquisition.progress : undefined}
         magicItemAllowances={step.showMagicItemGrants ? step.acquisition.allowances : undefined}
         focusedAllowanceId={step.focusedAllowanceId}

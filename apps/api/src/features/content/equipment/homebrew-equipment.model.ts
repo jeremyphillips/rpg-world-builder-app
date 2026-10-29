@@ -51,8 +51,6 @@ const homebrewEquipmentSchema = new Schema(
     material: { type: String, enum: [...ARMOR_MATERIALS] },
     baseAc: { type: Number },
     acBonus: { type: Number },
-    addDexModifier: { type: Boolean },
-    maxDexBonus: { type: Number },
     stealthDisadvantage: { type: Boolean },
     abilityScoreRequirements: { type: abilityScoreRequirementsSchema, default: undefined },
     // adventuring gear

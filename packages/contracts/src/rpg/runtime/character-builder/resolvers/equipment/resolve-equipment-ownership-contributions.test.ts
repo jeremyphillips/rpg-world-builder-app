@@ -49,7 +49,6 @@ const shield = equipmentSchema.parse({
   kind: 'armor',
   category: 'shields',
   acBonus: 2,
-  addDexModifier: false,
   stealthDisadvantage: false,
 })
 

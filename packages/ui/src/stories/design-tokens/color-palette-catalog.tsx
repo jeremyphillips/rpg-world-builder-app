@@ -129,7 +129,7 @@ function ColorSwatch({ token }: { token: ColorToken }) {
         <Text variant="body" className="text-base font-medium">
           {token.name}
         </Text>
-        <Text variant="caption" className="font-mono text-sm leading-relaxed text-foreground">
+        <Text variant="caption" className="font-mono leading-relaxed">
           {token.cssVar}
         </Text>
         <Text variant="caption" className="font-mono leading-relaxed">
@@ -163,7 +163,7 @@ function ElevationLadderSection() {
             className="flex items-center justify-between gap-4 rounded-lg border border-border-subtle px-4 py-3"
             style={{ backgroundColor: `var(${token.cssVar})` }}
           >
-            <span className="font-mono text-sm text-foreground">{token.name}</span>
+            <span className="font-mono text-style-body-compact">{token.name}</span>
             <span className="font-mono text-style-caption">{token.cssVar}</span>
           </div>
         ))}

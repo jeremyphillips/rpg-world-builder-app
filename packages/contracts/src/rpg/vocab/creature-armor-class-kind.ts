@@ -3,6 +3,7 @@ import type { GameTermEntry, VocabularyTerm } from './types'
 
 export const CREATURE_ARMOR_CLASS_KIND_TERM = {
   label: 'Armor Class',
+  compactLabel: 'AC',
   description: 'How a creature’s Armor Class is calculated.',
   sentence: {
     singular: 'Armor Class source',
@@ -13,19 +14,19 @@ export const CREATURE_ARMOR_CLASS_KIND_TERM = {
 export const CREATURE_ARMOR_CLASS_KIND_ENTRIES = {
   unarmored: {
     label: 'Unarmored',
-    description: '10 plus Dexterity, plus shields.',
+    description: 'Ruleset Armor Class base plus Dexterity.',
   },
   natural: {
     label: 'Natural',
-    description: '10 plus Dexterity plus a natural armor bonus, plus shields.',
+    description: 'Unarmored Armor Class plus a natural armor bonus.',
   },
-  equipment: {
+  armor: {
     label: 'Armor',
-    description: 'Calculated from equipped body armor and shields.',
+    description: 'Calculated from equipped body armor.',
   },
   fixed: {
     label: 'Fixed',
-    description: 'An authored Armor Class that ignores abilities and equipment.',
+    description: 'An authored Armor Class that replaces the calculated value.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

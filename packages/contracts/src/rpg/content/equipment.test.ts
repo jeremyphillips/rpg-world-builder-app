@@ -99,7 +99,6 @@ const LEATHER_STORED = systemRecord('leather-armor', {
   category: 'light',
   material: 'organic',
   baseAc: 11,
-  addDexModifier: true,
   stealthDisadvantage: false,
 })
 
@@ -111,8 +110,6 @@ const HALF_PLATE_STORED = systemRecord('half-plate-armor', {
   category: 'medium',
   material: 'metal',
   baseAc: 15,
-  addDexModifier: true,
-  maxDexBonus: 2,
   stealthDisadvantage: true,
 })
 
@@ -124,7 +121,6 @@ const PLATE_STORED = systemRecord('plate-armor', {
   category: 'heavy',
   material: 'metal',
   baseAc: 18,
-  addDexModifier: false,
   stealthDisadvantage: true,
   abilityScoreRequirements: { str: 15 },
 })
@@ -137,7 +133,6 @@ const SHIELD_WOOD_STORED = systemRecord('shield-wood', {
   category: 'shields',
   material: 'organic',
   acBonus: 2,
-  addDexModifier: false,
   stealthDisadvantage: false,
 })
 
@@ -149,7 +144,6 @@ const SAMPLE_BODIES = {
     cost: { amount: 10, currency: 'gp' },
     category: 'light',
     baseAc: 11,
-    addDexModifier: true,
     stealthDisadvantage: false,
   },
   adventuring_gear: {
@@ -324,8 +318,11 @@ describe('weapon equipment variant', () => {
 
 describe('armor equipment variant', () => {
   it('parses light, medium, heavy armor and shields', () => {
-    expect(equipmentSchema.parse(LEATHER_STORED)).toMatchObject({ baseAc: 11 })
-    expect(equipmentSchema.parse(HALF_PLATE_STORED)).toMatchObject({ maxDexBonus: 2 })
+    expect(equipmentSchema.parse(LEATHER_STORED)).toMatchObject({ baseAc: 11, category: 'light' })
+    expect(equipmentSchema.parse(HALF_PLATE_STORED)).toMatchObject({
+      category: 'medium',
+      baseAc: 15,
+    })
     expect(equipmentSchema.parse(PLATE_STORED)).toMatchObject({
       abilityScoreRequirements: { str: 15 },
     })
@@ -373,19 +370,13 @@ describe('getArmorAcDisplay', () => {
     category: 'light',
     baseAc: 11,
     acBonus: undefined,
-    addDexModifier: true,
-    maxDexBonus: undefined,
     ...overrides,
   })
 
   it('formats light, medium, heavy, and shield AC strings', () => {
     expect(getArmorAcDisplay(make({ category: 'light', baseAc: 11 }))).toBe('11 + Dex')
-    expect(getArmorAcDisplay(make({ category: 'medium', baseAc: 15, maxDexBonus: 2 }))).toBe(
-      '15 + Dex (max 2)',
-    )
-    expect(getArmorAcDisplay(make({ category: 'heavy', baseAc: 18, addDexModifier: false }))).toBe(
-      '18',
-    )
+    expect(getArmorAcDisplay(make({ category: 'medium', baseAc: 14 }))).toBe('14 + Dex (max 2)')
+    expect(getArmorAcDisplay(make({ category: 'heavy', baseAc: 18 }))).toBe('18 (no Dex)')
     expect(getArmorAcDisplay(make({ category: 'shields', acBonus: 2 }))).toBe('+2')
   })
 })

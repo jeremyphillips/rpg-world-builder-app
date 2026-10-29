@@ -1,5 +1,14 @@
 import type { ArmorEquipmentKindFields } from '../../content/equipment/armor-variant'
 import type { Equipment } from '../../content/equipment'
+import {
+  resolveArmorDexterityRule,
+  type ArmorDexterityRule,
+} from '../../vocab/armor/dexterity-rule'
+
+export {
+  resolveCreatureArmorSlot,
+  type CreatureArmorSlot,
+} from '../../content/equipment/armor-slot'
 import type { EquipmentInstance } from '../../content/equipment/instance/instance'
 import type { EquipmentModifier } from '../../content/equipment/instance/modifier'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
@@ -7,10 +16,13 @@ import type { ArmorClassBase } from '../../vocab/mechanics/edition-preset-mechan
 
 import { resolveEquipmentEntryEffectTotals } from '../../content/equipment/instance/equipment-effect-totals'
 
-export type ArmorAcFields = Pick<
-  ArmorEquipmentKindFields,
-  'category' | 'baseAc' | 'acBonus' | 'addDexModifier' | 'maxDexBonus'
->
+export type ArmorAcFields = Pick<ArmorEquipmentKindFields, 'category' | 'baseAc' | 'acBonus'>
+
+export type ArmorDexContribution = {
+  abilityModifier: number
+  appliedModifier: number
+  rule: ArmorDexterityRule | { mode: 'none' }
+}
 
 export type EquippedArmorPiece = ArmorAcFields & {
   acAdjustment: number
@@ -48,11 +60,34 @@ export function toEquippedArmorPieceForEntry(
   }
 }
 
-/** Applies the DEX modifier to body armor, respecting heavy armor and medium caps. */
-export function dexModifierForArmor(dexModifier: number, armor: ArmorAcFields): number {
-  if (armor.category === 'shields' || !armor.addDexModifier) return 0
-  if (armor.maxDexBonus !== undefined) return Math.min(dexModifier, armor.maxDexBonus)
+/** Applies the category DEX rule. Shields and heavy armor contribute 0, including negative DEX. */
+export function dexModifierForArmor(
+  dexModifier: number,
+  armor: Pick<ArmorAcFields, 'category'>,
+): number {
+  if (armor.category === 'shields') return 0
+  const rule = resolveArmorDexterityRule(armor.category)
+  if (rule.mode === 'none') return 0
+  if (rule.mode === 'capped') return Math.min(dexModifier, rule.maxBonus)
   return dexModifier
+}
+
+/**
+ * DEX before and after the category rule. A restriction reduced the contribution
+ * only when `appliedModifier` is lower than `abilityModifier`.
+ */
+export function resolveArmorDexContribution(
+  dexModifier: number,
+  armor: Pick<ArmorAcFields, 'category'>,
+): ArmorDexContribution {
+  if (armor.category === 'shields') {
+    return { abilityModifier: dexModifier, appliedModifier: 0, rule: { mode: 'none' } }
+  }
+  return {
+    abilityModifier: dexModifier,
+    appliedModifier: dexModifierForArmor(dexModifier, armor),
+    rule: resolveArmorDexterityRule(armor.category),
+  }
 }
 
 /** AC contribution from a single piece of equipped body armor. */

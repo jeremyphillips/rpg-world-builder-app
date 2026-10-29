@@ -55,12 +55,10 @@ import type { EquipmentInstance } from './equipment/instance/instance'
 import { normalizeEquipmentInstance } from './equipment/instance/normalize-equipment-instance'
 import { refineEquipmentInstanceInvariants } from './equipment/instance/instance-invariants'
 
-export const monsterArmorClassSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('unarmored') }),
-  z.object({ kind: z.literal('natural'), bonus: z.number().int().min(1) }),
-  z.object({ kind: z.literal('equipment') }),
-  z.object({ kind: z.literal('fixed'), value: z.number().int().min(0) }),
-])
+export const monsterArmorClassSchema = z.object({
+  naturalArmorBonus: z.number().int().min(1).optional(),
+  fixedValue: z.number().int().min(0).optional(),
+})
 
 export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('hit-dice'), count: z.number().int().min(1) }),
@@ -91,7 +89,7 @@ export const monsterBodyFields = {
   creatureType: creatureTypeRefSchema,
   alignment: creatureAlignmentSchema,
   abilityScores: creatureAbilityScoresSchema,
-  armorClass: monsterArmorClassSchema,
+  armorClass: monsterArmorClassSchema.default({}),
   hitPoints: monsterHitPointsSchema,
   movement: creatureMovementSchema,
   hover: z.boolean().optional(),
@@ -125,7 +123,6 @@ const monsterBodyDraftSchemaBase = mediaBearingDraftAuthoredContentBodySchema(
   creatureType: creatureTypeRefSchema.optional(),
   alignment: creatureAlignmentSchema.optional(),
   abilityScores: creatureAbilityScoresSchema.partial().optional(),
-  armorClass: monsterArmorClassSchema.optional(),
   hitPoints: monsterHitPointsSchema.optional(),
   movement: creatureMovementSchema.optional(),
   senses: creatureSensesDraftSchema.optional(),

@@ -62,7 +62,6 @@ const baselineCases: BaselineCase[] = [
       category: 'light',
       cost: { amount: 10, currency: 'gp' },
       baseAc: 11,
-      addDexModifier: true,
       stealthDisadvantage: false,
     },
     homebrewUpdate: { kind: 'armor', name: 'Updated Baseline Armor' },

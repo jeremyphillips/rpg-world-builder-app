@@ -51,7 +51,6 @@ const leatherArmor = equipmentSchema.parse({
   kind: 'armor',
   category: 'light',
   baseAc: 11,
-  addDexModifier: true,
   stealthDisadvantage: false,
 })
 

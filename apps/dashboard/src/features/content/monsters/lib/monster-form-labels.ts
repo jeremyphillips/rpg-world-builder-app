@@ -5,16 +5,19 @@ import {
   CHALLENGE_RATING_TERM,
   CREATURE_ARMOR_CLASS_KIND_TERM,
   getActionEconomyLabel,
+  getArmorCategoryLabel,
+  getArmorCategorySentenceForm,
   getAverageHitPointsLabel,
   getContentTypeSentenceForm,
+  getCreatureArmorClassKindLabel,
   getCreatureLanguageFluencyLabel,
   getMonsterActionKindFieldLabel,
   getMonsterReactionFieldLabel,
   getMonsterTraitSectionLabel,
-  getNaturalArmorBonusFieldLabel,
   getProficiencyDomainCollectionLabel,
   joinInlineMetadata,
   getProficiencyGrantCompactAddLabel,
+  getTermLabelSingular,
   HIT_POINTS_TERM,
   LANGUAGE_TERM,
   PASSIVE_PERCEPTION_TERM,
@@ -22,6 +25,7 @@ import {
   SAVING_THROW_SHORT_LABEL,
   SAVING_THROW_TERM,
   SENSE_TERM,
+  type CreatureArmorSlot,
 } from '@rpg/contracts'
 
 export { formatEquipmentCustomizationRemovalSummary } from './equipment/equipment-entry-customization.lib'
@@ -49,6 +53,10 @@ export const MONSTER_ABILITY_SCORES_HEADING = vocabularyFieldLabel(ABILITY_SCORE
   plural: true,
 })
 export const MONSTER_ARMOR_CLASS_HEADING = armorClassLabel
+
+export const MONSTER_BODY_ARMOR_SLOT_HEADING = getCreatureArmorClassKindLabel('armor')
+export const MONSTER_SHIELD_SLOT_HEADING = getArmorCategoryLabel('shields')
+
 export const MONSTER_HIT_POINTS_HEADING = vocabularyFieldLabel(HIT_POINTS_TERM, { plural: true })
 export const MONSTER_CHALLENGE_HEADING = vocabularyFieldLabel(CHALLENGE_RATING_TERM)
 export const MONSTER_SAVE_LABEL = SAVING_THROW_SHORT_LABEL
@@ -64,9 +72,6 @@ export const MONSTER_AWARDS_ZERO_XP_HINT =
 export const MONSTER_FIXED_AVERAGE_LABEL = getAverageHitPointsLabel()
 export const MONSTER_FIXED_FORMULA_LABEL = 'Formula'
 export const MONSTER_FIXED_FORMULA_HINT = 'Optional. Shown as written.'
-export const MONSTER_NATURAL_BONUS_LABEL = getNaturalArmorBonusFieldLabel()
-export const MONSTER_FIXED_AC_LABEL = `${armorClassLabel} value`
-export const MONSTER_FIXED_AC_HINT = 'Ignores ability scores and equipment.'
 export const MONSTER_SENSES_HINT = 'Add special senses and their ranges.'
 export const MONSTER_TELEPATHY_HINT =
   "Specify the range of this creature's telepathic communication."
@@ -95,7 +100,6 @@ export const MONSTER_EQUIPPED_LABEL = 'Equipped'
 export const MONSTER_CUSTOMIZATION_LABEL = 'Customization'
 export const MONSTER_CUSTOM_NAME_LABEL = 'Custom name'
 export const MONSTER_CUSTOM_DESCRIPTION_LABEL = 'Custom description'
-export const MONSTER_AC_ADJUSTMENT_LABEL = `${armorClassLabel} adjustment`
 export const MONSTER_REMOVE_LABEL = 'Remove'
 export const MONSTER_CANCEL_LABEL = 'Cancel'
 export const MONSTER_LOADING_EQUIPMENT = `Loading ${getContentTypeMidSentenceLabel('equipment')}…`
@@ -107,22 +111,6 @@ export const MONSTER_BLANK_CHALLENGE_HINT =
   'Required to publish. Values that use proficiency bonus show "—" until set.'
 export const MONSTER_SKILL_MODIFIER_UNAVAILABLE_TOOLTIP =
   'Set a Challenge Rating to determine the proficiency bonus.'
-
-export function monsterGoToEquipmentLabel(): string {
-  return `Go to ${getContentTypeItemLabel('equipment')}`
-}
-
-export function monsterChooseBodyArmorMessage(): string {
-  return `Choose and equip body armor in ${getContentTypeItemLabel('equipment')} to calculate ${armorClassLabel}.`
-}
-
-export function monsterBodyArmorConflictMessage(names: readonly string[]): string {
-  return `Two body armors are equipped: ${names.join(', ')}. Unequip one in ${getContentTypeItemLabel('equipment')} to calculate ${armorClassLabel}.`
-}
-
-export function monsterBodyArmorIgnoredMessage(name: string): string {
-  return `Equipped ${name} does not contribute to ${armorClassLabel}.`
-}
 
 export function monsterSkillSectionLabel(): string {
   return getContentTypeItemLabel('skill-proficiencies')
@@ -168,6 +156,38 @@ export const MONSTER_ACTIONS_EMPTY = 'No actions yet.'
 export const MONSTER_SECTION_EMPTY = 'None'
 export const MONSTER_ACTION_DETAIL_EMPTY = 'Select or add an action to edit it.'
 export const MONSTER_ADD_LABEL = 'Add'
+
+function monsterArmorSlotMidSentenceNoun(slot: CreatureArmorSlot): string {
+  if (slot === 'shield') return getArmorCategorySentenceForm('shields', 1)
+  return getTermLabelSingular(getCreatureArmorClassKindLabel('armor'))
+}
+
+export function formatMonsterArmorSlotAddLabel(slot: CreatureArmorSlot): string {
+  return `${MONSTER_ADD_LABEL} ${monsterArmorSlotMidSentenceNoun(slot)}`
+}
+
+export function formatMonsterArmorSlotChangeLabel(slot: CreatureArmorSlot): string {
+  return `Change ${monsterArmorSlotMidSentenceNoun(slot)}`
+}
+
+export function formatMonsterArmorSlotSelectLabel(slot: CreatureArmorSlot): string {
+  return `Select ${monsterArmorSlotMidSentenceNoun(slot)}`
+}
+
+export const MONSTER_ARMOR_SLOT_EMPTY_LABEL = 'None selected'
+
+export function getMonsterArmorSlotUiCopy(slot: CreatureArmorSlot): {
+  add: string
+  change: string
+  select: string
+} {
+  return {
+    add: formatMonsterArmorSlotAddLabel(slot),
+    change: formatMonsterArmorSlotChangeLabel(slot),
+    select: formatMonsterArmorSlotSelectLabel(slot),
+  }
+}
+
 export const MONSTER_KIND_LABEL = getMonsterActionKindFieldLabel()
 export const MONSTER_ACTION_NAME_LABEL = 'Name'
 export const MONSTER_TRIGGER_LABEL = getMonsterReactionFieldLabel('trigger')
@@ -236,6 +256,38 @@ export type EquipmentRemovalConfirmCopyInput = {
   referencedActionCount: number
   referencedActionSummary?: string
   customizationSummary?: string
+}
+
+export const MONSTER_ARMOR_SLOT_REPLACEMENT_SCOPE = 'This replaces every piece in the slot.'
+
+export function formatArmorSlotReplacementConfirmCopy(input: {
+  flagged: readonly EquipmentRemovalConfirmCopyInput[]
+}): {
+  headline: string
+  description: string
+  confirmLabel: string
+} {
+  const flagged = input.flagged[0]
+  if (input.flagged.length === 1 && flagged) {
+    const copy = formatEquipmentRemovalConfirmCopy(flagged)
+    return {
+      headline: copy.headline,
+      description: `${MONSTER_ARMOR_SLOT_REPLACEMENT_SCOPE} ${copy.description}`,
+      confirmLabel: copy.confirmLabel,
+    }
+  }
+
+  const details = input.flagged
+    .map((entry) => {
+      const copy = formatEquipmentRemovalConfirmCopy(entry)
+      return `${entry.displayName}: ${copy.description}`
+    })
+    .join(' ')
+  return {
+    headline: 'Replace this slot?',
+    description: `${MONSTER_ARMOR_SLOT_REPLACEMENT_SCOPE} ${details}`,
+    confirmLabel: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL,
+  }
 }
 
 export function formatEquipmentRemovalConfirmCopy({

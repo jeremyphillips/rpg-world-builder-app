@@ -235,4 +235,51 @@ describe('group field container', () => {
       shell as HTMLElement,
     )
   })
+
+  it.each(['comfortable', 'compact'] as const)(
+    'wires headingScale field through group config at %s density',
+    (density) => {
+      const fields: FormItem[] = [
+        {
+          kind: 'group',
+          legend: 'Armor',
+          fields: [
+            {
+              kind: 'group',
+              legend: 'Advanced options',
+              description: 'Optional tuning.',
+              headingScale: 'field',
+              fields: [{ type: 'text', name: 'note', label: 'Note' }],
+            },
+          ],
+        },
+      ]
+
+      render(
+        <Form
+          schema={schema}
+          density={density}
+          fields={fields}
+          defaultValues={{ note: '' }}
+          onSubmit={vi.fn()}
+        />,
+      )
+
+      const parentTitle = screen.getByText('Armor')
+      expect(parentTitle).toHaveClass(
+        density === 'compact' ? 'text-style-field-legend-compact' : 'text-style-field-legend',
+      )
+      const childTitle = screen.getByText('Advanced options')
+      expect(childTitle).toHaveClass(
+        density === 'compact' ? 'text-style-field-label-sm' : 'text-style-field-label-md',
+      )
+      expect(childTitle.className).not.toMatch(/text-style-field-legend/)
+      const description = screen.getByText('Optional tuning.')
+      expect(description).toHaveClass('text-style-caption')
+      expect(description).not.toHaveClass(
+        'text-style-field-group-description',
+        'text-style-field-group-description-compact',
+      )
+    },
+  )
 })

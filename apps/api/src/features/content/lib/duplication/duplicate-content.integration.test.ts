@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  DEFAULT_ARMOR_CLASS_BASE,
   deriveMonsterStatBlock,
   ELDRITCH_BLAST_RESOLUTION,
   monsterSchema,
@@ -49,7 +50,6 @@ describe('duplicate content routes', () => {
     category: 'light' as const,
     cost: { amount: 15, currency: 'gp' as const },
     baseAc: 12,
-    addDexModifier: true,
     stealthDisadvantage: false,
   }
 
@@ -329,11 +329,15 @@ describe('duplicate content routes', () => {
       monster: skeleton!,
       equipmentCatalog,
       skillCatalog,
+      acBase: DEFAULT_ARMOR_CLASS_BASE,
+      magicPropertyProvider: () => undefined,
     })
     const copyBlock = deriveMonsterStatBlock({
       monster: copy,
       equipmentCatalog,
       skillCatalog,
+      acBase: DEFAULT_ARMOR_CLASS_BASE,
+      magicPropertyProvider: () => undefined,
     })
 
     expect(copyBlock.attacks).toEqual(sourceBlock.attacks)

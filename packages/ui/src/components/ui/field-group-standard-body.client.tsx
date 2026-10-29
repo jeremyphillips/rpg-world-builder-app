@@ -21,6 +21,7 @@ import {
   resolveFieldGroupBodyGap,
   type FieldGroupLegendSize,
   type FieldRhythm,
+  type GroupHeadingScale,
 } from './field.variants'
 
 function useGroupCollapseState(options: {
@@ -64,10 +65,12 @@ function wrapFieldGroupBody(
 export type StandardFieldGroupBodyProps = {
   id?: string
   legend?: string
+  legendSrOnly?: boolean
   description?: string
   legendAccessory?: React.ReactNode
   legendAction?: React.ReactNode
   legendSize: FieldGroupLegendSize
+  headingScale?: GroupHeadingScale
   legendTypography: string
   fieldSize: FieldSizeToken
   rhythm: FieldRhythm
@@ -84,10 +87,12 @@ export type StandardFieldGroupBodyProps = {
 export function StandardFieldGroupBody({
   id,
   legend,
+  legendSrOnly = false,
   description,
   legendAccessory,
   legendAction,
   legendSize,
+  headingScale,
   legendTypography,
   fieldSize,
   rhythm,
@@ -110,7 +115,7 @@ export function StandardFieldGroupBody({
   const hasBody = React.Children.count(children) > 0
   const bodyVisible = hasBody && (!collapsible || open)
   const bodyGapClass =
-    legend && bodyVisible
+    legend && bodyVisible && !legendSrOnly
       ? resolveFieldGroupBodyGap({ size: legendSize, rhythm, fieldSize })
       : undefined
 
@@ -126,7 +131,13 @@ export function StandardFieldGroupBody({
     <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeClasses.body)}>{children}</div>
   )
 
-  const bodyWithGap = wrapFieldGroupBody(body, bodyGapClass)
+  // Keep one wrapper element across open and closed. Adding the gap div only
+  // while open remounts the body, and `shouldUnregister` then clears values.
+  const bodyWithGap = collapsible ? (
+    <div className={bodyGapClass}>{body}</div>
+  ) : (
+    wrapFieldGroupBody(body, bodyGapClass)
+  )
 
   const Wrapper = legend ? 'fieldset' : 'div'
 
@@ -135,10 +146,12 @@ export function StandardFieldGroupBody({
       {legend ? (
         <FieldGroupLegend
           legend={legend}
+          legendSrOnly={legendSrOnly}
           description={description}
           legendAccessory={legendAccessory}
           legendAction={legendAction}
           legendTypography={legendTypography}
+          headingScale={headingScale}
           rhythm={rhythm}
           legendChromeClassName={chromeClasses.legend}
           collapsible={collapsible}

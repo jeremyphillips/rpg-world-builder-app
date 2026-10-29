@@ -14,9 +14,6 @@ export function getArmorStatRows(item: ArmorEquipment): ContentStatRowData[] {
   return [
     { label: 'Category', value: getArmorCategorySummaryLabel(item.category) },
     { label: 'AC', value: getArmorAcDisplay(item) },
-    ...(item.maxDexBonus !== undefined
-      ? [{ label: 'Max Dex Bonus', value: String(item.maxDexBonus) }]
-      : []),
     {
       label: 'Stealth',
       value: item.stealthDisadvantage ? 'Disadvantage' : '—',

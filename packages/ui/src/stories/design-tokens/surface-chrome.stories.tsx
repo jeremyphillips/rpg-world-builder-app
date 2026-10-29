@@ -73,11 +73,11 @@ const OWNERSHIP_ROWS = [
 const INTERACTION_SAMPLES = [
   {
     label: 'control-hover',
-    className: 'rounded-md bg-control-hover px-3 py-2 text-sm text-foreground',
+    className: 'rounded-md bg-control-hover px-3 py-2 text-style-body-compact',
   },
   {
     label: 'control-selected',
-    className: 'rounded-md bg-control-selected px-3 py-2 text-sm text-foreground',
+    className: 'rounded-md bg-control-selected px-3 py-2 text-style-body-compact',
   },
   {
     label: 'drop-target',

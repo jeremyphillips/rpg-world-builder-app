@@ -165,7 +165,6 @@ export const LoadoutOwned: Story = {
     onOpenChange: () => undefined,
     items: [equipmentPickerItemsFixture[0]!],
     workflowMode: 'loadout',
-    workflowModes: ['loadout'],
     resolveRowActionViewModel: () => ({
       kind: 'loadout',
       ownedQuantity: 1,
@@ -301,16 +300,30 @@ export const AbilityScoreRequirements: Story = {
   },
 }
 
+export const Selection: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    title: 'Select armor',
+    items: equipmentPickerItemsFixture.slice(0, 2),
+    workflowMode: 'loadout',
+    selection: { value: null, onValueChange: () => undefined },
+    footer: <Button>Select armor</Button>,
+  },
+}
+
 export const MagicItemsWorkflow: Story = {
   args: {
     open: true,
     onOpenChange: () => undefined,
     items: equipmentPickerMagicItemsFixture,
     workflowMode: 'magic_items',
-    workflowModes: ['purchase', 'magic_items'],
+    workflowSwitcher: {
+      modes: ['purchase', 'magic_items'],
+      onChange: () => undefined,
+    },
     magicItemAllowances: equipmentPickerMagicItemAllowancesFixture,
     magicItemGrantProgress: equipmentPickerMagicItemProgressFixture,
-    onWorkflowModeChange: () => undefined,
     onFocusedAllowanceIdChange: () => undefined,
     onCommitAdd: () => undefined,
   },

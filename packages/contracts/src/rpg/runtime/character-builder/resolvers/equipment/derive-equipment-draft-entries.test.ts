@@ -37,7 +37,6 @@ const leatherArmor = equipmentSchema.parse({
   kind: 'armor',
   category: 'light',
   baseAc: 11,
-  addDexModifier: true,
   stealthDisadvantage: false,
 })
 
@@ -57,7 +56,6 @@ const shield = equipmentSchema.parse({
   kind: 'armor',
   category: 'shields',
   acBonus: 2,
-  addDexModifier: false,
   stealthDisadvantage: false,
 })
 

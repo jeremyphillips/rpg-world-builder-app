@@ -12,6 +12,7 @@ import {
   type Species,
   type WeaponCategory,
   isWeaponEquipment,
+  resolveMechanicsPatch,
 } from '@rpg/contracts'
 
 import { useCampaignRules } from '@/features/campaign'
@@ -314,6 +315,8 @@ export function useContentFormOptions(campaignId: string | undefined): {
         : catalog.skillsQuery.isPending
           ? 'pending'
           : 'ready',
+      armorClassBase:
+        rulesetPatch?.mechanics.armorClass.base ?? resolveMechanicsPatch().armorClass.base,
     }),
     [
       campaignId,
@@ -328,6 +331,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
       catalog.equipmentQuery.isPending,
       catalog.skillsQuery.isError,
       catalog.skillsQuery.isPending,
+      rulesetPatch?.mechanics.armorClass.base,
     ],
   )
 

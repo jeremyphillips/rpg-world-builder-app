@@ -22,6 +22,8 @@ const INCREASE_LABEL_PREFIX = 'Increase'
 
 export function useNumberStepperInteraction(args: {
   value: number
+  /** Empty form value. Decrement stays disabled and increment seeds from `stepNumber`. */
+  unbound?: boolean
   onChange: (value: number) => void
   min: number
   max: number
@@ -31,7 +33,18 @@ export function useNumberStepperInteraction(args: {
   ariaLabel: string
   signDisplay?: NumberStepperSignDisplay
 }) {
-  const { value, onChange, min, max, step, disabled, minAction, ariaLabel, signDisplay } = args
+  const {
+    value,
+    unbound = false,
+    onChange,
+    min,
+    max,
+    step,
+    disabled,
+    minAction,
+    ariaLabel,
+    signDisplay,
+  } = args
 
   const resolvedSignDisplay = resolveNumberStepperSignDisplay(signDisplay)
 
@@ -68,16 +81,23 @@ export function useNumberStepperInteraction(args: {
     step,
     stepperMin: min,
     stepperMax: max,
-    value: numberStepperInputValueForBinding(resolvedSignDisplay, resolvedValue, value),
+    value: unbound
+      ? ''
+      : numberStepperInputValueForBinding(resolvedSignDisplay, resolvedValue, value),
     onChange: handleChange,
   })
 
   const handleBump = React.useCallback(
     (direction: 'up' | 'down') => {
       if (disabled) return
+      if (unbound) {
+        if (direction === 'down') return
+        onChange(stepNumber(undefined, 'up', stepOptions))
+        return
+      }
       onChange(stepNumber(resolvedValue, direction, stepOptions))
     },
-    [disabled, onChange, resolvedValue, stepOptions],
+    [disabled, onChange, resolvedValue, stepOptions, unbound],
   )
 
   const showRemoveAtMin = (minAction?.mode ?? 'disable') === 'remove' && resolvedValue === min
@@ -105,10 +125,10 @@ export function useNumberStepperInteraction(args: {
   return {
     resolvedValue,
     resolvedSignDisplay,
-    showRemoveAtMin,
-    leftDisabled: stepperActions.leftDisabled,
-    stepperLocked: stepperActions.stepperLocked,
-    incrementDisabled: disabled || numberInput.incrementDisabled,
+    showRemoveAtMin: unbound ? false : showRemoveAtMin,
+    leftDisabled: unbound || stepperActions.leftDisabled,
+    stepperLocked: unbound ? disabled : stepperActions.stepperLocked,
+    incrementDisabled: unbound ? disabled : disabled || numberInput.incrementDisabled,
     leftAriaLabel,
     increaseLabel: `${INCREASE_LABEL_PREFIX} ${ariaLabel}`,
     handleLeftClick,

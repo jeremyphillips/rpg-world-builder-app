@@ -23,7 +23,6 @@ function armor(slug: string, name: string) {
     kind: 'armor',
     category: 'light',
     baseAc: 11,
-    addDexModifier: true,
     stealthDisadvantage: false,
   })
 }
@@ -80,7 +79,6 @@ describe('collectMonsterCatalogIssues', () => {
   it('blocks unknown equipment, non-weapon actions, and armor modifiers on every intent', () => {
     const issues = collectMonsterCatalogIssues(
       {
-        armorClass: { kind: 'unarmored' },
         equipment: [
           { entryId: 'missing', equipmentId: 'nope', equipped: true },
           { entryId: 'leather', equipmentId: leather.id, equipped: true },
@@ -107,13 +105,12 @@ describe('collectMonsterCatalogIssues', () => {
     ])
   })
 
-  it('blocks a second equipped body armor and accepts unequipped weapon references', () => {
+  it('blocks a second owned body armor even when one is unequipped', () => {
     const issues = collectMonsterCatalogIssues(
       {
-        armorClass: { kind: 'natural' },
         equipment: [
-          { entryId: 'leather', equipmentId: leather.id, equipped: true },
-          { entryId: 'chain', equipmentId: chain.id, equipped: true },
+          { entryId: 'leather', equipmentId: leather.id, equipped: true, quantity: 1 },
+          { entryId: 'chain', equipmentId: chain.id, equipped: false, quantity: 1 },
           { entryId: 'dagger', equipmentId: dagger.id, equipped: false },
         ],
         actions: [{ kind: 'weapon', equipmentEntryId: 'dagger' }],
@@ -123,31 +120,67 @@ describe('collectMonsterCatalogIssues', () => {
     )
     expect(issues).toEqual([
       expect.objectContaining({
-        code: MONSTER_CATALOG_ISSUE_CODE.multipleEquippedBodyArmor,
-        path: 'equipment.1.equipped',
+        code: MONSTER_CATALOG_ISSUE_CODE.multipleOwnedBodyArmor,
+        path: 'equipment.1',
       }),
     ])
   })
 
-  it('requires equipped body armor only when publishing equipment Armor Class', () => {
-    const body = { armorClass: { kind: 'equipment' }, equipment: [] }
-    expect(collectMonsterCatalogIssues(body, readyCatalogs(), 'draft')).toEqual([])
-    expect(collectMonsterCatalogIssues(body, readyCatalogs(), 'publish')).toEqual([
+  it('reports slot quantity and a second shield on draft and publish', () => {
+    const shield = equipmentSchema.parse({
+      ...leather,
+      id: `${RULESET}:shield`,
+      slug: 'shield',
+      name: 'Shield',
+      category: 'shields',
+      baseAc: undefined,
+      acBonus: 2,
+    })
+    const catalogs = readyCatalogs({
+      equipmentById: new Map([...readyCatalogs().equipmentById, [shield.id, shield]]),
+    })
+    const body = {
+      equipment: [
+        { entryId: 'leather', equipmentId: leather.id, quantity: 2, equipped: true },
+        { entryId: 'shield-a', equipmentId: shield.id, quantity: 1, equipped: false },
+        { entryId: 'shield-b', equipmentId: shield.id, quantity: 1, equipped: true },
+      ],
+    }
+    const expected = [
       expect.objectContaining({
-        code: MONSTER_CATALOG_ISSUE_CODE.equipmentAcMissingBodyArmor,
-        path: 'armorClass.kind',
+        code: MONSTER_CATALOG_ISSUE_CODE.armorSlotQuantity,
+        path: 'equipment.0.quantity',
       }),
-    ])
+      expect.objectContaining({
+        code: MONSTER_CATALOG_ISSUE_CODE.multipleOwnedShield,
+        path: 'equipment.2',
+      }),
+    ]
+    expect(collectMonsterCatalogIssues(body, catalogs, 'draft')).toEqual(expected)
+    expect(collectMonsterCatalogIssues(body, catalogs, 'publish')).toEqual(expected)
   })
 
-  it('does not flag equipped body armor under natural Armor Class', () => {
+  it('accepts one owned body armor and one shield', () => {
+    const shield = equipmentSchema.parse({
+      ...leather,
+      id: `${RULESET}:shield`,
+      slug: 'shield',
+      name: 'Shield',
+      category: 'shields',
+      baseAc: undefined,
+      acBonus: 2,
+    })
     expect(
       collectMonsterCatalogIssues(
         {
-          armorClass: { kind: 'natural' },
-          equipment: [{ entryId: 'leather', equipmentId: leather.id, equipped: true }],
+          equipment: [
+            { entryId: 'leather', equipmentId: leather.id, equipped: true, quantity: 1 },
+            { entryId: 'shield', equipmentId: shield.id, equipped: true, quantity: 1 },
+          ],
         },
-        readyCatalogs(),
+        readyCatalogs({
+          equipmentById: new Map([...readyCatalogs().equipmentById, [shield.id, shield]]),
+        }),
         'publish',
       ),
     ).toEqual([])

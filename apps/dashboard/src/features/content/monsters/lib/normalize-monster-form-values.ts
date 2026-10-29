@@ -86,15 +86,14 @@ function normalizeAction(
 }
 
 function normalizeArmorClass(armorClass: MonsterFormValues['armorClass']): Record<string, unknown> {
-  if (armorClass.kind === 'natural') {
-    return { kind: 'natural', bonus: armorClass.bonus }
+  const next: Record<string, unknown> = {}
+  if (typeof armorClass.naturalArmorBonus === 'number' && armorClass.naturalArmorBonus > 0) {
+    next.naturalArmorBonus = armorClass.naturalArmorBonus
   }
-  if (armorClass.kind === 'fixed') {
-    const next: Record<string, unknown> = { kind: 'fixed' }
-    if ('value' in armorClass && armorClass.value !== undefined) next.value = armorClass.value
-    return next
+  if (armorClass.useFixedAc && typeof armorClass.fixedValue === 'number') {
+    next.fixedValue = armorClass.fixedValue
   }
-  return { kind: armorClass.kind }
+  return next
 }
 
 function normalizeHitPoints(hitPoints: MonsterFormValues['hitPoints']): Record<string, unknown> {

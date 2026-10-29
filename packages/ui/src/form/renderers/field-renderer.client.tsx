@@ -11,7 +11,10 @@ import {
 import { CheckboxField } from '../../components/ui/checkbox-field'
 import { ChipsField } from '../../components/ui/chips-field.client'
 import { ComboboxFieldRenderer } from './fields/combobox-field-renderer.client'
+import { FormField } from '../../components/ui/form-field'
 import { NumberField } from '../../components/ui/number-field'
+import { NumberStepper } from '../../components/ui/number-stepper.client'
+import { resolveNumberStepperSizeFromFieldSize } from '../../components/ui/number-stepper.variants'
 import { RadioCardField } from '../../components/ui/radio-card-field'
 import { RadioGroupField } from '../../components/ui/radio-group-field'
 import { SwitchField } from '../../components/ui/switch-field'
@@ -87,6 +90,21 @@ const LazyEditableGridFieldRenderer = lazyFieldComponent<EditableGridFieldRender
   'EditableGridFieldRenderer',
 )
 
+/**
+ * Steppers with a `defaultValue` keep the numeric fallback. A stepper with no
+ * default, such as Base AC, stays blank until the author steps or types a number.
+ */
+function resolveNumberStepperBinding(
+  fieldValue: unknown,
+  config: { defaultValue?: number; min?: number },
+): { value: number; unbound: boolean } {
+  if (typeof fieldValue === 'number') return { value: fieldValue, unbound: false }
+  if (config.defaultValue !== undefined) {
+    return { value: config.defaultValue ?? config.min ?? 0, unbound: false }
+  }
+  return { value: 0, unbound: true }
+}
+
 /** Parses a numeric `<input>` value into `number | undefined` (option A). */
 function parseNumber(raw: string): number | undefined {
   if (raw.trim() === '') return undefined
@@ -101,6 +119,7 @@ interface RenderArgs<K extends FieldType> {
   id: string
   hint?: string
   hintPosition?: FieldHintPosition
+  hintIcon?: 'info'
   labelVisibility: FieldLabelVisibility
   error?: string
   invalid?: boolean
@@ -179,35 +198,68 @@ const fieldRenderers: {
     id,
     hint,
     hintPosition,
+    hintIcon,
     labelVisibility,
     ...validation
-  }) => (
-    <NumberField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      {...fieldValidationProps(validation)}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      inputWidth={config.inputWidth}
-      size={controlSize}
-      placeholder={config.placeholder}
-      disabled={config.disabled}
-      step={config.step}
-      stepperMin={config.min}
-      stepperMax={config.max}
-      digits={config.digits}
-      labelPosition={config.labelPosition}
-      ref={field.ref}
-      value={field.value ?? ''}
-      onChange={(event) => field.onChange(parseNumber(event.target.value))}
-      onBlur={field.onBlur}
-    />
-  ),
+  }) =>
+    config.control === 'stepper' ? (
+      <FormField
+        id={id}
+        {...pickFieldChromeProps(config)}
+        label={config.label}
+        labelVisibility={labelVisibility}
+        labelPosition={config.labelPosition}
+        {...fieldValidationProps(validation)}
+        hint={hint}
+        hintPosition={hintPosition}
+        hintIcon={hintIcon}
+        info={config.info}
+        required={config.required}
+        width={config.width}
+        size={controlSize}
+      >
+        <NumberStepper
+          id={id}
+          {...resolveNumberStepperBinding(field.value, config)}
+          onChange={field.onChange}
+          min={config.min}
+          max={config.max}
+          step={config.step}
+          digits={config.digits}
+          size={resolveNumberStepperSizeFromFieldSize(controlSize)}
+          disabled={config.disabled}
+          aria-label={config.label}
+          aria-invalid={validation.invalid || undefined}
+          onBlur={field.onBlur}
+        />
+      </FormField>
+    ) : (
+      <NumberField
+        id={id}
+        {...pickFieldChromeProps(config)}
+        label={config.label}
+        labelVisibility={labelVisibility}
+        {...fieldValidationProps(validation)}
+        hint={hint}
+        hintPosition={hintPosition}
+        info={config.info}
+        required={config.required}
+        width={config.width}
+        inputWidth={config.inputWidth}
+        size={controlSize}
+        placeholder={config.placeholder}
+        disabled={config.disabled}
+        step={config.step}
+        stepperMin={config.min}
+        stepperMax={config.max}
+        digits={config.digits}
+        labelPosition={config.labelPosition}
+        ref={field.ref}
+        value={field.value ?? ''}
+        onChange={(event) => field.onChange(parseNumber(event.target.value))}
+        onBlur={field.onBlur}
+      />
+    ),
   textarea: ({
     config,
     controlSize,
@@ -671,6 +723,7 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
       controlSize={resolved.controlSize}
       hint={resolved.hint}
       hintPosition={resolved.hintPosition}
+      hintIcon={resolved.hintIcon}
       fullName={fullName}
       id={id}
       namePrefix={namePrefix}
@@ -699,6 +752,7 @@ interface StandardFieldRendererProps {
   controlSize: FieldSize
   hint?: string
   hintPosition?: FieldHintPosition
+  hintIcon?: 'info'
   fullName: string
   id: string
   namePrefix?: string
@@ -710,6 +764,7 @@ function StandardFieldRenderer({
   controlSize,
   hint,
   hintPosition,
+  hintIcon,
   fullName,
   id,
   namePrefix,
@@ -781,6 +836,7 @@ function StandardFieldRenderer({
     id,
     hint,
     hintPosition,
+    hintIcon,
     labelVisibility,
     ...validation,
     remotePreview,

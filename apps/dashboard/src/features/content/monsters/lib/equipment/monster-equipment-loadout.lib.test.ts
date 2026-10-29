@@ -5,9 +5,11 @@ import { pickEquipment } from '@/test/fixtures/pick'
 import { EQUIPMENT_INVENTORY_GROUP_LABELS } from '../../../equipment/lib/inventory/equipment-inventory-group-labels.lib'
 
 import {
+  createPlainMonsterEquipmentEntry,
   groupMonsterEquipmentByKind,
   incrementMonsterPlainStack,
   incrementMonsterPlainStacks,
+  replaceMonsterArmorSlotEntry,
   setMonsterPlainStackQuantity,
 } from './monster-equipment-loadout.lib'
 
@@ -106,6 +108,24 @@ describe('monster-equipment-loadout.lib', () => {
       EQUIPMENT_INVENTORY_GROUP_LABELS.gear,
     ])
     expect(groups[1]?.entries.map((entry) => entry.entryId)).toEqual(['r1', 'bad'])
+  })
+
+  it('replaces the owned body armor and leaves other gear', () => {
+    const leather = pickEquipment('leather-armor')
+    const chain = pickEquipment('chain-mail')
+    const dagger = pickEquipment('dagger')
+    const catalog = new Map([leather, chain, dagger].map((item) => [item.id, item]))
+    const next = replaceMonsterArmorSlotEntry(
+      [createPlainMonsterEquipmentEntry(leather.id), createPlainMonsterEquipmentEntry(dagger.id)],
+      'body-armor',
+      chain.id,
+      catalog,
+    )
+    expect(next.map((entry) => entry.equipmentId)).toEqual([dagger.id, chain.id])
+    expect(next.find((entry) => entry.equipmentId === chain.id)).toMatchObject({
+      quantity: 1,
+      equipped: true,
+    })
   })
 
   it('removes the plain stack when quantity hits zero', () => {

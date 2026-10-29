@@ -37,7 +37,7 @@ describe('resolveEquipmentRemovalDecision', () => {
     values.equipment = [entry]
     const decision = resolveEquipmentRemovalDecision(values, entry)
     expect(decision).toEqual({
-      requiresConfirmation: false,
+      outcome: 'allowed',
       reasons: [],
       references: [],
     })
@@ -47,7 +47,7 @@ describe('resolveEquipmentRemovalDecision', () => {
     const entry = { entryId: 'mag', equipmentId: 'dagger', quantity: 1, magical: true }
     values.equipment = [entry]
     const decision = resolveEquipmentRemovalDecision(values, entry)
-    expect(decision.requiresConfirmation).toBe(false)
+    expect(decision.outcome).toBe('allowed')
     expect(decision.reasons).toEqual([])
   })
 
@@ -61,7 +61,7 @@ describe('resolveEquipmentRemovalDecision', () => {
     values.equipment = [entry, { entryId: 'stack-b', equipmentId: 'dagger', quantity: 1 }]
     values.actions = [{ id: 'stab', kind: 'weapon', equipmentEntryId: 'stack-a', name: 'Stab' }]
     const decision = resolveEquipmentRemovalDecision(values, entry)
-    expect(decision.requiresConfirmation).toBe(true)
+    expect(decision.outcome).toBe('confirm')
     expect(decision.reasons).toEqual(['customized', 'referenced'])
     expect(decision.references).toHaveLength(1)
   })
@@ -77,7 +77,7 @@ describe('resolveEquipmentRemovalDecision', () => {
       equipmentId: 'dagger',
       quantity: 1,
     })
-    expect(decision.requiresConfirmation).toBe(false)
+    expect(decision.outcome).toBe('allowed')
     expect(decision.references).toEqual([])
   })
 })

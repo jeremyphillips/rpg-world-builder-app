@@ -6,7 +6,6 @@ import { describe, expect, it } from 'vitest'
 
 const uiDir = join(dirname(fileURLToPath(import.meta.url)), '.')
 const stylesDir = join(uiDir, '../../styles')
-const formChromePath = join(uiDir, '../../form/chrome/form-chrome.css')
 
 function readUtilityBlock(css: string, utilityName: string): string {
   const start = css.indexOf(`@utility ${utilityName}`)
@@ -31,8 +30,6 @@ describe('pill and badge surfaces', () => {
     join(stylesDir, 'surface-relative-chrome.utilities.css'),
     'utf8',
   )
-  const formChromeCss = readFileSync(formChromePath, 'utf8')
-
   it('matches border-semantic-neutral-border mix ingredients (surface-relative at use time)', () => {
     const utilityBlock = readUtilityBlock(surfaceUtilitiesCss, 'border-semantic-neutral-border')
     expectSurfaceRelativeNeutralBorderMix(utilityBlock)

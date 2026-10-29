@@ -60,6 +60,7 @@ import type {
   FieldHintPosition,
   FieldLabelPosition,
   FieldSeparator,
+  GroupHeadingScale,
 } from '../components/ui/field.variants'
 import type { FieldLayoutRecommendation } from '../components/ui/field-recommendation.types'
 import type { FormDensity } from './form-density'
@@ -301,10 +302,15 @@ export interface FieldDynamicRecommendation {
   ) => FieldLayoutRecommendation | null
 }
 
+/** Decorative mark rendered inside the hint element so `aria-describedby` still points at it. */
+export type FieldHintIcon = 'info'
+
 /** Static and dynamic hint configuration on leaf fields. */
 export interface FieldHintConfig {
   text?: string
   position?: FieldHintPosition
+  /** Info icon inside the hint. Shown only while hint text is present. */
+  icon?: FieldHintIcon
   resolve?: FieldDynamicHint
 }
 
@@ -496,6 +502,11 @@ export interface NumberFieldConfig extends BaseFieldConfig {
   digits?: FieldDigits
   /** `above` (default) — label over control. `settings` — label + hint left, control right. */
   labelPosition?: FieldLabelPosition
+  /**
+   * `input` (default) keeps the text number field.
+   * `stepper` renders the shared `NumberStepper` for small bounded integers.
+   */
+  control?: 'input' | 'stepper'
 }
 
 export interface TextareaFieldConfig extends BaseFieldConfig {
@@ -1219,7 +1230,7 @@ export interface DependentConfig {
  * Named fieldset subsection (`kind: 'group'`).
  *
  * Common options: `legend`, `fields`, `density`, `chrome`, `disclosure`,
- * `description`, `visibility`.
+ * `description`, `headingScale`, `visibility`.
  * Use `defineGroupField()` for completion.
  *
  * @example
@@ -1238,6 +1249,13 @@ export interface GroupConfig {
   /** When omitted, renders as a layout/visibility wrapper without a legend. */
   legend?: string
   description?: string
+  /**
+   * When `'field'`, legend and description use this group's field label and hint
+   * type scale. Omit for structural legend type from nesting depth. Typography
+   * only — spacing, disclosure, and legend semantics stay unchanged. There is
+   * no separate legend or description size.
+   */
+  headingScale?: GroupHeadingScale
   fields: GroupFieldItem[]
   className?: string
   /** Optional DOM id on the fieldset — for in-page scroll anchors. */
@@ -1914,6 +1932,7 @@ export function hiddenFieldNames(items: FormItem[], values: Record<string, unkno
 export function normalizeFieldHint(hint: string | FieldHintConfig | undefined): {
   text?: string
   position: FieldHintPosition
+  icon?: FieldHintIcon
   resolve?: FieldDynamicHint
 } {
   if (hint === undefined) {
@@ -1925,6 +1944,7 @@ export function normalizeFieldHint(hint: string | FieldHintConfig | undefined): 
   return {
     text: hint.text,
     position: hint.position ?? 'below-label',
+    icon: hint.icon,
     resolve: hint.resolve,
   }
 }
@@ -2023,11 +2043,13 @@ export function resolveFieldHintPosition(field: Pick<BaseFieldConfig, 'hint'>): 
 export function resolveFieldHintPresentation(
   field: Pick<BaseFieldConfig, 'hint'>,
   values: Record<string, unknown>,
-): { text?: string; position: FieldHintPosition } {
+): { text?: string; position: FieldHintPosition; icon?: FieldHintIcon } {
   const normalized = normalizeFieldHint(field.hint)
+  const text = normalized.resolve?.hintWhen(values) ?? normalized.text
   return {
-    text: normalized.resolve?.hintWhen(values) ?? normalized.text,
+    text,
     position: normalized.position,
+    ...(text && normalized.icon ? { icon: normalized.icon } : {}),
   }
 }
 

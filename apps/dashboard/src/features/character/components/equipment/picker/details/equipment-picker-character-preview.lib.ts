@@ -6,6 +6,7 @@ import {
   isArmorEquipment,
   proficiencyBonus,
   resolveArmorClassIfEquipped,
+  resolveArmorDexterityRule,
   resolveEquippedArmorFromInventory,
   resolveInventoryWeaponAttackTotals,
   resolveWeaponAttackAbilityModifier,
@@ -97,7 +98,8 @@ function resolveArmorPreviewLine(
 ): string | undefined {
   const dexScore = context.abilityScores?.dex
   const needsDexScore =
-    equipment.category !== 'heavy' && equipment.category !== 'shields' && equipment.addDexModifier
+    equipment.category !== 'shields' &&
+    resolveArmorDexterityRule(equipment.category).mode !== 'none'
 
   if (needsDexScore && typeof dexScore !== 'number') return undefined
 

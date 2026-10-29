@@ -9,8 +9,11 @@ export { equipmentEntryHasMeaningfulCustomization } from './equipment-entry-cust
 
 export type EquipmentRemovalReason = 'customized' | 'referenced'
 
+/** `prohibited` is a hard stop. It must not be stored as a confirmable removal. */
+export type EquipmentRemovalOutcome = 'allowed' | 'confirm' | 'prohibited'
+
 export type EquipmentRemovalDecision = {
-  requiresConfirmation: boolean
+  outcome: EquipmentRemovalOutcome
   reasons: EquipmentRemovalReason[]
   references: MonsterEquipmentActionReference[]
 }
@@ -24,9 +27,8 @@ export function resolveEquipmentRemovalDecision(
   const reasons: EquipmentRemovalReason[] = []
   if (customized) reasons.push('customized')
   if (references.length > 0) reasons.push('referenced')
-  return {
-    requiresConfirmation: customized || references.length > 0,
-    reasons,
-    references,
+  if (reasons.length === 0) {
+    return { outcome: 'allowed', reasons, references }
   }
+  return { outcome: 'confirm', reasons, references }
 }

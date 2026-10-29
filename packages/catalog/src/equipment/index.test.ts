@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { EQUIPMENT_KINDS } from '@rpg/contracts'
+import { EQUIPMENT_KINDS, getArmorAcDisplay } from '@rpg/contracts'
 
 import {
   EQUIPMENT_KIND_FILES,
@@ -178,9 +178,9 @@ describe('armor records in unified seed', () => {
     }
   })
 
-  it('plate has addDexModifier false and requires STR 15', () => {
+  it('plate follows heavy armor and requires STR 15', () => {
     const plate = getArmorBySlug(RULESET, 'plate-armor')
-    expect(plate.addDexModifier).toBe(false)
+    expect(getArmorAcDisplay(plate)).toBe('18 (no Dex)')
     expect(plate.abilityScoreRequirements).toEqual({ str: 15 })
   })
 
@@ -189,14 +189,9 @@ describe('armor records in unified seed', () => {
     expect(getArmorBySlug(RULESET, 'ring-mail').abilityScoreRequirements).toBeUndefined()
   })
 
-  it('leather has addDexModifier true and no maxDexBonus', () => {
-    const leather = getArmorBySlug(RULESET, 'leather-armor')
-    expect(leather.addDexModifier).toBe(true)
-    expect(leather.maxDexBonus).toBeUndefined()
-  })
-
-  it('chain-shirt has maxDexBonus 2', () => {
-    expect(getArmorBySlug(RULESET, 'chain-shirt').maxDexBonus).toBe(2)
+  it('derives light and medium DEX phrases from category', () => {
+    expect(getArmorAcDisplay(getArmorBySlug(RULESET, 'leather-armor'))).toBe('11 + Dex')
+    expect(getArmorAcDisplay(getArmorBySlug(RULESET, 'chain-shirt'))).toBe('13 + Dex (max 2)')
   })
 
   it('chain-mail requires STR 13', () => {

@@ -1,6 +1,9 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import type { Monster } from '@rpg/contracts'
+import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
+import { resolveMechanicsPatch, type Monster, type SystemRulesetId } from '@rpg/contracts'
+
+import { useRulesetPatch } from '@/features/homebrew'
 
 import {
   formatContentListLoadErrorMessage,
@@ -58,6 +61,13 @@ export function MonsterDetailContent({
 
   const equipmentQuery = useEquipment(campaignId)
   const skillsQuery = useSkillProficiencies(campaignId)
+  const { data: rulesetPatch } = useRulesetPatch(campaignId)
+  const rulesetId = (monster.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
+  const magicPropertyProvider = useMemo(
+    () => createMagicPropertyDefinitionProvider(rulesetId),
+    [rulesetId],
+  )
+  const acBase = rulesetPatch?.mechanics.armorClass.base ?? resolveMechanicsPatch().armorClass.base
   const equipment = equipmentQuery.data
   const skillProficiencies = skillsQuery.data
 
@@ -79,8 +89,11 @@ export function MonsterDetailContent({
 
   const derived = useMemo(() => {
     if (catalogState !== 'ready') return null
-    return tryDeriveMonsterStatBlock(monster, equipment ?? [], skillProficiencies ?? [])
-  }, [catalogState, equipment, monster, skillProficiencies])
+    return tryDeriveMonsterStatBlock(monster, equipment ?? [], skillProficiencies ?? [], {
+      acBase,
+      magicPropertyProvider,
+    })
+  }, [acBase, catalogState, equipment, magicPropertyProvider, monster, skillProficiencies])
 
   const equipmentById = useMemo(() => buildMonsterEquipmentCatalog(equipment ?? []), [equipment])
 

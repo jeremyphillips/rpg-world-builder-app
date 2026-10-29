@@ -365,8 +365,6 @@ const armorEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
   material: armorMaterialSchema.optional(),
   baseAc: z.number().int().optional(),
   acBonus: z.number().int().optional(),
-  addDexModifier: z.boolean().optional(),
-  maxDexBonus: z.number().int().optional(),
   stealthDisadvantage: z.boolean().optional(),
   abilityScoreRequirements: abilityScoreRequirementsSchema.optional(),
 })
@@ -597,3 +595,4 @@ export function isArmorEquipment(e: Equipment): e is ArmorEquipment {
 }
 
 export { isEquipmentStackable } from './equipment/stackable'
+export { resolveCreatureArmorSlot, type CreatureArmorSlot } from './equipment/armor-slot'

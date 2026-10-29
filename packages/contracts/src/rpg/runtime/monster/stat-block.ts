@@ -1,5 +1,4 @@
-import { DEFAULT_ARMOR_CLASS_BASE } from '../../campaign/patches/campaign-mechanics-patch'
-import { isArmorEquipment, isWeaponEquipment, type Equipment } from '../../content/equipment'
+import { isWeaponEquipment, type Equipment } from '../../content/equipment'
 import type { MonsterAction, MonsterBody } from '../../content/monster'
 import { getSkillName } from '../../content/skill-proficiency'
 import { NEUTRAL_ABILITY_SCORE } from '../../vocab/ability'
@@ -7,13 +6,8 @@ import { CHALLENGE_RATING_MECHANICS } from '../../vocab/challenge-rating'
 import { CREATURE_SIZE_HIT_DIE } from '../../vocab/creature-size'
 import type { ArmorClassBase } from '../../vocab/mechanics/edition-preset-mechanics'
 import { abilityModifier } from '../creature/ability-modifier'
-import {
-  dexModifierForArmor,
-  resolveEquippedArmorClass,
-  toEquippedArmorPieceForEntry,
-  type EquippedArmorPiece,
-} from '../creature/armor-class'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
+import { resolveMonsterArmorClass, type MonsterArmorClassResolution } from './armor-class'
 import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
 import { resolvePassivePerception, savingThrowBonus, skillModifier } from '../creature/checks'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
@@ -32,7 +26,6 @@ import {
   unavailableField,
   type DerivedField,
 } from './derived-field'
-import { getCreatureArmorClassKindLabel } from '../../vocab/creature-armor-class-kind'
 import {
   formatSignedModifier,
   formatWeaponDamageWithModifier,
@@ -53,36 +46,9 @@ export type DerivedMonsterAttackLine = {
   trigger?: string
 }
 
-export type MonsterArmorClassBodyContribution = {
-  entryId: string
-  label: string
-  base: number
-  dex: number
-  maxDexBonus?: number
-  adjustment: number
-}
-
-export type MonsterArmorClassShieldContribution = {
-  entryId: string
-  label: string
-  acBonus: number
-  adjustment: number
-}
-
-export type MonsterArmorClassBreakdown = {
-  source: 'unarmored' | 'natural' | 'equipment' | 'fixed'
-  label: string
-  base: number
-  appliedDex: number
-  naturalBonus?: number
-  fixedValue?: number
-  bodyArmor?: MonsterArmorClassBodyContribution
-  shields: MonsterArmorClassShieldContribution[]
-}
-
 export type DerivedMonsterStatBlock = {
   ac: number
-  acBreakdown: MonsterArmorClassBreakdown
+  acResolution: MonsterArmorClassResolution
   hp: number
   hpFormula: string
   hpClampedToMinimum: boolean
@@ -100,204 +66,12 @@ export type DeriveMonsterStatBlockInput = {
   monster: MonsterBody
   equipmentCatalog: CreatureEquipmentCatalog
   skillCatalog: CreatureSkillCatalog
-  acBase?: ArmorClassBase
-  magicPropertyProvider?: MagicPropertyDefinitionProvider
+  acBase: ArmorClassBase
+  magicPropertyProvider: MagicPropertyDefinitionProvider
 }
-
-const EMPTY_MAGIC_PROPERTY_PROVIDER: MagicPropertyDefinitionProvider = () => undefined
 
 function formatInitiativeLabel(modifier: number, dexScore: number): string {
   return `${formatSignedModifier(modifier)} (${dexScore})`
-}
-
-type ArmorContributionRow = {
-  entryId: string
-  label: string
-  item: Extract<Equipment, { kind: 'armor' }>
-  piece: EquippedArmorPiece
-}
-
-function equippedArmorRows(
-  monster: Pick<MonsterBody, 'equipment'>,
-  equipmentCatalog: CreatureEquipmentCatalog,
-  magicPropertyProvider: MagicPropertyDefinitionProvider,
-): ArmorContributionRow[] {
-  return (monster.equipment ?? [])
-    .filter((entry) => entry.equipped)
-    .flatMap((entry) => {
-      const item = equipmentCatalog.get(entry.equipmentId)
-      if (!item || !isArmorEquipment(item)) return []
-      return [
-        {
-          entryId: entry.entryId,
-          label: entry.customName ?? item.name,
-          item,
-          piece: toEquippedArmorPieceForEntry(item, entry, item, magicPropertyProvider),
-        },
-      ]
-    })
-}
-
-function shieldContribution(row: ArmorContributionRow): MonsterArmorClassShieldContribution {
-  return {
-    entryId: row.entryId,
-    label: row.label,
-    acBonus: row.item.acBonus ?? 0,
-    adjustment: row.piece.acAdjustment,
-  }
-}
-
-export function resolveMonsterArmorClass(args: {
-  monster: Pick<MonsterBody, 'armorClass' | 'equipment' | 'abilityScores'>
-  equipmentCatalog: CreatureEquipmentCatalog
-  acBase?: ArmorClassBase
-  magicPropertyProvider?: MagicPropertyDefinitionProvider
-}): DerivedField<{ ac: number; breakdown: MonsterArmorClassBreakdown }> {
-  const { monster, equipmentCatalog } = args
-  const acBase = args.acBase ?? DEFAULT_ARMOR_CLASS_BASE
-  const magicPropertyProvider = args.magicPropertyProvider ?? EMPTY_MAGIC_PROPERTY_PROVIDER
-  const armorClass = monster.armorClass
-  if (!armorClass) return unavailableField('missing-input')
-
-  const rows = equippedArmorRows(monster, equipmentCatalog, magicPropertyProvider)
-  const { shields, bodyArmor } = partitionEquippedArmor(rows)
-  const dexScore = monster.abilityScores?.dex
-  const blocked = armorClassBlocker(armorClass, bodyArmor, dexScore)
-  if (blocked) return blocked
-
-  const dexModifier = dexScore === undefined ? 0 : abilityModifier(dexScore)
-  const shieldEntries = shields.map(shieldContribution)
-  if (armorClass.kind === 'fixed') return resolveFixedArmorClass(armorClass.value)
-
-  return resolveVariableArmorClass({
-    armorClass,
-    rows,
-    shields,
-    bodyArmor,
-    acBase,
-    dexModifier,
-    shieldEntries,
-  })
-}
-
-function resolveVariableArmorClass(input: {
-  armorClass: Exclude<MonsterBody['armorClass'], { kind: 'fixed' }>
-  rows: ReturnType<typeof equippedArmorRows>
-  shields: ReturnType<typeof equippedArmorRows>
-  bodyArmor: ReturnType<typeof equippedArmorRows>
-  acBase: ArmorClassBase
-  dexModifier: number
-  shieldEntries: MonsterArmorClassBreakdown['shields']
-}): DerivedField<{ ac: number; breakdown: MonsterArmorClassBreakdown }> {
-  const { armorClass, rows, shields, bodyArmor, acBase, dexModifier, shieldEntries } = input
-  const naturalBonus = armorClass.kind === 'natural' ? armorClass.bonus : undefined
-  const participating = armorClass.kind === 'equipment' ? rows : shields
-  const shieldBonus = shields.reduce(
-    (sum, row) => sum + (row.item.acBonus ?? 0) + row.piece.acAdjustment,
-    0,
-  )
-  const ac =
-    armorClass.kind === 'natural'
-      ? acBase + dexModifier + (naturalBonus ?? 0) + shieldBonus
-      : resolveEquippedArmorClass({
-          acBase,
-          dexModifier,
-          equippedArmor: participating.map((row) => row.piece),
-        })
-  return resolvedField({
-    ac,
-    breakdown: armorClassBreakdown({
-      kind: armorClass.kind,
-      acBase,
-      dexModifier,
-      naturalBonus,
-      selectedBody: armorClass.kind === 'equipment' ? bodyArmor[0] : undefined,
-      shieldEntries,
-    }),
-  })
-}
-
-function armorClassBlocker(
-  armorClass: MonsterBody['armorClass'],
-  bodyArmor: ReturnType<typeof equippedArmorRows>,
-  dexScore: number | undefined,
-): DerivedField<{ ac: number; breakdown: MonsterArmorClassBreakdown }> | undefined {
-  if (bodyArmor.length > 1) return unavailableField('conflict')
-  if (armorClass.kind !== 'fixed' && dexScore === undefined)
-    return unavailableField('missing-input')
-  if (armorClass.kind === 'equipment' && bodyArmor.length === 0) {
-    return unavailableField('missing-reference')
-  }
-  if (armorClass.kind === 'natural' && armorClass.bonus === undefined) {
-    return unavailableField('missing-input')
-  }
-  return undefined
-}
-
-function partitionEquippedArmor(rows: ReturnType<typeof equippedArmorRows>): {
-  shields: ReturnType<typeof equippedArmorRows>
-  bodyArmor: ReturnType<typeof equippedArmorRows>
-} {
-  return {
-    shields: rows.filter((row) => row.item.category === 'shields'),
-    bodyArmor: rows.filter((row) => row.item.category !== 'shields'),
-  }
-}
-
-function resolveFixedArmorClass(
-  value: number | undefined,
-): DerivedField<{ ac: number; breakdown: MonsterArmorClassBreakdown }> {
-  if (value === undefined) return unavailableField('missing-input')
-  return resolvedField({
-    ac: value,
-    breakdown: {
-      source: 'fixed',
-      label: getCreatureArmorClassKindLabel('fixed'),
-      base: value,
-      appliedDex: 0,
-      fixedValue: value,
-      shields: [],
-    },
-  })
-}
-
-function armorClassBreakdown(input: {
-  kind: MonsterBody['armorClass']['kind']
-  acBase: number
-  dexModifier: number
-  naturalBonus: number | undefined
-  selectedBody: ReturnType<typeof equippedArmorRows>[number] | undefined
-  shieldEntries: MonsterArmorClassBreakdown['shields']
-}): MonsterArmorClassBreakdown {
-  const { kind, acBase, dexModifier, naturalBonus, selectedBody, shieldEntries } = input
-  const appliedDex = selectedBody
-    ? dexModifierForArmor(dexModifier, selectedBody.piece)
-    : dexModifier
-  return {
-    source: kind,
-    label: getCreatureArmorClassKindLabel(kind),
-    base: selectedBody?.item.baseAc ?? acBase,
-    appliedDex,
-    ...(naturalBonus !== undefined ? { naturalBonus } : {}),
-    ...(selectedBody ? { bodyArmor: bodyArmorContribution(selectedBody, appliedDex) } : {}),
-    shields: shieldEntries,
-  }
-}
-
-function bodyArmorContribution(
-  selectedBody: NonNullable<ReturnType<typeof equippedArmorRows>[number]>,
-  appliedDex: number,
-): NonNullable<MonsterArmorClassBreakdown['bodyArmor']> {
-  return {
-    entryId: selectedBody.entryId,
-    label: selectedBody.label,
-    base: selectedBody.item.baseAc ?? 0,
-    dex: appliedDex,
-    ...(selectedBody.item.maxDexBonus !== undefined
-      ? { maxDexBonus: selectedBody.item.maxDexBonus }
-      : {}),
-    adjustment: selectedBody.piece.acAdjustment,
-  }
 }
 
 function resolveFixedHitPoints(
@@ -490,8 +264,8 @@ export function deriveMonsterStatBlock({
   monster,
   equipmentCatalog,
   skillCatalog,
-  acBase = DEFAULT_ARMOR_CLASS_BASE,
-  magicPropertyProvider = EMPTY_MAGIC_PROPERTY_PROVIDER,
+  acBase,
+  magicPropertyProvider,
 }: DeriveMonsterStatBlockInput): DerivedMonsterStatBlock {
   const dexScore = monster.abilityScores.dex
   const proficiencyBonus = CHALLENGE_RATING_MECHANICS[monster.challengeRating].proficiencyBonus
@@ -538,7 +312,7 @@ export function deriveMonsterStatBlock({
 
   return {
     ac: armor.ac,
-    acBreakdown: armor.breakdown,
+    acResolution: armor,
     hp: hitPoints.hp,
     hpFormula: hitPoints.formula,
     hpClampedToMinimum: hitPoints.clampedToMinimum,
@@ -560,7 +334,7 @@ export type DerivedDraftAttack = {
 }
 
 export type DerivedMonsterDraftStatBlock = {
-  ac: DerivedField<{ ac: number; breakdown: MonsterArmorClassBreakdown }>
+  ac: DerivedField<MonsterArmorClassResolution>
   hp: DerivedField<{ hp: number; formula: string; clampedToMinimum: boolean }>
   initiative: DerivedField<{ modifier: number; label: string }>
   challenge: DerivedField<{ experiencePoints: number; proficiencyBonus: number }>
@@ -714,11 +488,10 @@ export function deriveMonsterDraftStatBlock(args: {
   monster: DraftMonsterSource
   equipmentCatalog: CreatureEquipmentCatalog
   skillCatalog: CreatureSkillCatalog
-  acBase?: ArmorClassBase
-  magicPropertyProvider?: MagicPropertyDefinitionProvider
+  acBase: ArmorClassBase
+  magicPropertyProvider: MagicPropertyDefinitionProvider
 }): DerivedMonsterDraftStatBlock {
-  const { monster, equipmentCatalog, skillCatalog, acBase } = args
-  const magicPropertyProvider = args.magicPropertyProvider ?? EMPTY_MAGIC_PROPERTY_PROVIDER
+  const { monster, equipmentCatalog, skillCatalog, acBase, magicPropertyProvider } = args
   const dexScore = monster.abilityScores?.dex
   const initiative =
     dexScore === undefined

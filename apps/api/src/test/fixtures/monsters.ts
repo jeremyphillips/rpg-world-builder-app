@@ -7,7 +7,7 @@ export const minimalHomebrewMonsterInput = {
   creatureType: 'humanoid',
   alignment: 'n',
   abilityScores: { str: 8, dex: 12, con: 10, int: 8, wis: 8, cha: 8 },
-  armorClass: { kind: 'unarmored' },
+  armorClass: {},
   hitPoints: { kind: 'hit-dice', count: 1 },
   movement: { walk: 30 },
   communication: {},

@@ -28,7 +28,6 @@ describe('createHomebrewContent (equipment)', () => {
     category: 'light' as const,
     cost: { amount: 15, currency: 'gp' as const },
     baseAc: 12,
-    addDexModifier: true,
     stealthDisadvantage: false,
   }
 

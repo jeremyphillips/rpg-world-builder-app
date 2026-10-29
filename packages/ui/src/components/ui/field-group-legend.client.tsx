@@ -12,6 +12,7 @@ import {
   fieldGroupLegendHeaderStackVariants,
   resolveFieldGroupDescriptionTypography,
   type FieldRhythm,
+  type GroupHeadingScale,
 } from './field.variants'
 import { Text } from './text'
 
@@ -19,6 +20,7 @@ const legendChromeClasses = 'w-full min-w-0'
 
 export type FieldGroupLegendProps = {
   legend: string
+  legendSrOnly?: boolean
   description?: string
   /** Non-interactive status/decoration beside the legend label (group headings only). */
   legendAccessory?: React.ReactNode
@@ -26,6 +28,8 @@ export type FieldGroupLegendProps = {
   legendAction?: React.ReactNode
   /** Resolved title scale — applied to the label only, not the `<legend>` wrapper. */
   legendTypography: string
+  /** When `'field'`, description uses field-hint type instead of group description type. */
+  headingScale?: GroupHeadingScale
   legendChromeClassName: string
   collapsible: boolean
   rhythm?: FieldRhythm
@@ -78,6 +82,7 @@ type LegendContentOptions = {
   rhythm: FieldRhythm
   legendTypography: string
   descriptionTypography: string
+  headingScale?: GroupHeadingScale
 }
 
 function resolveLegendPrimaryLabel(options: LegendContentOptions): React.ReactNode {
@@ -93,7 +98,7 @@ function LegendTitle({ typography, children }: { typography: string; children: R
 }
 
 function resolveLegendContent(options: LegendContentOptions): React.ReactNode {
-  const { description, rhythm, legendTypography, descriptionTypography } = options
+  const { description, rhythm, legendTypography, descriptionTypography, headingScale } = options
   const title = (
     <LegendTitle typography={legendTypography}>{resolveLegendPrimaryLabel(options)}</LegendTitle>
   )
@@ -105,26 +110,37 @@ function resolveLegendContent(options: LegendContentOptions): React.ReactNode {
   return (
     <span className={fieldGroupLegendHeaderStackVariants({ rhythm })}>
       {title}
-      <Text as="span" className={descriptionTypography}>
+      <Text
+        as="span"
+        variant={headingScale === 'field' ? 'caption' : undefined}
+        className={headingScale === 'field' ? undefined : descriptionTypography}
+      >
         {description}
       </Text>
     </span>
   )
 }
 
+function legendClassName(legendChromeClassName: string, legendSrOnly: boolean): string {
+  if (legendSrOnly) return 'sr-only'
+  return cn(legendChromeClasses, legendChromeClassName)
+}
+
 function StaticFieldGroupLegend({
   legendChromeClassName,
+  legendSrOnly,
   legendContent,
   legendAction,
   hasStackedHint,
 }: {
   legendChromeClassName: string
+  legendSrOnly: boolean
   legendContent: React.ReactNode
   legendAction?: React.ReactNode
   hasStackedHint: boolean
 }) {
   return (
-    <legend className={cn(legendChromeClasses, legendChromeClassName)}>
+    <legend className={legendClassName(legendChromeClassName, legendSrOnly)}>
       <LegendHeaderActionLayout action={legendAction} hasStackedHint={hasStackedHint}>
         {legendContent}
       </LegendHeaderActionLayout>
@@ -134,6 +150,7 @@ function StaticFieldGroupLegend({
 
 function CollapsibleFieldGroupLegend({
   legendChromeClassName,
+  legendSrOnly,
   legendContent,
   legendAccessory,
   legendAction,
@@ -143,6 +160,7 @@ function CollapsibleFieldGroupLegend({
   onToggle,
 }: {
   legendChromeClassName: string
+  legendSrOnly: boolean
   legendContent: React.ReactNode
   legendAccessory?: React.ReactNode
   legendAction?: React.ReactNode
@@ -163,7 +181,10 @@ function CollapsibleFieldGroupLegend({
         <Icon
           name="chevron-down"
           size="lg"
-          className="shrink-0 text-muted-foreground open && rotate-180"
+          className={cn(
+            'shrink-0 text-muted-foreground transition-transform',
+            open && 'rotate-180',
+          )}
         />
       </button>
       {legendAccessory ? <span className="shrink-0 pt-0.5">{legendAccessory}</span> : null}
@@ -171,7 +192,7 @@ function CollapsibleFieldGroupLegend({
   )
 
   return (
-    <legend className={cn(legendChromeClasses, legendChromeClassName)}>
+    <legend className={legendClassName(legendChromeClassName, legendSrOnly)}>
       <LegendHeaderActionLayout action={legendAction} hasStackedHint={hasStackedHint}>
         {toggleRow}
       </LegendHeaderActionLayout>
@@ -181,17 +202,19 @@ function CollapsibleFieldGroupLegend({
 
 export function FieldGroupLegend({
   legend,
+  legendSrOnly = false,
   description,
   legendAccessory,
   legendAction,
   legendTypography,
+  headingScale,
   legendChromeClassName,
   collapsible,
   rhythm = 'comfortable',
   open,
   onToggle,
 }: FieldGroupLegendProps) {
-  const descriptionTypography = resolveFieldGroupDescriptionTypography(rhythm)
+  const descriptionTypography = resolveFieldGroupDescriptionTypography(rhythm, headingScale)
 
   const contentOptions: LegendContentOptions = {
     legend,
@@ -201,6 +224,7 @@ export function FieldGroupLegend({
     rhythm,
     legendTypography,
     descriptionTypography,
+    headingScale,
   }
   const legendContent = resolveLegendContent(contentOptions)
   const hasStackedHint = Boolean(description)
@@ -209,6 +233,7 @@ export function FieldGroupLegend({
     return (
       <StaticFieldGroupLegend
         legendChromeClassName={legendChromeClassName}
+        legendSrOnly={legendSrOnly}
         legendContent={legendContent}
         legendAction={legendAction}
         hasStackedHint={hasStackedHint}
@@ -219,6 +244,7 @@ export function FieldGroupLegend({
   return (
     <CollapsibleFieldGroupLegend
       legendChromeClassName={legendChromeClassName}
+      legendSrOnly={legendSrOnly}
       legendContent={legendContent}
       legendAccessory={legendAccessory}
       legendAction={legendAction}

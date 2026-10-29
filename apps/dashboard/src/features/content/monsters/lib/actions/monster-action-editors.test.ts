@@ -1,5 +1,6 @@
-import type { Equipment } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
+
+import { pickEquipment } from '@/test/fixtures/pick'
 
 import {
   reconcileMonsterActionKind,
@@ -135,40 +136,14 @@ describe('resolveMonsterActionSelectionAfterRemoval', () => {
 })
 
 describe('monster form advisories', () => {
-  it('reports unequipped weapons, missing proficiency, and ignored body armor', () => {
+  it('reports unequipped weapons and missing proficiency', () => {
     const values = resolveMonsterCreateDefaultValues()
-    values.armorClass = { kind: 'natural', bonus: 1 }
-    values.equipment = [
-      { entryId: 'bow', equipmentId: 'shortbow', quantity: 1, equipped: false },
-      { entryId: 'shirt', equipmentId: 'chain-shirt', quantity: 1, equipped: true },
-    ]
+    values.equipment = [{ entryId: 'bow', equipmentId: 'shortbow', quantity: 1, equipped: false }]
     values.actions = [{ id: 'shot', kind: 'weapon', equipmentEntryId: 'bow' }]
-    const shortbow = {
-      id: 'shortbow',
-      kind: 'weapon',
-      name: 'Shortbow',
-      category: 'martial',
-      mode: 'ranged',
-    } as Equipment
-    const chain = {
-      id: 'chain-shirt',
-      kind: 'armor',
-      name: 'Chain Shirt',
-      category: 'light',
-    } as Equipment
-    const advisories = collectMonsterFormAdvisories(
-      values,
-      new Map([
-        ['shortbow', shortbow],
-        ['chain-shirt', chain],
-      ]),
-    )
+    const shortbow = pickEquipment('shortbow')
+    const advisories = collectMonsterFormAdvisories(values, new Map([['shortbow', shortbow]]))
     expect(advisories.map((advisory) => advisory.code)).toEqual(
-      expect.arrayContaining([
-        'weapon-not-equipped',
-        'weapon-not-proficient',
-        'body-armor-ignored',
-      ]),
+      expect.arrayContaining(['weapon-not-equipped', 'weapon-not-proficient']),
     )
     expect(advisories.find((advisory) => advisory.code === 'weapon-not-equipped')?.message).toBe(
       'Shortbow is not equipped.',

@@ -3,6 +3,10 @@ import type { ContentValidationIssue } from '../lib/content-validation-issue'
 import { isContentCampaignEligible, isContentReferenceable } from '../lib/content-resolution-policy'
 import type { Equipment, EquipmentInstance } from '../equipment'
 import { isArmorEquipment, isWeaponEquipment } from '../equipment'
+import {
+  monsterArmorOwnershipViolations,
+  MONSTER_ARMOR_OWNERSHIP_VIOLATION_ID,
+} from './monster-armor-ownership'
 import type { MagicPropertyDefinitionProvider } from '../equipment/instance/magic-property'
 import { normalizeEquipmentInstance } from '../equipment/instance/normalize-equipment-instance'
 import { validateEquipmentMagicProperties } from '../equipment/instance/validate-equipment-magic-properties'
@@ -11,8 +15,9 @@ export const MONSTER_CATALOG_ISSUE_CODE = {
   unknownEquipment: 'unknown_equipment',
   weaponActionNotWeapon: 'weapon_action_not_weapon',
   armorClassModifierNotArmor: 'armor_class_modifier_not_armor',
-  multipleEquippedBodyArmor: 'multiple_equipped_body_armor',
-  equipmentAcMissingBodyArmor: 'equipment_ac_missing_body_armor',
+  multipleOwnedBodyArmor: 'multiple_owned_body_armor',
+  multipleOwnedShield: 'multiple_owned_shield',
+  armorSlotQuantity: 'armor_slot_quantity',
   equipmentCatalogUnavailable: 'equipment_catalog_unavailable',
   unknownSkill: 'unknown_skill',
   skillNotReferenceable: 'skill_not_referenceable',
@@ -39,7 +44,6 @@ type CatalogSkillEntry = {
 }
 
 export type MonsterCatalogIssueBody = {
-  armorClass?: { kind?: string }
   equipment?: readonly CatalogEquipmentEntry[]
   actions?: readonly CatalogAction[]
   bonusActions?: readonly CatalogAction[]
@@ -71,16 +75,11 @@ function catalogStatus(status: MonsterCatalogLoadStatus | undefined): MonsterCat
   return status ?? 'ready'
 }
 
-function isBodyArmor(item: Equipment): boolean {
-  return isArmorEquipment(item) && item.category !== 'shields'
-}
-
 function collectEquipmentRowIssues(
   entry: CatalogEquipmentEntry,
   index: number,
   catalogs: MonsterCatalogs,
   issues: ContentValidationIssue[],
-  equippedBodyArmor: { index: number; label: string }[],
   intent: ContentValidationIntent,
 ): void {
   if (!entry.equipmentId) return
@@ -119,27 +118,34 @@ function collectEquipmentRowIssues(
       }),
     )
   }
-  if (entry.equipped && isBodyArmor(item)) {
-    equippedBodyArmor.push({ index, label: itemLabel(entry, item) })
-  }
 }
 
-function collectBodyArmorConflicts(
-  equippedBodyArmor: { index: number; label: string }[],
+const OWNERSHIP_ISSUE_COPY = {
+  [MONSTER_ARMOR_OWNERSHIP_VIOLATION_ID.duplicateBodyArmor]: {
+    path: (entryIndex: number) => `equipment.${entryIndex}`,
+    message: 'Only one body armor can be owned.',
+    code: MONSTER_CATALOG_ISSUE_CODE.multipleOwnedBodyArmor,
+  },
+  [MONSTER_ARMOR_OWNERSHIP_VIOLATION_ID.duplicateShield]: {
+    path: (entryIndex: number) => `equipment.${entryIndex}`,
+    message: 'Only one shield can be owned.',
+    code: MONSTER_CATALOG_ISSUE_CODE.multipleOwnedShield,
+  },
+  [MONSTER_ARMOR_OWNERSHIP_VIOLATION_ID.invalidQuantity]: {
+    path: (entryIndex: number) => `equipment.${entryIndex}.quantity`,
+    message: 'Armor and shields are limited to a quantity of 1.',
+    code: MONSTER_CATALOG_ISSUE_CODE.armorSlotQuantity,
+  },
+} as const
+
+function collectArmorOwnershipIssues(
+  equipment: readonly CatalogEquipmentEntry[],
+  catalogs: MonsterCatalogs,
   issues: ContentValidationIssue[],
 ): void {
-  if (equippedBodyArmor.length < 2) return
-  const names = equippedBodyArmor.map((row) => row.label)
-  for (const row of equippedBodyArmor.slice(1)) {
-    const others = names.filter((name) => name !== row.label)
-    const listed = others.length > 0 ? others.join(' or ') : names[0]
-    issues.push(
-      issue(
-        `equipment.${row.index}.equipped`,
-        `Only one body armor can be equipped. Unequip ${listed} or ${row.label}.`,
-        MONSTER_CATALOG_ISSUE_CODE.multipleEquippedBodyArmor,
-      ),
-    )
+  for (const violation of monsterArmorOwnershipViolations(equipment, catalogs.equipmentById)) {
+    const copy = OWNERSHIP_ISSUE_COPY[violation.id]
+    issues.push(issue(copy.path(violation.entryIndex), copy.message, copy.code))
   }
 }
 
@@ -229,10 +235,6 @@ function collectSkillIssues(
   }
 }
 
-function itemLabel(entry: CatalogEquipmentEntry, item: Equipment | undefined): string {
-  return entry.customName ?? item?.name ?? entry.equipmentId ?? 'item'
-}
-
 /**
  * Catalog-aware monster rules. Accepts draft-shaped bodies and never throws
  * on incomplete input. Callers share this collector instead of reimplementing rules.
@@ -244,7 +246,6 @@ export function collectMonsterCatalogIssues(
 ): ContentValidationIssue[] {
   const issues: ContentValidationIssue[] = []
   const equipment = body.equipment ?? []
-  const equippedBodyArmor: { index: number; label: string }[] = []
   const equipmentReady = catalogStatus(catalogs.equipmentCatalog) === 'ready'
 
   if (intent === 'publish' && !equipmentReady) {
@@ -259,29 +260,14 @@ export function collectMonsterCatalogIssues(
 
   if (equipmentReady) {
     equipment.forEach((entry, index) => {
-      collectEquipmentRowIssues(entry, index, catalogs, issues, equippedBodyArmor, intent)
+      collectEquipmentRowIssues(entry, index, catalogs, issues, intent)
     })
-    collectBodyArmorConflicts(equippedBodyArmor, issues)
+    collectArmorOwnershipIssues(equipment, catalogs, issues)
     collectWeaponActionIssues(body, equipment, catalogs, issues)
   }
 
   if (intent === 'publish') {
     collectSkillIssues(body, catalogs, issues)
-  }
-
-  if (
-    intent === 'publish' &&
-    equipmentReady &&
-    body.armorClass?.kind === 'equipment' &&
-    equippedBodyArmor.length !== 1
-  ) {
-    issues.push(
-      issue(
-        'armorClass.kind',
-        'Choose and equip body armor to calculate Armor Class.',
-        MONSTER_CATALOG_ISSUE_CODE.equipmentAcMissingBodyArmor,
-      ),
-    )
   }
 
   return issues

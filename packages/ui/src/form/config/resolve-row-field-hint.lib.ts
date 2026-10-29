@@ -1,5 +1,5 @@
 import type { FieldHintPosition } from '../../components/ui/field.variants'
-import { resolveFieldHintPresentation } from '../field-config'
+import { resolveFieldHintPresentation, type FieldHintIcon } from '../field-config'
 
 type FieldHintSource = Parameters<typeof resolveFieldHintPresentation>[0]
 
@@ -8,11 +8,12 @@ export function resolveRowAwareFieldHintPresentation(
   field: FieldHintSource,
   values: Record<string, unknown>,
   inAnatomyRow: boolean,
-): { text?: string; position: FieldHintPosition } {
+): { text?: string; position: FieldHintPosition; icon?: FieldHintIcon } {
   const presentation = resolveFieldHintPresentation(field, values)
   if (!inAnatomyRow) return presentation
   return {
     text: presentation.text,
     position: 'below-control',
+    ...(presentation.icon ? { icon: presentation.icon } : {}),
   }
 }

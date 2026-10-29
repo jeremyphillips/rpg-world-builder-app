@@ -5,6 +5,7 @@ import { toEquippedArmorPiece } from '../../creature/armor-class'
 import {
   bodyArmorAc,
   dexModifierForArmor,
+  resolveArmorDexContribution,
   resolveEquippedArmorClass,
   shieldAcBonus,
 } from './armor-class'
@@ -25,7 +26,6 @@ const leatherArmor = armorBodySchema.parse({
   kind: 'armor',
   category: 'light',
   baseAc: 11,
-  addDexModifier: true,
   stealthDisadvantage: false,
 })
 
@@ -45,7 +45,6 @@ const chainMail = armorBodySchema.parse({
   kind: 'armor',
   category: 'heavy',
   baseAc: 16,
-  addDexModifier: false,
   stealthDisadvantage: true,
 })
 
@@ -65,8 +64,6 @@ const halfPlate = armorBodySchema.parse({
   kind: 'armor',
   category: 'medium',
   baseAc: 15,
-  addDexModifier: true,
-  maxDexBonus: 2,
   stealthDisadvantage: true,
 })
 
@@ -86,7 +83,6 @@ const shield = armorBodySchema.parse({
   kind: 'armor',
   category: 'shields',
   acBonus: 2,
-  addDexModifier: false,
   stealthDisadvantage: false,
 })
 
@@ -96,13 +92,58 @@ const halfPlatePiece = toEquippedArmorPiece(halfPlate)
 const shieldPiece = toEquippedArmorPiece(shield)
 
 describe('dexModifierForArmor', () => {
-  it('caps medium armor DEX bonus', () => {
-    expect(dexModifierForArmor(4, halfPlate)).toBe(2)
+  it('adds the full DEX modifier for light armor, including zero and negative', () => {
+    expect(resolveArmorDexContribution(3, leatherArmor)).toEqual({
+      abilityModifier: 3,
+      appliedModifier: 3,
+      rule: { mode: 'full' },
+    })
+    expect(resolveArmorDexContribution(0, leatherArmor)).toMatchObject({
+      abilityModifier: 0,
+      appliedModifier: 0,
+      rule: { mode: 'full' },
+    })
+    expect(resolveArmorDexContribution(-1, leatherArmor)).toMatchObject({
+      abilityModifier: -1,
+      appliedModifier: -1,
+      rule: { mode: 'full' },
+    })
   })
 
-  it('returns zero for heavy armor and shields', () => {
-    expect(dexModifierForArmor(3, chainMail)).toBe(0)
+  it('caps medium armor at +2 and still applies a smaller or negative modifier', () => {
+    expect(resolveArmorDexContribution(1, halfPlate)).toMatchObject({
+      abilityModifier: 1,
+      appliedModifier: 1,
+      rule: { mode: 'capped', maxBonus: 2 },
+    })
+    expect(resolveArmorDexContribution(2, halfPlate).appliedModifier).toBe(2)
+    expect(resolveArmorDexContribution(4, halfPlate)).toEqual({
+      abilityModifier: 4,
+      appliedModifier: 2,
+      rule: { mode: 'capped', maxBonus: 2 },
+    })
+    expect(resolveArmorDexContribution(-1, halfPlate).appliedModifier).toBe(-1)
+  })
+
+  it('ignores positive and negative DEX on heavy armor and shields', () => {
+    expect(resolveArmorDexContribution(3, chainMail)).toEqual({
+      abilityModifier: 3,
+      appliedModifier: 0,
+      rule: { mode: 'none' },
+    })
+    expect(resolveArmorDexContribution(-2, chainMail)).toMatchObject({
+      abilityModifier: -2,
+      appliedModifier: 0,
+      rule: { mode: 'none' },
+    })
     expect(dexModifierForArmor(3, shield)).toBe(0)
+    expect(dexModifierForArmor(-2, shield)).toBe(0)
+  })
+
+  it('matches the monster contribution for medium armor, DEX +4, and a +1 enhancement', () => {
+    const piece = toEquippedArmorPiece(halfPlate, [{ kind: 'armor_class', bonus: 1 }])
+    expect(dexModifierForArmor(4, halfPlate)).toBe(2)
+    expect(bodyArmorAc(piece, 4)).toBe(18)
   })
 })
 

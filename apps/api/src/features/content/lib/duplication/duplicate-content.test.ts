@@ -230,7 +230,6 @@ describe('transformDuplicateSource', () => {
         weight: { value: 65, unit: 'lb' },
         category: 'heavy',
         baseAc: 18,
-        addDexModifier: false,
         stealthDisadvantage: true,
         abilityScoreRequirements: { str: 15 },
       } as never,

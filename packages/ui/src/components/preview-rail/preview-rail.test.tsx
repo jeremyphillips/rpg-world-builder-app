@@ -194,10 +194,14 @@ describe('PreviewRail', () => {
     const { container } = render(
       <>
         <PreviewRail>
-          <PreviewRail.Identity name="Fighter" facts={facts} />
+          <PreviewRail.Identity name="Fighter" status="Level 1" facts={facts} />
         </PreviewRail>
         <PreviewRail>
-          <PreviewRail.Identity name="Rogue" facts={[{ label: 'Hit die', value: 'd8' }]} />
+          <PreviewRail.Identity
+            name="Rogue"
+            status="Level 1"
+            facts={[{ label: 'Hit die', value: 'd8' }]}
+          />
         </PreviewRail>
       </>,
     )

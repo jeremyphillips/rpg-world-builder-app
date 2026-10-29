@@ -43,7 +43,7 @@ export const quickNpcStartingChoiceInnerSectionClasses =
 export const quickNpcStartingChoiceSelectedListClasses = 'flex flex-col gap-y-2'
 
 export const quickNpcAdditionalEquipmentQuantityClasses =
-  'shrink-0 text-sm font-body-emphasis text-foreground'
+  'shrink-0 text-style-body-compact font-body-emphasis'
 
 export const quickNpcStartingChoiceOptionsContainerClasses = 'flex flex-col'
 

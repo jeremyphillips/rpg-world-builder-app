@@ -24,11 +24,10 @@ const ACTION_BUTTON_SIZE_HOSTS = [
   { size: 'icon-sm', host: 'ui-button--icon-sm' },
   { size: 'icon', host: 'ui-button--icon-md' },
   { size: 'icon-lg', host: 'ui-button--icon-lg' },
-] as const satisfies readonly {
-  size: ButtonSize
-  host: string
-  label?: string
-}[]
+] as const satisfies readonly (
+  | { size: ButtonSize; host: string; label: string }
+  | { size: ButtonSize; host: string }
+)[]
 
 describe('ActionButton', () => {
   it('renders the registry glyph and visible label', () => {
@@ -93,7 +92,7 @@ describe('ActionButton', () => {
   it('resolves each size from the host class and an owner glyph', () => {
     for (const entry of ACTION_BUTTON_SIZE_HOSTS) {
       const { unmount, container } = render(
-        entry.label ? (
+        'label' in entry ? (
           <ActionButton action="add" variant="outline" size={entry.size}>
             {entry.label}
           </ActionButton>
@@ -102,7 +101,9 @@ describe('ActionButton', () => {
         ),
       )
 
-      const button = screen.getByRole('button', { name: entry.label ?? 'Edit' })
+      const button = screen.getByRole('button', {
+        name: 'label' in entry ? entry.label : 'Edit',
+      })
       expect(button, entry.size).toHaveClass(entry.host)
       const svg = container.querySelector('svg')
       expect(svg, entry.size).toHaveClass('ui-icon--owner')

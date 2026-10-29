@@ -219,9 +219,11 @@ export function GroupFieldSection({
     <FieldGroup
       id={item.id}
       legend={heading?.label ?? item.legend}
+      legendSrOnly={heading?.labelVisibility === 'srOnly'}
       legendAccessory={heading?.accessory}
       legendAction={heading?.action}
       legendSize={legendSize}
+      headingScale={item.headingScale}
       rhythm={groupRhythm}
       size={groupSize}
       description={description}

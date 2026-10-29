@@ -5,8 +5,13 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import type { FieldSize } from '../../components/ui/field.client'
 import { fieldAnatomyStackVariants } from '../../components/ui/field.variants'
+import { normalizeFieldHint } from '../field-config'
 import type { FormHeading } from '../form-heading.lib'
 import { HeadingPresentation } from './heading-presentation.client'
+import {
+  formSectionHeaderActionSlotClasses,
+  resolveFormSectionHeaderActionLayoutClasses,
+} from './form-section-header.variants'
 
 export interface CompositeGroupProps {
   heading: FormHeading
@@ -41,12 +46,24 @@ export function CompositeGroup({
       size={size}
     />
   )
+  const header = heading.action ? (
+    <div
+      className={resolveFormSectionHeaderActionLayoutClasses({
+        hasStackedHint: Boolean(normalizeFieldHint(heading.hint).text),
+      })}
+    >
+      <div className="min-w-0">{presentation}</div>
+      <div className={formSectionHeaderActionSlotClasses}>{heading.action}</div>
+    </div>
+  ) : (
+    presentation
+  )
   const stackClassName = cn('min-w-0', fieldAnatomyStackVariants({ size }), className)
 
   if (useFieldset) {
     return (
       <fieldset id={id} className={cn('border-0 p-0', stackClassName)}>
-        {presentation}
+        {header}
         {children}
       </fieldset>
     )
@@ -54,7 +71,7 @@ export function CompositeGroup({
 
   return (
     <div id={id} role="group" aria-labelledby={headingId} className={stackClassName}>
-      {presentation}
+      {header}
       {children}
     </div>
   )

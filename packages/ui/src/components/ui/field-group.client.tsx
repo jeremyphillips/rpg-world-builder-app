@@ -18,20 +18,28 @@ import {
   fieldLabelTypographyVariants,
   type FieldGroupLegendSize,
   type FieldRhythm,
+  type GroupHeadingScale,
 } from './field.variants'
 import { resolveFormDensity } from '../../form/form-density'
 
-export type { FieldGroupLegendSize }
+export type { FieldGroupLegendSize, GroupHeadingScale }
 
 export interface FieldGroupProps {
   /** Group heading rendered as the fieldset legend. Omit for layout-only wrappers. */
   legend?: string
+  /** Keep the legend as the group name without showing it. */
+  legendSrOnly?: boolean
   /** Non-interactive status beside the legend label (badges, static text). */
   legendAccessory?: ReactNode
   /** Trailing header action aligned to the legend row end (compact inline controls). */
   legendAction?: ReactNode
   /** Legend type scale — use `subsection` for nested groups, `array` for repeatable lists. */
   legendSize?: FieldGroupLegendSize
+  /**
+   * When `'field'`, legend and description use the field label and hint type scale
+   * for `size`. Replaces structural legend type. Spacing and disclosure stay on `legendSize`.
+   */
+  headingScale?: GroupHeadingScale
   /**
    * Control + label scale — when `legendSize="array"`, also drives array legend
    * typography (same tokens as leaf field labels).
@@ -71,9 +79,11 @@ export interface FieldGroupProps {
  */
 export function FieldGroup({
   legend,
+  legendSrOnly = false,
   legendAccessory,
   legendAction,
   legendSize = 'section',
+  headingScale,
   size,
   rhythm = resolveFormDensity().rhythm,
   description,
@@ -90,7 +100,7 @@ export function FieldGroup({
 }: FieldGroupProps) {
   const resolvedFieldSize = size ?? resolveFormDensity('compact').size
   const legendTypography =
-    legendSize === 'array'
+    headingScale === 'field' || legendSize === 'array'
       ? fieldLabelTypographyVariants({ size: resolvedFieldSize })
       : fieldGroupLegendVariants({ size: legendSize, rhythm })
   const chromeClasses = resolveFieldGroupChromeClassNames(chrome, { rhythm })
@@ -144,10 +154,12 @@ export function FieldGroup({
     <StandardFieldGroupBody
       id={id}
       legend={legend}
+      legendSrOnly={legendSrOnly}
       description={description}
       legendAccessory={legendAccessory}
       legendAction={legendAction}
       legendSize={legendSize}
+      headingScale={headingScale}
       legendTypography={legendTypography}
       fieldSize={resolvedFieldSize}
       rhythm={rhythm}

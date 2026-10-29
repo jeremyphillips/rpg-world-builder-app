@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { Link } from './link'
+import { Text } from './text'
 
 const meta = {
   title: 'Primitives/Link',
@@ -26,9 +27,9 @@ type Story = StoryObj<typeof meta>
 
 export const InlineDefault: Story = {
   render: (args) => (
-    <p className="text-sm text-foreground">
+    <Text as="p" variant="body-compact">
       See the campaign <Link {...args} /> for details.
-    </p>
+    </Text>
   ),
 }
 

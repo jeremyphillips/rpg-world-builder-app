@@ -13,12 +13,14 @@ export type FormHeadingTier = 'section' | 'subsection' | 'leaf'
  * `FieldGroup`). Status/decorative content (badges, static text) — not buttons, links,
  * or other focusable controls inside `<legend>`.
  *
- * `action` is a **group-heading** trailing slot (same end alignment as array legend add
- * controls). Use compact `sm` text/outline buttons — not nested inside `<legend>` text.
+ * `action` is a trailing slot on group headings and leaf composite headings (slots
+ * and rows). Use compact `sm` text/outline buttons — not nested inside `<legend>` text.
  */
 export type FormHeading = {
   label: string
   hint?: string | FieldHintConfig
+  /** Screen-reader-only group legends keep the accessible name without a visible heading. */
+  labelVisibility?: FieldLabelVisibility
   accessory?: ReactNode
   action?: ReactNode
 }

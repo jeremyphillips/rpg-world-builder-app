@@ -10,8 +10,9 @@ Derived values follow SRD 5.2.1 table math unless the body explicitly overrides 
 
 - **Natural weapons** are always treated as proficient for attack bonus.
 - **Weapon actions** use equipment catalog rows; names fall back from action → instance custom name → equipment name.
-- **Armor class** modes: unarmored (optional shield equipment), natural (AC base + Dex + bonus), equipment (equipped armor instances), fixed.
-- **`armor_class` equipment modifiers** on instances adjust equipped armor through `toEquippedArmorPiece` (shared with character inventory).
+- **Armor class** is `{ naturalArmorBonus?, fixedValue? }`. Natural armor and worn body armor are both candidates; the higher total wins, and a tie uses the armor. An equipped shield and its enhancement always apply once. `fixedValue` replaces the displayed total and keeps `calculatedAc` on the resolution, unless ownership is already invalid. Body-armor DEX comes from `resolveArmorDexterityRule` (light adds the full modifier, medium caps it at +2, heavy adds none) and is not stored on the armor record. A second owned body armor or shield, or a quantity other than 1, makes Armor Class unavailable even when the extra piece is unequipped and even when a fixed value is set. `resolveMonsterArmorClass` in `runtime/monster/armor-class.ts` is the only monster AC resolver. `deriveMonsterStatBlock` requires `acBase` and a magic-property provider.
+- **Armor proficiency** is derived at read time from owned body armor and shields. It is not stored.
+- **`armor_class` equipment modifiers** on instances adjust the armor candidate (or the shield, for shield enhancements) through `toEquippedArmorPiece` (shared with character inventory). Magic armor enhancement applies only when that armor wins.
 
 ## Campaign access
 

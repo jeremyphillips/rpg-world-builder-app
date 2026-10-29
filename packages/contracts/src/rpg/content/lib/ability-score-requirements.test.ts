@@ -106,7 +106,6 @@ describe('getEquipmentAbilityScoreRequirements', () => {
     cost: { amount: 1500, currency: 'gp' },
     category: 'heavy',
     baseAc: 18,
-    addDexModifier: false,
     stealthDisadvantage: true,
   } as const
 

@@ -94,7 +94,26 @@ export type EquipmentPickerViewDefaults = {
   sortMode: EquipmentPickerSortMode
 }
 
-export type EquipmentPickerDrawerProps = {
+/** Adds one copy through the active workflow's channel. */
+export type EquipmentPickerCommitAdd = (item: EquipmentPickerItem) => boolean | void
+
+/**
+ * Single-select mode. Rows stay flat (no expandable details) and the footer
+ * commits the pending choice.
+ */
+export type EquipmentPickerSelection = {
+  value: string | null
+  onValueChange: (itemKey: string) => void
+  isItemDisabled?: (item: EquipmentPickerRow) => boolean
+}
+
+/** Optional two-mode switch. Omit it to keep `workflowMode` fixed. */
+export type EquipmentPickerWorkflowSwitcher = {
+  modes: readonly EquipmentPickerWorkflowMode[]
+  onChange: (mode: EquipmentPickerWorkflowMode) => void
+}
+
+export type EquipmentPickerDrawerBaseProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   /** Overrides the default choice-set heading (for example loadout "Add equipment"). */
@@ -109,11 +128,10 @@ export type EquipmentPickerDrawerProps = {
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
   /** Per-item ownership contributions — the only source the header reads. */
   ownership?: EquipmentPickerOwnershipIndex
-  /** Active browse workflow — purchase vs magic-item grants. */
+  /** Active browse workflow. Defaults to purchase when omitted. */
   workflowMode?: EquipmentPickerWorkflowMode
-  /** Available workflows; segmented control renders only when length is 2. */
-  workflowModes?: readonly EquipmentPickerWorkflowMode[]
-  onWorkflowModeChange?: (mode: EquipmentPickerWorkflowMode) => void
+  /** Enables switching workflows. Absent means the active workflow is fixed. */
+  workflowSwitcher?: EquipmentPickerWorkflowSwitcher
   /** Grant progress for rarity chips. Paired with allowances for the magic-item summary. */
   magicItemGrantProgress?: readonly MagicItemGrantProgress[]
   /** Allowances paired with progress so slot badges keep exact vs up-to. */
@@ -130,8 +148,11 @@ export type EquipmentPickerDrawerProps = {
     workflowMode: EquipmentPickerWorkflowMode
     requestedQuantity: number
   }) => EquipmentPickerRowActionViewModel
-  /** Adds one copy through the active workflow's channel. */
-  onCommitAdd: (item: EquipmentPickerItem) => boolean | void
+  footer?: ReactNode
+}
+
+type EquipmentPickerAcquisitionCallbacks = {
+  onCommitAdd: EquipmentPickerCommitAdd
   /** Sets the aggregate editable purchased quantity for an item. */
   onSetPurchasedQuantity?: (item: EquipmentPickerItem, total: number) => void
   /** Neutral alias for loadout mode — adjusts the plain stack quantity. */
@@ -139,3 +160,21 @@ export type EquipmentPickerDrawerProps = {
   onReleaseChoice?: (item: EquipmentPickerItem, allowanceId: string) => void
   onRemovePurchaseOne?: (item: EquipmentPickerItem) => void
 }
+
+export type EquipmentPickerAcquisitionDrawerProps = EquipmentPickerDrawerBaseProps &
+  EquipmentPickerAcquisitionCallbacks & {
+    selection?: never
+  }
+
+export type EquipmentPickerSelectionDrawerProps = EquipmentPickerDrawerBaseProps & {
+  selection: EquipmentPickerSelection
+  onCommitAdd?: never
+  onSetPurchasedQuantity?: never
+  onSetRowQuantity?: never
+  onReleaseChoice?: never
+  onRemovePurchaseOne?: never
+}
+
+export type EquipmentPickerDrawerProps =
+  | EquipmentPickerAcquisitionDrawerProps
+  | EquipmentPickerSelectionDrawerProps
