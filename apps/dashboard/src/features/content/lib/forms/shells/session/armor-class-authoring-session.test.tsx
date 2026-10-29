@@ -8,11 +8,13 @@ import type { ArmorClassRules } from '@rpg/contracts'
 import {
   ArmorClassAuthoringNotice,
   ArmorClassAuthoringProvider,
+} from './armor-class-authoring-session'
+import {
   armorClassRulesSignature,
   useArmorClassAuthoringSave,
   useArmorClassAuthoringSession,
   useArmorClassRulesStale,
-} from './armor-class-authoring-session'
+} from './armor-class-authoring-session.lib'
 
 const ASCENDING_TEN = { mode: 'ascending' as const, base: 10 as const }
 const ASCENDING_NINE = { mode: 'ascending' as const, base: 9 as const }

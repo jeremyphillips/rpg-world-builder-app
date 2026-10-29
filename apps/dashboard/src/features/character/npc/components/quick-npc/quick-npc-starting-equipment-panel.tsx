@@ -6,6 +6,7 @@ import {
   getEquipmentKindCollectionLabel,
   getNpcTemplateLabel,
   indexCharacterBuildCatalog,
+  type ArmorClassRules,
   type CharacterBuildContext,
   type NpcStartingChoices,
   type RecommendationSourceName,
@@ -126,7 +127,7 @@ const QUICK_NPC_EQUIPMENT_SEARCH_NOUN = (() => {
 const QUICK_NPC_EQUIPMENT_CATEGORY_FILTER_LABEL = 'Equipment kind'
 
 export type QuickNpcStartingEquipmentPanelProps = {
-  armorClassRules?: import('@rpg/contracts').ArmorClassRules
+  armorClassRules?: ArmorClassRules
   setup: QuickNpcSetupValues
   choices: NpcStartingChoices
   buildContext: CharacterBuildContext
@@ -610,7 +611,7 @@ function QuickNpcStartingEquipmentPackageSection({
 }
 
 type QuickNpcAdditionalEquipmentSectionProps = {
-  armorClassRules?: import('@rpg/contracts').ArmorClassRules
+  armorClassRules?: ArmorClassRules
   setup: QuickNpcSetupValues
   choices: NpcStartingChoices
   buildContext: CharacterBuildContext

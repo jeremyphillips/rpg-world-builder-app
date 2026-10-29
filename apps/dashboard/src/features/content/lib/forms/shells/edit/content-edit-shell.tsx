@@ -27,9 +27,11 @@ import { findContentEditEntity, loadContentEditFormState } from './content-edit-
 import {
   ArmorClassAuthoringNotice,
   ArmorClassAuthoringProvider,
+} from '../session/armor-class-authoring-session'
+import {
   armorClassRulesSignature,
   useArmorClassAuthoringSession,
-} from '../session/armor-class-authoring-session'
+} from '../session/armor-class-authoring-session.lib'
 import { useContentEditEntityFormState } from './content-edit-entity-form-state'
 import {
   ContentFormNotRegistered,

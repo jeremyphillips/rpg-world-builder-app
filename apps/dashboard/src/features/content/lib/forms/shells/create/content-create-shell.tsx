@@ -15,9 +15,11 @@ import { ContentFormPageShell } from '../layout/content-form-page-shell'
 import {
   ArmorClassAuthoringNotice,
   ArmorClassAuthoringProvider,
+} from '../session/armor-class-authoring-session'
+import {
   armorClassRulesSignature,
   useArmorClassAuthoringSession,
-} from '../session/armor-class-authoring-session'
+} from '../session/armor-class-authoring-session.lib'
 import {
   resolveContentFormLayout,
   type ContentFormLayout as ResolvedContentFormLayout,

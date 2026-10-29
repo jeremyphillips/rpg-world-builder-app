@@ -5,6 +5,7 @@ import {
   optionIdentitiesOverlap,
   projectEquipmentSelection,
   resolveEquipmentAdditionPolicy,
+  type ArmorClassRules,
   type CharacterBuildCatalogIndex,
   type CharacterSelectionSource,
   type EquipmentSupplySource,
@@ -268,7 +269,7 @@ export function collectQuickNpcEquipmentSupply(args: {
 }
 
 export function presentQuickNpcEquipmentOption(args: {
-  armorClassRules?: import('@rpg/contracts').ArmorClassRules
+  armorClassRules?: ArmorClassRules
   entry: QuickNpcAdditionalEquipmentOption
   equipmentSelections: readonly QuickNpcEquipmentSelection[]
   roleId?: string
@@ -416,7 +417,7 @@ export function listSelectedQuickNpcAdditionalEquipment(args: {
 }
 
 export function buildQuickNpcAdditionalEquipmentPresentationMap(args: {
-  armorClassRules?: import('@rpg/contracts').ArmorClassRules
+  armorClassRules?: ArmorClassRules
   entries: readonly QuickNpcAdditionalEquipmentOption[]
   equipmentSelections: readonly QuickNpcEquipmentSelection[]
   choices: NpcStartingChoices
@@ -452,7 +453,7 @@ export function buildQuickNpcAdditionalEquipmentPresentationMap(args: {
 }
 
 export function canAppendQuickNpcAdditionalEquipment(args: {
-  armorClassRules?: import('@rpg/contracts').ArmorClassRules
+  armorClassRules?: ArmorClassRules
   entry: QuickNpcAdditionalEquipmentOption | undefined
   equipmentSelections: readonly QuickNpcEquipmentSelection[]
   choices: NpcStartingChoices

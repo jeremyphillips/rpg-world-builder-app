@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { type UseFormReturn } from 'react-hook-form'
 
-import type { CharacterBuildContext } from '@rpg/contracts'
+import type { ArmorClassRules, CharacterBuildContext } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 import { SetupSummaryRows, type SetupSummaryEditTarget } from '@/lib/create-setup'
 import { useCreateFlowFormDensity, CREATE_FLOW_FORM_DENSITY } from '@/lib/create-flow'
@@ -94,7 +94,7 @@ function buildQuickNpcAuthoringTabs(args: {
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
   createContext: QuickNpcCreateContext
-  armorClassRules?: import('@rpg/contracts').ArmorClassRules
+  armorClassRules?: ArmorClassRules
   nameTrailingAction?: TrailingFieldActionConfig
   nameHint?: string
 }): TabbedFormTab[] {
@@ -159,7 +159,7 @@ function QuickNpcAuthoringTabsSync({
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
   createContext: QuickNpcCreateContext
-  armorClassRules?: import('@rpg/contracts').ArmorClassRules
+  armorClassRules?: ArmorClassRules
   onTabsChange: (tabs: TabbedFormTab[]) => void
 }) {
   const { trailingAction, nameHint } = useSpeciesNameTrailingAction({

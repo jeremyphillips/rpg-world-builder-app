@@ -5,7 +5,7 @@ import { useFormUiContext, useSchemaFormSubmit } from '@rpg/ui/form'
 import { hasDirtyFields } from '@/lib/form-dirty-state'
 
 import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-state'
-import { useArmorClassAuthoringSave } from './armor-class-authoring-session'
+import { useArmorClassAuthoringSave } from './armor-class-authoring-session.lib'
 import {
   runCoordinatedContentSave,
   type CoordinatedSaveSavedEvent,

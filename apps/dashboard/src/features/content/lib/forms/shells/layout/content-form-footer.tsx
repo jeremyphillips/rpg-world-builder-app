@@ -17,7 +17,7 @@ import { resolveContentFormFooterPresentation } from './content-form-footer.lib'
 import { useContentFormWriteGateReason } from './content-form-write-gate'
 import { useContentFormActionState } from './use-content-form-action-state'
 import type { ContentSaveActionState } from '../session/use-content-save-session'
-import { useArmorClassRulesStale } from '../session/armor-class-authoring-session'
+import { useArmorClassRulesStale } from '../session/armor-class-authoring-session.lib'
 
 const DISCARD_CHANGES_LABEL = 'Discard changes'
 const CANCEL_LABEL = 'Cancel'

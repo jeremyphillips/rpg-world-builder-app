@@ -15,6 +15,7 @@ import {
 } from '@rpg/ui'
 
 import type {
+  ArmorClassRules,
   CharacterBuildContext,
   StartingChoiceCategory,
   StartingChoiceContribution,
@@ -104,7 +105,7 @@ const QUICK_NPC_ADD_STARTING_CHOICE_SPELL_DESCRIPTION =
   'Require a spell this NPC must know or prepare.'
 
 export type QuickNpcStartingChoicesProps = {
-  armorClassRules?: import('@rpg/contracts').ArmorClassRules
+  armorClassRules?: ArmorClassRules
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
   createContext: QuickNpcCreateContext
@@ -474,7 +475,7 @@ function StartingChoiceEditor({
   canonicalAllowances,
   onOverridesChange,
 }: {
-  armorClassRules?: import('@rpg/contracts').ArmorClassRules
+  armorClassRules?: ArmorClassRules
   categoryKind: StartingChoiceCategory
   entries: readonly StartingChoiceContribution[]
   choices: ReturnType<typeof resolveQuickNpcStartingChoices>
