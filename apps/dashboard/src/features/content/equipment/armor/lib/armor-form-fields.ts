@@ -1,11 +1,13 @@
 import {
   armorBaseAcDisplayBounds,
+  armorClassFromProtection,
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
   ARMOR_MATERIALS,
   ARMOR_MATERIAL_ENTRIES,
+  formatArmorClassContributionHint,
   formatArmorDexterityRuleHint,
   getAbilityCompactLabel,
   getAbilityLabel,
@@ -45,9 +47,9 @@ function visibleWhenArmorShield(): FieldVisibility {
   }
 }
 
-function armorBaseAcHint(category: unknown): string | undefined {
+function armorBaseAcHint(category: unknown, rules: ArmorClassRules): string | undefined {
   if (category !== 'light' && category !== 'medium' && category !== 'heavy') return undefined
-  return formatArmorDexterityRuleHint(resolveArmorDexterityRule(category))
+  return formatArmorDexterityRuleHint(resolveArmorDexterityRule(category), rules)
 }
 
 /** Body Base AC and shield AC bonus both use the same empty stepper control. */
@@ -58,8 +60,9 @@ function armorAcStepperField(args: {
   hint?: FieldHintConfig
   min?: number
   max?: number
+  emptySeed?: number
 }): NumberFieldConfig {
-  const { name, label, visibility, hint, min, max } = args
+  const { name, label, visibility, hint, min, max, emptySeed } = args
   return {
     type: 'number',
     name,
@@ -70,6 +73,7 @@ function armorAcStepperField(args: {
     required: true,
     ...(min !== undefined ? { min } : {}),
     ...(max !== undefined ? { max } : {}),
+    ...(emptySeed !== undefined ? { emptySeed } : {}),
     ...(hint ? { hint } : {}),
   }
 }
@@ -106,21 +110,35 @@ export function armorFormFieldGroup(rules?: ArmorClassRules): FormItem {
         label: 'Base AC',
         min: baseBounds?.min,
         max: baseBounds?.max,
+        emptySeed: rules ? armorClassFromProtection(rules, 0) : undefined,
         visibility: visibleWhenArmorNotShield(),
-        hint: {
-          position: 'below-control',
-          icon: 'info',
-          resolve: {
-            dependsOn: ['armorCategory'],
-            hintWhen: (values) => armorBaseAcHint(values.armorCategory),
-          },
-        },
+        ...(rules
+          ? {
+              hint: {
+                position: 'below-control' as const,
+                icon: 'info' as const,
+                resolve: {
+                  dependsOn: ['armorCategory'],
+                  hintWhen: (values: Record<string, unknown>) =>
+                    armorBaseAcHint(values.armorCategory, rules),
+                },
+              },
+            }
+          : {}),
       }),
       armorAcStepperField({
         name: 'acBonus',
         label: 'AC bonus',
         min: 0,
         visibility: visibleWhenArmorShield(),
+        ...(rules
+          ? {
+              hint: {
+                position: 'below-control' as const,
+                text: formatArmorClassContributionHint(rules, 'shield'),
+              },
+            }
+          : {}),
       }),
       {
         type: 'switch',

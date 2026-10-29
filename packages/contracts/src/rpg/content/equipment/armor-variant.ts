@@ -1,11 +1,13 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
+import { formatSignedModifier } from '../../primitives/signed-modifier'
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { resolveArmorDexterityRule } from '../../vocab/armor/dexterity-rule'
 import { armorMaterialSchema } from '../../vocab/armor/material'
 import {
   BASE_AC_OFFSET_RANGE,
+  armorClassDelta,
   armorClassFromProtection,
   type ArmorClassRules,
 } from '../../vocab/mechanics/armor-class-scale'
@@ -77,19 +79,30 @@ export function refineArmorEquipment(
 
 type ArmorAcDisplayFields = Pick<ArmorEquipmentKindFields, 'category' | 'baseAcOffset' | 'acBonus'>
 
+function dexOperator(rules: ArmorClassRules): '+' | '-' {
+  return armorClassDelta(rules, 1) < 0 ? '-' : '+'
+}
+
 /**
  * Returns a human-readable AC string for the detail page and table columns.
+ * Operators follow the ruleset direction. The parenthetical cap stays a protection magnitude.
  *
- * @example getArmorAcDisplay(leather, ascending10)    // "11 + Dex"
- * @example getArmorAcDisplay(chainMail, ascending10)  // "16 (no Dex)"
- * @example getArmorAcDisplay(halfPlate, ascending10)  // "15 + Dex (max 2)"
- * @example getArmorAcDisplay(shieldWood, ascending10) // "+2"
+ * @example getArmorAcDisplay(leather, ascending10)     // "11 + Dex"
+ * @example getArmorAcDisplay(chainMail, ascending10)   // "18 (no Dex)"
+ * @example getArmorAcDisplay(halfPlate, ascending10)   // "15 + Dex (max 2)"
+ * @example getArmorAcDisplay(shieldWood, ascending10)  // "+2"
+ * @example getArmorAcDisplay(leather, descending9)     // "8 - Dex"
+ * @example getArmorAcDisplay(plate, descending10)      // "2 (no Dex)"
+ * @example getArmorAcDisplay(shieldWood, descending10) // "-2"
  */
 export function getArmorAcDisplay(armor: ArmorAcDisplayFields, rules: ArmorClassRules): string {
-  if (armor.category === 'shields') return `+${armor.acBonus ?? 0}`
+  if (armor.category === 'shields') {
+    return formatSignedModifier(armorClassDelta(rules, armor.acBonus ?? 0))
+  }
   const base = armorClassFromProtection(rules, armor.baseAcOffset ?? 0)
   const rule = resolveArmorDexterityRule(armor.category)
   if (rule.mode === 'none') return `${base} (no Dex)`
-  if (rule.mode === 'capped') return `${base} + Dex (max ${rule.maxBonus})`
-  return `${base} + Dex`
+  const operator = dexOperator(rules)
+  if (rule.mode === 'capped') return `${base} ${operator} Dex (max ${rule.maxBonus})`
+  return `${base} ${operator} Dex`
 }

@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
@@ -12,6 +13,7 @@ const ctx = {
   equipmentCatalogStatus: 'ready',
   equipmentCatalogById: new Map(),
   skillCatalogStatus: 'ready',
+  armorClassRules: systemDefaultArmorClassRules(),
 } satisfies ContentFormCtx
 
 function renderArmorClassForm(onSubmit: (values: MonsterFormValues) => void) {
@@ -34,7 +36,7 @@ describe('monster armor class fields', () => {
 
     expect(screen.queryByRole('group', { name: 'Natural armor' })).not.toBeInTheDocument()
     expect(screen.queryByRole('checkbox', { name: 'Natural armor' })).not.toBeInTheDocument()
-    expect(screen.getByText('Improves unarmored AC.')).toBeInTheDocument()
+    expect(screen.getByText('Raises unarmored Armor Class by this amount.')).toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Armor & shield' })).toBeInTheDocument()
     expect(
       screen.getByRole('group', { name: 'Armor & shield' }).querySelector('legend'),

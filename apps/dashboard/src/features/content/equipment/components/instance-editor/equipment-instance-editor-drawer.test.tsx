@@ -10,6 +10,7 @@ import { EquipmentInstanceEditorDrawer } from './equipment-instance-editor-drawe
 
 const rulesetId = 'srd-cc-5.2.1'
 const dagger = pickEquipment('dagger')
+const leather = pickEquipment('leather-armor')
 
 describe('EquipmentInstanceEditorDrawer', () => {
   it('prompts to discard when Cancel is clicked with a dirty session', async () => {
@@ -68,6 +69,39 @@ describe('EquipmentInstanceEditorDrawer', () => {
 
     expect(screen.getByText('Bright blade')).toBeInTheDocument()
     expect(screen.queryByText(dagger.name)).not.toBeInTheDocument()
+  })
+
+  it('keeps an armor enhancement bonus positive and explains descending Armor Class', async () => {
+    const user = userEvent.setup()
+    const provider = createMagicPropertyDefinitionProvider(rulesetId)
+    const sourceEntry = {
+      entryId: 'e1',
+      equipmentId: leather.id,
+      quantity: 1,
+      equipped: true,
+    }
+
+    render(
+      <EquipmentInstanceEditorDrawer
+        open
+        onOpenChange={() => undefined}
+        sourceEntry={sourceEntry}
+        entries={[sourceEntry]}
+        catalogItem={leather}
+        rulesetId={rulesetId}
+        definitions={provider}
+        subjectNoun="creature"
+        armorClassRules={{ mode: 'descending', base: 10 }}
+        onCommit={() => undefined}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add adjustment' }))
+    await user.click(screen.getByRole('radio', { name: /Armor Class/ }))
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(screen.getByText('A positive enhancement lowers Armor Class.')).toBeInTheDocument()
+    expect(screen.getByLabelText('Modifier')).toHaveValue('1')
   })
 
   itAxe('has no axe accessibility violations in main mode', async () => {

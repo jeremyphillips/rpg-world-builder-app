@@ -124,6 +124,7 @@ function MonsterEquipmentEditorDialog({
   catalog,
   rulesetId,
   magicProvider,
+  armorClassRules,
   editorOpen,
   onUpdate,
   onClose,
@@ -135,6 +136,7 @@ function MonsterEquipmentEditorDialog({
   catalog: ReturnType<typeof monsterEquipmentCatalog>
   rulesetId: SystemRulesetId
   magicProvider: ReturnType<typeof createMagicPropertyDefinitionProvider>
+  armorClassRules?: ArmorClassRules
   editorOpen: boolean
   onUpdate: (next: MonsterEquipmentFormEntry[]) => void
   onClose: () => void
@@ -152,6 +154,7 @@ function MonsterEquipmentEditorDialog({
       catalogItem={editorItem}
       rulesetId={rulesetId}
       definitions={magicProvider}
+      armorClassRules={armorClassRules}
       subjectNoun="creature"
       referencedByLabel={
         referenced
@@ -205,6 +208,7 @@ export function MonsterEquipmentEntryDialogs({
   catalog,
   rulesetId,
   magicProvider,
+  armorClassRules,
   editorEntryId,
   pendingRemove,
   pendingRemoveCopy,
@@ -218,6 +222,7 @@ export function MonsterEquipmentEntryDialogs({
   catalog: ReturnType<typeof monsterEquipmentCatalog>
   rulesetId: SystemRulesetId
   magicProvider: ReturnType<typeof createMagicPropertyDefinitionProvider>
+  armorClassRules?: ArmorClassRules
   editorEntryId: string | null
   pendingRemove: { entryId: string } | null
   pendingRemoveCopy: {
@@ -243,6 +248,7 @@ export function MonsterEquipmentEntryDialogs({
         catalog={catalog}
         rulesetId={rulesetId}
         magicProvider={magicProvider}
+        armorClassRules={armorClassRules}
         editorOpen={editorEntryId !== null}
         onUpdate={onUpdate}
         onClose={onCloseEditor}

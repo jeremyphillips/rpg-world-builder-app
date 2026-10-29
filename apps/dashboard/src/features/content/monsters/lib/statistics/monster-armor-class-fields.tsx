@@ -1,6 +1,7 @@
 import {
   armorClassFromProtection,
   fixedAcDisplayBounds,
+  formatArmorClassContributionHint,
   getNaturalArmorBonusFieldLabel,
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
@@ -17,7 +18,6 @@ import {
   MONSTER_SHIELD_SLOT_HEADING,
 } from '../monster-form-labels'
 
-const NATURAL_ARMOR_BONUS_HINT = 'Improves unarmored AC.'
 const ARMOR_AND_SHIELD_LEGEND = 'Armor & shield'
 const MANUAL_AC_OVERRIDE_LABEL = 'Manual AC override'
 const FIXED_ARMOR_CLASS_LABEL = 'Fixed Armor Class'
@@ -45,7 +45,11 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
           type: 'number',
           name: 'armorClass.naturalArmorBonus',
           label: getNaturalArmorBonusFieldLabel(),
-          hint: NATURAL_ARMOR_BONUS_HINT,
+          ...(ctx.armorClassRules
+            ? {
+                hint: formatArmorClassContributionHint(ctx.armorClassRules, 'unarmored'),
+              }
+            : {}),
           labelPosition: 'settings',
           control: 'stepper',
           min: 0,

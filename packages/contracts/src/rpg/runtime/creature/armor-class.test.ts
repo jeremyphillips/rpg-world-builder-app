@@ -122,6 +122,57 @@ describe('resolveCreatureArmorClass', () => {
     expect(tied.tie).toBe(true)
   })
 
+  it('signs row deltas in descending and keeps the dex cap as a magnitude', () => {
+    const resolved = resolveCreatureArmorClass({
+      rules: { mode: 'descending', base: 10 },
+      dexModifier: 3,
+      bodyArmor: medium,
+      shields: [shield],
+      eligibility: { skinCompetesWithArmor: false },
+    })
+    expect(resolved.rows).toEqual([
+      expect.objectContaining({ kind: 'armor-base', value: 8 }),
+      expect.objectContaining({ kind: 'dex', value: -2, cap: 2 }),
+      expect.objectContaining({ kind: 'shield', value: -2 }),
+      expect.objectContaining({ kind: 'enhancement', value: -1 }),
+    ])
+    expect(resolved.ac).toBe(3)
+  })
+
+  it('keeps selection and dex-restriction outcomes aligned in both directions', () => {
+    const scaleMail: EquippedArmorPiece = {
+      category: 'medium',
+      baseAcOffset: 4,
+      acAdjustment: 0,
+      entryId: 'scale',
+      label: 'Scale mail',
+    }
+    const outcomes = ARMOR_CLASS_RULES_MATRIX.map((rules) =>
+      resolveCreatureArmorClass({
+        rules,
+        dexModifier: 4,
+        naturalArmorBonus: 3,
+        bodyArmor: scaleMail,
+        shields: [],
+        eligibility: { skinCompetesWithArmor: true },
+      }),
+    )
+    for (const resolved of outcomes) {
+      expect(resolved.source).toBe('natural')
+      expect(resolved.tie).toBe(false)
+      expect(resolved.dexRestriction).toMatchObject({
+        mode: 'capped',
+        abilityModifier: 4,
+        appliedModifier: 2,
+        maxBonus: 2,
+        affectsOutcome: true,
+      })
+    }
+    const ascendingAc = outcomes[0]?.ac
+    const descendingAc = outcomes[2]?.ac
+    expect(descendingAc).not.toBe(ascendingAc)
+  })
+
   it('picks the same winner in both directions', () => {
     const ascending = resolveCreatureArmorClass({
       rules: { mode: 'ascending', base: 10 },

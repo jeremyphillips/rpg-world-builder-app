@@ -42,8 +42,10 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
     derived?.ac.status === 'unavailable'
       ? monsterUnavailableReasonCopy(derived.ac.reason, 'armor')
       : undefined
+  const rules = ctx.armorClassRules
   const comparisonMessages = resolution ? monsterArmorClassAlternativeMessages(resolution) : []
-  const dexAdvisory = resolution ? monsterArmorClassDexAdvisory(resolution) : undefined
+  const dexAdvisory =
+    resolution && rules ? monsterArmorClassDexAdvisory(resolution, rules) : undefined
 
   return (
     <InsetPanel size="sm">
@@ -57,10 +59,10 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
               {resolution ? monsterArmorClassCaption(resolution) : (unavailable ?? 'Not set')}
             </Text>
           </div>
-          {resolution ? (
+          {resolution && rules ? (
             <dl className="monster-armor-class-preview__breakdown">
               <div className="flex flex-col gap-0.5">
-                {monsterArmorClassBreakdownRows(resolution).map((row) => (
+                {monsterArmorClassBreakdownRows(resolution, rules).map((row) => (
                   <div key={row.id} className="flex items-baseline justify-between gap-3">
                     <dt>
                       <Text as="span" variant="caption">

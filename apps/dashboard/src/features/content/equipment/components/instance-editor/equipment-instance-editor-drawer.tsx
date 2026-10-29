@@ -3,9 +3,11 @@ import { useMemo, useReducer, type Dispatch } from 'react'
 import {
   EQUIPMENT_EFFECT_BONUS_MAX,
   EQUIPMENT_EFFECT_BONUS_MIN,
+  formatArmorClassContributionHint,
   nextNonZeroBonus,
   resolveEquipmentEntryEffectTotals,
   resolveEquipmentMagicProperties,
+  type ArmorClassRules,
   type Equipment,
   type EquipmentEffectTarget,
   type EquipmentInstance,
@@ -98,6 +100,8 @@ export type EquipmentInstanceEditorDrawerProps<T extends EquipmentInstance & { e
     definitions?: MagicPropertyDefinitionProvider
     subjectNoun: 'creature' | 'character'
     referencedByLabel?: string
+    /** Direction for Armor Class adjustment hints. The authored bonus stays a protection magnitude. */
+    armorClassRules?: ArmorClassRules
     onCommit: (nextEntries: T[]) => void
   }
 
@@ -118,6 +122,7 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
   definitions: definitionsProp,
   subjectNoun,
   referencedByLabel,
+  armorClassRules,
   onCommit,
 }: EquipmentInstanceEditorDrawerProps<T>) {
   const definitions = useMemo(
@@ -201,6 +206,7 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
           catalogItem={catalogItem}
           subjectNoun={subjectNoun}
           referencedByLabel={referencedByLabel}
+          armorClassRules={armorClassRules}
           sourceQuantity={sourceEntry.quantity ?? 1}
           magic={magic}
           totals={totals}
@@ -218,6 +224,7 @@ function EquipmentInstanceEditorBody({
   catalogItem,
   subjectNoun,
   referencedByLabel,
+  armorClassRules,
   sourceQuantity,
   magic,
   totals,
@@ -228,6 +235,7 @@ function EquipmentInstanceEditorBody({
   catalogItem: Equipment
   subjectNoun: 'creature' | 'character'
   referencedByLabel?: string
+  armorClassRules?: ArmorClassRules
   sourceQuantity: number
   magic: ReturnType<typeof resolveEquipmentMagicProperties>
   totals: ReturnType<typeof resolveEquipmentEntryEffectTotals>
@@ -266,7 +274,7 @@ function EquipmentInstanceEditorBody({
         />
       )
     case 'effectForm':
-      return <EffectFormBody mode={mode} dispatch={dispatch} />
+      return <EffectFormBody mode={mode} dispatch={dispatch} armorClassRules={armorClassRules} />
     case 'propertyBrowse':
       return (
         <PropertyBrowseBody
@@ -369,9 +377,11 @@ function EffectChooseBody({
 function EffectFormBody({
   mode,
   dispatch,
+  armorClassRules,
 }: {
   mode: Extract<EquipmentEditorMode, { kind: 'effectForm' }>
   dispatch: EditorDispatch
+  armorClassRules?: ArmorClassRules
 }) {
   const { draft } = mode
   return (
@@ -408,6 +418,11 @@ function EffectFormBody({
         }
         aria-label={EQUIPMENT_INSTANCE_EDITOR_MODIFIER_LABEL}
       />
+      {draft.target === 'armor_class' && armorClassRules ? (
+        <Text as="p" variant="caption">
+          {formatArmorClassContributionHint(armorClassRules, 'enhancement')}
+        </Text>
+      ) : null}
       <TextareaField
         id="equipment-effect-notes"
         label={EQUIPMENT_INSTANCE_EDITOR_NOTES_LABEL}

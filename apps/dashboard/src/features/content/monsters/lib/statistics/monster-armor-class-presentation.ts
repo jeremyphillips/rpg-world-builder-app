@@ -1,8 +1,10 @@
 import {
   CREATURE_ARMOR_CLASS_KIND_TERM,
+  armorClassDelta,
   formatSignedModifier,
   getCreatureArmorClassKindLabel,
   getTermCompactLabel,
+  type ArmorClassRules,
   type DerivedFieldReason,
   type MonsterArmorClassAlternative,
   type MonsterArmorClassResolution,
@@ -35,7 +37,11 @@ export function monsterArmorClassCompactLabel(): string {
   return getTermCompactLabel(CREATURE_ARMOR_CLASS_KIND_TERM)
 }
 
-function rowLabel(row: MonsterArmorClassRow): string {
+function formatEffectiveModifier(rules: ArmorClassRules, protection: number): string {
+  return formatSignedModifier(armorClassDelta(rules, protection))
+}
+
+function rowLabel(row: MonsterArmorClassRow, rules: ArmorClassRules): string {
   switch (row.kind) {
     case 'ruleset-base':
       return `Base ${monsterArmorClassCompactLabel()}`
@@ -44,7 +50,7 @@ function rowLabel(row: MonsterArmorClassRow): string {
     case 'dex':
       return row.cap === undefined
         ? 'DEX modifier'
-        : `DEX modifier (max ${formatSignedModifier(row.cap)})`
+        : `DEX modifier (max ${formatEffectiveModifier(rules, row.cap)})`
     case 'natural':
       return 'Natural armor'
     case 'shield':
@@ -79,12 +85,13 @@ function isZeroOptionalModifier(row: MonsterArmorClassRow): boolean {
 
 export function monsterArmorClassBreakdownRows(
   resolution: MonsterArmorClassResolution,
+  rules: ArmorClassRules,
 ): MonsterArmorClassPresentationRow[] {
   return resolution.rows
     .filter((row) => !isZeroOptionalModifier(row))
     .map((row, index) => ({
       id: `${row.kind}-${index}`,
-      label: rowLabel(row),
+      label: rowLabel(row, rules),
       value: rowValue(row),
     }))
 }
@@ -136,14 +143,15 @@ function alternativeSentence(
 /** Rules note when worn armor caps or ignores DEX. Independent of natural-versus-armor winner. */
 export function monsterArmorClassDexAdvisory(
   resolution: MonsterArmorClassResolution,
+  rules: ArmorClassRules,
 ): string | undefined {
   if (resolution.source === 'fixed') return undefined
   const restriction = resolution.dexRestriction
   if (!restriction?.affectsOutcome) return undefined
   const name = proseArmorName(resolution.bodyArmor?.label ?? 'Armor', true)
-  const original = formatSignedModifier(restriction.abilityModifier)
+  const original = formatEffectiveModifier(rules, restriction.abilityModifier)
   if (restriction.mode === 'capped') {
-    return `${name} limits the ${original} DEX modifier to ${formatSignedModifier(restriction.appliedModifier)}.`
+    return `${name} limits the ${original} DEX modifier to ${formatEffectiveModifier(rules, restriction.appliedModifier)}.`
   }
   return `${name} ignores the ${original} DEX modifier.`
 }

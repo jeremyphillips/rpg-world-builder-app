@@ -494,6 +494,11 @@ export interface NumberFieldConfig extends BaseFieldConfig {
   step?: number
   defaultValue?: number
   /**
+   * Value written when an empty stepper is incremented. Omitted steppers still
+   * seed from `min`.
+   */
+  emptySeed?: number
+  /**
    * Max-width applied to the `<input>` element itself, independent of the
    * container's layout `width`. Use intrinsic tokens (`xs`–`xl`, `auto`).
    */

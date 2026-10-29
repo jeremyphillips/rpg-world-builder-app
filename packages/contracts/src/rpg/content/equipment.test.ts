@@ -388,6 +388,21 @@ describe('getArmorAcDisplay', () => {
     )
     expect(getArmorAcDisplay(make({ category: 'shields', acBonus: 2 }), rules)).toBe('+2')
   })
+
+  it('uses descending operators without changing the stored offsets', () => {
+    const descending10 = { mode: 'descending' as const, base: 10 as const }
+    const descending9 = { mode: 'descending' as const, base: 9 as const }
+    expect(getArmorAcDisplay(make({ category: 'heavy', baseAcOffset: 8 }), descending10)).toBe(
+      '2 (no Dex)',
+    )
+    expect(getArmorAcDisplay(make({ category: 'light', baseAcOffset: 1 }), descending9)).toBe(
+      '8 - Dex',
+    )
+    expect(getArmorAcDisplay(make({ category: 'medium', baseAcOffset: 5 }), descending10)).toBe(
+      '5 - Dex (max 2)',
+    )
+    expect(getArmorAcDisplay(make({ category: 'shields', acBonus: 2 }), descending10)).toBe('-2')
+  })
 })
 
 describe('weapon display helpers', () => {

@@ -153,6 +153,39 @@ describe('equipment-compact-display', () => {
     )
   })
 
+  it('uses descending operators in compact armor lines', () => {
+    const rules = { mode: 'descending' as const, base: 10 as const }
+    expect(
+      buildEquipmentCompactSummaryWithRules(plateArmor, { armorClassRules: rules })
+        .comparisonGroups[0],
+    ).toBe('AC 2 (no Dex)')
+    expect(
+      buildEquipmentCompactSummaryWithRules(
+        {
+          ...plateArmor,
+          category: 'light',
+          baseAcOffset: 1,
+          stealthDisadvantage: false,
+          abilityScoreRequirements: undefined,
+        },
+        { armorClassRules: { mode: 'descending', base: 9 } },
+      ).comparisonGroups[0],
+    ).toBe('AC 8 - Dex')
+    expect(
+      buildEquipmentCompactSummaryWithRules(
+        {
+          ...plateArmor,
+          category: 'shields',
+          baseAcOffset: undefined,
+          acBonus: 2,
+          stealthDisadvantage: false,
+          abilityScoreRequirements: undefined,
+        },
+        { armorClassRules: rules },
+      ).comparisonGroups[0],
+    ).toBe('-2 AC')
+  })
+
   it('formats holy symbol spellcasting gear without the parent gear kind', () => {
     expect(buildEquipmentCompactSummary(holySymbolAmulet)).toEqual({
       kindLabel: 'Adventuring Gear',

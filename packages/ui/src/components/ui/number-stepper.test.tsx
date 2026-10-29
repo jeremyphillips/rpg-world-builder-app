@@ -20,6 +20,47 @@ describe('NumberStepper', () => {
     expect(screen.getByLabelText('Increase Quantity')).toBeInTheDocument()
   })
 
+  it('seeds an empty increment from emptySeed and otherwise from min', async () => {
+    function Seeded() {
+      const [value, setValue] = React.useState<number | undefined>(undefined)
+      return (
+        <NumberStepper
+          aria-label="Base AC"
+          unbound={value === undefined}
+          value={value ?? 0}
+          min={-5}
+          max={10}
+          emptySeed={10}
+          onChange={setValue}
+        />
+      )
+    }
+
+    const seeded = render(<Seeded />)
+    expect(screen.getByRole('button', { name: 'Decrease Base AC' })).toBeDisabled()
+    await userEvent.click(screen.getByRole('button', { name: 'Increase Base AC' }))
+    expect(screen.getByLabelText('Base AC')).toHaveValue(10)
+    seeded.unmount()
+
+    function DefaultSeed() {
+      const [value, setValue] = React.useState<number | undefined>(undefined)
+      return (
+        <NumberStepper
+          aria-label="Count"
+          unbound={value === undefined}
+          value={value ?? 0}
+          min={-5}
+          max={10}
+          onChange={setValue}
+        />
+      )
+    }
+
+    render(<DefaultSeed />)
+    await userEvent.click(screen.getByRole('button', { name: 'Increase Count' }))
+    expect(screen.getByLabelText('Count')).toHaveValue(-5)
+  })
+
   it('increments and decrements via side buttons', async () => {
     render(<Harness initial={5} />)
 

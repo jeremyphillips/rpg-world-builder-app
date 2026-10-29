@@ -24,6 +24,8 @@ export function useNumberStepperInteraction(args: {
   value: number
   /** Empty form value. Decrement stays disabled and increment seeds from `stepNumber`. */
   unbound?: boolean
+  /** Increment seed while empty. Omitted steppers still seed from `min`. */
+  emptySeed?: number
   onChange: (value: number) => void
   min: number
   max: number
@@ -36,6 +38,7 @@ export function useNumberStepperInteraction(args: {
   const {
     value,
     unbound = false,
+    emptySeed,
     onChange,
     min,
     max,
@@ -92,12 +95,16 @@ export function useNumberStepperInteraction(args: {
       if (disabled) return
       if (unbound) {
         if (direction === 'down') return
+        if (emptySeed !== undefined) {
+          onChange(Math.min(max, Math.max(min, emptySeed)))
+          return
+        }
         onChange(stepNumber(undefined, 'up', stepOptions))
         return
       }
       onChange(stepNumber(resolvedValue, direction, stepOptions))
     },
-    [disabled, onChange, resolvedValue, stepOptions, unbound],
+    [disabled, emptySeed, max, min, onChange, resolvedValue, stepOptions, unbound],
   )
 
   const showRemoveAtMin = (minAction?.mode ?? 'disable') === 'remove' && resolvedValue === min
