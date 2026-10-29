@@ -61,7 +61,6 @@ function armor(slug: string, category: 'light' | 'medium' | 'heavy' = 'heavy') {
     kind: 'armor',
     category,
     baseAc: 16,
-    addDexModifier: category === 'light',
     stealthDisadvantage: category !== 'light',
     abilityScoreRequirements: category === 'heavy' ? { str: 13 } : undefined,
   })

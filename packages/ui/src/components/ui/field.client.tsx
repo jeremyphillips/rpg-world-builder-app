@@ -20,6 +20,7 @@ import {
   type FieldLabelPlacement,
 } from './field.variants'
 import { resolveControlRequiredProps } from './field-required.lib'
+import { Icon } from './icon/icon'
 import { Text } from './text'
 
 interface FieldContextValue {
@@ -36,6 +37,7 @@ interface FieldContextValue {
   required: boolean
   error?: string
   hint?: string
+  hintIcon?: 'info'
 }
 
 const FieldContext = React.createContext<FieldContextValue | null>(null)
@@ -74,6 +76,8 @@ export interface FieldRootProps extends React.HTMLAttributes<HTMLDivElement> {
   hint?: string
   /** Where helper text renders — drives hint visibility and `aria-describedby`. */
   hintPosition?: FieldHintPosition
+  /** Info icon inside the hint. The hint id still covers the icon and the text. */
+  hintIcon?: 'info'
   /**
    * Flat three-region layout (`FieldLayout` / toggle adapters). Root uses no
    * stack gap — spacing is owned by label/message region padding.
@@ -101,6 +105,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
       describedBy: describedByOverride,
       hint,
       hintPosition = 'below-label',
+      hintIcon,
       anatomy = false,
       rowParticipation = false,
       className,
@@ -128,6 +133,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
           describedByOverride,
           hint,
           hintPosition,
+          hintIcon,
           size,
           required,
           hasDerivedMeta,
@@ -139,6 +145,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
         describedByOverride,
         hint,
         hintPosition,
+        hintIcon,
         size,
         required,
         hasDerivedMeta,
@@ -336,11 +343,17 @@ export function FieldHintErrorBelowControl({
 export type FieldHintProps = React.HTMLAttributes<HTMLParagraphElement>
 
 function FieldHint({ className, children, ...props }: FieldHintProps) {
-  const { hintId, hasError, hasHint, hint, hintPosition } = useFieldContext('Field.Hint')
+  const { hintId, hasError, hasHint, hint, hintPosition, hintIcon } = useFieldContext('Field.Hint')
   if (!hasHint) return null
   if (hasError && hintPosition === 'below-control') return null
   return (
-    <Text id={hintId} variant="caption" className={className} {...props}>
+    <Text
+      id={hintId}
+      variant="caption"
+      className={cn(hintIcon ? 'inline-flex items-center gap-1' : undefined, className)}
+      {...props}
+    >
+      {hintIcon === 'info' ? <Icon name="info" size="xs" /> : null}
       {children ?? hint}
     </Text>
   )

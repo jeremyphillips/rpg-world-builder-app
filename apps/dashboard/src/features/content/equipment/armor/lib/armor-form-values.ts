@@ -47,8 +47,6 @@ export function armorFormValuesFromEntity(
   | 'material'
   | 'baseAc'
   | 'acBonus'
-  | 'addDexModifier'
-  | 'maxDexBonus'
   | 'stealthDisadvantage'
   | 'abilityScoreRequirements'
   | 'hasMinimumStrengthRequirement'
@@ -58,8 +56,6 @@ export function armorFormValuesFromEntity(
     material: item.material,
     baseAc: item.baseAc,
     acBonus: item.acBonus,
-    addDexModifier: item.addDexModifier,
-    maxDexBonus: item.maxDexBonus,
     stealthDisadvantage: item.stealthDisadvantage,
     abilityScoreRequirements: item.abilityScoreRequirements,
     hasMinimumStrengthRequirement: item.abilityScoreRequirements?.str !== undefined,
@@ -82,20 +78,13 @@ export function buildArmorInput({
       kind: 'armor',
       ...(values.armorCategory && { category: values.armorCategory }),
       ...(isDraft
-        ? {
-            ...(values.addDexModifier !== undefined && { addDexModifier: values.addDexModifier }),
-            ...(values.stealthDisadvantage !== undefined && {
-              stealthDisadvantage: values.stealthDisadvantage,
-            }),
-          }
-        : {
-            addDexModifier: values.addDexModifier ?? false,
-            stealthDisadvantage: values.stealthDisadvantage ?? false,
-          }),
+        ? values.stealthDisadvantage !== undefined
+          ? { stealthDisadvantage: values.stealthDisadvantage }
+          : {}
+        : { stealthDisadvantage: values.stealthDisadvantage ?? false }),
       ...(weight && { weight }),
       ...(values.material && { material: values.material }),
       ...optionalArmorAc(values),
-      ...(values.maxDexBonus !== undefined && { maxDexBonus: values.maxDexBonus }),
       ...(abilityScoreRequirements && { abilityScoreRequirements }),
     },
     validationIntent,

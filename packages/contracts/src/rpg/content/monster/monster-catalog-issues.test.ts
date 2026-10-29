@@ -23,7 +23,6 @@ function armor(slug: string, name: string) {
     kind: 'armor',
     category: 'light',
     baseAc: 11,
-    addDexModifier: true,
     stealthDisadvantage: false,
   })
 }
@@ -136,7 +135,6 @@ describe('collectMonsterCatalogIssues', () => {
       category: 'shields',
       baseAc: undefined,
       acBonus: 2,
-      addDexModifier: false,
     })
     const catalogs = readyCatalogs({
       equipmentById: new Map([...readyCatalogs().equipmentById, [shield.id, shield]]),
@@ -171,7 +169,6 @@ describe('collectMonsterCatalogIssues', () => {
       category: 'shields',
       baseAc: undefined,
       acBonus: 2,
-      addDexModifier: false,
     })
     expect(
       collectMonsterCatalogIssues(

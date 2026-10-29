@@ -97,15 +97,52 @@ function isNaturalVersusArmor(
   return sources.includes('natural') && sources.includes('armor')
 }
 
+/** Catalog and custom names in prose. The first letter is capital only when the name starts the sentence. */
+function proseArmorName(name: string, leading: boolean): string {
+  const lower = name.toLocaleLowerCase()
+  if (!leading || lower.length === 0) return lower
+  return `${lower.charAt(0).toUpperCase()}${lower.slice(1)}`
+}
+
+function equippedArmorName(
+  resolution: MonsterArmorClassResolution,
+  alternative: MonsterArmorClassAlternative,
+): string {
+  if (resolution.source === 'armor') return resolution.bodyArmor?.label ?? 'Armor'
+  return alternative.label
+}
+
 function alternativeSentence(
   resolution: MonsterArmorClassResolution,
   alternative: MonsterArmorClassAlternative,
 ): string | undefined {
-  const loser = `${alternative.label}: ${alternative.ac}.`
-  const winner = comparisonWinnerLabel(resolution)
-  if (!winner) return loser
   if (!isNaturalVersusArmor(resolution, alternative)) return undefined
-  return `${winner} wins. ${loser}`
+  const armorName = equippedArmorName(resolution, alternative)
+  const naturalAc = resolution.source === 'natural' ? resolution.ac : alternative.ac
+  const armorAc = resolution.source === 'armor' ? resolution.ac : alternative.ac
+  if (naturalAc === armorAc) {
+    return `Natural armor and ${proseArmorName(armorName, false)} both provide ${naturalAc}.`
+  }
+  if (naturalAc > armorAc) {
+    return `Natural armor wins: ${naturalAc} vs. ${armorAc} with ${proseArmorName(armorName, false)}.`
+  }
+  return `${proseArmorName(armorName, true)} wins: ${armorAc} vs. ${naturalAc} with natural armor.`
+}
+
+/** Rules note when worn armor caps or ignores DEX. Independent of natural-versus-armor winner. */
+export function monsterArmorClassDexAdvisory(
+  resolution: MonsterArmorClassResolution,
+): string | undefined {
+  if (resolution.source === 'fixed') return undefined
+  const restriction = resolution.dexRestriction
+  if (!restriction) return undefined
+  if (restriction.appliedModifier >= restriction.abilityModifier) return undefined
+  const name = proseArmorName(resolution.bodyArmor?.label ?? 'Armor', true)
+  const original = formatSignedModifier(restriction.abilityModifier)
+  if (restriction.mode === 'capped') {
+    return `${name} limits the ${original} DEX modifier to ${formatSignedModifier(restriction.appliedModifier)}.`
+  }
+  return `${name} ignores the ${original} DEX modifier.`
 }
 
 export function monsterArmorClassAlternativeMessages(

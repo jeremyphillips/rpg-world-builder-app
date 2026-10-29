@@ -123,8 +123,6 @@ export const armorEquipmentFormSchema = physicalEquipmentBaseFormSchema.extend({
   material: armorMaterialSchema.optional(),
   baseAc: z.coerce.number().int().optional(),
   acBonus: z.coerce.number().int().optional(),
-  addDexModifier: z.boolean().optional(),
-  maxDexBonus: z.coerce.number().int().optional(),
   stealthDisadvantage: z.boolean().optional(),
   ...armorAbilityScoreRequirementsFormFields,
 })
@@ -237,8 +235,6 @@ export const armorEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormSchem
   material: draftOptionalSelect(armorMaterialSchema),
   baseAc: z.coerce.number().int().optional(),
   acBonus: z.coerce.number().int().optional(),
-  addDexModifier: z.boolean().optional(),
-  maxDexBonus: z.coerce.number().int().optional(),
   stealthDisadvantage: z.boolean().optional(),
   ...armorAbilityScoreRequirementsFormFields,
 })
@@ -484,8 +480,6 @@ export const equipmentFormSchema = z
     material: armorMaterialSchema.optional(),
     baseAc: z.coerce.number().int().optional(),
     acBonus: z.coerce.number().int().optional(),
-    addDexModifier: z.boolean().optional(),
-    maxDexBonus: z.coerce.number().int().optional(),
     stealthDisadvantage: z.boolean().optional(),
     ...armorAbilityScoreRequirementsFormFields,
   })
@@ -557,8 +551,6 @@ export const equipmentFormDraftSchema = z.object({
   material: draftOptionalSelect(armorMaterialSchema),
   baseAc: z.coerce.number().int().optional(),
   acBonus: z.coerce.number().int().optional(),
-  addDexModifier: z.boolean().optional(),
-  maxDexBonus: z.coerce.number().int().optional(),
   stealthDisadvantage: z.boolean().optional(),
   ...armorAbilityScoreRequirementsFormFields,
 })

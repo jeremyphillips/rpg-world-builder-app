@@ -92,8 +92,6 @@ const armor = equipmentSchema.parse({
   kind: 'armor',
   category: 'medium',
   baseAc: 13,
-  addDexModifier: true,
-  maxDexBonus: 2,
   stealthDisadvantage: false,
 })
 

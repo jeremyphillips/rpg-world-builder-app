@@ -16,6 +16,7 @@ export type FieldRootContextInput = {
   describedByOverride?: string
   hint?: string
   hintPosition: FieldHintPosition
+  hintIcon?: 'info'
   size: FieldSize
   required: boolean
   hasDerivedMeta: boolean
@@ -49,6 +50,7 @@ export function buildFieldRootContextValue(input: FieldRootContextInput) {
     required: input.required,
     error: input.error,
     hint: input.hint,
+    hintIcon: input.hint ? input.hintIcon : undefined,
   }
 }
 

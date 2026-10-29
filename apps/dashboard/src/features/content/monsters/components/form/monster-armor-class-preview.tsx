@@ -1,5 +1,5 @@
 import { useFormContext, useWatch } from 'react-hook-form'
-import { cn, InsetPanel, SemanticText, Text } from '@rpg/ui'
+import { cn, Icon, InsetPanel, SemanticText, Text } from '@rpg/ui'
 
 import { abilityScoreCardScoreValueClassesFor } from '@/components/ability-score/ability-score-card.variants'
 
@@ -14,6 +14,7 @@ import {
   monsterArmorClassAlternativeMessages,
   monsterArmorClassBreakdownRows,
   monsterArmorClassCaption,
+  monsterArmorClassDexAdvisory,
 } from '../../lib/statistics/monster-armor-class-presentation'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 
@@ -42,6 +43,7 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
       ? monsterUnavailableReasonCopy(derived.ac.reason, 'armor')
       : undefined
   const comparisonMessages = resolution ? monsterArmorClassAlternativeMessages(resolution) : []
+  const dexAdvisory = resolution ? monsterArmorClassDexAdvisory(resolution) : undefined
 
   return (
     <InsetPanel size="sm">
@@ -88,13 +90,24 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
             </dl>
           ) : null}
         </div>
-        {comparisonMessages.length > 0 ? (
-          <div className="flex flex-col gap-0.5">
-            {comparisonMessages.map((message) => (
-              <Text key={message} as="p" variant="caption">
-                {message}
+        {comparisonMessages.length > 0 || dexAdvisory ? (
+          <div className="flex flex-col">
+            {comparisonMessages.length > 0 ? (
+              <div className="flex flex-col gap-0.5">
+                {comparisonMessages.map((message) => (
+                  <Text key={message} as="p" variant="caption">
+                    {message}
+                  </Text>
+                ))}
+              </div>
+            ) : null}
+            {dexAdvisory ? (
+              <Text as="p" variant="micro" className="mt-1">
+                <SemanticText tone="neutral" emphasis="low" icon={<Icon name="info" size="xs" />}>
+                  {dexAdvisory}
+                </SemanticText>
               </Text>
-            ))}
+            ) : null}
           </div>
         ) : null}
       </div>

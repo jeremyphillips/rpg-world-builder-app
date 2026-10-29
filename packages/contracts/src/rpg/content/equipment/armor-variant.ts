@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { armorCategorySchema } from '../../vocab/armor/category'
+import { resolveArmorDexterityRule } from '../../vocab/armor/dexterity-rule'
 import { armorMaterialSchema } from '../../vocab/armor/material'
 import { abilityScoreRequirementsSchema } from '../lib/ability-score-requirements'
 import type { EquipmentBaseFields } from './base'
@@ -34,10 +35,6 @@ export const armorEquipmentKindFields = {
    * absent for body armor.
    */
   acBonus: z.number().int().optional(),
-  /** Light/medium armor adds Dex modifier; heavy armor and shields do not. */
-  addDexModifier: z.boolean(),
-  /** Medium armor caps the Dex bonus at +2; absent for light and shields. */
-  maxDexBonus: z.number().int().optional(),
   stealthDisadvantage: z.boolean(),
   /**
    * Minimum ability scores to wear without penalty (AND of minimums). Read through
@@ -68,22 +65,21 @@ export function refineArmorEquipment(
   }
 }
 
-type ArmorAcDisplayFields = Pick<
-  ArmorEquipmentKindFields,
-  'category' | 'baseAc' | 'acBonus' | 'addDexModifier' | 'maxDexBonus'
->
+type ArmorAcDisplayFields = Pick<ArmorEquipmentKindFields, 'category' | 'baseAc' | 'acBonus'>
 
 /**
  * Returns a human-readable AC string for the detail page and table columns.
  *
  * @example getArmorAcDisplay(leather)       // "11 + Dex"
- * @example getArmorAcDisplay(chainMail)     // "16"
+ * @example getArmorAcDisplay(chainMail)     // "16 (no Dex)"
  * @example getArmorAcDisplay(halfPlate)     // "15 + Dex (max 2)"
  * @example getArmorAcDisplay(shieldWood)    // "+2"
  */
 export function getArmorAcDisplay(a: ArmorAcDisplayFields): string {
   if (a.category === 'shields') return `+${a.acBonus ?? 0}`
   const base = a.baseAc ?? 0
-  if (!a.addDexModifier) return String(base)
-  return a.maxDexBonus !== undefined ? `${base} + Dex (max ${a.maxDexBonus})` : `${base} + Dex`
+  const rule = resolveArmorDexterityRule(a.category)
+  if (rule.mode === 'none') return `${base} (no Dex)`
+  if (rule.mode === 'capped') return `${base} + Dex (max ${rule.maxBonus})`
+  return `${base} + Dex`
 }

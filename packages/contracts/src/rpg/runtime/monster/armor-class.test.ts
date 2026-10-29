@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { equipmentSchema, type Equipment } from '../../content/equipment'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
-import { resolveCreatureArmorSlot } from '../creature/armor-class'
+import { dexModifierForArmor, resolveCreatureArmorSlot } from '../creature/armor-class'
 import { resolveMonsterArmorClass, type MonsterArmorClassResolution } from './armor-class'
 
 const RULESET = 'srd-cc-5.2.1'
@@ -13,8 +13,6 @@ function armor(input: {
   category: 'light' | 'medium' | 'heavy' | 'shields'
   baseAc?: number
   acBonus?: number
-  addDexModifier: boolean
-  maxDexBonus?: number
 }): Equipment {
   return equipmentSchema.parse({
     id: `${RULESET}:${input.slug}`,
@@ -32,8 +30,6 @@ function armor(input: {
     category: input.category,
     ...(input.baseAc !== undefined ? { baseAc: input.baseAc } : {}),
     ...(input.acBonus !== undefined ? { acBonus: input.acBonus } : {}),
-    addDexModifier: input.addDexModifier,
-    ...(input.maxDexBonus !== undefined ? { maxDexBonus: input.maxDexBonus } : {}),
     stealthDisadvantage: false,
   })
 }
@@ -43,32 +39,35 @@ const leather = armor({
   name: 'Leather armor',
   category: 'light',
   baseAc: 11,
-  addDexModifier: true,
 })
 const chainShirt = armor({
   slug: 'chain-shirt',
   name: 'Chain shirt',
   category: 'medium',
   baseAc: 13,
-  addDexModifier: true,
-  maxDexBonus: 2,
 })
 const chainMail = armor({
   slug: 'chain-mail',
   name: 'Chain mail',
   category: 'heavy',
   baseAc: 16,
-  addDexModifier: false,
+})
+const halfPlate = armor({
+  slug: 'half-plate',
+  name: 'Half plate',
+  category: 'medium',
+  baseAc: 15,
 })
 const shield = armor({
   slug: 'shield',
   name: 'Shield',
   category: 'shields',
   acBonus: 2,
-  addDexModifier: false,
 })
 
-const catalog = new Map([leather, chainShirt, chainMail, shield].map((item) => [item.id, item]))
+const catalog = new Map(
+  [leather, chainShirt, chainMail, halfPlate, shield].map((item) => [item.id, item]),
+)
 
 const armorEnhancement: MagicPropertyDefinitionProvider = (id) =>
   id === `${RULESET}:armor-enhancement-1`
@@ -329,5 +328,146 @@ describe('resolveMonsterArmorClass', () => {
     expect(resolve({ equipment: [] })).toEqual({ status: 'unavailable', reason: 'missing-input' })
     expect(resolve({ fixedValue: 12 }).status).toBe('resolved')
     expect(resolved({ fixedValue: 12 }).calculatedAc).toBeUndefined()
+    expect(resolved({ fixedValue: 12 }).dexRestriction).toBeUndefined()
+  })
+
+  it('records when a medium cap is why natural armor wins, including the shared shield', () => {
+    const ac = resolved({
+      dex: 18,
+      naturalArmorBonus: 2,
+      equipment: [entry(chainShirt), entry(shield)],
+    })
+    expect(ac.source).toBe('natural')
+    expect(ac.ac).toBe(18)
+    expect(ac.alternatives).toEqual([{ source: 'armor', label: 'Chain shirt', ac: 17 }])
+    expect(ac.dexRestriction).toEqual({
+      mode: 'capped',
+      abilityModifier: 4,
+      appliedModifier: 2,
+      maxBonus: 2,
+      affectsOutcome: true,
+    })
+  })
+
+  it('treats an equal unrestricted armor body as changing the winner', () => {
+    const ac = resolved({
+      dex: 18,
+      naturalArmorBonus: 3,
+      equipment: [entry(chainShirt), entry(shield)],
+    })
+    expect(ac.ac).toBe(19)
+    expect(ac.alternatives).toEqual([{ source: 'armor', label: 'Chain shirt', ac: 17 }])
+    expect(ac.dexRestriction?.affectsOutcome).toBe(true)
+  })
+
+  it('omits the restriction when natural armor still wins with full DEX', () => {
+    const ac = resolved({
+      dex: 18,
+      naturalArmorBonus: 3,
+      equipment: [entry(leather)],
+    })
+    expect(ac.source).toBe('natural')
+    expect(ac.ac).toBe(17)
+    expect(ac.dexRestriction).toBeUndefined()
+  })
+
+  it('does not mark the outcome when capped armor already wins', () => {
+    const ac = resolved({ dex: 18, equipment: [entry(chainShirt)] })
+    expect(ac.source).toBe('armor')
+    expect(ac.ac).toBe(15)
+    expect(ac.dexRestriction).toMatchObject({
+      mode: 'capped',
+      abilityModifier: 4,
+      appliedModifier: 2,
+      affectsOutcome: false,
+    })
+  })
+
+  it('does not mark the outcome when DEX is inside the cap, zero, or negative', () => {
+    expect(
+      resolved({ dex: 12, naturalArmorBonus: 5, equipment: [entry(chainShirt)] }).dexRestriction,
+    ).toMatchObject({ abilityModifier: 1, appliedModifier: 1, affectsOutcome: false })
+    expect(
+      resolved({ dex: 10, naturalArmorBonus: 2, equipment: [entry(chainShirt)] }).dexRestriction,
+    ).toMatchObject({ abilityModifier: 0, appliedModifier: 0, affectsOutcome: false })
+    expect(
+      resolved({ dex: 8, naturalArmorBonus: 4, equipment: [entry(chainShirt)] }).dexRestriction,
+    ).toMatchObject({ abilityModifier: -1, appliedModifier: -1, affectsOutcome: false })
+  })
+
+  it('marks ignored positive DEX on heavy armor and ignores a negative modifier', () => {
+    const positive = resolved({
+      dex: 18,
+      naturalArmorBonus: 5,
+      equipment: [entry(chainMail)],
+    })
+    expect(positive.source).toBe('natural')
+    expect(positive.dexRestriction).toEqual({
+      mode: 'none',
+      abilityModifier: 4,
+      appliedModifier: 0,
+      affectsOutcome: true,
+    })
+
+    const negative = resolved({
+      dex: 8,
+      naturalArmorBonus: 8,
+      equipment: [entry(chainMail)],
+    })
+    expect(negative.source).toBe('natural')
+    expect(negative.dexRestriction).toMatchObject({
+      mode: 'none',
+      abilityModifier: -1,
+      appliedModifier: 0,
+      affectsOutcome: false,
+    })
+  })
+
+  it('keeps an armor enhancement inside the armor body when the cap changes the winner', () => {
+    const ac = resolved({
+      dex: 18,
+      naturalArmorBonus: 3,
+      equipment: [entry(chainShirt, { adjustment: 1 })],
+    })
+    expect(ac.ac).toBe(17)
+    expect(ac.alternatives).toEqual([{ source: 'armor', label: 'Chain shirt', ac: 16 }])
+    expect(ac.rows.some((row) => row.kind === 'enhancement')).toBe(false)
+    expect(ac.dexRestriction?.affectsOutcome).toBe(true)
+  })
+
+  it('shares the character armor contribution for medium armor, DEX +4, and a +1 enhancement', () => {
+    if (halfPlate.kind !== 'armor') throw new Error('expected armor')
+    expect(dexModifierForArmor(4, halfPlate)).toBe(2)
+    const ac = resolved({
+      dex: 18,
+      equipment: [entry(halfPlate, { adjustment: 1 })],
+    })
+    expect(ac.source).toBe('armor')
+    expect(ac.ac).toBe(18)
+    expect(ac.rows).toContainEqual({ kind: 'dex', value: 2, cap: 2 })
+  })
+
+  it('drops the restriction on a fixed override and on unequipped armor', () => {
+    const overridden = resolved({
+      dex: 18,
+      naturalArmorBonus: 2,
+      fixedValue: 20,
+      equipment: [entry(chainShirt), entry(shield)],
+    })
+    expect(overridden).toMatchObject({
+      source: 'fixed',
+      ac: 20,
+      calculatedAc: 18,
+    })
+    expect(overridden.dexRestriction).toBeUndefined()
+    expect(overridden.alternatives).toEqual([{ source: 'armor', label: 'Chain shirt', ac: 17 }])
+
+    const stowed = resolved({
+      dex: 18,
+      naturalArmorBonus: 2,
+      equipment: [entry(chainShirt, { equipped: false })],
+    })
+    expect(stowed.bodyArmor).toBeUndefined()
+    expect(stowed.dexRestriction).toBeUndefined()
   })
 })

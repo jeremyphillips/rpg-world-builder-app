@@ -53,6 +53,7 @@ export interface ResolvedFieldRenderConfig {
   controlSize: FieldSize
   hint?: string
   hintPosition: ReturnType<typeof resolveFieldHintPresentation>['position']
+  hintIcon?: ReturnType<typeof resolveFieldHintPresentation>['icon']
   derivedMeta?: FieldDerivedMeta
   derivedMetaReserveSpace?: boolean
 }
@@ -98,6 +99,7 @@ export function resolveFieldRenderConfig(
     controlSize,
     hint: resolvedHint,
     hintPosition: hintPresentation.position,
+    hintIcon: hintPresentation.text ? hintPresentation.icon : undefined,
     ...derivedMetaPresentation,
   }
 

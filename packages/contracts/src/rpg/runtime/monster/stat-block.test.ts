@@ -119,8 +119,6 @@ const equipmentCatalog = new Map(
       kind: 'armor',
       category: 'medium',
       baseAc: 13,
-      addDexModifier: true,
-      maxDexBonus: 2,
       stealthDisadvantage: false,
     }),
   ].map((row) => [row.id, row]),
@@ -440,7 +438,6 @@ describe('modifiedArmorFixture parity', () => {
       category: 'shields',
       material: 'metal',
       acBonus: 2,
-      addDexModifier: false,
       stealthDisadvantage: false,
     })
     const catalog = new Map(equipmentCatalog)

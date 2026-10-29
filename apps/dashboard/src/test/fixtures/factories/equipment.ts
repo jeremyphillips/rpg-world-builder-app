@@ -36,7 +36,6 @@ function armorBase(): Equipment {
     kind: 'armor',
     category: 'light',
     baseAc: 11,
-    addDexModifier: true,
     stealthDisadvantage: false,
     weight: { value: 10, unit: 'lb' },
   } satisfies Equipment

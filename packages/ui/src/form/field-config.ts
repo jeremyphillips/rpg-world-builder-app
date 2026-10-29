@@ -302,10 +302,15 @@ export interface FieldDynamicRecommendation {
   ) => FieldLayoutRecommendation | null
 }
 
+/** Decorative mark rendered inside the hint element so `aria-describedby` still points at it. */
+export type FieldHintIcon = 'info'
+
 /** Static and dynamic hint configuration on leaf fields. */
 export interface FieldHintConfig {
   text?: string
   position?: FieldHintPosition
+  /** Info icon inside the hint. Shown only while hint text is present. */
+  icon?: FieldHintIcon
   resolve?: FieldDynamicHint
 }
 
@@ -1927,6 +1932,7 @@ export function hiddenFieldNames(items: FormItem[], values: Record<string, unkno
 export function normalizeFieldHint(hint: string | FieldHintConfig | undefined): {
   text?: string
   position: FieldHintPosition
+  icon?: FieldHintIcon
   resolve?: FieldDynamicHint
 } {
   if (hint === undefined) {
@@ -1938,6 +1944,7 @@ export function normalizeFieldHint(hint: string | FieldHintConfig | undefined): 
   return {
     text: hint.text,
     position: hint.position ?? 'below-label',
+    icon: hint.icon,
     resolve: hint.resolve,
   }
 }
@@ -2036,11 +2043,13 @@ export function resolveFieldHintPosition(field: Pick<BaseFieldConfig, 'hint'>): 
 export function resolveFieldHintPresentation(
   field: Pick<BaseFieldConfig, 'hint'>,
   values: Record<string, unknown>,
-): { text?: string; position: FieldHintPosition } {
+): { text?: string; position: FieldHintPosition; icon?: FieldHintIcon } {
   const normalized = normalizeFieldHint(field.hint)
+  const text = normalized.resolve?.hintWhen(values) ?? normalized.text
   return {
-    text: normalized.resolve?.hintWhen(values) ?? normalized.text,
+    text,
     position: normalized.position,
+    ...(text && normalized.icon ? { icon: normalized.icon } : {}),
   }
 }
 

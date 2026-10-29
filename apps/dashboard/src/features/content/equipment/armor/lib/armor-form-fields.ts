@@ -5,11 +5,19 @@ import {
   ARMOR_CATEGORY_ENTRIES,
   ARMOR_MATERIALS,
   ARMOR_MATERIAL_ENTRIES,
+  formatArmorDexterityRuleHint,
   getAbilityCompactLabel,
   getAbilityLabel,
+  resolveArmorDexterityRule,
   type Ability,
 } from '@rpg/contracts'
-import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import {
+  toOptions,
+  type FieldHintConfig,
+  type FieldVisibility,
+  type FormItem,
+  type NumberFieldConfig,
+} from '@rpg/ui/form'
 
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 import {
@@ -35,10 +43,30 @@ function visibleWhenArmorShield(): FieldVisibility {
   }
 }
 
-function visibleWhenArmorDexCap(): FieldVisibility {
+function armorBaseAcHint(category: unknown): string | undefined {
+  if (category !== 'light' && category !== 'medium' && category !== 'heavy') return undefined
+  return formatArmorDexterityRuleHint(resolveArmorDexterityRule(category))
+}
+
+/** Body Base AC and shield AC bonus both use the same empty stepper control. */
+function armorAcStepperField(args: {
+  name: 'baseAc' | 'acBonus'
+  label: string
+  visibility: FieldVisibility
+  hint?: FieldHintConfig
+  min?: number
+}): NumberFieldConfig {
+  const { name, label, visibility, hint, min } = args
   return {
-    dependsOn: ['armorCategory', 'addDexModifier'],
-    visibleWhen: (v) => v.armorCategory === 'medium' && v.addDexModifier === true,
+    type: 'number',
+    name,
+    label,
+    control: 'stepper',
+    digits: 2,
+    visibility,
+    required: true,
+    ...(min !== undefined ? { min } : {}),
+    ...(hint ? { hint } : {}),
   }
 }
 
@@ -68,51 +96,31 @@ export function armorFormFieldGroup(): FormItem {
           },
         ],
       },
-      {
-        type: 'number',
+      armorAcStepperField({
         name: 'baseAc',
         label: 'Base AC',
-        min: 0,
         visibility: visibleWhenArmorNotShield(),
-        required: true,
-        digits: 2,
-      },
-      {
-        type: 'number',
+        hint: {
+          position: 'below-control',
+          icon: 'info',
+          resolve: {
+            dependsOn: ['armorCategory'],
+            hintWhen: (values) => armorBaseAcHint(values.armorCategory),
+          },
+        },
+      }),
+      armorAcStepperField({
         name: 'acBonus',
         label: 'AC bonus',
         min: 0,
         visibility: visibleWhenArmorShield(),
-        required: true,
-      },
+      }),
       {
-        kind: 'row',
-        fields: [
-          {
-            type: 'switch',
-            name: 'addDexModifier',
-            label: 'Add Dex modifier',
-            visibility: visibleWhenArmorNotShield(),
-            width: 'auto',
-            labelPosition: 'above',
-          },
-          {
-            type: 'number',
-            name: 'maxDexBonus',
-            label: 'Max Dex bonus',
-            min: 0,
-            digits: 2,
-            visibility: visibleWhenArmorDexCap(),
-            width: 'auto',
-          },
-          {
-            type: 'switch',
-            name: 'stealthDisadvantage',
-            label: 'Stealth disadvantage',
-            width: 'auto',
-            labelPosition: 'above',
-          },
-        ],
+        type: 'switch',
+        name: 'stealthDisadvantage',
+        label: 'Stealth disadvantage',
+        width: 'auto',
+        labelPosition: 'above',
       },
       minimumAbilityScoreRequirementField({
         ability: 'str',

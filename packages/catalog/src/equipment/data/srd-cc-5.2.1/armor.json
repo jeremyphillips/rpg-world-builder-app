@@ -21,8 +21,6 @@
     "category": "medium",
     "material": "metal",
     "baseAc": 14,
-    "addDexModifier": true,
-    "maxDexBonus": 2,
     "stealthDisadvantage": false
   },
   {
@@ -47,9 +45,10 @@
     "category": "heavy",
     "material": "metal",
     "baseAc": 16,
-    "addDexModifier": false,
     "stealthDisadvantage": true,
-    "abilityScoreRequirements": { "str": 13 }
+    "abilityScoreRequirements": {
+      "str": 13
+    }
   },
   {
     "id": "srd-cc-5.2.1:chain-shirt",
@@ -73,8 +72,6 @@
     "category": "medium",
     "material": "metal",
     "baseAc": 13,
-    "addDexModifier": true,
-    "maxDexBonus": 2,
     "stealthDisadvantage": false
   },
   {
@@ -99,8 +96,6 @@
     "category": "medium",
     "material": "metal",
     "baseAc": 15,
-    "addDexModifier": true,
-    "maxDexBonus": 2,
     "stealthDisadvantage": true
   },
   {
@@ -125,8 +120,6 @@
     "category": "medium",
     "material": "organic",
     "baseAc": 12,
-    "addDexModifier": true,
-    "maxDexBonus": 2,
     "stealthDisadvantage": false
   },
   {
@@ -151,7 +144,6 @@
     "category": "light",
     "material": "organic",
     "baseAc": 11,
-    "addDexModifier": true,
     "stealthDisadvantage": false
   },
   {
@@ -176,7 +168,6 @@
     "category": "light",
     "material": "organic",
     "baseAc": 11,
-    "addDexModifier": true,
     "stealthDisadvantage": true
   },
   {
@@ -201,9 +192,10 @@
     "category": "heavy",
     "material": "metal",
     "baseAc": 18,
-    "addDexModifier": false,
     "stealthDisadvantage": true,
-    "abilityScoreRequirements": { "str": 15 }
+    "abilityScoreRequirements": {
+      "str": 15
+    }
   },
   {
     "id": "srd-cc-5.2.1:ring-mail",
@@ -227,7 +219,6 @@
     "category": "heavy",
     "material": "metal",
     "baseAc": 14,
-    "addDexModifier": false,
     "stealthDisadvantage": true
   },
   {
@@ -252,8 +243,6 @@
     "category": "medium",
     "material": "metal",
     "baseAc": 14,
-    "addDexModifier": true,
-    "maxDexBonus": 2,
     "stealthDisadvantage": true
   },
   {
@@ -278,7 +267,6 @@
     "category": "shields",
     "material": "metal",
     "acBonus": 2,
-    "addDexModifier": false,
     "stealthDisadvantage": false
   },
   {
@@ -303,7 +291,6 @@
     "category": "shields",
     "material": "organic",
     "acBonus": 2,
-    "addDexModifier": false,
     "stealthDisadvantage": false
   },
   {
@@ -328,9 +315,10 @@
     "category": "heavy",
     "material": "metal",
     "baseAc": 17,
-    "addDexModifier": false,
     "stealthDisadvantage": true,
-    "abilityScoreRequirements": { "str": 15 }
+    "abilityScoreRequirements": {
+      "str": 15
+    }
   },
   {
     "id": "srd-cc-5.2.1:studded-leather",
@@ -354,7 +342,6 @@
     "category": "light",
     "material": "metal",
     "baseAc": 12,
-    "addDexModifier": true,
     "stealthDisadvantage": false
   }
 ]

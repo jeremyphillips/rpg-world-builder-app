@@ -9,24 +9,18 @@ import { resolveArmorClassIfEquipped } from './preview-equipped-armor'
 const leatherArmor = {
   category: 'light' as const,
   baseAc: 11,
-  addDexModifier: true,
-  maxDexBonus: undefined,
   acBonus: undefined,
 }
 
 const chainMail = {
   category: 'heavy' as const,
   baseAc: 16,
-  addDexModifier: false,
-  maxDexBonus: undefined,
   acBonus: undefined,
 }
 
 const shield = {
   category: 'shields' as const,
   baseAc: undefined,
-  addDexModifier: false,
-  maxDexBonus: undefined,
   acBonus: 2,
 }
 

@@ -45,7 +45,6 @@ const plateArmor = {
   kind: 'armor',
   category: 'heavy',
   baseAc: 18,
-  addDexModifier: false,
   stealthDisadvantage: true,
   abilityScoreRequirements: { str: 15 },
 } satisfies Equipment
@@ -119,8 +118,31 @@ describe('equipment-compact-display', () => {
   it('builds armor comparison groups with summary category labels', () => {
     expect(buildEquipmentCompactSummary(plateArmor)).toEqual({
       kindLabel: 'Armor',
-      comparisonGroups: ['AC 18', 'Heavy'],
+      comparisonGroups: ['AC 18 (no Dex)', 'Heavy'],
     })
+    const withoutRestriction = {
+      stealthDisadvantage: false,
+      abilityScoreRequirements: undefined,
+    }
+    expect(
+      buildEquipmentCompactSummary({
+        ...plateArmor,
+        category: 'light',
+        baseAc: 11,
+        ...withoutRestriction,
+      }).comparisonGroups.join(' · '),
+    ).toBe('AC 11 + Dex · Light')
+    expect(
+      buildEquipmentCompactSummary({
+        ...plateArmor,
+        category: 'medium',
+        baseAc: 14,
+        ...withoutRestriction,
+      }).comparisonGroups.join(' · '),
+    ).toBe('AC 14 + Dex (max 2) · Medium')
+    expect(buildEquipmentCompactSummary(plateArmor).comparisonGroups.join(' · ')).toBe(
+      'AC 18 (no Dex) · Heavy',
+    )
   })
 
   it('formats holy symbol spellcasting gear without the parent gear kind', () => {
@@ -149,7 +171,7 @@ describe('equipment-compact-display', () => {
       '1d4 Piercing',
     ])
     expect(buildEquipmentCompactSummary(plateArmor, 'compact-row').comparisonGroups).toEqual([
-      'AC 18',
+      'AC 18 (no Dex)',
     ])
     expect(buildEquipmentCompactSummary(holySymbolAmulet, 'compact-row').comparisonGroups).toEqual([
       'Spellcasting',

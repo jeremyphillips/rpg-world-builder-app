@@ -41,8 +41,6 @@ function equipmentFixture(
       ...base,
       category: category ?? 'heavy',
       baseAc: 16,
-      addDexModifier: false,
-      maxDexBonus: 0,
       stealthDisadvantage: true,
     } as Equipment
   }

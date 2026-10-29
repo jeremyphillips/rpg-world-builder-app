@@ -86,8 +86,6 @@ describe('resolveEquipmentMagicProperties', () => {
       kind: 'armor',
       category: 'medium',
       baseAc: 14,
-      addDexModifier: true,
-      maxDexBonus: 2,
       stealthDisadvantage: false,
       mode: undefined,
       properties: undefined,

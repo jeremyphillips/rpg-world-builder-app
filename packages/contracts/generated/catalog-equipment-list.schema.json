@@ -10,22 +10,22 @@
         "$ref": "#/definitions/__schema33"
       },
       {
+        "$ref": "#/definitions/__schema42"
+      },
+      {
         "$ref": "#/definitions/__schema44"
       },
       {
         "$ref": "#/definitions/__schema46"
       },
       {
-        "$ref": "#/definitions/__schema48"
+        "$ref": "#/definitions/__schema49"
+      },
+      {
+        "$ref": "#/definitions/__schema50"
       },
       {
         "$ref": "#/definitions/__schema51"
-      },
-      {
-        "$ref": "#/definitions/__schema52"
-      },
-      {
-        "$ref": "#/definitions/__schema53"
       }
     ],
     "markdownDescription": "Branch on **kind**: **weapon** | **armor** | **adventuring_gear** | **tool** | **mount** | **vehicle** | **service** | **magic_item**"
@@ -839,17 +839,11 @@
         "acBonus": {
           "$ref": "#/definitions/__schema38"
         },
-        "addDexModifier": {
+        "stealthDisadvantage": {
           "$ref": "#/definitions/__schema39"
         },
-        "maxDexBonus": {
-          "$ref": "#/definitions/__schema40"
-        },
-        "stealthDisadvantage": {
-          "$ref": "#/definitions/__schema41"
-        },
         "abilityScoreRequirements": {
-          "$ref": "#/definitions/__schema42"
+          "$ref": "#/definitions/__schema40"
         }
       },
       "required": [
@@ -865,7 +859,6 @@
         "cost",
         "kind",
         "category",
-        "addDexModifier",
         "stealthDisadvantage"
       ],
       "additionalProperties": false
@@ -907,14 +900,6 @@
       "type": "boolean"
     },
     "__schema40": {
-      "type": "integer",
-      "minimum": -9007199254740991,
-      "maximum": 9007199254740991
-    },
-    "__schema41": {
-      "type": "boolean"
-    },
-    "__schema42": {
       "type": "object",
       "propertyNames": {
         "allOf": [
@@ -938,7 +923,7 @@
         "maximum": 30
       }
     },
-    "__schema43": {
+    "__schema41": {
       "type": "string",
       "enum": [
         "str",
@@ -950,7 +935,7 @@
       ],
       "description": "str | dex | con | int | wis | cha"
     },
-    "__schema44": {
+    "__schema42": {
       "type": "object",
       "properties": {
         "id": {
@@ -1093,7 +1078,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema45": {
+    "__schema43": {
       "type": "string",
       "enum": [
         "worn",
@@ -1103,7 +1088,7 @@
       ],
       "description": "worn | held | borne_on_fabric | borne_on_shield"
     },
-    "__schema46": {
+    "__schema44": {
       "type": "object",
       "properties": {
         "id": {
@@ -1196,7 +1181,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema47"
+            "$ref": "#/definitions/__schema45"
           }
         },
         "crafts": {
@@ -1225,7 +1210,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema47": {
+    "__schema45": {
       "type": "object",
       "properties": {
         "description": {
@@ -1244,7 +1229,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema48": {
+    "__schema46": {
       "type": "object",
       "properties": {
         "id": {
@@ -1310,10 +1295,10 @@
           "description": "mount"
         },
         "carryingCapacity": {
-          "$ref": "#/definitions/__schema49"
+          "$ref": "#/definitions/__schema47"
         },
         "speed": {
-          "$ref": "#/definitions/__schema50"
+          "$ref": "#/definitions/__schema48"
         }
       },
       "required": [
@@ -1333,7 +1318,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema49": {
+    "__schema47": {
       "type": "object",
       "properties": {
         "value": {
@@ -1355,7 +1340,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema50": {
+    "__schema48": {
       "type": "object",
       "properties": {
         "value": {
@@ -1377,7 +1362,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema51": {
+    "__schema49": {
       "type": "object",
       "properties": {
         "id": {
@@ -1454,12 +1439,12 @@
           "description": "land | water | air | space | other"
         },
         "speed": {
-          "$ref": "#/definitions/__schema50"
+          "$ref": "#/definitions/__schema48"
         },
         "cargoCapacity": {
           "allOf": [
             {
-              "$ref": "#/definitions/__schema49"
+              "$ref": "#/definitions/__schema47"
             }
           ]
         },
@@ -1506,7 +1491,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema52": {
+    "__schema50": {
       "type": "object",
       "properties": {
         "id": {
@@ -1626,7 +1611,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema53": {
+    "__schema51": {
       "type": "object",
       "properties": {
         "id": {

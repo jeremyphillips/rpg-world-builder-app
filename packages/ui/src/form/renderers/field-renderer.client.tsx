@@ -90,6 +90,21 @@ const LazyEditableGridFieldRenderer = lazyFieldComponent<EditableGridFieldRender
   'EditableGridFieldRenderer',
 )
 
+/**
+ * Steppers with a `defaultValue` keep the numeric fallback. A stepper with no
+ * default, such as Base AC, stays blank until the author steps or types a number.
+ */
+function resolveNumberStepperBinding(
+  fieldValue: unknown,
+  config: { defaultValue?: number; min?: number },
+): { value: number; unbound: boolean } {
+  if (typeof fieldValue === 'number') return { value: fieldValue, unbound: false }
+  if (config.defaultValue !== undefined) {
+    return { value: config.defaultValue ?? config.min ?? 0, unbound: false }
+  }
+  return { value: 0, unbound: true }
+}
+
 /** Parses a numeric `<input>` value into `number | undefined` (option A). */
 function parseNumber(raw: string): number | undefined {
   if (raw.trim() === '') return undefined
@@ -104,6 +119,7 @@ interface RenderArgs<K extends FieldType> {
   id: string
   hint?: string
   hintPosition?: FieldHintPosition
+  hintIcon?: 'info'
   labelVisibility: FieldLabelVisibility
   error?: string
   invalid?: boolean
@@ -182,6 +198,7 @@ const fieldRenderers: {
     id,
     hint,
     hintPosition,
+    hintIcon,
     labelVisibility,
     ...validation
   }) =>
@@ -195,6 +212,7 @@ const fieldRenderers: {
         {...fieldValidationProps(validation)}
         hint={hint}
         hintPosition={hintPosition}
+        hintIcon={hintIcon}
         info={config.info}
         required={config.required}
         width={config.width}
@@ -202,9 +220,7 @@ const fieldRenderers: {
       >
         <NumberStepper
           id={id}
-          value={
-            typeof field.value === 'number' ? field.value : (config.defaultValue ?? config.min ?? 0)
-          }
+          {...resolveNumberStepperBinding(field.value, config)}
           onChange={field.onChange}
           min={config.min}
           max={config.max}
@@ -707,6 +723,7 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
       controlSize={resolved.controlSize}
       hint={resolved.hint}
       hintPosition={resolved.hintPosition}
+      hintIcon={resolved.hintIcon}
       fullName={fullName}
       id={id}
       namePrefix={namePrefix}
@@ -735,6 +752,7 @@ interface StandardFieldRendererProps {
   controlSize: FieldSize
   hint?: string
   hintPosition?: FieldHintPosition
+  hintIcon?: 'info'
   fullName: string
   id: string
   namePrefix?: string
@@ -746,6 +764,7 @@ function StandardFieldRenderer({
   controlSize,
   hint,
   hintPosition,
+  hintIcon,
   fullName,
   id,
   namePrefix,
@@ -817,6 +836,7 @@ function StandardFieldRenderer({
     id,
     hint,
     hintPosition,
+    hintIcon,
     labelVisibility,
     ...validation,
     remotePreview,

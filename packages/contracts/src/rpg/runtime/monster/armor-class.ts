@@ -8,7 +8,7 @@ import { getCreatureArmorClassKindLabel } from '../../vocab/creature-armor-class
 import type { ArmorClassBase } from '../../vocab/mechanics/edition-preset-mechanics'
 import { abilityModifier } from '../creature/ability-modifier'
 import {
-  dexModifierForArmor,
+  resolveArmorDexContribution,
   resolveCreatureArmorSlot,
   toEquippedArmorPieceForEntry,
   type EquippedArmorPiece,
@@ -49,6 +49,18 @@ export type MonsterArmorClassResolution = {
   calculatedAc?: number
   bodyArmor?: { entryId: string; label: string }
   shield?: { entryId: string; label: string }
+  /**
+   * Present when equipped body armor caps or ignores DEX. Omitted for light armor,
+   * unequipped armor, and fixed overrides.
+   */
+  dexRestriction?: {
+    mode: 'capped' | 'none'
+    abilityModifier: number
+    appliedModifier: number
+    maxBonus?: number
+    /** Natural armor won only because the restriction lowered the armor body total. */
+    affectsOutcome: boolean
+  }
 }
 
 type ArmorContributionRow = {
@@ -158,16 +170,15 @@ function armorCandidate(
   provider: MagicPropertyDefinitionProvider,
 ): BodyCandidate {
   const base = row.item.baseAc ?? 0
+  const contribution = resolveArmorDexContribution(dexModifier, row.piece)
   const rows: MonsterArmorClassRow[] = [
     { kind: 'armor-base', entryId: row.entryId, label: row.label, value: base },
   ]
-  let appliedDex = 0
-  if (row.item.addDexModifier) {
-    appliedDex = dexModifierForArmor(dexModifier, row.piece)
+  if (contribution.rule.mode !== 'none') {
     rows.push({
       kind: 'dex',
-      value: appliedDex,
-      ...(row.item.maxDexBonus !== undefined ? { cap: row.item.maxDexBonus } : {}),
+      value: contribution.appliedModifier,
+      ...(contribution.rule.mode === 'capped' ? { cap: contribution.rule.maxBonus } : {}),
     })
   }
   const enhancement = enhancementRow(row, 'armor', provider)
@@ -175,7 +186,7 @@ function armorCandidate(
   return {
     source: 'armor',
     label: row.label,
-    bodyAc: base + appliedDex + row.piece.acAdjustment,
+    bodyAc: base + contribution.appliedModifier + row.piece.acAdjustment,
     rows,
   }
 }
@@ -236,6 +247,12 @@ function calculateArmorClass(input: {
       label: candidate.label,
       ac: candidate.bodyAc + bonus,
     }))
+  const dexRestriction = resolveDexRestriction({
+    bodyArmor,
+    dexModifier,
+    winner,
+    candidates,
+  })
   return {
     ac: winner.bodyAc + bonus,
     source: winner.source,
@@ -243,6 +260,41 @@ function calculateArmorClass(input: {
     alternatives,
     ...optionalPiece('bodyArmor', pieceRef(bodyArmor)),
     ...optionalPiece('shield', pieceRef(shield)),
+    ...(dexRestriction ? { dexRestriction } : {}),
+  }
+}
+
+function resolveDexRestriction(input: {
+  bodyArmor: ArmorContributionRow | undefined
+  dexModifier: number
+  winner: BodyCandidate
+  candidates: readonly BodyCandidate[]
+}): MonsterArmorClassResolution['dexRestriction'] {
+  const { bodyArmor, dexModifier, winner, candidates } = input
+  if (!bodyArmor || bodyArmor.item.category === 'shields') return undefined
+  const contribution = resolveArmorDexContribution(dexModifier, bodyArmor.piece)
+  if (contribution.rule.mode === 'full') return undefined
+
+  const armorCandidate = candidates.find((candidate) => candidate.source === 'armor')
+  const naturalCandidate = candidates.find((candidate) => candidate.source === 'natural')
+  const reduced = contribution.appliedModifier < contribution.abilityModifier
+  const unrestrictedBody =
+    armorCandidate === undefined
+      ? undefined
+      : armorCandidate.bodyAc + (contribution.abilityModifier - contribution.appliedModifier)
+  const affectsOutcome =
+    winner.source === 'natural' &&
+    reduced &&
+    naturalCandidate !== undefined &&
+    unrestrictedBody !== undefined &&
+    unrestrictedBody >= naturalCandidate.bodyAc
+
+  return {
+    mode: contribution.rule.mode,
+    abilityModifier: contribution.abilityModifier,
+    appliedModifier: contribution.appliedModifier,
+    ...(contribution.rule.mode === 'capped' ? { maxBonus: contribution.rule.maxBonus } : {}),
+    affectsOutcome,
   }
 }
 

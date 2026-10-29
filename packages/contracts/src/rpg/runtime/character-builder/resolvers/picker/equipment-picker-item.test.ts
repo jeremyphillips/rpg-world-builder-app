@@ -111,7 +111,6 @@ describe('getEquipmentRecommendationKindRank', () => {
           kind: 'armor',
           category: 'heavy',
           baseAc: 16,
-          addDexModifier: false,
         }),
       ),
     ).toBe(EQUIPMENT_RECOMMENDATION_KIND_RANK.armor)
@@ -314,7 +313,6 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         kind: 'armor',
         category: 'light',
         baseAc: 11,
-        addDexModifier: true,
       }),
       { tier: 'compatible', reasons: ['classSuggested'] },
     )
@@ -462,7 +460,6 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         kind: 'armor',
         category: 'light',
         baseAc: 11,
-        addDexModifier: true,
       }),
       {
         tier: 'strong',

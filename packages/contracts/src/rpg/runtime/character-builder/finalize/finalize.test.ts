@@ -450,7 +450,6 @@ describe('finalizePcCharacterBuild', () => {
       kind: 'armor',
       category: 'heavy',
       baseAc: 18,
-      addDexModifier: false,
       stealthDisadvantage: true,
       abilityScoreRequirements: { str: 15 },
     })
