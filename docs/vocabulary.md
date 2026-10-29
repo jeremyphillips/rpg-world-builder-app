@@ -398,12 +398,12 @@ apply product casing conventions.
 Closed reference entries expose up to four semantic layers plus an optional
 presentation casing step in apps:
 
-| Field | Role | Example |
-| ----- | ---- | ------- |
-| `label` | Canonical identity / title | Adventuring Gear / Skill Proficiency |
-| `compactLabel` | Short identity for tight spaces | Gear / Skills |
-| `sentence` | Counted prose for generated sentences | piece(s) of adventuring gear |
-| `collectionLabel` | Set or category name (sentence case) | Adventuring gear / Skill proficiencies |
+| Field             | Role                                  | Example                                |
+| ----------------- | ------------------------------------- | -------------------------------------- |
+| `label`           | Canonical identity / title            | Adventuring Gear / Skill Proficiency   |
+| `compactLabel`    | Short identity for tight spaces       | Gear / Skills                          |
+| `sentence`        | Counted prose for generated sentences | piece(s) of adventuring gear           |
+| `collectionLabel` | Set or category name (sentence case)  | Adventuring gear / Skill proficiencies |
 
 Use `getTermCollectionLabel(entry)` for collection copy; it prefers authored
 `collectionLabel` and otherwise capitalizes the plural `sentence` form. Do not
@@ -432,7 +432,7 @@ Equipment picker rows use a contracts-side segment assembler in
 2. **Layout registry** — per `EquipmentKind`, a priority-ordered `fields` list with optional `{ firstAvailable: [...] }` fallback slots.
 3. **Assembler** — walks slots in order, skips redundant segments, caps intrinsic `metadata` at three segments; `kindLabel` and contextual callouts sit outside the cap.
 
-Dashboard surfaces call `buildEquipmentCompactSummary()` through
+Dashboard surfaces call `buildEquipmentCompactSummary(equipment, { profile?, armorClassRules })` through
 [`buildEquipmentPickerRowViewModel`](../apps/dashboard/src/features/content/equipment/lib/equipment-display.ts);
 the picker UI joins segments with `EQUIPMENT_COMPACT_SEPARATOR`.
 

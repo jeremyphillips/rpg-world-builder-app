@@ -1,4 +1,10 @@
-import { type CreateEquipmentInput, type VehicleEquipment } from '@rpg/contracts'
+import {
+  armorClassFromProtection,
+  protectionFromArmorClass,
+  type ArmorClassRules,
+  type CreateEquipmentInput,
+  type VehicleEquipment,
+} from '@rpg/contracts'
 
 import {
   massFromForm,
@@ -16,6 +22,7 @@ type VehicleInput = Extract<CreateEquipmentInput, { kind: 'vehicle' }>
 
 function optionalVehicleFields(
   values: EquipmentInputBuildCtx<'vehicle'>['values'],
+  rules: ArmorClassRules | undefined,
 ): Partial<VehicleInput> {
   const cargoCapacity = massFromForm(values.cargoCapacity)
   const speed = speedRateFromForm(values.speed)
@@ -24,7 +31,8 @@ function optionalVehicleFields(
     ...(cargoCapacity && { cargoCapacity }),
     ...(values.crew !== undefined && { crew: values.crew }),
     ...(values.passengers !== undefined && { passengers: values.passengers }),
-    ...(values.ac !== undefined && { ac: values.ac }),
+    ...(values.ac !== undefined &&
+      rules && { acOffset: protectionFromArmorClass(rules, values.ac) }),
     ...(values.hp !== undefined && { hp: values.hp }),
     ...(values.damageThreshold !== undefined && { damageThreshold: values.damageThreshold }),
   }
@@ -32,6 +40,7 @@ function optionalVehicleFields(
 
 export function vehicleFormValuesFromEntity(
   item: VehicleEquipment,
+  rules?: ArmorClassRules,
 ): Pick<
   VehicleEquipmentFormValues,
   | 'vehicleCategory'
@@ -49,7 +58,10 @@ export function vehicleFormValuesFromEntity(
     cargoCapacity: massToForm(item.cargoCapacity),
     crew: item.crew,
     passengers: item.passengers,
-    ac: item.ac,
+    ac:
+      item.acOffset !== undefined && rules
+        ? armorClassFromProtection(rules, item.acOffset)
+        : undefined,
     hp: item.hp,
     damageThreshold: item.damageThreshold,
   }
@@ -74,7 +86,7 @@ export function buildVehicleInput({
           ? {}
           : { vehicleCategory: 'other' as const }),
       ...(weight && { weight }),
-      ...optionalVehicleFields(values),
+      ...optionalVehicleFields(values, ctx?.armorClassRules),
     },
     validationIntent,
   )

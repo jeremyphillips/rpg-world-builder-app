@@ -14,7 +14,7 @@ import {
   subtractFromWealth,
   type Ability,
   type ArmorEquipment,
-  type ArmorClassBase,
+  type ArmorClassRules,
   type CharacterBuildCatalogIndex,
   type EquippedArmorPiece,
   type CharacterBuilderDraft,
@@ -34,7 +34,7 @@ export const EQUIPMENT_PICKER_PREVIEW_REMAINING_AFTER_PURCHASE_LABEL = 'Remainin
 
 export type EquipmentPickerCharacterPreviewContext = {
   level: number
-  armorClassBase: ArmorClassBase
+  armorClassRules: ArmorClassRules
   abilityScores?: Partial<Record<Ability, number>>
   equippedArmor?: readonly EquippedArmorPiece[]
   budget?: EquipmentBudgetSummary
@@ -61,7 +61,7 @@ export function resolveEquipmentPickerCharacterPreviewContext(args: {
 
   return {
     level: draft.class.level,
-    armorClassBase: characterCreationRules.armorClass.base,
+    armorClassRules: characterCreationRules.armorClass,
     abilityScores: draft.abilities.scores,
     equippedArmor: equippedArmor.pieces,
     budget,
@@ -105,7 +105,7 @@ function resolveArmorPreviewLine(
 
   const dexModifier = typeof dexScore === 'number' ? abilityModifier(dexScore) : 0
   const ac = resolveArmorClassIfEquipped({
-    acBase: context.armorClassBase,
+    rules: context.armorClassRules,
     dexModifier,
     currentEquippedArmor: context.equippedArmor ?? [],
     candidateArmor: equipment,

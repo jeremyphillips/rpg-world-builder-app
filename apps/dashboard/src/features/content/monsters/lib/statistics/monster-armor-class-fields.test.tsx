@@ -34,7 +34,7 @@ describe('monster armor class fields', () => {
 
     expect(screen.queryByRole('group', { name: 'Natural armor' })).not.toBeInTheDocument()
     expect(screen.queryByRole('checkbox', { name: 'Natural armor' })).not.toBeInTheDocument()
-    expect(screen.getByText("Adds to the creature's unarmored AC.")).toBeInTheDocument()
+    expect(screen.getByText('Improves unarmored AC.')).toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Armor & shield' })).toBeInTheDocument()
     expect(
       screen.getByRole('group', { name: 'Armor & shield' }).querySelector('legend'),

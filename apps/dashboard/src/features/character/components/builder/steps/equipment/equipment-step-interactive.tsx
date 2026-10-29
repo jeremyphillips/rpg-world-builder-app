@@ -185,6 +185,7 @@ export function EquipmentStepInteractive({
         budget={budget}
         showCharacterPreview
         characterPreviewContext={characterPreviewContext}
+        armorClassRules={characterPreviewContext?.armorClassRules}
         ownership={pickerAcquisition.ownership}
         workflowMode={step.pickerWorkflowMode}
         workflowSwitcher={

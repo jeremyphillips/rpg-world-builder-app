@@ -4,6 +4,7 @@ import {
   isEquipmentPickerSupportedEquipment,
   resolveNpcTemplateEffectiveEquipmentPreferences,
   resolvePlayableBuilderContent,
+  type ArmorClassRules,
   type CharacterBuildContext,
   type EquipmentPickerItem,
   type EquipmentPickerSupportedKind,
@@ -28,6 +29,7 @@ export type QuickNpcAdditionalEquipmentOption = {
 export function resolveQuickNpcAdditionalEquipmentOptions(args: {
   setup: QuickNpcSetupValues
   context: CharacterBuildContext
+  armorClassRules?: ArmorClassRules
 }): QuickNpcAdditionalEquipmentOption[] {
   const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
   const characterClass = catalogIndex.classes.get(args.setup.classId)
@@ -55,7 +57,14 @@ export function resolveQuickNpcAdditionalEquipmentOptions(args: {
             },
           },
         },
-        row: buildEquipmentPickerRowViewModel(row),
+        row: args.armorClassRules
+          ? buildEquipmentPickerRowViewModel(row, args.armorClassRules)
+          : {
+              name: row.name,
+              priceLabel: '',
+              kindLabel: row.kind,
+              comparisonGroups: [],
+            },
       }))
   }
   const draft = buildMinimalCharacterBuilderDraftForRecommendations({
@@ -84,7 +93,14 @@ export function resolveQuickNpcAdditionalEquipmentOptions(args: {
   return sortEquipmentPickerItems(items, browseSortContext).map((pickerItem) => ({
     option: { value: pickerItem.equipment.id, label: pickerItem.equipment.name },
     pickerItem,
-    row: buildEquipmentPickerRowViewModel(pickerItem.equipment),
+    row: args.armorClassRules
+      ? buildEquipmentPickerRowViewModel(pickerItem.equipment, args.armorClassRules)
+      : {
+          name: pickerItem.equipment.name,
+          priceLabel: '',
+          kindLabel: pickerItem.equipment.kind,
+          comparisonGroups: [],
+        },
   }))
 }
 

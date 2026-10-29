@@ -126,6 +126,7 @@ const QUICK_NPC_EQUIPMENT_SEARCH_NOUN = (() => {
 const QUICK_NPC_EQUIPMENT_CATEGORY_FILTER_LABEL = 'Equipment kind'
 
 export type QuickNpcStartingEquipmentPanelProps = {
+  armorClassRules?: import('@rpg/contracts').ArmorClassRules
   setup: QuickNpcSetupValues
   choices: NpcStartingChoices
   buildContext: CharacterBuildContext
@@ -609,6 +610,7 @@ function QuickNpcStartingEquipmentPackageSection({
 }
 
 type QuickNpcAdditionalEquipmentSectionProps = {
+  armorClassRules?: import('@rpg/contracts').ArmorClassRules
   setup: QuickNpcSetupValues
   choices: NpcStartingChoices
   buildContext: CharacterBuildContext
@@ -761,6 +763,7 @@ function AdditionalEquipmentPicker({
 }
 
 function QuickNpcAdditionalEquipmentSection({
+  armorClassRules,
   setup,
   choices,
   buildContext,
@@ -822,6 +825,7 @@ function QuickNpcAdditionalEquipmentSection({
   const presentationById = React.useMemo(
     () =>
       buildQuickNpcAdditionalEquipmentPresentationMap({
+        armorClassRules,
         entries: visibleEntries,
         equipmentSelections,
         choices,
@@ -878,6 +882,7 @@ function QuickNpcAdditionalEquipmentSection({
 }
 
 export function QuickNpcStartingEquipmentPanel({
+  armorClassRules,
   setup,
   choices,
   buildContext,
@@ -970,6 +975,7 @@ export function QuickNpcStartingEquipmentPanel({
       ) : null}
 
       <QuickNpcAdditionalEquipmentSection
+        armorClassRules={armorClassRules}
         setup={setup}
         choices={choices}
         buildContext={buildContext}

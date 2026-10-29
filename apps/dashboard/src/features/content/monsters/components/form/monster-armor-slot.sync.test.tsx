@@ -1,3 +1,4 @@
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -21,6 +22,7 @@ const ctx = {
   equipmentCatalogStatus: 'ready',
   equipmentCatalogById: new Map([[leather.id, leather]]),
   skillCatalogStatus: 'ready',
+  armorClassRules: systemDefaultArmorClassRules(),
 } satisfies ContentFormCtx
 
 function Host({ equipment }: { equipment?: MonsterFormValues['equipment'] }) {
@@ -45,7 +47,9 @@ describe('monster armor slot and equipment tab', () => {
     expect(toggles).toHaveLength(2)
     expect(toggles[0]).toBeChecked()
     expect(toggles[1]).toBeChecked()
-    for (const segment of buildEquipmentCompactSummary(leather).comparisonGroups) {
+    for (const segment of buildEquipmentCompactSummary(leather, {
+      armorClassRules: systemDefaultArmorClassRules(),
+    }).comparisonGroups) {
       expect(screen.getAllByText(segment).length).toBeGreaterThan(0)
     }
 

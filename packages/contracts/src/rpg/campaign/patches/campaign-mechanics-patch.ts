@@ -10,9 +10,8 @@ import {
 import {
   ARMOR_CLASS_BASES,
   ARMOR_CLASS_MODES,
-  type ArmorClassBase,
-  type ArmorClassMode,
-} from '../../vocab/mechanics/edition-preset-mechanics'
+  type ArmorClassRules,
+} from '../../vocab/mechanics/armor-class-scale'
 
 export const armorClassModeSchema = z.enum(ARMOR_CLASS_MODES)
 
@@ -20,10 +19,6 @@ export const armorClassBaseSchema = z.union([
   z.literal(ARMOR_CLASS_BASES[0]),
   z.literal(ARMOR_CLASS_BASES[1]),
 ])
-
-export const DEFAULT_ARMOR_CLASS_MODE = 'ascending' as const satisfies ArmorClassMode
-
-export const DEFAULT_ARMOR_CLASS_BASE = 10 as const satisfies ArmorClassBase
 
 const armorClassPatchSchema = z
   .object({
@@ -68,9 +63,14 @@ export type ResolvedEditionPreset = z.infer<typeof resolvedEditionPresetSchema>
 export const resolvedArmorClassSchema = z.object({
   mode: armorClassModeSchema,
   base: armorClassBaseSchema,
-})
+}) satisfies z.ZodType<ArmorClassRules>
 
 export type ResolvedArmorClass = z.infer<typeof resolvedArmorClassSchema>
+
+/** The only place system-default Armor Class rules are selected. */
+export function systemDefaultArmorClassRules(): ArmorClassRules {
+  return getEditionPresetMechanics(DEFAULT_EDITION_PRESET_ID).armorClass
+}
 
 export const resolvedAttackResolutionSchema = z.object({
   mode: attackResolutionModeIdSchema,

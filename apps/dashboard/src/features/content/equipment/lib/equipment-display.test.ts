@@ -1,3 +1,4 @@
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { formatEquipmentCostLabel, getEquipmentKindLabel } from '@rpg/contracts'
@@ -46,7 +47,7 @@ function expectedMetadataStatRows(slug: string) {
       label: EQUIPMENT_STAT_LABELS.cost,
       value: expectedCostLabel(slug),
     },
-    ...getEquipmentKindStatRows(equipment),
+    ...getEquipmentKindStatRows(equipment, systemDefaultArmorClassRules()),
   ].filter((row) => row.label !== EQUIPMENT_STAT_LABELS.gearKind)
 }
 
@@ -56,7 +57,7 @@ describe('equipment-display', () => {
       const equipment = pickEquipment(slug)
       expect(equipment.kind).toBe(kind)
 
-      const viewModel = buildEquipmentPickerRowViewModel(equipment)
+      const viewModel = buildEquipmentPickerRowViewModel(equipment, systemDefaultArmorClassRules())
 
       expect(viewModel.name).toBe(equipment.name)
       expect(viewModel.priceLabel).toBe(expectedPickerPriceLabel(slug))
@@ -66,42 +67,41 @@ describe('equipment-display', () => {
 
     it('builds dagger compact metadata segments', () => {
       const equipment = pickEquipment('dagger')
-      expect(buildEquipmentPickerRowViewModel(equipment).comparisonGroups).toEqual([
-        '1d4 Piercing',
-        'Finesse · Light · Thrown',
-      ])
+      expect(
+        buildEquipmentPickerRowViewModel(equipment, systemDefaultArmorClassRules())
+          .comparisonGroups,
+      ).toEqual(['1d4 Piercing', 'Finesse · Light · Thrown'])
     })
 
     it('builds plate armor compact metadata segments', () => {
       const equipment = pickEquipment('plate-armor')
-      expect(buildEquipmentPickerRowViewModel(equipment).comparisonGroups).toEqual([
-        'AC 18 (no Dex)',
-        'Heavy',
-      ])
+      expect(
+        buildEquipmentPickerRowViewModel(equipment, systemDefaultArmorClassRules())
+          .comparisonGroups,
+      ).toEqual(['AC 18 (no Dex)', 'Heavy'])
     })
 
     it('builds holy symbol compact metadata segments', () => {
       const equipment = pickEquipment('holy-symbol-amulet')
-      expect(buildEquipmentPickerRowViewModel(equipment).comparisonGroups).toEqual([
-        'Holy Symbol',
-        'Worn or held',
-      ])
+      expect(
+        buildEquipmentPickerRowViewModel(equipment, systemDefaultArmorClassRules())
+          .comparisonGroups,
+      ).toEqual(['Holy Symbol', 'Worn or held'])
     })
 
     it('builds magic item compact metadata segments', () => {
       const equipment = pickEquipment('bracers-of-defense')
-      expect(buildEquipmentPickerRowViewModel(equipment).comparisonGroups).toEqual([
-        'Wondrous Item',
-        'Rare',
-        'Requires attunement',
-      ])
+      expect(
+        buildEquipmentPickerRowViewModel(equipment, systemDefaultArmorClassRules())
+          .comparisonGroups,
+      ).toEqual(['Wondrous Item', 'Rare', 'Requires attunement'])
     })
   })
 
   describe('buildEquipmentDetailViewModel', () => {
     it.each(KIND_FIXTURES)('builds detail stat rows for $kind', ({ slug, kind }) => {
       const equipment = pickEquipment(slug)
-      const viewModel = buildEquipmentDetailViewModel(equipment)
+      const viewModel = buildEquipmentDetailViewModel(equipment, systemDefaultArmorClassRules())
 
       expect(viewModel.detailsSectionTitle).toBe(EQUIPMENT_DETAILS_SECTION_TITLES[kind])
       expect(viewModel.classificationLabel).toBe(getEquipmentKindLabel(kind))
@@ -120,21 +120,25 @@ describe('equipment-display', () => {
         description: 'A versatile martial weapon.',
       }
 
-      expect(buildEquipmentDetailViewModel(equipment).description).toBe(
-        'A versatile martial weapon.',
-      )
+      expect(
+        buildEquipmentDetailViewModel(equipment, systemDefaultArmorClassRules()).description,
+      ).toBe('A versatile martial weapon.')
     })
 
     it('omits description when absent', () => {
       const equipment = { ...pickEquipment('longsword'), description: undefined }
 
-      expect(buildEquipmentDetailViewModel(equipment).description).toBeUndefined()
+      expect(
+        buildEquipmentDetailViewModel(equipment, systemDefaultArmorClassRules()).description,
+      ).toBeUndefined()
     })
 
     it('omits description when empty', () => {
       const equipment = { ...pickEquipment('longsword'), description: '' }
 
-      expect(buildEquipmentDetailViewModel(equipment).description).toBeUndefined()
+      expect(
+        buildEquipmentDetailViewModel(equipment, systemDefaultArmorClassRules()).description,
+      ).toBeUndefined()
     })
   })
 })

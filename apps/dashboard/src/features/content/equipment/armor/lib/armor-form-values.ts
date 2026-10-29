@@ -1,5 +1,8 @@
 import {
+  armorClassFromProtection,
+  protectionFromArmorClass,
   type AbilityScoreRequirements,
+  type ArmorClassRules,
   type ArmorEquipment,
   type CreateEquipmentInput,
 } from '@rpg/contracts'
@@ -13,11 +16,15 @@ import type { ArmorEquipmentFormValues } from '../../lib/equipment-form-fields'
 
 type ArmorInput = Extract<CreateEquipmentInput, { kind: 'armor' }>
 
-function optionalArmorAc(values: EquipmentInputBuildCtx<'armor'>['values']): Partial<ArmorInput> {
+function optionalArmorAc(
+  values: EquipmentInputBuildCtx<'armor'>['values'],
+  rules: ArmorClassRules | undefined,
+): Partial<ArmorInput> {
   if (values.armorCategory === 'shields') {
     return values.acBonus !== undefined ? { acBonus: values.acBonus } : {}
   }
-  return values.baseAc !== undefined ? { baseAc: values.baseAc } : {}
+  if (values.baseAc === undefined || !rules) return {}
+  return { baseAcOffset: protectionFromArmorClass(rules, values.baseAc) }
 }
 
 /**
@@ -41,6 +48,7 @@ function abilityScoreRequirementsFromForm(
 
 export function armorFormValuesFromEntity(
   item: ArmorEquipment,
+  rules?: ArmorClassRules,
 ): Pick<
   ArmorEquipmentFormValues,
   | 'armorCategory'
@@ -54,7 +62,10 @@ export function armorFormValuesFromEntity(
   return {
     armorCategory: item.category,
     material: item.material,
-    baseAc: item.baseAc,
+    baseAc:
+      item.baseAcOffset !== undefined && rules
+        ? armorClassFromProtection(rules, item.baseAcOffset)
+        : undefined,
     acBonus: item.acBonus,
     stealthDisadvantage: item.stealthDisadvantage,
     abilityScoreRequirements: item.abilityScoreRequirements,
@@ -84,7 +95,7 @@ export function buildArmorInput({
         : { stealthDisadvantage: values.stealthDisadvantage ?? false }),
       ...(weight && { weight }),
       ...(values.material && { material: values.material }),
-      ...optionalArmorAc(values),
+      ...optionalArmorAc(values, ctx?.armorClassRules),
       ...(abilityScoreRequirements && { abilityScoreRequirements }),
     },
     validationIntent,

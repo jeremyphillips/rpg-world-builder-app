@@ -1,14 +1,14 @@
 import type { EquipmentModifier } from '../../../content/equipment/instance/modifier'
-import type { ArmorClassBase } from '../../../vocab/mechanics/edition-preset-mechanics'
+import type { ArmorClassRules } from '../../../vocab/mechanics/armor-class-scale'
 import {
-  resolveEquippedArmorClass,
+  resolveCreatureArmorClass,
   toEquippedArmorPiece,
   type ArmorAcFields,
   type EquippedArmorPiece,
 } from '../../creature/armor-class'
 
 export type ResolveArmorClassIfEquippedInput = {
-  acBase: ArmorClassBase
+  rules: ArmorClassRules
   dexModifier: number
   currentEquippedArmor: readonly EquippedArmorPiece[]
   candidateArmor: ArmorAcFields
@@ -20,7 +20,7 @@ export type ResolveArmorClassIfEquippedInput = {
  * stacking/replacing shields to match the preview panel rules.
  */
 export function resolveArmorClassIfEquipped({
-  acBase,
+  rules,
   dexModifier,
   currentEquippedArmor,
   candidateArmor,
@@ -31,10 +31,14 @@ export function resolveArmorClassIfEquipped({
     candidatePiece.category === 'shields'
       ? [...currentEquippedArmor.filter((armor) => armor.category !== 'shields'), candidatePiece]
       : [...currentEquippedArmor.filter((armor) => armor.category === 'shields'), candidatePiece]
+  const bodyArmor = equipped.find((armor) => armor.category !== 'shields')
+  const shields = equipped.filter((armor) => armor.category === 'shields')
 
-  return resolveEquippedArmorClass({
-    acBase,
+  return resolveCreatureArmorClass({
+    rules,
     dexModifier,
-    equippedArmor: equipped,
-  })
+    bodyArmor,
+    shields,
+    eligibility: { skinCompetesWithArmor: false },
+  }).ac
 }

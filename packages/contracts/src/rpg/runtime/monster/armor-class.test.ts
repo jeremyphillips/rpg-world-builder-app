@@ -12,7 +12,7 @@ function armor(input: {
   slug: string
   name: string
   category: 'light' | 'medium' | 'heavy' | 'shields'
-  baseAc?: number
+  baseAcOffset?: number
   acBonus?: number
 }): Equipment {
   return equipmentSchema.parse({
@@ -29,7 +29,7 @@ function armor(input: {
     weight: { value: 1, unit: 'lb' },
     kind: 'armor',
     category: input.category,
-    ...(input.baseAc !== undefined ? { baseAc: input.baseAc } : {}),
+    ...(input.baseAcOffset !== undefined ? { baseAcOffset: input.baseAcOffset } : {}),
     ...(input.acBonus !== undefined ? { acBonus: input.acBonus } : {}),
     stealthDisadvantage: false,
   })
@@ -39,25 +39,25 @@ const leather = armor({
   slug: 'leather-armor',
   name: 'Leather armor',
   category: 'light',
-  baseAc: 11,
+  baseAcOffset: 1,
 })
 const chainShirt = armor({
   slug: 'chain-shirt',
   name: 'Chain shirt',
   category: 'medium',
-  baseAc: 13,
+  baseAcOffset: 3,
 })
 const chainMail = armor({
   slug: 'chain-mail',
   name: 'Chain mail',
   category: 'heavy',
-  baseAc: 16,
+  baseAcOffset: 6,
 })
 const halfPlate = armor({
   slug: 'half-plate',
   name: 'Half plate',
   category: 'medium',
-  baseAc: 15,
+  baseAcOffset: 5,
 })
 const shield = armor({
   slug: 'shield',
@@ -127,11 +127,13 @@ function entry(
 function resolve(input: {
   dex?: number
   naturalArmorBonus?: number
+  /** Absolute AC under the chosen ascending base. Converted to an offset. */
   fixedValue?: number
   equipment?: ReturnType<typeof entry>[]
   acBase?: 9 | 10
   provider?: MagicPropertyDefinitionProvider
 }) {
+  const base = input.acBase ?? 10
   return resolveMonsterArmorClass({
     monster: {
       abilityScores: input.dex === undefined ? {} : { dex: input.dex },
@@ -139,12 +141,12 @@ function resolve(input: {
         ...(input.naturalArmorBonus !== undefined
           ? { naturalArmorBonus: input.naturalArmorBonus }
           : {}),
-        ...(input.fixedValue !== undefined ? { fixedValue: input.fixedValue } : {}),
+        ...(input.fixedValue !== undefined ? { fixedAcOffset: input.fixedValue - base } : {}),
       },
       equipment: input.equipment ?? [],
     },
     equipmentCatalog: catalog,
-    acBase: input.acBase ?? 10,
+    armorClassRules: { mode: 'ascending', base },
     magicPropertyProvider: input.provider ?? emptyProvider,
   })
 }
@@ -522,7 +524,7 @@ describe('resolveMonsterArmorClass', () => {
         equipment: [{ entryId: 'gone', equipmentId: 'missing-armor', quantity: 1, equipped: true }],
       },
       equipmentCatalog: catalog,
-      acBase: 10,
+      armorClassRules: { mode: 'ascending', base: 10 },
       magicPropertyProvider: emptyProvider,
     })
 
@@ -547,11 +549,11 @@ describe('resolveMonsterArmorClass', () => {
     const overridden = resolveMonsterArmorClass({
       monster: {
         abilityScores: { dex: 14 },
-        armorClass: { fixedValue: 16 },
+        armorClass: { fixedAcOffset: 6 },
         equipment: [{ entryId: 'gone', equipmentId: 'missing-armor', quantity: 1, equipped: true }],
       },
       equipmentCatalog: catalog,
-      acBase: 10,
+      armorClassRules: { mode: 'ascending', base: 10 },
       magicPropertyProvider: emptyProvider,
     })
 

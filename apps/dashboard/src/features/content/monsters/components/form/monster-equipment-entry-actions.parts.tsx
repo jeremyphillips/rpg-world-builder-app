@@ -6,7 +6,11 @@ import {
   resolveEquipmentInstanceSummary,
   shouldShowUnmodifiedEquipmentQualifier,
 } from '@rpg/contracts'
-import type { buildEquipmentInventoryUnmodifiedContext, SystemRulesetId } from '@rpg/contracts'
+import type {
+  ArmorClassRules,
+  buildEquipmentInventoryUnmodifiedContext,
+  SystemRulesetId,
+} from '@rpg/contracts'
 import { ConfirmDialog } from '@rpg/ui'
 
 import { EquipmentInstanceEditorDrawer } from '../../../equipment/components/instance-editor/equipment-instance-editor-drawer'
@@ -42,6 +46,7 @@ export function MonsterEquipmentEntryCardView({
   magicProvider,
   weaponGrants,
   unmodifiedContext,
+  armorClassRules,
   onUpdate,
   onRemove,
   onCustomize,
@@ -53,6 +58,7 @@ export function MonsterEquipmentEntryCardView({
   magicProvider: ReturnType<typeof createMagicPropertyDefinitionProvider>
   weaponGrants: ReturnType<typeof resolveMonsterFormWeaponGrants>
   unmodifiedContext: ReturnType<typeof buildEquipmentInventoryUnmodifiedContext>
+  armorClassRules?: ArmorClassRules
   onUpdate: (next: MonsterEquipmentFormEntry[]) => void
   onRemove: (entryId: string) => void
   onCustomize: (entryId: string) => void
@@ -77,6 +83,7 @@ export function MonsterEquipmentEntryCardView({
     adjustmentSegments: rowSummary?.adjustmentSegments,
   })
   const supportingMetadata = buildCreatureEquipmentRowSupportingMetadata({
+    armorClassRules,
     rowSummary,
     catalogItem: item,
     leadingSegments: shouldShowUnmodifiedEquipmentQualifier(entry, unmodifiedContext)

@@ -119,6 +119,7 @@ export function useMonsterEquipmentEntryActions(ctx: ContentFormCtx): MonsterEqu
       magicProvider={magicProvider}
       weaponGrants={weaponGrants}
       unmodifiedContext={unmodifiedContext}
+      armorClassRules={ctx.armorClassRules}
       onUpdate={updateEquipment}
       onRemove={removeEntry}
       onCustomize={setEditorEntryId}

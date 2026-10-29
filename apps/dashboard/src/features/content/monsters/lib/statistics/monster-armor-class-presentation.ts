@@ -121,13 +121,16 @@ function alternativeSentence(
   const armorName = equippedArmorName(resolution, alternative)
   const naturalAc = resolution.source === 'natural' ? resolution.ac : alternative.ac
   const armorAc = resolution.source === 'armor' ? resolution.ac : alternative.ac
-  if (naturalAc === armorAc) {
+  if (resolution.tie) {
     return `Natural armor and ${proseArmorName(armorName, false)} both provide ${naturalAc}.`
   }
-  if (naturalAc > armorAc) {
+  if (resolution.source === 'natural') {
     return `Natural armor wins: ${naturalAc} vs. ${armorAc} with ${proseArmorName(armorName, false)}.`
   }
-  return `${proseArmorName(armorName, true)} wins: ${armorAc} vs. ${naturalAc} with natural armor.`
+  if (resolution.source === 'armor') {
+    return `${proseArmorName(armorName, true)} wins: ${armorAc} vs. ${naturalAc} with natural armor.`
+  }
+  return undefined
 }
 
 /** Rules note when worn armor caps or ignores DEX. Independent of natural-versus-armor winner. */

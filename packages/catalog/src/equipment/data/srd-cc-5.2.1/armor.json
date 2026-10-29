@@ -20,8 +20,8 @@
     "kind": "armor",
     "category": "medium",
     "material": "metal",
-    "baseAc": 14,
-    "stealthDisadvantage": false
+    "stealthDisadvantage": false,
+    "baseAcOffset": 4
   },
   {
     "id": "srd-cc-5.2.1:chain-mail",
@@ -44,11 +44,11 @@
     "kind": "armor",
     "category": "heavy",
     "material": "metal",
-    "baseAc": 16,
     "stealthDisadvantage": true,
     "abilityScoreRequirements": {
       "str": 13
-    }
+    },
+    "baseAcOffset": 6
   },
   {
     "id": "srd-cc-5.2.1:chain-shirt",
@@ -71,8 +71,8 @@
     "kind": "armor",
     "category": "medium",
     "material": "metal",
-    "baseAc": 13,
-    "stealthDisadvantage": false
+    "stealthDisadvantage": false,
+    "baseAcOffset": 3
   },
   {
     "id": "srd-cc-5.2.1:half-plate-armor",
@@ -95,8 +95,8 @@
     "kind": "armor",
     "category": "medium",
     "material": "metal",
-    "baseAc": 15,
-    "stealthDisadvantage": true
+    "stealthDisadvantage": true,
+    "baseAcOffset": 5
   },
   {
     "id": "srd-cc-5.2.1:hide",
@@ -119,8 +119,8 @@
     "kind": "armor",
     "category": "medium",
     "material": "organic",
-    "baseAc": 12,
-    "stealthDisadvantage": false
+    "stealthDisadvantage": false,
+    "baseAcOffset": 2
   },
   {
     "id": "srd-cc-5.2.1:leather-armor",
@@ -143,8 +143,8 @@
     "kind": "armor",
     "category": "light",
     "material": "organic",
-    "baseAc": 11,
-    "stealthDisadvantage": false
+    "stealthDisadvantage": false,
+    "baseAcOffset": 1
   },
   {
     "id": "srd-cc-5.2.1:padded",
@@ -167,8 +167,8 @@
     "kind": "armor",
     "category": "light",
     "material": "organic",
-    "baseAc": 11,
-    "stealthDisadvantage": true
+    "stealthDisadvantage": true,
+    "baseAcOffset": 1
   },
   {
     "id": "srd-cc-5.2.1:plate-armor",
@@ -191,11 +191,11 @@
     "kind": "armor",
     "category": "heavy",
     "material": "metal",
-    "baseAc": 18,
     "stealthDisadvantage": true,
     "abilityScoreRequirements": {
       "str": 15
-    }
+    },
+    "baseAcOffset": 8
   },
   {
     "id": "srd-cc-5.2.1:ring-mail",
@@ -218,8 +218,8 @@
     "kind": "armor",
     "category": "heavy",
     "material": "metal",
-    "baseAc": 14,
-    "stealthDisadvantage": true
+    "stealthDisadvantage": true,
+    "baseAcOffset": 4
   },
   {
     "id": "srd-cc-5.2.1:scale-mail",
@@ -242,8 +242,8 @@
     "kind": "armor",
     "category": "medium",
     "material": "metal",
-    "baseAc": 14,
-    "stealthDisadvantage": true
+    "stealthDisadvantage": true,
+    "baseAcOffset": 4
   },
   {
     "id": "srd-cc-5.2.1:shield",
@@ -314,11 +314,11 @@
     "kind": "armor",
     "category": "heavy",
     "material": "metal",
-    "baseAc": 17,
     "stealthDisadvantage": true,
     "abilityScoreRequirements": {
       "str": 15
-    }
+    },
+    "baseAcOffset": 7
   },
   {
     "id": "srd-cc-5.2.1:studded-leather",
@@ -341,7 +341,7 @@
     "kind": "armor",
     "category": "light",
     "material": "metal",
-    "baseAc": 12,
-    "stealthDisadvantage": false
+    "stealthDisadvantage": false,
+    "baseAcOffset": 2
   }
 ]

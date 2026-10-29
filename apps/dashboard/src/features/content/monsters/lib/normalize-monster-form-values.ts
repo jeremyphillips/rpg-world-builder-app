@@ -1,8 +1,10 @@
 import {
+  protectionFromArmorClass,
   creatureWeaponProficienciesSchema,
   creatureWeaponProficiencyTargetsFromGrantSet,
   monsterActionDraftSchema,
   monsterReactionDraftSchema,
+  type ArmorClassRules,
   type ContentValidationIntent,
 } from '@rpg/contracts'
 
@@ -28,6 +30,7 @@ export type NormalizeMonsterFormOptions = {
   baseline?: MonsterNormalizeBaseline
   intent: ContentValidationIntent
   mode?: 'create' | 'update'
+  armorClassRules?: ArmorClassRules
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -85,13 +88,16 @@ function normalizeAction(
   return stable
 }
 
-function normalizeArmorClass(armorClass: MonsterFormValues['armorClass']): Record<string, unknown> {
+function normalizeArmorClass(
+  armorClass: MonsterFormValues['armorClass'],
+  rules: ArmorClassRules | undefined,
+): Record<string, unknown> {
   const next: Record<string, unknown> = {}
   if (typeof armorClass.naturalArmorBonus === 'number' && armorClass.naturalArmorBonus > 0) {
     next.naturalArmorBonus = armorClass.naturalArmorBonus
   }
-  if (armorClass.useFixedAc && typeof armorClass.fixedValue === 'number') {
-    next.fixedValue = armorClass.fixedValue
+  if (armorClass.useFixedAc && typeof armorClass.fixedValue === 'number' && rules) {
+    next.fixedAcOffset = protectionFromArmorClass(rules, armorClass.fixedValue)
   }
   return next
 }
@@ -187,7 +193,7 @@ export function normalizeMonsterFormValues(
     creatureType: values.creatureType,
     alignment: values.alignment,
     abilityScores: values.abilityScores,
-    armorClass: normalizeArmorClass(values.armorClass),
+    armorClass: normalizeArmorClass(values.armorClass, options.armorClassRules),
     hitPoints: normalizeHitPoints(values.hitPoints),
     movement: movementRecord,
     senses: values.senses ?? [],

@@ -17,6 +17,7 @@ import { resolveContentFormFooterPresentation } from './content-form-footer.lib'
 import { useContentFormWriteGateReason } from './content-form-write-gate'
 import { useContentFormActionState } from './use-content-form-action-state'
 import type { ContentSaveActionState } from '../session/use-content-save-session'
+import { useArmorClassRulesStale } from '../session/armor-class-authoring-session'
 
 const DISCARD_CHANGES_LABEL = 'Discard changes'
 const CANCEL_LABEL = 'Cancel'
@@ -156,9 +157,11 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
   onLeaveGuardReady,
 }: ContentFormFooterProps<TFieldValues>) {
   const fallbackActionState = useContentFormActionState({ mode, pending })
+  const rulesStale = useArmorClassRulesStale()
   const strictWriteGateReason = useContentFormWriteGateReason('strict')
   const resolvedActionState = actionState ?? fallbackActionState
-  const submitDisabled = resolvedActionState.submitDisabled || strictWriteGateReason !== null
+  const submitDisabled =
+    resolvedActionState.submitDisabled || rulesStale || strictWriteGateReason !== null
   const createPending = pending || saveDraftPending
   const { dirtyFields } = useFormState({ control: form.control })
   const subclassEdits = useSubclassUnsavedEditsBlocking()

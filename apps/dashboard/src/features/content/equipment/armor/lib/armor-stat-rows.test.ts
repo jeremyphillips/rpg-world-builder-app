@@ -1,3 +1,4 @@
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 import { isArmorEquipment } from '@rpg/contracts'
 
@@ -12,13 +13,13 @@ if (!isArmorEquipment(LEATHER) || !isArmorEquipment(PLATE)) {
 
 describe('getArmorStatRows', () => {
   it('omits optional rows for light armor', () => {
-    const labels = getArmorStatRows(LEATHER).map((row) => row.label)
+    const labels = getArmorStatRows(LEATHER, systemDefaultArmorClassRules()).map((row) => row.label)
     expect(labels).not.toContain('Max Dex Bonus')
     expect(labels).not.toContain('Strength Required')
   })
 
   it('uses summary category labels and omits strength requirement for heavy armor', () => {
-    const rows = getArmorStatRows(PLATE)
+    const rows = getArmorStatRows(PLATE, systemDefaultArmorClassRules())
     expect(rows.find((row) => row.label === 'Category')?.value).toBe('Heavy')
     expect(rows.find((row) => row.label === 'Strength Required')).toBeUndefined()
     expect(rows.find((row) => row.label === 'Stealth')?.value).toBe('Disadvantage')

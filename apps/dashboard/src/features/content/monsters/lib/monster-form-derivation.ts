@@ -1,8 +1,7 @@
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import {
   deriveMonsterDraftStatBlock,
-  resolveMechanicsPatch,
-  type ArmorClassBase,
+  type ArmorClassRules,
   type DerivedMonsterDraftStatBlock,
   type Equipment,
   type MagicPropertyDefinitionProvider,
@@ -14,8 +13,8 @@ import type { ContentFormCtx } from '../../lib/forms/registry/content-form-regis
 import type { MonsterFormValues } from './monster-form-values'
 import { normalizeMonsterFormValues } from './normalize-monster-form-values'
 
-export function monsterArmorClassBase(ctx: ContentFormCtx): ArmorClassBase {
-  return ctx.armorClassBase ?? resolveMechanicsPatch().armorClass.base
+export function monsterArmorClassRules(ctx: ContentFormCtx): ArmorClassRules | undefined {
+  return ctx.armorClassRules
 }
 
 export function monsterMagicPropertyProvider(ctx: ContentFormCtx): MagicPropertyDefinitionProvider {
@@ -38,12 +37,18 @@ export function deriveMonsterFormDraft(
   ctx: ContentFormCtx,
 ): DerivedMonsterDraftStatBlock | null {
   if (ctx.equipmentCatalogStatus !== 'ready') return null
-  const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
+  const armorClassRules = monsterArmorClassRules(ctx)
+  if (!armorClassRules) return null
+  const normalized = normalizeMonsterFormValues(values, {
+    intent: 'draft',
+    mode: 'create',
+    armorClassRules,
+  })
   return deriveMonsterDraftStatBlock({
     monster: normalized,
     equipmentCatalog: monsterEquipmentCatalog(ctx),
     skillCatalog: monsterSkillCatalog(ctx),
-    acBase: monsterArmorClassBase(ctx),
+    armorClassRules,
     magicPropertyProvider: monsterMagicPropertyProvider(ctx),
   })
 }

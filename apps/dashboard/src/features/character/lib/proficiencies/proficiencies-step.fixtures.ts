@@ -88,7 +88,7 @@ export function createEmptyProficienciesStepPreviewFixture(): CharacterBuildPrev
     abilityScores: {},
     proficiencyBonus: undefined,
     maxHp: undefined,
-    ac: undefined,
+    ac: { status: 'unavailable', reason: 'missing-input' },
     savingThrows: ABILITY_IDS.map((ability) => ({
       ability,
       bonus: undefined,

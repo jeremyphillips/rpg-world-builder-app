@@ -50,7 +50,7 @@ const leatherArmor = equipmentSchema.parse({
   weight: { value: 10, unit: 'lb' },
   kind: 'armor',
   category: 'light',
-  baseAc: 11,
+  baseAcOffset: 1,
   stealthDisadvantage: false,
 })
 

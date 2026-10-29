@@ -43,7 +43,7 @@ const chainMail = equipmentSchema.parse({
   weight: { value: 55, unit: 'lb' },
   kind: 'armor',
   category: 'heavy',
-  baseAc: 16,
+  baseAcOffset: 6,
   stealthDisadvantage: true,
   abilityScoreRequirements: { str: 13 },
 })
@@ -920,7 +920,7 @@ const leatherArmor = equipmentSchema.parse({
   weight: { value: 10, unit: 'lb' },
   kind: 'armor',
   category: 'light',
-  baseAc: 11,
+  baseAcOffset: 1,
   stealthDisadvantage: false,
 })
 

@@ -42,7 +42,7 @@ export function toCharacterDerivationInput(
   return {
     level: getCharacterBuilderTotalLevel(draft),
     proficiencyBonusOverride: isLevelZeroNpc ? rules.levelZeroNpcs.proficiencyBonus : undefined,
-    armorClassBase: rules.armorClass.base,
+    armorClassRules: rules.armorClass,
     abilityScores: draft.abilities.scores,
     characterClass,
     proficiencies: assembleCharacterProficiencies(draft, catalogIndex, choiceSets, characterClass, {

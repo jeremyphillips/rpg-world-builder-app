@@ -3,7 +3,7 @@ import type { ZodType } from 'zod'
 import type { FormItem, FormValueSync, TabbedFormTab } from '@rpg/ui/form'
 
 import type {
-  ArmorClassBase,
+  ArmorClassRules,
   ContentMediaDomain,
   ContentSource,
   ContentValidationIntent,
@@ -79,8 +79,8 @@ export type ContentFormCtx = {
   equipmentCatalogStatus?: 'pending' | 'ready' | 'error'
   /** `ready` once `skillCatalogBySlug` is the campaign's effective catalog. */
   skillCatalogStatus?: 'pending' | 'ready' | 'error'
-  /** Campaign ruleset Armor Class base. Falls back to resolved default mechanics. */
-  armorClassBase?: ArmorClassBase
+  /** Campaign armor-class scale captured for this authoring session. */
+  armorClassRules?: ArmorClassRules
   /** Selected member class affinity ids for orphan chip union on edit load. */
   organizationMemberClassAffinitySeedIds?: readonly string[]
   /** Selected member species affinity ids for orphan chip union on edit load. */
@@ -114,6 +114,8 @@ export type ContentFormInputCtx<TEntity> = {
   campaignRules?: ResolvedCampaignRules
   /** Injected on family routes when the Kind field is omitted from the form. */
   equipmentKind?: EquipmentKind
+  /** Same snapshot as {@link ContentFormCtx.armorClassRules} for offset conversion. */
+  armorClassRules?: ArmorClassRules
 }
 
 /**
@@ -165,7 +167,7 @@ export interface ContentFormDef<
    * Maps a stored entity to form defaults for the edit shell.
    * Partial so optional fields don't need explicit `undefined`.
    */
-  toFormValues: (entity: TEntity) => Partial<TFormValues>
+  toFormValues: (entity: TEntity, ctx?: ContentFormValuesCtx) => Partial<TFormValues>
   /**
    * Initial values for the create shell. Merged over synthesized field defaults
    * from `buildFields` (e.g. nested `movement` rows need `{ movement: [{ mode, feet }] }`).
@@ -212,6 +214,12 @@ export interface ContentFormDef<
    * Projection builders are required when `preview` is present.
    */
   preview?: ContentFormPreviewConfig<TFormValues, TPreviewResources>
+  /** Displayed AC fields depend on the campaign ruleset and must snapshot it. */
+  armorClassRulesSensitive?: boolean
+}
+
+export type ContentFormValuesCtx = {
+  armorClassRules?: ArmorClassRules
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- all params are erased at the registry boundary; each def is strongly typed internally

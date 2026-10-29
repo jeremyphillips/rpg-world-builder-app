@@ -1,3 +1,4 @@
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { equipmentPickerLongswordFixture } from '../../../components/equipment/picker/drawer/equipment-picker-drawer.fixtures'
@@ -8,7 +9,10 @@ import type { QuickNpcWeaponRequirementOption } from './quick-npc-requirement-op
 
 describe('quick-npc-requirement-preview.lib', () => {
   it('formats equipment metadata lines as readable preview description text', () => {
-    const row = buildEquipmentPickerRowViewModel(equipmentPickerLongswordFixture)
+    const row = buildEquipmentPickerRowViewModel(
+      equipmentPickerLongswordFixture,
+      systemDefaultArmorClassRules(),
+    )
     const entry = {
       option: { value: equipmentPickerLongswordFixture.id, label: row.name },
       pickerItem: {

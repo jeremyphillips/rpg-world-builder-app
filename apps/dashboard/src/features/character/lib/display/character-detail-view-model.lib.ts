@@ -97,7 +97,7 @@ function toCharacterDetailDerivationInput(
 
   return {
     level: getDetailSourceTotalLevel(source),
-    armorClassBase: rules.armorClass.base,
+    armorClassRules: rules.armorClass,
     abilityScores: source.abilityScores,
     characterClass,
     proficiencies: source.proficiencies,
@@ -580,7 +580,8 @@ export function buildCharacterDetailViewModel({
     savingThrows: buildSavingThrowSection(source, catalogIndex, rules),
     proficiencies: buildProficienciesSection(source, catalogIndex, rules),
     spells: buildCharacterSheetSpellCards({ spells: [...source.spells] }, catalogIndex),
-    equipment: buildCharacterSheetEquipmentCards(source, catalogIndex),
+    equipment: buildCharacterSheetEquipmentCards(source, catalogIndex, rules.armorClass),
+    armorClassRules: rules.armorClass,
     wealth: {
       label: CHARACTER_SECTION_LABELS.wealth,
       value: source.wealth !== undefined ? `${source.wealth.gp} gp` : '—',

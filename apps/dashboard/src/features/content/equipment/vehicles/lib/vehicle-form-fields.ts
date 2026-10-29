@@ -1,4 +1,9 @@
-import { VEHICLE_CATEGORIES, VEHICLE_CATEGORY_ENTRIES } from '@rpg/contracts'
+import {
+  fixedAcDisplayBounds,
+  VEHICLE_CATEGORIES,
+  VEHICLE_CATEGORY_ENTRIES,
+  type ArmorClassRules,
+} from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import { vehicleCargoSpeedFields } from '../../../lib/forms/fields/content-speed-form-fields'
@@ -10,7 +15,12 @@ const vehicleCategoryOptions = toOptions(
 )
 
 /** Vehicle-specific form field group for the unified equipment form. */
-export function vehicleFormFieldGroup(): FormItem {
+function openStepperBound(value: number | undefined, fallback: number): number {
+  return value ?? fallback
+}
+
+export function vehicleFormFieldGroup(rules?: ArmorClassRules): FormItem {
+  const bounds = rules ? fixedAcDisplayBounds(rules) : undefined
   return {
     kind: 'group',
     legend: '',
@@ -35,7 +45,8 @@ export function vehicleFormFieldGroup(): FormItem {
                 type: 'number',
                 name: 'ac',
                 label: 'AC',
-                min: 0,
+                min: rules ? openStepperBound(bounds?.min, Number.MIN_SAFE_INTEGER) : 0,
+                ...(rules ? { max: openStepperBound(bounds?.max, Number.MAX_SAFE_INTEGER) } : {}),
                 digits: 2,
                 width: 'auto',
               },

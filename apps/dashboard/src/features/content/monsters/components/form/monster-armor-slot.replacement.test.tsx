@@ -123,7 +123,7 @@ function ReplacementHost({ equipment }: { equipment: MonsterEquipmentFormEntry[]
         forReference: () => [leather, chain],
       },
     },
-  } as ContentFormCtx
+  } as unknown as ContentFormCtx
   return (
     <FormProvider {...form}>
       <MonsterArmorSlotAction slot="body-armor" ctx={ctx} />

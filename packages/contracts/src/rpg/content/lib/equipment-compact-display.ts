@@ -6,6 +6,7 @@ import {
   getEquipmentKindLabel,
   getEquipmentSpellcastingGearKind,
 } from '../equipment'
+import type { ArmorClassRules } from '../../vocab/mechanics/armor-class-scale'
 import { formatAbilityScoreRequirementsRestriction } from './ability-score-requirements'
 import { getArmorCategorySummaryLabel } from '../../vocab/armor/category'
 import { getPhysicalDamageTypeLabel } from '../../vocab/damage/physical'
@@ -113,9 +114,9 @@ function formatCompactProperties(equipment: Equipment): string | undefined {
   return joinInlineMetadata(equipment.properties)
 }
 
-function formatCompactArmorClass(equipment: Equipment): string | undefined {
+function formatCompactArmorClass(equipment: Equipment, rules: ArmorClassRules): string | undefined {
   if (equipment.kind !== 'armor') return undefined
-  const ac = getArmorAcDisplay(equipment)
+  const ac = getArmorAcDisplay(equipment, rules)
   return equipment.category === 'shields' ? `${ac} AC` : `AC ${ac}`
 }
 
@@ -230,7 +231,7 @@ const COMPACT_FIELD_FORMATTERS: Record<
 > = {
   damage: formatCompactDamage,
   properties: formatCompactProperties,
-  armorClass: formatCompactArmorClass,
+  armorClass: () => undefined,
   category: formatCompactCategory,
   magicItemCategory: formatCompactMagicItemCategory,
   restriction: formatCompactRestriction,
@@ -345,7 +346,12 @@ function resolveEquipmentCompactLayout(
   return COMPACT_METADATA_LAYOUT[equipment.kind] ?? { fields: [] }
 }
 
-function formatCompactField(equipment: Equipment, fieldId: CompactFieldId): string | undefined {
+function formatCompactField(
+  equipment: Equipment,
+  fieldId: CompactFieldId,
+  rules: ArmorClassRules,
+): string | undefined {
+  if (fieldId === 'armorClass') return formatCompactArmorClass(equipment, rules)
   return COMPACT_FIELD_FORMATTERS[fieldId](equipment)
 }
 
@@ -369,6 +375,7 @@ function assembleComparisonGroups(
   equipment: Equipment,
   layout: EquipmentCompactLayout,
   kindLabel: string,
+  rules: ArmorClassRules,
 ): string[] {
   const maxSegments = layout.maxSegments ?? EQUIPMENT_COMPACT_DEFAULT_MAX_SEGMENTS
   const comparisonGroups: string[] = []
@@ -380,7 +387,7 @@ function assembleComparisonGroups(
       if (
         pushCompactSegment(
           comparisonGroups,
-          formatCompactField(equipment, slot),
+          formatCompactField(equipment, slot, rules),
           kindLabel,
           maxSegments,
           equipment.name,
@@ -392,7 +399,7 @@ function assembleComparisonGroups(
     }
 
     for (const fieldId of slot.firstAvailable) {
-      const segment = formatCompactField(equipment, fieldId)
+      const segment = formatCompactField(equipment, fieldId, rules)
       if (
         !segment ||
         isRedundantCompactSegment(segment, comparisonGroups, kindLabel, equipment.name)
@@ -409,13 +416,22 @@ function assembleComparisonGroups(
 
 export function buildEquipmentCompactSummary(
   equipment: Equipment,
-  profile: EquipmentCompactSummaryProfile = 'standard',
+  options: {
+    profile?: EquipmentCompactSummaryProfile
+    armorClassRules: ArmorClassRules
+  },
 ): EquipmentCompactSummary {
+  const profile = options.profile ?? 'standard'
   const kindLabel = getEquipmentKindLabel(equipment.kind)
   const layout = resolveEquipmentCompactLayout(equipment, profile)
 
   return {
     kindLabel,
-    comparisonGroups: assembleComparisonGroups(equipment, layout, kindLabel),
+    comparisonGroups: assembleComparisonGroups(
+      equipment,
+      layout,
+      kindLabel,
+      options.armorClassRules,
+    ),
   }
 }

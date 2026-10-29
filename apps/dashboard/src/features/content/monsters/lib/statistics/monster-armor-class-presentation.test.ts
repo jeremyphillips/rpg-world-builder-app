@@ -18,6 +18,7 @@ import {
 
 const missingCalculation: MonsterArmorClassResolution = {
   ac: 16,
+  tie: false,
   source: 'fixed',
   rows: [{ kind: 'fixed', value: 16 }],
   alternatives: { status: 'unavailable', reason: 'missing-reference' },
@@ -26,6 +27,7 @@ const missingCalculation: MonsterArmorClassResolution = {
 
 const chainAndShield: MonsterArmorClassResolution = {
   ac: 18,
+  tie: false,
   source: 'armor',
   rows: [
     { kind: 'armor-base', entryId: 'mail', label: 'Chain mail', value: 16 },
@@ -58,6 +60,7 @@ describe('monster armor class presentation', () => {
     expect(
       monsterArmorClassAlternativeMessages({
         ac: 15,
+        tie: false,
         source: 'natural',
         rows: [{ kind: 'natural', value: 2 }],
         alternatives: resolvedField([{ source: 'armor', label: 'Studded Leather', ac: 14 }]),
@@ -69,6 +72,7 @@ describe('monster armor class presentation', () => {
     expect(
       monsterArmorClassAlternativeMessages({
         ac: 14,
+        tie: false,
         source: 'armor',
         rows: [{ kind: 'armor-base', entryId: 'leather', label: 'Studded Leather', value: 12 }],
         alternatives: resolvedField([{ source: 'unarmored', label: 'Unarmored', ac: 10 }]),
@@ -78,6 +82,7 @@ describe('monster armor class presentation', () => {
     expect(
       monsterArmorClassCaption({
         ac: 14,
+        tie: false,
         source: 'armor',
         rows: [],
         alternatives: resolvedField([{ source: 'unarmored', label: 'Unarmored', ac: 10 }]),
@@ -89,6 +94,7 @@ describe('monster armor class presentation', () => {
   it('labels a dex cap and a fixed override separately from the calculated total', () => {
     const resolution: MonsterArmorClassResolution = {
       ac: 17,
+      tie: false,
       source: 'fixed',
       rows: [{ kind: 'fixed', value: 17 }],
       alternatives: resolvedField([]),
@@ -122,6 +128,7 @@ describe('monster armor class presentation', () => {
     expect(
       monsterArmorClassAlternativeMessages({
         ac: 18,
+        tie: true,
         source: 'armor',
         rows: [],
         alternatives: resolvedField([{ source: 'natural', label: 'Natural armor', ac: 18 }]),
@@ -133,6 +140,7 @@ describe('monster armor class presentation', () => {
   it('omits zero optional modifiers and keeps a non-zero dex contribution', () => {
     const rows = monsterArmorClassBreakdownRows({
       ac: 16,
+      tie: false,
       source: 'armor',
       rows: [
         { kind: 'armor-base', entryId: 'plate', label: 'Plate', value: 18 },
@@ -151,6 +159,7 @@ describe('monster armor class presentation', () => {
   it('labels the ruleset base with the armor class compact term', () => {
     const rows = monsterArmorClassBreakdownRows({
       ac: 10,
+      tie: false,
       source: 'unarmored',
       rows: [{ kind: 'ruleset-base', value: 10 }],
       alternatives: resolvedField([]),
@@ -183,7 +192,7 @@ function armorItem(input: {
     weight: { value: 1, unit: 'lb' },
     kind: 'armor',
     category: input.category,
-    ...(input.baseAc !== undefined ? { baseAc: input.baseAc } : {}),
+    ...(input.baseAc !== undefined ? { baseAcOffset: input.baseAc - 10 } : {}),
     ...(input.acBonus !== undefined ? { acBonus: input.acBonus } : {}),
     stealthDisadvantage: false,
   })
@@ -203,7 +212,7 @@ function resolvedAc(input: {
         ...(input.naturalArmorBonus !== undefined
           ? { naturalArmorBonus: input.naturalArmorBonus }
           : {}),
-        ...(input.fixedValue !== undefined ? { fixedValue: input.fixedValue } : {}),
+        ...(input.fixedValue !== undefined ? { fixedAcOffset: input.fixedValue - 10 } : {}),
       },
       equipment: input.equipment.map((item) => ({
         entryId: item.slug,
@@ -213,7 +222,7 @@ function resolvedAc(input: {
       })),
     },
     equipmentCatalog: new Map(input.equipment.map((item) => [item.id, item])),
-    acBase: 10,
+    armorClassRules: { mode: 'ascending', base: 10 },
     magicPropertyProvider: () => undefined,
   })
   if (result.status !== 'resolved') throw new Error(result.reason)

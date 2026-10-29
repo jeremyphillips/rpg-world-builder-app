@@ -24,6 +24,12 @@ import {
   type ContentFormCtx,
 } from '../../registry/content-form-registry'
 import { findContentEditEntity, loadContentEditFormState } from './content-edit-load'
+import {
+  ArmorClassAuthoringNotice,
+  ArmorClassAuthoringProvider,
+  armorClassRulesSignature,
+  useArmorClassAuthoringSession,
+} from '../session/armor-class-authoring-session'
 import { useContentEditEntityFormState } from './content-edit-entity-form-state'
 import {
   ContentFormNotRegistered,
@@ -136,6 +142,8 @@ interface ContentEditEntityFormProps<
   submitPending: boolean
   formError: string | null
   onSubmit: (values: FieldValues, form: UseFormReturn<FieldValues>) => Promise<void>
+  formKey?: string
+  formHeaderNotice?: ReactNode
 }
 
 function ContentEditEntityForm<
@@ -177,6 +185,8 @@ function ContentEditEntityFormBody<
   submitPending,
   formError,
   onSubmit,
+  formKey,
+  formHeaderNotice,
 }: ContentEditEntityFormProps<TEntity>) {
   useSetBreadcrumbLabel(entity.name)
   const layout = resolveContentFormLayout(def)
@@ -225,7 +235,7 @@ function ContentEditEntityFormBody<
     <ContentFormLayout
       def={def}
       ctx={layoutCtx}
-      formKey={entity.id}
+      formKey={formKey ?? entity.id}
       schema={schema}
       defaultValues={{ ...defaultValues, media: entity.media ?? emptyContentMediaSchema }}
       formMode="edit"
@@ -244,7 +254,12 @@ function ContentEditEntityFormBody<
       scrollMode={layout.scrollMode}
       previewEnabled={layout.previewEnabled}
       previewDraftBadge={layout.previewEnabled && entity.status === 'draft'}
-      formHeaderPrefix={layout.previewEnabled ? heading : undefined}
+      formHeaderPrefix={
+        <>
+          {layout.previewEnabled ? heading : null}
+          {formHeaderNotice}
+        </>
+      }
     />
   )
 
@@ -344,6 +359,10 @@ function ContentEditFormBody({
   ctx,
 }: ContentEditFormBodyProps) {
   const mutation = useContentWriteMutation(def, campaignId, entityId)
+  const authoring = useArmorClassAuthoringSession(
+    Boolean(def.armorClassRulesSensitive),
+    ctx.armorClassRules,
+  )
 
   const { layoutCtx, schema, validationIntent, defaultValues } = loadContentEditFormState({
     def,
@@ -352,6 +371,7 @@ function ContentEditFormBody({
     formCtx,
     campaignId,
     entityId,
+    armorClassRules: authoring.snapshot,
   })
   const { onSubmit, formError } = useSubmitHandler({
     submit: async (values, form) => {
@@ -366,6 +386,7 @@ function ContentEditFormBody({
               weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
               campaignRules: layoutCtx.campaignRules,
               equipmentKind: layoutCtx.equipmentKind,
+              armorClassRules: layoutCtx.armorClassRules,
             },
             validationIntent,
             {
@@ -384,7 +405,10 @@ function ContentEditFormBody({
       }
       const savedRecord = saved as typeof entity & { media?: ContentMedia }
       const baseline = stripEditEnvelopeFromFormDefaults(
-        { ...def.toFormValues(saved), media: savedRecord.media ?? emptyContentMediaSchema },
+        {
+          ...def.toFormValues(saved, { armorClassRules: layoutCtx.armorClassRules }),
+          media: savedRecord.media ?? emptyContentMediaSchema,
+        },
         {
           stripKind: layoutCtx.equipmentKind != null,
         },
@@ -394,21 +418,30 @@ function ContentEditFormBody({
     fallbackMessage: `Could not update ${def.routeKey}.`,
   })
 
+  const formDefaults = authoring.keptValues ?? {
+    ...defaultValues,
+    media: entity.media ?? emptyContentMediaSchema,
+  }
+
   return (
-    <ContentEditEntityForm
-      def={def}
-      entity={entity}
-      campaignId={campaignId}
-      overviewHref={overviewHref}
-      contentTypeKey={contentTypeKey}
-      headingFn={headingFn}
-      layoutCtx={layoutCtx}
-      schema={schema}
-      defaultValues={{ ...defaultValues, media: entity.media ?? emptyContentMediaSchema }}
-      submitPending={mutation.isPending}
-      formError={formError ?? null}
-      onSubmit={onSubmit}
-    />
+    <ArmorClassAuthoringProvider value={authoring}>
+      <ContentEditEntityForm
+        def={def}
+        entity={entity}
+        campaignId={campaignId}
+        overviewHref={overviewHref}
+        contentTypeKey={contentTypeKey}
+        headingFn={headingFn}
+        layoutCtx={layoutCtx}
+        schema={schema}
+        formKey={`${entity.id}:${armorClassRulesSignature(authoring.snapshot)}:${authoring.generation}`}
+        formHeaderNotice={<ArmorClassAuthoringNotice />}
+        defaultValues={formDefaults}
+        submitPending={mutation.isPending}
+        formError={formError ?? null}
+        onSubmit={onSubmit}
+      />
+    </ArmorClassAuthoringProvider>
   )
 }
 

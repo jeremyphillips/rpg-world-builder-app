@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { systemDefaultArmorClassRules } from '../../../campaign/patches/campaign-mechanics-patch'
 import { resolvedField, unavailableField } from '../../creature/derived-field'
 import type { ClassStored } from '../../../content/classes/class'
 import type { SkillProficiency } from '../../../content/skill-proficiency'
@@ -53,7 +54,10 @@ const athleticsSkill = {
   examples: ['Jump farther than normal', 'Stay afloat in rough water', 'Break something'],
 } as const satisfies SkillProficiency
 
+const armorClassRules = systemDefaultArmorClassRules()
+
 const completeInput: CharacterDerivationInput = {
+  armorClassRules,
   level: 1,
   abilityScores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
   characterClass: fighterClass,
@@ -71,6 +75,7 @@ describe('deriveCharacterProfile', () => {
   it('tolerates empty input without throwing', () => {
     expect(() =>
       deriveCharacterProfile({
+        armorClassRules,
         level: 1,
         proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
         skillProficiencies: [],
@@ -80,6 +85,7 @@ describe('deriveCharacterProfile', () => {
 
   it('derives baseline defenses from level and ruleset AC base when class is missing', () => {
     const profile = deriveCharacterProfile({
+      armorClassRules,
       level: 1,
       abilityScores: { dex: 14 },
       proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
@@ -93,6 +99,7 @@ describe('deriveCharacterProfile', () => {
 
   it('derives ruleset base AC with neutral DEX modifier when dex is unset', () => {
     const profile = deriveCharacterProfile({
+      armorClassRules,
       level: 1,
       proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
       skillProficiencies: [],
@@ -104,6 +111,7 @@ describe('deriveCharacterProfile', () => {
 
   it('derives hit die max HP with neutral CON modifier when con is unset', () => {
     const profile = deriveCharacterProfile({
+      armorClassRules,
       level: 1,
       characterClass: fighterClass,
       proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
@@ -133,6 +141,7 @@ describe('deriveCharacterProfile', () => {
 
   it('does not fall back to unarmored AC when equipped armor is unresolved', () => {
     const profile = deriveCharacterProfile({
+      armorClassRules,
       level: 1,
       abilityScores: { dex: 14 },
       proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },

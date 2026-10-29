@@ -833,7 +833,7 @@
           ],
           "description": "organic | metal"
         },
-        "baseAc": {
+        "baseAcOffset": {
           "$ref": "#/definitions/__schema37"
         },
         "acBonus": {
@@ -888,8 +888,8 @@
     },
     "__schema37": {
       "type": "integer",
-      "minimum": -9007199254740991,
-      "maximum": 9007199254740991
+      "minimum": 0,
+      "maximum": 15
     },
     "__schema38": {
       "type": "integer",
@@ -1458,9 +1458,9 @@
           "minimum": 0,
           "maximum": 9007199254740991
         },
-        "ac": {
+        "acOffset": {
           "type": "integer",
-          "minimum": 0,
+          "minimum": -10,
           "maximum": 9007199254740991
         },
         "hp": {

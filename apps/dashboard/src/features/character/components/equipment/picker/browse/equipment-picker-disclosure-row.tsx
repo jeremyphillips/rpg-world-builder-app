@@ -1,7 +1,7 @@
+import type { ArmorClassRules } from '@rpg/contracts'
 import type { CatalogPickerCollapsibleRowRenderArgs } from '@rpg/ui'
 
 import {
-  buildEquipmentPickerRowViewModel,
   CatalogCard,
   CatalogMetadataRenderer,
   type EntitySummaryProvenanceItem,
@@ -17,7 +17,10 @@ import {
   type SelectionRowStatusTooltip,
 } from '../../../../lib/selection-row-status'
 import { EquipmentPickerRowAcquisitionControl } from './equipment-picker-row-acquisition-control'
-import { getEquipmentUnaffordableAmounts } from '../drawer/equipment-picker-drawer.lib'
+import {
+  equipmentPickerRow,
+  getEquipmentUnaffordableAmounts,
+} from '../drawer/equipment-picker-drawer.lib'
 import type {
   EquipmentBudgetSummary,
   EquipmentPickerItem,
@@ -45,6 +48,7 @@ export type EquipmentPickerDisclosureRowProps = {
   workflowMode?: EquipmentPickerWorkflowMode
   isGoldShoppingPath?: boolean
   budget?: EquipmentBudgetSummary
+  armorClassRules?: ArmorClassRules
   onCommitAdd?: () => boolean
   onSetPurchasedQuantity?: (total: number) => void
   onReleaseChoice?: (allowanceId: string) => void
@@ -57,6 +61,7 @@ export function EquipmentPickerDisclosureRow({
   workflowMode = 'purchase',
   isGoldShoppingPath = false,
   budget,
+  armorClassRules,
   onCommitAdd,
   onSetPurchasedQuantity,
   onReleaseChoice,
@@ -67,7 +72,7 @@ export function EquipmentPickerDisclosureRow({
   })
 
   const item = rowArgs.item
-  const row = buildEquipmentPickerRowViewModel(item.equipment)
+  const row = equipmentPickerRow(item.equipment, armorClassRules)
   const status = resolveSelectionRowStatusItems(
     resolveEquipmentSelectionRowPresentation({
       equipment: item.equipment,

@@ -1,3 +1,4 @@
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { pickSpell } from '@/features/content'
@@ -35,7 +36,11 @@ describe('character-sheet-catalog', () => {
       },
     }
 
-    const [card] = buildCharacterSheetEquipmentCards(character, catalogIndex)
+    const [card] = buildCharacterSheetEquipmentCards(
+      character,
+      catalogIndex,
+      systemDefaultArmorClassRules(),
+    )
     expect(card?.id).toBe('weapon-row-1')
     expect(card?.displayName).toBe('Dagger')
   })
@@ -62,7 +67,11 @@ describe('character-sheet-catalog', () => {
       },
     }
 
-    const cards = buildCharacterSheetEquipmentCards(character, catalogIndex)
+    const cards = buildCharacterSheetEquipmentCards(
+      character,
+      catalogIndex,
+      systemDefaultArmorClassRules(),
+    )
     expect(cards).toHaveLength(2)
     expect(cards[0]?.id).not.toBe(cards[1]?.id)
     expect(buildSourceSignature(sourceA)).not.toBe(buildSourceSignature(sourceB))
@@ -83,10 +92,18 @@ describe('character-sheet-catalog', () => {
       },
     }
 
-    const [card] = buildCharacterSheetEquipmentCards(character, catalogIndex)
+    const [card] = buildCharacterSheetEquipmentCards(
+      character,
+      catalogIndex,
+      systemDefaultArmorClassRules(),
+    )
     expect(card?.status).toBe('missing')
-    expect(toEquipmentCatalogHeaderModel(card!).tone).toBe('unavailable')
-    expect(toEquipmentCatalogHeaderModel(card!).unavailableMessage).toMatch(/unavailable/i)
+    expect(toEquipmentCatalogHeaderModel(card!, systemDefaultArmorClassRules()).tone).toBe(
+      'unavailable',
+    )
+    expect(
+      toEquipmentCatalogHeaderModel(card!, systemDefaultArmorClassRules()).unavailableMessage,
+    ).toMatch(/unavailable/i)
   })
 
   it('builds spell cards with prepared metadata', () => {

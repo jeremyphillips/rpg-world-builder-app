@@ -31,6 +31,7 @@ export const unitTestFiles = [
   'src/features/conversation/direct-message-peer-eligibility.lib.test.ts',
   'src/features/dev-bench/bench-query.test.ts',
   'src/features/global-search/lib/project-content-document.test.ts',
+  'src/features/global-search/sources/content.source.test.ts',
   'src/features/notification/notification.registry.test.ts',
   'src/features/notification/notification.repository.test.ts',
   'src/features/vocabulary/lib/assert-vocabulary-id-available.test.ts',

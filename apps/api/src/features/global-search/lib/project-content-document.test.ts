@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { getEquipmentBySlug } from '@rpg/catalog/equipment'
 import { buildingClassificationSchema, DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
 import { projectContentEntity } from './project-content-document'
@@ -66,5 +67,21 @@ describe('projectContentEntity', () => {
     expect(document.secondary).toBe('Political')
     expect(document.fields.some((field) => field.text.includes('Smuggling'))).toBe(true)
     expect(document.fields.some((field) => field.text.includes('contraband'))).toBe(true)
+  })
+
+  it('projects plate Armor Class from the campaign rules', () => {
+    const plate = getEquipmentBySlug('srd-cc-5.2.1', 'plate-armor')
+
+    expect(() => projectContentEntity('equipment', plate)).toThrow(/Armor Class rules are required/)
+
+    const ascendingTen = projectContentEntity('equipment', plate, {
+      armorClassRules: { mode: 'ascending', base: 10 },
+    })
+    const ascendingNine = projectContentEntity('equipment', plate, {
+      armorClassRules: { mode: 'ascending', base: 9 },
+    })
+
+    expect(ascendingTen.secondary).toContain('18')
+    expect(ascendingNine.secondary).toContain('17')
   })
 })

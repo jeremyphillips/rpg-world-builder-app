@@ -12,7 +12,6 @@ import {
   type Species,
   type WeaponCategory,
   isWeaponEquipment,
-  resolveMechanicsPatch,
 } from '@rpg/contracts'
 
 import { useCampaignRules } from '@/features/campaign'
@@ -250,7 +249,8 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const catalog = useContentCatalogLists(campaignId)
   const vocabulary = useContentFormVocabulary(campaignId)
   const campaignRules = useCampaignRules(campaignId)
-  const { data: rulesetPatch } = useRulesetPatch(campaignId)
+  const rulesetQuery = useRulesetPatch(campaignId)
+  const rulesetPatch = rulesetQuery.data
   const rulesetId = catalog.classes?.[0]?.rulesetId ?? 'srd-cc-5.2.1'
 
   const spellcastingProgression = useMemo(
@@ -315,8 +315,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
         : catalog.skillsQuery.isPending
           ? 'pending'
           : 'ready',
-      armorClassBase:
-        rulesetPatch?.mechanics.armorClass.base ?? resolveMechanicsPatch().armorClass.base,
+      armorClassRules: rulesetPatch?.mechanics.armorClass,
     }),
     [
       campaignId,
@@ -331,13 +330,21 @@ export function useContentFormOptions(campaignId: string | undefined): {
       catalog.equipmentQuery.isPending,
       catalog.skillsQuery.isError,
       catalog.skillsQuery.isPending,
-      rulesetPatch?.mechanics.armorClass.base,
+      rulesetPatch?.mechanics.armorClass,
     ],
   )
 
   const formQueries = useMemo(
-    () => [...catalog.queries, ...vocabulary.queries],
-    [catalog.queries, vocabulary.queries],
+    () => [
+      ...catalog.queries,
+      ...vocabulary.queries,
+      {
+        isPending: Boolean(campaignId) && rulesetQuery.isPending,
+        isError: Boolean(campaignId) && rulesetQuery.isError,
+        refetch: () => rulesetQuery.refetch(),
+      },
+    ],
+    [campaignId, catalog.queries, rulesetQuery, vocabulary.queries],
   )
 
   const [isRetrying, setIsRetrying] = useState(false)
@@ -355,8 +362,9 @@ export function useContentFormOptions(campaignId: string | undefined): {
 
   return {
     ctx,
-    isPending: catalog.isPending || vocabulary.isPending,
-    isError: catalog.isError || vocabulary.isError,
+    isPending:
+      catalog.isPending || vocabulary.isPending || (Boolean(campaignId) && rulesetQuery.isPending),
+    isError: catalog.isError || vocabulary.isError || (Boolean(campaignId) && rulesetQuery.isError),
     isRetrying,
     retryFailedQueries,
   }

@@ -60,7 +60,7 @@ function armor(slug: string, category: 'light' | 'medium' | 'heavy' = 'heavy') {
     weight: { value: 40, unit: 'lb' },
     kind: 'armor',
     category,
-    baseAc: 16,
+    baseAcOffset: 6,
     stealthDisadvantage: category !== 'light',
     abilityScoreRequirements: category === 'heavy' ? { str: 13 } : undefined,
   })

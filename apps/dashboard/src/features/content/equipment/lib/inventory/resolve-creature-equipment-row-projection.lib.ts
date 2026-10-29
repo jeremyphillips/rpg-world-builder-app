@@ -3,6 +3,7 @@ import {
   resolveCreatureArmorSlot,
   resolveEquipmentRowSummary,
   type Ability,
+  type ArmorClassRules,
   type CreatureWeaponProficiencies,
   type Equipment,
   type EquipmentInstance,
@@ -13,19 +14,23 @@ import {
 export const EQUIPMENT_ROW_UNMODIFIED_SUPPORTING_SEGMENT = 'Unmodified' as const
 
 /** Catalog comparison groups the equipment drawer already shows for worn armor and shields. */
-function armorCompactSupportingMetadata(item: Equipment | undefined): readonly string[] {
-  if (!item || resolveCreatureArmorSlot(item) === undefined) return []
-  return buildEquipmentCompactSummary(item).comparisonGroups
+function armorCompactSupportingMetadata(
+  item: Equipment | undefined,
+  rules: ArmorClassRules | undefined,
+): readonly string[] {
+  if (!item || !rules || resolveCreatureArmorSlot(item) === undefined) return []
+  return buildEquipmentCompactSummary(item, { armorClassRules: rules }).comparisonGroups
 }
 
 export function buildCreatureEquipmentRowSupportingMetadata(args: {
-  rowSummary: EquipmentRowWeaponSummary | undefined
+  armorClassRules?: ArmorClassRules
+  rowSummary?: EquipmentRowWeaponSummary
   /** Worn armor and shields contribute their compact catalog line. Weapons do not. */
   catalogItem?: Equipment
   leadingSegments?: readonly string[]
 }): readonly string[] {
   const calculated = [
-    ...armorCompactSupportingMetadata(args.catalogItem),
+    ...armorCompactSupportingMetadata(args.catalogItem, args.armorClassRules),
     ...(args.rowSummary?.supportingMetadata ?? []),
   ]
   const leading = args.leadingSegments ?? []

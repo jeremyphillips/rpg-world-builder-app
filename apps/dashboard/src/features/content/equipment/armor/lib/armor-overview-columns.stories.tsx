@@ -1,3 +1,4 @@
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DataTable } from '@rpg/ui'
 
@@ -17,7 +18,7 @@ type Story = StoryObj
 export const Default: Story = {
   render: () => (
     <DataTable
-      columns={armorColumns(STORY_CAMPAIGN_ID)}
+      columns={armorColumns(STORY_CAMPAIGN_ID, undefined, systemDefaultArmorClassRules())}
       data={[...ARMOR_LIST]}
       caption="Armor available in this campaign"
     />

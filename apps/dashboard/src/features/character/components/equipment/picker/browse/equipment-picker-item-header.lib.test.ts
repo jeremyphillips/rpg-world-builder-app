@@ -1,3 +1,4 @@
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -134,7 +135,7 @@ function presentationFor(args: {
     requestedQuantity: 1,
   })
   const rowActionVm = buildEquipmentPickerRowActionViewModel(actionState)
-  const row = buildEquipmentPickerRowViewModel(args.equipment)
+  const row = buildEquipmentPickerRowViewModel(args.equipment, systemDefaultArmorClassRules())
   const ownership = getEquipmentOwnership(
     buildEquipmentPickerOwnershipIndex({
       draft: args.draft,
@@ -338,7 +339,10 @@ describe('resolveEquipmentPickerItemPresentation', () => {
   it('swaps add for the aggregate stepper once an editable purchase exists', () => {
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: equipmentStepPotionOfHealingFixture,
-      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      row: buildEquipmentPickerRowViewModel(
+        equipmentStepPotionOfHealingFixture,
+        systemDefaultArmorClassRules(),
+      ),
       workflowMode: 'purchase',
       rowActionVm: {
         kind: 'purchase',
@@ -360,7 +364,10 @@ describe('resolveEquipmentPickerItemPresentation', () => {
   it('pins the stepper ceiling at the current aggregate when the next copy is blocked', () => {
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: equipmentStepPotionOfHealingFixture,
-      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      row: buildEquipmentPickerRowViewModel(
+        equipmentStepPotionOfHealingFixture,
+        systemDefaultArmorClassRules(),
+      ),
       workflowMode: 'purchase',
       rowActionVm: {
         kind: 'purchase',
@@ -377,7 +384,10 @@ describe('resolveEquipmentPickerItemPresentation', () => {
   it('keeps add disabled for unaffordable rows with nothing purchased yet', () => {
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: equipmentStepPotionOfHealingFixture,
-      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      row: buildEquipmentPickerRowViewModel(
+        equipmentStepPotionOfHealingFixture,
+        systemDefaultArmorClassRules(),
+      ),
       workflowMode: 'purchase',
       rowActionVm: {
         kind: 'purchase',
@@ -393,7 +403,10 @@ describe('resolveEquipmentPickerItemPresentation', () => {
   it('shows a selected package contribution as owned provenance', () => {
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: equipmentStepPotionOfHealingFixture,
-      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      row: buildEquipmentPickerRowViewModel(
+        equipmentStepPotionOfHealingFixture,
+        systemDefaultArmorClassRules(),
+      ),
       workflowMode: 'purchase',
       rowActionVm: {
         kind: 'purchase',
@@ -416,7 +429,10 @@ describe('resolveEquipmentPickerItemPresentation', () => {
   it('lists package, converted, and purchased provenance ahead of the control', () => {
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: equipmentStepPotionOfHealingFixture,
-      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      row: buildEquipmentPickerRowViewModel(
+        equipmentStepPotionOfHealingFixture,
+        systemDefaultArmorClassRules(),
+      ),
       workflowMode: 'magic_items',
       rowActionVm: {
         kind: 'purchase',
@@ -463,7 +479,10 @@ describe('equipment picker blocker mapping', () => {
   })
 
   it('maps purchase unavailability to unavailable or not purchasable', () => {
-    const row = buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture)
+    const row = buildEquipmentPickerRowViewModel(
+      equipmentStepPotionOfHealingFixture,
+      systemDefaultArmorClassRules(),
+    )
     const blockersFor = (reason: 'unsupported_kind' | 'no_market_price') =>
       resolveEquipmentPickerItemPresentation({
         equipment: equipmentStepPotionOfHealingFixture,
@@ -532,7 +551,7 @@ describe('equipment picker blocker mapping', () => {
 
     const commonPresentation = resolveEquipmentPickerItemPresentation({
       equipment: unpricedCommon,
-      row: buildEquipmentPickerRowViewModel(unpricedCommon),
+      row: buildEquipmentPickerRowViewModel(unpricedCommon, systemDefaultArmorClassRules()),
       workflowMode: 'magic_items',
       rowActionVm,
       ownership: EMPTY_EQUIPMENT_OWNERSHIP,
@@ -548,7 +567,7 @@ describe('equipment picker blocker mapping', () => {
 
     const uncommonPresentation = resolveEquipmentPickerItemPresentation({
       equipment: unpricedUncommon,
-      row: buildEquipmentPickerRowViewModel(unpricedUncommon),
+      row: buildEquipmentPickerRowViewModel(unpricedUncommon, systemDefaultArmorClassRules()),
       workflowMode: 'magic_items',
       rowActionVm,
       ownership: EMPTY_EQUIPMENT_OWNERSHIP,
@@ -565,7 +584,7 @@ describe('equipment picker blocker mapping', () => {
   it('replaces the not-for-sale badge with a disabled action in purchase mode', () => {
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: rareAmulet,
-      row: buildEquipmentPickerRowViewModel(rareAmulet),
+      row: buildEquipmentPickerRowViewModel(rareAmulet, systemDefaultArmorClassRules()),
       workflowMode: 'purchase',
       rowActionVm: {
         kind: 'purchase',
@@ -583,7 +602,7 @@ describe('equipment picker blocker mapping', () => {
     const dagger = equipmentStepPotionOfHealingFixture
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: dagger,
-      row: buildEquipmentPickerRowViewModel(dagger),
+      row: buildEquipmentPickerRowViewModel(dagger, systemDefaultArmorClassRules()),
       workflowMode: 'loadout',
       rowActionVm: {
         kind: 'loadout',
@@ -609,7 +628,7 @@ describe('equipment picker blocker mapping', () => {
     const dagger = equipmentStepPotionOfHealingFixture
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: dagger,
-      row: buildEquipmentPickerRowViewModel(dagger),
+      row: buildEquipmentPickerRowViewModel(dagger, systemDefaultArmorClassRules()),
       workflowMode: 'loadout',
       rowActionVm: {
         kind: 'loadout',
@@ -628,7 +647,7 @@ describe('equipment picker blocker mapping', () => {
     const dagger = equipmentStepPotionOfHealingFixture
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: dagger,
-      row: buildEquipmentPickerRowViewModel(dagger),
+      row: buildEquipmentPickerRowViewModel(dagger, systemDefaultArmorClassRules()),
       workflowMode: 'loadout',
       rowActionVm: {
         kind: 'loadout',
@@ -649,7 +668,10 @@ describe('equipment picker blocker mapping', () => {
   it('omits wealth when an editable purchase has no spend', () => {
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: equipmentStepPotionOfHealingFixture,
-      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      row: buildEquipmentPickerRowViewModel(
+        equipmentStepPotionOfHealingFixture,
+        systemDefaultArmorClassRules(),
+      ),
       workflowMode: 'purchase',
       rowActionVm: {
         kind: 'purchase',
@@ -670,7 +692,7 @@ describe('equipment picker blocker mapping', () => {
     const dagger = equipmentStepPotionOfHealingFixture
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: dagger,
-      row: buildEquipmentPickerRowViewModel(dagger),
+      row: buildEquipmentPickerRowViewModel(dagger, systemDefaultArmorClassRules()),
       workflowMode: 'loadout',
       rowActionVm: {
         kind: 'loadout',
@@ -687,7 +709,7 @@ describe('equipment picker blocker mapping', () => {
     const unpriced = { ...equipmentStepPotionOfHealingFixture, cost: null }
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: unpriced,
-      row: buildEquipmentPickerRowViewModel(unpriced),
+      row: buildEquipmentPickerRowViewModel(unpriced, systemDefaultArmorClassRules()),
       workflowMode: 'purchase',
       rowActionVm: {
         kind: 'purchase',

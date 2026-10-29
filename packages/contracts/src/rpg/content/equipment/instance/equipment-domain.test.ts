@@ -85,7 +85,7 @@ describe('resolveEquipmentMagicProperties', () => {
       ...weapon,
       kind: 'armor',
       category: 'medium',
-      baseAc: 14,
+      baseAcOffset: 4,
       stealthDisadvantage: false,
       mode: undefined,
       properties: undefined,

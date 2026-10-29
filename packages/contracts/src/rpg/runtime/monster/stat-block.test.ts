@@ -11,13 +11,14 @@ import {
 import { skillProficiencySchema } from '../../content/skill-proficiency'
 import { deriveCharacterProfile } from '../character/derive/profile'
 import { resolveEquippedArmorFromInventory } from '../character/sheet/equipment-inventory'
-import { toEquippedArmorPiece, resolveEquippedArmorClass } from '../creature/armor-class'
+import { resolveCreatureArmorClass, toEquippedArmorPiece } from '../creature/armor-class'
 import { isWeaponProficient } from '../creature/proficiencies'
 import { resolveWeaponAttackAbilityModifier } from '../creature/weapon-attack'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { normalizeEquipmentInstance } from '../../content/equipment/instance/normalize-equipment-instance'
 import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
-import { DEFAULT_ARMOR_CLASS_BASE } from '../../campaign/patches/campaign-mechanics-patch'
+import { systemDefaultArmorClassRules } from '../../campaign/patches/campaign-mechanics-patch'
+import { ARMOR_CLASS_RULES_MATRIX } from '../../vocab/mechanics/armor-class-scale'
 import {
   deriveMonsterDraftStatBlock as deriveMonsterDraftStatBlockRaw,
   deriveMonsterStatBlock as deriveMonsterStatBlockRaw,
@@ -26,13 +27,19 @@ import {
 const EMPTY_MAGIC_PROVIDER: MagicPropertyDefinitionProvider = () => undefined
 
 function deriveMonsterStatBlock(
-  input: Omit<Parameters<typeof deriveMonsterStatBlockRaw>[0], 'acBase' | 'magicPropertyProvider'> &
+  input: Omit<
+    Parameters<typeof deriveMonsterStatBlockRaw>[0],
+    'armorClassRules' | 'magicPropertyProvider'
+  > &
     Partial<
-      Pick<Parameters<typeof deriveMonsterStatBlockRaw>[0], 'acBase' | 'magicPropertyProvider'>
+      Pick<
+        Parameters<typeof deriveMonsterStatBlockRaw>[0],
+        'armorClassRules' | 'magicPropertyProvider'
+      >
     >,
 ) {
   return deriveMonsterStatBlockRaw({
-    acBase: DEFAULT_ARMOR_CLASS_BASE,
+    armorClassRules: systemDefaultArmorClassRules(),
     magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
     ...input,
   })
@@ -41,14 +48,17 @@ function deriveMonsterStatBlock(
 function deriveMonsterDraftStatBlock(
   input: Omit<
     Parameters<typeof deriveMonsterDraftStatBlockRaw>[0],
-    'acBase' | 'magicPropertyProvider'
+    'armorClassRules' | 'magicPropertyProvider'
   > &
     Partial<
-      Pick<Parameters<typeof deriveMonsterDraftStatBlockRaw>[0], 'acBase' | 'magicPropertyProvider'>
+      Pick<
+        Parameters<typeof deriveMonsterDraftStatBlockRaw>[0],
+        'armorClassRules' | 'magicPropertyProvider'
+      >
     >,
 ) {
   return deriveMonsterDraftStatBlockRaw({
-    acBase: DEFAULT_ARMOR_CLASS_BASE,
+    armorClassRules: systemDefaultArmorClassRules(),
     magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
     ...input,
   })
@@ -118,7 +128,7 @@ const equipmentCatalog = new Map(
       weight: { value: 13, unit: 'lb' },
       kind: 'armor',
       category: 'medium',
-      baseAc: 13,
+      baseAcOffset: 3,
       stealthDisadvantage: false,
     }),
   ].map((row) => [row.id, row]),
@@ -329,6 +339,7 @@ describe('modifiedArmorFixture parity', () => {
         catalog: equipmentCatalog,
       })
       const characterAc = deriveCharacterProfile({
+        armorClassRules: systemDefaultArmorClassRules(),
         level: 1,
         proficiencies: { weapons: [], armor: [], tools: [], skills: [], languages: [] },
         skillProficiencies: [],
@@ -338,6 +349,42 @@ describe('modifiedArmorFixture parity', () => {
 
       expect(monsterBlock.ac).toBe(14)
       expect(characterAc).toEqual({ status: 'resolved', value: 14 })
+    }
+
+    for (const rules of ARMOR_CLASS_RULES_MATRIX) {
+      const monsterBlock = deriveMonsterStatBlock({
+        armorClassRules: rules,
+        monster: {
+          ...kobold,
+          armorClass: {},
+          equipment: [modifiedArmorFixture],
+          actions: [],
+        },
+        equipmentCatalog,
+        skillCatalog,
+      })
+      const characterPieces = resolveEquippedArmorFromInventory({
+        equipment: {
+          weapons: [],
+          armor: [modifiedArmorFixture],
+          tools: [],
+          gear: [],
+          magicItems: [],
+          vehicles: [],
+          mounts: [],
+        },
+        catalog: equipmentCatalog,
+      })
+      const characterAc = deriveCharacterProfile({
+        armorClassRules: rules,
+        level: 1,
+        proficiencies: { weapons: [], armor: [], tools: [], skills: [], languages: [] },
+        skillProficiencies: [],
+        abilityScores: { dex: dexScore },
+        equippedArmor: characterPieces.pieces,
+      }).ac
+
+      expect(characterAc).toEqual({ status: 'resolved', value: monsterBlock.ac })
     }
 
     const monsterBlock = deriveMonsterStatBlock({
@@ -360,20 +407,20 @@ describe('modifiedArmorFixture parity', () => {
     )
     expect(monsterBlock.acResolution.shield).toBeUndefined()
     expect(
-      resolveEquippedArmorClass({
-        acBase: 10,
+      resolveCreatureArmorClass({
+        rules: systemDefaultArmorClassRules(),
         dexModifier: 3,
-        equippedArmor: [
-          toEquippedArmorPiece(
-            (() => {
-              const item = equipmentCatalog.get(`${RULESET}:chain-shirt`)!
-              if (!isArmorEquipment(item)) throw new Error('expected armor')
-              return item
-            })(),
-            [{ kind: 'armor_class', bonus: -1 }],
-          ),
-        ],
-      }),
+        shields: [],
+        bodyArmor: toEquippedArmorPiece(
+          (() => {
+            const item = equipmentCatalog.get(`${RULESET}:chain-shirt`)!
+            if (!isArmorEquipment(item)) throw new Error('expected armor')
+            return item
+          })(),
+          [{ kind: 'armor_class', bonus: -1 }],
+        ),
+        eligibility: { skinCompetesWithArmor: false },
+      }).ac,
     ).toBe(14)
   })
 
@@ -762,7 +809,7 @@ describe('equipment effect derivation (ship P0)', () => {
     const block = deriveMonsterStatBlock({
       monster: {
         ...kobold,
-        armorClass: { naturalArmorBonus: 2, fixedValue: 17 },
+        armorClass: { naturalArmorBonus: 2, fixedAcOffset: 7 },
         equipment: [fixture],
         actions: [],
       },

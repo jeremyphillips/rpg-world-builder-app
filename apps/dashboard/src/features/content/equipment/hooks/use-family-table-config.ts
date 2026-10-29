@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 
+import { useRulesetPatch } from '@/features/homebrew'
+
 import {
   loadFamilyTableConfig,
   type FamilyTableConfig,
@@ -30,7 +32,11 @@ export function useFamilyTableConfig(
   family: EquipmentFamilyPath,
   usage?: ContentUsageOpts,
 ) {
-  const usageKey = usageKeyOf(usage)
+  const needsArmorRules = family === 'armor'
+  const rulesQuery = useRulesetPatch(campaignId, needsArmorRules)
+  const armorClassRules = rulesQuery.data?.mechanics.armorClass
+  const rulesKey = armorClassRules ? `${armorClassRules.mode}:${armorClassRules.base}` : ''
+  const usageKey = `${usageKeyOf(usage)}|${needsArmorRules ? rulesKey : ''}`
   const [loadState, setLoadState] = useState<FamilyTableLoadState>({
     campaignId,
     family,
@@ -48,33 +54,41 @@ export function useFamilyTableConfig(
         }
       : undefined
 
-    void loadFamilyTableConfig(campaignId, family, usageOpts)
-      .then((config) => {
-        if (!cancelled) {
-          setLoadState({ campaignId, family, usageKey, tableConfig: config, isError: false })
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setLoadState({ campaignId, family, usageKey, tableConfig: null, isError: true })
-        }
-      })
+    if (!(needsArmorRules && !armorClassRules)) {
+      void loadFamilyTableConfig(campaignId, family, usageOpts, armorClassRules)
+        .then((config) => {
+          if (!cancelled) {
+            setLoadState({ campaignId, family, usageKey, tableConfig: config, isError: false })
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setLoadState({ campaignId, family, usageKey, tableConfig: null, isError: true })
+          }
+        })
+    }
 
     return () => {
       cancelled = true
     }
     // usageKey encodes usage opts — avoid depending on the usage object identity.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- usageKey is the stable usage fingerprint
-  }, [campaignId, family, usageKey])
+  }, [armorClassRules, campaignId, family, needsArmorRules, usageKey])
 
   const isStale =
     loadState.campaignId !== campaignId ||
     loadState.family !== family ||
     loadState.usageKey !== usageKey
 
+  const rulesPending = needsArmorRules && rulesQuery.isPending
+  const rulesError = needsArmorRules && rulesQuery.isError
+
   return {
-    tableConfig: isStale ? null : loadState.tableConfig,
-    isPending: isStale || (loadState.tableConfig === null && !loadState.isError),
-    isError: isStale ? false : loadState.isError,
+    tableConfig: isStale || rulesPending || rulesError ? null : loadState.tableConfig,
+    isPending:
+      rulesPending ||
+      isStale ||
+      (loadState.tableConfig === null && !loadState.isError && !rulesError),
+    isError: rulesError || (isStale ? false : loadState.isError),
   }
 }

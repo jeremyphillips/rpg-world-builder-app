@@ -58,6 +58,7 @@ function buildMonsterFormValueSyncs(): FormValueSync[] {
 
 export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMonsterInput> = {
   routeKey: 'monsters',
+  armorClassRulesSensitive: true,
   ...monsterMediaFields,
   schema: resolveMonsterFormSchema({}, 'publish') as unknown as ContentFormDef<
     Monster,

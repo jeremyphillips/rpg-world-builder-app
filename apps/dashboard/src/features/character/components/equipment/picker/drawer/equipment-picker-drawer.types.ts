@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import {
+  type ArmorClassRules,
   type EquipmentBudgetSummary,
   type EquipmentPickerBrowseSortContext,
   type EquipmentPickerItem,
@@ -124,6 +125,8 @@ export type EquipmentPickerDrawerBaseProps = {
   browseSortContext?: EquipmentPickerBrowseSortContext
   budget?: EquipmentBudgetSummary
   allowedKinds?: readonly EquipmentPickerSupportedKind[]
+  /** Campaign armor-class scale for catalog AC lines. */
+  armorClassRules?: ArmorClassRules
   showCharacterPreview?: boolean
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
   /** Per-item ownership contributions — the only source the header reads. */

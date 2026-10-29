@@ -1,14 +1,18 @@
 import {
   canPurchaseEquipment,
   compareEquipmentPickerItemsByRecommendation,
+  formatEquipmentCostLabel,
   formatInlineWealth,
+  getEquipmentKindLabel,
   formatMoney,
   isEquipmentPickerSupportedKind,
   maxAffordableEquipmentQuantity,
   moneyToCopper,
   resolveMagicItemAcquiredCopyCap,
   EQUIPMENT_PURCHASE_QUANTITY_MAX,
+  type ArmorClassRules,
   type CharacterWealth,
+  type Equipment,
   type EquipmentPickerBrowseSortContext,
   type MagicItemGrantProgress,
   type Money,
@@ -385,6 +389,18 @@ export function resolveMaxPurchaseAggregate(args: {
   )
 }
 
+export function equipmentPickerRow(equipment: Equipment, rules?: ArmorClassRules) {
+  if (!rules) {
+    return {
+      name: equipment.name,
+      priceLabel: formatEquipmentCostLabel(equipment.cost) ?? '',
+      kindLabel: getEquipmentKindLabel(equipment.kind),
+      comparisonGroups: [] as string[],
+    }
+  }
+  return buildEquipmentPickerRowViewModel(equipment, rules)
+}
+
 export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
   item: EquipmentPickerItem
   workflowMode: EquipmentPickerWorkflowMode
@@ -392,8 +408,9 @@ export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
   rowActionVm?: EquipmentPickerRowActionViewModel
   budget?: EquipmentBudgetSummary
   magicItemGrantProgress?: readonly MagicItemGrantProgress[]
+  armorClassRules?: ArmorClassRules
 }): EquipmentPickerItemPresentation {
-  const row = buildEquipmentPickerRowViewModel(args.item.equipment)
+  const row = equipmentPickerRow(args.item.equipment, args.armorClassRules)
   const copyCap = resolveMagicItemAcquiredCopyCap({
     equipment: args.item.equipment,
     acquiredQuantity: args.ownership.acquiredQuantity,

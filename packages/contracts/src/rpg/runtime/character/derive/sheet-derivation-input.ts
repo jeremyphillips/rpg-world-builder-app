@@ -27,7 +27,7 @@ export function toCharacterSheetDerivationInput(
 
   return {
     level: getCharacterTotalLevel(character),
-    armorClassBase: rules.armorClass.base,
+    armorClassRules: rules.armorClass,
     abilityScores: character.abilityScores,
     characterClass,
     proficiencies: character.proficiencies,

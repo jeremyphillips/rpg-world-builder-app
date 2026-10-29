@@ -1,3 +1,4 @@
+import { armorClassFromProtection, systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 import type { GroupConfig, RowConfig } from '@rpg/ui/form'
 
@@ -85,7 +86,11 @@ describe('vehicle form round-trips', () => {
       expect(formValues.crew).toBe(item.crew)
       expect(formValues.passengers).toBe(item.passengers)
       expect(formValues.cargoCapacity).toEqual(item.cargoCapacity)
-      expect(formValues.ac).toBe(item.ac)
+      expect(formValues.ac).toBe(
+        item.acOffset === undefined
+          ? undefined
+          : armorClassFromProtection(systemDefaultArmorClassRules(), item.acOffset),
+      )
       expect(formValues.hp).toBe(item.hp)
       expect(formValues.damageThreshold).toBe(item.damageThreshold)
     })

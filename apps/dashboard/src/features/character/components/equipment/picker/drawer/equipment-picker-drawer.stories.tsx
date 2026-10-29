@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 
 import { EquipmentPickerDrawer } from './equipment-picker-drawer'
@@ -105,7 +105,7 @@ export const CharacterPreview: Story = {
     showCharacterPreview: true,
     characterPreviewContext: {
       level: 1,
-      armorClassBase: DEFAULT_ARMOR_CLASS_BASE,
+      armorClassRules: systemDefaultArmorClassRules(),
       abilityScores: { str: 16, dex: 14 },
       equippedArmor: [],
       budget: equipmentPickerBudgetFixture,

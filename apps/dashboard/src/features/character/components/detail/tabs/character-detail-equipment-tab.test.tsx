@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { pickEquipment } from '@/features/content'
@@ -60,6 +61,7 @@ function buildEquipmentCards() {
         [chainMail.id, chainMail],
       ]),
     },
+    systemDefaultArmorClassRules(),
   )
 }
 
@@ -69,7 +71,11 @@ describe('CharacterDetailEquipmentTab', () => {
     const cards = buildEquipmentCards()
 
     render(
-      <CharacterDetailEquipmentTab cards={cards} wealth={{ label: 'Wealth', value: '15 gp' }} />,
+      <CharacterDetailEquipmentTab
+        cards={cards}
+        armorClassRules={systemDefaultArmorClassRules()}
+        wealth={{ label: 'Wealth', value: '15 gp' }}
+      />,
     )
 
     const list = screen.getByRole('list')
@@ -88,6 +94,7 @@ describe('CharacterDetailEquipmentTab', () => {
     const { container } = render(
       <CharacterDetailEquipmentTab
         cards={buildEquipmentCards()}
+        armorClassRules={systemDefaultArmorClassRules()}
         wealth={{ label: 'Wealth', value: '15 gp' }}
       />,
     )

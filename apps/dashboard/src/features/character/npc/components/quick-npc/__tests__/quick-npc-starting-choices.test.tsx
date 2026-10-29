@@ -1,3 +1,4 @@
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import type { ComponentProps } from 'react'
 import * as React from 'react'
 import { cleanup, render, screen } from '@testing-library/react'
@@ -282,7 +283,10 @@ describe('QuickNpcStartingChoices', () => {
                 },
               },
             },
-            row: buildEquipmentPickerRowViewModel(equipmentStepSpearFixture),
+            row: buildEquipmentPickerRowViewModel(
+              equipmentStepSpearFixture,
+              systemDefaultArmorClassRules(),
+            ),
           },
         ]}
       />,

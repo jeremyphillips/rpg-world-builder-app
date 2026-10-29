@@ -19,6 +19,7 @@ import {
   updateEquipmentInputSchema,
 } from './equipment'
 import type { ArmorBody, EquipmentKind } from './equipment'
+import { systemDefaultArmorClassRules } from '../campaign/patches/campaign-mechanics-patch'
 
 const meta = {
   rulesetId: 'srd-cc-5.2.1',
@@ -98,7 +99,7 @@ const LEATHER_STORED = systemRecord('leather-armor', {
   weight: { value: 10, unit: 'lb' },
   category: 'light',
   material: 'organic',
-  baseAc: 11,
+  baseAcOffset: 1,
   stealthDisadvantage: false,
 })
 
@@ -109,7 +110,7 @@ const HALF_PLATE_STORED = systemRecord('half-plate-armor', {
   weight: { value: 40, unit: 'lb' },
   category: 'medium',
   material: 'metal',
-  baseAc: 15,
+  baseAcOffset: 5,
   stealthDisadvantage: true,
 })
 
@@ -120,7 +121,7 @@ const PLATE_STORED = systemRecord('plate-armor', {
   weight: { value: 65, unit: 'lb' },
   category: 'heavy',
   material: 'metal',
-  baseAc: 18,
+  baseAcOffset: 8,
   stealthDisadvantage: true,
   abilityScoreRequirements: { str: 15 },
 })
@@ -143,7 +144,7 @@ const SAMPLE_BODIES = {
     name: 'Leather',
     cost: { amount: 10, currency: 'gp' },
     category: 'light',
-    baseAc: 11,
+    baseAcOffset: 1,
     stealthDisadvantage: false,
   },
   adventuring_gear: {
@@ -179,7 +180,7 @@ const SAMPLE_BODIES = {
     speed: { value: 4, unit: 'mph' },
     crew: 80,
     cargoCapacity: { value: 150, unit: 'ton' },
-    ac: 15,
+    acOffset: 5,
     hp: 500,
     damageThreshold: 20,
   },
@@ -318,10 +319,13 @@ describe('weapon equipment variant', () => {
 
 describe('armor equipment variant', () => {
   it('parses light, medium, heavy armor and shields', () => {
-    expect(equipmentSchema.parse(LEATHER_STORED)).toMatchObject({ baseAc: 11, category: 'light' })
+    expect(equipmentSchema.parse(LEATHER_STORED)).toMatchObject({
+      baseAcOffset: 1,
+      category: 'light',
+    })
     expect(equipmentSchema.parse(HALF_PLATE_STORED)).toMatchObject({
       category: 'medium',
-      baseAc: 15,
+      baseAcOffset: 5,
     })
     expect(equipmentSchema.parse(PLATE_STORED)).toMatchObject({
       abilityScoreRequirements: { str: 15 },
@@ -330,12 +334,12 @@ describe('armor equipment variant', () => {
     expect(shield.kind).toBe('armor')
     if (shield.kind === 'armor') {
       expect(shield.acBonus).toBe(2)
-      expect(shield.baseAc).toBeUndefined()
+      expect(shield.baseAcOffset).toBeUndefined()
     }
   })
 
   it('rejects body armor without baseAc and shields without acBonus', () => {
-    const { baseAc: _b, ...noBase } = LEATHER_STORED as Record<string, unknown>
+    const { baseAcOffset: _b, ...noBase } = LEATHER_STORED as Record<string, unknown>
     expect(equipmentSchema.safeParse(noBase).success).toBe(false)
     const { acBonus: _a, ...noBonus } = SHIELD_WOOD_STORED as Record<string, unknown>
     expect(equipmentSchema.safeParse(noBonus).success).toBe(false)
@@ -368,16 +372,21 @@ describe('tool display helpers', () => {
 describe('getArmorAcDisplay', () => {
   const make = (overrides: Partial<ArmorBody>): Parameters<typeof getArmorAcDisplay>[0] => ({
     category: 'light',
-    baseAc: 11,
+    baseAcOffset: 1,
     acBonus: undefined,
     ...overrides,
   })
 
   it('formats light, medium, heavy, and shield AC strings', () => {
-    expect(getArmorAcDisplay(make({ category: 'light', baseAc: 11 }))).toBe('11 + Dex')
-    expect(getArmorAcDisplay(make({ category: 'medium', baseAc: 14 }))).toBe('14 + Dex (max 2)')
-    expect(getArmorAcDisplay(make({ category: 'heavy', baseAc: 18 }))).toBe('18 (no Dex)')
-    expect(getArmorAcDisplay(make({ category: 'shields', acBonus: 2 }))).toBe('+2')
+    const rules = systemDefaultArmorClassRules()
+    expect(getArmorAcDisplay(make({ category: 'light', baseAcOffset: 1 }), rules)).toBe('11 + Dex')
+    expect(getArmorAcDisplay(make({ category: 'medium', baseAcOffset: 4 }), rules)).toBe(
+      '14 + Dex (max 2)',
+    )
+    expect(getArmorAcDisplay(make({ category: 'heavy', baseAcOffset: 8 }), rules)).toBe(
+      '18 (no Dex)',
+    )
+    expect(getArmorAcDisplay(make({ category: 'shields', acBonus: 2 }), rules)).toBe('+2')
   })
 })
 

@@ -17,6 +17,7 @@ import { useSubmitHandler } from '@/lib/use-submit-handler'
 
 import { useSpeciesNameTrailingAction } from '../../../hooks/use-species-name-trailing-action'
 import { useCreateNpc } from '../../hooks/use-create-npc'
+import { useRulesetPatch } from '@/features/homebrew'
 import { isQuickNpcSetupStillValid } from '../../lib/quick-npc/quick-npc-authoring-validation.lib'
 import { formatQuickNpcCreationError } from '../../lib/quick-npc/quick-npc-create'
 import { reconcileQuickNpcAuthoringRequirementValues } from '../../lib/quick-npc/quick-npc-authoring-requirements-reconcile.lib'
@@ -93,16 +94,19 @@ function buildQuickNpcAuthoringTabs(args: {
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
   createContext: QuickNpcCreateContext
+  armorClassRules?: import('@rpg/contracts').ArmorClassRules
   nameTrailingAction?: TrailingFieldActionConfig
   nameHint?: string
 }): TabbedFormTab[] {
   const optionSets = buildQuickNpcRequirementOptionSets({
     setup: args.setup,
     context: args.buildContext,
+    armorClassRules: args.armorClassRules,
   })
   const additionalEquipmentOptions = resolveQuickNpcAdditionalEquipmentOptions({
     setup: args.setup,
     context: args.buildContext,
+    armorClassRules: args.armorClassRules,
   })
   const generationSupport = resolveCharacterSpeciesNameGenerationSupport({
     speciesId: args.setup.speciesId,
@@ -132,6 +136,7 @@ function buildQuickNpcAuthoringTabs(args: {
     requirementsFields: buildQuickNpcRequirementsFields(),
     requirementsHeader: (
       <QuickNpcStartingChoices
+        armorClassRules={args.armorClassRules}
         setup={args.setup}
         buildContext={args.buildContext}
         createContext={args.createContext}
@@ -147,12 +152,14 @@ function QuickNpcAuthoringTabsSync({
   setup,
   buildContext,
   createContext,
+  armorClassRules,
   onTabsChange,
 }: {
   form: UseFormReturn<QuickNpcAuthoringTabFormValues>
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
   createContext: QuickNpcCreateContext
+  armorClassRules?: import('@rpg/contracts').ArmorClassRules
   onTabsChange: (tabs: TabbedFormTab[]) => void
 }) {
   const { trailingAction, nameHint } = useSpeciesNameTrailingAction({
@@ -167,10 +174,11 @@ function QuickNpcAuthoringTabsSync({
         setup,
         buildContext,
         createContext,
+        armorClassRules,
         nameTrailingAction: trailingAction,
         nameHint,
       }),
-    [buildContext, createContext, nameHint, setup, trailingAction],
+    [armorClassRules, buildContext, createContext, nameHint, setup, trailingAction],
   )
 
   React.useLayoutEffect(() => {
@@ -214,6 +222,8 @@ export function QuickNpcAuthoringForm({
   previewButtonRef,
 }: QuickNpcAuthoringFormProps) {
   const queryClient = useQueryClient()
+  const rulesetPatch = useRulesetPatch(campaignId).data
+  const armorClassRules = rulesetPatch?.mechanics.armorClass
   const createFlowDensity = useCreateFlowFormDensity()
   const { mutateAsync, isSuccess } = useCreateNpc()
   const organization =
@@ -225,6 +235,7 @@ export function QuickNpcAuthoringForm({
       setup,
       buildContext,
       createContext,
+      armorClassRules,
     }),
   )
 
@@ -272,7 +283,11 @@ export function QuickNpcAuthoringForm({
   }, [buildContext, createContext, equipmentBaseline, initialValues, setup])
 
   const requirementCategoryKey = React.useMemo(() => {
-    const optionSets = buildQuickNpcRequirementOptionSets({ setup, context: buildContext })
+    const optionSets = buildQuickNpcRequirementOptionSets({
+      setup,
+      context: buildContext,
+      armorClassRules,
+    })
     return `${optionSets.weapons.length}:${optionSets.spells.length}`
   }, [buildContext, setup])
 
@@ -366,6 +381,7 @@ export function QuickNpcAuthoringForm({
           <>
             <QuickNpcAuthoringTabsSync
               form={form}
+              armorClassRules={armorClassRules}
               setup={setup}
               buildContext={buildContext}
               createContext={createContext}

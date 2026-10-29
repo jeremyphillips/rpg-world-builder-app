@@ -1,5 +1,6 @@
 import * as React from 'react'
 
+import type { ArmorClassRules } from '@rpg/contracts'
 import { CatalogToolbar, Text } from '@rpg/ui'
 import { useSanitizedFilterState } from '@rpg/ui/filters'
 
@@ -43,11 +44,18 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type CharacterDetailEquipmentTabProps = {
   cards: readonly CharacterSheetEquipmentCard[]
+  armorClassRules: ArmorClassRules
   wealth: CharacterWealthViewModel
 }
 
-function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
-  const header = toEquipmentCatalogHeaderModel(card)
+function EquipmentCatalogRow({
+  card,
+  armorClassRules,
+}: {
+  card: CharacterSheetEquipmentCard
+  armorClassRules: ArmorClassRules
+}) {
+  const header = toEquipmentCatalogHeaderModel(card, armorClassRules)
   const toolbarLabel = buildCatalogDisclosureLabel({
     name: card.displayName,
     sourceLabel: header.sourceLabel,
@@ -80,7 +88,7 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
     >
       {card.status === 'resolved' ? (
         <EquipmentDetailMetadata
-          viewModel={buildEquipmentDetailViewModel(card.equipment)}
+          viewModel={buildEquipmentDetailViewModel(card.equipment, armorClassRules)}
           sectionId={`${card.id}-detail-metadata`}
           omitSectionTitle
           statRowSize="sm"
@@ -92,7 +100,11 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
   )
 }
 
-export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEquipmentTabProps) {
+export function CharacterDetailEquipmentTab({
+  cards,
+  armorClassRules,
+  wealth,
+}: CharacterDetailEquipmentTabProps) {
   const [filterState, setFilterState] = React.useState<CharacterDetailEquipmentFilterState>({
     selectedKind: CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS.selectedKind,
   })
@@ -211,7 +223,9 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
           <CatalogCollapsibleList
             items={visibleCards}
             getItemId={(card) => card.id}
-            renderItem={(card) => <EquipmentCatalogRow card={card} />}
+            renderItem={(card) => (
+              <EquipmentCatalogRow card={card} armorClassRules={armorClassRules} />
+            )}
           />
         </>
       )}

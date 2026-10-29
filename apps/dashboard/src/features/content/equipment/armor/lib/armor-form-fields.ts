@@ -1,4 +1,5 @@
 import {
+  armorBaseAcDisplayBounds,
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
   ARMOR_CATEGORIES,
@@ -10,6 +11,7 @@ import {
   getAbilityLabel,
   resolveArmorDexterityRule,
   type Ability,
+  type ArmorClassRules,
 } from '@rpg/contracts'
 import {
   toOptions,
@@ -55,8 +57,9 @@ function armorAcStepperField(args: {
   visibility: FieldVisibility
   hint?: FieldHintConfig
   min?: number
+  max?: number
 }): NumberFieldConfig {
-  const { name, label, visibility, hint, min } = args
+  const { name, label, visibility, hint, min, max } = args
   return {
     type: 'number',
     name,
@@ -66,12 +69,14 @@ function armorAcStepperField(args: {
     visibility,
     required: true,
     ...(min !== undefined ? { min } : {}),
+    ...(max !== undefined ? { max } : {}),
     ...(hint ? { hint } : {}),
   }
 }
 
 /** Armor-specific form field group for the unified equipment form. */
-export function armorFormFieldGroup(): FormItem {
+export function armorFormFieldGroup(rules?: ArmorClassRules): FormItem {
+  const baseBounds = rules ? armorBaseAcDisplayBounds(rules) : undefined
   return {
     kind: 'group',
     legend: '',
@@ -99,6 +104,8 @@ export function armorFormFieldGroup(): FormItem {
       armorAcStepperField({
         name: 'baseAc',
         label: 'Base AC',
+        min: baseBounds?.min,
+        max: baseBounds?.max,
         visibility: visibleWhenArmorNotShield(),
         hint: {
           position: 'below-control',

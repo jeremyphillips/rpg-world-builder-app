@@ -1,7 +1,5 @@
-import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mechanics-patch'
 import type { ClassHitDie } from '../../../primitives/dice'
 import type { Ability } from '../../../vocab/ability'
-import type { ArmorClassBase } from '../../../vocab/mechanics/edition-preset-mechanics'
 // ---------------------------------------------------------------------------
 // Derived stat helpers — pure functions over raw scores and catalog data.
 //
@@ -88,47 +86,6 @@ export function spellSaveDc(spellcastingAbilityScore: number, profBonus: number)
  */
 export function spellAttackBonus(spellcastingAbilityScore: number, profBonus: number): number {
   return profBonus + abilityModifier(spellcastingAbilityScore)
-}
-
-// ---------------------------------------------------------------------------
-// Armour class
-// ---------------------------------------------------------------------------
-
-/** Ruleset base AC before DEX or equipment adjustments (ascending mode). */
-export function baseArmorClass(acBase: ArmorClassBase): number {
-  return acBase
-}
-
-export { unarmoredAcFromDexModifier } from '../../creature/armor-class'
-import { unarmoredAcFromDexModifier } from '../../creature/armor-class'
-
-/**
- * Unarmored AC from a DEX score and ruleset base.
- * Equipment-based AC (armor + shield) is handled via {@link resolveEquippedArmorClass}
- * when `equippedArmor` is supplied on {@link CharacterDerivationInput}.
- */
-export function unarmoredAc(
-  dexScore: number,
-  acBase: ArmorClassBase = DEFAULT_ARMOR_CLASS_BASE,
-): number {
-  return unarmoredAcFromDexModifier(acBase, abilityModifier(dexScore))
-}
-
-export type ResolveUnarmoredAcInput = {
-  acBase: ArmorClassBase
-  dexScore: number | undefined
-  /** Used when `dexScore` is unset — preview default, not an assigned ability score. */
-  defaultDexModifier?: number
-}
-
-/** Resolves unarmored AC, applying a neutral DEX modifier when no score is set. */
-export function resolveUnarmoredAc({
-  acBase,
-  dexScore,
-  defaultDexModifier = 0,
-}: ResolveUnarmoredAcInput): number {
-  const dexModifier = typeof dexScore === 'number' ? abilityModifier(dexScore) : defaultDexModifier
-  return unarmoredAcFromDexModifier(acBase, dexModifier)
 }
 
 export * from './armor-class'

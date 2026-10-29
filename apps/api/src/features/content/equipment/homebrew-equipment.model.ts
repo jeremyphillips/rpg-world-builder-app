@@ -49,7 +49,7 @@ const homebrewEquipmentSchema = new Schema(
     specialRules: { type: String },
     // armor
     material: { type: String, enum: [...ARMOR_MATERIALS] },
-    baseAc: { type: Number },
+    baseAcOffset: { type: Number },
     acBonus: { type: Number },
     stealthDisadvantage: { type: Boolean },
     abilityScoreRequirements: { type: abilityScoreRequirementsSchema, default: undefined },
@@ -79,7 +79,7 @@ const homebrewEquipmentSchema = new Schema(
     crew: { type: Number },
     passengers: { type: Number },
     cargoCapacity: { type: Schema.Types.Mixed },
-    ac: { type: Number },
+    acOffset: { type: Number },
     hp: { type: Number },
     damageThreshold: { type: Number },
     // service

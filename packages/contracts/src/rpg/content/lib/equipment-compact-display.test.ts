@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Equipment } from '../equipment'
+import { systemDefaultArmorClassRules } from '../../campaign/patches/campaign-mechanics-patch'
 import {
-  buildEquipmentCompactSummary,
+  buildEquipmentCompactSummary as buildEquipmentCompactSummaryWithRules,
   COMPACT_METADATA_LAYOUT,
   joinCompactSegments,
 } from './equipment-compact-display'
+
+function buildEquipmentCompactSummary(equipment: Equipment, profile?: 'standard' | 'compact-row') {
+  return buildEquipmentCompactSummaryWithRules(equipment, {
+    armorClassRules: systemDefaultArmorClassRules(),
+    ...(profile ? { profile } : {}),
+  })
+}
 
 const dagger = {
   id: 'test:dagger',
@@ -44,7 +52,7 @@ const plateArmor = {
   weight: { value: 65, unit: 'lb' },
   kind: 'armor',
   category: 'heavy',
-  baseAc: 18,
+  baseAcOffset: 8,
   stealthDisadvantage: true,
   abilityScoreRequirements: { str: 15 },
 } satisfies Equipment
@@ -128,7 +136,7 @@ describe('equipment-compact-display', () => {
       buildEquipmentCompactSummary({
         ...plateArmor,
         category: 'light',
-        baseAc: 11,
+        baseAcOffset: 1,
         ...withoutRestriction,
       }).comparisonGroups.join(' · '),
     ).toBe('AC 11 + Dex · Light')
@@ -136,7 +144,7 @@ describe('equipment-compact-display', () => {
       buildEquipmentCompactSummary({
         ...plateArmor,
         category: 'medium',
-        baseAc: 14,
+        baseAcOffset: 4,
         ...withoutRestriction,
       }).comparisonGroups.join(' · '),
     ).toBe('AC 14 + Dex (max 2) · Medium')

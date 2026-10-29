@@ -35,7 +35,7 @@ function armorBase(): Equipment {
     name: 'Test Armor',
     kind: 'armor',
     category: 'light',
-    baseAc: 11,
+    baseAcOffset: 1,
     stealthDisadvantage: false,
     weight: { value: 10, unit: 'lb' },
   } satisfies Equipment

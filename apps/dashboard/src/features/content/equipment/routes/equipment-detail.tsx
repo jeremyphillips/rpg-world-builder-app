@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
-import { RichTextContent } from '@rpg/ui'
+import { useRulesetPatch } from '@/features/homebrew'
+import { Button, RichTextContent, Text } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 
 import {
@@ -35,8 +36,22 @@ type EquipmentDetailContentProps = {
 
 export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDetailContentProps) {
   useSetBreadcrumbLabel(item.name)
-
-  const viewModel = buildEquipmentDetailViewModel(item)
+  const rulesQuery = useRulesetPatch(campaignId)
+  const armorClassRules = rulesQuery.data?.mechanics.armorClass
+  const viewModel = armorClassRules ? buildEquipmentDetailViewModel(item, armorClassRules) : null
+  if (rulesQuery.isError) {
+    return (
+      <Text variant="warning" role="alert">
+        Could not load Armor Class rules.{' '}
+        <Button type="button" variant="outline" onClick={() => void rulesQuery.refetch()}>
+          Retry
+        </Button>
+      </Text>
+    )
+  }
+  if (!viewModel) {
+    return <Text variant="supporting">Loading Armor Class rules…</Text>
+  }
 
   return (
     <ContentDetailLayout

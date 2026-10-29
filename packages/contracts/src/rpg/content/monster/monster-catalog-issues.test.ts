@@ -22,7 +22,7 @@ function armor(slug: string, name: string) {
     weight: { value: 1, unit: 'lb' },
     kind: 'armor',
     category: 'light',
-    baseAc: 11,
+    baseAcOffset: 1,
     stealthDisadvantage: false,
   })
 }
@@ -133,7 +133,7 @@ describe('collectMonsterCatalogIssues', () => {
       slug: 'shield',
       name: 'Shield',
       category: 'shields',
-      baseAc: undefined,
+      baseAcOffset: undefined,
       acBonus: 2,
     })
     const catalogs = readyCatalogs({
@@ -167,7 +167,7 @@ describe('collectMonsterCatalogIssues', () => {
       slug: 'shield',
       name: 'Shield',
       category: 'shields',
-      baseAc: undefined,
+      baseAcOffset: undefined,
       acBonus: 2,
     })
     expect(

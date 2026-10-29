@@ -68,6 +68,7 @@ export function CharacterDetailSheet({
         <CharacterDetailTabs
           spells={viewModel.spells}
           equipment={viewModel.equipment}
+          armorClassRules={viewModel.armorClassRules}
           wealth={viewModel.wealth}
           classFeatures={viewModel.classFeatures}
           speciesTraits={viewModel.speciesTraits}
