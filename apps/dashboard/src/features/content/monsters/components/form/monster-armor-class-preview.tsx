@@ -3,7 +3,6 @@ import { Icon, InsetPanel, SemanticText, Text } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
-import './monster-armor-class-preview.css'
 import { deriveMonsterFormDraft } from '../../lib/monster-form-derivation'
 import { monsterUnavailableReasonCopy } from '../../lib/monster-display'
 import {
@@ -50,8 +49,8 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
   return (
     <InsetPanel size="sm">
       <div className="flex flex-col gap-3">
-        <div className="monster-armor-class-preview__columns">
-          <div className="monster-armor-class-preview__summary">
+        <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-0">
+          <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 text-center md:w-[13.75rem] md:border-r md:border-border md:pr-4">
             <Text as="p" variant="emphasis">
               {resolution ? resolution.ac : '—'}
             </Text>
@@ -60,7 +59,7 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
             </Text>
           </div>
           {resolution && rules ? (
-            <dl className="monster-armor-class-preview__breakdown">
+            <dl className="flex min-w-0 flex-1 flex-col md:pl-4">
               <div className="flex flex-col gap-0.5">
                 {monsterArmorClassBreakdownRows(resolution, rules).map((row) => (
                   <div key={row.id} className="flex items-baseline justify-between gap-3">

@@ -1,7 +1,11 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { resolveFieldConfigPrimaryName, type DependentConfig } from '@rpg/ui/form'
 import { loadSeedEquipment } from '@rpg/catalog/equipment'
-import { deriveContentKey, type CreateEquipmentInput } from '@rpg/contracts'
+import {
+  deriveContentKey,
+  systemDefaultArmorClassRules,
+  type CreateEquipmentInput,
+} from '@rpg/contracts'
 
 import { STORY_RULESET_ID } from '../../lib/fixtures/constants'
 import {
@@ -29,7 +33,9 @@ describe('equipmentFormDef round-trips', () => {
     })
 
     it(`${item.slug}: name and kind preserved`, () => {
-      const input = equipmentFormDef.toInput(toEquipmentFormValues(item))
+      const input = equipmentFormDef.toInput(toEquipmentFormValues(item), {
+        armorClassRules: systemDefaultArmorClassRules(),
+      })
       expect(input.name).toBe(item.name)
       expect(input.kind).toBe(item.kind)
     })
