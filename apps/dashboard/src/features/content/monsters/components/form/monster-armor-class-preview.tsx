@@ -1,9 +1,9 @@
 import { useFormContext, useWatch } from 'react-hook-form'
-import { cn, Icon, InsetPanel, SemanticText, Text } from '@rpg/ui'
-
-import { abilityScoreCardScoreValueClassesFor } from '@/components/ability-score/ability-score-card.variants'
+import { Icon, InsetPanel, SemanticText, Text } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+
+import './monster-armor-class-preview.css'
 import { deriveMonsterFormDraft } from '../../lib/monster-form-derivation'
 import { monsterUnavailableReasonCopy } from '../../lib/monster-display'
 import {
@@ -48,20 +48,20 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
   return (
     <InsetPanel size="sm">
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-0">
-          <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 text-center md:w-[220px] md:border-r md:border-border md:pr-4">
-            <p className={cn(abilityScoreCardScoreValueClassesFor('md'), 'text-center')}>
+        <div className="monster-armor-class-preview__columns">
+          <div className="monster-armor-class-preview__summary">
+            <Text as="p" variant="emphasis">
               {resolution ? resolution.ac : '—'}
-            </p>
-            <Text as="p" variant="caption" className="text-center">
+            </Text>
+            <Text as="p" variant="caption">
               {resolution ? monsterArmorClassCaption(resolution) : (unavailable ?? 'Not set')}
             </Text>
           </div>
           {resolution ? (
-            <dl className="flex min-w-0 flex-1 flex-col md:pl-4">
+            <dl className="monster-armor-class-preview__breakdown">
               <div className="flex flex-col gap-0.5">
                 {monsterArmorClassBreakdownRows(resolution).map((row) => (
-                  <div key={row.id} className="flex items-baseline justify-between gap-3 leading-4">
+                  <div key={row.id} className="flex items-baseline justify-between gap-3">
                     <dt>
                       <Text as="span" variant="caption">
                         {row.label}
@@ -75,14 +75,14 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
                   </div>
                 ))}
               </div>
-              <div className="mt-1 flex items-baseline justify-between gap-3 border-t border-border pt-1 leading-4">
+              <div className="mt-1 flex items-baseline justify-between gap-3 border-t border-border pt-1">
                 <dt>
-                  <Text as="span" className="text-xs font-semibold">
+                  <Text as="span" variant="label">
                     Total
                   </Text>
                 </dt>
                 <dd>
-                  <Text as="span" className="text-xs font-semibold">
+                  <Text as="span" variant="label">
                     {resolution.ac}
                   </Text>
                 </dd>

@@ -94,12 +94,18 @@ const emptyProvider: MagicPropertyDefinitionProvider = () => undefined
 
 function entry(
   item: Equipment,
-  options: { equipped?: boolean; propertyId?: string; adjustment?: number } = {},
+  options: {
+    equipped?: boolean
+    propertyId?: string
+    adjustment?: number
+    quantity?: number
+    entryId?: string
+  } = {},
 ) {
   return {
-    entryId: item.slug,
+    entryId: options.entryId ?? item.slug,
     equipmentId: item.id,
-    quantity: 1,
+    quantity: options.quantity ?? 1,
     equipped: options.equipped ?? true,
     ...(options.propertyId
       ? {
@@ -312,7 +318,7 @@ describe('resolveMonsterArmorClass', () => {
     expect(open.ac).toBe(13)
   })
 
-  it('reports equipped armor conflicts and missing Dexterity without an override', () => {
+  it('reports owned armor conflicts before a fixed override', () => {
     expect(
       resolve({
         dex: 14,
@@ -322,13 +328,33 @@ describe('resolveMonsterArmorClass', () => {
     expect(
       resolve({
         dex: 14,
-        equipment: [entry(shield), entry(shield)],
+        equipment: [
+          entry(shield, { entryId: 'shield-a' }),
+          entry(shield, { entryId: 'shield-b', equipped: false }),
+        ],
       }),
     ).toEqual({ status: 'unavailable', reason: 'conflict' })
+    expect(
+      resolve({
+        dex: 14,
+        naturalArmorBonus: 2,
+        fixedValue: 18,
+        equipment: [entry(leather, { quantity: 2 })],
+      }),
+    ).toEqual({ status: 'unavailable', reason: 'conflict' })
+    expect(
+      resolve({
+        dex: 14,
+        fixedValue: 18,
+        equipment: [entry(leather), entry(chainShirt, { equipped: false })],
+      }),
+    ).toEqual({ status: 'unavailable', reason: 'conflict' })
+    expect(resolved({ dex: 14, naturalArmorBonus: 2 }).ac).toBe(14)
     expect(resolve({ equipment: [] })).toEqual({ status: 'unavailable', reason: 'missing-input' })
     expect(resolve({ fixedValue: 12 }).status).toBe('resolved')
     expect(resolved({ fixedValue: 12 }).calculatedAc).toBeUndefined()
     expect(resolved({ fixedValue: 12 }).dexRestriction).toBeUndefined()
+    expect(resolved({ dex: 14, equipment: [entry(leather), entry(shield)] }).ac).toBe(15)
   })
 
   it('records when a medium cap is why natural armor wins, including the shared shield', () => {

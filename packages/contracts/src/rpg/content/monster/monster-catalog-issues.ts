@@ -2,7 +2,11 @@ import type { ContentValidationIntent } from '../lib/content-validation-intent'
 import type { ContentValidationIssue } from '../lib/content-validation-issue'
 import { isContentCampaignEligible, isContentReferenceable } from '../lib/content-resolution-policy'
 import type { Equipment, EquipmentInstance } from '../equipment'
-import { isArmorEquipment, isWeaponEquipment, resolveCreatureArmorSlot } from '../equipment'
+import { isArmorEquipment, isWeaponEquipment } from '../equipment'
+import {
+  monsterArmorOwnershipViolations,
+  MONSTER_ARMOR_OWNERSHIP_VIOLATION_ID,
+} from './monster-armor-ownership'
 import type { MagicPropertyDefinitionProvider } from '../equipment/instance/magic-property'
 import { normalizeEquipmentInstance } from '../equipment/instance/normalize-equipment-instance'
 import { validateEquipmentMagicProperties } from '../equipment/instance/validate-equipment-magic-properties'
@@ -116,53 +120,32 @@ function collectEquipmentRowIssues(
   }
 }
 
+const OWNERSHIP_ISSUE_COPY = {
+  [MONSTER_ARMOR_OWNERSHIP_VIOLATION_ID.duplicateBodyArmor]: {
+    path: (entryIndex: number) => `equipment.${entryIndex}`,
+    message: 'Only one body armor can be owned.',
+    code: MONSTER_CATALOG_ISSUE_CODE.multipleOwnedBodyArmor,
+  },
+  [MONSTER_ARMOR_OWNERSHIP_VIOLATION_ID.duplicateShield]: {
+    path: (entryIndex: number) => `equipment.${entryIndex}`,
+    message: 'Only one shield can be owned.',
+    code: MONSTER_CATALOG_ISSUE_CODE.multipleOwnedShield,
+  },
+  [MONSTER_ARMOR_OWNERSHIP_VIOLATION_ID.invalidQuantity]: {
+    path: (entryIndex: number) => `equipment.${entryIndex}.quantity`,
+    message: 'Armor and shields are limited to a quantity of 1.',
+    code: MONSTER_CATALOG_ISSUE_CODE.armorSlotQuantity,
+  },
+} as const
+
 function collectArmorOwnershipIssues(
   equipment: readonly CatalogEquipmentEntry[],
   catalogs: MonsterCatalogs,
   issues: ContentValidationIssue[],
 ): void {
-  const bodyArmor: number[] = []
-  const shields: number[] = []
-  equipment.forEach((entry, index) => {
-    if (!entry.equipmentId) return
-    const item = catalogs.equipmentById.get(entry.equipmentId)
-    if (!item) return
-    const slot = resolveCreatureArmorSlot(item)
-    if (!slot) return
-    if ((entry.quantity ?? 1) !== 1) {
-      issues.push(
-        issue(
-          `equipment.${index}.quantity`,
-          'Armor and shields are limited to a quantity of 1.',
-          MONSTER_CATALOG_ISSUE_CODE.armorSlotQuantity,
-        ),
-      )
-    }
-    if (slot === 'body-armor') bodyArmor.push(index)
-    else shields.push(index)
-  })
-  pushExtraSlotIssues(
-    bodyArmor,
-    'Only one body armor can be owned.',
-    MONSTER_CATALOG_ISSUE_CODE.multipleOwnedBodyArmor,
-    issues,
-  )
-  pushExtraSlotIssues(
-    shields,
-    'Only one shield can be owned.',
-    MONSTER_CATALOG_ISSUE_CODE.multipleOwnedShield,
-    issues,
-  )
-}
-
-function pushExtraSlotIssues(
-  indexes: readonly number[],
-  message: string,
-  code: MonsterCatalogIssueCode,
-  issues: ContentValidationIssue[],
-): void {
-  for (const index of indexes.slice(1)) {
-    issues.push(issue(`equipment.${index}`, message, code))
+  for (const violation of monsterArmorOwnershipViolations(equipment, catalogs.equipmentById)) {
+    const copy = OWNERSHIP_ISSUE_COPY[violation.id]
+    issues.push(issue(copy.path(violation.entryIndex), copy.message, copy.code))
   }
 }
 

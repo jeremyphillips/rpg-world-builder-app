@@ -135,8 +135,7 @@ export function monsterArmorClassDexAdvisory(
 ): string | undefined {
   if (resolution.source === 'fixed') return undefined
   const restriction = resolution.dexRestriction
-  if (!restriction) return undefined
-  if (restriction.appliedModifier >= restriction.abilityModifier) return undefined
+  if (!restriction?.affectsOutcome) return undefined
   const name = proseArmorName(resolution.bodyArmor?.label ?? 'Armor', true)
   const original = formatSignedModifier(restriction.abilityModifier)
   if (restriction.mode === 'capped') {

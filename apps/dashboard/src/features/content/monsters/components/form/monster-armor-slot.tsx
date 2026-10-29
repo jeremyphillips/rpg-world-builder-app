@@ -14,15 +14,18 @@ import {
   monsterEquipmentCatalog,
   monsterMagicPropertyProvider,
 } from '../../lib/monster-form-derivation'
-import { replaceMonsterArmorSlotEntry } from '../../lib/equipment/monster-equipment-loadout.lib'
+import {
+  commitMonsterArmorSlotReplacement,
+  planArmorSlotReplacement,
+} from '../../lib/equipment/armor-slot-replacement.lib'
 import {
   buildMonsterLoadoutPickerItems,
   resolveMonsterFormWeaponGrants,
 } from '../../lib/equipment/monster-loadout-picker.lib'
 import { resolveEquipmentRemovalDecision } from '../../lib/equipment/resolve-equipment-removal-decision.lib'
 import {
+  formatArmorSlotReplacementConfirmCopy,
   formatEquipmentCustomizationRemovalSummary,
-  formatEquipmentRemovalConfirmCopy,
   getMonsterArmorSlotUiCopy,
   MONSTER_ARMOR_SLOT_EMPTY_LABEL,
 } from '../../lib/monster-form-labels'
@@ -51,20 +54,6 @@ function armorSlotSelectionUnchanged(
   return pendingId === null || (owned.length === 1 && pendingId === currentId)
 }
 
-function blockingArmorReplacement(
-  values: MonsterFormValues,
-  owned: readonly MonsterEquipmentFormEntry[],
-): MonsterEquipmentFormEntry | undefined {
-  return owned.find((entry) => resolveEquipmentRemovalDecision(values, entry).requiresConfirmation)
-}
-
-function armorSlotPickerItems(
-  items: ReturnType<typeof buildMonsterLoadoutPickerItems>,
-  slot: CreatureArmorSlot,
-) {
-  return items.filter((item) => resolveCreatureArmorSlot(item.equipment) === slot)
-}
-
 function resolveArmorSlotCommit(
   pendingId: string | null,
   unchanged: boolean,
@@ -72,34 +61,64 @@ function resolveArmorSlotCommit(
   owned: readonly MonsterEquipmentFormEntry[],
 ) {
   if (!pendingId || unchanged || !values) return null
-  const blocking = blockingArmorReplacement(values, owned)
-  if (blocking) return { kind: 'confirm' as const, entry: blocking }
+  const plan = planArmorSlotReplacement(
+    owned.map((entry) => resolveEquipmentRemovalDecision(values, entry)),
+  )
+  if (plan === 'prohibited') return { kind: 'prohibited' as const }
+  if (plan === 'confirm') return { kind: 'confirm' as const, equipmentId: pendingId }
   return { kind: 'apply' as const, equipmentId: pendingId }
 }
 
+function armorSlotFlaggedCopy(
+  owned: readonly MonsterEquipmentFormEntry[],
+  values: MonsterFormValues,
+  catalog: ReturnType<typeof monsterEquipmentCatalog>,
+  provider: ReturnType<typeof monsterMagicPropertyProvider>,
+) {
+  return owned.flatMap((entry) => {
+    const decision = resolveEquipmentRemovalDecision(values, entry)
+    if (decision.outcome !== 'confirm') return []
+    return [
+      {
+        displayName: resolveEquipmentInstanceSummary(
+          entry,
+          catalog.get(entry.equipmentId),
+          provider,
+        ).displayName,
+        reasons: decision.reasons,
+        referencedActionCount: decision.references.length,
+        referencedActionSummary: decision.references
+          .map((reference) => reference.name ?? reference.id)
+          .join(', '),
+        customizationSummary: formatEquipmentCustomizationRemovalSummary(entry),
+      },
+    ]
+  })
+}
+
 function ArmorSlotReplaceDialog({
-  pendingId,
-  pendingReplace,
+  confirmingId,
+  owned,
   values,
   catalog,
   provider,
   onApply,
   onClear,
 }: {
-  pendingId: string | null
-  pendingReplace: MonsterEquipmentFormEntry | null
+  confirmingId: string | null
+  owned: readonly MonsterEquipmentFormEntry[]
   values: MonsterFormValues
   catalog: ReturnType<typeof monsterEquipmentCatalog>
   provider: ReturnType<typeof monsterMagicPropertyProvider>
   onApply: (equipmentId: string) => void
   onClear: () => void
 }) {
-  const replaceCopy = pendingReplace
-    ? armorReplacementConfirmCopy(pendingReplace, values, catalog, provider)
-    : null
+  const flagged = armorSlotFlaggedCopy(owned, values, catalog, provider)
+  const replaceCopy =
+    confirmingId && flagged.length > 0 ? formatArmorSlotReplacementConfirmCopy({ flagged }) : null
   return (
     <ConfirmDialog
-      open={pendingReplace !== null}
+      open={replaceCopy !== null}
       onOpenChange={(next) => {
         if (!next) onClear()
       }}
@@ -107,27 +126,17 @@ function ArmorSlotReplaceDialog({
       description={replaceCopy?.description ?? ''}
       confirmLabel={replaceCopy?.confirmLabel ?? ''}
       onConfirm={() => {
-        if (pendingId) onApply(pendingId)
+        if (confirmingId) onApply(confirmingId)
       }}
       onCancel={onClear}
     />
   )
 }
-
-function armorReplacementConfirmCopy(
-  entry: MonsterEquipmentFormEntry,
-  values: MonsterFormValues,
-  catalog: ReturnType<typeof monsterEquipmentCatalog>,
-  provider: ReturnType<typeof monsterMagicPropertyProvider>,
+function armorSlotPickerItems(
+  items: ReturnType<typeof buildMonsterLoadoutPickerItems>,
+  slot: CreatureArmorSlot,
 ) {
-  const decision = resolveEquipmentRemovalDecision(values, entry)
-  return formatEquipmentRemovalConfirmCopy({
-    displayName: resolveEquipmentInstanceSummary(entry, catalog.get(entry.equipmentId), provider)
-      .displayName,
-    reasons: decision.reasons,
-    referencedActionCount: decision.references.length,
-    customizationSummary: formatEquipmentCustomizationRemovalSummary(entry),
-  })
+  return items.filter((item) => resolveCreatureArmorSlot(item.equipment) === slot)
 }
 
 export function MonsterArmorSlotAction({
@@ -147,7 +156,7 @@ export function MonsterArmorSlotAction({
   const copy = getMonsterArmorSlotUiCopy(slot)
   const [open, setOpen] = useState(false)
   const [pendingId, setPendingId] = useState<string | null>(null)
-  const [pendingReplace, setPendingReplace] = useState<MonsterEquipmentFormEntry | null>(null)
+  const [confirmingId, setConfirmingId] = useState<string | null>(null)
 
   const weaponGrants = useMemo(() => resolveMonsterFormWeaponGrants(values), [values])
   const items = useMemo(() => {
@@ -166,20 +175,16 @@ export function MonsterArmorSlotAction({
   const provider = monsterMagicPropertyProvider(ctx)
 
   const applyReplacement = (equipmentId: string) => {
-    form.setValue(
-      'equipment',
-      replaceMonsterArmorSlotEntry(form.getValues('equipment') ?? [], slot, equipmentId, catalog),
-      { shouldDirty: true },
-    )
+    commitMonsterArmorSlotReplacement(form, slot, equipmentId, catalog)
     setOpen(false)
-    setPendingReplace(null)
+    setConfirmingId(null)
   }
 
   const commit = () => {
     const decision = resolveArmorSlotCommit(pendingId, unchanged, values, owned)
-    if (!decision) return
+    if (!decision || decision.kind === 'prohibited') return
     if (decision.kind === 'confirm') {
-      setPendingReplace(decision.entry)
+      setConfirmingId(decision.equipmentId)
       return
     }
     applyReplacement(decision.equipmentId)
@@ -230,13 +235,13 @@ export function MonsterArmorSlotAction({
         }
       />
       <ArmorSlotReplaceDialog
-        pendingId={pendingId}
-        pendingReplace={pendingReplace}
+        confirmingId={confirmingId}
+        owned={owned}
         values={values ?? form.getValues()}
         catalog={catalog}
         provider={provider}
         onApply={applyReplacement}
-        onClear={() => setPendingReplace(null)}
+        onClear={() => setConfirmingId(null)}
       />
     </>
   )
@@ -255,8 +260,7 @@ export function MonsterArmorSlotBody({
   const equipmentSource = values?.equipment
   const equipment = useMemo(() => equipmentSource ?? [], [equipmentSource])
   const owned = slotEntries(equipment, catalog, slot)
-  const entry = owned[0]
-  if (!entry) {
+  if (owned.length === 0) {
     return (
       <InsetPanel borderStyle="dashed" size="sm" align="center" surface={{}}>
         <InsetPanel.Text>{MONSTER_ARMOR_SLOT_EMPTY_LABEL}</InsetPanel.Text>
@@ -264,9 +268,11 @@ export function MonsterArmorSlotBody({
     )
   }
   return (
-    <>
-      {equipmentEntrySurface.entryCard(entry)}
+    <div className="flex flex-col gap-2">
+      {owned.map((entry) => (
+        <div key={entry.entryId}>{equipmentEntrySurface.entryCard(entry)}</div>
+      ))}
       {equipmentEntrySurface.dialogs}
-    </>
+    </div>
   )
 }

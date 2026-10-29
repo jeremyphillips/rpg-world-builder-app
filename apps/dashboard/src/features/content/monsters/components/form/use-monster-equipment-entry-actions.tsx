@@ -96,7 +96,7 @@ export function useMonsterEquipmentEntryActions(ctx: ContentFormCtx): MonsterEqu
     (entryId: string) => {
       const entry = equipment.find((row) => row.entryId === entryId)
       if (!entry || !values) return
-      if (resolveEquipmentRemovalDecision(values, entry).requiresConfirmation) {
+      if (resolveEquipmentRemovalDecision(values, entry).outcome === 'confirm') {
         setPendingRemove({ entryId })
         return
       }

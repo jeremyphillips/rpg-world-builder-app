@@ -258,6 +258,38 @@ export type EquipmentRemovalConfirmCopyInput = {
   customizationSummary?: string
 }
 
+export const MONSTER_ARMOR_SLOT_REPLACEMENT_SCOPE = 'This replaces every piece in the slot.'
+
+export function formatArmorSlotReplacementConfirmCopy(input: {
+  flagged: readonly EquipmentRemovalConfirmCopyInput[]
+}): {
+  headline: string
+  description: string
+  confirmLabel: string
+} {
+  const flagged = input.flagged[0]
+  if (input.flagged.length === 1 && flagged) {
+    const copy = formatEquipmentRemovalConfirmCopy(flagged)
+    return {
+      headline: copy.headline,
+      description: `${MONSTER_ARMOR_SLOT_REPLACEMENT_SCOPE} ${copy.description}`,
+      confirmLabel: copy.confirmLabel,
+    }
+  }
+
+  const details = input.flagged
+    .map((entry) => {
+      const copy = formatEquipmentRemovalConfirmCopy(entry)
+      return `${entry.displayName}: ${copy.description}`
+    })
+    .join(' ')
+  return {
+    headline: 'Replace this slot?',
+    description: `${MONSTER_ARMOR_SLOT_REPLACEMENT_SCOPE} ${details}`,
+    confirmLabel: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL,
+  }
+}
+
 export function formatEquipmentRemovalConfirmCopy({
   displayName,
   reasons,

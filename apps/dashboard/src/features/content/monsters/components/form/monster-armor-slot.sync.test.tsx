@@ -23,9 +23,10 @@ const ctx = {
   skillCatalogStatus: 'ready',
 } satisfies ContentFormCtx
 
-function Host() {
+function Host({ equipment }: { equipment?: MonsterFormValues['equipment'] }) {
   const defaults = resolveMonsterCreateDefaultValues()
-  defaults.equipment = [createPlainMonsterEquipmentEntry(leather.id)]
+  if (equipment) defaults.equipment = equipment
+  else defaults.equipment = [createPlainMonsterEquipmentEntry(leather.id)]
   const form = useForm<MonsterFormValues>({ defaultValues: defaults })
   return (
     <FormProvider {...form}>
@@ -58,5 +59,17 @@ describe('monster armor slot and equipment tab', () => {
       screen.queryByRole('checkbox', { name: `Equipped: ${leather.name}` }),
     ).not.toBeInTheDocument()
     expect(screen.getByText('None selected')).toBeInTheDocument()
+  })
+
+  it('shows every owned body armor in the slot and on the equipment tab', () => {
+    render(
+      <Host
+        equipment={[
+          createPlainMonsterEquipmentEntry(leather.id),
+          createPlainMonsterEquipmentEntry(leather.id),
+        ]}
+      />,
+    )
+    expect(screen.getAllByRole('checkbox', { name: `Equipped: ${leather.name}` })).toHaveLength(4)
   })
 })

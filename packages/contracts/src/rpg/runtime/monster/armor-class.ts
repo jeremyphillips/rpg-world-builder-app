@@ -1,4 +1,5 @@
 import { isArmorEquipment, type Equipment } from '../../content/equipment'
+import { monsterArmorOwnershipViolations } from '../../content/monster/monster-armor-ownership'
 import type { EquipmentInstance } from '../../content/equipment/instance/instance'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { resolveEquipmentEntryEffects } from '../../content/equipment/instance/equipment-effect-totals'
@@ -326,10 +327,15 @@ export function resolveMonsterArmorClass(
   args: ResolveMonsterArmorClassInput,
 ): DerivedField<MonsterArmorClassResolution> {
   const { monster, equipmentCatalog, acBase, magicPropertyProvider } = args
+  // Ownership conflicts invalidate AC before candidates and before a fixed override,
+  // including when the extra piece is unequipped.
+  if (monsterArmorOwnershipViolations(monster.equipment ?? [], equipmentCatalog).length > 0) {
+    return unavailableField('conflict')
+  }
+
   const rows = equippedArmorRows(monster, equipmentCatalog, magicPropertyProvider)
   const bodyArmor = rows.filter((row) => resolveCreatureArmorSlot(row.item) === 'body-armor')
   const shields = rows.filter((row) => resolveCreatureArmorSlot(row.item) === 'shield')
-  if (bodyArmor.length > 1 || shields.length > 1) return unavailableField('conflict')
 
   const fixedValue = monster.armorClass?.fixedValue
   const dexScore = monster.abilityScores?.dex

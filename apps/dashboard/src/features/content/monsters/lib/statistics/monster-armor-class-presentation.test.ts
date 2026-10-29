@@ -280,13 +280,21 @@ describe('monster armor class comparison from the resolver', () => {
     expect(monsterArmorClassDexAdvisory(stowed)).toBeUndefined()
   })
 
-  it('shows the DEX advisory whenever armor caps or ignores DEX, even when armor wins', () => {
+  it('hides the DEX advisory when armor still wins or the restriction does not change the winner', () => {
     const cappedWins = resolvedAc({ dex: 18, equipment: [scaleMail] })
-    expect(monsterArmorClassDexAdvisory(cappedWins)).toBe(
-      'Scale mail limits the +4 DEX modifier to +2.',
-    )
+    expect(cappedWins.dexRestriction?.affectsOutcome).toBe(false)
+    expect(monsterArmorClassDexAdvisory(cappedWins)).toBeUndefined()
 
     const heavyWins = resolvedAc({ dex: 18, equipment: [chainMail] })
-    expect(monsterArmorClassDexAdvisory(heavyWins)).toBe('Chain mail ignores the +4 DEX modifier.')
+    expect(heavyWins.dexRestriction?.affectsOutcome).toBe(false)
+    expect(monsterArmorClassDexAdvisory(heavyWins)).toBeUndefined()
+
+    const naturalWinsAnyway = resolvedAc({
+      dex: 18,
+      naturalArmorBonus: 9,
+      equipment: [scaleMail],
+    })
+    expect(naturalWinsAnyway.dexRestriction?.affectsOutcome).toBe(false)
+    expect(monsterArmorClassDexAdvisory(naturalWinsAnyway)).toBeUndefined()
   })
 })

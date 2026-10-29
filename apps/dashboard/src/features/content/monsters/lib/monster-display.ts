@@ -100,7 +100,9 @@ export function monsterUnavailableReasonCopy(
   reason: DerivedFieldReason,
   subject: 'generic' | 'challenge' | 'armor',
 ): string {
-  if (reason === 'conflict') return 'More than one armor or shield is equipped'
+  if (reason === 'conflict') {
+    return 'Only one body armor and one shield can be owned, each with quantity 1.'
+  }
   if (reason === 'missing-reference' && subject === 'armor') return 'Missing armor reference'
   if (reason === 'missing-input' && subject === 'challenge')
     return 'Set a challenge rating to calculate'
