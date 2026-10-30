@@ -40,6 +40,18 @@ vi.mock('../../equipment/hooks/use-equipment', async (importOriginal) => {
 vi.mock('../hooks/use-monsters', () => ({
   useMonsters: vi.fn(),
 }))
+vi.mock('../../spells/hooks/use-spells', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../spells/hooks/use-spells')>()
+  return {
+    ...actual,
+    useSpells: vi.fn(() => ({
+      data: [],
+      isPending: false,
+      isError: false,
+      isLoadingError: false,
+    })),
+  }
+})
 vi.mock('../../skill-proficiencies/hooks/use-skill-proficiencies', async (importOriginal) => {
   const actual = await importOriginal<typeof UseSkillProficienciesModule>()
   return {

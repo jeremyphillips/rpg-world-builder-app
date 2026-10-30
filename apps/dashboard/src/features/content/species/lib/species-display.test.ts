@@ -189,8 +189,8 @@ describe('species-display', () => {
     const elf = pickSpecies('elf')
     const vocabularyWithSpells = {
       ...vocabulary,
-      resolveSpell: (slug: string) => {
-        const spell = getDrowHeritageSpellCatalog().find((entry) => entry.slug === slug)
+      resolveSpell: (spellId: string) => {
+        const spell = getDrowHeritageSpellCatalog().find((entry) => entry.id === spellId)
         return spell ? { name: spell.name, level: spell.level } : undefined
       },
     }

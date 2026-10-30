@@ -1,3 +1,4 @@
+import { getContentTypeTerm } from '../primitives/content/content-type-terms'
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import type { GameTermEntry, VocabularyTerm } from './types'
 
@@ -29,7 +30,7 @@ export const MONSTER_ACTION_KIND_ENTRIES = {
     description: 'A named special action described in prose.',
   },
   spell: {
-    label: 'Spell',
+    label: getContentTypeTerm('spells').label,
     description:
       'Casts referenced spells. The structure is authoritative and the prose is generated.',
   },

@@ -247,6 +247,7 @@ const armedRogue = classSchema.parse({
         {
           grants: [
             {
+              id: 'weapon-proficiency',
               kind: 'weaponProficiency',
               grant: {
                 kind: 'choice',
@@ -267,6 +268,7 @@ const armedRogue = classSchema.parse({
         {
           grants: [
             {
+              id: 'armor-training',
               kind: 'armorTraining',
               grant: {
                 kind: 'choice',

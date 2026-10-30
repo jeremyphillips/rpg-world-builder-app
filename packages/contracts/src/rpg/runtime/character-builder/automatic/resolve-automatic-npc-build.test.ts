@@ -310,7 +310,7 @@ describe('resolveAutomaticNpcBuild', () => {
       spellcasting: {
         ...spellcasting,
         recommendations: [
-          { target: 'cantrips' as const, classLevel: 1, spellIds: ['prestidigitation'] },
+          { target: 'cantrips' as const, classLevel: 1, spellIds: [`${RULESET}:prestidigitation`] },
         ],
       },
     }

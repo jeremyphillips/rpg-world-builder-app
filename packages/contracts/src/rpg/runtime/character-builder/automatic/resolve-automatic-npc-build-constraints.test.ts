@@ -477,7 +477,9 @@ describe('automatic NPC discovery helpers', () => {
         ...wizardClass,
         spellcasting: {
           ...spellcasting,
-          recommendations: [{ target: 'cantrips', classLevel: 1, spellIds: ['prestidigitation'] }],
+          recommendations: [
+            { target: 'cantrips', classLevel: 1, spellIds: [`${RULESET}:prestidigitation`] },
+          ],
         },
       },
       catalogIndex,

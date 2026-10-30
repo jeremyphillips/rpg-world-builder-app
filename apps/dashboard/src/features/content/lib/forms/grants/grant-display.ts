@@ -530,14 +530,14 @@ function applyMaxItems(
   }
 }
 
-/** Resolves spell slugs from catalog entries by `Spell.slug`. */
+/** Resolves canonical spell ids from catalog entries. */
 export function buildSpellGrantVocabulary(
   spells: readonly Spell[],
 ): GrantDisplayVocabulary['resolveSpell'] {
-  const spellsBySlug = new Map(spells.map((spell) => [spell.slug, spell]))
+  const spellsById = new Map(spells.map((spell) => [spell.id, spell]))
 
-  return (slug) => {
-    const spell = spellsBySlug.get(slug)
+  return (spellId) => {
+    const spell = spellsById.get(spellId)
     if (!spell) return undefined
     return { name: spell.name, level: spell.level }
   }

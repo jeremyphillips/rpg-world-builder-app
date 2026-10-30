@@ -104,7 +104,9 @@ describe('resolveSpellPickerItems', () => {
       ...wizardClass,
       spellcasting: {
         ...wizardClass.spellcasting!,
-        recommendations: [{ target: 'cantrips', classLevel: 1, spellIds: ['mage-hand'] }],
+        recommendations: [
+          { target: 'cantrips', classLevel: 1, spellIds: ['srd-cc-5.2.1:mage-hand'] },
+        ],
       },
     })
     const context = {

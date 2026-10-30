@@ -146,7 +146,10 @@ describe('classFormDef round-trips', () => {
     const spellGrant = wordsOfCreation?.grantGroups?.[0]?.grants?.[0]
     expect(spellGrant?.kind).toBe('spells')
     if (spellGrant?.kind === 'spells') {
-      expect(spellGrant.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
+      expect(spellGrant.spellIds).toEqual([
+        'srd-cc-5.2.1:power-word-heal',
+        'srd-cc-5.2.1:power-word-kill',
+      ])
     }
   })
 
@@ -345,7 +348,10 @@ describe('classFormDef round-trips', () => {
     const formValues = classFormDef.toFormValues(bard) as ClassFormValues
     const wordsOfCreation = formValues.features.find((f) => f.id === 'words-of-creation')
     const spellRow = wordsOfCreation?.grants.find((r) => r.grantType === 'spells')
-    expect(spellRow?.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
+    expect(spellRow?.spellIds).toEqual([
+      'srd-cc-5.2.1:power-word-heal',
+      'srd-cc-5.2.1:power-word-kill',
+    ])
   })
 
   it('preserves feature tables through toFormValues → edit → toInput', () => {

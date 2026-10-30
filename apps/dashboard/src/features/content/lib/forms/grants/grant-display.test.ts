@@ -491,7 +491,7 @@ describe('formatGrantSummaryByLevel', () => {
 })
 
 describe('buildSpellGrantVocabulary', () => {
-  it('resolves spell display metadata by slug', () => {
+  it('resolves spell display metadata by canonical id', () => {
     const resolveSpell = buildSpellGrantVocabulary([
       makeSpell({
         id: 'ruleset:dancing-lights',
@@ -501,7 +501,7 @@ describe('buildSpellGrantVocabulary', () => {
       }),
     ])
 
-    expect(resolveSpell('dancing-lights')).toEqual({ name: 'Dancing Lights', level: 0 })
+    expect(resolveSpell('ruleset:dancing-lights')).toEqual({ name: 'Dancing Lights', level: 0 })
     expect(resolveSpell('missing')).toBeUndefined()
   })
 })

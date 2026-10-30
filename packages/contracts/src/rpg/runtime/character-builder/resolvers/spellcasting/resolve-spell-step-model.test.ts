@@ -43,7 +43,7 @@ const highElfSpecies = {
                 id: 'spells-1',
                 kind: 'spells' as const,
                 ability: 'int' as const,
-                spellIds: ['prestidigitation'],
+                spellIds: ['srd-cc-5.2.1:prestidigitation'],
                 casting: { mode: 'free_cast' as const },
               },
             ],
@@ -55,7 +55,7 @@ const highElfSpecies = {
                 id: 'spells-2',
                 kind: 'spells' as const,
                 ability: 'int' as const,
-                spellIds: ['detect-magic'],
+                spellIds: ['srd-cc-5.2.1:detect-magic'],
                 casting: {
                   mode: 'free_cast' as const,
                   limitedUse: {
@@ -74,7 +74,7 @@ const highElfSpecies = {
                 id: 'spells-3',
                 kind: 'spells' as const,
                 ability: 'int' as const,
-                spellIds: ['misty-step'],
+                spellIds: ['srd-cc-5.2.1:misty-step'],
                 casting: {
                   mode: 'free_cast' as const,
                   limitedUse: {
@@ -367,7 +367,7 @@ describe('resolveSpellStepModel', () => {
                   id: 'spells-5',
                   kind: 'spells',
                   ability: 'wis',
-                  spellIds: ['hunters-mark'],
+                  spellIds: ['srd-cc-5.2.1:hunters-mark'],
                   availability: 'always_prepared',
                   casting: {
                     mode: 'free_cast',
