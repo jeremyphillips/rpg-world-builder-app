@@ -186,7 +186,7 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
         backHref={backHref}
         createPending={createPending}
         submitDisabled={submitDisabled}
-        saveDraftDisabled={resolvedActionState.submitDisabled || saveDraftPending}
+        saveDraftDisabled={resolvedActionState.submitDisabled || rulesStale || saveDraftPending}
         saveDraftPending={saveDraftPending}
         onSaveDraft={onSaveDraft}
       />

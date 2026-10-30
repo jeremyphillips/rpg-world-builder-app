@@ -77,6 +77,9 @@ export function useTabbedFormSetup<TFieldValues extends FieldValues>({
     mode,
     reValidateMode: 'onChange',
   })
+  // `useFormState` updates its own copy. Submit handlers read this snapshot,
+  // which stays stale unless the form render subscribes to `isDirty`.
+  void form.formState.isDirty
 
   React.useEffect(() => {
     warnHeaderOnlyTabValidationWiring(tabs)

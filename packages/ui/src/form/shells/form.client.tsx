@@ -170,6 +170,9 @@ export function Form<TFieldValues extends FieldValues>({
     shouldUnregister: true,
     mode,
   })
+  // `useFormState` updates its own copy. Submit handlers read this snapshot,
+  // which stays stale unless the form render subscribes to `isDirty`.
+  void form.formState.isDirty
 
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const resolvedHeader = resolveSchemaFormFooter(header, form)

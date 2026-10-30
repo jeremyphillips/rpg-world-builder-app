@@ -45,7 +45,7 @@ const chainAndShield: MonsterArmorClassResolution = {
 describe('monster armor class presentation', () => {
   it('captions the winning pieces and lists signed breakdown rows', () => {
     expect(monsterArmorClassCaption(chainAndShield)).toBe('Chain mail + Shield')
-    expect(monsterArmorClassBreakdownRows(chainAndShield, ascendingRules)).toEqual([
+    expect(monsterArmorClassBreakdownRows(chainAndShield)).toEqual([
       { id: 'armor-base-0', label: 'Chain mail (base)', value: '16' },
       { id: 'shield-1', label: 'Shield', value: '+2' },
     ])
@@ -106,15 +106,12 @@ describe('monster armor class presentation', () => {
     }
     expect(monsterArmorClassCaption(resolution)).toBe('Fixed override')
     expect(
-      monsterArmorClassBreakdownRows(
-        {
-          ...resolution,
-          source: 'armor',
-          rows: [{ kind: 'dex', value: 2, cap: 2 }],
-        },
-        ascendingRules,
-      )[0],
-    ).toMatchObject({ label: 'DEX modifier (max +2)', value: '+2' })
+      monsterArmorClassBreakdownRows({
+        ...resolution,
+        source: 'armor',
+        rows: [{ kind: 'dex', value: 2, cap: 2 }],
+      })[0],
+    ).toMatchObject({ label: 'DEX modifier (max 2)', value: '+2' })
     expect(
       monsterArmorClassAlternativeMessages({
         ...resolution,
@@ -145,44 +142,38 @@ describe('monster armor class presentation', () => {
   })
 
   it('omits zero optional modifiers and keeps a non-zero dex contribution', () => {
-    const rows = monsterArmorClassBreakdownRows(
-      {
-        ac: 16,
-        tie: false,
-        source: 'armor',
-        rows: [
-          { kind: 'armor-base', entryId: 'plate', label: 'Plate', value: 18 },
-          { kind: 'dex', value: 0, cap: 2 },
-          { kind: 'natural', value: 0 },
-          { kind: 'shield', entryId: 'buckler', label: 'Buckler', value: 0 },
-          {
-            kind: 'enhancement',
-            target: 'armor',
-            entryId: 'plate',
-            label: 'Enhancement',
-            value: 0,
-          },
-          { kind: 'dex', value: -1 },
-        ],
-        alternatives: resolvedField([]),
-      },
-      ascendingRules,
-    )
+    const rows = monsterArmorClassBreakdownRows({
+      ac: 16,
+      tie: false,
+      source: 'armor',
+      rows: [
+        { kind: 'armor-base', entryId: 'plate', label: 'Plate', value: 18 },
+        { kind: 'dex', value: 0, cap: 2 },
+        { kind: 'natural', value: 0 },
+        { kind: 'shield', entryId: 'buckler', label: 'Buckler', value: 0 },
+        {
+          kind: 'enhancement',
+          target: 'armor',
+          entryId: 'plate',
+          label: 'Enhancement',
+          value: 0,
+        },
+        { kind: 'dex', value: -1 },
+      ],
+      alternatives: resolvedField([]),
+    })
     expect(rows.map((row) => row.label)).toEqual(['Plate (base)', 'DEX modifier'])
     expect(rows[1]).toMatchObject({ value: '-1' })
   })
 
   it('labels the ruleset base with the armor class compact term', () => {
-    const rows = monsterArmorClassBreakdownRows(
-      {
-        ac: 10,
-        tie: false,
-        source: 'unarmored',
-        rows: [{ kind: 'ruleset-base', value: 10 }],
-        alternatives: resolvedField([]),
-      },
-      ascendingRules,
-    )
+    const rows = monsterArmorClassBreakdownRows({
+      ac: 10,
+      tie: false,
+      source: 'unarmored',
+      rows: [{ kind: 'ruleset-base', value: 10 }],
+      alternatives: resolvedField([]),
+    })
     expect(rows[0]).toMatchObject({ label: `Base ${monsterArmorClassCompactLabel()}` })
     expect(monsterArmorClassCompactLabel()).toBe('AC')
   })
@@ -360,9 +351,9 @@ describe('monster armor class comparison from the resolver', () => {
       'Scale mail limits the -4 DEX modifier to -2.',
     )
     const armored = resolvedAc({ dex: 18, equipment: [scaleMail], rules })
-    expect(monsterArmorClassBreakdownRows(armored, rules)).toEqual(
+    expect(monsterArmorClassBreakdownRows(armored)).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ label: 'DEX modifier (max -2)', value: '-2' }),
+        expect.objectContaining({ label: 'DEX modifier (max 2)', value: '-2' }),
       ]),
     )
   })

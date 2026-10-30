@@ -565,4 +565,132 @@ describe('resolveMonsterArmorClass', () => {
     expect(overridden.value.alternatives).toEqual(unavailableField('missing-reference'))
     expect(overridden.value.calculatedAc).toEqual(unavailableField('missing-reference'))
   })
+
+  it('treats every unresolved equipped id as a missing reference, including beside resolved armor', () => {
+    const dagger = equipmentSchema.parse({
+      id: `${RULESET}:dagger`,
+      slug: 'dagger',
+      rulesetId: RULESET,
+      source: 'system',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Dagger',
+      description: '',
+      cost: { amount: 1, currency: 'gp' },
+      weight: { value: 1, unit: 'lb' },
+      kind: 'weapon',
+      category: 'simple',
+      mode: 'melee',
+      properties: ['finesse', 'light'],
+      mastery: 'nick',
+      damage: { dice: { count: 1, faces: 4 } },
+      damageType: 'piercing',
+    })
+    const withWeapon = new Map(catalog)
+    withWeapon.set(dagger.id, dagger)
+
+    const missing = (entryId: string, equipped = true) =>
+      ({
+        entryId,
+        equipmentId: `${RULESET}:missing-${entryId}`,
+        quantity: 1,
+        equipped,
+      }) as ReturnType<typeof entry>
+
+    for (const entryId of ['weapon', 'armor', 'shield'] as const) {
+      expect(
+        resolveMonsterArmorClass({
+          monster: {
+            abilityScores: { dex: 14 },
+            armorClass: {},
+            equipment: [missing(entryId)],
+          },
+          equipmentCatalog: withWeapon,
+          armorClassRules: { mode: 'ascending', base: 10 },
+          magicPropertyProvider: emptyProvider,
+        }),
+      ).toEqual(unavailableField('missing-reference'))
+    }
+
+    const worn = resolved({ dex: 14, equipment: [entry(leather)] })
+    const besideMissing = resolve({
+      dex: 14,
+      equipment: [entry(leather), missing('gone')],
+    })
+    expect(besideMissing).toEqual(unavailableField('missing-reference'))
+
+    const stowedMissing = resolved({
+      dex: 14,
+      equipment: [entry(leather), missing('stowed', false)],
+    })
+    expect(stowedMissing.ac).toBe(worn.ac)
+    expect(stowedMissing.source).toBe(worn.source)
+
+    const weaponOnly = resolveMonsterArmorClass({
+      monster: {
+        abilityScores: { dex: 14 },
+        armorClass: {},
+        equipment: [entry(dagger)],
+      },
+      equipmentCatalog: withWeapon,
+      armorClassRules: { mode: 'ascending', base: 10 },
+      magicPropertyProvider: emptyProvider,
+    })
+    expect(weaponOnly).toEqual(
+      resolveMonsterArmorClass({
+        monster: { abilityScores: { dex: 14 }, armorClass: {}, equipment: [] },
+        equipmentCatalog: withWeapon,
+        armorClassRules: { mode: 'ascending', base: 10 },
+        magicPropertyProvider: emptyProvider,
+      }),
+    )
+  })
+
+  it('does not invent a calculated total when a fixed override is missing an equipped reference', () => {
+    const missing = resolve({
+      dex: 14,
+      fixedValue: 16,
+      equipment: [
+        entry(leather),
+        entry(shield),
+        {
+          entryId: 'gone',
+          equipmentId: `${RULESET}:missing-weapon`,
+          quantity: 1,
+          equipped: true,
+        } as ReturnType<typeof entry>,
+      ],
+    })
+
+    expect(missing.status).toBe('resolved')
+    if (missing.status !== 'resolved') return
+    expect(missing.value).toMatchObject({
+      source: 'fixed',
+      ac: 16,
+      rows: [{ kind: 'fixed', value: 16 }],
+    })
+    expect(missing.value.calculatedAc).toEqual(unavailableField('missing-reference'))
+    expect(missing.value.alternatives).toEqual(unavailableField('missing-reference'))
+    expect(missing.value.bodyArmor).toBeUndefined()
+    expect(missing.value.shield).toBeUndefined()
+  })
+
+  it('reports an ownership conflict before a missing equipped reference', () => {
+    expect(
+      resolve({
+        dex: 14,
+        equipment: [
+          entry(leather),
+          entry(chainShirt),
+          {
+            entryId: 'gone',
+            equipmentId: `${RULESET}:missing-weapon`,
+            quantity: 1,
+            equipped: true,
+          } as ReturnType<typeof entry>,
+        ],
+      }),
+    ).toEqual(unavailableField('conflict'))
+  })
 })

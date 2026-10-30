@@ -29,6 +29,7 @@ import {
   ArmorClassAuthoringProvider,
 } from '../session/armor-class-authoring-session'
 import {
+  armorClassAuthoringIsStale,
   armorClassRulesSignature,
   useArmorClassAuthoringSession,
 } from '../session/armor-class-authoring-session.lib'
@@ -377,6 +378,17 @@ function ContentEditFormBody({
   })
   const { onSubmit, formError } = useSubmitHandler({
     submit: async (values, form) => {
+      if (
+        armorClassAuthoringIsStale({
+          sensitive: authoring.sensitive,
+          isDirty: form.formState.isDirty,
+          snapshot: authoring.snapshot,
+          live: authoring.live,
+        })
+      ) {
+        return
+      }
+
       let saved: unknown
       try {
         saved = await mutation.mutateAsync(

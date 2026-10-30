@@ -61,7 +61,7 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
           {resolution && rules ? (
             <dl className="flex min-w-0 flex-1 flex-col md:pl-4">
               <div className="flex flex-col gap-0.5">
-                {monsterArmorClassBreakdownRows(resolution, rules).map((row) => (
+                {monsterArmorClassBreakdownRows(resolution).map((row) => (
                   <div key={row.id} className="flex items-baseline justify-between gap-3">
                     <dt>
                       <Text as="span" variant="caption">

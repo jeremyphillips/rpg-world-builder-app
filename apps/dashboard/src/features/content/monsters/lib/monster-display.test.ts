@@ -31,6 +31,46 @@ describe('monster-display', () => {
     expect(viewModel.statRows.find((row) => row.id === 'hp')?.value).toContain('7')
   })
 
+  it('keeps the detail ready when only armor class is a missing reference', () => {
+    const base = pickMonster('kobold-warrior')
+    const monster = {
+      ...base,
+      equipment: [
+        ...base.equipment,
+        {
+          entryId: 'missing-weapon',
+          equipmentId: 'missing-weapon',
+          quantity: 1,
+          equipped: true,
+        },
+      ],
+    }
+    const equipment = [pickEquipment('dagger')]
+    const derived = tryDeriveMonsterStatBlock(
+      monster,
+      equipment,
+      [pickSkillProficiency('perception')],
+      {
+        armorClassRules: systemDefaultArmorClassRules(),
+      },
+    )
+
+    expect(derived?.ac).toEqual({ status: 'unavailable', reason: 'missing-reference' })
+
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Dragon',
+      equipmentById: new Map(equipment.map((item) => [item.id, item])),
+      catalogState: 'ready',
+      derived,
+    })
+
+    expect(viewModel.catalogState).toBe('ready')
+    expect(viewModel.statRows.find((row) => row.id === 'ac')?.value).toBe('Missing armor reference')
+    expect(viewModel.statRows.find((row) => row.id === 'hp')?.value).toContain('7')
+    expect(viewModel.abilities.length).toBeGreaterThan(0)
+  })
+
   it('shows gear alias with catalog name as secondary text', () => {
     const monster = {
       ...pickMonster('kobold-warrior'),

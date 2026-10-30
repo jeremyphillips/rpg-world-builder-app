@@ -17,6 +17,7 @@ import {
   ArmorClassAuthoringProvider,
 } from '../session/armor-class-authoring-session'
 import {
+  armorClassAuthoringIsStale,
   armorClassRulesSignature,
   useArmorClassAuthoringSession,
 } from '../session/armor-class-authoring-session.lib'
@@ -123,6 +124,17 @@ function ContentCreateFormBody({
     validationIntent: ContentValidationIntent,
     form?: UseFormReturn<FieldValues>,
   ) => {
+    if (
+      armorClassAuthoringIsStale({
+        sensitive: authoring.sensitive,
+        isDirty: form?.formState.isDirty ?? false,
+        snapshot: authoring.snapshot,
+        live: authoring.live,
+      })
+    ) {
+      return
+    }
+
     const preparedValues = prepareSubmitValues?.(values) ?? values
     const inputCtx = {
       weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
