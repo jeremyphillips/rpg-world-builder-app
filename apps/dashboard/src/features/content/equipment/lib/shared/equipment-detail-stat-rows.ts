@@ -1,4 +1,4 @@
-import type { Equipment } from '@rpg/contracts'
+import type { ArmorClassRules, Equipment } from '@rpg/contracts'
 import { isArmorEquipment, isWeaponEquipment } from '@rpg/contracts'
 
 import { getArmorStatRows } from '../../armor/lib/armor-stat-rows'
@@ -14,9 +14,10 @@ import { getVehicleStatRows } from '../../vehicles/lib/vehicle-stat-rows'
 type StatRow = ContentStatRowData
 
 /** Kind-specific stat rows for unified equipment detail (excludes kind and cost). */
-export function getEquipmentKindStatRows(item: Equipment): StatRow[] {
+export function getEquipmentKindStatRows(item: Equipment, rules: ArmorClassRules): StatRow[] {
   if (isWeaponEquipment(item)) return getWeaponStatRows(item).filter((row) => row.label !== 'Cost')
-  if (isArmorEquipment(item)) return getArmorStatRows(item).filter((row) => row.label !== 'Cost')
+  if (isArmorEquipment(item))
+    return getArmorStatRows(item, rules).filter((row) => row.label !== 'Cost')
 
   switch (item.kind) {
     case 'adventuring_gear':
@@ -26,7 +27,7 @@ export function getEquipmentKindStatRows(item: Equipment): StatRow[] {
     case 'mount':
       return getMountStatRows(item)
     case 'vehicle':
-      return getVehicleStatRows(item)
+      return getVehicleStatRows(item, rules)
     case 'service':
       return getServiceStatRows(item)
     case 'magic_item':

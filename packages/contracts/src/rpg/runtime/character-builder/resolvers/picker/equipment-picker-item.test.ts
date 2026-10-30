@@ -110,7 +110,7 @@ describe('getEquipmentRecommendationKindRank', () => {
           name: 'Chain Mail',
           kind: 'armor',
           category: 'heavy',
-          baseAc: 16,
+          baseAcOffset: 6,
         }),
       ),
     ).toBe(EQUIPMENT_RECOMMENDATION_KIND_RANK.armor)
@@ -312,7 +312,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         name: 'Leather Armor',
         kind: 'armor',
         category: 'light',
-        baseAc: 11,
+        baseAcOffset: 1,
       }),
       { tier: 'compatible', reasons: ['classSuggested'] },
     )
@@ -459,7 +459,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         name: 'Leather Armor',
         kind: 'armor',
         category: 'light',
-        baseAc: 11,
+        baseAcOffset: 1,
       }),
       {
         tier: 'strong',

@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import {
   CONTENT_CATALOG_PLAY_SCOPE,
+  CONTENT_CATALOG_REFERENCE_SCOPE,
   CONTENT_CATALOG_SCOPE_QUERY,
   CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY,
   CONTENT_PLAY_ACTOR_KIND_QUERY,
   isPlayCatalogScopeQuery,
+  isReferenceCatalogScopeQuery,
   parseOptionalPlayActorFromQuery,
   parsePlayActorCharacterIdQuery,
   requirePlayActorFromQuery,
@@ -20,6 +22,25 @@ describe('isPlayCatalogScopeQuery', () => {
     ).toBe(true)
     expect(isPlayCatalogScopeQuery({ [CONTENT_CATALOG_SCOPE_QUERY]: 'discovery' })).toBe(false)
     expect(isPlayCatalogScopeQuery({})).toBe(false)
+    expect(
+      isPlayCatalogScopeQuery({
+        [CONTENT_CATALOG_SCOPE_QUERY]: CONTENT_CATALOG_REFERENCE_SCOPE,
+      }),
+    ).toBe(false)
+  })
+})
+
+describe('isReferenceCatalogScopeQuery', () => {
+  it('detects reference-catalog scope requests', () => {
+    expect(
+      isReferenceCatalogScopeQuery({
+        [CONTENT_CATALOG_SCOPE_QUERY]: CONTENT_CATALOG_REFERENCE_SCOPE,
+      }),
+    ).toBe(true)
+    expect(
+      isReferenceCatalogScopeQuery({ [CONTENT_CATALOG_SCOPE_QUERY]: CONTENT_CATALOG_PLAY_SCOPE }),
+    ).toBe(false)
+    expect(isReferenceCatalogScopeQuery({})).toBe(false)
   })
 })
 

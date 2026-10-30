@@ -1,3 +1,4 @@
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -52,7 +53,7 @@ function optionFor(
         },
       },
     },
-    row: buildEquipmentPickerRowViewModel(equipment),
+    row: buildEquipmentPickerRowViewModel(equipment, systemDefaultArmorClassRules()),
   }
 }
 

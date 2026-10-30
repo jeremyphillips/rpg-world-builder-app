@@ -6,7 +6,11 @@ import {
   resolveEquipmentInstanceSummary,
   shouldShowUnmodifiedEquipmentQualifier,
 } from '@rpg/contracts'
-import type { buildEquipmentInventoryUnmodifiedContext, SystemRulesetId } from '@rpg/contracts'
+import type {
+  ArmorClassRules,
+  buildEquipmentInventoryUnmodifiedContext,
+  SystemRulesetId,
+} from '@rpg/contracts'
 import { ConfirmDialog } from '@rpg/ui'
 
 import { EquipmentInstanceEditorDrawer } from '../../../equipment/components/instance-editor/equipment-instance-editor-drawer'
@@ -42,6 +46,7 @@ export function MonsterEquipmentEntryCardView({
   magicProvider,
   weaponGrants,
   unmodifiedContext,
+  armorClassRules,
   onUpdate,
   onRemove,
   onCustomize,
@@ -53,6 +58,7 @@ export function MonsterEquipmentEntryCardView({
   magicProvider: ReturnType<typeof createMagicPropertyDefinitionProvider>
   weaponGrants: ReturnType<typeof resolveMonsterFormWeaponGrants>
   unmodifiedContext: ReturnType<typeof buildEquipmentInventoryUnmodifiedContext>
+  armorClassRules?: ArmorClassRules
   onUpdate: (next: MonsterEquipmentFormEntry[]) => void
   onRemove: (entryId: string) => void
   onCustomize: (entryId: string) => void
@@ -77,6 +83,7 @@ export function MonsterEquipmentEntryCardView({
     adjustmentSegments: rowSummary?.adjustmentSegments,
   })
   const supportingMetadata = buildCreatureEquipmentRowSupportingMetadata({
+    armorClassRules,
     rowSummary,
     catalogItem: item,
     leadingSegments: shouldShowUnmodifiedEquipmentQualifier(entry, unmodifiedContext)
@@ -117,6 +124,7 @@ function MonsterEquipmentEditorDialog({
   catalog,
   rulesetId,
   magicProvider,
+  armorClassRules,
   editorOpen,
   onUpdate,
   onClose,
@@ -128,6 +136,7 @@ function MonsterEquipmentEditorDialog({
   catalog: ReturnType<typeof monsterEquipmentCatalog>
   rulesetId: SystemRulesetId
   magicProvider: ReturnType<typeof createMagicPropertyDefinitionProvider>
+  armorClassRules?: ArmorClassRules
   editorOpen: boolean
   onUpdate: (next: MonsterEquipmentFormEntry[]) => void
   onClose: () => void
@@ -145,6 +154,7 @@ function MonsterEquipmentEditorDialog({
       catalogItem={editorItem}
       rulesetId={rulesetId}
       definitions={magicProvider}
+      armorClassRules={armorClassRules}
       subjectNoun="creature"
       referencedByLabel={
         referenced
@@ -198,6 +208,7 @@ export function MonsterEquipmentEntryDialogs({
   catalog,
   rulesetId,
   magicProvider,
+  armorClassRules,
   editorEntryId,
   pendingRemove,
   pendingRemoveCopy,
@@ -211,6 +222,7 @@ export function MonsterEquipmentEntryDialogs({
   catalog: ReturnType<typeof monsterEquipmentCatalog>
   rulesetId: SystemRulesetId
   magicProvider: ReturnType<typeof createMagicPropertyDefinitionProvider>
+  armorClassRules?: ArmorClassRules
   editorEntryId: string | null
   pendingRemove: { entryId: string } | null
   pendingRemoveCopy: {
@@ -236,6 +248,7 @@ export function MonsterEquipmentEntryDialogs({
         catalog={catalog}
         rulesetId={rulesetId}
         magicProvider={magicProvider}
+        armorClassRules={armorClassRules}
         editorOpen={editorEntryId !== null}
         onUpdate={onUpdate}
         onClose={onCloseEditor}

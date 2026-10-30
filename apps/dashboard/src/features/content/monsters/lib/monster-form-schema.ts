@@ -37,7 +37,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function adaptMonsterFormMovementForBodySchema(input: unknown): unknown {
+function adaptMonsterFormMovementForBodySchema(
+  input: unknown,
+  rules: ContentFormCtx['armorClassRules'],
+): unknown {
   if (!isRecord(input)) return input
   const stripped = stripMonsterHitPointsAuthoringFields(input)
   const movement = stripped.movement
@@ -45,6 +48,7 @@ function adaptMonsterFormMovementForBodySchema(input: unknown): unknown {
   return normalizeMonsterFormValues({ ...stripped, movement } as MonsterFormValues, {
     intent: 'draft',
     mode: 'create',
+    armorClassRules: rules,
   })
 }
 
@@ -67,7 +71,12 @@ export function resolveMonsterFormSchema(
         )
       }
     })
-    .pipe(z.preprocess(adaptMonsterFormMovementForBodySchema, base))
+    .pipe(
+      z.preprocess(
+        (input) => adaptMonsterFormMovementForBodySchema(input, ctx.armorClassRules),
+        base,
+      ),
+    )
     .superRefine((body, refinement) => {
       for (const issue of collectMonsterCatalogIssues(
         body,

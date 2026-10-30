@@ -37,6 +37,7 @@ import {
   buildCharacterSheetSpellCards,
 } from '../detail/character-sheet-catalog'
 import {
+  formatDerivedArmorClass,
   formatPreviewOptionalNumber,
   formatPreviewSignedNumber,
 } from '../builder-preview/character-builder-preview-panel.lib'
@@ -96,12 +97,13 @@ function toCharacterDetailDerivationInput(
 
   return {
     level: getDetailSourceTotalLevel(source),
-    armorClassBase: rules.armorClass.base,
+    armorClassRules: rules.armorClass,
     abilityScores: source.abilityScores,
     characterClass,
     proficiencies: source.proficiencies,
     skillProficiencies: Array.from(catalogIndex.skillProficiencies.values()),
-    equippedArmor: equippedArmor.length > 0 ? equippedArmor : undefined,
+    equippedArmor: equippedArmor.pieces.length > 0 ? equippedArmor.pieces : undefined,
+    unresolvedEquippedArmor: equippedArmor.unresolvedEntryIds.length > 0,
   }
 }
 
@@ -418,7 +420,7 @@ function buildStats(
     {
       id: 'ac',
       label: CHARACTER_STAT_LABELS.armorClass,
-      value: formatPreviewOptionalNumber(profile.ac),
+      value: formatDerivedArmorClass(profile.ac),
     },
     {
       id: 'initiative',
@@ -578,7 +580,8 @@ export function buildCharacterDetailViewModel({
     savingThrows: buildSavingThrowSection(source, catalogIndex, rules),
     proficiencies: buildProficienciesSection(source, catalogIndex, rules),
     spells: buildCharacterSheetSpellCards({ spells: [...source.spells] }, catalogIndex),
-    equipment: buildCharacterSheetEquipmentCards(source, catalogIndex),
+    equipment: buildCharacterSheetEquipmentCards(source, catalogIndex, rules.armorClass),
+    armorClassRules: rules.armorClass,
     wealth: {
       label: CHARACTER_SECTION_LABELS.wealth,
       value: source.wealth !== undefined ? `${source.wealth.gp} gp` : '—',

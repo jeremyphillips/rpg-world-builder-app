@@ -6,9 +6,12 @@ import {
   resolveCharacterBuilderDraftKey,
   resolveCharacterBuilderDraftScope,
   type CampaignBuildContext,
+  type CharacterBuildCatalog,
   type CharacterBuilderDraftScope,
+  type CharacterBuildCatalogIndex,
   type CharacterOwnershipTarget,
   type ContentPlayActor,
+  type RulesetPatchRead,
   type SystemRulesetId,
 } from '@rpg/contracts'
 import type { CharacterBuildAcquisition } from '@rpg/contracts/rpg/character-builder'
@@ -19,12 +22,18 @@ import { useRulesetPatch } from '@/features/homebrew'
 import {
   campaignBuildContextQueryKey,
   fetchCampaignBuilderCatalog,
+  type FetchCampaignBuilderCatalogOptions,
 } from '../api/campaign-content-client'
 import {
+  resolveCampaignBuildContext,
+  resolveCampaignBuildRules,
+} from '../lib/campaign-context/resolve-campaign-build-context.lib'
+import {
   resolveCampaignBuildContextUnavailable,
+  resolveCampaignBuildFoundationUnavailable,
   type CampaignBuildContextUnavailable,
+  type CampaignBuildFoundationUnavailable,
 } from '../lib/campaign-context/resolve-campaign-build-context-unavailable.lib'
-import { resolveCampaignBuildContext } from '../lib/campaign-context/resolve-campaign-build-context.lib'
 
 type UseCampaignCharacterBuildContextInput = {
   campaignId: string | undefined
@@ -34,7 +43,169 @@ type UseCampaignCharacterBuildContextInput = {
   playActor?: ContentPlayActor
 }
 
-export type { CampaignBuildContextUnavailable }
+export type { CampaignBuildContextUnavailable, CampaignBuildFoundationUnavailable }
+
+export type CampaignBuildFoundationResult = {
+  rulesetId: SystemRulesetId | undefined
+  patch: RulesetPatchRead | undefined
+  catalog: CharacterBuildCatalog | undefined
+  catalogIndex: CharacterBuildCatalogIndex | null
+  rules: ReturnType<typeof resolveCampaignBuildRules> | null
+  unavailable: CampaignBuildFoundationUnavailable | null
+  /** Active fetches and an unresolved campaign list. Disabled queries are not pending. */
+  isPending: boolean
+  /** Raw query pending flags, including disabled queries. Builder pages keep this. */
+  queryPending: boolean
+  isError: boolean
+  isFetching: boolean
+  error: Error | null
+  refetch: () => Promise<unknown>
+}
+
+function isQueryActivelyPending(query: { isPending: boolean; fetchStatus?: string }): boolean {
+  return query.isPending && query.fetchStatus !== 'idle'
+}
+
+function campaignCatalogQueryKey(
+  campaignId: string | undefined,
+  rulesetId: SystemRulesetId | undefined,
+  catalogScope: FetchCampaignBuilderCatalogOptions | undefined,
+) {
+  if (!campaignId || !rulesetId || !catalogScope) return [] as const
+  return [...campaignBuildContextQueryKey(campaignId, catalogScope), 'catalog', rulesetId] as const
+}
+
+function isCampaignFoundationPending(input: {
+  campaignId: string | undefined
+  campaignsPending: boolean
+  patchActivelyPending: boolean
+  catalogEnabled: boolean
+  catalogPending: boolean
+}): boolean {
+  if (!input.campaignId) return false
+  if (input.campaignsPending || input.patchActivelyPending) return true
+  return input.catalogEnabled && input.catalogPending
+}
+
+function indexLoadedCatalog(catalog: CharacterBuildCatalog | undefined) {
+  return catalog ? indexCharacterBuildCatalog(catalog) : null
+}
+
+function rulesFromPatch(
+  patch: RulesetPatchRead | undefined,
+  rulesetId: SystemRulesetId | undefined,
+) {
+  if (!patch || !rulesetId) return null
+  return resolveCampaignBuildRules(patch, rulesetId)
+}
+
+function foundationQueryState(input: {
+  campaignId: string | undefined
+  rulesetId: SystemRulesetId | undefined
+  catalogEnabled: boolean
+  patch: RulesetPatchRead | undefined
+  catalog: CharacterBuildCatalog | undefined
+  rules: ReturnType<typeof resolveCampaignBuildRules> | null
+  campaignsPending: boolean
+  patchQuery: {
+    isPending: boolean
+    isError: boolean
+    isFetching: boolean
+    fetchStatus?: string
+    error: Error | null
+  }
+  catalogQuery: { isPending: boolean; isError: boolean; isFetching: boolean; error: Error | null }
+}) {
+  const isPending = isCampaignFoundationPending({
+    campaignId: input.campaignId,
+    campaignsPending: input.campaignsPending,
+    patchActivelyPending: isQueryActivelyPending(input.patchQuery),
+    catalogEnabled: input.catalogEnabled,
+    catalogPending: input.catalogQuery.isPending,
+  })
+  const isError = input.patchQuery.isError || input.catalogQuery.isError
+  const isReady = Boolean(
+    input.campaignId && input.rulesetId && input.patch && input.catalog && input.rules,
+  )
+
+  return {
+    isPending,
+    isError,
+    isReady,
+    error: input.patchQuery.error ?? input.catalogQuery.error ?? null,
+    isFetching: input.patchQuery.isFetching || input.catalogQuery.isFetching,
+    queryPending: input.patchQuery.isPending || input.catalogQuery.isPending,
+  }
+}
+
+/** Patch, reference-or-play catalog, and rules shared by builder and detail sheets. */
+export function useCampaignBuildFoundation(
+  campaignId: string | undefined,
+  options: { catalogScope: FetchCampaignBuilderCatalogOptions | undefined },
+): CampaignBuildFoundationResult {
+  const campaignsQuery = useCampaigns()
+  const rulesetId = campaignsQuery.data?.find((campaign) => campaign.id === campaignId)
+    ?.rulesetId as SystemRulesetId | undefined
+  const catalogScope = options.catalogScope
+  const catalogEnabled = Boolean(campaignId && rulesetId && catalogScope)
+
+  const patchQuery = useRulesetPatch(campaignId)
+  const catalogQuery = useQuery({
+    queryKey: campaignCatalogQueryKey(campaignId, rulesetId, catalogScope),
+    queryFn: () => fetchCampaignBuilderCatalog(campaignId!, rulesetId!, catalogScope!),
+    enabled: catalogEnabled,
+  })
+
+  const catalogIndex = useMemo(() => indexLoadedCatalog(catalogQuery.data), [catalogQuery.data])
+
+  const rules = useMemo(
+    () => rulesFromPatch(patchQuery.data, rulesetId),
+    [patchQuery.data, rulesetId],
+  )
+
+  const queryState = foundationQueryState({
+    campaignId,
+    rulesetId,
+    catalogEnabled,
+    patch: patchQuery.data,
+    catalog: catalogQuery.data,
+    rules,
+    campaignsPending: Boolean(campaignsQuery.isPending),
+    patchQuery,
+    catalogQuery,
+  })
+
+  const unavailable = resolveCampaignBuildFoundationUnavailable({
+    campaignId,
+    rulesetId,
+    isPending: queryState.isPending,
+    hasPatch: Boolean(patchQuery.data),
+    hasCatalog: Boolean(catalogQuery.data),
+    isReady: queryState.isReady,
+    isError: queryState.isError,
+  })
+
+  const refetch = () =>
+    Promise.all([
+      patchQuery.refetch(),
+      catalogEnabled ? catalogQuery.refetch() : Promise.resolve(undefined),
+    ])
+
+  return {
+    rulesetId,
+    patch: patchQuery.data,
+    catalog: catalogQuery.data,
+    catalogIndex,
+    rules,
+    unavailable,
+    isPending: queryState.isPending,
+    queryPending: queryState.queryPending,
+    isError: queryState.isError,
+    isFetching: queryState.isFetching,
+    error: queryState.error,
+    refetch,
+  }
+}
 
 export function useCampaignCharacterBuildContext({
   campaignId,
@@ -43,11 +214,6 @@ export function useCampaignCharacterBuildContext({
   acquisition,
   playActor: playActorInput,
 }: UseCampaignCharacterBuildContextInput) {
-  const { data: campaigns } = useCampaigns()
-  const rulesetId = campaigns?.find((campaign) => campaign.id === campaignId)?.rulesetId as
-    | SystemRulesetId
-    | undefined
-
   const playActor = useMemo((): ContentPlayActor | undefined => {
     if (playActorInput) {
       return playActorInput
@@ -61,26 +227,21 @@ export function useCampaignCharacterBuildContext({
     return undefined
   }, [characterKind, playActorInput])
 
-  const patchQuery = useRulesetPatch(campaignId)
-  const catalogQuery = useQuery({
-    queryKey:
-      campaignId && rulesetId && playActor
-        ? ([...campaignBuildContextQueryKey(campaignId, playActor), 'catalog', rulesetId] as const)
-        : [],
-    queryFn: () => fetchCampaignBuilderCatalog(campaignId!, rulesetId!, { playActor: playActor! }),
-    enabled: Boolean(campaignId && rulesetId && playActor),
+  const foundation = useCampaignBuildFoundation(campaignId, {
+    catalogScope: playActor ? { scope: 'play', playActor } : undefined,
   })
+  const { rulesetId, patch, catalog } = foundation
 
   const context = useMemo((): CampaignBuildContext | null => {
-    if (!campaignId || !rulesetId || !patchQuery.data || !catalogQuery.data || !playActor) {
+    if (!campaignId || !rulesetId || !patch || !catalog || !playActor) {
       return null
     }
 
     return resolveCampaignBuildContext({
       campaignId,
       rulesetId,
-      catalog: catalogQuery.data,
-      patch: patchQuery.data,
+      catalog,
+      patch,
       characterKind,
       ownershipTarget,
       acquisition,
@@ -89,10 +250,10 @@ export function useCampaignCharacterBuildContext({
   }, [
     acquisition,
     campaignId,
-    catalogQuery.data,
+    catalog,
     characterKind,
     ownershipTarget,
-    patchQuery.data,
+    patch,
     playActor,
     rulesetId,
   ])
@@ -112,16 +273,12 @@ export function useCampaignCharacterBuildContext({
     [draftScope],
   )
 
-  const isPending = patchQuery.isPending || catalogQuery.isPending
-  const isError = patchQuery.isError || catalogQuery.isError
-  const error = patchQuery.error ?? catalogQuery.error
-
   const unavailable = resolveCampaignBuildContextUnavailable({
     campaignId,
     rulesetId,
-    isPending,
-    hasPatch: Boolean(patchQuery.data),
-    hasCatalog: Boolean(catalogQuery.data),
+    isPending: foundation.queryPending,
+    hasPatch: Boolean(patch),
+    hasCatalog: Boolean(catalog),
     characterKind,
     ownershipTarget,
     acquisition,
@@ -135,10 +292,10 @@ export function useCampaignCharacterBuildContext({
     storageKey,
     rulesetId,
     unavailable,
-    isPending,
-    isError,
-    isFetching: patchQuery.isFetching || catalogQuery.isFetching,
-    error,
+    isPending: foundation.queryPending,
+    isError: foundation.isError,
+    isFetching: foundation.isFetching,
+    error: foundation.error,
   }
 }
 

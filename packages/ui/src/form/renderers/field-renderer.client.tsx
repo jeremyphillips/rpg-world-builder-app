@@ -222,6 +222,7 @@ const fieldRenderers: {
           id={id}
           {...resolveNumberStepperBinding(field.value, config)}
           onChange={field.onChange}
+          emptySeed={config.emptySeed}
           min={config.min}
           max={config.max}
           step={config.step}

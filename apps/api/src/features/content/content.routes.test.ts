@@ -6,6 +6,7 @@ import {
   ACTION_VALIDATE_BATCH_TARGET_LIMIT,
   CHILL_TOUCH_RESOLUTION,
   CONTENT_CATALOG_PLAY_SCOPE,
+  CONTENT_CATALOG_REFERENCE_SCOPE,
   CONTENT_CATALOG_SCOPE_QUERY,
   CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY,
   CONTENT_PLAY_ACTOR_KIND_QUERY,
@@ -1449,5 +1450,88 @@ describe('content play-catalog enforcement', () => {
       )
       .set(CSRF_HEADER, member.csrfToken)
       .expect(403)
+  })
+})
+
+describe('content reference-catalog scope', () => {
+  const referenceScope = `${CONTENT_CATALOG_SCOPE_QUERY}=${CONTENT_CATALOG_REFERENCE_SCOPE}`
+
+  it('shows visibility-limited rows to a GM and hides them from a player without a play actor', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'reference-catalog-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const draftRes = await owner.agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        slug: 'reference-draft-feat',
+        name: 'Reference Draft Feat',
+        category: 'origin',
+        repeatable: { allowed: false },
+        status: 'draft',
+      })
+      .expect(201)
+    const draftId = draftRes.body.feats.id as string
+
+    const dmOnlyRes = await owner.agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        slug: 'reference-dm-only-feat',
+        name: 'Reference DM Only Feat',
+        category: 'origin',
+        repeatable: { allowed: false },
+      })
+      .expect(201)
+    const dmOnlyId = dmOnlyRes.body.feats.id as string
+
+    const unavailableRes = await owner.agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        slug: 'reference-unavailable-feat',
+        name: 'Reference Unavailable Feat',
+        category: 'origin',
+        repeatable: { allowed: false },
+      })
+      .expect(201)
+    const unavailableId = unavailableRes.body.feats.id as string
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${dmOnlyId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ available: true, visibilityMode: 'dm_only', participantIds: [] })
+      .expect(200)
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${unavailableId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ available: false, visibilityMode: 'all_players', participantIds: [] })
+      .expect(200)
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'reference-catalog-player@example.com',
+      campaignRole: 'pc',
+    })
+
+    const managerList = await owner.agent
+      .get(`/api/campaigns/${campaignId}/content/feats?${referenceScope}`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+    const managerIds = managerList.body.feats.map((feat: { id: string }) => feat.id)
+    expect(managerIds).toEqual(expect.arrayContaining([draftId, dmOnlyId, unavailableId]))
+
+    const playerList = await member.agent
+      .get(`/api/campaigns/${campaignId}/content/feats?${referenceScope}`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    const playerIds = playerList.body.feats.map((feat: { id: string }) => feat.id)
+    expect(playerIds).not.toContain(draftId)
+    expect(playerIds).not.toContain(dmOnlyId)
+    expect(playerIds).toContain(unavailableId)
   })
 })

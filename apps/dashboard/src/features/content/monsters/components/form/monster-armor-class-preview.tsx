@@ -3,7 +3,6 @@ import { Icon, InsetPanel, SemanticText, Text } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
-import './monster-armor-class-preview.css'
 import { deriveMonsterFormDraft } from '../../lib/monster-form-derivation'
 import { monsterUnavailableReasonCopy } from '../../lib/monster-display'
 import {
@@ -42,14 +41,16 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
     derived?.ac.status === 'unavailable'
       ? monsterUnavailableReasonCopy(derived.ac.reason, 'armor')
       : undefined
+  const rules = ctx.armorClassRules
   const comparisonMessages = resolution ? monsterArmorClassAlternativeMessages(resolution) : []
-  const dexAdvisory = resolution ? monsterArmorClassDexAdvisory(resolution) : undefined
+  const dexAdvisory =
+    resolution && rules ? monsterArmorClassDexAdvisory(resolution, rules) : undefined
 
   return (
     <InsetPanel size="sm">
       <div className="flex flex-col gap-3">
-        <div className="monster-armor-class-preview__columns">
-          <div className="monster-armor-class-preview__summary">
+        <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-0">
+          <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 text-center md:w-[13.75rem] md:border-r md:border-border md:pr-4">
             <Text as="p" variant="emphasis">
               {resolution ? resolution.ac : '—'}
             </Text>
@@ -57,10 +58,10 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
               {resolution ? monsterArmorClassCaption(resolution) : (unavailable ?? 'Not set')}
             </Text>
           </div>
-          {resolution ? (
-            <dl className="monster-armor-class-preview__breakdown">
+          {resolution && rules ? (
+            <dl className="flex min-w-0 flex-1 flex-col md:pl-4">
               <div className="flex flex-col gap-0.5">
-                {monsterArmorClassBreakdownRows(resolution).map((row) => (
+                {monsterArmorClassBreakdownRows(resolution, rules).map((row) => (
                   <div key={row.id} className="flex items-baseline justify-between gap-3">
                     <dt>
                       <Text as="span" variant="caption">

@@ -1,9 +1,16 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
+import { formatSignedModifier } from '../../primitives/signed-modifier'
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { resolveArmorDexterityRule } from '../../vocab/armor/dexterity-rule'
 import { armorMaterialSchema } from '../../vocab/armor/material'
+import {
+  BASE_AC_OFFSET_RANGE,
+  armorClassDelta,
+  armorClassFromProtection,
+  type ArmorClassRules,
+} from '../../vocab/mechanics/armor-class-scale'
 import { abilityScoreRequirementsSchema } from '../lib/ability-score-requirements'
 import type { EquipmentBaseFields } from './base'
 import { equipmentVariantValidationMessages } from './equipment-variant-messages'
@@ -26,10 +33,15 @@ export const armorEquipmentKindFields = {
   category: armorCategorySchema,
   material: armorMaterialSchema.optional(),
   /**
-   * Base AC before Dex modifier. Required for body armor; absent for shields
-   * (shields contribute an `acBonus` instead).
+   * Protection above the ruleset unarmored base. Required for body armor; absent
+   * for shields (shields contribute an `acBonus` instead). Context-free: 0..15.
    */
-  baseAc: z.number().int().optional(),
+  baseAcOffset: z
+    .number()
+    .int()
+    .min(BASE_AC_OFFSET_RANGE.min)
+    .max(BASE_AC_OFFSET_RANGE.max)
+    .optional(),
   /**
    * Flat AC bonus added on top of the wearer's AC. Required for shields;
    * absent for body armor.
@@ -58,28 +70,39 @@ export function refineArmorEquipment(
         'acBonus',
       ])
     }
-  } else if (val.baseAc === undefined) {
+  } else if (val.baseAcOffset === undefined) {
     addCustomRefinementIssue(ctx, equipmentVariantValidationMessages.bodyArmorBaseAcRequired(), [
-      'baseAc',
+      'baseAcOffset',
     ])
   }
 }
 
-type ArmorAcDisplayFields = Pick<ArmorEquipmentKindFields, 'category' | 'baseAc' | 'acBonus'>
+type ArmorAcDisplayFields = Pick<ArmorEquipmentKindFields, 'category' | 'baseAcOffset' | 'acBonus'>
+
+function dexOperator(rules: ArmorClassRules): '+' | '-' {
+  return armorClassDelta(rules, 1) < 0 ? '-' : '+'
+}
 
 /**
  * Returns a human-readable AC string for the detail page and table columns.
+ * Operators follow the ruleset direction. The parenthetical cap stays a protection magnitude.
  *
- * @example getArmorAcDisplay(leather)       // "11 + Dex"
- * @example getArmorAcDisplay(chainMail)     // "16 (no Dex)"
- * @example getArmorAcDisplay(halfPlate)     // "15 + Dex (max 2)"
- * @example getArmorAcDisplay(shieldWood)    // "+2"
+ * @example getArmorAcDisplay(leather, ascending10)     // "11 + Dex"
+ * @example getArmorAcDisplay(chainMail, ascending10)   // "18 (no Dex)"
+ * @example getArmorAcDisplay(halfPlate, ascending10)   // "15 + Dex (max 2)"
+ * @example getArmorAcDisplay(shieldWood, ascending10)  // "+2"
+ * @example getArmorAcDisplay(leather, descending9)     // "8 - Dex"
+ * @example getArmorAcDisplay(plate, descending10)      // "2 (no Dex)"
+ * @example getArmorAcDisplay(shieldWood, descending10) // "-2"
  */
-export function getArmorAcDisplay(a: ArmorAcDisplayFields): string {
-  if (a.category === 'shields') return `+${a.acBonus ?? 0}`
-  const base = a.baseAc ?? 0
-  const rule = resolveArmorDexterityRule(a.category)
+export function getArmorAcDisplay(armor: ArmorAcDisplayFields, rules: ArmorClassRules): string {
+  if (armor.category === 'shields') {
+    return formatSignedModifier(armorClassDelta(rules, armor.acBonus ?? 0))
+  }
+  const base = armorClassFromProtection(rules, armor.baseAcOffset ?? 0)
+  const rule = resolveArmorDexterityRule(armor.category)
   if (rule.mode === 'none') return `${base} (no Dex)`
-  if (rule.mode === 'capped') return `${base} + Dex (max ${rule.maxBonus})`
-  return `${base} + Dex`
+  const operator = dexOperator(rules)
+  if (rule.mode === 'capped') return `${base} ${operator} Dex (max ${rule.maxBonus})`
+  return `${base} ${operator} Dex`
 }

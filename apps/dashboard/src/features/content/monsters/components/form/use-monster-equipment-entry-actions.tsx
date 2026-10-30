@@ -119,6 +119,7 @@ export function useMonsterEquipmentEntryActions(ctx: ContentFormCtx): MonsterEqu
       magicProvider={magicProvider}
       weaponGrants={weaponGrants}
       unmodifiedContext={unmodifiedContext}
+      armorClassRules={ctx.armorClassRules}
       onUpdate={updateEquipment}
       onRemove={removeEntry}
       onCustomize={setEditorEntryId}
@@ -132,6 +133,7 @@ export function useMonsterEquipmentEntryActions(ctx: ContentFormCtx): MonsterEqu
       catalog={catalog}
       rulesetId={rulesetId}
       magicProvider={magicProvider}
+      armorClassRules={ctx.armorClassRules}
       editorEntryId={editorEntryId}
       pendingRemove={pendingRemove}
       pendingRemoveCopy={pendingRemoveCopy}

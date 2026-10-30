@@ -2,7 +2,11 @@ import type {
   CatalogMembershipFilterInput,
   CatalogPlayFilterInput,
 } from './filter-catalog-for-viewer'
-import { filterCatalogForMembership, filterCatalogForPlayActor } from './filter-catalog-for-viewer'
+import {
+  filterCatalogForMembership,
+  filterCatalogForPlayActor,
+  filterCatalogForReference,
+} from './filter-catalog-for-viewer'
 
 export type CatalogListFilter =
   | { mode: 'discovery'; membership: CatalogMembershipFilterInput | undefined }
@@ -11,6 +15,7 @@ export type CatalogListFilter =
       membership: CatalogMembershipFilterInput
       playActor: CatalogPlayFilterInput['playActor']
     }
+  | { mode: 'reference'; membership: CatalogMembershipFilterInput }
 
 type CatalogListRow = Parameters<typeof filterCatalogForMembership>[0][number]
 
@@ -27,6 +32,10 @@ export function applyCatalogListFilter<T extends CatalogListRow>(
       campaignRole: filter.membership.campaignRole,
       playActor: filter.playActor,
     })
+  }
+
+  if (filter.mode === 'reference') {
+    return filterCatalogForReference(items, filter.membership)
   }
 
   return filterCatalogForMembership(items, filter.membership)

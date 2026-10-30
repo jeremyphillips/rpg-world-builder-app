@@ -127,6 +127,12 @@ export function characterWealthFromGrant(grant: CharacterWealthGrant | undefined
   }
 }
 
+export type EquippedArmorResolution = {
+  pieces: EquippedArmorPiece[]
+  /** Equipped armor-bucket entries whose catalog item is missing or not armor. */
+  unresolvedEntryIds: string[]
+}
+
 /** Returns equipped armor catalog rows referenced by the character inventory. */
 const EMPTY_MAGIC_PROPERTY_PROVIDER: MagicPropertyDefinitionProvider = () => undefined
 
@@ -134,14 +140,22 @@ export function resolveEquippedArmorFromInventory(args: {
   equipment: CharacterEquipment
   catalog: CreatureEquipmentCatalog
   magicPropertyProvider?: MagicPropertyDefinitionProvider
-}): EquippedArmorPiece[] {
+}): EquippedArmorResolution {
   const provider = args.magicPropertyProvider ?? EMPTY_MAGIC_PROPERTY_PROVIDER
-  return args.equipment.armor.flatMap((entry) => {
-    if (!entry.equipped) return []
+  const pieces: EquippedArmorPiece[] = []
+  const unresolvedEntryIds: string[] = []
+
+  for (const entry of args.equipment.armor) {
+    if (!entry.equipped) continue
     const item = args.catalog.get(entry.equipmentId)
-    if (!item || !isArmorEquipment(item)) return []
-    return [toEquippedArmorPieceForEntry(item, entry, item, provider)]
-  })
+    if (!item || !isArmorEquipment(item)) {
+      unresolvedEntryIds.push(entry.entryId ?? entry.equipmentId)
+      continue
+    }
+    pieces.push(toEquippedArmorPieceForEntry(item, entry, item, provider))
+  }
+
+  return { pieces, unresolvedEntryIds }
 }
 
 export const characterWealthSchema = coinWealthSchema

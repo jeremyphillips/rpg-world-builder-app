@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '@/test/render'
@@ -81,9 +82,11 @@ describe('CampaignCharacterDetail', () => {
       viewModel,
       organizationReferences: [],
       locationReferences: [],
+      unavailable: null,
       isPending: false,
       isError: false,
       errorLabel: undefined,
+      refetch: vi.fn(),
     })
 
     renderWithProviders(
@@ -112,9 +115,11 @@ describe('CampaignCharacterDetail', () => {
       viewModel,
       organizationReferences: [],
       locationReferences: [],
+      unavailable: null,
       isPending: false,
       isError: false,
       errorLabel: undefined,
+      refetch: vi.fn(),
     })
 
     renderWithProviders(
@@ -141,9 +146,11 @@ describe('CampaignCharacterDetail', () => {
       viewModel,
       organizationReferences: [],
       locationReferences: [],
+      unavailable: null,
       isPending: false,
       isError: false,
       errorLabel: undefined,
+      refetch: vi.fn(),
     })
 
     renderWithProviders(
@@ -165,9 +172,11 @@ describe('CampaignCharacterDetail', () => {
       viewModel: null,
       organizationReferences: undefined,
       locationReferences: undefined,
+      unavailable: null,
       isPending: false,
       isError: true,
       errorLabel: 'You do not have permission to view this character.',
+      refetch: vi.fn(),
     })
 
     renderWithProviders(
@@ -187,5 +196,62 @@ describe('CampaignCharacterDetail', () => {
       'href',
       ROUTES.campaign.characters.list('camp-1'),
     )
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()
+  })
+
+  it('retries a failed campaign character load', async () => {
+    const user = userEvent.setup()
+    const refetch = vi.fn()
+    useCampaignCharacterDetail.mockReturnValue({
+      campaignCharacter: undefined,
+      viewModel: null,
+      organizationReferences: undefined,
+      locationReferences: undefined,
+      unavailable: null,
+      isPending: false,
+      isError: true,
+      errorLabel: 'Could not load character.',
+      refetch,
+    })
+
+    renderWithProviders(
+      <Routes>
+        <Route
+          path="/campaigns/:campaignId/characters/:characterId"
+          element={<CampaignCharacterDetail />}
+        />
+      </Routes>,
+      { initialEntries: ['/campaigns/camp-1/characters/char-sample-1'] },
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(refetch).toHaveBeenCalledOnce()
+  })
+
+  it('shows a missing ruleset instead of a sheet', () => {
+    useCampaignCharacterDetail.mockReturnValue({
+      campaignCharacter: undefined,
+      viewModel: null,
+      organizationReferences: [],
+      locationReferences: [],
+      unavailable: { kind: 'missing_ruleset' },
+      isPending: false,
+      isError: false,
+      errorLabel: undefined,
+      refetch: vi.fn(),
+    })
+
+    renderWithProviders(
+      <Routes>
+        <Route
+          path="/campaigns/:campaignId/characters/:characterId"
+          element={<CampaignCharacterDetail />}
+        />
+      </Routes>,
+      { initialEntries: ['/campaigns/camp-1/characters/char-sample-1'] },
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent('This campaign has no ruleset.')
+    expect(screen.queryByRole('heading', { name: viewModel.identity.name })).not.toBeInTheDocument()
   })
 })

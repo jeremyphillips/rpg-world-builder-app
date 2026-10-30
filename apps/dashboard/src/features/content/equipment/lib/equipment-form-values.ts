@@ -1,5 +1,5 @@
 import {
-  parseSpeedRateString,
+  type ArmorClassRules,
   type ContentValidationIntent,
   type CreateEquipmentInput,
   type Equipment,
@@ -51,17 +51,21 @@ function sharedFormValues(entity: Equipment): Pick<
   }
 }
 
-type KindFormExtractor = (entity: Equipment) => Partial<EquipmentFormValues>
+type KindFormExtractor = (
+  entity: Equipment,
+  rules?: ArmorClassRules,
+) => Partial<EquipmentFormValues>
 
 const kindFormValueExtractors: Record<EquipmentKind, KindFormExtractor> = {
   weapon: (entity) => weaponFormValuesFromEntity(entity as Extract<Equipment, { kind: 'weapon' }>),
-  armor: (entity) => armorFormValuesFromEntity(entity as Extract<Equipment, { kind: 'armor' }>),
+  armor: (entity, rules) =>
+    armorFormValuesFromEntity(entity as Extract<Equipment, { kind: 'armor' }>, rules),
   adventuring_gear: (entity) =>
     adventuringGearFormValuesFromEntity(entity as Extract<Equipment, { kind: 'adventuring_gear' }>),
   tool: (entity) => toolFormValuesFromEntity(entity as Extract<Equipment, { kind: 'tool' }>),
   mount: (entity) => mountFormValuesFromEntity(entity as Extract<Equipment, { kind: 'mount' }>),
-  vehicle: (entity) =>
-    vehicleFormValuesFromEntity(entity as Extract<Equipment, { kind: 'vehicle' }>),
+  vehicle: (entity, rules) =>
+    vehicleFormValuesFromEntity(entity as Extract<Equipment, { kind: 'vehicle' }>, rules),
   service: (entity) =>
     serviceFormValuesFromEntity(entity as Extract<Equipment, { kind: 'service' }>),
   magic_item: (entity) =>
@@ -101,25 +105,6 @@ function legacyKindFormValues(entity: Equipment): Partial<EquipmentFormValues> {
       spellcastingGearKind,
     }
   }
-  if (legacyKind === 'ship') {
-    const legacySpeed = (legacy as { speed?: string }).speed
-    return {
-      kind: 'vehicle',
-      vehicleCategory: 'water',
-      speed: legacySpeed ? parseSpeedRateString(legacySpeed) : undefined,
-      crew: (legacy as { crew?: number }).crew,
-      passengers: (legacy as { passengers?: number }).passengers,
-      cargoCapacity: (() => {
-        const cargoTons = (legacy as Record<string, unknown>).cargoTons
-        return typeof cargoTons === 'number'
-          ? { value: cargoTons, unit: 'ton' as const }
-          : undefined
-      })(),
-      ac: (legacy as { ac?: number }).ac,
-      hp: (legacy as { hp?: number }).hp,
-      damageThreshold: (legacy as { damageThreshold?: number }).damageThreshold,
-    }
-  }
   if (legacyKind === 'misc') {
     return {
       kind: 'service',
@@ -130,15 +115,18 @@ function legacyKindFormValues(entity: Equipment): Partial<EquipmentFormValues> {
   return {}
 }
 
-function kindFormValues(entity: Equipment): Partial<EquipmentFormValues> {
+function kindFormValues(entity: Equipment, rules?: ArmorClassRules): Partial<EquipmentFormValues> {
   const extractor = kindFormValueExtractors[entity.kind as EquipmentKind]
-  return extractor ? extractor(entity) : legacyKindFormValues(entity)
+  return extractor ? extractor(entity, rules) : legacyKindFormValues(entity)
 }
 
-export function equipmentToFormValues(entity: Equipment) {
+export function equipmentToFormValues(
+  entity: Equipment,
+  ctx?: { armorClassRules?: ArmorClassRules },
+) {
   return {
     ...sharedFormValues(entity),
-    ...kindFormValues(entity),
+    ...kindFormValues(entity, ctx?.armorClassRules),
   }
 }
 

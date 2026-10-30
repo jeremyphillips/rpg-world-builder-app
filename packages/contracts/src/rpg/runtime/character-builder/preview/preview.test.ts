@@ -4,6 +4,7 @@ import { equipmentSchema } from '../../../content/equipment'
 import { indexCharacterBuildCatalog } from '../context'
 import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuilderDraft } from '../draft/draft'
+import { resolvedField } from '../../creature/derived-field'
 import { buildCharacterPreview } from './preview'
 import { builderTestCatalog, builderTestRules, storedFighter } from '../test-fixtures'
 
@@ -44,7 +45,7 @@ describe('buildCharacterPreview', () => {
     )
 
     expect(preview.maxHp).toBeUndefined()
-    expect(preview.ac).toBe(10)
+    expect(preview.ac).toEqual(resolvedField(10))
     expect(preview.proficiencyBonus).toBe(2)
   })
 
@@ -60,7 +61,7 @@ describe('buildCharacterPreview', () => {
     )
 
     expect(preview.maxHp).toBeUndefined()
-    expect(preview.ac).toBe(12)
+    expect(preview.ac).toEqual(resolvedField(12))
     expect(preview.proficiencyBonus).toBe(2)
   })
 
@@ -76,7 +77,7 @@ describe('buildCharacterPreview', () => {
     )
 
     expect(preview.maxHp).toBe(10)
-    expect(preview.ac).toBe(10)
+    expect(preview.ac).toEqual(resolvedField(10))
   })
 
   it('derives level-1 fighter stats from a complete draft', () => {
@@ -89,7 +90,7 @@ describe('buildCharacterPreview', () => {
 
     expect(preview.proficiencyBonus).toBe(2)
     expect(preview.maxHp).toBe(11) // d10 + CON mod (+1)
-    expect(preview.ac).toBe(12) // 10 + DEX mod (+2)
+    expect(preview.ac).toEqual(resolvedField(12)) // 10 + DEX mod (+2)
     expect(preview.abilityScores.str).toEqual({ score: 15, modifier: 2 })
     expect(preview.savingThrows.find((save) => save.ability === 'str')).toMatchObject({
       proficient: true,

@@ -28,7 +28,6 @@ export type ResolveEquipmentEffectWarningsInput = {
   item: Equipment
   provider: MagicPropertyDefinitionProvider
   totals?: EquipmentEffectTotals
-  unarmoredAcBase?: number
 }
 
 function enhancementContributingTargets(
@@ -73,15 +72,11 @@ function weaponDamageMinimumWarning(
     : []
 }
 
-function armorAcWarnings(
-  item: Equipment,
-  totals: EquipmentEffectTotals,
-  unarmoredAcBase: number,
-): EquipmentEffectWarning[] {
+function armorAcWarnings(item: Equipment, totals: EquipmentEffectTotals): EquipmentEffectWarning[] {
   if (!isArmorEquipment(item)) return []
   if (item.category !== 'shields') {
-    const baseAc = item.baseAc ?? 0
-    return baseAc + totals.armor_class < unarmoredAcBase
+    const protection = (item.baseAcOffset ?? 0) + totals.armor_class
+    return protection < 0
       ? [{ code: EQUIPMENT_EFFECT_WARNING.bodyArmorBelowUnarmored, target: 'armor_class' }]
       : []
   }
@@ -97,10 +92,9 @@ export function resolveEquipmentEffectWarnings(
   const entry = normalizeEquipmentInstance(input.entry)
   const totals =
     input.totals ?? resolveEquipmentEntryEffectTotals(entry, input.item, input.provider)
-  const unarmoredAcBase = input.unarmoredAcBase ?? 10
   return [
     ...aboveStandardEnhancementWarnings(entry, input.item, input.provider, totals),
     ...weaponDamageMinimumWarning(input.item, totals),
-    ...armorAcWarnings(input.item, totals, unarmoredAcBase),
+    ...armorAcWarnings(input.item, totals),
   ]
 }

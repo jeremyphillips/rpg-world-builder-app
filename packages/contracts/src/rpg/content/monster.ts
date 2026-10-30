@@ -55,9 +55,12 @@ import type { EquipmentInstance } from './equipment/instance/instance'
 import { normalizeEquipmentInstance } from './equipment/instance/normalize-equipment-instance'
 import { refineEquipmentInstanceInvariants } from './equipment/instance/instance-invariants'
 
+import { FIXED_AC_OFFSET_MIN } from '../vocab/mechanics/armor-class-scale'
+
 export const monsterArmorClassSchema = z.object({
   naturalArmorBonus: z.number().int().min(1).optional(),
-  fixedValue: z.number().int().min(0).optional(),
+  /** Protection offset for a fixed override. Minimum -10; no maximum. */
+  fixedAcOffset: z.number().int().min(FIXED_AC_OFFSET_MIN).optional(),
 })
 
 export const monsterHitPointsSchema = z.discriminatedUnion('kind', [

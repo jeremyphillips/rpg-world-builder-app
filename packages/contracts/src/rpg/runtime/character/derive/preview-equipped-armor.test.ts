@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mechanics-patch'
+import { systemDefaultArmorClassRules } from '../../../campaign/patches/campaign-mechanics-patch'
 
 import { toEquippedArmorPiece } from '../../creature/armor-class'
 
@@ -8,27 +8,28 @@ import { resolveArmorClassIfEquipped } from './preview-equipped-armor'
 
 const leatherArmor = {
   category: 'light' as const,
-  baseAc: 11,
+  baseAcOffset: 1,
   acBonus: undefined,
 }
 
 const chainMail = {
   category: 'heavy' as const,
-  baseAc: 16,
+  baseAcOffset: 6,
   acBonus: undefined,
 }
 
 const shield = {
   category: 'shields' as const,
-  baseAc: undefined,
   acBonus: 2,
 }
+
+const rules = systemDefaultArmorClassRules()
 
 describe('resolveArmorClassIfEquipped', () => {
   it('replaces body armor when previewing a new suit', () => {
     expect(
       resolveArmorClassIfEquipped({
-        acBase: DEFAULT_ARMOR_CLASS_BASE,
+        rules,
         dexModifier: 3,
         currentEquippedArmor: [toEquippedArmorPiece(leatherArmor)],
         candidateArmor: chainMail,
@@ -39,7 +40,7 @@ describe('resolveArmorClassIfEquipped', () => {
   it('stacks shields onto the current loadout', () => {
     expect(
       resolveArmorClassIfEquipped({
-        acBase: DEFAULT_ARMOR_CLASS_BASE,
+        rules,
         dexModifier: 3,
         currentEquippedArmor: [toEquippedArmorPiece(leatherArmor)],
         candidateArmor: shield,

@@ -10,6 +10,12 @@ export const CONTENT_CATALOG_SCOPE_QUERY = 'catalogScope' as const
 /** Value of {@link CONTENT_CATALOG_SCOPE_QUERY} for character-play catalog fetches. */
 export const CONTENT_CATALOG_PLAY_SCOPE = 'play' as const
 
+/**
+ * Value of {@link CONTENT_CATALOG_SCOPE_QUERY} for read-only reference catalogs.
+ * Visibility only — never an authorization to acquire or play the row.
+ */
+export const CONTENT_CATALOG_REFERENCE_SCOPE = 'reference' as const
+
 export const CONTENT_PLAY_ACTOR_KINDS = ['new_pc', 'npc'] as const
 export type ContentPlayActorKind = (typeof CONTENT_PLAY_ACTOR_KINDS)[number]
 
@@ -71,10 +77,19 @@ function readPlayActorKindQuery(
   return { kind: 'present', value: trimmed }
 }
 
+function readCatalogScopeQuery(query: Record<string, unknown>): string | undefined {
+  const raw = query[CONTENT_CATALOG_SCOPE_QUERY]
+  return typeof raw === 'string' ? raw.trim() : undefined
+}
+
 /** Whether the request targets the play-catalog scope (builder / Quick NPC). */
 export function isPlayCatalogScopeQuery(query: Record<string, unknown>): boolean {
-  const raw = query[CONTENT_CATALOG_SCOPE_QUERY]
-  return typeof raw === 'string' && raw.trim() === CONTENT_CATALOG_PLAY_SCOPE
+  return readCatalogScopeQuery(query) === CONTENT_CATALOG_PLAY_SCOPE
+}
+
+/** Whether the request targets the read-only reference catalog (detail sheets). */
+export function isReferenceCatalogScopeQuery(query: Record<string, unknown>): boolean {
+  return readCatalogScopeQuery(query) === CONTENT_CATALOG_REFERENCE_SCOPE
 }
 
 /** Parses the play-actor character id query param when present. */

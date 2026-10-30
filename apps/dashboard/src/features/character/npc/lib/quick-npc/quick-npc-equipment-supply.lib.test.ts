@@ -1,3 +1,4 @@
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -168,7 +169,10 @@ describe('manual equipment does not steer the class package', () => {
           recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
         },
       },
-      row: buildEquipmentPickerRowViewModel(equipmentStepSpearFixture),
+      row: buildEquipmentPickerRowViewModel(
+        equipmentStepSpearFixture,
+        systemDefaultArmorClassRules(),
+      ),
     }
   }
 
@@ -348,7 +352,10 @@ describe('package, role, and manual quantities stay partitioned', () => {
           recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
         },
       },
-      row: buildEquipmentPickerRowViewModel(equipmentStepSpearFixture),
+      row: buildEquipmentPickerRowViewModel(
+        equipmentStepSpearFixture,
+        systemDefaultArmorClassRules(),
+      ),
     }
   }
 

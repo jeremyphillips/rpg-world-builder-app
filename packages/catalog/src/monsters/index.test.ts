@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_ARMOR_CLASS_BASE, deriveMonsterStatBlock } from '@rpg/contracts'
+import { deriveMonsterStatBlock, systemDefaultArmorClassRules } from '@rpg/contracts'
 
 import { loadSeedEquipment } from '../equipment'
 import { loadSeedMonsters, seedMonsterSlugs } from './index'
@@ -22,7 +22,7 @@ describe('SRD 5.2.1 monster seed', () => {
       monster: kobold!,
       equipmentCatalog,
       skillCatalog: new Map(),
-      acBase: DEFAULT_ARMOR_CLASS_BASE,
+      armorClassRules: systemDefaultArmorClassRules(),
       magicPropertyProvider: () => undefined,
     })
     expect(block.ac).toBe(14)

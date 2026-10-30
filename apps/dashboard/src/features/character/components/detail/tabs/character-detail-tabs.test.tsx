@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -21,6 +22,7 @@ describe('CharacterDetailTabs', () => {
       <CharacterDetailTabs
         spells={[]}
         equipment={[]}
+        armorClassRules={systemDefaultArmorClassRules()}
         wealth={{ label: 'Wealth', value: '0 gp' }}
         classFeatures={{
           ...emptySection,

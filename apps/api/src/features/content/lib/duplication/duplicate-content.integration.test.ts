@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  DEFAULT_ARMOR_CLASS_BASE,
+  systemDefaultArmorClassRules,
   deriveMonsterStatBlock,
   ELDRITCH_BLAST_RESOLUTION,
   monsterSchema,
@@ -49,7 +49,7 @@ describe('duplicate content routes', () => {
     name: 'Dup Source Armor',
     category: 'light' as const,
     cost: { amount: 15, currency: 'gp' as const },
-    baseAc: 12,
+    baseAcOffset: 2,
     stealthDisadvantage: false,
   }
 
@@ -329,14 +329,14 @@ describe('duplicate content routes', () => {
       monster: skeleton!,
       equipmentCatalog,
       skillCatalog,
-      acBase: DEFAULT_ARMOR_CLASS_BASE,
+      armorClassRules: systemDefaultArmorClassRules(),
       magicPropertyProvider: () => undefined,
     })
     const copyBlock = deriveMonsterStatBlock({
       monster: copy,
       equipmentCatalog,
       skillCatalog,
-      acBase: DEFAULT_ARMOR_CLASS_BASE,
+      armorClassRules: systemDefaultArmorClassRules(),
       magicPropertyProvider: () => undefined,
     })
 

@@ -29,6 +29,7 @@ import { useRulesetPatch } from '@/features/homebrew'
 import { fetchCampaignBuilderCatalog } from '../api/campaign-content-client'
 import {
   useCampaignBuildContext,
+  useCampaignBuildFoundation,
   useCampaignPcOnboardingBuildContext,
 } from './use-campaign-build-context'
 
@@ -107,6 +108,7 @@ describe('useCampaignBuildContext', () => {
       playActor: { kind: 'npc' },
     })
     expect(mockFetchCatalog).toHaveBeenCalledWith('camp-1', 'srd-cc-5.2.1', {
+      scope: 'play',
       playActor: { kind: 'npc' },
     })
     expect(result.current.context?.characterCreationRules.abilityGeneration).toEqual(
@@ -142,7 +144,83 @@ describe('useCampaignBuildContext', () => {
 
     expect(result.current.context?.playActor).toEqual({ kind: 'new_pc' })
     expect(mockFetchCatalog).toHaveBeenCalledWith('camp-1', 'srd-cc-5.2.1', {
+      scope: 'play',
       playActor: { kind: 'new_pc' },
     })
+  })
+})
+
+describe('useCampaignBuildFoundation', () => {
+  beforeEach(() => {
+    mockUseCampaigns.mockReset()
+    mockUseRulesetPatch.mockReset()
+    mockFetchCatalog.mockReset()
+    mockUseCampaigns.mockReturnValue({
+      data: [{ id: 'camp-1', rulesetId: 'srd-cc-5.2.1' }],
+      isPending: false,
+    } as unknown as ReturnType<typeof useCampaigns>)
+    mockUseRulesetPatch.mockReturnValue({
+      data: rulesPatch,
+      isPending: false,
+      isError: false,
+      isFetching: false,
+      error: null,
+      fetchStatus: 'idle',
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useRulesetPatch>)
+    mockFetchCatalog.mockResolvedValue(emptyCatalog)
+  })
+
+  it('loads the reference catalog without a play actor', async () => {
+    const { result } = renderHook(
+      () => useCampaignBuildFoundation('camp-1', { catalogScope: { scope: 'reference' } }),
+      { wrapper: makeQueryWrapper() },
+    )
+
+    await waitFor(() => expect(result.current.unavailable).toBeNull())
+
+    expect(mockFetchCatalog).toHaveBeenCalledWith('camp-1', 'srd-cc-5.2.1', {
+      scope: 'reference',
+    })
+    expect(result.current.rules?.characterCreationRules.armorClass).toEqual(
+      rulesPatch.mechanics.armorClass,
+    )
+    expect(result.current.unavailable).toBeNull()
+  })
+
+  it('reports an error without substituting rules', () => {
+    mockUseRulesetPatch.mockReturnValue({
+      data: undefined,
+      isPending: false,
+      isError: true,
+      isFetching: false,
+      error: new Error('ruleset failed'),
+      fetchStatus: 'idle',
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useRulesetPatch>)
+
+    const { result } = renderHook(
+      () => useCampaignBuildFoundation('camp-1', { catalogScope: { scope: 'reference' } }),
+      { wrapper: makeQueryWrapper() },
+    )
+
+    expect(result.current.isError).toBe(true)
+    expect(result.current.rules).toBeNull()
+    expect(result.current.unavailable).toBeNull()
+  })
+
+  it('reports a missing ruleset once the campaign list has settled', () => {
+    mockUseCampaigns.mockReturnValue({
+      data: [{ id: 'other-campaign', rulesetId: 'srd-cc-5.2.1' }],
+      isPending: false,
+    } as unknown as ReturnType<typeof useCampaigns>)
+
+    const { result } = renderHook(
+      () => useCampaignBuildFoundation('camp-1', { catalogScope: { scope: 'reference' } }),
+      { wrapper: makeQueryWrapper() },
+    )
+
+    expect(result.current.unavailable).toEqual({ kind: 'missing_ruleset' })
+    expect(mockFetchCatalog).not.toHaveBeenCalled()
   })
 })

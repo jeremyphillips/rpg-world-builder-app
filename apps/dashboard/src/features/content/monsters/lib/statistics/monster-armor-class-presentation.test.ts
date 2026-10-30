@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import {
   equipmentSchema,
+  resolvedField,
   resolveMonsterArmorClass,
+  systemDefaultArmorClassRules,
+  type ArmorClassRules,
   type Equipment,
   type MonsterArmorClassResolution,
 } from '@rpg/contracts'
@@ -15,14 +18,26 @@ import {
   monsterArmorClassDexAdvisory,
 } from './monster-armor-class-presentation'
 
+const ascendingRules = systemDefaultArmorClassRules()
+
+const missingCalculation: MonsterArmorClassResolution = {
+  ac: 16,
+  tie: false,
+  source: 'fixed',
+  rows: [{ kind: 'fixed', value: 16 }],
+  alternatives: { status: 'unavailable', reason: 'missing-reference' },
+  calculatedAc: { status: 'unavailable', reason: 'missing-reference' },
+}
+
 const chainAndShield: MonsterArmorClassResolution = {
   ac: 18,
+  tie: false,
   source: 'armor',
   rows: [
     { kind: 'armor-base', entryId: 'mail', label: 'Chain mail', value: 16 },
     { kind: 'shield', entryId: 'shield', label: 'Shield', value: 2 },
   ],
-  alternatives: [{ source: 'natural', label: 'Natural armor', ac: 15 }],
+  alternatives: resolvedField([{ source: 'natural', label: 'Natural armor', ac: 15 }]),
   bodyArmor: { entryId: 'mail', label: 'Chain mail' },
   shield: { entryId: 'shield', label: 'Shield' },
 }
@@ -30,7 +45,7 @@ const chainAndShield: MonsterArmorClassResolution = {
 describe('monster armor class presentation', () => {
   it('captions the winning pieces and lists signed breakdown rows', () => {
     expect(monsterArmorClassCaption(chainAndShield)).toBe('Chain mail + Shield')
-    expect(monsterArmorClassBreakdownRows(chainAndShield)).toEqual([
+    expect(monsterArmorClassBreakdownRows(chainAndShield, ascendingRules)).toEqual([
       { id: 'armor-base-0', label: 'Chain mail (base)', value: '16' },
       { id: 'shield-1', label: 'Shield', value: '+2' },
     ])
@@ -39,13 +54,20 @@ describe('monster armor class presentation', () => {
     ])
   })
 
+  it('shows a missing armor reference when a fixed override cannot calculate alternatives', () => {
+    expect(monsterArmorClassAlternativeMessages(missingCalculation)).toEqual([
+      'Missing armor reference',
+    ])
+  })
+
   it('names the winning body source before the losing armor total', () => {
     expect(
       monsterArmorClassAlternativeMessages({
         ac: 15,
+        tie: false,
         source: 'natural',
         rows: [{ kind: 'natural', value: 2 }],
-        alternatives: [{ source: 'armor', label: 'Studded Leather', ac: 14 }],
+        alternatives: resolvedField([{ source: 'armor', label: 'Studded Leather', ac: 14 }]),
       }),
     ).toEqual(['Natural armor wins: 15 vs. 14 with studded leather.'])
   })
@@ -54,18 +76,20 @@ describe('monster armor class presentation', () => {
     expect(
       monsterArmorClassAlternativeMessages({
         ac: 14,
+        tie: false,
         source: 'armor',
         rows: [{ kind: 'armor-base', entryId: 'leather', label: 'Studded Leather', value: 12 }],
-        alternatives: [{ source: 'unarmored', label: 'Unarmored', ac: 10 }],
+        alternatives: resolvedField([{ source: 'unarmored', label: 'Unarmored', ac: 10 }]),
         bodyArmor: { entryId: 'leather', label: 'Studded Leather' },
       }),
     ).toEqual([])
     expect(
       monsterArmorClassCaption({
         ac: 14,
+        tie: false,
         source: 'armor',
         rows: [],
-        alternatives: [{ source: 'unarmored', label: 'Unarmored', ac: 10 }],
+        alternatives: resolvedField([{ source: 'unarmored', label: 'Unarmored', ac: 10 }]),
         bodyArmor: { entryId: 'leather', label: 'Studded Leather' },
       }),
     ).toBe('Studded Leather')
@@ -74,23 +98,27 @@ describe('monster armor class presentation', () => {
   it('labels a dex cap and a fixed override separately from the calculated total', () => {
     const resolution: MonsterArmorClassResolution = {
       ac: 17,
+      tie: false,
       source: 'fixed',
       rows: [{ kind: 'fixed', value: 17 }],
-      alternatives: [],
-      calculatedAc: 18,
+      alternatives: resolvedField([]),
+      calculatedAc: resolvedField(18),
     }
     expect(monsterArmorClassCaption(resolution)).toBe('Fixed override')
     expect(
-      monsterArmorClassBreakdownRows({
-        ...resolution,
-        source: 'armor',
-        rows: [{ kind: 'dex', value: 2, cap: 2 }],
-      })[0],
+      monsterArmorClassBreakdownRows(
+        {
+          ...resolution,
+          source: 'armor',
+          rows: [{ kind: 'dex', value: 2, cap: 2 }],
+        },
+        ascendingRules,
+      )[0],
     ).toMatchObject({ label: 'DEX modifier (max +2)', value: '+2' })
     expect(
       monsterArmorClassAlternativeMessages({
         ...resolution,
-        alternatives: [{ source: 'natural', label: 'Natural armor', ac: 15 }],
+        alternatives: resolvedField([{ source: 'natural', label: 'Natural armor', ac: 15 }]),
         dexRestriction: {
           mode: 'capped',
           abilityModifier: 4,
@@ -100,46 +128,61 @@ describe('monster armor class presentation', () => {
         },
       }),
     ).toEqual([`Calculated ${monsterArmorClassCompactLabel()} without override: 18`])
-    expect(monsterArmorClassDexAdvisory(resolution)).toBeUndefined()
+    expect(monsterArmorClassDexAdvisory(resolution, ascendingRules)).toBeUndefined()
   })
 
   it('names both totals on a tie, with natural armor first', () => {
     expect(
       monsterArmorClassAlternativeMessages({
         ac: 18,
+        tie: true,
         source: 'armor',
         rows: [],
-        alternatives: [{ source: 'natural', label: 'Natural armor', ac: 18 }],
+        alternatives: resolvedField([{ source: 'natural', label: 'Natural armor', ac: 18 }]),
         bodyArmor: { entryId: 'leather', label: 'Studded Leather' },
       }),
     ).toEqual(['Natural armor and studded leather both provide 18.'])
   })
 
   it('omits zero optional modifiers and keeps a non-zero dex contribution', () => {
-    const rows = monsterArmorClassBreakdownRows({
-      ac: 16,
-      source: 'armor',
-      rows: [
-        { kind: 'armor-base', entryId: 'plate', label: 'Plate', value: 18 },
-        { kind: 'dex', value: 0, cap: 2 },
-        { kind: 'natural', value: 0 },
-        { kind: 'shield', entryId: 'buckler', label: 'Buckler', value: 0 },
-        { kind: 'enhancement', target: 'armor', entryId: 'plate', label: 'Enhancement', value: 0 },
-        { kind: 'dex', value: -1 },
-      ],
-      alternatives: [],
-    })
+    const rows = monsterArmorClassBreakdownRows(
+      {
+        ac: 16,
+        tie: false,
+        source: 'armor',
+        rows: [
+          { kind: 'armor-base', entryId: 'plate', label: 'Plate', value: 18 },
+          { kind: 'dex', value: 0, cap: 2 },
+          { kind: 'natural', value: 0 },
+          { kind: 'shield', entryId: 'buckler', label: 'Buckler', value: 0 },
+          {
+            kind: 'enhancement',
+            target: 'armor',
+            entryId: 'plate',
+            label: 'Enhancement',
+            value: 0,
+          },
+          { kind: 'dex', value: -1 },
+        ],
+        alternatives: resolvedField([]),
+      },
+      ascendingRules,
+    )
     expect(rows.map((row) => row.label)).toEqual(['Plate (base)', 'DEX modifier'])
     expect(rows[1]).toMatchObject({ value: '-1' })
   })
 
   it('labels the ruleset base with the armor class compact term', () => {
-    const rows = monsterArmorClassBreakdownRows({
-      ac: 10,
-      source: 'unarmored',
-      rows: [{ kind: 'ruleset-base', value: 10 }],
-      alternatives: [],
-    })
+    const rows = monsterArmorClassBreakdownRows(
+      {
+        ac: 10,
+        tie: false,
+        source: 'unarmored',
+        rows: [{ kind: 'ruleset-base', value: 10 }],
+        alternatives: resolvedField([]),
+      },
+      ascendingRules,
+    )
     expect(rows[0]).toMatchObject({ label: `Base ${monsterArmorClassCompactLabel()}` })
     expect(monsterArmorClassCompactLabel()).toBe('AC')
   })
@@ -168,7 +211,7 @@ function armorItem(input: {
     weight: { value: 1, unit: 'lb' },
     kind: 'armor',
     category: input.category,
-    ...(input.baseAc !== undefined ? { baseAc: input.baseAc } : {}),
+    ...(input.baseAc !== undefined ? { baseAcOffset: input.baseAc - 10 } : {}),
     ...(input.acBonus !== undefined ? { acBonus: input.acBonus } : {}),
     stealthDisadvantage: false,
   })
@@ -180,7 +223,9 @@ function resolvedAc(input: {
   fixedValue?: number
   equipment: Equipment[]
   equipped?: boolean
+  rules?: ArmorClassRules
 }): MonsterArmorClassResolution {
+  const rules = input.rules ?? ascendingRules
   const result = resolveMonsterArmorClass({
     monster: {
       abilityScores: { dex: input.dex },
@@ -188,7 +233,7 @@ function resolvedAc(input: {
         ...(input.naturalArmorBonus !== undefined
           ? { naturalArmorBonus: input.naturalArmorBonus }
           : {}),
-        ...(input.fixedValue !== undefined ? { fixedValue: input.fixedValue } : {}),
+        ...(input.fixedValue !== undefined ? { fixedAcOffset: input.fixedValue - rules.base } : {}),
       },
       equipment: input.equipment.map((item) => ({
         entryId: item.slug,
@@ -198,7 +243,7 @@ function resolvedAc(input: {
       })),
     },
     equipmentCatalog: new Map(input.equipment.map((item) => [item.id, item])),
-    acBase: 10,
+    armorClassRules: rules,
     magicPropertyProvider: () => undefined,
   })
   if (result.status !== 'resolved') throw new Error(result.reason)
@@ -234,7 +279,7 @@ describe('monster armor class comparison from the resolver', () => {
     expect(monsterArmorClassAlternativeMessages(resolution)).toEqual([
       'Natural armor wins: 17 vs. 16 with scale mail.',
     ])
-    expect(monsterArmorClassDexAdvisory(resolution)).toBe(
+    expect(monsterArmorClassDexAdvisory(resolution, ascendingRules)).toBe(
       'Scale mail limits the +4 DEX modifier to +2.',
     )
   })
@@ -245,16 +290,18 @@ describe('monster armor class comparison from the resolver', () => {
       naturalArmorBonus: 5,
       equipment: [chainMail],
     })
-    expect(monsterArmorClassDexAdvisory(resolution)).toBe('Chain mail ignores the +4 DEX modifier.')
+    expect(monsterArmorClassDexAdvisory(resolution, ascendingRules)).toBe(
+      'Chain mail ignores the +4 DEX modifier.',
+    )
   })
 
   it('stays silent for unarmored full DEX, a fixed override, and unequipped armor', () => {
     const armorWins = resolvedAc({ dex: 18, equipment: [leather] })
     expect(monsterArmorClassAlternativeMessages(armorWins)).toEqual([])
-    expect(monsterArmorClassDexAdvisory(armorWins)).toBeUndefined()
+    expect(monsterArmorClassDexAdvisory(armorWins, ascendingRules)).toBeUndefined()
 
     const fullDex = resolvedAc({ dex: 18, naturalArmorBonus: 3, equipment: [leather] })
-    expect(monsterArmorClassDexAdvisory(fullDex)).toBeUndefined()
+    expect(monsterArmorClassDexAdvisory(fullDex, ascendingRules)).toBeUndefined()
     expect(monsterArmorClassAlternativeMessages(fullDex)).toEqual([
       'Natural armor wins: 17 vs. 15 with leather armor.',
     ])
@@ -268,7 +315,7 @@ describe('monster armor class comparison from the resolver', () => {
     expect(monsterArmorClassAlternativeMessages(fixed)).toEqual([
       `Calculated ${monsterArmorClassCompactLabel()} without override: 17`,
     ])
-    expect(monsterArmorClassDexAdvisory(fixed)).toBeUndefined()
+    expect(monsterArmorClassDexAdvisory(fixed, ascendingRules)).toBeUndefined()
 
     const stowed = resolvedAc({
       dex: 18,
@@ -277,17 +324,17 @@ describe('monster armor class comparison from the resolver', () => {
       equipped: false,
     })
     expect(monsterArmorClassAlternativeMessages(stowed)).toEqual([])
-    expect(monsterArmorClassDexAdvisory(stowed)).toBeUndefined()
+    expect(monsterArmorClassDexAdvisory(stowed, ascendingRules)).toBeUndefined()
   })
 
   it('hides the DEX advisory when armor still wins or the restriction does not change the winner', () => {
     const cappedWins = resolvedAc({ dex: 18, equipment: [scaleMail] })
     expect(cappedWins.dexRestriction?.affectsOutcome).toBe(false)
-    expect(monsterArmorClassDexAdvisory(cappedWins)).toBeUndefined()
+    expect(monsterArmorClassDexAdvisory(cappedWins, ascendingRules)).toBeUndefined()
 
     const heavyWins = resolvedAc({ dex: 18, equipment: [chainMail] })
     expect(heavyWins.dexRestriction?.affectsOutcome).toBe(false)
-    expect(monsterArmorClassDexAdvisory(heavyWins)).toBeUndefined()
+    expect(monsterArmorClassDexAdvisory(heavyWins, ascendingRules)).toBeUndefined()
 
     const naturalWinsAnyway = resolvedAc({
       dex: 18,
@@ -295,6 +342,28 @@ describe('monster armor class comparison from the resolver', () => {
       equipment: [scaleMail],
     })
     expect(naturalWinsAnyway.dexRestriction?.affectsOutcome).toBe(false)
-    expect(monsterArmorClassDexAdvisory(naturalWinsAnyway)).toBeUndefined()
+    expect(monsterArmorClassDexAdvisory(naturalWinsAnyway, ascendingRules)).toBeUndefined()
+  })
+
+  it('signs caps, shields, and the winner sentence in descending', () => {
+    const rules = { mode: 'descending' as const, base: 10 as const }
+    const resolution = resolvedAc({
+      dex: 18,
+      naturalArmorBonus: 3,
+      equipment: [scaleMail],
+      rules,
+    })
+    expect(monsterArmorClassAlternativeMessages(resolution)).toEqual([
+      'Natural armor wins: 3 vs. 4 with scale mail.',
+    ])
+    expect(monsterArmorClassDexAdvisory(resolution, rules)).toBe(
+      'Scale mail limits the -4 DEX modifier to -2.',
+    )
+    const armored = resolvedAc({ dex: 18, equipment: [scaleMail], rules })
+    expect(monsterArmorClassBreakdownRows(armored, rules)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: 'DEX modifier (max -2)', value: '-2' }),
+      ]),
+    )
   })
 })

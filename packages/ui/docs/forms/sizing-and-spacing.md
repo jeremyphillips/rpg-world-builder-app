@@ -194,6 +194,10 @@ utility bands via `useEntityCardUtilityFieldSize()`).
 Width formulas in `numberStepperWidthVariants` use **3rem** side columns for `xs` and **4rem**
 for `sm` / `md` / `lg`. See [`number-stepper.variants.ts`](../../src/components/ui/number-stepper.variants.ts).
 
+An empty stepper increments from `min`. Set `emptySeed` on `NumberFieldConfig` when that first
+press should land on a different value, such as the unarmored Armor Class under a descending
+ruleset. Decrement stays disabled while the field is empty.
+
 **Sign display:** use `signDisplay="positive-prefix"` only when `min >= 0` (additive quantity
 stacks). For signed modifiers (`min < 0`), use `signDisplay="signed-prefix"`: the decorative
 prefix shows `+` or `−`, the center field edits magnitude, and `aria-valuetext` exposes the full

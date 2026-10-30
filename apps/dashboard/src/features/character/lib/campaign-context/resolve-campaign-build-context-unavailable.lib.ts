@@ -53,13 +53,34 @@ function isMissingPcOnboardingUser(
   )
 }
 
+export type CampaignBuildFoundationUnavailable = Extract<
+  CampaignBuildContextUnavailable,
+  { kind: 'loading' } | { kind: 'missing_campaign_id' } | { kind: 'missing_ruleset' }
+>
+
+/** Loading and identity gaps shared by builder and read-only campaign sheets. */
+export function resolveCampaignBuildFoundationUnavailable(
+  args: Pick<
+    CampaignBuildContextUnavailableInput,
+    'campaignId' | 'rulesetId' | 'isPending' | 'hasPatch' | 'hasCatalog'
+  > & { isReady: boolean; isError?: boolean },
+): CampaignBuildFoundationUnavailable | null {
+  if (args.isReady || args.isError) return null
+  if (isAwaitingCampaignBuildDependencies(args)) return { kind: 'loading' }
+  if (!args.campaignId) return { kind: 'missing_campaign_id' }
+  if (!args.rulesetId) return { kind: 'missing_ruleset' }
+  return null
+}
+
 export function resolveCampaignBuildContextUnavailable(
   args: CampaignBuildContextUnavailableInput,
 ): CampaignBuildContextUnavailable | null {
   if (args.context) return null
-  if (isAwaitingCampaignBuildDependencies(args)) return { kind: 'loading' }
-  if (!args.campaignId) return { kind: 'missing_campaign_id' }
-  if (!args.rulesetId) return { kind: 'missing_ruleset' }
+  const foundation = resolveCampaignBuildFoundationUnavailable({
+    ...args,
+    isReady: false,
+  })
+  if (foundation) return foundation
   if (isMissingPcOnboardingUser(args.characterKind, args.acquisition, args.ownershipTarget)) {
     return { kind: 'missing_session_user' }
   }

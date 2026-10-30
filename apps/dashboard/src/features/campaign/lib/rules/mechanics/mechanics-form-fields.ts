@@ -7,9 +7,12 @@ import {
   ATTACK_RESOLUTION_MODE_TERM,
   DEFAULT_EDITION_PRESET_ID,
   EDITION_PRESET_TERM,
+  armorClassFromProtection,
   attackResolutionModeIdSchema,
   editionPresetIdSchema,
   armorClassModeSchema,
+  type ArmorClassBase,
+  type ArmorClassMode,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
@@ -42,6 +45,30 @@ type MechanicsFieldOptions = {
 
 const EDITION_PRESET_RECOMMENDED_BADGE = 'Recommended'
 const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-8'
+
+/** Protection stored on SRD plate. The unarmored-base hint displays it through the scale. */
+export const UNARMORED_BASE_EXAMPLE_PLATE_OFFSET = 8
+
+const UNARMORED_BASE_STATIC_HINT =
+  'The baseline for an unarmored character. Changing it shifts the displayed AC of every armor.'
+
+function isArmorClassMode(value: unknown): value is ArmorClassMode {
+  return (ARMOR_CLASS_MODES as readonly string[]).includes(String(value))
+}
+
+function isArmorClassBase(value: unknown): value is ArmorClassBase {
+  return (ARMOR_CLASS_BASES as readonly number[]).includes(Number(value))
+}
+
+/** Plate's displayed AC under the selected direction and base. */
+export function unarmoredBaseShiftHint(values: Record<string, unknown>): string | undefined {
+  const mode = values.armorClassMode
+  const base = Number(values.armorClassBase)
+  if (!isArmorClassMode(mode) || !isArmorClassBase(base)) return undefined
+
+  const plate = armorClassFromProtection({ mode, base }, UNARMORED_BASE_EXAMPLE_PLATE_OFFSET)
+  return `${UNARMORED_BASE_STATIC_HINT} Plate: ${plate}.`
+}
 
 function editionPresetOptionsWithRecommendedBadge(options: FieldOption[]): FieldOption[] {
   return options.map((option) =>
@@ -102,7 +129,13 @@ function mechanicsKnobsGroup(attackResolutionModeOptions: FieldOption[]): FormIt
           value: String(base),
           label: ARMOR_CLASS_BASE_LABELS[base],
         })),
-        hint: 'The baseline armor class for an unarmored character in this rules framework.',
+        hint: {
+          text: UNARMORED_BASE_STATIC_HINT,
+          resolve: {
+            dependsOn: ['armorClassMode', 'armorClassBase'],
+            hintWhen: unarmoredBaseShiftHint,
+          },
+        },
       },
       {
         type: 'select',

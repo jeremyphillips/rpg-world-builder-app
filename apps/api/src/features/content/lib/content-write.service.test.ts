@@ -27,7 +27,7 @@ describe('createHomebrewContent (equipment)', () => {
     name: 'Custom Leather',
     category: 'light' as const,
     cost: { amount: 15, currency: 'gp' as const },
-    baseAc: 12,
+    baseAcOffset: 2,
     stealthDisadvantage: false,
   }
 
@@ -83,7 +83,7 @@ describe('createHomebrewContent (equipment)', () => {
     expect(created.source).toBe('homebrew')
     expect(created.kind).toBe('armor')
     if (!isArmorEquipment(created)) throw new Error('expected armor')
-    expect(created.baseAc).toBe(12)
+    expect(created.baseAcOffset).toBe(2)
 
     const equipment = await resolveCatalogForCampaign(equipmentWriteConfig.readConfig, campaign.id)
     expect(equipment.some((item) => item.slug === 'custom-leather')).toBe(true)
@@ -182,11 +182,11 @@ describe('createHomebrewContent (equipment)', () => {
 
     const updated = await updateContentEntity(equipmentWriteConfig, campaign.id, leather.id, {
       kind: 'armor',
-      baseAc: 12,
+      baseAcOffset: 2,
     })
 
     if (!isArmorEquipment(updated)) throw new Error('expected armor')
-    expect(updated.baseAc).toBe(12)
+    expect(updated.baseAcOffset).toBe(2)
     expect(updated.source).toBe('system')
   })
 

@@ -55,6 +55,7 @@ export type ContentEditFormLoadInput = {
   formCtx?: Partial<ContentFormCtx>
   campaignId: string
   entityId: string
+  armorClassRules?: ContentFormCtx['armorClassRules']
 }
 
 export type ContentEditFormLoadResult = {
@@ -72,8 +73,12 @@ export function loadContentEditFormState({
   formCtx,
   campaignId,
   entityId,
+  armorClassRules,
 }: ContentEditFormLoadInput): ContentEditFormLoadResult {
-  const layoutCtx = mergeEditLayoutCtx(optionsCtx, formCtx, campaignId, entityId, entity)
+  const layoutCtx = {
+    ...mergeEditLayoutCtx(optionsCtx, formCtx, campaignId, entityId, entity),
+    ...(armorClassRules ? { armorClassRules } : {}),
+  }
   const layoutCtxWithSeeds: ContentFormCtx = def.enrichEditLayoutCtx
     ? def.enrichEditLayoutCtx(
         {
@@ -93,8 +98,11 @@ export function loadContentEditFormState({
     layoutCtx: { ...layoutCtxWithSeeds, validationIntent },
     schema: resolveContentFormSchema(def, layoutCtx, validationIntent),
     validationIntent,
-    defaultValues: stripEditEnvelopeFromFormDefaults(def.toFormValues(entity), {
-      stripKind: layoutCtx.equipmentKind != null,
-    }),
+    defaultValues: stripEditEnvelopeFromFormDefaults(
+      def.toFormValues(entity, { armorClassRules: layoutCtx.armorClassRules }),
+      {
+        stripKind: layoutCtx.equipmentKind != null,
+      },
+    ),
   }
 }

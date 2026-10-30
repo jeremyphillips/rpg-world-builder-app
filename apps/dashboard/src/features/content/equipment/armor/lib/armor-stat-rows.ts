@@ -1,4 +1,4 @@
-import type { ArmorEquipment } from '@rpg/contracts'
+import type { ArmorClassRules, ArmorEquipment } from '@rpg/contracts'
 import {
   formatEquipmentCostLabel,
   formatWeight,
@@ -10,10 +10,13 @@ import type { ContentStatRowData } from '../../../lib/detail/metadata/content-st
 import { titleCase } from '../../../lib/utils/title-case'
 
 /** Stat rows for armor equipment detail (excludes kind; includes cost). */
-export function getArmorStatRows(item: ArmorEquipment): ContentStatRowData[] {
+export function getArmorStatRows(
+  item: ArmorEquipment,
+  rules: ArmorClassRules,
+): ContentStatRowData[] {
   return [
     { label: 'Category', value: getArmorCategorySummaryLabel(item.category) },
-    { label: 'AC', value: getArmorAcDisplay(item) },
+    { label: 'AC', value: getArmorAcDisplay(item, rules) },
     {
       label: 'Stealth',
       value: item.stealthDisadvantage ? 'Disadvantage' : '—',

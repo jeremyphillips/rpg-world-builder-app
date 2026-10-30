@@ -229,7 +229,7 @@ describe('transformDuplicateSource', () => {
         cost: { amount: 1500, currency: 'gp' },
         weight: { value: 65, unit: 'lb' },
         category: 'heavy',
-        baseAc: 18,
+        baseAcOffset: 8,
         stealthDisadvantage: true,
         abilityScoreRequirements: { str: 15 },
       } as never,

@@ -235,6 +235,18 @@ Picker and relationship surfaces derive selectable sets from content resolution 
 - **`forCampaignUse()`** — campaign-use metadata such as org member class affinity chips
 - **`forPlay(playActor)`** — character consumption (builder, Quick NPC, recommendations)
 
+## Catalog list scopes
+
+Campaign content list routes take `catalogScope`:
+
+| Scope     | Query                                 | Who                                         | What it filters                                                   | What it authorizes                                                     |
+| --------- | ------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Play      | `catalogScope=play` plus a play actor | Builder, picker, Quick NPC, recommendations | Playability for that actor, including availability                | Acquisition and play for that actor                                    |
+| Reference | `catalogScope=reference`              | Campaign PC detail and NPC detail           | Viewer visibility only: drafts, `dm_only`, and `specific_players` | Nothing. A reference-scope row never authorizes acquisition or a write |
+| Discovery | omitted                               | Overview and search lists                   | Discovery policy, including availability                          | Existing list behavior                                                 |
+
+Reference ignores `available: false` and audience `none`, so a persisted item still resolves after the GM turns availability off. It still hides drafts and `dm_only` from non-managers. Builder, picker, and Quick NPC stay on the play scope.
+
 Dashboard ESLint guards block raw list hooks and local `status === 'draft'|'published'`
 filters in picker modules. See `dashboardContentPickerPolicyGuards` in
 `apps/dashboard/eslint.config.js`.

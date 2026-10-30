@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { EQUIPMENT_KINDS, getArmorAcDisplay } from '@rpg/contracts'
+import { EQUIPMENT_KINDS, getArmorAcDisplay, systemDefaultArmorClassRules } from '@rpg/contracts'
 
 import {
   EQUIPMENT_KIND_FILES,
@@ -167,20 +167,20 @@ describe('armor records in unified seed', () => {
   it('shields have acBonus and no baseAc', () => {
     for (const s of armor().filter((a) => a.category === 'shields')) {
       expect(s.acBonus).toBeDefined()
-      expect(s.baseAc).toBeUndefined()
+      expect(s.baseAcOffset).toBeUndefined()
     }
   })
 
   it('body armor has baseAc and no acBonus', () => {
     for (const a of armor().filter((item) => item.category !== 'shields')) {
-      expect(a.baseAc).toBeDefined()
+      expect(a.baseAcOffset).toBeDefined()
       expect(a.acBonus).toBeUndefined()
     }
   })
 
   it('plate follows heavy armor and requires STR 15', () => {
     const plate = getArmorBySlug(RULESET, 'plate-armor')
-    expect(getArmorAcDisplay(plate)).toBe('18 (no Dex)')
+    expect(getArmorAcDisplay(plate, systemDefaultArmorClassRules())).toBe('18 (no Dex)')
     expect(plate.abilityScoreRequirements).toEqual({ str: 15 })
   })
 
@@ -190,8 +190,11 @@ describe('armor records in unified seed', () => {
   })
 
   it('derives light and medium DEX phrases from category', () => {
-    expect(getArmorAcDisplay(getArmorBySlug(RULESET, 'leather-armor'))).toBe('11 + Dex')
-    expect(getArmorAcDisplay(getArmorBySlug(RULESET, 'chain-shirt'))).toBe('13 + Dex (max 2)')
+    const rules = systemDefaultArmorClassRules()
+    expect(getArmorAcDisplay(getArmorBySlug(RULESET, 'leather-armor'), rules)).toBe('11 + Dex')
+    expect(getArmorAcDisplay(getArmorBySlug(RULESET, 'chain-shirt'), rules)).toBe(
+      '13 + Dex (max 2)',
+    )
   })
 
   it('chain-mail requires STR 13', () => {

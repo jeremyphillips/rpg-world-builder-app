@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { ATTACK_RESOLUTION_MODE_IDS } from './attack-resolution-mode'
+import { ARMOR_CLASS_BASES, ARMOR_CLASS_MODES } from './armor-class-scale'
 import { EDITION_PRESET_IDS } from './edition-preset'
 import { EDITION_PRESET_MECHANICS, getEditionPresetMechanics } from './edition-preset-mechanics'
 
@@ -13,6 +14,14 @@ describe('EDITION_PRESET_MECHANICS', () => {
 
   it('uses proficiency_attack_vs_ac for the 5e preset', () => {
     expect(getEditionPresetMechanics('5e').attackResolution.mode).toBe('proficiency_attack_vs_ac')
+  })
+
+  it('stores armor class knobs from the scale', () => {
+    for (const id of EDITION_PRESET_IDS) {
+      const armorClass = getEditionPresetMechanics(id).armorClass
+      expect(ARMOR_CLASS_MODES).toContain(armorClass.mode)
+      expect(ARMOR_CLASS_BASES).toContain(armorClass.base)
+    }
   })
 })
 

@@ -1,6 +1,11 @@
-import type { ArmorEquipment, WithCampaignAccess } from '@rpg/contracts'
+import type { ArmorClassRules, ArmorEquipment, WithCampaignAccess } from '@rpg/contracts'
 import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
-import { ARMOR_CATEGORIES, getArmorAcDisplay, getArmorCategoryLabel } from '@rpg/contracts'
+import {
+  ARMOR_CATEGORIES,
+  armorClassFromProtection,
+  getArmorAcDisplay,
+  getArmorCategoryLabel,
+} from '@rpg/contracts'
 import { dataTableTypographyMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
@@ -12,9 +17,10 @@ import {
   type ContentOverviewBaseFilterState,
 } from '../../../lib/overview/content-overview-filter-schema'
 
-function armorAcSortValue(item: ArmorEquipment): number {
+function armorAcSortValue(item: ArmorEquipment, rules: ArmorClassRules): number {
   if (item.category === 'shields') return 999
-  return item.baseAc ?? 0
+  if (item.baseAcOffset === undefined) return 0
+  return armorClassFromProtection(rules, item.baseAcOffset)
 }
 
 type ArmorRow = WithCampaignAccess<ArmorEquipment>
@@ -23,29 +29,31 @@ export type ArmorOverviewFilterState = ContentOverviewBaseFilterState & {
   category?: string
 }
 
-const ARMOR_MIDDLE_COLUMNS: ColumnDef<ArmorEquipment>[] = [
-  {
-    accessorKey: 'category',
-    header: ({ column }) => <SortableHeader column={column}>Category</SortableHeader>,
-    cell: ({ row }) => getArmorCategoryLabel(row.getValue<string>('category')),
-    filterFn: 'equalsString',
-    meta: { label: 'Category' },
-  },
-  {
-    id: 'ac',
-    accessorFn: (row) => armorAcSortValue(row),
-    header: ({ column }) => <SortableHeader column={column}>AC</SortableHeader>,
-    cell: ({ row }) => getArmorAcDisplay(row.original),
-    meta: { label: 'AC', ...dataTableTypographyMeta('meta') },
-  },
-  {
-    id: 'stealth',
-    header: 'Stealth',
-    cell: ({ row }) => (row.original.stealthDisadvantage ? 'Disadvantage' : '—'),
-    meta: { label: 'Stealth' },
-  },
-  costColumn<ArmorEquipment>(),
-]
+function armorMiddleColumns(rules: ArmorClassRules): ColumnDef<ArmorEquipment>[] {
+  return [
+    {
+      accessorKey: 'category',
+      header: ({ column }) => <SortableHeader column={column}>Category</SortableHeader>,
+      cell: ({ row }) => getArmorCategoryLabel(row.getValue<string>('category')),
+      filterFn: 'equalsString',
+      meta: { label: 'Category' },
+    },
+    {
+      id: 'ac',
+      accessorFn: (row) => armorAcSortValue(row, rules),
+      header: ({ column }) => <SortableHeader column={column}>AC</SortableHeader>,
+      cell: ({ row }) => getArmorAcDisplay(row.original, rules),
+      meta: { label: 'AC', ...dataTableTypographyMeta('meta') },
+    },
+    {
+      id: 'stealth',
+      header: 'Stealth',
+      cell: ({ row }) => (row.original.stealthDisadvantage ? 'Disadvantage' : '—'),
+      meta: { label: 'Stealth' },
+    },
+    costColumn<ArmorEquipment>(),
+  ]
+}
 
 export const armorOverviewFilterSchema = buildContentFilterSchema<
   ArmorRow,
@@ -65,12 +73,15 @@ export const armorOverviewFilterSchema = buildContentFilterSchema<
 /** Armor column definitions with the name cell linked to the detail page. */
 export function armorColumns(
   campaignId: string,
-  usage?: {
-    usageSummaryLabels?: ContentUsageSummaryLabels
-    overviewUsageScope?: ContentOverviewUsageScope
-  },
+  usage:
+    | {
+        usageSummaryLabels?: ContentUsageSummaryLabels
+        overviewUsageScope?: ContentOverviewUsageScope
+      }
+    | undefined,
+  rules: ArmorClassRules,
 ) {
-  return buildContentColumns<ArmorEquipment>(ARMOR_MIDDLE_COLUMNS, {
+  return buildContentColumns<ArmorEquipment>(armorMiddleColumns(rules), {
     ...usage,
     contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'armor', row.id),

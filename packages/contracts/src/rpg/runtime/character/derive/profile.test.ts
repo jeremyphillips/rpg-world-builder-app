@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { systemDefaultArmorClassRules } from '../../../campaign/patches/campaign-mechanics-patch'
+import { resolvedField, unavailableField } from '../../creature/derived-field'
 import type { ClassStored } from '../../../content/classes/class'
 import type { SkillProficiency } from '../../../content/skill-proficiency'
 import {
@@ -52,7 +54,10 @@ const athleticsSkill = {
   examples: ['Jump farther than normal', 'Stay afloat in rough water', 'Break something'],
 } as const satisfies SkillProficiency
 
+const armorClassRules = systemDefaultArmorClassRules()
+
 const completeInput: CharacterDerivationInput = {
+  armorClassRules,
   level: 1,
   abilityScores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
   characterClass: fighterClass,
@@ -70,6 +75,7 @@ describe('deriveCharacterProfile', () => {
   it('tolerates empty input without throwing', () => {
     expect(() =>
       deriveCharacterProfile({
+        armorClassRules,
         level: 1,
         proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
         skillProficiencies: [],
@@ -79,6 +85,7 @@ describe('deriveCharacterProfile', () => {
 
   it('derives baseline defenses from level and ruleset AC base when class is missing', () => {
     const profile = deriveCharacterProfile({
+      armorClassRules,
       level: 1,
       abilityScores: { dex: 14 },
       proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
@@ -87,22 +94,24 @@ describe('deriveCharacterProfile', () => {
 
     expect(profile.proficiencyBonus).toBe(2)
     expect(profile.maxHp).toBeUndefined()
-    expect(profile.ac).toBe(12)
+    expect(profile.ac).toEqual(resolvedField(12))
   })
 
   it('derives ruleset base AC with neutral DEX modifier when dex is unset', () => {
     const profile = deriveCharacterProfile({
+      armorClassRules,
       level: 1,
       proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
       skillProficiencies: [],
     })
 
     expect(profile.proficiencyBonus).toBe(2)
-    expect(profile.ac).toBe(10)
+    expect(profile.ac).toEqual(resolvedField(10))
   })
 
   it('derives hit die max HP with neutral CON modifier when con is unset', () => {
     const profile = deriveCharacterProfile({
+      armorClassRules,
       level: 1,
       characterClass: fighterClass,
       proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
@@ -117,7 +126,7 @@ describe('deriveCharacterProfile', () => {
 
     expect(profile.proficiencyBonus).toBe(2)
     expect(profile.maxHp).toBe(11)
-    expect(profile.ac).toBe(12)
+    expect(profile.ac).toEqual(resolvedField(12))
     expect(profile.abilityScores.str).toEqual({ score: 15, modifier: 2 })
     expect(profile.savingThrows.find((save) => save.ability === 'str')).toMatchObject({
       proficient: true,
@@ -128,6 +137,19 @@ describe('deriveCharacterProfile', () => {
       rank: 'proficient',
     })
     expect(profile.spellcasting).toBeNull()
+  })
+
+  it('does not fall back to unarmored AC when equipped armor is unresolved', () => {
+    const profile = deriveCharacterProfile({
+      armorClassRules,
+      level: 1,
+      abilityScores: { dex: 14 },
+      proficiencies: { skills: [], weapons: [], armor: [], tools: [], languages: [] },
+      skillProficiencies: [],
+      unresolvedEquippedArmor: true,
+    })
+
+    expect(profile.ac).toEqual(unavailableField('missing-reference'))
   })
 })
 

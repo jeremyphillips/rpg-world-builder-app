@@ -40,7 +40,7 @@ function equipmentFixture(
     return {
       ...base,
       category: category ?? 'heavy',
-      baseAc: 16,
+      baseAcOffset: 6,
       stealthDisadvantage: true,
     } as Equipment
   }

@@ -1,14 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
 import { armorBodySchema } from '../../../content/equipment'
-import { toEquippedArmorPiece } from '../../creature/armor-class'
+import { systemDefaultArmorClassRules } from '../../../campaign/patches/campaign-mechanics-patch'
+import { armorClassFromProtection } from '../../../vocab/mechanics/armor-class-scale'
 import {
-  bodyArmorAc,
-  dexModifierForArmor,
-  resolveArmorDexContribution,
-  resolveEquippedArmorClass,
-  shieldAcBonus,
-} from './armor-class'
+  bodyArmorProtection,
+  resolveCreatureArmorClass,
+  shieldProtection,
+  toEquippedArmorPiece,
+} from '../../creature/armor-class'
+import { dexModifierForArmor, resolveArmorDexContribution } from './armor-class'
+
+const rules = systemDefaultArmorClassRules()
+
+function bodyArmorAc(piece: Parameters<typeof bodyArmorProtection>[0], dexModifier: number) {
+  return armorClassFromProtection(rules, bodyArmorProtection(piece, dexModifier))
+}
 
 const leatherArmor = armorBodySchema.parse({
   id: 'srd-cc-5.2.1:leather-armor',
@@ -25,7 +32,7 @@ const leatherArmor = armorBodySchema.parse({
   weight: { value: 10, unit: 'lb' },
   kind: 'armor',
   category: 'light',
-  baseAc: 11,
+  baseAcOffset: 1,
   stealthDisadvantage: false,
 })
 
@@ -44,7 +51,7 @@ const chainMail = armorBodySchema.parse({
   weight: { value: 55, unit: 'lb' },
   kind: 'armor',
   category: 'heavy',
-  baseAc: 16,
+  baseAcOffset: 6,
   stealthDisadvantage: true,
 })
 
@@ -63,7 +70,7 @@ const halfPlate = armorBodySchema.parse({
   weight: { value: 40, unit: 'lb' },
   kind: 'armor',
   category: 'medium',
-  baseAc: 15,
+  baseAcOffset: 5,
   stealthDisadvantage: true,
 })
 
@@ -157,40 +164,45 @@ describe('bodyArmorAc', () => {
   })
 })
 
-describe('shieldAcBonus', () => {
+describe('shieldProtection', () => {
   it('returns the shield bonus', () => {
-    expect(shieldAcBonus(shieldPiece)).toBe(2)
+    expect(shieldProtection(shieldPiece)).toBe(2)
   })
 })
 
-describe('resolveEquippedArmorClass', () => {
+describe('resolveCreatureArmorClass character eligibility', () => {
   it('uses unarmored AC plus shield when no body armor is equipped', () => {
     expect(
-      resolveEquippedArmorClass({
-        acBase: 10,
+      resolveCreatureArmorClass({
+        rules,
         dexModifier: 2,
-        equippedArmor: [shieldPiece],
-      }),
+        shields: [shieldPiece],
+        eligibility: { skinCompetesWithArmor: false },
+      }).ac,
     ).toBe(14)
   })
 
   it('combines body armor, capped DEX, and shield bonus', () => {
     expect(
-      resolveEquippedArmorClass({
-        acBase: 10,
+      resolveCreatureArmorClass({
+        rules,
         dexModifier: 3,
-        equippedArmor: [halfPlatePiece, shieldPiece],
-      }),
+        bodyArmor: halfPlatePiece,
+        shields: [shieldPiece],
+        eligibility: { skinCompetesWithArmor: false },
+      }).ac,
     ).toBe(19)
   })
 
   it('derives druid standard package AC from leather and shield', () => {
     expect(
-      resolveEquippedArmorClass({
-        acBase: 10,
+      resolveCreatureArmorClass({
+        rules,
         dexModifier: 2,
-        equippedArmor: [leatherPiece, shieldPiece],
-      }),
+        bodyArmor: leatherPiece,
+        shields: [shieldPiece],
+        eligibility: { skinCompetesWithArmor: false },
+      }).ac,
     ).toBe(15)
   })
 })

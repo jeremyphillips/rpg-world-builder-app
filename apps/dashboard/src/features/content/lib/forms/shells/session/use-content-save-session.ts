@@ -5,6 +5,7 @@ import { useFormUiContext, useSchemaFormSubmit } from '@rpg/ui/form'
 import { hasDirtyFields } from '@/lib/form-dirty-state'
 
 import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-state'
+import { useArmorClassAuthoringSave } from './armor-class-authoring-session.lib'
 import {
   runCoordinatedContentSave,
   type CoordinatedSaveSavedEvent,
@@ -40,6 +41,7 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
   onSaved,
 }: UseContentSaveSessionOptions<TFieldValues>): ContentSaveActionState {
   const campaignAccess = useCampaignAccessForm()
+  const { saveWithoutDirty } = useArmorClassAuthoringSave()
   const { dirtyFields, isSubmitting } = useFormState({ control: form.control })
   const bodyDirty = hasDirtyFields(dirtyFields)
   const schemaFormSubmit = useSchemaFormSubmit<TFieldValues>()
@@ -52,7 +54,9 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
   })
 
   const hasUnsavedEdits =
-    mode === 'edit' ? bodyDirty || campaignAccess.isDirty : campaignAccess.isDirty
+    mode === 'edit'
+      ? bodyDirty || campaignAccess.isDirty || saveWithoutDirty
+      : campaignAccess.isDirty
   const anyPending = pending || campaignAccess.isPending || isSubmitting
 
   const discard = useCallback(() => {
@@ -143,7 +147,7 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
 
   return {
     hasUnsavedEdits,
-    submitDisabled: anyPending || readOnly || !hasUnsavedEdits,
+    submitDisabled: anyPending || readOnly || (!hasUnsavedEdits && !saveWithoutDirty),
     discardDisabled: anyPending || readOnly || !hasUnsavedEdits,
     save,
     discard,

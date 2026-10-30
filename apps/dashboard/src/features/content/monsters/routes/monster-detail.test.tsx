@@ -20,13 +20,16 @@ vi.mock('../../lib/usage/content-usage-references-section', () => ({
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => true),
 }))
-vi.mock('@/features/homebrew', () => ({
-  useRulesetPatch: vi.fn(() => ({
-    data: undefined,
-    isPending: false,
-    isError: false,
-  })),
-}))
+vi.mock('@/features/homebrew', async () => {
+  const { systemDefaultArmorClassRules } = await import('@rpg/contracts')
+  return {
+    useRulesetPatch: vi.fn(() => ({
+      data: { mechanics: { armorClass: systemDefaultArmorClassRules() } },
+      isPending: false,
+      isError: false,
+    })),
+  }
+})
 vi.mock('../../equipment/hooks/use-equipment', async (importOriginal) => {
   const actual = await importOriginal<typeof UseEquipmentModule>()
   return {

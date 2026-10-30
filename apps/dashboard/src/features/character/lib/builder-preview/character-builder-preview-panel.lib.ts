@@ -18,6 +18,17 @@ export function getBuilderDraftNarrative(
   return draft.identity.narrative
 }
 
+export const ARMOR_CLASS_MISSING_REFERENCE_LABEL = 'Missing armor reference'
+
+export function formatDerivedArmorClass(
+  ac: { status: 'resolved'; value: number } | { status: 'unavailable'; reason: string },
+): string {
+  if (ac.status === 'unavailable') {
+    return ac.reason === 'missing-reference' ? ARMOR_CLASS_MISSING_REFERENCE_LABEL : '—'
+  }
+  return formatPreviewOptionalNumber(ac.value)
+}
+
 export function formatPreviewOptionalNumber(value: number | undefined, prefix = ''): string {
   if (value === undefined) return '—'
   return `${prefix}${value}`

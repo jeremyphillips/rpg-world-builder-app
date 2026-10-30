@@ -1,5 +1,4 @@
-import type { EquippedArmorPiece } from '../../creature/armor-class'
-import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mechanics-patch'
+import { resolveCreatureArmorClass, type EquippedArmorPiece } from '../../creature/armor-class'
 import type { CharacterClass } from '../../../content/classes/class'
 import { isSpellcastingActiveAtLevel } from '../../../content/classes/spellcasting/class-spellcasting-ownership'
 import type { ResolvedSpellcastingProgressionConfig } from '../../../campaign/rules/spellcasting-progression'
@@ -9,22 +8,20 @@ import type { SkillProficiency } from '../../../content/skill-proficiency'
 import { getSkillName } from '../../../content/skill-proficiency'
 import { proficiencyBonus } from '../../../primitives/level'
 import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
-import type { ArmorClassBase } from '../../../vocab/mechanics/edition-preset-mechanics'
+import type { ArmorClassRules } from '../../../vocab/mechanics/armor-class-scale'
 import type { CharacterProficiencies } from '../sheet/proficiencies'
 import type { CharacterSkillToolProficiencyRank } from '../sheet/proficiencies'
 import {
   abilityModifier,
   hasSavingThrowProficiency,
   resolveLevelOneMaxHp,
-  resolveUnarmoredAc,
   savingThrowBonus,
   skillModifier,
   spellAttackBonus,
   spellSaveDc,
 } from './index'
 import { resolveMaxHpAtLevel } from './hit-points-at-level'
-import { resolveEquippedArmorClass } from './armor-class'
-
+import { resolvedField, unavailableField, type DerivedField } from '../../creature/derived-field'
 // ---------------------------------------------------------------------------
 // Character derived profile — reusable derivation over partial character-like
 // input. Accepts incomplete data (builder drafts, sheet previews, imports)
@@ -35,14 +32,16 @@ export type CharacterDerivationInput = {
   level: number
   /** When set, overrides formula-derived proficiency bonus (e.g. Level 0 NPC campaign literal). */
   proficiencyBonusOverride?: number
-  /** Ruleset base AC (ascending mode). Defaults to the SRD ascending base when omitted. */
-  armorClassBase?: ArmorClassBase
+  /** Server-resolved Armor Class rules. Required. */
+  armorClassRules: ArmorClassRules
   abilityScores?: Partial<Record<Ability, number>>
   characterClass?: CharacterClass
   proficiencies: CharacterProficiencies
   skillProficiencies: readonly SkillProficiency[]
   /** Equipped armor variants for equipment-based AC; omit for unarmored preview. */
   equippedArmor?: readonly EquippedArmorPiece[]
+  /** Equipped armor-bucket entry is missing or is not armor. Do not fall back to unarmored AC. */
+  unresolvedEquippedArmor?: boolean
   /** Resolved spellcasting progression config; required when deriving spell slots. */
   spellcastingProgression?: ResolvedSpellcastingProgressionConfig
 }
@@ -77,7 +76,7 @@ export type CharacterDerivedProfile = {
   abilityScores: Partial<Record<Ability, CharacterDerivedAbilityScore>>
   proficiencyBonus: number | undefined
   maxHp: number | undefined
-  ac: number | undefined
+  ac: DerivedField<number>
   savingThrows: CharacterDerivedSavingThrow[]
   skills: CharacterDerivedSkill[]
   spellcasting: CharacterDerivedSpellcasting | null
@@ -187,15 +186,32 @@ export function deriveSpellcastingStats(
   }
 }
 
+function deriveArmorClass(input: CharacterDerivationInput): DerivedField<number> {
+  if (input.unresolvedEquippedArmor) return unavailableField('missing-reference')
+
+  const dexScore = input.abilityScores?.dex
+  const dexModifier = typeof dexScore === 'number' ? abilityModifier(dexScore) : 0
+  const equipped = input.equippedArmor ?? []
+  const bodyArmor = equipped.find((armor) => armor.category !== 'shields')
+  const shields = equipped.filter((armor) => armor.category === 'shields')
+  return resolvedField(
+    resolveCreatureArmorClass({
+      rules: input.armorClassRules,
+      dexModifier,
+      bodyArmor,
+      shields,
+      eligibility: { skinCompetesWithArmor: false },
+    }).ac,
+  )
+}
+
 /**
  * Derives ability modifiers, defenses, skills, and spellcasting from partial
  * character-like input. Tolerant of missing class or ability scores.
  */
 export function deriveCharacterProfile(input: CharacterDerivationInput): CharacterDerivedProfile {
-  const acBase = input.armorClassBase ?? DEFAULT_ARMOR_CLASS_BASE
   const profBonus = input.proficiencyBonusOverride ?? proficiencyBonus(input.level)
   const conScore = input.abilityScores?.con
-  const dexScore = input.abilityScores?.dex
 
   return {
     abilityScores: deriveAbilityScores(input.abilityScores),
@@ -213,14 +229,7 @@ export function deriveCharacterProfile(input: CharacterDerivationInput): Charact
             method: 'average',
           })
       : undefined,
-    ac:
-      input.equippedArmor && input.equippedArmor.length > 0
-        ? resolveEquippedArmorClass({
-            acBase,
-            dexModifier: typeof dexScore === 'number' ? abilityModifier(dexScore) : 0,
-            equippedArmor: input.equippedArmor,
-          })
-        : resolveUnarmoredAc({ acBase, dexScore }),
+    ac: deriveArmorClass(input),
     savingThrows: deriveSavingThrows(input, profBonus),
     skills: deriveSkillModifiers(input, profBonus),
     spellcasting: deriveSpellcastingStats(input, profBonus),

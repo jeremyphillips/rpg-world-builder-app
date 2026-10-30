@@ -64,7 +64,7 @@ function armor(
     name,
     kind: 'armor',
     category,
-    ...(category === 'shields' ? { acBonus: 2 } : { baseAc: 16 }),
+    ...(category === 'shields' ? { acBonus: 2 } : { baseAcOffset: 6 }),
     stealthDisadvantage: false,
     ...extra,
   })

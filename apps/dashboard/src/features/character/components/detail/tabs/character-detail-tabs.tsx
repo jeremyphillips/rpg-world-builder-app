@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { CharacterNarrative } from '@rpg/contracts'
+import type { ArmorClassRules, CharacterNarrative } from '@rpg/contracts'
 import { Panel, Tabs, TabsContent, TabsList, TabsTrigger, Text } from '@rpg/ui'
 
 import {
@@ -20,6 +20,7 @@ import { CharacterDetailSpellsTab } from './character-detail-spells-tab'
 export type CharacterDetailTabsProps = {
   spells: readonly CharacterSheetSpellCard[]
   equipment: readonly CharacterSheetEquipmentCard[]
+  armorClassRules: ArmorClassRules
   wealth: CharacterWealthViewModel
   classFeatures: CharacterDetailListSection
   speciesTraits: CharacterDetailListSection
@@ -32,6 +33,7 @@ export type CharacterDetailTabsProps = {
 export function CharacterDetailTabs({
   spells,
   equipment,
+  armorClassRules,
   wealth,
   classFeatures,
   speciesTraits,
@@ -63,7 +65,11 @@ export function CharacterDetailTabs({
 
       <TabsContent value="equipment">
         <CharacterDetailTabPanel>
-          <CharacterDetailEquipmentTab cards={equipment} wealth={wealth} />
+          <CharacterDetailEquipmentTab
+            cards={equipment}
+            armorClassRules={armorClassRules}
+            wealth={wealth}
+          />
         </CharacterDetailTabPanel>
       </TabsContent>
 

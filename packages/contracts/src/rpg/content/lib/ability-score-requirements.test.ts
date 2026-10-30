@@ -105,7 +105,7 @@ describe('getEquipmentAbilityScoreRequirements', () => {
     name: 'Plate Armor',
     cost: { amount: 1500, currency: 'gp' },
     category: 'heavy',
-    baseAc: 18,
+    baseAcOffset: 8,
     stealthDisadvantage: true,
   } as const
 

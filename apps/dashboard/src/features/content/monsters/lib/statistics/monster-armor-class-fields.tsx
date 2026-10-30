@@ -1,4 +1,9 @@
-import { getNaturalArmorBonusFieldLabel } from '@rpg/contracts'
+import {
+  armorClassFromProtection,
+  fixedAcDisplayBounds,
+  formatArmorClassContributionHint,
+  getNaturalArmorBonusFieldLabel,
+} from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -13,7 +18,6 @@ import {
   MONSTER_SHIELD_SLOT_HEADING,
 } from '../monster-form-labels'
 
-const NATURAL_ARMOR_BONUS_HINT = "Adds to the creature's unarmored AC."
 const ARMOR_AND_SHIELD_LEGEND = 'Armor & shield'
 const MANUAL_AC_OVERRIDE_LABEL = 'Manual AC override'
 const FIXED_ARMOR_CLASS_LABEL = 'Fixed Armor Class'
@@ -22,6 +26,10 @@ const USE_FIXED_ARMOR_CLASS_HINT =
   "Use when the normal calculation doesn't apply. Replaces the calculated result."
 
 export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
+  const fixedBounds = ctx.armorClassRules ? fixedAcDisplayBounds(ctx.armorClassRules) : undefined
+  const fixedDefault = ctx.armorClassRules
+    ? armorClassFromProtection(ctx.armorClassRules, 0)
+    : undefined
   return [
     {
       kind: 'group',
@@ -37,7 +45,11 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
           type: 'number',
           name: 'armorClass.naturalArmorBonus',
           label: getNaturalArmorBonusFieldLabel(),
-          hint: NATURAL_ARMOR_BONUS_HINT,
+          ...(ctx.armorClassRules
+            ? {
+                hint: formatArmorClassContributionHint(ctx.armorClassRules, 'unarmored'),
+              }
+            : {}),
           labelPosition: 'settings',
           control: 'stepper',
           min: 0,
@@ -113,8 +125,11 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
                     label: FIXED_ARMOR_CLASS_LABEL,
                     labelPosition: 'settings',
                     control: 'stepper',
-                    min: 0,
-                    defaultValue: 10,
+                    min: fixedBounds ? (fixedBounds.min ?? Number.MIN_SAFE_INTEGER) : 0,
+                    ...(fixedBounds ? { max: fixedBounds.max ?? Number.MAX_SAFE_INTEGER } : {}),
+                    ...(fixedDefault !== undefined
+                      ? { defaultValue: fixedDefault }
+                      : { defaultValue: 10 }),
                     digits: 2,
                   },
                 ],

@@ -1,5 +1,6 @@
 import type { ColumnDef } from '@rpg/ui'
 import type {
+  ArmorClassRules,
   ContentOverviewUsageScope,
   ContentUsageSummaryLabels,
   Equipment,
@@ -43,6 +44,7 @@ export async function loadFamilyTableConfig(
     usageSummaryLabels?: ContentUsageSummaryLabels
     overviewUsageScope?: ContentOverviewUsageScope
   },
+  armorClassRules?: ArmorClassRules,
 ): Promise<FamilyTableConfig> {
   switch (family) {
     case 'services': {
@@ -94,10 +96,13 @@ export async function loadFamilyTableConfig(
       }
     }
     case 'armor': {
+      if (!armorClassRules) {
+        throw new Error('Armor Class rules are required for the armor overview')
+      }
       const { armorColumns, armorOverviewFilterSchema } =
         await import('../../armor/lib/armor-overview-columns')
       return {
-        columns: armorColumns(campaignId, usage) as ColumnDef<Equipment>[],
+        columns: armorColumns(campaignId, usage, armorClassRules) as ColumnDef<Equipment>[],
         filterSchema: armorOverviewFilterSchema as FamilyTableConfig['filterSchema'],
       }
     }

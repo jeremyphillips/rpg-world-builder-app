@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
-import { resolveMechanicsPatch, type Monster, type SystemRulesetId } from '@rpg/contracts'
+import { type Monster, type SystemRulesetId } from '@rpg/contracts'
 
 import { useRulesetPatch } from '@/features/homebrew'
 
@@ -61,25 +61,31 @@ export function MonsterDetailContent({
 
   const equipmentQuery = useEquipment(campaignId)
   const skillsQuery = useSkillProficiencies(campaignId)
-  const { data: rulesetPatch } = useRulesetPatch(campaignId)
+  const rulesetQuery = useRulesetPatch(campaignId)
+  const rulesetPatch = rulesetQuery.data
   const rulesetId = (monster.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
   const magicPropertyProvider = useMemo(
     () => createMagicPropertyDefinitionProvider(rulesetId),
     [rulesetId],
   )
-  const acBase = rulesetPatch?.mechanics.armorClass.base ?? resolveMechanicsPatch().armorClass.base
+  const armorClassRules = rulesetPatch?.mechanics.armorClass
   const equipment = equipmentQuery.data
   const skillProficiencies = skillsQuery.data
 
   const catalogState: MonsterCatalogLoadState = useMemo(() => {
-    if (equipmentQuery.isPending || skillsQuery.isPending) return 'pending'
-    if (equipmentQuery.isLoadingError || skillsQuery.isLoadingError) return 'error'
+    if (equipmentQuery.isPending || skillsQuery.isPending || rulesetQuery.isPending)
+      return 'pending'
+    if (equipmentQuery.isLoadingError || skillsQuery.isLoadingError || rulesetQuery.isError) {
+      return 'error'
+    }
     return 'ready'
   }, [
     equipmentQuery.isLoadingError,
     equipmentQuery.isPending,
     skillsQuery.isLoadingError,
     skillsQuery.isPending,
+    rulesetQuery.isError,
+    rulesetQuery.isPending,
   ])
 
   const catalogLoadErrors =
@@ -90,10 +96,10 @@ export function MonsterDetailContent({
   const derived = useMemo(() => {
     if (catalogState !== 'ready') return null
     return tryDeriveMonsterStatBlock(monster, equipment ?? [], skillProficiencies ?? [], {
-      acBase,
+      armorClassRules,
       magicPropertyProvider,
     })
-  }, [acBase, catalogState, equipment, magicPropertyProvider, monster, skillProficiencies])
+  }, [armorClassRules, catalogState, equipment, magicPropertyProvider, monster, skillProficiencies])
 
   const equipmentById = useMemo(() => buildMonsterEquipmentCatalog(equipment ?? []), [equipment])
 

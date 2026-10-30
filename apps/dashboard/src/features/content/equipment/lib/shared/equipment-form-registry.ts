@@ -20,8 +20,8 @@ export const kindFieldGroups: Partial<Record<EquipmentKind, KindFieldGroupBuilde
   tool: () => toolFormFieldGroup(),
   magic_item: (ctx) => [magicItemFormFieldGroup(ctx)],
   adventuring_gear: () => [adventuringGearFormFieldGroup()],
-  vehicle: () => [vehicleFormFieldGroup()],
-  armor: () => [armorFormFieldGroup()],
+  vehicle: (ctx) => [vehicleFormFieldGroup(ctx?.armorClassRules)],
+  armor: (ctx) => [armorFormFieldGroup(ctx?.armorClassRules)],
   weapon: (ctx) => [weaponFormFieldGroup(ctx ?? {})],
 }
 

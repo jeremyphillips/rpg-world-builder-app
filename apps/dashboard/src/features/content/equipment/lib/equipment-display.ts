@@ -2,6 +2,7 @@ import {
   buildEquipmentCompactSummary,
   formatEquipmentCostLabel,
   getEquipmentKindLabel,
+  type ArmorClassRules,
   type Equipment,
   type EquipmentCompactSummaryProfile,
   type EquipmentKind,
@@ -64,6 +65,7 @@ function formatEquipmentCostOrUnavailableLabel(cost: Equipment['cost']): string 
 function buildEquipmentStatRows(
   equipment: Equipment,
   surface: EquipmentStatRowSurface,
+  rules: ArmorClassRules,
 ): ContentStatRowData[] {
   const rows: ContentStatRowData[] = []
 
@@ -81,16 +83,20 @@ function buildEquipmentStatRows(
     value: formatEquipmentCostOrUnavailableLabel(equipment.cost),
   })
 
-  rows.push(...getEquipmentKindStatRows(equipment))
+  rows.push(...getEquipmentKindStatRows(equipment, rules))
 
   return rows.filter((row) => !OMITTED_EQUIPMENT_DETAIL_STAT_ROW_LABELS.has(row.label))
 }
 
 export function buildEquipmentPickerRowViewModel(
   equipment: Equipment,
+  rules: ArmorClassRules,
   profile: EquipmentCompactSummaryProfile = 'standard',
 ): EquipmentPickerRowViewModel {
-  const { kindLabel, comparisonGroups } = buildEquipmentCompactSummary(equipment, profile)
+  const { kindLabel, comparisonGroups } = buildEquipmentCompactSummary(equipment, {
+    profile,
+    armorClassRules: rules,
+  })
 
   return {
     name: equipment.name,
@@ -100,12 +106,15 @@ export function buildEquipmentPickerRowViewModel(
   }
 }
 
-export function buildEquipmentDetailViewModel(equipment: Equipment): EquipmentDetailViewModel {
+export function buildEquipmentDetailViewModel(
+  equipment: Equipment,
+  rules: ArmorClassRules,
+): EquipmentDetailViewModel {
   return {
     classificationLabel: getEquipmentKindLabel(equipment.kind),
     detailsSectionTitle: EQUIPMENT_DETAILS_SECTION_TITLES[equipment.kind],
-    statRows: buildEquipmentStatRows(equipment, 'metadata'),
-    heroStatRows: buildEquipmentStatRows(equipment, 'content-detail-hero'),
+    statRows: buildEquipmentStatRows(equipment, 'metadata', rules),
+    heroStatRows: buildEquipmentStatRows(equipment, 'content-detail-hero', rules),
     description: equipment.description || undefined,
   }
 }

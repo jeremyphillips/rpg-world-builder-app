@@ -40,7 +40,7 @@ describe('ReviewStep', () => {
           },
           proficiencyBonus: undefined,
           maxHp: undefined,
-          ac: undefined,
+          ac: { status: 'unavailable', reason: 'missing-input' },
           spellcasting: null,
           equipmentSummary: [],
           startingEquipmentPending: false,

@@ -8,7 +8,7 @@ import { CHARACTER_SHEET_ERROR_LABELS } from '../../lib/detail/character-sheet-e
 
 export type CharacterSheetDetailShellProps = Pick<
   PageLoadStateProps,
-  'isPending' | 'isError' | 'errorLabel'
+  'isPending' | 'isError' | 'errorLabel' | 'onRetry'
 > & {
   scope: 'standalone' | 'campaign'
   errorBackLink?: {
@@ -25,6 +25,7 @@ export function CharacterSheetDetailShell({
   isPending,
   isError,
   errorLabel,
+  onRetry,
   children,
 }: CharacterSheetDetailShellProps) {
   return (
@@ -41,6 +42,7 @@ export function CharacterSheetDetailShell({
         errorLabel={errorLabel}
         defaultErrorLabel={CHARACTER_SHEET_ERROR_LABELS.loadFailed}
         errorBackLink={errorBackLink}
+        onRetry={onRetry}
       >
         {children}
       </PageLoadState>

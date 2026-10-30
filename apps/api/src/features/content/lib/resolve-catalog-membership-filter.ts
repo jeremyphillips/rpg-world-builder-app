@@ -1,5 +1,6 @@
 import {
   isPlayCatalogScopeQuery,
+  isReferenceCatalogScopeQuery,
   parsePlayActorCharacterIdQuery,
   requirePlayActorFromQuery,
 } from '@rpg/contracts'
@@ -21,12 +22,19 @@ export function resolveCatalogMembershipFilter(
   return filter.membership
 }
 
-/** Resolves discovery vs play-catalog filtering for campaign content list routes. */
+/** Resolves discovery, reference, or play-catalog filtering for campaign content list routes. */
 export function resolveCatalogListFilter(
   req: Pick<Request, 'campaignMembership' | 'query'>,
 ): CatalogListFilter | undefined {
   if (!req.campaignMembership) {
     return undefined
+  }
+
+  if (isReferenceCatalogScopeQuery(req.query)) {
+    return {
+      mode: 'reference',
+      membership: req.campaignMembership,
+    }
   }
 
   if (isPlayCatalogScopeQuery(req.query)) {

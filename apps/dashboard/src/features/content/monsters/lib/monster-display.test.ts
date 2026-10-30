@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 
 import { pickEquipment, pickMonster, pickSkillProficiency } from '@/test/fixtures/pick'
 
@@ -13,7 +14,9 @@ describe('monster-display', () => {
     const monster = pickMonster('kobold-warrior')
     const equipment = [pickEquipment('dagger')]
     const skills = [pickSkillProficiency('perception')]
-    const derived = tryDeriveMonsterStatBlock(monster, equipment, skills)
+    const derived = tryDeriveMonsterStatBlock(monster, equipment, skills, {
+      armorClassRules: systemDefaultArmorClassRules(),
+    })
     expect(derived).not.toBeNull()
 
     const viewModel = buildMonsterDetailViewModel({

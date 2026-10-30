@@ -20,6 +20,7 @@ import { equipmentFormToInput, equipmentToFormValues } from './equipment-form-va
 
 const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEquipmentInput> = {
   routeKey: 'equipment',
+  armorClassRulesSensitive: true,
   ...managedMediaFormDefFields('equipment'),
   schema: equipmentFormSchema as ZodType<EquipmentFormValues>,
   draftSchema: equipmentFormDraftSchema as ZodType<EquipmentFormValues>,

@@ -140,6 +140,7 @@ function NumberStepperValueSlot({
 function NumberStepperControl({
   value,
   unbound = false,
+  emptySeed,
   onChange,
   min,
   max,
@@ -160,6 +161,7 @@ function NumberStepperControl({
 }: {
   value: number
   unbound?: boolean
+  emptySeed?: number
   onChange: (value: number) => void
   min: number
   max: number
@@ -183,6 +185,7 @@ function NumberStepperControl({
   const interaction = useNumberStepperInteraction({
     value,
     unbound,
+    emptySeed,
     onChange,
     min,
     max,
@@ -250,9 +253,11 @@ export interface NumberStepperProps extends NumberStepperVariantProps {
   value: number
   /**
    * Blank value. The numeric `value` is ignored for display. Decrement is disabled,
-   * and increment seeds from an empty `stepNumber` call.
+   * and increment seeds from an empty `stepNumber` call unless `emptySeed` is set.
    */
   unbound?: boolean
+  /** Increment seed while `unbound`. Omitted steppers still seed from `min`. */
+  emptySeed?: number
   onChange: (value: number) => void
   min?: number
   max?: number
@@ -279,6 +284,7 @@ export interface NumberStepperProps extends NumberStepperVariantProps {
 export function NumberStepper({
   value,
   unbound = false,
+  emptySeed,
   onChange,
   min = 1,
   max = Number.MAX_SAFE_INTEGER,
@@ -302,6 +308,7 @@ export function NumberStepper({
     <NumberStepperControl
       value={value}
       unbound={unbound}
+      emptySeed={emptySeed}
       onChange={onChange}
       min={min}
       max={max}

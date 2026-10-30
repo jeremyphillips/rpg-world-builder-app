@@ -227,6 +227,7 @@ export function MonsterArmorSlotAction({
         allowedKinds={['armor']}
         workflowMode="loadout"
         showCharacterPreview={false}
+        armorClassRules={ctx.armorClassRules}
         selection={{ value: pendingId, onValueChange: setPendingId }}
         footer={
           <Button type="button" disabled={unchanged} onClick={commit}>

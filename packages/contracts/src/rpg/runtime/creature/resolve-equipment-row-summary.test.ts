@@ -91,7 +91,7 @@ const armor = equipmentSchema.parse({
   weight: { value: 13, unit: 'lb' },
   kind: 'armor',
   category: 'medium',
-  baseAc: 13,
+  baseAcOffset: 3,
   stealthDisadvantage: false,
 })
 
@@ -248,7 +248,7 @@ describe('resolveEquipmentRowSummary', () => {
       monster,
       equipmentCatalog: new Map([[battleaxe.id, battleaxe]]),
       skillCatalog: new Map(),
-      acBase: 10,
+      armorClassRules: { mode: 'ascending', base: 10 },
       magicPropertyProvider: emptyProvider,
     }).attacks[0]
 

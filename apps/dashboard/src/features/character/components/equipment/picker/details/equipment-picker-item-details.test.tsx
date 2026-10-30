@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
-import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details'
@@ -34,7 +34,7 @@ describe('EquipmentPickerItemDetails', () => {
         showCharacterPreview
         characterPreviewContext={{
           level: 1,
-          armorClassBase: DEFAULT_ARMOR_CLASS_BASE,
+          armorClassRules: systemDefaultArmorClassRules(),
           abilityScores: { str: 16, dex: 14 },
           equippedArmor: [],
           budget: equipmentPickerBudgetFixture,

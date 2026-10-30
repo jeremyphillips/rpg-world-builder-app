@@ -21,6 +21,7 @@ import { formatUnionBranchDescription } from '../vocab/enum-schema'
 import { serviceCategorySchema } from '../vocab/equipment/service-category'
 import { serviceDurationSchema } from '../vocab/equipment/service-duration'
 import { vehicleCategorySchema } from '../vocab/equipment/vehicle-category'
+import { BASE_AC_OFFSET_RANGE, FIXED_AC_OFFSET_MIN } from '../vocab/mechanics/armor-class-scale'
 import { magicItemCategorySchema } from '../vocab/magic-item/category'
 import { magicItemRaritySchema } from '../vocab/magic-item/rarity'
 import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './lib/envelope'
@@ -255,7 +256,7 @@ export const vehicleBodySchema = equipmentBaseSchema.extend({
   cargoCapacity: massSchema.optional(),
   crew: z.number().int().min(0).optional(),
   passengers: z.number().int().min(0).optional(),
-  ac: z.number().int().min(0).optional(),
+  acOffset: z.number().int().min(FIXED_AC_OFFSET_MIN).optional(),
   hp: z.number().int().min(0).optional(),
   damageThreshold: z.number().int().min(0).optional(),
 })
@@ -363,7 +364,12 @@ const armorEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
   kind: z.literal('armor'),
   category: armorCategorySchema.optional(),
   material: armorMaterialSchema.optional(),
-  baseAc: z.number().int().optional(),
+  baseAcOffset: z
+    .number()
+    .int()
+    .min(BASE_AC_OFFSET_RANGE.min)
+    .max(BASE_AC_OFFSET_RANGE.max)
+    .optional(),
   acBonus: z.number().int().optional(),
   stealthDisadvantage: z.boolean().optional(),
   abilityScoreRequirements: abilityScoreRequirementsSchema.optional(),
@@ -402,7 +408,7 @@ const vehicleEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
   cargoCapacity: massSchema.optional(),
   crew: z.number().int().min(0).optional(),
   passengers: z.number().int().min(0).optional(),
-  ac: z.number().int().min(0).optional(),
+  acOffset: z.number().int().min(FIXED_AC_OFFSET_MIN).optional(),
   hp: z.number().int().min(0).optional(),
   damageThreshold: z.number().int().min(0).optional(),
 })

@@ -469,10 +469,10 @@ Optional. When present, create/edit shells switch to `PageShell width="wide"` an
 Top-level content shells share `ContentFormFooter` (`content-form-footer.tsx`) wired through
 `ContentFormLayout` and `useContentFormActionState`:
 
-| Mode       | Footer                               | Submit enabled when                                                          | Success                                                                                                                                                                                                |
-| ---------- | ------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Create** | `[Cancel]` `[Create {type}]`         | Always (click validates) — disabled only while `pending` or read-only        | Navigate to `…/:id/edit` after POST; toast via `notifyContentCreated`                                                                                                                                  |
-| **Edit**   | `[Discard changes]` `[Save changes]` | `hasDirtyFields(dirtyFields)` — disabled when clean, `pending`, or read-only | Stay on edit route; reset baseline from `def.toFormValues(saved)`; one toast from coordinated save session (`onSaved`) — access-only uses availability copy, body or combined uses `notifySaveSuccess` |
+| Mode       | Footer                               | Submit enabled when                                                                                       | Success                                                                                                                                                                                                                                                  |
+| ---------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Create** | `[Cancel]` `[Create {type}]`         | Always (click validates) — disabled only while `pending` or read-only                                     | Navigate to `…/:id/edit` after POST; toast via `notifyContentCreated`                                                                                                                                                                                    |
+| **Edit**   | `[Discard changes]` `[Save changes]` | `hasDirtyFields(dirtyFields)` — disabled when clean, `pending`, read-only, or Armor Class rules are stale | Stay on edit route; reset baseline from `def.toFormValues(saved, { armorClassRules })` using the authoring snapshot; one toast from coordinated save session (`onSaved`) — access-only uses availability copy, body or combined uses `notifySaveSuccess` |
 
 Create handoff URL: `resolveContentPostCreateEditHref` in `content-form-navigation.ts`.
 Submit/error wiring: `useContentFormSubmit` for ContentFormDef create modals and hosts;
@@ -499,7 +499,7 @@ never hard-codes tab ids.
 can read `true` after hydration when value-sync, rich-text init, or conditional `shouldUnregister`
 paths mutate values without user intent. `dirtyFields` records which registered fields the user
 actually touched — the same signal as `FormUnsavedChangesGuard`. After a successful edit save,
-always `form.reset(def.toFormValues(saved))` (not the pre-save client payload) so server
+always `form.reset(def.toFormValues(saved, ctx))` (not the pre-save client payload) so server
 normalization does not immediately re-dirty the form.
 
 Validation **display** stays progressive (`mode` default `onSubmit`): standard fields show error

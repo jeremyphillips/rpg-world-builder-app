@@ -1,3 +1,4 @@
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 import { buildEquipmentCompactSummary } from '@rpg/contracts'
 
@@ -58,15 +59,23 @@ describe('buildCreatureEquipmentRowSupportingMetadata', () => {
     const plate = pickEquipment('plate-armor')
     const shield = pickEquipment('shield')
 
-    expect(buildCreatureEquipmentRowSupportingMetadata({ catalogItem: plate })).toEqual([
-      ...buildEquipmentCompactSummary(plate).comparisonGroups,
+    const rules = systemDefaultArmorClassRules()
+    expect(
+      buildCreatureEquipmentRowSupportingMetadata({ catalogItem: plate, armorClassRules: rules }),
+    ).toEqual([
+      ...buildEquipmentCompactSummary(plate, { armorClassRules: systemDefaultArmorClassRules() })
+        .comparisonGroups,
     ])
-    expect(buildCreatureEquipmentRowSupportingMetadata({ catalogItem: shield })).toEqual([
-      ...buildEquipmentCompactSummary(shield).comparisonGroups,
+    expect(
+      buildCreatureEquipmentRowSupportingMetadata({ catalogItem: shield, armorClassRules: rules }),
+    ).toEqual([
+      ...buildEquipmentCompactSummary(shield, { armorClassRules: systemDefaultArmorClassRules() })
+        .comparisonGroups,
     ])
     expect(
       buildCreatureEquipmentRowSupportingMetadata({
         catalogItem: plate,
+        armorClassRules: rules,
         leadingSegments: [EQUIPMENT_ROW_UNMODIFIED_SUPPORTING_SEGMENT],
       })[0],
     ).toBe(EQUIPMENT_ROW_UNMODIFIED_SUPPORTING_SEGMENT)

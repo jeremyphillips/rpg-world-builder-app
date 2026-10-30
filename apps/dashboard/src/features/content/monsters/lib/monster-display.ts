@@ -19,8 +19,7 @@ import {
   type MonsterReaction,
   type SkillProficiency,
   deriveMonsterStatBlock,
-  resolveMechanicsPatch,
-  type ArmorClassBase,
+  type ArmorClassRules,
   type DerivedMonsterAttackLine,
   type DerivedFieldReason,
   type DerivedMonsterStatBlock,
@@ -444,10 +443,11 @@ export function tryDeriveMonsterStatBlock(
   equipment: Equipment[],
   skillProficiencies: SkillProficiency[],
   options?: {
-    acBase?: ArmorClassBase
+    armorClassRules?: ArmorClassRules
     magicPropertyProvider?: MagicPropertyDefinitionProvider
   },
 ): DerivedMonsterStatBlock | null {
+  if (!options?.armorClassRules) return null
   try {
     const equipmentCatalog = buildMonsterEquipmentCatalog(equipment)
     const skillCatalog = new Map(skillProficiencies.map((skill) => [skill.slug, skill]))
@@ -455,7 +455,7 @@ export function tryDeriveMonsterStatBlock(
       monster,
       equipmentCatalog,
       skillCatalog,
-      acBase: options?.acBase ?? resolveMechanicsPatch().armorClass.base,
+      armorClassRules: options?.armorClassRules,
       magicPropertyProvider: options?.magicPropertyProvider ?? (() => undefined),
     })
   } catch (error) {

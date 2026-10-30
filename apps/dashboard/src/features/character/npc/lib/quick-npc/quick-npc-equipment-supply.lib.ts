@@ -5,6 +5,7 @@ import {
   optionIdentitiesOverlap,
   projectEquipmentSelection,
   resolveEquipmentAdditionPolicy,
+  type ArmorClassRules,
   type CharacterBuildCatalogIndex,
   type CharacterSelectionSource,
   type EquipmentSupplySource,
@@ -268,6 +269,7 @@ export function collectQuickNpcEquipmentSupply(args: {
 }
 
 export function presentQuickNpcEquipmentOption(args: {
+  armorClassRules?: ArmorClassRules
   entry: QuickNpcAdditionalEquipmentOption
   equipmentSelections: readonly QuickNpcEquipmentSelection[]
   roleId?: string
@@ -279,8 +281,20 @@ export function presentQuickNpcEquipmentOption(args: {
   packageInventoryRows?: readonly EquipmentInventoryRow[]
 }): EquipmentOptionRowPresentation {
   const equipment = args.entry.pickerItem.equipment
-  const compact = buildEquipmentCompactSummary(equipment, 'compact-row')
-  const row = buildEquipmentPickerRowViewModel(equipment, 'compact-row')
+  const compact = args.armorClassRules
+    ? buildEquipmentCompactSummary(equipment, {
+        profile: 'compact-row',
+        armorClassRules: args.armorClassRules,
+      })
+    : { kindLabel: equipment.kind, comparisonGroups: [] as string[] }
+  const row = args.armorClassRules
+    ? buildEquipmentPickerRowViewModel(equipment, args.armorClassRules, 'compact-row')
+    : {
+        name: equipment.name,
+        priceLabel: '',
+        kindLabel: equipment.kind,
+        comparisonGroups: [] as string[],
+      }
   const supply = collectQuickNpcEquipmentSupply({
     equipmentId: equipment.id,
     equipmentSelections: args.equipmentSelections,
@@ -403,6 +417,7 @@ export function listSelectedQuickNpcAdditionalEquipment(args: {
 }
 
 export function buildQuickNpcAdditionalEquipmentPresentationMap(args: {
+  armorClassRules?: ArmorClassRules
   entries: readonly QuickNpcAdditionalEquipmentOption[]
   equipmentSelections: readonly QuickNpcEquipmentSelection[]
   choices: NpcStartingChoices
@@ -422,6 +437,7 @@ export function buildQuickNpcAdditionalEquipmentPresentationMap(args: {
     args.entries.map((entry) => [
       entry.option.value,
       presentQuickNpcEquipmentOption({
+        armorClassRules: args.armorClassRules,
         entry,
         equipmentSelections: args.equipmentSelections,
         choices: args.choices,
@@ -437,6 +453,7 @@ export function buildQuickNpcAdditionalEquipmentPresentationMap(args: {
 }
 
 export function canAppendQuickNpcAdditionalEquipment(args: {
+  armorClassRules?: ArmorClassRules
   entry: QuickNpcAdditionalEquipmentOption | undefined
   equipmentSelections: readonly QuickNpcEquipmentSelection[]
   choices: NpcStartingChoices
@@ -445,6 +462,7 @@ export function canAppendQuickNpcAdditionalEquipment(args: {
 }): boolean {
   if (!args.entry) return false
   return !presentQuickNpcEquipmentOption({
+    armorClassRules: args.armorClassRules,
     entry: args.entry,
     equipmentSelections: args.equipmentSelections,
     choices: args.choices,

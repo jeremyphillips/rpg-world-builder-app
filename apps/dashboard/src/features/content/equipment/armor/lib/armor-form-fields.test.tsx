@@ -2,7 +2,11 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { FormItem } from '@rpg/ui/form'
 import { Form } from '@rpg/ui/form'
-import type { Equipment } from '@rpg/contracts'
+import {
+  armorClassFromProtection,
+  systemDefaultArmorClassRules,
+  type Equipment,
+} from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
@@ -46,10 +50,9 @@ function findStrengthRequirementDependent(): Extract<FormItem, { kind: 'dependen
 
 function toInputWith(item: ArmorSeed, overrides: Record<string, unknown>) {
   const values = { ...toEquipmentFormValues(item), ...overrides }
-  return equipmentFormDef.toInput(values) as Extract<
-    ReturnType<typeof equipmentFormDef.toInput>,
-    { kind: 'armor' }
-  >
+  return equipmentFormDef.toInput(values, {
+    armorClassRules: systemDefaultArmorClassRules(),
+  }) as Extract<ReturnType<typeof equipmentFormDef.toInput>, { kind: 'armor' }>
 }
 
 describe('armor kindFieldGroups', () => {
@@ -135,7 +138,7 @@ describe('armor base AC hint', () => {
           stealthDisadvantage: z.boolean().optional(),
           hasMinimumStrengthRequirement: z.boolean().optional(),
         })}
-        fields={[armorFormFieldGroup()]}
+        fields={[armorFormFieldGroup(systemDefaultArmorClassRules())]}
         defaultValues={{ armorCategory: 'light', stealthDisadvantage: false }}
         onSubmit={() => undefined}
       />,
@@ -153,16 +156,16 @@ describe('armor base AC hint', () => {
     expect(baseAc).toHaveAttribute('aria-describedby', hint.id)
 
     await user.click(screen.getByRole('button', { name: 'Increase Base AC' }))
-    expect(baseAc).toHaveValue(1)
+    expect(baseAc).toHaveValue(10)
 
     const category = document.querySelector('select[name="armorCategory"]')
     if (!(category instanceof HTMLSelectElement)) throw new Error('missing category select')
     await user.selectOptions(category, 'medium')
-    expect(baseAc).toHaveValue(1)
+    expect(baseAc).toHaveValue(10)
     expect(screen.getByText('Adds the DEX modifier, up to +2.')).toBeInTheDocument()
 
     await user.selectOptions(category, 'heavy')
-    expect(baseAc).toHaveValue(1)
+    expect(baseAc).toHaveValue(10)
     expect(screen.getByText('DEX modifier does not apply.')).toBeInTheDocument()
   })
 
@@ -190,6 +193,37 @@ describe('armor base AC hint', () => {
     await user.click(screen.getByRole('button', { name: 'Increase AC bonus' }))
     expect(acBonus).toHaveValue(0)
   })
+
+  it('seeds an empty Base AC stepper at the unarmored value in descending', async () => {
+    const user = userEvent.setup()
+    const rules = { mode: 'descending' as const, base: 10 as const }
+    render(
+      <Form
+        schema={z.object({
+          armorCategory: z.string().optional(),
+          material: z.string().optional(),
+          baseAc: z.number().optional(),
+          acBonus: z.number().optional(),
+          stealthDisadvantage: z.boolean().optional(),
+          hasMinimumStrengthRequirement: z.boolean().optional(),
+        })}
+        fields={[armorFormFieldGroup(rules)]}
+        defaultValues={{ armorCategory: 'heavy', stealthDisadvantage: false }}
+        onSubmit={() => undefined}
+      />,
+    )
+
+    expect(screen.getByText('DEX modifier does not apply.')).toBeInTheDocument()
+    const baseAc = screen.getByRole('spinbutton', { name: 'Base AC' })
+    expect(baseAc).toHaveValue(null)
+    await user.click(screen.getByRole('button', { name: 'Increase Base AC' }))
+    expect(baseAc).toHaveValue(10)
+
+    const category = document.querySelector('select[name="armorCategory"]')
+    if (!(category instanceof HTMLSelectElement)) throw new Error('missing category select')
+    await user.selectOptions(category, 'shields')
+    expect(screen.getByText('Lowers Armor Class by this amount.')).toBeInTheDocument()
+  })
 })
 
 describe('armor form round-trips', () => {
@@ -202,7 +236,11 @@ describe('armor form round-trips', () => {
       if (item.kind !== 'armor') return
       const formValues = toEquipmentFormValues(item)
       expect(formValues.armorCategory).toBe(item.category)
-      expect(formValues.baseAc).toBe(item.baseAc)
+      expect(formValues.baseAc).toBe(
+        item.baseAcOffset === undefined
+          ? undefined
+          : armorClassFromProtection(systemDefaultArmorClassRules(), item.baseAcOffset),
+      )
       expect(formValues.acBonus).toBe(item.acBonus)
       expect(formValues).not.toHaveProperty('addDexModifier')
       expect(formValues).not.toHaveProperty('maxDexBonus')

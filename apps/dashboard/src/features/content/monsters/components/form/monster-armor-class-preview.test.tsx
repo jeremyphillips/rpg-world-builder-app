@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { pickEquipment } from '@/test/fixtures/pick'
@@ -22,6 +23,7 @@ const ctx = {
     [shield.id, shield],
   ]),
   skillCatalogStatus: 'ready',
+  armorClassRules: systemDefaultArmorClassRules(),
 } satisfies ContentFormCtx
 
 function Host() {

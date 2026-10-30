@@ -5,6 +5,7 @@ import {
   formatSpellConcentrationMarker,
   formatSpellRitualMarker,
   getSpellSchoolLabel,
+  type ArmorClassRules,
   type CharacterBuildCatalogIndex,
   type CharacterEquipmentEntry,
   type CharacterEquipmentInventoryBucket,
@@ -142,6 +143,7 @@ function resolveEquipmentOccurrenceId(
 function buildEquipmentCards(
   character: Pick<Character, 'equipment'>,
   catalogIndex: CharacterBuildCatalogIndex,
+  _armorClassRules: ArmorClassRules,
 ): CharacterSheetEquipmentCard[] {
   const occurrenceCounts = new Map<string, number>()
   const cards: CharacterSheetEquipmentCard[] = []
@@ -202,8 +204,9 @@ function buildSpellCards(
 export function buildCharacterSheetEquipmentCards(
   character: Pick<Character, 'equipment'>,
   catalogIndex: CharacterBuildCatalogIndex,
+  armorClassRules: ArmorClassRules,
 ): CharacterSheetEquipmentCard[] {
-  return buildEquipmentCards(character, catalogIndex)
+  return buildEquipmentCards(character, catalogIndex, armorClassRules)
 }
 
 export function buildCharacterSheetSpellCards(
@@ -215,8 +218,9 @@ export function buildCharacterSheetSpellCards(
 
 function mapEquipmentCompactSummaryToMetadataLines(
   equipment: Equipment,
+  armorClassRules: ArmorClassRules,
 ): readonly CatalogMetadataLine[] {
-  const { comparisonGroups } = buildEquipmentCompactSummary(equipment)
+  const { comparisonGroups } = buildEquipmentCompactSummary(equipment, { armorClassRules })
   if (comparisonGroups.length === 0) return []
 
   return [
@@ -231,13 +235,16 @@ function mapEquipmentCompactSummaryToMetadataLines(
 
 export function toEquipmentCatalogHeaderModel(
   card: CharacterSheetEquipmentCard,
+  armorClassRules: ArmorClassRules,
 ): EquipmentCatalogHeaderModel {
   const availability = catalogHeaderAvailability(card.status, 'equipment')
 
   return {
     name: card.displayName,
     metadataLines:
-      card.status === 'resolved' ? mapEquipmentCompactSummaryToMetadataLines(card.equipment) : [],
+      card.status === 'resolved'
+        ? mapEquipmentCompactSummaryToMetadataLines(card.equipment, armorClassRules)
+        : [],
     sourceLabel: card.sources[0]?.label,
     equipped: card.equipped,
     ...availability,

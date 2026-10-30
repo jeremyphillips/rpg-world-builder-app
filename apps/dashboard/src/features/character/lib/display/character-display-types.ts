@@ -1,5 +1,6 @@
 import type {
   Ability,
+  ArmorClassRules,
   CharacterNarrative,
   CharacterVitalState,
   ContentDisplayImagesByRole,
@@ -107,6 +108,7 @@ export type CharacterDetailViewModel = {
   proficiencies: CharacterProficienciesViewModel
   spells: CharacterSheetSpellCard[]
   equipment: CharacterSheetEquipmentCard[]
+  armorClassRules: ArmorClassRules
   wealth: CharacterWealthViewModel
   classFeatures: CharacterDetailListSection
   speciesTraits: CharacterDetailListSection

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 
 import { pickEquipment } from '@/features/content'
 
@@ -42,6 +43,7 @@ const cards = buildCharacterSheetEquipmentCards(
     ...catalogIndex,
     equipment: new Map([...catalogIndex.equipment, [dagger.id, dagger], [chainMail.id, chainMail]]),
   },
+  systemDefaultArmorClassRules(),
 )
 
 const meta = {
@@ -56,6 +58,7 @@ type Story = StoryObj<typeof meta>
 export const WithEquipment: Story = {
   args: {
     cards,
+    armorClassRules: systemDefaultArmorClassRules(),
     wealth: { label: 'Wealth', value: '15 gp' },
   },
 }
@@ -78,7 +81,9 @@ export const MissingReference: Story = {
         },
       },
       catalogIndex,
+      systemDefaultArmorClassRules(),
     ),
+    armorClassRules: systemDefaultArmorClassRules(),
     wealth: { label: 'Wealth', value: '0 gp' },
   },
 }
@@ -86,6 +91,7 @@ export const MissingReference: Story = {
 export const Empty: Story = {
   args: {
     cards: [],
+    armorClassRules: systemDefaultArmorClassRules(),
     wealth: { label: 'Wealth', value: '0 gp' },
   },
 }

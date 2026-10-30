@@ -13,6 +13,14 @@ import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import { PageShell } from '@/components/layout/page/page-shell'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
 import {
+  ArmorClassAuthoringNotice,
+  ArmorClassAuthoringProvider,
+} from '../session/armor-class-authoring-session'
+import {
+  armorClassRulesSignature,
+  useArmorClassAuthoringSession,
+} from '../session/armor-class-authoring-session.lib'
+import {
   resolveContentFormLayout,
   type ContentFormLayout as ResolvedContentFormLayout,
 } from '../layout/content-form-layout.lib'
@@ -96,7 +104,14 @@ function ContentCreateFormBody({
   )
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
   const leaveGuardRef = useRef<Pick<UnsavedChangesConfirmController, 'runTrusted'> | null>(null)
-  const formKey = `content-create-${def.routeKey}-${campaignId}`
+  const authoring = useArmorClassAuthoringSession(
+    Boolean(def.armorClassRulesSensitive),
+    ctx.armorClassRules,
+  )
+  const authoringCtx = def.armorClassRulesSensitive
+    ? { ...ctx, armorClassRules: authoring.snapshot }
+    : ctx
+  const formKey = `content-create-${def.routeKey}-${campaignId}:${armorClassRulesSignature(authoring.snapshot)}:${authoring.generation}`
 
   const prepareCommitValues = prepareSubmitValues as
     | ((values: Record<string, unknown>) => Record<string, unknown>)
@@ -113,6 +128,7 @@ function ContentCreateFormBody({
       weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
       campaignRules: ctx.campaignRules,
       equipmentKind: ctx.equipmentKind,
+      armorClassRules: authoringCtx.armorClassRules,
     }
     const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
       campaignId,
@@ -174,54 +190,59 @@ function ContentCreateFormBody({
   )
 
   return (
-    <>
-      {campaignAccessDeferredError ? (
-        <Text variant="warning" role="status" className="mb-4">
-          {campaignAccessDeferredError}
-        </Text>
-      ) : null}
-      <ContentFormLayout
-        def={def}
-        ctx={ctx}
-        schema={resolveContentFormSchema(def, ctx, 'draft')}
-        defaultValues={{
-          ...resolveContentFormCreateDefaultValues(def),
-          ...initialValues,
-          media: emptyContentMediaSchema,
-        }}
-        formKey={formKey}
-        formMode="create"
-        contentTypeKey={contentTypeKey}
-        campaignId={campaignId}
-        onCampaignAccessDraftChange={(patch) => {
-          campaignAccessDraftRef.current = patch
-        }}
-        backHref={backHref}
-        submitLabel={formatContentCreateActionLabel(contentTypeKey)}
-        submitPending={mutation.isPending}
-        formError={publishFormError ?? saveDraftFormError ?? null}
-        onSubmit={onPublish}
-        onSaveDraft={onSaveDraft}
-        saveDraftPending={saveDraftPending}
-        onLeaveGuardReady={(guard) => {
-          leaveGuardRef.current = guard
-        }}
-        scrollMode={layout.scrollMode}
-        previewEnabled={layout.previewEnabled}
-        previewDraftBadge={layout.previewEnabled}
-        formHeaderPrefix={
-          <>
-            {layout.previewEnabled ? (
-              <Heading variant="page" as="h1">
-                {heading}
-              </Heading>
-            ) : null}
-            <UiBridge />
-            {formHeaderPrefix}
-          </>
-        }
-      />
-    </>
+    <ArmorClassAuthoringProvider value={authoring}>
+      <>
+        {campaignAccessDeferredError ? (
+          <Text variant="warning" role="status" className="mb-4">
+            {campaignAccessDeferredError}
+          </Text>
+        ) : null}
+        <ContentFormLayout
+          def={def}
+          ctx={authoringCtx}
+          schema={resolveContentFormSchema(def, authoringCtx, 'draft')}
+          defaultValues={
+            authoring.keptValues ?? {
+              ...resolveContentFormCreateDefaultValues(def),
+              ...initialValues,
+              media: emptyContentMediaSchema,
+            }
+          }
+          formKey={formKey}
+          formMode="create"
+          contentTypeKey={contentTypeKey}
+          campaignId={campaignId}
+          onCampaignAccessDraftChange={(patch) => {
+            campaignAccessDraftRef.current = patch
+          }}
+          backHref={backHref}
+          submitLabel={formatContentCreateActionLabel(contentTypeKey)}
+          submitPending={mutation.isPending}
+          formError={publishFormError ?? saveDraftFormError ?? null}
+          onSubmit={onPublish}
+          onSaveDraft={onSaveDraft}
+          saveDraftPending={saveDraftPending}
+          onLeaveGuardReady={(guard) => {
+            leaveGuardRef.current = guard
+          }}
+          scrollMode={layout.scrollMode}
+          previewEnabled={layout.previewEnabled}
+          previewDraftBadge={layout.previewEnabled}
+          formHeaderPrefix={
+            <>
+              {layout.previewEnabled ? (
+                <Heading variant="page" as="h1">
+                  {heading}
+                </Heading>
+              ) : null}
+              <UiBridge />
+              {formHeaderPrefix}
+              <ArmorClassAuthoringNotice />
+            </>
+          }
+        />
+      </>
+    </ArmorClassAuthoringProvider>
   )
 }
 

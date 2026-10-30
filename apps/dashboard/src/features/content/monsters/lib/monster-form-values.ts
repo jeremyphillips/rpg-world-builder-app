@@ -1,5 +1,7 @@
 import {
+  armorClassFromProtection,
   neutralAbilityScores,
+  type ArmorClassRules,
   type ContentValidationIntent,
   type CreateMonsterInput,
   type CreatureWeaponProficiencies,
@@ -149,7 +151,10 @@ function hitPointsAuthoringFromEntity(
   }
 }
 
-export function monsterToFormValues(entity: Monster): MonsterFormValues {
+export function monsterToFormValues(
+  entity: Monster,
+  ctx?: { armorClassRules?: ArmorClassRules },
+): MonsterFormValues {
   const weapons = coerceCreatureWeaponProficienciesForForm(entity.proficiencies.weapons)
 
   return {
@@ -161,9 +166,14 @@ export function monsterToFormValues(entity: Monster): MonsterFormValues {
     abilityScores: entity.abilityScores,
     armorClass: {
       naturalArmorBonus: entity.armorClass.naturalArmorBonus ?? 0,
-      useFixedAc: entity.armorClass.fixedValue !== undefined,
-      ...(entity.armorClass.fixedValue !== undefined
-        ? { fixedValue: entity.armorClass.fixedValue }
+      useFixedAc: entity.armorClass.fixedAcOffset !== undefined,
+      ...(entity.armorClass.fixedAcOffset !== undefined && ctx?.armorClassRules
+        ? {
+            fixedValue: armorClassFromProtection(
+              ctx.armorClassRules,
+              entity.armorClass.fixedAcOffset,
+            ),
+          }
         : {}),
     },
     hitPoints: entity.hitPoints,
@@ -212,6 +222,7 @@ export function buildMonsterInput(
     baseline: baselineFromEntity(ctx?.entity),
     intent: validationIntent,
     mode: ctx?.entity ? 'update' : 'create',
+    armorClassRules: ctx?.armorClassRules,
   })
   const slug = slugForInputParse(
     typeof normalized.name === 'string' ? normalized.name : values.name,

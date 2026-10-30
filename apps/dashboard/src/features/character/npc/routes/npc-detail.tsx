@@ -1,6 +1,10 @@
+import { Text } from '@rpg/ui'
+
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { PageShell } from '@/components/layout/page/page-shell'
 import { useCampaignCharacterAbilityScoreEditor } from '@/features/campaign'
+
+import { campaignSheetUnavailableMessage } from '../../lib/detail/character-sheet-error-labels'
 
 import { CampaignCharacterStatusSummary } from '../../components/detail/status/campaign-character-status-summary'
 import { CharacterDetailContent } from '../../components/detail/character-detail-content'
@@ -21,8 +25,12 @@ export function NpcDetail() {
     isError,
     isPending,
     npcDetail,
+    refetch,
+    unavailable,
     viewModel,
   } = useNpcDetailPage()
+
+  const unavailableMessage = campaignSheetUnavailableMessage(unavailable)
 
   const abilityScoreEditor = useCampaignCharacterAbilityScoreEditor(
     campaignId,
@@ -37,7 +45,15 @@ export function NpcDetail() {
         isError={isError}
         errorLabel={errorLabel}
         defaultErrorLabel="Could not load NPC."
+        onRetry={
+          isError
+            ? () => {
+                void refetch()
+              }
+            : undefined
+        }
       >
+        {unavailableMessage ? <Text role="status">{unavailableMessage}</Text> : null}
         {viewModel && npcDetail ? (
           <CharacterDetailContent
             viewModel={viewModel}

@@ -1,4 +1,4 @@
-import { type Equipment } from '@rpg/contracts'
+import { type ArmorClassRules, type Equipment } from '@rpg/contracts'
 
 import {
   buildEquipmentDetailViewModel,
@@ -25,6 +25,7 @@ export type EquipmentPickerItemDetailsProps = {
   ownership: EquipmentOwnership
   showCharacterPreview?: boolean
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
+  armorClassRules?: ArmorClassRules
 }
 
 /** Expanded equipment picker body — metadata, optional character preview, ownership ledger. */
@@ -34,8 +35,10 @@ export function EquipmentPickerItemDetails({
   ownership,
   showCharacterPreview = false,
   characterPreviewContext,
+  armorClassRules,
 }: EquipmentPickerItemDetailsProps) {
-  const detailViewModel = buildEquipmentDetailViewModel(equipment)
+  const rules = armorClassRules ?? characterPreviewContext?.armorClassRules
+  const detailViewModel = rules ? buildEquipmentDetailViewModel(equipment, rules) : undefined
   const previewContext =
     showCharacterPreview && characterPreviewContext
       ? { ...characterPreviewContext, budget: undefined }
@@ -48,14 +51,16 @@ export function EquipmentPickerItemDetails({
 
   return (
     <div className="space-y-4">
-      <EquipmentDetailMetadata
-        viewModel={detailViewModel}
-        sectionId={`${equipment.id}-detail-metadata`}
-        omitStatLabels={[EQUIPMENT_STAT_LABELS.kind, EQUIPMENT_STAT_LABELS.cost]}
-        omitSectionTitle
-        statRowSize="sm"
-        descriptionSize={PICKER_DISCLOSURE_DESCRIPTION_SIZE}
-      />
+      {detailViewModel ? (
+        <EquipmentDetailMetadata
+          viewModel={detailViewModel}
+          sectionId={`${equipment.id}-detail-metadata`}
+          omitStatLabels={[EQUIPMENT_STAT_LABELS.kind, EQUIPMENT_STAT_LABELS.cost]}
+          omitSectionTitle
+          statRowSize="sm"
+          descriptionSize={PICKER_DISCLOSURE_DESCRIPTION_SIZE}
+        />
+      ) : null}
 
       {previewLines ? (
         <EquipmentPickerCharacterPreviewSection

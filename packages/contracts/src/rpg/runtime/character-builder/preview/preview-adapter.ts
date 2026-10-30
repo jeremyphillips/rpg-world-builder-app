@@ -42,7 +42,7 @@ export function toCharacterDerivationInput(
   return {
     level: getCharacterBuilderTotalLevel(draft),
     proficiencyBonusOverride: isLevelZeroNpc ? rules.levelZeroNpcs.proficiencyBonus : undefined,
-    armorClassBase: rules.armorClass.base,
+    armorClassRules: rules.armorClass,
     abilityScores: draft.abilities.scores,
     characterClass,
     proficiencies: assembleCharacterProficiencies(draft, catalogIndex, choiceSets, characterClass, {
@@ -50,7 +50,8 @@ export function toCharacterDerivationInput(
       characterCreationRules: rules,
     }),
     skillProficiencies: Array.from(catalogIndex.skillProficiencies.values()),
-    equippedArmor: equippedArmor.length > 0 ? equippedArmor : undefined,
+    equippedArmor: equippedArmor.pieces.length > 0 ? equippedArmor.pieces : undefined,
+    unresolvedEquippedArmor: equippedArmor.unresolvedEntryIds.length > 0,
     spellcastingProgression,
   }
 }

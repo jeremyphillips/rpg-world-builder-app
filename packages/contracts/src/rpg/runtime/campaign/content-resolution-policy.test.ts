@@ -6,6 +6,7 @@ import type { ContentPlayActor } from './content-play-actor'
 import {
   isContentCampaignEligible,
   isContentPlayableFor,
+  isContentReferenceVisibleToViewer,
   isContentReferenceable,
   isContentVisibleToViewer,
   type ContentResolutionRow,
@@ -99,6 +100,61 @@ describe('content resolution policy matrix', () => {
       expect(isContentPlayableFor(testRow, pcBPlayActor)).toBe(playable.pcB)
     },
   )
+})
+
+describe('isContentReferenceVisibleToViewer', () => {
+  it('lets managers see drafts, restricted rows, and unavailable rows', () => {
+    expect(isContentReferenceVisibleToViewer(row({ status: 'draft' }), manageViewer)).toBe(true)
+    expect(
+      isContentReferenceVisibleToViewer(
+        row({ campaignAccess: access({ visibilityMode: 'dm_only' }) }),
+        manageViewer,
+      ),
+    ).toBe(true)
+    expect(
+      isContentReferenceVisibleToViewer(
+        row({ campaignAccess: access({ available: false, effectiveAudience: 'none' }) }),
+        manageViewer,
+      ),
+    ).toBe(true)
+  })
+
+  it('hides drafts and dm_only from players and ignores availability', () => {
+    expect(isContentReferenceVisibleToViewer(row({ status: 'draft' }), pcViewer)).toBe(false)
+    expect(
+      isContentReferenceVisibleToViewer(
+        row({ campaignAccess: access({ visibilityMode: 'dm_only' }) }),
+        pcViewer,
+      ),
+    ).toBe(false)
+    expect(
+      isContentReferenceVisibleToViewer(
+        row({ campaignAccess: access({ available: false, effectiveAudience: 'none' }) }),
+        pcViewer,
+      ),
+    ).toBe(true)
+    expect(
+      isContentReferenceVisibleToViewer(
+        row({ campaignAccess: access({ available: false, effectiveAudience: 'none' }) }),
+        noneViewer,
+      ),
+    ).toBe(true)
+  })
+
+  it('requires the viewer character ids to intersect specific_players', () => {
+    const specific = row({
+      campaignAccess: access({
+        visibilityMode: 'specific_players',
+        participantIds: ['char-a'],
+      }),
+    })
+
+    expect(isContentReferenceVisibleToViewer(specific, pcViewer)).toBe(true)
+    expect(
+      isContentReferenceVisibleToViewer(specific, { kind: 'pc', characterIds: ['char-b'] }),
+    ).toBe(false)
+    expect(isContentReferenceVisibleToViewer(specific, noneViewer)).toBe(false)
+  })
 })
 
 describe('isContentPlayableFor', () => {

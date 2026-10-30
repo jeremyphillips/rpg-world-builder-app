@@ -1,6 +1,11 @@
 import { expect } from 'vitest'
 import { loadSeedEquipmentByKind } from '@rpg/catalog/equipment'
-import { createEquipmentInputSchema, type Equipment, type EquipmentKind } from '@rpg/contracts'
+import {
+  createEquipmentInputSchema,
+  systemDefaultArmorClassRules,
+  type Equipment,
+  type EquipmentKind,
+} from '@rpg/contracts'
 import type { FormItem, GroupConfig } from '@rpg/ui/form'
 
 import { STORY_RULESET_ID } from '../../../lib/fixtures/constants'
@@ -41,15 +46,21 @@ export function expectComposedKindGroups(
   return fields
 }
 
+const seedArmorClassRules = systemDefaultArmorClassRules()
+
 /** Seed item → kind-narrowed form values for per-family assertions. */
 export function toEquipmentFormValues<K extends EquipmentKind>(
   item: Extract<Equipment, { kind: K }>,
 ): EquipmentFormValuesFor<K> {
-  return equipmentFormDef.toFormValues(item) as EquipmentFormValuesFor<K>
+  return equipmentFormDef.toFormValues(item, {
+    armorClassRules: seedArmorClassRules,
+  }) as EquipmentFormValuesFor<K>
 }
 
 /** Asserts the toFormValues → toInput → createEquipmentInputSchema.parse round-trip. */
 export function expectSeedRoundTrip(item: Equipment): void {
-  const input = equipmentFormDef.toInput(toEquipmentFormValues(item))
+  const input = equipmentFormDef.toInput(toEquipmentFormValues(item), {
+    armorClassRules: seedArmorClassRules,
+  })
   expect(() => createEquipmentInputSchema.parse(input)).not.toThrow()
 }

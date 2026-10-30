@@ -1,5 +1,7 @@
 import type { GlobalSearchDocument } from '@rpg/contracts'
 
+import { HttpError } from '../../../lib/http-error'
+
 import { attachCampaignAccessForTargetType } from '../../content'
 import { filterCatalogForMembership } from '../../content'
 import { resolveContentForCampaign } from '../../content'
@@ -13,7 +15,7 @@ import {
   vocabularyUsageContextForCampaign,
 } from '../../vocabulary'
 import { resolveGameTermDisplayImage } from '../lib/resolve-game-term-display-image.lib'
-import { requireCampaignRuleset } from '../../vocabulary'
+import { getRulesetPatchRead, requireCampaignRuleset } from '../../vocabulary'
 import type { NamedContentEntity } from '../lib/project-content-document'
 import type { SearchSource } from '../lib/search-source.types'
 
@@ -35,6 +37,12 @@ export const contentSearchSource: SearchSource = {
         controlledCharacterIds: ctx.viewerControlledCharacterIds,
       },
     })
+
+    const rulesetPatch = await getRulesetPatchRead(ctx.campaignId)
+    if (!rulesetPatch) {
+      throw new HttpError(404, 'not_found', 'Campaign not found')
+    }
+    const armorClassRules = rulesetPatch.mechanics.armorClass
 
     const documents: GlobalSearchDocument[] = []
     const vocabularyContext = vocabularyUsageContextForCampaign(ctx.campaignId)
@@ -81,6 +89,7 @@ export const contentSearchSource: SearchSource = {
           entity as unknown as NamedContentEntity,
           {
             resolveSpellSchoolDisplay,
+            armorClassRules,
           },
         )
         documents.push(

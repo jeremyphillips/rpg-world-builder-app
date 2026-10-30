@@ -1,13 +1,24 @@
 import type { AttackResolutionModeId } from './attack-resolution-mode'
 import type { EditionPresetId } from './edition-preset'
+import type { ArmorClassBase, ArmorClassMode } from './armor-class-scale'
 
-export const ARMOR_CLASS_MODES = ['ascending', 'descending'] as const
-
-export type ArmorClassMode = (typeof ARMOR_CLASS_MODES)[number]
-
-export const ARMOR_CLASS_BASES = [9, 10] as const
-
-export type ArmorClassBase = (typeof ARMOR_CLASS_BASES)[number]
+export {
+  ARMOR_CLASS_BASES,
+  ARMOR_CLASS_MODES,
+  ARMOR_CLASS_RULES_MATRIX,
+  BASE_AC_OFFSET_RANGE,
+  FIXED_AC_OFFSET_MIN,
+  armorBaseAcDisplayBounds,
+  armorClassBoundsForProtection,
+  armorClassDelta,
+  armorClassFromProtection,
+  compareArmorClass,
+  fixedAcDisplayBounds,
+  protectionFromArmorClass,
+  type ArmorClassBase,
+  type ArmorClassMode,
+  type ArmorClassRules,
+} from './armor-class-scale'
 
 export type EditionPresetMechanicsKnobs = {
   readonly armorClass: {

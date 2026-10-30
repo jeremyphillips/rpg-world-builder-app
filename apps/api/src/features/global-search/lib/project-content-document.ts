@@ -1,4 +1,5 @@
 import type {
+  ArmorClassRules,
   ApiContentTypeKey,
   CharacterClass,
   ContentMedia,
@@ -157,16 +158,16 @@ function buildMonsterTarget(monster: Monster): GlobalSearchTarget {
   return { kind: 'monster', id: monster.id }
 }
 
-function buildEquipmentSecondary(equipment: Equipment): string {
-  const summary = buildEquipmentCompactSummary(equipment)
+function buildEquipmentSecondary(equipment: Equipment, rules: ArmorClassRules): string {
+  const summary = buildEquipmentCompactSummary(equipment, { armorClassRules: rules })
   return joinCompactSegments(summary.kindLabel, ...summary.comparisonGroups) ?? summary.kindLabel
 }
 
-function buildEquipmentFields(equipment: Equipment): GlobalSearchField[] {
+function buildEquipmentFields(equipment: Equipment, rules: ArmorClassRules): GlobalSearchField[] {
   return [
     labelField(equipment.name),
     keywordField(getEquipmentSearchName(equipment)),
-    groupField(buildEquipmentCompactSummary(equipment).kindLabel),
+    groupField(buildEquipmentCompactSummary(equipment, { armorClassRules: rules }).kindLabel),
   ]
 }
 
@@ -229,9 +230,13 @@ function buildLocationTarget(location: Location): GlobalSearchTarget {
   return { kind: 'location', id: location.id }
 }
 
+type ContentProjectOptions = {
+  armorClassRules?: ArmorClassRules
+}
+
 type ContentProjector<T extends WriteEntityBase> = {
-  secondary: (entity: T) => string
-  fields: (entity: T) => GlobalSearchField[]
+  secondary: (entity: T, options?: ContentProjectOptions) => string
+  fields: (entity: T, options?: ContentProjectOptions) => GlobalSearchField[]
   target: (entity: T) => GlobalSearchTarget
 }
 
@@ -259,8 +264,18 @@ const CONTENT_PROJECTORS: {
     target: (entity) => buildFeatTarget(entity as Feat),
   },
   equipment: {
-    secondary: (entity) => buildEquipmentSecondary(entity as Equipment),
-    fields: (entity) => buildEquipmentFields(entity as Equipment),
+    secondary: (entity, options) => {
+      if (!options?.armorClassRules) {
+        throw new Error('Armor Class rules are required to project equipment')
+      }
+      return buildEquipmentSecondary(entity as Equipment, options.armorClassRules)
+    },
+    fields: (entity, options) => {
+      if (!options?.armorClassRules) {
+        throw new Error('Armor Class rules are required to project equipment')
+      }
+      return buildEquipmentFields(entity as Equipment, options.armorClassRules)
+    },
     target: (entity) => buildEquipmentTarget(entity as Equipment),
   },
   'skill-proficiencies': {
@@ -290,6 +305,7 @@ export function projectContentEntity(
   entity: NamedContentEntity,
   options?: {
     resolveSpellSchoolDisplay?: (schoolId: string) => GlobalSearchDocument['displayImage']
+    armorClassRules?: ArmorClassRules
   },
 ): GlobalSearchDocument {
   const projector = CONTENT_PROJECTORS[contentType]
@@ -314,9 +330,9 @@ export function projectContentEntity(
     filterGroup: CONTENT_TYPE_LABEL,
     typeLabel: getContentTypeTerm(contentType).label,
     title: entity.name,
-    secondary: projector.secondary(entity),
+    secondary: projector.secondary(entity, options),
     target: projector.target(entity),
-    fields: projector.fields(entity),
+    fields: projector.fields(entity, options),
     ...(entity.campaignAccess?.available === false ? { campaignAvailable: false as const } : {}),
     ...(displayImage ? { displayImage } : {}),
   }

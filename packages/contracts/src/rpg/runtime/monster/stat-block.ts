@@ -4,7 +4,7 @@ import { getSkillName } from '../../content/skill-proficiency'
 import { NEUTRAL_ABILITY_SCORE } from '../../vocab/ability'
 import { CHALLENGE_RATING_MECHANICS } from '../../vocab/challenge-rating'
 import { CREATURE_SIZE_HIT_DIE } from '../../vocab/creature-size'
-import type { ArmorClassBase } from '../../vocab/mechanics/edition-preset-mechanics'
+import type { ArmorClassRules } from '../../vocab/mechanics/armor-class-scale'
 import { abilityModifier } from '../creature/ability-modifier'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { resolveMonsterArmorClass, type MonsterArmorClassResolution } from './armor-class'
@@ -66,7 +66,7 @@ export type DeriveMonsterStatBlockInput = {
   monster: MonsterBody
   equipmentCatalog: CreatureEquipmentCatalog
   skillCatalog: CreatureSkillCatalog
-  acBase: ArmorClassBase
+  armorClassRules: ArmorClassRules
   magicPropertyProvider: MagicPropertyDefinitionProvider
 }
 
@@ -264,7 +264,7 @@ export function deriveMonsterStatBlock({
   monster,
   equipmentCatalog,
   skillCatalog,
-  acBase,
+  armorClassRules,
   magicPropertyProvider,
 }: DeriveMonsterStatBlockInput): DerivedMonsterStatBlock {
   const dexScore = monster.abilityScores.dex
@@ -272,7 +272,12 @@ export function deriveMonsterStatBlock({
 
   const armor = requireDerivedField(
     'armorClass',
-    resolveMonsterArmorClass({ monster, equipmentCatalog, acBase, magicPropertyProvider }),
+    resolveMonsterArmorClass({
+      monster,
+      equipmentCatalog,
+      armorClassRules,
+      magicPropertyProvider,
+    }),
   )
   const hitPoints = requireDerivedField('hitPoints', resolveMonsterHitPoints(monster))
   const initiativeModifier = resolveCreatureInitiativeModifier(dexScore)
@@ -488,10 +493,10 @@ export function deriveMonsterDraftStatBlock(args: {
   monster: DraftMonsterSource
   equipmentCatalog: CreatureEquipmentCatalog
   skillCatalog: CreatureSkillCatalog
-  acBase: ArmorClassBase
+  armorClassRules: ArmorClassRules
   magicPropertyProvider: MagicPropertyDefinitionProvider
 }): DerivedMonsterDraftStatBlock {
-  const { monster, equipmentCatalog, skillCatalog, acBase, magicPropertyProvider } = args
+  const { monster, equipmentCatalog, skillCatalog, armorClassRules, magicPropertyProvider } = args
   const dexScore = monster.abilityScores?.dex
   const initiative =
     dexScore === undefined
@@ -526,7 +531,7 @@ export function deriveMonsterDraftStatBlock(args: {
     ac: resolveMonsterArmorClass({
       monster: asBody,
       equipmentCatalog,
-      acBase,
+      armorClassRules,
       magicPropertyProvider,
     }),
     hp: resolveMonsterHitPoints(asBody),

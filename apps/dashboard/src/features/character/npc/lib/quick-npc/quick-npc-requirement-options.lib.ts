@@ -4,6 +4,7 @@ import {
   listReachableSpellOptions,
   normalizeAutomaticNpcBuildConstraints,
   resolvePlayableBuilderContent,
+  type ArmorClassRules,
   type CharacterBuildContext,
   type EquipmentPickerItem,
 } from '@rpg/contracts'
@@ -38,6 +39,7 @@ export type QuickNpcRequirementOptionSets = {
 export function resolveQuickNpcWeaponRequirementOptions(args: {
   setup: QuickNpcSetupValues
   context: CharacterBuildContext
+  armorClassRules?: ArmorClassRules
 }): QuickNpcWeaponRequirementOption[] {
   const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
   const characterClass = catalogIndex.classes.get(args.setup.classId)
@@ -61,7 +63,14 @@ export function resolveQuickNpcWeaponRequirementOptions(args: {
   return sortEquipmentPickerItems(items, browseSortContext).map((pickerItem) => ({
     option: { value: pickerItem.equipment.id, label: pickerItem.equipment.name },
     pickerItem,
-    row: buildEquipmentPickerRowViewModel(pickerItem.equipment),
+    row: args.armorClassRules
+      ? buildEquipmentPickerRowViewModel(pickerItem.equipment, args.armorClassRules)
+      : {
+          name: pickerItem.equipment.name,
+          priceLabel: '',
+          kindLabel: pickerItem.equipment.kind,
+          comparisonGroups: [],
+        },
   }))
 }
 
@@ -97,6 +106,7 @@ function buildQuickNpcSpellRequirementOptions(args: {
 export function buildQuickNpcRequirementOptionSets(args: {
   setup: QuickNpcSetupValues
   context: CharacterBuildContext
+  armorClassRules?: ArmorClassRules
 }): QuickNpcRequirementOptionSets {
   return {
     weapons: resolveQuickNpcWeaponRequirementOptions(args),

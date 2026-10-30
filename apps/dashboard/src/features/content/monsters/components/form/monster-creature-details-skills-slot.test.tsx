@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -15,6 +16,7 @@ const mockCtx: ContentFormCtx = {
   campaignId: 'campaign-1',
   skillCatalogStatus: 'ready',
   equipmentCatalogStatus: 'ready',
+  armorClassRules: systemDefaultArmorClassRules(),
   options: {
     skills: {
       visible: [

@@ -122,6 +122,7 @@ export function EquipmentPickerDrawer(props: EquipmentPickerDrawerProps) {
     allowedKinds,
     showCharacterPreview = false,
     characterPreviewContext,
+    armorClassRules,
     ownership,
     workflowMode = 'purchase',
     workflowSwitcher,
@@ -295,6 +296,7 @@ export function EquipmentPickerDrawer(props: EquipmentPickerDrawerProps) {
           rowActionVm: resolveRowVm(item, 1),
           budget: picker.effectiveBudget,
           magicItemGrantProgress,
+          armorClassRules: armorClassRules ?? characterPreviewContext?.armorClassRules,
         })
         const commitHeader = picker.handleHeaderCommit
 
@@ -305,6 +307,7 @@ export function EquipmentPickerDrawer(props: EquipmentPickerDrawerProps) {
             workflowMode={workflowMode}
             isGoldShoppingPath={isGoldShoppingPath}
             budget={picker.effectiveBudget}
+            armorClassRules={armorClassRules ?? characterPreviewContext?.armorClassRules}
             {...(selection || !commitHeader
               ? {}
               : {
@@ -336,6 +339,7 @@ export function EquipmentPickerDrawer(props: EquipmentPickerDrawerProps) {
                 ownership={getEquipmentOwnership(ownership, item.equipment.id)}
                 showCharacterPreview={showCharacterPreview}
                 characterPreviewContext={characterPreviewContext}
+                armorClassRules={armorClassRules ?? characterPreviewContext?.armorClassRules}
               />
             ),
           })}
