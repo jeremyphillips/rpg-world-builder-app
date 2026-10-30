@@ -1,4 +1,3 @@
-import type { MonsterReferencedSpell } from '../../runtime/monster/reaction-trigger'
 import type { SpellCastingTime } from '../../vocab/spell/casting-time'
 
 const RULESET = 'srd-cc-5.2.1'
@@ -19,7 +18,7 @@ function spell(
   name: string,
   unit: SpellCastingTime['normal']['unit'],
   trigger?: string,
-): MonsterReferencedSpell & { id: string } {
+): { id: string; name: string; castingTime: SpellCastingTime } {
   return {
     id: `${RULESET}:${slug}`,
     name,
@@ -48,7 +47,10 @@ export const MONSTER_FIXTURE_SPELLS = {
   mistyStep: spell('misty-step', 'Misty Step', 'bonus-action'),
 } as const
 
-export function monsterFixtureSpellLookup(): Map<string, MonsterReferencedSpell> {
+export function monsterFixtureSpellLookup(): Map<
+  string,
+  { name: string; castingTime: SpellCastingTime }
+> {
   return new Map(
     Object.values(MONSTER_FIXTURE_SPELLS).map((entry) => [
       entry.id,
