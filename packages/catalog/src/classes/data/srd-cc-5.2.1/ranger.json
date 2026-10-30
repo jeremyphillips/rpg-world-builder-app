@@ -203,6 +203,7 @@
         {
           "grants": [
             {
+              "id": "spellcasting",
               "kind": "spellcasting"
             }
           ]
@@ -219,6 +220,7 @@
         {
           "grants": [
             {
+              "id": "hunters-mark-spells",
               "kind": "spells",
               "ability": "wis",
               "spellIds": ["hunters-mark"],
@@ -309,6 +311,7 @@
         {
           "grants": [
             {
+              "id": "fighting-style-feat",
               "kind": "featChoice",
               "category": "fighting-style",
               "choose": 1,
@@ -334,6 +337,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -365,6 +369,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -396,6 +401,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -427,6 +433,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -452,6 +459,7 @@
         {
           "grants": [
             {
+              "id": "blindsight",
               "kind": "sense",
               "type": "blindsight",
               "range": 30
@@ -469,6 +477,7 @@
         {
           "grants": [
             {
+              "id": "epic-boon-feat",
               "kind": "featChoice",
               "category": "epic-boon",
               "choose": 1,

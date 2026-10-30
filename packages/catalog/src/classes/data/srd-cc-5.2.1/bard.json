@@ -252,6 +252,7 @@
         {
           "grants": [
             {
+              "id": "spellcasting",
               "kind": "spellcasting"
             }
           ]
@@ -337,6 +338,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -368,6 +370,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -393,6 +396,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -412,6 +416,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -437,6 +442,7 @@
         {
           "grants": [
             {
+              "id": "epic-boon-feat",
               "kind": "featChoice",
               "category": "epic-boon",
               "choose": 1,
@@ -456,6 +462,7 @@
         {
           "grants": [
             {
+              "id": "power-word-heal-spells",
               "kind": "spells",
               "ability": "cha",
               "spellIds": ["power-word-heal", "power-word-kill"],

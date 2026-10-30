@@ -162,7 +162,11 @@ describe('species culture helpers', () => {
     const heritageOption = {
       kind: 'grant' as const,
       id: 'drow-magic',
-      grantGroups: [{ grants: [{ kind: 'languages' as const, languageIds: ['undercommon'] }] }],
+      grantGroups: [
+        {
+          grants: [{ id: 'languages-1', kind: 'languages' as const, languageIds: ['undercommon'] }],
+        },
+      ],
     }
 
     expect(getHeritageLanguageAffinity(heritageOption)).toEqual(['undercommon'])

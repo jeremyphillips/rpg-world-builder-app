@@ -29,4 +29,17 @@ export const characterValidationMessages = {
     'validation.character.selectionSourceIdRequired',
     () => 'Choose a source, or set the source kind to manual.',
   ),
+  grantDerivedSourceKind: defineMessage(
+    'validation.character.grantDerivedSourceKind',
+    () =>
+      'Grant-derived sources must come from a species trait, heritage option, class feature, or subclass feature.',
+  ),
+  grantDerivedGrantIdRequired: defineMessage(
+    'validation.character.grantDerivedGrantIdRequired',
+    () => 'Grant-derived sources require the owning trait or feature id.',
+  ),
+  grantDerivedGrantRowIdRequired: defineMessage(
+    'validation.character.grantDerivedGrantRowIdRequired',
+    () => 'Grant-derived sources require a grant row id.',
+  ),
 }

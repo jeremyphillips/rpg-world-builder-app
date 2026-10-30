@@ -72,6 +72,11 @@ with a `featChoice` grant (`category: general`, `allowAnyQualifying: true`,
 picker for convenience; on save it generates/replaces those feature rows — there is no
 top-level `asiLevels` field on the class body.
 
+Every grant row has an `id`, unique across all groups of its owner (trait, feature, or heritage option).
+
+- **Seeds** use an explicit readable slug (`darkvision`, `fighting-style-feat`). Assign it once. Never regenerate it, and never give a deleted id to a different grant.
+- **Authored rows** use an opaque `grt_<uuid>`. The dashboard allocates one when a row is added. The API allocates one before strict parsing when a write arrives without an id. Opaque ids are never reused. A stored id keeps its grant kind; a different kind needs a new id.
+
 Example (Fighter Fighting Style):
 
 ```json
@@ -79,6 +84,7 @@ Example (Fighter Fighting Style):
   {
     "grants": [
       {
+        "id": "fighting-style-feat",
         "kind": "featChoice",
         "category": "fighting-style",
         "choose": 1,
@@ -101,6 +107,7 @@ Example (ASI at level 4):
     {
       "grants": [
         {
+          "id": "general-feat",
           "kind": "featChoice",
           "category": "general",
           "choose": 1,

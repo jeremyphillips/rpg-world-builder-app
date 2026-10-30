@@ -406,6 +406,8 @@ function validateGrantRow(
 function createGrantRowFormSchemaBase(maxLevel: number = MAX_CHARACTER_LEVEL) {
   return z
     .object({
+      /** Stable grant row id. New rows receive an opaque id when they are added. */
+      id: z.string().min(1).optional(),
       grantType: z.enum(GRANT_ROW_TYPES),
       /**
        * Unlock level for this grant row. `undefined` or `default` = the parent unlock

@@ -19,7 +19,9 @@ const ELF_BODY = {
     {
       kind: 'grant' as const,
       id: 'darkvision',
-      grantGroups: [{ grants: [{ kind: 'sense' as const, type: 'darkvision', range: 60 }] }],
+      grantGroups: [
+        { grants: [{ id: 'sense-1', kind: 'sense' as const, type: 'darkvision', range: 60 }] },
+      ],
     },
     {
       kind: 'custom' as const,
@@ -41,12 +43,13 @@ const ELF_BODY = {
         description: '<p>Drow trace their lineage to the Underdark.</p>',
         grantGroups: [
           {
-            grants: [{ kind: 'sense' as const, type: 'darkvision', range: 120 }],
+            grants: [{ id: 'sense-2', kind: 'sense' as const, type: 'darkvision', range: 120 }],
           },
           {
             unlock: { level: 1 },
             grants: [
               {
+                id: 'spells-3',
                 kind: 'spells' as const,
                 ability: 'cha',
                 casting: { mode: 'free_cast', frequency: 'at_will' },
@@ -58,6 +61,7 @@ const ELF_BODY = {
             unlock: { level: 3 },
             grants: [
               {
+                id: 'spells-4',
                 kind: 'spells' as const,
                 ability: 'cha',
                 casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
@@ -76,6 +80,7 @@ const ELF_BODY = {
           {
             grants: [
               {
+                id: 'movement-5',
                 kind: 'movement' as const,
                 mode: 'walk',
                 operation: 'increase',

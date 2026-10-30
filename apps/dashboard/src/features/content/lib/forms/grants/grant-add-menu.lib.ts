@@ -1,3 +1,4 @@
+import { createGrantRowId } from '@rpg/contracts'
 import type { WeightedSearchField } from '@rpg/ui'
 import type { ArrayAddActionConfig } from '@rpg/ui/form'
 
@@ -72,7 +73,7 @@ export function buildGrantArrayAddMenu(grantTypes: readonly GrantType[]): GrantA
       description: template.description,
       groupId: template.groupId,
       searchTerms: buildTemplateSearchTerms(template),
-      appendDefaults: template.createDefault,
+      appendDefaults: () => ({ id: createGrantRowId(), ...template.createDefault() }),
       isDuplicate: buildIsDuplicate(template),
       duplicatePolicy: resolveGrantTemplateDuplicatePolicy(template),
     })),

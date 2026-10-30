@@ -234,6 +234,7 @@ describe('resolveProficiencyStepModel', () => {
           {
             grants: [
               {
+                id: 'skill-proficiency-1',
                 kind: 'skillProficiency',
                 grant: {
                   kind: 'choice',
@@ -272,6 +273,7 @@ describe('resolveProficiencyStepModel', () => {
           {
             grants: [
               {
+                id: 'skill-proficiency-2',
                 kind: 'skillProficiency',
                 grant: {
                   kind: 'choice',

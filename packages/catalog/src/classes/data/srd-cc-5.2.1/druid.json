@@ -222,6 +222,7 @@
         {
           "grants": [
             {
+              "id": "spellcasting",
               "kind": "spellcasting"
             }
           ]
@@ -238,12 +239,14 @@
         {
           "grants": [
             {
+              "id": "speak-with-animals-spells",
               "kind": "spells",
               "ability": "wis",
               "spellIds": ["speak-with-animals"],
               "availability": "always_prepared"
             },
             {
+              "id": "druidic-language",
               "kind": "languages",
               "languageIds": ["druidic"]
             }
@@ -313,6 +316,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -344,6 +348,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -363,6 +368,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -388,6 +394,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -413,6 +420,7 @@
         {
           "grants": [
             {
+              "id": "epic-boon-feat",
               "kind": "featChoice",
               "category": "epic-boon",
               "choose": 1,

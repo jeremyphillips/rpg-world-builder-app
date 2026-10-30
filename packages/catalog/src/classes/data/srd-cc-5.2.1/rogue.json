@@ -152,10 +152,12 @@
         {
           "grants": [
             {
+              "id": "thieves-cant-language",
               "kind": "languages",
               "languageIds": ["thieves-cant"]
             },
             {
+              "id": "language-choice",
               "kind": "languageChoice",
               "choose": 1,
               "categories": ["standard"]
@@ -218,6 +220,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -261,6 +264,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -280,6 +284,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -305,6 +310,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -336,6 +342,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -361,6 +368,7 @@
         {
           "grants": [
             {
+              "id": "epic-boon-feat",
               "kind": "featChoice",
               "category": "epic-boon",
               "choose": 1,

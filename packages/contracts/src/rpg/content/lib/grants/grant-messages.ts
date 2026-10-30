@@ -38,6 +38,10 @@ export const grantValidationMessages = {
     'validation.grant.grantGroupsSortedByUnlock',
     () => 'Grant groups must be sorted by unlock level, lowest first.',
   ),
+  grantRowIdsUnique: defineMessage(
+    'validation.grant.grantRowIdsUnique',
+    () => 'Grant row ids must be unique within the trait or feature.',
+  ),
   grantTraitSingleAtomicGrant: defineMessage(
     'validation.grant.grantTraitSingleAtomicGrant',
     () =>

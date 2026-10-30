@@ -35,6 +35,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 60
@@ -64,10 +65,12 @@
             {
               "grants": [
                 {
+                  "id": "acid-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["acid"]
                 },
                 {
+                  "id": "acid-resistance",
                   "kind": "resistances",
                   "damageTypes": ["acid"]
                 }
@@ -84,10 +87,12 @@
             {
               "grants": [
                 {
+                  "id": "lightning-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["lightning"]
                 },
                 {
+                  "id": "lightning-resistance",
                   "kind": "resistances",
                   "damageTypes": ["lightning"]
                 }
@@ -104,10 +109,12 @@
             {
               "grants": [
                 {
+                  "id": "fire-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["fire"]
                 },
                 {
+                  "id": "fire-resistance",
                   "kind": "resistances",
                   "damageTypes": ["fire"]
                 }
@@ -124,10 +131,12 @@
             {
               "grants": [
                 {
+                  "id": "lightning-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["lightning"]
                 },
                 {
+                  "id": "lightning-resistance",
                   "kind": "resistances",
                   "damageTypes": ["lightning"]
                 }
@@ -144,10 +153,12 @@
             {
               "grants": [
                 {
+                  "id": "acid-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["acid"]
                 },
                 {
+                  "id": "acid-resistance",
                   "kind": "resistances",
                   "damageTypes": ["acid"]
                 }
@@ -164,10 +175,12 @@
             {
               "grants": [
                 {
+                  "id": "fire-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["fire"]
                 },
                 {
+                  "id": "fire-resistance",
                   "kind": "resistances",
                   "damageTypes": ["fire"]
                 }
@@ -184,10 +197,12 @@
             {
               "grants": [
                 {
+                  "id": "poison-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["poison"]
                 },
                 {
+                  "id": "poison-resistance",
                   "kind": "resistances",
                   "damageTypes": ["poison"]
                 }
@@ -204,10 +219,12 @@
             {
               "grants": [
                 {
+                  "id": "fire-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["fire"]
                 },
                 {
+                  "id": "fire-resistance",
                   "kind": "resistances",
                   "damageTypes": ["fire"]
                 }
@@ -224,10 +241,12 @@
             {
               "grants": [
                 {
+                  "id": "cold-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["cold"]
                 },
                 {
+                  "id": "cold-resistance",
                   "kind": "resistances",
                   "damageTypes": ["cold"]
                 }
@@ -244,10 +263,12 @@
             {
               "grants": [
                 {
+                  "id": "cold-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["cold"]
                 },
                 {
+                  "id": "cold-resistance",
                   "kind": "resistances",
                   "damageTypes": ["cold"]
                 }
@@ -287,6 +308,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 120
@@ -304,6 +326,7 @@
           {
             "grants": [
               {
+                "id": "poison-resistance",
                 "kind": "resistances",
                 "damageTypes": ["poison"]
               }
@@ -354,6 +377,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 60
@@ -377,6 +401,7 @@
           {
             "grants": [
               {
+                "id": "skill-proficiency",
                 "kind": "skillProficiency",
                 "grant": {
                   "kind": "choice",
@@ -412,11 +437,13 @@
             {
               "grants": [
                 {
+                  "id": "darkvision",
                   "kind": "sense",
                   "type": "darkvision",
                   "range": 120
                 },
                 {
+                  "id": "dancing-lights-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["dancing-lights"],
@@ -433,6 +460,7 @@
               },
               "grants": [
                 {
+                  "id": "faerie-fire-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["faerie-fire"],
@@ -449,6 +477,7 @@
               },
               "grants": [
                 {
+                  "id": "darkness-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["darkness"],
@@ -470,6 +499,7 @@
             {
               "grants": [
                 {
+                  "id": "prestidigitation-spells",
                   "kind": "spells",
                   "ability": "int",
                   "spellIds": ["prestidigitation"],
@@ -486,6 +516,7 @@
               },
               "grants": [
                 {
+                  "id": "detect-magic-spells",
                   "kind": "spells",
                   "ability": "int",
                   "spellIds": ["detect-magic"],
@@ -502,6 +533,7 @@
               },
               "grants": [
                 {
+                  "id": "misty-step-spells",
                   "kind": "spells",
                   "ability": "int",
                   "spellIds": ["misty-step"],
@@ -523,12 +555,14 @@
             {
               "grants": [
                 {
+                  "id": "walk-movement",
                   "kind": "movement",
                   "mode": "walk",
                   "operation": "increase",
                   "feet": 5
                 },
                 {
+                  "id": "druidcraft-spells",
                   "kind": "spells",
                   "ability": "wis",
                   "spellIds": ["druidcraft"],
@@ -545,6 +579,7 @@
               },
               "grants": [
                 {
+                  "id": "longstrider-spells",
                   "kind": "spells",
                   "ability": "wis",
                   "spellIds": ["longstrider"],
@@ -561,6 +596,7 @@
               },
               "grants": [
                 {
+                  "id": "pass-without-trace-spells",
                   "kind": "spells",
                   "ability": "wis",
                   "spellIds": ["pass-without-trace"],
@@ -607,6 +643,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 60
@@ -636,6 +673,7 @@
             {
               "grants": [
                 {
+                  "id": "minor-illusion-spells",
                   "kind": "spells",
                   "ability": "wis",
                   "spellIds": ["minor-illusion"],
@@ -645,6 +683,7 @@
                   }
                 },
                 {
+                  "id": "speak-with-animals-spells",
                   "kind": "spells",
                   "ability": "wis",
                   "spellIds": ["speak-with-animals"],
@@ -667,6 +706,7 @@
             {
               "grants": [
                 {
+                  "id": "mending-spells",
                   "kind": "spells",
                   "ability": "int",
                   "spellIds": ["mending", "prestidigitation"],
@@ -737,6 +777,7 @@
             {
               "grants": [
                 {
+                  "id": "fire-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["fire"]
                 }
@@ -753,6 +794,7 @@
             {
               "grants": [
                 {
+                  "id": "cold-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["cold"]
                 }
@@ -781,6 +823,7 @@
             {
               "grants": [
                 {
+                  "id": "thunder-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["thunder"]
                 }
@@ -876,6 +919,7 @@
           {
             "grants": [
               {
+                "id": "skill-proficiency",
                 "kind": "skillProficiency",
                 "grant": {
                   "kind": "choice",
@@ -898,6 +942,7 @@
           {
             "grants": [
               {
+                "id": "origin-feat",
                 "kind": "featChoice",
                 "category": "origin",
                 "choose": 1,
@@ -944,6 +989,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 120
@@ -987,6 +1033,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 60
@@ -1004,6 +1051,7 @@
           {
             "grants": [
               {
+                "id": "thaumaturgy-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["thaumaturgy"],
@@ -1031,10 +1079,12 @@
             {
               "grants": [
                 {
+                  "id": "poison-resistance",
                   "kind": "resistances",
                   "damageTypes": ["poison"]
                 },
                 {
+                  "id": "poison-spray-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["poison-spray"],
@@ -1051,6 +1101,7 @@
               },
               "grants": [
                 {
+                  "id": "ray-of-sickness-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["ray-of-sickness"],
@@ -1067,6 +1118,7 @@
               },
               "grants": [
                 {
+                  "id": "hold-person-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["hold-person"],
@@ -1088,10 +1140,12 @@
             {
               "grants": [
                 {
+                  "id": "necrotic-resistance",
                   "kind": "resistances",
                   "damageTypes": ["necrotic"]
                 },
                 {
+                  "id": "chill-touch-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["chill-touch"],
@@ -1108,6 +1162,7 @@
               },
               "grants": [
                 {
+                  "id": "false-life-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["false-life"],
@@ -1124,6 +1179,7 @@
               },
               "grants": [
                 {
+                  "id": "ray-of-enfeeblement-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["ray-of-enfeeblement"],
@@ -1145,10 +1201,12 @@
             {
               "grants": [
                 {
+                  "id": "fire-resistance",
                   "kind": "resistances",
                   "damageTypes": ["fire"]
                 },
                 {
+                  "id": "fire-bolt-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["fire-bolt"],
@@ -1165,6 +1223,7 @@
               },
               "grants": [
                 {
+                  "id": "hellish-rebuke-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["hellish-rebuke"],
@@ -1181,6 +1240,7 @@
               },
               "grants": [
                 {
+                  "id": "darkness-spells",
                   "kind": "spells",
                   "ability": "cha",
                   "spellIds": ["darkness"],

@@ -114,6 +114,7 @@ describe('SRD 5.2.1 species seed', () => {
     const defaultGrants = woodElf.grantGroups?.[0]?.grants ?? []
     const speedGrant = defaultGrants.find((g) => g.kind === 'movement')
     expect(speedGrant).toEqual({
+      id: 'walk-movement',
       kind: 'movement',
       mode: 'walk',
       operation: 'increase',

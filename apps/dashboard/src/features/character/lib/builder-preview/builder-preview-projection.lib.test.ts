@@ -131,7 +131,7 @@ describe('builder-preview-projection.lib', () => {
           id: 'spellcasting',
           name: 'Spellcasting',
           level: 1,
-          grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+          grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' }] }],
         },
       ],
       spellcasting: {

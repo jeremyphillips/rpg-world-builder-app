@@ -21,7 +21,7 @@ const spellcastingGrantFeature = {
   id: 'spellcasting',
   name: 'Spellcasting',
   level: 1,
-  grantGroups: [{ grants: [{ kind: 'spellcasting' as const }] }],
+  grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
 }
 
 describe('spellcastingSchema', () => {

@@ -161,6 +161,7 @@ describe('grant sentence formatters', () => {
   it('formats spell grants with usage-frequency cadence prose', () => {
     expect(
       formatSpellsGrantSentence({
+        id: 'spells-1',
         kind: 'spells',
         ability: 'cha',
         casting: { mode: 'free_cast', frequency: 'at_will' },
@@ -171,6 +172,7 @@ describe('grant sentence formatters', () => {
     expect(
       formatSpellsGrantSentence(
         {
+          id: 'spells-2',
           kind: 'spells',
           ability: 'cha',
           casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
@@ -183,6 +185,7 @@ describe('grant sentence formatters', () => {
     expect(
       formatSpellsGrantSentence(
         {
+          id: 'spells-3',
           kind: 'spells',
           ability: 'wis',
           availability: 'always_prepared',
@@ -211,7 +214,9 @@ describe('grantContentTraitSchema', () => {
     const trait = {
       kind: 'grant' as const,
       id: 'darkvision',
-      grantGroups: [{ grants: [{ kind: 'sense' as const, type: 'darkvision', range: 60 }] }],
+      grantGroups: [
+        { grants: [{ id: 'sense-4', kind: 'sense' as const, type: 'darkvision', range: 60 }] },
+      ],
     }
     expect(grantContentTraitSchema.parse(trait)).toEqual(trait)
   })
@@ -220,7 +225,9 @@ describe('grantContentTraitSchema', () => {
     const trait = {
       kind: 'grant' as const,
       id: 'darkvision-superior',
-      grantGroups: [{ grants: [{ kind: 'sense' as const, type: 'darkvision', range: 120 }] }],
+      grantGroups: [
+        { grants: [{ id: 'sense-5', kind: 'sense' as const, type: 'darkvision', range: 120 }] },
+      ],
       nameOverride: 'Superior Darkvision',
     }
     expect(grantContentTraitSchema.parse(trait)).toEqual(trait)
@@ -234,8 +241,9 @@ describe('grantContentTraitSchema', () => {
         grantGroups: [
           {
             grants: [
-              { kind: 'sense', type: 'darkvision', range: 120 },
+              { id: 'sense-6', kind: 'sense', type: 'darkvision', range: 120 },
               {
+                id: 'spells-7',
                 kind: 'spells',
                 ability: 'cha',
                 casting: { mode: 'free_cast', frequency: 'at_will' },
@@ -257,6 +265,7 @@ describe('grantContentTraitSchema', () => {
           {
             grants: [
               {
+                id: 'spells-8',
                 kind: 'spells',
                 ability: 'cha',
                 casting: { mode: 'free_cast', frequency: 'at_will' },
@@ -276,7 +285,9 @@ describe('contentTraitSchema', () => {
       contentTraitSchema.parse({
         kind: 'grant',
         id: 'darkvision',
-        grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+        grantGroups: [
+          { grants: [{ id: 'sense-9', kind: 'sense', type: 'darkvision', range: 60 }] },
+        ],
       }),
     ).toMatchObject({ kind: 'grant', id: 'darkvision' })
 
@@ -295,7 +306,9 @@ describe('contentTraitSchema', () => {
       id: 'darkvision',
       name: 'Darkvision',
       description: '<p>You have Darkvision with a range of 60 feet.</p>',
-      grantGroups: [{ grants: [{ kind: 'sense' as const, type: 'darkvision', range: 60 }] }],
+      grantGroups: [
+        { grants: [{ id: 'sense-10', kind: 'sense' as const, type: 'darkvision', range: 60 }] },
+      ],
     }
     expect(contentTraitSchema.parse(trait)).toEqual({
       ...trait,
@@ -310,7 +323,9 @@ describe('normalizeContentTrait', () => {
       normalizeContentTrait({
         kind: 'grant',
         id: 'darkvision',
-        grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+        grantGroups: [
+          { grants: [{ id: 'sense-11', kind: 'sense', type: 'darkvision', range: 60 }] },
+        ],
       }),
     ).toMatchObject({ kind: 'grant' })
   })
@@ -322,7 +337,9 @@ describe('resolveTraitDisplay', () => {
       contentTraitSchema.parse({
         kind: 'grant',
         id: 'darkvision',
-        grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+        grantGroups: [
+          { grants: [{ id: 'sense-12', kind: 'sense', type: 'darkvision', range: 60 }] },
+        ],
       }),
     )
     expect(display.name).toBe('Darkvision')
@@ -334,7 +351,9 @@ describe('resolveTraitDisplay', () => {
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'darkvision',
-        grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 120 }] }],
+        grantGroups: [
+          { grants: [{ id: 'sense-13', kind: 'sense', type: 'darkvision', range: 120 }] },
+        ],
         nameOverride: 'Superior Darkvision',
         descriptionOverride: '<p>Custom homebrew wording.</p>',
       }),
@@ -350,7 +369,10 @@ describe('resolveTraitDisplay', () => {
 
 describe('contentGrantSchema — sense', () => {
   it('parses a sense grant', () => {
-    expect(contentGrantSchema.parse({ kind: 'sense', type: 'darkvision', range: 60 })).toEqual({
+    expect(
+      contentGrantSchema.parse({ id: 'sense-14', kind: 'sense', type: 'darkvision', range: 60 }),
+    ).toEqual({
+      id: 'sense-14',
       kind: 'sense',
       type: 'darkvision',
       range: 60,
@@ -360,23 +382,35 @@ describe('contentGrantSchema — sense', () => {
 
 describe('contentGrantSchema — resistances', () => {
   it('parses a resistances grant', () => {
-    expect(contentGrantSchema.parse({ kind: 'resistances', damageTypes: ['fire'] })).toEqual({
+    expect(
+      contentGrantSchema.parse({
+        id: 'resistances-16',
+        kind: 'resistances',
+        damageTypes: ['fire'],
+      }),
+    ).toEqual({
+      id: 'resistances-16',
       kind: 'resistances',
       damageTypes: ['fire'],
     })
   })
   it('rejects empty damageTypes', () => {
-    expect(contentGrantSchema.safeParse({ kind: 'resistances', damageTypes: [] }).success).toBe(
-      false,
-    )
+    expect(
+      contentGrantSchema.safeParse({ id: 'resistances-18', kind: 'resistances', damageTypes: [] })
+        .success,
+    ).toBe(false)
   })
 })
 
 describe('contentGrantSchema — damageType', () => {
   it('parses a damageType grant', () => {
-    expect(contentGrantSchema.parse({ kind: 'damageType', damageTypes: ['fire', 'acid'] })).toEqual(
-      { kind: 'damageType', damageTypes: ['fire', 'acid'] },
-    )
+    expect(
+      contentGrantSchema.parse({
+        id: 'damage-type-19',
+        kind: 'damageType',
+        damageTypes: ['fire', 'acid'],
+      }),
+    ).toEqual({ id: 'damage-type-19', kind: 'damageType', damageTypes: ['fire', 'acid'] })
   })
 })
 
@@ -384,12 +418,14 @@ describe('contentGrantSchema — movement', () => {
   it('parses a walk speed increase', () => {
     expect(
       contentGrantSchema.parse({
+        id: 'movement-21',
         kind: 'movement',
         mode: 'walk',
         operation: 'increase',
         feet: 5,
       }),
     ).toEqual({
+      id: 'movement-21',
       kind: 'movement',
       mode: 'walk',
       operation: 'increase',
@@ -402,10 +438,12 @@ describe('contentGrantSchema — weaponProficiency', () => {
   it('parses a weapon proficiency grant', () => {
     expect(
       contentGrantSchema.parse({
+        id: 'weapon-proficiency-23',
         kind: 'weaponProficiency',
         grant: { kind: 'fixed', weaponCategories: ['simple'] },
       }),
     ).toEqual({
+      id: 'weapon-proficiency-23',
       kind: 'weaponProficiency',
       grant: { kind: 'fixed', weaponCategories: ['simple'] },
     })
@@ -416,10 +454,12 @@ describe('contentGrantSchema — skillProficiency', () => {
   it('parses a skill proficiency grant', () => {
     expect(
       contentGrantSchema.parse({
+        id: 'skill-proficiency-25',
         kind: 'skillProficiency',
         grant: { kind: 'fixed', skillIds: ['athletics', 'stealth'] },
       }),
     ).toEqual({
+      id: 'skill-proficiency-25',
       kind: 'skillProficiency',
       grant: { kind: 'fixed', skillIds: ['athletics', 'stealth'] },
     })
@@ -429,24 +469,41 @@ describe('contentGrantSchema — skillProficiency', () => {
 describe('contentGrantSchema — languages', () => {
   it('parses a languages grant', () => {
     expect(
-      contentGrantSchema.parse({ kind: 'languages', languageIds: ['common', 'elvish'] }),
-    ).toEqual({ kind: 'languages', languageIds: ['common', 'elvish'] })
+      contentGrantSchema.parse({
+        id: 'languages-27',
+        kind: 'languages',
+        languageIds: ['common', 'elvish'],
+      }),
+    ).toEqual({ id: 'languages-27', kind: 'languages', languageIds: ['common', 'elvish'] })
   })
   it('rejects empty languageIds', () => {
-    expect(contentGrantSchema.safeParse({ kind: 'languages', languageIds: [] }).success).toBe(false)
+    expect(
+      contentGrantSchema.safeParse({ id: 'languages-29', kind: 'languages', languageIds: [] })
+        .success,
+    ).toBe(false)
   })
 })
 
 describe('contentGrantSchema — languageChoice', () => {
   it('parses with categories', () => {
-    expect(contentGrantSchema.parse({ kind: 'languageChoice', categories: ['standard'] })).toEqual({
+    expect(
+      contentGrantSchema.parse({
+        id: 'language-choice-30',
+        kind: 'languageChoice',
+        categories: ['standard'],
+      }),
+    ).toEqual({
+      id: 'language-choice-30',
       kind: 'languageChoice',
       choose: 1,
       categories: ['standard'],
     })
   })
   it('rejects without from or categories', () => {
-    expect(contentGrantSchema.safeParse({ kind: 'languageChoice', choose: 1 }).success).toBe(false)
+    expect(
+      contentGrantSchema.safeParse({ id: 'language-choice-32', kind: 'languageChoice', choose: 1 })
+        .success,
+    ).toBe(false)
   })
 })
 
@@ -454,15 +511,23 @@ describe('contentGrantSchema — featChoice', () => {
   it('parses a feat choice grant', () => {
     expect(
       contentGrantSchema.parse({
+        id: 'feat-choice-33',
         kind: 'featChoice',
         category: 'general',
         allowAnyQualifying: true,
       }),
-    ).toEqual({ kind: 'featChoice', category: 'general', choose: 1, allowAnyQualifying: true })
+    ).toEqual({
+      id: 'feat-choice-33',
+      kind: 'featChoice',
+      category: 'general',
+      choose: 1,
+      allowAnyQualifying: true,
+    })
   })
   it('rejects allowAnyQualifying on non-eligible categories', () => {
     expect(
       contentGrantSchema.safeParse({
+        id: 'feat-choice-35',
         kind: 'featChoice',
         category: 'fighting-style',
         allowAnyQualifying: true,
@@ -475,10 +540,15 @@ describe('contentGrantSchema — equipment', () => {
   it('parses a granted equipment item', () => {
     expect(
       contentGrantSchema.parse({
+        id: 'equipment-36',
         kind: 'equipment',
         grant: { kind: 'grant', equipmentSlug: 'dagger', quantity: 1 },
       }),
-    ).toMatchObject({ kind: 'equipment', grant: { kind: 'grant', equipmentSlug: 'dagger' } })
+    ).toMatchObject({
+      id: 'equipment-36',
+      kind: 'equipment',
+      grant: { kind: 'grant', equipmentSlug: 'dagger' },
+    })
   })
 })
 
@@ -486,12 +556,14 @@ describe('contentGrantSchema — spells', () => {
   it('parses an always_prepared spells grant', () => {
     expect(
       contentGrantSchema.parse({
+        id: 'spells-38',
         kind: 'spells',
         ability: 'wis',
         availability: 'always_prepared',
         spellIds: ['bless', 'cure-wounds'],
       }),
     ).toEqual({
+      id: 'spells-38',
       kind: 'spells',
       ability: 'wis',
       availability: 'always_prepared',
@@ -502,12 +574,14 @@ describe('contentGrantSchema — spells', () => {
   it('parses a free_cast spells grant with frequency', () => {
     expect(
       contentGrantSchema.parse({
+        id: 'spells-40',
         kind: 'spells',
         ability: 'cha',
         casting: { mode: 'free_cast', frequency: 'at_will' },
         spellIds: ['dancing-lights'],
       }),
     ).toEqual({
+      id: 'spells-40',
       kind: 'spells',
       ability: 'cha',
       casting: { mode: 'free_cast', frequency: 'at_will' },
@@ -518,6 +592,7 @@ describe('contentGrantSchema — spells', () => {
   it('rejects availability with top-level frequency alias', () => {
     expect(
       contentGrantSchema.safeParse({
+        id: 'spells-42',
         kind: 'spells',
         ability: 'wis',
         availability: 'always_prepared',
@@ -530,6 +605,7 @@ describe('contentGrantSchema — spells', () => {
   it('rejects grants without availability or casting', () => {
     expect(
       contentGrantSchema.safeParse({
+        id: 'spells-43',
         kind: 'spells',
         ability: 'wis',
         spellIds: ['bless'],
@@ -540,6 +616,7 @@ describe('contentGrantSchema — spells', () => {
   it('rejects allowsSlotCasting without availability', () => {
     expect(
       contentGrantSchema.safeParse({
+        id: 'spells-44',
         kind: 'spells',
         ability: 'wis',
         spellIds: ['bless'],
@@ -555,6 +632,7 @@ describe('contentGrantSchema — spells', () => {
   it('rejects empty spellIds', () => {
     expect(
       contentGrantSchema.safeParse({
+        id: 'spells-45',
         kind: 'spells',
         ability: 'wis',
         availability: 'always_prepared',
@@ -569,8 +647,9 @@ describe('contentGrantSchema — spells', () => {
 // ---------------------------------------------------------------------------
 
 describe('grantGroupsSchema', () => {
-  const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+  const senseGrant = { id: 'sense-46', kind: 'sense' as const, type: 'darkvision', range: 60 }
   const spellGrant = {
+    id: 'spells-47',
     kind: 'spells' as const,
     ability: 'cha' as const,
     casting: { mode: 'free_cast' as const, frequency: 'at_will' as const },
@@ -586,12 +665,19 @@ describe('grantGroupsSchema', () => {
   })
 
   it('accepts default group followed by ascending level groups', () => {
+    const laterSpellGrant = { ...spellGrant, id: 'spells-later' }
     const groups = [
       { grants: [senseGrant] },
       { unlock: { level: 3 }, grants: [spellGrant] },
-      { unlock: { level: 5 }, grants: [spellGrant] },
+      { unlock: { level: 5 }, grants: [laterSpellGrant] },
     ]
     expect(grantGroupsSchema.parse(groups)).toEqual(groups)
+  })
+
+  it('rejects duplicate grant row ids within an owner', () => {
+    expect(grantGroupsSchema.safeParse([{ grants: [senseGrant, { ...senseGrant }] }]).success).toBe(
+      false,
+    )
   })
 
   it('rejects two default groups', () => {
@@ -634,11 +720,13 @@ describe('grantGroupsSchema', () => {
 
 describe('normalizeGrantGroups', () => {
   const grantA: Parameters<typeof normalizeGrantGroups>[0][number]['grants'][number] = {
+    id: 'sense-48',
     kind: 'sense',
     type: 'darkvision',
     range: 60,
   }
   const grantB: Parameters<typeof normalizeGrantGroups>[0][number]['grants'][number] = {
+    id: 'resistances-49',
     kind: 'resistances',
     damageTypes: ['fire'],
   }
@@ -689,8 +777,9 @@ describe('normalizeGrantGroups', () => {
 
 describe('flattenGrantGroups', () => {
   it('flattens groups into { grant, unlock? } pairs', () => {
-    const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+    const senseGrant = { id: 'sense-50', kind: 'sense' as const, type: 'darkvision', range: 60 }
     const spellGrant = {
+      id: 'spells-51',
       kind: 'spells' as const,
       ability: 'cha' as const,
       casting: { mode: 'free_cast' as const, frequency: 'at_will' as const },
@@ -714,7 +803,7 @@ describe('flattenGrantGroups', () => {
 // ---------------------------------------------------------------------------
 
 describe('getGrantGroupEffectiveUnlock', () => {
-  const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+  const senseGrant = { id: 'sense-52', kind: 'sense' as const, type: 'darkvision', range: 60 }
 
   it('returns the group unlock when present', () => {
     expect(getGrantGroupEffectiveUnlock({ unlock: { level: 5 }, grants: [senseGrant] })).toEqual({
@@ -738,14 +827,16 @@ describe('getGrantGroupEffectiveUnlock', () => {
 // ---------------------------------------------------------------------------
 
 describe('getUnlockedGrantsAtLevel', () => {
-  const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+  const senseGrant = { id: 'sense-53', kind: 'sense' as const, type: 'darkvision', range: 60 }
   const spellGrant3 = {
+    id: 'spells-54',
     kind: 'spells' as const,
     ability: 'cha' as const,
     casting: { mode: 'free_cast' as const, frequency: 'once_per_long_rest' as const },
     spellIds: ['faerie-fire'],
   }
   const spellGrant5 = {
+    id: 'spells-55',
     kind: 'spells' as const,
     ability: 'cha' as const,
     casting: { mode: 'free_cast' as const, frequency: 'once_per_long_rest' as const },
@@ -785,8 +876,9 @@ describe('getUnlockedGrantsAtLevel', () => {
 // ---------------------------------------------------------------------------
 
 describe('isGrantGroupsEligible', () => {
-  const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+  const senseGrant = { id: 'sense-56', kind: 'sense' as const, type: 'darkvision', range: 60 }
   const spellGrant = {
+    id: 'spells-57',
     kind: 'spells' as const,
     ability: 'cha' as const,
     casting: { mode: 'free_cast' as const, frequency: 'at_will' as const },
@@ -799,7 +891,9 @@ describe('isGrantGroupsEligible', () => {
 
   it('accepts a single default group with one resistances grant', () => {
     expect(
-      isGrantGroupsEligible([{ grants: [{ kind: 'resistances', damageTypes: ['fire'] }] }]),
+      isGrantGroupsEligible([
+        { grants: [{ id: 'resistances-58', kind: 'resistances', damageTypes: ['fire'] }] },
+      ]),
     ).toBe(true)
   })
 
@@ -807,7 +901,9 @@ describe('isGrantGroupsEligible', () => {
     expect(
       isGrantGroupsEligible([
         {
-          grants: [{ kind: 'movement', mode: 'walk', operation: 'increase', feet: 5 }],
+          grants: [
+            { id: 'movement-59', kind: 'movement', mode: 'walk', operation: 'increase', feet: 5 },
+          ],
         },
       ]),
     ).toBe(true)
@@ -815,7 +911,9 @@ describe('isGrantGroupsEligible', () => {
 
   it('accepts a single default group with one languages grant', () => {
     expect(
-      isGrantGroupsEligible([{ grants: [{ kind: 'languages', languageIds: ['elvish'] }] }]),
+      isGrantGroupsEligible([
+        { grants: [{ id: 'languages-60', kind: 'languages', languageIds: ['elvish'] }] },
+      ]),
     ).toBe(true)
   })
 
@@ -835,7 +933,12 @@ describe('isGrantGroupsEligible', () => {
   it('rejects a group with multiple grants', () => {
     expect(
       isGrantGroupsEligible([
-        { grants: [senseGrant, { kind: 'resistances', damageTypes: ['fire'] }] },
+        {
+          grants: [
+            senseGrant,
+            { id: 'resistances-61', kind: 'resistances', damageTypes: ['fire'] },
+          ],
+        },
       ]),
     ).toBe(false)
   })
@@ -853,10 +956,12 @@ describe('resolveGrantGroupsFromContent', () => {
   it('returns normalized grantGroups on custom content', () => {
     const groups = resolveGrantGroupsFromContent({
       kind: 'custom',
-      grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+      grantGroups: [{ grants: [{ id: 'sense-62', kind: 'sense', type: 'darkvision', range: 60 }] }],
     })
 
-    expect(groups).toEqual([{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }])
+    expect(groups).toEqual([
+      { grants: [{ id: 'sense-62', kind: 'sense', type: 'darkvision', range: 60 }] },
+    ])
   })
 
   it('returns an empty array when grantGroups is absent', () => {
@@ -866,10 +971,12 @@ describe('resolveGrantGroupsFromContent', () => {
   it('normalizes grant-kind traits from grantGroups', () => {
     const groups = resolveGrantGroupsFromContent({
       kind: 'grant',
-      grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+      grantGroups: [{ grants: [{ id: 'sense-64', kind: 'sense', type: 'darkvision', range: 60 }] }],
     })
 
-    expect(groups).toEqual([{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }])
+    expect(groups).toEqual([
+      { grants: [{ id: 'sense-64', kind: 'sense', type: 'darkvision', range: 60 }] },
+    ])
   })
 
   it('resolves class-feature-shaped content with parent unlock', () => {
@@ -881,6 +988,7 @@ describe('resolveGrantGroupsFromContent', () => {
             unlock: { level: 3 },
             grants: [
               {
+                id: 'spells-66',
                 kind: 'spells',
                 ability: 'wis',
                 availability: 'always_prepared',
@@ -898,6 +1006,7 @@ describe('resolveGrantGroupsFromContent', () => {
         unlock: { level: 3 },
         grants: [
           {
+            id: 'spells-66',
             kind: 'spells',
             ability: 'wis',
             availability: 'always_prepared',

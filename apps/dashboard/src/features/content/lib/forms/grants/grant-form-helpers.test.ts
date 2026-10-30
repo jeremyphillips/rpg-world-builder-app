@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { GrantGroups } from '@rpg/contracts'
+import { isOpaqueGrantRowId, type GrantGroups } from '@rpg/contracts'
 import {
   isContainer,
   resolveColumnsCollapseSequence,
@@ -30,6 +30,7 @@ import {
   GRANT_TYPE_LABELS,
   GRANT_DEFAULT_UNLOCK_LEVEL,
 } from './grant-form-schema'
+import { buildGrantArrayAddMenu } from './grant-add-menu.lib'
 import { formRowsToGrantGroups, grantGroupsToFormRows } from './grant-form-values'
 
 function formItemKey(item: FormItem | RowConfig, index: number, namePrefix?: string): string {
@@ -157,6 +158,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
       {
         grants: [
           {
+            id: 'spells-1',
             kind: 'spells',
             ability: 'cha',
             casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
@@ -185,6 +187,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
         unlock: { level: 5 },
         grants: [
           {
+            id: 'spells-2',
             kind: 'spells',
             ability: 'wis',
             availability: 'always_prepared',
@@ -205,6 +208,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
       {
         grants: [
           {
+            id: 'spells-3',
             kind: 'spells',
             ability: 'cha',
             availability: 'always_prepared',
@@ -244,8 +248,10 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
     expect(groups).toHaveLength(2)
     expect(groups[0]?.unlock).toBeUndefined()
     expect(groups[0]?.grants[0]).toMatchObject({ kind: 'spells', spellIds: ['dancing-lights'] })
+    expect(isOpaqueGrantRowId(groups[0]?.grants[0]?.id ?? '')).toBe(true)
     expect(groups[1]?.unlock?.level).toBe(3)
     expect(groups[1]?.grants[0]).toMatchObject({ kind: 'spells', spellIds: ['faerie-fire'] })
+    expect(isOpaqueGrantRowId(groups[1]?.grants[0]?.id ?? '')).toBe(true)
   })
 
   it('normalizes unlock level equal to parentUnlock to default group', () => {
@@ -270,6 +276,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
       {
         grants: [
           {
+            id: 'tool-proficiency-6',
             kind: 'toolProficiency',
             grant: {
               kind: 'fixed',
@@ -293,6 +300,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
       {
         grants: [
           {
+            id: 'skill-proficiency-7',
             kind: 'skillProficiency',
             grant: {
               kind: 'fixed',
@@ -315,6 +323,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
       {
         grants: [
           {
+            id: 'weapon-proficiency-8',
             kind: 'weaponProficiency',
             grant: {
               kind: 'choice',
@@ -339,6 +348,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
       {
         grants: [
           {
+            id: 'armor-training-9',
             kind: 'armorTraining',
             grant: {
               kind: 'fixed',
@@ -360,7 +370,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
   it('expands languages grant with multiple ids into multiple rows', () => {
     const groups: GrantGroups = [
       {
-        grants: [{ kind: 'languages', languageIds: ['common', 'elvish'] }],
+        grants: [{ id: 'languages-10', kind: 'languages', languageIds: ['common', 'elvish'] }],
       },
     ]
     const rows = grantGroupsToFormRows(groups)
@@ -523,5 +533,30 @@ describe('resolveGrantRowPresentation integration', () => {
     expect(presentation?.detail).toBe('Power Word Heal, Power Word Kill')
     expect(presentation?.description).toContain('Power Word Heal')
     expect(presentation?.description).not.toContain('power-word-heal')
+  })
+})
+
+describe('grant row ids', () => {
+  it('round-trips a stored id and gives a new row an opaque id', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [
+          {
+            id: 'darkvision',
+            kind: 'sense',
+            type: 'darkvision',
+            range: 60,
+          },
+        ],
+      },
+    ]
+
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows[0]?.id).toBe('darkvision')
+    expect(formRowsToGrantGroups(rows)).toEqual(groups)
+
+    const added = buildGrantArrayAddMenu(['senses']).items[0]?.appendDefaults()
+    expect(typeof added?.id).toBe('string')
+    expect(isOpaqueGrantRowId(String(added?.id))).toBe(true)
   })
 })

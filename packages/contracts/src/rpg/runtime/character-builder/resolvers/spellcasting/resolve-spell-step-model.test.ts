@@ -40,6 +40,7 @@ const highElfSpecies = {
           {
             grants: [
               {
+                id: 'spells-1',
                 kind: 'spells' as const,
                 ability: 'int' as const,
                 spellIds: ['prestidigitation'],
@@ -51,6 +52,7 @@ const highElfSpecies = {
             unlock: { level: 3 },
             grants: [
               {
+                id: 'spells-2',
                 kind: 'spells' as const,
                 ability: 'int' as const,
                 spellIds: ['detect-magic'],
@@ -65,6 +67,7 @@ const highElfSpecies = {
             unlock: { level: 5 },
             grants: [
               {
+                id: 'spells-3',
                 kind: 'spells' as const,
                 ability: 'int' as const,
                 spellIds: ['misty-step'],
@@ -342,7 +345,7 @@ describe('resolveSpellStepModel', () => {
           id: 'spellcasting',
           name: 'Spellcasting',
           level: 1,
-          grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+          grantGroups: [{ grants: [{ id: 'spellcasting-4', kind: 'spellcasting' }] }],
         },
         {
           kind: 'custom',
@@ -353,6 +356,7 @@ describe('resolveSpellStepModel', () => {
             {
               grants: [
                 {
+                  id: 'spells-5',
                   kind: 'spells',
                   ability: 'wis',
                   spellIds: ['hunters-mark'],

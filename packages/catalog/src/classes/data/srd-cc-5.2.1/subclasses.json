@@ -105,6 +105,7 @@
           {
             "grants": [
               {
+                "id": "aid-spells",
                 "kind": "spells",
                 "ability": "wis",
                 "spellIds": ["aid", "bless", "cure-wounds", "lesser-restoration"],
@@ -118,6 +119,7 @@
             },
             "grants": [
               {
+                "id": "mass-healing-word-spells",
                 "kind": "spells",
                 "ability": "wis",
                 "spellIds": ["mass-healing-word", "revivify"],
@@ -131,6 +133,7 @@
             },
             "grants": [
               {
+                "id": "aura-of-life-spells",
                 "kind": "spells",
                 "ability": "wis",
                 "spellIds": ["aura-of-life", "death-ward"],
@@ -144,6 +147,7 @@
             },
             "grants": [
               {
+                "id": "greater-restoration-spells",
                 "kind": "spells",
                 "ability": "wis",
                 "spellIds": ["greater-restoration", "mass-cure-wounds"],
@@ -252,6 +256,7 @@
           {
             "grants": [
               {
+                "id": "fighting-style-feat",
                 "kind": "featChoice",
                 "category": "fighting-style",
                 "choose": 1
@@ -341,6 +346,7 @@
           {
             "grants": [
               {
+                "id": "protection-from-evil-and-good-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["protection-from-evil-and-good", "shield-of-faith"],
@@ -354,6 +360,7 @@
             },
             "grants": [
               {
+                "id": "aid-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["aid", "zone-of-truth"],
@@ -367,6 +374,7 @@
             },
             "grants": [
               {
+                "id": "beacon-of-hope-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["beacon-of-hope", "dispel-magic"],
@@ -380,6 +388,7 @@
             },
             "grants": [
               {
+                "id": "freedom-of-movement-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["freedom-of-movement", "guardian-of-faith"],
@@ -393,6 +402,7 @@
             },
             "grants": [
               {
+                "id": "commune-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["commune", "flame-strike"],
@@ -546,6 +556,7 @@
           {
             "grants": [
               {
+                "id": "alter-self-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["alter-self", "chromatic-orb", "command", "dragons-breath"],
@@ -559,6 +570,7 @@
             },
             "grants": [
               {
+                "id": "fear-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["fear", "fly"],
@@ -572,6 +584,7 @@
             },
             "grants": [
               {
+                "id": "arcane-eye-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["arcane-eye", "charm-monster"],
@@ -585,6 +598,7 @@
             },
             "grants": [
               {
+                "id": "legend-lore-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["legend-lore", "summon-dragon"],
@@ -615,6 +629,7 @@
           {
             "grants": [
               {
+                "id": "summon-dragon-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["summon-dragon"],
@@ -657,6 +672,7 @@
           {
             "grants": [
               {
+                "id": "burning-hands-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["burning-hands", "command", "scorching-ray", "suggestion"],
@@ -670,6 +686,7 @@
             },
             "grants": [
               {
+                "id": "fireball-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["fireball", "stinking-cloud"],
@@ -683,6 +700,7 @@
             },
             "grants": [
               {
+                "id": "fire-shield-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["fire-shield", "wall-of-fire"],
@@ -696,6 +714,7 @@
             },
             "grants": [
               {
+                "id": "geas-spells",
                 "kind": "spells",
                 "ability": "cha",
                 "spellIds": ["geas", "insect-plague"],

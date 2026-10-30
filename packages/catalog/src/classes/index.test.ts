@@ -451,7 +451,11 @@ describe('SRD 5.2.1 class seed', () => {
       spellIds: ['speak-with-animals'],
     })
     const druidicLanguage = druidicGrants.find((g) => g.kind === 'languages')
-    expect(druidicLanguage).toEqual({ kind: 'languages', languageIds: ['druidic'] })
+    expect(druidicLanguage).toEqual({
+      id: 'druidic-language',
+      kind: 'languages',
+      languageIds: ['druidic'],
+    })
     const wildShape = druid.features.find((f) => f.id === 'wild-shape')
     expect(wildShape?.description).toContain('<strong>Beast Shapes.</strong>')
     expect(wildShape?.description).toContain('<strong>Game Statistics.</strong>')

@@ -17,7 +17,7 @@ describe('contentGrantToChoiceSets — languageChoice', () => {
 
   it('expands category pools against the catalog vocabulary', () => {
     const [choiceSet] = contentGrantToChoiceSets(
-      { kind: 'languageChoice', choose: 1, categories: ['standard'] },
+      { id: 'language-choice-1', kind: 'languageChoice', choose: 1, categories: ['standard'] },
       {
         sourceType: 'species',
         sourceId: 'srd-cc-5.2.1:elf',
@@ -36,7 +36,12 @@ describe('contentGrantToChoiceSets — languageChoice', () => {
 
   it('resolves explicit language ids from the catalog with vocab fallback', () => {
     const [choiceSet] = contentGrantToChoiceSets(
-      { kind: 'languageChoice', choose: 1, from: ['elvish', 'unknown-language'] },
+      {
+        id: 'language-choice-2',
+        kind: 'languageChoice',
+        choose: 1,
+        from: ['elvish', 'unknown-language'],
+      },
       {
         sourceType: 'species',
         sourceId: 'srd-cc-5.2.1:elf',
@@ -58,6 +63,7 @@ describe('contentGrantToChoiceSets — proficiency pools', () => {
   it('expands any skill pools against the catalog vocabulary', () => {
     const [choiceSet] = contentGrantToChoiceSets(
       {
+        id: 'skill-proficiency-3',
         kind: 'skillProficiency',
         grant: { kind: 'choice', choose: 1, pool: { source: 'any' } },
       },
@@ -79,6 +85,7 @@ describe('contentGrantToChoiceSets — proficiency pools', () => {
   it('expands any tool pools against catalog equipment', () => {
     const [choiceSet] = contentGrantToChoiceSets(
       {
+        id: 'tool-proficiency-4',
         kind: 'toolProficiency',
         grant: { kind: 'choice', choose: 1, pool: { source: 'any' } },
       },

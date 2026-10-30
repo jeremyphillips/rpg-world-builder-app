@@ -190,6 +190,7 @@ function resolveSpellGrantDescription(values: GrantRowValues, ctx: GrantRowHeade
 
   return formatSpellsGrantSentence(
     {
+      id: 'spells',
       kind: 'spells',
       ability: ability as never,
       spellIds,

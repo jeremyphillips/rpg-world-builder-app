@@ -26,7 +26,7 @@ export function unlockedGrantChoiceSets(
   const grants = getUnlockedGrantsAtLevel(groups, level, parentLevel)
 
   return grants.flatMap((grant, index) => {
-    const slot = options.grantSlot?.(grant, index) ?? `${ctx.slot}:${grant.kind}:${index}`
+    const slot = options.grantSlot?.(grant, index) ?? `${ctx.slot}:grant:${grant.id}`
     return contentGrantToChoiceSets(grant, { ...ctx, slot }, catalogIndex)
   })
 }

@@ -217,6 +217,7 @@ describe('resolveNpcStartingChoices', () => {
                   {
                     grants: [
                       {
+                        id: 'skill-proficiency-1',
                         kind: 'skillProficiency' as const,
                         grant: {
                           kind: 'choice' as const,
@@ -272,7 +273,7 @@ describe('resolveNpcStartingChoices', () => {
         ],
       },
     }
-    const keenId = `species:${RULESET}:elf:trait:keen-senses:skillProficiency`
+    const keenId = `species:${RULESET}:elf:trait:keen-senses:grant:skill-proficiency-1`
     const fighterId = buildChoiceSetId('class', `${RULESET}:fighter`, 'class-skills')
     const choices = resolveNpcStartingChoices({
       context: fighterContext,

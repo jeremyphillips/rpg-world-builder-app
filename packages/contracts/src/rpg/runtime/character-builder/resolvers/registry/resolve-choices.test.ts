@@ -108,6 +108,7 @@ describe('resolveAvailableChoices', () => {
             {
               grants: [
                 {
+                  id: 'feat-choice-1',
                   kind: 'featChoice' as const,
                   category: 'origin' as const,
                   choose: 1,
@@ -132,7 +133,7 @@ describe('resolveAvailableChoices', () => {
     })
 
     const featChoice = resolveAvailableChoices(draft, context).find((choiceSet) =>
-      choiceSet.id.includes('featChoice'),
+      choiceSet.id.endsWith(':trait:versatile:grant:feat-choice-1'),
     )
 
     expect(featChoice).toMatchObject({

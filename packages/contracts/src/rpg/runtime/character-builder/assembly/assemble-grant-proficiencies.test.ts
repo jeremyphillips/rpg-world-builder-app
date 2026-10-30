@@ -36,6 +36,7 @@ const speciesWithSkillGrant = {
         {
           grants: [
             {
+              id: 'skill-proficiency-1',
               kind: 'skillProficiency',
               grant: {
                 kind: 'choice',
@@ -115,7 +116,7 @@ describe('assembleGrantSkillProficiencyEntries', () => {
       createCharacterBuildContext(),
     )
     const keenSensesChoiceSet = choiceSets.find((choiceSet) =>
-      choiceSet.id.endsWith(':trait:keen-senses:skillProficiency'),
+      choiceSet.id.endsWith(':trait:keen-senses:grant:skill-proficiency-1'),
     )
 
     expect(keenSensesChoiceSet).toMatchObject({

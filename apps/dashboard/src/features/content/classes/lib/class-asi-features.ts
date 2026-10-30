@@ -1,4 +1,4 @@
-import type { ClassFeature } from '@rpg/contracts'
+import { createGrantRowId, type ClassFeature } from '@rpg/contracts'
 
 export const ABILITY_SCORE_IMPROVEMENT_FEAT_ID = 'ability-score-improvement'
 
@@ -19,6 +19,7 @@ export function createAsiFeature(level: number): ClassFeature {
       {
         grants: [
           {
+            id: createGrantRowId(),
             kind: 'featChoice',
             category: 'general',
             choose: 1,

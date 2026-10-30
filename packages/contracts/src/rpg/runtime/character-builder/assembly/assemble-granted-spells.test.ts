@@ -27,6 +27,7 @@ describe('assembleGrantedSpells', () => {
                     {
                       grants: [
                         {
+                          id: 'spells-1',
                           kind: 'spells',
                           ability: 'cha',
                           casting: { mode: 'free_cast', frequency: 'at_will' },
@@ -57,14 +58,28 @@ describe('assembleGrantedSpells', () => {
     expect(entries).toEqual([
       {
         spellId: 'dancing-lights',
-        sources: [{ kind: 'heritageOption', sourceId: 'srd-cc-5.2.1:elf', grantId: 'drow' }],
+        sources: [
+          {
+            kind: 'heritageOption',
+            sourceId: 'srd-cc-5.2.1:elf',
+            grantId: 'drow',
+            grantRowId: 'spells-1',
+          },
+        ],
         access: { granted: true },
         castingEntitlements: [
           {
             mode: 'free_cast',
             frequency: 'at_will',
             allowsSlotCasting: false,
-            sources: [{ kind: 'heritageOption', sourceId: 'srd-cc-5.2.1:elf', grantId: 'drow' }],
+            sources: [
+              {
+                kind: 'heritageOption',
+                sourceId: 'srd-cc-5.2.1:elf',
+                grantId: 'drow',
+                grantRowId: 'spells-1',
+              },
+            ],
           },
         ],
       },
@@ -92,6 +107,7 @@ describe('assembleGrantedSpells', () => {
                   {
                     grants: [
                       {
+                        id: 'spells-2',
                         kind: 'spells',
                         ability: 'cha',
                         availability: 'always_prepared',

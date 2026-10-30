@@ -339,6 +339,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -388,6 +389,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -425,6 +427,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -462,6 +465,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -487,6 +491,7 @@
         {
           "grants": [
             {
+              "id": "epic-boon-feat",
               "kind": "featChoice",
               "category": "epic-boon",
               "choose": 1,

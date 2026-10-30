@@ -33,7 +33,7 @@ export function resolveClassFeatureGrantChoiceSets(
         {
           parentLevel: feature.level,
           parentUnlock: { level: feature.level },
-          grantSlot: (grant) => `feature:${feature.id}:${grant.kind}`,
+          grantSlot: (grant) => `feature:${feature.id}:grant:${grant.id}`,
         },
       ),
   )

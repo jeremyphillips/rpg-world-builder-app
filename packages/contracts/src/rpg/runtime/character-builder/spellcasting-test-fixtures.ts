@@ -36,7 +36,7 @@ function spellcastingGrantFeature(usesPactMagic = false) {
     id: usesPactMagic ? 'pact-magic' : 'spellcasting',
     name: usesPactMagic ? getSlotProgressionKindLabel('pact-magic') : 'Spellcasting',
     level: 1,
-    grantGroups: [{ grants: [{ kind: 'spellcasting' as const }] }],
+    grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
   }
 }
 

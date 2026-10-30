@@ -240,7 +240,7 @@ const storedWizard: ClassStored = {
       id: 'spellcasting',
       name: 'Spellcasting',
       level: 1,
-      grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+      grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' }] }],
     },
   ],
   characterCreation: {
@@ -700,7 +700,7 @@ describe('deriveEquipmentRecommendations', () => {
           id: 'spellcasting',
           name: 'Spellcasting',
           level: 1,
-          grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+          grantGroups: [{ grants: [{ id: 'spellcasting-2', kind: 'spellcasting' }] }],
         },
       ],
       spellcasting: {

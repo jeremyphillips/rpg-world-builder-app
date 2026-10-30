@@ -153,6 +153,7 @@ describe('classSchema', () => {
             {
               grants: [
                 {
+                  id: 'spells-1',
                   kind: 'spells',
                   ability: 'cha',
                   availability: 'always_prepared',
@@ -490,8 +491,9 @@ describe('classStoredSchema', () => {
 
 describe('classFeatureSchema — grantGroups superRefine', () => {
   const baseFeature = { kind: 'custom' as const, id: 'smite', name: 'Divine Smite', level: 3 }
-  const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+  const senseGrant = { id: 'sense-2', kind: 'sense' as const, type: 'darkvision', range: 60 }
   const spellGrant = {
+    id: 'spells-3',
     kind: 'spells' as const,
     ability: 'wis' as const,
     availability: 'always_prepared' as const,

@@ -44,12 +44,13 @@ const druidClass = {
         {
           grants: [
             {
+              id: 'spells-1',
               kind: 'spells',
               ability: 'wis',
               availability: 'always_prepared',
               spellIds: ['speak-with-animals'],
             },
-            { kind: 'languages', languageIds: ['druidic'] },
+            { id: 'languages-2', kind: 'languages', languageIds: ['druidic'] },
           ],
         },
       ],

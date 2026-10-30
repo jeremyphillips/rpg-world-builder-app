@@ -1,4 +1,8 @@
-import { getSlotProgressionKindLabel, type ClassBodyFeature } from '@rpg/contracts'
+import {
+  createGrantRowId,
+  getSlotProgressionKindLabel,
+  type ClassBodyFeature,
+} from '@rpg/contracts'
 
 export function createSpellcastingFeature(input: {
   level?: number
@@ -13,7 +17,7 @@ export function createSpellcastingFeature(input: {
     name: input.usesPactMagic ? getSlotProgressionKindLabel('pact-magic') : 'Spellcasting',
     level,
     ...(input.description ? { description: input.description } : {}),
-    grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+    grantGroups: [{ grants: [{ id: createGrantRowId(), kind: 'spellcasting' }] }],
   }
 }
 
