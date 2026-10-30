@@ -99,6 +99,19 @@ describe('cn', () => {
     expect(cn('text-destructive', 'text-style-caption')).toBe('text-destructive text-style-caption')
   })
 
+  it('keeps a score base beside its size modifier and replaces a sibling size', () => {
+    expect(cn('text-style-score', 'text-style-score--sm')).toBe(
+      'text-style-score text-style-score--sm',
+    )
+    expect(cn('text-style-score text-style-score--md', 'text-style-score--sm')).toBe(
+      'text-style-score text-style-score--sm',
+    )
+    expect(cn('text-style-score text-style-score--md', 'text-style-score--muted')).toBe(
+      'text-style-score text-style-score--md text-style-score--muted',
+    )
+    expect(cn('text-3xl leading-none', 'text-style-score--md')).toBe('text-style-score--md')
+  })
+
   it('replaces sibling heading-style composites', () => {
     expect(cn('heading-style-page', 'heading-style-section')).toBe('heading-style-section')
   })

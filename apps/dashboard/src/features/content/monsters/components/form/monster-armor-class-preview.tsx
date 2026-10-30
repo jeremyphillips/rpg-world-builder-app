@@ -51,9 +51,9 @@ export function MonsterArmorClassPreview({ ctx }: { ctx: ContentFormCtx }) {
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-0">
           <div className="flex shrink-0 flex-col items-center justify-center gap-0.5 text-center md:w-[13.75rem] md:border-r md:border-border md:pr-4">
-            <Text as="p" variant="emphasis">
+            <span className="text-style-score text-style-score--lg">
               {resolution ? resolution.ac : '—'}
-            </Text>
+            </span>
             <Text as="p" variant="caption">
               {resolution ? monsterArmorClassCaption(resolution) : (unavailable ?? 'Not set')}
             </Text>

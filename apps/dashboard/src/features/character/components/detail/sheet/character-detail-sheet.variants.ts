@@ -16,10 +16,9 @@ export const characterDetailStatTileVariants = cva(
   },
 )
 
-const characterDetailStatValueTypeClasses =
-  'text-[length:var(--text-character-stat-value)] leading-[length:var(--text-character-stat-value--line-height)] font-semibold tabular-nums'
+const characterDetailStatValueTypeClasses = 'text-style-score text-style-score--md'
 
-export const characterDetailStatTileValueClasses = `${characterDetailStatValueTypeClasses} text-foreground`
+export const characterDetailStatTileValueClasses = characterDetailStatValueTypeClasses
 
 export const characterDetailStatTileCompactWidthClasses = 'w-[100px] shrink-0'
 
@@ -42,9 +41,9 @@ export const characterDetailStatTileHitPointsGridClasses =
 export const characterDetailStatTileHitPointsPairClasses =
   'relative inline-flex items-center justify-center'
 
-export const characterDetailStatTileHitPointsSlashClasses = `absolute left-1/2 -translate-x-1/2 ${characterDetailStatValueTypeClasses} text-muted-foreground`
+export const characterDetailStatTileHitPointsSlashClasses = `absolute left-1/2 -translate-x-1/2 ${characterDetailStatValueTypeClasses} text-style-score--muted`
 
-export const characterDetailStatTileHitPointsNumberClasses = `${characterDetailStatValueTypeClasses} text-foreground px-3`
+export const characterDetailStatTileHitPointsNumberClasses = `${characterDetailStatValueTypeClasses} px-3`
 
 export const characterDetailAbilitiesStatsSectionClasses = 'flex flex-wrap items-start gap-2'
 

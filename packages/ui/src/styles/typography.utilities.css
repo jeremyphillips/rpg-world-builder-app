@@ -283,3 +283,30 @@
   line-height: var(--text-xs--line-height);
   color: var(--destructive);
 }
+
+/* Score numerals. Base owns weight, tabular figures, and foreground. Size modifiers own size and line-height. */
+@utility text-style-score {
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--foreground);
+}
+
+@utility text-style-score--sm {
+  font-size: var(--text-score-sm);
+  line-height: var(--text-score-sm--line-height);
+}
+
+@utility text-style-score--md {
+  font-size: var(--text-score-md);
+  line-height: var(--text-score-md--line-height);
+}
+
+@utility text-style-score--lg {
+  font-size: var(--text-score-lg);
+  line-height: var(--text-score-lg--line-height);
+}
+
+/* Defined after the base so muted color wins on the same element. */
+@utility text-style-score--muted {
+  color: var(--muted-foreground);
+}
