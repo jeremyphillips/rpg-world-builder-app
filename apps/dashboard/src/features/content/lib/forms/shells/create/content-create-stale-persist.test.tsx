@@ -10,7 +10,7 @@ import '../../../../equipment/lib/equipment-form-def'
 import { ContentCreateShell } from './content-create-shell'
 
 const harness = vi.hoisted(() => ({
-  rules: { mode: 'ascending' as const, base: 10 as const } satisfies ArmorClassRules,
+  rules: { mode: 'ascending', base: 10 } as ArmorClassRules,
   mutateAsync: vi.fn(async () => ({ id: 'created', kind: 'adventuring_gear' })),
 }))
 
