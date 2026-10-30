@@ -54,7 +54,10 @@ export type MonsterActionItemViewModel = {
   id: string
   name: string
   attackLine?: string
+  /** `Trigger: …` when the reaction has authored eligibility prose. */
   triggerLine?: string
+  /** `Response:` when that authored trigger has a description or attack line. */
+  responseLabel?: string
   descriptionHtml?: string
 }
 
@@ -263,13 +266,15 @@ function mapReactionItems(
 ): MonsterActionItemViewModel[] {
   return reactions.map((action) => {
     const [base] = mapActionItems([action], 'reactions', derived, catalogState)
-    const trigger = 'trigger' in action && action.trigger ? `Trigger: ${action.trigger}` : undefined
+    const triggerText = action.trigger?.text
+    const hasBody = Boolean(base?.attackLine || base?.descriptionHtml)
     return {
       id: base?.id ?? action.id,
       name: base?.name ?? action.id,
       attackLine: base?.attackLine,
       descriptionHtml: base?.descriptionHtml,
-      triggerLine: trigger,
+      triggerLine: triggerText ? `Trigger: ${triggerText}` : undefined,
+      responseLabel: triggerText && hasBody ? 'Response:' : undefined,
     }
   })
 }

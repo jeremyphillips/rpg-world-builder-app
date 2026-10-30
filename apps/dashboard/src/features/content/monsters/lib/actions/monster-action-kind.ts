@@ -29,6 +29,21 @@ export function monsterActionActiveKeys(
   return variantKeys(schema, kind)
 }
 
+/** Authored reaction trigger prose, or undefined when the field is blank. */
+export function monsterActionTriggerText(trigger: unknown): string | undefined {
+  if (typeof trigger === 'string') {
+    const text = trigger.trim()
+    return text.length > 0 ? text : undefined
+  }
+  if (typeof trigger === 'object' && trigger !== null && 'text' in trigger) {
+    const text = trigger.text
+    if (typeof text !== 'string') return undefined
+    const trimmed = text.trim()
+    return trimmed.length > 0 ? trimmed : undefined
+  }
+  return undefined
+}
+
 function present(value: unknown): boolean {
   if (value == null) return false
   if (typeof value === 'string') return value.trim().length > 0
@@ -48,7 +63,8 @@ export function reconcileMonsterActionKind(
     next.name = options.resolvedWeaponName
   }
   if (present(action.description)) next.description = action.description
-  if (present(action.trigger)) next.trigger = action.trigger
+  const triggerText = monsterActionTriggerText(action.trigger)
+  if (triggerText) next.trigger = { text: triggerText }
   return next
 }
 
@@ -129,7 +145,11 @@ export function actionMoveDropsTrigger(
   from: MonsterActionSection,
   to: MonsterActionSection,
 ): boolean {
-  return from === 'reactions' && to !== 'reactions' && present(action.trigger)
+  return (
+    from === 'reactions' &&
+    to !== 'reactions' &&
+    monsterActionTriggerText(action.trigger) !== undefined
+  )
 }
 
 export function actionAfterSectionMove(

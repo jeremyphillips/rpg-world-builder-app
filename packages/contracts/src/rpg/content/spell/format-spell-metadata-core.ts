@@ -58,7 +58,7 @@ export function formatSpellCastingTimeLabel(
 
   let timeStr = formatCastingTimeUnit(value, unit, style)
   if (includeTrigger && trigger) {
-    timeStr = `${timeStr} (${trigger})`
+    timeStr = `${timeStr} (${trigger.text})`
   }
 
   return timeStr

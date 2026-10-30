@@ -140,7 +140,9 @@
       "normal": {
         "value": 1,
         "unit": "reaction",
-        "trigger": "when you see a creature within 60 feet of yourself casting a spell with Verbal, Somatic, or Material components"
+        "trigger": {
+          "text": "when you see a creature within 60 feet of yourself casting a spell with Verbal, Somatic, or Material components"
+        }
       },
       "canBeCastAsRitual": false
     },

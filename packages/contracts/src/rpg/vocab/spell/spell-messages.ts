@@ -13,4 +13,11 @@ export const spellValidationMessages = {
   materialDescriptionRequired: defineMessage('validation.spell.materialDescriptionRequired', () =>
     requiredWhenCopy('Material description', 'the material component is selected'),
   ),
+  reactionTriggerRequired: defineMessage('validation.spell.reactionTriggerRequired', () =>
+    requiredWhenCopy('Reaction trigger', 'the casting time is a reaction'),
+  ),
+  reactionTriggerForbidden: defineMessage(
+    'validation.spell.reactionTriggerForbidden',
+    () => 'A reaction trigger is only allowed when the casting time is a reaction.',
+  ),
 }

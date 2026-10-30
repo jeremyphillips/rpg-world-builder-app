@@ -1,6 +1,6 @@
 # Activation and limited use
 
-Shared mechanics for how often an ability can be used, and later for what triggers it. Consumers compose these primitives. They do not share one action container.
+Shared mechanics for how often an ability can be used and what triggers it. Consumers compose these primitives. They do not share one action container.
 
 ## Rest
 
@@ -26,6 +26,14 @@ Spell grants store only the `uses` variant (`restLimitedUseSchema`). A grant sen
 ## Character entitlements
 
 A free-cast entitlement has one `source` from `grantDerivedSelectionSourceSchema`, so `grantRowId` is required. Entitlement identity is the spell id plus that source. Different grant rows are different pools.
+
+## Trigger
+
+`activationTriggerSchema` is authored eligibility prose: `{ text }`. A future machine-readable event can sit beside `text`.
+
+Spell casting time stores that object on `normal.trigger`. It is required when the unit is `reaction` and rejected for every other unit.
+
+Monster reactions store the same object. An absent trigger means the reaction's trigger is unspecified. Reactions with an authored trigger render as `Trigger:` followed by `Response:`.
 
 ## Spell references and grant rows
 

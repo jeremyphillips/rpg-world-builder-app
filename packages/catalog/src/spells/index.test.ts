@@ -101,6 +101,23 @@ describe('SRD 5.2.1 spell seed', () => {
     expect(fireBolt?.description).not.toContain('Cantrip Upgrade')
   })
 
+  it('stores a trigger object on reaction spells only', () => {
+    const reactions = spells.filter((spell) => spell.castingTime.normal.unit === 'reaction')
+    expect(reactions.map((spell) => spell.slug).sort()).toEqual([
+      'counterspell',
+      'feather-fall',
+      'hellish-rebuke',
+      'shield',
+    ])
+    for (const spell of spells) {
+      if (spell.castingTime.normal.unit === 'reaction') {
+        expect(spell.castingTime.normal.trigger?.text.length).toBeGreaterThan(0)
+      } else {
+        expect(spell.castingTime.normal.trigger).toBeUndefined()
+      }
+    }
+  })
+
   it('spot-checks deliveryMethod and ritual casting', () => {
     const poisonSpray = spells.find((s) => s.slug === 'poison-spray')
     expect(poisonSpray?.deliveryMethod).toBe('ranged-spell-attack')

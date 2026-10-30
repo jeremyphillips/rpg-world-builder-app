@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import {
   createMonsterDraftInputSchema,
@@ -6,6 +6,7 @@ import {
   monsterActionDraftSchema,
   monsterActionSchema,
   monsterReactionSchema,
+  type MonsterReaction,
 } from './monster'
 
 describe('monsterActionSchema', () => {
@@ -39,9 +40,15 @@ describe('monsterActionSchema', () => {
         kind: 'special',
         name: 'Parry',
         description: '<p>Adds 2 to AC.</p>',
-        trigger: 'When hit',
+        trigger: { text: 'When hit' },
       }).trigger,
-    ).toBe('When hit')
+    ).toEqual({ text: 'When hit' })
+  })
+
+  it('keeps special reaction descriptions required', () => {
+    expectTypeOf<
+      Extract<MonsterReaction, { kind: 'special' }>['description']
+    >().toEqualTypeOf<string>()
   })
 })
 
@@ -73,7 +80,9 @@ describe('monsterBodySchema refinements', () => {
         slug: 'dup-actions',
         ...baseBody,
         actions: [{ id: 'shared', kind: 'special', name: 'A', description: 'a' }],
-        reactions: [{ id: 'shared', kind: 'special', name: 'B', description: 'b', trigger: 't' }],
+        reactions: [
+          { id: 'shared', kind: 'special', name: 'B', description: 'b', trigger: { text: 't' } },
+        ],
       }).success,
     ).toBe(false)
   })

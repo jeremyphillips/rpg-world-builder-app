@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
+import { activationTriggerSchema } from '../../primitives/activation-trigger'
 import {
   weaponDamageDraftSchema,
   weaponDamageSchema,
@@ -18,18 +19,16 @@ const actionIdentity = {
   description: z.string().optional(),
 }
 
-function monsterActionVariants<E extends z.ZodRawShape>(extension: E) {
+function monsterActionVariants() {
   return [
     z.object({
       ...actionIdentity,
-      ...extension,
       kind: z.literal('weapon'),
       name: z.string().min(1).optional(),
       equipmentEntryId: z.string().min(1),
     }),
     z.object({
       ...actionIdentity,
-      ...extension,
       kind: z.literal('natural-weapon'),
       name: z.string().min(1),
       mode: weaponModeSchema,
@@ -41,7 +40,6 @@ function monsterActionVariants<E extends z.ZodRawShape>(extension: E) {
     }),
     z.object({
       ...actionIdentity,
-      ...extension,
       kind: z.literal('special'),
       name: z.string().min(1),
       description: z.string().min(1),
@@ -49,16 +47,20 @@ function monsterActionVariants<E extends z.ZodRawShape>(extension: E) {
   ] as const
 }
 
-export const monsterActionSchema = z.discriminatedUnion('kind', [...monsterActionVariants({})])
+export const monsterActionSchema = z.discriminatedUnion('kind', [...monsterActionVariants()])
+
+const reactionTriggerField = { trigger: activationTriggerSchema.optional() } as const
 
 export const monsterReactionSchema = z.discriminatedUnion('kind', [
-  ...monsterActionVariants({ trigger: z.string().min(1).optional() }),
+  monsterActionSchema.options[0].extend(reactionTriggerField),
+  monsterActionSchema.options[1].extend(reactionTriggerField),
+  monsterActionSchema.options[2].extend(reactionTriggerField),
 ])
 
 export type MonsterAction = z.infer<typeof monsterActionSchema>
 export type MonsterReaction = z.infer<typeof monsterReactionSchema>
 
-function monsterActionDraftVariants<E extends z.ZodRawShape>(extension: E) {
+function monsterActionDraftVariants() {
   return [
     z.object({
       id: z.string().min(1),
@@ -66,7 +68,6 @@ function monsterActionDraftVariants<E extends z.ZodRawShape>(extension: E) {
       name: z.string().min(1).optional(),
       equipmentEntryId: z.string().min(1).optional(),
       description: z.string().optional(),
-      ...extension,
     }),
     z.object({
       id: z.string().min(1),
@@ -79,24 +80,24 @@ function monsterActionDraftVariants<E extends z.ZodRawShape>(extension: E) {
       damage: weaponDamageDraftSchema.optional(),
       damageType: damageTypeIdSchema.optional(),
       description: z.string().optional(),
-      ...extension,
     }),
     z.object({
       id: z.string().min(1),
       kind: z.literal('special'),
       name: z.string().min(1).optional(),
       description: z.string().min(1).optional(),
-      ...extension,
     }),
   ] as const
 }
 
 export const monsterActionDraftSchema = z.discriminatedUnion('kind', [
-  ...monsterActionDraftVariants({}),
+  ...monsterActionDraftVariants(),
 ])
 
 export const monsterReactionDraftSchema = z.discriminatedUnion('kind', [
-  ...monsterActionDraftVariants({ trigger: z.string().min(1).optional() }),
+  monsterActionDraftSchema.options[0].extend(reactionTriggerField),
+  monsterActionDraftSchema.options[1].extend(reactionTriggerField),
+  monsterActionDraftSchema.options[2].extend(reactionTriggerField),
 ])
 
 export type MonsterActionDraft = z.infer<typeof monsterActionDraftSchema>

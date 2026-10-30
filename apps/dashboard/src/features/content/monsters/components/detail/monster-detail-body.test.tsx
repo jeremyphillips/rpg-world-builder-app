@@ -80,6 +80,46 @@ describe('MonsterDetailBody details section', () => {
   })
 })
 
+describe('MonsterDetailBody reactions', () => {
+  it('renders Trigger and Response for an authored reaction', () => {
+    const monster = {
+      ...pickMonster('kobold-warrior'),
+      reactions: [
+        {
+          id: 'parry',
+          kind: 'special' as const,
+          name: 'Parry',
+          description: '<p>Adds 2 to AC.</p>',
+          trigger: { text: 'When hit by a melee attack' },
+        },
+      ],
+    }
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Humanoid',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+      derived: null,
+    })
+
+    render(
+      <MemoryRouter>
+        <MonsterDetailBody
+          name={monster.name}
+          imageName={monster.name}
+          campaignId="camp_1"
+          viewModel={viewModel}
+          pageShell={false}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Trigger: When hit by a melee attack')).toBeInTheDocument()
+    expect(screen.getByText('Response:')).toBeInTheDocument()
+    expect(screen.getByText('Adds 2 to AC.')).toBeInTheDocument()
+  })
+})
+
 describe('MonsterDetailBody catalog footer', () => {
   it('keeps the derivation sentence when both catalogs loaded', () => {
     const { monster, viewModel } = buildKoboldViewModel()

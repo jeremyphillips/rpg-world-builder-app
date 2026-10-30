@@ -163,10 +163,10 @@
         "$ref": "#/definitions/__schema47"
       },
       "bonusActions": {
-        "$ref": "#/definitions/__schema57"
+        "$ref": "#/definitions/__schema66"
       },
       "reactions": {
-        "$ref": "#/definitions/__schema58"
+        "$ref": "#/definitions/__schema67"
       }
     },
     "required": [
@@ -1221,12 +1221,10 @@
               "description": "weapon"
             },
             "name": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/__schema52"
             },
             "equipmentEntryId": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/__schema53"
             }
           },
           "required": [
@@ -1251,8 +1249,7 @@
               "description": "natural-weapon"
             },
             "name": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/__schema55"
             },
             "mode": {
               "type": "string",
@@ -1263,30 +1260,16 @@
               "description": "melee | ranged"
             },
             "properties": {
-              "default": [],
-              "type": "array",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "finesse"
-                ],
-                "description": "finesse"
-              }
+              "$ref": "#/definitions/__schema57"
             },
             "reach": {
-              "type": "integer",
-              "minimum": 5,
-              "maximum": 9007199254740991
+              "$ref": "#/definitions/__schema58"
             },
             "range": {
-              "allOf": [
-                {
-                  "$ref": "#/definitions/__schema53"
-                }
-              ]
+              "$ref": "#/definitions/__schema59"
             },
             "damage": {
-              "$ref": "#/definitions/__schema54"
+              "$ref": "#/definitions/__schema60"
             },
             "damageType": {
               "$ref": "#/definitions/__schema17"
@@ -1310,8 +1293,7 @@
               "$ref": "#/definitions/__schema49"
             },
             "description": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/__schema63"
             },
             "kind": {
               "type": "string",
@@ -1319,8 +1301,7 @@
               "description": "special"
             },
             "name": {
-              "type": "string",
-              "minLength": 1
+              "$ref": "#/definitions/__schema65"
             }
           },
           "required": [
@@ -1342,20 +1323,51 @@
     },
     "__schema51": {
       "type": "string",
+      "const": "weapon",
+      "description": "weapon"
+    },
+    "__schema52": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema53": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema54": {
+      "type": "string",
+      "const": "natural-weapon",
+      "description": "natural-weapon"
+    },
+    "__schema55": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema56": {
+      "type": "string",
       "enum": [
         "melee",
         "ranged"
       ],
       "description": "melee | ranged"
     },
-    "__schema52": {
-      "type": "string",
-      "enum": [
-        "finesse"
-      ],
-      "description": "finesse"
+    "__schema57": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "finesse"
+        ],
+        "description": "finesse"
+      }
     },
-    "__schema53": {
+    "__schema58": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 9007199254740991
+    },
+    "__schema59": {
       "type": "object",
       "properties": {
         "normal": {
@@ -1374,19 +1386,19 @@
       ],
       "additionalProperties": false
     },
-    "__schema54": {
+    "__schema60": {
       "type": "object",
       "properties": {
         "dice": {
-          "$ref": "#/definitions/__schema55"
+          "$ref": "#/definitions/__schema61"
         },
         "flat": {
-          "$ref": "#/definitions/__schema56"
+          "$ref": "#/definitions/__schema62"
         }
       },
       "additionalProperties": false
     },
-    "__schema55": {
+    "__schema61": {
       "type": "object",
       "properties": {
         "count": {
@@ -1433,19 +1445,32 @@
       ],
       "additionalProperties": false
     },
-    "__schema56": {
+    "__schema62": {
       "type": "integer",
       "minimum": -9007199254740991,
       "maximum": 9007199254740991
     },
-    "__schema57": {
+    "__schema63": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema64": {
+      "type": "string",
+      "const": "special",
+      "description": "special"
+    },
+    "__schema65": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema66": {
       "default": [],
       "type": "array",
       "items": {
         "$ref": "#/definitions/__schema48"
       }
     },
-    "__schema58": {
+    "__schema67": {
       "default": [],
       "type": "array",
       "items": {
@@ -1459,21 +1484,19 @@
               "description": {
                 "$ref": "#/definitions/__schema50"
               },
-              "trigger": {
-                "$ref": "#/definitions/__schema59"
-              },
               "kind": {
                 "type": "string",
                 "const": "weapon",
                 "description": "weapon"
               },
               "name": {
-                "type": "string",
-                "minLength": 1
+                "$ref": "#/definitions/__schema52"
               },
               "equipmentEntryId": {
-                "type": "string",
-                "minLength": 1
+                "$ref": "#/definitions/__schema53"
+              },
+              "trigger": {
+                "$ref": "#/definitions/__schema68"
               }
             },
             "required": [
@@ -1492,17 +1515,13 @@
               "description": {
                 "$ref": "#/definitions/__schema50"
               },
-              "trigger": {
-                "$ref": "#/definitions/__schema59"
-              },
               "kind": {
                 "type": "string",
                 "const": "natural-weapon",
                 "description": "natural-weapon"
               },
               "name": {
-                "type": "string",
-                "minLength": 1
+                "$ref": "#/definitions/__schema55"
               },
               "mode": {
                 "type": "string",
@@ -1513,33 +1532,22 @@
                 "description": "melee | ranged"
               },
               "properties": {
-                "default": [],
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "enum": [
-                    "finesse"
-                  ],
-                  "description": "finesse"
-                }
+                "$ref": "#/definitions/__schema57"
               },
               "reach": {
-                "type": "integer",
-                "minimum": 5,
-                "maximum": 9007199254740991
+                "$ref": "#/definitions/__schema58"
               },
               "range": {
-                "allOf": [
-                  {
-                    "$ref": "#/definitions/__schema53"
-                  }
-                ]
+                "$ref": "#/definitions/__schema59"
               },
               "damage": {
-                "$ref": "#/definitions/__schema54"
+                "$ref": "#/definitions/__schema60"
               },
               "damageType": {
                 "$ref": "#/definitions/__schema17"
+              },
+              "trigger": {
+                "$ref": "#/definitions/__schema68"
               }
             },
             "required": [
@@ -1560,11 +1568,7 @@
                 "$ref": "#/definitions/__schema49"
               },
               "description": {
-                "type": "string",
-                "minLength": 1
-              },
-              "trigger": {
-                "$ref": "#/definitions/__schema59"
+                "$ref": "#/definitions/__schema63"
               },
               "kind": {
                 "type": "string",
@@ -1572,8 +1576,10 @@
                 "description": "special"
               },
               "name": {
-                "type": "string",
-                "minLength": 1
+                "$ref": "#/definitions/__schema65"
+              },
+              "trigger": {
+                "$ref": "#/definitions/__schema68"
               }
             },
             "required": [
@@ -1587,9 +1593,18 @@
         ]
       }
     },
-    "__schema59": {
-      "type": "string",
-      "minLength": 1
+    "__schema68": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false
     }
   }
 }

@@ -8,7 +8,7 @@ import {
   type ContentValidationIntent,
 } from '@rpg/contracts'
 
-import { monsterActionActiveKeys } from './actions/monster-action-kind'
+import { monsterActionActiveKeys, monsterActionTriggerText } from './actions/monster-action-kind'
 
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
 
@@ -73,6 +73,11 @@ function normalizeAction(
   if (!isRecord(action)) return action
   const cleaned = omitEmptyStrings(action)
   if (!isRecord(cleaned)) return cleaned
+  if (section === 'reactions') {
+    const text = monsterActionTriggerText(cleaned.trigger)
+    if (text) cleaned.trigger = { text }
+    else delete cleaned.trigger
+  }
   const keys =
     typeof cleaned.kind === 'string' ? monsterActionActiveKeys(cleaned.kind, section) : []
   const active = keys.length > 0 ? pickKeys(cleaned, keys) : cleaned

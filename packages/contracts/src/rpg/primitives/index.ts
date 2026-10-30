@@ -12,6 +12,7 @@ export * from './character-wealth-grant'
 export * from './prose'
 export * from './rest-recovery'
 export * from './limited-use'
+export * from './activation-trigger'
 export {
   INLINE_METADATA_SEPARATOR,
   formatInlineMetadataTail,

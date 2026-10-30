@@ -550,8 +550,11 @@ function MonsterActionDetail({
           {MONSTER_TRIGGER_LABEL}
           <input
             aria-label={MONSTER_TRIGGER_LABEL}
-            value={action.trigger ?? ''}
-            onChange={(event) => onChange({ ...action, trigger: event.target.value })}
+            value={action.trigger?.text ?? ''}
+            onChange={(event) => {
+              const text = event.target.value
+              onChange({ ...action, trigger: text ? { text } : undefined })
+            }}
           />
         </label>
       ) : null}

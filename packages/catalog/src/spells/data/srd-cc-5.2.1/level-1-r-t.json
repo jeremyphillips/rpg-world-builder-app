@@ -172,7 +172,9 @@
       "normal": {
         "value": 1,
         "unit": "reaction",
-        "trigger": "when you are hit by an attack roll or targeted by the Magic Missile spell"
+        "trigger": {
+          "text": "when you are hit by an attack roll or targeted by the Magic Missile spell"
+        }
       },
       "canBeCastAsRitual": false
     },

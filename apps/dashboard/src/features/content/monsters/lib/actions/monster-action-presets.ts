@@ -22,7 +22,7 @@ export type MonsterActionDraftRow = {
   kind: MonsterActionKind
   name?: string
   description?: string
-  trigger?: string
+  trigger?: { text: string }
   equipmentEntryId?: string
   mode?: 'melee' | 'ranged'
   properties?: string[]

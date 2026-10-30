@@ -43,7 +43,6 @@ export type DerivedMonsterAttackLine = {
   damageTypeLabel: string
   reach?: number
   range?: { normal: number; long?: number }
-  trigger?: string
 }
 
 export type DerivedMonsterStatBlock = {
@@ -250,10 +249,6 @@ function appendAttackLines(
     const line = resolveWeaponAttackLine({ ...args, action, section })
     if (!line) {
       throw new Error(`Monster attack ${action.id} is unavailable.`)
-    }
-    if (section === 'reactions' && 'trigger' in action && typeof action.trigger === 'string') {
-      target.push({ ...line, trigger: action.trigger })
-      continue
     }
     target.push(line)
   }

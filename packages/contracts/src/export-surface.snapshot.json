@@ -882,6 +882,7 @@
     "acceptCampaignInviteResultSchema",
     "actionEconomySchema",
     "actionTargetFailureSchema",
+    "activationTriggerSchema",
     "activeCampaignSchema",
     "activeVocabularyOptionIds",
     "adaptCharacterSelectionToEquipmentSupply",

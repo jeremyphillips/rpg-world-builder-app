@@ -90,7 +90,7 @@
       "normal": {
         "value": 1,
         "unit": "reaction",
-        "trigger": "when you or a creature you can see within 60 feet of you falls"
+        "trigger": { "text": "when you or a creature you can see within 60 feet of you falls" }
       },
       "canBeCastAsRitual": false
     },
@@ -255,7 +255,9 @@
       "normal": {
         "value": 1,
         "unit": "reaction",
-        "trigger": "in response to taking damage from a creature that you can see within 60 feet of yourself"
+        "trigger": {
+          "text": "in response to taking damage from a creature that you can see within 60 feet of yourself"
+        }
       },
       "canBeCastAsRitual": false
     },

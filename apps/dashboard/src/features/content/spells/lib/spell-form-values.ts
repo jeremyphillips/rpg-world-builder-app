@@ -147,7 +147,7 @@ export function spellCastingTimeToFormValues(castingTime: SpellCastingTime): Spe
     normal: {
       value: castingTime.normal.value,
       unit: castingTime.normal.unit,
-      ...(castingTime.normal.trigger !== undefined && { trigger: castingTime.normal.trigger }),
+      ...(castingTime.normal.trigger ? { trigger: castingTime.normal.trigger.text } : {}),
     },
     canBeCastAsRitual: castingTime.canBeCastAsRitual,
   }
@@ -161,7 +161,7 @@ export function spellCastingTimeFromFormValues(
     normal: {
       value,
       unit,
-      ...(unit === 'reaction' && trigger?.trim() ? { trigger: trigger.trim() } : {}),
+      ...(unit === 'reaction' && trigger?.trim() ? { trigger: { text: trigger.trim() } } : {}),
     },
     canBeCastAsRitual: castingTime.canBeCastAsRitual,
   })
@@ -177,7 +177,7 @@ export function trySpellCastingTimeFromFormValues(
     normal: {
       value,
       unit,
-      ...(unit === 'reaction' && trigger?.trim() ? { trigger: trigger.trim() } : {}),
+      ...(unit === 'reaction' && trigger?.trim() ? { trigger: { text: trigger.trim() } } : {}),
     },
     canBeCastAsRitual: castingTime.canBeCastAsRitual,
   })
