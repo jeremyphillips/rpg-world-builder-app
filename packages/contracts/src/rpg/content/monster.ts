@@ -95,6 +95,7 @@ export const monsterEquipmentEntrySchema = z.preprocess((value) => {
 
 export const monsterBodyFields = {
   size: creatureSizeRefSchema,
+  alternateSizes: z.array(creatureSizeRefSchema).default([]),
   creatureType: creatureTypeRefSchema,
   alignment: creatureAlignmentSchema,
   abilityScores: creatureAbilityScoresSchema,
@@ -110,6 +111,7 @@ export const monsterBodyFields = {
     savingThrows: z.array(abilitySchema).default([]),
     skills: z.array(creatureSkillProficiencyEntrySchema).default([]),
     languages: z.array(creatureLanguageProficiencyEntrySchema).default([]),
+    additionalLanguageCount: z.number().int().min(1).optional(),
     weapons: z.array(creatureWeaponProficiencyTargetSchema).default([]),
   }),
   defenses: creatureDefensesSchema,
@@ -304,6 +306,7 @@ export function refineMonsterBody(
     'telepathy',
   ])
   refineMonsterProficiencies(body.proficiencies, ctx, prefix)
+  refineAlternateSizes(body.size, body.alternateSizes, ctx, prefix)
 
   const derivedXp = CHALLENGE_RATING_MECHANICS[body.challengeRating].xp
   if (body.experiencePointsOverride !== undefined) {
@@ -331,6 +334,24 @@ const monsterStoredSchema = publishStoredSchema(monsterBodySchema).superRefine((
 )
 
 export const monsterSchema = monsterStoredSchema as unknown as z.ZodType<Monster>
+
+function refineAlternateSizes(
+  size: string | undefined,
+  alternateSizes: readonly string[] | undefined,
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  const sizes = alternateSizes ?? []
+  if (new Set(sizes).size !== sizes.length) {
+    addCustomRefinementIssue(ctx, 'Alternate sizes must be unique.', [...prefix, 'alternateSizes'])
+  }
+  if (size && sizes.includes(size)) {
+    addCustomRefinementIssue(ctx, 'Alternate sizes cannot repeat the primary size.', [
+      ...prefix,
+      'alternateSizes',
+    ])
+  }
+}
 
 function refineMonsterDraftIds(
   body: MonsterBodyDraft,
@@ -392,6 +413,7 @@ function refineMonsterDraftBody(
     prefix,
     { requirePresent: false },
   )
+  refineAlternateSizes(body.size, body.alternateSizes, ctx, prefix)
 }
 
 const monsterDraftStoredSchemaBase = draftStoredSchema(monsterBodyDraftSchema).superRefine(

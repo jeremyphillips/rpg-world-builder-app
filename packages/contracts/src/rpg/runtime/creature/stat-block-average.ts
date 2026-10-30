@@ -1,5 +1,5 @@
 import { averageDiceRoll, type DieFace } from '../../primitives/dice'
-import { averageRollValue, type RollValue } from '../../primitives/mechanics/roll'
+import { averageRollValue, formatRollValue, type RollValue } from '../../primitives/mechanics/roll'
 
 /** Floors a stat-block average after exact dice math — shared by HP and damage lines. */
 export function floorStatBlockAverage(value: number): number {
@@ -23,4 +23,18 @@ export function averageStatBlockHitPoints(args: {
 /** Average damage display value: floor(average roll + ability modifier). */
 export function averageStatBlockDamage(damage: RollValue, abilityModifierValue: number): number {
   return floorStatBlockAverage(averageRollValue(damage) + abilityModifierValue)
+}
+
+/** Expression and floored average for one damage part. A zero modifier is omitted. */
+export function resolveStatBlockDamagePart(
+  roll: RollValue,
+  abilityModifier: number,
+): { expression: string; average: number } {
+  const flat = (roll.flat ?? 0) + abilityModifier
+  const expressionRoll: RollValue =
+    roll.dice && flat === 0 ? { dice: roll.dice } : roll.dice ? { dice: roll.dice, flat } : { flat }
+  return {
+    expression: formatRollValue(expressionRoll),
+    average: averageStatBlockDamage(roll, abilityModifier),
+  }
 }

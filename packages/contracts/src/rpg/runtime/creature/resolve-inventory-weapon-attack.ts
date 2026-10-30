@@ -55,6 +55,8 @@ export function resolveInventoryWeaponAttackTotals(args: {
   proficient: boolean
   proficiencyBonus: number | undefined
   provider: MagicPropertyDefinitionProvider
+  /** Replaces catalog weapon dice. Ability and damage-roll adjustments still apply. */
+  damage?: WeaponDamage
 }): InventoryWeaponAttackTotals | undefined {
   if (!isWeaponEquipment(args.item)) return undefined
 
@@ -63,7 +65,25 @@ export function resolveInventoryWeaponAttackTotals(args: {
     args.item,
     args.provider,
   )
-  const abilityModifier = args.abilityModifier
+  return weaponAttackTotals({
+    abilityModifier: args.abilityModifier,
+    proficient: args.proficient,
+    proficiencyBonus: args.proficiencyBonus,
+    weaponDamage: args.damage ?? args.item.damage,
+    effectTotals,
+    magic,
+  })
+}
+
+function weaponAttackTotals(args: {
+  abilityModifier: number | undefined
+  proficient: boolean
+  proficiencyBonus: number | undefined
+  weaponDamage: WeaponDamage | undefined
+  effectTotals: EquipmentEffectTotals
+  magic: InventoryWeaponAttackTotals['magic']
+}): InventoryWeaponAttackTotals {
+  const { abilityModifier, effectTotals, weaponDamage } = args
   const damageModifier =
     abilityModifier === undefined ? undefined : abilityModifier + effectTotals.damage_roll
   const attackBonus =
@@ -71,21 +91,28 @@ export function resolveInventoryWeaponAttackTotals(args: {
       ? undefined
       : weaponAttackBonus(abilityModifier, args.proficient, args.proficiencyBonus) +
         effectTotals.attack_roll
-  const damageAverage =
-    abilityModifier === undefined
-      ? undefined
-      : averageStatBlockDamage(
-          args.item.damage ?? { dice: { count: 1, faces: 4 as const } },
-          abilityModifier,
-        ) + effectTotals.damage_roll
-  const damageExpression = damageExpressionFor(args.item.damage, damageModifier)
-
+  const damageAverage = damageAverageFor(weaponDamage, abilityModifier, effectTotals.damage_roll)
+  const damageExpression = damageExpressionFor(weaponDamage, damageModifier)
   return {
     ...(attackBonus !== undefined ? { attackBonus } : {}),
     ...(damageAverage !== undefined ? { damageAverage } : {}),
     ...(damageExpression !== undefined ? { damageExpression } : {}),
     ...(damageModifier !== undefined ? { damageModifier } : {}),
     effectTotals,
-    magic,
+    magic: args.magic,
   }
+}
+
+function damageAverageFor(
+  weaponDamage: WeaponDamage | undefined,
+  abilityModifier: number | undefined,
+  damageRollBonus: number,
+): number | undefined {
+  if (abilityModifier === undefined) return undefined
+  return (
+    averageStatBlockDamage(
+      weaponDamage ?? { dice: { count: 1, faces: 4 as const } },
+      abilityModifier,
+    ) + damageRollBonus
+  )
 }

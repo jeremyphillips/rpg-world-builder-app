@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 import { activationTriggerSchema } from '../../primitives/activation-trigger'
+import { attackOnHitSchema } from '../../primitives/mechanics/attack-on-hit'
 import { limitedUseDraftSchema, limitedUseSchema } from '../../primitives/limited-use'
 import { abilitySchema } from '../../vocab/ability'
 import { damageTypeIdSchema } from '../../vocab/damage'
@@ -27,18 +28,29 @@ function strict<T extends z.ZodType, M extends MonsterActionMode>(
   return (mode === 'draft' ? schema.optional() : schema) as M extends 'draft' ? z.ZodOptional<T> : T
 }
 
+const attackModes = ['melee', 'ranged'] as const
+
+const draftDamagePartSchema = z.object({
+  roll: weaponDamageDraftSchema.optional(),
+  damageType: damageTypeIdSchema.optional(),
+})
+
+const attackOnHitDraftSchema = z.object({
+  additionalDamage: z.array(draftDamagePartSchema).optional(),
+})
+
 function monsterActionFields<M extends MonsterActionMode>(mode: M) {
   const limitedUse = (
     mode === 'draft' ? limitedUseDraftSchema : limitedUseSchema
   ) as M extends 'draft' ? typeof limitedUseDraftSchema : typeof limitedUseSchema
-  const spellIds =
-    mode === 'draft'
-      ? z.array(spellReferenceSchema).default([])
-      : z.array(spellReferenceSchema).min(1)
-  const spellGroupSchema = z.object({
+  const onHit = mode === 'draft' ? attackOnHitDraftSchema.optional() : attackOnHitSchema.optional()
+  const spellEntrySchema = z.object({
+    spellId: mode === 'draft' ? spellReferenceSchema.optional() : spellReferenceSchema,
+    castAtLevel: z.number().int().min(0).max(9).optional(),
     limitedUse: limitedUse.optional(),
-    spellIds,
   })
+  const spells =
+    mode === 'draft' ? z.array(spellEntrySchema).default([]) : z.array(spellEntrySchema).min(1)
   const castingAbilitySchema = z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('ability'), ability: abilitySchema }),
     z.object({ kind: z.literal('shared'), entryId: z.string().min(1) }),
@@ -48,6 +60,14 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
     description: z.string().optional(),
     limitedUse: limitedUse.optional(),
   }
+  const attackBonusSourceSchema = z.discriminatedUnion('kind', [
+    z.object({ kind: z.literal('spell'), castingAbility: castingAbilitySchema }),
+    z.object({
+      kind: z.literal('ability'),
+      ability: abilitySchema,
+      proficient: z.boolean(),
+    }),
+  ])
 
   return [
     z.object({
@@ -55,6 +75,12 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       kind: z.literal('weapon'),
       name: z.string().min(1).optional(),
       equipmentEntryId: strict(z.string().min(1), mode),
+      damage: (mode === 'draft'
+        ? weaponDamageDraftSchema.optional()
+        : weaponDamageSchema.optional()) as M extends 'draft'
+        ? z.ZodOptional<typeof weaponDamageDraftSchema>
+        : z.ZodOptional<typeof weaponDamageSchema>,
+      onHit,
     }),
     z.object({
       ...identity,
@@ -74,6 +100,26 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
         ? z.ZodOptional<typeof weaponDamageDraftSchema>
         : typeof weaponDamageSchema,
       damageType: strict(damageTypeIdSchema, mode),
+      onHit,
+    }),
+    z.object({
+      ...identity,
+      kind: z.literal('attack'),
+      name: strict(z.string().min(1), mode),
+      bonusSource: strict(attackBonusSourceSchema, mode),
+      modes:
+        mode === 'draft'
+          ? z.array(z.enum(attackModes)).min(1).optional()
+          : z.array(z.enum(attackModes)).min(1),
+      reach: z.number().int().min(5).optional(),
+      range: weaponRangeSchema.optional(),
+      damage: (mode === 'draft'
+        ? weaponDamageDraftSchema.optional()
+        : weaponDamageSchema) as M extends 'draft'
+        ? z.ZodOptional<typeof weaponDamageDraftSchema>
+        : typeof weaponDamageSchema,
+      damageType: strict(damageTypeIdSchema, mode),
+      onHit,
     }),
     z.object({
       ...identity,
@@ -87,10 +133,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       name: strict(z.string().min(1), mode),
       castingAbility: strict(castingAbilitySchema, mode),
       omittedComponents: z.array(spellComponentIdSchema).optional(),
-      spellGroups: strict(
-        mode === 'draft' ? z.array(spellGroupSchema) : z.array(spellGroupSchema).min(1),
-        mode,
-      ),
+      spells: strict(spells, mode),
       description: z.string().optional(),
     }),
   ] as const
@@ -107,6 +150,7 @@ export const monsterReactionSchema = z.discriminatedUnion('kind', [
   monsterActionSchema.options[1].extend(reactionTriggerField),
   monsterActionSchema.options[2].extend(reactionTriggerField),
   monsterActionSchema.options[3].extend(reactionTriggerField),
+  monsterActionSchema.options[4].extend(reactionTriggerField),
 ])
 
 export type MonsterAction = z.infer<typeof monsterActionSchema>
@@ -121,6 +165,7 @@ export const monsterReactionDraftSchema = z.discriminatedUnion('kind', [
   monsterActionDraftSchema.options[1].extend(reactionTriggerField),
   monsterActionDraftSchema.options[2].extend(reactionTriggerField),
   monsterActionDraftSchema.options[3].extend(reactionTriggerField),
+  monsterActionDraftSchema.options[4].extend(reactionTriggerField),
 ])
 
 export type MonsterActionDraft = z.infer<typeof monsterActionDraftSchema>
@@ -132,7 +177,7 @@ type SpellEntryLike = {
   name?: string
   limitedUse?: unknown
   castingAbility?: { kind: string; entryId?: string }
-  spellGroups?: readonly { limitedUse?: unknown; spellIds?: readonly string[] }[]
+  spells?: readonly { spellId?: string; limitedUse?: unknown }[]
 }
 
 export function refineMonsterSpellEntries(
@@ -167,30 +212,25 @@ function refineOneSpellEntry(
   const { section, index, action } = locatedEntry
   if (action.kind !== 'spell') return
   const path = [...prefix, section, index]
-  const groups = action.spellGroups ?? []
-  refineSpellOwnership(action, groups, ctx, path)
+  refineSpellOwnership(action, ctx, path)
   refineSharedCastingAbility(action, spellsById, ctx, path)
 }
 
 function refineSpellOwnership(
   action: SpellEntryLike,
-  groups: NonNullable<SpellEntryLike['spellGroups']>,
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
-  if (action.limitedUse && groups.some((group) => group.limitedUse)) {
-    addCustomRefinementIssue(
-      ctx,
-      'A spell entry cannot limit both the entry and its spell groups.',
-      [...path, 'limitedUse'],
-    )
+  const spells = action.spells ?? []
+  if (action.limitedUse && spells.some((spell) => spell.limitedUse)) {
+    addCustomRefinementIssue(ctx, 'A spell entry cannot limit both the entry and its spells.', [
+      ...path,
+      'limitedUse',
+    ])
   }
-  const spellIds = groups.flatMap((group) => group.spellIds ?? [])
+  const spellIds = spells.flatMap((spell) => (spell.spellId ? [spell.spellId] : []))
   if (new Set(spellIds).size === spellIds.length) return
-  addCustomRefinementIssue(ctx, 'Spell ids must be unique within an entry.', [
-    ...path,
-    'spellGroups',
-  ])
+  addCustomRefinementIssue(ctx, 'Spell ids must be unique within an entry.', [...path, 'spells'])
 }
 
 function refineSharedCastingAbility(
@@ -210,26 +250,58 @@ function refineSharedCastingAbility(
   )
 }
 
+function refineNaturalWeaponShape(
+  action: Extract<MonsterAction | MonsterReaction, { kind: 'natural-weapon' }>,
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
+  if (!action.name) {
+    addCustomRefinementIssue(ctx, 'Natural weapon actions require a name.', [...path, 'name'])
+  }
+  if (action.mode === 'ranged' && !action.range) {
+    addCustomRefinementIssue(ctx, 'Ranged natural weapons require range.', [...path, 'range'])
+  }
+  if (action.mode === 'ranged' && action.reach !== undefined) {
+    addCustomRefinementIssue(ctx, 'Reach is only allowed on melee natural weapons.', [
+      ...path,
+      'reach',
+    ])
+  }
+}
+
+function refineAuthoredAttackShape(
+  action: Extract<MonsterAction | MonsterReaction, { kind: 'attack' }>,
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
+  if (!action.name) {
+    addCustomRefinementIssue(ctx, 'This action requires a name.', [...path, 'name'])
+  }
+  if (!action.modes) return
+  if (new Set(action.modes).size !== action.modes.length) {
+    addCustomRefinementIssue(ctx, 'Attack modes must be unique.', [...path, 'modes'])
+  }
+  if (action.modes.includes('melee') && action.reach === undefined) {
+    addCustomRefinementIssue(ctx, 'Melee attacks require reach.', [...path, 'reach'])
+  }
+  if (action.modes.includes('ranged') && !action.range) {
+    addCustomRefinementIssue(ctx, 'Ranged attacks require range.', [...path, 'range'])
+  }
+  if (!action.modes.includes('melee') && action.reach !== undefined) {
+    addCustomRefinementIssue(ctx, 'Reach is only allowed when the attack is melee.', [
+      ...path,
+      'reach',
+    ])
+  }
+}
+
 export function refineMonsterActionShape(
   action: MonsterAction | MonsterReaction,
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
-  if (action.kind === 'natural-weapon') {
-    if (!action.name) {
-      addCustomRefinementIssue(ctx, 'Natural weapon actions require a name.', [...path, 'name'])
-    }
-    if (action.mode === 'ranged' && !action.range) {
-      addCustomRefinementIssue(ctx, 'Ranged natural weapons require range.', [...path, 'range'])
-    }
-    if (action.mode === 'ranged' && action.reach !== undefined) {
-      addCustomRefinementIssue(ctx, 'Reach is only allowed on melee natural weapons.', [
-        ...path,
-        'reach',
-      ])
-    }
-  }
-
+  if (action.kind === 'natural-weapon') refineNaturalWeaponShape(action, ctx, path)
+  if (action.kind === 'attack') refineAuthoredAttackShape(action, ctx, path)
   if ((action.kind === 'special' || action.kind === 'spell') && !action.name) {
     addCustomRefinementIssue(ctx, 'This action requires a name.', [...path, 'name'])
   }

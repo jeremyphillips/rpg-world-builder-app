@@ -32,6 +32,7 @@ export type MonsterActionDraftRow = {
   kind: MonsterActionKind
 } & DraftVariant<'weapon'> &
   DraftVariant<'natural-weapon'> &
+  DraftVariant<'attack'> &
   DraftVariant<'special'> &
   DraftVariant<'spell'>
 
@@ -43,7 +44,7 @@ export function createActionFromPreset(presetId: MonsterActionPresetId): Monster
   const id = createMonsterRowId()
   if (presetId === 'weapon') return { id, kind: 'weapon' }
   if (presetId === 'special') return { id, kind: 'special' }
-  if (presetId === 'spell') return { id, kind: 'spell', spellGroups: [{ spellIds: [] }] }
+  if (presetId === 'spell') return { id, kind: 'spell', spells: [] }
   const preset = MONSTER_NATURAL_WEAPON_PRESETS.find((entry) => entry.id === presetId)
   if (!preset) return { id, kind: 'special' }
   return {

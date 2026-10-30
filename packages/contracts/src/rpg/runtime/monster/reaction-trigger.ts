@@ -2,6 +2,7 @@ import type { SpellCastingTime } from '../../vocab/spell/casting-time'
 
 export type MonsterReferencedSpell = {
   name: string
+  level?: number
   castingTime: SpellCastingTime
 }
 
@@ -24,7 +25,7 @@ export type ReactionTriggerResolution =
 type ReactionLike = {
   kind: string
   trigger?: { text?: string }
-  spellGroups?: readonly { spellIds?: readonly string[] }[]
+  spells?: readonly { spellId?: string }[]
 }
 
 /** Resolves a reaction's trigger. An authored trigger never replaces a spell's own trigger. */
@@ -38,7 +39,9 @@ export function resolveMonsterReactionTrigger(args: {
     return authored ? { kind: 'authored', text: authored } : { kind: 'unspecified' }
   }
 
-  const spellIds = (args.action.spellGroups ?? []).flatMap((group) => group.spellIds ?? [])
+  const spellIds = (args.action.spells ?? []).flatMap((spell) =>
+    spell.spellId ? [spell.spellId] : [],
+  )
   const spells = spellIds.map((spellId) => {
     if (args.catalogStatus === 'unavailable') {
       return { spellId, status: 'unresolved' as const, reason: 'catalog-unavailable' as const }

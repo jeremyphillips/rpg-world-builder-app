@@ -34,6 +34,7 @@ export type FormatCreatureCommunicationOptions = {
 export type FormatCreatureCommunicationInput = {
   languages: readonly CreatureLanguageProficiencyEntry[]
   telepathy?: number
+  additionalLanguageCount?: number
 }
 
 /**
@@ -44,7 +45,7 @@ export function formatCreatureCommunication(
   input: FormatCreatureCommunicationInput,
   options: FormatCreatureCommunicationOptions,
 ): string | undefined {
-  const { languages, telepathy } = input
+  const { languages, telepathy, additionalLanguageCount } = input
 
   if (languages.length === 0 && telepathy == null) {
     return undefined
@@ -55,7 +56,14 @@ export function formatCreatureCommunication(
 
   const parts: string[] = []
   if (speaking.length > 0) {
-    parts.push(speaking.map((entry) => options.formatLanguageLabel(entry.language)).join(', '))
+    const names = speaking.map((entry) => options.formatLanguageLabel(entry.language)).join(', ')
+    const extra =
+      additionalLanguageCount === 1
+        ? ' plus one other language'
+        : additionalLanguageCount && additionalLanguageCount > 1
+          ? ` plus ${additionalLanguageCount} other languages`
+          : ''
+    parts.push(`${names}${extra}`)
   }
   if (understandsOnly.length > 0) {
     const labels = understandsOnly

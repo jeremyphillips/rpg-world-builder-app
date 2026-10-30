@@ -9,7 +9,7 @@ import type { GameTermEntry, VocabularyTerm } from './types'
 export const MONSTER_ACTION_KIND_TERM = {
   label: 'Monster Action Kind',
   description:
-    'Whether a monster action uses equipment, a natural weapon, special prose, or referenced spells.',
+    'Whether a monster action uses equipment, a natural weapon, an authored attack, special prose, or referenced spells.',
   sentence: {
     singular: 'monster action kind',
     plural: 'monster action kinds',
@@ -24,6 +24,10 @@ export const MONSTER_ACTION_KIND_ENTRIES = {
   'natural-weapon': {
     label: 'Natural weapon',
     description: 'An innate attack such as a claw or bite with authored damage.',
+  },
+  attack: {
+    label: 'Attack',
+    description: 'An authored attack with an explicit bonus source and one or both modes.',
   },
   special: {
     label: 'Special',

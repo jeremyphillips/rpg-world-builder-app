@@ -13,7 +13,7 @@ function armor(slug: string, name: string) {
     id: `${RULESET}:${slug}`,
     slug,
     rulesetId: RULESET,
-    source: 'system',
+    catalogLayer: 'system',
     campaignId: null,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
@@ -32,7 +32,7 @@ const dagger = equipmentSchema.parse({
   id: `${RULESET}:dagger`,
   slug: 'dagger',
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
@@ -56,7 +56,7 @@ const athletics = skillProficiencySchema.parse({
   id: `${RULESET}:athletics`,
   slug: 'athletics',
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -253,7 +253,7 @@ describe('collectMonsterCatalogIssues', () => {
       bonusActions: [
         {
           kind: 'spell',
-          spellGroups: [{ spellIds: [fireball.id] }],
+          spells: [{ spellId: fireball.id }],
         },
       ],
     }

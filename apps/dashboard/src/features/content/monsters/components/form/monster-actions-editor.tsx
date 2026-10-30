@@ -675,7 +675,8 @@ function SpellActionFields({
       entry.castingAbility?.kind === 'ability' &&
       entry.name,
   )
-  const groups = action.spellGroups ?? []
+  const spells = action.spells ?? []
+  const sharedPool = Boolean(action.limitedUse)
 
   return (
     <div>
@@ -720,38 +721,92 @@ function SpellActionFields({
           </label>
         ))}
       </fieldset>
-      {groups.map((group, index) => (
-        <div key={`${action.id}-group-${index}`}>
+      <label>
+        <input
+          type="checkbox"
+          checked={sharedPool}
+          onChange={(event) => {
+            if (event.target.checked) {
+              onChange({
+                ...action,
+                limitedUse: action.limitedUse ?? { kind: 'uses' },
+                spells: spells.map(({ limitedUse: _limitedUse, ...spell }) => spell),
+              })
+              return
+            }
+            const { limitedUse: _limitedUse, ...rest } = action
+            onChange(rest)
+          }}
+        />
+        Shared pool for every spell
+      </label>
+      {sharedPool ? <Text>All spell choices consume the same pool.</Text> : null}
+      {sharedPool ? <LimitedUseFields action={action} onChange={onChange} /> : null}
+      {spells.map((spell, index) => (
+        <div key={`${action.id}-spell-${index}`}>
           <label>
-            Spells
+            Spell
             <select
-              aria-label={`Spells ${index + 1}`}
-              multiple
-              value={group.spellIds}
+              aria-label={`Spell ${index + 1}`}
+              value={spell.spellId ?? ''}
               onChange={(event) => {
-                const spellIds = [...event.target.selectedOptions].map((option) => option.value)
+                const spellId = event.target.value || undefined
                 onChange({
                   ...action,
-                  spellGroups: groups.map((entry, groupIndex) =>
-                    groupIndex === index ? { ...entry, spellIds } : entry,
+                  spells: spells.map((entry, spellIndex) =>
+                    spellIndex === index ? { ...entry, spellId } : entry,
                   ),
                 })
               }}
             >
-              {spellOptions.map((spell) => (
-                <option key={spell.id} value={spell.id}>
-                  {spell.name}
+              <option value="">Choose</option>
+              {spellOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
                 </option>
               ))}
             </select>
           </label>
+          <label>
+            Cast at level
+            <input
+              aria-label={`Cast at level ${index + 1}`}
+              type="number"
+              min={0}
+              max={9}
+              value={spell.castAtLevel ?? ''}
+              onChange={(event) => {
+                const castAtLevel =
+                  event.target.value === '' ? undefined : Number(event.target.value)
+                onChange({
+                  ...action,
+                  spells: spells.map((entry, spellIndex) =>
+                    spellIndex === index ? { ...entry, castAtLevel } : entry,
+                  ),
+                })
+              }}
+            />
+          </label>
+          {sharedPool ? null : (
+            <LimitedUseFields
+              action={{ ...action, limitedUse: spell.limitedUse }}
+              onChange={(next) => {
+                onChange({
+                  ...action,
+                  spells: spells.map((entry, spellIndex) =>
+                    spellIndex === index ? { ...entry, limitedUse: next.limitedUse } : entry,
+                  ),
+                })
+              }}
+            />
+          )}
         </div>
       ))}
       <Button
         type="button"
-        onClick={() => onChange({ ...action, spellGroups: [...groups, { spellIds: [] }] })}
+        onClick={() => onChange({ ...action, spells: [...spells, { spellId: undefined }] })}
       >
-        Add spell group
+        Add spell
       </Button>
       <InheritedSpellTriggers ctx={ctx} action={action} section={section} />
     </div>
@@ -904,7 +959,7 @@ function MonsterActionDetail({
           onChange={(event) => onChange({ ...action, name: event.target.value })}
         />
       </label>
-      <LimitedUseFields action={action} onChange={onChange} />
+      {action.kind === 'spell' ? null : <LimitedUseFields action={action} onChange={onChange} />}
       <SpellActionFields ctx={ctx} action={action} section={section} onChange={onChange} />
       <ReactionTriggerField action={action} section={section} onChange={onChange} />
       {action.kind === 'natural-weapon' ? (

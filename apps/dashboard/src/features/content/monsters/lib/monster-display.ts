@@ -196,7 +196,13 @@ function formatAttackLine(line: DerivedMonsterAttackLine): string {
         ? `range ${line.range.normal}/${line.range.long ?? '—'} ft.`
         : undefined
   const hitPart = joinInlineMetadata([`${line.attackBonusLabel} to hit`, reachPart, 'one target'])
-  const damagePart = `Hit: ${line.damage} ${line.damageTypeLabel} damage`
+  const primary = line.damageExpression ? `${line.damage} (${line.damageExpression})` : line.damage
+  const extra = (line.additionalDamage ?? [])
+    .map((part) => `${part.average} (${part.expression}) ${part.damageTypeLabel}`)
+    .join(' plus ')
+  const damagePart = extra
+    ? `Hit: ${primary} ${line.damageTypeLabel} damage plus ${extra} damage`
+    : `Hit: ${primary} ${line.damageTypeLabel} damage`
   return joinInlineMetadata([hitPart, damagePart]) || line.name
 }
 
@@ -352,6 +358,7 @@ function formatLanguageLines(monster: Monster): string | undefined {
     {
       languages: monster.proficiencies.languages,
       telepathy: monster.communication.telepathy,
+      additionalLanguageCount: monster.proficiencies.additionalLanguageCount,
     },
     { formatLanguageLabel: getLanguageLabel },
   )
@@ -483,7 +490,9 @@ export function buildMonsterDetailViewModel({
         .map((action) => [action.id, action]),
     ),
   }
-  const sizeLabel = getCreatureSizeLabel(monster.size)
+  const sizeLabel = [monster.size, ...monster.alternateSizes]
+    .map((size) => getCreatureSizeLabel(size))
+    .join(' or ')
   const classificationLabel =
     joinInlineMetadata([sizeLabel, creatureTypeLabel]) || creatureTypeLabel
 

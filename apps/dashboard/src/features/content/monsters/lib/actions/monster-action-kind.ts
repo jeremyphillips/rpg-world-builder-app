@@ -52,20 +52,39 @@ function present(value: unknown): boolean {
   return true
 }
 
+function carriedActionName(
+  action: MonsterActionDraftRow,
+  nextKind: MonsterActionKind,
+  resolvedWeaponName: string | undefined,
+): string | undefined {
+  if (present(action.name)) return action.name
+  if (action.kind === 'weapon' && nextKind !== 'weapon') return resolvedWeaponName
+  return undefined
+}
+
+function carriedOnHit(
+  action: MonsterActionDraftRow,
+  nextKind: MonsterActionKind,
+): MonsterActionDraftRow['onHit'] {
+  const attackKinds = new Set(['weapon', 'natural-weapon', 'attack'])
+  if (!attackKinds.has(action.kind) || !attackKinds.has(nextKind)) return undefined
+  return action.onHit
+}
+
 export function reconcileMonsterActionKind(
   action: MonsterActionDraftRow,
   nextKind: MonsterActionKind,
   options?: { resolvedWeaponName?: string },
 ): MonsterActionDraftRow {
   const next: MonsterActionDraftRow = { id: action.id, kind: nextKind }
-  if (present(action.name)) next.name = action.name
-  else if (action.kind === 'weapon' && nextKind !== 'weapon' && options?.resolvedWeaponName) {
-    next.name = options.resolvedWeaponName
-  }
+  const name = carriedActionName(action, nextKind, options?.resolvedWeaponName)
+  if (name) next.name = name
   if (present(action.description)) next.description = action.description
   const triggerText = monsterActionTriggerText(action.trigger)
   if (triggerText) next.trigger = { text: triggerText }
   if (action.limitedUse) next.limitedUse = action.limitedUse
+  const onHit = carriedOnHit(action, nextKind)
+  if (onHit) next.onHit = onHit
   return next
 }
 

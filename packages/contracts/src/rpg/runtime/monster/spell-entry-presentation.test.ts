@@ -63,11 +63,9 @@ describe('formatMonsterSpellEntry', () => {
     const changed = formatMonsterSpellEntry({
       entry: {
         ...SPELLCASTING_ACTION,
-        spellGroups: [
-          {
-            limitedUse: SPELLCASTING_ACTION.spellGroups[1]?.limitedUse,
-            spellIds: ['missing', MONSTER_CHANGED],
-          },
+        spells: [
+          { spellId: 'missing', limitedUse: SPELLCASTING_ACTION.spells[2]?.limitedUse },
+          { spellId: MONSTER_CHANGED, limitedUse: SPELLCASTING_ACTION.spells[2]?.limitedUse },
         ],
       },
       monsterName: 'Archmage',

@@ -112,13 +112,12 @@ export const SPELLCASTING_ACTION = {
   name: 'Spellcasting',
   castingAbility: { kind: 'ability' as const, ability: 'int' as const },
   omittedComponents: ['material' as const],
-  spellGroups: [
-    { spellIds: [MONSTER_FIXTURE_SPELLS.mageHand.id, MONSTER_FIXTURE_SPELLS.detectMagic.id] },
-    {
-      limitedUse: longRestUses(2),
-      spellIds: [MONSTER_FIXTURE_SPELLS.fireball.id, MONSTER_FIXTURE_SPELLS.lightningBolt.id],
-    },
-    { limitedUse: longRestUses(1), spellIds: [MONSTER_FIXTURE_SPELLS.raiseDead.id] },
+  spells: [
+    { spellId: MONSTER_FIXTURE_SPELLS.mageHand.id },
+    { spellId: MONSTER_FIXTURE_SPELLS.detectMagic.id },
+    { spellId: MONSTER_FIXTURE_SPELLS.fireball.id, limitedUse: longRestUses(2) },
+    { spellId: MONSTER_FIXTURE_SPELLS.lightningBolt.id, limitedUse: longRestUses(2) },
+    { spellId: MONSTER_FIXTURE_SPELLS.raiseDead.id, limitedUse: longRestUses(1) },
   ],
 }
 
@@ -128,8 +127,9 @@ export const PROTECTIVE_MAGIC_REACTION = {
   name: 'Protective Magic',
   castingAbility: { kind: 'shared' as const, entryId: 'spellcasting' },
   limitedUse: longRestUses(3),
-  spellGroups: [
-    { spellIds: [MONSTER_FIXTURE_SPELLS.counterspell.id, MONSTER_FIXTURE_SPELLS.shield.id] },
+  spells: [
+    { spellId: MONSTER_FIXTURE_SPELLS.counterspell.id },
+    { spellId: MONSTER_FIXTURE_SPELLS.shield.id },
   ],
 }
 
@@ -138,7 +138,7 @@ export const MISTY_STEP_BONUS_ACTION = {
   kind: 'spell' as const,
   name: 'Misty Step',
   castingAbility: { kind: 'shared' as const, entryId: 'spellcasting' },
-  spellGroups: [{ spellIds: [MONSTER_FIXTURE_SPELLS.mistyStep.id] }],
+  spells: [{ spellId: MONSTER_FIXTURE_SPELLS.mistyStep.id }],
 }
 
 export const SHIELD_CONDITION_REACTION = {
@@ -147,5 +147,5 @@ export const SHIELD_CONDITION_REACTION = {
   name: 'Shield',
   castingAbility: { kind: 'shared' as const, entryId: 'spellcasting' },
   trigger: { text: 'The archmage can see the attacker.' },
-  spellGroups: [{ spellIds: [MONSTER_FIXTURE_SPELLS.shield.id] }],
+  spells: [{ spellId: MONSTER_FIXTURE_SPELLS.shield.id }],
 }

@@ -18,7 +18,7 @@ is blocked early with the same loading/error copy shown inline.
 ## Spells
 
 Monster `spell` actions reference canonical spell ids. `collectMonsterCatalogIssues`
-calls `collectSpellReferenceIssues` for every `spellGroups[].spellIds` entry, then
+calls `collectSpellReferenceIssues` for every `spells[].spellId`, then
 adds `spell_casting_time_incompatible` on publish when a known spell's casting time
 does not match the section.
 

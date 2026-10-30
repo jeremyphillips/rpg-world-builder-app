@@ -9,6 +9,7 @@ const DEFAULT_MONSTER = {
   name: 'Test Monster',
   description: '<p>A synthetic monster for tests.</p>',
   size: 'medium',
+  alternateSizes: [],
   creatureType: 'humanoid',
   alignment: 'n',
   abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },

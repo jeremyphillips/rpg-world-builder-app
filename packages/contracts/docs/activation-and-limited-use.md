@@ -39,7 +39,7 @@ Monster reactions store the same object. An absent trigger means the reaction's 
 
 Existing monster kinds and the `spell` kind share one field set. Published and draft schemas differ only in how complete those fields must be. `limitedUse` on an entry is optional. Drafts keep a partial limit. An absent limit means at will.
 
-A `spell` entry references canonical spell ids in `spellGroups`. A limit on the entry is one shared pool. A limit on a group belongs to each spell in that group. An entry cannot have both. `castingAbility.shared` points at another spell entry in the same body that has its own ability. The section is the invoking economy. A spell whose casting time does not match that economy can be saved as a draft and is rejected on publish.
+A `spell` entry references canonical spell ids in `spells`. A limit on the entry is one shared pool. A limit on a spell is that spell's own pool. An entry cannot have both. Identical per-spell limits stay independent. Stat-block groups are derived. `castingAbility.shared` points at another spell entry in the same body that has its own ability. The section is the invoking economy. A spell whose casting time does not match that economy can be saved as a draft and is rejected on publish.
 
 Spell prose is generated from that structure. Weapon attack lines stay derived. Special descriptions stay authored.
 
@@ -47,7 +47,7 @@ Spell prose is generated from that structure. Weapon attack lines stay derived. 
 
 Persisted spell references are canonical content ids: `<rulesetId>:<slug>` for system spells and the Mongo id for homebrew. `spellReferenceSchema` is that string. `resolveSpellReference` is `spellsById.get(ref)` and nothing else. There is no slug match and no shape test that treats a colon as proof of an id.
 
-Grants, class recommendations, monster `spellGroups`, and character sheet rows all use that schema. `collectSpellReferenceIssues` reports `unknown_spell` whenever the catalog is ready, and `spell_not_referenceable` or `spell_catalog_unavailable` on publish. Campaign availability does not invalidate a reference. Deleting a spell that one of those records names is blocked. Rich-text `data-content-id` links are presentation only and are not part of this reference.
+Grants, class recommendations, monster `spells`, and character sheet rows all use that schema. `collectSpellReferenceIssues` reports `unknown_spell` whenever the catalog is ready, and `spell_not_referenceable` or `spell_catalog_unavailable` on publish. Campaign availability does not invalidate a reference. Deleting a spell that one of those records names is blocked. Rich-text `data-content-id` links are presentation only and are not part of this reference.
 
 ## Grant rows
 

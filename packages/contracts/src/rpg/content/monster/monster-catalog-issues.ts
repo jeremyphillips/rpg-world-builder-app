@@ -30,6 +30,7 @@ export const MONSTER_CATALOG_ISSUE_CODE = {
   skillNotCampaignEligible: 'skill_not_campaign_eligible',
   skillCatalogUnavailable: 'skill_catalog_unavailable',
   spellCastingTimeIncompatible: 'spell_casting_time_incompatible',
+  spellCastLevelTooLow: 'spell_cast_level_too_low',
 } as const
 
 export type MonsterCatalogIssueCode =
@@ -44,7 +45,7 @@ type CatalogEquipmentEntry = EquipmentInstance & {
 type CatalogAction = {
   kind?: string
   equipmentEntryId?: string
-  spellGroups?: readonly { spellIds?: readonly string[] }[]
+  spells?: readonly { spellId?: string; castAtLevel?: number }[]
 }
 
 type CatalogSkillEntry = {
@@ -245,35 +246,37 @@ function collectSkillIssues(
   }
 }
 
-function spellActionReferences(body: MonsterCatalogIssueBody): { path: string; spellId: string }[] {
-  const refs: { path: string; spellId: string }[] = []
+function spellActionReferences(
+  body: MonsterCatalogIssueBody,
+): { path: string; spellId: string; castAtLevel?: number }[] {
+  const refs: { path: string; spellId: string; castAtLevel?: number }[] = []
   for (const section of ACTION_SECTIONS) {
     for (const [index, action] of (body[section] ?? []).entries()) {
       if (action.kind !== 'spell') continue
-      appendSpellGroupReferences(refs, section, index, action.spellGroups)
+      appendSpellReferences(refs, section, index, action.spells)
     }
   }
   return refs
 }
 
-function appendSpellGroupReferences(
-  refs: { path: string; spellId: string }[],
+function appendSpellReferences(
+  refs: { path: string; spellId: string; castAtLevel?: number }[],
   section: string,
   actionIndex: number,
-  groups: CatalogAction['spellGroups'],
+  spells: CatalogAction['spells'],
 ): void {
-  for (const [groupIndex, group] of (groups ?? []).entries()) {
-    for (const [spellIndex, spellId] of (group.spellIds ?? []).entries()) {
-      refs.push({
-        path: `${section}.${actionIndex}.spellGroups.${groupIndex}.spellIds.${spellIndex}`,
-        spellId,
-      })
-    }
+  for (const [spellIndex, spell] of (spells ?? []).entries()) {
+    if (!spell.spellId) continue
+    refs.push({
+      path: `${section}.${actionIndex}.spells.${spellIndex}.spellId`,
+      spellId: spell.spellId,
+      ...(spell.castAtLevel !== undefined ? { castAtLevel: spell.castAtLevel } : {}),
+    })
   }
 }
 
 function appendIncompatibleCastingTimes(
-  refs: readonly { path: string; spellId: string }[],
+  refs: readonly { path: string; spellId: string; castAtLevel?: number }[],
   catalogs: MonsterCatalogs,
   issues: ContentValidationIssue[],
 ): void {
@@ -282,17 +285,25 @@ function appendIncompatibleCastingTimes(
     const section = ref.path.split('.')[0] as keyof typeof MONSTER_SECTION_ECONOMY
     if (!spell) continue
     if (
-      isSpellCastingTimeCompatibleWithEconomy(spell.castingTime, MONSTER_SECTION_ECONOMY[section])
+      !isSpellCastingTimeCompatibleWithEconomy(spell.castingTime, MONSTER_SECTION_ECONOMY[section])
     ) {
-      continue
+      issues.push(
+        issue(
+          ref.path,
+          'This spell casting time does not match the action section.',
+          MONSTER_CATALOG_ISSUE_CODE.spellCastingTimeIncompatible,
+        ),
+      )
     }
-    issues.push(
-      issue(
-        ref.path,
-        'This spell casting time does not match the action section.',
-        MONSTER_CATALOG_ISSUE_CODE.spellCastingTimeIncompatible,
-      ),
-    )
+    if (ref.castAtLevel !== undefined && ref.castAtLevel < spell.level) {
+      issues.push(
+        issue(
+          ref.path.replace(/\.spellId$/, '.castAtLevel'),
+          'Cast level cannot be below the spell level.',
+          MONSTER_CATALOG_ISSUE_CODE.spellCastLevelTooLow,
+        ),
+      )
+    }
   }
 }
 

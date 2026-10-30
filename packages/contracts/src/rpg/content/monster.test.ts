@@ -182,7 +182,7 @@ describe('monster spell entries', () => {
     kind: 'spell' as const,
     name: 'Spellcasting',
     castingAbility: { kind: 'ability' as const, ability: 'int' as const },
-    spellGroups: [{ spellIds: ['srd-cc-5.2.1:mage-hand'] }],
+    spells: [{ spellId: 'srd-cc-5.2.1:mage-hand' }],
   }
 
   it('accepts every kind in every section and an optional reaction trigger', () => {
@@ -211,7 +211,7 @@ describe('monster spell entries', () => {
           {
             ...spellcasting,
             limitedUse: limited,
-            spellGroups: [{ limitedUse: limited, spellIds: ['srd-cc-5.2.1:mage-hand'] }],
+            spells: [{ spellId: 'srd-cc-5.2.1:mage-hand', limitedUse: limited }],
           },
         ],
       }).success,
@@ -223,7 +223,7 @@ describe('monster spell entries', () => {
         actions: [
           {
             ...spellcasting,
-            spellGroups: [{ spellIds: ['srd-cc-5.2.1:mage-hand', 'srd-cc-5.2.1:mage-hand'] }],
+            spells: [{ spellId: 'srd-cc-5.2.1:mage-hand' }, { spellId: 'srd-cc-5.2.1:mage-hand' }],
           },
         ],
       }).success,
@@ -242,7 +242,7 @@ describe('monster spell entries', () => {
             kind: 'spell',
             name: 'Misty Step',
             castingAbility: { kind: 'shared', entryId: 'spellcasting' },
-            spellGroups: [{ spellIds: ['srd-cc-5.2.1:misty-step'] }],
+            spells: [{ spellId: 'srd-cc-5.2.1:misty-step' }],
           },
         ],
       }).success,

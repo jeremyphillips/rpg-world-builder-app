@@ -56,10 +56,9 @@ describe('resolveMonsterReactionTrigger', () => {
     const resolved = resolveMonsterReactionTrigger({
       action: {
         kind: 'spell',
-        spellGroups: [
-          {
-            spellIds: [MONSTER_FIXTURE_SPELLS.shield.id, MONSTER_FIXTURE_SPELLS.fireball.id],
-          },
+        spells: [
+          { spellId: MONSTER_FIXTURE_SPELLS.shield.id },
+          { spellId: MONSTER_FIXTURE_SPELLS.fireball.id },
         ],
       },
       spellsById,
@@ -81,14 +80,14 @@ describe('resolveMonsterReactionTrigger', () => {
   it('reports unknown spells and an unavailable catalog', () => {
     expect(
       resolveMonsterReactionTrigger({
-        action: { kind: 'spell', spellGroups: [{ spellIds: ['missing'] }] },
+        action: { kind: 'spell', spells: [{ spellId: 'missing' }] },
         spellsById,
         catalogStatus: 'ready',
       }),
     ).toMatchObject({ spells: [{ reason: 'unknown-spell' }] })
     expect(
       resolveMonsterReactionTrigger({
-        action: { kind: 'spell', spellGroups: [{ spellIds: [MONSTER_FIXTURE_SPELLS.shield.id] }] },
+        action: { kind: 'spell', spells: [{ spellId: MONSTER_FIXTURE_SPELLS.shield.id }] },
         spellsById,
         catalogStatus: 'unavailable',
       }),

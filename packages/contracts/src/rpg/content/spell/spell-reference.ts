@@ -45,6 +45,14 @@ function walkAuthoredSpellReferences(
       refs.push({ path: `${path}.spellIds.${index}`, spellId })
     })
   }
+  if (Array.isArray(record.spells)) {
+    record.spells.forEach((spell, index) => {
+      if (!spell || typeof spell !== 'object') return
+      const spellId = (spell as { spellId?: unknown }).spellId
+      if (typeof spellId !== 'string') return
+      refs.push({ path: `${path}.spells.${index}.spellId`, spellId })
+    })
+  }
 
   for (const [key, child] of Object.entries(record)) {
     if (key === 'spellIds') continue
