@@ -10,6 +10,7 @@ import { pickEquipment, pickMonster, pickSkillProficiency } from '@/test/fixture
 
 import type * as UseEquipmentModule from '../../equipment/hooks/use-equipment'
 import type * as UseSkillProficienciesModule from '../../skill-proficiencies/hooks/use-skill-proficiencies'
+import type * as UseSpellsModule from '../../spells/hooks/use-spells'
 
 vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
@@ -41,7 +42,7 @@ vi.mock('../hooks/use-monsters', () => ({
   useMonsters: vi.fn(),
 }))
 vi.mock('../../spells/hooks/use-spells', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../spells/hooks/use-spells')>()
+  const actual = await importOriginal<typeof UseSpellsModule>()
   return {
     ...actual,
     useSpells: vi.fn(() => ({
