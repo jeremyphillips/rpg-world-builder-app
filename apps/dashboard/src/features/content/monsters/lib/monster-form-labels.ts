@@ -191,6 +191,10 @@ export function getMonsterArmorSlotUiCopy(slot: CreatureArmorSlot): {
 export const MONSTER_KIND_LABEL = getMonsterActionKindFieldLabel()
 export const MONSTER_ACTION_NAME_LABEL = 'Name'
 export const MONSTER_TRIGGER_LABEL = getMonsterReactionFieldLabel('trigger')
+export const MONSTER_ADDITIONAL_CONDITION_LABEL =
+  getMonsterReactionFieldLabel('additionalCondition')
+export const MONSTER_ADDITIONAL_CONDITION_HINT = "Each spell's own trigger always applies."
+export const MONSTER_SPELL_PRESET_HINT = 'Casts referenced spells'
 export const MONSTER_MOVE_TO_LABEL = 'Move to'
 export const MONSTER_MOVE_UP_LABEL = 'Move up'
 export const MONSTER_MOVE_DOWN_LABEL = 'Move down'

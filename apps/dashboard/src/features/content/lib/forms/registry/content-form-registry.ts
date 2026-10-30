@@ -11,6 +11,7 @@ import type {
   EquipmentKind,
   OrganizationPractice,
   SkillProficiency,
+  Spell,
   WeaponCategory,
 } from '@rpg/contracts'
 import type { ResolvedCampaignRules, ResolvedSpellcastingProgressionConfig } from '@rpg/contracts'
@@ -79,6 +80,10 @@ export type ContentFormCtx = {
   equipmentCatalogStatus?: 'pending' | 'ready' | 'error'
   /** `ready` once `skillCatalogBySlug` is the campaign's effective catalog. */
   skillCatalogStatus?: 'pending' | 'ready' | 'error'
+  /** Spells keyed by canonical content id for monster spell actions. */
+  spellCatalogById?: ReadonlyMap<string, Spell>
+  /** `ready` once `spellCatalogById` is the campaign's effective catalog. */
+  spellCatalogStatus?: 'pending' | 'ready' | 'error'
   /** Campaign armor-class scale captured for this authoring session. */
   armorClassRules?: ArmorClassRules
   /** Selected member class affinity ids for orphan chip union on edit load. */

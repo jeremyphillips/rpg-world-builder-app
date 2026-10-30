@@ -19,8 +19,12 @@ import {
   type MonsterReaction,
   type SkillProficiency,
   deriveMonsterStatBlock,
+  formatMonsterLimitedUseHeading,
+  formatMonsterSpellEntry,
+  limitedUseSchema,
   type ArmorClassRules,
   type DerivedMonsterAttackLine,
+  type MonsterReferencedSpell,
   type DerivedFieldReason,
   type DerivedMonsterStatBlock,
   type MagicPropertyDefinitionProvider,
@@ -97,6 +101,8 @@ export type BuildMonsterDetailViewModelInput = {
   equipmentById: Map<string, Equipment>
   catalogState: MonsterCatalogLoadState
   derived?: DerivedMonsterStatBlock | null
+  spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
+  spellCatalogStatus?: 'ready' | 'unavailable'
 }
 
 export function monsterUnavailableReasonCopy(
@@ -202,14 +208,20 @@ function findAttackLine(
   return derived?.attacks.find((line) => line.section === section && line.id === actionId)
 }
 
+function withLimitedUseHeading(name: string, limitedUse: unknown): string {
+  const parsed = limitedUseSchema.safeParse(limitedUse)
+  return parsed.success ? formatMonsterLimitedUseHeading(name, parsed.data) : name
+}
+
 function resolveActionName(
   action: MonsterAction,
   attack: DerivedMonsterAttackLine | undefined,
 ): string {
-  if (action.kind === 'special' || action.kind === 'natural-weapon') {
-    return action.name
-  }
-  return action.name ?? attack?.name ?? action.id
+  const name =
+    action.kind === 'special' || action.kind === 'natural-weapon'
+      ? action.name
+      : (action.name ?? attack?.name ?? action.id)
+  return withLimitedUseHeading(name, action.limitedUse)
 }
 
 function resolveActionAttackLine(
@@ -225,12 +237,37 @@ function resolveActionAttackLine(
   return undefined
 }
 
+type SpellDisplayContext = {
+  monsterName: string
+  spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
+  catalogStatus: 'ready' | 'unavailable'
+  spellsInBody: Map<string, Extract<MonsterAction | MonsterReaction, { kind: 'spell' }>>
+}
+
 function mapActionItem(
-  action: MonsterAction,
+  action: MonsterAction | MonsterReaction,
   section: DerivedMonsterAttackLine['section'],
   derived: DerivedMonsterStatBlock | null | undefined,
   catalogState: MonsterCatalogLoadState,
+  spells: SpellDisplayContext,
 ): MonsterActionItemViewModel {
+  if (action.kind === 'spell') {
+    const rendered = formatMonsterSpellEntry({
+      entry: action,
+      monsterName: spells.monsterName,
+      section,
+      spellsById: spells.spellsById,
+      catalogStatus: spells.catalogStatus,
+      spellsInBody: spells.spellsInBody,
+    })
+    const descriptionHtml = [rendered.bodyHtml, action.description].filter(Boolean).join('')
+    return {
+      id: action.id,
+      name: rendered.heading,
+      descriptionHtml: descriptionHtml || undefined,
+    }
+  }
+
   const attack = findAttackLine(derived, section, action.id)
   const name = resolveActionName(action, attack)
 
@@ -251,32 +288,53 @@ function mapActionItem(
 }
 
 function mapActionItems(
-  actions: readonly MonsterAction[],
+  actions: readonly (MonsterAction | MonsterReaction)[],
   section: DerivedMonsterAttackLine['section'],
   derived: DerivedMonsterStatBlock | null | undefined,
   catalogState: MonsterCatalogLoadState,
+  spells: SpellDisplayContext,
 ): MonsterActionItemViewModel[] {
-  return actions.map((action) => mapActionItem(action, section, derived, catalogState))
+  return actions.map((action) => mapActionItem(action, section, derived, catalogState, spells))
 }
 
 function mapReactionItems(
   reactions: readonly MonsterReaction[],
   derived: DerivedMonsterStatBlock | null | undefined,
   catalogState: MonsterCatalogLoadState,
+  spells: SpellDisplayContext,
 ): MonsterActionItemViewModel[] {
-  return reactions.map((action) => {
-    const [base] = mapActionItems([action], 'reactions', derived, catalogState)
-    const triggerText = action.trigger?.text
-    const hasBody = Boolean(base?.attackLine || base?.descriptionHtml)
-    return {
-      id: base?.id ?? action.id,
-      name: base?.name ?? action.id,
-      attackLine: base?.attackLine,
-      descriptionHtml: base?.descriptionHtml,
-      triggerLine: triggerText ? `Trigger: ${triggerText}` : undefined,
-      responseLabel: triggerText && hasBody ? 'Response:' : undefined,
-    }
-  })
+  return reactions.map((action) =>
+    reactionItemView(
+      action,
+      mapActionItems([action], 'reactions', derived, catalogState, spells)[0],
+    ),
+  )
+}
+
+function reactionItemView(
+  action: MonsterReaction,
+  base: MonsterActionItemViewModel | undefined,
+): MonsterActionItemViewModel {
+  const triggerText = action.trigger?.text
+  const hasBody = Boolean(base?.attackLine || base?.descriptionHtml)
+  return {
+    id: base?.id ?? action.id,
+    name: base?.name ?? action.id,
+    attackLine: base?.attackLine,
+    descriptionHtml: base?.descriptionHtml,
+    triggerLine: triggerLine(triggerText),
+    responseLabel: responseLabel(triggerText, hasBody),
+  }
+}
+
+function triggerLine(text: string | undefined): string | undefined {
+  if (!text) return undefined
+  return `Trigger: ${text}`
+}
+
+function responseLabel(text: string | undefined, hasBody: boolean): string | undefined {
+  if (!text || !hasBody) return undefined
+  return 'Response:'
 }
 
 function formatSenseLines(monster: Monster, passivePerception?: number): string {
@@ -412,7 +470,19 @@ export function buildMonsterDetailViewModel({
   equipmentById,
   catalogState,
   derived,
+  spellsById,
+  spellCatalogStatus = 'unavailable',
 }: BuildMonsterDetailViewModelInput): MonsterDetailViewModel {
+  const spellContext = {
+    monsterName: monster.name,
+    spellsById,
+    catalogStatus: spellCatalogStatus,
+    spellsInBody: new Map(
+      [...monster.actions, ...monster.bonusActions, ...monster.reactions]
+        .filter((action) => action.kind === 'spell')
+        .map((action) => [action.id, action]),
+    ),
+  }
   const sizeLabel = getCreatureSizeLabel(monster.size)
   const classificationLabel =
     joinInlineMetadata([sizeLabel, creatureTypeLabel]) || creatureTypeLabel
@@ -445,9 +515,15 @@ export function buildMonsterDetailViewModel({
       name: trait.name,
       descriptionHtml: trait.description,
     })),
-    actions: mapActionItems(monster.actions, 'actions', derived, catalogState),
-    bonusActions: mapActionItems(monster.bonusActions, 'bonusActions', derived, catalogState),
-    reactions: mapReactionItems(monster.reactions, derived, catalogState),
+    actions: mapActionItems(monster.actions, 'actions', derived, catalogState, spellContext),
+    bonusActions: mapActionItems(
+      monster.bonusActions,
+      'bonusActions',
+      derived,
+      catalogState,
+      spellContext,
+    ),
+    reactions: mapReactionItems(monster.reactions, derived, catalogState, spellContext),
   }
 }
 

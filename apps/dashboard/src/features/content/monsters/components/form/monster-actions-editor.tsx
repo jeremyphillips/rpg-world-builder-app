@@ -2,10 +2,15 @@ import { useEffect, useId, useMemo, useRef, useState, type RefObject } from 'rea
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import { useFormContext, type UseFormReturn } from 'react-hook-form'
 import {
+  ABILITY_IDS,
+  getAbilityLabel,
   getContentTypeTerm,
   getDamageTypeLabel,
   getMonsterActionKindLabel,
   getWeaponModeLabel,
+  resolveMonsterReactionTrigger,
+  SPELL_COMPONENT_ENTRIES,
+  SPELL_COMPONENT_IDS,
   isWeaponEquipment,
   MONSTER_ACTION_KINDS,
   resolveEquipmentInstanceReferenceLabel,
@@ -37,6 +42,8 @@ import {
   MONSTER_ACTION_DETAIL_EMPTY,
   MONSTER_ACTION_NAME_LABEL,
   MONSTER_ACTIONS_EMPTY,
+  MONSTER_ADDITIONAL_CONDITION_HINT,
+  MONSTER_ADDITIONAL_CONDITION_LABEL,
   MONSTER_ADD_LABEL,
   MONSTER_CANCEL_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
@@ -48,6 +55,7 @@ import {
   MONSTER_REMOVE_LABEL,
   MONSTER_SECTION_EMPTY,
   MONSTER_SPECIAL_PRESET_HINT,
+  MONSTER_SPELL_PRESET_HINT,
   MONSTER_TRIGGER_LABEL,
   MONSTER_WEAPON_PRESET_HINT,
   MONSTER_DROP_TRIGGER_CONFIRM,
@@ -157,6 +165,10 @@ function ActionPresetMenu({
       <Button type="button" onClick={() => onChoose('special')}>
         Special
         <Text>{MONSTER_SPECIAL_PRESET_HINT}</Text>
+      </Button>
+      <Button type="button" onClick={() => onChoose('spell')}>
+        Spell
+        <Text>{MONSTER_SPELL_PRESET_HINT}</Text>
       </Button>
     </div>
   )
@@ -430,12 +442,13 @@ function NaturalWeaponMeasure({
           aria-label="Range"
           type="number"
           value={action.range?.normal ?? ''}
-          onChange={(event) =>
+          onChange={(event) => {
+            const normal = Number(event.target.value)
             onChange({
               ...action,
-              range: { normal: Number(event.target.value) || undefined },
+              range: Number.isFinite(normal) && normal > 0 ? { normal } : undefined,
             })
-          }
+          }}
         />
       </label>
     )
@@ -451,6 +464,352 @@ function NaturalWeaponMeasure({
           onChange({ ...action, reach: Number(event.target.value) || undefined })
         }
       />
+    </label>
+  )
+}
+
+function RechargeLimitFields({
+  action,
+  onChange,
+}: {
+  action: MonsterActionDraftRow
+  onChange: (next: MonsterActionDraftRow) => void
+}) {
+  if (action.limitedUse?.kind !== 'recharge') return null
+  return (
+    <label>
+      Minimum roll
+      <input
+        aria-label="Minimum roll"
+        type="number"
+        min={2}
+        max={6}
+        value={action.limitedUse.minRoll ?? ''}
+        onChange={(event) => {
+          const minRoll = event.target.value === '' ? undefined : Number(event.target.value)
+          onChange({
+            ...action,
+            limitedUse: { kind: 'recharge', ...(minRoll === undefined ? {} : { minRoll }) },
+          })
+        }}
+      />
+    </label>
+  )
+}
+
+function UsesLimitFields({
+  action,
+  onChange,
+}: {
+  action: MonsterActionDraftRow
+  onChange: (next: MonsterActionDraftRow) => void
+}) {
+  if (action.limitedUse?.kind !== 'uses') return null
+  const limitedUse = action.limitedUse
+  return (
+    <>
+      <label>
+        Count
+        <select
+          aria-label="Count"
+          value={limitedUse.count?.kind ?? ''}
+          onChange={(event) => onChange(usesCountChange(action, event.target.value))}
+        >
+          <option value="">Choose</option>
+          <option value="fixed">Fixed number</option>
+          <option value="proficiency-bonus">Proficiency bonus</option>
+        </select>
+      </label>
+      <FixedUseCountField action={action} onChange={onChange} />
+      <label>
+        Recovers on
+        <select
+          aria-label="Recovers on"
+          value={limitedUse.recovery?.minimumRest ?? ''}
+          onChange={(event) => onChange(usesRestChange(action, event.target.value))}
+        >
+          <option value="">Choose</option>
+          <option value="short">Short Rest</option>
+          <option value="long">Long Rest</option>
+        </select>
+      </label>
+    </>
+  )
+}
+
+function FixedUseCountField({
+  action,
+  onChange,
+}: {
+  action: MonsterActionDraftRow
+  onChange: (next: MonsterActionDraftRow) => void
+}) {
+  if (action.limitedUse?.kind !== 'uses' || action.limitedUse.count?.kind !== 'fixed') return null
+  return (
+    <label>
+      Uses
+      <input
+        aria-label="Uses"
+        type="number"
+        min={1}
+        value={action.limitedUse.count.value ?? ''}
+        onChange={(event) => onChange(fixedUseValueChange(action, event.target.value))}
+      />
+    </label>
+  )
+}
+
+function usesCountChange(action: MonsterActionDraftRow, countKind: string): MonsterActionDraftRow {
+  const recovery = action.limitedUse?.kind === 'uses' ? action.limitedUse.recovery : undefined
+  if (countKind === 'proficiency-bonus') {
+    return {
+      ...action,
+      limitedUse: { kind: 'uses', recovery, count: { kind: 'proficiency-bonus' } },
+    }
+  }
+  if (countKind === 'fixed') {
+    return { ...action, limitedUse: { kind: 'uses', recovery, count: { kind: 'fixed' } } }
+  }
+  return { ...action, limitedUse: { kind: 'uses', recovery } }
+}
+
+function fixedUseValueChange(action: MonsterActionDraftRow, raw: string): MonsterActionDraftRow {
+  const recovery = action.limitedUse?.kind === 'uses' ? action.limitedUse.recovery : undefined
+  const value = raw === '' ? undefined : Number(raw)
+  return {
+    ...action,
+    limitedUse: {
+      kind: 'uses',
+      recovery,
+      count: value === undefined ? { kind: 'fixed' } : { kind: 'fixed', value },
+    },
+  }
+}
+
+function usesRestChange(action: MonsterActionDraftRow, minimumRest: string): MonsterActionDraftRow {
+  const count = action.limitedUse?.kind === 'uses' ? action.limitedUse.count : undefined
+  if (minimumRest !== 'short' && minimumRest !== 'long') {
+    return { ...action, limitedUse: { kind: 'uses', count } }
+  }
+  return { ...action, limitedUse: { kind: 'uses', count, recovery: { minimumRest } } }
+}
+
+function LimitedUseFields({
+  action,
+  onChange,
+}: {
+  action: MonsterActionDraftRow
+  onChange: (next: MonsterActionDraftRow) => void
+}) {
+  const kind = action.limitedUse?.kind ?? 'none'
+  return (
+    <div>
+      <label>
+        Limit
+        <select
+          aria-label="Limit"
+          value={kind}
+          onChange={(event) => {
+            const next = event.target.value
+            if (next === 'none') {
+              const { limitedUse: _limitedUse, ...rest } = action
+              onChange(rest)
+              return
+            }
+            if (next === 'recharge') onChange({ ...action, limitedUse: { kind: 'recharge' } })
+            if (next === 'uses') onChange({ ...action, limitedUse: { kind: 'uses' } })
+          }}
+        >
+          <option value="none">No limit</option>
+          <option value="uses">Uses</option>
+          <option value="recharge">Recharge</option>
+        </select>
+      </label>
+      <RechargeLimitFields action={action} onChange={onChange} />
+      <UsesLimitFields action={action} onChange={onChange} />
+    </div>
+  )
+}
+
+function spellAbilityValue(action: MonsterActionDraftRow): string {
+  if (action.castingAbility?.kind === 'ability') return action.castingAbility.ability
+  if (action.castingAbility?.kind === 'shared') return `shared:${action.castingAbility.entryId}`
+  return ''
+}
+
+function applySpellAbility(action: MonsterActionDraftRow, value: string): MonsterActionDraftRow {
+  if (!value) {
+    const { castingAbility: _castingAbility, ...rest } = action
+    return rest
+  }
+  if (value.startsWith('shared:')) {
+    return {
+      ...action,
+      castingAbility: { kind: 'shared', entryId: value.slice('shared:'.length) },
+    }
+  }
+  return { ...action, castingAbility: { kind: 'ability', ability: value as never } }
+}
+
+function SpellActionFields({
+  ctx,
+  action,
+  section,
+  onChange,
+}: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  onChange: (next: MonsterActionDraftRow) => void
+}) {
+  const { getValues } = useFormContext<MonsterFormValues>()
+  if (action.kind !== 'spell') return null
+  const values = getValues()
+  const spellOptions = [...(ctx.spellCatalogById?.values() ?? [])]
+  const sharedTargets = (
+    [...values.actions, ...values.bonusActions, ...values.reactions] as MonsterActionDraftRow[]
+  ).filter(
+    (entry) =>
+      entry.kind === 'spell' &&
+      entry.id !== action.id &&
+      entry.castingAbility?.kind === 'ability' &&
+      entry.name,
+  )
+  const groups = action.spellGroups ?? []
+
+  return (
+    <div>
+      <label>
+        Spellcasting ability
+        <select
+          aria-label="Spellcasting ability"
+          value={spellAbilityValue(action)}
+          onChange={(event) => onChange(applySpellAbility(action, event.target.value))}
+        >
+          <option value="">Choose</option>
+          {ABILITY_IDS.map((ability) => (
+            <option key={ability} value={ability}>
+              {getAbilityLabel(ability)}
+            </option>
+          ))}
+          {sharedTargets.map((entry) => (
+            <option key={entry.id} value={`shared:${entry.id}`}>
+              Same as {entry.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <fieldset>
+        <legend>Omitted components</legend>
+        {SPELL_COMPONENT_IDS.map((component) => (
+          <label key={component}>
+            <input
+              type="checkbox"
+              checked={action.omittedComponents?.includes(component) ?? false}
+              onChange={(event) => {
+                const current = action.omittedComponents ?? []
+                onChange({
+                  ...action,
+                  omittedComponents: event.target.checked
+                    ? [...current, component]
+                    : current.filter((id) => id !== component),
+                })
+              }}
+            />
+            {SPELL_COMPONENT_ENTRIES[component].label}
+          </label>
+        ))}
+      </fieldset>
+      {groups.map((group, index) => (
+        <div key={`${action.id}-group-${index}`}>
+          <label>
+            Spells
+            <select
+              aria-label={`Spells ${index + 1}`}
+              multiple
+              value={group.spellIds}
+              onChange={(event) => {
+                const spellIds = [...event.target.selectedOptions].map((option) => option.value)
+                onChange({
+                  ...action,
+                  spellGroups: groups.map((entry, groupIndex) =>
+                    groupIndex === index ? { ...entry, spellIds } : entry,
+                  ),
+                })
+              }}
+            >
+              {spellOptions.map((spell) => (
+                <option key={spell.id} value={spell.id}>
+                  {spell.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      ))}
+      <Button
+        type="button"
+        onClick={() => onChange({ ...action, spellGroups: [...groups, { spellIds: [] }] })}
+      >
+        Add spell group
+      </Button>
+      <InheritedSpellTriggers ctx={ctx} action={action} section={section} />
+    </div>
+  )
+}
+
+function InheritedSpellTriggers({
+  ctx,
+  action,
+  section,
+}: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+}) {
+  if (section !== 'reactions' || action.kind !== 'spell') return null
+  const resolution = resolveMonsterReactionTrigger({
+    action,
+    spellsById: ctx.spellCatalogById,
+    catalogStatus: ctx.spellCatalogStatus === 'ready' ? 'ready' : 'unavailable',
+  })
+  if (resolution.kind !== 'spell-choices') return null
+  return (
+    <>
+      {resolution.spells.map((spell) => (
+        <Text key={spell.spellId}>
+          {spell.status === 'inherited'
+            ? `Trigger: ${spell.trigger}`
+            : `Unavailable spell (${spell.reason})`}
+        </Text>
+      ))}
+    </>
+  )
+}
+
+function ReactionTriggerField({
+  action,
+  section,
+  onChange,
+}: {
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  onChange: (next: MonsterActionDraftRow) => void
+}) {
+  if (section !== 'reactions') return null
+  const label = action.kind === 'spell' ? MONSTER_ADDITIONAL_CONDITION_LABEL : MONSTER_TRIGGER_LABEL
+  return (
+    <label>
+      {label}
+      <input
+        aria-label={label}
+        value={action.trigger?.text ?? ''}
+        onChange={(event) => {
+          const text = event.target.value
+          onChange({ ...action, trigger: text ? { text } : undefined })
+        }}
+      />
+      {action.kind === 'spell' ? <Text>{MONSTER_ADDITIONAL_CONDITION_HINT}</Text> : null}
     </label>
   )
 }
@@ -545,19 +904,9 @@ function MonsterActionDetail({
           onChange={(event) => onChange({ ...action, name: event.target.value })}
         />
       </label>
-      {section === 'reactions' ? (
-        <label>
-          {MONSTER_TRIGGER_LABEL}
-          <input
-            aria-label={MONSTER_TRIGGER_LABEL}
-            value={action.trigger?.text ?? ''}
-            onChange={(event) => {
-              const text = event.target.value
-              onChange({ ...action, trigger: text ? { text } : undefined })
-            }}
-          />
-        </label>
-      ) : null}
+      <LimitedUseFields action={action} onChange={onChange} />
+      <SpellActionFields ctx={ctx} action={action} section={section} onChange={onChange} />
+      <ReactionTriggerField action={action} section={section} onChange={onChange} />
       {action.kind === 'natural-weapon' ? (
         <NaturalWeaponControls action={action} prefix={`${section}.${index}`} onChange={onChange} />
       ) : null}

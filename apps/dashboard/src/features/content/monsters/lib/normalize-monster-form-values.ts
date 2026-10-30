@@ -8,6 +8,7 @@ import {
   type ContentValidationIntent,
 } from '@rpg/contracts'
 
+import { normalizeLimitedUse } from '../../lib/forms/limited-use/normalize-limited-use'
 import { monsterActionActiveKeys, monsterActionTriggerText } from './actions/monster-action-kind'
 
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
@@ -77,6 +78,11 @@ function normalizeAction(
     const text = monsterActionTriggerText(cleaned.trigger)
     if (text) cleaned.trigger = { text }
     else delete cleaned.trigger
+  }
+  if ('limitedUse' in cleaned) {
+    const limitedUse = normalizeLimitedUse(cleaned.limitedUse)
+    if (limitedUse) cleaned.limitedUse = limitedUse
+    else delete cleaned.limitedUse
   }
   const keys =
     typeof cleaned.kind === 'string' ? monsterActionActiveKeys(cleaned.kind, section) : []

@@ -30,6 +30,8 @@ function buildMonsterFormCatalogs(ctx: ContentFormCtx): MonsterCatalogs {
     skillBySlug: ctx.skillCatalogBySlug ?? new Map(),
     equipmentCatalog: catalogLoadStatus(ctx.equipmentCatalogStatus),
     skillCatalog: catalogLoadStatus(ctx.skillCatalogStatus),
+    spellsById: ctx.spellCatalogById,
+    spellCatalog: catalogLoadStatus(ctx.spellCatalogStatus),
   }
 }
 

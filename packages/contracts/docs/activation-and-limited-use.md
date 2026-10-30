@@ -33,7 +33,15 @@ A free-cast entitlement has one `source` from `grantDerivedSelectionSourceSchema
 
 Spell casting time stores that object on `normal.trigger`. It is required when the unit is `reaction` and rejected for every other unit.
 
-Monster reactions store the same object. An absent trigger means the reaction's trigger is unspecified. Reactions with an authored trigger render as `Trigger:` followed by `Response:`.
+Monster reactions store the same object. An absent trigger means the reaction's trigger is unspecified. Reactions with an authored trigger render as `Trigger:` followed by `Response:`. On a spell reaction, that field is an additional condition. Each referenced reaction spell keeps its own trigger.
+
+## Monster actions
+
+Existing monster kinds and the `spell` kind share one field set. Published and draft schemas differ only in how complete those fields must be. `limitedUse` on an entry is optional. Drafts keep a partial limit. An absent limit means at will.
+
+A `spell` entry references canonical spell ids in `spellGroups`. A limit on the entry is one shared pool. A limit on a group belongs to each spell in that group. An entry cannot have both. `castingAbility.shared` points at another spell entry in the same body that has its own ability. The section is the invoking economy. A spell whose casting time does not match that economy can be saved as a draft and is rejected on publish.
+
+Spell prose is generated from that structure. Weapon attack lines stay derived. Special descriptions stay authored.
 
 ## Spell references and grant rows
 

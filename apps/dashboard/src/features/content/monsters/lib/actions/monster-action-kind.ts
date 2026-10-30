@@ -65,6 +65,7 @@ export function reconcileMonsterActionKind(
   if (present(action.description)) next.description = action.description
   const triggerText = monsterActionTriggerText(action.trigger)
   if (triggerText) next.trigger = { text: triggerText }
+  if (action.limitedUse) next.limitedUse = action.limitedUse
   return next
 }
 

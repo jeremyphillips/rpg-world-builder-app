@@ -6,6 +6,7 @@ import { CHALLENGE_RATING_MECHANICS } from '../../vocab/challenge-rating'
 import { CREATURE_SIZE_HIT_DIE } from '../../vocab/creature-size'
 import type { ArmorClassRules } from '../../vocab/mechanics/armor-class-scale'
 import { abilityModifier } from '../creature/ability-modifier'
+import { spellAttackBonus, spellSaveDc } from '../creature/spell-dc'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { resolveMonsterArmorClass, type MonsterArmorClassResolution } from './armor-class'
 import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
@@ -58,6 +59,14 @@ export type DerivedMonsterStatBlock = {
   savingThrows: Partial<Record<'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha', number>>
   skills: Array<{ skillId: string; label: string; modifier: number }>
   attacks: DerivedMonsterAttackLine[]
+  spellcasting: DerivedMonsterSpellcastingLine[]
+}
+
+export type DerivedMonsterSpellcastingLine = {
+  id: string
+  section: 'actions' | 'bonusActions' | 'reactions'
+  saveDc: number
+  attackBonus: number
 }
 
 export type DeriveMonsterStatBlockInput = {
@@ -245,7 +254,7 @@ function appendAttackLines(
   section: DerivedMonsterAttackLine['section'],
 ): void {
   for (const action of actions) {
-    if (action.kind === 'special') continue
+    if (action.kind !== 'weapon' && action.kind !== 'natural-weapon') continue
     const line = resolveWeaponAttackLine({ ...args, action, section })
     if (!line) {
       throw new Error(`Monster attack ${action.id} is unavailable.`)
@@ -319,7 +328,48 @@ export function deriveMonsterStatBlock({
     savingThrows,
     skills,
     attacks,
+    spellcasting: deriveSpellcastingLines(monster, proficiencyBonus),
   }
+}
+
+function deriveSpellcastingLines(
+  monster: MonsterBody,
+  proficiencyBonus: number,
+): DerivedMonsterSpellcastingLine[] {
+  const sections = ['actions', 'bonusActions', 'reactions'] as const
+  const spells = new Map<
+    string,
+    Extract<MonsterBody['actions'][number] | MonsterBody['reactions'][number], { kind: 'spell' }>
+  >()
+  for (const section of sections) {
+    for (const action of monster[section]) {
+      if (action.kind === 'spell') spells.set(action.id, action)
+    }
+  }
+  const lines: DerivedMonsterSpellcastingLine[] = []
+  for (const section of sections) {
+    for (const action of monster[section]) {
+      if (action.kind !== 'spell' || !action.castingAbility) continue
+      const ability =
+        action.castingAbility.kind === 'ability'
+          ? action.castingAbility.ability
+          : (() => {
+              const target = spells.get(action.castingAbility.entryId)
+              return target?.castingAbility?.kind === 'ability'
+                ? target.castingAbility.ability
+                : undefined
+            })()
+      if (!ability) continue
+      const score = monster.abilityScores[ability]
+      lines.push({
+        id: action.id,
+        section,
+        saveDc: spellSaveDc(score, proficiencyBonus),
+        attackBonus: spellAttackBonus(score, proficiencyBonus),
+      })
+    }
+  }
+  return lines
 }
 
 export type DerivedDraftAttack = {

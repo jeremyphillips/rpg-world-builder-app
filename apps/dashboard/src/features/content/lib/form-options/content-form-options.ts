@@ -126,6 +126,7 @@ function useContentCatalogLists(campaignId: string | undefined) {
     isError: isAnyError(...queries),
     equipmentQuery,
     skillsQuery,
+    spellsQuery,
     queries,
   }
 }
@@ -305,6 +306,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
       options,
       equipmentCatalogById: new Map((catalog.equipment ?? []).map((item) => [item.id, item])),
       skillCatalogBySlug: new Map((catalog.skills ?? []).map((skill) => [skill.slug, skill])),
+      spellCatalogById: new Map((catalog.spells ?? []).map((spell) => [spell.id, spell])),
       equipmentCatalogStatus: catalog.equipmentQuery.isError
         ? 'error'
         : catalog.equipmentQuery.isPending
@@ -313,6 +315,11 @@ export function useContentFormOptions(campaignId: string | undefined): {
       skillCatalogStatus: catalog.skillsQuery.isError
         ? 'error'
         : catalog.skillsQuery.isPending
+          ? 'pending'
+          : 'ready',
+      spellCatalogStatus: catalog.spellsQuery.isError
+        ? 'error'
+        : catalog.spellsQuery.isPending
           ? 'pending'
           : 'ready',
       armorClassRules: rulesetPatch?.mechanics.armorClass,
@@ -330,6 +337,9 @@ export function useContentFormOptions(campaignId: string | undefined): {
       catalog.equipmentQuery.isPending,
       catalog.skillsQuery.isError,
       catalog.skillsQuery.isPending,
+      catalog.spells,
+      catalog.spellsQuery.isError,
+      catalog.spellsQuery.isPending,
       rulesetPatch?.mechanics.armorClass,
     ],
   )

@@ -1,5 +1,6 @@
 const MONSTER_REACTION_FIELD_LABELS = {
   trigger: 'Trigger',
+  additionalCondition: 'Additional condition',
 } as const satisfies Record<string, string>
 
 export type MonsterReactionFieldId = keyof typeof MONSTER_REACTION_FIELD_LABELS

@@ -42,6 +42,7 @@ import {
   monsterReactionDraftSchema,
   monsterReactionSchema,
   refineMonsterActionShape,
+  refineMonsterSpellEntries,
 } from './monster/action'
 
 export {
@@ -50,7 +51,12 @@ export {
   monsterActionDraftSchema,
   monsterReactionDraftSchema,
 } from './monster/action'
-export type { MonsterAction, MonsterReaction } from './monster/action'
+export type {
+  MonsterAction,
+  MonsterActionDraft,
+  MonsterReaction,
+  MonsterReactionDraft,
+} from './monster/action'
 import type { EquipmentInstance } from './equipment/instance/instance'
 import { normalizeEquipmentInstance } from './equipment/instance/normalize-equipment-instance'
 import { refineEquipmentInstanceInvariants } from './equipment/instance/instance-invariants'
@@ -287,6 +293,7 @@ export function refineMonsterBody(
       refineMonsterActionShape(action, ctx, [...prefix, section, index])
     }
   }
+  refineMonsterSpellEntries(body, ctx, prefix)
 
   refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
   refineCreatureDamageDefenses(body.defenses, ctx, [...prefix, 'defenses'])
@@ -325,10 +332,10 @@ const monsterStoredSchema = publishStoredSchema(monsterBodySchema).superRefine((
 
 export const monsterSchema = monsterStoredSchema as unknown as z.ZodType<Monster>
 
-function refineMonsterDraftBody(
+function refineMonsterDraftIds(
   body: MonsterBodyDraft,
   ctx: z.RefinementCtx,
-  prefix: (string | number)[] = [],
+  prefix: (string | number)[],
 ): void {
   const equipment = body.equipment ?? []
   const entryIds = equipment.map((entry) => entry.entryId)
@@ -354,6 +361,25 @@ function refineMonsterDraftBody(
       'actions',
     ])
   }
+}
+
+function refineMonsterDraftBody(
+  body: MonsterBodyDraft,
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[] = [],
+): void {
+  const equipment = body.equipment ?? []
+  refineMonsterDraftIds(body, ctx, prefix)
+
+  refineMonsterSpellEntries(
+    {
+      actions: body.actions ?? [],
+      bonusActions: body.bonusActions ?? [],
+      reactions: body.reactions ?? [],
+    },
+    ctx,
+    prefix,
+  )
 
   refineWeaponEntryReferences(
     {

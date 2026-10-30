@@ -5,6 +5,7 @@ import {
   createMonsterInputSchema,
   monsterActionDraftSchema,
   monsterActionSchema,
+  monsterReactionDraftSchema,
   monsterReactionSchema,
   type MonsterReaction,
 } from './monster'
@@ -152,6 +153,137 @@ describe('monsterBodySchema refinements', () => {
     expect(
       createMonsterDraftInputSchema.safeParse({ slug: 'overlap', ...baseBody, defenses }).success,
     ).toBe(true)
+  })
+})
+
+describe('monster spell entries', () => {
+  const baseBody = {
+    name: 'Test',
+    size: 'medium' as const,
+    creatureType: 'humanoid',
+    alignment: 'n' as const,
+    abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+    armorClass: {},
+    hitPoints: { kind: 'hit-dice' as const, count: 1 },
+    movement: { walk: 30 },
+    senses: [],
+    communication: {},
+    challengeRating: '0' as const,
+    proficiencies: { savingThrows: [], skills: [], languages: [], weapons: [] },
+    defenses: {
+      vulnerabilities: [],
+      resistances: [],
+      immunities: [],
+      conditionImmunities: [],
+    },
+  }
+  const spellcasting = {
+    id: 'spellcasting',
+    kind: 'spell' as const,
+    name: 'Spellcasting',
+    castingAbility: { kind: 'ability' as const, ability: 'int' as const },
+    spellGroups: [{ spellIds: ['srd-cc-5.2.1:mage-hand'] }],
+  }
+
+  it('accepts every kind in every section and an optional reaction trigger', () => {
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'kinds',
+        ...baseBody,
+        actions: [spellcasting],
+        bonusActions: [{ id: 'note', kind: 'special', name: 'Note', description: '<p>n</p>' }],
+        reactions: [{ ...spellcasting, id: 'react-spell' }],
+      }).success,
+    ).toBe(true)
+  })
+
+  it('rejects an entry limit combined with a group limit and duplicate spell ids', () => {
+    const limited = {
+      kind: 'uses' as const,
+      count: { kind: 'fixed' as const, value: 1 },
+      recovery: { minimumRest: 'long' as const },
+    }
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'both-limits',
+        ...baseBody,
+        actions: [
+          {
+            ...spellcasting,
+            limitedUse: limited,
+            spellGroups: [{ limitedUse: limited, spellIds: ['srd-cc-5.2.1:mage-hand'] }],
+          },
+        ],
+      }).success,
+    ).toBe(false)
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'dup-spells',
+        ...baseBody,
+        actions: [
+          {
+            ...spellcasting,
+            spellGroups: [{ spellIds: ['srd-cc-5.2.1:mage-hand', 'srd-cc-5.2.1:mage-hand'] }],
+          },
+        ],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('requires a shared ability target to be another spell entry with its own ability', () => {
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'shared',
+        ...baseBody,
+        actions: [
+          spellcasting,
+          {
+            id: 'misty-step',
+            kind: 'spell',
+            name: 'Misty Step',
+            castingAbility: { kind: 'shared', entryId: 'spellcasting' },
+            spellGroups: [{ spellIds: ['srd-cc-5.2.1:misty-step'] }],
+          },
+        ],
+      }).success,
+    ).toBe(true)
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'shared-self',
+        ...baseBody,
+        actions: [
+          {
+            ...spellcasting,
+            castingAbility: { kind: 'shared', entryId: 'spellcasting' },
+          },
+        ],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('keeps partial limited use on drafts and accepts published values', () => {
+    const partial = {
+      id: 'breath',
+      kind: 'special' as const,
+      limitedUse: { kind: 'recharge' as const },
+    }
+    expect(monsterActionDraftSchema.safeParse(partial).success).toBe(true)
+    expect(monsterActionSchema.safeParse(partial).success).toBe(false)
+    const published = monsterActionSchema.parse({
+      id: 'breath',
+      kind: 'special',
+      name: 'Breath',
+      description: '<p>Exhales.</p>',
+      limitedUse: { kind: 'recharge', minRoll: 5 },
+    })
+    expect(monsterActionDraftSchema.parse(published)).toMatchObject(published)
+  })
+
+  it('uses the same keys for published and draft variants', () => {
+    const keys = (schema: { options: readonly { shape: object }[] }) =>
+      schema.options.map((option) => Object.keys(option.shape).sort())
+    expect(keys(monsterActionDraftSchema)).toEqual(keys(monsterActionSchema))
+    expect(keys(monsterReactionDraftSchema)).toEqual(keys(monsterReactionSchema))
   })
 })
 

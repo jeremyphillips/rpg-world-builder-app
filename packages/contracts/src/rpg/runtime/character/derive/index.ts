@@ -73,20 +73,7 @@ export { savingThrowBonus, skillModifier } from '../../creature/checks'
 // Spellcasting
 // ---------------------------------------------------------------------------
 
-/**
- * Spell save DC: 8 + proficiency bonus + spellcasting ability modifier.
- * Pass the score of the class's designated spellcasting ability.
- */
-export function spellSaveDc(spellcastingAbilityScore: number, profBonus: number): number {
-  return 8 + profBonus + abilityModifier(spellcastingAbilityScore)
-}
-
-/**
- * Spell attack bonus: proficiency bonus + spellcasting ability modifier.
- */
-export function spellAttackBonus(spellcastingAbilityScore: number, profBonus: number): number {
-  return profBonus + abilityModifier(spellcastingAbilityScore)
-}
+export { spellAttackBonus, spellSaveDc } from '../../creature/spell-dc'
 
 export * from './armor-class'
 export * from './hit-points-at-level'

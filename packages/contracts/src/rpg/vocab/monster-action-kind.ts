@@ -7,7 +7,8 @@ import type { GameTermEntry, VocabularyTerm } from './types'
 
 export const MONSTER_ACTION_KIND_TERM = {
   label: 'Monster Action Kind',
-  description: 'Whether a monster action uses equipment, a natural weapon, or special prose.',
+  description:
+    'Whether a monster action uses equipment, a natural weapon, special prose, or referenced spells.',
   sentence: {
     singular: 'monster action kind',
     plural: 'monster action kinds',
@@ -26,6 +27,11 @@ export const MONSTER_ACTION_KIND_ENTRIES = {
   special: {
     label: 'Special',
     description: 'A named special action described in prose.',
+  },
+  spell: {
+    label: 'Spell',
+    description:
+      'Casts referenced spells. The structure is authoritative and the prose is generated.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

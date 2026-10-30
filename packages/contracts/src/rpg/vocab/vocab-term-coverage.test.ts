@@ -62,6 +62,7 @@ import { PROFICIENCY_TERM } from './proficiency'
 import { SENSE_TERM } from './sense'
 import { SPELL_ATOMIC_EFFECT_KIND_TERM } from './spell/atomic-effect-kind'
 import { CASTING_TIME_UNIT_TERM } from './spell/casting-time'
+import { SPELL_COMPONENT_TERM } from './spell/components'
 import { SPELL_DELIVERY_METHOD_TERM } from './spell/delivery-method'
 import { DURATION_UNIT_TERM } from './spell/duration'
 import { SPELL_FUNCTION_TAG_TERM } from './spell/function-tag'
@@ -120,6 +121,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   EDITION_PRESET_TERM,
   SPELL_ATOMIC_EFFECT_KIND_TERM,
   CASTING_TIME_UNIT_TERM,
+  SPELL_COMPONENT_TERM,
   SPELL_DELIVERY_METHOD_TERM,
   DURATION_UNIT_TERM,
   SPELL_FUNCTION_TAG_TERM,
@@ -198,7 +200,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(51)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(52)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }

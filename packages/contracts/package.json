@@ -85,6 +85,10 @@
     "./name-generator/test-fixtures": {
       "types": "./src/name-generator/test-fixtures.ts",
       "default": "./src/name-generator/test-fixtures.ts"
+    },
+    "./monster/test-fixtures": {
+      "types": "./src/rpg/content/monster/test-fixtures.ts",
+      "default": "./src/rpg/content/monster/test-fixtures.ts"
     }
   },
   "scripts": {

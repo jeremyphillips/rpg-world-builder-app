@@ -858,3 +858,35 @@ describe('equipment effect derivation (ship P0)', () => {
     expect(publishedArmor(block).ac).toBe(17)
   })
 })
+
+describe('monster spellcasting lines', () => {
+  it('resolves save DC and attack bonus through a shared ability', () => {
+    const monster = monsterSchema.parse({
+      ...kobold,
+      actions: [
+        ...kobold.actions,
+        {
+          id: 'spellcasting',
+          kind: 'spell',
+          name: 'Spellcasting',
+          castingAbility: { kind: 'ability', ability: 'int' },
+          spellGroups: [{ spellIds: [`${RULESET}:mage-hand`] }],
+        },
+      ],
+      reactions: [
+        {
+          id: 'protective-magic',
+          kind: 'spell',
+          name: 'Protective Magic',
+          castingAbility: { kind: 'shared', entryId: 'spellcasting' },
+          spellGroups: [{ spellIds: [`${RULESET}:shield`] }],
+        },
+      ],
+    }) as Monster
+    const derived = deriveMonsterStatBlock({ monster, equipmentCatalog, skillCatalog })
+    expect(derived.spellcasting).toEqual([
+      { id: 'spellcasting', section: 'actions', saveDc: 9, attackBonus: 1 },
+      { id: 'protective-magic', section: 'reactions', saveDc: 9, attackBonus: 1 },
+    ])
+  })
+})
