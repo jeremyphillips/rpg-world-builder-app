@@ -1,18 +1,11 @@
 import { Children, isValidElement, type ReactNode } from 'react'
-import type { ContentCardDensity } from '@rpg/ui'
-
-import {
-  entityLeadingRailColumnVariants,
-  entityLeadingRailVariants,
-} from './entity-leading-rail.variants'
 
 type EntityLeadingRailProps = {
   children: ReactNode
-  density?: ContentCardDensity
 }
 
-/** Lays out leading utilities — width includes padding-inline-end(contentGap). */
-export function EntityLeadingRail({ children, density }: EntityLeadingRailProps) {
+/** Lays out leading utilities. Content gap is the inherited leading-gap token. */
+export function EntityLeadingRail({ children }: EntityLeadingRailProps) {
   const utilities = Children.toArray(children).filter((child) => child != null)
 
   if (utilities.length === 0) {
@@ -20,12 +13,12 @@ export function EntityLeadingRail({ children, density }: EntityLeadingRailProps)
   }
 
   return (
-    <div className={entityLeadingRailVariants({ density })}>
+    <div className="dash-entity-leading">
       {utilities.map((utility, index) => {
         const key = isValidElement(utility) && utility.key != null ? utility.key : index
 
         return (
-          <div key={key} className={entityLeadingRailColumnVariants()}>
+          <div key={key} className="dash-entity-leading__column">
             {utility}
           </div>
         )

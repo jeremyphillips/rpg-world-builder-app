@@ -112,7 +112,11 @@ and dashboard shared surfaces (`EntityCard`, collection chrome, layout shells) o
 hand-rolled border, padding, and radius stacks. Simple layout utilities may stay in
 JSX; reusable feature chrome may use co-located `*.variants.ts` and optional `*.css`
 (`dash-*` where shared). Use CVA only for meaningful visual axes (density, tone, state) —
-not to hide static Tailwind. Entity and card ownership → [card-guide.md](./card-guide.md),
+not to hide static Tailwind. Feature-local blocks (`media-manager`, `spell-level-tabs`) use the
+same `--modifier` rule as `dash-*` and `ui-*`
+([naming](../../../packages/ui/docs/semantic-control-css.md#naming)): a modifier accompanies a
+base class and owns only the properties that vary. Complete utilities stay hyphenated. A size
+suffix alone is not a reason to split a class. Entity and card ownership → [card-guide.md](./card-guide.md),
 [entity-surfaces.md](./entity-surfaces.md); generic primitives →
 [`packages/ui/docs/ui-architecture.md`](../../../packages/ui/docs/ui-architecture.md).
 

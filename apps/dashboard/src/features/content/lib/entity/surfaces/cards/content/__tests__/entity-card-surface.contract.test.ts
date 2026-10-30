@@ -69,27 +69,40 @@ describe('entity card surface contract', () => {
           modifierPrefix: 'dash-entity-card__content',
           requiredProperties: ['padding-inline-start', 'padding-inline-end', 'padding-block'],
         },
-        {
-          modifierPrefix: 'dash-entity-card__body--disclosure-wash',
-          requiredProperties: [
-            'border-top-width',
-            'border-top-style',
-            'background-color',
-            '--surface-current',
-          ],
-        },
-        {
-          modifierPrefix: 'dash-entity-card__body--catalog-wash',
-          requiredProperties: [
-            'border-top-width',
-            'border-top-style',
-            'background-color',
-            '--surface-current',
-          ],
-        },
       ],
     })
     expect(failures).toEqual([])
+  })
+
+  it('shares wash chrome and keeps tone on each modifier', () => {
+    const css = readFileSync(dashEntityCardCssPath, 'utf8')
+    const grouped = css.match(
+      /\.dash-entity-card__body--disclosure-wash,\s*\.dash-entity-card__body--catalog-wash \{([^}]+)\}/,
+    )
+    const disclosure = css.match(/\.dash-entity-card__body--disclosure-wash \{([^}]+)\}/g)
+    const catalog = css.match(/\.dash-entity-card__body--catalog-wash \{([^}]+)\}/g)
+
+    expect(grouped?.[1]).toContain('border-top-width: 1px')
+    expect(grouped?.[1]).toContain('border-top-style: solid')
+    expect(grouped?.[1]).toContain('padding-block: calc(var(--spacing) * 3)')
+    expect(grouped?.[1]).not.toContain('background-color')
+    expect(grouped?.[1]).not.toContain('border-color')
+
+    const disclosureTone = disclosure?.find((rule) => rule.includes('background-color'))
+    const catalogTone = catalog?.find((rule) => rule.includes('background-color'))
+    expect(disclosureTone).toContain('background-color: var(--background)')
+    expect(disclosureTone).toContain('--surface-current: var(--background)')
+    expect(disclosureTone).not.toContain('border-top-width')
+    expect(disclosureTone).not.toContain('padding-block')
+    expect(catalogTone).toContain('background-color: var(--surface-subtle)')
+    expect(catalogTone).toContain('--surface-current: var(--surface-subtle)')
+    expect(catalogTone).not.toContain('border-top-width')
+    expect(catalogTone).not.toContain('padding-block')
+
+    expect(css.indexOf(grouped?.[0] ?? '')).toBeLessThan(css.indexOf(disclosureTone ?? ''))
+    expect(css.indexOf(disclosureTone ?? '')).toBeLessThan(css.indexOf(catalogTone ?? ''))
+    expect(css).not.toContain('dash-entity-card__body--wash')
+    expect(css).not.toContain('!important')
   })
 
   it('fills the available header region for full-width entity anatomy', () => {

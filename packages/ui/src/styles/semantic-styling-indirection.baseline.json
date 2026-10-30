@@ -53,7 +53,6 @@
   "apps/dashboard/src/features/content/lib/detail/page/content-detail-section.variants.ts:contentDetailSectionPanelContentHeadingClasses:single-utility-alias",
   "apps/dashboard/src/features/content/lib/detail/row/entity/detail-entity-row.variants.ts:detailEntityRowDisclosureItemVariants:empty-cva",
   "apps/dashboard/src/features/content/lib/detail/row/entity/detail-entity-row.variants.ts:detailEntityRowSubheadingVariants:empty-cva",
-  "apps/dashboard/src/features/content/lib/entity/anatomy/entity-leading-rail.variants.ts:entityLeadingRailColumnVariants:empty-cva",
   "apps/dashboard/src/features/media/components/content-media-image.variants.ts:contentMediaImageMonoGlyphInvertClasses:single-utility-alias",
   "apps/dashboard/src/features/media/components/content-media-image.variants.ts:contentMediaImageSurfaceBackdropClasses:single-utility-alias",
   "apps/dashboard/src/features/message/components/direct-list/direct-list.variants.ts:conversationListTitleUnreadClasses:single-utility-alias",

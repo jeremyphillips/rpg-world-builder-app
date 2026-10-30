@@ -17,23 +17,30 @@
     padding-inline: var(--entity-surface-inset);
   }
 
+  /* Inline padding shared by every body. Wash chrome does not live here. */
   .dash-entity-card__body {
     padding-inline-start: calc(var(--entity-surface-inline-start) + var(--entity-content-offset));
     padding-inline-end: var(--entity-surface-inset);
   }
 
-  .dash-entity-card__body--disclosure-wash {
+  /*
+   * Properties shared only by wash variants. Each modifier keeps its own
+   * background and --surface-current. Border color stays on ui-border--subtle
+   * so it mixes against that variable. Do not add another class for this group.
+   */
+  .dash-entity-card__body--disclosure-wash,
+  .dash-entity-card__body--catalog-wash {
     border-top-width: 1px;
     border-top-style: solid;
     padding-block: calc(var(--spacing) * 3);
+  }
+
+  .dash-entity-card__body--disclosure-wash {
     background-color: var(--background);
     --surface-current: var(--background);
   }
 
   .dash-entity-card__body--catalog-wash {
-    border-top-width: 1px;
-    border-top-style: solid;
-    padding-block: calc(var(--spacing) * 3);
     background-color: var(--surface-subtle);
     --surface-current: var(--surface-subtle);
   }

@@ -83,7 +83,7 @@ export function EntityAnatomy({
           cell={resolveEntityLeadingCell(leading)}
           data-entity-item-slot="leading"
         >
-          <EntityLeadingRail density={density}>{leading.content}</EntityLeadingRail>
+          <EntityLeadingRail>{leading.content}</EntityLeadingRail>
         </RowAnatomyCell>
       ) : null}
       {resolvedLeadingUtilities.length > 0 ? (
@@ -91,7 +91,7 @@ export function EntityAnatomy({
           cell={{ slot: 'band', column: 'leading' }}
           data-entity-item-slot="leading"
         >
-          <EntityLeadingRail density={density}>{resolvedLeadingUtilities}</EntityLeadingRail>
+          <EntityLeadingRail>{resolvedLeadingUtilities}</EntityLeadingRail>
         </RowAnatomyCell>
       ) : null}
       {entity.media ? (
