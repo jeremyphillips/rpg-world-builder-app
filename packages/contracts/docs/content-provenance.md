@@ -32,14 +32,10 @@ Optional `provenance` on `contentMetaSchema`:
 Public create/update routes use **`preserve`** authority: clients cannot set or
 change record provenance; omission on update keeps stored values.
 
-## Compliance review checklist
+## Compliance review
 
 When a PR touches registry attribution, license, access rules, [`NOTICE`](../../../NOTICE),
-or derivative modification wording, confirm:
+or derivative modification wording, complete the
+[content provenance compliance checklist](../../../.github/content-provenance-compliance-checklist.md).
 
-- [ ] CC-BY-4.0 attribution wording matches the registry `attributionStatement`
-- [ ] Change notice covers modified / reshaped / abbreviated SRD usage
-- [ ] License link: https://creativecommons.org/licenses/by/4.0/legalcode
-- [ ] Derivative homebrew statement remains accurate
-
-The NOTICE parity test is a regression guard only — it does not replace this review.
+The NOTICE parity test is a regression guard only — it does not replace that review.

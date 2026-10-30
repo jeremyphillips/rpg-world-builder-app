@@ -1,14 +1,9 @@
-import type { CatalogLayer } from '@rpg/contracts'
+import { CATALOG_LAYER_ENTRIES, type CatalogLayer } from '@rpg/contracts'
 
 import { resolveAvailability, type Availability, type AvailabilityReason } from '@/lib/availability'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 
 export type EmbeddedRowSource = 'system' | 'homebrew'
-
-const SOURCE_LABELS = {
-  system: 'System',
-  homebrew: 'Homebrew',
-} as const satisfies Record<EmbeddedRowSource, string>
 
 export interface ResolveEmbeddedRowMetaParams {
   row: { id?: string } | undefined
@@ -48,7 +43,7 @@ export function resolveEmbeddedRowMeta({
 
   return {
     source,
-    sourceLabel: SOURCE_LABELS[source],
+    sourceLabel: CATALOG_LAYER_ENTRIES[source].label,
     deletable: source !== 'system',
     availability,
   }

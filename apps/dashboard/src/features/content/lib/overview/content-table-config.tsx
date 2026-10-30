@@ -9,6 +9,7 @@ import {
   type ContentMedia,
   isContentTypeMediaEnabled,
   type ContentTypeKey,
+  CATALOG_LAYER_TERM,
 } from '@rpg/contracts'
 import { dataTableColumnMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
@@ -21,7 +22,7 @@ import {
   type DashboardContentDisplayResult,
   type ResolveDashboardContentDisplayInput,
 } from '../detail/page/content-display-image'
-import { CATALOG_LAYER_BADGE, type CatalogLayer } from './content-source-badge'
+import { CATALOG_LAYER_BADGE, type CatalogLayer } from './catalog-layer-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { ContentOverviewNameCell } from './content-overview-name-cell'
 import { shouldPresentCatalogLayer } from '../content-type-presentation'
@@ -156,10 +157,10 @@ export function buildContentColumns<T extends ContentBase>(
     } as ColumnDef<T>['meta'] & ContentOverviewNameColumnMeta<T>,
   }
 
-  const sourceColumn = buildSourceColumn<T, CatalogLayer>({
+  const catalogLayerColumn = buildSourceColumn<T, CatalogLayer>({
     badgeMap: CATALOG_LAYER_BADGE,
     accessorKey: 'catalogLayer',
-    label: 'Layer',
+    label: CATALOG_LAYER_TERM.label,
   })
 
   const statusColumn = buildSourceColumn<T, ContentStatus>({
@@ -186,6 +187,6 @@ export function buildContentColumns<T extends ContentBase>(
     ...stampDataColumns(middleColumns),
     ...usedByColumn,
     statusColumn,
-    ...(shouldPresentCatalogLayer(contentType) ? [sourceColumn] : []),
+    ...(shouldPresentCatalogLayer(contentType) ? [catalogLayerColumn] : []),
   ]
 }

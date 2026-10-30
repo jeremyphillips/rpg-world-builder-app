@@ -6,7 +6,7 @@ import type {
 } from '@rpg/contracts'
 import { Badge } from '@rpg/ui'
 
-import { CATALOG_LAYER_BADGE } from '../overview/content-source-badge'
+import { CATALOG_LAYER_BADGE } from '../overview/catalog-layer-badge'
 import { shouldPresentCatalogLayer } from '../content-type-presentation'
 
 export interface ContentEditHeadingBadgesProps {
@@ -26,8 +26,8 @@ export function ContentEditHeadingBadges({
   omitDraft = false,
 }: ContentEditHeadingBadgesProps) {
   const isDraft = !omitDraft && catalogLayer === 'homebrew' && status === 'draft'
-  const sourceBadge = CATALOG_LAYER_BADGE[catalogLayer]
-  const showSource = shouldPresentCatalogLayer(contentType)
+  const catalogLayerBadge = CATALOG_LAYER_BADGE[catalogLayer]
+  const showCatalogLayer = shouldPresentCatalogLayer(contentType)
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -40,9 +40,9 @@ export function ContentEditHeadingBadges({
           Inactive
         </Badge>
       ) : null}
-      {showSource ? (
-        <Badge appearance={sourceBadge.appearance} tone={sourceBadge.tone}>
-          {sourceBadge.label}
+      {showCatalogLayer ? (
+        <Badge appearance={catalogLayerBadge.appearance} tone={catalogLayerBadge.tone}>
+          {catalogLayerBadge.label}
         </Badge>
       ) : null}
     </div>

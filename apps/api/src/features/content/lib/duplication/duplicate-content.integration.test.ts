@@ -91,6 +91,7 @@ describe('duplicate content routes', () => {
       contentTypeKey: 'classes',
       catalogLayer: source.catalogLayer,
     })
+    expect(res.body.classes.provenance?.documents).toBeUndefined()
     expect(res.body.classes.status).toBe('draft')
     expect(res.body.classes.id).not.toBe(source.id)
     expect(res.body.classes.slug).toBe('dup-source-class-copy')
@@ -309,6 +310,12 @@ describe('duplicate content routes', () => {
       .expect(201)
 
     const copy = res.body.monsters
+    expect(copy.provenance?.documents?.[0]?.citation.documentId).toBe('srd-5.2.1')
+    expect(copy.provenance?.derivedFrom).toMatchObject({
+      relation: 'duplicate',
+      contentId: skeleton!.id,
+      catalogLayer: 'system',
+    })
     expect(copy.equipment.map((entry: { entryId: string }) => entry.entryId)).toEqual(
       skeleton!.equipment.map((entry) => entry.entryId),
     )

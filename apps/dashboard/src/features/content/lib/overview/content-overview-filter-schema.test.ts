@@ -31,7 +31,7 @@ describe('content-overview-filter-schema', () => {
     expect(schema.fields.map((field) => field.id)).toEqual([
       'name',
       'hitDie',
-      'source',
+      'catalogLayer',
       'status',
       'campaignAvailability',
     ])

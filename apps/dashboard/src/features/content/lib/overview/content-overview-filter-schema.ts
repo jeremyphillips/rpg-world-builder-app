@@ -3,6 +3,7 @@ import {
   type ContentStatus,
   type WithCampaignAccess,
   type ContentTypeKey,
+  CATALOG_LAYER_TERM,
 } from '@rpg/contracts'
 import {
   createEqualsFilter,
@@ -13,7 +14,7 @@ import {
 } from '@rpg/ui/filters'
 
 import type { ContentBase } from './content-table-config'
-import { CATALOG_LAYER_BADGE, type CatalogLayer } from './content-source-badge'
+import { CATALOG_LAYER_BADGE, type CatalogLayer } from './catalog-layer-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { shouldPresentCatalogLayer } from '../content-type-presentation'
 import { createCampaignAvailabilityFilterField as createSharedCampaignAvailabilityFilterField } from '@/lib/overview/create-campaign-availability-filter-field'
@@ -47,7 +48,7 @@ export function createCatalogLayerFilter<
 >(): FilterFieldDef<TData, TState> {
   return createEqualsFilter<TData, ContentOverviewBaseFilterState, 'catalogLayer', CatalogLayer>({
     id: 'catalogLayer',
-    label: 'Layer',
+    label: CATALOG_LAYER_TERM.label,
     placement: 'advanced',
     width: 'md',
     options: (Object.keys(CATALOG_LAYER_BADGE) as CatalogLayer[]).map((value) => ({

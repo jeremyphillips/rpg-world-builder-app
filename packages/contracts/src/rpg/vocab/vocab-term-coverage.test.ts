@@ -20,6 +20,11 @@ import {
   SPELL_RESOLUTION_TARGET_KIND_TERM,
 } from '../content/spell/resolution/vocab'
 import { AREA_GEOMETRY_SHAPE_TERM } from '../primitives/area-geometry'
+import {
+  SOURCE_DOCUMENT_DISPLAY_TERM,
+  SOURCE_DOCUMENT_EXPORT_TERM,
+  SOURCE_DOCUMENT_LICENSE_TERM,
+} from '../primitives/provenance/source-document-access'
 import { ABILITY_SCORE_TERM } from './ability'
 import { ALIGNMENT_TERM } from './alignment'
 import { CHARACTER_GENDER_TERM } from './character-gender'
@@ -167,7 +172,12 @@ const CHARACTER_NARRATIVE_TERMS = [
   NARRATIVE_FRAGMENT_CONDITION_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
-const PRIMITIVE_TERMS = [AREA_GEOMETRY_SHAPE_TERM] as const satisfies readonly VocabularyTerm[]
+const PRIMITIVE_TERMS = [
+  AREA_GEOMETRY_SHAPE_TERM,
+  SOURCE_DOCUMENT_DISPLAY_TERM,
+  SOURCE_DOCUMENT_EXPORT_TERM,
+  SOURCE_DOCUMENT_LICENSE_TERM,
+] as const satisfies readonly VocabularyTerm[]
 
 /** Taxonomies with `*_TERM` only — no `*_ENTRIES`, not in `VOCABULARY_OPTION_SET_TERMS`. */
 const CONCEPT_ONLY_TERMS = [
@@ -234,7 +244,7 @@ describe('character-narrative term coverage', () => {
 
 describe('primitives term coverage', () => {
   it('defines vocab terms for GameTermEntry *_ENTRIES maps', () => {
-    expect(PRIMITIVE_TERMS).toHaveLength(1)
+    expect(PRIMITIVE_TERMS).toHaveLength(4)
     for (const term of PRIMITIVE_TERMS) {
       expectVocabularyTerm(term)
     }

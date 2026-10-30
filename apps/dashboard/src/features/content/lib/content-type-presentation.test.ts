@@ -8,7 +8,7 @@ describe('content type presentation policy', () => {
     expect(Object.keys(CONTENT_TYPE_PRESENTATION).sort()).toEqual([...CONTENT_TYPE_KEYS].sort())
   })
 
-  it('retains source presentation for existing bundled content types', () => {
+  it('shows catalog-layer chrome for bundled content types', () => {
     for (const contentType of CONTENT_TYPE_KEYS.filter(
       (registeredType) => registeredType !== 'organizations' && registeredType !== 'locations',
     )) {

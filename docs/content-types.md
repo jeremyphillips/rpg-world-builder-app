@@ -702,7 +702,7 @@ It is a package/loader declaration—not a user-facing provenance policy.
 
 Campaign-authored records continue to persist `catalogLayer: 'homebrew'` regardless
 of how the dashboard presents that provenance. By default, content overviews
-and headings show the Homebrew badge, source column, and source filter.
+and headings show the Homebrew badge, catalog-layer column, and catalog-layer filter.
 
 A content type may suppress that UI language only through the exhaustive
 `CONTENT_TYPE_PRESENTATION` policy in
@@ -715,8 +715,8 @@ Exception rules:
 
 - Never infer UI labeling from `bundledContent`; bundling may change without
   changing the product meaning of provenance.
-- Suppression affects only source badges, labels, columns, and filters. It does
-  not change stored source, authorization, deletion rules, draft/publish state,
+- Suppression affects only catalog-layer badges, labels, columns, and filters. It does
+  not change stored `catalogLayer`, authorization, deletion rules, draft/publish state,
   or campaign availability.
 - Add exceptions by content-type key in the exhaustive policy, consume them
   through shared presentation helpers, and update the policy coverage tests.

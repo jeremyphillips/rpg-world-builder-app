@@ -11,7 +11,7 @@ import { listRulesetSourceDocumentIds } from '../../primitives/provenance/source
 export type ContentProvenanceWriteAuthority = 'preserve' | 'carry' | 'initialize'
 
 export class ContentProvenanceWriteError extends Error {
-  readonly code: 'provenance_forbidden' | 'provenance_reassignment'
+  readonly code: 'provenance_forbidden'
 
   constructor(code: ContentProvenanceWriteError['code'], message: string) {
     super(message)
@@ -33,6 +33,20 @@ function defaultDocumentsForRuleset(rulesetId: SystemRulesetId) {
   )
 }
 
+function documentsForDuplicate(
+  source: Record<string, unknown>,
+): ContentProvenance['documents'] | undefined {
+  const sourceCatalogLayer = source.catalogLayer as CatalogLayer
+  const sourceProvenance = source.provenance as ContentProvenance | undefined
+
+  if (sourceCatalogLayer === 'system') {
+    return defaultDocumentsForRuleset(source.rulesetId as SystemRulesetId)
+  }
+
+  if (sourceProvenance?.documents?.length) return sourceProvenance.documents
+  return undefined
+}
+
 function buildDuplicateProvenance(args: {
   source: Record<string, unknown>
   contentTypeKey: ApiContentTypeKey
@@ -40,16 +54,11 @@ function buildDuplicateProvenance(args: {
 }): ContentProvenance {
   const sourceCatalogLayer = args.source.catalogLayer as CatalogLayer
   const sourceId = String(args.source.id)
-  const rulesetId = args.source.rulesetId as SystemRulesetId
   const sourceProvenance = args.source.provenance as ContentProvenance | undefined
-
-  const documents =
-    sourceCatalogLayer === 'homebrew' && sourceProvenance?.documents?.length
-      ? sourceProvenance.documents
-      : defaultDocumentsForRuleset(rulesetId)
+  const documents = documentsForDuplicate(args.source)
 
   const next: ContentProvenance = {
-    documents,
+    ...(documents ? { documents } : {}),
     derivedFrom: {
       relation: 'duplicate',
       contentId: sourceId,
