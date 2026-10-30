@@ -643,7 +643,7 @@ describe('deriveMonsterDraftStatBlock', () => {
   it('throws when hit points are unavailable', () => {
     expect(() =>
       deriveMonsterStatBlock({
-        monster: { ...kobold, hitPoints: undefined, actions: [] } as Monster,
+        monster: { ...kobold, hitPoints: undefined, actions: [] } as unknown as Monster,
         equipmentCatalog,
         skillCatalog,
       }),
