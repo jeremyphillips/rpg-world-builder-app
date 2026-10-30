@@ -26,6 +26,10 @@ export type RestKind = keyof typeof REST_KIND_ENTRIES
 /** Least to most complete. Order lives in code; ranks are never persisted. */
 export const REST_KINDS = ['short', 'long'] as const satisfies readonly RestKind[]
 
+export function isRestKind(value: unknown): value is RestKind {
+  return typeof value === 'string' && (REST_KINDS as readonly string[]).includes(value)
+}
+
 export const restKindSchema = vocabEnumFromEntries(REST_KIND_ENTRIES)
 
 export const REST_KIND_IDS = keysFromEntries(REST_KIND_ENTRIES)

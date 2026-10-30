@@ -20,6 +20,7 @@ import {
 const DECREASE_LABEL_PREFIX = 'Decrease'
 const INCREASE_LABEL_PREFIX = 'Increase'
 
+// fallow-ignore-next-line complexity
 export function useNumberStepperInteraction(args: {
   value: number
   /** Empty form value. Decrement stays disabled and increment seeds from `stepNumber`. */

@@ -281,7 +281,7 @@ const spellcastingContentGrantSchema = z.object({
  * Spells granted by a trait or feature at a given unlock level.
  *
  * - `availability` — always on the prepared list; cast with normal slots.
- * - `casting` — slotless casting via `frequency` (species lineage pattern).
+ * - `casting` — slotless casting. `limitedUse` is the rest-based cadence; omit it for at will.
  */
 const spellsContentGrantSchema = z
   .object({

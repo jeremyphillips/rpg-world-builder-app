@@ -38,11 +38,11 @@ enforced by `vocab-term-coverage.test.ts`. Detail:
 
 ## Phase 0 promotions (completed)
 
-| Concept                                       | Module                              | Catalog JSON                        | Hover tier   |
-| --------------------------------------------- | ----------------------------------- | ----------------------------------- | ------------ |
-| Spell grant availability (`always_prepared`)  | `vocab/spell/grant-availability.ts` | yes (`spells` grant `availability`) | vocab-backed |
-| Spell grant casting (`free_cast` + frequency) | `vocab/spell/grant-casting.ts`      | yes (`spells` grant `casting`)      | local-exempt |
-| Equipment kind                                | `vocab/equipment/kind.ts`           | yes                                 | vocab-backed |
+| Concept                                         | Module                              | Catalog JSON                        | Hover tier   |
+| ----------------------------------------------- | ----------------------------------- | ----------------------------------- | ------------ |
+| Spell grant availability (`always_prepared`)    | `vocab/spell/grant-availability.ts` | yes (`spells` grant `availability`) | vocab-backed |
+| Spell grant casting (`free_cast` + limited use) | `vocab/spell/grant-casting.ts`      | yes (`spells` grant `casting`)      | local-exempt |
+| Equipment kind                                  | `vocab/equipment/kind.ts`           | yes                                 | vocab-backed |
 
 ---
 

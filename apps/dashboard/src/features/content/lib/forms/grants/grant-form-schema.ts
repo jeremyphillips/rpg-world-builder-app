@@ -175,6 +175,31 @@ function shouldSkipProficiencySchemaForEmptySpecific(
   return row.proficiencySource === 'specific' && !specificSlugs?.length
 }
 
+function validateSpellGrantUsesLimit(
+  row: {
+    spellUseCountKind?: string
+    spellUseCount?: number | string
+    spellMinimumRest?: string
+  },
+  ctx: z.RefinementCtx,
+): void {
+  if (row.spellUseCountKind !== 'fixed' && row.spellUseCountKind !== 'proficiency-bonus') {
+    addCustomRefinementIssue(ctx, 'Choose how many uses this spell grant has.', [
+      'spellUseCountKind',
+    ])
+  }
+  if (row.spellUseCountKind === 'fixed') {
+    const value =
+      typeof row.spellUseCount === 'number' ? row.spellUseCount : Number(row.spellUseCount)
+    if (!Number.isInteger(value) || value < 1) {
+      addCustomRefinementIssue(ctx, 'Enter at least one use.', ['spellUseCount'])
+    }
+  }
+  if (!row.spellMinimumRest) {
+    addCustomRefinementIssue(ctx, 'Choose the rest that restores these uses.', ['spellMinimumRest'])
+  }
+}
+
 function validateSpellsGrantRow(
   row: {
     spellAvailability?: boolean
@@ -198,23 +223,7 @@ function validateSpellsGrantRow(
   }
 
   if (hasCasting && row.spellUseLimit === 'uses') {
-    if (row.spellUseCountKind !== 'fixed' && row.spellUseCountKind !== 'proficiency-bonus') {
-      addCustomRefinementIssue(ctx, 'Choose how many uses this spell grant has.', [
-        'spellUseCountKind',
-      ])
-    }
-    if (row.spellUseCountKind === 'fixed') {
-      const value =
-        typeof row.spellUseCount === 'number' ? row.spellUseCount : Number(row.spellUseCount)
-      if (!Number.isInteger(value) || value < 1) {
-        addCustomRefinementIssue(ctx, 'Enter at least one use.', ['spellUseCount'])
-      }
-    }
-    if (!row.spellMinimumRest) {
-      addCustomRefinementIssue(ctx, 'Choose the rest that restores these uses.', [
-        'spellMinimumRest',
-      ])
-    }
+    validateSpellGrantUsesLimit(row, ctx)
   }
 
   if (row.spellAllowsSlotCasting === true && !hasAvailability) {

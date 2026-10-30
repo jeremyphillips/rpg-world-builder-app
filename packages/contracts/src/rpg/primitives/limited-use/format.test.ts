@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
-import { REST_KIND_ENTRIES, REST_KINDS, type RestKind } from '../../vocab/rest'
+import { isRestKind, REST_KIND_ENTRIES, REST_KINDS, type RestKind } from '../../vocab/rest'
 import { SPELL_MUTATION_TRIGGER_ENTRIES } from '../../vocab/spell/spell-mutation-policy'
 import { restMeetsRecovery } from '../rest-recovery'
 import {
@@ -83,6 +83,8 @@ describe('restMeetsRecovery', () => {
   it('uses the long-rest vocabulary label for the spell mutation trigger', () => {
     expect(SPELL_MUTATION_TRIGGER_ENTRIES.longRest.label).toBe(REST_KIND_ENTRIES.long.label)
     expect(REST_KINDS).toEqual(['short', 'long'])
+    expect(REST_KINDS.every((kind) => isRestKind(kind))).toBe(true)
+    expect(isRestKind('dawn')).toBe(false)
   })
 })
 

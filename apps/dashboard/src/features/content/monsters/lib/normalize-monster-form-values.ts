@@ -67,6 +67,37 @@ function pickKeys(
   return next
 }
 
+function applyReactionTriggerDraft(
+  cleaned: Record<string, unknown>,
+  section: 'actions' | 'bonusActions' | 'reactions',
+): void {
+  if (section !== 'reactions') return
+  const text = monsterActionTriggerText(cleaned.trigger)
+  if (text) cleaned.trigger = { text }
+  else delete cleaned.trigger
+}
+
+function applyLimitedUseDraft(cleaned: Record<string, unknown>): void {
+  if (!('limitedUse' in cleaned)) return
+  const limitedUse = normalizeLimitedUse(cleaned.limitedUse)
+  if (limitedUse) cleaned.limitedUse = limitedUse
+  else delete cleaned.limitedUse
+}
+
+function stabilizeDraftActionKeys(
+  active: Record<string, unknown>,
+  schema: typeof monsterActionDraftSchema | typeof monsterReactionDraftSchema,
+): unknown {
+  const parsed = schema.safeParse(active)
+  if (!parsed.success) return active
+  const parsedRecord = parsed.data as Record<string, unknown>
+  const stable: Record<string, unknown> = {}
+  for (const key of Object.keys(active)) {
+    if (parsedRecord[key] !== undefined) stable[key] = parsedRecord[key]
+  }
+  return stable
+}
+
 function normalizeAction(
   action: unknown,
   section: 'actions' | 'bonusActions' | 'reactions',
@@ -74,29 +105,13 @@ function normalizeAction(
   if (!isRecord(action)) return action
   const cleaned = omitEmptyStrings(action)
   if (!isRecord(cleaned)) return cleaned
-  if (section === 'reactions') {
-    const text = monsterActionTriggerText(cleaned.trigger)
-    if (text) cleaned.trigger = { text }
-    else delete cleaned.trigger
-  }
-  if ('limitedUse' in cleaned) {
-    const limitedUse = normalizeLimitedUse(cleaned.limitedUse)
-    if (limitedUse) cleaned.limitedUse = limitedUse
-    else delete cleaned.limitedUse
-  }
+  applyReactionTriggerDraft(cleaned, section)
+  applyLimitedUseDraft(cleaned)
   const keys =
     typeof cleaned.kind === 'string' ? monsterActionActiveKeys(cleaned.kind, section) : []
   const active = keys.length > 0 ? pickKeys(cleaned, keys) : cleaned
   const schema = section === 'reactions' ? monsterReactionDraftSchema : monsterActionDraftSchema
-  const parsed = schema.safeParse(active)
-  if (!parsed.success) return active
-  // Keep authored keys. Draft parse can insert defaults the author did not type.
-  const parsedRecord = parsed.data as Record<string, unknown>
-  const stable: Record<string, unknown> = {}
-  for (const key of Object.keys(active)) {
-    if (parsedRecord[key] !== undefined) stable[key] = parsedRecord[key]
-  }
-  return stable
+  return stabilizeDraftActionKeys(active, schema)
 }
 
 function normalizeArmorClass(

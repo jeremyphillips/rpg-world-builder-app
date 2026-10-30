@@ -32,6 +32,29 @@ export interface UseContentSaveSessionOptions<TFieldValues extends FieldValues> 
   onSaved?: (event: CoordinatedSaveSavedEvent) => void
 }
 
+function saveBodyViaSchemaForm<TFieldValues extends FieldValues>(
+  schemaFormSubmit: NonNullable<ReturnType<typeof useSchemaFormSubmit<TFieldValues>>>,
+  onSubmit: UseContentSaveSessionOptions<TFieldValues>['onSubmit'],
+): Promise<SaveResult> {
+  return new Promise((resolve) => {
+    schemaFormSubmit.requestSubmit(
+      async (values, submitForm) => {
+        try {
+          await onSubmit(values, submitForm)
+          resolve({ status: 'saved' })
+        } catch (err) {
+          resolve({
+            status: 'failed',
+            error: err instanceof Error ? err : new Error(String(err)),
+          })
+        }
+      },
+      () => resolve({ status: 'invalid' }),
+    )
+  })
+}
+
+// fallow-ignore-next-line complexity
 export function useContentSaveSession<TFieldValues extends FieldValues>({
   mode,
   pending,
@@ -95,23 +118,7 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
                 error: new Error('Form submit context is unavailable.'),
               } satisfies SaveResult
             }
-
-            return new Promise<SaveResult>((resolve) => {
-              schemaFormSubmit.requestSubmit(
-                async (values, submitForm) => {
-                  try {
-                    await onSubmit(values, submitForm)
-                    resolve({ status: 'saved' })
-                  } catch (err) {
-                    resolve({
-                      status: 'failed',
-                      error: err instanceof Error ? err : new Error(String(err)),
-                    })
-                  }
-                },
-                () => resolve({ status: 'invalid' }),
-              )
-            })
+            return saveBodyViaSchemaForm(schemaFormSubmit, onSubmit)
           },
         },
       })

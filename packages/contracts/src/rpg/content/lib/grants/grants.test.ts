@@ -158,7 +158,7 @@ describe('grant sentence formatters', () => {
     )
   })
 
-  it('formats spell grants with usage-frequency cadence prose', () => {
+  it('formats spell grants with limited-use cadence prose', () => {
     expect(
       formatSpellsGrantSentence({
         id: 'spells-1',
@@ -578,7 +578,7 @@ describe('contentGrantSchema — spells', () => {
     })
   })
 
-  it('parses a free_cast spells grant with frequency', () => {
+  it('parses a free_cast spells grant with no limited use', () => {
     expect(
       contentGrantSchema.parse({
         id: 'spells-40',

@@ -2451,6 +2451,7 @@
     "isRequiredStartingWeaponSatisfiedInDraft",
     "isResolutionEffectKind",
     "isResolutionTargetConfigured",
+    "isRestKind",
     "isRolePresentationCustomized",
     "isRollBearingResolutionEffect",
     "isRollFlatAmountPresent",

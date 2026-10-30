@@ -1,4 +1,4 @@
-import type { LimitedUseDraft } from '@rpg/contracts'
+import { isRestKind, type LimitedUseDraft } from '@rpg/contracts'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -30,7 +30,7 @@ function normalizeUses(value: Record<string, unknown>): UsesDraft {
   const next: UsesDraft = { kind: 'uses', count: normalizeUseCount(value.count) }
   const recovery = value.recovery
   if (!isRecord(recovery)) return next
-  if (recovery.minimumRest === 'short' || recovery.minimumRest === 'long') {
+  if (isRestKind(recovery.minimumRest)) {
     next.recovery = { minimumRest: recovery.minimumRest }
   }
   return next

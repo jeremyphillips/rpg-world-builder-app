@@ -1,4 +1,10 @@
-import { REST_KIND_ENTRIES, REST_KINDS, type RestKind, type RestLimitedUse } from '@rpg/contracts'
+import {
+  isRestKind,
+  REST_KIND_ENTRIES,
+  REST_KINDS,
+  type RestKind,
+  type RestLimitedUse,
+} from '@rpg/contracts'
 
 export const SPELL_USE_LIMITS = ['at-will', 'uses'] as const
 export type SpellUseLimit = (typeof SPELL_USE_LIMITS)[number]
@@ -26,10 +32,6 @@ type LimitedUseFormFields = {
   spellUseCountKind?: string
   spellUseCount?: number | string
   spellMinimumRest?: string
-}
-
-function isRestKind(value: string | undefined): value is RestKind {
-  return value === 'short' || value === 'long'
 }
 
 /** Rest-based grant limit from form fields. At will and incomplete rows omit the limit. */
