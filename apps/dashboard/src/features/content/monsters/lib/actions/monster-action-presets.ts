@@ -1,5 +1,5 @@
 import type { z } from 'zod'
-import { monsterReactionDraftSchema, type MonsterActionKind } from '@rpg/contracts'
+import type { monsterReactionDraftSchema, MonsterActionKind } from '@rpg/contracts'
 
 import type { MonsterActionSection } from './monster-action-equipment-references'
 
