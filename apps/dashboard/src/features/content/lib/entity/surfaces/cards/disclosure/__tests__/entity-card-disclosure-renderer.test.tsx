@@ -417,7 +417,14 @@ describe('EntityCardDisclosureRenderer', () => {
     const leadingSlot = container.querySelector('[data-entity-item-slot="leading"]') as HTMLElement
     const rail = leadingSlot.querySelector('.dash-entity-leading') as HTMLElement
     expect(rail).toBeTruthy()
-    expect(rail).toHaveClass('dash-entity-leading--comfortable')
+    expect(rail).toHaveClass('dash-entity-leading')
+    expect(rail.className).not.toMatch(/dash-entity-leading--/)
+    expect(container.querySelector('.dash-entity-anatomy')).toHaveClass(
+      'dash-entity-anatomy--comfortable',
+    )
+    expect(container.querySelector('.dash-entity-surface')).toHaveClass(
+      'dash-entity-surface--comfortable',
+    )
     expect(leadingSlot.className).not.toMatch(/\bmr-/)
     expect(leadingSlot.querySelectorAll('.dash-entity-leading__column')).toHaveLength(2)
 

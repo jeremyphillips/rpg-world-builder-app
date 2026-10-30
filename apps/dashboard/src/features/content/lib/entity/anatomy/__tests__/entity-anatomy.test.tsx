@@ -1,4 +1,8 @@
-import { render, screen } from '@testing-library/react'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import { cleanup, render, screen } from '@testing-library/react'
 import type { ComponentProps } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
@@ -114,15 +118,41 @@ describe('EntityAnatomy row tracks', () => {
     expect(slot('media')!.querySelector('[data-detail-row-leading-media]')).not.toBeNull()
   })
 
-  it('applies leading content gap on the rail and trailing separation from the host columns', () => {
+  it('reads the leading gap from the anatomy density publisher', () => {
+    for (const density of ['compact', 'comfortable', 'spacious'] as const) {
+      const { anatomy, slot } = renderAnatomy({
+        density,
+        leadingUtilities: [<span key="grip">Grip</span>],
+        trailing: SELECT_ACTION,
+      })
+
+      const rail = slot('leading')?.querySelector('.dash-entity-leading')
+      expect(rail).toHaveClass('dash-entity-leading')
+      expect(rail?.className).not.toMatch(/dash-entity-leading--/)
+      expect(anatomy.className).toContain(`dash-entity-anatomy--${density}`)
+      cleanup()
+    }
+  })
+
+  it('keeps the rail fallback when no ancestor publishes the leading gap', () => {
     const { anatomy, slot } = renderAnatomy({
+      density: undefined,
       leadingUtilities: [<span key="grip">Grip</span>],
-      trailing: SELECT_ACTION,
     })
 
     const rail = slot('leading')?.querySelector('.dash-entity-leading')
-    expect(rail).toHaveClass('dash-entity-leading--compact')
-    expect(anatomy.className).toContain('dash-entity-anatomy--compact')
+    expect(rail).toHaveClass('dash-entity-leading')
+    expect(rail?.className).not.toMatch(/dash-entity-leading--/)
+    expect(anatomy.className).not.toMatch(/dash-entity-anatomy--/)
+
+    const css = readFileSync(
+      path.join(path.dirname(fileURLToPath(import.meta.url)), '../dash-entity-leading.css'),
+      'utf8',
+    )
+    expect(css).toContain(
+      'padding-inline-end: var(--entity-leading-content-gap, calc(var(--spacing) * 3))',
+    )
+    expect(css).not.toContain('dash-entity-leading--')
   })
 })
 

@@ -11,6 +11,7 @@
     --entity-leading-content-gap: calc(var(--spacing) * 2);
   }
 
+  /* Inset geometry matches. Copy scale stays on dash-entity-anatomy--*. */
   .dash-entity-surface--comfortable,
   .dash-entity-surface--spacious {
     --entity-surface-inset: var(--ui-card-inset-inline);

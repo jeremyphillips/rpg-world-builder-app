@@ -1,4 +1,11 @@
 @layer components {
+  /*
+   * Gap comes from --entity-leading-content-gap on dash-entity-surface--* or
+   * dash-entity-anatomy--*. Compact is spacing * 2; comfortable and spacious are
+   * spacing * 3. The fallback matches that comfortable step when no ancestor
+   * publishes the token. Repeating the variable without a fallback would drop
+   * this declaration when the token is missing.
+   */
   .dash-entity-leading {
     display: flex;
     flex-shrink: 0;
@@ -13,13 +20,5 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-  }
-
-  .dash-entity-leading--compact {
-    padding-inline-end: var(--entity-leading-content-gap);
-  }
-
-  .dash-entity-leading--comfortable {
-    padding-inline-end: var(--entity-leading-content-gap);
   }
 }
