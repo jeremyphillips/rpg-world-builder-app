@@ -120,15 +120,13 @@ const baseCharacter = {
       castingEntitlements: [
         {
           mode: 'free_cast',
-          frequency: 'at_will',
           allowsSlotCasting: false,
-          sources: [
-            {
-              kind: 'heritageOption',
-              sourceId: 'srd-cc-5.2.1:elf',
-              grantId: 'high-elf-cantrip',
-            },
-          ],
+          source: {
+            kind: 'heritageOption',
+            sourceId: 'srd-cc-5.2.1:elf',
+            grantId: 'high-elf-cantrip',
+            grantRowId: 'light-spells',
+          },
         },
       ],
       sources: [

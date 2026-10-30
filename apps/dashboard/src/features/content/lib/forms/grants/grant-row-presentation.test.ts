@@ -138,7 +138,7 @@ describe('resolveGrantRowPresentation', () => {
         grantType: 'spells',
         spellAbility: 'cha',
         spellCastingEnabled: true,
-        spellCastingFrequency: 'at_will',
+        spellUseLimit: 'at-will',
         spellIds: ['srd-cc-5.2.1:aid', 'srd-cc-5.2.1:animate-dead'],
       },
       expected: {

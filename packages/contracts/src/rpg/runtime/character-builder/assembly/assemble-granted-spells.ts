@@ -36,18 +36,20 @@ function mergeSources(
   return merged
 }
 
+function entitlementIdentity(
+  entry: NonNullable<CharacterSpellEntry['castingEntitlements']>[number],
+): string {
+  const source = entry.source
+  return [source.kind, source.sourceId, source.grantId, source.grantRowId, entry.mode].join('\0')
+}
+
 function mergeCastingEntitlements(
   existing: CharacterSpellEntry['castingEntitlements'],
   incoming: NonNullable<CharacterSpellEntry['castingEntitlements']>[number],
 ): NonNullable<CharacterSpellEntry['castingEntitlements']> {
   const entitlements = [...(existing ?? [])]
-  const duplicate = entitlements.some(
-    (entry) =>
-      entry.mode === incoming.mode &&
-      entry.frequency === incoming.frequency &&
-      entry.allowsSlotCasting === incoming.allowsSlotCasting &&
-      JSON.stringify(entry.sources) === JSON.stringify(incoming.sources),
-  )
+  const incomingIdentity = entitlementIdentity(incoming)
+  const duplicate = entitlements.some((entry) => entitlementIdentity(entry) === incomingIdentity)
   if (!duplicate) entitlements.push(incoming)
   return entitlements
 }
@@ -73,13 +75,19 @@ function buildCastingEntitlement(
   grant: SpellsContentGrant,
   sources: CharacterSelectionSource[],
 ): NonNullable<CharacterSpellEntry['castingEntitlements']>[number] | undefined {
-  if (!grant.casting) return undefined
+  const source = sources[0]
+  if (!grant.casting || !source?.grantRowId || !source.sourceId || !source.grantId) return undefined
 
   return {
     mode: 'free_cast',
-    frequency: grant.casting.frequency,
+    ...(grant.casting.limitedUse ? { limitedUse: grant.casting.limitedUse } : {}),
     allowsSlotCasting: grant.casting.allowsSlotCasting ?? false,
-    sources,
+    source: {
+      kind: source.kind,
+      sourceId: source.sourceId,
+      grantId: source.grantId,
+      grantRowId: source.grantRowId,
+    },
   }
 }
 

@@ -44,7 +44,7 @@ const highElfSpecies = {
                 kind: 'spells' as const,
                 ability: 'int' as const,
                 spellIds: ['prestidigitation'],
-                casting: { mode: 'free_cast' as const, frequency: 'at_will' as const },
+                casting: { mode: 'free_cast' as const },
               },
             ],
           },
@@ -58,7 +58,11 @@ const highElfSpecies = {
                 spellIds: ['detect-magic'],
                 casting: {
                   mode: 'free_cast' as const,
-                  frequency: 'once_per_long_rest' as const,
+                  limitedUse: {
+                    kind: 'uses',
+                    count: { kind: 'fixed', value: 1 },
+                    recovery: { minimumRest: 'long' },
+                  } as const,
                 },
               },
             ],
@@ -73,7 +77,11 @@ const highElfSpecies = {
                 spellIds: ['misty-step'],
                 casting: {
                   mode: 'free_cast' as const,
-                  frequency: 'once_per_long_rest' as const,
+                  limitedUse: {
+                    kind: 'uses',
+                    count: { kind: 'fixed', value: 1 },
+                    recovery: { minimumRest: 'long' },
+                  } as const,
                 },
               },
             ],
@@ -363,7 +371,11 @@ describe('resolveSpellStepModel', () => {
                   availability: 'always_prepared',
                   casting: {
                     mode: 'free_cast',
-                    frequency: 'prof_bonus_per_long_rest',
+                    limitedUse: {
+                      kind: 'uses',
+                      count: { kind: 'proficiency-bonus' },
+                      recovery: { minimumRest: 'long' },
+                    } as const,
                   },
                 },
               ],

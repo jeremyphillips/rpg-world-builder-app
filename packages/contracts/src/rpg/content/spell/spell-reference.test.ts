@@ -21,7 +21,7 @@ const hiddenSpell = {
   id: 'srd-cc-5.2.1:hidden',
   status: 'published',
   campaignAccess: { available: false },
-} as Spell
+} as unknown as Spell
 
 const homebrewSpell = {
   id: '665f0c2a9b1e4c0011223344',

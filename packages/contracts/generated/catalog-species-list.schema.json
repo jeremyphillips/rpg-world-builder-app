@@ -2504,22 +2504,83 @@
           "const": "free_cast",
           "description": "free_cast"
         },
-        "frequency": {
-          "type": "string",
-          "enum": [
-            "at_will",
-            "once_per_long_rest",
-            "prof_bonus_per_long_rest"
+        "limitedUse": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "uses",
+              "description": "uses"
+            },
+            "count": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "fixed",
+                      "description": "fixed"
+                    },
+                    "value": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "proficiency-bonus",
+                      "description": "proficiency-bonus"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "recovery": {
+              "type": "object",
+              "properties": {
+                "minimumRest": {
+                  "type": "string",
+                  "enum": [
+                    "short",
+                    "long"
+                  ],
+                  "description": "short | long"
+                }
+              },
+              "required": [
+                "minimumRest"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "kind",
+            "count",
+            "recovery"
           ],
-          "description": "at_will | once_per_long_rest | prof_bonus_per_long_rest"
+          "additionalProperties": false
         },
         "allowsSlotCasting": {
           "type": "boolean"
         }
       },
       "required": [
-        "mode",
-        "frequency"
+        "mode"
       ],
       "additionalProperties": false
     },

@@ -11,7 +11,7 @@ describe('formatSpellMutationCopyParts', () => {
     expect(
       formatSpellMutationCopyParts({ kind: 'replace', trigger: 'longRest', limit: 'all' }),
     ).toEqual({
-      trigger: 'after a long rest',
+      trigger: 'after a Long Rest',
       replaceCount: 'all',
     })
   })
@@ -20,7 +20,7 @@ describe('formatSpellMutationCopyParts', () => {
     expect(
       formatSpellMutationCopyParts({ kind: 'replace', trigger: 'longRest', limit: 1 }),
     ).toEqual({
-      trigger: 'after a long rest',
+      trigger: 'after a Long Rest',
       replaceCount: 1,
     })
   })

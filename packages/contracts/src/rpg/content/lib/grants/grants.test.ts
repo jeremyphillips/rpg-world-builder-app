@@ -164,7 +164,7 @@ describe('grant sentence formatters', () => {
         id: 'spells-1',
         kind: 'spells',
         ability: 'cha',
-        casting: { mode: 'free_cast', frequency: 'at_will' },
+        casting: { mode: 'free_cast' },
         spellIds: ['dancing-lights'],
       }),
     ).toBe('Character can cast dancing-lights at will.')
@@ -175,7 +175,14 @@ describe('grant sentence formatters', () => {
           id: 'spells-2',
           kind: 'spells',
           ability: 'cha',
-          casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
+          casting: {
+            mode: 'free_cast',
+            limitedUse: {
+              kind: 'uses',
+              count: { kind: 'fixed', value: 1 },
+              recovery: { minimumRest: 'long' },
+            } as const,
+          },
           spellIds: ['faerie-fire', 'darkness'],
         },
         (id) => ({ 'faerie-fire': 'Faerie Fire', darkness: 'Darkness' })[id],
@@ -246,7 +253,7 @@ describe('grantContentTraitSchema', () => {
                 id: 'spells-7',
                 kind: 'spells',
                 ability: 'cha',
-                casting: { mode: 'free_cast', frequency: 'at_will' },
+                casting: { mode: 'free_cast' },
                 spellIds: ['dancing-lights'],
               },
             ],
@@ -268,7 +275,7 @@ describe('grantContentTraitSchema', () => {
                 id: 'spells-8',
                 kind: 'spells',
                 ability: 'cha',
-                casting: { mode: 'free_cast', frequency: 'at_will' },
+                casting: { mode: 'free_cast' },
                 spellIds: ['dancing-lights'],
               },
             ],
@@ -577,14 +584,14 @@ describe('contentGrantSchema — spells', () => {
         id: 'spells-40',
         kind: 'spells',
         ability: 'cha',
-        casting: { mode: 'free_cast', frequency: 'at_will' },
+        casting: { mode: 'free_cast' },
         spellIds: ['dancing-lights'],
       }),
     ).toEqual({
       id: 'spells-40',
       kind: 'spells',
       ability: 'cha',
-      casting: { mode: 'free_cast', frequency: 'at_will' },
+      casting: { mode: 'free_cast' },
       spellIds: ['dancing-lights'],
     })
   })
@@ -622,7 +629,7 @@ describe('contentGrantSchema — spells', () => {
         spellIds: ['bless'],
         casting: {
           mode: 'free_cast',
-          frequency: 'at_will',
+
           allowsSlotCasting: true,
         },
       }).success,
@@ -652,7 +659,7 @@ describe('grantGroupsSchema', () => {
     id: 'spells-47',
     kind: 'spells' as const,
     ability: 'cha' as const,
-    casting: { mode: 'free_cast' as const, frequency: 'at_will' as const },
+    casting: { mode: 'free_cast' as const },
     spellIds: ['dancing-lights'],
   }
 
@@ -782,7 +789,7 @@ describe('flattenGrantGroups', () => {
       id: 'spells-51',
       kind: 'spells' as const,
       ability: 'cha' as const,
-      casting: { mode: 'free_cast' as const, frequency: 'at_will' as const },
+      casting: { mode: 'free_cast' as const },
       spellIds: ['dancing-lights'],
     }
 
@@ -832,14 +839,28 @@ describe('getUnlockedGrantsAtLevel', () => {
     id: 'spells-54',
     kind: 'spells' as const,
     ability: 'cha' as const,
-    casting: { mode: 'free_cast' as const, frequency: 'once_per_long_rest' as const },
+    casting: {
+      mode: 'free_cast' as const,
+      limitedUse: {
+        kind: 'uses',
+        count: { kind: 'fixed', value: 1 },
+        recovery: { minimumRest: 'long' },
+      } as const,
+    },
     spellIds: ['faerie-fire'],
   }
   const spellGrant5 = {
     id: 'spells-55',
     kind: 'spells' as const,
     ability: 'cha' as const,
-    casting: { mode: 'free_cast' as const, frequency: 'once_per_long_rest' as const },
+    casting: {
+      mode: 'free_cast' as const,
+      limitedUse: {
+        kind: 'uses',
+        count: { kind: 'fixed', value: 1 },
+        recovery: { minimumRest: 'long' },
+      } as const,
+    },
     spellIds: ['darkness'],
   }
 
@@ -881,7 +902,7 @@ describe('isGrantGroupsEligible', () => {
     id: 'spells-57',
     kind: 'spells' as const,
     ability: 'cha' as const,
-    casting: { mode: 'free_cast' as const, frequency: 'at_will' as const },
+    casting: { mode: 'free_cast' as const },
     spellIds: ['dancing-lights'],
   }
 

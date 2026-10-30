@@ -15,7 +15,7 @@ const grantRowSchema = z.object({
   spellAbility: z.string().min(1),
   spellAvailability: z.boolean().optional(),
   spellCastingEnabled: z.boolean().optional(),
-  spellCastingFrequency: z.string().optional(),
+  spellUseLimit: z.string().optional(),
 })
 
 const formSchema = z.object({
@@ -80,7 +80,7 @@ const grantFields: FormItem[] = [
       },
       {
         type: 'text',
-        name: 'spellCastingFrequency',
+        name: 'spellUseLimit',
         label: 'Cast frequency',
       },
     ],

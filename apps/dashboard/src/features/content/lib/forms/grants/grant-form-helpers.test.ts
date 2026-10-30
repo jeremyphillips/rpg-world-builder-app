@@ -161,7 +161,14 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
             id: 'spells-1',
             kind: 'spells',
             ability: 'cha',
-            casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
+            casting: {
+              mode: 'free_cast',
+              limitedUse: {
+                kind: 'uses',
+                count: { kind: 'fixed', value: 1 },
+                recovery: { minimumRest: 'long' },
+              } as const,
+            },
             spellIds: ['power-word-heal', 'power-word-kill'],
           },
         ],
@@ -173,7 +180,10 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
     expect(rows[0]?.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
     expect(rows[0]?.spellAbility).toBe('cha')
     expect(rows[0]?.spellCastingEnabled).toBe(true)
-    expect(rows[0]?.spellCastingFrequency).toBe('once_per_long_rest')
+    expect(rows[0]?.spellUseLimit).toBe('uses')
+    expect(rows[0]?.spellUseCountKind).toBe('fixed')
+    expect(rows[0]?.spellUseCount).toBe(1)
+    expect(rows[0]?.spellMinimumRest).toBe('long')
     expect(rows[0]?.spellAvailability).toBe(false)
     expect(rows[0]?.unlockLevel).toBe(GRANT_DEFAULT_UNLOCK_LEVEL)
 
@@ -212,7 +222,14 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
             kind: 'spells',
             ability: 'cha',
             availability: 'always_prepared',
-            casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
+            casting: {
+              mode: 'free_cast',
+              limitedUse: {
+                kind: 'uses',
+                count: { kind: 'fixed', value: 1 },
+                recovery: { minimumRest: 'long' },
+              } as const,
+            },
             spellIds: ['contact-other-plane'],
           },
         ],
@@ -221,7 +238,10 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
     const rows = grantGroupsToFormRows(groups)
     expect(rows[0]?.spellAvailability).toBe(true)
     expect(rows[0]?.spellCastingEnabled).toBe(true)
-    expect(rows[0]?.spellCastingFrequency).toBe('once_per_long_rest')
+    expect(rows[0]?.spellUseLimit).toBe('uses')
+    expect(rows[0]?.spellUseCountKind).toBe('fixed')
+    expect(rows[0]?.spellUseCount).toBe(1)
+    expect(rows[0]?.spellMinimumRest).toBe('long')
     expect(formRowsToGrantGroups(rows)).toEqual(groups)
   })
 
@@ -231,7 +251,7 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
         grantType: 'spells' as const,
         spellAbility: 'cha' as const,
         spellCastingEnabled: true,
-        spellCastingFrequency: 'at_will' as const,
+        spellUseLimit: 'at-will' as const,
         spellIds: ['dancing-lights'],
         unlockLevel: GRANT_DEFAULT_UNLOCK_LEVEL,
       },
@@ -239,7 +259,10 @@ describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
         grantType: 'spells' as const,
         spellAbility: 'cha' as const,
         spellCastingEnabled: true,
-        spellCastingFrequency: 'once_per_long_rest' as const,
+        spellUseLimit: 'uses' as const,
+        spellUseCountKind: 'fixed' as const,
+        spellUseCount: 1,
+        spellMinimumRest: 'long' as const,
         spellIds: ['faerie-fire'],
         unlockLevel: 3,
       },
@@ -428,7 +451,7 @@ describe('grant row summaries', () => {
           grantType: 'spells',
           spellAbility: 'cha',
           spellCastingEnabled: true,
-          spellCastingFrequency: 'at_will',
+          spellUseLimit: 'at-will',
           spellIds: ['dancing-lights'],
         },
         {
@@ -478,7 +501,7 @@ describe('formatGrantRowSummary', () => {
           grantType: 'spells',
           spellAbility: 'cha',
           spellCastingEnabled: true,
-          spellCastingFrequency: 'at_will',
+          spellUseLimit: 'at-will',
           spellIds: ['power-word-heal'],
         },
         grantRowHeaderContext,
@@ -524,7 +547,7 @@ describe('resolveGrantRowPresentation integration', () => {
         grantType: 'spells',
         spellAbility: 'cha',
         spellCastingEnabled: true,
-        spellCastingFrequency: 'at_will',
+        spellUseLimit: 'at-will',
         spellIds: ['power-word-heal', 'power-word-kill'],
       },
       grantRowHeaderContext,
@@ -555,7 +578,11 @@ describe('grant row ids', () => {
     expect(rows[0]?.id).toBe('darkvision')
     expect(formRowsToGrantGroups(rows)).toEqual(groups)
 
-    const added = buildGrantArrayAddMenu(['senses']).items[0]?.appendDefaults()
+    const appendDefaults = buildGrantArrayAddMenu(['senses']).items[0]?.appendDefaults
+    if (typeof appendDefaults !== 'function') {
+      throw new Error('Grant add menu defaults must be a function.')
+    }
+    const added = appendDefaults()
     expect(typeof added?.id).toBe('string')
     expect(isOpaqueGrantRowId(String(added?.id))).toBe(true)
   })

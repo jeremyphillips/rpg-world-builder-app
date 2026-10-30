@@ -13,9 +13,10 @@ import {
   type MovementMode,
   type MovementOperation,
   type SenseId,
-  type UsageFrequency,
 } from '@rpg/contracts'
 import { INLINE_METADATA_SEPARATOR } from '@rpg/contracts/primitives'
+
+import { limitedUseFromForm } from '../limited-use/limited-use-form.lib'
 import type { FieldOption } from '@rpg/ui/form'
 
 import { formatCompactMetadataList } from './grant-compact-metadata.lib'
@@ -184,6 +185,14 @@ function resolveSpellGrantDescription(values: GrantRowValues, ctx: GrantRowHeade
   const hasAvailability = values['spellAvailability'] === true
   const hasCasting = values['spellCastingEnabled'] === true
   if (!hasAvailability && !hasCasting) return ''
+  const limitedUse = hasCasting
+    ? limitedUseFromForm({
+        spellUseLimit: values['spellUseLimit'] as string | undefined,
+        spellUseCountKind: values['spellUseCountKind'] as string | undefined,
+        spellUseCount: values['spellUseCount'] as number | string | undefined,
+        spellMinimumRest: values['spellMinimumRest'] as string | undefined,
+      })
+    : undefined
 
   return formatSpellsGrantSentence(
     {
@@ -192,11 +201,11 @@ function resolveSpellGrantDescription(values: GrantRowValues, ctx: GrantRowHeade
       ability: ability as never,
       spellIds,
       ...(hasAvailability ? { availability: 'always_prepared' as const } : {}),
-      ...(hasCasting && values['spellCastingFrequency']
+      ...(hasCasting
         ? {
             casting: {
               mode: 'free_cast' as const,
-              frequency: values['spellCastingFrequency'] as UsageFrequency,
+              ...(limitedUse ? { limitedUse } : {}),
               ...(values['spellAllowsSlotCasting'] === true ? { allowsSlotCasting: true } : {}),
             },
           }

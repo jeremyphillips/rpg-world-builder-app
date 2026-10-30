@@ -17,7 +17,7 @@ import {
   movementGrantSetSchema,
 } from '../../../vocab/movement-mode'
 import { getSenseSentenceForm, senseSchema } from '../../../vocab/sense'
-import { getUsageFrequencySentenceForm } from '../../../vocab/usage-frequency'
+import { formatLimitedUseSentence } from '../../../primitives/limited-use'
 import { featCategorySchema, getFeatCategorySentenceForm } from '../../../vocab/feat'
 import { spellReferenceSchema } from '../../spell/spell-reference'
 import { spellGrantAvailabilitySchema } from '../../../vocab/spell/grant-availability'
@@ -321,9 +321,7 @@ export function formatSpellsGrantSentence(
   const names = grant.spellIds.map((id) => resolveSpellName?.(id) ?? id)
   const spellList = joinNaturalList(names)
   const hasAvailability = grant.availability === 'always_prepared'
-  const cadence = grant.casting?.frequency
-    ? getUsageFrequencySentenceForm(grant.casting.frequency)
-    : undefined
+  const cadence = grant.casting ? formatLimitedUseSentence(grant.casting.limitedUse) : undefined
 
   if (hasAvailability && cadence) {
     const availabilityLabel =

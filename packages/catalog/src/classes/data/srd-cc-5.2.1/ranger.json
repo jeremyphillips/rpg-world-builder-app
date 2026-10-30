@@ -227,7 +227,15 @@
               "availability": "always_prepared",
               "casting": {
                 "mode": "free_cast",
-                "frequency": "prof_bonus_per_long_rest"
+                "limitedUse": {
+                  "kind": "uses",
+                  "count": {
+                    "kind": "proficiency-bonus"
+                  },
+                  "recovery": {
+                    "minimumRest": "long"
+                  }
+                }
               }
             }
           ]

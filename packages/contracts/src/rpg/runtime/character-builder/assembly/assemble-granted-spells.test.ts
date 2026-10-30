@@ -34,7 +34,7 @@ describe('assembleGrantedSpells', () => {
                           id: 'spells-1',
                           kind: 'spells',
                           ability: 'cha',
-                          casting: { mode: 'free_cast', frequency: 'at_will' },
+                          casting: { mode: 'free_cast' },
                           spellIds: ['dancing-lights'],
                         },
                       ],
@@ -74,16 +74,13 @@ describe('assembleGrantedSpells', () => {
         castingEntitlements: [
           {
             mode: 'free_cast',
-            frequency: 'at_will',
             allowsSlotCasting: false,
-            sources: [
-              {
-                kind: 'heritageOption',
-                sourceId: 'srd-cc-5.2.1:elf',
-                grantId: 'drow',
-                grantRowId: 'spells-1',
-              },
-            ],
+            source: {
+              kind: 'heritageOption',
+              sourceId: 'srd-cc-5.2.1:elf',
+              grantId: 'drow',
+              grantRowId: 'spells-1',
+            },
           },
         ],
       },
@@ -117,7 +114,11 @@ describe('assembleGrantedSpells', () => {
                         availability: 'always_prepared',
                         casting: {
                           mode: 'free_cast',
-                          frequency: 'once_per_long_rest',
+                          limitedUse: {
+                            kind: 'uses',
+                            count: { kind: 'fixed', value: 1 },
+                            recovery: { minimumRest: 'long' },
+                          } as const,
                         },
                         spellIds: ['contact-other-plane'],
                       },
@@ -160,7 +161,11 @@ describe('assembleGrantedSpells', () => {
       castingEntitlements: [
         {
           mode: 'free_cast',
-          frequency: 'once_per_long_rest',
+          limitedUse: {
+            kind: 'uses',
+            count: { kind: 'fixed', value: 1 },
+            recovery: { minimumRest: 'long' },
+          } as const,
           allowsSlotCasting: false,
         },
       ],
@@ -190,7 +195,7 @@ describe('assembleGrantedSpells', () => {
                           id: 'missing-spells',
                           kind: 'spells',
                           ability: 'cha',
-                          casting: { mode: 'free_cast', frequency: 'at_will' },
+                          casting: { mode: 'free_cast' },
                           spellIds: ['srd-cc-5.2.1:missing'],
                         },
                       ],

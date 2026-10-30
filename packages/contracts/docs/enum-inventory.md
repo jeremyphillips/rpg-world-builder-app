@@ -51,7 +51,7 @@ enforced by `vocab-term-coverage.test.ts`. Detail:
 | Schema                         | Module                              | Entries | Catalog JSON |
 | ------------------------------ | ----------------------------------- | ------- | ------------ |
 | `abilitySchema`                | `vocab/ability.ts`                  | full    | yes          |
-| `usageFrequencySchema`         | `vocab/usage-frequency.ts`          | full    | yes          |
+| `restKindSchema`               | `vocab/rest.ts`                     | full    | yes          |
 | `movementModeSchema`           | `vocab/movement-mode.ts`            | full    | yes          |
 | `extraMovementModeSchema`      | `vocab/movement-mode.ts`            | full    | yes          |
 | `movementOperationSchema`      | `vocab/movement-mode.ts`            | full    | yes          |

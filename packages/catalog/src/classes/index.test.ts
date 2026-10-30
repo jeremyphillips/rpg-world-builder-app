@@ -267,7 +267,11 @@ describe('SRD 5.2.1 class seed', () => {
       spellIds: ['srd-cc-5.2.1:hunters-mark'],
       casting: {
         mode: 'free_cast',
-        frequency: 'prof_bonus_per_long_rest',
+        limitedUse: {
+          kind: 'uses',
+          count: { kind: 'proficiency-bonus' },
+          recovery: { minimumRest: 'long' },
+        } as const,
       },
     })
     expectNumberColumnEntries(ranger, 'favored-enemy', 'favored-enemy-progression', 'uses', [
@@ -782,7 +786,14 @@ describe('SRD 5.2.1 class seed', () => {
     const dragonSpell = dragonCompanion?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
     expect(dragonSpell).toMatchObject({
       kind: 'spells',
-      casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
+      casting: {
+        mode: 'free_cast',
+        limitedUse: {
+          kind: 'uses',
+          count: { kind: 'fixed', value: 1 },
+          recovery: { minimumRest: 'long' },
+        } as const,
+      },
       spellIds: ['srd-cc-5.2.1:summon-dragon'],
     })
   })
@@ -815,7 +826,14 @@ describe('SRD 5.2.1 class seed', () => {
     expect(contactGrants[0]).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
-      casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
+      casting: {
+        mode: 'free_cast',
+        limitedUse: {
+          kind: 'uses',
+          count: { kind: 'fixed', value: 1 },
+          recovery: { minimumRest: 'long' },
+        } as const,
+      },
       spellIds: ['srd-cc-5.2.1:contact-other-plane'],
     })
     expectNumberColumnEntries(

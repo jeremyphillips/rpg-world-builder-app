@@ -448,8 +448,7 @@
                   "ability": "cha",
                   "spellIds": ["srd-cc-5.2.1:dancing-lights"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -466,7 +465,16 @@
                   "spellIds": ["srd-cc-5.2.1:faerie-fire"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -483,7 +491,16 @@
                   "spellIds": ["srd-cc-5.2.1:darkness"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -504,8 +521,7 @@
                   "ability": "int",
                   "spellIds": ["srd-cc-5.2.1:prestidigitation"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -522,7 +538,16 @@
                   "spellIds": ["srd-cc-5.2.1:detect-magic"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -539,7 +564,16 @@
                   "spellIds": ["srd-cc-5.2.1:misty-step"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -567,8 +601,7 @@
                   "ability": "wis",
                   "spellIds": ["srd-cc-5.2.1:druidcraft"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -585,7 +618,16 @@
                   "spellIds": ["srd-cc-5.2.1:longstrider"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -602,7 +644,16 @@
                   "spellIds": ["srd-cc-5.2.1:pass-without-trace"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -678,8 +729,7 @@
                   "ability": "wis",
                   "spellIds": ["srd-cc-5.2.1:minor-illusion"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 },
                 {
@@ -689,7 +739,15 @@
                   "spellIds": ["srd-cc-5.2.1:speak-with-animals"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "prof_bonus_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "proficiency-bonus"
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   },
                   "availability": "always_prepared"
                 }
@@ -711,8 +769,7 @@
                   "ability": "int",
                   "spellIds": ["srd-cc-5.2.1:mending", "srd-cc-5.2.1:prestidigitation"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -1056,8 +1113,7 @@
                 "ability": "cha",
                 "spellIds": ["srd-cc-5.2.1:thaumaturgy"],
                 "casting": {
-                  "mode": "free_cast",
-                  "frequency": "at_will"
+                  "mode": "free_cast"
                 }
               }
             ]
@@ -1089,8 +1145,7 @@
                   "ability": "cha",
                   "spellIds": ["srd-cc-5.2.1:poison-spray"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -1107,7 +1162,16 @@
                   "spellIds": ["srd-cc-5.2.1:ray-of-sickness"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -1124,7 +1188,16 @@
                   "spellIds": ["srd-cc-5.2.1:hold-person"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -1150,8 +1223,7 @@
                   "ability": "cha",
                   "spellIds": ["srd-cc-5.2.1:chill-touch"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -1168,7 +1240,16 @@
                   "spellIds": ["srd-cc-5.2.1:false-life"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -1185,7 +1266,16 @@
                   "spellIds": ["srd-cc-5.2.1:ray-of-enfeeblement"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -1211,8 +1301,7 @@
                   "ability": "cha",
                   "spellIds": ["srd-cc-5.2.1:fire-bolt"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -1229,7 +1318,16 @@
                   "spellIds": ["srd-cc-5.2.1:hellish-rebuke"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -1246,7 +1344,16 @@
                   "spellIds": ["srd-cc-5.2.1:darkness"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]

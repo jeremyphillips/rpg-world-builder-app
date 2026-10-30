@@ -339,7 +339,16 @@
               "availability": "always_prepared",
               "casting": {
                 "mode": "free_cast",
-                "frequency": "once_per_long_rest"
+                "limitedUse": {
+                  "kind": "uses",
+                  "count": {
+                    "kind": "fixed",
+                    "value": 1
+                  },
+                  "recovery": {
+                    "minimumRest": "long"
+                  }
+                }
               }
             }
           ]

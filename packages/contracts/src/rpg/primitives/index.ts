@@ -10,6 +10,8 @@ export * from './area-geometry'
 export * from './wealth'
 export * from './character-wealth-grant'
 export * from './prose'
+export * from './rest-recovery'
+export * from './limited-use'
 export {
   INLINE_METADATA_SEPARATOR,
   formatInlineMetadataTail,

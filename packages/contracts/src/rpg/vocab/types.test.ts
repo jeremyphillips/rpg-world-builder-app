@@ -30,7 +30,7 @@ import {
   vocabularyTermLabel,
   type GameTermEntry,
 } from './types'
-import { USAGE_FREQUENCY_ENTRIES } from './usage-frequency'
+import { REST_KIND_ENTRIES } from './rest'
 import { WEAPON_CATEGORY_ENTRIES } from './weapon/category'
 
 const ROLLOUT_ENTRY_TABLES = [
@@ -46,7 +46,7 @@ const ROLLOUT_ENTRY_TABLES = [
   MAGIC_ITEM_RARITY_ENTRIES,
   VEHICLE_CATEGORY_ENTRIES,
   SERVICE_CATEGORY_ENTRIES,
-  USAGE_FREQUENCY_ENTRIES,
+  REST_KIND_ENTRIES,
   ALIGNMENT_ENTRIES,
   CREATURE_SIZE_ENTRIES,
   ABILITY_ENTRIES,

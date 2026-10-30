@@ -21,7 +21,7 @@ describe('formatSpellAcquisitionCopy', () => {
 
     expect(spellAcquisitionCopyLines(copy)).toEqual([
       'Prepare 6 spells from the Druid spell list.',
-      'You can change your prepared spells after a long rest.',
+      'You can change your prepared spells after a Long Rest.',
     ])
   })
 
@@ -52,7 +52,7 @@ describe('formatSpellAcquisitionCopy', () => {
       destination: 'classList',
     })
 
-    expect(copy.change).toBe('After a long rest, you can replace 1 prepared spell.')
+    expect(copy.change).toBe('After a Long Rest, you can replace 1 prepared spell.')
   })
 
   it('formats limited repertoire on two lines', () => {
@@ -109,7 +109,7 @@ describe('formatSpellAcquisitionCopy', () => {
 
     expect(spellAcquisitionCopyLines(copy)).toEqual([
       'Prepare 4 spells from your spellbook.',
-      'You can change your prepared spells after a long rest.',
+      'You can change your prepared spells after a Long Rest.',
     ])
   })
 

@@ -1,6 +1,9 @@
+import { REST_KIND_ENTRIES } from '../rest'
 import type { SpellMutationPolicy } from './spell-mutation-policy'
 
-export type SpellMutationCopyTrigger = 'after a long rest' | 'when you gain a class level'
+const AFTER_LONG_REST = `after a ${REST_KIND_ENTRIES.long.label}` as const
+
+export type SpellMutationCopyTrigger = typeof AFTER_LONG_REST | 'when you gain a class level'
 
 export type SpellMutationCopyParts = {
   trigger: SpellMutationCopyTrigger
@@ -11,7 +14,7 @@ const TRIGGER_PHRASES: Record<
   Extract<SpellMutationPolicy, { kind: 'replace' }>['trigger'],
   SpellMutationCopyTrigger
 > = {
-  longRest: 'after a long rest',
+  longRest: AFTER_LONG_REST,
   levelUp: 'when you gain a class level',
 }
 

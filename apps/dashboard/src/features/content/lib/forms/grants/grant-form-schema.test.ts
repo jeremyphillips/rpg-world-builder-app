@@ -142,7 +142,7 @@ describe('grantRowFormSchema', () => {
     const result = grantRowFormSchema.safeParse({
       grantType: 'spells',
       spellCastingEnabled: true,
-      spellCastingFrequency: 'at_will',
+      spellUseLimit: 'at-will',
       spellIds: [],
     })
 

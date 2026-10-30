@@ -71,7 +71,7 @@ import { SPELL_ROLE_TAG_TERM } from './spell/role-tag'
 import { SLOT_PROGRESSION_KIND_TERM } from './spell/slot-progression-kind'
 import { SPELL_SCHOOL_TERM } from './spell/school'
 import { getTermSentenceForm, type VocabularyTerm } from './types'
-import { USAGE_FREQUENCY_TERM } from './usage-frequency'
+import { REST_KIND_TERM } from './rest'
 import { WEAPON_CATEGORY_TERM } from './weapon/category'
 import { WEAPON_MASTERY_TERM } from './weapon/mastery'
 import { WEAPON_MODE_TERM } from './weapon/mode'
@@ -98,7 +98,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   MOVEMENT_MODE_TERM,
   MOVEMENT_OPERATION_TERM,
   PROFICIENCY_TERM,
-  USAGE_FREQUENCY_TERM,
+  REST_KIND_TERM,
   ARMOR_CATEGORY_TERM,
   ARMOR_MATERIAL_TERM,
   PHYSICAL_DAMAGE_TYPE_TERM,

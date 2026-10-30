@@ -17,6 +17,7 @@ import {
   normalizeGrantGroups,
 } from '@rpg/contracts'
 
+import { formFieldsFromLimitedUse, limitedUseFromForm } from '../limited-use/limited-use-form.lib'
 import {
   type GrantRowForm,
   type GrantRowType,
@@ -70,7 +71,10 @@ function emptyGrantRow(grantType: GrantRowType): GrantRowForm {
     spellAbility: undefined,
     spellAvailability: false,
     spellCastingEnabled: false,
-    spellCastingFrequency: undefined,
+    spellUseLimit: 'at-will',
+    spellUseCountKind: undefined,
+    spellUseCount: undefined,
+    spellMinimumRest: undefined,
     spellAllowsSlotCasting: false,
     spellIds: [],
     featCategory: undefined,
@@ -200,7 +204,7 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
       spellAbility: grant.ability,
       spellAvailability: grant.availability === 'always_prepared',
       spellCastingEnabled: grant.casting !== undefined,
-      spellCastingFrequency: grant.casting?.frequency,
+      ...(grant.casting ? formFieldsFromLimitedUse(grant.casting.limitedUse) : {}),
       spellAllowsSlotCasting: grant.casting?.allowsSlotCasting ?? false,
       spellIds: grant.spellIds,
     }),
@@ -343,16 +347,17 @@ function spellsToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
     return undefined
   }
 
+  const limitedUse = hasCasting ? limitedUseFromForm(row) : undefined
   return {
     kind: 'spells',
     ability: row.spellAbility as Ability,
     spellIds: row.spellIds,
     ...(hasAvailability ? { availability: 'always_prepared' as const } : {}),
-    ...(hasCasting && row.spellCastingFrequency
+    ...(hasCasting
       ? {
           casting: {
             mode: 'free_cast' as const,
-            frequency: row.spellCastingFrequency,
+            ...(limitedUse ? { limitedUse } : {}),
             ...(row.spellAllowsSlotCasting ? { allowsSlotCasting: true } : {}),
           },
         }

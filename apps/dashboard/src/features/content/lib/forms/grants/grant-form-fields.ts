@@ -13,17 +13,20 @@ import {
   MOVEMENT_OPERATION_ENTRIES,
   MOVEMENT_OPERATIONS,
   MOVEMENT_SPEED_FEET,
-  USAGE_FREQUENCIES,
-  USAGE_FREQUENCY_ENTRIES,
   type FeatCategory,
   type MovementOperation,
   type SenseId,
-  type UsageFrequency,
   isArmorEquipment,
   isWeaponEquipment,
   getSpellGrantAvailabilityLabel,
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
+
+import {
+  SPELL_MINIMUM_REST_OPTIONS,
+  SPELL_USE_COUNT_KIND_OPTIONS,
+  SPELL_USE_LIMIT_OPTIONS,
+} from '../limited-use/limited-use-form.lib'
 import {
   toOptions,
   type FieldOption,
@@ -262,14 +265,6 @@ export function formatFeatChoiceRowSummary(
 export function formatSpellRowSummary(values: GrantRowValues, ctx: GrantRowHeaderContext): string {
   return resolveGrantRowPresentation(values, ctx)?.description ?? ''
 }
-
-const usageFrequencyOptions = toOptions(
-  USAGE_FREQUENCIES,
-  Object.fromEntries(USAGE_FREQUENCIES.map((f) => [f, USAGE_FREQUENCY_ENTRIES[f].label])) as Record<
-    UsageFrequency,
-    string
-  >,
-)
 
 const featCategoryOptions = toOptions(
   FEAT_CATEGORY_IDS,
@@ -545,14 +540,57 @@ export function grantItemFields<T extends string>(
       fields: [
         {
           type: 'select',
-          name: 'spellCastingFrequency',
-          label: 'Cast frequency',
-          options: usageFrequencyOptions,
-          width: '1/2',
+          name: 'spellUseLimit',
+          label: 'Use limit',
+          options: [...SPELL_USE_LIMIT_OPTIONS],
+          width: '1/3',
           visibility: {
             dependsOn: ['grantType', 'spellCastingEnabled'],
             visibleWhen: (watched) =>
               watched['grantType'] === 'spells' && watched['spellCastingEnabled'] === true,
+          },
+        },
+        {
+          type: 'select',
+          name: 'spellUseCountKind',
+          label: 'Uses',
+          options: [...SPELL_USE_COUNT_KIND_OPTIONS],
+          width: '1/3',
+          visibility: {
+            dependsOn: ['grantType', 'spellCastingEnabled', 'spellUseLimit'],
+            visibleWhen: (watched) =>
+              watched['grantType'] === 'spells' &&
+              watched['spellCastingEnabled'] === true &&
+              watched['spellUseLimit'] === 'uses',
+          },
+        },
+        {
+          type: 'number',
+          name: 'spellUseCount',
+          label: 'Number of uses',
+          min: 1,
+          width: '1/4',
+          visibility: {
+            dependsOn: ['grantType', 'spellCastingEnabled', 'spellUseLimit', 'spellUseCountKind'],
+            visibleWhen: (watched) =>
+              watched['grantType'] === 'spells' &&
+              watched['spellCastingEnabled'] === true &&
+              watched['spellUseLimit'] === 'uses' &&
+              watched['spellUseCountKind'] === 'fixed',
+          },
+        },
+        {
+          type: 'select',
+          name: 'spellMinimumRest',
+          label: 'Restores after',
+          options: SPELL_MINIMUM_REST_OPTIONS,
+          width: '1/3',
+          visibility: {
+            dependsOn: ['grantType', 'spellCastingEnabled', 'spellUseLimit'],
+            visibleWhen: (watched) =>
+              watched['grantType'] === 'spells' &&
+              watched['spellCastingEnabled'] === true &&
+              watched['spellUseLimit'] === 'uses',
           },
         },
         {
