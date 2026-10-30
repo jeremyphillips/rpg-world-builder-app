@@ -13,7 +13,8 @@ import {
   refineCreatureTelepathyRange,
   creatureCommunicationSchema,
   EMPTY_CREATURE_COMMUNICATION,
-  creatureSizeRefSchema,
+  creatureSizesDraftSchema,
+  creatureSizesSchema,
   creatureSkillProficiencyEntrySchema,
   creatureLanguageProficiencyEntrySchema,
   creatureStatBlockHitPointsSchema,
@@ -94,8 +95,7 @@ export const monsterEquipmentEntrySchema = z.preprocess((value) => {
 }, monsterEquipmentEntrySchemaParsed)
 
 export const monsterBodyFields = {
-  size: creatureSizeRefSchema,
-  alternateSizes: z.array(creatureSizeRefSchema).default([]),
+  sizes: creatureSizesSchema,
   creatureType: creatureTypeRefSchema,
   alignment: creatureAlignmentSchema,
   abilityScores: creatureAbilityScoresSchema,
@@ -130,7 +130,7 @@ const monsterBodyDraftSchemaBase = mediaBearingDraftAuthoredContentBodySchema(
   MONSTER_CONTENT_TYPE_TERM.label,
 ).extend({
   ...monsterBodyFields,
-  size: creatureSizeRefSchema.optional(),
+  sizes: creatureSizesDraftSchema,
   creatureType: creatureTypeRefSchema.optional(),
   alignment: creatureAlignmentSchema.optional(),
   abilityScores: creatureAbilityScoresSchema.partial().optional(),
@@ -306,8 +306,6 @@ export function refineMonsterBody(
     'telepathy',
   ])
   refineMonsterProficiencies(body.proficiencies, ctx, prefix)
-  refineAlternateSizes(body.size, body.alternateSizes, ctx, prefix)
-
   const derivedXp = CHALLENGE_RATING_MECHANICS[body.challengeRating].xp
   if (body.experiencePointsOverride !== undefined) {
     if (body.challengeRating !== '0') {
@@ -334,24 +332,6 @@ const monsterStoredSchema = publishStoredSchema(monsterBodySchema).superRefine((
 )
 
 export const monsterSchema = monsterStoredSchema as unknown as z.ZodType<Monster>
-
-function refineAlternateSizes(
-  size: string | undefined,
-  alternateSizes: readonly string[] | undefined,
-  ctx: z.RefinementCtx,
-  prefix: (string | number)[],
-): void {
-  const sizes = alternateSizes ?? []
-  if (new Set(sizes).size !== sizes.length) {
-    addCustomRefinementIssue(ctx, 'Alternate sizes must be unique.', [...prefix, 'alternateSizes'])
-  }
-  if (size && sizes.includes(size)) {
-    addCustomRefinementIssue(ctx, 'Alternate sizes cannot repeat the primary size.', [
-      ...prefix,
-      'alternateSizes',
-    ])
-  }
-}
 
 function refineMonsterDraftIds(
   body: MonsterBodyDraft,
@@ -413,7 +393,6 @@ function refineMonsterDraftBody(
     prefix,
     { requirePresent: false },
   )
-  refineAlternateSizes(body.size, body.alternateSizes, ctx, prefix)
 }
 
 const monsterDraftStoredSchemaBase = draftStoredSchema(monsterBodyDraftSchema).superRefine(

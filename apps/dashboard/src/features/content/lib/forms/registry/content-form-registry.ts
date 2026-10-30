@@ -92,6 +92,8 @@ export type ContentFormCtx = {
   organizationMemberSpeciesAffinitySeedIds?: readonly string[]
   /** Persisted parent location id for orphan union on location edit load. */
   locationParentLocationIdSeed?: string
+  /** Saved creature sizes so an inactive vocabulary size stays visible on edit. */
+  creatureSizesSeedIds?: readonly string[]
   /** Live practice recommendations from preset bridge — authoring guidance only. */
   organizationPracticeRecommendationIds?: readonly OrganizationPractice[]
   /** Standalone vs quick-create organization field visibility (`full` default). */

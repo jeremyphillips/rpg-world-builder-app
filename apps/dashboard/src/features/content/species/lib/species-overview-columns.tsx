@@ -1,6 +1,11 @@
 import type { Species, WithCampaignAccess } from '@rpg/contracts'
 import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
-import { formatMovementDisplay, getCreatureSizeLabel } from '@rpg/contracts'
+import {
+  CREATURE_SIZE_ENTRIES,
+  formatCreatureSizeList,
+  formatMovementDisplay,
+  resolveLargestCreatureSize,
+} from '@rpg/contracts'
 import { dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 
@@ -37,9 +42,12 @@ function speciesMiddleColumns(): ColumnDef<Species>[] {
     }),
     {
       id: 'sizes',
-      accessorFn: (row) => row.sizes.map(getCreatureSizeLabel).join(' / '),
+      accessorFn: (row) => {
+        const largest = resolveLargestCreatureSize(row.sizes)
+        return largest ? CREATURE_SIZE_ENTRIES[largest].rank : 0
+      },
       header: ({ column }) => <SortableHeader column={column}>Size</SortableHeader>,
-      cell: ({ row }) => row.getValue<string>('sizes'),
+      cell: ({ row }) => formatCreatureSizeList(row.original.sizes),
       meta: { label: 'Size', ...dataTableWidthMeta('medium') },
     },
     {

@@ -1,12 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import {
-  CREATURE_SIZE_TERM,
-  CREATURE_TYPE_TERM,
-  getVocabularyTermLabel,
-  vocabularyTermFieldCopy,
-} from '@rpg/contracts'
+import { CREATURE_TYPE_TERM, vocabularyTermFieldCopy } from '@rpg/contracts'
 import { isContainer, resolveColumnsCollapseSequence, type FormItem } from '@rpg/ui/form'
 
+import { CREATURE_SIZES_FIELD_LABEL } from '../../lib/forms/fields/creature-sizes-form-fields'
 import { buildSpeciesTabs } from './species-form-fields'
 
 function speciesBasicsColumns(fields?: FormItem[]) {
@@ -34,7 +30,8 @@ describe('buildSpeciesTabs basics', () => {
     expect(right?.fields[0]).toMatchObject({
       type: 'chips',
       name: 'sizes',
-      label: getVocabularyTermLabel(CREATURE_SIZE_TERM),
+      label: CREATURE_SIZES_FIELD_LABEL,
+      multiple: true,
     })
     expect(left?.fields[0]).toMatchObject({
       name: 'creatureType',

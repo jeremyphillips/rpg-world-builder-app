@@ -1,5 +1,7 @@
 import mongoose, { type InferSchemaType, type Model } from 'mongoose'
 
+import { CREATURE_SIZES } from '@rpg/contracts'
+
 import {
   homebrewCampaignSlugIndex,
   homebrewContentIdentityFields,
@@ -10,7 +12,7 @@ const { model, models, Schema } = mongoose
 const homebrewMonsterSchema = new Schema(
   {
     ...homebrewContentIdentityFields,
-    size: { type: String },
+    sizes: { type: [{ type: String, enum: [...CREATURE_SIZES] }], default: [] },
     creatureType: { type: String },
     alignment: { type: String },
     abilityScores: { type: Schema.Types.Mixed },

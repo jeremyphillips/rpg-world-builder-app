@@ -55,20 +55,8 @@
       "media": {
         "$ref": "#/definitions/__schema18"
       },
-      "size": {
-        "type": "string",
-        "enum": [
-          "tiny",
-          "small",
-          "medium",
-          "large",
-          "huge",
-          "gargantuan"
-        ],
-        "description": "tiny | small | medium | large | huge | gargantuan"
-      },
-      "alternateSizes": {
-        "$ref": "#/definitions/__schema25"
+      "sizes": {
+        "$ref": "#/definitions/__schema24"
       },
       "creatureType": {
         "$ref": "#/definitions/__schema26"
@@ -185,8 +173,7 @@
       "createdAt",
       "updatedAt",
       "name",
-      "size",
-      "alternateSizes",
+      "sizes",
       "creatureType",
       "alignment",
       "abilityScores",
@@ -735,19 +722,7 @@
       "maximum": 1
     },
     "__schema24": {
-      "type": "string",
-      "enum": [
-        "tiny",
-        "small",
-        "medium",
-        "large",
-        "huge",
-        "gargantuan"
-      ],
-      "description": "tiny | small | medium | large | huge | gargantuan"
-    },
-    "__schema25": {
-      "default": [],
+      "minItems": 1,
       "type": "array",
       "items": {
         "type": "string",
@@ -761,6 +736,18 @@
         ],
         "description": "tiny | small | medium | large | huge | gargantuan"
       }
+    },
+    "__schema25": {
+      "type": "string",
+      "enum": [
+        "tiny",
+        "small",
+        "medium",
+        "large",
+        "huge",
+        "gargantuan"
+      ],
+      "description": "tiny | small | medium | large | huge | gargantuan"
     },
     "__schema26": {
       "type": "string",

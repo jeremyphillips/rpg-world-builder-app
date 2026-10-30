@@ -78,6 +78,10 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
   buildFields: (ctx) => contentFormFields(monsterFormDef, ctx),
   valueSyncs: buildMonsterFormValueSyncs,
   toFormValues: monsterToFormValues,
+  enrichEditLayoutCtx: (ctx, entity) => ({
+    ...ctx,
+    creatureSizesSeedIds: entity.sizes,
+  }),
   toInput: (values, ctx, validationIntent = 'publish') =>
     buildMonsterInput(values, ctx, validationIntent),
   useListQuery: useMonsters,

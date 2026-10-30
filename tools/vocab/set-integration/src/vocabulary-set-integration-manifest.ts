@@ -57,7 +57,7 @@ export const VOCABULARY_SET_INTEGRATION_MANIFEST: VocabularySetIntegrationManife
   },
   sizes: {
     owner: 'catalog',
-    notes: 'Species size arrays.',
+    notes: 'Species and monster size arrays.',
     ...usageResolverExtension,
   },
   'spell-schools': {

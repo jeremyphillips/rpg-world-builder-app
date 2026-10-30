@@ -22,6 +22,7 @@ import { ARMOR_CLASS_RULES_MATRIX } from '../../vocab/mechanics/armor-class-scal
 import {
   deriveMonsterDraftStatBlock as deriveMonsterDraftStatBlockRaw,
   deriveMonsterStatBlock as deriveMonsterStatBlockRaw,
+  resolveMonsterHitPoints,
 } from './stat-block'
 
 const EMPTY_MAGIC_PROVIDER: MagicPropertyDefinitionProvider = () => undefined
@@ -170,7 +171,7 @@ const kobold = monsterSchema.parse({
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Kobold Warrior',
   description: '<p>Kobold</p>',
-  size: 'small',
+  sizes: ['small'],
   creatureType: 'dragon',
   alignment: 'n',
   abilityScores: { str: 7, dex: 15, con: 9, int: 8, wis: 7, cha: 8 },
@@ -209,7 +210,7 @@ const skeleton = monsterSchema.parse({
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Skeleton',
-  size: 'medium',
+  sizes: ['medium'],
   creatureType: 'undead',
   alignment: 'le',
   abilityScores: { str: 10, dex: 16, con: 15, int: 6, wis: 8, cha: 5 },
@@ -579,7 +580,7 @@ describe('deriveMonsterDraftStatBlock', () => {
     const block = deriveMonsterDraftStatBlock({
       monster: {
         ...kobold,
-        size: 'tiny',
+        sizes: ['tiny'],
         abilityScores: { ...kobold.abilityScores, con: 4 },
         hitPoints: { kind: 'hit-dice', count: 1 },
       },
@@ -888,5 +889,44 @@ describe('monster spellcasting lines', () => {
       { id: 'spellcasting', section: 'actions', saveDc: 9, attackBonus: 1 },
       { id: 'protective-magic', section: 'reactions', saveDc: 9, attackBonus: 1 },
     ])
+  })
+})
+
+describe('resolveMonsterHitPoints size', () => {
+  const scores = { str: 10, dex: 10, con: 14, int: 10, wis: 10, cha: 10 }
+
+  it('uses the largest permitted size regardless of array order', () => {
+    const forward = resolveMonsterHitPoints({
+      sizes: ['small', 'medium'],
+      abilityScores: scores,
+      hitPoints: { kind: 'hit-dice', count: 8 },
+    })
+    const reversed = resolveMonsterHitPoints({
+      sizes: ['medium', 'small'],
+      abilityScores: scores,
+      hitPoints: { kind: 'hit-dice', count: 8 },
+    })
+    expect(forward.status).toBe('resolved')
+    expect(reversed.status).toBe('resolved')
+    if (forward.status !== 'resolved' || reversed.status !== 'resolved') return
+    expect(forward.value.formula).toBe('8d8 +16')
+    expect(reversed.value.formula).toBe('8d8 +16')
+  })
+
+  it('keeps a single-size die and leaves an empty size list unavailable', () => {
+    const small = resolveMonsterHitPoints({
+      sizes: ['small'],
+      abilityScores: scores,
+      hitPoints: { kind: 'hit-dice', count: 3 },
+    })
+    expect(small.status).toBe('resolved')
+    if (small.status === 'resolved') expect(small.value.formula).toBe('3d6 +6')
+    expect(
+      resolveMonsterHitPoints({
+        sizes: [],
+        abilityScores: scores,
+        hitPoints: { kind: 'hit-dice', count: 3 },
+      }).status,
+    ).toBe('unavailable')
   })
 })

@@ -26,7 +26,7 @@ import {
   equipmentKindToFamilyPath,
   getChallengeRatingLabel,
   getContentTypeTerm,
-  getCreatureSizeLabel,
+  formatCreatureSizeList,
   resolveLocationClassificationDisplay,
   getFeatCategoryLabel,
   getOrganizationDomainLabel,
@@ -101,10 +101,12 @@ function buildSpellTarget(spell: Spell): GlobalSearchTarget {
 }
 
 function buildSpeciesSecondary(species: Species): string {
-  const sizeLabels = species.sizes.map((size) => getCreatureSizeLabel(size))
   const walkSpeed = species.movement.walk
   return (
-    joinCompactSegments(sizeLabels.join(', '), walkSpeed ? `${walkSpeed} ft.` : undefined) ?? ''
+    joinCompactSegments(
+      formatCreatureSizeList(species.sizes),
+      walkSpeed ? `${walkSpeed} ft.` : undefined,
+    ) ?? ''
   )
 }
 
@@ -139,7 +141,7 @@ function buildFeatTarget(feat: Feat): GlobalSearchTarget {
 function buildMonsterSecondary(monster: Monster): string {
   return (
     joinCompactSegments(
-      getCreatureSizeLabel(monster.size),
+      formatCreatureSizeList(monster.sizes),
       monster.creatureType,
       getChallengeRatingLabel(monster.challengeRating),
     ) ?? getChallengeRatingLabel(monster.challengeRating)

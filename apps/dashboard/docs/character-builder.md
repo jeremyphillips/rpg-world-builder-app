@@ -14,6 +14,15 @@ Picker chrome audit (equipment / spells / proficiencies):
 Implementation lives in `src/features/character/` — see
 [feature README](../src/features/character/README.md) for routes and key files.
 
+## Species size (BENCH-001)
+
+A species definition may permit more than one size (`sizes` on the species
+record). The builder draft
+(`packages/contracts/src/rpg/runtime/character-builder/draft/draft.ts`) and the
+character sheet store a species id and an optional heritage id. The species
+step writes that id and clears heritage. Choosing one permitted size is not
+implemented.
+
 ## Step readiness (BENCH-120)
 
 Advanced steps (Equipment, Spells, Proficiencies) use a **derived readiness**

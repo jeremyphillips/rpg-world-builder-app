@@ -27,11 +27,11 @@ describe('monsters-overview-columns', () => {
     const access = DEFAULT_CONTENT_CAMPAIGN_ACCESS
     const rows = [
       {
-        ...makeMonster({ id: 'a', creatureType: 'dragon', size: 'small' }),
+        ...makeMonster({ id: 'a', creatureType: 'dragon', sizes: ['small'] }),
         campaignAccess: access,
       },
       {
-        ...makeMonster({ id: 'b', creatureType: 'undead', size: 'medium' }),
+        ...makeMonster({ id: 'b', creatureType: 'undead', sizes: ['medium', 'small'] }),
         campaignAccess: access,
       },
     ]
@@ -41,5 +41,8 @@ describe('monsters-overview-columns', () => {
 
     const bySize = applyFilterSchema(monstersFilterSchema, { size: 'medium' }, rows)
     expect(bySize.map((row) => row.id)).toEqual(['b'])
+
+    const bySmall = applyFilterSchema(monstersFilterSchema, { size: 'small' }, rows)
+    expect(bySmall.map((row) => row.id).sort()).toEqual(['a', 'b'])
   })
 })

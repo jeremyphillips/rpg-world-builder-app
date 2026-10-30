@@ -18,6 +18,8 @@ export type InlineSentenceTextSegment = {
   kind: 'text'
   value: string
   tone?: 'label' | 'prose' | 'mono'
+  /** When omitted, the segment always renders. Same contract as `FieldVisibility`. */
+  visibility?: InlineSentenceSegmentVisibility
 }
 
 export type InlineSentenceNumberSegment = {

@@ -1,12 +1,19 @@
+import { z } from 'zod'
+
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry, VocabularyTerm } from './types'
 import type { VocabularyOptionSetId } from './vocabulary'
 
+/** Closed size entry. `rank` is relative magnitude; higher is larger. */
+type CreatureSizeEntry = GameTermEntry & { readonly rank: number }
+
 // ---------------------------------------------------------------------------
 // Creature sizes — the closed SRD 5.2.1 size categories, shared by species,
-// monsters, and any creature with a footprint. Ordered smallest to largest;
-// descriptions note the space each size occupies on a grid.
+// monsters, and any creature with a footprint. Relative order is `rank`
+// (higher is larger), not object key order. Descriptions note grid space.
+// Catalog seed order is not a second rank table.
 // ---------------------------------------------------------------------------
 
 export const CREATURE_SIZE_TERM = {
@@ -22,6 +29,7 @@ export const CREATURE_SIZE_SET_ID = 'sizes' as const satisfies VocabularyOptionS
 
 export const CREATURE_SIZE_ENTRIES = {
   tiny: {
+    rank: 1,
     label: 'Tiny',
     description: 'A Tiny creature occupies a space 2½ feet on a side (e.g. a sprite, a cat).',
     sentence: {
@@ -30,6 +38,7 @@ export const CREATURE_SIZE_ENTRIES = {
     },
   },
   small: {
+    rank: 2,
     label: 'Small',
     description: 'A Small creature occupies a space 5 feet on a side (e.g. a halfling, a goblin).',
     sentence: {
@@ -38,6 +47,7 @@ export const CREATURE_SIZE_ENTRIES = {
     },
   },
   medium: {
+    rank: 3,
     label: 'Medium',
     description: 'A Medium creature occupies a space 5 feet on a side (e.g. a human, an orc).',
     sentence: {
@@ -46,6 +56,7 @@ export const CREATURE_SIZE_ENTRIES = {
     },
   },
   large: {
+    rank: 4,
     label: 'Large',
     description: 'A Large creature occupies a space 10 feet on a side (e.g. an ogre, a horse).',
     sentence: {
@@ -54,6 +65,7 @@ export const CREATURE_SIZE_ENTRIES = {
     },
   },
   huge: {
+    rank: 5,
     label: 'Huge',
     description:
       'A Huge creature occupies a space 15 feet on a side (e.g. a fire giant, a treant).',
@@ -63,6 +75,7 @@ export const CREATURE_SIZE_ENTRIES = {
     },
   },
   gargantuan: {
+    rank: 6,
     label: 'Gargantuan',
     description:
       'A Gargantuan creature occupies a space 20 feet on a side or larger (e.g. a kraken, an ancient dragon).',
@@ -71,7 +84,7 @@ export const CREATURE_SIZE_ENTRIES = {
       plural: 'gargantuan creatures',
     },
   },
-} as const satisfies Record<string, GameTermEntry>
+} as const satisfies Record<string, CreatureSizeEntry>
 
 export type CreatureSize = keyof typeof CREATURE_SIZE_ENTRIES
 
@@ -88,6 +101,68 @@ export const CREATURE_SIZE_HIT_DIE: Record<CreatureSize, number> = {
 export const CREATURE_SIZES = keysFromEntries(CREATURE_SIZE_ENTRIES)
 
 export const creatureSizeSchema = vocabEnumFromEntries(CREATURE_SIZE_ENTRIES)
+
+const CREATURE_SIZES_MUST_BE_UNIQUE = 'Sizes must be unique.'
+
+function refineUniqueCreatureSizes(sizes: readonly string[], ctx: z.RefinementCtx): void {
+  if (new Set(sizes).size !== sizes.length) {
+    addCustomRefinementIssue(ctx, CREATURE_SIZES_MUST_BE_UNIQUE)
+  }
+}
+
+/** Published permitted sizes. At least one, no duplicates. Order is not canonical. */
+export const creatureSizesSchema = z
+  .array(creatureSizeSchema)
+  .min(1)
+  .superRefine(refineUniqueCreatureSizes)
+
+/** Draft permitted sizes. Empty is allowed. Duplicates and unknown ids are not. */
+export const creatureSizesDraftSchema = z
+  .array(creatureSizeSchema)
+  .default([])
+  .superRefine(refineUniqueCreatureSizes)
+
+export type CreatureSizeSortDirection = 'asc' | 'desc'
+
+/**
+ * Orders sizes by rank. Returns a new array and does not drop or unique members.
+ * Equal ranks keep input order.
+ */
+export function sortCreatureSizes(
+  sizes: readonly CreatureSize[],
+  direction: CreatureSizeSortDirection = 'desc',
+): CreatureSize[] {
+  return sizes
+    .map((size, index) => ({ size, index }))
+    .sort((left, right) => {
+      const delta = CREATURE_SIZE_ENTRIES[left.size].rank - CREATURE_SIZE_ENTRIES[right.size].rank
+      const ranked = direction === 'desc' ? -delta : delta
+      if (ranked !== 0) return ranked
+      return left.index - right.index
+    })
+    .map((entry) => entry.size)
+}
+
+/** Highest-rank size, or `undefined` when `sizes` is empty. */
+export function resolveLargestCreatureSize(
+  sizes: readonly CreatureSize[],
+): CreatureSize | undefined {
+  if (sizes.length === 0) return undefined
+  return sortCreatureSizes(sizes, 'desc')[0]
+}
+
+/**
+ * Natural-language size list in descending rank.
+ * `Medium`, `Medium or Small`, `Large, Medium, or Small`.
+ */
+export function formatCreatureSizeList(sizes: readonly CreatureSize[]): string {
+  const labels = sortCreatureSizes(sizes).map((size) => getCreatureSizeLabel(size))
+  if (labels.length === 0) return ''
+  if (labels.length === 1) return labels[0] ?? ''
+  if (labels.length === 2) return `${labels[0]} or ${labels[1]}`
+  const rest = labels.slice(0, -1).join(', ')
+  return `${rest}, or ${labels[labels.length - 1]}`
+}
 
 /** Returns the reference entry for a creature size id, if known. */
 export function getCreatureSizeEntry(id: string): GameTermEntry | undefined {

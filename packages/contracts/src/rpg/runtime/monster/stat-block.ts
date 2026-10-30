@@ -3,7 +3,7 @@ import type { MonsterAction, MonsterBody } from '../../content/monster'
 import { getSkillName } from '../../content/skill-proficiency'
 import { NEUTRAL_ABILITY_SCORE } from '../../vocab/ability'
 import { CHALLENGE_RATING_MECHANICS } from '../../vocab/challenge-rating'
-import { CREATURE_SIZE_HIT_DIE } from '../../vocab/creature-size'
+import { CREATURE_SIZE_HIT_DIE, resolveLargestCreatureSize } from '../../vocab/creature-size'
 import type { ArmorClassRules } from '../../vocab/mechanics/armor-class-scale'
 import { abilityModifier } from '../creature/ability-modifier'
 import { spellAttackBonus, spellSaveDc } from '../creature/spell-dc'
@@ -100,7 +100,7 @@ function resolveFixedHitPoints(
 }
 
 export function resolveMonsterHitPoints(
-  monster: Pick<MonsterBody, 'hitPoints' | 'size' | 'abilityScores'>,
+  monster: Pick<MonsterBody, 'hitPoints' | 'sizes' | 'abilityScores'>,
 ): DerivedField<{ hp: number; formula: string; clampedToMinimum: boolean }> {
   const hitPoints = monster.hitPoints
   if (!hitPoints) return unavailableField('missing-input')
@@ -108,10 +108,15 @@ export function resolveMonsterHitPoints(
   if (hitPoints.kind === 'fixed') return resolveFixedHitPoints(hitPoints)
 
   if (hitPoints.count === undefined || hitPoints.count < 1) return unavailableField('missing-input')
-  if (!monster.size || monster.abilityScores?.con === undefined)
+  // Largest permitted size chooses the Hit Die. That matches the current SRD
+  // stat blocks in this catalog. It is an application convention, not a claim
+  // that every future creature derives hit points the same way. An instance
+  // that later uses a smaller permitted size does not rewrite this formula.
+  const largestSize = resolveLargestCreatureSize(monster.sizes ?? [])
+  if (!largestSize || monster.abilityScores?.con === undefined)
     return unavailableField('missing-input')
 
-  const dieFaces = CREATURE_SIZE_HIT_DIE[monster.size]
+  const dieFaces = CREATURE_SIZE_HIT_DIE[largestSize]
   const conMod = abilityModifier(monster.abilityScores.con)
   const conTotal = hitPoints.count * conMod
   const averageDie = averageDiceRoll({ count: hitPoints.count, faces: dieFaces as DieFace })
@@ -522,7 +527,7 @@ export type DerivedMonsterDraftStatBlock = {
 }
 
 type DraftMonsterSource = {
-  size?: MonsterBody['size']
+  sizes?: MonsterBody['sizes']
   abilityScores?: Partial<MonsterBody['abilityScores']>
   armorClass?: MonsterBody['armorClass']
   hitPoints?: MonsterBody['hitPoints']

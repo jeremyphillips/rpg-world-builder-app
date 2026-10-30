@@ -216,7 +216,7 @@ describe('resolveEquipmentRowSummary', () => {
       updatedAt: '2026-01-01T00:00:00.000Z',
       name: 'Axe Fighter',
       description: '<p>Fighter</p>',
-      size: 'medium',
+      sizes: ['medium'],
       creatureType: 'humanoid',
       alignment: 'n',
       abilityScores: scores,

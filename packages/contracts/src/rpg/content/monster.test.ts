@@ -56,7 +56,7 @@ describe('monsterActionSchema', () => {
 describe('monsterBodySchema refinements', () => {
   const baseBody = {
     name: 'Test',
-    size: 'medium',
+    sizes: ['medium'],
     creatureType: 'humanoid',
     alignment: 'n',
     abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
@@ -159,7 +159,7 @@ describe('monsterBodySchema refinements', () => {
 describe('monster spell entries', () => {
   const baseBody = {
     name: 'Test',
-    size: 'medium' as const,
+    sizes: ['medium'] as const,
     creatureType: 'humanoid',
     alignment: 'n' as const,
     abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },

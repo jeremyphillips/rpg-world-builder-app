@@ -215,7 +215,7 @@ export function normalizeMonsterFormValues(
 
   const normalized: Record<string, unknown> = {
     name: typeof values.name === 'string' ? values.name : '',
-    size: values.size,
+    sizes: values.sizes,
     creatureType: values.creatureType,
     alignment: values.alignment,
     abilityScores: values.abilityScores,

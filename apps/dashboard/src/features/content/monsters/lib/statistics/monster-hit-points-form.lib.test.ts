@@ -6,20 +6,29 @@ import {
   formatMonsterHitPointsPreviewLine,
   hitPointsDiceAuthoringFields,
   hitPointsDiceFromFormValues,
+  MONSTER_HIT_POINTS_SELECT_SIZE_COPY,
   resolveAuthoringCreatureSize,
 } from './monster-hit-points-form.lib'
 
 describe('monster hit points form', () => {
-  it('falls back to medium hit die when size is unset or invalid', () => {
-    expect(resolveAuthoringCreatureSize(undefined)).toBe('medium')
-    expect(resolveAuthoringCreatureSize('')).toBe('medium')
-    expect(resolveAuthoringCreatureSize('large')).toBe('large')
+  it('does not assume a medium hit die when no size is selected', () => {
+    expect(resolveAuthoringCreatureSize(undefined)).toBeUndefined()
+    expect(resolveAuthoringCreatureSize([])).toBeUndefined()
+    expect(resolveAuthoringCreatureSize(['large'])).toBe('large')
+    expect(resolveAuthoringCreatureSize(['small', 'not-a-size'])).toBeUndefined()
     expect(
       hitPointsDiceFromFormValues({
         hitPoints: { kind: 'hit-dice', count: 1 },
-        size: undefined,
+        sizes: [],
       }),
-    ).toEqual({ count: 1, faces: 8 })
+    ).toBeUndefined()
+    expect(
+      formatMonsterHitPointsPreviewLine({
+        sizes: [],
+        abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+        hitPoints: { kind: 'hit-dice', count: 1 },
+      }),
+    ).toBe(MONSTER_HIT_POINTS_SELECT_SIZE_COPY)
   })
 
   it('maps hit dice authoring to inline-sentence leaf paths', () => {
@@ -33,7 +42,7 @@ describe('monster hit points form', () => {
   it('derives preview from default hit dice when hitPoints is omitted from watched slice', () => {
     expect(
       formatMonsterHitPointsPreviewLine({
-        size: 'medium',
+        sizes: ['medium'],
         abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
       } as Parameters<typeof formatMonsterHitPointsPreviewLine>[0]),
     ).toBe('HP 4 (1d8)')
@@ -43,13 +52,13 @@ describe('monster hit points form', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.abilityScores.con = 8
     values.hitPoints = { kind: 'hit-dice', count: 3 }
-    values.size = 'small'
+    values.sizes = ['small']
     expect(formatMonsterHitPointsPreviewLine(values)).toBe('HP 7 (3d6 -3)')
   })
 
   it('toggles fixed mode from derived hit dice average', () => {
     const values = resolveMonsterCreateDefaultValues()
-    values.size = 'medium'
+    values.sizes = ['medium']
     values.abilityScores.con = 10
     values.hitPoints = { kind: 'hit-dice', count: 2 }
     const patch = applyHitPointsFixedToggle({ ...values, hitPointsUseFixed: true }, true)
@@ -73,7 +82,7 @@ describe('monster hit points form', () => {
 
   it('derives dice faces from creature size', () => {
     const values = resolveMonsterCreateDefaultValues()
-    values.size = 'large'
+    values.sizes = ['small', 'large']
     values.hitPoints = { kind: 'hit-dice', count: 1 }
     expect(hitPointsDiceFromFormValues(values)).toEqual({ count: 1, faces: 10 })
   })

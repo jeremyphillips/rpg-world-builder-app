@@ -21,6 +21,7 @@ import {
   speciesDamageTypeSource,
   speciesLanguageSource,
   speciesSenseSource,
+  monsterSizeSource,
   speciesSizeSource,
   spellConditionSource,
   spellDamageTypeSource,
@@ -41,8 +42,11 @@ const VOCABULARY_USAGE_REGISTRATIONS_LIST = [
   }),
   defineVocabularyUsage({
     setId: CREATURE_SIZE_SET_ID,
-    sources: [{ source: speciesSizeSource, entry: true, batch: true }],
-    summaryLabels: { singular: 'species', plural: 'species' },
+    sources: [
+      { source: speciesSizeSource, entry: true, batch: true },
+      { source: monsterSizeSource, entry: true, batch: true },
+    ],
+    summaryLabels: { singular: 'reference', plural: 'references' },
   }),
   defineVocabularyUsage({
     setId: WEAPON_PROPERTY_SET_ID,

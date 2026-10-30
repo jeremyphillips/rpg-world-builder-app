@@ -5,7 +5,11 @@ import { abilityScoreSchema } from '../vocab/ability'
 import { alignmentSchema } from '../vocab/alignment'
 import { damageTypeIdSchema, getDamageTypeLabel } from '../vocab/damage'
 import { effectConditionSchema } from '../vocab/effect-condition'
-import { creatureSizeSchema } from '../vocab/creature-size'
+import {
+  creatureSizeSchema,
+  creatureSizesDraftSchema,
+  creatureSizesSchema,
+} from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
 import { SENSE_RANGES, senseDraftSchema, senseSchema } from '../vocab/sense'
 import { movementSpeedsSchema } from '../vocab/movement-mode'
@@ -31,6 +35,7 @@ import { equipmentInstanceSchema, equipmentInstanceSchemaBase } from './equipmen
 
 export const creatureAlignmentSchema = alignmentSchema
 export const creatureSizeRefSchema = creatureSizeSchema
+export { creatureSizesSchema, creatureSizesDraftSchema }
 export const creatureTypeRefSchema = creatureTypeSchema
 export const creatureMovementSchema = movementSpeedsSchema
 export const creatureSensesSchema = z.array(senseSchema).default([])

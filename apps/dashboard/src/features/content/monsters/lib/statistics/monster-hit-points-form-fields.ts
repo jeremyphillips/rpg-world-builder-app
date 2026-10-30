@@ -18,6 +18,13 @@ const HIT_DIE_FACE_OPTIONS: SelectFieldOptionListItem[] = [
   .sort((a, b) => a - b)
   .map((faces) => ({ value: String(faces), label: String(faces) }))
 
+function visibleWhenSizeSelected(): FieldVisibility {
+  return {
+    dependsOn: ['sizes'],
+    visibleWhen: (watched) => resolveAuthoringCreatureSize(watched.sizes) !== undefined,
+  }
+}
+
 function visibleWhenHitDiceMode(): FieldVisibility {
   return {
     dependsOn: [MONSTER_HIT_POINTS_USE_FIXED_FIELD],
@@ -37,7 +44,7 @@ function hitPointsDicePreviewMeta() {
     reserveSpace: true,
     dependsOn: [
       'hitPoints',
-      'size',
+      'sizes',
       'abilityScores',
       MONSTER_HIT_POINTS_DICE_FIELD,
       MONSTER_HIT_POINTS_DICE_COUNT_FIELD,
@@ -73,9 +80,11 @@ export function monsterHitPointsFields(): FormItem[] {
           visibility: visibleWhenHitDiceMode(),
           derivedMeta: hitPointsDicePreviewMeta(),
           optionsResolve: {
-            dependsOn: ['size'],
+            dependsOn: ['sizes'],
             optionsWhen: (values) => {
-              const faces = CREATURE_SIZE_HIT_DIE[resolveAuthoringCreatureSize(values.size)]
+              const size = resolveAuthoringCreatureSize(values.sizes)
+              if (!size) return []
+              const faces = CREATURE_SIZE_HIT_DIE[size]
               return [{ value: String(faces), label: String(faces) }]
             },
           },
@@ -88,10 +97,11 @@ export function monsterHitPointsFields(): FormItem[] {
               defaultValue: 1,
               ariaLabel: 'Hit dice count',
             },
-            { kind: 'text', value: 'd', tone: 'mono' },
+            { kind: 'text', value: 'd', tone: 'mono', visibility: visibleWhenSizeSelected() },
             {
               kind: 'select',
               name: MONSTER_HIT_POINTS_DICE_FACES_FIELD,
+              visibility: visibleWhenSizeSelected(),
               options: HIT_DIE_FACE_OPTIONS,
               digits: 2,
               width: 'xs',

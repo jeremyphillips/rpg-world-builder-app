@@ -53,19 +53,18 @@ export function inlineSentenceSegmentVisibilityDeps(
 ): string[] {
   const deps = new Set<string>()
   for (const segment of segments) {
-    if (segment.kind === 'text' || !segment.visibility) continue
+    if (!segment.visibility) continue
     for (const dep of segment.visibility.dependsOn) deps.add(dep)
   }
   return [...deps]
 }
 
-/** Filters bound segments by optional per-segment visibility; text segments always remain. */
+/** Filters segments by optional per-segment visibility. */
 export function filterVisibleInlineSentenceSegments(
   segments: readonly InlineSentenceSegment[],
   watched: Record<string, unknown>,
 ): InlineSentenceSegment[] {
   return segments.filter((segment) => {
-    if (segment.kind === 'text') return true
     if (!segment.visibility) return true
     return segment.visibility.visibleWhen(watched)
   })

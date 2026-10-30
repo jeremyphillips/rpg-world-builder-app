@@ -3,7 +3,7 @@ import {
   formatMovementDisplay,
   CREATURE_SIZE_TERM,
   CREATURE_TYPE_TERM,
-  getCreatureSizeLabel,
+  formatCreatureSizeList,
   getVocabularyTermLabel,
   resolveCreatureMovement,
   resolveGrantGroupsFromContent,
@@ -106,7 +106,7 @@ function buildSpeciesStatRows(
     },
     {
       label: SPECIES_STAT_LABELS.size,
-      value: species.sizes.map(getCreatureSizeLabel).join(' or '),
+      value: formatCreatureSizeList(species.sizes),
     },
     {
       label: SPECIES_STAT_LABELS.movement,

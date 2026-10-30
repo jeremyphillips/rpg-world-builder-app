@@ -4,7 +4,7 @@ import {
   formatSignedModifier,
   getAbilityCompactLabel,
   getChallengeRatingLabel,
-  getCreatureSizeLabel,
+  formatCreatureSizeList,
   getDamageTypeLabel,
   getEffectConditionLabel,
   getLanguageLabel,
@@ -490,9 +490,7 @@ export function buildMonsterDetailViewModel({
         .map((action) => [action.id, action]),
     ),
   }
-  const sizeLabel = [monster.size, ...monster.alternateSizes]
-    .map((size) => getCreatureSizeLabel(size))
-    .join(' or ')
+  const sizeLabel = formatCreatureSizeList(monster.sizes)
   const classificationLabel =
     joinInlineMetadata([sizeLabel, creatureTypeLabel]) || creatureTypeLabel
 

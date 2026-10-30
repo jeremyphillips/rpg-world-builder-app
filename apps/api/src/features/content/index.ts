@@ -35,6 +35,7 @@ export type { HomebrewDoc } from './lib/content-write-config'
 export { classContentConfig } from './classes/classes.config'
 export { equipmentWriteConfig } from './equipment/equipment.config'
 export { speciesWriteConfig } from './species/species.config'
+export { monstersWriteConfig } from './monsters/monsters.config'
 export { spellWriteConfig } from './spells/spells.config'
 export {
   organizationWriteConfig,

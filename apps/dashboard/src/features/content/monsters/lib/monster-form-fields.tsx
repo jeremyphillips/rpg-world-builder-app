@@ -2,18 +2,20 @@ import {
   ALIGNMENT_ENTRIES,
   CHALLENGE_RATING_IDS,
   CHALLENGE_RATING_MECHANICS,
-  CREATURE_SIZE_ENTRIES,
-  CREATURE_SIZES,
   CREATURE_TYPE_TERM,
   getChallengeRatingLabel,
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
-import { vocabularySelectFieldForTerm } from '@/features/vocabulary'
+import { buildActiveSizeFieldOptions, vocabularySelectFieldForTerm } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
+import {
+  createCreatureSizesFieldConfig,
+  MONSTER_SIZES_FIELD_HINT,
+} from '../../lib/forms/fields/creature-sizes-form-fields'
 import { movementWithHoverGroup } from '../../lib/forms/fields/content-movement-form-fields'
 import { MonsterChallengeRatingHint } from '../components/form/monster-challenge-rating-hint'
 import { creatureDetailsFields } from './creature-details/monster-creature-details-form-fields'
@@ -25,13 +27,6 @@ import { monsterArmorClassFields } from './statistics/monster-armor-class-fields
 import { monsterHitPointsFields } from './statistics/monster-hit-points-form-fields'
 import { MONSTER_CHALLENGE_HEADING, monsterEquipmentSectionLabel } from './monster-form-labels'
 import { MONSTER_FORM_TAB } from './monster-form-view'
-
-const sizeOptions = toOptions(
-  CREATURE_SIZES,
-  Object.fromEntries(
-    CREATURE_SIZES.map((size) => [size, CREATURE_SIZE_ENTRIES[size].label]),
-  ) as Record<(typeof CREATURE_SIZES)[number], string>,
-)
 
 const alignmentOptions = toOptions(
   Object.keys(ALIGNMENT_ENTRIES),
@@ -69,7 +64,10 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       density: 'comfortable',
       fields: [
         descriptionField(ctx),
-        { type: 'select', name: 'size', label: 'Size', options: sizeOptions, required: true },
+        createCreatureSizesFieldConfig({
+          hint: MONSTER_SIZES_FIELD_HINT,
+          options: buildActiveSizeFieldOptions(ctx.sizeVocabulary, ctx.creatureSizesSeedIds),
+        }),
         vocabularySelectFieldForTerm(CREATURE_TYPE_TERM, {
           name: 'creatureType',
           options: creatureTypeOptions(ctx),
