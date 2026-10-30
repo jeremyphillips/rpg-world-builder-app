@@ -7,7 +7,6 @@ import {
   formatResistanceGrantSentence,
   formatSenseGrantSentence,
   formatSpellsGrantSentence,
-  formatSlugAsLabel,
   getFeatCategorySentenceForm,
   type FeatCategory,
   type MovementGrantPayload,
@@ -66,10 +65,8 @@ export type GrantRowPresentation = {
 
 export { formatCompactMetadataList } from './grant-compact-metadata.lib'
 
-export function resolveSpellGrantName(slug: string, spellOptions: FieldOption[]): string {
-  const matched = spellOptions.find((option) => option.value === slug)?.label
-  if (matched) return matched
-  return formatSlugAsLabel(slug)
+export function resolveSpellGrantName(spellId: string, spellOptions: FieldOption[]): string {
+  return spellOptions.find((option) => option.value === spellId)?.label ?? spellId
 }
 
 function normalizePresentationPart(value: string): string {

@@ -261,7 +261,7 @@
               "id": "divine-smite-spells",
               "kind": "spells",
               "ability": "cha",
-              "spellIds": ["divine-smite"],
+              "spellIds": ["srd-cc-5.2.1:divine-smite"],
               "availability": "always_prepared",
               "casting": {
                 "mode": "free_cast",
@@ -347,7 +347,7 @@
               "id": "find-steed-spells",
               "kind": "spells",
               "ability": "cha",
-              "spellIds": ["find-steed"],
+              "spellIds": ["srd-cc-5.2.1:find-steed"],
               "availability": "always_prepared",
               "casting": {
                 "mode": "free_cast",

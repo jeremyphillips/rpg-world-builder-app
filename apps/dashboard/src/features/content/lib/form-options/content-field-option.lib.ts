@@ -125,10 +125,24 @@ export function referenceSkillFieldOptions(
   return toSortedContentFieldOptions(selectors?.forReference(), 'skill-proficiencies')
 }
 
+function toSpellReferenceFieldOption(spell: Spell): FieldOption {
+  return {
+    value: spell.id,
+    label: spell.name,
+    ...(shouldPresentContentSource('spells') && spell.source === 'homebrew'
+      ? { description: HOMEBREW_OPTION_DESCRIPTION }
+      : {}),
+  }
+}
+
 export function referenceSpellFieldOptions(
   selectors: ContentPurposeSelectors<Spell> | undefined,
 ): FieldOption[] {
-  return toSortedContentFieldOptions(selectors?.forReference(), 'spells')
+  return sortFieldOptions(selectors?.forReference().map(toSpellReferenceFieldOption) ?? [])
+}
+
+export function toSpellReferenceFieldOptions(spells: readonly Spell[]): FieldOption[] {
+  return sortFieldOptions(spells.map(toSpellReferenceFieldOption))
 }
 
 export function referenceFeatFieldOptions(

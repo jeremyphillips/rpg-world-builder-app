@@ -446,7 +446,7 @@
                   "id": "dancing-lights-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["dancing-lights"],
+                  "spellIds": ["srd-cc-5.2.1:dancing-lights"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "at_will"
@@ -463,7 +463,7 @@
                   "id": "faerie-fire-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["faerie-fire"],
+                  "spellIds": ["srd-cc-5.2.1:faerie-fire"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"
@@ -480,7 +480,7 @@
                   "id": "darkness-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["darkness"],
+                  "spellIds": ["srd-cc-5.2.1:darkness"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"
@@ -502,7 +502,7 @@
                   "id": "prestidigitation-spells",
                   "kind": "spells",
                   "ability": "int",
-                  "spellIds": ["prestidigitation"],
+                  "spellIds": ["srd-cc-5.2.1:prestidigitation"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "at_will"
@@ -519,7 +519,7 @@
                   "id": "detect-magic-spells",
                   "kind": "spells",
                   "ability": "int",
-                  "spellIds": ["detect-magic"],
+                  "spellIds": ["srd-cc-5.2.1:detect-magic"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"
@@ -536,7 +536,7 @@
                   "id": "misty-step-spells",
                   "kind": "spells",
                   "ability": "int",
-                  "spellIds": ["misty-step"],
+                  "spellIds": ["srd-cc-5.2.1:misty-step"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"
@@ -565,7 +565,7 @@
                   "id": "druidcraft-spells",
                   "kind": "spells",
                   "ability": "wis",
-                  "spellIds": ["druidcraft"],
+                  "spellIds": ["srd-cc-5.2.1:druidcraft"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "at_will"
@@ -582,7 +582,7 @@
                   "id": "longstrider-spells",
                   "kind": "spells",
                   "ability": "wis",
-                  "spellIds": ["longstrider"],
+                  "spellIds": ["srd-cc-5.2.1:longstrider"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"
@@ -599,7 +599,7 @@
                   "id": "pass-without-trace-spells",
                   "kind": "spells",
                   "ability": "wis",
-                  "spellIds": ["pass-without-trace"],
+                  "spellIds": ["srd-cc-5.2.1:pass-without-trace"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"
@@ -676,7 +676,7 @@
                   "id": "minor-illusion-spells",
                   "kind": "spells",
                   "ability": "wis",
-                  "spellIds": ["minor-illusion"],
+                  "spellIds": ["srd-cc-5.2.1:minor-illusion"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "at_will"
@@ -686,7 +686,7 @@
                   "id": "speak-with-animals-spells",
                   "kind": "spells",
                   "ability": "wis",
-                  "spellIds": ["speak-with-animals"],
+                  "spellIds": ["srd-cc-5.2.1:speak-with-animals"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "prof_bonus_per_long_rest"
@@ -709,7 +709,7 @@
                   "id": "mending-spells",
                   "kind": "spells",
                   "ability": "int",
-                  "spellIds": ["mending", "prestidigitation"],
+                  "spellIds": ["srd-cc-5.2.1:mending", "srd-cc-5.2.1:prestidigitation"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "at_will"
@@ -1054,7 +1054,7 @@
                 "id": "thaumaturgy-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["thaumaturgy"],
+                "spellIds": ["srd-cc-5.2.1:thaumaturgy"],
                 "casting": {
                   "mode": "free_cast",
                   "frequency": "at_will"
@@ -1087,7 +1087,7 @@
                   "id": "poison-spray-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["poison-spray"],
+                  "spellIds": ["srd-cc-5.2.1:poison-spray"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "at_will"
@@ -1104,7 +1104,7 @@
                   "id": "ray-of-sickness-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["ray-of-sickness"],
+                  "spellIds": ["srd-cc-5.2.1:ray-of-sickness"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"
@@ -1121,7 +1121,7 @@
                   "id": "hold-person-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["hold-person"],
+                  "spellIds": ["srd-cc-5.2.1:hold-person"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"
@@ -1148,7 +1148,7 @@
                   "id": "chill-touch-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["chill-touch"],
+                  "spellIds": ["srd-cc-5.2.1:chill-touch"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "at_will"
@@ -1165,7 +1165,7 @@
                   "id": "false-life-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["false-life"],
+                  "spellIds": ["srd-cc-5.2.1:false-life"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"
@@ -1182,7 +1182,7 @@
                   "id": "ray-of-enfeeblement-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["ray-of-enfeeblement"],
+                  "spellIds": ["srd-cc-5.2.1:ray-of-enfeeblement"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"
@@ -1209,7 +1209,7 @@
                   "id": "fire-bolt-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["fire-bolt"],
+                  "spellIds": ["srd-cc-5.2.1:fire-bolt"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "at_will"
@@ -1226,7 +1226,7 @@
                   "id": "hellish-rebuke-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["hellish-rebuke"],
+                  "spellIds": ["srd-cc-5.2.1:hellish-rebuke"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"
@@ -1243,7 +1243,7 @@
                   "id": "darkness-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["darkness"],
+                  "spellIds": ["srd-cc-5.2.1:darkness"],
                   "casting": {
                     "mode": "free_cast",
                     "frequency": "once_per_long_rest"

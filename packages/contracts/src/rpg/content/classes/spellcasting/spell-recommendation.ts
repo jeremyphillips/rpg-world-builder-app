@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { absoluteLevelSchema } from '../../../primitives/level'
+import { spellReferenceSchema } from '../../spell/spell-reference'
 
 export const SPELL_RECOMMENDATION_TARGETS = ['cantrips', 'level1Plus'] as const
 
@@ -12,7 +13,7 @@ export const spellRecommendationSchema = z.object({
   target: spellRecommendationTargetSchema,
   classLevel: absoluteLevelSchema.optional(),
   spellLevel: z.number().int().min(0).max(9).optional(),
-  spellIds: z.array(z.string().min(1)).min(1),
+  spellIds: z.array(spellReferenceSchema).min(1),
 })
 
 export type SpellRecommendation = z.infer<typeof spellRecommendationSchema>

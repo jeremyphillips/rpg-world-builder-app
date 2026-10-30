@@ -202,12 +202,21 @@ describe('SRD 5.2.1 class seed', () => {
     expectClassFeatureDescriptions(bard)
     expect(spellcastingFeatureDescription(bard)).toContain('cast spells through your bardic arts')
     expect(bard.spellcasting?.recommendations).toEqual([
-      { target: 'cantrips', classLevel: 1, spellIds: ['dancing-lights', 'vicious-mockery'] },
+      {
+        target: 'cantrips',
+        classLevel: 1,
+        spellIds: ['srd-cc-5.2.1:dancing-lights', 'srd-cc-5.2.1:vicious-mockery'],
+      },
       {
         target: 'level1Plus',
         classLevel: 1,
         spellLevel: 1,
-        spellIds: ['charm-person', 'color-spray', 'dissonant-whispers', 'healing-word'],
+        spellIds: [
+          'srd-cc-5.2.1:charm-person',
+          'srd-cc-5.2.1:color-spray',
+          'srd-cc-5.2.1:dissonant-whispers',
+          'srd-cc-5.2.1:healing-word',
+        ],
       },
     ])
     expect(asiLevelsFromFeatures(bard)).toEqual([4, 8, 12, 16])
@@ -224,7 +233,7 @@ describe('SRD 5.2.1 class seed', () => {
     expect(spellGrant).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
-      spellIds: ['power-word-heal', 'power-word-kill'],
+      spellIds: ['srd-cc-5.2.1:power-word-heal', 'srd-cc-5.2.1:power-word-kill'],
     })
   })
 
@@ -255,7 +264,7 @@ describe('SRD 5.2.1 class seed', () => {
     expect(spellGrant).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
-      spellIds: ['hunters-mark'],
+      spellIds: ['srd-cc-5.2.1:hunters-mark'],
       casting: {
         mode: 'free_cast',
         frequency: 'prof_bonus_per_long_rest',
@@ -417,7 +426,12 @@ describe('SRD 5.2.1 class seed', () => {
     expect(domainSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
-      spellIds: ['aid', 'bless', 'cure-wounds', 'lesser-restoration'],
+      spellIds: [
+        'srd-cc-5.2.1:aid',
+        'srd-cc-5.2.1:bless',
+        'srd-cc-5.2.1:cure-wounds',
+        'srd-cc-5.2.1:lesser-restoration',
+      ],
     })
     expect(domainSpells?.grantGroups?.[1]).toMatchObject({
       unlock: { level: 5 },
@@ -425,7 +439,7 @@ describe('SRD 5.2.1 class seed', () => {
         {
           kind: 'spells',
           availability: 'always_prepared',
-          spellIds: ['mass-healing-word', 'revivify'],
+          spellIds: ['srd-cc-5.2.1:mass-healing-word', 'srd-cc-5.2.1:revivify'],
         },
       ],
     })
@@ -448,7 +462,7 @@ describe('SRD 5.2.1 class seed', () => {
     expect(druidicSpell).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
-      spellIds: ['speak-with-animals'],
+      spellIds: ['srd-cc-5.2.1:speak-with-animals'],
     })
     const druidicLanguage = druidicGrants.find((g) => g.kind === 'languages')
     expect(druidicLanguage).toEqual({
@@ -654,7 +668,7 @@ describe('SRD 5.2.1 class seed', () => {
     expect(smiteSpell).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
-      spellIds: ['divine-smite'],
+      spellIds: ['srd-cc-5.2.1:divine-smite'],
     })
     expectNumberColumnEntries(paladin, 'channel-divinity', 'channel-divinity-progression', 'uses', [
       { level: 3, value: 2 },
@@ -680,12 +694,16 @@ describe('SRD 5.2.1 class seed', () => {
     expect(oathSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
-      spellIds: ['protection-from-evil-and-good', 'shield-of-faith'],
+      spellIds: ['srd-cc-5.2.1:protection-from-evil-and-good', 'srd-cc-5.2.1:shield-of-faith'],
     })
     expect(oathSpells?.grantGroups?.[4]).toMatchObject({
       unlock: { level: 17 },
       grants: [
-        { kind: 'spells', availability: 'always_prepared', spellIds: ['commune', 'flame-strike'] },
+        {
+          kind: 'spells',
+          availability: 'always_prepared',
+          spellIds: ['srd-cc-5.2.1:commune', 'srd-cc-5.2.1:flame-strike'],
+        },
       ],
     })
     const holyNimbus = devotion.features.find((f) => f.id === 'holy-nimbus')
@@ -751,7 +769,12 @@ describe('SRD 5.2.1 class seed', () => {
     expect(draconicSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
-      spellIds: ['alter-self', 'chromatic-orb', 'command', 'dragons-breath'],
+      spellIds: [
+        'srd-cc-5.2.1:alter-self',
+        'srd-cc-5.2.1:chromatic-orb',
+        'srd-cc-5.2.1:command',
+        'srd-cc-5.2.1:dragons-breath',
+      ],
     })
     expect(draconicSpells?.grantGroups?.[3]?.unlock).toEqual({ level: 9 })
     const dragonCompanion = draconic.features.find((f) => f.id === 'dragon-companion')
@@ -760,7 +783,7 @@ describe('SRD 5.2.1 class seed', () => {
     expect(dragonSpell).toMatchObject({
       kind: 'spells',
       casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
-      spellIds: ['summon-dragon'],
+      spellIds: ['srd-cc-5.2.1:summon-dragon'],
     })
   })
 
@@ -793,7 +816,7 @@ describe('SRD 5.2.1 class seed', () => {
       kind: 'spells',
       availability: 'always_prepared',
       casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
-      spellIds: ['contact-other-plane'],
+      spellIds: ['srd-cc-5.2.1:contact-other-plane'],
     })
     expectNumberColumnEntries(
       warlock,
@@ -832,7 +855,12 @@ describe('SRD 5.2.1 class seed', () => {
     expect(fiendSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
-      spellIds: ['burning-hands', 'command', 'scorching-ray', 'suggestion'],
+      spellIds: [
+        'srd-cc-5.2.1:burning-hands',
+        'srd-cc-5.2.1:command',
+        'srd-cc-5.2.1:scorching-ray',
+        'srd-cc-5.2.1:suggestion',
+      ],
     })
     expect(fiendSpells?.grantGroups?.[3]?.unlock).toEqual({ level: 9 })
     const hurlThroughHell = fiend.features.find((f) => f.id === 'hurl-through-hell')

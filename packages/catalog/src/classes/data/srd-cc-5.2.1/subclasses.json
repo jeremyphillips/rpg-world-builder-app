@@ -108,7 +108,12 @@
                 "id": "aid-spells",
                 "kind": "spells",
                 "ability": "wis",
-                "spellIds": ["aid", "bless", "cure-wounds", "lesser-restoration"],
+                "spellIds": [
+                  "srd-cc-5.2.1:aid",
+                  "srd-cc-5.2.1:bless",
+                  "srd-cc-5.2.1:cure-wounds",
+                  "srd-cc-5.2.1:lesser-restoration"
+                ],
                 "availability": "always_prepared"
               }
             ]
@@ -122,7 +127,7 @@
                 "id": "mass-healing-word-spells",
                 "kind": "spells",
                 "ability": "wis",
-                "spellIds": ["mass-healing-word", "revivify"],
+                "spellIds": ["srd-cc-5.2.1:mass-healing-word", "srd-cc-5.2.1:revivify"],
                 "availability": "always_prepared"
               }
             ]
@@ -136,7 +141,7 @@
                 "id": "aura-of-life-spells",
                 "kind": "spells",
                 "ability": "wis",
-                "spellIds": ["aura-of-life", "death-ward"],
+                "spellIds": ["srd-cc-5.2.1:aura-of-life", "srd-cc-5.2.1:death-ward"],
                 "availability": "always_prepared"
               }
             ]
@@ -150,7 +155,7 @@
                 "id": "greater-restoration-spells",
                 "kind": "spells",
                 "ability": "wis",
-                "spellIds": ["greater-restoration", "mass-cure-wounds"],
+                "spellIds": ["srd-cc-5.2.1:greater-restoration", "srd-cc-5.2.1:mass-cure-wounds"],
                 "availability": "always_prepared"
               }
             ]
@@ -349,7 +354,10 @@
                 "id": "protection-from-evil-and-good-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["protection-from-evil-and-good", "shield-of-faith"],
+                "spellIds": [
+                  "srd-cc-5.2.1:protection-from-evil-and-good",
+                  "srd-cc-5.2.1:shield-of-faith"
+                ],
                 "availability": "always_prepared"
               }
             ]
@@ -363,7 +371,7 @@
                 "id": "aid-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["aid", "zone-of-truth"],
+                "spellIds": ["srd-cc-5.2.1:aid", "srd-cc-5.2.1:zone-of-truth"],
                 "availability": "always_prepared"
               }
             ]
@@ -377,7 +385,7 @@
                 "id": "beacon-of-hope-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["beacon-of-hope", "dispel-magic"],
+                "spellIds": ["srd-cc-5.2.1:beacon-of-hope", "srd-cc-5.2.1:dispel-magic"],
                 "availability": "always_prepared"
               }
             ]
@@ -391,7 +399,7 @@
                 "id": "freedom-of-movement-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["freedom-of-movement", "guardian-of-faith"],
+                "spellIds": ["srd-cc-5.2.1:freedom-of-movement", "srd-cc-5.2.1:guardian-of-faith"],
                 "availability": "always_prepared"
               }
             ]
@@ -405,7 +413,7 @@
                 "id": "commune-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["commune", "flame-strike"],
+                "spellIds": ["srd-cc-5.2.1:commune", "srd-cc-5.2.1:flame-strike"],
                 "availability": "always_prepared"
               }
             ]
@@ -559,7 +567,12 @@
                 "id": "alter-self-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["alter-self", "chromatic-orb", "command", "dragons-breath"],
+                "spellIds": [
+                  "srd-cc-5.2.1:alter-self",
+                  "srd-cc-5.2.1:chromatic-orb",
+                  "srd-cc-5.2.1:command",
+                  "srd-cc-5.2.1:dragons-breath"
+                ],
                 "availability": "always_prepared"
               }
             ]
@@ -573,7 +586,7 @@
                 "id": "fear-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["fear", "fly"],
+                "spellIds": ["srd-cc-5.2.1:fear", "srd-cc-5.2.1:fly"],
                 "availability": "always_prepared"
               }
             ]
@@ -587,7 +600,7 @@
                 "id": "arcane-eye-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["arcane-eye", "charm-monster"],
+                "spellIds": ["srd-cc-5.2.1:arcane-eye", "srd-cc-5.2.1:charm-monster"],
                 "availability": "always_prepared"
               }
             ]
@@ -601,7 +614,7 @@
                 "id": "legend-lore-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["legend-lore", "summon-dragon"],
+                "spellIds": ["srd-cc-5.2.1:legend-lore", "srd-cc-5.2.1:summon-dragon"],
                 "availability": "always_prepared"
               }
             ]
@@ -632,7 +645,7 @@
                 "id": "summon-dragon-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["summon-dragon"],
+                "spellIds": ["srd-cc-5.2.1:summon-dragon"],
                 "casting": {
                   "mode": "free_cast",
                   "frequency": "once_per_long_rest"
@@ -675,7 +688,12 @@
                 "id": "burning-hands-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["burning-hands", "command", "scorching-ray", "suggestion"],
+                "spellIds": [
+                  "srd-cc-5.2.1:burning-hands",
+                  "srd-cc-5.2.1:command",
+                  "srd-cc-5.2.1:scorching-ray",
+                  "srd-cc-5.2.1:suggestion"
+                ],
                 "availability": "always_prepared"
               }
             ]
@@ -689,7 +707,7 @@
                 "id": "fireball-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["fireball", "stinking-cloud"],
+                "spellIds": ["srd-cc-5.2.1:fireball", "srd-cc-5.2.1:stinking-cloud"],
                 "availability": "always_prepared"
               }
             ]
@@ -703,7 +721,7 @@
                 "id": "fire-shield-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["fire-shield", "wall-of-fire"],
+                "spellIds": ["srd-cc-5.2.1:fire-shield", "srd-cc-5.2.1:wall-of-fire"],
                 "availability": "always_prepared"
               }
             ]
@@ -717,7 +735,7 @@
                 "id": "geas-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["geas", "insect-plague"],
+                "spellIds": ["srd-cc-5.2.1:geas", "srd-cc-5.2.1:insect-plague"],
                 "availability": "always_prepared"
               }
             ]

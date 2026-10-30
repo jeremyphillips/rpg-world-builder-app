@@ -6,6 +6,7 @@ import {
   updateSubclassInputSchema,
 } from '@rpg/contracts'
 
+import { assertContentSpellReferences } from '../lib/assert-content-spell-references'
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type {
   ContentWriteConfig,
@@ -56,6 +57,7 @@ async function validateSubclassBeforeWrite(ctx: ContentWriteContext): Promise<vo
   }
 
   await assertSubclassParentClassExists(ctx.campaignId, classId)
+  await assertContentSpellReferences(ctx, ctx.effectiveBody ?? ctx.input)
 }
 
 export const subclassContentConfig: ContentTypeConfig<Subclass> = {

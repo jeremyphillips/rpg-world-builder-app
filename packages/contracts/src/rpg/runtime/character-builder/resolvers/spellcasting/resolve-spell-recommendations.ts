@@ -38,11 +38,6 @@ function recommendationMatchesChoiceSet(args: {
   return choiceSetId === spellcastingChoiceSetId(classId, suffix)
 }
 
-function spellSlugFromId(spellId: string): string {
-  const colonIndex = spellId.indexOf(':')
-  return colonIndex === -1 ? spellId : spellId.slice(colonIndex + 1)
-}
-
 function recommendationMatchesSpellLevel(
   recommendation: SpellRecommendation,
   spell: Spell,
@@ -57,22 +52,18 @@ function recommendationMatchesSpellLevel(
   return true
 }
 
-function recommendedOptionIdsForSlug(args: {
-  slug: string
+function recommendedOptionIdsForReference(args: {
+  spellId: string
   optionIds: ReadonlySet<string>
   recommendation: SpellRecommendation
   classLevel: number
   catalogSpellsById: ReadonlyMap<string, Spell>
 }): string[] {
-  const matches: string[] = []
-  for (const optionId of args.optionIds) {
-    if (spellSlugFromId(optionId) !== args.slug) continue
-    const spell = args.catalogSpellsById.get(optionId)
-    if (!spell) continue
-    if (!recommendationMatchesSpellLevel(args.recommendation, spell, args.classLevel)) continue
-    matches.push(optionId)
-  }
-  return matches
+  if (!args.optionIds.has(args.spellId)) return []
+  const spell = args.catalogSpellsById.get(args.spellId)
+  if (!spell) return []
+  if (!recommendationMatchesSpellLevel(args.recommendation, spell, args.classLevel)) return []
+  return [args.spellId]
 }
 
 function recommendedOptionIdsForRecommendation(args: {
@@ -81,9 +72,9 @@ function recommendedOptionIdsForRecommendation(args: {
   classLevel: number
   catalogSpellsById: ReadonlyMap<string, Spell>
 }): string[] {
-  return args.recommendation.spellIds.flatMap((slug) =>
-    recommendedOptionIdsForSlug({
-      slug,
+  return args.recommendation.spellIds.flatMap((spellId) =>
+    recommendedOptionIdsForReference({
+      spellId,
       optionIds: args.optionIds,
       recommendation: args.recommendation,
       classLevel: args.classLevel,

@@ -335,7 +335,7 @@
               "id": "contact-other-plane-spells",
               "kind": "spells",
               "ability": "cha",
-              "spellIds": ["contact-other-plane"],
+              "spellIds": ["srd-cc-5.2.1:contact-other-plane"],
               "availability": "always_prepared",
               "casting": {
                 "mode": "free_cast",

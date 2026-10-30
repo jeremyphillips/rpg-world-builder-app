@@ -242,7 +242,7 @@
               "id": "speak-with-animals-spells",
               "kind": "spells",
               "ability": "wis",
-              "spellIds": ["speak-with-animals"],
+              "spellIds": ["srd-cc-5.2.1:speak-with-animals"],
               "availability": "always_prepared"
             },
             {

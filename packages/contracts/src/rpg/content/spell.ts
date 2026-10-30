@@ -1,4 +1,5 @@
 export * from './spell/body'
+export * from './spell/spell-reference'
 export * from './spell/format-spell-metadata-core'
 export * from './spell/levels'
 export * from './spell/effects'

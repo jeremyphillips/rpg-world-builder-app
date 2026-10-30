@@ -121,13 +121,18 @@
       {
         "target": "cantrips",
         "classLevel": 1,
-        "spellIds": ["dancing-lights", "vicious-mockery"]
+        "spellIds": ["srd-cc-5.2.1:dancing-lights", "srd-cc-5.2.1:vicious-mockery"]
       },
       {
         "target": "level1Plus",
         "classLevel": 1,
         "spellLevel": 1,
-        "spellIds": ["charm-person", "color-spray", "dissonant-whispers", "healing-word"]
+        "spellIds": [
+          "srd-cc-5.2.1:charm-person",
+          "srd-cc-5.2.1:color-spray",
+          "srd-cc-5.2.1:dissonant-whispers",
+          "srd-cc-5.2.1:healing-word"
+        ]
       }
     ]
   },
@@ -465,7 +470,7 @@
               "id": "power-word-heal-spells",
               "kind": "spells",
               "ability": "cha",
-              "spellIds": ["power-word-heal", "power-word-kill"],
+              "spellIds": ["srd-cc-5.2.1:power-word-heal", "srd-cc-5.2.1:power-word-kill"],
               "availability": "always_prepared"
             }
           ]

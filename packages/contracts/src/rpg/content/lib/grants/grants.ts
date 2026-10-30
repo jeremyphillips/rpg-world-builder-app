@@ -19,6 +19,7 @@ import {
 import { getSenseSentenceForm, senseSchema } from '../../../vocab/sense'
 import { getUsageFrequencySentenceForm } from '../../../vocab/usage-frequency'
 import { featCategorySchema, getFeatCategorySentenceForm } from '../../../vocab/feat'
+import { spellReferenceSchema } from '../../spell/spell-reference'
 import { spellGrantAvailabilitySchema } from '../../../vocab/spell/grant-availability'
 import { spellGrantCastingSchema } from '../../../vocab/spell/grant-casting'
 import { getSpellGrantAvailabilityEntry } from '../../../vocab/spell/grant-availability'
@@ -287,7 +288,7 @@ const spellsContentGrantSchema = z
     id: grantRowIdSchema,
     kind: z.literal('spells'),
     ability: abilitySchema,
-    spellIds: z.array(z.string().min(1)).min(1),
+    spellIds: z.array(spellReferenceSchema).min(1),
     availability: spellGrantAvailabilitySchema.optional(),
     casting: spellGrantCastingSchema.optional(),
   })

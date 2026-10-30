@@ -36,9 +36,9 @@ const headerContext = {
   armorOptions: [],
   skillOptions: [{ value: 'athletics', label: 'Athletics' }],
   spellOptions: [
-    { value: 'aid', label: 'Aid' },
-    { value: 'animate-dead', label: 'Animate Dead' },
-    { value: 'dancing-lights', label: 'Dancing Lights' },
+    { value: 'srd-cc-5.2.1:aid', label: 'Aid' },
+    { value: 'srd-cc-5.2.1:animate-dead', label: 'Animate Dead' },
+    { value: 'srd-cc-5.2.1:dancing-lights', label: 'Dancing Lights' },
   ],
 } satisfies GrantRowHeaderContext
 
@@ -68,8 +68,12 @@ describe('formatCompactMetadataList', () => {
 
 describe('resolveSpellGrantName', () => {
   it('returns catalog proper names and title-case slug fallback', () => {
-    expect(resolveSpellGrantName('animate-dead', headerContext.spellOptions)).toBe('Animate Dead')
-    expect(resolveSpellGrantName('unknown-spell', [])).toBe('Unknown Spell')
+    expect(resolveSpellGrantName('srd-cc-5.2.1:animate-dead', headerContext.spellOptions)).toBe(
+      'Animate Dead',
+    )
+    expect(resolveSpellGrantName('srd-cc-5.2.1:unknown-spell', [])).toBe(
+      'srd-cc-5.2.1:unknown-spell',
+    )
   })
 })
 
@@ -135,7 +139,7 @@ describe('resolveGrantRowPresentation', () => {
         spellAbility: 'cha',
         spellCastingEnabled: true,
         spellCastingFrequency: 'at_will',
-        spellIds: ['aid', 'animate-dead'],
+        spellIds: ['srd-cc-5.2.1:aid', 'srd-cc-5.2.1:animate-dead'],
       },
       expected: {
         heading: 'Spells',

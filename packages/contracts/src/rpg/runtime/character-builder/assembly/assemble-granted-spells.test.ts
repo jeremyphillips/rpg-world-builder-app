@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { assembleGrantedSpells, mergeCharacterSpellEntries } from './assemble-granted-spells'
+import {
+  assembleGrantedSpells,
+  collectUnresolvedGrantedSpellIds,
+  mergeCharacterSpellEntries,
+} from './assemble-granted-spells'
 import type { CharacterSpellEntry } from '../../character/sheet/spells'
 
 describe('assembleGrantedSpells', () => {
@@ -48,7 +52,7 @@ describe('assembleGrantedSpells', () => {
       weapons: new Map(),
       armor: new Map(),
       tools: new Map(),
-      spells: new Map(),
+      spells: new Map([['dancing-lights', { id: 'dancing-lights' }]]),
       feats: new Map(),
       backgrounds: new Map(),
       skills: new Map(),
@@ -130,7 +134,7 @@ describe('assembleGrantedSpells', () => {
       weapons: new Map(),
       armor: new Map(),
       tools: new Map(),
-      spells: new Map(),
+      spells: new Map([['contact-other-plane', { id: 'contact-other-plane' }]]),
       feats: new Map(),
       backgrounds: new Map(),
       skills: new Map(),
@@ -143,6 +147,13 @@ describe('assembleGrantedSpells', () => {
       catalogIndex as never,
       characterClass as never,
     )
+    expect(
+      collectUnresolvedGrantedSpellIds(
+        draft as never,
+        catalogIndex as never,
+        characterClass as never,
+      ),
+    ).toEqual([])
     expect(entries[0]).toMatchObject({
       spellId: 'contact-other-plane',
       access: { alwaysPrepared: true },
@@ -154,6 +165,51 @@ describe('assembleGrantedSpells', () => {
         },
       ],
     })
+  })
+
+  it('omits an unresolved grant reference and reports granted_spell_unavailable', () => {
+    const draft = {
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
+      species: { speciesId: 'srd-cc-5.2.1:elf', heritageId: 'drow' },
+    } as const
+    const catalogIndex = {
+      species: new Map([
+        [
+          'srd-cc-5.2.1:elf',
+          {
+            id: 'srd-cc-5.2.1:elf',
+            traits: [],
+            heritage: {
+              options: [
+                {
+                  id: 'drow',
+                  grantGroups: [
+                    {
+                      grants: [
+                        {
+                          id: 'missing-spells',
+                          kind: 'spells',
+                          ability: 'cha',
+                          casting: { mode: 'free_cast', frequency: 'at_will' },
+                          spellIds: ['srd-cc-5.2.1:missing'],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      ]),
+      classes: new Map(),
+      spells: new Map(),
+    }
+
+    expect(assembleGrantedSpells(draft as never, catalogIndex as never)).toEqual([])
+    expect(collectUnresolvedGrantedSpellIds(draft as never, catalogIndex as never)).toEqual([
+      'srd-cc-5.2.1:missing',
+    ])
   })
 })
 

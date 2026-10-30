@@ -28,6 +28,7 @@ import {
   indexMonsterEquipmentBlockersByContentId,
   indexMonsterSkillProficiencyBlockersByContentId,
 } from './reference-sources/monsters'
+import { indexContentSpellReferenceBlockersByContentId } from './reference-sources/spell-references'
 import type { ContentUsageSource } from './content-usage-source'
 
 function characterDescriptorSource(
@@ -49,6 +50,9 @@ export const characterClassSource = characterDescriptorSource(CLASS_CHARACTER_RE
 export const characterSubclassSource = characterDescriptorSource(SUBCLASS_CHARACTER_REFERENCE)
 export const characterSpeciesSource = characterDescriptorSource(SPECIES_CHARACTER_REFERENCE)
 export const characterSpellSource = characterDescriptorSource(SPELL_CHARACTER_REFERENCE)
+export const contentSpellReferenceSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexContentSpellReferenceBlockersByContentId(ctx),
+}
 export const characterFeatSource = characterDescriptorSource(FEAT_CHARACTER_REFERENCE)
 export const characterSkillProficiencySource = characterDescriptorSource(
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,

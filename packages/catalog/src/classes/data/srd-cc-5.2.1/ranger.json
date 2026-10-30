@@ -223,7 +223,7 @@
               "id": "hunters-mark-spells",
               "kind": "spells",
               "ability": "wis",
-              "spellIds": ["hunters-mark"],
+              "spellIds": ["srd-cc-5.2.1:hunters-mark"],
               "availability": "always_prepared",
               "casting": {
                 "mode": "free_cast",

@@ -34,9 +34,10 @@ describe('lookupSpellInCatalogIndex', () => {
     )
   })
 
-  it('resolves slug ids from grant payloads', () => {
-    expect(lookupSpellInCatalogIndex('prestidigitation', catalogIndex as never)).toBe(
-      prestidigitation,
-    )
+  it('does not resolve a slug or a suffix of another id', () => {
+    expect(lookupSpellInCatalogIndex('prestidigitation', catalogIndex as never)).toBeUndefined()
+    expect(
+      lookupSpellInCatalogIndex('srd-cc-5.2.1:other:prestidigitation', catalogIndex as never),
+    ).toBeUndefined()
   })
 })
