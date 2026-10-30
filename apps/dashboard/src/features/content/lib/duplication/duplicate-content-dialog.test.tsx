@@ -33,7 +33,7 @@ function renderDialog(
             campaignId="camp-1"
             contentTypeKey="classes"
             queryKeyFn={(id) => contentOverviewListQueryKey(id, 'classes')}
-            source={{ id: 'cls-1', name: 'Fighter', source: 'homebrew' }}
+            source={{ id: 'cls-1', name: 'Fighter', catalogLayer: 'homebrew' }}
             trigger={<button type="button">Duplicate</button>}
             {...props}
           />

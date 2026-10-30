@@ -20,8 +20,8 @@ export type ResolveCharacterDisplayImageInput = {
 const CHARACTER_REGISTRY_LOOKUP_STUB = {
   subject: contentTypeSubject('classes'),
   slug: '',
-  contentSource: 'homebrew',
-} as const satisfies Pick<ResolveContentDisplayImageInput, 'subject' | 'slug' | 'contentSource'>
+  catalogLayer: 'homebrew',
+} as const satisfies Pick<ResolveContentDisplayImageInput, 'subject' | 'slug' | 'catalogLayer'>
 
 /** Character display resolution — portrait→primary on compact; no catalog system art. */
 export function resolveCharacterDisplayImage(

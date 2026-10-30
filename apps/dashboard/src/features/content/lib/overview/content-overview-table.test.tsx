@@ -83,7 +83,7 @@ function createRows(count: number): ClassRow[] {
     id: `class-${index}`,
     name: `Class ${index}`,
     hitDie: 8,
-    source: 'system',
+    catalogLayer: 'system',
     status: 'published',
     primaryAbilities: ['str'],
     subclasses: [],

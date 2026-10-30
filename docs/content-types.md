@@ -282,7 +282,7 @@ Shared helpers: `packages/contracts/src/rpg/content/lib/content-key.ts` (`derive
 
 ## Delete homebrew content
 
-Homebrew-only deletion is wired for all six registered catalog types. System SRD rows return `403 forbidden` on both the advisory availability check and `DELETE`; edit views hide the delete control when `entity.source !== 'homebrew'`.
+Homebrew-only deletion is wired for all six registered catalog types. System SRD rows return `403 forbidden` on both the advisory availability check and `DELETE`; edit views hide the delete control when `entity.catalogLayer !== 'homebrew'`.
 
 ### Advisory GET vs authoritative DELETE
 
@@ -700,7 +700,7 @@ It is a package/loader declaration—not a user-facing provenance policy.
 
 #### Homebrew UI label exceptions
 
-Campaign-authored records continue to persist `source: 'homebrew'` regardless
+Campaign-authored records continue to persist `catalogLayer: 'homebrew'` regardless
 of how the dashboard presents that provenance. By default, content overviews
 and headings show the Homebrew badge, source column, and source filter.
 
@@ -729,7 +729,7 @@ Exception rules:
 Assert:
 
 - Correct count of seed records.
-- All records use `source: 'system'`, `campaignId: null`, `rulesetId` matching input.
+- All records use `catalogLayer: 'system'`, `campaignId: null`, `rulesetId` matching input.
 - `id === \`${rulesetId}:${slug}\`` for every record.
 - Unique slugs.
 

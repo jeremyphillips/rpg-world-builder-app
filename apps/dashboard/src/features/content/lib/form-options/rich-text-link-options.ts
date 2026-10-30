@@ -11,15 +11,15 @@ import {
 
 import { useFeats } from '../../feats/hooks/use-feats'
 import { useSpells } from '../../spells/hooks/use-spells'
-import { shouldPresentContentSource } from '../content-type-presentation'
+import { shouldPresentCatalogLayer } from '../content-type-presentation'
 
 export type LinkableContentType = 'spell' | 'feat'
 
 type LinkableContentTypeKey = Extract<ContentTypeKey, 'spells' | 'feats'>
 
 type LinkableEntityByType = {
-  spell: Pick<Spell, 'slug' | 'name' | 'source'>
-  feat: Pick<Feat, 'slug' | 'name' | 'source'>
+  spell: Pick<Spell, 'slug' | 'name' | 'catalogLayer'>
+  feat: Pick<Feat, 'slug' | 'name' | 'catalogLayer'>
 }
 
 type LinkableEntity = LinkableEntityByType[LinkableContentType]
@@ -89,9 +89,9 @@ function compareByTitle(
 
 function sourceLabel(
   contentType: LinkableContentTypeKey,
-  source: LinkableEntity['source'],
+  source: LinkableEntity['catalogLayer'],
 ): string | undefined {
-  return shouldPresentContentSource(contentType) && source === 'homebrew'
+  return shouldPresentCatalogLayer(contentType) && source === 'homebrew'
     ? HOMEBREW_SOURCE_LABEL
     : undefined
 }
@@ -111,7 +111,7 @@ function buildDetailLinkOptions<T extends LinkableContentType>(
         contentType,
         kind: 'detail' as const,
         eyebrowLabel: linkableEyebrowLabel(contentType),
-        sourceLabel: sourceLabel(config.contentTypeKey, entity.source),
+        sourceLabel: sourceLabel(config.contentTypeKey, entity.catalogLayer),
       }))
       .sort(compareByTitle) ?? []
   return detailOptions

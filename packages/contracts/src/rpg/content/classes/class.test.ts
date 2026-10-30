@@ -61,7 +61,7 @@ const fighter = {
   id: 'srd-cc-5.2.1:fighter',
   slug: 'fighter',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   ...timestamps,
@@ -120,7 +120,7 @@ describe('classSchema', () => {
   })
 
   it('parses a homebrew class with a campaignId', () => {
-    const homebrew = { ...fighter, source: 'homebrew', campaignId: 'camp_1' }
+    const homebrew = { ...fighter, catalogLayer: 'homebrew', campaignId: 'camp_1' }
     expect(classSchema.parse(homebrew)).toEqual(homebrew)
   })
 
@@ -293,7 +293,7 @@ describe('subclassSchema', () => {
       id: 'srd-cc-5.2.1:champion',
       slug: 'champion',
       rulesetId: 'srd-cc-5.2.1',
-      source: 'system',
+      catalogLayer: 'system',
       status: 'published',
       campaignId: null,
       ...timestamps,
@@ -310,7 +310,7 @@ describe('subclassSchema', () => {
       id: 'srd-cc-5.2.1:college-of-lore',
       slug: 'college-of-lore',
       rulesetId: 'srd-cc-5.2.1',
-      source: 'system',
+      catalogLayer: 'system',
       status: 'published',
       campaignId: null,
       ...timestamps,
@@ -336,7 +336,7 @@ describe('subclassSchema', () => {
         id: 'srd-cc-5.2.1:champion',
         slug: 'champion',
         rulesetId: 'srd-cc-5.2.1',
-        source: 'system',
+        catalogLayer: 'system',
         status: 'published',
         campaignId: null,
         ...timestamps,
@@ -353,7 +353,7 @@ describe('resolvedSubclassSchema', () => {
         id: 'srd-cc-5.2.1:champion',
         slug: 'champion',
         rulesetId: 'srd-cc-5.2.1',
-        source: 'system',
+        catalogLayer: 'system',
         status: 'published',
         campaignId: null,
         ...timestamps,
@@ -479,7 +479,7 @@ describe('classStoredSchema', () => {
         id: 'srd-cc-5.2.1:fighter',
         slug: 'fighter',
         rulesetId: 'srd-cc-5.2.1',
-        source: 'system',
+        catalogLayer: 'system',
         status: 'published',
         campaignId: null,
         ...timestamps,

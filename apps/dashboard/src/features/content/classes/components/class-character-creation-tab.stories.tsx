@@ -34,11 +34,11 @@ type Story = StoryObj<typeof meta>
 function TabStory({
   startingEquipment,
   proficiencies,
-  entitySource,
+  entityCatalogLayer,
 }: {
   startingEquipment?: StartingEquipmentForm
   proficiencies?: ReturnType<typeof characterCreationProficienciesToFormValues>
-  entitySource?: ContentFormCtx['entitySource']
+  entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
 }) {
   const form = useForm({
     defaultValues: {
@@ -50,7 +50,7 @@ function TabStory({
   })
   return (
     <FormProvider {...form}>
-      <ClassCharacterCreationTab formCtx={{ entitySource }} />
+      <ClassCharacterCreationTab formCtx={{ entityCatalogLayer }} />
     </FormProvider>
   )
 }
@@ -66,7 +66,7 @@ export const Empty: Story = {
 export const MonkStartingEquipment: Story = {
   render: () => (
     <TabStory
-      entitySource="system"
+      entityCatalogLayer="system"
       proficiencies={monkProficiencies}
       startingEquipment={monkStartingEquipment}
     />
@@ -74,13 +74,13 @@ export const MonkStartingEquipment: Story = {
 }
 
 export const BardStartingEquipment: Story = {
-  render: () => <TabStory entitySource="system" startingEquipment={bardStartingEquipment} />,
+  render: () => <TabStory entityCatalogLayer="system" startingEquipment={bardStartingEquipment} />,
 }
 
 export const RogueSkillChoices: Story = {
   render: () => (
     <TabStory
-      entitySource="system"
+      entityCatalogLayer="system"
       proficiencies={rogueProficiencies}
       startingEquipment={monkStartingEquipment}
     />
@@ -90,7 +90,7 @@ export const RogueSkillChoices: Story = {
 export const HomebrewWithStartingEquipment: Story = {
   render: () => (
     <TabStory
-      entitySource="homebrew"
+      entityCatalogLayer="homebrew"
       startingEquipment={{
         choose: 1,
         options: [

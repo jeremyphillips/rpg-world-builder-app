@@ -6,7 +6,7 @@ import {
   type ContentDisplaySurface,
   type ContentMediaDomain,
   type ContentMedia,
-  type ContentSource,
+  type CatalogLayer,
   type ContentTypeKey,
   type ResolveContentDisplayImageResult,
   contentTypeSubject,
@@ -20,7 +20,7 @@ export type ResolveDashboardContentDisplayInput = {
   media?: ContentMedia | null
   contentType: ContentTypeKey
   slug: string
-  contentSource: ContentSource
+  catalogLayer: CatalogLayer
   rulesetId?: string
   surface?: ContentDisplaySurface
   campaignImageSetId?: string
@@ -54,7 +54,7 @@ export function resolveDashboardContentDisplay(
     domain,
     subject: contentTypeSubject(input.contentType),
     slug: input.slug,
-    contentSource: input.contentSource,
+    catalogLayer: input.catalogLayer,
     rulesetId: input.rulesetId,
     campaignImageSetId: input.campaignImageSetId,
     resolveUploadSrc: (assetId) => mediaImageUrl(assetId, 'artwork', MEDIA_SOURCE_CROP),

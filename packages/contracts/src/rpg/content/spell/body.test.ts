@@ -63,7 +63,7 @@ const fireball = {
   id: 'srd-cc-5.2.1:fireball',
   slug: 'fireball',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   ...timestamps,
@@ -74,7 +74,7 @@ const fireBolt = {
   id: 'srd-cc-5.2.1:fire-bolt',
   slug: 'fire-bolt',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   ...timestamps,
@@ -87,7 +87,7 @@ describe('spellSchema', () => {
   })
 
   it('parses a homebrew spell with a campaignId', () => {
-    const homebrew = { ...fireBolt, source: 'homebrew', campaignId: 'camp_1' }
+    const homebrew = { ...fireBolt, catalogLayer: 'homebrew', campaignId: 'camp_1' }
     expect(spellSchema.parse(homebrew)).toEqual(homebrew)
   })
 
@@ -105,7 +105,7 @@ describe('spellSchema', () => {
       id: 'srd-cc-5.2.1:detect-magic',
       slug: 'detect-magic',
       rulesetId: 'srd-cc-5.2.1',
-      source: 'system',
+      catalogLayer: 'system',
       status: 'published',
       campaignId: null,
       ...timestamps,

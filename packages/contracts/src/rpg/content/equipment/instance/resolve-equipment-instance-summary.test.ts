@@ -9,7 +9,7 @@ const weapon = equipmentSchema.parse({
   id: 'srd-cc-5.2.1:shortsword',
   slug: 'shortsword',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',

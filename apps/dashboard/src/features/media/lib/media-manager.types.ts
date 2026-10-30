@@ -1,7 +1,7 @@
 import type {
   ContentMedia,
   ContentMediaDomain,
-  ContentSource,
+  CatalogLayer,
   MediaAsset,
   MediaScope,
   SystemImageSubject,
@@ -15,7 +15,7 @@ export type MediaManagerSave = {
 import type { mediaImageUrl } from './media-display'
 export type MediaManagerContentContext = {
   domain: ContentMediaDomain
-  contentSource: ContentSource
+  catalogLayer: CatalogLayer
   subject?: SystemImageSubject
   slug?: string
   rulesetId?: string

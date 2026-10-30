@@ -241,7 +241,7 @@ describe('creature weapon proficiency grant set helpers', () => {
     id: 'srd-cc-5.2.1:dagger',
     slug: 'dagger',
     rulesetId: 'srd-cc-5.2.1',
-    source: 'system',
+    catalogLayer: 'system',
     campaignId: null,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',

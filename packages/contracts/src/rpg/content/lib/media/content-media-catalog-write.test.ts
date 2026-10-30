@@ -20,7 +20,7 @@ const classWriteCtx = {
   domain: 'class' as const,
   subject: contentTypeSubject('classes'),
   slug: 'fighter',
-  contentSource: 'system' as const,
+  catalogLayer: 'system' as const,
   rulesetId: 'srd-cc-5.2.1',
 }
 

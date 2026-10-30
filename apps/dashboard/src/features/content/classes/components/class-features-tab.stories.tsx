@@ -16,15 +16,15 @@ type Story = StoryObj<typeof meta>
 
 function TabStory({
   features = [] as Array<Record<string, unknown>>,
-  entitySource,
+  entityCatalogLayer,
 }: {
   features?: Array<Record<string, unknown>>
-  entitySource?: ContentFormCtx['entitySource']
+  entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
 }) {
   const form = useForm({ defaultValues: { features } })
   return (
     <FormProvider {...form}>
-      <ClassFeaturesTab formCtx={{ entitySource }} />
+      <ClassFeaturesTab formCtx={{ entityCatalogLayer }} />
     </FormProvider>
   )
 }
@@ -36,7 +36,7 @@ export const Empty: Story = {
 export const HomebrewWithFeatures: Story = {
   render: () => (
     <TabStory
-      entitySource="homebrew"
+      entityCatalogLayer="homebrew"
       features={[
         { id: 'f1', level: 1, name: 'Rage', description: '<p>Bonus action fury.</p>', grants: [] },
         { id: 'f2', level: 1, name: 'Unarmored Defense', description: '', grants: [] },
@@ -49,7 +49,7 @@ export const HomebrewWithFeatures: Story = {
 export const SystemClassLockedFeatures: Story = {
   render: () => (
     <TabStory
-      entitySource="system"
+      entityCatalogLayer="system"
       features={[
         { id: 'f1', level: 1, name: 'Rage', description: '', grants: [] },
         { id: 'f2', level: 1, name: 'Unarmored Defense', description: '', grants: [] },

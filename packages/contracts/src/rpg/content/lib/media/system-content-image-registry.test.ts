@@ -19,7 +19,7 @@ describe('system content image registry', () => {
         subject: contentTypeSubject('classes'),
         assetRole: 'primary',
         slug: 'fighter',
-        contentSource: 'system',
+        catalogLayer: 'system',
       }),
     ).toEqual({
       path: 'assets/system/srd-cc-5.2.1/classes/primary/fighter.jpeg',
@@ -35,7 +35,7 @@ describe('system content image registry', () => {
         subject: vocabularySetSubject('spell-schools'),
         assetRole: 'emblem',
         slug: 'evocation',
-        contentSource: 'system',
+        catalogLayer: 'system',
       }),
     ).toEqual({
       path: 'assets/system/srd-cc-5.2.1/spell-schools/emblem/evocation.png',
@@ -51,7 +51,7 @@ describe('system content image registry', () => {
         subject: contentTypeSubject('monsters'),
         assetRole: 'primary',
         slug: 'kobold-warrior',
-        contentSource: 'system',
+        catalogLayer: 'system',
       }),
     ).toEqual({
       path: 'assets/system/srd-cc-5.2.1/monsters/primary/kobold-warrior.png',
@@ -65,7 +65,7 @@ describe('system content image registry', () => {
         subject: contentTypeSubject('monsters'),
         assetRole: 'primary',
         slug: 'skeleton',
-        contentSource: 'system',
+        catalogLayer: 'system',
       })?.path,
     ).toBe('assets/system/srd-cc-5.2.1/monsters/primary/skeleton.png')
   })
@@ -77,7 +77,7 @@ describe('system content image registry', () => {
         subject: contentTypeSubject('species'),
         assetRole: 'primary',
         slug: 'elf',
-        contentSource: 'system',
+        catalogLayer: 'system',
       })?.path,
     ).toBe('assets/system/srd-cc-5.2.1/species/primary/elf.jpeg')
 
@@ -87,7 +87,7 @@ describe('system content image registry', () => {
         subject: contentTypeSubject('species'),
         assetRole: 'primary',
         slug: 'human',
-        contentSource: 'system',
+        catalogLayer: 'system',
       })?.path,
     ).toBe('assets/system/srd-cc-5.2.1/species/primary/human.jpeg')
   })
@@ -99,7 +99,7 @@ describe('system content image registry', () => {
         subject: contentTypeSubject('classes'),
         assetRole: 'primary',
         slug: 'unknown',
-        contentSource: 'system',
+        catalogLayer: 'system',
       }),
     ).toBeUndefined()
     expect(
@@ -108,7 +108,7 @@ describe('system content image registry', () => {
         subject: contentTypeSubject('classes'),
         assetRole: 'portrait',
         slug: 'fighter',
-        contentSource: 'system',
+        catalogLayer: 'system',
       }),
     ).toBeUndefined()
     expect(
@@ -117,7 +117,7 @@ describe('system content image registry', () => {
         subject: contentTypeSubject('species'),
         assetRole: 'primary',
         slug: 'fighter',
-        contentSource: 'system',
+        catalogLayer: 'system',
       }),
     ).toBeUndefined()
   })
@@ -129,7 +129,7 @@ describe('system content image registry', () => {
         subject: contentTypeSubject('classes'),
         assetRole: 'primary',
         slug: 'fighter',
-        contentSource: 'homebrew',
+        catalogLayer: 'homebrew',
       }),
     ).toBeUndefined()
 
@@ -139,7 +139,7 @@ describe('system content image registry', () => {
         subject: contentTypeSubject('species'),
         assetRole: 'primary',
         slug: 'elf',
-        contentSource: 'homebrew',
+        catalogLayer: 'homebrew',
       }),
     ).toBeUndefined()
   })

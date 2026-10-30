@@ -86,7 +86,7 @@ describe('loadContentEditFormState', () => {
   const entity = {
     id: 'sp-1',
     name: 'Elf',
-    source: 'homebrew' as const,
+    catalogLayer: 'homebrew' as const,
     status: 'published' as const,
     slug: 'elf',
     kind: 'service',
@@ -117,7 +117,7 @@ describe('loadContentEditFormState', () => {
       campaignId: 'camp-1',
       entityId: 'sp-1',
       mode: 'edit',
-      entitySource: 'homebrew',
+      entityCatalogLayer: 'homebrew',
       equipmentKind: 'weapon',
       embeddedSeedRowIds: { traits: ['t1'] },
     })

@@ -103,7 +103,7 @@ describe.each(entries)('ContentFormDef[%s] — registration contract', (_key, de
           ? {
               campaignId: 'test-campaign',
               mode: 'create' as const,
-              entitySource: 'homebrew' as const,
+              entityCatalogLayer: 'homebrew' as const,
             }
           : {}
 

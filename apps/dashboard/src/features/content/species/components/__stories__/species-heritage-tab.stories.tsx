@@ -16,15 +16,15 @@ type Story = StoryObj<typeof meta>
 
 function TabStory({
   heritage,
-  entitySource,
+  entityCatalogLayer,
 }: {
   heritage?: Record<string, unknown>
-  entitySource?: ContentFormCtx['entitySource']
+  entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
 }) {
   const form = useForm({ defaultValues: { heritage } })
   return (
     <FormProvider {...form}>
-      <SpeciesHeritageTab formCtx={{ entitySource }} />
+      <SpeciesHeritageTab formCtx={{ entityCatalogLayer }} />
     </FormProvider>
   )
 }
@@ -36,7 +36,7 @@ export const Empty: Story = {
 export const HomebrewWithHeritage: Story = {
   render: () => (
     <TabStory
-      entitySource="homebrew"
+      entityCatalogLayer="homebrew"
       heritage={{
         id: 'hc1',
         name: 'Draconic Ancestry',
@@ -63,7 +63,7 @@ export const HomebrewWithHeritage: Story = {
 export const SystemSpeciesLockedHeritage: Story = {
   render: () => (
     <TabStory
-      entitySource="system"
+      entityCatalogLayer="system"
       heritage={{
         id: 'hc1',
         name: 'Draconic Ancestry',

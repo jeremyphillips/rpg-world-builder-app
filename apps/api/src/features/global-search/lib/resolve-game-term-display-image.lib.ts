@@ -25,7 +25,7 @@ export function resolveGameTermDisplayImage(input: {
     domain: 'game-term',
     subject: vocabularySetSubject(input.setId),
     slug: input.optionId,
-    contentSource: vocabularyOptionContentSource(input.source),
+    catalogLayer: vocabularyOptionContentSource(input.source),
     rulesetId: input.rulesetId,
     resolveUploadSrc: resolveMediaArtworkUrl,
   })

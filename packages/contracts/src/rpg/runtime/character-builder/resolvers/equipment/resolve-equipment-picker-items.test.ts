@@ -14,7 +14,7 @@ const RULESET = 'srd-cc-5.2.1' as const
 
 const CONTENT_META = {
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -212,7 +212,7 @@ describe('resolveEquipmentPickerItems', () => {
       id: `${RULESET}:amulet-of-health`,
       slug: 'amulet-of-health',
       rulesetId: RULESET,
-      source: 'system',
+      catalogLayer: 'system',
       status: 'published',
       campaignId: null,
       createdAt: '2026-01-01T00:00:00.000Z',

@@ -37,7 +37,7 @@ describe('SRD 5.2.1 species seed', () => {
   it('uses deterministic system ids and null campaignId', () => {
     for (const s of species) {
       expect(s.id).toBe(`${RULESET}:${s.slug}`)
-      expect(s.source).toBe('system')
+      expect(s.catalogLayer).toBe('system')
       expect(s.campaignId).toBeNull()
       expect(s.rulesetId).toBe(RULESET)
     }

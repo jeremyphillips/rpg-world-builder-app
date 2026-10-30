@@ -43,7 +43,7 @@ function makeStoredClass(
     id,
     slug: id.split(':').pop() ?? id,
     rulesetId: 'srd-cc-5.2.1',
-    source: 'system',
+    catalogLayer: 'system',
     status: 'published',
     campaignId: null,
     ...timestamps,

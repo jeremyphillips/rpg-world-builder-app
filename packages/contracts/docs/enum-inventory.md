@@ -108,7 +108,7 @@ Spell resolution closed sets (`content/spell/resolution/vocab.ts`) also define
 | `proficiencyPoolSourceSchema`                    | `content/lib/proficiency-grant.ts`       | yes          | no                | local-exempt |
 | `contentTraitKindSchema` (`custom`, `grant`)     | `content/lib/grants/grants.ts`           | yes          | no                | local-exempt |
 | `contentGrantSchema` `kind` literals             | `content/lib/grants/grants.ts`           | yes          | no                | local-exempt |
-| `contentSourceSchema` (`system`, `homebrew`)     | `content/lib/envelope.ts`                | yes          | no                | local-exempt |
+| `catalogLayerSchema` (`system`, `homebrew`)      | `content/lib/envelope.ts`                | yes          | no                | local-exempt |
 | `contentStatusSchema` (`draft`, `published`)     | `content/lib/envelope.ts`                | yes          | no                | local-exempt |
 | `equipmentModifierKindSchema`                    | `content/equipment/instance/modifier.ts` | yes          | no                | local-exempt |
 | `speciesMulticlassPolicySchema`                  | `content/species-character-creation.ts`  | yes          | no                | local-exempt |

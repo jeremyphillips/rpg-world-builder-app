@@ -16,7 +16,7 @@ export function mergeEditLayoutCtx(
   entityId: string,
   entity:
     | {
-        source?: ContentFormCtx['entitySource']
+        catalogLayer?: ContentFormCtx['entityCatalogLayer']
         kind?: unknown
         rulesetId?: string
         slug?: string
@@ -29,7 +29,7 @@ export function mergeEditLayoutCtx(
     campaignId,
     entityId,
     mode: 'edit',
-    entitySource: entity?.source,
+    entityCatalogLayer: entity?.catalogLayer,
     entitySlug: entity?.slug,
     rulesetId: entity?.rulesetId ?? optionsCtx.rulesetId,
     equipmentKind: formCtx?.equipmentKind ?? entityEquipmentKind(entity),

@@ -52,7 +52,7 @@ describe('useBulkCampaignAccessAction', () => {
       {
         id: 'class-1',
         name: 'Wizard',
-        source: 'system' as const,
+        catalogLayer: 'system' as const,
         status: 'published' as const,
         campaignAccess: unavailableAccess,
       },

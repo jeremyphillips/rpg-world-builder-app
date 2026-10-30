@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { canDuplicateContentType, type ContentSource, type ContentTypeKey } from '@rpg/contracts'
+import { canDuplicateContentType, type CatalogLayer, type ContentTypeKey } from '@rpg/contracts'
 import { Modal } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
 
@@ -26,7 +26,7 @@ import { useDuplicateContent } from './use-duplicate-content'
 export type DuplicateContentSource = {
   id: string
   name: string
-  source: ContentSource
+  catalogLayer: CatalogLayer
   kind?: unknown
 }
 
@@ -85,7 +85,7 @@ export function DuplicateContentDialog({
       <Modal.Content size="md">
         <Modal.Header
           headline={formatDuplicateContentDialogHeadline(contentTypeKey)}
-          description={formatDuplicateContentDialogDescription(source.source)}
+          description={formatDuplicateContentDialogDescription(source.catalogLayer)}
         />
         <Modal.Body>
           {open ? (

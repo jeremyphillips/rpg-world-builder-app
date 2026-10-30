@@ -14,7 +14,7 @@ describe('SRD 5.2.1 skill proficiency seed', () => {
   it('uses deterministic system ids and null campaignId', () => {
     for (const skill of skills) {
       expect(skill.id).toBe(`${RULESET}:${skill.slug}`)
-      expect(skill.source).toBe('system')
+      expect(skill.catalogLayer).toBe('system')
       expect(skill.campaignId).toBeNull()
       expect(skill.rulesetId).toBe(RULESET)
     }

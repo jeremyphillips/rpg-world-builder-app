@@ -7,7 +7,7 @@ const ELF_SPECIES = {
   id: 'srd-cc-5.2.1:elf',
   slug: 'elf',
   name: 'Elf',
-  source: 'system' as const,
+  catalogLayer: 'system' as const,
   status: 'published',
   culture: {
     id: 'elven',

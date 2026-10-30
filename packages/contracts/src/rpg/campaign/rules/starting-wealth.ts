@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { systemRulesetIdSchema, type SystemRulesetId } from '../../primitives/ruleset'
+import { catalogLayerSchema } from '../../vocab/catalog-layer'
 import { tierBonusGoldSchema } from '../../primitives/currency-formula'
 import { absoluteLevelSchema } from '../../primitives/level'
 import { levelRangeTiersSchema } from '../../primitives/level'
@@ -181,7 +182,7 @@ const startingWealthTableMetaSchema = z.object({
   id: z.string().min(1),
   slug: startingWealthTableSlugSchema,
   rulesetId: systemRulesetIdSchema,
-  source: z.enum(['system', 'homebrew']),
+  catalogLayer: catalogLayerSchema,
   campaignId: z.string().min(1).nullable(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),

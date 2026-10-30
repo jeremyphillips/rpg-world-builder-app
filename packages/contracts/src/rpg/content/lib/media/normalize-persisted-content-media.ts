@@ -1,4 +1,4 @@
-import type { ContentSource } from '../envelope'
+import type { CatalogLayer } from '../envelope'
 import type { ContentMedia } from '../../../primitives/media/content-media'
 import { systemImageSourcesEqual } from '../../../primitives/media/content-media-source'
 import { isRolePresentationCustomized } from '../../../primitives/media/is-role-presentation-customized'
@@ -16,7 +16,7 @@ export function normalizePersistedContentMedia(input: {
   media: ContentMedia
   subject: SystemImageSubject
   slug: string
-  contentSource: ContentSource
+  catalogLayer: CatalogLayer
   rulesetId?: string
   campaignImageSetId?: string
   allowedRoles: readonly MediaRole[]

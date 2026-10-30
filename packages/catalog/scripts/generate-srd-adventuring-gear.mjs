@@ -17,7 +17,7 @@ function base(slug, name, description, cost, weight, kind, extra) {
     id: `${RULESET}:${slug}`,
     slug,
     rulesetId: RULESET,
-    source: 'system',
+    catalogLayer: 'system',
     campaignId: null,
     createdAt: TS,
     updatedAt: TS,

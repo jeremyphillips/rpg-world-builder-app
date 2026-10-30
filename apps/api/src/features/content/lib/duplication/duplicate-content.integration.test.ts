@@ -84,7 +84,13 @@ describe('duplicate content routes', () => {
       .send({ name: 'Dup Source Class Copy' })
       .expect(201)
 
-    expect(res.body.classes.source).toBe('homebrew')
+    expect(res.body.classes.catalogLayer).toBe('homebrew')
+    expect(res.body.classes.provenance?.derivedFrom).toMatchObject({
+      relation: 'duplicate',
+      contentId: source.id,
+      contentTypeKey: 'classes',
+      catalogLayer: source.catalogLayer,
+    })
     expect(res.body.classes.status).toBe('draft')
     expect(res.body.classes.id).not.toBe(source.id)
     expect(res.body.classes.slug).toBe('dup-source-class-copy')
@@ -231,7 +237,7 @@ describe('duplicate content routes', () => {
     expect(Object.keys(duplicateRes.body)).toEqual(Object.keys(createRes.body))
     expect(duplicateRes.body.feats).toEqual(
       expect.objectContaining({
-        source: 'homebrew',
+        catalogLayer: 'homebrew',
         status: 'draft',
         category: 'origin',
       }),

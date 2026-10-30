@@ -214,13 +214,13 @@ function ClassSubclassesTabBody({
       const item = editor.listItems.find((entry) => entry.id === id)
       if (!item) return
 
-      if (item.source === 'unsaved' || isDraftSubclassId(id)) {
+      if (item.catalogLayer === 'unsaved' || isDraftSubclassId(id)) {
         editor.handleDeleteRequest(id)
         return
       }
 
-      if (item.source === 'homebrew') {
-        void deleteFlow.handleDeleteClick(id, item.name, item.source)
+      if (item.catalogLayer === 'homebrew') {
+        void deleteFlow.handleDeleteClick(id, item.name, item.catalogLayer)
       }
     },
     [deleteFlow, editor],
@@ -313,7 +313,7 @@ function ClassSubclassesTabBody({
       <SubclassDeleteDialog
         open={
           editor.deleteTargetId !== null &&
-          (editor.deleteTargetItem?.source === 'unsaved' ||
+          (editor.deleteTargetItem?.catalogLayer === 'unsaved' ||
             isDraftSubclassId(editor.deleteTargetId))
         }
         subclassName={editor.deleteTargetItem?.name ?? 'Untitled subclass'}

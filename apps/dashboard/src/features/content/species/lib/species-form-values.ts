@@ -107,7 +107,7 @@ function cultureForInput(
   return cultureFromFormValues(values.culture, {
     slug,
     existingCultureId: ctx?.entity?.culture?.id,
-    entitySource: ctx?.entity?.source ?? 'homebrew',
+    entityCatalogLayer: ctx?.entity?.catalogLayer ?? 'homebrew',
   })
 }
 

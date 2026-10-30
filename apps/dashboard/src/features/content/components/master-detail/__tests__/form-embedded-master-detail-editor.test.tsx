@@ -20,11 +20,11 @@ type TraitRow = { id?: string; kind: 'custom' | 'grant'; name?: string; grants: 
 
 function EditorShell({
   traits = [] as TraitRow[],
-  entitySource,
+  entityCatalogLayer,
   embeddedSeedRowIds,
 }: {
   traits?: TraitRow[]
-  entitySource?: 'system' | 'homebrew'
+  entityCatalogLayer?: 'system' | 'homebrew'
   embeddedSeedRowIds?: Record<string, readonly string[]>
 }) {
   const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name' }]
@@ -32,7 +32,7 @@ function EditorShell({
   return (
     <TestFormShell defaultValues={{ traits }}>
       <FormEmbeddedMasterDetailEditor
-        formCtx={{ entitySource, embeddedSeedRowIds }}
+        formCtx={{ entityCatalogLayer, embeddedSeedRowIds }}
         fieldName="traits"
         itemFields={itemFields}
         itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
@@ -78,7 +78,7 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     const user = userEvent.setup()
     render(
       <EditorShell
-        entitySource="homebrew"
+        entityCatalogLayer="homebrew"
         traits={[{ kind: 'custom', name: 'Darkvision', grants: [] }]}
       />,
     )
@@ -99,7 +99,7 @@ describe('FormEmbeddedMasterDetailEditor', () => {
   it('renders structured meta in the list and hides overflow delete for system seed rows', () => {
     render(
       <EditorShell
-        entitySource="system"
+        entityCatalogLayer="system"
         embeddedSeedRowIds={{ traits: ['t1'] }}
         traits={[{ id: 't1', kind: 'custom', name: 'Darkvision', grants: [] }]}
       />,

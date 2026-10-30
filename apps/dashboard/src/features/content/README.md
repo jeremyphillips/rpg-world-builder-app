@@ -165,7 +165,7 @@ Scope notes:
   see [campaign-access/README.md](lib/campaign-access/README.md) and
   [availability.md](../../../docs/availability.md#persisted-campaign-access-nested-master-detail).
 
-`ContentFormCtx.entitySource` (set by the create/edit shells) plus
+`ContentFormCtx.entityCatalogLayer` (set by the create/edit shells) plus
 `embeddedSeedRowIds` lets the editor derive per-row delete-locking when the
 embedded element has no own `source` (e.g. protecting a system class's saved
 features, starting equipment packages, species traits, or heritage options). The same

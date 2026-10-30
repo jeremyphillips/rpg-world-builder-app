@@ -9,7 +9,7 @@ const SOURCE_FOR_DELETABLE = {
   system: 'system',
   homebrew: 'homebrew',
   unsaved: 'homebrew',
-} as const satisfies Record<SubclassListItem['source'], 'system' | 'homebrew'>
+} as const satisfies Record<SubclassListItem['catalogLayer'], 'system' | 'homebrew'>
 
 export interface BuildSubclassMasterDetailListItemParams {
   item: SubclassListItem
@@ -30,11 +30,11 @@ export function buildSubclassMasterDetailListItem({
       ...(isModified ? { eyebrow: 'Modified' } : {}),
       sourceLabel: resolveSubclassSourceLabel(
         item.id,
-        item.source === 'unsaved' ? 'homebrew' : item.source,
-        item.source === 'unsaved' || isDraftSubclassId(item.id) ? 'draft' : 'published',
+        item.catalogLayer === 'unsaved' ? 'homebrew' : item.catalogLayer,
+        item.catalogLayer === 'unsaved' || isDraftSubclassId(item.id) ? 'draft' : 'published',
       ),
     },
     ...(isAvailable ? {} : { availabilityStatusLabel: 'Unavailable' as const }),
-    deletable: isSubclassDeletable(SOURCE_FOR_DELETABLE[item.source], item.id),
+    deletable: isSubclassDeletable(SOURCE_FOR_DELETABLE[item.catalogLayer], item.id),
   }
 }

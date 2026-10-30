@@ -7,7 +7,7 @@ const DEFAULT_CLASS_STORED = {
   id: `${DEFAULT_SYSTEM_RULESET_ID}:test-class`,
   slug: 'test-class',
   rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: CONTENT_TIMESTAMP,

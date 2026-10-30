@@ -24,7 +24,7 @@ function row(
   return {
     id,
     name,
-    source: 'system',
+    catalogLayer: 'system',
     status: 'published',
     campaignAccess: {
       ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
@@ -101,14 +101,14 @@ describe('matchesContentOverviewFilters', () => {
     const target = row('1', 'Wizard', { available: true })
     expect(
       matchesContentOverviewFilters(target, {
-        source: 'system',
+        catalogLayer: 'system',
         status: 'published',
         campaignAvailability: 'all',
       }),
     ).toBe(true)
     expect(
       matchesContentOverviewFilters(target, {
-        source: 'homebrew',
+        catalogLayer: 'homebrew',
         campaignAvailability: 'all',
       }),
     ).toBe(false)

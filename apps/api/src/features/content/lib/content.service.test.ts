@@ -20,7 +20,7 @@ describe('resolveCatalogForCampaign (classes)', () => {
 
     expect(classes).toHaveLength(12)
     expect(classes.find((c) => c.id === 'srd-cc-5.2.1:fighter')?.hitDie).toBe(10)
-    expect(classes.every((c) => c.source === 'system')).toBe(true)
+    expect(classes.every((c) => c.catalogLayer === 'system')).toBe(true)
     const fighter = classes.find((c) => c.slug === 'fighter')!
     expect(skillSlugsFromClassChoices(fighter).length).toBeGreaterThan(0)
   })
@@ -71,7 +71,7 @@ describe('resolveCatalogForCampaign (classes)', () => {
     const homebrew = classes.find((c) => c.slug === 'blood-hunter')
 
     expect(classes).toHaveLength(13)
-    expect(homebrew?.source).toBe('homebrew')
+    expect(homebrew?.catalogLayer).toBe('homebrew')
     expect(homebrew?.campaignId).toBe(campaign.id)
     expect(homebrew?.proficiencies.skills).toEqual({ categories: [], items: [] })
     expect(homebrew?.characterCreation?.proficiencies?.skills?.choices?.[0]?.from).toEqual([
@@ -85,7 +85,7 @@ describe('resolveCatalogForCampaign (classes)', () => {
     const campaignAuthored = {
       id: 'campaign:organization',
       slug: 'organization',
-      source: 'homebrew' as const,
+      catalogLayer: 'homebrew' as const,
     }
     const config: ContentTypeConfig<typeof campaignAuthored> = {
       type: 'campaign-authored',

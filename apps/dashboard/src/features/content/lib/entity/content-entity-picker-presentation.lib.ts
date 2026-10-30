@@ -48,7 +48,7 @@ export function buildLocationPickerEntitySummary(
 export function buildOrganizationPickerEntitySummary(
   organization: Pick<
     Organization,
-    'id' | 'name' | 'organizationDomain' | 'media' | 'slug' | 'source' | 'rulesetId'
+    'id' | 'name' | 'organizationDomain' | 'media' | 'slug' | 'catalogLayer' | 'rulesetId'
   >,
   options: EntitySummaryAdapterOptions = {},
 ): EntitySummaryModel {

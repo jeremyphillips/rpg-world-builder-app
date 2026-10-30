@@ -313,7 +313,7 @@ export function projectContentEntity(
     contentType,
     media: entity.media,
     slug: entity.slug,
-    contentSource: entity.source,
+    catalogLayer: entity.catalogLayer,
     rulesetId: entity.rulesetId,
   })
 

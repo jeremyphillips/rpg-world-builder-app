@@ -29,7 +29,7 @@ function cityCouncilCanonicalBase(): Organization {
     id: 'organization-city-council',
     slug: 'city-council',
     rulesetId: STORY_RULESET_ID,
-    source: 'homebrew',
+    catalogLayer: 'homebrew',
     status: 'published',
     campaignId: STORY_CAMPAIGN_ID,
     createdAt: CONTENT_TIMESTAMP,

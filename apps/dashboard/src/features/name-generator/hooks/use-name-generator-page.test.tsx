@@ -29,7 +29,7 @@ vi.mock('@/features/content', async (importOriginal) => {
           id: 'srd-cc-5.2.1:elf',
           slug: 'elf',
           name: 'Elf',
-          source: 'system',
+          catalogLayer: 'system',
           status: 'published',
           languageAffinities: ['elvish'],
           culture: {

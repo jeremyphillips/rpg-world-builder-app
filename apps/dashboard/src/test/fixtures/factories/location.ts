@@ -11,7 +11,7 @@ type LocationOverrides = Partial<Location> & { kind: LocationKind }
 
 const sharedMeta = {
   rulesetId: STORY_RULESET_ID,
-  source: 'homebrew' as const,
+  catalogLayer: 'homebrew' as const,
   status: 'published' as const,
   campaignId: STORY_CAMPAIGN_ID as string | null,
   createdAt: CONTENT_TIMESTAMP,

@@ -36,7 +36,7 @@ describe('finalizeNpcCharacterBuild', () => {
       id: 'organization-lantern-guild',
       slug: 'lantern-guild',
       rulesetId: 'srd-cc-5.2.1' as const,
-      source: 'homebrew' as const,
+      catalogLayer: 'homebrew' as const,
       status: 'published' as const,
       campaignId: 'campaign-1',
       createdAt: '2026-07-28T12:00:00.000Z',

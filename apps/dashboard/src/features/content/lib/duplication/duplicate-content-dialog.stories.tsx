@@ -11,7 +11,7 @@ const meta = {
     campaignId: 'camp-1',
     contentTypeKey: 'classes',
     queryKeyFn: (campaignId: string) => contentOverviewListQueryKey(campaignId, 'classes'),
-    source: { id: 'cls-1', name: 'Fighter', source: 'homebrew' as const },
+    source: { id: 'cls-1', name: 'Fighter', catalogLayer: 'homebrew' as const },
     trigger: <button type="button">Duplicate</button>,
   },
 } satisfies Meta<typeof DuplicateContentDialog>
@@ -23,6 +23,6 @@ export const HomebrewSource: Story = {}
 
 export const SystemSource: Story = {
   args: {
-    source: { id: 'cls-1', name: 'Fighter', source: 'system' },
+    source: { id: 'cls-1', name: 'Fighter', catalogLayer: 'system' },
   },
 }

@@ -52,7 +52,7 @@ export function SpeciesPreviewPlayerHost({
             {
               media: (values as ContentPreviewDisplayImageValues).media ?? emptyContentMediaSchema,
               slug: values.slug ?? 'preview',
-              source: ctx.entitySource ?? 'homebrew',
+              catalogLayer: ctx.entityCatalogLayer ?? 'homebrew',
               rulesetId: ctx.rulesetId,
             },
             'detail',

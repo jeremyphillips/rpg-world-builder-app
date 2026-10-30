@@ -4,7 +4,7 @@ import {
   type ApiContentTypeKey,
   type ContentDisplayImage,
   type ContentMedia,
-  type ContentSource,
+  type CatalogLayer,
   type ContentTypeKey,
   contentTypeSubject,
 } from '@rpg/contracts'
@@ -15,7 +15,7 @@ export function resolveGlobalSearchContentDisplayImage(input: {
   contentType: ApiContentTypeKey
   media?: ContentMedia | null
   slug: string
-  contentSource: ContentSource
+  catalogLayer: CatalogLayer
   rulesetId?: string
   campaignImageSetId?: string
 }): ContentDisplayImage | undefined {
@@ -30,7 +30,7 @@ export function resolveGlobalSearchContentDisplayImage(input: {
     domain,
     subject: contentTypeSubject(input.contentType as ContentTypeKey),
     slug: input.slug,
-    contentSource: input.contentSource,
+    catalogLayer: input.catalogLayer,
     rulesetId: input.rulesetId,
     campaignImageSetId: input.campaignImageSetId,
     resolveUploadSrc: resolveMediaArtworkUrl,

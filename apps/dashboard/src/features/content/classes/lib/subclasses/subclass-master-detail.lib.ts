@@ -1,4 +1,4 @@
-import type { ContentSource, ContentStatus, ResolvedSubclass } from '@rpg/contracts'
+import type { CatalogLayer, ContentStatus, ResolvedSubclass } from '@rpg/contracts'
 
 import type { MasterDetailEditorIdentity } from '../../../components/master-detail/master-detail-editor-shell'
 import type { MasterDetailAvailabilityPresentation } from '../../../lib/master-detail/master-detail-availability.types'
@@ -18,7 +18,7 @@ const SOURCE_BADGE_LABEL = {
 
 export function resolveSubclassSourceLabel(
   subclassId: string,
-  source: ContentSource,
+  source: CatalogLayer,
   status: ContentStatus,
 ): string {
   const listSource =
@@ -32,8 +32,8 @@ export function resolveSubclassSourceLabel(
 function resolveSubclassSelectionSource(
   selectedId: string,
   selectedEntity: ResolvedSubclass | undefined,
-): ContentSource {
-  if (selectedEntity?.source) return selectedEntity.source
+): CatalogLayer {
+  if (selectedEntity?.catalogLayer) return selectedEntity.catalogLayer
   return isDraftSubclassId(selectedId) ? 'homebrew' : 'system'
 }
 

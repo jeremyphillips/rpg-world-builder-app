@@ -366,7 +366,7 @@ export function spellDetailSourceFromFormValues(values: SpellFormValues): Spell 
     id: 'preview',
     name: spellPreviewName(values),
     slug: values.slug ?? 'preview',
-    source: 'homebrew',
+    catalogLayer: 'homebrew',
     status: 'draft',
     school: values.school ?? '',
     level,

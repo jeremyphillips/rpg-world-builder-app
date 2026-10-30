@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { authoredContentBodySchema } from '../../primitives/authored-content'
 import {
-  CONTENT_SOURCES,
+  CATALOG_LAYER_KEYS,
   CONTENT_STATUSES,
   contentBodyBaseSchema,
   contentMetaSchema,
   contentPatchBaseSchema,
-  contentSourceSchema,
+  catalogLayerSchema,
   contentStatusSchema,
   slugSchema,
 } from './envelope'
@@ -15,7 +15,7 @@ const systemMeta = {
   id: 'srd-cc-5.2.1:fighter',
   slug: 'fighter',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -28,15 +28,15 @@ describe('contentBodyBaseSchema', () => {
   })
 })
 
-describe('contentSourceSchema', () => {
+describe('catalogLayerSchema', () => {
   it('accepts every known source', () => {
-    for (const source of CONTENT_SOURCES) {
-      expect(contentSourceSchema.parse(source)).toBe(source)
+    for (const source of CATALOG_LAYER_KEYS) {
+      expect(catalogLayerSchema.parse(source)).toBe(source)
     }
   })
 
   it('rejects unknown sources', () => {
-    expect(contentSourceSchema.safeParse('official').success).toBe(false)
+    expect(catalogLayerSchema.safeParse('official').success).toBe(false)
   })
 })
 
@@ -73,7 +73,7 @@ describe('contentMetaSchema', () => {
   })
 
   it('accepts a homebrew record with a campaignId', () => {
-    const homebrew = { ...systemMeta, source: 'homebrew', campaignId: 'camp_123' }
+    const homebrew = { ...systemMeta, catalogLayer: 'homebrew', campaignId: 'camp_123' }
     expect(contentMetaSchema.parse(homebrew)).toEqual({ ...homebrew, status: 'published' })
   })
 

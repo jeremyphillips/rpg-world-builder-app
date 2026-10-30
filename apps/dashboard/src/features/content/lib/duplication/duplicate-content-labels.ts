@@ -1,4 +1,4 @@
-import type { ContentSource, ContentTypeKey } from '@rpg/contracts'
+import type { CatalogLayer, ContentTypeKey } from '@rpg/contracts'
 
 import { getContentTypeItemLabel } from '../content-type-labels'
 
@@ -6,7 +6,7 @@ export function formatDuplicateContentDialogHeadline(contentTypeKey: ContentType
   return `Duplicate ${getContentTypeItemLabel(contentTypeKey)}`
 }
 
-export function formatDuplicateContentDialogDescription(source: ContentSource): string {
+export function formatDuplicateContentDialogDescription(source: CatalogLayer): string {
   if (source === 'system') {
     return 'Create a homebrew copy you can edit. Campaign access resets to the default for new content.'
   }

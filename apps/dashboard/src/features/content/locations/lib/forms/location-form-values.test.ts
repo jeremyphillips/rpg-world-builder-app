@@ -20,7 +20,7 @@ import type { LocationFormCtx } from './location-form-ctx'
 const baseLocationCreateCtx: LocationFormCtx = {
   campaignId: 'campaign-1',
   mode: 'create',
-  entitySource: 'homebrew',
+  entityCatalogLayer: 'homebrew',
   campaignRules: defaultCampaignRules(),
 }
 

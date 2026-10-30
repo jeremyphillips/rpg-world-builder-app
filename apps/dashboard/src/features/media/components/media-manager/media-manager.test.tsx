@@ -45,7 +45,7 @@ function mount(overrides: Partial<MediaManagerProps> = {}) {
   const contentContext =
     'contentContext' in overrides
       ? overrides.contentContext
-      : { domain, contentSource: 'homebrew' as const }
+      : { domain, catalogLayer: 'homebrew' as const }
   const props: MediaManagerProps = {
     open: true,
     onOpenChange: vi.fn(),
@@ -304,7 +304,7 @@ describe('MediaManager', () => {
         domain: 'class',
         subject: contentTypeSubject('classes'),
         slug: 'fighter',
-        contentSource: 'system',
+        catalogLayer: 'system',
         rulesetId: 'srd-cc-5.2.1',
       },
     })
@@ -363,7 +363,7 @@ describe('MediaManager', () => {
       domain: 'class' as const,
       subject: contentTypeSubject('classes'),
       slug: 'fighter',
-      contentSource: 'system' as const,
+      catalogLayer: 'system' as const,
       rulesetId: 'srd-cc-5.2.1',
     }
     const onSave = vi.fn()

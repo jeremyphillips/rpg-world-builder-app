@@ -50,7 +50,7 @@ describe('catalog content media write integration', () => {
 
     const catalog = await resolveCatalogForCampaign(classWriteConfig.readConfig, campaign.id)
     const fighter = catalog.find(
-      (record) => record.slug === 'fighter' && record.source === 'system',
+      (record) => record.slug === 'fighter' && record.catalogLayer === 'system',
     )
     expect(fighter).toBeDefined()
     if (!fighter) throw new Error('expected fighter seed')

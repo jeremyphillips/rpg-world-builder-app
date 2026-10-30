@@ -36,13 +36,13 @@ function FormApiCapture({ onReady }: { onReady: (form: UseFormReturn) => void })
 
 function TabShell({
   features = [] as Feature[],
-  entitySource,
+  entityCatalogLayer,
   embeddedSeedRowIds,
   formCtx = {},
   onFormReady,
 }: {
   features?: Feature[]
-  entitySource?: ContentFormCtx['entitySource']
+  entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
   embeddedSeedRowIds?: ContentFormCtx['embeddedSeedRowIds']
   formCtx?: ContentFormCtx
   onFormReady?: (form: UseFormReturn) => void
@@ -50,7 +50,7 @@ function TabShell({
   return (
     <TestFormShell defaultValues={{ features }}>
       {onFormReady ? <FormApiCapture onReady={onFormReady} /> : null}
-      <ClassFeaturesTab formCtx={{ entitySource, embeddedSeedRowIds, ...formCtx }} />
+      <ClassFeaturesTab formCtx={{ entityCatalogLayer, embeddedSeedRowIds, ...formCtx }} />
     </TestFormShell>
   )
 }
@@ -119,7 +119,7 @@ describe('ClassFeaturesTab', () => {
 
   it('confirms deletion through the dialog and removes the row', async () => {
     const user = userEvent.setup()
-    render(<TabShell features={[rage]} entitySource="homebrew" />)
+    render(<TabShell features={[rage]} entityCatalogLayer="homebrew" />)
 
     await deleteViaOverflow(user, 'Rage')
     expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete feature?')
@@ -135,7 +135,7 @@ describe('ClassFeaturesTab', () => {
     render(
       <TabShell
         features={[rage]}
-        entitySource="system"
+        entityCatalogLayer="system"
         embeddedSeedRowIds={{ features: ['f1'] }}
       />,
     )
@@ -146,7 +146,7 @@ describe('ClassFeaturesTab', () => {
 
   it('allows deleting newly added rows even on a system class', async () => {
     const user = userEvent.setup()
-    render(<TabShell features={[rage]} entitySource="system" />)
+    render(<TabShell features={[rage]} entityCatalogLayer="system" />)
 
     await user.click(screen.getByRole('button', { name: /Add feature/i }))
 

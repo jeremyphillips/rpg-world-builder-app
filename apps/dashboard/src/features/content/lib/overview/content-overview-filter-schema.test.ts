@@ -6,7 +6,7 @@ import { buildContentFilterSchema } from './content-overview-filter-schema'
 
 type Row = WithCampaignAccess<{
   name: string
-  source: 'system' | 'homebrew'
+  catalogLayer: 'system' | 'homebrew'
   status: 'draft' | 'published'
   hitDie: number
 }>
@@ -43,14 +43,14 @@ describe('content-overview-filter-schema', () => {
     const filtered = applyFilterSchema(schema, { name: 'wiz', campaignAvailability: 'all' }, [
       {
         name: 'Wizard',
-        source: 'system',
+        catalogLayer: 'system',
         status: 'published',
         hitDie: 6,
         campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
       },
       {
         name: 'Fighter',
-        source: 'system',
+        catalogLayer: 'system',
         status: 'published',
         hitDie: 10,
         campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,

@@ -11,7 +11,7 @@ const uploadAvailable = {
 const fixtureSources = resolveAvailableContentMediaSources({
   media: mediaFixture,
   domain: 'character',
-  contentSource: 'homebrew',
+  catalogLayer: 'homebrew',
 }).sources
 
 const meta = {

@@ -13,7 +13,7 @@ import type { Location } from './location'
 
 const baseLocation = {
   rulesetId: 'srd-cc-5.2.1' as const,
-  source: 'homebrew' as const,
+  catalogLayer: 'homebrew' as const,
   status: 'published' as const,
   campaignId: 'camp_1',
   id: 'loc_test',

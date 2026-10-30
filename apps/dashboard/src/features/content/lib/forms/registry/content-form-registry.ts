@@ -5,7 +5,7 @@ import type { FormItem, FormValueSync, TabbedFormTab } from '@rpg/ui/form'
 import type {
   ArmorClassRules,
   ContentMediaDomain,
-  ContentSource,
+  CatalogLayer,
   ContentValidationIntent,
   Equipment,
   EquipmentKind,
@@ -46,7 +46,7 @@ export type ContentFormCtx = {
    * per-row delete-locking (system rows are protected) without a per-row
    * `source` field on the embedded element.
    */
-  entitySource?: ContentSource
+  entityCatalogLayer?: CatalogLayer
   /** Immutable catalog slug on edit — omitted from RHF because slug is envelope-only. */
   entitySlug?: string
   /** Ruleset for system artwork resolution in media fields. */

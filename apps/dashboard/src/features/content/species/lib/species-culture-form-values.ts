@@ -1,13 +1,13 @@
-import type { ContentSource, SpeciesCultureConfig } from '@rpg/contracts'
+import type { CatalogLayer, SpeciesCultureConfig } from '@rpg/contracts'
 
 import { deriveSlugForCreate } from '../../lib/forms/registry/content-form-key-helpers'
 import type { SpeciesCultureFormValues } from './species-culture-form-fields'
 
 function buildPersistedNaming(
   culture: SpeciesCultureFormValues,
-  entitySource: ContentSource,
+  entityCatalogLayer: CatalogLayer,
 ): SpeciesCultureConfig['naming'] {
-  if (entitySource === 'homebrew') {
+  if (entityCatalogLayer === 'homebrew') {
     return { supported: false }
   }
 
@@ -27,14 +27,14 @@ export function normalizeSpeciesCultureForPersist({
   slug,
   culture,
   existingCultureId,
-  entitySource = 'homebrew',
+  entityCatalogLayer = 'homebrew',
 }: {
   slug: string
   culture: SpeciesCultureFormValues
   existingCultureId?: string
-  entitySource?: ContentSource
+  entityCatalogLayer?: CatalogLayer
 }): SpeciesCultureConfig {
-  const naming = buildPersistedNaming(culture, entitySource)
+  const naming = buildPersistedNaming(culture, entityCatalogLayer)
 
   if (culture.useOverride !== true) {
     return { naming }
@@ -62,16 +62,16 @@ export function cultureFromFormValues(
   {
     slug,
     existingCultureId,
-    entitySource = 'homebrew',
+    entityCatalogLayer = 'homebrew',
   }: {
     slug: string
     existingCultureId?: string
-    entitySource?: ContentSource
+    entityCatalogLayer?: CatalogLayer
   },
 ): SpeciesCultureConfig | undefined {
   if (culture === undefined) {
     return undefined
   }
 
-  return normalizeSpeciesCultureForPersist({ slug, culture, existingCultureId, entitySource })
+  return normalizeSpeciesCultureForPersist({ slug, culture, existingCultureId, entityCatalogLayer })
 }

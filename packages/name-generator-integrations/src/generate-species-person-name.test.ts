@@ -24,7 +24,7 @@ const namingCapableDwarf: SpeciesCultureInput = {
   id: 'srd-cc-5.2.1:dwarf',
   slug: 'dwarf',
   name: 'Dwarf',
-  source: 'system',
+  catalogLayer: 'system',
   culture: { naming: { supported: true, personalNameComponents: ['clan'] } },
   languageAffinities: ['dwarvish'],
 }
@@ -33,14 +33,14 @@ const unsupportedSpecies: SpeciesCultureInput = {
   id: 'srd-cc-5.2.1:customfolk',
   slug: 'customfolk',
   name: 'Customfolk',
-  source: 'system',
+  catalogLayer: 'system',
 }
 
 const homebrewSpecies: SpeciesCultureInput = {
   id: 'homebrew:river-folk',
   slug: 'river-folk',
   name: 'River Folk',
-  source: 'homebrew',
+  catalogLayer: 'homebrew',
   culture: { naming: { supported: true } },
 }
 

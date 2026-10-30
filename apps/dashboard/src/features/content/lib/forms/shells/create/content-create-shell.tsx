@@ -298,7 +298,7 @@ function ContentCreateForm({
             ...formCtx,
             campaignId,
             mode: 'create',
-            entitySource: 'homebrew',
+            entityCatalogLayer: 'homebrew',
             validationIntent: 'draft',
           }}
           initialValues={initialValues}

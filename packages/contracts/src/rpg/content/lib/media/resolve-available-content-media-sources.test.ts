@@ -31,7 +31,7 @@ describe('resolveAvailableContentMediaSources', () => {
         roles: {},
       },
       domain: 'character',
-      contentSource: 'homebrew',
+      catalogLayer: 'homebrew',
     })
 
     expect(result.contextStatus).toBe('complete')
@@ -48,7 +48,7 @@ describe('resolveAvailableContentMediaSources', () => {
     const result = resolveAvailableContentMediaSources({
       media: emptyContentMediaSchema,
       domain: 'class',
-      contentSource: 'system',
+      catalogLayer: 'system',
       subject: contentTypeSubject('classes'),
       slug: 'fighter',
     })
@@ -62,7 +62,7 @@ describe('resolveAvailableContentMediaSources', () => {
     const result = resolveAvailableContentMediaSources({
       media: emptyContentMediaSchema,
       domain: 'class',
-      contentSource: 'system',
+      catalogLayer: 'system',
       subject: contentTypeSubject('classes'),
       slug: 'fighter',
       rulesetId: 'srd-cc-5.2.1',
@@ -97,7 +97,7 @@ describe('resolveAvailableContentMediaSources', () => {
         },
       },
       domain: 'class',
-      contentSource: 'system',
+      catalogLayer: 'system',
       subject: contentTypeSubject('classes'),
       slug: 'fighter',
       rulesetId: 'srd-cc-5.2.1',
@@ -116,7 +116,7 @@ describe('display and workspace source parity', () => {
     domain: 'class' as const,
     subject: contentTypeSubject('classes'),
     slug: 'fighter',
-    contentSource: 'system' as const,
+    catalogLayer: 'system' as const,
     rulesetId: 'srd-cc-5.2.1',
   }
 
@@ -219,7 +219,7 @@ describe('display and workspace source parity', () => {
       media,
       subject: systemClassContext.subject,
       slug: systemClassContext.slug,
-      contentSource: systemClassContext.contentSource,
+      catalogLayer: systemClassContext.catalogLayer,
       rulesetId: systemClassContext.rulesetId,
       allowedRoles: ['primary'],
     })
@@ -264,7 +264,7 @@ describe('registry-driven invariant', () => {
       const media = emptyContentMediaSchema
       const context = {
         ...entry,
-        contentSource: 'system' as const,
+        catalogLayer: 'system' as const,
         rulesetId: 'srd-cc-5.2.1',
       }
       const availability = resolveAvailableContentMediaSources({ media, ...context })

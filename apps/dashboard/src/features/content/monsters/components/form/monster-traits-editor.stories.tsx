@@ -11,7 +11,7 @@ import { MonsterTraitsEditor } from './monster-traits-editor'
 const meta = {
   title: 'Dashboard/Content/Monsters/MonsterTraitsEditor',
   component: MonsterTraitsEditor,
-  args: { ctx: { entitySource: 'homebrew' } },
+  args: { ctx: { entityCatalogLayer: 'homebrew' } },
 } satisfies Meta<typeof MonsterTraitsEditor>
 
 export default meta
@@ -22,7 +22,7 @@ function Host({ values, width }: { values?: MonsterFormValues; width?: number })
   const form = useForm<MonsterFormValues>({
     defaultValues: values ?? resolveMonsterCreateDefaultValues(),
   })
-  const ctx: ContentFormCtx = { entitySource: 'homebrew' }
+  const ctx: ContentFormCtx = { entityCatalogLayer: 'homebrew' }
   return (
     <div style={width ? { maxWidth: width } : undefined}>
       <FormProvider {...form}>

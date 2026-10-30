@@ -34,7 +34,7 @@ interface CharacterClass {
   hitDie: number
   primaryAbility: string
   spellcasting: boolean
-  source: 'system' | 'homebrew'
+  catalogLayer: 'system' | 'homebrew'
 }
 
 const CLASSES: CharacterClass[] = [
@@ -44,16 +44,23 @@ const CLASSES: CharacterClass[] = [
     hitDie: 12,
     primaryAbility: 'STR',
     spellcasting: false,
-    source: 'system',
+    catalogLayer: 'system',
   },
-  { id: '2', name: 'Bard', hitDie: 8, primaryAbility: 'CHA', spellcasting: true, source: 'system' },
+  {
+    id: '2',
+    name: 'Bard',
+    hitDie: 8,
+    primaryAbility: 'CHA',
+    spellcasting: true,
+    catalogLayer: 'system',
+  },
   {
     id: '3',
     name: 'Cleric',
     hitDie: 8,
     primaryAbility: 'WIS',
     spellcasting: true,
-    source: 'system',
+    catalogLayer: 'system',
   },
   {
     id: '4',
@@ -61,7 +68,7 @@ const CLASSES: CharacterClass[] = [
     hitDie: 8,
     primaryAbility: 'WIS',
     spellcasting: true,
-    source: 'system',
+    catalogLayer: 'system',
   },
   {
     id: '5',
@@ -69,7 +76,7 @@ const CLASSES: CharacterClass[] = [
     hitDie: 10,
     primaryAbility: 'STR',
     spellcasting: false,
-    source: 'system',
+    catalogLayer: 'system',
   },
   {
     id: '6',
@@ -77,7 +84,7 @@ const CLASSES: CharacterClass[] = [
     hitDie: 8,
     primaryAbility: 'DEX',
     spellcasting: false,
-    source: 'system',
+    catalogLayer: 'system',
   },
   {
     id: '7',
@@ -85,7 +92,7 @@ const CLASSES: CharacterClass[] = [
     hitDie: 10,
     primaryAbility: 'STR',
     spellcasting: true,
-    source: 'system',
+    catalogLayer: 'system',
   },
   {
     id: '8',
@@ -93,7 +100,7 @@ const CLASSES: CharacterClass[] = [
     hitDie: 10,
     primaryAbility: 'DEX',
     spellcasting: true,
-    source: 'system',
+    catalogLayer: 'system',
   },
   {
     id: '9',
@@ -101,7 +108,7 @@ const CLASSES: CharacterClass[] = [
     hitDie: 8,
     primaryAbility: 'DEX',
     spellcasting: false,
-    source: 'system',
+    catalogLayer: 'system',
   },
   {
     id: '10',
@@ -109,7 +116,7 @@ const CLASSES: CharacterClass[] = [
     hitDie: 6,
     primaryAbility: 'CHA',
     spellcasting: true,
-    source: 'system',
+    catalogLayer: 'system',
   },
   {
     id: '11',
@@ -117,7 +124,7 @@ const CLASSES: CharacterClass[] = [
     hitDie: 8,
     primaryAbility: 'CHA',
     spellcasting: true,
-    source: 'system',
+    catalogLayer: 'system',
   },
   {
     id: '12',
@@ -125,7 +132,7 @@ const CLASSES: CharacterClass[] = [
     hitDie: 6,
     primaryAbility: 'INT',
     spellcasting: true,
-    source: 'system',
+    catalogLayer: 'system',
   },
   {
     id: '13',
@@ -133,7 +140,7 @@ const CLASSES: CharacterClass[] = [
     hitDie: 8,
     primaryAbility: 'INT',
     spellcasting: true,
-    source: 'homebrew',
+    catalogLayer: 'homebrew',
   },
 ]
 
@@ -230,7 +237,7 @@ const classFilterSchema = createFilterSchema<CharacterClass, ClassFilterState>([
       { label: 'System', value: 'system' },
       { label: 'Homebrew', value: 'homebrew' },
     ],
-    getValue: (row) => row.source,
+    getValue: (row) => row.catalogLayer,
   }),
 ])
 

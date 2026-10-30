@@ -14,7 +14,7 @@ export function resolveFormPreviewDisplayImage(input: {
     media: input.media,
     contentType: input.contentType,
     slug: input.slug,
-    contentSource: input.ctx.entitySource ?? 'homebrew',
+    catalogLayer: input.ctx.entityCatalogLayer ?? 'homebrew',
     rulesetId: input.ctx.rulesetId,
     surface: 'field',
   })

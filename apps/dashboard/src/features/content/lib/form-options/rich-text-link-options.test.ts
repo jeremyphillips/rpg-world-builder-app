@@ -65,8 +65,8 @@ describe('buildRichTextInternalLinkOptions', () => {
 
   it('marks homebrew detail options with a source label', () => {
     const campaignId = 'campaign-123'
-    const homebrewSpell = { ...pickSpell('fire-bolt'), source: 'homebrew' as const }
-    const homebrewFeat = { ...pickFeat('alert'), source: 'homebrew' as const }
+    const homebrewSpell = { ...pickSpell('fire-bolt'), catalogLayer: 'homebrew' as const }
+    const homebrewFeat = { ...pickFeat('alert'), catalogLayer: 'homebrew' as const }
 
     const options = buildRichTextInternalLinkOptions({
       campaignId,

@@ -1,7 +1,7 @@
 import type {
   CharacterClass,
   ContentMedia,
-  ContentSource,
+  CatalogLayer,
   ContentTypeKey,
   Monster,
   Species,
@@ -12,7 +12,7 @@ import type { ResolveDashboardContentDisplayInput } from './content-display-imag
 export type ContentDisplayImageRecord = {
   media?: ContentMedia | null
   slug: string
-  source: ContentSource
+  catalogLayer: CatalogLayer
   rulesetId?: string
 }
 
@@ -32,7 +32,7 @@ export function buildContentDisplayImageInput(
     media: record.media,
     contentType,
     slug: record.slug,
-    contentSource: record.source,
+    catalogLayer: record.catalogLayer,
     rulesetId: record.rulesetId,
     surface,
   }
@@ -47,7 +47,7 @@ export function buildClassContentDisplayImageInput(
     {
       media: characterClass.media,
       slug: characterClass.slug,
-      source: characterClass.source,
+      catalogLayer: characterClass.catalogLayer,
       rulesetId: characterClass.rulesetId,
     },
     surface,
@@ -63,7 +63,7 @@ export function buildMonsterContentDisplayImageInput(
     {
       media: monster.media,
       slug: monster.slug,
-      source: monster.source,
+      catalogLayer: monster.catalogLayer,
       rulesetId: monster.rulesetId,
     },
     surface,
@@ -79,7 +79,7 @@ export function buildSpeciesContentDisplayImageInput(
     {
       media: species.media,
       slug: species.slug,
-      source: species.source,
+      catalogLayer: species.catalogLayer,
       rulesetId: species.rulesetId,
     },
     surface,
@@ -87,21 +87,21 @@ export function buildSpeciesContentDisplayImageInput(
 }
 
 export function buildLocationContentDisplayImageInput(
-  location: Pick<ContentDisplayImageRecord, 'media' | 'slug' | 'source' | 'rulesetId'>,
+  location: Pick<ContentDisplayImageRecord, 'media' | 'slug' | 'catalogLayer' | 'rulesetId'>,
   surface: ResolveDashboardContentDisplayInput['surface'] = 'compact',
 ): ResolveDashboardContentDisplayInput {
   return buildContentDisplayImageInput('locations', location, surface)
 }
 
 export function buildOrganizationContentDisplayImageInput(
-  organization: Pick<ContentDisplayImageRecord, 'media' | 'slug' | 'source' | 'rulesetId'>,
+  organization: Pick<ContentDisplayImageRecord, 'media' | 'slug' | 'catalogLayer' | 'rulesetId'>,
   surface: ResolveDashboardContentDisplayInput['surface'] = 'compact',
 ): ResolveDashboardContentDisplayInput {
   return buildContentDisplayImageInput('organizations', organization, surface)
 }
 
 export function buildEquipmentContentDisplayImageInput(
-  equipment: Pick<ContentDisplayImageRecord, 'media' | 'slug' | 'source' | 'rulesetId'>,
+  equipment: Pick<ContentDisplayImageRecord, 'media' | 'slug' | 'catalogLayer' | 'rulesetId'>,
   surface: ResolveDashboardContentDisplayInput['surface'] = 'compact',
 ): ResolveDashboardContentDisplayInput {
   return buildContentDisplayImageInput('equipment', equipment, surface)

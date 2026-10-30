@@ -1,4 +1,4 @@
-import type { ContentSource } from '../envelope'
+import type { CatalogLayer } from '../envelope'
 import type { ContentMedia } from '../../../primitives/media/content-media'
 import {
   buildSystemContentImageVirtualId,
@@ -69,7 +69,7 @@ export type AvailableContentMediaSource =
 export type ResolveAvailableContentMediaSourcesInput = {
   media: ContentMedia
   domain: ContentMediaDomain
-  contentSource?: ContentSource
+  catalogLayer?: CatalogLayer
   subject?: SystemImageSubject
   slug?: string
   rulesetId?: string
@@ -122,11 +122,11 @@ function evaluateSourceContext(
 ): Pick<ResolveAvailableContentMediaSourcesResult, 'contextStatus' | 'missing'> {
   const missing: ContentMediaSourceContextField[] = []
 
-  if (input.contentSource === undefined) {
+  if (input.catalogLayer === undefined) {
     return { contextStatus: 'incomplete', missing: ['contentSource'] }
   }
 
-  if (input.contentSource !== 'system') {
+  if (input.catalogLayer !== 'system') {
     return { contextStatus: 'complete', missing: [] }
   }
 
@@ -152,7 +152,7 @@ function buildSystemSources(input: {
   domain: ContentMediaDomain
   subject: SystemImageSubject
   slug: string
-  contentSource: ContentSource
+  catalogLayer: CatalogLayer
   rulesetId?: string
   campaignImageSetId?: string
 }): AvailableContentMediaSystemSource[] {
@@ -177,7 +177,7 @@ function buildSystemSources(input: {
       subject: derived.subject,
       assetRole: derived.assetRole,
       slug: derived.slug,
-      contentSource: input.contentSource,
+      catalogLayer: input.catalogLayer,
     })
     if (!resolved) continue
 
@@ -229,7 +229,7 @@ export function resolveAvailableContentMediaSources(
   const context = evaluateSourceContext(input)
   const uploads = buildUploadSources(input.media, policy.allowedRoles)
 
-  if (context.contextStatus === 'incomplete' || input.contentSource !== 'system') {
+  if (context.contextStatus === 'incomplete' || input.catalogLayer !== 'system') {
     return {
       ...context,
       sources: uploads,
@@ -241,7 +241,7 @@ export function resolveAvailableContentMediaSources(
     domain: input.domain,
     subject: input.subject!,
     slug: input.slug!.trim(),
-    contentSource: input.contentSource,
+    catalogLayer: input.catalogLayer,
     rulesetId: input.rulesetId,
     campaignImageSetId: input.campaignImageSetId,
   })

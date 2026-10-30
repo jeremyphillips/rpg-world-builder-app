@@ -21,7 +21,7 @@ const deriveUploadAvailability: DeriveMediaAvailability = (media: ContentMedia) 
   resolveAvailableContentMediaSources({
     media,
     domain: 'character',
-    contentSource: 'homebrew',
+    catalogLayer: 'homebrew',
   })
 
 function availabilityFor(media: ContentMedia) {

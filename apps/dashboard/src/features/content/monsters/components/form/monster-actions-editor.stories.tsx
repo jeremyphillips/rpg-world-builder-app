@@ -13,7 +13,7 @@ const meta = {
   component: MonsterActionsEditor,
   args: {
     ctx: {
-      entitySource: 'homebrew',
+      entityCatalogLayer: 'homebrew',
       equipmentCatalogStatus: 'ready',
       equipmentCatalogById: new Map(),
     },
@@ -31,7 +31,7 @@ function Host({ width }: { width?: number }) {
   ]
   const form = useForm<MonsterFormValues>({ defaultValues: values })
   const ctx: ContentFormCtx = {
-    entitySource: 'homebrew',
+    entityCatalogLayer: 'homebrew',
     equipmentCatalogStatus: 'ready',
     equipmentCatalogById: new Map(),
   }

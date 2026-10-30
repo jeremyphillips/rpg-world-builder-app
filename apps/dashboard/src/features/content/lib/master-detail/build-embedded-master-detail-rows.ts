@@ -32,7 +32,7 @@ export type BuildEmbeddedMasterDetailRowsParams = {
     field: { id: string }
     index: number
     row: unknown
-    entitySource: ContentFormCtx['entitySource']
+    entityCatalogLayer: ContentFormCtx['entityCatalogLayer']
     getRowIssueCount: (index: number) => number
   }) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string }
   getRowIssueCount: (index: number) => number
@@ -84,7 +84,7 @@ export function buildEmbeddedMasterDetailRows({
       field,
       index: formIndex,
       row,
-      entitySource: formCtx.entitySource,
+      entityCatalogLayer: formCtx.entityCatalogLayer,
       getRowIssueCount,
     })
     const extraReasons =
@@ -97,7 +97,7 @@ export function buildEmbeddedMasterDetailRows({
       field,
       index: formIndex,
       row: row as { id?: string } | undefined,
-      entitySource: formCtx.entitySource,
+      entityCatalogLayer: formCtx.entityCatalogLayer,
       seedRowIds,
       getRowIssueCount,
       title: masterDetailItemTitle(listDisplay.title, itemNoun),

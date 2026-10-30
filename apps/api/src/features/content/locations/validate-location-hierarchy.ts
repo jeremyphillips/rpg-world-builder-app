@@ -46,7 +46,7 @@ function entityBody(entity: Record<string, unknown>): Record<string, unknown> {
     id: _id,
     slug: _slug,
     rulesetId: _rulesetId,
-    source: _source,
+    catalogLayer: _catalogLayer,
     status: _status,
     campaignId: _campaignId,
     createdAt: _createdAt,

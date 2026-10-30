@@ -44,7 +44,7 @@ Equipment, Location, Organization, Game term). Full product and UX specification
    carries `sourceKind`, `sourcePersistence` (`persisted` uploads vs `virtual` registry
    art), and per-role `assignments` (`derived` defaults vs `persisted` role bindings).
    The result includes `contextStatus: 'complete' | 'incomplete'` and `missing` lookup
-   fields. System lookup requires `contentSource: 'system'`, subject, slug, and an image
+   fields. System lookup requires `catalogLayer: 'system'`, subject, slug, and an image
    set; homebrew domains (including characters) need only persisted media plus
    `contentSource`. Create vs edit is **not** in contracts — the dashboard treats
    `incomplete` as uploads-only on create and as a blocking edit state.

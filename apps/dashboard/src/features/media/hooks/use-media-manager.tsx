@@ -68,7 +68,7 @@ function normalizeManagerPersistedMedia(
   allowedRoles: readonly MediaRole[],
 ): ContentMedia {
   if (
-    contentContext.contentSource === 'system' &&
+    contentContext.catalogLayer === 'system' &&
     !(contentContext.subject && contentContext.slug?.trim())
   ) {
     return structuredClone(media)
@@ -78,7 +78,7 @@ function normalizeManagerPersistedMedia(
     media: structuredClone(media),
     subject: contentContext.subject ?? contentTypeSubject('classes'),
     slug: contentContext.slug ?? '',
-    contentSource: contentContext.contentSource,
+    catalogLayer: contentContext.catalogLayer,
     rulesetId: contentContext.rulesetId,
     allowedRoles,
   })

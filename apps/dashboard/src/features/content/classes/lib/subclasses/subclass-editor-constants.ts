@@ -10,6 +10,6 @@ export function createDraftSubclassId(): string {
   return `${DRAFT_SUBCLASS_ID_PREFIX}${crypto.randomUUID()}`
 }
 
-export function isSubclassDeletable(source: 'system' | 'homebrew', id: string): boolean {
-  return isDraftSubclassId(id) || source === 'homebrew'
+export function isSubclassDeletable(catalogLayer: 'system' | 'homebrew', id: string): boolean {
+  return isDraftSubclassId(id) || catalogLayer === 'homebrew'
 }

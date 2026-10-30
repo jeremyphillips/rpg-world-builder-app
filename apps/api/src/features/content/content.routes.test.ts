@@ -291,8 +291,8 @@ describe('content draft write routes', () => {
         .send(input)
         .expect(201)
 
-      const entity = res.body[responseKey] as { id: string; status: string; source: string }
-      expect(entity.source).toBe('homebrew')
+      const entity = res.body[responseKey] as { id: string; status: string; catalogLayer: string }
+      expect(entity.catalogLayer).toBe('homebrew')
       expect(entity.status).toBe('draft')
       expect(entity.id).toBeTruthy()
     },
@@ -345,7 +345,7 @@ describe('content write routes', () => {
       .send(minimalFeatInput)
       .expect(201)
 
-    expect(res.body.feats.source).toBe('homebrew')
+    expect(res.body.feats.catalogLayer).toBe('homebrew')
     expect(res.body.feats.slug).toBe('route-write-feat')
   })
 
@@ -367,7 +367,7 @@ describe('content write routes', () => {
       .send({ name: 'Route Patched Alert' })
       .expect(200)
 
-    expect(patchRes.body.feats.source).toBe('system')
+    expect(patchRes.body.feats.catalogLayer).toBe('system')
     expect(patchRes.body.feats.name).toBe('Route Patched Alert')
 
     const reloadRes = await agent
@@ -391,7 +391,7 @@ describe('content write routes', () => {
       .expect(201)
 
     const entityId = createRes.body.skillProficiencies.id as string
-    expect(createRes.body.skillProficiencies.source).toBe('homebrew')
+    expect(createRes.body.skillProficiencies.catalogLayer).toBe('homebrew')
 
     const patchRes = await agent
       .patch(`/api/campaigns/${campaignId}/content/skill-proficiencies/${entityId}`)

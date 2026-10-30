@@ -2,7 +2,7 @@
   "id": "srd-cc-5.2.1:bard",
   "slug": "bard",
   "rulesetId": "srd-cc-5.2.1",
-  "source": "system",
+  "catalogLayer": "system",
   "campaignId": null,
   "createdAt": "2024-05-21T00:00:00.000Z",
   "updatedAt": "2024-05-21T00:00:00.000Z",

@@ -31,7 +31,7 @@ export const unsupportedNamingDwarfSpecies = makeSpecies({
   id: 'srd-cc-5.2.1:dwarf-no-naming',
   slug: 'dwarf-no-naming',
   name: 'Dwarf (no naming)',
-  source: 'system',
+  catalogLayer: 'system',
   campaignId: null,
   culture: undefined,
 })
@@ -41,7 +41,7 @@ export const homebrewSpeciesFixture = makeSpecies({
   id: 'homebrew:river-folk',
   slug: 'river-folk',
   name: 'River Folk',
-  source: 'homebrew',
+  catalogLayer: 'homebrew',
 })
 
 export { populatedBuilderCatalog }

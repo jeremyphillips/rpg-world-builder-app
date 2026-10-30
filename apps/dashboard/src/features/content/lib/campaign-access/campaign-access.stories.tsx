@@ -62,7 +62,7 @@ export const HeadingBadgesDraftHomebrew: Story = {
   render: () => (
     <ContentEditHeadingBadges
       contentType="feats"
-      source="homebrew"
+      catalogLayer="homebrew"
       status="draft"
       campaignAccess={DEFAULT_CONTENT_CAMPAIGN_ACCESS}
     />
@@ -73,7 +73,7 @@ export const HeadingBadgesInactiveSystem: Story = {
   render: () => (
     <ContentEditHeadingBadges
       contentType="feats"
-      source="system"
+      catalogLayer="system"
       status="published"
       campaignAccess={{
         ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,

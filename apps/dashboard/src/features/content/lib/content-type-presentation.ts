@@ -1,9 +1,9 @@
 import type { ContentTypeKey } from '@rpg/contracts'
 
-export type ContentSourcePresentation = 'badge-and-filter' | 'suppressed'
+export type CatalogLayerPresentation = 'badge-and-filter' | 'suppressed'
 
 export type ContentTypePresentationPolicy = {
-  source: ContentSourcePresentation
+  source: CatalogLayerPresentation
 }
 
 /**
@@ -31,6 +31,6 @@ export function getContentTypePresentation(
   return CONTENT_TYPE_PRESENTATION[contentType]
 }
 
-export function shouldPresentContentSource(contentType: ContentTypeKey): boolean {
+export function shouldPresentCatalogLayer(contentType: ContentTypeKey): boolean {
   return getContentTypePresentation(contentType).source === 'badge-and-filter'
 }

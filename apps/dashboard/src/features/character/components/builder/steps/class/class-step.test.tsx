@@ -81,7 +81,7 @@ describe('ClassStep', () => {
       ...fighter,
       id: 'homebrew-custom-warrior',
       slug: 'custom-warrior',
-      source: 'homebrew' as const,
+      catalogLayer: 'homebrew' as const,
       media: undefined,
       imageKey: undefined,
     }
@@ -118,7 +118,7 @@ describe('ClassStep', () => {
       ...fighter,
       id: 'homebrew-custom-warrior',
       slug: 'custom-warrior',
-      source: 'homebrew' as const,
+      catalogLayer: 'homebrew' as const,
       media: undefined,
       imageKey: undefined,
     }

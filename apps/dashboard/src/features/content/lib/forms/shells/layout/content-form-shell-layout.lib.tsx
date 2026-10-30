@@ -1,7 +1,7 @@
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import type {
   ContentCampaignAccessPatch,
-  ContentSource,
+  CatalogLayer,
   ContentTypeKey,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
@@ -40,7 +40,7 @@ export interface ContentFormCampaignAccessProps {
   availabilityPresentation?: CampaignAvailabilityPresentation
   form?: UseFormReturn<FieldValues>
   mediaDomain?: ContentMediaDomain
-  entitySource?: ContentSource
+  entityCatalogLayer?: CatalogLayer
   formMode?: 'create' | 'edit'
 }
 
@@ -49,7 +49,7 @@ function ContentMediaIdentitySlot({
   form,
   campaignId,
   contentType,
-  contentSource,
+  catalogLayer,
   entitySlug,
   rulesetId,
   formMode,
@@ -58,7 +58,7 @@ function ContentMediaIdentitySlot({
   form: UseFormReturn<FieldValues>
   campaignId?: string
   contentType: ContentTypeKey
-  contentSource?: ContentSource
+  catalogLayer?: CatalogLayer
   entitySlug?: string
   rulesetId?: string
   formMode?: 'create' | 'edit'
@@ -71,10 +71,10 @@ function ContentMediaIdentitySlot({
       scope={{ kind: 'campaign-content', campaignId: campaignId ?? 'draft' }}
       formMode={formMode}
       contentContext={
-        contentSource !== undefined
+        catalogLayer !== undefined
           ? {
               domain,
-              contentSource,
+              catalogLayer,
               subject: contentTypeSubject(contentType),
               slug: slug?.trim() ? slug : undefined,
               rulesetId,
@@ -98,7 +98,7 @@ export function ContentFormHeader({
   availabilityPresentation = 'disclosure',
   form,
   mediaDomain,
-  entitySource,
+  entityCatalogLayer,
   formMode,
 }: ContentFormCampaignAccessProps) {
   const { density } = useFormSectionContext()
@@ -138,7 +138,7 @@ export function ContentFormHeader({
             form={form}
             campaignId={campaignId}
             contentType={def.routeKey as ContentTypeKey}
-            contentSource={entitySource}
+            catalogLayer={entityCatalogLayer}
             entitySlug={ctx.entitySlug}
             rulesetId={ctx.rulesetId}
             formMode={formMode}

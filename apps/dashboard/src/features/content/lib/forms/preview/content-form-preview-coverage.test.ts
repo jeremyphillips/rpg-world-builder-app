@@ -14,7 +14,11 @@ describe('ContentFormDef preview coverage', () => {
   })
 
   it.each(previewEntries)('$routeKey buildSections keys match buildTabs ids', (def) => {
-    const ctx = { campaignId: 'camp_1', mode: 'create' as const, entitySource: 'homebrew' as const }
+    const ctx = {
+      campaignId: 'camp_1',
+      mode: 'create' as const,
+      entityCatalogLayer: 'homebrew' as const,
+    }
     const tabs = def.buildTabs?.(ctx) ?? []
     const values = { ...def.createDefaultValues, name: '' }
     const sections = def.preview!.buildSections(values, ctx)
@@ -28,7 +32,7 @@ describe('ContentFormDef preview coverage', () => {
       const ctx = {
         campaignId: 'camp_1',
         mode: 'create' as const,
-        entitySource: 'homebrew' as const,
+        entityCatalogLayer: 'homebrew' as const,
       }
       const values = { ...def.createDefaultValues, name: '' }
 

@@ -1,8 +1,11 @@
 import {
   contentMediaSchema,
   contentStatusToValidationIntent,
+  ContentProvenanceWriteError,
+  reconcileContentProvenance,
   type ContentMedia,
-  type ContentSource,
+  type CatalogLayer,
+  type ContentProvenanceWriteAuthority,
   type ContentStatus,
   type ContentValidationIntent,
   type SystemRulesetId,
@@ -45,21 +48,25 @@ function withCanonicalContentMediaRoles(media: ContentMedia): ContentMedia {
 
 export interface CreateHomebrewContentOptions {
   status?: ContentStatus
-  source?: ContentSource
+  catalogLayer?: CatalogLayer
   slugCollisionPolicy?: ContentSlugCollisionPolicy
   resolvedSlug?: ResolvedContentSlug
   /** Skip nested id assignment — duplicate transform already regenerated authored ids. */
   preserveNestedIds?: boolean
   /** Bind every Mongo operation performed by this create to an existing transaction. */
   session?: ClientSession
+  provenanceAuthority?: ContentProvenanceWriteAuthority
+  provenanceSourceEntity?: Record<string, unknown>
+  contentTypeKey?: ApiContentTypeKey
 }
 
 type StoredEntity = {
   id: string
   slug: string
-  source: ContentSource
+  catalogLayer: CatalogLayer
   status: ContentStatus
   campaignId: string | null
+  provenance?: unknown
 }
 
 function stripUndefined(input: Record<string, unknown>): Record<string, unknown> {
@@ -71,14 +78,57 @@ function entityBody(entity: Record<string, unknown>): Record<string, unknown> {
     id: _id,
     slug: _slug,
     rulesetId: _rulesetId,
-    source: _source,
+    catalogLayer: _catalogLayer,
     status: _status,
     campaignId: _campaignId,
+    provenance: _provenance,
     createdAt: _createdAt,
     updatedAt: _updatedAt,
     ...body
   } = entity
   return body
+}
+
+function wrapContentProvenanceWriteError(err: unknown): never {
+  if (err instanceof ContentProvenanceWriteError) {
+    throw new HttpError(400, err.code, err.message)
+  }
+  throw err
+}
+
+function stripRecordProvenance(input: Record<string, unknown>): Record<string, unknown> {
+  const { provenance: _provenance, ...rest } = input
+  return rest
+}
+
+function extractRecordProvenance(input: Record<string, unknown>): unknown | undefined {
+  return input.provenance
+}
+
+function applyRecordProvenanceReconciliation(args: {
+  authority: ContentProvenanceWriteAuthority
+  catalogLayer: CatalogLayer
+  rulesetId: SystemRulesetId
+  contentTypeKey?: ApiContentTypeKey
+  normalized: Record<string, unknown>
+  existing?: Record<string, unknown>
+  provenanceSource?: Record<string, unknown>
+}): { normalized: Record<string, unknown>; provenance?: unknown } {
+  try {
+    const reconciled = reconcileContentProvenance({
+      authority: args.authority,
+      catalogLayer: args.catalogLayer,
+      rulesetId: args.rulesetId,
+      contentTypeKey: args.contentTypeKey,
+      normalized: args.normalized,
+      existing: args.existing,
+      provenanceSource: args.provenanceSource,
+    })
+    const provenance = extractRecordProvenance(reconciled)
+    return { normalized: stripRecordProvenance(reconciled), provenance }
+  } catch (err) {
+    wrapContentProvenanceWriteError(err)
+  }
 }
 
 async function loadCampaignSlugs<T extends StoredEntity>(
@@ -318,7 +368,7 @@ function parseSystemPatchedStoredEntity<T extends StoredEntity>(
     ...mergedBodyForParse,
     id: existing.id,
     slug: existing.slug,
-    source: existing.source,
+    catalogLayer: existing.catalogLayer,
     status: existing.status,
     campaignId: existing.campaignId,
     rulesetId: existingRecord.rulesetId,
@@ -373,6 +423,7 @@ async function saveNewHomebrewRecordWithOptionalMedia<T extends StoredEntity>(
     slug: string
     status: ContentStatus
     body: Record<string, unknown>
+    provenance?: unknown
     mediaEnvelope?: ReturnType<typeof extractCatalogMediaWriteEnvelope>
     validationIntent: ContentValidationIntent
     session?: ClientSession
@@ -384,6 +435,7 @@ async function saveNewHomebrewRecordWithOptionalMedia<T extends StoredEntity>(
     rulesetId: input.rulesetId,
     slug: input.slug,
     status: input.status,
+    ...(input.provenance !== undefined && { provenance: input.provenance }),
     ...(input.mediaEnvelope ? bodyWithoutMedia : input.body),
   })
   await created.save(input.session ? { session: input.session } : undefined)
@@ -403,7 +455,7 @@ async function saveNewHomebrewRecordWithOptionalMedia<T extends StoredEntity>(
           config,
           campaignId: input.campaignId,
           entityId,
-          contentSource: 'homebrew',
+          catalogLayer: 'homebrew',
           slug: input.slug,
           rulesetId: input.rulesetId,
           envelope: input.mediaEnvelope,
@@ -440,6 +492,7 @@ type HomebrewCreatePersistInput = {
   slug: string
   status: ContentStatus
   body: Record<string, unknown>
+  provenance?: unknown
   mediaEnvelope?: ReturnType<typeof extractCatalogMediaWriteEnvelope>
   validationIntent: ContentValidationIntent
 }
@@ -475,6 +528,7 @@ async function createHomebrewWithSlugRetries<T extends StoredEntity>(
     input: Record<string, unknown>
     normalized: Record<string, unknown>
     body: Record<string, unknown>
+    provenance?: unknown
     requestedName: string
     status: ContentStatus
     mediaEnvelope?: ReturnType<typeof extractCatalogMediaWriteEnvelope>
@@ -489,6 +543,7 @@ async function createHomebrewWithSlugRetries<T extends StoredEntity>(
     input,
     normalized,
     body,
+    provenance,
     requestedName,
     status,
     mediaEnvelope,
@@ -529,6 +584,7 @@ async function createHomebrewWithSlugRetries<T extends StoredEntity>(
           slug,
           status,
           body,
+          provenance,
           mediaEnvelope,
           validationIntent,
         },
@@ -555,9 +611,9 @@ export async function createHomebrewContent<T extends StoredEntity>(
   const slugCollisionPolicy = options.slugCollisionPolicy ?? 'reject'
   const validationIntent = contentStatusToValidationIntent(status)
   const writeMode = options.preserveNestedIds ? 'duplicate' : 'create'
-  const normalized = normalizeWriteInput(rawInput, undefined, writeMode)
+  const normalizedRaw = normalizeWriteInput(rawInput, undefined, writeMode)
   const mediaEnvelope = isCatalogMediaContentType(config.typeName)
-    ? extractCatalogMediaWriteEnvelope(normalized)
+    ? extractCatalogMediaWriteEnvelope(normalizedRaw)
     : undefined
 
   if (mediaEnvelope && !areMongoTransactionsEnabled()) {
@@ -568,13 +624,25 @@ export async function createHomebrewContent<T extends StoredEntity>(
     )
   }
 
-  const input = parsePersistedWriteInput(config, normalized, 'create', validationIntent)
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {
     throw new HttpError(404, 'not_found', 'Campaign not found.')
   }
 
   const { rulesetId } = campaign
+  const provenanceAuthority =
+    options.provenanceAuthority ?? (options.provenanceSourceEntity ? 'carry' : 'preserve')
+
+  const { normalized, provenance } = applyRecordProvenanceReconciliation({
+    authority: provenanceAuthority,
+    catalogLayer: 'homebrew',
+    rulesetId,
+    contentTypeKey: options.contentTypeKey,
+    normalized: normalizedRaw,
+    provenanceSource: options.provenanceSourceEntity,
+  })
+
+  const input = parsePersistedWriteInput(config, normalized, 'create', validationIntent)
   const writeCtx = buildWriteContext(
     campaignId,
     rulesetId,
@@ -597,6 +665,7 @@ export async function createHomebrewContent<T extends StoredEntity>(
     input,
     normalized,
     body,
+    provenance,
     requestedName,
     status,
     mediaEnvelope,
@@ -721,7 +790,7 @@ export async function resolveContentEntityForWrite<T extends StoredEntity>(
     throw new HttpError(404, 'not_found', 'Content record not found.')
   }
 
-  if (existing.source === 'homebrew' && existing.campaignId !== campaignId) {
+  if (existing.catalogLayer === 'homebrew' && existing.campaignId !== campaignId) {
     throw new HttpError(403, 'forbidden', 'Cannot edit homebrew from another campaign.')
   }
 
@@ -735,7 +804,7 @@ async function resolveUpdateEffectiveBody<T extends StoredEntity>(
   existingBody: Record<string, unknown>,
   update: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
-  if (existing.source === 'homebrew') {
+  if (existing.catalogLayer === 'homebrew') {
     return mergeHomebrewEffectiveBody(existingBody, update)
   }
   if (!config.patchModel) {
@@ -761,9 +830,9 @@ export async function updateContentEntity<T extends StoredEntity>(
   )
 
   const existingBody = entityBody(existing as unknown as Record<string, unknown>)
-  const normalized = normalizeWriteInput(rawInput, existingBody, 'update')
+  const normalizedRaw = normalizeWriteInput(rawInput, existingBody, 'update')
   const mediaEnvelope = isCatalogMediaContentType(config.typeName)
-    ? extractCatalogMediaWriteEnvelope(normalized)
+    ? extractCatalogMediaWriteEnvelope(normalizedRaw)
     : undefined
 
   if (mediaEnvelope && !areMongoTransactionsEnabled()) {
@@ -774,8 +843,18 @@ export async function updateContentEntity<T extends StoredEntity>(
     )
   }
 
+  const { normalized, provenance } = applyRecordProvenanceReconciliation({
+    authority: 'preserve',
+    catalogLayer: existing.catalogLayer,
+    rulesetId: campaign.rulesetId,
+    normalized: normalizedRaw,
+    existing: existing as unknown as Record<string, unknown>,
+  })
+
   const validationIntent = contentStatusToValidationIntent(existing.status)
   const update = parsePersistedWriteInput(config, normalized, 'update', validationIntent)
+  const persistPayload =
+    provenance !== undefined ? { ...update, provenance } : (update as Record<string, unknown>)
   const effectiveBody = await resolveUpdateEffectiveBody(
     config,
     campaignId,
@@ -796,7 +875,7 @@ export async function updateContentEntity<T extends StoredEntity>(
   await runValidateBeforeWrite(config, writeCtx)
 
   const persistUpdate = async (payload: Record<string, unknown>, session?: ClientSession) => {
-    if (existing.source === 'homebrew') {
+    if (existing.catalogLayer === 'homebrew') {
       return updateHomebrewRecord(
         config,
         campaignId,
@@ -827,7 +906,7 @@ export async function updateContentEntity<T extends StoredEntity>(
             config,
             campaignId,
             entityId,
-            contentSource: existing.source,
+            catalogLayer: existing.catalogLayer,
             slug,
             rulesetId: campaign.rulesetId,
             envelope: mediaEnvelope,
@@ -836,11 +915,11 @@ export async function updateContentEntity<T extends StoredEntity>(
           session,
         ),
       )
-      return persistUpdate({ ...update, media: reconciledMedia }, session)
+      return persistUpdate({ ...persistPayload, media: reconciledMedia }, session)
     })
     return finalizeWriteResult(config, writeCtx, updated)
   }
 
-  const updated = await persistUpdate(update)
+  const updated = await persistUpdate(persistPayload)
   return finalizeWriteResult(config, writeCtx, updated)
 }

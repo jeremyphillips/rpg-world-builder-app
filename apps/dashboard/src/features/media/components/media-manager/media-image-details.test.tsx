@@ -13,7 +13,7 @@ const uploadAvailable = {
 const fixtureSources = resolveAvailableContentMediaSources({
   media: mediaFixture,
   domain: 'character',
-  contentSource: 'homebrew',
+  catalogLayer: 'homebrew',
 }).sources
 
 it('explains why a small image cannot have Portrait or Primary', () => {

@@ -20,7 +20,7 @@ const RULESET = 'srd-cc-5.2.1' as const
 
 const baseContentFields = {
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -69,7 +69,7 @@ const storedDruid: ClassStored = {
   id: `${RULESET}:druid`,
   slug: 'druid',
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',

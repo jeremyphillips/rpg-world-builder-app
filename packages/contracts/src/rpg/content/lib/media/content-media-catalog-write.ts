@@ -1,6 +1,6 @@
 import type { ZodIssue } from 'zod'
 import { customZodIssue } from '../../../../lib/add-custom-refinement-issue'
-import type { ContentSource } from '../envelope'
+import type { CatalogLayer } from '../envelope'
 import type { ContentMedia } from '../../../primitives/media/content-media'
 import type { ImagePresentation } from '../../../primitives/media/image-presentation'
 import { contentMediaSchema } from '../../../primitives/media/content-media'
@@ -28,7 +28,7 @@ export type CatalogContentMediaWriteContext = {
   domain: ContentMediaDomain
   subject: SystemImageSubject
   slug: string
-  contentSource: ContentSource
+  catalogLayer: CatalogLayer
   rulesetId?: string
   campaignImageSetId?: string
 }
@@ -142,9 +142,9 @@ export function hasAuthoredContentMediaForCatalogWrite(
 export function resolvePersistedContentMediaOverride(input: {
   homebrewRecordMedia?: ContentMedia | null | undefined
   overlayPatchMedia?: ContentMedia | null | undefined
-  source: ContentSource
+  catalogLayer: CatalogLayer
 }): ContentMedia | null {
-  if (input.source === 'homebrew') {
+  if (input.catalogLayer === 'homebrew') {
     return input.homebrewRecordMedia ?? null
   }
   return input.overlayPatchMedia ?? null
@@ -176,7 +176,7 @@ export function normalizeContentMediaForCatalogPersist(
     media,
     subject: ctx.subject,
     slug: ctx.slug,
-    contentSource: ctx.contentSource,
+    catalogLayer: ctx.catalogLayer,
     rulesetId: ctx.rulesetId,
     campaignImageSetId: ctx.campaignImageSetId,
     allowedRoles: policy.allowedRoles,

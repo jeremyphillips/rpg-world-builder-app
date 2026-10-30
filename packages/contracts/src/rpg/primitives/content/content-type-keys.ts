@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 // ---------------------------------------------------------------------------
 // Content type keys — SSOT for routable catalog types and API registry keys.
 // Full read/write wiring stays in apps/api `content-types.ts`; contracts only
@@ -18,6 +20,8 @@ export const CONTENT_TYPE_KEYS = [
 ] as const
 
 export type ContentTypeKey = (typeof CONTENT_TYPE_KEYS)[number]
+
+export const contentTypeKeySchema = z.enum(CONTENT_TYPE_KEYS)
 
 /** Keys currently wired into the API `CONTENT_TYPES` runtime registry. */
 export const API_CONTENT_TYPE_KEYS = [

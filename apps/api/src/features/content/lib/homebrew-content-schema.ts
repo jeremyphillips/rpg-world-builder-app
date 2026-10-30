@@ -11,6 +11,8 @@ export const homebrewContentIdentityFields = {
   name: { type: String, required: true, trim: true },
   /** Managed image collection; contracts restrict this to opted-in content domains. */
   media: { type: Object },
+  /** Server-owned bibliographic lineage and document attribution (see content-provenance.md). */
+  provenance: { type: Object },
   description: { type: String },
 }
 

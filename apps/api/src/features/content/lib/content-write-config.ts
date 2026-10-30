@@ -3,7 +3,7 @@ import type { ZodType } from 'zod'
 
 import type {
   ContentAccessTargetType,
-  ContentSource,
+  CatalogLayer,
   SystemRulesetId,
   ContentStatus,
   ContentUsageBlocker,
@@ -30,7 +30,7 @@ export interface HomebrewDoc {
 export type WriteEntityBase = {
   id: string
   slug: string
-  source: ContentSource
+  catalogLayer: CatalogLayer
   status: ContentStatus
   campaignId: string | null
 }

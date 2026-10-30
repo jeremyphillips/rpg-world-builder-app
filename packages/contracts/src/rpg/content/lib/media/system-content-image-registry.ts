@@ -1,4 +1,4 @@
-import type { ContentSource } from '../envelope'
+import type { CatalogLayer } from '../envelope'
 import type { ContentTypeKey } from '../../../primitives/content/content-type-keys'
 import type { SourceDimensions } from '../../../primitives/media/geometry'
 import {
@@ -240,9 +240,9 @@ export function resolveSystemContentImage(input: {
   subject: SystemImageSubject
   assetRole: string
   slug: string
-  contentSource: ContentSource
+  catalogLayer: CatalogLayer
 }): ResolvedSystemContentImage | undefined {
-  if (input.contentSource !== 'system') return undefined
+  if (input.catalogLayer !== 'system') return undefined
   const entry = lookupSystemContentImageEntry(input)
   if (!entry) return undefined
   return {

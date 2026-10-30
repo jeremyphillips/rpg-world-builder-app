@@ -1,4 +1,4 @@
-import type { ContentSource } from '@rpg/contracts'
+import type { CatalogLayer } from '@rpg/contracts'
 
 import { resolveAvailability, type Availability, type AvailabilityReason } from '@/lib/availability'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
@@ -12,7 +12,7 @@ const SOURCE_LABELS = {
 
 export interface ResolveEmbeddedRowMetaParams {
   row: { id?: string } | undefined
-  entitySource: ContentFormCtx['entitySource']
+  entityCatalogLayer: ContentFormCtx['entityCatalogLayer']
   seedRowIds?: ReadonlySet<string>
   extraReasons?: readonly AvailabilityReason[]
 }
@@ -27,11 +27,11 @@ export interface EmbeddedRowMeta {
 /** Resolves ownership for embedded rows that have no per-row `source` in the contract. */
 export function resolveEmbeddedRowSource(
   row: { id?: string } | undefined,
-  entitySource: ContentSource | undefined,
+  entityCatalogLayer: CatalogLayer | undefined,
   seedRowIds?: ReadonlySet<string>,
 ): EmbeddedRowSource {
   const rowId = row?.id
-  if (entitySource !== 'system') return 'homebrew'
+  if (entityCatalogLayer !== 'system') return 'homebrew'
   if (typeof rowId !== 'string' || rowId.length === 0) return 'homebrew'
   if (seedRowIds) return seedRowIds.has(rowId) ? 'system' : 'homebrew'
   return 'system'
@@ -39,11 +39,11 @@ export function resolveEmbeddedRowSource(
 
 export function resolveEmbeddedRowMeta({
   row,
-  entitySource,
+  entityCatalogLayer,
   seedRowIds,
   extraReasons = [],
 }: ResolveEmbeddedRowMetaParams): EmbeddedRowMeta {
-  const source = resolveEmbeddedRowSource(row, entitySource, seedRowIds)
+  const source = resolveEmbeddedRowSource(row, entityCatalogLayer, seedRowIds)
   const availability = resolveAvailability(extraReasons)
 
   return {

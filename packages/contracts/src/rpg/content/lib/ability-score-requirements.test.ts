@@ -96,7 +96,7 @@ describe('getEquipmentAbilityScoreRequirements', () => {
     id: 'srd-cc-5.2.1:plate-armor',
     slug: 'plate-armor',
     rulesetId: 'srd-cc-5.2.1',
-    source: 'system',
+    catalogLayer: 'system',
     status: 'published',
     campaignId: null,
     createdAt: '2024-05-21T00:00:00.000Z',

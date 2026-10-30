@@ -131,7 +131,7 @@ describe('SRD 5.2.1 class seed', () => {
   it('uses deterministic system ids and null campaignId', () => {
     for (const cls of classes) {
       expect(cls.id).toBe(`${RULESET}:${cls.slug}`)
-      expect(cls.source).toBe('system')
+      expect(cls.catalogLayer).toBe('system')
       expect(cls.campaignId).toBeNull()
       expect(cls.rulesetId).toBe(RULESET)
     }

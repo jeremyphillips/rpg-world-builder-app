@@ -253,7 +253,7 @@ export function buildSpeciesNamingOption(
   conventions: readonly NamingConvention[],
   heritageAliases: readonly HeritageCultureAlias[] = [],
 ): SpeciesNamingOption {
-  if (species.source === 'homebrew') {
+  if (species.catalogLayer === 'homebrew') {
     return {
       speciesId: species.id,
       label: species.name,

@@ -18,7 +18,7 @@ import {
   withColumnWidth,
 } from './column-builders'
 
-type Row = { id: string; name: string; source: 'system' | 'homebrew' }
+type Row = { id: string; name: string; catalogLayer: 'system' | 'homebrew' }
 
 const SOURCE_BADGE = {
   system: { appearance: 'soft' as const, tone: 'neutral' as const, label: 'System' },

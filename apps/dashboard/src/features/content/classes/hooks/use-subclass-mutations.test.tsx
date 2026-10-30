@@ -38,7 +38,7 @@ describe('use-subclass-mutations', () => {
         id: 'sub_new',
         slug: 'test-subclass',
         name: 'Test Subclass',
-        source: 'homebrew',
+        catalogLayer: 'homebrew',
         status: 'published',
         features: [],
       }),
@@ -48,7 +48,7 @@ describe('use-subclass-mutations', () => {
         ...pickSubclass('champion'),
         id: 'sub_existing',
         name: 'Champion (edited)',
-        source: 'homebrew',
+        catalogLayer: 'homebrew',
         status: 'published',
       }),
     )

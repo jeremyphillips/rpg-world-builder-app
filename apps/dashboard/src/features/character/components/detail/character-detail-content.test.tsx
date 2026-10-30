@@ -47,7 +47,7 @@ const connectedViewModel = buildCharacterDetailViewModel({
         id: 'organization-lantern-guild',
         slug: 'lantern-guild',
         rulesetId: 'srd-cc-5.2.1',
-        source: 'homebrew',
+        catalogLayer: 'homebrew',
         status: 'published',
         campaignId: 'campaign-1',
         createdAt: '2026-07-28T12:00:00.000Z',

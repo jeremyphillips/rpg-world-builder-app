@@ -23,7 +23,7 @@ export function resolveMediaContentAvailability(input: {
   return resolveAvailableContentMediaSources({
     media,
     domain,
-    contentSource: contentContext.contentSource,
+    catalogLayer: contentContext.catalogLayer,
     subject: contentContext.subject,
     slug: contentContext.slug,
     rulesetId: contentContext.rulesetId,

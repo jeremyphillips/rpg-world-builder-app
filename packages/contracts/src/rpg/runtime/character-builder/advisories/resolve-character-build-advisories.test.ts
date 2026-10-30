@@ -27,7 +27,7 @@ function equipment(fields: Record<string, unknown>): Equipment {
   return equipmentSchema.parse({
     id: `${RULESET}:${slug}`,
     rulesetId: RULESET,
-    source: 'system',
+    catalogLayer: 'system',
     status: 'published',
     campaignId: null,
     createdAt: '2026-01-01T00:00:00.000Z',

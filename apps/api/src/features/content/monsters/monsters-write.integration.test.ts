@@ -429,7 +429,9 @@ describe('monster write validation', () => {
     expect(cleared.experiencePointsOverride).toBeUndefined()
 
     const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    const kobold = catalog.find((row) => row.slug === 'kobold-warrior' && row.source === 'system')
+    const kobold = catalog.find(
+      (row) => row.slug === 'kobold-warrior' && row.catalogLayer === 'system',
+    )
     expect(kobold).toBeDefined()
     if (!kobold) return
 
@@ -491,7 +493,9 @@ describe('monster write validation', () => {
   it('preserves untouched action rows on a system patch and a no-op resave', async () => {
     const campaign = await makeTestCampaign()
     const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    const kobold = catalog.find((row) => row.slug === 'kobold-warrior' && row.source === 'system')
+    const kobold = catalog.find(
+      (row) => row.slug === 'kobold-warrior' && row.catalogLayer === 'system',
+    )
     expect(kobold).toBeDefined()
     if (!kobold) return
 

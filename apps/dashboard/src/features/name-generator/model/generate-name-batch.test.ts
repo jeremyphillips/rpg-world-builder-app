@@ -14,7 +14,7 @@ const ELF_SPECIES = {
   id: 'srd-cc-5.2.1:elf',
   slug: 'elf',
   name: 'Elf',
-  source: 'system' as const,
+  catalogLayer: 'system' as const,
   status: 'published',
   culture: {
     id: 'elven',
@@ -28,7 +28,7 @@ const ORC_SPECIES = {
   id: 'srd-cc-5.2.1:orc',
   slug: 'orc',
   name: 'Orc',
-  source: 'system' as const,
+  catalogLayer: 'system' as const,
   status: 'published',
   culture: {
     naming: { supported: true },

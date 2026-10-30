@@ -14,7 +14,7 @@ export type SpeciesCultureInput = {
   id: string
   slug: string
   name: string
-  source: 'system' | 'homebrew'
+  catalogLayer: 'system' | 'homebrew'
   culture?: SpeciesCultureConfig
   languageAffinities?: readonly string[]
   heritage?: {
@@ -65,7 +65,7 @@ export function resolveCampaignConventions({
   const processedCultureIds = new Set<string>()
 
   for (const entry of species) {
-    if (entry.source === 'homebrew' || !isSpeciesNamingSupported(entry)) {
+    if (entry.catalogLayer === 'homebrew' || !isSpeciesNamingSupported(entry)) {
       continue
     }
 

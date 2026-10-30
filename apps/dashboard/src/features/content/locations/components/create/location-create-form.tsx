@@ -297,7 +297,7 @@ function LocationCreateFormShell({
     ...optionsCtx,
     campaignId,
     mode: 'create',
-    entitySource: 'homebrew',
+    entityCatalogLayer: 'homebrew',
     fixedCreate,
   }
 
@@ -395,7 +395,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
     ...optionsCtx,
     campaignId,
     mode: 'create',
-    entitySource: 'homebrew',
+    entityCatalogLayer: 'homebrew',
     fixedCreate,
   }
 
@@ -523,7 +523,7 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
     ...optionsCtx,
     campaignId,
     mode: 'create',
-    entitySource: 'homebrew',
+    entityCatalogLayer: 'homebrew',
     fixedCreate,
   }
 
@@ -609,7 +609,7 @@ function LocationSettlementCreateForm(
     ...optionsCtx,
     campaignId,
     mode: 'create',
-    entitySource: 'homebrew',
+    entityCatalogLayer: 'homebrew',
     fixedCreate,
   }
 

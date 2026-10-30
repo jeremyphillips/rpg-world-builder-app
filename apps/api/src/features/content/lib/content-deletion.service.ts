@@ -28,7 +28,7 @@ async function evaluateContentDeletionBlockers<T extends WriteEntityBase>(
 ): Promise<ContentUsageBlocker[]> {
   const { entity } = await resolveContentEntityForWrite(config, campaignId, entityId)
 
-  if (entity.source !== 'homebrew') {
+  if (entity.catalogLayer !== 'homebrew') {
     throw new HttpError(403, 'forbidden', 'System content cannot be deleted.')
   }
 

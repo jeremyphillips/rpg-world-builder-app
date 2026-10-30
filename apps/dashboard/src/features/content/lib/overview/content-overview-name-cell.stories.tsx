@@ -9,7 +9,7 @@ const managerContext = {
   campaignId: 'camp-1',
   contentTypeKey: 'classes' as const,
   queryKeyFn: (campaignId: string) => contentOverviewListQueryKey(campaignId, 'classes'),
-  duplicateSource: { id: 'cls-1', name: 'Arcane Trickster', source: 'homebrew' as const },
+  duplicateSource: { id: 'cls-1', name: 'Arcane Trickster', catalogLayer: 'homebrew' as const },
 }
 
 const meta = {

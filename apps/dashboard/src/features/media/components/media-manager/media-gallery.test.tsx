@@ -9,7 +9,7 @@ import { mediaFixture, mediaFixtureAssets } from '../../fixtures'
 const fixtureSources = resolveAvailableContentMediaSources({
   media: mediaFixture,
   domain: 'character',
-  contentSource: 'homebrew',
+  catalogLayer: 'homebrew',
 }).sources
 
 beforeEach(() => {

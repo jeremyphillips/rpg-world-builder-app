@@ -8,7 +8,7 @@ describe('buildSubclassMasterDetailListItem', () => {
       item: {
         id: 'sub_a',
         name: 'Champion',
-        source: 'system',
+        catalogLayer: 'system',
         classId: 'class_fighter',
       },
       isModified: true,
@@ -29,7 +29,7 @@ describe('buildSubclassMasterDetailListItem', () => {
       item: {
         id: 'draft-abc',
         name: '',
-        source: 'unsaved',
+        catalogLayer: 'unsaved',
         classId: 'class_fighter',
       },
       isModified: false,

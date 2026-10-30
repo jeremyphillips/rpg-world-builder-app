@@ -12,7 +12,7 @@ const systemContext = {
   domain: 'class' as const,
   subject: contentTypeSubject('classes'),
   slug: 'fighter',
-  contentSource: 'system' as const,
+  catalogLayer: 'system' as const,
   rulesetId: 'srd-cc-5.2.1',
 }
 
@@ -80,7 +80,7 @@ describe('resolveEffectiveRepresentativeImageId', () => {
     const homebrewSources = resolveAvailableContentMediaSources({
       media,
       domain: 'class',
-      contentSource: 'homebrew',
+      catalogLayer: 'homebrew',
     }).sources
     expect(
       resolveEffectiveRepresentativeImageId(media, ['primary'], homebrewSources),

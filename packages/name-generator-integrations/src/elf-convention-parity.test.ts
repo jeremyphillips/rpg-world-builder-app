@@ -18,7 +18,7 @@ const HUMAN_SPECIES: SpeciesCultureInput = {
   id: 'srd-cc-5.2.1:human',
   slug: 'human',
   name: 'Human',
-  source: 'system',
+  catalogLayer: 'system',
   culture: {
     naming: { supported: false },
   },
@@ -28,7 +28,7 @@ const HOMEBREW_SPECIES: SpeciesCultureInput = {
   id: 'homebrew:custom',
   slug: 'custom',
   name: 'Custom Folk',
-  source: 'homebrew',
+  catalogLayer: 'homebrew',
   culture: {
     naming: { supported: true },
   },
@@ -92,7 +92,7 @@ describe('buildSpeciesNamingOption', () => {
       id: 'srd-cc-5.2.1:human',
       slug: 'human',
       name: 'Human',
-      source: 'system',
+      catalogLayer: 'system',
       culture: {
         naming: { supported: true },
       },

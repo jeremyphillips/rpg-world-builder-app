@@ -191,7 +191,7 @@ describe('monster action draft round trip', () => {
     const reloaded = monsterToFormValues({
       ...input,
       id: 'm1',
-      source: 'homebrew',
+      catalogLayer: 'homebrew',
       status: 'draft',
       rulesetId: 'srd',
       slug: 'scout',

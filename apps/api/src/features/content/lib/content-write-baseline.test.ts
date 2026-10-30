@@ -149,7 +149,7 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
       campaign.id,
       baselineCase.createInput,
     )
-    expect(created.source).toBe('homebrew')
+    expect(created.catalogLayer).toBe('homebrew')
     expect(created.campaignId).toBe(campaign.id)
     expect(created.status).toBe('published')
 
@@ -159,7 +159,7 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
       created.id,
       baselineCase.homebrewUpdate,
     )
-    expect(updatedHomebrew.source).toBe('homebrew')
+    expect(updatedHomebrew.catalogLayer).toBe('homebrew')
     expect(updatedHomebrew.name).toBe(baselineCase.expectedHomebrewName)
 
     const catalogAfterHomebrew = await resolveCatalogForCampaign(
@@ -172,7 +172,7 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
     )
 
     const systemRecord = catalogAfterHomebrew.find(
-      (record) => record.slug === baselineCase.systemTargetSlug && record.source === 'system',
+      (record) => record.slug === baselineCase.systemTargetSlug && record.catalogLayer === 'system',
     )
     expect(systemRecord).toBeDefined()
     if (!systemRecord) throw new Error(`expected system seed ${baselineCase.systemTargetSlug}`)
@@ -184,7 +184,7 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
       systemRecord.id,
       baselineCase.systemPatch,
     )
-    expect(patchedSystem.source).toBe('system')
+    expect(patchedSystem.catalogLayer).toBe('system')
     expect(patchedSystem.name).toBe(baselineCase.expectedPatchedSystemName)
     expect(patchedSystem.status).toBe('published')
 

@@ -23,7 +23,7 @@ import { systemDefaultArmorClassRules } from '../campaign/patches/campaign-mecha
 
 const meta = {
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2024-05-21T00:00:00.000Z',
@@ -233,7 +233,7 @@ describe('equipmentSchema', () => {
     const result = equipmentSchema.safeParse({
       ...systemRecord('lucky-charm', SAMPLE_BODIES.magic_item),
       id: 'abc123',
-      source: 'homebrew',
+      catalogLayer: 'homebrew',
       status: 'published',
       campaignId: 'camp_1',
     })

@@ -55,7 +55,7 @@ function resolveCatalogMediaWriteContext(
   const slug =
     (ctx?.entity as { slug?: string } | undefined)?.slug ??
     (typeof values.slug === 'string' ? values.slug : undefined)
-  const contentSource =
+  const catalogLayer =
     (ctx?.entity as { source?: 'homebrew' | 'system' } | undefined)?.source ?? 'homebrew'
 
   if (!slug) return undefined
@@ -64,7 +64,7 @@ function resolveCatalogMediaWriteContext(
     domain: def.mediaDomain,
     subject: contentTypeSubject(def.routeKey as ContentTypeKey),
     slug,
-    contentSource,
+    catalogLayer,
     rulesetId,
   }
 }

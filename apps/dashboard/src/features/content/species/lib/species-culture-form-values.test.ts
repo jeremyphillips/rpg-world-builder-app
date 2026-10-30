@@ -14,7 +14,7 @@ describe('normalizeSpeciesCultureForPersist', () => {
         culture: cultureToFormValues({
           naming: { supported: true, personalNameComponents: ['clan'] },
         }),
-        entitySource: 'system',
+        entityCatalogLayer: 'system',
       }),
     ).toEqual({
       naming: { supported: true, personalNameComponents: ['clan'] },
@@ -26,7 +26,7 @@ describe('normalizeSpeciesCultureForPersist', () => {
       normalizeSpeciesCultureForPersist({
         slug: 'orc',
         culture: cultureToFormValues({ naming: { supported: true, personalNameComponents: [] } }),
-        entitySource: 'system',
+        entityCatalogLayer: 'system',
       }),
     ).toEqual({
       naming: { supported: true },
@@ -40,7 +40,7 @@ describe('normalizeSpeciesCultureForPersist', () => {
         culture: cultureToFormValues({
           naming: { supported: true, personalNameComponents: ['family'] },
         }),
-        entitySource: 'homebrew',
+        entityCatalogLayer: 'homebrew',
       }),
     ).toEqual({
       naming: { supported: false },
@@ -56,7 +56,7 @@ describe('normalizeSpeciesCultureForPersist', () => {
           name: 'Elven',
           naming: { supported: true },
         },
-        entitySource: 'homebrew',
+        entityCatalogLayer: 'homebrew',
       }),
     ).toEqual({
       id: 'elven',
@@ -76,7 +76,7 @@ describe('normalizeSpeciesCultureForPersist', () => {
           naming: { supported: true },
         },
         existingCultureId: 'elven',
-        entitySource: 'system',
+        entityCatalogLayer: 'system',
       }),
     ).toEqual({
       id: 'elven',
@@ -94,7 +94,7 @@ describe('normalizeSpeciesCultureForPersist', () => {
           name: 'Dwarf',
           naming: { supported: true },
         },
-        entitySource: 'system',
+        entityCatalogLayer: 'system',
       }),
     ).toEqual({
       naming: { supported: true },
@@ -111,7 +111,7 @@ describe('normalizeSpeciesCultureForPersist', () => {
       {
         slug: 'elf',
         existingCultureId: 'elven',
-        entitySource: 'system',
+        entityCatalogLayer: 'system',
       },
     )
 

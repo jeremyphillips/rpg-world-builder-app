@@ -27,7 +27,7 @@ describe('toContentFieldOption', () => {
   })
 
   it('adds a Homebrew description for homebrew content', () => {
-    const entity = { ...pickEquipment('dagger'), source: 'homebrew' as const }
+    const entity = { ...pickEquipment('dagger'), catalogLayer: 'homebrew' as const }
     expect(toContentFieldOption(entity, 'equipment')).toEqual({
       value: 'dagger',
       label: entity.name,
