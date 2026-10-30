@@ -17,6 +17,7 @@ import {
   type ContentOverviewBaseFilterState,
 } from '../../../lib/overview/content-overview-filter-schema'
 
+/** Numeric displayed AC, not `compareArmorClass`. Shields sort last. */
 function armorAcSortValue(item: ArmorEquipment, rules: ArmorClassRules): number {
   if (item.category === 'shields') return 999
   if (item.baseAcOffset === undefined) return 0

@@ -25,7 +25,9 @@ describe('SRD 5.2.1 monster seed', () => {
       armorClassRules: systemDefaultArmorClassRules(),
       magicPropertyProvider: () => undefined,
     })
-    expect(block.ac).toBe(14)
+    expect(block.ac).toEqual(
+      expect.objectContaining({ status: 'resolved', value: expect.objectContaining({ ac: 14 }) }),
+    )
     expect(block.attacks.find((line) => line.id === 'dagger')?.attackBonus).toBe(4)
   })
 })

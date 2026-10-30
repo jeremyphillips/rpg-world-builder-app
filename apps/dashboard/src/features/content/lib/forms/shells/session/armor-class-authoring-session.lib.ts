@@ -59,9 +59,24 @@ export function useArmorClassAuthoringSave(): { saveWithoutDirty: boolean } {
   return { saveWithoutDirty: session?.saveWithoutDirty ?? false }
 }
 
+/** Sensitive form, dirty, and the snapshotted rules no longer match the live ruleset. */
+export function armorClassAuthoringIsStale(input: {
+  sensitive: boolean
+  isDirty: boolean
+  snapshot: ArmorClassRules | undefined
+  live: ArmorClassRules | undefined
+}): boolean {
+  if (!input.sensitive || !input.isDirty) return false
+  return armorClassRulesSignature(input.snapshot) !== armorClassRulesSignature(input.live)
+}
+
 export function useArmorClassRulesStale(): boolean {
   const session = useContext(ArmorClassAuthoringContext)
   const { isDirty } = useFormState()
-  if (!session?.sensitive || !isDirty) return false
-  return armorClassRulesSignature(session.snapshot) !== armorClassRulesSignature(session.live)
+  return armorClassAuthoringIsStale({
+    sensitive: session?.sensitive ?? false,
+    isDirty,
+    snapshot: session?.snapshot,
+    live: session?.live,
+  })
 }

@@ -1,4 +1,5 @@
 // Lightweight cross-feature surface — keep before route/form exports to avoid barrel init cycles.
+export { monsterArmorClassUnavailableCopy } from './monsters/lib/statistics/monster-armor-class-presentation'
 export {
   formatAddContentTypeLabel,
   formatContentCollectionAvailabilityCaption,

@@ -47,8 +47,7 @@ export type DerivedMonsterAttackLine = {
 }
 
 export type DerivedMonsterStatBlock = {
-  ac: number
-  acResolution: MonsterArmorClassResolution
+  ac: DerivedField<MonsterArmorClassResolution>
   hp: number
   hpFormula: string
   hpClampedToMinimum: boolean
@@ -270,15 +269,12 @@ export function deriveMonsterStatBlock({
   const dexScore = monster.abilityScores.dex
   const proficiencyBonus = CHALLENGE_RATING_MECHANICS[monster.challengeRating].proficiencyBonus
 
-  const armor = requireDerivedField(
-    'armorClass',
-    resolveMonsterArmorClass({
-      monster,
-      equipmentCatalog,
-      armorClassRules,
-      magicPropertyProvider,
-    }),
-  )
+  const armor = resolveMonsterArmorClass({
+    monster,
+    equipmentCatalog,
+    armorClassRules,
+    magicPropertyProvider,
+  })
   const hitPoints = requireDerivedField('hitPoints', resolveMonsterHitPoints(monster))
   const initiativeModifier = resolveCreatureInitiativeModifier(dexScore)
 
@@ -316,8 +312,7 @@ export function deriveMonsterStatBlock({
   appendAttackLines(attacks, monster.reactions, attackLineArgs, 'reactions')
 
   return {
-    ac: armor.ac,
-    acResolution: armor,
+    ac: armor,
     hp: hitPoints.hp,
     hpFormula: hitPoints.formula,
     hpClampedToMinimum: hitPoints.clampedToMinimum,

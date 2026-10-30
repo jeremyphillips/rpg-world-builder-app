@@ -41,16 +41,14 @@ function formatEffectiveModifier(rules: ArmorClassRules, protection: number): st
   return formatSignedModifier(armorClassDelta(rules, protection))
 }
 
-function rowLabel(row: MonsterArmorClassRow, rules: ArmorClassRules): string {
+function rowLabel(row: MonsterArmorClassRow): string {
   switch (row.kind) {
     case 'ruleset-base':
       return `Base ${monsterArmorClassCompactLabel()}`
     case 'armor-base':
       return `${row.label} (base)`
     case 'dex':
-      return row.cap === undefined
-        ? 'DEX modifier'
-        : `DEX modifier (max ${formatEffectiveModifier(rules, row.cap)})`
+      return row.cap === undefined ? 'DEX modifier' : `DEX modifier (max ${row.cap})`
     case 'natural':
       return 'Natural armor'
     case 'shield':
@@ -85,13 +83,12 @@ function isZeroOptionalModifier(row: MonsterArmorClassRow): boolean {
 
 export function monsterArmorClassBreakdownRows(
   resolution: MonsterArmorClassResolution,
-  rules: ArmorClassRules,
 ): MonsterArmorClassPresentationRow[] {
   return resolution.rows
     .filter((row) => !isZeroOptionalModifier(row))
     .map((row, index) => ({
       id: `${row.kind}-${index}`,
-      label: rowLabel(row, rules),
+      label: rowLabel(row),
       value: rowValue(row),
     }))
 }
@@ -156,10 +153,16 @@ export function monsterArmorClassDexAdvisory(
   return `${name} ignores the ${original} DEX modifier.`
 }
 
+/** Armor-only unavailable sentences. Challenge rating and generic "Not set" stay with their callers. */
+export function monsterArmorClassUnavailableCopy(reason: 'missing-reference' | 'conflict'): string {
+  return reason === 'missing-reference'
+    ? 'Missing armor reference'
+    : 'Only one body armor and one shield can be owned, each with quantity 1.'
+}
+
 function unavailableArmorCopy(reason: DerivedFieldReason): string {
-  if (reason === 'missing-reference') return 'Missing armor reference'
-  if (reason === 'conflict') {
-    return 'Only one body armor and one shield can be owned, each with quantity 1.'
+  if (reason === 'missing-reference' || reason === 'conflict') {
+    return monsterArmorClassUnavailableCopy(reason)
   }
   return 'Not set'
 }

@@ -9,6 +9,7 @@ import {
 } from '../spells/spells-step.fixtures'
 import {
   collectPreviewSpellLabels,
+  formatDerivedArmorClass,
   formatPreviewSpellsSubsection,
   resolveEquipmentPreviewEmptyHint,
 } from './character-builder-preview-panel.lib'
@@ -59,6 +60,14 @@ describe('character-builder-preview-panel.lib', () => {
       resolvedText: null,
       emptyHint: 'Not applicable for this class.',
     })
+  })
+
+  it('prints the shared missing armor reference sentence', () => {
+    expect(formatDerivedArmorClass({ status: 'unavailable', reason: 'missing-reference' })).toBe(
+      'Missing armor reference',
+    )
+    expect(formatDerivedArmorClass({ status: 'unavailable', reason: 'missing-input' })).toBe('—')
+    expect(formatDerivedArmorClass({ status: 'resolved', value: 16 })).toBe('16')
   })
 
   it('uses the pending hint while starting equipment is unresolved', () => {

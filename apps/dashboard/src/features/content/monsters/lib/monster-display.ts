@@ -29,6 +29,7 @@ import {
 import {
   monsterArmorClassCaption,
   monsterArmorClassCompactLabel,
+  monsterArmorClassUnavailableCopy,
 } from './statistics/monster-armor-class-presentation'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
@@ -99,20 +100,32 @@ export function monsterUnavailableReasonCopy(
   reason: DerivedFieldReason,
   subject: 'generic' | 'challenge' | 'armor',
 ): string {
-  if (reason === 'conflict') {
-    return 'Only one body armor and one shield can be owned, each with quantity 1.'
+  if (reason === 'conflict' || (reason === 'missing-reference' && subject === 'armor')) {
+    return monsterArmorClassUnavailableCopy(
+      reason === 'conflict' ? 'conflict' : 'missing-reference',
+    )
   }
-  if (reason === 'missing-reference' && subject === 'armor') return 'Missing armor reference'
   if (reason === 'missing-input' && subject === 'challenge')
     return 'Set a challenge rating to calculate'
   return 'Not set'
 }
 
 function formatAcStatRow(derived: DerivedMonsterStatBlock): ContentStatRowData {
+  if (derived.ac.status === 'unavailable') {
+    return {
+      id: 'ac',
+      label: monsterArmorClassCompactLabel(),
+      value: monsterUnavailableReasonCopy(derived.ac.reason, 'armor'),
+    }
+  }
+
   return {
     id: 'ac',
     label: monsterArmorClassCompactLabel(),
-    value: joinInlineMetadata([String(derived.ac), monsterArmorClassCaption(derived.acResolution)]),
+    value: joinInlineMetadata([
+      String(derived.ac.value.ac),
+      monsterArmorClassCaption(derived.ac.value),
+    ]),
   }
 }
 

@@ -1,6 +1,8 @@
 import type { CharacterBuilderDraft, CharacterNarrative, ChoiceSet } from '@rpg/contracts'
 import { characterBuilderStepReadinessMessages, formatStepReadinessMessage } from '@rpg/contracts'
 
+import { monsterArmorClassUnavailableCopy } from '@/features/content'
+
 export const CHARACTER_BUILDER_PREVIEW_SECTIONS = [
   'narrative',
   'combat',
@@ -18,13 +20,13 @@ export function getBuilderDraftNarrative(
   return draft.identity.narrative
 }
 
-export const ARMOR_CLASS_MISSING_REFERENCE_LABEL = 'Missing armor reference'
-
 export function formatDerivedArmorClass(
   ac: { status: 'resolved'; value: number } | { status: 'unavailable'; reason: string },
 ): string {
   if (ac.status === 'unavailable') {
-    return ac.reason === 'missing-reference' ? ARMOR_CLASS_MISSING_REFERENCE_LABEL : '—'
+    return ac.reason === 'missing-reference'
+      ? monsterArmorClassUnavailableCopy('missing-reference')
+      : '—'
   }
   return formatPreviewOptionalNumber(ac.value)
 }

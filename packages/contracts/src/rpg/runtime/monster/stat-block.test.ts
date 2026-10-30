@@ -45,6 +45,13 @@ function deriveMonsterStatBlock(
   })
 }
 
+function publishedArmor(block: ReturnType<typeof deriveMonsterStatBlock>) {
+  if (block.ac.status !== 'resolved') {
+    throw new Error(`expected resolved armor class, received ${block.ac.reason}`)
+  }
+  return block.ac.value
+}
+
 function deriveMonsterDraftStatBlock(
   input: Omit<
     Parameters<typeof deriveMonsterDraftStatBlockRaw>[0],
@@ -240,7 +247,7 @@ const skeleton = monsterSchema.parse({
 describe('deriveMonsterStatBlock', () => {
   it('derives Kobold Warrior stat lines', () => {
     const block = deriveMonsterStatBlock({ monster: kobold, equipmentCatalog, skillCatalog })
-    expect(block.ac).toBe(14)
+    expect(publishedArmor(block).ac).toBe(14)
     expect(block.hp).toBe(7)
     expect(block.hpFormula).toBe('3d6 -3')
     expect(block.initiativeModifier).toBe(2)
@@ -255,7 +262,7 @@ describe('deriveMonsterStatBlock', () => {
 
   it('derives Skeleton stat lines', () => {
     const block = deriveMonsterStatBlock({ monster: skeleton, equipmentCatalog, skillCatalog })
-    expect(block.ac).toBe(14)
+    expect(publishedArmor(block).ac).toBe(14)
     expect(block.hp).toBe(13)
     expect(block.experiencePoints).toBe(50)
     expect(block.passivePerception).toBe(9)
@@ -347,7 +354,7 @@ describe('modifiedArmorFixture parity', () => {
         equippedArmor: characterPieces.pieces,
       }).ac
 
-      expect(monsterBlock.ac).toBe(14)
+      expect(publishedArmor(monsterBlock).ac).toBe(14)
       expect(characterAc).toEqual({ status: 'resolved', value: 14 })
     }
 
@@ -384,7 +391,7 @@ describe('modifiedArmorFixture parity', () => {
         equippedArmor: characterPieces.pieces,
       }).ac
 
-      expect(characterAc).toEqual({ status: 'resolved', value: monsterBlock.ac })
+      expect(characterAc).toEqual({ status: 'resolved', value: publishedArmor(monsterBlock).ac })
     }
 
     const monsterBlock = deriveMonsterStatBlock({
@@ -397,15 +404,15 @@ describe('modifiedArmorFixture parity', () => {
       equipmentCatalog,
       skillCatalog,
     })
-    expect(monsterBlock.acResolution.source).toBe('armor')
-    expect(monsterBlock.acResolution.rows).toEqual(
+    expect(publishedArmor(monsterBlock).source).toBe('armor')
+    expect(publishedArmor(monsterBlock).rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'armor-base', value: 13 }),
         expect.objectContaining({ kind: 'dex', value: 2, cap: 2 }),
         expect.objectContaining({ kind: 'enhancement', target: 'armor', value: -1 }),
       ]),
     )
-    expect(monsterBlock.acResolution.shield).toBeUndefined()
+    expect(publishedArmor(monsterBlock).shield).toBeUndefined()
     expect(
       resolveCreatureArmorClass({
         rules: systemDefaultArmorClassRules(),
@@ -458,10 +465,10 @@ describe('modifiedArmorFixture parity', () => {
       magicPropertyProvider: armorEnhancementProvider,
     })
 
-    expect(withoutBody.ac).toBe(14)
-    expect(withBody.ac).toBe(16)
-    expect(withBody.acResolution.source).toBe('armor')
-    expect(withBody.acResolution.rows).toEqual(
+    expect(publishedArmor(withoutBody).ac).toBe(14)
+    expect(publishedArmor(withBody).ac).toBe(16)
+    expect(publishedArmor(withBody).source).toBe('armor')
+    expect(publishedArmor(withBody).rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'enhancement', target: 'armor', value: 1 }),
       ]),
@@ -506,16 +513,16 @@ describe('modifiedArmorFixture parity', () => {
       equipmentCatalog: catalog,
       skillCatalog,
     })
-    expect(block.ac).toBe(17)
-    expect(block.acResolution.source).toBe('natural')
-    expect(block.acResolution.shield).toEqual({ entryId: 'shield', label: 'Shield' })
-    expect(block.acResolution.rows).toEqual(
+    expect(publishedArmor(block).ac).toBe(17)
+    expect(publishedArmor(block).source).toBe('natural')
+    expect(publishedArmor(block).shield).toEqual({ entryId: 'shield', label: 'Shield' })
+    expect(publishedArmor(block).rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'shield', value: 2 }),
         expect.objectContaining({ kind: 'enhancement', target: 'shield', value: 1 }),
       ]),
     )
-    expect(block.acResolution.bodyArmor).toBeUndefined()
+    expect(publishedArmor(block).bodyArmor).toBeUndefined()
   })
 })
 
@@ -585,30 +592,62 @@ describe('deriveMonsterDraftStatBlock', () => {
     })
   })
 
-  it('throws from the strict wrapper when an invariant is broken', () => {
+  it('keeps the rest of the block when armor class is unavailable', () => {
+    const conflict = deriveMonsterStatBlock({
+      monster: {
+        ...kobold,
+        actions: [],
+        equipment: [
+          {
+            entryId: 'a',
+            equipmentId: `${RULESET}:chain-shirt`,
+            quantity: 1,
+            equipped: true,
+          },
+          {
+            entryId: 'b',
+            equipmentId: `${RULESET}:chain-shirt`,
+            quantity: 1,
+            equipped: true,
+          },
+        ],
+      },
+      equipmentCatalog,
+      skillCatalog,
+    })
+    expect(conflict.ac).toEqual({ status: 'unavailable', reason: 'conflict' })
+    expect(conflict.hp).toBe(7)
+    expect(conflict.proficiencyBonus).toBe(2)
+
+    const missing = deriveMonsterStatBlock({
+      monster: {
+        ...kobold,
+        actions: [],
+        equipment: [
+          {
+            entryId: 'gone',
+            equipmentId: `${RULESET}:missing-armor`,
+            quantity: 1,
+            equipped: true,
+          },
+        ],
+      },
+      equipmentCatalog,
+      skillCatalog,
+    })
+    expect(missing.ac).toEqual({ status: 'unavailable', reason: 'missing-reference' })
+    expect(missing.hp).toBe(7)
+    expect(missing.initiativeModifier).toBe(2)
+  })
+
+  it('throws when hit points are unavailable', () => {
     expect(() =>
       deriveMonsterStatBlock({
-        monster: {
-          ...kobold,
-          equipment: [
-            {
-              entryId: 'a',
-              equipmentId: `${RULESET}:chain-shirt`,
-              quantity: 1,
-              equipped: true,
-            },
-            {
-              entryId: 'b',
-              equipmentId: `${RULESET}:chain-shirt`,
-              quantity: 1,
-              equipped: true,
-            },
-          ],
-        },
+        monster: { ...kobold, hitPoints: undefined, actions: [] } as Monster,
         equipmentCatalog,
         skillCatalog,
       }),
-    ).toThrow(/armorClass is unavailable/)
+    ).toThrow(/hitPoints is unavailable/)
   })
 })
 
@@ -795,7 +834,7 @@ describe('equipment effect derivation (ship P0)', () => {
       equipmentCatalog,
       skillCatalog,
     })
-    expect(normalizedBlock.ac).toBe(legacyBlock.ac)
+    expect(publishedArmor(normalizedBlock).ac).toBe(publishedArmor(legacyBlock).ac)
   })
 
   it('ignores equipment AC effects under fixed monster armor class', () => {
@@ -816,6 +855,6 @@ describe('equipment effect derivation (ship P0)', () => {
       equipmentCatalog,
       skillCatalog,
     })
-    expect(block.ac).toBe(17)
+    expect(publishedArmor(block).ac).toBe(17)
   })
 })
