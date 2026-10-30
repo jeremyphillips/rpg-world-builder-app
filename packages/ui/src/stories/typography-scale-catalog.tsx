@@ -126,32 +126,22 @@ const HEADING_ALIASES: AliasRow[] = [
 
 const SPECIALTY: SpecialtyRow[] = [
   {
-    key: 'ability-score-sm',
-    token: '--text-ability-score-sm',
-    className:
-      'text-[length:var(--text-ability-score-sm)] leading-[length:var(--text-ability-score-sm--line-height)]',
+    key: 'score-sm',
+    token: '--text-score-sm',
+    className: 'text-style-score text-style-score--sm',
     pointsAt: 'text-3xl',
   },
   {
-    key: 'ability-score-md',
-    token: '--text-ability-score-md',
-    className:
-      'text-[length:var(--text-ability-score-md)] leading-[length:var(--text-ability-score-md--line-height)]',
-    pointsAt: 'literal 32px',
-  },
-  {
-    key: 'score-token-value',
-    token: '--text-score-token-value',
-    className:
-      'text-[length:var(--text-score-token-value)] leading-[length:var(--text-score-token-value--line-height)]',
+    key: 'score-md',
+    token: '--text-score-md',
+    className: 'text-style-score text-style-score--md',
     pointsAt: 'text-4xl',
   },
   {
-    key: 'character-stat-value',
-    token: '--text-character-stat-value',
-    className:
-      'text-[length:var(--text-character-stat-value)] leading-[length:var(--text-character-stat-value--line-height)]',
-    pointsAt: 'text-4xl',
+    key: 'score-lg',
+    token: '--text-score-lg',
+    className: 'text-style-score text-style-score--lg',
+    pointsAt: '--text-heading-display',
   },
 ]
 
@@ -192,6 +182,10 @@ const SPECIALTY_COLUMNS: CatalogColumn<SpecialtyRow>[] = [
   {
     header: 'Token',
     cell: (row) => <span className="font-mono text-xs">{row.token}</span>,
+  },
+  {
+    header: 'Class',
+    cell: (row) => <span className="font-mono text-xs">{row.className}</span>,
   },
   { header: 'Points at', cell: (row) => row.pointsAt },
 ]

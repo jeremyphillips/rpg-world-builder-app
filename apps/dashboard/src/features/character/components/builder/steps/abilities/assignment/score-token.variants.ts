@@ -15,8 +15,7 @@ export const scoreTokenVariants = cva(
     variants: {
       size: {
         pool: 'size-16 min-h-16 min-w-16 p-0 text-lg font-semibold',
-        assigned:
-          'min-h-16 w-fit min-w-0 px-0 py-0 font-semibold text-[length:var(--text-score-token-value)] leading-[length:var(--text-score-token-value--line-height)]',
+        assigned: 'min-h-16 w-fit min-w-0 px-0 py-0 text-style-score text-style-score--md',
       },
       surface: {
         token: scoreTokenSurfaceTokenClasses,

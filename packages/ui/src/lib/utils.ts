@@ -99,6 +99,17 @@ const TEXT_STYLE_COLOR_UTILITIES = [
   'text-style-success',
   'text-style-warning',
   'text-style-destructive',
+  'text-style-score--muted',
+] as const
+
+/** Score numeral base. Weight and color; composes with a size modifier. */
+const TEXT_STYLE_SCORE_UTILITIES = ['text-style-score'] as const
+
+/** Score size modifiers. Mutually exclusive; compose with `text-style-score`. */
+const TEXT_STYLE_SCORE_SIZE_UTILITIES = [
+  'text-style-score--sm',
+  'text-style-score--md',
+  'text-style-score--lg',
 ] as const
 
 const EYEBROW_STYLE_CONFLICT_GROUPS = [
@@ -132,6 +143,8 @@ type TypographyClassGroupIds =
   | 'eyebrow-style'
   | 'text-style'
   | 'text-style-color'
+  | 'text-style-score'
+  | 'text-style-score-size'
   | 'text-action'
   | 'ui-button-size'
   | 'ui-button-appearance'
@@ -215,6 +228,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'eyebrow-style': [...EYEBROW_STYLE_UTILITIES],
       'text-style': [...TEXT_STYLE_UTILITIES],
       'text-style-color': [...TEXT_STYLE_COLOR_UTILITIES],
+      'text-style-score': [...TEXT_STYLE_SCORE_UTILITIES],
+      'text-style-score-size': [...TEXT_STYLE_SCORE_SIZE_UTILITIES],
       'text-action': [...TEXT_ACTION_UTILITIES],
       'ui-button-size': [...UI_BUTTON_SIZE_CLASSES],
       'ui-button-appearance': [...UI_BUTTON_APPEARANCE_CLASSES],
@@ -261,6 +276,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'eyebrow-style': [...EYEBROW_STYLE_CONFLICT_GROUPS],
       'text-style': [...TEXT_STYLE_SIZE_CONFLICT_GROUPS],
       'text-style-color': ['text-color'],
+      'text-style-score': ['font-weight'],
+      'text-style-score-size': ['font-size', 'leading'],
       'text-action': ['text-action'],
       'ui-button-size': ['ui-button-size'],
       'ui-button-appearance': ['ui-button-appearance'],
@@ -312,10 +329,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-toast-tone': ['ui-toast-tone', 'ui-border-strength'],
       'ui-semantic-text-tone': ['ui-semantic-text-tone'],
       'ui-semantic-text-emphasis': ['ui-semantic-text-emphasis'],
-      'font-size': ['heading-style', 'eyebrow-style', 'text-style'],
-      'font-weight': ['heading-style', 'eyebrow-style', 'text-style'],
+      'font-size': ['heading-style', 'eyebrow-style', 'text-style', 'text-style-score-size'],
+      'font-weight': ['heading-style', 'eyebrow-style', 'text-style', 'text-style-score'],
       tracking: ['heading-style', 'eyebrow-style'],
-      leading: ['heading-style', 'text-style'],
+      leading: ['heading-style', 'text-style', 'text-style-score-size'],
       'text-color': ['text-style-color'],
       'font-family': ['heading-style'],
       'text-transform': ['heading-style', 'eyebrow-style'],

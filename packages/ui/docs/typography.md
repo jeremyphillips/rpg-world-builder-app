@@ -228,7 +228,7 @@ Legend sizes live on `:root` and are read by `text-style-field-legend` composite
 
 ## Heading size tokens
 
-Role tokens live on `:root` in [`styles/tokens/typography-roles.css`](../src/styles/tokens/typography-roles.css). They share a primitive pair (size and line-height). Display (42px) and ability-score `md` (32px) are the only off-scale literals. Retune a role by pointing it at another primitive, not by adding a numbered heading token.
+Role tokens live on `:root` in [`styles/tokens/typography-roles.css`](../src/styles/tokens/typography-roles.css). They share a primitive pair (size and line-height). Display (42px) is the only off-scale literal. Retune a role by pointing it at another primitive, not by adding a numbered heading token.
 
 | Role token                  | Points at                                          | `Heading` variant / utility              | px    |
 | --------------------------- | -------------------------------------------------- | ---------------------------------------- | ----- |
@@ -244,6 +244,16 @@ Role tokens live on `:root` in [`styles/tokens/typography-roles.css`](../src/sty
 
 `variant` controls appearance; `as` controls document semantics. Match the hierarchy
 table above in app code.
+
+## Score numerals
+
+`text-style-score` owns semibold weight, tabular figures, and foreground. A size modifier owns font-size and line-height. Compose both: `text-style-score text-style-score--md`. `text-style-score--muted` overrides color on the same element (hit-point slash). Layout such as min-width, overflow, and centering stays on the call site.
+
+| Classes                                 | Token             | Points at                | px  | Use                                                    |
+| --------------------------------------- | ----------------- | ------------------------ | --- | ------------------------------------------------------ |
+| `text-style-score text-style-score--sm` | `--text-score-sm` | `text-3xl`               | 28  | Compact ability score cards                            |
+| `text-style-score text-style-score--md` | `--text-score-md` | `text-4xl`               | 34  | Ability cards, sheet stat tiles, assigned score tokens |
+| `text-style-score text-style-score--lg` | `--text-score-lg` | `--text-heading-display` | 42  | Monster form armor class                               |
 
 ## Media preview size
 

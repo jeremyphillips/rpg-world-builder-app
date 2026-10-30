@@ -45,9 +45,9 @@ Introduce a shared variant when it represents a stable, meaningful dimension of 
 
 ## Semantic CSS threshold
 
-- **Semantic CSS** is for a reusable component's appearance, sizing, geometry, and interaction states. Components use `ui-*` blocks in `@rpg/ui` and `dash-*` blocks for dashboard-owned shared compositions.
+- **Semantic CSS** is for a reusable component's appearance, sizing, geometry, and interaction states. Components use `ui-*` blocks in `@rpg/ui` and `dash-*` blocks for dashboard-owned shared compositions. The `ui-*` prefix denotes that ownership. BEM `--modifier` syntax is for any class that modifies an accompanying base class, including utilities (`text-style-score text-style-score--md`).
 - **Tailwind utilities** are for one-off composition and layout that the consumer intentionally owns (`flex items-center gap-2`). Do not replace utility sprawl with a parallel catalog of semantic classes for trivial layouts.
-- **Typography roles** stay single-class `@utility` composites (`heading-style-*`, `text-style-*`). They already meet the inspector goal and apply to arbitrary elements.
+- **Self-contained typography roles** stay one `@utility` (`heading-style-section`, `text-style-caption`). A role that shares a contract across sizes uses a base plus BEM modifiers.
 
 ### Semantic class ownership
 

@@ -222,8 +222,11 @@ strings.
   [packages/ui/docs/breakpoints.md](packages/ui/docs/breakpoints.md); container
   steps such as `@lg` are a separate scale from `sm:` / `md:` / `lg:` / `xl:` / `2xl:`.
 - **Semantic CSS:** Prefer descriptive BEM-style classes for reusable component anatomy,
-  appearance, and states (e.g. `ui-card`, `ui-card__content`, `ui-card--subtle`).
-  Keep definitions in the owning component's CSS or shared UI styles. Layer policy →
+  appearance, and states. Use `--modifier` wherever a class modifies an accompanying base
+  class, regardless of prefix (`ui-card ui-card--subtle`, `text-style-score text-style-score--md`).
+  Self-contained utilities keep hyphenated names (`text-style-caption`). The `ui-*` prefix
+  denotes component ownership, not exclusive ownership of BEM. Keep definitions in the
+  owning component's CSS or shared UI styles. Layer policy →
   [packages/ui/docs/semantic-style-layers.md](packages/ui/docs/semantic-style-layers.md);
   control migration shape →
   [packages/ui/docs/semantic-control-css.md](packages/ui/docs/semantic-control-css.md).

@@ -8,11 +8,13 @@ Interactive controls and buttons emit BEM-style classes (`ui-button ui-button--o
 
 ## Naming
 
-| Pattern  | Example                               |
-| -------- | ------------------------------------- |
-| Block    | `ui-button`                           |
-| Modifier | `ui-button--sm`, `ui-button--outline` |
-| Element  | `ui-floating-label-field__label`      |
+Use BEM `--modifier` syntax wherever a class modifies an accompanying base class, regardless of prefix (`ui-button ui-button--sm`, `text-style-score text-style-score--md`). Self-contained utilities keep descriptive hyphenated names (`heading-style-section`, `text-style-caption`). The `ui-*` prefix denotes component ownership, not exclusive ownership of BEM conventions. Dashboard-owned shared compositions use the `dash-` prefix with the same shape.
+
+| Pattern  | Example                                 |
+| -------- | --------------------------------------- |
+| Block    | `ui-button`, `text-style-score`         |
+| Modifier | `ui-button--sm`, `text-style-score--md` |
+| Element  | `ui-floating-label-field__label`        |
 
 ## JSX and TypeScript
 
@@ -150,7 +152,7 @@ Overlay notification counts use `ui-notification-unread-badge` (not pill geometr
 
 ## Text roles
 
-`text-style-*` utilities are the Text role ladder and the field label, legend, hint, and error maps. They are `@utility` composites, same as `heading-style-*`. Size-setting roles share the `text-style` twMerge group and conflict with font size, weight, and leading. Color-only roles (`text-style-body`, `text-style-muted`, and the status tones) share `text-style-color`, which conflicts with text color only. SemanticText is not a Text role: it owns emphasis weight, the icon slot, and the `--semantic-*` readability palette.
+`text-style-*` utilities are the Text role ladder and the field label, legend, hint, and error maps. Self-contained roles are one `@utility` each, same as `heading-style-*`. A role with a shared contract and modifiers uses BEM: `text-style-score` plus `text-style-score--{sm|md|lg}`, and `text-style-score--muted` for color. Size-setting roles share the `text-style` twMerge group and conflict with font size, weight, and leading. Color-only roles (`text-style-body`, `text-style-muted`, the status tones, and `text-style-score--muted`) share `text-style-color`, which conflicts with text color only. Score size modifiers are their own group so they compose with the base and replace one another. SemanticText is not a Text role: it owns emphasis weight, the icon slot, and the `--semantic-*` readability palette.
 
 ## Popover content
 

@@ -85,7 +85,7 @@ export const abilityScoreCardScoreRowVariants = cva('flex w-full min-w-0 items-c
   variants: {
     layout: {
       centered: 'justify-center',
-      stepper: 'justify-center gap-2',
+      stepper: 'relative justify-center gap-2',
       'select-filled': 'justify-center',
       choose: 'justify-center',
     },
@@ -98,13 +98,12 @@ export const abilityScoreCardScoreRowVariants = cva('flex w-full min-w-0 items-c
 /** Locks score-row height so modifiers align across numerals, prompts, and display dashes. */
 export function abilityScoreCardScoreSlotMinHeightClassesFor(size: 'sm' | 'md'): string {
   return size === 'sm'
-    ? 'min-h-[length:var(--text-ability-score-sm--line-height)]'
-    : 'min-h-[length:var(--text-ability-score-md--line-height)]'
+    ? 'min-h-[length:var(--text-score-sm--line-height)]'
+    : 'min-h-[length:var(--text-score-md--line-height)]'
 }
 
 /** Stepper mode: score width follows the numeral; row centers score + stepper as one group. */
-export const abilityScoreCardScoreStepperSlotClasses =
-  'min-w-0 shrink-0 overflow-hidden tabular-nums'
+export const abilityScoreCardScoreStepperSlotClasses = 'relative min-w-0 shrink-0 overflow-hidden'
 
 /** Centered score (display, select-filled score, choose). */
 export const abilityScoreCardScoreCenteredSlotClasses =
@@ -151,18 +150,14 @@ export const abilityScoreCardDragOverPreviewHintClasses = cn(
 export const abilityScoreCardChooseOverlayClasses =
   'absolute inset-0 z-10 rounded-md opacity-0 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
-export const abilityScoreCardStepperStackClasses = 'flex shrink-0 flex-col items-center gap-0.5'
+export const abilityScoreCardStepperStackClasses =
+  'relative flex shrink-0 flex-col items-center gap-0.5'
 
-const abilityScoreCardScoreValueBaseClasses = 'font-semibold tabular-nums text-foreground'
-
-/** Score numerals — sm 28px (`--text-ability-score-sm`), md 32px. */
+/** Score numerals — base plus size. sm 28px, md 34px. */
 export function abilityScoreCardScoreValueClassesFor(size: 'sm' | 'md'): string {
-  return cn(
-    abilityScoreCardScoreValueBaseClasses,
-    size === 'sm'
-      ? 'text-[length:var(--text-ability-score-sm)] leading-[length:var(--text-ability-score-sm--line-height)]'
-      : 'text-[length:var(--text-ability-score-md)] leading-[length:var(--text-ability-score-md--line-height)]',
-  )
+  return size === 'sm'
+    ? 'text-style-score text-style-score--sm'
+    : 'text-style-score text-style-score--md'
 }
 
 /** 24px compact lane — matches `--control-height-compact` / `size-control-action-compact`. */

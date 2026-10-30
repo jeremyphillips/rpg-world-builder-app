@@ -67,6 +67,12 @@ export function AbilityScoreNumeric({
     }
   }, [displayValue, editing])
 
+  useEffect(() => {
+    if (!editing) return
+    inputRef.current?.focus()
+    inputRef.current?.select()
+  }, [editing])
+
   const commitDraft = useCallback(() => {
     const parsed = parseDraftInteger(draft)
     if (parsed === null) {
@@ -90,10 +96,6 @@ export function AbilityScoreNumeric({
     if (disabled) return
     setDraft(displayValue === null ? '' : String(displayValue))
     setEditing(true)
-    requestAnimationFrame(() => {
-      inputRef.current?.focus()
-      inputRef.current?.select()
-    })
   }, [disabled, displayValue])
 
   const handleScoreKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -147,10 +149,7 @@ export function AbilityScoreNumeric({
     return true
   }
 
-  const scoreSlotClasses = cn(
-    abilityScoreCardScoreStepperSlotClasses,
-    abilityScoreCardScoreValueClassesFor(size),
-  )
+  const scoreTypeClasses = abilityScoreCardScoreValueClassesFor(size)
 
   const scoreCell = editing ? (
     <input
@@ -160,9 +159,11 @@ export function AbilityScoreNumeric({
       aria-label={`${fullName} score`}
       aria-invalid={ariaInvalid || undefined}
       className={cn(
-        scoreSlotClasses,
+        'relative box-border min-w-0 max-w-full overflow-hidden text-center',
+        scoreTypeClasses,
         'border-0 bg-transparent p-0 outline-none focus-visible:ring-0',
       )}
+      style={{ width: `${Math.max(2, draft.length)}ch` }}
       value={draft}
       onChange={(event) => setDraft(event.target.value)}
       onBlur={handleInputBlur}
@@ -175,7 +176,8 @@ export function AbilityScoreNumeric({
       aria-label={`${fullName} score`}
       aria-invalid={ariaInvalid || undefined}
       className={cn(
-        scoreSlotClasses,
+        abilityScoreCardScoreStepperSlotClasses,
+        scoreTypeClasses,
         disabled && 'text-muted-foreground',
         state === 'draggingFrom' && 'opacity-50',
       )}

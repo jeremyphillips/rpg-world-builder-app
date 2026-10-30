@@ -11,6 +11,19 @@ describe('AbilityScoreNumeric', () => {
     expect(onCommit).not.toHaveBeenCalled()
   })
 
+  it('keeps the editing input digit-sized inside a relative score row', async () => {
+    const user = userEvent.setup()
+    render(<AbilityScoreNumeric ability="str" value={10} min={1} max={30} onCommit={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: 'Strength score' }))
+    const input = screen.getByRole('textbox', { name: 'Strength score' })
+
+    expect(input).toHaveStyle({ width: '2ch' })
+    expect(input.className).toContain('relative')
+    expect(input.className).not.toContain('shrink-0')
+    expect(input.parentElement).toHaveClass('relative')
+  })
+
   it('commits an in-range integer on Enter', async () => {
     const user = userEvent.setup()
     const onCommit = vi.fn()

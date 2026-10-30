@@ -9,9 +9,9 @@ import {
 } from './ability-score-card.variants'
 
 describe('abilityScoreCardScoreValueClassesFor', () => {
-  it('uses ability-score-sm for sm and ability-score-md for md', () => {
-    expect(abilityScoreCardScoreValueClassesFor('sm')).toContain('var(--text-ability-score-sm)')
-    expect(abilityScoreCardScoreValueClassesFor('md')).toContain('var(--text-ability-score-md)')
+  it('uses the score base with a size modifier', () => {
+    expect(abilityScoreCardScoreValueClassesFor('sm')).toBe('text-style-score text-style-score--sm')
+    expect(abilityScoreCardScoreValueClassesFor('md')).toBe('text-style-score text-style-score--md')
   })
 })
 
@@ -27,9 +27,11 @@ describe('abilityScoreCardScoreSectionVariants', () => {
 })
 
 describe('abilityScoreCardScoreRowVariants', () => {
-  it('centers the score and stepper cluster with gap-2', () => {
-    expect(abilityScoreCardScoreRowVariants({ layout: 'stepper' })).toContain('justify-center')
-    expect(abilityScoreCardScoreRowVariants({ layout: 'stepper' })).toContain('gap-2')
+  it('centers the score and stepper cluster with gap-2 inside a relative row', () => {
+    const classes = abilityScoreCardScoreRowVariants({ layout: 'stepper' })
+    expect(classes).toContain('relative')
+    expect(classes).toContain('justify-center')
+    expect(classes).toContain('gap-2')
   })
 
   it('centers select-filled layout without absolute positioning on the row', () => {
@@ -51,10 +53,10 @@ describe('abilityScoreCardSelectFilledClusterClasses', () => {
 describe('abilityScoreCardScoreSlotMinHeightClassesFor', () => {
   it('ties min height to score typography line heights', () => {
     expect(abilityScoreCardScoreSlotMinHeightClassesFor('sm')).toContain(
-      '--text-ability-score-sm--line-height',
+      '--text-score-sm--line-height',
     )
     expect(abilityScoreCardScoreSlotMinHeightClassesFor('md')).toContain(
-      '--text-ability-score-md--line-height',
+      '--text-score-md--line-height',
     )
   })
 })
