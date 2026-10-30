@@ -58,6 +58,8 @@ enforced by `vocab-term-coverage.test.ts`. Detail:
 | `featCategorySchema`           | `vocab/feat.ts`                     | full    | yes          |
 | `equipmentKindSchema`          | `vocab/equipment/kind.ts`           | full    | yes          |
 | `spellGrantAvailabilitySchema` | `vocab/spell/grant-availability.ts` | full    | yes          |
+| `spellComponentIdSchema`       | `vocab/spell/components.ts`         | full    | yes          |
+| `monsterActionKindSchema`      | `vocab/monster-action-kind.ts`      | full    | yes          |
 
 ## Vocab-backed — existing `*_ENTRIES`, wire in follow-up phases
 
@@ -141,6 +143,7 @@ Spell resolution closed sets (`content/spell/resolution/vocab.ts`) also define
 | `INNATE_SPELL_KINDS` / `innateSpell*` schemas | Replaced by `spellGrantCastingModeSchema` on atomic `spells` grants |
 | `contentGrantsSchema` (legacy bag)            | Catalog seeds use `grantGroups`; zero `innateSpells` in seeds       |
 | `isGrantEligibleGrants`                       | Replaced by `isGrantGroupsEligible`                                 |
+| `usageFrequencySchema`                        | Replaced by `limitedUseSchema` in `primitives/limited-use`          |
 
 ---
 

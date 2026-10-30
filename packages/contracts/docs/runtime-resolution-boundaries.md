@@ -121,8 +121,10 @@ lookup when assembling derivation input from a persisted sheet — not draft sem
 **Audience:** Monster catalog stat blocks (`content/monster.ts`).
 
 **Responsibilities:** Derive printed-style values from authored monster bodies — AC,
-HP, saves, skills, passive Perception, attack lines, XP, and initiative. Policy
-lives in [monster-stat-blocks.md](./monster-stat-blocks.md).
+HP, saves, skills, passive Perception, attack lines, spellcasting DC and attack
+bonus, reaction triggers, generated spell prose, XP, and initiative. Policy
+lives in [monster-stat-blocks.md](./monster-stat-blocks.md) and
+[activation-and-limited-use.md](./activation-and-limited-use.md).
 
 **May import:** `runtime/creature/` (shared math only).
 
@@ -176,7 +178,7 @@ runtime/character/*
   → must not import character-builder draft / ChoiceSet semantics
   → derive/sheet-derivation-input.ts may import CharacterBuildCatalogIndex only
 
-runtime/monster/*   (future)
+runtime/monster/*
   → may import creature
   → never character-builder
 

@@ -174,6 +174,8 @@ primitives/
   content/
     content-type-keys.ts         # admission boundary only
 
+  rest-recovery.ts  activation-trigger.ts
+  limited-use/                   # schema, describe, exhaustive notation
   money.ts  units.ts  wealth.ts  character-wealth-grant.ts
   viewer-character-relationship.ts
   dice.ts  dice-formula.ts  currency-formula.ts  area-geometry.ts

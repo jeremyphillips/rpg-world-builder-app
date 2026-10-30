@@ -14,4 +14,4 @@ Selection modes, method, outcomes, and recipient derivation — see [base.md](./
 
 - No spell slot level or spell `range` metadata.
 - Many features may use `selectionMode: 'none'` for passive grants.
-- Resource-triggered features may add activation semantics later (out of MVP scope).
+- Class and species features do not store activation or limited use yet. Those primitives exist for grants, spells, and monster actions. Feature adoption is documented only.

@@ -15,6 +15,22 @@ Draft saves intentionally stay enabled when the skill query fails. Strict saves 
 `useReportContentFormWriteGate('strict', …)` from the creature-details panel so publish
 is blocked early with the same loading/error copy shown inline.
 
+## Spells
+
+Monster `spell` actions reference canonical spell ids. `collectMonsterCatalogIssues`
+calls `collectSpellReferenceIssues` for every `spellGroups[].spellIds` entry, then
+adds `spell_casting_time_incompatible` on publish when a known spell's casting time
+does not match the section.
+
+| Intent              | Catalog unavailable                   | Unknown id      | Incompatible casting time         |
+| ------------------- | ------------------------------------- | --------------- | --------------------------------- |
+| Draft homebrew save | Allowed                               | `unknown_spell` | Allowed                           |
+| Publish / promotion | Blocked (`spell_catalog_unavailable`) | `unknown_spell` | `spell_casting_time_incompatible` |
+
+`spell_not_referenceable` applies on publish when the spell exists but is still a draft.
+The dashboard passes `spellCatalogById` from the spells query. The API loads spells in
+`monstersValidateBeforeWrite`.
+
 ## Equipment
 
 Equipment row rules (unknown ids, body-armor conflicts, weapon actions) still run on

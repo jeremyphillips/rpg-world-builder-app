@@ -43,6 +43,14 @@ A `spell` entry references canonical spell ids in `spellGroups`. A limit on the 
 
 Spell prose is generated from that structure. Weapon attack lines stay derived. Special descriptions stay authored.
 
-## Spell references and grant rows
+## Spell references
 
-Persisted spell references are canonical content ids. `resolveSpellReference` is an exact map lookup. Grant rows have stable ids (`grt_<uuid>` when authored, explicit slugs in seeds) that are unique within the owning trait, feature, or heritage option and are never reused.
+Persisted spell references are canonical content ids: `<rulesetId>:<slug>` for system spells and the Mongo id for homebrew. `spellReferenceSchema` is that string. `resolveSpellReference` is `spellsById.get(ref)` and nothing else. There is no slug match and no shape test that treats a colon as proof of an id.
+
+Grants, class recommendations, monster `spellGroups`, and character sheet rows all use that schema. `collectSpellReferenceIssues` reports `unknown_spell` whenever the catalog is ready, and `spell_not_referenceable` or `spell_catalog_unavailable` on publish. Campaign availability does not invalidate a reference. Deleting a spell that one of those records names is blocked. Rich-text `data-content-id` links are presentation only and are not part of this reference.
+
+## Grant rows
+
+Every grant row has an id that is unique within its owning trait, feature, or heritage option. Authored ids are opaque `grt_<uuid>` values from `createGrantRowId`. Seed ids are explicit readable slugs and are never regenerated or reused. The API assigns a missing id before strict parsing. A stored id is kept when the grant kind stays the same. A readable seed-format id that is not already stored is rejected, as is reusing an id for a different kind.
+
+Choice-set slots are `trait:<traitKey>:grant:<grant.id>` and `feature:<feature.id>:grant:<grant.id>`. A grant-derived character source requires `grantRowId`. Entitlements use one such source, so two grant rows that name the same spell are two pools.
