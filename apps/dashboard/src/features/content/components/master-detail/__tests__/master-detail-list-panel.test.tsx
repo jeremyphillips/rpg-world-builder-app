@@ -50,6 +50,18 @@ describe('MasterDetailListPanel', () => {
     vi.mocked(HTMLElement.prototype.scrollIntoView as typeof vi.fn).mockClear()
   })
 
+  it('renders addControl in place of the default add button', () => {
+    render(
+      <MasterDetailListPanel
+        {...baseProps()}
+        addControl={<button type="button">Custom add</button>}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Custom add' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Add feature/i })).not.toBeInTheDocument()
+  })
+
   it('calls onAdd when the add button is clicked', async () => {
     const user = userEvent.setup()
     const props = baseProps()
