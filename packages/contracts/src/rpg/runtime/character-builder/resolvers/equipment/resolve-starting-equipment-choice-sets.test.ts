@@ -52,6 +52,7 @@ describe('resolveStartingEquipmentChoiceSets', () => {
       equipment: [],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
     const draft = {
@@ -117,6 +118,7 @@ describe('resolveStartingEquipmentChoiceSets', () => {
       equipment: [],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
     const draft = {
@@ -145,6 +147,7 @@ describe('resolveStartingEquipmentResolution', () => {
     equipment: [],
     skillProficiencies: [],
     organizations: [],
+    feats: [],
     languages: [],
   })
   const classDraft = {

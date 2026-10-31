@@ -23,6 +23,7 @@ const emptyCatalog: StandaloneBuildContext['catalog'] = {
   equipment: [],
   skillProficiencies: [],
   organizations: [],
+  feats: [],
   languages: [],
 }
 

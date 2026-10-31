@@ -34,6 +34,7 @@ const storyCatalog = {
   equipment: [rope, silverNeedle, dagger],
   skillProficiencies: [],
   organizations: [],
+  feats: [],
   languages: [],
 }
 const catalogIndex = indexCharacterBuildCatalog(storyCatalog)

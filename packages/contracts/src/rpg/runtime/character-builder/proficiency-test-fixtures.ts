@@ -207,6 +207,7 @@ export const proficiencyTestCatalog: CharacterBuildCatalog = {
   equipment: [luteTool, fluteTool],
   skillProficiencies: [stealthSkill, acrobaticsSkill, perceptionSkill],
   organizations: [],
+  feats: [],
   languages: [...builderTestLanguages],
 }
 

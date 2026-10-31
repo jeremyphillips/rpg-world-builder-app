@@ -25,6 +25,7 @@ const emptyCatalog: CharacterBuildCatalog = {
   equipment: [],
   skillProficiencies: [],
   organizations: [],
+  feats: [],
   languages: [],
 }
 
