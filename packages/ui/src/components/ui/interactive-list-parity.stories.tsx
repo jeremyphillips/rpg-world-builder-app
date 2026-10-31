@@ -6,6 +6,7 @@ import { ComboboxOptionRow } from './combobox-option-row.client'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from './dropdown-menu.client'
 import { IdentityRow } from './identity-row.client'
 import { InteractiveList } from './interactive-list.client'
+import { POPOVER_INTERACTIVE_LIST_DENSITY } from './list-density.lib'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { MenuChoiceRow } from './menu-choice-row.client'
 import { dropdownMenuChoiceContentClasses } from './dropdown-menu-choice.variants'
@@ -43,7 +44,11 @@ export const RowSeparators: Story = {
   render: () => (
     <div className="flex w-96 flex-col gap-6">
       <DemoPanel>
-        <InteractiveList role="listbox" aria-label="Three combobox rows">
+        <InteractiveList
+          density={POPOVER_INTERACTIVE_LIST_DENSITY}
+          role="listbox"
+          aria-label="Three combobox rows"
+        >
           <ComboboxOptionRow
             optionId="fireball"
             {...FIXTURE}
@@ -92,7 +97,11 @@ export const SameIdentityAcrossHosts: Story = {
   render: () => (
     <div className="flex w-96 flex-col gap-6">
       <DemoPanel>
-        <InteractiveList role="listbox" aria-label="Combobox options">
+        <InteractiveList
+          density={POPOVER_INTERACTIVE_LIST_DENSITY}
+          role="listbox"
+          aria-label="Combobox options"
+        >
           <ComboboxOptionRow
             optionId="fireball-option"
             {...FIXTURE}

@@ -2,6 +2,7 @@ import { Icon } from './icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { ComboboxOptionRow } from './combobox-option-row.client'
+import { POPOVER_INTERACTIVE_LIST_DENSITY } from './list-density.lib'
 import { InteractiveList } from './interactive-list.client'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
@@ -29,7 +30,11 @@ export const RowStates: Story = {
   render: () => (
     <DemoPanel>
       <InteractiveListViewport>
-        <InteractiveList role="listbox" aria-label="Spells">
+        <InteractiveList
+          density={POPOVER_INTERACTIVE_LIST_DENSITY}
+          role="listbox"
+          aria-label="Spells"
+        >
           <InteractiveListRow
             name="Fireball"
             classification="Spell"

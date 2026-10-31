@@ -3,11 +3,9 @@ import { Icon } from './icon/icon'
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import {
-  resolveComboboxSearchFieldSizeForButtonSize,
-  resolveListDensityForFieldSize,
-} from '../../components/ui/field-sizing.variants'
+import { resolveComboboxSearchFieldSizeForButtonSize } from '../../components/ui/field-sizing.variants'
 import { cn } from '../../lib/utils'
+import { POPOVER_INTERACTIVE_LIST_DENSITY } from './list-density.lib'
 import { Button } from './button.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
 import { comboboxContentVariants } from './combobox-field.variants'
@@ -147,7 +145,6 @@ export function ButtonDropdown({
   } = useButtonDropdownControl({ groups, items, enableSearch, onSelectItem })
   const groupedSections = groupHeadingsForItems(displayItems, groups, searchActive)
   const searchFieldSize = resolveComboboxSearchFieldSizeForButtonSize(size)
-  const listDensity = resolveListDensityForFieldSize(searchFieldSize)
 
   const highlightIndexForItem = React.useCallback(
     (item: ButtonDropdownItem) =>
@@ -211,11 +208,11 @@ export function ButtonDropdown({
               onKeyDown={enableSearch ? undefined : handleNavigationKeyDown}
             >
               {displayItems.length === 0 ? (
-                <InteractiveList density={listDensity}>
+                <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY}>
                   <InteractiveListEmpty>{emptyMessage}</InteractiveListEmpty>
                 </InteractiveList>
               ) : searchActive ? (
-                <InteractiveList density={listDensity}>
+                <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY}>
                   {displayItems.map((item) => (
                     <ButtonDropdownItemRow
                       key={item.id}
@@ -239,7 +236,7 @@ export function ButtonDropdown({
                       </InteractiveListGroupHeading>
                     ) : null}
                     <InteractiveList
-                      density={listDensity}
+                      density={POPOVER_INTERACTIVE_LIST_DENSITY}
                       role="group"
                       aria-labelledby={group ? `${generatedId}-group-${group.id}` : undefined}
                     >

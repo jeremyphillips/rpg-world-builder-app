@@ -8,7 +8,7 @@ import {
   InteractiveListGroupHeading,
   type InteractiveListGroupHeadingProps,
 } from './interactive-list-group-heading.client'
-import type { ListDensity } from './list-density.lib'
+import { POPOVER_INTERACTIVE_LIST_DENSITY, type ListDensity } from './list-density.lib'
 import { InteractiveList } from './interactive-list.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
 
@@ -27,7 +27,7 @@ export type InteractiveListPanelProps = {
 /** Neutral scroll body — compositions set `listbox` or `menu` roles on the list. */
 export function InteractiveListPanel({
   children,
-  density = 'comfortable',
+  density = POPOVER_INTERACTIVE_LIST_DENSITY,
   groupHeading,
   groupHeadingProps,
   listProps,

@@ -14,7 +14,7 @@ import {
   comboboxContentVariants,
   comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
-import { resolveListDensityForFieldSize } from './field-sizing.variants'
+import { POPOVER_INTERACTIVE_LIST_DENSITY } from './list-density.lib'
 import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
@@ -159,7 +159,6 @@ function SearchableUnitSelect({
   const triggerText = unit ? selectedOption.label : (unitPlaceholder ?? 'Choose unit')
   const sizingLabels = options.map((option) => option.label)
   const searchPlaceholder = resolveFieldSearchPlaceholder({ label })
-  const listDensity = resolveListDensityForFieldSize(size)
 
   function handleSelect(nextUnit: string) {
     onUnitChange(nextUnit)
@@ -228,7 +227,12 @@ function SearchableUnitSelect({
           />
 
           <InteractiveListViewport>
-            <InteractiveList density={listDensity} id={listboxId} role="listbox" aria-label={label}>
+            <InteractiveList
+              density={POPOVER_INTERACTIVE_LIST_DENSITY}
+              id={listboxId}
+              role="listbox"
+              aria-label={label}
+            >
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => {
                   const isSelected = option.value === unit

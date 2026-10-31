@@ -10,6 +10,7 @@ import { Checkbox } from './checkbox.client'
 import { Input } from './input.client'
 import { SearchBar } from './search-bar.client'
 import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
+import { POPOVER_INTERACTIVE_LIST_DENSITY } from './list-density.lib'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListToolbar } from './interactive-list-toolbar.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
@@ -224,7 +225,7 @@ function RichTextLinkPickerForm({
 
             <InteractiveListViewport className="max-h-40">
               {selectedInternalOption ? (
-                <InteractiveList density="compact">
+                <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY}>
                   <InteractiveListRow
                     name={selectedInternalOption.title}
                     classification={resolveInternalLinkClassification(
@@ -248,7 +249,7 @@ function RichTextLinkPickerForm({
                   />
                 </InteractiveList>
               ) : (
-                <InteractiveList density="compact">
+                <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY}>
                   {filteredInternalOptions.length === 0 ? (
                     <InteractiveListEmpty>{EMPTY_SEARCH_MESSAGE}</InteractiveListEmpty>
                   ) : (

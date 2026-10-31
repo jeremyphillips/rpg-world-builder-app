@@ -395,8 +395,6 @@ export {
   buttonTextSizeToComboboxFieldSize,
   COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON,
   resolveComboboxSearchFieldSizeForButtonSize,
-  fieldSizeToListDensity,
-  resolveListDensityForFieldSize,
   fieldSizeToArrayAddButtonSize,
   fieldSizeToAttachedButtonSize,
   INLINE_HEADER_ACTION_BUTTON_SIZE,
@@ -816,6 +814,7 @@ export {
 export {
   LIST_DENSITIES,
   UI_LIST_DENSITY_CLASSES,
+  POPOVER_INTERACTIVE_LIST_DENSITY,
   listShellClasses,
   type ListDensity,
 } from './components/ui/list-density.lib'

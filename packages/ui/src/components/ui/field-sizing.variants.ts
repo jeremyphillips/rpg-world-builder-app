@@ -15,7 +15,6 @@ import {
   resolveFieldGroupInputSegmentClasses,
   resolveFieldGroupSizeClass,
 } from './field-group.styles'
-import type { ListDensity } from './list-density.lib'
 
 export type FieldSizeToken = 'xs' | 'sm' | 'md' | 'lg'
 
@@ -152,18 +151,6 @@ export function resolveComboboxSearchFieldSizeForButtonSize(
     return buttonTextSizeToComboboxFieldSize[size as keyof typeof buttonTextSizeToComboboxFieldSize]
   }
   return COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON
-}
-
-/** Combobox field band → list density (typography + row geometry on `InteractiveList`). */
-export const fieldSizeToListDensity = {
-  xs: 'compact',
-  sm: 'compact',
-  md: 'comfortable',
-  lg: 'spacious',
-} as const satisfies Record<FieldSizeToken, ListDensity>
-
-export function resolveListDensityForFieldSize(fieldSize: FieldSizeToken = 'md'): ListDensity {
-  return fieldSizeToListDensity[fieldSize]
 }
 
 /** Resolves grouped shell size modifier for composite roots. */

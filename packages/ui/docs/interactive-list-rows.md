@@ -30,7 +30,7 @@ Surface hover and pressed mixes come from [surface-interaction.css](../src/compo
 
 ## List density (typography and row geometry)
 
-`InteractiveList` and `DestinationList` publish **`ui-list ui-list--{density}`** on the list root. Copy-scale variables (`--ui-copy-title-*`, anatomy row gap, and related tokens) come from [copy-scale.css](../src/components/ui/copy-scale.css) on those modifiers. Row padding and destination insets are owned per component in [interactive-list.css](../src/components/ui/interactive-list.css) and [destination-list.css](../src/components/ui/destination-list.css) — comfortable values on base rules, compact/spacious overrides scoped under `.ui-list--compact|spacious`. Set **`density`** on `InteractiveList` / `InteractiveListPanel` (combobox field `size` maps via `resolveListDensityForFieldSize`); do not size individual rows.
+`InteractiveList` and `DestinationList` publish **`ui-list ui-list--{density}`** on the list root. Copy-scale variables (`--ui-copy-title-*`, anatomy row gap, and related tokens) come from [copy-scale.css](../src/components/ui/copy-scale.css) on those modifiers. Row padding and destination insets are owned per component in [interactive-list.css](../src/components/ui/interactive-list.css) and [destination-list.css](../src/components/ui/destination-list.css) — comfortable values on base rules, compact/spacious overrides scoped under `.ui-list--compact|spacious`. Set **`density`** on `InteractiveList` for in-page/card lists; popover-hosted lists (combobox, dropdown, searchable unit select, link picker) use **`POPOVER_INTERACTIVE_LIST_DENSITY`** (`compact`) via `InteractiveListPanel` default or an explicit prop. Do not size individual rows.
 
 ## Menu item contract
 

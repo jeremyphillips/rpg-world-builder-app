@@ -116,6 +116,10 @@ describe('InteractiveListPanel', () => {
     )
 
     expect(screen.getByRole('listbox', { name: 'Results' })).toBeInTheDocument()
+    expect(screen.getByRole('listbox', { name: 'Results' })).toHaveClass(
+      'ui-list',
+      'ui-list--compact',
+    )
   })
 })
 
