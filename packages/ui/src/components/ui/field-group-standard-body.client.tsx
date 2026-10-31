@@ -14,6 +14,7 @@ import type { FieldGroupDisclosure } from './field-group-disclosure.types'
 import { isLegendDisclosure, resolveDisclosureDefaultOpen } from './field-group-disclosure.types'
 import { FieldGroupLegend } from './field-group-legend.client'
 import {
+  fieldAnatomyStackVariants,
   fieldGroupBottomMarginClasses,
   fieldGroupLegendDisclosureContentVariants,
   fieldSetResetClasses,
@@ -114,9 +115,11 @@ export function StandardFieldGroupBody({
 
   const hasBody = React.Children.count(children) > 0
   const bodyVisible = hasBody && (!collapsible || open)
+  const useLeafAnatomyStack =
+    legendSize === 'array' && Boolean(legend) && bodyVisible && !legendSrOnly
   const bodyGapClass =
-    legend && bodyVisible && !legendSrOnly
-      ? resolveFieldGroupBodyGap({ size: legendSize, rhythm, fieldSize })
+    legend && bodyVisible && !legendSrOnly && legendSize !== 'array'
+      ? resolveFieldGroupBodyGap({ size: legendSize, rhythm })
       : undefined
 
   const fieldsetClassName = cn(
@@ -124,6 +127,7 @@ export function StandardFieldGroupBody({
     fieldGroupBottomMarginClasses,
     'min-w-0',
     chromeClasses.fieldset,
+    useLeafAnatomyStack && fieldAnatomyStackVariants({ size: fieldSize }),
     className,
   )
 

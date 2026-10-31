@@ -5,6 +5,8 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { writeGroupCollapseOpen } from '../../form/config/group-collapse-storage.lib'
 
+import { fieldAnatomyStackVariants } from './field.variants'
+
 import { Badge } from './badge'
 
 import { FieldGroup } from './field-group'
@@ -260,7 +262,7 @@ describe('FieldGroup', () => {
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-4')
   })
 
-  it('applies array body gap outside array legend typography', () => {
+  it('applies array anatomy stack on the fieldset instead of body margin', () => {
     render(
       <FieldGroup legend="Grants" legendSize="array" size="md">
         <TextField id="grant-type" label="Grant type" />
@@ -272,7 +274,8 @@ describe('FieldGroup', () => {
       'text-style-field-label-md',
     )
     expect(screen.getByText('Grants').closest('legend')).not.toHaveClass('mb-1.5')
-    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-1.5')
+    expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
+    expect(bodyRelationshipWrapper(fieldset)).toBeNull()
   })
 
   it('defaults array legend to sm field label typography when size is omitted', () => {

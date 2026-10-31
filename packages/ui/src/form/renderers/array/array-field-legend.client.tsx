@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react'
 
 import type { FieldSizeToken } from '../../../components/ui/field-sizing.variants'
-import { resolveArrayLegendSpacingClassName } from '../../../components/ui/field.variants'
 import { cn } from '../../../lib/utils'
 import type { ArrayAddActionLayout, FieldHintConfig } from '../../field-config'
 import type { ArrayLabelMode } from '../../config/array/resolve-array-label.lib'
@@ -61,7 +60,7 @@ export function ArrayFieldSectionHeader(props: ArrayFieldSectionHeaderProps) {
   if (labelMode === 'anonymous') {
     if (!hasVisibleHeaderBand(props, inlineAction)) return null
     return (
-      <div className={cn(resolveArrayLegendSpacingClassName(legendFieldSize), 'w-full min-w-0')}>
+      <div className="w-full min-w-0">
         <ArrayLikeSectionHeader
           label={sectionLabel}
           hint={hint}
@@ -81,9 +80,7 @@ export function ArrayFieldSectionHeader(props: ArrayFieldSectionHeaderProps) {
       <>
         <legend className="sr-only">{sectionLabel}</legend>
         {hasVisibleHeaderBand(props, inlineAction) ? (
-          <div
-            className={cn(resolveArrayLegendSpacingClassName(legendFieldSize), 'w-full min-w-0')}
-          >
+          <div className="w-full min-w-0">
             <ArrayLikeSectionHeader
               label={sectionLabel}
               hint={hint}

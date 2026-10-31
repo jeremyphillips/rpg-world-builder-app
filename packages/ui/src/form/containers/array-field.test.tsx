@@ -10,6 +10,7 @@ import { z } from 'zod'
 import { addCustomRefinementIssue } from '@rpg/contracts'
 
 import { CANVAS_SURFACE } from '../../components/ui/surface.variants'
+import { fieldAnatomyStackVariants } from '../../components/ui/field.variants'
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
 import { readArrayItemCollapseOverrides } from '../config/array/array-item-collapse-storage.lib'
@@ -158,21 +159,44 @@ describe('ArrayFieldRenderer', () => {
   it('renders the add button, legend, and empty state for an empty array', () => {
     renderForm()
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
-    const legend = screen.getByRole('group', { name: /Traits/ }).querySelector('legend')
+    const fieldset = screen.getByRole('group', { name: /Traits/ })
+    const legend = fieldset.querySelector('legend')
     expect(legend).toHaveClass('contents')
-    expect(legend).toHaveClass('mb-1.5')
-    expect(legend).not.toHaveClass('text-style-field-label-md')
+    expect(legend).not.toHaveClass('mb-1.5')
+    expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
     expect(screen.getByText('Traits').parentElement).toHaveClass('text-style-field-label-md')
     expect(legend).not.toHaveClass('text-field-array-legend')
     expect(legend).not.toHaveClass('text-style-field-legend')
-    expect(screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')).toHaveClass(
-      'gap-3',
-    )
+    expect(fieldset.querySelector(':scope > div')).toHaveClass('gap-3')
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('ui-button--md')
     expect(screen.getByText('No trait added.')).toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
-    expect(screen.getByRole('group', { name: /Traits/ })).not.toHaveClass('mb-8')
+    expect(fieldset).not.toHaveClass('mb-8')
+  })
+
+  it('omits fieldset anatomy stack for sr-only labels without visible header chrome', () => {
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={[
+          {
+            kind: 'array',
+            name: 'traits',
+            label: 'Traits',
+            labelVisibility: 'srOnly',
+            fields: traitFields,
+            addAction: { label: 'Add trait' },
+          },
+        ]}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const fieldset = screen.getByRole('group', { name: /Traits/ })
+    expect(fieldset.querySelector('legend.sr-only')).toHaveTextContent('Traits')
+    expect(fieldset).not.toHaveClass('gap-y-1', 'gap-y-1.5')
   })
 
   it('omits section bottom margin and empty legends for nested arrays in dependent stacks', async () => {

@@ -12,7 +12,8 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `field-row-presentation.lib.ts` — `resolveFieldPresentation`, `resolveFieldRowClasses`
  *
  * Spacing tokens below:
- * - `fieldAnatomyStackVariants` — legacy Root stack gap (non-anatomy compositions)
+ * - `fieldAnatomyHeaderBodyGapClasses` — header→body step values (fieldset `gap-y` + label-region `pb`)
+ * - `fieldAnatomyStackVariants` — fieldset / composite column stack (reads header→body map)
  * - `fieldLabelRegionVariants` / `fieldMessageRegionVariants` — region-owned padding for flat three-region anatomy
  * - `fieldControlRegionClasses` — control region shell (no intrinsic spacing)
  * - `fieldLabelContentClusterClasses` — label + required marker + info on one line
@@ -48,6 +49,17 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `fieldSeparatorVariants` — trailing divider after a leaf field or row
  */
 /**
+ * Header/label cluster → body/control step by field size — values only.
+ * Fieldset stacks use `stack`; flat three-region anatomy uses `labelRegionBottom`.
+ */
+export const fieldAnatomyHeaderBodyGapClasses = {
+  xs: { stack: 'gap-y-1', labelRegionBottom: 'has-[*]:pb-1' },
+  sm: { stack: 'gap-y-1', labelRegionBottom: 'has-[*]:pb-1' },
+  md: { stack: 'gap-y-1.5', labelRegionBottom: 'has-[*]:pb-1.5' },
+  lg: { stack: 'gap-y-1.5', labelRegionBottom: 'has-[*]:pb-1.5' },
+} as const satisfies Record<FieldSizeToken, { stack: string; labelRegionBottom: string }>
+
+/**
  * Label/heading cluster → control and control → validation / bottom hint.
  * Compact `sm` is 4px; comfortable `md`/`lg` is 6px. Keep
  * {@link fieldAnatomyAlignVariants} in lockstep. Both use `gap-y` so fieldset
@@ -56,13 +68,10 @@ import { type FieldSizeToken } from './field-sizing.variants'
 export const fieldAnatomyStackVariants = cva('flex flex-col', {
   variants: {
     size: {
-      /** Entity-card utility band and extra-dense controls — 4px label-to-control gap. */
-      xs: 'gap-y-1',
-      /** Dense forms (`FormDensity: 'compact'`) — 4px label-to-control gap. */
-      sm: 'gap-y-1',
-      /** Comfortable default — 6px label-to-control / control-to-message gap. */
-      md: 'gap-y-1.5',
-      lg: 'gap-y-1.5',
+      xs: fieldAnatomyHeaderBodyGapClasses.xs.stack,
+      sm: fieldAnatomyHeaderBodyGapClasses.sm.stack,
+      md: fieldAnatomyHeaderBodyGapClasses.md.stack,
+      lg: fieldAnatomyHeaderBodyGapClasses.lg.stack,
     },
   },
   defaultVariants: {
@@ -74,16 +83,21 @@ export const fieldAnatomyStackVariants = cva('flex flex-col', {
 export const fieldAnatomyAlignVariants = cva('flex flex-col', {
   variants: {
     size: {
-      xs: 'gap-y-1',
-      sm: 'gap-y-1',
-      md: 'gap-y-1.5',
-      lg: 'gap-y-1.5',
+      xs: fieldAnatomyHeaderBodyGapClasses.xs.stack,
+      sm: fieldAnatomyHeaderBodyGapClasses.sm.stack,
+      md: fieldAnatomyHeaderBodyGapClasses.md.stack,
+      lg: fieldAnatomyHeaderBodyGapClasses.lg.stack,
     },
   },
   defaultVariants: {
     size: 'md',
   },
 })
+
+/** Fieldset / composite column header→body stack — thin alias for call-site clarity. */
+export function resolveFieldAnatomyHeaderBodyStackClassName(size: FieldSizeToken = 'md'): string {
+  return fieldAnatomyStackVariants({ size })
+}
 
 /** Subgrid row track for label regions inside {@link fieldRowParticipationClasses} columns. */
 export const fieldAnatomyLabelRegionRowTrackClasses =
@@ -107,10 +121,10 @@ export const fieldLabelRegionVariants = cva(
   {
     variants: {
       size: {
-        xs: 'has-[*]:pb-1',
-        sm: 'has-[*]:pb-1',
-        md: 'has-[*]:pb-1.5',
-        lg: 'has-[*]:pb-1.5',
+        xs: fieldAnatomyHeaderBodyGapClasses.xs.labelRegionBottom,
+        sm: fieldAnatomyHeaderBodyGapClasses.sm.labelRegionBottom,
+        md: fieldAnatomyHeaderBodyGapClasses.md.labelRegionBottom,
+        lg: fieldAnatomyHeaderBodyGapClasses.lg.labelRegionBottom,
       },
     },
     defaultVariants: {
@@ -213,36 +227,6 @@ export const fieldLabelTypographyVariants = cva('', {
     size: 'md',
   },
 })
-
-/** Legend-to-list spacing — mirrors {@link fieldAnatomyStackVariants} label→control gap. */
-export const fieldArrayLegendSpacingVariants = cva('', {
-  variants: {
-    size: {
-      xs: 'mb-1',
-      sm: 'mb-1',
-      md: 'mb-1.5',
-      lg: 'mb-1.5',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-  },
-})
-
-/** Legend-to-list spacing — mirrors {@link fieldAnatomyStackVariants} label→control gap. */
-export function resolveArrayLegendSpacingClassName(size: FieldSizeToken = 'md'): string {
-  return fieldArrayLegendSpacingVariants({ size })
-}
-
-/**
- * Spacing below an array section header band — label typography lives on the label line only
- * ({@link fieldLabelVariants}), not on the `<legend>` wrapper.
- *
- * @deprecated Prefer {@link resolveArrayLegendSpacingClassName}. Typography is no longer composed here.
- */
-export function resolveArrayLegendClassName(size: FieldSizeToken = 'md'): string {
-  return resolveArrayLegendSpacingClassName(size)
-}
 
 /**
  * @deprecated Prefer {@link formSectionHeaderActionLayoutClasses} from form presentation.
@@ -548,10 +532,10 @@ export type FieldStackLayout = 'default' | 'dependent'
 
 export type FieldGroupLegendSize = 'section' | 'subsection' | 'array'
 
-/** @deprecated Array legends use {@link resolveArrayLegendClassName} — scale is unused. */
+/** @deprecated Internal array-tier density bridge — scale is unused for spacing. */
 export type FieldGroupLegendScale = 'default' | 'sm'
 
-/** @deprecated Array legends use {@link resolveArrayLegendClassName}. */
+/** @deprecated Internal array-tier density bridge. */
 export function resolveArrayLegendScale(size: FieldSizeToken): FieldGroupLegendScale {
   return size === 'sm' || size === 'xs' ? 'sm' : 'default'
 }
@@ -621,7 +605,7 @@ export const fieldGroupLegendHeaderMarginVariants = cva('', {
     size: {
       section: '',
       subsection: '',
-      array: 'mb-1.5',
+      array: '',
     },
     rhythm: {
       comfortable: '',
@@ -652,43 +636,30 @@ export const fieldGroupBodyGapVariants = cva('', {
       comfortable: '',
       compact: '',
     },
-    fieldSize: {
-      xs: '',
-      sm: '',
-      md: '',
-      lg: '',
-    },
   },
   compoundVariants: [
     { size: 'section', rhythm: 'comfortable', class: 'mt-5' },
     { size: 'subsection', rhythm: 'comfortable', class: 'mt-4' },
     { size: 'section', rhythm: 'compact', class: 'mt-3' },
     { size: 'subsection', rhythm: 'compact', class: 'mt-3' },
-    { size: 'array', fieldSize: 'xs', class: 'mt-1' },
-    { size: 'array', fieldSize: 'sm', class: 'mt-1' },
-    { size: 'array', fieldSize: 'md', class: 'mt-1.5' },
-    { size: 'array', fieldSize: 'lg', class: 'mt-1.5' },
   ],
   defaultVariants: {
     size: 'section',
     rhythm: 'comfortable',
-    fieldSize: 'md',
   },
 })
 
+/** Structural legend→body spacing for section/subsection FieldGroups only. */
 export function resolveFieldGroupBodyGap(options: {
   size: FieldGroupLegendSize
   rhythm: FieldRhythm
-  fieldSize?: FieldSizeToken
 }): string {
-  const fieldSize = options.fieldSize ?? 'md'
   if (options.size === 'array') {
-    return fieldGroupBodyGapVariants({ size: 'array', rhythm: options.rhythm, fieldSize })
+    return ''
   }
   return fieldGroupBodyGapVariants({
     size: options.size,
     rhythm: options.rhythm,
-    fieldSize,
   })
 }
 
@@ -705,10 +676,7 @@ export function resolveFieldGroupLegendClassName(
   const rhythm = options.rhythm ?? 'comfortable'
   if (size === 'array') {
     const fieldSize = options.fieldSize ?? 'sm'
-    return cn(
-      fieldLabelTypographyVariants({ size: fieldSize }),
-      fieldArrayLegendSpacingVariants({ size: fieldSize }),
-    )
+    return fieldLabelTypographyVariants({ size: fieldSize })
   }
   return cn(
     fieldGroupLegendVariants({ size, scale: options.scale, rhythm }),

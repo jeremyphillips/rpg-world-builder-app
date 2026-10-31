@@ -1,5 +1,6 @@
 'use client'
 
+import type { FieldSizeToken } from '../../../components/ui/field-sizing.variants'
 import {
   fieldGroupBottomMarginClasses,
   fieldGroupSectionOuterMarginResetClasses,
@@ -8,6 +9,7 @@ import {
 } from '../../../components/ui/field.variants'
 import { cn } from '../../../lib/utils'
 import type { ArrayConfig } from '../../field-config'
+import { resolveArrayFieldsetHeaderBodyStackClassName } from './resolve-array-fieldset-header-body-stack.lib'
 import { ArrayFieldAddControl } from './array-field-add-control.client'
 import { ArrayFieldContainerError } from './array-field-container-error.client'
 import { ArrayFieldEmptyState } from './array-field-empty-state.client'
@@ -22,10 +24,14 @@ export function resolveArrayFieldsetClassName({
   config,
   sectionLayout,
   omitSectionBottomMargin,
+  showSectionHeader,
+  legendFieldSize,
 }: {
   config: ArrayConfig
   sectionLayout?: ArrayFieldSectionLayout
   omitSectionBottomMargin: boolean
+  showSectionHeader: boolean
+  legendFieldSize: FieldSizeToken
 }): string {
   return cn(
     fieldSetResetClasses,
@@ -34,6 +40,7 @@ export function resolveArrayFieldsetClassName({
     sectionLayout &&
       (sectionLayout.inParentRhythm || sectionLayout.wrapSectionChrome) &&
       fieldGroupSectionOuterMarginResetClasses,
+    resolveArrayFieldsetHeaderBodyStackClassName(showSectionHeader, legendFieldSize),
     config.className,
   )
 }
@@ -80,6 +87,8 @@ export function ArrayFieldRendererFieldset({
         config,
         sectionLayout,
         omitSectionBottomMargin: state.omitSectionBottomMargin,
+        showSectionHeader: state.showSectionHeader,
+        legendFieldSize: state.legendFieldSize,
       })}
       aria-describedby={state.hasContainerIssue ? containerErrorId : undefined}
       aria-invalid={state.hasContainerIssue ? true : undefined}
