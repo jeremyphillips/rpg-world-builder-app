@@ -25,7 +25,9 @@ describe('InlineMetadata', () => {
   it('renders heading compact nowrap with muted-free items', () => {
     const { container } = renderTwoItems({ role: 'heading', density: 'compact', wrap: false })
 
-    expect(container).toHaveTextContent('A · B')
+    expect(container.textContent).toContain('A')
+    expect(container.textContent).toContain('·')
+    expect(container.textContent).toContain('B')
     expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
     expect(container.firstElementChild).toHaveClass('flex', 'min-w-0', 'items-baseline')
     expect(container.querySelector('[data-inline-metadata-separator]')).toHaveClass('mx-1')
@@ -79,7 +81,9 @@ describe('InlineMetadata', () => {
     )
 
     expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(2)
-    expect(container).toHaveTextContent('One · Two · Three')
+    expect(container.textContent).toContain('One')
+    expect(container.textContent).toContain('Two')
+    expect(container.textContent).toContain('Three')
   })
 
   it('drops conditional items and their separators', () => {
@@ -94,7 +98,8 @@ describe('InlineMetadata', () => {
     )
 
     expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
-    expect(container).toHaveTextContent('Weapon · 1d6')
+    expect(container.textContent).toContain('Weapon')
+    expect(container.textContent).toContain('1d6')
   })
 
   it('marks separators aria-hidden', () => {
@@ -102,6 +107,41 @@ describe('InlineMetadata', () => {
 
     const separator = container.querySelector('[data-inline-metadata-separator]')
     expect(separator).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('nowrap separator uses horizontal margin only', () => {
+    const { container } = renderTwoItems(
+      {
+        role: 'heading',
+        density: 'comfortable',
+        wrap: false,
+      },
+      '(1d8+3)',
+    )
+
+    const separator = container.querySelector('[data-inline-metadata-separator]')
+    expect(separator).toHaveClass('mx-1.5')
+    expect(separator?.textContent).toBe('·')
+
+    const secondItem = container.querySelectorAll(':scope > span > span')[1]
+    expect(secondItem?.firstElementChild).toBe(separator)
+    expect(secondItem?.lastChild?.textContent).toBe('(1d8+3)')
+  })
+
+  it('nowrap compact and comfortable use distinct margin steps only', () => {
+    const { container: compact } = renderTwoItems({
+      role: 'heading',
+      density: 'compact',
+      wrap: false,
+    })
+    const { container: comfortable } = renderTwoItems({
+      role: 'heading',
+      density: 'comfortable',
+      wrap: false,
+    })
+
+    expect(compact.querySelector('[data-inline-metadata-separator]')).toHaveClass('mx-1')
+    expect(comfortable.querySelector('[data-inline-metadata-separator]')).toHaveClass('mx-1.5')
   })
 
   it('uses wrapping separator markup with nbsp glue', () => {
@@ -113,14 +153,28 @@ describe('InlineMetadata', () => {
     expect(container).toHaveTextContent('A · B')
   })
 
-  it('applies comfortable glyph margin when wrapping', () => {
+  it('wrap separator uses nbsp glue without horizontal margin', () => {
     const { container } = renderTwoItems({
       role: 'supporting',
       density: 'comfortable',
       wrap: true,
     })
 
-    expect(container.querySelector('[data-inline-metadata-separator]')).toHaveClass('mx-0.5')
+    const separator = container.querySelector('[data-inline-metadata-separator]')
+    expect(separator?.textContent).toBe('\u00A0· ')
+    expect(separator?.className).not.toMatch(/\bmx-/)
+  })
+
+  it('wrap compact matches string copy spacing without margin', () => {
+    const { container } = renderTwoItems({
+      role: 'supporting',
+      density: 'compact',
+      wrap: true,
+    })
+
+    const separator = container.querySelector('[data-inline-metadata-separator]')
+    expect(separator?.textContent).toBe('\u00A0· ')
+    expect(separator?.className).not.toMatch(/\bmx-/)
   })
 
   it('applies truncate only on nowrap items', () => {

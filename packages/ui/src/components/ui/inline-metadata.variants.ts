@@ -67,10 +67,5 @@ export const inlineMetadataSeparatorVariants = cva('font-normal text-muted-foreg
       density: 'comfortable',
       className: 'mx-1.5',
     },
-    {
-      wrap: true,
-      density: 'comfortable',
-      className: 'mx-0.5',
-    },
   ],
 })

@@ -72,12 +72,9 @@ function InlineMetadataSeparator({
   }
 
   return (
-    <>
-      {' '}
-      <span aria-hidden="true" data-inline-metadata-separator className={className}>
-        {INLINE_METADATA_SEPARATOR}
-      </span>{' '}
-    </>
+    <span aria-hidden="true" data-inline-metadata-separator className={className}>
+      {INLINE_METADATA_SEPARATOR}
+    </span>
   )
 }
 
