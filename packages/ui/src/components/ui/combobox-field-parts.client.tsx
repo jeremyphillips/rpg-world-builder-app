@@ -24,7 +24,6 @@ import {
   comboboxSelectedItemsRowVariants,
   comboboxSelectedListVariants,
   comboboxContentVariants,
-  comboboxSearchRowVariants,
   comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
 import { InteractiveListEmpty } from './interactive-list.client'
@@ -244,21 +243,19 @@ export function ComboboxSearchField({
   return (
     <InteractiveListToolbar
       search={
-        <div className={comboboxSearchRowVariants({ size })}>
-          <SearchBar
-            appearance="embedded"
-            id={searchId}
-            value={query}
-            onValueChange={onQueryChange}
-            onKeyDown={onSearchKeyDown}
-            placeholder={searchPlaceholder}
-            ariaLabel={searchPlaceholder}
-            size={size}
-            inputRef={searchInputRef}
-            aria-controls={listboxId}
-            aria-activedescendant={activeOptionId}
-          />
-        </div>
+        <SearchBar
+          appearance="embedded"
+          id={searchId}
+          value={query}
+          onValueChange={onQueryChange}
+          onKeyDown={onSearchKeyDown}
+          placeholder={searchPlaceholder}
+          ariaLabel={searchPlaceholder}
+          size={size}
+          inputRef={searchInputRef}
+          aria-controls={listboxId}
+          aria-activedescendant={activeOptionId}
+        />
       }
       filter={filter}
     />

@@ -1,12 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { FormSectionProvider } from '../../form/context/form-section.context'
 import { FilterChromeProvider } from '../../filters/filter-chrome.context'
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
-import { comboboxSearchRowVariants } from './combobox-field.variants'
+import { ComboboxSearchField } from './combobox-field-parts.client'
+import { comboboxContentVariants } from './combobox-field.variants'
 import { fieldControlVariants } from './field-control.variants'
 import { FIELD_CONTROL_SIZE_SPECS, resolveSearchBarFieldInputClass } from './field-control.styles'
+import { ListGroupHeading } from './list-group-heading.client'
+import { InteractiveList } from './interactive-list.client'
+import { InteractiveListRow } from './interactive-list-row.client'
+import { POPOVER_INTERACTIVE_LIST_DENSITY } from './list-density.lib'
 import { SearchBar } from './search-bar.client'
 
 const meta = {
@@ -90,32 +95,45 @@ export const FormSectionCompact: Story = {
   ),
 }
 
-function EmbeddedHostDemo(args: NonNullable<Story['args']>) {
-  const [value, setValue] = useState(args.value ?? '')
+function PopoverToolbarCompositionDemo() {
+  const [value, setValue] = useState('fire')
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
   return (
-    <div className="max-w-md border border-border bg-input">
-      <div className={comboboxSearchRowVariants({ size: args.size ?? 'md' })}>
-        <SearchBar
-          appearance="embedded"
-          id="embedded-search-demo"
-          placeholder={args.placeholder}
-          ariaLabel={args.ariaLabel ?? 'Search choices'}
-          value={value}
-          onValueChange={setValue}
-          size={args.size}
-        />
-      </div>
+    <div className={comboboxContentVariants()}>
+      <ComboboxSearchField
+        searchPlaceholder="Search add…"
+        listboxId="popover-toolbar-demo-listbox"
+        searchId="popover-toolbar-demo-search"
+        size="md"
+        query={value}
+        onQueryChange={setValue}
+        searchInputRef={searchInputRef}
+      />
+      <ListGroupHeading label="Equipped weapons" first />
+      <InteractiveList
+        density={POPOVER_INTERACTIVE_LIST_DENSITY}
+        role="listbox"
+        aria-label="Weapons"
+      >
+        <InteractiveListRow name="Add a weapon to Equipment" />
+      </InteractiveList>
+      <ListGroupHeading label="Natural attacks" follows="complete" />
+      <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY}>
+        <InteractiveListRow name="Claw" classification="Slashing" />
+        <InteractiveListRow name="Bite" classification="Piercing" />
+      </InteractiveList>
     </div>
   )
 }
 
-export const EmbeddedInHostRow: Story = {
-  render: (args) => <EmbeddedHostDemo {...args} />,
-  args: {
-    ariaLabel: 'Search choices',
-    placeholder: 'Search choices…',
-    value: 'arc',
-  },
+/** Production shape: toolbar-owned inset, embedded search, group bands, compact rows. */
+export const PopoverToolbarComposition: Story = {
+  render: () => (
+    <div className="w-96 overflow-hidden rounded-md border border-border bg-background">
+      <PopoverToolbarCompositionDemo />
+    </div>
+  ),
 }
 
 export const ClassReference: Story = {

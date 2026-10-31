@@ -8,11 +8,10 @@ import { cn } from '../../lib/utils'
 import { portalPopoverSurfaceClasses } from './surface-current.lib'
 import { Checkbox } from './checkbox.client'
 import { Input } from './input.client'
-import { SearchBar } from './search-bar.client'
+import { ComboboxSearchField } from './combobox-field-parts.client'
 import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
 import { POPOVER_INTERACTIVE_LIST_DENSITY } from './list-density.lib'
 import { InteractiveListRow } from './interactive-list-row.client'
-import { InteractiveListToolbar } from './interactive-list-toolbar.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
 import {
   buildExternalLinkPickerValue,
@@ -45,6 +44,7 @@ const DEFAULT_CONTENT_TYPE_OPTIONS: RichTextLinkPickerContentTypeOption[] = [
 ]
 
 const EMPTY_SEARCH_MESSAGE = 'No content matches your search.'
+const INTERNAL_LINK_LISTBOX_ID = 'rich-text-link-internal-listbox'
 
 function resolveInternalLinkClassification(contentType: string, eyebrowLabel?: string): string {
   if (eyebrowLabel) return eyebrowLabel
@@ -109,6 +109,7 @@ function RichTextLinkPickerForm({
   const [externalOpenInNewWindow, setExternalOpenInNewWindow] = React.useState(
     () => resolveLinkPickerFormState(initialValue, internalOptions).externalOpenInNewWindow,
   )
+  const internalSearchInputRef = React.useRef<HTMLInputElement>(null)
 
   const selectedInternalOption = React.useMemo(
     () => internalOptions.find((option) => option.id === selectedOptionId) ?? null,
@@ -190,20 +191,14 @@ function RichTextLinkPickerForm({
 
         <TabsContent value="internal" className="space-y-3">
           <div className="overflow-hidden rounded-md border border-border">
-            <InteractiveListToolbar
-              search={
-                <div className="flex h-8 w-full items-center">
-                  <SearchBar
-                    appearance="embedded"
-                    id="rich-text-link-internal-search"
-                    value={searchQuery}
-                    onValueChange={setSearchQuery}
-                    placeholder="Search content"
-                    ariaLabel="Search internal content"
-                    size="sm"
-                  />
-                </div>
-              }
+            <ComboboxSearchField
+              searchPlaceholder="Search content"
+              listboxId={INTERNAL_LINK_LISTBOX_ID}
+              searchId="rich-text-link-internal-search"
+              size="sm"
+              query={searchQuery}
+              onQueryChange={setSearchQuery}
+              searchInputRef={internalSearchInputRef}
               filter={
                 <Select value={contentType} onValueChange={setContentType}>
                   <SelectTrigger size="sm" aria-label="Filter by content type">
@@ -223,7 +218,7 @@ function RichTextLinkPickerForm({
               }
             />
 
-            <InteractiveListViewport className="max-h-40">
+            <InteractiveListViewport className="max-h-40" id={INTERNAL_LINK_LISTBOX_ID}>
               {selectedInternalOption ? (
                 <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY}>
                   <InteractiveListRow

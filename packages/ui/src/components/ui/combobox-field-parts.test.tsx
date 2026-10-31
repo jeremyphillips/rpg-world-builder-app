@@ -1,9 +1,10 @@
 import type { ComponentProps } from 'react'
+import { createRef } from 'react'
 import { render, screen } from '@testing-library/react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { describe, expect, it } from 'vitest'
 
-import { ComboboxTrigger } from './combobox-field-parts.client'
+import { ComboboxSearchField, ComboboxTrigger } from './combobox-field-parts.client'
 import { Field } from './field.client'
 
 function renderComboboxTrigger(props: ComponentProps<typeof ComboboxTrigger>) {
@@ -58,5 +59,45 @@ describe('ComboboxTrigger', () => {
     const trigger = screen.getByRole('combobox')
     expect(trigger).toHaveAttribute('aria-busy', 'true')
     expect(trigger.querySelector('[data-select-caret-slot] [role="status"]')).toBeInTheDocument()
+  })
+})
+
+describe('ComboboxSearchField', () => {
+  it('mounts embedded SearchBar directly in the toolbar search slot without an extra padded wrapper', () => {
+    const { container } = render(
+      <ComboboxSearchField
+        searchPlaceholder="Search options"
+        listboxId="options-listbox"
+        searchId="options-search"
+        size="md"
+        query=""
+        onQueryChange={() => undefined}
+        searchInputRef={createRef()}
+      />,
+    )
+
+    const toolbarSearch = container.querySelector('.ui-interactive-list__toolbar-search')
+    expect(toolbarSearch).toBeInTheDocument()
+    const embeddedHost = toolbarSearch?.querySelector('.ui-search-bar--embedded-host')
+    expect(embeddedHost?.parentElement).toBe(toolbarSearch)
+    expect(toolbarSearch?.querySelector('.px-3')).toBeNull()
+  })
+
+  it('exposes a single toolbar horizontal inset on the search slot', () => {
+    const { container } = render(
+      <ComboboxSearchField
+        searchPlaceholder="Search"
+        listboxId="lb"
+        searchId="search"
+        size="sm"
+        query="fire"
+        onQueryChange={() => undefined}
+        searchInputRef={createRef()}
+      />,
+    )
+
+    const toolbarSearch = container.querySelector('.ui-interactive-list__toolbar-search')
+    expect(toolbarSearch).toHaveClass('ui-interactive-list__toolbar-search')
+    expect(screen.getByRole('searchbox', { name: 'Search' })).toBeInTheDocument()
   })
 })

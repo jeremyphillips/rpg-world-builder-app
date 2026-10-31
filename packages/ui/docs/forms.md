@@ -147,8 +147,9 @@ field value.
 Use [`SearchBar`](../src/components/ui/search-bar.client.tsx) for magnifier + optional clear —
 not a hand-wired `Input` + icon. **`ariaLabel` is required** (semantic name); `placeholder` is
 presentation-only. `appearance="field"` is the bordered control; `appearance="embedded"` is for
-popover toolbars (combobox panel, columns menu) where the **host** owns outer row padding and
-keyboard routing (`onKeyDown`).
+popover toolbars — use [`ComboboxSearchField`](../src/components/ui/combobox-field-parts.client.tsx)
+(`InteractiveListToolbar` + embedded `SearchBar`) so horizontal inset is owned once by
+`.ui-interactive-list__toolbar-search`; embedded `SearchBar` owns icon/input gap and row min-height.
 
 Clear uses [`FieldClearAffordanceButton`](../src/components/ui/field-clear-affordance.client.tsx)
 (`variant="inset"`) with focus restored to the input after clear. Control scale resolves via
