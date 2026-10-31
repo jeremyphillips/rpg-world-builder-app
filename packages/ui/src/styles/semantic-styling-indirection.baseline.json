@@ -159,7 +159,6 @@
   "packages/ui/src/components/ui/floating-label-field.styles.ts:FLOATING_LABEL_TEXT_CLASS:single-semantic-alias",
   "packages/ui/src/components/ui/hero.variants.ts:heroMarkCopyGapClasses:single-utility-alias",
   "packages/ui/src/components/ui/hero.variants.ts:heroMarkRadiusClasses:single-utility-alias",
-  "packages/ui/src/components/ui/input-select-field.variants.ts:inputSelectSearchablePanelVariants:empty-cva",
   "packages/ui/src/components/ui/interactive-focus.variants.ts:interactivePointerClasses:single-utility-alias",
   "packages/ui/src/components/ui/interactive-row.styles.ts:UI_INTERACTIVE_ROW_BLOCK_CLASS:single-semantic-alias",
   "packages/ui/src/components/ui/interactive-row.styles.ts:UI_INTERACTIVE_ROW_EMPHASIS_FILL_CLASS:single-semantic-alias",

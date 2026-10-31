@@ -38,7 +38,5 @@ export const inputSelectSearchableUnitShellWidthVariants = cva('', {
   },
 })
 
-export const inputSelectSearchablePanelVariants = cva('min-w-56')
-
 export type InputSelectGroupVariantProps = VariantProps<typeof inputSelectGroupVariants>
 export type InputSelectSegmentVariantProps = VariantProps<typeof inputSelectValueSegmentVariants>

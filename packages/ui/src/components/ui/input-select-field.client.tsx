@@ -26,10 +26,7 @@ import {
   resolveInputSelectOption,
   type InputSelectOption,
 } from './input-select-field.lib'
-import {
-  inputSelectSearchablePanelVariants,
-  inputSelectSearchableUnitShellWidthVariants,
-} from './input-select-field.variants'
+import { inputSelectSearchableUnitShellWidthVariants } from './input-select-field.variants'
 import { groupedSelectSegmentShellClasses } from './select-compact-trigger.variants'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import { type NumberInputDigits } from './number-input.client'
@@ -210,7 +207,7 @@ function SearchableUnitSelect({
           side="bottom"
           avoidCollisions
           sideOffset={-COMBOBOX_TRIGGER_OVERLAP_OFFSET[size]}
-          className={cn(comboboxContentVariants(), inputSelectSearchablePanelVariants())}
+          className={comboboxContentVariants()}
           onOpenAutoFocus={(event) => {
             event.preventDefault()
             searchInputRef.current?.focus()

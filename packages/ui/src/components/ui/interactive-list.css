@@ -49,13 +49,13 @@
   }
 
   .ui-interactive-list__panel--match {
-    width: var(--radix-popover-trigger-width);
-    min-width: var(--radix-popover-trigger-width);
+    width: max(var(--radix-popover-trigger-width), 18.75rem);
+    min-width: max(var(--radix-popover-trigger-width), 18.75rem);
   }
 
   .ui-interactive-list__panel--fit {
     width: max-content;
-    min-width: 15.625rem; /* 250px — minimum readable width when the trigger is fit-sized */
+    min-width: 18.75rem; /* 300px — minimum readable width when the trigger is fit-sized */
   }
 
   .ui-interactive-list__toolbar {
