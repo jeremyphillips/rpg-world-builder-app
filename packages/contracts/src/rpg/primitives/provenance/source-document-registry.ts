@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import type { SystemRulesetId } from '../ruleset'
-import { sourceDocumentAccessSchema, sourceDocumentLicenseSchema } from './source-document-access'
+import type { SourceDocumentAccess, SourceDocumentLicense } from './source-document-access'
 
 export type SourceDocumentEntry = {
   label: string
@@ -9,8 +9,8 @@ export type SourceDocumentEntry = {
   publisher: string
   revision: string
   url: string
-  license: z.infer<typeof sourceDocumentLicenseSchema>
-  access: z.infer<typeof sourceDocumentAccessSchema>
+  license: SourceDocumentLicense
+  access: SourceDocumentAccess
   attributionStatement: string
 }
 
