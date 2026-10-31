@@ -9,7 +9,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { Button } from './button.client'
 import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
-import { InteractiveListGroupHeading } from './interactive-list-group-heading.client'
+import { ListGroupHeading } from './list-group-heading.client'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListToolbar } from './interactive-list-toolbar.client'
 import { InteractiveListPanel } from './interactive-list-panel.client'
@@ -162,9 +162,7 @@ describe('InteractiveList', () => {
   it('leaves only direct row children inside the list (headings belong outside)', () => {
     render(
       <>
-        <InteractiveListGroupHeading id="group" as="h2">
-          Section
-        </InteractiveListGroupHeading>
+        <ListGroupHeading id="group" as="h2" label="Section" />
         <InteractiveList data-testid="row-list">
           <InteractiveListRow name="A" />
           <InteractiveListRow name="B" />
@@ -188,15 +186,11 @@ describe('InteractiveList', () => {
   })
 })
 
-describe('InteractiveListGroupHeading', () => {
+describe('ListGroupHeading in list composition', () => {
   it('exposes host-owned heading id', () => {
-    render(
-      <InteractiveListGroupHeading id="content-group" as="h2">
-        Content · 14
-      </InteractiveListGroupHeading>,
-    )
+    render(<ListGroupHeading id="content-group" as="h2" label="Content" count={14} />)
 
-    expect(screen.getByRole('heading', { name: 'Content · 14' })).toHaveAttribute(
+    expect(screen.getByRole('heading', { name: 'Content 14' })).toHaveAttribute(
       'id',
       'content-group',
     )

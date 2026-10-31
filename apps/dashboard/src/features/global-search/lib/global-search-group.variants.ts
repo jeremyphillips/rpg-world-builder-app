@@ -1,11 +1,4 @@
 import { cva } from 'class-variance-authority'
-import { cn, establishSurfaceCurrent } from '@rpg/ui'
-
-/** Faint band for group headings inside transparent search panels (matches {@code .ui-interactive-list__heading}). */
-export const globalSearchGroupHeadingClasses = cn(
-  'bg-surface-faint',
-  establishSurfaceCurrent('surface-faint'),
-)
 
 export const globalSearchGroupSectionVariants = cva('', {
   variants: {
@@ -18,9 +11,6 @@ export const globalSearchGroupSectionVariants = cva('', {
     state: 'complete',
   },
 })
-
-/** Quiet match count suffix in group headings (`Content · 14`). */
-export const globalSearchGroupHeadingCountClasses = 'font-normal tabular-nums text-muted-foreground'
 
 /** Per-group overflow action when a section is truncated. */
 export const globalSearchGroupShowAllLinkVariants =

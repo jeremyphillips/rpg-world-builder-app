@@ -16,28 +16,6 @@ import {
   selectableRowListPointerHoverClasses,
 } from './interactive-row.variants'
 
-/** Visual-only group heading; hosts own section / listbox group semantics. */
-export const interactiveListGroupHeadingVariants = cva(
-  cn('ui-interactive-list__heading', borderStrength('subtle')),
-  {
-    variants: {
-      first: {
-        true: 'ui-interactive-list__heading--first',
-        false: '',
-      },
-      follows: {
-        none: '',
-        complete: 'ui-interactive-list__heading--follows-complete',
-        truncated: '',
-      },
-    },
-    defaultVariants: {
-      first: false,
-      follows: 'none',
-    },
-  },
-)
-
 /** List surface. Adjacent-sibling borders live on `.ui-interactive-list`. */
 export const interactiveListSurfaceClasses = cn('ui-interactive-list', borderStrength('subtle'))
 
@@ -133,7 +111,3 @@ export const interactiveListRowMainVariants = cva('ui-interactive-list__main', {
     interactive: true,
   },
 })
-
-export type InteractiveListGroupHeadingVariantProps = VariantProps<
-  typeof interactiveListGroupHeadingVariants
->

@@ -1,6 +1,6 @@
 import type { GlobalSearchDocument } from '@rpg/contracts'
 import { getGlobalSearchFilterGroupLabel } from '@rpg/contracts'
-import { DestinationList, InlineMetadata, InteractiveListGroupHeading, cn } from '@rpg/ui'
+import { DestinationList, ListGroupHeading, cn } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
@@ -9,8 +9,6 @@ import {
   deriveGlobalSearchPreviewGroupState,
 } from '../../lib/global-search-preview-group'
 import {
-  globalSearchGroupHeadingClasses,
-  globalSearchGroupHeadingCountClasses,
   globalSearchGroupSectionVariants,
   globalSearchGroupShowAllLinkVariants,
 } from '../../lib/global-search-group.variants'
@@ -51,20 +49,14 @@ export function GlobalSearchGroupSection({
       aria-label={`${groupLabel}, ${section.totalCount} results`}
       className={globalSearchGroupSectionVariants({ state })}
     >
-      <InteractiveListGroupHeading
+      <ListGroupHeading
         id={headingId}
         as="h2"
+        label={groupLabel}
+        count={section.totalCount}
         first={sectionIndex === 0}
         follows={follows}
-        className={globalSearchGroupHeadingClasses}
-      >
-        <InlineMetadata role="heading" density="compact" wrap={false}>
-          <InlineMetadata.Item>{groupLabel}</InlineMetadata.Item>
-          <InlineMetadata.Item className={globalSearchGroupHeadingCountClasses}>
-            {section.totalCount}
-          </InlineMetadata.Item>
-        </InlineMetadata>
-      </InteractiveListGroupHeading>
+      />
 
       <DestinationList appearance="embedded" density="compact">
         {section.items.map((document) => (

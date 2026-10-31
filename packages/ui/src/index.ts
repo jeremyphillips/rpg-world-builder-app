@@ -761,9 +761,9 @@ export {
   type InteractiveListToolbarProps,
 } from './components/ui/interactive-list-toolbar.client'
 export {
-  InteractiveListGroupHeading,
-  type InteractiveListGroupHeadingProps,
-} from './components/ui/interactive-list-group-heading.client'
+  ListGroupHeading,
+  type ListGroupHeadingProps,
+} from './components/ui/list-group-heading.client'
 export {
   InteractiveListViewport,
   type InteractiveListViewportProps,
@@ -818,8 +818,8 @@ export {
   listShellClasses,
   type ListDensity,
 } from './components/ui/list-density.lib'
+export { listGroupHeadingVariants } from './components/ui/list-group-heading.variants'
 export {
-  interactiveListGroupHeadingVariants,
   interactiveListSurfaceClasses,
   interactiveListVariants,
   interactiveListRowChromeVariants,
