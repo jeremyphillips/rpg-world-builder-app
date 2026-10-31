@@ -91,7 +91,6 @@ const UNSEEDED_SPELL_REFERENCES = new Set([
   'srd-cc-5.2.1:chromatic-orb',
   'srd-cc-5.2.1:command',
   'srd-cc-5.2.1:fear',
-  'srd-cc-5.2.1:fly',
   'srd-cc-5.2.1:arcane-eye',
   'srd-cc-5.2.1:charm-monster',
   'srd-cc-5.2.1:legend-lore',

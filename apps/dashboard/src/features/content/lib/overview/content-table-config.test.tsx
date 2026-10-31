@@ -29,10 +29,10 @@ function columnIds<T>(columns: ColumnDef<T>[]): string[] {
 }
 
 describe('buildContentColumns', () => {
-  it('includes source chrome according to the content-type presentation policy', () => {
+  it('includes catalog-layer chrome according to the content-type presentation policy', () => {
     const columns = buildContentColumns([], { contentType: 'classes' })
 
-    expect(columnIds(columns)).toContain('source')
+    expect(columnIds(columns)).toContain('catalogLayer')
   })
 
   it('places the display image column before name for classes and species', () => {

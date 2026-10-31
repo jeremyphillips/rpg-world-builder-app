@@ -18,13 +18,13 @@ const CREATURE_TYPE_SET = vocabularyOptionSetSchema.parse({
       id: 'humanoid',
       label: 'Humanoid',
       description: 'People of the world.',
-      catalogLayer: 'system',
+      source: 'system',
       status: 'active',
     },
     {
       id: 'fey',
       label: 'Fey',
-      catalogLayer: 'system',
+      source: 'system',
       status: 'disabled',
     },
     {
