@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '../../lib/resolution/schema'
+import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from './schema'
 import {
   buildDefaultOutcomeSlots,
   ensureOutcomeSlotsForMethod,
@@ -17,15 +17,8 @@ import {
 describe('getOutcomeResultsForMethod', () => {
   it('maps automatic, attack, and saving-throw methods to stable slot order', () => {
     expect(getOutcomeResultsForMethod({ kind: 'automatic' })).toEqual(['applied'])
-    expect(getOutcomeResultsForMethod({ kind: 'attack', attackType: 'melee-spell' })).toEqual([
-      'hit',
-      'miss',
-    ])
-    expect(getOutcomeResultsForMethod({ kind: 'attack', attackType: 'ranged-spell' })).toEqual([
-      'hit',
-      'miss',
-    ])
-    expect(getOutcomeResultsForMethod({ kind: 'saving-throw', ability: 'con' })).toEqual([
+    expect(getOutcomeResultsForMethod({ kind: 'attack' })).toEqual(['hit', 'miss'])
+    expect(getOutcomeResultsForMethod({ kind: 'saving-throw' })).toEqual([
       'failed-save',
       'successful-save',
     ])
@@ -109,14 +102,12 @@ describe('buildDefaultOutcomeSlots', () => {
       { result: 'applied', applications: [{ effectId, amount: 'full' }] },
     ])
 
-    expect(
-      buildDefaultOutcomeSlots({ kind: 'attack', attackType: 'ranged-spell' }, effectId),
-    ).toEqual([
+    expect(buildDefaultOutcomeSlots({ kind: 'attack' }, effectId)).toEqual([
       { result: 'hit', applications: [{ effectId, amount: 'full' }] },
       { result: 'miss', applications: [] },
     ])
 
-    expect(buildDefaultOutcomeSlots({ kind: 'saving-throw', ability: 'con' }, effectId)).toEqual([
+    expect(buildDefaultOutcomeSlots({ kind: 'saving-throw' }, effectId)).toEqual([
       { result: 'failed-save', applications: [{ effectId, amount: 'full' }] },
       { result: 'successful-save', applications: [{ effectId, amount: 'half' }] },
     ])

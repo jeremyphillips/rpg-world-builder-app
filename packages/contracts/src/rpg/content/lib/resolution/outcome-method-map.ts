@@ -1,10 +1,11 @@
-import type { SpellResolutionMethod } from './schema'
-import type { ResolutionOutcomeResult } from '../../../vocab/resolution'
+import type { ResolutionMethodKind, ResolutionOutcomeResult } from '../../../vocab/resolution'
+
+type ResolutionMethodRef = { kind: ResolutionMethodKind }
 
 /** Primary outcome remapping when resolution method kind changes. */
 const OUTCOME_METHOD_KIND_CHANGE_MAP: Partial<
   Record<
-    `${SpellResolutionMethod['kind']}:${SpellResolutionMethod['kind']}:${ResolutionOutcomeResult}`,
+    `${ResolutionMethodKind}:${ResolutionMethodKind}:${ResolutionOutcomeResult}`,
     ResolutionOutcomeResult
   >
 > = {
@@ -17,8 +18,8 @@ const OUTCOME_METHOD_KIND_CHANGE_MAP: Partial<
 }
 
 export function mapOutcomeResultBetweenMethodKinds(
-  fromMethod: SpellResolutionMethod,
-  toMethod: SpellResolutionMethod,
+  fromMethod: ResolutionMethodRef,
+  toMethod: ResolutionMethodRef,
   result: ResolutionOutcomeResult,
 ): ResolutionOutcomeResult | undefined {
   const key = `${fromMethod.kind}:${toMethod.kind}:${result}` as const

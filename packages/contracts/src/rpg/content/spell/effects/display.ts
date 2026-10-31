@@ -1,5 +1,5 @@
-import { formatRollValue, type RollValue } from '../../../primitives/mechanics/roll'
-import { getDamageTypeLabel } from '../../../vocab/damage/vocabulary'
+import { formatDamageValue } from '../../lib/resolution/effect-sentence'
+import { formatRollValue } from '../../../primitives/mechanics/roll'
 import { HIT_POINTS_TERM } from '../../../vocab/mechanics/hit-points'
 import { vocabularyTermLabel } from '../../../vocab/types'
 import {
@@ -44,10 +44,7 @@ export function formatEffectRowTitleFromParts(
   return effectKindPrefix(kindLabel, label || undefined)
 }
 
-/** Formats a damage roll with type label (e.g. "8d6 Fire damage"). */
-export function formatDamageValue(roll: RollValue, damageTypeId: string): string {
-  return `${formatRollValue(roll)} ${getDamageTypeLabel(damageTypeId)} damage`
-}
+export { formatDamageValue }
 
 function formatProjectileCountCompact(effect: SpellProjectileCountEffect): string {
   return `${effect.count} ${effect.unitLabel}`

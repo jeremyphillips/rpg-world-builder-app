@@ -23,7 +23,7 @@ import {
 import { formatSignedModifier } from '../creature/weapon-attack'
 import {
   attackProfileOnHitLabels,
-  MONSTER_ACTION_ATTACK_KIND_SET,
+  isMonsterActionAttackKind,
   resolveMonsterActionAttackProfile,
   type MonsterActionAttackProfile,
   type ResolveMonsterActionAttackProfileInput,
@@ -167,7 +167,7 @@ function appendAttackLines(
   section: DerivedMonsterAttackLine['section'],
 ): void {
   for (const action of actions) {
-    if (!MONSTER_ACTION_ATTACK_KIND_SET.has(action.kind)) continue
+    if (!isMonsterActionAttackKind(action.kind)) continue
     const profile = resolveMonsterActionAttackProfile({ ...args, action })
     if (profile.status !== 'resolved') {
       throw new Error(`Monster attack ${action.id} is unavailable.`)

@@ -11,6 +11,7 @@ import {
 } from '@rpg/contracts'
 import { z } from 'zod'
 
+import { areaGeometryFormSchema } from '../../../../lib/forms/fields/area-geometry-form-fields'
 import { rollFormObjectSchema } from '../../../../lib/forms/mechanics/roll-form-values'
 import { RESOLUTION_APPLICATION_PATTERN_FORM_KINDS } from '../application-pattern/resolution-application-pattern.lib'
 import { validateResolutionFormSelection } from './resolution-form-selection-validation'
@@ -67,16 +68,6 @@ export const resolutionOutcomeFormItemSchema = z.object({
 
 export type ResolutionOutcomeFormItem = z.infer<typeof resolutionOutcomeFormItemSchema>
 
-const resolutionAreaFormSchema = z.object({
-  shape: z.string(),
-  radius: z.object({ value: z.coerce.number(), unit: z.literal('ft').optional() }).optional(),
-  length: z.object({ value: z.coerce.number(), unit: z.literal('ft').optional() }).optional(),
-  width: z.object({ value: z.coerce.number(), unit: z.literal('ft').optional() }).optional(),
-  size: z.object({ value: z.coerce.number(), unit: z.literal('ft').optional() }).optional(),
-  height: z.object({ value: z.coerce.number(), unit: z.literal('ft').optional() }).optional(),
-  description: z.string().optional(),
-})
-
 export const resolutionFormSchema = z
   .object({
     selectionMode: z.enum(RESOLUTION_SELECTION_MODES).default('targets'),
@@ -87,7 +78,7 @@ export const resolutionFormSchema = z
     proximityDistanceFt: z.coerce.number().min(0).optional(),
     proximityReachDistanceFt: z.coerce.number().min(0).optional(),
     originDistanceFt: z.coerce.number().min(0).optional(),
-    areaOfEffect: resolutionAreaFormSchema.optional(),
+    areaOfEffect: areaGeometryFormSchema.optional(),
     methodKind: z.enum(RESOLUTION_METHOD_KINDS),
     attackType: z.enum(SPELL_RESOLUTION_ATTACK_TYPES).optional(),
     saveAbility: abilitySchema.optional(),

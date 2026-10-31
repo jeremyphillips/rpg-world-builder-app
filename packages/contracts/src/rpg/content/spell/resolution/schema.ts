@@ -8,10 +8,9 @@ import {
   type ResolutionEffect,
   type ResolutionEffectId,
   type ResolutionOrigin,
-  type ResolutionOutcomeResult,
-  type ResolutionSelectionMode,
   type ResolutionTarget,
 } from '../../lib/resolution/schema'
+import type { ResolutionOutcomeResult, ResolutionSelectionMode } from '../../../vocab/resolution'
 import { SPELL_RESOLUTION_ATTACK_TYPES } from './vocab'
 import { spellResolutionProgressionSchema } from './progression/schema'
 import { validateSpellResolutionProgression } from './progression/validation'

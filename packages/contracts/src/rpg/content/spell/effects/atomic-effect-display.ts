@@ -4,9 +4,9 @@ import {
 } from '../../../vocab/spell/atomic-effect-kind'
 import { joinInlineMetadata } from '../../../primitives/inline-metadata'
 import type { RollValue } from '../../../primitives/mechanics/roll'
-import type { ResolutionTargetKind } from '../resolution/vocab'
+import type { ResolutionTargetKind } from '../../../vocab/resolution'
 
-import type { EffectRecipient } from './recipient'
+import type { EffectRecipient } from './format'
 import type { SpellAtomicEffect } from './schema'
 import { formatAtomicEffectSummary } from './display'
 import {

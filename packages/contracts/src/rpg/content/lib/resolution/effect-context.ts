@@ -1,6 +1,6 @@
+import type { ResolutionFormatInput } from './schema'
 import type { ResolutionSelectionState } from './selection-types'
-import type { EffectRecipient, EffectRowFormatOptions } from '../effects/format'
-import type { SpellResolution } from './schema'
+import type { EffectRecipient, EffectRowFormatOptions } from './effect-sentence'
 import type { ResolutionSelectionMode } from '../../../vocab/resolution'
 
 export type { EffectRecipient }
@@ -26,7 +26,9 @@ function deriveRecipientFromModeAndArea(
 }
 
 /** Derives effect recipient from a stored resolution envelope. */
-export function deriveEffectRecipientFromResolution(resolution: SpellResolution): EffectRecipient {
+export function deriveEffectRecipientFromResolution(
+  resolution: ResolutionFormatInput,
+): EffectRecipient {
   return deriveRecipientFromModeAndArea(resolution.selectionMode, Boolean(resolution.areaOfEffect))
 }
 
@@ -64,7 +66,7 @@ export function isResolutionTargetConfigured(
 
 /** Shared recipient/register options for resolution preview and outcome sentences. */
 export function resolutionEffectFormatOptions(
-  resolution: SpellResolution,
+  resolution: ResolutionFormatInput,
   overrides: Partial<EffectRowFormatOptions> = {},
 ): EffectRowFormatOptions {
   return {

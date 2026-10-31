@@ -1,4 +1,4 @@
-import type { SpellResolutionAttackType } from './vocab'
+import type { SpellResolutionAttackType } from '../../spell/resolution/vocab'
 import type {
   ResolutionOutcomeResult,
   ResolutionProximityKind,

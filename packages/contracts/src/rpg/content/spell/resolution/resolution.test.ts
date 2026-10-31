@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
+import { formatResolutionOutcomes } from '../../lib/resolution/format-outcomes'
+import {
+  formatResolutionTarget,
+  formatResolutionTargetProximityPhrase,
+} from '../../lib/resolution/format-target'
 import {
   formatResolutionEffectsApplicationLabel,
   formatResolutionMethod,
-  formatResolutionOutcomes,
   formatResolutionProjectilesPreview,
   formatResolutionSummary,
-  formatResolutionTarget,
-  formatResolutionTargetProximityPhrase,
 } from './format'
 import {
   BURNING_HANDS_RESOLUTION,
@@ -26,7 +28,7 @@ import {
   resolutionEffectIdSchema,
 } from '../../lib/resolution/schema'
 import { spellResolutionSchema } from './schema'
-import { spellResolutionValidationMessages } from './validation-messages'
+import { spellResolutionValidationMessages } from '../../lib/resolution/validation-messages'
 
 describe('spellResolutionSchema', () => {
   it('accepts the scoped spell fixtures', () => {

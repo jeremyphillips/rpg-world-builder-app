@@ -17,7 +17,9 @@ export type MonsterActionDraftRow = {
   DraftVariant<'natural-weapon'> &
   DraftVariant<'attack'> &
   DraftVariant<'special'> &
-  DraftVariant<'spell'>
+  DraftVariant<'spell'> &
+  DraftVariant<'save'> &
+  DraftVariant<'multiattack'>
 
 export function createMonsterRowId(): string {
   return crypto.randomUUID()

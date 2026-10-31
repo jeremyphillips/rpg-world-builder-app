@@ -136,13 +136,3 @@ export function visibleWhenApplicationPatternKind(kind: 'projectiles'): FieldVis
     visibleWhen: (values) => values[`${RESOLUTION_PREFIX}.applicationPatternKind`] === kind,
   }
 }
-
-export function visibleWhenAreaShape(shapes: string[]): FieldVisibility {
-  return combineFieldVisibility(visibleWhenSelectionModeIsOneOf('self', 'point'), {
-    dependsOn: [`${RESOLUTION_PREFIX}.areaOfEffect.shape`],
-    visibleWhen: (values) => {
-      const shape = values[`${RESOLUTION_PREFIX}.areaOfEffect.shape`]
-      return typeof shape === 'string' && shapes.includes(shape)
-    },
-  })
-}

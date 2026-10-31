@@ -1,5 +1,5 @@
 import type { Ability } from '../../../vocab/ability'
-import type { SpellResolutionMethod } from './schema'
+import type { SpellResolutionMethod } from '../../spell/resolution/schema'
 import {
   ensureOutcomeSlotsForMethod,
   getOutcomeResultsForMethod,

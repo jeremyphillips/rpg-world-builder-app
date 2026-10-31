@@ -1,25 +1,10 @@
 export {
   formatResolutionApplicationPattern,
-  formatResolutionDamage,
-  formatResolutionDamageRoll,
   formatResolutionEffectsApplicationLabel,
-  formatResolutionHealing,
   formatResolutionMethod,
-  formatResolutionOutcomeLine,
-  formatResolutionOutcomes,
   formatResolutionProjectilesPreview,
-  formatResolutionSelectionSections,
   formatResolutionSummary,
   formatResolutionSummarySections,
-  formatResolutionTarget,
-  formatResolutionTargetFromParts,
-  formatResolutionTargetProximityPhrase,
-  formatResolutionTemporaryHitPoints,
-  findResolutionDamageEffects,
-  findResolutionHealingEffects,
-  findResolutionTemporaryHitPointsEffects,
-  RESOLUTION_AFFECTED_AREA_COPY,
-  type SpellResolutionSelectionSection,
   type SpellResolutionSummarySection,
 } from './format'
 export {
@@ -70,7 +55,6 @@ export {
   type SpellApplicationPatternKind,
   type SpellResolutionAttackType,
 } from './vocab'
-export { spellResolutionValidationMessages } from './validation-messages'
 export {
   BLESS_PROGRESSION_FIXTURE_RESOLUTION,
   BLESS_TARGET_COUNT_PROGRESSION,
@@ -139,91 +123,6 @@ export {
 } from './progression/validation'
 export { spellResolutionProgressionValidationMessages } from './progression/validation-messages'
 export {
-  getSpellResolutionOutcomeAuthoringLabel,
-  SPELL_RESOLUTION_CONVENTIONAL_PRIMARY_OUTCOME,
-  SPELL_RESOLUTION_OUTCOME_AUTHORING_LABELS,
-} from './outcome-display'
-export {
-  buildDefaultOutcomeSlots,
-  effectKindsSupportingPartialApplication,
-  ensureOutcomeSlotsForMethod,
-  findOutcomeByResult,
-  getOutcomeResultsForMethod,
-  hasMeaningfulOutcomeContent,
-  isOutcomeEmpty,
-  normalizeOutcomeOrder,
-  stripEmptyOutcomeSlots,
-  supportsPartialApplicationForEffectKind,
-  type OutcomeLike,
-} from './outcome-slots'
-export {
-  outcomeApplicationsReferenceEffect,
-  planOutcomeMethodChange,
-  stripEffectFromOutcomes,
-  type OutcomeMethodChangePlan,
-} from './outcome-change-plan'
-export {
-  deriveDefaultEffectRecipient,
-  deriveEffectRecipientFromResolution,
-  isResolutionTargetConfigured,
-  resolutionEffectFormatOptions,
-  type EffectRecipient,
-} from './effect-context'
-export {
-  getEffectTargetAvailability,
-  isCreatureOnlyResolutionEffectKind,
-  isEffectKindAllowedForTarget,
-  type CreatureOnlyResolutionEffectKind,
-  type EffectTargetCompatibilityContext,
-} from './effect-target-compatibility'
-export {
   formatResolutionAvailabilityReason,
   type ResolutionAvailabilityTone,
 } from './availability-reasons'
-export {
-  getSelectionMethodCapabilityRequired,
-  getSelectionMethodCompatibility,
-  getSelectionMethodCompatibilityReasonCode,
-  isSelectionMethodAllowed,
-  methodOptionToMethodKind,
-  resolveSelectionMethodContextKey,
-  resolveSelectionModeFromState,
-  SELECTION_METHOD_COMPATIBILITY_MATRIX,
-  SELECTION_METHOD_COMPATIBILITY_REASON_CODES,
-  selectionMethodContextFromState,
-  validateSpellResolutionMethodCompatibility,
-  type SelectionMethodCompatibility,
-  type SelectionMethodCompatibilityReasonCode,
-  type SelectionMethodContextKey,
-} from './selection-method-compatibility'
-export {
-  applyMethodOptionPatch,
-  applyResolutionStructuralCleanup,
-  buildIncompatibleSelectionClearPatch,
-  getApplicationPatternAvailability,
-  getEffectKindAvailability,
-  getMethodAvailability,
-  isEffectKindAllowedForState,
-  isResolutionEffectKind,
-  planResolutionChange,
-  resolutionChangeRequiresConfirm,
-  RESOLUTION_METHOD_OPTIONS,
-  toMethodOption,
-} from './selection-policy'
-export type {
-  IncompatibleSelection,
-  OptionAvailability,
-  ResolutionApplicationPatternFormKind,
-  ResolutionAvailabilityReason,
-  ResolutionChangePlan,
-  ResolutionChangeRequest,
-  ResolutionEffectKind,
-  ResolutionEffectRef,
-  ResolutionMethodOption,
-  ResolutionOutcomeRef,
-  ResolutionPatch,
-  ResolutionSelectionField,
-  ResolutionSelectionState,
-  ResolutionWarning,
-  ResolutionWarningCode,
-} from './selection-types'

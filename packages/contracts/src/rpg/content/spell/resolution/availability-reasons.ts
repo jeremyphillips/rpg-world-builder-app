@@ -5,8 +5,8 @@ import {
   type ResolutionTargetKind,
 } from '../../../vocab/resolution'
 import { getSpellAtomicEffectKindLabel } from '../../../vocab/spell/atomic-effect-kind'
-import { getSelectionMethodCapabilityRequired } from './selection-method-compatibility'
-import type { ResolutionAvailabilityReason } from './selection-types'
+import { getSelectionMethodCapabilityRequired } from '../../lib/resolution/selection-method-compatibility'
+import type { ResolutionAvailabilityReason } from '../../lib/resolution/selection-types'
 import { getResolutionSelectionModeLabel } from '../../../vocab/resolution'
 
 export type ResolutionAvailabilityTone = 'option' | 'hint' | 'dialog' | 'compact'

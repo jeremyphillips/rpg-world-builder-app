@@ -16,16 +16,16 @@ import {
   type ResolutionOutcomeResult,
   type ResolutionSelectionMode,
 } from '../../../vocab/resolution'
-import { isEffectKindAllowedForTarget } from '../../spell/resolution/effect-target-compatibility'
+import { isEffectKindAllowedForTarget } from './effect-target-compatibility'
 import {
   getOutcomeResultsForMethod,
   hasMeaningfulOutcomeContent,
   supportsPartialApplicationForEffectKind,
-} from '../../spell/resolution/outcome-slots'
-import { validateSpellResolutionMethodCompatibility } from '../../spell/resolution/selection-method-compatibility'
-import { validateSpellResolutionModeFields } from '../../spell/resolution/selection-mode-validation'
-import { isResolutionEffectKind } from '../../spell/resolution/selection-availability'
-import { spellResolutionValidationMessages } from '../../spell/resolution/validation-messages'
+} from './outcome-slots'
+import { validateSpellResolutionMethodCompatibility } from './selection-method-compatibility'
+import { validateSpellResolutionModeFields } from './selection-mode-validation'
+import { isResolutionEffectKind } from './selection-availability'
+import { spellResolutionValidationMessages } from './validation-messages'
 
 const resolutionDistanceSchema = z.object({
   value: z.number().min(0),
@@ -284,6 +284,14 @@ export const effectResolutionSchema = z
   .superRefine(validateEffectResolution)
 
 export type EffectResolution = z.infer<typeof effectResolutionSchema>
+
+/** Envelope fields shared by spell resolution and monster saving-throw actions. */
+export type ResolutionEnvelopeBase = Omit<EffectResolution, 'method'>
+
+/** Formatter input. Attack methods are included so spell resolutions stay assignable. */
+export type ResolutionFormatInput = ResolutionEnvelopeBase & {
+  method: { kind: ResolutionMethodKind }
+}
 
 export const RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID = resolutionEffectIdSchema.parse('damage')
 

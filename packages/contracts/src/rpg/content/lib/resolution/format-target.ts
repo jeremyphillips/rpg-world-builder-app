@@ -1,6 +1,5 @@
 import { formatAreaGeometry } from '../../../primitives/area-geometry'
-import type { ResolutionTarget, ResolutionTargetProximity } from '../../lib/resolution/schema'
-import type { SpellResolution } from './schema'
+import type { ResolutionFormatInput, ResolutionTarget, ResolutionTargetProximity } from './schema'
 import { inferResolutionTargetCountKind } from '../../../vocab/resolution'
 import {
   type ResolutionTargetCountKind,
@@ -55,7 +54,7 @@ export function formatResolutionTargetProximityPhrase(
   }
 }
 
-function formatOriginDistancePhrase(resolution: SpellResolution): string {
+function formatOriginDistancePhrase(resolution: ResolutionFormatInput): string {
   const distance = resolution.origin?.proximity.distance
   if (!distance) return 'A point within range'
   return `A point within ${formatDistanceFeet(distance)}`
@@ -74,17 +73,17 @@ export function formatResolutionTargetFromParts(target: ResolutionTarget): strin
 }
 
 /** e.g. "One creature within 60 feet" — targets mode only. */
-export function formatResolutionTarget(resolution: SpellResolution): string {
+export function formatResolutionTarget(resolution: ResolutionFormatInput): string {
   if (!resolution.target) return ''
   return formatResolutionTargetFromParts(resolution.target)
 }
 
-export type SpellResolutionSelectionSection = {
+export type ResolutionSelectionSection = {
   heading: string
   lines: string[]
 }
 
-function areaSections(resolution: SpellResolution): SpellResolutionSelectionSection[] {
+function areaSections(resolution: ResolutionFormatInput): ResolutionSelectionSection[] {
   if (!resolution.areaOfEffect) return []
 
   return [
@@ -95,8 +94,8 @@ function areaSections(resolution: SpellResolution): SpellResolutionSelectionSect
 
 /** Mode-driven selection preview sections for resolution summary panels. */
 export function formatResolutionSelectionSections(
-  resolution: SpellResolution,
-): SpellResolutionSelectionSection[] {
+  resolution: ResolutionFormatInput,
+): ResolutionSelectionSection[] {
   switch (resolution.selectionMode) {
     case 'none':
       return []

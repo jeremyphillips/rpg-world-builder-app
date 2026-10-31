@@ -1,4 +1,4 @@
-export type { EffectRecipient } from './recipient'
+export type { EffectRecipient } from './format'
 export {
   formatEffectRowSentence,
   formatEffectRowSentenceFromParts,

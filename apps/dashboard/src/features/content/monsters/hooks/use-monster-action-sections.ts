@@ -8,6 +8,10 @@ import {
   type MonsterActionAcquisitionChoice,
 } from '../lib/actions/monster-action-acquisition'
 import { actionAfterSectionMove, actionMoveDropsTrigger } from '../lib/actions/monster-action-kind'
+import {
+  multiattacksReferencingAction,
+  stripMultiattackActionId,
+} from '../lib/actions/monster-action-multiattack-references'
 import type { MonsterActionDraftRow } from '../lib/actions/monster-action-presets'
 import {
   firstMonsterActionId,
@@ -28,7 +32,16 @@ type TriggerPending = {
   index: number
 }
 
-export type MonsterActionPending = TriggerPending
+type MultiattackPending = {
+  type: 'multiattack-delete' | 'multiattack-move'
+  actionId: string
+  names: string[]
+  from: MonsterActionSection
+  to?: MonsterActionSection
+  index: number
+}
+
+export type MonsterActionPending = TriggerPending | MultiattackPending
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -239,15 +252,50 @@ export function useMonsterActionSections(entityId?: string) {
     [editors, getValues, setValue],
   )
 
+  const commitRemove = useCallback(
+    (actionId: string) => {
+      const located = locate(actionId)
+      if (!located) return
+      const nextSelection = resolveMonsterActionSelectionAfterRemoval(
+        getValues(),
+        located.section,
+        actionId,
+      )
+      if (located.section === 'actions') {
+        const actions = stripMultiattackActionId(rowsOf(getValues(), 'actions'), actionId).filter(
+          (action) => action.id !== actionId,
+        )
+        setValue('actions', actions, { shouldDirty: true })
+      } else {
+        editors[located.section].removeAt(located.index)
+      }
+      setSelectedActionId(nextSelection)
+      setPending(null)
+    },
+    [editors, getValues, locate, setValue],
+  )
+
   const removeAction = useCallback(
     (actionId: string) => {
       const located = locate(actionId)
       if (!located) return
-      const next = resolveMonsterActionSelectionAfterRemoval(getValues(), located.section, actionId)
-      editors[located.section].removeAt(located.index)
-      setSelectedActionId(next)
+      const references =
+        located.section === 'actions'
+          ? multiattacksReferencingAction(rowsOf(getValues(), 'actions'), actionId)
+          : []
+      if (references.length > 0) {
+        setPending({
+          type: 'multiattack-delete',
+          actionId,
+          names: references.map((action) => action.name?.trim() || 'Multiattack'),
+          from: located.section,
+          index: located.index,
+        })
+        return
+      }
+      commitRemove(actionId)
     },
-    [editors, getValues, locate],
+    [commitRemove, getValues, locate],
   )
 
   const commitMove = useCallback(
@@ -275,19 +323,44 @@ export function useMonsterActionSections(entityId?: string) {
     (to: MonsterActionSection) => {
       const located = locate(selectedActionId)
       if (!located || located.section === to) return
+      if (located.action.kind === 'multiattack' && to !== 'actions') return
+      if (
+        located.section === 'actions' &&
+        to !== 'actions' &&
+        multiattacksReferencingAction(rowsOf(getValues(), 'actions'), located.action.id).length > 0
+      ) {
+        const references = multiattacksReferencingAction(
+          rowsOf(getValues(), 'actions'),
+          located.action.id,
+        )
+        setPending({
+          type: 'multiattack-move',
+          actionId: located.action.id,
+          names: references.map((action) => action.name?.trim() || 'Multiattack'),
+          from: located.section,
+          to,
+          index: located.index,
+        })
+        return
+      }
       if (actionMoveDropsTrigger(located.action, located.section, to)) {
         setPending({ type: 'trigger', from: located.section, to, index: located.index })
         return
       }
       commitMove(located.section, located.index, to)
     },
-    [commitMove, locate, selectedActionId],
+    [commitMove, getValues, locate, selectedActionId],
   )
 
   const confirmPending = useCallback(() => {
-    if (!pending || pending.type !== 'trigger') return
-    commitMove(pending.from, pending.index, pending.to)
-  }, [commitMove, pending])
+    if (!pending) return
+    if (pending.type === 'trigger' || pending.type === 'multiattack-move') {
+      if (!pending.to) return
+      commitMove(pending.from, pending.index, pending.to)
+      return
+    }
+    commitRemove(pending.actionId)
+  }, [commitMove, commitRemove, pending])
 
   return {
     values: watched,

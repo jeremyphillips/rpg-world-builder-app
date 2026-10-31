@@ -1,22 +1,27 @@
 import { formatRollValue } from '../../../primitives/mechanics/roll'
-import { formatDamageValue } from '../effects/display'
-import { formatEffectRowSentenceFromParts, type EffectRowParts } from '../effects/format'
 import { resolutionEffectFormatOptions } from './effect-context'
+import {
+  formatDamageValue,
+  formatEffectRowSentenceFromParts,
+  type EffectRowParts,
+} from './effect-sentence'
 import type {
   ResolutionDamageEffect,
+  ResolutionFormatInput,
   ResolutionHealingEffect,
   ResolutionTemporaryHitPointsEffect,
-} from '../../lib/resolution/schema'
-import type { SpellResolution } from './schema'
+} from './schema'
 
-export function findResolutionDamageEffects(resolution: SpellResolution): ResolutionDamageEffect[] {
+export function findResolutionDamageEffects(
+  resolution: ResolutionFormatInput,
+): ResolutionDamageEffect[] {
   return resolution.effects.filter(
     (effect): effect is ResolutionDamageEffect => effect.kind === 'damage',
   )
 }
 
 export function findResolutionHealingEffects(
-  resolution: SpellResolution,
+  resolution: ResolutionFormatInput,
 ): ResolutionHealingEffect[] {
   return resolution.effects.filter(
     (effect): effect is ResolutionHealingEffect => effect.kind === 'healing',
@@ -24,7 +29,7 @@ export function findResolutionHealingEffects(
 }
 
 export function findResolutionTemporaryHitPointsEffects(
-  resolution: SpellResolution,
+  resolution: ResolutionFormatInput,
 ): ResolutionTemporaryHitPointsEffect[] {
   return resolution.effects.filter(
     (effect): effect is ResolutionTemporaryHitPointsEffect =>
@@ -32,7 +37,10 @@ export function findResolutionTemporaryHitPointsEffects(
   )
 }
 
-function formatResolutionEffectLine(resolution: SpellResolution, parts: EffectRowParts): string {
+function formatResolutionEffectLine(
+  resolution: ResolutionFormatInput,
+  parts: EffectRowParts,
+): string {
   return formatEffectRowSentenceFromParts(parts, resolutionEffectFormatOptions(resolution)).replace(
     /\.$/,
     '',
@@ -40,14 +48,14 @@ function formatResolutionEffectLine(resolution: SpellResolution, parts: EffectRo
 }
 
 /** Recipient-aware preview sentence for the primary healing effect. */
-export function formatResolutionHealing(resolution: SpellResolution): string {
+export function formatResolutionHealing(resolution: ResolutionFormatInput): string {
   const healing = findResolutionHealingEffects(resolution)[0]
   if (!healing) return ''
   return formatResolutionEffectLine(resolution, { kind: 'healing', roll: healing.roll })
 }
 
 /** Recipient-aware preview sentence for the primary temporary hit points effect. */
-export function formatResolutionTemporaryHitPoints(resolution: SpellResolution): string {
+export function formatResolutionTemporaryHitPoints(resolution: ResolutionFormatInput): string {
   const temporaryHitPoints = findResolutionTemporaryHitPointsEffects(resolution)[0]
   if (!temporaryHitPoints) return ''
   return formatResolutionEffectLine(resolution, {
@@ -57,7 +65,7 @@ export function formatResolutionTemporaryHitPoints(resolution: SpellResolution):
 }
 
 /** Recipient-aware preview sentence for the primary damage effect. */
-export function formatResolutionDamage(resolution: SpellResolution): string {
+export function formatResolutionDamage(resolution: ResolutionFormatInput): string {
   const damage = findResolutionDamageEffects(resolution)[0]
   if (!damage) return ''
   return formatResolutionEffectLine(resolution, {
@@ -68,14 +76,14 @@ export function formatResolutionDamage(resolution: SpellResolution): string {
 }
 
 /** Compact mechanical damage fragment (e.g. "8d6 Fire damage") — not a preview sentence. */
-export function formatResolutionDamageValue(resolution: SpellResolution): string {
+export function formatResolutionDamageValue(resolution: ResolutionFormatInput): string {
   const damage = findResolutionDamageEffects(resolution)[0]
   if (!damage) return ''
   return formatDamageValue(damage.roll, damage.damageType)
 }
 
 /** Compact damage line using roll formatting only (no damage type label). */
-export function formatResolutionDamageRoll(resolution: SpellResolution): string {
+export function formatResolutionDamageRoll(resolution: ResolutionFormatInput): string {
   const damage = findResolutionDamageEffects(resolution)[0]
   if (!damage) return ''
   return formatRollValue(damage.roll)
@@ -83,7 +91,7 @@ export function formatResolutionDamageRoll(resolution: SpellResolution): string 
 
 /** Preview sentence for one outcome application. */
 export function formatResolutionApplicationSentence(
-  resolution: SpellResolution,
+  resolution: ResolutionFormatInput,
   effectId: string,
   amount: 'full' | 'half',
 ): string {

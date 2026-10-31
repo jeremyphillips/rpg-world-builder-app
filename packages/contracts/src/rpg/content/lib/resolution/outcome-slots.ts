@@ -1,7 +1,8 @@
-import type { ResolutionApplication, ResolutionEffectId } from '../../lib/resolution/schema'
-import type { SpellResolutionMethod } from './schema'
+import type { ResolutionApplication, ResolutionEffectId } from './schema'
 import type { ResolutionEffectKind } from './selection-types'
 import type { ResolutionMethodKind, ResolutionOutcomeResult } from '../../../vocab/resolution'
+
+type ResolutionMethodRef = { kind: ResolutionMethodKind }
 
 // ---------------------------------------------------------------------------
 // Method-derived outcome slots — shared by stored validation and form adapters.
@@ -50,7 +51,7 @@ export function findOutcomeByResult<T extends OutcomeLike>(
 
 /** Reorders outcomes to match method-defined slot order; drops results outside the method. */
 export function normalizeOutcomeOrder<T extends OutcomeLike>(
-  method: SpellResolutionMethod,
+  method: ResolutionMethodRef,
   outcomes: readonly T[],
 ): T[] {
   const allowed = new Set(getOutcomeResultsForMethod(method))
@@ -67,7 +68,7 @@ export function normalizeOutcomeOrder<T extends OutcomeLike>(
 
 /** Merges stored outcomes with empty method-derived slots; preserves all authored data. */
 export function ensureOutcomeSlotsForMethod<T extends OutcomeLike>(
-  method: SpellResolutionMethod,
+  method: ResolutionMethodRef,
   outcomes: readonly T[],
   createEmptySlot: (result: ResolutionOutcomeResult) => T,
 ): T[] {
@@ -114,7 +115,7 @@ function defaultApplicationsForResult(
 
 /** Authoring defaults for all method-derived slots when the first effect is created. */
 export function buildDefaultOutcomeSlots(
-  method: SpellResolutionMethod,
+  method: ResolutionMethodRef,
   primaryEffectId: ResolutionEffectId,
 ): Array<{
   result: ResolutionOutcomeResult

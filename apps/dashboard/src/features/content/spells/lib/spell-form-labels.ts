@@ -1,6 +1,4 @@
 import {
-  AREA_GEOMETRY_SHAPES,
-  AREA_GEOMETRY_SHAPE_ENTRIES,
   CASTING_TIME_UNITS,
   CASTING_TIME_UNIT_ENTRIES,
   DURATION_UNITS,
@@ -19,6 +17,11 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
 
+import {
+  AREA_GEOMETRY_FORM_NONE,
+  areaGeometryShapeOptions,
+} from '../../lib/forms/fields/area-geometry-form-fields'
+
 import { buildActiveConditionFieldOptions } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -34,17 +37,9 @@ export const SPELL_DURATION_KIND_LABELS: Record<(typeof SPELL_DURATION_KINDS)[nu
 
 export const SPELL_DELIVERY_METHOD_NONE = 'none'
 
-export const SPELL_AREA_GEOMETRY_NONE = 'none'
+export const SPELL_AREA_GEOMETRY_NONE = AREA_GEOMETRY_FORM_NONE
 
-export const areaGeometryShapeOptions: FieldOption[] = [
-  { value: SPELL_AREA_GEOMETRY_NONE, label: 'None' },
-  ...toOptions(
-    AREA_GEOMETRY_SHAPES,
-    Object.fromEntries(
-      AREA_GEOMETRY_SHAPES.map((shape) => [shape, AREA_GEOMETRY_SHAPE_ENTRIES[shape].label]),
-    ) as Record<(typeof AREA_GEOMETRY_SHAPES)[number], string>,
-  ),
-]
+export { areaGeometryShapeOptions }
 
 export const spellLevelOptions: FieldOption[] = Array.from(
   { length: MAX_SPELL_CONTENT_LEVEL - MIN_SPELL_CONTENT_LEVEL + 1 },

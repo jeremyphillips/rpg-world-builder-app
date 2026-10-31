@@ -1,4 +1,4 @@
-import { getMonsterNaturalWeaponPreset, MONSTER_NATURAL_WEAPON_PRESET_IDS } from '@rpg/contracts'
+import { ACTION_PRESET_IDS, getActionPreset, getActionVocabularyEntry } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
@@ -27,27 +27,33 @@ import { buildMonsterInput, monsterToFormValues } from '../monster-form-values'
 import type { FieldErrors } from 'react-hook-form'
 
 describe('monster action acquisition', () => {
-  it('seeds a natural weapon from vocabulary without recording the preset id', () => {
+  it('stamps a natural attack with its preset and form', () => {
     const action = createMonsterActionFromAcquisition({ type: 'natural', presetId: 'claw' })
-    expect(action.kind).toBe('natural-weapon')
-    expect(action.name).toBe('Claw')
-    expect(action.damageType).toBe('slashing')
-    expect(action.mode).toBe('melee')
-    expect(action.reach).toBe(5)
-    expect(action.damage).toEqual({ dice: { count: 1, faces: 6 } })
-    expect(action).not.toHaveProperty('preset')
+    expect(action).toMatchObject({
+      kind: 'natural-weapon',
+      preset: 'claw',
+      name: 'Claw',
+      form: 'claw',
+      damageType: 'slashing',
+      mode: 'melee',
+      reach: 5,
+      damage: { dice: { count: 1, faces: 6 } },
+    })
     expect(createMonsterRowId()).not.toBe(createMonsterRowId())
   })
 
-  it('seeds every natural weapon preset without properties or a limit', () => {
-    for (const presetId of MONSTER_NATURAL_WEAPON_PRESET_IDS) {
-      const preset = getMonsterNaturalWeaponPreset(presetId)
+  it('seeds every attack-roll preset without properties or a limit', () => {
+    for (const presetId of ACTION_PRESET_IDS) {
+      const preset = getActionPreset(presetId)
+      if (preset?.mechanics !== 'attack-roll') continue
       const action = createMonsterActionFromAcquisition({ type: 'natural', presetId })
       expect(action).toMatchObject({
         kind: 'natural-weapon',
-        name: preset?.label,
-        damageType: preset?.defaultDamageType,
-        mode: preset?.defaultMode,
+        preset: presetId,
+        name: getActionVocabularyEntry(preset.vocabularyId)?.label,
+        form: preset.defaults.naturalForm,
+        damageType: preset.defaults.damageType,
+        mode: preset.defaults.mode,
         reach: 5,
         damage: { dice: { count: 1, faces: 6 } },
       })
@@ -82,6 +88,18 @@ describe('monster action acquisition', () => {
       reach: 5,
     })
     expect(customNatural.damageType).toBeUndefined()
+    expect(customNatural.form).toBeUndefined()
+    expect(
+      createMonsterActionFromAcquisition({ type: 'preset', presetId: 'breath-weapon' }),
+    ).toMatchObject({
+      kind: 'save',
+      preset: 'breath-weapon',
+      name: 'Fire Breath',
+      limitedUse: { kind: 'recharge', minRoll: 5 },
+    })
+    expect(
+      createMonsterActionFromAcquisition({ type: 'preset', presetId: 'multiattack' }),
+    ).toMatchObject({ kind: 'multiattack', preset: 'multiattack', name: 'Multiattack', steps: [] })
     expect(
       createMonsterActionFromAcquisition({ type: 'weapon-entry', entryId: 'greatsword' }),
     ).toMatchObject({ kind: 'weapon', equipmentEntryId: 'greatsword' })

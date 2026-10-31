@@ -11,26 +11,13 @@ import { reachFeetSchema } from '../../vocab/attack/melee-reach'
 import { weaponModeSchema } from '../../vocab/weapon'
 import { entryProvenanceField } from '../../primitives/provenance'
 import { effectResolutionSchema } from '../lib/resolution/schema'
+import { naturalAttackFormSchema } from '../../vocab/action/natural-attack-form'
 import { spellReferenceSchema } from '../spell/spell-reference'
 import {
   weaponDamageDraftSchema,
   weaponDamageSchema,
   weaponRangeSchema,
 } from '../equipment/weapon-variant'
-
-export const NATURAL_ATTACK_FORMS = [
-  'bite',
-  'claw',
-  'slam',
-  'gore',
-  'ram',
-  'sting',
-  'tail',
-  'tentacle',
-  'talons',
-] as const
-
-const naturalAttackFormSchema = z.enum(NATURAL_ATTACK_FORMS)
 
 export const NATURAL_WEAPON_PROPERTIES = ['finesse'] as const
 
@@ -56,29 +43,30 @@ const attackOnHitDraftSchema = z.object({
   additionalDamage: z.array(draftDamagePartSchema).optional(),
 })
 
-function multiattackStepsSchema(mode: MonsterActionMode) {
-  if (mode === 'draft') {
-    return z
-      .array(
-        z.object({
-          count: z.number().int().min(1).optional(),
-          actionIds: z.array(z.string().min(1)),
-        }),
-      )
-      .default([])
-  }
-  return z
-    .array(
-      z.object({
-        count: z.number().int().min(1),
-        actionIds: z.array(z.string().min(1)).min(1),
-      }),
-    )
-    .min(1)
+const multiattackDraftStepSchema = z.object({
+  count: z.number().int().min(1).optional(),
+  actionIds: z.array(z.string().min(1)),
+})
+
+const multiattackPublishedStepSchema = z.object({
+  count: z.number().int().min(1),
+  actionIds: z.array(z.string().min(1)).min(1),
+})
+
+function multiattackStepsSchema<M extends MonsterActionMode>(mode: M) {
+  const draft = z.array(multiattackDraftStepSchema).default([])
+  const published = z.array(multiattackPublishedStepSchema).min(1)
+  return (mode === 'draft' ? draft : published) as M extends 'draft'
+    ? typeof draft
+    : typeof published
 }
 
-function saveResolutionSchema(mode: MonsterActionMode) {
-  return mode === 'draft' ? effectResolutionSchema.optional() : effectResolutionSchema
+function saveResolutionSchema<M extends MonsterActionMode>(mode: M) {
+  const published = effectResolutionSchema
+  const draft = effectResolutionSchema.optional()
+  return (mode === 'draft' ? draft : published) as M extends 'draft'
+    ? typeof draft
+    : typeof published
 }
 
 function monsterActionFields<M extends MonsterActionMode>(mode: M) {
@@ -213,19 +201,29 @@ function reactionsFromActions<T extends { shape: { kind: z.ZodType } }>(options:
   )
 }
 
-export const monsterReactionSchema = reactionsFromActions(monsterActionSchema.options)
+type WithReactionTrigger<T> = T & {
+  trigger?: z.infer<typeof activationTriggerSchema>
+}
 
 export type MonsterAction = z.infer<typeof monsterActionSchema>
-export type MonsterReaction = z.infer<typeof monsterReactionSchema>
+export type MonsterReaction = WithReactionTrigger<Exclude<MonsterAction, { kind: 'multiattack' }>>
+
+export const monsterReactionSchema = reactionsFromActions(
+  monsterActionSchema.options,
+) as unknown as z.ZodType<MonsterReaction>
 
 export const monsterActionDraftSchema = z.discriminatedUnion('kind', [
   ...monsterActionFields('draft'),
 ])
 
-export const monsterReactionDraftSchema = reactionsFromActions(monsterActionDraftSchema.options)
-
 export type MonsterActionDraft = z.infer<typeof monsterActionDraftSchema>
-export type MonsterReactionDraft = z.infer<typeof monsterReactionDraftSchema>
+export type MonsterReactionDraft = WithReactionTrigger<
+  Exclude<MonsterActionDraft, { kind: 'multiattack' }>
+>
+
+export const monsterReactionDraftSchema = reactionsFromActions(
+  monsterActionDraftSchema.options,
+) as unknown as z.ZodType<MonsterReactionDraft>
 
 type SpellEntryLike = {
   id: string

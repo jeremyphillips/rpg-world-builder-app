@@ -5,8 +5,8 @@ import {
   CURE_WOUNDS_RESOLUTION,
   FALSE_LIFE_RESOLUTION,
   FIREBALL_RESOLUTION,
-} from './fixtures'
-import { formatResolutionSummary } from './format-summary'
+} from '../../spell/resolution/fixtures'
+import { formatResolutionSummary } from '../../spell/resolution/format-summary'
 import { formatResolutionSelectionSections, RESOLUTION_AFFECTED_AREA_COPY } from './format-target'
 
 describe('formatResolutionSelectionSections', () => {

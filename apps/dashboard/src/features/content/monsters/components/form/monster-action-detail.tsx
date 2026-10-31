@@ -88,6 +88,13 @@ export function MonsterActionDetail({
       namePrefix,
       equipmentOptions: equipmentOptions(values, ctx),
       sharedCastingOptions: sharedCastingOptions(values, action.id),
+      attackOptions: (values[located.section] ?? [])
+        .filter(
+          (row) =>
+            row.id !== action.id &&
+            (row.kind === 'weapon' || row.kind === 'natural-weapon' || row.kind === 'attack'),
+        )
+        .map((row) => ({ value: row.id, label: row.name?.trim() || row.kind })),
     })
   }, [action, ctx, located, namePrefix, values])
 
@@ -128,13 +135,15 @@ export function MonsterActionDetail({
               {
                 id: 'move-to',
                 label: MONSTER_MOVE_TO_LABEL,
-                items: MONSTER_ACTION_SECTIONS.filter((section) => section !== located.section).map(
-                  (section) => ({
-                    id: `move-${section}`,
-                    label: monsterActionSectionHeading(section),
-                    onSelect: () => sections.requestMove(section),
-                  }),
-                ),
+                items: MONSTER_ACTION_SECTIONS.filter(
+                  (section) =>
+                    section !== located.section &&
+                    !(located.action.kind === 'multiattack' && section !== 'actions'),
+                ).map((section) => ({
+                  id: `move-${section}`,
+                  label: monsterActionSectionHeading(section),
+                  onSelect: () => sections.requestMove(section),
+                })),
               },
             ]
           : undefined

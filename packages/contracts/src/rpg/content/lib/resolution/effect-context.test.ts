@@ -5,7 +5,7 @@ import {
   CURE_WOUNDS_RESOLUTION,
   FALSE_LIFE_RESOLUTION,
   FIREBALL_RESOLUTION,
-} from './fixtures'
+} from '../../spell/resolution/fixtures'
 import {
   deriveDefaultEffectRecipient,
   deriveEffectRecipientFromResolution,

@@ -95,7 +95,7 @@ function isPatternAllowedForProximity(
 /** Target proximity gates method/pattern only for external target selection. */
 function isProximityRelevantForAvailability(context: ResolutionSelectionState): boolean {
   if (context.selectionMode) return context.selectionMode === 'targets'
-  return context.proximityKind !== undefined && context.proximityKind !== 'self'
+  return context.proximityKind !== undefined
 }
 
 export function isResolutionEffectKind(kind: string): kind is ResolutionEffectKind {

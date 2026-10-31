@@ -266,10 +266,11 @@ function refineMultiattackReferences(
         return
       }
       const seen = new Set<string>()
-      const steps = 'steps' in action ? (action.steps ?? []) : []
+      const steps = 'steps' in action && Array.isArray(action.steps) ? action.steps : []
       steps.forEach((step, stepIndex) => {
         const stepSeen = new Set<string>()
-        ;(step.actionIds ?? []).forEach((id, idIndex) => {
+        const actionIds: readonly string[] = Array.isArray(step.actionIds) ? step.actionIds : []
+        actionIds.forEach((id, idIndex) => {
           const path = [...prefix, section, index, 'steps', stepIndex, 'actionIds', idIndex]
           if (id === action.id) {
             addCustomRefinementIssue(ctx, 'A multiattack cannot reference itself.', path)

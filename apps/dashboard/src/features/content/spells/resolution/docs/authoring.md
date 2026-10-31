@@ -82,12 +82,12 @@ occur. Dialog copy: `resolution-change-dialog.lib.ts`.
 
 ## Area geometry
 
-Casting `areaOfEffect` and `resolution.areaOfEffect` each still define their
-own form fields. Both use the spell area value shape and its adapters. The
-shared contract is `areaGeometrySchema`. Stat-block sentences use
+Casting `areaOfEffect` and `resolution.areaOfEffect` share
+`areaGeometryFormFields` in `features/content/lib/forms/fields/area-geometry-form-fields.ts`.
+Resolution passes its self/point gating through that builder's `visibility`.
+The shared contract is `areaGeometrySchema`. Stat-block sentences use
 `formatAreaGeometry(area, 'stat-block')` (`15-foot Cone`,
-`60-foot-long, 5-foot-wide Line`). A single dashboard area-field builder has
-not been extracted.
+`60-foot-long, 5-foot-wide Line`).
 
 ## Round-trip
 

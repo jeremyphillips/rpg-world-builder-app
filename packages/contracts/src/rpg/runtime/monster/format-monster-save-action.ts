@@ -1,5 +1,6 @@
 import type { MonsterAction } from '../../content/monster/action'
 import { formatAreaGeometry } from '../../primitives/area-geometry'
+import { limitedUseSchema } from '../../primitives/limited-use'
 import type { Ability } from '../../vocab/ability'
 import { getAbilityLabel } from '../../vocab/ability'
 import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
@@ -86,7 +87,8 @@ export function formatMonsterSaveAction(args: {
     resolution.method.kind === 'saving-throw'
       ? getAbilityLabel(resolution.method.ability)
       : 'Saving throw'
-  const heading = formatMonsterLimitedUseHeading(action.name, action.limitedUse)
+  const limitedUse = limitedUseSchema.safeParse(action.limitedUse).data
+  const heading = formatMonsterLimitedUseHeading(action.name, limitedUse)
   const failed = resolution.outcomes.find((outcome) => outcome.result === 'failed-save')
   const saved = resolution.outcomes.find((outcome) => outcome.result === 'successful-save')
   const sentences = [
