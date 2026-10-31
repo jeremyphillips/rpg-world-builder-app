@@ -8,10 +8,12 @@ import {
   InteractiveListGroupHeading,
   type InteractiveListGroupHeadingProps,
 } from './interactive-list-group-heading.client'
+import type { ListDensity } from './list-density.lib'
 import { InteractiveList } from './interactive-list.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
 
 export type InteractiveListPanelProps = {
+  density?: ListDensity
   children: React.ReactNode
   /** Visual group label — hosts own menu/listbox section semantics. */
   groupHeading?: React.ReactNode
@@ -25,6 +27,7 @@ export type InteractiveListPanelProps = {
 /** Neutral scroll body — compositions set `listbox` or `menu` roles on the list. */
 export function InteractiveListPanel({
   children,
+  density = 'comfortable',
   groupHeading,
   groupHeadingProps,
   listProps,
@@ -39,7 +42,9 @@ export function InteractiveListPanel({
         </InteractiveListGroupHeading>
       ) : null}
       <InteractiveListViewport>
-        <InteractiveList {...listProps}>{children}</InteractiveList>
+        <InteractiveList density={density} {...listProps}>
+          {children}
+        </InteractiveList>
       </InteractiveListViewport>
     </>
   )

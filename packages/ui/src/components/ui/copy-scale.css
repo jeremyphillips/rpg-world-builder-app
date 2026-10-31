@@ -33,9 +33,7 @@
     line-height: var(--ui-copy-supporting-line-height, var(--text-sm--line-height));
   }
 
-  .ui-card,
-  .ui-destination-list,
-  .ui-interactive-list__main--md {
+  .ui-card {
     --ui-copy-title-size: var(--text-base);
     --ui-copy-title-line-height: 1.375rem;
     --ui-copy-supporting-size: var(--text-sm);
@@ -48,10 +46,9 @@
     --ui-anatomy-leading-size: 2.5rem;
   }
 
+  .ui-list--compact,
   .ui-card--compact,
   .ui-alert--compact,
-  .ui-destination-list--compact,
-  .ui-interactive-list__main--sm,
   .dash-entity-anatomy--compact,
   .ui-identity-row--compact,
   .ui-content-card-heading--compact,
@@ -69,9 +66,9 @@
     --ui-anatomy-leading-size: 2.5rem;
   }
 
+  .ui-list--comfortable,
   .ui-card--comfortable,
   .ui-alert--comfortable,
-  .ui-destination-list--comfortable,
   .dash-entity-anatomy--comfortable,
   .ui-identity-row--comfortable,
   .ui-content-card-heading--comfortable,
@@ -88,10 +85,9 @@
     --ui-anatomy-leading-size: 2.5rem;
   }
 
+  .ui-list--spacious,
   .ui-card--spacious,
   .ui-alert--spacious,
-  .ui-destination-list--spacious,
-  .ui-interactive-list__main--lg,
   .dash-entity-anatomy--spacious,
   .ui-identity-row--spacious,
   .ui-content-card-heading--spacious {

@@ -35,6 +35,9 @@ describe('destination-list.css inset divider contract', () => {
     expect(css).toMatch(
       /\.ui-destination-list--elevation-subtle[\s\S]*var\(--shadow-surface-subtle\)/,
     )
+    expect(css).toContain('.ui-list--compact.ui-destination-list')
+    expect(css).toContain('.ui-list--spacious.ui-destination-list')
+    expect(css).not.toMatch(/\.ui-destination-list--(?:compact|comfortable|spacious)\s*\{/)
   })
 
   it('declares stable item link geometry on ui-destination-item__link', () => {
@@ -191,14 +194,16 @@ describe('DestinationList + DestinationItem', () => {
         <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
-    expect(container.firstElementChild).toHaveClass('ui-destination-list--compact')
+    expect(container.firstElementChild).toHaveClass('ui-list', 'ui-list--compact')
+    expect(container.firstElementChild).not.toHaveClass('ui-destination-list--compact')
 
     rerender(
       <DestinationList density="comfortable">
         <DestinationItem link={<a href="/a">nav</a>} title="Alpha" />
       </DestinationList>,
     )
-    expect(container.firstElementChild).toHaveClass('ui-destination-list--comfortable')
+    expect(container.firstElementChild).toHaveClass('ui-list', 'ui-list--comfortable')
+    expect(container.firstElementChild).not.toHaveClass('ui-destination-list--comfortable')
   })
 
   it('renders rich content with identity cluster and no nested anchors', () => {

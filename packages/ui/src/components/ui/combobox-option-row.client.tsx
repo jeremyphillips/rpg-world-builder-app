@@ -3,7 +3,6 @@
 import * as React from 'react'
 
 import { IdentityRow } from './identity-row.client'
-import type { InteractiveListSize } from './interactive-list.variants'
 import { InteractiveListRow } from './interactive-list-row.client'
 
 export type ComboboxOptionRowProps = {
@@ -11,7 +10,6 @@ export type ComboboxOptionRowProps = {
   highlighted?: boolean
   selected: boolean
   disabled?: boolean
-  size?: InteractiveListSize
   heading?: string
   classification?: string
   supporting?: React.ReactNode
@@ -30,7 +28,6 @@ export function ComboboxOptionRow({
   highlighted = false,
   selected,
   disabled = false,
-  size = 'md',
   heading,
   classification,
   supporting,
@@ -57,7 +54,6 @@ export function ComboboxOptionRow({
       highlighted={highlighted}
       selected={selected}
       disabled={disabled}
-      size={size}
       content={content}
       endSlot={endSlot}
       asChild

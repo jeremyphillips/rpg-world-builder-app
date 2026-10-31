@@ -63,7 +63,7 @@ Side-by-side recipes live in dashboard Storybook **Recipes / Cards and Rows** ([
 
 ### Interactive list chrome vs semantic hosts
 
-Visual row recipes (`InteractiveListRow`, `InteractiveListSize`, slots) are shared; the
+Visual row recipes (`InteractiveListRow`, list `density` / `ui-list--*`, slots) are shared; the
 **host** sets ARIA semantics. Entity choice rows must render identity through these
 primitives — not ad-hoc menu item class stacks. Menu rows derive highlight/wash from Radix
 `data-[highlighted]` only (no parallel `:hover` rail on `MenuChoiceRow`).

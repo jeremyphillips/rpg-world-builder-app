@@ -67,11 +67,11 @@ export {
   UI_INTERACTIVE_ROW_SELECTED_CLASSES,
 } from '../components/ui/interactive-row.styles'
 
-/** twMerge group — interactive list row padding sizes. */
-export const UI_INTERACTIVE_LIST_ROW_SIZE_CLASSES = [
-  'ui-interactive-list__main--sm',
-  'ui-interactive-list__main--md',
-  'ui-interactive-list__main--lg',
+/** twMerge group — list typography / density modifiers on list roots. */
+export const UI_LIST_DENSITY_CLASSES = [
+  'ui-list--compact',
+  'ui-list--comfortable',
+  'ui-list--spacious',
 ] as const
 
 export { UI_AVATAR_SIZE_CLASSES } from '../components/ui/avatar.variants'

@@ -30,7 +30,7 @@ import {
   UI_TABS_TRIGGER_APPEARANCE_CLASSES,
   UI_CARD_INTERACTION_CLASSES,
   UI_INSET_PANEL_SIZE_CLASSES,
-  UI_INTERACTIVE_LIST_ROW_SIZE_CLASSES,
+  UI_LIST_DENSITY_CLASSES,
   UI_INTERACTIVE_ROW_HOVER_CLASSES,
   UI_INTERACTIVE_ROW_SELECTED_CLASSES,
   UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES,
@@ -183,7 +183,7 @@ type TypographyClassGroupIds =
   | 'ui-inset-panel-size'
   | 'ui-interactive-row-hover'
   | 'ui-interactive-row-selected'
-  | 'ui-interactive-list-row-size'
+  | 'ui-list-density'
   | 'ui-choice-control-kind'
   | 'ui-choice-control-indicator-size'
 
@@ -261,7 +261,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-inset-panel-size': [...UI_INSET_PANEL_SIZE_CLASSES],
       'ui-interactive-row-hover': [...UI_INTERACTIVE_ROW_HOVER_CLASSES],
       'ui-interactive-row-selected': [...UI_INTERACTIVE_ROW_SELECTED_CLASSES],
-      'ui-interactive-list-row-size': [...UI_INTERACTIVE_LIST_ROW_SIZE_CLASSES],
+      'ui-list-density': [...UI_LIST_DENSITY_CLASSES],
       'ui-choice-control-kind': [...UI_CHOICE_CONTROL_KIND_CLASSES],
       'ui-choice-control-indicator-size': [...UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES],
       'ui-field-group-size': [...UI_FIELD_GROUP_SIZE_CLASSES],
@@ -308,19 +308,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-inset-panel-size': ['ui-inset-panel-size'],
       'ui-interactive-row-hover': ['ui-interactive-row-hover'],
       'ui-interactive-row-selected': ['ui-interactive-row-selected'],
-      'ui-interactive-list-row-size': [
-        'ui-interactive-list-row-size',
-        'p',
-        'px',
-        'py',
-        'ps',
-        'pe',
-        'pt',
-        'pb',
-      ],
-      p: ['ui-interactive-list-row-size'],
-      px: ['ui-interactive-list-row-size'],
-      py: ['ui-interactive-list-row-size'],
+      'ui-list-density': ['ui-list-density', 'p', 'px', 'py', 'ps', 'pe', 'pt', 'pb'],
+      p: ['ui-list-density'],
+      px: ['ui-list-density'],
+      py: ['ui-list-density'],
       'ui-choice-control-kind': ['ui-choice-control-kind'],
       'ui-choice-control-indicator-size': ['ui-choice-control-indicator-size'],
       'ui-field-group-size': ['ui-field-group-size'],

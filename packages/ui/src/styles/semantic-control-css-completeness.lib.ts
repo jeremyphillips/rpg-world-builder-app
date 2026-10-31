@@ -198,7 +198,11 @@ const choiceControlCssPath = path.join(stylesDir, '../components/ui/choice-contr
 
 const interactiveRowCssPath = path.join(stylesDir, '../components/ui/interactive-row.css')
 
+const destinationListCssPath = path.join(stylesDir, '../components/ui/destination-list.css')
+
 const interactiveListCssPath = path.join(stylesDir, '../components/ui/interactive-list.css')
+
+const copyScaleCssPath = path.join(stylesDir, '../components/ui/copy-scale.css')
 
 const alertCssPath = path.join(stylesDir, '../components/ui/alert.css')
 
@@ -368,7 +372,7 @@ const INTERACTIVE_ROW_DATA_MODIFIERS = ['data-none', 'data-selected', 'data-chec
 
 const INTERACTIVE_ROW_HIT_MODIFIERS = ['hit-none', 'hit-pointer'] as const
 
-const INTERACTIVE_LIST_ROW_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+const INTERACTIVE_LIST_DENSITY_MODIFIERS = ['compact', 'comfortable', 'spacious'] as const
 
 const INTERACTIVE_LIST_PANEL_WIDTH_MODIFIERS = ['match', 'fit'] as const
 
@@ -390,7 +394,16 @@ const INTERACTIVE_ROW_DATA_REQUIRED = [
 
 const INTERACTIVE_ROW_HIT_REQUIRED = ['cursor'] as const
 
-const INTERACTIVE_LIST_ROW_SIZE_REQUIRED = ['gap', 'padding-inline', 'padding-block'] as const
+const INTERACTIVE_LIST_DENSITY_GEOMETRY_REQUIRED = [
+  'gap',
+  'padding-inline',
+  'padding-block',
+] as const
+
+const DESTINATION_LIST_DENSITY_GEOMETRY_REQUIRED = [
+  '--ui-destination-inset-inline',
+  '--ui-destination-inset-block',
+] as const
 
 const INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED = ['width', 'min-width'] as const
 
@@ -560,15 +573,37 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
     ],
   },
   {
+    filePath: destinationListCssPath,
+    dimensions: [
+      {
+        modifierPrefix: 'ui-destination-list',
+        requiredProperties: DESTINATION_LIST_DENSITY_GEOMETRY_REQUIRED,
+      },
+    ],
+  },
+  {
     filePath: interactiveListCssPath,
     dimensions: [
-      ...INTERACTIVE_LIST_ROW_SIZE_MODIFIERS.map((name) => ({
-        modifierPrefix: `ui-interactive-list__main--${name}`,
-        requiredProperties: INTERACTIVE_LIST_ROW_SIZE_REQUIRED,
-      })),
+      {
+        modifierPrefix: 'ui-interactive-list__main',
+        requiredProperties: INTERACTIVE_LIST_DENSITY_GEOMETRY_REQUIRED,
+      },
       ...INTERACTIVE_LIST_PANEL_WIDTH_MODIFIERS.map((name) => ({
         modifierPrefix: `ui-interactive-list__panel--${name}`,
         requiredProperties: INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: copyScaleCssPath,
+    dimensions: [
+      ...INTERACTIVE_LIST_DENSITY_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-list--${name}`,
+        requiredProperties: [
+          '--ui-copy-title-size',
+          '--ui-copy-supporting-size',
+          '--ui-anatomy-leading-size',
+        ] as const,
       })),
     ],
   },

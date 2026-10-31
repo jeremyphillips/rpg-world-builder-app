@@ -15,7 +15,7 @@ import {
   resolveFieldGroupInputSegmentClasses,
   resolveFieldGroupSizeClass,
 } from './field-group.styles'
-import type { InteractiveListSize } from './interactive-list.variants'
+import type { ListDensity } from './list-density.lib'
 
 export type FieldSizeToken = 'xs' | 'sm' | 'md' | 'lg'
 
@@ -154,18 +154,26 @@ export function resolveComboboxSearchFieldSizeForButtonSize(
   return COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON
 }
 
-/** Combobox field band → interactive list row scale (not field typography). */
-export const fieldSizeToInteractiveListSize = {
-  xs: 'sm',
-  sm: 'sm',
-  md: 'md',
-  lg: 'lg',
-} as const satisfies Record<FieldSizeToken, InteractiveListSize>
+/** Combobox field band → list density (typography + row geometry on `InteractiveList`). */
+export const fieldSizeToListDensity = {
+  xs: 'compact',
+  sm: 'compact',
+  md: 'comfortable',
+  lg: 'spacious',
+} as const satisfies Record<FieldSizeToken, ListDensity>
 
+export function resolveListDensityForFieldSize(fieldSize: FieldSizeToken = 'md'): ListDensity {
+  return fieldSizeToListDensity[fieldSize]
+}
+
+/** @deprecated Use {@link resolveListDensityForFieldSize}. */
+export const fieldSizeToInteractiveListSize = fieldSizeToListDensity
+
+/** @deprecated Use {@link resolveListDensityForFieldSize}. */
 export function resolveInteractiveListSizeForFieldSize(
   fieldSize: FieldSizeToken = 'md',
-): InteractiveListSize {
-  return fieldSizeToInteractiveListSize[fieldSize]
+): ListDensity {
+  return resolveListDensityForFieldSize(fieldSize)
 }
 
 /** Resolves grouped shell size modifier for composite roots. */

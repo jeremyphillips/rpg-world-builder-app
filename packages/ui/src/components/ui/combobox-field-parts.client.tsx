@@ -9,7 +9,7 @@ import { Field, type FieldSize } from './field.client'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import { UI_FIELD_CONTROL_TRIGGER_FILL_CLASS } from './field-control.styles'
 import { selectTriggerShellClasses } from './select-compact-trigger.variants'
-import { resolveInteractiveListSizeForFieldSize } from './field-sizing.variants'
+import { resolveListDensityForFieldSize } from './field-sizing.variants'
 import { ComboboxOptionRow } from './combobox-option-row.client'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
@@ -163,7 +163,6 @@ function ComboboxOptionItem({
   onHighlight,
   onSelect,
 }: ComboboxOptionItemProps) {
-  const rowSize = resolveInteractiveListSizeForFieldSize(size)
   const selectionEndSlot = comboboxOptionEndSlot(
     option,
     multiple,
@@ -184,7 +183,6 @@ function ComboboxOptionItem({
         highlighted={isHighlighted}
         selected={isSelected}
         disabled={isDisabled}
-        size={rowSize}
         ariaLabel={option.label}
         renderContent={
           selectionEndSlot ? (
@@ -208,7 +206,6 @@ function ComboboxOptionItem({
       highlighted={isHighlighted}
       selected={isSelected}
       disabled={isDisabled}
-      size={rowSize}
       heading={option.label}
       classification={option.classification}
       supporting={option.metadata}
@@ -322,6 +319,8 @@ export function ComboboxPanel({
   onHighlight,
   onSelect,
 }: ComboboxPanelProps) {
+  const listDensity = resolveListDensityForFieldSize(size)
+
   return (
     <PopoverLayerPortal>
       <PopoverPrimitive.Content
@@ -351,6 +350,7 @@ export function ComboboxPanel({
         ) : null}
 
         <InteractiveListPanel
+          density={listDensity}
           listProps={{
             ref: listboxRef,
             id: listboxId,

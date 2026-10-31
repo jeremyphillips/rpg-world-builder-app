@@ -224,7 +224,7 @@ function RichTextLinkPickerForm({
 
             <InteractiveListViewport className="max-h-40">
               {selectedInternalOption ? (
-                <InteractiveList>
+                <InteractiveList density="compact">
                   <InteractiveListRow
                     name={selectedInternalOption.title}
                     classification={resolveInternalLinkClassification(
@@ -248,7 +248,7 @@ function RichTextLinkPickerForm({
                   />
                 </InteractiveList>
               ) : (
-                <InteractiveList>
+                <InteractiveList density="compact">
                   {filteredInternalOptions.length === 0 ? (
                     <InteractiveListEmpty>{EMPTY_SEARCH_MESSAGE}</InteractiveListEmpty>
                   ) : (

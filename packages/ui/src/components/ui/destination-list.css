@@ -71,12 +71,12 @@
     pointer-events: none;
   }
 
-  .ui-destination-list--compact {
+  .ui-list--compact.ui-destination-list {
     --ui-destination-inset-inline: calc(var(--spacing) * 4);
     --ui-destination-inset-block: calc(var(--spacing) * 2);
   }
 
-  .ui-destination-list--spacious {
+  .ui-list--spacious.ui-destination-list {
     --ui-destination-inset-inline: calc(var(--spacing) * 6);
     --ui-destination-inset-block: calc(var(--spacing) * 5);
   }

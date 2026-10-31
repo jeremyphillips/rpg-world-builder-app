@@ -3,9 +3,10 @@ import { cva } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
 import { borderStrength } from './border-strength'
 import type { CardElevation } from './card.variants'
+import { LIST_DENSITIES, type ListDensity } from './list-density.lib'
 
-export const DESTINATION_LIST_DENSITIES = ['compact', 'comfortable', 'spacious'] as const
-export type DestinationListDensity = (typeof DESTINATION_LIST_DENSITIES)[number]
+export const DESTINATION_LIST_DENSITIES = LIST_DENSITIES
+export type DestinationListDensity = ListDensity
 
 export const DESTINATION_LIST_APPEARANCES = ['panel', 'embedded', 'filled'] as const
 export type DestinationListAppearance = (typeof DESTINATION_LIST_APPEARANCES)[number]
@@ -23,11 +24,6 @@ export const destinationListVariants = cva('ui-destination-list', {
       embedded: 'ui-destination-list--embedded',
       filled: cn('ui-destination-list--filled', borderStrength()),
     },
-    density: {
-      compact: 'ui-destination-list--compact',
-      comfortable: 'ui-destination-list--comfortable',
-      spacious: 'ui-destination-list--spacious',
-    },
     tone: {
       strong: 'ui-destination-list--tone-strong',
     },
@@ -38,6 +34,5 @@ export const destinationListVariants = cva('ui-destination-list', {
   },
   defaultVariants: {
     appearance: 'panel',
-    density: 'comfortable',
   },
 })

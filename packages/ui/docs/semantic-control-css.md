@@ -66,7 +66,7 @@ Bordered `NumberStepper` (`.ui-number-stepper--bordered` in `field-group.css`) u
 | State     | `--state-default`, `--state-inactive`, `--state-disabled`                     | `--ui-row-border-style`, `--ui-row-state-border`        |
 | Data      | `--data-none`, `--data-selected`, `--data-checked`                            | `--ui-row-bg-data-selected`, `--ui-row-bg-data-checked` |
 
-`ui-interactive-list` owns the list surface, `--ui-surface-bg`, adjacent-sibling borders, and shared hover/pressed mixes (with `surface-interaction.css`). `__panel`, `__toolbar`, `__main--{sm,md,lg}` own panel chrome, toolbar chrome, and row padding. List rows use `--rail` for keyboard highlight only — not action menus. State precedence → [interactive-list-rows.md](./interactive-list-rows.md). `shadow-md` stays a utility on the panel. twMerge groups: `ui-interactive-row-hover`, `ui-interactive-row-selected`, `ui-interactive-list-row-size` (the size group also drops `px`/`py`/`p`).
+`ui-interactive-list` owns the list surface, `--ui-surface-bg`, adjacent-sibling borders, and shared hover/pressed mixes (with `surface-interaction.css`). List roots also emit `ui-list ui-list--{density}` for copy-scale typography; compact/spacious row padding is scoped in `interactive-list.css` under `.ui-list--*`. `__panel` and `__toolbar` own panel and toolbar chrome. List rows use `--rail` for keyboard highlight only — not action menus. State precedence → [interactive-list-rows.md](./interactive-list-rows.md). `shadow-md` stays a utility on the panel. twMerge groups: `ui-interactive-row-hover`, `ui-interactive-row-selected`, `ui-list-density` (the density group also drops `px`/`py`/`p`).
 
 ## DataTable bands
 

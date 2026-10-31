@@ -182,10 +182,10 @@ export function SignInForm({ onSubmit, formError }) {
 
 ## Interactive list chrome
 
-Picker-like rows share one visual system (`InteractiveListSize` owns row geometry) in Storybook **UI/InteractiveList**:
+Picker-like rows share one visual system (`InteractiveList` `density` / `ui-list--*` owns typography and row geometry) in Storybook **UI/InteractiveList**:
 
 - **`InteractiveListRow`** — row frame, highlight/selected wash, `startSlot` / `endSlot` / `trailingAction`.
-- **`IdentityRow`** — heading, classification, supporting copy (typography subordinate to `InteractiveListSize`).
+- **`IdentityRow`** — heading, classification, supporting copy (typography subordinate to list `density`).
 - **`ComboboxOptionRow`** — `listbox` / `option` with required `selected` → `aria-selected`.
 - **`MenuChoiceRow`** — `menuitem` on `ui-menu-item`; optional description via `DropdownMenuItemContent`; not `InteractiveList`.
 - **`InteractiveListPanel`** — neutral scroll body; compositions set `listbox` or `menu` on the host.

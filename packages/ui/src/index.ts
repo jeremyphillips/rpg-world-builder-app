@@ -395,6 +395,8 @@ export {
   buttonTextSizeToComboboxFieldSize,
   COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON,
   resolveComboboxSearchFieldSizeForButtonSize,
+  fieldSizeToListDensity,
+  resolveListDensityForFieldSize,
   fieldSizeToInteractiveListSize,
   resolveInteractiveListSizeForFieldSize,
   fieldSizeToArrayAddButtonSize,
@@ -813,6 +815,12 @@ export {
   type RowAnatomySlot,
   type RowColumn,
 } from './components/ui/row-anatomy'
+export {
+  LIST_DENSITIES,
+  UI_LIST_DENSITY_CLASSES,
+  listShellClasses,
+  type ListDensity,
+} from './components/ui/list-density.lib'
 export {
   interactiveListGroupHeadingVariants,
   interactiveListSurfaceClasses,

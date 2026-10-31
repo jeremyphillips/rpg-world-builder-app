@@ -4,7 +4,7 @@ import { cn } from './utils'
 
 describe('cn semantic control groups', () => {
   it('prefers interactive list row size over menu item padding utilities', () => {
-    expect(cn('px-2 py-1.5', 'ui-interactive-list__main--md')).toBe('ui-interactive-list__main--md')
+    expect(cn('px-2 py-1.5', 'ui-list--comfortable')).toBe('ui-list--comfortable')
   })
 
   it('drops conflicting interactive row hover modifiers', () => {

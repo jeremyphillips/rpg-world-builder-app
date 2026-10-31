@@ -5,7 +5,6 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import { borderStrength } from './border-strength'
 import { IdentityRow } from './identity-row.client'
-import type { InteractiveListSize } from './interactive-list.variants'
 import {
   interactiveListRowChromeVariants,
   interactiveListRowMainVariants,
@@ -17,7 +16,6 @@ export type InteractiveListRowProps = {
   metadata?: React.ReactNode
   /** Replaces the default identity block while keeping row chrome. */
   content?: React.ReactNode
-  size?: InteractiveListSize
   /** Keyboard / pointer highlight — independent of selected. */
   highlighted?: boolean
   /** Persisted selection (e.g. combobox value) — independent of highlighted. */
@@ -41,7 +39,6 @@ export function InteractiveListRow({
   classification,
   metadata,
   content,
-  size = 'md',
   highlighted = false,
   selected = false,
   disabled = false,
@@ -71,7 +68,7 @@ export function InteractiveListRow({
     disabled,
     interactive,
   })
-  const mainClassName = cn(interactiveListRowMainVariants({ interactive, size }), className)
+  const mainClassName = cn(interactiveListRowMainVariants({ interactive }), className)
 
   const main = asChild ? (
     React.isValidElement<{ className?: string; disabled?: boolean; children?: React.ReactNode }>(

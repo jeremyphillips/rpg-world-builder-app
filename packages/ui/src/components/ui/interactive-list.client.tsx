@@ -3,17 +3,19 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import type { ListDensity } from './list-density.lib'
 import { interactiveListVariants } from './interactive-list.variants'
 
 export interface InteractiveListProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
+  density?: ListDensity
 }
 
 /** Row-list wrapper — hosts set `listbox`, `menu`, or section semantics as needed. */
 export const InteractiveList = React.forwardRef<HTMLDivElement, InteractiveListProps>(
-  function InteractiveList({ children, className, ...props }, ref) {
+  function InteractiveList({ children, className, density = 'comfortable', ...props }, ref) {
     return (
-      <div ref={ref} className={cn(interactiveListVariants(), className)} {...props}>
+      <div ref={ref} className={cn(interactiveListVariants(density), className)} {...props}>
         {children}
       </div>
     )

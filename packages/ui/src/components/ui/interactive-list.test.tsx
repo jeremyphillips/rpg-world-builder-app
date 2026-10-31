@@ -1,3 +1,7 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
@@ -10,6 +14,17 @@ import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListToolbar } from './interactive-list-toolbar.client'
 import { InteractiveListPanel } from './interactive-list-panel.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
+
+const interactiveListCssPath = join(dirname(fileURLToPath(import.meta.url)), 'interactive-list.css')
+
+describe('interactive-list.css row geometry', () => {
+  it('uses list-level density overrides and drops row size modifiers', () => {
+    const css = readFileSync(interactiveListCssPath, 'utf8')
+    expect(css).toContain('.ui-list--compact.ui-interactive-list .ui-interactive-list__main')
+    expect(css).toContain('.ui-list--spacious.ui-interactive-list .ui-interactive-list__main')
+    expect(css).not.toMatch(/\.ui-interactive-list__main--(?:sm|md|lg)\s*\{/)
+  })
+})
 
 describe('InteractiveListRow', () => {
   it('renders name, classification, and metadata', () => {
@@ -37,10 +52,16 @@ describe('InteractiveListRow', () => {
     expect(container.firstChild).not.toHaveClass('ui-interactive-row--rail')
   })
 
-  it('applies InteractiveListSize padding on the main hit area', () => {
-    const { container } = render(<InteractiveListRow name="Fireball" size="lg" />)
+  it('applies list-level density padding on the main hit area', () => {
+    const { container } = render(
+      <InteractiveList density="spacious" data-testid="list">
+        <InteractiveListRow name="Fireball" />
+      </InteractiveList>,
+    )
 
-    expect(container.querySelector('.ui-interactive-list__main--lg')).toBeInTheDocument()
+    expect(screen.getByTestId('list')).toHaveClass('ui-list', 'ui-list--spacious')
+    expect(container.querySelector('.ui-interactive-list__main--lg')).not.toBeInTheDocument()
+    expect(container.querySelector('.ui-interactive-list__main')).toBeInTheDocument()
   })
 
   it('injects identity into an asChild interactive root', async () => {
