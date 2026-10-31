@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 
+import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
@@ -14,7 +15,7 @@ import type { FieldValidationProps } from './field-validation-props'
 import { fieldReadOnlyValueClassName } from './field-read-only-value.variants'
 
 export interface FieldReadOnlyValueProps {
-  id: string
+  id?: string
   displayValue: string
   size?: FieldSize
   digits?: FieldDigits
@@ -67,6 +68,8 @@ export interface FieldReadOnlyValueFieldProps extends FieldValidationProps, Fiel
   digits?: FieldDigits
   labelPosition?: FieldLabelPosition
   className?: string
+  /** Renders inside the control band beside the read-only value (e.g. Change). */
+  controlEnd?: ReactNode
 }
 
 /** Labelled read-only field — mirrors `SelectField` anatomy without an editable control. */
@@ -87,11 +90,12 @@ export function FieldReadOnlyValueField({
   labelPosition,
   className,
   chrome,
+  controlEnd,
 }: FieldReadOnlyValueFieldProps) {
   const labelId = `${id}-label`
   const valueNode = (
     <FieldReadOnlyValue
-      id={id}
+      id={controlEnd ? undefined : id}
       displayValue={displayValue}
       size={size}
       digits={digits}
@@ -99,6 +103,14 @@ export function FieldReadOnlyValueField({
       ariaLabelledBy={label.trim() ? labelId : undefined}
       ariaLabel={label.trim() ? label : displayValue}
     />
+  )
+  const controlBody = controlEnd ? (
+    <div className={cn('flex w-full min-w-0 items-center gap-2')}>
+      <div className="min-w-0">{valueNode}</div>
+      {controlEnd}
+    </div>
+  ) : (
+    valueNode
   )
 
   if (labelPosition === 'settings') {
@@ -144,7 +156,7 @@ export function FieldReadOnlyValueField({
               <FieldLabelContent label={label} info={info} />
             </Field.Label>
           }
-          control={<Field.Control>{valueNode}</Field.Control>}
+          control={<Field.Control>{controlBody}</Field.Control>}
           chrome={chrome}
           size={size}
         />

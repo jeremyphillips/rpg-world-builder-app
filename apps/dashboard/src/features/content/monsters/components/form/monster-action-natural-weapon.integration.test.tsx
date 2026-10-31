@@ -212,7 +212,7 @@ describe('natural weapon action round trip', () => {
             name: 'Claw',
             mode: 'melee',
             reach: 5,
-            damageType: 'slashing',
+            damageType: 'piercing',
             damage: { dice: { count: 1, faces: 6 } },
           },
           { id: 'custom', kind: 'natural-weapon', name: 'Gore', mode: 'melee', reach: 5 },
@@ -220,7 +220,13 @@ describe('natural weapon action round trip', () => {
       />,
     )
 
-    expect(await screen.findByRole('button', { name: 'Change Damage type' })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Claw')
+    })
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Change Damage type' })).toBeInTheDocument()
+    })
     expect(screen.queryByRole('combobox', { name: 'Damage type' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add custom description' })).toBeInTheDocument()
     expect(screen.getByText('Ability modifiers are applied automatically.')).toBeInTheDocument()

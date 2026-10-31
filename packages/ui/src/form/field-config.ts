@@ -181,11 +181,11 @@ export type FieldReadOnlyContext = {
 export type FieldPresentationConfig = {
   readOnlyWhen?: (context: FieldReadOnlyContext) => boolean
   /**
-   * When the value is set, show it read-only with this action. The action
-   * reveals the select without unregistering the field. An empty value shows
-   * the select immediately.
+   * When present, a committed option label renders read-only with a Change
+   * action that reveals the select without unregistering the field. See
+   * `packages/ui/docs/forms/field-types.md` (Select change presentation).
    */
-  changeLabel?: string
+  change?: { label: string }
 }
 
 /**
@@ -2166,4 +2166,14 @@ export function resolveSelectFieldDisplayLabel(
   }
   if (options.length === 1) return options[0]?.label
   return normalized
+}
+
+/** Option label for a stored value; omits raw ids when no option matches (Change mode). */
+export function resolveSelectFieldOptionLabel(
+  value: unknown,
+  options: FieldOption[],
+): string | undefined {
+  const normalized = value != null && value !== '' ? String(value) : undefined
+  if (!normalized) return undefined
+  return options.find((option) => option.value === normalized)?.label
 }

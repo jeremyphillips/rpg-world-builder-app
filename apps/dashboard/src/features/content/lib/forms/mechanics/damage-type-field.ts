@@ -17,11 +17,11 @@ const PHYSICAL_DAMAGE_TYPE_LABELS = Object.fromEntries(
   PHYSICAL_DAMAGE_TYPE_IDS.map((id) => [id, getPhysicalDamageTypeLabel(id)]),
 ) as Record<PhysicalDamageType, string>
 
-export type DamageTypeFieldScope = 'vocabulary' | 'physical'
+export type DamageTypeFieldScope = 'vocabulary' | 'physical' | 'physical-and-vocabulary'
 
 export type DamageTypeFieldOptions = {
   name: string
-  /** `physical` for weapons; `vocabulary` (default) for spells, grants, and tags. */
+  /** `physical` for weapons; `physical-and-vocabulary` for natural weapons; `vocabulary` (default) for spells. */
   scope?: DamageTypeFieldScope
   ctx: ContentFormCtx
   label?: string
@@ -35,12 +35,36 @@ export function buildPhysicalDamageTypeFieldOptions(): FieldOption[] {
   return toOptions(PHYSICAL_DAMAGE_TYPE_IDS, PHYSICAL_DAMAGE_TYPE_LABELS)
 }
 
+function mergeDamageTypeFieldOptions(...lists: readonly FieldOption[][]): FieldOption[] {
+  const byValue = new Map<string, FieldOption>()
+  for (const list of lists) {
+    for (const option of list) {
+      if (!byValue.has(option.value)) byValue.set(option.value, option)
+    }
+  }
+  return [...byValue.values()]
+}
+
+/** Physical SRD types plus campaign vocabulary — natural weapons use both. */
+export function buildPhysicalAndVocabularyDamageTypeFieldOptions(
+  ctx: ContentFormCtx,
+): FieldOption[] {
+  return mergeDamageTypeFieldOptions(
+    buildPhysicalDamageTypeFieldOptions(),
+    buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary),
+  )
+}
+
 function resolveDamageTypeFieldOptions(
   scope: DamageTypeFieldScope,
   ctx: ContentFormCtx,
 ): FieldOption[] {
   if (scope === 'physical') {
     return buildPhysicalDamageTypeFieldOptions()
+  }
+
+  if (scope === 'physical-and-vocabulary') {
+    return buildPhysicalAndVocabularyDamageTypeFieldOptions(ctx)
   }
 
   return buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)

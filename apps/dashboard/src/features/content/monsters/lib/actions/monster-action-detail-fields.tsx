@@ -175,8 +175,13 @@ export function monsterActionDetailFields(input: {
             },
           }),
           {
-            ...damageTypeField({ name: 'damageType', ctx, required: true }),
-            presentation: { changeLabel: MONSTER_DAMAGE_TYPE_CHANGE_LABEL },
+            ...damageTypeField({
+              name: 'damageType',
+              ctx,
+              scope: 'physical-and-vocabulary',
+              required: true,
+            }),
+            presentation: { change: { label: MONSTER_DAMAGE_TYPE_CHANGE_LABEL } },
           },
         ],
       },
