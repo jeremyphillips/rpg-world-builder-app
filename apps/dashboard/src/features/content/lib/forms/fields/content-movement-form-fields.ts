@@ -26,9 +26,6 @@ export const movementValidationMessages = {
   ),
 }
 
-/** @deprecated Use {@link movementValidationMessages}. */
-export const speciesMovementValidationMessages = movementValidationMessages
-
 const movementModeDraftSchema = z.union([movementModeSchema, z.literal('')])
 const movementFeetDraftSchema = z.union([movementSpeedFeetSchema, z.literal(''), z.undefined()])
 

@@ -10,7 +10,10 @@ import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
-import { rollValueFields } from '../../../lib/forms/mechanics/roll-value-fields'
+import {
+  rollValueFieldConfigs,
+  rollValueFields,
+} from '../../../lib/forms/mechanics/roll-value-fields'
 import {
   MONSTER_ACTION_NAME_LABEL,
   MONSTER_ADDITIONAL_CONDITION_HINT,
@@ -165,7 +168,7 @@ export function monsterActionDetailFields(input: {
       {
         kind: 'row',
         fields: [
-          ...rollValueFields({
+          ...rollValueFieldConfigs({
             namePrefix: 'damage',
             label: 'Damage',
             required: true,

@@ -1,4 +1,4 @@
-import { MONSTER_ACTION_ATTACK_KIND_SET } from '@rpg/contracts'
+import { MONSTER_ACTION_ATTACK_KINDS } from '@rpg/contracts'
 import {
   Eyebrow,
   EmphasisDetailLine,
@@ -20,27 +20,11 @@ import { MONSTER_ACTION_ATTACK_PREVIEW_LABEL } from '../../lib/monster-form-labe
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 
-const ATTACK_KINDS = MONSTER_ACTION_ATTACK_KIND_SET
+const ATTACK_PREVIEW_KINDS: readonly string[] = MONSTER_ACTION_ATTACK_KINDS
 
 function previewRowValue(row: MonsterActionAttackPreviewRow) {
-  if (row.secondary) {
-    return (
-      <EmphasisDetailLine
-        as="span"
-        className="text-style-body-compact"
-        primary={row.primary}
-        secondary={row.secondary}
-      />
-    )
-  }
-  if (row.id === 'reach') {
-    return (
-      <Text as="span" variant="body">
-        {row.primary}
-      </Text>
-    )
-  }
-  return row.primary
+  if (!row.secondary) return row.primary
+  return <EmphasisDetailLine as="span" primary={row.primary} secondary={row.secondary} />
 }
 
 function toMetadataItems(rows: readonly MonsterActionAttackPreviewRow[]): MetadataListItem[] {
@@ -60,7 +44,7 @@ export function MonsterActionAttackSummary({
 }) {
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const preview = useMemo(() => {
-    if (!values || !ATTACK_KINDS.has(action.kind)) return null
+    if (!values || !ATTACK_PREVIEW_KINDS.includes(action.kind)) return null
     return buildMonsterActionAttackPreview(
       resolveMonsterFormActionAttackProfile(values, ctx, action.id),
       values.abilityScores,
@@ -90,6 +74,7 @@ export function MonsterActionAttackSummary({
           size="sm"
           columnGap="sm"
           valueTrack="fill"
+          emphasis="value"
           divider={false}
           items={toMetadataItems(preview.rows)}
         />
