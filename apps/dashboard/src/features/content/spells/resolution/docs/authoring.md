@@ -80,6 +80,15 @@ may flag incompatible attack/saving-throw methods without coercing them.
 when incompatible selections, effect removals, or outcome branch discards would
 occur. Dialog copy: `resolution-change-dialog.lib.ts`.
 
+## Area geometry
+
+Casting `areaOfEffect` and `resolution.areaOfEffect` each still define their
+own form fields. Both use the spell area value shape and its adapters. The
+shared contract is `areaGeometrySchema`. Stat-block sentences use
+`formatAreaGeometry(area, 'stat-block')` (`15-foot Cone`,
+`60-foot-long, 5-foot-wide Line`). A single dashboard area-field builder has
+not been extracted.
+
 ## Round-trip
 
 `resolutionToForm` / `resolutionToStored` must preserve `selectionMode`,

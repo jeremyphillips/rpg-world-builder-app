@@ -4,10 +4,17 @@ Spell-specific adapter for the shared framework in [base.md](./base.md).
 
 ## Envelope location
 
-Optional `resolution` on [`spellBodySchema`](../../src/rpg/content/spell/body.ts):
+Optional `resolution` on [`spellBodySchema`](../../src/rpg/content/spell/body.ts)
+is [`spellResolutionSchema`](../../src/rpg/content/spell/resolution/schema.ts):
 
-- `selectionMode`, optional `target`, optional `origin`, optional `areaOfEffect`
-- `method`, `effects[]`, `outcomes[]`, optional `applicationPattern`, optional `progression`
+- Shared fields from [`effectResolutionSchema`](../../src/rpg/content/lib/resolution/schema.ts):
+  `selectionMode`, optional `target`, optional `origin`, optional `areaOfEffect`,
+  `method`, `effects[]`, `outcomes[]`
+- Spell-only: `method.kind: 'attack'` with `attackType`, optional `applicationPattern`,
+  optional `progression`
+
+The neutral method union is `saving-throw` | `automatic`. Spell attacks are added
+only on the spell schema.
 
 ## Progression scope (initial pass)
 

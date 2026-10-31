@@ -95,8 +95,9 @@ catalog JSON.
 | `attackResolutionModeIdSchema` | `vocab/mechanics/attack-resolution-mode.ts` | full             |
 | `editionPresetIdSchema`        | `vocab/mechanics/edition-preset.ts`         | full             |
 
-Spell resolution closed sets (`content/spell/resolution/vocab.ts`) also define
-`*_TERM` + `*_ENTRIES` pairs; schema wiring remains deferred from catalog JSON.
+Resolution closed sets live in `vocab/resolution/` (`RESOLUTION_*_TERM` /
+`RESOLUTION_*_ENTRIES`) and are used by `effectResolutionSchema`. Spell attack
+types and the projectile pattern stay in `content/spell/resolution/vocab.ts`.
 
 ---
 
@@ -122,17 +123,15 @@ Spell resolution closed sets (`content/spell/resolution/vocab.ts`) also define
 
 ## Defer (out of catalog JSON Schema workstream)
 
-| Area                                                             | Home                                             | Notes                                               |
-| ---------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------- |
-| Spell resolution enums                                           | `content/spell/resolution/schema.ts`             | Separate follow-up; `@todo` in module               |
-| Spell resolution progression                                     | `content/spell/resolution/progression/schema.ts` | Same project                                        |
-| Character builder runtime                                        | `runtime/character-builder/*`                    | Runtime-only                                        |
-| Character import                                                 | `character-import/*`                             | Adapter pipeline                                    |
-| Name generator                                                   | `name-generator/*`                               | Internal tooling                                    |
-| Dev bench                                                        | `dev-bench/*`                                    | Internal tooling                                    |
-| Campaign authoring                                               | `campaign/campaign.ts`, patches                  | Dashboard-only for now                              |
-| Platform / campaign roles                                        | `shared/roles.ts`                                | Auth layer                                          |
-| Primitives (`area-geometry`, `dice-formula`, `units`, `ruleset`) | `primitives/*`                                   | Mixed; promote individually when UI reuse confirmed |
+| Area                                                             | Home                            | Notes                                               |
+| ---------------------------------------------------------------- | ------------------------------- | --------------------------------------------------- |
+| Character builder runtime                                        | `runtime/character-builder/*`   | Runtime-only                                        |
+| Character import                                                 | `character-import/*`            | Adapter pipeline                                    |
+| Name generator                                                   | `name-generator/*`              | Internal tooling                                    |
+| Dev bench                                                        | `dev-bench/*`                   | Internal tooling                                    |
+| Campaign authoring                                               | `campaign/campaign.ts`, patches | Dashboard-only for now                              |
+| Platform / campaign roles                                        | `shared/roles.ts`               | Auth layer                                          |
+| Primitives (`area-geometry`, `dice-formula`, `units`, `ruleset`) | `primitives/*`                  | Mixed; promote individually when UI reuse confirmed |
 
 ---
 
