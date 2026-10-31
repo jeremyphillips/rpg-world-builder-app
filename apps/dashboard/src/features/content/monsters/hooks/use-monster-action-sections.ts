@@ -144,15 +144,6 @@ export function useMonsterActionSections(entityId?: string) {
     [editors, getValues, locate],
   )
 
-  const reorder = useCallback(
-    (section: MonsterActionSection, from: number, to: number) => {
-      if (from === to || from < 0 || to < 0) return
-      editors[section].move(from, to)
-      setFocusToken((token) => token + 1)
-    },
-    [editors],
-  )
-
   const commitMove = useCallback(
     (from: MonsterActionSection, index: number, to: MonsterActionSection) => {
       const values = getValues()
@@ -205,7 +196,6 @@ export function useMonsterActionSections(entityId?: string) {
     addAcquisition,
     commitEquippedWeapon,
     removeAction,
-    reorder,
     requestMove,
     confirmPending,
     locate,

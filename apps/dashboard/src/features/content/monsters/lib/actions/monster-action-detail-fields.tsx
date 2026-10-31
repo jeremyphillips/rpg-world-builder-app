@@ -5,6 +5,7 @@ import {
   getWeaponModeLabel,
   getWeaponPropertyLabel,
   MONSTER_ACTION_ATTACK_KIND_SET,
+  REACH_FEET,
   WEAPON_MODES,
 } from '@rpg/contracts'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
@@ -55,14 +56,31 @@ function modeOptions() {
   return WEAPON_MODES.map((id) => ({ value: id, label: getWeaponModeLabel(id) }))
 }
 
+const reachFeetOptions = REACH_FEET.map((feet) => ({
+  value: feet,
+  label: String(feet),
+}))
+
 function reachRangeFields(modeField: 'mode' | 'modes'): FormItem[] {
   return [
     {
-      type: 'number',
-      name: 'reach',
+      type: 'joinedPair',
       label: 'Reach',
-      min: 5,
+      width: 'auto',
       visibility: meleeVisibility(modeField),
+      start: {
+        kind: 'select',
+        name: 'reach',
+        options: reachFeetOptions,
+        digits: 2,
+        defaultValue: 5,
+        ariaLabel: 'Reach value',
+      },
+      end: {
+        kind: 'label',
+        text: 'ft.',
+        ariaLabel: 'Reach unit',
+      },
     },
     {
       type: 'number',

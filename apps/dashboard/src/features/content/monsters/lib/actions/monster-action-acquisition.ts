@@ -115,6 +115,20 @@ export function monsterActionAcquisitionItems(input: {
   ]
 }
 
+function naturalWeaponFromPreset(presetId: MonsterNaturalWeaponPresetId): MonsterActionDraftRow {
+  const preset = getMonsterNaturalWeaponPreset(presetId)
+  const mode = preset?.defaultMode ?? 'melee'
+  return {
+    id: createMonsterRowId(),
+    kind: 'natural-weapon',
+    name: preset?.label ?? presetId,
+    damageType: preset?.defaultDamageType,
+    mode,
+    ...(mode !== 'ranged' ? { reach: 5 as const } : {}),
+    damage: { ...MONSTER_NATURAL_WEAPON_PRESET_DEFAULT_DAMAGE },
+  }
+}
+
 export function createMonsterActionFromAcquisition(
   choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
 ): MonsterActionDraftRow {
@@ -123,19 +137,11 @@ export function createMonsterActionFromAcquisition(
     return { id, kind: 'weapon', equipmentEntryId: choice.entryId }
   }
   if (choice.type === 'natural') {
-    const preset = getMonsterNaturalWeaponPreset(choice.presetId)
-    return {
-      id,
-      kind: 'natural-weapon',
-      name: preset?.label ?? choice.presetId,
-      damageType: preset?.defaultDamageType,
-      mode: preset?.defaultMode ?? 'melee',
-      damage: { ...MONSTER_NATURAL_WEAPON_PRESET_DEFAULT_DAMAGE },
-    }
+    return naturalWeaponFromPreset(choice.presetId)
   }
   if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] }
   if (choice.kind === 'special') return { id, kind: 'special' }
-  if (choice.kind === 'natural') return { id, kind: 'natural-weapon', mode: 'melee' }
+  if (choice.kind === 'natural') return { id, kind: 'natural-weapon', mode: 'melee', reach: 5 }
   return { id, kind: 'attack' }
 }
 

@@ -1,4 +1,12 @@
-import { cn, panelVariants, scrollBoundaryRegionRootClasses } from '@rpg/ui'
+import {
+  cn,
+  interactiveListVariants,
+  panelVariants,
+  scrollBoundaryRegionRootClasses,
+} from '@rpg/ui'
+
+/** Compact interactive list shell for the scrollport — flush body, no outer inset. */
+export const masterDetailListBodyClasses = interactiveListVariants('compact')
 
 export const masterDetailListShellClasses = cn(
   panelVariants({ tone: 'quiet', density: 'comfortable', bleed: true }),

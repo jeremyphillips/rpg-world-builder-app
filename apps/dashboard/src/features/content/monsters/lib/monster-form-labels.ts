@@ -190,8 +190,6 @@ export const MONSTER_ADDITIONAL_CONDITION_LABEL =
   getMonsterReactionFieldLabel('additionalCondition')
 export const MONSTER_ADDITIONAL_CONDITION_HINT = "Each spell's own trigger always applies."
 export const MONSTER_MOVE_TO_LABEL = 'Move to'
-export const MONSTER_MOVE_UP_LABEL = 'Move up'
-export const MONSTER_MOVE_DOWN_LABEL = 'Move down'
 export function monsterAddWeaponShortcut(): string {
   return `Add a weapon to ${getContentTypeItemLabel('equipment')}`
 }

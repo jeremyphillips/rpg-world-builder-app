@@ -23,7 +23,6 @@ import {
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
-import { monsterActionSectionHeading } from '../../lib/actions/monster-action-presets'
 import {
   buildMonsterLoadoutPickerItems,
   resolveMonsterFormWeaponGrants,
@@ -146,7 +145,6 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
                   id: row.id,
                   title: row.name?.trim() || `Action ${index + 1}`,
                   meta: {
-                    eyebrow: monsterActionSectionHeading(section),
                     sourceLabel: getMonsterActionKindLabel(row.kind),
                   },
                   hasError: formState.submitCount > 0 && sections.hasRowError(section, index),

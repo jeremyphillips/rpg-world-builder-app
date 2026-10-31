@@ -4,7 +4,7 @@ import {
   isWeaponEquipment,
   resolveEquipmentInstanceReferenceLabel,
 } from '@rpg/contracts'
-import { Button, SemanticText, Text } from '@rpg/ui'
+import { SemanticText, Text } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
@@ -20,7 +20,6 @@ import {
   monsterEquipmentCatalog,
   monsterMagicPropertyProvider,
 } from '../../lib/monster-form-derivation'
-import { MONSTER_MOVE_DOWN_LABEL, MONSTER_MOVE_UP_LABEL } from '../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import type { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
 import { MonsterActionAttackSummary } from './monster-action-attack-summary'
@@ -100,7 +99,6 @@ export function MonsterActionDetail({
           .filter((advisory) => advisory.path.startsWith(`${located.section}.${located.index}`))
           .map((advisory) => advisory.message)
       : []
-  const rowCount = located && values ? (values[located.section]?.length ?? 0) : 0
   const showError = Boolean(
     located && formState.submitCount > 0 && sections.hasRowError(located.section, located.index),
   )
@@ -140,26 +138,6 @@ export function MonsterActionDetail({
             idPrefix={`monster-action-${action.id}`}
             namePrefix={namePrefix}
           />
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={located.index <= 0}
-              onClick={() => sections.reorder(located.section, located.index, located.index - 1)}
-            >
-              {MONSTER_MOVE_UP_LABEL}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={located.index >= rowCount - 1}
-              onClick={() => sections.reorder(located.section, located.index, located.index + 1)}
-            >
-              {MONSTER_MOVE_DOWN_LABEL}
-            </Button>
-          </div>
           <MonsterActionMoveSectionField
             section={located.section}
             onMove={(target) => sections.requestMove(target)}

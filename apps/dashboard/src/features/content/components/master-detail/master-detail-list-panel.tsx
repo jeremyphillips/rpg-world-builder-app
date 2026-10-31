@@ -15,6 +15,7 @@ import { MasterDetailListRow } from './master-detail-list-row'
 import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import {
+  masterDetailListBodyClasses,
   masterDetailListScrollViewportClasses,
   masterDetailListShellClasses,
 } from './master-detail-list-panel.layout'
@@ -75,7 +76,7 @@ function buildVisibleListProjection(items: readonly MasterDetailListItem[]): str
 
 /**
  * Generic sidebar for a master-detail editor: bordered collection shell with
- * list title + Add, and card-style row selection in the scrollport.
+ * list title + Add, and compact interactive-list row selection in the scrollport.
  * Presentation only — selection and array mutation are owned by the parent.
  */
 export function MasterDetailListPanel({
@@ -158,7 +159,7 @@ export function MasterDetailListPanel({
       ) : null}
 
       {items.length === 0 ? (
-        <Text variant="supporting" className="px-3 py-4">
+        <Text variant="supporting" className="py-4">
           {emptyLabel}
         </Text>
       ) : (
@@ -168,7 +169,7 @@ export function MasterDetailListPanel({
           viewportRef={scrollRef}
           data-master-detail-list-scroll
         >
-          <ul className="flex flex-col gap-2 p-2" role="list">
+          <ul className={masterDetailListBodyClasses} role="list">
             {items.map((item, index) => (
               <MasterDetailListRow
                 key={item.id}
