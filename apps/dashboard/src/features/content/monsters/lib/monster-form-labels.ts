@@ -11,7 +11,6 @@ import {
   getContentTypeSentenceForm,
   getCreatureArmorClassKindLabel,
   getCreatureLanguageFluencyLabel,
-  getMonsterActionKindFieldLabel,
   getMonsterReactionFieldLabel,
   getMonsterTraitSectionLabel,
   getProficiencyDomainCollectionLabel,
@@ -152,9 +151,6 @@ export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
 export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
 export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')
 export const MONSTER_REACTIONS_HEADING = actionEconomySectionHeading('reaction')
-export const MONSTER_ACTIONS_EMPTY = 'No actions yet.'
-export const MONSTER_SECTION_EMPTY = 'None'
-export const MONSTER_ACTION_DETAIL_EMPTY = 'Select or add an action to edit it.'
 export const MONSTER_ADD_LABEL = 'Add'
 
 function monsterArmorSlotMidSentenceNoun(slot: CreatureArmorSlot): string {
@@ -188,38 +184,20 @@ export function getMonsterArmorSlotUiCopy(slot: CreatureArmorSlot): {
   }
 }
 
-export const MONSTER_KIND_LABEL = getMonsterActionKindFieldLabel()
 export const MONSTER_ACTION_NAME_LABEL = 'Name'
 export const MONSTER_TRIGGER_LABEL = getMonsterReactionFieldLabel('trigger')
 export const MONSTER_ADDITIONAL_CONDITION_LABEL =
   getMonsterReactionFieldLabel('additionalCondition')
 export const MONSTER_ADDITIONAL_CONDITION_HINT = "Each spell's own trigger always applies."
-export const MONSTER_SPELL_PRESET_HINT = 'Casts referenced spells'
 export const MONSTER_MOVE_TO_LABEL = 'Move to'
 export const MONSTER_MOVE_UP_LABEL = 'Move up'
 export const MONSTER_MOVE_DOWN_LABEL = 'Move down'
-export const MONSTER_WEAPON_PRESET_HINT = 'Uses an equipped weapon'
-export const MONSTER_SPECIAL_PRESET_HINT = 'Prose-based action'
-export const MONSTER_KIND_SWITCH_KEEP = 'The name and description are kept.'
-
 export function monsterAddWeaponShortcut(): string {
   return `Add a weapon to ${getContentTypeItemLabel('equipment')}`
 }
 
 export function formatAddedEquipmentNotice(name: string): string {
   return `${name} was added to ${getContentTypeItemLabel('equipment')}.`
-}
-
-export function formatWeaponSwapNotice(name: string): string {
-  return `Now uses ${name}. Attack bonus, range, and damage come from ${name}.`
-}
-
-export function formatKindSwitchTitle(name: string, nextKindLabel: string): string {
-  return `Change ${name} to a ${nextKindLabel.toLowerCase()}?`
-}
-
-export function formatKindSwitchConfirm(nextKindLabel: string): string {
-  return `Change to ${nextKindLabel.toLowerCase()}`
 }
 
 export function formatDropTriggerBody(): string {

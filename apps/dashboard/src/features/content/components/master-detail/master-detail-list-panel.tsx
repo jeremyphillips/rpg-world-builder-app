@@ -48,6 +48,11 @@ export type MasterDetailListPanelProps = {
   addLabel: string
   itemNoun: MasterDetailItemNounTerm
   onAdd: () => void
+  /**
+   * Replaces the default Add button. Omit it to keep that button.
+   * The control owns its own action; `onAdd` is not called.
+   */
+  addControl?: ReactNode
   onSelect: (index: number) => void
   /** Optional stable availability count row rendered below the list header. */
   countSupplement?: ReactNode
@@ -82,6 +87,7 @@ export function MasterDetailListPanel({
   addLabel,
   itemNoun,
   onAdd,
+  addControl,
   onSelect,
   countSupplement,
   invalidItemCount = 0,
@@ -136,9 +142,11 @@ export function MasterDetailListPanel({
         <Heading as="div" variant="section" className="min-w-0">
           {listTitle}
         </Heading>
-        <ActionButton action="add" variant="outline" size="sm" onClick={onAdd}>
-          {addLabel}
-        </ActionButton>
+        {addControl ?? (
+          <ActionButton action="add" variant="outline" size="sm" onClick={onAdd}>
+            {addLabel}
+          </ActionButton>
+        )}
       </div>
 
       {countSupplementRow ? (

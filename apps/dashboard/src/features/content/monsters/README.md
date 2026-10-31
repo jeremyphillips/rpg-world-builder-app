@@ -11,6 +11,8 @@ Monsters / stat block entries. Part of the [`content`](../README.md) feature; se
 | Form hub                              | `lib/monster-form-{fields,values,schema,labels,preview}.ts(x)`                                                             |
 | Equipment tab lib                     | [`lib/equipment/`](./lib/equipment/)                                                                                       |
 | Actions tab lib                       | [`lib/actions/`](./lib/actions/)                                                                                           |
+| Actions tab UI                        | [`components/form/monster-action-sections.tsx`](./components/form/monster-action-sections.tsx)                             |
+| Weapon action mode audit              | [`docs/weapon-action-modes.md`](./docs/weapon-action-modes.md)                                                             |
 | Statistics tab lib                    | [`lib/statistics/`](./lib/statistics/)                                                                                     |
 | Creature details tab lib              | [`lib/creature-details/`](./lib/creature-details/)                                                                         |
 | Detail read model                     | [`lib/monster-display.ts`](./lib/monster-display.ts)                                                                       |

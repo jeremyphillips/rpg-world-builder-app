@@ -19,6 +19,7 @@ import { normalizeEquipmentInstance } from '../../content/equipment/instance/nor
 import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
 import { systemDefaultArmorClassRules } from '../../campaign/patches/campaign-mechanics-patch'
 import { ARMOR_CLASS_RULES_MATRIX } from '../../vocab/mechanics/armor-class-scale'
+import { resolveMonsterActionAttackProfile } from './resolve-monster-action-attack-profile'
 import {
   deriveMonsterDraftStatBlock as deriveMonsterDraftStatBlockRaw,
   deriveMonsterStatBlock as deriveMonsterStatBlockRaw,
@@ -928,5 +929,88 @@ describe('resolveMonsterHitPoints size', () => {
         hitPoints: { kind: 'hit-dice', count: 3 },
       }).status,
     ).toBe('unavailable')
+  })
+})
+
+describe('resolveMonsterActionAttackProfile', () => {
+  it('matches the published dagger line and keeps thrown range without a second attack', () => {
+    const block = deriveMonsterStatBlock({ monster: kobold, equipmentCatalog, skillCatalog })
+    const line = block.attacks.find((attack) => attack.id === 'dagger')
+    const profile = resolveMonsterActionAttackProfile({
+      action: kobold.actions[0]!,
+      monster: kobold,
+      equipmentCatalog,
+      proficiencyBonus: block.proficiencyBonus,
+      magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    })
+    expect(profile.status).toBe('resolved')
+    if (profile.status !== 'resolved') return
+    expect(profile.value.attackBonus).toBe(line?.attackBonus)
+    expect(String(profile.value.primary.average)).toBe(line?.damage)
+    expect(profile.value.primary.expression).toBe(line?.damageExpression)
+    expect(profile.value.range).toEqual(line?.range)
+    expect(profile.value.reach).toBe(5)
+    expect(profile.value.modes).toEqual(['melee'])
+    expect(profile.value.sourceLabel).toBe('Dagger')
+    expect(profile.value.unresolvedCapabilities.map((entry) => entry.id)).toEqual(['thrown'])
+    expect(profile.value.unresolvedCapabilities[0]?.reason).toBe('missing-input')
+  })
+
+  it('does not apply versatile damage and does not invent dice when damage is missing', () => {
+    const versatile = weaponFromSeed('longsword-versatile', {
+      name: 'Longsword',
+      properties: ['versatile'],
+      damage: { dice: { count: 1, faces: 8 } },
+      versatileDamage: { count: 1, faces: 10 },
+      damageType: 'slashing',
+    })
+    const catalog = new Map(equipmentCatalog)
+    catalog.set(versatile.id, versatile)
+    const monster = {
+      ...kobold,
+      equipment: [{ entryId: 'sword', equipmentId: versatile.id, quantity: 1, equipped: true }],
+      actions: [{ id: 'slash', kind: 'weapon' as const, equipmentEntryId: 'sword' }],
+      proficiencies: {
+        ...kobold.proficiencies,
+        weapons: [{ weaponId: versatile.id }],
+      },
+    }
+    const block = deriveMonsterStatBlock({ monster, equipmentCatalog: catalog, skillCatalog })
+    const profile = resolveMonsterActionAttackProfile({
+      action: monster.actions[0]!,
+      monster,
+      equipmentCatalog: catalog,
+      proficiencyBonus: block.proficiencyBonus,
+      magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    })
+    expect(profile.status).toBe('resolved')
+    if (profile.status !== 'resolved') return
+    expect(String(profile.value.primary.average)).toBe(block.attacks[0]?.damage)
+    expect(profile.value.primary.expression).not.toContain('d10')
+    expect(profile.value.unresolvedCapabilities.map((entry) => entry.id)).toContain('versatile')
+
+    const missing = resolveMonsterActionAttackProfile({
+      action: {
+        id: 'bite',
+        kind: 'natural-weapon',
+        name: 'Bite',
+        mode: 'melee',
+        damageType: 'piercing',
+      },
+      monster: kobold,
+      equipmentCatalog,
+      proficiencyBonus: 2,
+      magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    })
+    expect(missing).toEqual({ status: 'unavailable', reason: 'missing-input' })
+
+    const unlinked = resolveMonsterActionAttackProfile({
+      action: { id: 'hit', kind: 'weapon' },
+      monster: kobold,
+      equipmentCatalog,
+      proficiencyBonus: 2,
+      magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    })
+    expect(unlinked).toEqual({ status: 'unavailable', reason: 'missing-reference' })
   })
 })

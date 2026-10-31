@@ -67,6 +67,7 @@ import { PASSIVE_PERCEPTION_TERM } from './mechanics/passive-perception'
 import { TELEPATHY_TERM } from './mechanics/telepathy'
 import { SAVING_THROW_TERM } from './mechanics/saving-throw'
 import { MOVEMENT_MODE_TERM, MOVEMENT_OPERATION_TERM } from './movement-mode'
+import { MONSTER_NATURAL_WEAPON_PRESET_TERM } from './monster-natural-weapon-preset'
 import { PROFICIENCY_TERM } from './proficiency'
 import { SENSE_TERM } from './sense'
 import { SPELL_ATOMIC_EFFECT_KIND_TERM } from './spell/atomic-effect-kind'
@@ -148,6 +149,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   ORGANIZATION_PRACTICE_TERM,
   NPC_TEMPLATE_TERM,
   NPC_WEALTH_TIER_TERM,
+  MONSTER_NATURAL_WEAPON_PRESET_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
 /** Open `rpg/vocab` sets — `*_SET_ID` modules with a sibling `*_TERM`. */
@@ -216,7 +218,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(52)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(53)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }
