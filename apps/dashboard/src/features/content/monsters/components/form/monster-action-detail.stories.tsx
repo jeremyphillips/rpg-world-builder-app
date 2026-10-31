@@ -1,8 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
+
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
+import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
@@ -22,27 +25,51 @@ const ctx = {
   entityCatalogLayer: 'homebrew',
   equipmentCatalogStatus: 'ready',
   equipmentCatalogById: new Map(),
+  damageTypeVocabulary: buildSeedDamageTypeVocabulary(),
 } as ContentFormCtx
 
-function Host() {
+function Host({ action }: { action: MonsterActionDraftRow }) {
   const values = resolveMonsterCreateDefaultValues()
-  values.actions = [
-    { id: 'claw', kind: 'natural-weapon', name: 'Claw', mode: 'melee', damageType: 'slashing' },
-  ]
-  const form = useForm<MonsterFormValues>({ defaultValues: values })
+  values.actions = [action]
+  const form = useForm<MonsterFormValues>({ shouldUnregister: true, defaultValues: values })
   return (
     <FormProvider {...form}>
-      <Detail />
+      <Detail actionId={action.id} />
     </FormProvider>
   )
 }
 
-function Detail() {
+function Detail({ actionId }: { actionId: string }) {
   const sections = useMonsterActionSections()
-  return <MonsterActionDetail ctx={ctx} sections={sections} located={sections.locate('claw')} />
+  return <MonsterActionDetail ctx={ctx} sections={sections} located={sections.locate(actionId)} />
+}
+
+const claw: MonsterActionDraftRow = {
+  id: 'claw',
+  kind: 'natural-weapon',
+  name: 'Claw',
+  mode: 'melee',
+  reach: 5,
+  damageType: 'slashing',
+  damage: { dice: { count: 1, faces: 6 } },
 }
 
 export const Claw: Story = {
   args: { ctx, sections: undefined as never, located: null },
-  render: () => <Host />,
+  render: () => <Host action={claw} />,
+}
+
+export const WithDescriptionAndOnHit: Story = {
+  args: { ctx, sections: undefined as never, located: null },
+  render: () => (
+    <Host
+      action={{
+        ...claw,
+        description: '<p>Rakes with both claws.</p>',
+        onHit: {
+          additionalDamage: [{ damageType: 'poison', roll: { dice: { count: 1, faces: 4 } } }],
+        },
+      }}
+    />
+  ),
 }

@@ -41,6 +41,7 @@ import { collectFieldDynamicDependsOn } from '../field-config'
 import { FieldDerivedMetaProvider } from '../../components/ui/field-derived-meta-context.client'
 import { renderSpecializedField } from './fields/field-renderer-specialized.client'
 import {
+  OptionalDisclosureRichTextFieldRenderer,
   OptionalDisclosureSelectFieldRenderer,
   OptionalDisclosureTextareaFieldRenderer,
   OptionalDisclosureTextSuggestionsFieldRenderer,
@@ -814,6 +815,20 @@ function StandardFieldRenderer({
   if (renderConfig.type === 'textarea' && renderConfig.optionalDisclosure) {
     return (
       <OptionalDisclosureTextareaFieldRenderer
+        config={renderConfig}
+        disclosure={renderConfig.optionalDisclosure}
+        field={progressiveField}
+        id={id}
+        hint={hint}
+        hintPosition={hintPosition}
+        {...validation}
+      />
+    )
+  }
+
+  if (renderConfig.type === 'richtext' && renderConfig.optionalDisclosure) {
+    return (
+      <OptionalDisclosureRichTextFieldRenderer
         config={renderConfig}
         disclosure={renderConfig.optionalDisclosure}
         field={progressiveField}

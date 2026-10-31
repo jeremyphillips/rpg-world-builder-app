@@ -111,6 +111,19 @@ describe('assertOptionalDisclosureFieldConfig', () => {
     } as FieldConfig)
 
     expect(error).toHaveBeenCalledWith(expect.stringContaining('not implemented for "text"'))
-    expect(error).toHaveBeenCalledWith(expect.stringContaining('TODO(richtext)'))
+    expect(error).toHaveBeenCalledWith(expect.stringContaining('TODO(text)'))
+  })
+
+  it('allows a valid richtext optionalDisclosure config', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    assertOptionalDisclosureFieldConfig({
+      type: 'richtext',
+      name: 'description',
+      label: 'Custom description',
+      optionalDisclosure: { addLabel: 'Add custom description' },
+    })
+
+    expect(error).not.toHaveBeenCalled()
   })
 })

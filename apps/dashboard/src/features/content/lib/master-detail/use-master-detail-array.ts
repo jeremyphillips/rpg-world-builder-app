@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useFieldArray, useFormContext } from 'react-hook-form'
+import { useFieldArray, useFormContext, type Control } from 'react-hook-form'
 
 import {
   applyFieldIndexPermutation,
@@ -60,6 +60,41 @@ export interface UseMasterDetailArrayResult {
   ) => void
 }
 
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+type FieldArrayControl = Control & {
+  _defaultValues?: Record<string, unknown>
+  _formValues?: Record<string, unknown>
+}
+
+function readControlRows(
+  control: Control,
+  store: '_defaultValues' | '_formValues',
+  name: string,
+): unknown[] | undefined {
+  const rows = (control as FieldArrayControl)[store]?.[name]
+  return Array.isArray(rows) ? rows : undefined
+}
+
+/** True when a live row dropped keys that are still on the default record. */
+function defaultsOmitted(base: unknown, live: unknown): boolean {
+  if (!isPlainRecord(base)) return false
+  if (!isPlainRecord(live)) return true
+  return Object.entries(base).some(([key, value]) => value !== undefined && live[key] === undefined)
+}
+
+function mergeDefaultRow(base: unknown, live: unknown): unknown {
+  if (!isPlainRecord(base)) return live ?? base
+  if (!isPlainRecord(live)) return base
+  const next: Record<string, unknown> = { ...base }
+  for (const [key, value] of Object.entries(live)) {
+    if (value !== undefined) next[key] = value
+  }
+  return next
+}
+
 /**
  * Presentation-only master-detail state over a parent form field array. Binds
  * to the enclosing `FormProvider` via `useFieldArray`, so values, validation,
@@ -76,7 +111,37 @@ export function useMasterDetailArray(
     getValues,
     formState: { errors, submitCount },
   } = useFormContext()
-  const { fields, append, remove, move: fieldArrayMove } = useFieldArray({ control, name })
+  const {
+    fields,
+    append,
+    remove,
+    move: fieldArrayMove,
+    replace,
+  } = useFieldArray({
+    control,
+    name,
+  })
+
+  // Form `shouldUnregister` starts from an empty value store and only copies
+  // paths a control mounts. Reapply the default row so unmounted keys (mode,
+  // reach, properties, limits) stay on the field-array record.
+  useEffect(() => {
+    const defaults = readControlRows(control, '_defaultValues', name)
+    if (!defaults || defaults.length === 0) return
+    // Read the value store directly. getValues() still returns defaults until
+    // the form marks itself mounted, which hides keys shouldUnregister dropped.
+    const liveRows = readControlRows(control, '_formValues', name) ?? []
+    const missing =
+      liveRows.length !== defaults.length ||
+      defaults.some((row, index) => defaultsOmitted(row, liveRows[index]))
+    if (!missing) return
+    replace(
+      defaults.map((row, index) => mergeDefaultRow(row, liveRows[index])) as Record<
+        string,
+        unknown
+      >[],
+    )
+  }, [control, name, replace])
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null)
   const [pendingSelectIndex, setPendingSelectIndex] = useState<number | null>(null)
   const [consumedAddedFieldId, setConsumedAddedFieldId] = useState<string | null>(null)

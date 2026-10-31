@@ -3,7 +3,6 @@ import {
   getAbilityLabel,
   getContentTypeTerm,
   getWeaponModeLabel,
-  getWeaponPropertyLabel,
   REACH_FEET,
   WEAPON_MODES,
 } from '@rpg/contracts'
@@ -16,9 +15,13 @@ import {
   MONSTER_ACTION_NAME_LABEL,
   MONSTER_ADDITIONAL_CONDITION_HINT,
   MONSTER_ADDITIONAL_CONDITION_LABEL,
+  MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL,
+  MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
+  MONSTER_DAMAGE_TYPE_CHANGE_LABEL,
+  MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
   MONSTER_TRIGGER_LABEL,
-} from '../../lib/monster-form-labels'
+} from '../monster-form-labels'
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import {
@@ -30,8 +33,6 @@ import {
   monsterActionOnHitFields,
   spellComponentField,
 } from './monster-action-on-hit-fields'
-import { MonsterActionMoveSectionField } from './monster-action-move-section-field'
-
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {
   return {
     dependsOn: [name],
@@ -114,17 +115,24 @@ export function monsterActionDetailFields(input: {
   namePrefix: string
   equipmentOptions: { value: string; label: string }[]
   sharedCastingOptions: { value: string; label: string }[]
-  onMove: (target: MonsterActionSection) => void
 }): FormItem[] {
-  const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions, onMove } = input
+  const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions } = input
   const fields: FormItem[] = [
     { type: 'text', name: 'name', label: MONSTER_ACTION_NAME_LABEL },
-    {
-      type: 'richtext',
-      name: 'description',
-      label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
-      required: action.kind === 'special',
-    },
+    action.kind === 'natural-weapon'
+      ? {
+          type: 'richtext',
+          name: 'description',
+          label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
+          hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
+          optionalDisclosure: { addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
+        }
+      : {
+          type: 'richtext',
+          name: 'description',
+          label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
+          required: action.kind === 'special',
+        },
   ]
 
   if (section === 'reactions') {
@@ -136,7 +144,9 @@ export function monsterActionDetailFields(input: {
     })
   }
 
-  if (action.kind !== 'spell') fields.push(...monsterActionLimitedUseFields())
+  if (action.kind !== 'spell' && action.kind !== 'natural-weapon') {
+    fields.push(...monsterActionLimitedUseFields())
+  }
 
   if (action.kind === 'weapon') {
     fields.push({
@@ -153,21 +163,23 @@ export function monsterActionDetailFields(input: {
   if (action.kind === 'natural-weapon') {
     fields.push(
       {
-        type: 'chips',
-        name: 'mode',
-        label: 'Mode',
-        multiple: false,
-        options: modeOptions(),
+        kind: 'row',
+        fields: [
+          ...rollValueFields({
+            namePrefix: 'damage',
+            label: 'Damage',
+            required: true,
+            hint: {
+              text: MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
+              position: 'below-control',
+            },
+          }),
+          {
+            ...damageTypeField({ name: 'damageType', ctx, required: true }),
+            presentation: { changeLabel: MONSTER_DAMAGE_TYPE_CHANGE_LABEL },
+          },
+        ],
       },
-      {
-        type: 'chips',
-        name: 'properties',
-        label: 'Properties',
-        options: [{ value: 'finesse', label: getWeaponPropertyLabel('finesse') }],
-      },
-      ...reachRangeFields('mode'),
-      damageTypeField({ name: 'damageType', ctx, required: true }),
-      ...rollValueFields({ namePrefix: 'damage', label: 'Damage', required: true }),
       monsterActionOnHitFields(ctx),
     )
   }
@@ -259,18 +271,6 @@ export function monsterActionDetailFields(input: {
       },
     )
   }
-
-  fields.push({
-    kind: 'slot',
-    name: 'moveSection',
-    render: () => (
-      <MonsterActionMoveSectionField
-        id={`monster-action-${action.id}-moveSection`}
-        section={section}
-        onMove={onMove}
-      />
-    ),
-  })
 
   return fields
 }

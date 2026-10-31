@@ -7,6 +7,7 @@ export type RollValueFieldsOptions = {
   visibility?: FieldConfig['visibility']
   required?: boolean
   defaultFaces?: number
+  hint?: FieldConfig['hint']
 }
 
 /**
@@ -19,6 +20,7 @@ export function rollValueFieldConfigs({
   visibility,
   required,
   defaultFaces,
+  hint,
 }: RollValueFieldsOptions): FieldConfig[] {
   return [
     {
@@ -29,6 +31,7 @@ export function rollValueFieldConfigs({
       visibility,
       required,
       defaultFaces,
+      hint,
     },
   ]
 }

@@ -12,7 +12,11 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import { MasterDetailEditorShell } from '../../../components/master-detail/master-detail-editor-shell'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
-import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
+import {
+  MONSTER_ACTION_SECTIONS,
+  type MonsterActionSection,
+} from '../../lib/actions/monster-action-equipment-references'
+import { MONSTER_MOVE_TO_LABEL } from '../../lib/monster-form-labels'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import { monsterActionSectionHeading } from '../../lib/actions/monster-action-presets'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-trait-form-fields'
@@ -84,7 +88,6 @@ export function MonsterActionDetail({
       namePrefix,
       equipmentOptions: equipmentOptions(values, ctx),
       sharedCastingOptions: sharedCastingOptions(values, action.id),
-      onMove: sections.requestMove,
     })
   }, [action, ctx, located, namePrefix, values])
 
@@ -119,6 +122,23 @@ export function MonsterActionDetail({
           : undefined
       }
       onDelete={located ? () => sections.removeAction(located.action.id) : undefined}
+      overflowActions={
+        located
+          ? [
+              {
+                id: 'move-to',
+                label: MONSTER_MOVE_TO_LABEL,
+                items: MONSTER_ACTION_SECTIONS.filter((section) => section !== located.section).map(
+                  (section) => ({
+                    id: `move-${section}`,
+                    label: monsterActionSectionHeading(section),
+                    onSelect: () => sections.requestMove(section),
+                  }),
+                ),
+              },
+            ]
+          : undefined
+      }
     >
       {located && action ? (
         <div id={`monster-action-focus-${action.id}`} tabIndex={-1} className="flex flex-col gap-4">

@@ -1,5 +1,8 @@
+import { getMonsterNaturalWeaponPreset, MONSTER_NATURAL_WEAPON_PRESET_IDS } from '@rpg/contracts'
+import type { FormItem } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
+import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 import { pickEquipment, pickMonster } from '@/test/fixtures/pick'
 
 import {
@@ -11,11 +14,13 @@ import {
   actionMoveDropsTrigger,
   actionAfterSectionMove,
 } from './monster-action-kind'
-import { createMonsterRowId } from './monster-action-presets'
+import { monsterActionDetailFields } from './monster-action-detail-fields'
+import { createMonsterRowId, type MonsterActionDraftRow } from './monster-action-presets'
 import {
   resolveFirstInvalidActionPath,
   resolveMonsterActionSelectionAfterRemoval,
 } from './monster-action-selection'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { collectMonsterFormAdvisories } from '../monster-form-advisories'
 import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 import { buildMonsterInput, monsterToFormValues } from '../monster-form-values'
@@ -32,6 +37,23 @@ describe('monster action acquisition', () => {
     expect(action.damage).toEqual({ dice: { count: 1, faces: 6 } })
     expect(action).not.toHaveProperty('preset')
     expect(createMonsterRowId()).not.toBe(createMonsterRowId())
+  })
+
+  it('seeds every natural weapon preset without properties or a limit', () => {
+    for (const presetId of MONSTER_NATURAL_WEAPON_PRESET_IDS) {
+      const preset = getMonsterNaturalWeaponPreset(presetId)
+      const action = createMonsterActionFromAcquisition({ type: 'natural', presetId })
+      expect(action).toMatchObject({
+        kind: 'natural-weapon',
+        name: preset?.label,
+        damageType: preset?.defaultDamageType,
+        mode: preset?.defaultMode,
+        reach: 5,
+        damage: { dice: { count: 1, faces: 6 } },
+      })
+      expect(action).not.toHaveProperty('properties')
+      expect(action).not.toHaveProperty('limitedUse')
+    }
   })
 
   it('links a new equipped weapon and its action in one result', () => {
@@ -53,13 +75,88 @@ describe('monster action acquisition', () => {
     expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }).kind).toBe(
       'special',
     )
-    expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'natural' })).toMatchObject({
+    const customNatural = createMonsterActionFromAcquisition({ type: 'create', kind: 'natural' })
+    expect(customNatural).toMatchObject({
       kind: 'natural-weapon',
       mode: 'melee',
+      reach: 5,
     })
+    expect(customNatural.damageType).toBeUndefined()
     expect(
       createMonsterActionFromAcquisition({ type: 'weapon-entry', entryId: 'greatsword' }),
     ).toMatchObject({ kind: 'weapon', equipmentEntryId: 'greatsword' })
+  })
+})
+
+const detailCtx = {
+  damageTypeVocabulary: buildSeedDamageTypeVocabulary(),
+} as ContentFormCtx
+
+function collectFieldNames(items: readonly FormItem[]): string[] {
+  const names: string[] = []
+  for (const item of items) {
+    if ('name' in item && typeof item.name === 'string') names.push(item.name)
+    if ('fields' in item && Array.isArray(item.fields)) {
+      names.push(...collectFieldNames(item.fields as FormItem[]))
+    }
+    if ('start' in item && item.start && typeof item.start === 'object' && 'name' in item.start) {
+      if (typeof item.start.name === 'string') names.push(item.start.name)
+    }
+  }
+  return names
+}
+
+function detailFields(action: MonsterActionDraftRow, section: 'actions' | 'reactions' = 'actions') {
+  return collectFieldNames(
+    monsterActionDetailFields({
+      ctx: detailCtx,
+      action,
+      section,
+      namePrefix: `${section}.0`,
+      equipmentOptions: [],
+      sharedCastingOptions: [],
+    }),
+  )
+}
+
+describe('monster action detail fields', () => {
+  it('shows only the natural-weapon editors and keeps attack editors', () => {
+    const natural = detailFields({
+      id: 'bite',
+      kind: 'natural-weapon',
+      name: 'Bite',
+      mode: 'melee',
+      damageType: 'piercing',
+    })
+    expect(natural).toEqual(
+      expect.arrayContaining([
+        'name',
+        'description',
+        'damage',
+        'damageType',
+        'onHit.additionalDamage',
+      ]),
+    )
+    for (const hidden of ['mode', 'properties', 'reach', 'limitedUse.kind', 'moveSection']) {
+      expect(natural).not.toContain(hidden)
+    }
+
+    const reaction = detailFields(
+      { id: 'bite', kind: 'natural-weapon', name: 'Bite', mode: 'melee' },
+      'reactions',
+    )
+    expect(reaction).toContain('trigger.text')
+
+    const attack = detailFields({ id: 'slash', kind: 'attack', name: 'Slash' })
+    expect(attack).toEqual(
+      expect.arrayContaining(['modes', 'reach', 'limitedUse.kind', 'damageType', 'damage']),
+    )
+    expect(attack).not.toContain('moveSection')
+
+    const weapon = detailFields({ id: 'sword', kind: 'weapon', equipmentEntryId: 'sword' })
+    expect(weapon).toContain('equipmentEntryId')
+    expect(weapon).toContain('limitedUse.kind')
+    expect(weapon).not.toContain('moveSection')
   })
 })
 

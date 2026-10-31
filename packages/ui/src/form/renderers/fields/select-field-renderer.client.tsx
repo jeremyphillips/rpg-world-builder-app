@@ -1,5 +1,8 @@
 'use client'
 
+import { useState } from 'react'
+
+import { Button } from '../../../components/ui/button.client'
 import { FieldReadOnlyValueField } from '../../../components/ui/field-read-only-value.client'
 import { SelectField } from '../../../components/ui/select-field'
 import type { SelectFieldConfig } from '../../field-config'
@@ -28,6 +31,10 @@ export function SelectFieldRenderer({
     hintPosition: state.hintPosition,
     size: state.controlSize,
   })
+  const changeLabel = state.renderConfig.presentation?.changeLabel
+  const [changing, setChanging] = useState(false)
+  const value = normalizedSelectFieldValue(state.field.value)
+  const showEditor = !changeLabel || changing || value === ''
 
   if (state.isReadOnly) {
     return (
@@ -37,6 +44,31 @@ export function SelectFieldRenderer({
         {...chrome}
         {...state.validation}
       />
+    )
+  }
+
+  if (changeLabel && !showEditor) {
+    return (
+      <div className="flex min-w-0 items-end gap-2">
+        <div className="min-w-0">
+          <FieldReadOnlyValueField
+            id={id}
+            displayValue={state.displayValue}
+            {...chrome}
+            {...state.validation}
+          />
+        </div>
+        <Button
+          type="button"
+          variant="text"
+          size="sm"
+          className="shrink-0 font-normal"
+          aria-label={`${changeLabel} ${state.renderConfig.label}`}
+          onClick={() => setChanging(true)}
+        >
+          {changeLabel}
+        </Button>
+      </div>
     )
   }
 
@@ -51,9 +83,15 @@ export function SelectFieldRenderer({
       sizingLabels={state.renderConfig.sizingLabels}
       name={state.field.name}
       disabled={state.renderConfig.disabled}
-      value={normalizedSelectFieldValue(state.field.value)}
-      onValueChange={state.field.onChange}
-      onBlur={state.field.onBlur}
+      value={value}
+      onValueChange={(next) => {
+        state.field.onChange(next)
+        if (changeLabel && next) setChanging(false)
+      }}
+      onBlur={() => {
+        state.field.onBlur()
+        if (changeLabel && value) setChanging(false)
+      }}
       clearable={state.renderConfig.clearable}
       clearAccessibleName={state.renderConfig.clearAccessibleName}
       onClear={() => state.field.onChange('', { shouldDirty: true })}

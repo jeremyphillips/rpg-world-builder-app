@@ -180,6 +180,12 @@ export type FieldReadOnlyContext = {
 /** Presentation overrides that swap an editable control for read-only chrome. */
 export type FieldPresentationConfig = {
   readOnlyWhen?: (context: FieldReadOnlyContext) => boolean
+  /**
+   * When the value is set, show it read-only with this action. The action
+   * reveals the select without unregistering the field. An empty value shows
+   * the select immediately.
+   */
+  changeLabel?: string
 }
 
 /**
@@ -618,7 +624,7 @@ export interface JsonFieldConfig extends BaseFieldConfig {
 
 export interface RichTextFieldConfig extends BaseFieldConfig {
   type: 'richtext'
-  // TODO(richtext): add optionalDisclosure when empty-HTML detection + header wiring land.
+  optionalDisclosure?: OptionalDisclosureConfig
   /** Opt in to the link toolbar button + extension (off by default). */
   linkable?: boolean
   /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */

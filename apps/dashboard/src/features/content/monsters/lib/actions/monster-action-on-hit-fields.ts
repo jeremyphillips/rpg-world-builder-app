@@ -9,6 +9,7 @@ import type { FormItem } from '@rpg/ui/form'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
 import { rollValueFields } from '../../../lib/forms/mechanics/roll-value-fields'
+import { MONSTER_ON_HIT_HINT, MONSTER_ON_HIT_LEGEND } from '../monster-form-labels'
 
 function limitVisibility(kind: 'uses' | 'recharge') {
   return {
@@ -76,7 +77,11 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'array',
     name: 'onHit.additionalDamage',
-    legend: 'On hit',
+    legend: MONSTER_ON_HIT_LEGEND,
+    heading: {
+      label: MONSTER_ON_HIT_LEGEND,
+      hint: MONSTER_ON_HIT_HINT,
+    },
     addAction: { label: 'Add damage' },
     item: { header: { fallback: (index) => `Damage ${index + 1}` } },
     fields: [

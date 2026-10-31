@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
@@ -30,6 +30,89 @@ type TriggerPending = {
 
 export type MonsterActionPending = TriggerPending
 
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+type MissingPathEntry = { path: string; value: unknown }
+
+function collectMissingPaths(
+  snapshot: unknown,
+  live: unknown,
+  path: string,
+  missing: MissingPathEntry[],
+) {
+  if (Array.isArray(snapshot)) {
+    collectMissingArraySnapshot(snapshot, live, path, missing)
+    return
+  }
+  if (isPlainRecord(snapshot)) {
+    collectMissingRecordSnapshot(snapshot, live, path, missing)
+  }
+}
+
+function collectMissingArraySnapshot(
+  snapshot: unknown[],
+  live: unknown,
+  path: string,
+  missing: MissingPathEntry[],
+) {
+  if (!Array.isArray(live)) {
+    missing.push({ path, value: snapshot })
+    return
+  }
+  live.forEach((item, index) => {
+    const source = sourceForLiveItem(snapshot, item)
+    if (source === undefined || !isPlainRecord(item) || typeof item.id !== 'string') return
+    collectMissingPaths(source, item, `${path}.${index}`, missing)
+  })
+}
+
+function collectMissingRecordSnapshot(
+  snapshot: Record<string, unknown>,
+  live: unknown,
+  path: string,
+  missing: MissingPathEntry[],
+) {
+  const liveRecord = isPlainRecord(live) ? live : {}
+  for (const [key, value] of Object.entries(snapshot)) {
+    const childPath = path ? `${path}.${key}` : key
+    const liveValue = liveRecord[key]
+    if (isPlainRecord(value) || Array.isArray(value)) {
+      if (liveValue === undefined) {
+        missing.push({ path: childPath, value })
+        continue
+      }
+      collectMissingPaths(value, liveValue, childPath, missing)
+      continue
+    }
+    if (liveValue === undefined && value !== undefined) {
+      missing.push({ path: childPath, value })
+    }
+  }
+}
+
+function sourceForLiveItem(snapshot: unknown[], live: unknown): unknown {
+  if (!isPlainRecord(live) || typeof live.id !== 'string') return undefined
+  return snapshot.find((item) => isPlainRecord(item) && item.id === live.id)
+}
+
+function lostDefinedKeys(previous: unknown, next: unknown): boolean {
+  if (Array.isArray(previous)) {
+    if (!Array.isArray(next) || next.length < previous.length) return true
+    return previous.some((item, index) => lostDefinedKeys(item, next[index]))
+  }
+  if (isPlainRecord(previous)) {
+    if (!isPlainRecord(next)) return true
+    return Object.entries(previous).some(([key, value]) => {
+      if (value === undefined) return false
+      if (next[key] === undefined) return true
+      return lostDefinedKeys(value, next[key])
+    })
+  }
+  return false
+}
+
 function rowsOf(
   values: MonsterFormValues | undefined,
   section: MonsterActionSection,
@@ -42,6 +125,12 @@ export function useMonsterActionSections(entityId?: string) {
   const { getValues, setValue, clearErrors, trigger, formState } =
     useFormContext<MonsterFormValues>()
   const watched = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
+  const rowSnapshot = useRef<MonsterFormValues | undefined>(undefined)
+  useLayoutEffect(() => {
+    const live = getValues()
+    const previous = rowSnapshot.current
+    if (!previous || !lostDefinedKeys(previous, live)) rowSnapshot.current = live
+  })
   const actions = useMasterDetailArray('actions', () =>
     createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
   )
@@ -59,6 +148,23 @@ export function useMonsterActionSections(entityId?: string) {
   const [pending, setPending] = useState<MonsterActionPending | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [focusToken, setFocusToken] = useState(0)
+
+  useEffect(() => {
+    const snapshot = rowSnapshot.current
+    if (!snapshot) return
+    const live = getValues()
+    const missing: { path: string; value: unknown }[] = []
+    for (const section of MONSTER_ACTION_SECTIONS) {
+      collectMissingPaths(snapshot[section], live[section], section, missing)
+    }
+    for (const entry of missing) {
+      setValue(entry.path as never, entry.value as never, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: false,
+      })
+    }
+  })
 
   const idSignature = MONSTER_ACTION_SECTIONS.map((section) =>
     rowsOf(watched, section)

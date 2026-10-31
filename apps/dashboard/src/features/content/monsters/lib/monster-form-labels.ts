@@ -99,6 +99,13 @@ export const MONSTER_EQUIPPED_LABEL = 'Equipped'
 export const MONSTER_CUSTOMIZATION_LABEL = 'Customization'
 export const MONSTER_CUSTOM_NAME_LABEL = 'Custom name'
 export const MONSTER_CUSTOM_DESCRIPTION_LABEL = 'Custom description'
+export const MONSTER_CUSTOM_DESCRIPTION_HINT = 'Optional text shown with this action.'
+export const MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL = 'Add custom description'
+export const MONSTER_NATURAL_WEAPON_DAMAGE_HINT = 'Ability modifiers are applied automatically.'
+export const MONSTER_ON_HIT_LEGEND = 'On hit'
+export const MONSTER_ON_HIT_HINT =
+  'Additional damage dealt when this attack hits, beyond its primary damage.'
+export const MONSTER_DAMAGE_TYPE_CHANGE_LABEL = 'Change'
 export const MONSTER_REMOVE_LABEL = 'Remove'
 export const MONSTER_CANCEL_LABEL = 'Cancel'
 export const MONSTER_LOADING_EQUIPMENT = `Loading ${getContentTypeMidSentenceLabel('equipment')}…`

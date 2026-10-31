@@ -17,4 +17,6 @@ Natural-weapon presets from the add menu seed name, damage type, mode, and a def
 
 `kind: 'natural-weapon'` stores one authored `mode`. Melee reach uses the authored reach, or 5 when reach is omitted. That 5 is the same default the stat block already publishes.
 
+The natural-weapon detail form edits name, description, damage dice, primary damage type, and on-hit damage. It does not edit mode, reach, range, properties, or limited use. Those values stay on the action and still feed this resolver. The attack summary shows mode, reach, range, damage type, and the governing ability. It does not show limited use, and it does not name Finesse unless that property changes the ability on the attack-bonus line. Finesse still chooses Strength or Dexterity in the resolver. Limited use still prefixes the read-view action heading.
+
 Knight's Greatsword is the melee catalog fixture (reach 5, no range). Knight's Heavy Crossbow is the ranged fixture (catalog range, and the action's damage override replaces the catalog dice). Neither fixture adds a mode field to the action.
