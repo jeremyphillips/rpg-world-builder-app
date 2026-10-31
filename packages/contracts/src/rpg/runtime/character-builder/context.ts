@@ -51,8 +51,8 @@ export type CharacterBuildCatalog = {
   equipment: Equipment[]
   skillProficiencies: SkillProficiency[]
   organizations: Organization[]
-  /** Feat recommendations resolve by slug. Omitted catalogs drop unresolved recommendations. */
-  feats?: readonly Feat[]
+  /** Feat recommendations resolve names by slug. */
+  feats: readonly Feat[]
   /** Active language vocabulary rows for the ruleset (category included). */
   languages: CharacterBuildLanguageOption[]
 }
@@ -72,11 +72,9 @@ function byId<T extends { id: string }>(items: readonly T[]): ReadonlyMap<string
   return new Map(items.map((item) => [item.id, item]))
 }
 
-function bySlug<T extends { slug: string }>(
-  items: readonly T[] | undefined,
-): ReadonlyMap<string, T> {
+function bySlug<T extends { slug: string }>(items: readonly T[]): ReadonlyMap<string, T> {
   const map = new Map<string, T>()
-  for (const item of items ?? []) {
+  for (const item of items) {
     if (!map.has(item.slug)) map.set(item.slug, item)
   }
   return map

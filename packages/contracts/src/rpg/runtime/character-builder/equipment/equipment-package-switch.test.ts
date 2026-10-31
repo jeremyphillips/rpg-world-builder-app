@@ -132,6 +132,7 @@ function buildCatalogIndex() {
     equipment: [rope, dagger, silverNeedle],
     skillProficiencies: [],
     organizations: [],
+    feats: [],
     languages: [],
   })
 }
@@ -526,6 +527,7 @@ describe('evaluateEquipmentPackageSwitch with Legend-tier funding', () => {
     equipment: [rope, dagger],
     skillProficiencies: [],
     organizations: [],
+    feats: [],
     languages: [],
   })
 

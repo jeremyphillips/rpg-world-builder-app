@@ -85,6 +85,7 @@ function makeContext(input: {
       equipment: [],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     },
     characterCreationRules: {

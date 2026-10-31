@@ -135,6 +135,7 @@ export function createProficienciesStepRogueContextFixture(
         proficienciesStepPerceptionSkill,
       ],
       organizations: [],
+      feats: [],
       languages: [...proficienciesStepLanguages],
     },
     characterCreationRules: {

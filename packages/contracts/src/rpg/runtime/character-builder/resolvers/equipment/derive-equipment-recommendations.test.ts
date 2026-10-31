@@ -319,6 +319,7 @@ function buildContext(
     equipment,
     skillProficiencies: [],
     organizations: [],
+    feats: [],
     languages: [],
   })
   const draft = {

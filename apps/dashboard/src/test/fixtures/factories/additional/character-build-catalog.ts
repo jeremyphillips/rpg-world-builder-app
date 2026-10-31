@@ -14,6 +14,7 @@ export function makeCharacterBuildCatalog(
     equipment: overrides.equipment ?? [],
     skillProficiencies: overrides.skillProficiencies ?? [pickSkillProficiency('athletics')],
     organizations: overrides.organizations ?? [],
+    feats: overrides.feats ?? [],
     languages: overrides.languages ?? [...listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)],
     ...overrides,
   }

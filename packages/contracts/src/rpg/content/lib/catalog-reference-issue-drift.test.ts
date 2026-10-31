@@ -36,7 +36,11 @@ const PREDICATE_CALL_EXCEPTIONS = new Set([
 
 const KIND_SUFFIX =
   /(['"`])([a-z0-9_]+(?:_not_referenceable|_not_campaign_eligible|_catalog_unavailable))\1/g
-const PREDICATE_CALL = /isContent(?:Referenceable|CampaignEligible)\s*\(/g
+/**
+ * Direct calls and callback arguments (`rows.filter(isContentReferenceable)`).
+ * A call-only pattern misses the form the exception files already use.
+ */
+const PREDICATE_USE = /\bisContent(?:Referenceable|CampaignEligible)\b/g
 
 function collectSourceFiles(dir: string): string[] {
   const files: string[] = []
@@ -128,15 +132,27 @@ describe('catalog reference issue drift', () => {
     expect(offenders).toEqual([])
   })
 
-  it('keeps resolution-predicate calls on the exception list', () => {
+  it('keeps resolution-predicate uses on the exception list', () => {
     const offenders: string[] = []
     for (const file of files) {
       const repoPath = relative(REPO_ROOT, file)
       if (PREDICATE_CALL_EXCEPTIONS.has(repoPath)) continue
       const source = stripComments(readFileSync(file, 'utf8'))
-      if (PREDICATE_CALL.test(source)) offenders.push(repoPath)
-      PREDICATE_CALL.lastIndex = 0
+      if (PREDICATE_USE.test(source)) offenders.push(repoPath)
+      PREDICATE_USE.lastIndex = 0
     }
     expect(offenders).toEqual([])
+  })
+
+  it('matches predicate calls and callback arguments', () => {
+    const samples = [
+      'isContentReferenceable(row)',
+      'rows.filter(isContentReferenceable)',
+      'visible.filter(isContentCampaignEligible)',
+    ]
+    for (const sample of samples) {
+      expect(PREDICATE_USE.test(sample)).toBe(true)
+      PREDICATE_USE.lastIndex = 0
+    }
   })
 })

@@ -149,6 +149,7 @@ function makeContext(
       equipment: [],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     },
     characterCreationRules: {
@@ -174,6 +175,7 @@ describe('resolvePlayableBuilderContent', () => {
         equipment: [],
         skillProficiencies: [],
         organizations: [],
+        feats: [],
         languages: [],
       },
     })
@@ -193,6 +195,7 @@ describe('resolvePlayableBuilderContent', () => {
         equipment: [],
         skillProficiencies: [],
         organizations: [],
+        feats: [],
         languages: [],
       },
     })
@@ -213,6 +216,7 @@ describe('resolvePlayableBuilderContent', () => {
         equipment: [],
         skillProficiencies: [],
         organizations: [],
+        feats: [],
         languages: [],
       },
     })
@@ -236,6 +240,7 @@ describe('resolvePlayableBuilderContent', () => {
         equipment: [],
         skillProficiencies: [],
         organizations: [],
+        feats: [],
         languages: [],
       },
     })
@@ -266,6 +271,7 @@ describe('resolvePlayableBuilderContent', () => {
         equipment: [],
         skillProficiencies: [],
         organizations: [],
+        feats: [],
         languages: [],
       },
     })
@@ -304,6 +310,7 @@ describe('resolvePlayableBuilderContent', () => {
       equipment: [],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     }
 
@@ -331,6 +338,7 @@ describe('resolvePlayableBuilderContent', () => {
           makeOrganization('visible-guild', 'all_players'),
           makeOrganization('hidden-guild', 'dm_only'),
         ],
+        feats: [],
         languages: [],
       },
     })
@@ -372,6 +380,7 @@ describe('resolvePlayableBuilderContent', () => {
           equipment: [],
           skillProficiencies: [],
           organizations: [],
+          feats: [],
           languages: [],
         },
       }),
@@ -408,6 +417,7 @@ describe('resolvePlayableBuilderContent', () => {
         equipment: [equipment],
         skillProficiencies: [],
         organizations: [],
+        feats: [],
         languages: [],
       },
     })

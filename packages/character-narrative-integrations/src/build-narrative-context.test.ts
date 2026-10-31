@@ -85,6 +85,7 @@ function createCampaignNpcContext(
       equipment: [],
       skillProficiencies: [],
       organizations,
+      feats: [],
       languages: [],
     },
     characterCreationRules: {

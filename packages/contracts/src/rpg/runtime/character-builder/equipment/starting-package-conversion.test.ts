@@ -234,6 +234,7 @@ const catalogIndex = indexCharacterBuildCatalog({
   equipment: [spear, dagger, explorersPack, lute, arrows, torch, freeToken],
   skillProficiencies: [],
   organizations: [],
+  feats: [],
   languages: [],
 })
 
@@ -399,6 +400,7 @@ describe('buildStartingPackageConversionPreview', () => {
       equipment: [freeToken],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -553,6 +555,7 @@ describe('buildStartingPackageConversionPatch', () => {
       equipment: [torch],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -647,6 +650,7 @@ describe('buildStartingPackageConversionPatch', () => {
       equipment: [arrows],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
