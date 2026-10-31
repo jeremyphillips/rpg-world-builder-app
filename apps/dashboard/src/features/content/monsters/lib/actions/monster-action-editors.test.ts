@@ -75,7 +75,7 @@ describe('monster action acquisition', () => {
     expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }).kind).toBe(
       'special',
     )
-    const customNatural = createMonsterActionFromAcquisition({ type: 'create', kind: 'natural' })
+    const customNatural = createMonsterActionFromAcquisition({ type: 'other-natural' })
     expect(customNatural).toMatchObject({
       kind: 'natural-weapon',
       mode: 'melee',

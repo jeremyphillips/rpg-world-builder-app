@@ -32,7 +32,8 @@ export type MonsterActionAcquisitionChoice =
   | { type: 'weapon-entry'; entryId: string }
   | { type: 'add-weapon' }
   | { type: 'natural'; presetId: MonsterNaturalWeaponPresetId }
-  | { type: 'create'; kind: 'attack' | 'spell' | 'special' | 'natural' }
+  | { type: 'other-natural' }
+  | { type: 'create'; kind: 'attack' | 'spell' | 'special' }
 
 const CREATE_ITEMS: readonly MonsterActionAcquisitionItem[] = [
   {
@@ -53,12 +54,6 @@ const CREATE_ITEMS: readonly MonsterActionAcquisitionItem[] = [
     groupId: 'create',
     metadata: getMonsterActionKindLabel('special'),
   },
-  {
-    id: 'create:natural',
-    label: 'Custom natural attack',
-    groupId: 'create',
-    metadata: getMonsterActionKindLabel('natural-weapon'),
-  },
 ]
 
 export function parseMonsterActionAcquisitionId(
@@ -68,7 +63,7 @@ export function parseMonsterActionAcquisitionId(
   if (id === 'create:attack') return { type: 'create', kind: 'attack' }
   if (id === 'create:spell') return { type: 'create', kind: 'spell' }
   if (id === 'create:special') return { type: 'create', kind: 'special' }
-  if (id === 'create:natural') return { type: 'create', kind: 'natural' }
+  if (id === 'natural:other') return { type: 'other-natural' }
   if (id.startsWith('weapon-entry:')) {
     const entryId = id.slice('weapon-entry:'.length)
     return entryId ? { type: 'weapon-entry', entryId } : undefined
@@ -111,11 +106,19 @@ export function monsterActionAcquisitionItems(input: {
       note: input.allowAddWeapon ? undefined : 'Equipment catalog is not ready',
     },
     ...natural,
+    {
+      id: 'natural:other',
+      label: 'Other natural attack',
+      groupId: 'natural',
+      metadata: getMonsterActionKindLabel('natural-weapon'),
+    },
     ...CREATE_ITEMS,
   ]
 }
 
-function naturalWeaponFromPreset(presetId: MonsterNaturalWeaponPresetId): MonsterActionDraftRow {
+function draftNaturalWeaponFromPreset(
+  presetId: MonsterNaturalWeaponPresetId,
+): MonsterActionDraftRow {
   const preset = getMonsterNaturalWeaponPreset(presetId)
   const mode = preset?.defaultMode ?? 'melee'
   return {
@@ -136,12 +139,12 @@ export function createMonsterActionFromAcquisition(
   if (choice.type === 'weapon-entry') {
     return { id, kind: 'weapon', equipmentEntryId: choice.entryId }
   }
-  if (choice.type === 'natural') {
-    return naturalWeaponFromPreset(choice.presetId)
+  if (choice.type === 'natural') return draftNaturalWeaponFromPreset(choice.presetId)
+  if (choice.type === 'other-natural') {
+    return { id, kind: 'natural-weapon', mode: 'melee', reach: 5 }
   }
   if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] }
   if (choice.kind === 'special') return { id, kind: 'special' }
-  if (choice.kind === 'natural') return { id, kind: 'natural-weapon', mode: 'melee', reach: 5 }
   return { id, kind: 'attack' }
 }
 

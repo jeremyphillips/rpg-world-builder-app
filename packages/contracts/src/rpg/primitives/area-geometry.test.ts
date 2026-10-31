@@ -161,6 +161,15 @@ describe('formatAreaGeometry', () => {
   })
 
   it('formats fractional positive distances', () => {
+    expect(
+      formatAreaGeometry({ shape: 'cone', length: { value: 15, unit: 'ft' } }, 'stat-block'),
+    ).toBe('15-foot Cone')
+    expect(
+      formatAreaGeometry(
+        { shape: 'line', length: { value: 60, unit: 'ft' }, width: { value: 5, unit: 'ft' } },
+        'stat-block',
+      ),
+    ).toBe('60-foot-long, 5-foot-wide Line')
     expect(formatAreaGeometry({ shape: 'cone', length: { value: 2.5, unit: 'ft' } })).toBe(
       '2½-ft cone',
     )

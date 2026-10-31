@@ -10,12 +10,27 @@ import { spellComponentIdSchema } from '../../vocab/spell/components'
 import { reachFeetSchema } from '../../vocab/attack/melee-reach'
 import { weaponModeSchema } from '../../vocab/weapon'
 import { entryProvenanceField } from '../../primitives/provenance'
+import { effectResolutionSchema } from '../lib/resolution/schema'
 import { spellReferenceSchema } from '../spell/spell-reference'
 import {
   weaponDamageDraftSchema,
   weaponDamageSchema,
   weaponRangeSchema,
 } from '../equipment/weapon-variant'
+
+export const NATURAL_ATTACK_FORMS = [
+  'bite',
+  'claw',
+  'slam',
+  'gore',
+  'ram',
+  'sting',
+  'tail',
+  'tentacle',
+  'talons',
+] as const
+
+const naturalAttackFormSchema = z.enum(NATURAL_ATTACK_FORMS)
 
 export const NATURAL_WEAPON_PROPERTIES = ['finesse'] as const
 
@@ -41,6 +56,31 @@ const attackOnHitDraftSchema = z.object({
   additionalDamage: z.array(draftDamagePartSchema).optional(),
 })
 
+function multiattackStepsSchema(mode: MonsterActionMode) {
+  if (mode === 'draft') {
+    return z
+      .array(
+        z.object({
+          count: z.number().int().min(1).optional(),
+          actionIds: z.array(z.string().min(1)),
+        }),
+      )
+      .default([])
+  }
+  return z
+    .array(
+      z.object({
+        count: z.number().int().min(1),
+        actionIds: z.array(z.string().min(1)).min(1),
+      }),
+    )
+    .min(1)
+}
+
+function saveResolutionSchema(mode: MonsterActionMode) {
+  return mode === 'draft' ? effectResolutionSchema.optional() : effectResolutionSchema
+}
+
 function monsterActionFields<M extends MonsterActionMode>(mode: M) {
   const limitedUse = (
     mode === 'draft' ? limitedUseDraftSchema : limitedUseSchema
@@ -59,11 +99,12 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
   ])
   const identity = {
     id: z.string().min(1),
+    preset: z.string().min(1).optional(),
     description: z.string().optional(),
     limitedUse: limitedUse.optional(),
     ...entryProvenanceField,
   }
-  const attackBonusSourceSchema = z.discriminatedUnion('kind', [
+  const monsterAbilitySourceSchema = z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('spell'), castingAbility: castingAbilitySchema }),
     z.object({
       kind: z.literal('ability'),
@@ -89,6 +130,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       ...identity,
       kind: z.literal('natural-weapon'),
       name: strict(z.string().min(1), mode),
+      form: naturalAttackFormSchema.optional(),
       mode: strict(weaponModeSchema, mode),
       properties: (mode === 'draft'
         ? z.array(naturalWeaponPropertySchema).optional()
@@ -109,7 +151,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       ...identity,
       kind: z.literal('attack'),
       name: strict(z.string().min(1), mode),
-      bonusSource: strict(attackBonusSourceSchema, mode),
+      bonusSource: strict(monsterAbilitySourceSchema, mode),
       modes:
         mode === 'draft'
           ? z.array(z.enum(attackModes)).min(1).optional()
@@ -139,6 +181,19 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       spells: strict(spells, mode),
       description: z.string().optional(),
     }),
+    z.object({
+      ...identity,
+      kind: z.literal('save'),
+      name: strict(z.string().min(1), mode),
+      dcSource: strict(monsterAbilitySourceSchema, mode),
+      resolution: saveResolutionSchema(mode),
+    }),
+    z.object({
+      ...identity,
+      kind: z.literal('multiattack'),
+      name: strict(z.string().min(1), mode),
+      steps: multiattackStepsSchema(mode),
+    }),
   ] as const
 }
 
@@ -148,13 +203,17 @@ export const monsterActionSchema = z.discriminatedUnion('kind', [
 
 const reactionTriggerField = { trigger: activationTriggerSchema.optional() } as const
 
-export const monsterReactionSchema = z.discriminatedUnion('kind', [
-  monsterActionSchema.options[0].extend(reactionTriggerField),
-  monsterActionSchema.options[1].extend(reactionTriggerField),
-  monsterActionSchema.options[2].extend(reactionTriggerField),
-  monsterActionSchema.options[3].extend(reactionTriggerField),
-  monsterActionSchema.options[4].extend(reactionTriggerField),
-])
+function reactionsFromActions<T extends { shape: { kind: z.ZodType } }>(options: readonly T[]) {
+  const extended = options
+    .filter((option) => !option.shape.kind.safeParse('multiattack').success)
+    .map((option) => (option as unknown as z.ZodObject).extend(reactionTriggerField))
+  return z.discriminatedUnion(
+    'kind',
+    extended as unknown as [z.ZodObject, z.ZodObject, ...z.ZodObject[]],
+  )
+}
+
+export const monsterReactionSchema = reactionsFromActions(monsterActionSchema.options)
 
 export type MonsterAction = z.infer<typeof monsterActionSchema>
 export type MonsterReaction = z.infer<typeof monsterReactionSchema>
@@ -163,13 +222,7 @@ export const monsterActionDraftSchema = z.discriminatedUnion('kind', [
   ...monsterActionFields('draft'),
 ])
 
-export const monsterReactionDraftSchema = z.discriminatedUnion('kind', [
-  monsterActionDraftSchema.options[0].extend(reactionTriggerField),
-  monsterActionDraftSchema.options[1].extend(reactionTriggerField),
-  monsterActionDraftSchema.options[2].extend(reactionTriggerField),
-  monsterActionDraftSchema.options[3].extend(reactionTriggerField),
-  monsterActionDraftSchema.options[4].extend(reactionTriggerField),
-])
+export const monsterReactionDraftSchema = reactionsFromActions(monsterActionDraftSchema.options)
 
 export type MonsterActionDraft = z.infer<typeof monsterActionDraftSchema>
 export type MonsterReactionDraft = z.infer<typeof monsterReactionDraftSchema>
@@ -298,6 +351,58 @@ function refineAuthoredAttackShape(
   }
 }
 
+const MONSTER_SAVE_OUTCOME_RESULTS = new Set(['failed-save', 'successful-save'])
+
+function refineMonsterSaveResolution(
+  action: Extract<MonsterAction | MonsterReaction, { kind: 'save' }>,
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
+  const resolution = action.resolution
+  if (!resolution) return
+  if (resolution.method.kind !== 'saving-throw') {
+    addCustomRefinementIssue(ctx, 'Saving throw actions require a saving throw.', [
+      ...path,
+      'resolution',
+      'method',
+      'kind',
+    ])
+  }
+  const creatureInReach =
+    resolution.selectionMode === 'targets' &&
+    resolution.target?.kind === 'creature' &&
+    (resolution.target.proximity.kind === 'reach' ||
+      resolution.target.proximity.kind === 'distance')
+  const areaFromSelf = resolution.selectionMode === 'self' && Boolean(resolution.areaOfEffect)
+  if (!creatureInReach && !areaFromSelf) {
+    addCustomRefinementIssue(
+      ctx,
+      'Saving throw actions select an area from self or creatures in reach or at a distance.',
+      [...path, 'resolution', 'selectionMode'],
+    )
+  }
+  resolution.effects.forEach((effect, effectIndex) => {
+    if (effect.kind === 'damage') return
+    addCustomRefinementIssue(ctx, 'Saving throw actions can only deal damage.', [
+      ...path,
+      'resolution',
+      'effects',
+      effectIndex,
+      'kind',
+    ])
+  })
+  resolution.outcomes.forEach((outcome, outcomeIndex) => {
+    if (MONSTER_SAVE_OUTCOME_RESULTS.has(outcome.result)) return
+    addCustomRefinementIssue(ctx, 'Saving throw outcomes must be a failed or successful save.', [
+      ...path,
+      'resolution',
+      'outcomes',
+      outcomeIndex,
+      'result',
+    ])
+  })
+}
+
 export function refineMonsterActionShape(
   action: MonsterAction | MonsterReaction,
   ctx: z.RefinementCtx,
@@ -305,7 +410,14 @@ export function refineMonsterActionShape(
 ): void {
   if (action.kind === 'natural-weapon') refineNaturalWeaponShape(action, ctx, path)
   if (action.kind === 'attack') refineAuthoredAttackShape(action, ctx, path)
-  if ((action.kind === 'special' || action.kind === 'spell') && !action.name) {
+  if (action.kind === 'save') refineMonsterSaveResolution(action, ctx, path)
+  if (
+    (action.kind === 'special' ||
+      action.kind === 'spell' ||
+      action.kind === 'save' ||
+      action.kind === 'multiattack') &&
+    !action.name
+  ) {
     addCustomRefinementIssue(ctx, 'This action requires a name.', [...path, 'name'])
   }
 }
