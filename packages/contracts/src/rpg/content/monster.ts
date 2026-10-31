@@ -45,6 +45,11 @@ import {
   refineMonsterActionShape,
   refineMonsterSpellEntries,
 } from './monster/action'
+import { entryProvenanceField } from '../primitives/provenance'
+import { MONSTER_ACTION_SECTIONS } from './monster/action-sections'
+
+export { MONSTER_ACTION_SECTIONS }
+export type { MonsterActionSection } from './monster/action-sections'
 
 export {
   monsterActionSchema,
@@ -77,12 +82,13 @@ export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
 
 export const monsterTraitSchema = customContentTraitSchema
   .pick({ id: true, name: true })
-  .extend({ description: z.string().min(1) })
+  .extend({ description: z.string().min(1), ...entryProvenanceField })
 
 export const monsterTraitDraftSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).optional(),
   description: z.string().min(1).optional(),
+  ...entryProvenanceField,
 })
 
 const monsterEquipmentEntrySchemaParsed = equipmentInstanceSchemaBase
@@ -159,8 +165,6 @@ function collectActionIds(body: {
     ...body.reactions.map((a) => a.id),
   ]
 }
-
-const MONSTER_ACTION_SECTIONS = ['actions', 'bonusActions', 'reactions'] as const
 
 function refineMonsterProficiencies(
   proficiencies: MonsterBody['proficiencies'],

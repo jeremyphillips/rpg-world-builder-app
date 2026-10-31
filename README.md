@@ -231,4 +231,6 @@ The system content catalog includes material from the System Reference Document
 5.2.1 by Wizards of the Coast LLC, used under
 [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode) and modified
 for this project. See [`NOTICE`](NOTICE) for the full attribution and a summary
-of changes.
+of changes. Original passages, when captured, live in
+`packages/catalog/source-excerpts` and are not the catalog records. See
+[content provenance](packages/contracts/docs/content-provenance.md).

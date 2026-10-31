@@ -36,6 +36,10 @@
       "types": "./src/monsters/index.ts",
       "default": "./src/monsters/index.ts"
     },
+    "./source-excerpts": {
+      "types": "./src/source-excerpts/index.ts",
+      "default": "./src/source-excerpts/index.ts"
+    },
     "./xp-progressions": {
       "types": "./src/xp-progressions/index.ts",
       "default": "./src/xp-progressions/index.ts"

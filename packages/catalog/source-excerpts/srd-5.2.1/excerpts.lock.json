@@ -1,0 +1,20 @@
+{
+  "monsters/hell-hound/bite@1": "00afa8ed3166ae6d6d9e942270e65e33cc5faa50ea2f85af0e740a1dbc0b1ed4",
+  "monsters/hell-hound/fire-breath@1": "096f439eef36d979e0c9991b09036aa80f10b8292d0c6475e6e93f28f4f2d417",
+  "monsters/hell-hound/multiattack@1": "340df4b13131191a94a7214ccb8c191fd2476a5812292ea7e64c9742e11ae975",
+  "monsters/hell-hound/pack-tactics@1": "97d9387d1d4794b5f044cf3ce5b34ac051f2c1700d58a7387cfe4239f0e47881",
+  "monsters/knight/greatsword@1": "7644239a119e2243668c0260f6c77da85303facacc337346cecded322899ef3d",
+  "monsters/knight/heavy-crossbow@1": "4dce41aaba53c3efc9c1509a5dc6d5ea290768740a273f422303af267f59c7e8",
+  "monsters/knight/multiattack@1": "a45df8e67ef6dfbaa90c09a3a1da46e8be2019433f1dbd09940fddf6ea6c3361",
+  "monsters/knight/parry@1": "45d65c2c224bdd1941f61b944a8b3fae2ffb4c547f58a6233ecc058ad79d9943",
+  "monsters/kobold-warrior/dagger@1": "3d82db62cafcda58babf7b416c12775d9f599ebe6c17a2de17de2b4cbe56c0b9",
+  "monsters/kobold-warrior/pack-tactics@1": "f1f53ad2634544efb3d17e6d16eddd31808fe9c0969ba360287bae661e269fc7",
+  "monsters/kobold-warrior/sunlight-sensitivity@1": "480309b2f75a3e57742766c7083264da9a2dabfce5f43a44fa21bf6146a4c906",
+  "monsters/mage/arcane-burst@1": "09614e4ec6203de943b3e9ee2292d0f6020e9c82c1f95c8f386aa110a70e992d",
+  "monsters/mage/misty-step@1": "24ee5b8070d879552cdcc100e89cebf3acbe061a391453cf4949783bc4ece030",
+  "monsters/mage/multiattack@1": "a335f3fc8e123550dc0e7dd557ec1d8edeed65ebe388c3451c95be5661752911",
+  "monsters/mage/protective-magic@1": "cd7d8f5c2ff1462940c8c246a5266af3c2a76a56efb9a3847ff510d9f3f5bdf2",
+  "monsters/mage/spellcasting@1": "895558fa2ab101813c4bc2e47ac884ecfb054cea9bce823d84588209586c4bb5",
+  "monsters/skeleton/shortbow@1": "50a38917f19201ba5454c62a3c3a25821efbad4ce000381e07732975812e141b",
+  "monsters/skeleton/shortsword@1": "bc48aaf532307c6cca6656f9c141e93d5c8673a61a92d6c68b63d674161aee63"
+}

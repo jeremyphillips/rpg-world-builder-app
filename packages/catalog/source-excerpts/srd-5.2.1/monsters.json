@@ -1,0 +1,218 @@
+[
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/hell-hound/bite",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 297 },
+    "text": "Bite. Melee Attack Roll: +5, reach 5 ft. Hit: 7 (1d8 + 3) Piercing damage plus 3 (1d6) Fire damage.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/hell-hound/fire-breath",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 297 },
+    "text": "Fire Breath (Recharge 5–6). Dexterity Saving Throw: DC 12, each creature in a 15-foot Cone. Failure: 17 (5d6) Fire damage. Success: Half damage.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/hell-hound/multiattack",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 297 },
+    "text": "Multiattack. The hound makes two Bite attacks.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/hell-hound/pack-tactics",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 297 },
+    "text": "Pack Tactics. The hound has Advantage on an attack roll against a creature if at least one of the hound’s allies is within 5 feet of the creature and the ally doesn’t have the Incapacitated condition.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/knight/greatsword",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 302 },
+    "text": "Greatsword. Melee Attack Roll: +5, reach 5 ft. Hit: 10 (2d6 + 3) Slashing damage plus 4 (1d8) Radiant damage.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/knight/heavy-crossbow",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 302 },
+    "text": "Heavy Crossbow. Ranged Attack Roll: +2, range 100/400 ft. Hit: 11 (2d10) Piercing damage plus 4 (1d8) Radiant damage.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/knight/multiattack",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 302 },
+    "text": "Multiattack. The knight makes two attacks, using Greatsword or Heavy Crossbow in any combination.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/knight/parry",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 302 },
+    "text": "Parry. Trigger: The knight is hit by a melee attack roll while holding a weapon. Response: The knight adds 2 to its AC against that attack, possibly causing it to miss.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/kobold-warrior/dagger",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 302 },
+    "text": "Dagger. Melee or Ranged Attack Roll: +4, reach 5 ft. or range 20/60 ft. Hit: 4 (1d4 + 2) Piercing damage.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/kobold-warrior/pack-tactics",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 302 },
+    "text": "Pack Tactics. The kobold has Advantage on an attack roll against a creature if at least one of the kobold’s allies is within 5 feet of the creature and the ally doesn’t have the Incapacitated condition.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/kobold-warrior/sunlight-sensitivity",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 302 },
+    "text": "Sunlight Sensitivity. While in sunlight, the kobold has Disadvantage on ability checks and attack rolls.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/mage/arcane-burst",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 305 },
+    "text": "Arcane Burst. Melee or Ranged Attack Roll: +6, reach 5 ft. or range 120 ft. Hit: 16 (3d8 + 3) Force damage.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/mage/misty-step",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 305 },
+    "text": "Misty Step (3/Day). The mage casts Misty Step, using the same spellcasting ability as Spellcasting.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/mage/multiattack",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 305 },
+    "text": "Multiattack. The mage makes three Arcane Burst attacks.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/mage/protective-magic",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 305 },
+    "text": "Protective Magic (3/Day). The mage casts Counterspell or Shield in response to the spell’s trigger, using the same spellcasting ability as Spellcasting.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/mage/spellcasting",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 305 },
+    "text": "Spellcasting. The mage casts one of the following spells, using Intelligence as the spellcasting ability (spell save DC 14):\nAt Will: Detect Magic, Light, Mage Armor (included in AC), Mage Hand, Prestidigitation\n2/Day Each: Fireball (level 4 version), Invisibility\n1/Day Each: Cone of Cold, Fly",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/skeleton/shortbow",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 326 },
+    "text": "Shortbow. Ranged Attack Roll: +5, range 80/320 ft. Hit: 6 (1d6 + 3) Piercing damage.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  },
+  {
+    "documentId": "srd-5.2.1",
+    "excerptId": "monsters/skeleton/shortsword",
+    "revision": 1,
+    "locator": { "section": "Monsters", "page": 326 },
+    "text": "Shortsword. Melee Attack Roll: +5, reach 5 ft. Hit: 6 (1d6 + 3) Piercing damage.",
+    "transcription": {
+      "method": "pdf-text",
+      "cleanup": ["page-chrome", "line-rejoin", "whitespace", "unicode-nfc"]
+    },
+    "capturedAt": "2026-10-30"
+  }
+]

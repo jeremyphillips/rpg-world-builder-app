@@ -25,6 +25,10 @@ import {
   SOURCE_DOCUMENT_EXPORT_TERM,
   SOURCE_DOCUMENT_LICENSE_TERM,
 } from '../primitives/provenance/source-document-access'
+import {
+  EXCERPT_CORRECTION_REASON_TERM,
+  SOURCE_TRANSCRIPTION_CLEANUP_TERM,
+} from '../primitives/provenance/transcription'
 import { ABILITY_SCORE_TERM } from './ability'
 import { ALIGNMENT_TERM } from './alignment'
 import { CHARACTER_GENDER_TERM } from './character-gender'
@@ -177,6 +181,8 @@ const PRIMITIVE_TERMS = [
   SOURCE_DOCUMENT_DISPLAY_TERM,
   SOURCE_DOCUMENT_EXPORT_TERM,
   SOURCE_DOCUMENT_LICENSE_TERM,
+  SOURCE_TRANSCRIPTION_CLEANUP_TERM,
+  EXCERPT_CORRECTION_REASON_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
 /** Taxonomies with `*_TERM` only — no `*_ENTRIES`, not in `VOCABULARY_OPTION_SET_TERMS`. */
@@ -244,7 +250,7 @@ describe('character-narrative term coverage', () => {
 
 describe('primitives term coverage', () => {
   it('defines vocab terms for GameTermEntry *_ENTRIES maps', () => {
-    expect(PRIMITIVE_TERMS).toHaveLength(4)
+    expect(PRIMITIVE_TERMS).toHaveLength(6)
     for (const term of PRIMITIVE_TERMS) {
       expectVocabularyTerm(term)
     }

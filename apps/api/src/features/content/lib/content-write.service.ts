@@ -3,6 +3,7 @@ import {
   contentStatusToValidationIntent,
   ContentProvenanceWriteError,
   reconcileContentProvenance,
+  stripContentProvenanceForPatch,
   type ContentMedia,
   type CatalogLayer,
   type ContentProvenanceWriteAuthority,
@@ -361,11 +362,19 @@ function parseSystemPatchedStoredEntity<T extends StoredEntity>(
   // Cleared tombstones are absent on the effective record. Identity fields come
   // from the stored row so a key removed from the body cannot fall back to it.
   const mergedBodyForParse = omitClearedTombstones(replaced, config.patchTombstoneKeys)
-  config.bodySchema.parse(mergedBodyForParse)
-
   const existingRecord = existing as Record<string, unknown>
+  const reconciledBody = reconcileContentProvenance({
+    authority: 'preserve',
+    catalogLayer: 'system',
+    rulesetId: existingRecord.rulesetId as SystemRulesetId,
+    contentTypeKey: config.typeName as ApiContentTypeKey,
+    normalized: mergedBodyForParse,
+    existing: existingRecord,
+  })
+  config.bodySchema.parse(reconciledBody)
+
   const entityForParse = {
-    ...mergedBodyForParse,
+    ...reconciledBody,
     id: existing.id,
     slug: existing.slug,
     catalogLayer: existing.catalogLayer,
@@ -404,7 +413,10 @@ async function updateSystemPatch<T extends StoredEntity>(
     update,
   )
 
-  const sanitizedPatch = cumulativePatch
+  const sanitizedPatch = stripContentProvenanceForPatch(
+    cumulativePatch,
+    config.typeName as ApiContentTypeKey,
+  )
 
   await config.patchModel.findOneAndUpdate(
     { campaignId, targetId: entityId },
@@ -600,6 +612,40 @@ async function createHomebrewWithSlugRetries<T extends StoredEntity>(
   throw new HttpError(409, 'slug_conflict', 'Could not allocate a unique slug for this content.')
 }
 
+function provenanceAuthorityForCreate(
+  options: CreateHomebrewContentOptions,
+): ContentProvenanceWriteAuthority {
+  if (options.provenanceAuthority) return options.provenanceAuthority
+  if (options.provenanceSourceEntity) return 'carry'
+  return 'preserve'
+}
+
+async function prepareHomebrewCreateProvenance<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  normalizedRaw: Record<string, unknown>,
+  options: CreateHomebrewContentOptions,
+): Promise<{
+  rulesetId: SystemRulesetId
+  normalized: Record<string, unknown>
+  provenance?: unknown
+}> {
+  const campaign = await findCampaignById(campaignId)
+  if (!campaign) {
+    throw new HttpError(404, 'not_found', 'Campaign not found.')
+  }
+
+  const reconciled = applyRecordProvenanceReconciliation({
+    authority: provenanceAuthorityForCreate(options),
+    catalogLayer: 'homebrew',
+    rulesetId: campaign.rulesetId,
+    contentTypeKey: options.contentTypeKey ?? (config.typeName as ApiContentTypeKey),
+    normalized: normalizedRaw,
+    provenanceSource: options.provenanceSourceEntity,
+  })
+  return { rulesetId: campaign.rulesetId, ...reconciled }
+}
+
 /** Create a campaign-owned homebrew record for a content type. */
 export async function createHomebrewContent<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
@@ -624,23 +670,12 @@ export async function createHomebrewContent<T extends StoredEntity>(
     )
   }
 
-  const campaign = await findCampaignById(campaignId)
-  if (!campaign) {
-    throw new HttpError(404, 'not_found', 'Campaign not found.')
-  }
-
-  const { rulesetId } = campaign
-  const provenanceAuthority =
-    options.provenanceAuthority ?? (options.provenanceSourceEntity ? 'carry' : 'preserve')
-
-  const { normalized, provenance } = applyRecordProvenanceReconciliation({
-    authority: provenanceAuthority,
-    catalogLayer: 'homebrew',
-    rulesetId,
-    contentTypeKey: options.contentTypeKey,
-    normalized: normalizedRaw,
-    provenanceSource: options.provenanceSourceEntity,
-  })
+  const { rulesetId, normalized, provenance } = await prepareHomebrewCreateProvenance(
+    config,
+    campaignId,
+    normalizedRaw,
+    options,
+  )
 
   const input = parsePersistedWriteInput(config, normalized, 'create', validationIntent)
   const writeCtx = buildWriteContext(
@@ -847,6 +882,7 @@ export async function updateContentEntity<T extends StoredEntity>(
     authority: 'preserve',
     catalogLayer: existing.catalogLayer,
     rulesetId: campaign.rulesetId,
+    contentTypeKey: config.typeName as ApiContentTypeKey,
     normalized: normalizedRaw,
     existing: existing as unknown as Record<string, unknown>,
   })

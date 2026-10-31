@@ -1,3 +1,9 @@
+import {
+  reconcileContentProvenance,
+  type ApiContentTypeKey,
+  type SystemRulesetId,
+} from '@rpg/contracts'
+
 import { deepMerge } from './deep-merge'
 import type { DeepMergeOptions } from './deep-merge'
 
@@ -25,14 +31,24 @@ export function resolveCatalog<T extends Identified>(
   system: readonly T[],
   patches: readonly OverlayPatch[],
   homebrew: readonly T[],
-  options?: Pick<DeepMergeOptions, 'replaceKeys'>,
+  options?: Pick<DeepMergeOptions, 'replaceKeys'> & { contentTypeKey?: ApiContentTypeKey },
 ): T[] {
   const patchByTarget = new Map(patches.map((p) => [p.targetId, p]))
 
   const resolvedSystem = system.map((record) => {
     const overlay = patchByTarget.get(record.id)
     const merged = overlay ? deepMerge(record, overlay.patch, options) : record
-    return { ...merged, status: 'published' as const }
+    const published = { ...merged, status: 'published' as const }
+    const rulesetId = (record as { rulesetId?: SystemRulesetId }).rulesetId
+    if (!options?.contentTypeKey || !rulesetId) return published
+    return reconcileContentProvenance({
+      authority: 'preserve',
+      catalogLayer: 'system',
+      rulesetId,
+      contentTypeKey: options.contentTypeKey,
+      normalized: published as unknown as Record<string, unknown>,
+      existing: record as unknown as Record<string, unknown>,
+    }) as T
   })
 
   return [...resolvedSystem, ...homebrew]

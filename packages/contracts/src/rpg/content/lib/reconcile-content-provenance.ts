@@ -2,16 +2,23 @@ import type { ApiContentTypeKey } from '../../primitives/content/content-type-ke
 import type { SystemRulesetId } from '../../primitives/ruleset'
 import {
   contentProvenanceSchema,
+  entryProvenanceSchema,
   type ContentProvenance,
   documentAttributionSchema,
 } from '../../primitives/provenance'
 import type { CatalogLayer } from '../../vocab/catalog-layer'
 import { listRulesetSourceDocumentIds } from '../../primitives/provenance/source-document-registry'
+import {
+  provenanceEntryHostsFor,
+  readProvenanceHostEntries,
+  writeProvenanceHostEntries,
+  type ProvenanceEntryHostPath,
+} from './content-type-capabilities'
 
 export type ContentProvenanceWriteAuthority = 'preserve' | 'carry' | 'initialize'
 
 export class ContentProvenanceWriteError extends Error {
-  readonly code: 'provenance_forbidden'
+  readonly code: 'provenance_forbidden' | 'provenance_reassignment'
 
   constructor(code: ContentProvenanceWriteError['code'], message: string) {
     super(message)
@@ -74,9 +81,149 @@ function buildDuplicateProvenance(args: {
   return contentProvenanceSchema.parse(next)
 }
 
+function isEntry(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function entryId(entry: Record<string, unknown>): string | undefined {
+  return typeof entry.id === 'string' ? entry.id : undefined
+}
+
+function omitEntryProvenance(entry: Record<string, unknown>): Record<string, unknown> {
+  const { provenance: _provenance, ...rest } = entry
+  return rest
+}
+
+function hostsFor(
+  contentTypeKey: ApiContentTypeKey | undefined,
+): readonly ProvenanceEntryHostPath[] {
+  return contentTypeKey ? provenanceEntryHostsFor(contentTypeKey) : []
+}
+
+function storedProvenanceById(
+  existing: Record<string, unknown> | undefined,
+  hosts: readonly ProvenanceEntryHostPath[],
+): Map<string, unknown> {
+  const stored = new Map<string, unknown>()
+  if (!existing) return stored
+  for (const host of hosts) {
+    const entries = readProvenanceHostEntries(existing, host)
+    if (!Array.isArray(entries)) continue
+    for (const entry of entries) {
+      if (!isEntry(entry)) continue
+      const id = entryId(entry)
+      if (id && entry.provenance !== undefined) stored.set(id, entry.provenance)
+    }
+  }
+  return stored
+}
+
+function hostIsPresent(body: Record<string, unknown>, host: ProvenanceEntryHostPath): boolean {
+  return Object.prototype.hasOwnProperty.call(body, host)
+}
+
+/** Drops record and entry provenance so a system patch cannot store it. */
+export function stripContentProvenanceForPatch(
+  body: Record<string, unknown>,
+  contentTypeKey: ApiContentTypeKey,
+): Record<string, unknown> {
+  const { provenance: _provenance, ...rest } = body
+  let next: Record<string, unknown> = rest
+  for (const host of hostsFor(contentTypeKey)) {
+    if (!hostIsPresent(body, host)) continue
+    const entries = readProvenanceHostEntries(body, host)
+    if (!Array.isArray(entries)) continue
+    next = writeProvenanceHostEntries(
+      next,
+      host,
+      entries.map((entry) => (isEntry(entry) ? omitEntryProvenance(entry) : entry)),
+    )
+  }
+  return next
+}
+
+function reattachSystemEntries(
+  normalized: Record<string, unknown>,
+  existing: Record<string, unknown> | undefined,
+  hosts: readonly ProvenanceEntryHostPath[],
+): Record<string, unknown> {
+  const stored = storedProvenanceById(existing, hosts)
+  let next = { ...normalized }
+  if (existing?.provenance !== undefined) next.provenance = existing.provenance
+  else delete next.provenance
+
+  for (const host of hosts) {
+    if (!hostIsPresent(normalized, host)) continue
+    const entries = readProvenanceHostEntries(normalized, host)
+    if (!Array.isArray(entries)) continue
+    next = writeProvenanceHostEntries(
+      next,
+      host,
+      entries.map((entry) => {
+        if (!isEntry(entry)) return entry
+        const id = entryId(entry)
+        const provenance = id ? stored.get(id) : undefined
+        if (provenance === undefined) return omitEntryProvenance(entry)
+        return { ...entry, provenance }
+      }),
+    )
+  }
+  return next
+}
+
+function reconcilePreservedEntries(
+  normalized: Record<string, unknown>,
+  existing: Record<string, unknown> | undefined,
+  hosts: readonly ProvenanceEntryHostPath[],
+): Record<string, unknown> {
+  const stored = storedProvenanceById(existing, hosts)
+  let next = normalized
+  for (const host of hosts) {
+    if (!hostIsPresent(normalized, host)) continue
+    const entries = readProvenanceHostEntries(normalized, host)
+    if (!Array.isArray(entries)) continue
+    next = writeProvenanceHostEntries(
+      next,
+      host,
+      entries.map((entry) => {
+        if (!isEntry(entry)) return entry
+        const id = entryId(entry)
+        const storedProvenance = id ? stored.get(id) : undefined
+        if (entry.provenance === undefined) {
+          if (storedProvenance === undefined) return entry
+          return { ...entry, provenance: storedProvenance }
+        }
+        if (storedProvenance !== undefined && provenanceEqual(entry.provenance, storedProvenance)) {
+          return entry
+        }
+        throw new ContentProvenanceWriteError(
+          'provenance_reassignment',
+          'Entry provenance is server-owned and cannot be added, replaced, or moved.',
+        )
+      }),
+    )
+  }
+  return next
+}
+
+function reconcileInitializedEntries(
+  normalized: Record<string, unknown>,
+  hosts: readonly ProvenanceEntryHostPath[],
+): Record<string, unknown> {
+  for (const host of hosts) {
+    const entries = readProvenanceHostEntries(normalized, host)
+    if (!Array.isArray(entries)) continue
+    for (const entry of entries) {
+      if (isEntry(entry) && entry.provenance !== undefined) {
+        entryProvenanceSchema.parse(entry.provenance)
+      }
+    }
+  }
+  return normalized
+}
+
 /**
- * Reconciles record-level provenance on a normalized write payload.
- * Entry-level hosts are handled in P2.
+ * Reconciles record and entry provenance on a normalized write payload.
  */
 function reconcileInitializedProvenance(
   normalized: Record<string, unknown>,
@@ -135,7 +282,17 @@ export function reconcileContentProvenance(args: {
   provenanceSource?: Record<string, unknown>
   now?: string
 }): Record<string, unknown> {
-  if (args.authority === 'initialize') return reconcileInitializedProvenance(args.normalized)
+  const hosts = hostsFor(args.contentTypeKey)
+  if (args.authority === 'initialize') {
+    return reconcileInitializedEntries(reconcileInitializedProvenance(args.normalized), hosts)
+  }
   if (args.authority === 'carry') return reconcileCarriedProvenance(args)
-  return reconcilePreservedProvenance(args.normalized, args.existing)
+  if (args.catalogLayer === 'system') {
+    return reattachSystemEntries(args.normalized, args.existing, hosts)
+  }
+  return reconcilePreservedEntries(
+    reconcilePreservedProvenance(args.normalized, args.existing),
+    args.existing,
+    hosts,
+  )
 }

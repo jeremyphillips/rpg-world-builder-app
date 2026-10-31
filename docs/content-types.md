@@ -22,7 +22,7 @@ When sub-choices are small, fixed sets owned by one catalog record (lineages, an
 
 **Not a content type:** standard XP progression thresholds live in `rpg/campaign/rules/xp-progression.ts` and are patched via `CampaignRulesetPatch.characterCreation.progression.xpThresholds` — not the content API registry. SRD defaults ship from `@rpg/catalog/xp-progressions`.
 
-**Duplication:** manager-only copy workflow for registered API content types — see [apps/api/docs/content-duplication.md](../apps/api/docs/content-duplication.md). Declare `canDuplicate` and `nestedIdRegeneration` in `CONTENT_TYPE_CAPABILITIES`.
+**Duplication:** manager-only copy workflow for registered API content types — see [apps/api/docs/content-duplication.md](../apps/api/docs/content-duplication.md). Declare `canDuplicate`, `nestedIdRegeneration`, and `provenanceEntryHosts` in `CONTENT_TYPE_CAPABILITIES`. Bibliographic lineage is [content provenance](../packages/contracts/docs/content-provenance.md).
 
 ---
 

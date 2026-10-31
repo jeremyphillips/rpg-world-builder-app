@@ -8,6 +8,7 @@ import { abilitySchema } from '../../vocab/ability'
 import { damageTypeIdSchema } from '../../vocab/damage'
 import { spellComponentIdSchema } from '../../vocab/spell/components'
 import { weaponModeSchema } from '../../vocab/weapon'
+import { entryProvenanceField } from '../../primitives/provenance'
 import { spellReferenceSchema } from '../spell/spell-reference'
 import {
   weaponDamageDraftSchema,
@@ -59,6 +60,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
     id: z.string().min(1),
     description: z.string().optional(),
     limitedUse: limitedUse.optional(),
+    ...entryProvenanceField,
   }
   const attackBonusSourceSchema = z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('spell'), castingAbility: castingAbilitySchema }),

@@ -4,6 +4,12 @@
     "slug": "kobold-warrior",
     "rulesetId": "srd-cc-5.2.1",
     "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": { "section": "Monsters", "page": 302 }
+      }
+    },
     "status": "published",
     "campaignId": null,
     "createdAt": "2026-01-01T00:00:00.000Z",
@@ -62,19 +68,37 @@
       {
         "id": "pack-tactics",
         "name": "Pack Tactics",
-        "description": "<p>The kobold has Advantage on an attack roll against a creature if at least one of the kobold's allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.</p>"
+        "description": "<p>The kobold has Advantage on an attack roll against a creature if at least one of the kobold's allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/kobold-warrior/pack-tactics"
+          }
+        }
       },
       {
         "id": "sunlight-sensitivity",
         "name": "Sunlight Sensitivity",
-        "description": "<p>While in sunlight, the kobold has Disadvantage on ability checks and attack rolls.</p>"
+        "description": "<p>While in sunlight, the kobold has Disadvantage on ability checks and attack rolls.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/kobold-warrior/sunlight-sensitivity"
+          }
+        }
       }
     ],
     "actions": [
       {
         "id": "dagger",
         "kind": "weapon",
-        "equipmentEntryId": "dagger"
+        "equipmentEntryId": "dagger",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/kobold-warrior/dagger"
+          }
+        }
       }
     ],
     "bonusActions": [],
@@ -85,6 +109,12 @@
     "slug": "skeleton",
     "rulesetId": "srd-cc-5.2.1",
     "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": { "section": "Monsters", "page": 325 }
+      }
+    },
     "status": "published",
     "campaignId": null,
     "createdAt": "2026-01-01T00:00:00.000Z",
@@ -153,12 +183,24 @@
       {
         "id": "shortsword",
         "kind": "weapon",
-        "equipmentEntryId": "shortsword"
+        "equipmentEntryId": "shortsword",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/skeleton/shortsword"
+          }
+        }
       },
       {
         "id": "shortbow",
         "kind": "weapon",
-        "equipmentEntryId": "shortbow"
+        "equipmentEntryId": "shortbow",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/skeleton/shortbow"
+          }
+        }
       }
     ],
     "bonusActions": [],
@@ -169,6 +211,12 @@
     "slug": "knight",
     "rulesetId": "srd-cc-5.2.1",
     "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": { "section": "Monsters", "page": 302 }
+      }
+    },
     "status": "published",
     "campaignId": null,
     "createdAt": "2026-01-01T00:00:00.000Z",
@@ -226,7 +274,13 @@
         "id": "multiattack",
         "kind": "special",
         "name": "Multiattack",
-        "description": "<p>The knight makes two attacks, using Greatsword or Heavy Crossbow in any combination.</p>"
+        "description": "<p>The knight makes two attacks, using Greatsword or Heavy Crossbow in any combination.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/knight/multiattack"
+          }
+        }
       },
       {
         "id": "greatsword",
@@ -236,6 +290,12 @@
           "additionalDamage": [
             { "roll": { "dice": { "count": 1, "faces": 8 } }, "damageType": "radiant" }
           ]
+        },
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/knight/greatsword"
+          }
         }
       },
       {
@@ -247,6 +307,12 @@
           "additionalDamage": [
             { "roll": { "dice": { "count": 1, "faces": 8 } }, "damageType": "radiant" }
           ]
+        },
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/knight/heavy-crossbow"
+          }
         }
       }
     ],
@@ -257,7 +323,13 @@
         "kind": "special",
         "name": "Parry",
         "trigger": { "text": "The knight is hit by a melee attack roll while holding a weapon." },
-        "description": "<p>The knight adds 2 to its AC against that attack, possibly causing it to miss.</p>"
+        "description": "<p>The knight adds 2 to its AC against that attack, possibly causing it to miss.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/knight/parry"
+          }
+        }
       }
     ]
   },
@@ -266,6 +338,12 @@
     "slug": "mage",
     "rulesetId": "srd-cc-5.2.1",
     "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": { "section": "Monsters", "page": 305 }
+      }
+    },
     "status": "published",
     "campaignId": null,
     "createdAt": "2026-01-01T00:00:00.000Z",
@@ -307,7 +385,13 @@
         "id": "multiattack",
         "kind": "special",
         "name": "Multiattack",
-        "description": "<p>The mage makes three Arcane Burst attacks.</p>"
+        "description": "<p>The mage makes three Arcane Burst attacks.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/mage/multiattack"
+          }
+        }
       },
       {
         "id": "arcane-burst",
@@ -321,7 +405,13 @@
         "reach": 5,
         "range": { "normal": 120 },
         "damage": { "dice": { "count": 3, "faces": 8 } },
-        "damageType": "force"
+        "damageType": "force",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/mage/arcane-burst"
+          }
+        }
       },
       {
         "id": "spellcasting",
@@ -367,7 +457,13 @@
               "recovery": { "minimumRest": "long" }
             }
           }
-        ]
+        ],
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/mage/spellcasting"
+          }
+        }
       }
     ],
     "bonusActions": [
@@ -381,7 +477,13 @@
           "count": { "kind": "fixed", "value": 3 },
           "recovery": { "minimumRest": "long" }
         },
-        "spells": [{ "spellId": "srd-cc-5.2.1:misty-step" }]
+        "spells": [{ "spellId": "srd-cc-5.2.1:misty-step" }],
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/mage/misty-step"
+          }
+        }
       }
     ],
     "reactions": [
@@ -395,7 +497,16 @@
           "count": { "kind": "fixed", "value": 3 },
           "recovery": { "minimumRest": "long" }
         },
-        "spells": [{ "spellId": "srd-cc-5.2.1:counterspell" }, { "spellId": "srd-cc-5.2.1:shield" }]
+        "spells": [
+          { "spellId": "srd-cc-5.2.1:counterspell" },
+          { "spellId": "srd-cc-5.2.1:shield" }
+        ],
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/mage/protective-magic"
+          }
+        }
       }
     ]
   },
@@ -404,6 +515,12 @@
     "slug": "hell-hound",
     "rulesetId": "srd-cc-5.2.1",
     "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": { "section": "Monsters", "page": 297 }
+      }
+    },
     "status": "published",
     "campaignId": null,
     "createdAt": "2026-01-01T00:00:00.000Z",
@@ -436,7 +553,13 @@
       {
         "id": "pack-tactics",
         "name": "Pack Tactics",
-        "description": "<p>The hound has Advantage on an attack roll against a creature if at least one of the hound's allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.</p>"
+        "description": "<p>The hound has Advantage on an attack roll against a creature if at least one of the hound's allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/hell-hound/pack-tactics"
+          }
+        }
       }
     ],
     "actions": [
@@ -444,7 +567,13 @@
         "id": "multiattack",
         "kind": "special",
         "name": "Multiattack",
-        "description": "<p>The hound makes two Bite attacks.</p>"
+        "description": "<p>The hound makes two Bite attacks.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/hell-hound/multiattack"
+          }
+        }
       },
       {
         "id": "bite",
@@ -457,6 +586,12 @@
           "additionalDamage": [
             { "roll": { "dice": { "count": 1, "faces": 6 } }, "damageType": "fire" }
           ]
+        },
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/hell-hound/bite"
+          }
         }
       },
       {
@@ -464,7 +599,13 @@
         "kind": "special",
         "name": "Fire Breath",
         "description": "<p>Dexterity Saving Throw: DC 12, each creature in a 15-foot Cone. Failure: 17 (5d6) Fire damage. Success: Half damage.</p>",
-        "limitedUse": { "kind": "recharge", "minRoll": 5 }
+        "limitedUse": { "kind": "recharge", "minRoll": 5 },
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/hell-hound/fire-breath"
+          }
+        }
       }
     ],
     "bonusActions": [],

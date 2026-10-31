@@ -17,6 +17,7 @@ import {
   MONSTER_SECTION_ECONOMY,
 } from '../spell/casting-economy'
 import { collectSpellReferenceIssues } from '../spell/spell-reference'
+import { MONSTER_ACTION_SECTIONS } from './action-sections'
 export const MONSTER_CATALOG_ISSUE_CODE = {
   unknownEquipment: 'unknown_equipment',
   weaponActionNotWeapon: 'weapon_action_not_weapon',
@@ -71,8 +72,6 @@ export type MonsterCatalogs = {
   spellsById?: ReadonlyMap<string, Spell>
   spellCatalog?: MonsterCatalogLoadStatus
 }
-
-const ACTION_SECTIONS = ['actions', 'bonusActions', 'reactions'] as const
 
 function issue(
   path: string,
@@ -166,7 +165,7 @@ function collectWeaponActionIssues(
   catalogs: MonsterCatalogs,
   issues: ContentValidationIssue[],
 ): void {
-  for (const section of ACTION_SECTIONS) {
+  for (const section of MONSTER_ACTION_SECTIONS) {
     for (const [index, action] of (body[section] ?? []).entries()) {
       pushWeaponActionIssue(section, index, action, equipment, catalogs, issues)
     }
@@ -174,7 +173,7 @@ function collectWeaponActionIssues(
 }
 
 function pushWeaponActionIssue(
-  section: (typeof ACTION_SECTIONS)[number],
+  section: (typeof MONSTER_ACTION_SECTIONS)[number],
   index: number,
   action: NonNullable<MonsterCatalogIssueBody['actions']>[number],
   equipment: readonly CatalogEquipmentEntry[],
@@ -250,7 +249,7 @@ function spellActionReferences(
   body: MonsterCatalogIssueBody,
 ): { path: string; spellId: string; castAtLevel?: number }[] {
   const refs: { path: string; spellId: string; castAtLevel?: number }[] = []
-  for (const section of ACTION_SECTIONS) {
+  for (const section of MONSTER_ACTION_SECTIONS) {
     for (const [index, action] of (body[section] ?? []).entries()) {
       if (action.kind !== 'spell') continue
       appendSpellReferences(refs, section, index, action.spells)
