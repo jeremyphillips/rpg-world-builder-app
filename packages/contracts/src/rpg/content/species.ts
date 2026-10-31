@@ -5,7 +5,7 @@ import {
   mediaBearingAuthoredContentBodySchema,
   mediaBearingDraftAuthoredContentBodySchema,
 } from './lib/media/media-bearing-content'
-import { creatureSizeSchema } from '../vocab/creature-size'
+import { creatureSizesDraftSchema, creatureSizesSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
 import { movementSpeedsDraftSchema, movementSpeedsSchema } from '../vocab/movement-mode'
 import { contentNamedChoiceSchema } from './lib/grants/choice'
@@ -78,8 +78,11 @@ export type SpeciesHeritageDraft = z.infer<typeof speciesHeritageDraftSchema>
 /** The editable shape: what a form authors and what a patch overrides. */
 export const speciesBodySchema = mediaBearingAuthoredContentBodySchema.extend({
   creatureType: creatureTypeSchema,
-  /** Allowed sizes; a single-element array is a fixed size, multiple is a choice. */
-  sizes: z.array(creatureSizeSchema).min(1),
+  /**
+   * Permitted sizes. A character has one of these sizes. Choosing it in the
+   * builder is not implemented — see apps/dashboard/docs/character-builder.md.
+   */
+  sizes: creatureSizesSchema,
   movement: movementSpeedsSchema,
   /** Only meaningful when `movement` includes fly speed. */
   hover: z.boolean().optional(),
@@ -104,7 +107,7 @@ export const speciesBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema
   SPECIES_CONTENT_TYPE_TERM.label,
 ).extend({
   creatureType: creatureTypeSchema,
-  sizes: z.array(creatureSizeSchema).default([]),
+  sizes: creatureSizesDraftSchema,
   movement: movementSpeedsDraftSchema,
   hover: z.boolean().optional(),
   /** See {@link speciesBodySchema} `languageAffinities`. */

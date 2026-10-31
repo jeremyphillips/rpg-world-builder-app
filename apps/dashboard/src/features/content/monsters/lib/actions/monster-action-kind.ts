@@ -29,6 +29,21 @@ export function monsterActionActiveKeys(
   return variantKeys(schema, kind)
 }
 
+/** Authored reaction trigger prose, or undefined when the field is blank. */
+export function monsterActionTriggerText(trigger: unknown): string | undefined {
+  if (typeof trigger === 'string') {
+    const text = trigger.trim()
+    return text.length > 0 ? text : undefined
+  }
+  if (typeof trigger === 'object' && trigger !== null && 'text' in trigger) {
+    const text = trigger.text
+    if (typeof text !== 'string') return undefined
+    const trimmed = text.trim()
+    return trimmed.length > 0 ? trimmed : undefined
+  }
+  return undefined
+}
+
 function present(value: unknown): boolean {
   if (value == null) return false
   if (typeof value === 'string') return value.trim().length > 0
@@ -37,18 +52,39 @@ function present(value: unknown): boolean {
   return true
 }
 
+function carriedActionName(
+  action: MonsterActionDraftRow,
+  nextKind: MonsterActionKind,
+  resolvedWeaponName: string | undefined,
+): string | undefined {
+  if (present(action.name)) return action.name
+  if (action.kind === 'weapon' && nextKind !== 'weapon') return resolvedWeaponName
+  return undefined
+}
+
+function carriedOnHit(
+  action: MonsterActionDraftRow,
+  nextKind: MonsterActionKind,
+): MonsterActionDraftRow['onHit'] {
+  const attackKinds = new Set(['weapon', 'natural-weapon', 'attack'])
+  if (!attackKinds.has(action.kind) || !attackKinds.has(nextKind)) return undefined
+  return action.onHit
+}
+
 export function reconcileMonsterActionKind(
   action: MonsterActionDraftRow,
   nextKind: MonsterActionKind,
   options?: { resolvedWeaponName?: string },
 ): MonsterActionDraftRow {
   const next: MonsterActionDraftRow = { id: action.id, kind: nextKind }
-  if (present(action.name)) next.name = action.name
-  else if (action.kind === 'weapon' && nextKind !== 'weapon' && options?.resolvedWeaponName) {
-    next.name = options.resolvedWeaponName
-  }
+  const name = carriedActionName(action, nextKind, options?.resolvedWeaponName)
+  if (name) next.name = name
   if (present(action.description)) next.description = action.description
-  if (present(action.trigger)) next.trigger = action.trigger
+  const triggerText = monsterActionTriggerText(action.trigger)
+  if (triggerText) next.trigger = { text: triggerText }
+  if (action.limitedUse) next.limitedUse = action.limitedUse
+  const onHit = carriedOnHit(action, nextKind)
+  if (onHit) next.onHit = onHit
   return next
 }
 
@@ -129,7 +165,11 @@ export function actionMoveDropsTrigger(
   from: MonsterActionSection,
   to: MonsterActionSection,
 ): boolean {
-  return from === 'reactions' && to !== 'reactions' && present(action.trigger)
+  return (
+    from === 'reactions' &&
+    to !== 'reactions' &&
+    monsterActionTriggerText(action.trigger) !== undefined
+  )
 }
 
 export function actionAfterSectionMove(

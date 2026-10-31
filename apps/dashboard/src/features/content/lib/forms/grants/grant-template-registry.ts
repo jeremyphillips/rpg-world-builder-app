@@ -8,7 +8,7 @@ import {
   MOVEMENT_OPERATION_ENTRIES,
   MOVEMENT_OPERATIONS,
   TOOL_CATEGORY_ENTRIES,
-  USAGE_FREQUENCY_ENTRIES,
+  REST_KIND_ENTRIES,
   WEAPON_CATEGORY_ENTRIES,
   getSenseEntry,
   type ArmorCategory,
@@ -16,7 +16,7 @@ import {
   type MovementMode,
   type MovementOperation,
   type ToolCategory,
-  type UsageFrequency,
+  type RestKind,
   type WeaponCategory,
 } from '@rpg/contracts'
 
@@ -56,7 +56,7 @@ export type GrantTemplateVocabRef =
   | { kind: 'toolCategory'; id: ToolCategory }
   | { kind: 'armorCategory'; id: ArmorCategory }
   | { kind: 'sense'; id: string }
-  | { kind: 'usageFrequency'; id: UsageFrequency }
+  | { kind: 'restKind'; id: RestKind }
 
 export type ResolvedGrantTemplateVocabRef = {
   label: string
@@ -158,21 +158,21 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
     id: 'spells',
     label: GRANT_TYPE_LABELS.spells,
     description:
-      'Grant innate spells with a spellcasting ability, cast mode, and optional frequency.',
+      'Grant innate spells with a spellcasting ability, free casting, and an optional rest limit.',
     groupId: 'character-options',
     grantType: 'spells',
     createDefault: () => ({
       grantType: 'spells',
       spellCastingEnabled: true,
-      spellCastingFrequency: 'at_will',
+      spellUseLimit: 'at-will',
     }),
     search: {
       aliases: ['innate spells', 'spellcasting', 'cantrips', 'always prepared'],
       keywords: ['spells', 'magic'],
     },
-    vocabRefs: Object.keys(USAGE_FREQUENCY_ENTRIES).map((id) => ({
-      kind: 'usageFrequency' as const,
-      id: id as UsageFrequency,
+    vocabRefs: Object.keys(REST_KIND_ENTRIES).map((id) => ({
+      kind: 'restKind' as const,
+      id: id as RestKind,
     })),
   },
   {
@@ -282,8 +282,8 @@ export function resolveGrantTemplateVocabRef(
       return ARMOR_CATEGORY_ENTRIES[ref.id]
     case 'sense':
       return getSenseEntry(ref.id)
-    case 'usageFrequency':
-      return USAGE_FREQUENCY_ENTRIES[ref.id]
+    case 'restKind':
+      return REST_KIND_ENTRIES[ref.id]
     default: {
       const _exhaustive: never = ref
       return _exhaustive

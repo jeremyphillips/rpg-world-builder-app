@@ -21,11 +21,11 @@ import {
 
 import {
   createCampaignAvailabilityFilterField,
-  createContentSourceFilter,
+  createCatalogLayerFilter,
   createContentStatusFilter,
   type ContentOverviewBaseFilterState,
 } from '../../../lib/overview/content-overview-filter-schema'
-import { shouldPresentContentSource } from '../../../lib/content-type-presentation'
+import { shouldPresentCatalogLayer } from '../../../lib/content-type-presentation'
 import {
   getLocationOverviewSearchText,
   readLocationBuildingClassification,
@@ -128,8 +128,8 @@ export function buildLocationsFilterSchema(): FilterSchema<
     [
       createLocationNameFilter(),
       ...contentFields,
-      ...(shouldPresentContentSource('locations')
-        ? [createContentSourceFilter<LocationRow, LocationsOverviewFilterState>()]
+      ...(shouldPresentCatalogLayer('locations')
+        ? [createCatalogLayerFilter<LocationRow, LocationsOverviewFilterState>()]
         : []),
       createContentStatusFilter<LocationRow, LocationsOverviewFilterState>(),
       createCampaignAvailabilityFilterField<LocationRow, LocationsOverviewFilterState>(),

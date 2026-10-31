@@ -16,15 +16,15 @@ type Story = StoryObj<typeof meta>
 
 function TabStory({
   traits = [] as Array<Record<string, unknown>>,
-  entitySource,
+  entityCatalogLayer,
 }: {
   traits?: Array<Record<string, unknown>>
-  entitySource?: ContentFormCtx['entitySource']
+  entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
 }) {
   const form = useForm({ defaultValues: { traits } })
   return (
     <FormProvider {...form}>
-      <SpeciesTraitsTab formCtx={{ entitySource }} />
+      <SpeciesTraitsTab formCtx={{ entityCatalogLayer }} />
     </FormProvider>
   )
 }
@@ -37,7 +37,7 @@ export const HomebrewWithTraits: Story = {
   tags: ['storybook-test-runner-skip'],
   render: () => (
     <TabStory
-      entitySource="homebrew"
+      entityCatalogLayer="homebrew"
       traits={[
         {
           id: 't1',
@@ -74,7 +74,7 @@ export const HomebrewWithTraits: Story = {
 export const SystemSpeciesLockedTraits: Story = {
   render: () => (
     <TabStory
-      entitySource="system"
+      entityCatalogLayer="system"
       traits={[
         { id: 't1', kind: 'custom', name: 'Darkvision', description: '', grants: [] },
         { id: 't2', kind: 'custom', name: 'Keen Senses', description: '', grants: [] },

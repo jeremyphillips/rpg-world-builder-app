@@ -16,7 +16,7 @@ const storedBarbarian: ClassStored = {
   id: `${RULESET}:barbarian`,
   slug: 'barbarian',
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',

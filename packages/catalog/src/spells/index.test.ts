@@ -22,14 +22,14 @@ const SPELL_OPTION_HEADROOM = 2
 describe('SRD 5.2.1 spell seed', () => {
   const spells = loadSeedSpells(RULESET)
 
-  it('ships 97 curated spells (validated against the schema at load)', () => {
-    expect(spells).toHaveLength(97)
+  it('ships 100 curated spells (validated against the schema at load)', () => {
+    expect(spells).toHaveLength(100)
   })
 
   it('uses deterministic system ids and null campaignId', () => {
     for (const spell of spells) {
       expect(spell.id).toBe(`${RULESET}:${spell.slug}`)
-      expect(spell.source).toBe('system')
+      expect(spell.catalogLayer).toBe('system')
       expect(spell.campaignId).toBeNull()
       expect(spell.rulesetId).toBe(RULESET)
     }
@@ -38,7 +38,7 @@ describe('SRD 5.2.1 spell seed', () => {
   it('has globally unique slugs', () => {
     const slugs = spells.map((s) => s.slug)
     expect(new Set(slugs).size).toBe(slugs.length)
-    expect(seedSpellSlugs(RULESET).size).toBe(97)
+    expect(seedSpellSlugs(RULESET).size).toBe(100)
   })
 
   it('stores each spell in the level file matching its level field', () => {
@@ -99,6 +99,23 @@ describe('SRD 5.2.1 spell seed', () => {
     const fireBolt = spells.find((s) => s.slug === 'fire-bolt')
     expect(fireBolt?.cantripScaling).toContain('The damage increases by 1d10')
     expect(fireBolt?.description).not.toContain('Cantrip Upgrade')
+  })
+
+  it('stores a trigger object on reaction spells only', () => {
+    const reactions = spells.filter((spell) => spell.castingTime.normal.unit === 'reaction')
+    expect(reactions.map((spell) => spell.slug).sort()).toEqual([
+      'counterspell',
+      'feather-fall',
+      'hellish-rebuke',
+      'shield',
+    ])
+    for (const spell of spells) {
+      if (spell.castingTime.normal.unit === 'reaction') {
+        expect(spell.castingTime.normal.trigger?.text.length).toBeGreaterThan(0)
+      } else {
+        expect(spell.castingTime.normal.trigger).toBeUndefined()
+      }
+    }
   })
 
   it('spot-checks deliveryMethod and ritual casting', () => {

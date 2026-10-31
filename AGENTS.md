@@ -55,7 +55,9 @@ narrowest relevant Vitest paths → targeted typecheck/lint when useful → broa
   before `test:affected:gate` or to finish a task; not a hook or CI gate.
 
 When finishing, **report** which checks ran and which repository gates (pre-commit,
-pre-push) were **intentionally deferred**.
+pre-push) were **intentionally deferred**. When the task used a
+`.cursor/plans/*.plan.md`, also sync that plan’s frontmatter `todos` (see **Implementation
+plans**).
 
 ### Repository gates (checkpoints)
 
@@ -92,6 +94,14 @@ to every phase or milestone. Prefer the default agent loop above; name **commit*
 **push/PR** checkpoints explicitly when full gates belong in the schedule—not after
 each prompt-sized slice of work. Plan footers and verification sections →
 [docs/agent-validation.md](docs/agent-validation.md).
+
+**Progress:** frontmatter `todos` (`status: pending | in_progress | completed`) are the
+handoff record for multi-session plan work—not in-chat todo lists. Before ending a turn,
+set each finished checkpoint to `completed`, the active slice to `in_progress`, and do
+not leave finished gates as `pending`. Mark push/PR todos complete only after the user
+requested that checkpoint. Body markdown checklists are acceptance criteria unless a plan
+says otherwise; do not duplicate status there. Detail →
+[docs/agent-validation.md](docs/agent-validation.md#plan-progress).
 
 ## Test failures
 

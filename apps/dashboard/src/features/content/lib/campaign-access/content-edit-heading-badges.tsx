@@ -1,17 +1,17 @@
 import type {
-  ContentSource,
+  CatalogLayer,
   ContentStatus,
   ContentTypeKey,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
 import { Badge } from '@rpg/ui'
 
-import { CONTENT_SOURCE_BADGE } from '../overview/content-source-badge'
-import { shouldPresentContentSource } from '../content-type-presentation'
+import { CATALOG_LAYER_BADGE } from '../overview/catalog-layer-badge'
+import { shouldPresentCatalogLayer } from '../content-type-presentation'
 
 export interface ContentEditHeadingBadgesProps {
   contentType: ContentTypeKey
-  source: ContentSource
+  catalogLayer: CatalogLayer
   status: ContentStatus
   campaignAccess: ResolvedContentCampaignAccess
   /** When true, the Draft badge is omitted (shown on the preview rail instead). */
@@ -20,14 +20,14 @@ export interface ContentEditHeadingBadgesProps {
 
 export function ContentEditHeadingBadges({
   contentType,
-  source,
+  catalogLayer,
   status,
   campaignAccess,
   omitDraft = false,
 }: ContentEditHeadingBadgesProps) {
-  const isDraft = !omitDraft && source === 'homebrew' && status === 'draft'
-  const sourceBadge = CONTENT_SOURCE_BADGE[source]
-  const showSource = shouldPresentContentSource(contentType)
+  const isDraft = !omitDraft && catalogLayer === 'homebrew' && status === 'draft'
+  const catalogLayerBadge = CATALOG_LAYER_BADGE[catalogLayer]
+  const showCatalogLayer = shouldPresentCatalogLayer(contentType)
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -40,9 +40,9 @@ export function ContentEditHeadingBadges({
           Inactive
         </Badge>
       ) : null}
-      {showSource ? (
-        <Badge appearance={sourceBadge.appearance} tone={sourceBadge.tone}>
-          {sourceBadge.label}
+      {showCatalogLayer ? (
+        <Badge appearance={catalogLayerBadge.appearance} tone={catalogLayerBadge.tone}>
+          {catalogLayerBadge.label}
         </Badge>
       ) : null}
     </div>

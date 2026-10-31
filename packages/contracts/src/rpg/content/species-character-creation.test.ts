@@ -13,7 +13,7 @@ const ELF_SYSTEM = {
   id: 'srd-cc-5.2.1:elf',
   slug: 'elf',
   rulesetId: 'srd-cc-5.2.1' as const,
-  source: 'system' as const,
+  catalogLayer: 'system' as const,
   campaignId: null,
   createdAt: '2024-05-21T00:00:00.000Z',
   updatedAt: '2024-05-21T00:00:00.000Z',

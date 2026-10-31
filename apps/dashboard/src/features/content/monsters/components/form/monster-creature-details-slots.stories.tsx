@@ -37,7 +37,7 @@ const mockCtx: ContentFormCtx = {
           name: 'Stealth',
           description: 'Make a Dexterity (Stealth) check.',
           ability: 'dex',
-          source: 'system',
+          catalogLayer: 'system',
         } as never,
       ],
     } as never,

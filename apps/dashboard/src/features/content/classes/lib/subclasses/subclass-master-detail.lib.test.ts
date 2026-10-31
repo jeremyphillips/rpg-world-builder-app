@@ -27,7 +27,7 @@ describe('buildSubclassSelectedIdentity', () => {
       selectedListItem: {
         id: 'sub_a',
         name: 'Champion',
-        source: 'system',
+        catalogLayer: 'system',
         classId: 'class_fighter',
       },
       selectedEntity: undefined,

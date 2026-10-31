@@ -2,7 +2,7 @@
   "id": "srd-cc-5.2.1:bard",
   "slug": "bard",
   "rulesetId": "srd-cc-5.2.1",
-  "source": "system",
+  "catalogLayer": "system",
   "campaignId": null,
   "createdAt": "2024-05-21T00:00:00.000Z",
   "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -121,13 +121,18 @@
       {
         "target": "cantrips",
         "classLevel": 1,
-        "spellIds": ["dancing-lights", "vicious-mockery"]
+        "spellIds": ["srd-cc-5.2.1:dancing-lights", "srd-cc-5.2.1:vicious-mockery"]
       },
       {
         "target": "level1Plus",
         "classLevel": 1,
         "spellLevel": 1,
-        "spellIds": ["charm-person", "color-spray", "dissonant-whispers", "healing-word"]
+        "spellIds": [
+          "srd-cc-5.2.1:charm-person",
+          "srd-cc-5.2.1:color-spray",
+          "srd-cc-5.2.1:dissonant-whispers",
+          "srd-cc-5.2.1:healing-word"
+        ]
       }
     ]
   },
@@ -252,6 +257,7 @@
         {
           "grants": [
             {
+              "id": "spellcasting",
               "kind": "spellcasting"
             }
           ]
@@ -337,6 +343,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -368,6 +375,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -393,6 +401,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -412,6 +421,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -437,6 +447,7 @@
         {
           "grants": [
             {
+              "id": "epic-boon-feat",
               "kind": "featChoice",
               "category": "epic-boon",
               "choose": 1,
@@ -456,9 +467,10 @@
         {
           "grants": [
             {
+              "id": "power-word-heal-spells",
               "kind": "spells",
               "ability": "cha",
-              "spellIds": ["power-word-heal", "power-word-kill"],
+              "spellIds": ["srd-cc-5.2.1:power-word-heal", "srd-cc-5.2.1:power-word-kill"],
               "availability": "always_prepared"
             }
           ]

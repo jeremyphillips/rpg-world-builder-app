@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { equipmentSchema } from '../equipment'
+import type { Spell } from '../spell/body'
 import { skillProficiencySchema } from '../skill-proficiency'
 import { collectMonsterCatalogIssues, MONSTER_CATALOG_ISSUE_CODE } from './monster-catalog-issues'
 import type { MonsterCatalogs } from './monster-catalog-issues'
@@ -12,7 +13,7 @@ function armor(slug: string, name: string) {
     id: `${RULESET}:${slug}`,
     slug,
     rulesetId: RULESET,
-    source: 'system',
+    catalogLayer: 'system',
     campaignId: null,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
@@ -31,7 +32,7 @@ const dagger = equipmentSchema.parse({
   id: `${RULESET}:dagger`,
   slug: 'dagger',
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
@@ -55,7 +56,7 @@ const athletics = skillProficiencySchema.parse({
   id: `${RULESET}:athletics`,
   slug: 'athletics',
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -240,6 +241,30 @@ describe('collectMonsterCatalogIssues', () => {
         'publish',
       ).map((row) => row.code),
     ).toContain('unknown_magic_property_preset')
+  })
+
+  it('rejects an incompatible spell casting time on publish and allows the draft', () => {
+    const fireball = {
+      id: `${RULESET}:fireball`,
+      status: 'published',
+      castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
+    } as Spell
+    const body = {
+      bonusActions: [
+        {
+          kind: 'spell',
+          spells: [{ spellId: fireball.id }],
+        },
+      ],
+    }
+    const catalogs = readyCatalogs({
+      spellsById: new Map([[fireball.id, fireball]]),
+      spellCatalog: 'ready',
+    })
+    expect(collectMonsterCatalogIssues(body, catalogs, 'draft')).toEqual([])
+    expect(
+      collectMonsterCatalogIssues(body, catalogs, 'publish').map((issue) => issue.code),
+    ).toEqual([MONSTER_CATALOG_ISSUE_CODE.spellCastingTimeIncompatible])
   })
 
   it('skips equipment row checks on draft when the equipment catalog is unavailable', () => {

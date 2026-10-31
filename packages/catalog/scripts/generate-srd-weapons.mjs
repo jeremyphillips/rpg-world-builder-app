@@ -27,7 +27,7 @@ function weapon(slug, name, category, mode, damage, damageType, mastery, cost, w
     id: `${RULESET}:${slug}`,
     slug,
     rulesetId: RULESET,
-    source: 'system',
+    catalogLayer: 'system',
     campaignId: null,
     createdAt: TS,
     updatedAt: TS,

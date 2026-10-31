@@ -6,7 +6,7 @@ import {
   type SpellRecommendation,
 } from '@rpg/contracts'
 
-import { toContentFieldOption } from '../../lib/form-options/content-field-option.lib'
+import { toSpellReferenceFieldOptions } from '../../lib/form-options/content-field-option.lib'
 
 export const SPELLCASTING_RECOMMENDATION_TARGET_LABELS = {
   cantrips: getSpellCollectionKindLabel('cantrips'),
@@ -26,9 +26,7 @@ export function spellOptionsForRecommendationTarget(
     return spell.level === 1
   })
 
-  return filtered
-    .map((spell) => toContentFieldOption(spell, 'spells'))
-    .sort((left, right) => left.label.localeCompare(right.label))
+  return toSpellReferenceFieldOptions(filtered)
 }
 
 export function readRecommendationSpellIds(

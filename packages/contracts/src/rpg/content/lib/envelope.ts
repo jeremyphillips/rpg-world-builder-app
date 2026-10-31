@@ -3,7 +3,9 @@ import {
   authoredContentBodySchema,
   type AuthoredContentBody,
 } from '../../primitives/authored-content'
+import { contentProvenanceSchema } from '../../primitives/provenance'
 import { systemRulesetIdSchema } from '../../primitives/ruleset'
+import { catalogLayerSchema } from '../../vocab/catalog-layer'
 
 // ---------------------------------------------------------------------------
 // Content ownership — the reusable envelope every catalog content type extends
@@ -12,16 +14,15 @@ import { systemRulesetIdSchema } from '../../primitives/ruleset'
 // fields, so it is authored once and shared across content types.
 // ---------------------------------------------------------------------------
 
-/**
- * Where a content record comes from.
- * - system   → shipped SRD catalog (read-only; `campaignId` is null)
- * - homebrew → authored within a campaign (`campaignId` is set)
- */
-export const CONTENT_SOURCES = ['system', 'homebrew'] as const
-
-export const contentSourceSchema = z.enum(CONTENT_SOURCES)
-
-export type ContentSource = z.infer<typeof contentSourceSchema>
+export {
+  CATALOG_LAYER_ENTRIES,
+  CATALOG_LAYER_KEYS,
+  CATALOG_LAYER_OPTIONS,
+  CATALOG_LAYER_TERM,
+  catalogLayerSchema,
+  type CatalogLayer,
+  type CatalogLayerValue,
+} from '../../vocab/catalog-layer'
 
 /** Homebrew lifecycle — draft records are visible only to campaign managers. */
 export const CONTENT_STATUSES = ['draft', 'published'] as const
@@ -55,9 +56,10 @@ export const contentMetaSchema = z.object({
   id: z.string().min(1),
   slug: slugSchema,
   rulesetId: systemRulesetIdSchema,
-  source: contentSourceSchema,
+  catalogLayer: catalogLayerSchema,
   status: contentStatusSchema.default('published'),
   campaignId: z.string().min(1).nullable(),
+  provenance: contentProvenanceSchema.optional(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 })

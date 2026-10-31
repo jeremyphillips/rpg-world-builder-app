@@ -11,6 +11,13 @@ import type { MagicPropertyDefinitionProvider } from '../equipment/instance/magi
 import { normalizeEquipmentInstance } from '../equipment/instance/normalize-equipment-instance'
 import { validateEquipmentMagicProperties } from '../equipment/instance/validate-equipment-magic-properties'
 import type { SkillProficiency } from '../skill-proficiency'
+import type { Spell } from '../spell/body'
+import {
+  isSpellCastingTimeCompatibleWithEconomy,
+  MONSTER_SECTION_ECONOMY,
+} from '../spell/casting-economy'
+import { collectSpellReferenceIssues } from '../spell/spell-reference'
+import { MONSTER_ACTION_SECTIONS } from './action-sections'
 export const MONSTER_CATALOG_ISSUE_CODE = {
   unknownEquipment: 'unknown_equipment',
   weaponActionNotWeapon: 'weapon_action_not_weapon',
@@ -23,6 +30,8 @@ export const MONSTER_CATALOG_ISSUE_CODE = {
   skillNotReferenceable: 'skill_not_referenceable',
   skillNotCampaignEligible: 'skill_not_campaign_eligible',
   skillCatalogUnavailable: 'skill_catalog_unavailable',
+  spellCastingTimeIncompatible: 'spell_casting_time_incompatible',
+  spellCastLevelTooLow: 'spell_cast_level_too_low',
 } as const
 
 export type MonsterCatalogIssueCode =
@@ -37,6 +46,7 @@ type CatalogEquipmentEntry = EquipmentInstance & {
 type CatalogAction = {
   kind?: string
   equipmentEntryId?: string
+  spells?: readonly { spellId?: string; castAtLevel?: number }[]
 }
 
 type CatalogSkillEntry = {
@@ -59,9 +69,9 @@ export type MonsterCatalogs = {
   equipmentCatalog?: MonsterCatalogLoadStatus
   skillCatalog?: MonsterCatalogLoadStatus
   magicPropertyProvider?: MagicPropertyDefinitionProvider
+  spellsById?: ReadonlyMap<string, Spell>
+  spellCatalog?: MonsterCatalogLoadStatus
 }
-
-const ACTION_SECTIONS = ['actions', 'bonusActions', 'reactions'] as const
 
 function issue(
   path: string,
@@ -155,7 +165,7 @@ function collectWeaponActionIssues(
   catalogs: MonsterCatalogs,
   issues: ContentValidationIssue[],
 ): void {
-  for (const section of ACTION_SECTIONS) {
+  for (const section of MONSTER_ACTION_SECTIONS) {
     for (const [index, action] of (body[section] ?? []).entries()) {
       pushWeaponActionIssue(section, index, action, equipment, catalogs, issues)
     }
@@ -163,7 +173,7 @@ function collectWeaponActionIssues(
 }
 
 function pushWeaponActionIssue(
-  section: (typeof ACTION_SECTIONS)[number],
+  section: (typeof MONSTER_ACTION_SECTIONS)[number],
   index: number,
   action: NonNullable<MonsterCatalogIssueBody['actions']>[number],
   equipment: readonly CatalogEquipmentEntry[],
@@ -235,6 +245,89 @@ function collectSkillIssues(
   }
 }
 
+function spellActionReferences(
+  body: MonsterCatalogIssueBody,
+): { path: string; spellId: string; castAtLevel?: number }[] {
+  const refs: { path: string; spellId: string; castAtLevel?: number }[] = []
+  for (const section of MONSTER_ACTION_SECTIONS) {
+    for (const [index, action] of (body[section] ?? []).entries()) {
+      if (action.kind !== 'spell') continue
+      appendSpellReferences(refs, section, index, action.spells)
+    }
+  }
+  return refs
+}
+
+function appendSpellReferences(
+  refs: { path: string; spellId: string; castAtLevel?: number }[],
+  section: string,
+  actionIndex: number,
+  spells: CatalogAction['spells'],
+): void {
+  for (const [spellIndex, spell] of (spells ?? []).entries()) {
+    if (!spell.spellId) continue
+    refs.push({
+      path: `${section}.${actionIndex}.spells.${spellIndex}.spellId`,
+      spellId: spell.spellId,
+      ...(spell.castAtLevel !== undefined ? { castAtLevel: spell.castAtLevel } : {}),
+    })
+  }
+}
+
+function appendIncompatibleCastingTimes(
+  refs: readonly { path: string; spellId: string; castAtLevel?: number }[],
+  catalogs: MonsterCatalogs,
+  issues: ContentValidationIssue[],
+): void {
+  for (const ref of refs) {
+    const spell = catalogs.spellsById?.get(ref.spellId)
+    const section = ref.path.split('.')[0] as keyof typeof MONSTER_SECTION_ECONOMY
+    if (!spell) continue
+    if (
+      !isSpellCastingTimeCompatibleWithEconomy(spell.castingTime, MONSTER_SECTION_ECONOMY[section])
+    ) {
+      issues.push(
+        issue(
+          ref.path,
+          'This spell casting time does not match the action section.',
+          MONSTER_CATALOG_ISSUE_CODE.spellCastingTimeIncompatible,
+        ),
+      )
+    }
+    if (ref.castAtLevel !== undefined && ref.castAtLevel < spell.level) {
+      issues.push(
+        issue(
+          ref.path.replace(/\.spellId$/, '.castAtLevel'),
+          'Cast level cannot be below the spell level.',
+          MONSTER_CATALOG_ISSUE_CODE.spellCastLevelTooLow,
+        ),
+      )
+    }
+  }
+}
+
+function collectSpellActionIssues(
+  body: MonsterCatalogIssueBody,
+  catalogs: MonsterCatalogs,
+  issues: ContentValidationIssue[],
+  intent: ContentValidationIntent,
+): void {
+  const refs = spellActionReferences(body)
+  const spellCatalog = catalogStatus(
+    catalogs.spellCatalog ?? (catalogs.spellsById ? 'ready' : 'unavailable'),
+  )
+  issues.push(
+    ...collectSpellReferenceIssues({
+      refs,
+      spellsById: catalogs.spellsById ?? new Map(),
+      catalogStatus: spellCatalog,
+      intent,
+    }),
+  )
+  if (intent !== 'publish' || spellCatalog !== 'ready') return
+  appendIncompatibleCastingTimes(refs, catalogs, issues)
+}
+
 /**
  * Catalog-aware monster rules. Accepts draft-shaped bodies and never throws
  * on incomplete input. Callers share this collector instead of reimplementing rules.
@@ -269,6 +362,7 @@ export function collectMonsterCatalogIssues(
   if (intent === 'publish') {
     collectSkillIssues(body, catalogs, issues)
   }
+  collectSpellActionIssues(body, catalogs, issues, intent)
 
   return issues
 }

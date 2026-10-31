@@ -108,6 +108,7 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
     gap('flammability-rules', 'Ignition/burning state not automated; rider documented on outcome'),
     gap('object-state-awareness', 'Worn or carried carve-out on object ignition rider'),
   ]),
+  fly: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'movement' }),
   'fire-bolt': mechanicsReady([
     gap(
       'flammability-rules',
@@ -232,6 +233,7 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     ),
   ]),
   'color-spray': blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'condition' }),
+  'cone-of-cold': blockedProseOnly({ code: 'effect-schema-missing' }),
   contingency: blockedProseOnly(
     {
       code: 'effect-schema-missing',
@@ -387,6 +389,7 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     code: 'effect-schema-missing',
     capabilityId: 'information-reveal',
   }),
+  invisibility: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'condition' }),
   'illusory-script': blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'illusion' }, [
     gap('choice-model-missing', 'Designated viewers at cast time stay prose'),
   ]),

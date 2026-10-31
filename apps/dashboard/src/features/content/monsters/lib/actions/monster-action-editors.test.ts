@@ -84,7 +84,12 @@ describe('describeActionKindSwitchLoss', () => {
 
 describe('monster action section moves', () => {
   it('confirms dropping a trigger when leaving reactions and keeps ids', () => {
-    const action = { id: 'parry', kind: 'special' as const, name: 'Parry', trigger: 'When hit' }
+    const action = {
+      id: 'parry',
+      kind: 'special' as const,
+      name: 'Parry',
+      trigger: { text: 'When hit' },
+    }
     expect(actionMoveDropsTrigger(action, 'reactions', 'actions')).toBe(true)
     expect(actionAfterSectionMove(action, 'actions')).toEqual({
       id: 'parry',
@@ -166,7 +171,11 @@ describe('monster action draft round trip', () => {
       },
     ]
     values.bonusActions = [{ id: 'note', kind: 'special', name: 'N' }]
-    values.reactions = [{ id: 'parry', kind: 'special', trigger: 'When' }]
+    values.reactions = [
+      { id: 'parry', kind: 'special', trigger: { text: 'When' } },
+      { id: 'legacy', kind: 'special', trigger: 'Still' },
+      { id: 'blank', kind: 'special', trigger: { text: '   ' } },
+    ]
     const input = buildMonsterInput(values, undefined, 'draft')
     const actions = input.actions as Array<Record<string, unknown>>
     const reactions = input.reactions as Array<Record<string, unknown>>
@@ -176,11 +185,13 @@ describe('monster action draft round trip', () => {
       damage: { dice: { count: 1 } },
     })
     expect(actions[0]).not.toHaveProperty('equipmentEntryId')
-    expect(reactions[0]).toMatchObject({ trigger: 'When' })
+    expect(reactions[0]).toMatchObject({ trigger: { text: 'When' } })
+    expect(reactions[1]).toMatchObject({ trigger: { text: 'Still' } })
+    expect(reactions[2]).not.toHaveProperty('trigger')
     const reloaded = monsterToFormValues({
       ...input,
       id: 'm1',
-      source: 'homebrew',
+      catalogLayer: 'homebrew',
       status: 'draft',
       rulesetId: 'srd',
       slug: 'scout',

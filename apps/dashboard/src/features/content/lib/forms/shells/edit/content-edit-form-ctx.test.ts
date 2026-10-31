@@ -22,12 +22,12 @@ describe('mergeEditLayoutCtx', () => {
   it('prefers route form context equipmentKind over entity kind', () => {
     const ctx = mergeEditLayoutCtx(baseOptionsCtx, { equipmentKind: 'weapon' }, 'c1', 'e1', {
       kind: 'service',
-      source: 'homebrew',
+      catalogLayer: 'homebrew',
     })
 
     expect(ctx.equipmentKind).toBe('weapon')
     expect(ctx.mode).toBe('edit')
-    expect(ctx.entitySource).toBe('homebrew')
+    expect(ctx.entityCatalogLayer).toBe('homebrew')
   })
 
   it('falls back to entity kind when route context omits equipmentKind', () => {
@@ -41,11 +41,11 @@ describe('mergeEditLayoutCtx', () => {
       undefined,
       'c1',
       'srd-cc-5.2.1:elf',
-      { source: 'system', slug: 'elf', rulesetId: 'srd-cc-5.2.1' },
+      { catalogLayer: 'system', slug: 'elf', rulesetId: 'srd-cc-5.2.1' },
     )
 
     expect(ctx.entitySlug).toBe('elf')
-    expect(ctx.entitySource).toBe('system')
+    expect(ctx.entityCatalogLayer).toBe('system')
     expect(ctx.rulesetId).toBe('srd-cc-5.2.1')
   })
 })

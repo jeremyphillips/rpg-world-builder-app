@@ -22,6 +22,7 @@ import { ARMOR_CLASS_RULES_MATRIX } from '../../vocab/mechanics/armor-class-scal
 import {
   deriveMonsterDraftStatBlock as deriveMonsterDraftStatBlockRaw,
   deriveMonsterStatBlock as deriveMonsterStatBlockRaw,
+  resolveMonsterHitPoints,
 } from './stat-block'
 
 const EMPTY_MAGIC_PROVIDER: MagicPropertyDefinitionProvider = () => undefined
@@ -81,7 +82,7 @@ function weaponFromSeed(
     id: `${RULESET}:${slug}`,
     slug,
     rulesetId: RULESET,
-    source: 'system',
+    catalogLayer: 'system',
     campaignId: null,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
@@ -125,7 +126,7 @@ const equipmentCatalog = new Map(
       id: `${RULESET}:chain-shirt`,
       slug: 'chain-shirt',
       rulesetId: RULESET,
-      source: 'system',
+      catalogLayer: 'system',
       campaignId: null,
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
@@ -148,7 +149,7 @@ const skillCatalog = new Map([
       id: `${RULESET}:perception`,
       slug: 'perception',
       rulesetId: RULESET,
-      source: 'system',
+      catalogLayer: 'system',
       campaignId: null,
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
@@ -163,14 +164,14 @@ const kobold = monsterSchema.parse({
   id: `${RULESET}:kobold-warrior`,
   slug: 'kobold-warrior',
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Kobold Warrior',
   description: '<p>Kobold</p>',
-  size: 'small',
+  sizes: ['small'],
   creatureType: 'dragon',
   alignment: 'n',
   abilityScores: { str: 7, dex: 15, con: 9, int: 8, wis: 7, cha: 8 },
@@ -203,13 +204,13 @@ const skeleton = monsterSchema.parse({
   id: `${RULESET}:skeleton`,
   slug: 'skeleton',
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Skeleton',
-  size: 'medium',
+  sizes: ['medium'],
   creatureType: 'undead',
   alignment: 'le',
   abilityScores: { str: 10, dex: 16, con: 15, int: 6, wis: 8, cha: 5 },
@@ -480,7 +481,7 @@ describe('modifiedArmorFixture parity', () => {
       id: `${RULESET}:shield`,
       slug: 'shield',
       rulesetId: RULESET,
-      source: 'system',
+      catalogLayer: 'system',
       campaignId: null,
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
@@ -579,7 +580,7 @@ describe('deriveMonsterDraftStatBlock', () => {
     const block = deriveMonsterDraftStatBlock({
       monster: {
         ...kobold,
-        size: 'tiny',
+        sizes: ['tiny'],
         abilityScores: { ...kobold.abilityScores, con: 4 },
         hitPoints: { kind: 'hit-dice', count: 1 },
       },
@@ -643,7 +644,7 @@ describe('deriveMonsterDraftStatBlock', () => {
   it('throws when hit points are unavailable', () => {
     expect(() =>
       deriveMonsterStatBlock({
-        monster: { ...kobold, hitPoints: undefined, actions: [] } as Monster,
+        monster: { ...kobold, hitPoints: undefined, actions: [] } as unknown as Monster,
         equipmentCatalog,
         skillCatalog,
       }),
@@ -856,5 +857,76 @@ describe('equipment effect derivation (ship P0)', () => {
       skillCatalog,
     })
     expect(publishedArmor(block).ac).toBe(17)
+  })
+})
+
+describe('monster spellcasting lines', () => {
+  it('resolves save DC and attack bonus through a shared ability', () => {
+    const monster = monsterSchema.parse({
+      ...kobold,
+      actions: [
+        ...kobold.actions,
+        {
+          id: 'spellcasting',
+          kind: 'spell',
+          name: 'Spellcasting',
+          castingAbility: { kind: 'ability', ability: 'int' },
+          spells: [{ spellId: `${RULESET}:mage-hand` }],
+        },
+      ],
+      reactions: [
+        {
+          id: 'protective-magic',
+          kind: 'spell',
+          name: 'Protective Magic',
+          castingAbility: { kind: 'shared', entryId: 'spellcasting' },
+          spells: [{ spellId: `${RULESET}:shield` }],
+        },
+      ],
+    }) as Monster
+    const derived = deriveMonsterStatBlock({ monster, equipmentCatalog, skillCatalog })
+    expect(derived.spellcasting).toEqual([
+      { id: 'spellcasting', section: 'actions', saveDc: 9, attackBonus: 1 },
+      { id: 'protective-magic', section: 'reactions', saveDc: 9, attackBonus: 1 },
+    ])
+  })
+})
+
+describe('resolveMonsterHitPoints size', () => {
+  const scores = { str: 10, dex: 10, con: 14, int: 10, wis: 10, cha: 10 }
+
+  it('uses the largest permitted size regardless of array order', () => {
+    const forward = resolveMonsterHitPoints({
+      sizes: ['small', 'medium'],
+      abilityScores: scores,
+      hitPoints: { kind: 'hit-dice', count: 8 },
+    })
+    const reversed = resolveMonsterHitPoints({
+      sizes: ['medium', 'small'],
+      abilityScores: scores,
+      hitPoints: { kind: 'hit-dice', count: 8 },
+    })
+    expect(forward.status).toBe('resolved')
+    expect(reversed.status).toBe('resolved')
+    if (forward.status !== 'resolved' || reversed.status !== 'resolved') return
+    expect(forward.value.formula).toBe('8d8 +16')
+    expect(reversed.value.formula).toBe('8d8 +16')
+  })
+
+  it('keeps a single-size die and leaves an empty size list unavailable', () => {
+    const small = resolveMonsterHitPoints({
+      sizes: ['small'],
+      abilityScores: scores,
+      hitPoints: { kind: 'hit-dice', count: 3 },
+    })
+    expect(small.status).toBe('resolved')
+    if (small.status === 'resolved') expect(small.value.formula).toBe('3d6 +6')
+    expect(
+      resolveMonsterHitPoints({
+        sizes: [],
+        abilityScores: scores,
+        hitPoints: { kind: 'hit-dice', count: 3 },
+      }).status,
+    ).toBe('unavailable')
   })
 })

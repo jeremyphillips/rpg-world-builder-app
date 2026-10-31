@@ -1,4 +1,4 @@
-import type { CharacterClass, Equipment, Species, Spell } from '@rpg/contracts'
+import type { CharacterClass, Equipment, Monster, Species, Spell } from '@rpg/contracts'
 
 import { extractClassLanguageIds } from './reference-sources/classes'
 import { indexCharacterLanguageBlockersByLanguageId } from './reference-sources/characters-languages'
@@ -67,6 +67,15 @@ export const speciesSizeSource = deferredCatalogSource(async () => {
     readConfig: speciesWriteConfig.readConfig,
     contentTypeKey: 'species',
     extractIds: (record: Species) => extractSpeciesSizeIds(record),
+  }
+})
+
+export const monsterSizeSource = deferredCatalogSource(async () => {
+  const { monstersWriteConfig } = await import('../../content')
+  return {
+    readConfig: monstersWriteConfig.readConfig,
+    contentTypeKey: 'monsters',
+    extractIds: (record: Monster) => record.sizes,
   }
 })
 

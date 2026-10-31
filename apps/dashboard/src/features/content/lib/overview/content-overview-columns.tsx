@@ -120,7 +120,7 @@ export function patchOverviewColumns<T extends OverviewNameRow>(
               : {
                   id: row.original.id,
                   name: row.original.name,
-                  source: row.original.source,
+                  catalogLayer: row.original.catalogLayer,
                   kind: row.original.kind,
                 }
           }

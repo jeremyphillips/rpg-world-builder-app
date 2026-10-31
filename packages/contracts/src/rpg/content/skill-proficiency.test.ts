@@ -63,7 +63,7 @@ const athletics = {
   id: 'srd-cc-5.2.1:athletics',
   slug: 'athletics',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   ...timestamps,
@@ -76,7 +76,7 @@ describe('skillProficiencySchema', () => {
   })
 
   it('parses a homebrew skill proficiency with a campaignId', () => {
-    const homebrew = { ...athletics, source: 'homebrew', campaignId: 'camp_1' }
+    const homebrew = { ...athletics, catalogLayer: 'homebrew', campaignId: 'camp_1' }
     expect(skillProficiencySchema.parse(homebrew)).toEqual(homebrew)
   })
 

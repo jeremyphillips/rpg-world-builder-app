@@ -25,33 +25,38 @@ describe('spellGrantAvailabilitySchema', () => {
 })
 
 describe('spellGrantCastingSchema', () => {
-  it('parses a free-cast entitlement with frequency', () => {
-    expect(
-      spellGrantCastingSchema.parse({
-        mode: 'free_cast',
-        frequency: 'at_will',
-      }),
-    ).toEqual({
-      mode: 'free_cast',
-      frequency: 'at_will',
-    })
+  it('parses at-will casting without a limited use', () => {
+    expect(spellGrantCastingSchema.parse({ mode: 'free_cast' })).toEqual({ mode: 'free_cast' })
   })
 
   it('parses optional allowsSlotCasting', () => {
     expect(
       spellGrantCastingSchema.parse({
         mode: 'free_cast',
-        frequency: 'once_per_long_rest',
+        limitedUse: {
+          kind: 'uses',
+          count: { kind: 'fixed', value: 1 },
+          recovery: { minimumRest: 'long' },
+        } as const,
         allowsSlotCasting: true,
       }),
     ).toEqual({
       mode: 'free_cast',
-      frequency: 'once_per_long_rest',
+      limitedUse: {
+        kind: 'uses',
+        count: { kind: 'fixed', value: 1 },
+        recovery: { minimumRest: 'long' },
+      } as const,
       allowsSlotCasting: true,
     })
   })
 
-  it('rejects missing frequency', () => {
-    expect(spellGrantCastingSchema.safeParse({ mode: 'free_cast' }).success).toBe(false)
+  it('rejects recharge as a grant cadence', () => {
+    expect(
+      spellGrantCastingSchema.safeParse({
+        mode: 'free_cast',
+        limitedUse: { kind: 'recharge', minRoll: 5 },
+      }).success,
+    ).toBe(false)
   })
 })

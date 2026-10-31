@@ -7,7 +7,7 @@ export interface BuildEmbeddedMasterDetailListItemParams {
   field: { id: string }
   index: number
   row: { id?: string } | undefined
-  entitySource: ContentFormCtx['entitySource']
+  entityCatalogLayer: ContentFormCtx['entityCatalogLayer']
   seedRowIds?: ReadonlySet<string>
   getRowIssueCount: (index: number) => number
   title: string
@@ -21,7 +21,7 @@ export function buildEmbeddedMasterDetailListItem({
   field,
   index,
   row,
-  entitySource,
+  entityCatalogLayer,
   seedRowIds,
   getRowIssueCount,
   title,
@@ -31,7 +31,7 @@ export function buildEmbeddedMasterDetailListItem({
 }: BuildEmbeddedMasterDetailListItemParams): MasterDetailListItem {
   const rowMeta = resolveEmbeddedRowMeta({
     row,
-    entitySource,
+    entityCatalogLayer,
     seedRowIds,
     extraReasons,
   })

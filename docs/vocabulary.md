@@ -56,8 +56,11 @@ and API language stay neutral:
 
 - Vocabulary options created by a DM have `source: 'campaign'` (not
   `homebrew`).
-- Content records use `Homebrew*` Mongoose models and `source: 'homebrew'` for
-  **catalog entities** (classes, species, …).
+- Content records use `Homebrew*` Mongoose models and `catalogLayer: 'homebrew'` for
+  **catalog entities** (classes, species, …). `VOCABULARY_OPTION_SOURCES`
+  (`system` | `campaign`) stays a resolve-time label on vocabulary rows. It is
+  not stored on a content envelope and is not `catalogLayer`. See
+  [content provenance](../packages/contracts/docs/content-provenance.md).
 - Rules vocabulary changes are **ruleset customizations** stored on
   `CampaignRulesetPatch`, separate from content homebrew documents.
 

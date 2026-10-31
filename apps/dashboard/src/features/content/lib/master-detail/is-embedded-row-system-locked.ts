@@ -9,8 +9,8 @@ import { resolveEmbeddedRowSource } from './resolve-embedded-row-meta'
  */
 export function isEmbeddedRowSystemLocked(
   row: { id?: string } | undefined,
-  entitySource: ContentFormCtx['entitySource'],
+  entityCatalogLayer: ContentFormCtx['entityCatalogLayer'],
   seedRowIds?: ReadonlySet<string>,
 ): boolean {
-  return resolveEmbeddedRowSource(row, entitySource, seedRowIds) === 'system'
+  return resolveEmbeddedRowSource(row, entityCatalogLayer, seedRowIds) === 'system'
 }

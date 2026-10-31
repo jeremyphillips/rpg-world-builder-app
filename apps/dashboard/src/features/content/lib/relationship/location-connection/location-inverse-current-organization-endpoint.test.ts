@@ -30,7 +30,7 @@ describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
             id: 'org-1',
             organizationDomain: 'government',
             slug: 'city-council',
-            source: 'homebrew',
+            catalogLayer: 'homebrew',
             rulesetId: 'srd-cc-5.2.1',
           },
         ],

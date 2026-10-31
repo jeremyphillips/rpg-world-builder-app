@@ -20,18 +20,18 @@ type FeatureRow = { id?: string; name?: string; level?: number }
 
 function EditorStory({
   features = [] as FeatureRow[],
-  entitySource,
+  entityCatalogLayer,
   fields = itemFields,
 }: {
   features?: FeatureRow[]
-  entitySource?: 'system' | 'homebrew'
+  entityCatalogLayer?: 'system' | 'homebrew'
   fields?: FormItem[]
 }) {
   const form = useForm({ defaultValues: { features } })
   return (
     <FormProvider {...form}>
       <FormEmbeddedMasterDetailEditor
-        formCtx={{ entitySource }}
+        formCtx={{ entityCatalogLayer }}
         fieldName="features"
         itemFields={fields}
         itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
@@ -131,7 +131,7 @@ export const TallerDetailThanRail: Story = {
 export const SystemLocked: Story = {
   render: () => (
     <EditorStory
-      entitySource="system"
+      entityCatalogLayer="system"
       features={[
         { id: 'f1', name: 'Rage', level: 1 },
         { id: 'f2', name: 'Reckless Attack', level: 2 },

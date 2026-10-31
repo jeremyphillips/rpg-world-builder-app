@@ -2,7 +2,7 @@
   "id": "srd-cc-5.2.1:warlock",
   "slug": "warlock",
   "rulesetId": "srd-cc-5.2.1",
-  "source": "system",
+  "catalogLayer": "system",
   "campaignId": null,
   "createdAt": "2024-05-21T00:00:00.000Z",
   "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -208,6 +208,7 @@
         {
           "grants": [
             {
+              "id": "spellcasting",
               "kind": "spellcasting"
             }
           ]
@@ -291,6 +292,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -310,6 +312,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -329,13 +332,23 @@
         {
           "grants": [
             {
+              "id": "contact-other-plane-spells",
               "kind": "spells",
               "ability": "cha",
-              "spellIds": ["contact-other-plane"],
+              "spellIds": ["srd-cc-5.2.1:contact-other-plane"],
               "availability": "always_prepared",
               "casting": {
                 "mode": "free_cast",
-                "frequency": "once_per_long_rest"
+                "limitedUse": {
+                  "kind": "uses",
+                  "count": {
+                    "kind": "fixed",
+                    "value": 1
+                  },
+                  "recovery": {
+                    "minimumRest": "long"
+                  }
+                }
               }
             }
           ]
@@ -357,6 +370,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -376,6 +390,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -395,6 +410,7 @@
         {
           "grants": [
             {
+              "id": "epic-boon-feat",
               "kind": "featChoice",
               "category": "epic-boon",
               "choose": 1,

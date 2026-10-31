@@ -5,15 +5,17 @@ import { RICH_TEXT_TABLE_EMBED_ATTR } from '@rpg/ui'
 
 import { makeSpell } from '@/test/fixtures/factories/spell'
 
+import { spellFormSchema, type SpellFormValues } from './spell-form-fields'
 import {
   buildSpellCreateInput,
+  spellCastingTimeFromFormValues,
+  spellCastingTimeToFormValues,
   spellCreateDefaultValues,
   SPELL_SCALING_FORM_DEFAULTS,
   spellScalingProseFromForm,
   spellScalingTogglesFromStored,
   spellToFormValues,
 } from './spell-form-values'
-import type { SpellFormValues } from './spell-form-fields'
 
 function publishReadySpellFormValues(overrides: Partial<SpellFormValues> = {}): SpellFormValues {
   return {
@@ -34,6 +36,37 @@ function publishReadySpellFormValues(overrides: Partial<SpellFormValues> = {}): 
     ...overrides,
   } as SpellFormValues
 }
+
+describe('spell casting time form values', () => {
+  it('round-trips a reaction trigger as authored prose', () => {
+    const stored = spellCastingTimeFromFormValues({
+      normal: { value: 1, unit: 'reaction', trigger: 'when you are hit' },
+      canBeCastAsRitual: false,
+    })
+    expect(stored.normal.trigger).toEqual({ text: 'when you are hit' })
+    expect(spellCastingTimeToFormValues(stored).normal.trigger).toBe('when you are hit')
+  })
+
+  it('omits a trigger unless the casting time is a reaction', () => {
+    const stored = spellCastingTimeFromFormValues({
+      normal: { value: 1, unit: 'action', trigger: 'when you are hit' },
+      canBeCastAsRitual: false,
+    })
+    expect(stored.normal.trigger).toBeUndefined()
+  })
+
+  it('requires reaction trigger prose before publish', () => {
+    const result = spellFormSchema.safeParse(
+      publishReadySpellFormValues({
+        castingTime: {
+          normal: { value: 1, unit: 'reaction' },
+          canBeCastAsRitual: false,
+        },
+      }),
+    )
+    expect(result.success).toBe(false)
+  })
+})
 
 describe('SPELL_SCALING_FORM_DEFAULTS', () => {
   it('keeps scaling toggles off in create defaults', () => {

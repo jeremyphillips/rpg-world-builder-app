@@ -10,6 +10,9 @@ export * from './area-geometry'
 export * from './wealth'
 export * from './character-wealth-grant'
 export * from './prose'
+export * from './rest-recovery'
+export * from './limited-use'
+export * from './activation-trigger'
 export {
   INLINE_METADATA_SEPARATOR,
   formatInlineMetadataTail,
@@ -40,3 +43,4 @@ export * from './standard-array'
 export * from './xp-progression'
 export * from './xp-progression-messages'
 export * from './media'
+export * from './provenance'

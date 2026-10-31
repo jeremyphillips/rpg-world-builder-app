@@ -186,7 +186,7 @@ describe('resolveProficiencyStepModel', () => {
     id: 'srd-cc-5.2.1:insight',
     slug: 'insight',
     rulesetId: 'srd-cc-5.2.1',
-    source: 'system',
+    catalogLayer: 'system',
     status: 'published',
     campaignId: null,
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -200,7 +200,7 @@ describe('resolveProficiencyStepModel', () => {
     id: 'srd-cc-5.2.1:survival',
     slug: 'survival',
     rulesetId: 'srd-cc-5.2.1',
-    source: 'system',
+    catalogLayer: 'system',
     status: 'published',
     campaignId: null,
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -214,7 +214,7 @@ describe('resolveProficiencyStepModel', () => {
     id: 'srd-cc-5.2.1:human',
     slug: 'human',
     rulesetId: 'srd-cc-5.2.1',
-    source: 'system',
+    catalogLayer: 'system',
     status: 'published',
     campaignId: null,
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -234,6 +234,7 @@ describe('resolveProficiencyStepModel', () => {
           {
             grants: [
               {
+                id: 'skill-proficiency-1',
                 kind: 'skillProficiency',
                 grant: {
                   kind: 'choice',
@@ -252,7 +253,7 @@ describe('resolveProficiencyStepModel', () => {
     id: 'srd-cc-5.2.1:elf',
     slug: 'elf',
     rulesetId: 'srd-cc-5.2.1',
-    source: 'system',
+    catalogLayer: 'system',
     status: 'published',
     campaignId: null,
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -272,6 +273,7 @@ describe('resolveProficiencyStepModel', () => {
           {
             grants: [
               {
+                id: 'skill-proficiency-2',
                 kind: 'skillProficiency',
                 grant: {
                   kind: 'choice',

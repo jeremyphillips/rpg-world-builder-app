@@ -33,7 +33,7 @@ const dwarfWithTraits = makeSpecies({
       id: 'darkvision',
       grantGroups: [
         {
-          grants: [{ kind: 'sense', type: 'darkvision', range: 120 }],
+          grants: [{ id: 'sense-1', kind: 'sense', type: 'darkvision', range: 120 }],
         },
       ],
     },

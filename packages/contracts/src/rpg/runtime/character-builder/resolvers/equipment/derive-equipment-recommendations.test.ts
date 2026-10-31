@@ -26,7 +26,7 @@ const RULESET = 'srd-cc-5.2.1' as const
 
 const CONTENT_META = {
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -240,7 +240,7 @@ const storedWizard: ClassStored = {
       id: 'spellcasting',
       name: 'Spellcasting',
       level: 1,
-      grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+      grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' }] }],
     },
   ],
   characterCreation: {
@@ -700,7 +700,7 @@ describe('deriveEquipmentRecommendations', () => {
           id: 'spellcasting',
           name: 'Spellcasting',
           level: 1,
-          grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+          grantGroups: [{ grants: [{ id: 'spellcasting-2', kind: 'spellcasting' }] }],
         },
       ],
       spellcasting: {

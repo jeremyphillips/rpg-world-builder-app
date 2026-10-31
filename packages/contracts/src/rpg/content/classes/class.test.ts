@@ -61,7 +61,7 @@ const fighter = {
   id: 'srd-cc-5.2.1:fighter',
   slug: 'fighter',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   ...timestamps,
@@ -120,7 +120,7 @@ describe('classSchema', () => {
   })
 
   it('parses a homebrew class with a campaignId', () => {
-    const homebrew = { ...fighter, source: 'homebrew', campaignId: 'camp_1' }
+    const homebrew = { ...fighter, catalogLayer: 'homebrew', campaignId: 'camp_1' }
     expect(classSchema.parse(homebrew)).toEqual(homebrew)
   })
 
@@ -153,6 +153,7 @@ describe('classSchema', () => {
             {
               grants: [
                 {
+                  id: 'spells-1',
                   kind: 'spells',
                   ability: 'cha',
                   availability: 'always_prepared',
@@ -292,7 +293,7 @@ describe('subclassSchema', () => {
       id: 'srd-cc-5.2.1:champion',
       slug: 'champion',
       rulesetId: 'srd-cc-5.2.1',
-      source: 'system',
+      catalogLayer: 'system',
       status: 'published',
       campaignId: null,
       ...timestamps,
@@ -309,7 +310,7 @@ describe('subclassSchema', () => {
       id: 'srd-cc-5.2.1:college-of-lore',
       slug: 'college-of-lore',
       rulesetId: 'srd-cc-5.2.1',
-      source: 'system',
+      catalogLayer: 'system',
       status: 'published',
       campaignId: null,
       ...timestamps,
@@ -335,7 +336,7 @@ describe('subclassSchema', () => {
         id: 'srd-cc-5.2.1:champion',
         slug: 'champion',
         rulesetId: 'srd-cc-5.2.1',
-        source: 'system',
+        catalogLayer: 'system',
         status: 'published',
         campaignId: null,
         ...timestamps,
@@ -352,7 +353,7 @@ describe('resolvedSubclassSchema', () => {
         id: 'srd-cc-5.2.1:champion',
         slug: 'champion',
         rulesetId: 'srd-cc-5.2.1',
-        source: 'system',
+        catalogLayer: 'system',
         status: 'published',
         campaignId: null,
         ...timestamps,
@@ -478,7 +479,7 @@ describe('classStoredSchema', () => {
         id: 'srd-cc-5.2.1:fighter',
         slug: 'fighter',
         rulesetId: 'srd-cc-5.2.1',
-        source: 'system',
+        catalogLayer: 'system',
         status: 'published',
         campaignId: null,
         ...timestamps,
@@ -490,8 +491,9 @@ describe('classStoredSchema', () => {
 
 describe('classFeatureSchema — grantGroups superRefine', () => {
   const baseFeature = { kind: 'custom' as const, id: 'smite', name: 'Divine Smite', level: 3 }
-  const senseGrant = { kind: 'sense' as const, type: 'darkvision', range: 60 }
+  const senseGrant = { id: 'sense-2', kind: 'sense' as const, type: 'darkvision', range: 60 }
   const spellGrant = {
+    id: 'spells-3',
     kind: 'spells' as const,
     ability: 'wis' as const,
     availability: 'always_prepared' as const,

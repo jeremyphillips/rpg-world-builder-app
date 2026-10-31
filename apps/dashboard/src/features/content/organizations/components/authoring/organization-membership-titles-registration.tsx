@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useController, useFormContext, useWatch } from 'react-hook-form'
+import { useController, useFormContext } from 'react-hook-form'
 
 import { membersTitlesFieldPath } from '../../lib/membership-titles/organization-membership-titles-form.lib'
 
@@ -15,11 +15,18 @@ function OrganizationMembershipTitleDomainIdRegistration({
   return null
 }
 
-/** Keeps `members.titles` and each row `id` registered under React Hook Form `shouldUnregister`. */
+/**
+ * Keeps `members.titles` and each row `id` registered under React Hook Form
+ * `shouldUnregister`.
+ *
+ * Row count comes from `watch`, not `useWatch`. `useWatch` lags a frame after
+ * `useFieldArray` `remove`, and the leftover id controller writes the removed
+ * row back.
+ */
 export function OrganizationMembershipTitlesRegistration({ prefix }: { prefix?: string }) {
   const form = useFormContext()
   const path = membersTitlesFieldPath(prefix)
-  const titles = useWatch({ name: path }) as unknown[] | undefined
+  const titles = form.watch(path) as unknown[] | undefined
   const rowCount = Array.isArray(titles) ? titles.length : 0
 
   useEffect(() => {

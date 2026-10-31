@@ -17,8 +17,9 @@ import {
   movementGrantSetSchema,
 } from '../../../vocab/movement-mode'
 import { getSenseSentenceForm, senseSchema } from '../../../vocab/sense'
-import { getUsageFrequencySentenceForm } from '../../../vocab/usage-frequency'
+import { formatLimitedUseSentence } from '../../../primitives/limited-use'
 import { featCategorySchema, getFeatCategorySentenceForm } from '../../../vocab/feat'
+import { spellReferenceSchema } from '../../spell/spell-reference'
 import { spellGrantAvailabilitySchema } from '../../../vocab/spell/grant-availability'
 import { spellGrantCastingSchema } from '../../../vocab/spell/grant-casting'
 import { getSpellGrantAvailabilityEntry } from '../../../vocab/spell/grant-availability'
@@ -31,6 +32,7 @@ import {
   languageIdSchema,
 } from '../../../vocab/language'
 import { equipmentGrantSchema } from './equipment-grant'
+import { grantRowIdSchema } from './grant-row-id'
 import { grantValidationMessages } from './grant-messages'
 import {
   armorTrainingGrantSchema,
@@ -167,53 +169,63 @@ export function formatResistanceGrantCompact(damageTypes: readonly string[]): st
 // ---------------------------------------------------------------------------
 
 /** A single special sense granted by a trait or feature. */
-const senseContentGrantSchema = senseSchema.extend({ kind: z.literal('sense') })
+const senseContentGrantSchema = senseSchema.extend({
+  id: grantRowIdSchema,
+  kind: z.literal('sense'),
+})
 
 /** Damage resistance grant. */
 const resistancesContentGrantSchema = z.object({
+  id: grantRowIdSchema,
   kind: z.literal('resistances'),
   damageTypes: z.array(damageTypeIdSchema).min(1),
 })
 
 /** Chosen damage type(s) — e.g. a Dragonborn's breath or a Goliath's ancestry. */
 const damageTypeContentGrantSchema = z.object({
+  id: grantRowIdSchema,
   kind: z.literal('damageType'),
   damageTypes: z.array(damageTypeIdSchema).min(1),
 })
 
 /** Movement grant — set, increase, or match speed for a movement mode. */
 const movementContentGrantSchema = z.discriminatedUnion('operation', [
-  movementGrantSetSchema.extend({ kind: z.literal('movement') }),
-  movementGrantIncreaseSchema.extend({ kind: z.literal('movement') }),
-  movementGrantMatchSchema.extend({ kind: z.literal('movement') }),
+  movementGrantSetSchema.extend({ id: grantRowIdSchema, kind: z.literal('movement') }),
+  movementGrantIncreaseSchema.extend({ id: grantRowIdSchema, kind: z.literal('movement') }),
+  movementGrantMatchSchema.extend({ id: grantRowIdSchema, kind: z.literal('movement') }),
 ])
 
 /** Weapon proficiency grant — fixed weapons/categories or a pool choice. */
 const weaponProficiencyContentGrantSchema = z.object({
+  id: grantRowIdSchema,
   kind: z.literal('weaponProficiency'),
   grant: weaponProficiencyGrantSchema,
 })
 
 /** Tool proficiency grant — fixed tools/categories or a pool choice. */
 const toolProficiencyContentGrantSchema = z.object({
+  id: grantRowIdSchema,
   kind: z.literal('toolProficiency'),
   grant: toolProficiencyGrantSchema,
 })
 
 /** Skill proficiency grant — fixed skills or a pool choice. */
 const skillProficiencyContentGrantSchema = z.object({
+  id: grantRowIdSchema,
   kind: z.literal('skillProficiency'),
   grant: skillProficiencyGrantSchema,
 })
 
 /** Armor training grant — fixed armor/categories or a pool choice. */
 const armorTrainingContentGrantSchema = z.object({
+  id: grantRowIdSchema,
   kind: z.literal('armorTraining'),
   grant: armorTrainingGrantSchema,
 })
 
 /** Fixed language grant. */
 const languagesContentGrantSchema = z.object({
+  id: grantRowIdSchema,
   kind: z.literal('languages'),
   languageIds: z.array(languageIdSchema).min(1),
 })
@@ -221,6 +233,7 @@ const languagesContentGrantSchema = z.object({
 /** Language choice from a constrained pool. */
 const languageChoiceContentGrantSchema = z
   .object({
+    id: grantRowIdSchema,
     kind: z.literal('languageChoice'),
     choose: z.number().int().min(1).default(1),
     from: z.array(languageIdSchema).min(1).optional(),
@@ -235,6 +248,7 @@ const languageChoiceContentGrantSchema = z
 /** Feat pick from a filtered pool. */
 const featChoiceContentGrantSchema = z
   .object({
+    id: grantRowIdSchema,
     kind: z.literal('featChoice'),
     category: featCategorySchema,
     choose: z.number().int().min(1).default(1),
@@ -252,12 +266,14 @@ const featChoiceContentGrantSchema = z
 
 /** Single equipment grant (a granted item or a pool choice). */
 const equipmentContentGrantSchema = z.object({
+  id: grantRowIdSchema,
   kind: z.literal('equipment'),
   grant: equipmentGrantSchema,
 })
 
 /** Class spellcasting activation — payload-less; authored only on the managed Spellcasting feature. */
 const spellcastingContentGrantSchema = z.object({
+  id: grantRowIdSchema,
   kind: z.literal('spellcasting'),
 })
 
@@ -265,13 +281,14 @@ const spellcastingContentGrantSchema = z.object({
  * Spells granted by a trait or feature at a given unlock level.
  *
  * - `availability` — always on the prepared list; cast with normal slots.
- * - `casting` — slotless casting via `frequency` (species lineage pattern).
+ * - `casting` — slotless casting. `limitedUse` is the rest-based cadence; omit it for at will.
  */
 const spellsContentGrantSchema = z
   .object({
+    id: grantRowIdSchema,
     kind: z.literal('spells'),
     ability: abilitySchema,
-    spellIds: z.array(z.string().min(1)).min(1),
+    spellIds: z.array(spellReferenceSchema).min(1),
     availability: spellGrantAvailabilitySchema.optional(),
     casting: spellGrantCastingSchema.optional(),
   })
@@ -304,9 +321,7 @@ export function formatSpellsGrantSentence(
   const names = grant.spellIds.map((id) => resolveSpellName?.(id) ?? id)
   const spellList = joinNaturalList(names)
   const hasAvailability = grant.availability === 'always_prepared'
-  const cadence = grant.casting?.frequency
-    ? getUsageFrequencySentenceForm(grant.casting.frequency)
-    : undefined
+  const cadence = grant.casting ? formatLimitedUseSentence(grant.casting.limitedUse) : undefined
 
   if (hasAvailability && cadence) {
     const availabilityLabel =
@@ -394,6 +409,17 @@ export type GrantGroup = z.infer<typeof grantGroupSchema>
  * Use {@link normalizeGrantGroups} to produce a canonical array before storing.
  */
 export const grantGroupsSchema = z.array(grantGroupSchema).superRefine((groups, ctx) => {
+  const seenGrantRowIds = new Set<string>()
+  for (const group of groups) {
+    for (const grant of group.grants) {
+      if (seenGrantRowIds.has(grant.id)) {
+        addCustomRefinementIssue(ctx, grantValidationMessages.grantRowIdsUnique())
+        return
+      }
+      seenGrantRowIds.add(grant.id)
+    }
+  }
+
   const defaultIndexes = groups.reduce<number[]>((acc, g, i) => {
     if (g.unlock === undefined) acc.push(i)
     return acc

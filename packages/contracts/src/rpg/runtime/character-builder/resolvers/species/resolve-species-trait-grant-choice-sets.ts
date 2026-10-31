@@ -38,7 +38,7 @@ function traitGrantChoiceSets(
     },
     {
       parentLevel: 1,
-      grantSlot: (grant) => `trait:${traitKey}:${grant.kind}`,
+      grantSlot: (grant) => `trait:${traitKey}:grant:${grant.id}`,
     },
   )
 }

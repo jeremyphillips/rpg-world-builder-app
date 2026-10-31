@@ -4,7 +4,7 @@ import { resolveMonsterFormSchema } from './monster-form-schema'
 
 const minimalMonsterBody = {
   name: 'Test',
-  size: 'medium',
+  sizes: ['medium'],
   creatureType: 'humanoid',
   alignment: 'n',
   abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
@@ -29,6 +29,16 @@ const minimalMonsterBody = {
 }
 
 describe('resolveMonsterFormSchema senses', () => {
+  it('accepts an empty size list on a draft without inventing a size', () => {
+    const result = resolveMonsterFormSchema({}, 'draft').safeParse({
+      ...minimalMonsterBody,
+      sizes: [],
+    })
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    expect(result.data.sizes).toEqual([])
+  })
+
   it('accepts senses without range for draft intent', () => {
     const result = resolveMonsterFormSchema({}, 'draft').safeParse(minimalMonsterBody)
     expect(result.success).toBe(true)

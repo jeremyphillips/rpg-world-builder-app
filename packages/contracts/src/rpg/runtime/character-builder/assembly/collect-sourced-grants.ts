@@ -38,7 +38,10 @@ function traitSourcedGrants(
 
   const grants = getUnlockedGrantsAtLevel(groups, characterLevel, parentLevel)
 
-  return grants.map((grant) => ({ grant, sources }))
+  return grants.map((grant) => ({
+    grant,
+    sources: sources.map((source) => ({ ...source, grantRowId: grant.id })),
+  }))
 }
 
 type SpeciesWithAccess = Species & {

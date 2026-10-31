@@ -13,7 +13,7 @@ import {
 const grantDarkvision: GrantContentTrait = {
   kind: 'grant',
   id: 'darkvision',
-  grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+  grantGroups: [{ grants: [{ id: 'sense-1', kind: 'sense', type: 'darkvision', range: 60 }] }],
 }
 
 describe('heritage option form contract', () => {

@@ -20,7 +20,7 @@ function makeSpell(slug: string, level: number): Spell {
     school: 'evocation',
     description: '<p>Test</p>',
     rulesetId: RULESET,
-    source: 'system',
+    catalogLayer: 'system',
     status: 'published',
     campaignId: null,
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -74,7 +74,9 @@ describe('resolveRecommendedSpellIdsForChoiceSet', () => {
         model: 'limitedRepertoire',
         change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
       },
-      recommendations: [{ target: 'cantrips', classLevel: 1, spellIds: ['dancing-lights'] }],
+      recommendations: [
+        { target: 'cantrips', classLevel: 1, spellIds: [`${RULESET}:dancing-lights`] },
+      ],
     }
 
     const result = resolveForChoiceSet({
@@ -99,7 +101,7 @@ describe('resolveRecommendedSpellIdsForChoiceSet', () => {
           target: 'level1Plus',
           classLevel: 1,
           spellLevel: 1,
-          spellIds: ['bless'],
+          spellIds: [`${RULESET}:bless`],
         },
       ],
     }
@@ -136,7 +138,7 @@ describe('resolveRecommendedSpellIdsForChoiceSet', () => {
           target: 'level1Plus',
           classLevel: 1,
           spellLevel: 1,
-          spellIds: ['magic-missile'],
+          spellIds: [`${RULESET}:magic-missile`],
         },
       ],
     }
@@ -167,7 +169,7 @@ describe('resolveRecommendedSpellIdsForChoiceSet', () => {
           target: 'level1Plus',
           classLevel: 3,
           spellLevel: 2,
-          spellIds: ['invisibility'],
+          spellIds: [`${RULESET}:invisibility`],
         },
       ],
     }
@@ -204,7 +206,9 @@ describe('resolveRecommendedSpellIdsForChoiceSet', () => {
         model: 'limitedRepertoire',
         change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
       },
-      recommendations: [{ target: 'cantrips', classLevel: 1, spellIds: ['dancing-lights'] }],
+      recommendations: [
+        { target: 'cantrips', classLevel: 1, spellIds: [`${RULESET}:dancing-lights`] },
+      ],
     }
 
     const result = resolveForChoiceSet({

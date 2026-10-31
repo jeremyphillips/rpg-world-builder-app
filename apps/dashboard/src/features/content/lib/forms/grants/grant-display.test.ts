@@ -25,6 +25,7 @@ const GRANT_SUMMARY_JOIN = ' · ' as const
 const vocabulary = buildCatalogDrowGrantDisplayVocabulary()
 
 const movementGrant = {
+  id: 'movement-1',
   kind: 'movement',
   mode: 'walk',
   operation: 'increase',
@@ -32,11 +33,13 @@ const movementGrant = {
 } as const satisfies GrantGroup['grants'][number]
 
 const acidResistanceGrant = {
+  id: 'resistances-2',
   kind: 'resistances',
   damageTypes: ['acid'],
 } as const satisfies GrantGroup['grants'][number]
 
 const hiddenFeatChoiceGrant = {
+  id: 'feat-choice-3',
   kind: 'featChoice',
   category: 'general',
   choose: 1,
@@ -54,18 +57,22 @@ const equipmentVocabulary = {
 
 const starterProficiencyGrants = [
   {
+    id: 'skill-proficiency-4',
     kind: 'skillProficiency',
     grant: { kind: 'fixed', skillIds: ['athletics'] },
   },
   {
+    id: 'tool-proficiency-5',
     kind: 'toolProficiency',
     grant: { kind: 'fixed', toolSlugs: ['thieves-tools'] },
   },
   {
+    id: 'weapon-proficiency-6',
     kind: 'weaponProficiency',
     grant: { kind: 'fixed', weaponCategories: ['simple'] },
   },
   {
+    id: 'armor-training-7',
     kind: 'armorTraining',
     grant: { kind: 'fixed', armorCategories: ['light'] },
   },
@@ -169,7 +176,7 @@ describe('buildGrantSummaryModel', () => {
 
   it('renders language grants with compact labels', () => {
     const single = buildGrantSummaryModel(
-      [{ grants: [{ kind: 'languages', languageIds: ['druidic'] }] }],
+      [{ grants: [{ id: 'languages-10', kind: 'languages', languageIds: ['druidic'] }] }],
       vocabulary,
     )
     expect(single.flatItems[0]).toMatchObject({
@@ -180,7 +187,7 @@ describe('buildGrantSummaryModel', () => {
     })
 
     const many = buildGrantSummaryModel(
-      [{ grants: [{ kind: 'languages', languageIds: ['common', 'elvish'] }] }],
+      [{ grants: [{ id: 'languages-11', kind: 'languages', languageIds: ['common', 'elvish'] }] }],
       vocabulary,
     )
     expect(many.flatItems[0]).toMatchObject({
@@ -244,6 +251,7 @@ describe('buildGrantSummaryModel', () => {
         {
           grants: [
             {
+              id: 'skill-proficiency-12',
               kind: 'skillProficiency',
               grant: { kind: 'choice', choose: 2, pool: { source: 'any' } },
             },
@@ -266,22 +274,27 @@ describe('buildGrantSummaryModel', () => {
         {
           grants: [
             {
+              id: 'equipment-13',
               kind: 'equipment',
               grant: { kind: 'grant', equipmentSlug: 'antitoxin', quantity: 1 },
             },
             {
+              id: 'equipment-14',
               kind: 'equipment',
               grant: { kind: 'grant', equipmentSlug: 'camel', quantity: 1 },
             },
             {
+              id: 'equipment-15',
               kind: 'equipment',
               grant: { kind: 'grant', equipmentSlug: 'wagon', quantity: 1 },
             },
             {
+              id: 'equipment-16',
               kind: 'equipment',
               grant: { kind: 'grant', equipmentSlug: 'potion-of-healing', quantity: 1 },
             },
             {
+              id: 'equipment-17',
               kind: 'equipment',
               grant: { kind: 'grant', equipmentSlug: 'messenger', quantity: 1 },
             },
@@ -354,7 +367,10 @@ describe('formatGrantSummaryInline', () => {
     const model = buildGrantSummaryModel(
       [
         {
-          grants: [{ kind: 'sense', type: 'darkvision', range: 120 }, hiddenFeatChoiceGrant],
+          grants: [
+            { id: 'sense-18', kind: 'sense', type: 'darkvision', range: 120 },
+            hiddenFeatChoiceGrant,
+          ],
         },
       ],
       vocabulary,
@@ -379,7 +395,7 @@ describe('formatGrantSummaryByLevel', () => {
     const model = buildGrantSummaryModel(
       [
         {
-          grants: [{ kind: 'languages', languageIds: ['elvish'] }],
+          grants: [{ id: 'languages-19', kind: 'languages', languageIds: ['elvish'] }],
         },
       ],
       vocabulary,
@@ -401,10 +417,10 @@ describe('formatGrantSummaryByLevel', () => {
       [
         {
           grants: [
-            { kind: 'sense', type: 'darkvision', range: 120 },
+            { id: 'sense-20', kind: 'sense', type: 'darkvision', range: 120 },
             movementGrant,
             acidResistanceGrant,
-            { kind: 'languages', languageIds: ['elvish'] },
+            { id: 'languages-21', kind: 'languages', languageIds: ['elvish'] },
             hiddenFeatChoiceGrant,
           ],
         },
@@ -435,7 +451,7 @@ describe('formatGrantSummaryByLevel', () => {
       [
         {
           grants: [
-            { kind: 'sense', type: 'darkvision', range: 120 },
+            { id: 'sense-22', kind: 'sense', type: 'darkvision', range: 120 },
             movementGrant,
             { kind: 'futureGrant' } as never,
           ],
@@ -456,7 +472,10 @@ describe('formatGrantSummaryByLevel', () => {
     const model = buildGrantSummaryModel(
       [
         {
-          grants: [{ kind: 'sense', type: 'darkvision', range: 120 }, hiddenFeatChoiceGrant],
+          grants: [
+            { id: 'sense-23', kind: 'sense', type: 'darkvision', range: 120 },
+            hiddenFeatChoiceGrant,
+          ],
         },
       ],
       vocabulary,
@@ -472,7 +491,7 @@ describe('formatGrantSummaryByLevel', () => {
 })
 
 describe('buildSpellGrantVocabulary', () => {
-  it('resolves spell display metadata by slug', () => {
+  it('resolves spell display metadata by canonical id', () => {
     const resolveSpell = buildSpellGrantVocabulary([
       makeSpell({
         id: 'ruleset:dancing-lights',
@@ -482,7 +501,7 @@ describe('buildSpellGrantVocabulary', () => {
       }),
     ])
 
-    expect(resolveSpell('dancing-lights')).toEqual({ name: 'Dancing Lights', level: 0 })
+    expect(resolveSpell('ruleset:dancing-lights')).toEqual({ name: 'Dancing Lights', level: 0 })
     expect(resolveSpell('missing')).toBeUndefined()
   })
 })

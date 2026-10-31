@@ -25,12 +25,12 @@ describe('ClassSpellcastingRecommendationsField', () => {
         defaultValues: {
           spellcasting: {
             recommendations: [
-              { target: 'cantrips', classLevel: 1, spellIds: ['dancing-lights'] },
+              { target: 'cantrips', classLevel: 1, spellIds: [spellCatalog[0]!.id] },
               {
                 target: 'level1Plus',
                 classLevel: 1,
                 spellLevel: 1,
-                spellIds: ['charm-person'],
+                spellIds: [spellCatalog[2]!.id],
               },
             ],
           },

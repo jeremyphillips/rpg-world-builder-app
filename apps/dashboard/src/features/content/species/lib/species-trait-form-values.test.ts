@@ -32,7 +32,9 @@ describe('trait form row hydration', () => {
       traitToFormRow({
         kind: 'grant',
         id: 'darkvision',
-        grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+        grantGroups: [
+          { grants: [{ id: 'sense-1', kind: 'sense', type: 'darkvision', range: 60 }] },
+        ],
       }).kind,
     ).toBe('grant')
   })
@@ -41,7 +43,7 @@ describe('trait form row hydration', () => {
     const row = traitToFormRow({
       kind: 'grant',
       id: 'darkvision',
-      grantGroups: [{ grants: [{ kind: 'sense', type: 'darkvision', range: 60 }] }],
+      grantGroups: [{ grants: [{ id: 'sense-2', kind: 'sense', type: 'darkvision', range: 60 }] }],
     })
     const senseRow = row.grants.find((grant) => grant.grantType === 'senses')
     expect(senseRow).toBeDefined()

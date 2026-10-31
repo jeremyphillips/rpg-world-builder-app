@@ -77,7 +77,7 @@ function OrganizationCreateModalForm({
     ...optionsCtx,
     campaignId,
     mode: 'create' as const,
-    entitySource: 'homebrew' as const,
+    entityCatalogLayer: 'homebrew' as const,
     organizationPracticeRecommendationIds: practiceRecommendations,
     organizationFormPresentation: 'quick' as const,
   }

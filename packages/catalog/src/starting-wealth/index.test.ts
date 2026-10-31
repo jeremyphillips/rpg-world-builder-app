@@ -22,7 +22,7 @@ describe('SRD 5.2.1 starting wealth seed', () => {
   it('uses deterministic system ids and null campaignId', () => {
     for (const table of tables) {
       expect(table.id).toBe(`${RULESET}:${table.slug}`)
-      expect(table.source).toBe('system')
+      expect(table.catalogLayer).toBe('system')
       expect(table.campaignId).toBeNull()
       expect(table.rulesetId).toBe(RULESET)
     }

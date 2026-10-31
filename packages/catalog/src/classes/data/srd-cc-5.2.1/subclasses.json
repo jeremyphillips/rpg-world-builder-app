@@ -3,7 +3,7 @@
     "id": "srd-cc-5.2.1:path-of-the-berserker",
     "slug": "path-of-the-berserker",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -42,7 +42,7 @@
     "id": "srd-cc-5.2.1:college-of-lore",
     "slug": "college-of-lore",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -81,7 +81,7 @@
     "id": "srd-cc-5.2.1:life-domain",
     "slug": "life-domain",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -105,9 +105,15 @@
           {
             "grants": [
               {
+                "id": "aid-spells",
                 "kind": "spells",
                 "ability": "wis",
-                "spellIds": ["aid", "bless", "cure-wounds", "lesser-restoration"],
+                "spellIds": [
+                  "srd-cc-5.2.1:aid",
+                  "srd-cc-5.2.1:bless",
+                  "srd-cc-5.2.1:cure-wounds",
+                  "srd-cc-5.2.1:lesser-restoration"
+                ],
                 "availability": "always_prepared"
               }
             ]
@@ -118,9 +124,10 @@
             },
             "grants": [
               {
+                "id": "mass-healing-word-spells",
                 "kind": "spells",
                 "ability": "wis",
-                "spellIds": ["mass-healing-word", "revivify"],
+                "spellIds": ["srd-cc-5.2.1:mass-healing-word", "srd-cc-5.2.1:revivify"],
                 "availability": "always_prepared"
               }
             ]
@@ -131,9 +138,10 @@
             },
             "grants": [
               {
+                "id": "aura-of-life-spells",
                 "kind": "spells",
                 "ability": "wis",
-                "spellIds": ["aura-of-life", "death-ward"],
+                "spellIds": ["srd-cc-5.2.1:aura-of-life", "srd-cc-5.2.1:death-ward"],
                 "availability": "always_prepared"
               }
             ]
@@ -144,9 +152,10 @@
             },
             "grants": [
               {
+                "id": "greater-restoration-spells",
                 "kind": "spells",
                 "ability": "wis",
-                "spellIds": ["greater-restoration", "mass-cure-wounds"],
+                "spellIds": ["srd-cc-5.2.1:greater-restoration", "srd-cc-5.2.1:mass-cure-wounds"],
                 "availability": "always_prepared"
               }
             ]
@@ -177,7 +186,7 @@
     "id": "srd-cc-5.2.1:circle-of-the-land",
     "slug": "circle-of-the-land",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -222,7 +231,7 @@
     "id": "srd-cc-5.2.1:champion",
     "slug": "champion",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -252,6 +261,7 @@
           {
             "grants": [
               {
+                "id": "fighting-style-feat",
                 "kind": "featChoice",
                 "category": "fighting-style",
                 "choose": 1
@@ -284,7 +294,7 @@
     "id": "srd-cc-5.2.1:warrior-of-the-open-hand",
     "slug": "warrior-of-the-open-hand",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -323,7 +333,7 @@
     "id": "srd-cc-5.2.1:oath-of-devotion",
     "slug": "oath-of-devotion",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -341,9 +351,13 @@
           {
             "grants": [
               {
+                "id": "protection-from-evil-and-good-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["protection-from-evil-and-good", "shield-of-faith"],
+                "spellIds": [
+                  "srd-cc-5.2.1:protection-from-evil-and-good",
+                  "srd-cc-5.2.1:shield-of-faith"
+                ],
                 "availability": "always_prepared"
               }
             ]
@@ -354,9 +368,10 @@
             },
             "grants": [
               {
+                "id": "aid-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["aid", "zone-of-truth"],
+                "spellIds": ["srd-cc-5.2.1:aid", "srd-cc-5.2.1:zone-of-truth"],
                 "availability": "always_prepared"
               }
             ]
@@ -367,9 +382,10 @@
             },
             "grants": [
               {
+                "id": "beacon-of-hope-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["beacon-of-hope", "dispel-magic"],
+                "spellIds": ["srd-cc-5.2.1:beacon-of-hope", "srd-cc-5.2.1:dispel-magic"],
                 "availability": "always_prepared"
               }
             ]
@@ -380,9 +396,10 @@
             },
             "grants": [
               {
+                "id": "freedom-of-movement-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["freedom-of-movement", "guardian-of-faith"],
+                "spellIds": ["srd-cc-5.2.1:freedom-of-movement", "srd-cc-5.2.1:guardian-of-faith"],
                 "availability": "always_prepared"
               }
             ]
@@ -393,9 +410,10 @@
             },
             "grants": [
               {
+                "id": "commune-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["commune", "flame-strike"],
+                "spellIds": ["srd-cc-5.2.1:commune", "srd-cc-5.2.1:flame-strike"],
                 "availability": "always_prepared"
               }
             ]
@@ -432,7 +450,7 @@
     "id": "srd-cc-5.2.1:hunter",
     "slug": "hunter",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -477,7 +495,7 @@
     "id": "srd-cc-5.2.1:thief",
     "slug": "thief",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -522,7 +540,7 @@
     "id": "srd-cc-5.2.1:draconic-sorcery",
     "slug": "draconic-sorcery",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -546,9 +564,15 @@
           {
             "grants": [
               {
+                "id": "alter-self-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["alter-self", "chromatic-orb", "command", "dragons-breath"],
+                "spellIds": [
+                  "srd-cc-5.2.1:alter-self",
+                  "srd-cc-5.2.1:chromatic-orb",
+                  "srd-cc-5.2.1:command",
+                  "srd-cc-5.2.1:dragons-breath"
+                ],
                 "availability": "always_prepared"
               }
             ]
@@ -559,9 +583,10 @@
             },
             "grants": [
               {
+                "id": "fear-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["fear", "fly"],
+                "spellIds": ["srd-cc-5.2.1:fear", "srd-cc-5.2.1:fly"],
                 "availability": "always_prepared"
               }
             ]
@@ -572,9 +597,10 @@
             },
             "grants": [
               {
+                "id": "arcane-eye-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["arcane-eye", "charm-monster"],
+                "spellIds": ["srd-cc-5.2.1:arcane-eye", "srd-cc-5.2.1:charm-monster"],
                 "availability": "always_prepared"
               }
             ]
@@ -585,9 +611,10 @@
             },
             "grants": [
               {
+                "id": "legend-lore-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["legend-lore", "summon-dragon"],
+                "spellIds": ["srd-cc-5.2.1:legend-lore", "srd-cc-5.2.1:summon-dragon"],
                 "availability": "always_prepared"
               }
             ]
@@ -615,12 +642,22 @@
           {
             "grants": [
               {
+                "id": "summon-dragon-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["summon-dragon"],
+                "spellIds": ["srd-cc-5.2.1:summon-dragon"],
                 "casting": {
                   "mode": "free_cast",
-                  "frequency": "once_per_long_rest"
+                  "limitedUse": {
+                    "kind": "uses",
+                    "count": {
+                      "kind": "fixed",
+                      "value": 1
+                    },
+                    "recovery": {
+                      "minimumRest": "long"
+                    }
+                  }
                 }
               }
             ]
@@ -633,7 +670,7 @@
     "id": "srd-cc-5.2.1:fiend-patron",
     "slug": "fiend-patron",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -657,9 +694,15 @@
           {
             "grants": [
               {
+                "id": "burning-hands-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["burning-hands", "command", "scorching-ray", "suggestion"],
+                "spellIds": [
+                  "srd-cc-5.2.1:burning-hands",
+                  "srd-cc-5.2.1:command",
+                  "srd-cc-5.2.1:scorching-ray",
+                  "srd-cc-5.2.1:suggestion"
+                ],
                 "availability": "always_prepared"
               }
             ]
@@ -670,9 +713,10 @@
             },
             "grants": [
               {
+                "id": "fireball-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["fireball", "stinking-cloud"],
+                "spellIds": ["srd-cc-5.2.1:fireball", "srd-cc-5.2.1:stinking-cloud"],
                 "availability": "always_prepared"
               }
             ]
@@ -683,9 +727,10 @@
             },
             "grants": [
               {
+                "id": "fire-shield-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["fire-shield", "wall-of-fire"],
+                "spellIds": ["srd-cc-5.2.1:fire-shield", "srd-cc-5.2.1:wall-of-fire"],
                 "availability": "always_prepared"
               }
             ]
@@ -696,9 +741,10 @@
             },
             "grants": [
               {
+                "id": "geas-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["geas", "insect-plague"],
+                "spellIds": ["srd-cc-5.2.1:geas", "srd-cc-5.2.1:insect-plague"],
                 "availability": "always_prepared"
               }
             ]
@@ -729,7 +775,7 @@
     "id": "srd-cc-5.2.1:school-of-evocation",
     "slug": "school-of-evocation",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",

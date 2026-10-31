@@ -10,8 +10,14 @@ import type {
   MovementSpeedFeet,
   SenseId,
 } from '@rpg/contracts'
-import { flattenGrantGroups, normalizeGrantGroups } from '@rpg/contracts'
+import {
+  createGrantRowId,
+  flattenGrantGroups,
+  grantRowIdSchema,
+  normalizeGrantGroups,
+} from '@rpg/contracts'
 
+import { formFieldsFromLimitedUse, limitedUseFromForm } from '../limited-use/limited-use-form.lib'
 import {
   type GrantRowForm,
   type GrantRowType,
@@ -43,8 +49,14 @@ import {
 // Empty row factory
 // ---------------------------------------------------------------------------
 
+function grantIdFromRow(row: GrantRowForm): string {
+  if (row.id && grantRowIdSchema.safeParse(row.id).success) return row.id
+  return createGrantRowId()
+}
+
 function emptyGrantRow(grantType: GrantRowType): GrantRowForm {
   return {
+    id: createGrantRowId(),
     grantType,
     unlockLevel: GRANT_DEFAULT_UNLOCK_LEVEL,
     resistances: [],
@@ -59,7 +71,10 @@ function emptyGrantRow(grantType: GrantRowType): GrantRowForm {
     spellAbility: undefined,
     spellAvailability: false,
     spellCastingEnabled: false,
-    spellCastingFrequency: undefined,
+    spellUseLimit: 'at-will',
+    spellUseCountKind: undefined,
+    spellUseCount: undefined,
+    spellMinimumRest: undefined,
     spellAllowsSlotCasting: false,
     spellIds: [],
     featCategory: undefined,
@@ -100,11 +115,15 @@ type ContentGrantRowsConverter<K extends ContentGrant['kind']> = (
 
 const CONTENT_GRANT_TO_FORM_ROWS = {
   sense: (grant, unlockLevel) =>
-    grantRows('senses', unlockLevel, { senseType: grant.type, senseRange: grant.range }),
+    grantRows('senses', unlockLevel, {
+      id: grant.id,
+      senseType: grant.type,
+      senseRange: grant.range,
+    }),
   resistances: (grant, unlockLevel) =>
-    grantRows('resistances', unlockLevel, { resistances: grant.damageTypes }),
+    grantRows('resistances', unlockLevel, { id: grant.id, resistances: grant.damageTypes }),
   damageType: (grant, unlockLevel) =>
-    grantRows('damageType', unlockLevel, { damageType: grant.damageTypes }),
+    grantRows('damageType', unlockLevel, { id: grant.id, damageType: grant.damageTypes }),
   movement: (grant, unlockLevel) => {
     const base = {
       movementMode: grant.mode,
@@ -112,17 +131,20 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
     }
     if (grant.operation === 'match') {
       return grantRows('movement', unlockLevel, {
+        id: grant.id,
         ...base,
         movementMatchMode: grant.matchMode,
       })
     }
     return grantRows('movement', unlockLevel, {
+      id: grant.id,
       ...base,
       movementFeet: grant.feet,
     })
   },
   weaponProficiency: (grant, unlockLevel) => [
     {
+      id: grant.id,
       grantType: 'weaponProficiency',
       unlockLevel: formUnlockLevel(unlockLevel),
       ...weaponProficiencyGrantToFormRow(grant.grant),
@@ -130,6 +152,7 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
   ],
   toolProficiency: (grant, unlockLevel) => [
     {
+      id: grant.id,
       grantType: 'toolProficiency',
       unlockLevel: formUnlockLevel(unlockLevel),
       ...toolProficiencyGrantToFormRow(grant.grant),
@@ -137,6 +160,7 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
   ],
   skillProficiency: (grant, unlockLevel) => [
     {
+      id: grant.id,
       grantType: 'skillProficiency',
       unlockLevel: formUnlockLevel(unlockLevel),
       ...skillProficiencyGrantToFormRow(grant.grant),
@@ -144,19 +168,22 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
   ],
   armorTraining: (grant, unlockLevel) => [
     {
+      id: grant.id,
       grantType: 'armorTraining',
       unlockLevel: formUnlockLevel(unlockLevel),
       ...armorTrainingGrantToFormRow(grant.grant),
     },
   ],
   languages: (grant, unlockLevel) =>
-    grant.languageIds.map((id) => ({
+    grant.languageIds.map((languageId, index) => ({
       ...emptyGrantRow('languages'),
+      id: index === 0 ? grant.id : createGrantRowId(),
       unlockLevel: formUnlockLevel(unlockLevel),
-      language: id,
+      language: languageId,
     })),
   featChoice: (grant, unlockLevel) =>
     grantRows('featChoice', unlockLevel, {
+      id: grant.id,
       featCategory: grant.category,
       featChoose: grant.choose,
       featAllowAnyQualifying: grant.allowAnyQualifying ?? false,
@@ -165,6 +192,7 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
     }),
   equipment: (grant, unlockLevel) => [
     {
+      id: grant.id,
       grantType: 'equipment',
       unlockLevel: formUnlockLevel(unlockLevel),
       ...equipmentGrantToFormRow(grant.grant),
@@ -172,15 +200,16 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
   ],
   spells: (grant, unlockLevel) =>
     grantRows('spells', unlockLevel, {
+      id: grant.id,
       spellAbility: grant.ability,
       spellAvailability: grant.availability === 'always_prepared',
       spellCastingEnabled: grant.casting !== undefined,
-      spellCastingFrequency: grant.casting?.frequency,
+      ...(grant.casting ? formFieldsFromLimitedUse(grant.casting.limitedUse) : {}),
       spellAllowsSlotCasting: grant.casting?.allowsSlotCasting ?? false,
       spellIds: grant.spellIds,
     }),
   languageChoice: () => [],
-  spellcasting: (_grant, unlockLevel) => grantRows('spellcasting', unlockLevel, {}),
+  spellcasting: (grant, unlockLevel) => grantRows('spellcasting', unlockLevel, { id: grant.id }),
 } satisfies { [K in ContentGrant['kind']]: ContentGrantRowsConverter<K> }
 
 /**
@@ -202,7 +231,13 @@ function contentGrantToFormRows(grant: ContentGrant, unlockLevel?: number): Gran
 // GrantRowForm → atomic ContentGrant (one row → one grant or nothing)
 // ---------------------------------------------------------------------------
 
-function weaponProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
+type GrantWithoutRowId = ContentGrant extends infer Grant
+  ? Grant extends unknown
+    ? Omit<Grant, 'id'>
+    : never
+  : never
+
+function weaponProficiencyToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   if (!row.proficiencySource) return undefined
   return {
     kind: 'weaponProficiency',
@@ -210,7 +245,7 @@ function weaponProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
   }
 }
 
-function toolProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
+function toolProficiencyToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   if (!row.proficiencySource) return undefined
   return {
     kind: 'toolProficiency',
@@ -218,7 +253,7 @@ function toolProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
   }
 }
 
-function skillProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
+function skillProficiencyToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   if (!row.proficiencySource) return undefined
   return {
     kind: 'skillProficiency',
@@ -226,7 +261,7 @@ function skillProficiencyToGrant(row: GrantRowForm): ContentGrant | undefined {
   }
 }
 
-function armorTrainingToGrant(row: GrantRowForm): ContentGrant | undefined {
+function armorTrainingToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   if (!row.proficiencySource) return undefined
   return {
     kind: 'armorTraining',
@@ -234,22 +269,22 @@ function armorTrainingToGrant(row: GrantRowForm): ContentGrant | undefined {
   }
 }
 
-function sensesToGrant(row: GrantRowForm): ContentGrant | undefined {
+function sensesToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   if (!row.senseType) return undefined
   return { kind: 'sense', type: row.senseType as SenseId, range: row.senseRange ?? 60 }
 }
 
-function resistancesToGrant(row: GrantRowForm): ContentGrant | undefined {
+function resistancesToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   if (!row.resistances?.length) return undefined
   return { kind: 'resistances', damageTypes: row.resistances as DamageTypeId[] }
 }
 
-function damageTypeToGrant(row: GrantRowForm): ContentGrant | undefined {
+function damageTypeToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   if (!row.damageType?.length) return undefined
   return { kind: 'damageType', damageTypes: row.damageType as DamageTypeId[] }
 }
 
-function movementToGrant(row: GrantRowForm): ContentGrant | undefined {
+function movementToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   if (!row.movementMode || !row.movementOperation) return undefined
 
   if (row.movementOperation === 'match') {
@@ -283,12 +318,12 @@ function movementToGrant(row: GrantRowForm): ContentGrant | undefined {
   }
 }
 
-function languagesToGrant(row: GrantRowForm): ContentGrant | undefined {
+function languagesToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   if (!row.language) return undefined
   return { kind: 'languages', languageIds: [row.language] }
 }
 
-function featChoiceToGrant(row: GrantRowForm): ContentGrant | undefined {
+function featChoiceToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   if (!row.featCategory) return undefined
   return {
     kind: 'featChoice',
@@ -300,28 +335,29 @@ function featChoiceToGrant(row: GrantRowForm): ContentGrant | undefined {
   }
 }
 
-function equipmentToGrant(row: GrantRowForm): ContentGrant | undefined {
+function equipmentToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   if (!row.itemKind) return undefined
   return { kind: 'equipment', grant: equipmentGrantFromFormRow(row as EquipmentGrantItemForm) }
 }
 
-function spellsToGrant(row: GrantRowForm): ContentGrant | undefined {
+function spellsToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   const hasAvailability = row.spellAvailability === true
   const hasCasting = row.spellCastingEnabled === true
   if (!row.spellAbility || !row.spellIds?.length || (!hasAvailability && !hasCasting)) {
     return undefined
   }
 
+  const limitedUse = hasCasting ? limitedUseFromForm(row) : undefined
   return {
     kind: 'spells',
     ability: row.spellAbility as Ability,
     spellIds: row.spellIds,
     ...(hasAvailability ? { availability: 'always_prepared' as const } : {}),
-    ...(hasCasting && row.spellCastingFrequency
+    ...(hasCasting
       ? {
           casting: {
             mode: 'free_cast' as const,
-            frequency: row.spellCastingFrequency,
+            ...(limitedUse ? { limitedUse } : {}),
             ...(row.spellAllowsSlotCasting ? { allowsSlotCasting: true } : {}),
           },
         }
@@ -329,9 +365,9 @@ function spellsToGrant(row: GrantRowForm): ContentGrant | undefined {
   }
 }
 
-type GrantRowContentConverter = (row: GrantRowForm) => ContentGrant | undefined
+type GrantRowContentConverter = (row: GrantRowForm) => GrantWithoutRowId | undefined
 
-function spellcastingToGrant(_row: GrantRowForm): ContentGrant {
+function spellcastingToGrant(_row: GrantRowForm): GrantWithoutRowId {
   return { kind: 'spellcasting' }
 }
 
@@ -357,7 +393,9 @@ const FORM_ROW_TO_CONTENT_GRANT: Partial<Record<GrantRowType, GrantRowContentCon
  * dropped).
  */
 export function formRowToContentGrant(row: GrantRowForm): ContentGrant | undefined {
-  return FORM_ROW_TO_CONTENT_GRANT[row.grantType]?.(row)
+  const grant = FORM_ROW_TO_CONTENT_GRANT[row.grantType]?.(row)
+  if (!grant) return undefined
+  return { ...grant, id: grantIdFromRow(row) } as ContentGrant
 }
 
 // ---------------------------------------------------------------------------

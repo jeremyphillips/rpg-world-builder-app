@@ -12,6 +12,7 @@ import {
 import { resolveCatalogForCampaign } from '../content.service'
 import { classContentConfig } from '../classes/classes.config'
 import type { ContentWriteContext } from '../lib/content-write-config'
+import { assertContentSpellReferences } from '../lib/assert-content-spell-references'
 import { assertSpeciesClassSlugsFromInput } from './assert-species-class-slugs'
 
 function entityBody(entity: Record<string, unknown>): Record<string, unknown> {
@@ -19,7 +20,7 @@ function entityBody(entity: Record<string, unknown>): Record<string, unknown> {
     id: _id,
     slug: _slug,
     rulesetId: _rulesetId,
-    source: _source,
+    catalogLayer: _catalogLayer,
     campaignId: _campaignId,
     createdAt: _createdAt,
     updatedAt: _updatedAt,
@@ -52,4 +53,5 @@ export async function speciesValidateBeforeWrite(ctx: ContentWriteContext): Prom
 
   const classes = await resolveCatalogForCampaign(classContentConfig, ctx.campaignId)
   assertSpeciesClassSlugsFromInput(inputForVocab, classes)
+  await assertContentSpellReferences(ctx, inputForVocab)
 }

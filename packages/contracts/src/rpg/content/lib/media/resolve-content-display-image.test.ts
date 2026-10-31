@@ -24,7 +24,7 @@ describe('resolveContentDisplayImage', () => {
       media: emptyContentMediaSchema,
       subject: contentTypeSubject('classes'),
       slug: 'fighter',
-      contentSource: 'system',
+      catalogLayer: 'system',
       rulesetId: 'srd-cc-5.2.1',
     })
 
@@ -52,7 +52,7 @@ describe('resolveContentDisplayImage', () => {
       },
       subject: contentTypeSubject('classes'),
       slug: 'fighter',
-      contentSource: 'system',
+      catalogLayer: 'system',
       rulesetId: 'srd-cc-5.2.1',
       resolveUploadSrc,
     })
@@ -85,7 +85,7 @@ describe('resolveContentDisplayImage', () => {
       },
       subject: contentTypeSubject('classes'),
       slug: 'fighter',
-      contentSource: 'system',
+      catalogLayer: 'system',
       rulesetId: 'srd-cc-5.2.1',
     })
 
@@ -103,7 +103,7 @@ describe('resolveContentDisplayImage', () => {
       media: emptyContentMediaSchema,
       subject: contentTypeSubject('species'),
       slug: 'elf',
-      contentSource: 'system',
+      catalogLayer: 'system',
       rulesetId: 'srd-cc-5.2.1',
     })
 
@@ -135,7 +135,7 @@ describe('resolveContentDisplayImage', () => {
       },
       subject: contentTypeSubject('classes'),
       slug: '',
-      contentSource: 'homebrew',
+      catalogLayer: 'homebrew',
       resolveUploadSrc: (assetId) =>
         assetId === 'portrait-asset' ? '/portrait.jpg' : '/primary.jpg',
     })
@@ -163,7 +163,7 @@ describe('resolveContentDisplayImage', () => {
       },
       subject: contentTypeSubject('classes'),
       slug: '',
-      contentSource: 'homebrew',
+      catalogLayer: 'homebrew',
       resolveUploadSrc: (assetId) =>
         assetId === 'portrait-asset' ? '/portrait.jpg' : '/primary.jpg',
     })
@@ -187,7 +187,7 @@ describe('resolveContentDisplayImage', () => {
       },
       subject: contentTypeSubject('organizations'),
       slug: 'silver-compass',
-      contentSource: 'homebrew',
+      catalogLayer: 'homebrew',
       resolveUploadSrc: () => '/emblem.jpg',
     })
 
@@ -215,7 +215,7 @@ describe('resolveContentDisplayImage', () => {
       },
       subject: contentTypeSubject('classes'),
       slug: '',
-      contentSource: 'homebrew',
+      catalogLayer: 'homebrew',
       resolveUploadSrc: () => '/shared.jpg',
     })
 
@@ -240,7 +240,7 @@ describe('resolveContentDisplayImage', () => {
         domain: 'class',
         subject: contentTypeSubject('classes'),
         slug: 'custom-archetype',
-        contentSource: 'homebrew',
+        catalogLayer: 'homebrew',
       }),
     ).toEqual({ outcome: 'fallback', fallback: 'class' })
 
@@ -250,7 +250,7 @@ describe('resolveContentDisplayImage', () => {
         domain: 'class',
         subject: contentTypeSubject('classes'),
         slug: 'custom-archetype',
-        contentSource: 'homebrew',
+        catalogLayer: 'homebrew',
       }),
     ).toBeUndefined()
   })
@@ -267,7 +267,7 @@ describe('getAvailableContentImages', () => {
       domain: 'class',
       subject: contentTypeSubject('classes'),
       slug: 'fighter',
-      contentSource: 'system',
+      catalogLayer: 'system',
       rulesetId: 'srd-cc-5.2.1',
     })
 
@@ -285,7 +285,7 @@ describe('getAvailableContentImages', () => {
       domain: 'species',
       subject: contentTypeSubject('species'),
       slug: 'human',
-      contentSource: 'system',
+      catalogLayer: 'system',
       rulesetId: 'srd-cc-5.2.1',
     })
 
@@ -303,7 +303,7 @@ describe('getAvailableContentImages', () => {
         domain: 'class',
         subject: contentTypeSubject('classes'),
         slug: 'fighter-variant',
-        contentSource: 'system',
+        catalogLayer: 'system',
         rulesetId: 'srd-cc-5.2.1',
       }),
     ).toEqual([])
@@ -314,7 +314,7 @@ describe('getAvailableContentImages', () => {
         domain: 'class',
         subject: contentTypeSubject('classes'),
         slug: 'fighter',
-        contentSource: 'homebrew',
+        catalogLayer: 'homebrew',
         rulesetId: 'srd-cc-5.2.1',
       }),
     ).toEqual([])
@@ -325,7 +325,7 @@ describe('getAvailableContentImages', () => {
         domain: 'species',
         subject: contentTypeSubject('species'),
         slug: 'elf',
-        contentSource: 'homebrew',
+        catalogLayer: 'homebrew',
         rulesetId: 'srd-cc-5.2.1',
       }),
     ).toEqual([])
@@ -349,7 +349,7 @@ describe('normalizePersistedContentMedia', () => {
       },
       subject: contentTypeSubject('classes'),
       slug: 'fighter',
-      contentSource: 'system',
+      catalogLayer: 'system',
       rulesetId: 'srd-cc-5.2.1',
       allowedRoles: ['primary'],
     })

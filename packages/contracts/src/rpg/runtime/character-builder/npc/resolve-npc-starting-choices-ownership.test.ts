@@ -69,7 +69,7 @@ const fighterClass: ClassStored = {
   id: `${RULESET}:fighter`,
   slug: 'fighter',
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -124,6 +124,7 @@ const elfSpecies = {
         {
           grants: [
             {
+              id: 'skill-proficiency-1',
               kind: 'skillProficiency' as const,
               grant: {
                 kind: 'choice' as const,
@@ -157,6 +158,7 @@ const fixedPerceptionSpecies = {
         {
           grants: [
             {
+              id: 'skill-proficiency-2',
               kind: 'skillProficiency' as const,
               grant: { kind: 'fixed' as const, skillIds: ['perception'] },
             },
@@ -641,6 +643,7 @@ describe('starting choice ownership', () => {
               {
                 grants: [
                   {
+                    id: 'skill-proficiency-3',
                     kind: 'skillProficiency' as const,
                     grant: {
                       kind: 'choice' as const,

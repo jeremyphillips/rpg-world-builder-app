@@ -1,3 +1,5 @@
+import { contentTypeKeySchema } from '@rpg/contracts'
+
 import { HttpError } from '../../lib/http-error'
 import { findCampaignById } from '../campaign'
 import type { ContentTypeConfig } from './lib/content-type-config'
@@ -24,7 +26,9 @@ export async function resolveCatalogForCampaign<T extends { id: string }>(
     config.loadHomebrew(campaignId, rulesetId),
   ])
 
+  const contentTypeKey = contentTypeKeySchema.safeParse(config.type).data
   return resolveCatalog(loadSystemContent(config, rulesetId), patches, homebrew, {
     replaceKeys: config.patchReplaceKeys,
+    ...(contentTypeKey ? { contentTypeKey } : {}),
   })
 }

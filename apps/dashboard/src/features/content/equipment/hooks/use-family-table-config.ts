@@ -27,6 +27,7 @@ function usageKeyOf(usage?: ContentUsageOpts): string {
   return `${usage.overviewUsageScope ?? ''}:${usage.usageSummaryLabels.singular}:${usage.usageSummaryLabels.plural}`
 }
 
+// fallow-ignore-next-line complexity
 export function useFamilyTableConfig(
   campaignId: string,
   family: EquipmentFamilyPath,

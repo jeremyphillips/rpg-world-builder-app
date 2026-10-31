@@ -23,6 +23,7 @@ import { buildMonsterContentDisplayImageInput } from '../../lib/detail/page/cont
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
+import { useSpells } from '../../spells/hooks/use-spells'
 import { MonsterDetailBody } from '../components/detail/monster-detail-body'
 import {
   buildMonsterDetailViewModel,
@@ -61,6 +62,7 @@ export function MonsterDetailContent({
 
   const equipmentQuery = useEquipment(campaignId)
   const skillsQuery = useSkillProficiencies(campaignId)
+  const spellsQuery = useSpells(campaignId)
   const rulesetQuery = useRulesetPatch(campaignId)
   const rulesetPatch = rulesetQuery.data
   const rulesetId = (monster.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
@@ -111,8 +113,22 @@ export function MonsterDetailContent({
         equipmentById,
         catalogState: derived === null && catalogState === 'ready' ? 'error' : catalogState,
         derived,
+        spellsById: new Map((spellsQuery.data ?? []).map((spell) => [spell.id, spell])),
+        spellCatalogStatus: spellsQuery.isError
+          ? 'unavailable'
+          : spellsQuery.isPending
+            ? 'unavailable'
+            : 'ready',
       }),
-    [catalogState, derived, equipmentById, monster],
+    [
+      catalogState,
+      derived,
+      equipmentById,
+      monster,
+      spellsQuery.data,
+      spellsQuery.isError,
+      spellsQuery.isPending,
+    ],
   )
 
   return (

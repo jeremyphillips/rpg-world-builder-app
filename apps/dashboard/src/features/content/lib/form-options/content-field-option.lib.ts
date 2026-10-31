@@ -5,7 +5,7 @@ import {
   isWeaponEquipment,
   TOOL_CATEGORY_ENTRIES,
   type CharacterClass,
-  type ContentSource,
+  type CatalogLayer,
   type ContentTypeKey,
   type ContentPurposeSelectors,
   type Equipment,
@@ -18,14 +18,14 @@ import type { FieldOption } from '@rpg/ui/form'
 
 import { resolveEquipmentComboboxFilterValues } from '@/lib/equipment/resolve-equipment-grant-filter-dimensions.lib'
 
-import { shouldPresentContentSource } from '../content-type-presentation'
+import { shouldPresentCatalogLayer } from '../content-type-presentation'
 
 const HOMEBREW_OPTION_DESCRIPTION = 'Homebrew'
 
 interface ContentOptionEntity {
   slug: string
   name: string
-  source: ContentSource
+  catalogLayer: CatalogLayer
 }
 
 /** Maps a catalog entity to a combobox option (slug value, name label). */
@@ -36,7 +36,7 @@ export function toContentFieldOption(
   return {
     value: entity.slug,
     label: entity.name,
-    ...(shouldPresentContentSource(contentType) && entity.source === 'homebrew'
+    ...(shouldPresentCatalogLayer(contentType) && entity.catalogLayer === 'homebrew'
       ? { description: HOMEBREW_OPTION_DESCRIPTION }
       : {}),
   }
@@ -125,10 +125,24 @@ export function referenceSkillFieldOptions(
   return toSortedContentFieldOptions(selectors?.forReference(), 'skill-proficiencies')
 }
 
+function toSpellReferenceFieldOption(spell: Spell): FieldOption {
+  return {
+    value: spell.id,
+    label: spell.name,
+    ...(shouldPresentCatalogLayer('spells') && spell.catalogLayer === 'homebrew'
+      ? { description: HOMEBREW_OPTION_DESCRIPTION }
+      : {}),
+  }
+}
+
 export function referenceSpellFieldOptions(
   selectors: ContentPurposeSelectors<Spell> | undefined,
 ): FieldOption[] {
-  return toSortedContentFieldOptions(selectors?.forReference(), 'spells')
+  return sortFieldOptions(selectors?.forReference().map(toSpellReferenceFieldOption) ?? [])
+}
+
+export function toSpellReferenceFieldOptions(spells: readonly Spell[]): FieldOption[] {
+  return sortFieldOptions(spells.map(toSpellReferenceFieldOption))
 }
 
 export function referenceFeatFieldOptions(

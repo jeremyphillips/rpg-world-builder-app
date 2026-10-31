@@ -11,7 +11,7 @@ import { buildLocationsFilterSchema } from './locations-overview-filter-schema'
 
 const baseLocation = {
   rulesetId: 'srd-cc-5.2.1' as const,
-  source: 'homebrew' as const,
+  catalogLayer: 'homebrew' as const,
   status: 'published' as const,
   campaignId: 'camp_1',
   createdAt: '2026-01-01T00:00:00.000Z',

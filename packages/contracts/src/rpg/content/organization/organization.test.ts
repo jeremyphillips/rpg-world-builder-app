@@ -132,7 +132,7 @@ describe('organization stored contracts', () => {
     id: 'organization-1',
     slug: 'lantern-guild',
     rulesetId: 'srd-cc-5.2.1',
-    source: 'homebrew' as const,
+    catalogLayer: 'homebrew' as const,
     campaignId: 'campaign-1',
     ...timestamps,
   }

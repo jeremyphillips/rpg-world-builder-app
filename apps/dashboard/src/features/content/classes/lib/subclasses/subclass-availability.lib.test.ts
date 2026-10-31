@@ -9,8 +9,13 @@ import { buildSubclassAvailabilityPresentations } from './subclass-availability.
 describe('buildSubclassAvailabilityPresentations', () => {
   it('builds one shared presentation per list row', () => {
     const listItems = [
-      { id: 'sub_a', name: 'Champion', source: 'system' as const, classId: 'class_fighter' },
-      { id: 'sub_b', name: 'Battle Master', source: 'homebrew' as const, classId: 'class_fighter' },
+      { id: 'sub_a', name: 'Champion', catalogLayer: 'system' as const, classId: 'class_fighter' },
+      {
+        id: 'sub_b',
+        name: 'Battle Master',
+        catalogLayer: 'homebrew' as const,
+        classId: 'class_fighter',
+      },
     ]
     const subclasses: ResolvedSubclass[] = [
       {
@@ -23,7 +28,7 @@ describe('buildSubclassAvailabilityPresentations', () => {
         ...CHAMPION,
         id: 'sub_b',
         name: 'Battle Master',
-        source: 'homebrew',
+        catalogLayer: 'homebrew',
         campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
       },
     ]

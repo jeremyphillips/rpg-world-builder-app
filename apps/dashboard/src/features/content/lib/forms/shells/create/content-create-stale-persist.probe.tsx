@@ -29,7 +29,7 @@ export function StaleCreateProbeLayout({
       defaultValues={{ name: 'Shield' }}
       onSubmit={async (values, form) => {
         try {
-          await onSubmit(values, form)
+          await onSubmit(values, form as unknown as UseFormReturn<FieldValues>)
         } finally {
           setPublishSettled(true)
         }
@@ -42,7 +42,11 @@ export function StaleCreateProbeLayout({
             backHref="/overview"
             submitLabel="Create equipment"
             pending={false}
-            onSaveDraft={onSaveDraft}
+            onSaveDraft={
+              onSaveDraft as
+                | ((values: ProbeValues, form: UseFormReturn<ProbeValues>) => void | Promise<void>)
+                | undefined
+            }
           />
           <ProbeBypass onSaveDraft={onSaveDraft} />
           <output data-testid="publish-settled">{String(publishSettled)}</output>
@@ -67,7 +71,7 @@ function ProbeBypass({
         onClick={() => {
           submit?.requestSubmit(async (values, form) => {
             try {
-              await onSaveDraft?.(values, form)
+              await onSaveDraft?.(values, form as unknown as UseFormReturn<FieldValues>)
             } finally {
               setDraftSettled(true)
             }

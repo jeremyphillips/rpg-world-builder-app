@@ -41,7 +41,7 @@ export interface FormEmbeddedMasterDetailMapListItemContext {
   field: { id: string }
   index: number
   row: unknown
-  entitySource: ContentFormCtx['entitySource']
+  entityCatalogLayer: ContentFormCtx['entityCatalogLayer']
   getRowIssueCount: (index: number) => number
 }
 
@@ -157,14 +157,14 @@ function FormEmbeddedMasterDetailEditorBody({
         field,
         index: formIndex,
         row,
-        entitySource: formCtx.entitySource,
+        entityCatalogLayer: formCtx.entityCatalogLayer,
         getRowIssueCount,
       })
       const item = buildEmbeddedMasterDetailListItem({
         field,
         index: formIndex,
         row: row as { id?: string } | undefined,
-        entitySource: formCtx.entitySource,
+        entityCatalogLayer: formCtx.entityCatalogLayer,
         seedRowIds,
         getRowIssueCount,
         title: masterDetailItemTitle(listDisplay.title, itemNoun),
@@ -313,7 +313,7 @@ function FormEmbeddedMasterDetailEditorBody({
             field: editor.fields[editor.deleteIndex]!,
             index: editor.deleteIndex,
             row: watched?.[editor.deleteIndex],
-            entitySource: formCtx.entitySource,
+            entityCatalogLayer: formCtx.entityCatalogLayer,
             getRowIssueCount,
           }).title,
           itemNoun,

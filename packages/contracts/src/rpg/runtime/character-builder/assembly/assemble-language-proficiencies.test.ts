@@ -20,7 +20,7 @@ const druidClass = {
   id: 'srd-cc-5.2.1:druid',
   slug: 'druid',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -44,12 +44,13 @@ const druidClass = {
         {
           grants: [
             {
+              id: 'spells-1',
               kind: 'spells',
               ability: 'wis',
               availability: 'always_prepared',
               spellIds: ['speak-with-animals'],
             },
-            { kind: 'languages', languageIds: ['druidic'] },
+            { id: 'languages-2', kind: 'languages', languageIds: ['druidic'] },
           ],
         },
       ],

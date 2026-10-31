@@ -19,7 +19,7 @@ function gear(slug, name, description, cost, spellcastingGearKind, { weight, ...
     id: `${RULESET}:${slug}`,
     slug,
     rulesetId: RULESET,
-    source: 'system',
+    catalogLayer: 'system',
     campaignId: null,
     createdAt: TS,
     updatedAt: TS,

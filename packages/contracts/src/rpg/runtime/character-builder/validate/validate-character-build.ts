@@ -18,6 +18,7 @@ import type {
 import { validateChoiceSetsForStep } from './validate-choice-sets'
 import { validateEquipment } from './validate-equipment'
 import { validateEquipmentPurchases } from './validate-equipment-purchases'
+import { validateGrantedSpellReferences } from './validate-granted-spells'
 import { resolveBuilderStandardArray } from '../ability/resolve-builder-standard-array'
 import {
   validateAbilities,
@@ -194,6 +195,7 @@ export function validateCharacterBuild(
       ? STEP_VALIDATORS.connections(draft, context, choiceSets)
       : []),
     ...validateEquipmentPurchases(draft, context),
+    ...validateGrantedSpellReferences(draft, context),
   ]
   return { ok: issues.length === 0, issues }
 }

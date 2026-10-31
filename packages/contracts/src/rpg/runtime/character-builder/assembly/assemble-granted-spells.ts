@@ -28,11 +28,19 @@ function mergeSources(
       (entry) =>
         entry.kind === source.kind &&
         entry.sourceId === source.sourceId &&
-        entry.grantId === source.grantId,
+        entry.grantId === source.grantId &&
+        entry.grantRowId === source.grantRowId,
     )
     if (!duplicate) merged.push(source)
   }
   return merged
+}
+
+function entitlementIdentity(
+  entry: NonNullable<CharacterSpellEntry['castingEntitlements']>[number],
+): string {
+  const source = entry.source
+  return [source.kind, source.sourceId, source.grantId, source.grantRowId, entry.mode].join('\0')
 }
 
 function mergeCastingEntitlements(
@@ -40,13 +48,8 @@ function mergeCastingEntitlements(
   incoming: NonNullable<CharacterSpellEntry['castingEntitlements']>[number],
 ): NonNullable<CharacterSpellEntry['castingEntitlements']> {
   const entitlements = [...(existing ?? [])]
-  const duplicate = entitlements.some(
-    (entry) =>
-      entry.mode === incoming.mode &&
-      entry.frequency === incoming.frequency &&
-      entry.allowsSlotCasting === incoming.allowsSlotCasting &&
-      JSON.stringify(entry.sources) === JSON.stringify(incoming.sources),
-  )
+  const incomingIdentity = entitlementIdentity(incoming)
+  const duplicate = entitlements.some((entry) => entitlementIdentity(entry) === incomingIdentity)
   if (!duplicate) entitlements.push(incoming)
   return entitlements
 }
@@ -72,13 +75,19 @@ function buildCastingEntitlement(
   grant: SpellsContentGrant,
   sources: CharacterSelectionSource[],
 ): NonNullable<CharacterSpellEntry['castingEntitlements']>[number] | undefined {
-  if (!grant.casting) return undefined
+  const source = sources[0]
+  if (!grant.casting || !source?.grantRowId || !source.sourceId || !source.grantId) return undefined
 
   return {
     mode: 'free_cast',
-    frequency: grant.casting.frequency,
+    ...(grant.casting.limitedUse ? { limitedUse: grant.casting.limitedUse } : {}),
     allowsSlotCasting: grant.casting.allowsSlotCasting ?? false,
-    sources,
+    source: {
+      kind: source.kind,
+      sourceId: source.sourceId,
+      grantId: source.grantId,
+      grantRowId: source.grantRowId,
+    },
   }
 }
 
@@ -106,10 +115,28 @@ function applySpellsGrant(
   entries: Map<string, CharacterSpellEntry>,
   grant: SpellsContentGrant,
   sources: CharacterSelectionSource[],
+  spellsById: ReadonlyMap<string, unknown>,
 ): void {
   for (const spellId of grant.spellIds) {
+    if (!spellsById.has(spellId)) continue
     entries.set(spellId, mergeSpellEntry(entries.get(spellId), spellId, grant, sources))
   }
+}
+
+/** Grant references that are not members of the loaded spell id set. */
+export function collectUnresolvedGrantedSpellIds(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  characterClass?: CharacterClass,
+): string[] {
+  const missing: string[] = []
+  for (const { grant } of collectSourcedGrants(draft, catalogIndex, characterClass)) {
+    if (!isSpellsGrant(grant)) continue
+    for (const spellId of grant.spellIds) {
+      if (!catalogIndex.spells.has(spellId)) missing.push(spellId)
+    }
+  }
+  return missing
 }
 
 /** Assembles spell rows from species, heritage, and class feature spell grants. */
@@ -122,7 +149,7 @@ export function assembleGrantedSpells(
 
   for (const { grant, sources } of collectSourcedGrants(draft, catalogIndex, characterClass)) {
     if (!isSpellsGrant(grant)) continue
-    applySpellsGrant(entries, grant, sources)
+    applySpellsGrant(entries, grant, sources, catalogIndex.spells)
   }
 
   return Array.from(entries.values())

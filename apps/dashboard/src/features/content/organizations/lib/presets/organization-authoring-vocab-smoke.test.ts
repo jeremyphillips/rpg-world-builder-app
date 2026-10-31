@@ -243,7 +243,7 @@ describe('organization authoring vocab smoke', () => {
       id: 'org-admiralty',
       slug: 'admiralty-office',
       rulesetId: 'srd-cc-5.2.1',
-      source: 'homebrew',
+      catalogLayer: 'homebrew',
       status: 'published',
       campaignId: 'camp',
       createdAt: '2026-01-01T00:00:00.000Z',

@@ -6,7 +6,7 @@ describe('resolveEmbeddedRowMeta', () => {
   it('marks inactive availability without list badges', () => {
     const meta = resolveEmbeddedRowMeta({
       row: { id: 'fighter-subclass' },
-      entitySource: 'system',
+      entityCatalogLayer: 'system',
       seedRowIds: new Set(['fighter-subclass']),
       extraReasons: [
         { code: 'subclasses-disabled', settingId: 'characterCreation.subclasses.enabled' },
@@ -21,7 +21,7 @@ describe('resolveEmbeddedRowMeta', () => {
   it('marks unsaved homebrew rows as deletable', () => {
     const meta = resolveEmbeddedRowMeta({
       row: {},
-      entitySource: 'homebrew',
+      entityCatalogLayer: 'homebrew',
     })
 
     expect(meta.sourceLabel).toBe('Homebrew')

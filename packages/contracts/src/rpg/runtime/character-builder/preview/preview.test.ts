@@ -173,7 +173,7 @@ describe('buildCharacterPreview', () => {
   it('marks retained purchases as pending without listing them while starting equipment is unresolved', () => {
     const rope = equipmentSchema.parse({
       rulesetId: RULESET_ID,
-      source: 'system',
+      catalogLayer: 'system',
       status: 'published',
       campaignId: null,
       createdAt: '2026-01-01T00:00:00.000Z',

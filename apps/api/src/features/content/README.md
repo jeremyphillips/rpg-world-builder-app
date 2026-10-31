@@ -11,7 +11,7 @@ feature owns persistence and serving. `classes` is the first content type;
   module load). It is read-only and never mutated. Ids are deterministic
   (`"<rulesetId>:<slug>"`).
 - **Homebrew** content is campaign-owned and stored in Mongo
-  (`source: 'homebrew'`, `campaignId` set, Mongo-generated id).
+  (`catalogLayer: 'homebrew'`, `campaignId` set, Mongo-generated id).
 - **Overlay patches** are per-campaign partial edits to a system record
   (`ClassPatchModel`), keyed by the base record's `targetId`. The system seed is
   never edited in place.

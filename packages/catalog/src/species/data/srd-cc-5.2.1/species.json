@@ -3,7 +3,7 @@
     "id": "srd-cc-5.2.1:dragonborn",
     "slug": "dragonborn",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -35,6 +35,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 60
@@ -64,10 +65,12 @@
             {
               "grants": [
                 {
+                  "id": "acid-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["acid"]
                 },
                 {
+                  "id": "acid-resistance",
                   "kind": "resistances",
                   "damageTypes": ["acid"]
                 }
@@ -84,10 +87,12 @@
             {
               "grants": [
                 {
+                  "id": "lightning-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["lightning"]
                 },
                 {
+                  "id": "lightning-resistance",
                   "kind": "resistances",
                   "damageTypes": ["lightning"]
                 }
@@ -104,10 +109,12 @@
             {
               "grants": [
                 {
+                  "id": "fire-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["fire"]
                 },
                 {
+                  "id": "fire-resistance",
                   "kind": "resistances",
                   "damageTypes": ["fire"]
                 }
@@ -124,10 +131,12 @@
             {
               "grants": [
                 {
+                  "id": "lightning-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["lightning"]
                 },
                 {
+                  "id": "lightning-resistance",
                   "kind": "resistances",
                   "damageTypes": ["lightning"]
                 }
@@ -144,10 +153,12 @@
             {
               "grants": [
                 {
+                  "id": "acid-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["acid"]
                 },
                 {
+                  "id": "acid-resistance",
                   "kind": "resistances",
                   "damageTypes": ["acid"]
                 }
@@ -164,10 +175,12 @@
             {
               "grants": [
                 {
+                  "id": "fire-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["fire"]
                 },
                 {
+                  "id": "fire-resistance",
                   "kind": "resistances",
                   "damageTypes": ["fire"]
                 }
@@ -184,10 +197,12 @@
             {
               "grants": [
                 {
+                  "id": "poison-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["poison"]
                 },
                 {
+                  "id": "poison-resistance",
                   "kind": "resistances",
                   "damageTypes": ["poison"]
                 }
@@ -204,10 +219,12 @@
             {
               "grants": [
                 {
+                  "id": "fire-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["fire"]
                 },
                 {
+                  "id": "fire-resistance",
                   "kind": "resistances",
                   "damageTypes": ["fire"]
                 }
@@ -224,10 +241,12 @@
             {
               "grants": [
                 {
+                  "id": "cold-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["cold"]
                 },
                 {
+                  "id": "cold-resistance",
                   "kind": "resistances",
                   "damageTypes": ["cold"]
                 }
@@ -244,10 +263,12 @@
             {
               "grants": [
                 {
+                  "id": "cold-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["cold"]
                 },
                 {
+                  "id": "cold-resistance",
                   "kind": "resistances",
                   "damageTypes": ["cold"]
                 }
@@ -268,7 +289,7 @@
     "id": "srd-cc-5.2.1:dwarf",
     "slug": "dwarf",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -287,6 +308,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 120
@@ -304,6 +326,7 @@
           {
             "grants": [
               {
+                "id": "poison-resistance",
                 "kind": "resistances",
                 "damageTypes": ["poison"]
               }
@@ -335,7 +358,7 @@
     "id": "srd-cc-5.2.1:elf",
     "slug": "elf",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -354,6 +377,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 60
@@ -377,6 +401,7 @@
           {
             "grants": [
               {
+                "id": "skill-proficiency",
                 "kind": "skillProficiency",
                 "grant": {
                   "kind": "choice",
@@ -412,17 +437,18 @@
             {
               "grants": [
                 {
+                  "id": "darkvision",
                   "kind": "sense",
                   "type": "darkvision",
                   "range": 120
                 },
                 {
+                  "id": "dancing-lights-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["dancing-lights"],
+                  "spellIds": ["srd-cc-5.2.1:dancing-lights"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -433,12 +459,22 @@
               },
               "grants": [
                 {
+                  "id": "faerie-fire-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["faerie-fire"],
+                  "spellIds": ["srd-cc-5.2.1:faerie-fire"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -449,12 +485,22 @@
               },
               "grants": [
                 {
+                  "id": "darkness-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["darkness"],
+                  "spellIds": ["srd-cc-5.2.1:darkness"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -470,12 +516,12 @@
             {
               "grants": [
                 {
+                  "id": "prestidigitation-spells",
                   "kind": "spells",
                   "ability": "int",
-                  "spellIds": ["prestidigitation"],
+                  "spellIds": ["srd-cc-5.2.1:prestidigitation"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -486,12 +532,22 @@
               },
               "grants": [
                 {
+                  "id": "detect-magic-spells",
                   "kind": "spells",
                   "ability": "int",
-                  "spellIds": ["detect-magic"],
+                  "spellIds": ["srd-cc-5.2.1:detect-magic"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -502,12 +558,22 @@
               },
               "grants": [
                 {
+                  "id": "misty-step-spells",
                   "kind": "spells",
                   "ability": "int",
-                  "spellIds": ["misty-step"],
+                  "spellIds": ["srd-cc-5.2.1:misty-step"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -523,18 +589,19 @@
             {
               "grants": [
                 {
+                  "id": "walk-movement",
                   "kind": "movement",
                   "mode": "walk",
                   "operation": "increase",
                   "feet": 5
                 },
                 {
+                  "id": "druidcraft-spells",
                   "kind": "spells",
                   "ability": "wis",
-                  "spellIds": ["druidcraft"],
+                  "spellIds": ["srd-cc-5.2.1:druidcraft"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -545,12 +612,22 @@
               },
               "grants": [
                 {
+                  "id": "longstrider-spells",
                   "kind": "spells",
                   "ability": "wis",
-                  "spellIds": ["longstrider"],
+                  "spellIds": ["srd-cc-5.2.1:longstrider"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -561,12 +638,22 @@
               },
               "grants": [
                 {
+                  "id": "pass-without-trace-spells",
                   "kind": "spells",
                   "ability": "wis",
-                  "spellIds": ["pass-without-trace"],
+                  "spellIds": ["srd-cc-5.2.1:pass-without-trace"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -588,7 +675,7 @@
     "id": "srd-cc-5.2.1:gnome",
     "slug": "gnome",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -607,6 +694,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 60
@@ -636,21 +724,30 @@
             {
               "grants": [
                 {
+                  "id": "minor-illusion-spells",
                   "kind": "spells",
                   "ability": "wis",
-                  "spellIds": ["minor-illusion"],
+                  "spellIds": ["srd-cc-5.2.1:minor-illusion"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 },
                 {
+                  "id": "speak-with-animals-spells",
                   "kind": "spells",
                   "ability": "wis",
-                  "spellIds": ["speak-with-animals"],
+                  "spellIds": ["srd-cc-5.2.1:speak-with-animals"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "prof_bonus_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "proficiency-bonus"
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   },
                   "availability": "always_prepared"
                 }
@@ -667,12 +764,12 @@
             {
               "grants": [
                 {
+                  "id": "mending-spells",
                   "kind": "spells",
                   "ability": "int",
-                  "spellIds": ["mending", "prestidigitation"],
+                  "spellIds": ["srd-cc-5.2.1:mending", "srd-cc-5.2.1:prestidigitation"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -692,7 +789,7 @@
     "id": "srd-cc-5.2.1:goliath",
     "slug": "goliath",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -737,6 +834,7 @@
             {
               "grants": [
                 {
+                  "id": "fire-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["fire"]
                 }
@@ -753,6 +851,7 @@
             {
               "grants": [
                 {
+                  "id": "cold-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["cold"]
                 }
@@ -781,6 +880,7 @@
             {
               "grants": [
                 {
+                  "id": "thunder-damage-type",
                   "kind": "damageType",
                   "damageTypes": ["thunder"]
                 }
@@ -801,7 +901,7 @@
     "id": "srd-cc-5.2.1:halfling",
     "slug": "halfling",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -849,7 +949,7 @@
     "id": "srd-cc-5.2.1:human",
     "slug": "human",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -876,6 +976,7 @@
           {
             "grants": [
               {
+                "id": "skill-proficiency",
                 "kind": "skillProficiency",
                 "grant": {
                   "kind": "choice",
@@ -898,6 +999,7 @@
           {
             "grants": [
               {
+                "id": "origin-feat",
                 "kind": "featChoice",
                 "category": "origin",
                 "choose": 1,
@@ -919,7 +1021,7 @@
     "id": "srd-cc-5.2.1:orc",
     "slug": "orc",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -944,6 +1046,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 120
@@ -969,7 +1072,7 @@
     "id": "srd-cc-5.2.1:tiefling",
     "slug": "tiefling",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
     "campaignId": null,
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -987,6 +1090,7 @@
           {
             "grants": [
               {
+                "id": "darkvision",
                 "kind": "sense",
                 "type": "darkvision",
                 "range": 60
@@ -1004,12 +1108,12 @@
           {
             "grants": [
               {
+                "id": "thaumaturgy-spells",
                 "kind": "spells",
                 "ability": "cha",
-                "spellIds": ["thaumaturgy"],
+                "spellIds": ["srd-cc-5.2.1:thaumaturgy"],
                 "casting": {
-                  "mode": "free_cast",
-                  "frequency": "at_will"
+                  "mode": "free_cast"
                 }
               }
             ]
@@ -1031,16 +1135,17 @@
             {
               "grants": [
                 {
+                  "id": "poison-resistance",
                   "kind": "resistances",
                   "damageTypes": ["poison"]
                 },
                 {
+                  "id": "poison-spray-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["poison-spray"],
+                  "spellIds": ["srd-cc-5.2.1:poison-spray"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -1051,12 +1156,22 @@
               },
               "grants": [
                 {
+                  "id": "ray-of-sickness-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["ray-of-sickness"],
+                  "spellIds": ["srd-cc-5.2.1:ray-of-sickness"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -1067,12 +1182,22 @@
               },
               "grants": [
                 {
+                  "id": "hold-person-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["hold-person"],
+                  "spellIds": ["srd-cc-5.2.1:hold-person"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -1088,16 +1213,17 @@
             {
               "grants": [
                 {
+                  "id": "necrotic-resistance",
                   "kind": "resistances",
                   "damageTypes": ["necrotic"]
                 },
                 {
+                  "id": "chill-touch-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["chill-touch"],
+                  "spellIds": ["srd-cc-5.2.1:chill-touch"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -1108,12 +1234,22 @@
               },
               "grants": [
                 {
+                  "id": "false-life-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["false-life"],
+                  "spellIds": ["srd-cc-5.2.1:false-life"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -1124,12 +1260,22 @@
               },
               "grants": [
                 {
+                  "id": "ray-of-enfeeblement-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["ray-of-enfeeblement"],
+                  "spellIds": ["srd-cc-5.2.1:ray-of-enfeeblement"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -1145,16 +1291,17 @@
             {
               "grants": [
                 {
+                  "id": "fire-resistance",
                   "kind": "resistances",
                   "damageTypes": ["fire"]
                 },
                 {
+                  "id": "fire-bolt-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["fire-bolt"],
+                  "spellIds": ["srd-cc-5.2.1:fire-bolt"],
                   "casting": {
-                    "mode": "free_cast",
-                    "frequency": "at_will"
+                    "mode": "free_cast"
                   }
                 }
               ]
@@ -1165,12 +1312,22 @@
               },
               "grants": [
                 {
+                  "id": "hellish-rebuke-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["hellish-rebuke"],
+                  "spellIds": ["srd-cc-5.2.1:hellish-rebuke"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]
@@ -1181,12 +1338,22 @@
               },
               "grants": [
                 {
+                  "id": "darkness-spells",
                   "kind": "spells",
                   "ability": "cha",
-                  "spellIds": ["darkness"],
+                  "spellIds": ["srd-cc-5.2.1:darkness"],
                   "casting": {
                     "mode": "free_cast",
-                    "frequency": "once_per_long_rest"
+                    "limitedUse": {
+                      "kind": "uses",
+                      "count": {
+                        "kind": "fixed",
+                        "value": 1
+                      },
+                      "recovery": {
+                        "minimumRest": "long"
+                      }
+                    }
                   }
                 }
               ]

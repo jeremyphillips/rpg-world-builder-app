@@ -29,7 +29,7 @@ describe('organization content routes', () => {
       name: 'Emerald Concord',
       organizationDomain: 'political',
       functions: ['worship'],
-      source: 'homebrew',
+      catalogLayer: 'homebrew',
       status: 'published',
     })
 

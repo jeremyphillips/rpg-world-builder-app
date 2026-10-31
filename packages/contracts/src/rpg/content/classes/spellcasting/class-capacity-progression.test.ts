@@ -9,7 +9,7 @@ const spellcastingGrantFeature = (level: number) => ({
   id: 'spellcasting',
   name: 'Spellcasting',
   level,
-  grantGroups: [{ grants: [{ kind: 'spellcasting' as const }] }],
+  grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
 })
 
 describe('classCapacityProgressionSchema', () => {

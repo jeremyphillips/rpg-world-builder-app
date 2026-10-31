@@ -80,7 +80,16 @@ const featChoiceSpecies = {
       id: 'versatile',
       name: 'Versatile',
       grantGroups: [
-        { grants: [{ kind: 'featChoice' as const, category: 'origin' as const, choose: 1 }] },
+        {
+          grants: [
+            {
+              id: 'feat-choice-1',
+              kind: 'featChoice' as const,
+              category: 'origin' as const,
+              choose: 1,
+            },
+          ],
+        },
       ],
     },
   ],
@@ -301,7 +310,7 @@ describe('resolveAutomaticNpcBuild', () => {
       spellcasting: {
         ...spellcasting,
         recommendations: [
-          { target: 'cantrips' as const, classLevel: 1, spellIds: ['prestidigitation'] },
+          { target: 'cantrips' as const, classLevel: 1, spellIds: [`${RULESET}:prestidigitation`] },
         ],
       },
     }
@@ -458,7 +467,7 @@ describe('resolveAutomaticNpcBuild', () => {
       id: `${RULESET}:extra-dagger`,
       slug: 'extra-dagger',
       rulesetId: RULESET,
-      source: 'system',
+      catalogLayer: 'system',
       status: 'published',
       campaignId: null,
       createdAt: '2026-01-01T00:00:00.000Z',
@@ -502,7 +511,7 @@ describe('resolveAutomaticNpcBuild', () => {
       id: `${RULESET}:extra-dagger`,
       slug: 'extra-dagger',
       rulesetId: RULESET,
-      source: 'system',
+      catalogLayer: 'system',
       status: 'published',
       campaignId: null,
       createdAt: '2026-01-01T00:00:00.000Z',

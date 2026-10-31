@@ -143,16 +143,17 @@ describe('generated catalog JSON schemas', () => {
     )
     expect(availabilityPaths.length).toBeGreaterThan(0)
 
-    const frequencyPaths = collectObjectPaths(
+    const restPaths = collectObjectPaths(
       schema,
       (_path, value) =>
         value.type === 'string' &&
         Array.isArray(value.enum) &&
-        value.enum.includes('at_will') &&
+        value.enum.includes('short') &&
+        value.enum.includes('long') &&
         typeof value.description === 'string' &&
-        String(value.description).includes('at_will | once_per_long_rest'),
+        String(value.description).includes('short | long'),
     )
-    expect(frequencyPaths.length).toBeGreaterThan(0)
+    expect(restPaths.length).toBeGreaterThan(0)
   })
 
   it('surfaces closed-set hover on weapon category enums in equipment schema', () => {

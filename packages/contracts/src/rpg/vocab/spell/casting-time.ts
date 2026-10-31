@@ -1,8 +1,11 @@
 import { z } from 'zod'
 
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
+import { activationTriggerSchema } from '../../primitives/activation-trigger'
 import { ACTION_ECONOMY_ENTRIES } from '../action-economy'
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
+import { spellValidationMessages } from './spell-messages'
 
 // ---------------------------------------------------------------------------
 // Casting time units — closed SRD set for spell metadata.
@@ -32,16 +35,32 @@ export const castingTimeUnitSchema = vocabEnumFromEntries(CASTING_TIME_UNIT_ENTR
 export const spellCastingTimeNormalSchema = z.object({
   value: z.number().int().min(1),
   unit: castingTimeUnitSchema,
-  /** Required for reaction casting times (e.g. Hellish Rebuke). */
-  trigger: z.string().min(1).optional(),
+  /** Required when `unit` is `reaction`. Forbidden for every other unit. */
+  trigger: activationTriggerSchema.optional(),
 })
 
 export type SpellCastingTimeNormal = z.infer<typeof spellCastingTimeNormalSchema>
 
-export const spellCastingTimeSchema = z.object({
-  normal: spellCastingTimeNormalSchema,
-  canBeCastAsRitual: z.boolean(),
-})
+export const spellCastingTimeSchema = z
+  .object({
+    normal: spellCastingTimeNormalSchema,
+    canBeCastAsRitual: z.boolean(),
+  })
+  .superRefine((castingTime, ctx) => {
+    const isReaction = castingTime.normal.unit === 'reaction'
+    if (isReaction && !castingTime.normal.trigger) {
+      addCustomRefinementIssue(ctx, spellValidationMessages.reactionTriggerRequired(), [
+        'normal',
+        'trigger',
+      ])
+    }
+    if (!isReaction && castingTime.normal.trigger) {
+      addCustomRefinementIssue(ctx, spellValidationMessages.reactionTriggerForbidden(), [
+        'normal',
+        'trigger',
+      ])
+    }
+  })
 
 export type SpellCastingTime = z.infer<typeof spellCastingTimeSchema>
 

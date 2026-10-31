@@ -34,8 +34,8 @@ normal records are campaign-authored do not need fake empty seed packages;
 catalog export and path drift checks skip `bundledContent: 'none'`.
 
 This metadata describes package and loader topology only. It must not determine
-whether the dashboard displays a Homebrew badge or source filter. User-facing
-source-label exceptions belong to the exhaustive dashboard
+whether the dashboard displays a Homebrew badge or catalog-layer filter. User-facing
+catalog-layer exceptions belong to the exhaustive dashboard
 `CONTENT_TYPE_PRESENTATION` policy; they do not alter persisted provenance,
 authorization, or lifecycle behavior. See
 [`docs/content-types.md`](../../docs/content-types.md#homebrew-ui-label-exceptions).

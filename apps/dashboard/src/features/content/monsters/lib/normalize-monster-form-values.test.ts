@@ -8,6 +8,7 @@ import { buildMonsterInput } from './monster-form-values'
 describe('normalizeMonsterFormValues', () => {
   it('strips inactive variants and never emits a zero hit-dice count', () => {
     const values = resolveMonsterCreateDefaultValues()
+    values.sizes = ['small', 'medium']
     values.armorClass = { naturalArmorBonus: 2, useFixedAc: false }
     values.hitPoints = { kind: 'hit-dice', count: 0 }
     values.actions = [
@@ -15,6 +16,7 @@ describe('normalizeMonsterFormValues', () => {
     ]
 
     const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
+    expect(normalized.sizes).toEqual(['small', 'medium'])
     expect(normalized.armorClass).toEqual({ naturalArmorBonus: 2 })
     expect(normalized.hitPoints).toEqual({ kind: 'hit-dice' })
     expect(JSON.stringify(normalized)).not.toContain('"count":0')

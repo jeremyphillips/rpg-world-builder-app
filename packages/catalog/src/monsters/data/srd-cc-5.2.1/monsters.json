@@ -3,14 +3,20 @@
     "id": "srd-cc-5.2.1:kobold-warrior",
     "slug": "kobold-warrior",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": { "section": "Monsters", "page": 302 }
+      }
+    },
     "status": "published",
     "campaignId": null,
     "createdAt": "2026-01-01T00:00:00.000Z",
     "updatedAt": "2026-01-01T00:00:00.000Z",
     "name": "Kobold Warrior",
     "description": "<p>Small reptilian dragons that rely on traps, ambushes, and overwhelming numbers.</p>",
-    "size": "small",
+    "sizes": ["small"],
     "creatureType": "dragon",
     "alignment": "n",
     "abilityScores": {
@@ -62,19 +68,37 @@
       {
         "id": "pack-tactics",
         "name": "Pack Tactics",
-        "description": "<p>The kobold has Advantage on an attack roll against a creature if at least one of the kobold's allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.</p>"
+        "description": "<p>The kobold has Advantage on an attack roll against a creature if at least one of the kobold's allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/kobold-warrior/pack-tactics"
+          }
+        }
       },
       {
         "id": "sunlight-sensitivity",
         "name": "Sunlight Sensitivity",
-        "description": "<p>While in sunlight, the kobold has Disadvantage on ability checks and attack rolls.</p>"
+        "description": "<p>While in sunlight, the kobold has Disadvantage on ability checks and attack rolls.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/kobold-warrior/sunlight-sensitivity"
+          }
+        }
       }
     ],
     "actions": [
       {
         "id": "dagger",
         "kind": "weapon",
-        "equipmentEntryId": "dagger"
+        "equipmentEntryId": "dagger",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/kobold-warrior/dagger"
+          }
+        }
       }
     ],
     "bonusActions": [],
@@ -84,14 +108,20 @@
     "id": "srd-cc-5.2.1:skeleton",
     "slug": "skeleton",
     "rulesetId": "srd-cc-5.2.1",
-    "source": "system",
+    "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": { "section": "Monsters", "page": 325 }
+      }
+    },
     "status": "published",
     "campaignId": null,
     "createdAt": "2026-01-01T00:00:00.000Z",
     "updatedAt": "2026-01-01T00:00:00.000Z",
     "name": "Skeleton",
     "description": "<p>Animated bones that serve necromancers and dark powers.</p>",
-    "size": "medium",
+    "sizes": ["medium"],
     "creatureType": "undead",
     "alignment": "le",
     "abilityScores": {
@@ -153,12 +183,429 @@
       {
         "id": "shortsword",
         "kind": "weapon",
-        "equipmentEntryId": "shortsword"
+        "equipmentEntryId": "shortsword",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/skeleton/shortsword"
+          }
+        }
       },
       {
         "id": "shortbow",
         "kind": "weapon",
-        "equipmentEntryId": "shortbow"
+        "equipmentEntryId": "shortbow",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/skeleton/shortbow"
+          }
+        }
+      }
+    ],
+    "bonusActions": [],
+    "reactions": []
+  },
+  {
+    "id": "srd-cc-5.2.1:knight",
+    "slug": "knight",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": { "section": "Monsters", "page": 302 }
+      }
+    },
+    "status": "published",
+    "campaignId": null,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z",
+    "name": "Knight",
+    "description": "<p>A mounted warrior in plate who strikes with steel and radiant force.</p>",
+    "sizes": ["medium", "small"],
+    "creatureType": "humanoid",
+    "alignment": "n",
+    "abilityScores": { "str": 16, "dex": 11, "con": 14, "int": 11, "wis": 11, "cha": 15 },
+    "armorClass": {},
+    "hitPoints": { "kind": "hit-dice", "count": 8 },
+    "movement": { "walk": 30 },
+    "senses": [],
+    "challengeRating": "3",
+    "proficiencies": {
+      "savingThrows": ["con", "wis"],
+      "skills": [],
+      "languages": [{ "language": "common" }],
+      "additionalLanguageCount": 1,
+      "weapons": [
+        { "weaponId": "srd-cc-5.2.1:greatsword" },
+        { "weaponId": "srd-cc-5.2.1:heavy-crossbow" }
+      ]
+    },
+    "defenses": {
+      "vulnerabilities": [],
+      "resistances": [],
+      "immunities": [],
+      "conditionImmunities": ["frightened"]
+    },
+    "equipment": [
+      {
+        "entryId": "greatsword",
+        "equipmentId": "srd-cc-5.2.1:greatsword",
+        "quantity": 1,
+        "equipped": true
+      },
+      {
+        "entryId": "heavy-crossbow",
+        "equipmentId": "srd-cc-5.2.1:heavy-crossbow",
+        "quantity": 1,
+        "equipped": true
+      },
+      {
+        "entryId": "plate-armor",
+        "equipmentId": "srd-cc-5.2.1:plate-armor",
+        "quantity": 1,
+        "equipped": true
+      }
+    ],
+    "traits": [],
+    "actions": [
+      {
+        "id": "multiattack",
+        "kind": "special",
+        "name": "Multiattack",
+        "description": "<p>The knight makes two attacks, using Greatsword or Heavy Crossbow in any combination.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/knight/multiattack"
+          }
+        }
+      },
+      {
+        "id": "greatsword",
+        "kind": "weapon",
+        "equipmentEntryId": "greatsword",
+        "onHit": {
+          "additionalDamage": [
+            { "roll": { "dice": { "count": 1, "faces": 8 } }, "damageType": "radiant" }
+          ]
+        },
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/knight/greatsword"
+          }
+        }
+      },
+      {
+        "id": "heavy-crossbow",
+        "kind": "weapon",
+        "equipmentEntryId": "heavy-crossbow",
+        "damage": { "dice": { "count": 2, "faces": 10 } },
+        "onHit": {
+          "additionalDamage": [
+            { "roll": { "dice": { "count": 1, "faces": 8 } }, "damageType": "radiant" }
+          ]
+        },
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/knight/heavy-crossbow"
+          }
+        }
+      }
+    ],
+    "bonusActions": [],
+    "reactions": [
+      {
+        "id": "parry",
+        "kind": "special",
+        "name": "Parry",
+        "trigger": { "text": "The knight is hit by a melee attack roll while holding a weapon." },
+        "description": "<p>The knight adds 2 to its AC against that attack, possibly causing it to miss.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/knight/parry"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:mage",
+    "slug": "mage",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": { "section": "Monsters", "page": 305 }
+      }
+    },
+    "status": "published",
+    "campaignId": null,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z",
+    "name": "Mage",
+    "description": "<p>A wizard whose defenses include mage armor and a burst of force.</p>",
+    "sizes": ["medium", "small"],
+    "creatureType": "humanoid",
+    "alignment": "n",
+    "abilityScores": { "str": 9, "dex": 14, "con": 11, "int": 17, "wis": 12, "cha": 11 },
+    "armorClass": { "fixedAcOffset": 5 },
+    "hitPoints": { "kind": "hit-dice", "count": 18 },
+    "movement": { "walk": 30 },
+    "senses": [],
+    "challengeRating": "6",
+    "proficiencies": {
+      "savingThrows": ["int", "wis"],
+      "skills": [
+        { "skill": "arcana", "rank": "proficient" },
+        { "skill": "history", "rank": "proficient" },
+        { "skill": "perception", "rank": "proficient" }
+      ],
+      "languages": [{ "language": "common" }],
+      "additionalLanguageCount": 3,
+      "weapons": []
+    },
+    "defenses": {
+      "vulnerabilities": [],
+      "resistances": [],
+      "immunities": [],
+      "conditionImmunities": []
+    },
+    "equipment": [
+      { "entryId": "wand", "equipmentId": "srd-cc-5.2.1:wand", "quantity": 1, "equipped": true }
+    ],
+    "traits": [],
+    "actions": [
+      {
+        "id": "multiattack",
+        "kind": "special",
+        "name": "Multiattack",
+        "description": "<p>The mage makes three Arcane Burst attacks.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/mage/multiattack"
+          }
+        }
+      },
+      {
+        "id": "arcane-burst",
+        "kind": "attack",
+        "name": "Arcane Burst",
+        "bonusSource": {
+          "kind": "spell",
+          "castingAbility": { "kind": "shared", "entryId": "spellcasting" }
+        },
+        "modes": ["melee", "ranged"],
+        "reach": 5,
+        "range": { "normal": 120 },
+        "damage": { "dice": { "count": 3, "faces": 8 } },
+        "damageType": "force",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/mage/arcane-burst"
+          }
+        }
+      },
+      {
+        "id": "spellcasting",
+        "kind": "spell",
+        "name": "Spellcasting",
+        "castingAbility": { "kind": "ability", "ability": "int" },
+        "spells": [
+          { "spellId": "srd-cc-5.2.1:detect-magic" },
+          { "spellId": "srd-cc-5.2.1:light" },
+          { "spellId": "srd-cc-5.2.1:mage-armor" },
+          { "spellId": "srd-cc-5.2.1:mage-hand" },
+          { "spellId": "srd-cc-5.2.1:prestidigitation" },
+          {
+            "spellId": "srd-cc-5.2.1:fireball",
+            "castAtLevel": 4,
+            "limitedUse": {
+              "kind": "uses",
+              "count": { "kind": "fixed", "value": 2 },
+              "recovery": { "minimumRest": "long" }
+            }
+          },
+          {
+            "spellId": "srd-cc-5.2.1:invisibility",
+            "limitedUse": {
+              "kind": "uses",
+              "count": { "kind": "fixed", "value": 2 },
+              "recovery": { "minimumRest": "long" }
+            }
+          },
+          {
+            "spellId": "srd-cc-5.2.1:cone-of-cold",
+            "limitedUse": {
+              "kind": "uses",
+              "count": { "kind": "fixed", "value": 1 },
+              "recovery": { "minimumRest": "long" }
+            }
+          },
+          {
+            "spellId": "srd-cc-5.2.1:fly",
+            "limitedUse": {
+              "kind": "uses",
+              "count": { "kind": "fixed", "value": 1 },
+              "recovery": { "minimumRest": "long" }
+            }
+          }
+        ],
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/mage/spellcasting"
+          }
+        }
+      }
+    ],
+    "bonusActions": [
+      {
+        "id": "misty-step",
+        "kind": "spell",
+        "name": "Misty Step",
+        "castingAbility": { "kind": "shared", "entryId": "spellcasting" },
+        "limitedUse": {
+          "kind": "uses",
+          "count": { "kind": "fixed", "value": 3 },
+          "recovery": { "minimumRest": "long" }
+        },
+        "spells": [{ "spellId": "srd-cc-5.2.1:misty-step" }],
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/mage/misty-step"
+          }
+        }
+      }
+    ],
+    "reactions": [
+      {
+        "id": "protective-magic",
+        "kind": "spell",
+        "name": "Protective Magic",
+        "castingAbility": { "kind": "shared", "entryId": "spellcasting" },
+        "limitedUse": {
+          "kind": "uses",
+          "count": { "kind": "fixed", "value": 3 },
+          "recovery": { "minimumRest": "long" }
+        },
+        "spells": [
+          { "spellId": "srd-cc-5.2.1:counterspell" },
+          { "spellId": "srd-cc-5.2.1:shield" }
+        ],
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/mage/protective-magic"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "srd-cc-5.2.1:hell-hound",
+    "slug": "hell-hound",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": { "section": "Monsters", "page": 297 }
+      }
+    },
+    "status": "published",
+    "campaignId": null,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z",
+    "name": "Hell Hound",
+    "description": "<p>A fiendish hound that hunts in packs and breathes fire.</p>",
+    "sizes": ["medium"],
+    "creatureType": "fiend",
+    "alignment": "le",
+    "abilityScores": { "str": 17, "dex": 12, "con": 14, "int": 6, "wis": 13, "cha": 6 },
+    "armorClass": { "naturalArmorBonus": 4 },
+    "hitPoints": { "kind": "hit-dice", "count": 9 },
+    "movement": { "walk": 50 },
+    "senses": [{ "type": "darkvision", "range": 60 }],
+    "challengeRating": "3",
+    "proficiencies": {
+      "savingThrows": [],
+      "skills": [{ "skill": "perception", "rank": "expertise" }],
+      "languages": [{ "language": "infernal", "speaks": false }],
+      "weapons": []
+    },
+    "defenses": {
+      "vulnerabilities": [],
+      "resistances": [],
+      "immunities": ["fire"],
+      "conditionImmunities": []
+    },
+    "equipment": [],
+    "traits": [
+      {
+        "id": "pack-tactics",
+        "name": "Pack Tactics",
+        "description": "<p>The hound has Advantage on an attack roll against a creature if at least one of the hound's allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/hell-hound/pack-tactics"
+          }
+        }
+      }
+    ],
+    "actions": [
+      {
+        "id": "multiattack",
+        "kind": "special",
+        "name": "Multiattack",
+        "description": "<p>The hound makes two Bite attacks.</p>",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/hell-hound/multiattack"
+          }
+        }
+      },
+      {
+        "id": "bite",
+        "kind": "natural-weapon",
+        "name": "Bite",
+        "mode": "melee",
+        "damage": { "dice": { "count": 1, "faces": 8 } },
+        "damageType": "piercing",
+        "onHit": {
+          "additionalDamage": [
+            { "roll": { "dice": { "count": 1, "faces": 6 } }, "damageType": "fire" }
+          ]
+        },
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/hell-hound/bite"
+          }
+        }
+      },
+      {
+        "id": "fire-breath",
+        "kind": "special",
+        "name": "Fire Breath",
+        "description": "<p>Dexterity Saving Throw: DC 12, each creature in a 15-foot Cone. Failure: 17 (5d6) Fire damage. Success: Half damage.</p>",
+        "limitedUse": { "kind": "recharge", "minRoll": 5 },
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/hell-hound/fire-breath"
+          }
+        }
       }
     ],
     "bonusActions": [],

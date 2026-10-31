@@ -3,6 +3,7 @@ import {
   type ContentStatus,
   type WithCampaignAccess,
   type ContentTypeKey,
+  CATALOG_LAYER_TERM,
 } from '@rpg/contracts'
 import {
   createEqualsFilter,
@@ -13,14 +14,14 @@ import {
 } from '@rpg/ui/filters'
 
 import type { ContentBase } from './content-table-config'
-import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
+import { CATALOG_LAYER_BADGE, type CatalogLayer } from './catalog-layer-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
-import { shouldPresentContentSource } from '../content-type-presentation'
+import { shouldPresentCatalogLayer } from '../content-type-presentation'
 import { createCampaignAvailabilityFilterField as createSharedCampaignAvailabilityFilterField } from '@/lib/overview/create-campaign-availability-filter-field'
 
 export type ContentOverviewBaseFilterState = {
   name?: string
-  source?: ContentSource
+  catalogLayer?: CatalogLayer
   status?: ContentStatus
   campaignAvailability?: CampaignAvailabilityFilter
 }
@@ -41,20 +42,20 @@ export function createContentNameFilter<
   }) as unknown as FilterFieldDef<TData, TState>
 }
 
-export function createContentSourceFilter<
+export function createCatalogLayerFilter<
   TData extends OverviewRow,
   TState extends ContentOverviewBaseFilterState,
 >(): FilterFieldDef<TData, TState> {
-  return createEqualsFilter<TData, ContentOverviewBaseFilterState, 'source', ContentSource>({
-    id: 'source',
-    label: 'Source',
+  return createEqualsFilter<TData, ContentOverviewBaseFilterState, 'catalogLayer', CatalogLayer>({
+    id: 'catalogLayer',
+    label: CATALOG_LAYER_TERM.label,
     placement: 'advanced',
     width: 'md',
-    options: (Object.keys(CONTENT_SOURCE_BADGE) as ContentSource[]).map((value) => ({
+    options: (Object.keys(CATALOG_LAYER_BADGE) as CatalogLayer[]).map((value) => ({
       value,
-      label: CONTENT_SOURCE_BADGE[value].label,
+      label: CATALOG_LAYER_BADGE[value].label,
     })),
-    getValue: (row: TData) => row.source,
+    getValue: (row: TData) => row.catalogLayer,
   }) as unknown as FilterFieldDef<TData, TState>
 }
 
@@ -96,8 +97,8 @@ export function buildContentFilterSchema<
     [
       createContentNameFilter<TData, TState>(),
       ...contentFields,
-      ...(shouldPresentContentSource(contentType)
-        ? [createContentSourceFilter<TData, TState>()]
+      ...(shouldPresentCatalogLayer(contentType)
+        ? [createCatalogLayerFilter<TData, TState>()]
         : []),
       createContentStatusFilter<TData, TState>(),
       createCampaignAvailabilityFilterField<TData, TState>(),

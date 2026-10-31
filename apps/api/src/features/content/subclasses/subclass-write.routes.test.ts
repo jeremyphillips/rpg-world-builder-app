@@ -34,7 +34,7 @@ describe('subclass write routes', () => {
       .expect(201)
 
     const entityId = createRes.body.subclasses.id as string
-    expect(createRes.body.subclasses.source).toBe('homebrew')
+    expect(createRes.body.subclasses.catalogLayer).toBe('homebrew')
     expect(createRes.body.subclasses.classId).toBe(FIGHTER_CLASS_ID)
 
     const listAfterCreate = await agent

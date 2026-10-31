@@ -46,7 +46,7 @@ export async function getSpeciesHeritageRemovalAvailability(
 ): Promise<ContentDeletionAvailability> {
   const { entity } = await resolveContentEntityForWrite(speciesWriteConfig, campaignId, speciesId)
 
-  if (entity.source !== 'homebrew') {
+  if (entity.catalogLayer !== 'homebrew') {
     throw new HttpError(403, 'forbidden', 'System species heritage cannot be removed.')
   }
 

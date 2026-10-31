@@ -572,7 +572,7 @@ export function useBuildingOrganizationsCreateTab({
   const context: ContentFormCtx = formCtx ?? {
     campaignId,
     mode: 'create',
-    entitySource: 'homebrew',
+    entityCatalogLayer: 'homebrew',
   }
 
   const addPendingWorkflowMode: AddPendingWorkflowMode =

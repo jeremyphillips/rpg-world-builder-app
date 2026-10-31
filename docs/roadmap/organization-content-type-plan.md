@@ -170,7 +170,7 @@ Add an exhaustive, drift-tested dashboard content-presentation policy keyed by
 `ContentTypeKey`, with a source presentation mode such as:
 
 ```ts
-type ContentSourcePresentation = 'badge-and-filter' | 'suppressed'
+type CatalogLayerPresentation = 'badge-and-filter' | 'suppressed'
 ```
 
 Organizations use `suppressed`; existing types initially use

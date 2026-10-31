@@ -43,7 +43,7 @@ describe('class preview projection', () => {
 
   it('derives system artwork when the form has no persisted media', () => {
     const identity = buildClassPreviewIdentity(createValues(), {
-      entitySource: 'system',
+      entityCatalogLayer: 'system',
       entitySlug: 'fighter',
       rulesetId: 'srd-cc-5.2.1',
     })

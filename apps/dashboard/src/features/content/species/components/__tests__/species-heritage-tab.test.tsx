@@ -37,12 +37,12 @@ function HeritageValuesProbe() {
 
 function TabShell({
   heritage,
-  entitySource,
+  entityCatalogLayer,
   campaignId = 'camp-1',
   entityId = 'species-1',
 }: {
   heritage?: HeritageForm
-  entitySource?: ContentFormCtx['entitySource']
+  entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
   campaignId?: string
   entityId?: string
 }) {
@@ -50,7 +50,7 @@ function TabShell({
     <QueryClientProvider client={makeTestQueryClient()}>
       <CampaignAccessFormProvider>
         <TestFormShell defaultValues={{ heritage }}>
-          <SpeciesHeritageTab formCtx={{ entitySource, campaignId, entityId }} />
+          <SpeciesHeritageTab formCtx={{ entityCatalogLayer, campaignId, entityId }} />
           <HeritageValuesProbe />
         </TestFormShell>
       </CampaignAccessFormProvider>
@@ -113,7 +113,7 @@ describe('SpeciesHeritageTab', () => {
 
   it('confirms deletion through the dialog and removes an option row', async () => {
     const user = userEvent.setup()
-    render(<TabShell heritage={draconicHeritageForm} entitySource="homebrew" />)
+    render(<TabShell heritage={draconicHeritageForm} entityCatalogLayer="homebrew" />)
 
     await deleteOptionViaOverflow(user, 'Breath Weapon')
     expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete heritage option?')
@@ -126,7 +126,7 @@ describe('SpeciesHeritageTab', () => {
   })
 
   it('locks system options on a system species', () => {
-    render(<TabShell heritage={draconicHeritageForm} entitySource="system" />)
+    render(<TabShell heritage={draconicHeritageForm} entityCatalogLayer="system" />)
 
     expect(screen.getAllByText(/System/).length).toBeGreaterThan(0)
     expect(
@@ -139,7 +139,7 @@ describe('SpeciesHeritageTab', () => {
 
   it('allows deleting newly added options even on a system species', async () => {
     const user = userEvent.setup()
-    render(<TabShell heritage={draconicHeritageForm} entitySource="system" />)
+    render(<TabShell heritage={draconicHeritageForm} entityCatalogLayer="system" />)
 
     await user.click(screen.getByRole('button', { name: /Add option/i }))
 
@@ -151,7 +151,7 @@ describe('SpeciesHeritageTab', () => {
   it('allows removing heritage on homebrew species after availability check', async () => {
     const user = userEvent.setup()
     mockFetchHeritageRemovalAvailability.mockResolvedValue({ status: 'allowed' })
-    render(<TabShell heritage={draconicHeritageForm} entitySource="homebrew" />)
+    render(<TabShell heritage={draconicHeritageForm} entityCatalogLayer="homebrew" />)
 
     await removeHeritageGroupViaOverflow(user)
     expect(mockFetchHeritageRemovalAvailability).toHaveBeenCalledWith('camp-1', 'species-1')
@@ -181,7 +181,7 @@ describe('SpeciesHeritageTab', () => {
         },
       ],
     })
-    render(<TabShell heritage={draconicHeritageForm} entitySource="homebrew" />)
+    render(<TabShell heritage={draconicHeritageForm} entityCatalogLayer="homebrew" />)
 
     await removeHeritageGroupViaOverflow(user)
 

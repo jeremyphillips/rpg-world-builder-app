@@ -13,7 +13,8 @@ import {
   refineCreatureTelepathyRange,
   creatureCommunicationSchema,
   EMPTY_CREATURE_COMMUNICATION,
-  creatureSizeRefSchema,
+  creatureSizesDraftSchema,
+  creatureSizesSchema,
   creatureSkillProficiencyEntrySchema,
   creatureLanguageProficiencyEntrySchema,
   creatureStatBlockHitPointsSchema,
@@ -42,7 +43,13 @@ import {
   monsterReactionDraftSchema,
   monsterReactionSchema,
   refineMonsterActionShape,
+  refineMonsterSpellEntries,
 } from './monster/action'
+import { entryProvenanceField } from '../primitives/provenance'
+import { MONSTER_ACTION_SECTIONS } from './monster/action-sections'
+
+export { MONSTER_ACTION_SECTIONS }
+export type { MonsterActionSection } from './monster/action-sections'
 
 export {
   monsterActionSchema,
@@ -50,7 +57,12 @@ export {
   monsterActionDraftSchema,
   monsterReactionDraftSchema,
 } from './monster/action'
-export type { MonsterAction, MonsterReaction } from './monster/action'
+export type {
+  MonsterAction,
+  MonsterActionDraft,
+  MonsterReaction,
+  MonsterReactionDraft,
+} from './monster/action'
 import type { EquipmentInstance } from './equipment/instance/instance'
 import { normalizeEquipmentInstance } from './equipment/instance/normalize-equipment-instance'
 import { refineEquipmentInstanceInvariants } from './equipment/instance/instance-invariants'
@@ -70,12 +82,13 @@ export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
 
 export const monsterTraitSchema = customContentTraitSchema
   .pick({ id: true, name: true })
-  .extend({ description: z.string().min(1) })
+  .extend({ description: z.string().min(1), ...entryProvenanceField })
 
 export const monsterTraitDraftSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).optional(),
   description: z.string().min(1).optional(),
+  ...entryProvenanceField,
 })
 
 const monsterEquipmentEntrySchemaParsed = equipmentInstanceSchemaBase
@@ -88,7 +101,7 @@ export const monsterEquipmentEntrySchema = z.preprocess((value) => {
 }, monsterEquipmentEntrySchemaParsed)
 
 export const monsterBodyFields = {
-  size: creatureSizeRefSchema,
+  sizes: creatureSizesSchema,
   creatureType: creatureTypeRefSchema,
   alignment: creatureAlignmentSchema,
   abilityScores: creatureAbilityScoresSchema,
@@ -104,6 +117,7 @@ export const monsterBodyFields = {
     savingThrows: z.array(abilitySchema).default([]),
     skills: z.array(creatureSkillProficiencyEntrySchema).default([]),
     languages: z.array(creatureLanguageProficiencyEntrySchema).default([]),
+    additionalLanguageCount: z.number().int().min(1).optional(),
     weapons: z.array(creatureWeaponProficiencyTargetSchema).default([]),
   }),
   defenses: creatureDefensesSchema,
@@ -122,7 +136,7 @@ const monsterBodyDraftSchemaBase = mediaBearingDraftAuthoredContentBodySchema(
   MONSTER_CONTENT_TYPE_TERM.label,
 ).extend({
   ...monsterBodyFields,
-  size: creatureSizeRefSchema.optional(),
+  sizes: creatureSizesDraftSchema,
   creatureType: creatureTypeRefSchema.optional(),
   alignment: creatureAlignmentSchema.optional(),
   abilityScores: creatureAbilityScoresSchema.partial().optional(),
@@ -151,8 +165,6 @@ function collectActionIds(body: {
     ...body.reactions.map((a) => a.id),
   ]
 }
-
-const MONSTER_ACTION_SECTIONS = ['actions', 'bonusActions', 'reactions'] as const
 
 function refineMonsterProficiencies(
   proficiencies: MonsterBody['proficiencies'],
@@ -287,6 +299,7 @@ export function refineMonsterBody(
       refineMonsterActionShape(action, ctx, [...prefix, section, index])
     }
   }
+  refineMonsterSpellEntries(body, ctx, prefix)
 
   refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
   refineCreatureDamageDefenses(body.defenses, ctx, [...prefix, 'defenses'])
@@ -297,7 +310,6 @@ export function refineMonsterBody(
     'telepathy',
   ])
   refineMonsterProficiencies(body.proficiencies, ctx, prefix)
-
   const derivedXp = CHALLENGE_RATING_MECHANICS[body.challengeRating].xp
   if (body.experiencePointsOverride !== undefined) {
     if (body.challengeRating !== '0') {
@@ -325,10 +337,10 @@ const monsterStoredSchema = publishStoredSchema(monsterBodySchema).superRefine((
 
 export const monsterSchema = monsterStoredSchema as unknown as z.ZodType<Monster>
 
-function refineMonsterDraftBody(
+function refineMonsterDraftIds(
   body: MonsterBodyDraft,
   ctx: z.RefinementCtx,
-  prefix: (string | number)[] = [],
+  prefix: (string | number)[],
 ): void {
   const equipment = body.equipment ?? []
   const entryIds = equipment.map((entry) => entry.entryId)
@@ -354,6 +366,25 @@ function refineMonsterDraftBody(
       'actions',
     ])
   }
+}
+
+function refineMonsterDraftBody(
+  body: MonsterBodyDraft,
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[] = [],
+): void {
+  const equipment = body.equipment ?? []
+  refineMonsterDraftIds(body, ctx, prefix)
+
+  refineMonsterSpellEntries(
+    {
+      actions: body.actions ?? [],
+      bonusActions: body.bonusActions ?? [],
+      reactions: body.reactions ?? [],
+    },
+    ctx,
+    prefix,
+  )
 
   refineWeaponEntryReferences(
     {

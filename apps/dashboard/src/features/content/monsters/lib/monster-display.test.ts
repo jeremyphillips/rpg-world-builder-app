@@ -115,4 +115,59 @@ describe('monster-display', () => {
     ).toBe(true)
     expect(viewModel.traits.length).toBeGreaterThan(0)
   })
+
+  it('labels an authored reaction trigger and its response', () => {
+    const monster = {
+      ...pickMonster('kobold-warrior'),
+      reactions: [
+        {
+          id: 'parry',
+          kind: 'special' as const,
+          name: 'Parry',
+          description: '<p>Adds 2 to AC.</p>',
+          trigger: { text: 'When hit by a melee attack' },
+        },
+      ],
+    }
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Dragon',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+      derived: null,
+    })
+
+    expect(viewModel.reactions).toEqual([
+      expect.objectContaining({
+        name: 'Parry',
+        triggerLine: 'Trigger: When hit by a melee attack',
+        responseLabel: 'Response:',
+        descriptionHtml: '<p>Adds 2 to AC.</p>',
+      }),
+    ])
+  })
+
+  it('leaves an unspecified reaction trigger unlabeled', () => {
+    const monster = {
+      ...pickMonster('kobold-warrior'),
+      reactions: [
+        {
+          id: 'parry',
+          kind: 'special' as const,
+          name: 'Parry',
+          description: '<p>Adds 2 to AC.</p>',
+        },
+      ],
+    }
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Dragon',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+      derived: null,
+    })
+
+    expect(viewModel.reactions[0]?.triggerLine).toBeUndefined()
+    expect(viewModel.reactions[0]?.responseLabel).toBeUndefined()
+  })
 })

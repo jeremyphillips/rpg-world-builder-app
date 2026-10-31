@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { REST_KIND_ENTRIES } from '../rest'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 
@@ -23,8 +24,8 @@ export const SPELL_MUTATION_TRIGGER_ENTRIES = {
     description: 'When the character gains a class level.',
   },
   longRest: {
-    label: 'Long rest',
-    description: 'When the character finishes a long rest.',
+    label: REST_KIND_ENTRIES.long.label,
+    description: 'When the character finishes a Long Rest.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

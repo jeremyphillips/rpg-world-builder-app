@@ -13,9 +13,9 @@ import type { DiceFormulaValue } from '@rpg/ui'
 import type { FieldValues } from 'react-hook-form'
 
 import {
-  defaultHitPointsDiceForSize,
   hitPointsDiceAuthoringFields,
   hitPointsDiceFromFormValues,
+  MONSTER_HIT_POINTS_DICE_COUNT_FIELD,
   MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD,
   MONSTER_HIT_POINTS_STASH_FIELD,
   MONSTER_HIT_POINTS_USE_FIXED_FIELD,
@@ -61,7 +61,7 @@ export type MonsterEquipmentFormEntry = Monster['equipment'][number]
 export type MonsterFormValues = FieldValues & {
   name: string
   description?: string
-  size?: Monster['size']
+  sizes?: Monster['sizes']
   creatureType?: Monster['creatureType']
   alignment?: Monster['alignment']
   abilityScores: Monster['abilityScores']
@@ -93,14 +93,14 @@ export type MonsterFormValues = FieldValues & {
 }
 
 export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
-  const authoringHitDice = defaultHitPointsDiceForSize(undefined)
   return {
     name: '',
+    sizes: [],
     abilityScores: neutralAbilityScores(),
     armorClass: { naturalArmorBonus: 0, useFixedAc: false },
-    hitPoints: { kind: 'hit-dice', count: authoringHitDice.count },
+    hitPoints: { kind: 'hit-dice', count: 1 },
     [MONSTER_HIT_POINTS_USE_FIXED_FIELD]: false,
-    ...hitPointsDiceAuthoringFields(authoringHitDice),
+    [MONSTER_HIT_POINTS_DICE_COUNT_FIELD]: 1,
     [MONSTER_HIT_POINTS_STASH_FIELD]: {},
     movement: [{ mode: 'walk', feet: 30 }],
     senses: [],
@@ -139,11 +139,16 @@ function hitPointsAuthoringFromEntity(
   const useFixed = entity.hitPoints.kind === 'fixed'
   const dice = hitPointsDiceFromFormValues({
     hitPoints: entity.hitPoints,
-    size: entity.size,
+    sizes: entity.sizes,
   })
   return {
     [MONSTER_HIT_POINTS_USE_FIXED_FIELD]: useFixed,
-    ...hitPointsDiceAuthoringFields(dice),
+    ...(dice
+      ? hitPointsDiceAuthoringFields(dice)
+      : {
+          [MONSTER_HIT_POINTS_DICE_COUNT_FIELD]:
+            entity.hitPoints.kind === 'hit-dice' ? entity.hitPoints.count : 1,
+        }),
     [MONSTER_HIT_POINTS_STASH_FIELD]: {},
     ...(useFixed && entity.hitPoints.kind === 'fixed' && entity.hitPoints.average !== undefined
       ? { [MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD]: entity.hitPoints.average }
@@ -160,7 +165,7 @@ export function monsterToFormValues(
   return {
     name: entity.name,
     description: entity.description,
-    size: entity.size,
+    sizes: entity.sizes,
     creatureType: entity.creatureType,
     alignment: entity.alignment,
     abilityScores: entity.abilityScores,

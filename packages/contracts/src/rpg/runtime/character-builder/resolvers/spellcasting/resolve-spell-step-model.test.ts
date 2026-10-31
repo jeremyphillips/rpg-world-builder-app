@@ -40,10 +40,11 @@ const highElfSpecies = {
           {
             grants: [
               {
+                id: 'spells-1',
                 kind: 'spells' as const,
                 ability: 'int' as const,
-                spellIds: ['prestidigitation'],
-                casting: { mode: 'free_cast' as const, frequency: 'at_will' as const },
+                spellIds: ['srd-cc-5.2.1:prestidigitation'],
+                casting: { mode: 'free_cast' as const },
               },
             ],
           },
@@ -51,12 +52,17 @@ const highElfSpecies = {
             unlock: { level: 3 },
             grants: [
               {
+                id: 'spells-2',
                 kind: 'spells' as const,
                 ability: 'int' as const,
-                spellIds: ['detect-magic'],
+                spellIds: ['srd-cc-5.2.1:detect-magic'],
                 casting: {
                   mode: 'free_cast' as const,
-                  frequency: 'once_per_long_rest' as const,
+                  limitedUse: {
+                    kind: 'uses',
+                    count: { kind: 'fixed', value: 1 },
+                    recovery: { minimumRest: 'long' },
+                  } as const,
                 },
               },
             ],
@@ -65,12 +71,17 @@ const highElfSpecies = {
             unlock: { level: 5 },
             grants: [
               {
+                id: 'spells-3',
                 kind: 'spells' as const,
                 ability: 'int' as const,
-                spellIds: ['misty-step'],
+                spellIds: ['srd-cc-5.2.1:misty-step'],
                 casting: {
                   mode: 'free_cast' as const,
-                  frequency: 'once_per_long_rest' as const,
+                  limitedUse: {
+                    kind: 'uses',
+                    count: { kind: 'fixed', value: 1 },
+                    recovery: { minimumRest: 'long' },
+                  } as const,
                 },
               },
             ],
@@ -86,7 +97,7 @@ function heritageSpell(slug: string, level: number, name: string): Spell {
     id: `${RULESET}:${slug}`,
     slug,
     rulesetId: RULESET,
-    source: 'system',
+    catalogLayer: 'system',
     status: 'published',
     campaignId: null,
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -314,7 +325,7 @@ describe('resolveSpellStepModel', () => {
       id: `${RULESET}:fixture-ranger`,
       slug: 'fixture-ranger',
       rulesetId: RULESET,
-      source: 'system',
+      catalogLayer: 'system',
       status: 'published',
       campaignId: null,
       createdAt: '2026-01-01T00:00:00.000Z',
@@ -342,7 +353,7 @@ describe('resolveSpellStepModel', () => {
           id: 'spellcasting',
           name: 'Spellcasting',
           level: 1,
-          grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+          grantGroups: [{ grants: [{ id: 'spellcasting-4', kind: 'spellcasting' }] }],
         },
         {
           kind: 'custom',
@@ -353,13 +364,18 @@ describe('resolveSpellStepModel', () => {
             {
               grants: [
                 {
+                  id: 'spells-5',
                   kind: 'spells',
                   ability: 'wis',
-                  spellIds: ['hunters-mark'],
+                  spellIds: ['srd-cc-5.2.1:hunters-mark'],
                   availability: 'always_prepared',
                   casting: {
                     mode: 'free_cast',
-                    frequency: 'prof_bonus_per_long_rest',
+                    limitedUse: {
+                      kind: 'uses',
+                      count: { kind: 'proficiency-bonus' },
+                      recovery: { minimumRest: 'long' },
+                    } as const,
                   },
                 },
               ],

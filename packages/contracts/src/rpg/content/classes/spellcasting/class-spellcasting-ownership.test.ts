@@ -22,7 +22,7 @@ const minimalClassBody = {
       id: 'spellcasting',
       name: 'Spellcasting',
       level: 1,
-      grantGroups: [{ grants: [{ kind: 'spellcasting' as const }] }],
+      grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
     },
   ],
 }
@@ -80,7 +80,10 @@ describe('isClassSpellcastingGrantingFeature', () => {
       isClassSpellcastingGrantingFeature({
         grantGroups: [
           {
-            grants: [{ kind: 'spellcasting' }, { kind: 'languages', languageIds: ['common'] }],
+            grants: [
+              { id: 'spellcasting-2', kind: 'spellcasting' },
+              { id: 'languages-3', kind: 'languages', languageIds: ['common'] },
+            ],
           },
         ],
       }),

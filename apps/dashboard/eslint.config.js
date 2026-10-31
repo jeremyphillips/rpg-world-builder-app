@@ -405,6 +405,31 @@ const dashboardShellContractsImportGuard = {
   },
 }
 
+const dashboardSourceExcerptImportGuard = {
+  files: ['src/**/*.{ts,tsx}'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/catalog/source-excerpts',
+            message:
+              'Dashboard presentation must not import the source excerpt store. Catalog fields stay authoritative.',
+          },
+        ],
+        patterns: [
+          {
+            group: ['**/source-excerpts/**', '**/source-excerpts'],
+            message:
+              'Dashboard presentation must not import the source excerpt store. Catalog fields stay authoritative.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
 const dashboardAuthApiContractsImportGuard = {
   files: ['src/features/auth/api/**/*.{ts,tsx}'],
   rules: {
@@ -440,6 +465,7 @@ export default [
   ...react,
   ...storybook.configs['flat/recommended'],
   buildingArchetypeAppQuarantine,
+  dashboardSourceExcerptImportGuard,
   dashboardDatatableFilterRegionImportGuard,
   dashboardStorybookRouterRule,
   dashboardEntitySurfaceImportGuard,

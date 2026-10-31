@@ -143,6 +143,7 @@ export interface ContentFormFooterProps<TFieldValues extends FieldValues> {
   onLeaveGuardReady?: (guard: Pick<UnsavedChangesConfirmController, 'runTrusted'>) => void
 }
 
+// fallow-ignore-next-line complexity
 export function ContentFormFooter<TFieldValues extends FieldValues>({
   mode,
   form,

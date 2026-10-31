@@ -1,4 +1,4 @@
-import type { ContentSource, Subclass } from '@rpg/contracts'
+import type { CatalogLayer, Subclass } from '@rpg/contracts'
 
 import type { SubclassFormValues } from './subclass-form-fields'
 import { serializeSubclassFormValues } from './subclass-form-value-snapshot'
@@ -12,13 +12,13 @@ import {
 export type SubclassDraft = {
   id: string
   classId: string
-  source: 'homebrew'
+  catalogLayer: 'homebrew'
 }
 
 export type SubclassListItem = {
   id: string
   name: string
-  source: ContentSource | 'unsaved'
+  catalogLayer: CatalogLayer | 'unsaved'
   classId: string
 }
 
@@ -26,7 +26,7 @@ export function createSubclassDraft(classId: string): SubclassDraft {
   return {
     id: createDraftSubclassId(),
     classId,
-    source: 'homebrew',
+    catalogLayer: 'homebrew',
   }
 }
 
@@ -37,7 +37,7 @@ export function draftToListItem(
   return {
     id: draft.id,
     name: edits.name?.trim() || UNTITLED_SUBCLASS_LABEL,
-    source: 'unsaved',
+    catalogLayer: 'unsaved',
     classId: draft.classId,
   }
 }
@@ -49,7 +49,7 @@ export function subclassToListItem(
   return {
     id: subclass.id,
     name: edits.name?.trim() || subclass.name,
-    source: subclass.source,
+    catalogLayer: subclass.catalogLayer,
     classId: subclass.classId,
   }
 }

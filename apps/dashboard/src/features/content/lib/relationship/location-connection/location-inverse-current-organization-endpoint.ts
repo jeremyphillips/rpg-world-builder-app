@@ -11,7 +11,7 @@ export function resolveLocationInverseCurrentOrganizationEndpoint(input: {
   rows: readonly LocationConnectedPartyRow[]
   organizations?: readonly Pick<
     Organization,
-    'id' | 'organizationDomain' | 'media' | 'slug' | 'source' | 'rulesetId'
+    'id' | 'organizationDomain' | 'media' | 'slug' | 'catalogLayer' | 'rulesetId'
   >[]
 }): EntityReplacementCurrentSnapshot {
   const row = input.rows.find(({ relationshipId }) => relationshipId === input.relationshipId)

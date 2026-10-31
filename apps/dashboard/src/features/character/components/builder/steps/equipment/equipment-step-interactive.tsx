@@ -73,6 +73,7 @@ function scrollToStartingEquipmentOptions() {
   el?.focus()
 }
 
+// fallow-ignore-next-line complexity
 export function EquipmentStepInteractive({
   draft,
   onDraftChange,

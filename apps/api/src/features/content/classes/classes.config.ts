@@ -12,8 +12,13 @@ import {
 
 import type { ZodType } from 'zod'
 
+import { assertContentSpellReferences } from '../lib/assert-content-spell-references'
 import type { ContentTypeConfig } from '../lib/content-type-config'
-import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
+import type {
+  ContentWriteConfig,
+  ContentWriteContext,
+  HomebrewDoc,
+} from '../lib/content-write-config'
 import type { OverlayPatch } from '../lib/resolve-catalog'
 import { homebrewContentEnvelope } from '../lib/homebrew-envelope'
 import { parseClassReadModel } from './derive-classes-catalog'
@@ -79,9 +84,14 @@ export const classContentConfig: ContentTypeConfig<CharacterClass> = {
   },
 }
 
+async function validateClassBeforeWrite(ctx: ContentWriteContext): Promise<void> {
+  await assertContentSpellReferences(ctx, ctx.effectiveBody ?? ctx.input)
+}
+
 export const classWriteConfig: ContentWriteConfig<CharacterClass> = {
   typeName: 'classes',
   readConfig: classContentConfig,
+  validateBeforeWrite: validateClassBeforeWrite,
   responseKey: 'classes',
   createInputSchema: createClassInputSchema,
   updateInputSchema: updateClassInputSchema,

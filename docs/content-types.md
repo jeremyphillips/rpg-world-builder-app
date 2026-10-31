@@ -22,7 +22,7 @@ When sub-choices are small, fixed sets owned by one catalog record (lineages, an
 
 **Not a content type:** standard XP progression thresholds live in `rpg/campaign/rules/xp-progression.ts` and are patched via `CampaignRulesetPatch.characterCreation.progression.xpThresholds` — not the content API registry. SRD defaults ship from `@rpg/catalog/xp-progressions`.
 
-**Duplication:** manager-only copy workflow for registered API content types — see [apps/api/docs/content-duplication.md](../apps/api/docs/content-duplication.md). Declare `canDuplicate` and `nestedIdRegeneration` in `CONTENT_TYPE_CAPABILITIES`.
+**Duplication:** manager-only copy workflow for registered API content types — see [apps/api/docs/content-duplication.md](../apps/api/docs/content-duplication.md). Declare `canDuplicate`, `nestedIdRegeneration`, and `provenanceEntryHosts` in `CONTENT_TYPE_CAPABILITIES`. Bibliographic lineage is [content provenance](../packages/contracts/docs/content-provenance.md).
 
 ---
 
@@ -72,6 +72,11 @@ with a `featChoice` grant (`category: general`, `allowAnyQualifying: true`,
 picker for convenience; on save it generates/replaces those feature rows — there is no
 top-level `asiLevels` field on the class body.
 
+Every grant row has an `id`, unique across all groups of its owner (trait, feature, or heritage option).
+
+- **Seeds** use an explicit readable slug (`darkvision`, `fighting-style-feat`). Assign it once. Never regenerate it, and never give a deleted id to a different grant.
+- **Authored rows** use an opaque `grt_<uuid>`. The dashboard allocates one when a row is added. The API allocates one before strict parsing when a write arrives without an id. Opaque ids are never reused. A stored id keeps its grant kind; a different kind needs a new id.
+
 Example (Fighter Fighting Style):
 
 ```json
@@ -79,6 +84,7 @@ Example (Fighter Fighting Style):
   {
     "grants": [
       {
+        "id": "fighting-style-feat",
         "kind": "featChoice",
         "category": "fighting-style",
         "choose": 1,
@@ -101,6 +107,7 @@ Example (ASI at level 4):
     {
       "grants": [
         {
+          "id": "general-feat",
           "kind": "featChoice",
           "category": "general",
           "choose": 1,
@@ -275,7 +282,7 @@ Shared helpers: `packages/contracts/src/rpg/content/lib/content-key.ts` (`derive
 
 ## Delete homebrew content
 
-Homebrew-only deletion is wired for all six registered catalog types. System SRD rows return `403 forbidden` on both the advisory availability check and `DELETE`; edit views hide the delete control when `entity.source !== 'homebrew'`.
+Homebrew-only deletion is wired for all six registered catalog types. System SRD rows return `403 forbidden` on both the advisory availability check and `DELETE`; edit views hide the delete control when `entity.catalogLayer !== 'homebrew'`.
 
 ### Advisory GET vs authoritative DELETE
 
@@ -693,9 +700,9 @@ It is a package/loader declaration—not a user-facing provenance policy.
 
 #### Homebrew UI label exceptions
 
-Campaign-authored records continue to persist `source: 'homebrew'` regardless
+Campaign-authored records continue to persist `catalogLayer: 'homebrew'` regardless
 of how the dashboard presents that provenance. By default, content overviews
-and headings show the Homebrew badge, source column, and source filter.
+and headings show the Homebrew badge, catalog-layer column, and catalog-layer filter.
 
 A content type may suppress that UI language only through the exhaustive
 `CONTENT_TYPE_PRESENTATION` policy in
@@ -708,8 +715,8 @@ Exception rules:
 
 - Never infer UI labeling from `bundledContent`; bundling may change without
   changing the product meaning of provenance.
-- Suppression affects only source badges, labels, columns, and filters. It does
-  not change stored source, authorization, deletion rules, draft/publish state,
+- Suppression affects only catalog-layer badges, labels, columns, and filters. It does
+  not change stored `catalogLayer`, authorization, deletion rules, draft/publish state,
   or campaign availability.
 - Add exceptions by content-type key in the exhaustive policy, consume them
   through shared presentation helpers, and update the policy coverage tests.
@@ -722,7 +729,7 @@ Exception rules:
 Assert:
 
 - Correct count of seed records.
-- All records use `source: 'system'`, `campaignId: null`, `rulesetId` matching input.
+- All records use `catalogLayer: 'system'`, `campaignId: null`, `rulesetId` matching input.
 - `id === \`${rulesetId}:${slug}\`` for every record.
 - Unique slugs.
 

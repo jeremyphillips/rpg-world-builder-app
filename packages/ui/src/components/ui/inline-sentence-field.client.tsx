@@ -297,11 +297,16 @@ function InlineSentenceSelectControl({
   inAnatomyRow?: boolean
 }) {
   const optionNodes = useMemo(() => renderSelectContent(control.options), [control.options])
+  const hasOptions = control.options.length > 0
   const triggerWidthClassName =
     control.digits == null && control.sizingLabel == null && control.sizingLabels == null
       ? inlineSentenceSelectTriggerWidthClasses(control.width)
       : undefined
   const resolvedLabel = label ?? control.ariaLabel ?? 'Field'
+
+  if (!hasOptions) {
+    return null
+  }
 
   const selectControl = (
     <Select value={control.value} onValueChange={control.onChange} disabled={disabled}>

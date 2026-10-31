@@ -21,7 +21,7 @@ describe('SRD 5.2.1 XP progression seed', () => {
   it('uses deterministic system ids and null campaignId', () => {
     for (const progression of progressions) {
       expect(progression.id).toBe(`${RULESET}:${progression.slug}`)
-      expect(progression.source).toBe('system')
+      expect(progression.catalogLayer).toBe('system')
       expect(progression.campaignId).toBeNull()
       expect(progression.rulesetId).toBe(RULESET)
     }

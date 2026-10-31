@@ -260,18 +260,40 @@ function refineSpellComponents(
   }
 }
 
-export const spellFormSchema = spellFormObjectSchema.superRefine(refineSpellComponents)
+function refineSpellCastingTrigger(
+  values: {
+    castingTime?: { normal?: { unit?: string; trigger?: string } }
+  },
+  ctx: z.RefinementCtx,
+) {
+  const normal = values.castingTime?.normal
+  if (!normal?.unit) return
+  if (normal.unit === 'reaction' && !normal.trigger?.trim()) {
+    addCustomRefinementIssue(ctx, spellValidationMessages.reactionTriggerRequired(), [
+      'castingTime',
+      'normal',
+      'trigger',
+    ])
+  }
+}
 
-export const spellDraftFormSchema = spellFormObjectSchema.extend({
-  name: z.string(),
-  school: draftOptionalSelect(spellSchoolIdSchema),
-  level: draftOptionalSelect(spellFormLevelSchema),
-  classIds: z.array(z.string()).default([]),
-  castingTime: spellFormObjectSchema.shape.castingTime.optional(),
-  range: spellFormObjectSchema.shape.range.optional(),
-  duration: spellFormObjectSchema.shape.duration.optional(),
-  components: spellFormObjectSchema.shape.components.optional(),
+export const spellFormSchema = spellFormObjectSchema.superRefine((values, ctx) => {
+  refineSpellComponents(values, ctx)
+  refineSpellCastingTrigger(values, ctx)
 })
+
+export const spellDraftFormSchema = spellFormObjectSchema
+  .extend({
+    name: z.string(),
+    school: draftOptionalSelect(spellSchoolIdSchema),
+    level: draftOptionalSelect(spellFormLevelSchema),
+    classIds: z.array(z.string()).default([]),
+    castingTime: spellFormObjectSchema.shape.castingTime.optional(),
+    range: spellFormObjectSchema.shape.range.optional(),
+    duration: spellFormObjectSchema.shape.duration.optional(),
+    components: spellFormObjectSchema.shape.components.optional(),
+  })
+  .superRefine(refineSpellCastingTrigger)
 
 export type SpellFormValues = z.infer<typeof spellFormSchema>
 

@@ -15,7 +15,7 @@ export const RULESET = 'srd-cc-5.2.1' as const
 
 const baseMeta = {
   rulesetId: RULESET,
-  source: 'system' as const,
+  catalogLayer: 'system' as const,
   status: 'published' as const,
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -36,7 +36,7 @@ function spellcastingGrantFeature(usesPactMagic = false) {
     id: usesPactMagic ? 'pact-magic' : 'spellcasting',
     name: usesPactMagic ? getSlotProgressionKindLabel('pact-magic') : 'Spellcasting',
     level: 1,
-    grantGroups: [{ grants: [{ kind: 'spellcasting' as const }] }],
+    grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
   }
 }
 
@@ -228,7 +228,7 @@ export const athleticsSkill = {
   id: `${RULESET}:athletics`,
   slug: 'athletics',
   rulesetId: RULESET,
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',

@@ -28,8 +28,13 @@ export function useSubclassDeleteFlow({
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
 
   const handleDeleteClick = useCallback(
-    async (subclassId: string, subclassName: string, source: 'system' | 'homebrew' | 'unsaved') => {
-      if (source !== 'homebrew' || isDraftSubclassId(subclassId) || checkingAvailability) return
+    async (
+      subclassId: string,
+      subclassName: string,
+      catalogLayer: 'system' | 'homebrew' | 'unsaved',
+    ) => {
+      if (catalogLayer !== 'homebrew' || isDraftSubclassId(subclassId) || checkingAvailability)
+        return
 
       setDeleteError(null)
       setCheckingAvailability(true)

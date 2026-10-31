@@ -274,7 +274,7 @@ export function buildLocationEntitySummaryVm(
         {
           media: location.media,
           slug: location.slug,
-          source: location.source,
+          catalogLayer: location.catalogLayer,
           rulesetId: location.rulesetId,
         },
         'compact',

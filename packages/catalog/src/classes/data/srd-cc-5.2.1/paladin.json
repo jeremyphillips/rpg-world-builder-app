@@ -2,7 +2,7 @@
   "id": "srd-cc-5.2.1:paladin",
   "slug": "paladin",
   "rulesetId": "srd-cc-5.2.1",
-  "source": "system",
+  "catalogLayer": "system",
   "campaignId": null,
   "createdAt": "2024-05-21T00:00:00.000Z",
   "updatedAt": "2024-05-21T00:00:00.000Z",
@@ -190,6 +190,7 @@
         {
           "grants": [
             {
+              "id": "spellcasting",
               "kind": "spellcasting"
             }
           ]
@@ -238,6 +239,7 @@
         {
           "grants": [
             {
+              "id": "fighting-style-feat",
               "kind": "featChoice",
               "category": "fighting-style",
               "choose": 1,
@@ -256,13 +258,23 @@
         {
           "grants": [
             {
+              "id": "divine-smite-spells",
               "kind": "spells",
               "ability": "cha",
-              "spellIds": ["divine-smite"],
+              "spellIds": ["srd-cc-5.2.1:divine-smite"],
               "availability": "always_prepared",
               "casting": {
                 "mode": "free_cast",
-                "frequency": "once_per_long_rest"
+                "limitedUse": {
+                  "kind": "uses",
+                  "count": {
+                    "kind": "fixed",
+                    "value": 1
+                  },
+                  "recovery": {
+                    "minimumRest": "long"
+                  }
+                }
               }
             }
           ]
@@ -315,6 +327,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -340,13 +353,23 @@
         {
           "grants": [
             {
+              "id": "find-steed-spells",
               "kind": "spells",
               "ability": "cha",
-              "spellIds": ["find-steed"],
+              "spellIds": ["srd-cc-5.2.1:find-steed"],
               "availability": "always_prepared",
               "casting": {
                 "mode": "free_cast",
-                "frequency": "once_per_long_rest"
+                "limitedUse": {
+                  "kind": "uses",
+                  "count": {
+                    "kind": "fixed",
+                    "value": 1
+                  },
+                  "recovery": {
+                    "minimumRest": "long"
+                  }
+                }
               }
             }
           ]
@@ -368,6 +391,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -405,6 +429,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -430,6 +455,7 @@
         {
           "grants": [
             {
+              "id": "general-feat",
               "kind": "featChoice",
               "category": "general",
               "choose": 1,
@@ -455,6 +481,7 @@
         {
           "grants": [
             {
+              "id": "epic-boon-feat",
               "kind": "featChoice",
               "category": "epic-boon",
               "choose": 1,

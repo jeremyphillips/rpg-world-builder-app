@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import type { ContentUsageBlocker, ContentSource } from '@rpg/contracts'
+import type { ContentUsageBlocker, CatalogLayer } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
 import type { AnyContentFormDef } from '../forms/registry/content-form-registry'
@@ -10,7 +10,7 @@ type UseContentDemoteFlowOptions = {
   campaignId: string
   entityId: string
   entityName: string
-  entitySource: ContentSource
+  entityCatalogLayer: CatalogLayer
   entityStatus: 'draft' | 'published'
 }
 
@@ -19,7 +19,7 @@ export function useContentDemoteFlow({
   campaignId,
   entityId,
   entityName,
-  entitySource,
+  entityCatalogLayer,
   entityStatus,
 }: UseContentDemoteFlowOptions) {
   const demoteMutation = useDemoteContent(def, campaignId)
@@ -40,7 +40,8 @@ export function useContentDemoteFlow({
   }
 
   const handleDemoteClick = useCallback(async () => {
-    if (entitySource !== 'homebrew' || entityStatus !== 'published' || checkingAvailability) return
+    if (entityCatalogLayer !== 'homebrew' || entityStatus !== 'published' || checkingAvailability)
+      return
 
     setDemoteError(null)
     setCheckingAvailability(true)
@@ -63,7 +64,7 @@ export function useContentDemoteFlow({
     } finally {
       setCheckingAvailability(false)
     }
-  }, [campaignId, checkingAvailability, def.routeKey, entityId, entitySource, entityStatus])
+  }, [campaignId, checkingAvailability, def.routeKey, entityId, entityCatalogLayer, entityStatus])
 
   const handleConfirmDemote = useCallback(async () => {
     setDemoteError(null)
@@ -83,7 +84,7 @@ export function useContentDemoteFlow({
     }
   }, [demoteMutation, entityId])
 
-  const canDemote = entitySource === 'homebrew' && entityStatus === 'published'
+  const canDemote = entityCatalogLayer === 'homebrew' && entityStatus === 'published'
   const demotePending = checkingAvailability || demoteMutation.isPending
 
   return {

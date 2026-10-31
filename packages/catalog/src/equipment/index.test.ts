@@ -32,7 +32,7 @@ describe('SRD 5.2.1 equipment seed', () => {
   it('uses deterministic system ids and null campaignId', () => {
     for (const item of equipment) {
       expect(item.id).toBe(`${RULESET}:${item.slug}`)
-      expect(item.source).toBe('system')
+      expect(item.catalogLayer).toBe('system')
       expect(item.campaignId).toBeNull()
       expect(item.rulesetId).toBe(RULESET)
     }

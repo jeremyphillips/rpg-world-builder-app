@@ -65,7 +65,7 @@ export type OrganizationEntitySummaryVm = {
 export function buildOrganizationEntitySummaryVm(
   organization: Pick<
     Organization,
-    'id' | 'name' | 'organizationDomain' | 'media' | 'slug' | 'source' | 'rulesetId'
+    'id' | 'name' | 'organizationDomain' | 'media' | 'slug' | 'catalogLayer' | 'rulesetId'
   >,
 ): OrganizationEntitySummaryVm {
   return {
@@ -77,7 +77,7 @@ export function buildOrganizationEntitySummaryVm(
         {
           media: organization.media,
           slug: organization.slug,
-          source: organization.source,
+          catalogLayer: organization.catalogLayer,
           rulesetId: organization.rulesetId,
         },
         'compact',

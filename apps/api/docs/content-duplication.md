@@ -34,9 +34,17 @@ The API stores a campaign-scoped mapping and replays the created entity id for d
 
 Without a key, suffix collision policy allows two successful requests to create two records.
 
+## Lineage
+
+Duplication uses `carry` provenance. The new homebrew record stores
+`provenance.derivedFrom` (`relation: 'duplicate'`) and, when the source is a
+system record or already declares documents, `provenance.documents`. Record
+`citation` and `excerpt`, and entry provenance on opted-in hosts, are copied
+with the source. See
+[content provenance](../../../packages/contracts/docs/content-provenance.md).
+
 ## Gaps / backlog
 
-- `duplicatedFrom` provenance field (not modeled yet)
 - Subclass duplication
 
 ## Related

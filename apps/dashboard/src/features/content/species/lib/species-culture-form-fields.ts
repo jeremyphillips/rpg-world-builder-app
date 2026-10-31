@@ -37,11 +37,11 @@ export const speciesCultureFormSchema = z
 export type SpeciesCultureFormValues = z.infer<typeof speciesCultureFormSchema>
 
 function isSystemSpecies(ctx: ContentFormCtx): boolean {
-  return ctx.entitySource === 'system'
+  return ctx.entityCatalogLayer === 'system'
 }
 
 function isHomebrewSpecies(ctx: ContentFormCtx): boolean {
-  return ctx.entitySource === 'homebrew'
+  return ctx.entityCatalogLayer === 'homebrew'
 }
 
 function visibleWhenCultureOverrideActive() {
@@ -158,7 +158,7 @@ export function cultureFields(ctx: ContentFormCtx): FormItem {
 
 export function cultureFormSchemaRefinement(
   values: { culture?: SpeciesCultureFormValues },
-  ctx: Pick<ContentFormCtx, 'entitySource'>,
+  ctx: Pick<ContentFormCtx, 'entityCatalogLayer'>,
   addIssue: (issue: { path: (string | number)[]; message: string }) => void,
 ): void {
   const culture = values.culture
@@ -171,7 +171,11 @@ export function cultureFormSchemaRefinement(
     })
   }
 
-  if (ctx.entitySource !== 'system' && culture.id !== undefined && culture.name === undefined) {
+  if (
+    ctx.entityCatalogLayer !== 'system' &&
+    culture.id !== undefined &&
+    culture.name === undefined
+  ) {
     addIssue({
       path: ['culture', 'name'],
       message: 'Culture name is required when a culture id override is present.',

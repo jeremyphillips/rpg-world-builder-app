@@ -1,5 +1,5 @@
 import type {
-  ContentSource,
+  CatalogLayer,
   ContentStatus,
   ContentTypeKey,
   ResolvedContentCampaignAccess,
@@ -60,7 +60,7 @@ function ContentEditFormHeading({
 }: {
   heading: string
   contentTypeKey: ContentTypeKey
-  source: ContentSource
+  source: CatalogLayer
   status: ContentStatus
   campaignAccess: ResolvedContentCampaignAccess
   omitDraft?: boolean
@@ -74,7 +74,7 @@ function ContentEditFormHeading({
         </Heading>
         <ContentEditHeadingBadges
           contentType={contentTypeKey}
-          source={source}
+          catalogLayer={source}
           status={status}
           campaignAccess={campaignAccess}
           omitDraft={omitDraft}
@@ -127,7 +127,7 @@ interface ContentEditEntityFormProps<
   TEntity extends {
     id: string
     name: string
-    source: ContentSource
+    catalogLayer: CatalogLayer
     status: ContentStatus
     campaignAccess?: ResolvedContentCampaignAccess
     media?: ContentMedia
@@ -153,7 +153,7 @@ function ContentEditEntityForm<
   TEntity extends {
     id: string
     name: string
-    source: ContentSource
+    catalogLayer: CatalogLayer
     status: ContentStatus
     campaignAccess?: ResolvedContentCampaignAccess
     media?: ContentMedia
@@ -170,7 +170,7 @@ function ContentEditEntityFormBody<
   TEntity extends {
     id: string
     name: string
-    source: ContentSource
+    catalogLayer: CatalogLayer
     status: ContentStatus
     campaignAccess?: ResolvedContentCampaignAccess
     media?: ContentMedia
@@ -218,7 +218,7 @@ function ContentEditEntityFormBody<
     <ContentEditFormHeading
       heading={headingFn(entity.name)}
       contentTypeKey={contentTypeKey}
-      source={entity.source}
+      source={entity.catalogLayer}
       status={entity.status}
       campaignAccess={campaignAccess}
       omitDraft={layout.previewEnabled}
@@ -336,7 +336,7 @@ interface ContentEditFormBodyProps {
   entity: {
     id: string
     name: string
-    source: ContentSource
+    catalogLayer: CatalogLayer
     status: ContentStatus
     campaignAccess?: ResolvedContentCampaignAccess
     media?: ContentMedia

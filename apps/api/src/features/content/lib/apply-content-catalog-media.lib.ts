@@ -12,7 +12,7 @@ import {
   CONTENT_TYPE_MEDIA_ENABLED_KEYS,
   type ApiContentTypeKey,
   type ContentMedia,
-  type ContentSource,
+  type CatalogLayer,
   type SystemRulesetId,
 } from '@rpg/contracts'
 import type { ClientSession } from 'mongoose'
@@ -59,7 +59,7 @@ async function loadPersistedMediaOverride<T extends WriteEntityBase>(
   config: ContentWriteConfig<T>,
   campaignId: string,
   entityId: string,
-  source: ContentSource,
+  source: CatalogLayer,
   session?: ClientSession,
 ): Promise<ContentMedia | null> {
   if (source === 'homebrew') {
@@ -69,7 +69,7 @@ async function loadPersistedMediaOverride<T extends WriteEntityBase>(
       .session(session ?? null)
       .lean<{ media?: ContentMedia }>()
     return resolvePersistedContentMediaOverride({
-      source,
+      catalogLayer: source,
       homebrewRecordMedia: doc?.media,
     })
   }
@@ -81,7 +81,7 @@ async function loadPersistedMediaOverride<T extends WriteEntityBase>(
     .lean<{ patch?: Record<string, unknown> }>()
   const patchMedia = patchDoc?.patch?.media
   return resolvePersistedContentMediaOverride({
-    source,
+    catalogLayer: source,
     overlayPatchMedia:
       patchMedia !== undefined ? prepareContentMediaForCatalogWrite(patchMedia) : undefined,
   })
@@ -91,7 +91,7 @@ function buildCatalogMediaPersistContext<T extends WriteEntityBase>(
   config: ContentWriteConfig<T>,
   input: {
     slug: string
-    contentSource: ContentSource
+    catalogLayer: CatalogLayer
     rulesetId: SystemRulesetId
   },
 ) {
@@ -104,7 +104,7 @@ function buildCatalogMediaPersistContext<T extends WriteEntityBase>(
     domain,
     subject: contentTypeSubject(config.typeName as ApiContentTypeKey),
     slug: input.slug,
-    contentSource: input.contentSource,
+    catalogLayer: input.catalogLayer,
     rulesetId: input.rulesetId,
   }
 }
@@ -166,7 +166,7 @@ async function reconcileCatalogContentMediaWithSession<T extends WriteEntityBase
     config: ContentWriteConfig<T>
     campaignId: string
     entityId: string
-    contentSource: ContentSource
+    catalogLayer: CatalogLayer
     slug: string
     rulesetId: SystemRulesetId
     envelope: CatalogMediaWriteEnvelope
@@ -177,7 +177,7 @@ async function reconcileCatalogContentMediaWithSession<T extends WriteEntityBase
 ): Promise<ContentMedia> {
   const persistCtx = buildCatalogMediaPersistContext(input.config, {
     slug: input.slug,
-    contentSource: input.contentSource,
+    catalogLayer: input.catalogLayer,
     rulesetId: input.rulesetId,
   })
 
@@ -192,7 +192,7 @@ async function reconcileCatalogContentMediaWithSession<T extends WriteEntityBase
             input.config,
             input.campaignId,
             input.entityId,
-            input.contentSource,
+            input.catalogLayer,
             session,
           )
         : null
@@ -268,7 +268,7 @@ export async function releaseCatalogContentMediaReferencesWithSession<T extends 
       config,
       campaignId: input.campaignId,
       entityId: input.entityId,
-      contentSource: 'homebrew',
+      catalogLayer: 'homebrew',
       slug: input.slug,
       rulesetId: input.rulesetId,
       envelope: {
@@ -300,7 +300,7 @@ export async function releaseCatalogContentMediaReferences<T extends WriteEntity
     config,
     campaignId,
     entityId,
-    contentSource: 'homebrew',
+    catalogLayer: 'homebrew',
     slug: doc?.slug ?? '',
     rulesetId: doc?.rulesetId ?? 'srd-cc-5.2.1',
     envelope: { media: emptyContentMediaSchema, expectedMediaRevision: currentMedia.revision },

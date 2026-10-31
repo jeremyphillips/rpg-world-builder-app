@@ -20,6 +20,15 @@ import {
   SPELL_RESOLUTION_TARGET_KIND_TERM,
 } from '../content/spell/resolution/vocab'
 import { AREA_GEOMETRY_SHAPE_TERM } from '../primitives/area-geometry'
+import {
+  SOURCE_DOCUMENT_DISPLAY_TERM,
+  SOURCE_DOCUMENT_EXPORT_TERM,
+  SOURCE_DOCUMENT_LICENSE_TERM,
+} from '../primitives/provenance/source-document-access'
+import {
+  EXCERPT_CORRECTION_REASON_TERM,
+  SOURCE_TRANSCRIPTION_CLEANUP_TERM,
+} from '../primitives/provenance/transcription'
 import { ABILITY_SCORE_TERM } from './ability'
 import { ALIGNMENT_TERM } from './alignment'
 import { CHARACTER_GENDER_TERM } from './character-gender'
@@ -62,6 +71,7 @@ import { PROFICIENCY_TERM } from './proficiency'
 import { SENSE_TERM } from './sense'
 import { SPELL_ATOMIC_EFFECT_KIND_TERM } from './spell/atomic-effect-kind'
 import { CASTING_TIME_UNIT_TERM } from './spell/casting-time'
+import { SPELL_COMPONENT_TERM } from './spell/components'
 import { SPELL_DELIVERY_METHOD_TERM } from './spell/delivery-method'
 import { DURATION_UNIT_TERM } from './spell/duration'
 import { SPELL_FUNCTION_TAG_TERM } from './spell/function-tag'
@@ -71,7 +81,7 @@ import { SPELL_ROLE_TAG_TERM } from './spell/role-tag'
 import { SLOT_PROGRESSION_KIND_TERM } from './spell/slot-progression-kind'
 import { SPELL_SCHOOL_TERM } from './spell/school'
 import { getTermSentenceForm, type VocabularyTerm } from './types'
-import { USAGE_FREQUENCY_TERM } from './usage-frequency'
+import { REST_KIND_TERM } from './rest'
 import { WEAPON_CATEGORY_TERM } from './weapon/category'
 import { WEAPON_MASTERY_TERM } from './weapon/mastery'
 import { WEAPON_MODE_TERM } from './weapon/mode'
@@ -98,7 +108,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   MOVEMENT_MODE_TERM,
   MOVEMENT_OPERATION_TERM,
   PROFICIENCY_TERM,
-  USAGE_FREQUENCY_TERM,
+  REST_KIND_TERM,
   ARMOR_CATEGORY_TERM,
   ARMOR_MATERIAL_TERM,
   PHYSICAL_DAMAGE_TYPE_TERM,
@@ -120,6 +130,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   EDITION_PRESET_TERM,
   SPELL_ATOMIC_EFFECT_KIND_TERM,
   CASTING_TIME_UNIT_TERM,
+  SPELL_COMPONENT_TERM,
   SPELL_DELIVERY_METHOD_TERM,
   DURATION_UNIT_TERM,
   SPELL_FUNCTION_TAG_TERM,
@@ -165,7 +176,14 @@ const CHARACTER_NARRATIVE_TERMS = [
   NARRATIVE_FRAGMENT_CONDITION_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
-const PRIMITIVE_TERMS = [AREA_GEOMETRY_SHAPE_TERM] as const satisfies readonly VocabularyTerm[]
+const PRIMITIVE_TERMS = [
+  AREA_GEOMETRY_SHAPE_TERM,
+  SOURCE_DOCUMENT_DISPLAY_TERM,
+  SOURCE_DOCUMENT_EXPORT_TERM,
+  SOURCE_DOCUMENT_LICENSE_TERM,
+  SOURCE_TRANSCRIPTION_CLEANUP_TERM,
+  EXCERPT_CORRECTION_REASON_TERM,
+] as const satisfies readonly VocabularyTerm[]
 
 /** Taxonomies with `*_TERM` only — no `*_ENTRIES`, not in `VOCABULARY_OPTION_SET_TERMS`. */
 const CONCEPT_ONLY_TERMS = [
@@ -198,7 +216,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(51)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(52)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }
@@ -232,7 +250,7 @@ describe('character-narrative term coverage', () => {
 
 describe('primitives term coverage', () => {
   it('defines vocab terms for GameTermEntry *_ENTRIES maps', () => {
-    expect(PRIMITIVE_TERMS).toHaveLength(1)
+    expect(PRIMITIVE_TERMS).toHaveLength(6)
     for (const term of PRIMITIVE_TERMS) {
       expectVocabularyTerm(term)
     }

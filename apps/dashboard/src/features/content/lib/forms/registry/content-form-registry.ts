@@ -5,12 +5,13 @@ import type { FormItem, FormValueSync, TabbedFormTab } from '@rpg/ui/form'
 import type {
   ArmorClassRules,
   ContentMediaDomain,
-  ContentSource,
+  CatalogLayer,
   ContentValidationIntent,
   Equipment,
   EquipmentKind,
   OrganizationPractice,
   SkillProficiency,
+  Spell,
   WeaponCategory,
 } from '@rpg/contracts'
 import type { ResolvedCampaignRules, ResolvedSpellcastingProgressionConfig } from '@rpg/contracts'
@@ -45,7 +46,7 @@ export type ContentFormCtx = {
    * per-row delete-locking (system rows are protected) without a per-row
    * `source` field on the embedded element.
    */
-  entitySource?: ContentSource
+  entityCatalogLayer?: CatalogLayer
   /** Immutable catalog slug on edit — omitted from RHF because slug is envelope-only. */
   entitySlug?: string
   /** Ruleset for system artwork resolution in media fields. */
@@ -79,6 +80,10 @@ export type ContentFormCtx = {
   equipmentCatalogStatus?: 'pending' | 'ready' | 'error'
   /** `ready` once `skillCatalogBySlug` is the campaign's effective catalog. */
   skillCatalogStatus?: 'pending' | 'ready' | 'error'
+  /** Spells keyed by canonical content id for monster spell actions. */
+  spellCatalogById?: ReadonlyMap<string, Spell>
+  /** `ready` once `spellCatalogById` is the campaign's effective catalog. */
+  spellCatalogStatus?: 'pending' | 'ready' | 'error'
   /** Campaign armor-class scale captured for this authoring session. */
   armorClassRules?: ArmorClassRules
   /** Selected member class affinity ids for orphan chip union on edit load. */
@@ -87,6 +92,8 @@ export type ContentFormCtx = {
   organizationMemberSpeciesAffinitySeedIds?: readonly string[]
   /** Persisted parent location id for orphan union on location edit load. */
   locationParentLocationIdSeed?: string
+  /** Saved creature sizes so an inactive vocabulary size stays visible on edit. */
+  creatureSizesSeedIds?: readonly string[]
   /** Live practice recommendations from preset bridge — authoring guidance only. */
   organizationPracticeRecommendationIds?: readonly OrganizationPractice[]
   /** Standalone vs quick-create organization field visibility (`full` default). */

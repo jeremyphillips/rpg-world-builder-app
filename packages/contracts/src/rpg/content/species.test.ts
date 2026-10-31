@@ -19,7 +19,9 @@ const ELF_BODY = {
     {
       kind: 'grant' as const,
       id: 'darkvision',
-      grantGroups: [{ grants: [{ kind: 'sense' as const, type: 'darkvision', range: 60 }] }],
+      grantGroups: [
+        { grants: [{ id: 'sense-1', kind: 'sense' as const, type: 'darkvision', range: 60 }] },
+      ],
     },
     {
       kind: 'custom' as const,
@@ -41,15 +43,16 @@ const ELF_BODY = {
         description: '<p>Drow trace their lineage to the Underdark.</p>',
         grantGroups: [
           {
-            grants: [{ kind: 'sense' as const, type: 'darkvision', range: 120 }],
+            grants: [{ id: 'sense-2', kind: 'sense' as const, type: 'darkvision', range: 120 }],
           },
           {
             unlock: { level: 1 },
             grants: [
               {
+                id: 'spells-3',
                 kind: 'spells' as const,
                 ability: 'cha',
-                casting: { mode: 'free_cast', frequency: 'at_will' },
+                casting: { mode: 'free_cast' },
                 spellIds: ['dancing-lights'],
               },
             ],
@@ -58,9 +61,17 @@ const ELF_BODY = {
             unlock: { level: 3 },
             grants: [
               {
+                id: 'spells-4',
                 kind: 'spells' as const,
                 ability: 'cha',
-                casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
+                casting: {
+                  mode: 'free_cast',
+                  limitedUse: {
+                    kind: 'uses',
+                    count: { kind: 'fixed', value: 1 },
+                    recovery: { minimumRest: 'long' },
+                  } as const,
+                },
                 spellIds: ['faerie-fire'],
               },
             ],
@@ -76,6 +87,7 @@ const ELF_BODY = {
           {
             grants: [
               {
+                id: 'movement-5',
                 kind: 'movement' as const,
                 mode: 'walk',
                 operation: 'increase',
@@ -93,7 +105,7 @@ const ELF_SYSTEM = {
   id: 'srd-cc-5.2.1:elf',
   slug: 'elf',
   rulesetId: 'srd-cc-5.2.1' as const,
-  source: 'system' as const,
+  catalogLayer: 'system' as const,
   campaignId: null,
   createdAt: '2024-05-21T00:00:00.000Z',
   updatedAt: '2024-05-21T00:00:00.000Z',
@@ -113,7 +125,7 @@ describe('speciesSchema', () => {
     const homebrew = {
       ...ELF_SYSTEM,
       id: 'abc123',
-      source: 'homebrew' as const,
+      catalogLayer: 'homebrew' as const,
       campaignId: 'camp-1',
     }
     expect(speciesSchema.safeParse(homebrew).success).toBe(true)

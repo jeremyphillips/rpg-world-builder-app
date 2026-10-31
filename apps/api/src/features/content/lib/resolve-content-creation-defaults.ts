@@ -1,7 +1,7 @@
 import {
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   type ApiContentTypeKey,
-  type ContentSource,
+  type CatalogLayer,
   type ContentStatus,
   type ResolvedContentCampaignAccess,
   resolveContentCampaignAccess,
@@ -12,7 +12,7 @@ export type ContentCreationMode = 'duplicate' | 'ordinary'
 
 export interface ContentCreationDefaults {
   status: ContentStatus
-  source: ContentSource
+  catalogLayer: CatalogLayer
   /**
    * Resolved campaign-access default when no overlay row exists — documentation
    * only; not written on create. List reads resolve via `resolveContentCampaignAccess(null)`.
@@ -34,14 +34,14 @@ export function resolveContentCreationDefaults(options: {
   if (options.mode === 'duplicate') {
     return {
       status: 'draft',
-      source: 'homebrew',
+      catalogLayer: 'homebrew',
       resolvedCampaignAccessDefault,
     }
   }
 
   return {
     status: 'published',
-    source: 'homebrew',
+    catalogLayer: 'homebrew',
     resolvedCampaignAccessDefault,
   }
 }

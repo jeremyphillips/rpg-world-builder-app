@@ -8,9 +8,10 @@ export function homebrewContentEnvelope(doc: HomebrewDoc) {
     id: String(doc._id),
     slug: doc.slug,
     rulesetId: doc.rulesetId,
-    source: 'homebrew' as const,
+    catalogLayer: 'homebrew' as const,
     campaignId: doc.campaignId,
     status: (doc.status as ContentStatus | undefined) ?? 'published',
+    ...(doc.provenance !== undefined && { provenance: doc.provenance }),
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   }

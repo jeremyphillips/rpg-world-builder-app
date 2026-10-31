@@ -8,6 +8,7 @@ import type {
 } from '../../lib/forms/preview/content-form-preview.types'
 import { deriveMonsterFormDraft } from './monster-form-derivation'
 import { MONSTER_HP_MINIMUM_NOTE } from './monster-form-labels'
+import { MONSTER_HIT_POINTS_SELECT_SIZE_COPY } from './statistics/monster-hit-points-form.lib'
 import { monsterUnavailableReasonCopy } from './monster-display'
 import { monsterArmorClassCompactLabel } from './statistics/monster-armor-class-presentation'
 import { MONSTER_FORM_TAB } from './monster-form-view'
@@ -35,11 +36,15 @@ function formatPreviewAc(derived: ReturnType<typeof deriveMonsterFormDraft>): st
   return '—'
 }
 
-function formatPreviewHp(derived: ReturnType<typeof deriveMonsterFormDraft>): string {
+function formatPreviewHp(
+  values: MonsterFormValues,
+  derived: ReturnType<typeof deriveMonsterFormDraft>,
+): string {
   if (derived?.hp.status === 'resolved') {
     const note = derived.hp.value.clampedToMinimum ? ` ${MONSTER_HP_MINIMUM_NOTE}` : ''
     return `${derived.hp.value.hp}${note}`
   }
+  if (!values.sizes || values.sizes.length === 0) return MONSTER_HIT_POINTS_SELECT_SIZE_COPY
   if (derived?.hp.status === 'unavailable') return unavailableText(derived.hp.reason, 'generic')
   return '—'
 }
@@ -69,7 +74,7 @@ export function buildMonsterPreviewSections(
   const derived = deriveMonsterFormDraft(values, ctx)
   const skillsReady = ctx.skillCatalogStatus === 'ready'
   const ac = formatPreviewAc(derived)
-  const hp = formatPreviewHp(derived)
+  const hp = formatPreviewHp(values, derived)
   const initiative =
     derived?.initiative.status === 'resolved' ? derived.initiative.value.label : '—'
   const challenge = formatPreviewChallenge(values, derived, skillsReady)

@@ -1,8 +1,8 @@
+import { MONSTER_ACTION_SECTIONS, type MonsterActionSection } from '@rpg/contracts/content'
+
 import type { MonsterFormValues } from '../monster-form-values'
 
-export const MONSTER_ACTION_SECTIONS = ['actions', 'bonusActions', 'reactions'] as const
-
-export type MonsterActionSection = (typeof MONSTER_ACTION_SECTIONS)[number]
+export { MONSTER_ACTION_SECTIONS, type MonsterActionSection }
 
 export type MonsterEquipmentActionReference = {
   section: MonsterActionSection

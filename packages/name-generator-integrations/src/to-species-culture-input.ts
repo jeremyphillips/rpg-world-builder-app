@@ -8,7 +8,7 @@ export function toSpeciesCultureInput(species: Species): SpeciesCultureInput {
     id: species.id,
     slug: species.slug,
     name: species.name,
-    source: species.source,
+    catalogLayer: species.catalogLayer,
     languageAffinities: species.languageAffinities,
     culture: species.culture,
     heritage:

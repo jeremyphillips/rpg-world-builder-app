@@ -84,7 +84,14 @@ describe('duplicate content routes', () => {
       .send({ name: 'Dup Source Class Copy' })
       .expect(201)
 
-    expect(res.body.classes.source).toBe('homebrew')
+    expect(res.body.classes.catalogLayer).toBe('homebrew')
+    expect(res.body.classes.provenance?.derivedFrom).toMatchObject({
+      relation: 'duplicate',
+      contentId: source.id,
+      contentTypeKey: 'classes',
+      catalogLayer: source.catalogLayer,
+    })
+    expect(res.body.classes.provenance?.documents).toBeUndefined()
     expect(res.body.classes.status).toBe('draft')
     expect(res.body.classes.id).not.toBe(source.id)
     expect(res.body.classes.slug).toBe('dup-source-class-copy')
@@ -231,7 +238,7 @@ describe('duplicate content routes', () => {
     expect(Object.keys(duplicateRes.body)).toEqual(Object.keys(createRes.body))
     expect(duplicateRes.body.feats).toEqual(
       expect.objectContaining({
-        source: 'homebrew',
+        catalogLayer: 'homebrew',
         status: 'draft',
         category: 'origin',
       }),
@@ -303,6 +310,25 @@ describe('duplicate content routes', () => {
       .expect(201)
 
     const copy = res.body.monsters
+    expect(copy.provenance?.documents?.[0]?.citation.documentId).toBe('srd-5.2.1')
+    expect(copy.provenance?.derivedFrom).toMatchObject({
+      relation: 'duplicate',
+      contentId: skeleton!.id,
+      catalogLayer: 'system',
+    })
+    expect(copy.provenance?.citation).toEqual(skeleton!.provenance?.citation)
+    expect(copy.actions.map((action: { provenance?: unknown }) => action.provenance)).toEqual(
+      skeleton!.actions.map((action) => action.provenance),
+    )
+    expect(copy.bonusActions.map((action: { provenance?: unknown }) => action.provenance)).toEqual(
+      skeleton!.bonusActions.map((action) => action.provenance),
+    )
+    expect(copy.reactions.map((action: { provenance?: unknown }) => action.provenance)).toEqual(
+      skeleton!.reactions.map((action) => action.provenance),
+    )
+    expect(copy.traits.map((trait: { provenance?: unknown }) => trait.provenance)).toEqual(
+      skeleton!.traits.map((trait) => trait.provenance),
+    )
     expect(copy.equipment.map((entry: { entryId: string }) => entry.entryId)).toEqual(
       skeleton!.equipment.map((entry) => entry.entryId),
     )

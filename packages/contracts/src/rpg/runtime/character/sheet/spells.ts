@@ -4,8 +4,11 @@ import {
   spellCollectionKindSchema,
   type SpellCollectionKind,
 } from '../../../vocab/spell/spell-collection-kind'
-import { usageFrequencySchema } from '../../../vocab/usage-frequency'
-import { characterSelectionSourcesSchema } from './selection-sources'
+import { restLimitedUseSchema } from '../../../primitives/limited-use'
+import {
+  characterSelectionSourcesSchema,
+  grantDerivedSelectionSourceSchema,
+} from './selection-sources'
 
 // ---------------------------------------------------------------------------
 // Runtime spell list entries on a character sheet.
@@ -39,9 +42,9 @@ export type CharacterSpellCollectionMembership = z.infer<
 
 export const characterSpellCastingEntitlementSchema = z.object({
   mode: z.literal('free_cast'),
-  frequency: usageFrequencySchema,
+  limitedUse: restLimitedUseSchema.optional(),
   allowsSlotCasting: z.boolean(),
-  sources: characterSelectionSourcesSchema,
+  source: grantDerivedSelectionSourceSchema,
 })
 
 export type CharacterSpellCastingEntitlement = z.infer<

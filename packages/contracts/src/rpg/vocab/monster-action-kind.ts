@@ -1,3 +1,4 @@
+import { getContentTypeTerm } from '../primitives/content/content-type-terms'
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import type { GameTermEntry, VocabularyTerm } from './types'
 
@@ -7,7 +8,8 @@ import type { GameTermEntry, VocabularyTerm } from './types'
 
 export const MONSTER_ACTION_KIND_TERM = {
   label: 'Monster Action Kind',
-  description: 'Whether a monster action uses equipment, a natural weapon, or special prose.',
+  description:
+    'Whether a monster action uses equipment, a natural weapon, an authored attack, special prose, or referenced spells.',
   sentence: {
     singular: 'monster action kind',
     plural: 'monster action kinds',
@@ -23,9 +25,18 @@ export const MONSTER_ACTION_KIND_ENTRIES = {
     label: 'Natural weapon',
     description: 'An innate attack such as a claw or bite with authored damage.',
   },
+  attack: {
+    label: 'Attack',
+    description: 'An authored attack with an explicit bonus source and one or both modes.',
+  },
   special: {
     label: 'Special',
     description: 'A named special action described in prose.',
+  },
+  spell: {
+    label: getContentTypeTerm('spells').label,
+    description:
+      'Casts referenced spells. The structure is authoritative and the prose is generated.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

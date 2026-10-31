@@ -154,7 +154,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
         campaignAccess,
         onCampaignAccessDraftChange,
         onCampaignAccessPersisted,
-        entitySource: ctx.entitySource,
+        entityCatalogLayer: ctx.entityCatalogLayer,
         formMode,
         identityLayout: CONTENT_FORM_IDENTITY_LAYOUT_INLINE,
         availabilityPresentation: CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,

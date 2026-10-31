@@ -23,7 +23,9 @@ describe('resolveTraitDisplay', () => {
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'poison-resistance',
-        grantGroups: [{ grants: [{ kind: 'resistances', damageTypes: ['poison'] }] }],
+        grantGroups: [
+          { grants: [{ id: 'resistances-1', kind: 'resistances', damageTypes: ['poison'] }] },
+        ],
       }),
     )
     expect(display.name).toBe('Damage Resistance')
@@ -37,7 +39,9 @@ describe('resolveTraitDisplay', () => {
         id: 'speed',
         grantGroups: [
           {
-            grants: [{ kind: 'movement', mode: 'walk', operation: 'increase', feet: 5 }],
+            grants: [
+              { id: 'movement-2', kind: 'movement', mode: 'walk', operation: 'increase', feet: 5 },
+            ],
           },
         ],
       }),
@@ -51,7 +55,9 @@ describe('resolveTraitDisplay', () => {
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'common',
-        grantGroups: [{ grants: [{ kind: 'languages', languageIds: ['common'] }] }],
+        grantGroups: [
+          { grants: [{ id: 'languages-3', kind: 'languages', languageIds: ['common'] }] },
+        ],
       }),
     )
     expect(display.name).toBe('Language')

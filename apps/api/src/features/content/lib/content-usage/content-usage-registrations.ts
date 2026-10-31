@@ -12,6 +12,7 @@ import {
   characterSkillProficiencySource,
   characterSpeciesSource,
   characterSpellSource,
+  contentSpellReferenceSource,
   characterSubclassSource,
   locationParentReferenceSource,
   organizationLocationSource,
@@ -55,7 +56,10 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
   }),
   defineContentUsage({
     contentType: 'spells',
-    sources: [{ source: characterSpellSource, entry: true, batch: true }],
+    sources: [
+      { source: characterSpellSource, entry: true, batch: true },
+      { source: contentSpellReferenceSource, entry: true, batch: true },
+    ],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
     viewerCharacterRelationship: { strategy: 'spell-selection' },

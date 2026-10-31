@@ -1,4 +1,4 @@
-import type { ContentSource, ContentStatus, ContentTypeKey } from '@rpg/contracts'
+import type { CatalogLayer, ContentStatus, ContentTypeKey } from '@rpg/contracts'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS, getErrorMessage } from '@rpg/contracts'
 import { useCallback, useState } from 'react'
 
@@ -13,7 +13,7 @@ export function useContentEditEntityFormState<
   TEntity extends {
     id: string
     name: string
-    source: ContentSource
+    catalogLayer: CatalogLayer
     status: ContentStatus
     campaignAccess?: typeof DEFAULT_CONTENT_CAMPAIGN_ACCESS
   },
@@ -35,7 +35,7 @@ export function useContentEditEntityFormState<
     campaignId: input.campaignId,
     entityId: input.entity.id,
     entityName: input.entity.name,
-    entitySource: input.entity.source,
+    entityCatalogLayer: input.entity.catalogLayer,
     contentTypeKey: input.contentTypeKey,
     overviewHref: input.overviewHref,
   })
@@ -43,7 +43,7 @@ export function useContentEditEntityFormState<
     def: input.def,
     campaignId: input.campaignId,
     entityId: input.entity.id,
-    entitySource: input.entity.source,
+    entityCatalogLayer: input.entity.catalogLayer,
     entityStatus: input.entity.status,
   })
   const demoteFlow = useContentDemoteFlow({
@@ -51,7 +51,7 @@ export function useContentEditEntityFormState<
     campaignId: input.campaignId,
     entityId: input.entity.id,
     entityName: input.entity.name,
-    entitySource: input.entity.source,
+    entityCatalogLayer: input.entity.catalogLayer,
     entityStatus: input.entity.status,
   })
 
@@ -83,6 +83,6 @@ export function useContentEditEntityFormState<
     handlePublish,
     handleCoordinatedSaveSuccess,
     headerError,
-    showLifecycleActions: input.entity.source === 'homebrew',
+    showLifecycleActions: input.entity.catalogLayer === 'homebrew',
   }
 }

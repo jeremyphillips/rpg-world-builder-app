@@ -7,25 +7,25 @@
         "$ref": "#/definitions/__schema0"
       },
       {
-        "$ref": "#/definitions/__schema33"
-      },
-      {
         "$ref": "#/definitions/__schema42"
       },
       {
-        "$ref": "#/definitions/__schema44"
-      },
-      {
-        "$ref": "#/definitions/__schema46"
-      },
-      {
-        "$ref": "#/definitions/__schema49"
-      },
-      {
-        "$ref": "#/definitions/__schema50"
-      },
-      {
         "$ref": "#/definitions/__schema51"
+      },
+      {
+        "$ref": "#/definitions/__schema53"
+      },
+      {
+        "$ref": "#/definitions/__schema55"
+      },
+      {
+        "$ref": "#/definitions/__schema58"
+      },
+      {
+        "$ref": "#/definitions/__schema59"
+      },
+      {
+        "$ref": "#/definitions/__schema60"
       }
     ],
     "markdownDescription": "Branch on **kind**: **weapon** | **armor** | **adventuring_gear** | **tool** | **mount** | **vehicle** | **service** | **magic_item**"
@@ -47,7 +47,7 @@
           ],
           "description": "srd-cc-5.2.1"
         },
-        "source": {
+        "catalogLayer": {
           "type": "string",
           "enum": [
             "system",
@@ -67,29 +67,32 @@
         "campaignId": {
           "$ref": "#/definitions/__schema6"
         },
-        "createdAt": {
+        "provenance": {
           "$ref": "#/definitions/__schema7"
         },
+        "createdAt": {
+          "$ref": "#/definitions/__schema16"
+        },
         "updatedAt": {
-          "$ref": "#/definitions/__schema8"
-        },
-        "name": {
-          "$ref": "#/definitions/__schema9"
-        },
-        "description": {
-          "$ref": "#/definitions/__schema10"
-        },
-        "media": {
-          "$ref": "#/definitions/__schema11"
-        },
-        "cost": {
           "$ref": "#/definitions/__schema17"
         },
-        "weight": {
+        "name": {
           "$ref": "#/definitions/__schema18"
         },
-        "tags": {
+        "description": {
           "$ref": "#/definitions/__schema19"
+        },
+        "media": {
+          "$ref": "#/definitions/__schema20"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema26"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema27"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema28"
         },
         "kind": {
           "type": "string",
@@ -113,7 +116,7 @@
           "description": "melee | ranged"
         },
         "damage": {
-          "$ref": "#/definitions/__schema23"
+          "$ref": "#/definitions/__schema32"
         },
         "damageType": {
           "type": "string",
@@ -125,10 +128,10 @@
           "description": "bludgeoning | piercing | slashing"
         },
         "versatileDamage": {
-          "$ref": "#/definitions/__schema28"
+          "$ref": "#/definitions/__schema37"
         },
         "properties": {
-          "$ref": "#/definitions/__schema29"
+          "$ref": "#/definitions/__schema38"
         },
         "mastery": {
           "type": "string",
@@ -145,17 +148,17 @@
           "description": "cleave | graze | nick | push | sap | slow | topple | vex"
         },
         "range": {
-          "$ref": "#/definitions/__schema31"
+          "$ref": "#/definitions/__schema40"
         },
         "specialRules": {
-          "$ref": "#/definitions/__schema32"
+          "$ref": "#/definitions/__schema41"
         }
       },
       "required": [
         "id",
         "slug",
         "rulesetId",
-        "source",
+        "catalogLayer",
         "status",
         "campaignId",
         "createdAt",
@@ -214,23 +217,193 @@
       ]
     },
     "__schema7": {
-      "type": "string",
-      "format": "date-time",
-      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+      "type": "object",
+      "properties": {
+        "documents": {
+          "$ref": "#/definitions/__schema8"
+        },
+        "citation": {
+          "$ref": "#/definitions/__schema12"
+        },
+        "excerpt": {
+          "$ref": "#/definitions/__schema13"
+        },
+        "derivedFrom": {
+          "$ref": "#/definitions/__schema15"
+        }
+      },
+      "additionalProperties": false
     },
     "__schema8": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/__schema9"
+      }
+    },
+    "__schema9": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "registered",
+              "description": "registered"
+            },
+            "citation": {
+              "$ref": "#/definitions/__schema10"
+            }
+          },
+          "required": [
+            "kind",
+            "citation"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "__schema10": {
+      "type": "object",
+      "properties": {
+        "documentId": {
+          "type": "string",
+          "enum": [
+            "srd-5.2.1"
+          ],
+          "description": "srd-5.2.1"
+        },
+        "locator": {
+          "type": "object",
+          "properties": {
+            "section": {
+              "type": "string",
+              "minLength": 1
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "documentId"
+      ],
+      "additionalProperties": false
+    },
+    "__schema11": {
+      "type": "string",
+      "enum": [
+        "srd-5.2.1"
+      ],
+      "description": "srd-5.2.1"
+    },
+    "__schema12": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/__schema10"
+        }
+      ]
+    },
+    "__schema13": {
+      "type": "object",
+      "properties": {
+        "documentId": {
+          "type": "string",
+          "enum": [
+            "srd-5.2.1"
+          ],
+          "description": "srd-5.2.1"
+        },
+        "excerptId": {
+          "$ref": "#/definitions/__schema14"
+        }
+      },
+      "required": [
+        "documentId",
+        "excerptId"
+      ],
+      "additionalProperties": false
+    },
+    "__schema14": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+(?:\\/[a-z0-9-]+)+$"
+    },
+    "__schema15": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "relation": {
+              "type": "string",
+              "const": "duplicate",
+              "description": "duplicate"
+            },
+            "contentId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "contentTypeKey": {
+              "type": "string",
+              "enum": [
+                "classes",
+                "spells",
+                "species",
+                "feats",
+                "equipment",
+                "skill-proficiencies",
+                "organizations",
+                "locations",
+                "monsters"
+              ],
+              "description": "classes | spells | species | feats | equipment | skill-proficiencies | organizations | locations | monsters"
+            },
+            "catalogLayer": {
+              "type": "string",
+              "enum": [
+                "system",
+                "homebrew"
+              ],
+              "description": "system | homebrew"
+            },
+            "at": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+            }
+          },
+          "required": [
+            "relation",
+            "contentId",
+            "contentTypeKey",
+            "catalogLayer",
+            "at"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "__schema16": {
       "type": "string",
       "format": "date-time",
       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
     },
-    "__schema9": {
+    "__schema17": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+    },
+    "__schema18": {
       "type": "string",
       "minLength": 1
     },
-    "__schema10": {
+    "__schema19": {
       "type": "string"
     },
-    "__schema11": {
+    "__schema20": {
       "type": "object",
       "properties": {
         "revision": {
@@ -268,28 +441,28 @@
             "primary": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/__schema12"
+                  "$ref": "#/definitions/__schema21"
                 }
               ]
             },
             "portrait": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/__schema12"
+                  "$ref": "#/definitions/__schema21"
                 }
               ]
             },
             "banner": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/__schema12"
+                  "$ref": "#/definitions/__schema21"
                 }
               ]
             },
             "emblem": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/__schema12"
+                  "$ref": "#/definitions/__schema21"
                 }
               ]
             }
@@ -304,7 +477,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema12": {
+    "__schema21": {
       "type": "object",
       "properties": {
         "source": {
@@ -416,16 +589,16 @@
                   "type": "object",
                   "properties": {
                     "x": {
-                      "$ref": "#/definitions/__schema13"
+                      "$ref": "#/definitions/__schema22"
                     },
                     "y": {
-                      "$ref": "#/definitions/__schema14"
+                      "$ref": "#/definitions/__schema23"
                     },
                     "width": {
-                      "$ref": "#/definitions/__schema15"
+                      "$ref": "#/definitions/__schema24"
                     },
                     "height": {
-                      "$ref": "#/definitions/__schema16"
+                      "$ref": "#/definitions/__schema25"
                     }
                   },
                   "required": [
@@ -510,27 +683,27 @@
       ],
       "additionalProperties": false
     },
-    "__schema13": {
+    "__schema22": {
       "type": "number",
       "minimum": 0,
       "maximum": 1
     },
-    "__schema14": {
+    "__schema23": {
       "type": "number",
       "minimum": 0,
       "maximum": 1
     },
-    "__schema15": {
+    "__schema24": {
       "type": "number",
       "exclusiveMinimum": 0,
       "maximum": 1
     },
-    "__schema16": {
+    "__schema25": {
       "type": "number",
       "exclusiveMinimum": 0,
       "maximum": 1
     },
-    "__schema17": {
+    "__schema26": {
       "anyOf": [
         {
           "type": "object",
@@ -562,7 +735,7 @@
         }
       ]
     },
-    "__schema18": {
+    "__schema27": {
       "type": "object",
       "properties": {
         "value": {
@@ -581,18 +754,18 @@
       ],
       "additionalProperties": false
     },
-    "__schema19": {
+    "__schema28": {
       "type": "array",
       "items": {
         "type": "string"
       }
     },
-    "__schema20": {
+    "__schema29": {
       "type": "string",
       "const": "weapon",
       "description": "weapon"
     },
-    "__schema21": {
+    "__schema30": {
       "type": "string",
       "enum": [
         "simple",
@@ -600,7 +773,7 @@
       ],
       "description": "simple | martial"
     },
-    "__schema22": {
+    "__schema31": {
       "type": "string",
       "enum": [
         "melee",
@@ -608,26 +781,26 @@
       ],
       "description": "melee | ranged"
     },
-    "__schema23": {
+    "__schema32": {
       "type": "object",
       "properties": {
         "dice": {
-          "$ref": "#/definitions/__schema24"
+          "$ref": "#/definitions/__schema33"
         },
         "flat": {
-          "$ref": "#/definitions/__schema26"
+          "$ref": "#/definitions/__schema35"
         }
       },
       "additionalProperties": false
     },
-    "__schema24": {
+    "__schema33": {
       "allOf": [
         {
-          "$ref": "#/definitions/__schema25"
+          "$ref": "#/definitions/__schema34"
         }
       ]
     },
-    "__schema25": {
+    "__schema34": {
       "type": "object",
       "properties": {
         "count": {
@@ -674,12 +847,12 @@
       ],
       "additionalProperties": false
     },
-    "__schema26": {
+    "__schema35": {
       "type": "integer",
       "minimum": -9007199254740991,
       "maximum": 9007199254740991
     },
-    "__schema27": {
+    "__schema36": {
       "type": "string",
       "enum": [
         "bludgeoning",
@@ -688,14 +861,14 @@
       ],
       "description": "bludgeoning | piercing | slashing"
     },
-    "__schema28": {
+    "__schema37": {
       "allOf": [
         {
-          "$ref": "#/definitions/__schema25"
+          "$ref": "#/definitions/__schema34"
         }
       ]
     },
-    "__schema29": {
+    "__schema38": {
       "type": "array",
       "items": {
         "type": "string",
@@ -714,7 +887,7 @@
         "description": "ammunition | finesse | heavy | light | loading | reach | special | thrown | two-handed | versatile"
       }
     },
-    "__schema30": {
+    "__schema39": {
       "type": "string",
       "enum": [
         "cleave",
@@ -728,7 +901,7 @@
       ],
       "description": "cleave | graze | nick | push | sap | slow | topple | vex"
     },
-    "__schema31": {
+    "__schema40": {
       "type": "object",
       "properties": {
         "normal": {
@@ -747,10 +920,10 @@
       ],
       "additionalProperties": false
     },
-    "__schema32": {
+    "__schema41": {
       "type": "string"
     },
-    "__schema33": {
+    "__schema42": {
       "type": "object",
       "properties": {
         "id": {
@@ -766,7 +939,7 @@
           ],
           "description": "srd-cc-5.2.1"
         },
-        "source": {
+        "catalogLayer": {
           "type": "string",
           "enum": [
             "system",
@@ -786,29 +959,32 @@
         "campaignId": {
           "$ref": "#/definitions/__schema6"
         },
-        "createdAt": {
+        "provenance": {
           "$ref": "#/definitions/__schema7"
         },
+        "createdAt": {
+          "$ref": "#/definitions/__schema16"
+        },
         "updatedAt": {
-          "$ref": "#/definitions/__schema8"
-        },
-        "name": {
-          "$ref": "#/definitions/__schema9"
-        },
-        "description": {
-          "$ref": "#/definitions/__schema10"
-        },
-        "media": {
-          "$ref": "#/definitions/__schema11"
-        },
-        "cost": {
           "$ref": "#/definitions/__schema17"
         },
-        "weight": {
+        "name": {
           "$ref": "#/definitions/__schema18"
         },
-        "tags": {
+        "description": {
           "$ref": "#/definitions/__schema19"
+        },
+        "media": {
+          "$ref": "#/definitions/__schema20"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema26"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema27"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema28"
         },
         "kind": {
           "type": "string",
@@ -834,23 +1010,23 @@
           "description": "organic | metal"
         },
         "baseAcOffset": {
-          "$ref": "#/definitions/__schema37"
+          "$ref": "#/definitions/__schema46"
         },
         "acBonus": {
-          "$ref": "#/definitions/__schema38"
+          "$ref": "#/definitions/__schema47"
         },
         "stealthDisadvantage": {
-          "$ref": "#/definitions/__schema39"
+          "$ref": "#/definitions/__schema48"
         },
         "abilityScoreRequirements": {
-          "$ref": "#/definitions/__schema40"
+          "$ref": "#/definitions/__schema49"
         }
       },
       "required": [
         "id",
         "slug",
         "rulesetId",
-        "source",
+        "catalogLayer",
         "status",
         "campaignId",
         "createdAt",
@@ -863,12 +1039,12 @@
       ],
       "additionalProperties": false
     },
-    "__schema34": {
+    "__schema43": {
       "type": "string",
       "const": "armor",
       "description": "armor"
     },
-    "__schema35": {
+    "__schema44": {
       "type": "string",
       "enum": [
         "light",
@@ -878,7 +1054,7 @@
       ],
       "description": "light | medium | heavy | shields"
     },
-    "__schema36": {
+    "__schema45": {
       "type": "string",
       "enum": [
         "organic",
@@ -886,20 +1062,20 @@
       ],
       "description": "organic | metal"
     },
-    "__schema37": {
+    "__schema46": {
       "type": "integer",
       "minimum": 0,
       "maximum": 15
     },
-    "__schema38": {
+    "__schema47": {
       "type": "integer",
       "minimum": -9007199254740991,
       "maximum": 9007199254740991
     },
-    "__schema39": {
+    "__schema48": {
       "type": "boolean"
     },
-    "__schema40": {
+    "__schema49": {
       "type": "object",
       "propertyNames": {
         "allOf": [
@@ -923,7 +1099,7 @@
         "maximum": 30
       }
     },
-    "__schema41": {
+    "__schema50": {
       "type": "string",
       "enum": [
         "str",
@@ -935,7 +1111,7 @@
       ],
       "description": "str | dex | con | int | wis | cha"
     },
-    "__schema42": {
+    "__schema51": {
       "type": "object",
       "properties": {
         "id": {
@@ -951,7 +1127,7 @@
           ],
           "description": "srd-cc-5.2.1"
         },
-        "source": {
+        "catalogLayer": {
           "type": "string",
           "enum": [
             "system",
@@ -971,29 +1147,32 @@
         "campaignId": {
           "$ref": "#/definitions/__schema6"
         },
-        "createdAt": {
+        "provenance": {
           "$ref": "#/definitions/__schema7"
         },
+        "createdAt": {
+          "$ref": "#/definitions/__schema16"
+        },
         "updatedAt": {
-          "$ref": "#/definitions/__schema8"
-        },
-        "name": {
-          "$ref": "#/definitions/__schema9"
-        },
-        "description": {
-          "$ref": "#/definitions/__schema10"
-        },
-        "media": {
-          "$ref": "#/definitions/__schema11"
-        },
-        "cost": {
           "$ref": "#/definitions/__schema17"
         },
-        "weight": {
+        "name": {
           "$ref": "#/definitions/__schema18"
         },
-        "tags": {
+        "description": {
           "$ref": "#/definitions/__schema19"
+        },
+        "media": {
+          "$ref": "#/definitions/__schema20"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema26"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema27"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema28"
         },
         "kind": {
           "type": "string",
@@ -1066,7 +1245,7 @@
         "id",
         "slug",
         "rulesetId",
-        "source",
+        "catalogLayer",
         "status",
         "campaignId",
         "createdAt",
@@ -1078,7 +1257,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema43": {
+    "__schema52": {
       "type": "string",
       "enum": [
         "worn",
@@ -1088,7 +1267,7 @@
       ],
       "description": "worn | held | borne_on_fabric | borne_on_shield"
     },
-    "__schema44": {
+    "__schema53": {
       "type": "object",
       "properties": {
         "id": {
@@ -1104,7 +1283,7 @@
           ],
           "description": "srd-cc-5.2.1"
         },
-        "source": {
+        "catalogLayer": {
           "type": "string",
           "enum": [
             "system",
@@ -1124,29 +1303,32 @@
         "campaignId": {
           "$ref": "#/definitions/__schema6"
         },
-        "createdAt": {
+        "provenance": {
           "$ref": "#/definitions/__schema7"
         },
+        "createdAt": {
+          "$ref": "#/definitions/__schema16"
+        },
         "updatedAt": {
-          "$ref": "#/definitions/__schema8"
-        },
-        "name": {
-          "$ref": "#/definitions/__schema9"
-        },
-        "description": {
-          "$ref": "#/definitions/__schema10"
-        },
-        "media": {
-          "$ref": "#/definitions/__schema11"
-        },
-        "cost": {
           "$ref": "#/definitions/__schema17"
         },
-        "weight": {
+        "name": {
           "$ref": "#/definitions/__schema18"
         },
-        "tags": {
+        "description": {
           "$ref": "#/definitions/__schema19"
+        },
+        "media": {
+          "$ref": "#/definitions/__schema20"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema26"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema27"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema28"
         },
         "kind": {
           "type": "string",
@@ -1181,7 +1363,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema45"
+            "$ref": "#/definitions/__schema54"
           }
         },
         "crafts": {
@@ -1196,7 +1378,7 @@
         "id",
         "slug",
         "rulesetId",
-        "source",
+        "catalogLayer",
         "status",
         "campaignId",
         "createdAt",
@@ -1210,7 +1392,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema45": {
+    "__schema54": {
       "type": "object",
       "properties": {
         "description": {
@@ -1229,7 +1411,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema46": {
+    "__schema55": {
       "type": "object",
       "properties": {
         "id": {
@@ -1245,7 +1427,7 @@
           ],
           "description": "srd-cc-5.2.1"
         },
-        "source": {
+        "catalogLayer": {
           "type": "string",
           "enum": [
             "system",
@@ -1265,29 +1447,32 @@
         "campaignId": {
           "$ref": "#/definitions/__schema6"
         },
-        "createdAt": {
+        "provenance": {
           "$ref": "#/definitions/__schema7"
         },
+        "createdAt": {
+          "$ref": "#/definitions/__schema16"
+        },
         "updatedAt": {
-          "$ref": "#/definitions/__schema8"
-        },
-        "name": {
-          "$ref": "#/definitions/__schema9"
-        },
-        "description": {
-          "$ref": "#/definitions/__schema10"
-        },
-        "media": {
-          "$ref": "#/definitions/__schema11"
-        },
-        "cost": {
           "$ref": "#/definitions/__schema17"
         },
-        "weight": {
+        "name": {
           "$ref": "#/definitions/__schema18"
         },
-        "tags": {
+        "description": {
           "$ref": "#/definitions/__schema19"
+        },
+        "media": {
+          "$ref": "#/definitions/__schema20"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema26"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema27"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema28"
         },
         "kind": {
           "type": "string",
@@ -1295,17 +1480,17 @@
           "description": "mount"
         },
         "carryingCapacity": {
-          "$ref": "#/definitions/__schema47"
+          "$ref": "#/definitions/__schema56"
         },
         "speed": {
-          "$ref": "#/definitions/__schema48"
+          "$ref": "#/definitions/__schema57"
         }
       },
       "required": [
         "id",
         "slug",
         "rulesetId",
-        "source",
+        "catalogLayer",
         "status",
         "campaignId",
         "createdAt",
@@ -1318,7 +1503,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema47": {
+    "__schema56": {
       "type": "object",
       "properties": {
         "value": {
@@ -1340,7 +1525,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema48": {
+    "__schema57": {
       "type": "object",
       "properties": {
         "value": {
@@ -1362,7 +1547,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema49": {
+    "__schema58": {
       "type": "object",
       "properties": {
         "id": {
@@ -1378,7 +1563,7 @@
           ],
           "description": "srd-cc-5.2.1"
         },
-        "source": {
+        "catalogLayer": {
           "type": "string",
           "enum": [
             "system",
@@ -1398,29 +1583,32 @@
         "campaignId": {
           "$ref": "#/definitions/__schema6"
         },
-        "createdAt": {
+        "provenance": {
           "$ref": "#/definitions/__schema7"
         },
+        "createdAt": {
+          "$ref": "#/definitions/__schema16"
+        },
         "updatedAt": {
-          "$ref": "#/definitions/__schema8"
-        },
-        "name": {
-          "$ref": "#/definitions/__schema9"
-        },
-        "description": {
-          "$ref": "#/definitions/__schema10"
-        },
-        "media": {
-          "$ref": "#/definitions/__schema11"
-        },
-        "cost": {
           "$ref": "#/definitions/__schema17"
         },
-        "weight": {
+        "name": {
           "$ref": "#/definitions/__schema18"
         },
-        "tags": {
+        "description": {
           "$ref": "#/definitions/__schema19"
+        },
+        "media": {
+          "$ref": "#/definitions/__schema20"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema26"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema27"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema28"
         },
         "kind": {
           "type": "string",
@@ -1439,12 +1627,12 @@
           "description": "land | water | air | space | other"
         },
         "speed": {
-          "$ref": "#/definitions/__schema48"
+          "$ref": "#/definitions/__schema57"
         },
         "cargoCapacity": {
           "allOf": [
             {
-              "$ref": "#/definitions/__schema47"
+              "$ref": "#/definitions/__schema56"
             }
           ]
         },
@@ -1478,7 +1666,7 @@
         "id",
         "slug",
         "rulesetId",
-        "source",
+        "catalogLayer",
         "status",
         "campaignId",
         "createdAt",
@@ -1491,7 +1679,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema50": {
+    "__schema59": {
       "type": "object",
       "properties": {
         "id": {
@@ -1507,7 +1695,7 @@
           ],
           "description": "srd-cc-5.2.1"
         },
-        "source": {
+        "catalogLayer": {
           "type": "string",
           "enum": [
             "system",
@@ -1527,26 +1715,29 @@
         "campaignId": {
           "$ref": "#/definitions/__schema6"
         },
-        "createdAt": {
+        "provenance": {
           "$ref": "#/definitions/__schema7"
         },
+        "createdAt": {
+          "$ref": "#/definitions/__schema16"
+        },
         "updatedAt": {
-          "$ref": "#/definitions/__schema8"
-        },
-        "name": {
-          "$ref": "#/definitions/__schema9"
-        },
-        "description": {
-          "$ref": "#/definitions/__schema10"
-        },
-        "media": {
-          "$ref": "#/definitions/__schema11"
-        },
-        "cost": {
           "$ref": "#/definitions/__schema17"
         },
-        "tags": {
+        "name": {
+          "$ref": "#/definitions/__schema18"
+        },
+        "description": {
           "$ref": "#/definitions/__schema19"
+        },
+        "media": {
+          "$ref": "#/definitions/__schema20"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema26"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema28"
         },
         "kind": {
           "type": "string",
@@ -1599,7 +1790,7 @@
         "id",
         "slug",
         "rulesetId",
-        "source",
+        "catalogLayer",
         "status",
         "campaignId",
         "createdAt",
@@ -1611,7 +1802,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema51": {
+    "__schema60": {
       "type": "object",
       "properties": {
         "id": {
@@ -1627,7 +1818,7 @@
           ],
           "description": "srd-cc-5.2.1"
         },
-        "source": {
+        "catalogLayer": {
           "type": "string",
           "enum": [
             "system",
@@ -1647,29 +1838,32 @@
         "campaignId": {
           "$ref": "#/definitions/__schema6"
         },
-        "createdAt": {
+        "provenance": {
           "$ref": "#/definitions/__schema7"
         },
+        "createdAt": {
+          "$ref": "#/definitions/__schema16"
+        },
         "updatedAt": {
-          "$ref": "#/definitions/__schema8"
-        },
-        "name": {
-          "$ref": "#/definitions/__schema9"
-        },
-        "description": {
-          "$ref": "#/definitions/__schema10"
-        },
-        "media": {
-          "$ref": "#/definitions/__schema11"
-        },
-        "cost": {
           "$ref": "#/definitions/__schema17"
         },
-        "weight": {
+        "name": {
           "$ref": "#/definitions/__schema18"
         },
-        "tags": {
+        "description": {
           "$ref": "#/definitions/__schema19"
+        },
+        "media": {
+          "$ref": "#/definitions/__schema20"
+        },
+        "cost": {
+          "$ref": "#/definitions/__schema26"
+        },
+        "weight": {
+          "$ref": "#/definitions/__schema27"
+        },
+        "tags": {
+          "$ref": "#/definitions/__schema28"
         },
         "kind": {
           "type": "string",
@@ -1718,7 +1912,7 @@
         "id",
         "slug",
         "rulesetId",
-        "source",
+        "catalogLayer",
         "status",
         "campaignId",
         "createdAt",

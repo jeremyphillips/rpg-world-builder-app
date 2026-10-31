@@ -9,6 +9,7 @@ import {
   CONTENT_TYPE_CAPABILITIES,
   ContentKeyError,
   ORGANIZATION_MEMBERSHIP_TITLE_ID_PREFIX,
+  isOpaqueGrantRowId,
   type NestedContentIdRegenerationPath,
 } from '@rpg/contracts'
 
@@ -244,5 +245,201 @@ describe('regenerateNestedContentKeysForDuplicate', () => {
         ),
       ).not.toThrow()
     }
+  })
+})
+
+const OPAQUE_GRANT_ID = 'grt_11111111-1111-1111-1111-111111111111'
+const OTHER_OPAQUE_GRANT_ID = 'grt_22222222-2222-2222-2222-222222222222'
+
+function traitWithGrants(grants: Array<Record<string, unknown>>): {
+  traits: Array<Record<string, unknown>>
+} {
+  return {
+    traits: [
+      {
+        id: 'lineage',
+        name: 'Lineage',
+        grantGroups: [{ grants }],
+      },
+    ],
+  }
+}
+
+function firstGrantId(body: Record<string, unknown>): string {
+  const traits = body.traits as Array<{
+    grantGroups: Array<{ grants: Array<{ id: string }> }>
+  }>
+  return traits[0]!.grantGroups[0]!.grants[0]!.id
+}
+
+describe('stabilizeGrantRowIds', () => {
+  it('allocates missing ids before strict parse', () => {
+    const body = applyStableNestedContentKeys(
+      traitWithGrants([{ kind: 'sense', type: 'darkvision', range: 60 }]),
+    )
+
+    expect(isOpaqueGrantRowId(firstGrantId(body))).toBe(true)
+  })
+
+  it('preserves stored ids when grants or groups are reordered', () => {
+    const stored = {
+      traits: [
+        {
+          id: 'lineage',
+          name: 'Lineage',
+          grantGroups: [
+            { grants: [{ id: 'darkvision', kind: 'sense', type: 'darkvision', range: 60 }] },
+            {
+              unlock: { level: 3 },
+              grants: [{ id: OPAQUE_GRANT_ID, kind: 'languages', languageIds: ['elvish'] }],
+            },
+          ],
+        },
+      ],
+    }
+    const reordered = {
+      traits: [
+        {
+          id: 'lineage',
+          name: 'Lineage',
+          grantGroups: [
+            {
+              unlock: { level: 3 },
+              grants: [{ id: OPAQUE_GRANT_ID, kind: 'languages', languageIds: ['elvish'] }],
+            },
+            { grants: [{ id: 'darkvision', kind: 'sense', type: 'darkvision', range: 120 }] },
+          ],
+        },
+      ],
+    }
+
+    const body = applyStableNestedContentKeys(reordered, stored)
+    const groups = (
+      body.traits as Array<{ grantGroups: Array<{ grants: Array<{ id: string }> }> }>
+    )[0]!.grantGroups
+
+    expect(groups.map((group) => group.grants[0]!.id)).toEqual([OPAQUE_GRANT_ID, 'darkvision'])
+  })
+
+  it('allocates a new opaque id when a deleted grant is replaced by the same kind', () => {
+    const stored = traitWithGrants([
+      { id: 'hellish-rebuke-spells', kind: 'spells', spellIds: ['hellish-rebuke'] },
+    ])
+    const incoming = traitWithGrants([{ kind: 'spells', spellIds: ['thaumaturgy'] }])
+
+    const id = firstGrantId(applyStableNestedContentKeys(incoming, stored))
+    expect(id).not.toBe('hellish-rebuke-spells')
+    expect(isOpaqueGrantRowId(id)).toBe(true)
+  })
+
+  it('rejects a stored id reused for a different kind', () => {
+    const stored = traitWithGrants([
+      { id: 'hellish-rebuke-spells', kind: 'spells', spellIds: ['hellish-rebuke'] },
+    ])
+    const incoming = traitWithGrants([
+      { id: 'hellish-rebuke-spells', kind: 'sense', type: 'darkvision', range: 60 },
+    ])
+
+    expect(() => applyStableNestedContentKeys(incoming, stored)).toThrow(ContentKeyError)
+  })
+
+  it('rejects a readable seed id that is not already stored', () => {
+    expect(() =>
+      applyStableNestedContentKeys(
+        traitWithGrants([{ id: 'darkvision', kind: 'sense', type: 'darkvision', range: 60 }]),
+      ),
+    ).toThrow(ContentKeyError)
+  })
+
+  it('rejects duplicate ids within an owner', () => {
+    const stored = traitWithGrants([
+      { id: 'darkvision', kind: 'sense', type: 'darkvision', range: 60 },
+    ])
+    const incoming = traitWithGrants([
+      { id: 'darkvision', kind: 'sense', type: 'darkvision', range: 60 },
+      { id: 'darkvision', kind: 'sense', type: 'darkvision', range: 120 },
+    ])
+
+    expect(() => applyStableNestedContentKeys(incoming, stored)).toThrow(ContentKeyError)
+  })
+
+  it('stabilizes system-patch updates against the effective body', () => {
+    const effective = {
+      features: [
+        {
+          id: 'spellcasting',
+          name: 'Spellcasting',
+          level: 1,
+          grantGroups: [
+            {
+              grants: [
+                { id: 'spellcasting', kind: 'spellcasting' },
+                { id: OPAQUE_GRANT_ID, kind: 'spells', spellIds: ['shield'] },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    const incoming = {
+      features: [
+        {
+          id: 'spellcasting',
+          name: 'Spellcasting',
+          level: 1,
+          grantGroups: [
+            {
+              grants: [
+                { id: OPAQUE_GRANT_ID, kind: 'spells', spellIds: ['shield'] },
+                { id: 'spellcasting', kind: 'spellcasting' },
+                { id: OTHER_OPAQUE_GRANT_ID, kind: 'languages', languageIds: ['draconic'] },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+
+    const body = applyStableNestedContentKeys(incoming, effective)
+    const grants = (
+      body.features as Array<{ grantGroups: Array<{ grants: Array<{ id: string }> }> }>
+    )[0]!.grantGroups[0]!.grants
+
+    expect(grants.map((grant) => grant.id)).toEqual([
+      OPAQUE_GRANT_ID,
+      'spellcasting',
+      OTHER_OPAQUE_GRANT_ID,
+    ])
+  })
+
+  it('copies grant row ids when trait ids are regenerated for duplication', () => {
+    const body = regenerateNestedContentKeysForDuplicate(
+      {
+        traits: [
+          {
+            id: 'darkvision',
+            name: 'Darkvision',
+            grantGroups: [
+              {
+                grants: [{ id: 'darkvision', kind: 'sense', type: 'darkvision', range: 60 }],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        destinationSlug: 'custom-elf',
+        nestedIdRegeneration: { paths: ['traits', 'heritage'] },
+      },
+    )
+
+    const trait = (
+      body.traits as Array<{
+        id: string
+        grantGroups: Array<{ grants: Array<{ id: string }> }>
+      }>
+    )[0]!
+    expect(trait.id).not.toBe('darkvision')
+    expect(trait.grantGroups[0]!.grants[0]!.id).toBe('darkvision')
   })
 })

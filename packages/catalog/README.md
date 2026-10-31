@@ -8,7 +8,9 @@ campaign presets use separate source trees and public entry points.
 - **In:** static system content (`srd-cc-5.2.1` JSON), product-owned campaign
   presets, validated loaders, slug guards, and lookup helpers.
 - **Out:** campaign overlays, homebrew, and API merge logic (those stay in
-  `@rpg/api`).
+  `@rpg/api`). Original passages under `source-excerpts/` are not catalog
+  records. Runtime and dashboard code do not import `@rpg/catalog/source-excerpts`.
+  See [content provenance](../contracts/docs/content-provenance.md).
 
 ## Consumers
 

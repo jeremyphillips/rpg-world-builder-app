@@ -27,7 +27,7 @@ describe('toContentFieldOption', () => {
   })
 
   it('adds a Homebrew description for homebrew content', () => {
-    const entity = { ...pickEquipment('dagger'), source: 'homebrew' as const }
+    const entity = { ...pickEquipment('dagger'), catalogLayer: 'homebrew' as const }
     expect(toContentFieldOption(entity, 'equipment')).toEqual({
       value: 'dagger',
       label: entity.name,
@@ -83,7 +83,7 @@ describe('buildContentFormOptionSets', () => {
           id: 'spellcasting',
           name: 'Spellcasting',
           level: 1,
-          grantGroups: [{ grants: [{ kind: 'spellcasting' as const }] }],
+          grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
         },
       ],
       spellcasting: {

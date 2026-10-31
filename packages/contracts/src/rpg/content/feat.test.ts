@@ -40,7 +40,7 @@ const grappler = {
   id: 'srd-cc-5.2.1:grappler',
   slug: 'grappler',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   ...timestamps,
@@ -53,7 +53,7 @@ describe('featSchema', () => {
   })
 
   it('parses a homebrew feat with a campaignId', () => {
-    const homebrew = { ...grappler, source: 'homebrew', campaignId: 'camp_1' }
+    const homebrew = { ...grappler, catalogLayer: 'homebrew', campaignId: 'camp_1' }
     expect(featSchema.parse(homebrew)).toEqual(homebrew)
   })
 

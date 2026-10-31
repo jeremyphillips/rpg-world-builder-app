@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { characterValidationMessages } from './character-messages'
 import { characterSchema, getCharacterTotalLevel } from './sheet'
-import { characterSelectionSourceSchema } from './sheet/selection-sources'
+import {
+  characterSelectionSourceSchema,
+  grantDerivedSelectionSourceSchema,
+} from './sheet/selection-sources'
 import {
   characterToolProficiencyEntrySchema,
   characterWeaponProficiencyEntrySchema,
@@ -117,15 +120,13 @@ const baseCharacter = {
       castingEntitlements: [
         {
           mode: 'free_cast',
-          frequency: 'at_will',
           allowsSlotCasting: false,
-          sources: [
-            {
-              kind: 'heritageOption',
-              sourceId: 'srd-cc-5.2.1:elf',
-              grantId: 'high-elf-cantrip',
-            },
-          ],
+          source: {
+            kind: 'heritageOption',
+            sourceId: 'srd-cc-5.2.1:elf',
+            grantId: 'high-elf-cantrip',
+            grantRowId: 'light-spells',
+          },
         },
       ],
       sources: [
@@ -297,6 +298,46 @@ describe('characterSelectionSourceSchema', () => {
         grantId: 'levels-5-10',
       }).success,
     ).toBe(true)
+  })
+
+  it('keeps manual and starting gold sources valid without a grant row id', () => {
+    expect(characterSelectionSourceSchema.safeParse({ kind: 'manual' }).success).toBe(true)
+    expect(
+      characterSelectionSourceSchema.safeParse({
+        kind: 'startingGold',
+        sourceId: 'srd-cc-5.2.1:fighter',
+        grantId: 'starting-gold',
+      }).success,
+    ).toBe(true)
+  })
+})
+
+describe('grantDerivedSelectionSourceSchema', () => {
+  it('requires grantRowId on grant-derived sources', () => {
+    expect(
+      grantDerivedSelectionSourceSchema.safeParse({
+        kind: 'speciesTrait',
+        sourceId: 'srd-cc-5.2.1:elf',
+        grantId: 'keen-senses',
+      }).success,
+    ).toBe(false)
+    expect(
+      grantDerivedSelectionSourceSchema.safeParse({
+        kind: 'classFeature',
+        sourceId: 'srd-cc-5.2.1:fighter',
+        grantId: 'fighting-style',
+        grantRowId: 'fighting-style-feat',
+      }).success,
+    ).toBe(true)
+  })
+
+  it('rejects manual sources', () => {
+    expect(
+      grantDerivedSelectionSourceSchema.safeParse({
+        kind: 'manual',
+        grantRowId: 'darkvision',
+      }).success,
+    ).toBe(false)
   })
 })
 

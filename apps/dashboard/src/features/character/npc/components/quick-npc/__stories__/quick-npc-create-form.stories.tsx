@@ -22,7 +22,7 @@ const buildContext = createCampaignNpcBuilderContextFixture({
         id: createContext.organization.id,
         slug: 'lantern-guild',
         rulesetId: 'srd-cc-5.2.1',
-        source: 'homebrew',
+        catalogLayer: 'homebrew',
         status: 'published',
         campaignId: 'campaign-test-1',
         createdAt: '2026-01-01T00:00:00.000Z',

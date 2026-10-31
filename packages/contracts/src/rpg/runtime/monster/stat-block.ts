@@ -3,9 +3,10 @@ import type { MonsterAction, MonsterBody } from '../../content/monster'
 import { getSkillName } from '../../content/skill-proficiency'
 import { NEUTRAL_ABILITY_SCORE } from '../../vocab/ability'
 import { CHALLENGE_RATING_MECHANICS } from '../../vocab/challenge-rating'
-import { CREATURE_SIZE_HIT_DIE } from '../../vocab/creature-size'
+import { CREATURE_SIZE_HIT_DIE, resolveLargestCreatureSize } from '../../vocab/creature-size'
 import type { ArmorClassRules } from '../../vocab/mechanics/armor-class-scale'
 import { abilityModifier } from '../creature/ability-modifier'
+import { spellAttackBonus, spellSaveDc } from '../creature/spell-dc'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { resolveMonsterArmorClass, type MonsterArmorClassResolution } from './armor-class'
 import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
@@ -15,10 +16,12 @@ import { resolveCreatureInitiativeModifier } from '../creature/initiative'
 import { isWeaponProficient } from '../creature/proficiencies'
 import type { CreatureSkillCatalog } from '../creature/proficiencies'
 import { averageDiceRoll, type DieFace } from '../../primitives/dice'
+import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
+import type { RollValue } from '../../primitives/mechanics/roll'
 import {
-  averageStatBlockDamage,
   averageStatBlockHitPoints,
   floorStatBlockAverage,
+  resolveStatBlockDamagePart,
 } from '../creature/stat-block-average'
 import {
   requireDerivedField,
@@ -28,7 +31,6 @@ import {
 } from './derived-field'
 import {
   formatSignedModifier,
-  formatWeaponDamageWithModifier,
   resolveWeaponAttackAbilityModifier,
   weaponAttackBonus,
 } from '../creature/weapon-attack'
@@ -40,10 +42,15 @@ export type DerivedMonsterAttackLine = {
   attackBonus: number
   attackBonusLabel: string
   damage: string
+  damageExpression?: string
   damageTypeLabel: string
+  additionalDamage?: Array<{
+    expression: string
+    average: number
+    damageTypeLabel: string
+  }>
   reach?: number
   range?: { normal: number; long?: number }
-  trigger?: string
 }
 
 export type DerivedMonsterStatBlock = {
@@ -59,6 +66,14 @@ export type DerivedMonsterStatBlock = {
   savingThrows: Partial<Record<'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha', number>>
   skills: Array<{ skillId: string; label: string; modifier: number }>
   attacks: DerivedMonsterAttackLine[]
+  spellcasting: DerivedMonsterSpellcastingLine[]
+}
+
+export type DerivedMonsterSpellcastingLine = {
+  id: string
+  section: 'actions' | 'bonusActions' | 'reactions'
+  saveDc: number
+  attackBonus: number
 }
 
 export type DeriveMonsterStatBlockInput = {
@@ -69,8 +84,8 @@ export type DeriveMonsterStatBlockInput = {
   magicPropertyProvider: MagicPropertyDefinitionProvider
 }
 
-function formatInitiativeLabel(modifier: number, dexScore: number): string {
-  return `${formatSignedModifier(modifier)} (${dexScore})`
+function formatInitiativeLabel(modifier: number): string {
+  return `${formatSignedModifier(modifier)} (${10 + modifier})`
 }
 
 function resolveFixedHitPoints(
@@ -85,7 +100,7 @@ function resolveFixedHitPoints(
 }
 
 export function resolveMonsterHitPoints(
-  monster: Pick<MonsterBody, 'hitPoints' | 'size' | 'abilityScores'>,
+  monster: Pick<MonsterBody, 'hitPoints' | 'sizes' | 'abilityScores'>,
 ): DerivedField<{ hp: number; formula: string; clampedToMinimum: boolean }> {
   const hitPoints = monster.hitPoints
   if (!hitPoints) return unavailableField('missing-input')
@@ -93,10 +108,15 @@ export function resolveMonsterHitPoints(
   if (hitPoints.kind === 'fixed') return resolveFixedHitPoints(hitPoints)
 
   if (hitPoints.count === undefined || hitPoints.count < 1) return unavailableField('missing-input')
-  if (!monster.size || monster.abilityScores?.con === undefined)
+  // Largest permitted size chooses the Hit Die. That matches the current SRD
+  // stat blocks in this catalog. It is an application convention, not a claim
+  // that every future creature derives hit points the same way. An instance
+  // that later uses a smaller permitted size does not rewrite this formula.
+  const largestSize = resolveLargestCreatureSize(monster.sizes ?? [])
+  if (!largestSize || monster.abilityScores?.con === undefined)
     return unavailableField('missing-input')
 
-  const dieFaces = CREATURE_SIZE_HIT_DIE[monster.size]
+  const dieFaces = CREATURE_SIZE_HIT_DIE[largestSize]
   const conMod = abilityModifier(monster.abilityScores.con)
   const conTotal = hitPoints.count * conMod
   const averageDie = averageDiceRoll({ count: hitPoints.count, faces: dieFaces as DieFace })
@@ -170,18 +190,43 @@ function resolveCatalogWeaponAttackLine(args: {
     proficient: isWeaponProficient(catalogItem, monster.proficiencies.weapons),
     proficiencyBonus,
     provider: magicPropertyProvider,
+    ...(action.damage ? { damage: action.damage } : {}),
   })
   if (totals?.attackBonus === undefined || totals.damageAverage === undefined) return undefined
 
   return {
-    id: action.id,
-    section,
-    name: action.name ?? entry?.customName ?? catalogItem.name,
-    attackBonus: totals.attackBonus,
-    attackBonusLabel: formatSignedModifier(totals.attackBonus),
-    damage: String(totals.damageAverage),
-    damageTypeLabel: catalogItem.damageType ?? '',
+    ...catalogWeaponLine({
+      action,
+      section,
+      name: action.name ?? entry.customName ?? catalogItem.name,
+      attackBonus: totals.attackBonus,
+      damageAverage: totals.damageAverage,
+      damageExpression: totals.damageExpression,
+      damageTypeLabel: catalogItem.damageType ?? '',
+    }),
     ...weaponActionReachRange(catalogItem),
+  }
+}
+
+function catalogWeaponLine(args: {
+  action: Extract<MonsterAction, { kind: 'weapon' }>
+  section: DerivedMonsterAttackLine['section']
+  name: string
+  attackBonus: number
+  damageAverage: number
+  damageExpression?: string
+  damageTypeLabel: string
+}): DerivedMonsterAttackLine {
+  return {
+    id: args.action.id,
+    section: args.section,
+    name: args.name,
+    attackBonus: args.attackBonus,
+    attackBonusLabel: formatSignedModifier(args.attackBonus),
+    damage: String(args.damageAverage),
+    ...(args.damageExpression ? { damageExpression: args.damageExpression } : {}),
+    damageTypeLabel: args.damageTypeLabel,
+    ...additionalDamageLines(args.action.onHit),
   }
 }
 
@@ -199,6 +244,7 @@ function resolveNaturalWeaponAttackLine(args: {
   if (abilityMod === undefined) return undefined
 
   const attackBonusValue = weaponAttackBonus(abilityMod, true, proficiencyBonus)
+  const primary = resolveStatBlockDamagePart(action.damage, abilityMod)
 
   return {
     id: action.id,
@@ -206,11 +252,106 @@ function resolveNaturalWeaponAttackLine(args: {
     name: action.name,
     attackBonus: attackBonusValue,
     attackBonusLabel: formatSignedModifier(attackBonusValue),
-    damage: String(averageStatBlockDamage(action.damage, abilityMod)),
+    damage: String(primary.average),
+    damageExpression: primary.expression,
     damageTypeLabel: action.damageType,
+    ...additionalDamageLines(action.onHit),
     ...(action.mode === 'melee' ? { reach: action.reach ?? 5 } : {}),
     ...(action.range ? { range: action.range } : {}),
   }
+}
+
+function isDamageRoll(value: unknown): value is RollValue {
+  if (!value || typeof value !== 'object') return false
+  const roll = value as { dice?: { count?: number; faces?: number }; flat?: number }
+  const dice = roll.dice
+  const diceOk =
+    dice !== undefined && typeof dice.count === 'number' && typeof dice.faces === 'number'
+  return diceOk || typeof roll.flat === 'number'
+}
+
+function additionalDamageLines(onHit: unknown): Pick<DerivedMonsterAttackLine, 'additionalDamage'> {
+  if (!onHit || typeof onHit !== 'object' || !('additionalDamage' in onHit)) return {}
+  const list = (onHit as { additionalDamage?: unknown }).additionalDamage
+  if (!Array.isArray(list)) return {}
+  const parts = list.flatMap((part) => {
+    if (!part || typeof part !== 'object') return []
+    const row = part as { roll?: unknown; damageType?: unknown }
+    if (!isDamageRoll(row.roll) || typeof row.damageType !== 'string') return []
+    const resolved = resolveStatBlockDamagePart(row.roll, 0)
+    return [
+      {
+        expression: resolved.expression,
+        average: resolved.average,
+        damageTypeLabel: getDamageTypeLabel(row.damageType),
+      },
+    ]
+  })
+  if (parts.length === 0) return {}
+  return { additionalDamage: parts }
+}
+
+function resolveAuthoredAttackLine(args: {
+  action: Extract<MonsterAction, { kind: 'attack' }>
+  monster: MonsterBody
+  proficiencyBonus: number
+  section: DerivedMonsterAttackLine['section']
+}): DerivedMonsterAttackLine | undefined {
+  const { action, monster, proficiencyBonus, section } = args
+  const ability = resolveAttackBonusAbility(action, monster)
+  if (!ability) return undefined
+  const abilityMod = abilityModifier(monster.abilityScores[ability.ability])
+  const attackBonusValue = weaponAttackBonus(abilityMod, ability.proficient, proficiencyBonus)
+  const primary = resolveStatBlockDamagePart(action.damage, abilityMod)
+  return {
+    id: action.id,
+    section,
+    name: action.name,
+    attackBonus: attackBonusValue,
+    attackBonusLabel: formatSignedModifier(attackBonusValue),
+    damage: String(primary.average),
+    damageExpression: primary.expression,
+    damageTypeLabel: action.damageType,
+    ...additionalDamageLines(action.onHit),
+    ...((action.modes ?? []).includes('melee') && action.reach !== undefined
+      ? { reach: action.reach }
+      : {}),
+    ...((action.modes ?? []).includes('ranged') && action.range ? { range: action.range } : {}),
+  }
+}
+
+function abilityFromEntry(
+  entry: MonsterAction,
+  entryId: string,
+): keyof MonsterBody['abilityScores'] | undefined {
+  if (entry.id !== entryId) return undefined
+  if (entry.kind === 'spell' && entry.castingAbility?.kind === 'ability') {
+    return entry.castingAbility.ability
+  }
+  if (entry.kind === 'attack' && entry.bonusSource.kind === 'spell') {
+    const nested = entry.bonusSource.castingAbility
+    if (nested.kind === 'ability') return nested.ability
+  }
+  return undefined
+}
+
+function resolveAttackBonusAbility(
+  action: Extract<MonsterAction, { kind: 'attack' }>,
+  monster: MonsterBody,
+): { ability: keyof MonsterBody['abilityScores']; proficient: boolean } | undefined {
+  if (action.bonusSource.kind === 'ability') {
+    return { ability: action.bonusSource.ability, proficient: action.bonusSource.proficient }
+  }
+  const casting = action.bonusSource.castingAbility
+  if (casting.kind === 'ability') return { ability: casting.ability, proficient: true }
+  const sections = ['actions', 'bonusActions', 'reactions'] as const
+  for (const section of sections) {
+    for (const entry of monster[section]) {
+      const ability = abilityFromEntry(entry, casting.entryId)
+      if (ability) return { ability, proficient: true }
+    }
+  }
+  return undefined
 }
 
 function resolveWeaponAttackLine(args: {
@@ -236,6 +377,9 @@ function resolveWeaponAttackLine(args: {
   if (action.kind === 'natural-weapon') {
     return resolveNaturalWeaponAttackLine({ action, monster, proficiencyBonus, section })
   }
+  if (action.kind === 'attack') {
+    return resolveAuthoredAttackLine({ action, monster, proficiencyBonus, section })
+  }
   return undefined
 }
 
@@ -246,14 +390,11 @@ function appendAttackLines(
   section: DerivedMonsterAttackLine['section'],
 ): void {
   for (const action of actions) {
-    if (action.kind === 'special') continue
+    if (action.kind !== 'weapon' && action.kind !== 'natural-weapon' && action.kind !== 'attack')
+      continue
     const line = resolveWeaponAttackLine({ ...args, action, section })
     if (!line) {
       throw new Error(`Monster attack ${action.id} is unavailable.`)
-    }
-    if (section === 'reactions' && 'trigger' in action && typeof action.trigger === 'string') {
-      target.push({ ...line, trigger: action.trigger })
-      continue
     }
     target.push(line)
   }
@@ -317,14 +458,55 @@ export function deriveMonsterStatBlock({
     hpFormula: hitPoints.formula,
     hpClampedToMinimum: hitPoints.clampedToMinimum,
     initiativeModifier,
-    initiativeLabel: formatInitiativeLabel(initiativeModifier, dexScore),
+    initiativeLabel: formatInitiativeLabel(initiativeModifier),
     proficiencyBonus,
     experiencePoints: resolveExperiencePoints(monster),
     passivePerception: resolvePassivePerception(perceptionMod),
     savingThrows,
     skills,
     attacks,
+    spellcasting: deriveSpellcastingLines(monster, proficiencyBonus),
   }
+}
+
+function deriveSpellcastingLines(
+  monster: MonsterBody,
+  proficiencyBonus: number,
+): DerivedMonsterSpellcastingLine[] {
+  const sections = ['actions', 'bonusActions', 'reactions'] as const
+  const spells = new Map<
+    string,
+    Extract<MonsterBody['actions'][number] | MonsterBody['reactions'][number], { kind: 'spell' }>
+  >()
+  for (const section of sections) {
+    for (const action of monster[section]) {
+      if (action.kind === 'spell') spells.set(action.id, action)
+    }
+  }
+  const lines: DerivedMonsterSpellcastingLine[] = []
+  for (const section of sections) {
+    for (const action of monster[section]) {
+      if (action.kind !== 'spell' || !action.castingAbility) continue
+      const ability =
+        action.castingAbility.kind === 'ability'
+          ? action.castingAbility.ability
+          : (() => {
+              const target = spells.get(action.castingAbility.entryId)
+              return target?.castingAbility?.kind === 'ability'
+                ? target.castingAbility.ability
+                : undefined
+            })()
+      if (!ability) continue
+      const score = monster.abilityScores[ability]
+      lines.push({
+        id: action.id,
+        section,
+        saveDc: spellSaveDc(score, proficiencyBonus),
+        attackBonus: spellAttackBonus(score, proficiencyBonus),
+      })
+    }
+  }
+  return lines
 }
 
 export type DerivedDraftAttack = {
@@ -345,7 +527,7 @@ export type DerivedMonsterDraftStatBlock = {
 }
 
 type DraftMonsterSource = {
-  size?: MonsterBody['size']
+  sizes?: MonsterBody['sizes']
   abilityScores?: Partial<MonsterBody['abilityScores']>
   armorClass?: MonsterBody['armorClass']
   hitPoints?: MonsterBody['hitPoints']
@@ -498,7 +680,7 @@ export function deriveMonsterDraftStatBlock(args: {
       ? unavailableField<{ modifier: number; label: string }>('missing-input')
       : resolvedField({
           modifier: resolveCreatureInitiativeModifier(dexScore),
-          label: formatInitiativeLabel(resolveCreatureInitiativeModifier(dexScore), dexScore),
+          label: formatInitiativeLabel(resolveCreatureInitiativeModifier(dexScore)),
         })
 
   const challengeRating = monster.challengeRating
@@ -538,5 +720,3 @@ export function deriveMonsterDraftStatBlock(args: {
     attacks,
   }
 }
-
-export { formatWeaponDamageWithModifier }

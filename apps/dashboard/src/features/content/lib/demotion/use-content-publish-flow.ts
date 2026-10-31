@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import type { ContentSource } from '@rpg/contracts'
+import type { CatalogLayer } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
 import { notifyPublishSuccess } from '@/lib/notify'
@@ -11,7 +11,7 @@ type UseContentPublishFlowOptions = {
   def: Pick<AnyContentFormDef, 'routeKey' | 'queryKey' | 'invalidateQueryKeys'>
   campaignId: string
   entityId: string
-  entitySource: ContentSource
+  entityCatalogLayer: CatalogLayer
   entityStatus: 'draft' | 'published'
 }
 
@@ -19,7 +19,7 @@ export function useContentPublishFlow({
   def,
   campaignId,
   entityId,
-  entitySource,
+  entityCatalogLayer,
   entityStatus,
 }: UseContentPublishFlowOptions) {
   const publishMutation = usePublishContent(def, campaignId)
@@ -38,7 +38,11 @@ export function useContentPublishFlow({
   }, [entityId, publishMutation])
 
   const handlePublishClick = useCallback(async () => {
-    if (entitySource !== 'homebrew' || entityStatus !== 'draft' || publishMutation.isPending) {
+    if (
+      entityCatalogLayer !== 'homebrew' ||
+      entityStatus !== 'draft' ||
+      publishMutation.isPending
+    ) {
       return
     }
 
@@ -54,9 +58,15 @@ export function useContentPublishFlow({
     } catch (err) {
       setPublishError(getErrorMessage(err, 'Could not publish this item.'))
     }
-  }, [entitySource, entityStatus, publishMutation.isPending, publishRequest, runPublishMutation])
+  }, [
+    entityCatalogLayer,
+    entityStatus,
+    publishMutation.isPending,
+    publishRequest,
+    runPublishMutation,
+  ])
 
-  const canPublish = entitySource === 'homebrew' && entityStatus === 'draft'
+  const canPublish = entityCatalogLayer === 'homebrew' && entityStatus === 'draft'
 
   return {
     canPublish,

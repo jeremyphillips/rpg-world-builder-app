@@ -32,7 +32,7 @@ function toStartingWealthTable(
     id: standardStartingWealthTableId(rulesetId),
     slug: STANDARD_STARTING_WEALTH_SLUG,
     rulesetId,
-    source: 'system',
+    catalogLayer: 'system',
     campaignId: null,
     createdAt: SYSTEM_SEED_TIMESTAMP,
     updatedAt: SYSTEM_SEED_TIMESTAMP,

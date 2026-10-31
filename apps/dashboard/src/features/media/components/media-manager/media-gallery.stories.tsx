@@ -6,7 +6,7 @@ import { mediaFixture, mediaFixtureAssets, mediaFixtureImageUrl } from '../../fi
 const fixtureSources = resolveAvailableContentMediaSources({
   media: mediaFixture,
   domain: 'character',
-  contentSource: 'homebrew',
+  catalogLayer: 'homebrew',
 }).sources
 
 const fixtureAvailable = mediaFixture.images.map((attachment) => ({

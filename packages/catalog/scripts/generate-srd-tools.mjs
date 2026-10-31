@@ -24,7 +24,7 @@ function tool(slug, name, toolCategory, ability, cost, utilizes, extra = {}) {
     id: `${RULESET}:${slug}`,
     slug,
     rulesetId: RULESET,
-    source: 'system',
+    catalogLayer: 'system',
     campaignId: null,
     createdAt: TS,
     updatedAt: TS,

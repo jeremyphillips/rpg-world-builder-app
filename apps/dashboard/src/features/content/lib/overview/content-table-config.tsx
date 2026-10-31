@@ -9,6 +9,7 @@ import {
   type ContentMedia,
   isContentTypeMediaEnabled,
   type ContentTypeKey,
+  CATALOG_LAYER_TERM,
 } from '@rpg/contracts'
 import { dataTableColumnMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
@@ -21,10 +22,10 @@ import {
   type DashboardContentDisplayResult,
   type ResolveDashboardContentDisplayInput,
 } from '../detail/page/content-display-image'
-import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
+import { CATALOG_LAYER_BADGE, type CatalogLayer } from './catalog-layer-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { ContentOverviewNameCell } from './content-overview-name-cell'
-import { shouldPresentContentSource } from '../content-type-presentation'
+import { shouldPresentCatalogLayer } from '../content-type-presentation'
 import { buildContentUsedByColumn } from './content-used-by-column'
 import { resolveReadSurfaceCampaignAccess } from '../campaign-access/resolve-read-surface-campaign-access'
 
@@ -36,7 +37,7 @@ export type ContentBase = {
   name: string
   slug?: string
   rulesetId?: string
-  source: ContentSource
+  catalogLayer: CatalogLayer
   status: ContentStatus
   media?: ContentMedia
 }
@@ -86,7 +87,7 @@ function buildDefaultOverviewDisplayResolver<T extends ContentBase>(
       media: row.media,
       contentType,
       slug: row.slug ?? row.name,
-      contentSource: row.source,
+      catalogLayer: row.catalogLayer,
       rulesetId: row.rulesetId,
       surface: 'compact',
     } satisfies ResolveDashboardContentDisplayInput)
@@ -156,8 +157,10 @@ export function buildContentColumns<T extends ContentBase>(
     } as ColumnDef<T>['meta'] & ContentOverviewNameColumnMeta<T>,
   }
 
-  const sourceColumn = buildSourceColumn<T, ContentSource>({
-    badgeMap: CONTENT_SOURCE_BADGE,
+  const catalogLayerColumn = buildSourceColumn<T, CatalogLayer>({
+    badgeMap: CATALOG_LAYER_BADGE,
+    accessorKey: 'catalogLayer',
+    label: CATALOG_LAYER_TERM.label,
   })
 
   const statusColumn = buildSourceColumn<T, ContentStatus>({
@@ -184,6 +187,6 @@ export function buildContentColumns<T extends ContentBase>(
     ...stampDataColumns(middleColumns),
     ...usedByColumn,
     statusColumn,
-    ...(shouldPresentContentSource(contentType) ? [sourceColumn] : []),
+    ...(shouldPresentCatalogLayer(contentType) ? [catalogLayerColumn] : []),
   ]
 }

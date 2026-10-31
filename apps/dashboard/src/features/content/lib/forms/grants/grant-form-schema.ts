@@ -20,7 +20,7 @@ import {
   skillSchema,
   spellcastingGearKindSchema,
   toolCategorySchema,
-  usageFrequencySchema,
+  restKindSchema,
   weaponCategorySchema,
 } from '@rpg/contracts'
 
@@ -175,11 +175,39 @@ function shouldSkipProficiencySchemaForEmptySpecific(
   return row.proficiencySource === 'specific' && !specificSlugs?.length
 }
 
+function validateSpellGrantUsesLimit(
+  row: {
+    spellUseCountKind?: string
+    spellUseCount?: number | string
+    spellMinimumRest?: string
+  },
+  ctx: z.RefinementCtx,
+): void {
+  if (row.spellUseCountKind !== 'fixed' && row.spellUseCountKind !== 'proficiency-bonus') {
+    addCustomRefinementIssue(ctx, 'Choose how many uses this spell grant has.', [
+      'spellUseCountKind',
+    ])
+  }
+  if (row.spellUseCountKind === 'fixed') {
+    const value =
+      typeof row.spellUseCount === 'number' ? row.spellUseCount : Number(row.spellUseCount)
+    if (!Number.isInteger(value) || value < 1) {
+      addCustomRefinementIssue(ctx, 'Enter at least one use.', ['spellUseCount'])
+    }
+  }
+  if (!row.spellMinimumRest) {
+    addCustomRefinementIssue(ctx, 'Choose the rest that restores these uses.', ['spellMinimumRest'])
+  }
+}
+
 function validateSpellsGrantRow(
   row: {
     spellAvailability?: boolean
     spellCastingEnabled?: boolean
-    spellCastingFrequency?: string
+    spellUseLimit?: string
+    spellUseCountKind?: string
+    spellUseCount?: number | string
+    spellMinimumRest?: string
     spellAllowsSlotCasting?: boolean
     spellIds?: string[]
   },
@@ -194,10 +222,8 @@ function validateSpellsGrantRow(
     ])
   }
 
-  if (hasCasting && !row.spellCastingFrequency) {
-    addCustomRefinementIssue(ctx, 'Choose a cast frequency when casting is enabled.', [
-      'spellCastingFrequency',
-    ])
+  if (hasCasting && row.spellUseLimit === 'uses') {
+    validateSpellGrantUsesLimit(row, ctx)
   }
 
   if (row.spellAllowsSlotCasting === true && !hasAvailability) {
@@ -406,6 +432,8 @@ function validateGrantRow(
 function createGrantRowFormSchemaBase(maxLevel: number = MAX_CHARACTER_LEVEL) {
   return z
     .object({
+      /** Stable grant row id. New rows receive an opaque id when they are added. */
+      id: z.string().min(1).optional(),
       grantType: z.enum(GRANT_ROW_TYPES),
       /**
        * Unlock level for this grant row. `undefined` or `default` = the parent unlock
@@ -434,8 +462,11 @@ function createGrantRowFormSchemaBase(maxLevel: number = MAX_CHARACTER_LEVEL) {
       spellAvailability: z.boolean().optional(),
       /** When true, grants a nested `casting` free-cast entitlement. */
       spellCastingEnabled: z.boolean().optional(),
-      /** Usage frequency — required when `spellCastingEnabled` is true. */
-      spellCastingFrequency: usageFrequencySchema.optional(),
+      /** `at-will` omits a limit. `uses` requires a count and a rest threshold. */
+      spellUseLimit: z.enum(['at-will', 'uses']).optional(),
+      spellUseCountKind: z.enum(['fixed', 'proficiency-bonus']).optional(),
+      spellUseCount: z.coerce.number().int().min(1).optional(),
+      spellMinimumRest: restKindSchema.optional(),
       /** Optional slot-casting permission on the free-cast entitlement (requires availability in v1). */
       spellAllowsSlotCasting: z.boolean().optional(),
       /** Spell slugs granted by this row. */

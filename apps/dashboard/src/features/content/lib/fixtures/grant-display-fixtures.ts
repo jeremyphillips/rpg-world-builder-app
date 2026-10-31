@@ -87,7 +87,10 @@ export function buildCatalogEquipmentGrantVocabulary(): Pick<
 export function buildCatalogDrowGrantDisplayVocabulary(): GrantDisplayVocabulary {
   return {
     resolveSenseLabel: (type) => (type === 'darkvision' ? 'Darkvision' : type),
-    resolveSpell: (slug) => {
+    resolveSpell: (spellId) => {
+      const slug = spellId.startsWith(`${STORY_RULESET_ID}:`)
+        ? spellId.slice(STORY_RULESET_ID.length + 1)
+        : spellId
       const spell = pickSpell(slug)
       return { name: spell.name, level: spell.level }
     },

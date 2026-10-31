@@ -25,7 +25,7 @@ function renderNameCell(props: Partial<ComponentProps<typeof ContentOverviewName
               campaignId="camp-1"
               contentTypeKey="classes"
               queryKeyFn={(id) => contentOverviewListQueryKey(id, 'classes')}
-              duplicateSource={{ id: 'cls-1', name: 'Fighter', source: 'homebrew' }}
+              duplicateSource={{ id: 'cls-1', name: 'Fighter', catalogLayer: 'homebrew' }}
               {...props}
             />
           </QueryClientProvider>

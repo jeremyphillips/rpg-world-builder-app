@@ -1,4 +1,4 @@
-import type { ContentSource } from '../envelope'
+import type { CatalogLayer } from '../envelope'
 import type { ContentMedia } from '../../../primitives/media/content-media'
 import { roleAssignmentMatchesSelection } from '../../../primitives/media/content-media-source'
 import type { ContentDisplaySurface } from '../../../primitives/media/content-display-surface'
@@ -49,7 +49,7 @@ export type ResolveContentDisplayImageInput = {
   domain: ContentMediaDomain
   subject: SystemImageSubject
   slug: string
-  contentSource: ContentSource
+  catalogLayer: CatalogLayer
   rulesetId?: string
   campaignImageSetId?: string
   resolveUploadSrc?: (assetId: string) => string | undefined
@@ -149,7 +149,7 @@ function resolveAvailabilityForDisplay(input: ResolveContentDisplayImageInput) {
   return resolveAvailableContentMediaSources({
     media: input.media ?? { revision: 0, images: [], roles: {} },
     domain: input.domain,
-    contentSource: input.contentSource,
+    catalogLayer: input.catalogLayer,
     subject: input.subject,
     slug: input.slug,
     rulesetId: input.rulesetId,

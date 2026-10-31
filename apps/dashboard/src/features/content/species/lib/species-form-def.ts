@@ -72,6 +72,10 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
   valueSyncs: buildSpeciesFormValueSyncs,
 
   toFormValues: speciesToFormValues,
+  enrichEditLayoutCtx: (ctx, entity) => ({
+    ...ctx,
+    creatureSizesSeedIds: entity.sizes,
+  }),
 
   toInput: (values, ctx, validationIntent = 'publish') =>
     finalizeContentInput(

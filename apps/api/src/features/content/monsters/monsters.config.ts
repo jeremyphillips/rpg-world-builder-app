@@ -33,7 +33,7 @@ function toHomebrewMonster(doc: HomebrewDoc): Monster {
     name: record.name,
     ...(record.media !== undefined && { media: record.media }),
     ...(record.description !== undefined && { description: record.description }),
-    size: record.size as Monster['size'],
+    sizes: (record.sizes ?? []) as Monster['sizes'],
     creatureType: record.creatureType as string,
     alignment: record.alignment as Monster['alignment'],
     abilityScores: record.abilityScores as Monster['abilityScores'],

@@ -19,7 +19,7 @@ export const CAMPAIGN_AVAILABILITY_FILTER_ID = 'campaignAvailability' as const
 
 export type ContentOverviewFilterState = {
   name?: string
-  source?: string
+  catalogLayer?: string
   status?: string
   campaignAvailability: CampaignAvailabilityFilter
 }
@@ -41,7 +41,7 @@ export function matchesContentOverviewFilters<T extends WithCampaignAccess<Conte
     if (!matchesPrimaryTextQuery(row.name, filters.name, 'forgiving')) return false
   }
 
-  if (filters.source && row.source !== filters.source) return false
+  if (filters.catalogLayer && row.catalogLayer !== filters.catalogLayer) return false
   if (filters.status && row.status !== filters.status) return false
 
   if (!options?.excludeCampaignAvailability) {

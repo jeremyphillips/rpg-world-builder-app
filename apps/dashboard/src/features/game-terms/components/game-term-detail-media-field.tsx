@@ -37,7 +37,7 @@ export function GameTermDetailMediaField({
         domain: 'game-term',
         subject: vocabularySetSubject(setId),
         slug: entry.id,
-        contentSource: entry.source === 'system' ? 'system' : 'homebrew',
+        catalogLayer: entry.source === 'system' ? 'system' : 'homebrew',
         rulesetId,
       }}
       onSave={onSave}

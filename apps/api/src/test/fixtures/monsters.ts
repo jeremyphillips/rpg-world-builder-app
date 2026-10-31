@@ -3,7 +3,7 @@ const DAGGER_ID = 'srd-cc-5.2.1:dagger'
 export const minimalHomebrewMonsterInput = {
   slug: 'usage-test-monster',
   name: 'Usage Test Monster',
-  size: 'small',
+  sizes: ['small'],
   creatureType: 'humanoid',
   alignment: 'n',
   abilityScores: { str: 8, dex: 12, con: 10, int: 8, wis: 8, cha: 8 },

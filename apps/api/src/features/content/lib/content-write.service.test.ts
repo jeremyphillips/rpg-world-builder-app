@@ -80,7 +80,7 @@ describe('createHomebrewContent (equipment)', () => {
       minimalArmorInput,
     )
 
-    expect(created.source).toBe('homebrew')
+    expect(created.catalogLayer).toBe('homebrew')
     expect(created.kind).toBe('armor')
     if (!isArmorEquipment(created)) throw new Error('expected armor')
     expect(created.baseAcOffset).toBe(2)
@@ -143,7 +143,7 @@ describe('createHomebrewContent (equipment)', () => {
     if (updated.kind !== 'tool') throw new Error('expected tool')
     expect(updated.name).toBe("Enhanced Thieves' Tools")
     expect(updated.utilizes).toHaveLength(2)
-    expect(updated.source).toBe('system')
+    expect(updated.catalogLayer).toBe('system')
   })
 
   it('derives slug from name and ignores client-provided slug', async () => {
@@ -187,7 +187,7 @@ describe('createHomebrewContent (equipment)', () => {
 
     if (!isArmorEquipment(updated)) throw new Error('expected armor')
     expect(updated.baseAcOffset).toBe(2)
-    expect(updated.source).toBe('system')
+    expect(updated.catalogLayer).toBe('system')
   })
 
   it('patches a system weapon record', async () => {
@@ -202,7 +202,7 @@ describe('createHomebrewContent (equipment)', () => {
     })
 
     expect(updated.name).toBe('Enhanced Longsword')
-    expect(updated.source).toBe('system')
+    expect(updated.catalogLayer).toBe('system')
   })
 
   it('patches a system magic item record', async () => {
@@ -218,7 +218,7 @@ describe('createHomebrewContent (equipment)', () => {
 
     if (updated.kind !== 'magic_item') throw new Error('expected magic item')
     expect(updated.rarity).toBe('very_rare')
-    expect(updated.source).toBe('system')
+    expect(updated.catalogLayer).toBe('system')
   })
 })
 
@@ -373,7 +373,7 @@ describe('createHomebrewContent (spells)', () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(spellWriteConfig, campaign.id, minimalSpellInput)
 
-    expect(created.source).toBe('homebrew')
+    expect(created.catalogLayer).toBe('homebrew')
     expect(created.slug).toBe('custom-bolt')
     expect(created.level).toBe(0)
 
@@ -439,7 +439,7 @@ describe('createHomebrewContent (spells)', () => {
     })
 
     expect(updated.name).toBe('Enhanced Fire Bolt')
-    expect(updated.source).toBe('system')
+    expect(updated.catalogLayer).toBe('system')
   })
 
   it('replaces resolution on a system spell via overlay patch', async () => {
@@ -471,7 +471,7 @@ describe('createHomebrewContent (spells)', () => {
     })
 
     expect(updated.resolution).toEqual(patchedResolution)
-    expect(updated.source).toBe('system')
+    expect(updated.catalogLayer).toBe('system')
 
     const reloaded = (
       await resolveCatalogForCampaign(spellWriteConfig.readConfig, campaign.id)
@@ -493,7 +493,7 @@ describe('createHomebrewContent (feats)', () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(featWriteConfig, campaign.id, minimalFeatInput)
 
-    expect(created.source).toBe('homebrew')
+    expect(created.catalogLayer).toBe('homebrew')
     expect(created.slug).toBe('custom-feat')
     expect(created.category).toBe('origin')
 
@@ -512,7 +512,7 @@ describe('createHomebrewContent (feats)', () => {
     })
 
     expect(updated.name).toBe('Enhanced Alert')
-    expect(updated.source).toBe('system')
+    expect(updated.catalogLayer).toBe('system')
   })
 })
 
@@ -534,7 +534,7 @@ describe('createHomebrewContent (species)', () => {
       minimalSpeciesInput,
     )
 
-    expect(created.source).toBe('homebrew')
+    expect(created.catalogLayer).toBe('homebrew')
     expect(created.creatureType).toBe('humanoid')
   })
 

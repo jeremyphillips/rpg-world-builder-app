@@ -14,7 +14,7 @@ const speciesWithSkillGrant = {
   id: 'srd-cc-5.2.1:elf',
   slug: 'elf',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -36,6 +36,7 @@ const speciesWithSkillGrant = {
         {
           grants: [
             {
+              id: 'skill-proficiency-1',
               kind: 'skillProficiency',
               grant: {
                 kind: 'choice',
@@ -57,7 +58,7 @@ const insightSkill = {
   id: 'srd-cc-5.2.1:insight',
   slug: 'insight',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -71,7 +72,7 @@ const survivalSkill = {
   id: 'srd-cc-5.2.1:survival',
   slug: 'survival',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   createdAt: '2026-01-01T00:00:00.000Z',
@@ -115,7 +116,7 @@ describe('assembleGrantSkillProficiencyEntries', () => {
       createCharacterBuildContext(),
     )
     const keenSensesChoiceSet = choiceSets.find((choiceSet) =>
-      choiceSet.id.endsWith(':trait:keen-senses:skillProficiency'),
+      choiceSet.id.endsWith(':trait:keen-senses:grant:skill-proficiency-1'),
     )
 
     expect(keenSensesChoiceSet).toMatchObject({

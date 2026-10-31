@@ -36,7 +36,7 @@ describe('applySubclassFormEdits', () => {
         'draft-1',
         values,
         [],
-        [{ id: 'draft-1', classId: 'class-1', source: 'homebrew' }],
+        [{ id: 'draft-1', classId: 'class-1', catalogLayer: 'homebrew' }],
       ),
     ).toEqual({
       'draft-1': values,
@@ -47,7 +47,7 @@ describe('applySubclassFormEdits', () => {
     const subclass = {
       id: 'sub-1',
       classId: 'class-1',
-      source: 'homebrew' as const,
+      catalogLayer: 'homebrew' as const,
       status: 'published',
       name: 'Champion',
       slug: 'champion',

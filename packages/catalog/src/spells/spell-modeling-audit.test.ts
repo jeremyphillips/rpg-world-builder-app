@@ -27,9 +27,9 @@ const RULESET = 'srd-cc-5.2.1' as const
 describe('spell modeling audit (srd-cc-5.2.1)', () => {
   const audit = buildSpellModelingAudit(RULESET)
 
-  it('covers all 97 seed spells', () => {
-    expect(audit.totalSpells).toBe(97)
-    expect(audit.entries).toHaveLength(97)
+  it('covers all 100 seed spells', () => {
+    expect(audit.totalSpells).toBe(100)
+    expect(audit.entries).toHaveLength(100)
   })
 
   it('reports all spells as reviewed after manifest apply', () => {
@@ -232,7 +232,7 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
 
   it('derives prose-only for reviewed spells without resolution', () => {
     const proseOnly = audit.entries.filter((entry) => !entry.hasResolution)
-    expect(proseOnly).toHaveLength(76)
+    expect(proseOnly).toHaveLength(79)
     for (const entry of proseOnly) {
       expect(entry.effectiveStatus).toBe('prose-only')
       expect(entry.explicitStatus).toBeUndefined()

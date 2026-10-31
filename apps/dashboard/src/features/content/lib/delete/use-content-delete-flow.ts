@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { ContentUsageBlocker, ContentSource, ContentTypeKey } from '@rpg/contracts'
+import type { ContentUsageBlocker, CatalogLayer, ContentTypeKey } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
 import type { AnyContentFormDef } from '../forms/registry/content-form-registry'
@@ -12,7 +12,7 @@ type UseContentDeleteFlowOptions = {
   campaignId: string
   entityId: string
   entityName: string
-  entitySource: ContentSource
+  entityCatalogLayer: CatalogLayer
   contentTypeKey: ContentTypeKey
   overviewHref: string
 }
@@ -22,7 +22,7 @@ export function useContentDeleteFlow({
   campaignId,
   entityId,
   entityName,
-  entitySource,
+  entityCatalogLayer,
   contentTypeKey,
   overviewHref,
 }: UseContentDeleteFlowOptions) {
@@ -45,7 +45,7 @@ export function useContentDeleteFlow({
   }
 
   const handleDeleteClick = useCallback(async () => {
-    if (entitySource !== 'homebrew' || checkingAvailability) return
+    if (entityCatalogLayer !== 'homebrew' || checkingAvailability) return
 
     setDeleteError(null)
     setCheckingAvailability(true)
@@ -66,7 +66,7 @@ export function useContentDeleteFlow({
     } finally {
       setCheckingAvailability(false)
     }
-  }, [campaignId, checkingAvailability, def.routeKey, entityId, entitySource])
+  }, [campaignId, checkingAvailability, def.routeKey, entityId, entityCatalogLayer])
 
   const handleConfirmDelete = useCallback(async () => {
     setDeleteError(null)
@@ -89,7 +89,7 @@ export function useContentDeleteFlow({
     }
   }, [contentTypeKey, deleteMutation, entityId, navigate, overviewHref])
 
-  const canDelete = entitySource === 'homebrew'
+  const canDelete = entityCatalogLayer === 'homebrew'
   const deletePending = checkingAvailability || deleteMutation.isPending
 
   return {

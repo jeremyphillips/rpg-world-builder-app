@@ -21,7 +21,7 @@ describe('SRD 5.2.1 feat seed', () => {
   it('uses deterministic system ids and null campaignId', () => {
     for (const feat of feats) {
       expect(feat.id).toBe(`${RULESET}:${feat.slug}`)
-      expect(feat.source).toBe('system')
+      expect(feat.catalogLayer).toBe('system')
       expect(feat.campaignId).toBeNull()
       expect(feat.rulesetId).toBe(RULESET)
     }

@@ -345,7 +345,7 @@ export function CharacterConnectionAddModal({
                                   {
                                     media: location.media,
                                     slug: location.slug,
-                                    source: location.source,
+                                    catalogLayer: location.catalogLayer,
                                     rulesetId: location.rulesetId,
                                   },
                                   'compact',
@@ -375,7 +375,7 @@ export function CharacterConnectionAddModal({
                                   {
                                     media: location.media,
                                     slug: location.slug,
-                                    source: location.source,
+                                    catalogLayer: location.catalogLayer,
                                     rulesetId: location.rulesetId,
                                   },
                                   'compact',

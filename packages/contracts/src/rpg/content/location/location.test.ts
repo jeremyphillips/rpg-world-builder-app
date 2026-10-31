@@ -65,7 +65,7 @@ describe('location stored contracts', () => {
     id: 'location-1',
     slug: 'waterdeep',
     rulesetId: 'srd-cc-5.2.1',
-    source: 'homebrew' as const,
+    catalogLayer: 'homebrew' as const,
     campaignId: 'campaign-1',
     ...timestamps,
   }

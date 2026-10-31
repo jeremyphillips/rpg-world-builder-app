@@ -91,6 +91,26 @@ describe('resolveSelectionSourceProvenance', () => {
     })
   })
 
+  it('renders the parent trait when the grant row was deleted', () => {
+    expect(
+      resolveSelectionSourceProvenance(
+        {
+          kind: 'speciesTrait',
+          sourceId: 'srd-cc-5.2.1:elf',
+          grantId: 'keen-senses',
+          grantRowId: 'deleted-skill-grant',
+        },
+        catalogIndex,
+      ),
+    ).toEqual({
+      sourceKind: 'speciesTrait',
+      ownerKind: 'species',
+      primaryLabel: 'Keen Senses',
+      ownerLabel: 'Elf',
+      parentContext: 'Elf trait',
+    })
+  })
+
   it('resolves species trait grants with trait and species context', () => {
     expect(
       resolveSelectionSourceProvenance(

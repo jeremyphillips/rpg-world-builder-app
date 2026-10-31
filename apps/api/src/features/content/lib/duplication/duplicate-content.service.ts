@@ -59,10 +59,13 @@ export async function duplicateContentEntity({
 
   const entity = await createHomebrewContent(writeConfig, campaignId, createInput, {
     status: creationDefaults.status,
-    source: creationDefaults.source,
+    catalogLayer: creationDefaults.catalogLayer,
     resolvedSlug: destinationSlug,
     slugCollisionPolicy: 'suffix',
     preserveNestedIds: true,
+    provenanceAuthority: 'carry',
+    provenanceSourceEntity: source as unknown as Record<string, unknown>,
+    contentTypeKey: contentType,
   })
 
   if (idempotencyKey) {
@@ -74,8 +77,6 @@ export async function duplicateContentEntity({
       createdEntityId: (entity as WriteEntityBase).id,
     })
   }
-
-  // TODO: duplicatedFrom — record provenance at the success point.
 
   return { writeConfig, entity }
 }

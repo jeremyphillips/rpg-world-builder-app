@@ -25,7 +25,7 @@ describe('location content routes', () => {
     expect(world).toMatchObject({
       kind: 'world',
       name: 'Faerûn',
-      source: 'homebrew',
+      catalogLayer: 'homebrew',
       status: 'published',
     })
 

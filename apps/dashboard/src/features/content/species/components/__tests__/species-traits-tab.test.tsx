@@ -28,14 +28,14 @@ function TraitsValuesProbe() {
 
 function TabShell({
   traits = [] as Trait[],
-  entitySource,
+  entityCatalogLayer,
 }: {
   traits?: Trait[]
-  entitySource?: ContentFormCtx['entitySource']
+  entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
 }) {
   return (
     <TestFormShell defaultValues={{ traits }}>
-      <SpeciesTraitsTab formCtx={{ entitySource }} />
+      <SpeciesTraitsTab formCtx={{ entityCatalogLayer }} />
       <TraitsValuesProbe />
     </TestFormShell>
   )
@@ -138,7 +138,9 @@ describe('SpeciesTraitsTab', () => {
 
   it('selects the next trait when the selected middle trait is removed', async () => {
     const user = userEvent.setup()
-    render(<TabShell traits={[darkvision, feyAncestry, keenSenses]} entitySource="homebrew" />)
+    render(
+      <TabShell traits={[darkvision, feyAncestry, keenSenses]} entityCatalogLayer="homebrew" />,
+    )
 
     await user.click(
       within(screen.getByRole('navigation', { name: 'Traits' })).getByRole('button', {
@@ -161,7 +163,7 @@ describe('SpeciesTraitsTab', () => {
 
   it('confirms deletion through the dialog and removes the row', async () => {
     const user = userEvent.setup()
-    render(<TabShell traits={[darkvision]} entitySource="homebrew" />)
+    render(<TabShell traits={[darkvision]} entityCatalogLayer="homebrew" />)
 
     await deleteViaOverflow(user, 'Darkvision')
     expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete trait?')
@@ -174,7 +176,7 @@ describe('SpeciesTraitsTab', () => {
   })
 
   it('locks system traits on a system species (no overflow delete, System meta)', () => {
-    render(<TabShell traits={[darkvision]} entitySource="system" />)
+    render(<TabShell traits={[darkvision]} entityCatalogLayer="system" />)
 
     expect(screen.getAllByText(/System/).length).toBeGreaterThan(0)
     expect(
@@ -184,7 +186,7 @@ describe('SpeciesTraitsTab', () => {
 
   it('allows deleting newly added rows even on a system species', async () => {
     const user = userEvent.setup()
-    render(<TabShell traits={[darkvision]} entitySource="system" />)
+    render(<TabShell traits={[darkvision]} entityCatalogLayer="system" />)
 
     await user.click(screen.getByRole('button', { name: /Add trait/i }))
 

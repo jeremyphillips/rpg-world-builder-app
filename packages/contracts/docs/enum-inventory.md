@@ -38,11 +38,11 @@ enforced by `vocab-term-coverage.test.ts`. Detail:
 
 ## Phase 0 promotions (completed)
 
-| Concept                                       | Module                              | Catalog JSON                        | Hover tier   |
-| --------------------------------------------- | ----------------------------------- | ----------------------------------- | ------------ |
-| Spell grant availability (`always_prepared`)  | `vocab/spell/grant-availability.ts` | yes (`spells` grant `availability`) | vocab-backed |
-| Spell grant casting (`free_cast` + frequency) | `vocab/spell/grant-casting.ts`      | yes (`spells` grant `casting`)      | local-exempt |
-| Equipment kind                                | `vocab/equipment/kind.ts`           | yes                                 | vocab-backed |
+| Concept                                         | Module                              | Catalog JSON                        | Hover tier   |
+| ----------------------------------------------- | ----------------------------------- | ----------------------------------- | ------------ |
+| Spell grant availability (`always_prepared`)    | `vocab/spell/grant-availability.ts` | yes (`spells` grant `availability`) | vocab-backed |
+| Spell grant casting (`free_cast` + limited use) | `vocab/spell/grant-casting.ts`      | yes (`spells` grant `casting`)      | local-exempt |
+| Equipment kind                                  | `vocab/equipment/kind.ts`           | yes                                 | vocab-backed |
 
 ---
 
@@ -51,13 +51,15 @@ enforced by `vocab-term-coverage.test.ts`. Detail:
 | Schema                         | Module                              | Entries | Catalog JSON |
 | ------------------------------ | ----------------------------------- | ------- | ------------ |
 | `abilitySchema`                | `vocab/ability.ts`                  | full    | yes          |
-| `usageFrequencySchema`         | `vocab/usage-frequency.ts`          | full    | yes          |
+| `restKindSchema`               | `vocab/rest.ts`                     | full    | yes          |
 | `movementModeSchema`           | `vocab/movement-mode.ts`            | full    | yes          |
 | `extraMovementModeSchema`      | `vocab/movement-mode.ts`            | full    | yes          |
 | `movementOperationSchema`      | `vocab/movement-mode.ts`            | full    | yes          |
 | `featCategorySchema`           | `vocab/feat.ts`                     | full    | yes          |
 | `equipmentKindSchema`          | `vocab/equipment/kind.ts`           | full    | yes          |
 | `spellGrantAvailabilitySchema` | `vocab/spell/grant-availability.ts` | full    | yes          |
+| `spellComponentIdSchema`       | `vocab/spell/components.ts`         | full    | yes          |
+| `monsterActionKindSchema`      | `vocab/monster-action-kind.ts`      | full    | yes          |
 
 ## Vocab-backed — existing `*_ENTRIES`, wire in follow-up phases
 
@@ -106,7 +108,7 @@ Spell resolution closed sets (`content/spell/resolution/vocab.ts`) also define
 | `proficiencyPoolSourceSchema`                    | `content/lib/proficiency-grant.ts`       | yes          | no                | local-exempt |
 | `contentTraitKindSchema` (`custom`, `grant`)     | `content/lib/grants/grants.ts`           | yes          | no                | local-exempt |
 | `contentGrantSchema` `kind` literals             | `content/lib/grants/grants.ts`           | yes          | no                | local-exempt |
-| `contentSourceSchema` (`system`, `homebrew`)     | `content/lib/envelope.ts`                | yes          | no                | local-exempt |
+| `catalogLayerSchema` (`system`, `homebrew`)      | `content/lib/envelope.ts`                | yes          | no                | local-exempt |
 | `contentStatusSchema` (`draft`, `published`)     | `content/lib/envelope.ts`                | yes          | no                | local-exempt |
 | `equipmentModifierKindSchema`                    | `content/equipment/instance/modifier.ts` | yes          | no                | local-exempt |
 | `speciesMulticlassPolicySchema`                  | `content/species-character-creation.ts`  | yes          | no                | local-exempt |
@@ -141,6 +143,7 @@ Spell resolution closed sets (`content/spell/resolution/vocab.ts`) also define
 | `INNATE_SPELL_KINDS` / `innateSpell*` schemas | Replaced by `spellGrantCastingModeSchema` on atomic `spells` grants |
 | `contentGrantsSchema` (legacy bag)            | Catalog seeds use `grantGroups`; zero `innateSpells` in seeds       |
 | `isGrantEligibleGrants`                       | Replaced by `isGrantGroupsEligible`                                 |
+| `usageFrequencySchema`                        | Replaced by `limitedUseSchema` in `primitives/limited-use`          |
 
 ---
 

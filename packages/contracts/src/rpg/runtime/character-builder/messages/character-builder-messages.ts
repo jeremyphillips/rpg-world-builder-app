@@ -102,6 +102,10 @@ export const characterBuilderValidationMessages = {
     'validation.characterBuilder.removeSpells',
     ({ count }) => (count === 1 ? 'Remove 1 prepared spell.' : `Remove ${count} prepared spells.`),
   ),
+  grantedSpellUnavailable: defineMessage(
+    'validation.characterBuilder.grantedSpellUnavailable',
+    () => 'A granted spell is not in the catalog.',
+  ),
   spellNoLongerAvailable: defineMessage<{ spellLabel: string }>(
     'validation.characterBuilder.spellNoLongerAvailable',
     ({ spellLabel }) =>

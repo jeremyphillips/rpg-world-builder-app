@@ -63,7 +63,7 @@ const fireball = {
   id: 'srd-cc-5.2.1:fireball',
   slug: 'fireball',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   ...timestamps,
@@ -74,7 +74,7 @@ const fireBolt = {
   id: 'srd-cc-5.2.1:fire-bolt',
   slug: 'fire-bolt',
   rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
+  catalogLayer: 'system',
   status: 'published',
   campaignId: null,
   ...timestamps,
@@ -87,7 +87,7 @@ describe('spellSchema', () => {
   })
 
   it('parses a homebrew spell with a campaignId', () => {
-    const homebrew = { ...fireBolt, source: 'homebrew', campaignId: 'camp_1' }
+    const homebrew = { ...fireBolt, catalogLayer: 'homebrew', campaignId: 'camp_1' }
     expect(spellSchema.parse(homebrew)).toEqual(homebrew)
   })
 
@@ -105,7 +105,7 @@ describe('spellSchema', () => {
       id: 'srd-cc-5.2.1:detect-magic',
       slug: 'detect-magic',
       rulesetId: 'srd-cc-5.2.1',
-      source: 'system',
+      catalogLayer: 'system',
       status: 'published',
       campaignId: null,
       ...timestamps,
@@ -158,12 +158,52 @@ describe('spellSchema', () => {
         normal: {
           value: 1,
           unit: 'reaction',
-          trigger: 'in response to taking damage from a creature that you can see within 60 feet',
+          trigger: {
+            text: 'in response to taking damage from a creature that you can see within 60 feet',
+          },
         },
         canBeCastAsRitual: false,
       },
     }
     expect(spellSchema.parse(hellishRebuke)).toEqual(hellishRebuke)
+  })
+
+  it('requires a trigger when the casting time is a reaction', () => {
+    const result = spellSchema.safeParse({
+      ...fireBolt,
+      castingTime: {
+        normal: { value: 1, unit: 'reaction' },
+        canBeCastAsRitual: false,
+      },
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(
+        result.error.issues.some((issue) => issue.path.join('.') === 'castingTime.normal.trigger'),
+      ).toBe(true)
+    }
+  })
+
+  it('rejects a trigger on a non-reaction casting time', () => {
+    expect(
+      spellSchema.safeParse({
+        ...fireBolt,
+        castingTime: {
+          normal: { value: 1, unit: 'action', trigger: { text: 'when struck' } },
+          canBeCastAsRitual: false,
+        },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects a draft reaction casting time without a trigger', () => {
+    expect(
+      createSpellDraftInputSchema.safeParse({
+        slug: 'react',
+        name: 'React',
+        castingTime: { normal: { value: 1, unit: 'reaction' }, canBeCastAsRitual: false },
+      }).success,
+    ).toBe(false)
   })
 
   it('parses a spell with range and areaOfEffect kept separate', () => {

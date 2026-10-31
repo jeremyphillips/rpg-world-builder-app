@@ -1,5 +1,6 @@
 export * from './choice'
 export * from './grant-messages'
+export * from './grant-row-id'
 export * from './grants'
 export * from './equipment-grant'
 export * from './proficiency-grant'

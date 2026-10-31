@@ -6,6 +6,7 @@ import {
   hasAuthoredContentMediaForCatalogWrite,
   prepareContentMediaForCatalogWrite,
   type CatalogContentMediaWriteContext,
+  type CatalogLayer,
   type ContentMedia,
   type ContentTypeKey,
   type ContentValidationIntent,
@@ -55,8 +56,8 @@ function resolveCatalogMediaWriteContext(
   const slug =
     (ctx?.entity as { slug?: string } | undefined)?.slug ??
     (typeof values.slug === 'string' ? values.slug : undefined)
-  const contentSource =
-    (ctx?.entity as { source?: 'homebrew' | 'system' } | undefined)?.source ?? 'homebrew'
+  const catalogLayer =
+    (ctx?.entity as { catalogLayer?: CatalogLayer } | undefined)?.catalogLayer ?? 'homebrew'
 
   if (!slug) return undefined
 
@@ -64,7 +65,7 @@ function resolveCatalogMediaWriteContext(
     domain: def.mediaDomain,
     subject: contentTypeSubject(def.routeKey as ContentTypeKey),
     slug,
-    contentSource,
+    catalogLayer,
     rulesetId,
   }
 }

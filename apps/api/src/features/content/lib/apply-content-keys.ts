@@ -4,8 +4,10 @@ import {
   assignStableContentIds,
   assertStableContentIds,
   ContentKeyError,
+  createGrantRowId,
   createOrganizationMembershipTitleId,
   deriveContentKey,
+  isSeedGrantRowId,
   type NestedContentIdRegenerationPath,
   type NestedIdRegeneration,
 } from '@rpg/contracts'
@@ -149,6 +151,145 @@ export function applyStableNestedContentKeys(
   return normalizeNestedContentKeysForCreate(body, existingBody)
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function matchStoredRow(incoming: unknown, stored: unknown[] | undefined): unknown {
+  if (!stored || !isRecord(incoming) || typeof incoming.id !== 'string') return undefined
+  return stored.find((row) => isRecord(row) && row.id === incoming.id)
+}
+
+function indexStoredGrantKinds(groups: unknown[]): Map<string, string> {
+  const stored = new Map<string, string>()
+  for (const group of groups) {
+    if (!isRecord(group) || !Array.isArray(group.grants)) continue
+    for (const grant of group.grants) {
+      if (!isRecord(grant) || typeof grant.id !== 'string' || typeof grant.kind !== 'string') {
+        continue
+      }
+      stored.set(grant.id, grant.kind)
+    }
+  }
+  return stored
+}
+
+function assertStoredGrantKind(
+  id: string,
+  kind: string | undefined,
+  storedKind: string | undefined,
+) {
+  if (kind !== undefined && storedKind !== kind) {
+    throw new ContentKeyError(`Cannot reuse grant row id "${id}" for a different grant kind.`)
+  }
+}
+
+function assertNewGrantId(id: string) {
+  if (isSeedGrantRowId(id)) {
+    throw new ContentKeyError(
+      `Cannot assign seed grant row id "${id}" to a grant that is not already stored.`,
+    )
+  }
+}
+
+function resolveStabilizedGrantId(
+  grant: Record<string, unknown>,
+  storedKinds: Map<string, string>,
+): string {
+  const kind = typeof grant.kind === 'string' ? grant.kind : undefined
+  const incomingId = typeof grant.id === 'string' && grant.id.length > 0 ? grant.id : undefined
+  if (incomingId === undefined) return createGrantRowId()
+
+  if (storedKinds.has(incomingId)) {
+    assertStoredGrantKind(incomingId, kind, storedKinds.get(incomingId))
+    return incomingId
+  }
+
+  assertNewGrantId(incomingId)
+  return incomingId
+}
+
+function rememberGrantRowId(id: string, seen: Set<string>) {
+  if (seen.has(id)) {
+    throw new ContentKeyError(`Duplicate grant row id "${id}".`)
+  }
+  seen.add(id)
+}
+
+function stabilizeGrant(
+  grant: unknown,
+  storedKinds: Map<string, string>,
+  seen: Set<string>,
+): unknown {
+  if (!isRecord(grant)) return grant
+  const id = resolveStabilizedGrantId(grant, storedKinds)
+  rememberGrantRowId(id, seen)
+  return { ...grant, id }
+}
+
+function stabilizeGrantGroup(
+  group: unknown,
+  storedKinds: Map<string, string>,
+  seen: Set<string>,
+): unknown {
+  if (!isRecord(group) || !Array.isArray(group.grants)) return group
+  return {
+    ...group,
+    grants: group.grants.map((grant) => stabilizeGrant(grant, storedKinds, seen)),
+  }
+}
+
+/**
+ * Allocates missing grant row ids and rejects reuse. Compared against the stored
+ * owner (the effective body on system-patch updates).
+ */
+function stabilizeGrantGroups(
+  incomingGroups: unknown[],
+  storedGroups: unknown[] | undefined,
+): unknown[] {
+  const storedKinds = storedGroups ? indexStoredGrantKinds(storedGroups) : new Map<string, string>()
+  const seen = new Set<string>()
+  return incomingGroups.map((group) => stabilizeGrantGroup(group, storedKinds, seen))
+}
+
+const GRANT_OWNER_ARRAY_KEYS = ['traits', 'features', 'options'] as const
+
+function stabilizeOwnedGrantGroups(
+  next: Record<string, unknown>,
+  storedRecord: Record<string, unknown> | undefined,
+) {
+  if (!Array.isArray(next.grantGroups)) return
+  const storedGroups =
+    storedRecord && Array.isArray(storedRecord.grantGroups) ? storedRecord.grantGroups : undefined
+  next.grantGroups = stabilizeGrantGroups(next.grantGroups, storedGroups)
+}
+
+function stabilizeNestedGrantOwners(
+  next: Record<string, unknown>,
+  storedRecord: Record<string, unknown> | undefined,
+  key: (typeof GRANT_OWNER_ARRAY_KEYS)[number],
+) {
+  if (!Array.isArray(next[key])) return
+  const storedRows =
+    storedRecord && Array.isArray(storedRecord[key]) ? storedRecord[key] : undefined
+  next[key] = next[key].map((row) => stabilizeGrantOwners(row, matchStoredRow(row, storedRows)))
+}
+
+function stabilizeGrantOwners(incoming: unknown, stored: unknown): unknown {
+  if (!isRecord(incoming)) return incoming
+
+  const next: Record<string, unknown> = { ...incoming }
+  const storedRecord = isRecord(stored) ? stored : undefined
+  stabilizeOwnedGrantGroups(next, storedRecord)
+  for (const key of GRANT_OWNER_ARRAY_KEYS) {
+    stabilizeNestedGrantOwners(next, storedRecord, key)
+  }
+  if (isRecord(next.heritage)) {
+    next.heritage = stabilizeGrantOwners(next.heritage, storedRecord?.heritage)
+  }
+  return next
+}
+
 /** Create-time nested id assignment — preserves stable ids on update. */
 export function normalizeNestedContentKeysForCreate(
   body: Record<string, unknown>,
@@ -168,7 +309,7 @@ export function normalizeNestedContentKeysForCreate(
     result.heritage = stableHeritageObject(result.heritage, existing)
   }
 
-  return result
+  return stabilizeGrantOwners(result, existingBody) as Record<string, unknown>
 }
 
 export interface RegenerateNestedContentKeysContext {

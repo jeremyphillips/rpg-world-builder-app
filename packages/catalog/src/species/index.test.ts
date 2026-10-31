@@ -37,7 +37,7 @@ describe('SRD 5.2.1 species seed', () => {
   it('uses deterministic system ids and null campaignId', () => {
     for (const s of species) {
       expect(s.id).toBe(`${RULESET}:${s.slug}`)
-      expect(s.source).toBe('system')
+      expect(s.catalogLayer).toBe('system')
       expect(s.campaignId).toBeNull()
       expect(s.rulesetId).toBe(RULESET)
     }
@@ -114,6 +114,7 @@ describe('SRD 5.2.1 species seed', () => {
     const defaultGrants = woodElf.grantGroups?.[0]?.grants ?? []
     const speedGrant = defaultGrants.find((g) => g.kind === 'movement')
     expect(speedGrant).toEqual({
+      id: 'walk-movement',
       kind: 'movement',
       mode: 'walk',
       operation: 'increase',

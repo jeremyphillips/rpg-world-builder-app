@@ -100,4 +100,28 @@ export default [
       ],
     },
   },
+  {
+    files: ['src/rpg/runtime/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@rpg/catalog/source-excerpts',
+              message:
+                'Runtime resolution must not import the source excerpt store. Mechanics stay independent of original text.',
+            },
+          ],
+          patterns: [
+            {
+              group: ['**/source-excerpts/**', '**/source-excerpts'],
+              message:
+                'Runtime resolution must not import the source excerpt store. Mechanics stay independent of original text.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]

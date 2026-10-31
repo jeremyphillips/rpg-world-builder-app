@@ -1,9 +1,9 @@
 import type { ContentTypeKey } from '@rpg/contracts'
 
-export type ContentSourcePresentation = 'badge-and-filter' | 'suppressed'
+export type CatalogLayerPresentation = 'badge-and-filter' | 'suppressed'
 
 export type ContentTypePresentationPolicy = {
-  source: ContentSourcePresentation
+  catalogLayer: CatalogLayerPresentation
 }
 
 /**
@@ -14,15 +14,15 @@ export type ContentTypePresentationPolicy = {
  * be emphasized in the UI.
  */
 export const CONTENT_TYPE_PRESENTATION = {
-  classes: { source: 'badge-and-filter' },
-  spells: { source: 'badge-and-filter' },
-  species: { source: 'badge-and-filter' },
-  feats: { source: 'badge-and-filter' },
-  equipment: { source: 'badge-and-filter' },
-  'skill-proficiencies': { source: 'badge-and-filter' },
-  organizations: { source: 'suppressed' },
-  locations: { source: 'suppressed' },
-  monsters: { source: 'badge-and-filter' },
+  classes: { catalogLayer: 'badge-and-filter' },
+  spells: { catalogLayer: 'badge-and-filter' },
+  species: { catalogLayer: 'badge-and-filter' },
+  feats: { catalogLayer: 'badge-and-filter' },
+  equipment: { catalogLayer: 'badge-and-filter' },
+  'skill-proficiencies': { catalogLayer: 'badge-and-filter' },
+  organizations: { catalogLayer: 'suppressed' },
+  locations: { catalogLayer: 'suppressed' },
+  monsters: { catalogLayer: 'badge-and-filter' },
 } as const satisfies Record<ContentTypeKey, ContentTypePresentationPolicy>
 
 export function getContentTypePresentation(
@@ -31,6 +31,6 @@ export function getContentTypePresentation(
   return CONTENT_TYPE_PRESENTATION[contentType]
 }
 
-export function shouldPresentContentSource(contentType: ContentTypeKey): boolean {
-  return getContentTypePresentation(contentType).source === 'badge-and-filter'
+export function shouldPresentCatalogLayer(contentType: ContentTypeKey): boolean {
+  return getContentTypePresentation(contentType).catalogLayer === 'badge-and-filter'
 }

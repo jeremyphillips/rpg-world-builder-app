@@ -36,7 +36,7 @@ function TabShell({
     <FormProvider {...form}>
       <ClassCharacterCreationTab
         formCtx={{
-          entitySource: formCtx?.entitySource,
+          entityCatalogLayer: formCtx?.entityCatalogLayer,
           embeddedSeedRowIds: formCtx?.embeddedSeedRowIds,
         }}
       />
@@ -93,7 +93,7 @@ describe('ClassCharacterCreationTab', () => {
       <TabShell
         startingEquipment={monkStartingEquipment}
         formCtx={{
-          entitySource: 'system',
+          entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
@@ -114,7 +114,7 @@ describe('ClassCharacterCreationTab', () => {
           ),
         }}
         formCtx={{
-          entitySource: 'system',
+          entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
@@ -131,7 +131,7 @@ describe('ClassCharacterCreationTab', () => {
       <TabShell
         startingEquipment={monkStartingEquipment}
         formCtx={{
-          entitySource: 'system',
+          entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
@@ -160,7 +160,7 @@ describe('ClassCharacterCreationTab', () => {
       <TabShell
         startingEquipment={bardStartingEquipment}
         formCtx={{
-          entitySource: 'system',
+          entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': bardStartingEquipment.options.map(
               (option) => option.id!,
@@ -181,7 +181,7 @@ describe('ClassCharacterCreationTab', () => {
       <TabShell
         startingEquipment={monkStartingEquipment}
         formCtx={{
-          entitySource: 'system',
+          entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
@@ -220,7 +220,7 @@ describe('ClassCharacterCreationTab', () => {
         proficiencies={rogueProficiencies}
         startingEquipment={monkStartingEquipment}
         formCtx={{
-          entitySource: 'system',
+          entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
@@ -241,7 +241,7 @@ describe('ClassCharacterCreationTab', () => {
       <TabShell
         startingEquipment={monkStartingEquipment}
         formCtx={{
-          entitySource: 'system',
+          entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
@@ -256,7 +256,7 @@ describe('ClassCharacterCreationTab', () => {
       <TabShell
         startingEquipment={bardStartingEquipment}
         formCtx={{
-          entitySource: 'system',
+          entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': bardStartingEquipment.options.map(
               (option) => option.id!,

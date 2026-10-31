@@ -119,7 +119,7 @@ export function EditOrganizationMembershipDrawer({
     name: organization.name,
     organizationDomain: organization.organizationDomain,
     slug: organization.id,
-    source: 'homebrew',
+    catalogLayer: 'homebrew',
     rulesetId: 'srd-cc-5.2.1',
     media: undefined,
   })

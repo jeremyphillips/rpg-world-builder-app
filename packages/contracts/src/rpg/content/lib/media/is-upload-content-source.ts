@@ -1,5 +1,5 @@
-import type { ContentSource } from '../envelope'
+import type { CatalogLayer } from '../envelope'
 
-export function isUploadContentSource(contentSource: ContentSource): boolean {
-  return contentSource !== 'system'
+export function isUploadCatalogLayer(catalogLayer: CatalogLayer): boolean {
+  return catalogLayer !== 'system'
 }

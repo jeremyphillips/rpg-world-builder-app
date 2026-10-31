@@ -17,7 +17,7 @@ const STORY_ELF_SPECIES: SpeciesCultureInput = {
   id: 'srd-cc-5.2.1:elf',
   slug: 'elf',
   name: 'Elf',
-  source: 'system',
+  catalogLayer: 'system',
   culture: {
     id: 'elven',
     name: 'Elven',

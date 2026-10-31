@@ -43,7 +43,7 @@ describe('species preview projection', () => {
 
   it('derives system artwork when the form has no persisted media', () => {
     const identity = buildSpeciesPreviewIdentity(createValues(), {
-      entitySource: 'system',
+      entityCatalogLayer: 'system',
       entitySlug: 'elf',
       rulesetId: 'srd-cc-5.2.1',
     })

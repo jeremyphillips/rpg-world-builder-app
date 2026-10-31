@@ -48,7 +48,7 @@ export type ContentEditFormLoadInput = {
   entity: {
     id: string
     name: string
-    source?: ContentFormCtx['entitySource']
+    catalogLayer?: ContentFormCtx['entityCatalogLayer']
     status?: ContentStatus
   }
   optionsCtx: ContentFormCtx

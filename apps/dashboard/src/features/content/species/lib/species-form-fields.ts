@@ -1,14 +1,13 @@
 import { createElement } from 'react'
 import { z } from 'zod'
 import {
-  CREATURE_SIZE_TERM,
   CREATURE_TYPE_TERM,
+  creatureSizesDraftSchema,
+  creatureSizesSchema,
   addCustomRefinementIssue,
-  creatureSizeSchema,
   creatureTypeSchema,
   defineMessage,
   getTermSentenceForm,
-  getVocabularyTermLabel,
   slugSchema,
   type CreatureTypeId,
   getSpeciesHeritageLabel,
@@ -29,6 +28,10 @@ import {
 } from '../../lib/forms/fields/content-managed-media-form-schema.lib'
 import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
+import {
+  createCreatureSizesFieldConfig,
+  SPECIES_SIZES_FIELD_HINT,
+} from '../../lib/forms/fields/creature-sizes-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   embeddedArrayResolverField,
@@ -94,7 +97,7 @@ export function createSpeciesFormSchema(
       slug: slugSchema.optional(),
       description: z.string().optional(),
       creatureType: creatureTypeSchema,
-      sizes: z.array(creatureSizeSchema).min(1),
+      sizes: creatureSizesSchema,
       movement: z.array(movementRowFormSchema).min(1),
       hover: z.boolean().optional(),
       languageAffinities: z.array(z.string()).optional(),
@@ -129,7 +132,7 @@ export function createSpeciesDraftFormSchema() {
       slug: slugSchema.optional(),
       description: z.string().optional(),
       creatureType: creatureTypeSchema,
-      sizes: z.array(creatureSizeSchema).default([]),
+      sizes: creatureSizesDraftSchema,
       movement: z.array(movementRowDraftFormSchema).default([]),
       hover: z.boolean().optional(),
       languageAffinities: z.array(z.string()).optional(),
@@ -170,13 +173,10 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
         },
         {
           fields: [
-            {
-              type: 'chips',
-              name: 'sizes',
-              label: getVocabularyTermLabel(CREATURE_SIZE_TERM),
-              options: buildActiveSizeFieldOptions(ctx.sizeVocabulary),
-              required: true,
-            },
+            createCreatureSizesFieldConfig({
+              hint: SPECIES_SIZES_FIELD_HINT,
+              options: buildActiveSizeFieldOptions(ctx.sizeVocabulary, ctx.creatureSizesSeedIds),
+            }),
             descriptionField(ctx),
           ],
         },
