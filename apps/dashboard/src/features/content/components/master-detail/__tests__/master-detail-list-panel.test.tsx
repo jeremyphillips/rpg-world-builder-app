@@ -50,6 +50,25 @@ describe('MasterDetailListPanel', () => {
     vi.mocked(HTMLElement.prototype.scrollIntoView as typeof vi.fn).mockClear()
   })
 
+  it('renders the list title at card heading scale (text-lg) independent of panel density', () => {
+    render(<MasterDetailListPanel {...baseProps()} />)
+
+    expect(screen.getByText('Features')).toHaveClass('heading-style-card')
+    expect(screen.getByText('Features')).not.toHaveClass('heading-style-section')
+  })
+
+  it('renders addControl in place of the default add button', () => {
+    render(
+      <MasterDetailListPanel
+        {...baseProps()}
+        addControl={<button type="button">Custom add</button>}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Custom add' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Add feature/i })).not.toBeInTheDocument()
+  })
+
   it('calls onAdd when the add button is clicked', async () => {
     const user = userEvent.setup()
     const props = baseProps()
@@ -59,19 +78,35 @@ describe('MasterDetailListPanel', () => {
     expect(props.onAdd).toHaveBeenCalledOnce()
   })
 
-  it('uses interactive card selected chrome on the current row', () => {
+  it('uses compact interactive list selected chrome on the current row', () => {
     render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
 
     const selected = screen.getByRole('button', { name: /Rage/i })
     const unselected = screen.getByRole('button', { name: /Unarmored Defense/i })
 
-    expect(selected).toHaveClass('ui-card', 'ui-card--interactive', 'ui-card--selected')
-    expect(selected).not.toHaveClass('ui-interactive-list__row')
-    expect(unselected).toHaveClass('ui-card', 'ui-card--interactive')
-    expect(unselected).not.toHaveClass('ui-card--selected')
+    expect(selected).toHaveClass(
+      'ui-interactive-list__main',
+      'ui-interactive-list__main--interactive',
+    )
+    expect(selected).not.toHaveClass('ui-card', 'ui-card--selected')
+    expect(selected.closest('.ui-interactive-list__row')).toHaveClass(
+      'ui-interactive-row--fill-surface',
+    )
+    expect(unselected.closest('.ui-interactive-list__row')).not.toHaveClass(
+      'ui-interactive-row--fill-surface',
+    )
     expect(screen.getByRole('navigation', { name: 'Features' })).not.toHaveClass(
       'border-border-subtle',
     )
+  })
+
+  it('renders a flush compact list body without scrollport padding', () => {
+    render(<MasterDetailListPanel {...baseProps()} />)
+
+    const list = screen.getByRole('list')
+    expect(list).toHaveClass('ui-interactive-list', 'ui-list--compact')
+    expect(list.className).not.toMatch(/\bp-2\b/)
+    expect(list.className).not.toMatch(/\bgap-2\b/)
   })
 
   it('calls onSelect with the row index when the whole row is clicked', async () => {
@@ -112,9 +147,11 @@ describe('MasterDetailListPanel', () => {
 
   it('renders the empty label when there are no items', () => {
     render(<MasterDetailListPanel {...baseProps()} items={[]} selectedIndex={null} />)
-    expect(
-      screen.getByText(masterDetailEmptyListLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN)),
-    ).toBeInTheDocument()
+    const emptyLabel = screen.getByText(
+      masterDetailEmptyListLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN),
+    )
+    expect(emptyLabel).toBeInTheDocument()
+    expect(emptyLabel).toHaveClass('ui-interactive-list__empty', 'text-start')
     expect(document.querySelector('[data-master-detail-list-scroll]')).toBeNull()
   })
 

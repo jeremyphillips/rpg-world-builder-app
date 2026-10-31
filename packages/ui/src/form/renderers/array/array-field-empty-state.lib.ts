@@ -1,12 +1,17 @@
 import { arrayItemLabel } from '../../config/array/array-item-label.lib'
 import { resolveArrayItemHeader } from '../../config/array/array-item-config.lib'
+import {
+  resolveArrayLabel,
+  resolveArraySectionLabelForDisplay,
+} from '../../config/array/resolve-array-label.lib'
 import type { ArrayConfig } from '../../field-config'
-import { resolveArrayHeading } from '../../resolve-container-heading.lib'
 
 export function resolveArrayEmptyItemLabel(config: ArrayConfig): string {
-  const legend = resolveArrayHeading(config)?.label ?? config.legend ?? config.name
-  const header = resolveArrayItemHeader(config, legend)
-  return arrayItemLabel(header, legend)
+  const sectionLabel =
+    resolveArrayLabel(config)?.label ?? resolveArraySectionLabelForDisplay(config)
+  const itemLegend = resolveArrayLabel(config)?.label ?? ''
+  const header = resolveArrayItemHeader(config, itemLegend)
+  return arrayItemLabel(header, itemLegend)
 }
 
 export function arrayEmptyStatePrimaryMessage(itemLabel: string): string {

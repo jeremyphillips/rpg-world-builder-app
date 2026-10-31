@@ -1,5 +1,16 @@
 export type DerivedFieldReason = 'missing-input' | 'missing-reference' | 'conflict'
 
+export function derivedFieldReasonLabel(reason: DerivedFieldReason): string {
+  switch (reason) {
+    case 'missing-input':
+      return 'missing input'
+    case 'missing-reference':
+      return 'missing reference'
+    case 'conflict':
+      return 'conflict'
+  }
+}
+
 export type DerivedField<T> =
   | { status: 'resolved'; value: T }
   | { status: 'unavailable'; reason: DerivedFieldReason }

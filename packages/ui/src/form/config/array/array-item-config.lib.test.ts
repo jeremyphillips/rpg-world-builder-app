@@ -20,7 +20,7 @@ describe('array-item-config.lib', () => {
         {
           kind: 'array',
           name: 'tags',
-          legend: 'Tags',
+          label: 'Tags',
           fields: [{ type: 'text', name: 'label', label: 'Label' }],
         },
         { nested: true },
@@ -35,7 +35,6 @@ describe('array-item-config.lib', () => {
           kind: 'array',
           item: { variant: 'detailed' },
           name: 'effects',
-          legend: '',
           fields: [{ type: 'text', name: 'kind', label: 'Kind' }],
         },
         { nested: true },
@@ -49,7 +48,7 @@ describe('array-item-config.lib', () => {
         {
           kind: 'array',
           name: 'entries',
-          legend: 'Entries',
+          label: 'Entries',
           item: { collapsible: true },
           fields: [{ type: 'text', name: 'label', label: 'Label' }],
         },
@@ -62,7 +61,7 @@ describe('array-item-config.lib', () => {
         {
           kind: 'array',
           name: 'examples',
-          legend: 'Examples',
+          label: 'Examples',
           item: { collapsible: true, variant: 'compact' },
           fields: [{ type: 'text', name: 'label', label: 'Label' }],
         },
@@ -75,7 +74,7 @@ describe('array-item-config.lib', () => {
     const config = {
       kind: 'array' as const,
       name: 'utilizes',
-      legend: 'Utilize actions',
+      label: 'Utilize actions',
       fields: [
         {
           kind: 'row' as const,
@@ -107,7 +106,7 @@ describe('array-item-config.lib', () => {
     const config = {
       kind: 'array' as const,
       name: 'traits',
-      legend: 'Traits',
+      label: 'Traits',
       fields: [
         { type: 'text' as const, name: 'name', label: 'Name', required: true },
         { type: 'textarea' as const, name: 'description', label: 'Description' },
@@ -172,7 +171,7 @@ describe('array-item-config.lib', () => {
       resolveArrayAddAction({
         kind: 'array',
         name: 'traits',
-        legend: 'Traits',
+        label: 'Traits',
         fields: [],
         addAction: { label: 'Add trait', layout: 'inline' },
       }),

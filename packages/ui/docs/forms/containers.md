@@ -159,10 +159,13 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 }
 ```
 
-Legend→body spacing for `FieldGroup` is owned by `StandardFieldGroupBody` (`resolveFieldGroupBodyGap`
-on a body-side wrapper when a body is visible). `FieldGroupLegend` keeps title, description, and
-accessory anatomy only. Legacy legend header margin (`fieldGroupLegendHeaderMarginVariants`) remains
-for non-FieldGroup headings. `<legend>` is `w-full` and sits **outside** panel, outline, inset, and
+Legend→body spacing for `FieldGroup` is owned by `StandardFieldGroupBody`: section/subsection tiers use
+`resolveFieldGroupBodyGap` on a body-side wrapper when a body is visible; `headingScale="field"` applies
+`fieldAnatomyStackVariants` on the fieldset (stable when collapsible groups are closed). Array fieldsets gate the same
+stack with `showSectionHeader` (visible label band or chrome — not sr-only-only labels). `FieldGroupLegend`
+keeps title, description, and accessory anatomy only. Legacy legend header margin
+(`fieldGroupLegendHeaderMarginVariants`) remains for non-FieldGroup headings. In-flow array legends use
+`fieldSetInFlowLegendClasses` and require a parent fieldset stack — never legend `mb-*`. `<legend>` is `w-full` and sits **outside** panel, outline, inset, and
 callout **group chrome** boxes. The default
 field container wraps the whole fieldset, including the legend and description — see
 [Field container chrome](#field-container-chrome-default). Divider and accent-top chrome
@@ -499,7 +502,7 @@ pick compact but disclosure chrome is still required without `itemCollapsible`.
 
 **Legend scale:** Array legend typography inherits parent section density unless the array
 sets `density` explicitly; item bodies still default to `compact`. Prefer `heading.label`
-when authoring new arrays; `legend` remains supported via `resolveArrayHeading`.
+when authoring new arrays. Anonymous arrays omit `label`.
 
 ### Collapse defaults and persistence
 

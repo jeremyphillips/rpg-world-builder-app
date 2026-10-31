@@ -5,6 +5,7 @@ import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-de
 import { MasterDetailEditorShell } from '../master-detail-editor-shell'
 import { MasterDetailGrid } from '../master-detail-grid'
 import {
+  masterDetailListBodyClasses,
   masterDetailListScrollRegionClasses,
   masterDetailListScrollViewportClasses,
   masterDetailListShellClasses,
@@ -26,6 +27,9 @@ describe('master-detail layout variants', () => {
 
   it('caps the list shell with shared viewport utilities without restating raw lengths', () => {
     expect(masterDetailListShellClasses).toContain('master-detail-list-shell-viewport-cap')
+    expect(masterDetailListShellClasses).toContain('w-full')
+    expect(masterDetailListShellClasses).toContain('min-w-0')
+    expect(masterDetailListShellClasses).not.toContain('self-start')
     expect(masterDetailListShellClasses).toContain('sticky')
     expect(masterDetailListShellClasses).toContain(
       'top-[var(--rpg-form-sticky-tabs-block-size,0px)]',
@@ -40,6 +44,11 @@ describe('master-detail layout variants', () => {
     expect(masterDetailListShellClasses).not.toContain('5.5rem')
     expect(masterDetailListShellClasses).not.toContain('70dvh')
     expect(masterDetailListShellClasses).not.toContain('border-border-subtle')
+  })
+
+  it('uses a compact interactive list shell for the scroll body', () => {
+    expect(masterDetailListBodyClasses).toContain('ui-interactive-list')
+    expect(masterDetailListBodyClasses).toContain('ui-list--compact')
   })
 
   it('wraps list scroll in a boundary region without reserving scrollbar gutter space', () => {

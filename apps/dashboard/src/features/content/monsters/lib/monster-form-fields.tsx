@@ -20,7 +20,7 @@ import { movementWithHoverGroup } from '../../lib/forms/fields/content-movement-
 import { MonsterChallengeRatingHint } from '../components/form/monster-challenge-rating-hint'
 import { creatureDetailsFields } from './creature-details/monster-creature-details-form-fields'
 import { MonsterEquipmentPanel } from '../components/form/monster-equipment-panel'
-import { MonsterActionsEditor } from '../components/form/monster-actions-editor'
+import { MonsterActionSections } from '../components/form/monster-action-sections'
 import { MonsterTraitsEditor } from '../components/form/monster-traits-editor'
 import { MonsterStatisticsPanel } from '../components/form/monster-statistics-panel'
 import { monsterArmorClassFields } from './statistics/monster-armor-class-fields'
@@ -122,7 +122,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   ]
 
   const actions: FormItem[] = [
-    { kind: 'slot', name: 'actions', render: () => <MonsterActionsEditor ctx={ctx} /> },
+    { kind: 'slot', name: 'actions', render: () => <MonsterActionSections ctx={ctx} /> },
     ownedSlot('bonusActions'),
     ownedSlot('reactions'),
   ]

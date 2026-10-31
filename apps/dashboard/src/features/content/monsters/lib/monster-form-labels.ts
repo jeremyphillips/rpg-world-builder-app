@@ -5,13 +5,13 @@ import {
   CHALLENGE_RATING_TERM,
   CREATURE_ARMOR_CLASS_KIND_TERM,
   getActionEconomyLabel,
+  getSpellAtomicEffectKindLabel,
   getArmorCategoryLabel,
   getArmorCategorySentenceForm,
   getAverageHitPointsLabel,
   getContentTypeSentenceForm,
   getCreatureArmorClassKindLabel,
   getCreatureLanguageFluencyLabel,
-  getMonsterActionKindFieldLabel,
   getMonsterReactionFieldLabel,
   getMonsterTraitSectionLabel,
   getProficiencyDomainCollectionLabel,
@@ -39,6 +39,8 @@ import {
   getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
 import { vocabularyFieldLabel } from '@/features/vocabulary'
+
+import type { MonsterActionSection } from './actions/monster-action-equipment-references'
 
 const armorClassLabel = CREATURE_ARMOR_CLASS_KIND_TERM.label
 
@@ -100,6 +102,23 @@ export const MONSTER_EQUIPPED_LABEL = 'Equipped'
 export const MONSTER_CUSTOMIZATION_LABEL = 'Customization'
 export const MONSTER_CUSTOM_NAME_LABEL = 'Custom name'
 export const MONSTER_CUSTOM_DESCRIPTION_LABEL = 'Custom description'
+export const MONSTER_CUSTOM_DESCRIPTION_HINT = 'Optional text shown with this action.'
+export const MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL = 'Add custom description'
+export const MONSTER_NATURAL_WEAPON_DAMAGE_HINT = 'Ability modifiers are applied automatically.'
+export const MONSTER_ON_HIT_LEGEND = 'On hit'
+export const MONSTER_ON_HIT_HINT =
+  'Additional damage dealt when this attack hits, beyond its primary damage.'
+export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
+/** Stat-block preview row — not action-economy {@link getActionEconomyLabel} “Action”. */
+export const MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL = 'Attack'
+export const MONSTER_ACTION_DAMAGE_FIELD_LABEL = getSpellAtomicEffectKindLabel('damage')
+export const MONSTER_ACTION_ATTACK_PREVIEW_DAMAGE_LABEL = MONSTER_ACTION_DAMAGE_FIELD_LABEL
+export const MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL = 'Extra'
+export const MONSTER_ACTION_REACH_FIELD_LABEL = 'Reach'
+export const MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL = MONSTER_ACTION_REACH_FIELD_LABEL
+export const MONSTER_ACTION_ATTACK_PREVIEW_RANGE_LABEL = 'Range'
+export const MONSTER_ACTION_ATTACK_PREVIEW_PROPERTIES_LABEL = 'Properties'
+export const MONSTER_DAMAGE_TYPE_CHANGE_LABEL = 'Change'
 export const MONSTER_REMOVE_LABEL = 'Remove'
 export const MONSTER_CANCEL_LABEL = 'Cancel'
 export const MONSTER_LOADING_EQUIPMENT = `Loading ${getContentTypeMidSentenceLabel('equipment')}…`
@@ -152,9 +171,17 @@ export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
 export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
 export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')
 export const MONSTER_REACTIONS_HEADING = actionEconomySectionHeading('reaction')
-export const MONSTER_ACTIONS_EMPTY = 'No actions yet.'
-export const MONSTER_SECTION_EMPTY = 'None'
-export const MONSTER_ACTION_DETAIL_EMPTY = 'Select or add an action to edit it.'
+
+const MONSTER_ACTION_SECTION_HEADINGS = {
+  actions: MONSTER_ACTIONS_HEADING,
+  bonusActions: MONSTER_BONUS_ACTIONS_HEADING,
+  reactions: MONSTER_REACTIONS_HEADING,
+} as const satisfies Record<MonsterActionSection, string>
+
+export function monsterActionSectionHeading(section: MonsterActionSection): string {
+  return MONSTER_ACTION_SECTION_HEADINGS[section]
+}
+
 export const MONSTER_ADD_LABEL = 'Add'
 
 function monsterArmorSlotMidSentenceNoun(slot: CreatureArmorSlot): string {
@@ -188,38 +215,18 @@ export function getMonsterArmorSlotUiCopy(slot: CreatureArmorSlot): {
   }
 }
 
-export const MONSTER_KIND_LABEL = getMonsterActionKindFieldLabel()
 export const MONSTER_ACTION_NAME_LABEL = 'Name'
 export const MONSTER_TRIGGER_LABEL = getMonsterReactionFieldLabel('trigger')
 export const MONSTER_ADDITIONAL_CONDITION_LABEL =
   getMonsterReactionFieldLabel('additionalCondition')
 export const MONSTER_ADDITIONAL_CONDITION_HINT = "Each spell's own trigger always applies."
-export const MONSTER_SPELL_PRESET_HINT = 'Casts referenced spells'
 export const MONSTER_MOVE_TO_LABEL = 'Move to'
-export const MONSTER_MOVE_UP_LABEL = 'Move up'
-export const MONSTER_MOVE_DOWN_LABEL = 'Move down'
-export const MONSTER_WEAPON_PRESET_HINT = 'Uses an equipped weapon'
-export const MONSTER_SPECIAL_PRESET_HINT = 'Prose-based action'
-export const MONSTER_KIND_SWITCH_KEEP = 'The name and description are kept.'
-
 export function monsterAddWeaponShortcut(): string {
   return `Add a weapon to ${getContentTypeItemLabel('equipment')}`
 }
 
 export function formatAddedEquipmentNotice(name: string): string {
   return `${name} was added to ${getContentTypeItemLabel('equipment')}.`
-}
-
-export function formatWeaponSwapNotice(name: string): string {
-  return `Now uses ${name}. Attack bonus, range, and damage come from ${name}.`
-}
-
-export function formatKindSwitchTitle(name: string, nextKindLabel: string): string {
-  return `Change ${name} to a ${nextKindLabel.toLowerCase()}?`
-}
-
-export function formatKindSwitchConfirm(nextKindLabel: string): string {
-  return `Change to ${nextKindLabel.toLowerCase()}`
 }
 
 export function formatDropTriggerBody(): string {

@@ -57,7 +57,7 @@ export function toolFormFieldGroup(): FormItem[] {
     {
       kind: 'array',
       name: 'utilizes',
-      legend: 'Utilize actions',
+      label: 'Utilize actions',
       addAction: { label: 'Add utilize action', layout: 'inline' },
       min: 1,
       item: {

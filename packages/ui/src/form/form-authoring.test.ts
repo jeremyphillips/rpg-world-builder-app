@@ -26,7 +26,7 @@ describe('form-authoring helpers', () => {
     const array = defineArrayField({
       kind: 'array',
       name: 'items',
-      legend: 'Items',
+      label: 'Items',
       fields: [],
     })
     expect(defineArrayField(array)).toBe(array)
@@ -42,7 +42,7 @@ describe('form-authoring helpers', () => {
     const field = defineArrayField({
       kind: 'array',
       name: 'traits',
-      legend: 'Traits',
+      label: 'Traits',
       addAction: { label: 'Add trait' },
       min: 1,
       item: {
@@ -67,12 +67,12 @@ describe('form-authoring helpers', () => {
       defineArrayField({
         kind: 'array',
         name: 'grants',
-        legend: 'Grants',
+        label: 'Grants',
         fields: [
           defineArrayField({
             kind: 'array',
             name: 'effects',
-            legend: 'Effects',
+            label: 'Effects',
             fields: [{ type: 'text', name: 'label', label: 'Label' }],
           }),
         ],

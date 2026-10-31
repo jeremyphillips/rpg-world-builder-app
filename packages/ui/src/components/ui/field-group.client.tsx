@@ -33,17 +33,15 @@ export interface FieldGroupProps {
   legendAccessory?: ReactNode
   /** Trailing header action aligned to the legend row end (compact inline controls). */
   legendAction?: ReactNode
-  /** Legend type scale — use `subsection` for nested groups, `array` for repeatable lists. */
+  /** Legend type scale — use `subsection` for nested named groups. */
   legendSize?: FieldGroupLegendSize
   /**
    * When `'field'`, legend and description use the field label and hint type scale
-   * for `size`. Replaces structural legend type. Spacing and disclosure stay on `legendSize`.
+   * for `size`. Replaces structural legend type. Spacing uses field anatomy stack on
+   * the fieldset; structural legend→body margins stay on `legendSize` only.
    */
   headingScale?: GroupHeadingScale
-  /**
-   * Control + label scale — when `legendSize="array"`, also drives array legend
-   * typography (same tokens as leaf field labels).
-   */
+  /** Control + label scale — drives field label typography when `headingScale="field"`. */
   size?: FieldSize
   /** Vertical gap between sibling fields — defaults to `comfortable` (`gap-6`). */
   rhythm?: FieldRhythm
@@ -100,7 +98,7 @@ export function FieldGroup({
 }: FieldGroupProps) {
   const resolvedFieldSize = size ?? resolveFormDensity('compact').size
   const legendTypography =
-    headingScale === 'field' || legendSize === 'array'
+    headingScale === 'field'
       ? fieldLabelTypographyVariants({ size: resolvedFieldSize })
       : fieldGroupLegendVariants({ size: legendSize, rhythm })
   const chromeClasses = resolveFieldGroupChromeClassNames(chrome, { rhythm })

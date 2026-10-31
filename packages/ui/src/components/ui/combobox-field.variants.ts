@@ -1,5 +1,3 @@
-import { cva } from 'class-variance-authority'
-
 import { cn } from '../../lib/utils'
 import {
   interactiveListPanelVariants,
@@ -26,24 +24,6 @@ export const comboboxContentVariants = (options?: { triggerWidth?: 'match' | 'fi
     interactiveListPanelVariants({ triggerWidth: options?.triggerWidth ?? 'match' }),
     interactiveListPopoverHostClasses,
   )
-
-/**
- * Search row pinned to the top of the combobox panel — matches trigger field-control
- * height/background so the open panel reads as one expanded input.
- */
-export const comboboxSearchRowVariants = cva('flex w-full items-center gap-2 px-3', {
-  variants: {
-    size: {
-      xs: 'h-6 text-xs',
-      sm: 'h-8 text-xs',
-      md: 'h-9 text-md',
-      lg: 'h-11 text-base',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-  },
-})
 
 /** Dismissible-badge row shown below the trigger in multi-select mode. */
 export const comboboxSelectedItemsRowVariants = 'flex flex-wrap gap-1.5 pt-2'

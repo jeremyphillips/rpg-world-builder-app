@@ -6,6 +6,7 @@ import { NavigationChevron } from './card.lib'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import { interactiveRowVariants } from './interactive-row.variants'
 import { renderNavigableLinkRoot } from './navigable-link-root.lib'
+import { listShellClasses } from './list-density.lib'
 import {
   destinationListVariants,
   type DestinationListAppearance,
@@ -46,9 +47,9 @@ export function DestinationList({
   return (
     <ul
       className={cn(
+        listShellClasses(density),
         destinationListVariants({
           appearance,
-          density,
           tone: resolvedTone,
           elevation: resolvedElevation,
         }),

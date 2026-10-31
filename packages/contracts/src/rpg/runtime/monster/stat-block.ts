@@ -1,4 +1,3 @@
-import { isWeaponEquipment, type Equipment } from '../../content/equipment'
 import type { MonsterAction, MonsterBody } from '../../content/monster'
 import { getSkillName } from '../../content/skill-proficiency'
 import { NEUTRAL_ABILITY_SCORE } from '../../vocab/ability'
@@ -9,31 +8,26 @@ import { abilityModifier } from '../creature/ability-modifier'
 import { spellAttackBonus, spellSaveDc } from '../creature/spell-dc'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { resolveMonsterArmorClass, type MonsterArmorClassResolution } from './armor-class'
-import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
 import { resolvePassivePerception, savingThrowBonus, skillModifier } from '../creature/checks'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
 import { resolveCreatureInitiativeModifier } from '../creature/initiative'
-import { isWeaponProficient } from '../creature/proficiencies'
 import type { CreatureSkillCatalog } from '../creature/proficiencies'
 import { averageDiceRoll, type DieFace } from '../../primitives/dice'
-import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
-import type { RollValue } from '../../primitives/mechanics/roll'
-import {
-  averageStatBlockHitPoints,
-  floorStatBlockAverage,
-  resolveStatBlockDamagePart,
-} from '../creature/stat-block-average'
+import { averageStatBlockHitPoints, floorStatBlockAverage } from '../creature/stat-block-average'
 import {
   requireDerivedField,
   resolvedField,
   unavailableField,
   type DerivedField,
 } from './derived-field'
+import { formatSignedModifier } from '../creature/weapon-attack'
 import {
-  formatSignedModifier,
-  resolveWeaponAttackAbilityModifier,
-  weaponAttackBonus,
-} from '../creature/weapon-attack'
+  attackProfileOnHitLabels,
+  MONSTER_ACTION_ATTACK_KIND_SET,
+  resolveMonsterActionAttackProfile,
+  type MonsterActionAttackProfile,
+  type ResolveMonsterActionAttackProfileInput,
+} from './resolve-monster-action-attack-profile'
 
 export type DerivedMonsterAttackLine = {
   id: string
@@ -145,258 +139,40 @@ function resolveExperiencePoints(monster: MonsterBody): number {
   return derived
 }
 
-function weaponActionReachRange(
-  weapon: Extract<Equipment, { kind: 'weapon' }>,
-): Pick<DerivedMonsterAttackLine, 'reach' | 'range'> {
+function attackLineFromProfile(
+  profile: MonsterActionAttackProfile,
+  id: string,
+  section: DerivedMonsterAttackLine['section'],
+): DerivedMonsterAttackLine {
+  const onHit = attackProfileOnHitLabels(profile.onHit)
   return {
-    ...(weapon.mode === 'melee' ? { reach: 5 } : {}),
-    ...(weapon.range ? { range: weapon.range } : {}),
-  }
-}
-
-function catalogWeaponForAction(
-  monster: MonsterBody,
-  equipmentCatalog: CreatureEquipmentCatalog,
-  equipmentEntryId: string,
-) {
-  const entry = monster.equipment.find((row) => row.entryId === equipmentEntryId)
-  if (!entry) return undefined
-  const catalogItem = equipmentCatalog.get(entry.equipmentId)
-  if (!catalogItem || !isWeaponEquipment(catalogItem)) return undefined
-  return { entry, catalogItem }
-}
-
-function resolveCatalogWeaponAttackLine(args: {
-  action: Extract<MonsterAction, { kind: 'weapon' }>
-  monster: MonsterBody
-  equipmentCatalog: CreatureEquipmentCatalog
-  proficiencyBonus: number
-  section: DerivedMonsterAttackLine['section']
-  magicPropertyProvider: MagicPropertyDefinitionProvider
-}): DerivedMonsterAttackLine | undefined {
-  const { action, monster, equipmentCatalog, proficiencyBonus, section, magicPropertyProvider } =
-    args
-  const resolved = catalogWeaponForAction(monster, equipmentCatalog, action.equipmentEntryId)
-  if (!resolved) return undefined
-  const { entry, catalogItem } = resolved
-
-  const abilityMod = resolveWeaponAttackAbilityModifier(catalogItem, monster.abilityScores)
-  if (abilityMod === undefined) return undefined
-
-  const totals = resolveInventoryWeaponAttackTotals({
-    entry,
-    item: catalogItem,
-    abilityModifier: abilityMod,
-    proficient: isWeaponProficient(catalogItem, monster.proficiencies.weapons),
-    proficiencyBonus,
-    provider: magicPropertyProvider,
-    ...(action.damage ? { damage: action.damage } : {}),
-  })
-  if (totals?.attackBonus === undefined || totals.damageAverage === undefined) return undefined
-
-  return {
-    ...catalogWeaponLine({
-      action,
-      section,
-      name: action.name ?? entry.customName ?? catalogItem.name,
-      attackBonus: totals.attackBonus,
-      damageAverage: totals.damageAverage,
-      damageExpression: totals.damageExpression,
-      damageTypeLabel: catalogItem.damageType ?? '',
-    }),
-    ...weaponActionReachRange(catalogItem),
-  }
-}
-
-function catalogWeaponLine(args: {
-  action: Extract<MonsterAction, { kind: 'weapon' }>
-  section: DerivedMonsterAttackLine['section']
-  name: string
-  attackBonus: number
-  damageAverage: number
-  damageExpression?: string
-  damageTypeLabel: string
-}): DerivedMonsterAttackLine {
-  return {
-    id: args.action.id,
-    section: args.section,
-    name: args.name,
-    attackBonus: args.attackBonus,
-    attackBonusLabel: formatSignedModifier(args.attackBonus),
-    damage: String(args.damageAverage),
-    ...(args.damageExpression ? { damageExpression: args.damageExpression } : {}),
-    damageTypeLabel: args.damageTypeLabel,
-    ...additionalDamageLines(args.action.onHit),
-  }
-}
-
-function resolveNaturalWeaponAttackLine(args: {
-  action: Extract<MonsterAction, { kind: 'natural-weapon' }>
-  monster: MonsterBody
-  proficiencyBonus: number
-  section: DerivedMonsterAttackLine['section']
-}): DerivedMonsterAttackLine | undefined {
-  const { action, monster, proficiencyBonus, section } = args
-  const abilityMod = resolveWeaponAttackAbilityModifier(
-    { mode: action.mode, properties: [...action.properties] },
-    monster.abilityScores,
-  )
-  if (abilityMod === undefined) return undefined
-
-  const attackBonusValue = weaponAttackBonus(abilityMod, true, proficiencyBonus)
-  const primary = resolveStatBlockDamagePart(action.damage, abilityMod)
-
-  return {
-    id: action.id,
+    id,
     section,
-    name: action.name,
-    attackBonus: attackBonusValue,
-    attackBonusLabel: formatSignedModifier(attackBonusValue),
-    damage: String(primary.average),
-    damageExpression: primary.expression,
-    damageTypeLabel: action.damageType,
-    ...additionalDamageLines(action.onHit),
-    ...(action.mode === 'melee' ? { reach: action.reach ?? 5 } : {}),
-    ...(action.range ? { range: action.range } : {}),
+    name: profile.name,
+    attackBonus: profile.attackBonus,
+    attackBonusLabel: formatSignedModifier(profile.attackBonus),
+    damage: String(profile.primary.average),
+    ...(profile.primary.expression ? { damageExpression: profile.primary.expression } : {}),
+    damageTypeLabel: profile.primary.damageTypeId,
+    ...(onHit.length > 0 ? { additionalDamage: onHit } : {}),
+    ...(profile.reach !== undefined ? { reach: profile.reach } : {}),
+    ...(profile.range ? { range: profile.range } : {}),
   }
-}
-
-function isDamageRoll(value: unknown): value is RollValue {
-  if (!value || typeof value !== 'object') return false
-  const roll = value as { dice?: { count?: number; faces?: number }; flat?: number }
-  const dice = roll.dice
-  const diceOk =
-    dice !== undefined && typeof dice.count === 'number' && typeof dice.faces === 'number'
-  return diceOk || typeof roll.flat === 'number'
-}
-
-function additionalDamageLines(onHit: unknown): Pick<DerivedMonsterAttackLine, 'additionalDamage'> {
-  if (!onHit || typeof onHit !== 'object' || !('additionalDamage' in onHit)) return {}
-  const list = (onHit as { additionalDamage?: unknown }).additionalDamage
-  if (!Array.isArray(list)) return {}
-  const parts = list.flatMap((part) => {
-    if (!part || typeof part !== 'object') return []
-    const row = part as { roll?: unknown; damageType?: unknown }
-    if (!isDamageRoll(row.roll) || typeof row.damageType !== 'string') return []
-    const resolved = resolveStatBlockDamagePart(row.roll, 0)
-    return [
-      {
-        expression: resolved.expression,
-        average: resolved.average,
-        damageTypeLabel: getDamageTypeLabel(row.damageType),
-      },
-    ]
-  })
-  if (parts.length === 0) return {}
-  return { additionalDamage: parts }
-}
-
-function resolveAuthoredAttackLine(args: {
-  action: Extract<MonsterAction, { kind: 'attack' }>
-  monster: MonsterBody
-  proficiencyBonus: number
-  section: DerivedMonsterAttackLine['section']
-}): DerivedMonsterAttackLine | undefined {
-  const { action, monster, proficiencyBonus, section } = args
-  const ability = resolveAttackBonusAbility(action, monster)
-  if (!ability) return undefined
-  const abilityMod = abilityModifier(monster.abilityScores[ability.ability])
-  const attackBonusValue = weaponAttackBonus(abilityMod, ability.proficient, proficiencyBonus)
-  const primary = resolveStatBlockDamagePart(action.damage, abilityMod)
-  return {
-    id: action.id,
-    section,
-    name: action.name,
-    attackBonus: attackBonusValue,
-    attackBonusLabel: formatSignedModifier(attackBonusValue),
-    damage: String(primary.average),
-    damageExpression: primary.expression,
-    damageTypeLabel: action.damageType,
-    ...additionalDamageLines(action.onHit),
-    ...((action.modes ?? []).includes('melee') && action.reach !== undefined
-      ? { reach: action.reach }
-      : {}),
-    ...((action.modes ?? []).includes('ranged') && action.range ? { range: action.range } : {}),
-  }
-}
-
-function abilityFromEntry(
-  entry: MonsterAction,
-  entryId: string,
-): keyof MonsterBody['abilityScores'] | undefined {
-  if (entry.id !== entryId) return undefined
-  if (entry.kind === 'spell' && entry.castingAbility?.kind === 'ability') {
-    return entry.castingAbility.ability
-  }
-  if (entry.kind === 'attack' && entry.bonusSource.kind === 'spell') {
-    const nested = entry.bonusSource.castingAbility
-    if (nested.kind === 'ability') return nested.ability
-  }
-  return undefined
-}
-
-function resolveAttackBonusAbility(
-  action: Extract<MonsterAction, { kind: 'attack' }>,
-  monster: MonsterBody,
-): { ability: keyof MonsterBody['abilityScores']; proficient: boolean } | undefined {
-  if (action.bonusSource.kind === 'ability') {
-    return { ability: action.bonusSource.ability, proficient: action.bonusSource.proficient }
-  }
-  const casting = action.bonusSource.castingAbility
-  if (casting.kind === 'ability') return { ability: casting.ability, proficient: true }
-  const sections = ['actions', 'bonusActions', 'reactions'] as const
-  for (const section of sections) {
-    for (const entry of monster[section]) {
-      const ability = abilityFromEntry(entry, casting.entryId)
-      if (ability) return { ability, proficient: true }
-    }
-  }
-  return undefined
-}
-
-function resolveWeaponAttackLine(args: {
-  action: MonsterAction
-  monster: MonsterBody
-  equipmentCatalog: CreatureEquipmentCatalog
-  proficiencyBonus: number
-  section: DerivedMonsterAttackLine['section']
-  magicPropertyProvider: MagicPropertyDefinitionProvider
-}): DerivedMonsterAttackLine | undefined {
-  const { action, monster, equipmentCatalog, proficiencyBonus, section, magicPropertyProvider } =
-    args
-  if (action.kind === 'weapon') {
-    return resolveCatalogWeaponAttackLine({
-      action,
-      monster,
-      equipmentCatalog,
-      proficiencyBonus,
-      section,
-      magicPropertyProvider,
-    })
-  }
-  if (action.kind === 'natural-weapon') {
-    return resolveNaturalWeaponAttackLine({ action, monster, proficiencyBonus, section })
-  }
-  if (action.kind === 'attack') {
-    return resolveAuthoredAttackLine({ action, monster, proficiencyBonus, section })
-  }
-  return undefined
 }
 
 function appendAttackLines(
   target: DerivedMonsterAttackLine[],
   actions: readonly MonsterAction[],
-  args: Omit<Parameters<typeof resolveWeaponAttackLine>[0], 'action' | 'section'>,
+  args: Omit<ResolveMonsterActionAttackProfileInput, 'action'>,
   section: DerivedMonsterAttackLine['section'],
 ): void {
   for (const action of actions) {
-    if (action.kind !== 'weapon' && action.kind !== 'natural-weapon' && action.kind !== 'attack')
-      continue
-    const line = resolveWeaponAttackLine({ ...args, action, section })
-    if (!line) {
+    if (!MONSTER_ACTION_ATTACK_KIND_SET.has(action.kind)) continue
+    const profile = resolveMonsterActionAttackProfile({ ...args, action })
+    if (profile.status !== 'resolved') {
       throw new Error(`Monster attack ${action.id} is unavailable.`)
     }
-    target.push(line)
+    target.push(attackLineFromProfile(profile.value, action.id, section))
   }
 }
 
@@ -548,24 +324,9 @@ function draftAttackResult(args: {
   section: DerivedMonsterAttackLine['section']
   magicPropertyProvider: MagicPropertyDefinitionProvider
 }): DerivedField<DerivedMonsterAttackLine> {
-  if (args.proficiencyBonus === undefined) return unavailableField('missing-input')
-  if (args.action.kind === 'natural-weapon' && !args.action.damage)
-    return unavailableField('missing-input')
-  if (args.action.kind === 'weapon' && !args.action.equipmentEntryId) {
-    return unavailableField('missing-reference')
-  }
-  const line = resolveWeaponAttackLine({
-    action: args.action,
-    monster: args.monster,
-    equipmentCatalog: args.equipmentCatalog,
-    proficiencyBonus: args.proficiencyBonus,
-    section: args.section,
-    magicPropertyProvider: args.magicPropertyProvider,
-  })
-  if (!line) {
-    return unavailableField(args.action.kind === 'weapon' ? 'missing-reference' : 'missing-input')
-  }
-  return resolvedField(line)
+  const profile = resolveMonsterActionAttackProfile(args)
+  if (profile.status === 'unavailable') return profile
+  return resolvedField(attackLineFromProfile(profile.value, args.action.id, args.section))
 }
 
 function draftAttacks(

@@ -9,6 +9,7 @@ export const OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS = [
   'textarea',
   'select',
   'textSuggestions',
+  'richtext',
 ] as const
 export type OptionalDisclosureImplementedKind =
   (typeof OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS)[number]
@@ -51,7 +52,7 @@ export function assertOptionalDisclosureFieldConfig(field: FieldConfig): void {
 
   if (!fieldKindImplementsOptionalDisclosure(field.type)) {
     console.error(
-      `[Form] optionalDisclosure on "${path}" is not implemented for "${field.type}" yet. TODO(text): single-line fields. TODO(richtext): empty HTML detection.`,
+      `[Form] optionalDisclosure on "${path}" is not implemented for "${field.type}" yet. TODO(text): single-line fields.`,
     )
   }
 }

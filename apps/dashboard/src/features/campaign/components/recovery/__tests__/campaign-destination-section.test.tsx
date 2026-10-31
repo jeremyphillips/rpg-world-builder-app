@@ -29,8 +29,9 @@ describe('CampaignDestinationSection', () => {
     )
 
     const list = container.querySelector('ul')
-    expect(list).toHaveClass('ui-destination-list--spacious')
-    expect(list).not.toHaveClass('ui-destination-list--comfortable')
+    expect(list).toHaveClass('ui-list', 'ui-list--spacious')
+    expect(list).not.toHaveClass('ui-list--comfortable')
+    expect(list).not.toHaveClass('ui-destination-list--spacious')
   })
 
   it('renders spacious anatomy and an md onboarding badge', () => {
@@ -80,7 +81,8 @@ describe('PendingCampaignInvitationsSection index list', () => {
     )
 
     const list = container.querySelector('ul')
-    expect(list).toHaveClass('ui-destination-list--comfortable')
-    expect(list).not.toHaveClass('ui-destination-list--spacious')
+    expect(list).toHaveClass('ui-list', 'ui-list--comfortable')
+    expect(list).not.toHaveClass('ui-list--spacious')
+    expect(list).not.toHaveClass('ui-destination-list--comfortable')
   })
 })

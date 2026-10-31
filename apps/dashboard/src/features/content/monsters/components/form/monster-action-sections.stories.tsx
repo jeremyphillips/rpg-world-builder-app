@@ -6,11 +6,11 @@ import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
 } from '../../lib/monster-form-values'
-import { MonsterActionsEditor } from './monster-actions-editor'
+import { MonsterActionSections } from './monster-action-sections'
 
 const meta = {
-  title: 'Dashboard/Content/Monsters/MonsterActionsEditor',
-  component: MonsterActionsEditor,
+  title: 'Dashboard/Content/Monsters/MonsterActionSections',
+  component: MonsterActionSections,
   args: {
     ctx: {
       entityCatalogLayer: 'homebrew',
@@ -18,7 +18,7 @@ const meta = {
       equipmentCatalogById: new Map(),
     },
   },
-} satisfies Meta<typeof MonsterActionsEditor>
+} satisfies Meta<typeof MonsterActionSections>
 
 export default meta
 
@@ -38,7 +38,7 @@ function Host({ width }: { width?: number }) {
   return (
     <div style={width ? { maxWidth: width } : undefined}>
       <FormProvider {...form}>
-        <MonsterActionsEditor ctx={ctx} />
+        <MonsterActionSections ctx={ctx} />
       </FormProvider>
     </div>
   )

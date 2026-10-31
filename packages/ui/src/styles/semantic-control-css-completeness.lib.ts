@@ -10,6 +10,8 @@ export type SemanticControlCssDimension = {
   modifierPrefix: string
   /** Declarations every modifier in this dimension must define (same keys). */
   requiredProperties: readonly string[]
+  /** Match descendant selectors that begin with `.{modifierPrefix} `. */
+  matchDescendantSelectors?: boolean
 }
 
 export type SemanticControlCssRegistryEntry = {
@@ -99,27 +101,18 @@ function isBareModifierPart(part: string, className: string): boolean {
   return trimmed === className || trimmed === `&${className}`
 }
 
-function selectorTargetsModifier(selector: string, className: string): boolean {
-  const normalizedClass = normalizeSelectorToken(className)
-  return selector.split(',').some((part) => {
-    const trimmed = normalizeSelectorToken(part.trim())
-    if (isBareModifierPart(trimmed, normalizedClass)) return true
-    if (trimmed.startsWith(`${normalizedClass}:`) || trimmed.startsWith(`&${normalizedClass}:`)) {
-      return true
-    }
-    if (trimmed.startsWith(`${normalizedClass}[`) || trimmed.startsWith(`&${normalizedClass}[`)) {
-      return true
-    }
-    return false
-  })
-}
-
-function modifiersForDimension(rules: ParsedRule[], modifierPrefix: string) {
-  const className = modifierPrefix.startsWith('.') ? modifierPrefix : `.${modifierPrefix}`
-  return rules.filter(
-    (rule) =>
-      selectorTargetsModifier(rule.selector, className) &&
-      rule.selector.split(',').some((part) => isBareModifierPart(part, className)),
+function modifiersForDimension(rules: ParsedRule[], dimension: SemanticControlCssDimension) {
+  const className = dimension.modifierPrefix.startsWith('.')
+    ? dimension.modifierPrefix
+    : `.${dimension.modifierPrefix}`
+  const matchDescendant = dimension.matchDescendantSelectors ?? false
+  return rules.filter((rule) =>
+    rule.selector.split(',').some((part) => {
+      const trimmed = normalizeSelectorToken(part.trim())
+      if (isBareModifierPart(trimmed, className)) return true
+      if (matchDescendant && trimmed.startsWith(`${className} `)) return true
+      return false
+    }),
   )
 }
 
@@ -174,7 +167,7 @@ export function validateSemanticControlCssCompleteness(
   const classPrefix = entry.classPrefix ?? 'ui'
 
   return entry.dimensions.flatMap((dimension) => {
-    const modifiers = modifiersForDimension(rules, dimension.modifierPrefix)
+    const modifiers = modifiersForDimension(rules, dimension)
     return [
       ...missingRequiredProperties(modifiers, dimension.requiredProperties, entry.filePath),
       ...compareModifierPropertySets(modifiers, entry.filePath, classPrefix),
@@ -198,7 +191,11 @@ const choiceControlCssPath = path.join(stylesDir, '../components/ui/choice-contr
 
 const interactiveRowCssPath = path.join(stylesDir, '../components/ui/interactive-row.css')
 
+const destinationListCssPath = path.join(stylesDir, '../components/ui/destination-list.css')
+
 const interactiveListCssPath = path.join(stylesDir, '../components/ui/interactive-list.css')
+
+const copyScaleCssPath = path.join(stylesDir, '../components/ui/copy-scale.css')
 
 const alertCssPath = path.join(stylesDir, '../components/ui/alert.css')
 
@@ -368,7 +365,11 @@ const INTERACTIVE_ROW_DATA_MODIFIERS = ['data-none', 'data-selected', 'data-chec
 
 const INTERACTIVE_ROW_HIT_MODIFIERS = ['hit-none', 'hit-pointer'] as const
 
-const INTERACTIVE_LIST_ROW_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+const INTERACTIVE_LIST_DENSITY_MODIFIERS = ['compact', 'comfortable', 'spacious'] as const
+
+const INTERACTIVE_LIST_DENSITY_GEOMETRY_OVERRIDES = ['compact', 'spacious'] as const
+
+const DESTINATION_LIST_DENSITY_GEOMETRY_OVERRIDES = ['compact', 'spacious'] as const
 
 const INTERACTIVE_LIST_PANEL_WIDTH_MODIFIERS = ['match', 'fit'] as const
 
@@ -390,7 +391,16 @@ const INTERACTIVE_ROW_DATA_REQUIRED = [
 
 const INTERACTIVE_ROW_HIT_REQUIRED = ['cursor'] as const
 
-const INTERACTIVE_LIST_ROW_SIZE_REQUIRED = ['gap', 'padding-inline', 'padding-block'] as const
+const INTERACTIVE_LIST_DENSITY_GEOMETRY_REQUIRED = [
+  'gap',
+  'padding-inline',
+  'padding-block',
+] as const
+
+const DESTINATION_LIST_DENSITY_GEOMETRY_REQUIRED = [
+  '--ui-destination-inset-inline',
+  '--ui-destination-inset-block',
+] as const
 
 const INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED = ['width', 'min-width'] as const
 
@@ -560,15 +570,46 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
     ],
   },
   {
+    filePath: destinationListCssPath,
+    dimensions: [
+      {
+        modifierPrefix: 'ui-destination-list',
+        requiredProperties: DESTINATION_LIST_DENSITY_GEOMETRY_REQUIRED,
+      },
+      ...DESTINATION_LIST_DENSITY_GEOMETRY_OVERRIDES.map((name) => ({
+        modifierPrefix: `ui-list--${name}.ui-destination-list`,
+        requiredProperties: DESTINATION_LIST_DENSITY_GEOMETRY_REQUIRED,
+      })),
+    ],
+  },
+  {
     filePath: interactiveListCssPath,
     dimensions: [
-      ...INTERACTIVE_LIST_ROW_SIZE_MODIFIERS.map((name) => ({
-        modifierPrefix: `ui-interactive-list__main--${name}`,
-        requiredProperties: INTERACTIVE_LIST_ROW_SIZE_REQUIRED,
+      {
+        modifierPrefix: 'ui-interactive-list__main',
+        requiredProperties: INTERACTIVE_LIST_DENSITY_GEOMETRY_REQUIRED,
+      },
+      ...INTERACTIVE_LIST_DENSITY_GEOMETRY_OVERRIDES.map((name) => ({
+        modifierPrefix: `ui-list--${name}.ui-interactive-list`,
+        requiredProperties: INTERACTIVE_LIST_DENSITY_GEOMETRY_REQUIRED,
+        matchDescendantSelectors: true,
       })),
       ...INTERACTIVE_LIST_PANEL_WIDTH_MODIFIERS.map((name) => ({
         modifierPrefix: `ui-interactive-list__panel--${name}`,
         requiredProperties: INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: copyScaleCssPath,
+    dimensions: [
+      ...INTERACTIVE_LIST_DENSITY_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-list--${name}`,
+        requiredProperties: [
+          '--ui-copy-title-size',
+          '--ui-copy-supporting-size',
+          '--ui-anatomy-leading-size',
+        ] as const,
       })),
     ],
   },

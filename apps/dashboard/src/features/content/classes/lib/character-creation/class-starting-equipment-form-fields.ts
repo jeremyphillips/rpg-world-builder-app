@@ -243,7 +243,7 @@ export function startingEquipmentModifierFields(): FormItem[] {
     {
       kind: 'array',
       name: 'modifiers',
-      legend: 'Modifiers',
+      label: 'Modifiers',
       visibility: visibleForEquipmentGrantTarget(),
       addAction: { label: 'Add modifier' },
       appendDefaults: () => ({
@@ -295,7 +295,7 @@ export function startingEquipmentSectionIntroFields(): FormItem[] {
     {
       kind: 'group',
       id: 'class-starting-equipment-heading',
-      legend: STARTING_EQUIPMENT_GROUP_LEGEND,
+      label: STARTING_EQUIPMENT_GROUP_LEGEND,
       description: STARTING_EQUIPMENT_GROUP_DESCRIPTION,
       fields: [],
     },
@@ -348,7 +348,7 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
     {
       kind: 'array',
       name: 'items',
-      legend: 'Items',
+      label: 'Items',
       addAction: { label: 'Add item' },
       appendDefaults: () => ({
         id: createStartingEquipmentContributionId(),

@@ -26,7 +26,7 @@ const fields: FormItem[] = [
   {
     kind: 'array',
     name: 'rows',
-    legend: 'Applications',
+    label: 'Applications',
     filterSelect: {
       dependsOn: [],
       filter: ({

@@ -66,6 +66,7 @@ export type SelectRootWithClearProps = {
   clearAccessibleName?: string
   onClear?: () => void
   onValueChange?: (value: string) => void
+  onOpenChange?: (open: boolean) => void
   triggerConfig: SelectTriggerConfig
   options: SelectFieldOptionListItem[]
 }
@@ -81,6 +82,7 @@ export function SelectRootWithClear({
   clearAccessibleName,
   onClear,
   onValueChange,
+  onOpenChange,
   triggerConfig,
   options,
 }: SelectRootWithClearProps) {
@@ -107,6 +109,7 @@ export function SelectRootWithClear({
       value={resolvedValue}
       defaultValue={defaultValue}
       onValueChange={onValueChange}
+      onOpenChange={onOpenChange}
       name={name}
       disabled={disabled}
     >

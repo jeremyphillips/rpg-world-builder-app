@@ -4,7 +4,13 @@ import { z } from 'zod'
 
 import { Form } from '@rpg/ui/form'
 
-import { buildPhysicalDamageTypeFieldOptions, damageTypeField } from './damage-type-field'
+import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
+
+import {
+  buildPhysicalAndVocabularyDamageTypeFieldOptions,
+  buildPhysicalDamageTypeFieldOptions,
+  damageTypeField,
+} from './damage-type-field'
 
 describe('buildPhysicalDamageTypeFieldOptions', () => {
   it('includes closed physical damage types', () => {
@@ -13,6 +19,22 @@ describe('buildPhysicalDamageTypeFieldOptions', () => {
       { value: 'piercing', label: 'Piercing' },
       { value: 'slashing', label: 'Slashing' },
     ])
+  })
+})
+
+describe('buildPhysicalAndVocabularyDamageTypeFieldOptions', () => {
+  it('includes physical types and seed vocabulary ids without duplicates', () => {
+    const options = buildPhysicalAndVocabularyDamageTypeFieldOptions({
+      damageTypeVocabulary: buildSeedDamageTypeVocabulary(),
+    })
+    expect(options.find((option) => option.value === 'piercing')).toEqual({
+      value: 'piercing',
+      label: 'Piercing',
+    })
+    expect(options.find((option) => option.value === 'fire')).toEqual({
+      value: 'fire',
+      label: 'Fire',
+    })
   })
 })
 

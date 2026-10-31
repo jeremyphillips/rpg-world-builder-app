@@ -50,7 +50,6 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'array',
     name: `${RESOLUTION_PREFIX}.effects`,
-    legend: '',
     addAction: false,
     item: {
       variant: 'detailed',
@@ -86,7 +85,7 @@ function resolutionProjectilesFields(): FormItem[] {
   return [
     {
       kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.projectiles,
+      label: RESOLUTION_SECTION_LABELS.projectiles,
       visibility: projectilesVisibility,
       fields: [
         {
@@ -129,7 +128,7 @@ function resolutionProjectilesFields(): FormItem[] {
 function resolutionOutcomeBranchesGroup(): FormItem {
   return {
     kind: 'group',
-    legend: RESOLUTION_SECTION_LABELS.outcomeBranches,
+    label: RESOLUTION_SECTION_LABELS.outcomeBranches,
     description: RESOLUTION_SECTION_LABELS.outcomesHint,
     fields: [
       {
@@ -145,13 +144,13 @@ function resolutionOutcomeBranchesGroup(): FormItem {
 function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'group',
-    legend: RESOLUTION_SECTION_LABELS.effectsAndOutcomes,
+    label: RESOLUTION_SECTION_LABELS.effectsAndOutcomes,
     description: RESOLUTION_SECTION_LABELS.effectsAndOutcomesHint,
     visibility: visibleWhenResolutionConfigured(),
     fields: [
       {
         kind: 'group',
-        legend: RESOLUTION_SECTION_LABELS.authoredEffects,
+        label: RESOLUTION_SECTION_LABELS.authoredEffects,
         description: RESOLUTION_SECTION_LABELS.authoredEffectsDescription,
         fields: [
           {
@@ -204,7 +203,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.selection,
+      label: RESOLUTION_SECTION_LABELS.selection,
       visibility: configured,
       fields: [
         {
@@ -228,7 +227,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.check,
+      label: RESOLUTION_SECTION_LABELS.check,
       visibility: configured,
       fields: [
         {
@@ -243,7 +242,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     resolutionEffectsAndOutcomesGroup(ctx),
     {
       kind: 'group',
-      legend: RESOLUTION_SECTION_LABELS.progression,
+      label: RESOLUTION_SECTION_LABELS.progression,
       visibility: configured,
       fields: [
         {

@@ -92,10 +92,8 @@ export function buildOrganizationMembershipTitlesArrayField(prefix?: string): Fo
     id: 'organization-membership-titles',
     name: membersTitlesFieldPath(prefix),
     keyName: ORGANIZATION_MEMBERSHIP_TITLE_FIELD_ARRAY_KEY,
-    heading: {
-      label: ORGANIZATION_SECTION_LABELS.membershipTitles,
-      hint: ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
-    },
+    label: ORGANIZATION_SECTION_LABELS.membershipTitles,
+    hint: ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
     min: 1,
     addAction: { label: 'Add title', layout: 'inline' },
     appendDefaults: () => createOrganizationMembershipTitleAppendRow(),

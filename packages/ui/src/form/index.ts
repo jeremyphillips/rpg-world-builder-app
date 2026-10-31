@@ -237,7 +237,6 @@ export {
   type FieldChrome,
   type FieldHintConfig,
   type FormHeading,
-  type FormHeadingContent,
   type FormHeadingTier,
   type FieldLabelVisibility,
   type FormNavigationAnchor,

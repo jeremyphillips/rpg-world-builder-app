@@ -3,6 +3,7 @@
 import type { ComponentProps, ReactNode } from 'react'
 
 import { Button } from './button.client'
+import { formMicroActionButtonProps } from '../../form/form-micro-action'
 import type { FieldSize } from './field.client'
 import { fieldDigitsForMax } from './field-digit-metrics'
 import { NumberInput } from './number-input.client'
@@ -534,10 +535,8 @@ function DiceFormulaModifierControls({
 
       {modifierMode === 'optional' ? (
         <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="shrink-0 px-2"
+          {...formMicroActionButtonProps}
+          className="shrink-0"
           disabled={disabled}
           onClick={onRemoveModifier}
         >
@@ -559,10 +558,8 @@ function DiceFormulaAddActionButton({
 }) {
   return (
     <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      className="shrink-0 px-2"
+      {...formMicroActionButtonProps}
+      className="shrink-0"
       disabled={disabled}
       onClick={onClick}
     >

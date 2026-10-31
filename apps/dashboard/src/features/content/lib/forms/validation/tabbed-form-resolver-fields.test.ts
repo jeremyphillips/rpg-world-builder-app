@@ -28,7 +28,7 @@ describe('prefixFormItems', () => {
         {
           kind: 'array',
           name: 'options',
-          legend: 'Options',
+          label: 'Options',
           fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
         },
       ],
@@ -38,7 +38,7 @@ describe('prefixFormItems', () => {
     expect(items[0]).toMatchObject({
       kind: 'array',
       name: 'heritage.options',
-      legend: 'Options',
+      label: 'Options',
     })
     expect(items[0]).toMatchObject({
       fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
@@ -55,7 +55,7 @@ describe('embeddedArrayResolverField', () => {
     expect(field).toMatchObject({
       kind: 'array',
       name: 'traits',
-      legend: 'Traits',
+      label: 'Traits',
     })
   })
 })
@@ -76,7 +76,7 @@ describe('embeddedMasterDetailTabValidation', () => {
         {
           kind: 'array',
           name: 'traits',
-          legend: 'Traits',
+          label: 'Traits',
           fields: itemFields,
         },
       ],
@@ -89,6 +89,6 @@ describe('embeddedMasterDetailTabValidation', () => {
       itemLabel: 'Trait',
       fields: itemFields,
     })
-    expect(wiring.resolverFields[0]).toMatchObject({ legend: 'Trait' })
+    expect(wiring.resolverFields[0]).toMatchObject({ label: 'Trait' })
   })
 })

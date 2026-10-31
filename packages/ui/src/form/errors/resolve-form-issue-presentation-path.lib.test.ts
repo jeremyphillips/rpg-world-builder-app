@@ -11,7 +11,7 @@ const fields: FormItem[] = [
   {
     kind: 'array',
     name: 'grants',
-    legend: 'Grants',
+    label: 'Grants',
     fields: [
       {
         type: 'combobox',

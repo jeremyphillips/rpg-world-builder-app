@@ -23,7 +23,7 @@ const fields: FormItem[] = [
   {
     kind: 'array',
     name: 'tags',
-    legend: 'Tags',
+    label: 'Tags',
     fields: [{ type: 'text', name: 'label', label: 'Label' }],
     addAction: { label: 'Add tag' },
   },
@@ -44,7 +44,9 @@ describe('Form section rendering', () => {
 
     expect(screen.getByText('Identity')).toHaveClass('text-style-field-legend')
     const tagsLegend = screen.getByRole('group', { name: /Tags/ }).querySelector('legend')
-    expect(tagsLegend).toHaveClass('text-style-field-label-md')
+    expect(tagsLegend).toHaveClass('contents')
+    expect(tagsLegend).not.toHaveClass('text-style-field-label-md')
+    expect(screen.getByText('Tags').parentElement).toHaveClass('text-style-field-label-md')
     expect(tagsLegend).not.toHaveClass('text-field-array-legend')
   })
 

@@ -1,9 +1,15 @@
-import { Icon, InlineInactiveStatus, ValidationIssueCountBadge } from '@rpg/ui'
+import {
+  Icon,
+  InlineInactiveStatus,
+  InteractiveListRow,
+  ValidationIssueCountBadge,
+  cn,
+  interactiveFocusVariants,
+} from '@rpg/ui'
 import type { RefObject } from 'react'
 
 import { masterDetailRowValidationStateLabel } from '../../lib/master-detail/master-detail-row-validation'
 import type { MasterDetailListItem } from './master-detail-list-panel'
-import { masterDetailListRowClasses } from './master-detail-list-row.variants'
 
 export type MasterDetailListRowProps = {
   item: MasterDetailListItem
@@ -52,22 +58,25 @@ export function MasterDetailListRow({
 
   return (
     <li>
-      <button
-        ref={isSelected ? selectedRowRef : undefined}
-        type="button"
-        aria-current={isSelected ? 'true' : undefined}
-        aria-invalid={item.hasError ? true : undefined}
-        onClick={() => onSelect(index)}
-        className={masterDetailListRowClasses({ isSelected })}
+      <InteractiveListRow
+        selected={isSelected}
+        content={<MasterDetailListRowContent item={item} issueCount={issueCount} />}
+        endSlot={<Icon name="chevron-right" size="lg" className="text-foreground" aria-hidden />}
+        asChild
       >
-        <MasterDetailListRowContent item={item} issueCount={issueCount} />
-        <span className="flex shrink-0 self-center text-foreground" aria-hidden>
-          <Icon name="chevron-right" size="lg" />
-        </span>
-        {issueCount > 0 ? (
-          <span className="sr-only">, {masterDetailRowValidationStateLabel(issueCount)}</span>
-        ) : null}
-      </button>
+        <button
+          ref={isSelected ? selectedRowRef : undefined}
+          type="button"
+          aria-current={isSelected ? 'true' : undefined}
+          aria-invalid={item.hasError ? true : undefined}
+          onClick={() => onSelect(index)}
+          className={cn(interactiveFocusVariants({ context: 'standalone' }))}
+        >
+          {issueCount > 0 ? (
+            <span className="sr-only">, {masterDetailRowValidationStateLabel(issueCount)}</span>
+          ) : null}
+        </button>
+      </InteractiveListRow>
     </li>
   )
 }

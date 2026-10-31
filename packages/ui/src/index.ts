@@ -395,8 +395,6 @@ export {
   buttonTextSizeToComboboxFieldSize,
   COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON,
   resolveComboboxSearchFieldSizeForButtonSize,
-  fieldSizeToInteractiveListSize,
-  resolveInteractiveListSizeForFieldSize,
   fieldSizeToArrayAddButtonSize,
   fieldSizeToAttachedButtonSize,
   INLINE_HEADER_ACTION_BUTTON_SIZE,
@@ -679,6 +677,7 @@ export type {
 } from './components/ui/visual-vocabulary.types'
 export type { FieldChrome } from './components/ui/field-chrome.variants'
 export {
+  fieldAnatomyStackVariants,
   fieldArrayItemClasses,
   fieldArrayItemListClasses,
   fieldArrayItemVariants,
@@ -763,9 +762,9 @@ export {
   type InteractiveListToolbarProps,
 } from './components/ui/interactive-list-toolbar.client'
 export {
-  InteractiveListGroupHeading,
-  type InteractiveListGroupHeadingProps,
-} from './components/ui/interactive-list-group-heading.client'
+  ListGroupHeading,
+  type ListGroupHeadingProps,
+} from './components/ui/list-group-heading.client'
 export {
   InteractiveListViewport,
   type InteractiveListViewportProps,
@@ -814,12 +813,18 @@ export {
   type RowColumn,
 } from './components/ui/row-anatomy'
 export {
-  interactiveListGroupHeadingVariants,
+  LIST_DENSITIES,
+  UI_LIST_DENSITY_CLASSES,
+  POPOVER_INTERACTIVE_LIST_DENSITY,
+  listShellClasses,
+  type ListDensity,
+} from './components/ui/list-density.lib'
+export { listGroupHeadingVariants } from './components/ui/list-group-heading.variants'
+export {
   interactiveListSurfaceClasses,
   interactiveListVariants,
   interactiveListRowChromeVariants,
   interactiveListRowMainVariants,
-  type InteractiveListSize,
 } from './components/ui/interactive-list.variants'
 export {
   PreviewRail,

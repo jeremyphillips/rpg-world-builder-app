@@ -45,7 +45,7 @@ const schema = z.object({
 const relationshipArrayField = (cardinality: 'one' | 'many' | undefined): FormItem => ({
   kind: 'array',
   name: 'links',
-  legend: 'Links',
+  label: 'Links',
   fields: [],
   addAction: {
     label: 'Add link',

@@ -9,7 +9,6 @@ import {
   fieldLabelVariants,
   fieldSetInFlowLegendClasses,
   resolveFieldGroupLegendClassName,
-  type FieldGroupLegendScale,
 } from '../../components/ui/field.variants'
 import type { FieldSize } from '../../components/ui/field.client'
 import { FieldLabelContent } from '../../components/ui/field-label-content'
@@ -28,25 +27,16 @@ export interface HeadingPresentationProps {
   className?: string
   /** Leaf-tier control scale; ignored for section/subsection. */
   size?: FieldSize
-  /** Array-tier density scale bridge; internal use only. */
-  arrayScale?: FieldGroupLegendScale
 }
 
-function resolveHeadingLabelClassName(
-  tier: FormHeadingTier,
-  size: FieldSize,
-  arrayScale: FieldGroupLegendScale,
-): string {
+function resolveHeadingLabelClassName(tier: FormHeadingTier, size: FieldSize): string {
   if (tier === 'leaf') {
     return fieldLabelVariants({ size })
   }
   if (tier === 'section') {
     return resolveFieldGroupLegendClassName({ size: 'section' })
   }
-  if (tier === 'subsection') {
-    return resolveFieldGroupLegendClassName({ size: 'subsection' })
-  }
-  return resolveFieldGroupLegendClassName({ size: 'array', scale: arrayScale })
+  return resolveFieldGroupLegendClassName({ size: 'subsection' })
 }
 
 function renderHint(hint: string | FieldHintConfig | undefined, tier: FormHeadingTier): ReactNode {
@@ -80,9 +70,8 @@ export function HeadingPresentation({
   as: Component = 'span',
   className,
   size = 'md',
-  arrayScale = 'default',
 }: HeadingPresentationProps) {
-  const labelClassName = resolveHeadingLabelClassName(tier, size, arrayScale)
+  const labelClassName = resolveHeadingLabelClassName(tier, size)
   const hintNode = renderHint(hint, tier)
 
   if (tier === 'leaf') {

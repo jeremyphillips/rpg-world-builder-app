@@ -110,7 +110,7 @@ export const startingWealthFormSchema = z.object({
 export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
   return buildLevelRangeTiersArrayField({
     name: 'tiers',
-    legend: STARTING_WEALTH_TIERS_LEGEND,
+    label: STARTING_WEALTH_TIERS_LEGEND,
     min: STARTING_WEALTH_TIER_COUNT,
     max: STARTING_WEALTH_TIER_COUNT,
     density: 'comfortable',
@@ -185,7 +185,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
       {
         kind: 'array',
         name: 'magicItemGrants',
-        legend: 'Magic item grants',
+        label: 'Magic item grants',
         addAction: { label: 'Add magic item grant' },
         min: 0,
         item: {

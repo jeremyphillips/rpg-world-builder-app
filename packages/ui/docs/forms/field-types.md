@@ -6,20 +6,20 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 
 ## Standard leaf types (brief)
 
-| `type`            | Value     | Notes                                                                      |
-| ----------------- | --------- | -------------------------------------------------------------------------- |
-| `text`            | `string`  | Optional `inputType`, `autoComplete`                                       |
-| `textSuggestions` | `string`  | Free entry with inline advisory suggestions; optional `optionalDisclosure` |
-| `number`          | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`                           |
-| `textarea`        | `string`  | `rows`, optional `optionalDisclosure`                                      |
-| `select`          | `string`  | `options`, optional `optionalDisclosure`                                   |
-| `select`          | `string`  | Flat or grouped options; `optionAvailability`; `presentation.readOnlyWhen` |
-| `radio`           | `string`  | `orientation`, `labelHidden`                                               |
-| `radioCard`       | `string`  | Card-style options with `meta` / `badge`                                   |
-| `checkbox`        | `boolean` |                                                                            |
-| `switch`          | `boolean` | `labelPosition`: `inline`, `above`, `settings`                             |
-| `select`          | `string`  | `labelPosition`: `inline`, `above`, `settings`                             |
-| `file`            | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                |
+| `type`            | Value     | Notes                                                                                             |
+| ----------------- | --------- | ------------------------------------------------------------------------------------------------- |
+| `text`            | `string`  | Optional `inputType`, `autoComplete`                                                              |
+| `textSuggestions` | `string`  | Free entry with inline advisory suggestions; optional `optionalDisclosure`                        |
+| `number`          | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`                                                  |
+| `textarea`        | `string`  | `rows`, optional `optionalDisclosure`                                                             |
+| `select`          | `string`  | `options`, optional `optionalDisclosure`                                                          |
+| `select`          | `string`  | Flat or grouped options; `optionAvailability`; `presentation.readOnlyWhen`; `presentation.change` |
+| `radio`           | `string`  | `orientation`, `labelHidden`                                                                      |
+| `radioCard`       | `string`  | Card-style options with `meta` / `badge`                                                          |
+| `checkbox`        | `boolean` |                                                                                                   |
+| `switch`          | `boolean` | `labelPosition`: `inline`, `above`, `settings`                                                    |
+| `select`          | `string`  | `labelPosition`: `inline`, `above`, `settings`                                                    |
+| `file`            | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                                       |
 
 `select` and `combobox` fields default to `Choose {label}…` when `placeholder` is omitted.
 Multi-select chips/combobox fields with `min` / `max` also derive constraint hints from the
@@ -74,6 +74,41 @@ instead of a one-option dropdown. Value stays registered in RHF and still valida
 
 Works with `filterSelectOptions` on parent `array` configs — `readOnlyWhen` receives the
 resolved flat option list after array filtering and `optionAvailability`.
+
+### Select change presentation
+
+When a select should read like a compact summary until the author explicitly edits it,
+opt in with `presentation.change`. The `label` is only the action button text; presence
+of `change` is the mode. Applies to `select` fields only.
+
+```ts
+{
+  type: 'select',
+  name: 'damageType',
+  label: 'Damage type',
+  options: damageTypeOptions,
+  presentation: {
+    change: { label: 'Change' },
+  },
+}
+```
+
+Behavior:
+
+- A stored value with a matching option label renders as that label plus **Change** inside
+  the field control band (same row track as neighboring controls).
+- An empty value shows the select immediately.
+- A value with no matching option (including filtered-out options) keeps the select open;
+  the raw id is never shown as fake read-only text.
+- `disabled` disables **Change**; the resolved label still displays. The open select
+  receives `disabled` as usual.
+- `readOnlyWhen` wins — when true, render read-only chrome with no **Change** (sole-option
+  auto-write still applies).
+- `form.reset()` reflects the reset value and clears any in-progress **Change** editing
+  state.
+
+`useController` stays mounted in both presentations so `shouldUnregister` does not drop
+the value when the trigger is hidden.
 
 ## Derived metadata (`derivedMeta`)
 

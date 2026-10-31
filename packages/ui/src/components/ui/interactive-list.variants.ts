@@ -1,7 +1,9 @@
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { borderStrength } from './border-strength'
+import { listShellClasses } from './list-density.lib'
+import type { ListDensity } from './list-density.tokens'
 import {
   UI_INTERACTIVE_ROW_BLOCK_CLASS,
   UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS,
@@ -14,36 +16,12 @@ import {
   selectableRowListPointerHoverClasses,
 } from './interactive-row.variants'
 
-export type InteractiveListSize = 'sm' | 'md' | 'lg'
-
-/** Visual-only group heading; hosts own section / listbox group semantics. */
-export const interactiveListGroupHeadingVariants = cva(
-  cn('ui-interactive-list__heading', borderStrength('subtle')),
-  {
-    variants: {
-      first: {
-        true: 'ui-interactive-list__heading--first',
-        false: '',
-      },
-      follows: {
-        none: '',
-        complete: 'ui-interactive-list__heading--follows-complete',
-        truncated: '',
-      },
-    },
-    defaultVariants: {
-      first: false,
-      follows: 'none',
-    },
-  },
-)
-
 /** List surface. Adjacent-sibling borders live on `.ui-interactive-list`. */
 export const interactiveListSurfaceClasses = cn('ui-interactive-list', borderStrength('subtle'))
 
 /** Row-list shell — wrap row adapters only (not labels/separators). */
-export function interactiveListVariants(): string {
-  return cn(interactiveListSurfaceClasses, 'ui-interactive-list')
+export function interactiveListVariants(density: ListDensity = 'comfortable'): string {
+  return cn(listShellClasses(density), interactiveListSurfaceClasses)
 }
 
 /** Shared panel shell for combobox popovers and choice menus (animation composed per host). */
@@ -124,22 +102,12 @@ export const interactiveListRowChromeVariants = cva(
 /** Main hit area — identity and decorative trailing chrome. */
 export const interactiveListRowMainVariants = cva('ui-interactive-list__main', {
   variants: {
-    size: {
-      sm: 'ui-interactive-list__main--sm',
-      md: 'ui-interactive-list__main--md',
-      lg: 'ui-interactive-list__main--lg',
-    },
     interactive: {
       true: 'ui-interactive-list__main--interactive',
       false: '',
     },
   },
   defaultVariants: {
-    size: 'md',
     interactive: true,
   },
 })
-
-export type InteractiveListGroupHeadingVariantProps = VariantProps<
-  typeof interactiveListGroupHeadingVariants
->

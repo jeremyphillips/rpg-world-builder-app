@@ -37,7 +37,7 @@ describe('resolveArrayItemPresentation', () => {
       config: {
         kind: 'array',
         name: 'traits',
-        legend: 'Traits',
+        label: 'Traits',
         item: {
           variant: 'compact',
           header: { fallback: (index) => `Trait ${index + 1}`, srOnly: true },
@@ -60,7 +60,7 @@ describe('resolveArrayItemPresentation', () => {
       config: {
         kind: 'array',
         name: 'movement',
-        legend: 'Movement',
+        label: 'Movement',
         item: {
           variant: 'compact',
           headerVisibility: 'hidden',
@@ -87,7 +87,7 @@ describe('resolveArrayItemPresentation', () => {
       config: {
         kind: 'array',
         name: 'entries',
-        legend: 'Entries',
+        label: 'Entries',
         item: {
           variant: 'compact',
           header: {
@@ -112,7 +112,7 @@ describe('resolveArrayItemPresentation', () => {
       config: {
         kind: 'array',
         name: 'traits',
-        legend: 'Traits',
+        label: 'Traits',
         item: {
           collapsible: true,
           headerVisibility: 'hidden',
@@ -137,7 +137,7 @@ describe('resolveArrayItemPresentation', () => {
       config: {
         kind: 'array',
         name: 'examples',
-        legend: 'Examples',
+        label: 'Examples',
         item: {
           variant: 'compact',
           collapsible: true,
@@ -160,7 +160,7 @@ describe('resolveArrayItemPresentation', () => {
       config: {
         kind: 'array',
         name: 'grants',
-        legend: 'Grants',
+        label: 'Grants',
         item: {
           variant: 'compact',
           header: {
@@ -184,7 +184,7 @@ describe('resolveArrayItemPresentation', () => {
     const baseConfig = {
       kind: 'array' as const,
       name: 'rows',
-      legend: 'Rows',
+      label: 'Rows',
       item: {
         variant: 'compact' as const,
         headerVisibility: 'hidden' as const,
@@ -226,7 +226,7 @@ describe('resolveArrayItemPresentation', () => {
       config: {
         kind: 'array',
         name: 'tags',
-        legend: 'Tags',
+        label: 'Tags',
         fields: [{ type: 'text' as const, name: 'label', label: 'Label' }],
       },
       variant: 'compact',
@@ -241,7 +241,7 @@ describe('resolveArrayItemPresentation', () => {
       config: {
         kind: 'array',
         name: 'tags',
-        legend: 'Tags',
+        label: 'Tags',
         fields: [{ type: 'text' as const, name: 'label', label: 'Label' }],
       },
       variant: 'compact',
@@ -258,7 +258,7 @@ describe('resolveArrayItemPresentation', () => {
       config: {
         kind: 'array',
         name: 'movement',
-        legend: 'Movement',
+        label: 'Movement',
         item: { headerVisibility: 'hidden' },
         fields: [{ type: 'text' as const, name: 'mode', label: 'Mode' }],
       },
@@ -271,7 +271,7 @@ describe('resolveArrayItemPresentation', () => {
       config: {
         kind: 'array',
         name: 'entries',
-        legend: 'Entries',
+        label: 'Entries',
         item: { header: { fallback: (index) => `Entry ${index + 1}`, primaryField: 'name' } },
         fields: stackedCompactFields,
       },
@@ -289,7 +289,7 @@ describe('resolveArrayItemPresentation', () => {
       config: {
         kind: 'array',
         name: 'traits',
-        legend: 'Traits',
+        label: 'Traits',
         item: {
           collapsible: true,
           header: { fallback: (index) => `Trait ${index + 1}`, primaryField: 'name' },

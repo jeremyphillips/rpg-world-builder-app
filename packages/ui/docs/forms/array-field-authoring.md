@@ -14,11 +14,13 @@ Ticket code references — compact rows, `primaryField` title, no collapse:
 defineArrayField({
   kind: 'array',
   name: 'codeRefs',
-  legend: 'Code references',
-  addActionLabel: 'Add code reference',
-  itemHeader: {
-    fallback: (index) => `Ref ${index + 1}`,
-    primaryField: 'path',
+  label: 'Code references',
+  addAction: { label: 'Add code reference' },
+  item: {
+    header: {
+      fallback: (index) => `Ref ${index + 1}`,
+      primaryField: 'path',
+    },
   },
   fields: [
     { type: 'text', name: 'path', label: 'Path', required: true },
@@ -43,15 +45,19 @@ Species/class grant rows — detailed items, template add menu, domain header fo
 defineArrayField({
   kind: 'array',
   name: 'grants',
-  legend: 'Grants',
-  addActionLabel: 'Add grant',
-  itemCollapsible: true,
-  itemHeader: {
-    fallback: (index) => `Grant ${index + 1}`,
-    primary: (values, index) => formatGrantRowPrimary(values, index, ctx),
-    summary: (values) => formatGrantRowSummary(values, ctx),
+  label: 'Grants',
+  addAction: {
+    label: 'Add grant',
+    menu: buildGrantArrayAddMenu(grantTypes),
   },
-  addActionMenu: buildGrantArrayAddMenu(grantTypes),
+  item: {
+    collapsible: true,
+    header: {
+      fallback: (index) => `Grant ${index + 1}`,
+      primary: (values, index) => formatGrantRowPrimary(values, index, ctx),
+      summary: (values) => formatGrantRowSummary(values, ctx),
+    },
+  },
   fields: grantItemFields(grantTypes, labels, ctx),
 })
 ```
@@ -62,14 +68,16 @@ Wealth tiers — fixed order, no reorder, collapse with summary:
 defineArrayField({
   kind: 'array',
   name: 'tiers',
-  legend: 'Wealth tiers',
-  itemVariant: 'detailed',
-  itemCollapsible: true,
-  reorder: false,
-  itemHeader: {
-    primaryField: 'label',
-    fallback: (i) => `Wealth tier #${i + 1}`,
-    summary: (values) => formatTierSummary(values),
+  label: 'Wealth tiers',
+  item: {
+    variant: 'detailed',
+    collapsible: true,
+    reorder: false,
+    header: {
+      primaryField: 'label',
+      fallback: (i) => `Wealth tier #${i + 1}`,
+      summary: (values) => formatTierSummary(values),
+    },
   },
   fields: [
     /* tier fields */
@@ -77,9 +85,20 @@ defineArrayField({
 })
 ```
 
-## `itemVariant` / `item.surface` / `itemCollapsible`
+## `label` / `hint` presentation
 
-| Goal                                              | `itemVariant`       | `item.surface` / `item.tone`                           | `itemCollapsible`     |
+Array section headers use the same **leaf field label line** (`fieldLabelVariants`) and
+**below-label hint** (`Text variant="caption"`) as scalar fields. The fieldset
+`<legend>` is in-flow (`fieldSetInFlowLegendClasses`) so label weight does not cascade
+into hints or inline add controls. Section/subsection legend scale belongs on named
+**groups**, not on `kind: 'array'`.
+
+Author with `label`, optional `hint`, and optional `labelVisibility` — see
+[heading-hierarchy.md](./heading-hierarchy.md).
+
+## `item.variant` / `item.surface` / `item.collapsible`
+
+| Goal                                              | `item.variant`      | `item.surface` / `item.tone`                           | `item.collapsible`    |
 | ------------------------------------------------- | ------------------- | ------------------------------------------------------ | --------------------- |
 | Single inline control per row (tags, simple refs) | `auto` or `compact` | default subtle header (omit `item.surface`)            | omit / `false`        |
 | Flat inline rows on page canvas (no beige wash)   | `compact`           | `CANVAS_SURFACE` from `@rpg/ui/form`                   | omit / `false`        |
@@ -103,9 +122,9 @@ required — defaults avoid stacked-beige-card noise.
 - **Invariant:** text anatomy never owns external vertical spacing (`pb-*` on summary/issue
   lines is forbidden); header rhythm does not change between collapsed and expanded state
 
-`itemCollapsible: true` always renders disclosure anatomy. Omit `itemVariant: 'compact'` on
+`item.collapsible: true` always renders disclosure anatomy. Omit `item.variant: 'compact'` on
 collapsible arrays — the dev validator warns when both are set. Nested arrays with
-`itemCollapsible: true` keep disclosure chrome instead of silently auto-compacting.
+`item.collapsible: true` keep disclosure chrome instead of silently auto-compacting.
 
 `item.surface` is an **override** — default subtle header + canvas body need no `item.surface`.
 Uses `SurfaceConfig` (`emphasis`, `elevation`). For flat non-collapsible rows that should sit
@@ -140,7 +159,7 @@ item: {
 },
 ```
 
-## `itemHeader` patterns
+## `item.header` patterns
 
 | Pattern                 | When                              | Config                              |
 | ----------------------- | --------------------------------- | ----------------------------------- |
@@ -205,7 +224,7 @@ add clicks to the vocabulary adapter registered on `RelationshipFieldProvider`.
 defineArrayField({
   kind: 'array',
   name: 'organizations',
-  legend: 'Organizations',
+  label: 'Organizations',
   addAction: {
     label: 'Add organization',
     layout: 'inline',
@@ -233,9 +252,9 @@ Wrap the form in `RelationshipFieldProvider` with adapters that implement
 `createEdge` and `renderPicker`. Row presentation stays on `item.renderShell`; the host
 only owns picker lifecycle and RHF `append` / `replace`.
 
-## `addActionMenu`
+## `addAction.menu`
 
-Replace the plain add button with a searchable template dropdown. Each item supplies
+Replace the plain add button with a searchable template dropdown via `addAction.menu`. Each item supplies
 `appendDefaults` (object or factory) and optional `duplicatePolicy` (`allow` | `warn` |
 `block`).
 
@@ -248,7 +267,7 @@ start from an empty object. Prefer explicit `appendDefaults` over per-field
 
 `fields` may contain nested `kind: 'array'` items. Names cascade:
 `root.0.sub.1.field`. Prefer at most two levels for UX; nested arrays default to
-compact unless `itemVariant: 'detailed'` is set on the inner array.
+compact unless `item.variant: 'detailed'` is set on the inner array.
 
 ## `filterSelect` — cross-row select options
 
@@ -377,12 +396,12 @@ treats bare leaves and row wraps equivalently.
 ## Common mistakes
 
 1. **Absolute names in item `fields`** — use `name: 'label'`, not `traits.0.label`.
-2. **Missing `fallback`** — required on every `itemHeader`.
-3. **`itemCollapsible` + explicit `itemVariant: 'compact'`** — dev warning; collapsible wins as disclosure.
+2. **Missing `fallback`** — required on every `item.header`.
+3. **`item.collapsible` + explicit `item.variant: 'compact'`** — dev warning; collapsible wins as disclosure.
 4. **Replacing `item` when spreading builders** — merge (`item: { ...built.item, … }`) instead of
    overwriting; a bare `item: { surface: … }` drops collapsible/header config.
 5. **Zod mismatch** — hidden item fields need `z.optional()`; `min`/`max` should mirror schema.
-6. **Empty `legend` without parent label** — omit legend only when a parent stack/group
+6. **Empty `label` without parent label** — omit `label` only when a parent stack/group
    already labels the block (see [containers.md](./containers.md#array-fields)).
 7. **Resolver `.omit` in nested items** — works on top-level keys only, not inside array items.
 8. **Row wrapper for chrome** — use `kind: 'row'` only when fields should share a horizontal row,

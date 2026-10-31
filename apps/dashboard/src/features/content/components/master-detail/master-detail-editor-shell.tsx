@@ -2,7 +2,10 @@ import type { ReactNode, RefObject } from 'react'
 import { cn, panelVariants } from '@rpg/ui'
 
 import { DetailOverflowMenu } from '../../lib/detail/detail-overflow-menu'
-import { detailOverflowDeleteAction } from '../../lib/detail/detail-overflow-actions'
+import {
+  detailOverflowDeleteAction,
+  type DetailOverflowMenuEntry,
+} from '../../lib/detail/detail-overflow-actions'
 import {
   joinMasterDetailItemMeta,
   type MasterDetailItemMeta,
@@ -27,6 +30,8 @@ export interface MasterDetailEditorShellProps {
   itemNoun: MasterDetailItemNounTerm
   selectedIdentity?: MasterDetailEditorIdentity
   onDelete?: () => void
+  /** Leading overflow entries, rendered before delete. */
+  overflowActions?: readonly DetailOverflowMenuEntry[]
   bodyRef?: RefObject<HTMLDivElement | null>
   children?: ReactNode
 }
@@ -35,14 +40,27 @@ function MasterDetailEditorIdentityHeader({
   identity,
   itemNoun,
   onDelete,
+  overflowActions,
 }: {
   identity: MasterDetailEditorIdentity
   itemNoun: MasterDetailItemNounTerm
   onDelete?: () => void
+  overflowActions?: readonly DetailOverflowMenuEntry[]
 }) {
   const metaLine = identity.meta ? joinMasterDetailItemMeta(identity.meta) : undefined
   const deletable = identity.deletable !== false && Boolean(onDelete)
   const itemNounLabel = masterDetailItemNounLabel(itemNoun)
+  const menuActions: DetailOverflowMenuEntry[] = [
+    ...(overflowActions ?? []),
+    ...(deletable && onDelete
+      ? [
+          {
+            ...detailOverflowDeleteAction(`Delete ${itemNounLabel}`, onDelete),
+            separatorBefore: (overflowActions?.length ?? 0) > 0,
+          },
+        ]
+      : []),
+  ]
 
   return (
     <div className="flex items-start justify-between gap-3 border-b ui-border--subtle px-4 py-3">
@@ -55,11 +73,8 @@ function MasterDetailEditorIdentityHeader({
           issueCount={identity.issueCount}
         />
       </div>
-      {deletable && onDelete ? (
-        <DetailOverflowMenu
-          triggerLabel={`Actions for ${identity.title}`}
-          actions={[detailOverflowDeleteAction(`Delete ${itemNounLabel}`, onDelete)]}
-        />
+      {menuActions.length > 0 ? (
+        <DetailOverflowMenu triggerLabel={`Actions for ${identity.title}`} actions={menuActions} />
       ) : null}
     </div>
   )
@@ -73,6 +88,7 @@ export function MasterDetailEditorShell({
   itemNoun,
   selectedIdentity,
   onDelete,
+  overflowActions,
   bodyRef,
   children,
 }: MasterDetailEditorShellProps) {
@@ -95,6 +111,7 @@ export function MasterDetailEditorShell({
             identity={selectedIdentity}
             itemNoun={itemNoun}
             onDelete={onDelete}
+            overflowActions={overflowActions}
           />
           <div ref={bodyRef} className="px-4 py-4">
             {children}

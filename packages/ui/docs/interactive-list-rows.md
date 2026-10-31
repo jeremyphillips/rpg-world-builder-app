@@ -28,6 +28,14 @@ States are orthogonal. Lower layers do not replace the accent rail; highlight ad
 
 Surface hover and pressed mixes come from [surface-interaction.css](../src/components/ui/surface-interaction.css) on painted publishers (list shell, panel, card, popover, canvas `:root`, …) — the same 94% / 88% recipe as interactive cards, without composing `ui-card` chrome.
 
+## List density (typography and row geometry)
+
+`InteractiveList` and `DestinationList` publish **`ui-list ui-list--{density}`** on the list root. Copy-scale variables (`--ui-copy-title-*`, anatomy row gap, and related tokens) come from [copy-scale.css](../src/components/ui/copy-scale.css) on those modifiers. Row padding and destination insets are owned per component in [interactive-list.css](../src/components/ui/interactive-list.css) and [destination-list.css](../src/components/ui/destination-list.css) — comfortable values on base rules, compact/spacious overrides scoped under `.ui-list--compact|spacious`. Set **`density`** on `InteractiveList` for in-page/card lists; popover-hosted lists (combobox, dropdown, searchable unit select, link picker) use **`POPOVER_INTERACTIVE_LIST_DENSITY`** (`compact`) via `InteractiveListPanel` default or an explicit prop. Do not size individual rows.
+
+## Group section bands
+
+Use [`ListGroupHeading`](../src/components/ui/list-group-heading.client.tsx) for the faint band above grouped rows (`label`, optional `count`, `first`, `follows`). It wraps `Eyebrow` at **`xs`** and owns padding, borders, and count styling in [list-group-heading.css](../src/components/ui/list-group-heading.css). Place headings **outside** the `InteractiveList` shell so row adjacency borders stay correct. Row-level type labels belong on [`IdentityRow`](../src/components/ui/identity-row.client.tsx) (`classification`), not on the section band. Consumers: `ButtonDropdown` groups, global search preview sections, optional `InteractiveListPanel.listGroupHeading`.
+
 ## Menu item contract
 
 `ui-menu-item` owns padding, type, and `data-highlighted` / focus wash (`--row-hover-bg`, foreground unchanged). Optional description uses `ui-menu-item__description` and stays `muted-foreground` when highlighted. Submenu triggers keep `data-state="open"` accent treatment. Checkbox and radio items are unchanged (`DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`).

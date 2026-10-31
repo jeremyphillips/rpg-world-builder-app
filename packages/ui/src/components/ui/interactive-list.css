@@ -1,7 +1,7 @@
 /*
  * Interactive list shell, panel, toolbar, and row geometry.
  * Source order: list → panel width → toolbar → row size.
- * Row sizes declare the same padding and gap list.
+ * Row geometry: comfortable on base `__main`; compact/spacious via list-root `ui-list--*`.
  */
 @layer components {
   .ui-interactive-list {
@@ -33,25 +33,6 @@
     color: var(--muted-foreground);
   }
 
-  .ui-interactive-list__heading {
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-color: var(--ui-border-color);
-    background-color: var(--surface-faint);
-    padding-inline: calc(var(--spacing) * 3);
-    padding-block: calc(var(--spacing) * 1);
-  }
-
-  .ui-interactive-list__heading--first {
-    padding-top: calc(var(--spacing) * 2);
-  }
-
-  .ui-interactive-list__heading--follows-complete {
-    border-top-width: 1px;
-    border-top-style: solid;
-    border-top-color: var(--ui-border-color);
-  }
-
   .ui-interactive-list__panel {
     z-index: 50;
     overflow: hidden;
@@ -68,13 +49,13 @@
   }
 
   .ui-interactive-list__panel--match {
-    width: var(--radix-popover-trigger-width);
-    min-width: var(--radix-popover-trigger-width);
+    width: max(var(--radix-popover-trigger-width), 18.75rem);
+    min-width: max(var(--radix-popover-trigger-width), 18.75rem);
   }
 
   .ui-interactive-list__panel--fit {
     width: max-content;
-    min-width: 15.625rem; /* 250px — minimum readable width when the trigger is fit-sized */
+    min-width: 18.75rem; /* 300px — minimum readable width when the trigger is fit-sized */
   }
 
   .ui-interactive-list__toolbar {
@@ -114,25 +95,22 @@
     align-items: flex-start;
     text-align: left;
     outline: none;
+    gap: var(--control-gap-sm);
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 2);
   }
 
   .ui-interactive-list__main--interactive {
     cursor: pointer;
   }
 
-  .ui-interactive-list__main--sm {
+  .ui-list--compact.ui-interactive-list .ui-interactive-list__main {
     gap: var(--control-gap-xs);
     padding-inline: calc(var(--spacing) * 2);
     padding-block: calc(var(--spacing) * 2);
   }
 
-  .ui-interactive-list__main--md {
-    gap: var(--control-gap-sm);
-    padding-inline: calc(var(--spacing) * 3);
-    padding-block: calc(var(--spacing) * 2);
-  }
-
-  .ui-interactive-list__main--lg {
+  .ui-list--spacious.ui-interactive-list .ui-interactive-list__main {
     gap: var(--control-gap-sm);
     padding-inline: calc(var(--spacing) * 4);
     padding-block: calc(var(--spacing) * 2);

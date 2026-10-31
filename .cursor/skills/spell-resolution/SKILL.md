@@ -28,6 +28,8 @@ ambiguous, or pasted rules text has multiple valid interpretations.
 
 **Do not** read whole `spell-progression-modeling.md` — link §1 / §12.4 only when needed.
 
+SRD source text or stat verification (Open5e, live JSON) → [`open5e-srd`](../open5e-srd/SKILL.md).
+
 ---
 
 ## Trigger phrases

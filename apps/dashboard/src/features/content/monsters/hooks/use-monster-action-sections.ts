@@ -1,18 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import {
-  actionAfterSectionMove,
-  actionMoveDropsTrigger,
-  describeActionKindSwitchLoss,
-  reconcileMonsterActionKind,
-} from '../lib/actions/monster-action-kind'
-import {
-  createActionFromPreset,
-  type MonsterActionDraftRow,
-  type MonsterActionPresetId,
-} from '../lib/actions/monster-action-presets'
+  createEquippedWeaponAcquisition,
+  createMonsterActionFromAcquisition,
+  type MonsterActionAcquisitionChoice,
+} from '../lib/actions/monster-action-acquisition'
+import { actionAfterSectionMove, actionMoveDropsTrigger } from '../lib/actions/monster-action-kind'
+import type { MonsterActionDraftRow } from '../lib/actions/monster-action-presets'
 import {
   firstMonsterActionId,
   resolveFirstInvalidActionPath,
@@ -22,16 +18,8 @@ import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../lib/actions/monster-action-equipment-references'
+import { formatAddedEquipmentNotice } from '../lib/monster-form-labels'
 import type { MonsterFormValues } from '../lib/monster-form-values'
-import type { MonsterActionKind } from '@rpg/contracts'
-
-type KindSwitchPending = {
-  type: 'kind'
-  section: MonsterActionSection
-  index: number
-  nextKind: MonsterActionKind
-  losses: string[]
-}
 
 type TriggerPending = {
   type: 'trigger'
@@ -40,7 +28,90 @@ type TriggerPending = {
   index: number
 }
 
-export type MonsterActionPending = KindSwitchPending | TriggerPending
+export type MonsterActionPending = TriggerPending
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+type MissingPathEntry = { path: string; value: unknown }
+
+function collectMissingPaths(
+  snapshot: unknown,
+  live: unknown,
+  path: string,
+  missing: MissingPathEntry[],
+) {
+  if (Array.isArray(snapshot)) {
+    collectMissingArraySnapshot(snapshot, live, path, missing)
+    return
+  }
+  if (isPlainRecord(snapshot)) {
+    collectMissingRecordSnapshot(snapshot, live, path, missing)
+  }
+}
+
+function collectMissingArraySnapshot(
+  snapshot: unknown[],
+  live: unknown,
+  path: string,
+  missing: MissingPathEntry[],
+) {
+  if (!Array.isArray(live)) {
+    missing.push({ path, value: snapshot })
+    return
+  }
+  live.forEach((item, index) => {
+    const source = sourceForLiveItem(snapshot, item)
+    if (source === undefined || !isPlainRecord(item) || typeof item.id !== 'string') return
+    collectMissingPaths(source, item, `${path}.${index}`, missing)
+  })
+}
+
+function collectMissingRecordSnapshot(
+  snapshot: Record<string, unknown>,
+  live: unknown,
+  path: string,
+  missing: MissingPathEntry[],
+) {
+  const liveRecord = isPlainRecord(live) ? live : {}
+  for (const [key, value] of Object.entries(snapshot)) {
+    const childPath = path ? `${path}.${key}` : key
+    const liveValue = liveRecord[key]
+    if (isPlainRecord(value) || Array.isArray(value)) {
+      if (liveValue === undefined) {
+        missing.push({ path: childPath, value })
+        continue
+      }
+      collectMissingPaths(value, liveValue, childPath, missing)
+      continue
+    }
+    if (liveValue === undefined && value !== undefined) {
+      missing.push({ path: childPath, value })
+    }
+  }
+}
+
+function sourceForLiveItem(snapshot: unknown[], live: unknown): unknown {
+  if (!isPlainRecord(live) || typeof live.id !== 'string') return undefined
+  return snapshot.find((item) => isPlainRecord(item) && item.id === live.id)
+}
+
+function lostDefinedKeys(previous: unknown, next: unknown): boolean {
+  if (Array.isArray(previous)) {
+    if (!Array.isArray(next) || next.length < previous.length) return true
+    return previous.some((item, index) => lostDefinedKeys(item, next[index]))
+  }
+  if (isPlainRecord(previous)) {
+    if (!isPlainRecord(next)) return true
+    return Object.entries(previous).some(([key, value]) => {
+      if (value === undefined) return false
+      if (next[key] === undefined) return true
+      return lostDefinedKeys(value, next[key])
+    })
+  }
+  return false
+}
 
 function rowsOf(
   values: MonsterFormValues | undefined,
@@ -54,9 +125,21 @@ export function useMonsterActionSections(entityId?: string) {
   const { getValues, setValue, clearErrors, trigger, formState } =
     useFormContext<MonsterFormValues>()
   const watched = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
-  const actions = useMasterDetailArray('actions', () => createActionFromPreset('weapon'))
-  const bonusActions = useMasterDetailArray('bonusActions', () => createActionFromPreset('weapon'))
-  const reactions = useMasterDetailArray('reactions', () => createActionFromPreset('weapon'))
+  const rowSnapshot = useRef<MonsterFormValues | undefined>(undefined)
+  useLayoutEffect(() => {
+    const live = getValues()
+    const previous = rowSnapshot.current
+    if (!previous || !lostDefinedKeys(previous, live)) rowSnapshot.current = live
+  })
+  const actions = useMasterDetailArray('actions', () =>
+    createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
+  )
+  const bonusActions = useMasterDetailArray('bonusActions', () =>
+    createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
+  )
+  const reactions = useMasterDetailArray('reactions', () =>
+    createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
+  )
   const editors = useMemo(
     () => ({ actions, bonusActions, reactions }),
     [actions, bonusActions, reactions],
@@ -65,6 +148,23 @@ export function useMonsterActionSections(entityId?: string) {
   const [pending, setPending] = useState<MonsterActionPending | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [focusToken, setFocusToken] = useState(0)
+
+  useEffect(() => {
+    const snapshot = rowSnapshot.current
+    if (!snapshot) return
+    const live = getValues()
+    const missing: { path: string; value: unknown }[] = []
+    for (const section of MONSTER_ACTION_SECTIONS) {
+      collectMissingPaths(snapshot[section], live[section], section, missing)
+    }
+    for (const entry of missing) {
+      setValue(entry.path as never, entry.value as never, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: false,
+      })
+    }
+  })
 
   const idSignature = MONSTER_ACTION_SECTIONS.map((section) =>
     rowsOf(watched, section)
@@ -114,14 +214,29 @@ export function useMonsterActionSections(entityId?: string) {
     [getValues],
   )
 
-  const addPreset = useCallback(
-    (section: MonsterActionSection, presetId: MonsterActionPresetId) => {
-      const row = createActionFromPreset(presetId)
+  const addAcquisition = useCallback(
+    (
+      section: MonsterActionSection,
+      choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
+    ) => {
+      const row = createMonsterActionFromAcquisition(choice)
       editors[section].appendRow(row)
       setSelectedActionId(row.id)
       setNotice(null)
     },
     [editors],
+  )
+
+  const commitEquippedWeapon = useCallback(
+    (section: MonsterActionSection, equipmentId: string, name: string) => {
+      const { entry, action } = createEquippedWeaponAcquisition(equipmentId)
+      const equipment = [...(getValues('equipment') ?? []), entry]
+      setValue('equipment', equipment, { shouldDirty: true })
+      editors[section].appendRow(action)
+      setSelectedActionId(action.id)
+      setNotice(formatAddedEquipmentNotice(name))
+    },
+    [editors, getValues, setValue],
   )
 
   const removeAction = useCallback(
@@ -133,14 +248,6 @@ export function useMonsterActionSections(entityId?: string) {
       setSelectedActionId(next)
     },
     [editors, getValues, locate],
-  )
-
-  const reorder = useCallback(
-    (section: MonsterActionSection, from: number, to: number) => {
-      editors[section].move(from, to)
-      setFocusToken((token) => token + 1)
-    },
-    [editors],
   )
 
   const commitMove = useCallback(
@@ -177,63 +284,13 @@ export function useMonsterActionSections(entityId?: string) {
     [commitMove, locate, selectedActionId],
   )
 
-  const applyKind = useCallback(
-    (
-      section: MonsterActionSection,
-      index: number,
-      nextKind: MonsterActionKind,
-      resolvedWeaponName?: string,
-    ) => {
-      const action = rowsOf(getValues(), section)[index]
-      if (!action) return
-      const next = reconcileMonsterActionKind(action, nextKind, { resolvedWeaponName })
-      setValue(`${section}.${index}`, next, { shouldDirty: true })
-      clearErrors(`${section}.${index}`)
-      setPending(null)
-    },
-    [clearErrors, getValues, setValue],
-  )
-
-  const requestKind = useCallback(
-    (nextKind: MonsterActionKind, equipmentName?: string, resolvedWeaponName?: string) => {
-      const located = locate(selectedActionId)
-      if (!located || located.action.kind === nextKind) return
-      const losses = describeActionKindSwitchLoss(located.action, nextKind, { equipmentName })
-      if (losses.length === 0) {
-        applyKind(located.section, located.index, nextKind, resolvedWeaponName)
-        return
-      }
-      setPending({
-        type: 'kind',
-        section: located.section,
-        index: located.index,
-        nextKind,
-        losses,
-      })
-    },
-    [applyKind, locate, selectedActionId],
-  )
-
-  const confirmPending = useCallback(
-    (resolvedWeaponName?: string) => {
-      if (!pending) return
-      if (pending.type === 'kind') {
-        applyKind(pending.section, pending.index, pending.nextKind, resolvedWeaponName)
-        return
-      }
-      commitMove(pending.from, pending.index, pending.to)
-    },
-    [applyKind, commitMove, pending],
-  )
-
-  const replaceAction = useCallback(
-    (section: MonsterActionSection, index: number, next: MonsterActionDraftRow) => {
-      setValue(`${section}.${index}`, next, { shouldDirty: true })
-    },
-    [setValue],
-  )
+  const confirmPending = useCallback(() => {
+    if (!pending || pending.type !== 'trigger') return
+    commitMove(pending.from, pending.index, pending.to)
+  }, [commitMove, pending])
 
   return {
+    values: watched,
     editors,
     selectedActionId,
     setSelectedActionId,
@@ -242,13 +299,11 @@ export function useMonsterActionSections(entityId?: string) {
     notice,
     setNotice,
     focusToken,
-    addPreset,
+    addAcquisition,
+    commitEquippedWeapon,
     removeAction,
-    reorder,
     requestMove,
-    requestKind,
     confirmPending,
-    replaceAction,
     locate,
     hasRowError: (section: MonsterActionSection, index: number) =>
       editors[section].hasRowError(index),

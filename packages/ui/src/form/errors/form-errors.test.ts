@@ -20,14 +20,14 @@ const startingWealthFields: FormItem[] = [
   {
     kind: 'array',
     name: 'startingWealth.tiers',
-    legend: 'Wealth tiers',
+    label: 'Wealth tiers',
     arrayPattern: { kind: 'levelRange', levelKeys: { min: 'minLevel', max: 'maxLevel' } },
     fields: [
       { type: 'text', name: 'label', label: 'Tier label', required: true },
       {
         kind: 'array',
         name: 'magicItemGrants',
-        legend: 'Grants',
+        label: 'Grants',
         fields: [{ type: 'select', name: 'rarity', label: 'Rarity', options: [], required: true }],
       },
     ],

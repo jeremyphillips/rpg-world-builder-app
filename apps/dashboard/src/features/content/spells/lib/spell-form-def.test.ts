@@ -339,7 +339,7 @@ describe('spellFormDef resolution tab', () => {
     expect(findGroup(resolutionTab?.fields ?? [], 'Authored effects')).toBeDefined()
     const effectsArray = findArrayField(resolutionTab?.fields ?? [], 'resolution.effects')
     expect(effectsArray).toBeDefined()
-    expect(effectsArray?.legend).toBe('')
+    expect('label' in (effectsArray ?? {}) ? effectsArray?.label : undefined).toBeUndefined()
     expect(effectsArray?.item?.variant).toBe('detailed')
     expect(effectsArray?.item?.collapsible).toBe(true)
     expect(effectsArray?.item?.header?.primary).toBeTypeOf('function')

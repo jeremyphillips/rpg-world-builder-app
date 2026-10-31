@@ -39,7 +39,7 @@ function levelOptionsForEffectiveMax(effectiveMax: number): SelectFieldOptionLis
 
 export type BuildLevelRangeTiersArrayFieldOptions = {
   name: string
-  legend: string
+  label: string
   min?: number
   max?: number
   density?: LevelRangeArrayConfig['density']
@@ -64,7 +64,7 @@ export function buildLevelRangeTiersArrayField(
   return {
     kind: 'array',
     name: options.name,
-    legend: options.legend,
+    label: options.label,
     min: options.min,
     max: options.max,
     density: options.density,

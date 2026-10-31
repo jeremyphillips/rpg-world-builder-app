@@ -5,11 +5,12 @@ import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { resolveComboboxSearchFieldSizeForButtonSize } from '../../components/ui/field-sizing.variants'
 import { cn } from '../../lib/utils'
+import { POPOVER_INTERACTIVE_LIST_DENSITY } from './list-density.lib'
 import { Button } from './button.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
 import { comboboxContentVariants } from './combobox-field.variants'
 import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
-import { InteractiveListGroupHeading } from './interactive-list-group-heading.client'
+import { ListGroupHeading } from './list-group-heading.client'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
 import { useButtonDropdownControl } from './use-button-dropdown-control.client'
@@ -207,11 +208,11 @@ export function ButtonDropdown({
               onKeyDown={enableSearch ? undefined : handleNavigationKeyDown}
             >
               {displayItems.length === 0 ? (
-                <InteractiveList>
+                <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY}>
                   <InteractiveListEmpty>{emptyMessage}</InteractiveListEmpty>
                 </InteractiveList>
               ) : searchActive ? (
-                <InteractiveList>
+                <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY}>
                   {displayItems.map((item) => (
                     <ButtonDropdownItemRow
                       key={item.id}
@@ -230,11 +231,13 @@ export function ButtonDropdown({
                 groupedSections.map(({ group, items: sectionItems }) => (
                   <React.Fragment key={group?.id ?? '__ungrouped'}>
                     {group ? (
-                      <InteractiveListGroupHeading id={`${generatedId}-group-${group.id}`}>
-                        {group.label}
-                      </InteractiveListGroupHeading>
+                      <ListGroupHeading
+                        id={`${generatedId}-group-${group.id}`}
+                        label={group.label}
+                      />
                     ) : null}
                     <InteractiveList
+                      density={POPOVER_INTERACTIVE_LIST_DENSITY}
                       role="group"
                       aria-labelledby={group ? `${generatedId}-group-${group.id}` : undefined}
                     >

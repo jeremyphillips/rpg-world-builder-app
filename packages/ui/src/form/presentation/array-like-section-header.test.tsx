@@ -1,12 +1,16 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import {
+  fieldAnatomyStackVariants,
+  fieldSetInFlowLegendClasses,
+} from '../../components/ui/field.variants'
 import { ArrayLikeSectionHeader } from './array-like-section-header.client'
 
 describe('ArrayLikeSectionHeader', () => {
-  it('renders a legend wrapper with field-label typography by default', () => {
+  it('renders an in-flow legend with label typography on the label line only', () => {
     const { container } = render(
-      <fieldset>
+      <fieldset className={fieldAnatomyStackVariants({ size: 'md' })}>
         <ArrayLikeSectionHeader
           label="Grants"
           hint="Add the mechanical effects this feature provides."
@@ -17,10 +21,12 @@ describe('ArrayLikeSectionHeader', () => {
     )
 
     const legend = container.querySelector('legend')
-    expect(legend).toHaveClass('text-style-field-label-md')
-    expect(screen.getByText('Grants')).toBeInTheDocument()
+    expect(legend).toHaveClass(...fieldSetInFlowLegendClasses.split(/\s+/))
+    expect(legend).not.toHaveClass('mb-1.5')
+    expect(legend).not.toHaveClass('text-style-field-label-md')
+    expect(screen.getByText('Grants').parentElement).toHaveClass('text-style-field-label-md')
     expect(screen.getByText('Add the mechanical effects this feature provides.')).toHaveClass(
-      'text-style-supporting',
+      'text-style-caption',
     )
     expect(screen.getByRole('button', { name: 'Add grant' })).toBeInTheDocument()
   })

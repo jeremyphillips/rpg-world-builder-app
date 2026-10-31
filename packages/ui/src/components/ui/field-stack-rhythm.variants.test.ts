@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   fieldAnatomyAlignVariants,
+  fieldAnatomyHeaderBodyGapClasses,
   fieldAnatomyStackVariants,
   fieldChipWrapGapClasses,
   fieldLabelHintStackClasses,
@@ -9,12 +10,10 @@ import {
   fieldLabelVariants,
   fieldMessageRegionVariants,
   fieldArrayItemListClasses,
-  fieldGroupBodyGapVariants,
   fieldGroupLegendHeaderMarginVariants,
   resolveFieldGroupBodyGap,
   fieldStackRhythmVariants,
-  resolveArrayLegendClassName,
-  resolveArrayLegendScale,
+  resolveFieldAnatomyHeaderBodyStackClassName,
   resolveFieldGroupInsetPaddingClasses,
   resolveFieldGroupLegendClassName,
 } from './field.variants'
@@ -44,6 +43,18 @@ describe('fieldAnatomyStackVariants', () => {
     expect(fieldLabelRegionVariants({ size: 'md' })).toContain('has-[*]:pb-1.5')
     expect(fieldMessageRegionVariants({ size: 'sm' })).toContain('has-[*]:pt-1.5')
     expect(fieldMessageRegionVariants({ size: 'md' })).toContain('has-[*]:pt-1.5')
+  })
+
+  it('derives stack, align, and label-region classes from fieldAnatomyHeaderBodyGapClasses', () => {
+    for (const size of ['xs', 'sm', 'md', 'lg'] as const) {
+      const { stack, labelRegionBottom } = fieldAnatomyHeaderBodyGapClasses[size]
+      expect(fieldAnatomyStackVariants({ size })).toContain(stack)
+      expect(fieldAnatomyAlignVariants({ size })).toContain(stack)
+      expect(fieldLabelRegionVariants({ size })).toContain(labelRegionBottom)
+      expect(resolveFieldAnatomyHeaderBodyStackClassName(size)).toBe(
+        fieldAnatomyStackVariants({ size }),
+      )
+    }
   })
 
   it('limits chip wrap classes to pill-row gap', () => {
@@ -99,31 +110,10 @@ describe('fieldArrayItemListClasses', () => {
   })
 })
 
-describe('resolveArrayLegendScale', () => {
-  it('maps sm field size to sm legend scale', () => {
-    expect(resolveArrayLegendScale('sm')).toBe('sm')
-  })
-
-  it('maps md field size to default legend scale', () => {
-    expect(resolveArrayLegendScale('md')).toBe('default')
-  })
-})
-
 describe('field group legend helpers', () => {
-  it('applies sm array legend typography via resolveArrayLegendClassName', () => {
-    expect(resolveArrayLegendClassName('sm')).toContain('text-style-field-label-sm')
-    expect(resolveArrayLegendClassName('sm')).toContain('mb-1')
-  })
-
-  it('applies md array legend typography via resolveArrayLegendClassName', () => {
-    expect(resolveArrayLegendClassName('md')).toContain('text-style-field-label-md')
-    expect(resolveArrayLegendClassName('md')).toContain('mb-1.5')
-  })
-
-  it('applies legend header margins by size', () => {
+  it('applies legend header margins by size for structural tiers only', () => {
     expect(fieldGroupLegendHeaderMarginVariants({ size: 'section' })).toBe('mb-5')
     expect(fieldGroupLegendHeaderMarginVariants({ size: 'subsection' })).toBe('mb-4')
-    expect(fieldGroupLegendHeaderMarginVariants({ size: 'array' })).toBe('mb-1.5')
     expect(fieldGroupLegendHeaderMarginVariants({ size: 'section', rhythm: 'compact' })).toBe(
       'mb-3',
     )
@@ -132,19 +122,13 @@ describe('field group legend helpers', () => {
     )
   })
 
-  it('applies FieldGroup body gap scale by size and rhythm', () => {
+  it('applies FieldGroup body gap scale for section/subsection only', () => {
     expect(resolveFieldGroupBodyGap({ size: 'section', rhythm: 'comfortable' })).toBe('mt-5')
     expect(resolveFieldGroupBodyGap({ size: 'subsection', rhythm: 'comfortable' })).toBe('mt-4')
     expect(resolveFieldGroupBodyGap({ size: 'section', rhythm: 'compact' })).toBe('mt-3')
-    expect(
-      resolveFieldGroupBodyGap({ size: 'array', rhythm: 'comfortable', fieldSize: 'sm' }),
-    ).toBe('mt-1')
-    expect(
-      fieldGroupBodyGapVariants({ size: 'array', rhythm: 'comfortable', fieldSize: 'md' }),
-    ).toBe('mt-1.5')
   })
 
-  it('composes legend class names with header margin', () => {
+  it('composes legend class names with header margin for structural tiers', () => {
     expect(resolveFieldGroupLegendClassName({ size: 'section' })).toContain('mb-5')
     expect(resolveFieldGroupLegendClassName({ size: 'section' })).toContain(
       'text-style-field-legend',
@@ -153,12 +137,6 @@ describe('field group legend helpers', () => {
     expect(resolveFieldGroupLegendClassName({ size: 'subsection' })).toContain(
       'text-style-field-legend-sub',
     )
-    const arrayLegendClassName = resolveFieldGroupLegendClassName({
-      size: 'array',
-      fieldSize: 'md',
-    })
-    expect(arrayLegendClassName).toContain('text-style-field-label-md')
-    expect(arrayLegendClassName).toContain('mb-1.5')
   })
 })
 

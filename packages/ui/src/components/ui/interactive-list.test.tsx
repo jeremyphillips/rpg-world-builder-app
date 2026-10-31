@@ -1,3 +1,7 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
@@ -5,11 +9,22 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { Button } from './button.client'
 import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
-import { InteractiveListGroupHeading } from './interactive-list-group-heading.client'
+import { ListGroupHeading } from './list-group-heading.client'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListToolbar } from './interactive-list-toolbar.client'
 import { InteractiveListPanel } from './interactive-list-panel.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
+
+const interactiveListCssPath = join(dirname(fileURLToPath(import.meta.url)), 'interactive-list.css')
+
+describe('interactive-list.css row geometry', () => {
+  it('uses list-level density overrides and drops row size modifiers', () => {
+    const css = readFileSync(interactiveListCssPath, 'utf8')
+    expect(css).toContain('.ui-list--compact.ui-interactive-list .ui-interactive-list__main')
+    expect(css).toContain('.ui-list--spacious.ui-interactive-list .ui-interactive-list__main')
+    expect(css).not.toMatch(/\.ui-interactive-list__main--(?:sm|md|lg)\s*\{/)
+  })
+})
 
 describe('InteractiveListRow', () => {
   it('renders name, classification, and metadata', () => {
@@ -37,10 +52,16 @@ describe('InteractiveListRow', () => {
     expect(container.firstChild).not.toHaveClass('ui-interactive-row--rail')
   })
 
-  it('applies InteractiveListSize padding on the main hit area', () => {
-    const { container } = render(<InteractiveListRow name="Fireball" size="lg" />)
+  it('applies list-level density padding on the main hit area', () => {
+    const { container } = render(
+      <InteractiveList density="spacious" data-testid="list">
+        <InteractiveListRow name="Fireball" />
+      </InteractiveList>,
+    )
 
-    expect(container.querySelector('.ui-interactive-list__main--lg')).toBeInTheDocument()
+    expect(screen.getByTestId('list')).toHaveClass('ui-list', 'ui-list--spacious')
+    expect(container.querySelector('.ui-interactive-list__main--lg')).not.toBeInTheDocument()
+    expect(container.querySelector('.ui-interactive-list__main')).toBeInTheDocument()
   })
 
   it('injects identity into an asChild interactive root', async () => {
@@ -95,6 +116,10 @@ describe('InteractiveListPanel', () => {
     )
 
     expect(screen.getByRole('listbox', { name: 'Results' })).toBeInTheDocument()
+    expect(screen.getByRole('listbox', { name: 'Results' })).toHaveClass(
+      'ui-list',
+      'ui-list--compact',
+    )
   })
 })
 
@@ -137,9 +162,7 @@ describe('InteractiveList', () => {
   it('leaves only direct row children inside the list (headings belong outside)', () => {
     render(
       <>
-        <InteractiveListGroupHeading id="group" as="h2">
-          Section
-        </InteractiveListGroupHeading>
+        <ListGroupHeading id="group" as="h2" label="Section" />
         <InteractiveList data-testid="row-list">
           <InteractiveListRow name="A" />
           <InteractiveListRow name="B" />
@@ -163,13 +186,9 @@ describe('InteractiveList', () => {
   })
 })
 
-describe('InteractiveListGroupHeading', () => {
+describe('ListGroupHeading in list composition', () => {
   it('exposes host-owned heading id', () => {
-    render(
-      <InteractiveListGroupHeading id="content-group" as="h2">
-        Content · 14
-      </InteractiveListGroupHeading>,
-    )
+    render(<ListGroupHeading id="content-group" as="h2" label="Content" count={14} />)
 
     expect(screen.getByRole('heading', { name: 'Content · 14' })).toHaveAttribute(
       'id',

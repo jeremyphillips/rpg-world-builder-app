@@ -14,6 +14,7 @@ import {
   comboboxContentVariants,
   comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
+import { POPOVER_INTERACTIVE_LIST_DENSITY } from './list-density.lib'
 import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
@@ -25,10 +26,7 @@ import {
   resolveInputSelectOption,
   type InputSelectOption,
 } from './input-select-field.lib'
-import {
-  inputSelectSearchablePanelVariants,
-  inputSelectSearchableUnitShellWidthVariants,
-} from './input-select-field.variants'
+import { inputSelectSearchableUnitShellWidthVariants } from './input-select-field.variants'
 import { groupedSelectSegmentShellClasses } from './select-compact-trigger.variants'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import { type NumberInputDigits } from './number-input.client'
@@ -209,7 +207,7 @@ function SearchableUnitSelect({
           side="bottom"
           avoidCollisions
           sideOffset={-COMBOBOX_TRIGGER_OVERLAP_OFFSET[size]}
-          className={cn(comboboxContentVariants(), inputSelectSearchablePanelVariants())}
+          className={comboboxContentVariants()}
           onOpenAutoFocus={(event) => {
             event.preventDefault()
             searchInputRef.current?.focus()
@@ -226,7 +224,12 @@ function SearchableUnitSelect({
           />
 
           <InteractiveListViewport>
-            <InteractiveList id={listboxId} role="listbox" aria-label={label}>
+            <InteractiveList
+              density={POPOVER_INTERACTIVE_LIST_DENSITY}
+              id={listboxId}
+              role="listbox"
+              aria-label={label}
+            >
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => {
                   const isSelected = option.value === unit

@@ -18,6 +18,7 @@ import { useFormUiContext } from '../../context/form-ui.context'
 import { useFocusFirstArrayIssue } from './use-focus-first-array-issue.client'
 import { resolveArrayFieldRendererChrome } from './resolve-array-field-renderer-chrome.lib'
 import { resolveArrayRequiredMarker } from './array-field-empty-state.lib'
+import { resolveArrayShowSectionHeader } from './resolve-array-show-section-header.lib'
 import { useArrayFieldAppendControls } from './use-array-field-append-controls.client'
 import {
   resolveArrayAppendAvailability,
@@ -74,8 +75,10 @@ export function useArrayFieldRendererState({
     itemConfig,
     itemListClasses,
     itemBodyStackClasses,
-    legend,
-    headingHint,
+    itemLegend,
+    sectionLabel,
+    sectionHint,
+    labelMode,
     legendFieldSize,
     max,
     nested,
@@ -152,7 +155,7 @@ export function useArrayFieldRendererState({
       fullName,
       index,
       itemId: resolveFieldArrayRowKey(rhfField, config.keyName),
-      legend,
+      legend: itemLegend,
       itemBodyStackClasses,
       canRemove,
       showDefaultItemRemove,
@@ -176,7 +179,7 @@ export function useArrayFieldRendererState({
       fullName,
       idPrefix,
       itemBodyStackClasses,
-      legend,
+      sectionLabel,
       remove,
       reorderConfigured,
       toggleCollapse,
@@ -212,12 +215,21 @@ export function useArrayFieldRendererState({
     invalidRowCount,
     itemListClasses,
     itemProps,
-    legend,
-    headingHint,
+    sectionLabel,
+    sectionHint,
+    labelMode,
     legendFieldSize,
     nested,
     omitSectionBottomMargin,
-    showLegend: legend.trim().length > 0,
+    showSectionHeader: resolveArrayShowSectionHeader({
+      labelMode,
+      sectionHint,
+      addActionLayout,
+      hasAddAction: addAction !== null,
+      arrayIssueCount,
+      hasContainerIssue,
+      config,
+    }),
     sortableEnabled,
   }
 }

@@ -38,7 +38,7 @@ region separation (`--ui-surface-region-gap`); lists own spacing between distinc
 | spacious    | 6px     |
 
 Published on the same density selectors as copy scale (`ui-card--*`, `ui-alert--*`,
-`ui-destination-list--*`, `ui-identity-row--*`, `dash-entity-anatomy--*`, …). Comfortable is the `:root` default when
+`ui-list--*`, `ui-identity-row--*`, `dash-entity-anatomy--*`, …). Comfortable is the `:root` default when
 no density ancestor is present. Status uses this gap only — no separate offset.
 
 Embedded entity rows inside a `DestinationList` inherit row gap and copy vars from the list shell; they do not need `dash-entity-anatomy--*` unless overriding the list. Compact badge sizing, caption treatment, and `InlineMetadata` density still require an explicit anatomy `density` prop when those rules apply.
@@ -162,7 +162,7 @@ primitive that needs a new slot, variant, or override to fit is a different anat
 
 ## Heading accessories
 
-Density for identity copy is published on ancestors (`.ui-card--*`, `ui-destination-list--*`, `ui-identity-row--*`, `ui-content-card-heading--*`, `dash-entity-anatomy--*`) via [`copy-scale.css`](../src/components/ui/copy-scale.css). Anatomy titles use `ui-copy-title` (or equivalent shell rules) for **size and `--font-weight-heading` (600)** at every density — density does not switch titles to body-emphasis. Generic **`Card`** + `IdentityRowHeadingLine` inside `CardHeader` inherits title size from the card shell without `contentCardHeadingScaleClass`.
+Density for identity copy is published on ancestors (`.ui-card--*`, `ui-list--*`, `ui-identity-row--*`, `ui-content-card-heading--*`, `dash-entity-anatomy--*`) via [`copy-scale.css`](../src/components/ui/copy-scale.css). Anatomy titles use `ui-copy-title` (or equivalent shell rules) for **size and `--font-weight-heading` (600)** at every density — density does not switch titles to body-emphasis. Generic **`Card`** + `IdentityRowHeadingLine` inside `CardHeader` inherits title size from the card shell without `contentCardHeadingScaleClass`.
 
 | Card / identity density | Title copy | Title weight | Badge or `StatusIcon` beside the title line (`headingEnd`) |
 | ----------------------- | ---------: | ------------ | ---------------------------------------------------------- |

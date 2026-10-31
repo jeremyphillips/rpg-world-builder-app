@@ -47,6 +47,7 @@ export interface SelectFieldProps extends FieldValidationProps, FieldChromeProps
   defaultValue?: string
   onValueChange?: (value: string) => void
   onBlur?: () => void
+  onOpenChange?: (open: boolean) => void
   clearable?: boolean
   clearAccessibleName?: string
   onClear?: () => void
@@ -69,6 +70,7 @@ function buildSelectFieldControl(props: SelectFieldProps, resolvedPlaceholder: s
       clearAccessibleName={props.clearAccessibleName}
       onClear={props.onClear}
       onValueChange={props.onValueChange}
+      onOpenChange={props.onOpenChange}
       triggerConfig={{
         id: props.labelPosition === 'settings' ? props.id : undefined,
         size,

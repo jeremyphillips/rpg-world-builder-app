@@ -12,7 +12,7 @@ describe('array-field-empty-state.lib', () => {
       resolveArrayEmptyItemLabel({
         kind: 'array',
         name: 'movement',
-        legend: 'Movement',
+        label: 'Movement',
         fields: [],
         item: {
           header: {
@@ -32,7 +32,7 @@ describe('array-field-empty-state.lib', () => {
       resolveArrayRequiredMarker({
         kind: 'array',
         name: 'movement',
-        legend: 'Movement',
+        label: 'Movement',
         fields: [],
         min: 1,
       }),
@@ -41,7 +41,7 @@ describe('array-field-empty-state.lib', () => {
       resolveArrayRequiredMarker({
         kind: 'array',
         name: 'movement',
-        legend: 'Movement',
+        label: 'Movement',
         fields: [],
       }),
     ).toBe(false)

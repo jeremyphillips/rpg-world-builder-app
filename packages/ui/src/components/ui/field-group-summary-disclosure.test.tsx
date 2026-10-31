@@ -23,7 +23,6 @@ function SummaryDisclosureHarness({
       <FieldGroup
         id="access"
         legend="Campaign availability"
-        legendSize="array"
         formControl={form.control as unknown as Control<FieldValues>}
         disclosure={{
           variant: 'inline',
@@ -55,7 +54,6 @@ function StructuredStatusDisclosureHarness({
       <FieldGroup
         id="access-status"
         legend="Campaign availability"
-        legendSize="array"
         formControl={form.control as unknown as Control<FieldValues>}
         disclosure={{
           variant: 'inline',

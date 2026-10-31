@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
 import { useController, useFormState } from 'react-hook-form'
 
+import { normalizeRichTextHtml } from '../../../components/ui/rich-text-html'
+import type { RichTextFieldProps } from '../../../components/ui/rich-text-field'
 import { FieldReadOnlyValueField } from '../../../components/ui/field-read-only-value.client'
 import { OptionalFieldDisclosure } from '../../../components/ui/optional-field-disclosure.client'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
@@ -17,14 +19,32 @@ import { useFieldControlSize } from '../../context/form-section.context'
 import { resolveNestedFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import type {
   OptionalDisclosureConfig,
+  RichTextFieldConfig,
   SelectFieldConfig,
   TextareaFieldConfig,
   TextSuggestionsFieldConfig,
 } from '../../field-config'
+import { LazyFieldSuspense, lazyFieldComponent } from '../lazy-field.client'
 import { fieldDefaultValue, resolveFieldHintPresentation } from '../../field-config'
 import { useConfirmBeforeClear } from '../../config/use-confirm-before-clear.client'
 import { normalizedSelectFieldValue, pickSelectFieldChromeProps } from './select-field-renderer.lib'
 import { useSelectFieldRendererState } from './use-select-field-renderer-state.client'
+
+const LazyRichTextField = lazyFieldComponent<RichTextFieldProps>(
+  () => import('../../../components/ui/rich-text-field'),
+  'RichTextField',
+)
+
+function richTextHtml(value: unknown): string {
+  return normalizeRichTextHtml(typeof value === 'string' ? value : undefined)
+}
+
+function valueAtPath(source: unknown, path: string): unknown {
+  return path.split('.').reduce<unknown>((current, segment) => {
+    if (current == null || typeof current !== 'object') return undefined
+    return (current as Record<string, unknown>)[segment]
+  }, source)
+}
 
 type OptionalDisclosureTextareaRendererProps = {
   config: TextareaFieldConfig
@@ -295,6 +315,102 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
           onBlur={field.onBlur}
           {...validation}
         />
+      </OptionalFieldDisclosure>
+      {confirmDialog}
+    </>
+  )
+}
+
+type OptionalDisclosureRichTextRendererProps = {
+  config: RichTextFieldConfig
+  disclosure: OptionalDisclosureConfig
+  field: ControllerRenderProps
+  id: string
+  error?: string
+  invalid?: boolean
+  describedBy?: string
+  hint?: string
+  hintPosition?: FieldHintPosition
+}
+
+/** Collapses empty rich text. Clearing the editor does not close it; reset does. */
+export function OptionalDisclosureRichTextFieldRenderer({
+  config,
+  disclosure,
+  field,
+  id,
+  error,
+  invalid,
+  describedBy,
+  hint,
+  hintPosition,
+}: OptionalDisclosureRichTextRendererProps) {
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
+  const { value, onChange, onBlur, name } = field
+  const expandWhenPopulated = disclosure.expandWhenPopulated !== false
+  const [open, setOpen] = useState(() => expandWhenPopulated && richTextHtml(value).length > 0)
+  const { defaultValues } = useFormState({ name })
+  const defaultsRef = useRef<unknown>(undefined)
+
+  useEffect(() => {
+    if (defaultsRef.current === undefined && defaultValues !== undefined) {
+      defaultsRef.current = defaultValues
+      return
+    }
+    if (defaultsRef.current === defaultValues) return
+    defaultsRef.current = defaultValues
+    const next = richTextHtml(valueAtPath(defaultValues, name))
+    setOpen(expandWhenPopulated && next.length > 0)
+  }, [defaultValues, expandWhenPopulated, name])
+
+  const clearValue = () => {
+    onChange('')
+    setOpen(false)
+  }
+  const { attemptClear, confirmDialog } = useConfirmBeforeClear({
+    confirmBeforeClear: disclosure.confirmBeforeClear,
+    clearingFields: [config],
+    onClear: clearValue,
+  })
+
+  return (
+    <>
+      <OptionalFieldDisclosure
+        controlId={id}
+        fieldLabel={config.label}
+        addLabel={disclosure.addLabel}
+        removeLabel={disclosure.removeLabel}
+        open={open}
+        onOpenChange={setOpen}
+        onRemove={attemptClear}
+        size={controlSize}
+      >
+        <LazyFieldSuspense>
+          <LazyRichTextField
+            id={id}
+            {...pickFieldChromeProps(config)}
+            label={config.label}
+            labelVisibility="srOnly"
+            error={error}
+            invalid={invalid}
+            describedBy={describedBy}
+            hint={hint}
+            hintPosition={hintPosition}
+            info={config.info}
+            required={config.required}
+            width={config.width}
+            size={controlSize}
+            linkable={config.linkable}
+            codeBlocks={config.codeBlocks}
+            tables={config.tables}
+            internalLinkOptions={config.internalLinkOptions}
+            contentTypeOptions={config.contentTypeOptions}
+            disabled={config.disabled}
+            value={typeof value === 'string' ? value : ''}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+        </LazyFieldSuspense>
       </OptionalFieldDisclosure>
       {confirmDialog}
     </>

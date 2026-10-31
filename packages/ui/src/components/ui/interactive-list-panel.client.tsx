@@ -4,18 +4,16 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { comboboxContentVariants } from './combobox-field.variants'
-import {
-  InteractiveListGroupHeading,
-  type InteractiveListGroupHeadingProps,
-} from './interactive-list-group-heading.client'
+import { ListGroupHeading, type ListGroupHeadingProps } from './list-group-heading.client'
+import { POPOVER_INTERACTIVE_LIST_DENSITY, type ListDensity } from './list-density.lib'
 import { InteractiveList } from './interactive-list.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
 
 export type InteractiveListPanelProps = {
+  density?: ListDensity
   children: React.ReactNode
-  /** Visual group label — hosts own menu/listbox section semantics. */
-  groupHeading?: React.ReactNode
-  groupHeadingProps?: Omit<InteractiveListGroupHeadingProps, 'children'>
+  /** Section band above the scrollport — hosts own menu/listbox section semantics. */
+  listGroupHeading?: ListGroupHeadingProps
   listProps?: Omit<React.ComponentPropsWithRef<typeof InteractiveList>, 'children'>
   className?: string
   /** When set, wraps children in combobox-style panel width chrome (for popover content bodies). */
@@ -25,21 +23,19 @@ export type InteractiveListPanelProps = {
 /** Neutral scroll body — compositions set `listbox` or `menu` roles on the list. */
 export function InteractiveListPanel({
   children,
-  groupHeading,
-  groupHeadingProps,
+  density = POPOVER_INTERACTIVE_LIST_DENSITY,
+  listGroupHeading,
   listProps,
   className,
   panelWidth,
 }: InteractiveListPanelProps) {
   const list = (
     <>
-      {groupHeading != null ? (
-        <InteractiveListGroupHeading {...groupHeadingProps}>
-          {groupHeading}
-        </InteractiveListGroupHeading>
-      ) : null}
+      {listGroupHeading != null ? <ListGroupHeading {...listGroupHeading} /> : null}
       <InteractiveListViewport>
-        <InteractiveList {...listProps}>{children}</InteractiveList>
+        <InteractiveList density={density} {...listProps}>
+          {children}
+        </InteractiveList>
       </InteractiveListViewport>
     </>
   )

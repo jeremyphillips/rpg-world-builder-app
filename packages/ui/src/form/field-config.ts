@@ -64,14 +64,9 @@ import type {
 } from '../components/ui/field.variants'
 import type { FieldLayoutRecommendation } from '../components/ui/field-recommendation.types'
 import type { FormDensity } from './form-density'
-import type { FieldLabelVisibility, FormHeading, FormHeadingContent } from './form-heading.lib'
+import type { FieldLabelVisibility, FormHeading } from './form-heading.lib'
 
-export type {
-  FieldLabelVisibility,
-  FormHeading,
-  FormHeadingContent,
-  FormHeadingTier,
-} from './form-heading.lib'
+export type { FieldLabelVisibility, FormHeading, FormHeadingTier } from './form-heading.lib'
 export {
   DEFAULT_FORM_COLUMNS_COLLAPSE_ORDER,
   columnsNeedBreakpointReorder,
@@ -180,6 +175,12 @@ export type FieldReadOnlyContext = {
 /** Presentation overrides that swap an editable control for read-only chrome. */
 export type FieldPresentationConfig = {
   readOnlyWhen?: (context: FieldReadOnlyContext) => boolean
+  /**
+   * When present, a committed option label renders read-only with a Change
+   * action that reveals the select without unregistering the field. See
+   * `packages/ui/docs/forms/field-types.md` (Select change presentation).
+   */
+  change?: { label: string }
 }
 
 /**
@@ -618,7 +619,7 @@ export interface JsonFieldConfig extends BaseFieldConfig {
 
 export interface RichTextFieldConfig extends BaseFieldConfig {
   type: 'richtext'
-  // TODO(richtext): add optionalDisclosure when empty-HTML detection + header wiring land.
+  optionalDisclosure?: OptionalDisclosureConfig
   /** Opt in to the link toolbar button + extension (off by default). */
   linkable?: boolean
   /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
@@ -1523,7 +1524,7 @@ export type ArrayCanAppendResult = {
  * defineArrayField({
  *   kind: 'array',
  *   name: 'traits',
- *   legend: 'Traits',
+ *   label: 'Traits',
  *   addAction: { label: 'Add trait' },
  *   item: {
  *     header: { fallback: (i) => `Trait ${i + 1}`, primaryField: 'name' },
@@ -1531,13 +1532,9 @@ export type ArrayCanAppendResult = {
  *   fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
  * })
  */
-export interface ArrayConfig {
+interface ArrayConfigCore {
   kind: 'array'
   name: string
-  /** Preferred heading API — typography derives from nesting depth and density. */
-  heading?: FormHeadingContent
-  /** Required when `heading.label` is omitted — see `resolveArrayHeading`. */
-  legend?: string
   /**
    * Section density for this array subtree. Defaults to `compact` when omitted.
    */
@@ -1568,6 +1565,22 @@ export interface ArrayConfig {
   fieldChrome?: FieldChrome
   errorPlacement?: 'auto' | 'field' | 'row'
 }
+
+/** Anonymous repeatable list — omit `label`, `hint`, and `labelVisibility`. */
+type AnonymousArrayConfig = ArrayConfigCore & {
+  label?: never
+  hint?: never
+  labelVisibility?: never
+}
+
+/** Named repeatable list — `hint` and `labelVisibility` require a non-whitespace `label`. */
+type NamedArrayConfig = ArrayConfigCore & {
+  label: string
+  hint?: string | FieldHintConfig
+  labelVisibility?: FieldLabelVisibility
+}
+
+export type ArrayConfig = AnonymousArrayConfig | NamedArrayConfig
 
 /**
  * Custom field region rendered inside `FormProvider`. The slot `name` aligns with
@@ -2160,4 +2173,14 @@ export function resolveSelectFieldDisplayLabel(
   }
   if (options.length === 1) return options[0]?.label
   return normalized
+}
+
+/** Option label for a stored value; omits raw ids when no option matches (Change mode). */
+export function resolveSelectFieldOptionLabel(
+  value: unknown,
+  options: FieldOption[],
+): string | undefined {
+  const normalized = value != null && value !== '' ? String(value) : undefined
+  if (!normalized) return undefined
+  return options.find((option) => option.value === normalized)?.label
 }

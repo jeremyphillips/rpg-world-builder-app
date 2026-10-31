@@ -6,7 +6,13 @@ import {
   type MediaAsset,
   type MediaScope,
 } from '@rpg/contracts'
-import { CollectionAddControl, MediaFieldSummary, resolveExpandedCapacityHint } from '@rpg/ui'
+import {
+  CollectionAddControl,
+  MediaFieldSummary,
+  cn,
+  fieldAnatomyStackVariants,
+  resolveExpandedCapacityHint,
+} from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 
 import { buildMediaFieldSummaryModel } from '../lib/build-media-field-summary-model'
@@ -70,7 +76,11 @@ export function ManagedMediaField({
   return (
     <>
       {isExpanded ? (
-        <div className="space-y-3" role="group" aria-labelledby={headingId}>
+        <div
+          className={cn('min-w-0', fieldAnatomyStackVariants({ size }))}
+          role="group"
+          aria-labelledby={headingId}
+        >
           <ArrayLikeSectionHeader
             wrapper="none"
             id={headingId}

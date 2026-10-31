@@ -527,7 +527,7 @@ export function RequirementEditor({
         <Text variant="lead">{preview}</Text>
       </div>
 
-      <FieldGroup legend={CONDITION_SETS_HEADING} legendSize="array" size={size} rhythm={rhythm}>
+      <FieldGroup legend={CONDITION_SETS_HEADING} headingScale="field" size={size} rhythm={rhythm}>
         {fields.length === 0 ? (
           <Text variant="supporting">{EMPTY_CONDITION_SETS_HINT}</Text>
         ) : (

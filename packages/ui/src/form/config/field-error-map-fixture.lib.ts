@@ -55,14 +55,14 @@ export const GOLDEN_PATH_FIELDS: FormItem[] = [
   {
     kind: 'array',
     name: 'grants',
-    legend: 'Grants',
+    label: 'Grants',
     item: { header: { fallback: (index) => `Grant #${index + 1}` } },
     fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
   },
   {
     kind: 'array',
     name: 'tiers',
-    legend: 'Wealth tiers',
+    label: 'Wealth tiers',
     fields: [{ type: 'text', name: 'label', label: 'Tier label', required: true }],
   },
 ]

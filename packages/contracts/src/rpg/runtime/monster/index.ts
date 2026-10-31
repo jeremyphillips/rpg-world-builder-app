@@ -1,6 +1,7 @@
 export * from './derived-field'
 export * from './armor-class'
 export * from './stat-block'
+export * from './resolve-monster-action-attack-profile'
 export * from './reaction-trigger'
 export * from './spell-entry-presentation'
 export * from './challenge-metadata'

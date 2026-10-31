@@ -14,10 +14,10 @@ Import from `@rpg/contracts/primitives`.
 
 - `<InlineMetadata role="…" density="…">` with required `<InlineMetadata.Item>` children.
 - `role`: `heading` (foreground) or `supporting` (`text-muted-foreground`).
-- `density`: `compact` or `comfortable` (separator spacing).
-- `wrap`: default `true` for supporting (inline flow, no line-leading separators); `false` for nowrap flex rows (title + fixed tail).
+- `density`: `compact` or `comfortable` (nowrap separator horizontal margin only).
+- `wrap`: default `true` for supporting (inline flow, nbsp glue around `·`); `false` for nowrap flex rows (`mx-*` on the separator — no extra ASCII padding).
 
-Host components own font size, weight, and line-height; `InlineMetadata` only sets role tone and separator layout.
+Host components own font size, weight, and line-height; `InlineMetadata` only sets role tone and separator layout. Each separator mode uses one spacing mechanism (margin when `wrap={false}`, nbsp glue when `wrap`).
 
 ## String vs JSX
 

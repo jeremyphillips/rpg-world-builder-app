@@ -1,6 +1,14 @@
 import { useId, useMemo, useState } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
-import { ActionButton, Button, ConfirmDialog, Panel, TextField } from '@rpg/ui'
+import {
+  ActionButton,
+  Button,
+  ConfirmDialog,
+  Panel,
+  TextField,
+  cn,
+  fieldAnatomyStackVariants,
+} from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 import type { SlotProgression } from '@rpg/contracts'
 
@@ -147,7 +155,10 @@ export function SlotProgressionsField() {
 
   return (
     <>
-      <section className="space-y-3" aria-labelledby="slot-progressions-heading">
+      <section
+        className={cn('min-w-0', fieldAnatomyStackVariants({ size }))}
+        aria-labelledby="slot-progressions-heading"
+      >
         <ArrayLikeSectionHeader
           id="slot-progressions-heading"
           label="Slot progressions"

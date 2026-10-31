@@ -4,6 +4,11 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { detailOverflowDeleteAction } from '../detail-overflow-actions'
 import { DetailOverflowMenu } from '../detail-overflow-menu'
+import {
+  MONSTER_BONUS_ACTIONS_HEADING,
+  MONSTER_MOVE_TO_LABEL,
+  MONSTER_REACTIONS_HEADING,
+} from '@/features/content/monsters/lib/monster-form-labels'
 
 describe('DetailOverflowMenu', () => {
   it('returns null when actions are empty', () => {
@@ -43,6 +48,40 @@ describe('DetailOverflowMenu', () => {
     await user.click(screen.getByRole('button', { name: 'Actions' }))
     expect(screen.getByRole('menuitem', { name: 'Delete trait' })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: 'Delete trait' }).querySelector('svg')).toBeTruthy()
+  })
+
+  it('renders a flat labeled group of destinations', async () => {
+    const user = userEvent.setup()
+    const onBonus = vi.fn()
+
+    render(
+      <DetailOverflowMenu
+        actions={[
+          {
+            id: 'move-to',
+            label: MONSTER_MOVE_TO_LABEL,
+            items: [
+              { id: 'bonus', label: MONSTER_BONUS_ACTIONS_HEADING, onSelect: onBonus },
+              { id: 'reactions', label: MONSTER_REACTIONS_HEADING, onSelect: vi.fn() },
+            ],
+          },
+          {
+            id: 'delete',
+            label: 'Delete action',
+            destructive: true,
+            separatorBefore: true,
+            onSelect: vi.fn(),
+          },
+        ]}
+        triggerLabel="Actions for Bite"
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Actions for Bite' }))
+    expect(screen.getByText(MONSTER_MOVE_TO_LABEL)).toBeInTheDocument()
+    expect(screen.queryByRole('menu', { name: MONSTER_MOVE_TO_LABEL })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('menuitem', { name: MONSTER_BONUS_ACTIONS_HEADING }))
+    expect(onBonus).toHaveBeenCalledOnce()
   })
 
   it('applies destructive styling to destructive menu items', async () => {

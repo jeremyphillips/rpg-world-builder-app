@@ -9,7 +9,6 @@ import { Field, type FieldSize } from './field.client'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import { UI_FIELD_CONTROL_TRIGGER_FILL_CLASS } from './field-control.styles'
 import { selectTriggerShellClasses } from './select-compact-trigger.variants'
-import { resolveInteractiveListSizeForFieldSize } from './field-sizing.variants'
 import { ComboboxOptionRow } from './combobox-option-row.client'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
@@ -25,7 +24,6 @@ import {
   comboboxSelectedItemsRowVariants,
   comboboxSelectedListVariants,
   comboboxContentVariants,
-  comboboxSearchRowVariants,
   comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
 import { InteractiveListEmpty } from './interactive-list.client'
@@ -163,7 +161,6 @@ function ComboboxOptionItem({
   onHighlight,
   onSelect,
 }: ComboboxOptionItemProps) {
-  const rowSize = resolveInteractiveListSizeForFieldSize(size)
   const selectionEndSlot = comboboxOptionEndSlot(
     option,
     multiple,
@@ -184,7 +181,6 @@ function ComboboxOptionItem({
         highlighted={isHighlighted}
         selected={isSelected}
         disabled={isDisabled}
-        size={rowSize}
         ariaLabel={option.label}
         renderContent={
           selectionEndSlot ? (
@@ -208,7 +204,6 @@ function ComboboxOptionItem({
       highlighted={isHighlighted}
       selected={isSelected}
       disabled={isDisabled}
-      size={rowSize}
       heading={option.label}
       classification={option.classification}
       supporting={option.metadata}
@@ -248,21 +243,19 @@ export function ComboboxSearchField({
   return (
     <InteractiveListToolbar
       search={
-        <div className={comboboxSearchRowVariants({ size })}>
-          <SearchBar
-            appearance="embedded"
-            id={searchId}
-            value={query}
-            onValueChange={onQueryChange}
-            onKeyDown={onSearchKeyDown}
-            placeholder={searchPlaceholder}
-            ariaLabel={searchPlaceholder}
-            size={size}
-            inputRef={searchInputRef}
-            aria-controls={listboxId}
-            aria-activedescendant={activeOptionId}
-          />
-        </div>
+        <SearchBar
+          appearance="embedded"
+          id={searchId}
+          value={query}
+          onValueChange={onQueryChange}
+          onKeyDown={onSearchKeyDown}
+          placeholder={searchPlaceholder}
+          ariaLabel={searchPlaceholder}
+          size={size}
+          inputRef={searchInputRef}
+          aria-controls={listboxId}
+          aria-activedescendant={activeOptionId}
+        />
       }
       filter={filter}
     />

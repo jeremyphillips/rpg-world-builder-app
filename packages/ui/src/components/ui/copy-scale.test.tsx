@@ -136,7 +136,7 @@ describe('canonical copy scale', () => {
   it('inherits the surface density and lets an explicit child density override it', () => {
     installTokens()
     render(
-      <div className="ui-destination-list ui-destination-list--compact">
+      <div className="ui-list ui-list--compact ui-destination-list">
         <span className="ui-copy-title" data-testid="inherited">
           Inherited
         </span>
@@ -218,31 +218,31 @@ describe('canonical copy scale', () => {
     expect(resolvedClassificationLineHeight('root-class')).toBe('20px')
   })
 
-  it('maps interactive list size onto the same ladder', () => {
+  it('maps list density onto the same ladder', () => {
     installTokens()
     render(
       <>
-        <div className="ui-interactive-list__main--sm">
-          <span className="ui-copy-title" data-testid="sm">
-            Small
+        <div className="ui-list ui-list--compact ui-interactive-list">
+          <span className="ui-copy-title" data-testid="compact">
+            Compact
           </span>
         </div>
-        <div className="ui-interactive-list__main--md">
-          <span className="ui-copy-title" data-testid="md">
-            Medium
+        <div className="ui-list ui-list--comfortable ui-interactive-list">
+          <span className="ui-copy-title" data-testid="comfortable">
+            Comfortable
           </span>
         </div>
-        <div className="ui-interactive-list__main--lg">
-          <span className="ui-copy-title" data-testid="lg">
-            Large
+        <div className="ui-list ui-list--spacious ui-interactive-list">
+          <span className="ui-copy-title" data-testid="spacious">
+            Spacious
           </span>
         </div>
       </>,
     )
 
-    expect(resolvedCopySize('sm', '--ui-copy-title-size')).toBe('14px')
-    expect(resolvedCopySize('md', '--ui-copy-title-size')).toBe('16px')
-    expect(resolvedCopySize('lg', '--ui-copy-title-size')).toBe('19px')
+    expect(resolvedCopySize('compact', '--ui-copy-title-size')).toBe('14px')
+    expect(resolvedCopySize('comfortable', '--ui-copy-title-size')).toBe('16px')
+    expect(resolvedCopySize('spacious', '--ui-copy-title-size')).toBe('19px')
   })
 
   it('publishes anatomy row gap 2 / 4 / 6px by density', () => {
@@ -294,7 +294,7 @@ describe('canonical copy scale', () => {
   it('lets a nested density override anatomy row gap', () => {
     installTokens()
     render(
-      <div className="ui-destination-list ui-destination-list--compact">
+      <div className="ui-list ui-list--compact ui-destination-list">
         <div className="dash-entity-anatomy dash-entity-anatomy--spacious">
           <span data-testid="nested-gap">x</span>
         </div>
@@ -302,6 +302,11 @@ describe('canonical copy scale', () => {
     )
 
     expect(resolvedAnatomyRowGap('nested-gap')).toBe('6px')
+  })
+
+  it('does not ship removed density class names in list CSS', () => {
+    expect(copyScaleCss).not.toMatch(/ui-destination-list--(?:compact|comfortable|spacious)/)
+    expect(copyScaleCss).not.toMatch(/ui-interactive-list__main--(?:sm|md|lg)/)
   })
 
   it('applies heading weight on ui-copy-title via copy-scale.css', () => {

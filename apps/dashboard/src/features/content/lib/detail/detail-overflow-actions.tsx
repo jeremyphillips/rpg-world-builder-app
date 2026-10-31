@@ -12,6 +12,21 @@ export type DetailOverflowAction = {
   onSelect: () => void
 }
 
+/** Flat labeled group. Destinations stay in the same menu, not a submenu. */
+export type DetailOverflowActionGroup = {
+  id: string
+  label: string
+  items: readonly DetailOverflowAction[]
+}
+
+export type DetailOverflowMenuEntry = DetailOverflowAction | DetailOverflowActionGroup
+
+export function isDetailOverflowActionGroup(
+  entry: DetailOverflowMenuEntry,
+): entry is DetailOverflowActionGroup {
+  return 'items' in entry
+}
+
 const OVERFLOW_MENU_ICON_STEP = 'md' as const
 
 /** Standard destructive delete action with trash icon for detail overflow menus. */

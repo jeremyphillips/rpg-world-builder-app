@@ -85,7 +85,7 @@ describe('GlobalSearchGroupSection', () => {
     const list = container.querySelector('.ui-destination-list--embedded')
     const row = rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))
 
-    expect(heading).toHaveClass('ui-interactive-list__heading--first', 'bg-surface-faint')
+    expect(heading).toHaveClass('ui-list-group-heading--first')
     expect(list).toBeInTheDocument()
     expect(row).toHaveClass('ui-destination-item__link', 'ui-interactive-row--hover')
   })
@@ -127,7 +127,7 @@ describe('GlobalSearchGroupSection', () => {
     renderSection(sections[1]!, 1, sections)
     const heading = groupHeading('Content', 14)
 
-    expect(heading).toHaveClass('ui-interactive-list__heading--follows-complete')
+    expect(heading).toHaveClass('ui-list-group-heading--follows-complete')
   })
 
   it('omits a top border when following a truncated group', () => {
@@ -147,7 +147,7 @@ describe('GlobalSearchGroupSection', () => {
     renderSection(sections[1]!, 1, sections)
     const heading = groupHeading('Game terms', 1)
 
-    expect(heading.className).not.toContain('ui-interactive-list__heading--follows-complete')
+    expect(heading.className).not.toContain('ui-list-group-heading--follows-complete')
   })
 
   itAxe('has no axe accessibility violations', async () => {
