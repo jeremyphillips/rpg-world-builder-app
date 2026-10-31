@@ -26,6 +26,9 @@ describe('master-detail layout variants', () => {
 
   it('caps the list shell with shared viewport utilities without restating raw lengths', () => {
     expect(masterDetailListShellClasses).toContain('master-detail-list-shell-viewport-cap')
+    expect(masterDetailListShellClasses).toContain('w-full')
+    expect(masterDetailListShellClasses).toContain('min-w-0')
+    expect(masterDetailListShellClasses).not.toContain('self-start')
     expect(masterDetailListShellClasses).toContain('sticky')
     expect(masterDetailListShellClasses).toContain(
       'top-[var(--rpg-form-sticky-tabs-block-size,0px)]',

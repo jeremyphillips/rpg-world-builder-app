@@ -50,6 +50,13 @@ describe('MasterDetailListPanel', () => {
     vi.mocked(HTMLElement.prototype.scrollIntoView as typeof vi.fn).mockClear()
   })
 
+  it('renders the list title at card heading scale (text-lg) independent of panel density', () => {
+    render(<MasterDetailListPanel {...baseProps()} />)
+
+    expect(screen.getByText('Features')).toHaveClass('heading-style-card')
+    expect(screen.getByText('Features')).not.toHaveClass('heading-style-section')
+  })
+
   it('renders addControl in place of the default add button', () => {
     render(
       <MasterDetailListPanel

@@ -138,7 +138,7 @@ export function MasterDetailListPanel({
   return (
     <nav aria-label={ariaLabel} className={masterDetailListShellClasses}>
       <div className="flex shrink-0 items-center justify-between gap-3 border-b ui-border--subtle px-3 py-2.5">
-        <Heading as="div" variant="section" className="min-w-0">
+        <Heading as="div" variant="card" className="min-w-0">
           {listTitle}
         </Heading>
         {addControl ?? (
