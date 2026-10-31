@@ -44,6 +44,7 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 | —    | Tests     | `content-form-test-registry.ts` import when form def exists                                                                                               |
 | 10b  | Dashboard | `factories/<type>.ts` + `CONTENT_TEST_FACTORY_REGISTRY` entry (synthetic `makeX`; catalog via `pickX`)                                                    |
 | —    | Gates     | All [layer drift tests](#drift-test-map) green                                                                                                            |
+| —    | Contracts | A field that stores a catalog reference uses `collectCatalogReferenceIssues` with a host edge whose resolver defines the key (content id or slug). Do not add a local issue-code entry for these kinds. Registration is not mechanically guaranteed. |
 
 ---
 

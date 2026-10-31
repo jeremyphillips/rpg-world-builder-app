@@ -1,6 +1,11 @@
 import type { ContentValidationIntent } from '../lib/content-validation-intent'
 import type { ContentValidationIssue } from '../lib/content-validation-issue'
-import { isContentCampaignEligible, isContentReferenceable } from '../lib/content-resolution-policy'
+import {
+  CATALOG_REFERENCE_ISSUE_CODE,
+  collectCatalogReferenceIssues,
+  monsterEquipmentEdge,
+  monsterSkillProficienciesEdge,
+} from '../lib/catalog-reference-issues'
 import type { Equipment, EquipmentInstance } from '../equipment'
 import { isArmorEquipment, isWeaponEquipment } from '../equipment'
 import {
@@ -19,17 +24,17 @@ import {
 import { collectSpellReferenceIssues } from '../spell/spell-reference'
 import { MONSTER_ACTION_SECTIONS } from './action-sections'
 export const MONSTER_CATALOG_ISSUE_CODE = {
-  unknownEquipment: 'unknown_equipment',
+  unknownEquipment: CATALOG_REFERENCE_ISSUE_CODE.equipment.unknown,
   weaponActionNotWeapon: 'weapon_action_not_weapon',
   armorClassModifierNotArmor: 'armor_class_modifier_not_armor',
   multipleOwnedBodyArmor: 'multiple_owned_body_armor',
   multipleOwnedShield: 'multiple_owned_shield',
   armorSlotQuantity: 'armor_slot_quantity',
-  equipmentCatalogUnavailable: 'equipment_catalog_unavailable',
-  unknownSkill: 'unknown_skill',
-  skillNotReferenceable: 'skill_not_referenceable',
-  skillNotCampaignEligible: 'skill_not_campaign_eligible',
-  skillCatalogUnavailable: 'skill_catalog_unavailable',
+  equipmentCatalogUnavailable: CATALOG_REFERENCE_ISSUE_CODE.equipment.catalogUnavailable,
+  unknownSkill: CATALOG_REFERENCE_ISSUE_CODE.skill.unknown,
+  skillNotReferenceable: CATALOG_REFERENCE_ISSUE_CODE.skill.notReferenceable,
+  skillNotCampaignEligible: CATALOG_REFERENCE_ISSUE_CODE.skill.notCampaignEligible,
+  skillCatalogUnavailable: CATALOG_REFERENCE_ISSUE_CODE.skill.catalogUnavailable,
   spellCastingTimeIncompatible: 'spell_casting_time_incompatible',
   spellCastLevelTooLow: 'spell_cast_level_too_low',
 } as const
@@ -93,17 +98,21 @@ function collectEquipmentRowIssues(
   intent: ContentValidationIntent,
 ): void {
   if (!entry.equipmentId) return
-  const item = catalogs.equipmentById.get(entry.equipmentId)
-  if (!item) {
-    issues.push(
-      issue(
-        `equipment.${index}.equipmentId`,
-        'Unknown equipment.',
-        MONSTER_CATALOG_ISSUE_CODE.unknownEquipment,
-      ),
-    )
+  const referenceIssues = collectCatalogReferenceIssues({
+    policy: monsterEquipmentEdge.policy,
+    intent,
+    catalogStatus: 'ready',
+    refs: [{ path: `equipment.${index}.equipmentId`, key: entry.equipmentId }],
+    resolve: (key) => catalogs.equipmentById.get(key),
+    unavailablePlacement: monsterEquipmentEdge.unavailablePlacement,
+    messages: monsterEquipmentEdge.messages,
+  })
+  if (referenceIssues.length > 0) {
+    issues.push(...referenceIssues)
     return
   }
+  const item = catalogs.equipmentById.get(entry.equipmentId)
+  if (!item) return
   const normalized = normalizeEquipmentInstance(entry as EquipmentInstance)
   const hasAcEffect = (normalized.adjustments ?? []).some(
     (effect) => effect.target === 'armor_class',
@@ -198,51 +207,22 @@ function collectSkillIssues(
   body: MonsterCatalogIssueBody,
   catalogs: MonsterCatalogs,
   issues: ContentValidationIssue[],
+  intent: ContentValidationIntent,
 ): void {
-  if (catalogStatus(catalogs.skillCatalog) === 'unavailable') {
-    issues.push(
-      issue(
-        'proficiencies.skills',
-        'Skills could not be loaded. Try again before publishing.',
-        MONSTER_CATALOG_ISSUE_CODE.skillCatalogUnavailable,
-      ),
-    )
-    return
-  }
-
-  for (const [index, row] of (body.proficiencies?.skills ?? []).entries()) {
-    if (!row.skill) continue
-    const skill = catalogs.skillBySlug.get(row.skill)
-    if (!skill) {
-      issues.push(
-        issue(
-          `proficiencies.skills.${index}.skill`,
-          'Unknown skill.',
-          MONSTER_CATALOG_ISSUE_CODE.unknownSkill,
-        ),
-      )
-      continue
-    }
-    if (!isContentReferenceable(skill)) {
-      issues.push(
-        issue(
-          `proficiencies.skills.${index}.skill`,
-          'Publish this skill before using it on a monster.',
-          MONSTER_CATALOG_ISSUE_CODE.skillNotReferenceable,
-        ),
-      )
-      continue
-    }
-    if (!isContentCampaignEligible(skill)) {
-      issues.push(
-        issue(
-          `proficiencies.skills.${index}.skill`,
-          'This skill is not available in this campaign.',
-          MONSTER_CATALOG_ISSUE_CODE.skillNotCampaignEligible,
-        ),
-      )
-    }
-  }
+  const refs = (body.proficiencies?.skills ?? []).flatMap((row, index) =>
+    row.skill ? [{ path: `proficiencies.skills.${index}.skill`, key: row.skill }] : [],
+  )
+  issues.push(
+    ...collectCatalogReferenceIssues({
+      policy: monsterSkillProficienciesEdge.policy,
+      intent,
+      catalogStatus: catalogStatus(catalogs.skillCatalog),
+      refs,
+      resolve: (key) => catalogs.skillBySlug.get(key),
+      unavailablePlacement: monsterSkillProficienciesEdge.unavailablePlacement,
+      messages: monsterSkillProficienciesEdge.messages,
+    }),
+  )
 }
 
 function spellActionReferences(
@@ -343,11 +323,15 @@ export function collectMonsterCatalogIssues(
 
   if (intent === 'publish' && !equipmentReady) {
     issues.push(
-      issue(
-        'equipment',
-        'Equipment could not be loaded. Try again before publishing.',
-        MONSTER_CATALOG_ISSUE_CODE.equipmentCatalogUnavailable,
-      ),
+      ...collectCatalogReferenceIssues({
+        policy: monsterEquipmentEdge.policy,
+        intent,
+        catalogStatus: 'unavailable',
+        refs: [],
+        resolve: (key) => catalogs.equipmentById.get(key),
+        unavailablePlacement: monsterEquipmentEdge.unavailablePlacement,
+        messages: monsterEquipmentEdge.messages,
+      }),
     )
   }
 
@@ -360,7 +344,7 @@ export function collectMonsterCatalogIssues(
   }
 
   if (intent === 'publish') {
-    collectSkillIssues(body, catalogs, issues)
+    collectSkillIssues(body, catalogs, issues, intent)
   }
   collectSpellActionIssues(body, catalogs, issues, intent)
 

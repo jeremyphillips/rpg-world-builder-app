@@ -54,7 +54,6 @@ export {
   referenceArmorComboboxFieldOptions,
   referenceClassFieldOptions,
   referenceEquipmentFieldOptions,
-  referenceMagicItemBaseEquipmentFieldOptions,
   referenceSkillFieldOptions,
   referenceSpellcastingClassFieldOptions,
   referenceSpellFieldOptions,

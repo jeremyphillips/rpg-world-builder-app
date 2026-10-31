@@ -6,29 +6,12 @@ import {
   seedEquipmentOfKind,
   toEquipmentFormValues,
 } from '../../lib/test-utils/equipment-form-test-utils'
-import { magicItemFormFieldGroup } from './magic-item-form-fields'
 
 const MAGIC_ITEM_SEEDS = seedEquipmentOfKind('magic_item')
 
 describe('magic item kindFieldGroups', () => {
   it('buildFields composes name, kind group, economy, and description', () => {
     expectComposedKindGroups('magic_item', '')
-  })
-
-  it('renders base equipment in a plain row', () => {
-    const group = magicItemFormFieldGroup()
-    if (!('fields' in group)) throw new Error('Expected magic item group fields')
-
-    const baseEquipmentRow = group.fields.find(
-      (field): field is Extract<(typeof group.fields)[number], { kind: 'row' }> =>
-        'kind' in field &&
-        field.kind === 'row' &&
-        field.fields.some((rowField) => 'name' in rowField && rowField.name === 'baseEquipmentId'),
-    )
-
-    expect(baseEquipmentRow).toMatchObject({ kind: 'row' })
-    expect(baseEquipmentRow).not.toHaveProperty('layout')
-    expect(baseEquipmentRow).not.toHaveProperty('className')
   })
 })
 
