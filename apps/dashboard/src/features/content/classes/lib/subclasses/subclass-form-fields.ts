@@ -9,6 +9,8 @@ import {
   subclassFeatureRowFormSchema,
   type SubclassFeatureRowForm,
 } from '../class-feature-form-fields'
+import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../class-feature-form-labels'
+import { vocabularyFieldLabel } from '@/features/vocabulary'
 
 export const subclassFormSchema = z.object({
   name: z.string().min(1),
@@ -43,7 +45,7 @@ export function buildSubclassFields(
     {
       kind: 'array',
       name: 'features',
-      label: 'Features',
+      label: vocabularyFieldLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN, { plural: true }),
       addAction: { label: 'Add feature' },
       item: {
         collapsible: true,

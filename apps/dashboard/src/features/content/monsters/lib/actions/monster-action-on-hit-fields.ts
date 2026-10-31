@@ -3,13 +3,19 @@ import {
   REST_KINDS,
   SPELL_COMPONENT_ENTRIES,
   SPELL_COMPONENT_IDS,
+  PROFICIENCY_BONUS_TERM,
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
 import { rollValueFields } from '../../../lib/forms/mechanics/roll-value-fields'
-import { MONSTER_ON_HIT_HINT, MONSTER_ON_HIT_LEGEND } from '../monster-form-labels'
+import { vocabularyFieldLabel } from '@/features/vocabulary'
+import {
+  MONSTER_ACTION_DAMAGE_FIELD_LABEL,
+  MONSTER_ON_HIT_HINT,
+  MONSTER_ON_HIT_LEGEND,
+} from '../monster-form-labels'
 
 function limitVisibility(kind: 'uses' | 'recharge') {
   return {
@@ -51,7 +57,7 @@ export function monsterActionLimitedUseFields(): FormItem[] {
       placeholder: 'Choose',
       options: [
         { value: 'fixed', label: 'Fixed number' },
-        { value: 'proficiency-bonus', label: 'Proficiency bonus' },
+        { value: 'proficiency-bonus', label: vocabularyFieldLabel(PROFICIENCY_BONUS_TERM) },
       ],
       visibility: uses,
     },
@@ -83,7 +89,11 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
     item: { header: { fallback: (index) => `Damage ${index + 1}` } },
     fields: [
       damageTypeField({ name: 'damageType', ctx, required: true }),
-      ...rollValueFields({ namePrefix: 'roll', label: 'Damage', required: true }),
+      ...rollValueFields({
+        namePrefix: 'roll',
+        label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
+        required: true,
+      }),
     ],
   }
 }

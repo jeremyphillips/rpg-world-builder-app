@@ -5,6 +5,7 @@ import {
   CHALLENGE_RATING_TERM,
   CREATURE_ARMOR_CLASS_KIND_TERM,
   getActionEconomyLabel,
+  getSpellAtomicEffectKindLabel,
   getArmorCategoryLabel,
   getArmorCategorySentenceForm,
   getAverageHitPointsLabel,
@@ -38,6 +39,8 @@ import {
   getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
 import { vocabularyFieldLabel } from '@/features/vocabulary'
+
+import type { MonsterActionSection } from './actions/monster-action-equipment-references'
 
 const armorClassLabel = CREATURE_ARMOR_CLASS_KIND_TERM.label
 
@@ -106,10 +109,13 @@ export const MONSTER_ON_HIT_LEGEND = 'On hit'
 export const MONSTER_ON_HIT_HINT =
   'Additional damage dealt when this attack hits, beyond its primary damage.'
 export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
+/** Stat-block preview row — not action-economy {@link getActionEconomyLabel} “Action”. */
 export const MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL = 'Attack'
-export const MONSTER_ACTION_ATTACK_PREVIEW_DAMAGE_LABEL = 'Damage'
+export const MONSTER_ACTION_DAMAGE_FIELD_LABEL = getSpellAtomicEffectKindLabel('damage')
+export const MONSTER_ACTION_ATTACK_PREVIEW_DAMAGE_LABEL = MONSTER_ACTION_DAMAGE_FIELD_LABEL
 export const MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL = 'Extra'
-export const MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL = 'Reach'
+export const MONSTER_ACTION_REACH_FIELD_LABEL = 'Reach'
+export const MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL = MONSTER_ACTION_REACH_FIELD_LABEL
 export const MONSTER_ACTION_ATTACK_PREVIEW_RANGE_LABEL = 'Range'
 export const MONSTER_ACTION_ATTACK_PREVIEW_PROPERTIES_LABEL = 'Properties'
 export const MONSTER_DAMAGE_TYPE_CHANGE_LABEL = 'Change'
@@ -165,6 +171,17 @@ export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
 export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
 export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')
 export const MONSTER_REACTIONS_HEADING = actionEconomySectionHeading('reaction')
+
+const MONSTER_ACTION_SECTION_HEADINGS = {
+  actions: MONSTER_ACTIONS_HEADING,
+  bonusActions: MONSTER_BONUS_ACTIONS_HEADING,
+  reactions: MONSTER_REACTIONS_HEADING,
+} as const satisfies Record<MonsterActionSection, string>
+
+export function monsterActionSectionHeading(section: MonsterActionSection): string {
+  return MONSTER_ACTION_SECTION_HEADINGS[section]
+}
+
 export const MONSTER_ADD_LABEL = 'Add'
 
 function monsterArmorSlotMidSentenceNoun(slot: CreatureArmorSlot): string {

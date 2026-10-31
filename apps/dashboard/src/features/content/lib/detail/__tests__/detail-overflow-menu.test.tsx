@@ -4,6 +4,11 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { detailOverflowDeleteAction } from '../detail-overflow-actions'
 import { DetailOverflowMenu } from '../detail-overflow-menu'
+import {
+  MONSTER_BONUS_ACTIONS_HEADING,
+  MONSTER_MOVE_TO_LABEL,
+  MONSTER_REACTIONS_HEADING,
+} from '@/features/content/monsters/lib/monster-form-labels'
 
 describe('DetailOverflowMenu', () => {
   it('returns null when actions are empty', () => {
@@ -54,10 +59,10 @@ describe('DetailOverflowMenu', () => {
         actions={[
           {
             id: 'move-to',
-            label: 'Move to',
+            label: MONSTER_MOVE_TO_LABEL,
             items: [
-              { id: 'bonus', label: 'Bonus actions', onSelect: onBonus },
-              { id: 'reactions', label: 'Reactions', onSelect: vi.fn() },
+              { id: 'bonus', label: MONSTER_BONUS_ACTIONS_HEADING, onSelect: onBonus },
+              { id: 'reactions', label: MONSTER_REACTIONS_HEADING, onSelect: vi.fn() },
             ],
           },
           {
@@ -73,9 +78,9 @@ describe('DetailOverflowMenu', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Actions for Bite' }))
-    expect(screen.getByText('Move to')).toBeInTheDocument()
-    expect(screen.queryByRole('menu', { name: 'Move to' })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('menuitem', { name: 'Bonus actions' }))
+    expect(screen.getByText(MONSTER_MOVE_TO_LABEL)).toBeInTheDocument()
+    expect(screen.queryByRole('menu', { name: MONSTER_MOVE_TO_LABEL })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('menuitem', { name: MONSTER_BONUS_ACTIONS_HEADING }))
     expect(onBonus).toHaveBeenCalledOnce()
   })
 

@@ -22,6 +22,8 @@ import {
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_DAMAGE_TYPE_CHANGE_LABEL,
+  MONSTER_ACTION_DAMAGE_FIELD_LABEL,
+  MONSTER_ACTION_REACH_FIELD_LABEL,
   MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
   MONSTER_TRIGGER_LABEL,
 } from '../monster-form-labels'
@@ -69,7 +71,7 @@ function reachRangeFields(modeField: 'mode' | 'modes'): FormItem[] {
   return [
     {
       type: 'joinedPair',
-      label: 'Reach',
+      label: MONSTER_ACTION_REACH_FIELD_LABEL,
       width: 'auto',
       visibility: meleeVisibility(modeField),
       start: {
@@ -170,7 +172,7 @@ export function monsterActionDetailFields(input: {
         fields: [
           ...rollValueFieldConfigs({
             namePrefix: 'damage',
-            label: 'Damage',
+            label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
             required: true,
             hint: {
               text: MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
@@ -240,7 +242,11 @@ export function monsterActionDetailFields(input: {
       },
       ...reachRangeFields('modes'),
       damageTypeField({ name: 'damageType', ctx, required: true }),
-      ...rollValueFields({ namePrefix: 'damage', label: 'Damage', required: true }),
+      ...rollValueFields({
+        namePrefix: 'damage',
+        label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
+        required: true,
+      }),
       monsterActionOnHitFields(ctx),
     )
   }

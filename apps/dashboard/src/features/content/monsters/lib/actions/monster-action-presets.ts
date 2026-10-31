@@ -1,8 +1,6 @@
 import type { z } from 'zod'
 import type { monsterReactionDraftSchema, MonsterActionKind } from '@rpg/contracts'
 
-import type { MonsterActionSection } from './monster-action-equipment-references'
-
 type ReactionDraftInput = z.input<typeof monsterReactionDraftSchema>
 type DraftVariant<K extends MonsterActionKind> = Partial<
   Omit<Extract<ReactionDraftInput, { kind: K }>, 'id' | 'kind'>
@@ -25,8 +23,4 @@ export function createMonsterRowId(): string {
   return crypto.randomUUID()
 }
 
-export function monsterActionSectionHeading(section: MonsterActionSection): string {
-  if (section === 'bonusActions') return 'Bonus actions'
-  if (section === 'reactions') return 'Reactions'
-  return 'Actions'
-}
+export { monsterActionSectionHeading } from '../monster-form-labels'
