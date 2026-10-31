@@ -11,18 +11,13 @@ export function magicItemFormValuesFromEntity(
   item: MagicItemEquipment,
 ): Pick<
   MagicItemEquipmentFormValues,
-  | 'rarity'
-  | 'requiresAttunement'
-  | 'attunementRequirement'
-  | 'magicItemCategory'
-  | 'baseEquipmentId'
+  'rarity' | 'requiresAttunement' | 'attunementRequirement' | 'magicItemCategory'
 > {
   return {
     rarity: item.rarity,
     requiresAttunement: item.requiresAttunement,
     attunementRequirement: item.attunementRequirement,
     magicItemCategory: item.magicItemCategory,
-    baseEquipmentId: item.baseEquipmentId,
   }
 }
 
@@ -47,7 +42,6 @@ export function buildMagicItemInput({
           attunementRequirement: values.attunementRequirement,
         }),
       ...(values.magicItemCategory && { magicItemCategory: values.magicItemCategory }),
-      ...(values.baseEquipmentId && { baseEquipmentId: values.baseEquipmentId }),
     },
     validationIntent,
   )

@@ -2,6 +2,7 @@ import type {
   CharacterBuildLanguageOption,
   CharacterClass,
   Equipment,
+  Feat,
   Organization,
   RulesetPatchRead,
   SkillProficiency,
@@ -27,6 +28,7 @@ const BUILDER_CATALOG_CONTENT = [
   { routeKey: 'equipment', responseKey: 'equipment' },
   { routeKey: 'skill-proficiencies', responseKey: 'skillProficiencies' },
   { routeKey: 'organizations', responseKey: 'organizations' },
+  { routeKey: 'feats', responseKey: 'feats' },
 ] as const satisfies readonly RulesetContentConfig[]
 
 export type BuilderCatalogContentKey = (typeof BUILDER_CATALOG_CONTENT)[number]['routeKey']
@@ -38,6 +40,7 @@ export type BuilderCatalogLists = {
   equipment: Equipment[]
   skillProficiencies: SkillProficiency[]
   organizations: Organization[]
+  feats: Feat[]
   languages: CharacterBuildLanguageOption[]
 }
 
@@ -81,6 +84,10 @@ export async function listRulesetOrganizations(
   return listRulesetContent(rulesetId, BUILDER_CATALOG_CONTENT[5])
 }
 
+export async function listRulesetFeats(rulesetId: SystemRulesetId): Promise<Feat[]> {
+  return listRulesetContent(rulesetId, BUILDER_CATALOG_CONTENT[6])
+}
+
 export async function listRulesetLanguages(
   rulesetId: SystemRulesetId,
 ): Promise<CharacterBuildLanguageOption[]> {
@@ -95,7 +102,7 @@ export async function listRulesetLanguages(
 export async function fetchBuilderCatalog(
   rulesetId: SystemRulesetId,
 ): Promise<BuilderCatalogLists> {
-  const [species, classes, spells, equipment, skillProficiencies, organizations, languages] =
+  const [species, classes, spells, equipment, skillProficiencies, organizations, feats, languages] =
     await Promise.all([
       listRulesetSpecies(rulesetId),
       listRulesetClasses(rulesetId),
@@ -103,10 +110,20 @@ export async function fetchBuilderCatalog(
       listRulesetEquipment(rulesetId),
       listRulesetSkillProficiencies(rulesetId),
       listRulesetOrganizations(rulesetId),
+      listRulesetFeats(rulesetId),
       listRulesetLanguages(rulesetId),
     ])
 
-  return { species, classes, spells, equipment, skillProficiencies, organizations, languages }
+  return {
+    species,
+    classes,
+    spells,
+    equipment,
+    skillProficiencies,
+    organizations,
+    feats,
+    languages,
+  }
 }
 
 export async function fetchCharacterCreationRules(

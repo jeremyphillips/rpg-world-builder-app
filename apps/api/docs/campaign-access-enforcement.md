@@ -184,6 +184,8 @@ intersect persisted affinity ids with eligible rows supplied by the caller.
 chips. **`visibilityMode`** (`dm_only`, `specific_players`, …) is applied when an affinity
 is **consumed** for NPC member guidance, not when a manager authors the organization.
 
+Deletion stays blocked for a stored class or species affinity (`organizationMemberClassAffinitySource`, `organizationMemberSpeciesAffinitySource`). An unresolved or unavailable affinity still does not block organization publish. That pair is intentional.
+
 ### Species surface ownership
 
 Maps Species-related surfaces onto the resolution layers above — not a fifth generic predicate.

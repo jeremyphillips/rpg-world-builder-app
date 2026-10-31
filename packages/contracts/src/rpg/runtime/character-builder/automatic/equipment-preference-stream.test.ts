@@ -70,6 +70,7 @@ function catalogIndex(): CharacterBuildCatalogIndex {
     ]),
     skillProficiencies: new Map(),
     organizations: new Map(),
+    featsBySlug: new Map(),
     languages: [],
   }
 }

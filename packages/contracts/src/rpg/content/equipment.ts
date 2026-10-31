@@ -73,13 +73,6 @@ export {
   type ArmorMaterial,
 } from './equipment/armor-variant'
 
-export {
-  isMagicItemBaseEquipment,
-  isMagicItemBaseEquipmentKind,
-  MAGIC_ITEM_BASE_EQUIPMENT_KINDS,
-  type MagicItemBaseEquipmentKind,
-} from './equipment/magic-item-base-equipment'
-
 export { equipmentBaseSchema, type EquipmentBaseFields } from './equipment/base'
 
 export { canPurchaseEquipment } from './equipment/can-purchase-equipment'
@@ -279,8 +272,6 @@ export const magicItemBodySchema = equipmentBaseSchema.extend({
   requiresAttunement: z.boolean().optional(),
   attunementRequirement: z.string().optional(),
   magicItemCategory: magicItemCategorySchema.optional(),
-  /** Optional link to a mundane base item (weapon, armor, etc.) by content id. */
-  baseEquipmentId: z.string().optional(),
 })
 
 // ---------------------------------------------------------------------------
@@ -429,7 +420,6 @@ const magicItemEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
   requiresAttunement: z.boolean().optional(),
   attunementRequirement: z.string().optional(),
   magicItemCategory: magicItemCategorySchema.optional(),
-  baseEquipmentId: z.string().optional(),
 })
 
 export const weaponBodyDraftSchema = weaponEquipmentBodyDraftFields

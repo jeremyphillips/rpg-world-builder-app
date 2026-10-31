@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import type { Feat } from '../../../../content/feat'
 import { indexCharacterBuildCatalog } from '../../context'
 import { contentGrantToChoiceSets } from './grant-choice-sets'
 import { athleticsSkill, builderTestCatalog } from '../../test-fixtures'
@@ -98,5 +99,38 @@ describe('contentGrantToChoiceSets — proficiency pools', () => {
     )
 
     expect(choiceSet?.options).toEqual([{ id: luteTool.id, label: 'Lute' }])
+  })
+})
+
+describe('contentGrantToChoiceSets — featChoice', () => {
+  const alert = { slug: 'alert', name: 'Alert' } as Feat
+  const catalogIndex = indexCharacterBuildCatalog({
+    ...builderTestCatalog,
+    feats: [alert],
+  })
+
+  it('labels a recommended feat by catalog name and omits an unknown slug', () => {
+    const [choiceSet] = contentGrantToChoiceSets(
+      {
+        id: 'feat-choice-1',
+        kind: 'featChoice',
+        category: 'origin',
+        choose: 1,
+        recommendedFeatIds: ['alert', 'missing-feat'],
+      },
+      {
+        sourceType: 'species',
+        sourceId: 'srd-cc-5.2.1:human',
+        slot: 'trait:versatile:grant:feat-choice-1',
+      },
+      catalogIndex,
+    )
+
+    expect(choiceSet).toMatchObject({
+      choiceType: 'feat',
+      min: 1,
+      max: 1,
+      options: [{ id: 'alert', label: 'Alert' }],
+    })
   })
 })

@@ -194,7 +194,6 @@ export const magicItemEquipmentFormSchema = physicalEquipmentBaseFormSchema.exte
   requiresAttunement: z.boolean().optional(),
   attunementRequirement: z.string().optional(),
   magicItemCategory: magicItemCategorySchema.optional(),
-  baseEquipmentId: z.string().optional(),
 })
 
 /** Identity + economy fields only — no weight, no kind discriminant. */
@@ -306,7 +305,6 @@ export const magicItemEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormS
   requiresAttunement: z.boolean().optional(),
   attunementRequirement: z.string().optional(),
   magicItemCategory: draftOptionalSelect(magicItemCategorySchema),
-  baseEquipmentId: z.string().optional(),
 })
 
 export const equipmentKindScopedDraftFormSchema = withManagedContentMediaFormSchema(
@@ -460,7 +458,6 @@ export const equipmentFormSchema = z
     requiresAttunement: z.boolean().optional(),
     attunementRequirement: z.string().optional(),
     magicItemCategory: magicItemCategorySchema.optional(),
-    baseEquipmentId: z.string().optional(),
 
     // weapon variant fields
     category: weaponCategorySchema.optional(),
@@ -535,7 +532,6 @@ export const equipmentFormDraftSchema = z.object({
   requiresAttunement: z.boolean().optional(),
   attunementRequirement: z.string().optional(),
   magicItemCategory: draftOptionalSelect(magicItemCategorySchema),
-  baseEquipmentId: z.string().optional(),
   category: draftOptionalSelect(weaponCategorySchema),
   mode: draftOptionalSelect(weaponModeSchema),
   hasDamage: z.boolean().optional(),
