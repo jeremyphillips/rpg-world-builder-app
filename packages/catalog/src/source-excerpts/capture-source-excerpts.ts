@@ -75,7 +75,7 @@ export function applyCapturedProvenance<T extends { id: string; rulesetId: Syste
     const attachment = attachments.get(record.id)
     if (!attachment) return record
 
-    const next = { ...record } as T & Record<string, unknown>
+    const next: Record<string, unknown> = { ...record }
     if (attachment.citation) {
       next.provenance = {
         citation: {
@@ -123,14 +123,13 @@ export function applyCapturedProvenance<T extends { id: string; rulesetId: Syste
       next[entryAttachment.host] = updatedEntries
     }
 
-    reconcileContentProvenance({
+    return reconcileContentProvenance({
       authority: 'initialize',
       catalogLayer: 'system',
       rulesetId: record.rulesetId,
       contentTypeKey: args.attachment.contentTypeKey,
       normalized: next,
       excerptExists: (ref) => excerptExists(args.revisions, ref),
-    })
-    return next
+    }) as T
   })
 }

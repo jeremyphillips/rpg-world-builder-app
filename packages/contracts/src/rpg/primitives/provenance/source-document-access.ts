@@ -75,3 +75,5 @@ export const SOURCE_DOCUMENT_LICENSE_ENTRIES = {
 export const SOURCE_DOCUMENT_LICENSE_KEYS = keysFromEntries(SOURCE_DOCUMENT_LICENSE_ENTRIES)
 
 export const sourceDocumentLicenseSchema = vocabEnumFromEntries(SOURCE_DOCUMENT_LICENSE_ENTRIES)
+
+export type SourceDocumentLicense = z.infer<typeof sourceDocumentLicenseSchema>
