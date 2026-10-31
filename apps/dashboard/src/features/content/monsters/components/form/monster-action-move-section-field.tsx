@@ -1,4 +1,5 @@
-import { Field, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@rpg/ui'
+import { SelectField } from '@rpg/ui'
+import { useFieldControlSize } from '@rpg/ui/form'
 
 import {
   MONSTER_ACTION_SECTIONS,
@@ -7,30 +8,32 @@ import {
 import { monsterActionSectionHeading } from '../../lib/actions/monster-action-presets'
 import { MONSTER_MOVE_TO_LABEL } from '../../lib/monster-form-labels'
 
+const moveSectionOptions = MONSTER_ACTION_SECTIONS.map((target) => ({
+  value: target,
+  label: monsterActionSectionHeading(target),
+}))
+
 export function MonsterActionMoveSectionField({
+  id,
   section,
   onMove,
 }: {
+  id: string
   section: MonsterActionSection
   onMove: (target: MonsterActionSection) => void
 }) {
+  const size = useFieldControlSize()
+
   return (
-    <Field.Root id="monster-action-move-section" size="sm" width="full">
-      <Field.Label>{MONSTER_MOVE_TO_LABEL}</Field.Label>
-      <Select value={section} onValueChange={(value) => onMove(value as MonsterActionSection)}>
-        <Field.Control>
-          <SelectTrigger size="sm" aria-label={MONSTER_MOVE_TO_LABEL}>
-            <SelectValue />
-          </SelectTrigger>
-        </Field.Control>
-        <SelectContent>
-          {MONSTER_ACTION_SECTIONS.map((target) => (
-            <SelectItem key={target} value={target}>
-              {monsterActionSectionHeading(target)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </Field.Root>
+    <SelectField
+      id={id}
+      label={MONSTER_MOVE_TO_LABEL}
+      size={size}
+      value={section}
+      onValueChange={(value) => {
+        if (value && value !== section) onMove(value as MonsterActionSection)
+      }}
+      options={moveSectionOptions}
+    />
   )
 }

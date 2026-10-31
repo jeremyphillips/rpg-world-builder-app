@@ -4,7 +4,6 @@ import {
   getContentTypeTerm,
   getWeaponModeLabel,
   getWeaponPropertyLabel,
-  MONSTER_ACTION_ATTACK_KIND_SET,
   REACH_FEET,
   WEAPON_MODES,
 } from '@rpg/contracts'
@@ -31,6 +30,7 @@ import {
   monsterActionOnHitFields,
   spellComponentField,
 } from './monster-action-on-hit-fields'
+import { MonsterActionMoveSectionField } from '../../components/form/monster-action-move-section-field'
 
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {
   return {
@@ -114,8 +114,9 @@ export function monsterActionDetailFields(input: {
   namePrefix: string
   equipmentOptions: { value: string; label: string }[]
   sharedCastingOptions: { value: string; label: string }[]
+  onMove: (target: MonsterActionSection) => void
 }): FormItem[] {
-  const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions } = input
+  const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions, onMove } = input
   const fields: FormItem[] = [
     { type: 'text', name: 'name', label: MONSTER_ACTION_NAME_LABEL },
     {
@@ -259,12 +260,17 @@ export function monsterActionDetailFields(input: {
     )
   }
 
-  if (
-    !MONSTER_ACTION_ATTACK_KIND_SET.has(action.kind) &&
-    action.kind !== 'spell' &&
-    action.kind !== 'special'
-  ) {
-    return fields
-  }
+  fields.push({
+    kind: 'slot',
+    name: 'moveSection',
+    render: () => (
+      <MonsterActionMoveSectionField
+        id={`monster-action-${action.id}-moveSection`}
+        section={section}
+        onMove={onMove}
+      />
+    ),
+  })
+
   return fields
 }

@@ -147,9 +147,11 @@ describe('MasterDetailListPanel', () => {
 
   it('renders the empty label when there are no items', () => {
     render(<MasterDetailListPanel {...baseProps()} items={[]} selectedIndex={null} />)
-    expect(
-      screen.getByText(masterDetailEmptyListLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN)),
-    ).toBeInTheDocument()
+    const emptyLabel = screen.getByText(
+      masterDetailEmptyListLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN),
+    )
+    expect(emptyLabel).toBeInTheDocument()
+    expect(emptyLabel).toHaveClass('ui-interactive-list__empty', 'text-start')
     expect(document.querySelector('[data-master-detail-list-scroll]')).toBeNull()
   })
 

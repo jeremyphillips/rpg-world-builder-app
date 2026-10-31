@@ -23,7 +23,6 @@ import {
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import type { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
 import { MonsterActionAttackSummary } from './monster-action-attack-summary'
-import { MonsterActionMoveSectionField } from './monster-action-move-section-field'
 
 type Sections = ReturnType<typeof useMonsterActionSections>
 
@@ -85,6 +84,7 @@ export function MonsterActionDetail({
       namePrefix,
       equipmentOptions: equipmentOptions(values, ctx),
       sharedCastingOptions: sharedCastingOptions(values, action.id),
+      onMove: sections.requestMove,
     })
   }, [action, ctx, located, namePrefix, values])
 
@@ -137,10 +137,6 @@ export function MonsterActionDetail({
             items={fields}
             idPrefix={`monster-action-${action.id}`}
             namePrefix={namePrefix}
-          />
-          <MonsterActionMoveSectionField
-            section={located.section}
-            onMove={(target) => sections.requestMove(target)}
           />
         </div>
       ) : null}

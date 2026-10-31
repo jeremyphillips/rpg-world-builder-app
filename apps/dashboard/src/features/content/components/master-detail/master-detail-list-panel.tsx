@@ -3,9 +3,9 @@ import {
   ActionButton,
   cn,
   Heading,
+  InteractiveListEmpty,
   ScrollBoundaryRegion,
   scrollBoundaryRegionRootClasses,
-  Text,
   ValidationIssueCountBadge,
 } from '@rpg/ui'
 
@@ -159,9 +159,7 @@ export function MasterDetailListPanel({
       ) : null}
 
       {items.length === 0 ? (
-        <Text variant="supporting" className="py-4">
-          {emptyLabel}
-        </Text>
+        <InteractiveListEmpty className="text-start">{emptyLabel}</InteractiveListEmpty>
       ) : (
         <ScrollBoundaryRegion
           className={scrollBoundaryRegionRootClasses}
