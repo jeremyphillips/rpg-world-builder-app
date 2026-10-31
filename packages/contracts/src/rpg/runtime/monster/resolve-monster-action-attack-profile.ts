@@ -20,6 +20,13 @@ import { resolveStatBlockDamagePart } from '../creature/stat-block-average'
 import { resolveWeaponAttackAbilityModifier, weaponAttackBonus } from '../creature/weapon-attack'
 import { unavailableField, type DerivedField, type DerivedFieldReason } from './derived-field'
 
+export const MONSTER_ACTION_ATTACK_KINDS = ['weapon', 'natural-weapon', 'attack'] as const
+export type MonsterActionAttackKind = (typeof MONSTER_ACTION_ATTACK_KINDS)[number]
+
+export const MONSTER_ACTION_ATTACK_KIND_SET: ReadonlySet<MonsterActionAttackKind> = new Set(
+  MONSTER_ACTION_ATTACK_KINDS,
+)
+
 export type MonsterActionAttackRoll = {
   expression: string
   average: number
@@ -75,7 +82,7 @@ export type ResolveMonsterActionAttackProfileInput = {
   magicPropertyProvider: MagicPropertyDefinitionProvider
 }
 
-const ATTACK_KINDS = new Set(['weapon', 'natural-weapon', 'attack'])
+const ATTACK_KINDS = MONSTER_ACTION_ATTACK_KIND_SET
 
 function hasDamageRoll(value: unknown): value is RollValue {
   if (!value || typeof value !== 'object') return false

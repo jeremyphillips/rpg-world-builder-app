@@ -47,10 +47,9 @@ export type MasterDetailListPanelProps = {
   ariaLabel: string
   addLabel: string
   itemNoun: MasterDetailItemNounTerm
-  onAdd: () => void
   /**
-   * Replaces the default Add button. Omit it to keep that button.
-   * The control owns its own action; `onAdd` is not called.
+   * Replaces the default Add button. When set, the default add button is hidden and
+   * `onAdd` is not invoked.
    */
   addControl?: ReactNode
   onSelect: (index: number) => void
@@ -58,7 +57,7 @@ export type MasterDetailListPanelProps = {
   countSupplement?: ReactNode
   /** Count of visible list rows with validation issues (not total issue count). */
   invalidItemCount?: number
-}
+} & ({ addControl: ReactNode; onAdd?: () => void } | { addControl?: undefined; onAdd: () => void })
 
 function resolveSelectedItemId(
   items: MasterDetailListItem[],
@@ -143,7 +142,7 @@ export function MasterDetailListPanel({
           {listTitle}
         </Heading>
         {addControl ?? (
-          <ActionButton action="add" variant="outline" size="sm" onClick={onAdd}>
+          <ActionButton action="add" variant="outline" size="sm" onClick={() => onAdd?.()}>
             {addLabel}
           </ActionButton>
         )}

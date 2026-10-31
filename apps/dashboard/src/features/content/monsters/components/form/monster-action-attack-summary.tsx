@@ -1,3 +1,4 @@
+import { MONSTER_ACTION_ATTACK_KIND_SET } from '@rpg/contracts'
 import { useMemo } from 'react'
 import { Text } from '@rpg/ui'
 import { useWatch } from 'react-hook-form'
@@ -10,7 +11,7 @@ import {
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 
-const ATTACK_KINDS = new Set(['weapon', 'natural-weapon', 'attack'])
+const ATTACK_KINDS = MONSTER_ACTION_ATTACK_KIND_SET
 
 export function MonsterActionAttackSummary({
   ctx,

@@ -4,6 +4,7 @@ import {
   getContentTypeTerm,
   getWeaponModeLabel,
   getWeaponPropertyLabel,
+  MONSTER_ACTION_ATTACK_KIND_SET,
   WEAPON_MODES,
 } from '@rpg/contracts'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
@@ -23,14 +24,12 @@ import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-pre
 import {
   MonsterActionAttackCastingField,
   MonsterActionCastingAbilityField,
-} from '../../components/form/monster-action-on-hit-fields'
+} from './monster-action-casting-fields'
 import {
   monsterActionLimitedUseFields,
   monsterActionOnHitFields,
   spellComponentField,
 } from './monster-action-on-hit-fields'
-
-const ATTACK_KINDS = new Set(['weapon', 'natural-weapon', 'attack'])
 
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {
   return {
@@ -242,7 +241,11 @@ export function monsterActionDetailFields(input: {
     )
   }
 
-  if (!ATTACK_KINDS.has(action.kind) && action.kind !== 'spell' && action.kind !== 'special') {
+  if (
+    !MONSTER_ACTION_ATTACK_KIND_SET.has(action.kind) &&
+    action.kind !== 'spell' &&
+    action.kind !== 'special'
+  ) {
     return fields
   }
   return fields

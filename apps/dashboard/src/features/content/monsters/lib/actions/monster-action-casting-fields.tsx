@@ -1,7 +1,7 @@
 import { ABILITY_IDS, getAbilityLabel } from '@rpg/contracts'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import type { MonsterFormValues } from '../../lib/monster-form-values'
+import type { MonsterFormValues } from '../monster-form-values'
 
 function castingAbilityValue(value: unknown): string {
   if (!value || typeof value !== 'object') return ''

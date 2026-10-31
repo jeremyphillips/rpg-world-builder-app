@@ -1,4 +1,5 @@
 import {
+  derivedFieldReasonLabel,
   CHALLENGE_RATING_MECHANICS,
   formatSignedModifier,
   getAbilityLabel,
@@ -18,12 +19,6 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import { monsterEquipmentCatalog, monsterMagicPropertyProvider } from '../monster-form-derivation'
 import type { MonsterFormValues } from '../monster-form-values'
 import { normalizeMonsterFormValues } from '../normalize-monster-form-values'
-
-const REASON_LABEL = {
-  'missing-input': 'missing input',
-  'missing-reference': 'missing reference',
-  conflict: 'conflict',
-} as const
 
 function proficiencyBonus(challengeRating: unknown): number | undefined {
   if (typeof challengeRating !== 'string') return undefined
@@ -84,7 +79,7 @@ export function describeMonsterActionAttackProfile(
   profile: DerivedField<MonsterActionAttackProfile>,
 ): string[] {
   if (profile.status === 'unavailable') {
-    return [`Attack summary unavailable (${REASON_LABEL[profile.reason]})`]
+    return [`Attack summary unavailable (${derivedFieldReasonLabel(profile.reason)})`]
   }
   const value = profile.value
   const lines = [
@@ -104,7 +99,7 @@ export function describeMonsterActionAttackProfile(
   }
   for (const capability of value.unresolvedCapabilities) {
     lines.push(
-      `${getWeaponPropertyLabel(capability.id)} unavailable (${REASON_LABEL[capability.reason]})`,
+      `${getWeaponPropertyLabel(capability.id)} unavailable (${derivedFieldReasonLabel(capability.reason)})`,
     )
   }
   return lines

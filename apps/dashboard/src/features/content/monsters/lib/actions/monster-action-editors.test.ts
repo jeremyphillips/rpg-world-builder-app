@@ -28,6 +28,7 @@ describe('monster action acquisition', () => {
     expect(action.name).toBe('Claw')
     expect(action.damageType).toBe('slashing')
     expect(action.mode).toBe('melee')
+    expect(action.damage).toEqual({ dice: { count: 1, faces: 6 } })
     expect(action).not.toHaveProperty('preset')
     expect(createMonsterRowId()).not.toBe(createMonsterRowId())
   })

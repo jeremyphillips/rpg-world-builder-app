@@ -2,6 +2,7 @@ import {
   getDamageTypeLabel,
   getMonsterActionKindLabel,
   getMonsterNaturalWeaponPreset,
+  MONSTER_NATURAL_WEAPON_PRESET_DEFAULT_DAMAGE,
   MONSTER_NATURAL_WEAPON_PRESET_IDS,
   type MonsterNaturalWeaponPresetId,
 } from '@rpg/contracts'
@@ -129,6 +130,7 @@ export function createMonsterActionFromAcquisition(
       name: preset?.label ?? choice.presetId,
       damageType: preset?.defaultDamageType,
       mode: preset?.defaultMode ?? 'melee',
+      damage: { ...MONSTER_NATURAL_WEAPON_PRESET_DEFAULT_DAMAGE },
     }
   }
   if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] }

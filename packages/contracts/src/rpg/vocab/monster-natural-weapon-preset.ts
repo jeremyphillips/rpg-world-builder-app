@@ -3,6 +3,11 @@ import { keysFromEntries } from './enum-schema'
 import type { GameTermEntry, VocabularyTerm } from './types'
 import type { WeaponMode } from './weapon/mode'
 
+/** Default damage roll applied when acquiring a natural weapon from a preset. */
+export const MONSTER_NATURAL_WEAPON_PRESET_DEFAULT_DAMAGE = {
+  dice: { count: 1, faces: 6 },
+} as const
+
 // ---------------------------------------------------------------------------
 // Natural-weapon acquisition presets. Ids are not stored on monster actions.
 // ---------------------------------------------------------------------------

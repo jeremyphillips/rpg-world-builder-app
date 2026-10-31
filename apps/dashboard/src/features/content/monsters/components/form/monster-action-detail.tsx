@@ -12,10 +12,7 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import { MasterDetailEditorShell } from '../../../components/master-detail/master-detail-editor-shell'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
-import {
-  MONSTER_ACTION_SECTIONS,
-  type MonsterActionSection,
-} from '../../lib/actions/monster-action-equipment-references'
+import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import { monsterActionSectionHeading } from '../../lib/actions/monster-action-presets'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-trait-form-fields'
@@ -23,14 +20,11 @@ import {
   monsterEquipmentCatalog,
   monsterMagicPropertyProvider,
 } from '../../lib/monster-form-derivation'
-import {
-  MONSTER_MOVE_DOWN_LABEL,
-  MONSTER_MOVE_TO_LABEL,
-  MONSTER_MOVE_UP_LABEL,
-} from '../../lib/monster-form-labels'
+import { MONSTER_MOVE_DOWN_LABEL, MONSTER_MOVE_UP_LABEL } from '../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import type { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
 import { MonsterActionAttackSummary } from './monster-action-attack-summary'
+import { MonsterActionMoveSectionField } from './monster-action-move-section-field'
 
 type Sections = ReturnType<typeof useMonsterActionSections>
 
@@ -166,20 +160,10 @@ export function MonsterActionDetail({
               {MONSTER_MOVE_DOWN_LABEL}
             </Button>
           </div>
-          <label className="flex flex-col gap-1">
-            {MONSTER_MOVE_TO_LABEL}
-            <select
-              aria-label={MONSTER_MOVE_TO_LABEL}
-              value={located.section}
-              onChange={(event) => sections.requestMove(event.target.value as MonsterActionSection)}
-            >
-              {MONSTER_ACTION_SECTIONS.map((target) => (
-                <option key={target} value={target}>
-                  {monsterActionSectionHeading(target)}
-                </option>
-              ))}
-            </select>
-          </label>
+          <MonsterActionMoveSectionField
+            section={located.section}
+            onMove={(target) => sections.requestMove(target)}
+          />
         </div>
       ) : null}
     </MasterDetailEditorShell>

@@ -156,7 +156,6 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
                 ariaLabel={SECTION_HEADINGS[section]}
                 addLabel={MONSTER_ADD_LABEL}
                 itemNoun={MONSTER_ACTION_ITEM_NOUN}
-                onAdd={() => undefined}
                 addControl={
                   <MonsterActionAddMenu
                     section={section}
