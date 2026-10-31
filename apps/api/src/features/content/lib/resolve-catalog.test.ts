@@ -58,4 +58,35 @@ describe('resolveCatalog', () => {
     resolveCatalog(system, [{ targetId: 'sys:a', patch: { hitDie: 99 } }], [])
     expect(system[0]?.hitDie).toBe(8)
   })
+
+  it('reattaches record provenance without a content type and entry provenance with one', () => {
+    const provenance = { citation: { documentId: 'srd-5.2.1' } }
+    const entryProvenance = {
+      excerpt: { documentId: 'srd-5.2.1', excerptId: 'monsters/knight/parry' },
+    }
+    const seeded = [
+      {
+        id: 'sys:a',
+        name: 'Knight',
+        rulesetId: 'srd-cc-5.2.1' as const,
+        provenance,
+        reactions: [{ id: 'parry', name: 'Parry', provenance: entryProvenance }],
+      },
+    ]
+    const patch = [
+      {
+        targetId: 'sys:a',
+        patch: { reactions: [{ id: 'parry', name: 'Parry' }] },
+      },
+    ]
+
+    const withoutType = resolveCatalog(seeded, patch, [])
+    expect(withoutType[0]?.provenance).toEqual(provenance)
+    expect(withoutType[0]?.reactions).toEqual([{ id: 'parry', name: 'Parry' }])
+
+    const withType = resolveCatalog(seeded, patch, [], { contentTypeKey: 'monsters' })
+    expect(withType[0]?.reactions).toEqual([
+      { id: 'parry', name: 'Parry', provenance: entryProvenance },
+    ])
+  })
 })

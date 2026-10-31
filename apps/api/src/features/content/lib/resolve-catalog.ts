@@ -40,12 +40,12 @@ export function resolveCatalog<T extends Identified>(
     const merged = overlay ? deepMerge(record, overlay.patch, options) : record
     const published = { ...merged, status: 'published' as const }
     const rulesetId = (record as { rulesetId?: SystemRulesetId }).rulesetId
-    if (!options?.contentTypeKey || !rulesetId) return published
+    if (!rulesetId) return published
     return reconcileContentProvenance({
       authority: 'preserve',
       catalogLayer: 'system',
       rulesetId,
-      contentTypeKey: options.contentTypeKey,
+      contentTypeKey: options?.contentTypeKey,
       normalized: published as unknown as Record<string, unknown>,
       existing: record as unknown as Record<string, unknown>,
     }) as T

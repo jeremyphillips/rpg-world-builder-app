@@ -17,9 +17,10 @@ import {
   assertStoreTextPermitted,
   SourceExcerptStoreError,
 } from './assert-excerpt-store'
-import { buildExcerptRevisions } from './build-excerpt-revisions'
+import { applyCapturedProvenance, captureSourceExcerpts } from './capture-source-excerpts'
 import { fingerprintSourceExcerpt } from './fingerprint-source-excerpt'
 import { loadSrdMonsterExcerpts } from './load-source-excerpts'
+import lockJson from '../../source-excerpts/srd-5.2.1/excerpts.lock.json'
 
 const viewer = { isManager: false, canReadRecord: true }
 const hosts = ['traits', 'actions', 'bonusActions', 'reactions'] as const
@@ -47,7 +48,7 @@ describe('SRD monster excerpts', () => {
     const revisions = await loadSrdMonsterExcerpts()
     const first = revisions[0]
     if (!first) throw new Error('expected excerpts')
-    const rebuilt = buildExcerptRevisions({
+    const captured = await captureSourceExcerpts({
       documentId: first.documentId,
       capturedAt: first.capturedAt,
       transcription: first.transcription,
@@ -57,9 +58,45 @@ describe('SRD monster excerpts', () => {
         locator: revision.locator,
       })),
     })
-    expect(await Promise.all(rebuilt.map(fingerprintSourceExcerpt))).toEqual(
+    expect(captured.lock).toEqual(lockJson)
+    expect(await Promise.all(captured.revisions.map(fingerprintSourceExcerpt))).toEqual(
       await Promise.all(revisions.map(fingerprintSourceExcerpt)),
     )
+  })
+
+  it('reattaches seed provenance from the captured batch', async () => {
+    const revisions = await loadSrdMonsterExcerpts()
+    const seeds = loadSeedMonsters('srd-cc-5.2.1')
+    const stripped = structuredClone(seeds).map((monster) => {
+      const copy = monster as Monster &
+        Record<(typeof hosts)[number], Array<{ provenance?: unknown }>>
+      delete copy.provenance
+      for (const host of hosts) {
+        for (const entry of copy[host]) delete entry.provenance
+      }
+      return copy
+    })
+    const restored = applyCapturedProvenance(stripped, {
+      documentId: 'srd-5.2.1',
+      revisions,
+      attachment: {
+        contentTypeKey: 'monsters',
+        rulesetId: 'srd-cc-5.2.1',
+        records: seeds.map((monster) => ({
+          recordId: monster.id,
+          ...(monster.provenance?.citation?.locator
+            ? { citation: monster.provenance.citation.locator }
+            : {}),
+          entries: hosts.flatMap((host) =>
+            monster[host].flatMap((entry) => {
+              const excerptId = entry.provenance?.excerpt?.excerptId
+              return excerptId ? [{ host, entryId: entry.id, excerptId }] : []
+            }),
+          ),
+        })),
+      },
+    })
+    expect(restored).toEqual(seeds)
   })
 
   it('resolves every seed reference against the monster’s source documents', async () => {

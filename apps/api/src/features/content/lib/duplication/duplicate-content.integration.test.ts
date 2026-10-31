@@ -316,6 +316,19 @@ describe('duplicate content routes', () => {
       contentId: skeleton!.id,
       catalogLayer: 'system',
     })
+    expect(copy.provenance?.citation).toEqual(skeleton!.provenance?.citation)
+    expect(copy.actions.map((action: { provenance?: unknown }) => action.provenance)).toEqual(
+      skeleton!.actions.map((action) => action.provenance),
+    )
+    expect(copy.bonusActions.map((action: { provenance?: unknown }) => action.provenance)).toEqual(
+      skeleton!.bonusActions.map((action) => action.provenance),
+    )
+    expect(copy.reactions.map((action: { provenance?: unknown }) => action.provenance)).toEqual(
+      skeleton!.reactions.map((action) => action.provenance),
+    )
+    expect(copy.traits.map((trait: { provenance?: unknown }) => trait.provenance)).toEqual(
+      skeleton!.traits.map((trait) => trait.provenance),
+    )
     expect(copy.equipment.map((entry: { entryId: string }) => entry.entryId)).toEqual(
       skeleton!.equipment.map((entry) => entry.entryId),
     )

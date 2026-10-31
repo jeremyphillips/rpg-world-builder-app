@@ -3,6 +3,7 @@ import type { SystemRulesetId } from '../ruleset'
 import type { ContentProvenance } from './content-provenance'
 import type { SourceExcerptRef } from './content-provenance'
 import type { SourceExcerptRevision } from './source-excerpt'
+import type { SourceDocumentAccess } from './source-document-access'
 import { getRegisteredSourceDocument } from './source-document-registry'
 import { resolveContentSourceDocumentIds } from './resolve-content-source-documents'
 
@@ -22,6 +23,16 @@ export type SourceExcerptResolution =
   | { status: 'missing' }
   | { status: 'restricted' }
   | { status: 'unavailable' }
+
+/** Display gate for a registered document. `missing` means text must not be stored. */
+export function resolveSourceExcerptAccess(args: {
+  access: Pick<SourceDocumentAccess, 'storeText' | 'display'>
+  isManager: boolean
+}): 'ok' | 'missing' | 'restricted' {
+  if (!args.access.storeText) return 'missing'
+  if (args.access.display === 'managers' && !args.isManager) return 'restricted'
+  return 'ok'
+}
 
 function historyFor(
   revisions: readonly SourceExcerptRevision[],
@@ -53,11 +64,11 @@ export function resolveSourceExcerpt(args: {
   const allowed = resolveContentSourceDocumentIds(args.record)
   if (!allowed.includes(args.ref.documentId)) return { status: 'missing' }
 
-  const document = getRegisteredSourceDocument(args.ref.documentId)
-  if (!document.access.storeText) return { status: 'missing' }
-  if (document.access.display === 'managers' && !args.viewer.isManager) {
-    return { status: 'restricted' }
-  }
+  const access = resolveSourceExcerptAccess({
+    access: getRegisteredSourceDocument(args.ref.documentId).access,
+    isManager: args.viewer.isManager,
+  })
+  if (access !== 'ok') return { status: access }
 
   const history = historyFor(args.revisions, args.ref)
   const latest = history.at(-1)

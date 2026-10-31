@@ -60,7 +60,7 @@
             "$ref": "#/definitions/__schema6"
           },
           "derivedFrom": {
-            "$ref": "#/definitions/__schema7"
+            "$ref": "#/definitions/__schema8"
           }
         },
         "additionalProperties": false
@@ -95,7 +95,7 @@
       "prerequisite": {
         "allOf": [
           {
-            "$ref": "#/definitions/__schema8"
+            "$ref": "#/definitions/__schema9"
           }
         ]
       },
@@ -106,10 +106,10 @@
         "type": "object",
         "properties": {
           "allowed": {
-            "$ref": "#/definitions/__schema9"
+            "$ref": "#/definitions/__schema10"
           },
           "notes": {
-            "$ref": "#/definitions/__schema10"
+            "$ref": "#/definitions/__schema11"
           }
         },
         "required": [
@@ -124,7 +124,7 @@
             "minItems": 1,
             "type": "array",
             "items": {
-              "$ref": "#/definitions/__schema11"
+              "$ref": "#/definitions/__schema12"
             }
           }
         },
@@ -243,8 +243,7 @@
           "description": "srd-5.2.1"
         },
         "excerptId": {
-          "type": "string",
-          "pattern": "^[a-z0-9-]+(?:\\/[a-z0-9-]+)+$"
+          "$ref": "#/definitions/__schema7"
         }
       },
       "required": [
@@ -254,6 +253,10 @@
       "additionalProperties": false
     },
     "__schema7": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+(?:\\/[a-z0-9-]+)+$"
+    },
+    "__schema8": {
       "oneOf": [
         {
           "type": "object",
@@ -307,7 +310,7 @@
         }
       ]
     },
-    "__schema8": {
+    "__schema9": {
       "oneOf": [
         {
           "type": "object",
@@ -321,7 +324,7 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "$ref": "#/definitions/__schema8"
+                "$ref": "#/definitions/__schema9"
               }
             }
           },
@@ -343,7 +346,7 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "$ref": "#/definitions/__schema8"
+                "$ref": "#/definitions/__schema9"
               }
             }
           },
@@ -467,13 +470,13 @@
         }
       ]
     },
-    "__schema9": {
+    "__schema10": {
       "type": "boolean"
     },
-    "__schema10": {
+    "__schema11": {
       "type": "string"
     },
-    "__schema11": {
+    "__schema12": {
       "type": "object",
       "properties": {
         "id": {

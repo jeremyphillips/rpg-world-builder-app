@@ -1,13 +1,20 @@
 import type { ApiContentTypeKey } from '../../primitives/content/content-type-keys'
 import type { SystemRulesetId } from '../../primitives/ruleset'
+import { canonicalJson } from '../../primitives/provenance/canonical-json'
 import {
   contentProvenanceSchema,
   entryProvenanceSchema,
   type ContentProvenance,
+  type EntryProvenance,
+  type SourceExcerptRef,
   documentAttributionSchema,
 } from '../../primitives/provenance'
 import type { CatalogLayer } from '../../vocab/catalog-layer'
-import { listRulesetSourceDocumentIds } from '../../primitives/provenance/source-document-registry'
+import {
+  getRegisteredSourceDocument,
+  listRulesetSourceDocumentIds,
+} from '../../primitives/provenance/source-document-registry'
+import { resolveContentSourceDocumentIds } from '../../primitives/provenance/resolve-content-source-documents'
 import {
   provenanceEntryHostsFor,
   readProvenanceHostEntries,
@@ -18,7 +25,7 @@ import {
 export type ContentProvenanceWriteAuthority = 'preserve' | 'carry' | 'initialize'
 
 export class ContentProvenanceWriteError extends Error {
-  readonly code: 'provenance_forbidden' | 'provenance_reassignment'
+  readonly code: 'provenance_forbidden' | 'provenance_reassignment' | 'provenance_invalid'
 
   constructor(code: ContentProvenanceWriteError['code'], message: string) {
     super(message)
@@ -28,7 +35,7 @@ export class ContentProvenanceWriteError extends Error {
 }
 
 function provenanceEqual(a: unknown, b: unknown): boolean {
-  return JSON.stringify(a) === JSON.stringify(b)
+  return canonicalJson(a) === canonicalJson(b)
 }
 
 function defaultDocumentsForRuleset(rulesetId: SystemRulesetId) {
@@ -206,6 +213,109 @@ function reconcilePreservedEntries(
   return next
 }
 
+function requireSourceDocument(documentId: string, allowed: ReadonlySet<string>): void {
+  if (!allowed.has(documentId)) {
+    throw new ContentProvenanceWriteError(
+      'provenance_invalid',
+      `Document ${documentId} is not a source for this record.`,
+    )
+  }
+}
+
+function requireExcerpt(
+  ref: SourceExcerptRef,
+  allowed: ReadonlySet<string>,
+  excerptExists: ((ref: SourceExcerptRef) => boolean) | undefined,
+): void {
+  requireSourceDocument(ref.documentId, allowed)
+  if (!getRegisteredSourceDocument(ref.documentId).access.storeText) {
+    throw new ContentProvenanceWriteError(
+      'provenance_invalid',
+      'Reference-only documents cannot be cited as excerpts.',
+    )
+  }
+  if (!excerptExists) {
+    throw new ContentProvenanceWriteError(
+      'provenance_invalid',
+      'Excerpt references require an excerpt store check.',
+    )
+  }
+  if (!excerptExists(ref)) {
+    throw new ContentProvenanceWriteError(
+      'provenance_invalid',
+      `Excerpt ${ref.excerptId} does not exist.`,
+    )
+  }
+}
+
+function assertEntryProvenanceIntegrity(
+  provenance: EntryProvenance,
+  allowed: ReadonlySet<string>,
+  excerptExists: ((ref: SourceExcerptRef) => boolean) | undefined,
+): void {
+  if (provenance.citation) requireSourceDocument(provenance.citation.documentId, allowed)
+  if (provenance.excerpt) requireExcerpt(provenance.excerpt, allowed, excerptExists)
+}
+
+function readRecordProvenance(normalized: Record<string, unknown>): ContentProvenance | undefined {
+  if (normalized.provenance === undefined) return undefined
+  return contentProvenanceSchema.parse(normalized.provenance)
+}
+
+function assertRecordProvenanceIntegrity(
+  provenance: ContentProvenance | undefined,
+  allowed: ReadonlySet<string>,
+  excerptExists: ((ref: SourceExcerptRef) => boolean) | undefined,
+): void {
+  if (!provenance) return
+  for (const document of provenance.documents ?? []) {
+    requireSourceDocument(document.citation.documentId, allowed)
+  }
+  if (provenance.citation) requireSourceDocument(provenance.citation.documentId, allowed)
+  if (provenance.excerpt) requireExcerpt(provenance.excerpt, allowed, excerptExists)
+}
+
+function assertHostEntryIntegrity(
+  entries: unknown,
+  allowed: ReadonlySet<string>,
+  excerptExists: ((ref: SourceExcerptRef) => boolean) | undefined,
+): void {
+  if (!Array.isArray(entries)) return
+  for (const entry of entries) {
+    if (!isEntry(entry) || entry.provenance === undefined) continue
+    assertEntryProvenanceIntegrity(
+      entryProvenanceSchema.parse(entry.provenance),
+      allowed,
+      excerptExists,
+    )
+  }
+}
+
+function assertInitializeIntegrity(args: {
+  catalogLayer: CatalogLayer
+  rulesetId: SystemRulesetId
+  normalized: Record<string, unknown>
+  hosts: readonly ProvenanceEntryHostPath[]
+  excerptExists?: (ref: SourceExcerptRef) => boolean
+}): void {
+  const provenance = readRecordProvenance(args.normalized)
+  const allowed = new Set(
+    resolveContentSourceDocumentIds({
+      catalogLayer: args.catalogLayer,
+      rulesetId: args.rulesetId,
+      provenance,
+    }),
+  )
+  assertRecordProvenanceIntegrity(provenance, allowed, args.excerptExists)
+  for (const host of args.hosts) {
+    assertHostEntryIntegrity(
+      readProvenanceHostEntries(args.normalized, host),
+      allowed,
+      args.excerptExists,
+    )
+  }
+}
+
 function reconcileInitializedEntries(
   normalized: Record<string, unknown>,
   hosts: readonly ProvenanceEntryHostPath[],
@@ -281,10 +391,23 @@ export function reconcileContentProvenance(args: {
   existing?: Record<string, unknown>
   provenanceSource?: Record<string, unknown>
   now?: string
+  /** Required when `initialize` sets excerpt references. */
+  excerptExists?: (ref: SourceExcerptRef) => boolean
 }): Record<string, unknown> {
   const hosts = hostsFor(args.contentTypeKey)
   if (args.authority === 'initialize') {
-    return reconcileInitializedEntries(reconcileInitializedProvenance(args.normalized), hosts)
+    const normalized = reconcileInitializedEntries(
+      reconcileInitializedProvenance(args.normalized),
+      hosts,
+    )
+    assertInitializeIntegrity({
+      catalogLayer: args.catalogLayer,
+      rulesetId: args.rulesetId,
+      normalized,
+      hosts,
+      excerptExists: args.excerptExists,
+    })
+    return normalized
   }
   if (args.authority === 'carry') return reconcileCarriedProvenance(args)
   if (args.catalogLayer === 'system') {

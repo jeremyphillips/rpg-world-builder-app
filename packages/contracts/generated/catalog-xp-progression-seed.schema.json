@@ -66,7 +66,7 @@
               "$ref": "#/definitions/__schema7"
             },
             "derivedFrom": {
-              "$ref": "#/definitions/__schema8"
+              "$ref": "#/definitions/__schema9"
             }
           },
           "additionalProperties": false
@@ -129,7 +129,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema9"
+            "$ref": "#/definitions/__schema10"
           }
         }
       },
@@ -241,8 +241,7 @@
           "description": "srd-5.2.1"
         },
         "excerptId": {
-          "type": "string",
-          "pattern": "^[a-z0-9-]+(?:\\/[a-z0-9-]+)+$"
+          "$ref": "#/definitions/__schema8"
         }
       },
       "required": [
@@ -252,6 +251,10 @@
       "additionalProperties": false
     },
     "__schema8": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+(?:\\/[a-z0-9-]+)+$"
+    },
+    "__schema9": {
       "oneOf": [
         {
           "type": "object",
@@ -305,7 +308,7 @@
         }
       ]
     },
-    "__schema9": {
+    "__schema10": {
       "type": "object",
       "properties": {
         "level": {

@@ -1,14 +1,36 @@
 import { z } from 'zod'
 
 import { sourceCitationSchema } from './source-citation'
-import { sourceDocumentIdSchema } from './source-document-registry'
+import { getRegisteredSourceDocument, sourceDocumentIdSchema } from './source-document-registry'
 import { contentLineageSchema } from './content-lineage'
 
-/** Pointer to a captured passage (P2). Schema-only in P1. */
-export const sourceExcerptRefSchema = z.object({
-  documentId: sourceDocumentIdSchema,
-  excerptId: z.string().regex(/^[a-z0-9-]+(?:\/[a-z0-9-]+)+$/),
-})
+const SOURCE_EXCERPT_ID_PATTERN = /^[a-z0-9-]+(?:\/[a-z0-9-]+)+$/
+
+export const REFERENCE_ONLY_EXCERPT_MESSAGE =
+  'Reference-only documents cannot be cited as excerpts.'
+
+/** Excerpt ids are only valid for documents that permit stored text. */
+export function createSourceExcerptRefSchema<T extends string>(
+  documentIdSchema: z.ZodType<T>,
+  accessFor: (documentId: T) => { storeText: boolean },
+) {
+  return z
+    .object({
+      documentId: documentIdSchema,
+      excerptId: z.string().regex(SOURCE_EXCERPT_ID_PATTERN),
+    })
+    .superRefine((ref, ctx) => {
+      if (!accessFor(ref.documentId).storeText) {
+        ctx.addIssue({ code: 'custom', message: REFERENCE_ONLY_EXCERPT_MESSAGE })
+      }
+    })
+}
+
+/** Pointer to a captured passage. Rejected when the document cannot store text. */
+export const sourceExcerptRefSchema = createSourceExcerptRefSchema(
+  sourceDocumentIdSchema,
+  (documentId) => getRegisteredSourceDocument(documentId).access,
+)
 
 export type SourceExcerptRef = z.infer<typeof sourceExcerptRefSchema>
 

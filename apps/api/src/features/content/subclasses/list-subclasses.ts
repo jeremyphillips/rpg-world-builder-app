@@ -33,6 +33,8 @@ export async function resolveSubclassesForCampaign(
     loadSystemContent(subclassContentConfig, rulesetId),
     patches,
     homebrew,
+    // Subclasses are not a ContentTypeKey. They share the classes capability entry.
+    { contentTypeKey: 'classes' },
   ).filter((subclass) => subclass.classId === classId)
 
   return attachCampaignAccessForTargetType(campaignId, 'subclasses', resolved)

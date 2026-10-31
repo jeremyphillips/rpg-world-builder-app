@@ -250,6 +250,76 @@ describe('reconcileContentProvenance (entries)', () => {
     expect(result.provenance).toEqual({ citation: { documentId: 'srd-5.2.1' } })
   })
 
+  it('accepts equal entry provenance when object keys are ordered differently', () => {
+    const result = reconcileContentProvenance({
+      ...base,
+      normalized: {
+        reactions: [
+          {
+            id: 'protective-magic',
+            kind: 'spell',
+            name: 'Protective Magic',
+            provenance: {
+              excerpt: { excerptId: excerpt.excerptId, documentId: excerpt.documentId },
+            },
+          },
+        ],
+      },
+      existing: { reactions: [storedReaction] },
+    })
+    expect(result.reactions).toEqual([storedReaction])
+  })
+
+  it('checks initialize document membership and excerpt existence', () => {
+    const normalized = {
+      provenance: {
+        citation: { documentId: 'srd-5.2.1', locator: { section: 'Monsters', page: 305 } },
+      },
+      reactions: [storedReaction],
+    }
+    const initialized = reconcileContentProvenance({
+      authority: 'initialize',
+      catalogLayer: 'system',
+      rulesetId: 'srd-cc-5.2.1',
+      contentTypeKey: 'monsters',
+      normalized,
+      excerptExists: () => true,
+    })
+    expect(initialized.reactions).toEqual([storedReaction])
+
+    expect(() =>
+      reconcileContentProvenance({
+        authority: 'initialize',
+        catalogLayer: 'system',
+        rulesetId: 'srd-cc-5.2.1',
+        contentTypeKey: 'monsters',
+        normalized,
+      }),
+    ).toThrow(ContentProvenanceWriteError)
+
+    expect(() =>
+      reconcileContentProvenance({
+        authority: 'initialize',
+        catalogLayer: 'homebrew',
+        rulesetId: 'srd-cc-5.2.1',
+        contentTypeKey: 'monsters',
+        normalized,
+        excerptExists: () => true,
+      }),
+    ).toThrow(/not a source/)
+
+    expect(() =>
+      reconcileContentProvenance({
+        authority: 'initialize',
+        catalogLayer: 'system',
+        rulesetId: 'srd-cc-5.2.1',
+        contentTypeKey: 'monsters',
+        normalized,
+        excerptExists: () => false,
+      }),
+    ).toThrow(/does not exist/)
+  })
+
   it('copies entry provenance in carry mode', () => {
     const result = reconcileContentProvenance({
       authority: 'carry',

@@ -50,7 +50,8 @@ handlers cannot choose the mode.
 - **`carry`** — duplication only. Sets `derivedFrom` and inherited `documents`,
   and copies record `citation` / `excerpt` plus entry provenance.
 - **`initialize`** — capture and import tooling. May set record and entry
-  provenance. Integrity rules still apply.
+  provenance. Each citation or excerpt document must belong to the record, and
+  every excerpt reference must exist in the caller’s excerpt store.
 
 Ordinary homebrew has no provenance. Forms do not expose it.
 
@@ -71,11 +72,12 @@ SRD 5.2.1 monsters: Kobold Warrior, Skeleton, Knight, Mage, and Hell Hound.
 Passages were transcribed from the CC-BY PDF with `page-chrome`, `line-rejoin`,
 `whitespace`, and `unicode-nfc` cleanup. Each canonical entry in that batch
 draws from one passage, so multi-excerpt entries were not added. Record
-provenance on those seeds is a citation (section and page). Full stat-block
-tables are not stored as record excerpts because the PDF text layer mixes the
-ability table with page chrome.
+provenance on those seeds is a citation (section and page). Skeleton’s citation
+is page 325, where that stat block starts; its action passages continue on
+page 326. Full stat-block tables are not stored as record excerpts because the
+PDF text layer mixes the ability table with page chrome.
 
-Capture: `node packages/catalog/scripts/capture-source-excerpts.mjs --input <file> --out <dir>`.
+Capture: `pnpm exec tsx packages/catalog/scripts/capture-source-excerpts.mjs --input <file> --out <dir> [--seeds <seed.json>]`.
 The input file is not committed. The excerpt store is the only persisted
 original-text artifact.
 
