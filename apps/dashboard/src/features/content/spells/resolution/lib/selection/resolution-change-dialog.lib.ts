@@ -2,8 +2,8 @@ import {
   getSpellApplicationPatternKindLabel,
   getSpellResolutionAttackTypeLabel,
   getSpellResolutionOutcomeAuthoringLabel,
-  getSpellResolutionProximityKindLabel,
-  getSpellResolutionSelectionModeLabel,
+  getResolutionProximityKindLabel,
+  getResolutionSelectionModeLabel,
   type ResolutionChangePlan,
   type ResolutionChangeRequest,
   type ResolutionMethodOption,
@@ -58,9 +58,9 @@ export function formatChangePlanForDialog(
 
   let intro = 'Applying this change will:'
   if (change.field === 'selectionMode') {
-    intro = `Changing selection mode to ${getSpellResolutionSelectionModeLabel(change.value)} will:`
+    intro = `Changing selection mode to ${getResolutionSelectionModeLabel(change.value)} will:`
   } else if (change.field === 'proximityKind') {
-    intro = `Changing the target to ${getSpellResolutionProximityKindLabel(change.value)} will:`
+    intro = `Changing the target to ${getResolutionProximityKindLabel(change.value)} will:`
   }
 
   return {

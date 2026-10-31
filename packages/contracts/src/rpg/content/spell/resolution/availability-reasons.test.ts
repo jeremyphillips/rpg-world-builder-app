@@ -9,11 +9,11 @@ describe('formatResolutionAvailabilityReason', () => {
         {
           code: 'method-incompatible-with-proximity',
           method: 'ranged-spell',
-          proximity: 'self',
+          proximity: 'touch',
         },
         'option',
       ),
-    ).toBe('Not available when target proximity is self')
+    ).toBe('Not available when target proximity is touch')
   })
 
   it('formats pattern distance requirement for dialog tone', () => {

@@ -3,13 +3,10 @@ import { monsterActionDraftSchema, monsterReactionDraftSchema } from '@rpg/contr
 import type { MonsterActionSection } from './monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 
-type DraftUnion = typeof monsterActionDraftSchema
-
-function variantKeys(schema: DraftUnion, kind: string): readonly string[] {
-  const option = schema.options.find((entry) => {
-    const discriminator = entry.shape.kind
-    return 'value' in discriminator && discriminator.value === kind
-  })
+function variantKeys(schema: object, kind: string): readonly string[] {
+  const options = (schema as { options?: readonly { shape: { kind: { value?: unknown } } }[] })
+    .options
+  const option = options?.find((entry) => entry.shape.kind.value === kind)
   if (!option) return []
   return Object.keys(option.shape)
 }

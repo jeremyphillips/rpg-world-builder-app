@@ -4,27 +4,25 @@ import {
   getAbilityLabel,
   getSpellApplicationPatternKindLabel,
   getSpellResolutionAttackTypeLabel,
-  getSpellResolutionProximityKindLabel,
-  getSpellResolutionTargetKindLabel,
+  getResolutionProximityKindLabel,
+  getResolutionTargetKindLabel,
   SPELL_APPLICATION_PATTERN_KINDS,
-  SPELL_RESOLUTION_APPLICATION_AMOUNT_ENTRIES,
-  SPELL_RESOLUTION_APPLICATION_AMOUNTS,
+  RESOLUTION_APPLICATION_AMOUNT_ENTRIES,
+  RESOLUTION_APPLICATION_AMOUNTS,
   SPELL_RESOLUTION_ATTACK_TYPES,
-  SPELL_RESOLUTION_EXTERNAL_PROXIMITY_KINDS,
-  SPELL_RESOLUTION_PROXIMITY_KINDS,
-  SPELL_RESOLUTION_TARGET_KINDS,
+  RESOLUTION_PROXIMITY_KINDS,
+  RESOLUTION_TARGET_KINDS,
   type SpellApplicationPatternKind,
-  type SpellResolutionApplicationAmount,
+  type ResolutionApplicationAmount,
   type SpellResolutionAttackType,
-  type SpellResolutionExternalProximityKind,
-  type SpellResolutionProximityKind,
-  type SpellResolutionTargetKind,
-  getSpellResolutionSelectionModeLabel,
-  getSpellResolutionTargetCountKindLabel,
-  SPELL_RESOLUTION_SELECTION_MODES,
-  SPELL_RESOLUTION_TARGET_COUNT_KINDS,
-  type SpellResolutionSelectionMode,
-  type SpellResolutionTargetCountKind,
+  type ResolutionProximityKind,
+  type ResolutionTargetKind,
+  getResolutionSelectionModeLabel,
+  getResolutionTargetCountKindLabel,
+  RESOLUTION_SELECTION_MODES,
+  RESOLUTION_TARGET_COUNT_KINDS,
+  type ResolutionSelectionMode,
+  type ResolutionTargetCountKind,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
 
@@ -102,13 +100,13 @@ function ordinalSuffix(level: number): string {
 }
 
 export const RESOLUTION_OUTCOME_AMOUNT_OPTIONS: FieldOption[] = toOptions(
-  SPELL_RESOLUTION_APPLICATION_AMOUNTS,
+  RESOLUTION_APPLICATION_AMOUNTS,
   Object.fromEntries(
-    SPELL_RESOLUTION_APPLICATION_AMOUNTS.map((amount) => [
+    RESOLUTION_APPLICATION_AMOUNTS.map((amount) => [
       amount,
-      SPELL_RESOLUTION_APPLICATION_AMOUNT_ENTRIES[amount].label,
+      RESOLUTION_APPLICATION_AMOUNT_ENTRIES[amount].label,
     ]),
-  ) as Record<SpellResolutionApplicationAmount, string>,
+  ) as Record<ResolutionApplicationAmount, string>,
 )
 
 export const RESOLUTION_FIELD_LABELS = {
@@ -163,10 +161,10 @@ export const RESOLUTION_METHOD_KIND_OPTIONS: FieldOption[] = [
 ]
 
 export const resolutionTargetKindOptions: FieldOption[] = toOptions(
-  SPELL_RESOLUTION_TARGET_KINDS,
+  RESOLUTION_TARGET_KINDS,
   Object.fromEntries(
-    SPELL_RESOLUTION_TARGET_KINDS.map((kind) => [kind, getSpellResolutionTargetKindLabel(kind)]),
-  ) as Record<SpellResolutionTargetKind, string>,
+    RESOLUTION_TARGET_KINDS.map((kind) => [kind, getResolutionTargetKindLabel(kind)]),
+  ) as Record<ResolutionTargetKind, string>,
 )
 
 export const resolutionAttackTypeOptions: FieldOption[] = toOptions(
@@ -185,42 +183,22 @@ export const resolutionSaveAbilityOptions: FieldOption[] = ABILITY_IDS.map((abil
 }))
 
 export const resolutionSelectionModeOptions: FieldOption[] = toOptions(
-  SPELL_RESOLUTION_SELECTION_MODES,
+  RESOLUTION_SELECTION_MODES,
   Object.fromEntries(
-    SPELL_RESOLUTION_SELECTION_MODES.map((mode) => [
-      mode,
-      getSpellResolutionSelectionModeLabel(mode),
-    ]),
-  ) as Record<SpellResolutionSelectionMode, string>,
+    RESOLUTION_SELECTION_MODES.map((mode) => [mode, getResolutionSelectionModeLabel(mode)]),
+  ) as Record<ResolutionSelectionMode, string>,
 )
 
 export const resolutionCountKindOptions: FieldOption[] = toOptions(
-  SPELL_RESOLUTION_TARGET_COUNT_KINDS,
+  RESOLUTION_TARGET_COUNT_KINDS,
   Object.fromEntries(
-    SPELL_RESOLUTION_TARGET_COUNT_KINDS.map((kind) => [
-      kind,
-      getSpellResolutionTargetCountKindLabel(kind),
-    ]),
-  ) as Record<SpellResolutionTargetCountKind, string>,
+    RESOLUTION_TARGET_COUNT_KINDS.map((kind) => [kind, getResolutionTargetCountKindLabel(kind)]),
+  ) as Record<ResolutionTargetCountKind, string>,
 )
 
 export const resolutionProximityKindOptions: FieldOption[] = toOptions(
-  SPELL_RESOLUTION_EXTERNAL_PROXIMITY_KINDS,
+  RESOLUTION_PROXIMITY_KINDS,
   Object.fromEntries(
-    SPELL_RESOLUTION_EXTERNAL_PROXIMITY_KINDS.map((kind) => [
-      kind,
-      getSpellResolutionProximityKindLabel(kind),
-    ]),
-  ) as Record<SpellResolutionExternalProximityKind, string>,
-)
-
-/** @deprecated Proximity options included legacy self — use resolutionProximityKindOptions. */
-export const resolutionProximityKindOptionsWithSelf: FieldOption[] = toOptions(
-  SPELL_RESOLUTION_PROXIMITY_KINDS,
-  Object.fromEntries(
-    SPELL_RESOLUTION_PROXIMITY_KINDS.map((kind) => [
-      kind,
-      getSpellResolutionProximityKindLabel(kind),
-    ]),
-  ) as Record<SpellResolutionProximityKind, string>,
+    RESOLUTION_PROXIMITY_KINDS.map((kind) => [kind, getResolutionProximityKindLabel(kind)]),
+  ) as Record<ResolutionProximityKind, string>,
 )

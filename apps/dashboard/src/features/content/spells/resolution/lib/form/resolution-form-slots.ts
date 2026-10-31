@@ -13,9 +13,9 @@ import { SpellResolutionOutcomes } from '../../components/outcomes/spell-resolut
 import { SpellResolutionProgression } from '../../components/progression/spell-resolution-progression'
 import { SpellResolutionPreview } from '../../components/preview/spell-resolution-preview'
 import { SpellResolutionProximitySelect } from '../../components/target/spell-resolution-proximity-select'
-import { SpellResolutionSelectionModeSelect } from '../../components/target/spell-resolution-selection-mode-select'
+import { ResolutionSelectionModeSelect } from '../../components/target/spell-resolution-selection-mode-select'
 import { SpellResolutionSelectionHints } from '../../components/target/spell-resolution-selection-hints'
-import { deriveDefaultEffectRecipient, type SpellResolutionTargetKind } from '@rpg/contracts'
+import { deriveDefaultEffectRecipient, type ResolutionTargetKind } from '@rpg/contracts'
 import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
 import { resolutionEffectItemFields } from '../effects/resolution-effect-form-fields'
 import { resolutionSelectionContextFromWatched } from '../selection/resolution-selection-context.lib'
@@ -23,13 +23,14 @@ import { RESOLUTION_FIELD_LABELS, RESOLUTION_SECTION_LABELS } from './resolution
 import {
   combineFieldVisibility,
   visibleWhenResolutionConfigured,
+  visibleWhenSelectionModeIsOneOf,
 } from './resolution-form-visibility'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 import {
   resolutionTargetFormFields,
   visibleWhenApplicationPatternKind,
 } from './resolution-target-form-fields'
-import { resolutionAreaFormFields } from './resolution-area-form-fields'
+import { areaGeometryFormFields } from '../../../../lib/forms/fields/area-geometry-form-fields'
 
 const RESOLUTION_PREFIX = RESOLUTION_FIELD_NAME
 
@@ -67,7 +68,7 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
           const context = resolutionSelectionContextFromWatched(watched ?? {})
           return formatEffectRowSummary(values, {
             recipient: deriveDefaultEffectRecipient(context),
-            targetKind: context.targetKind as SpellResolutionTargetKind | undefined,
+            targetKind: context.targetKind as ResolutionTargetKind | undefined,
           })
         },
       },
@@ -85,7 +86,7 @@ function resolutionProjectilesFields(): FormItem[] {
   return [
     {
       kind: 'group',
-      label: RESOLUTION_SECTION_LABELS.projectiles,
+      legend: RESOLUTION_SECTION_LABELS.projectiles,
       visibility: projectilesVisibility,
       fields: [
         {
@@ -128,7 +129,7 @@ function resolutionProjectilesFields(): FormItem[] {
 function resolutionOutcomeBranchesGroup(): FormItem {
   return {
     kind: 'group',
-    label: RESOLUTION_SECTION_LABELS.outcomeBranches,
+    legend: RESOLUTION_SECTION_LABELS.outcomeBranches,
     description: RESOLUTION_SECTION_LABELS.outcomesHint,
     fields: [
       {
@@ -144,13 +145,13 @@ function resolutionOutcomeBranchesGroup(): FormItem {
 function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'group',
-    label: RESOLUTION_SECTION_LABELS.effectsAndOutcomes,
+    legend: RESOLUTION_SECTION_LABELS.effectsAndOutcomes,
     description: RESOLUTION_SECTION_LABELS.effectsAndOutcomesHint,
     visibility: visibleWhenResolutionConfigured(),
     fields: [
       {
         kind: 'group',
-        label: RESOLUTION_SECTION_LABELS.authoredEffects,
+        legend: RESOLUTION_SECTION_LABELS.authoredEffects,
         description: RESOLUTION_SECTION_LABELS.authoredEffectsDescription,
         fields: [
           {
@@ -203,13 +204,13 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      label: RESOLUTION_SECTION_LABELS.selection,
+      legend: RESOLUTION_SECTION_LABELS.selection,
       visibility: configured,
       fields: [
         {
           kind: 'slot',
           name: '_resolutionSelectionModeSelect',
-          render: () => createElement(SpellResolutionSelectionModeSelect),
+          render: () => createElement(ResolutionSelectionModeSelect),
         },
         {
           kind: 'slot',
@@ -222,12 +223,17 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
           render: () => createElement(SpellResolutionProximitySelect),
         },
         ...resolutionTargetFormFields(),
-        ...resolutionAreaFormFields(),
+        ...areaGeometryFormFields({
+          fieldPrefix: `${RESOLUTION_PREFIX}.areaOfEffect`,
+          legend: RESOLUTION_FIELD_LABELS.areaOfEffect,
+          shapeHint: 'Mechanical area geometry for resolution preview and execution.',
+          visibility: visibleWhenSelectionModeIsOneOf('self', 'point'),
+        }),
       ],
     },
     {
       kind: 'group',
-      label: RESOLUTION_SECTION_LABELS.check,
+      legend: RESOLUTION_SECTION_LABELS.check,
       visibility: configured,
       fields: [
         {
@@ -242,7 +248,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
     resolutionEffectsAndOutcomesGroup(ctx),
     {
       kind: 'group',
-      label: RESOLUTION_SECTION_LABELS.progression,
+      legend: RESOLUTION_SECTION_LABELS.progression,
       visibility: configured,
       fields: [
         {

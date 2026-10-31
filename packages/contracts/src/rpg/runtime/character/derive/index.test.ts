@@ -9,7 +9,7 @@ import {
   savingThrowBonus,
   skillModifier,
   spellAttackBonus,
-  spellSaveDc,
+  abilitySaveDc,
 } from './index'
 
 // ---------------------------------------------------------------------------
@@ -135,18 +135,18 @@ describe('skillModifier', () => {
 })
 
 // ---------------------------------------------------------------------------
-// spellSaveDc
+// abilitySaveDc
 // ---------------------------------------------------------------------------
 
-describe('spellSaveDc', () => {
+describe('abilitySaveDc', () => {
   it('computes 8 + profBonus + spellcasting ability mod', () => {
     // Wizard INT 18 (+4), profBonus 2 → DC 14
-    expect(spellSaveDc(18, 2)).toBe(14)
+    expect(abilitySaveDc(18, 2)).toBe(14)
   })
 
   it('scales with proficiency bonus at higher levels', () => {
     // Cleric WIS 16 (+3), profBonus 4 (L9) → DC 15
-    expect(spellSaveDc(16, 4)).toBe(15)
+    expect(abilitySaveDc(16, 4)).toBe(15)
   })
 })
 

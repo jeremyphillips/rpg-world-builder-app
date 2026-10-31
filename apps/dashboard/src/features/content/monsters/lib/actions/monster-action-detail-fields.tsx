@@ -9,6 +9,8 @@ import {
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
+import { distanceInputSelectField } from '../../../lib/forms/fields/content-speed-form-fields'
 import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
 import {
   rollValueFieldConfigs,
@@ -120,8 +122,10 @@ export function monsterActionDetailFields(input: {
   namePrefix: string
   equipmentOptions: { value: string; label: string }[]
   sharedCastingOptions: { value: string; label: string }[]
+  attackOptions?: { value: string; label: string }[]
 }): FormItem[] {
   const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions } = input
+  const attackOptions = input.attackOptions ?? []
   const fields: FormItem[] = [
     { type: 'text', name: 'name', label: MONSTER_ACTION_NAME_LABEL },
     action.kind === 'natural-weapon'
@@ -249,6 +253,146 @@ export function monsterActionDetailFields(input: {
       }),
       monsterActionOnHitFields(ctx),
     )
+  }
+
+  if (action.kind === 'save') {
+    fields.push(
+      {
+        type: 'select',
+        name: 'dcSource.kind',
+        label: 'Save DC',
+        placeholder: 'Choose',
+        options: [
+          { value: 'ability', label: 'Ability' },
+          { value: 'spell', label: 'Spellcasting' },
+        ],
+      },
+      {
+        type: 'select',
+        name: 'dcSource.ability',
+        label: 'Ability',
+        placeholder: 'Choose',
+        options: ABILITY_IDS.map((id) => ({ value: id, label: getAbilityLabel(id) })),
+        visibility: {
+          dependsOn: ['dcSource.kind'],
+          visibleWhen: (values) => values['dcSource.kind'] === 'ability',
+        },
+      },
+      {
+        type: 'switch',
+        name: 'dcSource.proficient',
+        label: 'Proficient',
+        visibility: {
+          dependsOn: ['dcSource.kind'],
+          visibleWhen: (values) => values['dcSource.kind'] === 'ability',
+        },
+      },
+      {
+        type: 'select',
+        name: 'resolution.selectionMode',
+        label: 'Selection',
+        options: [
+          { value: 'self', label: 'Area from self' },
+          { value: 'targets', label: 'Creatures in reach' },
+        ],
+      },
+      {
+        type: 'select',
+        name: 'resolution.method.ability',
+        label: 'Save ability',
+        options: ABILITY_IDS.map((id) => ({ value: id, label: getAbilityLabel(id) })),
+      },
+      ...areaGeometryFormFields({
+        fieldPrefix: 'resolution.areaOfEffect',
+        legend: 'Area',
+        shapeHint: 'Area measured from the monster.',
+        visibility: {
+          dependsOn: ['resolution.selectionMode'],
+          visibleWhen: (values) => values['resolution.selectionMode'] === 'self',
+        },
+      }),
+      ...rollValueFields({
+        namePrefix: 'resolution.effects.0.roll',
+        label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
+        required: true,
+      }),
+      damageTypeField({ name: 'resolution.effects.0.damageType', ctx, required: true }),
+      {
+        type: 'number',
+        name: 'resolution.target.count',
+        label: 'Target count',
+        min: 1,
+        visibility: {
+          dependsOn: ['resolution.selectionMode'],
+          visibleWhen: (values) => values['resolution.selectionMode'] === 'targets',
+        },
+      },
+      {
+        type: 'select',
+        name: 'resolution.target.proximity.kind',
+        label: 'Target distance',
+        options: [
+          { value: 'reach', label: 'Reach' },
+          { value: 'distance', label: 'Range' },
+        ],
+        visibility: {
+          dependsOn: ['resolution.selectionMode'],
+          visibleWhen: (values) => values['resolution.selectionMode'] === 'targets',
+        },
+      },
+      distanceInputSelectField({
+        name: 'resolution.target.proximity.distance.value',
+        label: 'Distance (ft)',
+        visibility: {
+          dependsOn: ['resolution.selectionMode', 'resolution.target.proximity.kind'],
+          visibleWhen: (values) =>
+            values['resolution.selectionMode'] === 'targets' &&
+            (values['resolution.target.proximity.kind'] === 'distance' ||
+              values['resolution.target.proximity.kind'] === 'reach'),
+        },
+      }),
+      {
+        type: 'textarea',
+        name: 'resolution.outcomes.0.note',
+        label: 'Failure note',
+        rows: 2,
+        width: 'full',
+        optionalDisclosure: {
+          addLabel: 'Add failure note',
+          removeLabel: 'Remove',
+          expandWhenPopulated: true,
+        },
+      },
+      {
+        type: 'select',
+        name: 'resolution.outcomes.1.applications.0.amount',
+        label: 'On successful save',
+        options: [
+          { value: 'half', label: 'Half damage' },
+          { value: 'full', label: 'Full damage' },
+          { value: 'none', label: 'No effect' },
+        ],
+      },
+    )
+  }
+
+  if (action.kind === 'multiattack') {
+    fields.push({
+      kind: 'array',
+      name: 'steps',
+      label: 'Steps',
+      addAction: { label: 'Add step' },
+      item: { header: { fallback: (index) => `Step ${index + 1}` } },
+      fields: [
+        { type: 'number', name: 'count', label: 'Count', min: 1 },
+        {
+          type: 'chips',
+          name: 'actionIds',
+          label: 'Attacks',
+          options: attackOptions,
+        },
+      ],
+    })
   }
 
   if (action.kind === 'spell') {

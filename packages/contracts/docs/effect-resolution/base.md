@@ -48,7 +48,8 @@ When `countKind` is omitted: `count === 1` → `exact`; otherwise → `up-to`.
 
 `areaOfEffect` is allowed only for `self` and `point`.
 
-Schema: [`spellResolutionSchema`](../../src/rpg/content/spell/resolution/schema.ts).
+Schema: [`effectResolutionSchema`](../../src/rpg/content/lib/resolution/schema.ts).
+Spells compose it as [`spellResolutionSchema`](../../src/rpg/content/spell/resolution/schema.ts).
 
 ## Preview sections
 
@@ -60,24 +61,32 @@ Schema: [`spellResolutionSchema`](../../src/rpg/content/spell/resolution/schema.
 | `point`   | yes  | Origin, Area, Affected  |
 | `none`    | —    | _(omit selection rows)_ |
 
-Formatter: [`formatResolutionSelectionSections`](../../src/rpg/content/spell/resolution/format-target.ts).
+Formatter: [`formatResolutionSelectionSections`](../../src/rpg/content/lib/resolution/format-target.ts).
 
-## Module index (spell implementation)
+## Module index
 
-| Module                              | Responsibility                               |
-| ----------------------------------- | -------------------------------------------- |
-| `schema.ts`                         | Zod shapes and cross-field validation        |
-| `normalize-resolution.ts`           | Legacy `target.proximity.self` normalization |
-| `vocab.ts`                          | Closed selection/target vocabularies         |
-| `effect-context.ts`                 | Recipient derivation                         |
-| `effect-target-compatibility.ts`    | Creature-only effect rules                   |
-| `selection-availability.ts`         | Authoring policy                             |
-| `format-target.ts`                  | Selection preview sections                   |
-| `format-summary.ts`                 | Full resolution preview                      |
-| `selection-change-plan.ts`          | Mode-transition cleanup planning             |
-| `selection-mode-cleanup.ts`         | Per-mode field clearing rules                |
-| `selection-availability.ts`         | Method/pattern availability (targets mode)   |
-| `selection-method-compatibility.ts` | Selection × method compatibility matrix      |
+Neutral envelope and closed sets:
+
+| Module                                                                               | Responsibility                                                       |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| [`content/lib/resolution/schema.ts`](../../src/rpg/content/lib/resolution/schema.ts) | `effectResolutionSchema`, field shape, reference validation          |
+| [`vocab/resolution/`](../../src/rpg/vocab/resolution/index.ts)                       | Selection modes, targets, proximity, outcomes, amounts, method kinds |
+| `content/lib/resolution/effect-context.ts`                                           | Recipient derivation                                                 |
+| `content/lib/resolution/effect-target-compatibility.ts`                              | Creature-only effect rules                                           |
+| `content/lib/resolution/selection-*.ts`                                              | Authoring policy, mode cleanup, method compatibility                 |
+| `content/lib/resolution/format-target.ts`                                            | Selection preview sections                                           |
+| `content/lib/resolution/format-summary.ts`                                           | Neutral summary: selection, check, effects, outcomes                 |
+
+Spell adapter (`content/spell/resolution/`):
+
+| Module                                   | Responsibility                                                               |
+| ---------------------------------------- | ---------------------------------------------------------------------------- |
+| `schema.ts`                              | `spellResolutionSchema` = envelope + attack method, projectiles, progression |
+| `vocab.ts`                               | Spell attack types and projectile pattern                                    |
+| `format-method.ts` / `format-summary.ts` | Attack check line, plus projectiles and progression sections                 |
+
+`selectionMode` is required. `proximity.kind: 'self'` is not a target proximity.
+Fields forbidden for the selected mode are rejected.
 
 ## Check method
 
@@ -85,7 +94,7 @@ Formatter: [`formatResolutionSelectionSections`](../../src/rpg/content/spell/res
 
 ### Selection × method compatibility
 
-Authoritative matrix: [`selection-method-compatibility.ts`](../../src/rpg/content/spell/resolution/selection-method-compatibility.ts).
+Authoritative matrix: [`selection-method-compatibility.ts`](../../src/rpg/content/lib/resolution/selection-method-compatibility.ts).
 
 Three states per cell:
 

@@ -11,14 +11,17 @@ import { NAME_REGION_TERM } from '../../name-generator/region'
 import { NAME_SUBJECT_KIND_TERM } from '../../name-generator/subject-kind'
 import {
   SPELL_APPLICATION_PATTERN_TERM,
-  SPELL_RESOLUTION_APPLICATION_AMOUNT_TERM,
   SPELL_RESOLUTION_ATTACK_TYPE_TERM,
-  SPELL_RESOLUTION_OUTCOME_RESULT_TERM,
-  SPELL_RESOLUTION_PROXIMITY_KIND_TERM,
-  SPELL_RESOLUTION_SELECTION_MODE_TERM,
-  SPELL_RESOLUTION_TARGET_COUNT_KIND_TERM,
-  SPELL_RESOLUTION_TARGET_KIND_TERM,
 } from '../content/spell/resolution/vocab'
+import {
+  RESOLUTION_APPLICATION_AMOUNT_TERM,
+  RESOLUTION_METHOD_KIND_TERM,
+  RESOLUTION_OUTCOME_RESULT_TERM,
+  RESOLUTION_PROXIMITY_KIND_TERM,
+  RESOLUTION_SELECTION_MODE_TERM,
+  RESOLUTION_TARGET_COUNT_KIND_TERM,
+  RESOLUTION_TARGET_KIND_TERM,
+} from './resolution'
 import { AREA_GEOMETRY_SHAPE_TERM } from '../primitives/area-geometry'
 import {
   SOURCE_DOCUMENT_DISPLAY_TERM,
@@ -67,7 +70,8 @@ import { PASSIVE_PERCEPTION_TERM } from './mechanics/passive-perception'
 import { TELEPATHY_TERM } from './mechanics/telepathy'
 import { SAVING_THROW_TERM } from './mechanics/saving-throw'
 import { MOVEMENT_MODE_TERM, MOVEMENT_OPERATION_TERM } from './movement-mode'
-import { MONSTER_NATURAL_WEAPON_PRESET_TERM } from './monster-natural-weapon-preset'
+import { ACTION_GROUP_TERM, ACTION_VOCABULARY_TERM } from './action/action-vocabulary'
+import { NATURAL_ATTACK_FORM_TERM } from './action/natural-attack-form'
 import { PROFICIENCY_TERM } from './proficiency'
 import { SENSE_TERM } from './sense'
 import { SPELL_ATOMIC_EFFECT_KIND_TERM } from './spell/atomic-effect-kind'
@@ -149,7 +153,16 @@ const RPG_VOCAB_CLOSED_TERMS = [
   ORGANIZATION_PRACTICE_TERM,
   NPC_TEMPLATE_TERM,
   NPC_WEALTH_TIER_TERM,
-  MONSTER_NATURAL_WEAPON_PRESET_TERM,
+  ACTION_GROUP_TERM,
+  ACTION_VOCABULARY_TERM,
+  NATURAL_ATTACK_FORM_TERM,
+  RESOLUTION_APPLICATION_AMOUNT_TERM,
+  RESOLUTION_METHOD_KIND_TERM,
+  RESOLUTION_OUTCOME_RESULT_TERM,
+  RESOLUTION_PROXIMITY_KIND_TERM,
+  RESOLUTION_SELECTION_MODE_TERM,
+  RESOLUTION_TARGET_COUNT_KIND_TERM,
+  RESOLUTION_TARGET_KIND_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
 /** Open `rpg/vocab` sets — `*_SET_ID` modules with a sibling `*_TERM`. */
@@ -199,13 +212,7 @@ const CONCEPT_ONLY_TERMS = [
 ] as const satisfies readonly VocabularyTerm[]
 
 const SPELL_RESOLUTION_TERMS = [
-  SPELL_RESOLUTION_TARGET_KIND_TERM,
   SPELL_RESOLUTION_ATTACK_TYPE_TERM,
-  SPELL_RESOLUTION_OUTCOME_RESULT_TERM,
-  SPELL_RESOLUTION_APPLICATION_AMOUNT_TERM,
-  SPELL_RESOLUTION_PROXIMITY_KIND_TERM,
-  SPELL_RESOLUTION_SELECTION_MODE_TERM,
-  SPELL_RESOLUTION_TARGET_COUNT_KIND_TERM,
   SPELL_APPLICATION_PATTERN_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
@@ -218,7 +225,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(53)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(62)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }
@@ -270,7 +277,7 @@ describe('concept-only term coverage', () => {
 
 describe('spell resolution term coverage', () => {
   it('defines vocab terms for every *_ENTRIES map', () => {
-    expect(SPELL_RESOLUTION_TERMS).toHaveLength(8)
+    expect(SPELL_RESOLUTION_TERMS).toHaveLength(2)
     for (const term of SPELL_RESOLUTION_TERMS) {
       expectVocabularyTerm(term)
     }

@@ -18,7 +18,7 @@ import {
   savingThrowBonus,
   skillModifier,
   spellAttackBonus,
-  spellSaveDc,
+  abilitySaveDc,
 } from './index'
 import { resolveMaxHpAtLevel } from './hit-points-at-level'
 import { resolvedField, unavailableField, type DerivedField } from '../../creature/derived-field'
@@ -176,7 +176,7 @@ export function deriveSpellcastingStats(
     ability: spellcasting.ability,
     saveDc:
       typeof abilityScore === 'number' && typeof profBonus === 'number'
-        ? spellSaveDc(abilityScore, profBonus)
+        ? abilitySaveDc(abilityScore, profBonus)
         : undefined,
     attackBonus:
       typeof abilityScore === 'number' && typeof profBonus === 'number'

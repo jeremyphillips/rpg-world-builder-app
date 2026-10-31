@@ -73,7 +73,7 @@ export { savingThrowBonus, skillModifier } from '../../creature/checks'
 // Spellcasting
 // ---------------------------------------------------------------------------
 
-export { spellAttackBonus, spellSaveDc } from '../../creature/spell-dc'
+export { abilitySaveDc, spellAttackBonus } from '../../creature/spell-dc'
 
 export * from './armor-class'
 export * from './hit-points-at-level'

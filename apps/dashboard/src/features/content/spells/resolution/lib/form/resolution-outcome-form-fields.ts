@@ -1,4 +1,4 @@
-import type { SpellResolutionOutcomeResult } from '@rpg/contracts'
+import type { ResolutionOutcomeResult } from '@rpg/contracts'
 import { createElement } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
@@ -66,7 +66,7 @@ export function buildOutcomeEffectApplicationMenuItems(
 
 export function findOutcomeIndexByResult(
   outcomes: readonly ResolutionOutcomeFormItem[],
-  result: SpellResolutionOutcomeResult,
+  result: ResolutionOutcomeResult,
 ): number {
   return outcomes.findIndex((outcome) => outcome.result === result)
 }

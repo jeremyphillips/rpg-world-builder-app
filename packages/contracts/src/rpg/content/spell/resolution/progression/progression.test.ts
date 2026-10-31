@@ -5,12 +5,13 @@ import {
   DEFAULT_CANTrip_SCALING_THRESHOLDS,
   SRD_CANTrip_SCALING_THRESHOLDS,
 } from '../../../../vocab/mechanics/cantrip-scaling-thresholds'
-import { spellResolutionSchema, SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '../schema'
+import { ELDRITCH_BLAST_RESOLUTION } from '../fixtures'
+import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '../../../lib/resolution/schema'
+import { spellResolutionSchema } from '../schema'
 import {
   BLESS_PROGRESSION_FIXTURE_RESOLUTION,
   BLESS_TARGET_COUNT_PROGRESSION,
   ELDRITCH_BLAST_PROGRESSION,
-  ELDRITCH_BLAST_WITH_PROJECTILES_RESOLUTION,
   FIRE_BOLT_PROGRESSION,
   FIREBALL_PROGRESSION,
   SPELL_RESOLUTION_PROGRESSION_FIXTURES,
@@ -192,10 +193,7 @@ describe('progression resolvers', () => {
     expect(track?.kind).toBe('thresholds')
     if (track?.kind !== 'thresholds') return
 
-    const base = readProgressionBaseValue(
-      ELDRITCH_BLAST_WITH_PROJECTILES_RESOLUTION,
-      track.reference,
-    )!
+    const base = readProgressionBaseValue(ELDRITCH_BLAST_RESOLUTION, track.reference)!
     const entries = track.entries
 
     expect(resolveProgressionValueAtCharacterLevel(base, entries, 5)).toEqual({
@@ -239,7 +237,7 @@ describe('progression formatters', () => {
 
 describe('progression references', () => {
   it('lists compatible references from a resolution snapshot', () => {
-    const refs = listCompatibleProgressionReferences(ELDRITCH_BLAST_WITH_PROJECTILES_RESOLUTION)
+    const refs = listCompatibleProgressionReferences(ELDRITCH_BLAST_RESOLUTION)
     const properties = refs.map((entry) => entry.reference.property)
 
     expect(properties).toContain('roll')
@@ -248,7 +246,7 @@ describe('progression references', () => {
 
   it('reads base roll from a referenced damage effect', () => {
     const reference = {
-      subject: { kind: 'effect' as const, effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID },
+      subject: { kind: 'effect' as const, effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID },
       property: 'roll' as const,
     }
     const base = readProgressionBaseValue(

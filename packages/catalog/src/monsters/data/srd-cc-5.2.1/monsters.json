@@ -272,9 +272,9 @@
     "actions": [
       {
         "id": "multiattack",
-        "kind": "special",
+        "kind": "multiattack",
         "name": "Multiattack",
-        "description": "<p>The knight makes two attacks, using Greatsword or Heavy Crossbow in any combination.</p>",
+        "steps": [{ "count": 2, "actionIds": ["greatsword", "heavy-crossbow"] }],
         "provenance": {
           "excerpt": {
             "documentId": "srd-5.2.1",
@@ -383,9 +383,9 @@
     "actions": [
       {
         "id": "multiattack",
-        "kind": "special",
+        "kind": "multiattack",
         "name": "Multiattack",
-        "description": "<p>The mage makes three Arcane Burst attacks.</p>",
+        "steps": [{ "count": 3, "actionIds": ["arcane-burst"] }],
         "provenance": {
           "excerpt": {
             "documentId": "srd-5.2.1",
@@ -565,9 +565,9 @@
     "actions": [
       {
         "id": "multiattack",
-        "kind": "special",
+        "kind": "multiattack",
         "name": "Multiattack",
-        "description": "<p>The hound makes two Bite attacks.</p>",
+        "steps": [{ "count": 2, "actionIds": ["bite"] }],
         "provenance": {
           "excerpt": {
             "documentId": "srd-5.2.1",
@@ -579,6 +579,7 @@
         "id": "bite",
         "kind": "natural-weapon",
         "name": "Bite",
+        "form": "bite",
         "mode": "melee",
         "damage": { "dice": { "count": 1, "faces": 8 } },
         "damageType": "piercing",
@@ -596,9 +597,33 @@
       },
       {
         "id": "fire-breath",
-        "kind": "special",
+        "kind": "save",
+        "preset": "breath-weapon",
         "name": "Fire Breath",
-        "description": "<p>Dexterity Saving Throw: DC 12, each creature in a 15-foot Cone. Failure: 17 (5d6) Fire damage. Success: Half damage.</p>",
+        "dcSource": { "kind": "ability", "ability": "con", "proficient": true },
+        "resolution": {
+          "selectionMode": "self",
+          "areaOfEffect": { "shape": "cone", "length": { "value": 15, "unit": "ft" } },
+          "method": { "kind": "saving-throw", "ability": "dex" },
+          "effects": [
+            {
+              "id": "damage",
+              "kind": "damage",
+              "roll": { "dice": { "count": 5, "faces": 6 } },
+              "damageType": "fire"
+            }
+          ],
+          "outcomes": [
+            {
+              "result": "failed-save",
+              "applications": [{ "effectId": "damage", "amount": "full" }]
+            },
+            {
+              "result": "successful-save",
+              "applications": [{ "effectId": "damage", "amount": "half" }]
+            }
+          ]
+        },
         "limitedUse": { "kind": "recharge", "minRoll": 5 },
         "provenance": {
           "excerpt": {

@@ -23,6 +23,7 @@ import {
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
+import type { MonsterActionPending } from '../../hooks/use-monster-action-sections'
 import {
   buildMonsterLoadoutPickerItems,
   resolveMonsterFormWeaponGrants,
@@ -88,16 +89,33 @@ function MonsterActionAddMenu({
   )
 }
 
-export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
-  const sections = useMonsterActionSections(ctx.entityId)
-  const { getValues, formState } = useFormContext<MonsterFormValues>()
-  const [weaponPickerSection, setWeaponPickerSection] = useState<MonsterActionSection | null>(null)
-  const values = sections.values ?? getValues()
-  const catalog = monsterEquipmentCatalog(ctx)
-  const provider = monsterMagicPropertyProvider(ctx)
-  const located = sections.locate(sections.selectedActionId)
-  const allowAddWeapon = ctx.equipmentCatalogStatus === 'ready'
-  const weapons = (values.equipment ?? []).flatMap((entry) => {
+function pendingConfirmCopy(pending: MonsterActionPending | null): {
+  headline: string
+  description: string
+} {
+  if (pending?.type === 'multiattack-delete') {
+    const names = pending.names.join(', ')
+    return {
+      headline: 'Remove referenced attack',
+      description: `This attack is used by ${names}. Removing it drops that reference and leaves the step count unchanged.`,
+    }
+  }
+  if (pending?.type === 'multiattack-move') {
+    const names = pending.names.join(', ')
+    return {
+      headline: 'Move referenced attack',
+      description: `${names} will be invalid until this attack is moved back to Actions.`,
+    }
+  }
+  return { headline: MONSTER_MOVE_TO_LABEL, description: formatDropTriggerBody() }
+}
+
+function equippedWeaponRows(
+  values: MonsterFormValues,
+  catalog: ReturnType<typeof monsterEquipmentCatalog>,
+  provider: ReturnType<typeof monsterMagicPropertyProvider>,
+) {
+  return (values.equipment ?? []).flatMap((entry) => {
     const item = catalog.get(entry.equipmentId)
     if (!item || !isWeaponEquipment(item)) return []
     return [
@@ -113,6 +131,19 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
       },
     ]
   })
+}
+
+export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
+  const sections = useMonsterActionSections(ctx.entityId)
+  const { getValues, formState } = useFormContext<MonsterFormValues>()
+  const [weaponPickerSection, setWeaponPickerSection] = useState<MonsterActionSection | null>(null)
+  const values = sections.values ?? getValues()
+  const catalog = monsterEquipmentCatalog(ctx)
+  const provider = monsterMagicPropertyProvider(ctx)
+  const located = sections.locate(sections.selectedActionId)
+  const allowAddWeapon = ctx.equipmentCatalogStatus === 'ready'
+  const weapons = equippedWeaponRows(values, catalog, provider)
+  const confirmCopy = pendingConfirmCopy(sections.pending)
 
   const pickerItems = useMemo(() => {
     if (!weaponPickerSection) return []
@@ -180,12 +211,12 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
         <MonsterActionDetail ctx={ctx} sections={sections} located={located} />
       </MasterDetailGrid>
       <ConfirmDialog
-        open={sections.pending?.type === 'trigger'}
+        open={sections.pending != null}
         onOpenChange={(open) => {
           if (!open) sections.setPending(null)
         }}
-        headline={MONSTER_MOVE_TO_LABEL}
-        description={formatDropTriggerBody()}
+        headline={confirmCopy.headline}
+        description={confirmCopy.description}
         confirmLabel={MONSTER_DROP_TRIGGER_CONFIRM}
         cancelLabel={MONSTER_CANCEL_LABEL}
         onConfirm={() => sections.confirmPending()}

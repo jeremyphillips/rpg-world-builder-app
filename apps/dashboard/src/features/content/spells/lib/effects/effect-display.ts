@@ -4,7 +4,7 @@ import {
   formatEffectRowSentence,
   type EffectRecipient,
   type SpellAtomicEffectKind,
-  type SpellResolutionTargetKind,
+  type ResolutionTargetKind,
 } from '@rpg/contracts'
 
 import {
@@ -18,7 +18,7 @@ export const SPELL_EFFECTS_PREVIEW_LABEL = 'Effect preview' as const
 
 type EffectRowDisplayOptions = {
   recipient?: EffectRecipient
-  targetKind?: SpellResolutionTargetKind
+  targetKind?: ResolutionTargetKind
   fallbackIndex?: number
 }
 

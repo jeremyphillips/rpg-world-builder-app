@@ -2,12 +2,12 @@ import {
   buildDefaultOutcomeSlots,
   defaultOriginFromSpellRange,
   inferPointSelectionModeFromSpell,
-  inferSpellResolutionTargetCountKind,
+  inferResolutionTargetCountKind,
   spellResolutionSchema,
   spellSchema,
-  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-  SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
-  SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+  RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
   stripEmptyOutcomeSlots,
   type Ability,
   type AreaGeometry,
@@ -16,14 +16,14 @@ import {
   type SpellDamageEffect,
   type SpellHealingEffect,
   type SpellResolution,
-  type SpellResolutionEffect,
-  type SpellResolutionEffectId,
+  type ResolutionEffect,
+  type ResolutionEffectId,
   type SpellResolutionMethod,
-  type SpellResolutionOrigin,
-  type SpellResolutionSelectionMode,
-  type SpellResolutionTarget,
-  type SpellResolutionTargetCountKind,
-  type SpellResolutionTargetProximity,
+  type ResolutionOrigin,
+  type ResolutionSelectionMode,
+  type ResolutionTarget,
+  type ResolutionTargetCountKind,
+  type ResolutionTargetProximity,
   type SpellTemporaryHitPointsEffect,
 } from '@rpg/contracts'
 
@@ -32,23 +32,21 @@ import { SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS } from './spell-resolution-
 export type ResolutionDerivationOverrides = {
   method?: SpellResolutionMethod
   saveAbility?: Ability
-  selectionMode?: SpellResolutionSelectionMode
-  proximity?: SpellResolutionTargetProximity
+  selectionMode?: ResolutionSelectionMode
+  proximity?: ResolutionTargetProximity
   target?: {
     count?: number
-    countKind?: SpellResolutionTargetCountKind
-    kind?: SpellResolutionTarget['kind']
-    proximity?: SpellResolutionTargetProximity
+    countKind?: ResolutionTargetCountKind
+    kind?: ResolutionTarget['kind']
+    proximity?: ResolutionTargetProximity
   }
-  origin?: SpellResolutionOrigin
+  origin?: ResolutionOrigin
   areaOfEffect?: AreaGeometry
   outcomes?: SpellResolution['outcomes']
   /** Applies to the hit outcome branch when method is attack. */
   hitNote?: string
   /** Applies to the failed-save outcome branch when method is saving-throw. */
   failedSaveNote?: string
-  /** @deprecated Use proximity */
-  range?: SpellResolutionTargetProximity
 }
 
 const DEFAULT_TARGET_KIND = 'creature-or-object' as const
@@ -83,14 +81,14 @@ export function findPrimaryResolutionEffect(
   )
 }
 
-function primaryEffectIdForKind(kind: PrimaryResolutionEffectKind): SpellResolutionEffectId {
+function primaryEffectIdForKind(kind: PrimaryResolutionEffectKind): ResolutionEffectId {
   switch (kind) {
     case 'damage':
-      return SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
+      return RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
     case 'healing':
-      return SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID
+      return RESOLUTION_PRIMARY_HEALING_EFFECT_ID
     case 'temporary-hit-points':
-      return SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID
+      return RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID
     default: {
       const _exhaustive: never = kind
       return _exhaustive
@@ -98,7 +96,7 @@ function primaryEffectIdForKind(kind: PrimaryResolutionEffectKind): SpellResolut
   }
 }
 
-function buildResolutionEffect(primary: PrimaryResolutionEffect): SpellResolutionEffect {
+function buildResolutionEffect(primary: PrimaryResolutionEffect): ResolutionEffect {
   const id = primaryEffectIdForKind(primary.kind)
 
   switch (primary.kind) {
@@ -143,10 +141,10 @@ function mapDeliveryMethodToResolutionMethod(
 function mapSpellRangeToTargetProximity(
   spellRange: Spell['range'],
   method: SpellResolutionMethod | undefined,
-): SpellResolutionTargetProximity | undefined {
+): ResolutionTargetProximity | undefined {
   switch (spellRange.kind) {
     case 'self':
-      return { kind: 'self' }
+      return undefined
     case 'touch':
       if (method?.kind === 'attack' && method.attackType === 'melee-spell') {
         return { kind: 'reach' }
@@ -223,23 +221,14 @@ function buildTargetsSelection(
   spell: Pick<Spell, 'range'>,
   method: SpellResolutionMethod,
   overrides: ResolutionDerivationOverrides,
-  proximity: SpellResolutionTargetProximity,
+  proximity: ResolutionTargetProximity,
 ): Pick<SpellResolution, 'selectionMode' | 'target'> {
   const count = overrides.target?.count ?? 1
-
-  let externalProximity: SpellResolutionTarget['proximity']
-  if (proximity.kind === 'self') {
-    const mapped = mapSpellRangeToTargetProximity(spell.range, method)
-    externalProximity = mapped && mapped.kind !== 'self' ? mapped : ({ kind: 'touch' } as const)
-  } else {
-    externalProximity = proximity
-  }
-
-  const target: SpellResolutionTarget = {
+  const target: ResolutionTarget = {
     count,
-    countKind: inferSpellResolutionTargetCountKind(count, overrides.target?.countKind),
+    countKind: inferResolutionTargetCountKind(count, overrides.target?.countKind),
     kind: overrides.target?.kind ?? DEFAULT_TARGET_KIND,
-    proximity: externalProximity,
+    proximity,
   }
 
   return { selectionMode: 'targets', target }
@@ -249,18 +238,14 @@ function inferSelectionMode(
   spell: Pick<Spell, 'range' | 'areaOfEffect'>,
   method: SpellResolutionMethod,
   overrides: ResolutionDerivationOverrides,
-  proximity: SpellResolutionTargetProximity,
-): SpellResolutionSelectionMode {
+): ResolutionSelectionMode {
   if (overrides.selectionMode) return overrides.selectionMode
 
-  if (proximity.kind === 'self') return 'self'
+  const hasProximityOverride = Boolean(overrides.proximity ?? overrides.target?.proximity)
+  if (!hasProximityOverride && spell.range.kind === 'self') return 'self'
 
   const pointMode = inferPointSelectionModeFromSpell({ ...spell, method })
   if (pointMode === 'point') return 'point'
-
-  if (spell.range.kind === 'self' && resolveAreaOfEffect(spell, overrides)) {
-    return 'self'
-  }
 
   return 'targets'
 }
@@ -270,13 +255,13 @@ function buildSelectionEnvelope(
   method: SpellResolutionMethod,
   overrides: ResolutionDerivationOverrides,
 ): Pick<SpellResolution, 'selectionMode' | 'target' | 'origin' | 'areaOfEffect'> {
-  const proximityOverride = overrides.proximity ?? overrides.range ?? overrides.target?.proximity
-  const proximity: SpellResolutionTargetProximity =
+  const proximityOverride = overrides.proximity ?? overrides.target?.proximity
+  const proximity: ResolutionTargetProximity =
     proximityOverride ??
     mapSpellRangeToTargetProximity(spell.range, method) ??
     ({ kind: 'touch' } as const)
 
-  const mode = inferSelectionMode(spell, method, overrides, proximity)
+  const mode = inferSelectionMode(spell, method, overrides)
 
   switch (mode) {
     case 'self':
@@ -296,7 +281,7 @@ function buildSelectionEnvelope(
 
 function buildOutcomes(
   method: SpellResolutionMethod,
-  effectId: SpellResolutionEffectId,
+  effectId: ResolutionEffectId,
   overrides: ResolutionDerivationOverrides,
 ): SpellResolution['outcomes'] {
   if (overrides.outcomes) return overrides.outcomes

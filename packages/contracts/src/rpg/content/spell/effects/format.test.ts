@@ -5,7 +5,7 @@ import {
   FALSE_LIFE_RESOLUTION,
   FIREBALL_RESOLUTION,
 } from '../resolution/fixtures'
-import { deriveEffectRecipientFromResolution } from '../resolution/effect-context'
+import { deriveEffectRecipientFromResolution } from '../../lib/resolution/effect-context'
 import { formatEffectRowSentenceFromParts } from './format'
 
 describe('formatEffectRowSentenceFromParts', () => {

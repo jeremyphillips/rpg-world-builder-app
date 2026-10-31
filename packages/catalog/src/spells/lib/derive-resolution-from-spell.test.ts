@@ -4,7 +4,7 @@ import {
   ELDRITCH_BLAST_RESOLUTION,
   ICE_KNIFE_RESOLUTION,
   INFlict_WOUNDS_RESOLUTION,
-  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
 } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
@@ -66,7 +66,7 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
     expect(resolution.outcomes).toEqual([
       {
         result: 'hit',
-        applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
       },
     ])
   })

@@ -1,5 +1,7 @@
 export * from './derived-field'
 export * from './armor-class'
+export * from './format-monster-multiattack'
+export * from './format-monster-save-action'
 export * from './stat-block'
 export * from './resolve-monster-action-attack-profile'
 export * from './reaction-trigger'

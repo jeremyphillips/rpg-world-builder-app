@@ -2,7 +2,7 @@
 
 Monster weapon actions do not store a mode. One `kind: 'weapon'` row becomes one attack line. Mode, reach, and range come from the catalog item.
 
-Natural-weapon presets from the add menu seed name, damage type, mode, and a default **1d6** damage roll (`MONSTER_NATURAL_WEAPON_PRESET_DEFAULT_DAMAGE`). Authors can change the roll in the detail panel.
+Natural-weapon presets from the add menu seed name, damage type, mode, and a default **1d6** damage roll (see `DEFAULT_NATURAL_DAMAGE` in `content/action/action-presets.ts`). Authors can change the roll in the detail panel.
 
 | Source               | What the resolver uses                                                                                                                            |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |

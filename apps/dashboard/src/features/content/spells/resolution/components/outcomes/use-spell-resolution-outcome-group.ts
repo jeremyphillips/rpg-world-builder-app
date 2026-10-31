@@ -1,5 +1,5 @@
 import { useId, useState } from 'react'
-import { isOutcomeEmpty, type SpellResolutionOutcomeResult } from '@rpg/contracts'
+import { isOutcomeEmpty, type ResolutionOutcomeResult } from '@rpg/contracts'
 import { useWatch } from 'react-hook-form'
 
 import { readOutcomeApplications } from '../../lib/form/resolution-outcome-applications.lib'
@@ -8,7 +8,7 @@ import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
 
 type UseSpellResolutionOutcomeGroupArgs = {
   outcomeIndex: number
-  result: SpellResolutionOutcomeResult
+  result: ResolutionOutcomeResult
 }
 
 export function useSpellResolutionOutcomeGroup({

@@ -31,6 +31,15 @@ does not match the section.
 The dashboard passes `spellCatalogById` from the spells query. The API loads spells in
 `monstersValidateBeforeWrite`.
 
+## Actions
+
+`save` and `multiattack` are contract shapes, not extra catalog issue codes.
+Publish rejects a `save` whose envelope is outside the supported shape, and a
+`multiattack` step that does not point at a `weapon`, `natural-weapon`, or
+`attack` in `actions`. Those errors come from monster body refinements. SRD
+seeds in `packages/catalog` cover Fire Breath and the Knight, Mage, and Hell
+Hound multiattacks.
+
 ## Equipment
 
 Equipment row rules (unknown ids, body-armor conflicts, weapon actions) still run on

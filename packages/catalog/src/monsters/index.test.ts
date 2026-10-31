@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { deriveMonsterStatBlock, systemDefaultArmorClassRules } from '@rpg/contracts'
+import {
+  CHALLENGE_RATING_MECHANICS,
+  deriveMonsterStatBlock,
+  formatMonsterMultiattack,
+  formatMonsterSaveAction,
+  systemDefaultArmorClassRules,
+} from '@rpg/contracts'
 
 import { loadSeedEquipment } from '../equipment'
 import { loadSeedMonsters, seedMonsterSlugs } from './index'
@@ -90,5 +96,64 @@ describe('SRD 5.2.1 monster seed', () => {
       damageExpression: '1d8+3',
       additionalDamage: [{ average: 3, expression: '1d6' }],
     })
+  })
+
+  it('keeps migrated action ids and generates the agreed stat-block text', () => {
+    const equipmentCatalog = new Map(loadSeedEquipment(RULESET).map((row) => [row.id, row]))
+    const knight = monsters.find((monster) => monster.slug === 'knight')
+    const mage = monsters.find((monster) => monster.slug === 'mage')
+    const hound = monsters.find((monster) => monster.slug === 'hell-hound')
+    expect(
+      knight?.actions.find((action) => action.id === 'parry' || action.kind === 'special'),
+    ).toBeUndefined()
+    expect(knight?.reactions.find((action) => action.id === 'parry')?.kind).toBe('special')
+
+    const formatMultiattack = (monster: NonNullable<typeof knight>) => {
+      const action = monster.actions.find((entry) => entry.kind === 'multiattack')
+      expect(action?.kind).toBe('multiattack')
+      if (action?.kind !== 'multiattack') return ''
+      return formatMonsterMultiattack({
+        monsterName: monster.name,
+        action,
+        actions: monster.actions,
+        equipment: monster.equipment,
+        equipmentCatalog,
+      })
+    }
+
+    expect(formatMultiattack(knight!)).toBe(
+      'The knight makes two attacks, using Greatsword or Heavy Crossbow in any combination.',
+    )
+    expect(formatMultiattack(mage!)).toBe('The mage makes three Arcane Burst attacks.')
+    expect(formatMultiattack(hound!)).toBe('The hell hound makes two Bite attacks.')
+
+    const breath = hound?.actions.find((action) => action.id === 'fire-breath')
+    const bite = hound?.actions.find((action) => action.id === 'bite')
+    expect(breath?.kind).toBe('save')
+    expect(bite).toMatchObject({ kind: 'natural-weapon', form: 'bite' })
+    expect(breath?.provenance?.excerpt?.excerptId).toBe('monsters/hell-hound/fire-breath')
+    if (breath?.kind !== 'save' || !hound) return
+    const formatted = formatMonsterSaveAction({
+      action: breath,
+      abilityScores: hound.abilityScores,
+      proficiencyBonus: CHALLENGE_RATING_MECHANICS[hound.challengeRating].proficiencyBonus,
+    })
+    expect(formatted.heading).toBe('Fire Breath (Recharge 5–6)')
+    expect(formatted.body).toBe(
+      'Dexterity Saving Throw: DC 12, each creature in a 15-foot Cone. Failure: 17 (5d6) Fire damage. Success: Half damage.',
+    )
+
+    for (const monster of [knight, mage, hound]) {
+      if (!monster) continue
+      for (const action of monster.actions) {
+        if (action.kind !== 'multiattack') continue
+        for (const step of action.steps) {
+          for (const id of step.actionIds) {
+            const target = monster.actions.find((entry) => entry.id === id)
+            expect(['weapon', 'natural-weapon', 'attack']).toContain(target?.kind)
+          }
+        }
+      }
+    }
   })
 })

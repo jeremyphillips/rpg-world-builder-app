@@ -3,8 +3,8 @@ import {
   DAMAGE_TYPE_TERM,
   getTermSentenceForm,
   withArticle,
-  type SpellResolutionApplicationAmount,
-  type SpellResolutionOutcomeResult,
+  type ResolutionApplicationAmount,
+  type ResolutionOutcomeResult,
 } from '@rpg/contracts'
 
 import {
@@ -67,8 +67,8 @@ export function formatResolutionEffectCompletenessMessage(
 
 export function defaultApplicationAmountForOutcome(
   effect: ResolutionEffectFormItem,
-  outcomeResult: SpellResolutionOutcomeResult,
-): SpellResolutionApplicationAmount {
+  outcomeResult: ResolutionOutcomeResult,
+): ResolutionApplicationAmount {
   if (outcomeResult === 'successful-save' && supportsPartialApplicationForEffectKind(effect.kind)) {
     return 'half'
   }

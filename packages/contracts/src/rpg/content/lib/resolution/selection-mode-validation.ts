@@ -1,0 +1,109 @@
+import type { z } from 'zod'
+
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
+import { spellResolutionValidationMessages } from './validation-messages'
+import type { ResolutionSelectionMode } from '../../../vocab/resolution'
+
+type ResolutionModeField = 'target' | 'origin' | 'areaOfEffect'
+
+export type ResolutionModeValidationInput = {
+  selectionMode: ResolutionSelectionMode
+  target?: unknown
+  origin?: unknown
+  areaOfEffect?: unknown
+}
+
+type ModeFieldRule = {
+  field: ResolutionModeField
+  message: (mode: ResolutionSelectionMode) => string
+}
+
+const MODE_FIELD_RULES: Record<
+  ResolutionSelectionMode,
+  { required?: ModeFieldRule[]; forbidden?: ModeFieldRule[] }
+> = {
+  targets: {
+    required: [
+      {
+        field: 'target',
+        message: () => spellResolutionValidationMessages.targetRequiredForTargetsMode(),
+      },
+    ],
+    forbidden: [
+      {
+        field: 'origin',
+        message: (mode) => spellResolutionValidationMessages.originForbiddenForMode({ mode }),
+      },
+      {
+        field: 'areaOfEffect',
+        message: (mode) => spellResolutionValidationMessages.areaForbiddenForMode({ mode }),
+      },
+    ],
+  },
+  point: {
+    required: [
+      {
+        field: 'origin',
+        message: () => spellResolutionValidationMessages.originRequiredForPointMode(),
+      },
+    ],
+    forbidden: [
+      {
+        field: 'target',
+        message: (mode) => spellResolutionValidationMessages.targetForbiddenForMode({ mode }),
+      },
+    ],
+  },
+  self: {
+    forbidden: [
+      {
+        field: 'target',
+        message: (mode) => spellResolutionValidationMessages.targetForbiddenForMode({ mode }),
+      },
+      {
+        field: 'origin',
+        message: (mode) => spellResolutionValidationMessages.originForbiddenForMode({ mode }),
+      },
+    ],
+  },
+  none: {
+    forbidden: [
+      {
+        field: 'target',
+        message: (mode) => spellResolutionValidationMessages.targetForbiddenForMode({ mode }),
+      },
+      {
+        field: 'origin',
+        message: (mode) => spellResolutionValidationMessages.originForbiddenForMode({ mode }),
+      },
+      {
+        field: 'areaOfEffect',
+        message: (mode) => spellResolutionValidationMessages.areaForbiddenForMode({ mode }),
+      },
+    ],
+  },
+}
+
+function hasModeField(
+  resolution: ResolutionModeValidationInput,
+  field: ResolutionModeField,
+): boolean {
+  return Boolean(resolution[field])
+}
+
+export function validateResolutionModeFields(
+  resolution: ResolutionModeValidationInput,
+  ctx: z.RefinementCtx,
+): void {
+  const rules = MODE_FIELD_RULES[resolution.selectionMode]
+
+  for (const rule of rules.required ?? []) {
+    if (hasModeField(resolution, rule.field)) continue
+    addCustomRefinementIssue(ctx, rule.message(resolution.selectionMode), [rule.field])
+  }
+
+  for (const rule of rules.forbidden ?? []) {
+    if (!hasModeField(resolution, rule.field)) continue
+    addCustomRefinementIssue(ctx, rule.message(resolution.selectionMode), [rule.field])
+  }
+}

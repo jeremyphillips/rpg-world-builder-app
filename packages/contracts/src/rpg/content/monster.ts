@@ -230,6 +230,70 @@ function refineUniqueIds(
   })
 }
 
+const MULTIATTACK_ATTACK_KINDS = new Set(['weapon', 'natural-weapon', 'attack'])
+
+function refineMultiattackReferences(
+  body: {
+    actions: readonly {
+      id?: string
+      kind: string
+      steps?: readonly { actionIds?: readonly string[] }[]
+    }[]
+    bonusActions: readonly { id?: string; kind: string }[]
+    reactions: readonly { id?: string; kind: string }[]
+  },
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  const actionsById = new Map(
+    body.actions.flatMap((action) => (action.id ? [[action.id, action] as const] : [])),
+  )
+  const sections = [
+    ['actions', body.actions],
+    ['bonusActions', body.bonusActions],
+    ['reactions', body.reactions],
+  ] as const
+  for (const [section, entries] of sections) {
+    entries.forEach((action, index) => {
+      if (action.kind !== 'multiattack') return
+      if (section !== 'actions') {
+        addCustomRefinementIssue(ctx, 'Multiattack is only valid in Actions.', [
+          ...prefix,
+          section,
+          index,
+          'kind',
+        ])
+        return
+      }
+      const seen = new Set<string>()
+      const steps = 'steps' in action && Array.isArray(action.steps) ? action.steps : []
+      steps.forEach((step, stepIndex) => {
+        const stepSeen = new Set<string>()
+        const actionIds: readonly string[] = Array.isArray(step.actionIds) ? step.actionIds : []
+        actionIds.forEach((id, idIndex) => {
+          const path = [...prefix, section, index, 'steps', stepIndex, 'actionIds', idIndex]
+          if (id === action.id) {
+            addCustomRefinementIssue(ctx, 'A multiattack cannot reference itself.', path)
+          }
+          if (stepSeen.has(id) || seen.has(id)) {
+            addCustomRefinementIssue(ctx, 'Each attack can be referenced only once.', path)
+          }
+          stepSeen.add(id)
+          seen.add(id)
+          const target = actionsById.get(id)
+          if (!target) {
+            addCustomRefinementIssue(ctx, 'must reference an action in Actions', path)
+            return
+          }
+          if (!MULTIATTACK_ATTACK_KINDS.has(target.kind)) {
+            addCustomRefinementIssue(ctx, 'invalid kind', path)
+          }
+        })
+      })
+    })
+  }
+}
+
 function refineWeaponEntryReferences(
   body: {
     equipment: readonly { entryId: string }[]
@@ -302,6 +366,7 @@ export function refineMonsterBody(
   refineMonsterSpellEntries(body, ctx, prefix)
 
   refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
+  refineMultiattackReferences(body, ctx, prefix)
   refineCreatureDamageDefenses(body.defenses, ctx, [...prefix, 'defenses'])
   refineCreatureSenseRanges(body.senses, ctx, [...prefix, 'senses'])
   refineCreatureTelepathyRange(body.communication.telepathy, ctx, [
@@ -396,6 +461,15 @@ function refineMonsterDraftBody(
     ctx,
     prefix,
     { requirePresent: false },
+  )
+  refineMultiattackReferences(
+    {
+      actions: body.actions ?? [],
+      bonusActions: body.bonusActions ?? [],
+      reactions: body.reactions ?? [],
+    },
+    ctx,
+    prefix,
   )
 }
 

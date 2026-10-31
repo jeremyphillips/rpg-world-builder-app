@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
+import { formatResolutionOutcomes } from '../../lib/resolution/format-outcomes'
+import {
+  formatResolutionTarget,
+  formatResolutionTargetProximityPhrase,
+} from '../../lib/resolution/format-target'
 import {
   formatResolutionEffectsApplicationLabel,
   formatResolutionMethod,
-  formatResolutionOutcomes,
   formatResolutionProjectilesPreview,
   formatResolutionSummary,
-  formatResolutionTarget,
-  formatResolutionTargetProximityPhrase,
 } from './format'
 import {
   BURNING_HANDS_RESOLUTION,
@@ -21,12 +23,12 @@ import {
   SPELL_RESOLUTION_FIXTURES,
 } from './fixtures'
 import {
-  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-  spellResolutionEffectIdSchema,
-  spellResolutionSchema,
-  SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
-} from './schema'
-import { spellResolutionValidationMessages } from './validation-messages'
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+  resolutionEffectIdSchema,
+} from '../../lib/resolution/schema'
+import { spellResolutionSchema } from './schema'
+import { spellResolutionValidationMessages } from '../../lib/resolution/validation-messages'
 
 describe('spellResolutionSchema', () => {
   it('accepts the scoped spell fixtures', () => {
@@ -42,7 +44,7 @@ describe('spellResolutionSchema', () => {
       method: { kind: 'attack', attackType: 'melee-spell' },
       effects: [
         {
-          id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+          id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
           kind: 'damage',
           roll: { dice: { count: 1, faces: 4 } },
           damageType: 'bludgeoning',
@@ -68,7 +70,7 @@ describe('spellResolutionSchema', () => {
         method: { kind: 'saving-throw', ability: 'wis' },
         effects: [
           {
-            id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+            id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
             kind: 'damage',
             roll: { dice: { count: 1, faces: 6 } },
             damageType: 'psychic',
@@ -77,7 +79,7 @@ describe('spellResolutionSchema', () => {
         outcomes: [
           {
             result: 'failed-save',
-            applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+            applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
           },
         ],
       }),
@@ -115,7 +117,7 @@ describe('spellResolutionSchema', () => {
   })
 
   it('rejects duplicate effect ids', () => {
-    const duplicateId = spellResolutionEffectIdSchema.parse('damage')
+    const duplicateId = resolutionEffectIdSchema.parse('damage')
     const result = spellResolutionSchema.safeParse({
       ...ELDRITCH_BLAST_RESOLUTION,
       effects: [
@@ -151,11 +153,11 @@ describe('spellResolutionSchema', () => {
       outcomes: [
         {
           result: 'failed-save',
-          applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+          applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
         },
         {
           result: 'failed-save',
-          applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+          applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
         },
       ],
     })
@@ -172,7 +174,7 @@ describe('spellResolutionSchema', () => {
   })
 
   it('rejects unknown effect references', () => {
-    const unknownId = spellResolutionEffectIdSchema.parse('missing')
+    const unknownId = resolutionEffectIdSchema.parse('missing')
     const result = spellResolutionSchema.safeParse({
       ...ELDRITCH_BLAST_RESOLUTION,
       outcomes: [
@@ -202,7 +204,7 @@ describe('spellResolutionSchema', () => {
       outcomes: [
         {
           result: 'failed-save',
-          applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+          applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
         },
       ],
     })
@@ -227,7 +229,7 @@ describe('spellResolutionSchema', () => {
       method: { kind: 'automatic' },
       effects: [
         {
-          id: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+          id: RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
           kind: 'healing',
           roll: { dice: { count: 2, faces: 8 } },
         },
@@ -235,7 +237,7 @@ describe('spellResolutionSchema', () => {
       outcomes: [
         {
           result: 'applied',
-          applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
+          applications: [{ effectId: RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
         },
       ],
     })
@@ -286,18 +288,17 @@ describe('spellResolutionSchema selection modes', () => {
     expect(result.success).toBe(false)
   })
 
-  it('strips target when selectionMode is self', () => {
-    const parsed = spellResolutionSchema.parse({
+  it('rejects a target when selectionMode is self', () => {
+    const result = spellResolutionSchema.safeParse({
       ...FALSE_LIFE_RESOLUTION,
       target: CURE_WOUNDS_RESOLUTION.target,
     })
 
-    expect(parsed.selectionMode).toBe('self')
-    expect(parsed.target).toBeUndefined()
+    expect(result.success).toBe(false)
   })
 
-  it('strips areaOfEffect when selectionMode is none', () => {
-    const parsed = spellResolutionSchema.parse({
+  it('rejects areaOfEffect when selectionMode is none', () => {
+    const result = spellResolutionSchema.safeParse({
       selectionMode: 'none',
       areaOfEffect: BURNING_HANDS_RESOLUTION.areaOfEffect,
       method: { kind: 'automatic' },
@@ -305,8 +306,7 @@ describe('spellResolutionSchema selection modes', () => {
       outcomes: FALSE_LIFE_RESOLUTION.outcomes,
     })
 
-    expect(parsed.selectionMode).toBe('none')
-    expect(parsed.areaOfEffect).toBeUndefined()
+    expect(result.success).toBe(false)
   })
 
   it('rejects attack method for self mode without area', () => {
@@ -333,8 +333,15 @@ describe('spellResolutionSchema selection modes', () => {
     expect(result.success).toBe(false)
   })
 
-  it('normalizes legacy target.self to selectionMode self', () => {
-    const parsed = spellResolutionSchema.parse({
+  it('rejects legacy input missing selectionMode or using proximity self', () => {
+    const missingMode = spellResolutionSchema.safeParse({
+      target: CURE_WOUNDS_RESOLUTION.target,
+      method: { kind: 'automatic' },
+      effects: FALSE_LIFE_RESOLUTION.effects,
+      outcomes: FALSE_LIFE_RESOLUTION.outcomes,
+    })
+    const selfProximity = spellResolutionSchema.safeParse({
+      selectionMode: 'targets',
       target: {
         count: 1,
         kind: 'creature',
@@ -345,8 +352,8 @@ describe('spellResolutionSchema selection modes', () => {
       outcomes: FALSE_LIFE_RESOLUTION.outcomes,
     })
 
-    expect(parsed.selectionMode).toBe('self')
-    expect(parsed.target).toBeUndefined()
+    expect(missingMode.success).toBe(false)
+    expect(selfProximity.success).toBe(false)
   })
 })
 

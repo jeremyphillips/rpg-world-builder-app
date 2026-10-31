@@ -1,12 +1,7 @@
-import {
-  formatResolutionDamage,
-  formatResolutionHealing,
-  formatResolutionTemporaryHitPoints,
-} from './format-effect-lines'
-import { formatResolutionMethod } from './format-method'
+import { formatResolutionEffectSummarySections } from '../../lib/resolution/format-summary'
 import { formatResolutionProjectilesPreview } from './format-application-pattern'
-import { formatResolutionOutcomes } from './format-outcomes'
-import { formatResolutionSelectionSections } from './format-target'
+import { formatResolutionMethod } from './format-method'
+import { formatResolutionSelectionSections } from '../../lib/resolution/format-target'
 import { formatResolutionProgressionSummary } from './progression/format'
 import type { SpellResolution } from './schema'
 
@@ -41,28 +36,7 @@ export function formatResolutionSummarySections(
     })
   }
 
-  const damageLine = formatResolutionDamage(resolution)
-  if (damageLine) {
-    sections.push({ heading: 'Damage', lines: [damageLine] })
-  }
-
-  const healingLine = formatResolutionHealing(resolution)
-  if (healingLine) {
-    sections.push({ heading: 'Healing', lines: [healingLine] })
-  }
-
-  const temporaryHitPointsLine = formatResolutionTemporaryHitPoints(resolution)
-  if (temporaryHitPointsLine) {
-    sections.push({ heading: 'Temporary hit points', lines: [temporaryHitPointsLine] })
-  }
-
-  const outcomeLines = formatResolutionOutcomes(resolution)
-  if (outcomeLines.length > 0) {
-    sections.push({
-      heading: outcomeLines.length === 1 ? 'Outcome' : 'Outcomes',
-      lines: outcomeLines,
-    })
-  }
+  sections.push(...formatResolutionEffectSummarySections(resolution))
 
   if (resolution.progression && options.spellLevel !== undefined) {
     sections.push({

@@ -314,11 +314,12 @@ cross-type registries (`content-type-terms.ts`, `content-type-capabilities.ts`,
 (`requirement-expression.ts`, `multiclassing-validation.ts`), and catalog entity
 presentation helpers (`equipment-compact-display.ts`, `skill-proficiency-*-display.ts`).
 
-| Folder             | Owns                                                                                          | Not allowed                                                     |
-| ------------------ | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| `grants/`          | Grant payloads, pool choices, grant validation messages, grant-linked trait display           | Equipment/skill catalog compact display; connection eligibility |
-| `relationship/`    | Cross-content projection registry, location-connection eligibility, org↔location family rules | Mongo reference-path descriptors; campaign access visibility    |
-| `campaign-access/` | Resolved campaign access fields, bulk access, viewer↔character relationships on content       | Content deletion/usage lifecycle; grant mechanics               |
+| Folder             | Owns                                                                                          | Not allowed                                                       |
+| ------------------ | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `grants/`          | Grant payloads, pool choices, grant validation messages, grant-linked trait display           | Equipment/skill catalog compact display; connection eligibility   |
+| `resolution/`      | Content-neutral effect resolution envelope (`effectResolutionSchema`)                         | Spell progression, spell attack types, projectiles, monster kinds |
+| `relationship/`    | Cross-content projection registry, location-connection eligibility, org↔location family rules | Mongo reference-path descriptors; campaign access visibility      |
+| `campaign-access/` | Resolved campaign access fields, bulk access, viewer↔character relationships on content       | Content deletion/usage lifecycle; grant mechanics                 |
 
 Domain subfolders meet the stable-responsibility threshold; do not add `utils/` or
 `helpers/` under `lib/`.
@@ -638,11 +639,13 @@ Spell catalog content lives under `rpg/content/spell/` (`body.ts`, `levels.ts`,
 Class spellcasting (`rpg/content/classes/spellcasting/`) holds the class
 `spellcasting` block schema and SRD slot tables (`slots.ts`).
 
-Spell resolution (`rpg/content/spell/resolution/`) is an optional envelope on
-`spellBodySchema` — selection mode, target/origin, method, effects, and outcome
-applications. Vocab for resolution-specific closed sets lives alongside the module;
-formatters return semantic preview strings. Like `effects`, `resolution` is on the read model
-but omitted from `spellPersistedBodySchema` until API persistence lands.
+The neutral effect envelope is `rpg/content/lib/resolution/`
+(`effectResolutionSchema`). Closed sets are `rpg/vocab/resolution/`. Spell
+resolution (`rpg/content/spell/resolution/`) composes that envelope and adds
+spell attack methods, projectiles, and progression. Formatters return semantic
+preview strings. Like `effects`, spell `resolution` is on the read model but
+omitted from `spellPersistedBodySchema` until API persistence lands. Layers:
+[action-architecture.md](action-architecture.md).
 
 Effect resolution documentation (shared framework + spell adapter):
 [docs/effect-resolution/README.md](effect-resolution/README.md).

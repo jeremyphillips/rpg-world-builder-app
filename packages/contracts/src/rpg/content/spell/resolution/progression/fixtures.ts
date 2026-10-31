@@ -4,10 +4,10 @@ import {
   MAGIC_MISSILE_RESOLUTION,
 } from '../fixtures'
 import {
-  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-  spellResolutionEffectIdSchema,
-  type SpellResolution,
-} from '../schema'
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  resolutionEffectIdSchema,
+} from '../../../lib/resolution/schema'
+import type { SpellResolution } from '../schema'
 import type { SpellResolutionProgression } from './schema'
 
 /** Fire Bolt — cantrip damage thresholds on primary damage roll. */
@@ -17,7 +17,7 @@ export const FIRE_BOLT_PROGRESSION: SpellResolutionProgression = {
     {
       kind: 'thresholds',
       reference: {
-        subject: { kind: 'effect', effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID },
+        subject: { kind: 'effect', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID },
         property: 'roll',
       },
       entries: [
@@ -36,7 +36,7 @@ export const POISON_SPRAY_PROGRESSION: SpellResolutionProgression = {
     {
       kind: 'thresholds',
       reference: {
-        subject: { kind: 'effect', effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID },
+        subject: { kind: 'effect', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID },
         property: 'roll',
       },
       entries: [
@@ -55,7 +55,7 @@ export const FIREBALL_PROGRESSION: SpellResolutionProgression = {
     {
       kind: 'linear',
       reference: {
-        subject: { kind: 'effect', effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID },
+        subject: { kind: 'effect', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID },
         property: 'roll',
       },
       increment: { kind: 'roll', roll: { dice: { count: 1, faces: 6 } } },
@@ -100,7 +100,7 @@ export const ELDRITCH_BLAST_PROGRESSION: SpellResolutionProgression = {
   ],
 }
 
-const BLESS_BUFF_EFFECT_ID = spellResolutionEffectIdSchema.parse('bless-buff')
+const BLESS_BUFF_EFFECT_ID = resolutionEffectIdSchema.parse('bless-buff')
 
 /** Bless — target-count linear fixture only (not a catalog seed). */
 export const BLESS_TARGET_COUNT_PROGRESSION: SpellResolutionProgression = {
@@ -143,9 +143,6 @@ export const BLESS_PROGRESSION_FIXTURE_RESOLUTION: SpellResolution = {
   ],
 }
 
-/** @deprecated Use {@link ELDRITCH_BLAST_RESOLUTION} — projectiles are on the canonical fixture. */
-export const ELDRITCH_BLAST_WITH_PROJECTILES_RESOLUTION = ELDRITCH_BLAST_RESOLUTION
-
 export const SPELL_RESOLUTION_PROGRESSION_FIXTURES = {
   'fire-bolt': {
     resolution: {
@@ -159,7 +156,7 @@ export const SPELL_RESOLUTION_PROGRESSION_FIXTURES = {
       method: { kind: 'attack', attackType: 'ranged-spell' },
       effects: [
         {
-          id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+          id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
           kind: 'damage',
           roll: { dice: { count: 1, faces: 10 } },
           damageType: 'fire',
@@ -168,7 +165,7 @@ export const SPELL_RESOLUTION_PROGRESSION_FIXTURES = {
       outcomes: [
         {
           result: 'hit',
-          applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+          applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
         },
       ],
     } satisfies SpellResolution,

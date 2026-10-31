@@ -5,7 +5,7 @@ import { CHALLENGE_RATING_MECHANICS } from '../../vocab/challenge-rating'
 import { CREATURE_SIZE_HIT_DIE, resolveLargestCreatureSize } from '../../vocab/creature-size'
 import type { ArmorClassRules } from '../../vocab/mechanics/armor-class-scale'
 import { abilityModifier } from '../creature/ability-modifier'
-import { spellAttackBonus, spellSaveDc } from '../creature/spell-dc'
+import { abilitySaveDc, spellAttackBonus } from '../creature/spell-dc'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { resolveMonsterArmorClass, type MonsterArmorClassResolution } from './armor-class'
 import { resolvePassivePerception, savingThrowBonus, skillModifier } from '../creature/checks'
@@ -23,7 +23,7 @@ import {
 import { formatSignedModifier } from '../creature/weapon-attack'
 import {
   attackProfileOnHitLabels,
-  MONSTER_ACTION_ATTACK_KIND_SET,
+  isMonsterActionAttackKind,
   resolveMonsterActionAttackProfile,
   type MonsterActionAttackProfile,
   type ResolveMonsterActionAttackProfileInput,
@@ -167,7 +167,7 @@ function appendAttackLines(
   section: DerivedMonsterAttackLine['section'],
 ): void {
   for (const action of actions) {
-    if (!MONSTER_ACTION_ATTACK_KIND_SET.has(action.kind)) continue
+    if (!isMonsterActionAttackKind(action.kind)) continue
     const profile = resolveMonsterActionAttackProfile({ ...args, action })
     if (profile.status !== 'resolved') {
       throw new Error(`Monster attack ${action.id} is unavailable.`)
@@ -277,7 +277,7 @@ function deriveSpellcastingLines(
       lines.push({
         id: action.id,
         section,
-        saveDc: spellSaveDc(score, proficiencyBonus),
+        saveDc: abilitySaveDc(score, proficiencyBonus),
         attackBonus: spellAttackBonus(score, proficiencyBonus),
       })
     }
@@ -344,7 +344,13 @@ function draftAttacks(
   const attacks: DerivedDraftAttack[] = []
   for (const [section, actions] of sections) {
     for (const action of actions) {
-      if (action.kind === 'special') continue
+      if (
+        action.kind !== 'weapon' &&
+        action.kind !== 'natural-weapon' &&
+        action.kind !== 'attack'
+      ) {
+        continue
+      }
       attacks.push({
         id: action.id,
         section,

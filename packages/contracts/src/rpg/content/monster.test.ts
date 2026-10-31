@@ -283,7 +283,278 @@ describe('monster spell entries', () => {
     const keys = (schema: { options: readonly { shape: object }[] }) =>
       schema.options.map((option) => Object.keys(option.shape).sort())
     expect(keys(monsterActionDraftSchema)).toEqual(keys(monsterActionSchema))
-    expect(keys(monsterReactionDraftSchema)).toEqual(keys(monsterReactionSchema))
+    const reactionOptions = (schema: object) =>
+      keys(schema as { options: readonly { shape: object }[] })
+    expect(reactionOptions(monsterReactionDraftSchema)).toEqual(
+      reactionOptions(monsterReactionSchema),
+    )
+  })
+})
+
+const publishedMonsterBase = {
+  slug: 'test-monster',
+  name: 'Test',
+  sizes: ['medium'],
+  creatureType: 'humanoid',
+  alignment: 'n',
+  abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+  armorClass: {},
+  hitPoints: { kind: 'hit-dice', count: 1 },
+  movement: { walk: 30 },
+  senses: [],
+  communication: {},
+  challengeRating: '0',
+  proficiencies: { savingThrows: [], skills: [], languages: [], weapons: [] },
+  defenses: {
+    vulnerabilities: [],
+    resistances: [],
+    immunities: [],
+    conditionImmunities: [],
+  },
+} as const
+
+const biteAction = {
+  id: 'bite',
+  kind: 'natural-weapon',
+  name: 'Bite',
+  mode: 'melee',
+  reach: 5,
+  damage: { dice: { count: 1, faces: 6 } },
+  damageType: 'piercing',
+}
+
+const fireDamage = {
+  id: 'damage',
+  kind: 'damage' as const,
+  roll: { dice: { count: 2, faces: 6 } },
+  damageType: 'fire',
+}
+
+const cone = { shape: 'cone' as const, length: { value: 15, unit: 'ft' as const } }
+
+function saveAction(resolution: Record<string, unknown>) {
+  return {
+    id: 'breath',
+    kind: 'save' as const,
+    name: 'Fire Breath',
+    dcSource: { kind: 'ability' as const, ability: 'con' as const, proficient: true },
+    resolution,
+  }
+}
+
+function issueMessages(result: {
+  success: boolean
+  error?: { issues: { path: PropertyKey[]; message: string }[] }
+}) {
+  return result.success ? [] : (result.error?.issues ?? []).map((issue) => issue.message)
+}
+
+describe('monster save and multiattack refinements', () => {
+  it('accepts a multi-damage save and an unknown preset id', () => {
+    const cold = { ...fireDamage, id: 'cold', damageType: 'cold' }
+    const parsed = createMonsterInputSchema.safeParse({
+      ...publishedMonsterBase,
+      actions: [
+        saveAction({
+          selectionMode: 'self',
+          areaOfEffect: cone,
+          method: { kind: 'saving-throw', ability: 'dex' },
+          effects: [fireDamage, cold],
+          outcomes: [
+            {
+              result: 'failed-save',
+              applications: [
+                { effectId: 'damage', amount: 'full' },
+                { effectId: 'cold', amount: 'full' },
+              ],
+            },
+          ],
+        }),
+        { ...biteAction, preset: 'not-in-the-registry' },
+      ],
+    })
+    expect(parsed.success).toBe(true)
+  })
+
+  it('rejects unsupported save shapes', () => {
+    const cases = [
+      saveAction({
+        selectionMode: 'point',
+        origin: { proximity: { kind: 'distance', distance: { value: 30, unit: 'ft' } } },
+        areaOfEffect: cone,
+        method: { kind: 'saving-throw', ability: 'dex' },
+        effects: [fireDamage],
+        outcomes: [
+          { result: 'failed-save', applications: [{ effectId: 'damage', amount: 'full' }] },
+        ],
+      }),
+      saveAction({
+        selectionMode: 'none',
+        method: { kind: 'saving-throw', ability: 'dex' },
+        effects: [fireDamage],
+        outcomes: [
+          { result: 'failed-save', applications: [{ effectId: 'damage', amount: 'full' }] },
+        ],
+      }),
+      saveAction({
+        selectionMode: 'self',
+        areaOfEffect: cone,
+        method: { kind: 'saving-throw', ability: 'dex' },
+        effects: [{ id: 'healing', kind: 'healing', roll: { dice: { count: 1, faces: 8 } } }],
+        outcomes: [
+          { result: 'failed-save', applications: [{ effectId: 'healing', amount: 'full' }] },
+        ],
+      }),
+      saveAction({
+        selectionMode: 'self',
+        areaOfEffect: cone,
+        method: { kind: 'saving-throw', ability: 'dex' },
+        effects: [
+          {
+            id: 'temporary-hit-points',
+            kind: 'temporary-hit-points',
+            roll: { dice: { count: 1, faces: 4 } },
+          },
+        ],
+        outcomes: [
+          {
+            result: 'failed-save',
+            applications: [{ effectId: 'temporary-hit-points', amount: 'full' }],
+          },
+        ],
+      }),
+      saveAction({
+        selectionMode: 'self',
+        areaOfEffect: cone,
+        method: { kind: 'automatic' },
+        effects: [fireDamage],
+        outcomes: [{ result: 'applied', applications: [{ effectId: 'damage', amount: 'full' }] }],
+      }),
+    ]
+    const messages = [
+      'Saving throw actions select an area from self or creatures in reach or at a distance.',
+      'Saving throw actions select an area from self or creatures in reach or at a distance.',
+      'Saving throw actions can only deal damage.',
+      'Saving throw actions can only deal damage.',
+      'Saving throw actions require a saving throw.',
+    ]
+    cases.forEach((action, index) => {
+      const parsed = createMonsterInputSchema.safeParse({
+        ...publishedMonsterBase,
+        actions: [action],
+      })
+      expect(issueMessages(parsed)).toContain(messages[index])
+    })
+  })
+
+  it('rejects broken multiattack references and allows an empty draft', () => {
+    const multiattack = (steps: { count?: number; actionIds: string[] }[], id = 'multi') => ({
+      id,
+      kind: 'multiattack' as const,
+      name: 'Multiattack',
+      steps,
+    })
+    const save = saveAction({
+      selectionMode: 'self',
+      areaOfEffect: cone,
+      method: { kind: 'saving-throw', ability: 'dex' },
+      effects: [fireDamage],
+      outcomes: [{ result: 'failed-save', applications: [{ effectId: 'damage', amount: 'full' }] }],
+    })
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          actions: [biteAction, multiattack([{ count: 1, actionIds: ['missing'] }])],
+        }),
+      ),
+    ).toContain('must reference an action in Actions')
+
+    expect(
+      createMonsterDraftInputSchema.safeParse({
+        ...publishedMonsterBase,
+        actions: [multiattack([])],
+      }).success,
+    ).toBe(true)
+    expect(
+      createMonsterInputSchema.safeParse({
+        ...publishedMonsterBase,
+        actions: [multiattack([])],
+      }).success,
+    ).toBe(false)
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          actions: [biteAction, multiattack([{ count: 2, actionIds: ['bite', 'bite'] }])],
+        }),
+      ),
+    ).toContain('Each attack can be referenced only once.')
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          actions: [
+            biteAction,
+            multiattack([
+              { count: 1, actionIds: ['bite'] },
+              { count: 1, actionIds: ['bite'] },
+            ]),
+          ],
+        }),
+      ),
+    ).toContain('Each attack can be referenced only once.')
+
+    for (const extra of [
+      save,
+      {
+        id: 'spell',
+        kind: 'spell',
+        name: 'Spells',
+        castingAbility: { kind: 'ability', ability: 'int' },
+        spells: [{ spellId: 'srd:fire-bolt' }],
+      },
+      { id: 'special', kind: 'special', name: 'Special', description: 'A trick.' },
+      multiattack([{ count: 1, actionIds: ['other-multi'] }], 'other-multi'),
+    ]) {
+      const parsed = createMonsterInputSchema.safeParse({
+        ...publishedMonsterBase,
+        actions: [extra, multiattack([{ count: 1, actionIds: [extra.id] }])],
+      })
+      expect(issueMessages(parsed)).toContain('invalid kind')
+    }
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          actions: [multiattack([{ count: 1, actionIds: ['bite'] }])],
+          bonusActions: [biteAction],
+        }),
+      ),
+    ).toContain('must reference an action in Actions')
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          bonusActions: [multiattack([{ count: 1, actionIds: ['bite'] }])],
+          actions: [biteAction],
+        }),
+      ),
+    ).toContain('Multiattack is only valid in Actions.')
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          actions: [multiattack([{ count: 1, actionIds: ['multi'] }])],
+        }),
+      ),
+    ).toContain('A multiattack cannot reference itself.')
   })
 })
 

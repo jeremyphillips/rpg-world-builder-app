@@ -3,7 +3,7 @@ import {
   getOutcomeResultsForMethod,
   hasMeaningfulOutcomeContent,
   supportsPartialApplicationForEffectKind,
-  type SpellResolutionOutcomeResult,
+  type ResolutionOutcomeResult,
 } from '@rpg/contracts'
 import type { z } from 'zod'
 
@@ -20,7 +20,7 @@ export function validateResolutionFormOutcomes(
   if (!method || !values.outcomes?.length) return
 
   const allowedResults = new Set(getOutcomeResultsForMethod(method))
-  const seenResults = new Set<SpellResolutionOutcomeResult>()
+  const seenResults = new Set<ResolutionOutcomeResult>()
 
   values.outcomes.forEach((outcome, outcomeIndex) => {
     validateResolutionFormOutcomeResult(outcome, outcomeIndex, allowedResults, seenResults, ctx)
@@ -39,8 +39,8 @@ export function validateResolutionFormOutcomes(
 function validateResolutionFormOutcomeResult(
   outcome: NonNullable<ResolutionFormValues['outcomes']>[number],
   outcomeIndex: number,
-  allowedResults: Set<SpellResolutionOutcomeResult>,
-  seenResults: Set<SpellResolutionOutcomeResult>,
+  allowedResults: Set<ResolutionOutcomeResult>,
+  seenResults: Set<ResolutionOutcomeResult>,
   ctx: z.RefinementCtx,
 ): void {
   if (seenResults.has(outcome.result)) {

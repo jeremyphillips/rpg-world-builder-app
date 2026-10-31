@@ -27,6 +27,10 @@ export const MONSTER_ACTION_ATTACK_KIND_SET: ReadonlySet<MonsterActionAttackKind
   MONSTER_ACTION_ATTACK_KINDS,
 )
 
+export function isMonsterActionAttackKind(kind: string): kind is MonsterActionAttackKind {
+  return MONSTER_ACTION_ATTACK_KIND_SET.has(kind as MonsterActionAttackKind)
+}
+
 export type MonsterActionAttackRoll = {
   expression: string
   average: number
@@ -81,8 +85,6 @@ export type ResolveMonsterActionAttackProfileInput = {
   proficiencyBonus: number | undefined
   magicPropertyProvider: MagicPropertyDefinitionProvider
 }
-
-const ATTACK_KINDS = MONSTER_ACTION_ATTACK_KIND_SET
 
 function hasDamageRoll(value: unknown): value is RollValue {
   if (!value || typeof value !== 'object') return false
@@ -353,7 +355,7 @@ export function resolveMonsterActionAttackProfile(
   args: ResolveMonsterActionAttackProfileInput,
 ): DerivedField<MonsterActionAttackProfile> {
   const { action } = args
-  if (!ATTACK_KINDS.has(action.kind)) return unavailableField('missing-input')
+  if (!isMonsterActionAttackKind(action.kind)) return unavailableField('missing-input')
   if (action.kind === 'weapon') return resolveWeaponProfile(action, args)
   if (action.kind === 'natural-weapon') return resolveNaturalProfile(action, args)
   if (action.kind === 'attack') return resolveAuthoredProfile(action, args)

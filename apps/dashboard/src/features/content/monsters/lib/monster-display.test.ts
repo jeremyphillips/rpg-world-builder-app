@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { systemDefaultArmorClassRules } from '@rpg/contracts'
+import { systemDefaultArmorClassRules, type Equipment } from '@rpg/contracts'
 
 import { pickEquipment, pickMonster, pickSkillProficiency } from '@/test/fixtures/pick'
 
@@ -169,5 +169,31 @@ describe('monster-display', () => {
 
     expect(viewModel.reactions[0]?.triggerLine).toBeUndefined()
     expect(viewModel.reactions[0]?.responseLabel).toBeUndefined()
+  })
+
+  it('renders structured save and multiattack bodies for hell hound', () => {
+    const monster = pickMonster('hell-hound')
+    const skills = [pickSkillProficiency('perception')]
+    const equipmentById = new Map<string, Equipment>()
+    const derived = tryDeriveMonsterStatBlock(monster, [], skills, {
+      armorClassRules: systemDefaultArmorClassRules(),
+    })
+    expect(derived).not.toBeNull()
+
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Fiend',
+      equipmentById,
+      catalogState: 'ready',
+      derived,
+    })
+
+    const multiattack = viewModel.actions.find((action) => action.id === 'multiattack')
+    expect(multiattack?.descriptionHtml).toContain('hell hound makes two Bite attacks')
+
+    const breath = viewModel.actions.find((action) => action.id === 'fire-breath')
+    expect(breath?.descriptionHtml).toContain('Dexterity Saving Throw: DC 12')
+    expect(breath?.descriptionHtml).toContain('15-foot Cone')
+    expect(breath?.descriptionHtml).toContain('Success: Half damage')
   })
 })

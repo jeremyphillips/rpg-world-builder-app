@@ -168,8 +168,38 @@ function formatPositiveDistanceFeetWithSuffix(distance: PositiveDistance, suffix
   return `${formatFractionalNumber(distance.value)}-ft-${suffix}`
 }
 
+export type AreaGeometryFormatStyle = 'compact' | 'stat-block'
+
+function formatStatBlockFeet(distance: PositiveDistance): string {
+  return `${formatFractionalNumber(distance.value)}-foot`
+}
+
+function formatAreaGeometryStatBlock(area: AreaGeometry): string {
+  const shapeLabel = getAreaGeometryShapeLabel(area.shape)
+  switch (area.shape) {
+    case 'sphere':
+      return `${formatStatBlockFeet(area.radius)}-radius ${shapeLabel}`
+    case 'emanation':
+      return `${formatStatBlockFeet(area.radius)} ${shapeLabel}`
+    case 'cone':
+      return `${formatStatBlockFeet(area.length)} ${shapeLabel}`
+    case 'cube':
+      return `${formatStatBlockFeet(area.size)} ${shapeLabel}`
+    case 'line':
+      return `${formatStatBlockFeet(area.length)}-long, ${formatStatBlockFeet(area.width)}-wide ${shapeLabel}`
+    case 'cylinder':
+      return `${formatStatBlockFeet(area.radius)}-radius, ${formatStatBlockFeet(area.height)}-high ${shapeLabel}`
+    case 'special':
+      return area.description
+  }
+}
+
 /** Compact display string for area geometry (e.g. "20-ft-radius sphere"). Does not include range. */
-export function formatAreaGeometry(area: AreaGeometry): string {
+export function formatAreaGeometry(
+  area: AreaGeometry,
+  style: AreaGeometryFormatStyle = 'compact',
+): string {
+  if (style === 'stat-block') return formatAreaGeometryStatBlock(area)
   const shapeLabel = getAreaGeometryShapeCompactLabel(area.shape)
 
   switch (area.shape) {

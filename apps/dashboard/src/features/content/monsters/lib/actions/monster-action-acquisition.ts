@@ -1,10 +1,11 @@
 import {
+  ACTION_PRESET_IDS,
+  getActionPreset,
+  getActionVocabularyEntry,
   getDamageTypeLabel,
   getMonsterActionKindLabel,
-  getMonsterNaturalWeaponPreset,
-  MONSTER_NATURAL_WEAPON_PRESET_DEFAULT_DAMAGE,
-  MONSTER_NATURAL_WEAPON_PRESET_IDS,
-  type MonsterNaturalWeaponPresetId,
+  listSpecialMenuActionPresetIds,
+  type ActionPresetId,
 } from '@rpg/contracts'
 
 import { monsterAddWeaponShortcut } from '../monster-form-labels'
@@ -13,7 +14,8 @@ import { createMonsterRowId, type MonsterActionDraftRow } from './monster-action
 export const MONSTER_ACTION_ACQUISITION_GROUPS = [
   { id: 'equipped', label: 'Equipped weapons' },
   { id: 'natural', label: 'Natural attacks' },
-  { id: 'create', label: 'Create' },
+  { id: 'special', label: 'Special actions' },
+  { id: 'other', label: 'Other' },
 ] as const
 
 export type MonsterActionAcquisitionGroupId =
@@ -31,54 +33,64 @@ export type MonsterActionAcquisitionItem = {
 export type MonsterActionAcquisitionChoice =
   | { type: 'weapon-entry'; entryId: string }
   | { type: 'add-weapon' }
-  | { type: 'natural'; presetId: MonsterNaturalWeaponPresetId }
-  | { type: 'create'; kind: 'attack' | 'spell' | 'special' | 'natural' }
+  | { type: 'natural'; presetId: ActionPresetId }
+  | { type: 'other-natural' }
+  | { type: 'preset'; presetId: ActionPresetId }
+  | { type: 'create'; kind: 'attack' | 'spell' | 'special' }
 
-const CREATE_ITEMS: readonly MonsterActionAcquisitionItem[] = [
+const OTHER_ITEMS: readonly MonsterActionAcquisitionItem[] = [
   {
     id: 'create:attack',
-    label: 'Custom attack',
-    groupId: 'create',
+    label: 'Attack',
+    groupId: 'other',
     metadata: getMonsterActionKindLabel('attack'),
   },
   {
     id: 'create:spell',
     label: 'Spellcasting',
-    groupId: 'create',
+    groupId: 'other',
     metadata: getMonsterActionKindLabel('spell'),
   },
   {
     id: 'create:special',
     label: 'Special ability',
-    groupId: 'create',
+    groupId: 'other',
     metadata: getMonsterActionKindLabel('special'),
   },
-  {
-    id: 'create:natural',
-    label: 'Custom natural attack',
-    groupId: 'create',
-    metadata: getMonsterActionKindLabel('natural-weapon'),
-  },
 ]
+
+function isAttackRollPreset(id: ActionPresetId): boolean {
+  return getActionPreset(id)?.mechanics === 'attack-roll'
+}
+
+const EXACT_ACQUISITION_CHOICES: Record<string, MonsterActionAcquisitionChoice> = {
+  'add-weapon': { type: 'add-weapon' },
+  'create:attack': { type: 'create', kind: 'attack' },
+  'create:spell': { type: 'create', kind: 'spell' },
+  'create:special': { type: 'create', kind: 'special' },
+  'natural:other': { type: 'other-natural' },
+}
+
+function parsePrefixedAcquisitionId(id: string): MonsterActionAcquisitionChoice | undefined {
+  const separator = id.indexOf(':')
+  if (separator < 0) return undefined
+  const prefix = id.slice(0, separator)
+  const value = id.slice(separator + 1)
+  if (!value) return undefined
+  if (prefix === 'weapon-entry') return { type: 'weapon-entry', entryId: value }
+  if (prefix === 'natural' && isAttackRollPreset(value as ActionPresetId)) {
+    return { type: 'natural', presetId: value as ActionPresetId }
+  }
+  if (prefix !== 'preset') return undefined
+  const preset = getActionPreset(value)
+  if (!preset || preset.mechanics === 'attack-roll') return undefined
+  return { type: 'preset', presetId: value as ActionPresetId }
+}
 
 export function parseMonsterActionAcquisitionId(
   id: string,
 ): MonsterActionAcquisitionChoice | undefined {
-  if (id === 'add-weapon') return { type: 'add-weapon' }
-  if (id === 'create:attack') return { type: 'create', kind: 'attack' }
-  if (id === 'create:spell') return { type: 'create', kind: 'spell' }
-  if (id === 'create:special') return { type: 'create', kind: 'special' }
-  if (id === 'create:natural') return { type: 'create', kind: 'natural' }
-  if (id.startsWith('weapon-entry:')) {
-    const entryId = id.slice('weapon-entry:'.length)
-    return entryId ? { type: 'weapon-entry', entryId } : undefined
-  }
-  if (id.startsWith('natural:')) {
-    const presetId = id.slice('natural:'.length)
-    if (!getMonsterNaturalWeaponPreset(presetId)) return undefined
-    return { type: 'natural', presetId: presetId as MonsterNaturalWeaponPresetId }
-  }
-  return undefined
+  return EXACT_ACQUISITION_CHOICES[id] ?? parsePrefixedAcquisitionId(id)
 }
 
 export function monsterActionAcquisitionItems(input: {
@@ -92,13 +104,24 @@ export function monsterActionAcquisitionItems(input: {
     disabled: !weapon.equipped,
     note: weapon.equipped ? undefined : 'Not equipped',
   }))
-  const natural = MONSTER_NATURAL_WEAPON_PRESET_IDS.map((presetId) => {
-    const preset = getMonsterNaturalWeaponPreset(presetId)
+  const natural = ACTION_PRESET_IDS.filter(isAttackRollPreset).map((presetId) => {
+    const preset = getActionPreset(presetId)
+    const vocabulary = preset ? getActionVocabularyEntry(preset.vocabularyId) : undefined
+    const damageType = preset?.mechanics === 'attack-roll' ? preset.defaults.damageType : undefined
     return {
       id: `natural:${presetId}`,
-      label: preset?.label ?? presetId,
+      label: vocabulary?.label ?? presetId,
       groupId: 'natural' as const,
-      metadata: preset ? getDamageTypeLabel(preset.defaultDamageType) : undefined,
+      metadata: damageType ? getDamageTypeLabel(damageType) : undefined,
+    }
+  })
+  const special = listSpecialMenuActionPresetIds().map((presetId) => {
+    const preset = getActionPreset(presetId)
+    const vocabulary = preset ? getActionVocabularyEntry(preset.vocabularyId) : undefined
+    return {
+      id: `preset:${presetId}`,
+      label: vocabulary?.label ?? presetId,
+      groupId: 'special' as const,
     }
   })
   return [
@@ -111,21 +134,52 @@ export function monsterActionAcquisitionItems(input: {
       note: input.allowAddWeapon ? undefined : 'Equipment catalog is not ready',
     },
     ...natural,
-    ...CREATE_ITEMS,
+    {
+      id: 'natural:other',
+      label: 'Other natural attack',
+      groupId: 'natural',
+      metadata: getMonsterActionKindLabel('natural-weapon'),
+    },
+    ...special,
+    ...OTHER_ITEMS,
   ]
 }
 
-function naturalWeaponFromPreset(presetId: MonsterNaturalWeaponPresetId): MonsterActionDraftRow {
-  const preset = getMonsterNaturalWeaponPreset(presetId)
-  const mode = preset?.defaultMode ?? 'melee'
+function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
+  const preset = getActionPreset(presetId)
+  const id = createMonsterRowId()
+  const vocabulary = preset ? getActionVocabularyEntry(preset.vocabularyId) : undefined
+  if (!preset) return { id, kind: 'special', name: presetId }
+  if (preset.mechanics === 'attack-roll') {
+    return {
+      id,
+      kind: 'natural-weapon',
+      preset: presetId,
+      name: vocabulary?.label ?? presetId,
+      form: preset.defaults.naturalForm,
+      damageType: preset.defaults.damageType,
+      mode: preset.defaults.mode,
+      reach: preset.defaults.reach,
+      damage: { ...preset.defaults.damage },
+    }
+  }
+  if (preset.mechanics === 'saving-throw') {
+    return {
+      id,
+      kind: 'save',
+      preset: presetId,
+      name: preset.defaults.suggestedName,
+      dcSource: preset.defaults.dcSource,
+      resolution: preset.defaults.resolution,
+      ...(preset.defaults.limitedUse ? { limitedUse: preset.defaults.limitedUse } : {}),
+    }
+  }
   return {
-    id: createMonsterRowId(),
-    kind: 'natural-weapon',
-    name: preset?.label ?? presetId,
-    damageType: preset?.defaultDamageType,
-    mode,
-    ...(mode !== 'ranged' ? { reach: 5 as const } : {}),
-    damage: { ...MONSTER_NATURAL_WEAPON_PRESET_DEFAULT_DAMAGE },
+    id,
+    kind: 'multiattack',
+    preset: presetId,
+    name: vocabulary?.label ?? presetId,
+    steps: [],
   }
 }
 
@@ -136,12 +190,12 @@ export function createMonsterActionFromAcquisition(
   if (choice.type === 'weapon-entry') {
     return { id, kind: 'weapon', equipmentEntryId: choice.entryId }
   }
-  if (choice.type === 'natural') {
-    return naturalWeaponFromPreset(choice.presetId)
+  if (choice.type === 'natural' || choice.type === 'preset') return draftFromPreset(choice.presetId)
+  if (choice.type === 'other-natural') {
+    return { id, kind: 'natural-weapon', mode: 'melee', reach: 5 }
   }
   if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] }
   if (choice.kind === 'special') return { id, kind: 'special' }
-  if (choice.kind === 'natural') return { id, kind: 'natural-weapon', mode: 'melee', reach: 5 }
   return { id, kind: 'attack' }
 }
 

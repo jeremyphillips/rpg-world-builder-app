@@ -1,6 +1,6 @@
-import type { SpellResolutionOutcomeResult } from '@rpg/contracts'
+import type { ResolutionOutcomeResult } from '@rpg/contracts'
 
 export type SpellResolutionOutcomeGroupProps = {
   outcomeIndex: number
-  result: SpellResolutionOutcomeResult
+  result: ResolutionOutcomeResult
 }
