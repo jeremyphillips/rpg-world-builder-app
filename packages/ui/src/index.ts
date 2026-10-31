@@ -677,6 +677,7 @@ export type {
 } from './components/ui/visual-vocabulary.types'
 export type { FieldChrome } from './components/ui/field-chrome.variants'
 export {
+  fieldAnatomyStackVariants,
   fieldArrayItemClasses,
   fieldArrayItemListClasses,
   fieldArrayItemVariants,

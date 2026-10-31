@@ -194,7 +194,8 @@ describe('FieldGroup', () => {
     const legend = screen.getByText('Advanced options').closest('legend')
     expect(legend?.firstElementChild).toHaveClass('gap-2')
     const fieldset = screen.getByRole('group', { name: /Advanced options/ })
-    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-4')
+    expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
+    expect(bodyRelationshipWrapper(fieldset)).toBeNull()
   })
 
   it('replaces subsection type with compact field label and hint type', () => {
@@ -220,7 +221,8 @@ describe('FieldGroup', () => {
     const legend = screen.getByText('Advanced options').closest('legend')
     expect(legend?.firstElementChild).toHaveClass('gap-1')
     const fieldset = screen.getByRole('group', { name: /Advanced options/ })
-    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-3')
+    expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'sm' }).split(/\s+/))
+    expect(bodyRelationshipWrapper(fieldset)).toBeNull()
   })
 
   it('keeps disclosure affordances when a collapsible legend uses field scale', async () => {
@@ -254,17 +256,19 @@ describe('FieldGroup', () => {
     expect(chevron).toBeTruthy()
     expect(chevron).not.toHaveClass('rotate-180')
     const fieldset = screen.getByRole('group', { name: /Advanced options/ })
+    expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
 
     await user.click(trigger)
     expect(trigger).toHaveAttribute('aria-expanded', 'true')
     expect(chevron).toHaveClass('rotate-180')
-    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-4')
+    expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
+    expect(bodyRelationshipWrapper(fieldset)).toBeNull()
   })
 
-  it('applies array anatomy stack on the fieldset instead of body margin', () => {
+  it('applies field anatomy stack on the fieldset when headingScale is field', () => {
     render(
-      <FieldGroup legend="Grants" legendSize="array" size="md">
+      <FieldGroup legend="Grants" headingScale="field" size="md">
         <TextField id="grant-type" label="Grant type" />
       </FieldGroup>,
     )
@@ -278,9 +282,9 @@ describe('FieldGroup', () => {
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
   })
 
-  it('defaults array legend to sm field label typography when size is omitted', () => {
+  it('defaults field-scale legend to sm field label typography when size is omitted', () => {
     render(
-      <FieldGroup legend="Grants" legendSize="array">
+      <FieldGroup legend="Grants" headingScale="field">
         <TextField id="grant-type" label="Grant type" />
       </FieldGroup>,
     )

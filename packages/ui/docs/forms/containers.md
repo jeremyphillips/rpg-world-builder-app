@@ -160,8 +160,8 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 ```
 
 Legend→body spacing for `FieldGroup` is owned by `StandardFieldGroupBody`: section/subsection tiers use
-`resolveFieldGroupBodyGap` on a body-side wrapper when a body is visible; `legendSize="array"` applies
-`fieldAnatomyStackVariants` on the fieldset (no array `mt-*` on the body). Array fieldsets gate the same
+`resolveFieldGroupBodyGap` on a body-side wrapper when a body is visible; `headingScale="field"` applies
+`fieldAnatomyStackVariants` on the fieldset (stable when collapsible groups are closed). Array fieldsets gate the same
 stack with `showSectionHeader` (visible label band or chrome — not sr-only-only labels). `FieldGroupLegend`
 keeps title, description, and accessory anatomy only. Legacy legend header margin
 (`fieldGroupLegendHeaderMarginVariants`) remains for non-FieldGroup headings. In-flow array legends use

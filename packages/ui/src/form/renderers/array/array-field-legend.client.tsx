@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react'
 
 import type { FieldSizeToken } from '../../../components/ui/field-sizing.variants'
-import { cn } from '../../../lib/utils'
 import type { ArrayAddActionLayout, FieldHintConfig } from '../../field-config'
 import type { ArrayLabelMode } from '../../config/array/resolve-array-label.lib'
 import { ArrayLikeSectionHeader } from '../../presentation/array-like-section-header.client'
@@ -11,6 +10,8 @@ import { ArrayLegendIssueLink } from './array-item-issue.client'
 
 export interface ArrayFieldSectionHeaderProps {
   labelMode: ArrayLabelMode
+  /** Gates visible chrome bands and fieldset anatomy stack — SSOT: resolveArrayShowSectionHeader. */
+  showSectionHeader: boolean
   sectionLabel: string
   hint?: string | FieldHintConfig
   legendFieldSize: FieldSizeToken
@@ -40,25 +41,13 @@ function resolveVisibleHeaderChrome(props: ArrayFieldSectionHeaderProps): {
   return { labelAccessory, inlineAction }
 }
 
-function hasVisibleHeaderBand(
-  props: ArrayFieldSectionHeaderProps,
-  inlineAction: ReactNode | undefined,
-): boolean {
-  if (props.labelMode === 'visible') return true
-  if (props.hint) return true
-  if (inlineAction) return true
-  if (props.required) return true
-  if (props.arrayIssueCount > 0 || props.hasContainerIssue) return true
-  return false
-}
-
 /** Array fieldset section header — semantic legend, visible label/hint, and renderer chrome. */
 export function ArrayFieldSectionHeader(props: ArrayFieldSectionHeaderProps) {
-  const { labelMode, sectionLabel, hint, legendFieldSize, required } = props
+  const { labelMode, showSectionHeader, sectionLabel, hint, legendFieldSize, required } = props
   const { labelAccessory, inlineAction } = resolveVisibleHeaderChrome(props)
 
   if (labelMode === 'anonymous') {
-    if (!hasVisibleHeaderBand(props, inlineAction)) return null
+    if (!showSectionHeader) return null
     return (
       <div className="w-full min-w-0">
         <ArrayLikeSectionHeader
@@ -79,7 +68,7 @@ export function ArrayFieldSectionHeader(props: ArrayFieldSectionHeaderProps) {
     return (
       <>
         <legend className="sr-only">{sectionLabel}</legend>
-        {hasVisibleHeaderBand(props, inlineAction) ? (
+        {showSectionHeader ? (
           <div className="w-full min-w-0">
             <ArrayLikeSectionHeader
               label={sectionLabel}

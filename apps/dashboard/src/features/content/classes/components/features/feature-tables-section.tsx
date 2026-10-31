@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { ActionButton, EmptyPanel } from '@rpg/ui'
+import { ActionButton, EmptyPanel, cn, fieldAnatomyStackVariants } from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 
 import {
@@ -25,7 +25,10 @@ export function FeatureTablesSection({ tables = [], onAddTable }: FeatureTablesS
   ) : undefined
 
   return (
-    <section className="flex flex-col gap-2" aria-labelledby="feature-tables-section-heading">
+    <section
+      className={cn('min-w-0', fieldAnatomyStackVariants({ size }))}
+      aria-labelledby="feature-tables-section-heading"
+    >
       <ArrayLikeSectionHeader
         id="feature-tables-section-heading"
         label={FEATURE_TABLES_SECTION_LABEL}

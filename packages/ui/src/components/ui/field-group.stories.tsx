@@ -252,7 +252,6 @@ function SummaryDisclosureDemo() {
       <FieldGroup
         id="campaign-access"
         legend="Campaign availability"
-        legendSize="array"
         rhythm="compact"
         formControl={form.control as unknown as Control<FieldValues>}
         disclosure={{
@@ -303,7 +302,6 @@ function DialogDisclosureDemo() {
       <FieldGroup
         id="campaign-access-dialog"
         legend="Campaign availability"
-        legendSize="array"
         rhythm="compact"
         formControl={form.control as unknown as Control<FieldValues>}
         disclosure={{

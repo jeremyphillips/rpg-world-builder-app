@@ -96,6 +96,7 @@ export function ArrayFieldRendererFieldset({
       {state.showSectionHeader || state.labelMode === 'srOnly' ? (
         <ArrayFieldSectionHeader
           labelMode={state.labelMode}
+          showSectionHeader={state.showSectionHeader}
           sectionLabel={state.sectionLabel}
           hint={state.sectionHint}
           legendFieldSize={state.legendFieldSize}

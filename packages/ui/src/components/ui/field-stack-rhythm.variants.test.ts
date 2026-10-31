@@ -10,11 +10,9 @@ import {
   fieldLabelVariants,
   fieldMessageRegionVariants,
   fieldArrayItemListClasses,
-  fieldGroupBodyGapVariants,
   fieldGroupLegendHeaderMarginVariants,
   resolveFieldGroupBodyGap,
   fieldStackRhythmVariants,
-  resolveArrayLegendScale,
   resolveFieldAnatomyHeaderBodyStackClassName,
   resolveFieldGroupInsetPaddingClasses,
   resolveFieldGroupLegendClassName,
@@ -112,21 +110,10 @@ describe('fieldArrayItemListClasses', () => {
   })
 })
 
-describe('resolveArrayLegendScale', () => {
-  it('maps sm field size to sm legend scale', () => {
-    expect(resolveArrayLegendScale('sm')).toBe('sm')
-  })
-
-  it('maps md field size to default legend scale', () => {
-    expect(resolveArrayLegendScale('md')).toBe('default')
-  })
-})
-
 describe('field group legend helpers', () => {
   it('applies legend header margins by size for structural tiers only', () => {
     expect(fieldGroupLegendHeaderMarginVariants({ size: 'section' })).toBe('mb-5')
     expect(fieldGroupLegendHeaderMarginVariants({ size: 'subsection' })).toBe('mb-4')
-    expect(fieldGroupLegendHeaderMarginVariants({ size: 'array' })).toBe('')
     expect(fieldGroupLegendHeaderMarginVariants({ size: 'section', rhythm: 'compact' })).toBe(
       'mb-3',
     )
@@ -139,8 +126,6 @@ describe('field group legend helpers', () => {
     expect(resolveFieldGroupBodyGap({ size: 'section', rhythm: 'comfortable' })).toBe('mt-5')
     expect(resolveFieldGroupBodyGap({ size: 'subsection', rhythm: 'comfortable' })).toBe('mt-4')
     expect(resolveFieldGroupBodyGap({ size: 'section', rhythm: 'compact' })).toBe('mt-3')
-    expect(resolveFieldGroupBodyGap({ size: 'array', rhythm: 'comfortable' })).toBe('')
-    expect(fieldGroupBodyGapVariants({ size: 'array', rhythm: 'comfortable' })).toBe('')
   })
 
   it('composes legend class names with header margin for structural tiers', () => {
@@ -152,12 +137,6 @@ describe('field group legend helpers', () => {
     expect(resolveFieldGroupLegendClassName({ size: 'subsection' })).toContain(
       'text-style-field-legend-sub',
     )
-    const arrayLegendClassName = resolveFieldGroupLegendClassName({
-      size: 'array',
-      fieldSize: 'md',
-    })
-    expect(arrayLegendClassName).toContain('text-style-field-label-md')
-    expect(arrayLegendClassName).not.toContain('mb-')
   })
 })
 

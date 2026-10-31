@@ -18,6 +18,7 @@ import { useFormUiContext } from '../../context/form-ui.context'
 import { useFocusFirstArrayIssue } from './use-focus-first-array-issue.client'
 import { resolveArrayFieldRendererChrome } from './resolve-array-field-renderer-chrome.lib'
 import { resolveArrayRequiredMarker } from './array-field-empty-state.lib'
+import { resolveArrayShowSectionHeader } from './resolve-array-show-section-header.lib'
 import { useArrayFieldAppendControls } from './use-array-field-append-controls.client'
 import {
   resolveArrayAppendAvailability,
@@ -220,13 +221,15 @@ export function useArrayFieldRendererState({
     legendFieldSize,
     nested,
     omitSectionBottomMargin,
-    showSectionHeader:
-      labelMode === 'visible' ||
-      Boolean(sectionHint) ||
-      (addActionLayout === 'inline' && addAction !== null) ||
-      arrayIssueCount > 0 ||
-      hasContainerIssue ||
-      resolveArrayRequiredMarker(config),
+    showSectionHeader: resolveArrayShowSectionHeader({
+      labelMode,
+      sectionHint,
+      addActionLayout,
+      hasAddAction: addAction !== null,
+      arrayIssueCount,
+      hasContainerIssue,
+      config,
+    }),
     sortableEnabled,
   }
 }

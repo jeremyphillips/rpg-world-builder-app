@@ -115,10 +115,9 @@ export function StandardFieldGroupBody({
 
   const hasBody = React.Children.count(children) > 0
   const bodyVisible = hasBody && (!collapsible || open)
-  const useLeafAnatomyStack =
-    legendSize === 'array' && Boolean(legend) && bodyVisible && !legendSrOnly
+  const useLeafAnatomyStack = headingScale === 'field' && Boolean(legend) && !legendSrOnly
   const bodyGapClass =
-    legend && bodyVisible && !legendSrOnly && legendSize !== 'array'
+    legend && bodyVisible && !legendSrOnly && headingScale !== 'field'
       ? resolveFieldGroupBodyGap({ size: legendSize, rhythm })
       : undefined
 

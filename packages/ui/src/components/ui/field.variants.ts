@@ -530,15 +530,7 @@ export const fieldErrorTextVariants = cva('', {
 /** Layout preset for controller + dependent field stacks. */
 export type FieldStackLayout = 'default' | 'dependent'
 
-export type FieldGroupLegendSize = 'section' | 'subsection' | 'array'
-
-/** @deprecated Internal array-tier density bridge — scale is unused for spacing. */
-export type FieldGroupLegendScale = 'default' | 'sm'
-
-/** @deprecated Internal array-tier density bridge. */
-export function resolveArrayLegendScale(size: FieldSizeToken): FieldGroupLegendScale {
-  return size === 'sm' || size === 'xs' ? 'sm' : 'default'
-}
+export type FieldGroupLegendSize = 'section' | 'subsection'
 
 /**
  * Legend-row disclosure trigger inside `<FieldGroupLegend>`.
@@ -572,7 +564,6 @@ export const fieldGroupLegendVariants = cva('', {
     size: {
       section: '',
       subsection: '',
-      array: '',
     },
     scale: {
       default: '',
@@ -605,7 +596,6 @@ export const fieldGroupLegendHeaderMarginVariants = cva('', {
     size: {
       section: '',
       subsection: '',
-      array: '',
     },
     rhythm: {
       comfortable: '',
@@ -630,7 +620,6 @@ export const fieldGroupBodyGapVariants = cva('', {
     size: {
       section: '',
       subsection: '',
-      array: '',
     },
     rhythm: {
       comfortable: '',
@@ -654,9 +643,6 @@ export function resolveFieldGroupBodyGap(options: {
   size: FieldGroupLegendSize
   rhythm: FieldRhythm
 }): string {
-  if (options.size === 'array') {
-    return ''
-  }
   return fieldGroupBodyGapVariants({
     size: options.size,
     rhythm: options.rhythm,
@@ -668,16 +654,11 @@ export type FieldGroupLegendVariantProps = VariantProps<typeof fieldGroupLegendV
 /** Typography + header margin for `<legend>` on groups and subgroups. */
 export function resolveFieldGroupLegendClassName(
   options: FieldGroupLegendVariantProps & {
-    fieldSize?: FieldSizeToken
     rhythm?: FieldRhythm
   } = {},
 ): string {
   const size = options.size ?? 'section'
   const rhythm = options.rhythm ?? 'comfortable'
-  if (size === 'array') {
-    const fieldSize = options.fieldSize ?? 'sm'
-    return fieldLabelTypographyVariants({ size: fieldSize })
-  }
   return cn(
     fieldGroupLegendVariants({ size, scale: options.scale, rhythm }),
     fieldGroupLegendHeaderMarginVariants({ size, rhythm }),

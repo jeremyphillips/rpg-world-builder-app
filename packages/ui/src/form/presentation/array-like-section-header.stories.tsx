@@ -3,6 +3,8 @@ import { Icon } from '../../components/ui/icon/icon'
 
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from '../../components/ui/button.client'
+import { fieldAnatomyStackVariants } from '../../components/ui/field.variants'
+import { cn } from '../../lib/utils'
 import { FormField } from '../../components/ui/form-field'
 import { Input } from '../../components/ui/input.client'
 import { ArrayLegendIssueLink } from '../renderers/array/array-item-issue.client'
@@ -25,8 +27,13 @@ const meta = {
     size: 'md',
   },
   decorators: [
-    (Story) => (
-      <fieldset className="border-0 p-0">
+    (Story, context) => (
+      <fieldset
+        className={cn(
+          'border-0 p-0',
+          fieldAnatomyStackVariants({ size: context.args.size ?? 'md' }),
+        )}
+      >
         <Story />
       </fieldset>
     ),
@@ -71,8 +78,11 @@ export const StandaloneSection: Story = {
     ),
   },
   decorators: [
-    (Story) => (
-      <section className="flex flex-col gap-2" aria-labelledby="feature-tables-section-heading">
+    (Story, context) => (
+      <section
+        className={cn('min-w-0', fieldAnatomyStackVariants({ size: context.args.size ?? 'md' }))}
+        aria-labelledby="feature-tables-section-heading"
+      >
         <Story />
       </section>
     ),
@@ -88,7 +98,7 @@ export const LeafFieldTypographyParity: Story = {
   },
   render: () => (
     <div className="grid max-w-xl gap-8 md:grid-cols-2">
-      <fieldset className="border-0 p-0">
+      <fieldset className={cn('border-0 p-0', fieldAnatomyStackVariants({ size: 'md' }))}>
         <ArrayLikeSectionHeader
           label="Grants"
           hint="Add the mechanical effects this feature provides."
