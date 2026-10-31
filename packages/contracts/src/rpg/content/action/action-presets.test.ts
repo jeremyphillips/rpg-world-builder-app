@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { ACTION_VOCABULARY_ENTRIES } from '../../vocab/action/action-vocabulary'
-import { ACTION_PRESET_ENTRIES, getActionPreset } from './action-presets'
+import {
+  ACTION_PRESET_ENTRIES,
+  getActionPreset,
+  listSpecialMenuActionPresetIds,
+} from './action-presets'
 
 describe('action presets', () => {
   it('never references a core vocabulary id', () => {
@@ -20,5 +24,20 @@ describe('action presets', () => {
 
   it('returns undefined for an unknown preset id', () => {
     expect(getActionPreset('not-a-preset')).toBeUndefined()
+  })
+
+  it('stamps saving-throw presets with a default dc source', () => {
+    const breath = getActionPreset('breath-weapon')
+    expect(breath?.mechanics).toBe('saving-throw')
+    if (breath?.mechanics !== 'saving-throw') return
+    expect(breath.defaults.dcSource).toEqual({
+      kind: 'ability',
+      ability: 'con',
+      proficient: true,
+    })
+  })
+
+  it('lists special menu presets from vocabulary group', () => {
+    expect(listSpecialMenuActionPresetIds()).toEqual(['breath-weapon', 'constrict', 'multiattack'])
   })
 })

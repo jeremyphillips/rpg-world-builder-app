@@ -33,8 +33,8 @@ reapplies preset defaults after creation.
 `sting`, `tail`, `tentacle`, `talons`). It is optional and independent of
 `preset`.
 
-A shared action-vocabulary map and a preset registry are not in contracts yet.
-Natural-weapon menu defaults still come from `vocab/monster-natural-weapon-preset.ts`.
+Action identity and add-menu defaults live in
+`vocab/action/action-vocabulary.ts` and `content/action/action-presets.ts`.
 Core action names (Attack, Grapple, Dash, and the rest) are not rules. Adding a
 vocabulary entry must not imply a mechanic.
 

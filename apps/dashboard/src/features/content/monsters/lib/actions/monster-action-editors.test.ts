@@ -95,6 +95,7 @@ describe('monster action acquisition', () => {
       kind: 'save',
       preset: 'breath-weapon',
       name: 'Fire Breath',
+      dcSource: { kind: 'ability', ability: 'con', proficient: true },
       limitedUse: { kind: 'recharge', minRoll: 5 },
     })
     expect(

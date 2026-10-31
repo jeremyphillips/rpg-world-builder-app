@@ -1,5 +1,5 @@
 import type { Ability } from '../../../vocab/ability'
-import type { SpellResolutionMethod } from '../../spell/resolution/schema'
+import type { SpellResolutionAttackType } from '../../spell/resolution/vocab'
 import {
   ensureOutcomeSlotsForMethod,
   getOutcomeResultsForMethod,
@@ -22,10 +22,15 @@ export type OutcomeMethodChangePlan = {
   mappedOutcomes: ResolutionOutcomeRef[]
 }
 
+type OutcomePlanResolutionMethod =
+  | { kind: 'automatic' }
+  | { kind: 'saving-throw'; ability: Ability }
+  | { kind: 'attack'; attackType: SpellResolutionAttackType }
+
 function methodOptionToMethod(
   state: ResolutionSelectionState,
   option: ResolutionMethodOption,
-): SpellResolutionMethod {
+): OutcomePlanResolutionMethod {
   if (option === 'automatic') return { kind: 'automatic' }
   if (option === 'saving-throw') {
     return { kind: 'saving-throw', ability: (state.saveAbility ?? 'con') as Ability }
@@ -50,8 +55,8 @@ function emptyOutcome(result: ResolutionOutcomeResult): ResolutionOutcomeRef {
 
 function mapOutcomeBetweenMethods(
   source: ResolutionOutcomeRef,
-  fromMethod: SpellResolutionMethod,
-  toMethod: SpellResolutionMethod,
+  fromMethod: OutcomePlanResolutionMethod,
+  toMethod: OutcomePlanResolutionMethod,
 ): ResolutionOutcomeRef | undefined {
   if (!hasMeaningfulOutcomeContent(source)) return undefined
 

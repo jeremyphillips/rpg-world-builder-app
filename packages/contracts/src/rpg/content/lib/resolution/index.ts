@@ -111,7 +111,7 @@ export {
   SELECTION_METHOD_COMPATIBILITY_MATRIX,
   SELECTION_METHOD_COMPATIBILITY_REASON_CODES,
   selectionMethodContextFromState,
-  validateSpellResolutionMethodCompatibility,
+  validateResolutionMethodCompatibility,
   type SelectionMethodCompatibility,
   type SelectionMethodCompatibilityReasonCode,
   type SelectionMethodContextKey,

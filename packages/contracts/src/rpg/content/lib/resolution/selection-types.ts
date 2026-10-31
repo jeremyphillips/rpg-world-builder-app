@@ -1,16 +1,22 @@
-import type { SpellResolutionAttackType } from '../../spell/resolution/vocab'
 import type {
+  ResolutionMethodKind,
   ResolutionOutcomeResult,
   ResolutionProximityKind,
+  ResolutionSelectionMode,
+  ResolutionTargetCountKind,
   ResolutionTargetKind,
 } from '../../../vocab/resolution'
+import type { SpellResolutionAttackType } from '../../spell/resolution/vocab'
 
 import type { SelectionMethodCompatibilityReasonCode } from './selection-method-compatibility'
-import type { ResolutionSelectionMode } from '../../../vocab/resolution'
-import type { ResolutionTargetCountKind } from '../../../vocab/resolution'
 
-/** Combined method select value used by resolution authoring UI. */
-export type ResolutionMethodOption = SpellResolutionAttackType | 'saving-throw' | 'automatic'
+/**
+ * Authoring UI method select values. Spell attack types are spell-adapter options;
+ * envelope methods are `saving-throw` and `automatic` only.
+ */
+export type ResolutionMethodOption =
+  | Extract<ResolutionMethodKind, 'saving-throw' | 'automatic'>
+  | SpellResolutionAttackType
 
 export type ResolutionApplicationPatternFormKind = 'none' | 'projectiles'
 

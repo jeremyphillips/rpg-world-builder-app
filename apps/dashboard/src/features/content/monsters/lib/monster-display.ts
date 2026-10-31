@@ -1,6 +1,7 @@
 import {
   ABILITY_IDS,
   abilityModifier,
+  CHALLENGE_RATING_MECHANICS,
   formatSignedModifier,
   getAbilityCompactLabel,
   getChallengeRatingLabel,
@@ -20,6 +21,8 @@ import {
   type SkillProficiency,
   deriveMonsterStatBlock,
   formatMonsterLimitedUseHeading,
+  formatMonsterMultiattack,
+  formatMonsterSaveAction,
   formatMonsterSpellEntry,
   limitedUseSchema,
   type ArmorClassRules,
@@ -224,10 +227,81 @@ function resolveActionName(
   attack: DerivedMonsterAttackLine | undefined,
 ): string {
   const name =
-    action.kind === 'special' || action.kind === 'natural-weapon'
+    action.kind === 'special' ||
+    action.kind === 'natural-weapon' ||
+    action.kind === 'save' ||
+    action.kind === 'multiattack'
       ? action.name
       : (action.name ?? attack?.name ?? action.id)
   return withLimitedUseHeading(name, action.limitedUse)
+}
+
+function proficiencyBonusForDisplay(
+  monster: Monster,
+  derived: DerivedMonsterStatBlock | null | undefined,
+): number {
+  if (derived) return derived.proficiencyBonus
+  return CHALLENGE_RATING_MECHANICS[monster.challengeRating].proficiencyBonus
+}
+
+function spellcastingAbilityScoreForSave(
+  monster: Monster,
+  dcSource: Extract<MonsterAction, { kind: 'save' }>['dcSource'],
+): number | undefined {
+  if (!dcSource || dcSource.kind !== 'spell') return undefined
+  const source = dcSource.castingAbility
+  if (source.kind === 'ability') {
+    return monster.abilityScores[source.ability]
+  }
+  const sections = [monster.actions, monster.bonusActions, monster.reactions] as const
+  for (const section of sections) {
+    for (const entry of section) {
+      if (entry.kind !== 'spell' || entry.id !== source.entryId || !entry.castingAbility) continue
+      if (entry.castingAbility.kind === 'ability') {
+        return monster.abilityScores[entry.castingAbility.ability]
+      }
+    }
+  }
+  return undefined
+}
+
+function formatSaveActionBody(
+  monster: Monster,
+  action: Extract<MonsterAction | MonsterReaction, { kind: 'save' }>,
+  derived: DerivedMonsterStatBlock | null | undefined,
+  catalogState: MonsterCatalogLoadState,
+): string | undefined {
+  if (catalogState !== 'ready' || !action.resolution || !action.dcSource) {
+    if (catalogState === 'error') return MONSTER_UNRESOLVED_CATALOG_REFERENCE
+    return undefined
+  }
+  const formatted = formatMonsterSaveAction({
+    action: { ...action, resolution: action.resolution, dcSource: action.dcSource },
+    abilityScores: monster.abilityScores,
+    proficiencyBonus: proficiencyBonusForDisplay(monster, derived),
+    spellcastingAbilityScore: spellcastingAbilityScoreForSave(monster, action.dcSource),
+  })
+  const extra = action.description?.trim()
+  return extra ? `${formatted.body} ${extra}` : formatted.body
+}
+
+function formatMultiattackActionBody(
+  monster: Monster,
+  action: Extract<MonsterAction, { kind: 'multiattack' }>,
+  equipmentById: Map<string, Equipment>,
+  catalogState: MonsterCatalogLoadState,
+): string | undefined {
+  if (catalogState !== 'ready') {
+    return catalogState === 'error' ? MONSTER_UNRESOLVED_CATALOG_REFERENCE : undefined
+  }
+  const generated = formatMonsterMultiattack({
+    monsterName: monster.name,
+    action,
+    actions: monster.actions,
+    equipment: monster.equipment,
+    equipmentCatalog: equipmentById,
+  })
+  return generated || undefined
 }
 
 function resolveActionAttackLine(
@@ -244,6 +318,8 @@ function resolveActionAttackLine(
 }
 
 type SpellDisplayContext = {
+  monster: Monster
+  equipmentById: Map<string, Equipment>
   monsterName: string
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   catalogStatus: 'ready' | 'unavailable'
@@ -282,6 +358,29 @@ function mapActionItem(
       id: action.id,
       name,
       descriptionHtml: action.description,
+    }
+  }
+
+  if (action.kind === 'save') {
+    const body = formatSaveActionBody(spells.monster, action, derived, catalogState)
+    return {
+      id: action.id,
+      name,
+      descriptionHtml: body ? `<p>${body}</p>` : action.description,
+    }
+  }
+
+  if (action.kind === 'multiattack') {
+    const body = formatMultiattackActionBody(
+      spells.monster,
+      action,
+      spells.equipmentById,
+      catalogState,
+    )
+    return {
+      id: action.id,
+      name,
+      descriptionHtml: body ? `<p>${body}</p>` : action.description,
     }
   }
 
@@ -481,6 +580,8 @@ export function buildMonsterDetailViewModel({
   spellCatalogStatus = 'unavailable',
 }: BuildMonsterDetailViewModelInput): MonsterDetailViewModel {
   const spellContext = {
+    monster,
+    equipmentById,
     monsterName: monster.name,
     spellsById,
     catalogStatus: spellCatalogStatus,

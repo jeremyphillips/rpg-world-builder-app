@@ -10,6 +10,7 @@ import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
+import { distanceInputSelectField } from '../../../lib/forms/fields/content-speed-form-fields'
 import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
 import {
   rollValueFieldConfigs,
@@ -316,6 +317,62 @@ export function monsterActionDetailFields(input: {
         required: true,
       }),
       damageTypeField({ name: 'resolution.effects.0.damageType', ctx, required: true }),
+      {
+        type: 'number',
+        name: 'resolution.target.count',
+        label: 'Target count',
+        min: 1,
+        visibility: {
+          dependsOn: ['resolution.selectionMode'],
+          visibleWhen: (values) => values['resolution.selectionMode'] === 'targets',
+        },
+      },
+      {
+        type: 'select',
+        name: 'resolution.target.proximity.kind',
+        label: 'Target distance',
+        options: [
+          { value: 'reach', label: 'Reach' },
+          { value: 'distance', label: 'Range' },
+        ],
+        visibility: {
+          dependsOn: ['resolution.selectionMode'],
+          visibleWhen: (values) => values['resolution.selectionMode'] === 'targets',
+        },
+      },
+      distanceInputSelectField({
+        name: 'resolution.target.proximity.distance.value',
+        label: 'Distance (ft)',
+        visibility: {
+          dependsOn: ['resolution.selectionMode', 'resolution.target.proximity.kind'],
+          visibleWhen: (values) =>
+            values['resolution.selectionMode'] === 'targets' &&
+            (values['resolution.target.proximity.kind'] === 'distance' ||
+              values['resolution.target.proximity.kind'] === 'reach'),
+        },
+      }),
+      {
+        type: 'textarea',
+        name: 'resolution.outcomes.0.note',
+        label: 'Failure note',
+        rows: 2,
+        width: 'full',
+        optionalDisclosure: {
+          addLabel: 'Add failure note',
+          removeLabel: 'Remove',
+          expandWhenPopulated: true,
+        },
+      },
+      {
+        type: 'select',
+        name: 'resolution.outcomes.1.applications.0.amount',
+        label: 'On successful save',
+        options: [
+          { value: 'half', label: 'Half damage' },
+          { value: 'full', label: 'Full damage' },
+          { value: 'none', label: 'No effect' },
+        ],
+      },
     )
   }
 

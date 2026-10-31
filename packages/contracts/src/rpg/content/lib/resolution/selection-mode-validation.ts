@@ -6,7 +6,7 @@ import type { ResolutionSelectionMode } from '../../../vocab/resolution'
 
 type ResolutionModeField = 'target' | 'origin' | 'areaOfEffect'
 
-export type SpellResolutionModeValidationInput = {
+export type ResolutionModeValidationInput = {
   selectionMode: ResolutionSelectionMode
   target?: unknown
   origin?: unknown
@@ -85,14 +85,14 @@ const MODE_FIELD_RULES: Record<
 }
 
 function hasModeField(
-  resolution: SpellResolutionModeValidationInput,
+  resolution: ResolutionModeValidationInput,
   field: ResolutionModeField,
 ): boolean {
   return Boolean(resolution[field])
 }
 
-export function validateSpellResolutionModeFields(
-  resolution: SpellResolutionModeValidationInput,
+export function validateResolutionModeFields(
+  resolution: ResolutionModeValidationInput,
   ctx: z.RefinementCtx,
 ): void {
   const rules = MODE_FIELD_RULES[resolution.selectionMode]

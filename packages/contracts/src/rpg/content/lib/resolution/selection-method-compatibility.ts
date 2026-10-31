@@ -182,7 +182,7 @@ export type SelectionMethodCompatibilityInput = {
 }
 
 /** Rejects deferred and unsupported method × selection-mode pairs on stored resolution. */
-export function validateSpellResolutionMethodCompatibility(
+export function validateResolutionMethodCompatibility(
   resolution: SelectionMethodCompatibilityInput,
   ctx: z.RefinementCtx,
 ): void {

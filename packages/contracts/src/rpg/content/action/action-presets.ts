@@ -1,11 +1,21 @@
-import type { EffectResolution } from '../lib/resolution/schema'
-import { effectResolutionSchema } from '../lib/resolution/schema'
-import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '../lib/resolution/schema'
+import type { Ability } from '../../vocab/ability'
 import {
   ACTION_VOCABULARY_ENTRIES,
+  getActionVocabularyEntry,
+  type ActionGroup,
   type ActionVocabularyId,
 } from '../../vocab/action/action-vocabulary'
 import type { NaturalAttackForm } from '../../vocab/action/natural-attack-form'
+import type { EffectResolution } from '../lib/resolution/schema'
+import { effectResolutionSchema } from '../lib/resolution/schema'
+import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '../lib/resolution/schema'
+
+export type ActionPresetDcSource =
+  | { kind: 'ability'; ability: Ability; proficient: boolean }
+  | {
+      kind: 'spell'
+      castingAbility: { kind: 'ability'; ability: Ability } | { kind: 'shared'; entryId: string }
+    }
 
 const NATURAL_ATTACK_DAMAGE_TYPE = {
   bite: 'piercing',
@@ -44,6 +54,7 @@ type SavingThrowPreset = {
   rulesets?: readonly string[]
   defaults: {
     resolution: EffectResolution
+    dcSource: ActionPresetDcSource
     limitedUse?: { kind: 'recharge'; minRoll: number }
     suggestedName: string
   }
@@ -142,6 +153,7 @@ export const ACTION_PRESET_ENTRIES = {
     mechanics: 'saving-throw',
     defaults: {
       resolution: BREATH_WEAPON_RESOLUTION,
+      dcSource: { kind: 'ability', ability: 'con', proficient: true },
       limitedUse: { kind: 'recharge', minRoll: 5 },
       suggestedName: 'Fire Breath',
     },
@@ -152,6 +164,7 @@ export const ACTION_PRESET_ENTRIES = {
     rulesets: ['srd-cc-5.2.1'],
     defaults: {
       resolution: CONSTRICT_RESOLUTION,
+      dcSource: { kind: 'ability', ability: 'str', proficient: true },
       suggestedName: 'Constrict',
     },
   },
@@ -171,4 +184,17 @@ export const ACTION_PRESET_IDS = Object.keys(ACTION_PRESET_ENTRIES) as [
 
 export function getActionPreset(id: string): ActionPreset | undefined {
   return ACTION_PRESET_ENTRIES[id as ActionPresetId]
+}
+
+function presetVocabularyGroup(presetId: ActionPresetId): ActionGroup | undefined {
+  const preset = ACTION_PRESET_ENTRIES[presetId]
+  return getActionVocabularyEntry(preset.vocabularyId)?.group
+}
+
+/** Presets for the monster add menu Special group (saving throw and sequence mechanics). */
+export function listSpecialMenuActionPresetIds(): ActionPresetId[] {
+  return ACTION_PRESET_IDS.filter((presetId) => {
+    if (ACTION_PRESET_ENTRIES[presetId].mechanics === 'attack-roll') return false
+    return presetVocabularyGroup(presetId) === 'special'
+  })
 }

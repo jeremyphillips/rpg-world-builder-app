@@ -22,8 +22,8 @@ import {
   hasMeaningfulOutcomeContent,
   supportsPartialApplicationForEffectKind,
 } from './outcome-slots'
-import { validateSpellResolutionMethodCompatibility } from './selection-method-compatibility'
-import { validateSpellResolutionModeFields } from './selection-mode-validation'
+import { validateResolutionMethodCompatibility } from './selection-method-compatibility'
+import { validateResolutionModeFields } from './selection-mode-validation'
 import { isResolutionEffectKind } from './selection-availability'
 import { spellResolutionValidationMessages } from './validation-messages'
 
@@ -171,8 +171,8 @@ export function validateEffectResolution(
   resolution: EffectResolutionValidationInput,
   ctx: z.RefinementCtx,
 ): void {
-  validateSpellResolutionModeFields(resolution, ctx)
-  validateSpellResolutionMethodCompatibility(
+  validateResolutionModeFields(resolution, ctx)
+  validateResolutionMethodCompatibility(
     {
       selectionMode: resolution.selectionMode,
       hasAreaOfEffect: Boolean(resolution.areaOfEffect),
