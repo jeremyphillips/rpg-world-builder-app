@@ -4,9 +4,9 @@ import { useFieldControlSize } from '@rpg/ui/form'
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
-} from '../../lib/actions/monster-action-equipment-references'
-import { monsterActionSectionHeading } from '../../lib/actions/monster-action-presets'
-import { MONSTER_MOVE_TO_LABEL } from '../../lib/monster-form-labels'
+} from './monster-action-equipment-references'
+import { monsterActionSectionHeading } from './monster-action-presets'
+import { MONSTER_MOVE_TO_LABEL } from '../monster-form-labels'
 
 const moveSectionOptions = MONSTER_ACTION_SECTIONS.map((target) => ({
   value: target,

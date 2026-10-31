@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { INLINE_METADATA_SEPARATOR } from '@rpg/contracts/primitives'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { Eyebrow } from './eyebrow'
 import {
@@ -34,13 +34,20 @@ export function ListGroupHeading({
   first,
   follows,
 }: ListGroupHeadingProps) {
+  const accessibleName =
+    count != null && typeof label === 'string' ? joinInlineMetadata([label, count]) : undefined
+
   return (
-    <Component id={id} className={listGroupHeadingVariants({ first, follows })}>
+    <Component
+      id={id}
+      aria-label={accessibleName}
+      className={listGroupHeadingVariants({ first, follows })}
+    >
       <Eyebrow size="xs" as="span" className="ui-list-group-heading__eyebrow">
         <span className="ui-list-group-heading__label">{label}</span>
         {count != null ? (
           <>
-            <span aria-hidden="true">{INLINE_METADATA_SEPARATOR}</span>
+            <span aria-hidden="true">·</span>
             <span className="ui-list-group-heading__count">{count}</span>
           </>
         ) : null}

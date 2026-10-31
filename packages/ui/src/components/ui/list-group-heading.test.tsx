@@ -7,7 +7,7 @@ describe('ListGroupHeading', () => {
   it('exposes host-owned heading id, label, and count', () => {
     render(<ListGroupHeading id="content-group" as="h2" label="Content" count={14} />)
 
-    expect(screen.getByRole('heading', { level: 2, name: 'Content 14' })).toHaveAttribute(
+    expect(screen.getByRole('heading', { level: 2, name: 'Content · 14' })).toHaveAttribute(
       'id',
       'content-group',
     )

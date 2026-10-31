@@ -7,6 +7,7 @@ import { limitedUseDraftSchema, limitedUseSchema } from '../../primitives/limite
 import { abilitySchema } from '../../vocab/ability'
 import { damageTypeIdSchema } from '../../vocab/damage'
 import { spellComponentIdSchema } from '../../vocab/spell/components'
+import { reachFeetSchema } from '../../vocab/attack/melee-reach'
 import { weaponModeSchema } from '../../vocab/weapon'
 import { entryProvenanceField } from '../../primitives/provenance'
 import { spellReferenceSchema } from '../spell/spell-reference'
@@ -94,7 +95,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
         : z.array(naturalWeaponPropertySchema).default([])) as M extends 'draft'
         ? z.ZodOptional<z.ZodArray<typeof naturalWeaponPropertySchema>>
         : z.ZodDefault<z.ZodArray<typeof naturalWeaponPropertySchema>>,
-      reach: z.number().int().min(5).optional(),
+      reach: reachFeetSchema.optional(),
       range: weaponRangeSchema.optional(),
       damage: (mode === 'draft'
         ? weaponDamageDraftSchema.optional()
@@ -113,7 +114,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
         mode === 'draft'
           ? z.array(z.enum(attackModes)).min(1).optional()
           : z.array(z.enum(attackModes)).min(1),
-      reach: z.number().int().min(5).optional(),
+      reach: reachFeetSchema.optional(),
       range: weaponRangeSchema.optional(),
       damage: (mode === 'draft'
         ? weaponDamageDraftSchema.optional()

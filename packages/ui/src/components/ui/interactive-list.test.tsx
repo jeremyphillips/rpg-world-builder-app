@@ -190,7 +190,7 @@ describe('ListGroupHeading in list composition', () => {
   it('exposes host-owned heading id', () => {
     render(<ListGroupHeading id="content-group" as="h2" label="Content" count={14} />)
 
-    expect(screen.getByRole('heading', { name: 'Content 14' })).toHaveAttribute(
+    expect(screen.getByRole('heading', { name: 'Content · 14' })).toHaveAttribute(
       'id',
       'content-group',
     )

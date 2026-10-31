@@ -30,7 +30,7 @@ import {
   monsterActionOnHitFields,
   spellComponentField,
 } from './monster-action-on-hit-fields'
-import { MonsterActionMoveSectionField } from '../../components/form/monster-action-move-section-field'
+import { MonsterActionMoveSectionField } from './monster-action-move-section-field'
 
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {
   return {
