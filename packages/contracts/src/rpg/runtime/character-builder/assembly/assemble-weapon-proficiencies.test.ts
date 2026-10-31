@@ -12,6 +12,7 @@ const emptyCatalogIndex = {
   spells: new Map(),
   skillProficiencies: new Map(),
   organizations: new Map(),
+  featsBySlug: new Map(),
   languages: [],
 } satisfies CharacterBuildCatalogIndex
 

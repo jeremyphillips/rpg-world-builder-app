@@ -130,6 +130,7 @@ export const builderTestCatalog: CharacterBuildCatalog = {
   equipment: [],
   skillProficiencies: [athleticsSkill],
   organizations: [],
+  feats: [],
   languages: [...builderTestLanguages],
 }
 

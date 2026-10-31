@@ -2,7 +2,11 @@ import { z } from 'zod'
 
 import type { ContentValidationIntent } from '../lib/content-validation-intent'
 import type { ContentValidationIssue } from '../lib/content-validation-issue'
-import { isContentReferenceable } from '../lib/content-resolution-policy'
+import {
+  authoredSpellIdsEdge,
+  CATALOG_REFERENCE_ISSUE_CODE,
+  collectCatalogReferenceIssues,
+} from '../lib/catalog-reference-issues'
 import type { Spell } from './body'
 
 /** Canonical spell content id. System spells use `<rulesetId>:<slug>`; homebrew uses the Mongo id. */
@@ -11,9 +15,9 @@ export const spellReferenceSchema = z.string().min(1)
 export type SpellReference = z.infer<typeof spellReferenceSchema>
 
 export const SPELL_REFERENCE_ISSUE_CODE = {
-  unknownSpell: 'unknown_spell',
-  spellNotReferenceable: 'spell_not_referenceable',
-  spellCatalogUnavailable: 'spell_catalog_unavailable',
+  unknownSpell: CATALOG_REFERENCE_ISSUE_CODE.spell.unknown,
+  spellNotReferenceable: CATALOG_REFERENCE_ISSUE_CODE.spell.notReferenceable,
+  spellCatalogUnavailable: CATALOG_REFERENCE_ISSUE_CODE.spell.catalogUnavailable,
 } as const
 
 /** Walks grant rows and recommendation lists for persisted spell references. */
@@ -73,33 +77,13 @@ export function collectSpellReferenceIssues(args: {
   catalogStatus: 'ready' | 'unavailable'
   intent: ContentValidationIntent
 }): ContentValidationIssue[] {
-  if (args.catalogStatus === 'unavailable') {
-    if (args.intent !== 'publish') return []
-    return args.refs.map((ref) => ({
-      path: ref.path,
-      code: SPELL_REFERENCE_ISSUE_CODE.spellCatalogUnavailable,
-      message: 'The spell catalog is unavailable, so this reference cannot be checked.',
-    }))
-  }
-
-  const issues: ContentValidationIssue[] = []
-  for (const ref of args.refs) {
-    const spell = resolveSpellReference(ref.spellId, args.spellsById)
-    if (!spell) {
-      issues.push({
-        path: ref.path,
-        code: SPELL_REFERENCE_ISSUE_CODE.unknownSpell,
-        message: 'Choose a spell from the catalog.',
-      })
-      continue
-    }
-    if (args.intent === 'publish' && !isContentReferenceable(spell)) {
-      issues.push({
-        path: ref.path,
-        code: SPELL_REFERENCE_ISSUE_CODE.spellNotReferenceable,
-        message: 'Draft spells cannot be referenced on published content.',
-      })
-    }
-  }
-  return issues
+  return collectCatalogReferenceIssues({
+    policy: authoredSpellIdsEdge.policy,
+    intent: args.intent,
+    catalogStatus: args.catalogStatus,
+    refs: args.refs.map((ref) => ({ path: ref.path, key: ref.spellId })),
+    resolve: (key) => resolveSpellReference(key, args.spellsById),
+    unavailablePlacement: authoredSpellIdsEdge.unavailablePlacement,
+    messages: authoredSpellIdsEdge.messages,
+  })
 }

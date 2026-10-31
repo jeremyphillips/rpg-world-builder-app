@@ -223,6 +223,7 @@ describe('magic item acquisition contracts', () => {
       equipment: [commonPotion],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -273,6 +274,7 @@ describe('magic item acquisition contracts', () => {
       equipment: [commonPotion, rareAmulet, rope],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -307,6 +309,7 @@ describe('magic item acquisition contracts', () => {
       equipment: [commonPotion],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -346,6 +349,7 @@ describe('magic item acquisition contracts', () => {
       equipment: [rope],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -406,6 +410,7 @@ describe('magic item acquisition contracts', () => {
       equipment: [rope],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -499,6 +504,7 @@ describe('magic item acquisition contracts', () => {
       equipment: [commonPotion],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -535,6 +541,7 @@ describe('magic item acquisition contracts', () => {
       equipment: [commonPotion],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -582,6 +589,7 @@ describe('magic item acquisition contracts', () => {
       equipment: [commonPotion, rareAmulet],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
     const context = builderContext(catalogIndex)
@@ -634,6 +642,7 @@ describe('magic item acquisition contracts', () => {
       equipment: [rareAmulet],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
     const context = resolveEquipmentAcquisitionBuilderContext({
@@ -677,6 +686,7 @@ describe('magic item acquisition contracts', () => {
           equipment: [rareAmulet],
           skillProficiencies: [],
           organizations: [],
+          feats: [],
           languages: [],
         }),
       ),
@@ -716,6 +726,7 @@ describe('magic item acquisition contracts', () => {
       equipment: [commonPotion, goldSink],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
     const context = builderContext(catalogIndex)
@@ -769,6 +780,7 @@ describe('magic item acquisition contracts', () => {
       equipment: [rareAmulet],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
     const context = resolveEquipmentAcquisitionBuilderContext({

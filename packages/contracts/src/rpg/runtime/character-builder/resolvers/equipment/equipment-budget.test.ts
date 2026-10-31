@@ -99,6 +99,7 @@ describe('deriveEquipmentBudgetSummary', () => {
       equipment: [rope],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -195,6 +196,7 @@ describe('resolveStartingEquipmentFundingOptions', () => {
       equipment: [rope],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -242,6 +244,7 @@ describe('resolveStartingEquipmentFundingOptions', () => {
       equipment: [rope],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -294,6 +297,7 @@ describe('resolveStartingEquipmentFundingOptions', () => {
       equipment: [rope],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -349,6 +353,7 @@ describe('resolvePurchaseBudgetCeilingCp', () => {
     equipment: [rope],
     skillProficiencies: [],
     organizations: [],
+    feats: [],
     languages: [],
   })
   const tierBonus = {
@@ -446,6 +451,7 @@ describe('deriveEquipmentBudgetSummaryFromFunding', () => {
       equipment: [rope],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 

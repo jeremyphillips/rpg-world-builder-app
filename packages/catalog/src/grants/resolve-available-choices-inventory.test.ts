@@ -35,6 +35,7 @@ function seedBuildContext(): CharacterBuildContext {
       equipment: [],
       skillProficiencies: loadSeedSkillProficiencies(RULESET),
       organizations: [],
+      feats: [],
       languages: [...listLanguageSeedOptions(RULESET)],
     },
     spellcastingProgression: resolveIndexedCampaignSpellcastingProgressionConfig(

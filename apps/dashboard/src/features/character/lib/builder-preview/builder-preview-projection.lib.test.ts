@@ -172,6 +172,7 @@ describe('builder-preview-projection.lib', () => {
         equipment: [],
         skillProficiencies: [],
         organizations: [],
+        feats: [],
         languages: [],
       },
     })
@@ -234,6 +235,7 @@ describe('builder-preview-projection.lib', () => {
         equipment: [],
         skillProficiencies: [],
         organizations: [],
+        feats: [],
         languages: [],
       },
     })

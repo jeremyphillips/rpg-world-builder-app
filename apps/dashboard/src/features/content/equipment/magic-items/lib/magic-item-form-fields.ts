@@ -9,9 +9,6 @@ import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 
-import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
-import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { referenceMagicItemBaseEquipmentFieldOptions } from '../../../lib/form-options/content-field-option.lib'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 
 const magicItemRarityOptions = toOptions(
@@ -25,7 +22,7 @@ const magicItemCategoryOptions = toOptions(
 )
 
 /** Magic item-specific form field group for the unified equipment form. */
-export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
+export function magicItemFormFieldGroup(): FormItem {
   return {
     kind: 'group',
     legend: '',
@@ -63,19 +60,6 @@ export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
             },
           ],
         },
-      },
-      {
-        kind: 'row',
-        fields: [
-          {
-            type: 'combobox',
-            name: 'baseEquipmentId',
-            label: `Base ${getContentTypeMidSentenceLabel('equipment')}`,
-            multiple: false,
-            width: 'full',
-            options: referenceMagicItemBaseEquipmentFieldOptions(ctx.options?.equipment),
-          },
-        ],
       },
     ],
   }

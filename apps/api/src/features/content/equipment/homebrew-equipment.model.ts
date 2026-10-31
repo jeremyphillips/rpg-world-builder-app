@@ -91,7 +91,6 @@ const homebrewEquipmentSchema = new Schema(
     requiresAttunement: { type: Boolean },
     attunementRequirement: { type: String },
     magicItemCategory: { type: String, enum: [...MAGIC_ITEM_CATEGORIES] },
-    baseEquipmentId: { type: String },
   },
   { timestamps: true },
 )

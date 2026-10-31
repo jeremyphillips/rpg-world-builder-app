@@ -1,7 +1,6 @@
 import {
   classHasSpellcasting,
   isArmorEquipment,
-  isMagicItemBaseEquipment,
   isWeaponEquipment,
   TOOL_CATEGORY_ENTRIES,
   type CharacterClass,
@@ -149,13 +148,4 @@ export function referenceFeatFieldOptions(
   selectors: ContentPurposeSelectors<Feat> | undefined,
 ): FieldOption[] {
   return toSortedContentFieldOptions(selectors?.forReference(), 'feats')
-}
-
-export function referenceMagicItemBaseEquipmentFieldOptions(
-  selectors: ContentPurposeSelectors<Equipment> | undefined,
-): FieldOption[] {
-  return toSortedContentFieldOptions(
-    selectors?.forReference().filter(isMagicItemBaseEquipment),
-    'equipment',
-  )
 }

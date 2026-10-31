@@ -141,6 +141,7 @@ describe('assembleStartingEquipment', () => {
       equipment: [leatherArmor, shield],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -191,6 +192,7 @@ describe('assembleStartingEquipment', () => {
       equipment: [leatherArmor, shield],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -224,6 +226,7 @@ describe('assembleStartingEquipment', () => {
       equipment: [leatherArmor, shield, rope],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -466,6 +469,7 @@ describe('proficiency-linked starting equipment lifecycle', () => {
       equipment: [commonPotion],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 

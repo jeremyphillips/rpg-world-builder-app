@@ -1903,9 +1903,6 @@
             "other"
           ],
           "description": "weapon | armor | wondrous_item | potion | ring | rod | scroll | staff | wand | other"
-        },
-        "baseEquipmentId": {
-          "type": "string"
         }
       },
       "required": [

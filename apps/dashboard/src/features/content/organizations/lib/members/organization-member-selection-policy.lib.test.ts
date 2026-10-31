@@ -34,6 +34,7 @@ describe('buildOrganizationMemberSelectionPolicy', () => {
       equipment: [],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     },
   })

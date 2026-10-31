@@ -50,27 +50,43 @@ describe('collectSpellReferenceIssues', () => {
   ]
 
   it('reports unknown ids on both intents and draft spells only on publish', () => {
-    const draftIssues = collectSpellReferenceIssues({
-      refs,
-      spellsById,
-      catalogStatus: 'ready',
-      intent: 'draft',
-    })
-    expect(draftIssues.map((issue) => issue.code)).toEqual(['unknown_spell'])
+    expect(
+      collectSpellReferenceIssues({
+        refs,
+        spellsById,
+        catalogStatus: 'ready',
+        intent: 'draft',
+      }),
+    ).toEqual([
+      {
+        path: 'grantGroups.0.grants.0.spellIds.0',
+        code: 'unknown_spell',
+        message: 'Choose a spell from the catalog.',
+      },
+    ])
 
-    const publishIssues = collectSpellReferenceIssues({
-      refs,
-      spellsById,
-      catalogStatus: 'ready',
-      intent: 'publish',
-    })
-    expect(publishIssues.map((issue) => issue.code)).toEqual([
-      'unknown_spell',
-      'spell_not_referenceable',
+    expect(
+      collectSpellReferenceIssues({
+        refs,
+        spellsById,
+        catalogStatus: 'ready',
+        intent: 'publish',
+      }),
+    ).toEqual([
+      {
+        path: 'grantGroups.0.grants.0.spellIds.0',
+        code: 'unknown_spell',
+        message: 'Choose a spell from the catalog.',
+      },
+      {
+        path: 'grantGroups.0.grants.1.spellIds.0',
+        code: 'spell_not_referenceable',
+        message: 'Draft spells cannot be referenced on published content.',
+      },
     ])
   })
 
-  it('reports an unavailable catalog only on publish', () => {
+  it('reports an unavailable catalog only on publish, once per ref', () => {
     expect(
       collectSpellReferenceIssues({
         refs: [{ path: 'spellIds.0', spellId: systemSpell.id }],
@@ -81,11 +97,33 @@ describe('collectSpellReferenceIssues', () => {
     ).toEqual([])
     expect(
       collectSpellReferenceIssues({
-        refs: [{ path: 'spellIds.0', spellId: systemSpell.id }],
+        refs: [
+          { path: 'spellIds.0', spellId: systemSpell.id },
+          { path: 'spellIds.1', spellId: draftSpell.id },
+        ],
         spellsById,
         catalogStatus: 'unavailable',
         intent: 'publish',
-      }).map((issue) => issue.code),
-    ).toEqual(['spell_catalog_unavailable'])
+      }),
+    ).toEqual([
+      {
+        path: 'spellIds.0',
+        code: 'spell_catalog_unavailable',
+        message: 'The spell catalog is unavailable, so this reference cannot be checked.',
+      },
+      {
+        path: 'spellIds.1',
+        code: 'spell_catalog_unavailable',
+        message: 'The spell catalog is unavailable, so this reference cannot be checked.',
+      },
+    ])
+    expect(
+      collectSpellReferenceIssues({
+        refs: [],
+        spellsById,
+        catalogStatus: 'unavailable',
+        intent: 'publish',
+      }),
+    ).toEqual([])
   })
 })

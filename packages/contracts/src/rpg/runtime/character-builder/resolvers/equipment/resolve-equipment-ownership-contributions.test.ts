@@ -135,6 +135,7 @@ function makeCatalogIndex() {
     equipment: [rope, shield, eyesOfTheEagle],
     skillProficiencies: [],
     organizations: [],
+    feats: [],
     languages: [],
   })
 }

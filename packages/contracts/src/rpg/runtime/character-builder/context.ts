@@ -4,6 +4,7 @@ import type { SystemRulesetId } from '../../primitives/ruleset'
 import type { ContentPlayActor } from '../campaign/content-play-actor'
 import type { CharacterClass } from '../../content/classes/class'
 import type { Equipment } from '../../content/equipment'
+import type { Feat } from '../../content/feat'
 import type { SkillProficiency } from '../../content/skill-proficiency'
 import type { Species } from '../../content/species'
 import type { Spell } from '../../content/spell'
@@ -50,6 +51,8 @@ export type CharacterBuildCatalog = {
   equipment: Equipment[]
   skillProficiencies: SkillProficiency[]
   organizations: Organization[]
+  /** Feat recommendations resolve names by slug. */
+  feats: readonly Feat[]
   /** Active language vocabulary rows for the ruleset (category included). */
   languages: CharacterBuildLanguageOption[]
 }
@@ -61,11 +64,20 @@ export type CharacterBuildCatalogIndex = {
   equipment: ReadonlyMap<string, Equipment>
   skillProficiencies: ReadonlyMap<string, SkillProficiency>
   organizations: ReadonlyMap<string, Organization>
+  featsBySlug: ReadonlyMap<string, Feat>
   languages: readonly CharacterBuildLanguageOption[]
 }
 
 function byId<T extends { id: string }>(items: readonly T[]): ReadonlyMap<string, T> {
   return new Map(items.map((item) => [item.id, item]))
+}
+
+function bySlug<T extends { slug: string }>(items: readonly T[]): ReadonlyMap<string, T> {
+  const map = new Map<string, T>()
+  for (const item of items) {
+    if (!map.has(item.slug)) map.set(item.slug, item)
+  }
+  return map
 }
 
 /** Build once per catalog (memoize in the consuming hook), pass to resolvers/derive. */
@@ -79,6 +91,7 @@ export function indexCharacterBuildCatalog(
     equipment: byId(catalog.equipment),
     skillProficiencies: byId(catalog.skillProficiencies),
     organizations: byId(catalog.organizations),
+    featsBySlug: bySlug(catalog.feats),
     languages: catalog.languages,
   }
 }

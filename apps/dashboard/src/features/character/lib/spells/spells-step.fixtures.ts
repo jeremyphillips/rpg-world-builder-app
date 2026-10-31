@@ -134,6 +134,7 @@ export function createSpellsStepContextFixture(
       equipment: [],
       skillProficiencies: [spellsStepAthleticsSkill],
       organizations: [],
+      feats: [],
       languages: [],
     },
     characterCreationRules: {

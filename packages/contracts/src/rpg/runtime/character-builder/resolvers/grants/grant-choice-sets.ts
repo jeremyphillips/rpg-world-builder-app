@@ -103,8 +103,13 @@ function equipmentPoolOptions(
 function featChoiceSet(
   grant: Extract<ContentGrant, { kind: 'featChoice' }>,
   ctx: GrantChoiceSetContext,
+  catalogIndex: CharacterBuildCatalogIndex,
 ): ChoiceSet {
-  const options = grant.recommendedFeatIds?.map((id) => ({ id, label: id })) ?? []
+  const options = (grant.recommendedFeatIds ?? []).flatMap((slug) => {
+    const feat = catalogIndex.featsBySlug.get(slug)
+    if (!feat?.name) return []
+    return [{ id: slug, label: feat.name }]
+  })
   const categoryLabel = getFeatCategoryLabel(grant.category)
 
   return buildGrantChoiceSet(
@@ -290,7 +295,7 @@ type GrantChoiceSetConverter<K extends ContentGrant['kind']> = (
 const GRANT_CHOICE_SET_CONVERTERS: {
   [K in ContentGrant['kind']]?: GrantChoiceSetConverter<K>
 } = {
-  featChoice: (grant, ctx) => [featChoiceSet(grant, ctx)],
+  featChoice: (grant, ctx, catalogIndex) => [featChoiceSet(grant, ctx, catalogIndex)],
   languageChoice: (grant, ctx, catalogIndex) => [languageChoiceSet(grant, ctx, catalogIndex)],
   skillProficiency: (grant, ctx, catalogIndex) =>
     toChoiceSets(skillProficiencyChoiceSet(grant, ctx, catalogIndex)),

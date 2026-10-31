@@ -145,6 +145,7 @@ function makeCatalogIndex() {
     equipment: [leatherArmor, shield, rope],
     skillProficiencies: [],
     organizations: [],
+    feats: [],
     languages: [],
   })
 }
@@ -424,6 +425,7 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: [longsword],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -492,6 +494,7 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: [leatherArmor],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -558,6 +561,7 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: [leatherArmor],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 

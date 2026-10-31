@@ -630,6 +630,7 @@ describe('resolveEffectiveBuilderSteps', () => {
           equipment: [],
           skillProficiencies: [],
           organizations: [],
+          feats: [],
           languages: [],
         },
       }),

@@ -188,6 +188,7 @@ export const equipmentStepCatalogFixture = {
   ],
   skillProficiencies: [],
   organizations: [],
+  feats: [],
   languages: [],
 }
 

@@ -198,6 +198,7 @@ describe('formatStartingEquipmentPackageDescription', () => {
       equipment: fighterEquipment,
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -222,6 +223,7 @@ describe('formatStartingEquipmentPackageDescription', () => {
       equipment: fighterEquipment,
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -249,6 +251,7 @@ describe('resolveStartingEquipmentOptionSummaries descriptions', () => {
       equipment: fighterEquipment,
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 

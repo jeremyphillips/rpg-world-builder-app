@@ -250,6 +250,7 @@ Pre-commit and pre-push hooks run only at user-requested checkpoints — see
 - Use raw Lucide glyphs for catalog identity in sidebar or form tabs — `contentIdentityIcon` only
 - Wire `media` as a form-tab `FormItem` — managed media lives on `ContentFormHeader` only
 - Call `def.toInput` at create/update mutations — use `serializeContentFormInput`
+- Add a local issue-code entry for a field that stores a catalog reference. Use `collectCatalogReferenceIssues` with a host edge whose resolver defines the key (content id or slug). Registration is not mechanically guaranteed.
 
 ---
 

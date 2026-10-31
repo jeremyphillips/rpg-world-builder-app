@@ -18,7 +18,7 @@ export const kindFieldGroups: Partial<Record<EquipmentKind, KindFieldGroupBuilde
   service: () => [serviceFormFieldGroup()],
   mount: () => [mountFormFieldGroup()],
   tool: () => toolFormFieldGroup(),
-  magic_item: (ctx) => [magicItemFormFieldGroup(ctx)],
+  magic_item: () => [magicItemFormFieldGroup()],
   adventuring_gear: () => [adventuringGearFormFieldGroup()],
   vehicle: (ctx) => [vehicleFormFieldGroup(ctx?.armorClassRules)],
   armor: (ctx) => [armorFormFieldGroup(ctx?.armorClassRules)],

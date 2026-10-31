@@ -80,6 +80,7 @@ const catalogIndex = indexCharacterBuildCatalog({
   equipment: [equipmentStepSpearFixture, equipmentStepDaggerFixture, torchFixture],
   skillProficiencies: [],
   organizations: [],
+  feats: [],
   languages: [],
 })
 

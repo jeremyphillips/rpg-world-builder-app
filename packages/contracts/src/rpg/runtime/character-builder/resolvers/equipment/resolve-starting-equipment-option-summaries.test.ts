@@ -138,6 +138,7 @@ describe('resolveStartingEquipmentOptionSummaries', () => {
       equipment: [leatherArmor, lute],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 
@@ -169,6 +170,7 @@ describe('resolveStartingEquipmentOptionSummaries', () => {
       equipment: [leatherArmor, lute],
       skillProficiencies: [],
       organizations: [],
+      feats: [],
       languages: [],
     })
 

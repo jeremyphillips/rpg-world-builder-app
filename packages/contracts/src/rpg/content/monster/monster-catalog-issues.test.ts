@@ -78,32 +78,38 @@ function readyCatalogs(overrides: Partial<MonsterCatalogs> = {}): MonsterCatalog
 
 describe('collectMonsterCatalogIssues', () => {
   it('blocks unknown equipment, non-weapon actions, and armor modifiers on every intent', () => {
-    const issues = collectMonsterCatalogIssues(
+    const body = {
+      equipment: [
+        { entryId: 'missing', equipmentId: 'nope', equipped: true },
+        { entryId: 'leather', equipmentId: leather.id, equipped: true },
+        {
+          entryId: 'dagger',
+          equipmentId: dagger.id,
+          modifiers: [{ kind: 'armor_class' as const, bonus: 1 }],
+        },
+      ],
+      reactions: [{ kind: 'weapon', equipmentEntryId: 'leather' }],
+    }
+    const issues = collectMonsterCatalogIssues(body, readyCatalogs(), 'draft')
+    const expected = [
       {
-        equipment: [
-          { entryId: 'missing', equipmentId: 'nope', equipped: true },
-          { entryId: 'leather', equipmentId: leather.id, equipped: true },
-          {
-            entryId: 'dagger',
-            equipmentId: dagger.id,
-            modifiers: [{ kind: 'armor_class', bonus: 1 }],
-          },
-        ],
-        reactions: [{ kind: 'weapon', equipmentEntryId: 'leather' }],
+        path: 'equipment.0.equipmentId',
+        code: MONSTER_CATALOG_ISSUE_CODE.unknownEquipment,
+        message: 'Unknown equipment.',
       },
-      readyCatalogs(),
-      'draft',
-    )
-    expect(issues.map((issue) => issue.code)).toEqual([
-      MONSTER_CATALOG_ISSUE_CODE.unknownEquipment,
-      MONSTER_CATALOG_ISSUE_CODE.armorClassModifierNotArmor,
-      MONSTER_CATALOG_ISSUE_CODE.weaponActionNotWeapon,
-    ])
-    expect(issues.map((issue) => issue.path)).toEqual([
-      'equipment.0.equipmentId',
-      'equipment.2.adjustments',
-      'reactions.0.equipmentEntryId',
-    ])
+      {
+        path: 'equipment.2.adjustments',
+        code: MONSTER_CATALOG_ISSUE_CODE.armorClassModifierNotArmor,
+        message: 'Armor Class adjustments are only allowed on armor or shields.',
+      },
+      {
+        path: 'reactions.0.equipmentEntryId',
+        code: MONSTER_CATALOG_ISSUE_CODE.weaponActionNotWeapon,
+        message: 'Weapon action must reference a weapon.',
+      },
+    ]
+    expect(issues).toEqual(expected)
+    expect(collectMonsterCatalogIssues(body, readyCatalogs(), 'publish')).toEqual(expected)
   })
 
   it('blocks a second owned body armor even when one is unequipped', () => {
@@ -188,30 +194,99 @@ describe('collectMonsterCatalogIssues', () => {
   })
 
   it('allows unresolved skills on draft and validates them on publish', () => {
-    const body = {
-      proficiencies: { skills: [{ skill: 'missing-skill', rank: 'proficient' as const }] },
+    const draftSkill = skillProficiencySchema.parse({
+      ...athletics,
+      id: `${RULESET}:stealth`,
+      slug: 'stealth',
+      name: 'Stealth',
+      status: 'draft',
+    })
+    const hiddenSkill = {
+      ...athletics,
+      id: `${RULESET}:acrobatics`,
+      slug: 'acrobatics',
+      name: 'Acrobatics',
+      campaignAccess: { available: false },
     }
-    expect(collectMonsterCatalogIssues(body, readyCatalogs(), 'draft')).toEqual([])
-    expect(collectMonsterCatalogIssues(body, readyCatalogs(), 'publish')).toEqual([
-      expect.objectContaining({
-        code: MONSTER_CATALOG_ISSUE_CODE.unknownSkill,
+    const catalogs = readyCatalogs({
+      skillBySlug: new Map([
+        [athletics.slug, athletics],
+        [draftSkill.slug, draftSkill],
+        [hiddenSkill.slug, hiddenSkill as typeof athletics],
+      ]),
+    })
+    const body = {
+      proficiencies: {
+        skills: [
+          { skill: 'missing-skill', rank: 'proficient' as const },
+          { skill: draftSkill.slug, rank: 'proficient' as const },
+          { skill: hiddenSkill.slug, rank: 'proficient' as const },
+        ],
+      },
+    }
+    expect(collectMonsterCatalogIssues(body, catalogs, 'draft')).toEqual([])
+    expect(collectMonsterCatalogIssues(body, catalogs, 'publish')).toEqual([
+      {
         path: 'proficiencies.skills.0.skill',
-      }),
+        code: MONSTER_CATALOG_ISSUE_CODE.unknownSkill,
+        message: 'Unknown skill.',
+      },
+      {
+        path: 'proficiencies.skills.1.skill',
+        code: MONSTER_CATALOG_ISSUE_CODE.skillNotReferenceable,
+        message: 'Publish this skill before using it on a monster.',
+      },
+      {
+        path: 'proficiencies.skills.2.skill',
+        code: MONSTER_CATALOG_ISSUE_CODE.skillNotCampaignEligible,
+        message: 'This skill is not available in this campaign.',
+      },
     ])
   })
 
   it('blocks publish when the skill catalog is unavailable', () => {
     expect(
       collectMonsterCatalogIssues(
-        { proficiencies: { skills: [{ skill: 'athletics' }] } },
+        { proficiencies: { skills: [] } },
         readyCatalogs({ skillCatalog: 'unavailable' }),
         'publish',
       ),
     ).toEqual([
-      expect.objectContaining({
-        code: MONSTER_CATALOG_ISSUE_CODE.skillCatalogUnavailable,
+      {
         path: 'proficiencies.skills',
-      }),
+        code: MONSTER_CATALOG_ISSUE_CODE.skillCatalogUnavailable,
+        message: 'Skills could not be loaded. Try again before publishing.',
+      },
+    ])
+    expect(
+      collectMonsterCatalogIssues(
+        { proficiencies: { skills: [{ skill: 'missing-skill' }] } },
+        readyCatalogs({ skillCatalog: 'unavailable' }),
+        'publish',
+      ),
+    ).toEqual([
+      {
+        path: 'proficiencies.skills',
+        code: MONSTER_CATALOG_ISSUE_CODE.skillCatalogUnavailable,
+        message: 'Skills could not be loaded. Try again before publishing.',
+      },
+    ])
+  })
+
+  it('reports one equipment catalog issue on publish and skips unknown rows', () => {
+    const body = { equipment: [{ entryId: 'x', equipmentId: 'nope' }] }
+    expect(
+      collectMonsterCatalogIssues(
+        body,
+        readyCatalogs({ equipmentCatalog: 'unavailable' }),
+        'publish',
+      ),
+    ).toEqual([
+      {
+        path: 'equipment',
+        code: MONSTER_CATALOG_ISSUE_CODE.equipmentCatalogUnavailable,
+        message: 'Equipment could not be loaded. Try again before publishing.',
+      },
     ])
   })
 

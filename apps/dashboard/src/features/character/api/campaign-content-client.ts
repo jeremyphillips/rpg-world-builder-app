@@ -9,6 +9,7 @@ import type {
   CharacterBuildLanguageOption,
   CharacterClass,
   Equipment,
+  Feat,
   Organization,
   SkillProficiency,
   Species,
@@ -35,6 +36,7 @@ const CAMPAIGN_CATALOG_CONTENT = [
   { routeKey: 'equipment', responseKey: 'equipment' },
   { routeKey: 'skill-proficiencies', responseKey: 'skillProficiencies' },
   { routeKey: 'organizations', responseKey: 'organizations' },
+  { routeKey: 'feats', responseKey: 'feats' },
 ] as const satisfies readonly CampaignContentConfig[]
 
 function buildPlayCatalogQuery(playActor: ContentPlayActor): string {
@@ -82,7 +84,7 @@ export async function fetchCampaignBuilderCatalog(
   rulesetId: SystemRulesetId,
   options: FetchCampaignBuilderCatalogOptions,
 ): Promise<BuilderCatalogLists> {
-  const [species, classes, spells, equipment, skillProficiencies, organizations, languages] =
+  const [species, classes, spells, equipment, skillProficiencies, organizations, feats, languages] =
     await Promise.all([
       listCampaignContent<Species>(campaignId, CAMPAIGN_CATALOG_CONTENT[0], options),
       listCampaignContent<CharacterClass>(campaignId, CAMPAIGN_CATALOG_CONTENT[1], options),
@@ -90,10 +92,20 @@ export async function fetchCampaignBuilderCatalog(
       listCampaignContent<Equipment>(campaignId, CAMPAIGN_CATALOG_CONTENT[3], options),
       listCampaignContent<SkillProficiency>(campaignId, CAMPAIGN_CATALOG_CONTENT[4], options),
       listCampaignContent<Organization>(campaignId, CAMPAIGN_CATALOG_CONTENT[5], options),
+      listCampaignContent<Feat>(campaignId, CAMPAIGN_CATALOG_CONTENT[6], options),
       listRulesetLanguages(rulesetId),
     ])
 
-  return { species, classes, spells, equipment, skillProficiencies, organizations, languages }
+  return {
+    species,
+    classes,
+    spells,
+    equipment,
+    skillProficiencies,
+    organizations,
+    feats,
+    languages,
+  }
 }
 
 export function campaignBuildContextQueryKey(
