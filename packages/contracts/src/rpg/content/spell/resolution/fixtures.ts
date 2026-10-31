@@ -1,20 +1,19 @@
 import type { SpellResolution } from './schema'
 import {
-  spellResolutionEffectIdSchema,
-  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-  SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
-  SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
-} from './schema'
+  resolutionEffectIdSchema,
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+  RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
+} from '../../lib/resolution/schema'
 
 const CHILL_TOUCH_NO_HEAL_NOTE =
   "The target can't regain Hit Points until the end of your next turn."
 
-const ICE_KNIFE_PIERCING_EFFECT_ID = spellResolutionEffectIdSchema.parse('piercing')
-const ICE_KNIFE_COLD_BURST_EFFECT_ID = spellResolutionEffectIdSchema.parse('cold-burst')
+const ICE_KNIFE_PIERCING_EFFECT_ID = resolutionEffectIdSchema.parse('piercing')
+const ICE_KNIFE_COLD_BURST_EFFECT_ID = resolutionEffectIdSchema.parse('cold-burst')
 
-const ARCANE_HAND_CLENCHED_FIST_EFFECT_ID = spellResolutionEffectIdSchema.parse('clenched-fist')
-const ARCANE_HAND_GRASPING_HAND_EFFECT_ID =
-  spellResolutionEffectIdSchema.parse('grasping-hand-crush')
+const ARCANE_HAND_CLENCHED_FIST_EFFECT_ID = resolutionEffectIdSchema.parse('clenched-fist')
+const ARCANE_HAND_GRASPING_HAND_EFFECT_ID = resolutionEffectIdSchema.parse('grasping-hand-crush')
 
 /** Eldritch Blast — ranged attack, 120 ft proximity, 1 beam dealing 1d10 force on hit. */
 export const ELDRITCH_BLAST_RESOLUTION: SpellResolution = {
@@ -34,7 +33,7 @@ export const ELDRITCH_BLAST_RESOLUTION: SpellResolution = {
   },
   effects: [
     {
-      id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+      id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
       kind: 'damage',
       roll: { dice: { count: 1, faces: 10 } },
       damageType: 'force',
@@ -43,7 +42,7 @@ export const ELDRITCH_BLAST_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'hit',
-      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
     },
   ],
 }
@@ -60,7 +59,7 @@ export const CHILL_TOUCH_RESOLUTION: SpellResolution = {
   method: { kind: 'attack', attackType: 'melee-spell' },
   effects: [
     {
-      id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+      id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
       kind: 'damage',
       roll: { dice: { count: 1, faces: 10 } },
       damageType: 'necrotic',
@@ -69,7 +68,7 @@ export const CHILL_TOUCH_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'hit',
-      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
       note: CHILL_TOUCH_NO_HEAL_NOTE,
     },
   ],
@@ -87,7 +86,7 @@ export const INFlict_WOUNDS_RESOLUTION: SpellResolution = {
   method: { kind: 'saving-throw', ability: 'con' },
   effects: [
     {
-      id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+      id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
       kind: 'damage',
       roll: { dice: { count: 2, faces: 10 } },
       damageType: 'necrotic',
@@ -96,11 +95,11 @@ export const INFlict_WOUNDS_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'failed-save',
-      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
     },
     {
       result: 'successful-save',
-      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
     },
   ],
 }
@@ -117,7 +116,7 @@ export const CURE_WOUNDS_RESOLUTION: SpellResolution = {
   method: { kind: 'automatic' },
   effects: [
     {
-      id: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+      id: RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
       kind: 'healing',
       roll: { dice: { count: 2, faces: 8 } },
     },
@@ -125,7 +124,7 @@ export const CURE_WOUNDS_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'applied',
-      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
+      applications: [{ effectId: RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
     },
   ],
 }
@@ -136,7 +135,7 @@ export const FALSE_LIFE_RESOLUTION: SpellResolution = {
   method: { kind: 'automatic' },
   effects: [
     {
-      id: SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
+      id: RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
       kind: 'temporary-hit-points',
       roll: { dice: { count: 2, faces: 4 }, flat: 4 },
     },
@@ -145,7 +144,7 @@ export const FALSE_LIFE_RESOLUTION: SpellResolution = {
     {
       result: 'applied',
       applications: [
-        { effectId: SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID, amount: 'full' },
+        { effectId: RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID, amount: 'full' },
       ],
     },
   ],
@@ -161,7 +160,7 @@ export const FIREBALL_RESOLUTION: SpellResolution = {
   method: { kind: 'saving-throw', ability: 'dex' },
   effects: [
     {
-      id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+      id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
       kind: 'damage',
       roll: { dice: { count: 8, faces: 6 } },
       damageType: 'fire',
@@ -170,11 +169,11 @@ export const FIREBALL_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'failed-save',
-      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
     },
     {
       result: 'successful-save',
-      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
     },
   ],
 }
@@ -186,7 +185,7 @@ export const BURNING_HANDS_RESOLUTION: SpellResolution = {
   method: { kind: 'saving-throw', ability: 'dex' },
   effects: [
     {
-      id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+      id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
       kind: 'damage',
       roll: { dice: { count: 3, faces: 6 } },
       damageType: 'fire',
@@ -195,11 +194,11 @@ export const BURNING_HANDS_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'failed-save',
-      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
     },
     {
       result: 'successful-save',
-      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
     },
   ],
 }
@@ -282,7 +281,7 @@ export const MASS_HEALING_WORD_RESOLUTION: SpellResolution = {
   method: { kind: 'automatic' },
   effects: [
     {
-      id: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+      id: RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
       kind: 'healing',
       roll: { dice: { count: 2, faces: 4 } },
     },
@@ -290,7 +289,7 @@ export const MASS_HEALING_WORD_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'applied',
-      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
+      applications: [{ effectId: RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
     },
   ],
 }
@@ -313,7 +312,7 @@ export const MAGIC_MISSILE_RESOLUTION: SpellResolution = {
   },
   effects: [
     {
-      id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+      id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
       kind: 'damage',
       roll: { dice: { count: 1, faces: 4 }, flat: 1 },
       damageType: 'force',
@@ -322,7 +321,7 @@ export const MAGIC_MISSILE_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'applied',
-      applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
     },
   ],
 }

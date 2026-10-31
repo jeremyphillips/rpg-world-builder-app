@@ -1,14 +1,11 @@
 import { formatAreaGeometry } from '../../../primitives/area-geometry'
-import type {
-  SpellResolution,
-  SpellResolutionExternalTargetProximity,
-  SpellResolutionTarget,
-} from './schema'
+import type { ResolutionTarget, ResolutionTargetProximity } from '../../lib/resolution/schema'
+import type { SpellResolution } from './schema'
+import { inferResolutionTargetCountKind } from '../../../vocab/resolution'
 import {
-  inferSpellResolutionTargetCountKind,
-  type SpellResolutionTargetCountKind,
-  type SpellResolutionTargetKind,
-} from './vocab'
+  type ResolutionTargetCountKind,
+  type ResolutionTargetKind,
+} from '../../../vocab/resolution'
 
 export const RESOLUTION_AFFECTED_AREA_COPY = 'Creatures and objects in the area'
 
@@ -16,14 +13,14 @@ function formatDistanceFeet(distance: { value: number; unit: 'ft' }): string {
   return `${distance.value} feet`
 }
 
-function formatTargetCount(count: number, countKind?: SpellResolutionTargetCountKind): string {
-  const kind = inferSpellResolutionTargetCountKind(count, countKind)
+function formatTargetCount(count: number, countKind?: ResolutionTargetCountKind): string {
+  const kind = inferResolutionTargetCountKind(count, countKind)
   if (kind === 'exact' && count === 1) return 'One'
   if (kind === 'exact') return String(count)
   return `Up to ${count}`
 }
 
-function formatTargetKindPhrase(kind: SpellResolutionTargetKind): string {
+function formatTargetKindPhrase(kind: ResolutionTargetKind): string {
   switch (kind) {
     case 'creature':
       return 'creature'
@@ -40,7 +37,7 @@ function formatTargetKindPhrase(kind: SpellResolutionTargetKind): string {
 
 /** Proximity phrase only — e.g. "you touch" / "within your reach" / "within 60 feet". */
 export function formatResolutionTargetProximityPhrase(
-  proximity: SpellResolutionExternalTargetProximity,
+  proximity: ResolutionTargetProximity,
 ): string {
   switch (proximity.kind) {
     case 'touch':
@@ -64,14 +61,14 @@ function formatOriginDistancePhrase(resolution: SpellResolution): string {
   return `A point within ${formatDistanceFeet(distance)}`
 }
 
-function targetSelectionHeading(count: number, countKind?: SpellResolutionTargetCountKind): string {
-  const kind = inferSpellResolutionTargetCountKind(count, countKind)
+function targetSelectionHeading(count: number, countKind?: ResolutionTargetCountKind): string {
+  const kind = inferResolutionTargetCountKind(count, countKind)
   if (kind === 'exact' && count === 1) return 'Target'
   return 'Targets'
 }
 
 /** Formats count, kind, and proximity without method context. */
-export function formatResolutionTargetFromParts(target: SpellResolutionTarget): string {
+export function formatResolutionTargetFromParts(target: ResolutionTarget): string {
   const { count, countKind, kind, proximity } = target
   return `${formatTargetCount(count, countKind)} ${formatTargetKindPhrase(kind)} ${formatResolutionTargetProximityPhrase(proximity)}`
 }
@@ -127,10 +124,4 @@ export function formatResolutionSelectionSections(
       return _exhaustive
     }
   }
-}
-
-/** @deprecated Proximity is owned by target — use formatResolutionTargetProximityPhrase. */
-export function formatResolutionRange(resolution: SpellResolution): string {
-  if (!resolution.target) return ''
-  return formatResolutionTargetProximityPhrase(resolution.target.proximity)
 }

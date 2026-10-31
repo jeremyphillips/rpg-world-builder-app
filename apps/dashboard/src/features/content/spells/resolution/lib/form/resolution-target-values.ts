@@ -1,8 +1,8 @@
-import type { SpellResolutionTarget } from '@rpg/contracts'
+import type { ResolutionTarget } from '@rpg/contracts'
 
 import type { ResolutionFormValues } from './resolution-form-schema'
 
-type ExternalTargetProximity = SpellResolutionTarget['proximity']
+type ExternalTargetProximity = ResolutionTarget['proximity']
 
 export function buildTargetProximity(
   values: ResolutionFormValues,

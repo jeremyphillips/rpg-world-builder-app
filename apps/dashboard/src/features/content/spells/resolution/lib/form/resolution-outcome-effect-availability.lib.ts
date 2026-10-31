@@ -2,8 +2,8 @@ import {
   formatResolutionAvailabilityReason,
   getEffectTargetAvailability,
   isResolutionEffectKind,
-  type SpellResolutionApplicationAmount,
-  type SpellResolutionOutcomeResult,
+  type ResolutionApplicationAmount,
+  type ResolutionOutcomeResult,
   type EffectTargetCompatibilityContext,
 } from '@rpg/contracts'
 import type { ButtonDropdownItem } from '@rpg/ui'
@@ -32,7 +32,7 @@ function appliedEffectIdsForOutcome(
 export type OutcomeEffectUnsupportedReason = string
 
 export type OutcomeEffectAvailability =
-  | { status: 'eligible'; defaultAmount: SpellResolutionApplicationAmount }
+  | { status: 'eligible'; defaultAmount: ResolutionApplicationAmount }
   | {
       status: 'incomplete'
       reason: Extract<ReturnType<typeof getResolutionEffectCompleteness>, { complete: false }>
@@ -53,7 +53,7 @@ export type OutcomeApplicationAddState =
 export function getOutcomeEffectAvailability(
   effect: ResolutionEffectFormItem,
   context: {
-    outcomeResult: SpellResolutionOutcomeResult
+    outcomeResult: ResolutionOutcomeResult
     appliedEffectIds: Set<string>
     selectionContext?: EffectTargetCompatibilityContext
   },
@@ -125,7 +125,7 @@ function toEligibleMenuItem(
 export function resolveOutcomeApplicationAddState(
   effects: readonly ResolutionEffectFormItem[],
   outcome: Pick<ResolutionOutcomeFormItem, 'applications'>,
-  outcomeResult: SpellResolutionOutcomeResult,
+  outcomeResult: ResolutionOutcomeResult,
   selectionContext?: EffectTargetCompatibilityContext,
 ): OutcomeApplicationAddState {
   if (effects.length === 0) {

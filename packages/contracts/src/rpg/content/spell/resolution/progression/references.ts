@@ -3,12 +3,12 @@ import { formatDamageValue } from '../../effects/display'
 import { effectKindPrefix } from '../../effects/display'
 import { getSpellAtomicEffectKindLabel } from '../../../../vocab/spell/atomic-effect-kind'
 import type {
-  SpellResolutionDamageEffect,
-  SpellResolutionEffect,
-  SpellResolutionHealingEffect,
-  SpellResolutionTemporaryHitPointsEffect,
-  SpellResolutionValidationInput,
-} from '../schema'
+  ResolutionDamageEffect,
+  ResolutionEffect,
+  ResolutionHealingEffect,
+  ResolutionTemporaryHitPointsEffect,
+} from '../../../lib/resolution/schema'
+import type { SpellResolutionValidationInput } from '../schema'
 import type {
   SpellResolutionProgressionProperty,
   SpellResolutionProgressionReference,
@@ -39,16 +39,13 @@ export function progressionValueKindForProperty(
 export function findResolutionEffectById(
   resolution: ProgressionResolutionContext,
   effectId: string,
-): SpellResolutionEffect | undefined {
+): ResolutionEffect | undefined {
   return resolution.effects.find((effect) => effect.id === effectId)
 }
 
 export function isRollBearingResolutionEffect(
-  effect: SpellResolutionEffect,
-): effect is
-  | SpellResolutionDamageEffect
-  | SpellResolutionHealingEffect
-  | SpellResolutionTemporaryHitPointsEffect {
+  effect: ResolutionEffect,
+): effect is ResolutionDamageEffect | ResolutionHealingEffect | ResolutionTemporaryHitPointsEffect {
   return ROLL_BEARING_EFFECT_KINDS.has(effect.kind)
 }
 
@@ -96,9 +93,7 @@ export function readProgressionBaseValue(
   return count === undefined ? undefined : { kind: 'count', count }
 }
 
-function buildEffectReference(
-  effect: SpellResolutionEffect,
-): ProgressionReferenceContext | undefined {
+function buildEffectReference(effect: ResolutionEffect): ProgressionReferenceContext | undefined {
   if (!isRollBearingResolutionEffect(effect)) return undefined
 
   const reference: SpellResolutionProgressionReference = {
@@ -139,7 +134,7 @@ export function listCompatibleProgressionReferences(
   )
 }
 
-function formatEffectReferenceTitle(effect: SpellResolutionEffect): string {
+function formatEffectReferenceTitle(effect: ResolutionEffect): string {
   const kindLabel = getSpellAtomicEffectKindLabel(
     effect.kind === 'temporary-hit-points' ? 'temporary-hit-points' : effect.kind,
   )

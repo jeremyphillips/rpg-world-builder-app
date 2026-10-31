@@ -1,7 +1,7 @@
 import {
-  spellResolutionEffectIdSchema,
-  type SpellResolutionEffect,
-  type SpellResolutionEffectId,
+  resolutionEffectIdSchema,
+  type ResolutionEffect,
+  type ResolutionEffectId,
 } from '@rpg/contracts'
 
 import {
@@ -15,20 +15,20 @@ const PRIMARY_RESOLUTION_EFFECT_KINDS = ['damage', 'healing', 'temporary-hit-poi
 
 type PrimaryResolutionEffectKind = (typeof PRIMARY_RESOLUTION_EFFECT_KINDS)[number]
 
-export function parseEffectId(id: string): SpellResolutionEffectId {
-  return spellResolutionEffectIdSchema.parse(id)
+export function parseEffectId(id: string): ResolutionEffectId {
+  return resolutionEffectIdSchema.parse(id)
 }
 
 export function findPrimaryEffectId(
   effects: readonly ResolutionEffectFormItem[],
-): SpellResolutionEffectId | undefined {
+): ResolutionEffectId | undefined {
   const primary = effects.find((effect) =>
     PRIMARY_RESOLUTION_EFFECT_KINDS.includes(effect.kind as PrimaryResolutionEffectKind),
   )
   return primary ? parseEffectId(primary.id) : undefined
 }
 
-export function effectToForm(effect: SpellResolutionEffect): ResolutionEffectFormItem {
+export function effectToForm(effect: ResolutionEffect): ResolutionEffectFormItem {
   const roll = rollToFormShape(effect.roll) ?? {}
 
   switch (effect.kind) {
@@ -58,9 +58,7 @@ export function effectToForm(effect: SpellResolutionEffect): ResolutionEffectFor
   }
 }
 
-export function effectToStored(
-  effect: ResolutionEffectFormItem,
-): SpellResolutionEffect | undefined {
+export function effectToStored(effect: ResolutionEffectFormItem): ResolutionEffect | undefined {
   const roll = normalizeRollFormValue(effect.roll as RollFormShape)
   if (!roll) return undefined
 

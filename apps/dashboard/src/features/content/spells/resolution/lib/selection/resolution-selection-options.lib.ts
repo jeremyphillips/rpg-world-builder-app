@@ -10,7 +10,7 @@ import {
   type ResolutionEffectKind,
   type ResolutionMethodOption,
   type ResolutionSelectionState,
-  type SpellResolutionTargetKind,
+  type ResolutionTargetKind,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
@@ -113,7 +113,7 @@ export function formatResolutionEffectRowSummary(
 ): string {
   return formatEffectRowSummary(row, {
     recipient: deriveDefaultEffectRecipient(context),
-    targetKind: context.targetKind as SpellResolutionTargetKind | undefined,
+    targetKind: context.targetKind as ResolutionTargetKind | undefined,
   })
 }
 

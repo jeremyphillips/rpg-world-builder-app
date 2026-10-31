@@ -1,25 +1,22 @@
-import type {
-  SpellResolutionApplication,
-  SpellResolutionEffectId,
-  SpellResolutionMethod,
-} from './schema'
+import type { ResolutionApplication, ResolutionEffectId } from '../../lib/resolution/schema'
+import type { SpellResolutionMethod } from './schema'
 import type { ResolutionEffectKind } from './selection-types'
-import type { SpellResolutionOutcomeResult } from './vocab'
+import type { ResolutionMethodKind, ResolutionOutcomeResult } from '../../../vocab/resolution'
 
 // ---------------------------------------------------------------------------
 // Method-derived outcome slots — shared by stored validation and form adapters.
 // ---------------------------------------------------------------------------
 
 export type OutcomeLike = {
-  result: SpellResolutionOutcomeResult
+  result: ResolutionOutcomeResult
   applications: readonly unknown[]
   note?: string
 }
 
 /** Outcome results rendered for a resolution method, in stable display order. */
-export function getOutcomeResultsForMethod(
-  method: SpellResolutionMethod,
-): readonly SpellResolutionOutcomeResult[] {
+export function getOutcomeResultsForMethod(method: {
+  kind: ResolutionMethodKind
+}): readonly ResolutionOutcomeResult[] {
   switch (method.kind) {
     case 'automatic':
       return ['applied']
@@ -28,7 +25,7 @@ export function getOutcomeResultsForMethod(
     case 'saving-throw':
       return ['failed-save', 'successful-save']
     default: {
-      const _exhaustive: never = method
+      const _exhaustive: never = method.kind
       return _exhaustive
     }
   }
@@ -46,7 +43,7 @@ export function isOutcomeEmpty(outcome: OutcomeLike): boolean {
 
 export function findOutcomeByResult<T extends OutcomeLike>(
   outcomes: readonly T[],
-  result: SpellResolutionOutcomeResult,
+  result: ResolutionOutcomeResult,
 ): T | undefined {
   return outcomes.find((outcome) => outcome.result === result)
 }
@@ -72,7 +69,7 @@ export function normalizeOutcomeOrder<T extends OutcomeLike>(
 export function ensureOutcomeSlotsForMethod<T extends OutcomeLike>(
   method: SpellResolutionMethod,
   outcomes: readonly T[],
-  createEmptySlot: (result: SpellResolutionOutcomeResult) => T,
+  createEmptySlot: (result: ResolutionOutcomeResult) => T,
 ): T[] {
   const allowed = new Set(getOutcomeResultsForMethod(method))
   const byResult = new Map(
@@ -96,9 +93,9 @@ export function supportsPartialApplicationForEffectKind(kind: string): boolean {
 }
 
 function defaultApplicationsForResult(
-  result: SpellResolutionOutcomeResult,
-  primaryEffectId: SpellResolutionEffectId,
-): SpellResolutionApplication[] {
+  result: ResolutionOutcomeResult,
+  primaryEffectId: ResolutionEffectId,
+): ResolutionApplication[] {
   switch (result) {
     case 'applied':
     case 'hit':
@@ -118,10 +115,10 @@ function defaultApplicationsForResult(
 /** Authoring defaults for all method-derived slots when the first effect is created. */
 export function buildDefaultOutcomeSlots(
   method: SpellResolutionMethod,
-  primaryEffectId: SpellResolutionEffectId,
+  primaryEffectId: ResolutionEffectId,
 ): Array<{
-  result: SpellResolutionOutcomeResult
-  applications: SpellResolutionApplication[]
+  result: ResolutionOutcomeResult
+  applications: ResolutionApplication[]
   note?: string
 }> {
   return getOutcomeResultsForMethod(method).map((result) => ({

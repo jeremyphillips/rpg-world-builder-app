@@ -8,7 +8,6 @@ import {
 } from './fixtures'
 import { formatResolutionSummary } from './format-summary'
 import { formatResolutionSelectionSections, RESOLUTION_AFFECTED_AREA_COPY } from './format-target'
-import { spellResolutionSchema } from './schema'
 
 describe('formatResolutionSelectionSections', () => {
   it('formats targets mode with singular heading', () => {
@@ -54,23 +53,5 @@ describe('formatResolutionSummary selection headings', () => {
     expect(summary).toContain('Origin')
     expect(summary).toContain('Area')
     expect(summary).toContain('Affected')
-  })
-})
-
-describe('legacy resolution normalization on parse', () => {
-  it('maps target.self to selectionMode self without target', () => {
-    const parsed = spellResolutionSchema.parse({
-      target: {
-        count: 1,
-        kind: 'creature',
-        proximity: { kind: 'self' },
-      },
-      method: { kind: 'automatic' },
-      effects: FALSE_LIFE_RESOLUTION.effects,
-      outcomes: FALSE_LIFE_RESOLUTION.outcomes,
-    })
-
-    expect(parsed.selectionMode).toBe('self')
-    expect(parsed.target).toBeUndefined()
   })
 })

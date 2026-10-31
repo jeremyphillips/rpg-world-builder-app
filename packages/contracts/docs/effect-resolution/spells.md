@@ -53,11 +53,12 @@ Rules:
 - Non-blocking warning when both exist and differ:
   [`getSpellResolutionAreaMismatchWarning`](../../src/rpg/content/spell/resolution/spell-resolution-warnings.ts).
 
-## Legacy normalization
+## Selection input
 
-Stored spells may still use `target.proximity.kind: 'self'`. On parse,
-[`normalizeSpellResolutionInput`](../../src/rpg/content/spell/resolution/normalize-resolution.ts)
-maps that to `selectionMode: 'self'` and removes the target block.
+`selectionMode` is required. Target proximity is `touch`, `reach`, or `distance`.
+A missing `selectionMode` or `proximity.kind: 'self'` fails validation. Fields that
+do not belong to the selected mode (a target outside `targets`, an origin outside
+`point`, an area outside `self` or `point`) are rejected.
 
 ## Fixtures
 

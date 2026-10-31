@@ -7,7 +7,7 @@ import {
   type OutcomeLike,
 } from './outcome-slots'
 import { mapOutcomeResultBetweenMethodKinds } from './outcome-method-map'
-import type { SpellResolutionOutcomeResult } from './vocab'
+import type { ResolutionOutcomeResult } from '../../../vocab/resolution'
 import { applyMethodOptionPatch, stateAfterPatch, toMethodOption } from './selection-availability'
 import type {
   ResolutionMethodOption,
@@ -17,7 +17,7 @@ import type {
 
 export type OutcomeMethodChangePlan = {
   /** Outcome branches with authored content that would be discarded */
-  discardedBranches: readonly SpellResolutionOutcomeResult[]
+  discardedBranches: readonly ResolutionOutcomeResult[]
   /** Next form outcomes after mapping, including empty method-derived slots */
   mappedOutcomes: ResolutionOutcomeRef[]
 }
@@ -44,7 +44,7 @@ function copyOutcome<T extends OutcomeLike>(outcome: T): ResolutionOutcomeRef {
   }
 }
 
-function emptyOutcome(result: SpellResolutionOutcomeResult): ResolutionOutcomeRef {
+function emptyOutcome(result: ResolutionOutcomeResult): ResolutionOutcomeRef {
   return { result, applications: [] }
 }
 
@@ -81,8 +81,8 @@ export function planOutcomeMethodChange(
   )
 
   const currentOutcomes = before.outcomes ?? []
-  const discardedBranches: SpellResolutionOutcomeResult[] = []
-  const mappedByResult = new Map<SpellResolutionOutcomeResult, ResolutionOutcomeRef>()
+  const discardedBranches: ResolutionOutcomeResult[] = []
+  const mappedByResult = new Map<ResolutionOutcomeResult, ResolutionOutcomeRef>()
 
   if (fromMethod) {
     for (const outcome of currentOutcomes) {

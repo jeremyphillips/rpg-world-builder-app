@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from './schema'
+import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '../../lib/resolution/schema'
 import {
   buildDefaultOutcomeSlots,
   ensureOutcomeSlotsForMethod,
@@ -36,9 +36,7 @@ describe('outcome slot helpers', () => {
   const attackOutcomes: OutcomeLike[] = [
     {
       result: 'hit' as const,
-      applications: [
-        { effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const },
-      ],
+      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
     },
   ]
 
@@ -83,15 +81,11 @@ describe('outcome slot helpers', () => {
     const shuffled = [
       {
         result: 'successful-save' as const,
-        applications: [
-          { effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' as const },
-        ],
+        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' as const }],
       },
       {
         result: 'failed-save' as const,
-        applications: [
-          { effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const },
-        ],
+        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
       },
     ]
 
@@ -109,7 +103,7 @@ describe('outcome slot helpers', () => {
 
 describe('buildDefaultOutcomeSlots', () => {
   it('generates intuitive defaults for each method', () => {
-    const effectId = SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
+    const effectId = RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
 
     expect(buildDefaultOutcomeSlots({ kind: 'automatic' }, effectId)).toEqual([
       { result: 'applied', applications: [{ effectId, amount: 'full' }] },

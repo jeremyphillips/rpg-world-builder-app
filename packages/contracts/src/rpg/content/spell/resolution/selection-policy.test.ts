@@ -170,7 +170,7 @@ describe('planResolutionChange', () => {
   it('collects advisory warnings for self damage and duplicate healing', () => {
     const plan = planResolutionChange(
       {
-        proximityKind: 'self',
+        selectionMode: 'self',
         targetKind: 'creature',
         targetCount: 1,
         methodKind: 'automatic',
@@ -181,7 +181,7 @@ describe('planResolutionChange', () => {
           { id: 'heal-2', kind: 'healing' },
         ],
       },
-      { field: 'proximityKind', value: 'self' },
+      { field: 'selectionMode', value: 'self' },
     )
 
     expect(plan.warnings).toEqual([

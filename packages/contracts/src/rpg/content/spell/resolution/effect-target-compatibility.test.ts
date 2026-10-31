@@ -15,7 +15,7 @@ describe('isCreatureOnlyResolutionEffectKind', () => {
 })
 
 describe('isEffectKindAllowedForTarget', () => {
-  it('allows creature-only effects for creature targets and self proximity', () => {
+  it('allows creature-only effects for creature targets and self recipients', () => {
     expect(
       isEffectKindAllowedForTarget('healing', {
         proximityKind: 'touch',
@@ -26,7 +26,8 @@ describe('isEffectKindAllowedForTarget', () => {
 
     expect(
       isEffectKindAllowedForTarget('healing', {
-        proximityKind: 'self',
+        selectionMode: 'self',
+        hasAreaOfEffect: false,
         targetKind: 'creature',
         targetCount: 1,
       }),

@@ -32,7 +32,7 @@ function SelectionModeStory({ defaultResolution }: SelectionModeStoryArgs) {
 }
 
 const meta = {
-  title: 'Content/Spells/SpellResolutionSelectionModeSelect',
+  title: 'Content/Spells/ResolutionSelectionModeSelect',
   component: SelectionModeStory,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof SelectionModeStory>

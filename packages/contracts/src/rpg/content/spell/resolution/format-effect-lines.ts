@@ -3,33 +3,31 @@ import { formatDamageValue } from '../effects/display'
 import { formatEffectRowSentenceFromParts, type EffectRowParts } from '../effects/format'
 import { resolutionEffectFormatOptions } from './effect-context'
 import type {
-  SpellResolution,
-  SpellResolutionDamageEffect,
-  SpellResolutionHealingEffect,
-  SpellResolutionTemporaryHitPointsEffect,
-} from './schema'
+  ResolutionDamageEffect,
+  ResolutionHealingEffect,
+  ResolutionTemporaryHitPointsEffect,
+} from '../../lib/resolution/schema'
+import type { SpellResolution } from './schema'
 
-export function findResolutionDamageEffects(
-  resolution: SpellResolution,
-): SpellResolutionDamageEffect[] {
+export function findResolutionDamageEffects(resolution: SpellResolution): ResolutionDamageEffect[] {
   return resolution.effects.filter(
-    (effect): effect is SpellResolutionDamageEffect => effect.kind === 'damage',
+    (effect): effect is ResolutionDamageEffect => effect.kind === 'damage',
   )
 }
 
 export function findResolutionHealingEffects(
   resolution: SpellResolution,
-): SpellResolutionHealingEffect[] {
+): ResolutionHealingEffect[] {
   return resolution.effects.filter(
-    (effect): effect is SpellResolutionHealingEffect => effect.kind === 'healing',
+    (effect): effect is ResolutionHealingEffect => effect.kind === 'healing',
   )
 }
 
 export function findResolutionTemporaryHitPointsEffects(
   resolution: SpellResolution,
-): SpellResolutionTemporaryHitPointsEffect[] {
+): ResolutionTemporaryHitPointsEffect[] {
   return resolution.effects.filter(
-    (effect): effect is SpellResolutionTemporaryHitPointsEffect =>
+    (effect): effect is ResolutionTemporaryHitPointsEffect =>
       effect.kind === 'temporary-hit-points',
   )
 }

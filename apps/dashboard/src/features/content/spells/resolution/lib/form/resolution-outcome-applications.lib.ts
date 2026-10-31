@@ -11,7 +11,7 @@ import type {
   ResolutionOutcomeApplicationFormItem,
 } from './resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
-import type { SpellResolutionOutcomeResult } from '@rpg/contracts'
+import type { ResolutionOutcomeResult } from '@rpg/contracts'
 
 export function readOutcomeApplications(
   applications: ResolutionOutcomeApplicationFormItem[] | undefined,
@@ -28,7 +28,7 @@ export function appendOutcomeApplication(
   ) => void,
   outcomeIndex: number,
   effectId: string,
-  outcomeResult: SpellResolutionOutcomeResult,
+  outcomeResult: ResolutionOutcomeResult,
   effects: readonly ResolutionEffectFormItem[],
 ): void {
   const outcomes = getValues(RESOLUTION_FIELD_NAME)?.outcomes
@@ -62,7 +62,7 @@ export function appendOutcomeApplicationSelection(
   ) => void,
   outcomeIndex: number,
   effectId: string,
-  outcomeResult: SpellResolutionOutcomeResult,
+  outcomeResult: ResolutionOutcomeResult,
   effects: readonly ResolutionEffectFormItem[],
 ): void {
   const applicationsPath = outcomeApplicationsFieldPath(outcomeIndex)

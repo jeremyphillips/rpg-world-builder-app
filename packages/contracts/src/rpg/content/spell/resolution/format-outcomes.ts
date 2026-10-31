@@ -1,9 +1,10 @@
 import { formatResolutionApplicationSentence } from './format-effect-lines'
-import type { SpellResolution, SpellResolutionOutcome } from './schema'
-import { getSpellResolutionOutcomeResultLabel } from './vocab'
+import type { ResolutionOutcome } from '../../lib/resolution/schema'
+import type { SpellResolution } from './schema'
+import { getResolutionOutcomeResultLabel } from '../../../vocab/resolution'
 
 function formatOutcomeApplicationSummary(
-  application: SpellResolutionOutcome['applications'][number],
+  application: ResolutionOutcome['applications'][number],
   resolution: SpellResolution,
 ): string {
   return formatResolutionApplicationSentence(resolution, application.effectId, application.amount)
@@ -11,10 +12,10 @@ function formatOutcomeApplicationSummary(
 
 /** e.g. "Failed save: Target takes 2d10 necrotic damage." */
 export function formatResolutionOutcomeLine(
-  outcome: SpellResolutionOutcome,
+  outcome: ResolutionOutcome,
   resolution: SpellResolution,
 ): string {
-  const resultLabel = getSpellResolutionOutcomeResultLabel(outcome.result)
+  const resultLabel = getResolutionOutcomeResultLabel(outcome.result)
 
   if (outcome.applications.length === 0) {
     return outcome.note ? `${resultLabel}: ${outcome.note}` : resultLabel

@@ -7,7 +7,7 @@ import {
   type AtomicEffectDisplay,
   type EffectRecipient,
   type EffectTargetCompatibilityContext,
-  type SpellResolutionTargetKind,
+  type ResolutionTargetKind,
 } from '@rpg/contracts'
 
 import {
@@ -52,7 +52,7 @@ function buildDisplayFromResolutionEffect(
     },
     {
       recipient: options.recipient,
-      targetKind: options.selectionContext?.targetKind as SpellResolutionTargetKind | undefined,
+      targetKind: options.selectionContext?.targetKind as ResolutionTargetKind | undefined,
       fallbackIndex: options.index,
     },
   )
@@ -69,7 +69,7 @@ function unavailableReasonForEffect(
     {
       code: 'effect-kind-incompatible-with-target',
       kind: effect.kind,
-      targetKind: selectionContext.targetKind as SpellResolutionTargetKind,
+      targetKind: selectionContext.targetKind as ResolutionTargetKind,
     },
     'hint',
   )

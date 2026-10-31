@@ -1,12 +1,13 @@
+import type { SpellResolutionAttackType } from './vocab'
 import type {
-  SpellResolutionAttackType,
-  SpellResolutionOutcomeResult,
-  SpellResolutionProximityKind,
-  SpellResolutionTargetKind,
-} from './vocab'
+  ResolutionOutcomeResult,
+  ResolutionProximityKind,
+  ResolutionTargetKind,
+} from '../../../vocab/resolution'
 
 import type { SelectionMethodCompatibilityReasonCode } from './selection-method-compatibility'
-import type { SpellResolutionSelectionMode, SpellResolutionTargetCountKind } from './vocab'
+import type { ResolutionSelectionMode } from '../../../vocab/resolution'
+import type { ResolutionTargetCountKind } from '../../../vocab/resolution'
 
 /** Combined method select value used by resolution authoring UI. */
 export type ResolutionMethodOption = SpellResolutionAttackType | 'saving-throw' | 'automatic'
@@ -23,19 +24,19 @@ export type ResolutionEffectRef = {
 
 /** Minimal outcome row for selection policy and change planning. */
 export type ResolutionOutcomeRef = {
-  result: SpellResolutionOutcomeResult
+  result: ResolutionOutcomeResult
   applications: readonly { effectId: string; amount: string }[]
   note?: string
 }
 
 /** Flattened resolution slice used by availability predicates and change planning. */
 export type ResolutionSelectionState = {
-  selectionMode?: SpellResolutionSelectionMode
-  countKind?: SpellResolutionTargetCountKind
+  selectionMode?: ResolutionSelectionMode
+  countKind?: ResolutionTargetCountKind
   originDistanceFt?: number
   hasAreaOfEffect?: boolean
   areaOfEffectShape?: string
-  proximityKind?: SpellResolutionProximityKind
+  proximityKind?: ResolutionProximityKind
   proximityDistanceFt?: number
   proximityReachDistanceFt?: number
   targetKind?: string
@@ -58,8 +59,8 @@ export type ResolutionSelectionField =
   | 'applicationPatternKind'
 
 export type ResolutionChangeRequest =
-  | { field: 'selectionMode'; value: SpellResolutionSelectionMode }
-  | { field: 'proximityKind'; value: SpellResolutionProximityKind }
+  | { field: 'selectionMode'; value: ResolutionSelectionMode }
+  | { field: 'proximityKind'; value: ResolutionProximityKind }
   | { field: 'methodOption'; value: ResolutionMethodOption }
   | { field: 'applicationPatternKind'; value: ResolutionApplicationPatternFormKind }
   | { field: 'removeEffect'; effectId: string }
@@ -86,7 +87,7 @@ export type ResolutionAvailabilityReason =
   | {
       code: 'method-incompatible-with-proximity'
       method: ResolutionMethodOption
-      proximity: SpellResolutionProximityKind
+      proximity: ResolutionProximityKind
     }
   | { code: 'pattern-requires-distance-proximity'; pattern: 'projectiles' }
   | {
@@ -97,12 +98,12 @@ export type ResolutionAvailabilityReason =
   | {
       code: 'effect-kind-incompatible-with-target'
       kind: ResolutionEffectKind
-      targetKind: SpellResolutionTargetKind
+      targetKind: ResolutionTargetKind
     }
   | {
       code: 'method-incompatible-with-selection-mode'
       method: ResolutionMethodOption
-      selectionMode: SpellResolutionSelectionMode
+      selectionMode: ResolutionSelectionMode
       hasAreaOfEffect: boolean
       compatibility: 'deferred' | 'unsupported'
       reasonCode: SelectionMethodCompatibilityReasonCode
@@ -124,7 +125,7 @@ export type ResolutionChangePlan = {
   /** Effect rows that would be removed if the change is applied */
   effectsToRemove: ResolutionEffectRef[]
   /** Outcome branches that would lose authored content on method change */
-  discardedOutcomeBranches: readonly SpellResolutionOutcomeResult[]
+  discardedOutcomeBranches: readonly ResolutionOutcomeResult[]
   /** Mapped outcomes after a method change (form-shaped, includes empty slots) */
   outcomePatch?: { outcomes: readonly ResolutionOutcomeRef[] }
   warnings: ResolutionWarning[]

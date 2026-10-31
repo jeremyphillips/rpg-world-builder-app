@@ -124,9 +124,7 @@ function maybeSelfWithDamageWarning(
   state: ResolutionSelectionState,
 ): ResolutionWarning | undefined {
   const effects = state.effects ?? []
-  const isSelfRecipient =
-    state.selectionMode === 'self' ||
-    (!state.selectionMode && state.proximityKind === 'self' && !state.hasAreaOfEffect)
+  const isSelfRecipient = state.selectionMode === 'self' && !state.hasAreaOfEffect
   if (isSelfRecipient && effects.some((effect) => effect.kind === 'damage')) {
     return { code: 'self-with-damage' }
   }
@@ -182,7 +180,6 @@ function maybeCreatureOnlyEffectWithNonCreatureTargetWarning(
   ) {
     return undefined
   }
-  if (state.proximityKind === 'self') return undefined
   if (!state.targetKind || state.targetKind === 'creature') return undefined
 
   const effects = state.effects ?? []

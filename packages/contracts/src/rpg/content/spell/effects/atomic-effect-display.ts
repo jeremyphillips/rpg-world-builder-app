@@ -4,7 +4,7 @@ import {
 } from '../../../vocab/spell/atomic-effect-kind'
 import { joinInlineMetadata } from '../../../primitives/inline-metadata'
 import type { RollValue } from '../../../primitives/mechanics/roll'
-import type { SpellResolutionTargetKind } from '../resolution/vocab'
+import type { ResolutionTargetKind } from '../resolution/vocab'
 
 import type { EffectRecipient } from './recipient'
 import type { SpellAtomicEffect } from './schema'
@@ -39,7 +39,7 @@ export type AtomicEffectDisplayInput = {
 
 export type BuildAtomicEffectDisplayOptions = {
   recipient?: EffectRecipient
-  targetKind?: SpellResolutionTargetKind
+  targetKind?: ResolutionTargetKind
   /** Fallback index when `kind` is absent during in-progress authoring. */
   fallbackIndex?: number
 }

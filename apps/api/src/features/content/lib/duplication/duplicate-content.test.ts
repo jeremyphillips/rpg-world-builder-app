@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   CHILL_TOUCH_RESOLUTION,
   ELDRITCH_BLAST_RESOLUTION,
-  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   resolveContentCampaignAccess,
 } from '@rpg/contracts'
 
@@ -175,7 +175,7 @@ describe('transformDuplicateSource', () => {
     })
 
     const resolution = parsed.resolution as typeof ELDRITCH_BLAST_RESOLUTION
-    expect(resolution.effects[0]?.id).not.toBe(SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID)
+    expect(resolution.effects[0]?.id).not.toBe(RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID)
     expect(resolution.outcomes[0]?.applications[0]?.effectId).toBe(resolution.effects[0]?.id)
   })
 

@@ -12,7 +12,6 @@ const CLEAR_TARGET_SELECTION: ResolutionPatch = {
 function inferLegacySelectionMode(
   state: ResolutionSelectionState,
 ): NonNullable<ResolutionSelectionState['selectionMode']> {
-  if (state.proximityKind === 'self') return 'self'
   if (state.originDistanceFt !== undefined) return 'point'
   return 'targets'
 }
@@ -29,7 +28,7 @@ function buildTargetsModeCleanup(
   }
   if (before.targetCount === undefined) patch.targetCount = 1
   if (before.countKind === undefined) patch.countKind = 'exact'
-  if (before.proximityKind === undefined || before.proximityKind === 'self') {
+  if (before.proximityKind === undefined) {
     patch.proximityKind = 'touch'
   }
 

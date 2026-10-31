@@ -1,9 +1,9 @@
 import type { SpellAtomicEffectKind } from '@rpg/contracts'
 import type { ArrayAddActionConfig } from '@rpg/ui/form'
 import {
-  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-  SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
-  SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+  RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
 } from '@rpg/contracts'
 
 import { buildEffectArrayAddMenu } from '../../../lib/effects/effect-add-menu.lib'
@@ -17,9 +17,9 @@ export const RESOLUTION_EFFECT_KINDS = [
 export type ResolutionEffectKind = (typeof RESOLUTION_EFFECT_KINDS)[number]
 
 const PRIMARY_EFFECT_ID_BY_KIND: Record<ResolutionEffectKind, string> = {
-  damage: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-  healing: SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
-  'temporary-hit-points': SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
+  damage: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  healing: RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+  'temporary-hit-points': RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
 }
 
 function createEffectId(): string {

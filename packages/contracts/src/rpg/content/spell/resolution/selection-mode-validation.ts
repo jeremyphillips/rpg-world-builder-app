@@ -2,12 +2,12 @@ import type { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 import { spellResolutionValidationMessages } from './validation-messages'
-import type { SpellResolutionSelectionMode } from './vocab'
+import type { ResolutionSelectionMode } from '../../../vocab/resolution'
 
 type ResolutionModeField = 'target' | 'origin' | 'areaOfEffect'
 
 export type SpellResolutionModeValidationInput = {
-  selectionMode: SpellResolutionSelectionMode
+  selectionMode: ResolutionSelectionMode
   target?: unknown
   origin?: unknown
   areaOfEffect?: unknown
@@ -15,11 +15,11 @@ export type SpellResolutionModeValidationInput = {
 
 type ModeFieldRule = {
   field: ResolutionModeField
-  message: (mode: SpellResolutionSelectionMode) => string
+  message: (mode: ResolutionSelectionMode) => string
 }
 
 const MODE_FIELD_RULES: Record<
-  SpellResolutionSelectionMode,
+  ResolutionSelectionMode,
   { required?: ModeFieldRule[]; forbidden?: ModeFieldRule[] }
 > = {
   targets: {

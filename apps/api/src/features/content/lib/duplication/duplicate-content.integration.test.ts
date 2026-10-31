@@ -5,7 +5,7 @@ import {
   deriveMonsterStatBlock,
   ELDRITCH_BLAST_RESOLUTION,
   monsterSchema,
-  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
 } from '@rpg/contracts'
 import { loadSeedEquipment } from '@rpg/catalog/equipment'
 import { loadSeedMonsters } from '@rpg/catalog/monsters'
@@ -131,7 +131,7 @@ describe('duplicate content routes', () => {
       .expect(201)
 
     const resolution = res.body.spells.resolution
-    expect(resolution.effects[0]?.id).not.toBe(SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID)
+    expect(resolution.effects[0]?.id).not.toBe(RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID)
     expect(resolution.outcomes[0]?.applications[0]?.effectId).toBe(resolution.effects[0]?.id)
     expect(resolution.effects[0]?.id).not.toBe(source.resolution.effects[0]?.id)
   })

@@ -6,7 +6,7 @@ import {
   stripEmptyOutcomeSlots,
   type SpellResolution,
   type SpellResolutionMethod,
-  type SpellResolutionOutcomeResult,
+  type ResolutionOutcomeResult,
 } from '@rpg/contracts'
 
 import { buildResolutionMethod } from './resolution-method-values'
@@ -21,13 +21,13 @@ export function resolutionMethodFromForm(
 
 export function getOutcomeResultsForFormMethod(
   values: Pick<ResolutionFormValues, 'methodKind' | 'attackType' | 'saveAbility'>,
-): readonly SpellResolutionOutcomeResult[] {
+): readonly ResolutionOutcomeResult[] {
   const method = resolutionMethodFromForm(values)
   if (!method) return []
   return getOutcomeResultsForMethod(method)
 }
 
-function createEmptyOutcomeSlot(result: SpellResolutionOutcomeResult): ResolutionOutcomeFormItem {
+function createEmptyOutcomeSlot(result: ResolutionOutcomeResult): ResolutionOutcomeFormItem {
   return { result, applications: [] }
 }
 

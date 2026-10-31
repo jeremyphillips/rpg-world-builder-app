@@ -2,7 +2,7 @@ import { SelectField } from '@rpg/ui'
 import { useId } from 'react'
 import { useWatch } from 'react-hook-form'
 
-import type { SpellResolutionSelectionMode } from '@rpg/contracts'
+import type { ResolutionSelectionMode } from '@rpg/contracts'
 
 import { useResolutionEditorContext } from '../../hooks/use-resolution-change-confirm'
 import {
@@ -13,7 +13,7 @@ import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
 
 /** Selection mode select routed through confirm-first change planning. */
-export function SpellResolutionSelectionModeSelect() {
+export function ResolutionSelectionModeSelect() {
   const id = useId()
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
   const { requestResolutionChange } = useResolutionEditorContext()
@@ -28,7 +28,7 @@ export function SpellResolutionSelectionModeSelect() {
       onValueChange={(next) => {
         requestResolutionChange({
           field: 'selectionMode',
-          value: next as SpellResolutionSelectionMode,
+          value: next as ResolutionSelectionMode,
         })
       }}
       options={resolutionSelectionModeOptions}

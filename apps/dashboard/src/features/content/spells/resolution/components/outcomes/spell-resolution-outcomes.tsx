@@ -2,7 +2,7 @@ import {
   hasMeaningfulOutcomeContent,
   isOutcomeEmpty,
   SPELL_RESOLUTION_CONVENTIONAL_PRIMARY_OUTCOME,
-  type SpellResolutionOutcomeResult,
+  type ResolutionOutcomeResult,
 } from '@rpg/contracts'
 import { Alert, Text } from '@rpg/ui'
 import { useWatch } from 'react-hook-form'
@@ -32,7 +32,7 @@ function shouldWarnPrimaryOutcomeEmpty(resolution: ResolutionFormValues): boolea
 
 function outcomeIndexForResult(
   outcomes: ResolutionFormValues['outcomes'],
-  result: SpellResolutionOutcomeResult,
+  result: ResolutionOutcomeResult,
 ): number {
   return outcomes?.findIndex((outcome) => outcome.result === result) ?? -1
 }

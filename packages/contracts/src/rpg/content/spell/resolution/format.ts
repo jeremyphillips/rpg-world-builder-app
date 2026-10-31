@@ -38,7 +38,6 @@ export {
   type SpellResolutionSummarySection,
 } from './format-summary'
 export {
-  formatResolutionRange,
   formatResolutionSelectionSections,
   formatResolutionTarget,
   formatResolutionTargetFromParts,

@@ -5,7 +5,7 @@ import {
   outcomeApplicationsReferenceEffect,
   planResolutionChange,
   resolutionChangeRequiresConfirm,
-  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
 } from '@rpg/contracts'
 
 import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
@@ -132,7 +132,7 @@ describe('resolutionFields effects array', () => {
           roll: { dice: { count: 3, faces: 8 } },
         },
         0,
-        { 'resolution.proximityKind': 'self' },
+        { 'resolution.selectionMode': 'self' },
       ),
     ).toBe('You heal 3d8 Hit Points.')
   })
@@ -141,7 +141,7 @@ describe('resolutionFields effects array', () => {
 describe('resolution effect removal planning', () => {
   it('requires confirm when removing an outcome-referenced effect', () => {
     const form = RESOLUTION_FORM_FIXTURES.inflictWounds
-    const effectId = SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
+    const effectId = RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
 
     expect(outcomeApplicationsReferenceEffect(form.outcomes, effectId)).toBe(true)
 

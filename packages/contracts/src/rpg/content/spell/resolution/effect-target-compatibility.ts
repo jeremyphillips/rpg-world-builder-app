@@ -3,7 +3,7 @@ import type {
   ResolutionEffectKind,
   ResolutionSelectionState,
 } from './selection-types'
-import type { SpellResolutionTargetKind } from './vocab'
+import type { ResolutionTargetKind } from '../../../vocab/resolution'
 
 export const CREATURE_ONLY_RESOLUTION_EFFECT_KINDS = [
   'healing',
@@ -41,7 +41,6 @@ export function isEffectKindAllowedForTarget(
     return true
   }
 
-  if (context.proximityKind === 'self') return true
   if (!context.targetKind) return true
   return context.targetKind === 'creature'
 }
@@ -59,7 +58,7 @@ export function getEffectTargetAvailability(
     reason: {
       code: 'effect-kind-incompatible-with-target',
       kind,
-      targetKind: context.targetKind as SpellResolutionTargetKind,
+      targetKind: context.targetKind as ResolutionTargetKind,
     },
     severity: 'unsupported',
   }

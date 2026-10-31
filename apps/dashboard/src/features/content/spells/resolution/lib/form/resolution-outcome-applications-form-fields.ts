@@ -1,5 +1,5 @@
 import { supportsPartialApplicationForEffectKind } from '@rpg/contracts'
-import type { SpellResolutionOutcomeResult } from '@rpg/contracts'
+import type { ResolutionOutcomeResult } from '@rpg/contracts'
 import type { FieldConfig, FieldOption, FormItem } from '@rpg/ui/form'
 
 import { defaultApplicationAmountForOutcome } from './resolution-effect-validity.lib'
@@ -51,7 +51,7 @@ export function formatOutcomeApplicationRowLabel(
 
 export function createOutcomeApplicationAppendValue(
   effectId: string,
-  outcomeResult: SpellResolutionOutcomeResult,
+  outcomeResult: ResolutionOutcomeResult,
   effects: readonly ResolutionEffectFormItem[],
 ): ResolutionOutcomeApplicationFormItem {
   const effect = findResolutionEffectById(effects, effectId)

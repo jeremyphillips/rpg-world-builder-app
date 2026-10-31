@@ -13,9 +13,9 @@ import { SpellResolutionOutcomes } from '../../components/outcomes/spell-resolut
 import { SpellResolutionProgression } from '../../components/progression/spell-resolution-progression'
 import { SpellResolutionPreview } from '../../components/preview/spell-resolution-preview'
 import { SpellResolutionProximitySelect } from '../../components/target/spell-resolution-proximity-select'
-import { SpellResolutionSelectionModeSelect } from '../../components/target/spell-resolution-selection-mode-select'
+import { ResolutionSelectionModeSelect } from '../../components/target/spell-resolution-selection-mode-select'
 import { SpellResolutionSelectionHints } from '../../components/target/spell-resolution-selection-hints'
-import { deriveDefaultEffectRecipient, type SpellResolutionTargetKind } from '@rpg/contracts'
+import { deriveDefaultEffectRecipient, type ResolutionTargetKind } from '@rpg/contracts'
 import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
 import { resolutionEffectItemFields } from '../effects/resolution-effect-form-fields'
 import { resolutionSelectionContextFromWatched } from '../selection/resolution-selection-context.lib'
@@ -67,7 +67,7 @@ function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
           const context = resolutionSelectionContextFromWatched(watched ?? {})
           return formatEffectRowSummary(values, {
             recipient: deriveDefaultEffectRecipient(context),
-            targetKind: context.targetKind as SpellResolutionTargetKind | undefined,
+            targetKind: context.targetKind as ResolutionTargetKind | undefined,
           })
         },
       },
@@ -209,7 +209,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'slot',
           name: '_resolutionSelectionModeSelect',
-          render: () => createElement(SpellResolutionSelectionModeSelect),
+          render: () => createElement(ResolutionSelectionModeSelect),
         },
         {
           kind: 'slot',

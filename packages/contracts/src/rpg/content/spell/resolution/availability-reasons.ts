@@ -1,14 +1,13 @@
+import { getSpellApplicationPatternKindLabel, getSpellResolutionAttackTypeLabel } from './vocab'
 import {
-  getSpellApplicationPatternKindLabel,
-  getSpellResolutionAttackTypeLabel,
-  getSpellResolutionProximityKindLabel,
-  getSpellResolutionTargetKindNoun,
-  type SpellResolutionTargetKind,
-} from './vocab'
+  getResolutionProximityKindLabel,
+  getResolutionTargetKindNoun,
+  type ResolutionTargetKind,
+} from '../../../vocab/resolution'
 import { getSpellAtomicEffectKindLabel } from '../../../vocab/spell/atomic-effect-kind'
 import { getSelectionMethodCapabilityRequired } from './selection-method-compatibility'
 import type { ResolutionAvailabilityReason } from './selection-types'
-import { getSpellResolutionSelectionModeLabel } from './vocab'
+import { getResolutionSelectionModeLabel } from '../../../vocab/resolution'
 
 export type ResolutionAvailabilityTone = 'option' | 'hint' | 'dialog' | 'compact'
 
@@ -18,10 +17,10 @@ function methodLabel(method: string): string {
   return getSpellResolutionAttackTypeLabel(method)
 }
 
-function targetPhraseForAvailability(targetKind: SpellResolutionTargetKind): string {
+function targetPhraseForAvailability(targetKind: ResolutionTargetKind): string {
   if (targetKind === 'object') return 'an object'
   if (targetKind === 'creature') return 'a creature'
-  return `a ${getSpellResolutionTargetKindNoun(targetKind)}`
+  return `a ${getResolutionTargetKindNoun(targetKind)}`
 }
 
 function formatMethodProximityReason(
@@ -30,7 +29,7 @@ function formatMethodProximityReason(
 ): string {
   const method = methodLabel(reason.method)
   const proximity =
-    getSpellResolutionProximityKindLabel(reason.proximity) ?? reason.proximity ?? 'unknown'
+    getResolutionProximityKindLabel(reason.proximity) ?? reason.proximity ?? 'unknown'
   const proximityPhrase = proximity.toLowerCase()
   if (tone === 'compact') return `Not available for ${proximityPhrase}`
   if (tone === 'option') return `Not available when target proximity is ${proximityPhrase}`
@@ -65,7 +64,7 @@ function formatEffectTargetReason(
   const kind = getSpellAtomicEffectKindLabel(reason.kind)
   const target = targetPhraseForAvailability(reason.targetKind)
   if (tone === 'compact')
-    return `Not available for ${getSpellResolutionTargetKindNoun(reason.targetKind)} targets`
+    return `Not available for ${getResolutionTargetKindNoun(reason.targetKind)} targets`
   if (tone === 'option') return `Not available when the target is ${target}`
   return `${kind} is not available when the target is ${target}.`
 }
@@ -78,7 +77,7 @@ function formatMethodSelectionModeReason(
   tone: ResolutionAvailabilityTone,
 ): string {
   const method = methodLabel(reason.method)
-  const modeLabel = getSpellResolutionSelectionModeLabel(reason.selectionMode)
+  const modeLabel = getResolutionSelectionModeLabel(reason.selectionMode)
   const areaSuffix = reason.selectionMode === 'self' && reason.hasAreaOfEffect ? ' with area' : ''
   const modePhrase = `${modeLabel}${areaSuffix}`
 

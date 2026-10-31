@@ -1,189 +1,31 @@
 import { z } from 'zod'
-import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
-/**
- * @todo Enum/vocab follow-up — migrate spell resolution closed sets (attack types,
- *   target kinds, selection modes, outcome results, application amounts, etc.)
- *   to `rpg/vocab` using the closed-set ownership rule. See
- *   `packages/contracts/docs/enum-inventory.md` (defer section).
- */
-import { areaGeometrySchema } from '../../../primitives/area-geometry'
-import { rollSchema } from '../../../primitives/mechanics/roll'
-import { abilitySchema } from '../../../vocab/ability'
-import { damageTypeIdSchema } from '../../../vocab/damage/vocabulary'
-import { normalizeSpellResolutionInput } from './normalize-resolution'
-import { validateSpellResolutionMethodCompatibility } from './selection-method-compatibility'
-import { validateSpellResolutionModeFields } from './selection-mode-validation'
 import {
-  SPELL_RESOLUTION_APPLICATION_AMOUNTS,
-  SPELL_RESOLUTION_ATTACK_TYPES,
-  SPELL_RESOLUTION_OUTCOME_RESULTS,
-  SPELL_RESOLUTION_SELECTION_MODES,
-  SPELL_RESOLUTION_TARGET_COUNT_KINDS,
-  SPELL_RESOLUTION_TARGET_KINDS,
-  type SpellResolutionOutcomeResult,
-  type SpellResolutionSelectionMode,
-} from './vocab'
-import {
-  getOutcomeResultsForMethod,
-  hasMeaningfulOutcomeContent,
-  supportsPartialApplicationForEffectKind,
-} from './outcome-slots'
-import { isEffectKindAllowedForTarget } from './effect-target-compatibility'
-import { isResolutionEffectKind } from './selection-availability'
-import { spellResolutionValidationMessages } from './validation-messages'
+  effectResolutionFieldShape,
+  resolutionAutomaticMethodSchema,
+  resolutionSavingThrowMethodSchema,
+  validateEffectResolution,
+  type ResolutionEffect,
+  type ResolutionEffectId,
+  type ResolutionOrigin,
+  type ResolutionOutcomeResult,
+  type ResolutionSelectionMode,
+  type ResolutionTarget,
+} from '../../lib/resolution/schema'
+import { SPELL_RESOLUTION_ATTACK_TYPES } from './vocab'
 import { spellResolutionProgressionSchema } from './progression/schema'
 import { validateSpellResolutionProgression } from './progression/validation'
-
-// ---------------------------------------------------------------------------
-// Spell resolution — contextual envelope for targets (with proximity), method,
-// effects, and outcome applications. Optional on spell body until persistence lands.
-// ---------------------------------------------------------------------------
-
-export const spellResolutionEffectIdSchema = z.string().min(1).brand<'SpellResolutionEffectId'>()
-
-export type SpellResolutionEffectId = z.infer<typeof spellResolutionEffectIdSchema>
 
 export const spellResolutionMethodSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('attack'),
     attackType: z.enum(SPELL_RESOLUTION_ATTACK_TYPES),
   }),
-  z.object({
-    kind: z.literal('saving-throw'),
-    ability: abilitySchema,
-  }),
-  z.object({
-    kind: z.literal('automatic'),
-  }),
+  resolutionSavingThrowMethodSchema,
+  resolutionAutomaticMethodSchema,
 ])
 
 export type SpellResolutionMethod = z.infer<typeof spellResolutionMethodSchema>
-
-const spellResolutionDistanceSchema = z.object({
-  value: z.number().min(0),
-  unit: z.literal('ft'),
-})
-
-export const spellResolutionExternalTargetProximitySchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('touch') }),
-  z.object({
-    kind: z.literal('reach'),
-    distance: spellResolutionDistanceSchema.optional(),
-  }),
-  z.object({
-    kind: z.literal('distance'),
-    distance: spellResolutionDistanceSchema,
-  }),
-])
-
-export type SpellResolutionExternalTargetProximity = z.infer<
-  typeof spellResolutionExternalTargetProximitySchema
->
-
-/** Includes legacy `self` for normalization input only. */
-export const spellResolutionTargetProximitySchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('self') }),
-  z.object({ kind: z.literal('touch') }),
-  z.object({
-    kind: z.literal('reach'),
-    distance: spellResolutionDistanceSchema.optional(),
-  }),
-  z.object({
-    kind: z.literal('distance'),
-    distance: spellResolutionDistanceSchema,
-  }),
-])
-
-export type SpellResolutionTargetProximity = z.infer<typeof spellResolutionTargetProximitySchema>
-
-/** @deprecated Use spellResolutionTargetProximitySchema */
-export const spellResolutionRangeSchema = spellResolutionTargetProximitySchema
-
-/** @deprecated Use SpellResolutionTargetProximity */
-export type SpellResolutionRange = SpellResolutionTargetProximity
-
-export const spellResolutionDamageEffectSchema = z.object({
-  id: spellResolutionEffectIdSchema,
-  kind: z.literal('damage'),
-  roll: rollSchema,
-  damageType: damageTypeIdSchema,
-})
-
-export type SpellResolutionDamageEffect = z.infer<typeof spellResolutionDamageEffectSchema>
-
-export const spellResolutionHealingEffectSchema = z.object({
-  id: spellResolutionEffectIdSchema,
-  kind: z.literal('healing'),
-  roll: rollSchema,
-})
-
-export type SpellResolutionHealingEffect = z.infer<typeof spellResolutionHealingEffectSchema>
-
-export const spellResolutionTemporaryHitPointsEffectSchema = z.object({
-  id: spellResolutionEffectIdSchema,
-  kind: z.literal('temporary-hit-points'),
-  roll: rollSchema,
-})
-
-export type SpellResolutionTemporaryHitPointsEffect = z.infer<
-  typeof spellResolutionTemporaryHitPointsEffectSchema
->
-
-export const spellResolutionEffectSchema = z.discriminatedUnion('kind', [
-  spellResolutionDamageEffectSchema,
-  spellResolutionHealingEffectSchema,
-  spellResolutionTemporaryHitPointsEffectSchema,
-])
-
-export type SpellResolutionEffect = z.infer<typeof spellResolutionEffectSchema>
-
-export const spellResolutionApplicationSchema = z.object({
-  effectId: spellResolutionEffectIdSchema,
-  amount: z.enum(SPELL_RESOLUTION_APPLICATION_AMOUNTS),
-})
-
-export type SpellResolutionApplication = z.infer<typeof spellResolutionApplicationSchema>
-
-export const spellResolutionOutcomeSchema = z
-  .object({
-    result: z.enum(SPELL_RESOLUTION_OUTCOME_RESULTS),
-    note: z.string().trim().optional(),
-    applications: z.array(spellResolutionApplicationSchema).default([]),
-  })
-  .refine((value) => value.applications.length > 0 || Boolean(value.note?.trim()), {
-    message: spellResolutionValidationMessages.outcomeRequiresApplicationOrNote(),
-  })
-
-export type SpellResolutionOutcome = z.infer<typeof spellResolutionOutcomeSchema>
-
-export const spellResolutionTargetSchema = z.object({
-  count: z.number().int().min(1),
-  countKind: z.enum(SPELL_RESOLUTION_TARGET_COUNT_KINDS).optional(),
-  kind: z.enum(SPELL_RESOLUTION_TARGET_KINDS),
-  proximity: spellResolutionExternalTargetProximitySchema,
-})
-
-export type SpellResolutionTarget = z.infer<typeof spellResolutionTargetSchema>
-
-/** Legacy input shape — accepts `proximity.self` before normalization. */
-export const spellResolutionLegacyTargetSchema = z.object({
-  count: z.number().int().min(1),
-  countKind: z.enum(SPELL_RESOLUTION_TARGET_COUNT_KINDS).optional(),
-  kind: z.enum(SPELL_RESOLUTION_TARGET_KINDS),
-  proximity: spellResolutionTargetProximitySchema,
-})
-
-export const spellResolutionOriginSchema = z.object({
-  proximity: z.object({
-    kind: z.literal('distance'),
-    distance: spellResolutionDistanceSchema,
-  }),
-})
-
-export type SpellResolutionOrigin = z.infer<typeof spellResolutionOriginSchema>
-
-export const spellResolutionSelectionModeSchema = z.enum(SPELL_RESOLUTION_SELECTION_MODES)
 
 export const spellApplicationPatternUnitLabelSchema = z.object({
   singular: z.string().min(1),
@@ -220,180 +62,41 @@ export const spellApplicationPatternSchema = z.discriminatedUnion('kind', [
 
 export type SpellApplicationPattern = z.infer<typeof spellApplicationPatternSchema>
 
-function allowedOutcomeResultsForMethod(
-  method: SpellResolutionMethod,
-): readonly SpellResolutionOutcomeResult[] {
-  return getOutcomeResultsForMethod(method)
-}
-
 export type SpellResolutionValidationInput = {
-  selectionMode: SpellResolutionSelectionMode
-  target?: SpellResolutionTarget
-  origin?: SpellResolutionOrigin
-  areaOfEffect?: z.infer<typeof areaGeometrySchema>
+  selectionMode: ResolutionSelectionMode
+  target?: ResolutionTarget
+  origin?: ResolutionOrigin
+  areaOfEffect?: EffectResolutionArea
   method: SpellResolutionMethod
-  applicationPattern?: z.infer<typeof spellApplicationPatternSchema>
-  effects: readonly SpellResolutionEffect[]
+  applicationPattern?: SpellApplicationPattern
+  effects: readonly ResolutionEffect[]
   outcomes: readonly {
-    result: SpellResolutionOutcomeResult
-    applications: readonly { effectId: SpellResolutionEffectId; amount: string }[]
+    result: ResolutionOutcomeResult
+    applications: readonly { effectId: ResolutionEffectId; amount: string }[]
     note?: string
   }[]
   progression?: z.infer<typeof spellResolutionProgressionSchema>
 }
 
+type EffectResolutionArea = NonNullable<z.infer<typeof effectResolutionFieldShape.areaOfEffect>>
+
 export function validateSpellResolutionReferences(
   resolution: SpellResolutionValidationInput,
   ctx: z.RefinementCtx,
 ): void {
-  validateSpellResolutionModeFields(resolution, ctx)
-  validateSpellResolutionMethodCompatibility(
-    {
-      selectionMode: resolution.selectionMode,
-      hasAreaOfEffect: Boolean(resolution.areaOfEffect),
-      method: resolution.method,
-    },
-    ctx,
-  )
-
-  const effectById = new Map(resolution.effects.map((effect) => [effect.id, effect]))
-  const effectIds = resolution.effects.map((effect) => effect.id)
-  const uniqueEffectIds = new Set(effectIds)
-  if (uniqueEffectIds.size !== effectIds.length) {
-    addCustomRefinementIssue(ctx, spellResolutionValidationMessages.duplicateEffectId(), [
-      'effects',
-    ])
-  }
-
-  const targetCompatibilityContext = {
-    selectionMode: resolution.selectionMode,
-    hasAreaOfEffect: Boolean(resolution.areaOfEffect),
-    proximityKind: resolution.target?.proximity.kind,
-    targetKind: resolution.target?.kind,
-  }
-  resolution.effects.forEach((effect, effectIndex) => {
-    if (!isResolutionEffectKind(effect.kind)) return
-    if (isEffectKindAllowedForTarget(effect.kind, targetCompatibilityContext)) return
-
-    addCustomRefinementIssue(
-      ctx,
-      spellResolutionValidationMessages.effectKindIncompatibleWithTarget({
-        kind: effect.kind,
-        targetKind: resolution.target?.kind ?? 'creature',
-      }),
-      ['effects', effectIndex, 'kind'],
-    )
-  })
-
-  if (!resolution.outcomes.some(hasMeaningfulOutcomeContent)) {
-    addCustomRefinementIssue(
-      ctx,
-      spellResolutionValidationMessages.resolutionRequiresMeaningfulOutcome(),
-      ['outcomes'],
-    )
-  }
-
-  const outcomeResults = resolution.outcomes.map((outcome) => outcome.result)
-  const uniqueOutcomeResults = new Set(outcomeResults)
-  if (uniqueOutcomeResults.size !== outcomeResults.length) {
-    addCustomRefinementIssue(ctx, spellResolutionValidationMessages.duplicateOutcomeResult(), [
-      'outcomes',
-    ])
-  }
-
-  const allowedResults = allowedOutcomeResultsForMethod(resolution.method)
-
-  resolution.outcomes.forEach((outcome, outcomeIndex) => {
-    if (!allowedResults.includes(outcome.result)) {
-      addCustomRefinementIssue(
-        ctx,
-        spellResolutionValidationMessages.outcomeResultNotAllowedForMethod({
-          result: outcome.result,
-        }),
-        ['outcomes', outcomeIndex, 'result'],
-      )
-    }
-
-    const applicationEffectIds = outcome.applications.map((application) => application.effectId)
-    const uniqueApplicationEffectIds = new Set(applicationEffectIds)
-    if (uniqueApplicationEffectIds.size !== applicationEffectIds.length) {
-      addCustomRefinementIssue(
-        ctx,
-        spellResolutionValidationMessages.duplicateOutcomeApplicationEffectId(),
-        ['outcomes', outcomeIndex, 'applications'],
-      )
-    }
-
-    outcome.applications.forEach((application, applicationIndex) => {
-      const effect = effectById.get(application.effectId)
-      if (!effect) {
-        addCustomRefinementIssue(
-          ctx,
-          spellResolutionValidationMessages.unknownEffectReference({
-            effectId: application.effectId,
-          }),
-          ['outcomes', outcomeIndex, 'applications', applicationIndex, 'effectId'],
-        )
-        return
-      }
-
-      if (application.amount === 'half' && !supportsPartialApplicationForEffectKind(effect.kind)) {
-        addCustomRefinementIssue(
-          ctx,
-          spellResolutionValidationMessages.halfNotSupportedForEffectKind({
-            kind: effect.kind,
-          }),
-          ['outcomes', outcomeIndex, 'applications', applicationIndex, 'amount'],
-        )
-      }
-    })
-  })
-
+  validateEffectResolution(resolution, ctx)
   if (resolution.progression) {
     validateSpellResolutionProgression(resolution, resolution.progression, ctx)
   }
 }
 
-const spellResolutionObjectSchema = z
+export const spellResolutionSchema = z
   .object({
-    selectionMode: spellResolutionSelectionModeSchema,
-    target: spellResolutionTargetSchema.optional(),
-    origin: spellResolutionOriginSchema.optional(),
-    areaOfEffect: areaGeometrySchema.optional(),
+    ...effectResolutionFieldShape,
     method: spellResolutionMethodSchema,
     applicationPattern: spellApplicationPatternSchema.optional(),
-    effects: z.array(spellResolutionEffectSchema).min(1),
-    outcomes: z.array(spellResolutionOutcomeSchema).min(1),
     progression: spellResolutionProgressionSchema.optional(),
   })
   .superRefine(validateSpellResolutionReferences)
 
-const spellResolutionInputSchema = z
-  .object({
-    selectionMode: spellResolutionSelectionModeSchema.optional(),
-    target: spellResolutionLegacyTargetSchema.optional(),
-    origin: spellResolutionOriginSchema.optional(),
-    areaOfEffect: areaGeometrySchema.optional(),
-    method: spellResolutionMethodSchema,
-    applicationPattern: spellApplicationPatternSchema.optional(),
-    effects: z.array(spellResolutionEffectSchema).min(1),
-    outcomes: z.array(spellResolutionOutcomeSchema).min(1),
-    progression: spellResolutionProgressionSchema.optional(),
-  })
-  .transform((value) => normalizeSpellResolutionInput(value))
-
-export const spellResolutionSchema = spellResolutionInputSchema.pipe(spellResolutionObjectSchema)
-
 export type SpellResolution = z.infer<typeof spellResolutionSchema>
-
-/** Primary damage effect id used by MVP authoring presets. */
-export const SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID =
-  spellResolutionEffectIdSchema.parse('damage')
-
-/** Primary healing effect id used by catalog resolution seeds. */
-export const SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID =
-  spellResolutionEffectIdSchema.parse('healing')
-
-/** Primary temporary hit points effect id used by catalog resolution seeds. */
-export const SPELL_RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID =
-  spellResolutionEffectIdSchema.parse('temporary-hit-points')

@@ -1,4 +1,4 @@
-import type { SpellResolutionProximityKind } from './vocab'
+import type { ResolutionProximityKind } from '../../../vocab/resolution'
 import {
   getEffectTargetAvailability,
   isEffectKindAllowedForTarget,
@@ -67,7 +67,7 @@ export function stateAfterPatch(
 
 function isMethodAllowedForProximity(
   method: ResolutionMethodOption,
-  proximity: SpellResolutionProximityKind,
+  proximity: ResolutionProximityKind,
 ): boolean {
   switch (method) {
     case 'melee-spell':
@@ -86,7 +86,7 @@ function isMethodAllowedForProximity(
 
 function isPatternAllowedForProximity(
   pattern: ResolutionApplicationPatternFormKind,
-  proximity: SpellResolutionProximityKind,
+  proximity: ResolutionProximityKind,
 ): boolean {
   if (pattern === 'none') return true
   return proximity === 'distance'

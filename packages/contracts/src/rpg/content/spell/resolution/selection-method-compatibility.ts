@@ -2,12 +2,8 @@ import type { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { spellResolutionValidationMessages } from './validation-messages'
-import type { SpellResolutionMethod } from './schema'
 import type { ResolutionMethodOption, ResolutionSelectionState } from './selection-types'
-import type { SpellResolutionSelectionMode } from './vocab'
-
-/** Structural resolution method kind — attack covers melee and ranged spell options. */
-export type ResolutionMethodKind = SpellResolutionMethod['kind']
+import type { ResolutionMethodKind, ResolutionSelectionMode } from '../../../vocab/resolution'
 
 export type SelectionMethodCompatibility = 'supported' | 'deferred' | 'unsupported'
 
@@ -94,7 +90,7 @@ export function methodOptionToMethodKind(option: ResolutionMethodOption): Resolu
 }
 
 export function resolveSelectionMethodContextKey(input: {
-  selectionMode: SpellResolutionSelectionMode
+  selectionMode: ResolutionSelectionMode
   hasAreaOfEffect: boolean
 }): SelectionMethodContextKey {
   if (input.selectionMode === 'self') {
@@ -108,11 +104,10 @@ export function resolveSelectionMethodContextKey(input: {
 function inferSelectionModeFromState(
   state: Pick<
     ResolutionSelectionState,
-    'selectionMode' | 'proximityKind' | 'originDistanceFt' | 'targetKind' | 'targetCount'
+    'selectionMode' | 'originDistanceFt' | 'targetKind' | 'targetCount'
   >,
-): SpellResolutionSelectionMode | undefined {
+): ResolutionSelectionMode | undefined {
   if (state.selectionMode) return state.selectionMode
-  if (state.proximityKind === 'self') return 'self'
   if (state.originDistanceFt !== undefined) return 'point'
   if (state.targetKind !== undefined || state.targetCount !== undefined) return 'targets'
   return undefined
@@ -124,7 +119,7 @@ export function resolveSelectionModeFromState(
     ResolutionSelectionState,
     'selectionMode' | 'proximityKind' | 'originDistanceFt' | 'targetKind' | 'targetCount'
   >,
-): SpellResolutionSelectionMode | undefined {
+): ResolutionSelectionMode | undefined {
   return inferSelectionModeFromState(state)
 }
 
@@ -181,9 +176,9 @@ export function isSelectionMethodAllowed(
 }
 
 export type SelectionMethodCompatibilityInput = {
-  selectionMode: SpellResolutionSelectionMode
+  selectionMode: ResolutionSelectionMode
   hasAreaOfEffect: boolean
-  method: SpellResolutionMethod
+  method: { kind: ResolutionMethodKind }
 }
 
 /** Rejects deferred and unsupported method × selection-mode pairs on stored resolution. */

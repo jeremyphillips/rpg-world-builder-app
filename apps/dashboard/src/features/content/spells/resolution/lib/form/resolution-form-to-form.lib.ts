@@ -1,5 +1,5 @@
 import type { SpellResolution } from '@rpg/contracts'
-import { inferSpellResolutionTargetCountKind } from '@rpg/contracts'
+import { inferResolutionTargetCountKind } from '@rpg/contracts'
 
 import { applicationPatternToForm } from '../application-pattern/resolution-application-pattern.lib'
 import { EMPTY_RESOLUTION_AREA_OF_EFFECT, resolutionAreaToForm } from './resolution-area-values'
@@ -26,7 +26,7 @@ export function buildResolutionFormSelectionFields(
   return {
     selectionMode: resolution.selectionMode,
     targetCount: target?.count ?? 1,
-    countKind: target?.countKind ?? inferSpellResolutionTargetCountKind(target?.count ?? 1),
+    countKind: target?.countKind ?? inferResolutionTargetCountKind(target?.count ?? 1),
     targetKind: target?.kind ?? 'creature',
     proximityKind: target?.proximity.kind ?? 'touch',
     originDistanceFt: resolution.origin?.proximity.distance.value,

@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  ELDRITCH_BLAST_RESOLUTION,
-  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-} from '@rpg/contracts'
+import { ELDRITCH_BLAST_RESOLUTION, RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '@rpg/contracts'
 
 import {
   formOutcomesToStoredShape,
@@ -26,7 +23,7 @@ describe('resolution outcome slot adapters', () => {
     const formSlots = hydrateOutcomeFormSlots(method, [
       {
         result: 'hit',
-        applications: [{ effectId: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
       },
       { result: 'miss', applications: [] },
     ])

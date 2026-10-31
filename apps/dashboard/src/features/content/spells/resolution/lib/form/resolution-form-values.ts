@@ -1,6 +1,6 @@
 import {
   spellResolutionSchema,
-  SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   type Spell,
   type SpellResolution,
 } from '@rpg/contracts'
@@ -136,7 +136,7 @@ export function initializeOriginFromSpellRange(
 
 function defaultDamageEffect(): ResolutionEffectFormItem {
   return {
-    id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+    id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
     kind: 'damage',
     roll: { dice: { count: 1, faces: 10 } },
     damageType: 'force',
@@ -186,7 +186,7 @@ export function createDefaultSavingThrowResolutionFormValues(): ResolutionFormVa
     applicationPatternKind: 'none',
     effects: [
       {
-        id: SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+        id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
         kind: 'damage',
         roll: { dice: { count: 2, faces: 10 } },
         damageType: 'necrotic',

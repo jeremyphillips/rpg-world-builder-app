@@ -2,7 +2,7 @@ import { formatRollValue, type RollValue } from '../../../primitives/mechanics/r
 import { getDamageTypeLabel } from '../../../vocab/damage/vocabulary'
 import { HIT_POINTS_TERM } from '../../../vocab/mechanics/hit-points'
 import { vocabularyTermLabel } from '../../../vocab/types'
-import type { SpellResolutionTargetKind } from '../resolution/vocab'
+import type { ResolutionTargetKind } from '../resolution/vocab'
 import type { EffectRecipient } from './recipient'
 import type { SpellAtomicEffect } from './schema'
 
@@ -12,7 +12,7 @@ export type EffectSentenceRegister = 'authoring' | 'resolution-preview'
 
 export type EffectRowFormatOptions = {
   recipient?: EffectRecipient
-  targetKind?: SpellResolutionTargetKind
+  targetKind?: ResolutionTargetKind
   /** Authoring rows vs player-facing resolution preview copy. */
   register?: EffectSentenceRegister
   applicationAmount?: 'full' | 'half'
@@ -49,7 +49,7 @@ function previewSubject(recipient: EffectRecipient): string {
 function recipientVerb(
   recipient: EffectRecipient,
   verb: 'heal' | 'gain',
-  targetKind?: SpellResolutionTargetKind,
+  targetKind?: ResolutionTargetKind,
 ): string {
   if (recipient === 'self') {
     return verb === 'heal' ? 'You heal' : 'You gain'
@@ -86,7 +86,7 @@ function formatPreviewDamageSentence(
 function formatAuthoringHealingSentence(
   parts: EffectRowParts,
   recipient: EffectRecipient,
-  targetKind?: SpellResolutionTargetKind,
+  targetKind?: ResolutionTargetKind,
 ): string {
   return `${recipientVerb(recipient, 'heal', targetKind)} ${formatRollValue(parts.roll)} ${hitPointsLabel('authoring', true)}.`
 }
@@ -104,7 +104,7 @@ function formatPreviewHealingSentence(parts: EffectRowParts, recipient: EffectRe
 function formatAuthoringTemporaryHitPointsSentence(
   parts: EffectRowParts,
   recipient: EffectRecipient,
-  targetKind?: SpellResolutionTargetKind,
+  targetKind?: ResolutionTargetKind,
 ): string {
   return `${recipientVerb(recipient, 'gain', targetKind)} ${formatRollValue(parts.roll)} temporary ${hitPointsLabel('authoring', true)}.`
 }

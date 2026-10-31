@@ -1,12 +1,12 @@
 import type { ResolutionSelectionState } from './selection-types'
 import type { EffectRecipient, EffectRowFormatOptions } from '../effects/format'
 import type { SpellResolution } from './schema'
-import type { SpellResolutionSelectionMode } from './vocab'
+import type { ResolutionSelectionMode } from '../../../vocab/resolution'
 
 export type { EffectRecipient }
 
 function deriveRecipientFromModeAndArea(
-  selectionMode: SpellResolutionSelectionMode,
+  selectionMode: ResolutionSelectionMode,
   hasAreaOfEffect: boolean,
 ): EffectRecipient {
   switch (selectionMode) {
@@ -31,7 +31,7 @@ export function deriveEffectRecipientFromResolution(resolution: SpellResolution)
 }
 
 /**
- * Derives effect recipient from flattened authoring state or legacy proximity fields.
+ * Derives effect recipient from flattened authoring state.
  *
  * When `selectionMode` is present it is authoritative together with `hasAreaOfEffect`.
  */
@@ -47,7 +47,6 @@ export function deriveDefaultEffectRecipient(
     return deriveRecipientFromModeAndArea(context.selectionMode, Boolean(context.hasAreaOfEffect))
   }
 
-  if (context.proximityKind === 'self') return 'self'
   if (isResolutionTargetConfigured(context)) return 'target'
   return 'generic'
 }
@@ -58,7 +57,6 @@ export function isResolutionTargetConfigured(
     proximityKind?: ResolutionSelectionState['proximityKind']
   },
 ): boolean {
-  if (context.proximityKind === 'self') return false
   if (!context.targetKind) return false
   if (context.targetCount === undefined || context.targetCount < 1) return false
   return true

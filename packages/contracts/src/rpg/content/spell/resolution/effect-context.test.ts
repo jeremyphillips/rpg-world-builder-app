@@ -100,11 +100,10 @@ describe('deriveDefaultEffectRecipient', () => {
 })
 
 describe('isResolutionTargetConfigured', () => {
-  it('is false for self proximity', () => {
+  it('is false when target kind is missing', () => {
     expect(
       isResolutionTargetConfigured({
-        proximityKind: 'self',
-        targetKind: 'creature',
+        proximityKind: 'touch',
         targetCount: 1,
       }),
     ).toBe(false)
