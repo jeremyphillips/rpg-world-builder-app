@@ -51,6 +51,29 @@ export const RowStates: Story = {
   ),
 }
 
+export const ListDensityLadder: Story = {
+  render: () => (
+    <div className="flex w-full max-w-md flex-col gap-6">
+      {(['compact', 'comfortable', 'spacious'] as const).map((density) => (
+        <DemoPanel key={density}>
+          <p className="border-b border-border px-3 py-2 text-style-caption text-muted-foreground">
+            {density}
+          </p>
+          <InteractiveListViewport>
+            <InteractiveList density={density} role="listbox" aria-label={`Spells (${density})`}>
+              <InteractiveListRow
+                name="Fireball"
+                classification="Spell"
+                metadata="Level 3 · Evocation"
+              />
+            </InteractiveList>
+          </InteractiveListViewport>
+        </DemoPanel>
+      ))}
+    </div>
+  ),
+}
+
 export const ClassReference: Story = {
   tags: ['control-parity'],
   parameters: { semanticClasses: true },

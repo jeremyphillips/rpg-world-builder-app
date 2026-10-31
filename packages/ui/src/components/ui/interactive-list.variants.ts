@@ -2,7 +2,8 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { borderStrength } from './border-strength'
-import { listShellClasses, type ListDensity } from './list-density.lib'
+import { listShellClasses } from './list-density.lib'
+import type { ListDensity } from './list-density.tokens'
 import {
   UI_INTERACTIVE_ROW_BLOCK_CLASS,
   UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS,
@@ -14,9 +15,6 @@ import {
   selectableRowListHighlightUnselectedClasses,
   selectableRowListPointerHoverClasses,
 } from './interactive-row.variants'
-
-/** @deprecated Use {@link ListDensity} on `InteractiveList` instead of row `size`. */
-export type InteractiveListSize = 'sm' | 'md' | 'lg'
 
 /** Visual-only group heading; hosts own section / listbox group semantics. */
 export const interactiveListGroupHeadingVariants = cva(

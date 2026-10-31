@@ -38,7 +38,7 @@ region separation (`--ui-surface-region-gap`); lists own spacing between distinc
 | spacious    | 6px     |
 
 Published on the same density selectors as copy scale (`ui-card--*`, `ui-alert--*`,
-`ui-destination-list--*`, `ui-list--*`, `ui-identity-row--*`, `dash-entity-anatomy--*`, …). Comfortable is the `:root` default when
+`ui-list--*`, `ui-identity-row--*`, `dash-entity-anatomy--*`, …). Comfortable is the `:root` default when
 no density ancestor is present. Status uses this gap only — no separate offset.
 
 Embedded entity rows inside a `DestinationList` inherit row gap and copy vars from the list shell; they do not need `dash-entity-anatomy--*` unless overriding the list. Compact badge sizing, caption treatment, and `InlineMetadata` density still require an explicit anatomy `density` prop when those rules apply.

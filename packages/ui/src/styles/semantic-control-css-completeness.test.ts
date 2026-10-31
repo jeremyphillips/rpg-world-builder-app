@@ -61,4 +61,32 @@ describe('semantic control CSS completeness', () => {
       }),
     ).toEqual([])
   })
+
+  it('matches descendant selectors when matchDescendantSelectors is set', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'semantic-css-'))
+    const filePath = path.join(dir, 'interactive-list.css')
+    writeFileSync(
+      filePath,
+      `
+        .ui-list--compact.ui-interactive-list .ui-interactive-list__main {
+          gap: var(--control-gap-xs);
+          padding-inline: calc(var(--spacing) * 2);
+          padding-block: calc(var(--spacing) * 2);
+        }
+      `,
+    )
+
+    expect(
+      validateSemanticControlCssCompleteness({
+        filePath,
+        dimensions: [
+          {
+            modifierPrefix: 'ui-list--compact.ui-interactive-list',
+            requiredProperties: ['gap', 'padding-inline', 'padding-block'],
+            matchDescendantSelectors: true,
+          },
+        ],
+      }),
+    ).toEqual([])
+  })
 })

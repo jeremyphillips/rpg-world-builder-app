@@ -397,8 +397,6 @@ export {
   resolveComboboxSearchFieldSizeForButtonSize,
   fieldSizeToListDensity,
   resolveListDensityForFieldSize,
-  fieldSizeToInteractiveListSize,
-  resolveInteractiveListSizeForFieldSize,
   fieldSizeToArrayAddButtonSize,
   fieldSizeToAttachedButtonSize,
   INLINE_HEADER_ACTION_BUTTON_SIZE,
@@ -827,7 +825,6 @@ export {
   interactiveListVariants,
   interactiveListRowChromeVariants,
   interactiveListRowMainVariants,
-  type InteractiveListSize,
 } from './components/ui/interactive-list.variants'
 export {
   PreviewRail,

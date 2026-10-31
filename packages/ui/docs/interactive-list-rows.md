@@ -28,6 +28,10 @@ States are orthogonal. Lower layers do not replace the accent rail; highlight ad
 
 Surface hover and pressed mixes come from [surface-interaction.css](../src/components/ui/surface-interaction.css) on painted publishers (list shell, panel, card, popover, canvas `:root`, …) — the same 94% / 88% recipe as interactive cards, without composing `ui-card` chrome.
 
+## List density (typography and row geometry)
+
+`InteractiveList` and `DestinationList` publish **`ui-list ui-list--{density}`** on the list root. Copy-scale variables (`--ui-copy-title-*`, anatomy row gap, and related tokens) come from [copy-scale.css](../src/components/ui/copy-scale.css) on those modifiers. Row padding and destination insets are owned per component in [interactive-list.css](../src/components/ui/interactive-list.css) and [destination-list.css](../src/components/ui/destination-list.css) — comfortable values on base rules, compact/spacious overrides scoped under `.ui-list--compact|spacious`. Set **`density`** on `InteractiveList` / `InteractiveListPanel` (combobox field `size` maps via `resolveListDensityForFieldSize`); do not size individual rows.
+
 ## Menu item contract
 
 `ui-menu-item` owns padding, type, and `data-highlighted` / focus wash (`--row-hover-bg`, foreground unchanged). Optional description uses `ui-menu-item__description` and stays `muted-foreground` when highlighted. Submenu triggers keep `data-state="open"` accent treatment. Checkbox and radio items are unchanged (`DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`).

@@ -166,16 +166,6 @@ export function resolveListDensityForFieldSize(fieldSize: FieldSizeToken = 'md')
   return fieldSizeToListDensity[fieldSize]
 }
 
-/** @deprecated Use {@link resolveListDensityForFieldSize}. */
-export const fieldSizeToInteractiveListSize = fieldSizeToListDensity
-
-/** @deprecated Use {@link resolveListDensityForFieldSize}. */
-export function resolveInteractiveListSizeForFieldSize(
-  fieldSize: FieldSizeToken = 'md',
-): ListDensity {
-  return resolveListDensityForFieldSize(fieldSize)
-}
-
 /** Resolves grouped shell size modifier for composite roots. */
 export function resolveFieldGroupedShellSizeClass(size: FieldSizeToken = 'md'): string {
   return resolveFieldGroupSizeClass(size)

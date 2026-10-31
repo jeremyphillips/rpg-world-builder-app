@@ -67,12 +67,7 @@ export {
   UI_INTERACTIVE_ROW_SELECTED_CLASSES,
 } from '../components/ui/interactive-row.styles'
 
-/** twMerge group — list typography / density modifiers on list roots. */
-export const UI_LIST_DENSITY_CLASSES = [
-  'ui-list--compact',
-  'ui-list--comfortable',
-  'ui-list--spacious',
-] as const
+export { UI_LIST_DENSITY_CLASSES } from '../components/ui/list-density.tokens'
 
 export { UI_AVATAR_SIZE_CLASSES } from '../components/ui/avatar.variants'
 export { UI_TOAST_TONE_CLASSES } from '../components/ui/toast.variants'
