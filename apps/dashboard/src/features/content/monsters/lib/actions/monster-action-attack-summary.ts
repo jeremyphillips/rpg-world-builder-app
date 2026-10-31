@@ -1,16 +1,22 @@
 import {
+  abilityModifier,
   derivedFieldReasonLabel,
   CHALLENGE_RATING_MECHANICS,
+  formatProficiencyBonus,
   formatSignedModifier,
-  getAbilityLabel,
+  getAbilityCompactLabel,
   getDamageTypeLabel,
   getWeaponModeLabel,
   getWeaponPropertyLabel,
+  joinInlineMetadata,
+  NEUTRAL_ABILITY_SCORE,
   resolveMonsterActionAttackProfile,
   unavailableField,
+  type Ability,
   type ChallengeRating,
   type DerivedField,
   type MonsterActionAttackProfile,
+  type MonsterActionAttackRoll,
   type MonsterActionDraft,
   type ResolveMonsterActionAttackProfileInput,
 } from '@rpg/contracts'
@@ -19,6 +25,14 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import { monsterEquipmentCatalog, monsterMagicPropertyProvider } from '../monster-form-derivation'
 import type { MonsterFormValues } from '../monster-form-values'
 import { normalizeMonsterFormValues } from '../normalize-monster-form-values'
+import {
+  MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL,
+  MONSTER_ACTION_ATTACK_PREVIEW_DAMAGE_LABEL,
+  MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL,
+  MONSTER_ACTION_ATTACK_PREVIEW_PROPERTIES_LABEL,
+  MONSTER_ACTION_ATTACK_PREVIEW_RANGE_LABEL,
+  MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL,
+} from '../monster-form-labels'
 
 function proficiencyBonus(challengeRating: unknown): number | undefined {
   if (typeof challengeRating !== 'string') return undefined
@@ -60,47 +74,120 @@ export function resolveMonsterFormActionAttackProfile(
   })
 }
 
-function sourceCaption(profile: MonsterActionAttackProfile): string {
-  const modes = profile.modes.map((mode) => getWeaponModeLabel(mode).toLowerCase()).join(' and ')
-  if (profile.sourceKind === 'weapon') {
-    return modes ? `Catalog ${modes} ${profile.sourceLabel}` : `Catalog ${profile.sourceLabel}`
-  }
-  if (profile.sourceKind === 'natural-weapon') {
-    return modes ? `Natural weapon, ${modes}` : 'Natural weapon'
-  }
-  return modes ? `Custom attack, ${modes}` : 'Custom attack'
+export type MonsterActionAttackPreviewRow = {
+  id: string
+  label: string
+  primary: string
+  secondary?: string
+}
+
+export type MonsterActionAttackPreview =
+  | { status: 'unavailable'; message: string }
+  | { status: 'ready'; modeCaption: string; rows: readonly MonsterActionAttackPreviewRow[] }
+
+function modeCaption(profile: MonsterActionAttackProfile): string {
+  return profile.modes.map((mode) => getWeaponModeLabel(mode)).join(' and ')
 }
 
 function rangeLabel(range: { normal: number; long?: number }): string {
   return range.long !== undefined ? `${range.normal}/${range.long} ft` : `${range.normal} ft`
 }
 
-export function describeMonsterActionAttackProfile(
+function governingAbilityModifier(
+  profile: MonsterActionAttackProfile,
+  abilityScores: Partial<Record<Ability, number>> | undefined,
+): number {
+  const score = abilityScores?.[profile.governingAbility] ?? NEUTRAL_ABILITY_SCORE
+  return abilityModifier(score)
+}
+
+function attackRowSecondary(
+  profile: MonsterActionAttackProfile,
+  abilityScores: Partial<Record<Ability, number>> | undefined,
+): string {
+  const abilityPart = `${getAbilityCompactLabel(profile.governingAbility)} ${formatSignedModifier(
+    governingAbilityModifier(profile, abilityScores),
+  )}`
+  if (profile.proficiencyContribution === 0) return abilityPart
+  return joinInlineMetadata([abilityPart, formatProficiencyBonus(profile.proficiencyContribution)])
+}
+
+function damageRowSecondary(roll: MonsterActionAttackRoll): string {
+  const typeLabel = getDamageTypeLabel(roll.damageTypeId)
+  if (!roll.expression) return typeLabel
+  return `(${roll.expression}) ${typeLabel}`
+}
+
+function damagePreviewRow(id: string, label: string, roll: MonsterActionAttackRoll) {
+  return {
+    id,
+    label,
+    primary: String(roll.average),
+    secondary: damageRowSecondary(roll),
+  }
+}
+
+export function buildMonsterActionAttackPreview(
   profile: DerivedField<MonsterActionAttackProfile>,
-): string[] {
+  abilityScores: Partial<Record<Ability, number>> | undefined,
+): MonsterActionAttackPreview {
   if (profile.status === 'unavailable') {
-    return [`Attack summary unavailable (${derivedFieldReasonLabel(profile.reason)})`]
+    return {
+      status: 'unavailable',
+      message: `Attack summary unavailable (${derivedFieldReasonLabel(profile.reason)})`,
+    }
   }
+
   const value = profile.value
-  const lines = [
-    sourceCaption(value),
-    `Attack ${formatSignedModifier(value.attackBonus)} (${getAbilityLabel(value.governingAbility)}, proficiency ${formatSignedModifier(value.proficiencyContribution)})`,
-    `Damage ${value.primary.average}${value.primary.expression ? ` (${value.primary.expression})` : ''} ${getDamageTypeLabel(value.primary.damageTypeId)}`,
+  const rows: MonsterActionAttackPreviewRow[] = [
+    {
+      id: 'attack',
+      label: MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL,
+      primary: formatSignedModifier(value.attackBonus),
+      secondary: attackRowSecondary(value, abilityScores),
+    },
+    damagePreviewRow('damage', MONSTER_ACTION_ATTACK_PREVIEW_DAMAGE_LABEL, value.primary),
   ]
-  for (const part of value.onHit) {
-    lines.push(
-      `On hit ${part.average} (${part.expression}) ${getDamageTypeLabel(part.damageTypeId)}`,
-    )
+
+  value.onHit.forEach((part, index) => {
+    rows.push(damagePreviewRow(`on-hit-${index}`, MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL, part))
+  })
+
+  if (value.reach !== undefined) {
+    rows.push({
+      id: 'reach',
+      label: MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL,
+      primary: `${value.reach} ft`,
+    })
   }
-  if (value.reach !== undefined) lines.push(`Reach ${value.reach} ft`)
-  if (value.range) lines.push(`Range ${rangeLabel(value.range)}`)
+
+  if (value.range) {
+    rows.push({
+      id: 'range',
+      label: MONSTER_ACTION_ATTACK_PREVIEW_RANGE_LABEL,
+      primary: rangeLabel(value.range),
+    })
+  }
+
   if (value.weaponProperties && value.weaponProperties.length > 0) {
-    lines.push(value.weaponProperties.map((id) => getWeaponPropertyLabel(id)).join(', '))
+    rows.push({
+      id: 'properties',
+      label: MONSTER_ACTION_ATTACK_PREVIEW_PROPERTIES_LABEL,
+      primary: value.weaponProperties.map((id) => getWeaponPropertyLabel(id)).join(', '),
+    })
   }
+
   for (const capability of value.unresolvedCapabilities) {
-    lines.push(
-      `${getWeaponPropertyLabel(capability.id)} unavailable (${derivedFieldReasonLabel(capability.reason)})`,
-    )
+    rows.push({
+      id: `capability-${capability.id}`,
+      label: getWeaponPropertyLabel(capability.id),
+      primary: `Unavailable (${derivedFieldReasonLabel(capability.reason)})`,
+    })
   }
-  return lines
+
+  return {
+    status: 'ready',
+    modeCaption: modeCaption(value),
+    rows,
+  }
 }

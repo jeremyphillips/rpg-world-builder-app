@@ -7,6 +7,7 @@ import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
 } from '../../lib/monster-form-values'
+import { MonsterActionAttackSummary } from './monster-action-attack-summary'
 
 const bite: MonsterActionDraftRow = {
   id: 'bite',
@@ -16,7 +17,6 @@ const bite: MonsterActionDraftRow = {
   damageType: 'piercing',
   damage: { dice: { count: 1, faces: 8 } },
 }
-import { MonsterActionAttackSummary } from './monster-action-attack-summary'
 
 const meta = {
   title: 'Dashboard/Content/Monsters/MonsterActionAttackSummary',

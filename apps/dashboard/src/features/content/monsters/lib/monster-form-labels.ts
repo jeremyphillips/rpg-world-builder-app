@@ -105,6 +105,13 @@ export const MONSTER_NATURAL_WEAPON_DAMAGE_HINT = 'Ability modifiers are applied
 export const MONSTER_ON_HIT_LEGEND = 'On hit'
 export const MONSTER_ON_HIT_HINT =
   'Additional damage dealt when this attack hits, beyond its primary damage.'
+export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
+export const MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL = 'Attack'
+export const MONSTER_ACTION_ATTACK_PREVIEW_DAMAGE_LABEL = 'Damage'
+export const MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL = 'Extra'
+export const MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL = 'Reach'
+export const MONSTER_ACTION_ATTACK_PREVIEW_RANGE_LABEL = 'Range'
+export const MONSTER_ACTION_ATTACK_PREVIEW_PROPERTIES_LABEL = 'Properties'
 export const MONSTER_DAMAGE_TYPE_CHANGE_LABEL = 'Change'
 export const MONSTER_REMOVE_LABEL = 'Remove'
 export const MONSTER_CANCEL_LABEL = 'Cancel'
