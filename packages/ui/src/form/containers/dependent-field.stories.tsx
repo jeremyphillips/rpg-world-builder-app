@@ -247,7 +247,6 @@ export const DependentFieldArrayItemsScope: Story = {
               {
                 kind: 'array',
                 name: 'caps',
-                legend: '',
                 addAction: { label: 'Add class limit' },
                 fields: [
                   { type: 'text', name: 'classId', label: 'Class' },

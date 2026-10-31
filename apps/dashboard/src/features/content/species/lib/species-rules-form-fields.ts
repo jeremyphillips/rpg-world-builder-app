@@ -226,7 +226,6 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
           {
             kind: 'array',
             name: 'classLevelCaps',
-            legend: '',
             addAction: { label: `Add ${getContentTypeMidSentenceLabel('classes')} limit` },
             item: {
               collapsible: true,

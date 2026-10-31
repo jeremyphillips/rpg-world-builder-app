@@ -32,7 +32,7 @@
       "defineArrayField({",
       "  kind: 'array',",
       "  name: '${1:fieldName}',",
-      "  legend: '${2:Section title}',",
+      "  label: '${2:Section title}',",
       "  addActionLabel: '${3:Add item}',",
       "  item: { surface: { emphasis: '${4|subtle,default,strong|}' } },",
       "  min: ${5:0},",

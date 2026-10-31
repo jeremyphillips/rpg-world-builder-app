@@ -290,7 +290,7 @@ export function buildTicketDetailTabs(options: {
         {
           kind: 'array',
           name: 'codeRefs',
-          legend: 'Code references',
+          label: 'Code references',
           addAction: { label: 'Add code reference' },
           item: {
             header: {
@@ -321,7 +321,7 @@ export function buildTicketDetailTabs(options: {
         {
           kind: 'array',
           name: 'acceptanceCriteria',
-          legend: 'Acceptance criteria',
+          label: 'Acceptance criteria',
           addAction: { label: 'Add criterion' },
           item: {
             header: {

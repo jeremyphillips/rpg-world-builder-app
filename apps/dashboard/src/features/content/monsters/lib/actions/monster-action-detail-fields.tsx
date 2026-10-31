@@ -259,7 +259,7 @@ export function monsterActionDetailFields(input: {
       {
         kind: 'array',
         name: 'spells',
-        legend: getContentTypeTerm('spells').label,
+        label: getContentTypeTerm('spells').label,
         addAction: { label: 'Add spell' },
         item: { header: { fallback: (index) => `Spell ${index + 1}` } },
         fields: [

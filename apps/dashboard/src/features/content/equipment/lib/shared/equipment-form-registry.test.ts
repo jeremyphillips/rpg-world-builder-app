@@ -27,7 +27,7 @@ describe('kindFieldGroups', () => {
     expect(groups?.[1]).toMatchObject({
       kind: 'array',
       name: 'utilizes',
-      legend: 'Utilize actions',
+      label: 'Utilize actions',
     })
   })
 

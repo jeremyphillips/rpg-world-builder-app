@@ -47,7 +47,7 @@ export function buildSkillProficiencyFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'group',
-      legend: 'Mechanics',
+      label: 'Mechanics',
       fields: [
         {
           type: 'chips',
@@ -61,7 +61,7 @@ export function buildSkillProficiencyFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'array',
           name: 'examples',
-          legend: 'Examples',
+          label: 'Examples',
           addAction: { label: 'Add example', layout: 'inline', size: 'sm' },
           min: 1,
           density: 'comfortable',

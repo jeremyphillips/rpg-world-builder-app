@@ -64,14 +64,9 @@ import type {
 } from '../components/ui/field.variants'
 import type { FieldLayoutRecommendation } from '../components/ui/field-recommendation.types'
 import type { FormDensity } from './form-density'
-import type { FieldLabelVisibility, FormHeading, FormHeadingContent } from './form-heading.lib'
+import type { FieldLabelVisibility, FormHeading } from './form-heading.lib'
 
-export type {
-  FieldLabelVisibility,
-  FormHeading,
-  FormHeadingContent,
-  FormHeadingTier,
-} from './form-heading.lib'
+export type { FieldLabelVisibility, FormHeading, FormHeadingTier } from './form-heading.lib'
 export {
   DEFAULT_FORM_COLUMNS_COLLAPSE_ORDER,
   columnsNeedBreakpointReorder,
@@ -1529,7 +1524,7 @@ export type ArrayCanAppendResult = {
  * defineArrayField({
  *   kind: 'array',
  *   name: 'traits',
- *   legend: 'Traits',
+ *   label: 'Traits',
  *   addAction: { label: 'Add trait' },
  *   item: {
  *     header: { fallback: (i) => `Trait ${i + 1}`, primaryField: 'name' },
@@ -1537,13 +1532,9 @@ export type ArrayCanAppendResult = {
  *   fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
  * })
  */
-export interface ArrayConfig {
+interface ArrayConfigCore {
   kind: 'array'
   name: string
-  /** Preferred heading API — typography derives from nesting depth and density. */
-  heading?: FormHeadingContent
-  /** Required when `heading.label` is omitted — see `resolveArrayHeading`. */
-  legend?: string
   /**
    * Section density for this array subtree. Defaults to `compact` when omitted.
    */
@@ -1574,6 +1565,22 @@ export interface ArrayConfig {
   fieldChrome?: FieldChrome
   errorPlacement?: 'auto' | 'field' | 'row'
 }
+
+/** Anonymous repeatable list — omit `label`, `hint`, and `labelVisibility`. */
+type AnonymousArrayConfig = ArrayConfigCore & {
+  label?: never
+  hint?: never
+  labelVisibility?: never
+}
+
+/** Named repeatable list — `hint` and `labelVisibility` require a non-whitespace `label`. */
+type NamedArrayConfig = ArrayConfigCore & {
+  label: string
+  hint?: string | FieldHintConfig
+  labelVisibility?: FieldLabelVisibility
+}
+
+export type ArrayConfig = AnonymousArrayConfig | NamedArrayConfig
 
 /**
  * Custom field region rendered inside `FormProvider`. The slot `name` aligns with

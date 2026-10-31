@@ -13,6 +13,7 @@ import {
   fieldGroupLegendHeaderMarginVariants,
   resolveFieldGroupBodyGap,
   fieldStackRhythmVariants,
+  resolveArrayLegendSpacingClassName,
   resolveArrayLegendClassName,
   resolveArrayLegendScale,
   resolveFieldGroupInsetPaddingClasses,
@@ -110,14 +111,18 @@ describe('resolveArrayLegendScale', () => {
 })
 
 describe('field group legend helpers', () => {
-  it('applies sm array legend typography via resolveArrayLegendClassName', () => {
-    expect(resolveArrayLegendClassName('sm')).toContain('text-style-field-label-sm')
-    expect(resolveArrayLegendClassName('sm')).toContain('mb-1')
+  it('applies sm array legend spacing via resolveArrayLegendSpacingClassName', () => {
+    expect(resolveArrayLegendSpacingClassName('sm')).toBe('mb-1')
+    expect(resolveArrayLegendSpacingClassName('sm')).not.toContain('text-style-field-label-sm')
   })
 
-  it('applies md array legend typography via resolveArrayLegendClassName', () => {
-    expect(resolveArrayLegendClassName('md')).toContain('text-style-field-label-md')
-    expect(resolveArrayLegendClassName('md')).toContain('mb-1.5')
+  it('applies md array legend spacing via resolveArrayLegendSpacingClassName', () => {
+    expect(resolveArrayLegendSpacingClassName('md')).toBe('mb-1.5')
+    expect(resolveArrayLegendSpacingClassName('md')).not.toContain('text-style-field-label-md')
+  })
+
+  it('keeps resolveArrayLegendClassName as a spacing alias', () => {
+    expect(resolveArrayLegendClassName('md')).toBe(resolveArrayLegendSpacingClassName('md'))
   })
 
   it('applies legend header margins by size', () => {

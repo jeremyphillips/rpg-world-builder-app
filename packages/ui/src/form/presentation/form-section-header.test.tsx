@@ -47,6 +47,6 @@ describe('FormSectionHeader', () => {
 
     const label = screen.getByText('Columns')
     expect(label.parentElement).toHaveClass('text-style-field-label-md')
-    expect(screen.getByText('Add the columns for this table.')).toHaveClass('text-style-supporting')
+    expect(screen.getByText('Add the columns for this table.')).toHaveClass('text-style-caption')
   })
 })

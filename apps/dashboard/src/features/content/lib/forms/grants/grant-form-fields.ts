@@ -702,10 +702,8 @@ export function grantArrayFields<T extends string>(
     {
       kind: 'array',
       name: 'grants',
-      heading: {
-        label: 'Grants',
-        hint: 'Add the mechanical effects this feature provides.',
-      },
+      label: 'Grants',
+      hint: 'Add the mechanical effects this feature provides.',
       addAction: {
         label: 'Add grant',
         layout: 'inline',

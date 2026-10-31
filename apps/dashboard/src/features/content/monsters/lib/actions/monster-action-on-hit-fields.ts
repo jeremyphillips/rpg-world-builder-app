@@ -77,11 +77,8 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'array',
     name: 'onHit.additionalDamage',
-    legend: MONSTER_ON_HIT_LEGEND,
-    heading: {
-      label: MONSTER_ON_HIT_LEGEND,
-      hint: MONSTER_ON_HIT_HINT,
-    },
+    label: MONSTER_ON_HIT_LEGEND,
+    hint: MONSTER_ON_HIT_HINT,
     addAction: { label: 'Add damage' },
     item: { header: { fallback: (index) => `Damage ${index + 1}` } },
     fields: [

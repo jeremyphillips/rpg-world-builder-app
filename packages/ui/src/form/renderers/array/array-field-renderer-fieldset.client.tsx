@@ -11,7 +11,7 @@ import type { ArrayConfig } from '../../field-config'
 import { ArrayFieldAddControl } from './array-field-add-control.client'
 import { ArrayFieldContainerError } from './array-field-container-error.client'
 import { ArrayFieldEmptyState } from './array-field-empty-state.client'
-import { ArrayFieldLegend } from './array-field-legend.client'
+import { ArrayFieldSectionHeader } from './array-field-legend.client'
 import { ArrayFieldItemList } from './array-field-item-list.client'
 import type { ArrayFieldSectionLayout } from './array-field-renderer.client'
 import type { useArrayFieldRendererState } from './use-array-field-renderer-state.client'
@@ -53,7 +53,7 @@ export function ArrayFieldRendererFieldset({
   fields,
   onMove,
 }: ArrayFieldRendererFieldsetProps) {
-  const inlineAddInLegend = state.addActionLayout === 'inline' && state.showLegend
+  const inlineAddInHeader = state.addActionLayout === 'inline' && state.showSectionHeader
   const containerErrorId = `${state.idPrefix}-${state.fullName.replaceAll('.', '-')}-error`
 
   const addControl = (
@@ -84,10 +84,11 @@ export function ArrayFieldRendererFieldset({
       aria-describedby={state.hasContainerIssue ? containerErrorId : undefined}
       aria-invalid={state.hasContainerIssue ? true : undefined}
     >
-      {state.showLegend ? (
-        <ArrayFieldLegend
-          legend={state.legend}
-          headingHint={state.headingHint}
+      {state.showSectionHeader || state.labelMode === 'srOnly' ? (
+        <ArrayFieldSectionHeader
+          labelMode={state.labelMode}
+          sectionLabel={state.sectionLabel}
+          hint={state.sectionHint}
           legendFieldSize={state.legendFieldSize}
           addActionLayout={state.addActionLayout}
           required={state.required}
@@ -95,7 +96,7 @@ export function ArrayFieldRendererFieldset({
           invalidRowCount={state.invalidRowCount}
           hasContainerIssue={state.hasContainerIssue}
           onFocusFirstArrayIssue={state.focusFirstArrayIssue}
-          addControl={inlineAddInLegend ? addControl : undefined}
+          addControl={inlineAddInHeader ? addControl : undefined}
         />
       ) : null}
       <div className={state.itemListClasses}>
@@ -126,7 +127,7 @@ export function ArrayFieldRendererFieldset({
             ) : null}
           </>
         )}
-        {!inlineAddInLegend ? (
+        {!inlineAddInHeader ? (
           <div className={state.addActionLayout === 'stacked' ? 'mt-4' : undefined}>
             {addControl}
           </div>

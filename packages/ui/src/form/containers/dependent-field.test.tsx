@@ -363,7 +363,6 @@ describe('dependent field', () => {
             {
               kind: 'array',
               name: 'items',
-              legend: '',
               addAction: { label: 'Add item' },
               fields: [{ type: 'text', name: 'label', label: 'Label' }],
             },

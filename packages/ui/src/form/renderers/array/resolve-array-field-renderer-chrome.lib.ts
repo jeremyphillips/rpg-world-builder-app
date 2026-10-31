@@ -3,6 +3,12 @@ import {
   fieldStackRhythmVariants,
 } from '../../../components/ui/field.variants'
 import { assertArrayItemConfig } from '../../config/array/assert-array-item-config.lib'
+import { assertArrayLabelConfig } from '../../config/array/assert-array-label-config.lib'
+import {
+  resolveArrayLabel,
+  resolveArrayLabelMode,
+  resolveArraySectionLabelForDisplay,
+} from '../../config/array/resolve-array-label.lib'
 import {
   isNestedArraySection,
   resolveArrayAddAction,
@@ -14,7 +20,6 @@ import { resolveArrayItemPresentation } from '../../config/array/array-item-pres
 import type { ArrayConfig } from '../../field-config'
 import { resolveFormDensity } from '../../form-density'
 import { resolveArrayEmptyItemLabel } from './array-field-empty-state.lib'
-import { resolveArrayHeading } from '../../resolve-container-heading.lib'
 
 type ResolveArrayFieldRendererChromeInput = {
   config: ArrayConfig
@@ -52,9 +57,11 @@ export function resolveArrayFieldRendererChrome({
     variant: 'outline' as const,
     layout: 'stacked' as const,
   }
-  const arrayHeading = resolveArrayHeading(config)
-  const legend = arrayHeading?.label ?? config.legend ?? ''
-  const headingHint = arrayHeading?.hint
+  const resolvedLabel = resolveArrayLabel(config)
+  const itemLegend = resolvedLabel?.label ?? ''
+  const sectionLabel = resolvedLabel?.label ?? resolveArraySectionLabelForDisplay(config)
+  const sectionHint = resolvedLabel?.hint
+  const labelMode = resolveArrayLabelMode(config)
   const { min = 0, max } = config
   const itemCollapsible = itemConfig.collapsible
   const itemCollapseKey = itemConfig.collapseKey
@@ -64,14 +71,15 @@ export function resolveArrayFieldRendererChrome({
   const variant = resolveArrayItemVariant(config, { nested })
   const reorder = resolveArrayItemReorder(config)
   const reorderConfigured = reorder === 'dragHandle'
-  assertArrayItemConfig(config, legend)
+  assertArrayLabelConfig(config)
+  assertArrayItemConfig(config, sectionLabel)
   const collapsible = itemCollapsible
   const presentation = resolveArrayItemPresentation({
     config,
     variant,
     reorder,
     fieldsLength,
-    legend,
+    legend: itemLegend,
     collapsible,
   })
   const itemListClasses = fieldArrayItemListClasses(
@@ -95,8 +103,10 @@ export function resolveArrayFieldRendererChrome({
     itemConfig,
     itemListClasses,
     itemBodyStackClasses,
-    legend,
-    headingHint,
+    itemLegend,
+    sectionLabel,
+    sectionHint,
+    labelMode,
     legendFieldSize,
     max,
     min,

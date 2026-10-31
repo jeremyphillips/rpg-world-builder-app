@@ -229,9 +229,19 @@ export const fieldArrayLegendSpacingVariants = cva('', {
   },
 })
 
-/** Typography + spacing for array section `<legend>` — SSOT with leaf field labels. */
+/** Legend-to-list spacing — mirrors {@link fieldAnatomyStackVariants} label→control gap. */
+export function resolveArrayLegendSpacingClassName(size: FieldSizeToken = 'md'): string {
+  return fieldArrayLegendSpacingVariants({ size })
+}
+
+/**
+ * Spacing below an array section header band — label typography lives on the label line only
+ * ({@link fieldLabelVariants}), not on the `<legend>` wrapper.
+ *
+ * @deprecated Prefer {@link resolveArrayLegendSpacingClassName}. Typography is no longer composed here.
+ */
 export function resolveArrayLegendClassName(size: FieldSizeToken = 'md'): string {
-  return cn(fieldLabelTypographyVariants({ size }), fieldArrayLegendSpacingVariants({ size }))
+  return resolveArrayLegendSpacingClassName(size)
 }
 
 /**
@@ -694,7 +704,11 @@ export function resolveFieldGroupLegendClassName(
   const size = options.size ?? 'section'
   const rhythm = options.rhythm ?? 'comfortable'
   if (size === 'array') {
-    return resolveArrayLegendClassName(options.fieldSize ?? 'sm')
+    const fieldSize = options.fieldSize ?? 'sm'
+    return cn(
+      fieldLabelTypographyVariants({ size: fieldSize }),
+      fieldArrayLegendSpacingVariants({ size: fieldSize }),
+    )
   }
   return cn(
     fieldGroupLegendVariants({ size, scale: options.scale, rhythm }),

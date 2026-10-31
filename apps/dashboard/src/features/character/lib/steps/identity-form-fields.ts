@@ -48,7 +48,7 @@ const GENDER_LABELS = Object.fromEntries(
 
 function narrativeArrayField(
   name: 'personalityTraits' | 'ideals' | 'bonds' | 'flaws',
-  legend: string,
+  label: string,
   placeholder: string,
   addActionLabel: string,
   hideItemLabel: boolean = true,
@@ -56,14 +56,14 @@ function narrativeArrayField(
   return {
     kind: 'array',
     name: `narrative.${name}`,
-    legend,
+    label,
     min: 1,
     density: 'comfortable',
     fields: [
       {
         type: 'text',
         name: 'value',
-        label: hideItemLabel ? '' : legend,
+        label: hideItemLabel ? '' : label,
         placeholder,
         width: 'full',
       },
@@ -73,7 +73,7 @@ function narrativeArrayField(
       headerVisibility: 'hidden',
       surface: CANVAS_SURFACE,
       header: {
-        fallback: (index) => `${legend} ${index + 1}`,
+        fallback: (index) => `${label} ${index + 1}`,
       },
     },
     addAction: {
@@ -145,7 +145,7 @@ export function buildIdentityStepFormFields({
     },
     {
       kind: 'group',
-      legend: 'Narrative',
+      label: 'Narrative',
       fieldChrome: { variant: 'none' },
       fields: [
         {

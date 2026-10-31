@@ -2,7 +2,10 @@ import type { FormItem } from '../field-config'
 import { resolveColumnsCollapseSequence } from './form-columns-collapse.lib'
 import { arrayItemLabel } from './array/array-item-label.lib'
 import { resolveArrayItemHeader } from './array/array-item-config.lib'
-import { resolveArrayHeading } from '../resolve-container-heading.lib'
+import {
+  resolveArrayLabel,
+  resolveArraySectionLabelForDisplay,
+} from './array/resolve-array-label.lib'
 import type { RegistryEntry } from './field-error-map-register.lib'
 import { registerFieldPaths } from './field-error-map-register.lib'
 import { fieldCategory } from './field-error-map-category.lib'
@@ -23,7 +26,7 @@ function registerArrayItem(
   registerItems: (registry: Map<string, RegistryEntry>, prefix: string, items: FormItem[]) => void,
 ): void {
   const arrayKey = prefix ? `${prefix}.${item.name}` : item.name
-  const arrayLabel = resolveArrayHeading(item)?.label ?? item.legend ?? item.name
+  const arrayLabel = resolveArrayLabel(item)?.label ?? resolveArraySectionLabelForDisplay(item)
   const header = resolveArrayItemHeader(item, arrayLabel)
   registry.set(arrayKey, {
     label: arrayLabel,

@@ -499,7 +499,7 @@ pick compact but disclosure chrome is still required without `itemCollapsible`.
 
 **Legend scale:** Array legend typography inherits parent section density unless the array
 sets `density` explicitly; item bodies still default to `compact`. Prefer `heading.label`
-when authoring new arrays; `legend` remains supported via `resolveArrayHeading`.
+when authoring new arrays. Anonymous arrays omit `label`.
 
 ### Collapse defaults and persistence
 

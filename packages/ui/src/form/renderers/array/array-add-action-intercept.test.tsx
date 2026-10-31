@@ -15,7 +15,7 @@ const fields: FormItem[] = [
   {
     kind: 'array',
     name: 'items',
-    heading: { label: 'Items' },
+    label: 'Items',
     addAction: {
       label: 'Add item',
       layout: 'inline',

@@ -1,4 +1,4 @@
-import type { ArrayConfig, GroupConfig, RowConfig, SlotConfig } from './field-config'
+import type { GroupConfig, RowConfig, SlotConfig } from './field-config'
 import type { FormHeading } from './form-heading.lib'
 import { isNonWhitespaceLabel } from './form-heading.lib'
 
@@ -27,17 +27,4 @@ export function resolveSlotHeading(config: SlotConfig): FormHeading | undefined 
 /** Resolves a row composite heading. */
 export function resolveRowHeading(item: RowConfig): FormHeading | undefined {
   return item.heading
-}
-
-/** Resolves an array heading from new or deprecated props. */
-export function resolveArrayHeading(config: ArrayConfig): FormHeading | undefined {
-  if (config.heading) return config.heading
-  if (isNonWhitespaceLabel(config.legend)) {
-    return { label: config.legend }
-  }
-  return undefined
-}
-
-export function hasNamedArrayHeading(config: ArrayConfig): boolean {
-  return resolveArrayHeading(config) !== undefined
 }

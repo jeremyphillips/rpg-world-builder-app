@@ -11,7 +11,7 @@ export function effectArrayFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'array',
       name: 'effects',
-      legend: 'Effects',
+      label: 'Effects',
       addAction: {
         label: 'Add effect',
         menu: buildEffectArrayAddMenu(),

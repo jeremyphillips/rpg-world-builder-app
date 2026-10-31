@@ -31,7 +31,7 @@ const rulesTab: TabValidationTab = {
     { type: 'number', name: 'level', label: 'Level', required: true },
     {
       kind: 'group',
-      legend: 'Class',
+      label: 'Class',
       fields: [{ type: 'text', name: 'class', label: 'Class', required: true }],
     },
   ],
@@ -43,7 +43,7 @@ const grantsTab: TabValidationTab = {
     {
       kind: 'array',
       name: 'grants',
-      legend: 'Grants',
+      label: 'Grants',
       fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
     },
   ],

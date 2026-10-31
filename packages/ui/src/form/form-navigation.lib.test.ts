@@ -44,7 +44,7 @@ describe('collectFormNavigationAnchors', () => {
       {
         kind: 'array',
         name: 'items',
-        legend: 'Items',
+        label: 'Items',
         fields: [{ type: 'text', name: 'label', label: 'Label' }],
       },
       {

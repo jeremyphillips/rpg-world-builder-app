@@ -43,7 +43,7 @@ export function buildSubclassFields(
     {
       kind: 'array',
       name: 'features',
-      legend: 'Features',
+      label: 'Features',
       addAction: { label: 'Add feature' },
       item: {
         collapsible: true,

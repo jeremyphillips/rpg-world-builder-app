@@ -74,8 +74,10 @@ export function useArrayFieldRendererState({
     itemConfig,
     itemListClasses,
     itemBodyStackClasses,
-    legend,
-    headingHint,
+    itemLegend,
+    sectionLabel,
+    sectionHint,
+    labelMode,
     legendFieldSize,
     max,
     nested,
@@ -152,7 +154,7 @@ export function useArrayFieldRendererState({
       fullName,
       index,
       itemId: resolveFieldArrayRowKey(rhfField, config.keyName),
-      legend,
+      legend: itemLegend,
       itemBodyStackClasses,
       canRemove,
       showDefaultItemRemove,
@@ -176,7 +178,7 @@ export function useArrayFieldRendererState({
       fullName,
       idPrefix,
       itemBodyStackClasses,
-      legend,
+      sectionLabel,
       remove,
       reorderConfigured,
       toggleCollapse,
@@ -212,12 +214,19 @@ export function useArrayFieldRendererState({
     invalidRowCount,
     itemListClasses,
     itemProps,
-    legend,
-    headingHint,
+    sectionLabel,
+    sectionHint,
+    labelMode,
     legendFieldSize,
     nested,
     omitSectionBottomMargin,
-    showLegend: legend.trim().length > 0,
+    showSectionHeader:
+      labelMode === 'visible' ||
+      Boolean(sectionHint) ||
+      (addActionLayout === 'inline' && addAction !== null) ||
+      arrayIssueCount > 0 ||
+      hasContainerIssue ||
+      resolveArrayRequiredMarker(config),
     sortableEnabled,
   }
 }

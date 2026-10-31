@@ -77,6 +77,17 @@ defineArrayField({
 })
 ```
 
+## `label` / `hint` presentation
+
+Array section headers use the same **leaf field label line** (`fieldLabelVariants`) and
+**below-label hint** (`Text variant="caption"`) as scalar fields. The fieldset
+`<legend>` is in-flow (`fieldSetInFlowLegendClasses`) so label weight does not cascade
+into hints or inline add controls. Section/subsection legend scale belongs on named
+**groups**, not on `kind: 'array'`.
+
+Author with `label`, optional `hint`, and optional `labelVisibility` — see
+[heading-hierarchy.md](./heading-hierarchy.md).
+
 ## `itemVariant` / `item.surface` / `itemCollapsible`
 
 | Goal                                              | `itemVariant`       | `item.surface` / `item.tone`                           | `itemCollapsible`     |

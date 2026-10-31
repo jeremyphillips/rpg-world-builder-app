@@ -6,7 +6,7 @@ import { resolveArrayFieldRendererChrome } from './resolve-array-field-renderer-
 const nestedGrantArray = {
   kind: 'array' as const,
   name: 'grants',
-  legend: 'Grants',
+  label: 'Grants',
   item: {
     collapsible: true,
     renderShell: (_props: ArrayItemShellRenderProps) => null,
@@ -36,7 +36,7 @@ describe('resolveArrayFieldRendererChrome', () => {
       config: {
         kind: 'array',
         name: 'examples',
-        legend: 'Examples',
+        label: 'Examples',
         item: { collapsible: true, variant: 'compact' },
         fields: [{ type: 'text', name: 'value', label: 'Value' }],
       },
@@ -68,7 +68,7 @@ describe('resolveArrayFieldRendererChrome', () => {
       config: {
         kind: 'array',
         name: 'tags',
-        legend: 'Tags',
+        label: 'Tags',
         fields: [{ type: 'text', name: 'label', label: 'Label' }],
       },
       density: 'comfortable',

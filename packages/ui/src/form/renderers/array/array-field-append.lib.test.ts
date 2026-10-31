@@ -63,7 +63,7 @@ describe('array-field-append.lib', () => {
     const config = {
       kind: 'array',
       name: 'items',
-      legend: 'Items',
+      label: 'Items',
       fields: [],
       appendDefaults: () => ({ kind: 'custom' }),
     } satisfies ArrayConfig
@@ -80,7 +80,7 @@ describe('array-field-append.lib', () => {
     const config = {
       kind: 'array',
       name: 'items',
-      legend: 'Items',
+      label: 'Items',
       fields: [],
     } satisfies ArrayConfig
     expect(resolveArrayAppendDefaults(config, { kind: 'default' }, [])).toEqual({ kind: 'default' })

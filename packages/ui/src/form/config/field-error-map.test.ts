@@ -18,13 +18,13 @@ const testFields: FormItem[] = [
   { type: 'chips', name: 'category', label: 'Category', options: [], multiple: false },
   {
     kind: 'group',
-    legend: 'Details',
+    label: 'Details',
     fields: [{ type: 'textarea', name: 'description', label: 'Description' }],
   },
   {
     kind: 'array',
     name: 'tiers',
-    legend: 'Wealth tiers',
+    label: 'Wealth tiers',
     fields: [
       { type: 'text', name: 'label', label: 'Tier label', required: true },
       { type: 'levelRange', name: 'minLevel', label: 'Level range', options: [] },
@@ -217,7 +217,7 @@ describe('makeFieldErrorMap', () => {
       {
         kind: 'array',
         name: 'tiers',
-        legend: 'Wealth tiers',
+        label: 'Wealth tiers',
         fields: [{ type: 'text', name: 'label', label: 'Label' }],
       },
     ]

@@ -3,14 +3,17 @@
 import type { ReactNode } from 'react'
 
 import { FieldLabelContent } from '../../components/ui/field-label-content'
-import { shouldShowVisibleRequiredMarker } from '../../components/ui/field-required.lib'
 import type { FieldSize } from '../../components/ui/field.client'
-import { fieldLabelHintStackClasses, fieldLabelVariants } from '../../components/ui/field.variants'
+import { fieldLabelVariants } from '../../components/ui/field.variants'
 import { Text } from '../../components/ui/text'
 import { cn } from '../../lib/utils'
 import type { FieldHintConfig } from '../field-config'
 import { normalizeFieldHint } from '../field-config'
 import type { FormHeadingTier } from '../form-heading.lib'
+import {
+  LeafFieldLabelHintCluster,
+  renderLeafFieldHint,
+} from './leaf-field-label-hint-cluster.client'
 import {
   formSectionHeaderActionSlotClasses,
   formSectionHeaderHeadingStackClasses,
@@ -28,7 +31,7 @@ export interface FormSectionHeaderProps {
   /** Leaf control scale when `tier` is `leaf`. */
   size?: FieldSize
   /**
-   * `field-label` — array legends where outer `<legend>` owns label typography.
+   * `field-label` — leaf field label scale on the label line; outer legend uses in-flow classes.
    * `heading` — standalone section headers.
    */
   labelPresentation?: FormSectionHeaderLabelPresentation
@@ -36,15 +39,10 @@ export interface FormSectionHeaderProps {
   /** Required markers, issue links, and similar accessories on the label line. */
   labelAccessory?: ReactNode
   required?: boolean
+  /** When false, omit the visible label line (field-label presentation only). Hint and accessories remain. */
+  showVisibleLabel?: boolean
   className?: string
   id?: string
-}
-
-function renderFieldLabelHint(hint: string | FieldHintConfig | undefined): ReactNode {
-  if (!hint) return null
-  const normalized = normalizeFieldHint(hint)
-  if (!normalized.text) return null
-  return <Text variant="supporting">{normalized.text}</Text>
 }
 
 function renderSectionHint(
@@ -55,7 +53,7 @@ function renderSectionHint(
   const normalized = normalizeFieldHint(hint)
   if (!normalized.text) return null
   if (tier === 'leaf') {
-    return <Text variant="supporting">{normalized.text}</Text>
+    return renderLeafFieldHint(hint)
   }
   return (
     <Text as="span" variant="supporting">
@@ -106,45 +104,30 @@ function renderHeadingBlock({
   labelAccessory,
   required,
   id,
+  showVisibleLabel = true,
 }: Pick<
   FormSectionHeaderProps,
-  'label' | 'hint' | 'tier' | 'size' | 'labelPresentation' | 'labelAccessory' | 'required' | 'id'
+  | 'label'
+  | 'hint'
+  | 'tier'
+  | 'size'
+  | 'labelPresentation'
+  | 'labelAccessory'
+  | 'required'
+  | 'id'
+  | 'showVisibleLabel'
 >): ReactNode {
   if (labelPresentation === 'field-label') {
-    const hintNode = renderFieldLabelHint(hint)
-    const labelLine = (
-      <div className={formSectionHeaderLabelRowClasses}>
-        <span className={fieldLabelVariants({ size: size ?? 'md' })}>
-          <FieldLabelContent
-            label={label}
-            required={required}
-            showRequiredMarker={shouldShowVisibleRequiredMarker(required ?? false, 'visible')}
-          />
-        </span>
-        {labelAccessory}
-      </div>
-    )
-
-    if (hintNode) {
-      return (
-        <div id={id} className={fieldLabelHintStackClasses}>
-          {labelLine}
-          {hintNode}
-        </div>
-      )
-    }
-
     return (
-      <div id={id} className={formSectionHeaderLabelRowClasses}>
-        <span className={fieldLabelVariants({ size: size ?? 'md' })}>
-          <FieldLabelContent
-            label={label}
-            required={required}
-            showRequiredMarker={shouldShowVisibleRequiredMarker(required ?? false, 'visible')}
-          />
-        </span>
-        {labelAccessory}
-      </div>
+      <LeafFieldLabelHintCluster
+        label={label}
+        hint={hint}
+        size={size ?? 'md'}
+        required={required}
+        labelAccessory={labelAccessory}
+        showVisibleLabel={showVisibleLabel}
+        id={id}
+      />
     )
   }
 
@@ -186,6 +169,7 @@ export function FormSectionHeader({
   required,
   className,
   id,
+  showVisibleLabel,
 }: FormSectionHeaderProps) {
   const headingBlock = renderHeadingBlock({
     label,
@@ -196,6 +180,7 @@ export function FormSectionHeader({
     labelAccessory,
     required,
     id,
+    showVisibleLabel,
   })
 
   if (!action) {

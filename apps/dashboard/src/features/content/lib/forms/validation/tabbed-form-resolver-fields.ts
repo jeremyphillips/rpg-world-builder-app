@@ -74,13 +74,13 @@ function prefixFormItem(item: FormItem, prefix: string): FormItem {
 /** Resolver-only array field config for master-detail tabs. */
 export function embeddedArrayResolverField(
   name: string,
-  legend: string,
+  label: string,
   itemFields: readonly FormItem[],
 ): FormItem {
   return {
     kind: 'array',
     name,
-    legend,
+    label,
     fields: [...itemFields],
   }
 }

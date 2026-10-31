@@ -3,6 +3,8 @@ import { Icon } from '../../components/ui/icon/icon'
 
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from '../../components/ui/button.client'
+import { FormField } from '../../components/ui/form-field'
+import { Input } from '../../components/ui/input.client'
 import { ArrayLegendIssueLink } from '../renderers/array/array-item-issue.client'
 import { ArrayLikeSectionHeader } from './array-like-section-header.client'
 
@@ -75,4 +77,32 @@ export const StandaloneSection: Story = {
       </section>
     ),
   ],
+}
+
+/** Visual parity check — array legend header vs an equivalent leaf field label + hint. */
+export const LeafFieldTypographyParity: Story = {
+  args: {
+    label: 'Grants',
+    hint: 'Add the mechanical effects this feature provides.',
+    size: 'md',
+  },
+  render: () => (
+    <div className="grid max-w-xl gap-8 md:grid-cols-2">
+      <fieldset className="border-0 p-0">
+        <ArrayLikeSectionHeader
+          label="Grants"
+          hint="Add the mechanical effects this feature provides."
+          size="md"
+        />
+      </fieldset>
+      <FormField
+        id="grants-parity"
+        label="Grants"
+        hint="Add the mechanical effects this feature provides."
+        size="md"
+      >
+        <Input id="grants-parity" readOnly value="" aria-hidden />
+      </FormField>
+    </div>
+  ),
 }
