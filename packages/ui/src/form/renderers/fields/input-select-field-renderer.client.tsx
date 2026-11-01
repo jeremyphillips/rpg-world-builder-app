@@ -8,6 +8,7 @@ import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import { resolveValueDigitsFromConfig } from '../../config/input-field-value-digits.lib'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import { fieldDefaultValue, type InputSelectFieldConfig } from '../../field-config'
+import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 import { useFieldControlSize } from '../../context/form-section.context'
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -100,6 +101,7 @@ export function InputSelectFieldRenderer({
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={resolveFieldLabelVisibility(config)}
       inputType={config.inputType}
       options={config.options ?? []}
       searchable={config.searchable}

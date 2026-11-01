@@ -11,6 +11,7 @@ import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { RollValueFieldPatchResult } from '../../../components/ui/roll-value-field.lib'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import type { RollValueFieldConfig } from '../../field-config'
+import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 import { useFieldControlSize } from '../../context/form-section.context'
 
 export interface RollValueFieldRendererProps {
@@ -110,6 +111,7 @@ export function RollValueFieldRenderer({
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={resolveFieldLabelVisibility(config)}
       parts={parts}
       error={combinedError}
       hint={hint}

@@ -115,6 +115,11 @@ function collectFieldNames(items: readonly FormItem[]): string[] {
   const names: string[] = []
   for (const item of items) {
     if ('name' in item && typeof item.name === 'string') names.push(item.name)
+    if (item.kind === 'dependent') {
+      names.push(...collectFieldNames([item.controller as FormItem]))
+      names.push(...collectFieldNames(item.dependents.fields))
+      continue
+    }
     if ('fields' in item && Array.isArray(item.fields)) {
       names.push(...collectFieldNames(item.fields as FormItem[]))
     }
@@ -136,6 +141,17 @@ function detailFields(action: MonsterActionDraftRow, section: 'actions' | 'react
       sharedCastingOptions: [],
     }),
   )
+}
+
+function descriptionFieldConfig(action: MonsterActionDraftRow): FormItem | undefined {
+  return monsterActionDetailFields({
+    ctx: detailCtx,
+    action,
+    section: 'actions',
+    namePrefix: 'actions.0',
+    equipmentOptions: [],
+    sharedCastingOptions: [],
+  }).find((item) => 'name' in item && item.name === 'description')
 }
 
 describe('monster action detail fields', () => {
@@ -176,6 +192,36 @@ describe('monster action detail fields', () => {
     expect(weapon).toContain('equipmentEntryId')
     expect(weapon).toContain('limitedUse.kind')
     expect(weapon).not.toContain('moveSection')
+  })
+
+  it('uses optional disclosure for preset action descriptions and required richtext for custom', () => {
+    expect(descriptionFieldConfig({ id: 'slash', kind: 'attack', name: 'Slash' })).toMatchObject({
+      type: 'richtext',
+      optionalDisclosure: { addLabel: 'Add custom description' },
+    })
+    expect(descriptionFieldConfig({ id: 'parry', kind: 'special', name: 'Parry' })).toMatchObject({
+      type: 'richtext',
+      required: true,
+    })
+    expect(
+      descriptionFieldConfig({ id: 'parry', kind: 'special', name: 'Parry' }),
+    ).not.toHaveProperty('optionalDisclosure')
+  })
+
+  it('places save damage inline immediately after the description field', () => {
+    const names = detailFields({
+      id: 'breath',
+      kind: 'save',
+      name: 'Fire Breath',
+      preset: 'breath-weapon',
+    })
+    const descriptionIndex = names.indexOf('description')
+    const rollIndex = names.indexOf('resolution.effects.0.roll')
+    const damageTypeIndex = names.indexOf('resolution.effects.0.damageType')
+    expect(descriptionIndex).toBeGreaterThanOrEqual(0)
+    expect(rollIndex).toBe(descriptionIndex + 1)
+    expect(damageTypeIndex).toBe(rollIndex + 1)
+    expect(names.indexOf('limitedUse.kind')).toBeGreaterThan(damageTypeIndex)
   })
 })
 

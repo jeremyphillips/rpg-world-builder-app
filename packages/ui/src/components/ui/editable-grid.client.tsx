@@ -13,8 +13,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './dropdown-menu.client'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { Field } from './field.client'
-import { FieldLabelContent } from './field-label-content'
+import { FieldLabelContent, FieldLabelInfoAction } from './field-label-content'
 import { hasActiveFieldChrome, type FieldChrome } from './field-chrome.variants'
 import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
 import { resolveFieldGroupLegendClassName } from './field.variants'
@@ -59,6 +60,8 @@ export interface EditableGridProps {
   value: EditableGridValue
   onChange: (value: EditableGridValue) => void
   legend?: string
+  /** Screen-reader-only legend. Cell labels stay on their own controls. */
+  labelVisibility?: FieldLabelVisibility
   /** Optional info-icon content rendered as an `[i]` tooltip beside the legend. */
   info?: ReactNode
   error?: string
@@ -256,6 +259,7 @@ export function EditableGrid({
   value,
   onChange,
   legend,
+  labelVisibility = 'visible',
   info,
   error,
   templates,
@@ -282,9 +286,20 @@ export function EditableGrid({
     setPendingTemplate(null)
   }, [onChange, pendingTemplate, value])
 
+  const legendSrOnly = labelVisibility === 'srOnly'
   const legendNode = legend ? (
-    <legend className={cn(resolveFieldGroupLegendClassName(), 'flex items-center gap-1.5')}>
-      <FieldLabelContent label={legend} info={info} />
+    <legend
+      className={
+        legendSrOnly
+          ? 'sr-only'
+          : cn(resolveFieldGroupLegendClassName(), 'flex items-center gap-1.5')
+      }
+    >
+      <FieldLabelContent
+        label={legend}
+        info={legendSrOnly ? undefined : info}
+        showRequiredMarker={false}
+      />
     </legend>
   ) : null
 
@@ -354,6 +369,9 @@ export function EditableGrid({
 
   const fieldsetContent = (
     <FieldsetChromeAnatomy hintId={`${id}-hint`} legend={legendNode}>
+      {legendSrOnly && info != null && legend ? (
+        <FieldLabelInfoAction label={legend} info={info} />
+      ) : null}
       {table}
     </FieldsetChromeAnatomy>
   )
@@ -364,6 +382,7 @@ export function EditableGrid({
         <FieldsetChromeFrame
           chrome={chrome}
           errorId={`${id}-error`}
+          legendSrOnly={legendSrOnly && info == null}
           fieldsetProps={{ className: 'min-w-0' }}
         >
           {fieldsetContent}

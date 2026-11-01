@@ -2,7 +2,7 @@ import type { ComponentProps, ReactNode } from 'react'
 
 import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { Field, type FieldSize } from './field.client'
-import { FieldLabelContent } from './field-label-content'
+import { FieldLabelContent, FieldLabelInfoAction } from './field-label-content'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import { Checkbox } from './checkbox.client'
 import {
@@ -60,17 +60,22 @@ export function CheckboxField({
   })
 
   const labelNode = (
-    <Field.Label
-      placement="inlineCheckbox"
-      className={cn(labelVisibility === 'srOnly' && 'sr-only')}
-    >
-      <FieldLabelContent
-        label={label}
-        required={required}
-        showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
-        info={info}
-      />
-    </Field.Label>
+    <>
+      <Field.Label
+        placement="inlineCheckbox"
+        className={cn(labelVisibility === 'srOnly' && 'sr-only')}
+      >
+        <FieldLabelContent
+          label={label}
+          required={required}
+          showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+          info={labelVisibility === 'srOnly' ? undefined : info}
+        />
+      </Field.Label>
+      {labelVisibility === 'srOnly' && info != null ? (
+        <FieldLabelInfoAction label={label} info={info} />
+      ) : null}
+    </>
   )
 
   const regions = (

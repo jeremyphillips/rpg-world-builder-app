@@ -35,6 +35,8 @@ export interface FieldsetChromeFrameProps {
   hintId?: string
   error?: string
   errorId: string
+  /** Omit header-to-body gap when the legend is out of flow. Body spacing stays. */
+  legendSrOnly?: boolean
   fieldsetProps: ComponentProps<'fieldset'>
   children: ReactNode
 }
@@ -142,11 +144,15 @@ export function FieldsetChromeFrame({
   hintId,
   error,
   errorId,
+  legendSrOnly = false,
   fieldsetProps,
   children,
 }: FieldsetChromeFrameProps) {
   const { className: fieldsetClassName, ...restFieldsetProps } = fieldsetProps
   const anatomyStack = fieldAnatomyStackVariants({ size })
+  const legendOutOfFlow =
+    legendSrOnly && !(hint && (hintPosition ?? 'below-label') !== 'below-control')
+  const fieldsetStack = legendOutOfFlow ? 'flex flex-col' : anatomyStack
 
   return (
     <FieldChromeShell chrome={chrome} size={size} className={anatomyStack}>
@@ -156,7 +162,7 @@ export function FieldsetChromeFrame({
           className={cn(
             fieldSetResetClasses,
             fieldSetChromeContainClasses,
-            anatomyStack,
+            fieldsetStack,
             fieldsetClassName,
           )}
         >

@@ -13,7 +13,7 @@ import {
   fieldLabelVariants,
   type FieldHintPosition,
 } from './field.variants'
-import { FieldLabelContent } from './field-label-content'
+import { FieldLabelContent, FieldLabelInfoAction } from './field-label-content'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
@@ -269,6 +269,7 @@ export function ChipsField({
         hintId={hintId}
         error={error}
         errorId={errorId}
+        legendSrOnly={labelVisibility === 'srOnly' && info == null}
         fieldsetProps={{
           id,
           'aria-describedby': resolvedDescribedBy,
@@ -288,11 +289,14 @@ export function ChipsField({
                 label={label}
                 required={required}
                 showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
-                info={info}
+                info={labelVisibility === 'srOnly' ? undefined : info}
               />
             </legend>
           }
         >
+          {labelVisibility === 'srOnly' && info != null ? (
+            <FieldLabelInfoAction label={label} info={info} />
+          ) : null}
           {chipsControl(legendId)}
         </FieldsetChromeAnatomy>
       </FieldsetChromeFrame>

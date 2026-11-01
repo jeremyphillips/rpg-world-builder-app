@@ -15,7 +15,9 @@
 
 Array legend typography derives from **parent** named-group depth plus section `density` (compact → smaller array legend). No feature-level `legendSize` / `arrayLegendTier` knobs at steady state.
 
-`headingScale: 'field'` on a group is the only authored heading-scale opt-in. It replaces structural legend and description type with the field label and hint scale for that group's density, and applies `fieldAnatomyStackVariants` on the fieldset for legend→body spacing (including when a collapsible group is closed). It is not a `legendSize` and does not change tier resolution or disclosure.
+`headingScale: 'field'` replaces structural legend and description type with the field label and hint scale for that group's density, and applies `fieldAnatomyStackVariants` on the fieldset for legend→body spacing (including when a collapsible group is closed). It is not a `legendSize` and does not change tier resolution or disclosure.
+
+`headingScale: 'subsection'` forces structural subsection legend typography when a flat sibling list would otherwise resolve as section (for example a named group at `namedGroupDepth === 0`). Description stays on the group description scale.
 
 ## Semantic layers
 
@@ -31,7 +33,9 @@ label: string // non-whitespace at steady state
 labelVisibility?: 'visible' | 'srOnly' // default 'visible'
 ```
 
-All standard field renderers route through `FormFieldLabel` or `FieldRadiogroupLabel` via `labelVisibility`.
+Declare `labelVisibility` once on the field or group heading. The nearest `Field.Root` stores it. The owned label slot (`FieldLayout`, settings, inline, `FormFieldLabel`, `FieldRadiogroupLabel`) reads that value. An explicit prop on the slot still wins. Nested fields create their own root and do not inherit it. Segment labels (`aria-label`, raw `<label>`, occupant text) do not read it, so they stay visible without `labelVisibility: 'visible'`.
+
+An `srOnly` label stays in the accessibility tree and does not occupy the label region, settings column, or inline label wrapper. A visible hint, recommendation, or info action still occupies that header space. The info button stays outside the `sr-only` text so it remains focusable. Fieldset legends stay `<legend>`; hiding one omits header-to-body gap and leaves body rhythm in place.
 
 ## Phase 0 migration audit (sample)
 

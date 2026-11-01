@@ -22,6 +22,7 @@ import { useFieldControlSize } from '../../context/form-section.context'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { LevelRangeFieldConfig } from '../../field-config'
+import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 
 export interface LevelRangeFieldRendererProps {
   config: LevelRangeFieldConfig
@@ -189,6 +190,7 @@ export function LevelRangeFieldRenderer({
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={resolveFieldLabelVisibility(config)}
       minId={minId}
       maxId={maxId}
       minValue={minLevel}

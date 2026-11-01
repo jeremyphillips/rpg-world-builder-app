@@ -9,7 +9,8 @@ import type { FieldDigits } from './field-digit-metrics'
 import { Field } from './field.client'
 import { FieldLayout } from './field-layout'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
-import { FieldLabelContent } from './field-label-content'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import type { FieldOption } from '../../form/field-config'
 import { flattenSelectFieldOptions } from '../../form/field-config'
@@ -34,6 +35,7 @@ export interface LevelRangeFieldProps {
   size?: FieldSize
   width?: FieldWidth
   chrome?: FieldChrome
+  labelVisibility?: FieldLabelVisibility
   digits?: FieldDigits
   onMinChange?: (value: number) => void
   onMaxChange?: (value: number) => void
@@ -69,6 +71,7 @@ export function LevelRangeField({
   size = 'md',
   width,
   chrome,
+  labelVisibility = 'visible',
   digits = 2,
   onMinChange,
   onMaxChange,
@@ -89,6 +92,7 @@ export function LevelRangeField({
       required={required}
       width={rootWidth}
       size={size}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
@@ -96,11 +100,7 @@ export function LevelRangeField({
         wrapControl={false}
         chrome={chrome}
         size={size}
-        label={
-          <Field.Label>
-            <FieldLabelContent label={label} info={info} />
-          </Field.Label>
-        }
+        label={<FormFieldLabel id={`${id}-label`} label={label} info={info} required={required} />}
         control={
           <InlineSentenceRow>
             <label htmlFor={minId} className="sr-only">

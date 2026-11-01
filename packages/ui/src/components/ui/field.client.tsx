@@ -19,6 +19,7 @@ import {
   type FieldHintPosition,
   type FieldLabelPlacement,
 } from './field.variants'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { resolveControlRequiredProps } from './field-required.lib'
 import { Icon } from './icon/icon'
 import { Text } from './text'
@@ -35,6 +36,8 @@ interface FieldContextValue {
   hintPosition: FieldHintPosition
   size: FieldSize
   required: boolean
+  /** Owned-label visibility. Undefined means the slot falls through to visible. */
+  labelVisibility?: FieldLabelVisibility
   error?: string
   hint?: string
   hintIcon?: 'info'
@@ -53,6 +56,11 @@ function useFieldContext(part: string): FieldContextValue {
 /** Field root ids and message wiring. Used by composites that render inside `Field.Root`. */
 export function useFieldRootContext(part = 'useFieldRootContext'): FieldContextValue {
   return useFieldContext(part)
+}
+
+/** Owned-label visibility from the nearest field root. Undefined outside a root. */
+export function useOptionalFieldLabelVisibility(): FieldLabelVisibility | undefined {
+  return React.useContext(FieldContext)?.labelVisibility
 }
 
 export interface FieldRootProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -78,6 +86,11 @@ export interface FieldRootProps extends React.HTMLAttributes<HTMLDivElement> {
   hintPosition?: FieldHintPosition
   /** Info icon inside the hint. The hint id still covers the icon and the text. */
   hintIcon?: 'info'
+  /**
+   * Visibility of this field's owned label. Nested roots replace it; segment
+   * labels do not read it.
+   */
+  labelVisibility?: FieldLabelVisibility
   /**
    * Flat three-region layout (`FieldLayout` / toggle adapters). Root uses no
    * stack gap — spacing is owned by label/message region padding.
@@ -106,6 +119,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
       hint,
       hintPosition = 'below-label',
       hintIcon,
+      labelVisibility,
       anatomy = false,
       rowParticipation = false,
       className,
@@ -137,6 +151,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
           size,
           required,
           hasDerivedMeta,
+          labelVisibility,
         }),
       [
         controlId,
@@ -149,6 +164,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
         size,
         required,
         hasDerivedMeta,
+        labelVisibility,
       ],
     )
 

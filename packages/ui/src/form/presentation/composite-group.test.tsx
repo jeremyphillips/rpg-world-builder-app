@@ -26,6 +26,21 @@ describe('CompositeGroup', () => {
     expect(legend).toContainElement(screen.getByText('Drag to reorder.'))
   })
 
+  it('keeps the column and drops header gap when the legend is sr-only', () => {
+    const { container } = render(
+      <CompositeGroup heading={{ label: 'Speed', labelVisibility: 'srOnly' }}>
+        <div>body</div>
+      </CompositeGroup>,
+    )
+
+    const fieldset = container.querySelector('fieldset')
+    const legend = screen.getByText('Speed').closest('legend')
+    expect(legend).toHaveClass('sr-only')
+    expect(fieldset).toHaveClass('flex', 'flex-col')
+    expect(fieldset?.className).not.toContain('gap-y-')
+    expect(screen.getByText('body')).toBeInTheDocument()
+  })
+
   it('matches Field.Label min-height on the leaf heading label line', () => {
     render(
       <CompositeGroup heading={{ label: 'Suggested ability scores', hint: 'Drag to reorder.' }}>

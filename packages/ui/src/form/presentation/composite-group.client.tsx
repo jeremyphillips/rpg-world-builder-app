@@ -36,6 +36,8 @@ export function CompositeGroup({
   useFieldset = true,
 }: CompositeGroupProps) {
   const headingId = React.useId()
+  const hintText = normalizeFieldHint(heading.hint).text
+  const titleOnlyHidden = heading.labelVisibility === 'srOnly' && !hintText && !heading.action
   const presentation = (
     <HeadingPresentation
       tier="leaf"
@@ -44,6 +46,7 @@ export function CompositeGroup({
       id={headingId}
       as={useFieldset ? 'legend' : 'span'}
       size={size}
+      labelVisibility={heading.labelVisibility}
     />
   )
   const header = heading.action ? (
@@ -58,7 +61,11 @@ export function CompositeGroup({
   ) : (
     presentation
   )
-  const stackClassName = cn('min-w-0', fieldAnatomyStackVariants({ size }), className)
+  const stackClassName = cn(
+    'min-w-0',
+    titleOnlyHidden ? 'flex flex-col' : fieldAnatomyStackVariants({ size }),
+    className,
+  )
 
   if (useFieldset) {
     return (

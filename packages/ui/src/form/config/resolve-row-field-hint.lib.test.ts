@@ -16,4 +16,13 @@ describe('resolveRowAwareFieldHintPresentation', () => {
     const result = resolveRowAwareFieldHintPresentation({ hint: 'Help' }, {}, true)
     expect(result).toEqual({ text: 'Help', position: 'below-control' })
   })
+
+  it('keeps below-label placement for settings rows inside anatomy rows', () => {
+    const result = resolveRowAwareFieldHintPresentation(
+      { hint: 'Help', labelPosition: 'settings' },
+      {},
+      true,
+    )
+    expect(result).toEqual({ text: 'Help', position: 'below-label' })
+  })
 })

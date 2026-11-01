@@ -90,6 +90,7 @@ export function chooseFromChipsToInlineSentence(
     width: config.width,
     chipSize: config.chipSize,
     visibility: config.visibility,
+    ...(config.labelVisibility ? { labelVisibility: config.labelVisibility } : {}),
   }
 }
 
@@ -117,5 +118,6 @@ export function inputUnitToInlineSentence(config: InputUnitFieldConfig): InlineS
     disabled: config.disabled,
     width: config.width,
     visibility: config.visibility,
+    ...(config.labelVisibility ? { labelVisibility: config.labelVisibility } : {}),
   }
 }

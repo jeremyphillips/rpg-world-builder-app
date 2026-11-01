@@ -27,11 +27,7 @@ import {
   useFormSectionContext,
 } from '../context/form-section.context'
 import { useFormUiContext } from '../context/form-ui.context'
-import {
-  resolveGroupHeadingTier,
-  resolveGroupLegendSize,
-  resolveNamedGroupDepthAfterEntering,
-} from '../form-heading.lib'
+import { resolveGroupLegendSize, resolveNamedGroupDepthAfterEntering } from '../form-heading.lib'
 import { hasNamedGroupHeading, resolveGroupHeading } from '../resolve-container-heading.lib'
 import type {
   GroupConfig,
@@ -40,10 +36,14 @@ import type {
   SelectFieldConfig,
   SwitchFieldConfig,
 } from '../field-config'
-import { normalizeFieldHint } from '../field-config'
 import { useVisibilityValues } from './form-conditional.client'
 import type { RenderNestedFormItems } from './form-dependent-section.client'
 import type { FieldChrome } from '../../components/ui/field-chrome.variants'
+import {
+  resolveGroupSectionDescription,
+  resolveGroupSectionFieldChromeSuppressed,
+  resolveGroupSectionHeadingTier,
+} from './form-group-section.lib'
 
 interface GroupFieldSectionProps {
   item: GroupConfig
@@ -144,7 +144,7 @@ export function GroupFieldSection({
   const { control } = useFormContext()
   const heading = resolveGroupHeading(item)
   const hasNamedHeading = hasNamedGroupHeading(item)
-  const groupTier = resolveGroupHeadingTier(parentContext.namedGroupDepth)
+  const groupTier = resolveGroupSectionHeadingTier(item, parentContext.namedGroupDepth)
   const legendSize = resolveGroupLegendSize(groupTier)
   const groupDensity = item.density ?? parentContext.density
   const { rhythm: groupRhythm, size: groupSize } = resolveFormDensity(groupDensity)
@@ -167,10 +167,10 @@ export function GroupFieldSection({
         namedGroupDepth: childNamedGroupDepth,
         headingTier: hasNamedHeading ? groupTier : parentContext.headingTier,
         fieldChromeCascade: item.fieldChrome ?? parentContext.fieldChromeCascade,
-        fieldChromeSuppressed:
-          hasActiveFieldChrome(groupFieldChrome) ||
-          parentContext.fieldChromeSuppressed ||
-          undefined,
+        fieldChromeSuppressed: resolveGroupSectionFieldChromeSuppressed(
+          groupFieldChrome,
+          parentContext.fieldChromeSuppressed,
+        ),
       }),
     [
       parentContext,
@@ -183,11 +183,10 @@ export function GroupFieldSection({
       groupFieldChrome,
     ],
   )
-  const description = React.useMemo(() => {
-    const hint = heading?.hint ?? item.description
-    if (!hint) return undefined
-    return typeof hint === 'string' ? hint : normalizeFieldHint(hint).text
-  }, [heading?.hint, item.description])
+  const description = React.useMemo(
+    () => resolveGroupSectionDescription(heading, item.description),
+    [heading, item.description],
+  )
 
   const nestedFields = (
     <FormSectionContext.Provider value={childContext}>

@@ -295,10 +295,11 @@ export const fieldSettingsRowClasses =
 export type FieldRhythm = 'compact' | 'comfortable'
 
 /**
- * Closed group heading opt-in. `'field'` replaces structural legend and description
- * type with the field label and hint scale. It is not a size token.
+ * Closed group heading opt-in.
+ * - `'field'` — field label / hint type scale (not structural tier).
+ * - `'subsection'` — structural subsection legend at any named-group depth.
  */
-export type GroupHeadingScale = 'field'
+export type GroupHeadingScale = 'field' | 'subsection'
 
 /** Group legend description typography — follows form density (`rhythm`), not legend title scale. */
 export function resolveFieldGroupDescriptionTypography(

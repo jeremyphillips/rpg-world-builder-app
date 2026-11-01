@@ -112,19 +112,15 @@ export function JsonField({
       required={required}
       width={width}
       size={size}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}
         label={
-          <div className="flex items-center justify-between gap-2">
-            <FormFieldLabel
-              label={label}
-              labelVisibility={labelVisibility}
-              info={info}
-              required={required}
-            />
-            {example !== undefined ? (
+          example !== undefined ? (
+            <div className="flex items-center justify-between gap-2">
+              <FormFieldLabel label={label} info={info} required={required} />
               <Button
                 variant="ghost"
                 size="sm"
@@ -134,8 +130,10 @@ export function JsonField({
               >
                 Insert example
               </Button>
-            ) : null}
-          </div>
+            </div>
+          ) : (
+            <FormFieldLabel label={label} info={info} required={required} />
+          )
         }
         control={
           <Textarea

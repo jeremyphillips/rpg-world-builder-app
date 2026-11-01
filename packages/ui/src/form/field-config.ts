@@ -1257,7 +1257,8 @@ export interface GroupConfig {
   description?: string
   /**
    * When `'field'`, legend and description use this group's field label and hint
-   * type scale. Omit for structural legend type from nesting depth. Typography
+   * type scale. When `'subsection'`, legend uses structural subsection type at
+   * any depth. Omit for structural legend type from nesting depth. Typography
    * only — spacing, disclosure, and legend semantics stay unchanged. There is
    * no separate legend or description size.
    */

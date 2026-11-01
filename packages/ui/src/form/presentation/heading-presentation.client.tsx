@@ -15,7 +15,7 @@ import { FieldLabelContent } from '../../components/ui/field-label-content'
 import { Text } from '../../components/ui/text'
 import type { FieldHintConfig } from '../field-config'
 import { normalizeFieldHint } from '../field-config'
-import type { FormHeadingTier } from '../form-heading.lib'
+import type { FieldLabelVisibility, FormHeadingTier } from '../form-heading.lib'
 
 export interface HeadingPresentationProps {
   tier: FormHeadingTier
@@ -27,6 +27,8 @@ export interface HeadingPresentationProps {
   className?: string
   /** Leaf-tier control scale; ignored for section/subsection. */
   size?: FieldSize
+  /** Hides the title text. A visible hint stays in flow. */
+  labelVisibility?: FieldLabelVisibility
 }
 
 function resolveHeadingLabelClassName(tier: FormHeadingTier, size: FieldSize): string {
@@ -53,9 +55,9 @@ function renderHint(hint: string | FieldHintConfig | undefined, tier: FormHeadin
   )
 }
 
-function renderLeafLabelLine(label: string, size: FieldSize): ReactNode {
+function renderLeafLabelLine(label: string, size: FieldSize, labelSrOnly: boolean): ReactNode {
   return (
-    <div className={fieldLabelVariants({ size })}>
+    <div className={cn(fieldLabelVariants({ size }), labelSrOnly && 'sr-only')}>
       <FieldLabelContent label={label} />
     </div>
   )
@@ -70,13 +72,17 @@ export function HeadingPresentation({
   as: Component = 'span',
   className,
   size = 'md',
+  labelVisibility = 'visible',
 }: HeadingPresentationProps) {
   const labelClassName = resolveHeadingLabelClassName(tier, size)
   const hintNode = renderHint(hint, tier)
+  const labelSrOnly = labelVisibility === 'srOnly'
 
   if (tier === 'leaf') {
-    const legendContents = Component === 'legend' ? fieldSetInFlowLegendClasses : undefined
-    const labelLine = renderLeafLabelLine(label, size)
+    const legendContents =
+      Component === 'legend' && !labelSrOnly ? fieldSetInFlowLegendClasses : undefined
+    const labelLine = renderLeafLabelLine(label, size, labelSrOnly && Boolean(hintNode))
+    const hideWholeHeading = labelSrOnly && !hintNode
 
     if (hintNode) {
       return (
@@ -90,7 +96,7 @@ export function HeadingPresentation({
     }
 
     return (
-      <Component id={id} className={cn(legendContents, className)}>
+      <Component id={id} className={cn(legendContents, hideWholeHeading && 'sr-only', className)}>
         {labelLine}
       </Component>
     )

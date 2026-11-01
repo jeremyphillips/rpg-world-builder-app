@@ -54,21 +54,9 @@ export interface FormFieldProps {
   children: ReactElement
 }
 
-const labelNode = (
-  label: string,
-  info?: ReactNode,
-  labelVisibility: FieldLabelVisibility = 'visible',
-  required?: boolean,
-) => {
+const labelNode = (label: string, info?: ReactNode, required?: boolean) => {
   if (!label.trim()) return null
-  return (
-    <FormFieldLabel
-      label={label}
-      labelVisibility={labelVisibility}
-      info={info}
-      required={required}
-    />
-  )
+  return <FormFieldLabel label={label} info={info} required={required} />
 }
 
 /**
@@ -99,18 +87,22 @@ export function FormField({
 }: FormFieldProps) {
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
   const resolvedRecommendation = resolveFieldLayoutRecommendation(hintPosition, recommendation)
+  const hintInHeader = Boolean(hint) && (hintPosition ?? 'below-label') !== 'below-control'
+  const headerHasVisibleContent =
+    labelVisibility !== 'srOnly' || hintInHeader || Boolean(resolvedRecommendation) || Boolean(info)
 
   if (labelPosition === 'settings') {
     const presentation = resolveFieldPresentation({
       size,
-      labelLayout: mapFormLabelPositionToLayout('settings'),
+      labelLayout: headerHasVisibleContent ? mapFormLabelPositionToLayout('settings') : 'hidden',
       controlBand,
     })
-    const settingsRow = (
+    const ownedLabel = labelNode(label, info, required)
+    const settingsRow = headerHasVisibleContent ? (
       <div data-field-align="" className={cn(presentation.alignmentAnchorClassName)}>
         <div className={presentation.groupClassName}>
           <div className={fieldLabelHintStackClasses}>
-            {labelNode(label, info, labelVisibility, required)}
+            {ownedLabel}
             <Field.Hint />
             {resolvedRecommendation ? (
               <FieldRecommendationFieldContent recommendation={resolvedRecommendation} />
@@ -120,6 +112,11 @@ export function FormField({
             <Field.Control>{children}</Field.Control>
           </div>
         </div>
+      </div>
+    ) : (
+      <div className={presentation.controlBandClassName}>
+        {ownedLabel}
+        <Field.Control>{children}</Field.Control>
       </div>
     )
     const chromedRow = hasActiveFieldChrome(chrome) ? (
@@ -146,6 +143,7 @@ export function FormField({
         required={required}
         size={size}
         width={rootWidth}
+        labelVisibility={labelVisibility}
       >
         {chromedRow}
       </Field.Root>
@@ -164,13 +162,13 @@ export function FormField({
       required={required}
       size={size}
       width={rootWidth}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}
         recommendation={recommendation}
-        labelVisibility={labelVisibility}
-        label={labelNode(label, info, labelVisibility, required)}
+        label={labelNode(label, info, required)}
         control={children}
         chrome={chrome}
         size={size}

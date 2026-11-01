@@ -62,6 +62,7 @@ export function RadioFieldShell({
       required={required}
       size={size}
       width={resolveFieldAnatomyWidth(width, chrome)}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
@@ -73,7 +74,6 @@ export function RadioFieldShell({
             required={required}
             info={info}
             size={size}
-            labelVisibility={labelVisibility}
           />
         }
         control={children(labelId)}

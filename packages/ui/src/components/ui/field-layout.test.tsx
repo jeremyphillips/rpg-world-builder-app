@@ -82,6 +82,63 @@ describe('FieldLayout three-region anatomy', () => {
     )
   })
 
+  it('reads sr-only visibility from Field.Root when the layout prop is omitted', () => {
+    const { container } = render(
+      <Field.Root id="limit" labelVisibility="srOnly" anatomy>
+        <FieldLayout label={<FormFieldLabel label="Limit" />} control={<input />} />
+      </Field.Root>,
+    )
+
+    const labelRegion = container.querySelector('[data-field-label-region]')
+    expect(labelRegion?.childElementCount).toBe(0)
+    expect(screen.getByText('Limit').closest('label')).toHaveClass('sr-only')
+    expect(screen.getByLabelText('Limit')).toBeInTheDocument()
+  })
+
+  it('keeps an info action in the label region when the label text is sr-only', () => {
+    const { container } = render(
+      <Field.Root id="limit" labelVisibility="srOnly" anatomy>
+        <FieldLayout
+          label={<FormFieldLabel label="Limit" info="Only positive values." />}
+          control={<input />}
+        />
+      </Field.Root>,
+    )
+
+    const infoButton = screen.getByRole('button', { name: 'About Limit' })
+    const controlRegion = container.querySelector('[data-field-control-region]')
+    expect(infoButton).not.toHaveClass('sr-only')
+    expect(controlRegion).toContainElement(infoButton)
+    expect(container.querySelector('[data-field-label-region]')?.childElementCount).toBe(0)
+    expect(screen.getByText('Limit').closest('label')).toHaveClass('sr-only')
+  })
+
+  it('does not hide a nested field label or a segment label', () => {
+    render(
+      <Field.Root id="parent" labelVisibility="srOnly" anatomy>
+        <FieldLayout
+          label={<FormFieldLabel label="Parent" />}
+          control={
+            <div>
+              <label htmlFor="segment">Segment</label>
+              <input id="segment" />
+              <Field.Root id="child">
+                <FormFieldLabel label="Child" />
+                <Field.Control>
+                  <input />
+                </Field.Control>
+              </Field.Root>
+            </div>
+          }
+        />
+      </Field.Root>,
+    )
+
+    expect(screen.getByText('Parent').closest('label')).toHaveClass('sr-only')
+    expect(screen.getByText('Segment')).not.toHaveClass('sr-only')
+    expect(screen.getByText('Child').closest('label')).not.toHaveClass('sr-only')
+  })
+
   it('renders an empty label region when the field has no label', () => {
     const { container } = render(
       <Field.Root id="name" anatomy>

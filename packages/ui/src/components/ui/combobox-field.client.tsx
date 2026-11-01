@@ -259,21 +259,14 @@ export function ComboboxField({
       required={required}
       width={rootWidth}
       size={size}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}
         recommendation={recommendation}
         wrapControl={false}
-        labelVisibility={labelVisibility}
-        label={
-          <FormFieldLabel
-            label={label}
-            labelVisibility={labelVisibility}
-            info={info}
-            required={required}
-          />
-        }
+        label={<FormFieldLabel label={label} info={info} required={required} />}
         control={
           <ComboboxFieldControl
             label={label}
