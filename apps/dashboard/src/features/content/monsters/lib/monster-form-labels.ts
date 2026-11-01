@@ -217,6 +217,13 @@ export function getMonsterArmorSlotUiCopy(slot: CreatureArmorSlot): {
 }
 
 export const MONSTER_ACTION_NAME_LABEL = 'Name'
+export const MONSTER_ATTACK_BONUS_LABEL = 'Attack bonus'
+export const MONSTER_ATTACK_BONUS_KIND_ABILITY_LABEL = 'Ability'
+export const MONSTER_ATTACK_BONUS_KIND_SPELL_LABEL = 'Spellcasting'
+export const MONSTER_ATTACK_BONUS_ABILITY_LABEL = 'Ability'
+export const MONSTER_ATTACK_BONUS_PROFICIENCY_LABEL = 'Proficient'
+export const MONSTER_SAVE_FAILURE_NOTE_LABEL = 'Failure note'
+export const MONSTER_SAVE_SUCCESS_AMOUNT_LABEL = 'On successful save'
 export const MONSTER_SAVE_THROW_SECTION_LEGEND = 'Saving throw'
 export const MONSTER_SAVE_THROW_SECTION_DESCRIPTION =
   'Set the saving throw target and how difficult it is to succeed.'
