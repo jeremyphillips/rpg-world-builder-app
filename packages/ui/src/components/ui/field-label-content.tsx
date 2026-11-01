@@ -1,3 +1,5 @@
+'use client'
+
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
@@ -5,8 +7,14 @@ import type { FieldSize } from './field.client'
 import { fieldLabelContentClusterClasses, fieldLabelVariants } from './field.variants'
 import { InfoTooltip } from './tooltip.client'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
+import { useOwnedLabelVisibility } from './owned-label-visibility.lib'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import { RequiredIndicator } from './required-indicator'
+
+/** Visible info control. Stays outside an sr-only label so it remains focusable. */
+export function FieldLabelInfoAction({ label, info }: { label: string; info: ReactNode }) {
+  return <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip>
+}
 
 export interface FieldLabelContentProps {
   label: string
@@ -32,7 +40,7 @@ export function FieldLabelContent({
     <span className={fieldLabelContentClusterClasses}>
       {label}
       {visibleMarker ? <RequiredIndicator /> : null}
-      {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
+      {info ? <FieldLabelInfoAction label={label} info={info} /> : null}
     </span>
   )
 }
@@ -57,21 +65,27 @@ export function FieldRadiogroupLabel({
   size = 'md',
   className,
 }: FieldRadiogroupLabelProps) {
-  return (
+  const visibility = useOwnedLabelVisibility(labelVisibility)
+  const caption = (
     <span
       id={id}
-      className={cn(
-        fieldLabelVariants({ size }),
-        labelVisibility === 'srOnly' && 'sr-only',
-        className,
-      )}
+      className={cn(fieldLabelVariants({ size }), visibility === 'srOnly' && 'sr-only', className)}
     >
       <FieldLabelContent
         label={label}
         required={required}
-        showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
-        info={info}
+        showRequiredMarker={shouldShowVisibleRequiredMarker(required, visibility)}
+        info={visibility === 'srOnly' ? undefined : info}
       />
     </span>
+  )
+
+  if (visibility !== 'srOnly' || info == null) return caption
+
+  return (
+    <>
+      {caption}
+      <FieldLabelInfoAction label={label} info={info} />
+    </>
   )
 }

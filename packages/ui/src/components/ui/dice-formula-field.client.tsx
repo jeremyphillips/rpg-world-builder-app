@@ -8,7 +8,8 @@ import { FieldLayout } from './field-layout'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import { Field, type FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
-import { FieldLabelContent } from './field-label-content'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { DiceFormulaControls } from './dice-formula-field-controls.client'
 import { DiceFormulaInlineField } from './dice-formula-field-inline.client'
 import {
@@ -41,6 +42,7 @@ export interface DiceFormulaFieldProps {
   size?: FieldSize
   width?: FieldWidth
   chrome?: FieldChrome
+  labelVisibility?: FieldLabelVisibility
   labelPosition?: DiceFormulaLabelPosition
   modifierMode?: DiceFormulaModifierMode
   faces?: readonly number[]
@@ -73,6 +75,7 @@ export function DiceFormulaField({
   size = 'md',
   width = 'full',
   chrome,
+  labelVisibility = 'visible',
   labelPosition = 'above',
   modifierMode = 'optional',
   faces = DIE_FACES,
@@ -145,6 +148,7 @@ export function DiceFormulaField({
         size={size}
         width={rootWidth}
         chrome={chrome}
+        labelVisibility={labelVisibility}
         inlineLabelId={inlineLabelId}
         hintId={hintId}
         errorId={errorId}
@@ -164,15 +168,20 @@ export function DiceFormulaField({
       required={required}
       size={size}
       width={rootWidth}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}
         label={
-          <Field.Label id={`${id}-label`} htmlFor={`${id}-count`}>
-            <FieldLabelContent label={label} info={info} />
-          </Field.Label>
+          <FormFieldLabel
+            id={`${id}-label`}
+            htmlFor={`${id}-count`}
+            label={label}
+            info={info}
+            required={required}
+          />
         }
         control={
           <div

@@ -8,7 +8,7 @@ import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.varia
 import { fieldAnatomyIds } from './choose-count-field.lib'
 import { resolveFieldDescribedBy } from './field-validation-props'
 import { type FieldHintPosition } from './field.variants'
-import { FieldLabelContent } from './field-label-content'
+import { FieldLabelContent, FieldLabelInfoAction } from './field-label-content'
 import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
@@ -74,6 +74,7 @@ export function ChooseCountFieldShell({
         hintId={hintId}
         error={error}
         errorId={errorId}
+        legendSrOnly={labelVisibility === 'srOnly' && info == null}
         fieldsetProps={{
           id,
           'aria-describedby': describedBy,
@@ -92,11 +93,14 @@ export function ChooseCountFieldShell({
                 label={label}
                 required={required}
                 showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
-                info={info}
+                info={labelVisibility === 'srOnly' ? undefined : info}
               />
             </legend>
           }
         >
+          {labelVisibility === 'srOnly' && info != null ? (
+            <FieldLabelInfoAction label={label} info={info} />
+          ) : null}
           {children({ legendId, chooseId, hintId, errorId })}
         </FieldsetChromeAnatomy>
       </FieldsetChromeFrame>

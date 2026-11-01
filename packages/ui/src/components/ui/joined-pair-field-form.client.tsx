@@ -126,26 +126,16 @@ export function JoinedPairFieldForm({
       required={required}
       width={resolveFieldAnatomyWidth(width, chrome)}
       size={size}
+      labelVisibility={labelVisibility}
       {...pickFieldChromeProps({ chrome })}
       anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}
-        labelVisibility={labelVisibility}
         wrapControl={false}
         chrome={chrome}
         size={size}
-        label={
-          <span id={labelId}>
-            <FormFieldLabel
-              label={label}
-              labelVisibility={labelVisibility}
-              required={required}
-              info={info}
-              className={labelVisibility === 'visible' ? undefined : 'sr-only'}
-            />
-          </span>
-        }
+        label={<FormFieldLabel id={labelId} label={label} required={required} info={info} />}
         control={
           <JoinedPair.Root
             layout="intrinsic"

@@ -93,7 +93,6 @@ function buildSelectFieldControl(props: SelectFieldProps, resolvedPlaceholder: s
 export function SelectField(props: SelectFieldProps) {
   const {
     label,
-    labelVisibility,
     width,
     size = 'md',
     labelPosition,

@@ -76,18 +76,12 @@ export function RichTextField({
       required={required}
       width={width}
       size={size}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}
-        label={
-          <FormFieldLabel
-            label={label}
-            labelVisibility={labelVisibility}
-            info={info}
-            required={required}
-          />
-        }
+        label={<FormFieldLabel label={label} info={info} required={required} />}
         control={
           <RichTextEditor
             aria-label={label}

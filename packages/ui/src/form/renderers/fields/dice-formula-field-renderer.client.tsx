@@ -7,6 +7,7 @@ import { pickFieldChromeProps } from '../../../components/ui/field-chrome.varian
 import type { DiceFormulaValue } from '../../../components/ui/dice-formula-field.lib'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { DiceFormulaFieldConfig } from '../../field-config'
+import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 import { useFieldControlSize } from '../../context/form-section.context'
 
 export interface DiceFormulaFieldRendererProps {
@@ -57,6 +58,7 @@ export function DiceFormulaFieldRenderer({
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={resolveFieldLabelVisibility(config)}
       error={error}
       hint={hint}
       hintPosition={hintPosition}

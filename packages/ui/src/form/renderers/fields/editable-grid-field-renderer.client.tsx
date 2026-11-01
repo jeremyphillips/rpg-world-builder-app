@@ -13,6 +13,7 @@ import {
   type EditableGridColumnConfig,
   type EditableGridFieldConfig,
 } from '../../field-config'
+import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 
 function watchedRecord(dependsOn: string[], watched: unknown[]): Record<string, unknown> {
   const values: Record<string, unknown> = {}
@@ -84,6 +85,7 @@ export function EditableGridFieldRenderer({
       id={id}
       {...pickFieldChromeProps(config)}
       legend={config.label}
+      labelVisibility={resolveFieldLabelVisibility(config)}
       info={config.info}
       columns={columns}
       rowCount={config.rowCount}

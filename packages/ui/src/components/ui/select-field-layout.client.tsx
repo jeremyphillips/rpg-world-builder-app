@@ -16,6 +16,8 @@ import {
 import type { FieldValidationProps } from './field-validation-props'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
+import { useFieldRootContext } from './field.client'
+import { useOwnedLabelVisibility } from './owned-label-visibility.lib'
 
 export type SelectFieldLayoutSharedProps = FieldValidationProps & {
   id: string
@@ -85,34 +87,6 @@ export function SelectFieldInlineLayout({
   chrome,
   control,
 }: SelectFieldLayoutSharedProps) {
-  const resolvedHintPosition = hintPosition ?? 'below-label'
-  const inlineBody = (
-    <>
-      <div className={fieldInlineControlRowClasses}>
-        {resolvedHintPosition === 'below-label' ? (
-          <div className={fieldLabelHintStackClasses}>
-            <FormFieldLabel
-              label={label}
-              labelVisibility={labelVisibility}
-              required={required}
-              info={info}
-            />
-            <Field.Hint />
-          </div>
-        ) : (
-          <FormFieldLabel
-            label={label}
-            labelVisibility={labelVisibility}
-            required={required}
-            info={info}
-          />
-        )}
-        {control}
-      </div>
-      {resolvedHintPosition === 'below-control' ? <Field.Hint /> : null}
-    </>
-  )
-
   return (
     <Field.Root
       id={id}
@@ -123,19 +97,77 @@ export function SelectFieldInlineLayout({
       required={required}
       width={width}
       size={size}
+      labelVisibility={labelVisibility}
     >
       {hasActiveFieldChrome(chrome) ? (
         <FieldChromeShell chrome={chrome} size={size}>
-          {inlineBody}
+          <SelectFieldInlineBody
+            label={label}
+            info={info}
+            required={required}
+            hintPosition={hintPosition}
+            control={control}
+          />
           <Field.Error />
         </FieldChromeShell>
       ) : (
         <>
-          {inlineBody}
+          <SelectFieldInlineBody
+            label={label}
+            info={info}
+            required={required}
+            hintPosition={hintPosition}
+            control={control}
+          />
           <Field.Error />
         </>
       )}
     </Field.Root>
+  )
+}
+
+function SelectFieldInlineBody({
+  label,
+  info,
+  required,
+  hintPosition,
+  control,
+}: {
+  label: string
+  info?: ReactNode
+  required?: boolean
+  hintPosition?: FieldHintPosition
+  control: ReactElement | ReactNode
+}) {
+  const visibility = useOwnedLabelVisibility()
+  const { hasHint } = useFieldRootContext('SelectFieldInlineBody')
+  const resolvedHintPosition = hintPosition ?? 'below-label'
+  const hintInLabelSlot = hasHint && resolvedHintPosition === 'below-label'
+  const showLabelSlot = visibility !== 'srOnly' || hintInLabelSlot || info != null
+  const ownedLabel = <FormFieldLabel label={label} info={info} required={required} />
+
+  return (
+    <>
+      {showLabelSlot ? (
+        <div className={fieldInlineControlRowClasses}>
+          {hintInLabelSlot ? (
+            <div className={fieldLabelHintStackClasses}>
+              {ownedLabel}
+              <Field.Hint />
+            </div>
+          ) : (
+            ownedLabel
+          )}
+          {control}
+        </div>
+      ) : (
+        <>
+          {ownedLabel}
+          <div className={fieldInlineControlRowClasses}>{control}</div>
+        </>
+      )}
+      {resolvedHintPosition === 'below-control' ? <Field.Hint /> : null}
+    </>
   )
 }
 
@@ -165,19 +197,13 @@ export function SelectFieldDefaultLayout({
       required={required}
       width={width}
       size={size}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}
-        label={
-          <FormFieldLabel
-            label={label}
-            labelVisibility={labelVisibility}
-            required={required}
-            info={info}
-          />
-        }
+        label={<FormFieldLabel label={label} required={required} info={info} />}
         control={control}
         chrome={chrome}
         size={size}

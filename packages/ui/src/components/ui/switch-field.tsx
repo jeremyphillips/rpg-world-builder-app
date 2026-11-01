@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from 'react'
 import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
-import { FieldLabelContent } from './field-label-content'
+import { FieldLabelContent, FieldLabelInfoAction } from './field-label-content'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import { FormField } from './form-field'
 import { FieldChromeShell } from './field-chrome-shell'
@@ -47,6 +47,32 @@ export interface SwitchFieldProps
   labelPosition?: SwitchLabelPosition
 }
 
+function SwitchFieldLabel({
+  label,
+  labelVisibility,
+  labelPosition,
+  required,
+  info,
+}: Pick<SwitchFieldProps, 'label' | 'labelVisibility' | 'labelPosition' | 'required' | 'info'>) {
+  const labelSrOnly = labelVisibility === 'srOnly'
+  return (
+    <>
+      <Field.Label
+        placement={labelPosition === 'inline' ? 'inlineSwitch' : undefined}
+        className={cn(labelSrOnly && 'sr-only')}
+      >
+        <FieldLabelContent
+          label={label}
+          required={required}
+          showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+          info={labelSrOnly ? undefined : info}
+        />
+      </Field.Label>
+      {labelSrOnly && info != null ? <FieldLabelInfoAction label={label} info={info} /> : null}
+    </>
+  )
+}
+
 /** A labelled toggle switch bound to the compound `Field`. */
 export function SwitchField({
   id,
@@ -70,17 +96,13 @@ export function SwitchField({
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   const labelNode = (
-    <Field.Label
-      placement={labelPosition === 'inline' ? 'inlineSwitch' : undefined}
-      className={cn(labelVisibility === 'srOnly' && 'sr-only')}
-    >
-      <FieldLabelContent
-        label={label}
-        required={required}
-        showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
-        info={info}
-      />
-    </Field.Label>
+    <SwitchFieldLabel
+      label={label}
+      labelVisibility={labelVisibility}
+      labelPosition={labelPosition}
+      required={required}
+      info={info}
+    />
   )
 
   if (labelPosition === 'settings') {
@@ -117,6 +139,7 @@ export function SwitchField({
         required={required}
         width={rootWidth}
         size={size}
+        labelVisibility={labelVisibility}
         anatomy
       >
         <FieldLayout

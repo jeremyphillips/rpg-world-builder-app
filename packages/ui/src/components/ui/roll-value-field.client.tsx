@@ -8,7 +8,8 @@ import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { fieldWidthVariants } from './field-control.variants'
-import { FieldLabelContent } from './field-label-content'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { ADD_DICE_LABEL, DiceFormulaControls } from './dice-formula-field-controls.client'
 import type { DiceFormulaPatch } from './dice-formula-field.lib'
 import { FieldLayout } from './field-layout'
@@ -50,6 +51,7 @@ export interface RollValueFieldProps {
   size?: FieldSize
   width?: FieldWidth
   chrome?: FieldChrome
+  labelVisibility?: FieldLabelVisibility
   faces?: readonly number[]
   countMin?: number
   countMax?: number
@@ -74,6 +76,7 @@ export function RollValueField({
   size = 'md',
   width = 'full',
   chrome,
+  labelVisibility = 'visible',
   faces = DIE_FACES,
   countMin = 1,
   countMax = 99,
@@ -170,18 +173,20 @@ export function RollValueField({
       required={required}
       size={size}
       width={rootWidth}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}
         label={
-          <Field.Label
+          <FormFieldLabel
             id={`${id}-label`}
             htmlFor={showDiceFields ? `${id}-count` : `${id}-operator`}
-          >
-            <FieldLabelContent label={label} info={info} />
-          </Field.Label>
+            label={label}
+            info={info}
+            required={required}
+          />
         }
         control={
           <div

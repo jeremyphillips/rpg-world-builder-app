@@ -31,8 +31,8 @@ import { groupedSelectSegmentShellClasses } from './select-compact-trigger.varia
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import { type NumberInputDigits } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
-import { FieldLabelContent } from './field-label-content'
-import { shouldShowVisibleRequiredMarker } from './field-required.lib'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { resolveFieldSearchPlaceholder } from '../../form/config/field-placeholder.lib'
 
 const EMPTY_UNIT_MESSAGE = 'No units match your search.'
@@ -68,6 +68,7 @@ export interface InputSelectFieldProps {
   size?: FieldSize
   width?: FieldWidth
   chrome?: FieldChrome
+  labelVisibility?: FieldLabelVisibility
   min?: number
   max?: number
   step?: number
@@ -301,6 +302,7 @@ export function InputSelectField({
   size = 'md',
   width = 'full',
   chrome,
+  labelVisibility = 'visible',
   min,
   max,
   step,
@@ -329,6 +331,7 @@ export function InputSelectField({
       required={required}
       size={size}
       width={rootWidth}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
@@ -337,14 +340,13 @@ export function InputSelectField({
         chrome={chrome}
         size={size}
         label={
-          <Field.Label id={`${id}-label`} htmlFor={valueId}>
-            <FieldLabelContent
-              label={label}
-              required={required}
-              showRequiredMarker={shouldShowVisibleRequiredMarker(required)}
-              info={info}
-            />
-          </Field.Label>
+          <FormFieldLabel
+            id={`${id}-label`}
+            htmlFor={valueId}
+            label={label}
+            info={info}
+            required={required}
+          />
         }
         control={
           <JoinedPair.Root

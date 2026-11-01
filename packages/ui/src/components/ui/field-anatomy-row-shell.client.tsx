@@ -57,7 +57,7 @@ export function FieldAnatomyRowShell({
 }: FieldAnatomyRowShellProps) {
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
   const labelId = `${id}-label`
-  const showFieldLabel = labelVisibility !== 'srOnly' && label.trim().length > 0
+  const showFieldLabel = label.trim().length > 0
 
   return (
     <Field.Root
@@ -70,6 +70,7 @@ export function FieldAnatomyRowShell({
       required={required}
       width={rootWidth}
       size={size}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
@@ -80,22 +81,11 @@ export function FieldAnatomyRowShell({
         controlBand={controlBand}
         label={
           showFieldLabel ? (
-            <span id={labelId}>
-              <FormFieldLabel
-                label={label}
-                labelVisibility={labelVisibility}
-                required={required}
-                info={info}
-              />
-            </span>
+            <FormFieldLabel id={labelId} label={label} required={required} info={info} />
           ) : null
         }
         control={
-          <div
-            role="group"
-            aria-labelledby={showFieldLabel ? labelId : undefined}
-            aria-label={showFieldLabel ? undefined : label}
-          >
+          <div role="group" aria-labelledby={showFieldLabel ? labelId : undefined}>
             {children({ labelId: showFieldLabel ? labelId : undefined })}
           </div>
         }

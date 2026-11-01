@@ -1,3 +1,4 @@
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import type { FieldHintPosition } from './field.variants'
 import { fieldAnatomyStackVariants } from './field.variants'
 import { resolveFieldWidthClassName, type FieldWidth } from './field-control.variants'
@@ -20,6 +21,8 @@ export type FieldRootContextInput = {
   size: FieldSize
   required: boolean
   hasDerivedMeta: boolean
+  /** Omitted on the root means readers fall through to visible. Nested roots do not inherit. */
+  labelVisibility?: FieldLabelVisibility
 }
 
 export function buildFieldRootContextValue(input: FieldRootContextInput) {
@@ -48,6 +51,7 @@ export function buildFieldRootContextValue(input: FieldRootContextInput) {
     hintPosition: input.hintPosition,
     size: input.size,
     required: input.required,
+    labelVisibility: input.labelVisibility,
     error: input.error,
     hint: input.hint,
     hintIcon: input.hint ? input.hintIcon : undefined,

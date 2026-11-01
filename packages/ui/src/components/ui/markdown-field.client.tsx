@@ -92,20 +92,14 @@ export function MarkdownField({
       required={required}
       width={width}
       size={size}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}
         controlBand="content-sized"
-        label={
-          <FormFieldLabel
-            label={label}
-            labelVisibility={labelVisibility}
-            info={info}
-            required={required}
-          />
-        }
+        label={<FormFieldLabel label={label} info={info} required={required} />}
         control={
           <Tabs value={tab} onValueChange={setTab} variant="line">
             <TabsList aria-label={`${label} mode`}>

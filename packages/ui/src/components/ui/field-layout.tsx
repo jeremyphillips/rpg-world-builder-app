@@ -1,3 +1,5 @@
+'use client'
+
 import type { ReactElement, ReactNode } from 'react'
 
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
@@ -11,6 +13,7 @@ import { resolveFieldPresentation } from './field-row-presentation.lib'
 import type { FieldHintPosition } from './field.variants'
 import { cn } from '../../lib/utils'
 import { FieldLayoutLabelRegionContent } from './field-layout-label-region.client'
+import { useOwnedLabelVisibility } from './owned-label-visibility.lib'
 import { resolveFieldLayoutRecommendation } from './field-recommendation.lib'
 import type { FieldLayoutRecommendation } from './field-recommendation.types'
 
@@ -28,7 +31,10 @@ export interface FieldLayoutProps {
   size?: FieldSize
   /** Default `single-line`. Use `content-sized` for multiline / compound shells. */
   controlBand?: FieldControlBand
-  /** When `srOnly`, the accessible label does not occupy the label region layout slot. */
+  /**
+   * Explicit override for the owned label. Omitted values read `Field.Root`.
+   * Do not default this to `'visible'` — that would shadow the root.
+   */
   labelVisibility?: FieldLabelVisibility
 }
 
@@ -52,10 +58,12 @@ export function FieldLayout({
   chrome,
   size = 'md',
   controlBand = 'single-line',
-  labelVisibility = 'visible',
+  labelVisibility,
 }: FieldLayoutProps) {
+  const visibility = useOwnedLabelVisibility(labelVisibility)
   const resolvedRecommendation = resolveFieldLayoutRecommendation(hintPosition, recommendation)
-  const showVisibleLabel = Boolean(label) && labelVisibility !== 'srOnly'
+  const showVisibleLabel = Boolean(label) && visibility !== 'srOnly'
+  const accessibleLabel = visibility === 'srOnly' ? label : null
   const presentation = resolveFieldPresentation({
     size,
     labelLayout: showVisibleLabel ? 'stacked' : 'hidden',
@@ -68,11 +76,9 @@ export function FieldLayout({
     control
   )
 
-  const accessibleOnlyLabel = label && labelVisibility === 'srOnly' ? label : null
-
   const bandedControl = (
     <div className={presentation.controlBandClassName}>
-      {accessibleOnlyLabel}
+      {accessibleLabel}
       {controlNode}
     </div>
   )
@@ -83,7 +89,7 @@ export function FieldLayout({
         <FieldLayoutLabelRegionContent
           hintPosition={hintPosition}
           showVisibleLabel={showVisibleLabel}
-          label={label}
+          label={showVisibleLabel ? label : null}
           recommendation={resolvedRecommendation}
         />
       </FieldLabelRegion>
