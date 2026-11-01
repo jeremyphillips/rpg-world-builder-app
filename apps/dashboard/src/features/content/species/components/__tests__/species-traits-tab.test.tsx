@@ -80,6 +80,7 @@ describe('SpeciesTraitsTab', () => {
     render(<TabShell />)
 
     await user.click(screen.getByRole('button', { name: /Add trait/i }))
+    await user.click(await screen.findByRole('menuitem', { name: /Custom trait/i }))
 
     expect(
       within(screen.getByRole('navigation', { name: 'Traits' })).getByRole('button', {
@@ -190,6 +191,7 @@ describe('SpeciesTraitsTab', () => {
     render(<TabShell traits={[darkvision]} entityCatalogLayer="system" />)
 
     await user.click(screen.getByRole('button', { name: /Add trait/i }))
+    await user.click(await screen.findByRole('menuitem', { name: /Custom trait/i }))
 
     expect(screen.getByRole('button', { name: /Actions for Unnamed Trait/i })).toBeInTheDocument()
   })

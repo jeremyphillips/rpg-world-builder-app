@@ -38,9 +38,15 @@ export const WithAvailability: Story = {
   render: () => {
     const values = resolveMonsterCreateDefaultValues()
     values.traits = [
-      { id: 'pack', name: 'Pack Tactics', description: 'Advantage when an ally is adjacent.' },
+      {
+        id: 'pack',
+        kind: 'custom',
+        name: 'Pack Tactics',
+        description: 'Advantage when an ally is adjacent.',
+      },
       {
         id: 'sunlight',
+        kind: 'custom',
         name: 'Sunlight Sensitivity',
         description: 'Disadvantage in sunlight.',
         available: false,

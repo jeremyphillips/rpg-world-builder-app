@@ -8,9 +8,12 @@ import { equipmentRegistration } from '../equipment/equipment.config'
 import { skillProficiencyRegistration } from '../skill-proficiencies/skill-proficiencies.config'
 import { spellRegistration } from '../spells/spells.config'
 import type { ContentWriteContext } from '../lib/content-write-config'
+import { rejectInvalidCreatureTraitTemplates } from '../lib/reject-creature-trait-templates'
 
 export async function monstersValidateBeforeWrite(ctx: ContentWriteContext): Promise<void> {
-  const body = (ctx.effectiveBody ?? ctx.input) as Parameters<typeof collectMonsterCatalogIssues>[0]
+  const rawBody = ctx.effectiveBody ?? ctx.input
+  rejectInvalidCreatureTraitTemplates(rawBody.traits, ['traits'])
+  const body = rawBody as Parameters<typeof collectMonsterCatalogIssues>[0]
   const [equipmentCatalog, skillCatalog, spellCatalog] = await Promise.all([
     resolveCatalogForCampaign(equipmentRegistration.read, ctx.campaignId),
     resolveCatalogForCampaign(skillProficiencyRegistration.read, ctx.campaignId),

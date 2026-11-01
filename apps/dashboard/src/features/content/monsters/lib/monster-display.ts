@@ -21,6 +21,9 @@ import {
   type SkillProficiency,
   availableBodyRows,
   deriveMonsterStatBlock,
+  resolveCreatureSenses,
+  resolveCreatureTraitGrants,
+  resolveTraitDisplay,
   formatMonsterLimitedUseHeading,
   formatMonsterMultiattack,
   formatMonsterSaveAction,
@@ -444,7 +447,13 @@ function responseLabel(text: string | undefined, hasBody: boolean): string | und
 }
 
 function formatSenseLines(monster: Monster, passivePerception?: number): string {
-  const senseParts = monster.senses.map((sense) =>
+  const senses = resolveCreatureSenses({
+    authored: monster.senses,
+    grants: resolveCreatureTraitGrants(
+      monster.traits.map((trait) => ({ trait, source: trait.id })),
+    ).map((resolved) => resolved.grant),
+  })
+  const senseParts = senses.map((sense) =>
     sense.range != null ? `${sense.type} ${sense.range} ft.` : sense.type,
   )
   if (passivePerception != null) {
@@ -619,11 +628,14 @@ export function buildMonsterDetailViewModel({
     statRows,
     abilities,
     detailsLeaves: buildDetailsLeaves(monster, derived, equipmentById, catalogState),
-    traits: availableBodyRows(monster.traits).map((trait) => ({
-      id: trait.id,
-      name: trait.name,
-      descriptionHtml: trait.description,
-    })),
+    traits: availableBodyRows(monster.traits).map((trait) => {
+      const display = resolveTraitDisplay(trait)
+      return {
+        id: trait.id,
+        name: display.name,
+        descriptionHtml: display.descriptionHtml ?? '',
+      }
+    }),
     actions: mapActionItems(
       availableBodyRows(monster.actions),
       'actions',

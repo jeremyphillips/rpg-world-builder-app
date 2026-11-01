@@ -11,6 +11,7 @@ import { STORY_RULESET_ID } from './constants'
 /** Catalog Wood Elf heritage option grant groups from the Elf species seed. */
 export function getCatalogWoodElfHeritageGrantGroups(): GrantGroup[] {
   const woodElf = getCatalogWoodElfHeritageOption()
+  if (woodElf.kind === 'template') return []
   return woodElf.grantGroups ?? []
 }
 
@@ -43,12 +44,14 @@ export function getCatalogDruidDruidicFeature() {
 /** Catalog Drow heritage option grant groups from the Elf species seed. */
 export function getCatalogDrowHeritageGrantGroups(): GrantGroup[] {
   const drow = getCatalogDrowHeritageOption()
+  if (drow.kind === 'template') return []
   return drow.grantGroups ?? []
 }
 
 /** Catalog Black Dragon heritage option grant groups from the Dragonborn species seed. */
 export function getCatalogBlackDragonHeritageGrantGroups(): GrantGroup[] {
   const blackDragon = getCatalogBlackDragonHeritageOption()
+  if (blackDragon.kind === 'template') return []
   return blackDragon.grantGroups ?? []
 }
 

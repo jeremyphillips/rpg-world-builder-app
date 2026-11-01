@@ -53,6 +53,8 @@
  * | `armorTraining` | yes | yes | e.g. `Light armor training` |
  * | `equipment` | yes | yes | name only; services use `{Name} service` / `{A}, {B} services` |
  * | `featChoice` | yes | no | follow-up |
+ * | `rollAdjustment` | yes | yes | advantage or disadvantage sentence |
+ * | `saveOutcomeOverride` | yes | yes | success-instead sentence with use notation |
  * | unrecognized kind | — | fallback | `Additional benefit` when sole unsummarized item |
  *
  * Terminology:
@@ -61,6 +63,8 @@
  *   label builder yet (`kind: 'notRenderedYet'`). Formatters collapse these to `N more benefit(s)`.
  */
 import {
+  formatCreatureRollAdjustmentSentence,
+  formatCreatureSaveOutcomeOverrideSentence,
   formatDamageTypeGrantCompact,
   formatLanguageGrantCompact,
   formatMovementGrantCompact,
@@ -153,6 +157,8 @@ const KNOWN_CONTENT_GRANT_KINDS = new Set<string>([
   'featChoice',
   'equipment',
   'spells',
+  'rollAdjustment',
+  'saveOutcomeOverride',
 ])
 
 function formatSlugLabel(slug: string): string {
@@ -427,6 +433,28 @@ const GRANT_ITEM_MAPPERS: Partial<Record<ContentGrant['kind'], GrantItemMapper>>
       `${idPrefix}:equipment`,
       grant.kind,
       'equipment',
+      level,
+    ),
+  rollAdjustment: (grant, _vocabulary, idPrefix, level) =>
+    createSupportedGrantItems(
+      idPrefix,
+      'rollAdjustment',
+      formatCreatureRollAdjustmentSentence(
+        grant as Extract<ContentGrant, { kind: 'rollAdjustment' }>,
+      ).replace(/\.$/, ''),
+      'trait',
+      grant.kind,
+      level,
+    ),
+  saveOutcomeOverride: (grant, _vocabulary, idPrefix, level) =>
+    createSupportedGrantItems(
+      idPrefix,
+      'saveOutcomeOverride',
+      formatCreatureSaveOutcomeOverrideSentence(
+        grant as Extract<ContentGrant, { kind: 'saveOutcomeOverride' }>,
+      ).replace(/\.$/, ''),
+      'trait',
+      grant.kind,
       level,
     ),
 }

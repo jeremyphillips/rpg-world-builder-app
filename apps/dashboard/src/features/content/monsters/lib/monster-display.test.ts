@@ -224,4 +224,28 @@ describe('monster-display', () => {
     expect(viewModel.actions.map((action) => action.id)).not.toContain(hiddenAction!.id)
     expect(viewModel.traits.length).toBe(monster.traits.length - 1)
   })
+
+  it('keeps kobold template trait prose from the cited description override', () => {
+    const monster = pickMonster('kobold-warrior')
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Dragon',
+      equipmentById: new Map(),
+      catalogState: 'pending',
+      derived: null,
+    })
+
+    expect(viewModel.traits).toEqual([
+      expect.objectContaining({
+        id: 'pack-tactics',
+        name: 'Pack Tactics',
+        descriptionHtml: expect.stringContaining('The kobold has Advantage'),
+      }),
+      expect.objectContaining({
+        id: 'sunlight-sensitivity',
+        name: 'Sunlight Sensitivity',
+        descriptionHtml: expect.stringContaining('ability checks and attack rolls'),
+      }),
+    ])
+  })
 })

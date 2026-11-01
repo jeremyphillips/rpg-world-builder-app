@@ -22,7 +22,6 @@ import { MasterDetailBodyCampaignAccessDialogFields } from './master-detail-body
 import { MasterDetailDeleteDialog } from './master-detail-delete-dialog'
 import { MasterDetailEditorPanel } from './master-detail-editor-panel'
 import type { MasterDetailEditorIdentity } from './master-detail-editor-shell'
-import type { MasterDetailListItem } from './master-detail-list-panel'
 import { MasterDetailGrid } from './master-detail-grid'
 import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel'
 

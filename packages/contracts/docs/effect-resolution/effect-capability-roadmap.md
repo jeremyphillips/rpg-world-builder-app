@@ -45,7 +45,11 @@ and monster actions — not only one spell level.
 Recommended schema tranches (each unblocks editor promotion for spells **and** parallel
 content types):
 
-1. **Stat / roll modifiers** — AC, speed, attack/save bonuses, ward values
+1. **Stat / roll modifiers** — AC, speed, attack/save bonuses, ward values.
+   Creature traits can already grant `rollAdjustment` (advantage or disadvantage
+   on attack rolls, saving throws, or ability checks) and `saveOutcomeOverride`
+   (choose to succeed on a failed save). Spell resolution still does not emit
+   those effects. Situational evaluation waits for a roll or encounter consumer.
 2. **Conditions** — apply, remove, save-or-suffer, repeating saves
 3. **Movement and forced movement** — push, pull, jump grants, fall mitigation
 4. **Action grants** — bonus actions, special action types

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import {
   addCustomRefinementIssue,
+  collectCreatureTraitTemplateIssues,
   contentTraitKindSchema,
   defineMessage,
   fieldValidationMessages,
@@ -11,6 +12,7 @@ import {
 } from '@rpg/contracts'
 import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
+import { creatureTraitTemplateFields } from '../../lib/creature-traits/creature-trait-template-fields'
 import { grantArrayFields } from '../../lib/forms/grants/grant-form-fields'
 import {
   GRANT_TYPES,
@@ -61,6 +63,12 @@ function traitRowObjectSchema<Kind extends z.ZodType>(kindSchema: Kind) {
     description: z.string().optional(),
     nameOverride: z.string().optional(),
     descriptionOverride: z.string().optional(),
+    templateId: z.string().min(1).optional(),
+    config: z
+      .object({
+        uses: z.coerce.number().int().min(1).optional(),
+      })
+      .optional(),
     grants: z.array(grantRowFormSchema),
   })
 }
@@ -69,12 +77,21 @@ export function refinePublishedTraitRow(
   row: {
     kind?: string
     name?: string
+    templateId?: string
+    config?: { uses?: number }
     grants: z.infer<typeof grantRowFormSchema>[]
   },
   ctx: z.RefinementCtx,
 ): void {
   if (row.kind === 'custom' && !row.name?.trim()) {
     addCustomRefinementIssue(ctx, fieldValidationMessages.requiredText({ label: 'Name' }), ['name'])
+  }
+  if (row.kind === 'template') {
+    for (const issue of collectCreatureTraitTemplateIssues([
+      { kind: 'template', templateId: row.templateId, config: row.config },
+    ])) {
+      addCustomRefinementIssue(ctx, issue.message, issue.path.slice(1))
+    }
   }
   if (row.kind === 'grant') {
     if (row.grants.length === 0) {
@@ -167,7 +184,14 @@ export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
         },
       ],
     },
-    ...grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx),
+    ...creatureTraitTemplateFields(),
+    ...grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx).map((field) => ({
+      ...field,
+      visibility: {
+        dependsOn: ['kind'],
+        visibleWhen: (watched: Record<string, unknown>) => watched['kind'] !== 'template',
+      },
+    })),
   ]
 }
 
@@ -178,6 +202,16 @@ export function heritageOptionItemFields(ctx: ContentFormCtx): FormItem[] {
 
 export function traitItemTitle(values: Record<string, unknown>, index: number): string {
   const row = values as TraitRowForm
+  if (row.kind === 'template' && row.templateId) {
+    return resolveTraitName({
+      kind: 'template',
+      id: row.id ?? `trait-${index}`,
+      templateId: row.templateId,
+      config: row.config,
+      nameOverride: row.nameOverride,
+      descriptionOverride: row.descriptionOverride,
+    })
+  }
   if (row.kind === 'grant') {
     const grantGroups: GrantGroups = formRowsToGrantGroups(row.grants)
     if (isGrantGroupsEligible(grantGroups)) {

@@ -260,6 +260,29 @@ describe('deriveMonsterStatBlock', () => {
     expect(dagger?.attackBonus).toBe(4)
     expect(dagger?.damage).toBe('4')
     expect(dagger?.range).toEqual({ normal: 20, long: 60 })
+    expect(block.senses).toEqual([{ type: 'darkvision', range: 60 }])
+  })
+
+  it('keeps the greater sense range when a trait grants the same sense', () => {
+    const block = deriveMonsterStatBlock({
+      monster: {
+        ...kobold,
+        traits: [
+          {
+            kind: 'custom',
+            id: 'keen',
+            name: 'Keen Senses',
+            description: '<p>Sees farther.</p>',
+            grantGroups: [
+              { grants: [{ id: 'sense-1', kind: 'sense', type: 'darkvision', range: 120 }] },
+            ],
+          },
+        ],
+      },
+      equipmentCatalog,
+      skillCatalog,
+    })
+    expect(block.senses).toEqual([{ type: 'darkvision', range: 120 }])
   })
 
   it('derives Skeleton stat lines', () => {

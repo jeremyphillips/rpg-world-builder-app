@@ -1,6 +1,8 @@
 import type {
   Ability,
   ContentGrant,
+  CreatureEffectCircumstance,
+  CreatureRollTarget,
   DamageTypeId,
   FeatCategory,
   GrantGroup,
@@ -210,6 +212,26 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
     }),
   languageChoice: () => [],
   spellcasting: (grant, unlockLevel) => grantRows('spellcasting', unlockLevel, { id: grant.id }),
+  rollAdjustment: (grant, unlockLevel) => {
+    const abilityCheck = grant.rolls.find((roll) => roll.kind === 'ability-check')
+    return grantRows('rollAdjustment', unlockLevel, {
+      id: grant.id,
+      rollMode: grant.mode,
+      rollTargets: grant.rolls.map((roll) => roll.kind),
+      rollCheckAbility: abilityCheck?.ability,
+      rollSkillId: abilityCheck?.skillId,
+      circumstanceKind: grant.circumstance?.kind,
+      circumstanceConditionId:
+        grant.circumstance?.kind === 'vs-condition' ? grant.circumstance.conditionId : undefined,
+    })
+  },
+  saveOutcomeOverride: (grant, unlockLevel) =>
+    grantRows('saveOutcomeOverride', unlockLevel, {
+      id: grant.id,
+      saveOutcomeUses:
+        grant.limitedUse.count.kind === 'fixed' ? grant.limitedUse.count.value : undefined,
+      saveOutcomeRest: grant.limitedUse.recovery.minimumRest,
+    }),
 } satisfies { [K in ContentGrant['kind']]: ContentGrantRowsConverter<K> }
 
 /**
@@ -371,6 +393,59 @@ function spellcastingToGrant(_row: GrantRowForm): GrantWithoutRowId {
   return { kind: 'spellcasting' }
 }
 
+function rollTargetsFromForm(row: GrantRowForm): CreatureRollTarget[] {
+  const rolls: CreatureRollTarget[] = []
+  for (const kind of row.rollTargets ?? []) {
+    if (kind !== 'ability-check') {
+      rolls.push({ kind })
+      continue
+    }
+    if (!row.rollCheckAbility) continue
+    rolls.push({
+      kind: 'ability-check',
+      ability: row.rollCheckAbility,
+      ...(row.rollSkillId ? { skillId: row.rollSkillId } : {}),
+    })
+  }
+  return rolls
+}
+
+function circumstanceFromForm(row: GrantRowForm): CreatureEffectCircumstance | undefined {
+  if (!row.circumstanceKind) return undefined
+  if (row.circumstanceKind !== 'vs-condition') return { kind: row.circumstanceKind }
+  if (!row.circumstanceConditionId) return undefined
+  return { kind: 'vs-condition', conditionId: row.circumstanceConditionId }
+}
+
+function rollAdjustmentToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
+  if (!row.rollMode) return undefined
+  const rolls = rollTargetsFromForm(row)
+  if (rolls.length === 0) return undefined
+  if (row.circumstanceKind === 'vs-condition' && !row.circumstanceConditionId) return undefined
+  const circumstance = circumstanceFromForm(row)
+  return {
+    kind: 'rollAdjustment',
+    mode: row.rollMode,
+    rolls,
+    ...(circumstance ? { circumstance } : {}),
+  }
+}
+
+function saveOutcomeOverrideToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
+  const uses =
+    typeof row.saveOutcomeUses === 'number' ? row.saveOutcomeUses : Number(row.saveOutcomeUses)
+  if (!Number.isInteger(uses) || uses < 1 || !row.saveOutcomeRest) return undefined
+  return {
+    kind: 'saveOutcomeOverride',
+    outcome: 'success',
+    limitedUse: {
+      kind: 'uses',
+      count: { kind: 'fixed', value: uses },
+      recovery: { minimumRest: row.saveOutcomeRest },
+    },
+  }
+}
+
 const FORM_ROW_TO_CONTENT_GRANT: Partial<Record<GrantRowType, GrantRowContentConverter>> = {
   senses: sensesToGrant,
   resistances: resistancesToGrant,
@@ -385,6 +460,8 @@ const FORM_ROW_TO_CONTENT_GRANT: Partial<Record<GrantRowType, GrantRowContentCon
   equipment: equipmentToGrant,
   spells: spellsToGrant,
   spellcasting: spellcastingToGrant,
+  rollAdjustment: rollAdjustmentToGrant,
+  saveOutcomeOverride: saveOutcomeOverrideToGrant,
 }
 
 /**

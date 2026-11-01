@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { expectRichTextHtml } from '../lib/expect-rich-text-html'
-import type { ContentTrait } from '@rpg/contracts'
+import type { ContentTrait, GrantGroups } from '@rpg/contracts'
 import { normalizeGrantGroups, resolveTraitDisplay } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '../vocabulary'
 import { loadSeedSpecies, seedSpeciesSlugs } from './index'
@@ -9,6 +9,13 @@ import { loadSeedSpecies, seedSpeciesSlugs } from './index'
 const RULESET = 'srd-cc-5.2.1' as const
 
 type SeedSpecies = ReturnType<typeof loadSeedSpecies>[number]
+
+function grantGroupsOf(trait: {
+  kind: string
+  grantGroups?: GrantGroups
+}): GrantGroups | undefined {
+  return trait.kind === 'template' ? undefined : trait.grantGroups
+}
 
 function traitDescriptionHtml(trait: ContentTrait): string | undefined {
   return resolveTraitDisplay(trait).descriptionHtml
@@ -75,7 +82,7 @@ describe('SRD 5.2.1 species seed', () => {
     expect(dragonborn!.heritage?.id).toBe('draconic-ancestry')
     expect(dragonborn!.heritage!.options).toHaveLength(10)
     for (const option of dragonborn!.heritage!.options) {
-      const grants = option.grantGroups?.[0]?.grants ?? []
+      const grants = grantGroupsOf(option)?.[0]?.grants ?? []
       expect(grants.some((g) => g.kind === 'damageType')).toBe(true)
       expect(grants.some((g) => g.kind === 'resistances')).toBe(true)
     }
@@ -91,12 +98,12 @@ describe('SRD 5.2.1 species seed', () => {
   it('Drow lineage grants darkvision 120 and level-gated spells', () => {
     const elf = species.find((s) => s.slug === 'elf')!
     const drow = elf.heritage!.options.find((o) => o.id === 'drow')!
-    const defaultGrants = drow.grantGroups?.[0]?.grants ?? []
+    const defaultGrants = grantGroupsOf(drow)?.[0]?.grants ?? []
     expect(
       defaultGrants.some((g) => g.kind === 'sense' && g.type === 'darkvision' && g.range === 120),
     ).toBe(true)
     // level-1 (default) + level-3 + level-5 groups
-    expect(drow.grantGroups?.length).toBeGreaterThanOrEqual(3)
+    expect(grantGroupsOf(drow)?.length).toBeGreaterThanOrEqual(3)
   })
 
   it('grant darkvision traits derive display name and description', () => {
@@ -111,7 +118,7 @@ describe('SRD 5.2.1 species seed', () => {
   it('Wood Elf grants +5 ft walking speed', () => {
     const elf = species.find((s) => s.slug === 'elf')!
     const woodElf = elf.heritage!.options.find((o) => o.id === 'wood-elf')!
-    const defaultGrants = woodElf.grantGroups?.[0]?.grants ?? []
+    const defaultGrants = grantGroupsOf(woodElf)?.[0]?.grants ?? []
     const speedGrant = defaultGrants.find((g) => g.kind === 'movement')
     expect(speedGrant).toEqual({
       id: 'walk-movement',
@@ -133,10 +140,10 @@ describe('SRD 5.2.1 species seed', () => {
     const tiefling = species.find((s) => s.slug === 'tiefling')!
     const options = tiefling.heritage!.options
     for (const option of options) {
-      const defaultGrants = option.grantGroups?.[0]?.grants ?? []
+      const defaultGrants = grantGroupsOf(option)?.[0]?.grants ?? []
       expect(defaultGrants.some((g) => g.kind === 'resistances')).toBe(true)
       // default (resistance + level-1 spell) + level-3 group + level-5 group
-      expect(option.grantGroups?.length).toBeGreaterThanOrEqual(3)
+      expect(grantGroupsOf(option)?.length).toBeGreaterThanOrEqual(3)
     }
   })
 
@@ -148,7 +155,7 @@ describe('SRD 5.2.1 species seed', () => {
     expect(tiefling.sizes).toContain('medium')
     expect(tiefling.sizes).toContain('small')
     const versatile = human.traits.find((t) => t.id === 'versatile')
-    const defaultGrants = versatile?.grantGroups?.[0]?.grants ?? []
+    const defaultGrants = (versatile ? grantGroupsOf(versatile) : undefined)?.[0]?.grants ?? []
     const featGrant = defaultGrants.find((g) => g.kind === 'featChoice')
     expect(featGrant).toMatchObject({
       kind: 'featChoice',
@@ -166,7 +173,7 @@ describe('SRD 5.2.1 species seed', () => {
   it('Dwarf grants poison resistance', () => {
     const dwarf = species.find((s) => s.slug === 'dwarf')!
     const resilience = dwarf.traits.find((t) => t.id === 'dwarven-resilience')!
-    const defaultGrants = resilience.grantGroups?.[0]?.grants ?? []
+    const defaultGrants = grantGroupsOf(resilience)?.[0]?.grants ?? []
     const resistGrant = defaultGrants.find((g) => g.kind === 'resistances')
     expect(resistGrant?.kind === 'resistances' && resistGrant.damageTypes).toContain('poison')
   })
@@ -212,12 +219,14 @@ describe('SRD 5.2.1 species seed', () => {
   it('all seed grantGroups are already in canonical form (normalizeGrantGroups round-trip is identity)', () => {
     for (const sp of species) {
       for (const trait of sp.traits) {
-        if (!trait.grantGroups) continue
-        expect(normalizeGrantGroups(trait.grantGroups)).toEqual(trait.grantGroups)
+        const traitGroups = grantGroupsOf(trait)
+        if (!traitGroups) continue
+        expect(normalizeGrantGroups(traitGroups)).toEqual(traitGroups)
       }
       for (const option of sp.heritage?.options ?? []) {
-        if (!option.grantGroups) continue
-        expect(normalizeGrantGroups(option.grantGroups)).toEqual(option.grantGroups)
+        const optionGroups = grantGroupsOf(option)
+        if (!optionGroups) continue
+        expect(normalizeGrantGroups(optionGroups)).toEqual(optionGroups)
       }
     }
   })

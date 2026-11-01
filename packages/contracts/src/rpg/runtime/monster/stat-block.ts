@@ -2,10 +2,13 @@ import { availableBodyRows } from '../../content/lib/campaign-access/body-row-av
 import type { MonsterAction, MonsterBody } from '../../content/monster'
 import { getSkillName } from '../../content/skill-proficiency'
 import { NEUTRAL_ABILITY_SCORE } from '../../vocab/ability'
+import type { Sense } from '../../vocab/sense'
 import { CHALLENGE_RATING_MECHANICS } from '../../vocab/challenge-rating'
 import { CREATURE_SIZE_HIT_DIE, resolveLargestCreatureSize } from '../../vocab/creature-size'
 import type { ArmorClassRules } from '../../vocab/mechanics/armor-class-scale'
 import { abilityModifier } from '../creature/ability-modifier'
+import { resolveCreatureSenses } from '../creature/senses'
+import { resolveCreatureTraitGrants } from '../creature/traits'
 import { abilitySaveDc, spellAttackBonus } from '../creature/spell-dc'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { resolveMonsterArmorClass, type MonsterArmorClassResolution } from './armor-class'
@@ -62,6 +65,7 @@ export type DerivedMonsterStatBlock = {
   skills: Array<{ skillId: string; label: string; modifier: number }>
   attacks: DerivedMonsterAttackLine[]
   spellcasting: DerivedMonsterSpellcastingLine[]
+  senses: Sense[]
 }
 
 export type DerivedMonsterSpellcastingLine = {
@@ -248,6 +252,12 @@ export function deriveMonsterStatBlock({
     skills,
     attacks,
     spellcasting: deriveSpellcastingLines(monster, proficiencyBonus),
+    senses: resolveCreatureSenses({
+      authored: monster.senses,
+      grants: resolveCreatureTraitGrants(
+        monster.traits.map((trait) => ({ trait, source: trait.id })),
+      ).map((resolved) => resolved.grant),
+    }),
   }
 }
 

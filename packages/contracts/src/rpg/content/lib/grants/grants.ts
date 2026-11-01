@@ -41,6 +41,11 @@ import {
   weaponProficiencyGrantSchema,
 } from './proficiency-grant'
 import { joinNaturalList } from '../../../primitives/prose'
+import {
+  creatureRollAdjustmentSchema,
+  creatureSaveOutcomeOverrideSchema,
+} from '../../creature/effects'
+import { refineCreatureTraitTemplate } from '../../creature/traits/validate'
 
 // ---------------------------------------------------------------------------
 // Content grants — shared mechanical payload for species traits, class features,
@@ -277,6 +282,18 @@ const spellcastingContentGrantSchema = z.object({
   kind: z.literal('spellcasting'),
 })
 
+/** Advantage or disadvantage on a closed set of rolls, optionally limited by circumstance. */
+const rollAdjustmentContentGrantSchema = creatureRollAdjustmentSchema.extend({
+  id: grantRowIdSchema,
+  kind: z.literal('rollAdjustment'),
+})
+
+/** Replace a failed saving throw with a success, limited by rest-based uses. */
+const saveOutcomeOverrideContentGrantSchema = creatureSaveOutcomeOverrideSchema.extend({
+  id: grantRowIdSchema,
+  kind: z.literal('saveOutcomeOverride'),
+})
+
 /**
  * Spells granted by a trait or feature at a given unlock level.
  *
@@ -359,6 +376,8 @@ export const contentGrantSchema = z.discriminatedUnion('kind', [
   equipmentContentGrantSchema,
   spellsContentGrantSchema,
   spellcastingContentGrantSchema,
+  rollAdjustmentContentGrantSchema,
+  saveOutcomeOverrideContentGrantSchema,
 ])
 
 export type ContentGrant = z.infer<typeof contentGrantSchema>
@@ -586,7 +605,7 @@ export function resolveGrantGroupsFromContent(
 
 // --- Trait building block ---------------------------------------------------
 
-export const CONTENT_TRAIT_KINDS = ['custom', 'grant'] as const
+export const CONTENT_TRAIT_KINDS = ['custom', 'grant', 'template'] as const
 
 export const contentTraitKindSchema = z.enum(CONTENT_TRAIT_KINDS)
 
@@ -633,9 +652,25 @@ export const grantContentTraitSchema = z
 
 export type GrantContentTrait = z.infer<typeof grantContentTraitSchema>
 
+/**
+ * Registry-backed trait. Mechanics resolve from `templateId` at read time.
+ * Only config and display overrides are stored on the assignment.
+ */
+export const templateContentTraitSchema = z.object({
+  kind: z.literal('template'),
+  id: z.string().min(1),
+  templateId: z.string().min(1),
+  config: z.unknown().optional(),
+  nameOverride: z.string().min(1).optional(),
+  descriptionOverride: z.string().optional(),
+})
+
+export type TemplateContentTrait = z.infer<typeof templateContentTraitSchema>
+
 const contentTraitUnionSchema = z.discriminatedUnion('kind', [
   customContentTraitSchema,
   grantContentTraitSchema,
+  templateContentTraitSchema,
 ])
 
 /** Defaults missing `kind` to `custom` for legacy homebrew records. */
@@ -650,6 +685,10 @@ export function normalizeContentTrait(input: unknown): unknown {
  * Universal building block for species traits and heritage options.
  * Class features extend {@link customContentTraitSchema} only.
  */
-export const contentTraitSchema = z.preprocess(normalizeContentTrait, contentTraitUnionSchema)
+export const contentTraitSchema = z
+  .preprocess(normalizeContentTrait, contentTraitUnionSchema)
+  .superRefine((trait, ctx) => {
+    if (trait.kind === 'template') refineCreatureTraitTemplate(trait, ctx)
+  })
 
 export type ContentTrait = z.infer<typeof contentTraitSchema>

@@ -61,6 +61,23 @@ export function traitToFormRow(trait: SpeciesBodyTrait): TraitRowForm {
       available,
     }
   }
+  if (trait.kind === 'template') {
+    const hasOverrides = Boolean(trait.nameOverride || trait.descriptionOverride)
+    return {
+      id: trait.id,
+      kind: 'template',
+      templateId: trait.templateId,
+      config:
+        trait.config && typeof trait.config === 'object'
+          ? (trait.config as TraitRowForm['config'])
+          : undefined,
+      overrideDisplay: hasOverrides,
+      nameOverride: trait.nameOverride,
+      descriptionOverride: trait.descriptionOverride,
+      grants: [],
+      available,
+    }
+  }
   const grants = grantGroupsToFormRows(resolveGrantGroupsFromContent(trait))
   return {
     id: trait.id,
@@ -73,19 +90,46 @@ export function traitToFormRow(trait: SpeciesBodyTrait): TraitRowForm {
   }
 }
 
-export function traitFromFormRow(row: TraitRowForm & { id: string }): SpeciesBodyTrait {
-  const available = mapBodyRowAvailableFromForm(row.available)
-  if (row.kind === 'grant') {
-    const grantGroups = formRowsToGrantGroups(row.grants)
-    return {
-      kind: 'grant',
-      id: row.id,
-      grantGroups,
-      nameOverride: row.nameOverride || undefined,
-      descriptionOverride: row.descriptionOverride || undefined,
-      ...(available === false ? { available: false } : {}),
-    }
+function unavailableFlag(
+  available: boolean | undefined,
+): { available: false } | Record<string, never> {
+  return available === false ? { available: false } : {}
+}
+
+function grantTraitFromFormRow(
+  row: TraitRowForm & { id: string },
+  available: boolean | undefined,
+): SpeciesBodyTrait {
+  return {
+    kind: 'grant',
+    id: row.id,
+    grantGroups: formRowsToGrantGroups(row.grants),
+    nameOverride: row.nameOverride || undefined,
+    descriptionOverride: row.descriptionOverride || undefined,
+    ...unavailableFlag(available),
   }
+}
+
+function templateTraitFromFormRow(
+  row: TraitRowForm & { id: string },
+  available: boolean | undefined,
+): SpeciesBodyTrait {
+  const uses = row.config?.uses
+  return {
+    kind: 'template',
+    id: row.id,
+    templateId: row.templateId ?? '',
+    ...(uses ? { config: { uses: Number(uses) } } : {}),
+    nameOverride: row.nameOverride || undefined,
+    descriptionOverride: row.descriptionOverride || undefined,
+    ...unavailableFlag(available),
+  }
+}
+
+function customTraitFromFormRow(
+  row: TraitRowForm & { id: string },
+  available: boolean | undefined,
+): SpeciesBodyTrait {
   const grantGroups = formRowsToGrantGroups(row.grants)
   return {
     kind: 'custom',
@@ -93,12 +137,19 @@ export function traitFromFormRow(row: TraitRowForm & { id: string }): SpeciesBod
     name: row.name!,
     description: row.description || undefined,
     ...(grantGroups.length ? { grantGroups } : {}),
-    ...(available === false ? { available: false } : {}),
+    ...unavailableFlag(available),
   }
 }
 
+export function traitFromFormRow(row: TraitRowForm & { id: string }): SpeciesBodyTrait {
+  const available = mapBodyRowAvailableFromForm(row.available)
+  if (row.kind === 'grant') return grantTraitFromFormRow(row, available)
+  if (row.kind === 'template') return templateTraitFromFormRow(row, available)
+  return customTraitFromFormRow(row, available)
+}
+
 export function traitRowNameForIdAssignment(row: TraitRowForm, index: number): string {
-  if (row.kind === 'grant') {
+  if (row.kind === 'grant' || row.kind === 'template') {
     return row.nameOverride?.trim() || traitItemTitle(row, index)
   }
   return row.name?.trim() || `Trait ${index + 1}`

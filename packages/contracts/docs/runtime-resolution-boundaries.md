@@ -63,14 +63,17 @@ from a layer below it in this diagram, it is in the wrong module.
 - Dashboard or API modules
 - `runtime/character-builder/`
 
-**Suggested modules:** one noun per file — `languages.ts`, `senses.ts`, `damage-resistances.ts`.
+**Suggested modules:** one noun per file — `languages.ts`, `senses.ts`, `traits.ts`, `damage-resistances.ts`.
 
 **Exists today:** `creature/languages.ts`, `creature/equipment.ts`, `creature/equipment-id-match.ts`,
 `creature/equipment-stack.ts`, `creature/proficiencies.ts`, `creature/weapon-cross-recommendation.ts`,
 `creature/resolve-inventory-weapon-attack.ts`, `creature/resolve-equipment-row-summary.ts`
 (card/read-model weapon summaries for any creature-like inventory row),
 `creature/equipment-inventory-unmodified-context.ts` (plain vs configured sibling context for UI qualifiers),
-`creature/spellcasting.ts`
+`creature/spellcasting.ts`, `creature/traits.ts` (template, custom, and grant rows
+expanded to grants, with the same template id collapsed across sources),
+`creature/senses.ts` (authored senses merged with sense grants by type, keeping
+the greater range)
 
 Loadout and inventory architecture (implemented vs future): [equipment-loadout.md](./equipment-loadout.md).
 
