@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from 'react'
+import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
@@ -6,6 +6,7 @@ import { wrapMasterDetailDetailFields } from '../../lib/master-detail/wrap-maste
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
 import { MasterDetailRowPrefixProvider } from '../../lib/master-detail/master-detail-row-prefix.context'
+import type { DetailOverflowMenuEntry } from '../../lib/detail/detail-overflow-actions'
 import {
   MasterDetailEditorShell,
   type MasterDetailEditorIdentity,
@@ -32,6 +33,19 @@ export interface MasterDetailEditorPanelProps {
   /** Override RHF prefix for availability dialog fields (defaults to row prefix). */
   availabilityNamePrefix?: string
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
+  /** Leading overflow entries, such as Move to. */
+  overflowActions?: readonly DetailOverflowMenuEntry[]
+  /** Attack summary, notices, and advisories rendered above the row fields. */
+  detailLeading?: ReactNode
+  /** Replaces the default `FormItems` body when the row is not a static field list. */
+  renderBody?: (ctx: {
+    selectedFieldId: string
+    selectedIndex: number
+    namePrefix: string
+  }) => ReactNode
+  onDuplicate?: () => void
+  /** Replaces the default delete-confirm request. */
+  onDelete?: () => void
 }
 
 interface MasterDetailSelectedRowEditorProps {
@@ -45,6 +59,12 @@ interface MasterDetailSelectedRowEditorProps {
   availabilityFormItems?: FormItem[]
   availabilityNamePrefix?: string
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
+  detailLeading?: ReactNode
+  renderBody?: (ctx: {
+    selectedFieldId: string
+    selectedIndex: number
+    namePrefix: string
+  }) => ReactNode
 }
 
 function MasterDetailSelectedRowEditor({
@@ -58,6 +78,8 @@ function MasterDetailSelectedRowEditor({
   availabilityFormItems,
   availabilityNamePrefix,
   availabilityDialogRef,
+  detailLeading,
+  renderBody,
 }: MasterDetailSelectedRowEditorProps) {
   const resolvedAvailabilityNamePrefix = availabilityNamePrefix ?? `${fieldName}.${selectedIndex}`
 
@@ -77,12 +99,17 @@ function MasterDetailSelectedRowEditor({
           />
         </div>
       ) : null}
-      <FormItems
-        key={`${selectedFieldId}:${selectedIndex}`}
-        items={wrapMasterDetailDetailFields(itemFields)}
-        idPrefix={`${idPrefix}-${selectedFieldId}`}
-        namePrefix={rowPrefix}
-      />
+      {detailLeading}
+      {renderBody ? (
+        renderBody({ selectedFieldId, selectedIndex, namePrefix: rowPrefix })
+      ) : (
+        <FormItems
+          key={`${selectedFieldId}:${selectedIndex}`}
+          items={wrapMasterDetailDetailFields(itemFields)}
+          idPrefix={`${idPrefix}-${selectedFieldId}`}
+          namePrefix={rowPrefix}
+        />
+      )}
     </MasterDetailRowPrefixProvider>
   )
 }
@@ -104,6 +131,11 @@ export function MasterDetailEditorPanel({
   availabilityFormItems,
   availabilityNamePrefix,
   availabilityDialogRef,
+  overflowActions,
+  detailLeading,
+  renderBody,
+  onDuplicate,
+  onDelete,
 }: MasterDetailEditorPanelProps) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const selectedIndex = editor.selectedIndex
@@ -125,9 +157,14 @@ export function MasterDetailEditorPanel({
     <MasterDetailEditorShell
       itemNoun={itemNoun}
       selectedIdentity={hasSelectedRow ? selectedIdentity : undefined}
-      onDelete={() => {
-        if (selectedIndex !== null) editor.requestRemove(selectedIndex)
-      }}
+      onDelete={
+        onDelete ??
+        (() => {
+          if (selectedIndex !== null) editor.requestRemove(selectedIndex)
+        })
+      }
+      onDuplicate={onDuplicate}
+      overflowActions={overflowActions}
       bodyRef={bodyRef}
     >
       {hasSelectedRow && selectedFieldId && selectedIndex !== null ? (
@@ -142,6 +179,8 @@ export function MasterDetailEditorPanel({
           availabilityFormItems={availabilityFormItems}
           availabilityNamePrefix={availabilityNamePrefix}
           availabilityDialogRef={availabilityDialogRef}
+          detailLeading={detailLeading}
+          renderBody={renderBody}
         />
       ) : null}
     </MasterDetailEditorShell>

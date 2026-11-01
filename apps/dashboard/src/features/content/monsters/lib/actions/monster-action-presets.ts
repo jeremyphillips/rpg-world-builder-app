@@ -21,8 +21,4 @@ export type MonsterActionDraftRow = {
   DraftVariant<'save'> &
   DraftVariant<'multiattack'>
 
-export function createMonsterRowId(): string {
-  return crypto.randomUUID()
-}
-
 export { monsterActionSectionHeading } from '../monster-form-labels'

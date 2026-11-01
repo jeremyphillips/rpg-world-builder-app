@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react'
 
+import { CreatureTraitAddMenu } from '../../lib/creature-traits/creature-trait-add-menu'
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
@@ -37,6 +38,23 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
       addLabel="Add trait"
       idPrefix="species-trait"
       makeItemDefaults={makeItemDefaults}
+      renderAddControl={({ append }) => (
+        <CreatureTraitAddMenu
+          label="Add trait"
+          rulesetId={formCtx.rulesetId}
+          onCustom={() => append(makeItemDefaults())}
+          onTemplate={(templateId) =>
+            append({
+              ...makeItemDefaults(),
+              kind: 'template',
+              templateId,
+              name: '',
+              description: '',
+              ...(templateId === 'legendary-resistance' ? { config: { uses: 3 } } : {}),
+            })
+          }
+        />
+      )}
       mapListItem={({ row, index }) => ({
         title: traitItemTitle((row ?? {}) as TraitRowForm, index),
       })}

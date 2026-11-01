@@ -28,13 +28,13 @@ const items: MasterDetailListItem[] = [
 function baseProps() {
   return {
     items,
-    selectedIndex: 0,
+    selectedItemId: 'a',
     listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: vi.fn(),
-    onSelect: vi.fn(),
+    onSelectItem: vi.fn(),
   }
 }
 
@@ -79,7 +79,7 @@ describe('MasterDetailListPanel', () => {
   })
 
   it('uses compact interactive list selected chrome on the current row', () => {
-    render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
+    render(<MasterDetailListPanel {...baseProps()} selectedItemId="a" />)
 
     const selected = screen.getByRole('button', { name: /Rage/i })
     const unselected = screen.getByRole('button', { name: /Unarmored Defense/i })
@@ -109,13 +109,13 @@ describe('MasterDetailListPanel', () => {
     expect(list.className).not.toMatch(/\bgap-2\b/)
   })
 
-  it('calls onSelect with the row index when the whole row is clicked', async () => {
+  it('calls onSelectItem with the row id when the whole row is clicked', async () => {
     const user = userEvent.setup()
     const props = baseProps()
     render(<MasterDetailListPanel {...props} />)
 
     await user.click(screen.getByRole('button', { name: /Unarmored Defense/i }))
-    expect(props.onSelect).toHaveBeenCalledWith(1)
+    expect(props.onSelectItem).toHaveBeenCalledWith('b')
   })
 
   it('renders structured meta in separate eyebrow and source regions', () => {
@@ -146,7 +146,7 @@ describe('MasterDetailListPanel', () => {
   })
 
   it('renders the empty label when there are no items', () => {
-    render(<MasterDetailListPanel {...baseProps()} items={[]} selectedIndex={null} />)
+    render(<MasterDetailListPanel {...baseProps()} items={[]} selectedItemId={null} />)
     const emptyLabel = screen.getByText(
       masterDetailEmptyListLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN),
     )
@@ -217,31 +217,31 @@ describe('MasterDetailListPanel', () => {
   })
 
   it('does not scroll into view on initial mount', () => {
-    render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
+    render(<MasterDetailListPanel {...baseProps()} selectedItemId="a" />)
 
     expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
   })
 
   it('scrolls the selected row into view when selection identity changes off-scrollport', () => {
-    const { rerender } = render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
+    const { rerender } = render(<MasterDetailListPanel {...baseProps()} selectedItemId="a" />)
 
     vi.mocked(isElementOutsideScrollport).mockReturnValue(true)
-    rerender(<MasterDetailListPanel {...baseProps()} selectedIndex={1} />)
+    rerender(<MasterDetailListPanel {...baseProps()} selectedItemId="b" />)
 
     expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ block: 'nearest' })
   })
 
   it('scrolls into view when the visible list projection changes off-scrollport', () => {
-    const { rerender } = render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
+    const { rerender } = render(<MasterDetailListPanel {...baseProps()} selectedItemId="a" />)
 
     vi.mocked(isElementOutsideScrollport).mockReturnValue(true)
     rerender(
       <MasterDetailListPanel
         {...baseProps()}
-        selectedIndex={0}
+        selectedItemId="a"
         items={[
+          { id: 'a', title: 'Rage' },
           { id: 'x', title: 'Revealed Row' },
-          { id: 'b', title: 'Unarmored Defense' },
         ]}
       />,
     )
@@ -250,12 +250,64 @@ describe('MasterDetailListPanel', () => {
   })
 
   it('does not scroll into view when the selected row is already in the scrollport', () => {
-    const { rerender } = render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
+    const { rerender } = render(<MasterDetailListPanel {...baseProps()} selectedItemId="a" />)
 
     vi.mocked(isElementOutsideScrollport).mockReturnValue(false)
-    rerender(<MasterDetailListPanel {...baseProps()} selectedIndex={1} />)
+    rerender(<MasterDetailListPanel {...baseProps()} selectedItemId="b" />)
 
     expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
+  })
+
+  it('renders grouped sections in one nav with one count and per-group add controls', async () => {
+    const user = userEvent.setup()
+    const onSelectItem = vi.fn()
+    const onAddActions = vi.fn()
+    const onAddReactions = vi.fn()
+
+    render(
+      <MasterDetailListPanel
+        ariaLabel="Actions"
+        itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
+        selectedItemId="bite"
+        onSelectItem={onSelectItem}
+        countSupplement={<span>2 available</span>}
+        invalidItemCount={1}
+        groups={[
+          {
+            id: 'actions',
+            title: 'Actions',
+            addControl: (
+              <button type="button" onClick={onAddActions}>
+                Add action
+              </button>
+            ),
+            items: [{ id: 'bite', title: 'Bite' }],
+          },
+          {
+            id: 'reactions',
+            title: 'Reactions',
+            addControl: (
+              <button type="button" onClick={onAddReactions}>
+                Add reaction
+              </button>
+            ),
+            items: [{ id: 'parry', title: 'Parry' }],
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getAllByRole('navigation')).toHaveLength(1)
+    expect(screen.getAllByText('2 available')).toHaveLength(1)
+    expect(screen.getByRole('region', { name: 'Actions' })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Reactions' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Add reaction' }))
+    expect(onAddReactions).toHaveBeenCalledOnce()
+    expect(onAddActions).not.toHaveBeenCalled()
+
+    await user.click(screen.getByRole('button', { name: /Parry/i }))
+    expect(onSelectItem).toHaveBeenCalledWith('parry')
   })
 
   itAxe('has no axe accessibility violations', async () => {

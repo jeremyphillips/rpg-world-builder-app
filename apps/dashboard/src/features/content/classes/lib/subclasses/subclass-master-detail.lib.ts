@@ -2,6 +2,7 @@ import type { CatalogLayer, ContentStatus, ResolvedSubclass } from '@rpg/contrac
 
 import type { MasterDetailEditorIdentity } from '../../../components/master-detail/master-detail-editor-shell'
 import type { MasterDetailAvailabilityPresentation } from '../../../lib/master-detail/master-detail-availability.types'
+import { resolveMasterDetailSourceLabel } from '../../../lib/master-detail/resolve-master-detail-source-label'
 import {
   isDraftSubclassId,
   isSubclassDeletable,
@@ -9,12 +10,6 @@ import {
 } from './subclass-editor-constants'
 import type { SubclassFormValues } from './subclass-form-fields'
 import type { SubclassListItem } from './subclass-editor-state'
-
-const SOURCE_BADGE_LABEL = {
-  system: 'System',
-  homebrew: 'Homebrew',
-  unsaved: 'Unsaved',
-} as const
 
 export function resolveSubclassSourceLabel(
   subclassId: string,
@@ -26,7 +21,7 @@ export function resolveSubclassSourceLabel(
       ? 'unsaved'
       : source
 
-  return SOURCE_BADGE_LABEL[listSource]
+  return resolveMasterDetailSourceLabel(listSource)
 }
 
 function resolveSubclassSelectionSource(

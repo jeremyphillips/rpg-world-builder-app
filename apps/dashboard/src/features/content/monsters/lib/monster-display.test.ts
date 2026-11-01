@@ -196,4 +196,56 @@ describe('monster-display', () => {
     expect(breath?.descriptionHtml).toContain('15-foot Cone')
     expect(breath?.descriptionHtml).toContain('Success: Half damage')
   })
+
+  it('omits unavailable traits and actions from the read-only projection', () => {
+    const monster = pickMonster('kobold-warrior')
+    const hiddenTrait = monster.traits[0]
+    const hiddenAction = monster.actions[0]
+    expect(hiddenTrait).toBeDefined()
+    expect(hiddenAction).toBeDefined()
+
+    const viewModel = buildMonsterDetailViewModel({
+      monster: {
+        ...monster,
+        traits: monster.traits.map((trait) =>
+          trait.id === hiddenTrait!.id ? { ...trait, available: false } : trait,
+        ),
+        actions: monster.actions.map((action) =>
+          action.id === hiddenAction!.id ? { ...action, available: false } : action,
+        ),
+      },
+      creatureTypeLabel: 'Dragon',
+      equipmentById: new Map(),
+      catalogState: 'pending',
+      derived: null,
+    })
+
+    expect(viewModel.traits.map((trait) => trait.id)).not.toContain(hiddenTrait!.id)
+    expect(viewModel.actions.map((action) => action.id)).not.toContain(hiddenAction!.id)
+    expect(viewModel.traits.length).toBe(monster.traits.length - 1)
+  })
+
+  it('keeps kobold template trait prose from the cited description override', () => {
+    const monster = pickMonster('kobold-warrior')
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Dragon',
+      equipmentById: new Map(),
+      catalogState: 'pending',
+      derived: null,
+    })
+
+    expect(viewModel.traits).toEqual([
+      expect.objectContaining({
+        id: 'pack-tactics',
+        name: 'Pack Tactics',
+        descriptionHtml: expect.stringContaining('The kobold has Advantage'),
+      }),
+      expect.objectContaining({
+        id: 'sunlight-sensitivity',
+        name: 'Sunlight Sensitivity',
+        descriptionHtml: expect.stringContaining('ability checks and attack rolls'),
+      }),
+    ])
+  })
 })

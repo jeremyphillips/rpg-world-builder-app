@@ -13,6 +13,7 @@ import { resolveCatalogForCampaign } from '../content.service'
 import { classContentConfig } from '../classes/classes.config'
 import type { ContentWriteContext } from '../lib/content-write-config'
 import { assertContentSpellReferences } from '../lib/assert-content-spell-references'
+import { rejectInvalidCreatureTraitTemplates } from '../lib/reject-creature-trait-templates'
 import { assertSpeciesClassSlugsFromInput } from './assert-species-class-slugs'
 
 function entityBody(entity: Record<string, unknown>): Record<string, unknown> {
@@ -42,6 +43,15 @@ export async function speciesValidateBeforeWrite(ctx: ContentWriteContext): Prom
           ...ctx.input,
         }
       : ctx.input
+
+  rejectInvalidCreatureTraitTemplates(inputForVocab.traits, ['traits'])
+  const heritage = inputForVocab.heritage
+  if (heritage && typeof heritage === 'object' && 'options' in heritage) {
+    rejectInvalidCreatureTraitTemplates((heritage as { options?: unknown }).options, [
+      'heritage',
+      'options',
+    ])
+  }
 
   await assertDamageTypesActiveInCampaign(ctx.campaignId, [
     ...extractSpeciesDamageTypeIds(inputForVocab),

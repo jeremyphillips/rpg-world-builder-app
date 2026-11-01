@@ -88,7 +88,10 @@ describe('speciesFormDef round-trips', () => {
     const formValues = speciesFormDef.toFormValues(dragonborn) as SpeciesFormValues
     const input = speciesFormDef.toInput(formValues)
     const firstOption = input.heritage?.options[0]
-    const defaultGrants = firstOption?.grantGroups?.[0]?.grants ?? []
+    const defaultGrants =
+      firstOption && firstOption.kind !== 'template'
+        ? (firstOption.grantGroups?.[0]?.grants ?? [])
+        : []
     expect(
       defaultGrants.some((g) => g.kind === 'resistances' && g.damageTypes.includes('acid')),
     ).toBe(true)

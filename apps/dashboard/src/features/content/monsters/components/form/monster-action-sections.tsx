@@ -10,8 +10,12 @@ import { useFormContext } from 'react-hook-form'
 import { EquipmentPickerDrawer } from '@/features/character'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { MasterDetailDeleteDialog } from '../../../components/master-detail/master-detail-delete-dialog'
 import { MasterDetailGrid } from '../../../components/master-detail/master-detail-grid'
 import { MasterDetailListPanel } from '../../../components/master-detail/master-detail-list-panel'
+import { masterDetailItemNounLabel } from '../../../lib/master-detail/master-detail-constants'
+import { useEmbeddedMasterDetailRows } from '../../../lib/master-detail/use-embedded-master-detail-rows'
+import { useMasterDetailCollectionAvailability } from '../../../lib/master-detail/use-master-detail-collection-availability'
 import {
   MONSTER_ACTION_ACQUISITION_GROUPS,
   monsterActionAcquisitionItems,
@@ -22,6 +26,7 @@ import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
+import { multiattacksReferencingAction } from '../../lib/actions/monster-action-multiattack-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterActionPending } from '../../hooks/use-monster-action-sections'
 import {
@@ -42,7 +47,7 @@ import {
   MONSTER_REACTIONS_HEADING,
   formatDropTriggerBody,
 } from '../../lib/monster-form-labels'
-import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-trait-form-fields'
+import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
 import { MonsterActionDetail } from './monster-action-detail'
@@ -53,12 +58,12 @@ const SECTION_HEADINGS = {
   reactions: MONSTER_REACTIONS_HEADING,
 } as const
 
-function sectionRows(
-  values: MonsterFormValues | undefined,
-  section: MonsterActionSection,
-): MonsterActionDraftRow[] {
-  const rows = values?.[section]
-  return Array.isArray(rows) ? (rows as MonsterActionDraftRow[]) : []
+function mapActionListItem(row: unknown, index: number) {
+  const action = row as MonsterActionDraftRow | undefined
+  return {
+    title: action?.name?.trim() || `Action ${index + 1}`,
+    eyebrow: action ? getMonsterActionKindLabel(action.kind) : undefined,
+  }
 }
 
 function MonsterActionAddMenu({
@@ -158,58 +163,132 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
 
   const weaponGrants = useMemo(() => resolveMonsterFormWeaponGrants(values), [values])
 
+  const actionRows = useEmbeddedMasterDetailRows({
+    formCtx: ctx,
+    fieldName: 'actions',
+    editor: sections.editors.actions,
+    itemFields: [],
+    itemNoun: MONSTER_ACTION_ITEM_NOUN,
+    mapListItem: ({ row, index }) => mapActionListItem(row, index),
+    access: { kind: 'availability', fieldName: 'available' },
+    resolveRowIssueCount: (index) =>
+      formState.submitCount > 0 && sections.hasRowError('actions', index) ? 1 : 0,
+  })
+  const bonusRows = useEmbeddedMasterDetailRows({
+    formCtx: ctx,
+    fieldName: 'bonusActions',
+    editor: sections.editors.bonusActions,
+    itemFields: [],
+    itemNoun: MONSTER_ACTION_ITEM_NOUN,
+    mapListItem: ({ row, index }) => mapActionListItem(row, index),
+    access: { kind: 'availability', fieldName: 'available' },
+    resolveRowIssueCount: (index) =>
+      formState.submitCount > 0 && sections.hasRowError('bonusActions', index) ? 1 : 0,
+  })
+  const reactionRows = useEmbeddedMasterDetailRows({
+    formCtx: ctx,
+    fieldName: 'reactions',
+    editor: sections.editors.reactions,
+    itemFields: [],
+    itemNoun: MONSTER_ACTION_ITEM_NOUN,
+    mapListItem: ({ row, index }) => mapActionListItem(row, index),
+    access: { kind: 'availability', fieldName: 'available' },
+    resolveRowIssueCount: (index) =>
+      formState.submitCount > 0 && sections.hasRowError('reactions', index) ? 1 : 0,
+  })
+  const rowsBySection = {
+    actions: actionRows,
+    bonusActions: bonusRows,
+    reactions: reactionRows,
+  }
+  const availabilityItems = useMemo(
+    () =>
+      [...actionRows.allRows, ...bonusRows.allRows, ...reactionRows.allRows].map(
+        (row) => row.availability,
+      ),
+    [actionRows.allRows, bonusRows.allRows, reactionRows.allRows],
+  )
+  const collection = useMasterDetailCollectionAvailability({
+    items: availabilityItems,
+    selectedId: sections.selectedActionId,
+    onSelectedIdChange: sections.selectAction,
+  })
+  const visibleIds = useMemo(
+    () => new Set(collection.visibleItems.map((item) => item.rowId)),
+    [collection.visibleItems],
+  )
+  const invalidItemCount = MONSTER_ACTION_SECTIONS.reduce((count, section) => {
+    return (
+      count +
+      rowsBySection[section].allRows.filter(
+        (row) => visibleIds.has(row.item.id) && (row.item.issueCount ?? 0) > 0,
+      ).length
+    )
+  }, 0)
+  const deleteLocated = sections.locate(sections.deleteTargetId)
+  const deleteReferences =
+    deleteLocated?.section === 'actions'
+      ? multiattacksReferencingAction(
+          (values.actions ?? []) as MonsterActionDraftRow[],
+          deleteLocated.action.id,
+        )
+      : []
+  const deleteDescription =
+    deleteReferences.length > 0
+      ? `This attack is used by ${deleteReferences
+          .map((action) => action.name?.trim() || 'Multiattack')
+          .join(', ')}. Removing it drops that reference and leaves the step count unchanged.`
+      : undefined
+
   return (
     <>
       <MasterDetailGrid>
-        <div className="flex flex-col gap-4">
-          {MONSTER_ACTION_SECTIONS.map((section) => {
-            const rows = sectionRows(values, section)
-            const selectedIndex = rows.findIndex((row) => row.id === sections.selectedActionId)
-            const invalidItemCount =
-              formState.submitCount > 0
-                ? rows.filter((_, index) => sections.hasRowError(section, index)).length
-                : 0
-            return (
-              <MasterDetailListPanel
-                key={section}
-                items={rows.map((row, index) => ({
-                  id: row.id,
-                  title: row.name?.trim() || `Action ${index + 1}`,
-                  meta: {
-                    sourceLabel: getMonsterActionKindLabel(row.kind),
-                  },
-                  hasError: formState.submitCount > 0 && sections.hasRowError(section, index),
-                }))}
-                selectedIndex={selectedIndex >= 0 ? selectedIndex : null}
-                listTitle={SECTION_HEADINGS[section]}
-                ariaLabel={SECTION_HEADINGS[section]}
-                addLabel={MONSTER_ADD_LABEL}
-                itemNoun={MONSTER_ACTION_ITEM_NOUN}
-                addControl={
-                  <MonsterActionAddMenu
-                    section={section}
-                    weapons={weapons}
-                    allowAddWeapon={allowAddWeapon}
-                    onSelect={(target, choice) => {
-                      if (choice.type === 'add-weapon') {
-                        setWeaponPickerSection(target)
-                        return
-                      }
-                      sections.addAcquisition(target, choice)
-                    }}
-                  />
-                }
-                onSelect={(index) => {
-                  const row = rows[index]
-                  if (row) sections.setSelectedActionId(row.id)
+        <MasterDetailListPanel
+          ariaLabel={MONSTER_ACTIONS_HEADING}
+          itemNoun={MONSTER_ACTION_ITEM_NOUN}
+          selectedItemId={collection.isSelectedVisible ? sections.selectedActionId : null}
+          onSelectItem={sections.selectAction}
+          countSupplement={collection.countSupplement}
+          invalidItemCount={invalidItemCount}
+          groups={MONSTER_ACTION_SECTIONS.map((section) => ({
+            id: section,
+            title: SECTION_HEADINGS[section],
+            addControl: (
+              <MonsterActionAddMenu
+                section={section}
+                weapons={weapons}
+                allowAddWeapon={allowAddWeapon}
+                onSelect={(target, choice) => {
+                  if (choice.type === 'add-weapon') {
+                    setWeaponPickerSection(target)
+                    return
+                  }
+                  sections.addAcquisition(target, choice)
                 }}
-                invalidItemCount={invalidItemCount}
               />
-            )
-          })}
-        </div>
-        <MonsterActionDetail ctx={ctx} sections={sections} located={located} />
+            ),
+            items: rowsBySection[section].allRows
+              .filter((row) => visibleIds.has(row.item.id))
+              .map((row) => row.item),
+          }))}
+        />
+        <MonsterActionDetail
+          ctx={ctx}
+          sections={sections}
+          located={collection.isSelectedVisible ? located : null}
+          rows={located ? rowsBySection[located.section] : actionRows}
+        />
       </MasterDetailGrid>
+      <MasterDetailDeleteDialog
+        open={sections.deleteTargetId !== null}
+        itemNoun={masterDetailItemNounLabel(MONSTER_ACTION_ITEM_NOUN)}
+        itemName={deleteLocated?.action.name?.trim() || 'Action'}
+        description={deleteDescription}
+        onOpenChange={(open) => {
+          if (!open) sections.cancelDelete()
+        }}
+        onConfirm={sections.confirmDelete}
+      />
       <ConfirmDialog
         open={sections.pending != null}
         onOpenChange={(open) => {

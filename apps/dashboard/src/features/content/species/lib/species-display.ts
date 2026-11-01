@@ -1,12 +1,12 @@
 import {
-  flattenGrantGroups,
   formatMovementDisplay,
   CREATURE_SIZE_TERM,
   CREATURE_TYPE_TERM,
   formatCreatureSizeList,
   getVocabularyTermLabel,
   resolveCreatureMovement,
-  resolveGrantGroupsFromContent,
+  resolveCreatureSenses,
+  resolveCreatureTraitGrants,
   resolveTraitDisplay,
   type Species,
   type SpeciesBodyTrait,
@@ -86,13 +86,13 @@ function collectSenses(
   traits: SpeciesBodyTrait[],
   resolveSenseLabel: (type: string) => string,
 ): string {
-  const senses = traits.flatMap((trait) =>
-    flattenGrantGroups(resolveGrantGroupsFromContent(trait))
-      .map(({ grant }) => grant)
-      .filter((grant): grant is Extract<typeof grant, { kind: 'sense' }> => grant.kind === 'sense'),
-  )
+  const senses = resolveCreatureSenses({
+    grants: resolveCreatureTraitGrants(traits.map((trait) => ({ trait, source: trait.id }))).map(
+      (resolved) => resolved.grant,
+    ),
+  })
   if (senses.length === 0) return 'None'
-  return senses.map((s) => `${resolveSenseLabel(s.type)} ${s.range} ft.`).join(', ')
+  return senses.map((sense) => `${resolveSenseLabel(sense.type)} ${sense.range} ft.`).join(', ')
 }
 
 function buildSpeciesStatRows(
@@ -150,9 +150,13 @@ function mapHeritageOptionToDetailItem(
 ): SpeciesDetailItem {
   const display = resolveTraitDisplay(trait)
   const grantVocabulary = toGrantDisplayVocabulary(vocabulary)
-  const summaryModel = buildGrantSummaryModel(trait.grantGroups, grantVocabulary, {
-    parentLevel: 1,
-  })
+  const summaryModel = buildGrantSummaryModel(
+    trait.kind === 'template' ? undefined : trait.grantGroups,
+    grantVocabulary,
+    {
+      parentLevel: 1,
+    },
+  )
   const groupedSummary = formatGrantSummaryByLevel(summaryModel, { includeTypeSuffix: true })
 
   if (groupedSummary.length === 0) {
