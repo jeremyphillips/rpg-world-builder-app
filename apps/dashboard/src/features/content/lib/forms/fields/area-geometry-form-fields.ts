@@ -55,16 +55,17 @@ export function visibleWhenAreaShape(
 export function areaGeometryFormFields(input: {
   fieldPrefix: string
   legend: string
+  legendVisibility?: 'visible' | 'srOnly'
   shapeHint: string
   visibility?: FieldVisibility
 }): FormItem[] {
-  const { fieldPrefix, legend, shapeHint, visibility } = input
+  const { fieldPrefix, legend, legendVisibility, shapeHint, visibility } = input
   const whenShape = (shapes: readonly string[]) =>
     visibleWhenAreaShape(fieldPrefix, shapes, visibility)
   return [
     {
       kind: 'group',
-      legend,
+      heading: { label: legend, labelVisibility: legendVisibility ?? 'visible' },
       ...(visibility ? { visibility } : {}),
       fields: [
         {
@@ -85,6 +86,13 @@ export function areaGeometryFormFields(input: {
               valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
               visibility: whenShape(['sphere', 'emanation', 'cylinder']),
             }),
+            distanceInputSelectField({
+              name: `${fieldPrefix}.length`,
+              label: 'Length',
+              required: true,
+              valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+              visibility: whenShape(['cone', 'line']),
+            }),
           ],
         },
         distanceInputSelectField({
@@ -93,13 +101,6 @@ export function areaGeometryFormFields(input: {
           required: true,
           valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
           visibility: whenShape(['cylinder']),
-        }),
-        distanceInputSelectField({
-          name: `${fieldPrefix}.length`,
-          label: 'Length',
-          required: true,
-          valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-          visibility: whenShape(['cone', 'line']),
         }),
         distanceInputSelectField({
           name: `${fieldPrefix}.width`,

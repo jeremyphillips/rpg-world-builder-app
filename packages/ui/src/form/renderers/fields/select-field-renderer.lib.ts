@@ -1,6 +1,7 @@
 import type { FieldSize } from '../../../components/ui/field.client'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { FieldOption, SelectFieldConfig } from '../../field-config'
+import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 import type { FieldValidationProps } from '../../../components/ui/field-validation-props'
 
 export function soleSelectOptionValue(options: readonly FieldOption[]): string | undefined {
@@ -23,6 +24,7 @@ export type SelectFieldChromeProps = {
   sizingLabel?: SelectFieldConfig['sizingLabel']
   sizingLabels?: SelectFieldConfig['sizingLabels']
   labelPosition?: SelectFieldConfig['labelPosition']
+  labelVisibility?: SelectFieldConfig['labelVisibility']
   chrome?: SelectFieldConfig['chrome']
 }
 
@@ -42,6 +44,7 @@ export function pickSelectFieldChromeProps(
     sizingLabel: config.sizingLabel,
     sizingLabels: config.sizingLabels,
     labelPosition: config.labelPosition,
+    labelVisibility: resolveFieldLabelVisibility(config),
     chrome: config.chrome,
   }
 }

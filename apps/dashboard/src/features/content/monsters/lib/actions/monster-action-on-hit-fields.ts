@@ -13,6 +13,8 @@ import { rollValueFields } from '../../../lib/forms/mechanics/roll-value-fields'
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 import {
   MONSTER_ACTION_DAMAGE_FIELD_LABEL,
+  MONSTER_LIMIT_RECHARGES_ON_LABEL,
+  monsterLimitRechargesOnHint,
   MONSTER_ON_HIT_HINT,
   MONSTER_ON_HIT_LEGEND,
 } from '../monster-form-labels'
@@ -24,8 +26,20 @@ function limitVisibility(kind: 'uses' | 'recharge') {
   }
 }
 
+function limitedUseDependentsVisible(): {
+  dependsOn: string[]
+  visibleWhen: (values: Record<string, unknown>) => boolean
+} {
+  return {
+    dependsOn: ['limitedUse.kind'],
+    visibleWhen: (values) =>
+      values['limitedUse.kind'] === 'uses' || values['limitedUse.kind'] === 'recharge',
+  }
+}
+
 export function monsterActionLimitedUseFields(): FormItem[] {
   const uses = limitVisibility('uses')
+  const recharge = limitVisibility('recharge')
   const fixed = {
     dependsOn: ['limitedUse.kind', 'limitedUse.count.kind'],
     visibleWhen: (values: Record<string, unknown>) =>
@@ -33,48 +47,86 @@ export function monsterActionLimitedUseFields(): FormItem[] {
   }
   return [
     {
-      type: 'select',
-      name: 'limitedUse.kind',
-      label: 'Limit',
-      placeholder: 'No limit',
-      options: [
-        { value: 'uses', label: 'Uses' },
-        { value: 'recharge', label: 'Recharge' },
+      kind: 'group',
+      heading: { label: 'Limit' },
+      headingScale: 'subsection',
+      fields: [
+        {
+          kind: 'dependent',
+          controller: {
+            type: 'select',
+            name: 'limitedUse.kind',
+            label: 'Limit',
+            labelVisibility: 'srOnly',
+            placeholder: 'No limit',
+            options: [
+              { value: 'uses', label: 'Uses' },
+              { value: 'recharge', label: 'Recharge' },
+            ],
+          },
+          dependents: {
+            chrome: 'none',
+            visibility: limitedUseDependentsVisible(),
+            fields: [
+              {
+                type: 'number',
+                name: 'limitedUse.minRoll',
+                label: MONSTER_LIMIT_RECHARGES_ON_LABEL,
+                labelPosition: 'settings',
+                min: 2,
+                max: 6,
+                digits: 2,
+                visibility: recharge,
+                hint: {
+                  resolve: {
+                    dependsOn: ['limitedUse.minRoll'],
+                    hintWhen: (values) => monsterLimitRechargesOnHint(values['limitedUse.minRoll']),
+                  },
+                },
+              },
+              {
+                kind: 'row',
+                visibility: uses,
+                fields: [
+                  {
+                    type: 'select',
+                    name: 'limitedUse.count.kind',
+                    label: 'Count',
+                    placeholder: 'Choose',
+                    width: '1/2',
+                    options: [
+                      { value: 'fixed', label: 'Fixed number' },
+                      {
+                        value: 'proficiency-bonus',
+                        label: vocabularyFieldLabel(PROFICIENCY_BONUS_TERM),
+                      },
+                    ],
+                  },
+                  {
+                    type: 'select',
+                    name: 'limitedUse.recovery.minimumRest',
+                    label: 'Recovers on',
+                    placeholder: 'Choose',
+                    width: '1/2',
+                    options: REST_KINDS.map((id) => ({
+                      value: id,
+                      label: REST_KIND_ENTRIES[id].label,
+                    })),
+                  },
+                ],
+              },
+              {
+                type: 'number',
+                name: 'limitedUse.count.value',
+                label: 'Uses',
+                min: 1,
+                digits: 2,
+                visibility: fixed,
+              },
+            ],
+          },
+        },
       ],
-    },
-    {
-      type: 'number',
-      name: 'limitedUse.minRoll',
-      label: 'Minimum roll',
-      min: 2,
-      max: 6,
-      visibility: limitVisibility('recharge'),
-    },
-    {
-      type: 'select',
-      name: 'limitedUse.count.kind',
-      label: 'Count',
-      placeholder: 'Choose',
-      options: [
-        { value: 'fixed', label: 'Fixed number' },
-        { value: 'proficiency-bonus', label: vocabularyFieldLabel(PROFICIENCY_BONUS_TERM) },
-      ],
-      visibility: uses,
-    },
-    {
-      type: 'number',
-      name: 'limitedUse.count.value',
-      label: 'Uses',
-      min: 1,
-      visibility: fixed,
-    },
-    {
-      type: 'select',
-      name: 'limitedUse.recovery.minimumRest',
-      label: 'Recovers on',
-      placeholder: 'Choose',
-      options: REST_KINDS.map((id) => ({ value: id, label: REST_KIND_ENTRIES[id].label })),
-      visibility: uses,
     },
   ]
 }

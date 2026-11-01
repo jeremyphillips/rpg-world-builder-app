@@ -4,7 +4,6 @@ import type { ReactElement, ReactNode } from 'react'
 
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
-import { FieldLabelContent } from './field-label-content'
 import { FormField } from './form-field'
 import { FieldChromeShell } from './field-chrome-shell'
 import { hasActiveFieldChrome, type FieldChrome } from './field-chrome.variants'
@@ -15,10 +14,13 @@ import {
   type FieldHintPosition,
 } from './field.variants'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 
 export type SelectFieldLayoutSharedProps = FieldValidationProps & {
   id: string
   label: string
+  labelVisibility?: FieldLabelVisibility
   hint?: string
   hintPosition?: FieldHintPosition
   info?: ReactNode
@@ -32,6 +34,7 @@ export type SelectFieldLayoutSharedProps = FieldValidationProps & {
 export function SelectFieldSettingsLayout({
   id,
   label,
+  labelVisibility,
   error,
   invalid,
   describedBy,
@@ -48,6 +51,7 @@ export function SelectFieldSettingsLayout({
     <FormField
       id={id}
       label={label}
+      labelVisibility={labelVisibility}
       error={error}
       invalid={invalid}
       describedBy={describedBy}
@@ -68,6 +72,7 @@ export function SelectFieldSettingsLayout({
 export function SelectFieldInlineLayout({
   id,
   label,
+  labelVisibility,
   error,
   invalid,
   describedBy,
@@ -86,15 +91,21 @@ export function SelectFieldInlineLayout({
       <div className={fieldInlineControlRowClasses}>
         {resolvedHintPosition === 'below-label' ? (
           <div className={fieldLabelHintStackClasses}>
-            <Field.Label>
-              <FieldLabelContent label={label} required={required} info={info} />
-            </Field.Label>
+            <FormFieldLabel
+              label={label}
+              labelVisibility={labelVisibility}
+              required={required}
+              info={info}
+            />
             <Field.Hint />
           </div>
         ) : (
-          <Field.Label>
-            <FieldLabelContent label={label} required={required} info={info} />
-          </Field.Label>
+          <FormFieldLabel
+            label={label}
+            labelVisibility={labelVisibility}
+            required={required}
+            info={info}
+          />
         )}
         {control}
       </div>
@@ -131,6 +142,7 @@ export function SelectFieldInlineLayout({
 export function SelectFieldDefaultLayout({
   id,
   label,
+  labelVisibility,
   error,
   invalid,
   describedBy,
@@ -159,9 +171,12 @@ export function SelectFieldDefaultLayout({
         hintPosition={hintPosition}
         wrapControl={false}
         label={
-          <Field.Label>
-            <FieldLabelContent label={label} required={required} info={info} />
-          </Field.Label>
+          <FormFieldLabel
+            label={label}
+            labelVisibility={labelVisibility}
+            required={required}
+            info={info}
+          />
         }
         control={control}
         chrome={chrome}

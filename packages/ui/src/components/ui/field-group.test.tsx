@@ -94,6 +94,7 @@ describe('FieldGroup', () => {
     expect(screen.getByText('Shown on your sheet.')).toHaveClass(
       'text-style-field-group-description',
     )
+    expect(screen.getByText('Shown on your sheet.')).not.toHaveClass('text-style-body')
     expect(screen.getByText('Shown on your sheet.')).not.toHaveClass('mb-3')
   })
 

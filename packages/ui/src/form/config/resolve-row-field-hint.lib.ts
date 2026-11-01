@@ -1,7 +1,9 @@
-import type { FieldHintPosition } from '../../components/ui/field.variants'
+import type { FieldHintPosition, FieldLabelPosition } from '../../components/ui/field.variants'
 import { resolveFieldHintPresentation, type FieldHintIcon } from '../field-config'
 
-type FieldHintSource = Parameters<typeof resolveFieldHintPresentation>[0]
+type FieldHintSource = Parameters<typeof resolveFieldHintPresentation>[0] & {
+  labelPosition?: FieldLabelPosition
+}
 
 /** Row-aware hint resolution — hints always render below the control in anatomy rows. */
 export function resolveRowAwareFieldHintPresentation(
@@ -11,6 +13,7 @@ export function resolveRowAwareFieldHintPresentation(
 ): { text?: string; position: FieldHintPosition; icon?: FieldHintIcon } {
   const presentation = resolveFieldHintPresentation(field, values)
   if (!inAnatomyRow) return presentation
+  if (field.labelPosition === 'settings') return presentation
   return {
     text: presentation.text,
     position: 'below-control',

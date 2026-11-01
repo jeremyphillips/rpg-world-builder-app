@@ -14,7 +14,6 @@ import {
   type FieldRhythm,
   type GroupHeadingScale,
 } from './field.variants'
-import { Text } from './text'
 
 const legendChromeClasses = 'w-full min-w-0'
 
@@ -82,7 +81,6 @@ type LegendContentOptions = {
   rhythm: FieldRhythm
   legendTypography: string
   descriptionTypography: string
-  headingScale?: GroupHeadingScale
 }
 
 function resolveLegendPrimaryLabel(options: LegendContentOptions): React.ReactNode {
@@ -98,7 +96,7 @@ function LegendTitle({ typography, children }: { typography: string; children: R
 }
 
 function resolveLegendContent(options: LegendContentOptions): React.ReactNode {
-  const { description, rhythm, legendTypography, descriptionTypography, headingScale } = options
+  const { description, rhythm, legendTypography, descriptionTypography } = options
   const title = (
     <LegendTitle typography={legendTypography}>{resolveLegendPrimaryLabel(options)}</LegendTitle>
   )
@@ -110,13 +108,7 @@ function resolveLegendContent(options: LegendContentOptions): React.ReactNode {
   return (
     <span className={fieldGroupLegendHeaderStackVariants({ rhythm })}>
       {title}
-      <Text
-        as="span"
-        variant={headingScale === 'field' ? 'caption' : undefined}
-        className={headingScale === 'field' ? undefined : descriptionTypography}
-      >
-        {description}
-      </Text>
+      <span className={descriptionTypography}>{description}</span>
     </span>
   )
 }
@@ -224,7 +216,6 @@ export function FieldGroupLegend({
     rhythm,
     legendTypography,
     descriptionTypography,
-    headingScale,
   }
   const legendContent = resolveLegendContent(contentOptions)
   const hasStackedHint = Boolean(description)

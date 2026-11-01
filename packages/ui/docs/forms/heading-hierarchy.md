@@ -15,7 +15,9 @@
 
 Array legend typography derives from **parent** named-group depth plus section `density` (compact → smaller array legend). No feature-level `legendSize` / `arrayLegendTier` knobs at steady state.
 
-`headingScale: 'field'` on a group is the only authored heading-scale opt-in. It replaces structural legend and description type with the field label and hint scale for that group's density, and applies `fieldAnatomyStackVariants` on the fieldset for legend→body spacing (including when a collapsible group is closed). It is not a `legendSize` and does not change tier resolution or disclosure.
+`headingScale: 'field'` replaces structural legend and description type with the field label and hint scale for that group's density, and applies `fieldAnatomyStackVariants` on the fieldset for legend→body spacing (including when a collapsible group is closed). It is not a `legendSize` and does not change tier resolution or disclosure.
+
+`headingScale: 'subsection'` forces structural subsection legend typography when a flat sibling list would otherwise resolve as section (for example a named group at `namedGroupDepth === 0`). Description stays on the group description scale.
 
 ## Semantic layers
 

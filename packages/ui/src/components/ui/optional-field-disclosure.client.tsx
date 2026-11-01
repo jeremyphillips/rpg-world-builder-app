@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 
+import { formMicroActionButtonProps } from '../../form/form-micro-action'
 import { Button } from './button.client'
 import { ActionIcon } from './action-icon.client'
 import type { FieldSize } from './field.client'
@@ -57,10 +58,7 @@ export function OptionalFieldDisclosure({
           <FieldLabelContent label={fieldLabel} />
         </label>
         <Button
-          type="button"
-          variant="text"
-          size="sm"
-          className="font-normal"
+          {...formMicroActionButtonProps}
           aria-label={`${removeLabel} ${fieldLabel}`}
           onClick={onRemove}
         >

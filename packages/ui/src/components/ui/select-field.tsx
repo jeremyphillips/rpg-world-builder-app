@@ -12,6 +12,7 @@ import {
 } from '../../form/config/field-placeholder.lib'
 import type { FieldNoun } from '@rpg/contracts'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
 import {
   SelectFieldDefaultLayout,
   SelectFieldInlineLayout,
@@ -24,7 +25,8 @@ export type SelectFieldOption = FieldOption
 
 export type SelectLabelPosition = FieldLabelPosition | 'inline'
 
-export interface SelectFieldProps extends FieldValidationProps, FieldChromeProps {
+export interface SelectFieldProps
+  extends FieldValidationProps, FieldChromeProps, FieldLabelPresentationProps {
   id: string
   label: string
   options: SelectFieldOptionListItem[]
@@ -91,6 +93,7 @@ function buildSelectFieldControl(props: SelectFieldProps, resolvedPlaceholder: s
 export function SelectField(props: SelectFieldProps) {
   const {
     label,
+    labelVisibility,
     width,
     size = 'md',
     labelPosition,
@@ -111,6 +114,7 @@ export function SelectField(props: SelectFieldProps) {
   const layoutProps: SelectFieldLayoutSharedProps = {
     id: props.id,
     label: props.label,
+    labelVisibility: props.labelVisibility,
     error: props.error,
     invalid: props.invalid,
     describedBy: props.describedBy,

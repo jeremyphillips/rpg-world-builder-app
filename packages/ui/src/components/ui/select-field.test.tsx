@@ -158,6 +158,23 @@ describe('SelectField', () => {
     await expectNoAxeViolations(container)
   })
 
+  it('hides the visible label when labelVisibility is srOnly', () => {
+    render(
+      <SelectField
+        id="limit-kind"
+        label="Limit"
+        labelVisibility="srOnly"
+        placeholder="No limit"
+        options={[
+          { label: 'Uses', value: 'uses' },
+          { label: 'Recharge', value: 'recharge' },
+        ]}
+      />,
+    )
+    expect(screen.getByText('Limit').closest('.sr-only')).toBeTruthy()
+    expect(screen.getByRole('combobox', { name: 'Limit' })).toBeInTheDocument()
+  })
+
   it('renders label and hint in the left column when labelPosition is settings', () => {
     const hint = 'First class level at which this class gains spellcasting'
     render(

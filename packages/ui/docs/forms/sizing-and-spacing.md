@@ -210,6 +210,9 @@ signed value to assistive tech. Optional `label` + `id` wrap the stepper in `For
 `labelPosition: 'settings'` on `number`, `select`, and `switch` — label + hint left,
 compact control right; stacks on narrow viewports.
 
+Put helper copy on the field’s `hint` (or `hint.resolve` when it depends on other values), not a
+trailing `kind: 'slot'` — slots use section stack rhythm and render below the full settings row.
+
 `labelPosition: 'inline'` on `select` — label left, compact control right on one
 centered row (toolbar / chrome). Use `info` for helper copy when horizontal space is tight.
 

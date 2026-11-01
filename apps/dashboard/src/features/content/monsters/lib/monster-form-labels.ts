@@ -22,6 +22,7 @@ import {
   LANGUAGE_TERM,
   PASSIVE_PERCEPTION_TERM,
   PROFICIENCY_TERM,
+  RECHARGE_DIE_FACES,
   SAVING_THROW_SHORT_LABEL,
   SAVING_THROW_TERM,
   SENSE_TERM,
@@ -216,6 +217,36 @@ export function getMonsterArmorSlotUiCopy(slot: CreatureArmorSlot): {
 }
 
 export const MONSTER_ACTION_NAME_LABEL = 'Name'
+export const MONSTER_SAVE_THROW_SECTION_LEGEND = 'Saving throw'
+export const MONSTER_SAVE_THROW_SECTION_DESCRIPTION =
+  'Set the saving throw target and how difficult it is to succeed.'
+export const MONSTER_SAVE_ABILITY_LABEL = 'Save ability'
+export const MONSTER_SAVE_DC_LABEL = 'Save DC'
+export const MONSTER_SAVE_DC_KIND_ABILITY_LABEL = 'Ability-based'
+export const MONSTER_SAVE_DC_KIND_SPELL_LABEL = 'Spellcasting-based'
+export const MONSTER_SAVE_DC_ABILITY_LABEL = 'DC ability'
+export const MONSTER_SAVE_DC_PROFICIENCY_LABEL = 'Include proficiency bonus'
+export const MONSTER_LIMIT_RECHARGES_ON_LABEL = 'Recharges on'
+
+/** Authoring hint for recharge threshold — matches stat-block recharge roll notation. */
+export function monsterLimitRechargesOnHint(minRoll: unknown): string {
+  const roll = normalizeRechargeMinRoll(minRoll)
+  const rechargesOn =
+    roll === undefined
+      ? `Recharges on …–${RECHARGE_DIE_FACES}`
+      : roll >= RECHARGE_DIE_FACES
+        ? `Recharges on ${RECHARGE_DIE_FACES}`
+        : `Recharges on ${roll}–${RECHARGE_DIE_FACES}`
+  return `Roll a d6 at the start of each turn. ${rechargesOn}.`
+}
+
+function normalizeRechargeMinRoll(minRoll: unknown): number | undefined {
+  if (minRoll === null || minRoll === undefined || minRoll === '') return undefined
+  const value = typeof minRoll === 'number' ? minRoll : Number(minRoll)
+  if (!Number.isFinite(value) || !Number.isInteger(value)) return undefined
+  if (value < 2 || value > RECHARGE_DIE_FACES) return undefined
+  return value
+}
 export const MONSTER_TRIGGER_LABEL = getMonsterReactionFieldLabel('trigger')
 export const MONSTER_ADDITIONAL_CONDITION_LABEL =
   getMonsterReactionFieldLabel('additionalCondition')
