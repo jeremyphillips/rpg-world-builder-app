@@ -15,7 +15,8 @@ import {
   actionAfterSectionMove,
 } from './monster-action-kind'
 import { monsterActionDetailFields } from './monster-action-detail-fields'
-import { createMonsterRowId, type MonsterActionDraftRow } from './monster-action-presets'
+import type { MonsterActionDraftRow } from './monster-action-presets'
+import { createMonsterRowId } from '../monster-row-id'
 import {
   resolveFirstInvalidActionPath,
   resolveMonsterActionSelectionAfterRemoval,

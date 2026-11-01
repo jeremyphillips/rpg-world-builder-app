@@ -9,7 +9,8 @@ import {
 } from '@rpg/contracts'
 
 import { monsterAddWeaponShortcut } from '../monster-form-labels'
-import { createMonsterRowId, type MonsterActionDraftRow } from './monster-action-presets'
+import { createMonsterRowId } from '../monster-row-id'
+import type { MonsterActionDraftRow } from './monster-action-presets'
 
 export const MONSTER_ACTION_ACQUISITION_GROUPS = [
   { id: 'equipped', label: 'Equipped weapons' },

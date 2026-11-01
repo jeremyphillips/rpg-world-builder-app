@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { FormEmbeddedMasterDetailEditor } from '../../../components/master-detail/form-embedded-master-detail-editor'
-import { createMonsterRowId } from '../../lib/actions/monster-action-presets'
+import { createMonsterRowId } from '../../lib/monster-row-id'
 import { MONSTER_TRAITS_HEADING } from '../../lib/monster-form-labels'
 import {
   MONSTER_TRAIT_ITEM_NOUN,
@@ -27,6 +27,7 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
       addLabel="Add trait"
       idPrefix="monster-trait"
       makeItemDefaults={makeItemDefaults}
+      access={{ kind: 'availability', fieldName: 'available' }}
       mapListItem={({ row, index }) => {
         const name = (row as { name?: string } | undefined)?.name?.trim()
         return { title: name || `Trait ${index + 1}` }

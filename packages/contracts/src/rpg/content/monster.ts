@@ -80,14 +80,17 @@ export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
   creatureStatBlockHitPointsSchema.extend({ kind: z.literal('fixed') }),
 ])
 
-export const monsterTraitSchema = customContentTraitSchema
-  .pick({ id: true, name: true })
-  .extend({ description: z.string().min(1), ...entryProvenanceField })
+export const monsterTraitSchema = customContentTraitSchema.pick({ id: true, name: true }).extend({
+  description: z.string().min(1),
+  available: z.boolean().optional(),
+  ...entryProvenanceField,
+})
 
 export const monsterTraitDraftSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).optional(),
   description: z.string().min(1).optional(),
+  available: z.boolean().optional(),
   ...entryProvenanceField,
 })
 

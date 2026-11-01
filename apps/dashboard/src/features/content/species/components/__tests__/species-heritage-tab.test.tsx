@@ -125,12 +125,15 @@ describe('SpeciesHeritageTab', () => {
     })
   })
 
-  it('locks system options on a system species', () => {
+  it('locks system options on a system species', async () => {
+    const user = userEvent.setup()
     render(<TabShell heritage={draconicHeritageForm} entityCatalogLayer="system" />)
 
     expect(screen.getAllByText(/System/).length).toBeGreaterThan(0)
+    await user.click(screen.getByRole('button', { name: /Actions for Breath Weapon/i }))
+    expect(screen.getByRole('menuitem', { name: /Duplicate heritage option/i })).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: /Actions for Breath Weapon/i }),
+      screen.queryByRole('menuitem', { name: /Delete heritage option/i }),
     ).not.toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: /Heritage group actions/i }),

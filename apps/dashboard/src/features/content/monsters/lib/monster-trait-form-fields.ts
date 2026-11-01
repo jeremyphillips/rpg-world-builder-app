@@ -9,12 +9,6 @@ export const MONSTER_TRAIT_ITEM_NOUN = defineMasterDetailItemNoun({
   plural: 'traits',
 })
 
-export const MONSTER_ACTION_ITEM_NOUN = defineMasterDetailItemNoun({
-  label: 'Action',
-  singular: 'action',
-  plural: 'actions',
-})
-
 export function monsterTraitItemFields(): FormItem[] {
   return [
     { type: 'text', name: 'name', label: MONSTER_ACTION_NAME_LABEL },

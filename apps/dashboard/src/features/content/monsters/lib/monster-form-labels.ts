@@ -32,6 +32,7 @@ import {
 export { formatEquipmentCustomizationRemovalSummary } from './equipment/equipment-entry-customization.lib'
 
 import { formatEquipmentRemovalInlineCount } from './equipment/equipment-entry-customization.lib'
+import { defineMasterDetailItemNoun } from '../../lib/master-detail/master-detail-item-noun'
 
 import {
   formatContentListLoadErrorMessage,
@@ -167,6 +168,12 @@ export const MONSTER_WEAPON_PROFICIENCY_RECOMMENDATION_ADD_LABEL = '+ Add'
 export function formatMonsterWeaponProficiencyBulkAddAriaLabel(count: number): string {
   return `Add all ${count} weapon proficiencies`
 }
+
+export const MONSTER_ACTION_ITEM_NOUN = defineMasterDetailItemNoun({
+  label: 'Action',
+  singular: 'action',
+  plural: 'actions',
+})
 
 export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
 export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')

@@ -1,3 +1,4 @@
+import { availableBodyRows } from '../../content/lib/campaign-access/body-row-availability'
 import type { MonsterAction, MonsterBody } from '../../content/monster'
 import { getSkillName } from '../../content/skill-proficiency'
 import { NEUTRAL_ABILITY_SCORE } from '../../vocab/ability'
@@ -224,9 +225,14 @@ export function deriveMonsterStatBlock({
 
   const attacks: DerivedMonsterAttackLine[] = []
   const attackLineArgs = { monster, equipmentCatalog, proficiencyBonus, magicPropertyProvider }
-  appendAttackLines(attacks, monster.actions, attackLineArgs, 'actions')
-  appendAttackLines(attacks, monster.bonusActions, attackLineArgs, 'bonusActions')
-  appendAttackLines(attacks, monster.reactions, attackLineArgs, 'reactions')
+  appendAttackLines(attacks, availableBodyRows(monster.actions), attackLineArgs, 'actions')
+  appendAttackLines(
+    attacks,
+    availableBodyRows(monster.bonusActions),
+    attackLineArgs,
+    'bonusActions',
+  )
+  appendAttackLines(attacks, availableBodyRows(monster.reactions), attackLineArgs, 'reactions')
 
   return {
     ac: armor,
@@ -255,13 +261,13 @@ function deriveSpellcastingLines(
     Extract<MonsterBody['actions'][number] | MonsterBody['reactions'][number], { kind: 'spell' }>
   >()
   for (const section of sections) {
-    for (const action of monster[section]) {
+    for (const action of availableBodyRows(monster[section])) {
       if (action.kind === 'spell') spells.set(action.id, action)
     }
   }
   const lines: DerivedMonsterSpellcastingLine[] = []
   for (const section of sections) {
-    for (const action of monster[section]) {
+    for (const action of availableBodyRows(monster[section])) {
       if (action.kind !== 'spell' || !action.castingAbility) continue
       const ability =
         action.castingAbility.kind === 'ability'
@@ -343,7 +349,7 @@ function draftAttacks(
   ] as const
   const attacks: DerivedDraftAttack[] = []
   for (const [section, actions] of sections) {
-    for (const action of actions) {
+    for (const action of availableBodyRows(actions)) {
       if (
         action.kind !== 'weapon' &&
         action.kind !== 'natural-weapon' &&

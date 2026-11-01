@@ -93,6 +93,28 @@ describe('MasterDetailEditorPanel', () => {
     expect(screen.getByText('2 issues')).toBeInTheDocument()
   })
 
+  it('opens duplicate from the overflow menu', async () => {
+    const user = userEvent.setup()
+    const onDuplicate = vi.fn()
+
+    render(
+      <PanelShell
+        editor={makeEditor()}
+        itemFields={itemFields}
+        fieldName="traits"
+        idPrefix="species-trait"
+        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
+        selectedIdentity={selectedIdentity}
+        onDuplicate={onDuplicate}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /Actions for Rage/i }))
+    await user.click(screen.getByRole('menuitem', { name: /Duplicate trait/i }))
+
+    expect(onDuplicate).toHaveBeenCalledOnce()
+  })
+
   it('opens delete through the overflow menu', async () => {
     const user = userEvent.setup()
     const editor = makeEditor()

@@ -178,7 +178,14 @@ and [`master-detail/`](../src/features/content/lib/master-detail/):
 
 **Nested API consumer:** subclasses via [`NestedResourceMasterDetailEditor`](../src/features/content/components/master-detail/nested-resource-master-detail-editor.tsx) on [`ClassSubclassesTab`](../src/features/content/classes/components/class-subclasses-tab.tsx).
 
-**Form-embedded consumer:** class **Features** via [`FormEmbeddedMasterDetailEditor`](../src/features/content/components/master-detail/form-embedded-master-detail-editor.tsx) with `availability={{ fieldName: 'available' }}` — broad header + availability-only dialog; persisted on the class body (`classBodyFeatureSchema.available`). **Blocked:** species traits, heritage options, starting-equipment packages.
+**Form-embedded consumers** use [`FormEmbeddedMasterDetailEditor`](../src/features/content/components/master-detail/form-embedded-master-detail-editor.tsx) with `access={{ kind: 'availability', fieldName: 'available' }}` — broad header + availability-only dialog:
+
+- class **Features** (`classBodyFeatureSchema.available`)
+- class **Character creation** starting choices
+- species **traits**
+- monster **traits** and **actions** (all three sections)
+
+Heritage options use body `campaignAccess`. Starting-equipment packages still inherit parent access only.
 
 Consumers build one `MasterDetailAvailabilityPresentation[]` and pass the same objects to
 list filter/counts and the selected editor header. Persistence stays consumer-owned

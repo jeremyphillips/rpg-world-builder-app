@@ -96,7 +96,8 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     })
   })
 
-  it('renders structured meta in the list and hides overflow delete for system seed rows', () => {
+  it('renders structured meta in the list and hides overflow delete for system seed rows', async () => {
+    const user = userEvent.setup()
     render(
       <EditorShell
         entityCatalogLayer="system"
@@ -107,9 +108,9 @@ describe('FormEmbeddedMasterDetailEditor', () => {
 
     expect(screen.getAllByText('Custom').length).toBeGreaterThan(0)
     expect(screen.getAllByText('System').length).toBeGreaterThan(0)
-    expect(
-      screen.queryByRole('button', { name: /Actions for Darkvision/i }),
-    ).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Actions for Darkvision/i }))
+    expect(screen.getByRole('menuitem', { name: /Duplicate trait/i })).toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /Delete trait/i })).not.toBeInTheDocument()
   })
 
   it('renders leadingContent above the editor grid', () => {

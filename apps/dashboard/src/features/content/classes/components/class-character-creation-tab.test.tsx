@@ -193,9 +193,10 @@ describe('ClassCharacterCreationTab', () => {
     expect(
       screen.queryByRole('button', { name: /Actions for Starting Gold/i }),
     ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: /Actions for Standard Equipment/i }),
-    ).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Actions for Standard Equipment/i }))
+    expect(screen.getByRole('menuitem', { name: /Duplicate package/i })).toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /Delete package/i })).not.toBeInTheDocument()
+    await user.keyboard('{Escape}')
 
     await user.click(packageListRow(/Starting Gold/))
     expect(screen.getByRole('group', { name: /Items/i })).toBeInTheDocument()

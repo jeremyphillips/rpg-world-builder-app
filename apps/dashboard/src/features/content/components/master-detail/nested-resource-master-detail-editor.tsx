@@ -1,11 +1,7 @@
 import type { ReactNode } from 'react'
-import { useCallback } from 'react'
 import { fieldGroupFlexStackClasses } from '@rpg/ui'
 
-import {
-  resolveSelectedIndexById,
-  selectIdAtIndex,
-} from '../../lib/master-detail/resolve-master-detail-selected-index'
+import type { DetailOverflowMenuEntry } from '../../lib/detail/detail-overflow-actions'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import {
   MasterDetailEditorShell,
@@ -28,6 +24,8 @@ export interface NestedResourceMasterDetailEditorProps {
   countSupplement?: ReactNode
   selectedIdentity?: MasterDetailEditorIdentity
   onDelete?: () => void
+  onDuplicate?: () => void
+  overflowActions?: readonly DetailOverflowMenuEntry[]
   invalidItemCount?: number
   renderDetail: (ctx: { rowId: string }) => ReactNode
   leadingContent?: ReactNode
@@ -51,27 +49,21 @@ export function NestedResourceMasterDetailEditor({
   countSupplement,
   selectedIdentity,
   onDelete,
+  onDuplicate,
+  overflowActions,
   invalidItemCount,
   renderDetail,
   leadingContent,
   deleteDialog,
 }: NestedResourceMasterDetailEditorProps) {
-  const selectedIndex = resolveSelectedIndexById(items, selectedRowId)
-
-  const handleSelect = useCallback(
-    (index: number) => {
-      const rowId = selectIdAtIndex(items, index)
-      if (rowId) onSelectRow(rowId)
-    },
-    [items, onSelectRow],
-  )
-
   const detailColumn =
     selectedRowId && selectedIdentity ? (
       <MasterDetailEditorShell
         itemNoun={itemNoun}
         selectedIdentity={selectedIdentity}
         onDelete={onDelete}
+        onDuplicate={onDuplicate}
+        overflowActions={overflowActions}
       >
         {renderDetail({ rowId: selectedRowId })}
       </MasterDetailEditorShell>
@@ -83,13 +75,13 @@ export function NestedResourceMasterDetailEditor({
     <MasterDetailGrid>
       <MasterDetailListPanel
         items={items}
-        selectedIndex={selectedIndex}
+        selectedItemId={selectedRowId}
         listTitle={listTitle}
         ariaLabel={ariaLabel}
         addLabel={addLabel}
         itemNoun={itemNoun}
         onAdd={onAdd}
-        onSelect={handleSelect}
+        onSelectItem={onSelectRow}
         countSupplement={countSupplement}
         invalidItemCount={invalidItemCount}
       />

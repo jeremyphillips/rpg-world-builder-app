@@ -19,6 +19,7 @@ import {
   type MonsterAction,
   type MonsterReaction,
   type SkillProficiency,
+  availableBodyRows,
   deriveMonsterStatBlock,
   formatMonsterLimitedUseHeading,
   formatMonsterMultiattack,
@@ -586,7 +587,7 @@ export function buildMonsterDetailViewModel({
     spellsById,
     catalogStatus: spellCatalogStatus,
     spellsInBody: new Map(
-      [...monster.actions, ...monster.bonusActions, ...monster.reactions]
+      availableBodyRows([...monster.actions, ...monster.bonusActions, ...monster.reactions])
         .filter((action) => action.kind === 'spell')
         .map((action) => [action.id, action]),
     ),
@@ -618,20 +619,31 @@ export function buildMonsterDetailViewModel({
     statRows,
     abilities,
     detailsLeaves: buildDetailsLeaves(monster, derived, equipmentById, catalogState),
-    traits: monster.traits.map((trait) => ({
+    traits: availableBodyRows(monster.traits).map((trait) => ({
       id: trait.id,
       name: trait.name,
       descriptionHtml: trait.description,
     })),
-    actions: mapActionItems(monster.actions, 'actions', derived, catalogState, spellContext),
+    actions: mapActionItems(
+      availableBodyRows(monster.actions),
+      'actions',
+      derived,
+      catalogState,
+      spellContext,
+    ),
     bonusActions: mapActionItems(
-      monster.bonusActions,
+      availableBodyRows(monster.bonusActions),
       'bonusActions',
       derived,
       catalogState,
       spellContext,
     ),
-    reactions: mapReactionItems(monster.reactions, derived, catalogState, spellContext),
+    reactions: mapReactionItems(
+      availableBodyRows(monster.reactions),
+      derived,
+      catalogState,
+      spellContext,
+    ),
   }
 }
 

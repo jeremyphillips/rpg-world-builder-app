@@ -175,13 +175,14 @@ describe('SpeciesTraitsTab', () => {
     })
   })
 
-  it('locks system traits on a system species (no overflow delete, System meta)', () => {
+  it('locks system traits on a system species (no overflow delete, System meta)', async () => {
+    const user = userEvent.setup()
     render(<TabShell traits={[darkvision]} entityCatalogLayer="system" />)
 
     expect(screen.getAllByText(/System/).length).toBeGreaterThan(0)
-    expect(
-      screen.queryByRole('button', { name: /Actions for Darkvision/i }),
-    ).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Actions for Darkvision/i }))
+    expect(screen.getByRole('menuitem', { name: /Duplicate trait/i })).toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /Delete trait/i })).not.toBeInTheDocument()
   })
 
   it('allows deleting newly added rows even on a system species', async () => {
