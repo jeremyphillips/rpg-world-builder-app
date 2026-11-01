@@ -14,3 +14,12 @@ export function resolveOwnedLabelVisibility(
 export function useOwnedLabelVisibility(explicit?: FieldLabelVisibility): FieldLabelVisibility {
   return resolveOwnedLabelVisibility(explicit, useOptionalFieldLabelVisibility())
 }
+
+/** Keep a visible label slot when the label is visible or the slot still has hint or info. */
+export function showOwnedLabelSlot(options: {
+  labelVisibility: FieldLabelVisibility | undefined
+  hintInLabelSlot: boolean
+  hasInfo: boolean
+}): boolean {
+  return options.labelVisibility !== 'srOnly' || options.hintInLabelSlot || options.hasInfo
+}

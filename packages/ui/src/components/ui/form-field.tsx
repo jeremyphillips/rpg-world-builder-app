@@ -59,6 +59,91 @@ const labelNode = (label: string, info?: ReactNode, required?: boolean) => {
   return <FormFieldLabel label={label} info={info} required={required} />
 }
 
+function FormFieldSettingsRoot({
+  id,
+  label,
+  error,
+  invalid,
+  describedBy,
+  hint,
+  hintPosition,
+  hintIcon,
+  info,
+  required,
+  size,
+  width,
+  labelVisibility,
+  chrome,
+  controlBand,
+  headerHasVisibleContent,
+  recommendation,
+  children,
+}: Omit<FormFieldProps, 'labelPosition'> & {
+  headerHasVisibleContent: boolean
+  recommendation: FieldLayoutRecommendation | null
+}) {
+  const presentation = resolveFieldPresentation({
+    size,
+    labelLayout: headerHasVisibleContent ? mapFormLabelPositionToLayout('settings') : 'hidden',
+    controlBand,
+  })
+  const ownedLabel = labelNode(label, info, required)
+  const hintBelowControl = Boolean(hint) && (hintPosition ?? 'below-label') === 'below-control'
+  const settingsRow = headerHasVisibleContent ? (
+    <div data-field-align="" className={cn(presentation.alignmentAnchorClassName)}>
+      <div className={presentation.groupClassName}>
+        <div className={fieldLabelHintStackClasses}>
+          {ownedLabel}
+          <Field.Hint />
+          {recommendation ? (
+            <FieldRecommendationFieldContent recommendation={recommendation} />
+          ) : null}
+        </div>
+        <div className={presentation.controlBandClassName}>
+          <Field.Control>{children}</Field.Control>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <>
+      <div className={presentation.controlBandClassName}>
+        {ownedLabel}
+        <Field.Control>{children}</Field.Control>
+      </div>
+      {hintBelowControl ? <Field.Hint /> : null}
+    </>
+  )
+  const chromedRow = hasActiveFieldChrome(chrome) ? (
+    <FieldChromeShell chrome={chrome} size={size}>
+      {settingsRow}
+      <Field.Error />
+    </FieldChromeShell>
+  ) : (
+    <>
+      {settingsRow}
+      <Field.Error />
+    </>
+  )
+
+  return (
+    <Field.Root
+      id={id}
+      error={error}
+      invalid={invalid}
+      describedBy={describedBy}
+      hint={hint}
+      hintPosition={hintPosition}
+      hintIcon={hintIcon}
+      required={required}
+      size={size}
+      width={width}
+      labelVisibility={labelVisibility}
+    >
+      {chromedRow}
+    </Field.Root>
+  )
+}
+
 /**
  * Prop-based shim over the compound `Field`: label (+ optional `[i]` info
  * tooltip), a single control, and inline hint/error. Use this (or the typed
@@ -92,61 +177,28 @@ export function FormField({
     labelVisibility !== 'srOnly' || hintInHeader || Boolean(resolvedRecommendation) || Boolean(info)
 
   if (labelPosition === 'settings') {
-    const presentation = resolveFieldPresentation({
-      size,
-      labelLayout: headerHasVisibleContent ? mapFormLabelPositionToLayout('settings') : 'hidden',
-      controlBand,
-    })
-    const ownedLabel = labelNode(label, info, required)
-    const settingsRow = headerHasVisibleContent ? (
-      <div data-field-align="" className={cn(presentation.alignmentAnchorClassName)}>
-        <div className={presentation.groupClassName}>
-          <div className={fieldLabelHintStackClasses}>
-            {ownedLabel}
-            <Field.Hint />
-            {resolvedRecommendation ? (
-              <FieldRecommendationFieldContent recommendation={resolvedRecommendation} />
-            ) : null}
-          </div>
-          <div className={presentation.controlBandClassName}>
-            <Field.Control>{children}</Field.Control>
-          </div>
-        </div>
-      </div>
-    ) : (
-      <div className={presentation.controlBandClassName}>
-        {ownedLabel}
-        <Field.Control>{children}</Field.Control>
-      </div>
-    )
-    const chromedRow = hasActiveFieldChrome(chrome) ? (
-      <FieldChromeShell chrome={chrome} size={size}>
-        {settingsRow}
-        <Field.Error />
-      </FieldChromeShell>
-    ) : (
-      <>
-        {settingsRow}
-        <Field.Error />
-      </>
-    )
-
     return (
-      <Field.Root
+      <FormFieldSettingsRoot
         id={id}
+        label={label}
         error={error}
         invalid={invalid}
         describedBy={describedBy}
         hint={hint}
         hintPosition={hintPosition}
         hintIcon={hintIcon}
+        info={info}
         required={required}
         size={size}
         width={rootWidth}
         labelVisibility={labelVisibility}
+        chrome={chrome}
+        controlBand={controlBand}
+        headerHasVisibleContent={headerHasVisibleContent}
+        recommendation={resolvedRecommendation}
       >
-        {chromedRow}
-      </Field.Root>
+        {children}
+      </FormFieldSettingsRoot>
     )
   }
 
