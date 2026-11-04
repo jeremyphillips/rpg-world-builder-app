@@ -281,12 +281,11 @@ export function formatRemoveEquipmentConfirmTitle(name: string): string {
 }
 
 export function formatRemoveEquipmentConfirmBody(actionSummary: string): string {
-  return `This ${getContentTypeSentenceForm('equipment', 1)} is used by ${actionSummary}. Removing it will also remove that action.`
+  return `This ${getContentTypeSentenceForm('equipment', 1)} is used by ${actionSummary}. Those actions keep a missing weapon until you choose another or delete them.`
 }
 
-export function formatRemoveEquipmentConfirmLabel(actionCount: number): string {
-  if (actionCount === 1) return 'Remove weapon and action'
-  return `Remove weapon and ${actionCount} actions`
+export function formatRemoveEquipmentConfirmLabel(_actionCount: number): string {
+  return MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL
 }
 
 export const MONSTER_EQUIPMENT_REMOVAL_FALLBACK_NAME = getContentTypeMidSentenceLabel('equipment')
@@ -374,7 +373,7 @@ export function formatEquipmentRemovalConfirmCopy({
   const equipmentPhrase = getContentTypeSentenceForm('equipment', 1)
   return {
     headline: formatRemoveEquipmentConfirmTitle(displayName),
-    description: `This ${equipmentPhrase} has customizations and is used by ${actionPhrase}. Removing it will discard those customizations and remove the linked actions.${summarySuffix}`,
+    description: `This ${equipmentPhrase} has customizations and is used by ${actionPhrase}. Removing it discards those customizations. The actions keep a missing weapon until you choose another or delete them.${summarySuffix}`,
     confirmLabel: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL,
   }
 }

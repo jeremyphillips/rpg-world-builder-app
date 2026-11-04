@@ -463,6 +463,7 @@ export function monsterActionDetailFields(input: {
       label: getContentTypeTerm('equipment').label,
       placeholder: 'Select',
       options: equipmentOptions,
+      presentation: { change: { label: 'Change weapon' } },
     })
     fields.push(...rollValueFields({ namePrefix: 'damage', label: 'Damage override' }))
     fields.push(monsterActionOnHitFields(ctx))

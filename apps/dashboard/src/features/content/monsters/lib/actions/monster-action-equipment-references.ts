@@ -45,14 +45,8 @@ export function removeEquipmentEntryWithDependents(
   values: MonsterFormValues,
   entryId: string,
 ): MonsterFormValues {
-  const next: MonsterFormValues = {
+  return {
     ...values,
     equipment: values.equipment.filter((entry) => entry.entryId !== entryId),
   }
-  for (const section of MONSTER_ACTION_SECTIONS) {
-    next[section] = sectionActions(values, section).filter(
-      (action) => !(action.kind === 'weapon' && action.equipmentEntryId === entryId),
-    )
-  }
-  return next
 }

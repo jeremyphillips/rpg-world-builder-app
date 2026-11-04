@@ -28,8 +28,8 @@ describe('monster equipment catalog changes', () => {
     ])
     const removed = removeEquipmentEntryWithDependents(values, 'dagger-1')
     expect(removed.equipment).toEqual([])
-    expect(removed.actions).toEqual([])
-    expect(removed.reactions).toEqual([])
+    expect(removed.actions).toEqual(values.actions)
+    expect(removed.reactions).toEqual(values.reactions)
   })
 
   it('keeps weapon references on a weapon swap and confirms a non-weapon swap', () => {
