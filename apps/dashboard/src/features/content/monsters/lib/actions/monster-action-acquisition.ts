@@ -32,6 +32,7 @@ export type MonsterActionAcquisitionItem = {
 
 export type MonsterActionAcquisitionChoice =
   | { type: 'weapon-entry'; entryId: string }
+  | { type: 'focus-existing'; actionId: string }
   | { type: 'add-weapon' }
   | { type: 'natural'; presetId: ActionPresetId }
   | { type: 'other-natural' }
@@ -78,6 +79,7 @@ function parsePrefixedAcquisitionId(id: string): MonsterActionAcquisitionChoice 
   const value = id.slice(separator + 1)
   if (!value) return undefined
   if (prefix === 'weapon-entry') return { type: 'weapon-entry', entryId: value }
+  if (prefix === 'focus-action') return { type: 'focus-existing', actionId: value }
   if (prefix === 'natural' && isAttackRollPreset(value as ActionPresetId)) {
     return { type: 'natural', presetId: value as ActionPresetId }
   }
@@ -93,17 +95,34 @@ export function parseMonsterActionAcquisitionId(
   return EXACT_ACQUISITION_CHOICES[id] ?? parsePrefixedAcquisitionId(id)
 }
 
+export const MONSTER_ACTION_ALREADY_ADDED_NOTE = 'Already added'
+
 export function monsterActionAcquisitionItems(input: {
   weapons: readonly { entryId: string; label: string; equipped: boolean }[]
   allowAddWeapon: boolean
+  /** Weapon actions in section order. The first match is the row Already added opens. */
+  weaponActions?: readonly { id: string; equipmentEntryId?: string }[]
 }): MonsterActionAcquisitionItem[] {
-  const equipped = input.weapons.map((weapon) => ({
-    id: `weapon-entry:${weapon.entryId}`,
-    label: weapon.label,
-    groupId: 'equipped' as const,
-    disabled: !weapon.equipped,
-    note: weapon.equipped ? undefined : 'Not equipped',
-  }))
+  const equipped = input.weapons.map((weapon) => {
+    const existing = input.weaponActions?.find(
+      (action) => action.equipmentEntryId === weapon.entryId,
+    )
+    if (existing) {
+      return {
+        id: `focus-action:${existing.id}`,
+        label: weapon.label,
+        groupId: 'equipped' as const,
+        note: MONSTER_ACTION_ALREADY_ADDED_NOTE,
+      }
+    }
+    return {
+      id: `weapon-entry:${weapon.entryId}`,
+      label: weapon.label,
+      groupId: 'equipped' as const,
+      disabled: !weapon.equipped,
+      note: weapon.equipped ? undefined : 'Not equipped',
+    }
+  })
   const natural = ACTION_PRESET_IDS.filter(isAttackRollPreset).map((presetId) => {
     const preset = getActionPreset(presetId)
     const vocabulary = preset ? getActionVocabularyEntry(preset.vocabularyId) : undefined

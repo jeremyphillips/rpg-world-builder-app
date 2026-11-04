@@ -67,11 +67,13 @@ function sectionRows(
 function MonsterActionAddMenu({
   section,
   weapons,
+  weaponActions,
   allowAddWeapon,
   onSelect,
 }: {
   section: MonsterActionSection
   weapons: readonly { entryId: string; label: string; equipped: boolean }[]
+  weaponActions: readonly { id: string; equipmentEntryId?: string }[]
   allowAddWeapon: boolean
   onSelect: (section: MonsterActionSection, choice: MonsterActionAcquisitionChoice) => void
 }) {
@@ -83,7 +85,7 @@ function MonsterActionAddMenu({
       size="sm"
       variant="outline"
       groups={[...MONSTER_ACTION_ACQUISITION_GROUPS]}
-      items={monsterActionAcquisitionItems({ weapons, allowAddWeapon })}
+      items={monsterActionAcquisitionItems({ weapons, weaponActions, allowAddWeapon })}
       onSelectItem={(id) => {
         const choice = parseMonsterActionAcquisitionId(id)
         if (choice) onSelect(section, choice)
@@ -194,10 +196,21 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
                   <MonsterActionAddMenu
                     section={section}
                     weapons={weapons}
+                    weaponActions={MONSTER_ACTION_SECTIONS.flatMap((actionSection) =>
+                      sectionRows(values, actionSection).flatMap((action) =>
+                        action.kind === 'weapon' && action.equipmentEntryId
+                          ? [{ id: action.id, equipmentEntryId: action.equipmentEntryId }]
+                          : [],
+                      ),
+                    )}
                     allowAddWeapon={allowAddWeapon}
                     onSelect={(target, choice) => {
                       if (choice.type === 'add-weapon') {
                         setWeaponPickerSection(target)
+                        return
+                      }
+                      if (choice.type === 'focus-existing') {
+                        sections.setSelectedActionId(choice.actionId)
                         return
                       }
                       sections.addAcquisition(target, choice)
