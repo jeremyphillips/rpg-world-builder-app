@@ -75,6 +75,26 @@ describe('normalizeMonsterFormValues', () => {
     expect(normalized.equipment).toEqual(values.equipment)
   })
 
+  it('omits a blank action name and keeps a custom name that matches the weapon', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.equipment = [
+      { entryId: 'sword', equipmentId: 'longsword', quantity: 1, customName: 'Longsword' },
+    ]
+    values.actions = [
+      { id: 'blank', kind: 'weapon', equipmentEntryId: 'sword', name: '   ' },
+      { id: 'custom', kind: 'weapon', equipmentEntryId: 'sword', name: 'Longsword' },
+    ]
+    const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
+    const actions = normalized.actions as { id: string; name?: string; equipmentEntryId?: string }[]
+    expect(actions.find((action) => action.id === 'blank')).not.toHaveProperty('name')
+    expect(actions.find((action) => action.id === 'custom')?.name).toBe('Longsword')
+
+    values.equipment[0]!.customName = 'Rusty Shiv'
+    const renamed = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
+    const renamedActions = renamed.actions as { id: string; name?: string }[]
+    expect(renamedActions.find((action) => action.id === 'custom')?.name).toBe('Longsword')
+  })
+
   it('matches the preview serializer', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Scout'
