@@ -102,9 +102,12 @@ export function formatMonsterEquipmentEquippedAriaLabel(displayName: string): st
 export const MONSTER_EQUIPPED_LABEL = 'Equipped'
 export const MONSTER_CUSTOMIZATION_LABEL = 'Customization'
 export const MONSTER_CUSTOM_NAME_LABEL = 'Custom name'
-export const MONSTER_CUSTOM_DESCRIPTION_LABEL = 'Custom description'
-export const MONSTER_CUSTOM_DESCRIPTION_HINT = 'Optional text shown with this action.'
-export const MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL = 'Add custom description'
+export const MONSTER_CUSTOM_DESCRIPTION_LABEL = 'Additional details'
+export const MONSTER_CUSTOM_DESCRIPTION_HINT =
+  'Narrative detail shown with the generated rules. It does not change them.'
+export const MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL = 'Add additional details'
+export const MONSTER_RULES_TEXT_LABEL = 'Rules text'
+export const MONSTER_CUSTOM_NAME_ADD_LABEL = 'Add custom name'
 export const MONSTER_NATURAL_WEAPON_DAMAGE_HINT = 'Ability modifiers are applied automatically.'
 export const MONSTER_ON_HIT_LEGEND = 'On hit'
 export const MONSTER_ON_HIT_HINT =

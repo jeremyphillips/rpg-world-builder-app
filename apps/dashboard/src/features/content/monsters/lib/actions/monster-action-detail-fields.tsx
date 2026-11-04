@@ -1,5 +1,6 @@
 import {
   ABILITY_IDS,
+  monsterActionAuthoring,
   getAbilityLabel,
   getContentTypeTerm,
   getWeaponModeLabel,
@@ -18,6 +19,9 @@ import {
 } from '../../../lib/forms/mechanics/roll-value-fields'
 import {
   MONSTER_ACTION_NAME_LABEL,
+  MONSTER_CUSTOM_NAME_ADD_LABEL,
+  MONSTER_CUSTOM_NAME_LABEL,
+  MONSTER_RULES_TEXT_LABEL,
   MONSTER_ADDITIONAL_CONDITION_HINT,
   MONSTER_ADDITIONAL_CONDITION_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL,
@@ -81,12 +85,24 @@ const monsterActionOptionalDescriptionField = {
   optionalDisclosure: { addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
 } as const satisfies FormItem
 
+function monsterActionNameField(action: MonsterActionDraftRow): FormItem {
+  if (monsterActionAuthoring(action).name === 'derived') {
+    return {
+      type: 'text',
+      name: 'name',
+      label: MONSTER_CUSTOM_NAME_LABEL,
+      optionalDisclosure: { addLabel: MONSTER_CUSTOM_NAME_ADD_LABEL },
+    }
+  }
+  return { type: 'text', name: 'name', label: MONSTER_ACTION_NAME_LABEL, required: true }
+}
+
 function monsterActionDescriptionField(action: MonsterActionDraftRow): FormItem {
-  if (action.kind === 'special') {
+  if (monsterActionAuthoring(action).description === 'authored') {
     return {
       type: 'richtext',
       name: 'description',
-      label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
+      label: MONSTER_RULES_TEXT_LABEL,
       required: true,
     }
   }
@@ -421,10 +437,7 @@ export function monsterActionDetailFields(input: {
 }): FormItem[] {
   const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions } = input
   const attackOptions = input.attackOptions ?? []
-  const fields: FormItem[] = [
-    { type: 'text', name: 'name', label: MONSTER_ACTION_NAME_LABEL },
-    monsterActionDescriptionField(action),
-  ]
+  const fields: FormItem[] = [monsterActionNameField(action), monsterActionDescriptionField(action)]
 
   if (action.kind === 'save') {
     fields.push(monsterSaveResolutionDamageRow(ctx))

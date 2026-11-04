@@ -197,7 +197,7 @@ describe('monster action detail fields', () => {
   it('uses optional disclosure for preset action descriptions and required richtext for custom', () => {
     expect(descriptionFieldConfig({ id: 'slash', kind: 'attack', name: 'Slash' })).toMatchObject({
       type: 'richtext',
-      optionalDisclosure: { addLabel: 'Add custom description' },
+      optionalDisclosure: { addLabel: 'Add additional details' },
     })
     expect(descriptionFieldConfig({ id: 'parry', kind: 'special', name: 'Parry' })).toMatchObject({
       type: 'richtext',

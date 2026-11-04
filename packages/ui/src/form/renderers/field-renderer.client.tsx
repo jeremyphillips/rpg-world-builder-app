@@ -43,6 +43,7 @@ import { renderSpecializedField } from './fields/field-renderer-specialized.clie
 import {
   OptionalDisclosureRichTextFieldRenderer,
   OptionalDisclosureSelectFieldRenderer,
+  OptionalDisclosureTextFieldRenderer,
   OptionalDisclosureTextareaFieldRenderer,
   OptionalDisclosureTextSuggestionsFieldRenderer,
 } from './fields/optional-disclosure-field-renderer.client'
@@ -811,6 +812,20 @@ function StandardFieldRenderer({
   )
   assertOptionalDisclosureFieldConfig(config)
   const labelVisibility = resolveFieldLabelVisibility(config)
+
+  if (renderConfig.type === 'text' && renderConfig.optionalDisclosure) {
+    return (
+      <OptionalDisclosureTextFieldRenderer
+        config={renderConfig}
+        disclosure={renderConfig.optionalDisclosure}
+        field={progressiveField}
+        id={id}
+        hint={hint}
+        hintPosition={hintPosition}
+        {...validation}
+      />
+    )
+  }
 
   if (renderConfig.type === 'textarea' && renderConfig.optionalDisclosure) {
     return (

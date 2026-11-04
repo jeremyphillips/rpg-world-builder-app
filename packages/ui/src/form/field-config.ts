@@ -469,8 +469,8 @@ export type TrailingFieldActionConfig = {
 
 export interface TextFieldConfig extends BaseFieldConfig {
   type: 'text'
-  // TODO(text): add optionalDisclosure when OptionalFieldDisclosure supports single-line fields.
   placeholder?: string
+  optionalDisclosure?: OptionalDisclosureConfig
   /** Native input type for the text control (e.g. `email`, `password`). */
   inputType?: 'text' | 'email' | 'password' | 'url' | 'tel' | 'search'
   autoComplete?: string
