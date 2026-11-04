@@ -25,9 +25,11 @@ bonus + ability modifier). Area sentences for stat blocks use
 `spell`. The section (`actions`, `bonusActions`, `reactions`) is the action
 economy. `multiattack` is valid only in `actions`. Reactions omit that kind.
 
-`preset` is an optional string stored on the action. It records where the row
-was created. Parsing does not require the id to exist in a registry, and nothing
-reapplies preset defaults after creation.
+`preset` is an optional string stored on the action. It records which preset
+created the row and remains the live source of that row's default name.
+Parsing requires a known preset id on publish. Copied mechanics (damage, form,
+reach, resolution, and the rest) are not reapplied after creation. `form` is
+anatomy, not a name.
 
 `form` on a natural weapon is anatomy (`bite`, `claw`, `slam`, `gore`, `ram`,
 `sting`, `tail`, `tentacle`, `talons`). It is optional and independent of

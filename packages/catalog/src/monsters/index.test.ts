@@ -4,6 +4,7 @@ import {
   deriveMonsterStatBlock,
   formatMonsterMultiattack,
   formatMonsterSaveAction,
+  resolveMonsterActionIdentity,
   systemDefaultArmorClassRules,
 } from '@rpg/contracts'
 
@@ -133,8 +134,13 @@ describe('SRD 5.2.1 monster seed', () => {
     expect(bite).toMatchObject({ kind: 'natural-weapon', form: 'bite' })
     expect(breath?.provenance?.excerpt?.excerptId).toBe('monsters/hell-hound/fire-breath')
     if (breath?.kind !== 'save' || !hound) return
+    const breathName = resolveMonsterActionIdentity({
+      action: breath,
+      equipmentCatalogStatus: 'ready',
+    }).displayName
     const formatted = formatMonsterSaveAction({
       action: breath,
+      name: breathName,
       abilityScores: hound.abilityScores,
       proficiencyBonus: CHALLENGE_RATING_MECHANICS[hound.challengeRating].proficiencyBonus,
     })

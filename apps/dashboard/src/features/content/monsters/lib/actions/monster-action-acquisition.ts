@@ -148,14 +148,12 @@ export function monsterActionAcquisitionItems(input: {
 function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
   const preset = getActionPreset(presetId)
   const id = createMonsterRowId()
-  const vocabulary = preset ? getActionVocabularyEntry(preset.vocabularyId) : undefined
-  if (!preset) return { id, kind: 'special', name: presetId }
+  if (!preset) return { id, kind: 'special' }
   if (preset.mechanics === 'attack-roll') {
     return {
       id,
       kind: 'natural-weapon',
       preset: presetId,
-      name: vocabulary?.label ?? presetId,
       form: preset.defaults.naturalForm,
       damageType: preset.defaults.damageType,
       mode: preset.defaults.mode,
@@ -168,7 +166,6 @@ function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
       id,
       kind: 'save',
       preset: presetId,
-      name: preset.defaults.suggestedName,
       dcSource: preset.defaults.dcSource,
       resolution: preset.defaults.resolution,
       ...(preset.defaults.limitedUse ? { limitedUse: preset.defaults.limitedUse } : {}),
@@ -178,7 +175,6 @@ function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
     id,
     kind: 'multiattack',
     preset: presetId,
-    name: vocabulary?.label ?? presetId,
     steps: [],
   }
 }

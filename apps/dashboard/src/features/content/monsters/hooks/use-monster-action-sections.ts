@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { resolveMonsterActionIdentity } from '@rpg/contracts'
 import { useFormContext, useWatch } from 'react-hook-form'
+
+import { masterDetailItemTitle } from '../../lib/master-detail/master-detail-constants'
+import { MONSTER_ACTION_ITEM_NOUN } from '../lib/monster-trait-form-fields'
 
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import {
@@ -23,6 +27,14 @@ import {
   type MonsterActionSection,
 } from '../lib/actions/monster-action-equipment-references'
 import { formatAddedEquipmentNotice } from '../lib/monster-form-labels'
+
+function monsterActionReferenceTitle(action: MonsterActionDraftRow): string {
+  const identity = resolveMonsterActionIdentity({
+    action,
+    equipmentCatalogStatus: 'pending',
+  })
+  return identity.displayName.trim() || masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
+}
 import type { MonsterFormValues } from '../lib/monster-form-values'
 
 type TriggerPending = {
@@ -287,7 +299,7 @@ export function useMonsterActionSections(entityId?: string) {
         setPending({
           type: 'multiattack-delete',
           actionId,
-          names: references.map((action) => action.name?.trim() || 'Multiattack'),
+          names: references.map((action) => monsterActionReferenceTitle(action)),
           from: located.section,
           index: located.index,
         })
@@ -336,7 +348,7 @@ export function useMonsterActionSections(entityId?: string) {
         setPending({
           type: 'multiattack-move',
           actionId: located.action.id,
-          names: references.map((action) => action.name?.trim() || 'Multiattack'),
+          names: references.map((action) => monsterActionReferenceTitle(action)),
           from: located.section,
           to,
           index: located.index,

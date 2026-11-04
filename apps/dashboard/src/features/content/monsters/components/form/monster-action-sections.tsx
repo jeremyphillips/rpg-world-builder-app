@@ -22,7 +22,10 @@ import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
-import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
+import {
+  monsterActionNavigationTitle,
+  resolveMonsterFormActionIdentity,
+} from '../../lib/actions/monster-action-identity'
 import type { MonsterActionPending } from '../../hooks/use-monster-action-sections'
 import {
   buildMonsterLoadoutPickerItems,
@@ -174,7 +177,9 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
                 key={section}
                 items={rows.map((row, index) => ({
                   id: row.id,
-                  title: row.name?.trim() || `Action ${index + 1}`,
+                  title: monsterActionNavigationTitle(
+                    resolveMonsterFormActionIdentity(row, values, ctx),
+                  ),
                   meta: {
                     sourceLabel: getMonsterActionKindLabel(row.kind),
                   },

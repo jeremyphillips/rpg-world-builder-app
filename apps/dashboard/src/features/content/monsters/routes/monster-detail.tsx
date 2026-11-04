@@ -119,6 +119,7 @@ export function MonsterDetailContent({
           : spellsQuery.isPending
             ? 'unavailable'
             : 'ready',
+        magicPropertyProvider,
       }),
     [
       catalogState,
@@ -126,6 +127,7 @@ export function MonsterDetailContent({
       equipmentById,
       monster,
       spellsQuery.data,
+      magicPropertyProvider,
       spellsQuery.isError,
       spellsQuery.isPending,
     ],

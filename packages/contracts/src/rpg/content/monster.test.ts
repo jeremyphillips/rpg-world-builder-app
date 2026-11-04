@@ -21,17 +21,30 @@ describe('monsterActionSchema', () => {
     ).toBeUndefined()
   })
 
-  it('requires a name for natural-weapon actions', () => {
+  it('requires a name for natural weapons that have no preset', () => {
+    const natural = {
+      id: 'claw',
+      kind: 'natural-weapon' as const,
+      mode: 'melee' as const,
+      properties: [],
+      damage: { dice: { count: 1, faces: 4 } },
+      damageType: 'slashing',
+    }
+    expect(monsterActionSchema.safeParse(natural).success).toBe(true)
+    const published = createMonsterInputSchema.safeParse({
+      ...publishedMonsterBase,
+      actions: [natural],
+    })
+    expect(published.success).toBe(false)
     expect(
-      monsterActionSchema.safeParse({
-        id: 'claw',
-        kind: 'natural-weapon',
-        mode: 'melee',
-        properties: [],
-        damage: { dice: { count: 1, faces: 4 } },
-        damageType: 'slashing',
+      published.error?.issues.some((issue) => issue.message === 'This action requires a name.'),
+    ).toBe(true)
+    expect(
+      createMonsterInputSchema.safeParse({
+        ...publishedMonsterBase,
+        actions: [{ ...natural, preset: 'claw' }],
       }).success,
-    ).toBe(false)
+    ).toBe(true)
   })
 
   it('parses reaction triggers on reactions only', () => {
@@ -350,7 +363,7 @@ function issueMessages(result: {
 }
 
 describe('monster save and multiattack refinements', () => {
-  it('accepts a multi-damage save and an unknown preset id', () => {
+  it('accepts a multi-damage save and rejects an unknown preset id', () => {
     const cold = { ...fireDamage, id: 'cold', damageType: 'cold' }
     const parsed = createMonsterInputSchema.safeParse({
       ...publishedMonsterBase,
@@ -373,7 +386,7 @@ describe('monster save and multiattack refinements', () => {
         { ...biteAction, preset: 'not-in-the-registry' },
       ],
     })
-    expect(parsed.success).toBe(true)
+    expect(issueMessages(parsed)).toContain('Unknown action preset.')
   })
 
   it('rejects unsupported save shapes', () => {

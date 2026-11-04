@@ -11,6 +11,8 @@ import { reachFeetSchema } from '../../vocab/attack/melee-reach'
 import { weaponModeSchema } from '../../vocab/weapon'
 import { entryProvenanceField } from '../../primitives/provenance'
 import { effectResolutionSchema } from '../lib/resolution/schema'
+import { getActionPreset } from '../action/action-presets'
+import { monsterActionAuthoring } from './monster-action-authoring'
 import { naturalAttackFormSchema } from '../../vocab/action/natural-attack-form'
 import { spellReferenceSchema } from '../spell/spell-reference'
 import {
@@ -117,7 +119,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
     z.object({
       ...identity,
       kind: z.literal('natural-weapon'),
-      name: strict(z.string().min(1), mode),
+      name: z.string().min(1).optional(),
       form: naturalAttackFormSchema.optional(),
       mode: strict(weaponModeSchema, mode),
       properties: (mode === 'draft'
@@ -172,14 +174,14 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
     z.object({
       ...identity,
       kind: z.literal('save'),
-      name: strict(z.string().min(1), mode),
+      name: z.string().min(1).optional(),
       dcSource: strict(monsterAbilitySourceSchema, mode),
       resolution: saveResolutionSchema(mode),
     }),
     z.object({
       ...identity,
       kind: z.literal('multiattack'),
-      name: strict(z.string().min(1), mode),
+      name: z.string().min(1).optional(),
       steps: multiattackStepsSchema(mode),
     }),
   ] as const
@@ -309,9 +311,6 @@ function refineNaturalWeaponShape(
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
-  if (!action.name) {
-    addCustomRefinementIssue(ctx, 'Natural weapon actions require a name.', [...path, 'name'])
-  }
   if (action.mode === 'ranged' && !action.range) {
     addCustomRefinementIssue(ctx, 'Ranged natural weapons require range.', [...path, 'range'])
   }
@@ -328,9 +327,6 @@ function refineAuthoredAttackShape(
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
-  if (!action.name) {
-    addCustomRefinementIssue(ctx, 'This action requires a name.', [...path, 'name'])
-  }
   if (!action.modes) return
   if (new Set(action.modes).size !== action.modes.length) {
     addCustomRefinementIssue(ctx, 'Attack modes must be unique.', [...path, 'modes'])
@@ -406,16 +402,13 @@ export function refineMonsterActionShape(
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
+  if (action.preset && !getActionPreset(action.preset)) {
+    addCustomRefinementIssue(ctx, 'Unknown action preset.', [...path, 'preset'])
+  }
+  if (monsterActionAuthoring(action).name === 'authored' && !action.name?.trim()) {
+    addCustomRefinementIssue(ctx, 'This action requires a name.', [...path, 'name'])
+  }
   if (action.kind === 'natural-weapon') refineNaturalWeaponShape(action, ctx, path)
   if (action.kind === 'attack') refineAuthoredAttackShape(action, ctx, path)
   if (action.kind === 'save') refineMonsterSaveResolution(action, ctx, path)
-  if (
-    (action.kind === 'special' ||
-      action.kind === 'spell' ||
-      action.kind === 'save' ||
-      action.kind === 'multiattack') &&
-    !action.name
-  ) {
-    addCustomRefinementIssue(ctx, 'This action requires a name.', [...path, 'name'])
-  }
 }

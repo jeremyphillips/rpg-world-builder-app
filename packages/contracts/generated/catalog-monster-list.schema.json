@@ -1553,7 +1553,6 @@
           "required": [
             "id",
             "kind",
-            "name",
             "mode",
             "properties",
             "damage",
@@ -1736,7 +1735,6 @@
           "required": [
             "id",
             "kind",
-            "name",
             "dcSource",
             "resolution"
           ],
@@ -1780,7 +1778,6 @@
           "required": [
             "id",
             "kind",
-            "name",
             "steps"
           ],
           "additionalProperties": false
@@ -3072,7 +3069,6 @@
             "required": [
               "id",
               "kind",
-              "name",
               "mode",
               "properties",
               "damage",
@@ -3267,7 +3263,6 @@
             "required": [
               "id",
               "kind",
-              "name",
               "dcSource",
               "resolution"
             ],

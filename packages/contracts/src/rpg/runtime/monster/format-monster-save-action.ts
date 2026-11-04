@@ -76,6 +76,8 @@ function selectionPhrase(action: SaveAction): string {
 /** SRD stat-block heading and body for a monster saving-throw action. */
 export function formatMonsterSaveAction(args: {
   action: SaveAction
+  /** Resolved display name. Limited-use suffix is applied here and nowhere else. */
+  name: string
   abilityScores: Record<Ability, number>
   proficiencyBonus: number
   spellcastingAbilityScore?: number
@@ -88,7 +90,7 @@ export function formatMonsterSaveAction(args: {
       ? getAbilityLabel(resolution.method.ability)
       : 'Saving throw'
   const limitedUse = limitedUseSchema.safeParse(action.limitedUse).data
-  const heading = formatMonsterLimitedUseHeading(action.name, limitedUse)
+  const heading = formatMonsterLimitedUseHeading(args.name, limitedUse)
   const failed = resolution.outcomes.find((outcome) => outcome.result === 'failed-save')
   const saved = resolution.outcomes.find((outcome) => outcome.result === 'successful-save')
   const sentences = [

@@ -273,7 +273,7 @@
       {
         "id": "multiattack",
         "kind": "multiattack",
-        "name": "Multiattack",
+        "preset": "multiattack",
         "steps": [{ "count": 2, "actionIds": ["greatsword", "heavy-crossbow"] }],
         "provenance": {
           "excerpt": {
@@ -384,7 +384,7 @@
       {
         "id": "multiattack",
         "kind": "multiattack",
-        "name": "Multiattack",
+        "preset": "multiattack",
         "steps": [{ "count": 3, "actionIds": ["arcane-burst"] }],
         "provenance": {
           "excerpt": {
@@ -566,7 +566,7 @@
       {
         "id": "multiattack",
         "kind": "multiattack",
-        "name": "Multiattack",
+        "preset": "multiattack",
         "steps": [{ "count": 2, "actionIds": ["bite"] }],
         "provenance": {
           "excerpt": {
@@ -578,7 +578,7 @@
       {
         "id": "bite",
         "kind": "natural-weapon",
-        "name": "Bite",
+        "preset": "bite",
         "form": "bite",
         "mode": "melee",
         "damage": { "dice": { "count": 1, "faces": 8 } },
@@ -599,7 +599,6 @@
         "id": "fire-breath",
         "kind": "save",
         "preset": "breath-weapon",
-        "name": "Fire Breath",
         "dcSource": { "kind": "ability", "ability": "con", "proficient": true },
         "resolution": {
           "selectionMode": "self",

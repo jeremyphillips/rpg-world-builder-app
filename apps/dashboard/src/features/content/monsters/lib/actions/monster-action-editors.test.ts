@@ -1,4 +1,4 @@
-import { ACTION_PRESET_IDS, getActionPreset, getActionVocabularyEntry } from '@rpg/contracts'
+import { ACTION_PRESET_IDS, getActionPreset } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
@@ -32,7 +32,6 @@ describe('monster action acquisition', () => {
     expect(action).toMatchObject({
       kind: 'natural-weapon',
       preset: 'claw',
-      name: 'Claw',
       form: 'claw',
       damageType: 'slashing',
       mode: 'melee',
@@ -50,7 +49,6 @@ describe('monster action acquisition', () => {
       expect(action).toMatchObject({
         kind: 'natural-weapon',
         preset: presetId,
-        name: getActionVocabularyEntry(preset.vocabularyId)?.label,
         form: preset.defaults.naturalForm,
         damageType: preset.defaults.damageType,
         mode: preset.defaults.mode,
@@ -94,13 +92,15 @@ describe('monster action acquisition', () => {
     ).toMatchObject({
       kind: 'save',
       preset: 'breath-weapon',
-      name: 'Fire Breath',
       dcSource: { kind: 'ability', ability: 'con', proficient: true },
       limitedUse: { kind: 'recharge', minRoll: 5 },
     })
     expect(
+      createMonsterActionFromAcquisition({ type: 'preset', presetId: 'breath-weapon' }).name,
+    ).toBeUndefined()
+    expect(
       createMonsterActionFromAcquisition({ type: 'preset', presetId: 'multiattack' }),
-    ).toMatchObject({ kind: 'multiattack', preset: 'multiattack', name: 'Multiattack', steps: [] })
+    ).toMatchObject({ kind: 'multiattack', preset: 'multiattack', steps: [] })
     expect(
       createMonsterActionFromAcquisition({ type: 'weapon-entry', entryId: 'greatsword' }),
     ).toMatchObject({ kind: 'weapon', equipmentEntryId: 'greatsword' })
@@ -378,10 +378,11 @@ describe('monster action draft round trip', () => {
     ])
     expect(reloaded.actions[0]).toMatchObject({ equipmentEntryId: 'greatsword' })
     expect(reloaded.actions[1]).toMatchObject({
-      name: 'Bite',
+      preset: 'bite',
       damageType: 'piercing',
       mode: 'melee',
     })
+    expect(reloaded.actions[1]).not.toHaveProperty('name')
 
     for (const slug of ['knight', 'mage', 'hell-hound'] as const) {
       const monster = pickMonster(slug)

@@ -56,7 +56,6 @@ describe('MonsterActionSections', () => {
     await user.click(addButtons[0]!)
     await user.click(await screen.findByRole('menuitem', { name: /Claw/i }))
 
-    expect(screen.getByDisplayValue('Claw')).toBeInTheDocument()
     expect(screen.getByRole('button', { current: true, name: /Claw/i })).toBeInTheDocument()
   })
 
@@ -71,6 +70,8 @@ describe('MonsterActionSections', () => {
     await user.click(screen.getByRole('button', { name: 'Commit mock weapon' }))
 
     expect(screen.getByText(/Longsword was added/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { current: true, name: /Action 1/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { current: true, name: /Unresolved reference/i }),
+    ).toBeInTheDocument()
   })
 })

@@ -19,6 +19,7 @@ import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventor
 import { resolveStatBlockDamagePart } from '../creature/stat-block-average'
 import { resolveWeaponAttackAbilityModifier, weaponAttackBonus } from '../creature/weapon-attack'
 import { unavailableField, type DerivedField, type DerivedFieldReason } from './derived-field'
+import { resolveMonsterActionIdentity } from './resolve-monster-action-identity'
 
 export const MONSTER_ACTION_ATTACK_KINDS = ['weapon', 'natural-weapon', 'attack'] as const
 export type MonsterActionAttackKind = (typeof MONSTER_ACTION_ATTACK_KINDS)[number]
@@ -45,7 +46,10 @@ export type MonsterActionAttackUnresolvedCapability = {
 /** Structured attack math before stat-block string formatting. */
 export type MonsterActionAttackProfile = {
   sourceKind: 'weapon' | 'natural-weapon' | 'attack'
-  /** Catalog item name for weapons; authored name otherwise. */
+  /**
+   * Mechanical source label for breakdowns. Catalog weapon name, or the natural
+   * or authored label. May differ from `name` when the action or instance has a custom name.
+   */
   sourceLabel: string
   name: string
   governingAbility: Ability
@@ -205,7 +209,13 @@ function resolveWeaponProfile(
     value: {
       sourceKind: 'weapon',
       sourceLabel: catalogItem.name,
-      name: action.name ?? entry.customName ?? catalogItem.name,
+      name: resolveMonsterActionIdentity({
+        action,
+        equipment: args.monster.equipment,
+        equipmentCatalog: args.equipmentCatalog,
+        magicPropertyProvider: args.magicPropertyProvider,
+        equipmentCatalogStatus: 'ready',
+      }).displayName,
       governingAbility: governing.ability,
       proficiencyContribution: proficient ? args.proficiencyBonus : 0,
       attackBonus: totals.attackBonus,
@@ -238,12 +248,13 @@ function resolveNaturalProfile(
 
   const attackBonus = weaponAttackBonus(governing.modifier, true, args.proficiencyBonus)
   const primary = resolveStatBlockDamagePart(action.damage, governing.modifier)
+  const named = resolveMonsterActionIdentity({ action, equipmentCatalogStatus: 'ready' })
   return {
     status: 'resolved',
     value: {
       sourceKind: 'natural-weapon',
-      sourceLabel: action.name?.trim() || 'Natural weapon',
-      name: action.name ?? '',
+      sourceLabel: named.defaultName || 'Natural weapon',
+      name: named.displayName,
       governingAbility: governing.ability,
       proficiencyContribution: args.proficiencyBonus,
       attackBonus,
@@ -328,7 +339,7 @@ function resolveAuthoredProfile(
     value: {
       sourceKind: 'attack',
       sourceLabel: action.name?.trim() || 'Custom attack',
-      name: action.name ?? '',
+      name: resolveMonsterActionIdentity({ action, equipmentCatalogStatus: 'ready' }).displayName,
       governingAbility: ability.ability,
       proficiencyContribution: ability.proficient ? args.proficiencyBonus : 0,
       attackBonus,

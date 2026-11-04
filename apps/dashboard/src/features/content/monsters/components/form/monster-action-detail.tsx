@@ -13,6 +13,10 @@ import { MasterDetailEditorShell } from '../../../components/master-detail/maste
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
 import {
+  monsterActionNavigationTitle,
+  resolveMonsterFormActionIdentity,
+} from '../../lib/actions/monster-action-identity'
+import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
@@ -94,7 +98,10 @@ export function MonsterActionDetail({
             row.id !== action.id &&
             (row.kind === 'weapon' || row.kind === 'natural-weapon' || row.kind === 'attack'),
         )
-        .map((row) => ({ value: row.id, label: row.name?.trim() || row.kind })),
+        .map((row) => ({
+          value: row.id,
+          label: monsterActionNavigationTitle(resolveMonsterFormActionIdentity(row, values, ctx)),
+        })),
     })
   }, [action, ctx, located, namePrefix, values])
 
@@ -119,7 +126,9 @@ export function MonsterActionDetail({
       selectedIdentity={
         located
           ? {
-              title: located.action.name?.trim() || `Action ${located.index + 1}`,
+              title: monsterActionNavigationTitle(
+                resolveMonsterFormActionIdentity(located.action, values, ctx),
+              ),
               meta: {
                 eyebrow: getMonsterActionKindLabel(located.action.kind),
                 sourceLabel: monsterActionSectionHeading(located.section),

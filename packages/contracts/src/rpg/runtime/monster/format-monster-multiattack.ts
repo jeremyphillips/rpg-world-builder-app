@@ -1,5 +1,8 @@
 import type { MonsterAction } from '../../content/monster/action'
+import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
+import type { EquipmentInstance } from '../../content/equipment/instance/instance'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
+import { resolveMonsterActionIdentity } from './resolve-monster-action-identity'
 import { formatMonsterStatBlockSubject } from './spell-entry-presentation'
 
 type MultiattackAction = Extract<MonsterAction, { kind: 'multiattack' }>
@@ -25,20 +28,20 @@ function countWord(count: number): string {
 function attackName(
   id: string,
   actions: readonly MonsterAction[],
-  equipment: readonly { entryId: string; equipmentId: string }[],
+  equipment: readonly EquipmentInstance[],
   equipmentCatalog: CreatureEquipmentCatalog,
+  magicPropertyProvider: MagicPropertyDefinitionProvider,
 ): string {
   const action = actions.find((entry) => entry.id === id)
   if (!action) return id
-  if (action.kind === 'weapon') {
-    const equipmentId = equipment.find(
-      (entry) => entry.entryId === action.equipmentEntryId,
-    )?.equipmentId
-    const item = equipmentId ? equipmentCatalog.get(equipmentId) : undefined
-    return action.name ?? item?.name ?? id
-  }
-  if ('name' in action && action.name) return action.name
-  return id
+  const identity = resolveMonsterActionIdentity({
+    action,
+    equipment,
+    equipmentCatalog,
+    magicPropertyProvider,
+    equipmentCatalogStatus: 'ready',
+  })
+  return identity.displayName || id
 }
 
 function combinationPhrase(names: readonly string[]): string {
@@ -64,9 +67,11 @@ export function formatMonsterMultiattack(args: {
   monsterName: string
   action: MultiattackAction
   actions: readonly MonsterAction[]
-  equipment: readonly { entryId: string; equipmentId: string }[]
+  equipment: readonly EquipmentInstance[]
   equipmentCatalog: CreatureEquipmentCatalog
+  magicPropertyProvider?: MagicPropertyDefinitionProvider
 }): string {
+  const provider = args.magicPropertyProvider ?? (() => undefined)
   const subject = formatMonsterStatBlockSubject(args.monsterName)
   const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
   const sentences = args.action.steps.map((step) =>
@@ -74,11 +79,9 @@ export function formatMonsterMultiattack(args: {
       subject: capitalSubject,
       count: step.count,
       names: step.actionIds.map((id) =>
-        attackName(id, args.actions, args.equipment, args.equipmentCatalog),
+        attackName(id, args.actions, args.equipment, args.equipmentCatalog, provider),
       ),
     }),
   )
-  const generated = sentences.join(' ')
-  const description = args.action.description?.replace(/<[^>]+>/g, '').trim()
-  return description ? `${generated} ${description}` : generated
+  return sentences.join(' ')
 }

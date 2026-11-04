@@ -24,6 +24,9 @@ import {
   formatMonsterMultiattack,
   formatMonsterSaveAction,
   formatMonsterSpellEntry,
+  appendMonsterActionSupplementalHtml,
+  appendMonsterActionSupplementalText,
+  resolveMonsterActionIdentity,
   limitedUseSchema,
   type ArmorClassRules,
   type DerivedMonsterAttackLine,
@@ -106,6 +109,7 @@ export type BuildMonsterDetailViewModelInput = {
   derived?: DerivedMonsterStatBlock | null
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   spellCatalogStatus?: 'ready' | 'unavailable'
+  magicPropertyProvider?: MagicPropertyDefinitionProvider
 }
 
 export function monsterUnavailableReasonCopy(
@@ -222,18 +226,20 @@ function withLimitedUseHeading(name: string, limitedUse: unknown): string {
   return parsed.success ? formatMonsterLimitedUseHeading(name, parsed.data) : name
 }
 
-function resolveActionName(
-  action: MonsterAction,
-  attack: DerivedMonsterAttackLine | undefined,
-): string {
-  const name =
-    action.kind === 'special' ||
-    action.kind === 'natural-weapon' ||
-    action.kind === 'save' ||
-    action.kind === 'multiattack'
-      ? action.name
-      : (action.name ?? attack?.name ?? action.id)
-  return withLimitedUseHeading(name, action.limitedUse)
+function actionDisplayIdentity(
+  action: MonsterAction | MonsterReaction,
+  monster: Monster,
+  equipmentById: Map<string, Equipment>,
+  catalogState: MonsterCatalogLoadState,
+  magicPropertyProvider: MagicPropertyDefinitionProvider,
+) {
+  return resolveMonsterActionIdentity({
+    action,
+    equipment: monster.equipment,
+    equipmentCatalog: equipmentById,
+    magicPropertyProvider,
+    equipmentCatalogStatus: catalogState,
+  })
 }
 
 function proficiencyBonusForDisplay(
@@ -270,6 +276,7 @@ function formatSaveActionBody(
   action: Extract<MonsterAction | MonsterReaction, { kind: 'save' }>,
   derived: DerivedMonsterStatBlock | null | undefined,
   catalogState: MonsterCatalogLoadState,
+  displayName: string,
 ): string | undefined {
   if (catalogState !== 'ready' || !action.resolution || !action.dcSource) {
     if (catalogState === 'error') return MONSTER_UNRESOLVED_CATALOG_REFERENCE
@@ -277,12 +284,12 @@ function formatSaveActionBody(
   }
   const formatted = formatMonsterSaveAction({
     action: { ...action, resolution: action.resolution, dcSource: action.dcSource },
+    name: displayName,
     abilityScores: monster.abilityScores,
     proficiencyBonus: proficiencyBonusForDisplay(monster, derived),
     spellcastingAbilityScore: spellcastingAbilityScoreForSave(monster, action.dcSource),
   })
-  const extra = action.description?.trim()
-  return extra ? `${formatted.body} ${extra}` : formatted.body
+  return appendMonsterActionSupplementalText(formatted.body, action.description) || undefined
 }
 
 function formatMultiattackActionBody(
@@ -290,6 +297,7 @@ function formatMultiattackActionBody(
   action: Extract<MonsterAction, { kind: 'multiattack' }>,
   equipmentById: Map<string, Equipment>,
   catalogState: MonsterCatalogLoadState,
+  magicPropertyProvider: MagicPropertyDefinitionProvider,
 ): string | undefined {
   if (catalogState !== 'ready') {
     return catalogState === 'error' ? MONSTER_UNRESOLVED_CATALOG_REFERENCE : undefined
@@ -300,8 +308,9 @@ function formatMultiattackActionBody(
     actions: monster.actions,
     equipment: monster.equipment,
     equipmentCatalog: equipmentById,
+    magicPropertyProvider,
   })
-  return generated || undefined
+  return appendMonsterActionSupplementalText(generated, action.description) || undefined
 }
 
 function resolveActionAttackLine(
@@ -323,6 +332,8 @@ type SpellDisplayContext = {
   monsterName: string
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   catalogStatus: 'ready' | 'unavailable'
+  catalogState: MonsterCatalogLoadState
+  magicPropertyProvider: MagicPropertyDefinitionProvider
   spellsInBody: Map<string, Extract<MonsterAction | MonsterReaction, { kind: 'spell' }>>
 }
 
@@ -333,16 +344,28 @@ function mapActionItem(
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionItemViewModel {
+  const identity = actionDisplayIdentity(
+    action,
+    spells.monster,
+    spells.equipmentById,
+    spells.catalogState,
+    spells.magicPropertyProvider,
+  )
+  const name = withLimitedUseHeading(identity.displayName, action.limitedUse)
+
   if (action.kind === 'spell') {
     const rendered = formatMonsterSpellEntry({
-      entry: action,
+      entry: { ...action, name: identity.displayName },
       monsterName: spells.monsterName,
       section,
       spellsById: spells.spellsById,
       catalogStatus: spells.catalogStatus,
       spellsInBody: spells.spellsInBody,
     })
-    const descriptionHtml = [rendered.bodyHtml, action.description].filter(Boolean).join('')
+    const descriptionHtml = appendMonsterActionSupplementalHtml(
+      rendered.bodyHtml,
+      action.description,
+    )
     return {
       id: action.id,
       name: rendered.heading,
@@ -351,7 +374,6 @@ function mapActionItem(
   }
 
   const attack = findAttackLine(derived, section, action.id)
-  const name = resolveActionName(action, attack)
 
   if (action.kind === 'special') {
     return {
@@ -362,7 +384,13 @@ function mapActionItem(
   }
 
   if (action.kind === 'save') {
-    const body = formatSaveActionBody(spells.monster, action, derived, catalogState)
+    const body = formatSaveActionBody(
+      spells.monster,
+      action,
+      derived,
+      catalogState,
+      identity.displayName,
+    )
     return {
       id: action.id,
       name,
@@ -376,6 +404,7 @@ function mapActionItem(
       action,
       spells.equipmentById,
       catalogState,
+      spells.magicPropertyProvider,
     )
     return {
       id: action.id,
@@ -424,7 +453,7 @@ function reactionItemView(
   const hasBody = Boolean(base?.attackLine || base?.descriptionHtml)
   return {
     id: base?.id ?? action.id,
-    name: base?.name ?? action.id,
+    name: base?.name ?? '',
     attackLine: base?.attackLine,
     descriptionHtml: base?.descriptionHtml,
     triggerLine: triggerLine(triggerText),
@@ -578,6 +607,7 @@ export function buildMonsterDetailViewModel({
   derived,
   spellsById,
   spellCatalogStatus = 'unavailable',
+  magicPropertyProvider = () => undefined,
 }: BuildMonsterDetailViewModelInput): MonsterDetailViewModel {
   const spellContext = {
     monster,
@@ -585,6 +615,8 @@ export function buildMonsterDetailViewModel({
     monsterName: monster.name,
     spellsById,
     catalogStatus: spellCatalogStatus,
+    catalogState,
+    magicPropertyProvider,
     spellsInBody: new Map(
       [...monster.actions, ...monster.bonusActions, ...monster.reactions]
         .filter((action) => action.kind === 'spell')
