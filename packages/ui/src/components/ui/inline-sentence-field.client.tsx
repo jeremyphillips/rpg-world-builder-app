@@ -235,6 +235,9 @@ function InlineSentenceJoinedPairControl({
           placeholder={start.placeholder}
           hasError={startHasError}
           describedBy={control.describedBy}
+          allowCustom={start.allowCustom}
+          clearable={start.clearable}
+          customMin={start.customMin}
           onValueChange={(next) => start.onChange?.(next)}
           onBlur={start.onBlur}
         />

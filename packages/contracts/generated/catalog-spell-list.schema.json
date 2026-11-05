@@ -257,12 +257,15 @@
                 "properties": {
                   "value": {
                     "type": "number",
-                    "minimum": 0
+                    "exclusiveMinimum": 0
                   },
                   "unit": {
                     "type": "string",
-                    "const": "ft",
-                    "description": "ft"
+                    "enum": [
+                      "ft",
+                      "mi"
+                    ],
+                    "description": "ft | mi"
                   }
                 },
                 "required": [
@@ -1185,10 +1188,12 @@
       "type": "object",
       "properties": {
         "value": {
-          "type": "number",
-          "minimum": 0
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
         },
         "unit": {
+          "default": "ft",
           "type": "string",
           "const": "ft",
           "description": "ft"

@@ -25,6 +25,15 @@ export type JoinedPairSelectOccupantConfig = {
   sizingLabels?: readonly string[]
   placeholder?: string
   ariaLabel: string
+  /**
+   * Appends Custom and swaps this occupant to a number input until blur.
+   * A stored number that is not in `options` stays selectable.
+   */
+  allowCustom?: boolean
+  /** Prepends an empty choice that writes `undefined`. Does not insert a default. */
+  clearable?: boolean
+  /** Minimum for the custom number input. Defaults to 1. */
+  customMin?: number
 }
 
 export type JoinedPairLabelOccupantConfig = {

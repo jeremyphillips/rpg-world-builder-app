@@ -11,6 +11,7 @@ import { useFieldErrorPresentation } from '../../context/array-item-presentation
 import { resolveRowAwareFieldHintPresentation } from '../../config/resolve-row-field-hint.lib'
 import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 import {
+  amountAfterJoinedPairUnitChange,
   buildJoinedPairControls,
   resolveJoinedPairBoundPaths,
   resolveJoinedPairCombinedError,
@@ -38,6 +39,32 @@ export function JoinedPairFieldRenderer({ config, id, namePrefix }: JoinedPairFi
     disabled: endPath === undefined,
     ...(endDefaultValue !== undefined ? { defaultValue: endDefaultValue } : {}),
   })
+  const unitValue = endPath !== undefined ? endController.field.value : undefined
+  const startOccupant =
+    config.start.kind === 'select' && config.presetsByUnit
+      ? {
+          ...config.start,
+          options:
+            config.presetsByUnit[String(unitValue ?? endDefaultValue ?? '')] ??
+            config.start.options,
+        }
+      : config.start
+  const endField = {
+    ...endController.field,
+    onChange: (next: unknown) => {
+      if (config.clearAmountWhenUnitChanges) {
+        const nextAmount = amountAfterJoinedPairUnitChange(
+          startController.field.value,
+          endController.field.value,
+          next,
+        )
+        if (nextAmount !== startController.field.value) {
+          startController.field.onChange(nextAmount)
+        }
+      }
+      endController.field.onChange(next)
+    },
+  }
 
   const combinedError = resolveJoinedPairCombinedError(
     startController.fieldState.error,
@@ -48,10 +75,10 @@ export function JoinedPairFieldRenderer({ config, id, namePrefix }: JoinedPairFi
   const hintPresentation = resolveRowAwareFieldHintPresentation(config, {}, inAnatomyRow)
   const labelVisibility = resolveFieldLabelVisibility(config)
   const controls = buildJoinedPairControls(
-    config,
+    { ...config, start: startOccupant },
     ids,
     startController.field,
-    endController.field,
+    endField,
     startController.fieldState.error,
     endController.fieldState.error,
     endPath,

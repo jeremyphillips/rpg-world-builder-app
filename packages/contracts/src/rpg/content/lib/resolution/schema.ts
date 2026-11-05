@@ -28,8 +28,8 @@ import { isResolutionEffectKind } from './selection-availability'
 import { spellResolutionValidationMessages } from './validation-messages'
 
 const resolutionDistanceSchema = z.object({
-  value: z.number().min(0),
-  unit: z.literal('ft'),
+  value: z.number().int().positive(),
+  unit: z.literal('ft').default('ft'),
 })
 
 export const resolutionSavingThrowMethodSchema = z.object({

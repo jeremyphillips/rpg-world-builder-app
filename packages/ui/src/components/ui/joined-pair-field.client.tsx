@@ -167,6 +167,9 @@ export function JoinedPairTextStartOccupant({
   )
 }
 
+const DISTANCE_CLEAR_OPTION = '__distance_clear__'
+const DISTANCE_CUSTOM_OPTION = '__distance_custom__'
+
 export function JoinedPairSelectOccupant({
   id,
   value,
@@ -181,14 +184,57 @@ export function JoinedPairSelectOccupant({
   hasError,
   describedBy,
   ariaLabel,
+  allowCustom = false,
+  clearable = false,
+  customMin = 1,
   onValueChange,
   onBlur,
 }: JoinedPairSelectOccupantProps) {
-  const encodedValue = encodeStoredSelectOptionValue(value, options)
-  const hideCaret = position === 'end' && options.length <= 1
+  const [editingCustom, setEditingCustom] = React.useState(false)
+  const displayOptions = React.useMemo(() => {
+    const next = [...options]
+    if (typeof value === 'number' && !next.some((option) => option.value === value)) {
+      next.push({ value, label: String(value) })
+    }
+    if (clearable) next.unshift({ value: DISTANCE_CLEAR_OPTION, label: '—' })
+    if (allowCustom) next.push({ value: DISTANCE_CUSTOM_OPTION, label: 'Custom' })
+    return next
+  }, [allowCustom, clearable, options, value])
+  const encodedValue = encodeStoredSelectOptionValue(value, displayOptions)
+  const hideCaret = position === 'end' && displayOptions.length <= 1
+
+  if (editingCustom && allowCustom && position === 'start') {
+    return (
+      <JoinedPairNumberOccupant
+        id={id}
+        ariaLabel={ariaLabel}
+        value={typeof value === 'number' ? value : undefined}
+        size={size}
+        disabled={disabled}
+        placeholder={placeholder}
+        min={customMin}
+        digits={digits}
+        hasError={hasError}
+        describedBy={describedBy}
+        onValueChange={onValueChange}
+        onBlur={() => {
+          setEditingCustom(false)
+          onBlur?.()
+        }}
+      />
+    )
+  }
 
   function handleChange(nextEncoded: string) {
-    const resolved = resolveSelectOptionChange(nextEncoded, options)
+    const resolved = resolveSelectOptionChange(nextEncoded, displayOptions)
+    if (resolved === DISTANCE_CLEAR_OPTION) {
+      onValueChange(undefined)
+      return
+    }
+    if (resolved === DISTANCE_CUSTOM_OPTION) {
+      setEditingCustom(true)
+      return
+    }
     onValueChange(resolved)
   }
 
@@ -214,7 +260,7 @@ export function JoinedPairSelectOccupant({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
-          {options.map((option) => (
+          {displayOptions.map((option) => (
             <SelectOptionItem
               key={encodeSelectOptionValue(option.value)}
               option={{

@@ -3,6 +3,24 @@ import { z } from 'zod'
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 
+/** Units for a published spell distance. Miles stay miles — not a feet sentinel. */
+export const SPELL_RANGE_DISTANCE_UNITS = ['ft', 'mi'] as const
+
+export type SpellRangeDistanceUnit = (typeof SPELL_RANGE_DISTANCE_UNITS)[number]
+
+export const spellRangeDistanceUnitSchema = z.enum(SPELL_RANGE_DISTANCE_UNITS)
+
+/**
+ * Spell range distance. Any positive amount is valid. Foot and mile preset
+ * lists are authoring suggestions, not this schema.
+ */
+export const spellRangeDistanceSchema = z.object({
+  value: z.number().positive(),
+  unit: spellRangeDistanceUnitSchema,
+})
+
+export type SpellRangeDistance = z.infer<typeof spellRangeDistanceSchema>
+
 // ---------------------------------------------------------------------------
 // Spell range kinds — closed SRD set for spell metadata.
 // ---------------------------------------------------------------------------
@@ -41,12 +59,9 @@ const spellRangeSelfSchema = z.object({ kind: z.literal('self') })
 const spellRangeTouchSchema = z.object({ kind: z.literal('touch') })
 const spellRangeSightSchema = z.object({ kind: z.literal('sight') })
 const spellRangeUnlimitedSchema = z.object({ kind: z.literal('unlimited') })
-const spellRangeDistanceSchema = z.object({
+const spellRangeDistanceKindSchema = z.object({
   kind: z.literal('distance'),
-  value: z.object({
-    value: z.number().min(0),
-    unit: z.literal('ft'),
-  }),
+  value: spellRangeDistanceSchema,
 })
 const spellRangeSpecialSchema = z.object({
   kind: z.literal('special'),
@@ -58,7 +73,7 @@ export const spellRangeSchema = z.discriminatedUnion('kind', [
   spellRangeTouchSchema,
   spellRangeSightSchema,
   spellRangeUnlimitedSchema,
-  spellRangeDistanceSchema,
+  spellRangeDistanceKindSchema,
   spellRangeSpecialSchema,
 ])
 

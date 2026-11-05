@@ -140,6 +140,9 @@ export type InlineSentenceBoundJoinedPairSelect = Omit<
   position: 'start' | 'end'
   value?: string | number
   options: readonly TypedSelectOption[]
+  allowCustom?: boolean
+  clearable?: boolean
+  customMin?: number
   onChange?: (value: string | number | undefined) => void
 }
 

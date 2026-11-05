@@ -763,6 +763,13 @@ export interface JoinedPairFieldConfig extends Omit<BaseFieldConfig, 'name'> {
   controlId?: string
   start: JoinedPairStartOccupantConfig
   end: JoinedPairEndOccupantConfig
+  /**
+   * Replaces the start select options from the end unit's current value.
+   * Keys are end-select values (`ft`, `mi`).
+   */
+  presetsByUnit?: Readonly<Record<string, readonly { value: number; label: string }[]>>
+  /** Clears the start amount when the end unit changes. Does not convert the number. */
+  clearAmountWhenUnitChanges?: boolean
 }
 
 /**

@@ -11,6 +11,16 @@ import type { FieldErrorPresentation } from '../../context/array-item-presentati
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import { resolveFieldPlaceholder } from '../../config/field-placeholder.lib'
 
+/** Drops the amount when the unit changes so 120 ft does not become 120 miles. */
+export function amountAfterJoinedPairUnitChange(
+  amount: unknown,
+  previousUnit: unknown,
+  nextUnit: unknown,
+): unknown {
+  if (nextUnit === previousUnit) return amount
+  return undefined
+}
+
 function resolveSelectControlValue(value: unknown): string | number | undefined {
   if (value === undefined || value === null || value === '') return undefined
   return value as string | number
@@ -56,6 +66,9 @@ function buildStartControl(
       config.placeholder,
     ),
     ariaLabel: config.ariaLabel,
+    allowCustom: config.allowCustom,
+    clearable: config.clearable,
+    customMin: config.customMin,
   }
 }
 

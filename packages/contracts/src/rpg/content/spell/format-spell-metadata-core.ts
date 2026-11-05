@@ -68,7 +68,12 @@ export function formatSpellCastingTimeLabel(
 export function formatSpellRangeLabel(range: SpellRange, style: SpellMetadataDisplayStyle): string {
   switch (range.kind) {
     case 'distance': {
-      const distance = `${range.value.value} ${range.value.unit}`
+      const distance =
+        range.value.unit === 'mi'
+          ? range.value.value === 1
+            ? '1 mile'
+            : `${range.value.value} miles`
+          : `${range.value.value} ${range.value.unit}`
       return style === 'detail' ? `${distance}.` : distance
     }
     case 'special':

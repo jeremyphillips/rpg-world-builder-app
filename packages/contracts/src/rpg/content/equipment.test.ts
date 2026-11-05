@@ -12,6 +12,7 @@ import {
   formatWeaponDamage,
   formatWeaponProperties,
   formatWeaponRange,
+  weaponRangeSchema,
   formatToolUtilizeAction,
   formatToolUtilizes,
   getArmorAcDisplay,
@@ -405,12 +406,28 @@ describe('getArmorAcDisplay', () => {
   })
 })
 
+describe('weaponRangeSchema', () => {
+  it('accepts a single range and a disadvantage band, including values outside the preset list', () => {
+    expect(weaponRangeSchema.parse({ normal: 120 })).toEqual({ normal: 120 })
+    expect(weaponRangeSchema.parse({ normal: 60, long: 240 })).toEqual({ normal: 60, long: 240 })
+    expect(weaponRangeSchema.parse({ normal: 175, long: 200 })).toEqual({ normal: 175, long: 200 })
+  })
+
+  it('rejects a missing normal range, zero, and a long range that does not exceed normal', () => {
+    expect(weaponRangeSchema.safeParse({ normal: 0 }).success).toBe(false)
+    expect(weaponRangeSchema.safeParse({ normal: 30, long: 30 }).success).toBe(false)
+    expect(weaponRangeSchema.safeParse({ normal: 80, long: 30 }).success).toBe(false)
+    expect(weaponRangeSchema.safeParse({ long: 30 }).success).toBe(false)
+  })
+})
+
 describe('weapon display helpers', () => {
   it('formats properties, range, and damage', () => {
     expect(formatWeaponProperties(['versatile', 'finesse'])).toBe('Versatile, Finesse')
     expect(formatWeaponProperties([])).toBe('—')
     expect(formatWeaponRange({ normal: 80, long: 320 })).toBe('80/320 ft.')
     expect(formatWeaponRange({ normal: 5 })).toBe('5 ft.')
+    expect(formatWeaponRange({ normal: 60, long: 240 })).toBe('60/240 ft.')
     expect(formatWeaponDamage({ dice: { count: 2, faces: 6 } })).toBe('2d6')
     expect(formatWeaponDamage({ flat: 1 })).toBe('1')
   })

@@ -34,6 +34,9 @@ export interface JoinedPairFieldFormStartSelectControl {
   ariaLabel: string
   hasError?: boolean
   describedBy?: string
+  allowCustom?: boolean
+  clearable?: boolean
+  customMin?: number
   onChange: (value: string | number | undefined) => void
   onBlur?: () => void
 }
@@ -175,6 +178,9 @@ export function JoinedPairFieldForm({
                 placeholder={start.placeholder}
                 hasError={startHasError}
                 describedBy={start.describedBy}
+                allowCustom={start.allowCustom}
+                clearable={start.clearable}
+                customMin={start.customMin}
                 onValueChange={start.onChange}
                 onBlur={start.onBlur}
               />

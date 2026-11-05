@@ -26,10 +26,7 @@ import {
 import { buildActiveWeaponPropertyFieldOptions, vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
-import {
-  feetInputUnitField,
-  SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-} from '../../../lib/forms/fields/content-identity-form-fields'
+import { weaponAttackRangeGroup } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
 import { weaponDamageFields } from '../../../lib/forms/mechanics/weapon-damage-fields'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
@@ -153,26 +150,11 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
           },
         ],
       },
-      {
-        kind: 'group',
-        legend: 'Range',
+      weaponAttackRangeGroup({
+        normalName: 'rangeNormal',
+        longName: 'rangeLong',
         visibility: visibleWhenRangeFields(),
-        fields: [
-          {
-            kind: 'row',
-            fields: [
-              feetInputUnitField('rangeNormal', 'Normal', {
-                valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-                width: 'auto',
-              }),
-              feetInputUnitField('rangeLong', 'Long', {
-                valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-                width: 'auto',
-              }),
-            ],
-          },
-        ],
-      },
+      }),
       {
         type: 'textarea',
         name: 'specialRules',

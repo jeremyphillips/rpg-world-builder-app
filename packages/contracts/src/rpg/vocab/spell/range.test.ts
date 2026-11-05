@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { distanceSchema } from '../../primitives/units'
 import {
   SPELL_RANGE_KIND_ENTRIES,
   SPELL_RANGE_KINDS,
   getSpellRangeKindLabel,
+  spellRangeDistanceSchema,
   spellRangeKindSchema,
   spellRangeSchema,
 } from './range'
@@ -22,29 +22,39 @@ describe('spellRangeKindSchema', () => {
 })
 
 describe('spellRangeSchema', () => {
-  it('distance branch stays aligned with distanceSchema', () => {
-    const validDistances = [
-      { value: 0, unit: 'ft' },
-      { value: 120, unit: 'ft' },
-      { value: 0.5, unit: 'ft' },
-    ] as const
+  it('accepts positive feet and miles, including values outside the preset lists', () => {
+    expect(spellRangeDistanceSchema.parse({ value: 175, unit: 'ft' })).toEqual({
+      value: 175,
+      unit: 'ft',
+    })
+    expect(spellRangeSchema.parse({ kind: 'distance', value: { value: 300, unit: 'ft' } })).toEqual(
+      {
+        kind: 'distance',
+        value: { value: 300, unit: 'ft' },
+      },
+    )
+    expect(spellRangeSchema.parse({ kind: 'distance', value: { value: 1, unit: 'mi' } })).toEqual({
+      kind: 'distance',
+      value: { value: 1, unit: 'mi' },
+    })
+    expect(spellRangeSchema.parse({ kind: 'distance', value: { value: 500, unit: 'mi' } })).toEqual(
+      {
+        kind: 'distance',
+        value: { value: 500, unit: 'mi' },
+      },
+    )
+  })
 
-    for (const distance of validDistances) {
-      expect(distanceSchema.safeParse(distance).success).toBe(true)
-      expect(spellRangeSchema.safeParse({ kind: 'distance', value: distance }).success).toBe(true)
-    }
-
-    const invalidDistances = [
-      { value: -1, unit: 'ft' },
-      { value: 10, unit: 'm' },
-      { value: 10, unit: 'lb' },
-    ] as const
-
-    for (const distance of invalidDistances) {
-      const distanceResult = distanceSchema.safeParse(distance).success
-      const rangeResult = spellRangeSchema.safeParse({ kind: 'distance', value: distance }).success
-      expect(rangeResult).toBe(distanceResult)
-    }
+  it('rejects zero, negative, and unknown units', () => {
+    expect(
+      spellRangeSchema.safeParse({ kind: 'distance', value: { value: 0, unit: 'ft' } }).success,
+    ).toBe(false)
+    expect(
+      spellRangeSchema.safeParse({ kind: 'distance', value: { value: -1, unit: 'ft' } }).success,
+    ).toBe(false)
+    expect(
+      spellRangeSchema.safeParse({ kind: 'distance', value: { value: 10, unit: 'm' } }).success,
+    ).toBe(false)
   })
 
   it('accepts non-distance kinds without a value', () => {

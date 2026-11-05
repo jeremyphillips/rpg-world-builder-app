@@ -32,10 +32,18 @@ export type WeaponDamageType = z.infer<typeof weaponDamageTypeSchema>
 // Range — normal reach in feet; long is optional (absent for melee-only)
 // ---------------------------------------------------------------------------
 
-export const weaponRangeSchema = z.object({
-  normal: z.number().int().min(0),
-  long: z.number().int().min(0).optional(),
-})
+export const weaponRangeSchema = z
+  .object({
+    normal: z.number().int().positive(),
+    long: z.number().int().positive().optional(),
+  })
+  .superRefine((range, ctx) => {
+    if (range.long !== undefined && range.long <= range.normal) {
+      addCustomRefinementIssue(ctx, equipmentVariantValidationMessages.longRangeExceedsNormal(), [
+        'long',
+      ])
+    }
+  })
 
 export type WeaponRange = z.infer<typeof weaponRangeSchema>
 

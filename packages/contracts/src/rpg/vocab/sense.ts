@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { standardFeet } from '../primitives/distance-presets'
 import { formatVocabularySlugLabel } from './format-slug-label'
 import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from './types'
 import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from './vocabulary'
@@ -32,7 +33,20 @@ export type SenseId = z.infer<typeof senseIdSchema>
  * steps through 120. The stored range stays a number — these presets are the
  * legal authoring choices.
  */
-export const SENSE_RANGES = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120] as const
+export const SENSE_RANGES = standardFeet(10, 120, 10) as unknown as readonly [
+  10,
+  20,
+  30,
+  40,
+  50,
+  60,
+  70,
+  80,
+  90,
+  100,
+  110,
+  120,
+]
 export type StandardSenseRange = (typeof SENSE_RANGES)[number]
 
 /** A special sense and its range in feet (e.g. Darkvision 60 ft). */

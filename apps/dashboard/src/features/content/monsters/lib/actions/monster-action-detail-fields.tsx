@@ -4,6 +4,7 @@ import {
   getAbilityLabel,
   getContentTypeTerm,
   getWeaponModeLabel,
+  MEASURED_RANGE_FEET,
   REACH_FEET,
   WEAPON_MODES,
 } from '@rpg/contracts'
@@ -11,7 +12,8 @@ import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
-import { distanceInputSelectField } from '../../../lib/forms/fields/content-speed-form-fields'
+import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
+import { weaponAttackRangeGroup } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
 import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
 import {
   rollValueFieldConfigs,
@@ -260,7 +262,7 @@ function monsterActionSaveDcDependent(
   }
 }
 
-function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
+function monsterActionSaveSelectionDependent(): FormItem {
   const selfMode = whenFieldEquals('resolution.selectionMode', 'self')
   const targetsMode = whenFieldEquals('resolution.selectionMode', 'targets')
   return {
@@ -302,26 +304,25 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
           ],
           visibility: targetsMode,
         },
-        {
-          ...distanceInputSelectField({
-            name: 'resolution.target.proximity.distance.value',
-            label: 'Distance (ft)',
-            visibility: {
-              dependsOn: ['resolution.selectionMode', 'resolution.target.proximity.kind'],
-              visibleWhen: (values) =>
-                values['resolution.selectionMode'] === 'targets' &&
-                (values['resolution.target.proximity.kind'] === 'distance' ||
-                  values['resolution.target.proximity.kind'] === 'reach'),
-            },
-          }),
-        },
+        distanceJoinedPairField({
+          amountName: 'resolution.target.proximity.distance.value',
+          label: 'Distance',
+          presets: MEASURED_RANGE_FEET,
+          allowCustom: true,
+          visibility: {
+            dependsOn: ['resolution.selectionMode', 'resolution.target.proximity.kind'],
+            visibleWhen: (values) =>
+              values['resolution.selectionMode'] === 'targets' &&
+              (values['resolution.target.proximity.kind'] === 'distance' ||
+                values['resolution.target.proximity.kind'] === 'reach'),
+          },
+        }),
       ],
     },
   }
 }
 
 function monsterActionSaveSection(
-  ctx: ContentFormCtx,
   namePrefix: string,
   sharedCastingOptions: { value: string; label: string }[],
 ): FormItem {
@@ -344,7 +345,7 @@ function monsterActionSaveSection(
         },
       },
       monsterActionSaveDcDependent(namePrefix, sharedCastingOptions),
-      monsterActionSaveSelectionDependent(ctx),
+      monsterActionSaveSelectionDependent(),
       {
         type: 'textarea',
         name: 'resolution.outcomes.0.note',
@@ -401,20 +402,11 @@ function reachRangeFields(modeField: 'mode' | 'modes'): FormItem[] {
         ariaLabel: 'Reach unit',
       },
     },
-    {
-      type: 'number',
-      name: 'range.normal',
-      label: 'Normal range',
-      min: 5,
+    weaponAttackRangeGroup({
+      normalName: 'range.normal',
+      longName: 'range.long',
       visibility: rangedVisibility(modeField),
-    },
-    {
-      type: 'number',
-      name: 'range.long',
-      label: 'Long range',
-      min: 5,
-      visibility: rangedVisibility(modeField),
-    },
+    }),
   ]
 }
 
@@ -519,7 +511,7 @@ export function monsterActionDetailFields(input: {
   }
 
   if (action.kind === 'save') {
-    fields.push(monsterActionSaveSection(ctx, namePrefix, sharedCastingOptions))
+    fields.push(monsterActionSaveSection(namePrefix, sharedCastingOptions))
   }
 
   if (action.kind === 'multiattack') {

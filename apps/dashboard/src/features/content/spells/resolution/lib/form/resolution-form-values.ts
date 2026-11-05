@@ -130,7 +130,7 @@ export function spellResolutionFromFormValues(
 export function initializeOriginFromSpellRange(
   spell: Pick<Spell, 'range'> | undefined,
 ): number | undefined {
-  if (!spell || spell.range.kind !== 'distance') return undefined
+  if (!spell || spell.range.kind !== 'distance' || spell.range.value.unit !== 'ft') return undefined
   return spell.range.value.value
 }
 
