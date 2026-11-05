@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import type { WeaponEquipment } from '@rpg/contracts'
 import { resolveFieldConfigPrimaryName, type FormItem, type GroupConfig } from '@rpg/ui/form'
 
 import {
@@ -25,7 +24,7 @@ function assertWeaponGroup(item: FormItem): GroupConfig {
 function damageGroupFromWeaponGroup(weaponGroup: GroupConfig) {
   const damageGroup = weaponGroup.fields.find(
     (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'group' }> =>
-      'kind' in field && field.kind === 'group' && field.legend === 'Damage',
+      'kind' in field && field.kind === 'group' && field.heading?.label === 'Damage',
   )
   if (!damageGroup || !('fields' in damageGroup)) {
     throw new Error('expected Damage group')
@@ -51,8 +50,9 @@ describe('weapon kindFieldGroups', () => {
 
     expect(damageGroup).toMatchObject({
       kind: 'group',
-      legend: 'Damage',
+      heading: { label: 'Damage' },
     })
+    expect(damageGroup.heading).not.toHaveProperty('labelVisibility')
     expect(damageGroup).not.toHaveProperty('legendSize')
   })
 
@@ -64,10 +64,7 @@ describe('weapon kindFieldGroups', () => {
       damageGroup.fields.find(
         (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'hasDamage',
       ),
-    ).toMatchObject({
-      type: 'switch',
-      label: 'Deals damage',
-    })
+    ).toBeUndefined()
 
     const damageRow = damageGroup.fields.find(
       (field): field is Extract<(typeof damageGroup.fields)[number], { kind: 'row' }> =>
@@ -151,15 +148,20 @@ describe('weapon kindFieldGroups', () => {
       throw new Error('expected versatile damage row')
     }
 
-    expect(
-      versatileRow.fields.find(
-        (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'versatileDamage',
-      ),
-    ).toMatchObject({
+    const versatileField = versatileRow.fields.find(
+      (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'versatileDamage',
+    )
+    expect(versatileField).toMatchObject({
       type: 'diceFormula',
       modifierMode: 'none',
       width: 'auto',
+      visibility: { dependsOn: ['properties'] },
     })
+    if (!versatileField || !('visibility' in versatileField) || !versatileField.visibility) {
+      throw new Error('expected versatile visibility')
+    }
+    expect(versatileField.visibility.visibleWhen({ properties: ['versatile'] })).toBe(true)
+    expect(versatileField.visibility.visibleWhen({ properties: [] })).toBe(false)
   })
 
   it('omits hardcoded placeholders on required weapon selects', () => {
@@ -219,27 +221,24 @@ describe('weapon kindFieldGroups', () => {
 describe('damageToForm', () => {
   it('maps dice damage to RollValue form shape', () => {
     expect(damageToForm({ dice: { count: 2, faces: 6 } })).toEqual({
-      hasDamage: true,
       damage: { dice: { count: 2, faces: 6 } },
     })
   })
 
   it('maps flat damage to RollValue form shape', () => {
     expect(damageToForm({ flat: 1 })).toEqual({
-      hasDamage: true,
       damage: { flatOperator: '+', flatAmount: 1 },
     })
   })
 
   it('maps combined dice and flat damage', () => {
     expect(damageToForm({ dice: { count: 1, faces: 8 }, flat: 2 })).toEqual({
-      hasDamage: true,
       damage: { dice: { count: 1, faces: 8 }, flatOperator: '+', flatAmount: 2 },
     })
   })
 
-  it('maps absent damage to hasDamage false', () => {
-    expect(damageToForm(undefined)).toEqual({ hasDamage: false })
+  it('leaves absent damage unset', () => {
+    expect(damageToForm(undefined)).toEqual({})
   })
 })
 
@@ -261,7 +260,7 @@ describe('weapon form round-trips', () => {
     it(`${item.slug}: preserves damage as RollValue form shape`, () => {
       if (item.kind !== 'weapon' || !item.damage) return
       const formValues = toEquipmentFormValues(item)
-      expect(formValues.hasDamage).toBe(true)
+      expect(formValues).not.toHaveProperty('hasDamage')
       expect(formValues.damage).toEqual(rollToFormShape(item.damage))
     })
 
@@ -274,11 +273,4 @@ describe('weapon form round-trips', () => {
       })
     })
   }
-
-  it('maps net to hasDamage false', () => {
-    const net = WEAPON_SEEDS.find((item) => item.slug === 'net')
-    expect(net).toBeDefined()
-    const formValues = toEquipmentFormValues(net! as WeaponEquipment)
-    expect(formValues.hasDamage).toBe(false)
-  })
 })

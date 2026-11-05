@@ -52,9 +52,6 @@ function weapon(slug, name, category, mode, damage, damageType, mastery, cost, w
 const LANCE_SPECIAL =
   "You have Disadvantage when you use a Lance to attack a target within 5 feet of you. Also, a Lance requires two hands to wield when you aren't mounted."
 
-const NET_SPECIAL =
-  'A Large or smaller creature hit by a Net is Restrained until it is freed. A Net has no effect on creatures that are Formless or Huge or larger. A creature can use its action to make a DC 10 Strength check, freeing itself or another creature within its reach on a success. Dealing 5 slashing damage to the Net (AC 10) also frees the creature without harming it, ending the effect and destroying the Net.'
-
 const weapons = [
   weapon(
     'battleaxe',
@@ -224,11 +221,6 @@ const weapons = [
   weapon('musket', 'Musket', 'martial', 'ranged', d(1, 12), 'piercing', 'slow', gp(500), lb(10), {
     properties: ['ammunition', 'loading', 'two-handed'],
     range: range(40, 120),
-  }),
-  weapon('net', 'Net', 'martial', 'ranged', undefined, undefined, 'topple', gp(1), lb(3), {
-    properties: ['special', 'thrown'],
-    range: range(5, 15),
-    specialRules: NET_SPECIAL,
   }),
   weapon('pike', 'Pike', 'martial', 'melee', d(1, 10), 'piercing', 'push', gp(5), lb(18), {
     properties: ['heavy', 'reach', 'two-handed'],

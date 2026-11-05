@@ -21,6 +21,8 @@ function weaponForm(overrides: Record<string, unknown> = {}) {
     category: 'martial' as const,
     mode: 'ranged' as const,
     mastery: 'slow' as const,
+    damage: { dice: { count: 1, faces: 8 } },
+    damageType: 'piercing' as const,
     ...overrides,
   }
 }
@@ -70,6 +72,8 @@ describe('weapon range form schema', () => {
       mode: 'ranged',
       mastery: 'slow',
       properties: [],
+      damage: { dice: { count: 1, faces: 8 } },
+      damageType: 'piercing',
       range: { normal: 80, long: 320 },
     } as unknown as WeaponEquipment)
 

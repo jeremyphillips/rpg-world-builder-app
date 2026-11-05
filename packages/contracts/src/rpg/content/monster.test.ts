@@ -292,6 +292,22 @@ describe('monster spell entries', () => {
     expect(monsterActionDraftSchema.parse(published)).toMatchObject(published)
   })
 
+  it('requires published attack damage and allows drafts to omit it', () => {
+    const attack = {
+      id: 'slash',
+      kind: 'attack' as const,
+      name: 'Slash',
+      bonusSource: { kind: 'ability' as const, ability: 'str' as const, proficient: true },
+      modes: ['melee' as const],
+      damage: { dice: { count: 1, faces: 8 } },
+      damageType: 'slashing',
+    }
+    expect(monsterActionSchema.safeParse(attack).success).toBe(true)
+    const { damage: _damage, damageType: _damageType, ...withoutDamage } = attack
+    expect(monsterActionSchema.safeParse(withoutDamage).success).toBe(false)
+    expect(monsterActionDraftSchema.safeParse(withoutDamage).success).toBe(true)
+  })
+
   it('uses the same keys for published and draft variants', () => {
     const keys = (schema: { options: readonly { shape: object }[] }) =>
       schema.options.map((option) => Object.keys(option.shape).sort())

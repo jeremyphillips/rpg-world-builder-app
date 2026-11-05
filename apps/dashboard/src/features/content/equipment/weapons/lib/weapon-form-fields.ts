@@ -27,7 +27,7 @@ import { buildActiveWeaponPropertyFieldOptions, vocabularyFieldLabel } from '@/f
 
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 import { weaponAttackRangeGroup } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
-import { weaponDamageFields } from '../../../lib/forms/mechanics/weapon-damage-fields'
+import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
 const weaponCategoryOptions = toOptions(
@@ -38,9 +38,8 @@ const weaponModeOptions = toOptions(WEAPON_MODES, labelsFromEntries(WEAPON_MODE_
 const weaponMasteryOptions = toOptions(WEAPON_MASTERIES, labelsFromEntries(WEAPON_MASTERY_ENTRIES))
 function visibleWhenVersatile(): FieldVisibility {
   return {
-    dependsOn: ['properties', 'hasDamage'],
-    visibleWhen: (v) =>
-      v.hasDamage === true && Array.isArray(v.properties) && v.properties.includes('versatile'),
+    dependsOn: ['properties'],
+    visibleWhen: (v) => Array.isArray(v.properties) && v.properties.includes('versatile'),
   }
 }
 
@@ -128,11 +127,14 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
         optionAvailability: weaponPropertyOptionAvailability,
         hint: { resolve: weaponPropertyDynamicHint },
       },
-      {
-        kind: 'group',
-        legend: 'Damage',
-        fields: [
-          ...weaponDamageFields({ ctx }),
+      damageFieldGroup({
+        ctx,
+        damageTypeName: 'damageType',
+        rollName: 'damage',
+        rollLabel: 'Damage roll',
+        scope: 'physical',
+        typeLabel: 'Type',
+        trailingFields: [
           {
             kind: 'row',
             fields: [
@@ -149,7 +151,7 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
             ],
           },
         ],
-      },
+      }),
       weaponAttackRangeGroup({
         normalName: 'range.normal',
         longName: 'range.long',
@@ -159,7 +161,7 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
         type: 'textarea',
         name: 'specialRules',
         label: 'Special rules',
-        hint: 'Prose for special properties (lance, net, etc.)',
+        hint: 'Prose for special properties (lance, etc.)',
       },
     ],
   }

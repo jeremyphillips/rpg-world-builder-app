@@ -21,9 +21,9 @@ type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
 
 export function damageToForm(
   damage: WeaponDamage | undefined,
-): Pick<WeaponEquipmentFormValues, 'hasDamage' | 'damage'> {
-  if (!damage) return { hasDamage: false }
-  return { hasDamage: true, damage: rollToFormShape(damage) }
+): Pick<WeaponEquipmentFormValues, 'damage'> {
+  if (!damage) return {}
+  return { damage: rollToFormShape(damage) }
 }
 
 export function weaponFormValuesFromEntity(
@@ -32,7 +32,6 @@ export function weaponFormValuesFromEntity(
   WeaponEquipmentFormValues,
   | 'category'
   | 'mode'
-  | 'hasDamage'
   | 'damage'
   | 'damageType'
   | 'versatileDamage'
@@ -57,7 +56,6 @@ export function weaponFormValuesFromEntity(
 }
 
 function damageFromForm(values: EquipmentInputBuildCtx<'weapon'>['values']): WeaponInput['damage'] {
-  if (!values.hasDamage) return undefined
   return normalizeRollFormValue(values.damage as RollFormShape | undefined)
 }
 

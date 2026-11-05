@@ -14,6 +14,7 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
 import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
 import { weaponAttackRangeGroup } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
+import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
 import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
 import {
   rollValueFieldConfigs,
@@ -493,11 +494,11 @@ export function monsterActionDetailFields(input: {
         options: modeOptions(),
       },
       ...reachRangeFields('modes'),
-      damageTypeField({ name: 'damageType', ctx, required: true }),
-      ...rollValueFields({
-        namePrefix: 'damage',
-        label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
-        required: true,
+      damageFieldGroup({
+        ctx,
+        damageTypeName: 'damageType',
+        rollName: 'damage',
+        rollLabel: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
       }),
       monsterActionOnHitFields(ctx),
     )

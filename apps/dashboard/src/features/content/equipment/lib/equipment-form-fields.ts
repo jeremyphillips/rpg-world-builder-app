@@ -8,6 +8,7 @@ import {
   armorMaterialSchema,
   currencySchema,
   diceSchema,
+  fieldValidationMessages,
   gearKindSchema,
   holySymbolUsageSchema,
   magicItemCategorySchema,
@@ -44,7 +45,11 @@ import {
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
-import { rollFormObjectSchema } from '../../lib/forms/mechanics/roll-form-values'
+import {
+  normalizeRollFormValue,
+  rollFormObjectSchema,
+  type RollFormShape,
+} from '../../lib/forms/mechanics/roll-form-values'
 import {
   allRegisteredKindFieldGroups,
   fieldGroupsForEquipmentKind,
@@ -129,6 +134,30 @@ function refineWeaponRangeFormValues(values: WeaponRangeFormFields, ctx: z.Refin
   forwardWeaponRangeIssues(parsed.error.issues, ctx)
 }
 
+type WeaponDamageFormFields = {
+  kind?: string
+  damage?: RollFormShape
+  damageType?: string
+}
+
+/**
+ * Publish authoring requires a complete roll and damage type. Draft schemas do
+ * not use this refine, and the stored contract still allows both to be omitted.
+ */
+function refinePublishedWeaponDamage(values: WeaponDamageFormFields, ctx: z.RefinementCtx): void {
+  if (values.kind !== 'weapon') return
+  if (!normalizeRollFormValue(values.damage)) {
+    addCustomRefinementIssue(ctx, fieldValidationMessages.requiredText({ label: 'Damage roll' }), [
+      'damage',
+    ])
+  }
+  if (!values.damageType) {
+    addCustomRefinementIssue(ctx, fieldValidationMessages.requiredSelect({ label: 'Type' }), [
+      'damageType',
+    ])
+  }
+}
+
 function refineEquipmentEconomyForm(
   data: { hasMarketPrice: boolean; cost: z.infer<typeof equipmentCostFormValueSchema> },
   ctx: z.RefinementCtx,
@@ -181,7 +210,6 @@ export const weaponEquipmentFormSchema = physicalEquipmentBaseFormSchema
     mode: weaponModeSchema,
     mastery: weaponMasterySchema,
     properties: z.array(weaponPropertySchema).optional(),
-    hasDamage: z.boolean().optional(),
     damage: rollFormObjectSchema.optional(),
     damageType: weaponDamageTypeSchema.optional(),
     versatileDamage: diceSchema.optional(),
@@ -189,6 +217,7 @@ export const weaponEquipmentFormSchema = physicalEquipmentBaseFormSchema
     specialRules: z.string().optional(),
   })
   .superRefine(refineWeaponRangeFormValues)
+  .superRefine(refinePublishedWeaponDamage)
 
 /** Armor create/edit form schema — fields match `armorFormFieldGroup`. */
 export const armorEquipmentFormSchema = physicalEquipmentBaseFormSchema.extend({
@@ -293,7 +322,6 @@ export const weaponEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormSche
     mode: draftOptionalSelect(weaponModeSchema),
     mastery: draftOptionalSelect(weaponMasterySchema),
     properties: z.array(weaponPropertySchema).optional(),
-    hasDamage: z.boolean().optional(),
     damage: rollFormObjectSchema.optional(),
     damageType: draftOptionalSelect(weaponDamageTypeSchema),
     versatileDamage: diceSchema.optional(),
@@ -537,7 +565,6 @@ export const equipmentFormSchema = z
     // weapon variant fields
     category: weaponCategorySchema.optional(),
     mode: weaponModeSchema.optional(),
-    hasDamage: z.boolean().optional(),
     damage: rollFormObjectSchema.optional(),
     damageType: weaponDamageTypeSchema.optional(),
     versatileDamage: diceSchema.optional(),
@@ -556,6 +583,7 @@ export const equipmentFormSchema = z
   })
   .superRefine(refineEquipmentEconomyForm)
   .superRefine(refineWeaponRangeFormValues)
+  .superRefine(refinePublishedWeaponDamage)
 
 /**
  * Unscoped hub draft schema — relaxed identity/economy for Save Draft on the equipment hub.
@@ -610,7 +638,6 @@ export const equipmentFormDraftSchema = z
     magicItemCategory: draftOptionalSelect(magicItemCategorySchema),
     category: draftOptionalSelect(weaponCategorySchema),
     mode: draftOptionalSelect(weaponModeSchema),
-    hasDamage: z.boolean().optional(),
     damage: rollFormObjectSchema.optional(),
     damageType: draftOptionalSelect(weaponDamageTypeSchema),
     versatileDamage: diceSchema.optional(),

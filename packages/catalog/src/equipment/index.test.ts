@@ -4,6 +4,7 @@ import { EQUIPMENT_KINDS, getArmorAcDisplay, systemDefaultArmorClassRules } from
 import {
   EQUIPMENT_KIND_FILES,
   getArmorBySlug,
+  getEquipmentBySlug,
   getWeaponBySlug,
   loadSeedArmor,
   loadSeedEquipment,
@@ -91,10 +92,10 @@ describe('SRD 5.2.1 equipment seed', () => {
 })
 
 describe('adventuring gear records in unified seed', () => {
-  it('loads 87 adventuring gear records', () => {
+  it('loads 88 adventuring gear records', () => {
     expect(
       loadSeedEquipment(RULESET).filter((item) => item.kind === 'adventuring_gear'),
-    ).toHaveLength(87)
+    ).toHaveLength(88)
   })
 })
 
@@ -103,8 +104,8 @@ function getEquipmentBySlugHelper(slug: string) {
 }
 
 describe('weapon records in unified seed', () => {
-  it('loads 39 weapons', () => {
-    expect(weapons()).toHaveLength(39)
+  it('loads 38 weapons', () => {
+    expect(weapons()).toHaveLength(38)
   })
 
   it('simple and martial categories are represented', () => {
@@ -117,11 +118,18 @@ describe('weapon records in unified seed', () => {
     expect(weapons().some((w) => w.mode === 'ranged')).toBe(true)
   })
 
-  it('net has no damage or damageType', () => {
-    const net = getWeaponBySlug(RULESET, 'net')
-    expect(net.damage).toBeUndefined()
-    expect(net.damageType).toBeUndefined()
-    expect(net.specialRules).toBeTruthy()
+  it('classifies net as adventuring gear with the SRD 5.2.1 rules', () => {
+    const net = getEquipmentBySlug(RULESET, 'net')
+    expect(net.id).toBe(`${RULESET}:net`)
+    expect(net.kind).toBe('adventuring_gear')
+    if (net.kind !== 'adventuring_gear') return
+    expect(net.gearKind).toBe('general')
+    expect(net.cost).toEqual({ amount: 1, currency: 'gp' })
+    expect(net.weight).toEqual({ value: 3, unit: 'lb' })
+    expect(net.description).toContain('Dexterity saving throw')
+    expect(net.description).toContain('DC 10 Strength (Athletics)')
+    expect(net.description).toContain('AC 10; 5 HP')
+    expect(weapons().some((item) => item.slug === 'net')).toBe(false)
   })
 
   it('blowgun has flat damage of 1', () => {

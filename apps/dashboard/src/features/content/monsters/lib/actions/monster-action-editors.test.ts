@@ -186,6 +186,50 @@ describe('monster action detail fields', () => {
     expect(attack).toEqual(
       expect.arrayContaining(['modes', 'reach', 'limitedUse.kind', 'damageType', 'damage']),
     )
+    const attackItems = monsterActionDetailFields({
+      ctx: detailCtx,
+      action: { id: 'slash', kind: 'attack', name: 'Slash' },
+      section: 'actions',
+      namePrefix: 'actions.0',
+      equipmentOptions: [],
+      sharedCastingOptions: [],
+    })
+    const attackDamage = attackItems.find(
+      (item) => 'kind' in item && item.kind === 'group' && item.heading?.label === 'Damage',
+    )
+    expect(attackDamage).toMatchObject({ heading: { label: 'Damage' } })
+    const damageRow =
+      attackDamage && 'fields' in attackDamage
+        ? attackDamage.fields.find((field) => 'kind' in field && field.kind === 'row')
+        : undefined
+    const damageType =
+      damageRow && 'fields' in damageRow
+        ? damageRow.fields.find((field) => !('kind' in field) && field.name === 'damageType')
+        : undefined
+    const damageRoll =
+      damageRow && 'fields' in damageRow
+        ? damageRow.fields.find((field) => !('kind' in field) && field.type === 'rollValue')
+        : undefined
+    expect(damageRoll).toMatchObject({ name: 'damage', label: 'Damage', required: true })
+    expect(damageType).toMatchObject({ name: 'damageType', required: true })
+    expect(
+      damageType && 'options' in damageType
+        ? damageType.options?.map((option) => option.value)
+        : [],
+    ).not.toEqual(['bludgeoning', 'piercing', 'slashing'])
+    const naturalItems = monsterActionDetailFields({
+      ctx: detailCtx,
+      action: { id: 'bite', kind: 'natural-weapon', name: 'Bite', mode: 'melee' },
+      section: 'actions',
+      namePrefix: 'actions.0',
+      equipmentOptions: [],
+      sharedCastingOptions: [],
+    })
+    expect(
+      naturalItems.some(
+        (item) => 'kind' in item && item.kind === 'group' && item.heading?.label === 'Damage',
+      ),
+    ).toBe(false)
     expect(attack).not.toContain('moveSection')
 
     const weapon = detailFields({ id: 'sword', kind: 'weapon', equipmentEntryId: 'sword' })

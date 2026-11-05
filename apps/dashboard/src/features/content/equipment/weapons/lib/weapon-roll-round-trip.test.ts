@@ -24,10 +24,6 @@ const WEAPON_FIXTURES = {
     damage: { flat: 1 },
     display: '1',
   },
-  net: {
-    slug: 'net',
-    damage: undefined,
-  },
 } as const
 
 function pickWeapon(slug: string): WeaponEquipment {
@@ -47,14 +43,8 @@ describe('weapon RollValue form round trips', () => {
 
       expect(() => createEquipmentInputSchema.parse(input)).not.toThrow()
 
-      if (fixture.damage === undefined) {
-        expect(formValues.hasDamage).toBe(false)
-        expect(input).not.toHaveProperty('damage')
-      } else {
-        expect(formValues.hasDamage).toBe(true)
-        expect(formValues.damage).toEqual(rollToFormShape(fixture.damage))
-        expect(input).toMatchObject({ damage: fixture.damage })
-      }
+      expect(formValues.damage).toEqual(rollToFormShape(fixture.damage))
+      expect(input).toMatchObject({ damage: fixture.damage })
     })
   }
 
@@ -76,10 +66,5 @@ describe('weapon RollValue display strings', () => {
   it('blowgun: formats flat-only damage', () => {
     const weapon = pickWeapon('blowgun')
     expect(formatWeaponDamage(weapon.damage!)).toBe(WEAPON_FIXTURES.blowgun.display)
-  })
-
-  it('net: has no damage to format', () => {
-    const weapon = pickWeapon('net')
-    expect(weapon.damage).toBeUndefined()
   })
 })

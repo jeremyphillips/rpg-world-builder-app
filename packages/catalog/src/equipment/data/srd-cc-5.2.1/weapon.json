@@ -794,35 +794,6 @@
     }
   },
   {
-    "id": "srd-cc-5.2.1:net",
-    "slug": "net",
-    "rulesetId": "srd-cc-5.2.1",
-    "catalogLayer": "system",
-    "campaignId": null,
-    "createdAt": "2024-05-21T00:00:00.000Z",
-    "updatedAt": "2024-05-21T00:00:00.000Z",
-    "name": "Net",
-    "description": "",
-    "cost": {
-      "amount": 1,
-      "currency": "gp"
-    },
-    "weight": {
-      "value": 3,
-      "unit": "lb"
-    },
-    "kind": "weapon",
-    "category": "martial",
-    "mode": "ranged",
-    "properties": ["special", "thrown"],
-    "mastery": "topple",
-    "range": {
-      "normal": 5,
-      "long": 15
-    },
-    "specialRules": "A Large or smaller creature hit by a Net is Restrained until it is freed. A Net has no effect on creatures that are Formless or Huge or larger. A creature can use its action to make a DC 10 Strength check, freeing itself or another creature within its reach on a success. Dealing 5 slashing damage to the Net (AC 10) also frees the creature without harming it, ending the effect and destroying the Net."
-  },
-  {
     "id": "srd-cc-5.2.1:pike",
     "slug": "pike",
     "rulesetId": "srd-cc-5.2.1",

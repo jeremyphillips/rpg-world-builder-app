@@ -37,13 +37,12 @@ describe('effectArrayFields', () => {
       ),
     ).toBeUndefined()
 
-    const damageRow = itemFields.find(
-      (field): field is Extract<(typeof itemFields)[number], { kind: 'row' }> =>
-        'kind' in field &&
-        field.kind === 'row' &&
-        Boolean(field.visibility?.dependsOn?.includes('kind')),
+    const damageGroup = itemFields.find(
+      (field) => 'kind' in field && field.kind === 'group' && field.heading?.label === 'Damage',
     )
-    expect(damageRow).toBeDefined()
+    expect(damageGroup).toMatchObject({
+      visibility: { dependsOn: ['kind'] },
+    })
   })
 
   it('shows effect label only for roll-bearing kinds and projectile label for projectile count', () => {
@@ -69,14 +68,18 @@ describe('effectArrayFields', () => {
   it('renders damage type and damage roll in one row without a duplicate roll field', () => {
     const itemFields = findEffectsArray(effectArrayFields({}))?.fields ?? []
 
-    const damageRow = itemFields.find(
-      (field): field is Extract<(typeof itemFields)[number], { kind: 'row' }> =>
-        'kind' in field &&
-        field.kind === 'row' &&
-        field.visibility?.visibleWhen != null &&
-        field.fields.some(
-          (child) => !('kind' in child) && resolveFieldConfigPrimaryName(child) === 'damageType',
-        ),
+    const damageGroup = itemFields.find(
+      (field): field is Extract<(typeof itemFields)[number], { kind: 'group' }> =>
+        'kind' in field && field.kind === 'group' && field.heading?.label === 'Damage',
+    )
+    expect(damageGroup).toMatchObject({
+      heading: { label: 'Damage', labelVisibility: 'srOnly' },
+    })
+    const damageRow = damageGroup?.fields.find(
+      (
+        field,
+      ): field is Extract<NonNullable<typeof damageGroup>['fields'][number], { kind: 'row' }> =>
+        'kind' in field && field.kind === 'row',
     )
     expect(damageRow).toBeDefined()
 
