@@ -8,11 +8,9 @@ import {
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
-import { rollValueFields } from '../../../lib/forms/mechanics/roll-value-fields'
+import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 import {
-  MONSTER_ACTION_DAMAGE_FIELD_LABEL,
   MONSTER_LIMIT_RECHARGES_ON_LABEL,
   monsterLimitRechargesOnHint,
   MONSTER_ON_HIT_HINT,
@@ -140,11 +138,11 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
     addAction: { label: 'Add damage' },
     item: { header: { fallback: (index) => `Damage ${index + 1}` } },
     fields: [
-      damageTypeField({ name: 'damageType', ctx, required: true }),
-      ...rollValueFields({
-        namePrefix: 'roll',
-        label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
-        required: true,
+      damageFieldGroup({
+        ctx,
+        damageTypeName: 'damageType',
+        rollName: 'roll',
+        legendVisibility: 'srOnly',
       }),
     ],
   }

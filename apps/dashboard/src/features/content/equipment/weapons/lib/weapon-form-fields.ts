@@ -131,9 +131,7 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
         ctx,
         damageTypeName: 'damageType',
         rollName: 'damage',
-        rollLabel: 'Damage roll',
         scope: 'physical',
-        typeLabel: 'Type',
         trailingFields: [
           {
             kind: 'row',

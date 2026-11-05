@@ -15,7 +15,6 @@ function spellDamageGroup() {
     ctx: {},
     damageTypeName: 'damageType',
     rollName: 'roll',
-    rollLabel: 'Damage roll',
     scope: 'physical',
     legendVisibility: 'srOnly',
   })
@@ -52,9 +51,7 @@ describe('damageFieldGroup', () => {
         ctx: {},
         damageTypeName: 'damageType',
         rollName: 'damage',
-        rollLabel: 'Damage roll',
         scope: 'physical',
-        typeLabel: 'Type',
       }),
     ]
     const defaults = buildDefaultValues(fields)

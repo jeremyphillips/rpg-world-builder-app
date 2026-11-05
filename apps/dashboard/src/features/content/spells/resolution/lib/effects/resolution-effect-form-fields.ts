@@ -9,6 +9,5 @@ export function resolutionEffectItemFields(ctx: ContentFormCtx): FormItem[] {
   return effectItemFieldsForKinds(ctx, RESOLUTION_EFFECT_KINDS, {
     includeLabel: false,
     includeDescription: false,
-    damageRollLabel: 'Damage roll',
   })
 }

@@ -11,7 +11,6 @@ const effectLabelKinds = ['damage', ...rollOnlyKinds] as const
 export type EffectItemFieldsOptions = {
   includeLabel?: boolean
   includeDescription?: boolean
-  damageRollLabel?: string
 }
 
 function visibleWhenEffectKind(kinds: readonly SpellAtomicEffectKind[]): FieldVisibility {
@@ -32,11 +31,7 @@ export function effectItemFieldsForKinds(
   kinds: readonly SpellAtomicEffectKind[] = SPELL_ATOMIC_EFFECT_KINDS,
   options: EffectItemFieldsOptions = {},
 ): FormItem[] {
-  const {
-    includeLabel = true,
-    includeDescription = true,
-    damageRollLabel = 'Damage roll',
-  } = options
+  const { includeLabel = true, includeDescription = true } = options
   const allowedKinds = new Set<SpellAtomicEffectKind>(kinds)
 
   const fields: FormItem[] = []
@@ -47,7 +42,6 @@ export function effectItemFieldsForKinds(
         ctx,
         damageTypeName: 'damageType',
         rollName: 'roll',
-        rollLabel: damageRollLabel,
         legendVisibility: 'srOnly',
         visibility: visibleWhenEffectKind(['damage']),
       }),

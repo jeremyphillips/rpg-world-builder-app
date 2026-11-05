@@ -96,6 +96,11 @@ describe('effectArrayFields', () => {
       (field) => !('kind' in field) && field.type === 'rollValue',
     )
     expect(damageRollField).toMatchObject({ name: 'roll', label: 'Damage roll' })
+    expect(
+      damageRow?.fields.find(
+        (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'damageType',
+      ),
+    ).toMatchObject({ label: 'Type' })
   })
 })
 

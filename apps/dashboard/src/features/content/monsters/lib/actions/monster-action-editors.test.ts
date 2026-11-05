@@ -210,8 +210,8 @@ describe('monster action detail fields', () => {
       damageRow && 'fields' in damageRow
         ? damageRow.fields.find((field) => !('kind' in field) && field.type === 'rollValue')
         : undefined
-    expect(damageRoll).toMatchObject({ name: 'damage', label: 'Damage', required: true })
-    expect(damageType).toMatchObject({ name: 'damageType', required: true })
+    expect(damageRoll).toMatchObject({ name: 'damage', label: 'Damage roll', required: true })
+    expect(damageType).toMatchObject({ name: 'damageType', label: 'Type', required: true })
     expect(
       damageType && 'options' in damageType
         ? damageType.options?.map((option) => option.value)
@@ -225,11 +225,35 @@ describe('monster action detail fields', () => {
       equipmentOptions: [],
       sharedCastingOptions: [],
     })
+    const naturalDamage = naturalItems.find(
+      (item) => 'kind' in item && item.kind === 'group' && item.heading?.label === 'Damage',
+    )
+    expect(naturalDamage).toMatchObject({ heading: { label: 'Damage' } })
+    const naturalRow =
+      naturalDamage && 'fields' in naturalDamage
+        ? naturalDamage.fields.find((field) => 'kind' in field && field.kind === 'row')
+        : undefined
+    const naturalType =
+      naturalRow && 'fields' in naturalRow
+        ? naturalRow.fields.find((field) => !('kind' in field) && field.name === 'damageType')
+        : undefined
+    const naturalRoll =
+      naturalRow && 'fields' in naturalRow
+        ? naturalRow.fields.find((field) => !('kind' in field) && field.type === 'rollValue')
+        : undefined
+    expect(naturalType).toMatchObject({
+      label: 'Type',
+      presentation: { change: { label: 'Change' } },
+    })
+    expect(naturalRoll).toMatchObject({
+      label: 'Damage roll',
+      hint: { text: 'Ability modifiers are applied automatically.' },
+    })
     expect(
-      naturalItems.some(
-        (item) => 'kind' in item && item.kind === 'group' && item.heading?.label === 'Damage',
-      ),
-    ).toBe(false)
+      naturalType && 'options' in naturalType
+        ? naturalType.options?.some((option) => option.value === 'fire')
+        : false,
+    ).toBe(true)
     expect(attack).not.toContain('moveSection')
 
     const weapon = detailFields({ id: 'sword', kind: 'weapon', equipmentEntryId: 'sword' })
@@ -263,9 +287,9 @@ describe('monster action detail fields', () => {
     const rollIndex = names.indexOf('resolution.effects.0.roll')
     const damageTypeIndex = names.indexOf('resolution.effects.0.damageType')
     expect(descriptionIndex).toBeGreaterThanOrEqual(0)
-    expect(rollIndex).toBe(descriptionIndex + 1)
-    expect(damageTypeIndex).toBe(rollIndex + 1)
-    expect(names.indexOf('limitedUse.kind')).toBeGreaterThan(damageTypeIndex)
+    expect(damageTypeIndex).toBe(descriptionIndex + 1)
+    expect(rollIndex).toBe(damageTypeIndex + 1)
+    expect(names.indexOf('limitedUse.kind')).toBeGreaterThan(rollIndex)
   })
 })
 

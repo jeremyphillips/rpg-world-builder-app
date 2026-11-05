@@ -15,11 +15,7 @@ import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-
 import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
 import { weaponAttackRangeGroup } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
 import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
-import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
-import {
-  rollValueFieldConfigs,
-  rollValueFields,
-} from '../../../lib/forms/mechanics/roll-value-fields'
+import { rollValueFields } from '../../../lib/forms/mechanics/roll-value-fields'
 import {
   MONSTER_ACTION_NAME_LABEL,
   MONSTER_CUSTOM_NAME_ADD_LABEL,
@@ -31,7 +27,6 @@ import {
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_DAMAGE_TYPE_CHANGE_LABEL,
-  MONSTER_ACTION_DAMAGE_FIELD_LABEL,
   MONSTER_ACTION_REACH_FIELD_LABEL,
   MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
   MONSTER_SAVE_ABILITY_LABEL,
@@ -108,18 +103,12 @@ function monsterActionDescriptionField(action: MonsterActionDraftRow): FormItem 
   return monsterActionOptionalDescriptionField
 }
 
-function monsterSaveResolutionDamageRow(ctx: ContentFormCtx): FormItem {
-  return {
-    kind: 'row',
-    fields: [
-      ...rollValueFieldConfigs({
-        namePrefix: 'resolution.effects.0.roll',
-        label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
-        required: true,
-      }),
-      damageTypeField({ name: 'resolution.effects.0.damageType', ctx, required: true }),
-    ],
-  }
+function monsterSaveResolutionDamageGroup(ctx: ContentFormCtx): FormItem {
+  return damageFieldGroup({
+    ctx,
+    damageTypeName: 'resolution.effects.0.damageType',
+    rollName: 'resolution.effects.0.roll',
+  })
 }
 
 function whenFieldEquals(field: string, value: string): FieldVisibility {
@@ -426,7 +415,7 @@ export function monsterActionDetailFields(input: {
   const fields: FormItem[] = [monsterActionNameField(action), monsterActionDescriptionField(action)]
 
   if (action.kind === 'save') {
-    fields.push(monsterSaveResolutionDamageRow(ctx))
+    fields.push(monsterSaveResolutionDamageGroup(ctx))
   }
 
   if (section === 'reactions') {
@@ -457,29 +446,17 @@ export function monsterActionDetailFields(input: {
 
   if (action.kind === 'natural-weapon') {
     fields.push(
-      {
-        kind: 'row',
-        fields: [
-          ...rollValueFieldConfigs({
-            namePrefix: 'damage',
-            label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
-            required: true,
-            hint: {
-              text: MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
-              position: 'below-control',
-            },
-          }),
-          {
-            ...damageTypeField({
-              name: 'damageType',
-              ctx,
-              scope: 'physical-and-vocabulary',
-              required: true,
-            }),
-            presentation: { change: { label: MONSTER_DAMAGE_TYPE_CHANGE_LABEL } },
-          },
-        ],
-      },
+      damageFieldGroup({
+        ctx,
+        damageTypeName: 'damageType',
+        rollName: 'damage',
+        scope: 'physical-and-vocabulary',
+        typeChangeLabel: MONSTER_DAMAGE_TYPE_CHANGE_LABEL,
+        rollHint: {
+          text: MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
+          position: 'below-control',
+        },
+      }),
       monsterActionOnHitFields(ctx),
     )
   }
@@ -498,7 +475,6 @@ export function monsterActionDetailFields(input: {
         ctx,
         damageTypeName: 'damageType',
         rollName: 'damage',
-        rollLabel: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
       }),
       monsterActionOnHitFields(ctx),
     )

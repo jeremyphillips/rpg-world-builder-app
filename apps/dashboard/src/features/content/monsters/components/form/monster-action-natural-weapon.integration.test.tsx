@@ -154,7 +154,7 @@ describe('natural weapon action round trip', () => {
     const name = screen.getByRole('textbox', { name: 'Name' })
     await user.clear(name)
     await user.type(name, 'Fangs')
-    const counts = screen.getAllByRole('spinbutton', { name: 'Damage Number of dice' })
+    const counts = screen.getAllByRole('spinbutton', { name: 'Damage roll Number of dice' })
     await user.clear(counts[0]!)
     await user.type(counts[0]!, '3')
 
@@ -225,10 +225,10 @@ describe('natural weapon action round trip', () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Change Damage type' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Change Type' })).toBeInTheDocument()
     })
-    expect(screen.queryByRole('combobox', { name: 'Damage type' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Add custom description' })).toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: 'Type' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add additional details' })).toBeInTheDocument()
     expect(screen.getByText('Ability modifiers are applied automatically.')).toBeInTheDocument()
     expect(
       screen.getByText('Additional damage dealt when this attack hits, beyond its primary damage.'),
@@ -238,7 +238,7 @@ describe('natural weapon action round trip', () => {
     expect(screen.queryByLabelText('Move to')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Gore/i }))
-    expect(screen.queryByRole('button', { name: 'Change Damage type' })).not.toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Damage type' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Change Type' })).not.toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Type' })).toBeInTheDocument()
   })
 })

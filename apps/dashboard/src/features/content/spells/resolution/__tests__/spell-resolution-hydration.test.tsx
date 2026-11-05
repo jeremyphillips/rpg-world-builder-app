@@ -244,7 +244,7 @@ describe('spell resolution tab hydration', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByRole('combobox', { name: 'Damage type' })).toHaveTextContent('Acid')
+      expect(screen.getByRole('combobox', { name: 'Type' })).toHaveTextContent('Acid')
       expect(screen.getByRole('spinbutton', { name: 'Damage roll Number of dice' })).toHaveValue(1)
       expect(screen.getByRole('combobox', { name: 'Die size' })).toHaveTextContent('d6')
     })
@@ -255,7 +255,7 @@ describe('spell resolution tab hydration', () => {
     renderSpellTabbedForm(spellToFormValues(editorEligibleSpell))
 
     await waitFor(() => {
-      expect(screen.getByRole('combobox', { name: 'Damage type' })).toHaveTextContent('Necrotic')
+      expect(screen.getByRole('combobox', { name: 'Type' })).toHaveTextContent('Necrotic')
       expect(screen.getByRole('spinbutton', { name: 'Damage roll Number of dice' })).toHaveValue(1)
       expect(screen.getByRole('combobox', { name: 'Die size' })).toHaveTextContent('d10')
     })
@@ -283,7 +283,7 @@ describe('spell resolution tab hydration', () => {
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: /add resolution/i })).not.toBeInTheDocument()
       expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
-      expect(screen.getByRole('combobox', { name: 'Damage type' })).toHaveTextContent('Force')
+      expect(screen.getByRole('combobox', { name: 'Type' })).toHaveTextContent('Force')
       expect(screen.getByRole('spinbutton', { name: 'Damage roll Number of dice' })).toHaveValue(1)
       expect(screen.getByRole('combobox', { name: 'Die size' })).toHaveTextContent('d10')
     })
@@ -347,7 +347,7 @@ describe('spell resolution tab hydration', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /add resolution/i })).toBeInTheDocument()
-      expect(screen.queryByRole('combobox', { name: 'Damage type' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('combobox', { name: 'Type' })).not.toBeInTheDocument()
     })
     expect(formValues.resolution).toBeUndefined()
   })
