@@ -38,8 +38,7 @@ export function weaponFormValuesFromEntity(
   | 'versatileDamage'
   | 'properties'
   | 'mastery'
-  | 'rangeNormal'
-  | 'rangeLong'
+  | 'range'
   | 'specialRules'
 > {
   return {
@@ -52,8 +51,7 @@ export function weaponFormValuesFromEntity(
       : undefined,
     properties: item.properties,
     mastery: item.mastery,
-    rangeNormal: item.range?.normal,
-    rangeLong: item.range?.long,
+    range: item.range,
     specialRules: item.specialRules,
   }
 }
@@ -92,11 +90,12 @@ function optionalVersatileDamage(
 function optionalWeaponRange(
   values: EquipmentInputBuildCtx<'weapon'>['values'],
 ): Partial<WeaponInput> {
-  if (values.rangeNormal === undefined) return {}
+  const range = values.range
+  if (range?.normal === undefined) return {}
   return {
     range: {
-      normal: values.rangeNormal,
-      ...(values.rangeLong !== undefined && { long: values.rangeLong }),
+      normal: range.normal,
+      ...(range.long !== undefined && { long: range.long }),
     },
   }
 }

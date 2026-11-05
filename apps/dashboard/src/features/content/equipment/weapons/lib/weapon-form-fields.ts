@@ -151,8 +151,8 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
         ],
       },
       weaponAttackRangeGroup({
-        normalName: 'rangeNormal',
-        longName: 'rangeLong',
+        normalName: 'range.normal',
+        longName: 'range.long',
         visibility: visibleWhenRangeFields(),
       }),
       {
