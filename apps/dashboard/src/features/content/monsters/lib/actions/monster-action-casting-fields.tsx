@@ -32,40 +32,6 @@ function monsterCastingAbilityOptions(
   ]
 }
 
-export function MonsterActionAttackCastingField({
-  namePrefix,
-  sharedOptions,
-}: {
-  namePrefix: string
-  sharedOptions: readonly { value: string; label: string }[]
-}) {
-  const kind = useWatch({ name: `${namePrefix}.bonusSource.kind` })
-  if (kind !== 'spell') return null
-  return (
-    <MonsterActionCastingAbilityField
-      name={`${namePrefix}.bonusSource.castingAbility`}
-      sharedOptions={sharedOptions}
-    />
-  )
-}
-
-export function MonsterActionSaveDcCastingField({
-  namePrefix,
-  sharedOptions,
-}: {
-  namePrefix: string
-  sharedOptions: readonly { value: string; label: string }[]
-}) {
-  const kind = useWatch({ name: `${namePrefix}.dcSource.kind` })
-  if (kind !== 'spell') return null
-  return (
-    <MonsterActionCastingAbilityField
-      name={`${namePrefix}.dcSource.castingAbility`}
-      sharedOptions={sharedOptions}
-    />
-  )
-}
-
 export function MonsterActionCastingAbilityField({
   name,
   sharedOptions,

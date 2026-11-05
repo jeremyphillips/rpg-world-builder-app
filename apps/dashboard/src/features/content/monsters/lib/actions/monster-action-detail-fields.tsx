@@ -34,9 +34,9 @@ import {
   MONSTER_ACTION_REACH_FIELD_LABEL,
   MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
   MONSTER_SAVE_ABILITY_LABEL,
+  MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL,
+  MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL,
   MONSTER_SAVE_DC_ABILITY_LABEL,
-  MONSTER_SAVE_DC_KIND_ABILITY_LABEL,
-  MONSTER_SAVE_DC_KIND_SPELL_LABEL,
   MONSTER_SAVE_DC_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
   MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
@@ -45,11 +45,7 @@ import {
 } from '../monster-form-labels'
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
-import {
-  MonsterActionAttackCastingField,
-  MonsterActionCastingAbilityField,
-  MonsterActionSaveDcCastingField,
-} from './monster-action-casting-fields'
+import { MonsterActionCastingAbilityField } from './monster-action-casting-fields'
 import {
   monsterActionLimitedUseFields,
   monsterActionOnHitFields,
@@ -146,49 +142,44 @@ function abilityOptions() {
   return ABILITY_IDS.map((id) => ({ value: id, label: getAbilityLabel(id) }))
 }
 
-function monsterActionBonusSourceDependent(
-  namePrefix: string,
-  sharedCastingOptions: { value: string; label: string }[],
-): FormItem {
-  const abilityBranch = whenFieldEquals('bonusSource.kind', 'ability')
-  const spellBranch = whenFieldEquals('bonusSource.kind', 'spell')
+type MonsterAbilitySourcePath = 'bonusSource' | 'dcSource'
+
+function monsterAbilitySourceDependent(input: {
+  sourcePath: MonsterAbilitySourcePath
+  namePrefix: string
+  controllerLabel: string
+  abilityFields: FormItem[]
+  sharedCastingOptions: { value: string; label: string }[]
+  dependentsChrome?: 'none'
+}): FormItem {
+  const kindName = `${input.sourcePath}.kind`
+  const abilityBranch = whenFieldEquals(kindName, 'ability')
+  const spellBranch = whenFieldEquals(kindName, 'spell')
   return {
     kind: 'dependent',
     controller: {
       type: 'select',
-      name: 'bonusSource.kind',
-      label: 'Attack bonus',
+      name: kindName,
+      label: input.controllerLabel,
       placeholder: 'Choose',
       options: [
-        { value: 'ability', label: 'Ability' },
-        { value: 'spell', label: 'Spellcasting' },
+        { value: 'ability', label: MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL },
+        { value: 'spell', label: MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL },
       ],
     },
     dependents: {
-      visibility: whenFieldIsOneOf('bonusSource.kind', ['ability', 'spell']),
+      ...(input.dependentsChrome ? { chrome: input.dependentsChrome } : {}),
+      visibility: whenFieldIsOneOf(kindName, ['ability', 'spell']),
       fields: [
-        {
-          type: 'select',
-          name: 'bonusSource.ability',
-          label: 'Ability',
-          placeholder: 'Choose',
-          options: abilityOptions(),
-          visibility: abilityBranch,
-        },
-        {
-          type: 'switch',
-          name: 'bonusSource.proficient',
-          label: 'Proficient',
-          visibility: abilityBranch,
-        },
+        ...input.abilityFields.map((field) => ({ ...field, visibility: abilityBranch })),
         {
           kind: 'slot',
-          name: 'bonusSource.castingAbility',
+          name: `${input.sourcePath}.castingAbility`,
           visibility: spellBranch,
           render: () => (
-            <MonsterActionAttackCastingField
-              namePrefix={namePrefix}
-              sharedOptions={sharedCastingOptions}
+            <MonsterActionCastingAbilityField
+              name={`${input.namePrefix}.${input.sourcePath}.castingAbility`}
+              sharedOptions={input.sharedCastingOptions}
             />
           ),
         },
@@ -197,69 +188,71 @@ function monsterActionBonusSourceDependent(
   }
 }
 
+function monsterActionBonusSourceDependent(
+  namePrefix: string,
+  sharedCastingOptions: { value: string; label: string }[],
+): FormItem {
+  return monsterAbilitySourceDependent({
+    sourcePath: 'bonusSource',
+    namePrefix,
+    controllerLabel: 'Attack bonus',
+    sharedCastingOptions,
+    abilityFields: [
+      {
+        type: 'select',
+        name: 'bonusSource.ability',
+        label: 'Ability',
+        placeholder: 'Choose',
+        options: abilityOptions(),
+      },
+      {
+        type: 'switch',
+        name: 'bonusSource.proficient',
+        label: 'Proficient',
+      },
+    ],
+  })
+}
+
 function monsterActionSaveDcDependent(
   namePrefix: string,
   sharedCastingOptions: { value: string; label: string }[],
 ): FormItem {
-  const abilityBranch = whenFieldEquals('dcSource.kind', 'ability')
-  const spellBranch = whenFieldEquals('dcSource.kind', 'spell')
-  return {
-    kind: 'dependent',
-    controller: {
-      type: 'select',
-      name: 'dcSource.kind',
-      label: MONSTER_SAVE_DC_LABEL,
-      placeholder: 'Choose',
-      options: [
-        { value: 'ability', label: MONSTER_SAVE_DC_KIND_ABILITY_LABEL },
-        { value: 'spell', label: MONSTER_SAVE_DC_KIND_SPELL_LABEL },
-      ],
-    },
-    dependents: {
-      chrome: 'none',
-      visibility: whenFieldIsOneOf('dcSource.kind', ['ability', 'spell']),
-      fields: [
-        {
-          kind: 'row',
-          visibility: abilityBranch,
-          fields: [
-            {
-              type: 'select',
-              name: 'dcSource.ability',
-              label: MONSTER_SAVE_DC_ABILITY_LABEL,
-              placeholder: 'Choose',
-              options: abilityOptions(),
-              width: '1/2',
-              hint: {
-                resolve: {
-                  dependsOn: ['dcSource.ability'],
-                  hintWhen: monsterSaveDcAbilityHintWhen,
-                },
+  return monsterAbilitySourceDependent({
+    sourcePath: 'dcSource',
+    namePrefix,
+    controllerLabel: MONSTER_SAVE_DC_LABEL,
+    sharedCastingOptions,
+    dependentsChrome: 'none',
+    abilityFields: [
+      {
+        kind: 'row',
+        fields: [
+          {
+            type: 'select',
+            name: 'dcSource.ability',
+            label: MONSTER_SAVE_DC_ABILITY_LABEL,
+            placeholder: 'Choose',
+            options: abilityOptions(),
+            width: '1/2',
+            hint: {
+              resolve: {
+                dependsOn: ['dcSource.ability'],
+                hintWhen: monsterSaveDcAbilityHintWhen,
               },
             },
-            {
-              type: 'switch',
-              name: 'dcSource.proficient',
-              label: MONSTER_SAVE_DC_PROFICIENCY_LABEL,
-              labelPosition: 'above',
-              width: '1/2',
-            },
-          ],
-        },
-        {
-          kind: 'slot',
-          name: 'dcSource.castingAbility',
-          visibility: spellBranch,
-          render: () => (
-            <MonsterActionSaveDcCastingField
-              namePrefix={namePrefix}
-              sharedOptions={sharedCastingOptions}
-            />
-          ),
-        },
-      ],
-    },
-  }
+          },
+          {
+            type: 'switch',
+            name: 'dcSource.proficient',
+            label: MONSTER_SAVE_DC_PROFICIENCY_LABEL,
+            labelPosition: 'above',
+            width: '1/2',
+          },
+        ],
+      },
+    ],
+  })
 }
 
 function monsterActionSaveSelectionDependent(): FormItem {
