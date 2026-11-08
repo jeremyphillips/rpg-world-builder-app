@@ -21,6 +21,28 @@ describe('monsterActionSchema', () => {
     ).toBeUndefined()
   })
 
+  it('keeps a partial weapon damage override on drafts and rejects it when published', () => {
+    const partial = {
+      id: 'shot',
+      kind: 'weapon' as const,
+      equipmentEntryId: 'bow',
+      damage: { dice: { count: 2 } },
+    }
+    expect(monsterActionDraftSchema.parse(partial)).toMatchObject({
+      damage: { dice: { count: 2 } },
+    })
+    expect(monsterActionDraftSchema.parse({ ...partial, damage: {} })).toMatchObject({
+      damage: {},
+    })
+    expect(monsterActionSchema.safeParse(partial).success).toBe(false)
+    expect(
+      monsterActionSchema.safeParse({
+        ...partial,
+        damage: { dice: { count: 2, faces: 6 } },
+      }).success,
+    ).toBe(true)
+  })
+
   it('requires a name for natural weapons that have no preset', () => {
     const natural = {
       id: 'claw',

@@ -428,6 +428,7 @@ export const OPTIONAL_DISCLOSURE_FIELD_KINDS = [
   'textarea',
   'richtext',
   'select',
+  'rollValue',
 ] as const
 export type OptionalDisclosureFieldKind = (typeof OPTIONAL_DISCLOSURE_FIELD_KINDS)[number]
 
@@ -445,6 +446,15 @@ export type ConfirmBeforeClearConfig = {
   ) => boolean
 }
 
+/**
+ * Display-only line for a labeled disclosure. `resolve` may read `open` so the
+ * copy can differ while the structured value is present. It must not write form state.
+ */
+export type OptionalDisclosureSummary = {
+  dependsOn: readonly string[]
+  resolve: (values: Record<string, unknown>, state: { open: boolean }) => string | undefined
+}
+
 /** Collapse empty optional fields behind an add control (textarea and select). */
 export type OptionalDisclosureConfig = {
   addLabel: string
@@ -453,6 +463,17 @@ export type OptionalDisclosureConfig = {
   expandWhenPopulated?: boolean
   /** When set, removing populated content prompts before clearing. */
   confirmBeforeClear?: ConfirmBeforeClearConfig
+  /**
+   * Keep the section label visible when collapsed, with the add action on that
+   * row and `summary` underneath. Scalar disclosures leave this unset.
+   */
+  labeled?: boolean
+  /** Inherited or status text. `seedWhen` receives these `dependsOn` values. */
+  summary?: OptionalDisclosureSummary
+  /** Value written when the add action opens a structured field. */
+  seedWhen?: (values: Record<string, unknown>) => unknown
+  /** Disables the add action. Does not disable an open editor. */
+  addDisabled?: boolean
 }
 
 /** Attached trailing action on a text-like field — operation failure stays outside RHF validation. */
@@ -1001,6 +1022,7 @@ export interface RollValueFieldConfig extends BaseFieldConfig {
   modifierMax?: number
   defaultCount?: number
   defaultFaces?: number
+  optionalDisclosure?: OptionalDisclosureConfig
 }
 
 /**
@@ -1872,7 +1894,9 @@ function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unk
   }
 
   if (field.type === 'rollValue') {
-    assignRollValueDefaults(field as RollValueFieldConfig, values)
+    const rollField = field as RollValueFieldConfig
+    if (rollField.optionalDisclosure) return
+    assignRollValueDefaults(rollField, values)
     return
   }
 

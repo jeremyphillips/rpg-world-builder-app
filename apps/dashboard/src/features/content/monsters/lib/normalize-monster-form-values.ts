@@ -10,6 +10,7 @@ import {
 
 import { normalizeLimitedUse } from '../../lib/forms/limited-use/normalize-limited-use'
 import { monsterActionActiveKeys, monsterActionTriggerText } from './actions/monster-action-kind'
+import { weaponActionDamageToDraft } from './actions/monster-weapon-damage-form'
 
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
 
@@ -107,6 +108,9 @@ function normalizeAction(
   if (!isRecord(cleaned)) return cleaned
   applyReactionTriggerDraft(cleaned, section)
   applyLimitedUseDraft(cleaned)
+  if (cleaned.kind === 'weapon' && isRecord(cleaned.damage)) {
+    cleaned.damage = weaponActionDamageToDraft(cleaned.damage)
+  }
   const keys =
     typeof cleaned.kind === 'string' ? monsterActionActiveKeys(cleaned.kind, section) : []
   const active = keys.length > 0 ? pickKeys(cleaned, keys) : cleaned

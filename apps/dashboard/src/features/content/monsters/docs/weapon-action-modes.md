@@ -2,6 +2,8 @@
 
 Monster weapon actions do not store a mode. One `kind: 'weapon'` row becomes one attack line. Mode, reach, and range come from the catalog item.
 
+An optional `damage` roll replaces the catalog base roll. Ability modifiers and equipment damage adjustments still apply, and the damage type stays on the weapon. The action does not copy catalog damage until the author adds an override.
+
 Natural-weapon presets from the add menu seed name, damage type, mode, and a default **1d6** damage roll (see `DEFAULT_NATURAL_DAMAGE` in `content/action/action-presets.ts`). Authors can change the roll in the detail panel.
 
 | Source               | What the resolver uses                                                                                                                            |

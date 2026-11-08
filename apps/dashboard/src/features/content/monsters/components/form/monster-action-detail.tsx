@@ -30,7 +30,6 @@ import {
 } from '../../lib/monster-form-derivation'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import type { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
-import { MonsterActionAttackSummary } from './monster-action-attack-summary'
 
 type Sections = ReturnType<typeof useMonsterActionSections>
 
@@ -85,12 +84,15 @@ export function MonsterActionDetail({
   const namePrefix = located ? `${located.section}.${located.index}` : ''
   const fields = useMemo(() => {
     if (!located || !values || !action) return []
+    const watched = values[located.section]?.[located.index]
+    const liveAction = (watched ?? action) as MonsterActionDraftRow
     return monsterActionDetailFields({
       ctx,
-      action,
+      action: liveAction,
       section: located.section,
       namePrefix,
       equipmentOptions: equipmentOptions(values, ctx),
+      equipment: values.equipment,
       sharedCastingOptions: sharedCastingOptions(values, action.id),
       attackOptions: (values[located.section] ?? [])
         .filter(
@@ -160,7 +162,6 @@ export function MonsterActionDetail({
     >
       {located && action ? (
         <div id={`monster-action-focus-${action.id}`} tabIndex={-1} className="flex flex-col gap-4">
-          <MonsterActionAttackSummary ctx={ctx} action={action} />
           {sections.notice ? (
             <Text as="p" variant="supporting">
               <SemanticText>{sections.notice}</SemanticText>

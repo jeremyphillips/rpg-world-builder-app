@@ -95,6 +95,39 @@ describe('normalizeMonsterFormValues', () => {
     expect(renamedActions.find((action) => action.id === 'custom')?.name).toBe('Longsword')
   })
 
+  it('keeps partial weapon damage and joins a form flat into the draft roll', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.actions = [
+      {
+        id: 'partial',
+        kind: 'weapon',
+        equipmentEntryId: 'sword',
+        damage: { dice: { count: 2 } },
+      },
+      {
+        id: 'flat',
+        kind: 'weapon',
+        equipmentEntryId: 'bow',
+        damage: { flatOperator: '+', flatAmount: 1 },
+      },
+      {
+        id: 'open',
+        kind: 'weapon',
+        equipmentEntryId: 'club',
+        damage: {},
+      },
+      { id: 'plain', kind: 'weapon', equipmentEntryId: 'dagger' },
+    ]
+    const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
+    const actions = normalized.actions as Array<{ id: string; damage?: unknown }>
+    expect(actions.find((action) => action.id === 'partial')?.damage).toEqual({
+      dice: { count: 2 },
+    })
+    expect(actions.find((action) => action.id === 'flat')?.damage).toEqual({ flat: 1 })
+    expect(actions.find((action) => action.id === 'open')?.damage).toEqual({})
+    expect(actions.find((action) => action.id === 'plain')).not.toHaveProperty('damage')
+  })
+
   it('matches the preview serializer', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Scout'

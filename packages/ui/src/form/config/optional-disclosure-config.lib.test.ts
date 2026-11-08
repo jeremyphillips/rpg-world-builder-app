@@ -83,7 +83,9 @@ describe('assertOptionalDisclosureFieldConfig', () => {
     } as FieldConfig)
 
     expect(error).toHaveBeenCalledWith(
-      expect.stringContaining('only allowed for text, textSuggestions, textarea, richtext, select'),
+      expect.stringContaining(
+        'only allowed for text, textSuggestions, textarea, richtext, select, rollValue',
+      ),
     )
   })
 

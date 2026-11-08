@@ -255,11 +255,17 @@ describe('monster action detail fields', () => {
         : false,
     ).toBe(true)
     expect(attack).not.toContain('moveSection')
+    expect(natural[0]).toBe('attackPreview')
+    expect(attack[0]).toBe('attackPreview')
 
     const weapon = detailFields({ id: 'sword', kind: 'weapon', equipmentEntryId: 'sword' })
     expect(weapon).toContain('equipmentEntryId')
     expect(weapon).toContain('limitedUse.kind')
     expect(weapon).not.toContain('moveSection')
+    expect(weapon.indexOf('name')).toBeLessThan(weapon.indexOf('equipmentEntryId'))
+    expect(weapon.indexOf('attackPreview')).toBe(weapon.indexOf('equipmentEntryId') + 1)
+    expect(weapon.indexOf('damage')).toBe(weapon.indexOf('attackPreview') + 1)
+    expect(detailFields({ id: 'cast', kind: 'spell' })).not.toContain('attackPreview')
   })
 
   it('uses optional disclosure for preset action descriptions and required richtext for custom', () => {
@@ -290,6 +296,7 @@ describe('monster action detail fields', () => {
     expect(damageTypeIndex).toBe(descriptionIndex + 1)
     expect(rollIndex).toBe(damageTypeIndex + 1)
     expect(names.indexOf('limitedUse.kind')).toBeGreaterThan(rollIndex)
+    expect(names).not.toContain('attackPreview')
   })
 })
 
@@ -470,5 +477,16 @@ describe('monster action draft round trip', () => {
         form.reactions.map((action) => action.id),
       )
     }
+
+    const knight = pickMonster('knight')
+    const knightForm = monsterToFormValues(knight)
+    const crossbow = knightForm.actions.find((action) => action.id === 'heavy-crossbow')
+    expect(crossbow).toMatchObject({ damage: { dice: { count: 2, faces: 10 } } })
+    const knightSaved = buildMonsterInput(knightForm, { entity: knight }, 'draft')
+    expect(
+      (knightSaved.actions as Array<{ id?: string; damage?: unknown }>).find(
+        (action) => action.id === 'heavy-crossbow',
+      )?.damage,
+    ).toEqual({ dice: { count: 2, faces: 10 } })
   })
 })

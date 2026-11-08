@@ -15,7 +15,7 @@ import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-
 import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
 import { weaponAttackRangeGroup } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
 import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
-import { rollValueFields } from '../../../lib/forms/mechanics/roll-value-fields'
+import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
 import {
   MONSTER_ACTION_NAME_LABEL,
   MONSTER_CUSTOM_NAME_ADD_LABEL,
@@ -51,6 +51,8 @@ import {
   monsterSaveAbilityHintWhen,
   monsterSaveDcAbilityHintWhen,
 } from './monster-action-save-field-hints'
+import { monsterWeaponDamageOverrideField } from './monster-weapon-damage-override'
+import type { MonsterFormValues } from '../monster-form-values'
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {
   return {
     dependsOn: [name],
@@ -393,6 +395,17 @@ function reachRangeFields(modeField: 'mode' | 'modes'): FormItem[] {
   ]
 }
 
+function monsterActionAttackPreviewSlot(
+  ctx: ContentFormCtx,
+  action: MonsterActionDraftRow,
+): FormItem {
+  return {
+    kind: 'slot',
+    name: 'attackPreview',
+    render: () => <MonsterActionAttackSummary ctx={ctx} action={action} />,
+  }
+}
+
 function spellOptions(ctx: ContentFormCtx) {
   return [...(ctx.spellCatalogById?.values() ?? [])].map((spell) => ({
     value: spell.id,
@@ -407,10 +420,12 @@ export function monsterActionDetailFields(input: {
   section: MonsterActionSection
   namePrefix: string
   equipmentOptions: { value: string; label: string }[]
+  equipment?: MonsterFormValues['equipment']
   sharedCastingOptions: { value: string; label: string }[]
   attackOptions?: { value: string; label: string }[]
 }): FormItem[] {
   const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions } = input
+  const equipment = input.equipment ?? []
   const attackOptions = input.attackOptions ?? []
   const fields: FormItem[] = [monsterActionNameField(action), monsterActionDescriptionField(action)]
 
@@ -440,7 +455,15 @@ export function monsterActionDetailFields(input: {
       options: equipmentOptions,
       presentation: { change: { label: 'Change weapon' } },
     })
-    fields.push(...rollValueFields({ namePrefix: 'damage', label: 'Damage override' }))
+    fields.push(monsterActionAttackPreviewSlot(ctx, action))
+    fields.push(
+      monsterWeaponDamageOverrideField({
+        ctx,
+        equipment,
+        equipmentEntryId: action.equipmentEntryId,
+        damage: action.damage,
+      }),
+    )
     fields.push(monsterActionOnHitFields(ctx))
   }
 
@@ -537,6 +560,10 @@ export function monsterActionDetailFields(input: {
         ],
       },
     )
+  }
+
+  if (action.kind === 'natural-weapon' || action.kind === 'attack') {
+    fields.unshift(monsterActionAttackPreviewSlot(ctx, action))
   }
 
   return fields

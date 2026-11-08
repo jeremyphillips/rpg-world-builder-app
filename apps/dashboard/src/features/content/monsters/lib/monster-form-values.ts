@@ -33,6 +33,7 @@ import {
   finalizeContentInput,
   slugForInputParse,
 } from '../../lib/forms/registry/content-form-key-helpers'
+import { mapWeaponActionDamageToForm } from './actions/monster-weapon-damage-form'
 import {
   normalizeMonsterFormValues,
   type MonsterNormalizeBaseline,
@@ -196,9 +197,9 @@ export function monsterToFormValues(
     defenses: entity.defenses,
     equipment: entity.equipment,
     traits: entity.traits,
-    actions: entity.actions,
-    bonusActions: entity.bonusActions,
-    reactions: entity.reactions,
+    actions: entity.actions.map(mapWeaponActionDamageToForm),
+    bonusActions: entity.bonusActions.map(mapWeaponActionDamageToForm),
+    reactions: entity.reactions.map(mapWeaponActionDamageToForm),
     ...(() => {
       const hydration = weaponProficiencyHydrationFromWeapons(weapons)
       return {
