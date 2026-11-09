@@ -266,6 +266,23 @@ describe('monster action detail fields', () => {
     expect(weapon.indexOf('attackPreview')).toBe(weapon.indexOf('equipmentEntryId') + 1)
     expect(weapon.indexOf('damage')).toBe(weapon.indexOf('attackPreview') + 1)
     expect(detailFields({ id: 'cast', kind: 'spell' })).not.toContain('attackPreview')
+
+    const spell = detailFields({ id: 'cast', kind: 'spell', name: 'Spellcasting', spells: [] })
+    expect(spell.indexOf('name')).toBeLessThan(spell.indexOf('castingAbility'))
+    expect(spell.indexOf('castingAbility')).toBeLessThan(spell.indexOf('spells'))
+    expect(spell.indexOf('spells')).toBeLessThan(spell.indexOf('description'))
+    expect(spell.indexOf('description')).toBeLessThan(spell.indexOf('omittedComponents'))
+    expect(spell).not.toContain('trigger.text')
+
+    const reactionSpell = detailFields(
+      { id: 'shield', kind: 'spell', name: 'Protective Magic', spells: [] },
+      'reactions',
+    )
+    expect(reactionSpell.indexOf('castingAbility')).toBeLessThan(
+      reactionSpell.indexOf('trigger.text'),
+    )
+    expect(reactionSpell.indexOf('trigger.text')).toBeLessThan(reactionSpell.indexOf('spells'))
+    expect(reactionSpell.indexOf('spells')).toBeLessThan(reactionSpell.indexOf('description'))
   })
 
   it('uses optional disclosure for preset action descriptions and required richtext for custom', () => {

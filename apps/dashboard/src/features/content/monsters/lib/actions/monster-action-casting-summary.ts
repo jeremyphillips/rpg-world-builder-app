@@ -1,5 +1,4 @@
 import {
-  findSpellCastingSource,
   getAbilityLabel,
   listDirectSpellCastingSources,
   MONSTER_SPELLCASTING_ACTION_NAME,
@@ -32,8 +31,7 @@ type CastingRow = {
 }
 
 export const MONSTER_CASTING_ABILITY_GROUP_LABEL = 'Choose an ability'
-export const MONSTER_CASTING_SHARE_GROUP_LABEL = 'Use another action'
-export const MONSTER_CASTING_UNAVAILABLE_SOURCE = 'Unavailable source'
+export const MONSTER_CASTING_SHARE_GROUP_LABEL = "Use another action's ability"
 
 type FormCastingSections = {
   actions?: readonly unknown[]
@@ -80,64 +78,6 @@ export function sharedCastingOptions(
     value: source.id,
     label: formatSharedCastingOptionLabel(source, sources),
   }))
-}
-
-function spellBasedPhrase(ability: Ability): string {
-  return `Spellcasting-based (${getAbilityLabel(ability)})`
-}
-
-function sharedPhrase(
-  sections: SpellCastingSections,
-  entryId: string | undefined,
-  format: (ability: Ability, source: ResolvedSpellCastingSource) => string,
-): string | undefined {
-  if (!entryId) return undefined
-  const source = findSpellCastingSource(sections, entryId)
-  if (!source) return MONSTER_CASTING_UNAVAILABLE_SOURCE
-  return format(source.ability, source)
-}
-
-function spellRowEyebrow(action: CastingRow, sections: SpellCastingSections): string | undefined {
-  const casting = action.castingAbility
-  if (casting?.kind === 'ability' && casting.ability) {
-    return getAbilityLabel(casting.ability as Ability)
-  }
-  if (casting?.kind !== 'shared') return undefined
-  return sharedPhrase(
-    sections,
-    casting.entryId,
-    (ability, source) => `${sourceTitle(source)} (${getAbilityLabel(ability)})`,
-  )
-}
-
-function nestedSourceEyebrow(
-  action: CastingRow,
-  sections: SpellCastingSections,
-): string | undefined {
-  const source = action.kind === 'attack' ? action.bonusSource : action.dcSource
-  if (action.kind !== 'attack' && action.kind !== 'save') return undefined
-  if (source?.kind !== 'spell') return undefined
-  return spellSourceEyebrow(sections, source.castingAbility)
-}
-
-export function monsterActionCastingEyebrow(
-  action: CastingRow,
-  sections: FormCastingSections,
-): string | undefined {
-  const resolved = asSpellCastingSections(sections)
-  if (action.kind === 'spell') return spellRowEyebrow(action, resolved)
-  return nestedSourceEyebrow(action, resolved)
-}
-
-function spellSourceEyebrow(
-  sections: SpellCastingSections,
-  casting: { kind?: string; ability?: Ability; entryId?: string } | undefined,
-): string | undefined {
-  if (casting?.kind === 'ability' && casting.ability) return spellBasedPhrase(casting.ability)
-  if (casting?.kind === 'shared') {
-    return sharedPhrase(sections, casting.entryId, (ability) => spellBasedPhrase(ability))
-  }
-  return undefined
 }
 
 export function monsterCastingDependentLabels(

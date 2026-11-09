@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
+  MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
+  MONSTER_ACQUISITION_SPELL_DESCRIPTION,
+  MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
+} from '../monster-form-labels'
+import {
+  MONSTER_ACTION_ACQUISITION_GROUPS,
   MONSTER_ACTION_ALREADY_ADDED_NOTE,
   createSpellActionDraft,
   monsterActionAcquisitionItems,
@@ -49,6 +56,48 @@ describe('monsterActionAcquisitionItems', () => {
       actionId: 'bonus-slash',
     })
     expect(items.find((item) => item.id === 'weapon-entry:sword-2')).toBeDefined()
+  })
+})
+
+describe('monster action acquisition presentation', () => {
+  const items = monsterActionAcquisitionItems({ weapons: [], allowAddWeapon: true })
+
+  it('uses General for custom actions and describes what each item creates', () => {
+    expect(MONSTER_ACTION_ACQUISITION_GROUPS.map((group) => group.label)).toEqual([
+      'Equipped weapons',
+      'Natural attacks',
+      'Special actions',
+      'General',
+    ])
+    expect(MONSTER_ACTION_ACQUISITION_GROUPS.find((group) => group.label === 'General')?.id).toBe(
+      'other',
+    )
+    expect(items.find((item) => item.id === 'create:attack')).toMatchObject({
+      metadata: MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
+    })
+    expect(items.find((item) => item.id === 'create:spell')).toMatchObject({
+      metadata: MONSTER_ACQUISITION_SPELL_DESCRIPTION,
+    })
+    expect(items.find((item) => item.id === 'create:special')).toMatchObject({
+      metadata: MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
+    })
+    expect(items.find((item) => item.id === 'natural:other')?.metadata).toBeUndefined()
+  })
+
+  it('lists Multiattack first and keeps natural-attack damage types', () => {
+    const special = items.filter((item) => item.groupId === 'special').map((item) => item.label)
+    expect(special.slice(0, 3)).toEqual(['Multiattack', 'Constrict', 'Breath Weapon'])
+    expect(items.find((item) => item.id === 'preset:multiattack')).toMatchObject({
+      metadata: MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
+    })
+    expect(items.find((item) => item.id === 'preset:constrict')?.metadata).toBeUndefined()
+    expect(items.find((item) => item.id === 'preset:breath-weapon')?.metadata).toBeUndefined()
+    expect(items.find((item) => item.id === 'natural:bite')).toMatchObject({ metadata: 'Piercing' })
+    expect(items.find((item) => item.id === 'natural:claw')).toMatchObject({ metadata: 'Slashing' })
+    expect(parseMonsterActionAcquisitionId('preset:multiattack')).toEqual({
+      type: 'preset',
+      presetId: 'multiattack',
+    })
   })
 })
 

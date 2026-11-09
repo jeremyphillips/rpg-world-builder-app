@@ -93,6 +93,15 @@ function monsterActionNameField(action: MonsterActionDraftRow): FormItem {
   return { type: 'text', name: 'name', label: MONSTER_ACTION_NAME_LABEL, required: true }
 }
 
+function monsterReactionConditionField(action: MonsterActionDraftRow): FormItem {
+  return {
+    type: 'text',
+    name: 'trigger.text',
+    label: action.kind === 'spell' ? MONSTER_ADDITIONAL_CONDITION_LABEL : MONSTER_TRIGGER_LABEL,
+    hint: action.kind === 'spell' ? MONSTER_ADDITIONAL_CONDITION_HINT : undefined,
+  }
+}
+
 function monsterActionDescriptionField(action: MonsterActionDraftRow): FormItem {
   if (monsterActionAuthoring(action).description === 'authored') {
     return {
@@ -428,19 +437,15 @@ export function monsterActionDetailFields(input: {
   const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions } = input
   const equipment = input.equipment ?? []
   const attackOptions = input.attackOptions ?? []
-  const fields: FormItem[] = [monsterActionNameField(action), monsterActionDescriptionField(action)]
+  const fields: FormItem[] = [monsterActionNameField(action)]
+  if (action.kind !== 'spell') fields.push(monsterActionDescriptionField(action))
 
   if (action.kind === 'save') {
     fields.push(monsterSaveResolutionDamageGroup(ctx))
   }
 
-  if (section === 'reactions') {
-    fields.push({
-      type: 'text',
-      name: 'trigger.text',
-      label: action.kind === 'spell' ? MONSTER_ADDITIONAL_CONDITION_LABEL : MONSTER_TRIGGER_LABEL,
-      hint: action.kind === 'spell' ? MONSTER_ADDITIONAL_CONDITION_HINT : undefined,
-    })
+  if (section === 'reactions' && action.kind !== 'spell') {
+    fields.push(monsterReactionConditionField(action))
   }
 
   if (action.kind !== 'spell' && action.kind !== 'natural-weapon') {
@@ -542,6 +547,7 @@ export function monsterActionDetailFields(input: {
           />
         ),
       },
+      ...(section === 'reactions' ? [monsterReactionConditionField(action)] : []),
       {
         kind: 'array',
         name: 'spells',
@@ -560,6 +566,7 @@ export function monsterActionDetailFields(input: {
           ...monsterActionLimitedUseFields(),
         ],
       },
+      monsterActionDescriptionField(action),
       spellComponentField(),
       ...monsterActionLimitedUseFields(),
     )

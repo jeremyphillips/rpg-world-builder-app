@@ -3,7 +3,6 @@ import {
   getActionPreset,
   getActionVocabularyEntry,
   getDamageTypeLabel,
-  getMonsterActionKindLabel,
   listSpecialMenuActionPresetIds,
   MONSTER_SPELLCASTING_ACTION_NAME,
   type ActionPresetId,
@@ -15,14 +14,20 @@ import {
 } from './monster-action-casting-summary'
 import type { MonsterActionSection } from './monster-action-equipment-references'
 
-import { monsterAddWeaponShortcut } from '../monster-form-labels'
+import {
+  MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
+  MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
+  MONSTER_ACQUISITION_SPELL_DESCRIPTION,
+  MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
+  monsterAddWeaponShortcut,
+} from '../monster-form-labels'
 import { createMonsterRowId, type MonsterActionDraftRow } from './monster-action-presets'
 
 export const MONSTER_ACTION_ACQUISITION_GROUPS = [
   { id: 'equipped', label: 'Equipped weapons' },
   { id: 'natural', label: 'Natural attacks' },
   { id: 'special', label: 'Special actions' },
-  { id: 'other', label: 'Other' },
+  { id: 'other', label: 'General' },
 ] as const
 
 export type MonsterActionAcquisitionGroupId =
@@ -46,26 +51,33 @@ export type MonsterActionAcquisitionChoice =
   | { type: 'preset'; presetId: ActionPresetId }
   | { type: 'create'; kind: 'attack' | 'spell' | 'special' }
 
+const SPECIAL_MENU_ORDER = ['multiattack', 'constrict', 'breath-weapon'] as const
+
 const OTHER_ITEMS: readonly MonsterActionAcquisitionItem[] = [
   {
     id: 'create:attack',
     label: 'Attack',
     groupId: 'other',
-    metadata: getMonsterActionKindLabel('attack'),
+    metadata: MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
   },
   {
     id: 'create:spell',
     label: 'Spellcasting',
     groupId: 'other',
-    metadata: getMonsterActionKindLabel('spell'),
+    metadata: MONSTER_ACQUISITION_SPELL_DESCRIPTION,
   },
   {
     id: 'create:special',
     label: 'Special ability',
     groupId: 'other',
-    metadata: getMonsterActionKindLabel('special'),
+    metadata: MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
   },
 ]
+
+function specialMenuRank(presetId: ActionPresetId): number {
+  const index = SPECIAL_MENU_ORDER.indexOf(presetId as (typeof SPECIAL_MENU_ORDER)[number])
+  return index === -1 ? SPECIAL_MENU_ORDER.length : index
+}
 
 function isAttackRollPreset(id: ActionPresetId): boolean {
   return getActionPreset(id)?.mechanics === 'attack-roll'
@@ -141,15 +153,25 @@ export function monsterActionAcquisitionItems(input: {
       metadata: damageType ? getDamageTypeLabel(damageType) : undefined,
     }
   })
-  const special = listSpecialMenuActionPresetIds().map((presetId) => {
-    const preset = getActionPreset(presetId)
-    const vocabulary = preset ? getActionVocabularyEntry(preset.vocabularyId) : undefined
-    return {
-      id: `preset:${presetId}`,
-      label: vocabulary?.label ?? presetId,
-      groupId: 'special' as const,
-    }
-  })
+  const special = listSpecialMenuActionPresetIds()
+    .map((presetId, index) => ({ presetId, index }))
+    .sort(
+      (left, right) =>
+        specialMenuRank(left.presetId) - specialMenuRank(right.presetId) ||
+        left.index - right.index,
+    )
+    .map(({ presetId }) => {
+      const preset = getActionPreset(presetId)
+      const vocabulary = preset ? getActionVocabularyEntry(preset.vocabularyId) : undefined
+      return {
+        id: `preset:${presetId}`,
+        label: vocabulary?.label ?? presetId,
+        groupId: 'special' as const,
+        ...(presetId === 'multiattack'
+          ? { metadata: MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION }
+          : {}),
+      }
+    })
   return [
     ...equipped,
     {
@@ -164,7 +186,6 @@ export function monsterActionAcquisitionItems(input: {
       id: 'natural:other',
       label: 'Other natural attack',
       groupId: 'natural',
-      metadata: getMonsterActionKindLabel('natural-weapon'),
     },
     ...special,
     ...OTHER_ITEMS,

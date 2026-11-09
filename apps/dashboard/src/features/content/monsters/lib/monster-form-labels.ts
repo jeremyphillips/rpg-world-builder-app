@@ -195,6 +195,12 @@ export function monsterActionSectionHeading(section: MonsterActionSection): stri
 
 export const MONSTER_ADD_LABEL = 'Add'
 
+export const MONSTER_ACQUISITION_ATTACK_DESCRIPTION = 'Custom attack'
+export const MONSTER_ACQUISITION_SPELL_DESCRIPTION = 'Cast spells'
+export const MONSTER_ACQUISITION_SPECIAL_DESCRIPTION = 'Custom rules or effects'
+export const MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION =
+  'Combine multiple attacks into one action'
+
 function monsterArmorSlotMidSentenceNoun(slot: CreatureArmorSlot): string {
   if (slot === 'shield') return getArmorCategorySentenceForm('shields', 1)
   return getTermLabelSingular(getCreatureArmorClassKindLabel('armor'))

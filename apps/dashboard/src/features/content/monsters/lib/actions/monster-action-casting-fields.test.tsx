@@ -72,6 +72,8 @@ describe('MonsterActionCastingAbilityField', () => {
     }
     render(<Guarded />)
     await user.click(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }))
+    expect(screen.getByText('Choose an ability')).toBeInTheDocument()
+    expect(screen.getByText("Use another action's ability")).toBeInTheDocument()
     await user.click(await screen.findByRole('option', { name: 'Wisdom' }))
     expect(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL })).toHaveTextContent(
       'Wisdom',

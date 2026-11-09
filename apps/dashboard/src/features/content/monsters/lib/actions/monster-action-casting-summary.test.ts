@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { MonsterActionDraftRow } from './monster-action-presets'
-import { monsterActionCastingEyebrow, sharedCastingOptions } from './monster-action-casting-summary'
+import { sharedCastingOptions } from './monster-action-casting-summary'
 
 function spell(row: MonsterActionDraftRow): MonsterActionDraftRow {
   return row
@@ -47,16 +47,8 @@ describe('monster action casting summary', () => {
     ],
   }
 
-  it('shows the resolved ability and disambiguates duplicate source names by section', () => {
-    expect(monsterActionCastingEyebrow(sections.actions[0]!, sections)).toBe('Intelligence')
-    expect(monsterActionCastingEyebrow(sections.bonusActions![0]!, sections)).toBe(
-      'Spellcasting (Intelligence)',
-    )
-    expect(monsterActionCastingEyebrow(sections.reactions![0]!, sections)).toBe(
-      'Unavailable source',
-    )
-    const labels = sharedCastingOptions(sections, 'misty').map((option) => option.label)
-    expect(labels).toEqual([
+  it('disambiguates duplicate source names by section', () => {
+    expect(sharedCastingOptions(sections, 'misty').map((option) => option.label)).toEqual([
       'Spellcasting (Intelligence) · Actions',
       'Spellcasting (Wisdom) · Actions',
     ])
@@ -73,8 +65,8 @@ describe('monster action casting summary', () => {
         sections.actions[1]!,
       ],
     }
-    expect(monsterActionCastingEyebrow(changed.bonusActions![0]!, changed)).toBe(
-      'Spellcasting (Wisdom)',
+    expect(sharedCastingOptions(changed, 'misty').map((option) => option.label)).toContain(
+      'Spellcasting (Wisdom) · Actions',
     )
     expect(changed.bonusActions![0]!.castingAbility).toEqual({
       kind: 'shared',
