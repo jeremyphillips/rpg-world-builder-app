@@ -1,4 +1,5 @@
 import { isWeaponEquipment, type Equipment } from '../../content/equipment'
+import { findSpellCastingSource } from '../../content/monster/spell-casting-source'
 import type {
   MonsterAction,
   MonsterActionDraft,
@@ -272,23 +273,22 @@ function resolveNaturalProfile(
   }
 }
 
-function abilityFromEntry(entry: ProfileAction, entryId: string): Ability | undefined {
-  if (entry.id !== entryId) return undefined
-  if (entry.kind === 'spell' && entry.castingAbility?.kind === 'ability') {
-    return entry.castingAbility.ability
+function abilityFromAttackEntry(entry: ProfileAction, entryId: string): Ability | undefined {
+  if (entry.id !== entryId || entry.kind !== 'attack' || entry.bonusSource?.kind !== 'spell') {
+    return undefined
   }
-  if (entry.kind === 'attack' && entry.bonusSource?.kind === 'spell') {
-    const nested = entry.bonusSource.castingAbility
-    if (nested?.kind === 'ability' && nested.ability) return nested.ability
-  }
+  const nested = entry.bonusSource.castingAbility
+  if (nested?.kind === 'ability' && nested.ability) return nested.ability
   return undefined
 }
 
 function resolveSharedAbility(monster: ProfileMonster, entryId: string): Ability | undefined {
+  const spell = findSpellCastingSource(monster, entryId)
+  if (spell) return spell.ability
   const sections = [monster.actions, monster.bonusActions, monster.reactions] as const
   for (const section of sections) {
     for (const entry of section ?? []) {
-      const ability = abilityFromEntry(entry, entryId)
+      const ability = abilityFromAttackEntry(entry, entryId)
       if (ability) return ability
     }
   }

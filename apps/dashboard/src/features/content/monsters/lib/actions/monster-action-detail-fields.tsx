@@ -423,6 +423,7 @@ export function monsterActionDetailFields(input: {
   equipment?: MonsterFormValues['equipment']
   sharedCastingOptions: { value: string; label: string }[]
   attackOptions?: { value: string; label: string }[]
+  onCastingSourceBlocked?: (message: string) => void
 }): FormItem[] {
   const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions } = input
   const equipment = input.equipment ?? []
@@ -536,11 +537,11 @@ export function monsterActionDetailFields(input: {
             name={`${namePrefix}.castingAbility`}
             sharedOptions={sharedCastingOptions}
             labelPosition="settings"
+            sourceActionId={action.id}
+            onBlocked={input.onCastingSourceBlocked}
           />
         ),
       },
-      spellComponentField(),
-      ...monsterActionLimitedUseFields(),
       {
         kind: 'array',
         name: 'spells',
@@ -559,6 +560,8 @@ export function monsterActionDetailFields(input: {
           ...monsterActionLimitedUseFields(),
         ],
       },
+      spellComponentField(),
+      ...monsterActionLimitedUseFields(),
     )
   }
 

@@ -227,7 +227,7 @@ describe('monster spell entries', () => {
         ...baseBody,
         actions: [spellcasting],
         bonusActions: [{ id: 'note', kind: 'special', name: 'Note', description: '<p>n</p>' }],
-        reactions: [{ ...spellcasting, id: 'react-spell' }],
+        reactions: [{ ...spellcasting, id: 'react-spell', name: 'Protective Magic' }],
       }).success,
     ).toBe(true)
   })
@@ -263,6 +263,70 @@ describe('monster spell entries', () => {
         ],
       }).success,
     ).toBe(false)
+  })
+
+  it('rejects duplicate direct casting names when published and allows them on drafts', () => {
+    const second = { ...spellcasting, id: 'other-spellcasting' }
+    expect(
+      createMonsterDraftInputSchema.safeParse({
+        slug: 'draft-dup-name',
+        ...baseBody,
+        actions: [spellcasting, second],
+      }).success,
+    ).toBe(true)
+    const published = createMonsterInputSchema.safeParse({
+      slug: 'dup-name',
+      ...baseBody,
+      actions: [spellcasting, second],
+    })
+    expect(published.success).toBe(false)
+    if (!published.success) {
+      expect(published.error.issues.some((issue) => issue.message.includes('unique names'))).toBe(
+        true,
+      )
+    }
+  })
+
+  it('rejects a published attack share with a missing spell source', () => {
+    const attack = {
+      id: 'burst',
+      kind: 'attack' as const,
+      name: 'Arcane Burst',
+      bonusSource: {
+        kind: 'spell' as const,
+        castingAbility: { kind: 'shared' as const, entryId: 'missing' },
+      },
+      modes: ['ranged' as const],
+      range: { normal: 120 },
+      damage: { dice: { count: 1, faces: 8 } },
+      damageType: 'force',
+    }
+    expect(
+      createMonsterDraftInputSchema.safeParse({
+        slug: 'draft-burst',
+        ...baseBody,
+        actions: [attack],
+      }).success,
+    ).toBe(true)
+    expect(
+      createMonsterInputSchema.safeParse({ slug: 'burst', ...baseBody, actions: [attack] }).success,
+    ).toBe(false)
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'burst-linked',
+        ...baseBody,
+        actions: [
+          spellcasting,
+          {
+            ...attack,
+            bonusSource: {
+              kind: 'spell' as const,
+              castingAbility: { kind: 'shared' as const, entryId: 'spellcasting' },
+            },
+          },
+        ],
+      }).success,
+    ).toBe(true)
   })
 
   it('requires a shared ability target to be another spell entry with its own ability', () => {

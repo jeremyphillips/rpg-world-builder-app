@@ -270,6 +270,14 @@ export function formatAddedEquipmentNotice(name: string): string {
   return `${name} was added to ${getContentTypeItemLabel('equipment')}.`
 }
 
+export function formatCastingSourceDeleteNotice(names: readonly string[]): string {
+  return `This action's spellcasting ability is used by ${names.join(', ')}.`
+}
+
+export function formatCastingSourceChangeNotice(names: readonly string[]): string {
+  return `This spellcasting ability is used by ${names.join(', ')}.`
+}
+
 export function formatDropTriggerBody(): string {
   return `Moving this reaction out of ${MONSTER_REACTIONS_HEADING} drops its trigger.`
 }

@@ -15,6 +15,7 @@ import { getActionPreset } from '../action/action-presets'
 import { monsterActionAuthoring } from './monster-action-authoring'
 import { naturalAttackFormSchema } from '../../vocab/action/natural-attack-form'
 import { spellReferenceSchema } from '../spell/spell-reference'
+import { findSpellCastingSource, listDirectSpellCastingSources } from './spell-casting-source'
 import {
   weaponDamageDraftSchema,
   weaponDamageSchema,
@@ -232,7 +233,9 @@ type SpellEntryLike = {
   kind: string
   name?: string
   limitedUse?: unknown
-  castingAbility?: { kind: string; entryId?: string }
+  castingAbility?: { kind: string; entryId?: string; ability?: string }
+  bonusSource?: { kind?: string; castingAbility?: { kind?: string; entryId?: string } }
+  dcSource?: { kind?: string; castingAbility?: { kind?: string; entryId?: string } }
   spells?: readonly { spellId?: string; limitedUse?: unknown }[]
 }
 
@@ -244,6 +247,7 @@ export function refineMonsterSpellEntries(
   },
   ctx: z.RefinementCtx,
   prefix: (string | number)[] = [],
+  options?: { published?: boolean },
 ): void {
   const located = (['actions', 'bonusActions', 'reactions'] as const).flatMap((section) =>
     (sections[section] ?? []).map((action, index) => ({ section, index, action })),
@@ -256,7 +260,9 @@ export function refineMonsterSpellEntries(
 
   for (const locatedEntry of located) {
     refineOneSpellEntry(locatedEntry, spellsById, ctx, prefix)
+    if (options?.published) refineNestedSpellSource(locatedEntry, sections, ctx, prefix)
   }
+  if (options?.published) refineUniqueDirectCastingNames(sections, ctx, prefix)
 }
 
 function refineOneSpellEntry(
@@ -287,6 +293,69 @@ function refineSpellOwnership(
   const spellIds = spells.flatMap((spell) => (spell.spellId ? [spell.spellId] : []))
   if (new Set(spellIds).size === spellIds.length) return
   addCustomRefinementIssue(ctx, 'Spell ids must be unique within an entry.', [...path, 'spells'])
+}
+
+const DUPLICATE_CASTING_SOURCE_NAME =
+  'Spellcasting sources that define an ability must have unique names.'
+
+function nestedSharedEntryId(
+  source: { kind?: string; castingAbility?: { kind?: string; entryId?: string } } | undefined,
+): string | undefined {
+  if (source?.kind !== 'spell' || source.castingAbility?.kind !== 'shared') return undefined
+  return source.castingAbility.entryId
+}
+
+function refineNestedSpellSource(
+  locatedEntry: { section: string; index: number; action: SpellEntryLike },
+  sections: {
+    actions?: readonly SpellEntryLike[]
+    bonusActions?: readonly SpellEntryLike[]
+    reactions?: readonly SpellEntryLike[]
+  },
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  const { section, index, action } = locatedEntry
+  const nested =
+    action.kind === 'attack'
+      ? { path: 'bonusSource', entryId: nestedSharedEntryId(action.bonusSource) }
+      : action.kind === 'save'
+        ? { path: 'dcSource', entryId: nestedSharedEntryId(action.dcSource) }
+        : undefined
+  if (!nested?.entryId) return
+  if (findSpellCastingSource(sections, nested.entryId)) return
+  addCustomRefinementIssue(
+    ctx,
+    'Shared spellcasting must use another spell entry that has its own ability.',
+    [...prefix, section, index, nested.path, 'castingAbility', 'entryId'],
+  )
+}
+
+function refineUniqueDirectCastingNames(
+  sections: {
+    actions?: readonly SpellEntryLike[]
+    bonusActions?: readonly SpellEntryLike[]
+    reactions?: readonly SpellEntryLike[]
+  },
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  const seen = new Set<string>()
+  for (const source of listDirectSpellCastingSources(sections)) {
+    const name = source.name?.trim()
+    if (!name) continue
+    if (seen.has(name)) {
+      const index = (sections[source.section] ?? []).findIndex((row) => row.id === source.id)
+      addCustomRefinementIssue(ctx, DUPLICATE_CASTING_SOURCE_NAME, [
+        ...prefix,
+        source.section,
+        index,
+        'name',
+      ])
+      continue
+    }
+    seen.add(name)
+  }
 }
 
 function refineSharedCastingAbility(

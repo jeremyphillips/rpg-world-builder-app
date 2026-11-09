@@ -1,0 +1,196 @@
+import {
+  findSpellCastingSource,
+  getAbilityLabel,
+  listDirectSpellCastingSources,
+  MONSTER_SPELLCASTING_ACTION_NAME,
+  resolveMonsterActionIdentity,
+  type Ability,
+  type MonsterActionDraft,
+  type ResolvedSpellCastingSource,
+  type SpellCastingSections,
+  type SpellCastingSourceRow,
+} from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
+
+import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-constants'
+import { monsterActionSectionHeading } from '../monster-form-labels'
+import { MONSTER_ACTION_ITEM_NOUN } from '../monster-trait-form-fields'
+
+type CastingRow = {
+  id: string
+  kind: string
+  name?: string
+  castingAbility?: { kind?: string; ability?: string; entryId?: string }
+  bonusSource?: {
+    kind?: string
+    castingAbility?: { kind?: string; ability?: Ability; entryId?: string }
+  }
+  dcSource?: {
+    kind?: string
+    castingAbility?: { kind?: string; ability?: Ability; entryId?: string }
+  }
+}
+
+export const MONSTER_CASTING_ABILITY_GROUP_LABEL = 'Choose an ability'
+export const MONSTER_CASTING_SHARE_GROUP_LABEL = 'Use another action'
+export const MONSTER_CASTING_UNAVAILABLE_SOURCE = 'Unavailable source'
+
+type FormCastingSections = {
+  actions?: readonly unknown[]
+  bonusActions?: readonly unknown[]
+  reactions?: readonly unknown[]
+}
+
+function asSpellCastingSections(sections: FormCastingSections): SpellCastingSections {
+  const rows = (section: readonly unknown[] | undefined) =>
+    (section ?? []) as SpellCastingSourceRow[]
+  return {
+    actions: rows(sections.actions),
+    bonusActions: rows(sections.bonusActions),
+    reactions: rows(sections.reactions),
+  }
+}
+
+function sourceTitle(source: ResolvedSpellCastingSource): string {
+  return source.name?.trim() || masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
+}
+
+function sourceNameKey(source: ResolvedSpellCastingSource): string {
+  return source.name?.trim() ?? ''
+}
+
+export function formatSharedCastingOptionLabel(
+  source: ResolvedSpellCastingSource,
+  sources: readonly ResolvedSpellCastingSource[],
+): string {
+  const base = `${sourceTitle(source)} (${getAbilityLabel(source.ability)})`
+  const collisions = sources.filter((other) => sourceNameKey(other) === sourceNameKey(source))
+  if (collisions.length < 2) return base
+  return joinInlineMetadata([base, monsterActionSectionHeading(source.section)])
+}
+
+export function sharedCastingOptions(
+  values: FormCastingSections,
+  actionId: string,
+): { value: string; label: string }[] {
+  const sources = listDirectSpellCastingSources(asSpellCastingSections(values)).filter(
+    (source) => source.id !== actionId,
+  )
+  return sources.map((source) => ({
+    value: source.id,
+    label: formatSharedCastingOptionLabel(source, sources),
+  }))
+}
+
+function spellBasedPhrase(ability: Ability): string {
+  return `Spellcasting-based (${getAbilityLabel(ability)})`
+}
+
+function sharedPhrase(
+  sections: SpellCastingSections,
+  entryId: string | undefined,
+  format: (ability: Ability, source: ResolvedSpellCastingSource) => string,
+): string | undefined {
+  if (!entryId) return undefined
+  const source = findSpellCastingSource(sections, entryId)
+  if (!source) return MONSTER_CASTING_UNAVAILABLE_SOURCE
+  return format(source.ability, source)
+}
+
+function spellRowEyebrow(action: CastingRow, sections: SpellCastingSections): string | undefined {
+  const casting = action.castingAbility
+  if (casting?.kind === 'ability' && casting.ability) {
+    return getAbilityLabel(casting.ability as Ability)
+  }
+  if (casting?.kind !== 'shared') return undefined
+  return sharedPhrase(
+    sections,
+    casting.entryId,
+    (ability, source) => `${sourceTitle(source)} (${getAbilityLabel(ability)})`,
+  )
+}
+
+function nestedSourceEyebrow(
+  action: CastingRow,
+  sections: SpellCastingSections,
+): string | undefined {
+  const source = action.kind === 'attack' ? action.bonusSource : action.dcSource
+  if (action.kind !== 'attack' && action.kind !== 'save') return undefined
+  if (source?.kind !== 'spell') return undefined
+  return spellSourceEyebrow(sections, source.castingAbility)
+}
+
+export function monsterActionCastingEyebrow(
+  action: CastingRow,
+  sections: FormCastingSections,
+): string | undefined {
+  const resolved = asSpellCastingSections(sections)
+  if (action.kind === 'spell') return spellRowEyebrow(action, resolved)
+  return nestedSourceEyebrow(action, resolved)
+}
+
+function spellSourceEyebrow(
+  sections: SpellCastingSections,
+  casting: { kind?: string; ability?: Ability; entryId?: string } | undefined,
+): string | undefined {
+  if (casting?.kind === 'ability' && casting.ability) return spellBasedPhrase(casting.ability)
+  if (casting?.kind === 'shared') {
+    return sharedPhrase(sections, casting.entryId, (ability) => spellBasedPhrase(ability))
+  }
+  return undefined
+}
+
+export function monsterCastingDependentLabels(
+  values: FormCastingSections,
+  sourceId: string,
+): string[] {
+  const rows = [
+    ...(values.actions ?? []),
+    ...(values.bonusActions ?? []),
+    ...(values.reactions ?? []),
+  ] as CastingRow[]
+  return rows.flatMap((row) => {
+    if (row.id === sourceId || !rowUsesCastingSource(row, sourceId)) return []
+    const identity = resolveMonsterActionIdentity({
+      action: row as MonsterActionDraft,
+      equipmentCatalogStatus: 'ready',
+    })
+    return [
+      identity.displayName.trim() || masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN),
+    ]
+  })
+}
+
+function sharedEntryId(
+  casting: { kind?: string; entryId?: string } | undefined,
+): string | undefined {
+  if (casting?.kind !== 'shared') return undefined
+  return casting.entryId
+}
+
+function rowUsesCastingSource(row: CastingRow, sourceId: string): boolean {
+  if (row.kind === 'spell') return sharedEntryId(row.castingAbility) === sourceId
+  if (row.kind === 'attack' && row.bonusSource?.kind === 'spell') {
+    return sharedEntryId(row.bonusSource.castingAbility) === sourceId
+  }
+  if (row.kind === 'save' && row.dcSource?.kind === 'spell') {
+    return sharedEntryId(row.dcSource.castingAbility) === sourceId
+  }
+  return false
+}
+
+export function conventionalSpellcastingSources(sections: FormCastingSections) {
+  return listDirectSpellCastingSources(asSpellCastingSections(sections)).filter(
+    (source) => source.name?.trim() === MONSTER_SPELLCASTING_ACTION_NAME,
+  )
+}
+
+export function spellcastingNameTaken(sections: FormCastingSections): boolean {
+  const resolved = asSpellCastingSections(sections)
+  for (const section of ['actions', 'bonusActions', 'reactions'] as const) {
+    for (const row of resolved[section] ?? []) {
+      if (row.kind === 'spell' && row.name?.trim() === MONSTER_SPELLCASTING_ACTION_NAME) return true
+    }
+  }
+  return false
+}

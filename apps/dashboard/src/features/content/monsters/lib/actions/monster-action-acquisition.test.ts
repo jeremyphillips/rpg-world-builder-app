@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   MONSTER_ACTION_ALREADY_ADDED_NOTE,
+  createSpellActionDraft,
   monsterActionAcquisitionItems,
   parseMonsterActionAcquisitionId,
 } from './monster-action-acquisition'
@@ -48,5 +49,82 @@ describe('monsterActionAcquisitionItems', () => {
       actionId: 'bonus-slash',
     })
     expect(items.find((item) => item.id === 'weapon-entry:sword-2')).toBeDefined()
+  })
+})
+
+describe('createSpellActionDraft', () => {
+  it('names the first Actions spell row and leaves bonus and reaction rows unnamed', () => {
+    expect(createSpellActionDraft('actions', {})).toMatchObject({
+      kind: 'spell',
+      name: 'Spellcasting',
+      spells: [],
+    })
+    expect(createSpellActionDraft('actions', {}).castingAbility).toBeUndefined()
+    expect(createSpellActionDraft('bonusActions', {}).name).toBeUndefined()
+    expect(createSpellActionDraft('reactions', {}).name).toBeUndefined()
+  })
+
+  it('does not name a second Spellcasting row and shares the one conventional source', () => {
+    const sections = {
+      actions: [
+        {
+          id: 'spellcasting',
+          kind: 'spell',
+          name: 'Spellcasting',
+          castingAbility: { kind: 'ability', ability: 'int' },
+        },
+      ],
+    }
+    expect(createSpellActionDraft('actions', sections)).toMatchObject({
+      castingAbility: { kind: 'shared', entryId: 'spellcasting' },
+    })
+    expect(createSpellActionDraft('actions', sections).name).toBeUndefined()
+    expect(createSpellActionDraft('bonusActions', sections).castingAbility).toEqual({
+      kind: 'shared',
+      entryId: 'spellcasting',
+    })
+  })
+
+  it('does not share a standalone source or an unfinished Spellcasting row', () => {
+    const standalone = {
+      actions: [
+        {
+          id: 'invisibility',
+          kind: 'spell',
+          name: 'Invisibility',
+          castingAbility: { kind: 'ability', ability: 'cha' },
+        },
+      ],
+    }
+    const unfinished = {
+      actions: [{ id: 'spellcasting', kind: 'spell', name: 'Spellcasting', spells: [] }],
+    }
+    expect(createSpellActionDraft('actions', standalone).name).toBe('Spellcasting')
+    expect(createSpellActionDraft('actions', standalone).castingAbility).toBeUndefined()
+    expect(createSpellActionDraft('bonusActions', unfinished).name).toBeUndefined()
+    expect(createSpellActionDraft('bonusActions', unfinished).castingAbility).toBeUndefined()
+    expect(createSpellActionDraft('actions', unfinished).name).toBeUndefined()
+  })
+
+  it('leaves the ability unset when several conventional sources exist', () => {
+    const sections = {
+      actions: [
+        {
+          id: 'one',
+          kind: 'spell',
+          name: 'Spellcasting',
+          castingAbility: { kind: 'ability', ability: 'int' },
+        },
+      ],
+      bonusActions: [
+        {
+          id: 'two',
+          kind: 'spell',
+          name: 'Spellcasting',
+          castingAbility: { kind: 'ability', ability: 'wis' },
+        },
+      ],
+    }
+    expect(createSpellActionDraft('reactions', sections).castingAbility).toBeUndefined()
   })
 })

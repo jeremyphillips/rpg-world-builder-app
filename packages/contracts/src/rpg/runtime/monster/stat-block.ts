@@ -1,4 +1,5 @@
 import type { MonsterAction, MonsterBody } from '../../content/monster'
+import { findSpellCastingSource } from '../../content/monster/spell-casting-source'
 import { getSkillName } from '../../content/skill-proficiency'
 import { NEUTRAL_ABILITY_SCORE } from '../../vocab/ability'
 import { CHALLENGE_RATING_MECHANICS } from '../../vocab/challenge-rating'
@@ -250,15 +251,6 @@ function deriveSpellcastingLines(
   proficiencyBonus: number,
 ): DerivedMonsterSpellcastingLine[] {
   const sections = ['actions', 'bonusActions', 'reactions'] as const
-  const spells = new Map<
-    string,
-    Extract<MonsterBody['actions'][number] | MonsterBody['reactions'][number], { kind: 'spell' }>
-  >()
-  for (const section of sections) {
-    for (const action of monster[section]) {
-      if (action.kind === 'spell') spells.set(action.id, action)
-    }
-  }
   const lines: DerivedMonsterSpellcastingLine[] = []
   for (const section of sections) {
     for (const action of monster[section]) {
@@ -266,12 +258,7 @@ function deriveSpellcastingLines(
       const ability =
         action.castingAbility.kind === 'ability'
           ? action.castingAbility.ability
-          : (() => {
-              const target = spells.get(action.castingAbility.entryId)
-              return target?.castingAbility?.kind === 'ability'
-                ? target.castingAbility.ability
-                : undefined
-            })()
+          : findSpellCastingSource(monster, action.castingAbility.entryId)?.ability
       if (!ability) continue
       const score = monster.abilityScores[ability]
       lines.push({

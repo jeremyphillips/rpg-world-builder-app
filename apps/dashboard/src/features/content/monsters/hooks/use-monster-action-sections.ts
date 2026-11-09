@@ -9,8 +9,10 @@ import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-
 import {
   createEquippedWeaponAcquisition,
   createMonsterActionFromAcquisition,
+  createSpellActionDraft,
   type MonsterActionAcquisitionChoice,
 } from '../lib/actions/monster-action-acquisition'
+import { monsterCastingDependentLabels } from '../lib/actions/monster-action-casting-summary'
 import { actionAfterSectionMove, actionMoveDropsTrigger } from '../lib/actions/monster-action-kind'
 import {
   multiattacksReferencingAction,
@@ -26,7 +28,10 @@ import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../lib/actions/monster-action-equipment-references'
-import { formatAddedEquipmentNotice } from '../lib/monster-form-labels'
+import {
+  formatAddedEquipmentNotice,
+  formatCastingSourceDeleteNotice,
+} from '../lib/monster-form-labels'
 
 function monsterActionReferenceTitle(action: MonsterActionDraftRow): string {
   const identity = resolveMonsterActionIdentity({
@@ -244,12 +249,15 @@ export function useMonsterActionSections(entityId?: string) {
       section: MonsterActionSection,
       choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
     ) => {
-      const row = createMonsterActionFromAcquisition(choice)
+      const row =
+        choice.type === 'create' && choice.kind === 'spell'
+          ? createSpellActionDraft(section, getValues())
+          : createMonsterActionFromAcquisition(choice)
       editors[section].appendRow(row)
       setSelectedActionId(row.id)
       setNotice(null)
     },
-    [editors],
+    [editors, getValues],
   )
 
   const commitEquippedWeapon = useCallback(
@@ -291,6 +299,11 @@ export function useMonsterActionSections(entityId?: string) {
     (actionId: string) => {
       const located = locate(actionId)
       if (!located) return
+      const castingDependents = monsterCastingDependentLabels(getValues(), actionId)
+      if (castingDependents.length > 0) {
+        setNotice(formatCastingSourceDeleteNotice(castingDependents))
+        return
+      }
       const references =
         located.section === 'actions'
           ? multiattacksReferencingAction(rowsOf(getValues(), 'actions'), actionId)

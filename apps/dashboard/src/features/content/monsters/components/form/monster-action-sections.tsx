@@ -22,10 +22,12 @@ import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
+import { monsterActionCastingEyebrow } from '../../lib/actions/monster-action-casting-summary'
 import {
   monsterActionNavigationTitle,
   resolveMonsterFormActionIdentity,
 } from '../../lib/actions/monster-action-identity'
+import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterActionPending } from '../../hooks/use-monster-action-sections'
 import {
   buildMonsterLoadoutPickerItems,
@@ -177,16 +179,20 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
             return (
               <MasterDetailListPanel
                 key={section}
-                items={rows.map((row, index) => ({
-                  id: row.id,
-                  title: monsterActionNavigationTitle(
-                    resolveMonsterFormActionIdentity(row, values, ctx),
-                  ),
-                  meta: {
-                    sourceLabel: getMonsterActionKindLabel(row.kind),
-                  },
-                  hasError: formState.submitCount > 0 && sections.hasRowError(section, index),
-                }))}
+                items={rows.map((row, index) => {
+                  const castingEyebrow = monsterActionCastingEyebrow(row, values)
+                  return {
+                    id: row.id,
+                    title: monsterActionNavigationTitle(
+                      resolveMonsterFormActionIdentity(row, values, ctx),
+                    ),
+                    meta: {
+                      ...(castingEyebrow ? { eyebrow: castingEyebrow } : {}),
+                      sourceLabel: getMonsterActionKindLabel(row.kind),
+                    },
+                    hasError: formState.submitCount > 0 && sections.hasRowError(section, index),
+                  }
+                })}
                 selectedIndex={selectedIndex >= 0 ? selectedIndex : null}
                 listTitle={SECTION_HEADINGS[section]}
                 ariaLabel={SECTION_HEADINGS[section]}

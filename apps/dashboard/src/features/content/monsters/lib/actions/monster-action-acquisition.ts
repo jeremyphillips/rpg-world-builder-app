@@ -5,8 +5,15 @@ import {
   getDamageTypeLabel,
   getMonsterActionKindLabel,
   listSpecialMenuActionPresetIds,
+  MONSTER_SPELLCASTING_ACTION_NAME,
   type ActionPresetId,
 } from '@rpg/contracts'
+
+import {
+  conventionalSpellcastingSources,
+  spellcastingNameTaken,
+} from './monster-action-casting-summary'
+import type { MonsterActionSection } from './monster-action-equipment-references'
 
 import { monsterAddWeaponShortcut } from '../monster-form-labels'
 import { createMonsterRowId, type MonsterActionDraftRow } from './monster-action-presets'
@@ -212,6 +219,34 @@ export function createMonsterActionFromAcquisition(
   if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] }
   if (choice.kind === 'special') return { id, kind: 'special' }
   return { id, kind: 'attack' }
+}
+
+/** Spell row for the add menu. Names Spellcasting only on Actions, and shares only that source. */
+export function createSpellActionDraft(
+  section: MonsterActionSection,
+  sections: {
+    actions?: readonly unknown[]
+    bonusActions?: readonly unknown[]
+    reactions?: readonly unknown[]
+  },
+): MonsterActionDraftRow {
+  const id = createMonsterRowId()
+  const conventional = conventionalSpellcastingSources(sections)
+  const name =
+    section === 'actions' && !spellcastingNameTaken(sections)
+      ? MONSTER_SPELLCASTING_ACTION_NAME
+      : undefined
+  const castingAbility =
+    conventional.length === 1
+      ? { kind: 'shared' as const, entryId: conventional[0]!.id }
+      : undefined
+  return {
+    id,
+    kind: 'spell',
+    spells: [],
+    ...(name ? { name } : {}),
+    ...(castingAbility ? { castingAbility } : {}),
+  }
 }
 
 /** Equipped catalog row and the weapon action that points at it. One commit, no orphan. */

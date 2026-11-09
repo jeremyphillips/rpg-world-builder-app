@@ -11,6 +11,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { MasterDetailEditorShell } from '../../../components/master-detail/master-detail-editor-shell'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
+import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-summary'
 import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
 import {
   monsterActionNavigationTitle,
@@ -32,22 +33,6 @@ import type { MonsterFormValues } from '../../lib/monster-form-values'
 import type { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
 
 type Sections = ReturnType<typeof useMonsterActionSections>
-
-function sharedCastingOptions(
-  values: MonsterFormValues,
-  actionId: string,
-): { value: string; label: string }[] {
-  const rows = [
-    ...values.actions,
-    ...values.bonusActions,
-    ...values.reactions,
-  ] as MonsterActionDraftRow[]
-  return rows.flatMap((entry) => {
-    if (entry.kind !== 'spell' || entry.id === actionId) return []
-    if (entry.castingAbility?.kind !== 'ability' || !entry.name?.trim()) return []
-    return [{ value: entry.id, label: `Same as ${entry.name}` }]
-  })
-}
 
 function equipmentOptions(
   values: MonsterFormValues,
@@ -94,6 +79,7 @@ export function MonsterActionDetail({
       equipmentOptions: equipmentOptions(values, ctx),
       equipment: values.equipment,
       sharedCastingOptions: sharedCastingOptions(values, action.id),
+      onCastingSourceBlocked: sections.setNotice,
       attackOptions: (values[located.section] ?? [])
         .filter(
           (row) =>
@@ -105,7 +91,7 @@ export function MonsterActionDetail({
           label: monsterActionNavigationTitle(resolveMonsterFormActionIdentity(row, values, ctx)),
         })),
     })
-  }, [action, ctx, located, namePrefix, values])
+  }, [action, ctx, located, namePrefix, sections.setNotice, values])
 
   useEffect(() => {
     if (sections.focusToken === 0 || !action) return

@@ -363,7 +363,7 @@ export function refineMonsterBody(
       refineMonsterActionShape(action, ctx, [...prefix, section, index])
     }
   }
-  refineMonsterSpellEntries(body, ctx, prefix)
+  refineMonsterSpellEntries(body, ctx, prefix, { published: true })
 
   refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
   refineMultiattackReferences(body, ctx, prefix)
