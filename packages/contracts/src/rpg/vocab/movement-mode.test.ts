@@ -184,4 +184,9 @@ describe('formatMovementDisplay', () => {
   it('formats fly-only movement', () => {
     expect(formatMovementDisplay({ fly: 60 })).toBe('Fly 60 ft')
   })
+
+  it('uses the stat-block abbreviation only when asked', () => {
+    expect(formatMovementDisplay({ walk: 20, fly: 40 }, 'ft.')).toBe('Walk 20 ft., Fly 40 ft.')
+    expect(formatMovementDisplay({ walk: 0 }, 'ft.')).toBe('Walk 0 ft.')
+  })
 })

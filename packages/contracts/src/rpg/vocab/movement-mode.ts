@@ -191,13 +191,14 @@ export function resolveCreatureMovement(entity: CreatureLikeMovement): MovementS
 
 /**
  * Dashboard detail/overview formatter (mode-labeled, readable).
+ * The default unit keeps existing species and overview copy. Stat blocks pass `ft.`.
  *
  * @example formatMovementDisplay({ walk: 30 }) // → "Walk 30 ft"
  * @example formatMovementDisplay({ walk: 30, fly: 60 }) // → "Walk 30 ft, Fly 60 ft"
  */
-export function formatMovementDisplay(speeds: MovementSpeeds): string {
+export function formatMovementDisplay(speeds: MovementSpeeds, unit: 'ft' | 'ft.' = 'ft'): string {
   return MOVEMENT_MODES.filter((mode) => speeds[mode] !== undefined)
-    .map((mode) => `${getMovementModeLabel(mode)} ${speeds[mode]} ft`)
+    .map((mode) => `${getMovementModeLabel(mode)} ${speeds[mode]} ${unit}`)
     .join(', ')
 }
 

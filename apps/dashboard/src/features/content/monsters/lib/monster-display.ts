@@ -4,16 +4,18 @@ import {
   CHALLENGE_RATING_MECHANICS,
   formatSignedModifier,
   getAbilityCompactLabel,
-  getChallengeRatingLabel,
   formatCreatureSizeList,
   getDamageTypeLabel,
   getEffectConditionLabel,
   getLanguageLabel,
+  getSenseLabel,
   joinInlineMetadata,
   formatMovementDisplay,
   formatCreatureCommunication,
-  formatMonsterChallengeMetadata,
+  formatExperiencePoints,
+  formatProficiencyBonus,
   formatPassivePerceptionStatPhrase,
+  formatStatBlockRollExpression,
   type Equipment,
   type Monster,
   type MonsterAction,
@@ -146,37 +148,39 @@ function formatAcStatRow(derived: DerivedMonsterStatBlock): ContentStatRowData {
   }
 }
 
+/** The resolver stores `9d8 +18`. The stat-block roll helper expects `9d8+18`. */
+function presentHitDiceFormula(formula: string): string {
+  return formatStatBlockRollExpression(formula.replace(/ ([+-])(?=\d+$)/, '$1'))
+}
+
 function formatHpStatRow(derived: DerivedMonsterStatBlock): ContentStatRowData {
-  const formula = derived.hpClampedToMinimum
-    ? `${derived.hpFormula} ${MONSTER_HP_MINIMUM_NOTE}`
-    : derived.hpFormula
+  const formula = presentHitDiceFormula(derived.hpFormula)
+  const minimum = derived.hpClampedToMinimum
+    ? `, ${MONSTER_HP_MINIMUM_NOTE.replace(/^\((.*)\)$/, '$1')}`
+    : ''
   return {
     id: 'hp',
     label: 'HP',
-    value: joinInlineMetadata([String(derived.hp), formula]) || String(derived.hp),
+    value: `${derived.hp} (${formula}${minimum})`,
   }
 }
 
 function formatSpeedStatRow(monster: Monster): ContentStatRowData {
-  const movement = formatMovementDisplay(monster.movement)
-  const hoverSuffix = monster.hover ? '(hover)' : undefined
+  const movement = formatMovementDisplay(monster.movement, 'ft.')
+  const value = movement && monster.hover ? `${movement} (hover)` : movement
   return {
     id: 'speed',
     label: 'Speed',
-    value: joinInlineMetadata([movement, hoverSuffix]) || movement,
+    value,
   }
 }
 
 function formatCrStatRow(monster: Monster, derived: DerivedMonsterStatBlock): ContentStatRowData {
-  const crLabel = getChallengeRatingLabel(monster.challengeRating)
-  const rewardMetadata = formatMonsterChallengeMetadata({
-    experiencePoints: derived.experiencePoints,
-    proficiencyBonus: derived.proficiencyBonus,
-  })
+  const reward = `${formatExperiencePoints(derived.experiencePoints)}; ${formatProficiencyBonus(derived.proficiencyBonus)}`
   return {
     id: 'cr',
     label: 'CR',
-    value: joinInlineMetadata([crLabel, rewardMetadata]) || crLabel,
+    value: `${monster.challengeRating} (${reward})`,
   }
 }
 
@@ -459,9 +463,10 @@ function responseLabel(text: string | undefined, hasBody: boolean): string | und
 }
 
 function formatSenseLines(monster: Monster, passivePerception?: number): string {
-  const senseParts = monster.senses.map((sense) =>
-    sense.range != null ? `${sense.type} ${sense.range} ft.` : sense.type,
-  )
+  const senseParts = monster.senses.map((sense) => {
+    const label = getSenseLabel(sense.type)
+    return sense.range != null ? `${label} ${sense.range} ft.` : label
+  })
   if (passivePerception != null) {
     senseParts.push(formatPassivePerceptionStatPhrase(passivePerception))
   }

@@ -28,7 +28,40 @@ describe('monster-display', () => {
     })
 
     expect(viewModel.statRows.find((row) => row.id === 'ac')?.value).toContain('14')
-    expect(viewModel.statRows.find((row) => row.id === 'hp')?.value).toContain('7')
+    expect(viewModel.statRows.find((row) => row.id === 'hp')?.value).toBe('7 (3d6 - 3)')
+    expect(viewModel.statRows.find((row) => row.id === 'cr')?.value).toBe('1/8 (XP 25; PB +2)')
+    expect(viewModel.statRows.find((row) => row.id === 'speed')?.value).toBe('Walk 30 ft.')
+    expect(viewModel.detailsLeaves.find((leaf) => leaf.id === 'senses')?.body).toBe(
+      'Darkvision 60 ft., Passive Perception 8',
+    )
+  })
+
+  it('formats hell hound header rows and hover on the speed phrase', () => {
+    const base = pickMonster('hell-hound')
+    const monster = {
+      ...base,
+      hover: true,
+      movement: { walk: 20, fly: 40 },
+    }
+    const derived = tryDeriveMonsterStatBlock(monster, [], [pickSkillProficiency('perception')], {
+      armorClassRules: systemDefaultArmorClassRules(),
+    })
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Fiend',
+      equipmentById: new Map<string, Equipment>(),
+      catalogState: 'ready',
+      derived,
+    })
+
+    expect(viewModel.statRows.find((row) => row.id === 'cr')?.value).toBe('3 (XP 700; PB +2)')
+    expect(viewModel.statRows.find((row) => row.id === 'hp')?.value).toBe('58 (9d8 + 18)')
+    expect(viewModel.statRows.find((row) => row.id === 'speed')?.value).toBe(
+      'Walk 20 ft., Fly 40 ft. (hover)',
+    )
+    expect(viewModel.detailsLeaves.find((leaf) => leaf.id === 'senses')?.body).toBe(
+      'Darkvision 60 ft., Passive Perception 15',
+    )
   })
 
   it('keeps the detail ready when only armor class is a missing reference', () => {
