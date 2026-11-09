@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   CHALLENGE_RATING_MECHANICS,
   deriveMonsterStatBlock,
+  formatMonsterAttackAction,
   formatMonsterMultiattack,
   formatMonsterSaveAction,
   formatMonsterSpellEntry,
@@ -40,6 +41,23 @@ describe('SRD 5.2.1 monster seed', () => {
       expect.objectContaining({ status: 'resolved', value: expect.objectContaining({ ac: 14 }) }),
     )
     expect(block.attacks.find((line) => line.id === 'dagger')?.attackBonus).toBe(4)
+    expect(formatMonsterAttackAction(block.attacks.find((line) => line.id === 'dagger')!)).toBe(
+      'Melee or Ranged Attack Roll: +4, reach 5 ft. or range 20/60 ft. Hit: 4 (1d4 + 2) Piercing damage.',
+    )
+    const skeleton = monsters.find((monster) => monster.slug === 'skeleton')
+    const skeletonBlock = deriveMonsterStatBlock({
+      monster: skeleton!,
+      equipmentCatalog,
+      skillCatalog: new Map(),
+      armorClassRules: systemDefaultArmorClassRules(),
+      magicPropertyProvider: () => undefined,
+    })
+    expect(
+      formatMonsterAttackAction(skeletonBlock.attacks.find((line) => line.id === 'shortsword')!),
+    ).toBe('Melee Attack Roll: +5, reach 5 ft. Hit: 6 (1d6 + 3) Piercing damage.')
+    expect(
+      formatMonsterAttackAction(skeletonBlock.attacks.find((line) => line.id === 'shortbow')!),
+    ).toBe('Ranged Attack Roll: +5, range 80/320 ft. Hit: 6 (1d6 + 3) Piercing damage.')
   })
 
   it('derives Knight, Mage, and Hell Hound stat lines from authored inputs', () => {
@@ -66,7 +84,7 @@ describe('SRD 5.2.1 monster seed', () => {
       attackBonus: 5,
       damage: '10',
       damageExpression: '2d6+3',
-      additionalDamage: [{ average: 4, expression: '1d8', damageTypeLabel: 'Radiant' }],
+      additionalDamage: [{ average: 4, expression: '1d8', damageTypeId: 'radiant' }],
     })
     expect(knight.attacks.find((line) => line.id === 'heavy-crossbow')).toMatchObject({
       attackBonus: 2,
@@ -86,6 +104,11 @@ describe('SRD 5.2.1 monster seed', () => {
       damage: '16',
       damageExpression: '3d8+3',
     })
+    expect(
+      formatMonsterAttackAction(mage.attacks.find((line) => line.id === 'arcane-burst')!),
+    ).toBe(
+      'Melee or Ranged Attack Roll: +6, reach 5 ft. or range 120 ft. Hit: 16 (3d8 + 3) Force damage.',
+    )
     expect(mage.spellcasting.find((line) => line.id === 'spellcasting')).toMatchObject({
       saveDc: 14,
       attackBonus: 6,
@@ -103,6 +126,9 @@ describe('SRD 5.2.1 monster seed', () => {
       damageExpression: '1d8+3',
       additionalDamage: [{ average: 3, expression: '1d6' }],
     })
+    expect(formatMonsterAttackAction(hound.attacks.find((line) => line.id === 'bite')!)).toBe(
+      'Melee Attack Roll: +5, reach 5 ft. Hit: 7 (1d8 + 3) Piercing damage plus 3 (1d6) Fire damage.',
+    )
   })
 
   it('keeps migrated action ids and generates the agreed stat-block text', () => {

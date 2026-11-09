@@ -936,7 +936,7 @@ describe('resolveMonsterHitPoints size', () => {
 })
 
 describe('resolveMonsterActionAttackProfile', () => {
-  it('matches the published dagger line and keeps thrown range without a second attack', () => {
+  it('matches the published dagger line with melee and ranged on one bonus', () => {
     const block = deriveMonsterStatBlock({ monster: kobold, equipmentCatalog, skillCatalog })
     const line = block.attacks.find((attack) => attack.id === 'dagger')
     const profile = resolveMonsterActionAttackProfile({
@@ -953,10 +953,9 @@ describe('resolveMonsterActionAttackProfile', () => {
     expect(profile.value.primary.expression).toBe(line?.damageExpression)
     expect(profile.value.range).toEqual(line?.range)
     expect(profile.value.reach).toBe(5)
-    expect(profile.value.modes).toEqual(['melee'])
+    expect(profile.value.modes).toEqual(['melee', 'ranged'])
     expect(profile.value.sourceLabel).toBe('Dagger')
-    expect(profile.value.unresolvedCapabilities.map((entry) => entry.id)).toEqual(['thrown'])
-    expect(profile.value.unresolvedCapabilities[0]?.reason).toBe('missing-input')
+    expect(profile.value.unresolvedCapabilities).toEqual([])
   })
 
   it('does not apply versatile damage and does not invent dice when damage is missing', () => {

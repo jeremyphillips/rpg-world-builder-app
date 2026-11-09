@@ -101,7 +101,7 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
           {
             type: 'select',
             name: 'mode',
-            label: 'Mode',
+            label: 'Weapon type',
             options: weaponModeOptions,
             required: true,
           },

@@ -22,7 +22,8 @@ export function resolveWeaponAttackAbility(
 
 /**
  * Ability modifier used for attack and damage rolls.
- * Finesse melee weapons use the higher of STR and DEX when both scores exist.
+ * Finesse uses the higher of Strength and Dexterity for melee and ranged weapons.
+ * A thrown melee weapon keeps this modifier. Its catalog type does not become ranged.
  */
 export function resolveWeaponAttackAbilityModifier(
   weapon: WeaponAttackFields,
@@ -30,19 +31,29 @@ export function resolveWeaponAttackAbilityModifier(
 ): number | undefined {
   const strScore = scores.str
   const dexScore = scores.dex
-
-  if (weapon.mode === 'ranged') {
-    return typeof dexScore === 'number' ? abilityModifier(dexScore) : undefined
-  }
+  const strMod = typeof strScore === 'number' ? abilityModifier(strScore) : undefined
+  const dexMod = typeof dexScore === 'number' ? abilityModifier(dexScore) : undefined
 
   if (weapon.properties.includes('finesse')) {
-    const strMod = typeof strScore === 'number' ? abilityModifier(strScore) : undefined
-    const dexMod = typeof dexScore === 'number' ? abilityModifier(dexScore) : undefined
     if (strMod === undefined && dexMod === undefined) return undefined
     return Math.max(strMod ?? Number.NEGATIVE_INFINITY, dexMod ?? Number.NEGATIVE_INFINITY)
   }
 
-  return typeof strScore === 'number' ? abilityModifier(strScore) : undefined
+  if (weapon.mode === 'ranged') return dexMod
+  return strMod
+}
+
+/** Melee reach in feet. Reach weapons add 5 feet. Ranged weapons have no melee reach. */
+export function resolveWeaponAttackReach(weapon: WeaponAttackFields): number | undefined {
+  if (weapon.mode !== 'melee') return undefined
+  return weapon.properties.includes('reach') ? 10 : 5
+}
+
+/** Attack modes a weapon permits. Thrown melee weapons can be used at range. */
+export function resolveWeaponAttackModes(weapon: WeaponAttackFields): Array<'melee' | 'ranged'> {
+  if (weapon.mode === 'ranged') return ['ranged']
+  if (weapon.properties.includes('thrown')) return ['melee', 'ranged']
+  return ['melee']
 }
 
 /** Weapon attack bonus: ability modifier plus proficiency when proficient. */

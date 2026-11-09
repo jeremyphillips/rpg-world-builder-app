@@ -23,7 +23,6 @@ import {
 } from './derived-field'
 import { formatSignedModifier } from '../creature/weapon-attack'
 import {
-  attackProfileOnHitLabels,
   isMonsterActionAttackKind,
   resolveMonsterActionAttackProfile,
   type MonsterActionAttackProfile,
@@ -38,12 +37,13 @@ export type DerivedMonsterAttackLine = {
   attackBonusLabel: string
   damage: string
   damageExpression?: string
-  damageTypeLabel: string
+  damageTypeId: string
   additionalDamage?: Array<{
     expression: string
     average: number
-    damageTypeLabel: string
+    damageTypeId: string
   }>
+  modes: Array<'melee' | 'ranged'>
   reach?: number
   range?: { normal: number; long?: number }
 }
@@ -145,7 +145,11 @@ function attackLineFromProfile(
   id: string,
   section: DerivedMonsterAttackLine['section'],
 ): DerivedMonsterAttackLine {
-  const onHit = attackProfileOnHitLabels(profile.onHit)
+  const onHit = profile.onHit.map((part) => ({
+    expression: part.expression,
+    average: part.average,
+    damageTypeId: part.damageTypeId,
+  }))
   return {
     id,
     section,
@@ -154,8 +158,9 @@ function attackLineFromProfile(
     attackBonusLabel: formatSignedModifier(profile.attackBonus),
     damage: String(profile.primary.average),
     ...(profile.primary.expression ? { damageExpression: profile.primary.expression } : {}),
-    damageTypeLabel: profile.primary.damageTypeId,
+    damageTypeId: profile.primary.damageTypeId,
     ...(onHit.length > 0 ? { additionalDamage: onHit } : {}),
+    modes: [...profile.modes],
     ...(profile.reach !== undefined ? { reach: profile.reach } : {}),
     ...(profile.range ? { range: profile.range } : {}),
   }

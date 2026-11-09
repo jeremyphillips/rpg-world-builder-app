@@ -3,10 +3,10 @@ import { formatAreaGeometry } from '../../primitives/area-geometry'
 import { limitedUseSchema } from '../../primitives/limited-use'
 import type { Ability } from '../../vocab/ability'
 import { getAbilityLabel } from '../../vocab/ability'
-import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
 import { abilityModifier } from '../creature/ability-modifier'
 import { abilitySaveDc } from '../creature/spell-dc'
 import { resolveStatBlockDamagePart } from '../creature/stat-block-average'
+import { formatStatBlockDamageComponent } from './format-stat-block-damage'
 import { formatMonsterLimitedUseHeading } from './spell-entry-presentation'
 
 type SaveAction = Extract<MonsterAction, { kind: 'save' }>
@@ -35,7 +35,11 @@ function damageClause(
 ): string {
   if (amount === 'half') return 'Half damage.'
   const part = resolveStatBlockDamagePart(effect.roll, 0)
-  return `${part.average} (${part.expression}) ${getDamageTypeLabel(effect.damageType)} damage.`
+  return `${formatStatBlockDamageComponent({
+    average: part.average,
+    expression: part.expression,
+    damageTypeId: effect.damageType,
+  })}.`
 }
 
 function outcomeSentence(

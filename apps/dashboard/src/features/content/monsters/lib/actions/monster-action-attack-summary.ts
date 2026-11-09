@@ -86,7 +86,7 @@ export type MonsterActionAttackPreview =
   | { status: 'ready'; modeCaption: string; rows: readonly MonsterActionAttackPreviewRow[] }
 
 function modeCaption(profile: MonsterActionAttackProfile): string {
-  return profile.modes.map((mode) => getWeaponModeLabel(mode)).join(' and ')
+  return profile.modes.map((mode) => getWeaponModeLabel(mode)).join(' or ')
 }
 
 function rangeLabel(range: { normal: number; long?: number }): string {

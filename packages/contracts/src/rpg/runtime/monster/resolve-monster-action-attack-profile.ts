@@ -11,14 +11,18 @@ import type { MagicPropertyDefinitionProvider } from '../../content/equipment/in
 import type { WeaponDamage } from '../../content/equipment/weapon-variant'
 import { type RollValue } from '../../primitives/mechanics/roll'
 import type { Ability } from '../../vocab/ability'
-import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
 import type { WeaponProperty } from '../../vocab/weapon/property'
 import { abilityModifier } from '../creature/ability-modifier'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
 import { isWeaponProficient } from '../creature/proficiencies'
 import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
 import { resolveStatBlockDamagePart } from '../creature/stat-block-average'
-import { resolveWeaponAttackAbilityModifier, weaponAttackBonus } from '../creature/weapon-attack'
+import {
+  resolveWeaponAttackAbilityModifier,
+  resolveWeaponAttackModes,
+  resolveWeaponAttackReach,
+  weaponAttackBonus,
+} from '../creature/weapon-attack'
 import { unavailableField, type DerivedField, type DerivedFieldReason } from './derived-field'
 import { resolveMonsterActionIdentity } from './resolve-monster-action-identity'
 
@@ -40,7 +44,7 @@ export type MonsterActionAttackRoll = {
 }
 
 export type MonsterActionAttackUnresolvedCapability = {
-  id: 'versatile' | 'thrown'
+  id: 'versatile'
   reason: DerivedFieldReason
 }
 
@@ -65,9 +69,8 @@ export type MonsterActionAttackProfile = {
   /** Catalog weapon properties. Absent for authored attacks. */
   weaponProperties?: readonly string[]
   /**
-   * Catalog traits the single attack line does not resolve (versatile two-hand
-   * damage, a separate thrown attack). The resolved primary roll stays the
-   * catalog or authored roll.
+   * Catalog traits the single attack line does not resolve. Versatile two-hand
+   * damage stays here. Thrown is represented as melee and ranged on one profile.
    */
   unresolvedCapabilities: readonly MonsterActionAttackUnresolvedCapability[]
 }
@@ -126,18 +129,19 @@ function governingAbility(
 ): { ability: Ability; modifier: number } | undefined {
   const modifier = resolveWeaponAttackAbilityModifier(weapon, scores)
   if (modifier === undefined) return undefined
-  if (weapon.mode === 'ranged') return { ability: 'dex', modifier }
 
   if (weapon.properties.includes('finesse')) {
     const strMod = typeof scores.str === 'number' ? abilityModifier(scores.str) : undefined
     const dexMod = typeof scores.dex === 'number' ? abilityModifier(scores.dex) : undefined
-    if (dexMod === modifier && (strMod === undefined || dexMod > strMod)) {
-      return { ability: 'dex', modifier }
+    if (strMod === modifier && (dexMod === undefined || strMod >= dexMod)) {
+      return { ability: 'str', modifier }
     }
-    if (strMod === modifier) return { ability: 'str', modifier }
     if (dexMod === modifier) return { ability: 'dex', modifier }
   }
 
+  if (weapon.mode === 'ranged') {
+    return typeof scores.dex === 'number' ? { ability: 'dex', modifier } : undefined
+  }
   return typeof scores.str === 'number' ? { ability: 'str', modifier } : undefined
 }
 
@@ -161,7 +165,6 @@ function unresolvedWeaponCapabilities(
   const unresolved: MonsterActionAttackUnresolvedCapability[] = []
   if (properties.includes('versatile'))
     unresolved.push({ id: 'versatile', reason: 'missing-input' })
-  if (properties.includes('thrown')) unresolved.push({ id: 'thrown', reason: 'missing-input' })
   return unresolved
 }
 
@@ -205,6 +208,8 @@ function resolveWeaponProfile(
   }
   if (!primary.expression) return unavailableField('missing-reference')
 
+  const modes = resolveWeaponAttackModes(catalogItem)
+  const reach = resolveWeaponAttackReach(catalogItem)
   return {
     status: 'resolved',
     value: {
@@ -220,9 +225,9 @@ function resolveWeaponProfile(
       governingAbility: governing.ability,
       proficiencyContribution: proficient ? args.proficiencyBonus : 0,
       attackBonus: totals.attackBonus,
-      modes: [catalogItem.mode],
-      ...(catalogItem.mode === 'melee' ? { reach: 5 } : {}),
-      ...(catalogItem.range ? { range: catalogItem.range } : {}),
+      modes,
+      ...(reach !== undefined ? { reach } : {}),
+      ...(modes.includes('ranged') && catalogItem.range ? { range: catalogItem.range } : {}),
       primary,
       onHit: onHitRolls(action.onHit),
       weaponProperties: catalogItem.properties,
@@ -360,7 +365,7 @@ function resolveAuthoredProfile(
 /**
  * Attack bonus, damage averages, and reach/range for one monster action.
  * Incomplete drafts are unavailable. This does not throw.
- * Versatile two-hand damage is not applied. A thrown weapon does not become a second line.
+ * Versatile two-hand damage is not applied. A thrown melee weapon is one profile with both modes.
  */
 export function resolveMonsterActionAttackProfile(
   args: ResolveMonsterActionAttackProfileInput,
@@ -371,15 +376,4 @@ export function resolveMonsterActionAttackProfile(
   if (action.kind === 'natural-weapon') return resolveNaturalProfile(action, args)
   if (action.kind === 'attack') return resolveAuthoredProfile(action, args)
   return unavailableField('missing-input')
-}
-
-/** Primary damage type labels on stat-block lines stay the id. On-hit parts use display labels. */
-export function attackProfileOnHitLabels(
-  onHit: readonly MonsterActionAttackRoll[],
-): Array<{ expression: string; average: number; damageTypeLabel: string }> {
-  return onHit.map((part) => ({
-    expression: part.expression,
-    average: part.average,
-    damageTypeLabel: getDamageTypeLabel(part.damageTypeId),
-  }))
 }

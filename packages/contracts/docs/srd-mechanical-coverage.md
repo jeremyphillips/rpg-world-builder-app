@@ -62,9 +62,9 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 
 ### `weapon-alternate-modes`
 
-- Concept: a second attack line for versatile damage or a separate thrown attack.
-- Deficiency: missing runtime resolution of that second line. The current policy is one weapon-action line. Versatile damage is not applied. Thrown range stays on the same line and is flagged `unresolvedCapabilities`.
-- Evidence: [weapon-action-modes.md](../../../apps/dashboard/src/features/content/monsters/docs/weapon-action-modes.md) and the fixture tests in `stat-block.test.ts`. The primary attack is supported. Kobold Warrior's dagger is the seeded thrown case. The catalog test asserts its attack bonus only.
+- Concept: versatile two-hand damage as a second damage profile.
+- Deficiency: missing runtime resolution of that alternate damage. A thrown melee weapon is one profile with melee and ranged modes and one attack bonus. Ammunition use is not part of this gap.
+- Evidence: [weapon-action-modes.md](../../../apps/dashboard/src/features/content/monsters/docs/weapon-action-modes.md). Versatile stays on `unresolvedCapabilities`. Kobold Warrior's dagger sentence is a monster fixture for the thrown combined line.
 - Current fallback: the primary line, plus the unresolved-capability flag. Do not invent a second bonus.
 - Importance: standard. It becomes essential only when the SRD prints a second line the seed must match.
 - Owner: weapon attack profile. Characters meet versatile and thrown through inventory, not monster weapon actions.
@@ -74,7 +74,7 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 
 Recorded 2026-11-09 from Open5e `srd-2024` details and the catalog fixtures. A listed literal is a monster SRD fixture. Anything else is unverified. None of these monsters is fully verified.
 
-- **Kobold Warrior** (`srd-cc-5.2.1:kobold-warrior`, `srd-2024_kobold-warrior`). Fidelity not yet verified for the whole block. Open5e: AC 14, HP 7 (`3d6 - 3`), dagger `+4` and `4 (1d4 + 2)` as one melee-or-ranged line (reach 5 or 20/60). Monster fixtures: AC 14, dagger attack bonus 4. Descriptive: Pack Tactics, Sunlight Sensitivity. Gap: `weapon-alternate-modes` (the combined line is not asserted). Disposition: text-supported. Outstanding seed correction: none from this review.
+- **Kobold Warrior** (`srd-cc-5.2.1:kobold-warrior`, `srd-2024_kobold-warrior`). Fidelity not yet verified for the whole block. Open5e: AC 14, HP 7 (`3d6 - 3`), dagger `+4` and `4 (1d4 + 2)` as one melee-or-ranged line (reach 5 or 20/60). Monster fixtures: AC 14, dagger attack bonus 4. Descriptive: Pack Tactics, Sunlight Sensitivity. The dagger sentence is a monster fixture for melee and ranged on one bonus. Versatile damage remains `weapon-alternate-modes`. Disposition: text-supported. Outstanding seed correction: none from this review.
 - **Skeleton** (`srd-cc-5.2.1:skeleton`, `srd-2024_skeleton`). Fidelity not yet verified. Open5e: AC 14, HP 13 (`2d8 + 4`), shortsword and shortbow `+5` and `6 (1d6 + 3)`, poison immunity, exhaustion and poisoned. The seed also stores a bludgeoning vulnerability. Open5e’s vulnerability list is empty, and no excerpt confirms it. Monster fixtures: schema and slug only. Disposition: corrections recommended for that vulnerability. The seed was not changed.
 - **Knight** (`srd-cc-5.2.1:knight`, `srd-2024_knight`). Fidelity not yet verified. Open5e calls the AC natural armor. The seed reaches AC 18 with equipped plate, which matches the tested total. Greatsword and heavy crossbow use catalog weapons, a crossbow damage override, and radiant on-hit damage. Parry is a `special` reaction whose +2 AC stays prose. The seed stores a frightened immunity. Open5e’s condition list is empty, and no excerpt confirms it. Monster fixtures: initiative `+0 (10)`, HP 52, AC 18, both attack lines, the multiattack sentence, and Parry’s kind. Disposition: corrections recommended for frightened. The seed was not changed.
 - **Mage** (`srd-cc-5.2.1:mage`, `srd-2024_mage`). Fidelity not yet verified. Monster fixtures: initiative `+2 (12)`, HP 81, AC 15, Arcane Burst `+6` / `16 (3d8 + 3)`, the multiattack sentence, derived spellcasting `saveDc` 14 and `attackBonus` 6, and the Spellcasting sentence `spell save DC 14`. The attack bonus is not printed. Spell bodies stay on the spell records. Gap: `spell-list-omits-dc-and-attack` for the attack-bonus clause only. `fixedAcOffset` stays, because the excerpt includes Mage Armor in the AC. Disposition: text-supported for the seed. No seed change.
@@ -93,7 +93,7 @@ A monster SRD fixture is an assertion in `packages/catalog/src/monsters/index.te
 - Multiattack sentence. Supported and resolved. Monster fixtures: Knight, Mage, Hell Hound.
 - Spell save DC presentation. Supported and resolved when a listed spell’s resolution method is `saving-throw`. Monster fixture: Mage sentence with DC 14. Prose-only save spells still omit the DC.
 - Spell attack bonus on the Spellcasting sentence. The number is derived (`attackBonus` 6 on Mage). It is not printed. Not a monster fixture for presentation.
-- Thrown second line. Contract fixture only (`unresolvedCapabilities` on a dagger fixture). Not verified on the Kobold seed. Gap `weapon-alternate-modes`.
+- Thrown melee and ranged modes. Supported on one attack bonus. Monster fixture: Kobold Warrior dagger sentence. Versatile two-hand damage remains `weapon-alternate-modes`.
 
 ## Capability log
 

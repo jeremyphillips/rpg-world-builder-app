@@ -6,14 +6,14 @@ An optional `damage` roll replaces the catalog base roll. Ability modifiers and 
 
 Natural-weapon presets from the add menu seed name, damage type, mode, and a default **1d6** damage roll (see `DEFAULT_NATURAL_DAMAGE` in `content/action/action-presets.ts`). Authors can change the roll in the detail panel.
 
-| Source               | What the resolver uses                                                                                                                            |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Catalog `mode`       | Melee or ranged. Melee lines include reach 5. Ranged lines do not.                                                                                |
-| Catalog `range`      | Copied onto that same line when the item has a range, including a melee weapon with a thrown range.                                               |
-| Catalog `properties` | Listed on the attack profile. They do not add a second line.                                                                                      |
-| `versatileDamage`    | Not applied. The primary roll is the catalog damage roll (or the action's damage override). Versatile is reported unavailable.                    |
-| Thrown               | Not a separate attack. Catalog range still appears on the one line. Thrown is reported unavailable so the summary does not invent a second bonus. |
-| Reach property       | Not added to the 5-foot melee reach. The published line stays at 5 feet, matching the stat block.                                                 |
+| Source               | What the resolver uses                                                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Catalog `mode`       | Melee or ranged. Melee lines include reach 5. Ranged lines do not.                                                                         |
+| Catalog `range`      | Copied onto that same line when the item has a range, including a melee weapon with a thrown range.                                        |
+| Catalog `properties` | Listed on the attack profile. They do not add a second line.                                                                               |
+| `versatileDamage`    | Not applied. The primary roll is the catalog damage roll (or the action's damage override). Versatile is reported unavailable.             |
+| Thrown               | Not a separate attack. A melee weapon with Thrown resolves melee and ranged on one attack bonus. A ranged weapon with Thrown stays ranged. |
+| Reach property       | Not added to the 5-foot melee reach. The published line stays at 5 feet, matching the stat block.                                          |
 
 `kind: 'attack'` is different: `modes` can include melee and ranged together, and reach or range is kept only for the modes that are selected.
 

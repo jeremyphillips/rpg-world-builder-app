@@ -20,6 +20,7 @@ import {
   type MonsterReaction,
   type SkillProficiency,
   deriveMonsterStatBlock,
+  formatMonsterAttackAction,
   formatMonsterLimitedUseHeading,
   formatMonsterMultiattack,
   formatMonsterSaveAction,
@@ -195,24 +196,6 @@ function buildAbilityRows(monster: Monster, derived: DerivedMonsterStatBlock): M
   })
 }
 
-function formatAttackLine(line: DerivedMonsterAttackLine): string {
-  const reachPart =
-    line.reach != null
-      ? `reach ${line.reach} ft.`
-      : line.range
-        ? `range ${line.range.normal}/${line.range.long ?? '—'} ft.`
-        : undefined
-  const hitPart = joinInlineMetadata([`${line.attackBonusLabel} to hit`, reachPart, 'one target'])
-  const primary = line.damageExpression ? `${line.damage} (${line.damageExpression})` : line.damage
-  const extra = (line.additionalDamage ?? [])
-    .map((part) => `${part.average} (${part.expression}) ${part.damageTypeLabel}`)
-    .join(' plus ')
-  const damagePart = extra
-    ? `Hit: ${primary} ${line.damageTypeLabel} damage plus ${extra} damage`
-    : `Hit: ${primary} ${line.damageTypeLabel} damage`
-  return joinInlineMetadata([hitPart, damagePart]) || line.name
-}
-
 function findAttackLine(
   derived: DerivedMonsterStatBlock | null | undefined,
   section: DerivedMonsterAttackLine['section'],
@@ -318,7 +301,7 @@ function resolveActionAttackLine(
   attack: DerivedMonsterAttackLine | undefined,
 ): string | undefined {
   if (catalogState === 'ready' && attack) {
-    return formatAttackLine(attack)
+    return formatMonsterAttackAction(attack) ?? MONSTER_UNRESOLVED_CATALOG_REFERENCE
   }
   if (catalogState === 'error' || (catalogState === 'ready' && !attack)) {
     return MONSTER_UNRESOLVED_CATALOG_REFERENCE
