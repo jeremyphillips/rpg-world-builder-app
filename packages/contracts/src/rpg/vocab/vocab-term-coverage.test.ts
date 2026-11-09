@@ -71,6 +71,10 @@ import { TELEPATHY_TERM } from './mechanics/telepathy'
 import { SAVING_THROW_TERM } from './mechanics/saving-throw'
 import { MOVEMENT_MODE_TERM, MOVEMENT_OPERATION_TERM } from './movement-mode'
 import { ACTION_GROUP_TERM, ACTION_VOCABULARY_TERM } from './action/action-vocabulary'
+import {
+  CREATURE_TRAIT_GROUP_TERM,
+  CREATURE_TRAIT_VOCABULARY_TERM,
+} from './creature/trait-vocabulary'
 import { NATURAL_ATTACK_FORM_TERM } from './action/natural-attack-form'
 import { PROFICIENCY_TERM } from './proficiency'
 import { SENSE_TERM } from './sense'
@@ -155,6 +159,8 @@ const RPG_VOCAB_CLOSED_TERMS = [
   NPC_WEALTH_TIER_TERM,
   ACTION_GROUP_TERM,
   ACTION_VOCABULARY_TERM,
+  CREATURE_TRAIT_GROUP_TERM,
+  CREATURE_TRAIT_VOCABULARY_TERM,
   NATURAL_ATTACK_FORM_TERM,
   RESOLUTION_APPLICATION_AMOUNT_TERM,
   RESOLUTION_METHOD_KIND_TERM,
@@ -225,7 +231,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(62)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(64)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }

@@ -22,11 +22,13 @@ import {
   type MonsterReaction,
   type SkillProficiency,
   deriveMonsterStatBlock,
+  formatCreatureTrait,
   formatMonsterAttackAction,
   formatMonsterLimitedUseHeading,
   formatMonsterMultiattack,
   formatMonsterSaveAction,
   formatMonsterSpellEntry,
+  formatMonsterStatBlockSubject,
   appendMonsterActionSupplementalHtml,
   appendMonsterActionSupplementalText,
   resolveMonsterActionIdentity,
@@ -591,6 +593,32 @@ function buildDetailsLeaves(
   ].filter((leaf): leaf is MonsterDetailsLeafViewModel => leaf != null)
 }
 
+function escapeTraitSentence(value: string): string {
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+}
+
+function mapMonsterTrait(
+  trait: Monster['traits'][number],
+  monsterName: string,
+): MonsterTraitItemViewModel {
+  if ('preset' in trait) {
+    const formatted = formatCreatureTrait({
+      presetId: trait.preset,
+      subject: formatMonsterStatBlockSubject(monsterName),
+    })
+    return {
+      id: trait.id,
+      name: formatted?.name ?? trait.preset,
+      descriptionHtml: formatted ? `<p>${escapeTraitSentence(formatted.sentence)}</p>` : '',
+    }
+  }
+  return {
+    id: trait.id,
+    name: trait.name,
+    descriptionHtml: trait.description,
+  }
+}
+
 export function buildMonsterDetailViewModel({
   monster,
   creatureTypeLabel,
@@ -642,11 +670,7 @@ export function buildMonsterDetailViewModel({
     statRows,
     abilities,
     detailsLeaves: buildDetailsLeaves(monster, derived, equipmentById, catalogState),
-    traits: monster.traits.map((trait) => ({
-      id: trait.id,
-      name: trait.name,
-      descriptionHtml: trait.description,
-    })),
+    traits: monster.traits.map((trait) => mapMonsterTrait(trait, monster.name)),
     actions: mapActionItems(monster.actions, 'actions', derived, catalogState, spellContext),
     bonusActions: mapActionItems(
       monster.bonusActions,

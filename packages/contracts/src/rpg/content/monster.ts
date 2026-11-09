@@ -24,7 +24,7 @@ import {
   equipmentInstanceSchemaBase,
   refineCreatureDamageDefenses,
 } from './creature'
-import { customContentTraitSchema } from './lib/grants/grants'
+import { CREATURE_TRAIT_VOCABULARY_IDS } from '../vocab/creature/trait-vocabulary'
 import { MONSTER_CONTENT_TYPE_TERM } from '../primitives/content/content-type-terms'
 import {
   createDraftInputSchema,
@@ -80,16 +80,41 @@ export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
   creatureStatBlockHitPointsSchema.extend({ kind: z.literal('fixed') }),
 ])
 
-export const monsterTraitSchema = customContentTraitSchema
-  .pick({ id: true, name: true })
-  .extend({ description: z.string().min(1), ...entryProvenanceField })
+const monsterPresetTraitSchema = z.object({
+  id: z.string().min(1),
+  preset: z.enum(CREATURE_TRAIT_VOCABULARY_IDS),
+  ...entryProvenanceField,
+})
 
-export const monsterTraitDraftSchema = z.object({
+const monsterCustomTraitSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  ...entryProvenanceField,
+})
+
+/** Preset traits are matched first so a `preset` id is not stripped as a custom row. */
+export const monsterTraitSchema = z.union([monsterPresetTraitSchema, monsterCustomTraitSchema])
+
+const monsterPresetTraitDraftSchema = z.object({
+  id: z.string().min(1),
+  preset: z.enum(CREATURE_TRAIT_VOCABULARY_IDS),
+  ...entryProvenanceField,
+})
+
+const monsterCustomTraitDraftSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).optional(),
   description: z.string().min(1).optional(),
   ...entryProvenanceField,
 })
+
+export const monsterTraitDraftSchema = z.union([
+  monsterPresetTraitDraftSchema,
+  monsterCustomTraitDraftSchema,
+])
+
+export type MonsterTrait = z.infer<typeof monsterTraitSchema>
 
 const monsterEquipmentEntrySchemaParsed = equipmentInstanceSchemaBase
   .extend({ entryId: z.string().min(1) })
@@ -212,6 +237,26 @@ function refineMonsterProficiencies(
       }
       seenWeaponCategories.add(target.weaponCategory)
     }
+  })
+}
+
+function traitPresetId(trait: { preset?: string } | { name?: string }): string | undefined {
+  return 'preset' in trait ? trait.preset : undefined
+}
+
+function refineUniqueTraitPresets(
+  traits: readonly ({ preset?: string } | { name?: string })[],
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
+  const seen = new Set<string>()
+  traits.forEach((trait, index) => {
+    const preset = traitPresetId(trait)
+    if (!preset) return
+    if (seen.has(preset)) {
+      addCustomRefinementIssue(ctx, 'Trait presets must be unique.', [...path, index, 'preset'])
+    }
+    seen.add(preset)
   })
 }
 
@@ -349,6 +394,7 @@ export function refineMonsterBody(
     [...prefix, 'traits'],
     'Trait ids must be unique.',
   )
+  refineUniqueTraitPresets(body.traits, ctx, [...prefix, 'traits'])
 
   const actionIds = collectActionIds(body)
   if (new Set(actionIds).size !== actionIds.length) {
@@ -419,6 +465,7 @@ function refineMonsterDraftIds(
     [...prefix, 'traits'],
     'Trait ids must be unique.',
   )
+  refineUniqueTraitPresets(body.traits ?? [], ctx, [...prefix, 'traits'])
 
   const actionIds = collectActionIds({
     actions: body.actions ?? [],

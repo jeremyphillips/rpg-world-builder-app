@@ -147,6 +147,12 @@ describe('monster-display', () => {
       ),
     ).toBe(true)
     expect(viewModel.traits.length).toBeGreaterThan(0)
+    expect(viewModel.traits.map((trait) => trait.name)).toEqual([
+      'Pack Tactics',
+      'Sunlight Sensitivity',
+    ])
+    expect(viewModel.traits[0]?.descriptionHtml).toContain('The kobold warrior')
+    expect(viewModel.traits[0]?.descriptionHtml).toContain('its allies')
   })
 
   it('labels an authored reaction trigger and its response', () => {

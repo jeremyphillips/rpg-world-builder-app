@@ -26,6 +26,22 @@ describe('SRD 5.2.1 monster seed', () => {
     )
   })
 
+  it('stores the repeated general traits as presets', () => {
+    const kobold = monsters.find((monster) => monster.slug === 'kobold-warrior')
+    const hound = monsters.find((monster) => monster.slug === 'hell-hound')
+    expect(kobold?.traits).toEqual([
+      expect.objectContaining({ id: 'pack-tactics', preset: 'pack-tactics' }),
+      expect.objectContaining({ id: 'sunlight-sensitivity', preset: 'sunlight-sensitivity' }),
+    ])
+    expect(hound?.traits).toEqual([
+      expect.objectContaining({ id: 'pack-tactics', preset: 'pack-tactics' }),
+    ])
+    const presetRows = monsters.flatMap((monster) =>
+      monster.traits.filter((trait) => 'preset' in trait),
+    )
+    expect(presetRows).toHaveLength(3)
+  })
+
   it('derives kobold warrior AC and dagger attack from catalog equipment', () => {
     const kobold = monsters.find((monster) => monster.slug === 'kobold-warrior')
     expect(kobold).toBeDefined()

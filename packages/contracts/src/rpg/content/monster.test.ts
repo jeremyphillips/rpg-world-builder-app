@@ -152,6 +152,44 @@ describe('monsterBodySchema refinements', () => {
     ).toBe(false)
   })
 
+  it('rejects a second copy of the same trait preset on publish and draft', () => {
+    const traits = [
+      { id: 'pack-1', preset: 'pack-tactics' as const },
+      { id: 'pack-2', preset: 'pack-tactics' as const },
+    ]
+    expect(
+      createMonsterInputSchema.safeParse({ slug: 'dup-preset', ...baseBody, traits }).success,
+    ).toBe(false)
+    expect(
+      createMonsterDraftInputSchema.safeParse({ slug: 'dup-preset', ...baseBody, traits }).success,
+    ).toBe(false)
+  })
+
+  it('publishes a preset trait without a description and still requires custom prose', () => {
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'preset-trait',
+        ...baseBody,
+        traits: [{ id: 'pack', preset: 'pack-tactics' }],
+      }).success,
+    ).toBe(true)
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'custom-trait',
+        ...baseBody,
+        traits: [{ id: 'eldritch', name: 'Eldritch Restoration' }],
+      }).success,
+    ).toBe(false)
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'swarm-climb',
+        ...baseBody,
+        name: 'Swarm of Insects',
+        traits: [{ id: 'climb', preset: 'spider-climb' }],
+      }).success,
+    ).toBe(true)
+  })
+
   it('rejects duplicate trait ids on publish and draft', () => {
     const traits = [
       { id: 'pack', name: 'Pack', description: '<p>A</p>' },

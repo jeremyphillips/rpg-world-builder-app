@@ -26,4 +26,4 @@ Derived values follow SRD 5.2.1 table math unless the body explicitly overrides 
 
 System monsters default to **DM-only** campaign visibility via `CONTENT_ACCESS_CAPABILITIES.monsters.defaultVisibilityMode`.
 
-See also `docs/runtime-resolution-boundaries.md`, [srd-mechanical-coverage.md](./srd-mechanical-coverage.md), and `apps/api/docs/campaign-access-enforcement.md`.
+See also `docs/runtime-resolution-boundaries.md`, [srd-mechanical-coverage.md](./srd-mechanical-coverage.md), [creature-trait-inventory.md](./creature-trait-inventory.md), and `apps/api/docs/campaign-access-enforcement.md`.

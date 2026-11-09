@@ -1378,30 +1378,75 @@
       "default": [],
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "minLength": 1
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "preset": {
+                "type": "string",
+                "enum": [
+                  "amphibious",
+                  "ice-walk",
+                  "sunlight-sensitivity",
+                  "agile",
+                  "amorphous",
+                  "earth-glide",
+                  "flyby",
+                  "incorporeal-movement",
+                  "running-leap",
+                  "spider-climb",
+                  "tunneler",
+                  "web-walker",
+                  "lightning-absorption",
+                  "magic-resistance",
+                  "pack-tactics",
+                  "siege-monster",
+                  "undead-fortitude",
+                  "immutable-form"
+                ],
+                "description": "amphibious | ice-walk | sunlight-sensitivity | agile | amorphous | earth-glide | flyby | incorporeal-movement | running-leap | spider-climb | tunneler | web-walker | lightning-absorption | magic-resistance | pack-tactics | siege-monster | undead-fortitude | immutable-form"
+              },
+              "provenance": {
+                "$ref": "#/definitions/__schema59"
+              }
+            },
+            "required": [
+              "id",
+              "preset"
+            ],
+            "additionalProperties": false
           },
-          "name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "description": {
-            "type": "string",
-            "minLength": 1
-          },
-          "provenance": {
-            "$ref": "#/definitions/__schema59"
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "provenance": {
+                "$ref": "#/definitions/__schema59"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "description"
+            ],
+            "additionalProperties": false
           }
-        },
-        "required": [
-          "id",
-          "name",
-          "description"
-        ],
-        "additionalProperties": false
+        ]
       }
     },
     "__schema59": {

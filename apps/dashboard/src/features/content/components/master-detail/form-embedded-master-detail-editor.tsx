@@ -57,6 +57,13 @@ export interface FormEmbeddedMasterDetailEditorProps {
   /** Accessible name for the list nav — must remain independent from `listTitle`. */
   ariaLabel: string
   addLabel: string
+  /**
+   * Replaces the default Add button. Species and other callers omit this and keep
+   * the plain button that appends `makeItemDefaults`.
+   */
+  addControl?: ReactNode
+  /** Row-specific detail fields. When omitted, every row uses `itemFields`. */
+  resolveItemFields?: (row: unknown) => FormItem[]
   /** Prefix for detail `FormItems` ids, e.g. `species-trait`. */
   idPrefix: string
   mapListItem: (
@@ -107,6 +114,25 @@ interface FormEmbeddedMasterDetailEditorBodyProps extends Omit<
   editor: UseMasterDetailArrayResult
 }
 
+function embeddedDetailFields(
+  itemFields: FormItem[],
+  resolveItemFields: ((row: unknown) => FormItem[]) | undefined,
+  selectedRow: { formIndex: number } | undefined,
+  watched: unknown[] | undefined,
+): FormItem[] {
+  if (!resolveItemFields) return itemFields
+  const row = selectedRow ? watched?.[selectedRow.formIndex] : undefined
+  return resolveItemFields(row)
+}
+
+function embeddedListAddProps(
+  addControl: ReactNode | undefined,
+  onAdd: () => void,
+): { addControl: ReactNode } | { onAdd: () => void } {
+  if (addControl) return { addControl }
+  return { onAdd }
+}
+
 function FormEmbeddedMasterDetailEditorBody({
   formCtx,
   fieldName,
@@ -115,6 +141,8 @@ function FormEmbeddedMasterDetailEditorBody({
   listTitle,
   ariaLabel,
   addLabel,
+  addControl,
+  resolveItemFields,
   idPrefix,
   mapListItem,
   editor,
@@ -350,6 +378,8 @@ function FormEmbeddedMasterDetailEditorBody({
     return index === -1 ? null : index
   }, [editor.selectedFieldId, visibleRows])
 
+  const detailFields = embeddedDetailFields(itemFields, resolveItemFields, selectedRow, watched)
+
   const masterDetailGrid = (
     <MasterDetailGrid>
       <MasterDetailListPanel
@@ -361,13 +391,13 @@ function FormEmbeddedMasterDetailEditorBody({
         itemNoun={itemNoun}
         countSupplement={countSupplement}
         invalidItemCount={invalidItemCount}
-        onAdd={editor.handleAdd}
+        {...embeddedListAddProps(addControl, editor.handleAdd)}
         onSelect={handleSelect}
       />
 
       <MasterDetailEditorPanel
         editor={editor}
-        itemFields={itemFields}
+        itemFields={detailFields}
         fieldName={fieldName}
         idPrefix={idPrefix}
         itemNoun={itemNoun}

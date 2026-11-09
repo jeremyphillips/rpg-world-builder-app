@@ -67,8 +67,7 @@
     "traits": [
       {
         "id": "pack-tactics",
-        "name": "Pack Tactics",
-        "description": "<p>The kobold has Advantage on an attack roll against a creature if at least one of the kobold's allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.</p>",
+        "preset": "pack-tactics",
         "provenance": {
           "excerpt": {
             "documentId": "srd-5.2.1",
@@ -78,8 +77,7 @@
       },
       {
         "id": "sunlight-sensitivity",
-        "name": "Sunlight Sensitivity",
-        "description": "<p>While in sunlight, the kobold has Disadvantage on ability checks and attack rolls.</p>",
+        "preset": "sunlight-sensitivity",
         "provenance": {
           "excerpt": {
             "documentId": "srd-5.2.1",
@@ -552,8 +550,7 @@
     "traits": [
       {
         "id": "pack-tactics",
-        "name": "Pack Tactics",
-        "description": "<p>The hound has Advantage on an attack roll against a creature if at least one of the hound's allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.</p>",
+        "preset": "pack-tactics",
         "provenance": {
           "excerpt": {
             "documentId": "srd-5.2.1",
