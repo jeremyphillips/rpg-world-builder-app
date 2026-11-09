@@ -35,7 +35,7 @@ character assembly      ← stored sheet shapes (PC + NPC today)
         ↓
 character-builder       ← draft, ChoiceSets, validation, finalize orchestration
 
-monster assembly        ← future; also consumes creature primitives, not builder
+monster assembly        ← runtime/monster/; consumes creature primitives, not builder
 ```
 
 Each layer answers a different question. If a function needs types or concepts
@@ -402,10 +402,10 @@ Track refactors against this doc. Not exhaustive — update as files move.
 - thin `resolve-*-choices.ts` adapters; finalize orchestration lives in `assemble-*.ts`;
   creature primitives in `runtime/creature/`.
 
-| Current module              | Issue                          | Disposition                                               |
-| --------------------------- | ------------------------------ | --------------------------------------------------------- |
-| `character/derive/index.ts` | Mixes `resolve*` and `derive*` | Acceptable within derive; do not add grant expansion here |
-| `creature/proficiencies.ts` | Not yet created                | Deferred until grant finalize needs shared pool expansion |
+| Current module              | Issue                                              | Disposition                                               |
+| --------------------------- | -------------------------------------------------- | --------------------------------------------------------- |
+| `character/derive/index.ts` | Mixes `resolve*` and `derive*`                     | Acceptable within derive; do not add grant expansion here |
+| `creature/proficiencies.ts` | Exists. Expands grant pools for creature surfaces. | Keep. Do not treat the file as missing.                   |
 
 ---
 
