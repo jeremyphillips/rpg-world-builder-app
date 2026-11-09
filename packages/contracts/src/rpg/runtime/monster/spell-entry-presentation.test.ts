@@ -30,6 +30,42 @@ describe('formatMonsterSpellEntry', () => {
     expect(rendered.bodyHtml).toContain('2/Day Each: <em>Fireball</em>, <em>Lightning Bolt</em>')
     expect(rendered.bodyHtml).toContain('1/Day: <em>Raise Dead</em>')
     expect(rendered.bodyHtml).not.toContain('At Will Each')
+    expect(rendered.bodyHtml).not.toContain('spell save DC')
+  })
+
+  it('prints a derived save DC only when a listed spell resolves with a saving throw', () => {
+    const fireballId = 'srd-cc-5.2.1:fireball'
+    const withSave = new Map(spellsById)
+    const fireball = withSave.get(fireballId)
+    expect(fireball).toBeDefined()
+    withSave.set(fireballId, {
+      ...fireball!,
+      resolution: { method: { kind: 'saving-throw' } },
+    })
+    const rendered = formatMonsterSpellEntry({
+      entry: SPELLCASTING_ACTION,
+      monsterName: 'Mage',
+      section: 'actions',
+      spellsById: withSave,
+      catalogStatus: 'ready',
+      spellsInBody,
+      saveDc: 14,
+    })
+    expect(rendered.bodyHtml).toContain(
+      'The mage casts one of the following spells, using Intelligence as the spellcasting ability (spell save DC 14):',
+    )
+
+    const shared = formatMonsterSpellEntry({
+      entry: MISTY_STEP_BONUS_ACTION,
+      monsterName: 'Mage',
+      section: 'bonusActions',
+      spellsById: withSave,
+      catalogStatus: 'ready',
+      spellsInBody,
+      saveDc: 14,
+    })
+    expect(shared.bodyHtml).not.toContain('spell save DC')
+    expect(shared.bodyHtml).toContain('using the same spellcasting ability as Spellcasting')
   })
 
   it('renders Protective Magic and Misty Step from structure', () => {

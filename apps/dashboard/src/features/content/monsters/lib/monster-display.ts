@@ -354,6 +354,9 @@ function mapActionItem(
   const name = withLimitedUseHeading(identity.displayName, action.limitedUse)
 
   if (action.kind === 'spell') {
+    const spellLine = derived?.spellcasting.find(
+      (line) => line.id === action.id && line.section === section,
+    )
     const rendered = formatMonsterSpellEntry({
       entry: { ...action, name: identity.displayName },
       monsterName: spells.monsterName,
@@ -361,6 +364,7 @@ function mapActionItem(
       spellsById: spells.spellsById,
       catalogStatus: spells.catalogStatus,
       spellsInBody: spells.spellsInBody,
+      saveDc: spellLine?.saveDc,
     })
     const descriptionHtml = appendMonsterActionSupplementalHtml(
       rendered.bodyHtml,

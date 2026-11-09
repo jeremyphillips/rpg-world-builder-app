@@ -53,13 +53,41 @@ function listPhrase(labels: string[]): string {
   return `${labels.slice(0, -1).join(', ')}, or ${labels[labels.length - 1]}`
 }
 
-function abilityPhrase(entry: SpellEntry, spellsInBody: ReadonlyMap<string, SpellEntry>): string {
+function resolutionMethodKind(
+  spellId: string | undefined,
+  spellsById: ReadonlyMap<string, MonsterReferencedSpell> | undefined,
+  catalogStatus: 'ready' | 'unavailable',
+): string | undefined {
+  if (catalogStatus !== 'ready' || !spellId) return undefined
+  return spellsById?.get(spellId)?.resolution?.method?.kind
+}
+
+function directSaveDcSuffix(args: {
+  entry: SpellEntry
+  spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
+  catalogStatus: 'ready' | 'unavailable'
+  saveDc?: number
+}): string {
+  if (args.entry.castingAbility?.kind !== 'ability' || args.saveDc === undefined) return ''
+  const hasSavingThrow = args.entry.spells.some(
+    (spell) =>
+      resolutionMethodKind(spell.spellId, args.spellsById, args.catalogStatus) === 'saving-throw',
+  )
+  if (!hasSavingThrow) return ''
+  return ` as the spellcasting ability (spell save DC ${args.saveDc})`
+}
+
+function abilityPhrase(
+  entry: SpellEntry,
+  spellsInBody: ReadonlyMap<string, SpellEntry>,
+  saveDcSuffix: string,
+): string {
   if (entry.castingAbility?.kind === 'shared') {
     const target = spellsInBody.get(entry.castingAbility.entryId)
     return `using the same spellcasting ability as ${target?.name ?? 'that entry'}`
   }
   if (entry.castingAbility?.kind === 'ability') {
-    return `using ${getAbilityLabel(entry.castingAbility.ability)}`
+    return `using ${getAbilityLabel(entry.castingAbility.ability)}${saveDcSuffix}`
   }
   return 'using its spellcasting ability'
 }
@@ -120,6 +148,7 @@ function castingSentence(args: {
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   catalogStatus: 'ready' | 'unavailable'
   spellsInBody: ReadonlyMap<string, SpellEntry>
+  saveDcSuffix: string
 }): string {
   const labels = args.entry.spells.map((spell) =>
     spellName(spell, args.spellsById, args.catalogStatus),
@@ -130,7 +159,7 @@ function castingSentence(args: {
     MONSTER_SECTION_ECONOMY[args.section] === 'reaction'
       ? " in response to the spell's trigger"
       : ''
-  return `<p>${capitalSubject} casts ${listPhrase(labels)}${response}, ${abilityPhrase(args.entry, args.spellsInBody)}${componentPhrase(args.entry.omittedComponents)}.</p>`
+  return `<p>${capitalSubject} casts ${listPhrase(labels)}${response}, ${abilityPhrase(args.entry, args.spellsInBody, args.saveDcSuffix)}${componentPhrase(args.entry.omittedComponents)}.</p>`
 }
 
 export function formatMonsterLimitedUseHeading(name: string, limitedUse?: LimitedUse): string {
@@ -145,6 +174,8 @@ export function formatMonsterSpellEntry(args: {
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   catalogStatus: 'ready' | 'unavailable'
   spellsInBody: ReadonlyMap<string, SpellEntry>
+  /** Derived with `abilitySaveDc`. Omitted numbers are not printed. */
+  saveDc?: number
 }): { heading: string; bodyHtml: string } {
   const entryLimit = limitedUseSchema.safeParse(args.entry.limitedUse)
   const heading = formatMonsterLimitedUseHeading(
@@ -155,12 +186,20 @@ export function formatMonsterSpellEntry(args: {
   const perSpellLimits = args.entry.spells.some((spell) => spell.limitedUse)
   const useGroupLabels =
     args.section !== 'reactions' && (groups.length > 1 || perSpellLimits) && !args.entry.limitedUse
+  const saveDcSuffix = directSaveDcSuffix(args)
+  const subject = formatMonsterStatBlockSubject(args.monsterName)
+  const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
+  const groupedIntro =
+    useGroupLabels && saveDcSuffix
+      ? `<p>${capitalSubject} casts one of the following spells, ${abilityPhrase(args.entry, args.spellsInBody, saveDcSuffix)}:</p>`
+      : ''
   const bodyHtml = useGroupLabels
-    ? groups
+    ? groupedIntro +
+      groups
         .map((group) =>
           groupLine(group.spells, group.limitedUse, args.spellsById, args.catalogStatus),
         )
         .join('')
-    : castingSentence(args)
+    : castingSentence({ ...args, saveDcSuffix })
   return { heading, bodyHtml }
 }

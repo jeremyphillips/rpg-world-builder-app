@@ -125,6 +125,8 @@ Classify each discrepancy with an owner, a severity, and confirmed or uncertain.
 
 Disposition, separate from the score: **Verified** for a named scope, **Corrections recommended**, **Text-supported**, or **Needs reconciliation**. Verified never means the whole monster when only some fields were tested. "No change" is a complete result.
 
+`review` and `assess` do not update the gap registry. When the user approves recording a finished review, update [`srd-mechanical-coverage.md`](../../../packages/contracts/docs/srd-mechanical-coverage.md) with the compact seed row and any confirmed gap note. That approval is not a new mode, and it does not approve seed or schema edits.
+
 ---
 
 ## Tests

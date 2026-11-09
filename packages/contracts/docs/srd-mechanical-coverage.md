@@ -37,8 +37,8 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 - Evidence: monster saves accept damage only. Grapple or restraint stays in an outcome `note`. The spell roadmap already names the `condition` capability in [effect-capability-roadmap.md](./effect-resolution/effect-capability-roadmap.md).
 - Current fallback: outcome `note` for a rider. That fallback leaves this gap open.
 - Importance: essential when the condition is the feature's main effect.
-- Owner: shared effect envelope, then monster saves. Characters meet the same hole through spells and features. Do not add a monster-only condition effect.
-- Approval: open. Implementation: not started.
+- Owner: not chosen. The shared effect envelope is a candidate, along with spell outcomes and on-hit damage. A condition effect would also need duration, removal, repeat saves, and escape, which that envelope does not express. Monsters, spells, characters, and other creature abilities are all possible consumers. Dire Wolf's bite applies Prone on a hit, which is an on-hit consumer rather than a save. Do not add a monster-only condition effect.
+- Approval: open. Implementation: not started. Research only. No owner has been selected.
 
 ### `trait-spellcasting`
 
@@ -53,12 +53,12 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 ### `spell-list-omits-dc-and-attack`
 
 - Concept: the printed spellcasting sentence's save DC and, when the SRD prints it, spell attack bonus.
-- Deficiency: missing stat-block presentation. `deriveSpellcastingLines` already computes both. `formatMonsterSpellEntry` does not print them.
-- Evidence: [monster-stat-blocks.md](./monster-stat-blocks.md). Mage's derived numbers have no test assertion, so they are unverified. Do not treat this as a missing resolver.
-- Current fallback: none in the generated sentence. Do not paste the SRD DC into description HTML to hide the omission.
+- Deficiency: missing stat-block presentation for the attack-bonus clause. `deriveSpellcastingLines` already computes both numbers. The save DC is printed when a listed spell has a saving-throw resolution.
+- Evidence: [monster-stat-blocks.md](./monster-stat-blocks.md). `formatMonsterSpellEntry` prints `spell save DC N` only when that entry has a direct casting ability and one of its own spells has `resolution.method.kind === 'saving-throw'`. The number is the derived `saveDc`. A prose-only save spell does not count, and a missing resolution is not treated as "no save." Mage's Fireball supplies the method. The catalog fixture expects the excerpt sentence with DC 14. That is a monster SRD fixture for the save-DC clause only.
+- Current fallback: none. Do not paste the SRD DC into description HTML. The spell attack bonus is still omitted. Do not add it from a separate attack such as Arcane Burst. Green Hag is the future case that needs both numbers, once a listed spell has `resolution.method.kind === 'attack'`.
 - Importance: essential when the SRD sentence includes the number.
 - Owner: `formatMonsterSpellEntry` and monster display. The math stays in `runtime/creature/spell-dc.ts`. Characters already use the same DC and attack functions.
-- Approval: open. Implementation: not started.
+- Approval: open. Implementation: save-DC clause verified for Mage. Attack-bonus clause not started.
 
 ### `weapon-alternate-modes`
 
@@ -72,15 +72,28 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 
 ## Seed coverage inventory
 
-Status is **not assessed** until a later approved pass records a review. The Hell Hound and Mage reviews that calibrated the skill stayed in the chat report and did not change this table. Nothing below is a claim of complete SRD parity.
+Recorded 2026-11-09 from Open5e `srd-2024` details and the catalog fixtures. A listed literal is a monster SRD fixture. Anything else is unverified. None of these monsters is fully verified.
 
-The catalog test parses all five seeds and asserts the slug set. It does not call `collectMonsterCatalogIssues`, and it does not render traits, defenses, senses, or spell lists.
+- **Kobold Warrior** (`srd-cc-5.2.1:kobold-warrior`, `srd-2024_kobold-warrior`). Fidelity not yet verified for the whole block. Open5e: AC 14, HP 7 (`3d6 - 3`), dagger `+4` and `4 (1d4 + 2)` as one melee-or-ranged line (reach 5 or 20/60). Monster fixtures: AC 14, dagger attack bonus 4. Descriptive: Pack Tactics, Sunlight Sensitivity. Gap: `weapon-alternate-modes` (the combined line is not asserted). Disposition: text-supported. Outstanding seed correction: none from this review.
+- **Skeleton** (`srd-cc-5.2.1:skeleton`, `srd-2024_skeleton`). Fidelity not yet verified. Open5e: AC 14, HP 13 (`2d8 + 4`), shortsword and shortbow `+5` and `6 (1d6 + 3)`, poison immunity, exhaustion and poisoned. The seed also stores a bludgeoning vulnerability. Open5e’s vulnerability list is empty, and no excerpt confirms it. Monster fixtures: schema and slug only. Disposition: corrections recommended for that vulnerability. The seed was not changed.
+- **Knight** (`srd-cc-5.2.1:knight`, `srd-2024_knight`). Fidelity not yet verified. Open5e calls the AC natural armor. The seed reaches AC 18 with equipped plate, which matches the tested total. Greatsword and heavy crossbow use catalog weapons, a crossbow damage override, and radiant on-hit damage. Parry is a `special` reaction whose +2 AC stays prose. The seed stores a frightened immunity. Open5e’s condition list is empty, and no excerpt confirms it. Monster fixtures: initiative `+0 (10)`, HP 52, AC 18, both attack lines, the multiattack sentence, and Parry’s kind. Disposition: corrections recommended for frightened. The seed was not changed.
+- **Mage** (`srd-cc-5.2.1:mage`, `srd-2024_mage`). Fidelity not yet verified. Monster fixtures: initiative `+2 (12)`, HP 81, AC 15, Arcane Burst `+6` / `16 (3d8 + 3)`, the multiattack sentence, derived spellcasting `saveDc` 14 and `attackBonus` 6, and the Spellcasting sentence `spell save DC 14`. The attack bonus is not printed. Spell bodies stay on the spell records. Gap: `spell-list-omits-dc-and-attack` for the attack-bonus clause only. `fixedAcOffset` stays, because the excerpt includes Mage Armor in the AC. Disposition: text-supported for the seed. No seed change.
+- **Hell Hound** (`srd-cc-5.2.1:hell-hound`, `srd-2024_hell-hound`). Fidelity not yet verified. Monster fixtures: initiative `+1 (11)`, HP 58, AC 15, bite `+5` / `7 (1d8 + 3)` plus `1d6`, the multiattack sentence, and Fire Breath’s heading and DC 12 / `17 (5d6)` body. Pack Tactics is trait prose. Fire immunity, darkvision, and Perception are stored and untested. Disposition: text-supported. No seed change.
 
-- **Kobold Warrior** (`srd-cc-5.2.1:kobold-warrior`). Tested literals: AC 14, dagger attack bonus 4. Untested: HP, saves, skills, traits. Descriptive prose in the seed: Pack Tactics, Sunlight Sensitivity. May exercise `weapon-alternate-modes`. Not asserted here. Status: not assessed.
-- **Skeleton** (`srd-cc-5.2.1:skeleton`). Tested: schema load and slug only. Untested: AC, HP, attacks, defenses. Status: not assessed.
-- **Knight** (`srd-cc-5.2.1:knight`). Tested literals: initiative `+0 (10)`, HP 52, AC 18, greatsword `+5` / `10` / `2d6+3` plus `1d8` radiant, heavy crossbow `+2` / `11` / `2d10` plus `1d8`, multiattack sentence, Parry stored as a reaction of kind `special`. Untested: saves, skills, the Parry sentence. Parry's AC bonus is prose. Status: not assessed.
-- **Mage** (`srd-cc-5.2.1:mage`). Tested literals: initiative `+2 (12)`, HP 81, AC 15, Arcane Burst `+6` / `16` / `3d8+3`, multiattack sentence. Untested: spell list, per-spell limits, shared casting, Misty Step, Protective Magic, spell DC, spell attack. Spell bodies stay on the spell records. Related gap: `spell-list-omits-dc-and-attack`, unverified for this seed. Status: not assessed.
-- **Hell Hound** (`srd-cc-5.2.1:hell-hound`). Tested literals: initiative `+1 (11)`, HP 58, AC 15, bite `+5` / `7` / `1d8+3` plus `1d6`, natural-weapon bite, multiattack sentence, Fire Breath heading `Fire Breath (Recharge 5–6)` and the DC 12 / 15-foot cone / `17 (5d6)` body. Untested: fire immunity, Pack Tactics rendering, senses, skills. Pack Tactics is trait prose. Fire Breath is a resolved save. Status: not assessed.
+## Shared capabilities
+
+A monster SRD fixture is an assertion in `packages/catalog/src/monsters/index.test.ts`. A contract fixture is a resolver test that is not that seed.
+
+- Natural armor. Supported and resolved. Monster fixture: Hell Hound AC 15. Kobold Warrior AC 14 is the same capability with a different bonus.
+- Equipped weapon attack. Supported and resolved. Monster fixtures: Kobold dagger bonus 4. Knight greatsword and heavy crossbow bonuses.
+- Weapon damage override. Supported and resolved. Monster fixture: Knight heavy crossbow `2d10` with no ability modifier in the expression.
+- On-hit extra damage. Supported and resolved. Monster fixtures: Knight radiant `1d8`. Hell Hound bite fire `1d6`.
+- Natural weapon. Supported and resolved. Monster fixture: Hell Hound bite.
+- Save damage and recharge. Supported and resolved. Monster fixture: Hell Hound Fire Breath.
+- Multiattack sentence. Supported and resolved. Monster fixtures: Knight, Mage, Hell Hound.
+- Spell save DC presentation. Supported and resolved when a listed spell’s resolution method is `saving-throw`. Monster fixture: Mage sentence with DC 14. Prose-only save spells still omit the DC.
+- Spell attack bonus on the Spellcasting sentence. The number is derived (`attackBonus` 6 on Mage). It is not printed. Not a monster fixture for presentation.
+- Thrown second line. Contract fixture only (`unresolvedCapabilities` on a dagger fixture). Not verified on the Kobold seed. Gap `weapon-alternate-modes`.
 
 ## Capability log
 

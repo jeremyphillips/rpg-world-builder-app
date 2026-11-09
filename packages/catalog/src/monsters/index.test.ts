@@ -4,11 +4,13 @@ import {
   deriveMonsterStatBlock,
   formatMonsterMultiattack,
   formatMonsterSaveAction,
+  formatMonsterSpellEntry,
   resolveMonsterActionIdentity,
   systemDefaultArmorClassRules,
 } from '@rpg/contracts'
 
 import { loadSeedEquipment } from '../equipment'
+import { loadSeedSpells } from '../spells'
 import { loadSeedMonsters, seedMonsterSlugs } from './index'
 
 const RULESET = 'srd-cc-5.2.1'
@@ -84,6 +86,10 @@ describe('SRD 5.2.1 monster seed', () => {
       damage: '16',
       damageExpression: '3d8+3',
     })
+    expect(mage.spellcasting.find((line) => line.id === 'spellcasting')).toMatchObject({
+      saveDc: 14,
+      attackBonus: 6,
+    })
 
     const hound = derive('hell-hound')
     expect(hound.initiativeLabel).toBe('+1 (11)')
@@ -126,6 +132,34 @@ describe('SRD 5.2.1 monster seed', () => {
       'The knight makes two attacks, using Greatsword or Heavy Crossbow in any combination.',
     )
     expect(formatMultiattack(mage!)).toBe('The mage makes three Arcane Burst attacks.')
+    const spellcasting = mage?.actions.find((action) => action.id === 'spellcasting')
+    expect(spellcasting?.kind).toBe('spell')
+    if (spellcasting?.kind === 'spell' && mage) {
+      const spellsById = new Map(
+        loadSeedSpells(RULESET).map((spell) => [
+          spell.id,
+          {
+            name: spell.name,
+            level: spell.level,
+            castingTime: spell.castingTime,
+            resolution: spell.resolution,
+          },
+        ]),
+      )
+      const rendered = formatMonsterSpellEntry({
+        entry: spellcasting,
+        monsterName: mage.name,
+        section: 'actions',
+        spellsById,
+        catalogStatus: 'ready',
+        spellsInBody: new Map([[spellcasting.id, spellcasting]]),
+        saveDc: 14,
+      })
+      expect(rendered.bodyHtml).toContain(
+        'The mage casts one of the following spells, using Intelligence as the spellcasting ability (spell save DC 14):',
+      )
+      expect(rendered.bodyHtml).not.toContain('spell attack')
+    }
     expect(formatMultiattack(hound!)).toBe('The hell hound makes two Bite attacks.')
 
     const breath = hound?.actions.find((action) => action.id === 'fire-breath')
