@@ -316,7 +316,7 @@ export function FieldErrorText({
   ...props
 }: FieldErrorTextProps) {
   return (
-    <Text
+    <p
       id={id}
       role="alert"
       aria-live="polite"
@@ -324,7 +324,7 @@ export function FieldErrorText({
       {...props}
     >
       {children}
-    </Text>
+    </p>
   )
 }
 
