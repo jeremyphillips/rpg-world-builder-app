@@ -81,7 +81,7 @@ describe('formatArmorSlotReplacementConfirmCopy', () => {
 })
 
 describe('nextMonsterArmorSlotValues', () => {
-  it('replaces the slot once and drops actions that referenced a removed piece', () => {
+  it('replaces the slot once and keeps actions that referenced a removed piece', () => {
     const aegis = namedEntry(leather.id, 'Aegis')
     const wall = namedEntry(chain.id, 'Wall')
     const knife = createPlainMonsterEquipmentEntry(dagger.id)
@@ -103,7 +103,7 @@ describe('nextMonsterArmorSlotValues', () => {
     const next = nextMonsterArmorSlotValues(values, 'body-armor', chain.id, catalog)
     expect(next.equipment.map((entry) => entry.equipmentId)).toEqual([knife.equipmentId, chain.id])
     expect(next.equipment.filter((entry) => entry.equipmentId === chain.id)).toHaveLength(1)
-    expect(next.actions).toEqual([])
+    expect(next.actions).toEqual(values.actions)
   })
 })
 

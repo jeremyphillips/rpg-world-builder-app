@@ -163,7 +163,7 @@ export function monsterActionAcquisitionItems(input: {
       groupId: 'natural' as const,
       metadata: damageType ? getDamageTypeLabel(damageType) : undefined,
       search: { includeSupporting: false as const },
-      searchTerms: getActionVocabularySearchTerms(preset.vocabularyId),
+      searchTerms: preset ? getActionVocabularySearchTerms(preset.vocabularyId) : [],
     }
   })
   const special = listSpecialMenuActionPresetIds()
@@ -252,10 +252,16 @@ export function createMonsterActionFromAcquisition(
   if (choice.type === 'other-natural') {
     return { id, kind: 'natural-weapon', mode: 'melee', reach: 5 }
   }
-  if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] }
-  if (choice.kind === 'special') return { id, kind: 'special' }
-  if (choice.kind === 'save') return { id, kind: 'save' }
-  return { id, kind: 'attack' }
+  if (choice.type === 'focus-existing') {
+    throw new Error('focus-existing is not a create choice')
+  }
+  if (choice.type === 'create') {
+    if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] }
+    if (choice.kind === 'special') return { id, kind: 'special' }
+    if (choice.kind === 'save') return { id, kind: 'save' }
+    return { id, kind: 'attack' } as MonsterActionDraftRow
+  }
+  return { id, kind: 'special' } as MonsterActionDraftRow
 }
 
 /** Spell row for the add menu. Names Spellcasting only on Actions, and shares only that source. */

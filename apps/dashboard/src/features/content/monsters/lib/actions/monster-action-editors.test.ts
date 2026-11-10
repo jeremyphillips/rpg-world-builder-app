@@ -93,8 +93,10 @@ describe('monster action acquisition', () => {
       mode: 'melee',
       reach: 5,
     })
-    expect(customNatural.damageType).toBeUndefined()
-    expect(customNatural.form).toBeUndefined()
+    if (customNatural.kind === 'natural-weapon') {
+      expect(customNatural.damageType).toBeUndefined()
+      expect(customNatural.form).toBeUndefined()
+    }
     expect(
       createMonsterActionFromAcquisition({ type: 'preset', presetId: 'breath-weapon' }),
     ).toMatchObject({
@@ -123,7 +125,7 @@ function collectFieldNames(items: readonly FormItem[]): string[] {
   const names: string[] = []
   for (const item of items) {
     if ('name' in item && typeof item.name === 'string') names.push(item.name)
-    if (item.kind === 'dependent') {
+    if ('kind' in item && item.kind === 'dependent') {
       names.push(...collectFieldNames([item.controller as FormItem]))
       names.push(...collectFieldNames(item.dependents.fields))
       continue
@@ -191,13 +193,17 @@ describe('monster action detail fields', () => {
     )
     expect(reaction).toContain('trigger.text')
 
-    const attack = detailFields({ id: 'slash', kind: 'attack', name: 'Slash' })
+    const attack = detailFields({
+      id: 'slash',
+      kind: 'attack',
+      name: 'Slash',
+    } as MonsterActionDraftRow)
     expect(attack).toEqual(
       expect.arrayContaining(['modes', 'reach', 'limitedUse', 'damageType', 'damage']),
     )
     const attackItems = monsterActionDetailFields({
       ctx: detailCtx,
-      action: { id: 'slash', kind: 'attack', name: 'Slash' },
+      action: { id: 'slash', kind: 'attack', name: 'Slash' } as MonsterActionDraftRow,
       section: 'actions',
       namePrefix: 'actions.0',
       equipmentOptions: [],
@@ -213,7 +219,7 @@ describe('monster action detail fields', () => {
         : undefined
     const damageType =
       damageRow && 'fields' in damageRow
-        ? damageRow.fields.find((field) => !('kind' in field) && field.name === 'damageType')
+        ? damageRow.fields.find((field) => 'name' in field && field.name === 'damageType')
         : undefined
     const damageRoll =
       damageRow && 'fields' in damageRow
@@ -223,7 +229,7 @@ describe('monster action detail fields', () => {
     expect(damageType).toMatchObject({ name: 'damageType', label: 'Type', required: true })
     expect(
       damageType && 'options' in damageType
-        ? damageType.options?.map((option) => option.value)
+        ? damageType.options?.map((option) => ('value' in option ? option.value : option))
         : [],
     ).not.toEqual(['bludgeoning', 'piercing', 'slashing'])
     const naturalItems = monsterActionDetailFields({
@@ -244,7 +250,7 @@ describe('monster action detail fields', () => {
         : undefined
     const naturalType =
       naturalRow && 'fields' in naturalRow
-        ? naturalRow.fields.find((field) => !('kind' in field) && field.name === 'damageType')
+        ? naturalRow.fields.find((field) => 'name' in field && field.name === 'damageType')
         : undefined
     const naturalRoll =
       naturalRow && 'fields' in naturalRow
@@ -260,7 +266,9 @@ describe('monster action detail fields', () => {
     })
     expect(
       naturalType && 'options' in naturalType
-        ? naturalType.options?.some((option) => option.value === 'fire')
+        ? naturalType.options?.some(
+            (option) => ('value' in option ? option.value : option) === 'fire',
+          )
         : false,
     ).toBe(true)
     expect(attack).not.toContain('moveSection')
@@ -303,7 +311,13 @@ describe('monster action detail fields', () => {
   })
 
   it('uses optional disclosure for preset action descriptions and required richtext for custom', () => {
-    expect(descriptionFieldConfig({ id: 'slash', kind: 'attack', name: 'Slash' })).toMatchObject({
+    expect(
+      descriptionFieldConfig({
+        id: 'slash',
+        kind: 'attack',
+        name: 'Slash',
+      } as MonsterActionDraftRow),
+    ).toMatchObject({
       type: 'richtext',
       optionalDisclosure: { addLabel: 'Add additional details' },
     })

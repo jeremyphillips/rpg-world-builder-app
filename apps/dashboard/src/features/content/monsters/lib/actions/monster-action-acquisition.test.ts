@@ -118,16 +118,25 @@ describe('monster action acquisition presentation', () => {
   })
 })
 
+function spellDraft(
+  section: Parameters<typeof createSpellActionDraft>[0],
+  sections?: Parameters<typeof createSpellActionDraft>[1],
+) {
+  const draft = createSpellActionDraft(section, sections ?? {})
+  if (draft.kind !== 'spell') throw new Error('expected spell draft')
+  return draft
+}
+
 describe('createSpellActionDraft', () => {
   it('names the first Actions spell row and leaves bonus and reaction rows unnamed', () => {
-    expect(createSpellActionDraft('actions', {})).toMatchObject({
+    expect(spellDraft('actions', {})).toMatchObject({
       kind: 'spell',
       name: 'Spellcasting',
       spells: [],
     })
-    expect(createSpellActionDraft('actions', {}).castingAbility).toBeUndefined()
-    expect(createSpellActionDraft('bonusActions', {}).name).toBeUndefined()
-    expect(createSpellActionDraft('reactions', {}).name).toBeUndefined()
+    expect(spellDraft('actions', {}).castingAbility).toBeUndefined()
+    expect(spellDraft('bonusActions', {}).name).toBeUndefined()
+    expect(spellDraft('reactions', {}).name).toBeUndefined()
   })
 
   it('does not name a second Spellcasting row and shares the one conventional source', () => {
@@ -141,11 +150,11 @@ describe('createSpellActionDraft', () => {
         },
       ],
     }
-    expect(createSpellActionDraft('actions', sections)).toMatchObject({
+    expect(spellDraft('actions', sections)).toMatchObject({
       castingAbility: { kind: 'shared', entryId: 'spellcasting' },
     })
-    expect(createSpellActionDraft('actions', sections).name).toBeUndefined()
-    expect(createSpellActionDraft('bonusActions', sections).castingAbility).toEqual({
+    expect(spellDraft('actions', sections).name).toBeUndefined()
+    expect(spellDraft('bonusActions', sections).castingAbility).toEqual({
       kind: 'shared',
       entryId: 'spellcasting',
     })
@@ -165,11 +174,11 @@ describe('createSpellActionDraft', () => {
     const unfinished = {
       actions: [{ id: 'spellcasting', kind: 'spell', name: 'Spellcasting', spells: [] }],
     }
-    expect(createSpellActionDraft('actions', standalone).name).toBe('Spellcasting')
-    expect(createSpellActionDraft('actions', standalone).castingAbility).toBeUndefined()
-    expect(createSpellActionDraft('bonusActions', unfinished).name).toBeUndefined()
-    expect(createSpellActionDraft('bonusActions', unfinished).castingAbility).toBeUndefined()
-    expect(createSpellActionDraft('actions', unfinished).name).toBeUndefined()
+    expect(spellDraft('actions', standalone).name).toBe('Spellcasting')
+    expect(spellDraft('actions', standalone).castingAbility).toBeUndefined()
+    expect(spellDraft('bonusActions', unfinished).name).toBeUndefined()
+    expect(spellDraft('bonusActions', unfinished).castingAbility).toBeUndefined()
+    expect(spellDraft('actions', unfinished).name).toBeUndefined()
   })
 
   it('leaves the ability unset when several conventional sources exist', () => {
@@ -191,6 +200,6 @@ describe('createSpellActionDraft', () => {
         },
       ],
     }
-    expect(createSpellActionDraft('reactions', sections).castingAbility).toBeUndefined()
+    expect(spellDraft('reactions', sections).castingAbility).toBeUndefined()
   })
 })

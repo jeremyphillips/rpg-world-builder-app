@@ -56,16 +56,5 @@ export const inlineMetadataSeparatorVariants = cva('font-normal text-muted-foreg
       xs: 'text-xs',
     },
   },
-  compoundVariants: [
-    {
-      wrap: false,
-      density: 'compact',
-      className: 'mx-1',
-    },
-    {
-      wrap: false,
-      density: 'comfortable',
-      className: 'mx-1.5',
-    },
-  ],
+  compoundVariants: [],
 })

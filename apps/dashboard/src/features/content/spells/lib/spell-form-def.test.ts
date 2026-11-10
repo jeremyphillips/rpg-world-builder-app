@@ -78,8 +78,11 @@ function findDependentBySwitch(
 function findGroup(fields: FormItem[], legend: string): GroupConfig | undefined {
   let found: GroupConfig | undefined
   walkNestedFormItems(fields, (field) => {
-    if (!found && isContainer(field) && field.kind === 'group' && field.legend === legend) {
-      found = field
+    if (!found && isContainer(field) && field.kind === 'group') {
+      const groupLegend = field.legend ?? field.heading?.label
+      if (groupLegend === legend) {
+        found = field
+      }
     }
   })
   return found
@@ -222,6 +225,11 @@ describe('spellFormDef area of effect fields', () => {
       expect.objectContaining({
         type: 'inputSelect',
         name: 'areaOfEffect.radius',
+        width: 'auto',
+      }),
+      expect.objectContaining({
+        type: 'inputSelect',
+        name: 'areaOfEffect.length',
         width: 'auto',
       }),
     ])

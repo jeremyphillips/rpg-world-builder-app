@@ -307,11 +307,12 @@ describe('nested grant validation integration', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add feature' }))
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
-    await user.type(
-      screen.getByRole('searchbox', { name: 'Search add grant…' }),
-      'weapon proficiency',
-    )
-    await user.click(screen.getByRole('menuitem', { name: GRANT_TYPE_LABELS.weaponProficiency }))
+    const grantSearch = await screen.findByRole('searchbox', { name: 'Search add grant…' })
+    await user.type(grantSearch, 'proficiency')
+    const weaponGrantItem = await screen.findByRole('menuitem', {
+      name: new RegExp(GRANT_TYPE_LABELS.weaponProficiency, 'i'),
+    })
+    await user.click(weaponGrantItem)
 
     await waitFor(() => {
       expect(formValuesCapture.read?.()).toBeDefined()

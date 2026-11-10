@@ -35,7 +35,7 @@ import {
   draftStoredSchema,
   publishStoredSchema,
 } from './lib/content-input-schemas'
-import { contentPatchBaseSchema, type ContentMeta } from './lib/envelope'
+import { contentPatchBaseSchema, type ContentMeta, type Slug } from './lib/envelope'
 import {
   mediaBearingAuthoredContentBodySchema,
   mediaBearingDraftAuthoredContentBodySchema,
@@ -522,17 +522,18 @@ export type MonsterDraft = z.infer<typeof monsterDraftStoredSchema>
 const monsterPublishInputSchema = createPublishInputSchema(monsterBodySchema)
 const monsterDraftInputSchema = createDraftInputSchema(monsterBodyDraftSchema)
 
+/** Publish create DTO — explicit shape so Zod `extend` / `superRefine` do not widen trait output. */
+export type CreateMonsterInput = MonsterBody & { slug: Slug }
+
 export const createMonsterInputSchema = monsterPublishInputSchema.superRefine((input, ctx) =>
   refineMonsterBody(input as MonsterBody, ctx),
 )
 
-export type CreateMonsterInput = z.infer<typeof createMonsterInputSchema>
+export type CreateMonsterDraftInput = MonsterBodyDraft & { slug: Slug }
 
 export const createMonsterDraftInputSchema = monsterDraftInputSchema.superRefine((input, ctx) =>
   refineMonsterDraftBody(input as MonsterBodyDraft, ctx),
 )
-
-export type CreateMonsterDraftInput = z.infer<typeof createMonsterDraftInputSchema>
 
 export const updateMonsterInputSchema = monsterPublishInputSchema.partial().extend({
   experiencePointsOverride: z.number().int().min(0).nullable().optional(),

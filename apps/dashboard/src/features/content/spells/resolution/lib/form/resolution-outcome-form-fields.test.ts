@@ -100,7 +100,7 @@ describe('resolutionOutcomeApplicationsResolverFields', () => {
       `${RESOLUTION_FIELD_NAME}.outcomes.2.applications`,
     ])
     expect(resolverFields[0]).toMatchObject({
-      legend: RESOLUTION_SECTION_LABELS.appliedEffects,
+      label: RESOLUTION_SECTION_LABELS.appliedEffects,
     })
   })
 })

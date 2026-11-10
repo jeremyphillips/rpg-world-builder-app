@@ -232,5 +232,5 @@ export function getActionVocabularyEntry(id: string): ActionVocabularyEntry | un
 export function getActionVocabularySearchTerms(id: string): readonly string[] {
   const fromEntry = getActionVocabularyEntry(id)?.searchTerms
   if (fromEntry?.length) return fromEntry
-  return ACTION_VOCABULARY_SEARCH_TERMS[id] ?? []
+  return ACTION_VOCABULARY_SEARCH_TERMS[id as keyof typeof ACTION_VOCABULARY_SEARCH_TERMS] ?? []
 }

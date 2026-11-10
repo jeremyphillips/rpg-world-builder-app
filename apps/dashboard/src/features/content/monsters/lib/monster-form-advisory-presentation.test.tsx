@@ -4,6 +4,8 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import type { SlotConfig } from '@rpg/ui/form'
+
 import type { MonsterFormAdvisory } from './monster-form-advisories'
 import {
   advisoriesForRowPath,
@@ -35,7 +37,8 @@ describe('monster form advisory presentation', () => {
       ],
       'actions.0',
     )
-    render(<>{slot.render()}</>)
+    const advisorySlot = slot as SlotConfig
+    render(<>{advisorySlot.render()}</>)
     const note = screen.getByText('Still shown.')
     expect(note.closest('.ui-alert')).toHaveClass('ui-alert--warning')
   })
@@ -63,7 +66,7 @@ describe('monster form advisory presentation', () => {
   })
 
   it('renders nothing when the row has no match and does not collect', () => {
-    const slot = monsterFormAdvisorySlot(weaponNotes, 'actions.2')
+    const slot = monsterFormAdvisorySlot(weaponNotes, 'actions.2') as SlotConfig
     expect(slot.name).toBe('buildAdvisories')
     expect(slot.render()).toBeNull()
   })

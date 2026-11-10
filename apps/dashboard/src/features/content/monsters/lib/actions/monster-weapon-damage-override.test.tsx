@@ -6,6 +6,7 @@ import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form
 import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import type { MonsterActionDraftRow } from './monster-action-presets'
 import { buildMonsterInput, resolveMonsterCreateDefaultValues } from '../monster-form-values'
 import { mapWeaponActionDamageToForm } from './monster-weapon-damage-form'
 import {
@@ -230,7 +231,8 @@ describe('monster weapon damage override', () => {
     expect(values.actions[0]).toMatchObject({
       damage: { flatOperator: '+', flatAmount: 1 },
     })
-    expect(values.actions[0]?.damage).not.toHaveProperty('dice')
+    const action = values.actions[0] as MonsterActionDraftRow | undefined
+    expect(action?.kind === 'weapon' ? action.damage : undefined).not.toHaveProperty('dice')
     const saved = buildMonsterInput(values, undefined, 'draft')
     expect((saved.actions as Array<{ damage?: unknown }>)[0]?.damage).toEqual({ flat: 1 })
   })

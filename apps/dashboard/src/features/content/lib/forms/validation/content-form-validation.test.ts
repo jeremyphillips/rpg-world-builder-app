@@ -245,6 +245,9 @@ function minimalValidEquipmentFor(kind: (typeof EQUIPMENT_KINDS)[number]): Recor
         category: 'simple',
         mode: 'melee',
         mastery: 'cleave',
+        properties: [],
+        damage: { dice: { count: 1, faces: 6 } },
+        damageType: 'slashing',
       }
     case 'armor':
       return { ...base, kind, armorCategory: 'light' }

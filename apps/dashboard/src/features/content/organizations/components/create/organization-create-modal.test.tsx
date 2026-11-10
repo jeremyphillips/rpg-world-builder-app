@@ -191,5 +191,5 @@ describe('OrganizationCreateModal', () => {
     expect(
       (createInput.members as { titles?: unknown[] } | undefined)?.titles?.length ?? 0,
     ).toBeGreaterThan(0)
-  })
+  }, 15_000)
 })

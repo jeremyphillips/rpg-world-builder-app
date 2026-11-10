@@ -21,7 +21,9 @@ describe('commitEquipmentEntryRemoval', () => {
     })
 
     expect(form.getValues('equipment')).toEqual([])
-    expect(form.getValues('actions')).toEqual([])
+    expect(form.getValues('actions')).toEqual([
+      { id: 'stab', kind: 'weapon', equipmentEntryId: 'd1' },
+    ])
     expect(form.getValues('name')).toBe('Edited')
     expect(form.getFieldState('name').isDirty).toBe(true)
   })

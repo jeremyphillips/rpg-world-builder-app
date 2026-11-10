@@ -43,7 +43,7 @@ export function actionMoveDropsTrigger(
   return (
     from === 'reactions' &&
     to !== 'reactions' &&
-    monsterActionTriggerText(action.trigger) !== undefined
+    monsterActionTriggerText('trigger' in action ? action.trigger : undefined) !== undefined
   )
 }
 
@@ -52,6 +52,7 @@ export function actionAfterSectionMove(
   to: MonsterActionSection,
 ): MonsterActionDraftRow {
   if (to === 'reactions') return action
+  if (!('trigger' in action)) return action
   const { trigger: _trigger, ...rest } = action
-  return rest
+  return rest as MonsterActionDraftRow
 }

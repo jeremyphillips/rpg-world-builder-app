@@ -10,6 +10,11 @@ const meta = {
   title: 'Content/MasterDetailListPanel',
   component: MasterDetailListPanel,
   parameters: { layout: 'padded' },
+  args: {
+    addControl: undefined,
+    onAdd: () => {},
+    onSelect: () => {},
+  },
   decorators: [
     (Story) => (
       <MasterDetailGrid>

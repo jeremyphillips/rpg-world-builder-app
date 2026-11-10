@@ -403,5 +403,5 @@ export function getCreatureTraitGroupEntry(id: string): GameTermEntry | undefine
 export function getCreatureTraitSearchTerms(id: string): readonly string[] {
   const fromEntry = getCreatureTraitVocabularyEntry(id)?.searchTerms
   if (fromEntry?.length) return fromEntry
-  return CREATURE_TRAIT_SEARCH_TERMS[id] ?? []
+  return CREATURE_TRAIT_SEARCH_TERMS[id as keyof typeof CREATURE_TRAIT_SEARCH_TERMS] ?? []
 }

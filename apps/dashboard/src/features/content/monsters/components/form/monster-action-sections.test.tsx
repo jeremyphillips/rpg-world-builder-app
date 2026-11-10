@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
+import type * as CharacterFeature from '@/features/character'
+
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   resolveMonsterCreateDefaultValues,
@@ -11,7 +13,7 @@ import {
 import { MonsterActionSections } from './monster-action-sections'
 
 vi.mock('@/features/character', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/character')>()
+  const actual = await importOriginal<typeof CharacterFeature>()
   return {
     ...actual,
     EquipmentPickerDrawer: ({

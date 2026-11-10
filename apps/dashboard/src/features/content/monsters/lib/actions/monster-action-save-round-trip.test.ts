@@ -34,6 +34,7 @@ describe('monster save action round trip', () => {
       type: 'preset',
       presetId: 'breath-weapon',
     })
+    if (created.kind !== 'save') throw new Error('expected save action')
     const resolution = created.resolution
     if (!resolution) throw new Error('Breath preset is missing a resolution')
     const effects = resolution.effects.map((effect, index) =>

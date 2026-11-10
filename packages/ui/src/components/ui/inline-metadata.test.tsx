@@ -30,7 +30,7 @@ describe('InlineMetadata', () => {
     expect(container.textContent).toContain('B')
     expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
     expect(container.firstElementChild).toHaveClass('flex', 'min-w-0', 'items-baseline')
-    expect(container.querySelector('[data-inline-metadata-separator]')).toHaveClass('mx-1')
+    expect(container.querySelector('[data-inline-metadata-separator]')?.textContent).toBe(' · ')
     expect(container.querySelectorAll('.text-muted-foreground')).toHaveLength(1)
   })
 
@@ -52,7 +52,7 @@ describe('InlineMetadata', () => {
       wrap: false,
     })
 
-    expect(container.querySelector('[data-inline-metadata-separator]')).toHaveClass('mx-1.5')
+    expect(container.querySelector('[data-inline-metadata-separator]')?.textContent).toBe(' · ')
   })
 
   it('renders supporting compact with muted items', () => {
@@ -109,7 +109,7 @@ describe('InlineMetadata', () => {
     expect(separator).toHaveAttribute('aria-hidden', 'true')
   })
 
-  it('nowrap separator uses horizontal margin only', () => {
+  it('nowrap separator uses word spaces around the middle dot', () => {
     const { container } = renderTwoItems(
       {
         role: 'heading',
@@ -120,15 +120,15 @@ describe('InlineMetadata', () => {
     )
 
     const separator = container.querySelector('[data-inline-metadata-separator]')
-    expect(separator).toHaveClass('mx-1.5')
-    expect(separator?.textContent).toBe('·')
+    expect(separator?.textContent).toBe(' · ')
+    expect(separator?.className).not.toMatch(/\bmx-/)
 
     const secondItem = container.querySelectorAll(':scope > span > span')[1]
     expect(secondItem?.firstElementChild).toBe(separator)
     expect(secondItem?.lastChild?.textContent).toBe('(1d8+3)')
   })
 
-  it('nowrap compact and comfortable use distinct margin steps only', () => {
+  it('nowrap compact and comfortable use word spaces around the middle dot', () => {
     const { container: compact } = renderTwoItems({
       role: 'heading',
       density: 'compact',
@@ -140,8 +140,8 @@ describe('InlineMetadata', () => {
       wrap: false,
     })
 
-    expect(compact.querySelector('[data-inline-metadata-separator]')).toHaveClass('mx-1')
-    expect(comfortable.querySelector('[data-inline-metadata-separator]')).toHaveClass('mx-1.5')
+    expect(compact.querySelector('[data-inline-metadata-separator]')?.textContent).toBe(' · ')
+    expect(comfortable.querySelector('[data-inline-metadata-separator]')?.textContent).toBe(' · ')
   })
 
   it('uses wrapping separator markup with nbsp glue', () => {

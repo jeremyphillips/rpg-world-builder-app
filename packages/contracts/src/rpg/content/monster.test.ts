@@ -7,6 +7,7 @@ import {
   monsterActionSchema,
   monsterReactionDraftSchema,
   monsterReactionSchema,
+  type CreateMonsterInput,
   type MonsterReaction,
 } from './monster'
 
@@ -211,7 +212,8 @@ describe('monsterBodySchema refinements', () => {
     })
     expect(troll.success).toBe(true)
     if (troll.success) {
-      expect(troll.data.traits[0]).toMatchObject({
+      const data = troll.data as CreateMonsterInput
+      expect(data.traits[0]).toMatchObject({
         preset: 'regeneration',
         hitPoints: 15,
         regeneratesAtZeroHp: true,
@@ -225,7 +227,8 @@ describe('monsterBodySchema refinements', () => {
     })
     expect(defaults.success).toBe(true)
     if (defaults.success) {
-      expect(defaults.data.traits[0]).toMatchObject({
+      const data = defaults.data as CreateMonsterInput
+      expect(data.traits[0]).toMatchObject({
         hitPoints: 10,
         regeneratesAtZeroHp: false,
         interruptedByDamageTypes: [],
@@ -245,7 +248,8 @@ describe('monsterBodySchema refinements', () => {
     })
     expect(held.success).toBe(true)
     if (held.success) {
-      expect(held.data.traits[0]).toMatchObject({ count: 1, unit: 'hour' })
+      const data = held.data as CreateMonsterInput
+      expect(data.traits[0]).toMatchObject({ count: 1, unit: 'hour' })
     }
     expect(
       createMonsterInputSchema.safeParse({
@@ -274,7 +278,10 @@ describe('monsterBodySchema refinements', () => {
       traits: [{ id: 'pack', preset: 'pack-tactics', uses: 3 }],
     })
     expect(stripped.success).toBe(true)
-    if (stripped.success) expect(stripped.data.traits[0]).not.toHaveProperty('uses')
+    if (stripped.success) {
+      const data = stripped.data as CreateMonsterInput
+      expect(data.traits[0]).not.toHaveProperty('uses')
+    }
     const fury = createMonsterInputSchema.safeParse({
       slug: 'boar',
       ...baseBody,
@@ -287,7 +294,10 @@ describe('monsterBodySchema refinements', () => {
       traits: [{ id: 'berserk', preset: 'berserk' }],
     })
     expect(calm.success).toBe(true)
-    if (calm.success) expect(calm.data.traits[0]).toMatchObject({ canBeCalmed: false })
+    if (calm.success) {
+      const data = calm.data as CreateMonsterInput
+      expect(data.traits[0]).toMatchObject({ canBeCalmed: false })
+    }
     expect(
       createMonsterInputSchema.safeParse({
         slug: 'sight',

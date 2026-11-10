@@ -18,11 +18,11 @@ function legacyIncludes(text: string, query: string): boolean {
 describe('organization picker library', () => {
   it('searches names and canonical classification terms', () => {
     expect(getOrganizationPickerSearchText(organizationPickerItems[0]!.organization)).toContain(
-      'Occupational',
+      'trade',
     )
     expect(
       scoreAndSortOrganizationPickerItems(organizationPickerItems, {
-        searchQuery: 'government',
+        searchQuery: 'governance',
       }).map(({ organization }) => organization.name),
     ).toEqual(['City Council'])
   })
@@ -36,14 +36,7 @@ describe('organization picker library', () => {
   })
 
   it('keeps every legacy includes match', () => {
-    const queries = [
-      '',
-      '  Government  ',
-      'GOVERNMENT',
-      'lantern occupational',
-      'city council',
-      "o'brien",
-    ]
+    const queries = ['', '  governance  ', 'GOVERNANCE', 'lantern trade', 'city council', "o'brien"]
     const named = makeOrganization({
       id: 'organization-obrien',
       slug: 'obrien-watch',
@@ -68,19 +61,19 @@ describe('organization picker library', () => {
 
   it('ranks a literal name hit above a discovery-term hit', () => {
     const nameHit = makeOrganization({
-      id: 'organization-government-hall',
-      slug: 'government-hall',
-      name: 'Government Hall',
-      organizationDomain: 'occupational',
+      id: 'organization-administration-annex',
+      slug: 'administration-annex',
+      name: 'Administration Annex',
+      organizationDomain: 'academic',
     })
     const keywordHit = organizationPickerItems[1]!
 
     expect(
       scoreAndSortOrganizationPickerItems(
         [keywordHit, { organization: nameHit, selected: false }],
-        { searchQuery: 'government' },
+        { searchQuery: 'administration' },
       ).map(({ organization }) => organization.name),
-    ).toEqual(['Government Hall', 'City Council'])
+    ).toEqual(['Administration Annex', 'City Council'])
   })
 
   it('formats the singular description', () => {

@@ -50,6 +50,21 @@ describe('button-dropdown.lib', () => {
     ).toBe(true)
   })
 
+  it('matches multi-word queries against grant-style labels', () => {
+    const weaponItem = {
+      id: 'weapon-proficiency',
+      label: 'Weapon proficiency',
+      metadata: 'Grant proficiency with specific weapons, a weapon category, or a player choice.',
+      groupId: 'proficiencies',
+      searchTerms: ['proficiency'],
+      search: { includeSupporting: true as const },
+    }
+
+    expect(
+      rankButtonDropdownItems([weaponItem], groups, 'weapon proficiency').map((item) => item.id),
+    ).toEqual(['weapon-proficiency'])
+  })
+
   it('excludes metadata from search when search.includeSupporting is false', () => {
     const withMetadataOnly = {
       id: 'hold-breath',

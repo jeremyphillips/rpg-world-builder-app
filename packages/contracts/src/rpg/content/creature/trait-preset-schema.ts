@@ -226,25 +226,29 @@ const waterBreathingSchema = z
     )
   })
 
+const monsterPresetTraitUnionSchema = z.union([
+  fixedPresetSchema,
+  legendaryResistanceSchema,
+  holdBreathSchema,
+  illuminationSchema,
+  standingLeapSchema,
+  swarmSchema,
+  regenerationSchema,
+  waterBreathingSchema,
+  bloodiedFurySchema,
+  etherealSightSchema,
+  mimicrySchema,
+  airFormSchema,
+  berserkSchema,
+  elementalRestorationSchema,
+  stenchSchema,
+])
+
+export type MonsterPresetTrait = z.infer<typeof monsterPresetTraitUnionSchema>
+
 export const monsterPresetTraitSchema = z.preprocess(
   normalizePresetTraitInput,
-  z.union([
-    fixedPresetSchema,
-    legendaryResistanceSchema,
-    holdBreathSchema,
-    illuminationSchema,
-    standingLeapSchema,
-    swarmSchema,
-    regenerationSchema,
-    waterBreathingSchema,
-    bloodiedFurySchema,
-    etherealSightSchema,
-    mimicrySchema,
-    airFormSchema,
-    berserkSchema,
-    elementalRestorationSchema,
-    stenchSchema,
-  ]),
+  monsterPresetTraitUnionSchema,
 )
 
 const legendaryResistanceDraftSchema = z.object({

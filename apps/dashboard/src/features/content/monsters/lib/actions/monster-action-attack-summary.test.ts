@@ -20,7 +20,6 @@ describe('buildMonsterActionAttackPreview', () => {
       },
       monster: {
         abilityScores: { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 },
-        challengeRating: '1',
       },
       equipmentCatalog: new Map(),
       proficiencyBonus: 2,

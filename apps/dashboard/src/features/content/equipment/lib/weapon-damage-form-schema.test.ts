@@ -32,7 +32,7 @@ function weaponForm(overrides: Record<string, unknown> = {}) {
     category: 'martial' as const,
     mode: 'melee' as const,
     mastery: 'sap' as const,
-    properties: [] as string[],
+    properties: [] as WeaponEquipment['properties'],
     ...overrides,
   }
 }

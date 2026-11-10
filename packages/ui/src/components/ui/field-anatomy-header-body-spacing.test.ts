@@ -63,7 +63,7 @@ const PROBE_HTML = `<!doctype html>
     <fieldset id="array-sronly-hint" class="border-0 p-0 m-0 ${STACK_MD}">
       <legend class="sr-only">Hidden</legend>
       <div class="w-full min-w-0">
-        <p class="text-style-caption">Visible hint</p>
+        <div class="text-style-caption">Visible hint</div>
       </div>
       <div id="array-sronly-hint-body">body</div>
     </fieldset>

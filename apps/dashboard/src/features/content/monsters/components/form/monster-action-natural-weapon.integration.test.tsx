@@ -97,11 +97,11 @@ function Host({
   )
 }
 
-function biteRow(values: MonsterFormValues) {
+function biteRow(values: MonsterFormValues): MonsterActionDraftRow | undefined {
   const sections = [values.actions, values.bonusActions, values.reactions]
   for (const rows of sections) {
     const match = rows.find((row) => row.id === 'bite')
-    if (match) return match
+    if (match) return match as MonsterActionDraftRow
   }
   return undefined
 }
@@ -124,7 +124,8 @@ describe('natural weapon action round trip', () => {
     const view = render(<Host values={initial} formRef={formRef} />)
 
     await waitFor(() => {
-      expect(biteRow(formRef.current!.getValues())?.reach).toBe(15)
+      const row = biteRow(formRef.current!.getValues())
+      expect(row?.kind === 'natural-weapon' ? row.reach : undefined).toBe(15)
     })
     expect(biteRow(formRef.current!.getValues())).toMatchObject({
       properties: ['finesse'],
@@ -135,8 +136,10 @@ describe('natural weapon action round trip', () => {
 
     await user.click(screen.getByRole('button', { name: /Slam/i }))
     await user.click(screen.getByRole('button', { name: /Bite/i }))
-    expect(biteRow(formRef.current!.getValues())?.reach).toBe(15)
-    expect(biteRow(formRef.current!.getValues())?.properties).toEqual(['finesse'])
+    const reopened = biteRow(formRef.current!.getValues())
+    expect(reopened?.kind === 'natural-weapon' ? reopened.reach : undefined).toBe(15)
+    const row = biteRow(formRef.current!.getValues())
+    expect(row?.kind === 'natural-weapon' ? row.properties : undefined).toEqual(['finesse'])
 
     await user.click(screen.getByRole('button', { name: 'Actions for Bite' }))
     expect(screen.queryByRole('menuitem', { name: 'Actions' })).not.toBeInTheDocument()
@@ -182,7 +185,10 @@ describe('natural weapon action round trip', () => {
     const reloadedForm: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
     render(<Host values={reloaded} formRef={reloadedForm} />)
     await waitFor(() => {
-      expect(reloadedForm.current!.getValues().bonusActions[0]?.reach).toBe(15)
+      const bonus = reloadedForm.current!.getValues().bonusActions[0] as
+        | MonsterActionDraftRow
+        | undefined
+      expect(bonus?.kind === 'natural-weapon' ? bonus.reach : undefined).toBe(15)
     })
     await user.click(screen.getByRole('button', { name: /Fangs/i }))
     const reloadedName = screen.getByRole('textbox', { name: 'Name' })

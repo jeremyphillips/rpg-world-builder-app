@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 
 import type { FieldNoun } from '@rpg/contracts'
 
+import type { PickerSearchOptions } from '../lib/picker-search.types'
+
 import type { FormIssue, FormIssueScope, FormIssueSeverity } from './errors/form-issue.types'
 
 import type {
@@ -142,7 +144,7 @@ export interface FieldOption {
   /** Alternative names matched as keywords in combobox search. */
   aliases?: readonly string[]
   /** Controls whether `description` is indexed for combobox search (omitted → indexed when description is set). */
-  search?: import('../lib/picker-search.types').PickerSearchOptions
+  search?: PickerSearchOptions
   /** Optional classification shown inline after the label in combobox panels. */
   classification?: string
   /** Canonical dimension slugs matched by combobox `filterSelects` (AND across active keys). */

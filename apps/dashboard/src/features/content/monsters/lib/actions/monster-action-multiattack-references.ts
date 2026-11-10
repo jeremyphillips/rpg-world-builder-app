@@ -1,6 +1,7 @@
 import type { MonsterActionDraftRow } from './monster-action-presets'
 
 function stepReferences(action: MonsterActionDraftRow, actionId: string): boolean {
+  if (action.kind !== 'multiattack') return false
   return (action.steps ?? []).some((step) => (step.actionIds ?? []).includes(actionId))
 }
 

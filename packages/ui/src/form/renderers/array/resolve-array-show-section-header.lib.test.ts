@@ -14,7 +14,7 @@ describe('resolveArrayShowSectionHeader', () => {
         hasAddAction: true,
         arrayIssueCount: 0,
         hasContainerIssue: false,
-        config: { ...baseConfig, labelVisibility: 'srOnly' },
+        config: { ...baseConfig, label: 'Items', labelVisibility: 'srOnly' },
       }),
     ).toBe(false)
   })
@@ -39,7 +39,7 @@ describe('resolveArrayShowSectionHeader', () => {
         hasAddAction: false,
         arrayIssueCount: 0,
         hasContainerIssue: false,
-        config: { ...baseConfig, labelVisibility: 'srOnly', hint: 'Help' },
+        config: { ...baseConfig, label: 'Items', labelVisibility: 'srOnly', hint: 'Help' },
       }),
     ).toBe(true)
 

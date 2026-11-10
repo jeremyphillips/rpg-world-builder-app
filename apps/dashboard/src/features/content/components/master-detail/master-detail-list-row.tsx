@@ -61,7 +61,11 @@ export function MasterDetailListRow({
       <InteractiveListRow
         selected={isSelected}
         content={<MasterDetailListRowContent item={item} issueCount={issueCount} />}
-        endSlot={<Icon name="chevron-right" size="lg" className="text-foreground" aria-hidden />}
+        endSlot={
+          <span aria-hidden className="text-foreground">
+            <Icon name="chevron-right" size="lg" />
+          </span>
+        }
         asChild
       >
         <button

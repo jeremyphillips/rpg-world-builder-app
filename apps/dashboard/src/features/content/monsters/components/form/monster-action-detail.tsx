@@ -81,7 +81,7 @@ export function MonsterActionDetail({
       sharedCastingOptions: sharedCastingOptions(values, action.id),
       advisories: collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx)),
       onCastingSourceBlocked: sections.setNotice,
-      attackOptions: (values[located.section] ?? [])
+      attackOptions: ((values[located.section] ?? []) as MonsterActionDraftRow[])
         .filter(
           (row) =>
             row.id !== action.id &&

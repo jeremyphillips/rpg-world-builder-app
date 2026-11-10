@@ -39,13 +39,14 @@ export function SelectFieldRenderer({
   const changeButtonRef = useRef<HTMLButtonElement>(null)
   const selectWasOpenRef = useRef(false)
   const value = normalizedSelectFieldValue(state.field.value)
+  const [committedValue, setCommittedValue] = useState(value)
+  if (committedValue !== value) {
+    setCommittedValue(value)
+    if (changing) setChanging(false)
+  }
   const committedLabel = resolveSelectFieldOptionLabel(state.field.value, state.resolvedOptions)
   const showEditor =
     !changeLabel || changing || value === '' || (value !== '' && committedLabel == null)
-
-  useEffect(() => {
-    setChanging(false)
-  }, [state.field.value])
 
   useEffect(() => {
     if (!changing || !changeLabel) return

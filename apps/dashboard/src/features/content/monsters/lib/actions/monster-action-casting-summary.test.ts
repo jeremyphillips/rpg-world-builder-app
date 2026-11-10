@@ -43,7 +43,7 @@ describe('monster action casting summary', () => {
           kind: 'spell',
           castingAbility: { kind: 'shared', entryId: 'missing' },
         },
-      }),
+      } as MonsterActionDraftRow),
     ],
   }
 
@@ -68,7 +68,8 @@ describe('monster action casting summary', () => {
     expect(sharedCastingOptions(changed, 'misty').map((option) => option.label)).toContain(
       'Spellcasting (Wisdom) · Actions',
     )
-    expect(changed.bonusActions![0]!.castingAbility).toEqual({
+    const bonusSpell = changed.bonusActions?.[0]
+    expect(bonusSpell?.kind === 'spell' ? bonusSpell.castingAbility : undefined).toEqual({
       kind: 'shared',
       entryId: 'spellcasting',
     })

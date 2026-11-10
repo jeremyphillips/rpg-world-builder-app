@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import { ACTION_VOCABULARY_SEARCH_TERMS } from './action-vocabulary-search-terms'
 import { getActionVocabularyEntry, getActionVocabularySearchTerms } from './action-vocabulary'
 
-const MONSTER_MENU_VOCABULARY_IDS = Object.keys(ACTION_VOCABULARY_SEARCH_TERMS)
+const MONSTER_MENU_VOCABULARY_IDS = Object.keys(
+  ACTION_VOCABULARY_SEARCH_TERMS,
+) as (keyof typeof ACTION_VOCABULARY_SEARCH_TERMS)[]
 
 describe('action vocabulary search terms', () => {
   it('defines search terms for every monster menu preset vocabulary id', () => {
