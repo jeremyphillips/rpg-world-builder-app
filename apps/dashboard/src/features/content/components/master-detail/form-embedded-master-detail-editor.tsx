@@ -49,6 +49,13 @@ export interface FormEmbeddedMasterDetailEditorProps {
   mapListItem: (
     ctx: FormEmbeddedMasterDetailMapListItemContext,
   ) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string }
+  /** Adjusts the selected detail header without a title render prop. */
+  resolveHeaderIdentity?: (ctx: {
+    row: unknown
+    index: number
+    fieldId: string
+    identity: MasterDetailEditorIdentity
+  }) => MasterDetailEditorIdentity
   /**
    * Optional pre-bound editor state. Pass when the parent must coordinate with
    * `useMasterDetailArray` (e.g. level normalization or cancel a pending delete
@@ -137,6 +144,7 @@ function FormEmbeddedMasterDetailEditorBody({
   resolveItemFields,
   idPrefix,
   mapListItem,
+  resolveHeaderIdentity,
   editor,
   showDelete = true,
   leadingContent,
@@ -208,6 +216,16 @@ function FormEmbeddedMasterDetailEditorBody({
     if (copy) editor.appendRow(copy)
   }, [editor, rows])
 
+  const selectedIdentity =
+    rows.selectedIdentity && resolveHeaderIdentity && rows.selectedRow
+      ? resolveHeaderIdentity({
+          row: rows.rowAt(rows.selectedRow.formIndex),
+          index: rows.selectedRow.formIndex,
+          fieldId: rows.selectedRow.fieldId,
+          identity: rows.selectedIdentity,
+        })
+      : rows.selectedIdentity
+
   const detailFields = resolveEmbeddedDetailFields(
     itemFields,
     resolveItemFields,
@@ -243,7 +261,7 @@ function FormEmbeddedMasterDetailEditorBody({
       fieldName={fieldName}
       idPrefix={idPrefix}
       showSelectedDetail={isSelectedRowVisible}
-      selectedIdentity={rows.selectedIdentity}
+      selectedIdentity={selectedIdentity}
       campaignId={formCtx.campaignId}
       rowAvailability={rows.selectedRowAvailability}
       availabilityFormItems={rows.availabilityFormItems}

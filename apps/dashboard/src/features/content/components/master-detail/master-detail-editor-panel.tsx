@@ -10,9 +10,15 @@ import type { DetailOverflowMenuEntry } from '../../lib/detail/detail-overflow-a
 import {
   MasterDetailEditorShell,
   type MasterDetailEditorIdentity,
+  type MasterDetailInlineTitle,
 } from './master-detail-editor-shell'
 
-export type { MasterDetailEditorIdentity }
+export type { MasterDetailEditorIdentity, MasterDetailInlineTitle }
+
+function omitInlineTitleField(fields: FormItem[], fieldName: string | undefined): FormItem[] {
+  if (!fieldName) return fields
+  return fields.filter((item) => !('name' in item) || item.name !== fieldName)
+}
 
 export interface MasterDetailEditorPanelProps {
   editor: UseMasterDetailArrayResult
@@ -142,8 +148,14 @@ export function MasterDetailEditorPanel({
   const selectedFieldId = editor.selectedFieldId
   const hasSelectedRow = showSelectedDetail && selectedIndex !== null && Boolean(selectedFieldId)
 
+  const inlineTitle = hasSelectedRow ? selectedIdentity?.inlineTitle : undefined
+
   useEffect(() => {
     if (!editor.lastAddedFieldId || editor.lastAddedFieldId !== selectedFieldId) return
+    if (inlineTitle?.initialEdit) {
+      editor.clearLastAddedFieldId()
+      return
+    }
     const root = bodyRef.current
     if (!root) return
     const focusable = root.querySelector<HTMLElement>(
@@ -151,11 +163,16 @@ export function MasterDetailEditorPanel({
     )
     focusable?.focus()
     editor.clearLastAddedFieldId()
-  }, [editor, selectedFieldId])
+  }, [editor, inlineTitle?.initialEdit, selectedFieldId])
+
+  const visibleFields = omitInlineTitleField(itemFields, inlineTitle?.field)
 
   return (
     <MasterDetailEditorShell
       itemNoun={itemNoun}
+      namePrefix={
+        hasSelectedRow && selectedIndex !== null ? `${fieldName}.${selectedIndex}` : undefined
+      }
       selectedIdentity={hasSelectedRow ? selectedIdentity : undefined}
       onDelete={
         onDelete ??
@@ -169,7 +186,7 @@ export function MasterDetailEditorPanel({
     >
       {hasSelectedRow && selectedFieldId && selectedIndex !== null ? (
         <MasterDetailSelectedRowEditor
-          itemFields={itemFields}
+          itemFields={visibleFields}
           fieldName={fieldName}
           idPrefix={idPrefix}
           selectedFieldId={selectedFieldId}

@@ -154,9 +154,11 @@ describe('natural weapon action round trip', () => {
       mode: 'melee',
     })
 
+    await user.click(screen.getByRole('button', { name: 'Edit name' }))
     const name = screen.getByRole('textbox', { name: 'Name' })
     await user.clear(name)
     await user.type(name, 'Fangs')
+    await user.keyboard('{Enter}')
     const counts = screen.getAllByRole('spinbutton', { name: 'Damage roll Number of dice' })
     await user.clear(counts[0]!)
     await user.type(counts[0]!, '3')
@@ -191,9 +193,11 @@ describe('natural weapon action round trip', () => {
       expect(bonus?.kind === 'natural-weapon' ? bonus.reach : undefined).toBe(15)
     })
     await user.click(screen.getByRole('button', { name: /Fangs/i }))
+    await user.click(screen.getByRole('button', { name: 'Edit name' }))
     const reloadedName = screen.getByRole('textbox', { name: 'Name' })
     await user.clear(reloadedName)
     await user.type(reloadedName, 'Fangs again')
+    await user.keyboard('{Enter}')
     const again = buildMonsterInput(reloadedForm.current!.getValues(), undefined, 'draft')
     const bonus = (again.bonusActions as Array<Record<string, unknown>>)[0]
     expect(bonus).toMatchObject({
@@ -226,6 +230,7 @@ describe('natural weapon action round trip', () => {
       />,
     )
 
+    await user.click(screen.getByRole('button', { name: 'Edit name' }))
     await waitFor(() => {
       expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Claw')
     })

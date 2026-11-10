@@ -80,6 +80,25 @@ export const SelectedRow: Story = {
   render: () => <PanelStory editor={selectedEditor} />,
 }
 
+export const InlineTitle: Story = {
+  render: () => (
+    <PanelStory
+      editor={selectedEditor}
+      selectedIdentity={{
+        title: 'Rage',
+        rowKey: 'field-a',
+        meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+        inlineTitle: {
+          field: 'name',
+          mode: 'authored',
+          fallback: 'Trait 1',
+          placeholder: 'Trait 1',
+        },
+      }}
+    />
+  ),
+}
+
 export const SelectedRowWithIssues: Story = {
   render: () => (
     <PanelStory

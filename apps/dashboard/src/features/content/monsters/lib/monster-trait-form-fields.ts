@@ -2,12 +2,9 @@ import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import { defineMasterDetailItemNoun } from '../../lib/master-detail/master-detail-item-noun'
 import {
-  MONSTER_ACTION_NAME_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
-  MONSTER_CUSTOM_NAME_ADD_LABEL,
-  MONSTER_CUSTOM_NAME_LABEL,
 } from './monster-form-labels'
 
 function visibleForCustomTrait(): FieldVisibility {
@@ -25,12 +22,6 @@ export const MONSTER_TRAIT_ITEM_NOUN = defineMasterDetailItemNoun({
 
 export function monsterTraitItemFields(): FormItem[] {
   return [
-    {
-      type: 'text',
-      name: 'name',
-      label: MONSTER_ACTION_NAME_LABEL,
-      visibility: visibleForCustomTrait(),
-    },
     {
       type: 'richtext',
       name: 'description',
@@ -54,12 +45,6 @@ export function monsterTraitTemplateFields(): FormItem[] {
         dependsOn: ['templateId'],
         visibleWhen: (watched) => watched['templateId'] === 'legendary-resistance',
       },
-    },
-    {
-      type: 'text',
-      name: 'nameOverride',
-      label: MONSTER_CUSTOM_NAME_LABEL,
-      optionalDisclosure: { addLabel: MONSTER_CUSTOM_NAME_ADD_LABEL },
     },
     {
       type: 'richtext',

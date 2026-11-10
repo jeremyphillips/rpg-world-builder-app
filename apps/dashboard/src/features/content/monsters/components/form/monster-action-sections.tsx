@@ -26,10 +26,7 @@ import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
-import {
-  monsterActionNavigationTitle,
-  resolveMonsterFormActionIdentity,
-} from '../../lib/actions/monster-action-identity'
+import { monsterActionEditorTitles } from '../../lib/actions/monster-action-editor-title'
 import { multiattacksReferencingAction } from '../../lib/actions/monster-action-multiattack-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterActionPending } from '../../hooks/use-monster-action-sections'
@@ -62,17 +59,10 @@ const SECTION_HEADINGS = {
   reactions: MONSTER_REACTIONS_HEADING,
 } as const
 
-function mapActionListItem(
-  row: unknown,
-  index: number,
-  values: MonsterFormValues,
-  ctx: ContentFormCtx,
-) {
+function mapActionListItem(row: unknown, index: number, titles: ReadonlyMap<string, string>) {
   const action = row as MonsterActionDraftRow | undefined
   return {
-    title: action
-      ? monsterActionNavigationTitle(resolveMonsterFormActionIdentity(action, values, ctx))
-      : `Action ${index + 1}`,
+    title: action ? (titles.get(action.id) ?? `Action ${index + 1}`) : `Action ${index + 1}`,
     sourceLabel: action ? getMonsterActionKindLabel(action.kind) : undefined,
   }
 }
@@ -176,13 +166,33 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
 
   const weaponGrants = useMemo(() => resolveMonsterFormWeaponGrants(values), [values])
 
+  const actionTitles = monsterActionEditorTitles(
+    (values.actions ?? []) as MonsterActionDraftRow[],
+    values,
+    ctx,
+  )
+  const bonusTitles = monsterActionEditorTitles(
+    (values.bonusActions ?? []) as MonsterActionDraftRow[],
+    values,
+    ctx,
+  )
+  const reactionTitles = monsterActionEditorTitles(
+    (values.reactions ?? []) as MonsterActionDraftRow[],
+    values,
+    ctx,
+  )
+  const titlesBySection = {
+    actions: actionTitles,
+    bonusActions: bonusTitles,
+    reactions: reactionTitles,
+  }
   const actionRows = useEmbeddedMasterDetailRows({
     formCtx: ctx,
     fieldName: 'actions',
     editor: sections.editors.actions,
     itemFields: [],
     itemNoun: MONSTER_ACTION_ITEM_NOUN,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, values, ctx),
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, actionTitles),
     access: { kind: 'availability', fieldName: 'available' },
     resolveRowIssueCount: (index) =>
       formState.submitCount > 0 && sections.hasRowError('actions', index) ? 1 : 0,
@@ -193,7 +203,7 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
     editor: sections.editors.bonusActions,
     itemFields: [],
     itemNoun: MONSTER_ACTION_ITEM_NOUN,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, values, ctx),
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, bonusTitles),
     access: { kind: 'availability', fieldName: 'available' },
     resolveRowIssueCount: (index) =>
       formState.submitCount > 0 && sections.hasRowError('bonusActions', index) ? 1 : 0,
@@ -204,7 +214,7 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
     editor: sections.editors.reactions,
     itemFields: [],
     itemNoun: MONSTER_ACTION_ITEM_NOUN,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, values, ctx),
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, reactionTitles),
     access: { kind: 'availability', fieldName: 'available' },
     resolveRowIssueCount: (index) =>
       formState.submitCount > 0 && sections.hasRowError('reactions', index) ? 1 : 0,
@@ -249,9 +259,7 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
   const deleteDescription =
     deleteReferences.length > 0
       ? `This attack is used by ${deleteReferences
-          .map((action) =>
-            monsterActionNavigationTitle(resolveMonsterFormActionIdentity(action, values, ctx)),
-          )
+          .map((action) => titlesBySection.actions.get(action.id) ?? action.id)
           .join(', ')}. Removing it drops that reference and leaves the step count unchanged.`
       : undefined
 

@@ -83,7 +83,8 @@ describe('MonsterTraitsEditor', () => {
     expect(
       screen.queryByRole('switch', { name: 'Override generated name and description' }),
     ).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add custom name' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add custom name' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Edit name' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add additional details' })).toBeInTheDocument()
   })
 

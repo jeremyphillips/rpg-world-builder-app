@@ -14,9 +14,9 @@ import type { useEmbeddedMasterDetailRows } from '../../../lib/master-detail/use
 import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-summary'
 import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
 import {
-  monsterActionNavigationTitle,
-  resolveMonsterFormActionIdentity,
-} from '../../lib/actions/monster-action-identity'
+  monsterActionHeaderName,
+  monsterActionEditorTitles,
+} from '../../lib/actions/monster-action-editor-title'
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
@@ -70,10 +70,31 @@ export function MonsterActionDetail({
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const action = located?.action
   const namePrefix = located ? `${located.section}.${located.index}` : ''
+  const sectionRows = (
+    located && values ? (values[located.section] ?? []) : []
+  ) as MonsterActionDraftRow[]
+  const liveAction =
+    located && values
+      ? ((values[located.section]?.[located.index] as MonsterActionDraftRow | undefined) ?? action)
+      : action
+  const headerName =
+    located && liveAction
+      ? monsterActionHeaderName({
+          action: liveAction,
+          sectionRows,
+          values,
+          ctx,
+        })
+      : undefined
+  const editor = located ? sections.editors[located.section] : sections.editors.actions
+  const initialEdit = Boolean(
+    headerName?.mode === 'authored' &&
+    !liveAction?.name?.trim() &&
+    editor.lastAddedFieldId &&
+    editor.lastAddedFieldId === editor.selectedFieldId,
+  )
   const fields = useMemo(() => {
-    if (!located || !values || !action) return []
-    const watched = values[located.section]?.[located.index]
-    const liveAction = (watched ?? action) as MonsterActionDraftRow
+    if (!located || !values || !action || !liveAction) return []
     return monsterActionDetailFields({
       ctx,
       action: liveAction,
@@ -92,17 +113,22 @@ export function MonsterActionDetail({
         )
         .map((row) => ({
           value: row.id,
-          label: monsterActionNavigationTitle(resolveMonsterFormActionIdentity(row, values, ctx)),
+          label:
+            monsterActionEditorTitles(
+              (values[located.section] ?? []) as MonsterActionDraftRow[],
+              values,
+              ctx,
+            ).get(row.id) ??
+            headerName?.title ??
+            row.id,
         })),
     })
-  }, [action, ctx, located, namePrefix, sections.setNotice, values])
+  }, [action, ctx, headerName?.title, liveAction, located, namePrefix, sections.setNotice, values])
 
   useEffect(() => {
     if (sections.focusToken === 0 || !action) return
     document.getElementById(`monster-action-focus-${action.id}`)?.focus()
   }, [action, sections.focusToken])
-
-  const editor = located ? sections.editors[located.section] : sections.editors.actions
 
   return (
     <MasterDetailEditorPanel
@@ -113,14 +139,22 @@ export function MonsterActionDetail({
       itemNoun={MONSTER_ACTION_ITEM_NOUN}
       showSelectedDetail={Boolean(located && action)}
       selectedIdentity={
-        located && action
+        located && action && headerName
           ? {
-              title: monsterActionNavigationTitle(
-                resolveMonsterFormActionIdentity(action, values, ctx),
-              ),
+              title: headerName.title,
+              rowKey: editor.selectedFieldId ?? action.id,
               meta: {
+                ...(headerName.sourceName ? { sourceName: headerName.sourceName } : {}),
                 eyebrow: getMonsterActionKindLabel(action.kind),
                 sourceLabel: monsterActionSectionHeading(located.section),
+              },
+              inlineTitle: {
+                field: 'name',
+                fallback: headerName.fallback,
+                placeholder: headerName.placeholder,
+                mode: headerName.mode,
+                initialEdit,
+                ...(headerName.resetLabel ? { resetLabel: headerName.resetLabel } : {}),
               },
               deletable: rows.selectedIdentity?.deletable,
               availability: rows.selectedIdentity?.availability,

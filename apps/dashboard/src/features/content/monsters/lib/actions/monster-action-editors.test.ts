@@ -175,13 +175,7 @@ describe('monster action detail fields', () => {
       damageType: 'piercing',
     })
     expect(natural).toEqual(
-      expect.arrayContaining([
-        'name',
-        'description',
-        'damage',
-        'damageType',
-        'onHit.additionalDamage',
-      ]),
+      expect.arrayContaining(['description', 'damage', 'damageType', 'onHit.additionalDamage']),
     )
     expect(natural).toContain('limitedUse')
     for (const hidden of ['mode', 'properties', 'reach', 'limitedUse.kind', 'moveSection']) {
@@ -282,8 +276,8 @@ describe('monster action detail fields', () => {
     expect(weapon).toContain('equipmentEntryId')
     expect(weapon).not.toContain('limitedUse')
     expect(weapon).not.toContain('limitedUse.kind')
+    expect(weapon).not.toContain('name')
     expect(weapon).not.toContain('moveSection')
-    expect(weapon.indexOf('name')).toBeLessThan(weapon.indexOf('equipmentEntryId'))
     expect(weapon.indexOf('attackPreview')).toBe(weapon.indexOf('equipmentEntryId') + 1)
     expect(weapon.indexOf('buildAdvisories')).toBe(weapon.indexOf('attackPreview') + 1)
     expect(weapon.indexOf('damage')).toBe(weapon.indexOf('buildAdvisories') + 1)
@@ -292,7 +286,7 @@ describe('monster action detail fields', () => {
     expect(spellNames[0]).toBe('buildAdvisories')
 
     const spell = detailFields({ id: 'cast', kind: 'spell', name: 'Spellcasting', spells: [] })
-    expect(spell.indexOf('name')).toBeLessThan(spell.indexOf('castingAbility'))
+    expect(spell).not.toContain('name')
     expect(spell.indexOf('castingAbility')).toBeLessThan(spell.indexOf('spells'))
     expect(spell.indexOf('spells')).toBeLessThan(spell.indexOf('description'))
     expect(spell.indexOf('description')).toBeLessThan(spell.indexOf('omittedComponents'))

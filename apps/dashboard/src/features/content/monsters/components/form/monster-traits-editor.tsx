@@ -5,10 +5,7 @@ import {
   formatCreatureTrait,
   formatMonsterStatBlockSubject,
   getCreatureTraitTemplate,
-  getCreatureTraitVocabularyEntry,
   listCreatureTraitTemplatesForRuleset,
-  resolveTraitName,
-  type ContentTrait,
 } from '@rpg/contracts'
 import { ActionIcon, ButtonDropdown, RulesPreview } from '@rpg/ui'
 import type { FormItem } from '@rpg/ui/form'
@@ -36,6 +33,10 @@ import {
   monsterTraitItemFields,
   monsterTraitTemplateFields,
 } from '../../lib/monster-trait-form-fields'
+import {
+  monsterTraitListTitle,
+  resolveMonsterTraitHeaderIdentity,
+} from '../../lib/monster-trait-editor-title'
 import {
   monsterTraitPresetDefaults,
   monsterTraitPresetFields,
@@ -70,11 +71,6 @@ function isTemplateRow(row: unknown): row is {
   )
 }
 
-function storedOverride(value: string | undefined): string | undefined {
-  const trimmed = value?.trim()
-  return trimmed ? trimmed : undefined
-}
-
 function templatePreviewSentence(
   row: { templateId: string; config?: unknown },
   monsterName: string,
@@ -86,31 +82,6 @@ function templatePreviewSentence(
       monsterName,
     }) ?? ''
   )
-}
-
-function traitListTitle(row: unknown, index: number, monsterName: string): string {
-  if (isTemplateRow(row)) {
-    return (
-      resolveTraitName({
-        kind: 'template',
-        id: 'row',
-        templateId: row.templateId,
-        config: row.config,
-        nameOverride: storedOverride(row.nameOverride),
-      } as ContentTrait) || `Trait ${index + 1}`
-    )
-  }
-  if (isPresetRow(row)) {
-    const formatted = formatCreatureTrait({
-      subject: formatMonsterStatBlockSubject(monsterName),
-      trait: row,
-    })
-    return (
-      formatted?.name ?? getCreatureTraitVocabularyEntry(row.preset)?.label ?? `Trait ${index + 1}`
-    )
-  }
-  const name = (row as { name?: string } | undefined)?.name?.trim()
-  return name || `Trait ${index + 1}`
 }
 
 export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
@@ -259,8 +230,19 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
       makeItemDefaults={makeItemDefaults}
       access={{ kind: 'availability', fieldName: 'available' }}
       mapListItem={({ row, index }) => ({
-        title: traitListTitle(row, index, monsterName ?? ''),
+        title: monsterTraitListTitle(row, traits ?? [], monsterName ?? '', index),
       })}
+      resolveHeaderIdentity={({ row, index, fieldId, identity }) =>
+        resolveMonsterTraitHeaderIdentity({
+          row,
+          rows: traits ?? [],
+          monsterName: monsterName ?? '',
+          index,
+          fieldId,
+          lastAddedFieldId: editor.lastAddedFieldId,
+          identity,
+        })
+      }
     />
   )
 }

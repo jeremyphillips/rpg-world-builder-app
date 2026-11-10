@@ -103,6 +103,7 @@ export function formatMonsterEquipmentEquippedAriaLabel(displayName: string): st
 export const MONSTER_EQUIPPED_LABEL = 'Equipped'
 export const MONSTER_CUSTOMIZATION_LABEL = 'Customization'
 export const MONSTER_CUSTOM_NAME_LABEL = 'Custom name'
+export const MONSTER_USE_DEFAULT_NAME_LABEL = 'Use default name'
 export const MONSTER_CUSTOM_DESCRIPTION_LABEL = 'Additional details'
 export const MONSTER_CUSTOM_DESCRIPTION_HINT =
   'Narrative detail shown with the generated rules. It does not change them.'

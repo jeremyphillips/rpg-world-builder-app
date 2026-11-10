@@ -18,9 +18,6 @@ import { weaponAttackRangeGroup } from '../../../lib/forms/fields/weapon-attack-
 import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
 import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
 import {
-  MONSTER_ACTION_NAME_LABEL,
-  MONSTER_CUSTOM_NAME_ADD_LABEL,
-  MONSTER_CUSTOM_NAME_LABEL,
   MONSTER_RULES_TEXT_LABEL,
   MONSTER_ADDITIONAL_CONDITION_HINT,
   MONSTER_ADDITIONAL_CONDITION_LABEL,
@@ -91,18 +88,6 @@ const monsterActionOptionalDescriptionField = {
   hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
   optionalDisclosure: { addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
 } as const satisfies FormItem
-
-function monsterActionNameField(action: MonsterActionDraftRow): FormItem {
-  if (monsterActionAuthoring(action).name === 'derived') {
-    return {
-      type: 'text',
-      name: 'name',
-      label: MONSTER_CUSTOM_NAME_LABEL,
-      optionalDisclosure: { addLabel: MONSTER_CUSTOM_NAME_ADD_LABEL },
-    }
-  }
-  return { type: 'text', name: 'name', label: MONSTER_ACTION_NAME_LABEL, required: true }
-}
 
 function monsterReactionConditionField(action: MonsterActionDraftRow): FormItem {
   return {
@@ -459,7 +444,7 @@ export function monsterActionDetailFields(input: {
   const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions } = input
   const equipment = input.equipment ?? []
   const attackOptions = input.attackOptions ?? []
-  const fields: FormItem[] = [monsterActionNameField(action)]
+  const fields: FormItem[] = []
   if (action.kind !== 'spell') fields.push(monsterActionDescriptionField(action))
 
   if (action.kind === 'save') {
