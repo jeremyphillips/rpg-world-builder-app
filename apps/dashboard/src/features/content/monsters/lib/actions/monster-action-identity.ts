@@ -3,7 +3,7 @@ import { resolveMonsterActionIdentity, type ResolvedMonsterActionIdentity } from
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-constants'
 import { monsterEquipmentCatalog, monsterMagicPropertyProvider } from '../monster-form-derivation'
-import { MONSTER_ACTION_ITEM_NOUN } from '../monster-trait-form-fields'
+import { MONSTER_ACTION_ITEM_NOUN } from '../monster-form-labels'
 import type { MonsterFormValues } from '../monster-form-values'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 

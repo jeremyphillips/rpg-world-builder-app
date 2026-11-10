@@ -7,11 +7,8 @@ import {
   resolveEffectiveSpeciesTraitAccess,
   type ResolvedContentCampaignAccess,
 } from '../../../content/lib/campaign-access'
-import type { ContentGrant, GrantGroupSource } from '../../../content/lib/grants'
-import {
-  getUnlockedGrantsAtLevel,
-  resolveGrantGroupsFromContent,
-} from '../../../content/lib/grants'
+import type { ContentGrant } from '../../../content/lib/grants'
+import { resolveCreatureTraitGrants } from '../../creature/traits'
 import type { Species } from '../../../content/species'
 import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 import type { CharacterBuildCatalogIndex } from '../context'
@@ -28,20 +25,35 @@ export type SourcedContentGrant = {
 }
 
 function traitSourcedGrants(
-  trait: GrantGroupSource,
+  trait: Parameters<
+    typeof resolveCreatureTraitGrants<CharacterSelectionSource>
+  >[0][number]['trait'],
   sources: CharacterSelectionSource[],
   characterLevel: number,
   parentLevel = 1,
 ): SourcedContentGrant[] {
-  const groups = resolveGrantGroupsFromContent(trait, { level: parentLevel })
-  if (!groups.length) return []
+  return sourcedFromAssignments(
+    sources.map((source) => ({ trait, source, parentLevel })),
+    characterLevel,
+  )
+}
 
-  const grants = getUnlockedGrantsAtLevel(groups, characterLevel, parentLevel)
-
-  return grants.map((grant) => ({
-    grant,
-    sources: sources.map((source) => ({ ...source, grantRowId: grant.id })),
-  }))
+function sourcedFromAssignments(
+  assignments: Parameters<typeof resolveCreatureTraitGrants<CharacterSelectionSource>>[0],
+  characterLevel: number,
+): SourcedContentGrant[] {
+  return resolveCreatureTraitGrants(assignments).flatMap((resolved) => {
+    if (resolved.unlockLevel > characterLevel) return []
+    return [
+      {
+        grant: resolved.grant,
+        sources: resolved.sources.map((source) => ({
+          ...source,
+          grantRowId: resolved.grant.id,
+        })),
+      },
+    ]
+  })
 }
 
 type SpeciesWithAccess = Species & {
@@ -54,16 +66,23 @@ function speciesTraitGrants(
 ): SourcedContentGrant[] {
   const speciesAccess = resolveDefaultSpeciesAccess(species.campaignAccess)
 
-  return species.traits.flatMap((trait) => {
+  const assignments = species.traits.flatMap((trait) => {
     const effective = resolveEffectiveSpeciesTraitAccess(speciesAccess, trait)
     if (!isEffectiveAvailable(effective)) return []
-
-    return traitSourcedGrants(
-      trait,
-      [{ kind: 'speciesTrait', sourceId: species.id, grantId: trait.id }],
-      characterLevel,
-    )
+    return [
+      {
+        trait,
+        source: {
+          kind: 'speciesTrait' as const,
+          sourceId: species.id,
+          grantId: trait.id,
+        },
+        parentLevel: 1,
+      },
+    ]
   })
+
+  return sourcedFromAssignments(assignments, characterLevel)
 }
 
 function heritageOptionGrants(

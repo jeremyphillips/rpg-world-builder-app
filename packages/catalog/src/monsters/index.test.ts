@@ -6,7 +6,9 @@ import {
   formatMonsterMultiattack,
   formatMonsterSaveAction,
   formatMonsterSpellEntry,
+  resolveCreatureTraitGrants,
   resolveMonsterActionIdentity,
+  resolveTraitDisplay,
   systemDefaultArmorClassRules,
 } from '@rpg/contracts'
 
@@ -26,20 +28,24 @@ describe('SRD 5.2.1 monster seed', () => {
     )
   })
 
-  it('stores the repeated general traits as presets', () => {
+  it('stores the repeated general traits as templates', () => {
     const kobold = monsters.find((monster) => monster.slug === 'kobold-warrior')
     const hound = monsters.find((monster) => monster.slug === 'hell-hound')
     expect(kobold?.traits).toEqual([
-      expect.objectContaining({ id: 'pack-tactics', preset: 'pack-tactics' }),
-      expect.objectContaining({ id: 'sunlight-sensitivity', preset: 'sunlight-sensitivity' }),
+      expect.objectContaining({
+        id: 'pack-tactics',
+        kind: 'template',
+        templateId: 'pack-tactics',
+      }),
+      expect.objectContaining({
+        id: 'sunlight-sensitivity',
+        kind: 'template',
+        templateId: 'sunlight-sensitivity',
+      }),
     ])
     expect(hound?.traits).toEqual([
-      expect.objectContaining({ id: 'pack-tactics', preset: 'pack-tactics' }),
+      expect.objectContaining({ id: 'pack-tactics', kind: 'template', templateId: 'pack-tactics' }),
     ])
-    const presetRows = monsters.flatMap((monster) =>
-      monster.traits.filter((trait) => 'preset' in trait),
-    )
-    expect(presetRows).toHaveLength(3)
   })
 
   it('derives kobold warrior AC and dagger attack from catalog equipment', () => {
@@ -74,6 +80,27 @@ describe('SRD 5.2.1 monster seed', () => {
     expect(
       formatMonsterAttackAction(skeletonBlock.attacks.find((line) => line.id === 'shortbow')!),
     ).toBe('Ranged Attack Roll: +5, range 80/320 ft. Hit: 6 (1d6 + 3) Piercing damage.')
+    expect(kobold!.traits.map((trait) => trait.kind)).toEqual(['template', 'template'])
+    expect(resolveTraitDisplay(kobold!.traits[0]!).descriptionHtml).toContain(
+      'The kobold has Advantage',
+    )
+    expect(resolveTraitDisplay(kobold!.traits[1]!).descriptionHtml).toContain(
+      'ability checks and attack rolls',
+    )
+    const grants = resolveCreatureTraitGrants(
+      kobold!.traits.map((trait) => ({ trait, source: trait.id })),
+    )
+    expect(grants.map((row) => row.templateId)).toEqual(['pack-tactics', 'sunlight-sensitivity'])
+    expect(grants[0]?.grant).toMatchObject({
+      kind: 'rollAdjustment',
+      mode: 'advantage',
+      rolls: [{ kind: 'attack' }],
+    })
+    expect(grants[1]?.grant).toMatchObject({
+      kind: 'rollAdjustment',
+      mode: 'disadvantage',
+      circumstance: { kind: 'in-sunlight' },
+    })
   })
 
   it('derives Knight, Mage, and Hell Hound stat lines from authored inputs', () => {

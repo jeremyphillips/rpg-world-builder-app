@@ -13,7 +13,7 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-constants'
 import { monsterActionSectionHeading } from '../monster-form-labels'
-import { MONSTER_ACTION_ITEM_NOUN } from '../monster-trait-form-fields'
+import { MONSTER_ACTION_ITEM_NOUN } from '../monster-form-labels'
 
 type CastingRow = {
   id: string

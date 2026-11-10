@@ -1,7 +1,8 @@
-import { CATALOG_LAYER_ENTRIES, type CatalogLayer } from '@rpg/contracts'
+import type { CatalogLayer } from '@rpg/contracts'
 
 import { resolveAvailability, type Availability, type AvailabilityReason } from '@/lib/availability'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
+import { resolveMasterDetailSourceLabel } from './resolve-master-detail-source-label'
 
 export type EmbeddedRowSource = 'system' | 'homebrew'
 
@@ -43,7 +44,7 @@ export function resolveEmbeddedRowMeta({
 
   return {
     source,
-    sourceLabel: CATALOG_LAYER_ENTRIES[source].label,
+    sourceLabel: resolveMasterDetailSourceLabel(source),
     deletable: source !== 'system',
     availability,
   }

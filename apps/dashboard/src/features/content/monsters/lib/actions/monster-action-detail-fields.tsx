@@ -60,6 +60,10 @@ import {
 } from './monster-action-save-field-hints'
 import { monsterWeaponDamageOverrideField } from './monster-weapon-damage-override'
 import type { MonsterFormValues } from '../monster-form-values'
+import {
+  MonsterActionSaveFailureNoteField,
+  MonsterActionSaveSuccessAmountField,
+} from './monster-action-save-outcome-fields'
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {
   return {
     dependsOn: [name],
@@ -348,26 +352,14 @@ function monsterActionSaveSection(
       monsterActionSaveDcDependent(namePrefix, sharedCastingOptions),
       monsterActionSaveSelectionDependent(),
       {
-        type: 'textarea',
-        name: 'resolution.outcomes.0.note',
-        label: 'Failure note',
-        rows: 2,
-        width: 'full',
-        optionalDisclosure: {
-          addLabel: 'Add failure note',
-          removeLabel: 'Remove',
-          expandWhenPopulated: true,
-        },
+        kind: 'slot',
+        name: '_saveFailureNote',
+        render: () => <MonsterActionSaveFailureNoteField namePrefix={namePrefix} />,
       },
       {
-        type: 'select',
-        name: 'resolution.outcomes.1.applications.0.amount',
-        label: 'On successful save',
-        options: [
-          { value: 'half', label: 'Half damage' },
-          { value: 'full', label: 'Full damage' },
-          { value: 'none', label: 'No effect' },
-        ],
+        kind: 'slot',
+        name: '_saveSuccessAmount',
+        render: () => <MonsterActionSaveSuccessAmountField namePrefix={namePrefix} />,
       },
     ],
   }

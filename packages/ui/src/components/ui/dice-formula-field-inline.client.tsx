@@ -9,6 +9,7 @@ import { FieldErrorText, FieldHintBelowLabel, FieldHintText, type FieldSize } fr
 import type { FieldWidth } from './field-control.variants'
 import { fieldWidthVariants } from './field-control.variants'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
+import { showOwnedLabelSlot } from './owned-label-visibility.lib'
 import { FieldLabelContent, FieldLabelInfoAction } from './field-label-content'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import {
@@ -96,9 +97,12 @@ function DiceFormulaInlineBody({
   | 'error'
   | 'controls'
 >) {
-  const labelSrOnly = labelVisibility === 'srOnly'
   const hintInLabelSlot = hintPosition === 'below-label' && Boolean(hint)
-  const showLabelSlot = !labelSrOnly || hintInLabelSlot || info != null
+  const showLabelSlot = showOwnedLabelSlot({
+    labelVisibility,
+    hintInLabelSlot,
+    hasInfo: info != null,
+  })
   const ownedLabel = (
     <DiceFormulaInlineLabel
       label={label}

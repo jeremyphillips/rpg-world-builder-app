@@ -9,7 +9,9 @@ import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 import { pickEquipment } from '@/test/fixtures/pick'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { useEmbeddedMasterDetailRows } from '../../../lib/master-detail/use-embedded-master-detail-rows'
 import { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
+import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-form-labels'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import {
   resolveMonsterCreateDefaultValues,
@@ -49,7 +51,18 @@ function Host({
 
 function Detail({ ctx, actionId }: { ctx: ContentFormCtx; actionId: string }) {
   const sections = useMonsterActionSections()
-  return <MonsterActionDetail ctx={ctx} sections={sections} located={sections.locate(actionId)} />
+  const located = sections.locate(actionId)
+  const rows = useEmbeddedMasterDetailRows({
+    formCtx: ctx,
+    fieldName: located?.section ?? 'actions',
+    editor: sections.editors[located?.section ?? 'actions'],
+    itemFields: [],
+    itemNoun: MONSTER_ACTION_ITEM_NOUN,
+    mapListItem: ({ row, index }) => ({
+      title: (row as { name?: string } | undefined)?.name?.trim() || `Action ${index + 1}`,
+    }),
+  })
+  return <MonsterActionDetail ctx={ctx} sections={sections} located={located} rows={rows} />
 }
 
 const shot: MonsterActionDraftRow = {

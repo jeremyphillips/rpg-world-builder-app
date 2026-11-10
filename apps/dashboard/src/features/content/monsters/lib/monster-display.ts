@@ -21,9 +21,13 @@ import {
   type MonsterAction,
   type MonsterReaction,
   type SkillProficiency,
+  availableBodyRows,
   deriveMonsterStatBlock,
   formatCreatureTrait,
   formatMonsterAttackAction,
+  resolveCreatureSenses,
+  resolveCreatureTraitGrants,
+  resolveTraitDisplay,
   formatMonsterLimitedUseHeading,
   formatMonsterMultiattack,
   formatMonsterSaveAction,
@@ -465,7 +469,13 @@ function responseLabel(text: string | undefined, hasBody: boolean): string | und
 }
 
 function formatSenseLines(monster: Monster, passivePerception?: number): string {
-  const senseParts = monster.senses.map((sense) => {
+  const senses = resolveCreatureSenses({
+    authored: monster.senses,
+    grants: resolveCreatureTraitGrants(
+      monster.traits.flatMap((trait) => ('kind' in trait ? [{ trait, source: trait.id }] : [])),
+    ).map((resolved) => resolved.grant),
+  })
+  const senseParts = senses.map((sense) => {
     const label = getSenseLabel(sense.type)
     return sense.range != null ? `${label} ${sense.range} ft.` : label
   })
@@ -597,26 +607,67 @@ function escapeTraitSentence(value: string): string {
   return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 }
 
+function traitRecord(trait: Monster['traits'][number]): Record<string, unknown> {
+  return trait as Record<string, unknown>
+}
+
+function mapPresetMonsterTrait(
+  trait: Monster['traits'][number],
+  record: Record<string, unknown>,
+  monsterName: string,
+): MonsterTraitItemViewModel | undefined {
+  if (typeof record.preset !== 'string') return undefined
+  const formatted = formatCreatureTrait({
+    subject: formatMonsterStatBlockSubject(monsterName),
+    trait: trait as Parameters<typeof formatCreatureTrait>[0]['trait'],
+  })
+  return {
+    id: trait.id,
+    name: formatted?.name ?? record.preset,
+    descriptionHtml: formatted ? `<p>${escapeTraitSentence(formatted.sentence)}</p>` : '',
+  }
+}
+
+function mapTemplateMonsterTrait(
+  trait: Monster['traits'][number],
+  record: Record<string, unknown>,
+): MonsterTraitItemViewModel | undefined {
+  if (record.kind !== 'template' || typeof record.templateId !== 'string') return undefined
+  const display = resolveTraitDisplay({
+    kind: 'template',
+    id: trait.id,
+    templateId: record.templateId,
+    config: record.config,
+    nameOverride: typeof record.nameOverride === 'string' ? record.nameOverride : undefined,
+    descriptionOverride:
+      typeof record.descriptionOverride === 'string' ? record.descriptionOverride : undefined,
+  })
+  return {
+    id: trait.id,
+    name: display.name,
+    descriptionHtml: display.descriptionHtml ?? '',
+  }
+}
+
+function mapNamedMonsterTrait(
+  trait: Monster['traits'][number],
+  record: Record<string, unknown>,
+): MonsterTraitItemViewModel {
+  const name = typeof record.name === 'string' ? record.name : trait.id
+  const description = typeof record.description === 'string' ? record.description : ''
+  return { id: trait.id, name, descriptionHtml: description }
+}
+
 function mapMonsterTrait(
   trait: Monster['traits'][number],
   monsterName: string,
 ): MonsterTraitItemViewModel {
-  if ('preset' in trait) {
-    const formatted = formatCreatureTrait({
-      subject: formatMonsterStatBlockSubject(monsterName),
-      trait,
-    })
-    return {
-      id: trait.id,
-      name: formatted?.name ?? trait.preset,
-      descriptionHtml: formatted ? `<p>${escapeTraitSentence(formatted.sentence)}</p>` : '',
-    }
-  }
-  return {
-    id: trait.id,
-    name: trait.name,
-    descriptionHtml: trait.description,
-  }
+  const record = traitRecord(trait)
+  return (
+    mapPresetMonsterTrait(trait, record, monsterName) ??
+    mapTemplateMonsterTrait(trait, record) ??
+    mapNamedMonsterTrait(trait, record)
+  )
 }
 
 export function buildMonsterDetailViewModel({
@@ -638,7 +689,7 @@ export function buildMonsterDetailViewModel({
     catalogState,
     magicPropertyProvider,
     spellsInBody: new Map(
-      [...monster.actions, ...monster.bonusActions, ...monster.reactions]
+      availableBodyRows([...monster.actions, ...monster.bonusActions, ...monster.reactions])
         .filter((action) => action.kind === 'spell')
         .map((action) => [action.id, action]),
     ),
@@ -670,16 +721,32 @@ export function buildMonsterDetailViewModel({
     statRows,
     abilities,
     detailsLeaves: buildDetailsLeaves(monster, derived, equipmentById, catalogState),
-    traits: monster.traits.map((trait) => mapMonsterTrait(trait, monster.name)),
-    actions: mapActionItems(monster.actions, 'actions', derived, catalogState, spellContext),
+    traits: monster.traits
+      .filter((trait) => {
+        const available = (trait as { available?: boolean }).available
+        return available !== false
+      })
+      .map((trait) => mapMonsterTrait(trait, monster.name)),
+    actions: mapActionItems(
+      availableBodyRows(monster.actions),
+      'actions',
+      derived,
+      catalogState,
+      spellContext,
+    ),
     bonusActions: mapActionItems(
-      monster.bonusActions,
+      availableBodyRows(monster.bonusActions),
       'bonusActions',
       derived,
       catalogState,
       spellContext,
     ),
-    reactions: mapReactionItems(monster.reactions, derived, catalogState, spellContext),
+    reactions: mapReactionItems(
+      availableBodyRows(monster.reactions),
+      derived,
+      catalogState,
+      spellContext,
+    ),
   }
 }
 

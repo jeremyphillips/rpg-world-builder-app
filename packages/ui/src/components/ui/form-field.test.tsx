@@ -153,6 +153,24 @@ describe('FormField', () => {
     expect(screen.getByTestId('control')).toHaveAttribute('required')
   })
 
+  it('keeps a below-control hint when an sr-only settings label collapses', () => {
+    render(
+      <FormField
+        id="title"
+        label="Title"
+        labelVisibility="srOnly"
+        labelPosition="settings"
+        hint="Shown beside the control."
+        hintPosition="below-control"
+      >
+        <input id="title" />
+      </FormField>,
+    )
+    expect(screen.getByText('Shown beside the control.')).toBeInTheDocument()
+    expect(screen.getByLabelText('Title')).toBeInTheDocument()
+    expect(document.body.innerHTML).not.toContain('sm:grid-cols-[minmax(0,1fr)_auto]')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <FormField id="name" label="Name">

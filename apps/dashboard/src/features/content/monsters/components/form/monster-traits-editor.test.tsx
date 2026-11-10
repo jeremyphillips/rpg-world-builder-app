@@ -68,7 +68,7 @@ describe('MonsterTraitsEditor', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Ankheg'
     values.traits = [
-      { id: 'note', name: 'Note', description: 'Custom.' },
+      { id: 'note', kind: 'custom', name: 'Note', description: 'Custom.' },
       { id: 'tunnel', preset: 'tunneler' },
     ]
     const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }

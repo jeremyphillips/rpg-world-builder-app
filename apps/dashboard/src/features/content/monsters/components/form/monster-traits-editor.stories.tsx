@@ -34,4 +34,26 @@ function Host({ values, width }: { values?: MonsterFormValues; width?: number })
 
 export const Empty: Story = { render: () => <Host /> }
 
+export const WithAvailability: Story = {
+  render: () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.traits = [
+      {
+        id: 'pack',
+        kind: 'custom',
+        name: 'Pack Tactics',
+        description: 'Advantage when an ally is adjacent.',
+      },
+      {
+        id: 'sunlight',
+        kind: 'custom',
+        name: 'Sunlight Sensitivity',
+        description: 'Disadvantage in sunlight.',
+        available: false,
+      },
+    ]
+    return <Host values={values} />
+  },
+}
+
 export const Narrow: Story = { render: () => <Host width={360} /> }

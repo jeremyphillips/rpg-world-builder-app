@@ -231,6 +231,36 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
       ...MOVEMENT_OPERATIONS.map((id) => ({ kind: 'movementOperation' as const, id })),
     ],
   },
+  {
+    id: 'roll-adjustment',
+    label: GRANT_TYPE_LABELS.rollAdjustment,
+    description:
+      'Grant advantage or disadvantage on attack rolls, saving throws, or ability checks.',
+    groupId: 'combat-traits',
+    grantType: 'rollAdjustment',
+    createDefault: () => ({
+      grantType: 'rollAdjustment',
+      rollMode: 'advantage',
+      rollTargets: ['saving-throw'],
+    }),
+    aliases: ['advantage', 'disadvantage', 'fey ancestry'],
+    searchTerms: ['saving throw', 'attack roll'],
+  },
+  {
+    id: 'save-outcome-override',
+    label: GRANT_TYPE_LABELS.saveOutcomeOverride,
+    description:
+      'Let the creature choose to succeed on a failed saving throw a limited number of times.',
+    groupId: 'combat-traits',
+    grantType: 'saveOutcomeOverride',
+    createDefault: () => ({
+      grantType: 'saveOutcomeOverride',
+      saveOutcomeUses: 1,
+      saveOutcomeRest: 'long',
+    }),
+    aliases: ['legendary resistance'],
+    searchTerms: ['saving throw', 'success'],
+  },
 ] as const
 
 const GRANT_TEMPLATE_BY_ID = Object.fromEntries(

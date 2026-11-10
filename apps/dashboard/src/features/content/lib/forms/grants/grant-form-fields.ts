@@ -1,4 +1,9 @@
 import {
+  ABILITY_IDS,
+  CREATURE_EFFECT_CIRCUMSTANCE_ENTRIES,
+  CREATURE_ROLL_ADJUSTMENT_MODE_ENTRIES,
+  CREATURE_ROLL_TARGET_ENTRIES,
+  EFFECT_CONDITION_ENTRIES,
   FEAT_CATEGORY_IDS,
   FEAT_CATEGORY_ENTRIES,
   formatDamageTypeGrantSentence,
@@ -6,6 +11,7 @@ import {
   formatLanguageGrantSentence,
   formatMovementGrantAuthoringSummary,
   formatResistanceGrantSentence,
+  getAbilityLabel,
   formatSenseGrantSentence,
   getMovementModeGrantLabel,
   MOVEMENT_BONUS_FEET,
@@ -505,6 +511,97 @@ export function grantItemFields<T extends string>(
         options: languageOptions,
       }),
       visibility: visibleFor('languages'),
+    },
+    {
+      type: 'select',
+      name: 'rollMode',
+      label: 'Adjustment',
+      required: true,
+      options: Object.entries(CREATURE_ROLL_ADJUSTMENT_MODE_ENTRIES).map(([value, entry]) => ({
+        value,
+        label: entry.label,
+      })),
+      visibility: visibleFor('rollAdjustment'),
+    },
+    {
+      type: 'chips',
+      name: 'rollTargets',
+      label: 'Rolls',
+      required: true,
+      options: Object.entries(CREATURE_ROLL_TARGET_ENTRIES).map(([value, entry]) => ({
+        value,
+        label: entry.label,
+      })),
+      visibility: visibleFor('rollAdjustment'),
+    },
+    {
+      type: 'select',
+      name: 'rollCheckAbility',
+      label: 'Ability',
+      required: true,
+      options: ABILITY_IDS.map((id) => ({ value: id, label: getAbilityLabel(id) })),
+      visibility: {
+        dependsOn: ['grantType', 'rollTargets'],
+        visibleWhen: (watched) =>
+          watched['grantType'] === 'rollAdjustment' &&
+          Array.isArray(watched['rollTargets']) &&
+          watched['rollTargets'].includes('ability-check'),
+      },
+    },
+    {
+      type: 'text',
+      name: 'rollSkillId',
+      label: 'Skill',
+      hint: 'Optional skill id, such as perception.',
+      visibility: {
+        dependsOn: ['grantType', 'rollTargets'],
+        visibleWhen: (watched) =>
+          watched['grantType'] === 'rollAdjustment' &&
+          Array.isArray(watched['rollTargets']) &&
+          watched['rollTargets'].includes('ability-check'),
+      },
+    },
+    {
+      type: 'select',
+      name: 'circumstanceKind',
+      label: 'Circumstance',
+      options: Object.entries(CREATURE_EFFECT_CIRCUMSTANCE_ENTRIES).map(([value, entry]) => ({
+        value,
+        label: entry.label,
+      })),
+      visibility: visibleFor('rollAdjustment'),
+    },
+    {
+      type: 'select',
+      name: 'circumstanceConditionId',
+      label: 'Condition',
+      required: true,
+      options: Object.entries(EFFECT_CONDITION_ENTRIES).map(([value, entry]) => ({
+        value,
+        label: entry.label,
+      })),
+      visibility: {
+        dependsOn: ['grantType', 'circumstanceKind'],
+        visibleWhen: (watched) =>
+          watched['grantType'] === 'rollAdjustment' &&
+          watched['circumstanceKind'] === 'vs-condition',
+      },
+    },
+    {
+      type: 'number',
+      name: 'saveOutcomeUses',
+      label: 'Uses',
+      min: 1,
+      required: true,
+      visibility: visibleFor('saveOutcomeOverride'),
+    },
+    {
+      type: 'select',
+      name: 'saveOutcomeRest',
+      label: 'Restores after',
+      required: true,
+      options: [...SPELL_MINIMUM_REST_OPTIONS],
+      visibility: visibleFor('saveOutcomeOverride'),
     },
     ...proficiencyGrantFieldsForTypes(grantTypes, ctx),
     // --- Spells row fields (replaces legacy innateSpells entries array) ---

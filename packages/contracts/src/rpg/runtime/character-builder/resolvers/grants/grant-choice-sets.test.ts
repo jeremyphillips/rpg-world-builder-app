@@ -134,3 +134,44 @@ describe('contentGrantToChoiceSets — featChoice', () => {
     })
   })
 })
+
+describe('contentGrantToChoiceSets — creature effects', () => {
+  const catalogIndex = indexCharacterBuildCatalog(builderTestCatalog)
+  const ctx = {
+    sourceType: 'species' as const,
+    sourceId: 'srd-cc-5.2.1:elf',
+    slot: 'trait:fey:grant:roll',
+  }
+
+  it('ignores roll adjustments and save outcome overrides', () => {
+    expect(
+      contentGrantToChoiceSets(
+        {
+          id: 'roll-1',
+          kind: 'rollAdjustment',
+          mode: 'advantage',
+          rolls: [{ kind: 'saving-throw' }],
+          circumstance: { kind: 'vs-condition', conditionId: 'charmed' },
+        },
+        ctx,
+        catalogIndex,
+      ),
+    ).toEqual([])
+    expect(
+      contentGrantToChoiceSets(
+        {
+          id: 'save-1',
+          kind: 'saveOutcomeOverride',
+          outcome: 'success',
+          limitedUse: {
+            kind: 'uses',
+            count: { kind: 'fixed', value: 3 },
+            recovery: { minimumRest: 'long' },
+          },
+        },
+        ctx,
+        catalogIndex,
+      ),
+    ).toEqual([])
+  })
+})

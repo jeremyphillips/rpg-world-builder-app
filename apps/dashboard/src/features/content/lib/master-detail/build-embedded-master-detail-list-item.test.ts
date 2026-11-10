@@ -19,7 +19,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
     })
 
     expect(item).toMatchObject({
-      id: 'rhf-1',
+      id: 'rage',
       title: 'Rage',
       meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
       deletable: false,
@@ -39,7 +39,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
     })
 
     expect(item).toMatchObject({
-      id: 'rhf-1',
+      id: 'custom-feature',
       title: 'Custom Feature',
       meta: { sourceLabel: 'Homebrew' },
       deletable: true,
@@ -59,6 +59,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
       title: 'Untitled',
     })
 
+    expect(item.id).toBe('rhf-1')
     expect(item.issueCount).toBe(2)
     expect(item.hasError).toBe(true)
     expect(item.meta).toEqual({ sourceLabel: 'Homebrew' })

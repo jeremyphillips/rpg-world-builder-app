@@ -1,11 +1,15 @@
+import { availableBodyRows } from '../../content/lib/campaign-access/body-row-availability'
 import type { MonsterAction, MonsterBody } from '../../content/monster'
 import { findSpellCastingSource } from '../../content/monster/spell-casting-source'
 import { getSkillName } from '../../content/skill-proficiency'
 import { NEUTRAL_ABILITY_SCORE } from '../../vocab/ability'
+import type { Sense } from '../../vocab/sense'
 import { CHALLENGE_RATING_MECHANICS } from '../../vocab/challenge-rating'
 import { CREATURE_SIZE_HIT_DIE, resolveLargestCreatureSize } from '../../vocab/creature-size'
 import type { ArmorClassRules } from '../../vocab/mechanics/armor-class-scale'
 import { abilityModifier } from '../creature/ability-modifier'
+import { resolveCreatureSenses } from '../creature/senses'
+import { resolveCreatureTraitGrants } from '../creature/traits'
 import { abilitySaveDc, spellAttackBonus } from '../creature/spell-dc'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { resolveMonsterArmorClass, type MonsterArmorClassResolution } from './armor-class'
@@ -62,6 +66,7 @@ export type DerivedMonsterStatBlock = {
   skills: Array<{ skillId: string; label: string; modifier: number }>
   attacks: DerivedMonsterAttackLine[]
   spellcasting: DerivedMonsterSpellcastingLine[]
+  senses: Sense[]
 }
 
 export type DerivedMonsterSpellcastingLine = {
@@ -230,9 +235,14 @@ export function deriveMonsterStatBlock({
 
   const attacks: DerivedMonsterAttackLine[] = []
   const attackLineArgs = { monster, equipmentCatalog, proficiencyBonus, magicPropertyProvider }
-  appendAttackLines(attacks, monster.actions, attackLineArgs, 'actions')
-  appendAttackLines(attacks, monster.bonusActions, attackLineArgs, 'bonusActions')
-  appendAttackLines(attacks, monster.reactions, attackLineArgs, 'reactions')
+  appendAttackLines(attacks, availableBodyRows(monster.actions), attackLineArgs, 'actions')
+  appendAttackLines(
+    attacks,
+    availableBodyRows(monster.bonusActions),
+    attackLineArgs,
+    'bonusActions',
+  )
+  appendAttackLines(attacks, availableBodyRows(monster.reactions), attackLineArgs, 'reactions')
 
   return {
     ac: armor,
@@ -248,6 +258,12 @@ export function deriveMonsterStatBlock({
     skills,
     attacks,
     spellcasting: deriveSpellcastingLines(monster, proficiencyBonus),
+    senses: resolveCreatureSenses({
+      authored: monster.senses,
+      grants: resolveCreatureTraitGrants(
+        monster.traits.flatMap((trait) => ('kind' in trait ? [{ trait, source: trait.id }] : [])),
+      ).map((resolved) => resolved.grant),
+    }),
   }
 }
 
@@ -258,7 +274,7 @@ function deriveSpellcastingLines(
   const sections = ['actions', 'bonusActions', 'reactions'] as const
   const lines: DerivedMonsterSpellcastingLine[] = []
   for (const section of sections) {
-    for (const action of monster[section]) {
+    for (const action of availableBodyRows(monster[section])) {
       if (action.kind !== 'spell' || !action.castingAbility) continue
       const ability =
         action.castingAbility.kind === 'ability'
@@ -335,7 +351,7 @@ function draftAttacks(
   ] as const
   const attacks: DerivedDraftAttack[] = []
   for (const [section, actions] of sections) {
-    for (const action of actions) {
+    for (const action of availableBodyRows(actions)) {
       if (
         action.kind !== 'weapon' &&
         action.kind !== 'natural-weapon' &&

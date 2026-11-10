@@ -22,6 +22,7 @@ export const unitTestFiles = [
   'src/features/content/lib/duplication/duplicate-content.test.ts',
   'src/features/content/lib/filter-catalog-for-viewer.test.ts',
   'src/features/content/lib/resolve-catalog.test.ts',
+  'src/features/content/lib/reject-creature-trait-templates.test.ts',
   'src/features/content/lib/resolve-catalog-membership-filter.test.ts',
   'src/features/content/species/assert-species-class-slugs.test.ts',
   'src/features/content/spells/assert-spell-class-ids.test.ts',

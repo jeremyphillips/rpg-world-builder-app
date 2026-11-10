@@ -1,17 +1,23 @@
 import { useCallback, useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 import {
+  DEFAULT_SYSTEM_RULESET_ID,
   formatCreatureTrait,
   formatMonsterStatBlockSubject,
+  getCreatureTraitTemplate,
   getCreatureTraitVocabularyEntry,
+  listCreatureTraitTemplatesForRuleset,
+  resolveTraitName,
+  type ContentTrait,
 } from '@rpg/contracts'
 import { ActionIcon, ButtonDropdown, RulesPreview } from '@rpg/ui'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { creatureTraitTemplateRow } from '../../../lib/creature-traits/creature-trait-add-menu'
 import { FormEmbeddedMasterDetailEditor } from '../../../components/master-detail/form-embedded-master-detail-editor'
 import { useMasterDetailArray } from '../../../lib/master-detail/use-master-detail-array'
-import { createMonsterRowId } from '../../lib/actions/monster-action-presets'
+import { createMonsterRowId } from '../../lib/monster-row-id'
 import {
   MONSTER_TRAIT_ACQUISITION_GROUPS,
   monsterTraitAcquisitionItems,
@@ -36,13 +42,41 @@ import {
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import { WaterBreathingToggle } from './water-breathing-toggle'
 
+const TEMPLATE_GROUP_ID = 'templates'
+
 function isPresetRow(row: unknown): row is { preset: string } & Record<string, unknown> {
   return (
-    typeof row === 'object' && row !== null && 'preset' in row && typeof row.preset === 'string'
+    typeof row === 'object' &&
+    row !== null &&
+    'preset' in row &&
+    typeof row.preset === 'string' &&
+    !('templateId' in row)
+  )
+}
+
+function isTemplateRow(
+  row: unknown,
+): row is { templateId: string; config?: unknown; nameOverride?: string } {
+  return (
+    typeof row === 'object' &&
+    row !== null &&
+    'templateId' in row &&
+    typeof row.templateId === 'string'
   )
 }
 
 function traitListTitle(row: unknown, index: number, monsterName: string): string {
+  if (isTemplateRow(row)) {
+    return (
+      resolveTraitName({
+        kind: 'template',
+        id: 'row',
+        templateId: row.templateId,
+        config: row.config,
+        nameOverride: row.nameOverride,
+      } as ContentTrait) || `Trait ${index + 1}`
+    )
+  }
   if (isPresetRow(row)) {
     const formatted = formatCreatureTrait({
       subject: formatMonsterStatBlockSubject(monsterName),
@@ -59,14 +93,32 @@ function traitListTitle(row: unknown, index: number, monsterName: string): strin
 export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const customFields = useMemo(() => monsterTraitItemFields(), [])
   const makeItemDefaults = useCallback(
-    () => ({ id: createMonsterRowId(), name: '', description: '' }),
+    () => ({ id: createMonsterRowId(), kind: 'custom' as const, name: '', description: '' }),
     [],
   )
   const editor = useMasterDetailArray('traits', makeItemDefaults)
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const traits = values?.traits
   const monsterName = values?.name
-  const items = useMemo(() => monsterTraitAcquisitionItems({ traits: traits ?? [] }), [traits])
+  const templateIds = useMemo(
+    () => listCreatureTraitTemplatesForRuleset(ctx.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID),
+    [ctx.rulesetId],
+  )
+  const templateIdSet = useMemo(() => new Set<string>(templateIds), [templateIds])
+  const items = useMemo(() => {
+    const presetItems = monsterTraitAcquisitionItems({ traits: traits ?? [] }).filter((item) => {
+      if (!item.id.startsWith('preset:')) return true
+      return !templateIdSet.has(item.id.slice('preset:'.length))
+    })
+    return [
+      ...templateIds.map((templateId) => ({
+        id: `template:${templateId}`,
+        label: getCreatureTraitTemplate(templateId)?.label ?? templateId,
+        groupId: TEMPLATE_GROUP_ID,
+      })),
+      ...presetItems,
+    ]
+  }, [templateIdSet, templateIds, traits])
   const advisories = useMemo(
     () => (values ? collectMonsterFormAdvisories(values, new Map()) : []),
     [values],
@@ -76,9 +128,10 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
     (row: unknown): FormItem[] => {
       const rowPath = editor.selectedIndex === null ? '' : `traits.${editor.selectedIndex}`
       const advisorySlot = monsterFormAdvisorySlot(advisories, rowPath)
+      if (isTemplateRow(row)) return [advisorySlot, ...customFields]
       if (!isPresetRow(row)) return [advisorySlot, ...customFields]
       const subject = formatMonsterStatBlockSubject(monsterName ?? '')
-      const formatted = isPresetRow(row) ? formatCreatureTrait({ subject, trait: row }) : undefined
+      const formatted = formatCreatureTrait({ subject, trait: row })
       const preview: FormItem[] = formatted
         ? [
             {
@@ -93,7 +146,6 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
             },
           ]
         : []
-      if (!isPresetRow(row)) return [advisorySlot, ...customFields]
       const parameterFields =
         row.preset === 'water-breathing'
           ? [
@@ -131,9 +183,18 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
           width="fit"
           size="sm"
           variant="outline"
-          groups={[...MONSTER_TRAIT_ACQUISITION_GROUPS]}
+          groups={[
+            { id: TEMPLATE_GROUP_ID, label: 'Templates' },
+            ...MONSTER_TRAIT_ACQUISITION_GROUPS,
+          ]}
           items={items}
           onSelectItem={(id) => {
+            if (id.startsWith('template:')) {
+              editor.appendRow(
+                creatureTraitTemplateRow(id.slice('template:'.length), createMonsterRowId()),
+              )
+              return
+            }
             const choice = parseMonsterTraitAcquisitionId(id)
             if (!choice) return
             if (choice.type === 'focus') {
@@ -142,7 +203,7 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
               return
             }
             if (choice.type === 'custom') {
-              editor.appendRow({ id: createMonsterRowId(), name: '', description: '' })
+              editor.appendRow(makeItemDefaults())
               return
             }
             editor.appendRow({
@@ -155,6 +216,7 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
       }
       idPrefix="monster-trait"
       makeItemDefaults={makeItemDefaults}
+      access={{ kind: 'availability', fieldName: 'available' }}
       mapListItem={({ row, index }) => ({
         title: traitListTitle(row, index, monsterName ?? ''),
       })}

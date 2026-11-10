@@ -9,7 +9,9 @@ describe('private monster form', () => {
     expect(contentFormRegistry.monsters?.routeKey).toBe('monsters')
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Scout'
-    values.traits = [{ id: 'pack-tactics', name: 'Pack Tactics', description: 'Advantage.' }]
+    values.traits = [
+      { id: 'pack-tactics', kind: 'custom', name: 'Pack Tactics', description: 'Advantage.' },
+    ]
     values.equipment = [{ entryId: 'dagger-1', equipmentId: 'dagger', quantity: 1 }]
     values.actions = [
       { id: 'dagger', kind: 'weapon', equipmentEntryId: 'dagger-1', name: 'Dagger' },

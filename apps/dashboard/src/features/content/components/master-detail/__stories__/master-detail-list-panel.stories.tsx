@@ -13,7 +13,7 @@ const meta = {
   args: {
     addControl: undefined,
     onAdd: () => {},
-    onSelect: () => {},
+    onSelectItem: () => {},
   },
   decorators: [
     (Story) => (
@@ -42,26 +42,26 @@ const longItems = Array.from({ length: 20 }, (_, index) => ({
 export const Default: Story = {
   args: {
     items,
-    selectedIndex: 0,
+    selectedItemId: 'a',
     listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
-    onSelect: () => {},
+    onSelectItem: () => {},
   },
 }
 
 export const LongCollection: Story = {
   args: {
     items: longItems,
-    selectedIndex: 0,
+    selectedItemId: 'feature-0',
     listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
-    onSelect: () => {},
+    onSelectItem: () => {},
     countSupplement: <span>20 available</span>,
   },
 }
@@ -78,13 +78,13 @@ export const ConstrainedViewport: Story = {
   ],
   args: {
     items: longItems,
-    selectedIndex: 0,
+    selectedItemId: 'feature-0',
     listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
-    onSelect: () => {},
+    onSelectItem: () => {},
     countSupplement: <span>20 available</span>,
   },
 }
@@ -117,13 +117,13 @@ export const WithStickyFormFooter: Story = {
   ),
   args: {
     items: longItems,
-    selectedIndex: 0,
+    selectedItemId: 'feature-0',
     listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
-    onSelect: () => {},
+    onSelectItem: () => {},
     countSupplement: <span>20 available</span>,
   },
 }
@@ -150,26 +150,26 @@ export const WithProtectedSystemRow: Story = {
         deletable: false,
       },
     ],
-    selectedIndex: 0,
+    selectedItemId: 'a',
     listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
-    onSelect: () => {},
+    onSelectItem: () => {},
   },
 }
 
 export const Empty: Story = {
   args: {
     items: [],
-    selectedIndex: null,
+    selectedItemId: null,
     listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
-    onSelect: () => {},
+    onSelectItem: () => {},
   },
 }
 
@@ -189,12 +189,44 @@ export const WithValidationIssues: Story = {
         meta: { eyebrow: 'Grant', sourceLabel: 'System' },
       },
     ],
-    selectedIndex: 0,
+    selectedItemId: 'a',
     listTitle: 'Traits',
     ariaLabel: 'Traits',
     addLabel: 'Add trait',
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
-    onSelect: () => {},
+    onSelectItem: () => {},
+  },
+}
+
+export const Grouped: Story = {
+  args: {
+    ariaLabel: 'Actions',
+    itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
+    selectedItemId: 'bite',
+    onSelectItem: () => {},
+    countSupplement: <span>2 available · 1 unavailable</span>,
+    groups: [
+      {
+        id: 'actions',
+        title: 'Actions',
+        addControl: <Button type="button">Add</Button>,
+        items: [
+          { id: 'bite', title: 'Bite', meta: { sourceLabel: 'Homebrew' } },
+          {
+            id: 'claw',
+            title: 'Claw',
+            meta: { sourceLabel: 'System' },
+            availabilityStatusLabel: 'Unavailable',
+          },
+        ],
+      },
+      {
+        id: 'reactions',
+        title: 'Reactions',
+        addControl: <Button type="button">Add</Button>,
+        items: [{ id: 'parry', title: 'Parry', meta: { sourceLabel: 'Homebrew' } }],
+      },
+    ],
   },
 }

@@ -1,7 +1,15 @@
-import type { FormItem } from '@rpg/ui/form'
+import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
+import { creatureTraitTemplateFields } from '../../lib/creature-traits/creature-trait-template-fields'
 import { defineMasterDetailItemNoun } from '../../lib/master-detail/master-detail-item-noun'
 import { MONSTER_ACTION_NAME_LABEL, MONSTER_CUSTOM_DESCRIPTION_LABEL } from './monster-form-labels'
+
+function visibleForCustomTrait(): FieldVisibility {
+  return {
+    dependsOn: ['kind'],
+    visibleWhen: (watched) => watched['kind'] !== 'template',
+  }
+}
 
 export const MONSTER_TRAIT_ITEM_NOUN = defineMasterDetailItemNoun({
   label: 'Trait',
@@ -9,15 +17,20 @@ export const MONSTER_TRAIT_ITEM_NOUN = defineMasterDetailItemNoun({
   plural: 'traits',
 })
 
-export const MONSTER_ACTION_ITEM_NOUN = defineMasterDetailItemNoun({
-  label: 'Action',
-  singular: 'action',
-  plural: 'actions',
-})
-
 export function monsterTraitItemFields(): FormItem[] {
   return [
-    { type: 'text', name: 'name', label: MONSTER_ACTION_NAME_LABEL },
-    { type: 'richtext', name: 'description', label: MONSTER_CUSTOM_DESCRIPTION_LABEL },
+    {
+      type: 'text',
+      name: 'name',
+      label: MONSTER_ACTION_NAME_LABEL,
+      visibility: visibleForCustomTrait(),
+    },
+    {
+      type: 'richtext',
+      name: 'description',
+      label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
+      visibility: visibleForCustomTrait(),
+    },
+    ...creatureTraitTemplateFields(),
   ]
 }

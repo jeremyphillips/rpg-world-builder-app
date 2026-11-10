@@ -3,8 +3,8 @@ import { resolveMonsterActionIdentity } from '@rpg/contracts'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { masterDetailItemTitle } from '../../lib/master-detail/master-detail-constants'
-import { MONSTER_ACTION_ITEM_NOUN } from '../lib/monster-trait-form-fields'
-
+import { duplicateMasterDetailRow } from '../../lib/master-detail/duplicate-master-detail-row'
+import { MONSTER_ACTION_ITEM_NOUN } from '../lib/monster-form-labels'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import {
   createEquippedWeaponAcquisition,
@@ -178,6 +178,7 @@ export function useMonsterActionSections(entityId?: string) {
     [actions, bonusActions, reactions],
   )
   const [selectedActionId, setSelectedActionId] = useState<string | null>(null)
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
   const [pending, setPending] = useState<MonsterActionPending | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [focusToken, setFocusToken] = useState(0)
@@ -231,6 +232,21 @@ export function useMonsterActionSections(entityId?: string) {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- focus first invalid action after failed submit.
     if (resolved) setSelectedActionId(resolved.id)
   }, [formState.errors, formState.submitCount, getValues])
+
+  const selectLocatedEditor = useCallback(
+    (actionId: string | null) => {
+      if (!actionId) return
+      const values = getValues()
+      for (const section of MONSTER_ACTION_SECTIONS) {
+        const index = rowsOf(values, section).findIndex((row) => row.id === actionId)
+        if (index >= 0) {
+          editors[section].select(index)
+          return
+        }
+      }
+    },
+    [editors, getValues],
+  )
 
   const locate = useCallback(
     (actionId: string | null) => {
@@ -380,6 +396,41 @@ export function useMonsterActionSections(entityId?: string) {
     [commitMove, getValues, locate, selectedActionId],
   )
 
+  const selectAction = useCallback(
+    (actionId: string | null) => {
+      setSelectedActionId(actionId)
+      selectLocatedEditor(actionId)
+    },
+    [selectLocatedEditor],
+  )
+
+  useEffect(() => {
+    selectLocatedEditor(selectedActionId)
+  }, [selectLocatedEditor, selectedActionId])
+
+  const requestDelete = useCallback((actionId: string) => {
+    setDeleteTargetId(actionId)
+  }, [])
+
+  const cancelDelete = useCallback(() => {
+    setDeleteTargetId(null)
+  }, [])
+
+  const confirmDelete = useCallback(() => {
+    if (!deleteTargetId) return
+    commitRemove(deleteTargetId)
+    setDeleteTargetId(null)
+  }, [commitRemove, deleteTargetId])
+
+  const duplicateSelected = useCallback(() => {
+    const located = locate(selectedActionId)
+    if (!located) return
+    const copy = duplicateMasterDetailRow(located.action)
+    if (!copy || typeof copy.id !== 'string') return
+    editors[located.section].appendRow(copy)
+    setSelectedActionId(copy.id)
+  }, [editors, locate, selectedActionId])
+
   const confirmPending = useCallback(() => {
     if (!pending) return
     if (pending.type === 'trigger' || pending.type === 'multiattack-move') {
@@ -395,6 +446,12 @@ export function useMonsterActionSections(entityId?: string) {
     editors,
     selectedActionId,
     setSelectedActionId,
+    selectAction,
+    deleteTargetId,
+    requestDelete,
+    cancelDelete,
+    confirmDelete,
+    duplicateSelected,
     pending,
     setPending,
     notice,

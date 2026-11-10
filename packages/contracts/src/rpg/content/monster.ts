@@ -28,6 +28,12 @@ import {
   monsterPresetTraitDraftSchema,
   monsterPresetTraitSchema,
 } from './creature/trait-preset-schema'
+import { refineCreatureTraitTemplate } from './creature/traits/validate'
+import {
+  customContentTraitSchema,
+  normalizeContentTrait,
+  templateContentTraitSchema,
+} from './lib/grants/grants'
 import { MONSTER_CONTENT_TYPE_TERM } from '../primitives/content/content-type-terms'
 import {
   createDraftInputSchema,
@@ -83,26 +89,66 @@ export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
   creatureStatBlockHitPointsSchema.extend({ kind: z.literal('fixed') }),
 ])
 
-const monsterCustomTraitSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
+const monsterTraitAvailabilityFields = {
+  available: z.boolean().optional(),
+  ...entryProvenanceField,
+}
+
+const monsterCustomTraitSchema = customContentTraitSchema.extend({
   description: z.string().min(1),
-  ...entryProvenanceField,
+  ...monsterTraitAvailabilityFields,
 })
 
-/** Preset traits are matched first so a `preset` id is not stripped as a custom row. */
-export const monsterTraitSchema = z.union([monsterPresetTraitSchema, monsterCustomTraitSchema])
+const monsterTemplateTraitSchema = templateContentTraitSchema.extend(monsterTraitAvailabilityFields)
 
-const monsterCustomTraitDraftSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1).optional(),
-  description: z.string().min(1).optional(),
-  ...entryProvenanceField,
-})
+function refineMonsterTemplateTrait(
+  trait: { kind?: string; templateId?: unknown; config?: unknown },
+  ctx: z.RefinementCtx,
+): void {
+  if (trait.kind === 'template') refineCreatureTraitTemplate(trait, ctx)
+}
+
+const monsterAuthoredTraitSchema = z
+  .preprocess(
+    normalizeContentTrait,
+    z.discriminatedUnion('kind', [monsterCustomTraitSchema, monsterTemplateTraitSchema]),
+  )
+  .superRefine(refineMonsterTemplateTrait)
+
+/** Preset rows stay a separate member so a `preset` id is not read as a custom trait. */
+export const monsterTraitSchema = z.union([monsterPresetTraitSchema, monsterAuthoredTraitSchema])
+
+const monsterAuthoredTraitDraftSchema = z
+  .preprocess(
+    normalizeContentTrait,
+    z.discriminatedUnion('kind', [
+      z.object({
+        kind: z.literal('custom'),
+        id: z.string().min(1),
+        name: z.string().min(1).optional(),
+        description: z.string().min(1).optional(),
+        grantGroups: customContentTraitSchema.shape.grantGroups,
+        ...monsterTraitAvailabilityFields,
+      }),
+      z.object({
+        kind: z.literal('template'),
+        id: z.string().min(1),
+        templateId: z.string().min(1).optional(),
+        config: z.unknown().optional(),
+        nameOverride: z.string().min(1).optional(),
+        descriptionOverride: z.string().optional(),
+        ...monsterTraitAvailabilityFields,
+      }),
+    ]),
+  )
+  .superRefine((trait, ctx) => {
+    if (trait.kind !== 'template' || trait.templateId === undefined) return
+    refineCreatureTraitTemplate(trait, ctx)
+  })
 
 export const monsterTraitDraftSchema = z.union([
   monsterPresetTraitDraftSchema,
-  monsterCustomTraitDraftSchema,
+  monsterAuthoredTraitDraftSchema,
 ])
 
 export type MonsterTrait = z.infer<typeof monsterTraitSchema>
@@ -231,23 +277,26 @@ function refineMonsterProficiencies(
   })
 }
 
-function traitPresetId(trait: { preset?: string } | { name?: string }): string | undefined {
-  return 'preset' in trait ? trait.preset : undefined
-}
-
 function refineUniqueTraitPresets(
-  traits: readonly ({ preset?: string } | { name?: string })[],
+  traits: readonly object[],
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
   const seen = new Set<string>()
   traits.forEach((trait, index) => {
-    const preset = traitPresetId(trait)
-    if (!preset) return
-    if (seen.has(preset)) {
-      addCustomRefinementIssue(ctx, 'Trait presets must be unique.', [...path, index, 'preset'])
+    const preset = 'preset' in trait && typeof trait.preset === 'string' ? trait.preset : undefined
+    const templateId =
+      'templateId' in trait && typeof trait.templateId === 'string' ? trait.templateId : undefined
+    const key = preset ?? templateId
+    if (!key) return
+    if (seen.has(key)) {
+      addCustomRefinementIssue(ctx, 'Trait presets must be unique.', [
+        ...path,
+        index,
+        preset ? 'preset' : 'templateId',
+      ])
     }
-    seen.add(preset)
+    seen.add(key)
   })
 }
 

@@ -23,7 +23,8 @@ import {
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
   monsterAddWeaponShortcut,
 } from '../monster-form-labels'
-import { createMonsterRowId, type MonsterActionDraftRow } from './monster-action-presets'
+import { createMonsterRowId } from '../monster-row-id'
+import type { MonsterActionDraftRow } from './monster-action-presets'
 
 export const MONSTER_ACTION_ACQUISITION_GROUPS = [
   { id: 'equipped', label: 'Equipped weapons' },

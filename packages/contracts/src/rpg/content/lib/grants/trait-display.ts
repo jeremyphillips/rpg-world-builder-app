@@ -2,7 +2,14 @@ import { getDamageTypeSentenceForm } from '../../../vocab/damage/vocabulary'
 import { getLanguageSentenceForm } from '../../../vocab/language'
 import { formatMovementGrantSentence } from '../../../vocab/movement-mode'
 import { getSenseLabel, getSenseSentenceForm } from '../../../vocab/sense'
-import type { ContentTrait, CustomContentTrait, GrantContentTrait, GrantGroups } from './grants'
+import { readCreatureTraitTemplateConfig } from '../../creature/traits/templates'
+import type {
+  ContentTrait,
+  CustomContentTrait,
+  GrantContentTrait,
+  GrantGroups,
+  TemplateContentTrait,
+} from './grants'
 
 export type TraitDisplay = {
   name: string
@@ -56,11 +63,28 @@ function resolveGrantTraitDisplay(trait: GrantContentTrait): TraitDisplay {
   }
 }
 
+function htmlParagraph(text: string): string {
+  return `<p>${text}</p>`
+}
+
+function resolveTemplateTraitDisplay(trait: TemplateContentTrait): TraitDisplay {
+  const read = readCreatureTraitTemplateConfig(trait.templateId, trait.config)
+  const derivedName = read
+    ? (read.template.formatName?.(read.config) ?? read.template.label)
+    : trait.templateId
+  const derivedDescription = read
+    ? htmlParagraph(read.template.formatDescription(read.config))
+    : undefined
+  return {
+    name: trait.nameOverride ?? derivedName,
+    descriptionHtml: trait.descriptionOverride ?? derivedDescription,
+  }
+}
+
 /** Resolves human-facing name and description HTML for a content trait. */
 export function resolveTraitDisplay(trait: ContentTrait): TraitDisplay {
-  if (trait.kind === 'grant') {
-    return resolveGrantTraitDisplay(trait)
-  }
+  if (trait.kind === 'grant') return resolveGrantTraitDisplay(trait)
+  if (trait.kind === 'template') return resolveTemplateTraitDisplay(trait)
   return resolveCustomTraitDisplay(trait)
 }
 

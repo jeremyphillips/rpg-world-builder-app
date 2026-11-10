@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { ActionIcon } from '@rpg/ui'
+import { ActionIcon, Icon } from '@rpg/ui'
 
 export type DetailOverflowAction = {
   id: string
@@ -39,6 +39,18 @@ export function detailOverflowDeleteAction(
     label,
     icon: <ActionIcon action="delete" size={OVERFLOW_MENU_ICON_STEP} />,
     destructive: true,
+    onSelect,
+  }
+}
+
+export function detailOverflowDuplicateAction(
+  label: string,
+  onSelect: () => void,
+): DetailOverflowAction {
+  return {
+    id: 'duplicate',
+    label,
+    icon: <Icon name="copy" size="md" />,
     onSelect,
   }
 }

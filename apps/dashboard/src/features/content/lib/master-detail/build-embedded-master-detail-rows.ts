@@ -106,7 +106,7 @@ export function buildEmbeddedMasterDetailRows({
       extraReasons,
     })
     const { isAvailable, localCampaignAccess } = resolveRowLocalAvailability(row, access)
-    const availability = buildMasterDetailAvailabilityPresentation(field.id, isAvailable)
+    const availability = buildMasterDetailAvailabilityPresentation(listItem.id, isAvailable)
 
     return {
       fieldId: field.id,

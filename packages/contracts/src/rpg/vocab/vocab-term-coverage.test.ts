@@ -43,6 +43,11 @@ import { DAMAGE_TYPE_TERM } from './damage/vocabulary'
 import { EQUIPMENT_CATEGORY_TERM } from './equipment/equipment-category'
 import { PHYSICAL_DAMAGE_TYPE_TERM } from './damage/physical'
 import { CONDITION_TERM } from './effect-condition'
+import {
+  CREATURE_EFFECT_CIRCUMSTANCE_TERM,
+  CREATURE_ROLL_ADJUSTMENT_MODE_TERM,
+  CREATURE_ROLL_TARGET_TERM,
+} from './creature-effect'
 import { EQUIPMENT_KIND_TERM } from './equipment/kind'
 import { GEAR_KIND_TERM } from './equipment/gear-kind'
 import { HOLY_SYMBOL_USAGE_TERM } from './equipment/holy-symbol-usage'
@@ -111,6 +116,9 @@ const RPG_VOCAB_CLOSED_TERMS = [
   CHARACTER_GENDER_TERM,
   CREATURE_SIZE_TERM,
   CONDITION_TERM,
+  CREATURE_EFFECT_CIRCUMSTANCE_TERM,
+  CREATURE_ROLL_ADJUSTMENT_MODE_TERM,
+  CREATURE_ROLL_TARGET_TERM,
   FEAT_CATEGORY_TERM,
   REQUIREMENT_CONDITION_TYPE_TERM,
   FEAT_PART_TERM,
