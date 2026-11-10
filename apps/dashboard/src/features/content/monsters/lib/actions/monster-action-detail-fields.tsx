@@ -318,7 +318,6 @@ function monsterActionSaveSection(
     kind: 'group',
     heading: { label: MONSTER_SAVE_THROW_SECTION_LEGEND },
     description: MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
-    headingScale: 'subsection',
     fields: [
       {
         type: 'select',

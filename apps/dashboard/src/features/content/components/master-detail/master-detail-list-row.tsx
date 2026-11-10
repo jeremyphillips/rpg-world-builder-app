@@ -29,7 +29,7 @@ function MasterDetailListRowContent({
   const caption = item.meta ? joinMasterDetailCaption(item.meta, 'list') : ''
 
   return (
-    <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
+    <span className="flex min-w-0 flex-1 flex-col gap-0.5 text-left">
       {item.meta?.eyebrow ? (
         <span className="min-w-0 truncate text-style-caption">{item.meta.eyebrow}</span>
       ) : null}

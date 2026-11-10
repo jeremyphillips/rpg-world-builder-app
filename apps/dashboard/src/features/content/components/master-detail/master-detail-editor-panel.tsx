@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
+import { MasterDetailDetailFormScope } from '../../lib/master-detail/master-detail-detail-form-scope'
 import { wrapMasterDetailDetailFields } from '../../lib/master-detail/wrap-master-detail-detail-fields'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
@@ -106,16 +107,18 @@ function MasterDetailSelectedRowEditor({
         </div>
       ) : null}
       {detailLeading}
-      {renderBody ? (
-        renderBody({ selectedFieldId, selectedIndex, namePrefix: rowPrefix })
-      ) : (
-        <FormItems
-          key={`${selectedFieldId}:${selectedIndex}`}
-          items={wrapMasterDetailDetailFields(itemFields)}
-          idPrefix={`${idPrefix}-${selectedFieldId}`}
-          namePrefix={rowPrefix}
-        />
-      )}
+      <MasterDetailDetailFormScope>
+        {renderBody ? (
+          renderBody({ selectedFieldId, selectedIndex, namePrefix: rowPrefix })
+        ) : (
+          <FormItems
+            key={`${selectedFieldId}:${selectedIndex}`}
+            items={wrapMasterDetailDetailFields(itemFields)}
+            idPrefix={`${idPrefix}-${selectedFieldId}`}
+            namePrefix={rowPrefix}
+          />
+        )}
+      </MasterDetailDetailFormScope>
     </MasterDetailRowPrefixProvider>
   )
 }
