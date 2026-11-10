@@ -235,7 +235,7 @@ A `variant="selection"` request routes to `SelectionOptionCard`, not `Card`, so 
 
 Card and Alert share canonical copy scale (`ui-copy-title` size and heading weight), `--ui-anatomy-row-gap` between related header/copy rows, and `--ui-surface-inset-*` rhythm via [`copy-scale.css`](../src/components/ui/copy-scale.css) (typography ladder in [row-anatomy.md](./row-anatomy.md)). Alert keeps semantic variants and optional `leading`; Card keeps tone, elevation, and navigation. Choose **Card** for neutral hub tiles and invitations; choose **Alert** for status-colored guidance.
 
-For labeled footer or Alert action controls, pass explicit `size` from `resolveSurfaceActionButtonSize(density)` in `@rpg/ui`. `CardFooter` is layout-only — no contextual descendant sizing. Persistent dashboard copy may use `announcement="none"` on Alert so variant color does not imply a live region.
+For labeled footer or Alert action controls, pass explicit `size` from `resolveSurfaceActionButtonSize(density)` in `@rpg/ui`. `CardFooter` is layout-only — no contextual descendant sizing. Persistent dashboard copy may use `announcement="none"` on Alert so variant color does not imply a live region. `AdvisoryAlert` is that persistent facade: `info`, `warning`, or `error`, a derived icon, compact density, and no live region. `RulesPreview` is the compact rules panel (`Panel`, an eyebrow, and either metadata rows or prose). It does not collect advisories.
 
 | Card `density` | Labeled footer `Button` / `ButtonLink` `size` |
 | -------------- | --------------------------------------------- |

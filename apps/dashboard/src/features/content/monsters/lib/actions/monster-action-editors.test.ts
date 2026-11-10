@@ -265,7 +265,9 @@ describe('monster action detail fields', () => {
     ).toBe(true)
     expect(attack).not.toContain('moveSection')
     expect(natural[0]).toBe('attackPreview')
+    expect(natural[1]).toBe('buildAdvisories')
     expect(attack[0]).toBe('attackPreview')
+    expect(attack[1]).toBe('buildAdvisories')
 
     const weapon = detailFields({ id: 'sword', kind: 'weapon', equipmentEntryId: 'sword' })
     expect(weapon).toContain('equipmentEntryId')
@@ -274,8 +276,11 @@ describe('monster action detail fields', () => {
     expect(weapon).not.toContain('moveSection')
     expect(weapon.indexOf('name')).toBeLessThan(weapon.indexOf('equipmentEntryId'))
     expect(weapon.indexOf('attackPreview')).toBe(weapon.indexOf('equipmentEntryId') + 1)
-    expect(weapon.indexOf('damage')).toBe(weapon.indexOf('attackPreview') + 1)
-    expect(detailFields({ id: 'cast', kind: 'spell' })).not.toContain('attackPreview')
+    expect(weapon.indexOf('buildAdvisories')).toBe(weapon.indexOf('attackPreview') + 1)
+    expect(weapon.indexOf('damage')).toBe(weapon.indexOf('buildAdvisories') + 1)
+    const spellNames = detailFields({ id: 'cast', kind: 'spell' })
+    expect(spellNames).not.toContain('attackPreview')
+    expect(spellNames[0]).toBe('buildAdvisories')
 
     const spell = detailFields({ id: 'cast', kind: 'spell', name: 'Spellcasting', spells: [] })
     expect(spell.indexOf('name')).toBeLessThan(spell.indexOf('castingAbility'))
@@ -327,6 +332,7 @@ describe('monster action detail fields', () => {
     expect(names.indexOf('limitedUse')).toBeGreaterThan(rollIndex)
     expect(names).not.toContain('limitedUse.kind')
     expect(names).not.toContain('attackPreview')
+    expect(names[0]).toBe('buildAdvisories')
     const constrict = detailFields({
       id: 'squeeze',
       kind: 'save',

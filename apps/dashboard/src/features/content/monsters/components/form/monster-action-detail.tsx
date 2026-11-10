@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react'
+import { useFormContext, useWatch } from 'react-hook-form'
 import {
   getMonsterActionKindLabel,
   isWeaponEquipment,
@@ -6,12 +7,9 @@ import {
 } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
-import { useFormContext, useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { MasterDetailEditorShell } from '../../../components/master-detail/master-detail-editor-shell'
-import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
-import { MonsterFormAdvisoryMessages } from './monster-form-advisory-messages'
 import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-summary'
 import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
 import {
@@ -26,6 +24,7 @@ import { MONSTER_MOVE_TO_LABEL } from '../../lib/monster-form-labels'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import { monsterActionSectionHeading } from '../../lib/actions/monster-action-presets'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-trait-form-fields'
+import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import {
   monsterEquipmentCatalog,
   monsterMagicPropertyProvider,
@@ -80,6 +79,7 @@ export function MonsterActionDetail({
       equipmentOptions: equipmentOptions(values, ctx),
       equipment: values.equipment,
       sharedCastingOptions: sharedCastingOptions(values, action.id),
+      advisories: collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx)),
       onCastingSourceBlocked: sections.setNotice,
       attackOptions: (values[located.section] ?? [])
         .filter(
@@ -99,12 +99,6 @@ export function MonsterActionDetail({
     document.getElementById(`monster-action-focus-${action.id}`)?.focus()
   }, [action, sections.focusToken])
 
-  const advisories =
-    located && values
-      ? collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx))
-          .filter((advisory) => advisory.path.startsWith(`${located.section}.${located.index}`))
-          .map((advisory) => advisory.message)
-      : []
   const showError = Boolean(
     located && formState.submitCount > 0 && sections.hasRowError(located.section, located.index),
   )
@@ -154,7 +148,6 @@ export function MonsterActionDetail({
               <SemanticText>{sections.notice}</SemanticText>
             </Text>
           ) : null}
-          <MonsterFormAdvisoryMessages messages={advisories} />
           <FormItems
             items={fields}
             idPrefix={`monster-action-${action.id}`}

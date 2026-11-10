@@ -120,6 +120,7 @@ export const MONSTER_ON_HIT_LEGEND = 'On hit'
 export const MONSTER_ON_HIT_HINT =
   'Additional damage dealt when this attack hits, beyond its primary damage.'
 export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
+export const MONSTER_TRAIT_PREVIEW_LABEL = 'Trait preview'
 /** Stat-block preview row — not action-economy {@link getActionEconomyLabel} “Action”. */
 export const MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL = 'Attack'
 export const MONSTER_ACTION_DAMAGE_FIELD_LABEL = getSpellAtomicEffectKindLabel('damage')

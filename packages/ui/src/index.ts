@@ -70,6 +70,18 @@ export {
   type AlertVariant,
 } from './components/ui/alert'
 export {
+  AdvisoryAlert,
+  ADVISORY_TONES,
+  type AdvisoryAlertProps,
+  type AdvisoryTone,
+} from './components/ui/advisory-alert'
+export {
+  RulesPreview,
+  type RulesPreviewContent,
+  type RulesPreviewMetadataRow,
+  type RulesPreviewProps,
+} from './components/ui/rules-preview'
+export {
   alertVariants,
   ALERT_DENSITIES,
   ALERT_VARIANTS,

@@ -5,7 +5,7 @@ import {
   formatMonsterStatBlockSubject,
   getCreatureTraitVocabularyEntry,
 } from '@rpg/contracts'
-import { ActionIcon, ButtonDropdown, Text } from '@rpg/ui'
+import { ActionIcon, ButtonDropdown, RulesPreview } from '@rpg/ui'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -18,13 +18,17 @@ import {
   parseMonsterTraitAcquisitionId,
 } from '../../lib/actions/monster-trait-acquisition'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
-import { MONSTER_ADD_LABEL, MONSTER_TRAITS_HEADING } from '../../lib/monster-form-labels'
+import { monsterFormAdvisorySlot } from '../../lib/monster-form-advisory-presentation'
+import {
+  MONSTER_ADD_LABEL,
+  MONSTER_TRAIT_PREVIEW_LABEL,
+  MONSTER_TRAITS_HEADING,
+} from '../../lib/monster-form-labels'
 import {
   MONSTER_TRAIT_ITEM_NOUN,
   monsterTraitItemFields,
 } from '../../lib/monster-trait-form-fields'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
-import { MonsterFormAdvisoryMessages } from './monster-form-advisory-messages'
 
 function isPresetRow(row: unknown): row is { preset: string } {
   return (
@@ -51,38 +55,36 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const traits = values?.traits
   const monsterName = values?.name
   const items = useMemo(() => monsterTraitAcquisitionItems({ traits: traits ?? [] }), [traits])
-  const selectedTraitAdvisories = useMemo(
-    () =>
-      values && editor.selectedIndex !== null
-        ? collectMonsterFormAdvisories(values, new Map())
-            .filter((advisory) => advisory.path === `traits.${editor.selectedIndex}`)
-            .map((advisory) => advisory.message)
-        : [],
-    [editor.selectedIndex, values],
+  const advisories = useMemo(
+    () => (values ? collectMonsterFormAdvisories(values, new Map()) : []),
+    [values],
   )
 
   const resolveItemFields = useCallback(
     (row: unknown): FormItem[] => {
-      if (!isPresetRow(row)) return customFields
+      const rowPath = editor.selectedIndex === null ? '' : `traits.${editor.selectedIndex}`
+      const advisorySlot = monsterFormAdvisorySlot(advisories, rowPath)
+      if (!isPresetRow(row)) return [advisorySlot, ...customFields]
       const formatted = formatCreatureTrait({
         presetId: row.preset,
         subject: formatMonsterStatBlockSubject(monsterName ?? ''),
       })
+      if (!formatted) return [advisorySlot]
       return [
         {
           kind: 'slot',
-          name: 'preset',
+          name: 'traitPreview',
           render: () => (
-            <div className="flex flex-col gap-2">
-              <MonsterFormAdvisoryMessages messages={selectedTraitAdvisories} />
-              <Text variant="label">{formatted?.name ?? row.preset}</Text>
-              {formatted ? <Text>{formatted.sentence}</Text> : null}
-            </div>
+            <RulesPreview
+              label={MONSTER_TRAIT_PREVIEW_LABEL}
+              content={{ kind: 'prose', text: formatted.sentence }}
+            />
           ),
         },
+        advisorySlot,
       ]
     },
-    [customFields, monsterName, selectedTraitAdvisories],
+    [advisories, customFields, editor.selectedIndex, monsterName],
   )
 
   return (

@@ -42,6 +42,11 @@ import {
 } from '../monster-form-labels'
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
+import type { MonsterFormAdvisory } from '../monster-form-advisories'
+import {
+  insertMonsterFormAdvisorySlot,
+  monsterFormAdvisorySlot,
+} from '../monster-form-advisory-presentation'
 import { MonsterActionCastingAbilityField } from './monster-action-casting-fields'
 import { MonsterActionRechargeField } from './monster-action-recharge-field'
 import {
@@ -456,6 +461,8 @@ export function monsterActionDetailFields(input: {
   sharedCastingOptions: { value: string; label: string }[]
   attackOptions?: { value: string; label: string }[]
   onCastingSourceBlocked?: (message: string) => void
+  /** Already collected for this form. The advisory slot only filters this list. */
+  advisories?: readonly MonsterFormAdvisory[]
 }): FormItem[] {
   const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions } = input
   const equipment = input.equipment ?? []
@@ -599,5 +606,8 @@ export function monsterActionDetailFields(input: {
     fields.unshift(monsterActionAttackPreviewSlot(ctx, action))
   }
 
-  return fields
+  return insertMonsterFormAdvisorySlot(
+    fields,
+    monsterFormAdvisorySlot(input.advisories ?? [], namePrefix),
+  )
 }

@@ -1,12 +1,5 @@
 import { MONSTER_ACTION_ATTACK_KINDS } from '@rpg/contracts'
-import {
-  Eyebrow,
-  EmphasisDetailLine,
-  MetadataList,
-  Panel,
-  Text,
-  type MetadataListItem,
-} from '@rpg/ui'
+import { RulesPreview, Text } from '@rpg/ui'
 import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 
@@ -14,26 +7,12 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import {
   buildMonsterActionAttackPreview,
   resolveMonsterFormActionAttackProfile,
-  type MonsterActionAttackPreviewRow,
 } from '../../lib/actions/monster-action-attack-summary'
 import { MONSTER_ACTION_ATTACK_PREVIEW_LABEL } from '../../lib/monster-form-labels'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 
 const ATTACK_PREVIEW_KINDS: readonly string[] = MONSTER_ACTION_ATTACK_KINDS
-
-function previewRowValue(row: MonsterActionAttackPreviewRow) {
-  if (!row.secondary) return row.primary
-  return <EmphasisDetailLine as="span" primary={row.primary} secondary={row.secondary} />
-}
-
-function toMetadataItems(rows: readonly MonsterActionAttackPreviewRow[]): MetadataListItem[] {
-  return rows.map((row) => ({
-    id: row.id,
-    label: row.label,
-    value: previewRowValue(row),
-  }))
-}
 
 export function MonsterActionAttackSummary({
   ctx,
@@ -62,23 +41,10 @@ export function MonsterActionAttackSummary({
   }
 
   return (
-    <Panel tone="subtle" density="compact">
-      <div className="flex flex-col gap-3">
-        <div className="flex items-baseline justify-between gap-3">
-          <Eyebrow size="sm">{MONSTER_ACTION_ATTACK_PREVIEW_LABEL}</Eyebrow>
-          <Text as="span" variant="supporting">
-            {preview.modeCaption}
-          </Text>
-        </div>
-        <MetadataList
-          size="sm"
-          columnGap="sm"
-          valueTrack="fill"
-          emphasis="value"
-          divider={false}
-          items={toMetadataItems(preview.rows)}
-        />
-      </div>
-    </Panel>
+    <RulesPreview
+      label={MONSTER_ACTION_ATTACK_PREVIEW_LABEL}
+      context={preview.modeCaption}
+      content={{ kind: 'metadata', rows: preview.rows }}
+    />
   )
 }
