@@ -4,6 +4,8 @@ import {
   deriveMonsterStatBlock,
   formatMonsterMultiattack,
   formatMonsterSaveAction,
+  resolveCreatureTraitGrants,
+  resolveTraitDisplay,
   systemDefaultArmorClassRules,
 } from '@rpg/contracts'
 
@@ -37,6 +39,27 @@ describe('SRD 5.2.1 monster seed', () => {
       expect.objectContaining({ status: 'resolved', value: expect.objectContaining({ ac: 14 }) }),
     )
     expect(block.attacks.find((line) => line.id === 'dagger')?.attackBonus).toBe(4)
+    expect(kobold!.traits.map((trait) => trait.kind)).toEqual(['template', 'template'])
+    expect(resolveTraitDisplay(kobold!.traits[0]!).descriptionHtml).toContain(
+      'The kobold has Advantage',
+    )
+    expect(resolveTraitDisplay(kobold!.traits[1]!).descriptionHtml).toContain(
+      'ability checks and attack rolls',
+    )
+    const grants = resolveCreatureTraitGrants(
+      kobold!.traits.map((trait) => ({ trait, source: trait.id })),
+    )
+    expect(grants.map((row) => row.templateId)).toEqual(['pack-tactics', 'sunlight-sensitivity'])
+    expect(grants[0]?.grant).toMatchObject({
+      kind: 'rollAdjustment',
+      mode: 'advantage',
+      rolls: [{ kind: 'attack' }],
+    })
+    expect(grants[1]?.grant).toMatchObject({
+      kind: 'rollAdjustment',
+      mode: 'disadvantage',
+      circumstance: { kind: 'in-sunlight' },
+    })
   })
 
   it('derives Knight, Mage, and Hell Hound stat lines from authored inputs', () => {

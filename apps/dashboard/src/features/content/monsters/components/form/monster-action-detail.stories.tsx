@@ -10,6 +10,8 @@ import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
 } from '../../lib/monster-form-values'
+import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-form-labels'
+import { useEmbeddedMasterDetailRows } from '../../../lib/master-detail/use-embedded-master-detail-rows'
 import { MonsterActionDetail } from './monster-action-detail'
 
 const meta = {
@@ -41,7 +43,18 @@ function Host({ action }: { action: MonsterActionDraftRow }) {
 
 function Detail({ actionId }: { actionId: string }) {
   const sections = useMonsterActionSections()
-  return <MonsterActionDetail ctx={ctx} sections={sections} located={sections.locate(actionId)} />
+  const located = sections.locate(actionId)
+  const rows = useEmbeddedMasterDetailRows({
+    formCtx: ctx,
+    fieldName: located?.section ?? 'actions',
+    editor: sections.editors[located?.section ?? 'actions'],
+    itemFields: [],
+    itemNoun: MONSTER_ACTION_ITEM_NOUN,
+    mapListItem: ({ row, index }) => ({
+      title: (row as { name?: string } | undefined)?.name?.trim() || `Action ${index + 1}`,
+    }),
+  })
+  return <MonsterActionDetail ctx={ctx} sections={sections} located={located} rows={rows} />
 }
 
 const claw: MonsterActionDraftRow = {

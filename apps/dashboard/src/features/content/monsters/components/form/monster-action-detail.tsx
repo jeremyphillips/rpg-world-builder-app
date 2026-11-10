@@ -1,15 +1,12 @@
 import { useEffect, useMemo } from 'react'
-import {
-  getMonsterActionKindLabel,
-  isWeaponEquipment,
-  resolveEquipmentInstanceReferenceLabel,
-} from '@rpg/contracts'
+import { isWeaponEquipment, resolveEquipmentInstanceReferenceLabel } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { MasterDetailEditorShell } from '../../../components/master-detail/master-detail-editor-shell'
+import { MasterDetailEditorPanel } from '../../../components/master-detail/master-detail-editor-panel'
+import type { useEmbeddedMasterDetailRows } from '../../../lib/master-detail/use-embedded-master-detail-rows'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
 import {
@@ -19,7 +16,7 @@ import {
 import { MONSTER_MOVE_TO_LABEL } from '../../lib/monster-form-labels'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import { monsterActionSectionHeading } from '../../lib/actions/monster-action-presets'
-import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-trait-form-fields'
+import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-form-labels'
 import {
   monsterEquipmentCatalog,
   monsterMagicPropertyProvider,
@@ -29,6 +26,7 @@ import type { useMonsterActionSections } from '../../hooks/use-monster-action-se
 import { MonsterActionAttackSummary } from './monster-action-attack-summary'
 
 type Sections = ReturnType<typeof useMonsterActionSections>
+type ActionRows = ReturnType<typeof useEmbeddedMasterDetailRows>
 
 function sharedCastingOptions(
   values: MonsterFormValues,
@@ -70,13 +68,14 @@ export function MonsterActionDetail({
   ctx,
   sections,
   located,
+  rows,
 }: {
   ctx: ContentFormCtx
   sections: Sections
   located: { action: MonsterActionDraftRow; section: MonsterActionSection; index: number } | null
+  rows: ActionRows
 }) {
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
-  const { formState } = useFormContext<MonsterFormValues>()
   const action = located?.action
   const namePrefix = located ? `${located.section}.${located.index}` : ''
   const fields = useMemo(() => {
@@ -109,26 +108,24 @@ export function MonsterActionDetail({
           .filter((advisory) => advisory.path.startsWith(`${located.section}.${located.index}`))
           .map((advisory) => advisory.message)
       : []
-  const showError = Boolean(
-    located && formState.submitCount > 0 && sections.hasRowError(located.section, located.index),
-  )
+  const editor = located ? sections.editors[located.section] : sections.editors.actions
 
   return (
-    <MasterDetailEditorShell
+    <MasterDetailEditorPanel
+      editor={editor}
+      itemFields={fields}
+      fieldName={located?.section ?? 'actions'}
+      idPrefix="monster-action"
       itemNoun={MONSTER_ACTION_ITEM_NOUN}
-      selectedIdentity={
-        located
-          ? {
-              title: located.action.name?.trim() || `Action ${located.index + 1}`,
-              meta: {
-                eyebrow: getMonsterActionKindLabel(located.action.kind),
-                sourceLabel: monsterActionSectionHeading(located.section),
-              },
-              issueCount: showError ? 1 : 0,
-            }
-          : undefined
-      }
-      onDelete={located ? () => sections.removeAction(located.action.id) : undefined}
+      showSelectedDetail={Boolean(located && action)}
+      selectedIdentity={located ? rows.selectedIdentity : undefined}
+      campaignId={ctx.campaignId}
+      rowAvailability={rows.selectedRowAvailability}
+      availabilityFormItems={rows.availabilityFormItems}
+      availabilityNamePrefix={rows.availabilityNamePrefix}
+      availabilityDialogRef={rows.availabilityDialogRef}
+      onDelete={located ? () => sections.requestDelete(located.action.id) : undefined}
+      onDuplicate={located ? sections.duplicateSelected : undefined}
       overflowActions={
         located
           ? [
@@ -148,27 +145,38 @@ export function MonsterActionDetail({
             ]
           : undefined
       }
-    >
-      {located && action ? (
-        <div id={`monster-action-focus-${action.id}`} tabIndex={-1} className="flex flex-col gap-4">
-          <MonsterActionAttackSummary ctx={ctx} action={action} />
-          {sections.notice ? (
-            <Text as="p" variant="supporting">
-              <SemanticText>{sections.notice}</SemanticText>
-            </Text>
-          ) : null}
-          {advisories.map((message) => (
-            <Text key={message} as="p" variant="supporting">
-              <SemanticText>{message}</SemanticText>
-            </Text>
-          ))}
-          <FormItems
-            items={fields}
-            idPrefix={`monster-action-${action.id}`}
-            namePrefix={namePrefix}
-          />
-        </div>
-      ) : null}
-    </MasterDetailEditorShell>
+      detailLeading={
+        located && action ? (
+          <div
+            id={`monster-action-focus-${action.id}`}
+            tabIndex={-1}
+            className="flex flex-col gap-4"
+          >
+            <MonsterActionAttackSummary ctx={ctx} action={action} />
+            {sections.notice ? (
+              <Text as="p" variant="supporting">
+                <SemanticText>{sections.notice}</SemanticText>
+              </Text>
+            ) : null}
+            {advisories.map((message) => (
+              <Text key={message} as="p" variant="supporting">
+                <SemanticText>{message}</SemanticText>
+              </Text>
+            ))}
+          </div>
+        ) : null
+      }
+      renderBody={
+        located && action
+          ? () => (
+              <FormItems
+                items={fields}
+                idPrefix={`monster-action-${action.id}`}
+                namePrefix={namePrefix}
+              />
+            )
+          : undefined
+      }
+    />
   )
 }

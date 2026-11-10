@@ -9,19 +9,3 @@ export type FormEmbeddedMasterDetailAccessConfig =
       fieldName: 'campaignAccess'
       resolveParentAccess: (ctx: { formCtx: ContentFormCtx }) => ResolvedContentCampaignAccess
     }
-
-/** @deprecated Use `access={{ kind: 'availability', fieldName }}` instead. */
-export type FormEmbeddedMasterDetailAvailabilityConfig = {
-  fieldName: string
-}
-
-export function normalizeFormEmbeddedMasterDetailAccess(
-  access?: FormEmbeddedMasterDetailAccessConfig,
-  availability?: FormEmbeddedMasterDetailAvailabilityConfig,
-): FormEmbeddedMasterDetailAccessConfig | undefined {
-  if (access) return access
-  if (availability) {
-    return { kind: 'availability', fieldName: 'available' }
-  }
-  return undefined
-}

@@ -97,7 +97,7 @@ export const SHORT_REST_ACTION = {
 export const PROFICIENCY_BONUS_ACTION = {
   id: 'pb',
   kind: 'special' as const,
-  name: 'Legendary Resistance',
+  name: 'Relentless',
   description: '<p>Succeeds instead.</p>',
   limitedUse: {
     kind: 'uses' as const,

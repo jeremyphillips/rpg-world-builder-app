@@ -13,9 +13,8 @@ import type { MasterDetailListItem } from './master-detail-list-panel'
 
 export type MasterDetailListRowProps = {
   item: MasterDetailListItem
-  index: number
   isSelected: boolean
-  onSelect: (index: number) => void
+  onSelect: (id: string) => void
   selectedRowRef?: RefObject<HTMLButtonElement | null>
 }
 
@@ -49,7 +48,6 @@ function MasterDetailListRowContent({
 
 export function MasterDetailListRow({
   item,
-  index,
   isSelected,
   onSelect,
   selectedRowRef,
@@ -69,7 +67,7 @@ export function MasterDetailListRow({
           type="button"
           aria-current={isSelected ? 'true' : undefined}
           aria-invalid={item.hasError ? true : undefined}
-          onClick={() => onSelect(index)}
+          onClick={() => onSelect(item.id)}
           className={cn(interactiveFocusVariants({ context: 'standalone' }))}
         >
           {issueCount > 0 ? (

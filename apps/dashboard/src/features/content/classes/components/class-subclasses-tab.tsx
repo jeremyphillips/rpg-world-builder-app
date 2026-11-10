@@ -8,9 +8,10 @@ import type { ContentFormCtx } from '../../lib/forms/registry/content-form-regis
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { CampaignAccessFormProvider } from '../../lib/campaign-access/campaign-access-form-context'
 import { openCampaignAvailabilityDialog } from '../../lib/campaign-access/open-campaign-availability-dialog.lib'
-import { buildAvailabilityCountSupplement } from '../../lib/campaign-access/availability-count-supplement'
 import { NestedResourceMasterDetailEditor } from '../../components/master-detail/nested-resource-master-detail-editor'
-import { useMasterDetailAvailabilityFilter } from '../../lib/master-detail/use-master-detail-availability-filter'
+import { MasterDetailDeleteDialog } from '../../components/master-detail/master-detail-delete-dialog'
+import { masterDetailItemNounLabel } from '../../lib/master-detail/master-detail-constants'
+import { useMasterDetailCollectionAvailability } from '../../lib/master-detail/use-master-detail-collection-availability'
 import { useClassSubclassesTabState, useSubclassTabSave } from '../hooks/use-class-subclasses-tab'
 import { useReportSubclassUnsavedEdits } from '../hooks/use-subclass-unsaved-edits'
 import { useSubclassDeleteFlow } from '../hooks/use-subclass-delete-flow'
@@ -27,7 +28,6 @@ import {
   SubclassLoadingGate,
 } from './subclasses/class-subclasses-tab-gates'
 import { SubclassDetailEditor } from './subclasses/subclass-detail-editor'
-import { SubclassDeleteDialog } from './subclasses/subclass-delete-dialog'
 
 export interface ClassSubclassesTabProps {
   campaignId?: string
@@ -107,58 +107,27 @@ function ClassSubclassesTabBody({
     [accessOverrides, editor.listItems, editor.subclasses],
   )
 
-  const filterableItems = useMemo(
-    () =>
-      editor.listItems.map((item) => {
-        const availability = availabilityItems.find((entry) => entry.rowId === item.id)
-        return {
-          ...item,
-          rowId: item.id,
-          isAvailable: availability?.isAvailable ?? true,
-          statusLabel: availability?.statusLabel ?? 'Available',
-        }
-      }),
-    [availabilityItems, editor.listItems],
-  )
+  const { visibleItems, isSelectedVisible, countSupplement } =
+    useMasterDetailCollectionAvailability({
+      items: availabilityItems,
+      selectedId: editor.selectedId,
+      onSelectedIdChange: editor.setSelectedId,
+    })
 
-  const {
-    showUnavailable,
-    scope,
-    visibleItems,
-    hiddenUnavailableCount,
-    showUnavailableItems,
-    hideUnavailableItems,
-  } = useMasterDetailAvailabilityFilter({
-    items: filterableItems,
-    selectedRowId: editor.selectedId,
-    onSelectedRowIdChange: editor.setSelectedId,
-  })
-
-  const isSelectedRowVisible = useMemo(
-    () =>
-      editor.selectedId !== null && visibleItems.some((item) => item.rowId === editor.selectedId),
-    [editor.selectedId, visibleItems],
-  )
-
-  const listItems = useMemo(
-    () =>
-      visibleItems.map((item) =>
+  const listItems = useMemo(() => {
+    const byId = new Map(editor.listItems.map((item) => [item.id, item]))
+    return visibleItems.flatMap((entry) => {
+      const item = byId.get(entry.rowId)
+      if (!item) return []
+      return [
         buildSubclassMasterDetailListItem({
           item,
           isModified: editor.modifiedIds.has(item.id),
-          isAvailable: item.isAvailable,
+          isAvailable: entry.isAvailable,
         }),
-      ),
-    [editor.modifiedIds, visibleItems],
-  )
-
-  const countSupplement = buildAvailabilityCountSupplement({
-    scope,
-    showUnavailable,
-    hiddenUnavailableCount,
-    onShow: showUnavailableItems,
-    onHide: hideUnavailableItems,
-  })
+      ]
+    })
+  }, [editor.listItems, editor.modifiedIds, visibleItems])
 
   const selectedAvailability = useMemo(
     () => availabilityItems.find((item) => item.rowId === editor.selectedId),
@@ -258,7 +227,7 @@ function ClassSubclassesTabBody({
 
         <NestedResourceMasterDetailEditor
           items={listItems}
-          selectedRowId={isSelectedRowVisible ? editor.selectedId : null}
+          selectedRowId={isSelectedVisible ? editor.selectedId : null}
           onSelectRow={handleSelect}
           onAdd={editor.handleAdd}
           listTitle="Subclasses"
@@ -266,7 +235,7 @@ function ClassSubclassesTabBody({
           addLabel="Add subclass"
           itemNoun={SUBCLASS_MASTER_DETAIL_ITEM_NOUN}
           countSupplement={countSupplement}
-          selectedIdentity={isSelectedRowVisible ? selectedIdentity : undefined}
+          selectedIdentity={isSelectedVisible ? selectedIdentity : undefined}
           onDelete={editor.selectedId ? () => handleDeleteRequest(editor.selectedId!) : undefined}
           renderDetail={({ rowId }) =>
             editor.selectedValues ? (
@@ -310,13 +279,14 @@ function ClassSubclassesTabBody({
         onCancel={() => setSwitchTargetId(null)}
       />
 
-      <SubclassDeleteDialog
+      <MasterDetailDeleteDialog
         open={
           editor.deleteTargetId !== null &&
           (editor.deleteTargetItem?.catalogLayer === 'unsaved' ||
             isDraftSubclassId(editor.deleteTargetId))
         }
-        subclassName={editor.deleteTargetItem?.name ?? 'Untitled subclass'}
+        itemNoun={masterDetailItemNounLabel(SUBCLASS_MASTER_DETAIL_ITEM_NOUN)}
+        itemName={editor.deleteTargetItem?.name ?? 'Untitled subclass'}
         onOpenChange={(open) => {
           if (!open) editor.handleDeleteDismiss()
         }}

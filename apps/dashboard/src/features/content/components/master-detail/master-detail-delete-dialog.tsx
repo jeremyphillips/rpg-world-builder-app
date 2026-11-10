@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { ConfirmDialog } from '@rpg/ui'
 
 export interface MasterDetailDeleteDialogProps {
@@ -6,6 +7,8 @@ export interface MasterDetailDeleteDialogProps {
   itemNoun: string
   /** Display name of the item, shown in bold. */
   itemName: string
+  /** Replaces the default permanent-delete sentence. */
+  description?: ReactNode
   onOpenChange: (open: boolean) => void
   onConfirm: () => void
 }
@@ -19,6 +22,7 @@ export function MasterDetailDeleteDialog({
   open,
   itemNoun,
   itemName,
+  description,
   onOpenChange,
   onConfirm,
 }: MasterDetailDeleteDialogProps) {
@@ -28,9 +32,11 @@ export function MasterDetailDeleteDialog({
       onOpenChange={onOpenChange}
       headline={`Delete ${itemNoun}?`}
       description={
-        <>
-          Permanently delete <strong>{itemName}</strong>? This cannot be undone.
-        </>
+        description ?? (
+          <>
+            Permanently delete <strong>{itemName}</strong>? This cannot be undone.
+          </>
+        )
       }
       confirmLabel="Delete"
       confirmVariant="destructive"

@@ -24,7 +24,12 @@ import {
   equipmentInstanceSchemaBase,
   refineCreatureDamageDefenses,
 } from './creature'
-import { customContentTraitSchema } from './lib/grants/grants'
+import {
+  customContentTraitSchema,
+  normalizeContentTrait,
+  templateContentTraitSchema,
+} from './lib/grants/grants'
+import { refineCreatureTraitTemplate } from './creature/traits/validate'
 import { MONSTER_CONTENT_TYPE_TERM } from '../primitives/content/content-type-terms'
 import {
   createDraftInputSchema,
@@ -80,16 +85,59 @@ export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
   creatureStatBlockHitPointsSchema.extend({ kind: z.literal('fixed') }),
 ])
 
-export const monsterTraitSchema = customContentTraitSchema
-  .pick({ id: true, name: true })
-  .extend({ description: z.string().min(1), ...entryProvenanceField })
-
-export const monsterTraitDraftSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1).optional(),
-  description: z.string().min(1).optional(),
+const monsterTraitAvailabilityFields = {
+  available: z.boolean().optional(),
   ...entryProvenanceField,
+}
+
+const monsterCustomTraitSchema = customContentTraitSchema.extend({
+  description: z.string().min(1),
+  ...monsterTraitAvailabilityFields,
 })
+
+const monsterTemplateTraitSchema = templateContentTraitSchema.extend(monsterTraitAvailabilityFields)
+
+function refineMonsterTemplateTrait(
+  trait: { kind?: string; templateId?: unknown; config?: unknown },
+  ctx: z.RefinementCtx,
+): void {
+  if (trait.kind === 'template') refineCreatureTraitTemplate(trait, ctx)
+}
+
+export const monsterTraitSchema = z
+  .preprocess(
+    normalizeContentTrait,
+    z.discriminatedUnion('kind', [monsterCustomTraitSchema, monsterTemplateTraitSchema]),
+  )
+  .superRefine(refineMonsterTemplateTrait)
+
+export const monsterTraitDraftSchema = z
+  .preprocess(
+    normalizeContentTrait,
+    z.discriminatedUnion('kind', [
+      z.object({
+        kind: z.literal('custom'),
+        id: z.string().min(1),
+        name: z.string().min(1).optional(),
+        description: z.string().min(1).optional(),
+        grantGroups: customContentTraitSchema.shape.grantGroups,
+        ...monsterTraitAvailabilityFields,
+      }),
+      z.object({
+        kind: z.literal('template'),
+        id: z.string().min(1),
+        templateId: z.string().min(1).optional(),
+        config: z.unknown().optional(),
+        nameOverride: z.string().min(1).optional(),
+        descriptionOverride: z.string().optional(),
+        ...monsterTraitAvailabilityFields,
+      }),
+    ]),
+  )
+  .superRefine((trait, ctx) => {
+    if (trait.kind !== 'template' || trait.templateId === undefined) return
+    refineCreatureTraitTemplate(trait, ctx)
+  })
 
 const monsterEquipmentEntrySchemaParsed = equipmentInstanceSchemaBase
   .extend({ entryId: z.string().min(1) })

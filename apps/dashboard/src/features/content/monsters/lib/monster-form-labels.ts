@@ -32,6 +32,7 @@ import {
 export { formatEquipmentCustomizationRemovalSummary } from './equipment/equipment-entry-customization.lib'
 
 import { formatEquipmentRemovalInlineCount } from './equipment/equipment-entry-customization.lib'
+import { defineMasterDetailItemNoun } from '../../lib/master-detail/master-detail-item-noun'
 
 import {
   formatContentListLoadErrorMessage,
@@ -168,6 +169,12 @@ export function formatMonsterWeaponProficiencyBulkAddAriaLabel(count: number): s
   return `Add all ${count} weapon proficiencies`
 }
 
+export const MONSTER_ACTION_ITEM_NOUN = defineMasterDetailItemNoun({
+  label: 'Action',
+  singular: 'action',
+  plural: 'actions',
+})
+
 export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
 export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
 export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')
@@ -217,6 +224,13 @@ export function getMonsterArmorSlotUiCopy(slot: CreatureArmorSlot): {
 }
 
 export const MONSTER_ACTION_NAME_LABEL = 'Name'
+export const MONSTER_ATTACK_BONUS_LABEL = 'Attack bonus'
+export const MONSTER_ATTACK_BONUS_KIND_ABILITY_LABEL = 'Ability'
+export const MONSTER_ATTACK_BONUS_KIND_SPELL_LABEL = 'Spellcasting'
+export const MONSTER_ATTACK_BONUS_ABILITY_LABEL = 'Ability'
+export const MONSTER_ATTACK_BONUS_PROFICIENCY_LABEL = 'Proficient'
+export const MONSTER_SAVE_FAILURE_NOTE_LABEL = 'Failure note'
+export const MONSTER_SAVE_SUCCESS_AMOUNT_LABEL = 'On successful save'
 export const MONSTER_SAVE_THROW_SECTION_LEGEND = 'Saving throw'
 export const MONSTER_SAVE_THROW_SECTION_DESCRIPTION =
   'Set the saving throw target and how difficult it is to succeed.'

@@ -90,6 +90,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
     preset: z.string().min(1).optional(),
     description: z.string().optional(),
     limitedUse: limitedUse.optional(),
+    available: z.boolean().optional(),
     ...entryProvenanceField,
   }
   const monsterAbilitySourceSchema = z.discriminatedUnion('kind', [

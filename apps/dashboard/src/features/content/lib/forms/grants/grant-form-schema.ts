@@ -7,6 +7,7 @@ import {
   armorCategorySchema,
   campaignLevelSchema,
   damageTypeIdSchema,
+  effectConditionSchema,
   equipmentKindSchema,
   featCategorySchema,
   fieldValidationMessages,
@@ -56,6 +57,8 @@ const BASE_GRANT_TYPES = [
   'skillProficiency',
   'armorTraining',
   'languages',
+  'rollAdjustment',
+  'saveOutcomeOverride',
 ] as const
 
 /** Grant types exposed in species traits and class-feature grant pickers. */
@@ -85,6 +88,8 @@ const BASE_GRANT_TYPE_LABELS: Record<BaseGrantType, string> = {
   skillProficiency: 'Skill proficiency',
   armorTraining: 'Armor training',
   languages: 'Language',
+  rollAdjustment: 'Roll adjustment',
+  saveOutcomeOverride: 'Saving throw success',
 }
 
 export const GRANT_TYPE_LABELS: Record<GrantType, string> = {
@@ -381,52 +386,69 @@ function validateAtomicGrantRow(row: GrantRowValues, ctx: z.RefinementCtx): void
   }
 }
 
-function validateGrantRow(
-  row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>,
+type GrantRowValuesForValidation = z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>
+
+function validateProficiencyGrantRow(
+  row: GrantRowValuesForValidation,
+  ctx: z.RefinementCtx,
+  specificSlugs: string[] | undefined,
+  itemSchema: z.ZodType,
+): void {
+  validateProficiencySpecificGrantRow(row, ctx)
+  if (shouldSkipProficiencySchemaForEmptySpecific(row, specificSlugs)) return
+  applyFormSchemaIssues(ctx, itemSchema.safeParse(row))
+}
+
+function validateRollAdjustmentGrantRow(
+  row: GrantRowValuesForValidation,
   ctx: z.RefinementCtx,
 ): void {
+  if (!row.rollMode) addValidationIssue(ctx, 'Choose advantage or disadvantage.', 'rollMode')
+  if (!row.rollTargets?.length) addValidationIssue(ctx, 'Choose at least one roll.', 'rollTargets')
+  if (row.rollTargets?.includes('ability-check') && !row.rollCheckAbility) {
+    addValidationIssue(ctx, 'Choose the ability for this check.', 'rollCheckAbility')
+  }
+  if (row.circumstanceKind === 'vs-condition' && !row.circumstanceConditionId) {
+    addValidationIssue(ctx, 'Choose the condition.', 'circumstanceConditionId')
+  }
+}
+
+function validateSaveOutcomeGrantRow(row: GrantRowValuesForValidation, ctx: z.RefinementCtx): void {
+  const uses =
+    typeof row.saveOutcomeUses === 'number' ? row.saveOutcomeUses : Number(row.saveOutcomeUses)
+  if (!Number.isInteger(uses) || uses < 1) {
+    addValidationIssue(ctx, 'Enter at least one use.', 'saveOutcomeUses')
+  }
+  if (!row.saveOutcomeRest) {
+    addValidationIssue(ctx, 'Choose the rest that restores these uses.', 'saveOutcomeRest')
+  }
+}
+
+const GRANT_ROW_VALIDATORS: Partial<
+  Record<string, (row: GrantRowValuesForValidation, ctx: z.RefinementCtx) => void>
+> = {
+  equipment: (row, ctx) => applyFormSchemaIssues(ctx, equipmentGrantItemFormSchema.safeParse(row)),
+  weaponProficiency: (row, ctx) =>
+    validateProficiencyGrantRow(
+      row,
+      ctx,
+      row.weaponProficiencySlugs,
+      weaponProficiencyItemFormSchema,
+    ),
+  toolProficiency: (row, ctx) =>
+    validateProficiencyGrantRow(row, ctx, row.toolProficiencySlugs, toolProficiencyItemFormSchema),
+  skillProficiency: (row, ctx) =>
+    validateProficiencyGrantRow(row, ctx, row.skillProficiencyIds, skillProficiencyItemFormSchema),
+  armorTraining: (row, ctx) =>
+    validateProficiencyGrantRow(row, ctx, row.armorTrainingSlugs, armorTrainingItemFormSchema),
+  spells: validateSpellsGrantRow,
+  rollAdjustment: validateRollAdjustmentGrantRow,
+  saveOutcomeOverride: validateSaveOutcomeGrantRow,
+}
+
+function validateGrantRow(row: GrantRowValuesForValidation, ctx: z.RefinementCtx): void {
   validateAtomicGrantRow(row, ctx)
-
-  if (row.grantType === 'equipment') {
-    applyFormSchemaIssues(ctx, equipmentGrantItemFormSchema.safeParse(row))
-    return
-  }
-
-  if (row.grantType === 'weaponProficiency') {
-    validateProficiencySpecificGrantRow(row, ctx)
-    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.weaponProficiencySlugs)) {
-      applyFormSchemaIssues(ctx, weaponProficiencyItemFormSchema.safeParse(row))
-    }
-    return
-  }
-
-  if (row.grantType === 'toolProficiency') {
-    validateProficiencySpecificGrantRow(row, ctx)
-    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.toolProficiencySlugs)) {
-      applyFormSchemaIssues(ctx, toolProficiencyItemFormSchema.safeParse(row))
-    }
-    return
-  }
-
-  if (row.grantType === 'skillProficiency') {
-    validateProficiencySpecificGrantRow(row, ctx)
-    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.skillProficiencyIds)) {
-      applyFormSchemaIssues(ctx, skillProficiencyItemFormSchema.safeParse(row))
-    }
-    return
-  }
-
-  if (row.grantType === 'armorTraining') {
-    validateProficiencySpecificGrantRow(row, ctx)
-    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.armorTrainingSlugs)) {
-      applyFormSchemaIssues(ctx, armorTrainingItemFormSchema.safeParse(row))
-    }
-    return
-  }
-
-  if (row.grantType === 'spells') {
-    validateSpellsGrantRow(row, ctx)
-  }
+  GRANT_ROW_VALIDATORS[row.grantType]?.(row, ctx)
 }
 
 function createGrantRowFormSchemaBase(maxLevel: number = MAX_CHARACTER_LEVEL) {
@@ -476,6 +498,16 @@ function createGrantRowFormSchemaBase(maxLevel: number = MAX_CHARACTER_LEVEL) {
       featAllowAnyQualifying: z.boolean().optional(),
       featReplaceable: z.boolean().optional(),
       featRecommendedIds: z.array(z.string()).optional(),
+      rollMode: z.enum(['advantage', 'disadvantage']).optional(),
+      rollTargets: z.array(z.enum(['attack', 'saving-throw', 'ability-check'])).optional(),
+      rollCheckAbility: abilitySchema.optional(),
+      rollSkillId: z.string().min(1).optional(),
+      circumstanceKind: z
+        .enum(['vs-magic', 'vs-condition', 'ally-adjacent-to-target', 'in-sunlight'])
+        .optional(),
+      circumstanceConditionId: effectConditionSchema.optional(),
+      saveOutcomeUses: z.coerce.number().int().min(1).optional(),
+      saveOutcomeRest: restKindSchema.optional(),
     })
     .merge(equipmentGrantRowFieldsSchema)
     .merge(proficiencyGrantRowFieldsSchema)

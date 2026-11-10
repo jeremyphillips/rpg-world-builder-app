@@ -4,6 +4,7 @@ import { cn, panelVariants } from '@rpg/ui'
 import { DetailOverflowMenu } from '../../lib/detail/detail-overflow-menu'
 import {
   detailOverflowDeleteAction,
+  detailOverflowDuplicateAction,
   type DetailOverflowMenuEntry,
 } from '../../lib/detail/detail-overflow-actions'
 import {
@@ -30,7 +31,9 @@ export interface MasterDetailEditorShellProps {
   itemNoun: MasterDetailItemNounTerm
   selectedIdentity?: MasterDetailEditorIdentity
   onDelete?: () => void
-  /** Leading overflow entries, rendered before delete. */
+  /** Copies the selected row as a new homebrew row. */
+  onDuplicate?: () => void
+  /** Leading overflow entries, rendered before duplicate and delete. */
   overflowActions?: readonly DetailOverflowMenuEntry[]
   bodyRef?: RefObject<HTMLDivElement | null>
   children?: ReactNode
@@ -40,23 +43,31 @@ function MasterDetailEditorIdentityHeader({
   identity,
   itemNoun,
   onDelete,
+  onDuplicate,
   overflowActions,
 }: {
   identity: MasterDetailEditorIdentity
   itemNoun: MasterDetailItemNounTerm
   onDelete?: () => void
+  onDuplicate?: () => void
   overflowActions?: readonly DetailOverflowMenuEntry[]
 }) {
   const metaLine = identity.meta ? joinMasterDetailItemMeta(identity.meta) : undefined
   const deletable = identity.deletable !== false && Boolean(onDelete)
   const itemNounLabel = masterDetailItemNounLabel(itemNoun)
-  const menuActions: DetailOverflowMenuEntry[] = [
+  const leadingActions: DetailOverflowMenuEntry[] = [
     ...(overflowActions ?? []),
+    ...(onDuplicate
+      ? [detailOverflowDuplicateAction(`Duplicate ${itemNounLabel}`, onDuplicate)]
+      : []),
+  ]
+  const menuActions: DetailOverflowMenuEntry[] = [
+    ...leadingActions,
     ...(deletable && onDelete
       ? [
           {
             ...detailOverflowDeleteAction(`Delete ${itemNounLabel}`, onDelete),
-            separatorBefore: (overflowActions?.length ?? 0) > 0,
+            separatorBefore: leadingActions.length > 0,
           },
         ]
       : []),
@@ -88,6 +99,7 @@ export function MasterDetailEditorShell({
   itemNoun,
   selectedIdentity,
   onDelete,
+  onDuplicate,
   overflowActions,
   bodyRef,
   children,
@@ -111,6 +123,7 @@ export function MasterDetailEditorShell({
             identity={selectedIdentity}
             itemNoun={itemNoun}
             onDelete={onDelete}
+            onDuplicate={onDuplicate}
             overflowActions={overflowActions}
           />
           <div ref={bodyRef} className="px-4 py-4">

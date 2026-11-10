@@ -17,7 +17,7 @@ import type { FieldValidationProps } from './field-validation-props'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { useFieldRootContext } from './field.client'
-import { useOwnedLabelVisibility } from './owned-label-visibility.lib'
+import { showOwnedLabelSlot, useOwnedLabelVisibility } from './owned-label-visibility.lib'
 
 export type SelectFieldLayoutSharedProps = FieldValidationProps & {
   id: string
@@ -143,7 +143,11 @@ function SelectFieldInlineBody({
   const { hasHint } = useFieldRootContext('SelectFieldInlineBody')
   const resolvedHintPosition = hintPosition ?? 'below-label'
   const hintInLabelSlot = hasHint && resolvedHintPosition === 'below-label'
-  const showLabelSlot = visibility !== 'srOnly' || hintInLabelSlot || info != null
+  const showLabelSlot = showOwnedLabelSlot({
+    labelVisibility: visibility,
+    hintInLabelSlot,
+    hasInfo: info != null,
+  })
   const ownedLabel = <FormFieldLabel label={label} info={info} required={required} />
 
   return (

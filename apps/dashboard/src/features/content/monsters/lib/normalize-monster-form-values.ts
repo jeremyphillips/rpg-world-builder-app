@@ -10,6 +10,7 @@ import {
 
 import { normalizeLimitedUse } from '../../lib/forms/limited-use/normalize-limited-use'
 import { monsterActionActiveKeys, monsterActionTriggerText } from './actions/monster-action-kind'
+import { normalizeMonsterSaveOutcomes } from './actions/monster-action-save-outcomes'
 
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
 
@@ -77,6 +78,13 @@ function applyReactionTriggerDraft(
   else delete cleaned.trigger
 }
 
+function applySaveOutcomeDraft(cleaned: Record<string, unknown>): void {
+  if (cleaned.kind !== 'save' || !isRecord(cleaned.resolution)) return
+  const resolution = cleaned.resolution
+  if (!Array.isArray(resolution.outcomes)) return
+  resolution.outcomes = normalizeMonsterSaveOutcomes(resolution.outcomes)
+}
+
 function applyLimitedUseDraft(cleaned: Record<string, unknown>): void {
   if (!('limitedUse' in cleaned)) return
   const limitedUse = normalizeLimitedUse(cleaned.limitedUse)
@@ -107,6 +115,7 @@ function normalizeAction(
   if (!isRecord(cleaned)) return cleaned
   applyReactionTriggerDraft(cleaned, section)
   applyLimitedUseDraft(cleaned)
+  applySaveOutcomeDraft(cleaned)
   const keys =
     typeof cleaned.kind === 'string' ? monsterActionActiveKeys(cleaned.kind, section) : []
   const active = keys.length > 0 ? pickKeys(cleaned, keys) : cleaned

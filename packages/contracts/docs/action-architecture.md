@@ -74,6 +74,17 @@ errors. Draft mode reports broken references. Empty steps are a publish error.
 `formatMonsterMultiattack` builds the sentence from the monster name and resolved
 action names. Weapon names come from the equipment catalog.
 
+## Creature trait templates
+
+Trait mechanics are not action presets. `content/creature/traits` keeps a
+versioned registry (`CREATURE_TRAIT_TEMPLATE_ENTRIES`). A species or monster
+row stores `templateId`, optional config, and display overrides. Reading the
+row resolves grants from the registry. Nothing copies those mechanics into the
+row, and a later edit of config does not rewrite the registry.
+
+Action `preset` stays authoring provenance only. It still does not reapply
+defaults after creation.
+
 ## Not in this model
 
 Available-actions resolver, encounter picker, action grants, legendary actions,

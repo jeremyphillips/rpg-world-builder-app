@@ -27,6 +27,11 @@ import {
   MONSTER_ACTION_DAMAGE_FIELD_LABEL,
   MONSTER_ACTION_REACH_FIELD_LABEL,
   MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
+  MONSTER_ATTACK_BONUS_ABILITY_LABEL,
+  MONSTER_ATTACK_BONUS_KIND_ABILITY_LABEL,
+  MONSTER_ATTACK_BONUS_KIND_SPELL_LABEL,
+  MONSTER_ATTACK_BONUS_LABEL,
+  MONSTER_ATTACK_BONUS_PROFICIENCY_LABEL,
   MONSTER_SAVE_ABILITY_LABEL,
   MONSTER_SAVE_DC_ABILITY_LABEL,
   MONSTER_SAVE_DC_KIND_ABILITY_LABEL,
@@ -53,6 +58,11 @@ import {
   monsterSaveAbilityHintWhen,
   monsterSaveDcAbilityHintWhen,
 } from './monster-action-save-field-hints'
+import {
+  MonsterActionSaveFailureNoteField,
+  MonsterActionSaveSuccessAmountField,
+} from './monster-action-save-outcome-fields'
+
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {
   return {
     dependsOn: [name],
@@ -139,11 +149,11 @@ function monsterActionBonusSourceDependent(
     controller: {
       type: 'select',
       name: 'bonusSource.kind',
-      label: 'Attack bonus',
+      label: MONSTER_ATTACK_BONUS_LABEL,
       placeholder: 'Choose',
       options: [
-        { value: 'ability', label: 'Ability' },
-        { value: 'spell', label: 'Spellcasting' },
+        { value: 'ability', label: MONSTER_ATTACK_BONUS_KIND_ABILITY_LABEL },
+        { value: 'spell', label: MONSTER_ATTACK_BONUS_KIND_SPELL_LABEL },
       ],
     },
     dependents: {
@@ -152,7 +162,7 @@ function monsterActionBonusSourceDependent(
         {
           type: 'select',
           name: 'bonusSource.ability',
-          label: 'Ability',
+          label: MONSTER_ATTACK_BONUS_ABILITY_LABEL,
           placeholder: 'Choose',
           options: abilityOptions(),
           visibility: abilityBranch,
@@ -160,7 +170,7 @@ function monsterActionBonusSourceDependent(
         {
           type: 'switch',
           name: 'bonusSource.proficient',
-          label: 'Proficient',
+          label: MONSTER_ATTACK_BONUS_PROFICIENCY_LABEL,
           visibility: abilityBranch,
         },
         {
@@ -244,7 +254,7 @@ function monsterActionSaveDcDependent(
   }
 }
 
-function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
+function monsterActionSaveSelectionDependent(): FormItem {
   const selfMode = whenFieldEquals('resolution.selectionMode', 'self')
   const targetsMode = whenFieldEquals('resolution.selectionMode', 'targets')
   return {
@@ -328,28 +338,16 @@ function monsterActionSaveSection(
         },
       },
       monsterActionSaveDcDependent(namePrefix, sharedCastingOptions),
-      monsterActionSaveSelectionDependent(ctx),
+      monsterActionSaveSelectionDependent(),
       {
-        type: 'textarea',
-        name: 'resolution.outcomes.0.note',
-        label: 'Failure note',
-        rows: 2,
-        width: 'full',
-        optionalDisclosure: {
-          addLabel: 'Add failure note',
-          removeLabel: 'Remove',
-          expandWhenPopulated: true,
-        },
+        kind: 'slot',
+        name: '_saveFailureNote',
+        render: () => <MonsterActionSaveFailureNoteField namePrefix={namePrefix} />,
       },
       {
-        type: 'select',
-        name: 'resolution.outcomes.1.applications.0.amount',
-        label: 'On successful save',
-        options: [
-          { value: 'half', label: 'Half damage' },
-          { value: 'full', label: 'Full damage' },
-          { value: 'none', label: 'No effect' },
-        ],
+        kind: 'slot',
+        name: '_saveSuccessAmount',
+        render: () => <MonsterActionSaveSuccessAmountField namePrefix={namePrefix} />,
       },
     ],
   }

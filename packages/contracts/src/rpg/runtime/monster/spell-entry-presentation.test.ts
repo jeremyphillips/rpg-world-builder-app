@@ -99,6 +99,6 @@ describe('formatMonsterLimitedUseHeading', () => {
         PROFICIENCY_BONUS_ACTION.name,
         PROFICIENCY_BONUS_ACTION.limitedUse,
       ),
-    ).toBe('Legendary Resistance (Proficiency Bonus/Long Rest)')
+    ).toBe('Relentless (Proficiency Bonus/Long Rest)')
   })
 })

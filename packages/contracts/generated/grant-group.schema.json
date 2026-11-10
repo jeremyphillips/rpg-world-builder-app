@@ -691,6 +691,151 @@
             "kind"
           ],
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "advantage",
+                "disadvantage"
+              ],
+              "description": "advantage | disadvantage"
+            },
+            "rolls": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema78"
+              }
+            },
+            "circumstance": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "vs-magic",
+                      "description": "vs-magic"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "vs-condition",
+                      "description": "vs-condition"
+                    },
+                    "conditionId": {
+                      "type": "string",
+                      "enum": [
+                        "blinded",
+                        "charmed",
+                        "deafened",
+                        "exhaustion",
+                        "frightened",
+                        "grappled",
+                        "incapacitated",
+                        "invisible",
+                        "paralyzed",
+                        "petrified",
+                        "poisoned",
+                        "prone",
+                        "restrained",
+                        "stunned",
+                        "unconscious"
+                      ],
+                      "description": "blinded | charmed | deafened | exhaustion | frightened | grappled | incapacitated | invisible | paralyzed | petrified | poisoned | prone | restrained | stunned | unconscious"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "conditionId"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "ally-adjacent-to-target",
+                      "description": "ally-adjacent-to-target"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "in-sunlight",
+                      "description": "in-sunlight"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "id": {
+              "$ref": "#/definitions/__schema3"
+            },
+            "kind": {
+              "type": "string",
+              "const": "rollAdjustment",
+              "description": "rollAdjustment"
+            }
+          },
+          "required": [
+            "mode",
+            "rolls",
+            "id",
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "outcome": {
+              "type": "string",
+              "const": "success",
+              "description": "success"
+            },
+            "limitedUse": {
+              "$ref": "#/definitions/__schema77"
+            },
+            "id": {
+              "$ref": "#/definitions/__schema3"
+            },
+            "kind": {
+              "type": "string",
+              "const": "saveOutcomeOverride",
+              "description": "saveOutcomeOverride"
+            }
+          },
+          "required": [
+            "outcome",
+            "limitedUse",
+            "id",
+            "kind"
+          ],
+          "additionalProperties": false
         }
       ]
     },
@@ -1797,75 +1942,11 @@
           "description": "free_cast"
         },
         "limitedUse": {
-          "type": "object",
-          "properties": {
-            "kind": {
-              "type": "string",
-              "const": "uses",
-              "description": "uses"
-            },
-            "count": {
-              "oneOf": [
-                {
-                  "type": "object",
-                  "properties": {
-                    "kind": {
-                      "type": "string",
-                      "const": "fixed",
-                      "description": "fixed"
-                    },
-                    "value": {
-                      "type": "integer",
-                      "minimum": 1,
-                      "maximum": 9007199254740991
-                    }
-                  },
-                  "required": [
-                    "kind",
-                    "value"
-                  ],
-                  "additionalProperties": false
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "kind": {
-                      "type": "string",
-                      "const": "proficiency-bonus",
-                      "description": "proficiency-bonus"
-                    }
-                  },
-                  "required": [
-                    "kind"
-                  ],
-                  "additionalProperties": false
-                }
-              ]
-            },
-            "recovery": {
-              "type": "object",
-              "properties": {
-                "minimumRest": {
-                  "type": "string",
-                  "enum": [
-                    "short",
-                    "long"
-                  ],
-                  "description": "short | long"
-                }
-              },
-              "required": [
-                "minimumRest"
-              ],
-              "additionalProperties": false
+          "allOf": [
+            {
+              "$ref": "#/definitions/__schema77"
             }
-          },
-          "required": [
-            "kind",
-            "count",
-            "recovery"
-          ],
-          "additionalProperties": false
+          ]
         },
         "allowsSlotCasting": {
           "type": "boolean"
@@ -1875,6 +1956,143 @@
         "mode"
       ],
       "additionalProperties": false
+    },
+    "__schema77": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "uses",
+          "description": "uses"
+        },
+        "count": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "fixed",
+                  "description": "fixed"
+                },
+                "value": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "kind",
+                "value"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "proficiency-bonus",
+                  "description": "proficiency-bonus"
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "recovery": {
+          "type": "object",
+          "properties": {
+            "minimumRest": {
+              "type": "string",
+              "enum": [
+                "short",
+                "long"
+              ],
+              "description": "short | long"
+            }
+          },
+          "required": [
+            "minimumRest"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "kind",
+        "count",
+        "recovery"
+      ],
+      "additionalProperties": false
+    },
+    "__schema78": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "attack",
+              "description": "attack"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "saving-throw",
+              "description": "saving-throw"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "ability-check",
+              "description": "ability-check"
+            },
+            "ability": {
+              "type": "string",
+              "enum": [
+                "str",
+                "dex",
+                "con",
+                "int",
+                "wis",
+                "cha"
+              ],
+              "description": "str | dex | con | int | wis | cha"
+            },
+            "skillId": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema31"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "ability"
+          ],
+          "additionalProperties": false
+        }
+      ]
     }
   }
 }
