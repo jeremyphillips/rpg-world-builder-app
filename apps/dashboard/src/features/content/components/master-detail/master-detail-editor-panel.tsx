@@ -33,7 +33,7 @@ export interface MasterDetailEditorPanelProps {
   /** Override RHF prefix for availability dialog fields (defaults to row prefix). */
   availabilityNamePrefix?: string
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
-  /** Leading overflow entries, such as Move to. */
+  /** Extra overflow entries, such as Move to, rendered after availability and duplicate. */
   overflowActions?: readonly DetailOverflowMenuEntry[]
   /** Attack summary, notices, and advisories rendered above the row fields. */
   detailLeading?: ReactNode

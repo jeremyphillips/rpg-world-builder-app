@@ -14,7 +14,7 @@ describe('MasterDetailAvailabilityHeaderLine', () => {
       />,
     )
 
-    expect(screen.getByText('Available')).toBeInTheDocument()
+    expect(screen.getByText('Available')).toHaveClass('text-style-caption')
     expect(screen.getByText('Available').parentElement?.querySelector('[aria-hidden]')).toHaveClass(
       'size-1.5',
       'shrink-0',

@@ -34,7 +34,7 @@ export interface MasterDetailEditorShellProps {
   onDelete?: () => void
   /** Copies the selected row as a new homebrew row. */
   onDuplicate?: () => void
-  /** Leading overflow entries, rendered before duplicate and delete. */
+  /** Extra overflow entries, rendered after availability and duplicate. */
   overflowActions?: readonly DetailOverflowMenuEntry[]
   bodyRef?: RefObject<HTMLDivElement | null>
   children?: ReactNode
@@ -57,13 +57,13 @@ function MasterDetailEditorIdentityHeader({
   const deletable = identity.deletable !== false && Boolean(onDelete)
   const itemNounLabel = masterDetailItemNounLabel(itemNoun)
   const leadingActions: DetailOverflowMenuEntry[] = [
-    ...(overflowActions ?? []),
     ...(identity.onAvailabilityChange
       ? [detailOverflowAvailabilityAction(identity.onAvailabilityChange)]
       : []),
     ...(onDuplicate
       ? [detailOverflowDuplicateAction(`Duplicate ${itemNounLabel}`, onDuplicate)]
       : []),
+    ...(overflowActions ?? []),
   ]
   const menuActions: DetailOverflowMenuEntry[] = [
     ...leadingActions,
