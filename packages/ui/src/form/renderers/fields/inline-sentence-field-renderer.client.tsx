@@ -92,7 +92,7 @@ function syncResolvedInlineSentenceSelectValue(
 
   const controller = controllerByName.get(segment.name)
   const resolvedOptions = resolvedSelectOptionsBySegment.get(segment.name)
-  if (!controller || !resolvedOptions) return
+  if (!controller || !resolvedOptions || resolvedOptions.length === 0) return
 
   const currentValue = coerceInlineSentenceSelectValue(controller.field.value)
   const validValues = new Set(resolvedOptions.map((option) => option.value))
@@ -399,6 +399,13 @@ export function InlineSentenceFieldRenderer({
   useEffect(() => {
     if (!config.optionsResolve) return
 
+    const hasSelectableOption = visibleSegments.some(
+      (segment) =>
+        segment.kind === 'select' &&
+        (resolvedSelectOptionsBySegment.get(segment.name)?.length ?? 0) > 0,
+    )
+    if (!hasSelectableOption) return
+
     syncResolvedInlineSentenceSelectValues(
       visibleSegments,
       config.name,
@@ -463,8 +470,9 @@ export function InlineSentenceFieldRenderer({
 
       const selectSegment = segment as InlineSentenceSelectSegment
       const selectLabel = selectSegment.ariaLabel ?? config.label
+      const resolvedFromMap = resolvedSelectOptionsBySegment.get(segment.name)
       const resolvedOptions =
-        resolvedSelectOptionsBySegment.get(segment.name) ?? selectSegment.options
+        resolvedFromMap !== undefined ? resolvedFromMap : selectSegment.options
       const selectControl: InlineSentenceBoundSelect = {
         kind: 'select',
         id: controlId,

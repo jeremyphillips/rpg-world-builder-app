@@ -174,20 +174,6 @@ function authoredHitDiceCount(dice: DiceFormulaValue | undefined): number {
   return dice.count
 }
 
-function hasStoredHitDieFace(formValues: MonsterFormValues): boolean {
-  const storedFace = formValues[MONSTER_HIT_POINTS_DICE_FACES_FIELD]
-  if (typeof storedFace === 'string' && storedFace !== '') return true
-  return formValues.hitPointsDice?.faces != null
-}
-
-function clearHitDieFacePatch(count: number): Partial<MonsterFormValues> {
-  return {
-    [MONSTER_HIT_POINTS_DICE_FIELD]: undefined,
-    [MONSTER_HIT_POINTS_DICE_COUNT_FIELD]: count,
-    [MONSTER_HIT_POINTS_DICE_FACES_FIELD]: undefined,
-  }
-}
-
 function patchResolvedHitDie(
   formValues: MonsterFormValues,
   count: number,
@@ -210,7 +196,11 @@ function patchHitPointsDiceForSize(
   const faces = resolveHitDieFacesForSizes(formValues.sizes)
   const count = authoredHitDiceCount(hitPointsDiceFromFormValues(formValues))
   if (faces === undefined) {
-    return hasStoredHitDieFace(formValues) ? clearHitDieFacePatch(count) : undefined
+    // Do not clear inline-sentence select state when no size is selected. Clearing
+    // `hitPointsDice` in value-sync fights mounted controllers and can loop updates
+    // with the hit-dice inline sentence. Stale faces are harmless while hidden and
+    // are overwritten when a size is selected again.
+    return undefined
   }
   return patchResolvedHitDie(formValues, count, faces)
 }
