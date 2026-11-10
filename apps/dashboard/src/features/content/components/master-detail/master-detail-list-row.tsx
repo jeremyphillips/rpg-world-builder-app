@@ -8,6 +8,7 @@ import {
 } from '@rpg/ui'
 import type { RefObject } from 'react'
 
+import { joinMasterDetailCaption } from '../../lib/master-detail/master-detail-item-meta'
 import { masterDetailRowValidationStateLabel } from '../../lib/master-detail/master-detail-row-validation'
 import type { MasterDetailListItem } from './master-detail-list-panel'
 
@@ -25,15 +26,15 @@ function MasterDetailListRowContent({
   item: MasterDetailListItem
   issueCount: number
 }) {
+  const caption = item.meta ? joinMasterDetailCaption(item.meta, 'list') : ''
+
   return (
     <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
       {item.meta?.eyebrow ? (
         <span className="min-w-0 truncate text-style-caption">{item.meta.eyebrow}</span>
       ) : null}
       <span className="min-w-0 truncate text-style-label text-foreground">{item.title}</span>
-      {item.meta?.sourceLabel ? (
-        <span className="min-w-0 truncate text-style-caption">{item.meta.sourceLabel}</span>
-      ) : null}
+      {caption ? <span className="min-w-0 truncate text-style-caption">{caption}</span> : null}
       {item.availabilityStatusLabel ? (
         <InlineInactiveStatus label={item.availabilityStatusLabel} className="min-w-0" />
       ) : null}

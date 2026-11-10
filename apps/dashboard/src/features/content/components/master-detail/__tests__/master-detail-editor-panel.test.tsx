@@ -57,7 +57,7 @@ describe('MasterDetailEditorPanel', () => {
   const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name' }]
   const selectedIdentity = {
     title: 'Rage',
-    meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+    meta: { eyebrow: 'Level 1', provenance: 'system', persistence: 'persisted' },
     deletable: true,
   }
 

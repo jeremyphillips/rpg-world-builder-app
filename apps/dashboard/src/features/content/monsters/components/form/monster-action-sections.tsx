@@ -64,7 +64,7 @@ function mapActionListItem(row: unknown, index: number, titles: ReadonlyMap<stri
   const action = row as MonsterActionDraftRow | undefined
   return {
     title: action ? (titles.get(action.id) ?? `Action ${index + 1}`) : `Action ${index + 1}`,
-    sourceLabel: action ? getMonsterActionKindLabel(action.kind) : undefined,
+    kindLabel: action ? getMonsterActionKindLabel(action.kind) : undefined,
   }
 }
 
@@ -179,18 +179,21 @@ function useMonsterActionDetailRows(
     ...shared,
     fieldName: 'actions',
     editor: sections.editors.actions,
+    sectionLabel: SECTION_HEADINGS.actions,
     mapListItem: ({ row, index }) => mapActionListItem(row, index, actionTitles),
   })
   const bonusRows = useEmbeddedMasterDetailRows({
     ...shared,
     fieldName: 'bonusActions',
     editor: sections.editors.bonusActions,
+    sectionLabel: SECTION_HEADINGS.bonusActions,
     mapListItem: ({ row, index }) => mapActionListItem(row, index, bonusTitles),
   })
   const reactionRows = useEmbeddedMasterDetailRows({
     ...shared,
     fieldName: 'reactions',
     editor: sections.editors.reactions,
+    sectionLabel: SECTION_HEADINGS.reactions,
     mapListItem: ({ row, index }) => mapActionListItem(row, index, reactionTitles),
   })
   return {

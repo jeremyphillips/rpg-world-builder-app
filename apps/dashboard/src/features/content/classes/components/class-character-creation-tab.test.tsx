@@ -38,6 +38,7 @@ function TabShell({
         formCtx={{
           entityCatalogLayer: formCtx?.entityCatalogLayer,
           embeddedSeedRowIds: formCtx?.embeddedSeedRowIds,
+          embeddedSystemOriginRowIds: formCtx?.embeddedSystemOriginRowIds,
         }}
       />
     </FormProvider>
@@ -94,6 +95,9 @@ describe('ClassCharacterCreationTab', () => {
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
+          embeddedSystemOriginRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
         }}
       />,
     )
@@ -115,6 +119,9 @@ describe('ClassCharacterCreationTab', () => {
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
+          embeddedSystemOriginRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
         }}
       />,
     )
@@ -130,6 +137,9 @@ describe('ClassCharacterCreationTab', () => {
         formCtx={{
           entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
+          embeddedSystemOriginRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
         }}
@@ -182,6 +192,9 @@ describe('ClassCharacterCreationTab', () => {
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
+          embeddedSystemOriginRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
         }}
       />,
     )
@@ -222,6 +235,9 @@ describe('ClassCharacterCreationTab', () => {
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
+          embeddedSystemOriginRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
         }}
       />,
     )
@@ -241,6 +257,9 @@ describe('ClassCharacterCreationTab', () => {
         formCtx={{
           entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
+          embeddedSystemOriginRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
         }}

@@ -120,11 +120,7 @@ function templateHeaderIdentity(
     ...identity,
     title,
     rowKey: fieldId,
-    meta: {
-      sourceLabel: identity.meta?.sourceLabel ?? '',
-      ...identity.meta,
-      ...(sourceName ? { sourceName } : {}),
-    },
+    ...(sourceName ? { sourceName } : {}),
     inlineTitle: {
       field: 'nameOverride',
       mode: 'override',

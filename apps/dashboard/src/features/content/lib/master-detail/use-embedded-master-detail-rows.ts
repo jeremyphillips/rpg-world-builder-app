@@ -37,7 +37,7 @@ export interface UseEmbeddedMasterDetailRowsParams {
   itemNoun: MasterDetailItemNounTerm
   mapListItem: (
     ctx: FormEmbeddedMasterDetailMapListItemContext,
-  ) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string; sourceLabel?: string }
+  ) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string; kindLabel?: string }
   access?: FormEmbeddedMasterDetailAccessConfig
   resolveRowReasons?: (ctx: {
     row: unknown
@@ -52,6 +52,8 @@ export interface UseEmbeddedMasterDetailRowsParams {
   /** When set, replaces presentation-path issue counts for heterogeneous rows. */
   resolveRowIssueCount?: (index: number) => number
   showDelete?: boolean
+  /** Detail caption placement for every row in this array, such as "Actions". */
+  sectionLabel?: string
 }
 
 export function useEmbeddedMasterDetailRows({
@@ -66,13 +68,18 @@ export function useEmbeddedMasterDetailRows({
   resolveAvailabilityFormItems,
   resolveRowIssueCount,
   showDelete = true,
+  sectionLabel,
 }: UseEmbeddedMasterDetailRowsParams) {
   const watched = useWatch({ name: fieldName }) as unknown[] | undefined
   const availabilityDialogRef = useRef<HTMLDivElement>(null)
-  const seedRowIds = useMemo(() => {
+  const persistedRowIds = useMemo(() => {
     const ids = formCtx.embeddedSeedRowIds?.[fieldName]
     return ids?.length ? new Set(ids) : undefined
   }, [formCtx.embeddedSeedRowIds, fieldName])
+  const systemOriginRowIds = useMemo(() => {
+    const ids = formCtx.embeddedSystemOriginRowIds?.[fieldName]
+    return ids?.length ? new Set(ids) : undefined
+  }, [formCtx.embeddedSystemOriginRowIds, fieldName])
 
   const validation = useMasterDetailRowValidation(fieldName, itemFields)
   const getRowIssueCount = resolveRowIssueCount ?? validation.getRowIssueCount
@@ -89,7 +96,9 @@ export function useEmbeddedMasterDetailRows({
         access,
         mapListItem,
         getRowIssueCount,
-        seedRowIds,
+        persistedRowIds,
+        systemOriginRowIds,
+        sectionLabel,
         resolveRowReasons,
       })
     }
@@ -108,11 +117,13 @@ export function useEmbeddedMasterDetailRows({
         index: formIndex,
         row: row as { id?: string } | undefined,
         entityCatalogLayer: formCtx.entityCatalogLayer,
-        seedRowIds,
+        persistedRowIds,
+        systemOriginRowIds,
         getRowIssueCount,
         title: masterDetailItemTitle(listDisplay.title, itemNoun),
         eyebrow: listDisplay.eyebrow,
-        sourceLabel: listDisplay.sourceLabel,
+        kindLabel: listDisplay.kindLabel,
+        sectionLabel,
         showDelete,
         extraReasons:
           resolveRowReasons?.({
@@ -140,7 +151,9 @@ export function useEmbeddedMasterDetailRows({
     itemNoun,
     mapListItem,
     resolveRowReasons,
-    seedRowIds,
+    persistedRowIds,
+    systemOriginRowIds,
+    sectionLabel,
     showDelete,
     watched,
   ])

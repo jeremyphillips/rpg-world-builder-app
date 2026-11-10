@@ -1,9 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import {
-  getMonsterActionKindLabel,
-  isWeaponEquipment,
-  resolveEquipmentInstanceReferenceLabel,
-} from '@rpg/contracts'
+import { isWeaponEquipment, resolveEquipmentInstanceReferenceLabel } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
 import { FormItems, FormRhythmStack } from '@rpg/ui/form'
 import { useWatch } from 'react-hook-form'
@@ -143,11 +139,8 @@ export function MonsterActionDetail({
           ? {
               title: headerName.title,
               rowKey: editor.selectedFieldId ?? action.id,
-              meta: {
-                ...(headerName.sourceName ? { sourceName: headerName.sourceName } : {}),
-                eyebrow: getMonsterActionKindLabel(action.kind),
-                sourceLabel: monsterActionSectionHeading(located.section),
-              },
+              meta: rows.selectedIdentity?.meta,
+              ...(headerName.sourceName ? { sourceName: headerName.sourceName } : {}),
               inlineTitle: {
                 field: 'name',
                 fallback: headerName.fallback,

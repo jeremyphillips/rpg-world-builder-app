@@ -1,7 +1,7 @@
 import type { MasterDetailListItem } from '../../../components/master-detail/master-detail-list-panel'
 import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-constants'
-import { resolveSubclassSourceLabel } from './subclass-master-detail.lib'
-import { isDraftSubclassId, isSubclassDeletable } from './subclass-editor-constants'
+import { subclassMasterDetailMeta } from './subclass-master-detail.lib'
+import { isSubclassDeletable } from './subclass-editor-constants'
 import type { SubclassListItem } from './subclass-editor-state'
 import { SUBCLASS_MASTER_DETAIL_ITEM_NOUN } from './subclass-form-labels'
 
@@ -26,14 +26,7 @@ export function buildSubclassMasterDetailListItem({
   return {
     id: item.id,
     title: masterDetailItemTitle(item.name, SUBCLASS_MASTER_DETAIL_ITEM_NOUN),
-    meta: {
-      ...(isModified ? { eyebrow: 'Modified' } : {}),
-      sourceLabel: resolveSubclassSourceLabel(
-        item.id,
-        item.catalogLayer === 'unsaved' ? 'homebrew' : item.catalogLayer,
-        item.catalogLayer === 'unsaved' || isDraftSubclassId(item.id) ? 'draft' : 'published',
-      ),
-    },
+    meta: subclassMasterDetailMeta(item.id, item.catalogLayer, isModified),
     ...(isAvailable ? {} : { availabilityStatusLabel: 'Unavailable' as const }),
     deletable: isSubclassDeletable(SOURCE_FOR_DELETABLE[item.catalogLayer], item.id),
   }

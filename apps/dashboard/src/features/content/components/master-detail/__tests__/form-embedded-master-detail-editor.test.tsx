@@ -22,17 +22,19 @@ function EditorShell({
   traits = [] as TraitRow[],
   entityCatalogLayer,
   embeddedSeedRowIds,
+  embeddedSystemOriginRowIds,
 }: {
   traits?: TraitRow[]
   entityCatalogLayer?: 'system' | 'homebrew'
   embeddedSeedRowIds?: Record<string, readonly string[]>
+  embeddedSystemOriginRowIds?: Record<string, readonly string[]>
 }) {
   const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name' }]
 
   return (
     <TestFormShell defaultValues={{ traits }}>
       <FormEmbeddedMasterDetailEditor
-        formCtx={{ entityCatalogLayer, embeddedSeedRowIds }}
+        formCtx={{ entityCatalogLayer, embeddedSeedRowIds, embeddedSystemOriginRowIds }}
         fieldName="traits"
         itemFields={itemFields}
         itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
@@ -102,6 +104,7 @@ describe('FormEmbeddedMasterDetailEditor', () => {
       <EditorShell
         entityCatalogLayer="system"
         embeddedSeedRowIds={{ traits: ['t1'] }}
+        embeddedSystemOriginRowIds={{ traits: ['t1'] }}
         traits={[{ id: 't1', kind: 'custom', name: 'Darkvision', grants: [] }]}
       />,
     )

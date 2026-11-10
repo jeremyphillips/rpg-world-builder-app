@@ -28,15 +28,31 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 const items = [
-  { id: 'a', title: 'Rage', meta: { eyebrow: 'Level 1', sourceLabel: 'System' } },
-  { id: 'b', title: 'Unarmored Defense', meta: { eyebrow: 'Level 1', sourceLabel: 'Homebrew' } },
-  { id: 'c', title: 'Reckless Attack', meta: { eyebrow: 'Level 2', sourceLabel: 'Homebrew' } },
+  {
+    id: 'a',
+    title: 'Rage',
+    meta: { eyebrow: 'Level 1', provenance: 'system', persistence: 'persisted' },
+  },
+  {
+    id: 'b',
+    title: 'Unarmored Defense',
+    meta: { eyebrow: 'Level 1', provenance: 'homebrew', persistence: 'persisted' },
+  },
+  {
+    id: 'c',
+    title: 'Reckless Attack',
+    meta: { eyebrow: 'Level 2', provenance: 'homebrew', persistence: 'persisted' },
+  },
 ]
 
 const longItems = Array.from({ length: 20 }, (_, index) => ({
   id: `feature-${index}`,
   title: `Feature ${index + 1}`,
-  meta: { eyebrow: `Level ${index + 1}`, sourceLabel: 'Homebrew' as const },
+  meta: {
+    eyebrow: `Level ${index + 1}`,
+    provenance: 'homebrew',
+    persistence: 'persisted' as const,
+  },
 }))
 
 export const Default: Story = {
@@ -134,18 +150,18 @@ export const WithProtectedSystemRow: Story = {
       {
         id: 'a',
         title: 'Rage',
-        meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+        meta: { eyebrow: 'Level 1', provenance: 'system', persistence: 'persisted' },
         deletable: false,
       },
       {
         id: 'b',
         title: 'Custom Fury',
-        meta: { eyebrow: 'Level 3', sourceLabel: 'Homebrew' },
+        meta: { eyebrow: 'Level 3', provenance: 'homebrew', persistence: 'persisted' },
       },
       {
         id: 'c',
         title: 'Legacy Option',
-        meta: { eyebrow: 'Level 5', sourceLabel: 'System' },
+        meta: { eyebrow: 'Level 5', provenance: 'system', persistence: 'persisted' },
         availabilityStatusLabel: 'Unavailable',
         deletable: false,
       },
@@ -179,14 +195,14 @@ export const WithValidationIssues: Story = {
       {
         id: 'a',
         title: 'Unnamed Trait',
-        meta: { eyebrow: 'Grant', sourceLabel: 'Homebrew' },
+        meta: { eyebrow: 'Grant', provenance: 'homebrew', persistence: 'persisted' },
         issueCount: 2,
         hasError: true,
       },
       {
         id: 'b',
         title: 'Darkvision',
-        meta: { eyebrow: 'Grant', sourceLabel: 'System' },
+        meta: { eyebrow: 'Grant', provenance: 'system', persistence: 'persisted' },
       },
     ],
     selectedItemId: 'a',
@@ -212,11 +228,11 @@ export const Grouped: Story = {
         title: 'Actions',
         addControl: <Button type="button">Add</Button>,
         items: [
-          { id: 'bite', title: 'Bite', meta: { sourceLabel: 'Homebrew' } },
+          { id: 'bite', title: 'Bite', meta: { provenance: 'homebrew', persistence: 'persisted' } },
           {
             id: 'claw',
             title: 'Claw',
-            meta: { sourceLabel: 'System' },
+            meta: { provenance: 'system', persistence: 'persisted' },
             availabilityStatusLabel: 'Unavailable',
           },
         ],
@@ -225,7 +241,13 @@ export const Grouped: Story = {
         id: 'reactions',
         title: 'Reactions',
         addControl: <Button type="button">Add</Button>,
-        items: [{ id: 'parry', title: 'Parry', meta: { sourceLabel: 'Homebrew' } }],
+        items: [
+          {
+            id: 'parry',
+            title: 'Parry',
+            meta: { provenance: 'homebrew', persistence: 'persisted' },
+          },
+        ],
       },
     ],
   },

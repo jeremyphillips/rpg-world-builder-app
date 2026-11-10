@@ -9,7 +9,7 @@ import {
 
 const identity = {
   title: 'Trait',
-  meta: { sourceLabel: 'Homebrew' },
+  meta: { provenance: 'homebrew', persistence: 'persisted' },
 } satisfies MasterDetailEditorIdentity
 
 describe('monster trait editor titles', () => {
@@ -74,7 +74,7 @@ describe('monster trait editor titles', () => {
       resetLabel: 'Use default name',
     })
     expect(template.inlineTitle?.initialEdit).toBeUndefined()
-    expect(template.meta?.sourceName).toBeTruthy()
+    expect(template.sourceName).toBeTruthy()
     expect(template.title).toBe('Allies')
   })
 })

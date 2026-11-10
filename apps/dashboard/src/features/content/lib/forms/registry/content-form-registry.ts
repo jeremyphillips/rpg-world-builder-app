@@ -108,10 +108,17 @@ export type ContentFormCtx = {
   /** Equipment family URL segment for breadcrumbs and back links. */
   equipmentFamily?: string
   /**
-   * Seed domain ids for embedded master-detail arrays on edit, keyed by field
-   * path (e.g. `features`, `characterCreation.startingEquipment.options`).
+   * Row ids on the latest saved entity, keyed by field path. Membership means
+   * the row has been persisted. It does not mean the row originated as system
+   * content.
    */
   embeddedSeedRowIds?: Readonly<Record<string, readonly string[]>>
+  /**
+   * Row ids present when a system entity was first loaded in this editor
+   * session. Membership is the only system-provenance signal. Later saves must
+   * not add ids to this set.
+   */
+  embeddedSystemOriginRowIds?: Readonly<Record<string, readonly string[]>>
 }
 
 /** Optional context for `toInput` — present on edit, omitted on create. */

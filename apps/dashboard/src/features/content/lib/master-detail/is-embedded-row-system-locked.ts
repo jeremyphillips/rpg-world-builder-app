@@ -1,16 +1,15 @@
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
-import { resolveEmbeddedRowSource } from './resolve-embedded-row-meta'
+import { resolveEmbeddedRowProvenance } from './resolve-embedded-row-meta'
 
 /**
- * An embedded master-detail row is delete-locked only when it is system content:
- * a seed row on an entity whose `source` is `'system'`. Newly added rows and
- * homebrew entities are always removable. Used when the embedded element has no
- * per-row `source` in the contract (e.g. class features, species traits).
+ * An embedded master-detail row is delete-locked only when it was on the
+ * system entity at editor open. Newly added rows and homebrew entities are
+ * always removable.
  */
 export function isEmbeddedRowSystemLocked(
   row: { id?: string } | undefined,
   entityCatalogLayer: ContentFormCtx['entityCatalogLayer'],
-  seedRowIds?: ReadonlySet<string>,
+  systemOriginRowIds?: ReadonlySet<string>,
 ): boolean {
-  return resolveEmbeddedRowSource(row, entityCatalogLayer, seedRowIds) === 'system'
+  return resolveEmbeddedRowProvenance(row, entityCatalogLayer, systemOriginRowIds) === 'system'
 }

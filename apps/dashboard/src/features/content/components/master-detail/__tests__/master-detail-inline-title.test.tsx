@@ -38,7 +38,12 @@ function Harness({
         selectedIdentity={{
           title: name || fallback,
           rowKey,
-          meta: { eyebrow: 'Weapon', sourceLabel: 'Actions' },
+          meta: {
+            provenance: 'homebrew',
+            persistence: 'persisted',
+            kindLabel: 'Weapon',
+            sectionLabel: 'Actions',
+          },
           inlineTitle: {
             field: 'name',
             mode,

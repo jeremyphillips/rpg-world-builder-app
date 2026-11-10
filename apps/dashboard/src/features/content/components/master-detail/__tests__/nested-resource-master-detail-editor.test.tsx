@@ -17,13 +17,13 @@ const baseItems: MasterDetailListItem[] = [
   {
     id: 'row-a',
     title: 'Alpha',
-    meta: { sourceLabel: 'System' },
+    meta: { provenance: 'system', persistence: 'persisted' },
     deletable: true,
   },
   {
     id: 'row-b',
     title: 'Beta',
-    meta: { sourceLabel: 'Homebrew' },
+    meta: { provenance: 'homebrew', persistence: 'persisted' },
     deletable: false,
   },
 ]
@@ -47,13 +47,13 @@ function EditorHarness({
     selectedRowId === 'row-a'
       ? {
           title: 'Alpha',
-          meta: { sourceLabel: 'System' },
+          meta: { provenance: 'system', persistence: 'persisted' },
           deletable: true,
         }
       : selectedRowId === 'row-b'
         ? {
             title: 'Beta',
-            meta: { sourceLabel: 'Homebrew' },
+            meta: { provenance: 'homebrew', persistence: 'persisted' },
             deletable: false,
           }
         : undefined

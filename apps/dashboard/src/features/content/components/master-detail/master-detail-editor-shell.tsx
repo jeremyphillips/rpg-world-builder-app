@@ -10,7 +10,7 @@ import {
   type DetailOverflowMenuEntry,
 } from '../../lib/detail/detail-overflow-actions'
 import {
-  joinMasterDetailItemMeta,
+  joinMasterDetailCaption,
   type MasterDetailItemMeta,
 } from '../../lib/master-detail/master-detail-item-meta'
 import { masterDetailItemNounLabel } from '../../lib/master-detail/master-detail-constants'
@@ -30,6 +30,8 @@ export interface MasterDetailEditorIdentity {
   /** Stable selected row id. Remounts the title editor when the selection changes. */
   rowKey?: string
   meta?: MasterDetailItemMeta
+  /** Derived original name, shown in the detail caption while a custom name is stored. */
+  sourceName?: string
   deletable?: boolean
   availability?: MasterDetailAvailabilityPresentation
   onAvailabilityChange?: () => void
@@ -69,7 +71,9 @@ function MasterDetailEditorIdentityChrome({
   resetAction?: DetailOverflowMenuEntry
   title: ReactNode
 }) {
-  const metaLine = identity.meta ? joinMasterDetailItemMeta(identity.meta) : undefined
+  const metaLine = identity.meta
+    ? joinMasterDetailCaption(identity.meta, 'detail', identity.sourceName)
+    : undefined
   const deletable = identity.deletable !== false && Boolean(onDelete)
   const itemNounLabel = masterDetailItemNounLabel(itemNoun)
   const leadingActions: DetailOverflowMenuEntry[] = [

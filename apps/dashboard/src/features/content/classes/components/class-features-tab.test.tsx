@@ -99,7 +99,7 @@ describe('ClassFeaturesTab', () => {
   })
 
   it('renders structured meta for each row', () => {
-    render(<TabShell features={[rage]} />)
+    render(<TabShell features={[rage]} embeddedSeedRowIds={{ features: ['f1'] }} />)
     const list = within(screen.getByRole('navigation', { name: 'Features' }))
     expect(list.getByText('Level 1')).toBeInTheDocument()
     expect(list.getByText('Homebrew')).toBeInTheDocument()
@@ -138,6 +138,7 @@ describe('ClassFeaturesTab', () => {
         features={[rage]}
         entityCatalogLayer="system"
         embeddedSeedRowIds={{ features: ['f1'] }}
+        formCtx={{ embeddedSystemOriginRowIds: { features: ['f1'] } }}
       />,
     )
 
