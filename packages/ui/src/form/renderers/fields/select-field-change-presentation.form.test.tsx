@@ -78,6 +78,7 @@ describe('SelectField change presentation', () => {
       'data-field-row-participant',
     )
     expect(screen.getByRole('button', { name: 'Change Damage type' })).toBeInTheDocument()
+    expect(screen.getByText('Piercing')).toHaveClass('px-0')
     expect(typeRegion).toContainElement(screen.getByRole('button', { name: 'Change Damage type' }))
 
     const readOnlyMetrics = {
@@ -125,6 +126,30 @@ describe('SelectField change presentation', () => {
     })
     expect(screen.getByLabelText('Damage type')).toHaveTextContent('Fire')
     expect(screen.queryByRole('combobox', { name: 'Damage type' })).not.toBeInTheDocument()
+  })
+
+  it('returns to the label when the closed select is blurred', async () => {
+    const user = userEvent.setup()
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={fields}
+        defaultValues={{ damage: '2d6', damageType: 'piercing' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Change Damage type' }))
+    await waitFor(() => {
+      expect(screen.getByRole('combobox', { name: 'Damage type' })).toHaveFocus()
+    })
+    await user.click(screen.getByRole('textbox', { name: 'Damage' }))
+
+    await waitFor(() => {
+      expect(screen.queryByRole('combobox', { name: 'Damage type' })).not.toBeInTheDocument()
+    })
+    expect(screen.getByLabelText('Damage type')).toHaveTextContent('Piercing')
+    expect(screen.getByRole('textbox', { name: 'Damage' })).toHaveFocus()
   })
 
   it('returns to the label when the popup closes without a new value', async () => {

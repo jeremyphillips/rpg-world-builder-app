@@ -462,6 +462,7 @@ export function monsterActionDetailFields(input: {
   if (action.kind === 'weapon') {
     fields.push({
       type: 'select',
+      width: '1/2',
       name: 'equipmentEntryId',
       label: getContentTypeTerm('equipment').label,
       placeholder: 'Select',

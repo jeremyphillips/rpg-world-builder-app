@@ -61,6 +61,15 @@ export function SelectFieldRenderer({
     })
   }
 
+  const exitChangeOnBlur = () => {
+    state.field.onBlur()
+    if (!changeLabel || !value) return
+    window.setTimeout(() => {
+      if (selectWasOpenRef.current) return
+      setChanging(false)
+    }, 0)
+  }
+
   if (state.isReadOnly) {
     return (
       <FieldReadOnlyValueField
@@ -77,6 +86,7 @@ export function SelectFieldRenderer({
       <FieldReadOnlyValueField
         id={id}
         displayValue={committedLabel ?? state.displayValue}
+        className="px-0"
         controlEnd={
           <Button
             {...formMicroActionButtonProps}
@@ -118,9 +128,7 @@ export function SelectFieldRenderer({
           focusChangeButton()
         }
       }}
-      onBlur={() => {
-        state.field.onBlur()
-      }}
+      onBlur={exitChangeOnBlur}
       onOpenChange={(open) => {
         if (open) {
           selectWasOpenRef.current = true
