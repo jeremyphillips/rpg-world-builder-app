@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
+import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
+
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   resolveMonsterCreateDefaultValues,
@@ -25,7 +27,10 @@ function Host({
     if (!formRef) return
     formRef.current = form
   }, [form, formRef])
-  const ctx: ContentFormCtx = { entityCatalogLayer: 'homebrew' }
+  const ctx: ContentFormCtx = {
+    entityCatalogLayer: 'homebrew',
+    damageTypeVocabulary: buildSeedDamageTypeVocabulary(),
+  }
   return (
     <FormProvider {...form}>
       <MonsterTraitsEditor ctx={ctx} />
@@ -126,5 +131,68 @@ describe('MonsterTraitsEditor', () => {
     expect(cleared).not.toHaveProperty('outsideWaterBreathAmount')
     expect(cleared).not.toHaveProperty('outsideWaterBreathUnit')
     expect(cleared).not.toHaveProperty('outsideWaterBreathEnabled')
+  })
+
+  it('builds regeneration rules from hit points, 0 HP, and interrupting damage types', async () => {
+    const user = userEvent.setup()
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    render(<Host formRef={formRef} />)
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    await user.click(screen.getByRole('menuitem', { name: /Regeneration/ }))
+
+    const preview = () => screen.getByText('Trait preview').closest('.ui-panel')
+    expect(preview()).toHaveTextContent(
+      'The owl regains 10 Hit Points at the start of each of its turns if it has at least 1 Hit Point.',
+    )
+    expect(preview()).not.toHaveTextContent("doesn't regenerate")
+    expect(screen.getByRole('checkbox', { name: 'Regenerates at 0 HP' })).not.toBeChecked()
+    expect(formRef.current?.getValues('traits.0')).toMatchObject({
+      preset: 'regeneration',
+      hitPoints: 10,
+      regeneratesAtZeroHp: false,
+      interruptedByDamageTypes: [],
+    })
+
+    await user.click(screen.getByRole('checkbox', { name: 'Regenerates at 0 HP' }))
+    await waitFor(() => {
+      expect(preview()).toHaveTextContent(
+        "The owl regains 10 Hit Points at the start of each of its turns. The owl dies only if it starts its turn with 0 Hit Points and doesn't regenerate.",
+      )
+    })
+    expect(preview()).not.toHaveTextContent('at least 1 Hit Point')
+
+    await user.click(
+      screen.getByRole('combobox', { name: 'Damage types that interrupt regeneration' }),
+    )
+    await user.click(screen.getByRole('option', { name: 'Acid' }))
+    const damageSearch = screen.getByRole('searchbox', { name: /search damage types/i })
+    await user.type(damageSearch, 'fire')
+    expect(screen.getByRole('option', { name: 'Fire' })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Cold' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('option', { name: 'Fire' }))
+    await waitFor(() => {
+      expect(preview()).toHaveTextContent(
+        "If the owl takes Acid or Fire damage, this trait doesn't function on the owl's next turn.",
+      )
+    })
+    expect(preview()).toHaveTextContent("doesn't regenerate")
+    expect(formRef.current?.getValues('traits.0')).toMatchObject({
+      regeneratesAtZeroHp: true,
+      interruptedByDamageTypes: ['acid', 'fire'],
+    })
+
+    await user.click(screen.getByRole('checkbox', { name: 'Regenerates at 0 HP' }))
+    await waitFor(() => {
+      expect(preview()).toHaveTextContent('at least 1 Hit Point')
+    })
+    expect(preview()).toHaveTextContent('Acid or Fire')
+    expect(preview()).not.toHaveTextContent("doesn't regenerate")
+    expect(formRef.current?.getValues('traits.0')).toMatchObject({
+      regeneratesAtZeroHp: false,
+      interruptedByDamageTypes: ['acid', 'fire'],
+    })
+    expect(screen.getByRole('button', { name: /^Regeneration/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove Acid' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove Fire' })).toBeInTheDocument()
   })
 })

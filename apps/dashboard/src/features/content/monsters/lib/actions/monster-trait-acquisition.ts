@@ -12,13 +12,10 @@ export const MONSTER_TRAIT_CUSTOM_ID = 'custom'
 
 export const MONSTER_TRAIT_CUSTOM_DESCRIPTION = 'Write a name and description.'
 
-export const MONSTER_TRAIT_ACQUISITION_GROUPS = [
-  ...CREATURE_TRAIT_GROUPS.map((id) => ({
-    id,
-    label: getCreatureTraitGroupEntry(id)?.label ?? id,
-  })),
-  { id: 'general', label: 'General' },
-] as const
+export const MONSTER_TRAIT_ACQUISITION_GROUPS = CREATURE_TRAIT_GROUPS.map((id) => ({
+  id,
+  label: getCreatureTraitGroupEntry(id)?.label ?? id,
+}))
 
 export type MonsterTraitAcquisitionGroupId = (typeof MONSTER_TRAIT_ACQUISITION_GROUPS)[number]['id']
 

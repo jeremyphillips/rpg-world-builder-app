@@ -27,7 +27,6 @@ import {
 import {
   monsterPresetTraitDraftSchema,
   monsterPresetTraitSchema,
-  REGENERATION_TRAIT_PRESET_FAMILY,
 } from './creature/trait-preset-schema'
 import { MONSTER_CONTENT_TYPE_TERM } from '../primitives/content/content-type-terms'
 import {
@@ -250,18 +249,6 @@ function refineUniqueTraitPresets(
     }
     seen.add(preset)
   })
-  const present = new Set(
-    traits.map(traitPresetId).filter((preset): preset is string => Boolean(preset)),
-  )
-  const regeneration = REGENERATION_TRAIT_PRESET_FAMILY.filter((preset) => present.has(preset))
-  if (regeneration.length > 1) {
-    const index = traits.findIndex((trait) => traitPresetId(trait) === regeneration[1])
-    addCustomRefinementIssue(ctx, 'A creature can have only one Regeneration trait.', [
-      ...path,
-      index,
-      'preset',
-    ])
-  }
 }
 
 function refineUniqueIds(

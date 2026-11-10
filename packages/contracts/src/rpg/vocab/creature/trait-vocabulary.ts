@@ -40,6 +40,10 @@ export const CREATURE_TRAIT_GROUP_ENTRIES = {
     label: 'Form',
     description: 'The creature’s shape.',
   },
+  general: {
+    label: 'General',
+    description: 'Other reusable traits.',
+  },
 } as const satisfies Record<string, GameTermEntry>
 
 export type CreatureTraitGroup = keyof typeof CREATURE_TRAIT_GROUP_ENTRIES
@@ -141,6 +145,171 @@ export const CREATURE_TRAIT_VOCABULARY_ENTRIES = {
     description: 'Cannot shape-shift.',
     group: 'form',
   },
+  abduct: {
+    label: 'Abduct',
+    description: 'Moves grappled creatures at no extra cost.',
+    group: 'movement',
+  },
+  'divine-awareness': {
+    label: 'Divine Awareness',
+    description: 'Knows when it hears a lie.',
+    group: 'general',
+  },
+  inscrutable: {
+    label: 'Inscrutable',
+    description: 'Blocks remote observation; Insight is harder.',
+    group: 'general',
+  },
+  'demonic-restoration': {
+    label: 'Demonic Restoration',
+    description: 'Reforms instantly in the Abyss.',
+    group: 'form',
+  },
+  'diabolical-restoration': {
+    label: 'Diabolical Restoration',
+    description: 'Reforms instantly in the Nine Hells.',
+    group: 'form',
+  },
+  'exalted-restoration': {
+    label: 'Exalted Restoration',
+    description: 'Reforms instantly in Mount Celestia.',
+    group: 'form',
+  },
+  'fiendish-restoration': {
+    label: 'Fiendish Restoration',
+    description: 'Reforms instantly in the Nine Hells.',
+    group: 'form',
+  },
+  wishes: {
+    label: 'Wishes',
+    description: 'May know Wish and cast it for others.',
+    group: 'general',
+  },
+  compression: {
+    label: 'Compression',
+    description: 'Moves through 1-inch spaces without slowing.',
+    group: 'movement',
+  },
+  'blood-frenzy': {
+    label: 'Blood Frenzy',
+    description: 'Advantage against wounded creatures.',
+    group: 'combat',
+  },
+  'bloodied-frenzy': {
+    label: 'Bloodied Frenzy',
+    description: 'Advantage on attacks and saves if Bloodied.',
+    group: 'combat',
+  },
+  'beast-of-burden': {
+    label: 'Beast of Burden',
+    description: 'Carries as if one size larger.',
+    group: 'general',
+  },
+  jumper: {
+    label: 'Jumper',
+    description: 'Jump distance uses Dexterity.',
+    group: 'movement',
+  },
+  ephemeral: {
+    label: 'Ephemeral',
+    description: 'Cannot wear or carry anything.',
+    group: 'form',
+  },
+  invisibility: {
+    label: 'Invisibility',
+    description: 'Has the Invisible condition.',
+    group: 'form',
+  },
+  'light-sensitivity': {
+    label: 'Light Sensitivity',
+    description: 'Disadvantage on attacks in bright light.',
+    group: 'combat',
+  },
+  'limited-amphibiousness': {
+    label: 'Limited Amphibiousness',
+    description: 'Breathes air and water; must submerge.',
+    group: 'environment',
+  },
+  'blurred-form': {
+    label: 'Blurred Form',
+    description: 'Attacks against it have Disadvantage.',
+    group: 'form',
+  },
+  reactive: {
+    label: 'Reactive',
+    description: 'One Reaction on every turn.',
+    group: 'combat',
+  },
+  evasion: {
+    label: 'Evasion',
+    description: 'Avoids damage when a Dex save halves it.',
+    group: 'combat',
+  },
+  'speak-with-beasts-and-plants': {
+    label: 'Speak with Beasts and Plants',
+    description: 'Talks with Beasts and Plants.',
+    group: 'form',
+  },
+  freeze: {
+    label: 'Freeze',
+    description: 'Cold damage temporarily reduces its Speed.',
+    group: 'combat',
+  },
+  'fire-absorption': {
+    label: 'Fire Absorption',
+    description: 'Regains HP from Fire damage.',
+    group: 'combat',
+  },
+  'acid-absorption': {
+    label: 'Acid Absorption',
+    description: 'Acid damage heals it instead.',
+    group: 'combat',
+  },
+  'water-form': {
+    label: 'Water Form',
+    description: 'Enters enemy spaces and squeezes through.',
+    group: 'movement',
+  },
+  'heat-aura': {
+    label: 'Heat Aura',
+    description: 'Nearby creatures take Fire damage.',
+    group: 'combat',
+  },
+  'death-throes': {
+    label: 'Death Throes',
+    description: 'Explodes on death, then reforms.',
+    group: 'combat',
+  },
+  'mucus-cloud': {
+    label: 'Mucus Cloud',
+    description: 'Underwater cloud curses nearby creatures.',
+    group: 'combat',
+  },
+  'aberrant-ground': {
+    label: 'Aberrant Ground',
+    description: 'Nearby ground is Difficult Terrain.',
+    group: 'environment',
+  },
+  'aura-of-authority': {
+    label: 'Aura of Authority',
+    description: 'Gives itself and allies Advantage on attacks and saves.',
+    group: 'combat',
+  },
+  'barbed-hide': {
+    label: 'Barbed Hide',
+    description: 'Damages creatures grappling with it.',
+    group: 'combat',
+  },
+  'fear-aura': {
+    label: 'Fear Aura',
+    description: 'Frightens enemies that start their turn nearby.',
+    group: 'combat',
+  },
+  'vile-appearance': {
+    label: 'Vile Appearance',
+    description: 'Frightens beasts and humanoids that see it.',
+    group: 'combat',
+  },
   'hold-breath': {
     label: 'Hold Breath',
     description: 'Holds its breath for a set time.',
@@ -169,11 +338,6 @@ export const CREATURE_TRAIT_VOCABULARY_ENTRIES = {
   regeneration: {
     label: 'Regeneration',
     description: 'Regains Hit Points at the start of its turn.',
-    group: 'combat',
-  },
-  'regeneration-halt': {
-    label: 'Regeneration (Acid/Fire)',
-    description: 'Acid or Fire interrupts regeneration.',
     group: 'combat',
   },
   swarm: {

@@ -30,6 +30,39 @@ const APPROVED_DESCRIPTIONS = {
   'siege-monster': 'Double damage to objects and structures.',
   'undead-fortitude': 'Con save can leave it at 1 HP instead of 0.',
   'immutable-form': 'Cannot shape-shift.',
+  abduct: 'Moves grappled creatures at no extra cost.',
+  'divine-awareness': 'Knows when it hears a lie.',
+  inscrutable: 'Blocks remote observation; Insight is harder.',
+  'demonic-restoration': 'Reforms instantly in the Abyss.',
+  'diabolical-restoration': 'Reforms instantly in the Nine Hells.',
+  'exalted-restoration': 'Reforms instantly in Mount Celestia.',
+  'fiendish-restoration': 'Reforms instantly in the Nine Hells.',
+  wishes: 'May know Wish and cast it for others.',
+  compression: 'Moves through 1-inch spaces without slowing.',
+  'blood-frenzy': 'Advantage against wounded creatures.',
+  'bloodied-frenzy': 'Advantage on attacks and saves if Bloodied.',
+  'beast-of-burden': 'Carries as if one size larger.',
+  jumper: 'Jump distance uses Dexterity.',
+  ephemeral: 'Cannot wear or carry anything.',
+  invisibility: 'Has the Invisible condition.',
+  'light-sensitivity': 'Disadvantage on attacks in bright light.',
+  'limited-amphibiousness': 'Breathes air and water; must submerge.',
+  'blurred-form': 'Attacks against it have Disadvantage.',
+  reactive: 'One Reaction on every turn.',
+  evasion: 'Avoids damage when a Dex save halves it.',
+  'speak-with-beasts-and-plants': 'Talks with Beasts and Plants.',
+  freeze: 'Cold damage temporarily reduces its Speed.',
+  'fire-absorption': 'Regains HP from Fire damage.',
+  'acid-absorption': 'Acid damage heals it instead.',
+  'water-form': 'Enters enemy spaces and squeezes through.',
+  'heat-aura': 'Nearby creatures take Fire damage.',
+  'death-throes': 'Explodes on death, then reforms.',
+  'mucus-cloud': 'Underwater cloud curses nearby creatures.',
+  'aberrant-ground': 'Nearby ground is Difficult Terrain.',
+  'aura-of-authority': 'Gives itself and allies Advantage on attacks and saves.',
+  'barbed-hide': 'Damages creatures grappling with it.',
+  'fear-aura': 'Frightens enemies that start their turn nearby.',
+  'vile-appearance': 'Frightens beasts and humanoids that see it.',
 } as const
 
 describe('formatCreatureTrait', () => {
@@ -61,6 +94,45 @@ describe('formatCreatureTrait', () => {
         subject: formatMonsterStatBlockSubject('Rat'),
       })?.sentence,
     ).toContain('an Opportunity Attack')
+  })
+
+  it('keeps the wave 1 fixture sentences', () => {
+    const subject = formatMonsterStatBlockSubject('Djinni')
+    expect(formatCreatureTrait({ subject, trait: { preset: 'wishes' } })?.sentence).toBe(
+      "The djinni has a 30 percent chance of knowing the Wish spell. If it knows it, it can cast it only on behalf of a non-genie creature who communicates a wish in a way it can understand. If it casts the spell for the creature, it suffers none of the spell's stress. Once it has cast it three times, it can't do so again for 365 days.",
+    )
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Balor'),
+        trait: { preset: 'death-throes' },
+      })?.sentence,
+    ).toContain('31 (9d6) Fire damage plus 31 (9d6) Force damage')
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Aboleth'),
+        trait: { preset: 'mucus-cloud' },
+      })?.sentence,
+    ).toContain('at the end of its turn')
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Cat'),
+        trait: { preset: 'jumper' },
+      })?.sentence,
+    ).toBe(
+      'The jump distance of the cat is determined using its Dexterity rather than its Strength.',
+    )
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Pit Fiend'),
+        trait: { preset: 'fear-aura' },
+      })?.sentence,
+    ).toContain("this creature's aura for 24 hours")
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Sea Hag'),
+        trait: { preset: 'vile-appearance' },
+      })?.sentence,
+    ).toContain("this creature's Vile Appearance for 24 hours")
   })
 
   it('formats spider climb for any subject, including a swarm', () => {
@@ -108,12 +180,10 @@ describe('formatCreatureTrait', () => {
     expect(CREATURE_TRAIT_VOCABULARY_ENTRIES.swarm.description).toBe(
       'Occupies spaces; passes through tiny gaps.',
     )
-    expect(CREATURE_TRAIT_VOCABULARY_ENTRIES['regeneration-halt'].description).toBe(
-      'Acid or Fire interrupts regeneration.',
+    expect(CREATURE_TRAIT_VOCABULARY_ENTRIES.regeneration.description).toBe(
+      'Regains Hit Points at the start of its turn.',
     )
-    expect(CREATURE_TRAIT_VOCABULARY_ENTRIES['regeneration-halt'].label).toBe(
-      'Regeneration (Acid/Fire)',
-    )
+    expect(CREATURE_TRAIT_VOCABULARY_ENTRIES.regeneration.label).toBe('Regeneration')
   })
 
   it('formats configurable presets from the subject without a doubled article', () => {
@@ -167,10 +237,64 @@ describe('formatCreatureTrait', () => {
     )
     expect(
       formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Troll'),
+        trait: {
+          preset: 'regeneration',
+          hitPoints: 15,
+          regeneratesAtZeroHp: true,
+          interruptedByDamageTypes: ['acid', 'fire'],
+        },
+      }),
+    ).toEqual({
+      name: 'Regeneration',
+      sentence:
+        "The troll regains 15 Hit Points at the start of each of its turns. If the troll takes Acid or Fire damage, this trait doesn't function on the troll's next turn. The troll dies only if it starts its turn with 0 Hit Points and doesn't regenerate.",
+    })
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Troll'),
+        trait: {
+          preset: 'regeneration',
+          hitPoints: 15,
+          regeneratesAtZeroHp: true,
+          interruptedByDamageTypes: [],
+        },
+      })?.sentence,
+    ).toBe(
+      "The troll regains 15 Hit Points at the start of each of its turns. The troll dies only if it starts its turn with 0 Hit Points and doesn't regenerate.",
+    )
+    expect(
+      formatCreatureTrait({
         subject,
-        trait: { preset: 'regeneration-halt', hitPoints: 5 },
-      })?.name,
-    ).toBe('Regeneration')
+        trait: {
+          preset: 'regeneration',
+          hitPoints: 10,
+          regeneratesAtZeroHp: false,
+          interruptedByDamageTypes: ['cold'],
+        },
+      })?.sentence,
+    ).toBe(
+      "The hell hound regains 10 Hit Points at the start of each of its turns if it has at least 1 Hit Point. If the hell hound takes Cold damage, this trait doesn't function on the hell hound's next turn.",
+    )
+    expect(
+      formatCreatureTrait({
+        subject,
+        trait: {
+          preset: 'regeneration',
+          hitPoints: 5,
+          regeneratesAtZeroHp: true,
+          interruptedByDamageTypes: ['acid', 'cold', 'fire'],
+        },
+      })?.sentence,
+    ).toBe(
+      "The hell hound regains 5 Hit Points at the start of each of its turns. If the hell hound takes Acid, Cold, or Fire damage, this trait doesn't function on the hell hound's next turn. The hell hound dies only if it starts its turn with 0 Hit Points and doesn't regenerate.",
+    )
+    expect(
+      formatCreatureTrait({
+        subject,
+        trait: { preset: 'regeneration', regeneratesAtZeroHp: true },
+      }),
+    ).toBeUndefined()
     expect(formatCreatureTrait({ subject, trait: { preset: 'swarm' } })).toBeUndefined()
     expect(
       formatCreatureTrait({

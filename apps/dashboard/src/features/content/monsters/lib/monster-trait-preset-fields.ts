@@ -1,6 +1,18 @@
-import { getTermSentenceForm, SENSE_RANGES, standardFeet, TIME_UNIT_ENTRIES } from '@rpg/contracts'
+import {
+  DAMAGE_TYPE_TERM,
+  getTermSentenceForm,
+  SENSE_RANGES,
+  standardFeet,
+  TIME_UNIT_ENTRIES,
+} from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
+import {
+  buildActiveDamageTypeFieldOptions,
+  vocabularyComboboxFieldForTerm,
+} from '@/features/vocabulary'
+
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   distanceAmountOptions,
   distanceJoinedPairField,
@@ -45,7 +57,10 @@ export function waterBreathingDurationEnabled(row: object): boolean {
 }
 
 /** Parameter fields for a configurable trait. Fixed presets return none. */
-export function monsterTraitPresetFields(preset: string): FormItem[] {
+export function monsterTraitPresetFields(
+  preset: string,
+  ctx: Pick<ContentFormCtx, 'damageTypeVocabulary'> = {},
+): FormItem[] {
   switch (preset) {
     case 'legendary-resistance':
       return [
@@ -88,17 +103,28 @@ export function monsterTraitPresetFields(preset: string): FormItem[] {
     case 'swarm':
       return [{ type: 'text', name: 'noun', label: 'Tiny creature' }]
     case 'regeneration':
-    case 'regeneration-halt':
       return [
         distanceJoinedPairField({
           amountName: 'hitPoints',
-          label: 'Hit points',
+          label: 'Hit Points regained per turn',
           presets: REGENERATION_HIT_POINTS,
           fixedUnitLabel: 'HP',
           allowCustom: true,
           customMin: 1,
           customMax: 30,
           digits: 2,
+        }),
+        {
+          type: 'checkbox',
+          name: 'regeneratesAtZeroHp',
+          label: 'Regenerates at 0 HP',
+          defaultValue: false,
+        },
+        vocabularyComboboxFieldForTerm(DAMAGE_TYPE_TERM, {
+          name: 'interruptedByDamageTypes',
+          label: 'Damage types that interrupt regeneration',
+          multiple: true,
+          options: buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary),
         }),
       ]
     case 'water-breathing':
@@ -119,9 +145,7 @@ export function monsterTraitPresetDefaults(preset: string): Record<string, unkno
     case 'standing-leap':
       return { longJump: 10 }
     case 'regeneration':
-      return { hitPoints: 10 }
-    case 'regeneration-halt':
-      return { hitPoints: 15 }
+      return { hitPoints: 10, regeneratesAtZeroHp: false, interruptedByDamageTypes: [] }
     default:
       return {}
   }

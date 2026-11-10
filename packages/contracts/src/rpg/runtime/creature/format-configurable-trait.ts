@@ -1,8 +1,10 @@
-import { getCreatureTraitVocabularyEntry } from '../../vocab/creature/trait-vocabulary'
+import { joinNaturalList } from '../../primitives/prose'
 import {
   formatCreatureTraitDuration,
   type CreatureTraitDurationUnit,
 } from '../../content/creature/trait-duration'
+import { getCreatureTraitVocabularyEntry } from '../../vocab/creature/trait-vocabulary'
+import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
 
 export type CreatureTraitFormatRow = {
   preset: string
@@ -14,6 +16,8 @@ export type CreatureTraitFormatRow = {
   longJump?: number
   noun?: string
   hitPoints?: number
+  regeneratesAtZeroHp?: boolean
+  interruptedByDamageTypes?: readonly string[]
   outsideWaterBreathAmount?: number
   outsideWaterBreathUnit?: CreatureTraitDurationUnit
 }
@@ -101,25 +105,35 @@ function formatSwarm(subject: string, trait: CreatureTraitFormatRow): FormattedT
   }
 }
 
+function interruptingDamageTypes(value: readonly string[] | undefined): string[] {
+  if (!value) return []
+  return value.filter((id) => id.length > 0)
+}
+
 function formatRegeneration(
   subject: string,
   trait: CreatureTraitFormatRow,
 ): FormattedTrait | undefined {
   if (!isPositiveInt(trait.hitPoints)) return undefined
+  const capital = capitalSubject(subject)
+  const atZero = trait.regeneratesAtZeroHp === true
+  const regain = atZero
+    ? `${capital} regains ${trait.hitPoints} Hit Points at the start of each of its turns.`
+    : `${capital} regains ${trait.hitPoints} Hit Points at the start of each of its turns if it has at least 1 Hit Point.`
+  const damageTypes = interruptingDamageTypes(trait.interruptedByDamageTypes)
+  const interruption =
+    damageTypes.length > 0
+      ? `If ${subject} takes ${joinNaturalList(
+          damageTypes.map((id) => getDamageTypeLabel(id)),
+          { conjunction: 'or' },
+        )} damage, this trait doesn't function on ${subject}'s next turn.`
+      : ''
+  const death = atZero
+    ? `${capital} dies only if it starts its turn with 0 Hit Points and doesn't regenerate.`
+    : ''
   return {
-    name: 'Regeneration',
-    sentence: `${capitalSubject(subject)} regains ${trait.hitPoints} Hit Points at the start of each of its turns if it has at least 1 Hit Point.`,
-  }
-}
-
-function formatRegenerationHalt(
-  subject: string,
-  trait: CreatureTraitFormatRow,
-): FormattedTrait | undefined {
-  if (!isPositiveInt(trait.hitPoints)) return undefined
-  return {
-    name: 'Regeneration',
-    sentence: `${capitalSubject(subject)} regains ${trait.hitPoints} Hit Points at the start of each of its turns. If it takes Acid or Fire damage, this trait doesn't function on its next turn. It dies only if it starts its turn with 0 Hit Points and doesn't regenerate.`,
+    name: presetLabel(trait.preset, 'Regeneration'),
+    sentence: [regain, interruption, death].filter((clause) => clause.length > 0).join(' '),
   }
 }
 
@@ -157,8 +171,6 @@ export function formatConfigurableCreatureTrait(
       return formatSwarm(subject, trait)
     case 'regeneration':
       return formatRegeneration(subject, trait)
-    case 'regeneration-halt':
-      return formatRegenerationHalt(subject, trait)
     case 'water-breathing':
       return formatWaterBreathing(subject, trait)
     default:

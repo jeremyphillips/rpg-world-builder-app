@@ -165,17 +165,79 @@ describe('monsterBodySchema refinements', () => {
     ).toBe(false)
   })
 
-  it('rejects both regeneration presets and publishes configurable traits', () => {
+  it('publishes one regeneration preset and other configurable traits', () => {
     expect(
       createMonsterInputSchema.safeParse({
         slug: 'two-regeneration',
         ...baseBody,
         traits: [
           { id: 'regen', preset: 'regeneration', hitPoints: 10 },
-          { id: 'halt', preset: 'regeneration-halt', hitPoints: 15 },
+          {
+            id: 'regen-2',
+            preset: 'regeneration',
+            hitPoints: 15,
+            regeneratesAtZeroHp: true,
+            interruptedByDamageTypes: ['acid', 'fire'],
+          },
         ],
       }).success,
     ).toBe(false)
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'regen-halt-id',
+        ...baseBody,
+        traits: [{ id: 'halt', preset: 'regeneration-halt', hitPoints: 15 }],
+      }).success,
+    ).toBe(false)
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'regen-too-high',
+        ...baseBody,
+        traits: [{ id: 'regen', preset: 'regeneration', hitPoints: 31 }],
+      }).success,
+    ).toBe(false)
+    const troll = createMonsterInputSchema.safeParse({
+      slug: 'troll',
+      ...baseBody,
+      traits: [
+        {
+          id: 'regen',
+          preset: 'regeneration',
+          hitPoints: 15,
+          regeneratesAtZeroHp: true,
+          interruptedByDamageTypes: ['acid', 'fire'],
+        },
+      ],
+    })
+    expect(troll.success).toBe(true)
+    if (troll.success) {
+      expect(troll.data.traits[0]).toMatchObject({
+        preset: 'regeneration',
+        hitPoints: 15,
+        regeneratesAtZeroHp: true,
+        interruptedByDamageTypes: ['acid', 'fire'],
+      })
+    }
+    const defaults = createMonsterInputSchema.safeParse({
+      slug: 'oni',
+      ...baseBody,
+      traits: [{ id: 'regen', preset: 'regeneration', hitPoints: 10 }],
+    })
+    expect(defaults.success).toBe(true)
+    if (defaults.success) {
+      expect(defaults.data.traits[0]).toMatchObject({
+        hitPoints: 10,
+        regeneratesAtZeroHp: false,
+        interruptedByDamageTypes: [],
+      })
+    }
+    expect(
+      createMonsterDraftInputSchema.safeParse({
+        slug: 'draft-regen',
+        ...baseBody,
+        traits: [{ id: 'regen', preset: 'regeneration' }],
+      }).success,
+    ).toBe(true)
     const held = createMonsterInputSchema.safeParse({
       slug: 'hold',
       ...baseBody,

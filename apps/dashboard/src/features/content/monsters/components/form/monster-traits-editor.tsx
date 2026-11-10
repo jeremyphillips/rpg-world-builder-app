@@ -44,9 +44,6 @@ function isPresetRow(row: unknown): row is { preset: string } & Record<string, u
 
 function traitListTitle(row: unknown, index: number, monsterName: string): string {
   if (isPresetRow(row)) {
-    if (row.preset === 'regeneration-halt') {
-      return getCreatureTraitVocabularyEntry(row.preset)?.label ?? 'Regeneration (Acid/Fire)'
-    }
     const formatted = formatCreatureTrait({
       subject: formatMonsterStatBlockSubject(monsterName),
       trait: row,
@@ -105,12 +102,14 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
                 name: 'outsideWaterBreathToggle',
                 render: () => <WaterBreathingToggle namePrefix={rowPath} />,
               },
-              ...(waterBreathingDurationEnabled(row) ? monsterTraitPresetFields(row.preset) : []),
+              ...(waterBreathingDurationEnabled(row)
+                ? monsterTraitPresetFields(row.preset, ctx)
+                : []),
             ]
-          : monsterTraitPresetFields(row.preset)
+          : monsterTraitPresetFields(row.preset, ctx)
       return [...preview, advisorySlot, ...parameterFields]
     },
-    [advisories, customFields, editor.selectedIndex, monsterName],
+    [advisories, ctx, customFields, editor.selectedIndex, monsterName],
   )
 
   return (

@@ -6,6 +6,7 @@ import {
   CREATURE_TRAIT_VOCABULARY_IDS,
   type CreatureTraitVocabularyId,
 } from '../../vocab/creature/trait-vocabulary'
+import { damageTypeIdSchema } from '../../vocab/damage/vocabulary'
 import { CONFIGURABLE_CREATURE_TRAIT_PRESET_IDS } from './trait-presets'
 import {
   CREATURE_TRAIT_DURATION_HOUR_MAX,
@@ -21,8 +22,6 @@ const configurableIds = new Set<string>(CONFIGURABLE_CREATURE_TRAIT_PRESET_IDS)
 export const FIXED_CREATURE_TRAIT_PRESET_IDS = CREATURE_TRAIT_VOCABULARY_IDS.filter(
   (id) => !configurableIds.has(id),
 ) as [CreatureTraitVocabularyId, ...CreatureTraitVocabularyId[]]
-
-export const REGENERATION_TRAIT_PRESET_FAMILY = ['regeneration', 'regeneration-halt'] as const
 
 const idField = { id: z.string().min(1) }
 
@@ -63,6 +62,13 @@ function normalizePresetTraitInput(value: unknown): unknown {
   if (row.preset === 'hold-breath') return normalizeDurationRow(value, 'count', 'unit')
   if (row.preset === 'water-breathing') {
     return normalizeDurationRow(value, 'outsideWaterBreathAmount', 'outsideWaterBreathUnit')
+  }
+  if (row.preset === 'regeneration') {
+    return {
+      regeneratesAtZeroHp: false,
+      interruptedByDamageTypes: [],
+      ...row,
+    }
   }
   return value
 }
@@ -125,13 +131,8 @@ const regenerationSchema = z.object({
   ...idField,
   preset: z.literal('regeneration'),
   hitPoints: hitPointsField,
-  ...entryProvenanceField,
-})
-
-const regenerationHaltSchema = z.object({
-  ...idField,
-  preset: z.literal('regeneration-halt'),
-  hitPoints: hitPointsField,
+  regeneratesAtZeroHp: z.boolean(),
+  interruptedByDamageTypes: z.array(damageTypeIdSchema),
   ...entryProvenanceField,
 })
 
@@ -175,7 +176,6 @@ export const monsterPresetTraitSchema = z.preprocess(
     standingLeapSchema,
     swarmSchema,
     regenerationSchema,
-    regenerationHaltSchema,
     waterBreathingSchema,
   ]),
 )
@@ -220,13 +220,8 @@ const regenerationDraftSchema = z.object({
   ...idField,
   preset: z.literal('regeneration'),
   hitPoints: hitPointsField.optional(),
-  ...entryProvenanceField,
-})
-
-const regenerationHaltDraftSchema = z.object({
-  ...idField,
-  preset: z.literal('regeneration-halt'),
-  hitPoints: hitPointsField.optional(),
+  regeneratesAtZeroHp: z.boolean().optional(),
+  interruptedByDamageTypes: z.array(damageTypeIdSchema).optional(),
   ...entryProvenanceField,
 })
 
@@ -246,6 +241,5 @@ export const monsterPresetTraitDraftSchema = z.union([
   standingLeapDraftSchema,
   swarmDraftSchema,
   regenerationDraftSchema,
-  regenerationHaltDraftSchema,
   waterBreathingDraftSchema,
 ])
