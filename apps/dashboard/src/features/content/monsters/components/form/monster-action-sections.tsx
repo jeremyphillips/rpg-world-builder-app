@@ -73,7 +73,7 @@ function mapActionListItem(
     title: action
       ? monsterActionNavigationTitle(resolveMonsterFormActionIdentity(action, values, ctx))
       : `Action ${index + 1}`,
-    eyebrow: action ? getMonsterActionKindLabel(action.kind) : undefined,
+    sourceLabel: action ? getMonsterActionKindLabel(action.kind) : undefined,
   }
 }
 

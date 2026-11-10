@@ -167,8 +167,9 @@ describe('monster-display', () => {
       'Pack Tactics',
       'Sunlight Sensitivity',
     ])
-    expect(viewModel.traits[0]?.descriptionHtml).toContain('The kobold has Advantage')
-    expect(viewModel.traits[0]?.descriptionHtml).toContain("the kobold's allies")
+    expect(viewModel.traits[0]?.descriptionHtml).toContain('The kobold warrior')
+    expect(viewModel.traits[0]?.descriptionHtml).toContain('its allies')
+    expect(viewModel.traits[0]?.descriptionHtml).not.toContain('This creature')
   })
 
   it('labels an authored reaction trigger and its response', () => {
@@ -280,7 +281,7 @@ describe('monster-display', () => {
     expect(viewModel.traits.length).toBe(monster.traits.length - 1)
   })
 
-  it('keeps kobold template trait prose from the cited description override', () => {
+  it('prints kobold template traits with the creature name', () => {
     const monster = pickMonster('kobold-warrior')
     const viewModel = buildMonsterDetailViewModel({
       monster,
@@ -294,7 +295,7 @@ describe('monster-display', () => {
       expect.objectContaining({
         id: 'pack-tactics',
         name: 'Pack Tactics',
-        descriptionHtml: expect.stringContaining('The kobold has Advantage'),
+        descriptionHtml: expect.stringContaining('The kobold warrior has Advantage'),
       }),
       expect.objectContaining({
         id: 'sunlight-sensitivity',

@@ -81,11 +81,13 @@ describe('SRD 5.2.1 monster seed', () => {
       formatMonsterAttackAction(skeletonBlock.attacks.find((line) => line.id === 'shortbow')!),
     ).toBe('Ranged Attack Roll: +5, range 80/320 ft. Hit: 6 (1d6 + 3) Piercing damage.')
     expect(kobold!.traits.map((trait) => trait.kind)).toEqual(['template', 'template'])
+    expect(kobold!.traits[0]).not.toHaveProperty('descriptionOverride')
+    expect(kobold!.traits[1]).not.toHaveProperty('descriptionOverride')
     expect(resolveTraitDisplay(kobold!.traits[0]!).descriptionHtml).toContain(
-      'The kobold has Advantage',
+      'This creature has Advantage',
     )
     expect(resolveTraitDisplay(kobold!.traits[1]!).descriptionHtml).toContain(
-      'ability checks and attack rolls',
+      'this creature has Disadvantage',
     )
     const grants = resolveCreatureTraitGrants(
       kobold!.traits.map((trait) => ({ trait, source: trait.id })),

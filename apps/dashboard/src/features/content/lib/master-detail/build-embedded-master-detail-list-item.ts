@@ -13,6 +13,8 @@ export interface BuildEmbeddedMasterDetailListItemParams {
   getRowIssueCount: (index: number) => number
   title: string
   eyebrow?: string
+  /** Replaces the System/Homebrew caption when the row has its own subtitle. */
+  sourceLabel?: string
   showDelete?: boolean
   extraReasons?: readonly AvailabilityReason[]
 }
@@ -27,6 +29,7 @@ export function buildEmbeddedMasterDetailListItem({
   getRowIssueCount,
   title,
   eyebrow,
+  sourceLabel,
   showDelete = true,
   extraReasons = [],
 }: BuildEmbeddedMasterDetailListItemParams): MasterDetailListItem {
@@ -43,7 +46,7 @@ export function buildEmbeddedMasterDetailListItem({
     title,
     meta: {
       ...(eyebrow !== undefined ? { eyebrow } : {}),
-      sourceLabel: rowMeta.sourceLabel,
+      sourceLabel: sourceLabel ?? rowMeta.sourceLabel,
     },
     deletable: showDelete && rowMeta.deletable,
     issueCount,

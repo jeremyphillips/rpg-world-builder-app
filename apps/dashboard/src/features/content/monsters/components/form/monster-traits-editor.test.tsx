@@ -63,6 +63,30 @@ describe('MonsterTraitsEditor', () => {
     expect(screen.queryByText('Trait preview')).not.toBeInTheDocument()
   })
 
+  it('previews a template trait and discloses name and description overrides', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.name = 'Kobold Warrior'
+    values.traits = [
+      {
+        id: 'pack-tactics',
+        kind: 'template',
+        templateId: 'pack-tactics',
+      },
+    ]
+    render(<Host values={values} />)
+
+    expect(screen.getByRole('button', { current: true, name: /Pack Tactics/ })).toBeInTheDocument()
+    const preview = screen.getByText('Trait preview').closest('.ui-panel')
+    expect(preview).toHaveTextContent('The kobold warrior')
+    expect(preview).toHaveTextContent('its allies')
+    expect(preview).not.toHaveTextContent('This creature')
+    expect(
+      screen.queryByRole('switch', { name: 'Override generated name and description' }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add custom name' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add additional details' })).toBeInTheDocument()
+  })
+
   it('shows a Tunneler advisory only on that trait', async () => {
     const user = userEvent.setup()
     const values = resolveMonsterCreateDefaultValues()

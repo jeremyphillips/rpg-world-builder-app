@@ -53,6 +53,7 @@ import {
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 
+import { formatMonsterTemplateSentence } from './format-monster-template-sentence'
 import { MONSTER_HP_MINIMUM_NOTE } from './monster-form-labels'
 
 export { MONSTER_HP_MINIMUM_NOTE }
@@ -631,21 +632,33 @@ function mapPresetMonsterTrait(
 function mapTemplateMonsterTrait(
   trait: Monster['traits'][number],
   record: Record<string, unknown>,
+  monsterName: string,
 ): MonsterTraitItemViewModel | undefined {
   if (record.kind !== 'template' || typeof record.templateId !== 'string') return undefined
+  const nameOverride = typeof record.nameOverride === 'string' ? record.nameOverride : undefined
   const display = resolveTraitDisplay({
     kind: 'template',
     id: trait.id,
     templateId: record.templateId,
     config: record.config,
-    nameOverride: typeof record.nameOverride === 'string' ? record.nameOverride : undefined,
-    descriptionOverride:
-      typeof record.descriptionOverride === 'string' ? record.descriptionOverride : undefined,
+    nameOverride,
   })
+  const sentence = formatMonsterTemplateSentence({
+    templateId: record.templateId,
+    config: record.config,
+    monsterName,
+  })
+  const extra =
+    typeof record.descriptionOverride === 'string' && record.descriptionOverride.trim()
+      ? record.descriptionOverride
+      : ''
+  const generated = sentence
+    ? `<p>${escapeTraitSentence(sentence)}</p>`
+    : (display.descriptionHtml ?? '')
   return {
     id: trait.id,
-    name: display.name,
-    descriptionHtml: display.descriptionHtml ?? '',
+    name: nameOverride?.trim() || display.name,
+    descriptionHtml: extra ? `${generated}${extra}` : generated,
   }
 }
 
@@ -665,7 +678,7 @@ function mapMonsterTrait(
   const record = traitRecord(trait)
   return (
     mapPresetMonsterTrait(trait, record, monsterName) ??
-    mapTemplateMonsterTrait(trait, record) ??
+    mapTemplateMonsterTrait(trait, record, monsterName) ??
     mapNamedMonsterTrait(trait, record)
   )
 }

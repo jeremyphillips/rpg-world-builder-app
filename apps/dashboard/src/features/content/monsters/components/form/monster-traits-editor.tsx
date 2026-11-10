@@ -23,6 +23,7 @@ import {
   monsterTraitAcquisitionItems,
   parseMonsterTraitAcquisitionId,
 } from '../../lib/actions/monster-trait-acquisition'
+import { formatMonsterTemplateSentence } from '../../lib/format-monster-template-sentence'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import { monsterFormAdvisorySlot } from '../../lib/monster-form-advisory-presentation'
 import {
@@ -33,6 +34,7 @@ import {
 import {
   MONSTER_TRAIT_ITEM_NOUN,
   monsterTraitItemFields,
+  monsterTraitTemplateFields,
 } from '../../lib/monster-trait-form-fields'
 import {
   monsterTraitPresetDefaults,
@@ -54,14 +56,35 @@ function isPresetRow(row: unknown): row is { preset: string } & Record<string, u
   )
 }
 
-function isTemplateRow(
-  row: unknown,
-): row is { templateId: string; config?: unknown; nameOverride?: string } {
+function isTemplateRow(row: unknown): row is {
+  templateId: string
+  config?: unknown
+  nameOverride?: string
+  descriptionOverride?: string
+} {
   return (
     typeof row === 'object' &&
     row !== null &&
     'templateId' in row &&
     typeof row.templateId === 'string'
+  )
+}
+
+function storedOverride(value: string | undefined): string | undefined {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : undefined
+}
+
+function templatePreviewSentence(
+  row: { templateId: string; config?: unknown },
+  monsterName: string,
+): string {
+  return (
+    formatMonsterTemplateSentence({
+      templateId: row.templateId,
+      config: row.config,
+      monsterName,
+    }) ?? ''
   )
 }
 
@@ -73,7 +96,7 @@ function traitListTitle(row: unknown, index: number, monsterName: string): strin
         id: 'row',
         templateId: row.templateId,
         config: row.config,
-        nameOverride: row.nameOverride,
+        nameOverride: storedOverride(row.nameOverride),
       } as ContentTrait) || `Trait ${index + 1}`
     )
   }
@@ -92,6 +115,7 @@ function traitListTitle(row: unknown, index: number, monsterName: string): strin
 
 export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const customFields = useMemo(() => monsterTraitItemFields(), [])
+  const templateFields = useMemo(() => monsterTraitTemplateFields(), [])
   const makeItemDefaults = useCallback(
     () => ({ id: createMonsterRowId(), kind: 'custom' as const, name: '', description: '' }),
     [],
@@ -128,7 +152,24 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
     (row: unknown): FormItem[] => {
       const rowPath = editor.selectedIndex === null ? '' : `traits.${editor.selectedIndex}`
       const advisorySlot = monsterFormAdvisorySlot(advisories, rowPath)
-      if (isTemplateRow(row)) return [advisorySlot, ...customFields]
+      if (isTemplateRow(row)) {
+        const sentence = templatePreviewSentence(row, monsterName ?? '')
+        const preview: FormItem[] = sentence
+          ? [
+              {
+                kind: 'slot',
+                name: 'traitPreview',
+                render: () => (
+                  <RulesPreview
+                    label={MONSTER_TRAIT_PREVIEW_LABEL}
+                    content={{ kind: 'prose', text: sentence }}
+                  />
+                ),
+              },
+            ]
+          : []
+        return [...preview, advisorySlot, ...templateFields]
+      }
       if (!isPresetRow(row)) return [advisorySlot, ...customFields]
       const subject = formatMonsterStatBlockSubject(monsterName ?? '')
       const formatted = formatCreatureTrait({ subject, trait: row })
@@ -161,7 +202,7 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
           : monsterTraitPresetFields(row.preset, ctx)
       return [...preview, advisorySlot, ...parameterFields]
     },
-    [advisories, ctx, customFields, editor.selectedIndex, monsterName],
+    [advisories, ctx, customFields, editor.selectedIndex, monsterName, templateFields],
   )
 
   return (

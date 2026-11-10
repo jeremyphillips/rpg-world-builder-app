@@ -37,7 +37,7 @@ export interface UseEmbeddedMasterDetailRowsParams {
   itemNoun: MasterDetailItemNounTerm
   mapListItem: (
     ctx: FormEmbeddedMasterDetailMapListItemContext,
-  ) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string }
+  ) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string; sourceLabel?: string }
   access?: FormEmbeddedMasterDetailAccessConfig
   resolveRowReasons?: (ctx: {
     row: unknown
@@ -112,6 +112,7 @@ export function useEmbeddedMasterDetailRows({
         getRowIssueCount,
         title: masterDetailItemTitle(listDisplay.title, itemNoun),
         eyebrow: listDisplay.eyebrow,
+        sourceLabel: listDisplay.sourceLabel,
         showDelete,
         extraReasons:
           resolveRowReasons?.({

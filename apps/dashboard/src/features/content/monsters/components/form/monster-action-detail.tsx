@@ -1,7 +1,11 @@
 import { useEffect, useMemo } from 'react'
-import { isWeaponEquipment, resolveEquipmentInstanceReferenceLabel } from '@rpg/contracts'
+import {
+  getMonsterActionKindLabel,
+  isWeaponEquipment,
+  resolveEquipmentInstanceReferenceLabel,
+} from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
-import { FormItems } from '@rpg/ui/form'
+import { FormItems, FormRhythmStack } from '@rpg/ui/form'
 import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -108,7 +112,23 @@ export function MonsterActionDetail({
       idPrefix="monster-action"
       itemNoun={MONSTER_ACTION_ITEM_NOUN}
       showSelectedDetail={Boolean(located && action)}
-      selectedIdentity={located ? rows.selectedIdentity : undefined}
+      selectedIdentity={
+        located && action
+          ? {
+              title: monsterActionNavigationTitle(
+                resolveMonsterFormActionIdentity(action, values, ctx),
+              ),
+              meta: {
+                eyebrow: getMonsterActionKindLabel(action.kind),
+                sourceLabel: monsterActionSectionHeading(located.section),
+              },
+              deletable: rows.selectedIdentity?.deletable,
+              availability: rows.selectedIdentity?.availability,
+              onAvailabilityChange: rows.selectedIdentity?.onAvailabilityChange,
+              issueCount: rows.selectedIdentity?.issueCount,
+            }
+          : undefined
+      }
       campaignId={ctx.campaignId}
       rowAvailability={rows.selectedRowAvailability}
       availabilityFormItems={rows.availabilityFormItems}
@@ -149,11 +169,13 @@ export function MonsterActionDetail({
       renderBody={
         located && action
           ? () => (
-              <FormItems
-                items={fields}
-                idPrefix={`monster-action-${action.id}`}
-                namePrefix={namePrefix}
-              />
+              <FormRhythmStack>
+                <FormItems
+                  items={fields}
+                  idPrefix={`monster-action-${action.id}`}
+                  namePrefix={namePrefix}
+                />
+              </FormRhythmStack>
             )
           : undefined
       }

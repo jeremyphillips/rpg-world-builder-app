@@ -93,6 +93,9 @@ function GroupFieldStackBody({
   groupSize: ReturnType<typeof resolveFormDensity>['size']
   groupRhythm: ReturnType<typeof resolveFormDensity>['rhythm']
 }) {
+  if (!chromeActive && !skipNestedFieldChrome) {
+    return <div className={fieldStackRhythmVariants({ rhythm: groupRhythm })}>{nestedFields}</div>
+  }
   if (!chromeActive || wrapEntireGroup || skipNestedFieldChrome) return nestedFields
 
   return (

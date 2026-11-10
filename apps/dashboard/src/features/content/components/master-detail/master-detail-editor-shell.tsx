@@ -3,6 +3,7 @@ import { cn, panelVariants } from '@rpg/ui'
 
 import { DetailOverflowMenu } from '../../lib/detail/detail-overflow-menu'
 import {
+  detailOverflowAvailabilityAction,
   detailOverflowDeleteAction,
   detailOverflowDuplicateAction,
   type DetailOverflowMenuEntry,
@@ -57,6 +58,9 @@ function MasterDetailEditorIdentityHeader({
   const itemNounLabel = masterDetailItemNounLabel(itemNoun)
   const leadingActions: DetailOverflowMenuEntry[] = [
     ...(overflowActions ?? []),
+    ...(identity.onAvailabilityChange
+      ? [detailOverflowAvailabilityAction(identity.onAvailabilityChange)]
+      : []),
     ...(onDuplicate
       ? [detailOverflowDuplicateAction(`Duplicate ${itemNounLabel}`, onDuplicate)]
       : []),
