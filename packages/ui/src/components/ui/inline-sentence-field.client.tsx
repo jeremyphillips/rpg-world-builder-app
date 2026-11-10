@@ -238,6 +238,7 @@ function InlineSentenceJoinedPairControl({
           allowCustom={start.allowCustom}
           clearable={start.clearable}
           customMin={start.customMin}
+          customMax={start.customMax}
           onValueChange={(next) => start.onChange?.(next)}
           onBlur={start.onBlur}
         />

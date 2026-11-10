@@ -83,7 +83,34 @@ export const CREATURE_TRAIT_PRESET_ENTRIES = {
   'immutable-form': {
     sentence: (subject) => `${capitalSubject(subject)} can't shape-shift.`,
   },
+  'hold-breath': { sentence: () => '' },
+  illumination: { sentence: () => '' },
+  'water-breathing': { sentence: () => '' },
+  'standing-leap': { sentence: () => '' },
+  'legendary-resistance': { sentence: () => '' },
+  regeneration: { sentence: () => '' },
+  'regeneration-halt': { sentence: () => '' },
+  swarm: { sentence: () => '' },
 } as const satisfies Record<CreatureTraitVocabularyId, CreatureTraitPreset>
+
+export const CONFIGURABLE_CREATURE_TRAIT_PRESET_IDS = [
+  'legendary-resistance',
+  'hold-breath',
+  'illumination',
+  'standing-leap',
+  'swarm',
+  'regeneration',
+  'regeneration-halt',
+  'water-breathing',
+] as const satisfies readonly CreatureTraitVocabularyId[]
+
+const CONFIGURABLE_CREATURE_TRAIT_PRESET_ID_SET = new Set<string>(
+  CONFIGURABLE_CREATURE_TRAIT_PRESET_IDS,
+)
+
+export function isConfigurableCreatureTraitPreset(presetId: string): boolean {
+  return CONFIGURABLE_CREATURE_TRAIT_PRESET_ID_SET.has(presetId)
+}
 
 export type CreatureTraitPresetId = keyof typeof CREATURE_TRAIT_PRESET_ENTRIES
 
@@ -93,5 +120,6 @@ export function getCreatureTraitPresetSentence(
   presetId: string,
   subject: string,
 ): string | undefined {
+  if (isConfigurableCreatureTraitPreset(presetId)) return undefined
   return CREATURE_TRAIT_PRESET_ENTRIES[presetId as CreatureTraitPresetId]?.sentence(subject)
 }

@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
-import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
-import type { GameTermEntry, VocabularyTerm } from '../types'
+import type { VocabularyTerm } from '../types'
+import { TIME_UNIT_ENTRIES, timeUnitSchema, TIME_UNIT_IDS, type TimeUnit } from '../time-unit'
 
 // ---------------------------------------------------------------------------
-// Duration units — closed SRD set for timed spell durations.
+// Duration units — spell durations use the shared time-unit entries.
 // ---------------------------------------------------------------------------
 
 export const DURATION_UNIT_TERM = {
@@ -17,17 +17,17 @@ export const DURATION_UNIT_TERM = {
 } as const satisfies VocabularyTerm
 
 export const DURATION_UNIT_ENTRIES = {
-  round: { label: 'Round', description: 'Lasts for one or more rounds of combat.' },
-  minute: { label: 'Minute', description: 'Lasts for one or more minutes.' },
-  hour: { label: 'Hour', description: 'Lasts for one or more hours.' },
-  day: { label: 'Day', description: 'Lasts for one or more days.' },
-} as const satisfies Record<string, GameTermEntry>
+  round: TIME_UNIT_ENTRIES.round,
+  minute: TIME_UNIT_ENTRIES.minute,
+  hour: TIME_UNIT_ENTRIES.hour,
+  day: TIME_UNIT_ENTRIES.day,
+} as const
 
-export type DurationUnit = keyof typeof DURATION_UNIT_ENTRIES
+export type DurationUnit = TimeUnit
 
-export const DURATION_UNITS = keysFromEntries(DURATION_UNIT_ENTRIES)
+export const DURATION_UNITS = TIME_UNIT_IDS
 
-export const durationUnitSchema = vocabEnumFromEntries(DURATION_UNIT_ENTRIES)
+export const durationUnitSchema = timeUnitSchema
 
 const spellDurationInstantaneousSchema = z.object({ kind: z.literal('instantaneous') })
 

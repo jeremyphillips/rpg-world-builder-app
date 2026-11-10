@@ -36,6 +36,22 @@ describe('monster-display', () => {
     )
   })
 
+  it('escapes a swarm noun in the stat block', () => {
+    const monster = {
+      ...pickMonster('hell-hound'),
+      traits: [{ id: 'swarm', preset: 'swarm' as const, noun: '<bat>' }],
+    }
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Fiend',
+      equipmentById: new Map(),
+      catalogState: 'pending',
+      derived: null,
+    })
+    expect(viewModel.traits[0]?.descriptionHtml).toContain('Tiny &lt;bat&gt;')
+    expect(viewModel.traits[0]?.descriptionHtml).not.toContain('<bat>')
+  })
+
   it('formats hell hound header rows and hover on the speed phrase', () => {
     const base = pickMonster('hell-hound')
     const monster = {

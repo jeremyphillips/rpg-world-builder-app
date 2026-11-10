@@ -69,6 +69,7 @@ function buildStartControl(
     allowCustom: config.allowCustom,
     clearable: config.clearable,
     customMin: config.customMin,
+    customMax: config.customMax,
   }
 }
 

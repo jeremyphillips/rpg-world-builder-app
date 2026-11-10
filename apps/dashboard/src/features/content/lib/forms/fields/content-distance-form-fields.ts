@@ -24,6 +24,10 @@ export function distanceJoinedPairField(options: {
   allowCustom?: boolean
   clearable?: boolean
   clearAmountWhenUnitChanges?: boolean
+  /** Fixed end label. Defaults to feet. Ignored when `unitName` is set. */
+  fixedUnitLabel?: string
+  customMin?: number
+  customMax?: number
   required?: boolean
   hint?: JoinedPairFieldConfig['hint']
   width?: JoinedPairFieldConfig['width']
@@ -44,7 +48,7 @@ export function distanceJoinedPairField(options: {
         }
       : {
           kind: 'label' as const,
-          text: DISTANCE_FEET_UNIT_LABEL,
+          text: options.fixedUnitLabel ?? DISTANCE_FEET_UNIT_LABEL,
           ariaLabel: `${options.label} unit`,
         }
 
@@ -64,6 +68,8 @@ export function distanceJoinedPairField(options: {
       digits,
       allowCustom: options.allowCustom,
       clearable: options.clearable,
+      customMin: options.customMin,
+      customMax: options.customMax,
       ariaLabel: `${options.label} value`,
     },
     end,

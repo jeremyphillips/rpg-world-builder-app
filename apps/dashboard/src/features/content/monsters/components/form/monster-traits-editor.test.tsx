@@ -90,4 +90,41 @@ describe('MonsterTraitsEditor', () => {
     await user.click(screen.getByRole('button', { name: /Note/ }))
     expect(screen.queryByText('Trait preview')).not.toBeInTheDocument()
   })
+
+  it('keeps water breathing duration behind a checkbox and out of the stored row when off', async () => {
+    const user = userEvent.setup()
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    render(<Host formRef={formRef} />)
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    await user.click(screen.getByRole('menuitem', { name: /Water Breathing/ }))
+    expect(screen.getByText(/can breathe only underwater/)).toBeInTheDocument()
+    expect(screen.getByText('Trait preview').closest('.ui-panel')).not.toHaveTextContent(
+      'outside water',
+    )
+    expect(screen.queryByRole('group', { name: 'Duration' })).not.toBeInTheDocument()
+    const checkbox = screen.getByRole('checkbox', { name: 'Hold breath outside water' })
+    expect(checkbox).not.toBeChecked()
+    expect(formRef.current?.getValues('traits.0')).not.toHaveProperty('outsideWaterBreathEnabled')
+
+    await user.click(checkbox)
+    await waitFor(() => {
+      expect(screen.getByText(/hold its breath for 1 hour outside water/)).toBeInTheDocument()
+    })
+    expect(formRef.current?.getValues('traits.0')).toMatchObject({
+      preset: 'water-breathing',
+      outsideWaterBreathAmount: 1,
+      outsideWaterBreathUnit: 'hour',
+    })
+
+    await user.click(screen.getByRole('checkbox', { name: 'Hold breath outside water' }))
+    await waitFor(() => {
+      expect(screen.getByText('Trait preview').closest('.ui-panel')).not.toHaveTextContent(
+        'outside water',
+      )
+    })
+    const cleared = formRef.current?.getValues('traits.0')
+    expect(cleared).not.toHaveProperty('outsideWaterBreathAmount')
+    expect(cleared).not.toHaveProperty('outsideWaterBreathUnit')
+    expect(cleared).not.toHaveProperty('outsideWaterBreathEnabled')
+  })
 })

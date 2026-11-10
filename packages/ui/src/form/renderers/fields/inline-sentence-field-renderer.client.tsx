@@ -221,6 +221,7 @@ function buildInlineSentenceJoinedPairSelectControl(options: {
     allowCustom: occupant.allowCustom,
     clearable: occupant.clearable,
     customMin: occupant.customMin,
+    customMax: occupant.customMax,
     hasError,
     onChange: field?.onChange,
     onBlur: field?.onBlur,

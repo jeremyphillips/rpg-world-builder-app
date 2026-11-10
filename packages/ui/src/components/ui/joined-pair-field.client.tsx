@@ -13,6 +13,10 @@ import {
   joinedPairStartTextSegmentVariants,
   type JoinedPairGroupVariantProps,
 } from './joined-pair-field.variants'
+import {
+  customJoinedPairSelection,
+  isJoinedPairCustomAmountInBounds,
+} from './joined-pair-field.lib'
 import type {
   JoinedPairLabelOccupantProps,
   JoinedPairNumberOccupantProps,
@@ -187,10 +191,12 @@ export function JoinedPairSelectOccupant({
   allowCustom = false,
   clearable = false,
   customMin = 1,
+  customMax,
   onValueChange,
   onBlur,
 }: JoinedPairSelectOccupantProps) {
   const [editingCustom, setEditingCustom] = React.useState(false)
+  const [draft, setDraft] = React.useState<number | undefined | null>(null)
   const displayOptions = React.useMemo(() => {
     const next = [...options]
     if (typeof value === 'number' && !next.some((option) => option.value === value)) {
@@ -204,21 +210,31 @@ export function JoinedPairSelectOccupant({
   const hideCaret = position === 'end' && displayOptions.length <= 1
 
   if (editingCustom && allowCustom && position === 'start') {
+    const shown = draft === null ? (typeof value === 'number' ? value : undefined) : draft
     return (
       <JoinedPairNumberOccupant
         id={id}
         ariaLabel={ariaLabel}
-        value={typeof value === 'number' ? value : undefined}
+        value={shown}
         size={size}
         disabled={disabled}
         placeholder={placeholder}
         min={customMin}
+        max={customMax}
         digits={digits}
         hasError={hasError}
         describedBy={describedBy}
-        onValueChange={onValueChange}
+        onValueChange={(next) => {
+          if (next !== undefined && isJoinedPairCustomAmountInBounds(next, customMin, customMax)) {
+            setDraft(null)
+            onValueChange(next)
+            return
+          }
+          setDraft(next)
+        }}
         onBlur={() => {
           setEditingCustom(false)
+          setDraft(null)
           onBlur?.()
         }}
       />
@@ -232,6 +248,14 @@ export function JoinedPairSelectOccupant({
       return
     }
     if (resolved === DISTANCE_CUSTOM_OPTION) {
+      const selection = customJoinedPairSelection({
+        value,
+        options,
+        customMin,
+        customMax,
+      })
+      if ('write' in selection) onValueChange(selection.write)
+      setDraft(null)
       setEditingCustom(true)
       return
     }

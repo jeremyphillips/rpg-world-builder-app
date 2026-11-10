@@ -83,6 +83,7 @@ import { CASTING_TIME_UNIT_TERM } from './spell/casting-time'
 import { SPELL_COMPONENT_TERM } from './spell/components'
 import { SPELL_DELIVERY_METHOD_TERM } from './spell/delivery-method'
 import { DURATION_UNIT_TERM } from './spell/duration'
+import { TIME_UNIT_TERM } from './time-unit'
 import { SPELL_FUNCTION_TAG_TERM } from './spell/function-tag'
 import { SPELL_GRANT_AVAILABILITY_TERM } from './spell/grant-availability'
 import { SPELL_RANGE_KIND_TERM } from './spell/range'
@@ -142,6 +143,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   SPELL_COMPONENT_TERM,
   SPELL_DELIVERY_METHOD_TERM,
   DURATION_UNIT_TERM,
+  TIME_UNIT_TERM,
   SPELL_FUNCTION_TAG_TERM,
   SPELL_GRANT_AVAILABILITY_TERM,
   SPELL_RANGE_KIND_TERM,
@@ -231,7 +233,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(64)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(65)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }

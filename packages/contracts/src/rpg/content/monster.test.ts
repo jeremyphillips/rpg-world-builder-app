@@ -165,6 +165,56 @@ describe('monsterBodySchema refinements', () => {
     ).toBe(false)
   })
 
+  it('rejects both regeneration presets and publishes configurable traits', () => {
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'two-regeneration',
+        ...baseBody,
+        traits: [
+          { id: 'regen', preset: 'regeneration', hitPoints: 10 },
+          { id: 'halt', preset: 'regeneration-halt', hitPoints: 15 },
+        ],
+      }).success,
+    ).toBe(false)
+    const held = createMonsterInputSchema.safeParse({
+      slug: 'hold',
+      ...baseBody,
+      traits: [{ id: 'breath', preset: 'hold-breath', count: 60, unit: 'minute' }],
+    })
+    expect(held.success).toBe(true)
+    if (held.success) {
+      expect(held.data.traits[0]).toMatchObject({ count: 1, unit: 'hour' })
+    }
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'leap',
+        ...baseBody,
+        traits: [{ id: 'leap', preset: 'standing-leap', longJump: 15 }],
+      }).success,
+    ).toBe(true)
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'partial-water',
+        ...baseBody,
+        traits: [{ id: 'water', preset: 'water-breathing', outsideWaterBreathAmount: 1 }],
+      }).success,
+    ).toBe(false)
+    expect(
+      createMonsterDraftInputSchema.safeParse({
+        slug: 'partial-water',
+        ...baseBody,
+        traits: [{ id: 'water', preset: 'water-breathing', outsideWaterBreathAmount: 1 }],
+      }).success,
+    ).toBe(true)
+    const stripped = createMonsterInputSchema.safeParse({
+      slug: 'pack-fields',
+      ...baseBody,
+      traits: [{ id: 'pack', preset: 'pack-tactics', uses: 3 }],
+    })
+    expect(stripped.success).toBe(true)
+    if (stripped.success) expect(stripped.data.traits[0]).not.toHaveProperty('uses')
+  })
+
   it('publishes a preset trait without a description and still requires custom prose', () => {
     expect(
       createMonsterInputSchema.safeParse({

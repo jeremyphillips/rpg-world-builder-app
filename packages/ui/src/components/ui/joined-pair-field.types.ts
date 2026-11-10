@@ -32,8 +32,10 @@ export type JoinedPairSelectOccupantConfig = {
   allowCustom?: boolean
   /** Prepends an empty choice that writes `undefined`. Does not insert a default. */
   clearable?: boolean
-  /** Minimum for the custom number input. Defaults to 1. */
+  /** Minimum for a committed custom number. Defaults to 1. */
   customMin?: number
+  /** Maximum for a committed custom number. Omitted means no ceiling. */
+  customMax?: number
 }
 
 export type JoinedPairLabelOccupantConfig = {

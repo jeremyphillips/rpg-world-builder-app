@@ -24,7 +24,11 @@ import {
   equipmentInstanceSchemaBase,
   refineCreatureDamageDefenses,
 } from './creature'
-import { CREATURE_TRAIT_VOCABULARY_IDS } from '../vocab/creature/trait-vocabulary'
+import {
+  monsterPresetTraitDraftSchema,
+  monsterPresetTraitSchema,
+  REGENERATION_TRAIT_PRESET_FAMILY,
+} from './creature/trait-preset-schema'
 import { MONSTER_CONTENT_TYPE_TERM } from '../primitives/content/content-type-terms'
 import {
   createDraftInputSchema,
@@ -80,12 +84,6 @@ export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
   creatureStatBlockHitPointsSchema.extend({ kind: z.literal('fixed') }),
 ])
 
-const monsterPresetTraitSchema = z.object({
-  id: z.string().min(1),
-  preset: z.enum(CREATURE_TRAIT_VOCABULARY_IDS),
-  ...entryProvenanceField,
-})
-
 const monsterCustomTraitSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
@@ -95,12 +93,6 @@ const monsterCustomTraitSchema = z.object({
 
 /** Preset traits are matched first so a `preset` id is not stripped as a custom row. */
 export const monsterTraitSchema = z.union([monsterPresetTraitSchema, monsterCustomTraitSchema])
-
-const monsterPresetTraitDraftSchema = z.object({
-  id: z.string().min(1),
-  preset: z.enum(CREATURE_TRAIT_VOCABULARY_IDS),
-  ...entryProvenanceField,
-})
 
 const monsterCustomTraitDraftSchema = z.object({
   id: z.string().min(1),
@@ -258,6 +250,18 @@ function refineUniqueTraitPresets(
     }
     seen.add(preset)
   })
+  const present = new Set(
+    traits.map(traitPresetId).filter((preset): preset is string => Boolean(preset)),
+  )
+  const regeneration = REGENERATION_TRAIT_PRESET_FAMILY.filter((preset) => present.has(preset))
+  if (regeneration.length > 1) {
+    const index = traits.findIndex((trait) => traitPresetId(trait) === regeneration[1])
+    addCustomRefinementIssue(ctx, 'A creature can have only one Regeneration trait.', [
+      ...path,
+      index,
+      'preset',
+    ])
+  }
 }
 
 function refineUniqueIds(

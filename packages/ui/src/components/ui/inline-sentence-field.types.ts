@@ -143,6 +143,7 @@ export type InlineSentenceBoundJoinedPairSelect = Omit<
   allowCustom?: boolean
   clearable?: boolean
   customMin?: number
+  customMax?: number
   onChange?: (value: string | number | undefined) => void
 }
 

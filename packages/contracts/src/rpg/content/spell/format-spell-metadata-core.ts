@@ -5,7 +5,8 @@ import type {
   SpellDuration,
   SpellRange,
 } from '../../vocab/spell'
-import { getDurationUnitLabel } from '../../vocab/spell/duration'
+import { TIME_UNIT_ENTRIES, type TimeUnit } from '../../vocab/time-unit'
+import { formatTermCount } from '../../vocab/types'
 import { getSpellRangeKindLabel } from '../../vocab/spell/range'
 
 export type SpellMetadataDisplayStyle = 'detail' | 'picker'
@@ -91,9 +92,10 @@ export function formatSpellDurationLabel(duration: SpellDuration): string {
     case 'special':
       return duration.description
     case 'timed': {
-      const unitLabel = getDurationUnitLabel(duration.unit).toLowerCase()
-      const durationText =
-        duration.value === 1 ? `1 ${unitLabel}` : `${duration.value} ${unitLabel}s`
+      const durationText = formatTermCount(
+        TIME_UNIT_ENTRIES[duration.unit as TimeUnit],
+        duration.value,
+      )
       if (duration.concentration && duration.upTo) {
         return `Concentration, up to ${durationText}`
       }

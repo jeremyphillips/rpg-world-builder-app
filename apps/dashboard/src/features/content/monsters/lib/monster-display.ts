@@ -603,8 +603,8 @@ function mapMonsterTrait(
 ): MonsterTraitItemViewModel {
   if ('preset' in trait) {
     const formatted = formatCreatureTrait({
-      presetId: trait.preset,
       subject: formatMonsterStatBlockSubject(monsterName),
+      trait,
     })
     return {
       id: trait.id,

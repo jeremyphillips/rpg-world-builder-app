@@ -141,6 +141,46 @@ export const CREATURE_TRAIT_VOCABULARY_ENTRIES = {
     description: 'Cannot shape-shift.',
     group: 'form',
   },
+  'hold-breath': {
+    label: 'Hold Breath',
+    description: 'Holds its breath for a set time.',
+    group: 'environment',
+  },
+  illumination: {
+    label: 'Illumination',
+    description: 'Sheds bright and dim light.',
+    group: 'environment',
+  },
+  'water-breathing': {
+    label: 'Water Breathing',
+    description: 'Breathes only underwater.',
+    group: 'environment',
+  },
+  'standing-leap': {
+    label: 'Standing Leap',
+    description: 'Long- and high-jumps without a run.',
+    group: 'movement',
+  },
+  'legendary-resistance': {
+    label: 'Legendary Resistance',
+    description: 'Can succeed on a failed save.',
+    group: 'combat',
+  },
+  regeneration: {
+    label: 'Regeneration',
+    description: 'Regains Hit Points at the start of its turn.',
+    group: 'combat',
+  },
+  'regeneration-halt': {
+    label: 'Regeneration (Acid/Fire)',
+    description: 'Acid or Fire interrupts regeneration.',
+    group: 'combat',
+  },
+  swarm: {
+    label: 'Swarm',
+    description: 'Occupies spaces; passes through tiny gaps.',
+    group: 'form',
+  },
 } as const satisfies Record<string, CreatureTraitVocabularyEntry>
 
 export type CreatureTraitVocabularyId = keyof typeof CREATURE_TRAIT_VOCABULARY_ENTRIES

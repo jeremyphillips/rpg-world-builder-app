@@ -37,6 +37,7 @@ export interface JoinedPairFieldFormStartSelectControl {
   allowCustom?: boolean
   clearable?: boolean
   customMin?: number
+  customMax?: number
   onChange: (value: string | number | undefined) => void
   onBlur?: () => void
 }
@@ -181,6 +182,7 @@ export function JoinedPairFieldForm({
                 allowCustom={start.allowCustom}
                 clearable={start.clearable}
                 customMin={start.customMin}
+                customMax={start.customMax}
                 onValueChange={start.onChange}
                 onBlur={start.onBlur}
               />

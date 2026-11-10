@@ -28,17 +28,32 @@ import {
   MONSTER_TRAIT_ITEM_NOUN,
   monsterTraitItemFields,
 } from '../../lib/monster-trait-form-fields'
+import {
+  monsterTraitPresetDefaults,
+  monsterTraitPresetFields,
+  waterBreathingDurationEnabled,
+} from '../../lib/monster-trait-preset-fields'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
+import { WaterBreathingToggle } from './water-breathing-toggle'
 
-function isPresetRow(row: unknown): row is { preset: string } {
+function isPresetRow(row: unknown): row is { preset: string } & Record<string, unknown> {
   return (
     typeof row === 'object' && row !== null && 'preset' in row && typeof row.preset === 'string'
   )
 }
 
-function traitListTitle(row: unknown, index: number): string {
+function traitListTitle(row: unknown, index: number, monsterName: string): string {
   if (isPresetRow(row)) {
-    return getCreatureTraitVocabularyEntry(row.preset)?.label ?? `Trait ${index + 1}`
+    if (row.preset === 'regeneration-halt') {
+      return getCreatureTraitVocabularyEntry(row.preset)?.label ?? 'Regeneration (Acid/Fire)'
+    }
+    const formatted = formatCreatureTrait({
+      subject: formatMonsterStatBlockSubject(monsterName),
+      trait: row,
+    })
+    return (
+      formatted?.name ?? getCreatureTraitVocabularyEntry(row.preset)?.label ?? `Trait ${index + 1}`
+    )
   }
   const name = (row as { name?: string } | undefined)?.name?.trim()
   return name || `Trait ${index + 1}`
@@ -65,24 +80,35 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
       const rowPath = editor.selectedIndex === null ? '' : `traits.${editor.selectedIndex}`
       const advisorySlot = monsterFormAdvisorySlot(advisories, rowPath)
       if (!isPresetRow(row)) return [advisorySlot, ...customFields]
-      const formatted = formatCreatureTrait({
-        presetId: row.preset,
-        subject: formatMonsterStatBlockSubject(monsterName ?? ''),
-      })
-      if (!formatted) return [advisorySlot]
-      return [
-        {
-          kind: 'slot',
-          name: 'traitPreview',
-          render: () => (
-            <RulesPreview
-              label={MONSTER_TRAIT_PREVIEW_LABEL}
-              content={{ kind: 'prose', text: formatted.sentence }}
-            />
-          ),
-        },
-        advisorySlot,
-      ]
+      const subject = formatMonsterStatBlockSubject(monsterName ?? '')
+      const formatted = isPresetRow(row) ? formatCreatureTrait({ subject, trait: row }) : undefined
+      const preview: FormItem[] = formatted
+        ? [
+            {
+              kind: 'slot',
+              name: 'traitPreview',
+              render: () => (
+                <RulesPreview
+                  label={MONSTER_TRAIT_PREVIEW_LABEL}
+                  content={{ kind: 'prose', text: formatted.sentence }}
+                />
+              ),
+            },
+          ]
+        : []
+      if (!isPresetRow(row)) return [advisorySlot, ...customFields]
+      const parameterFields =
+        row.preset === 'water-breathing'
+          ? [
+              {
+                kind: 'slot' as const,
+                name: 'outsideWaterBreathToggle',
+                render: () => <WaterBreathingToggle namePrefix={rowPath} />,
+              },
+              ...(waterBreathingDurationEnabled(row) ? monsterTraitPresetFields(row.preset) : []),
+            ]
+          : monsterTraitPresetFields(row.preset)
+      return [...preview, advisorySlot, ...parameterFields]
     },
     [advisories, customFields, editor.selectedIndex, monsterName],
   )
@@ -120,13 +146,19 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
               editor.appendRow({ id: createMonsterRowId(), name: '', description: '' })
               return
             }
-            editor.appendRow({ id: createMonsterRowId(), preset: choice.presetId })
+            editor.appendRow({
+              id: createMonsterRowId(),
+              preset: choice.presetId,
+              ...monsterTraitPresetDefaults(choice.presetId),
+            })
           }}
         />
       }
       idPrefix="monster-trait"
       makeItemDefaults={makeItemDefaults}
-      mapListItem={({ row, index }) => ({ title: traitListTitle(row, index) })}
+      mapListItem={({ row, index }) => ({
+        title: traitListTitle(row, index, monsterName ?? ''),
+      })}
     />
   )
 }
