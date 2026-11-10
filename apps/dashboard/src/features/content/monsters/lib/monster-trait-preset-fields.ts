@@ -23,6 +23,7 @@ const HOLD_BREATH_MINUTES = [1, 5, 10, 15, 30] as const
 const HOLD_BREATH_HOURS = [1, 2, 4, 8, 12, 24] as const
 const STANDING_LEAP_FEET = standardFeet(10, 60, 10)
 const REGENERATION_HIT_POINTS = standardFeet(5, 30, 5)
+const STENCH_RADIUS_FEET = [5, 10, 15, 20, 30] as const
 
 const DURATION_UNITS = (['hour', 'minute'] as const).map((unit) => ({
   value: unit,
@@ -130,6 +131,126 @@ export function monsterTraitPresetFields(
     case 'water-breathing':
       return [durationPair('outsideWaterBreathAmount')]
     default:
+      return waveTwoTraitFields(preset)
+  }
+}
+
+function waveTwoTraitFields(preset: string): FormItem[] {
+  switch (preset) {
+    case 'bloodied-fury':
+      return [
+        {
+          type: 'select',
+          name: 'attackScope',
+          label: 'Attack rolls',
+          required: true,
+          defaultValue: 'any',
+          options: [
+            { value: 'any', label: 'Any attack roll' },
+            { value: 'melee', label: 'Melee attack rolls' },
+          ],
+        },
+      ]
+    case 'ethereal-sight':
+      return [
+        {
+          type: 'select',
+          name: 'direction',
+          label: 'Sight direction',
+          required: true,
+          options: [
+            { value: 'material-to-ethereal', label: 'Material to Ethereal' },
+            { value: 'both', label: 'Both directions' },
+          ],
+        },
+      ]
+    case 'mimicry':
+      return [
+        {
+          type: 'select',
+          name: 'sounds',
+          label: 'Sounds mimicked',
+          required: true,
+          options: [
+            { value: 'animal-and-humanoid', label: 'Animal sounds and humanoid voices' },
+            { value: 'simple-heard', label: 'Previously heard simple sounds' },
+          ],
+        },
+        {
+          type: 'number',
+          name: 'insightDc',
+          label: 'Insight DC',
+          required: true,
+          min: 1,
+          max: 30,
+          digits: 2,
+        },
+      ]
+    case 'air-form':
+      return [
+        {
+          type: 'select',
+          name: 'space',
+          label: 'Can enter',
+          required: true,
+          defaultValue: 'creature',
+          options: [
+            { value: 'creature', label: "Any creature's space" },
+            { value: 'enemy', label: "An enemy's space" },
+          ],
+        },
+      ]
+    case 'berserk':
+      return [
+        {
+          type: 'checkbox',
+          name: 'canBeCalmed',
+          label: 'Creator can calm it',
+          defaultValue: false,
+        },
+      ]
+    case 'elemental-restoration':
+      return [
+        {
+          type: 'select',
+          name: 'element',
+          label: 'Element',
+          required: true,
+          options: [
+            { value: 'air', label: 'Air' },
+            { value: 'fire', label: 'Fire' },
+          ],
+        },
+      ]
+    case 'stench':
+      return [
+        {
+          type: 'number',
+          name: 'dc',
+          label: 'Save DC',
+          required: true,
+          min: 1,
+          max: 30,
+          digits: 2,
+        },
+        distanceJoinedPairField({
+          amountName: 'radius',
+          label: 'Emanation radius',
+          presets: STENCH_RADIUS_FEET,
+          allowCustom: true,
+          customMin: 5,
+          customMax: 120,
+          required: true,
+          digits: 2,
+        }),
+        {
+          type: 'checkbox',
+          name: 'successImmunity',
+          label: 'Immunity on success',
+          defaultValue: false,
+        },
+      ]
+    default:
       return []
   }
 }
@@ -146,6 +267,14 @@ export function monsterTraitPresetDefaults(preset: string): Record<string, unkno
       return { longJump: 10 }
     case 'regeneration':
       return { hitPoints: 10, regeneratesAtZeroHp: false, interruptedByDamageTypes: [] }
+    case 'bloodied-fury':
+      return { attackScope: 'any' }
+    case 'air-form':
+      return { space: 'creature' }
+    case 'berserk':
+      return { canBeCalmed: false }
+    case 'stench':
+      return { successImmunity: false }
     default:
       return {}
   }

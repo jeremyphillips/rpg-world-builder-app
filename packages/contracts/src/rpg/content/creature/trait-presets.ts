@@ -211,6 +211,13 @@ export const CREATURE_TRAIT_PRESET_ENTRIES = {
     sentence: (subject) =>
       `Wisdom Saving Throw: DC 11, any Beast or Humanoid that starts its turn within 30 feet of ${subject} and can see its true form. Failure: The target has the Frightened condition until the start of its next turn. Success: The target is immune to this creature's Vile Appearance for 24 hours.`,
   },
+  'bloodied-fury': { sentence: () => '' },
+  'ethereal-sight': { sentence: () => '' },
+  mimicry: { sentence: () => '' },
+  'air-form': { sentence: () => '' },
+  berserk: { sentence: () => '' },
+  'elemental-restoration': { sentence: () => '' },
+  stench: { sentence: () => '' },
   'hold-breath': { sentence: () => '' },
   illumination: { sentence: () => '' },
   'water-breathing': { sentence: () => '' },
@@ -228,6 +235,13 @@ export const CONFIGURABLE_CREATURE_TRAIT_PRESET_IDS = [
   'swarm',
   'regeneration',
   'water-breathing',
+  'bloodied-fury',
+  'ethereal-sight',
+  'mimicry',
+  'air-form',
+  'berserk',
+  'elemental-restoration',
+  'stench',
 ] as const satisfies readonly CreatureTraitVocabularyId[]
 
 const CONFIGURABLE_CREATURE_TRAIT_PRESET_ID_SET = new Set<string>(

@@ -63,6 +63,13 @@ const APPROVED_DESCRIPTIONS = {
   'barbed-hide': 'Damages creatures grappling with it.',
   'fear-aura': 'Frightens enemies that start their turn nearby.',
   'vile-appearance': 'Frightens beasts and humanoids that see it.',
+  'bloodied-fury': 'Advantage on attacks while Bloodied.',
+  'ethereal-sight': 'Sees into the Ethereal Plane.',
+  mimicry: 'Copies sounds; Insight reveals imitations.',
+  'air-form': 'Enters occupied spaces and squeezes.',
+  berserk: 'May lose control when Bloodied.',
+  'elemental-restoration': 'Returns to its home plane days later.',
+  stench: 'Sickens creatures that start their turn nearby.',
 } as const
 
 describe('formatCreatureTrait', () => {
@@ -314,5 +321,66 @@ describe('formatCreatureTrait', () => {
         trait: { preset: 'water-breathing', outsideWaterBreathAmount: 1 },
       })?.sentence,
     ).toBe('The hunter shark can breathe only underwater.')
+    const boar = formatMonsterStatBlockSubject('Boar')
+    expect(
+      formatCreatureTrait({ subject: boar, trait: { preset: 'bloodied-fury', attackScope: 'any' } })
+        ?.sentence,
+    ).toBe('While Bloodied, the boar has Advantage on attack rolls.')
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Giant Boar'),
+        trait: { preset: 'bloodied-fury', attackScope: 'melee' },
+      })?.sentence,
+    ).toBe('While Bloodied, the giant boar has Advantage on melee attack rolls.')
+    expect(
+      formatCreatureTrait({ subject: boar, trait: { preset: 'ethereal-sight' } }),
+    ).toBeUndefined()
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Phase Spider'),
+        trait: { preset: 'ethereal-sight', direction: 'both' },
+      })?.sentence,
+    ).toBe(
+      'The phase spider can see 60 feet into the Ethereal Plane while on the Material Plane and vice versa.',
+    )
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Green Hag'),
+        trait: { preset: 'mimicry', sounds: 'animal-and-humanoid', insightDc: 14 },
+      })?.sentence,
+    ).toContain('only with a successful DC 14 Wisdom (Insight) check')
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Raven'),
+        trait: { preset: 'mimicry', sounds: 'simple-heard', insightDc: 10 },
+      })?.sentence,
+    ).toContain('such as a whisper or chitter')
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Invisible Stalker'),
+        trait: { preset: 'air-form', space: 'enemy' },
+      })?.sentence,
+    ).toContain("an enemy's space")
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Flesh Golem'),
+        trait: { preset: 'berserk', canBeCalmed: true },
+      })?.sentence,
+    ).toContain('DC 15 Charisma (Persuasion)')
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Efreeti'),
+        trait: { preset: 'elemental-restoration', element: 'fire' },
+      })?.sentence,
+    ).toContain('dissolves into ash')
+    expect(
+      formatCreatureTrait({
+        subject: formatMonsterStatBlockSubject('Ghast'),
+        trait: { preset: 'stench', dc: 10, radius: 5, successImmunity: true },
+      })?.sentence,
+    ).toContain("this creature's Stench for 24 hours")
+    expect(
+      formatCreatureTrait({ subject: boar, trait: { preset: 'stench', dc: 10 } }),
+    ).toBeUndefined()
   })
 })

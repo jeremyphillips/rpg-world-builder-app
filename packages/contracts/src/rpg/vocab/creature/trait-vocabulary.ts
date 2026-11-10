@@ -310,6 +310,41 @@ export const CREATURE_TRAIT_VOCABULARY_ENTRIES = {
     description: 'Frightens beasts and humanoids that see it.',
     group: 'combat',
   },
+  'bloodied-fury': {
+    label: 'Bloodied Fury',
+    description: 'Advantage on attacks while Bloodied.',
+    group: 'combat',
+  },
+  'ethereal-sight': {
+    label: 'Ethereal Sight',
+    description: 'Sees into the Ethereal Plane.',
+    group: 'environment',
+  },
+  mimicry: {
+    label: 'Mimicry',
+    description: 'Copies sounds; Insight reveals imitations.',
+    group: 'form',
+  },
+  'air-form': {
+    label: 'Air Form',
+    description: 'Enters occupied spaces and squeezes.',
+    group: 'movement',
+  },
+  berserk: {
+    label: 'Berserk',
+    description: 'May lose control when Bloodied.',
+    group: 'combat',
+  },
+  'elemental-restoration': {
+    label: 'Elemental Restoration',
+    description: 'Returns to its home plane days later.',
+    group: 'form',
+  },
+  stench: {
+    label: 'Stench',
+    description: 'Sickens creatures that start their turn nearby.',
+    group: 'combat',
+  },
   'hold-breath': {
     label: 'Hold Breath',
     description: 'Holds its breath for a set time.',

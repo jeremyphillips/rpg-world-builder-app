@@ -22,15 +22,14 @@ Skeleton, Knight, and Mage have no traits. Their other named blocks are actions.
 
 326 trait rows on 204 creatures. 127 creatures have none. 106 names after stripping parentheticals.
 
-| Disposition           | Rows | Share | What the number means                                                                  |
-| --------------------- | ---: | ----: | -------------------------------------------------------------------------------------- |
-| Shipped               |  260 |   80% | Phase 1: 145 rows. Phase 2: 66 rows. Wave 1 fixed presets: 49 rows                     |
-| Approved, not shipped |   14 |    4% | Configurable rows. Preset code is not in place                                         |
-| Pending               |   15 |    5% | A fidelity or authoring blocker. Not a build task yet                                  |
-| Custom                |   37 |   11% | Signature prose, Spirit Naga’s Fiendish Restoration, and Swarm of Insects Spider Climb |
-| Total                 |  326 |  100% |                                                                                        |
+| Disposition | Rows | Share | What the number means                                                                  |
+| ----------- | ---: | ----: | -------------------------------------------------------------------------------------- |
+| Shipped     |  274 |   84% | Phase 1: 145 rows. Phase 2: 66 rows. Wave 1: 49 rows. Wave 2: 14 rows                  |
+| Pending     |   15 |    5% | A fidelity or authoring blocker. Not a build task yet                                  |
+| Custom      |   37 |   11% | Signature prose, Spirit Naga’s Fiendish Restoration, and Swarm of Insects Spider Climb |
+| Total       |  326 |  100% |                                                                                        |
 
-260 + 14 + 15 + 37 = 326. The remaining build scope is the 14 configurable rows.
+274 + 15 + 37 = 326. The remaining rows are pending or custom.
 
 Phase 1 is 18 preset ids. `spider-climb` stays field-free. The Swarm of Insects row is one of the 37 custom rows. `lightning-absorption` stays the shipped field-free preset. Fire Absorption and Acid Absorption are separate approved ids.
 
@@ -40,7 +39,7 @@ Shared creature pieces already live in [creature.ts](../src/rpg/content/creature
 
 Two trait systems exist, and they stay separate.
 
-- **Descriptive traits.** A monster trait is custom prose (`id`, `name`, `description`) or a preset row. Shipped presets are the phase 1 field-free ids, the wave 1 field-free ids, and the 7 configurable ids. The configurable ids below are not shipped. Custom HTML is stored. Preset sentences are generated. Display is [monster-display.ts](../../../apps/dashboard/src/features/content/monsters/lib/monster-display.ts).
+- **Descriptive traits.** A monster trait is custom prose (`id`, `name`, `description`) or a preset row. Shipped presets are the phase 1 field-free ids, the wave 1 field-free ids, and the configurable ids from phase 2 and wave 2. Custom HTML is stored. Preset sentences are generated. Display is [monster-display.ts](../../../apps/dashboard/src/features/content/monsters/lib/monster-display.ts).
 - **Grant traits.** [contentTraitSchema](../src/rpg/content/lib/grants/grants.ts) is `custom` or `grant`. A grant trait is one unlocked group with one sense, resistance, movement, or language grant. [resolveTraitDisplay](../src/rpg/content/lib/grants/trait-display.ts) derives “You have …” and allows `nameOverride` and `descriptionOverride`. Species traits and heritage options use this schema. Class features extend the custom trait only.
 
 Preset definitions belong next to the other creature value objects: stable id, label, menu group, and the stat-block sentence template. The formatter that fills the subject belongs in `runtime/creature/`, because [runtime-resolution-boundaries.md](./runtime-resolution-boundaries.md) puts reusable creature presentation there and keeps monster assembly in `runtime/monster/`.
@@ -163,9 +162,9 @@ Shipped. The description is the add-menu line. These traits store no fields. The
 - **Fear Aura** (`fear-aura`, Combat, 1). Frightens enemies that start their turn nearby. Pit Fiend. Wisdom DC 21, 20 feet, Frightened until the target’s next turn, unless the fiend is Incapacitated. Success: “The target is immune to this creature's aura for 24 hours.”
 - **Vile Appearance** (`vile-appearance`, Combat, 1). Frightens beasts and humanoids that see it. Sea Hag. Wisdom DC 11, 30 feet, the target must see its true form, Frightened until its next turn. Success: “The target is immune to this creature's Vile Appearance for 24 hours.”
 
-## Approved configurable presets
+## Wave 2 configurable presets
 
-Not shipped. The description is the add-menu line. No field has a hint.
+Shipped. The description is the add-menu line. No field has a hint.
 
 An empty variant does not generate a sentence. Unset selects keep the existing choice placeholder. An empty number keeps the existing empty number field. Publish copy comes from the form error map, using the field label. Schemas stay message-free. Draft may omit a value that has no default.
 
@@ -379,4 +378,4 @@ No other fixed preset gets a check. Running Leap, Pack Tactics, Web Walker, Spid
 
 ## Row check
 
-260 shipped + 14 approved configurable + 15 pending + 37 custom = 326. The 260 shipped rows are phase 1, phase 2, and the wave 1 fixed presets. Swarm of Insects Spider Climb is inside the custom 37. Every other name in the Open5e extract is in exactly one section above.
+274 shipped + 15 pending + 37 custom = 326. The shipped rows are phase 1, phase 2, and waves 1 and 2. Swarm of Insects Spider Climb is inside the custom 37. Every other name in the Open5e extract is in exactly one section above.

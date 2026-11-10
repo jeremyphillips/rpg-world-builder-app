@@ -275,6 +275,47 @@ describe('monsterBodySchema refinements', () => {
     })
     expect(stripped.success).toBe(true)
     if (stripped.success) expect(stripped.data.traits[0]).not.toHaveProperty('uses')
+    const fury = createMonsterInputSchema.safeParse({
+      slug: 'boar',
+      ...baseBody,
+      traits: [{ id: 'fury', preset: 'bloodied-fury', attackScope: 'any' }],
+    })
+    expect(fury.success).toBe(true)
+    const calm = createMonsterInputSchema.safeParse({
+      slug: 'clay',
+      ...baseBody,
+      traits: [{ id: 'berserk', preset: 'berserk' }],
+    })
+    expect(calm.success).toBe(true)
+    if (calm.success) expect(calm.data.traits[0]).toMatchObject({ canBeCalmed: false })
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'sight',
+        ...baseBody,
+        traits: [{ id: 'sight', preset: 'ethereal-sight' }],
+      }).success,
+    ).toBe(false)
+    expect(
+      createMonsterDraftInputSchema.safeParse({
+        slug: 'sight',
+        ...baseBody,
+        traits: [{ id: 'sight', preset: 'ethereal-sight' }],
+      }).success,
+    ).toBe(true)
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'dc',
+        ...baseBody,
+        traits: [{ id: 'stench', preset: 'stench', dc: 31, radius: 5 }],
+      }).success,
+    ).toBe(false)
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'radius',
+        ...baseBody,
+        traits: [{ id: 'stench', preset: 'stench', dc: 10, radius: 4 }],
+      }).success,
+    ).toBe(false)
   })
 
   it('publishes a preset trait without a description and still requires custom prose', () => {

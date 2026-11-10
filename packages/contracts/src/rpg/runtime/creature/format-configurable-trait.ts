@@ -20,6 +20,15 @@ export type CreatureTraitFormatRow = {
   interruptedByDamageTypes?: readonly string[]
   outsideWaterBreathAmount?: number
   outsideWaterBreathUnit?: CreatureTraitDurationUnit
+  attackScope?: 'any' | 'melee'
+  direction?: 'material-to-ethereal' | 'both'
+  sounds?: 'animal-and-humanoid' | 'simple-heard'
+  insightDc?: number
+  space?: 'creature' | 'enemy'
+  canBeCalmed?: boolean
+  element?: 'air' | 'fire'
+  dc?: number
+  successImmunity?: boolean
 }
 
 type FormattedTrait = { name: string; sentence: string }
@@ -137,6 +146,100 @@ function formatRegeneration(
   }
 }
 
+function formatBloodiedFury(
+  subject: string,
+  trait: CreatureTraitFormatRow,
+): FormattedTrait | undefined {
+  if (trait.attackScope !== 'any' && trait.attackScope !== 'melee') return undefined
+  const rolls = trait.attackScope === 'melee' ? 'melee attack rolls' : 'attack rolls'
+  return {
+    name: presetLabel(trait.preset, 'Bloodied Fury'),
+    sentence: `While Bloodied, ${subject} has Advantage on ${rolls}.`,
+  }
+}
+
+function formatEtherealSight(
+  subject: string,
+  trait: CreatureTraitFormatRow,
+): FormattedTrait | undefined {
+  if (trait.direction !== 'material-to-ethereal' && trait.direction !== 'both') return undefined
+  const sentence =
+    trait.direction === 'both'
+      ? `${capitalSubject(subject)} can see 60 feet into the Ethereal Plane while on the Material Plane and vice versa.`
+      : `${capitalSubject(subject)} can see 60 feet into the Ethereal Plane when it is on the Material Plane.`
+  return { name: presetLabel(trait.preset, 'Ethereal Sight'), sentence }
+}
+
+function formatMimicry(subject: string, trait: CreatureTraitFormatRow): FormattedTrait | undefined {
+  if (!isPositiveInt(trait.insightDc) || trait.insightDc > 30) return undefined
+  const capital = capitalSubject(subject)
+  if (trait.sounds === 'animal-and-humanoid') {
+    return {
+      name: presetLabel(trait.preset, 'Mimicry'),
+      sentence: `${capital} can mimic animal sounds and humanoid voices. A creature that hears the sounds can tell they are imitations only with a successful DC ${trait.insightDc} Wisdom (Insight) check.`,
+    }
+  }
+  if (trait.sounds === 'simple-heard') {
+    return {
+      name: presetLabel(trait.preset, 'Mimicry'),
+      sentence: `${capital} can mimic simple sounds it has heard, such as a whisper or chitter. A hearer can discern the sounds are imitations with a successful DC ${trait.insightDc} Wisdom (Insight) check.`,
+    }
+  }
+  return undefined
+}
+
+function formatAirForm(subject: string, trait: CreatureTraitFormatRow): FormattedTrait | undefined {
+  if (trait.space !== 'creature' && trait.space !== 'enemy') return undefined
+  const space = trait.space === 'enemy' ? "an enemy's space" : "a creature's space"
+  return {
+    name: presetLabel(trait.preset, 'Air Form'),
+    sentence: `${capitalSubject(subject)} can enter ${space} and stop there. It can move through a space as narrow as 1 inch without expending extra movement to do so.`,
+  }
+}
+
+function formatBerserk(subject: string, trait: CreatureTraitFormatRow): FormattedTrait {
+  const opening = `Whenever ${subject} starts its turn Bloodied, roll 1d6. On a 6, it goes berserk. On each of its turns while berserk, it attacks the nearest creature it can see. If no creature is near enough to move to and attack, it attacks an object.`
+  const ending =
+    trait.canBeCalmed === true
+      ? 'Once it goes berserk, it remains so until it is destroyed or it is no longer Bloodied. Its creator, if within 60 feet of it, can try to calm it by taking an action to make a DC 15 Charisma (Persuasion) check; it must be able to hear its creator. If this check succeeds, it ceases being berserk until the start of its next turn, at which point it resumes rolling for the Berserk trait again if it is still Bloodied.'
+      : 'Once it goes berserk, it continues to be berserk until it is destroyed or it is no longer Bloodied.'
+  return {
+    name: presetLabel(trait.preset, 'Berserk'),
+    sentence: `${opening} ${ending}`,
+  }
+}
+
+function formatElementalRestoration(
+  subject: string,
+  trait: CreatureTraitFormatRow,
+): FormattedTrait | undefined {
+  if (trait.element === 'air') {
+    return {
+      name: presetLabel(trait.preset, 'Elemental Restoration'),
+      sentence: `If ${subject} dies outside the Elemental Plane of Air, its body dissolves into mist, and it gains a new body in 1d4 days, reviving with all its Hit Points somewhere on the Plane of Air.`,
+    }
+  }
+  if (trait.element === 'fire') {
+    return {
+      name: presetLabel(trait.preset, 'Elemental Restoration'),
+      sentence: `If ${subject} dies outside the Elemental Plane of Fire, its body dissolves into ash, and it gains a new body in 1d4 days, reviving with all its Hit Points somewhere on the Plane of Fire.`,
+    }
+  }
+  return undefined
+}
+
+function formatStench(subject: string, trait: CreatureTraitFormatRow): FormattedTrait | undefined {
+  if (!isPositiveInt(trait.dc) || trait.dc > 30 || !isPositiveInt(trait.radius)) return undefined
+  const immunity =
+    trait.successImmunity === true
+      ? " Success: The target is immune to this creature's Stench for 24 hours."
+      : ''
+  return {
+    name: presetLabel(trait.preset, 'Stench'),
+    sentence: `Constitution Saving Throw: DC ${trait.dc}, any creature that starts its turn in a ${trait.radius}-foot Emanation originating from ${subject}. Failure: The target has the Poisoned condition until the start of its next turn.${immunity}`,
+  }
+}
+
 function formatWaterBreathing(
   subject: string,
   trait: CreatureTraitFormatRow,
@@ -153,27 +256,30 @@ function formatWaterBreathing(
   }
 }
 
+const CONFIGURABLE_TRAIT_FORMATTERS: Record<
+  string,
+  (subject: string, trait: CreatureTraitFormatRow) => FormattedTrait | undefined
+> = {
+  'legendary-resistance': formatLegendaryResistance,
+  'hold-breath': formatHoldBreath,
+  illumination: formatIllumination,
+  'standing-leap': formatStandingLeap,
+  swarm: formatSwarm,
+  regeneration: formatRegeneration,
+  'water-breathing': formatWaterBreathing,
+  'bloodied-fury': formatBloodiedFury,
+  'ethereal-sight': formatEtherealSight,
+  mimicry: formatMimicry,
+  'air-form': formatAirForm,
+  berserk: formatBerserk,
+  'elemental-restoration': formatElementalRestoration,
+  stench: formatStench,
+}
+
 /** Stat-block name and sentence for a configurable preset. Undefined when required fields are missing. */
 export function formatConfigurableCreatureTrait(
   subject: string,
   trait: CreatureTraitFormatRow,
 ): FormattedTrait | undefined {
-  switch (trait.preset) {
-    case 'legendary-resistance':
-      return formatLegendaryResistance(subject, trait)
-    case 'hold-breath':
-      return formatHoldBreath(subject, trait)
-    case 'illumination':
-      return formatIllumination(subject, trait)
-    case 'standing-leap':
-      return formatStandingLeap(subject, trait)
-    case 'swarm':
-      return formatSwarm(subject, trait)
-    case 'regeneration':
-      return formatRegeneration(subject, trait)
-    case 'water-breathing':
-      return formatWaterBreathing(subject, trait)
-    default:
-      return undefined
-  }
+  return CONFIGURABLE_TRAIT_FORMATTERS[trait.preset]?.(subject, trait)
 }

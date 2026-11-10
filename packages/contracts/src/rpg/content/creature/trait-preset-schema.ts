@@ -33,6 +33,12 @@ const fixedPresetSchema = z.object({
 
 const usesField = z.number().int().min(1).max(12)
 const radiusField = z.number().int().min(5).max(120)
+const literalDcField = z.number().int().min(1).max(30)
+const attackScopeField = z.enum(['any', 'melee'])
+const etherealDirectionField = z.enum(['material-to-ethereal', 'both'])
+const mimicrySoundsField = z.enum(['animal-and-humanoid', 'simple-heard'])
+const airFormSpaceField = z.enum(['creature', 'enemy'])
+const elementalPlaneField = z.enum(['air', 'fire'])
 const longJumpField = z.number().int().min(5).max(60)
 const hitPointsField = z.number().int().min(1).max(30)
 const durationUnitField = z.enum(CREATURE_TRAIT_DURATION_UNITS)
@@ -70,6 +76,8 @@ function normalizePresetTraitInput(value: unknown): unknown {
       ...row,
     }
   }
+  if (row.preset === 'berserk') return { canBeCalmed: false, ...row }
+  if (row.preset === 'stench') return { successImmunity: false, ...row }
   return value
 }
 
@@ -136,6 +144,58 @@ const regenerationSchema = z.object({
   ...entryProvenanceField,
 })
 
+const bloodiedFurySchema = z.object({
+  ...idField,
+  preset: z.literal('bloodied-fury'),
+  attackScope: attackScopeField,
+  ...entryProvenanceField,
+})
+
+const etherealSightSchema = z.object({
+  ...idField,
+  preset: z.literal('ethereal-sight'),
+  direction: etherealDirectionField,
+  ...entryProvenanceField,
+})
+
+const mimicrySchema = z.object({
+  ...idField,
+  preset: z.literal('mimicry'),
+  sounds: mimicrySoundsField,
+  insightDc: literalDcField,
+  ...entryProvenanceField,
+})
+
+const airFormSchema = z.object({
+  ...idField,
+  preset: z.literal('air-form'),
+  space: airFormSpaceField,
+  ...entryProvenanceField,
+})
+
+const berserkSchema = z.object({
+  ...idField,
+  preset: z.literal('berserk'),
+  canBeCalmed: z.boolean(),
+  ...entryProvenanceField,
+})
+
+const elementalRestorationSchema = z.object({
+  ...idField,
+  preset: z.literal('elemental-restoration'),
+  element: elementalPlaneField,
+  ...entryProvenanceField,
+})
+
+const stenchSchema = z.object({
+  ...idField,
+  preset: z.literal('stench'),
+  dc: literalDcField,
+  radius: radiusField,
+  successImmunity: z.boolean(),
+  ...entryProvenanceField,
+})
+
 const waterBreathingSchema = z
   .object({
     ...idField,
@@ -177,6 +237,13 @@ export const monsterPresetTraitSchema = z.preprocess(
     swarmSchema,
     regenerationSchema,
     waterBreathingSchema,
+    bloodiedFurySchema,
+    etherealSightSchema,
+    mimicrySchema,
+    airFormSchema,
+    berserkSchema,
+    elementalRestorationSchema,
+    stenchSchema,
   ]),
 )
 
@@ -225,6 +292,58 @@ const regenerationDraftSchema = z.object({
   ...entryProvenanceField,
 })
 
+const bloodiedFuryDraftSchema = z.object({
+  ...idField,
+  preset: z.literal('bloodied-fury'),
+  attackScope: attackScopeField.optional(),
+  ...entryProvenanceField,
+})
+
+const etherealSightDraftSchema = z.object({
+  ...idField,
+  preset: z.literal('ethereal-sight'),
+  direction: etherealDirectionField.optional(),
+  ...entryProvenanceField,
+})
+
+const mimicryDraftSchema = z.object({
+  ...idField,
+  preset: z.literal('mimicry'),
+  sounds: mimicrySoundsField.optional(),
+  insightDc: z.number().optional(),
+  ...entryProvenanceField,
+})
+
+const airFormDraftSchema = z.object({
+  ...idField,
+  preset: z.literal('air-form'),
+  space: airFormSpaceField.optional(),
+  ...entryProvenanceField,
+})
+
+const berserkDraftSchema = z.object({
+  ...idField,
+  preset: z.literal('berserk'),
+  canBeCalmed: z.boolean().optional(),
+  ...entryProvenanceField,
+})
+
+const elementalRestorationDraftSchema = z.object({
+  ...idField,
+  preset: z.literal('elemental-restoration'),
+  element: elementalPlaneField.optional(),
+  ...entryProvenanceField,
+})
+
+const stenchDraftSchema = z.object({
+  ...idField,
+  preset: z.literal('stench'),
+  dc: z.number().optional(),
+  radius: z.number().optional(),
+  successImmunity: z.boolean().optional(),
+  ...entryProvenanceField,
+})
+
 const waterBreathingDraftSchema = z.object({
   ...idField,
   preset: z.literal('water-breathing'),
@@ -242,4 +361,11 @@ export const monsterPresetTraitDraftSchema = z.union([
   swarmDraftSchema,
   regenerationDraftSchema,
   waterBreathingDraftSchema,
+  bloodiedFuryDraftSchema,
+  etherealSightDraftSchema,
+  mimicryDraftSchema,
+  airFormDraftSchema,
+  berserkDraftSchema,
+  elementalRestorationDraftSchema,
+  stenchDraftSchema,
 ])
