@@ -21,8 +21,12 @@ import {
   resolveMonsterActionSelectionAfterRemoval,
 } from './monster-action-selection'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { collectMonsterFormAdvisories } from '../monster-form-advisories'
-import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
+import {
+  collectMonsterFormAdvisories,
+  FLYBY_MISSING_FLY_SPEED_MESSAGE,
+  TUNNELER_MISSING_BURROW_SPEED_MESSAGE,
+} from '../monster-form-advisories'
+import { resolveMonsterCreateDefaultValues, type MonsterFormValues } from '../monster-form-values'
 import { buildMonsterInput, monsterToFormValues } from '../monster-form-values'
 import type { FieldErrors } from 'react-hook-form'
 
@@ -79,6 +83,10 @@ describe('monster action acquisition', () => {
     expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }).kind).toBe(
       'special',
     )
+    expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'save' })).toEqual({
+      id: expect.any(String),
+      kind: 'save',
+    })
     const customNatural = createMonsterActionFromAcquisition({ type: 'other-natural' })
     expect(customNatural).toMatchObject({
       kind: 'natural-weapon',
@@ -172,6 +180,7 @@ describe('monster action detail fields', () => {
         'onHit.additionalDamage',
       ]),
     )
+    expect(natural).toContain('limitedUse')
     for (const hidden of ['mode', 'properties', 'reach', 'limitedUse.kind', 'moveSection']) {
       expect(natural).not.toContain(hidden)
     }
@@ -184,7 +193,7 @@ describe('monster action detail fields', () => {
 
     const attack = detailFields({ id: 'slash', kind: 'attack', name: 'Slash' })
     expect(attack).toEqual(
-      expect.arrayContaining(['modes', 'reach', 'limitedUse.kind', 'damageType', 'damage']),
+      expect.arrayContaining(['modes', 'reach', 'limitedUse', 'damageType', 'damage']),
     )
     const attackItems = monsterActionDetailFields({
       ctx: detailCtx,
@@ -260,7 +269,8 @@ describe('monster action detail fields', () => {
 
     const weapon = detailFields({ id: 'sword', kind: 'weapon', equipmentEntryId: 'sword' })
     expect(weapon).toContain('equipmentEntryId')
-    expect(weapon).toContain('limitedUse.kind')
+    expect(weapon).not.toContain('limitedUse')
+    expect(weapon).not.toContain('limitedUse.kind')
     expect(weapon).not.toContain('moveSection')
     expect(weapon.indexOf('name')).toBeLessThan(weapon.indexOf('equipmentEntryId'))
     expect(weapon.indexOf('attackPreview')).toBe(weapon.indexOf('equipmentEntryId') + 1)
@@ -272,7 +282,9 @@ describe('monster action detail fields', () => {
     expect(spell.indexOf('castingAbility')).toBeLessThan(spell.indexOf('spells'))
     expect(spell.indexOf('spells')).toBeLessThan(spell.indexOf('description'))
     expect(spell.indexOf('description')).toBeLessThan(spell.indexOf('omittedComponents'))
+    expect(spell.indexOf('omittedComponents')).toBeLessThan(spell.lastIndexOf('limitedUse.kind'))
     expect(spell).not.toContain('trigger.text')
+    expect(spell.filter((name) => name === 'limitedUse.kind')).toHaveLength(2)
 
     const reactionSpell = detailFields(
       { id: 'shield', kind: 'spell', name: 'Protective Magic', spells: [] },
@@ -312,8 +324,17 @@ describe('monster action detail fields', () => {
     expect(descriptionIndex).toBeGreaterThanOrEqual(0)
     expect(damageTypeIndex).toBe(descriptionIndex + 1)
     expect(rollIndex).toBe(damageTypeIndex + 1)
-    expect(names.indexOf('limitedUse.kind')).toBeGreaterThan(rollIndex)
+    expect(names.indexOf('limitedUse')).toBeGreaterThan(rollIndex)
+    expect(names).not.toContain('limitedUse.kind')
     expect(names).not.toContain('attackPreview')
+    const constrict = detailFields({
+      id: 'squeeze',
+      kind: 'save',
+      name: 'Constrict',
+      preset: 'constrict',
+    })
+    expect(constrict).not.toContain('limitedUse')
+    expect(constrict).not.toContain('limitedUse.kind')
   })
 })
 
@@ -388,6 +409,60 @@ describe('monster form advisories', () => {
     expect(advisories.find((advisory) => advisory.code === 'weapon-not-equipped')?.message).toBe(
       'Shortbow is not equipped.',
     )
+  })
+
+  it('advises when Tunneler or Flyby has no usable speed and leaves the trait unchanged', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.movement = [{ mode: 'walk', feet: 30 }]
+    values.traits = [
+      { id: 'tunnel', preset: 'tunneler' },
+      { id: 'glide', preset: 'flyby' },
+      { id: 'leap', preset: 'running-leap' },
+    ]
+    const before = structuredClone(values.traits)
+
+    const missing = collectMonsterFormAdvisories(values, new Map())
+    expect(missing.map((advisory) => advisory.code)).toEqual([
+      'tunneler-missing-burrow-speed',
+      'flyby-missing-fly-speed',
+    ])
+    expect(missing[0]).toMatchObject({
+      message: TUNNELER_MISSING_BURROW_SPEED_MESSAGE,
+      path: 'traits.0',
+    })
+    expect(missing[1]).toMatchObject({
+      message: FLYBY_MISSING_FLY_SPEED_MESSAGE,
+      path: 'traits.1',
+    })
+    expect(values.traits).toEqual(before)
+
+    values.movement = [
+      { mode: 'walk', feet: 5 },
+      { mode: 'burrow', feet: 10 },
+      { mode: 'fly', feet: 30 },
+    ]
+    expect(collectMonsterFormAdvisories(values, new Map())).toEqual([])
+
+    values.movement = [
+      { mode: 'walk', feet: 5 },
+      { mode: 'burrow', feet: 0 },
+      { mode: 'fly', feet: 0 },
+    ] as MonsterFormValues['movement']
+    expect(
+      collectMonsterFormAdvisories(values, new Map()).map((advisory) => advisory.code),
+    ).toEqual(['tunneler-missing-burrow-speed', 'flyby-missing-fly-speed'])
+
+    values.movement = [
+      { mode: 'walk', feet: 30 },
+      { mode: 'burrow', feet: '' },
+      { mode: 'fly', feet: '' },
+    ]
+    expect(collectMonsterFormAdvisories(values, new Map())).toEqual([])
+
+    values.traits = [{ id: 'leap', preset: 'running-leap' }]
+    values.movement = [{ mode: 'walk', feet: 5 }]
+    expect(collectMonsterFormAdvisories(values, new Map())).toEqual([])
+    expect(values.traits).toEqual([{ id: 'leap', preset: 'running-leap' }])
   })
 })
 

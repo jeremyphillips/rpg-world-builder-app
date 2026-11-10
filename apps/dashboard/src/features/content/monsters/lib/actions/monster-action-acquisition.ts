@@ -3,6 +3,7 @@ import {
   getActionPreset,
   getActionVocabularyEntry,
   getDamageTypeLabel,
+  getMonsterActionKindLabel,
   listSpecialMenuActionPresetIds,
   MONSTER_SPELLCASTING_ACTION_NAME,
   type ActionPresetId,
@@ -16,6 +17,7 @@ import type { MonsterActionSection } from './monster-action-equipment-references
 
 import {
   MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
+  MONSTER_ACQUISITION_SAVE_DESCRIPTION,
   MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_DESCRIPTION,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
@@ -49,7 +51,7 @@ export type MonsterActionAcquisitionChoice =
   | { type: 'natural'; presetId: ActionPresetId }
   | { type: 'other-natural' }
   | { type: 'preset'; presetId: ActionPresetId }
-  | { type: 'create'; kind: 'attack' | 'spell' | 'special' }
+  | { type: 'create'; kind: 'attack' | 'spell' | 'special' | 'save' }
 
 const SPECIAL_MENU_ORDER = ['multiattack', 'constrict', 'breath-weapon'] as const
 
@@ -72,6 +74,12 @@ const OTHER_ITEMS: readonly MonsterActionAcquisitionItem[] = [
     groupId: 'other',
     metadata: MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
   },
+  {
+    id: 'create:save',
+    label: getMonsterActionKindLabel('save'),
+    groupId: 'other',
+    metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
+  },
 ]
 
 function specialMenuRank(presetId: ActionPresetId): number {
@@ -88,6 +96,7 @@ const EXACT_ACQUISITION_CHOICES: Record<string, MonsterActionAcquisitionChoice> 
   'create:attack': { type: 'create', kind: 'attack' },
   'create:spell': { type: 'create', kind: 'spell' },
   'create:special': { type: 'create', kind: 'special' },
+  'create:save': { type: 'create', kind: 'save' },
   'natural:other': { type: 'other-natural' },
 }
 
@@ -239,6 +248,7 @@ export function createMonsterActionFromAcquisition(
   }
   if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] }
   if (choice.kind === 'special') return { id, kind: 'special' }
+  if (choice.kind === 'save') return { id, kind: 'save' }
   return { id, kind: 'attack' }
 }
 

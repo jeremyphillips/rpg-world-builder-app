@@ -195,6 +195,9 @@ export function monsterActionSectionHeading(section: MonsterActionSection): stri
 
 export const MONSTER_ADD_LABEL = 'Add'
 
+export const MONSTER_LIMIT_ADD_LABEL = 'Add limit'
+export const MONSTER_RECHARGE_ADD_LABEL = 'Add recharge'
+export const MONSTER_ACQUISITION_SAVE_DESCRIPTION = 'Saving throw effect'
 export const MONSTER_ACQUISITION_ATTACK_DESCRIPTION = 'Custom attack'
 export const MONSTER_ACQUISITION_SPELL_DESCRIPTION = 'Cast spells'
 export const MONSTER_ACQUISITION_SPECIAL_DESCRIPTION = 'Custom rules or effects'

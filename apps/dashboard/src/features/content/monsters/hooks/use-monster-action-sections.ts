@@ -106,6 +106,7 @@ function collectMissingRecordSnapshot(
 ) {
   const liveRecord = isPlainRecord(live) ? live : {}
   for (const [key, value] of Object.entries(snapshot)) {
+    if (key === 'limitedUse') continue
     const childPath = path ? `${path}.${key}` : key
     const liveValue = liveRecord[key]
     if (isPlainRecord(value) || Array.isArray(value)) {
@@ -135,6 +136,8 @@ function lostDefinedKeys(previous: unknown, next: unknown): boolean {
   if (isPlainRecord(previous)) {
     if (!isPlainRecord(next)) return true
     return Object.entries(previous).some(([key, value]) => {
+      // The recharge editor owns this key and may clear or replace it.
+      if (key === 'limitedUse') return false
       if (value === undefined) return false
       if (next[key] === undefined) return true
       return lostDefinedKeys(value, next[key])

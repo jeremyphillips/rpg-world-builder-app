@@ -43,4 +43,21 @@ describe('MonsterTraitsEditor', () => {
     await user.click(screen.getByRole('menuitem', { name: /Custom trait/ }))
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
   })
+
+  it('shows a Tunneler advisory only on that trait', async () => {
+    const user = userEvent.setup()
+    const values = resolveMonsterCreateDefaultValues()
+    values.name = 'Ankheg'
+    values.traits = [
+      { id: 'note', name: 'Note', description: 'Custom.' },
+      { id: 'tunnel', preset: 'tunneler' },
+    ]
+    render(<Host values={values} />)
+    expect(
+      screen.queryByText(/Tunneler uses half the creature's Burrow Speed/),
+    ).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Tunneler/ }))
+    expect(screen.getByText(/Tunneler uses half the creature's Burrow Speed/)).toBeInTheDocument()
+    expect(screen.getByText(/burrow through solid rock/)).toBeInTheDocument()
+  })
 })

@@ -40,7 +40,7 @@ Shared creature pieces already live in [creature.ts](../src/rpg/content/creature
 
 Two trait systems exist, and they stay separate.
 
-- **Descriptive traits.** Monster traits are `id`, `name`, and required HTML `description` ([monster.ts](../src/rpg/content/monster.ts)). Display copies that HTML ([monster-display.ts](../../../apps/dashboard/src/features/content/monsters/lib/monster-display.ts)).
+- **Descriptive traits.** A monster trait is either custom prose (`id`, `name`, `description`) or a phase 1 preset id. Custom HTML is stored. Preset sentences are generated. Display is [monster-display.ts](../../../apps/dashboard/src/features/content/monsters/lib/monster-display.ts).
 - **Grant traits.** [contentTraitSchema](../src/rpg/content/lib/grants/grants.ts) is `custom` or `grant`. A grant trait is one unlocked group with one sense, resistance, movement, or language grant. [resolveTraitDisplay](../src/rpg/content/lib/grants/trait-display.ts) derives “You have …” and allows `nameOverride` and `descriptionOverride`. Species traits and heritage options use this schema. Class features extend the custom trait only.
 
 Preset definitions belong next to the other creature value objects: stable id, label, menu group, and the stat-block sentence template. The formatter that fills the subject belongs in `runtime/creature/`, because [runtime-resolution-boundaries.md](./runtime-resolution-boundaries.md) puts reusable creature presentation there and keeps monster assembly in `runtime/monster/`.
@@ -232,6 +232,85 @@ One creature, or a procedure that is not a reusable sentence. Eldritch Restorati
 - **Vampiric Connection** (1, Vampire Familiar).
 - **Water Form** (1, Water Elemental). Enter an enemy’s space, then the 1-inch clause.
 - **Water Susceptibility** (1, Fire Elemental). 3 (1d6) Cold per 5 feet moved in water or per gallon.
+
+## Phase 1 capability audit
+
+This audit covers the 18 shipped presets. It does not add preset ids or author fields. Movement facts below are from Open5e `srd-2024` creature detail (`document.key` is `srd-2024`). A speed that shows up on those stat blocks is an association until the trait sentence itself names that statistic.
+
+`resolveCreatureMovement` in [movement-mode.ts](../src/rpg/vocab/movement-mode.ts) is the movement read. Form rows reach it through `movementRowsToRecordForPreview`. The advisory result is derived while authoring. It is not stored on the trait.
+
+Four labels:
+
+- **Supporting.** Another creature statistic enables the trait. The only phase 1 case is a movement speed the sentence uses.
+- **Granted.** The trait itself is the ability.
+- **Activation.** A condition that happens in play. It is not an authoring field.
+- **Thematic.** A combination that is common on these stat blocks and is not a rule requirement.
+
+### Movement traits called out for review
+
+**Flyby** (7). Granted: no Opportunity Attack when the creature flies out of reach. Activation: that fly-out. Every current row also has a Fly Speed (Flying Snake 60, Gargoyle 60, Giant Owl 60, Giant Wasp 50, Hippogriff 60, Owl 60, Pteranodon 60). Those speeds are not a rule in the sentence, and flight can come from another effect. A missing Fly Speed can still leave the trait ineffective, so it gets a nonblocking advisory. The sentence does not change.
+
+**Tunneler** (2). Supporting: Burrow Speed. The sentence says “half its Burrow Speed,” so the speed is the number the trait uses. Ankheg’s Burrow Speed is 10. Purple Worm’s is 50. Granted on top of that speed: burrow through solid rock and leave a 10-foot tunnel. This is the one phase 1 relationship that produces a build advisory. The printed sentence still says “half its Burrow Speed.”
+
+**Earth Glide** (2). Granted: burrow through nonmagical unworked earth and stone without disturbing it. Earth Elemental (Burrow 30) and Xorn (Burrow 20) also have Burrow Speeds. The sentence does not mention Burrow Speed, so that speed is thematic. No hint.
+
+**Running Leap** (2). Granted: a 25-foot Long Jump. Activation: a 10-foot running start. Lion walks 50. Saber-Toothed Tiger walks 40. The 10 feet are what the creature must move before the jump during play. They do not require a base Walk Speed of at least 10. No build advisory.
+
+**Spider Climb** (13 on the preset). Granted: climb difficult surfaces, including ceilings, without a check. Twelve of those creatures have a Climb Speed. Vampire Spawn has the trait and Walk 30 only, so Climb Speed is not required. The Swarm of Insects sentence is the explicit exception (“If the swarm has a Climb Speed”) and stays custom. No hint on the preset.
+
+**Ice Walk** (4). Granted: cross and climb ice without a check, and ice or snow is not difficult terrain. The four white dragons also have walk, fly, burrow, and swim. Those modes are the dragon’s stat block, not this trait. No hint.
+
+**Web Walker** (5). Granted: ignore movement restrictions from webs, and know who else touches the same web. Drider, Ettercap, Giant Spider, Phase Spider, and Spider all have a Climb Speed. That pairing is thematic. The sentence does not mention climbing. No hint. A link to a Web action would be a different dependency and is not part of this pass.
+
+### The other eleven presets
+
+| Preset               | Granted                                                                                                           | Activation                                                                                       | Build advisory                                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Agile                | No Opportunity Attack when it moves out of reach                                                                  | That move                                                                                        | None. “Moves” is any movement. Deer walks 50. Rat walks 20 and climbs 20.          |
+| Amorphous            | Squeeze through a 1-inch space without extra movement                                                             | None                                                                                             | None                                                                               |
+| Amphibious           | Breathe air and water                                                                                             | None                                                                                             | None. A Swim Speed on many of these creatures is thematic.                         |
+| Immutable Form       | Cannot shape-shift                                                                                                | None                                                                                             | None                                                                               |
+| Incorporeal Movement | Move through creatures and objects as difficult terrain, then 5 (1d10) Force if it ends the turn inside an object | Ending the turn inside an object                                                                 | None. A fly or walk speed is not named.                                            |
+| Lightning Absorption | Regain hit points equal to the lightning damage taken                                                             | Being subjected to Lightning damage                                                              | None. Immunity or resistance changing “subjected to” stays a later rules question. |
+| Magic Resistance     | Advantage on saves against spells and other magical effects                                                       | The save                                                                                         | None                                                                               |
+| Pack Tactics         | Advantage on an attack roll                                                                                       | An ally within 5 feet who is not Incapacitated                                                   | None                                                                               |
+| Siege Monster        | Double damage to objects and structures                                                                           | The damage roll                                                                                  | None                                                                               |
+| Sunlight Sensitivity | Disadvantage on ability checks and attack rolls                                                                   | While in sunlight                                                                                | None                                                                               |
+| Undead Fortitude     | Drop to 1 hit point instead of 0                                                                                  | Damage to 0 hit points, then a Constitution save, unless the damage is Radiant or a critical hit | None. Constitution is already an ability score.                                    |
+
+### What produces a build advisory
+
+Documented relationships are not all checks. A build advisory is nonblocking feedback for a configuration that looks unintended, incomplete, or ineffective. Two of those situations can raise one:
+
+- **Missing referenced statistic.** The trait sentence uses a creature statistic that is not configured. Tunneler uses half the Burrow Speed.
+- **Potentially ineffective feature.** The trait’s benefit needs a capability the creature does not currently have. Flyby applies while flying, and nothing else on the form supplies flight.
+
+A normal activation condition, such as Running Leap’s 10-foot running start, does not raise an advisory. A thematic pairing, such as Spider Climb with a Climb Speed, does not either. Vampire Spawn has Spider Climb and Walk 30 only.
+
+Monster authoring advisories are `collectMonsterFormAdvisories` in [monster-form-advisories.ts](../../../apps/dashboard/src/features/content/monsters/lib/monster-form-advisories.ts). Each one is `{ code, message, path }`. There is no severity. They do not block save or publish. The open editor shows the messages whose path matches the selected row. The add menu, the generated sentence, the stat block, and the vocabulary description do not repeat them.
+
+| Preset   | Code                            | When                                                                                                                                           |
+| -------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tunneler | `tunneler-missing-burrow-speed` | No usable Burrow Speed. Message: “Tunneler uses half the creature's Burrow Speed, but no Burrow Speed is configured.” Path: `traits.${index}`. |
+| Flyby    | `flyby-missing-fly-speed`       | No usable Fly Speed. Message: “Flyby only applies while flying, but this creature has no Fly Speed.” Path: `traits.${index}`.                  |
+
+Movement is `movementRowsToRecordForPreview`, then `resolveCreatureMovement`. A positive speed is usable. An explicit 0 is not usable, because the creature cannot move in that mode. A row with the mode chosen and feet still blank is unfinished input and stays quiet. A missing mode is absent.
+
+No other fixed preset gets a check. Running Leap, Pack Tactics, Web Walker, Spider Climb, and Earth Glide stay exclusions. There is no `capabilityHints` metadata.
+
+### Later, not this follow-up
+
+### Later, not this follow-up
+
+- A severity level that would separate “cannot work yet” from “might be supplied another way.” Flyby uses the same nonblocking advisory as Tunneler until that exists.
+- Earth Glide plus a Burrow Speed, when an author wants a distance for the glide.
+- Spider Climb plus a Climb Speed. Vampire Spawn is the counterexample that keeps this optional.
+- Web Walker plus a web-producing action.
+- Amphibious plus a Swim Speed.
+- Ice Walk plus any of the white dragon’s other speeds.
+- Lightning Absorption when the creature is immune or resistant to lightning.
+- Incorporeal Movement when the creature has no speed with which to leave an object.
+- Flyby when flight comes from a spell or another trait rather than Fly Speed.
 
 ## Row check
 

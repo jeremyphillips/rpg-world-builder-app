@@ -2,10 +2,14 @@ import {
   isWeaponEquipment,
   isWeaponProficientFromGrantSet,
   joinInlineMetadata,
+  resolveCreatureMovement,
   resolveEquipmentNotProficientShortLabel,
   type Equipment,
+  type MovementMode,
 } from '@rpg/contracts'
 
+import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
+import type { MovementRowDraftFormValues } from '../../lib/forms/fields/content-movement-form-fields'
 import { equipmentEntryBaseName } from './equipment/monster-equipment-labels'
 import { coerceCreatureWeaponProficienciesForForm } from './creature-details/monster-weapon-proficiencies-form.lib'
 import {
@@ -15,10 +19,63 @@ import {
 import type { MonsterActionDraftRow } from './actions/monster-action-presets'
 import type { MonsterFormValues } from './monster-form-values'
 
+export const TUNNELER_MISSING_BURROW_SPEED_MESSAGE =
+  "Tunneler uses half the creature's Burrow Speed, but no Burrow Speed is configured."
+
+export const FLYBY_MISSING_FLY_SPEED_MESSAGE =
+  'Flyby only applies while flying, but this creature has no Fly Speed.'
+
 export type MonsterFormAdvisory = {
-  code: 'weapon-not-equipped' | 'weapon-not-proficient'
+  code:
+    | 'weapon-not-equipped'
+    | 'weapon-not-proficient'
+    | 'tunneler-missing-burrow-speed'
+    | 'flyby-missing-fly-speed'
   message: string
   path: string
+}
+
+type SpeedSupport = 'usable' | 'incomplete' | 'absent'
+
+function speedSupport(
+  rows: readonly MovementRowDraftFormValues[] | undefined,
+  mode: MovementMode,
+): SpeedSupport {
+  const matching = (rows ?? []).filter((row) => row.mode === mode)
+  if (matching.length === 0) return 'absent'
+  const resolved = resolveCreatureMovement({
+    movement: movementRowsToRecordForPreview([...(rows ?? [])]),
+  })
+  const feet = resolved[mode]
+  if (feet !== undefined && feet > 0) return 'usable'
+  const unfinished = matching.some((row) => row.feet === '' || row.feet === undefined)
+  if (unfinished && feet === undefined) return 'incomplete'
+  return 'absent'
+}
+
+function collectTraitSpeedAdvisories(values: MonsterFormValues): MonsterFormAdvisory[] {
+  const burrow = speedSupport(values.movement, 'burrow')
+  const fly = speedSupport(values.movement, 'fly')
+  const advisories: MonsterFormAdvisory[] = []
+  ;(values.traits ?? []).forEach((trait, index) => {
+    if (!('preset' in trait)) return
+    const path = `traits.${index}`
+    if (trait.preset === 'tunneler' && burrow === 'absent') {
+      advisories.push({
+        code: 'tunneler-missing-burrow-speed',
+        message: TUNNELER_MISSING_BURROW_SPEED_MESSAGE,
+        path,
+      })
+    }
+    if (trait.preset === 'flyby' && fly === 'absent') {
+      advisories.push({
+        code: 'flyby-missing-fly-speed',
+        message: FLYBY_MISSING_FLY_SPEED_MESSAGE,
+        path,
+      })
+    }
+  })
+  return advisories
 }
 
 function sectionRows(
@@ -69,5 +126,5 @@ export function collectMonsterFormAdvisories(
     })
   }
 
-  return advisories
+  return [...advisories, ...collectTraitSpeedAdvisories(values)]
 }

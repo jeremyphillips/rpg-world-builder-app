@@ -44,3 +44,42 @@ export function monsterActionAuthoring(action: AuthoringSubject): MonsterActionA
   }
   return { name: 'authored', description: 'authored', source: 'none' }
 }
+
+export const MONSTER_ACTION_USAGE_PRESENTATIONS = ['none', 'included', 'optional'] as const
+export type MonsterActionUsagePresentation = (typeof MONSTER_ACTION_USAGE_PRESENTATIONS)[number]
+export type MonsterActionUsageKind = 'recharge' | 'uses'
+
+/** Which usage editor an action shows, and which existing `limitedUse.kind` values it can write. */
+export type MonsterActionUsageCapability = {
+  presentation: MonsterActionUsagePresentation
+  kinds: readonly MonsterActionUsageKind[]
+}
+
+const NO_USAGE = { presentation: 'none', kinds: [] } as const satisfies MonsterActionUsageCapability
+const OPTIONAL_RECHARGE = {
+  presentation: 'optional',
+  kinds: ['recharge'],
+} as const satisfies MonsterActionUsageCapability
+const INCLUDED_RECHARGE = {
+  presentation: 'included',
+  kinds: ['recharge'],
+} as const satisfies MonsterActionUsageCapability
+const OPTIONAL_FULL_LIMIT = {
+  presentation: 'optional',
+  kinds: ['recharge', 'uses'],
+} as const satisfies MonsterActionUsageCapability
+
+/**
+ * Usage editor for an action. Preset ids distinguish the three save roles.
+ * A preset's `defaults.limitedUse` is not an edit policy.
+ */
+export function monsterActionUsageCapability(
+  action: AuthoringSubject,
+): MonsterActionUsageCapability {
+  if (action.kind === 'natural-weapon' || action.kind === 'attack') return OPTIONAL_RECHARGE
+  if (action.kind === 'special' || action.kind === 'spell') return OPTIONAL_FULL_LIMIT
+  if (action.kind !== 'save') return NO_USAGE
+  if (action.preset === 'breath-weapon') return INCLUDED_RECHARGE
+  if (action.preset === 'constrict') return NO_USAGE
+  return OPTIONAL_FULL_LIMIT
+}

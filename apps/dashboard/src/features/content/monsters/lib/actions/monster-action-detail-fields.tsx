@@ -1,6 +1,7 @@
 import {
   ABILITY_IDS,
   monsterActionAuthoring,
+  monsterActionUsageCapability,
   getAbilityLabel,
   getContentTypeTerm,
   getWeaponModeLabel,
@@ -42,6 +43,7 @@ import {
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import { MonsterActionCastingAbilityField } from './monster-action-casting-fields'
+import { MonsterActionRechargeField } from './monster-action-recharge-field'
 import {
   monsterActionLimitedUseFields,
   monsterActionOnHitFields,
@@ -422,6 +424,27 @@ function spellOptions(ctx: ContentFormCtx) {
   }))
 }
 
+function monsterActionUsageEditor(action: MonsterActionDraftRow, namePrefix: string): FormItem[] {
+  const usage = monsterActionUsageCapability(action)
+  if (usage.presentation === 'none') return []
+  if (usage.kinds.length === 1 && usage.kinds[0] === 'recharge') {
+    const presentation = usage.presentation === 'included' ? 'included' : 'optional'
+    return [
+      {
+        kind: 'slot',
+        name: 'limitedUse',
+        render: () => (
+          <MonsterActionRechargeField
+            name={`${namePrefix}.limitedUse`}
+            presentation={presentation}
+          />
+        ),
+      },
+    ]
+  }
+  return monsterActionLimitedUseFields()
+}
+
 // fallow-ignore-next-line complexity
 export function monsterActionDetailFields(input: {
   ctx: ContentFormCtx
@@ -448,8 +471,8 @@ export function monsterActionDetailFields(input: {
     fields.push(monsterReactionConditionField(action))
   }
 
-  if (action.kind !== 'spell' && action.kind !== 'natural-weapon') {
-    fields.push(...monsterActionLimitedUseFields())
+  if (action.kind !== 'spell') {
+    fields.push(...monsterActionUsageEditor(action, namePrefix))
   }
 
   if (action.kind === 'weapon') {

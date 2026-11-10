@@ -11,6 +11,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { MasterDetailEditorShell } from '../../../components/master-detail/master-detail-editor-shell'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
+import { MonsterFormAdvisoryMessages } from './monster-form-advisory-messages'
 import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-summary'
 import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
 import {
@@ -153,11 +154,7 @@ export function MonsterActionDetail({
               <SemanticText>{sections.notice}</SemanticText>
             </Text>
           ) : null}
-          {advisories.map((message) => (
-            <Text key={message} as="p" variant="supporting">
-              <SemanticText>{message}</SemanticText>
-            </Text>
-          ))}
+          <MonsterFormAdvisoryMessages messages={advisories} />
           <FormItems
             items={fields}
             idPrefix={`monster-action-${action.id}`}

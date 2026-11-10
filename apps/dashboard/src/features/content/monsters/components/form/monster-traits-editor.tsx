@@ -17,12 +17,14 @@ import {
   monsterTraitAcquisitionItems,
   parseMonsterTraitAcquisitionId,
 } from '../../lib/actions/monster-trait-acquisition'
+import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import { MONSTER_ADD_LABEL, MONSTER_TRAITS_HEADING } from '../../lib/monster-form-labels'
 import {
   MONSTER_TRAIT_ITEM_NOUN,
   monsterTraitItemFields,
 } from '../../lib/monster-trait-form-fields'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
+import { MonsterFormAdvisoryMessages } from './monster-form-advisory-messages'
 
 function isPresetRow(row: unknown): row is { preset: string } {
   return (
@@ -45,9 +47,19 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
     [],
   )
   const editor = useMasterDetailArray('traits', makeItemDefaults)
-  const traits = useWatch({ name: 'traits' }) as MonsterFormValues['traits'] | undefined
-  const monsterName = useWatch({ name: 'name' }) as string | undefined
+  const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
+  const traits = values?.traits
+  const monsterName = values?.name
   const items = useMemo(() => monsterTraitAcquisitionItems({ traits: traits ?? [] }), [traits])
+  const selectedTraitAdvisories = useMemo(
+    () =>
+      values && editor.selectedIndex !== null
+        ? collectMonsterFormAdvisories(values, new Map())
+            .filter((advisory) => advisory.path === `traits.${editor.selectedIndex}`)
+            .map((advisory) => advisory.message)
+        : [],
+    [editor.selectedIndex, values],
+  )
 
   const resolveItemFields = useCallback(
     (row: unknown): FormItem[] => {
@@ -62,6 +74,7 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
           name: 'preset',
           render: () => (
             <div className="flex flex-col gap-2">
+              <MonsterFormAdvisoryMessages messages={selectedTraitAdvisories} />
               <Text variant="label">{formatted?.name ?? row.preset}</Text>
               {formatted ? <Text>{formatted.sentence}</Text> : null}
             </div>
@@ -69,7 +82,7 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
         },
       ]
     },
-    [customFields, monsterName],
+    [customFields, monsterName, selectedTraitAdvisories],
   )
 
   return (
