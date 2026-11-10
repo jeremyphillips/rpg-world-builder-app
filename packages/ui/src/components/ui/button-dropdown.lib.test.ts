@@ -49,4 +49,22 @@ describe('button-dropdown.lib', () => {
       fields.some((field) => field.text === 'Proficiencies & training' && field.role === 'group'),
     ).toBe(true)
   })
+
+  it('excludes metadata from search when searchMetadata is false', () => {
+    const withMetadataOnly = {
+      id: 'hold-breath',
+      label: 'Hold Breath',
+      metadata: 'Holds its breath for a set time.',
+      searchMetadata: false as const,
+    }
+    const fields = buildButtonDropdownSearchFields(withMetadataOnly, new Map())
+    expect(fields.some((field) => field.role === 'description')).toBe(false)
+
+    const withKeyword = {
+      ...withMetadataOnly,
+      searchTerms: [{ text: 'suffocate', weight: 1, role: 'keyword' as const }],
+    }
+    expect(rankButtonDropdownItems([withKeyword], [], 'suffocate')).toHaveLength(1)
+    expect(rankButtonDropdownItems([withMetadataOnly], [], 'set time')).toHaveLength(0)
+  })
 })

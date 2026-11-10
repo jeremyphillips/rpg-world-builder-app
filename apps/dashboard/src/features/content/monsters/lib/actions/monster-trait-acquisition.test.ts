@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { CREATURE_TRAIT_VOCABULARY_ENTRIES, CREATURE_TRAIT_VOCABULARY_IDS } from '@rpg/contracts'
+import {
+  CREATURE_TRAIT_VOCABULARY_ENTRIES,
+  CREATURE_TRAIT_VOCABULARY_IDS,
+  getCreatureTraitSearchTerms,
+} from '@rpg/contracts'
 
 import {
   MONSTER_TRAIT_ACQUISITION_GROUPS,
@@ -52,5 +56,20 @@ describe('monsterTraitAcquisitionItems', () => {
       presetId: 'flyby',
     })
     expect(parseMonsterTraitAcquisitionId('custom')).toEqual({ type: 'custom' })
+  })
+
+  it('indexes curated search terms instead of add-menu descriptions', () => {
+    const flyby = items.find((item) => item.id === 'preset:flyby')
+    expect(flyby).toMatchObject({
+      searchMetadata: false,
+      searchTerms: expect.arrayContaining([
+        expect.objectContaining({ text: 'flying', role: 'keyword' }),
+      ]),
+    })
+    const freeze = items.find((item) => item.id === 'preset:freeze')
+    expect(freeze?.searchTerms).toEqual(
+      expect.arrayContaining([expect.objectContaining({ text: 'cold', role: 'keyword' })]),
+    )
+    expect(getCreatureTraitSearchTerms('flyby')).toContain('flying')
   })
 })

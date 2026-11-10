@@ -2,9 +2,13 @@ import {
   CREATURE_TRAIT_GROUPS,
   CREATURE_TRAIT_VOCABULARY_IDS,
   getCreatureTraitGroupEntry,
+  getCreatureTraitSearchTerms,
   getCreatureTraitVocabularyEntry,
   type CreatureTraitVocabularyId,
 } from '@rpg/contracts'
+import type { WeightedSearchField } from '@rpg/ui'
+
+import { mapVocabularySearchTermsToWeightedFields } from '../../../lib/vocabulary-button-dropdown-search.lib'
 
 import { MONSTER_ACTION_ALREADY_ADDED_NOTE } from './monster-action-acquisition'
 
@@ -24,6 +28,8 @@ export type MonsterTraitAcquisitionItem = {
   label: string
   groupId: MonsterTraitAcquisitionGroupId
   metadata?: string
+  searchMetadata?: boolean
+  searchTerms?: WeightedSearchField[]
   note?: string
 }
 
@@ -59,11 +65,16 @@ export function monsterTraitAcquisitionItems(input: {
   const presets = CREATURE_TRAIT_VOCABULARY_IDS.map((presetId) => {
     const entry = getCreatureTraitVocabularyEntry(presetId)
     const existingId = existingByPreset.get(presetId)
+    const searchTerms = mapVocabularySearchTermsToWeightedFields(
+      getCreatureTraitSearchTerms(presetId),
+    )
     return {
       presetId,
       label: entry?.label ?? presetId,
       groupId: entry?.group ?? 'combat',
       metadata: entry?.description,
+      searchMetadata: false as const,
+      searchTerms,
       existingId,
     }
   }).sort((left, right) => left.label.localeCompare(right.label))
@@ -74,6 +85,8 @@ export function monsterTraitAcquisitionItems(input: {
       label: preset.label,
       groupId: preset.groupId,
       metadata: preset.metadata,
+      searchMetadata: preset.searchMetadata,
+      searchTerms: preset.searchTerms,
       note: preset.existingId ? MONSTER_ACTION_ALREADY_ADDED_NOTE : undefined,
     })),
     {

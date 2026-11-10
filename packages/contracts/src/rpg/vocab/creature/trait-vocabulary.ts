@@ -1,9 +1,12 @@
 import { keysFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 
+import { CREATURE_TRAIT_SEARCH_TERMS } from './trait-vocabulary-search-terms'
+
 /**
  * Identity and discovery copy for reusable creature traits.
  * Descriptions are add-menu summaries. Stat-block sentences live on the preset.
+ * Curated picker keywords live in `trait-vocabulary-search-terms.ts`.
  */
 export const CREATURE_TRAIT_VOCABULARY_TERM = {
   label: 'Creature trait',
@@ -52,6 +55,7 @@ export const CREATURE_TRAIT_GROUPS = keysFromEntries(CREATURE_TRAIT_GROUP_ENTRIE
 
 export type CreatureTraitVocabularyEntry = GameTermEntry & {
   readonly group: CreatureTraitGroup
+  readonly searchTerms?: readonly string[]
 }
 
 export const CREATURE_TRAIT_VOCABULARY_ENTRIES = {
@@ -394,4 +398,10 @@ export function getCreatureTraitVocabularyEntry(
 
 export function getCreatureTraitGroupEntry(id: string): GameTermEntry | undefined {
   return CREATURE_TRAIT_GROUP_ENTRIES[id as CreatureTraitGroup]
+}
+
+export function getCreatureTraitSearchTerms(id: string): readonly string[] {
+  const fromEntry = getCreatureTraitVocabularyEntry(id)?.searchTerms
+  if (fromEntry?.length) return fromEntry
+  return CREATURE_TRAIT_SEARCH_TERMS[id] ?? []
 }

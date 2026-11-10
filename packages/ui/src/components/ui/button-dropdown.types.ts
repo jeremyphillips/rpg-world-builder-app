@@ -9,6 +9,8 @@ export type ButtonDropdownItem = {
   id: string
   label: string
   metadata?: string
+  /** When false, metadata is shown but not indexed for search. Defaults to true. */
+  searchMetadata?: boolean
   groupId?: string
   searchTerms?: WeightedSearchField[]
   disabled?: boolean

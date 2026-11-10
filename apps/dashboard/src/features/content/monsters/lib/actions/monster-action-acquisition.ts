@@ -2,12 +2,16 @@ import {
   ACTION_PRESET_IDS,
   getActionPreset,
   getActionVocabularyEntry,
+  getActionVocabularySearchTerms,
   getDamageTypeLabel,
   getMonsterActionKindLabel,
   listSpecialMenuActionPresetIds,
   MONSTER_SPELLCASTING_ACTION_NAME,
   type ActionPresetId,
 } from '@rpg/contracts'
+import type { WeightedSearchField } from '@rpg/ui'
+
+import { mapVocabularySearchTermsToWeightedFields } from '../../../lib/vocabulary-button-dropdown-search.lib'
 
 import {
   conventionalSpellcastingSources,
@@ -40,8 +44,14 @@ export type MonsterActionAcquisitionItem = {
   label: string
   groupId: MonsterActionAcquisitionGroupId
   metadata?: string
+  searchMetadata?: boolean
+  searchTerms?: WeightedSearchField[]
   disabled?: boolean
   note?: string
+}
+
+function vocabularyBackedSearchTerms(vocabularyId: string): WeightedSearchField[] {
+  return mapVocabularySearchTermsToWeightedFields(getActionVocabularySearchTerms(vocabularyId))
 }
 
 export type MonsterActionAcquisitionChoice =
@@ -160,6 +170,8 @@ export function monsterActionAcquisitionItems(input: {
       label: vocabulary?.label ?? presetId,
       groupId: 'natural' as const,
       metadata: damageType ? getDamageTypeLabel(damageType) : undefined,
+      searchMetadata: false as const,
+      searchTerms: vocabularyBackedSearchTerms(preset.vocabularyId),
     }
   })
   const special = listSpecialMenuActionPresetIds()
@@ -176,6 +188,8 @@ export function monsterActionAcquisitionItems(input: {
         id: `preset:${presetId}`,
         label: vocabulary?.label ?? presetId,
         groupId: 'special' as const,
+        searchMetadata: false as const,
+        searchTerms: preset ? vocabularyBackedSearchTerms(preset.vocabularyId) : [],
         ...(presetId === 'multiattack'
           ? { metadata: MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION }
           : {}),
