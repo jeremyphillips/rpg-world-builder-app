@@ -26,6 +26,11 @@ export type RegistryEntry = {
   itemLabel?: string
   /** Explicit singular/plural noun phrases for generated validation copy. */
   noun?: FieldNoun
+  /**
+   * Label only this path. Slots and array containers set this so a nested issue
+   * does not inherit the parent name.
+   */
+  exactPath?: boolean
 }
 
 type RegistryKey = (name: string) => string

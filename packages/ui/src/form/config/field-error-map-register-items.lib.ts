@@ -32,6 +32,7 @@ function registerArrayItem(
     label: arrayLabel,
     category: 'array',
     itemLabel: arrayItemLabel(header, arrayLabel),
+    exactPath: true,
   })
   registerItems(registry, `${arrayKey}.*`, item.fields)
 }
@@ -45,6 +46,7 @@ function registerSlotItem(
   registry.set(slotKey, {
     label: item.label ?? item.name,
     category: 'text',
+    exactPath: true,
   })
 }
 

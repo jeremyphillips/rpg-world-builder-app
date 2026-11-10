@@ -235,6 +235,41 @@ describe('makeFieldErrorMap', () => {
     )
   })
 
+  it('does not let a slot or array container label a nested issue', () => {
+    const fields: FormItem[] = [
+      { kind: 'slot', name: 'actions', render: () => null },
+      {
+        kind: 'array',
+        name: 'actions',
+        label: 'Actions',
+        fields: [{ type: 'text', name: 'name', label: 'Name' }],
+      },
+    ]
+    const schema = z.object({
+      actions: z.array(
+        z.object({
+          name: z.string().min(1),
+          notes: z.string().min(1),
+        }),
+      ),
+    })
+
+    expect(
+      messageFor(
+        schema,
+        { actions: [{ name: '', notes: '' }] },
+        { fields, path: ['actions', 0, 'name'] },
+      ),
+    ).toBe('Name is required.')
+    expect(
+      messageFor(
+        schema,
+        { actions: [{ name: 'Bite', notes: '' }] },
+        { fields, path: ['actions', 0, 'notes'] },
+      ),
+    ).toBe('Required.')
+  })
+
   it('formats unregistered paths with unlabeled catalog copy', () => {
     const schema = z.object({ unknownField: z.string().min(1) })
 

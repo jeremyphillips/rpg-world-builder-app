@@ -51,6 +51,7 @@ import {
   monsterActionSchema,
   monsterReactionDraftSchema,
   monsterReactionSchema,
+  monsterRichTextIsEmpty,
   refineMonsterActionShape,
   refineMonsterSpellEntries,
 } from './monster/action'
@@ -94,10 +95,17 @@ const monsterTraitAvailabilityFields = {
   ...entryProvenanceField,
 }
 
-const monsterCustomTraitSchema = customContentTraitSchema.extend({
-  description: z.string().min(1),
-  ...monsterTraitAvailabilityFields,
-})
+const monsterCustomTraitSchema = customContentTraitSchema
+  .extend({
+    name: z.string('Name is required.').min(1),
+    description: z.string("Enter the trait's description.").min(1),
+    ...monsterTraitAvailabilityFields,
+  })
+  .superRefine((trait, ctx) => {
+    if (monsterRichTextIsEmpty(trait.description)) {
+      addCustomRefinementIssue(ctx, "Enter the trait's description.", ['description'])
+    }
+  })
 
 const monsterTemplateTraitSchema = templateContentTraitSchema.extend(monsterTraitAvailabilityFields)
 
@@ -115,8 +123,68 @@ const monsterAuthoredTraitSchema = z
   )
   .superRefine(refineMonsterTemplateTrait)
 
-/** Preset rows stay a separate member so a `preset` id is not read as a custom trait. */
-export const monsterTraitSchema = z.union([monsterPresetTraitSchema, monsterAuthoredTraitSchema])
+const monsterTraitUnion = z.union([monsterPresetTraitSchema, monsterAuthoredTraitSchema])
+
+type TraitUnionIssue = {
+  code: string
+  path: PropertyKey[]
+  message: string
+  errors?: TraitUnionIssue[][]
+}
+
+function traitIssuePath(issue: TraitUnionIssue): PropertyKey[] {
+  return Array.isArray(issue.path) ? issue.path : []
+}
+
+function traitIssuePenalty(issue: TraitUnionIssue): number {
+  const key = traitIssuePath(issue)[0]
+  if ((key === 'preset' || key === 'kind') && issue.code === 'invalid_value') return 10
+  if (issue.code === 'invalid_union' && issue.errors?.length) {
+    return Math.min(...issue.errors.map(traitBranchPenalty))
+  }
+  return 1
+}
+
+function traitBranchPenalty(branch: TraitUnionIssue[]): number {
+  return branch.reduce((sum, issue) => sum + traitIssuePenalty(issue), 0)
+}
+
+/** Keeps the closest variant's leaf issues instead of one collapsed union error. */
+function flattenTraitIssues(
+  issues: TraitUnionIssue[],
+  prefix: PropertyKey[] = [],
+): TraitUnionIssue[] {
+  const flattened: TraitUnionIssue[] = []
+  for (const issue of issues) {
+    if (issue.code === 'invalid_union' && issue.errors?.length) {
+      const best = [...issue.errors].sort(
+        (left, right) => traitBranchPenalty(left) - traitBranchPenalty(right),
+      )[0]
+      flattened.push(...flattenTraitIssues(best ?? [], [...prefix, ...traitIssuePath(issue)]))
+      continue
+    }
+    flattened.push({ ...issue, path: [...prefix, ...traitIssuePath(issue)] })
+  }
+  return flattened
+}
+
+/**
+ * Preset rows stay a separate member so a `preset` id is not read as a custom trait.
+ * Union failures keep the closest variant's field errors. The schema stays a union
+ * so catalog JSON Schema generation can describe it.
+ */
+export const monsterTraitSchema = monsterTraitUnion
+
+const traitUnionRun = monsterTraitSchema._zod.run.bind(monsterTraitSchema._zod)
+monsterTraitSchema._zod.run = (payload, ctx) => {
+  const result = traitUnionRun(payload, ctx)
+  const apply = (next: typeof payload) => {
+    if (next.issues.length === 0) return next
+    next.issues = flattenTraitIssues(next.issues as TraitUnionIssue[]) as typeof next.issues
+    return next
+  }
+  return result instanceof Promise ? result.then(apply) : apply(result)
+}
 
 const monsterAuthoredTraitDraftSchema = z
   .preprocess(

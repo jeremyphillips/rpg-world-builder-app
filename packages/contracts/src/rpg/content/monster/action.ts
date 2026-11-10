@@ -10,7 +10,13 @@ import { spellComponentIdSchema } from '../../vocab/spell/components'
 import { reachFeetSchema } from '../../vocab/attack/melee-reach'
 import { weaponModeSchema } from '../../vocab/weapon'
 import { entryProvenanceField } from '../../primitives/provenance'
-import { effectResolutionSchema } from '../lib/resolution/schema'
+import {
+  effectResolutionFieldShape,
+  effectResolutionMethodSchema,
+  effectResolutionSchema,
+  validateEffectResolution,
+} from '../lib/resolution/schema'
+import { RESOLUTION_SELECTION_MODES } from '../../vocab/resolution'
 import { getActionPreset } from '../action/action-presets'
 import { monsterActionAuthoring } from './monster-action-authoring'
 import { naturalAttackFormSchema } from '../../vocab/action/natural-attack-form'
@@ -64,8 +70,20 @@ function multiattackStepsSchema<M extends MonsterActionMode>(mode: M) {
     : typeof published
 }
 
+const monsterSaveSelectionMessage =
+  'Saving throw actions select an area from self or creatures in reach or at a distance.'
+
+const monsterSaveResolutionSchema = z
+  .object({
+    ...effectResolutionFieldShape,
+    selectionMode: z.enum(RESOLUTION_SELECTION_MODES, monsterSaveSelectionMessage),
+    method: effectResolutionMethodSchema,
+  })
+  .strict()
+  .superRefine(validateEffectResolution)
+
 function saveResolutionSchema<M extends MonsterActionMode>(mode: M) {
-  const published = effectResolutionSchema
+  const published = monsterSaveResolutionSchema
   const draft = effectResolutionSchema.optional()
   return (mode === 'draft' ? draft : published) as M extends 'draft'
     ? typeof draft
@@ -162,7 +180,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       ...identity,
       kind: z.literal('special'),
       name: strict(z.string().min(1), mode),
-      description: strict(z.string().min(1), mode),
+      description: strict(z.string("Enter the action's rules text.").min(1), mode),
     }),
     z.object({
       ...identity,
@@ -417,6 +435,17 @@ function refineAuthoredAttackShape(
 
 const MONSTER_SAVE_OUTCOME_RESULTS = new Set(['failed-save', 'successful-save'])
 
+/** Rich-text shells such as `<p></p>` are not authored rules text. */
+export function monsterRichTextIsEmpty(value: string): boolean {
+  return (
+    value
+      .replace(/<br\s*\/?>/gi, '')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/gi, ' ')
+      .trim().length === 0
+  )
+}
+
 function refineMonsterSaveResolution(
   action: Extract<MonsterAction | MonsterReaction, { kind: 'save' }>,
   ctx: z.RefinementCtx,
@@ -476,7 +505,14 @@ export function refineMonsterActionShape(
     addCustomRefinementIssue(ctx, 'Unknown action preset.', [...path, 'preset'])
   }
   if (monsterActionAuthoring(action).name === 'authored' && !action.name?.trim()) {
-    addCustomRefinementIssue(ctx, 'This action requires a name.', [...path, 'name'])
+    addCustomRefinementIssue(ctx, 'Name is required.', [...path, 'name'])
+  }
+  if (
+    action.kind === 'special' &&
+    typeof action.description === 'string' &&
+    monsterRichTextIsEmpty(action.description)
+  ) {
+    addCustomRefinementIssue(ctx, "Enter the action's rules text.", [...path, 'description'])
   }
   if (action.kind === 'natural-weapon') refineNaturalWeaponShape(action, ctx, path)
   if (action.kind === 'attack') refineAuthoredAttackShape(action, ctx, path)

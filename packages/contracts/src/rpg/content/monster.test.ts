@@ -59,9 +59,9 @@ describe('monsterActionSchema', () => {
       actions: [natural],
     })
     expect(published.success).toBe(false)
-    expect(
-      published.error?.issues.some((issue) => issue.message === 'This action requires a name.'),
-    ).toBe(true)
+    expect(published.error?.issues.some((issue) => issue.message === 'Name is required.')).toBe(
+      true,
+    )
     expect(
       createMonsterInputSchema.safeParse({
         ...publishedMonsterBase,

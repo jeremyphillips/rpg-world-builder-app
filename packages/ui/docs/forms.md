@@ -101,7 +101,9 @@ editors that render via `FormItems` + `namePrefix` must also supply matching
 `resolverFields` on the tab — same `FormItem` shapes with **full** RHF paths
 (`heritage.name`, `traits`, `characterCreation.levelLimits.classLevelCaps`, …).
 These configs are **not rendered**; they exist solely so tier-1 validation copy uses
-field labels instead of Zod defaults.
+field labels instead of Zod defaults. A `kind: 'slot'` or array container labels
+only its own path. A nested issue uses a registered descendant, or the unlabeled
+catalog (`Required.` / `Add at least one item.`) when nothing is registered.
 
 Pair `resolverFields` with `errorPaths` on header-only tabs: `errorPaths` drives tab
 badges and the footer summary; `resolverFields` drives inline message copy.

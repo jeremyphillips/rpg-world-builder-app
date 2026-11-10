@@ -22,8 +22,8 @@ import { MONSTER_ADD_LABEL, MONSTER_TRAITS_HEADING } from '../../lib/monster-for
 import {
   MONSTER_TRAIT_ITEM_NOUN,
   monsterTraitDetailFields,
-  monsterTraitItemFields,
 } from '../../lib/monster-trait-form-fields'
+import { monsterTraitResolverFields } from '../../lib/monster-validation-resolver-fields'
 import {
   monsterTraitListTitle,
   resolveMonsterTraitHeaderIdentity,
@@ -34,7 +34,7 @@ import type { MonsterFormValues } from '../../lib/monster-form-values'
 const TEMPLATE_GROUP_ID = 'templates'
 
 export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
-  const customFields = useMemo(() => monsterTraitItemFields(), [])
+  const traitItemFields = useMemo(() => monsterTraitResolverFields(ctx), [ctx])
   const makeItemDefaults = useCallback(
     () => ({ id: createMonsterRowId(), kind: 'custom' as const, name: '', description: '' }),
     [],
@@ -84,7 +84,7 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
       editor={editor}
       formCtx={ctx}
       fieldName="traits"
-      itemFields={customFields}
+      itemFields={traitItemFields}
       resolveItemFields={resolveItemFields}
       itemNoun={MONSTER_TRAIT_ITEM_NOUN}
       listTitle={MONSTER_TRAITS_HEADING}

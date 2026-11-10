@@ -27,6 +27,14 @@ import { monsterArmorClassFields } from './statistics/monster-armor-class-fields
 import { monsterHitPointsFields } from './statistics/monster-hit-points-form-fields'
 import { MONSTER_CHALLENGE_HEADING, monsterEquipmentSectionLabel } from './monster-form-labels'
 import { MONSTER_FORM_TAB } from './monster-form-view'
+import {
+  monsterActionResolverFields,
+  monsterTraitResolverFields,
+} from './monster-validation-resolver-fields'
+import {
+  embeddedArrayResolverField,
+  embeddedMasterDetailTabValidation,
+} from '../../lib/forms/validation/tabbed-form-resolver-fields'
 
 const alignmentOptions = toOptions(
   Object.keys(ALIGNMENT_ENTRIES),
@@ -127,12 +135,39 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     ownedSlot('reactions'),
   ]
 
+  const actionItemFields = monsterActionResolverFields(ctx)
+  const actionValidation = embeddedMasterDetailTabValidation({
+    path: 'actions',
+    legend: 'Actions',
+    fields: actionItemFields,
+  })
+
   return [
     { id: MONSTER_FORM_TAB.identity, label: 'Identity', fields: identity },
     { id: MONSTER_FORM_TAB.statistics, label: 'Statistics', fields: statistics },
     { id: MONSTER_FORM_TAB.creatureDetails, label: 'Creature Details', fields: creatureDetails },
     { id: MONSTER_FORM_TAB.equipment, label: monsterEquipmentSectionLabel(), fields: equipment },
-    { id: MONSTER_FORM_TAB.traits, label: 'Traits', fields: traits },
-    { id: MONSTER_FORM_TAB.actions, label: 'Actions', fields: actions },
+    {
+      id: MONSTER_FORM_TAB.traits,
+      label: 'Traits',
+      fields: traits,
+      ...embeddedMasterDetailTabValidation({
+        path: 'traits',
+        legend: 'Traits',
+        fields: monsterTraitResolverFields(ctx),
+      }),
+    },
+    {
+      id: MONSTER_FORM_TAB.actions,
+      label: 'Actions',
+      fields: actions,
+      ...actionValidation,
+      errorPaths: ['actions', 'bonusActions', 'reactions'],
+      resolverFields: [
+        ...actionValidation.resolverFields,
+        embeddedArrayResolverField('bonusActions', 'Bonus actions', actionItemFields),
+        embeddedArrayResolverField('reactions', 'Reactions', actionItemFields),
+      ],
+    },
   ].map(withContentFormTabIcon)
 }

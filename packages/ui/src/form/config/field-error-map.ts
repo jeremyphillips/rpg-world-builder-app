@@ -62,7 +62,9 @@ function lookupEntry(
 
   for (let length = segments.length; length > 0; length--) {
     const entry = registry.get(segments.slice(0, length).join('.'))
-    if (entry) return entry
+    if (!entry) continue
+    if (entry.exactPath && length !== segments.length) continue
+    return entry
   }
 
   return undefined

@@ -1,3 +1,4 @@
+import { normalizeRichTextHtml } from '@rpg/ui'
 import {
   protectionFromArmorClass,
   creatureWeaponProficienciesSchema,
@@ -86,6 +87,45 @@ function applySaveOutcomeDraft(cleaned: Record<string, unknown>): void {
   resolution.outcomes = normalizeMonsterSaveOutcomes(resolution.outcomes)
 }
 
+const RICH_TEXT_KEYS = ['description', 'descriptionOverride'] as const
+
+function applyRichTextFields(record: Record<string, unknown>): void {
+  for (const key of RICH_TEXT_KEYS) {
+    const value = record[key]
+    if (typeof value !== 'string') continue
+    const normalized = normalizeRichTextHtml(value)
+    if (normalized.length > 0) record[key] = normalized
+    else delete record[key]
+  }
+}
+
+function onHitRowHasInput(row: unknown): boolean {
+  if (!isRecord(row)) return false
+  if (row.damageType !== undefined) return true
+  const roll = row.roll
+  if (!isRecord(roll)) return false
+  if (typeof roll.flat === 'number') return true
+  const dice = roll.dice
+  if (!isRecord(dice)) return false
+  return typeof dice.count === 'number' || typeof dice.faces === 'number'
+}
+
+/** Drops a mount-only on-hit list. A row with any damage input stays. */
+function omitEmptyOnHit(cleaned: Record<string, unknown>): void {
+  if (!isRecord(cleaned.onHit)) return
+  const rows = cleaned.onHit.additionalDamage
+  if (!Array.isArray(rows)) {
+    delete cleaned.onHit
+    return
+  }
+  const authored = rows.filter(onHitRowHasInput)
+  if (authored.length === 0) {
+    delete cleaned.onHit
+    return
+  }
+  cleaned.onHit.additionalDamage = authored
+}
+
 function applyLimitedUseDraft(cleaned: Record<string, unknown>): void {
   if (!('limitedUse' in cleaned)) return
   const limitedUse = normalizeLimitedUse(cleaned.limitedUse)
@@ -114,6 +154,8 @@ function normalizeAction(
   if (!isRecord(action)) return action
   const cleaned = omitEmptyStrings(action)
   if (!isRecord(cleaned)) return cleaned
+  applyRichTextFields(cleaned)
+  omitEmptyOnHit(cleaned)
   applyReactionTriggerDraft(cleaned, section)
   applyLimitedUseDraft(cleaned)
   if (cleaned.kind === 'weapon' && isRecord(cleaned.damage)) {
@@ -213,6 +255,15 @@ function normalizeCommunication(
   return {}
 }
 
+function normalizeTraitRichText(value: unknown): unknown {
+  if (!Array.isArray(value)) return value
+  return value.map((trait) => {
+    if (!isRecord(trait)) return trait
+    applyRichTextFields(trait)
+    return trait
+  })
+}
+
 /**
  * Single serializer for monster preview and save.
  * Inactive AC, HP, and action-kind fields are dropped. Empty strings are absent.
@@ -243,7 +294,7 @@ export function normalizeMonsterFormValues(
     ),
     defenses: values.defenses,
     equipment: values.equipment,
-    traits: omitEmptyStrings(values.traits),
+    traits: normalizeTraitRichText(omitEmptyStrings(values.traits)),
     actions: (values.actions ?? []).map((action) => normalizeAction(action, 'actions')),
     bonusActions: (values.bonusActions ?? []).map((action) =>
       normalizeAction(action, 'bonusActions'),

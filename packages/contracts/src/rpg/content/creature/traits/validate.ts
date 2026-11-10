@@ -35,11 +35,12 @@ function issuesForTemplateTrait(
   const parsed = template.configSchema.safeParse(trait.config ?? {})
   if (parsed.success) return []
 
-  const detail = parsed.error.issues[0]?.message
+  const inner = parsed.error.issues[0]
+  if (!inner) return [{ path: [index, 'config'], message: INVALID_CONFIG_MESSAGE }]
   return [
     {
-      path: [index, 'config'],
-      message: detail ? `${INVALID_CONFIG_MESSAGE} ${detail}` : INVALID_CONFIG_MESSAGE,
+      path: [index, 'config', ...(inner.path as (string | number)[])],
+      message: inner.message,
     },
   ]
 }

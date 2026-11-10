@@ -50,6 +50,7 @@ import {
 } from '../../lib/monster-form-labels'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
+import { monsterActionResolverFields } from '../../lib/monster-validation-resolver-fields'
 import { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
 import { MonsterActionDetail } from './monster-action-detail'
 
@@ -141,9 +142,75 @@ function equippedWeaponRows(
   })
 }
 
+function sectionTitles(
+  values: MonsterFormValues,
+  ctx: ContentFormCtx,
+  section: MonsterActionSection,
+) {
+  return monsterActionEditorTitles((values[section] ?? []) as MonsterActionDraftRow[], values, ctx)
+}
+
+function weaponActionReferences(values: MonsterFormValues) {
+  return MONSTER_ACTION_SECTIONS.flatMap((actionSection) =>
+    ((values[actionSection] ?? []) as MonsterActionDraftRow[]).flatMap((action) =>
+      action.kind === 'weapon' && action.equipmentEntryId
+        ? [{ id: action.id, equipmentEntryId: action.equipmentEntryId }]
+        : [],
+    ),
+  )
+}
+
+function useMonsterActionDetailRows(
+  ctx: ContentFormCtx,
+  sections: ReturnType<typeof useMonsterActionSections>,
+  values: MonsterFormValues,
+) {
+  const actionItemFields = useMemo(() => monsterActionResolverFields(ctx), [ctx])
+  const actionTitles = sectionTitles(values, ctx, 'actions')
+  const bonusTitles = sectionTitles(values, ctx, 'bonusActions')
+  const reactionTitles = sectionTitles(values, ctx, 'reactions')
+  const shared = {
+    formCtx: ctx,
+    itemFields: actionItemFields,
+    itemNoun: MONSTER_ACTION_ITEM_NOUN,
+    access: { kind: 'availability' as const, fieldName: 'available' },
+  }
+  const actionRows = useEmbeddedMasterDetailRows({
+    ...shared,
+    fieldName: 'actions',
+    editor: sections.editors.actions,
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, actionTitles),
+  })
+  const bonusRows = useEmbeddedMasterDetailRows({
+    ...shared,
+    fieldName: 'bonusActions',
+    editor: sections.editors.bonusActions,
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, bonusTitles),
+  })
+  const reactionRows = useEmbeddedMasterDetailRows({
+    ...shared,
+    fieldName: 'reactions',
+    editor: sections.editors.reactions,
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, reactionTitles),
+  })
+  return {
+    titlesBySection: {
+      actions: actionTitles,
+      bonusActions: bonusTitles,
+      reactions: reactionTitles,
+    },
+    rowsBySection: {
+      actions: actionRows,
+      bonusActions: bonusRows,
+      reactions: reactionRows,
+    },
+    actionRows,
+  }
+}
+
 export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
   const sections = useMonsterActionSections(ctx.entityId)
-  const { getValues, formState } = useFormContext<MonsterFormValues>()
+  const { getValues } = useFormContext<MonsterFormValues>()
   const [weaponPickerSection, setWeaponPickerSection] = useState<MonsterActionSection | null>(null)
   const values = sections.values ?? getValues()
   const catalog = monsterEquipmentCatalog(ctx)
@@ -166,70 +233,17 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
 
   const weaponGrants = useMemo(() => resolveMonsterFormWeaponGrants(values), [values])
 
-  const actionTitles = monsterActionEditorTitles(
-    (values.actions ?? []) as MonsterActionDraftRow[],
-    values,
+  const { titlesBySection, rowsBySection, actionRows } = useMonsterActionDetailRows(
     ctx,
-  )
-  const bonusTitles = monsterActionEditorTitles(
-    (values.bonusActions ?? []) as MonsterActionDraftRow[],
+    sections,
     values,
-    ctx,
   )
-  const reactionTitles = monsterActionEditorTitles(
-    (values.reactions ?? []) as MonsterActionDraftRow[],
-    values,
-    ctx,
-  )
-  const titlesBySection = {
-    actions: actionTitles,
-    bonusActions: bonusTitles,
-    reactions: reactionTitles,
-  }
-  const actionRows = useEmbeddedMasterDetailRows({
-    formCtx: ctx,
-    fieldName: 'actions',
-    editor: sections.editors.actions,
-    itemFields: [],
-    itemNoun: MONSTER_ACTION_ITEM_NOUN,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, actionTitles),
-    access: { kind: 'availability', fieldName: 'available' },
-    resolveRowIssueCount: (index) =>
-      formState.submitCount > 0 && sections.hasRowError('actions', index) ? 1 : 0,
-  })
-  const bonusRows = useEmbeddedMasterDetailRows({
-    formCtx: ctx,
-    fieldName: 'bonusActions',
-    editor: sections.editors.bonusActions,
-    itemFields: [],
-    itemNoun: MONSTER_ACTION_ITEM_NOUN,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, bonusTitles),
-    access: { kind: 'availability', fieldName: 'available' },
-    resolveRowIssueCount: (index) =>
-      formState.submitCount > 0 && sections.hasRowError('bonusActions', index) ? 1 : 0,
-  })
-  const reactionRows = useEmbeddedMasterDetailRows({
-    formCtx: ctx,
-    fieldName: 'reactions',
-    editor: sections.editors.reactions,
-    itemFields: [],
-    itemNoun: MONSTER_ACTION_ITEM_NOUN,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, reactionTitles),
-    access: { kind: 'availability', fieldName: 'available' },
-    resolveRowIssueCount: (index) =>
-      formState.submitCount > 0 && sections.hasRowError('reactions', index) ? 1 : 0,
-  })
-  const rowsBySection = {
-    actions: actionRows,
-    bonusActions: bonusRows,
-    reactions: reactionRows,
-  }
   const availabilityItems = useMemo(
     () =>
-      [...actionRows.allRows, ...bonusRows.allRows, ...reactionRows.allRows].map(
-        (row) => row.availability,
+      MONSTER_ACTION_SECTIONS.flatMap((section) =>
+        rowsBySection[section].allRows.map((row) => row.availability),
       ),
-    [actionRows.allRows, bonusRows.allRows, reactionRows.allRows],
+    [rowsBySection],
   )
   const collection = useMasterDetailCollectionAvailability({
     items: availabilityItems,
@@ -280,13 +294,7 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
               <MonsterActionAddMenu
                 section={section}
                 weapons={weapons}
-                weaponActions={MONSTER_ACTION_SECTIONS.flatMap((actionSection) =>
-                  ((values[actionSection] ?? []) as MonsterActionDraftRow[]).flatMap((action) =>
-                    action.kind === 'weapon' && action.equipmentEntryId
-                      ? [{ id: action.id, equipmentEntryId: action.equipmentEntryId }]
-                      : [],
-                  ),
-                )}
+                weaponActions={weaponActionReferences(values)}
                 allowAddWeapon={allowAddWeapon}
                 onSelect={(target, choice) => {
                   if (choice.type === 'add-weapon') {

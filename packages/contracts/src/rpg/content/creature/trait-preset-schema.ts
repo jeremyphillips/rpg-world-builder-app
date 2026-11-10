@@ -31,13 +31,28 @@ const fixedPresetSchema = z.object({
   ...entryProvenanceField,
 })
 
-const usesField = z.number().int().min(1).max(12)
-const radiusField = z.number().int().min(5).max(120)
-const literalDcField = z.number().int().min(1).max(30)
+function rangedNumber(label: string, min: number, max: number) {
+  return z
+    .number({
+      error: () => `${label} is required.`,
+    })
+    .int()
+    .min(min, `${label} must be at least ${min}.`)
+    .max(max, `${label} cannot exceed ${max}.`)
+}
+
+const usesField = rangedNumber('Uses', 1, 12)
+const brightRadiusField = rangedNumber('Bright radius', 5, 120)
+const emanationRadiusField = rangedNumber('Emanation radius', 5, 120)
+const insightDcField = rangedNumber('Insight DC', 1, 30)
+const stenchDcField = rangedNumber('Save DC', 1, 30)
 const attackScopeField = z.enum(['any', 'melee'])
 const etherealDirectionField = z.enum(['material-to-ethereal', 'both'])
-const mimicrySoundsField = z.enum(['animal-and-humanoid', 'simple-heard'])
-const airFormSpaceField = z.enum(['creature', 'enemy'])
+const mimicrySoundsField = z.enum(
+  ['animal-and-humanoid', 'simple-heard'],
+  'Choose which sounds it can mimic.',
+)
+const airFormSpaceField = z.enum(['creature', 'enemy'], 'Choose a space.')
 const elementalPlaneField = z.enum(['air', 'fire'])
 const longJumpField = z.number().int().min(5).max(60)
 const hitPointsField = z.number().int().min(1).max(30)
@@ -117,7 +132,7 @@ const holdBreathSchema = z
 const illuminationSchema = z.object({
   ...idField,
   preset: z.literal('illumination'),
-  radius: radiusField,
+  radius: brightRadiusField,
   ...entryProvenanceField,
 })
 
@@ -162,7 +177,7 @@ const mimicrySchema = z.object({
   ...idField,
   preset: z.literal('mimicry'),
   sounds: mimicrySoundsField,
-  insightDc: literalDcField,
+  insightDc: insightDcField,
   ...entryProvenanceField,
 })
 
@@ -190,8 +205,8 @@ const elementalRestorationSchema = z.object({
 const stenchSchema = z.object({
   ...idField,
   preset: z.literal('stench'),
-  dc: literalDcField,
-  radius: radiusField,
+  dc: stenchDcField,
+  radius: emanationRadiusField,
   successImmunity: z.boolean(),
   ...entryProvenanceField,
 })
@@ -269,7 +284,7 @@ const holdBreathDraftSchema = z.object({
 const illuminationDraftSchema = z.object({
   ...idField,
   preset: z.literal('illumination'),
-  radius: radiusField.optional(),
+  radius: brightRadiusField.optional(),
   ...entryProvenanceField,
 })
 

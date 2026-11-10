@@ -192,6 +192,7 @@ function waveTwoTraitFields(preset: string): FormItem[] {
           type: 'select',
           name: 'space',
           label: 'Can enter',
+          noun: { singular: 'space' },
           required: true,
           defaultValue: 'creature',
           options: [
