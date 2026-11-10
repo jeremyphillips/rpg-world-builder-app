@@ -40,10 +40,7 @@ import {
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterFormAdvisory } from '../monster-form-advisories'
-import {
-  insertMonsterFormAdvisorySlot,
-  monsterFormAdvisorySlot,
-} from '../monster-form-advisory-presentation'
+import { monsterFormAdvisorySlot } from '../monster-form-advisory-presentation'
 import { MonsterActionCastingAbilityField } from './monster-action-casting-fields'
 import { MonsterActionRechargeField } from './monster-action-recharge-field'
 import {
@@ -313,6 +310,7 @@ function monsterActionSaveSelectionDependent(): FormItem {
 }
 
 function monsterActionSaveSection(
+  ctx: ContentFormCtx,
   namePrefix: string,
   sharedCastingOptions: { value: string; label: string }[],
 ): FormItem {
@@ -336,6 +334,7 @@ function monsterActionSaveSection(
       },
       monsterActionSaveDcDependent(namePrefix, sharedCastingOptions),
       monsterActionSaveSelectionDependent(),
+      monsterSaveResolutionDamageGroup(ctx),
       {
         kind: 'slot',
         name: '_saveFailureNote',
@@ -427,62 +426,99 @@ function monsterActionUsageEditor(action: MonsterActionDraftRow, namePrefix: str
   return monsterActionLimitedUseFields()
 }
 
-// fallow-ignore-next-line complexity
-export function monsterActionDetailFields(input: {
+function monsterActionEquipmentField(
+  equipmentOptions: { value: string; label: string }[],
+): FormItem {
+  return {
+    type: 'select',
+    width: '1/2',
+    name: 'equipmentEntryId',
+    label: getContentTypeTerm('equipment').label,
+    placeholder: 'Select',
+    options: equipmentOptions,
+    presentation: { change: { label: 'Change weapon' } },
+  }
+}
+
+function monsterActionSpellMechanics(input: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  namePrefix: string
+  sharedCastingOptions: { value: string; label: string }[]
+  onCastingSourceBlocked?: (message: string) => void
+}): FormItem[] {
+  return [
+    {
+      kind: 'slot',
+      name: 'castingAbility',
+      render: () => (
+        <MonsterActionCastingAbilityField
+          name={`${input.namePrefix}.castingAbility`}
+          sharedOptions={input.sharedCastingOptions}
+          labelPosition="settings"
+          sourceActionId={input.action.id}
+          onBlocked={input.onCastingSourceBlocked}
+        />
+      ),
+    },
+    {
+      kind: 'array',
+      name: 'spells',
+      label: getContentTypeTerm('spells').label,
+      addAction: { label: 'Add spell' },
+      item: { header: { fallback: (index) => `Spell ${index + 1}` } },
+      fields: [
+        {
+          type: 'select',
+          name: 'spellId',
+          label: getContentTypeTerm('spells').label,
+          placeholder: 'Choose',
+          options: spellOptions(input.ctx),
+        },
+        { type: 'number', name: 'castAtLevel', label: 'Cast at level', min: 0, max: 9 },
+        ...monsterActionLimitedUseFields(),
+      ],
+    },
+    spellComponentField(),
+    ...monsterActionLimitedUseFields(),
+  ]
+}
+
+/** Trigger, usage, configuration, primary damage, then secondary effects. */
+function monsterActionMechanicFields(input: {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
   section: MonsterActionSection
   namePrefix: string
-  equipmentOptions: { value: string; label: string }[]
-  equipment?: MonsterFormValues['equipment']
   sharedCastingOptions: { value: string; label: string }[]
-  attackOptions?: { value: string; label: string }[]
+  attackOptions: { value: string; label: string }[]
+  equipment: MonsterFormValues['equipment']
   onCastingSourceBlocked?: (message: string) => void
-  /** Already collected for this form. The advisory slot only filters this list. */
-  advisories?: readonly MonsterFormAdvisory[]
 }): FormItem[] {
-  const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions } = input
-  const equipment = input.equipment ?? []
-  const attackOptions = input.attackOptions ?? []
-  const fields: FormItem[] = []
-  if (action.kind !== 'spell') fields.push(monsterActionDescriptionField(action))
-
-  if (action.kind === 'save') {
-    fields.push(monsterSaveResolutionDamageGroup(ctx))
+  const { ctx, action, section, namePrefix, sharedCastingOptions } = input
+  const trigger =
+    section === 'reactions' && action.kind !== 'multiattack'
+      ? [monsterReactionConditionField(action)]
+      : []
+  if (action.kind === 'spell') {
+    return [...trigger, ...monsterActionSpellMechanics(input)]
   }
 
-  if (section === 'reactions' && action.kind !== 'spell') {
-    fields.push(monsterReactionConditionField(action))
-  }
-
-  if (action.kind !== 'spell') {
-    fields.push(...monsterActionUsageEditor(action, namePrefix))
-  }
-
+  const usage = monsterActionUsageEditor(action, namePrefix)
+  const kindFields: FormItem[] = []
   if (action.kind === 'weapon') {
-    fields.push({
-      type: 'select',
-      width: '1/2',
-      name: 'equipmentEntryId',
-      label: getContentTypeTerm('equipment').label,
-      placeholder: 'Select',
-      options: equipmentOptions,
-      presentation: { change: { label: 'Change weapon' } },
-    })
-    fields.push(monsterActionAttackPreviewSlot(ctx, action))
-    fields.push(
+    kindFields.push(
       monsterWeaponDamageOverrideField({
         ctx,
-        equipment,
+        equipment: input.equipment,
         equipmentEntryId: action.equipmentEntryId,
         damage: action.damage,
       }),
+      monsterActionOnHitFields(ctx),
     )
-    fields.push(monsterActionOnHitFields(ctx))
   }
-
   if (action.kind === 'natural-weapon') {
-    fields.push(
+    kindFields.push(
       damageFieldGroup({
         ctx,
         damageTypeName: 'damageType',
@@ -497,9 +533,8 @@ export function monsterActionDetailFields(input: {
       monsterActionOnHitFields(ctx),
     )
   }
-
   if (action.kind === 'attack') {
-    fields.push(
+    kindFields.push(
       monsterActionBonusSourceDependent(namePrefix, sharedCastingOptions),
       {
         type: 'chips',
@@ -516,13 +551,11 @@ export function monsterActionDetailFields(input: {
       monsterActionOnHitFields(ctx),
     )
   }
-
   if (action.kind === 'save') {
-    fields.push(monsterActionSaveSection(namePrefix, sharedCastingOptions))
+    kindFields.push(monsterActionSaveSection(ctx, namePrefix, sharedCastingOptions))
   }
-
   if (action.kind === 'multiattack') {
-    fields.push({
+    kindFields.push({
       kind: 'array',
       name: 'steps',
       label: 'Steps',
@@ -534,58 +567,55 @@ export function monsterActionDetailFields(input: {
           type: 'chips',
           name: 'actionIds',
           label: 'Attacks',
-          options: attackOptions,
+          options: input.attackOptions,
         },
       ],
     })
   }
+  return [...trigger, ...usage, ...kindFields]
+}
 
-  if (action.kind === 'spell') {
-    fields.push(
-      {
-        kind: 'slot',
-        name: 'castingAbility',
-        render: () => (
-          <MonsterActionCastingAbilityField
-            name={`${namePrefix}.castingAbility`}
-            sharedOptions={sharedCastingOptions}
-            labelPosition="settings"
-            sourceActionId={action.id}
-            onBlocked={input.onCastingSourceBlocked}
-          />
-        ),
-      },
-      ...(section === 'reactions' ? [monsterReactionConditionField(action)] : []),
-      {
-        kind: 'array',
-        name: 'spells',
-        label: getContentTypeTerm('spells').label,
-        addAction: { label: 'Add spell' },
-        item: { header: { fallback: (index) => `Spell ${index + 1}` } },
-        fields: [
-          {
-            type: 'select',
-            name: 'spellId',
-            label: getContentTypeTerm('spells').label,
-            placeholder: 'Choose',
-            options: spellOptions(ctx),
-          },
-          { type: 'number', name: 'castAtLevel', label: 'Cast at level', min: 0, max: 9 },
-          ...monsterActionLimitedUseFields(),
-        ],
-      },
-      monsterActionDescriptionField(action),
-      spellComponentField(),
-      ...monsterActionLimitedUseFields(),
-    )
-  }
-
-  if (action.kind === 'natural-weapon' || action.kind === 'attack') {
-    fields.unshift(monsterActionAttackPreviewSlot(ctx, action))
-  }
-
-  return insertMonsterFormAdvisorySlot(
-    fields,
+/**
+ * Detail body order: source, preview, advisory, primary prose, mechanics, supplemental prose.
+ * Identity stays on the master-detail header.
+ */
+export function monsterActionDetailFields(input: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  namePrefix: string
+  equipmentOptions: { value: string; label: string }[]
+  equipment?: MonsterFormValues['equipment']
+  sharedCastingOptions: { value: string; label: string }[]
+  attackOptions?: { value: string; label: string }[]
+  onCastingSourceBlocked?: (message: string) => void
+  /** Already collected for this form. The advisory slot only filters this list. */
+  advisories?: readonly MonsterFormAdvisory[]
+}): FormItem[] {
+  const { ctx, action, section, namePrefix } = input
+  const source =
+    action.kind === 'weapon' ? [monsterActionEquipmentField(input.equipmentOptions)] : []
+  const preview =
+    action.kind === 'weapon' || action.kind === 'natural-weapon' || action.kind === 'attack'
+      ? [monsterActionAttackPreviewSlot(ctx, action)]
+      : []
+  const primaryProse = action.kind === 'special' ? [monsterActionDescriptionField(action)] : []
+  const supplemental = action.kind === 'special' ? [] : [monsterActionDescriptionField(action)]
+  return [
+    ...source,
+    ...preview,
     monsterFormAdvisorySlot(input.advisories ?? [], namePrefix),
-  )
+    ...primaryProse,
+    ...monsterActionMechanicFields({
+      ctx,
+      action,
+      section,
+      namePrefix,
+      sharedCastingOptions: input.sharedCastingOptions,
+      attackOptions: input.attackOptions ?? [],
+      equipment: input.equipment ?? [],
+      onCastingSourceBlocked: input.onCastingSourceBlocked,
+    }),
+    ...supplemental,
+  ]
 }

@@ -52,12 +52,3 @@ export function monsterFormAdvisorySlot(
     },
   }
 }
-
-/** After the attack preview when that slot exists; otherwise first. */
-export function insertMonsterFormAdvisorySlot(fields: FormItem[], slot: FormItem): FormItem[] {
-  const previewIndex = fields.findIndex(
-    (item) => 'kind' in item && item.kind === 'slot' && item.name === 'attackPreview',
-  )
-  if (previewIndex === -1) return [slot, ...fields]
-  return [...fields.slice(0, previewIndex + 1), slot, ...fields.slice(previewIndex + 1)]
-}

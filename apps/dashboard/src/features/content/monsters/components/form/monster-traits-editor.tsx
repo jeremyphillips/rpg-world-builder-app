@@ -2,13 +2,10 @@ import { useCallback, useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 import {
   DEFAULT_SYSTEM_RULESET_ID,
-  formatCreatureTrait,
-  formatMonsterStatBlockSubject,
   getCreatureTraitTemplate,
   listCreatureTraitTemplatesForRuleset,
 } from '@rpg/contracts'
-import { ActionIcon, ButtonDropdown, RulesPreview } from '@rpg/ui'
-import type { FormItem } from '@rpg/ui/form'
+import { ActionIcon, ButtonDropdown } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { creatureTraitTemplateRow } from '../../../lib/creature-traits/creature-trait-add-menu'
@@ -20,73 +17,24 @@ import {
   monsterTraitAcquisitionItems,
   parseMonsterTraitAcquisitionId,
 } from '../../lib/actions/monster-trait-acquisition'
-import { formatMonsterTemplateSentence } from '../../lib/format-monster-template-sentence'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
-import { monsterFormAdvisorySlot } from '../../lib/monster-form-advisory-presentation'
-import {
-  MONSTER_ADD_LABEL,
-  MONSTER_TRAIT_PREVIEW_LABEL,
-  MONSTER_TRAITS_HEADING,
-} from '../../lib/monster-form-labels'
+import { MONSTER_ADD_LABEL, MONSTER_TRAITS_HEADING } from '../../lib/monster-form-labels'
 import {
   MONSTER_TRAIT_ITEM_NOUN,
+  monsterTraitDetailFields,
   monsterTraitItemFields,
-  monsterTraitTemplateFields,
 } from '../../lib/monster-trait-form-fields'
 import {
   monsterTraitListTitle,
   resolveMonsterTraitHeaderIdentity,
 } from '../../lib/monster-trait-editor-title'
-import {
-  monsterTraitPresetDefaults,
-  monsterTraitPresetFields,
-  waterBreathingDurationEnabled,
-} from '../../lib/monster-trait-preset-fields'
+import { monsterTraitPresetDefaults } from '../../lib/monster-trait-preset-fields'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
-import { WaterBreathingToggle } from './water-breathing-toggle'
 
 const TEMPLATE_GROUP_ID = 'templates'
 
-function isPresetRow(row: unknown): row is { preset: string } & Record<string, unknown> {
-  return (
-    typeof row === 'object' &&
-    row !== null &&
-    'preset' in row &&
-    typeof row.preset === 'string' &&
-    !('templateId' in row)
-  )
-}
-
-function isTemplateRow(row: unknown): row is {
-  templateId: string
-  config?: unknown
-  nameOverride?: string
-  descriptionOverride?: string
-} {
-  return (
-    typeof row === 'object' &&
-    row !== null &&
-    'templateId' in row &&
-    typeof row.templateId === 'string'
-  )
-}
-
-function templatePreviewSentence(
-  row: { templateId: string; config?: unknown },
-  monsterName: string,
-): string {
-  return (
-    formatMonsterTemplateSentence({
-      templateId: row.templateId,
-      config: row.config,
-      monsterName,
-    }) ?? ''
-  )
-}
-
 export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const customFields = useMemo(() => monsterTraitItemFields(), [])
-  const templateFields = useMemo(() => monsterTraitTemplateFields(), [])
   const makeItemDefaults = useCallback(
     () => ({ id: createMonsterRowId(), kind: 'custom' as const, name: '', description: '' }),
     [],
@@ -120,60 +68,15 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
   )
 
   const resolveItemFields = useCallback(
-    (row: unknown): FormItem[] => {
-      const rowPath = editor.selectedIndex === null ? '' : `traits.${editor.selectedIndex}`
-      const advisorySlot = monsterFormAdvisorySlot(advisories, rowPath)
-      if (isTemplateRow(row)) {
-        const sentence = templatePreviewSentence(row, monsterName ?? '')
-        const preview: FormItem[] = sentence
-          ? [
-              {
-                kind: 'slot',
-                name: 'traitPreview',
-                render: () => (
-                  <RulesPreview
-                    label={MONSTER_TRAIT_PREVIEW_LABEL}
-                    content={{ kind: 'prose', text: sentence }}
-                  />
-                ),
-              },
-            ]
-          : []
-        return [...preview, advisorySlot, ...templateFields]
-      }
-      if (!isPresetRow(row)) return [advisorySlot, ...customFields]
-      const subject = formatMonsterStatBlockSubject(monsterName ?? '')
-      const formatted = formatCreatureTrait({ subject, trait: row })
-      const preview: FormItem[] = formatted
-        ? [
-            {
-              kind: 'slot',
-              name: 'traitPreview',
-              render: () => (
-                <RulesPreview
-                  label={MONSTER_TRAIT_PREVIEW_LABEL}
-                  content={{ kind: 'prose', text: formatted.sentence }}
-                />
-              ),
-            },
-          ]
-        : []
-      const parameterFields =
-        row.preset === 'water-breathing'
-          ? [
-              {
-                kind: 'slot' as const,
-                name: 'outsideWaterBreathToggle',
-                render: () => <WaterBreathingToggle namePrefix={rowPath} />,
-              },
-              ...(waterBreathingDurationEnabled(row)
-                ? monsterTraitPresetFields(row.preset, ctx)
-                : []),
-            ]
-          : monsterTraitPresetFields(row.preset, ctx)
-      return [...preview, advisorySlot, ...parameterFields]
-    },
-    [advisories, ctx, customFields, editor.selectedIndex, monsterName, templateFields],
+    (row: unknown) =>
+      monsterTraitDetailFields({
+        row,
+        rowPath: editor.selectedIndex === null ? '' : `traits.${editor.selectedIndex}`,
+        advisories,
+        monsterName: monsterName ?? '',
+        ctx,
+      }),
+    [advisories, ctx, editor.selectedIndex, monsterName],
   )
 
   return (

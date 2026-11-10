@@ -132,7 +132,17 @@ describe('natural weapon action round trip', () => {
       limitedUse: { kind: 'recharge', minRoll: 5 },
       damageType: 'fire',
       description: '<p>Venom</p>',
+      onHit: {
+        additionalDamage: [{ damageType: 'poison', roll: { dice: { count: 1, faces: 6 } } }],
+      },
     })
+    const onHitHint = screen.getByText(
+      'Additional damage dealt when this attack hits, beyond its primary damage.',
+    )
+    const details = screen.getByRole('button', { name: 'Remove Additional details' })
+    expect(
+      onHitHint.compareDocumentPosition(details) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
 
     await user.click(screen.getByRole('button', { name: /Slam/i }))
     await user.click(screen.getByRole('button', { name: /Bite/i }))
@@ -140,6 +150,13 @@ describe('natural weapon action round trip', () => {
     expect(reopened?.kind === 'natural-weapon' ? reopened.reach : undefined).toBe(15)
     const row = biteRow(formRef.current!.getValues())
     expect(row?.kind === 'natural-weapon' ? row.properties : undefined).toEqual(['finesse'])
+    expect(row).toMatchObject({
+      description: '<p>Venom</p>',
+      damage: { dice: { count: 2, faces: 6 } },
+      onHit: {
+        additionalDamage: [{ damageType: 'poison', roll: { dice: { count: 1, faces: 6 } } }],
+      },
+    })
 
     await user.click(screen.getByRole('button', { name: 'Actions for Bite' }))
     expect(screen.queryByRole('menuitem', { name: 'Actions' })).not.toBeInTheDocument()
@@ -162,6 +179,7 @@ describe('natural weapon action round trip', () => {
     const counts = screen.getAllByRole('spinbutton', { name: 'Damage roll Number of dice' })
     await user.clear(counts[0]!)
     await user.type(counts[0]!, '3')
+    expect(formRef.current!.getFieldState('bonusActions.0.damage.dice.count').isDirty).toBe(true)
 
     const saved = buildMonsterInput(formRef.current!.getValues(), undefined, 'draft')
     const reloaded = monsterToFormValues({

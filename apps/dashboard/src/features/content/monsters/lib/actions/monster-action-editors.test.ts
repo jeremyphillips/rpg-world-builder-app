@@ -186,7 +186,9 @@ describe('monster action detail fields', () => {
       { id: 'bite', kind: 'natural-weapon', name: 'Bite', mode: 'melee' },
       'reactions',
     )
-    expect(reaction).toContain('trigger.text')
+    expect(reaction.indexOf('buildAdvisories')).toBeLessThan(reaction.indexOf('trigger.text'))
+    expect(reaction.indexOf('trigger.text')).toBeLessThan(reaction.indexOf('limitedUse'))
+    expect(reaction.at(-1)).toBe('description')
 
     const attack = detailFields({
       id: 'slash',
@@ -269,8 +271,16 @@ describe('monster action detail fields', () => {
     expect(attack).not.toContain('moveSection')
     expect(natural[0]).toBe('attackPreview')
     expect(natural[1]).toBe('buildAdvisories')
+    expect(natural.indexOf('limitedUse')).toBeLessThan(natural.indexOf('damageType'))
+    expect(natural.indexOf('onHit.additionalDamage')).toBeLessThan(natural.indexOf('description'))
+    expect(natural.at(-1)).toBe('description')
     expect(attack[0]).toBe('attackPreview')
     expect(attack[1]).toBe('buildAdvisories')
+    expect(attack.indexOf('limitedUse')).toBeLessThan(attack.indexOf('bonusSource.kind'))
+    expect(attack.indexOf('bonusSource.kind')).toBeLessThan(attack.indexOf('modes'))
+    expect(attack.indexOf('modes')).toBeLessThan(attack.indexOf('damageType'))
+    expect(attack.indexOf('onHit.additionalDamage')).toBeLessThan(attack.indexOf('description'))
+    expect(attack.at(-1)).toBe('description')
 
     const weapon = detailFields({ id: 'sword', kind: 'weapon', equipmentEntryId: 'sword' })
     expect(weapon).toContain('equipmentEntryId')
@@ -281,6 +291,8 @@ describe('monster action detail fields', () => {
     expect(weapon.indexOf('attackPreview')).toBe(weapon.indexOf('equipmentEntryId') + 1)
     expect(weapon.indexOf('buildAdvisories')).toBe(weapon.indexOf('attackPreview') + 1)
     expect(weapon.indexOf('damage')).toBe(weapon.indexOf('buildAdvisories') + 1)
+    expect(weapon.indexOf('onHit.additionalDamage')).toBeLessThan(weapon.indexOf('description'))
+    expect(weapon.at(-1)).toBe('description')
     const spellNames = detailFields({ id: 'cast', kind: 'spell' })
     expect(spellNames).not.toContain('attackPreview')
     expect(spellNames[0]).toBe('buildAdvisories')
@@ -288,9 +300,10 @@ describe('monster action detail fields', () => {
     const spell = detailFields({ id: 'cast', kind: 'spell', name: 'Spellcasting', spells: [] })
     expect(spell).not.toContain('name')
     expect(spell.indexOf('castingAbility')).toBeLessThan(spell.indexOf('spells'))
-    expect(spell.indexOf('spells')).toBeLessThan(spell.indexOf('description'))
-    expect(spell.indexOf('description')).toBeLessThan(spell.indexOf('omittedComponents'))
+    expect(spell.indexOf('spells')).toBeLessThan(spell.indexOf('omittedComponents'))
     expect(spell.indexOf('omittedComponents')).toBeLessThan(spell.lastIndexOf('limitedUse.kind'))
+    expect(spell.lastIndexOf('limitedUse.kind')).toBeLessThan(spell.indexOf('description'))
+    expect(spell.at(-1)).toBe('description')
     expect(spell).not.toContain('trigger.text')
     expect(spell.filter((name) => name === 'limitedUse.kind')).toHaveLength(2)
 
@@ -298,11 +311,29 @@ describe('monster action detail fields', () => {
       { id: 'shield', kind: 'spell', name: 'Protective Magic', spells: [] },
       'reactions',
     )
-    expect(reactionSpell.indexOf('castingAbility')).toBeLessThan(
-      reactionSpell.indexOf('trigger.text'),
+    expect(reactionSpell.indexOf('trigger.text')).toBeLessThan(
+      reactionSpell.indexOf('castingAbility'),
     )
-    expect(reactionSpell.indexOf('trigger.text')).toBeLessThan(reactionSpell.indexOf('spells'))
-    expect(reactionSpell.indexOf('spells')).toBeLessThan(reactionSpell.indexOf('description'))
+    expect(reactionSpell.indexOf('castingAbility')).toBeLessThan(reactionSpell.indexOf('spells'))
+    expect(reactionSpell.lastIndexOf('limitedUse.kind')).toBeLessThan(
+      reactionSpell.indexOf('description'),
+    )
+    expect(reactionSpell.at(-1)).toBe('description')
+
+    const multiattack = detailFields({
+      id: 'multi',
+      kind: 'multiattack',
+      steps: [],
+    })
+    expect(multiattack[0]).toBe('buildAdvisories')
+    expect(multiattack.indexOf('steps')).toBeLessThan(multiattack.indexOf('description'))
+    expect(multiattack.at(-1)).toBe('description')
+    expect(multiattack).not.toContain('trigger.text')
+
+    const special = detailFields({ id: 'parry', kind: 'special', name: 'Parry' })
+    expect(special[0]).toBe('buildAdvisories')
+    expect(special[1]).toBe('description')
+    expect(special.indexOf('description')).toBeLessThan(special.indexOf('limitedUse.kind'))
   })
 
   it('uses optional disclosure for preset action descriptions and required richtext for custom', () => {
@@ -325,23 +356,27 @@ describe('monster action detail fields', () => {
     ).not.toHaveProperty('optionalDisclosure')
   })
 
-  it('places save damage inline immediately after the description field', () => {
+  it('places save configuration before resolution damage and outcomes', () => {
     const names = detailFields({
       id: 'breath',
       kind: 'save',
       name: 'Fire Breath',
       preset: 'breath-weapon',
     })
-    const descriptionIndex = names.indexOf('description')
-    const rollIndex = names.indexOf('resolution.effects.0.roll')
     const damageTypeIndex = names.indexOf('resolution.effects.0.damageType')
-    expect(descriptionIndex).toBeGreaterThanOrEqual(0)
-    expect(damageTypeIndex).toBe(descriptionIndex + 1)
+    const rollIndex = names.indexOf('resolution.effects.0.roll')
+    expect(names[0]).toBe('buildAdvisories')
+    expect(names.indexOf('limitedUse')).toBeLessThan(names.indexOf('resolution.method.ability'))
+    expect(names.indexOf('resolution.method.ability')).toBeLessThan(
+      names.indexOf('resolution.selectionMode'),
+    )
+    expect(names.indexOf('resolution.selectionMode')).toBeLessThan(damageTypeIndex)
     expect(rollIndex).toBe(damageTypeIndex + 1)
-    expect(names.indexOf('limitedUse')).toBeGreaterThan(rollIndex)
+    expect(damageTypeIndex).toBeLessThan(names.indexOf('_saveFailureNote'))
+    expect(names.indexOf('_saveFailureNote')).toBeLessThan(names.indexOf('_saveSuccessAmount'))
+    expect(names.at(-1)).toBe('description')
     expect(names).not.toContain('limitedUse.kind')
     expect(names).not.toContain('attackPreview')
-    expect(names[0]).toBe('buildAdvisories')
     const constrict = detailFields({
       id: 'squeeze',
       kind: 'save',
