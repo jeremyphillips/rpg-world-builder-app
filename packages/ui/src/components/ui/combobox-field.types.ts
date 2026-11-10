@@ -1,5 +1,6 @@
 import type { ReactNode, Ref } from 'react'
 
+import type { PickerSearchOptions } from '../../lib/picker-search.types'
 import type { FieldSize } from './field.client'
 import type { ResolveComboboxOptionLabel } from './combobox-field.lib'
 
@@ -17,6 +18,9 @@ export interface ComboboxFieldOption {
   filterValues?: Readonly<Record<string, string>>
   /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
   searchTerms?: readonly string[]
+  /** Alternative names matched as keywords in combobox search. */
+  aliases?: readonly string[]
+  search?: PickerSearchOptions
 }
 
 export interface ComboboxSelectedItemRenderContext {

@@ -14,25 +14,39 @@ export { COMBOBOX_DIMENSION_SELECT_ALL_VALUE }
 /** Maps form-layer options to combobox panel options. */
 export function toComboboxFieldOptions(options: FieldOption[]): ComboboxFieldOption[] {
   return options.map(
-    ({ description, classification, filterValues, disabledReason, ...option }) => ({
+    ({
+      description,
+      classification,
+      filterValues,
+      disabledReason,
+      search,
+      aliases,
+      ...option
+    }) => ({
       ...option,
       ...(disabledReason !== undefined ? { disabledReason } : {}),
       ...(description !== undefined ? { metadata: description } : {}),
       ...(classification !== undefined ? { classification } : {}),
       ...(filterValues !== undefined ? { filterValues } : {}),
+      ...(aliases !== undefined ? { aliases } : {}),
+      ...(search !== undefined ? { search } : {}),
     }),
   )
 }
 
 /** Maps combobox panel options back to form-layer options. */
 export function toFieldOptions(options: ComboboxFieldOption[]): FieldOption[] {
-  return options.map(({ metadata, classification, filterValues, disabledReason, ...option }) => ({
-    ...option,
-    ...(disabledReason !== undefined ? { disabledReason } : {}),
-    ...(metadata !== undefined ? { description: metadata } : {}),
-    ...(classification !== undefined ? { classification } : {}),
-    ...(filterValues !== undefined ? { filterValues } : {}),
-  }))
+  return options.map(
+    ({ metadata, classification, filterValues, disabledReason, search, aliases, ...option }) => ({
+      ...option,
+      ...(disabledReason !== undefined ? { disabledReason } : {}),
+      ...(metadata !== undefined ? { description: metadata } : {}),
+      ...(classification !== undefined ? { classification } : {}),
+      ...(filterValues !== undefined ? { filterValues } : {}),
+      ...(aliases !== undefined ? { aliases } : {}),
+      ...(search !== undefined ? { search } : {}),
+    }),
+  )
 }
 
 export function dimensionValueToSelectValue(value: FilterDimensionValue): string {

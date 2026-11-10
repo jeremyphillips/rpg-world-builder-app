@@ -61,15 +61,11 @@ describe('monsterTraitAcquisitionItems', () => {
   it('indexes curated search terms instead of add-menu descriptions', () => {
     const flyby = items.find((item) => item.id === 'preset:flyby')
     expect(flyby).toMatchObject({
-      searchMetadata: false,
-      searchTerms: expect.arrayContaining([
-        expect.objectContaining({ text: 'flying', role: 'keyword' }),
-      ]),
+      search: { includeSupporting: false },
+      searchTerms: expect.arrayContaining(['flying']),
     })
     const freeze = items.find((item) => item.id === 'preset:freeze')
-    expect(freeze?.searchTerms).toEqual(
-      expect.arrayContaining([expect.objectContaining({ text: 'cold', role: 'keyword' })]),
-    )
+    expect(freeze?.searchTerms).toEqual(expect.arrayContaining(['cold']))
     expect(getCreatureTraitSearchTerms('flyby')).toContain('flying')
   })
 })

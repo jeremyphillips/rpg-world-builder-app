@@ -105,13 +105,11 @@ describe('monster action acquisition presentation', () => {
     expect(items.find((item) => item.id === 'natural:bite')).toMatchObject({ metadata: 'Piercing' })
     expect(items.find((item) => item.id === 'natural:claw')).toMatchObject({ metadata: 'Slashing' })
     expect(items.find((item) => item.id === 'natural:bite')).toMatchObject({
-      searchMetadata: false,
-      searchTerms: expect.arrayContaining([
-        expect.objectContaining({ text: 'teeth', role: 'keyword' }),
-      ]),
+      search: { includeSupporting: false },
+      searchTerms: expect.arrayContaining(['teeth']),
     })
     expect(items.find((item) => item.id === 'preset:constrict')?.searchTerms).toEqual(
-      expect.arrayContaining([expect.objectContaining({ text: 'squeeze', role: 'keyword' })]),
+      expect.arrayContaining(['squeeze']),
     )
     expect(parseMonsterActionAcquisitionId('preset:multiattack')).toEqual({
       type: 'preset',

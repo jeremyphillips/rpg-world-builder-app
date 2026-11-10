@@ -579,7 +579,7 @@ rows.
         label: 'Movement bonus',
         description: 'Increase a movement mode speed.',
         groupId: 'combat-traits',
-        searchTerms: [{ text: 'speed', role: 'alias', weight: 1 }],
+        searchTerms: ['speed'],
         appendDefaults: () => ({
           grantType: 'movement',
           movementMode: 'walk',

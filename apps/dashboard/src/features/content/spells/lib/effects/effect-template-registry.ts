@@ -22,7 +22,8 @@ export type EffectTemplate = {
   groupId: EffectTemplateGroupId
   kind: SpellAtomicEffectKind
   createDefault: () => Record<string, unknown>
-  search?: { aliases?: string[]; keywords?: string[] }
+  aliases?: readonly string[]
+  searchTerms?: readonly string[]
 }
 
 function createEffectId(): string {
@@ -42,7 +43,7 @@ export const EFFECT_TEMPLATES: readonly EffectTemplate[] = [
       roll: { dice: { count: 1, faces: 6 } },
       damageType: 'fire',
     }),
-    search: { keywords: ['attack', 'harm'] },
+    searchTerms: ['attack', 'harm'],
   },
   {
     id: 'healing',
@@ -55,7 +56,8 @@ export const EFFECT_TEMPLATES: readonly EffectTemplate[] = [
       kind: 'healing',
       roll: { dice: { count: 2, faces: 8 } },
     }),
-    search: { aliases: ['cure', 'restore'], keywords: ['hit points'] },
+    aliases: ['cure', 'restore'],
+    searchTerms: ['hit points'],
   },
   {
     id: 'temporary-hit-points',
@@ -68,7 +70,7 @@ export const EFFECT_TEMPLATES: readonly EffectTemplate[] = [
       kind: 'temporary-hit-points',
       roll: { dice: { count: 2, faces: 4 }, flat: 4 },
     }),
-    search: { aliases: ['temp hp', 'false life'] },
+    aliases: ['temp hp', 'false life'],
   },
   {
     id: 'projectile-count',
@@ -82,7 +84,7 @@ export const EFFECT_TEMPLATES: readonly EffectTemplate[] = [
       count: 3,
       unitLabel: 'darts',
     }),
-    search: { aliases: ['magic missile', 'darts', 'bolts'] },
+    aliases: ['magic missile', 'darts', 'bolts'],
   },
 ] as const
 

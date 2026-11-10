@@ -23,7 +23,7 @@ const items = [
     label: 'Movement bonus',
     metadata: 'Increase speed',
     groupId: 'combat-traits',
-    searchTerms: [{ text: 'walk', weight: 1, role: 'keyword' as const }],
+    searchTerms: ['walk'],
   },
 ]
 
@@ -50,19 +50,19 @@ describe('button-dropdown.lib', () => {
     ).toBe(true)
   })
 
-  it('excludes metadata from search when searchMetadata is false', () => {
+  it('excludes metadata from search when search.includeSupporting is false', () => {
     const withMetadataOnly = {
       id: 'hold-breath',
       label: 'Hold Breath',
       metadata: 'Holds its breath for a set time.',
-      searchMetadata: false as const,
+      search: { includeSupporting: false as const },
     }
     const fields = buildButtonDropdownSearchFields(withMetadataOnly, new Map())
     expect(fields.some((field) => field.role === 'description')).toBe(false)
 
     const withKeyword = {
       ...withMetadataOnly,
-      searchTerms: [{ text: 'suffocate', weight: 1, role: 'keyword' as const }],
+      searchTerms: ['suffocate'],
     }
     expect(rankButtonDropdownItems([withKeyword], [], 'suffocate')).toHaveLength(1)
     expect(rankButtonDropdownItems([withMetadataOnly], [], 'set time')).toHaveLength(0)

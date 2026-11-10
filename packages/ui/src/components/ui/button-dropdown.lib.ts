@@ -1,4 +1,9 @@
 import { rankLegacySearchItems } from '../../lib/search-document.lib'
+import {
+  buildPickerSearchFields,
+  mapPickerFieldsToLegacyWeighted,
+  resolveIncludeSupportingForDropdown,
+} from '../../lib/picker-search.lib'
 import type { WeightedSearchField } from '../../lib/search'
 import {
   clampHighlightedIndex,
@@ -15,16 +20,17 @@ export function buildButtonDropdownSearchFields(
   item: ButtonDropdownItem,
   groupLabelById: ReadonlyMap<string, string>,
 ): WeightedSearchField[] {
-  const fields: WeightedSearchField[] = [{ text: item.label, weight: 1, role: 'label' }]
-  if (item.metadata && item.searchMetadata !== false) {
-    fields.push({ text: item.metadata, weight: 1, role: 'description' })
-  }
-  if (item.groupId) {
-    const groupLabel = groupLabelById.get(item.groupId)
-    if (groupLabel) fields.push({ text: groupLabel, weight: 1, role: 'group' })
-  }
-  if (item.searchTerms?.length) fields.push(...item.searchTerms)
-  return fields
+  const groupLabel = item.groupId ? groupLabelById.get(item.groupId) : undefined
+  const fields = buildPickerSearchFields({
+    label: item.label,
+    supportingText: item.metadata,
+    searchTerms: item.searchTerms,
+    aliases: item.aliases,
+    groupLabel,
+    includeSupporting: resolveIncludeSupportingForDropdown(item.search),
+  })
+
+  return mapPickerFieldsToLegacyWeighted(fields)
 }
 
 export function orderButtonDropdownItemsGrouped(

@@ -33,7 +33,7 @@ const items = [
     label: 'Movement',
     metadata: 'Grant a movement speed, increase a speed, or match one speed to another.',
     groupId: 'combat-traits',
-    searchTerms: [{ text: 'walking speed', weight: 1, role: 'keyword' as const }],
+    searchTerms: ['walking speed'],
   },
 ]
 

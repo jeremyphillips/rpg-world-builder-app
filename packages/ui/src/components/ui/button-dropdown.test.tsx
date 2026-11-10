@@ -22,7 +22,7 @@ const items = [
     label: 'Movement bonus',
     metadata: 'Increase a movement mode speed.',
     groupId: 'combat-traits',
-    searchTerms: [{ text: 'walking speed', weight: 1, role: 'keyword' as const }],
+    searchTerms: ['walking speed'],
   },
   {
     id: 'language',

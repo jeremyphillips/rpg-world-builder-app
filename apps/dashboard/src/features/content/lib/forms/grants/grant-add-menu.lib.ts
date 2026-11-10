@@ -1,49 +1,25 @@
 import { createGrantRowId } from '@rpg/contracts'
-import type { WeightedSearchField } from '@rpg/ui'
 import type { ArrayAddActionConfig } from '@rpg/ui/form'
 
 import type { GrantType } from './grant-form-schema'
 import {
   GRANT_TEMPLATE_GROUPS,
-  getGrantTemplateGroup,
   getGrantTemplatesForTypes,
   resolveGrantTemplateDuplicatePolicy,
   resolveGrantTemplateVocabRef,
   type GrantTemplate,
 } from './grant-template-registry'
 
-const VOCAB_LABEL_WEIGHT = 0.8
-const VOCAB_DESCRIPTION_WEIGHT = 0.8
-
 export type GrantArrayAddMenuConfig = NonNullable<ArrayAddActionConfig['menu']>
 
-function buildTemplateSearchTerms(template: GrantTemplate): WeightedSearchField[] {
-  const fields: WeightedSearchField[] = [
-    { text: template.label, weight: 1, role: 'label' },
-    { text: template.description, weight: 1, role: 'description' },
-    { text: getGrantTemplateGroup(template.groupId).label, weight: 1, role: 'group' },
-  ]
-
-  for (const alias of template.search?.aliases ?? []) {
-    fields.push({ text: alias, weight: 1, role: 'alias' })
-  }
-  for (const keyword of template.search?.keywords ?? []) {
-    fields.push({ text: keyword, weight: 1, role: 'keyword' })
-  }
-
+function collectGrantTemplateSearchTerms(template: GrantTemplate): readonly string[] {
+  const terms = [...(template.searchTerms ?? [])]
   for (const ref of template.vocabRefs ?? []) {
     const resolved = resolveGrantTemplateVocabRef(ref)
-    fields.push({ text: resolved.label, weight: VOCAB_LABEL_WEIGHT, role: 'label' })
-    if (resolved.description) {
-      fields.push({
-        text: resolved.description,
-        weight: VOCAB_DESCRIPTION_WEIGHT,
-        role: 'description',
-      })
-    }
+    terms.push(resolved.label)
+    if (resolved.description) terms.push(resolved.description)
   }
-
-  return fields
+  return terms
 }
 
 function buildIsDuplicate(template: GrantTemplate): ((items: unknown[]) => boolean) | undefined {
@@ -72,7 +48,9 @@ export function buildGrantArrayAddMenu(grantTypes: readonly GrantType[]): GrantA
       label: template.label,
       description: template.description,
       groupId: template.groupId,
-      searchTerms: buildTemplateSearchTerms(template),
+      searchTerms: collectGrantTemplateSearchTerms(template),
+      aliases: template.aliases,
+      search: { includeSupporting: true },
       appendDefaults: () => ({ id: createGrantRowId(), ...template.createDefault() }),
       isDuplicate: buildIsDuplicate(template),
       duplicatePolicy: resolveGrantTemplateDuplicatePolicy(template),

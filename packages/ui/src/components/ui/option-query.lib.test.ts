@@ -96,6 +96,17 @@ describe('option-query.lib', () => {
     expect(optionMatchesQuery(option, 'cow')).toBe(false)
   })
 
+  it('excludes metadata from search when includeSupporting is false', () => {
+    const option: LabelValueMetadataOption = {
+      value: 'flyby',
+      label: 'Flyby',
+      metadata: 'Flying past without provoking opportunity attacks',
+      search: { includeSupporting: false },
+    }
+    expect(optionMatchesQuery(option, 'flying')).toBe(false)
+    expect(optionMatchesQuery({ ...option, searchTerms: ['flying'] }, 'flying')).toBe(true)
+  })
+
   it('ranks label exact match above search-term-only match', () => {
     const libraryOption: LabelValueMetadataOption = {
       value: 'library',

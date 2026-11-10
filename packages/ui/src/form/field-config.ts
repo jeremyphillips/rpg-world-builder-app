@@ -135,10 +135,14 @@ export interface FieldOption {
   disabled?: boolean
   /** Shown in select panels when the option is disabled (e.g. "Already used"). */
   disabledReason?: string
-  /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
+  /** Secondary line text (e.g. source badge copy). Included in combobox search when opted in. */
   description?: string
   /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
   searchTerms?: readonly string[]
+  /** Alternative names matched as keywords in combobox search. */
+  aliases?: readonly string[]
+  /** Controls whether `description` is indexed for combobox search (omitted → indexed when description is set). */
+  search?: import('../lib/picker-search.types').PickerSearchOptions
   /** Optional classification shown inline after the label in combobox panels. */
   classification?: string
   /** Canonical dimension slugs matched by combobox `filterSelects` (AND across active keys). */

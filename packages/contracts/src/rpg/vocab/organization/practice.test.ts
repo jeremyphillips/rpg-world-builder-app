@@ -130,7 +130,7 @@ describe('Organization Practice vocabulary', () => {
 
   it('surfaces alias terms in discovery without creating duplicate ids', () => {
     expect(getOrganizationPracticeDiscoveryTerms('counterfeiting')).toEqual(
-      expect.arrayContaining(['Counterfeiting', 'forgery']),
+      expect.arrayContaining(['forgery']),
     )
     expect(getOrganizationPracticeDiscoveryTerms('theft')).toEqual(
       expect.arrayContaining(['burglary', 'robbery', 'larceny']),

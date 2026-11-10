@@ -48,6 +48,7 @@ describe('array-add-menu.lib', () => {
         {
           id: 'movement-bonus',
           label: 'Movement bonus',
+          description: 'Increase speed',
           groupId: 'combat-traits',
           appendDefaults: { grantType: 'movement' },
           duplicatePolicy: 'block' as const,
@@ -60,6 +61,7 @@ describe('array-add-menu.lib', () => {
     expect(buildArrayAddMenuItems(menu, [{ grantType: 'movement' }])).toEqual([
       expect.objectContaining({
         id: 'movement-bonus',
+        metadata: 'Increase speed',
         disabled: true,
         note: 'Already added',
       }),
