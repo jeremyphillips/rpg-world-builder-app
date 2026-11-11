@@ -39,7 +39,7 @@ Monster reactions store the same object. An absent trigger means the reaction's 
 
 Existing monster kinds and the `spell` kind share one field set. Published and draft schemas differ only in how complete those fields must be. `limitedUse` on an entry is optional. Drafts keep a partial limit. An absent limit means at will.
 
-A `spell` entry references canonical spell ids in `spells`. A limit on the entry is one shared pool. A limit on a spell is that spell's own pool. An entry cannot have both. Identical per-spell limits stay independent. Stat-block groups are derived. `castingAbility.shared` points at another spell entry in the same body that has its own ability. The section is the invoking economy. A spell whose casting time does not match that economy can be saved as a draft and is rejected on publish.
+A `spell` entry references canonical spell ids in `spells`. A limit on the entry is one shared pool. A limit on a spell is that spell's own pool. An entry cannot have both. Identical per-spell limits stay independent. Stat-block groups are derived. The Spellcasting frequency menu is authoring vocabulary over that same `limitedUse` object: At will leaves it unset, and 1–5/Day stores a fixed long-rest use. `castingAbility.shared` points at another spell entry in the same body that has its own ability. The section is the invoking economy. A spell whose casting time does not match that economy can be saved as a draft and is rejected on publish.
 
 Spell prose is generated from that structure. Weapon attack lines stay derived. Special descriptions stay authored.
 

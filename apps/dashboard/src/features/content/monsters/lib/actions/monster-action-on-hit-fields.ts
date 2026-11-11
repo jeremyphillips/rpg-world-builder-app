@@ -45,7 +45,7 @@ function limitedUseDependentsVisible(): {
   }
 }
 
-export function monsterActionLimitedUseFields(): FormItem[] {
+export function monsterActionLimitedUseFields(options?: { addDisabled?: boolean }): FormItem[] {
   const uses = limitVisibility('uses')
   const recharge = limitVisibility('recharge')
   const fixed = {
@@ -61,7 +61,10 @@ export function monsterActionLimitedUseFields(): FormItem[] {
         name: 'limitedUse.kind',
         label: 'Limit',
         placeholder: 'No limit',
-        optionalDisclosure: { addLabel: MONSTER_LIMIT_ADD_LABEL },
+        optionalDisclosure: {
+          addLabel: MONSTER_LIMIT_ADD_LABEL,
+          ...(options?.addDisabled ? { addDisabled: true } : {}),
+        },
         options: [
           { value: 'uses', label: 'Uses' },
           { value: 'recharge', label: 'Recharge' },

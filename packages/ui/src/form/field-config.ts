@@ -1524,6 +1524,11 @@ export interface ArrayItemConfig {
   removable?: boolean
   removeSlot?: Pick<SlotConfig, 'name' | 'render' | 'visibility'>
   /**
+   * Extra utility rendered immediately before the default remove button.
+   * Remove stays last. Does not replace it.
+   */
+  beforeRemove?: Pick<SlotConfig, 'name' | 'render'>
+  /**
    * Replace default ArrayItem card chrome with a custom shell (e.g. entity
    * EntityCardDisclosureRenderer). Form behavior stays array-owned; presentation does not.
    * Ignored for compact inline rows.

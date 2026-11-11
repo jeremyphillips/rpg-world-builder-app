@@ -385,7 +385,7 @@ describe('monster action detail fields', () => {
     expect(spell.lastIndexOf('limitedUse.kind')).toBeLessThan(spell.indexOf('description'))
     expect(spell.at(-1)).toBe('description')
     expect(spell).not.toContain('trigger.text')
-    expect(spell.filter((name) => name === 'limitedUse.kind')).toHaveLength(2)
+    expect(spell.filter((name) => name === 'limitedUse.kind')).toHaveLength(1)
 
     const reactionSpell = detailFields(
       { id: 'shield', kind: 'spell', name: 'Protective Magic', spells: [] },

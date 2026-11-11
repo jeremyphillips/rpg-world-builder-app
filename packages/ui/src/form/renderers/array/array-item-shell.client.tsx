@@ -46,6 +46,8 @@ export interface ArrayItemActionsRailProps {
   showDefaultRemove?: boolean
   /** Custom remove control rendered before the default button when both are shown. */
   customRemove?: React.ReactNode
+  /** Utility rendered immediately before the default remove button. Remove stays last. */
+  beforeRemove?: React.ReactNode
   issueCount?: number
   issueRowLabel?: string
   onIssuePress?: () => void
@@ -62,6 +64,7 @@ export function ArrayItemActionsContent({
   onRemove,
   showDefaultRemove = true,
   customRemove,
+  beforeRemove,
   issueCount = 0,
   issueRowLabel,
   onIssuePress,
@@ -76,6 +79,7 @@ export function ArrayItemActionsContent({
         compact={compact}
       />
       {customRemove}
+      {beforeRemove}
       {showDefaultRemove ? (
         <ArrayItemRemoveButton
           ariaLabel={removeAriaLabel}
@@ -96,6 +100,7 @@ export function ArrayItemActionsRail({
   onRemove,
   showDefaultRemove = true,
   customRemove,
+  beforeRemove,
   issueCount = 0,
   issueRowLabel,
   onIssuePress,
@@ -115,6 +120,7 @@ export function ArrayItemActionsRail({
         onRemove={onRemove}
         showDefaultRemove={showDefaultRemove}
         customRemove={customRemove}
+        beforeRemove={beforeRemove}
         issueCount={issueCount}
         issueRowLabel={issueRowLabel}
         onIssuePress={onIssuePress}

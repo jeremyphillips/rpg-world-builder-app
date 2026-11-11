@@ -943,6 +943,37 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('button', { name: 'Custom remove' })).toBeInTheDocument()
   })
 
+  it('renders beforeRemove immediately before the default remove button', async () => {
+    const user = userEvent.setup()
+    const fields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        label: 'Traits',
+        fields: traitFields,
+        addAction: { label: 'Add trait' },
+        item: {
+          beforeRemove: {
+            name: 'replaceTrait',
+            render: () => <button type="button">Change trait</button>,
+          },
+        },
+      },
+    ]
+    render(
+      <Form
+        schema={schema}
+        fields={fields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    const change = screen.getByRole('button', { name: 'Change trait' })
+    const remove = screen.getByRole('button', { name: /Remove Traits/i })
+    expect(change.compareDocumentPosition(remove) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it('hides nested arrays when item-scoped visibility is false', async () => {
     const user = userEvent.setup()
     const grantSchema = z.object({

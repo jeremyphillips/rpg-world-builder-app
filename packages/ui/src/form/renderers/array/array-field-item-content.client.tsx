@@ -57,6 +57,7 @@ interface ArrayFieldItemActionsRailProps {
   canRemove: boolean
   showDefaultItemRemove: boolean
   customRemove?: React.ReactNode
+  beforeRemove?: React.ReactNode
   onRemove: () => void
   showIssueBadge: boolean
   issueCount: number
@@ -71,6 +72,7 @@ function ArrayFieldItemActionsRailSlot({
   canRemove,
   showDefaultItemRemove,
   customRemove,
+  beforeRemove,
   onRemove,
   showIssueBadge,
   issueCount,
@@ -85,6 +87,7 @@ function ArrayFieldItemActionsRailSlot({
     canRemove,
     showDefaultRemove: showDefaultItemRemove,
     customRemove,
+    beforeRemove,
     onRemove,
     issueCount: showIssueBadge ? issueCount : 0,
     issueRowLabel: rowLabel,
@@ -287,6 +290,16 @@ function renderArrayFieldItemByAnatomy(
   }
 }
 
+function renderArrayItemUtilitySlot(
+  slot: { render: () => React.ReactNode } | undefined,
+  arrayContext: React.ComponentProps<typeof ArrayFieldContext.Provider>['value'],
+): React.ReactNode {
+  if (!slot) return undefined
+  return (
+    <ArrayFieldContext.Provider value={arrayContext}>{slot.render()}</ArrayFieldContext.Provider>
+  )
+}
+
 export function ArrayFieldItemContent({
   config,
   idPrefix,
@@ -365,11 +378,8 @@ export function ArrayFieldItemContent({
     </ArrayItemPresentationContext.Provider>
   )
 
-  const customRemove = itemConfig.removeSlot ? (
-    <ArrayFieldContext.Provider value={arrayContext}>
-      {itemConfig.removeSlot.render()}
-    </ArrayFieldContext.Provider>
-  ) : undefined
+  const customRemove = renderArrayItemUtilitySlot(itemConfig.removeSlot, arrayContext)
+  const beforeRemove = renderArrayItemUtilitySlot(itemConfig.beforeRemove, arrayContext)
 
   const actionsEmbedded = anatomy === 'flatNoHeader' || Boolean(itemConfig.renderShell)
   const actionsRail = (
@@ -378,6 +388,7 @@ export function ArrayFieldItemContent({
       canRemove={canRemove}
       showDefaultItemRemove={showDefaultItemRemove}
       customRemove={customRemove}
+      beforeRemove={beforeRemove}
       onRemove={onRemove}
       showIssueBadge={showIssueBadge}
       issueCount={issueGroup.totalCount}

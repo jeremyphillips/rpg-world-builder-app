@@ -86,8 +86,8 @@ export function monsterActionResolverFields(ctx: ContentFormCtx): FormItem[] {
       item: { header: { fallback: (index) => `Spell #${index + 1}` } },
       fields: [
         choice('spellId', getContentTypeTerm('spells').label),
-        { type: 'number', name: 'castAtLevel', label: 'Cast at level', min: 0, max: 9 },
-        ...monsterActionLimitedUseFields(),
+        { type: 'select', name: 'castAtLevel', label: 'Cast at level', options: [] },
+        { type: 'select', name: 'limitedUse', label: 'Frequency', options: [] },
       ],
     },
     {

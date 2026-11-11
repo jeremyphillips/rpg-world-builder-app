@@ -148,4 +148,52 @@ describe('FormItems select optionalDisclosure', () => {
 
     expect(screen.getByRole('button', { name: 'Add function override' })).toBeInTheDocument()
   })
+
+  it('aligns an open disclosure control with a sibling select', () => {
+    const { container } = render(
+      <SelectDisclosureHarness
+        defaultValues={{ castAtLevel: '4' }}
+        items={[
+          {
+            kind: 'row',
+            fields: [
+              {
+                type: 'select',
+                name: 'frequency',
+                label: 'Frequency',
+                labelVisibility: 'srOnly',
+                width: '1/2',
+                options: [{ value: 'at-will', label: 'At will' }],
+                defaultValue: 'at-will',
+              },
+              {
+                type: 'select',
+                name: 'castAtLevel',
+                label: 'Cast at level',
+                width: '1/2',
+                options: [{ value: '4', label: '4th' }],
+                optionalDisclosure: { addLabel: 'Cast at a higher level' },
+              },
+            ],
+          },
+        ]}
+      />,
+    )
+
+    const frequency = screen.getByRole('combobox', { name: 'Frequency' })
+    const cast = screen.getByRole('combobox', { name: 'Cast at level' })
+    const participants = [...container.querySelectorAll('[data-field-row-participant]')]
+    const controlRegionFor = (control: HTMLElement) =>
+      participants.find((participant) =>
+        participant.querySelector(':scope > [data-field-control-region]')?.contains(control),
+      )
+
+    expect(participants).toHaveLength(2)
+    expect(controlRegionFor(frequency)).toBeTruthy()
+    expect(controlRegionFor(cast)).toBeTruthy()
+    const labelRegion = screen.getByText('Cast at level').closest('[data-field-label-region]')
+    expect(labelRegion).toContainElement(
+      screen.getByRole('button', { name: 'Remove Cast at level' }),
+    )
+  })
 })

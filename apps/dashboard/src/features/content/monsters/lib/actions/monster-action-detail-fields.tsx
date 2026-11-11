@@ -8,8 +8,9 @@ import {
   MEASURED_RANGE_FEET,
   REACH_FEET,
   WEAPON_MODES,
+  type Spell,
 } from '@rpg/contracts'
-import type { FieldVisibility, FormItem } from '@rpg/ui/form'
+import type { FieldVisibility, FormItem, SelectFieldConfig } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
@@ -41,6 +42,8 @@ import {
   MONSTER_TURN_LIMIT_LABEL,
   MONSTER_TURN_LIMIT_OPTION_LABEL,
   MONSTER_ATTACK_BONUS_LABEL,
+  MONSTER_SPELL_CAST_HIGHER_LEVEL_LABEL,
+  MONSTER_SPELL_CAST_LEVEL_PLACEHOLDER,
 } from '../monster-form-labels'
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
@@ -64,11 +67,15 @@ import {
   MonsterActionSaveSuccessAmountField,
 } from './monster-action-save-outcome-fields'
 import { legendaryActionCategory } from './legendary-action-category'
+import { legendaryActionDetailFields } from './monster-legendary-action-fields'
+import { spellAllowsHigherCastLevel, higherCastLevelOptions } from './monster-spell-frequency'
+import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../components/form/monster-spell-picker-context'
 import {
-  legendaryActionDetailFields,
-  monsterCastAtLevelField,
-  monsterSpellIdField,
-} from './monster-legendary-action-fields'
+  MonsterSpellChangeAction,
+  MonsterSpellEntryCard,
+  MonsterSpellFrequencySlot,
+} from '../../components/form/monster-spell-entry-card'
+
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {
   return {
     dependsOn: [name],
@@ -462,6 +469,40 @@ function monsterActionEquipmentField(
   }
 }
 
+function monsterSpellCastAtLevelField(
+  catalog: ReadonlyMap<string, Spell> | undefined,
+): SelectFieldConfig {
+  return {
+    type: 'select',
+    name: 'castAtLevel',
+    label: 'Cast at level',
+    labelVisibility: 'srOnly',
+    placeholder: MONSTER_SPELL_CAST_LEVEL_PLACEHOLDER,
+    width: '1/2',
+    optionalDisclosure: {
+      addLabel: MONSTER_SPELL_CAST_HIGHER_LEVEL_LABEL,
+      expandWhenPopulated: true,
+    },
+    optionsResolve: {
+      dependsOn: ['spellId'],
+      optionsWhen: (values) => {
+        const spellId = typeof values.spellId === 'string' ? values.spellId : ''
+        const spell = catalog?.get(spellId)
+        if (!spell || !spellAllowsHigherCastLevel(spell.level)) return []
+        return higherCastLevelOptions(spell.level)
+      },
+    },
+    visibility: {
+      dependsOn: ['spellId'],
+      visibleWhen: (values) => {
+        const spellId = typeof values.spellId === 'string' ? values.spellId : ''
+        const spell = catalog?.get(spellId)
+        return Boolean(spell && spellAllowsHigherCastLevel(spell.level))
+      },
+    },
+  }
+}
+
 function monsterActionSpellMechanics(input: {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
@@ -487,16 +528,45 @@ function monsterActionSpellMechanics(input: {
       kind: 'array',
       name: 'spells',
       label: getContentTypeTerm('spells').label,
-      addAction: { label: 'Add spell' },
-      item: { header: { fallback: (index) => `Spell ${index + 1}` } },
+      addAction: { label: 'Add spell', intercept: MONSTER_SPELL_PICKER_INTERCEPT },
+      item: {
+        collapsible: true,
+        header: {
+          fallback: (index) => `Spell ${index + 1}`,
+          primary: (values) => {
+            const spellId = typeof values.spellId === 'string' ? values.spellId : ''
+            return input.ctx.spellCatalogById?.get(spellId)?.name
+          },
+        },
+        renderShell: (props) => (
+          <MonsterSpellEntryCard {...props} catalog={input.ctx.spellCatalogById} />
+        ),
+        beforeRemove: {
+          name: 'changeSpell',
+          render: () => <MonsterSpellChangeAction catalog={input.ctx.spellCatalogById} />,
+        },
+      },
       fields: [
-        monsterSpellIdField(spellOptions(input.ctx), {}),
-        monsterCastAtLevelField(),
-        ...monsterActionLimitedUseFields(),
+        {
+          kind: 'row',
+          fields: [
+            {
+              kind: 'slot',
+              name: 'frequency',
+              width: '1/2',
+              render: () => <MonsterSpellFrequencySlot />,
+            },
+            monsterSpellCastAtLevelField(input.ctx.spellCatalogById),
+          ],
+        },
       ],
     },
     spellComponentField(),
-    ...monsterActionLimitedUseFields(),
+    ...monsterActionLimitedUseFields({
+      addDisabled:
+        input.action.kind === 'spell' &&
+        (input.action.spells ?? []).some((spell) => spell.limitedUse != null),
+    }),
   ]
 }
 

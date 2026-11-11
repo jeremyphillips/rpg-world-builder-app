@@ -20,6 +20,7 @@ import {
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
 import { MONSTER_MOVE_TO_LABEL } from '../../lib/monster-form-labels'
+import { MonsterSpellPickerHost } from './monster-spell-picker-host'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import { monsterActionSectionHeading } from '../../lib/actions/monster-action-presets'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-form-labels'
@@ -218,13 +219,19 @@ export function MonsterActionDetail({
       renderBody={
         located && action
           ? () => (
-              <FormRhythmStack>
-                <FormItems
-                  items={fields}
-                  idPrefix={`monster-action-${action.id}`}
-                  namePrefix={namePrefix}
-                />
-              </FormRhythmStack>
+              <MonsterSpellPickerHost
+                enabled={action.kind === 'spell' && located.section !== 'legendaryActions'}
+                arrayName={`${namePrefix}.spells`}
+                catalog={ctx.spellCatalogById}
+              >
+                <FormRhythmStack>
+                  <FormItems
+                    items={fields}
+                    idPrefix={`monster-action-${action.id}`}
+                    namePrefix={namePrefix}
+                  />
+                </FormRhythmStack>
+              </MonsterSpellPickerHost>
             )
           : undefined
       }

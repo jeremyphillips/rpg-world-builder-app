@@ -168,6 +168,25 @@ function applyLimitedUseDraft(cleaned: Record<string, unknown>): void {
   else delete cleaned.limitedUse
 }
 
+function coerceSpellCastAtLevel(spell: Record<string, unknown>): void {
+  if (typeof spell.castAtLevel !== 'string') return
+  const level = Number(spell.castAtLevel)
+  if (Number.isInteger(level)) spell.castAtLevel = level
+  else delete spell.castAtLevel
+}
+
+/** Same limited-use normalizer as the action, applied to each spell row. */
+function applySpellEntryDraft(cleaned: Record<string, unknown>): void {
+  if (!Array.isArray(cleaned.spells)) return
+  cleaned.spells = cleaned.spells.map((spell) => {
+    if (!isRecord(spell)) return spell
+    const next = { ...spell }
+    applyLimitedUseDraft(next)
+    coerceSpellCastAtLevel(next)
+    return next
+  })
+}
+
 function applyTurnAndInvocationDraft(
   cleaned: Record<string, unknown>,
   section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
@@ -236,6 +255,7 @@ function normalizeAction(
   applyReactionTriggerDraft(cleaned, section)
   applyTurnAndInvocationDraft(cleaned, section)
   applyLimitedUseDraft(cleaned)
+  applySpellEntryDraft(cleaned)
   if (cleaned.kind === 'weapon' && isRecord(cleaned.damage)) {
     cleaned.damage = weaponActionDamageToDraft(cleaned.damage)
   }

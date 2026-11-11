@@ -218,4 +218,46 @@ describe('normalizeMonsterFormValues', () => {
     expect(spell).toEqual({ spellId: 'srd:fireball' })
     expect(spell).not.toHaveProperty('castAtLevel')
   })
+
+  it('normalizes each spell limit without turning custom or incomplete limits into At will', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    const daily = {
+      kind: 'uses' as const,
+      count: { kind: 'fixed' as const, value: 2 },
+      recovery: { minimumRest: 'long' as const },
+    }
+    const recharge = { kind: 'recharge' as const, minRoll: 5 }
+    const incomplete = { kind: 'uses' as const }
+    values.actions = [
+      {
+        id: 'cast',
+        kind: 'spell',
+        name: 'Spellcasting',
+        castingAbility: { kind: 'ability', ability: 'int' },
+        limitedUse: daily,
+        spells: [
+          { spellId: 'srd:fireball', limitedUse: daily, castAtLevel: '4' as never },
+          { spellId: 'srd:shield', limitedUse: recharge },
+          { spellId: 'srd:light', limitedUse: incomplete },
+          { spellId: 'srd:mage-hand' },
+        ],
+      },
+    ]
+    const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
+    const action = (
+      normalized.actions as {
+        limitedUse?: unknown
+        spells?: { spellId?: string; limitedUse?: unknown; castAtLevel?: unknown }[]
+      }[]
+    )[0]
+    expect(action?.limitedUse).toEqual(daily)
+    expect(action?.spells?.[0]).toEqual({
+      spellId: 'srd:fireball',
+      limitedUse: daily,
+      castAtLevel: 4,
+    })
+    expect(action?.spells?.[1]?.limitedUse).toEqual(recharge)
+    expect(action?.spells?.[2]?.limitedUse).toEqual(incomplete)
+    expect(action?.spells?.[3]).toEqual({ spellId: 'srd:mage-hand' })
+  })
 })
