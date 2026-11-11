@@ -35,10 +35,11 @@ import {
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
   MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
   MONSTER_SAVE_THROW_SECTION_LEGEND,
-  MONSTER_ATTACK_SEQUENCE_LEAD_LABEL,
   MONSTER_TRIGGER_LABEL,
   MONSTER_TURN_LIMIT_ADD_LABEL,
+  MONSTER_TURN_LIMIT_EMPTY_LABEL,
   MONSTER_TURN_LIMIT_LABEL,
+  MONSTER_TURN_LIMIT_OPTION_LABEL,
   MONSTER_ATTACK_BONUS_LABEL,
 } from '../monster-form-labels'
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
@@ -62,6 +63,12 @@ import {
   MonsterActionSaveFailureNoteField,
   MonsterActionSaveSuccessAmountField,
 } from './monster-action-save-outcome-fields'
+import { legendaryActionCategory } from './legendary-action-category'
+import {
+  legendaryActionDetailFields,
+  monsterCastAtLevelField,
+  monsterSpellIdField,
+} from './monster-legendary-action-fields'
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {
   return {
     dependsOn: [name],
@@ -470,22 +477,11 @@ function monsterActionSpellMechanics(input: {
         <MonsterActionCastingAbilityField
           name={`${input.namePrefix}.castingAbility`}
           sharedOptions={input.sharedCastingOptions}
-          labelPosition="settings"
           sourceActionId={input.action.id}
           onBlocked={input.onCastingSourceBlocked}
+          profile="primary"
         />
       ),
-    },
-    {
-      type: 'select',
-      name: 'spellInvocation',
-      label: 'Casting sentence',
-      optionalDisclosure: { addLabel: 'Use the spellcasting entry' },
-      options: [{ value: 'use-entry', label: 'Uses the spellcasting entry to cast' }],
-      visibility: {
-        dependsOn: ['castingAbility.kind'],
-        visibleWhen: (values) => values['castingAbility.kind'] === 'shared',
-      },
     },
     {
       kind: 'array',
@@ -494,14 +490,8 @@ function monsterActionSpellMechanics(input: {
       addAction: { label: 'Add spell' },
       item: { header: { fallback: (index) => `Spell ${index + 1}` } },
       fields: [
-        {
-          type: 'select',
-          name: 'spellId',
-          label: getContentTypeTerm('spells').label,
-          placeholder: 'Choose',
-          options: spellOptions(input.ctx),
-        },
-        { type: 'number', name: 'castAtLevel', label: 'Cast at level', min: 0, max: 9 },
+        monsterSpellIdField(spellOptions(input.ctx), {}),
+        monsterCastAtLevelField(),
         ...monsterActionLimitedUseFields(),
       ],
     },
@@ -581,17 +571,7 @@ function monsterActionMechanicFields(input: {
   if (action.kind === 'save') {
     kindFields.push(monsterActionSaveSection(ctx, namePrefix, sharedCastingOptions))
   }
-  if (action.kind === 'multiattack' || action.kind === 'attack-sequence') {
-    if (action.kind === 'attack-sequence') {
-      kindFields.push({
-        type: 'text',
-        name: 'lead',
-        label: MONSTER_ATTACK_SEQUENCE_LEAD_LABEL,
-        hint: {
-          text: 'Predicate before the attack sentence, without the creature name.',
-        },
-      })
-    }
+  if (action.kind === 'multiattack') {
     kindFields.push({
       kind: 'array',
       name: 'steps',
@@ -617,17 +597,43 @@ function turnLimitField(): FormItem {
     type: 'select',
     name: 'onceUntilNextTurn',
     label: MONSTER_TURN_LIMIT_LABEL,
-    placeholder: 'No turn limit',
+    placeholder: MONSTER_TURN_LIMIT_EMPTY_LABEL,
     optionalDisclosure: { addLabel: MONSTER_TURN_LIMIT_ADD_LABEL },
-    options: [{ value: 'true', label: "Can't take this again until its next turn" }],
+    options: [{ value: 'true', label: MONSTER_TURN_LIMIT_OPTION_LABEL }],
   }
 }
 
-/**
- * Detail body order: source, preview, advisory, primary prose, mechanics, supplemental prose.
- * Identity stays on the master-detail header.
- */
-export function monsterActionDetailFields(input: {
+function legendaryAuthoringFields(input: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  namePrefix: string
+  sharedCastingOptions: { value: string; label: string }[]
+  referenceOptions?: { value: string; label: string }[]
+  sourceSpellOptions?: { value: string; label: string }[]
+  onCastingSourceBlocked?: (message: string) => void
+  advisories?: readonly MonsterFormAdvisory[]
+}): FormItem[] | undefined {
+  const category =
+    input.section === 'legendaryActions' ? legendaryActionCategory(input.action) : undefined
+  if (!category || category === 'custom') return undefined
+  return [
+    monsterFormAdvisorySlot(input.advisories ?? [], input.namePrefix),
+    ...legendaryActionDetailFields({
+      category,
+      namePrefix: input.namePrefix,
+      actionId: input.action.id,
+      sharedCastingOptions: input.sharedCastingOptions,
+      referenceOptions: input.referenceOptions ?? [],
+      catalogSpellOptions: spellOptions(input.ctx),
+      sourceSpellOptions: input.sourceSpellOptions ?? [],
+      onCastingSourceBlocked: input.onCastingSourceBlocked,
+    }),
+    turnLimitField(),
+  ]
+}
+
+function sharedAuthoringFields(input: {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
   section: MonsterActionSection
@@ -637,7 +643,6 @@ export function monsterActionDetailFields(input: {
   sharedCastingOptions: { value: string; label: string }[]
   attackOptions?: { value: string; label: string }[]
   onCastingSourceBlocked?: (message: string) => void
-  /** Already collected for this form. The advisory slot only filters this list. */
   advisories?: readonly MonsterFormAdvisory[]
 }): FormItem[] {
   const { ctx, action, section, namePrefix } = input
@@ -648,10 +653,7 @@ export function monsterActionDetailFields(input: {
       ? [monsterActionAttackPreviewSlot(ctx, action)]
       : []
   const primaryProse = action.kind === 'special' ? [monsterActionDescriptionField(action)] : []
-  const supplemental =
-    action.kind === 'special' || action.kind === 'attack-sequence'
-      ? []
-      : [monsterActionDescriptionField(action)]
+  const supplemental = action.kind === 'special' ? [] : [monsterActionDescriptionField(action)]
   return [
     ...source,
     ...preview,
@@ -670,4 +672,26 @@ export function monsterActionDetailFields(input: {
     turnLimitField(),
     ...supplemental,
   ]
+}
+
+/**
+ * Detail body order: source, preview, advisory, primary prose, mechanics, supplemental prose.
+ * Identity stays on the master-detail header.
+ */
+export function monsterActionDetailFields(input: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  namePrefix: string
+  equipmentOptions: { value: string; label: string }[]
+  equipment?: MonsterFormValues['equipment']
+  sharedCastingOptions: { value: string; label: string }[]
+  attackOptions?: { value: string; label: string }[]
+  referenceOptions?: { value: string; label: string }[]
+  sourceSpellOptions?: { value: string; label: string }[]
+  onCastingSourceBlocked?: (message: string) => void
+  /** Already collected for this form. The advisory slot only filters this list. */
+  advisories?: readonly MonsterFormAdvisory[]
+}): FormItem[] {
+  return legendaryAuthoringFields(input) ?? sharedAuthoringFields(input)
 }

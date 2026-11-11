@@ -1,5 +1,6 @@
 import {
   getAbilityLabel,
+  getContentTypeSentenceForm,
   listDirectSpellCastingSources,
   MONSTER_SPELLCASTING_ACTION_NAME,
   resolveMonsterActionIdentity,
@@ -32,6 +33,13 @@ type CastingRow = {
 
 export const MONSTER_CASTING_ABILITY_GROUP_LABEL = 'Choose an ability'
 export const MONSTER_CASTING_SHARE_GROUP_LABEL = "Use another action's ability"
+
+type SpellCountRow = {
+  id?: string
+  kind?: string
+  castingAbility?: { kind?: string; ability?: Ability }
+  spells?: readonly { spellId?: string }[]
+}
 
 type FormCastingSections = {
   actions?: readonly unknown[]
@@ -67,6 +75,21 @@ export function formatSharedCastingOptionLabel(
   const collisions = sources.filter((other) => sourceNameKey(other) === sourceNameKey(source))
   if (collisions.length < 2) return base
   return joinInlineMetadata([base, monsterActionSectionHeading(source.section)])
+}
+
+/** Action title with its spell count and ability. Section is added only when names collide. */
+export function formatSpellcastingActionOptionLabel(
+  source: ResolvedSpellCastingSource,
+  sources: readonly ResolvedSpellCastingSource[],
+  spellCount: number,
+): string {
+  const collisions = sources.filter((other) => sourceNameKey(other) === sourceNameKey(source))
+  return joinInlineMetadata([
+    sourceTitle(source),
+    `${spellCount} ${getContentTypeSentenceForm('spells', spellCount)}`,
+    getAbilityLabel(source.ability),
+    collisions.length < 2 ? undefined : monsterActionSectionHeading(source.section),
+  ])
 }
 
 export function sharedCastingOptions(
@@ -136,4 +159,23 @@ export function spellcastingNameTaken(sections: FormCastingSections): boolean {
     }
   }
   return false
+}
+
+function spellCountFor(sections: FormCastingSections, entryId: string): number {
+  const rows = (['actions', 'bonusActions', 'reactions'] as const).flatMap(
+    (section) => (sections[section] ?? []) as SpellCountRow[],
+  )
+  const source = rows.find((row) => row.id === entryId && row.kind === 'spell')
+  return (source?.spells ?? []).filter((spell) => Boolean(spell.spellId)).length
+}
+
+export function legendarySpellcastingActionOptions(sections: FormCastingSections): {
+  value: string
+  label: string
+}[] {
+  const sources = listDirectSpellCastingSources(asSpellCastingSections(sections))
+  return sources.map((source) => ({
+    value: source.id,
+    label: formatSpellcastingActionOptionLabel(source, sources, spellCountFor(sections, source.id)),
+  }))
 }

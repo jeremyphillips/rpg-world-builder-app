@@ -36,6 +36,7 @@ export function listDirectSpellCastingSources(
 ): ResolvedSpellCastingSource[] {
   const sources: ResolvedSpellCastingSource[] = []
   for (const section of MONSTER_ACTION_SECTIONS) {
+    if (section === 'legendaryActions') continue
     for (const row of sections[section] ?? []) {
       const ability = directAbility(row)
       if (!ability) continue

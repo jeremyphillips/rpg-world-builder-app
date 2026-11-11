@@ -8,6 +8,8 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import { MasterDetailEditorPanel } from '../../../components/master-detail/master-detail-editor-panel'
 import type { useEmbeddedMasterDetailRows } from '../../../lib/master-detail/use-embedded-master-detail-rows'
 import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-summary'
+import { isLegendaryReferenceTarget } from '../../lib/actions/legendary-action-category'
+import { legendarySourceSpellOptions } from '../../lib/actions/monster-legendary-action-acquisition'
 import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
 import {
   monsterActionHeaderName,
@@ -31,6 +33,22 @@ import type { useMonsterActionSections } from '../../hooks/use-monster-action-se
 
 type Sections = ReturnType<typeof useMonsterActionSections>
 type ActionRows = ReturnType<typeof useEmbeddedMasterDetailRows>
+
+function attackChipOptions(
+  rows: readonly MonsterActionDraftRow[],
+  actionId: string,
+  values: MonsterFormValues,
+  ctx: ContentFormCtx,
+): { value: string; label: string }[] {
+  const titles = monsterActionEditorTitles(rows, values, ctx)
+  return rows
+    .filter(
+      (row) =>
+        row.id !== actionId &&
+        (row.kind === 'weapon' || row.kind === 'natural-weapon' || row.kind === 'attack'),
+    )
+    .map((row) => ({ value: row.id, label: titles.get(row.id) ?? row.id }))
+}
 
 function equipmentOptions(
   values: MonsterFormValues,
@@ -80,6 +98,7 @@ export function MonsterActionDetail({
           sectionRows,
           values,
           ctx,
+          section: located.section,
         })
       : undefined
   const editor = located ? sections.editors[located.section] : sections.editors.actions
@@ -101,25 +120,27 @@ export function MonsterActionDetail({
       sharedCastingOptions: sharedCastingOptions(values, action.id),
       advisories: collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx)),
       onCastingSourceBlocked: sections.setNotice,
-      attackOptions: ((values[located.section] ?? []) as MonsterActionDraftRow[])
-        .filter(
-          (row) =>
-            row.id !== action.id &&
-            (row.kind === 'weapon' || row.kind === 'natural-weapon' || row.kind === 'attack'),
-        )
+      attackOptions: attackChipOptions(
+        (values[located.section] ?? []) as MonsterActionDraftRow[],
+        action.id,
+        values,
+        ctx,
+      ),
+      referenceOptions: ((values.actions ?? []) as MonsterActionDraftRow[])
+        .filter(isLegendaryReferenceTarget)
         .map((row) => ({
           value: row.id,
           label:
             monsterActionEditorTitles(
-              (values[located.section] ?? []) as MonsterActionDraftRow[],
+              (values.actions ?? []) as MonsterActionDraftRow[],
               values,
               ctx,
-            ).get(row.id) ??
-            headerName?.title ??
-            row.id,
+              'actions',
+            ).get(row.id) ?? row.id,
         })),
+      sourceSpellOptions: legendarySourceSpellOptions(values, liveAction, ctx.spellCatalogById),
     })
-  }, [action, ctx, headerName?.title, liveAction, located, namePrefix, sections.setNotice, values])
+  }, [action, ctx, liveAction, located, namePrefix, sections.setNotice, values])
 
   useEffect(() => {
     if (sections.focusToken === 0 || !action) return
@@ -164,7 +185,7 @@ export function MonsterActionDetail({
       onDelete={located ? () => sections.requestDelete(located.action.id) : undefined}
       onDuplicate={located ? sections.duplicateSelected : undefined}
       overflowActions={
-        located
+        located && located.section !== 'legendaryActions'
           ? [
               {
                 id: 'move-to',
@@ -172,8 +193,8 @@ export function MonsterActionDetail({
                 items: MONSTER_ACTION_SECTIONS.filter(
                   (section) =>
                     section !== located.section &&
-                    !(located.action.kind === 'multiattack' && section !== 'actions') &&
-                    !(located.action.kind === 'attack-sequence' && section !== 'legendaryActions'),
+                    section !== 'legendaryActions' &&
+                    !(located.action.kind === 'multiattack' && section !== 'actions'),
                 ).map((section) => ({
                   id: `move-${section}`,
                   label: monsterActionSectionHeading(section),

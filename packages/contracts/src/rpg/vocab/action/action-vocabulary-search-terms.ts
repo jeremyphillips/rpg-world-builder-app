@@ -13,6 +13,5 @@ export const ACTION_VOCABULARY_SEARCH_TERMS = {
   constrict: ['constrict', 'squeeze', 'crush', 'grapple', 'snake'],
   'breath-weapon': ['breath', 'cone', 'exhale', 'dragon', 'fire breath'],
   multiattack: ['multiattack', 'multiple attacks', 'sequence', 'several attacks'],
-  'attack-sequence': ['legendary', 'pounce', 'referenced attack', 'makes one attack'],
   'frightful-presence': ['frighten', 'fear', 'presence', 'aura', 'wisdom save'],
 } as const satisfies Record<string, readonly string[]>

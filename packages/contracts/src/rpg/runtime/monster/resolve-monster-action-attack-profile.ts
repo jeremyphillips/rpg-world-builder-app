@@ -122,7 +122,6 @@ type ProfileMonster = {
   actions?: readonly ProfileAction[]
   bonusActions?: readonly ProfileAction[]
   reactions?: readonly ProfileAction[]
-  legendaryActions?: readonly ProfileAction[]
 }
 
 export type ResolveMonsterActionAttackProfileInput = {
@@ -407,12 +406,7 @@ function abilityFromAttackEntry(entry: ProfileAction, entryId: string): Ability 
 function resolveSharedAbility(monster: ProfileMonster, entryId: string): Ability | undefined {
   const spell = findSpellCastingSource(monster, entryId)
   if (spell) return spell.ability
-  const sections = [
-    monster.actions,
-    monster.bonusActions,
-    monster.reactions,
-    monster.legendaryActions,
-  ] as const
+  const sections = [monster.actions, monster.bonusActions, monster.reactions] as const
   for (const section of sections) {
     for (const entry of section ?? []) {
       const ability = abilityFromAttackEntry(entry, entryId)

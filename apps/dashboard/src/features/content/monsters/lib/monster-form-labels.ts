@@ -201,7 +201,9 @@ export const MONSTER_LEGENDARY_USES_LABEL = 'Uses'
 export const MONSTER_LEGENDARY_LAIR_USES_LABEL = 'Uses in lair'
 export const MONSTER_TURN_LIMIT_ADD_LABEL = 'Add turn limit'
 export const MONSTER_TURN_LIMIT_LABEL = 'Turn limit'
-export const MONSTER_ATTACK_SEQUENCE_LEAD_LABEL = 'Lead'
+export const MONSTER_TURN_LIMIT_EMPTY_LABEL = 'No turn limit'
+export const MONSTER_TURN_LIMIT_OPTION_LABEL =
+  "Can't take this action again until the start of its next turn"
 
 const MONSTER_ACTION_SECTION_HEADINGS = {
   actions: MONSTER_ACTIONS_HEADING,
@@ -224,8 +226,65 @@ export const MONSTER_ACQUISITION_SPELL_DESCRIPTION = 'Cast spells'
 export const MONSTER_ACQUISITION_SPECIAL_DESCRIPTION = 'Custom rules or effects'
 export const MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION =
   'Combine multiple attacks into one action'
-export const MONSTER_ACQUISITION_ATTACK_SEQUENCE_DESCRIPTION =
-  'Make attacks already listed under Actions'
+
+export const LEGENDARY_REFERENCE_LABEL = 'Attack or ability'
+export const LEGENDARY_REFERENCE_DESCRIPTION = 'Use an action already defined for this creature.'
+export const LEGENDARY_REFERENCE_DISABLED_NOTE = 'No attacks or abilities in Actions'
+export const LEGENDARY_SPELLCASTING_LABEL = 'Spellcasting'
+export const LEGENDARY_SPELLCASTING_DEFAULT_NAME = 'Use Spellcasting'
+export const LEGENDARY_SPELLCASTING_DESCRIPTION =
+  'Cast a spell from an existing Spellcasting action.'
+export const LEGENDARY_SPELLCASTING_DISABLED_NOTE = 'No Spellcasting action with spells'
+export const LEGENDARY_CAST_SPELL_LABEL = 'Cast a spell'
+export const LEGENDARY_CAST_SPELL_DEFAULT_NAME = 'Cast a spell'
+export const LEGENDARY_CAST_SPELL_DESCRIPTION = 'Choose a spell from the catalog.'
+export const LEGENDARY_CAST_SPELL_DISABLED_NOTE = 'Spell catalog is not ready'
+export const LEGENDARY_CUSTOM_LABEL = 'Custom ability'
+export const LEGENDARY_CUSTOM_DESCRIPTION = 'Write a standalone legendary ability.'
+
+export const LEGENDARY_ACTION_CATEGORY_LABELS = {
+  reference: LEGENDARY_REFERENCE_LABEL,
+  spellcasting: LEGENDARY_SPELLCASTING_LABEL,
+  'cast-spell': LEGENDARY_CAST_SPELL_LABEL,
+  custom: LEGENDARY_CUSTOM_LABEL,
+} as const
+
+export const LEGENDARY_ACTION_DEFAULT_NAMES = {
+  reference: LEGENDARY_REFERENCE_LABEL,
+  spellcasting: LEGENDARY_SPELLCASTING_DEFAULT_NAME,
+  'cast-spell': LEGENDARY_CAST_SPELL_DEFAULT_NAME,
+  custom: LEGENDARY_CUSTOM_LABEL,
+} as const
+
+export const MONSTER_REFERENCE_ACTION_LABEL = 'Action'
+export const MONSTER_REFERENCE_ACTION_HINT =
+  'Choose an attack or ability from Actions. If you select several attacks, the creature makes one of them.'
+export const MONSTER_MOVEMENT_LABEL = 'Movement'
+export const MONSTER_MOVEMENT_PLACEHOLDER = 'No movement'
+export const MONSTER_MOVEMENT_ADD_LABEL = 'Add movement'
+export const MONSTER_MOVEMENT_HINT = 'Optional movement before the action.'
+export const MONSTER_MOVEMENT_OPPORTUNITY_LABEL = 'Without provoking Opportunity Attacks'
+export const MONSTER_LEGENDARY_SPELLCASTING_FIELD_LABEL = 'Source action'
+export const MONSTER_LEGENDARY_SPELLCASTING_FIELD_HINT =
+  'Choose an existing action from Actions. Its spells and casting ability are reused.'
+export const MONSTER_SPELLCASTING_ABILITY_LABEL = 'Spellcasting ability'
+export const MONSTER_SPELLCASTING_ABILITY_PRIMARY_HINT =
+  'Choose the ability used to cast these spells. Other actions can reuse this ability.'
+export const MONSTER_SPELLCASTING_ABILITY_SHARED_HINT =
+  'Choose an ability or reuse one from an existing action.'
+export const MONSTER_SPELLCASTING_SPELL_HINT = 'Choose a spell from this Spellcasting action.'
+export const MONSTER_CAST_SPELL_HINT = 'Choose a spell from the catalog.'
+export const MONSTER_CAST_AT_LEVEL_HINT = 'Set only to cast a higher-level version.'
+export const MONSTER_REMOVE_REFERENCED_ACTION_HEADLINE = 'Remove referenced action'
+export const MONSTER_MOVE_REFERENCED_ACTION_HEADLINE = 'Move referenced action'
+
+export function formatRemoveReferencedActionBody(names: string): string {
+  return `This action is used by ${names}. Removing it drops that reference.`
+}
+
+export function formatMoveReferencedActionBody(names: string): string {
+  return `${names} will be invalid until this action is moved back to Actions.`
+}
 
 function monsterArmorSlotMidSentenceNoun(slot: CreatureArmorSlot): string {
   if (slot === 'shield') return getArmorCategorySentenceForm('shields', 1)

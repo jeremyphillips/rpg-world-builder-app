@@ -1,5 +1,5 @@
 import { ABILITY_IDS, getAbilityLabel, type Ability } from '@rpg/contracts'
-import { SelectField, type FieldLabelPosition } from '@rpg/ui'
+import { SelectField } from '@rpg/ui'
 import {
   resolveFieldErrorMessage,
   resolveNestedFieldErrorMessage,
@@ -10,13 +10,19 @@ import { useFormContext, useWatch } from 'react-hook-form'
 
 import { formatCastingSourceChangeNotice } from '../monster-form-labels'
 import {
+  legendarySpellcastingActionOptions,
   MONSTER_CASTING_ABILITY_GROUP_LABEL,
   MONSTER_CASTING_SHARE_GROUP_LABEL,
   monsterCastingDependentLabels,
 } from './monster-action-casting-summary'
+import {
+  MONSTER_LEGENDARY_SPELLCASTING_FIELD_HINT,
+  MONSTER_LEGENDARY_SPELLCASTING_FIELD_LABEL,
+  MONSTER_SPELLCASTING_ABILITY_LABEL,
+  MONSTER_SPELLCASTING_ABILITY_PRIMARY_HINT,
+  MONSTER_SPELLCASTING_ABILITY_SHARED_HINT,
+} from '../monster-form-labels'
 import type { MonsterFormValues } from '../monster-form-values'
-
-const SPELLCASTING_ABILITY_LABEL = 'Spellcasting ability'
 
 function castingAbilityValue(value: unknown): string {
   if (!value || typeof value !== 'object') return ''
@@ -34,18 +40,16 @@ function monsterCastingAbilityOptions(
     label: MONSTER_CASTING_ABILITY_GROUP_LABEL,
     options: ABILITY_IDS.map((ability) => ({ value: ability, label: getAbilityLabel(ability) })),
   }
+  const shared = {
+    kind: 'group' as const,
+    label: MONSTER_CASTING_SHARE_GROUP_LABEL,
+    options: sharedOptions.map((option) => ({
+      value: `shared:${option.value}`,
+      label: option.label,
+    })),
+  }
   if (sharedOptions.length === 0) return [abilities]
-  return [
-    abilities,
-    {
-      kind: 'group' as const,
-      label: MONSTER_CASTING_SHARE_GROUP_LABEL,
-      options: sharedOptions.map((option) => ({
-        value: `shared:${option.value}`,
-        label: option.label,
-      })),
-    },
-  ]
+  return [abilities, shared]
 }
 
 function isDirectAbility(value: unknown): value is { kind: 'ability'; ability: Ability } {
@@ -57,18 +61,19 @@ function isDirectAbility(value: unknown): value is { kind: 'ability'; ability: A
 export function MonsterActionCastingAbilityField({
   name,
   sharedOptions,
-  labelPosition,
   sourceActionId,
   onBlocked,
-  required,
+  required = true,
+  profile = 'shared',
 }: {
   name: string
   sharedOptions: readonly { value: string; label: string }[]
-  labelPosition?: FieldLabelPosition
   /** Set on the spell row that other actions share. Nested attack and save fields omit it. */
   sourceActionId?: string
   onBlocked?: (message: string) => void
   required?: boolean
+  /** Primary defines the ability other actions reuse. Shared may choose that ability or its own. */
+  profile?: 'primary' | 'shared'
 }) {
   const controlSize = useFieldControlSize()
   const { getValues, setValue, formState } = useFormContext<MonsterFormValues>()
@@ -76,15 +81,19 @@ export function MonsterActionCastingAbilityField({
   const value = castingAbilityValue(current)
   const fieldId = `${name.replaceAll('.', '-')}-casting-ability`
   const error = resolveFieldErrorMessage(resolveNestedFieldErrorMessage(formState.errors, name))
+  const hint =
+    profile === 'primary'
+      ? MONSTER_SPELLCASTING_ABILITY_PRIMARY_HINT
+      : MONSTER_SPELLCASTING_ABILITY_SHARED_HINT
 
   return (
     <SelectField
       id={fieldId}
       name={name}
-      label={SPELLCASTING_ABILITY_LABEL}
-      labelPosition={labelPosition}
+      label={MONSTER_SPELLCASTING_ABILITY_LABEL}
       required={required}
       placeholder="Choose"
+      hint={hint}
       options={monsterCastingAbilityOptions(sharedOptions)}
       value={value}
       size={controlSize}
@@ -113,6 +122,50 @@ export function MonsterActionCastingAbilityField({
           return
         }
         setValue(name as never, { kind: 'ability', ability: next } as never, {
+          shouldDirty: true,
+          shouldValidate: true,
+        })
+      }}
+    />
+  )
+}
+
+export function MonsterLegendarySpellcastingActionField({
+  name,
+  required = true,
+}: {
+  name: string
+  required?: boolean
+}) {
+  const controlSize = useFieldControlSize()
+  const { setValue, formState } = useFormContext<MonsterFormValues>()
+  const values = (useWatch() ?? {}) as MonsterFormValues
+  const current = useWatch({ name }) as { kind?: string; entryId?: string } | undefined
+  const entryId = current?.kind === 'shared' && current.entryId ? current.entryId : ''
+  const options = legendarySpellcastingActionOptions(values)
+  const fieldId = `${name.replaceAll('.', '-')}-spellcasting-action`
+  const error = resolveFieldErrorMessage(resolveNestedFieldErrorMessage(formState.errors, name))
+
+  return (
+    <SelectField
+      id={fieldId}
+      name={name}
+      label={MONSTER_LEGENDARY_SPELLCASTING_FIELD_LABEL}
+      hint={MONSTER_LEGENDARY_SPELLCASTING_FIELD_HINT}
+      required={required}
+      placeholder="Choose"
+      options={options}
+      value={entryId}
+      size={controlSize}
+      width="full"
+      error={error}
+      invalid={Boolean(error)}
+      onValueChange={(next) => {
+        if (!next) {
+          setValue(name as never, undefined as never, { shouldDirty: true, shouldValidate: true })
+          return
+        }
+        setValue(name as never, { kind: 'shared', entryId: next } as never, {
           shouldDirty: true,
           shouldValidate: true,
         })

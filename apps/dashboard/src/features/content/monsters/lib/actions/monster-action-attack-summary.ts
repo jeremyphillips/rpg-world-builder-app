@@ -69,6 +69,7 @@ export function findMonsterFormActionDraft(
   ctx: ContentFormCtx,
   actionId: string,
 ): MonsterActionDraft | undefined {
+  if (!values.armorClass || !values.hitPoints || !values.abilityScores) return undefined
   const normalized = normalizeMonsterFormValues(values, {
     intent: 'draft',
     mode: 'create',

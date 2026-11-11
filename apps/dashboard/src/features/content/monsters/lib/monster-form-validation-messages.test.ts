@@ -264,4 +264,27 @@ describe('monster publish validation messages', () => {
     const result = publish([{ id: 'sword', kind: 'weapon', equipmentEntryId: 'sword' }])
     expect(messages(result).some((issue) => issue.path === 'actions.0.name')).toBe(false)
   })
+
+  it('puts legendary uses on a two-digit row', () => {
+    const actions = buildMonsterTabs(ctx).find((tab) => tab.id === 'actions')
+    const group = actions?.fields.find(
+      (field) => 'legend' in field && field.legend === 'Legendary Actions',
+    )
+    const row =
+      group && 'fields' in group
+        ? group.fields.find((field) => 'kind' in field && field.kind === 'row')
+        : undefined
+    expect(row && 'fields' in row ? row.fields : []).toEqual([
+      expect.objectContaining({
+        name: 'legendaryActionUses',
+        digits: 2,
+        width: 'auto',
+      }),
+      expect.objectContaining({
+        name: 'legendaryActionUsesInLair',
+        digits: 2,
+        width: 'auto',
+      }),
+    ])
+  })
 })

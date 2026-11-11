@@ -152,3 +152,65 @@ export const SHIELD_CONDITION_REACTION = {
   trigger: { text: 'The archmage can see the attacker.' },
   spells: [{ spellId: MONSTER_FIXTURE_SPELLS.shield.id }],
 }
+
+export const MONSTER_TEST_BODY = {
+  name: 'Test',
+  sizes: ['medium'],
+  creatureType: 'humanoid',
+  alignment: 'n',
+  abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+  armorClass: {},
+  hitPoints: { kind: 'hit-dice', count: 1 },
+  movement: { walk: 30 },
+  senses: [],
+  communication: {},
+  challengeRating: '0',
+  proficiencies: { savingThrows: [], skills: [], languages: [], weapons: [] },
+  defenses: {
+    vulnerabilities: [],
+    resistances: [],
+    immunities: [],
+    conditionImmunities: [],
+  },
+} as const
+
+export const MONSTER_TEST_INPUT = {
+  slug: 'test-monster',
+  ...MONSTER_TEST_BODY,
+} as const
+
+export const BITE_ACTION = {
+  id: 'bite',
+  kind: 'natural-weapon',
+  name: 'Bite',
+  mode: 'melee',
+  reach: 5,
+  damage: { dice: { count: 1, faces: 6 } },
+  damageType: 'piercing',
+}
+
+export const FIRE_DAMAGE = {
+  id: 'damage',
+  kind: 'damage' as const,
+  roll: { dice: { count: 2, faces: 6 } },
+  damageType: 'fire',
+}
+
+export const CONE_AREA = { shape: 'cone' as const, length: { value: 15, unit: 'ft' as const } }
+
+export function monsterSaveAction(resolution: Record<string, unknown>) {
+  return {
+    id: 'breath',
+    kind: 'save' as const,
+    name: 'Fire Breath',
+    dcSource: { kind: 'ability' as const, ability: 'con' as const, proficient: true },
+    resolution,
+  }
+}
+
+export function issueMessages(result: {
+  success: boolean
+  error?: { issues: { path: PropertyKey[]; message: string }[] }
+}) {
+  return result.success ? [] : (result.error?.issues ?? []).map((issue) => issue.message)
+}

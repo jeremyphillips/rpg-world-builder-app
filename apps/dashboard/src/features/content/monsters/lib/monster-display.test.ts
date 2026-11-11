@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { systemDefaultArmorClassRules, type Equipment } from '@rpg/contracts'
+import { systemDefaultArmorClassRules, type Equipment, type Monster } from '@rpg/contracts'
 
 import { pickEquipment, pickMonster, pickSkillProficiency } from '@/test/fixtures/pick'
 
@@ -303,5 +303,41 @@ describe('monster-display', () => {
         descriptionHtml: expect.stringContaining('ability checks and attack rolls'),
       }),
     ])
+  })
+
+  it('prints the legendary intro and a reference row', () => {
+    const monster = {
+      ...pickMonster('hell-hound'),
+      name: 'Ancient Red Dragon',
+      legendaryActionUses: 3,
+      actions: [
+        {
+          id: 'rend',
+          kind: 'natural-weapon' as const,
+          name: 'Rend',
+          mode: 'melee' as const,
+          properties: [] as const,
+          damage: { dice: { count: 2, faces: 6 } },
+          damageType: 'slashing',
+        },
+      ],
+      legendaryActions: [
+        {
+          id: 'swipe',
+          kind: 'action-reference' as const,
+          name: 'Tail Swipe',
+          actionIds: ['rend'],
+        },
+      ],
+    }
+    const viewModel = buildMonsterDetailViewModel({
+      monster: monster as unknown as Monster,
+      creatureTypeLabel: 'Dragon',
+      equipmentById: new Map(),
+      catalogState: 'pending',
+      derived: null,
+    })
+    expect(viewModel.legendaryActionsIntro).toContain('Legendary Action Uses: 3')
+    expect(viewModel.legendaryActions[0]?.descriptionHtml).toContain('makes one Rend attack')
   })
 })

@@ -138,4 +138,60 @@ describe('useMonsterActionSections', () => {
     expect(result.current.values?.legendaryActionUses).toBeUndefined()
     expect(result.current.values?.legendaryActionUsesInLair).toBeUndefined()
   })
+
+  it('does not move a row into Legendary Actions', () => {
+    const { result } = renderHook(() => useMonsterActionSections(), {
+      wrapper: wrapper({
+        actions: [{ id: 'bite', kind: 'special', name: 'Bite', description: '<p>Bites.</p>' }],
+      }),
+    })
+    act(() => {
+      result.current.setSelectedActionId('bite')
+      result.current.requestMove('legendaryActions')
+    })
+    expect(result.current.pending).toBeNull()
+    expect(result.current.locate('bite')?.section).toBe('actions')
+  })
+
+  it('lists a legendary reference when its Actions target is removed or moved', () => {
+    const { result } = renderHook(() => useMonsterActionSections(), {
+      wrapper: wrapper({
+        actions: [{ id: 'bite', kind: 'natural-weapon', name: 'Bite' }],
+        legendaryActionUses: 3,
+        legendaryActions: [
+          { id: 'pounce', kind: 'action-reference', name: 'Pounce', actionIds: ['bite'] },
+        ],
+      }),
+    })
+    act(() => {
+      result.current.removeAction('bite')
+    })
+    expect(result.current.pending).toMatchObject({
+      type: 'multiattack-delete',
+      names: ['Pounce'],
+    })
+    act(() => {
+      result.current.confirmPending()
+    })
+    expect(result.current.values?.legendaryActions?.[0]).toMatchObject({ actionIds: [] })
+
+    const move = renderHook(() => useMonsterActionSections(), {
+      wrapper: wrapper({
+        actions: [{ id: 'bite', kind: 'natural-weapon', name: 'Bite' }],
+        legendaryActionUses: 3,
+        legendaryActions: [
+          { id: 'pounce', kind: 'action-reference', name: 'Pounce', actionIds: ['bite'] },
+        ],
+      }),
+    })
+    act(() => {
+      move.result.current.setSelectedActionId('bite')
+      move.result.current.requestMove('bonusActions')
+    })
+    expect(move.result.current.pending).toMatchObject({
+      type: 'multiattack-move',
+      names: ['Pounce'],
+      to: 'bonusActions',
+    })
+  })
 })

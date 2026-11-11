@@ -168,22 +168,43 @@ function applyLimitedUseDraft(cleaned: Record<string, unknown>): void {
   else delete cleaned.limitedUse
 }
 
-function applyTurnAndInvocationDraft(cleaned: Record<string, unknown>): void {
+function applyTurnAndInvocationDraft(
+  cleaned: Record<string, unknown>,
+  section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
+): void {
   if (cleaned.onceUntilNextTurn === true || cleaned.onceUntilNextTurn === 'true') {
     cleaned.onceUntilNextTurn = true
   } else {
     delete cleaned.onceUntilNextTurn
   }
-  const shared = isRecord(cleaned.castingAbility) && cleaned.castingAbility.kind === 'shared'
-  if (cleaned.spellInvocation === 'use-entry' && shared) cleaned.spellInvocation = 'use-entry'
-  else delete cleaned.spellInvocation
-  if (typeof cleaned.lead !== 'string') {
-    delete cleaned.lead
+  if (section === 'legendaryActions' && cleaned.spellInvocation === 'use-entry') {
+    cleaned.spellInvocation = 'use-entry'
+    if (Array.isArray(cleaned.spells)) {
+      cleaned.spells = cleaned.spells.map((spell) => {
+        if (!isRecord(spell)) return spell
+        const next = { ...spell }
+        delete next.castAtLevel
+        return next
+      })
+    }
+  } else {
+    delete cleaned.spellInvocation
+  }
+  if (Array.isArray(cleaned.actionIds)) {
+    cleaned.actionIds = cleaned.actionIds.filter((id) => typeof id === 'string' && id.length > 0)
+  }
+  if (!isRecord(cleaned.movement)) {
+    delete cleaned.movement
     return
   }
-  const lead = cleaned.lead.trim()
-  if (lead) cleaned.lead = lead
-  else delete cleaned.lead
+  const allowance = cleaned.movement.allowance
+  if (allowance !== 'half-speed' && allowance !== 'speed') {
+    delete cleaned.movement
+    return
+  }
+  if (cleaned.movement.withoutOpportunityAttacks !== true) {
+    delete cleaned.movement.withoutOpportunityAttacks
+  }
 }
 
 function stabilizeDraftActionKeys(
@@ -213,7 +234,7 @@ function normalizeAction(
   applyRichTextFields(cleaned)
   omitEmptyOnHit(cleaned)
   applyReactionTriggerDraft(cleaned, section)
-  applyTurnAndInvocationDraft(cleaned)
+  applyTurnAndInvocationDraft(cleaned, section)
   applyLimitedUseDraft(cleaned)
   if (cleaned.kind === 'weapon' && isRecord(cleaned.damage)) {
     cleaned.damage = weaponActionDamageToDraft(cleaned.damage)

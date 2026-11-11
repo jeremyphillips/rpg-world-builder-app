@@ -8,7 +8,13 @@ import {
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-constants'
-import { MONSTER_ACTION_ITEM_NOUN, MONSTER_USE_DEFAULT_NAME_LABEL } from '../monster-form-labels'
+import {
+  LEGENDARY_ACTION_DEFAULT_NAMES,
+  MONSTER_ACTION_ITEM_NOUN,
+  MONSTER_USE_DEFAULT_NAME_LABEL,
+} from '../monster-form-labels'
+import { legendaryActionCategory, type LegendaryActionCategory } from './legendary-action-category'
+import type { MonsterActionSection } from './monster-action-equipment-references'
 import type { MonsterFormValues } from '../monster-form-values'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 import { resolveMonsterFormActionIdentity } from './monster-action-identity'
@@ -24,7 +30,6 @@ const AUTHORED_FALLBACK_BASE = {
   'natural-weapon': getMonsterActionKindLabel('natural-weapon'),
   spell: MONSTER_SPELLCASTING_ACTION_NAME,
   multiattack: getMonsterActionKindLabel('multiattack'),
-  'attack-sequence': getMonsterActionKindLabel('attack-sequence'),
 } as const
 
 export interface MonsterActionHeaderName {
@@ -50,11 +55,55 @@ function publishedTitle(identity: ResolvedMonsterActionIdentity): string | undef
   return undefined
 }
 
+function queueUntitledAction(
+  pendingByKind: Map<string, string[]>,
+  action: MonsterActionDraftRow,
+  section?: MonsterActionSection,
+): void {
+  const category = section === 'legendaryActions' ? legendaryActionCategory(action) : undefined
+  const group = category ?? action.kind
+  const ids = pendingByKind.get(group) ?? []
+  ids.push(action.id)
+  pendingByKind.set(group, ids)
+}
+
+function fallbackTitleBase(kind: string, section?: MonsterActionSection): string {
+  const categoryLabel = LEGENDARY_ACTION_DEFAULT_NAMES[kind as LegendaryActionCategory]
+  if (section === 'legendaryActions' && categoryLabel) return categoryLabel
+  return (
+    AUTHORED_FALLBACK_BASE[kind as keyof typeof AUTHORED_FALLBACK_BASE] ??
+    masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
+  )
+}
+
+function assignFallbackTitles(
+  titles: Map<string, string>,
+  taken: Set<string>,
+  pendingByKind: Map<string, string[]>,
+  section?: MonsterActionSection,
+): void {
+  for (const [kind, ids] of pendingByKind) {
+    const base = fallbackTitleBase(kind, section)
+    let ordinal = 1
+    for (const id of ids) {
+      let label = actionOrdinalLabel(base, ordinal)
+      while (taken.has(label)) {
+        ordinal += 1
+        label = actionOrdinalLabel(base, ordinal)
+      }
+      titles.set(id, label)
+      taken.add(label)
+      ordinal += 1
+    }
+  }
+}
+
 /** Display titles for one action section. Empty authored rows get numbered fallbacks. */
 export function monsterActionEditorTitles(
   rows: readonly MonsterActionDraftRow[],
   values: MonsterFormValues | undefined,
   ctx: ContentFormCtx,
+  section?: MonsterActionSection,
 ): Map<string, string> {
   const resolved = rows.map((action) => ({
     action,
@@ -71,29 +120,10 @@ export function monsterActionEditorTitles(
       taken.add(published)
       continue
     }
-    const kind = action.kind
-    const ids = pendingByKind.get(kind) ?? []
-    ids.push(action.id)
-    pendingByKind.set(kind, ids)
+    queueUntitledAction(pendingByKind, action, section)
   }
 
-  for (const [kind, ids] of pendingByKind) {
-    const base =
-      AUTHORED_FALLBACK_BASE[kind as keyof typeof AUTHORED_FALLBACK_BASE] ??
-      masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
-    let ordinal = 1
-    for (const id of ids) {
-      let label = actionOrdinalLabel(base, ordinal)
-      while (taken.has(label)) {
-        ordinal += 1
-        label = actionOrdinalLabel(base, ordinal)
-      }
-      titles.set(id, label)
-      taken.add(label)
-      ordinal += 1
-    }
-  }
-
+  assignFallbackTitles(titles, taken, pendingByKind, section)
   return titles
 }
 
@@ -109,9 +139,15 @@ export function monsterActionHeaderName(input: {
   sectionRows: readonly MonsterActionDraftRow[]
   values: MonsterFormValues | undefined
   ctx: ContentFormCtx
+  section?: MonsterActionSection
 }): MonsterActionHeaderName {
   const identity = resolveMonsterFormActionIdentity(input.action, input.values, input.ctx)
-  const titles = monsterActionEditorTitles(input.sectionRows, input.values, input.ctx)
+  const titles = monsterActionEditorTitles(
+    input.sectionRows,
+    input.values,
+    input.ctx,
+    input.section,
+  )
   const title =
     titles.get(input.action.id) ?? masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
   const authored = monsterActionAuthoring(input.action).name === 'authored'
@@ -120,7 +156,9 @@ export function monsterActionHeaderName(input: {
       row.id === input.action.id ? withBlankName(row) : row,
     )
     const fallback =
-      monsterActionEditorTitles(clearedRows, input.values, input.ctx).get(input.action.id) ?? title
+      monsterActionEditorTitles(clearedRows, input.values, input.ctx, input.section).get(
+        input.action.id,
+      ) ?? title
     return {
       title,
       fallback,

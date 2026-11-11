@@ -1,7 +1,8 @@
-import type { MonsterAction } from '../../content/monster/action'
+import type { MonsterAction, MonsterLegendaryAction } from '../../content/monster/action'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import type { EquipmentInstance } from '../../content/equipment/instance/instance'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
+import { MOVEMENT_ALLOWANCE_ENTRIES, type MovementAllowance } from '../../vocab/movement-allowance'
 import { resolveMonsterActionIdentity } from './resolve-monster-action-identity'
 import { formatMonsterStatBlockSubject } from './spell-entry-presentation'
 
@@ -25,7 +26,7 @@ function countWord(count: number): string {
   return COUNT_WORDS[count] ?? String(count)
 }
 
-function attackName(
+function referencedActionName(
   id: string,
   actions: readonly MonsterAction[],
   equipment: readonly EquipmentInstance[],
@@ -83,22 +84,35 @@ export function formatMonsterMultiattack(args: {
       subject: capitalSubject,
       count: step.count,
       names: step.actionIds.map((id) =>
-        attackName(id, args.actions, args.equipment, args.equipmentCatalog, provider),
+        referencedActionName(id, args.actions, args.equipment, args.equipmentCatalog, provider),
       ),
     }),
   )
   return sentences.join(' ')
 }
 
-type AttackSequenceAction = {
-  lead?: string
-  steps: readonly { count: number; actionIds: readonly string[] }[]
+const REFERENCE_ATTACK_KINDS = new Set(['weapon', 'natural-weapon', 'attack'])
+
+type ActionReference = Extract<MonsterLegendaryAction, { kind: 'action-reference' }>
+
+function movementClause(allowance: MovementAllowance, withoutOpportunityAttacks?: true): string {
+  const label = MOVEMENT_ALLOWANCE_ENTRIES[allowance].label
+  const phrase = label.charAt(0).toLowerCase() + label.slice(1)
+  const opportunity = withoutOpportunityAttacks ? ' without provoking Opportunity Attacks' : ''
+  return `moves ${phrase}${opportunity}`
 }
 
-/** Legendary attack reference. A lead is a predicate; the subject and conjunction are supplied here. */
-export function formatMonsterAttackSequence(args: {
+function referenceClause(names: readonly string[], kinds: readonly string[]): string {
+  if (kinds.length > 0 && kinds.every((kind) => REFERENCE_ATTACK_KINDS.has(kind))) {
+    return `makes one ${combinationPhrase(names)} attack`
+  }
+  return `uses ${names[0] ?? ''}`
+}
+
+/** Legendary action that uses one Actions row, or one of several attacks. */
+export function formatMonsterActionReference(args: {
   monsterName: string
-  action: AttackSequenceAction
+  action: ActionReference
   actions: readonly MonsterAction[]
   equipment: readonly EquipmentInstance[]
   equipmentCatalog: CreatureEquipmentCatalog
@@ -107,17 +121,15 @@ export function formatMonsterAttackSequence(args: {
   const provider = args.magicPropertyProvider ?? (() => undefined)
   const subject = formatMonsterStatBlockSubject(args.monsterName)
   const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
-  const sentences = args.action.steps.map((step) =>
-    formatAttackClause({
-      count: step.count,
-      names: step.actionIds.map((id) =>
-        attackName(id, args.actions, args.equipment, args.equipmentCatalog, provider),
-      ),
-    }),
+  const targets = args.action.actionIds.map((id) => ({
+    name: referencedActionName(id, args.actions, args.equipment, args.equipmentCatalog, provider),
+    kind: args.actions.find((entry) => entry.id === id)?.kind ?? '',
+  }))
+  const clause = referenceClause(
+    targets.map((target) => target.name),
+    targets.map((target) => target.kind),
   )
-  const lead = args.action.lead?.replace(/[.,]\s*$/, '').trim()
-  if (lead && sentences.length === 1) {
-    return `${capitalSubject} ${lead}, and it ${sentences[0]}.`
-  }
-  return sentences.map((clause) => `${capitalSubject} ${clause}.`).join(' ')
+  const movement = args.action.movement
+  if (!movement) return `${capitalSubject} ${clause}.`
+  return `${capitalSubject} ${movementClause(movement.allowance, movement.withoutOpportunityAttacks)}, and it ${clause}.`
 }

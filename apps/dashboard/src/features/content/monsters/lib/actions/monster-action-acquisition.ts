@@ -18,7 +18,6 @@ import type { MonsterActionSection } from './monster-action-equipment-references
 import {
   MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SAVE_DESCRIPTION,
-  MONSTER_ACQUISITION_ATTACK_SEQUENCE_DESCRIPTION,
   MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_DESCRIPTION,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
@@ -56,6 +55,7 @@ export type MonsterActionAcquisitionChoice =
   | { type: 'other-natural' }
   | { type: 'preset'; presetId: ActionPresetId }
   | { type: 'create'; kind: 'attack' | 'spell' | 'special' | 'save' }
+  | { type: 'legendary'; category: 'reference' | 'spellcasting' | 'cast-spell' }
 
 const SPECIAL_MENU_ORDER = ['multiattack', 'constrict', 'breath-weapon'] as const
 
@@ -115,6 +115,12 @@ function parsePrefixedAcquisitionId(id: string): MonsterActionAcquisitionChoice 
   if (prefix === 'natural' && isAttackRollPreset(value as ActionPresetId)) {
     return { type: 'natural', presetId: value as ActionPresetId }
   }
+  if (
+    prefix === 'legendary' &&
+    (value === 'reference' || value === 'spellcasting' || value === 'cast-spell')
+  ) {
+    return { type: 'legendary', category: value }
+  }
   if (prefix !== 'preset') return undefined
   const preset = getActionPreset(value)
   if (!preset || preset.mechanics === 'attack-roll') return undefined
@@ -173,7 +179,6 @@ export function monsterActionAcquisitionItems(input: {
     .filter((presetId) => {
       if (presetId === 'multiattack')
         return input.section === undefined || input.section === 'actions'
-      if (presetId === 'attack-sequence') return input.section === 'legendaryActions'
       return true
     })
     .map((presetId, index) => ({ presetId, index }))
@@ -193,9 +198,7 @@ export function monsterActionAcquisitionItems(input: {
         searchTerms: preset ? getActionVocabularySearchTerms(preset.vocabularyId) : [],
         ...(presetId === 'multiattack'
           ? { metadata: MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION }
-          : presetId === 'attack-sequence'
-            ? { metadata: MONSTER_ACQUISITION_ATTACK_SEQUENCE_DESCRIPTION }
-            : {}),
+          : {}),
       }
     })
   return [
@@ -249,9 +252,6 @@ function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
       ...(preset.defaults.limitedUse ? { limitedUse: preset.defaults.limitedUse } : {}),
     }
   }
-  if (presetId === 'attack-sequence') {
-    return { id, kind: 'attack-sequence', preset: presetId, steps: [] }
-  }
   return {
     id,
     kind: 'multiattack',
@@ -261,7 +261,7 @@ function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
 }
 
 export function createMonsterActionFromAcquisition(
-  choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
+  choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' } | { type: 'legendary' }>,
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()
   if (choice.type === 'weapon-entry') {

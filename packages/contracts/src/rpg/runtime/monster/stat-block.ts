@@ -240,12 +240,6 @@ export function deriveMonsterStatBlock({
     'bonusActions',
   )
   appendAttackLines(attacks, availableBodyRows(monster.reactions), attackLineArgs, 'reactions')
-  appendAttackLines(
-    attacks,
-    availableBodyRows(monster.legendaryActions),
-    attackLineArgs,
-    'legendaryActions',
-  )
 
   return {
     ac: armor,
@@ -352,7 +346,6 @@ function draftAttacks(
     ['actions', monster.actions ?? []],
     ['bonusActions', monster.bonusActions ?? []],
     ['reactions', monster.reactions ?? []],
-    ['legendaryActions', monster.legendaryActions ?? []],
   ] as const
   const attacks: DerivedDraftAttack[] = []
   for (const [section, actions] of sections) {

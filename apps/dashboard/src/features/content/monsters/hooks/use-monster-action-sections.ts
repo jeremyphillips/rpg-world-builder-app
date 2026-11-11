@@ -12,6 +12,7 @@ import {
   createSpellActionDraft,
   type MonsterActionAcquisitionChoice,
 } from '../lib/actions/monster-action-acquisition'
+import { createLegendaryActionDraft } from '../lib/actions/monster-legendary-action-acquisition'
 import { monsterCastingDependentLabels } from '../lib/actions/monster-action-casting-summary'
 import { actionAfterSectionMove, actionMoveDropsTrigger } from '../lib/actions/monster-action-kind'
 import {
@@ -157,31 +158,6 @@ function legendaryUsesUnset(value: unknown): boolean {
   return value === undefined || value === null || value === ''
 }
 
-function legendaryCountAfterMove(
-  before: number,
-  from: MonsterActionSection,
-  to: MonsterActionSection,
-): number {
-  const entered = to === 'legendaryActions' ? 1 : 0
-  const left = from === 'legendaryActions' ? 1 : 0
-  return before + entered - left
-}
-
-function syncLegendaryPoolAfterMove(args: {
-  before: number
-  after: number
-  uses: unknown
-  setUses: (value: number | undefined) => void
-  clearInLair: () => void
-}): void {
-  const entered = args.before === 0 && args.after > 0
-  if (entered && legendaryUsesUnset(args.uses)) args.setUses(3)
-  if (args.before > 0 && args.after === 0) {
-    args.setUses(undefined)
-    args.clearInLair()
-  }
-}
-
 function rowsOf(
   values: MonsterFormValues | undefined,
   section: MonsterActionSection,
@@ -308,9 +284,11 @@ export function useMonsterActionSections(entityId?: string) {
       choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
     ) => {
       const row =
-        choice.type === 'create' && choice.kind === 'spell'
-          ? createSpellActionDraft(section, getValues())
-          : createMonsterActionFromAcquisition(choice)
+        choice.type === 'legendary'
+          ? createLegendaryActionDraft(choice.category, getValues())
+          : choice.type === 'create' && choice.kind === 'spell'
+            ? createSpellActionDraft(section, getValues())
+            : createMonsterActionFromAcquisition(choice)
       const before =
         section === 'legendaryActions' ? rowsOf(getValues(), 'legendaryActions').length : 0
       editors[section].appendRow(row)
@@ -423,39 +401,22 @@ export function useMonsterActionSections(entityId?: string) {
       clearErrors(`${from}.${index}`)
       const nextRow = actionAfterSectionMove(action, to)
       const targetIndex = rowsOf(values, to).length
-      const legendaryBefore = rowsOf(values, 'legendaryActions').length
       editors[from].removeAt(index)
       editors[to].appendRow(nextRow)
-      syncLegendaryPoolAfterMove({
-        before: legendaryBefore,
-        after: legendaryCountAfterMove(legendaryBefore, from, to),
-        uses: getValues('legendaryActionUses'),
-        setUses: (value) => setValue('legendaryActionUses', value as never, { shouldDirty: true }),
-        clearInLair: () =>
-          setValue('legendaryActionUsesInLair', undefined as never, { shouldDirty: true }),
-      })
       if (presented) void trigger(`${to}.${targetIndex}`)
       setSelectedActionId(action.id)
       setFocusToken((token) => token + 1)
       setPending(null)
     },
-    [
-      clearErrors,
-      editors,
-      formState.submitCount,
-      formState.touchedFields,
-      getValues,
-      setValue,
-      trigger,
-    ],
+    [clearErrors, editors, formState.submitCount, formState.touchedFields, getValues, trigger],
   )
 
   const requestMove = useCallback(
     (to: MonsterActionSection) => {
       const located = locate(selectedActionId)
       if (!located || located.section === to) return
+      if (located.section === 'legendaryActions' || to === 'legendaryActions') return
       if (located.action.kind === 'multiattack' && to !== 'actions') return
-      if (located.action.kind === 'attack-sequence' && to !== 'legendaryActions') return
       const referenceRows = [
         ...rowsOf(getValues(), 'actions'),
         ...rowsOf(getValues(), 'legendaryActions'),

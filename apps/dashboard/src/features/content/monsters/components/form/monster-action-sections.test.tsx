@@ -76,4 +76,17 @@ describe('MonsterActionSections', () => {
       screen.getByRole('button', { current: true, name: /Unresolved reference/i }),
     ).toBeInTheDocument()
   })
+
+  it('adds a custom legendary ability from the legendary menu and selects it', async () => {
+    const user = userEvent.setup()
+    render(<Host ctx={readyCtx} />)
+
+    const addButtons = screen.getAllByRole('button', { name: 'Add' })
+    await user.click(addButtons[3]!)
+    await user.click(await screen.findByRole('menuitem', { name: /Custom ability/i }))
+
+    expect(
+      screen.getByRole('button', { current: true, name: /Custom ability/i }),
+    ).toBeInTheDocument()
+  })
 })

@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import type { MonsterActionDraftRow } from './monster-action-presets'
-import { sharedCastingOptions } from './monster-action-casting-summary'
+import {
+  formatSpellcastingActionOptionLabel,
+  legendarySpellcastingActionOptions,
+  sharedCastingOptions,
+} from './monster-action-casting-summary'
 
 function spell(row: MonsterActionDraftRow): MonsterActionDraftRow {
   return row
@@ -73,5 +77,39 @@ describe('monster action casting summary', () => {
       kind: 'shared',
       entryId: 'spellcasting',
     })
+  })
+})
+
+describe('legendary spellcasting action profile', () => {
+  it('names the action and summarizes its spells and ability', () => {
+    const sections = {
+      actions: [
+        {
+          id: 'spellcasting',
+          kind: 'spell' as const,
+          name: 'Spellcasting',
+          castingAbility: { kind: 'ability' as const, ability: 'int' as const },
+          spells: [{ spellId: 'srd:fireball', castAtLevel: 5 }, { spellId: 'srd:mage-hand' }],
+        },
+        {
+          id: 'other',
+          kind: 'spell' as const,
+          name: 'Spellcasting',
+          castingAbility: { kind: 'ability' as const, ability: 'wis' as const },
+          spells: [{ spellId: 'srd:command' }],
+        },
+      ],
+    }
+    expect(legendarySpellcastingActionOptions(sections)).toEqual([
+      { value: 'spellcasting', label: 'Spellcasting · 2 spells · Intelligence · Actions' },
+      { value: 'other', label: 'Spellcasting · 1 spell · Wisdom · Actions' },
+    ])
+    expect(
+      formatSpellcastingActionOptionLabel(
+        { id: 'only', section: 'actions', ability: 'cha', name: 'Hellfire' },
+        [{ id: 'only', section: 'actions', ability: 'cha', name: 'Hellfire' }],
+        15,
+      ),
+    ).toBe('Hellfire · 15 spells · Charisma')
   })
 })

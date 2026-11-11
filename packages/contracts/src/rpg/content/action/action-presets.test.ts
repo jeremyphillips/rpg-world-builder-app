@@ -38,11 +38,6 @@ describe('action presets', () => {
   })
 
   it('lists special menu presets from vocabulary group', () => {
-    expect(listSpecialMenuActionPresetIds()).toEqual([
-      'breath-weapon',
-      'constrict',
-      'multiattack',
-      'attack-sequence',
-    ])
+    expect(listSpecialMenuActionPresetIds()).toEqual(['breath-weapon', 'constrict', 'multiattack'])
   })
 })

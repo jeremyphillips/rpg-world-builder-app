@@ -12,8 +12,8 @@ stat-block sentences.
 | Closed sets     | `rpg/vocab/resolution/`         | Selection modes, target kinds, proximity, outcomes, application amounts, method kinds                                       |
 | Envelope        | `rpg/content/lib/resolution/`   | `effectResolutionSchema` — selection, method (`saving-throw` \| `automatic`), damage/healing/temporary hit points, outcomes |
 | Spell adapter   | `rpg/content/spell/resolution/` | Spell attack methods, projectile pattern, progression. `spellResolutionSchema` spreads the envelope                         |
-| Monster actions | `rpg/content/monster/action.ts` | Kind union, `dcSource`, multiattack steps, optional `preset` and natural `form`                                             |
-| Stat block      | `rpg/runtime/monster/`          | Attack lines, `formatMonsterSaveAction`, `formatMonsterMultiattack`                                                         |
+| Monster actions | `rpg/content/monster/action.ts` | Kind union, `dcSource`, multiattack steps, legendary `action-reference`, optional `preset` and natural `form`               |
+| Stat block      | `rpg/runtime/monster/`          | Attack lines, `formatMonsterSaveAction`, `formatMonsterMultiattack`, `formatMonsterActionReference`                         |
 
 Save DC is `abilitySaveDc` in `rpg/runtime/creature/spell-dc.ts` (8 + proficiency
 bonus + ability modifier). Area sentences for stat blocks use
@@ -21,16 +21,23 @@ bonus + ability modifier). Area sentences for stat blocks use
 
 ## Monster action kinds
 
-`weapon`, `natural-weapon`, `attack`, `save`, `multiattack`, `attack-sequence`,
-`special`, and `spell`. The section (`actions`, `bonusActions`, `reactions`,
-`legendaryActions`) places the row. `multiattack` is valid only in `actions`.
-`attack-sequence` is valid only in `legendaryActions`. Reactions omit both.
-Legendary actions spend one use from `legendaryActionUses`. An optional
-`legendaryActionUsesInLair` is printed only when it is greater than that pool.
-There is no per-option cost. `onceUntilNextTurn` prints one restriction
-sentence and is not `limitedUse`. `spellInvocation: 'use-entry'` points at a
-spell on a shared spellcasting action. Omitting it shares only that action's
-ability. This remains authoring and display. It does not track spent uses.
+`weapon`, `natural-weapon`, `attack`, `save`, `multiattack`, `special`, and
+`spell`, plus the legendary-only `action-reference`. The section (`actions`,
+`bonusActions`, `reactions`, `legendaryActions`) places the row. `multiattack`
+is valid only in `actions`. `action-reference` is valid only in
+`legendaryActions`, and rows do not move into or out of that section. A
+reference points at Actions rows by id. Several ids mean the creature makes one
+of those attacks. One id may be an attack, a save, or a special ability.
+Optional `movement.allowance` is `half-speed` or `speed`. Reactions omit
+`multiattack` and `action-reference`. Legendary actions spend one use from
+`legendaryActionUses`. An optional `legendaryActionUsesInLair` is printed only
+when it is greater than that pool. There is no per-option cost.
+`onceUntilNextTurn` prints one restriction sentence and is not `limitedUse`.
+`spellInvocation: 'use-entry'` is stored only on a legendary spell row and
+points at one spell on a shared spellcasting action. Omitting it shares only
+that action's ability, and the spell does not have to be on a list. A legendary
+spell row has exactly one spell. This remains authoring and display. It does
+not track spent uses.
 
 `preset` is an optional string stored on the action. It records which preset
 created the row and remains the live source of that row's default name.

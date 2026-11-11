@@ -9,7 +9,12 @@ import {
   SPELLCASTING_ACTION,
   monsterFixtureSpellLookup,
 } from '../../content/monster/test-fixtures'
-import { formatMonsterLimitedUseHeading, formatMonsterSpellEntry } from './spell-entry-presentation'
+import {
+  formatMonsterLimitedUseHeading,
+  formatMonsterSpellEntry,
+  formatOnceUntilNextTurnSentence,
+} from './spell-entry-presentation'
+import type { MonsterReferencedSpell } from './reaction-trigger'
 
 const MONSTER_CHANGED = 'srd-cc-5.2.1:fireball'
 
@@ -134,6 +139,128 @@ describe('formatMonsterSpellEntry', () => {
     expect(rendered.bodyHtml).toContain('The ancient red dragon uses Spellcasting to cast')
     expect(rendered.bodyHtml).toContain('(level 5 version)')
     expect(rendered.bodyHtml).not.toContain('spellcasting ability')
+  })
+
+  it('prints legendary spell categories from structure', () => {
+    const commandId = 'srd-cc-5.2.1:command'
+    const catalogSpells = new Map<string, MonsterReferencedSpell>(spellsById)
+    catalogSpells.set('srd-cc-5.2.1:fear', {
+      name: 'Fear',
+      castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
+      resolution: { method: { kind: 'saving-throw' } },
+    })
+    catalogSpells.set(commandId, {
+      name: 'Command',
+      castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
+      level: 1,
+    })
+    const spellcasting = {
+      ...SPELLCASTING_ACTION,
+      spells: [...SPELLCASTING_ACTION.spells, { spellId: commandId, castAtLevel: 2 }],
+    }
+    const spells = new Map([[spellcasting.id, spellcasting]])
+
+    const gaze = formatMonsterSpellEntry({
+      entry: {
+        id: 'gaze',
+        kind: 'spell',
+        name: 'Frightening Gaze',
+        castingAbility: { kind: 'shared', entryId: spellcasting.id },
+        spells: [{ spellId: 'srd-cc-5.2.1:fear' }],
+        onceUntilNextTurn: true,
+      },
+      monsterName: 'Mummy Lord',
+      section: 'legendaryActions',
+      spellsById: catalogSpells,
+      catalogStatus: 'ready',
+      spellsInBody: spells,
+    })
+    expect(gaze.bodyHtml).toContain(
+      'The mummy lord casts <em>Fear</em>, using the same spellcasting ability as Spellcasting.',
+    )
+    expect(formatOnceUntilNextTurnSentence({ monsterName: 'Mummy Lord', kind: 'spell' })).toBe(
+      "The mummy lord can't take this action again until the start of its next turn.",
+    )
+
+    const presence = formatMonsterSpellEntry({
+      entry: {
+        id: 'presence',
+        kind: 'spell',
+        name: 'Commanding Presence',
+        spellInvocation: 'use-entry',
+        castingAbility: { kind: 'shared', entryId: spellcasting.id },
+        spells: [{ spellId: commandId, castAtLevel: 2 }],
+      },
+      monsterName: 'Ancient Red Dragon',
+      section: 'legendaryActions',
+      spellsById: catalogSpells,
+      catalogStatus: 'ready',
+      spellsInBody: spells,
+    })
+    expect(presence.bodyHtml).toContain(
+      'The ancient red dragon uses Spellcasting to cast <em>Command</em> (level 2 version).',
+    )
+
+    const inherited = formatMonsterSpellEntry({
+      entry: {
+        id: 'inherited',
+        kind: 'spell',
+        name: 'Commanding Presence',
+        spellInvocation: 'use-entry',
+        castingAbility: { kind: 'shared', entryId: spellcasting.id },
+        spells: [{ spellId: commandId }],
+      },
+      monsterName: 'Ancient Red Dragon',
+      section: 'legendaryActions',
+      spellsById: catalogSpells,
+      catalogStatus: 'ready',
+      spellsInBody: spells,
+    })
+    expect(inherited.bodyHtml).toContain('(level 2 version)')
+
+    const dread = formatMonsterSpellEntry({
+      entry: {
+        id: 'dread',
+        kind: 'spell',
+        name: 'Dread Command',
+        castingAbility: { kind: 'shared', entryId: spellcasting.id },
+        spells: [{ spellId: commandId, castAtLevel: 2 }],
+      },
+      monsterName: 'Ancient Red Dragon',
+      section: 'legendaryActions',
+      spellsById: catalogSpells,
+      catalogStatus: 'ready',
+      spellsInBody: spells,
+    })
+    expect(dread.bodyHtml).toContain(
+      'The ancient red dragon casts <em>Command</em> (level 2 version), using the same spellcasting ability as Spellcasting.',
+    )
+
+    const beguileSpells = new Map(catalogSpells)
+    beguileSpells.set('srd-cc-5.2.1:charm-person', {
+      name: 'Charm Person',
+      castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
+      resolution: { method: { kind: 'saving-throw' } },
+    })
+    // SRD prints "requiring no spell components". This formatter lists the omitted component labels.
+    const beguile = formatMonsterSpellEntry({
+      entry: {
+        id: 'beguile',
+        kind: 'spell',
+        name: 'Beguile',
+        castingAbility: { kind: 'ability', ability: 'cha' },
+        omittedComponents: ['verbal', 'somatic', 'material'],
+        spells: [{ spellId: 'srd-cc-5.2.1:charm-person' }],
+      },
+      monsterName: 'Vampire',
+      section: 'legendaryActions',
+      spellsById: beguileSpells,
+      catalogStatus: 'ready',
+      spellsInBody: spells,
+      saveDc: 17,
+    })
+    expect(beguile.bodyHtml).toContain('spell save DC 17')
+    expect(beguile.bodyHtml).toContain('without Verbal, Somatic, or Material components')
   })
 })
 

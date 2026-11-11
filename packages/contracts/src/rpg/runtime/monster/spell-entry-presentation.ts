@@ -9,6 +9,7 @@ import { getAbilityLabel } from '../../vocab/ability'
 import { SPELL_COMPONENT_ENTRIES, type SpellComponentId } from '../../vocab/spell/components'
 import type { MonsterReferencedSpell } from './reaction-trigger'
 import { type MonsterActionSectionId } from '../../content/spell/casting-economy'
+import { formatSpellCastAtLevelName } from '../../content/spell/format-spell-cast-level'
 
 type MonsterSpellPresentationSection = MonsterActionSectionId | 'legendaryActions'
 
@@ -103,13 +104,12 @@ function spellName(
   spell: SpellRow,
   spellsById: ReadonlyMap<string, MonsterReferencedSpell> | undefined,
   catalogStatus: 'ready' | 'unavailable',
+  castAtLevel: number | undefined = spell.castAtLevel,
 ): string {
   if (!spell.spellId) return 'Unavailable spell'
   const label = spellLabel(spell.spellId, spellsById, catalogStatus).html
   const level = catalogStatus === 'ready' ? spellsById?.get(spell.spellId)?.level : undefined
-  if (spell.castAtLevel === undefined) return label
-  if (level !== undefined && spell.castAtLevel <= level) return label
-  return `${label} (level ${spell.castAtLevel} version)`
+  return formatSpellCastAtLevelName({ name: label, castAtLevel, spellLevel: level })
 }
 
 function groupLine(
@@ -142,6 +142,19 @@ function presentationGroups(spells: readonly SpellRow[]): Array<{
   return groups
 }
 
+function inheritedCastAtLevel(
+  spell: SpellRow,
+  entry: SpellEntry,
+  spellsInBody: ReadonlyMap<string, SpellEntry>,
+): number | undefined {
+  if (spell.castAtLevel !== undefined) return spell.castAtLevel
+  if (entry.spellInvocation !== 'use-entry' || entry.castingAbility?.kind !== 'shared') {
+    return undefined
+  }
+  const source = spellsInBody.get(entry.castingAbility.entryId)
+  return source?.spells.find((row) => row.spellId === spell.spellId)?.castAtLevel
+}
+
 function castingSentence(args: {
   entry: SpellEntry
   monsterName: string
@@ -152,7 +165,12 @@ function castingSentence(args: {
   saveDcSuffix: string
 }): string {
   const labels = args.entry.spells.map((spell) =>
-    spellName(spell, args.spellsById, args.catalogStatus),
+    spellName(
+      spell,
+      args.spellsById,
+      args.catalogStatus,
+      inheritedCastAtLevel(spell, args.entry, args.spellsInBody),
+    ),
   )
   const subject = formatMonsterStatBlockSubject(args.monsterName)
   const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)

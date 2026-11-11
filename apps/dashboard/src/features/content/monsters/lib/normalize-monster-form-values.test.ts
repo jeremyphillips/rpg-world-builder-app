@@ -161,4 +161,61 @@ describe('normalizeMonsterFormValues', () => {
     expect(fromPreview.armorClass).toEqual({})
     expect(buildMonsterInput(values, undefined, 'draft').name).toContain('Scout')
   })
+
+  it('keeps legendary movement and drops spell invocation outside Legendary Actions', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.actions = [
+      {
+        id: 'cast',
+        kind: 'spell',
+        name: 'Spellcasting',
+        spellInvocation: 'use-entry',
+        castingAbility: { kind: 'shared', entryId: 'other' },
+        spells: [],
+      },
+    ]
+    values.legendaryActions = [
+      {
+        id: 'pounce',
+        kind: 'action-reference',
+        name: 'Pounce',
+        actionIds: ['bite', ''],
+        onceUntilNextTurn: 'true',
+        movement: { allowance: 'half-speed', withoutOpportunityAttacks: false },
+      },
+    ]
+    const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
+    const legendary = (
+      normalized.legendaryActions as
+        | { actionIds?: string[]; onceUntilNextTurn?: boolean; movement?: { allowance?: string } }[]
+        | undefined
+    )?.[0]
+    const action = (normalized.actions as { spellInvocation?: string }[] | undefined)?.[0]
+    expect(action).not.toHaveProperty('spellInvocation')
+    expect(legendary).toMatchObject({
+      actionIds: ['bite'],
+      onceUntilNextTurn: true,
+      movement: { allowance: 'half-speed' },
+    })
+  })
+
+  it('drops a cast level stored on a legendary spell taken from Spellcasting', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.legendaryActions = [
+      {
+        id: 'presence',
+        kind: 'spell',
+        name: 'Commanding Presence',
+        spellInvocation: 'use-entry',
+        castingAbility: { kind: 'shared', entryId: 'spellcasting' },
+        spells: [{ spellId: 'srd:fireball', castAtLevel: 5 }],
+      },
+    ]
+    const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
+    const spell = (
+      normalized.legendaryActions as { spells?: { spellId?: string; castAtLevel?: number }[] }[]
+    )[0]?.spells?.[0]
+    expect(spell).toEqual({ spellId: 'srd:fireball' })
+    expect(spell).not.toHaveProperty('castAtLevel')
+  })
 })

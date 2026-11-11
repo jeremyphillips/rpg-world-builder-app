@@ -74,6 +74,7 @@ import { PROFICIENCY_BONUS_TERM } from './mechanics/proficiency-bonus'
 import { PASSIVE_PERCEPTION_TERM } from './mechanics/passive-perception'
 import { TELEPATHY_TERM } from './mechanics/telepathy'
 import { SAVING_THROW_TERM } from './mechanics/saving-throw'
+import { MOVEMENT_ALLOWANCE_TERM } from './movement-allowance'
 import { MOVEMENT_MODE_TERM, MOVEMENT_OPERATION_TERM } from './movement-mode'
 import { ACTION_GROUP_TERM, ACTION_VOCABULARY_TERM } from './action/action-vocabulary'
 import {
@@ -123,6 +124,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   REQUIREMENT_CONDITION_TYPE_TERM,
   FEAT_PART_TERM,
   LANGUAGE_CATEGORY_TERM,
+  MOVEMENT_ALLOWANCE_TERM,
   MOVEMENT_MODE_TERM,
   MOVEMENT_OPERATION_TERM,
   PROFICIENCY_TERM,
@@ -241,7 +243,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(65)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(69)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }

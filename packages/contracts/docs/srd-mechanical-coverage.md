@@ -22,13 +22,24 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 ### `legendary-actions`
 
 - Concept: a legendary-action section on the shared monster action model.
-- Implemented: the section, shared action kinds, one shared uses pool, optional in-lair uses, `attack-sequence` composition, shared-ability spells, `use-entry` spell references, and the `onceUntilNextTurn` sentence.
-- Not this model: per-option costs, movement execution, and encounter tracking of spent uses. Condition-primary legendary saves stay on `save-conditions`.
+- Implemented: the section, one shared uses pool, optional in-lair uses, `action-reference` rows (including a movement allowance), shared-ability spells, `use-entry` spell references, catalog spells cast from the section, and the `onceUntilNextTurn` sentence. Legendary Actions store only `action-reference`, `spell`, and `special`.
+- Not this model: per-option costs, movement execution, and encounter tracking of spent uses. A legendary save that is its own effect stays on `legendary-saves`. Condition riders stay on `save-conditions`.
 - Evidence: [action-architecture.md](./action-architecture.md) and [effect-resolution/monster-actions.md](./effect-resolution/monster-actions.md).
 - Representative: none seeded. Seeded SRD parity is unverified.
 - Importance: essential when the source has the section.
 - Owner: monster action sections.
 - Approval: open. Implementation: section model implemented. Seed verification not started.
+
+### `legendary-saves`
+
+- Concept: a legendary action that is its own saving-throw effect, not a reference to an action in Actions.
+- Deficiency: missing structured capability. Legendary Actions accept only `action-reference`, `spell`, and `special`, so these saves are authored as Custom ability rules text.
+- Evidence: Lich Disrupt Life, Solar Blinding Gaze, Kraken Toxic Ink, Adult Black Dragon Cloud of Insects, Sphinx Weight of Years, and Adult Gold Dragon Banish (Open5e `srd-2024`).
+- Current fallback: `special` rules text. A turn limit on a `special` prints a plain sentence, not the SRD's "Failure or Success:" lead-in, so authors write that restriction into the rules text. The prose does not close the gap.
+- Importance: common in 5.2.1 legendary sections.
+- Owner: the shared `save` kind and the monster legendary union. Condition-primary cases also depend on `save-conditions`.
+- Approval: deferred. Implementation: not started.
+- Reopen when: a legendary save needs a derived DC or damage math.
 
 ### `save-conditions`
 

@@ -390,44 +390,51 @@ function refineUniqueIds(
 }
 
 const MULTIATTACK_ATTACK_KINDS = new Set(['weapon', 'natural-weapon', 'attack'])
+const LEGENDARY_REFERENCE_KINDS = new Set(['weapon', 'natural-weapon', 'attack', 'save', 'special'])
 
 type ActionReferenceRow = {
   id?: string
   kind: string
-  lead?: string
   steps?: readonly { actionIds?: readonly string[] }[]
+  actionIds?: readonly string[]
 }
 
-function refineReferencedAttackSteps(
-  action: ActionReferenceRow,
-  actionsById: ReadonlyMap<string, { id?: string; kind: string }>,
+type ReferenceIdMessages = {
+  self?: string
+  duplicate: string
+  missing: string
+  invalidKind: string
+}
+
+function refineReferencedIdList(
+  ownerId: string | undefined,
+  actionIds: readonly string[],
+  actionsById: ReadonlyMap<string, { kind: string }>,
   ctx: z.RefinementCtx,
-  path: (string | number)[],
+  idPath: (idIndex: number) => (string | number)[],
+  allowedKinds: ReadonlySet<string>,
+  messages: ReferenceIdMessages,
+  seen: Set<string>,
 ): void {
-  const seen = new Set<string>()
-  const steps = Array.isArray(action.steps) ? action.steps : []
-  steps.forEach((step, stepIndex) => {
-    const stepSeen = new Set<string>()
-    const actionIds: readonly string[] = Array.isArray(step.actionIds) ? step.actionIds : []
-    actionIds.forEach((id, idIndex) => {
-      const idPath = [...path, 'steps', stepIndex, 'actionIds', idIndex]
-      if (id === action.id) {
-        addCustomRefinementIssue(ctx, 'A multiattack cannot reference itself.', idPath)
-      }
-      if (stepSeen.has(id) || seen.has(id)) {
-        addCustomRefinementIssue(ctx, 'Each attack can be referenced only once.', idPath)
-      }
-      stepSeen.add(id)
-      seen.add(id)
-      const target = actionsById.get(id)
-      if (!target) {
-        addCustomRefinementIssue(ctx, 'must reference an action in Actions', idPath)
-        return
-      }
-      if (!MULTIATTACK_ATTACK_KINDS.has(target.kind)) {
-        addCustomRefinementIssue(ctx, 'invalid kind', idPath)
-      }
-    })
+  const listSeen = new Set<string>()
+  actionIds.forEach((id, idIndex) => {
+    const path = idPath(idIndex)
+    if (messages.self && id === ownerId) {
+      addCustomRefinementIssue(ctx, messages.self, path)
+    }
+    if (listSeen.has(id) || seen.has(id)) {
+      addCustomRefinementIssue(ctx, messages.duplicate, path)
+    }
+    listSeen.add(id)
+    seen.add(id)
+    const target = actionsById.get(id)
+    if (!target) {
+      addCustomRefinementIssue(ctx, messages.missing, path)
+      return
+    }
+    if (!allowedKinds.has(target.kind)) {
+      addCustomRefinementIssue(ctx, messages.invalidKind, path)
+    }
   })
 }
 
@@ -440,7 +447,7 @@ function refineMultiattackReferences(
   },
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
-  options: { published: boolean },
+  _options: { published: boolean },
 ): void {
   const actionsById = new Map(
     body.actions.flatMap((action) => (action.id ? [[action.id, action] as const] : [])),
@@ -459,22 +466,54 @@ function refineMultiattackReferences(
           addCustomRefinementIssue(ctx, 'Multiattack is only valid in Actions.', [...path, 'kind'])
           return
         }
-        refineReferencedAttackSteps(action, actionsById, ctx, path)
+        const seen = new Set<string>()
+        const steps = Array.isArray(action.steps) ? action.steps : []
+        steps.forEach((step, stepIndex) => {
+          refineReferencedIdList(
+            action.id,
+            Array.isArray(step.actionIds) ? step.actionIds : [],
+            actionsById,
+            ctx,
+            (idIndex) => [...path, 'steps', stepIndex, 'actionIds', idIndex],
+            MULTIATTACK_ATTACK_KINDS,
+            {
+              self: 'A multiattack cannot reference itself.',
+              duplicate: 'Each attack can be referenced only once.',
+              missing: 'must reference an action in Actions',
+              invalidKind: 'invalid kind',
+            },
+            seen,
+          )
+        })
         return
       }
-      if (action.kind !== 'attack-sequence') return
-      if (section !== 'legendaryActions') {
-        addCustomRefinementIssue(ctx, 'Attack sequence is only valid in Legendary Actions.', [
+      if (action.kind !== 'action-reference' || section !== 'legendaryActions') return
+      const actionIds = Array.isArray(action.actionIds) ? action.actionIds : []
+      refineReferencedIdList(
+        action.id,
+        actionIds,
+        actionsById,
+        ctx,
+        (idIndex) => [...path, 'actionIds', idIndex],
+        LEGENDARY_REFERENCE_KINDS,
+        {
+          duplicate: 'Each action can be chosen only once.',
+          missing: 'Choose an attack or ability from Actions.',
+          invalidKind: "This action can't be used by a legendary action.",
+        },
+        new Set(),
+      )
+      if (actionIds.length < 2) return
+      actionIds.forEach((id, idIndex) => {
+        const target = actionsById.get(id)
+        if (!target || !LEGENDARY_REFERENCE_KINDS.has(target.kind)) return
+        if (MULTIATTACK_ATTACK_KINDS.has(target.kind)) return
+        addCustomRefinementIssue(ctx, 'Only attacks can be offered as a choice.', [
           ...path,
-          'kind',
+          'actionIds',
+          idIndex,
         ])
-        return
-      }
-      const steps = Array.isArray(action.steps) ? action.steps : []
-      if (options.published && action.lead && steps.length !== 1) {
-        addCustomRefinementIssue(ctx, 'A lead allows one attack step.', [...path, 'lead'])
-      }
-      refineReferencedAttackSteps(action, actionsById, ctx, path)
+      })
     })
   }
 }

@@ -6,22 +6,26 @@ Other kinds do not. See [action-architecture.md](../action-architecture.md) and
 
 ## Kinds
 
-| Kind                                 | Resolution                                                         |
-| ------------------------------------ | ------------------------------------------------------------------ |
-| `weapon`, `natural-weapon`, `attack` | Attack profile. On-hit riders are ordered effects, not an envelope |
-| `save`                               | Envelope. Method must be `saving-throw`. Damage effects only       |
-| `multiattack`                        | Steps of `{ count, actionIds }`. Not an envelope                   |
-| `attack-sequence`                    | The same steps, only in Legendary Actions. Optional `lead`         |
-| `spell`                              | Referenced spells. Each spell keeps its own resolution             |
-| `special`                            | Prose                                                              |
+| Kind                                 | Resolution                                                                 |
+| ------------------------------------ | -------------------------------------------------------------------------- |
+| `weapon`, `natural-weapon`, `attack` | Attack profile. On-hit riders are ordered effects, not an envelope         |
+| `save`                               | Envelope. Method must be `saving-throw`. Damage effects only               |
+| `multiattack`                        | Steps of `{ count, actionIds }`. Not an envelope. Valid only in Actions    |
+| `action-reference`                   | Legendary only. `actionIds` name Actions rows. Optional movement allowance |
+| `spell`                              | Referenced spells. Each spell keeps its own resolution                     |
+| `special`                            | Prose                                                                      |
 
-The section places the row. `multiattack` is valid only in `actions`.
-`attack-sequence` is valid only in `legendaryActions`. Each legendary row
-spends one use from `legendaryActionUses`. `onceUntilNextTurn` is a stat-block
-sentence, not `limitedUse` and not encounter state. `spellInvocation:
-'use-entry'` requires the spell on the referenced spellcasting action.
-Condition-primary saves stay on `save-conditions`. There is no movement
-resolver and no per-option cost.
+The section places the row. Legendary Actions accept only `action-reference`,
+`spell`, and `special`. Rows do not move into or out of that section. Each
+legendary row spends one use from `legendaryActionUses`. `onceUntilNextTurn` is
+a stat-block sentence, not `limitedUse` and not encounter state. A legendary
+`spell` row stores exactly one spell. `spellInvocation: 'use-entry'` is valid
+only there and requires the spell on the referenced Spellcasting action.
+Omitting it casts a catalog spell with a shared or explicit ability. A
+legendary explicit ability is not itself a shared source. Condition-primary
+saves stay on `save-conditions` and, in this section, on `legendary-saves`.
+There is no movement resolver. `movement.allowance` is display copy only. There
+is no per-option cost.
 
 ## On hit
 

@@ -6,6 +6,7 @@ import { attackOnHitSchema } from '../../primitives/mechanics/attack-on-hit'
 import { limitedUseDraftSchema, limitedUseSchema } from '../../primitives/limited-use'
 import { abilitySchema } from '../../vocab/ability'
 import { damageTypeIdSchema } from '../../vocab/damage'
+import { movementAllowanceSchema } from '../../vocab/movement-allowance'
 import { spellComponentIdSchema } from '../../vocab/spell/components'
 import { reachFeetSchema } from '../../vocab/attack/melee-reach'
 import { weaponModeSchema } from '../../vocab/weapon'
@@ -130,7 +131,15 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
     available: z.boolean().optional(),
     ...entryProvenanceField,
   }
-  const { description: _attackSequenceDescription, ...attackSequenceIdentity } = identity
+  const {
+    description: _referenceDescription,
+    limitedUse: _referenceLimitedUse,
+    ...referenceIdentity
+  } = identity
+  const actionIds =
+    mode === 'draft'
+      ? z.array(z.string().min(1)).default([])
+      : z.array(z.string().min(1)).min(1, 'Choose an attack or ability.')
   const monsterAbilitySourceSchema = z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('spell'), castingAbility: castingAbilitySchema }),
     z.object({
@@ -223,11 +232,16 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       steps: multiattackStepsSchema(mode),
     }),
     z.object({
-      ...attackSequenceIdentity,
-      kind: z.literal('attack-sequence'),
+      ...referenceIdentity,
+      kind: z.literal('action-reference'),
       name: strict(z.string().min(1), mode),
-      lead: z.string().min(1).optional(),
-      steps: multiattackStepsSchema(mode),
+      actionIds,
+      movement: z
+        .object({
+          allowance: movementAllowanceSchema,
+          withoutOpportunityAttacks: z.literal(true).optional(),
+        })
+        .optional(),
     }),
   ] as const
 }
@@ -243,20 +257,23 @@ function omitActionKinds<T extends { shape: { kind: z.ZodType } }>(
 
 const publishedActionFields = monsterActionFields('published')
 
+const sharedActionKinds = ['action-reference'] as const
+const legendaryOmittedKinds = ['weapon', 'natural-weapon', 'attack', 'save', 'multiattack'] as const
+
 export const monsterActionSchema = z.discriminatedUnion(
   'kind',
-  omitActionKinds(publishedActionFields, ['attack-sequence']),
+  omitActionKinds(publishedActionFields, sharedActionKinds),
 )
 
 export const monsterLegendaryActionSchema = z.discriminatedUnion(
   'kind',
-  omitActionKinds(publishedActionFields, ['multiattack']),
+  omitActionKinds(publishedActionFields, legendaryOmittedKinds),
 )
 
 const reactionTriggerField = { trigger: activationTriggerSchema.optional() } as const
 
 function reactionsFromActions<T extends { shape: { kind: z.ZodType } }>(options: readonly T[]) {
-  const extended = omitActionKinds(options, ['multiattack', 'attack-sequence']).map((option) =>
+  const extended = omitActionKinds(options, ['multiattack', 'action-reference']).map((option) =>
     (option as unknown as z.ZodObject).extend(reactionTriggerField),
   )
   return z.discriminatedUnion(
@@ -281,12 +298,12 @@ const draftActionFields = monsterActionFields('draft')
 
 export const monsterActionDraftSchema = z.discriminatedUnion(
   'kind',
-  omitActionKinds(draftActionFields, ['attack-sequence']),
+  omitActionKinds(draftActionFields, sharedActionKinds),
 )
 
 export const monsterLegendaryActionDraftSchema = z.discriminatedUnion(
   'kind',
-  omitActionKinds(draftActionFields, ['multiattack']),
+  omitActionKinds(draftActionFields, legendaryOmittedKinds),
 )
 
 export type MonsterActionDraft = z.infer<typeof monsterActionDraftSchema>
@@ -327,7 +344,7 @@ export function refineMonsterSpellEntries(
   )
   const spellsById = new Map(
     located
-      .filter((entry) => entry.action.kind === 'spell')
+      .filter((entry) => entry.action.kind === 'spell' && entry.section !== 'legendaryActions')
       .map((entry) => [entry.action.id, entry.action]),
   )
 
@@ -350,7 +367,8 @@ function refineOneSpellEntry(
   const path = [...prefix, section, index]
   refineSpellOwnership(action, ctx, path)
   refineSharedCastingAbility(action, spellsById, ctx, path)
-  if (published) refineSpellInvocation(action, spellsById, ctx, path)
+  refineLegendarySpellShape(action, section, ctx, path, published)
+  if (published) refineSpellInvocation(action, spellsById, ctx, path, section)
 }
 
 function sharedSpellEntryId(action: SpellEntryLike): string | undefined {
@@ -367,7 +385,7 @@ function refineInvokedSpell(
 ): void {
   if (!spell.spellId) return
   if (!source) {
-    addCustomRefinementIssue(ctx, 'This spell must be on the selected spellcasting entry.', [
+    addCustomRefinementIssue(ctx, "This spell isn't on the selected Spellcasting action.", [
       ...path,
       'spells',
       spellIndex,
@@ -375,8 +393,8 @@ function refineInvokedSpell(
     ])
     return
   }
-  if (source.castAtLevel === undefined || spell.castAtLevel === source.castAtLevel) return
-  addCustomRefinementIssue(ctx, 'Cast level must match the spellcasting entry.', [
+  if (spell.castAtLevel === undefined || spell.castAtLevel === source.castAtLevel) return
+  addCustomRefinementIssue(ctx, 'Cast level must match the Spellcasting action.', [
     ...path,
     'spells',
     spellIndex,
@@ -384,20 +402,35 @@ function refineInvokedSpell(
   ])
 }
 
+function refineLegendarySpellShape(
+  action: SpellEntryLike,
+  section: string,
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+  published: boolean,
+): void {
+  if (action.spellInvocation === 'use-entry' && section !== 'legendaryActions') {
+    addCustomRefinementIssue(ctx, 'Spellcasting references are only valid in Legendary Actions.', [
+      ...path,
+      'spellInvocation',
+    ])
+  }
+  if (!published || section !== 'legendaryActions') return
+  if ((action.spells ?? []).length === 1) return
+  addCustomRefinementIssue(ctx, 'Choose one spell.', [...path, 'spells'])
+}
+
 function refineSpellInvocation(
   action: SpellEntryLike,
   spellsById: ReadonlyMap<string, SpellEntryLike>,
   ctx: z.RefinementCtx,
   path: (string | number)[],
+  section: string,
 ): void {
-  if (action.spellInvocation !== 'use-entry') return
+  if (action.spellInvocation !== 'use-entry' || section !== 'legendaryActions') return
   const entryId = sharedSpellEntryId(action)
   if (!entryId) {
-    addCustomRefinementIssue(
-      ctx,
-      'Using a spellcasting entry requires a shared spellcasting ability.',
-      [...path, 'spellInvocation'],
-    )
+    addCustomRefinementIssue(ctx, 'Choose a Spellcasting action.', [...path, 'castingAbility'])
     return
   }
   const target = spellsById.get(entryId)

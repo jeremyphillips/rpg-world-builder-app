@@ -27,6 +27,18 @@ import {
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
 import { monsterActionEditorTitles } from '../../lib/actions/monster-action-editor-title'
+import { legendaryActionCategory } from '../../lib/actions/legendary-action-category'
+import {
+  LEGENDARY_ACTION_ACQUISITION_GROUPS,
+  legendaryActionAcquisitionItems,
+} from '../../lib/actions/monster-legendary-action-acquisition'
+import {
+  LEGENDARY_ACTION_CATEGORY_LABELS,
+  formatMoveReferencedActionBody,
+  formatRemoveReferencedActionBody,
+  MONSTER_MOVE_REFERENCED_ACTION_HEADLINE,
+  MONSTER_REMOVE_REFERENCED_ACTION_HEADLINE,
+} from '../../lib/monster-form-labels'
 import { multiattacksReferencingAction } from '../../lib/actions/monster-action-multiattack-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterActionPending } from '../../hooks/use-monster-action-sections'
@@ -62,11 +74,21 @@ const SECTION_HEADINGS = {
   legendaryActions: MONSTER_LEGENDARY_ACTIONS_HEADING,
 } as const satisfies Record<MonsterActionSection, string>
 
-function mapActionListItem(row: unknown, index: number, titles: ReadonlyMap<string, string>) {
+function mapActionListItem(
+  row: unknown,
+  index: number,
+  titles: ReadonlyMap<string, string>,
+  section: MonsterActionSection,
+) {
   const action = row as MonsterActionDraftRow | undefined
+  const category = section === 'legendaryActions' ? legendaryActionCategory(action) : undefined
   return {
     title: action ? (titles.get(action.id) ?? `Action ${index + 1}`) : `Action ${index + 1}`,
-    kindLabel: action ? getMonsterActionKindLabel(action.kind) : undefined,
+    kindLabel: category
+      ? LEGENDARY_ACTION_CATEGORY_LABELS[category]
+      : action
+        ? getMonsterActionKindLabel(action.kind)
+        : undefined,
   }
 }
 
@@ -75,14 +97,31 @@ function MonsterActionAddMenu({
   weapons,
   weaponActions,
   allowAddWeapon,
+  values,
+  ctx,
   onSelect,
 }: {
   section: MonsterActionSection
   weapons: readonly { entryId: string; label: string; equipped: boolean }[]
   weaponActions: readonly { id: string; equipmentEntryId?: string }[]
   allowAddWeapon: boolean
+  values: MonsterFormValues
+  ctx: ContentFormCtx
   onSelect: (section: MonsterActionSection, choice: MonsterActionAcquisitionChoice) => void
 }) {
+  const items =
+    section === 'legendaryActions'
+      ? legendaryActionAcquisitionItems(values, ctx)
+      : monsterActionAcquisitionItems({
+          weapons,
+          weaponActions,
+          allowAddWeapon,
+          section,
+        })
+  const groups =
+    section === 'legendaryActions'
+      ? [...LEGENDARY_ACTION_ACQUISITION_GROUPS]
+      : [...MONSTER_ACTION_ACQUISITION_GROUPS]
   return (
     <ButtonDropdown
       label={MONSTER_ADD_LABEL}
@@ -90,13 +129,8 @@ function MonsterActionAddMenu({
       width="fit"
       size="sm"
       variant="outline"
-      groups={[...MONSTER_ACTION_ACQUISITION_GROUPS]}
-      items={monsterActionAcquisitionItems({
-        weapons,
-        weaponActions,
-        allowAddWeapon,
-        section,
-      })}
+      groups={groups}
+      items={items}
       onSelectItem={(id) => {
         const choice = parseMonsterActionAcquisitionId(id)
         if (choice) onSelect(section, choice)
@@ -112,15 +146,15 @@ function pendingConfirmCopy(pending: MonsterActionPending | null): {
   if (pending?.type === 'multiattack-delete') {
     const names = pending.names.join(', ')
     return {
-      headline: 'Remove referenced attack',
-      description: `This attack is used by ${names}. Removing it drops that reference and leaves the step count unchanged.`,
+      headline: MONSTER_REMOVE_REFERENCED_ACTION_HEADLINE,
+      description: formatRemoveReferencedActionBody(names),
     }
   }
   if (pending?.type === 'multiattack-move') {
     const names = pending.names.join(', ')
     return {
-      headline: 'Move referenced attack',
-      description: `${names} will be invalid until this attack is moved back to Actions.`,
+      headline: MONSTER_MOVE_REFERENCED_ACTION_HEADLINE,
+      description: formatMoveReferencedActionBody(names),
     }
   }
   return { headline: MONSTER_MOVE_TO_LABEL, description: formatDropTriggerBody() }
@@ -154,7 +188,12 @@ function sectionTitles(
   ctx: ContentFormCtx,
   section: MonsterActionSection,
 ) {
-  return monsterActionEditorTitles((values[section] ?? []) as MonsterActionDraftRow[], values, ctx)
+  return monsterActionEditorTitles(
+    (values[section] ?? []) as MonsterActionDraftRow[],
+    values,
+    ctx,
+    section,
+  )
 }
 
 function weaponActionReferences(values: MonsterFormValues) {
@@ -188,28 +227,29 @@ function useMonsterActionDetailRows(
     fieldName: 'actions',
     editor: sections.editors.actions,
     sectionLabel: SECTION_HEADINGS.actions,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, actionTitles),
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, actionTitles, 'actions'),
   })
   const bonusRows = useEmbeddedMasterDetailRows({
     ...shared,
     fieldName: 'bonusActions',
     editor: sections.editors.bonusActions,
     sectionLabel: SECTION_HEADINGS.bonusActions,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, bonusTitles),
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, bonusTitles, 'bonusActions'),
   })
   const reactionRows = useEmbeddedMasterDetailRows({
     ...shared,
     fieldName: 'reactions',
     editor: sections.editors.reactions,
     sectionLabel: SECTION_HEADINGS.reactions,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, reactionTitles),
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, reactionTitles, 'reactions'),
   })
   const legendaryRows = useEmbeddedMasterDetailRows({
     ...shared,
     fieldName: 'legendaryActions',
     editor: sections.editors.legendaryActions,
     sectionLabel: SECTION_HEADINGS.legendaryActions,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, legendaryTitles),
+    mapListItem: ({ row, index }) =>
+      mapActionListItem(row, index, legendaryTitles, 'legendaryActions'),
   })
   return {
     titlesBySection: {
@@ -283,19 +323,25 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
     )
   }, 0)
   const deleteLocated = sections.locate(sections.deleteTargetId)
-  const deleteReferences =
-    deleteLocated?.section === 'actions'
-      ? multiattacksReferencingAction(
-          (values.actions ?? []) as MonsterActionDraftRow[],
-          deleteLocated.action.id,
-        )
-      : []
+  const deleteReferences = deleteLocated
+    ? multiattacksReferencingAction(
+        [
+          ...((values.actions ?? []) as MonsterActionDraftRow[]),
+          ...((values.legendaryActions ?? []) as MonsterActionDraftRow[]),
+        ],
+        deleteLocated.action.id,
+      )
+    : []
+  const deleteNames = deleteReferences
+    .map((action) => {
+      const section = (values.legendaryActions ?? []).some((row) => row.id === action.id)
+        ? 'legendaryActions'
+        : 'actions'
+      return titlesBySection[section].get(action.id) ?? action.name ?? action.id
+    })
+    .join(', ')
   const deleteDescription =
-    deleteReferences.length > 0
-      ? `This attack is used by ${deleteReferences
-          .map((action) => titlesBySection.actions.get(action.id) ?? action.id)
-          .join(', ')}. Removing it drops that reference and leaves the step count unchanged.`
-      : undefined
+    deleteReferences.length > 0 ? formatRemoveReferencedActionBody(deleteNames) : undefined
 
   return (
     <>
@@ -316,6 +362,8 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
                 weapons={weapons}
                 weaponActions={weaponActionReferences(values)}
                 allowAddWeapon={allowAddWeapon}
+                values={values}
+                ctx={ctx}
                 onSelect={(target, choice) => {
                   if (choice.type === 'add-weapon') {
                     setWeaponPickerSection(target)

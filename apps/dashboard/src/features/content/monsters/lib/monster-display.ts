@@ -26,7 +26,7 @@ import {
   deriveMonsterStatBlock,
   formatCreatureTrait,
   formatMonsterAttackAction,
-  formatMonsterAttackSequence,
+  formatMonsterActionReference,
   formatLegendaryActionUsesIntro,
   formatOnceUntilNextTurnSentence,
   resolveCreatureSenses,
@@ -349,6 +349,100 @@ function withTurnLimit(
   return html ? `${body}<p>${sentence}</p>` : `${body} ${sentence}`
 }
 
+function mapSpellActionItem(
+  action: Extract<MonsterAction | MonsterReaction | MonsterLegendaryAction, { kind: 'spell' }>,
+  section: DerivedMonsterAttackLine['section'],
+  derived: DerivedMonsterStatBlock | null | undefined,
+  spells: SpellDisplayContext,
+  identityName: string,
+): MonsterActionItemViewModel {
+  const spellLine = derived?.spellcasting.find(
+    (line) => line.id === action.id && line.section === section,
+  )
+  const rendered = formatMonsterSpellEntry({
+    entry: { ...action, name: identityName },
+    monsterName: spells.monsterName,
+    section,
+    spellsById: spells.spellsById,
+    catalogStatus: spells.catalogStatus,
+    spellsInBody: spells.spellsInBody,
+    saveDc: spellLine?.saveDc,
+  })
+  const descriptionHtml = withTurnLimit(
+    appendMonsterActionSupplementalHtml(rendered.bodyHtml, action.description),
+    action,
+    spells.monsterName,
+    true,
+  )
+  return {
+    id: action.id,
+    name: rendered.heading,
+    descriptionHtml: descriptionHtml || undefined,
+  }
+}
+
+function mapSaveActionItem(
+  action: Extract<MonsterAction | MonsterReaction, { kind: 'save' }>,
+  name: string,
+  derived: DerivedMonsterStatBlock | null | undefined,
+  catalogState: MonsterCatalogLoadState,
+  spells: SpellDisplayContext,
+  identityName: string,
+): MonsterActionItemViewModel {
+  const body = formatSaveActionBody(spells.monster, action, derived, catalogState, identityName)
+  return {
+    id: action.id,
+    name,
+    descriptionHtml: body
+      ? `<p>${withTurnLimit(body, action, spells.monsterName, false)}</p>`
+      : withTurnLimit(action.description, action, spells.monsterName, true),
+  }
+}
+
+function mapActionReferenceItem(
+  action: Extract<MonsterLegendaryAction, { kind: 'action-reference' }>,
+  name: string,
+  spells: SpellDisplayContext,
+): MonsterActionItemViewModel {
+  const generated = formatMonsterActionReference({
+    monsterName: spells.monsterName,
+    action,
+    actions: spells.monster.actions,
+    equipment: spells.monster.equipment,
+    equipmentCatalog: spells.equipmentById,
+    magicPropertyProvider: spells.magicPropertyProvider,
+  })
+  const text = withTurnLimit(generated, action, spells.monsterName, false)
+  return {
+    id: action.id,
+    name,
+    descriptionHtml: text ? `<p>${text}</p>` : undefined,
+  }
+}
+
+function mapMultiattackActionItem(
+  action: Extract<MonsterAction, { kind: 'multiattack' }>,
+  name: string,
+  derived: DerivedMonsterStatBlock | null | undefined,
+  catalogState: MonsterCatalogLoadState,
+  spells: SpellDisplayContext,
+): MonsterActionItemViewModel {
+  const body = formatMultiattackActionBody(
+    spells.monster,
+    action,
+    spells.equipmentById,
+    catalogState,
+    spells.magicPropertyProvider,
+  )
+  return {
+    id: action.id,
+    name,
+    descriptionHtml: body
+      ? `<p>${withTurnLimit(body, action, spells.monsterName, false)}</p>`
+      : action.description,
+  }
+}
+
 function mapActionItem(
   action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
@@ -363,36 +457,14 @@ function mapActionItem(
     spells.catalogState,
     spells.magicPropertyProvider,
   )
-  const name = withLimitedUseHeading(identity.displayName, action.limitedUse)
+  const name = withLimitedUseHeading(
+    identity.displayName,
+    'limitedUse' in action ? action.limitedUse : undefined,
+  )
 
   if (action.kind === 'spell') {
-    const spellLine = derived?.spellcasting.find(
-      (line) => line.id === action.id && line.section === section,
-    )
-    const rendered = formatMonsterSpellEntry({
-      entry: { ...action, name: identity.displayName },
-      monsterName: spells.monsterName,
-      section,
-      spellsById: spells.spellsById,
-      catalogStatus: spells.catalogStatus,
-      spellsInBody: spells.spellsInBody,
-      saveDc: spellLine?.saveDc,
-    })
-    const descriptionHtml = withTurnLimit(
-      appendMonsterActionSupplementalHtml(rendered.bodyHtml, action.description),
-      action,
-      spells.monsterName,
-      true,
-    )
-    return {
-      id: action.id,
-      name: rendered.heading,
-      descriptionHtml: descriptionHtml || undefined,
-    }
+    return mapSpellActionItem(action, section, derived, spells, identity.displayName)
   }
-
-  const attack = findAttackLine(derived, section, action.id)
-
   if (action.kind === 'special') {
     return {
       id: action.id,
@@ -400,58 +472,15 @@ function mapActionItem(
       descriptionHtml: withTurnLimit(action.description, action, spells.monsterName, true),
     }
   }
-
   if (action.kind === 'save') {
-    const body = formatSaveActionBody(
-      spells.monster,
-      action,
-      derived,
-      catalogState,
-      identity.displayName,
-    )
-    return {
-      id: action.id,
-      name,
-      descriptionHtml: body
-        ? `<p>${withTurnLimit(body, action, spells.monsterName, false)}</p>`
-        : withTurnLimit(action.description, action, spells.monsterName, true),
-    }
+    return mapSaveActionItem(action, name, derived, catalogState, spells, identity.displayName)
   }
-
-  if (action.kind === 'attack-sequence') {
-    const generated = formatMonsterAttackSequence({
-      monsterName: spells.monsterName,
-      action,
-      actions: spells.monster.actions,
-      equipment: spells.monster.equipment,
-      equipmentCatalog: spells.equipmentById,
-      magicPropertyProvider: spells.magicPropertyProvider,
-    })
-    const text = withTurnLimit(generated, action, spells.monsterName, false)
-    return {
-      id: action.id,
-      name,
-      descriptionHtml: text ? `<p>${text}</p>` : undefined,
-    }
-  }
-
+  if (action.kind === 'action-reference') return mapActionReferenceItem(action, name, spells)
   if (action.kind === 'multiattack') {
-    const body = formatMultiattackActionBody(
-      spells.monster,
-      action,
-      spells.equipmentById,
-      catalogState,
-      spells.magicPropertyProvider,
-    )
-    return {
-      id: action.id,
-      name,
-      descriptionHtml: body
-        ? `<p>${withTurnLimit(body, action, spells.monsterName, false)}</p>`
-        : action.description,
-    }
+    return mapMultiattackActionItem(action, name, derived, catalogState, spells)
   }
 
+  const attack = findAttackLine(derived, section, action.id)
   return {
     id: action.id,
     name,

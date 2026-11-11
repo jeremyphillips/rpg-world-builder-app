@@ -146,16 +146,25 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       },
       fields: [
         {
-          type: 'number',
-          name: 'legendaryActionUses',
-          label: MONSTER_LEGENDARY_USES_LABEL,
-          min: 1,
-        },
-        {
-          type: 'number',
-          name: 'legendaryActionUsesInLair',
-          label: MONSTER_LEGENDARY_LAIR_USES_LABEL,
-          min: 1,
+          kind: 'row',
+          fields: [
+            {
+              type: 'number',
+              name: 'legendaryActionUses',
+              label: MONSTER_LEGENDARY_USES_LABEL,
+              min: 1,
+              digits: 2,
+              width: 'auto',
+            },
+            {
+              type: 'number',
+              name: 'legendaryActionUsesInLair',
+              label: MONSTER_LEGENDARY_LAIR_USES_LABEL,
+              min: 1,
+              digits: 2,
+              width: 'auto',
+            },
+          ],
         },
       ],
     },
