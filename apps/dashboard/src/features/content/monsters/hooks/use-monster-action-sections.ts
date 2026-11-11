@@ -153,6 +153,35 @@ function lostDefinedKeys(previous: unknown, next: unknown): boolean {
   return false
 }
 
+function legendaryUsesUnset(value: unknown): boolean {
+  return value === undefined || value === null || value === ''
+}
+
+function legendaryCountAfterMove(
+  before: number,
+  from: MonsterActionSection,
+  to: MonsterActionSection,
+): number {
+  const entered = to === 'legendaryActions' ? 1 : 0
+  const left = from === 'legendaryActions' ? 1 : 0
+  return before + entered - left
+}
+
+function syncLegendaryPoolAfterMove(args: {
+  before: number
+  after: number
+  uses: unknown
+  setUses: (value: number | undefined) => void
+  clearInLair: () => void
+}): void {
+  const entered = args.before === 0 && args.after > 0
+  if (entered && legendaryUsesUnset(args.uses)) args.setUses(3)
+  if (args.before > 0 && args.after === 0) {
+    args.setUses(undefined)
+    args.clearInLair()
+  }
+}
+
 function rowsOf(
   values: MonsterFormValues | undefined,
   section: MonsterActionSection,
@@ -180,9 +209,12 @@ export function useMonsterActionSections(entityId?: string) {
   const reactions = useMasterDetailArray('reactions', () =>
     createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
   )
+  const legendaryActions = useMasterDetailArray('legendaryActions', () =>
+    createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
+  )
   const editors = useMemo(
-    () => ({ actions, bonusActions, reactions }),
-    [actions, bonusActions, reactions],
+    () => ({ actions, bonusActions, reactions, legendaryActions }),
+    [actions, bonusActions, reactions, legendaryActions],
   )
   const [selectedActionId, setSelectedActionId] = useState<string | null>(null)
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
@@ -279,11 +311,20 @@ export function useMonsterActionSections(entityId?: string) {
         choice.type === 'create' && choice.kind === 'spell'
           ? createSpellActionDraft(section, getValues())
           : createMonsterActionFromAcquisition(choice)
+      const before =
+        section === 'legendaryActions' ? rowsOf(getValues(), 'legendaryActions').length : 0
       editors[section].appendRow(row)
+      if (
+        section === 'legendaryActions' &&
+        before === 0 &&
+        legendaryUsesUnset(getValues('legendaryActionUses'))
+      ) {
+        setValue('legendaryActionUses', 3, { shouldDirty: true })
+      }
       setSelectedActionId(row.id)
       setNotice(null)
     },
-    [editors, getValues],
+    [editors, getValues, setValue],
   )
 
   const commitEquippedWeapon = useCallback(
@@ -291,7 +332,16 @@ export function useMonsterActionSections(entityId?: string) {
       const { entry, action } = createEquippedWeaponAcquisition(equipmentId)
       const equipment = [...(getValues('equipment') ?? []), entry]
       setValue('equipment', equipment, { shouldDirty: true })
+      const before =
+        section === 'legendaryActions' ? rowsOf(getValues(), 'legendaryActions').length : 0
       editors[section].appendRow(action)
+      if (
+        section === 'legendaryActions' &&
+        before === 0 &&
+        legendaryUsesUnset(getValues('legendaryActionUses'))
+      ) {
+        setValue('legendaryActionUses', 3, { shouldDirty: true })
+      }
       setSelectedActionId(action.id)
       setNotice(formatAddedEquipmentNotice(name))
     },
@@ -307,13 +357,23 @@ export function useMonsterActionSections(entityId?: string) {
         located.section,
         actionId,
       )
+      const legendaryBefore = rowsOf(getValues(), 'legendaryActions').length
       if (located.section === 'actions') {
         const actions = stripMultiattackActionId(rowsOf(getValues(), 'actions'), actionId).filter(
           (action) => action.id !== actionId,
         )
         setValue('actions', actions, { shouldDirty: true })
+        setValue(
+          'legendaryActions',
+          stripMultiattackActionId(rowsOf(getValues(), 'legendaryActions'), actionId),
+          { shouldDirty: true },
+        )
       } else {
         editors[located.section].removeAt(located.index)
+      }
+      if (located.section === 'legendaryActions' && legendaryBefore === 1) {
+        setValue('legendaryActionUses', undefined as never, { shouldDirty: true })
+        setValue('legendaryActionUsesInLair', undefined as never, { shouldDirty: true })
       }
       setSelectedActionId(nextSelection)
       setPending(null)
@@ -332,7 +392,10 @@ export function useMonsterActionSections(entityId?: string) {
       }
       const references =
         located.section === 'actions'
-          ? multiattacksReferencingAction(rowsOf(getValues(), 'actions'), actionId)
+          ? multiattacksReferencingAction(
+              [...rowsOf(getValues(), 'actions'), ...rowsOf(getValues(), 'legendaryActions')],
+              actionId,
+            )
           : []
       if (references.length > 0) {
         setPending({
@@ -360,14 +423,31 @@ export function useMonsterActionSections(entityId?: string) {
       clearErrors(`${from}.${index}`)
       const nextRow = actionAfterSectionMove(action, to)
       const targetIndex = rowsOf(values, to).length
+      const legendaryBefore = rowsOf(values, 'legendaryActions').length
       editors[from].removeAt(index)
       editors[to].appendRow(nextRow)
+      syncLegendaryPoolAfterMove({
+        before: legendaryBefore,
+        after: legendaryCountAfterMove(legendaryBefore, from, to),
+        uses: getValues('legendaryActionUses'),
+        setUses: (value) => setValue('legendaryActionUses', value as never, { shouldDirty: true }),
+        clearInLair: () =>
+          setValue('legendaryActionUsesInLair', undefined as never, { shouldDirty: true }),
+      })
       if (presented) void trigger(`${to}.${targetIndex}`)
       setSelectedActionId(action.id)
       setFocusToken((token) => token + 1)
       setPending(null)
     },
-    [clearErrors, editors, formState.submitCount, formState.touchedFields, getValues, trigger],
+    [
+      clearErrors,
+      editors,
+      formState.submitCount,
+      formState.touchedFields,
+      getValues,
+      setValue,
+      trigger,
+    ],
   )
 
   const requestMove = useCallback(
@@ -375,15 +455,17 @@ export function useMonsterActionSections(entityId?: string) {
       const located = locate(selectedActionId)
       if (!located || located.section === to) return
       if (located.action.kind === 'multiattack' && to !== 'actions') return
+      if (located.action.kind === 'attack-sequence' && to !== 'legendaryActions') return
+      const referenceRows = [
+        ...rowsOf(getValues(), 'actions'),
+        ...rowsOf(getValues(), 'legendaryActions'),
+      ]
       if (
         located.section === 'actions' &&
         to !== 'actions' &&
-        multiattacksReferencingAction(rowsOf(getValues(), 'actions'), located.action.id).length > 0
+        multiattacksReferencingAction(referenceRows, located.action.id).length > 0
       ) {
-        const references = multiattacksReferencingAction(
-          rowsOf(getValues(), 'actions'),
-          located.action.id,
-        )
+        const references = multiattacksReferencingAction(referenceRows, located.action.id)
         setPending({
           type: 'multiattack-move',
           actionId: located.action.id,

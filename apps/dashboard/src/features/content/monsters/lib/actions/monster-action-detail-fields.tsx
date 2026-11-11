@@ -35,7 +35,10 @@ import {
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
   MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
   MONSTER_SAVE_THROW_SECTION_LEGEND,
+  MONSTER_ATTACK_SEQUENCE_LEAD_LABEL,
   MONSTER_TRIGGER_LABEL,
+  MONSTER_TURN_LIMIT_ADD_LABEL,
+  MONSTER_TURN_LIMIT_LABEL,
   MONSTER_ATTACK_BONUS_LABEL,
 } from '../monster-form-labels'
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
@@ -474,6 +477,17 @@ function monsterActionSpellMechanics(input: {
       ),
     },
     {
+      type: 'select',
+      name: 'spellInvocation',
+      label: 'Casting sentence',
+      optionalDisclosure: { addLabel: 'Use the spellcasting entry' },
+      options: [{ value: 'use-entry', label: 'Uses the spellcasting entry to cast' }],
+      visibility: {
+        dependsOn: ['castingAbility.kind'],
+        visibleWhen: (values) => values['castingAbility.kind'] === 'shared',
+      },
+    },
+    {
       kind: 'array',
       name: 'spells',
       label: getContentTypeTerm('spells').label,
@@ -567,7 +581,17 @@ function monsterActionMechanicFields(input: {
   if (action.kind === 'save') {
     kindFields.push(monsterActionSaveSection(ctx, namePrefix, sharedCastingOptions))
   }
-  if (action.kind === 'multiattack') {
+  if (action.kind === 'multiattack' || action.kind === 'attack-sequence') {
+    if (action.kind === 'attack-sequence') {
+      kindFields.push({
+        type: 'text',
+        name: 'lead',
+        label: MONSTER_ATTACK_SEQUENCE_LEAD_LABEL,
+        hint: {
+          text: 'Predicate before the attack sentence, without the creature name.',
+        },
+      })
+    }
     kindFields.push({
       kind: 'array',
       name: 'steps',
@@ -586,6 +610,17 @@ function monsterActionMechanicFields(input: {
     })
   }
   return [...trigger, ...usage, ...kindFields]
+}
+
+function turnLimitField(): FormItem {
+  return {
+    type: 'select',
+    name: 'onceUntilNextTurn',
+    label: MONSTER_TURN_LIMIT_LABEL,
+    placeholder: 'No turn limit',
+    optionalDisclosure: { addLabel: MONSTER_TURN_LIMIT_ADD_LABEL },
+    options: [{ value: 'true', label: "Can't take this again until its next turn" }],
+  }
 }
 
 /**
@@ -613,7 +648,10 @@ export function monsterActionDetailFields(input: {
       ? [monsterActionAttackPreviewSlot(ctx, action)]
       : []
   const primaryProse = action.kind === 'special' ? [monsterActionDescriptionField(action)] : []
-  const supplemental = action.kind === 'special' ? [] : [monsterActionDescriptionField(action)]
+  const supplemental =
+    action.kind === 'special' || action.kind === 'attack-sequence'
+      ? []
+      : [monsterActionDescriptionField(action)]
   return [
     ...source,
     ...preview,
@@ -629,6 +667,7 @@ export function monsterActionDetailFields(input: {
       equipment: input.equipment ?? [],
       onCastingSourceBlocked: input.onCastingSourceBlocked,
     }),
+    turnLimitField(),
     ...supplemental,
   ]
 }

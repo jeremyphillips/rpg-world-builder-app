@@ -19,12 +19,16 @@ import {
   type Equipment,
   type Monster,
   type MonsterAction,
+  type MonsterLegendaryAction,
   type MonsterReaction,
   type SkillProficiency,
   availableBodyRows,
   deriveMonsterStatBlock,
   formatCreatureTrait,
   formatMonsterAttackAction,
+  formatMonsterAttackSequence,
+  formatLegendaryActionUsesIntro,
+  formatOnceUntilNextTurnSentence,
   resolveCreatureSenses,
   resolveCreatureTraitGrants,
   resolveTraitDisplay,
@@ -109,6 +113,8 @@ export type MonsterDetailViewModel = {
   actions: MonsterActionItemViewModel[]
   bonusActions: MonsterActionItemViewModel[]
   reactions: MonsterActionItemViewModel[]
+  legendaryActions: MonsterActionItemViewModel[]
+  legendaryActionsIntro?: string
 }
 
 export type BuildMonsterDetailViewModelInput = {
@@ -331,8 +337,20 @@ type SpellDisplayContext = {
   spellsInBody: Map<string, Extract<MonsterAction | MonsterReaction, { kind: 'spell' }>>
 }
 
+function withTurnLimit(
+  body: string | undefined,
+  action: { kind: string; onceUntilNextTurn?: boolean },
+  monsterName: string,
+  html: boolean,
+): string | undefined {
+  if (action.onceUntilNextTurn !== true) return body
+  const sentence = formatOnceUntilNextTurnSentence({ monsterName, kind: action.kind })
+  if (!body) return html ? `<p>${sentence}</p>` : sentence
+  return html ? `${body}<p>${sentence}</p>` : `${body} ${sentence}`
+}
+
 function mapActionItem(
-  action: MonsterAction | MonsterReaction,
+  action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
   derived: DerivedMonsterStatBlock | null | undefined,
   catalogState: MonsterCatalogLoadState,
@@ -360,9 +378,11 @@ function mapActionItem(
       spellsInBody: spells.spellsInBody,
       saveDc: spellLine?.saveDc,
     })
-    const descriptionHtml = appendMonsterActionSupplementalHtml(
-      rendered.bodyHtml,
-      action.description,
+    const descriptionHtml = withTurnLimit(
+      appendMonsterActionSupplementalHtml(rendered.bodyHtml, action.description),
+      action,
+      spells.monsterName,
+      true,
     )
     return {
       id: action.id,
@@ -377,7 +397,7 @@ function mapActionItem(
     return {
       id: action.id,
       name,
-      descriptionHtml: action.description,
+      descriptionHtml: withTurnLimit(action.description, action, spells.monsterName, true),
     }
   }
 
@@ -392,7 +412,26 @@ function mapActionItem(
     return {
       id: action.id,
       name,
-      descriptionHtml: body ? `<p>${body}</p>` : action.description,
+      descriptionHtml: body
+        ? `<p>${withTurnLimit(body, action, spells.monsterName, false)}</p>`
+        : withTurnLimit(action.description, action, spells.monsterName, true),
+    }
+  }
+
+  if (action.kind === 'attack-sequence') {
+    const generated = formatMonsterAttackSequence({
+      monsterName: spells.monsterName,
+      action,
+      actions: spells.monster.actions,
+      equipment: spells.monster.equipment,
+      equipmentCatalog: spells.equipmentById,
+      magicPropertyProvider: spells.magicPropertyProvider,
+    })
+    const text = withTurnLimit(generated, action, spells.monsterName, false)
+    return {
+      id: action.id,
+      name,
+      descriptionHtml: text ? `<p>${text}</p>` : undefined,
     }
   }
 
@@ -407,7 +446,9 @@ function mapActionItem(
     return {
       id: action.id,
       name,
-      descriptionHtml: body ? `<p>${body}</p>` : action.description,
+      descriptionHtml: body
+        ? `<p>${withTurnLimit(body, action, spells.monsterName, false)}</p>`
+        : action.description,
     }
   }
 
@@ -415,12 +456,12 @@ function mapActionItem(
     id: action.id,
     name,
     attackLine: resolveActionAttackLine(catalogState, attack),
-    descriptionHtml: action.description,
+    descriptionHtml: withTurnLimit(action.description, action, spells.monsterName, true),
   }
 }
 
 function mapActionItems(
-  actions: readonly (MonsterAction | MonsterReaction)[],
+  actions: readonly (MonsterAction | MonsterReaction | MonsterLegendaryAction)[],
   section: DerivedMonsterAttackLine['section'],
   derived: DerivedMonsterStatBlock | null | undefined,
   catalogState: MonsterCatalogLoadState,
@@ -702,7 +743,12 @@ export function buildMonsterDetailViewModel({
     catalogState,
     magicPropertyProvider,
     spellsInBody: new Map(
-      availableBodyRows([...monster.actions, ...monster.bonusActions, ...monster.reactions])
+      availableBodyRows([
+        ...monster.actions,
+        ...monster.bonusActions,
+        ...monster.reactions,
+        ...monster.legendaryActions,
+      ])
         .filter((action) => action.kind === 'spell')
         .map((action) => [action.id, action]),
     ),
@@ -760,6 +806,22 @@ export function buildMonsterDetailViewModel({
       catalogState,
       spellContext,
     ),
+    legendaryActions: mapActionItems(
+      availableBodyRows(monster.legendaryActions),
+      'legendaryActions',
+      derived,
+      catalogState,
+      spellContext,
+    ),
+    legendaryActionsIntro:
+      availableBodyRows(monster.legendaryActions).length > 0 &&
+      monster.legendaryActionUses !== undefined
+        ? formatLegendaryActionUsesIntro({
+            monsterName: monster.name,
+            uses: monster.legendaryActionUses,
+            usesInLair: monster.legendaryActionUsesInLair,
+          })
+        : undefined,
   }
 }
 

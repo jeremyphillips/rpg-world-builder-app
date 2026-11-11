@@ -21,9 +21,16 @@ bonus + ability modifier). Area sentences for stat blocks use
 
 ## Monster action kinds
 
-`weapon`, `natural-weapon`, `attack`, `save`, `multiattack`, `special`, and
-`spell`. The section (`actions`, `bonusActions`, `reactions`) is the action
-economy. `multiattack` is valid only in `actions`. Reactions omit that kind.
+`weapon`, `natural-weapon`, `attack`, `save`, `multiattack`, `attack-sequence`,
+`special`, and `spell`. The section (`actions`, `bonusActions`, `reactions`,
+`legendaryActions`) places the row. `multiattack` is valid only in `actions`.
+`attack-sequence` is valid only in `legendaryActions`. Reactions omit both.
+Legendary actions spend one use from `legendaryActionUses`. An optional
+`legendaryActionUsesInLair` is printed only when it is greater than that pool.
+There is no per-option cost. `onceUntilNextTurn` prints one restriction
+sentence and is not `limitedUse`. `spellInvocation: 'use-entry'` points at a
+spell on a shared spellcasting action. Omitting it shares only that action's
+ability. This remains authoring and display. It does not track spent uses.
 
 `preset` is an optional string stored on the action. It records which preset
 created the row and remains the live source of that row's default name.
@@ -89,6 +96,7 @@ defaults after creation.
 
 ## Not in this model
 
-Available-actions resolver, encounter picker, action grants, legendary actions,
-and a structured condition effect. Grappled or restrained text on a save stays
+Available-actions resolver, encounter picker, action grants, variable legendary
+costs, movement execution, and a structured condition effect. Grappled or
+restrained text on a save stays
 in an outcome `note` until a condition effect exists on the envelope.

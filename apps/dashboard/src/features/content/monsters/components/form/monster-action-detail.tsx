@@ -172,7 +172,8 @@ export function MonsterActionDetail({
                 items: MONSTER_ACTION_SECTIONS.filter(
                   (section) =>
                     section !== located.section &&
-                    !(located.action.kind === 'multiattack' && section !== 'actions'),
+                    !(located.action.kind === 'multiattack' && section !== 'actions') &&
+                    !(located.action.kind === 'attack-sequence' && section !== 'legendaryActions'),
                 ).map((section) => ({
                   id: `move-${section}`,
                   label: monsterActionSectionHeading(section),

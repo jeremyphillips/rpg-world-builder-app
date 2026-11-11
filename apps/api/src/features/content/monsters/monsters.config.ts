@@ -54,6 +54,14 @@ function toHomebrewMonster(doc: HomebrewDoc): Monster {
     actions: (record.actions ?? []) as Monster['actions'],
     bonusActions: (record.bonusActions ?? []) as Monster['bonusActions'],
     reactions: (record.reactions ?? []) as Monster['reactions'],
+    legendaryActions: (record.legendaryActions ?? []) as Monster['legendaryActions'],
+    ...(record.legendaryActionUses !== undefined && {
+      legendaryActionUses: record.legendaryActionUses as Monster['legendaryActionUses'],
+    }),
+    ...(record.legendaryActionUsesInLair !== undefined && {
+      legendaryActionUsesInLair:
+        record.legendaryActionUsesInLair as Monster['legendaryActionUsesInLair'],
+    }),
   } as Monster
 }
 

@@ -11,11 +11,17 @@ Other kinds do not. See [action-architecture.md](../action-architecture.md) and
 | `weapon`, `natural-weapon`, `attack` | Attack profile. On-hit riders are ordered effects, not an envelope |
 | `save`                               | Envelope. Method must be `saving-throw`. Damage effects only       |
 | `multiattack`                        | Steps of `{ count, actionIds }`. Not an envelope                   |
+| `attack-sequence`                    | The same steps, only in Legendary Actions. Optional `lead`         |
 | `spell`                              | Referenced spells. Each spell keeps its own resolution             |
 | `special`                            | Prose                                                              |
 
-Action economy is the section. `multiattack` is valid only in `actions`.
-Legendary actions are not modeled.
+The section places the row. `multiattack` is valid only in `actions`.
+`attack-sequence` is valid only in `legendaryActions`. Each legendary row
+spends one use from `legendaryActionUses`. `onceUntilNextTurn` is a stat-block
+sentence, not `limitedUse` and not encounter state. `spellInvocation:
+'use-entry'` requires the spell on the referenced spellcasting action.
+Condition-primary saves stay on `save-conditions`. There is no movement
+resolver and no per-option cost.
 
 ## On hit
 

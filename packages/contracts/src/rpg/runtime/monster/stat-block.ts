@@ -1,5 +1,10 @@
 import { availableBodyRows } from '../../content/lib/campaign-access/body-row-availability'
-import type { MonsterAction, MonsterBody } from '../../content/monster'
+import type {
+  MonsterAction,
+  MonsterActionSection,
+  MonsterBody,
+  MonsterLegendaryAction,
+} from '../../content/monster'
 import { findSpellCastingSource } from '../../content/monster/spell-casting-source'
 import { getSkillName } from '../../content/skill-proficiency'
 import { NEUTRAL_ABILITY_SCORE } from '../../vocab/ability'
@@ -36,7 +41,7 @@ import {
 
 export type DerivedMonsterAttackLine = {
   id: string
-  section: 'actions' | 'bonusActions' | 'reactions'
+  section: MonsterActionSection
   name: string
   attackBonus: number
   attackBonusLabel: string
@@ -68,7 +73,7 @@ export type DerivedMonsterStatBlock = {
 
 export type DerivedMonsterSpellcastingLine = {
   id: string
-  section: 'actions' | 'bonusActions' | 'reactions'
+  section: MonsterActionSection
   saveDc: number
   attackBonus: number
 }
@@ -165,7 +170,7 @@ function attackLineFromProfile(
 
 function appendAttackLines(
   target: DerivedMonsterAttackLine[],
-  actions: readonly MonsterAction[],
+  actions: readonly (MonsterAction | MonsterLegendaryAction)[],
   args: Omit<ResolveMonsterActionAttackProfileInput, 'action'>,
   section: DerivedMonsterAttackLine['section'],
 ): void {
@@ -235,6 +240,12 @@ export function deriveMonsterStatBlock({
     'bonusActions',
   )
   appendAttackLines(attacks, availableBodyRows(monster.reactions), attackLineArgs, 'reactions')
+  appendAttackLines(
+    attacks,
+    availableBodyRows(monster.legendaryActions),
+    attackLineArgs,
+    'legendaryActions',
+  )
 
   return {
     ac: armor,
@@ -263,7 +274,7 @@ function deriveSpellcastingLines(
   monster: MonsterBody,
   proficiencyBonus: number,
 ): DerivedMonsterSpellcastingLine[] {
-  const sections = ['actions', 'bonusActions', 'reactions'] as const
+  const sections = ['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const
   const lines: DerivedMonsterSpellcastingLine[] = []
   for (const section of sections) {
     for (const action of availableBodyRows(monster[section])) {
@@ -314,10 +325,11 @@ type DraftMonsterSource = {
   actions?: MonsterAction[]
   bonusActions?: MonsterAction[]
   reactions?: MonsterAction[]
+  legendaryActions?: MonsterLegendaryAction[]
 }
 
 function draftAttackResult(args: {
-  action: MonsterAction
+  action: MonsterAction | MonsterLegendaryAction
   monster: MonsterBody
   equipmentCatalog: CreatureEquipmentCatalog
   proficiencyBonus: number | undefined
@@ -340,6 +352,7 @@ function draftAttacks(
     ['actions', monster.actions ?? []],
     ['bonusActions', monster.bonusActions ?? []],
     ['reactions', monster.reactions ?? []],
+    ['legendaryActions', monster.legendaryActions ?? []],
   ] as const
   const attacks: DerivedDraftAttack[] = []
   for (const [section, actions] of sections) {

@@ -4,6 +4,7 @@ import {
   creatureWeaponProficienciesSchema,
   creatureWeaponProficiencyTargetsFromGrantSet,
   monsterActionDraftSchema,
+  monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
   type ArmorClassRules,
   type ContentValidationIntent,
@@ -72,7 +73,7 @@ function pickKeys(
 
 function applyReactionTriggerDraft(
   cleaned: Record<string, unknown>,
-  section: 'actions' | 'bonusActions' | 'reactions',
+  section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
 ): void {
   if (section !== 'reactions') return
   const text = monsterActionTriggerText(cleaned.trigger)
@@ -167,9 +168,30 @@ function applyLimitedUseDraft(cleaned: Record<string, unknown>): void {
   else delete cleaned.limitedUse
 }
 
+function applyTurnAndInvocationDraft(cleaned: Record<string, unknown>): void {
+  if (cleaned.onceUntilNextTurn === true || cleaned.onceUntilNextTurn === 'true') {
+    cleaned.onceUntilNextTurn = true
+  } else {
+    delete cleaned.onceUntilNextTurn
+  }
+  const shared = isRecord(cleaned.castingAbility) && cleaned.castingAbility.kind === 'shared'
+  if (cleaned.spellInvocation === 'use-entry' && shared) cleaned.spellInvocation = 'use-entry'
+  else delete cleaned.spellInvocation
+  if (typeof cleaned.lead !== 'string') {
+    delete cleaned.lead
+    return
+  }
+  const lead = cleaned.lead.trim()
+  if (lead) cleaned.lead = lead
+  else delete cleaned.lead
+}
+
 function stabilizeDraftActionKeys(
   active: Record<string, unknown>,
-  schema: typeof monsterActionDraftSchema | typeof monsterReactionDraftSchema,
+  schema:
+    | typeof monsterActionDraftSchema
+    | typeof monsterReactionDraftSchema
+    | typeof monsterLegendaryActionDraftSchema,
 ): unknown {
   const parsed = schema.safeParse(active)
   if (!parsed.success) return active
@@ -183,7 +205,7 @@ function stabilizeDraftActionKeys(
 
 function normalizeAction(
   action: unknown,
-  section: 'actions' | 'bonusActions' | 'reactions',
+  section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
 ): unknown {
   if (!isRecord(action)) return action
   const cleaned = omitEmptyStrings(action)
@@ -191,6 +213,7 @@ function normalizeAction(
   applyRichTextFields(cleaned)
   omitEmptyOnHit(cleaned)
   applyReactionTriggerDraft(cleaned, section)
+  applyTurnAndInvocationDraft(cleaned)
   applyLimitedUseDraft(cleaned)
   if (cleaned.kind === 'weapon' && isRecord(cleaned.damage)) {
     cleaned.damage = weaponActionDamageToDraft(cleaned.damage)
@@ -199,7 +222,12 @@ function normalizeAction(
   const keys =
     typeof cleaned.kind === 'string' ? monsterActionActiveKeys(cleaned.kind, section) : []
   const active = keys.length > 0 ? pickKeys(cleaned, keys) : cleaned
-  const schema = section === 'reactions' ? monsterReactionDraftSchema : monsterActionDraftSchema
+  const schema =
+    section === 'reactions'
+      ? monsterReactionDraftSchema
+      : section === 'legendaryActions'
+        ? monsterLegendaryActionDraftSchema
+        : monsterActionDraftSchema
   return stabilizeDraftActionKeys(active, schema)
 }
 
@@ -303,6 +331,30 @@ function normalizeTraitRichText(value: unknown): unknown {
  * Inactive AC, HP, and action-kind fields are dropped. Empty strings are absent.
  * Update payloads send `null` only for clearable keys the baseline actually had.
  */
+function normalizedActionSections(values: MonsterFormValues): Record<string, unknown> {
+  return {
+    actions: (values.actions ?? []).map((action) => normalizeAction(action, 'actions')),
+    bonusActions: (values.bonusActions ?? []).map((action) =>
+      normalizeAction(action, 'bonusActions'),
+    ),
+    reactions: (values.reactions ?? []).map((action) => normalizeAction(action, 'reactions')),
+    legendaryActions: (values.legendaryActions ?? []).map((action) =>
+      normalizeAction(action, 'legendaryActions'),
+    ),
+  }
+}
+
+function legendaryUseFields(values: MonsterFormValues): Record<string, number> {
+  const fields: Record<string, number> = {}
+  if (typeof values.legendaryActionUses === 'number') {
+    fields.legendaryActionUses = values.legendaryActionUses
+  }
+  if (typeof values.legendaryActionUsesInLair === 'number') {
+    fields.legendaryActionUsesInLair = values.legendaryActionUsesInLair
+  }
+  return fields
+}
+
 export function normalizeMonsterFormValues(
   values: MonsterFormValues,
   options: NormalizeMonsterFormOptions,
@@ -329,11 +381,8 @@ export function normalizeMonsterFormValues(
     defenses: values.defenses,
     equipment: values.equipment,
     traits: normalizeTraitRichText(omitEmptyStrings(values.traits)),
-    actions: (values.actions ?? []).map((action) => normalizeAction(action, 'actions')),
-    bonusActions: (values.bonusActions ?? []).map((action) =>
-      normalizeAction(action, 'bonusActions'),
-    ),
-    reactions: (values.reactions ?? []).map((action) => normalizeAction(action, 'reactions')),
+    ...normalizedActionSections(values),
+    ...legendaryUseFields(values),
   }
 
   applyOptionalScalars(normalized, values, challengeRating, hasFly)

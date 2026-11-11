@@ -173,6 +173,11 @@ export const ACTION_PRESET_ENTRIES = {
     mechanics: 'sequence',
     defaults: { steps: [] },
   },
+  'attack-sequence': {
+    vocabularyId: 'attack-sequence',
+    mechanics: 'sequence',
+    defaults: { steps: [] },
+  },
 } as const satisfies Record<string, ActionPreset>
 
 export type ActionPresetId = keyof typeof ACTION_PRESET_ENTRIES

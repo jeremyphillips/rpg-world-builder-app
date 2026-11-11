@@ -126,9 +126,11 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
     preset: z.string().min(1).optional(),
     description: z.string().optional(),
     limitedUse: limitedUse.optional(),
+    onceUntilNextTurn: z.literal(true).optional(),
     available: z.boolean().optional(),
     ...entryProvenanceField,
   }
+  const { description: _attackSequenceDescription, ...attackSequenceIdentity } = identity
   const monsterAbilitySourceSchema = z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('spell'), castingAbility: castingAbilitySchema }),
     z.object({
@@ -202,6 +204,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       kind: z.literal('spell'),
       name: strict(z.string().min(1), mode),
       castingAbility: strict(castingAbilitySchema, mode),
+      spellInvocation: z.literal('use-entry').optional(),
       omittedComponents: z.array(spellComponentIdSchema).optional(),
       spells: strict(spells, mode),
       description: z.string().optional(),
@@ -219,19 +222,43 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       name: z.string().min(1).optional(),
       steps: multiattackStepsSchema(mode),
     }),
+    z.object({
+      ...attackSequenceIdentity,
+      kind: z.literal('attack-sequence'),
+      name: strict(z.string().min(1), mode),
+      lead: z.string().min(1).optional(),
+      steps: multiattackStepsSchema(mode),
+    }),
   ] as const
 }
 
-export const monsterActionSchema = z.discriminatedUnion('kind', [
-  ...monsterActionFields('published'),
-])
+function omitActionKinds<T extends { shape: { kind: z.ZodType } }>(
+  options: readonly T[],
+  kinds: readonly string[],
+) {
+  return options.filter(
+    (option) => !kinds.some((kind) => option.shape.kind.safeParse(kind).success),
+  ) as unknown as [T, T, ...T[]]
+}
+
+const publishedActionFields = monsterActionFields('published')
+
+export const monsterActionSchema = z.discriminatedUnion(
+  'kind',
+  omitActionKinds(publishedActionFields, ['attack-sequence']),
+)
+
+export const monsterLegendaryActionSchema = z.discriminatedUnion(
+  'kind',
+  omitActionKinds(publishedActionFields, ['multiattack']),
+)
 
 const reactionTriggerField = { trigger: activationTriggerSchema.optional() } as const
 
 function reactionsFromActions<T extends { shape: { kind: z.ZodType } }>(options: readonly T[]) {
-  const extended = options
-    .filter((option) => !option.shape.kind.safeParse('multiattack').success)
-    .map((option) => (option as unknown as z.ZodObject).extend(reactionTriggerField))
+  const extended = omitActionKinds(options, ['multiattack', 'attack-sequence']).map((option) =>
+    (option as unknown as z.ZodObject).extend(reactionTriggerField),
+  )
   return z.discriminatedUnion(
     'kind',
     extended as unknown as [z.ZodObject, z.ZodObject, ...z.ZodObject[]],
@@ -243,17 +270,27 @@ type WithReactionTrigger<T> = T & {
 }
 
 export type MonsterAction = z.infer<typeof monsterActionSchema>
+export type MonsterLegendaryAction = z.infer<typeof monsterLegendaryActionSchema>
 export type MonsterReaction = WithReactionTrigger<Exclude<MonsterAction, { kind: 'multiattack' }>>
 
 export const monsterReactionSchema = reactionsFromActions(
   monsterActionSchema.options,
 ) as unknown as z.ZodType<MonsterReaction>
 
-export const monsterActionDraftSchema = z.discriminatedUnion('kind', [
-  ...monsterActionFields('draft'),
-])
+const draftActionFields = monsterActionFields('draft')
+
+export const monsterActionDraftSchema = z.discriminatedUnion(
+  'kind',
+  omitActionKinds(draftActionFields, ['attack-sequence']),
+)
+
+export const monsterLegendaryActionDraftSchema = z.discriminatedUnion(
+  'kind',
+  omitActionKinds(draftActionFields, ['multiattack']),
+)
 
 export type MonsterActionDraft = z.infer<typeof monsterActionDraftSchema>
+export type MonsterLegendaryActionDraft = z.infer<typeof monsterLegendaryActionDraftSchema>
 export type MonsterReactionDraft = WithReactionTrigger<
   Exclude<MonsterActionDraft, { kind: 'multiattack' }>
 >
@@ -268,9 +305,10 @@ type SpellEntryLike = {
   name?: string
   limitedUse?: unknown
   castingAbility?: { kind: string; entryId?: string; ability?: string }
+  spellInvocation?: string
   bonusSource?: { kind?: string; castingAbility?: { kind?: string; entryId?: string } }
   dcSource?: { kind?: string; castingAbility?: { kind?: string; entryId?: string } }
-  spells?: readonly { spellId?: string; limitedUse?: unknown }[]
+  spells?: readonly { spellId?: string; castAtLevel?: number; limitedUse?: unknown }[]
 }
 
 export function refineMonsterSpellEntries(
@@ -278,13 +316,14 @@ export function refineMonsterSpellEntries(
     actions?: readonly SpellEntryLike[]
     bonusActions?: readonly SpellEntryLike[]
     reactions?: readonly SpellEntryLike[]
+    legendaryActions?: readonly SpellEntryLike[]
   },
   ctx: z.RefinementCtx,
   prefix: (string | number)[] = [],
   options?: { published?: boolean },
 ): void {
-  const located = (['actions', 'bonusActions', 'reactions'] as const).flatMap((section) =>
-    (sections[section] ?? []).map((action, index) => ({ section, index, action })),
+  const located = (['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const).flatMap(
+    (section) => (sections[section] ?? []).map((action, index) => ({ section, index, action })),
   )
   const spellsById = new Map(
     located
@@ -293,7 +332,7 @@ export function refineMonsterSpellEntries(
   )
 
   for (const locatedEntry of located) {
-    refineOneSpellEntry(locatedEntry, spellsById, ctx, prefix)
+    refineOneSpellEntry(locatedEntry, spellsById, ctx, prefix, options?.published === true)
     if (options?.published) refineNestedSpellSource(locatedEntry, sections, ctx, prefix)
   }
   if (options?.published) refineUniqueDirectCastingNames(sections, ctx, prefix)
@@ -304,12 +343,69 @@ function refineOneSpellEntry(
   spellsById: ReadonlyMap<string, SpellEntryLike>,
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
+  published: boolean,
 ): void {
   const { section, index, action } = locatedEntry
   if (action.kind !== 'spell') return
   const path = [...prefix, section, index]
   refineSpellOwnership(action, ctx, path)
   refineSharedCastingAbility(action, spellsById, ctx, path)
+  if (published) refineSpellInvocation(action, spellsById, ctx, path)
+}
+
+function sharedSpellEntryId(action: SpellEntryLike): string | undefined {
+  if (action.castingAbility?.kind !== 'shared') return undefined
+  return action.castingAbility.entryId
+}
+
+function refineInvokedSpell(
+  spell: NonNullable<SpellEntryLike['spells']>[number],
+  source: NonNullable<SpellEntryLike['spells']>[number] | undefined,
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+  spellIndex: number,
+): void {
+  if (!spell.spellId) return
+  if (!source) {
+    addCustomRefinementIssue(ctx, 'This spell must be on the selected spellcasting entry.', [
+      ...path,
+      'spells',
+      spellIndex,
+      'spellId',
+    ])
+    return
+  }
+  if (source.castAtLevel === undefined || spell.castAtLevel === source.castAtLevel) return
+  addCustomRefinementIssue(ctx, 'Cast level must match the spellcasting entry.', [
+    ...path,
+    'spells',
+    spellIndex,
+    'castAtLevel',
+  ])
+}
+
+function refineSpellInvocation(
+  action: SpellEntryLike,
+  spellsById: ReadonlyMap<string, SpellEntryLike>,
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
+  if (action.spellInvocation !== 'use-entry') return
+  const entryId = sharedSpellEntryId(action)
+  if (!entryId) {
+    addCustomRefinementIssue(
+      ctx,
+      'Using a spellcasting entry requires a shared spellcasting ability.',
+      [...path, 'spellInvocation'],
+    )
+    return
+  }
+  const target = spellsById.get(entryId)
+  if (!target) return
+  for (const [spellIndex, spell] of (action.spells ?? []).entries()) {
+    const source = target.spells?.find((entry) => entry.spellId === spell.spellId)
+    refineInvokedSpell(spell, source, ctx, path, spellIndex)
+  }
 }
 
 function refineSpellOwnership(
@@ -370,6 +466,7 @@ function refineUniqueDirectCastingNames(
     actions?: readonly SpellEntryLike[]
     bonusActions?: readonly SpellEntryLike[]
     reactions?: readonly SpellEntryLike[]
+    legendaryActions?: readonly SpellEntryLike[]
   },
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
@@ -509,7 +606,7 @@ function refineMonsterSaveResolution(
 }
 
 export function refineMonsterActionShape(
-  action: MonsterAction | MonsterReaction,
+  action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {

@@ -12,9 +12,7 @@ export type SpellCastingSourceRow = {
 }
 
 export type SpellCastingSections = {
-  actions?: readonly SpellCastingSourceRow[]
-  bonusActions?: readonly SpellCastingSourceRow[]
-  reactions?: readonly SpellCastingSourceRow[]
+  [K in MonsterActionSection]?: readonly SpellCastingSourceRow[]
 }
 
 export type ResolvedSpellCastingSource = {

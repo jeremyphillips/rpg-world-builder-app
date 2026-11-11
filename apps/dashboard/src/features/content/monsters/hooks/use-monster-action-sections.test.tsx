@@ -115,4 +115,27 @@ describe('useMonsterActionSections', () => {
     )
     expect(result.current.locate('spellcasting')?.section).toBe('actions')
   })
+
+  it('initializes legendary uses on the first row and clears them when the last row leaves', () => {
+    const { result } = renderHook(() => useMonsterActionSections(), { wrapper: wrapper() })
+    act(() => {
+      result.current.addAcquisition('legendaryActions', { type: 'create', kind: 'special' })
+    })
+    expect(result.current.values?.legendaryActionUses).toBe(3)
+    act(() => {
+      result.current.addAcquisition('legendaryActions', { type: 'create', kind: 'special' })
+    })
+    expect(result.current.values?.legendaryActionUses).toBe(3)
+    const ids = (result.current.values?.legendaryActions ?? []).flatMap((action) =>
+      action && typeof action === 'object' && 'id' in action && typeof action.id === 'string'
+        ? [action.id]
+        : [],
+    )
+    act(() => {
+      for (const id of ids) result.current.removeAction(id)
+    })
+    expect(result.current.values?.legendaryActions).toEqual([])
+    expect(result.current.values?.legendaryActionUses).toBeUndefined()
+    expect(result.current.values?.legendaryActionUsesInLair).toBeUndefined()
+  })
 })

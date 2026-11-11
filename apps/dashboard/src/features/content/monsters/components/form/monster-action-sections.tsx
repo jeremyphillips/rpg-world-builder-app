@@ -40,6 +40,7 @@ import {
 } from '../../lib/monster-form-derivation'
 import {
   MONSTER_ACTIONS_HEADING,
+  MONSTER_LEGENDARY_ACTIONS_HEADING,
   MONSTER_ADD_LABEL,
   MONSTER_BONUS_ACTIONS_HEADING,
   MONSTER_CANCEL_LABEL,
@@ -58,7 +59,8 @@ const SECTION_HEADINGS = {
   actions: MONSTER_ACTIONS_HEADING,
   bonusActions: MONSTER_BONUS_ACTIONS_HEADING,
   reactions: MONSTER_REACTIONS_HEADING,
-} as const
+  legendaryActions: MONSTER_LEGENDARY_ACTIONS_HEADING,
+} as const satisfies Record<MonsterActionSection, string>
 
 function mapActionListItem(row: unknown, index: number, titles: ReadonlyMap<string, string>) {
   const action = row as MonsterActionDraftRow | undefined
@@ -89,7 +91,12 @@ function MonsterActionAddMenu({
       size="sm"
       variant="outline"
       groups={[...MONSTER_ACTION_ACQUISITION_GROUPS]}
-      items={monsterActionAcquisitionItems({ weapons, weaponActions, allowAddWeapon })}
+      items={monsterActionAcquisitionItems({
+        weapons,
+        weaponActions,
+        allowAddWeapon,
+        section,
+      })}
       onSelectItem={(id) => {
         const choice = parseMonsterActionAcquisitionId(id)
         if (choice) onSelect(section, choice)
@@ -169,11 +176,12 @@ function useMonsterActionDetailRows(
   const actionTitles = sectionTitles(values, ctx, 'actions')
   const bonusTitles = sectionTitles(values, ctx, 'bonusActions')
   const reactionTitles = sectionTitles(values, ctx, 'reactions')
+  const legendaryTitles = sectionTitles(values, ctx, 'legendaryActions')
   const shared = {
     formCtx: ctx,
     itemFields: actionItemFields,
     itemNoun: MONSTER_ACTION_ITEM_NOUN,
-    access: { kind: 'availability' as const, fieldName: 'available' },
+    access: { kind: 'availability' as const, fieldName: 'available' as const },
   }
   const actionRows = useEmbeddedMasterDetailRows({
     ...shared,
@@ -196,16 +204,25 @@ function useMonsterActionDetailRows(
     sectionLabel: SECTION_HEADINGS.reactions,
     mapListItem: ({ row, index }) => mapActionListItem(row, index, reactionTitles),
   })
+  const legendaryRows = useEmbeddedMasterDetailRows({
+    ...shared,
+    fieldName: 'legendaryActions',
+    editor: sections.editors.legendaryActions,
+    sectionLabel: SECTION_HEADINGS.legendaryActions,
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, legendaryTitles),
+  })
   return {
     titlesBySection: {
       actions: actionTitles,
       bonusActions: bonusTitles,
       reactions: reactionTitles,
+      legendaryActions: legendaryTitles,
     },
     rowsBySection: {
       actions: actionRows,
       bonusActions: bonusRows,
       reactions: reactionRows,
+      legendaryActions: legendaryRows,
     },
     actionRows,
   }

@@ -1,4 +1,8 @@
-import { monsterActionDraftSchema, monsterReactionDraftSchema } from '@rpg/contracts'
+import {
+  monsterActionDraftSchema,
+  monsterLegendaryActionDraftSchema,
+  monsterReactionDraftSchema,
+} from '@rpg/contracts'
 
 import type { MonsterActionSection } from './monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './monster-action-presets'
@@ -16,7 +20,12 @@ export function monsterActionActiveKeys(
   kind: string,
   section: MonsterActionSection,
 ): readonly string[] {
-  const schema = section === 'reactions' ? monsterReactionDraftSchema : monsterActionDraftSchema
+  const schema =
+    section === 'reactions'
+      ? monsterReactionDraftSchema
+      : section === 'legendaryActions'
+        ? monsterLegendaryActionDraftSchema
+        : monsterActionDraftSchema
   return variantKeys(schema, kind)
 }
 

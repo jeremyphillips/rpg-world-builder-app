@@ -51,15 +51,19 @@ function combinationPhrase(names: readonly string[]): string {
   return `${names.slice(0, -1).join(', ')}, or ${names[names.length - 1]}`
 }
 
-function formatStep(args: { subject: string; count: number; names: readonly string[] }): string {
+function formatAttackClause(args: { count: number; names: readonly string[] }): string {
   const countLabel = countWord(args.count)
   if (args.names.length === 1) {
     const name = args.names[0]
     const noun = args.count === 1 ? 'attack' : 'attacks'
-    return `${args.subject} makes ${countLabel} ${name} ${noun}.`
+    return `makes ${countLabel} ${name} ${noun}`
   }
   const noun = args.count === 1 ? 'attack' : 'attacks'
-  return `${args.subject} makes ${countLabel} ${noun}, using ${combinationPhrase(args.names)} in any combination.`
+  return `makes ${countLabel} ${noun}, using ${combinationPhrase(args.names)} in any combination`
+}
+
+function formatStep(args: { subject: string; count: number; names: readonly string[] }): string {
+  return `${args.subject} ${formatAttackClause(args)}.`
 }
 
 /** SRD sentence for a multiattack, using resolved action and weapon names. */
@@ -84,4 +88,36 @@ export function formatMonsterMultiattack(args: {
     }),
   )
   return sentences.join(' ')
+}
+
+type AttackSequenceAction = {
+  lead?: string
+  steps: readonly { count: number; actionIds: readonly string[] }[]
+}
+
+/** Legendary attack reference. A lead is a predicate; the subject and conjunction are supplied here. */
+export function formatMonsterAttackSequence(args: {
+  monsterName: string
+  action: AttackSequenceAction
+  actions: readonly MonsterAction[]
+  equipment: readonly EquipmentInstance[]
+  equipmentCatalog: CreatureEquipmentCatalog
+  magicPropertyProvider?: MagicPropertyDefinitionProvider
+}): string {
+  const provider = args.magicPropertyProvider ?? (() => undefined)
+  const subject = formatMonsterStatBlockSubject(args.monsterName)
+  const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
+  const sentences = args.action.steps.map((step) =>
+    formatAttackClause({
+      count: step.count,
+      names: step.actionIds.map((id) =>
+        attackName(id, args.actions, args.equipment, args.equipmentCatalog, provider),
+      ),
+    }),
+  )
+  const lead = args.action.lead?.replace(/[.,]\s*$/, '').trim()
+  if (lead && sentences.length === 1) {
+    return `${capitalSubject} ${lead}, and it ${sentences[0]}.`
+  }
+  return sentences.map((clause) => `${capitalSubject} ${clause}.`).join(' ')
 }

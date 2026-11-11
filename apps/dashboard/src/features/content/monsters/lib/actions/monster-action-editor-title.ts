@@ -24,6 +24,7 @@ const AUTHORED_FALLBACK_BASE = {
   'natural-weapon': getMonsterActionKindLabel('natural-weapon'),
   spell: MONSTER_SPELLCASTING_ACTION_NAME,
   multiattack: getMonsterActionKindLabel('multiattack'),
+  'attack-sequence': getMonsterActionKindLabel('attack-sequence'),
 } as const
 
 export interface MonsterActionHeaderName {

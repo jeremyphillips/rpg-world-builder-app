@@ -5,6 +5,7 @@ import {
   createMonsterInputSchema,
   monsterActionDraftSchema,
   monsterActionSchema,
+  monsterLegendaryActionSchema,
   monsterReactionDraftSchema,
   monsterReactionSchema,
   type CreateMonsterInput,
@@ -884,5 +885,248 @@ describe('monsterActionDraftSchema', () => {
     }
     expect(monsterActionDraftSchema.safeParse(partial).success).toBe(true)
     expect(monsterActionSchema.safeParse(partial).success).toBe(false)
+  })
+})
+
+const spellcastingAction = {
+  id: 'spellcasting',
+  kind: 'spell' as const,
+  name: 'Spellcasting',
+  castingAbility: { kind: 'ability' as const, ability: 'cha' as const },
+  spells: [{ spellId: 'srd-cc-5.2.1:scorching-ray', castAtLevel: 3 }],
+}
+
+function legendarySpell(spellId: string, castAtLevel?: number, invocation?: 'use-entry') {
+  return {
+    id: 'legendary-spell',
+    kind: 'spell' as const,
+    name: 'Fiery Rays',
+    ...(invocation ? { spellInvocation: invocation } : {}),
+    castingAbility: { kind: 'shared' as const, entryId: 'spellcasting' },
+    spells: [{ spellId, ...(castAtLevel !== undefined ? { castAtLevel } : {}) }],
+  }
+}
+
+describe('legendary actions', () => {
+  it('keeps attack sequence out of the other sections', () => {
+    const sequence = {
+      id: 'pounce',
+      kind: 'attack-sequence' as const,
+      name: 'Pounce',
+      steps: [{ count: 1, actionIds: ['bite'] }],
+    }
+    expect(monsterActionSchema.safeParse(sequence).success).toBe(false)
+    expect(monsterReactionSchema.safeParse(sequence).success).toBe(false)
+    expect(monsterLegendaryActionSchema.safeParse(sequence).success).toBe(true)
+    expect(
+      monsterLegendaryActionSchema.safeParse({
+        id: 'multi',
+        kind: 'multiattack',
+        steps: [{ count: 1, actionIds: ['bite'] }],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('requires a uses pool only when legendary rows exist', () => {
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          actions: [biteAction],
+          legendaryActions: [
+            {
+              id: 'pounce',
+              kind: 'attack-sequence',
+              name: 'Pounce',
+              steps: [{ count: 1, actionIds: ['bite'] }],
+            },
+          ],
+        }),
+      ),
+    ).toContain('Enter legendary action uses.')
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          legendaryActionUses: 3,
+        }),
+      ),
+    ).toContain('Legendary action uses require a legendary action.')
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          legendaryActionUses: 3,
+          legendaryActionUsesInLair: 3,
+          legendaryActions: [
+            {
+              id: 'note',
+              kind: 'special',
+              name: 'Deathly Teleport',
+              description: '<p>The lich teleports.</p>',
+            },
+          ],
+        }),
+      ),
+    ).toContain('In-lair uses must be greater than legendary action uses.')
+
+    expect(
+      createMonsterInputSchema.safeParse({
+        ...publishedMonsterBase,
+        legendaryActionUses: 3,
+        legendaryActionUsesInLair: 4,
+        actions: [biteAction],
+        legendaryActions: [
+          {
+            id: 'pounce',
+            kind: 'attack-sequence',
+            name: 'Pounce',
+            lead: 'moves up to half its Speed',
+            steps: [{ count: 1, actionIds: ['bite'] }],
+          },
+        ],
+      }).success,
+    ).toBe(true)
+  })
+
+  it('rejects a missing, moved, or repeated attack reference and a lead with several steps', () => {
+    const sequence = (actionIds: string[], lead?: string) => ({
+      id: 'pounce',
+      kind: 'attack-sequence' as const,
+      name: 'Pounce',
+      ...(lead ? { lead } : {}),
+      steps: [{ count: 1, actionIds }],
+    })
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          legendaryActionUses: 3,
+          actions: [biteAction],
+          legendaryActions: [sequence(['missing'])],
+        }),
+      ),
+    ).toContain('must reference an action in Actions')
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          legendaryActionUses: 3,
+          bonusActions: [biteAction],
+          legendaryActions: [sequence(['bite'])],
+        }),
+      ),
+    ).toContain('must reference an action in Actions')
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          legendaryActionUses: 3,
+          actions: [biteAction],
+          legendaryActions: [
+            {
+              id: 'onslaught',
+              kind: 'attack-sequence',
+              name: 'Onslaught',
+              lead: 'moves up to half its Speed',
+              steps: [
+                { count: 1, actionIds: ['bite'] },
+                { count: 1, actionIds: ['bite'] },
+              ],
+            },
+          ],
+        }),
+      ),
+    ).toContain('A lead allows one attack step.')
+
+    expect(
+      issueMessages(
+        createMonsterDraftInputSchema.safeParse({
+          ...publishedMonsterBase,
+          actions: [biteAction, { ...biteAction, id: 'claw', name: 'Claw' }],
+          legendaryActions: [
+            {
+              id: 'onslaught',
+              kind: 'attack-sequence',
+              name: 'Onslaught',
+              lead: 'moves up to half its Speed',
+              steps: [
+                { count: 1, actionIds: ['bite'] },
+                { count: 1, actionIds: ['claw'] },
+              ],
+            },
+          ],
+        }),
+      ),
+    ).toEqual([])
+  })
+
+  it('checks spell list membership only for use-entry invocation', () => {
+    expect(
+      createMonsterInputSchema.safeParse({
+        ...publishedMonsterBase,
+        legendaryActionUses: 3,
+        actions: [spellcastingAction],
+        legendaryActions: [legendarySpell('srd-cc-5.2.1:fear')],
+      }).success,
+    ).toBe(true)
+
+    expect(
+      createMonsterInputSchema.safeParse({
+        ...publishedMonsterBase,
+        legendaryActionUses: 3,
+        actions: [spellcastingAction],
+        legendaryActions: [legendarySpell('srd-cc-5.2.1:scorching-ray', 3, 'use-entry')],
+      }).success,
+    ).toBe(true)
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          legendaryActionUses: 3,
+          actions: [spellcastingAction],
+          legendaryActions: [legendarySpell('srd-cc-5.2.1:fear', undefined, 'use-entry')],
+        }),
+      ),
+    ).toContain('This spell must be on the selected spellcasting entry.')
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          legendaryActionUses: 3,
+          actions: [spellcastingAction],
+          legendaryActions: [legendarySpell('srd-cc-5.2.1:scorching-ray', 2, 'use-entry')],
+        }),
+      ),
+    ).toContain('Cast level must match the spellcasting entry.')
+
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          legendaryActionUses: 3,
+          legendaryActions: [legendarySpell('srd-cc-5.2.1:scorching-ray', 3, 'use-entry')],
+        }),
+      ),
+    ).toContain('Shared spellcasting must use another spell entry that has its own ability.')
+  })
+
+  it('keeps action ids unique across legendary actions', () => {
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...publishedMonsterBase,
+          legendaryActionUses: 3,
+          actions: [biteAction],
+          legendaryActions: [{ ...biteAction }],
+        }),
+      ),
+    ).toContain('Action ids must be unique across all sections.')
   })
 })

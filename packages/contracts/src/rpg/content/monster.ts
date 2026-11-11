@@ -49,6 +49,8 @@ import {
 import {
   monsterActionDraftSchema,
   monsterActionSchema,
+  monsterLegendaryActionDraftSchema,
+  monsterLegendaryActionSchema,
   monsterReactionDraftSchema,
   monsterReactionSchema,
   monsterRichTextIsEmpty,
@@ -63,13 +65,17 @@ export type { MonsterActionSection } from './monster/action-sections'
 
 export {
   monsterActionSchema,
+  monsterLegendaryActionSchema,
   monsterReactionSchema,
   monsterActionDraftSchema,
+  monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
 } from './monster/action'
 export type {
   MonsterAction,
   MonsterActionDraft,
+  MonsterLegendaryAction,
+  MonsterLegendaryActionDraft,
   MonsterReaction,
   MonsterReactionDraft,
 } from './monster/action'
@@ -256,6 +262,9 @@ export const monsterBodyFields = {
   actions: z.array(monsterActionSchema).default([]),
   bonusActions: z.array(monsterActionSchema).default([]),
   reactions: z.array(monsterReactionSchema).default([]),
+  legendaryActionUses: z.number().int().min(1).optional(),
+  legendaryActionUsesInLair: z.number().int().min(1).optional(),
+  legendaryActions: z.array(monsterLegendaryActionSchema).default([]),
 } as const
 
 export const monsterBodySchema = mediaBearingAuthoredContentBodySchema.extend(monsterBodyFields)
@@ -277,6 +286,7 @@ const monsterBodyDraftSchemaBase = mediaBearingDraftAuthoredContentBodySchema(
   actions: z.array(monsterActionDraftSchema).default([]),
   bonusActions: z.array(monsterActionDraftSchema).default([]),
   reactions: z.array(monsterReactionDraftSchema).default([]),
+  legendaryActions: z.array(monsterLegendaryActionDraftSchema).default([]),
   traits: z.array(monsterTraitDraftSchema).default([]),
 })
 
@@ -285,15 +295,11 @@ export const monsterBodyDraftSchema = monsterBodyDraftSchemaBase
 export type MonsterBodyDraft = z.infer<typeof monsterBodyDraftSchema>
 
 function collectActionIds(body: {
-  actions: readonly { id: string }[]
-  bonusActions: readonly { id: string }[]
-  reactions: readonly { id: string }[]
+  [K in (typeof MONSTER_ACTION_SECTIONS)[number]]?: readonly { id?: string }[]
 }): string[] {
-  return [
-    ...body.actions.map((a) => a.id),
-    ...body.bonusActions.map((a) => a.id),
-    ...body.reactions.map((a) => a.id),
-  ]
+  return MONSTER_ACTION_SECTIONS.flatMap((section) =>
+    (body[section] ?? []).flatMap((action) => (action.id ? [action.id] : [])),
+  )
 }
 
 function refineMonsterProficiencies(
@@ -385,18 +391,56 @@ function refineUniqueIds(
 
 const MULTIATTACK_ATTACK_KINDS = new Set(['weapon', 'natural-weapon', 'attack'])
 
+type ActionReferenceRow = {
+  id?: string
+  kind: string
+  lead?: string
+  steps?: readonly { actionIds?: readonly string[] }[]
+}
+
+function refineReferencedAttackSteps(
+  action: ActionReferenceRow,
+  actionsById: ReadonlyMap<string, { id?: string; kind: string }>,
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
+  const seen = new Set<string>()
+  const steps = Array.isArray(action.steps) ? action.steps : []
+  steps.forEach((step, stepIndex) => {
+    const stepSeen = new Set<string>()
+    const actionIds: readonly string[] = Array.isArray(step.actionIds) ? step.actionIds : []
+    actionIds.forEach((id, idIndex) => {
+      const idPath = [...path, 'steps', stepIndex, 'actionIds', idIndex]
+      if (id === action.id) {
+        addCustomRefinementIssue(ctx, 'A multiattack cannot reference itself.', idPath)
+      }
+      if (stepSeen.has(id) || seen.has(id)) {
+        addCustomRefinementIssue(ctx, 'Each attack can be referenced only once.', idPath)
+      }
+      stepSeen.add(id)
+      seen.add(id)
+      const target = actionsById.get(id)
+      if (!target) {
+        addCustomRefinementIssue(ctx, 'must reference an action in Actions', idPath)
+        return
+      }
+      if (!MULTIATTACK_ATTACK_KINDS.has(target.kind)) {
+        addCustomRefinementIssue(ctx, 'invalid kind', idPath)
+      }
+    })
+  })
+}
+
 function refineMultiattackReferences(
   body: {
-    actions: readonly {
-      id?: string
-      kind: string
-      steps?: readonly { actionIds?: readonly string[] }[]
-    }[]
-    bonusActions: readonly { id?: string; kind: string }[]
-    reactions: readonly { id?: string; kind: string }[]
+    actions: readonly ActionReferenceRow[]
+    bonusActions: readonly ActionReferenceRow[]
+    reactions: readonly ActionReferenceRow[]
+    legendaryActions?: readonly ActionReferenceRow[]
   },
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
+  options: { published: boolean },
 ): void {
   const actionsById = new Map(
     body.actions.flatMap((action) => (action.id ? [[action.id, action] as const] : [])),
@@ -405,45 +449,76 @@ function refineMultiattackReferences(
     ['actions', body.actions],
     ['bonusActions', body.bonusActions],
     ['reactions', body.reactions],
+    ['legendaryActions', body.legendaryActions ?? []],
   ] as const
   for (const [section, entries] of sections) {
     entries.forEach((action, index) => {
-      if (action.kind !== 'multiattack') return
-      if (section !== 'actions') {
-        addCustomRefinementIssue(ctx, 'Multiattack is only valid in Actions.', [
-          ...prefix,
-          section,
-          index,
+      const path = [...prefix, section, index]
+      if (action.kind === 'multiattack') {
+        if (section !== 'actions') {
+          addCustomRefinementIssue(ctx, 'Multiattack is only valid in Actions.', [...path, 'kind'])
+          return
+        }
+        refineReferencedAttackSteps(action, actionsById, ctx, path)
+        return
+      }
+      if (action.kind !== 'attack-sequence') return
+      if (section !== 'legendaryActions') {
+        addCustomRefinementIssue(ctx, 'Attack sequence is only valid in Legendary Actions.', [
+          ...path,
           'kind',
         ])
         return
       }
-      const seen = new Set<string>()
-      const steps = 'steps' in action && Array.isArray(action.steps) ? action.steps : []
-      steps.forEach((step, stepIndex) => {
-        const stepSeen = new Set<string>()
-        const actionIds: readonly string[] = Array.isArray(step.actionIds) ? step.actionIds : []
-        actionIds.forEach((id, idIndex) => {
-          const path = [...prefix, section, index, 'steps', stepIndex, 'actionIds', idIndex]
-          if (id === action.id) {
-            addCustomRefinementIssue(ctx, 'A multiattack cannot reference itself.', path)
-          }
-          if (stepSeen.has(id) || seen.has(id)) {
-            addCustomRefinementIssue(ctx, 'Each attack can be referenced only once.', path)
-          }
-          stepSeen.add(id)
-          seen.add(id)
-          const target = actionsById.get(id)
-          if (!target) {
-            addCustomRefinementIssue(ctx, 'must reference an action in Actions', path)
-            return
-          }
-          if (!MULTIATTACK_ATTACK_KINDS.has(target.kind)) {
-            addCustomRefinementIssue(ctx, 'invalid kind', path)
-          }
-        })
-      })
+      const steps = Array.isArray(action.steps) ? action.steps : []
+      if (options.published && action.lead && steps.length !== 1) {
+        addCustomRefinementIssue(ctx, 'A lead allows one attack step.', [...path, 'lead'])
+      }
+      refineReferencedAttackSteps(action, actionsById, ctx, path)
     })
+  }
+}
+
+function refineLegendaryActionPool(
+  body: {
+    legendaryActions: readonly unknown[]
+    legendaryActionUses?: number
+    legendaryActionUsesInLair?: number
+  },
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  const hasRows = body.legendaryActions.length > 0
+  if (!hasRows) {
+    if (body.legendaryActionUses !== undefined) {
+      addCustomRefinementIssue(ctx, 'Legendary action uses require a legendary action.', [
+        ...prefix,
+        'legendaryActionUses',
+      ])
+    }
+    if (body.legendaryActionUsesInLair !== undefined) {
+      addCustomRefinementIssue(ctx, 'In-lair legendary action uses require a legendary action.', [
+        ...prefix,
+        'legendaryActionUsesInLair',
+      ])
+    }
+    return
+  }
+  if (body.legendaryActionUses === undefined) {
+    addCustomRefinementIssue(ctx, 'Enter legendary action uses.', [
+      ...prefix,
+      'legendaryActionUses',
+    ])
+    return
+  }
+  if (
+    body.legendaryActionUsesInLair !== undefined &&
+    body.legendaryActionUsesInLair <= body.legendaryActionUses
+  ) {
+    addCustomRefinementIssue(ctx, 'In-lair uses must be greater than legendary action uses.', [
+      ...prefix,
+      'legendaryActionUsesInLair',
+    ])
   }
 }
 
@@ -453,6 +528,7 @@ function refineWeaponEntryReferences(
     actions: readonly { kind: string; equipmentEntryId?: string }[]
     bonusActions: readonly { kind: string; equipmentEntryId?: string }[]
     reactions: readonly { kind: string; equipmentEntryId?: string }[]
+    legendaryActions: readonly { kind: string; equipmentEntryId?: string }[]
   },
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
@@ -520,7 +596,8 @@ export function refineMonsterBody(
   refineMonsterSpellEntries(body, ctx, prefix, { published: true })
 
   refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
-  refineMultiattackReferences(body, ctx, prefix)
+  refineMultiattackReferences(body, ctx, prefix, { published: true })
+  refineLegendaryActionPool(body, ctx, prefix)
   refineCreatureDamageDefenses(body.defenses, ctx, [...prefix, 'defenses'])
   refineCreatureSenseRanges(body.senses, ctx, [...prefix, 'senses'])
   refineCreatureTelepathyRange(body.communication.telepathy, ctx, [
@@ -579,6 +656,7 @@ function refineMonsterDraftIds(
     actions: body.actions ?? [],
     bonusActions: body.bonusActions ?? [],
     reactions: body.reactions ?? [],
+    legendaryActions: body.legendaryActions ?? [],
   })
   if (new Set(actionIds).size !== actionIds.length) {
     addCustomRefinementIssue(ctx, 'Action ids must be unique across all sections.', [
@@ -588,44 +666,27 @@ function refineMonsterDraftIds(
   }
 }
 
+function draftActionSections(body: MonsterBodyDraft) {
+  return {
+    actions: body.actions ?? [],
+    bonusActions: body.bonusActions ?? [],
+    reactions: body.reactions ?? [],
+    legendaryActions: body.legendaryActions ?? [],
+  }
+}
+
 function refineMonsterDraftBody(
   body: MonsterBodyDraft,
   ctx: z.RefinementCtx,
   prefix: (string | number)[] = [],
 ): void {
-  const equipment = body.equipment ?? []
+  const sections = draftActionSections(body)
   refineMonsterDraftIds(body, ctx, prefix)
-
-  refineMonsterSpellEntries(
-    {
-      actions: body.actions ?? [],
-      bonusActions: body.bonusActions ?? [],
-      reactions: body.reactions ?? [],
-    },
-    ctx,
-    prefix,
-  )
-
-  refineWeaponEntryReferences(
-    {
-      equipment,
-      actions: body.actions ?? [],
-      bonusActions: body.bonusActions ?? [],
-      reactions: body.reactions ?? [],
-    },
-    ctx,
-    prefix,
-    { requirePresent: false },
-  )
-  refineMultiattackReferences(
-    {
-      actions: body.actions ?? [],
-      bonusActions: body.bonusActions ?? [],
-      reactions: body.reactions ?? [],
-    },
-    ctx,
-    prefix,
-  )
+  refineMonsterSpellEntries(sections, ctx, prefix)
+  refineWeaponEntryReferences({ equipment: body.equipment ?? [], ...sections }, ctx, prefix, {
+    requirePresent: false,
+  })
+  refineMultiattackReferences(sections, ctx, prefix, { published: false })
 }
 
 const monsterDraftStoredSchemaBase = draftStoredSchema(monsterBodyDraftSchema).superRefine(

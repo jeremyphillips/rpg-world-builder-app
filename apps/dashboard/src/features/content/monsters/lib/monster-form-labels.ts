@@ -196,11 +196,18 @@ export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
 export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
 export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')
 export const MONSTER_REACTIONS_HEADING = actionEconomySectionHeading('reaction')
+export const MONSTER_LEGENDARY_ACTIONS_HEADING = 'Legendary Actions'
+export const MONSTER_LEGENDARY_USES_LABEL = 'Uses'
+export const MONSTER_LEGENDARY_LAIR_USES_LABEL = 'Uses in lair'
+export const MONSTER_TURN_LIMIT_ADD_LABEL = 'Add turn limit'
+export const MONSTER_TURN_LIMIT_LABEL = 'Turn limit'
+export const MONSTER_ATTACK_SEQUENCE_LEAD_LABEL = 'Lead'
 
 const MONSTER_ACTION_SECTION_HEADINGS = {
   actions: MONSTER_ACTIONS_HEADING,
   bonusActions: MONSTER_BONUS_ACTIONS_HEADING,
   reactions: MONSTER_REACTIONS_HEADING,
+  legendaryActions: MONSTER_LEGENDARY_ACTIONS_HEADING,
 } as const satisfies Record<MonsterActionSection, string>
 
 export function monsterActionSectionHeading(section: MonsterActionSection): string {
@@ -217,6 +224,8 @@ export const MONSTER_ACQUISITION_SPELL_DESCRIPTION = 'Cast spells'
 export const MONSTER_ACQUISITION_SPECIAL_DESCRIPTION = 'Custom rules or effects'
 export const MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION =
   'Combine multiple attacks into one action'
+export const MONSTER_ACQUISITION_ATTACK_SEQUENCE_DESCRIPTION =
+  'Make attacks already listed under Actions'
 
 function monsterArmorSlotMidSentenceNoun(slot: CreatureArmorSlot): string {
   if (slot === 'shield') return getArmorCategorySentenceForm('shields', 1)

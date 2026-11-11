@@ -1,7 +1,14 @@
 import type { MonsterActionDraftRow } from './monster-action-presets'
 
+function referencesAttacks(action: MonsterActionDraftRow): action is MonsterActionDraftRow & {
+  kind: 'multiattack' | 'attack-sequence'
+  steps?: { actionIds?: string[] }[]
+} {
+  return action.kind === 'multiattack' || action.kind === 'attack-sequence'
+}
+
 function stepReferences(action: MonsterActionDraftRow, actionId: string): boolean {
-  if (action.kind !== 'multiattack') return false
+  if (!referencesAttacks(action)) return false
   return (action.steps ?? []).some((step) => (step.actionIds ?? []).includes(actionId))
 }
 
@@ -12,7 +19,7 @@ export function multiattacksReferencingAction(
 ): MonsterActionDraftRow[] {
   return actions.filter(
     (action) =>
-      action.kind === 'multiattack' && action.id !== actionId && stepReferences(action, actionId),
+      referencesAttacks(action) && action.id !== actionId && stepReferences(action, actionId),
   )
 }
 
@@ -22,7 +29,7 @@ export function stripMultiattackActionId(
   actionId: string,
 ): MonsterActionDraftRow[] {
   return actions.map((action) => {
-    if (action.kind !== 'multiattack' || !action.steps) return action
+    if (!referencesAttacks(action) || !action.steps) return action
     return {
       ...action,
       steps: action.steps.map((step) => ({

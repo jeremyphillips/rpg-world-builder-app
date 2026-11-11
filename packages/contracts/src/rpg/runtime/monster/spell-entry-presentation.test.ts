@@ -114,6 +114,27 @@ describe('formatMonsterSpellEntry', () => {
     expect(changed.bodyHtml).not.toContain('missing')
     expect(changed.bodyHtml).not.toContain('Mage Hand')
   })
+
+  it('uses the spellcasting entry name without repeating its ability', () => {
+    const rendered = formatMonsterSpellEntry({
+      entry: {
+        ...SPELLCASTING_ACTION,
+        id: 'fiery',
+        name: 'Fiery Rays',
+        spellInvocation: 'use-entry',
+        castingAbility: { kind: 'shared', entryId: SPELLCASTING_ACTION.id },
+        spells: [{ spellId: 'srd-cc-5.2.1:fireball', castAtLevel: 5 }],
+      },
+      monsterName: 'Ancient Red Dragon',
+      section: 'legendaryActions',
+      spellsById,
+      catalogStatus: 'ready',
+      spellsInBody,
+    })
+    expect(rendered.bodyHtml).toContain('The ancient red dragon uses Spellcasting to cast')
+    expect(rendered.bodyHtml).toContain('(level 5 version)')
+    expect(rendered.bodyHtml).not.toContain('spellcasting ability')
+  })
 })
 
 describe('formatMonsterLimitedUseHeading', () => {

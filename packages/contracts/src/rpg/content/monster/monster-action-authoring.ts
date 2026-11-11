@@ -37,7 +37,9 @@ export function monsterActionAuthoring(action: AuthoringSubject): MonsterActionA
   if (action.kind === 'special') {
     return { name: 'authored', description: 'authored', source: 'none' }
   }
-  if (action.kind === 'attack' || action.kind === 'spell') return AUTHORED_NAME
+  if (action.kind === 'attack' || action.kind === 'spell' || action.kind === 'attack-sequence') {
+    return AUTHORED_NAME
+  }
   if (action.kind === 'natural-weapon' || action.kind === 'save' || action.kind === 'multiattack') {
     if (action.preset) return DERIVED_VOCABULARY
     return AUTHORED_NAME

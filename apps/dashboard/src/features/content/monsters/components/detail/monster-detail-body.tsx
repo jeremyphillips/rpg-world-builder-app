@@ -62,16 +62,19 @@ function ActionSection({
   headingId,
   items,
   navPrefix,
+  intro,
 }: {
   heading: string
   headingId: string
   items: MonsterActionItemViewModel[]
   navPrefix: string
+  intro?: string
 }) {
   if (items.length === 0) return null
 
   return (
     <ContentDetailSection heading={heading} headingId={headingId} bodyLayout="flush">
+      {intro ? <Text variant="body-compact">{intro}</Text> : null}
       <DetailNavFlushStack
         navPrefix={navPrefix}
         items={items}
@@ -241,6 +244,13 @@ export function MonsterDetailBody({
         headingId={MONSTER_DETAIL_SECTION_IDS.reactions}
         items={viewModel.reactions}
         navPrefix="reaction"
+      />
+      <ActionSection
+        heading="Legendary Actions"
+        headingId={MONSTER_DETAIL_SECTION_IDS.legendaryActions}
+        items={viewModel.legendaryActions}
+        navPrefix="legendary-action"
+        intro={viewModel.legendaryActionsIntro}
       />
 
       {usageSection}

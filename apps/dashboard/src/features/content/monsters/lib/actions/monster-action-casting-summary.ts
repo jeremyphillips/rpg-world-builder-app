@@ -37,6 +37,7 @@ type FormCastingSections = {
   actions?: readonly unknown[]
   bonusActions?: readonly unknown[]
   reactions?: readonly unknown[]
+  legendaryActions?: readonly unknown[]
 }
 
 function asSpellCastingSections(sections: FormCastingSections): SpellCastingSections {
@@ -46,6 +47,7 @@ function asSpellCastingSections(sections: FormCastingSections): SpellCastingSect
     actions: rows(sections.actions),
     bonusActions: rows(sections.bonusActions),
     reactions: rows(sections.reactions),
+    legendaryActions: rows(sections.legendaryActions),
   }
 }
 
@@ -88,6 +90,7 @@ export function monsterCastingDependentLabels(
     ...(values.actions ?? []),
     ...(values.bonusActions ?? []),
     ...(values.reactions ?? []),
+    ...(values.legendaryActions ?? []),
   ] as CastingRow[]
   return rows.flatMap((row) => {
     if (row.id === sourceId || !rowUsesCastingSource(row, sourceId)) return []
@@ -127,7 +130,7 @@ export function conventionalSpellcastingSources(sections: FormCastingSections) {
 
 export function spellcastingNameTaken(sections: FormCastingSections): boolean {
   const resolved = asSpellCastingSections(sections)
-  for (const section of ['actions', 'bonusActions', 'reactions'] as const) {
+  for (const section of ['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const) {
     for (const row of resolved[section] ?? []) {
       if (row.kind === 'spell' && row.name?.trim() === MONSTER_SPELLCASTING_ACTION_NAME) return true
     }

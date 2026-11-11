@@ -21,14 +21,14 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 
 ### `legendary-actions`
 
-- Concept: a legendary-action section and its costs.
-- Deficiency: missing structured capability and missing stat-block section.
-- Evidence: [action-architecture.md](./action-architecture.md) and [effect-resolution/monster-actions.md](./effect-resolution/monster-actions.md). No legendary section on the monster schema.
-- Representative: none seeded. Trait and spell examples such as hag coven casting are a different id.
-- Current fallback: none. Do not force legendary rows into actions, bonus actions, or reactions.
+- Concept: a legendary-action section on the shared monster action model.
+- Implemented: the section, shared action kinds, one shared uses pool, optional in-lair uses, `attack-sequence` composition, shared-ability spells, `use-entry` spell references, and the `onceUntilNextTurn` sentence.
+- Not this model: per-option costs, movement execution, and encounter tracking of spent uses. Condition-primary legendary saves stay on `save-conditions`.
+- Evidence: [action-architecture.md](./action-architecture.md) and [effect-resolution/monster-actions.md](./effect-resolution/monster-actions.md).
+- Representative: none seeded. Seeded SRD parity is unverified.
 - Importance: essential when the source has the section.
-- Owner: monster action sections. Character applicability is low. Limited-use recovery can already be shared.
-- Approval: open. Implementation: not started.
+- Owner: monster action sections.
+- Approval: open. Implementation: section model implemented. Seed verification not started.
 
 ### `save-conditions`
 

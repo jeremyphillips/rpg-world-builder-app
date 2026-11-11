@@ -1,6 +1,13 @@
-import type { MonsterActionDraft, MonsterReactionDraft } from '@rpg/contracts'
+import type {
+  MonsterActionDraft,
+  MonsterLegendaryActionDraft,
+  MonsterReactionDraft,
+} from '@rpg/contracts'
 
-/** Editor row for actions, bonus actions, and reactions before normalization. */
-export type MonsterActionDraftRow = MonsterActionDraft | MonsterReactionDraft
+/** Editor row for an action section before normalization. */
+export type MonsterActionDraftRow =
+  | MonsterActionDraft
+  | MonsterReactionDraft
+  | MonsterLegendaryActionDraft
 
 export { monsterActionSectionHeading } from '../monster-form-labels'

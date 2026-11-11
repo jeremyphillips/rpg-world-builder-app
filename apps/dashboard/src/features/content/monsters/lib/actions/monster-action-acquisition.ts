@@ -18,6 +18,7 @@ import type { MonsterActionSection } from './monster-action-equipment-references
 import {
   MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SAVE_DESCRIPTION,
+  MONSTER_ACQUISITION_ATTACK_SEQUENCE_DESCRIPTION,
   MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_DESCRIPTION,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
@@ -133,6 +134,7 @@ export function monsterActionAcquisitionItems(input: {
   allowAddWeapon: boolean
   /** Weapon actions in section order. The first match is the row Already added opens. */
   weaponActions?: readonly { id: string; equipmentEntryId?: string }[]
+  section?: MonsterActionSection
 }): MonsterActionAcquisitionItem[] {
   const equipped = input.weapons.map((weapon) => {
     const existing = input.weaponActions?.find(
@@ -168,6 +170,12 @@ export function monsterActionAcquisitionItems(input: {
     }
   })
   const special = listSpecialMenuActionPresetIds()
+    .filter((presetId) => {
+      if (presetId === 'multiattack')
+        return input.section === undefined || input.section === 'actions'
+      if (presetId === 'attack-sequence') return input.section === 'legendaryActions'
+      return true
+    })
     .map((presetId, index) => ({ presetId, index }))
     .sort(
       (left, right) =>
@@ -185,7 +193,9 @@ export function monsterActionAcquisitionItems(input: {
         searchTerms: preset ? getActionVocabularySearchTerms(preset.vocabularyId) : [],
         ...(presetId === 'multiattack'
           ? { metadata: MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION }
-          : {}),
+          : presetId === 'attack-sequence'
+            ? { metadata: MONSTER_ACQUISITION_ATTACK_SEQUENCE_DESCRIPTION }
+            : {}),
       }
     })
   return [
@@ -239,6 +249,9 @@ function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
       ...(preset.defaults.limitedUse ? { limitedUse: preset.defaults.limitedUse } : {}),
     }
   }
+  if (presetId === 'attack-sequence') {
+    return { id, kind: 'attack-sequence', preset: presetId, steps: [] }
+  }
   return {
     id,
     kind: 'multiattack',
@@ -252,20 +265,25 @@ export function createMonsterActionFromAcquisition(
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()
   if (choice.type === 'weapon-entry') {
-    return { id, kind: 'weapon', equipmentEntryId: choice.entryId }
+    return { id, kind: 'weapon', equipmentEntryId: choice.entryId } as MonsterActionDraftRow
   }
   if (choice.type === 'natural' || choice.type === 'preset') return draftFromPreset(choice.presetId)
   if (choice.type === 'other-natural') {
-    return { id, kind: 'natural-weapon', mode: 'melee', damage: authoredStartingDamage() }
+    return {
+      id,
+      kind: 'natural-weapon',
+      mode: 'melee',
+      damage: authoredStartingDamage(),
+    } as MonsterActionDraftRow
   }
   if (choice.type === 'focus-existing') {
     throw new Error('focus-existing is not a create choice')
   }
   if (choice.type === 'create') {
-    if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] }
-    if (choice.kind === 'special') return { id, kind: 'special' }
-    if (choice.kind === 'save') return { id, kind: 'save' }
-    return { id, kind: 'attack', damage: authoredStartingDamage() }
+    if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] } as MonsterActionDraftRow
+    if (choice.kind === 'special') return { id, kind: 'special' } as MonsterActionDraftRow
+    if (choice.kind === 'save') return { id, kind: 'save' } as MonsterActionDraftRow
+    return { id, kind: 'attack', damage: authoredStartingDamage() } as MonsterActionDraftRow
   }
   return { id, kind: 'special' } as MonsterActionDraftRow
 }
@@ -277,6 +295,7 @@ export function createSpellActionDraft(
     actions?: readonly unknown[]
     bonusActions?: readonly unknown[]
     reactions?: readonly unknown[]
+    legendaryActions?: readonly unknown[]
   },
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()

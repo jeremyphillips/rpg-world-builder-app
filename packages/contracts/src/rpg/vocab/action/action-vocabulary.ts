@@ -212,6 +212,13 @@ export const ACTION_VOCABULARY_ENTRIES = {
     group: 'special',
     description: 'Perform a defined sequence of attacks.',
   },
+  'attack-sequence': {
+    label: 'Attack sequence',
+    verb: 'Attack',
+    gerund: 'Making referenced attacks',
+    group: 'special',
+    description: 'Make one or more attacks already listed under Actions.',
+  },
   'frightful-presence': {
     label: 'Frightful Presence',
     verb: 'Terrify',

@@ -74,7 +74,7 @@ export function findMonsterFormActionDraft(
     mode: 'create',
     armorClassRules: ctx.armorClassRules,
   })
-  const sections = ['actions', 'bonusActions', 'reactions'] as const
+  const sections = ['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const
   for (const section of sections) {
     const rows = normalized[section]
     if (!Array.isArray(rows)) continue

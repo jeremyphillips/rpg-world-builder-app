@@ -8,10 +8,9 @@ import {
 import { getAbilityLabel } from '../../vocab/ability'
 import { SPELL_COMPONENT_ENTRIES, type SpellComponentId } from '../../vocab/spell/components'
 import type { MonsterReferencedSpell } from './reaction-trigger'
-import {
-  MONSTER_SECTION_ECONOMY,
-  type MonsterActionSectionId,
-} from '../../content/spell/casting-economy'
+import { type MonsterActionSectionId } from '../../content/spell/casting-economy'
+
+type MonsterSpellPresentationSection = MonsterActionSectionId | 'legendaryActions'
 
 type SpellEntry = Extract<MonsterAction | MonsterReaction, { kind: 'spell' }>
 
@@ -29,7 +28,9 @@ function usageKey(use: LimitedUse | undefined): string {
 export function formatMonsterStatBlockSubject(name: string): string {
   const trimmed = name.trim()
   if (!trimmed) return 'the creature'
-  return `the ${trimmed.toLowerCase()}`
+  const lower = trimmed.toLowerCase()
+  if (lower.startsWith('the ')) return lower
+  return `the ${lower}`
 }
 
 function escapeHtml(value: string): string {
@@ -144,7 +145,7 @@ function presentationGroups(spells: readonly SpellRow[]): Array<{
 function castingSentence(args: {
   entry: SpellEntry
   monsterName: string
-  section: MonsterActionSectionId
+  section: MonsterSpellPresentationSection
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   catalogStatus: 'ready' | 'unavailable'
   spellsInBody: ReadonlyMap<string, SpellEntry>
@@ -155,11 +156,36 @@ function castingSentence(args: {
   )
   const subject = formatMonsterStatBlockSubject(args.monsterName)
   const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
-  const response =
-    MONSTER_SECTION_ECONOMY[args.section] === 'reaction'
-      ? " in response to the spell's trigger"
-      : ''
-  return `<p>${capitalSubject} casts ${listPhrase(labels)}${response}, ${abilityPhrase(args.entry, args.spellsInBody, args.saveDcSuffix)}${componentPhrase(args.entry.omittedComponents)}.</p>`
+  const response = args.section === 'reactions' ? " in response to the spell's trigger" : ''
+  const components = componentPhrase(args.entry.omittedComponents)
+  if (args.entry.spellInvocation === 'use-entry' && args.entry.castingAbility?.kind === 'shared') {
+    const target = args.spellsInBody.get(args.entry.castingAbility.entryId)
+    return `<p>${capitalSubject} uses ${target?.name ?? 'that entry'} to cast ${listPhrase(labels)}${components}.</p>`
+  }
+  return `<p>${capitalSubject} casts ${listPhrase(labels)}${response}, ${abilityPhrase(args.entry, args.spellsInBody, args.saveDcSuffix)}${components}.</p>`
+}
+
+export function formatLegendaryActionUsesIntro(args: {
+  monsterName: string
+  uses: number
+  usesInLair?: number
+}): string {
+  const subject = formatMonsterStatBlockSubject(args.monsterName)
+  const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
+  const pool =
+    args.usesInLair === undefined ? String(args.uses) : `${args.uses} (${args.usesInLair} in Lair)`
+  return `Legendary Action Uses: ${pool}. Immediately after another creature's turn, ${subject} can expend a use to take one of the following actions. ${capitalSubject} regains all expended uses at the start of each of its turns.`
+}
+
+export function formatOnceUntilNextTurnSentence(args: {
+  monsterName: string
+  kind: string
+}): string {
+  const subject = formatMonsterStatBlockSubject(args.monsterName)
+  const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
+  const sentence = `${capitalSubject} can't take this action again until the start of its next turn.`
+  if (args.kind === 'save') return `Failure or Success: ${sentence}`
+  return sentence
 }
 
 export function formatMonsterLimitedUseHeading(name: string, limitedUse?: LimitedUse): string {
@@ -170,7 +196,7 @@ export function formatMonsterLimitedUseHeading(name: string, limitedUse?: Limite
 export function formatMonsterSpellEntry(args: {
   entry: SpellEntry
   monsterName: string
-  section: MonsterActionSectionId
+  section: MonsterSpellPresentationSection
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   catalogStatus: 'ready' | 'unavailable'
   spellsInBody: ReadonlyMap<string, SpellEntry>
