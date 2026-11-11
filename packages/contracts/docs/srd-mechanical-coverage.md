@@ -35,7 +35,7 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 - Concept: a legendary action that is its own saving-throw effect, not a reference to an action in Actions.
 - Deficiency: missing structured capability. Legendary Actions accept only `action-reference`, `spell`, and `special`, so these saves are authored as Custom ability rules text.
 - Evidence: Lich Disrupt Life, Solar Blinding Gaze, Kraken Toxic Ink, Adult Black Dragon Cloud of Insects, Sphinx Weight of Years, and Adult Gold Dragon Banish (Open5e `srd-2024`).
-- Current fallback: `special` rules text. A turn limit on a `special` prints a plain sentence, not the SRD's "Failure or Success:" lead-in, so authors write that restriction into the rules text. The prose does not close the gap.
+- Current fallback: `special` rules text, optionally with a prose saving throw (ability, fixed or spellcasting DC, targets, failure, and optional success). A turn limit on that row prints the SRD "Failure or Success:" lead-in. Damage averages and area geometry stay on `kind: 'save'`. The prose attachment does not close this gap.
 - Importance: common in 5.2.1 legendary sections.
 - Owner: the shared `save` kind and the monster legendary union. Condition-primary cases also depend on `save-conditions`.
 - Approval: deferred. Implementation: not started.

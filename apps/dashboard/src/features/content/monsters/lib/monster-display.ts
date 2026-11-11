@@ -17,7 +17,9 @@ import {
   formatPassivePerceptionStatPhrase,
   formatStatBlockRollExpression,
   type Equipment,
+  type CastingAbility,
   type Monster,
+  type SavingThrowEffect,
   type MonsterAction,
   type MonsterLegendaryAction,
   type MonsterReaction,
@@ -37,6 +39,10 @@ import {
   formatMonsterSaveAction,
   formatMonsterSpellEntry,
   formatMonsterStatBlockSubject,
+  formatSavingThrowClauses,
+  getAbilityLabel,
+  monsterRichTextIsEmpty,
+  resolveProseSavingThrowDc,
   appendMonsterActionSupplementalHtml,
   appendMonsterActionSupplementalText,
   resolveMonsterActionIdentity,
@@ -250,12 +256,11 @@ function proficiencyBonusForDisplay(
   return CHALLENGE_RATING_MECHANICS[monster.challengeRating].proficiencyBonus
 }
 
-function spellcastingAbilityScoreForSave(
+function spellcastingAbilityScore(
   monster: Monster,
-  dcSource: Extract<MonsterAction, { kind: 'save' }>['dcSource'],
+  source: CastingAbility | undefined,
 ): number | undefined {
-  if (!dcSource || dcSource.kind !== 'spell') return undefined
-  const source = dcSource.castingAbility
+  if (!source) return undefined
   if (source.kind === 'ability') {
     return monster.abilityScores[source.ability]
   }
@@ -269,6 +274,14 @@ function spellcastingAbilityScoreForSave(
     }
   }
   return undefined
+}
+
+function spellcastingAbilityScoreForSave(
+  monster: Monster,
+  dcSource: Extract<MonsterAction, { kind: 'save' }>['dcSource'],
+): number | undefined {
+  if (!dcSource || dcSource.kind !== 'spellcasting') return undefined
+  return spellcastingAbilityScore(monster, dcSource.castingAbility)
 }
 
 function formatSaveActionBody(
@@ -337,14 +350,52 @@ type SpellDisplayContext = {
   spellsInBody: Map<string, Extract<MonsterAction | MonsterReaction, { kind: 'spell' }>>
 }
 
+function proseSavingThrowParagraph(
+  monster: Monster,
+  effect: SavingThrowEffect | undefined,
+  derived: DerivedMonsterStatBlock | null | undefined,
+): string | undefined {
+  if (!effect?.ability || !effect.targets.trim() || !effect.failure.trim()) return undefined
+  const dc = resolveProseSavingThrowDc({
+    source: effect.dcSource,
+    proficiencyBonus: proficiencyBonusForDisplay(monster, derived),
+    spellcastingAbilityScore:
+      effect.dcSource.kind === 'spellcasting'
+        ? spellcastingAbilityScore(monster, effect.dcSource.castingAbility)
+        : undefined,
+  })
+  return formatSavingThrowClauses({
+    abilityLabel: getAbilityLabel(effect.ability),
+    dc,
+    targets: effect.targets,
+    failure: effect.failure,
+    success: effect.success,
+  })
+}
+
+function joinRulesAndSavingThrow(
+  rules: string | undefined,
+  paragraph: string | undefined,
+): string | undefined {
+  const rulesHtml = rules && !monsterRichTextIsEmpty(rules) ? rules : ''
+  const saveHtml = paragraph ? `<p>${escapeTraitSentence(paragraph)}</p>` : ''
+  const body = `${rulesHtml}${saveHtml}`
+  return body || undefined
+}
+
 function withTurnLimit(
   body: string | undefined,
   action: { kind: string; onceUntilNextTurn?: boolean },
   monsterName: string,
   html: boolean,
+  hasSavingThrow = false,
 ): string | undefined {
   if (action.onceUntilNextTurn !== true) return body
-  const sentence = formatOnceUntilNextTurnSentence({ monsterName, kind: action.kind })
+  const sentence = formatOnceUntilNextTurnSentence({
+    monsterName,
+    kind: action.kind,
+    hasSavingThrow,
+  })
   if (!body) return html ? `<p>${sentence}</p>` : sentence
   return html ? `${body}<p>${sentence}</p>` : `${body} ${sentence}`
 }
@@ -423,7 +474,7 @@ function mapActionReferenceItem(
 function mapMultiattackActionItem(
   action: Extract<MonsterAction, { kind: 'multiattack' }>,
   name: string,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  _derived: DerivedMonsterStatBlock | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionItemViewModel {
@@ -466,10 +517,17 @@ function mapActionItem(
     return mapSpellActionItem(action, section, derived, spells, identity.displayName)
   }
   if (action.kind === 'special') {
+    const paragraph = proseSavingThrowParagraph(spells.monster, action.savingThrow, derived)
     return {
       id: action.id,
       name,
-      descriptionHtml: withTurnLimit(action.description, action, spells.monsterName, true),
+      descriptionHtml: withTurnLimit(
+        joinRulesAndSavingThrow(action.description, paragraph),
+        action,
+        spells.monsterName,
+        true,
+        Boolean(paragraph),
+      ),
     }
   }
   if (action.kind === 'save') {
@@ -735,21 +793,33 @@ function mapTemplateMonsterTrait(
 function mapNamedMonsterTrait(
   trait: Monster['traits'][number],
   record: Record<string, unknown>,
+  monster: Monster,
+  derived: DerivedMonsterStatBlock | null | undefined,
 ): MonsterTraitItemViewModel {
   const name = typeof record.name === 'string' ? record.name : trait.id
   const description = typeof record.description === 'string' ? record.description : ''
-  return { id: trait.id, name, descriptionHtml: description }
+  const paragraph = proseSavingThrowParagraph(
+    monster,
+    'savingThrow' in trait ? trait.savingThrow : undefined,
+    derived,
+  )
+  return {
+    id: trait.id,
+    name,
+    descriptionHtml: joinRulesAndSavingThrow(description, paragraph) ?? '',
+  }
 }
 
 function mapMonsterTrait(
   trait: Monster['traits'][number],
-  monsterName: string,
+  monster: Monster,
+  derived: DerivedMonsterStatBlock | null | undefined,
 ): MonsterTraitItemViewModel {
   const record = traitRecord(trait)
   return (
-    mapPresetMonsterTrait(trait, record, monsterName) ??
-    mapTemplateMonsterTrait(trait, record, monsterName) ??
-    mapNamedMonsterTrait(trait, record)
+    mapPresetMonsterTrait(trait, record, monster.name) ??
+    mapTemplateMonsterTrait(trait, record, monster.name) ??
+    mapNamedMonsterTrait(trait, record, monster, derived)
   )
 }
 
@@ -814,7 +884,7 @@ export function buildMonsterDetailViewModel({
         const available = (trait as { available?: boolean }).available
         return available !== false
       })
-      .map((trait) => mapMonsterTrait(trait, monster.name)),
+      .map((trait) => mapMonsterTrait(trait, monster, derived)),
     actions: mapActionItems(
       availableBodyRows(monster.actions),
       'actions',

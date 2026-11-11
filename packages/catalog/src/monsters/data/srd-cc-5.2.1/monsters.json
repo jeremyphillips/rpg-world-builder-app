@@ -406,7 +406,7 @@
         "kind": "attack",
         "name": "Arcane Burst",
         "bonusSource": {
-          "kind": "spell",
+          "kind": "spellcasting",
           "castingAbility": { "kind": "shared", "entryId": "spellcasting" }
         },
         "modes": ["melee", "ranged"],
@@ -720,7 +720,7 @@
         "kind": "attack",
         "name": "Eldritch Burst",
         "bonusSource": {
-          "kind": "spell",
+          "kind": "spellcasting",
           "castingAbility": { "kind": "shared", "entryId": "spellcasting" }
         },
         "modes": ["melee", "ranged"],
@@ -734,7 +734,7 @@
         "kind": "attack",
         "name": "Paralyzing Touch",
         "bonusSource": {
-          "kind": "spell",
+          "kind": "spellcasting",
           "castingAbility": { "kind": "shared", "entryId": "spellcasting" }
         },
         "modes": ["melee"],

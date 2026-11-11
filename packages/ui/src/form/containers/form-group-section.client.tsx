@@ -36,7 +36,8 @@ import type {
   SelectFieldConfig,
   SwitchFieldConfig,
 } from '../field-config'
-import { useVisibilityValues } from './form-conditional.client'
+import { FieldSeparatorWrapper, useVisibilityValues } from './form-conditional.client'
+import { OptionalDisclosureGroup } from './optional-disclosure-group.client'
 import type { RenderNestedFormItems } from './form-dependent-section.client'
 import type { FieldChrome } from '../../components/ui/field-chrome.variants'
 import {
@@ -217,6 +218,16 @@ export function GroupFieldSection({
     />
   )
 
+  if (item.optionalDisclosure && item.name) {
+    return (
+      <FieldSeparatorWrapper separator={item.separator}>
+        <OptionalDisclosureGroup item={item} idPrefix={idPrefix} namePrefix={namePrefix}>
+          {groupBody}
+        </OptionalDisclosureGroup>
+      </FieldSeparatorWrapper>
+    )
+  }
+
   const group = (
     <FieldGroup
       id={item.id}
@@ -247,14 +258,16 @@ export function GroupFieldSection({
   )
 
   return (
-    <GroupFieldOuterChrome
-      wrapEntireGroup={wrapEntireGroup}
-      groupFieldChrome={groupFieldChrome}
-      groupSize={groupSize}
-      inParentRhythm={inParentRhythm}
-    >
-      {group}
-    </GroupFieldOuterChrome>
+    <FieldSeparatorWrapper separator={item.separator}>
+      <GroupFieldOuterChrome
+        wrapEntireGroup={wrapEntireGroup}
+        groupFieldChrome={groupFieldChrome}
+        groupSize={groupSize}
+        inParentRhythm={inParentRhythm}
+      >
+        {group}
+      </GroupFieldOuterChrome>
+    </FieldSeparatorWrapper>
   )
 }
 

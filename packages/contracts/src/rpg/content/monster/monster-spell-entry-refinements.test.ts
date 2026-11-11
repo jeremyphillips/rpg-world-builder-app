@@ -85,7 +85,7 @@ describe('monster spell entries', () => {
       kind: 'attack' as const,
       name: 'Arcane Burst',
       bonusSource: {
-        kind: 'spell' as const,
+        kind: 'spellcasting' as const,
         castingAbility: { kind: 'shared' as const, entryId: 'missing' },
       },
       modes: ['ranged' as const],
@@ -116,7 +116,7 @@ describe('monster spell entries', () => {
           {
             ...attack,
             bonusSource: {
-              kind: 'spell' as const,
+              kind: 'spellcasting' as const,
               castingAbility: { kind: 'shared' as const, entryId: 'spellcasting' },
             },
           },

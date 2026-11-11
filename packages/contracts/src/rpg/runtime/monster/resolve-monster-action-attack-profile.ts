@@ -395,7 +395,11 @@ function resolveNaturalProfile(
 }
 
 function abilityFromAttackEntry(entry: ProfileAction, entryId: string): Ability | undefined {
-  if (entry.id !== entryId || entry.kind !== 'attack' || entry.bonusSource?.kind !== 'spell') {
+  if (
+    entry.id !== entryId ||
+    entry.kind !== 'attack' ||
+    entry.bonusSource?.kind !== 'spellcasting'
+  ) {
     return undefined
   }
   const nested = entry.bonusSource.castingAbility

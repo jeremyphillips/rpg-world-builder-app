@@ -19,7 +19,7 @@ function saveDc(args: {
 }): number | undefined {
   const source = args.action.dcSource
   if (!source) return undefined
-  if (source.kind === 'spell') {
+  if (source.kind === 'spellcasting') {
     if (args.spellcastingAbilityScore === undefined) return undefined
     return abilitySaveDc(args.spellcastingAbilityScore, args.proficiencyBonus)
   }

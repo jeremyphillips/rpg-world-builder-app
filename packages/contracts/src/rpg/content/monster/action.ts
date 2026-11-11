@@ -19,6 +19,11 @@ import {
 } from '../lib/resolution/schema'
 import { RESOLUTION_SELECTION_MODES } from '../../vocab/resolution'
 import { getActionPreset } from '../action/action-presets'
+import {
+  castingAbilitySchema,
+  savingThrowEffectDraftSchema,
+  savingThrowEffectSchema,
+} from '../lib/saving-throw/schema'
 import { monsterActionAuthoring } from './monster-action-authoring'
 import { naturalAttackFormSchema } from '../../vocab/action/natural-attack-form'
 import { spellReferenceSchema } from '../spell/spell-reference'
@@ -106,6 +111,12 @@ function saveResolutionSchema<M extends MonsterActionMode>(mode: M) {
     : typeof published
 }
 
+function savingThrowFieldSchema(mode: MonsterActionMode) {
+  return mode === 'draft'
+    ? savingThrowEffectDraftSchema.optional()
+    : savingThrowEffectSchema.optional()
+}
+
 function monsterActionFields<M extends MonsterActionMode>(mode: M) {
   const limitedUse = (
     mode === 'draft' ? limitedUseDraftSchema : limitedUseSchema
@@ -118,10 +129,9 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
   })
   const spells =
     mode === 'draft' ? z.array(spellEntrySchema).default([]) : z.array(spellEntrySchema).min(1)
-  const castingAbilitySchema = z.discriminatedUnion('kind', [
-    z.object({ kind: z.literal('ability'), ability: abilitySchema }),
-    z.object({ kind: z.literal('shared'), entryId: z.string().min(1) }),
-  ])
+  const savingThrow = savingThrowFieldSchema(mode) as M extends 'draft'
+    ? z.ZodOptional<typeof savingThrowEffectDraftSchema>
+    : z.ZodOptional<typeof savingThrowEffectSchema>
   const identity = {
     id: z.string().min(1),
     preset: z.string().min(1).optional(),
@@ -141,7 +151,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       ? z.array(z.string().min(1)).default([])
       : z.array(z.string().min(1)).min(1, 'Choose an attack or ability.')
   const monsterAbilitySourceSchema = z.discriminatedUnion('kind', [
-    z.object({ kind: z.literal('spell'), castingAbility: castingAbilitySchema }),
+    z.object({ kind: z.literal('spellcasting'), castingAbility: castingAbilitySchema }),
     z.object({
       kind: z.literal('ability'),
       ability: abilitySchema,
@@ -202,12 +212,22 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       damageType: strict(damageTypeIdSchema, mode),
       onHit,
     }),
-    z.object({
-      ...identity,
-      kind: z.literal('special'),
-      name: strict(z.string().min(1), mode),
-      description: strict(z.string("Enter the action's rules text.").min(1), mode),
-    }),
+    z
+      .object({
+        ...identity,
+        kind: z.literal('special'),
+        name: strict(z.string().min(1), mode),
+        description: z.string().optional(),
+        savingThrow,
+      })
+      .superRefine((action, ctx) => {
+        if (mode === 'draft') return
+        const row = action as { description?: string; savingThrow?: unknown }
+        const text = typeof row.description === 'string' ? row.description : ''
+        if ((text.length === 0 || monsterRichTextIsEmpty(text)) && row.savingThrow == null) {
+          addCustomRefinementIssue(ctx, RULES_OR_SAVING_THROW_MESSAGE, ['description'])
+        }
+      }),
     z.object({
       ...identity,
       kind: z.literal('spell'),
@@ -325,6 +345,9 @@ type SpellEntryLike = {
   spellInvocation?: string
   bonusSource?: { kind?: string; castingAbility?: { kind?: string; entryId?: string } }
   dcSource?: { kind?: string; castingAbility?: { kind?: string; entryId?: string } }
+  savingThrow?: {
+    dcSource?: { kind?: string; castingAbility?: { kind?: string; entryId?: string } }
+  }
   spells?: readonly { spellId?: string; castAtLevel?: number; limitedUse?: unknown }[]
 }
 
@@ -464,7 +487,7 @@ const DUPLICATE_CASTING_SOURCE_NAME =
 function nestedSharedEntryId(
   source: { kind?: string; castingAbility?: { kind?: string; entryId?: string } } | undefined,
 ): string | undefined {
-  if (source?.kind !== 'spell' || source.castingAbility?.kind !== 'shared') return undefined
+  if (source?.kind !== 'spellcasting' || source.castingAbility?.kind !== 'shared') return undefined
   return source.castingAbility.entryId
 }
 
@@ -481,16 +504,21 @@ function refineNestedSpellSource(
   const { section, index, action } = locatedEntry
   const nested =
     action.kind === 'attack'
-      ? { path: 'bonusSource', entryId: nestedSharedEntryId(action.bonusSource) }
+      ? { path: ['bonusSource'], entryId: nestedSharedEntryId(action.bonusSource) }
       : action.kind === 'save'
-        ? { path: 'dcSource', entryId: nestedSharedEntryId(action.dcSource) }
-        : undefined
+        ? { path: ['dcSource'], entryId: nestedSharedEntryId(action.dcSource) }
+        : action.kind === 'special'
+          ? {
+              path: ['savingThrow', 'dcSource'],
+              entryId: nestedSharedEntryId(action.savingThrow?.dcSource),
+            }
+          : undefined
   if (!nested?.entryId) return
   if (findSpellCastingSource(sections, nested.entryId)) return
   addCustomRefinementIssue(
     ctx,
     'Shared spellcasting must use another spell entry that has its own ability.',
-    [...prefix, section, index, nested.path, 'castingAbility', 'entryId'],
+    [...prefix, section, index, ...nested.path, 'castingAbility', 'entryId'],
   )
 }
 
@@ -578,6 +606,8 @@ function refineAuthoredAttackShape(
 const MONSTER_SAVE_OUTCOME_RESULTS = new Set(['failed-save', 'successful-save'])
 
 /** Rich-text shells such as `<p></p>` are not authored rules text. */
+export const RULES_OR_SAVING_THROW_MESSAGE = 'Enter rules text or a saving throw.'
+
 export function monsterRichTextIsEmpty(value: string): boolean {
   return (
     value
@@ -638,24 +668,47 @@ function refineMonsterSaveResolution(
   })
 }
 
-export function refineMonsterActionShape(
-  action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
+function refineUnknownPreset(
+  action: { preset?: string },
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
   if (action.preset && !getActionPreset(action.preset)) {
     addCustomRefinementIssue(ctx, 'Unknown action preset.', [...path, 'preset'])
   }
+}
+
+function refineAuthoredActionName(
+  action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
   if (monsterActionAuthoring(action).name === 'authored' && !action.name?.trim()) {
     addCustomRefinementIssue(ctx, 'Name is required.', [...path, 'name'])
   }
-  if (
-    action.kind === 'special' &&
-    typeof action.description === 'string' &&
-    monsterRichTextIsEmpty(action.description)
-  ) {
-    addCustomRefinementIssue(ctx, "Enter the action's rules text.", [...path, 'description'])
+}
+
+function refineSpecialRulesText(
+  action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
+  if (action.kind !== 'special') return
+  const text = typeof action.description === 'string' ? action.description : ''
+  const hasSave = action.savingThrow != null
+  if ((text.length === 0 || monsterRichTextIsEmpty(text)) && !hasSave) {
+    addCustomRefinementIssue(ctx, RULES_OR_SAVING_THROW_MESSAGE, [...path, 'description'])
   }
+}
+
+export function refineMonsterActionShape(
+  action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
+  refineUnknownPreset(action, ctx, path)
+  refineAuthoredActionName(action, ctx, path)
+  refineSpecialRulesText(action, ctx, path)
   if (action.kind === 'natural-weapon') refineNaturalWeaponShape(action, ctx, path)
   if (action.kind === 'attack') refineAuthoredAttackShape(action, ctx, path)
   if (action.kind === 'save') refineMonsterSaveResolution(action, ctx, path)

@@ -54,9 +54,12 @@ import {
   monsterReactionDraftSchema,
   monsterReactionSchema,
   monsterRichTextIsEmpty,
+  RULES_OR_SAVING_THROW_MESSAGE,
   refineMonsterActionShape,
   refineMonsterSpellEntries,
 } from './monster/action'
+import { findSpellCastingSource } from './monster/spell-casting-source'
+import { savingThrowEffectDraftSchema, savingThrowEffectSchema } from './lib/saving-throw/schema'
 import { entryProvenanceField } from '../primitives/provenance'
 import { MONSTER_ACTION_SECTIONS } from './monster/action-sections'
 
@@ -104,12 +107,16 @@ const monsterTraitAvailabilityFields = {
 const monsterCustomTraitSchema = customContentTraitSchema
   .extend({
     name: z.string('Name is required.').min(1),
-    description: z.string("Enter the trait's description.").min(1),
+    description: z.string().optional(),
+    savingThrow: savingThrowEffectSchema.optional(),
+    /** Present only on preset rows. An empty allowance keeps those rows off this branch. */
+    preset: z.string().max(0).optional(),
     ...monsterTraitAvailabilityFields,
   })
   .superRefine((trait, ctx) => {
-    if (monsterRichTextIsEmpty(trait.description)) {
-      addCustomRefinementIssue(ctx, "Enter the trait's description.", ['description'])
+    const text = typeof trait.description === 'string' ? trait.description : ''
+    if ((text.length === 0 || monsterRichTextIsEmpty(text)) && !trait.savingThrow) {
+      addCustomRefinementIssue(ctx, RULES_OR_SAVING_THROW_MESSAGE, ['description'])
     }
   })
 
@@ -144,7 +151,8 @@ function traitIssuePath(issue: TraitUnionIssue): PropertyKey[] {
 
 function traitIssuePenalty(issue: TraitUnionIssue): number {
   const key = traitIssuePath(issue)[0]
-  if ((key === 'preset' || key === 'kind') && issue.code === 'invalid_value') return 10
+  if (key === 'preset') return 10
+  if (key === 'kind' && issue.code === 'invalid_value') return 10
   if (issue.code === 'invalid_union' && issue.errors?.length) {
     return Math.min(...issue.errors.map(traitBranchPenalty))
   }
@@ -201,6 +209,7 @@ const monsterAuthoredTraitDraftSchema = z
         id: z.string().min(1),
         name: z.string().min(1).optional(),
         description: z.string().min(1).optional(),
+        savingThrow: savingThrowEffectDraftSchema.optional(),
         grantGroups: customContentTraitSchema.shape.grantGroups,
         ...monsterTraitAvailabilityFields,
       }),
@@ -633,6 +642,17 @@ export function refineMonsterBody(
     }
   }
   refineMonsterSpellEntries(body, ctx, prefix, { published: true })
+  body.traits.forEach((trait, index) => {
+    if (!('savingThrow' in trait) || !trait.savingThrow) return
+    const source = trait.savingThrow.dcSource
+    if (source.kind !== 'spellcasting' || source.castingAbility.kind !== 'shared') return
+    if (findSpellCastingSource(body, source.castingAbility.entryId)) return
+    addCustomRefinementIssue(
+      ctx,
+      'Shared spellcasting must use another spell entry that has its own ability.',
+      [...prefix, 'traits', index, 'savingThrow', 'dcSource', 'castingAbility', 'entryId'],
+    )
+  })
 
   refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
   refineMultiattackReferences(body, ctx, prefix, { published: true })

@@ -13,7 +13,7 @@ Other kinds do not. See [action-architecture.md](../action-architecture.md) and
 | `multiattack`                        | Steps of `{ count, actionIds }`. Not an envelope. Valid only in Actions    |
 | `action-reference`                   | Legendary only. `actionIds` name Actions rows. Optional movement allowance |
 | `spell`                              | Referenced spells. Each spell keeps its own resolution                     |
-| `special`                            | Prose                                                                      |
+| `special`                            | Prose, plus an optional prose saving throw                                 |
 
 The section places the row. Legendary Actions accept only `action-reference`,
 `spell`, and `special`. Rows do not move into or out of that section. Each

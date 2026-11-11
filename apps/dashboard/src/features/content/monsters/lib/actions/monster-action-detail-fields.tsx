@@ -17,6 +17,7 @@ import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-
 import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
 import { weaponAttackRangeGroup } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
 import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
+import { savingThrowFieldGroup } from '../../../lib/forms/mechanics/saving-throw-field-group'
 import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
 import {
   MONSTER_RULES_TEXT_LABEL,
@@ -119,7 +120,6 @@ function monsterActionDescriptionField(action: MonsterActionDraftRow): FormItem 
       type: 'richtext',
       name: 'description',
       label: MONSTER_RULES_TEXT_LABEL,
-      required: true,
     }
   }
   return monsterActionOptionalDescriptionField
@@ -173,7 +173,7 @@ function monsterAbilitySourceDependent(input: {
 }): FormItem {
   const kindName = `${input.sourcePath}.kind`
   const abilityBranch = whenFieldEquals(kindName, 'ability')
-  const spellBranch = whenFieldEquals(kindName, 'spell')
+  const spellBranch = whenFieldEquals(kindName, 'spellcasting')
   return {
     kind: 'dependent',
     controller: {
@@ -183,13 +183,13 @@ function monsterAbilitySourceDependent(input: {
       placeholder: 'Choose',
       options: [
         { value: 'ability', label: MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL },
-        { value: 'spell', label: MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL },
+        { value: 'spellcasting', label: MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL },
       ],
       ...(input.required?.controller ? { required: true } : {}),
     },
     dependents: {
       ...(input.dependentsChrome ? { chrome: input.dependentsChrome } : {}),
-      visibility: whenFieldIsOneOf(kindName, ['ability', 'spell']),
+      visibility: whenFieldIsOneOf(kindName, ['ability', 'spellcasting']),
       fields: [
         ...input.abilityFields.map((field) => ({ ...field, visibility: abilityBranch })),
         {
@@ -591,6 +591,20 @@ function monsterActionMechanicFields(input: {
   }
 
   const usage = monsterActionUsageEditor(action, namePrefix)
+  const saveGroup =
+    action.kind === 'special'
+      ? [
+          savingThrowFieldGroup({
+            renderCastingAbility: () => (
+              <MonsterActionCastingAbilityField
+                name={`${namePrefix}.savingThrow.dcSource.castingAbility`}
+                sharedOptions={sharedCastingOptions}
+                required={false}
+              />
+            ),
+          }),
+        ]
+      : []
   const kindFields: FormItem[] = []
   if (action.kind === 'weapon') {
     kindFields.push(
@@ -659,7 +673,7 @@ function monsterActionMechanicFields(input: {
       ],
     })
   }
-  return [...trigger, ...usage, ...kindFields]
+  return [...trigger, ...saveGroup, ...usage, ...kindFields]
 }
 
 function turnLimitField(): FormItem {

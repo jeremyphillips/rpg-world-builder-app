@@ -197,7 +197,7 @@ describe('monster trait refinements', () => {
       createMonsterInputSchema.safeParse({
         slug: 'dc',
         ...MONSTER_TEST_BODY,
-        traits: [{ id: 'stench', preset: 'stench', dc: 31, radius: 5 }],
+        traits: [{ id: 'stench', preset: 'stench', dc: 41, radius: 5 }],
       }).success,
     ).toBe(false)
     expect(

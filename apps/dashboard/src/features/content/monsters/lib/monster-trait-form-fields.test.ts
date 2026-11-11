@@ -38,7 +38,18 @@ describe('monsterTraitDetailFields', () => {
   it('keeps a custom description immediately after the advisory', () => {
     expect(
       traitNames({ id: 'note', kind: 'custom', name: 'Note', description: 'Custom.' }),
-    ).toEqual(['buildAdvisories', 'description'])
+    ).toEqual([
+      'buildAdvisories',
+      'description',
+      'savingThrow',
+      'savingThrow.ability',
+      'savingThrow.dcSource.kind',
+      'savingThrow.dcSource.dc',
+      'savingThrow.dcSource.castingAbility',
+      'savingThrow.targets',
+      'savingThrow.failure',
+      'savingThrow.success',
+    ])
   })
 
   it('puts template supplemental prose after legendary-resistance uses', () => {

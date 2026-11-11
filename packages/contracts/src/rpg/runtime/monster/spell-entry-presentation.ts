@@ -198,11 +198,13 @@ export function formatLegendaryActionUsesIntro(args: {
 export function formatOnceUntilNextTurnSentence(args: {
   monsterName: string
   kind: string
+  /** Prose saving throw on a custom ability or trait. Structured saves use `kind`. */
+  hasSavingThrow?: boolean
 }): string {
   const subject = formatMonsterStatBlockSubject(args.monsterName)
   const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
   const sentence = `${capitalSubject} can't take this action again until the start of its next turn.`
-  if (args.kind === 'save') return `Failure or Success: ${sentence}`
+  if (args.kind === 'save' || args.hasSavingThrow) return `Failure or Success: ${sentence}`
   return sentence
 }
 

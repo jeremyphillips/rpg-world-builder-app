@@ -1,4 +1,6 @@
 import { formatCreatureTrait, formatMonsterStatBlockSubject } from '@rpg/contracts'
+import { savingThrowFieldGroup } from '../../lib/forms/mechanics/saving-throw-field-group'
+import { MonsterActionCastingAbilityField } from './actions/monster-action-casting-fields'
 import { RulesPreview } from '@rpg/ui'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
@@ -12,6 +14,7 @@ import {
   MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
+  MONSTER_RULES_TEXT_LABEL,
   MONSTER_TRAIT_PREVIEW_LABEL,
 } from './monster-form-labels'
 import {
@@ -32,12 +35,29 @@ export const MONSTER_TRAIT_ITEM_NOUN = defineMasterDetailItemNoun({
   plural: 'traits',
 })
 
-export function monsterTraitItemFields(): FormItem[] {
+export function monsterTraitItemFields(input?: {
+  rowPath?: string
+  sharedCastingOptions?: { value: string; label: string }[]
+}): FormItem[] {
+  const rowPath = input?.rowPath
+  const castingName = `${rowPath ? `${rowPath}.` : ''}savingThrow.dcSource.castingAbility`
   return [
     {
       type: 'richtext',
       name: 'description',
-      label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
+      label: MONSTER_RULES_TEXT_LABEL,
+      visibility: visibleForCustomTrait(),
+    },
+    {
+      ...savingThrowFieldGroup({
+        renderCastingAbility: () => (
+          <MonsterActionCastingAbilityField
+            name={castingName}
+            sharedOptions={input?.sharedCastingOptions ?? []}
+            required={false}
+          />
+        ),
+      }),
       visibility: visibleForCustomTrait(),
     },
   ]
@@ -123,6 +143,7 @@ export function monsterTraitDetailFields(input: {
   advisories: readonly MonsterFormAdvisory[]
   monsterName: string
   ctx: Pick<ContentFormCtx, 'damageTypeVocabulary'>
+  sharedCastingOptions?: { value: string; label: string }[]
 }): FormItem[] {
   const advisorySlot = monsterFormAdvisorySlot(input.advisories, input.rowPath)
   if (isTemplateRow(input.row)) {
@@ -135,7 +156,15 @@ export function monsterTraitDetailFields(input: {
     const preview = sentence ? [traitPreviewSlot(sentence)] : []
     return [...preview, advisorySlot, ...monsterTraitTemplateFields()]
   }
-  if (!isPresetRow(input.row)) return [advisorySlot, ...monsterTraitItemFields()]
+  if (!isPresetRow(input.row)) {
+    return [
+      advisorySlot,
+      ...monsterTraitItemFields({
+        rowPath: input.rowPath,
+        sharedCastingOptions: input.sharedCastingOptions,
+      }),
+    ]
+  }
   const subject = formatMonsterStatBlockSubject(input.monsterName)
   const formatted = formatCreatureTrait({ subject, trait: input.row })
   const preview = formatted ? [traitPreviewSlot(formatted.sentence)] : []

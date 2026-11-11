@@ -44,7 +44,7 @@ describe('monster action casting summary', () => {
         kind: 'attack',
         name: 'Arcane Burst',
         bonusSource: {
-          kind: 'spell',
+          kind: 'spellcasting',
           castingAbility: { kind: 'shared', entryId: 'missing' },
         },
       } as MonsterActionDraftRow),

@@ -81,10 +81,10 @@ describe('monsterActionSchema', () => {
     ).toEqual({ text: 'When hit' })
   })
 
-  it('keeps special reaction descriptions required', () => {
-    expectTypeOf<
-      Extract<MonsterReaction, { kind: 'special' }>['description']
-    >().toEqualTypeOf<string>()
+  it('keeps special reaction rules text optional when a saving throw can stand alone', () => {
+    expectTypeOf<Extract<MonsterReaction, { kind: 'special' }>['description']>().toEqualTypeOf<
+      string | undefined
+    >()
   })
 
   it('keeps partial limited use on drafts and accepts published values', () => {

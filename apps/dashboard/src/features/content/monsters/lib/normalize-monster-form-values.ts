@@ -4,6 +4,7 @@ import {
   creatureWeaponProficienciesSchema,
   creatureWeaponProficiencyTargetsFromGrantSet,
   monsterActionDraftSchema,
+  omitEmptySavingThrow,
   monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
   type ArmorClassRules,
@@ -260,6 +261,11 @@ function normalizeAction(
     cleaned.damage = weaponActionDamageToDraft(cleaned.damage)
   }
   applySaveOutcomeDraft(cleaned)
+  if ('savingThrow' in cleaned) {
+    const savingThrow = omitEmptySavingThrow(cleaned.savingThrow)
+    if (savingThrow === undefined) delete cleaned.savingThrow
+    else cleaned.savingThrow = savingThrow
+  }
   const keys =
     typeof cleaned.kind === 'string' ? monsterActionActiveKeys(cleaned.kind, section) : []
   const active = keys.length > 0 ? pickKeys(cleaned, keys) : cleaned
@@ -363,6 +369,11 @@ function normalizeTraitRichText(value: unknown): unknown {
   return value.map((trait) => {
     if (!isRecord(trait)) return trait
     applyRichTextFields(trait)
+    if ('savingThrow' in trait) {
+      const savingThrow = omitEmptySavingThrow(trait.savingThrow)
+      if (savingThrow === undefined) delete trait.savingThrow
+      else trait.savingThrow = savingThrow
+    }
     return trait
   })
 }

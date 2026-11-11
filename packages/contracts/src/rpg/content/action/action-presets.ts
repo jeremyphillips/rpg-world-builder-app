@@ -13,7 +13,7 @@ import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '../lib/resolution/schema'
 export type ActionPresetDcSource =
   | { kind: 'ability'; ability: Ability; proficient: boolean }
   | {
-      kind: 'spell'
+      kind: 'spellcasting'
       castingAbility: { kind: 'ability'; ability: Ability } | { kind: 'shared'; entryId: string }
     }
 

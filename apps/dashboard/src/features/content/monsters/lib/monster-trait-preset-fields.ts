@@ -1,5 +1,8 @@
 import {
   DAMAGE_TYPE_TERM,
+  DEFAULT_FIXED_SAVE_DC,
+  SAVE_DC_MAX,
+  SAVE_DC_MIN,
   getTermSentenceForm,
   SENSE_RANGES,
   standardFeet,
@@ -230,8 +233,9 @@ function waveTwoTraitFields(preset: string): FormItem[] {
           name: 'dc',
           label: 'Save DC',
           required: true,
-          min: 1,
-          max: 30,
+          min: SAVE_DC_MIN,
+          max: SAVE_DC_MAX,
+          defaultValue: DEFAULT_FIXED_SAVE_DC,
           digits: 2,
         },
         distanceJoinedPairField({
@@ -275,7 +279,7 @@ export function monsterTraitPresetDefaults(preset: string): Record<string, unkno
     case 'berserk':
       return { canBeCalmed: false }
     case 'stench':
-      return { successImmunity: false }
+      return { dc: DEFAULT_FIXED_SAVE_DC, successImmunity: false }
     default:
       return {}
   }

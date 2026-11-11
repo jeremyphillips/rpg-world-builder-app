@@ -69,7 +69,7 @@ describe('monster publish validation messages', () => {
   it('names the missing control instead of the actions slot', () => {
     const result = publish([
       { id: 'spell', kind: 'spell', spells: [] },
-      { id: 'special', kind: 'special', name: '   ', description: '<p></p>' },
+      { id: 'special', kind: 'special', name: 'Parry', description: '<p></p>' },
       { id: 'attack', kind: 'attack', name: 'Slash' },
       { id: 'weapon', kind: 'weapon', onHit: { effects: [] } },
       { id: 'multi', kind: 'multiattack', steps: [] },
@@ -97,8 +97,8 @@ describe('monster publish validation messages', () => {
     expect(messageAt(result, 'actions.0.castingAbility')).toBe('Choose a spellcasting ability.')
     expect(messageAt(result, 'actions.0.spells')).toBe('Add at least one spell.')
     expect(messageAt(result, 'actions.0.name')).toBe('Name is required.')
-    expect(messageAt(result, 'actions.1.description')).toBe("Enter the action's rules text.")
-    expect(messageAt(result, 'actions.1.name')).toBe('Name is required.')
+    expect(messageAt(result, 'actions.1.description')).toBe('Enter rules text or a saving throw.')
+    expect(messageAt(result, 'actions.1.name')).toBeUndefined()
     expect(messageAt(result, 'actions.2.modes')).toBe('Choose at least one mode.')
     expect(messageAt(result, 'actions.2.bonusSource')).toBe('Choose an attack bonus.')
     expect(messageAt(result, 'actions.2.damage')).toBe('Damage roll is required.')
@@ -241,7 +241,7 @@ describe('monster publish validation messages', () => {
     const traits = publish(
       [],
       [
-        { id: 'custom', kind: 'custom', name: ' ', description: '<p><br></p>' },
+        { id: 'custom', kind: 'custom', name: 'Custom', description: '<p><br></p>' },
         { id: 'light', preset: 'illumination' },
         { id: 'reek', preset: 'stench', dc: 0 },
         { id: 'mimic', preset: 'mimicry' },
@@ -249,8 +249,7 @@ describe('monster publish validation messages', () => {
         { id: 'template', kind: 'template', templateId: 'legendary-resistance', config: {} },
       ],
     )
-    expect(messageAt(traits, 'traits.0.name')).toBe('Name is required.')
-    expect(messageAt(traits, 'traits.0.description')).toBe("Enter the trait's description.")
+    expect(messageAt(traits, 'traits.0.description')).toBe('Enter rules text or a saving throw.')
     expect(messageAt(traits, 'traits.1.radius')).toBe('Bright radius is required.')
     expect(messageAt(traits, 'traits.2.dc')).toBe('Save DC must be at least 1.')
     expect(messageAt(traits, 'traits.2.radius')).toBe('Emanation radius is required.')

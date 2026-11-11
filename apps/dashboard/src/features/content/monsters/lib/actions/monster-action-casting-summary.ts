@@ -29,6 +29,12 @@ type CastingRow = {
     kind?: string
     castingAbility?: { kind?: string; ability?: Ability; entryId?: string }
   }
+  savingThrow?: {
+    dcSource?: {
+      kind?: string
+      castingAbility?: { kind?: string; entryId?: string }
+    }
+  }
 }
 
 export const MONSTER_CASTING_ABILITY_GROUP_LABEL = 'Choose an ability'
@@ -136,11 +142,14 @@ function sharedEntryId(
 
 function rowUsesCastingSource(row: CastingRow, sourceId: string): boolean {
   if (row.kind === 'spell') return sharedEntryId(row.castingAbility) === sourceId
-  if (row.kind === 'attack' && row.bonusSource?.kind === 'spell') {
+  if (row.kind === 'attack' && row.bonusSource?.kind === 'spellcasting') {
     return sharedEntryId(row.bonusSource.castingAbility) === sourceId
   }
-  if (row.kind === 'save' && row.dcSource?.kind === 'spell') {
+  if (row.kind === 'save' && row.dcSource?.kind === 'spellcasting') {
     return sharedEntryId(row.dcSource.castingAbility) === sourceId
+  }
+  if (row.savingThrow?.dcSource?.kind === 'spellcasting') {
+    return sharedEntryId(row.savingThrow.dcSource.castingAbility) === sourceId
   }
   return false
 }

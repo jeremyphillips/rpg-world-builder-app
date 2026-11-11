@@ -4,7 +4,6 @@ import {
   getActionVocabularyEntry,
   getActionVocabularySearchTerms,
   getDamageTypeLabel,
-  getMonsterActionKindLabel,
   listSpecialMenuActionPresetIds,
   MONSTER_SPELLCASTING_ACTION_NAME,
   type ActionPresetId,
@@ -17,7 +16,6 @@ import type { MonsterActionSection } from './monster-action-equipment-references
 
 import {
   MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
-  MONSTER_ACQUISITION_SAVE_DESCRIPTION,
   MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_DESCRIPTION,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
@@ -62,7 +60,7 @@ const SPECIAL_MENU_ORDER = ['multiattack', 'constrict', 'breath-weapon'] as cons
 const OTHER_ITEMS: readonly MonsterActionAcquisitionItem[] = [
   {
     id: 'create:attack',
-    label: 'Attack',
+    label: 'Attack roll',
     groupId: 'other',
     metadata: MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
   },
@@ -74,15 +72,9 @@ const OTHER_ITEMS: readonly MonsterActionAcquisitionItem[] = [
   },
   {
     id: 'create:special',
-    label: 'Special ability',
+    label: 'Custom ability',
     groupId: 'other',
     metadata: MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
-  },
-  {
-    id: 'create:save',
-    label: getMonsterActionKindLabel('save'),
-    groupId: 'other',
-    metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
   },
 ]
 
@@ -100,8 +92,20 @@ const EXACT_ACQUISITION_CHOICES: Record<string, MonsterActionAcquisitionChoice> 
   'create:attack': { type: 'create', kind: 'attack' },
   'create:spell': { type: 'create', kind: 'spell' },
   'create:special': { type: 'create', kind: 'special' },
-  'create:save': { type: 'create', kind: 'save' },
   'natural:other': { type: 'other-natural' },
+}
+
+function legendaryAcquisitionChoice(value: string): MonsterActionAcquisitionChoice | undefined {
+  if (value === 'reference' || value === 'spellcasting' || value === 'cast-spell') {
+    return { type: 'legendary', category: value }
+  }
+  return undefined
+}
+
+function presetAcquisitionChoice(value: string): MonsterActionAcquisitionChoice | undefined {
+  const preset = getActionPreset(value)
+  if (!preset || preset.mechanics === 'attack-roll') return undefined
+  return { type: 'preset', presetId: value as ActionPresetId }
 }
 
 function parsePrefixedAcquisitionId(id: string): MonsterActionAcquisitionChoice | undefined {
@@ -115,16 +119,9 @@ function parsePrefixedAcquisitionId(id: string): MonsterActionAcquisitionChoice 
   if (prefix === 'natural' && isAttackRollPreset(value as ActionPresetId)) {
     return { type: 'natural', presetId: value as ActionPresetId }
   }
-  if (
-    prefix === 'legendary' &&
-    (value === 'reference' || value === 'spellcasting' || value === 'cast-spell')
-  ) {
-    return { type: 'legendary', category: value }
-  }
-  if (prefix !== 'preset') return undefined
-  const preset = getActionPreset(value)
-  if (!preset || preset.mechanics === 'attack-roll') return undefined
-  return { type: 'preset', presetId: value as ActionPresetId }
+  if (prefix === 'legendary') return legendaryAcquisitionChoice(value)
+  if (prefix === 'preset') return presetAcquisitionChoice(value)
+  return undefined
 }
 
 export function parseMonsterActionAcquisitionId(

@@ -111,7 +111,7 @@ function authoredAttackGoverningAbility(
   const source = action.bonusSource
   if (!source) return undefined
   if (source.kind === 'ability' && source.ability) return source.ability
-  if (source.kind === 'spell') {
+  if (source.kind === 'spellcasting') {
     const casting = source.castingAbility
     if (casting?.kind === 'ability' && casting.ability) return casting.ability
   }

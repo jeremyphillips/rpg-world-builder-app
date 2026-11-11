@@ -7,6 +7,7 @@ import {
   type CreatureTraitVocabularyId,
 } from '../../vocab/creature/trait-vocabulary'
 import { damageTypeIdSchema } from '../../vocab/damage/vocabulary'
+import { DEFAULT_FIXED_SAVE_DC, fixedSaveDcSchema } from '../lib/saving-throw/schema'
 import { CONFIGURABLE_CREATURE_TRAIT_PRESET_IDS } from './trait-presets'
 import {
   CREATURE_TRAIT_DURATION_HOUR_MAX,
@@ -45,7 +46,7 @@ const usesField = rangedNumber('Uses', 1, 12)
 const brightRadiusField = rangedNumber('Bright radius', 5, 120)
 const emanationRadiusField = rangedNumber('Emanation radius', 5, 120)
 const insightDcField = rangedNumber('Insight DC', 1, 30)
-const stenchDcField = rangedNumber('Save DC', 1, 30)
+const stenchDcField = fixedSaveDcSchema.default(DEFAULT_FIXED_SAVE_DC)
 const attackScopeField = z.enum(['any', 'melee'])
 const etherealDirectionField = z.enum(['material-to-ethereal', 'both'])
 const mimicrySoundsField = z.enum(
@@ -357,7 +358,7 @@ const elementalRestorationDraftSchema = z.object({
 const stenchDraftSchema = z.object({
   ...idField,
   preset: z.literal('stench'),
-  dc: z.number().optional(),
+  dc: fixedSaveDcSchema.optional(),
   radius: z.number().optional(),
   successImmunity: z.boolean().optional(),
   ...entryProvenanceField,

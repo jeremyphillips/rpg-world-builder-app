@@ -90,7 +90,7 @@ describe('useMonsterActionSections', () => {
             kind: 'attack',
             name: 'Arcane Burst',
             bonusSource: {
-              kind: 'spell',
+              kind: 'spellcasting',
               castingAbility: { kind: 'shared', entryId: 'spellcasting' },
             },
           },

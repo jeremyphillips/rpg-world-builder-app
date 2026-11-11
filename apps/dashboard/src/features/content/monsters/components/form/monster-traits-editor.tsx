@@ -17,6 +17,7 @@ import {
   monsterTraitAcquisitionItems,
   parseMonsterTraitAcquisitionId,
 } from '../../lib/actions/monster-trait-acquisition'
+import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-summary'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import { MONSTER_ADD_LABEL, MONSTER_TRAITS_HEADING } from '../../lib/monster-form-labels'
 import {
@@ -75,8 +76,9 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
         advisories,
         monsterName: monsterName ?? '',
         ctx,
+        sharedCastingOptions: values ? sharedCastingOptions(values, '') : [],
       }),
-    [advisories, ctx, editor.selectedIndex, monsterName],
+    [advisories, ctx, editor.selectedIndex, monsterName, values],
   )
 
   return (

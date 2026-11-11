@@ -413,7 +413,8 @@ describe('monster action detail fields', () => {
     const special = detailFields({ id: 'parry', kind: 'special', name: 'Parry' })
     expect(special[0]).toBe('buildAdvisories')
     expect(special[1]).toBe('description')
-    expect(special.indexOf('description')).toBeLessThan(special.indexOf('limitedUse.kind'))
+    expect(special.indexOf('description')).toBeLessThan(special.indexOf('savingThrow.ability'))
+    expect(special.indexOf('savingThrow.ability')).toBeLessThan(special.indexOf('limitedUse.kind'))
   })
 
   it('uses optional disclosure for preset action descriptions and required richtext for custom', () => {
@@ -429,8 +430,11 @@ describe('monster action detail fields', () => {
     })
     expect(descriptionFieldConfig({ id: 'parry', kind: 'special', name: 'Parry' })).toMatchObject({
       type: 'richtext',
-      required: true,
+      label: 'Rules text',
     })
+    expect(
+      descriptionFieldConfig({ id: 'parry', kind: 'special', name: 'Parry' }),
+    ).not.toHaveProperty('required')
     expect(
       descriptionFieldConfig({ id: 'parry', kind: 'special', name: 'Parry' }),
     ).not.toHaveProperty('optionalDisclosure')

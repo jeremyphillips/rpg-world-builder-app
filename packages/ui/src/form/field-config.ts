@@ -1328,6 +1328,15 @@ export interface GroupConfig {
    * `dialog` — collapsed summary that opens the editor in a modal.
    */
   disclosure?: FieldGroupDisclosure
+  /**
+   * Object path for an optional nested group. Add opens local state and does not
+   * write a value. Remove unsets this path. Requires `optionalDisclosure`.
+   */
+  name?: string
+  /** Add/remove chrome for an optional object. Does not seed a value on open. */
+  optionalDisclosure?: OptionalDisclosureConfig
+  /** Trailing divider after this group within parent rhythm. */
+  separator?: FieldSeparator
 }
 
 /**

@@ -4,7 +4,6 @@ import {
   MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_DESCRIPTION,
-  MONSTER_ACQUISITION_SAVE_DESCRIPTION,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
 } from '../monster-form-labels'
 import {
@@ -74,23 +73,18 @@ describe('monster action acquisition presentation', () => {
       'other',
     )
     expect(items.find((item) => item.id === 'create:attack')).toMatchObject({
+      label: 'Attack roll',
       metadata: MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
     })
     expect(items.find((item) => item.id === 'create:spell')).toMatchObject({
       metadata: MONSTER_ACQUISITION_SPELL_DESCRIPTION,
     })
     expect(items.find((item) => item.id === 'create:special')).toMatchObject({
+      label: 'Custom ability',
       metadata: MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
     })
-    expect(items.find((item) => item.id === 'create:save')).toMatchObject({
-      label: 'Saving throw',
-      groupId: 'other',
-      metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
-    })
-    expect(parseMonsterActionAcquisitionId('create:save')).toEqual({
-      type: 'create',
-      kind: 'save',
-    })
+    expect(items.find((item) => item.id === 'create:save')).toBeUndefined()
+    expect(parseMonsterActionAcquisitionId('create:save')).toBeUndefined()
     expect(items.find((item) => item.id === 'natural:other')?.metadata).toBeUndefined()
   })
 
