@@ -116,6 +116,150 @@
     }
   },
   {
+    "id": "srd-cc-5.2.1:finger-of-death",
+    "slug": "finger-of-death",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Finger of Death",
+    "description": "<p>You unleash negative energy toward a creature you can see within range. The target makes a Constitution saving throw, taking 7d8 + 30 Necrotic damage on a failed save or half as much damage on a successful one. A Humanoid killed by this spell rises at the start of your next turn as a Zombie that follows your verbal orders.</p>",
+    "school": "necromancy",
+    "level": 7,
+    "classIds": ["sorcerer", "warlock", "wizard"],
+    "tags": {
+      "damageTypes": ["necrotic"],
+      "roles": ["damage", "summoning"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "modeling": {
+      "status": "sufficient-for-character-sheet",
+      "gaps": [
+        {
+          "code": "summoning-model-missing",
+          "note": "A Humanoid killed by this spell rises as a Zombie; that creature stays prose"
+        }
+      ]
+    },
+    "resolution": {
+      "selectionMode": "targets",
+      "target": {
+        "count": 1,
+        "countKind": "exact",
+        "kind": "creature",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 7,
+              "faces": 8
+            },
+            "flat": 30
+          },
+          "damageType": "necrotic"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ],
+      "method": {
+        "kind": "saving-throw",
+        "ability": "con"
+      }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:plane-shift",
+    "slug": "plane-shift",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Plane Shift",
+    "description": "<p>You and up to eight willing creatures who link hands in a circle are transported to a different plane of existence. You can specify a target destination in general terms, such as a specific city on the Elemental Plane of Fire or palace on the second level of the Nine Hells, and you appear in or near that destination, as determined by the GM. Alternatively, if you know the sigil sequence of a teleportation circle on another plane of existence, this spell can take you to that circle. If the teleportation circle is too small to hold all the creatures you transported, they appear in the closest unoccupied spaces next to the circle.</p>",
+    "school": "conjuration",
+    "level": 7,
+    "classIds": ["cleric", "druid", "sorcerer", "warlock", "wizard"],
+    "tags": {
+      "roles": ["movement"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a forked, metal rod worth 250+ GP and attuned to a plane of existence, which the spell consumes"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      }
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:simulacrum",
     "slug": "simulacrum",
     "rulesetId": "srd-cc-5.2.1",

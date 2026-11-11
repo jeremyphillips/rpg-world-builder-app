@@ -126,6 +126,25 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
         "Flammable objects in the area that aren't being worn or carried start burning.",
     },
   },
+  'finger-of-death': {
+    kind: 'derived',
+    overrides: {
+      saveAbility: 'con',
+      target: { count: 1, countKind: 'exact', kind: 'creature' },
+    },
+  },
+  'lightning-bolt': {
+    kind: 'derived',
+    overrides: {
+      saveAbility: 'dex',
+      selectionMode: 'self',
+      areaOfEffect: {
+        shape: 'line',
+        length: { value: 100, unit: 'ft' },
+        width: { value: 5, unit: 'ft' },
+      },
+    },
+  },
   'wall-of-fire': { kind: 'derived', overrides: { saveAbility: 'dex' } },
   'delayed-blast-fireball': { kind: 'derived', overrides: { saveAbility: 'dex' } },
 
@@ -188,6 +207,8 @@ export const SRD_521_SPELL_SEED_RESOLUTION_TIER_A_SLUGS = [
   'hellish-rebuke',
   'thunderwave',
   'fireball',
+  'finger-of-death',
+  'lightning-bolt',
   'wall-of-fire',
   'delayed-blast-fireball',
 ] as const satisfies readonly Srd521SpellSeedResolutionSlug[]

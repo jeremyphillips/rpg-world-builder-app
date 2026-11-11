@@ -15,6 +15,7 @@ import {
   actionAfterSectionMove,
 } from './monster-action-kind'
 import { monsterActionDetailFields } from './monster-action-detail-fields'
+import { monsterActionOnHitFields } from './monster-action-on-hit-fields'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 import { createMonsterRowId } from '../monster-row-id'
 import {
@@ -171,6 +172,27 @@ function descriptionFieldConfig(action: MonsterActionDraftRow): FormItem | undef
 }
 
 describe('monster action detail fields', () => {
+  it('adds an on-hit effect from Damage, Condition, or Note and starts damage at 1d6', () => {
+    const onHit = monsterActionOnHitFields(detailCtx)
+    expect(onHit.kind).toBe('array')
+    if (onHit.kind !== 'array') return
+    expect(onHit.addAction).toMatchObject({
+      label: 'Add effect',
+      menu: {
+        enableSearch: false,
+        items: [
+          {
+            id: 'damage',
+            label: 'Damage',
+            appendDefaults: { kind: 'damage', roll: { dice: { count: 1, faces: 6 } } },
+          },
+          { id: 'condition', label: 'Condition', appendDefaults: { kind: 'condition' } },
+          { id: 'note', label: 'Note', appendDefaults: { kind: 'note' } },
+        ],
+      },
+    })
+  })
+
   it('shows only the natural-weapon editors and keeps attack editors', () => {
     const natural = detailFields({
       id: 'bite',

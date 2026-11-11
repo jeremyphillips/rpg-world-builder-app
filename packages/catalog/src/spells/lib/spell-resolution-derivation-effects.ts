@@ -49,6 +49,14 @@ export const SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS = {
       roll: { dice: { count: 2, faces: 4 }, flat: 4 },
     },
   ],
+  'finger-of-death': [
+    {
+      id: derivationEffectId('finger-of-death', 'damage'),
+      kind: 'damage',
+      roll: { dice: { count: 7, faces: 8 }, flat: 30 },
+      damageType: 'necrotic',
+    },
+  ],
   fireball: [
     {
       id: derivationEffectId('fireball', 'damage'),
@@ -63,6 +71,14 @@ export const SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS = {
       kind: 'damage',
       roll: { dice: { count: 1, faces: 10 } },
       damageType: 'fire',
+    },
+  ],
+  'lightning-bolt': [
+    {
+      id: derivationEffectId('lightning-bolt', 'damage'),
+      kind: 'damage',
+      roll: { dice: { count: 8, faces: 6 } },
+      damageType: 'lightning',
     },
   ],
   'hellish-rebuke': [

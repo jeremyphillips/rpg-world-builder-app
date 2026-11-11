@@ -163,7 +163,33 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
     name: 'onHit.effects',
     label: MONSTER_ON_HIT_LEGEND,
     hint: MONSTER_ON_HIT_HINT,
-    addAction: { label: MONSTER_ON_HIT_ADD_LABEL },
+    addAction: {
+      label: MONSTER_ON_HIT_ADD_LABEL,
+      menu: {
+        groups: [],
+        enableSearch: false,
+        items: [
+          {
+            id: 'damage',
+            label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
+            appendDefaults: {
+              kind: 'damage',
+              roll: { dice: { count: 1, faces: 6 } },
+            },
+          },
+          {
+            id: 'condition',
+            label: vocabularyFieldLabel(CONDITION_TERM),
+            appendDefaults: { kind: 'condition' },
+          },
+          {
+            id: 'note',
+            label: MONSTER_ON_HIT_NOTE_LABEL,
+            appendDefaults: { kind: 'note' },
+          },
+        ],
+      },
+    },
     item: {
       header: {
         fallback: (index) => `Effect ${index + 1}`,

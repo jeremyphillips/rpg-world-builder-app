@@ -51,6 +51,49 @@
     }
   },
   {
+    "id": "srd-cc-5.2.1:power-word-kill",
+    "slug": "power-word-kill",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Power Word Kill",
+    "description": "<p>You compel one creature you can see within range to die. If the target has 100 Hit Points or fewer, it dies. Otherwise, it takes 12d12 Psychic damage.</p>",
+    "school": "enchantment",
+    "level": 9,
+    "classIds": ["bard", "sorcerer", "warlock", "wizard"],
+    "tags": {
+      "damageTypes": ["psychic"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing"
+      }
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:prismatic-wall",
     "slug": "prismatic-wall",
     "rulesetId": "srd-cc-5.2.1",

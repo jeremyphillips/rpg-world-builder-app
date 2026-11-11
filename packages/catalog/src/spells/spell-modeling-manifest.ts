@@ -100,6 +100,12 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
     },
   ]),
   'false-life': mechanicsReady(),
+  'finger-of-death': sufficientForCharacterSheet([
+    gap(
+      'summoning-model-missing',
+      'A Humanoid killed by this spell rises as a Zombie; that creature stays prose',
+    ),
+  ]),
   fireball: sufficientForCharacterSheet([
     gap(
       'unconditional-application',
@@ -108,6 +114,7 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
     gap('flammability-rules', 'Ignition/burning state not automated; rider documented on outcome'),
     gap('object-state-awareness', 'Worn or carried carve-out on object ignition rider'),
   ]),
+  fear: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'condition' }),
   fly: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'movement' }),
   'fire-bolt': mechanicsReady([
     gap(
@@ -140,6 +147,7 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
       'Slot level above 1 adds one projectile (dart), not additional target capacity',
     ),
   ]),
+  'lightning-bolt': sufficientForCharacterSheet(),
   'mass-cure-wounds': editorEligible([
     gap('modifier-model-missing', 'Spellcasting ability modifier on healing stays prose'),
     gap('chosen-within-area', 'Recipient selection within 30-ft sphere stays prose'),
@@ -232,6 +240,7 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
       'Advantage when fighting the target and post-charm awareness stay prose',
     ),
   ]),
+  'chain-lightning': blockedProseOnly({ code: 'chained-targets' }),
   'color-spray': blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'condition' }),
   'cone-of-cold': blockedProseOnly({ code: 'effect-schema-missing' }),
   contingency: blockedProseOnly(
@@ -291,6 +300,8 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     capabilityId: 'detection',
   }),
   'detect-magic': blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'detection' }),
+  'detect-thoughts': blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'detection' }),
+  'dimension-door': blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'movement' }),
   'detect-poison-and-disease': blockedProseOnly({
     code: 'effect-schema-missing',
     capabilityId: 'detection',
@@ -472,6 +483,7 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     { code: 'effect-schema-missing', capabilityId: 'stat-modifier' },
     [gap('chosen-within-area', 'Allies chosen within aura stay prose')],
   ),
+  'plane-shift': blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'movement' }),
   'planar-binding': blockedProseOnly({ code: 'summoning-model-missing' }, [
     gap('effect-schema-missing', 'Service binding mechanics stay prose'),
     gap('conditional-effect-model-missing', 'Save, hostile twist, extend summon stay prose'),
@@ -481,6 +493,7 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     gap('choice-model-missing', 'Beast form choice stays prose'),
     gap('conditional-effect-model-missing', 'Save, THP tracking, early end stay prose'),
   ]),
+  'power-word-kill': blockedProseOnly({ code: 'effect-schema-missing' }),
   'power-word-heal': blockedProseOnly(
     {
       code: 'effect-schema-missing',
@@ -494,6 +507,7 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
       ),
     ],
   ),
+  scrying: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'detection' }),
   prestidigitation: blockedProseOnly({ code: 'effect-schema-missing' }, [
     gap('multi-mode-choice', 'Sensory, fire, clean, mark, and creation modes stay prose'),
     gap('concurrent-effect-limit', 'Up to three non-instantaneous effects active at once'),

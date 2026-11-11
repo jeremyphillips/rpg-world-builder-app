@@ -22,9 +22,9 @@ describe('SRD 5.2.1 monster seed', () => {
   const monsters = loadSeedMonsters(RULESET)
 
   it('loads the system monster seeds validated against monsterSchema', () => {
-    expect(monsters).toHaveLength(5)
+    expect(monsters).toHaveLength(6)
     expect(seedMonsterSlugs(RULESET)).toEqual(
-      new Set(['kobold-warrior', 'skeleton', 'knight', 'mage', 'hell-hound']),
+      new Set(['kobold-warrior', 'skeleton', 'knight', 'mage', 'hell-hound', 'lich']),
     )
   })
 
@@ -261,6 +261,70 @@ describe('SRD 5.2.1 monster seed', () => {
     expect(formatted.body).toBe(
       'Dexterity Saving Throw: DC 12, each creature in a 15-foot Cone. Failure: 17 (5d6) Fire damage. Success: Half damage.',
     )
+
+    const lich = monsters.find((monster) => monster.slug === 'lich')
+    expect(lich).toBeDefined()
+    if (lich) {
+      const lichBlock = deriveMonsterStatBlock({
+        monster: lich,
+        equipmentCatalog,
+        skillCatalog: new Map(),
+        armorClassRules: systemDefaultArmorClassRules(),
+        magicPropertyProvider: () => undefined,
+      })
+      expect(lichBlock.hp).toBe(315)
+      expect(lichBlock.ac).toEqual(
+        expect.objectContaining({
+          status: 'resolved',
+          value: expect.objectContaining({ ac: 20 }),
+        }),
+      )
+      expect(lichBlock.initiativeLabel).toBe('+3 (13)')
+      expect(
+        formatMonsterAttackAction(
+          lichBlock.attacks.find((line) => line.id === 'paralyzing-touch')!,
+        ),
+      ).toBe(
+        "Melee Attack Roll: +12, reach 5 ft. Hit: 15 (3d6 + 5) Cold damage, and the target has the Paralyzed condition until the start of the lich's next turn.",
+      )
+      expect(
+        formatMonsterAttackAction(lichBlock.attacks.find((line) => line.id === 'eldritch-burst')!),
+      ).toBe(
+        'Melee or Ranged Attack Roll: +12, reach 5 ft. or range 120 ft. Hit: 31 (4d12 + 5) Force damage.',
+      )
+      expect(formatMultiattack(lich)).toBe(
+        'The lich makes three attacks, using Eldritch Burst or Paralyzing Touch in any combination.',
+      )
+      const casting = lich.actions.find((action) => action.id === 'spellcasting')
+      expect(casting?.kind).toBe('spell')
+      if (casting?.kind === 'spell') {
+        expect(
+          casting.spells.find((spell) => spell.spellId.endsWith(':fireball'))?.castAtLevel,
+        ).toBe(5)
+        expect(
+          casting.spells.find((spell) => spell.spellId.endsWith(':lightning-bolt'))?.castAtLevel,
+        ).toBe(5)
+        expect(
+          casting.spells.find((spell) => spell.spellId.endsWith(':animate-dead'))?.limitedUse,
+        ).toMatchObject({
+          kind: 'uses',
+          count: { kind: 'fixed', value: 2 },
+        })
+        expect(
+          casting.spells.find((spell) => spell.spellId.endsWith(':chain-lightning'))?.limitedUse,
+        ).toMatchObject({
+          kind: 'uses',
+          count: { kind: 'fixed', value: 1 },
+        })
+        expect(casting.spells.some((spell) => spell.spellId.endsWith(':fear'))).toBe(false)
+      }
+      expect(lich.actions.some((action) => action.name === 'Frightening Gaze')).toBe(false)
+      expect(lich.reactions.find((action) => action.id === 'protective-magic')?.kind).toBe('spell')
+      expect(lichBlock.spellcasting.find((line) => line.id === 'spellcasting')).toMatchObject({
+        saveDc: 20,
+        attackBonus: 12,
+      })
+    }
 
     for (const monster of [knight, mage, hound]) {
       if (!monster) continue

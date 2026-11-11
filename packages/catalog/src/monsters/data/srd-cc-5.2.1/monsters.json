@@ -646,5 +646,195 @@
     ],
     "bonusActions": [],
     "reactions": []
+  },
+  {
+    "id": "srd-cc-5.2.1:lich",
+    "slug": "lich",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": { "section": "Monsters" }
+      }
+    },
+    "status": "published",
+    "campaignId": null,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z",
+    "name": "Lich",
+    "description": "<p>An undead wizard whose touch paralyzes and whose spells burn and shock.</p>",
+    "sizes": ["medium"],
+    "creatureType": "undead",
+    "alignment": "ne",
+    "abilityScores": { "str": 11, "dex": 16, "con": 16, "int": 21, "wis": 14, "cha": 16 },
+    "armorClass": { "naturalArmorBonus": 7 },
+    "hitPoints": { "kind": "hit-dice", "count": 42 },
+    "movement": { "walk": 30 },
+    "senses": [{ "type": "truesight", "range": 120 }],
+    "challengeRating": "21",
+    "proficiencies": {
+      "savingThrows": ["dex", "con", "int", "wis"],
+      "skills": [
+        { "skill": "arcana", "rank": "expertise" },
+        { "skill": "history", "rank": "proficient" },
+        { "skill": "insight", "rank": "proficient" },
+        { "skill": "perception", "rank": "proficient" }
+      ],
+      "languages": [],
+      "weapons": []
+    },
+    "defenses": {
+      "vulnerabilities": [],
+      "resistances": ["cold", "lightning"],
+      "immunities": ["necrotic", "poison"],
+      "conditionImmunities": ["charmed", "exhaustion", "frightened", "paralyzed", "poisoned"]
+    },
+    "equipment": [],
+    "traits": [
+      {
+        "kind": "template",
+        "id": "legendary-resistance",
+        "templateId": "legendary-resistance",
+        "config": { "uses": 4 },
+        "nameOverride": "Legendary Resistance (4/Day, or 5/Day in Lair)",
+        "descriptionOverride": "<p>If the lich fails a saving throw, it can choose to succeed instead.</p>"
+      },
+      {
+        "kind": "custom",
+        "id": "spirit-jar",
+        "name": "Spirit Jar",
+        "description": "<p>If destroyed, the lich reforms in 1d10 days if it has a spirit jar, reviving with all its Hit Points. The new body appears in an unoccupied space within the lich's lair.</p>"
+      }
+    ],
+    "actions": [
+      {
+        "id": "multiattack",
+        "kind": "multiattack",
+        "preset": "multiattack",
+        "name": "Multiattack",
+        "steps": [{ "count": 3, "actionIds": ["eldritch-burst", "paralyzing-touch"] }]
+      },
+      {
+        "id": "eldritch-burst",
+        "kind": "attack",
+        "name": "Eldritch Burst",
+        "bonusSource": {
+          "kind": "spell",
+          "castingAbility": { "kind": "shared", "entryId": "spellcasting" }
+        },
+        "modes": ["melee", "ranged"],
+        "reach": 5,
+        "range": { "normal": 120 },
+        "damage": { "dice": { "count": 4, "faces": 12 } },
+        "damageType": "force"
+      },
+      {
+        "id": "paralyzing-touch",
+        "kind": "attack",
+        "name": "Paralyzing Touch",
+        "bonusSource": {
+          "kind": "spell",
+          "castingAbility": { "kind": "shared", "entryId": "spellcasting" }
+        },
+        "modes": ["melee"],
+        "reach": 5,
+        "damage": { "dice": { "count": 3, "faces": 6 } },
+        "damageType": "cold",
+        "onHit": {
+          "effects": [
+            {
+              "kind": "condition",
+              "conditionId": "paralyzed",
+              "description": "until the start of the lich's next turn"
+            }
+          ]
+        }
+      },
+      {
+        "id": "spellcasting",
+        "kind": "spell",
+        "name": "Spellcasting",
+        "castingAbility": { "kind": "ability", "ability": "int" },
+        "spells": [
+          { "spellId": "srd-cc-5.2.1:detect-magic" },
+          { "spellId": "srd-cc-5.2.1:detect-thoughts" },
+          { "spellId": "srd-cc-5.2.1:dispel-magic" },
+          { "spellId": "srd-cc-5.2.1:fireball", "castAtLevel": 5 },
+          { "spellId": "srd-cc-5.2.1:invisibility" },
+          { "spellId": "srd-cc-5.2.1:lightning-bolt", "castAtLevel": 5 },
+          { "spellId": "srd-cc-5.2.1:mage-hand" },
+          { "spellId": "srd-cc-5.2.1:prestidigitation" },
+          {
+            "spellId": "srd-cc-5.2.1:animate-dead",
+            "limitedUse": {
+              "kind": "uses",
+              "count": { "kind": "fixed", "value": 2 },
+              "recovery": { "minimumRest": "long" }
+            }
+          },
+          {
+            "spellId": "srd-cc-5.2.1:dimension-door",
+            "limitedUse": {
+              "kind": "uses",
+              "count": { "kind": "fixed", "value": 2 },
+              "recovery": { "minimumRest": "long" }
+            }
+          },
+          {
+            "spellId": "srd-cc-5.2.1:plane-shift",
+            "limitedUse": {
+              "kind": "uses",
+              "count": { "kind": "fixed", "value": 2 },
+              "recovery": { "minimumRest": "long" }
+            }
+          },
+          {
+            "spellId": "srd-cc-5.2.1:chain-lightning",
+            "limitedUse": {
+              "kind": "uses",
+              "count": { "kind": "fixed", "value": 1 },
+              "recovery": { "minimumRest": "long" }
+            }
+          },
+          {
+            "spellId": "srd-cc-5.2.1:finger-of-death",
+            "limitedUse": {
+              "kind": "uses",
+              "count": { "kind": "fixed", "value": 1 },
+              "recovery": { "minimumRest": "long" }
+            }
+          },
+          {
+            "spellId": "srd-cc-5.2.1:power-word-kill",
+            "limitedUse": {
+              "kind": "uses",
+              "count": { "kind": "fixed", "value": 1 },
+              "recovery": { "minimumRest": "long" }
+            }
+          },
+          {
+            "spellId": "srd-cc-5.2.1:scrying",
+            "limitedUse": {
+              "kind": "uses",
+              "count": { "kind": "fixed", "value": 1 },
+              "recovery": { "minimumRest": "long" }
+            }
+          }
+        ]
+      }
+    ],
+    "bonusActions": [],
+    "reactions": [
+      {
+        "id": "protective-magic",
+        "kind": "spell",
+        "name": "Protective Magic",
+        "castingAbility": { "kind": "shared", "entryId": "spellcasting" },
+        "trigger": { "text": "The spell's trigger." },
+        "description": "<p>The lich casts Counterspell or Shield in response to the spell's trigger, using the same spellcasting ability as Spellcasting.</p>",
+        "spells": [{ "spellId": "srd-cc-5.2.1:counterspell" }, { "spellId": "srd-cc-5.2.1:shield" }]
+      }
+    ]
   }
 ]

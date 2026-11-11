@@ -78,6 +78,7 @@ Recorded 2026-11-09 from Open5e `srd-2024` details and the catalog fixtures. A l
 - **Skeleton** (`srd-cc-5.2.1:skeleton`, `srd-2024_skeleton`). Fidelity not yet verified. Open5e: AC 14, HP 13 (`2d8 + 4`), shortsword and shortbow `+5` and `6 (1d6 + 3)`, poison immunity, exhaustion and poisoned. The seed also stores a bludgeoning vulnerability. Open5e’s vulnerability list is empty, and no excerpt confirms it. Monster fixtures: schema and slug only. Disposition: corrections recommended for that vulnerability. The seed was not changed.
 - **Knight** (`srd-cc-5.2.1:knight`, `srd-2024_knight`). Fidelity not yet verified. Open5e calls the AC natural armor. The seed reaches AC 18 with equipped plate, which matches the tested total. Greatsword and heavy crossbow use catalog weapons, a crossbow damage override, and radiant on-hit damage. Parry is a `special` reaction whose +2 AC stays prose. The seed stores a frightened immunity. Open5e’s condition list is empty, and no excerpt confirms it. Monster fixtures: initiative `+0 (10)`, HP 52, AC 18, both attack lines, the multiattack sentence, and Parry’s kind. Disposition: corrections recommended for frightened. The seed was not changed.
 - **Mage** (`srd-cc-5.2.1:mage`, `srd-2024_mage`). Fidelity not yet verified. Monster fixtures: initiative `+2 (12)`, HP 81, AC 15, Arcane Burst `+6` / `16 (3d8 + 3)`, the multiattack sentence, derived spellcasting `saveDc` 14 and `attackBonus` 6, and the Spellcasting sentence `spell save DC 14`. The attack bonus is not printed. Spell bodies stay on the spell records. Gap: `spell-list-omits-dc-and-attack` for the attack-bonus clause only. `fixedAcOffset` stays, because the excerpt includes Mage Armor in the AC. Disposition: text-supported for the seed. No seed change.
+- **Lich** (`srd-cc-5.2.1:lich`, `srd-2024_lich`). Text-supported for the non-legendary block. Monster fixtures: AC 20, HP 315, Paralyzing Touch `+12` / `15 (3d6 + 5)` cold plus Paralyzed until the lich's next turn, Eldritch Burst `+12` / `31 (4d12 + 5)` force, the multiattack sentence, and spellcasting `saveDc` 20 / `attackBonus` 12. Fireball and Lightning Bolt are stored with `castAtLevel` 5. The spell records stay level 3. Legendary actions are absent. Initiative resolves to Dexterity `+3`; the payload's `+17` is not stored. Languages "All" is not enumerated. Legendary Resistance is 4/day; the lair's fifth use stays in the name. Disposition: text-supported.
 - **Hell Hound** (`srd-cc-5.2.1:hell-hound`, `srd-2024_hell-hound`). Fidelity not yet verified. Monster fixtures: initiative `+1 (11)`, HP 58, AC 15, bite `+5` / `7 (1d8 + 3)` plus `1d6`, the multiattack sentence, and Fire Breath’s heading and DC 12 / `17 (5d6)` body. Pack Tactics is trait prose. Fire immunity, darkvision, and Perception are stored and untested. Disposition: text-supported. No seed change.
 
 ## Shared capabilities
@@ -99,11 +100,6 @@ A monster SRD fixture is an assertion in `packages/catalog/src/monsters/index.te
 
 ## Capability log
 
-Append after an approved authoring pass. No entries yet.
+Append after an approved authoring pass.
 
-- Monster slug.
-- Mechanics newly verified, and mechanics reused.
-- Gaps opened or exercised. Gaps resolved, if any.
-- Regression fixtures added.
-- Other SRD monsters now considered authorable.
-- Whether a model change was required.
+- **Lich** (`srd-cc-5.2.1:lich`). Verified the non-legendary attack lines, multiattack sentence, and spellcasting save DC. Reused equipped-attack resolution, on-hit conditions, spell references, and Legendary Resistance. Opened no new gap. `legendary-actions`, `save-conditions`, and the lair's fifth resistance use stay open. Fixtures are the attack sentences, AC 20, and HP 315. Other SRD undead with on-hit conditions can reuse the same rider. The on-hit condition model was already in place; this seed did not add one.
