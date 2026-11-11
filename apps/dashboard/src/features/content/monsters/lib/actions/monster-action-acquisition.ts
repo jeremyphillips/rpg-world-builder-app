@@ -208,6 +208,11 @@ export function monsterActionAcquisitionItems(input: {
   ]
 }
 
+/** Starting damage for a new Attack or Other natural attack. Not applied to loaded rows. */
+function authoredStartingDamage(): { dice: { count: 1; faces: 6 } } {
+  return { dice: { count: 1, faces: 6 } }
+}
+
 function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
   const preset = getActionPreset(presetId)
   const id = createMonsterRowId()
@@ -251,7 +256,7 @@ export function createMonsterActionFromAcquisition(
   }
   if (choice.type === 'natural' || choice.type === 'preset') return draftFromPreset(choice.presetId)
   if (choice.type === 'other-natural') {
-    return { id, kind: 'natural-weapon', mode: 'melee', reach: 5 }
+    return { id, kind: 'natural-weapon', mode: 'melee', damage: authoredStartingDamage() }
   }
   if (choice.type === 'focus-existing') {
     throw new Error('focus-existing is not a create choice')
@@ -260,7 +265,7 @@ export function createMonsterActionFromAcquisition(
     if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] }
     if (choice.kind === 'special') return { id, kind: 'special' }
     if (choice.kind === 'save') return { id, kind: 'save' }
-    return { id, kind: 'attack' } as MonsterActionDraftRow
+    return { id, kind: 'attack', damage: authoredStartingDamage() }
   }
   return { id, kind: 'special' } as MonsterActionDraftRow
 }

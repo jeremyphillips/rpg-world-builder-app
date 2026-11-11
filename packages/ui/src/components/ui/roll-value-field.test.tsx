@@ -37,6 +37,43 @@ describe('RollValueField', () => {
     expect(onPartsChange).toHaveBeenLastCalledWith({ flatOperator: '+', flatAmount: 0 })
   })
 
+  it('offers add dice when no dice atoms are stored', () => {
+    const onPartsChange = vi.fn()
+    render(
+      <RollValueField id="damage" label="Damage roll" parts={{}} onPartsChange={onPartsChange} />,
+    )
+
+    expect(screen.queryByLabelText('Number of dice')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add dice' })).toBeInTheDocument()
+    expect(onPartsChange).not.toHaveBeenCalled()
+  })
+
+  it('shows a stored count and leaves the missing die empty', async () => {
+    const onPartsChange = vi.fn()
+    render(
+      <RollValueField
+        id="damage"
+        label="Damage roll"
+        parts={{ diceCount: 2 }}
+        onPartsChange={onPartsChange}
+      />,
+    )
+
+    expect(screen.getByLabelText('Number of dice')).toHaveValue(2)
+    expect(screen.getByRole('combobox', { name: 'Die size' })).toHaveTextContent('d6')
+    expect(onPartsChange).not.toHaveBeenCalled()
+  })
+
+  it('commits both default dice only from add dice', async () => {
+    const onPartsChange = vi.fn()
+    render(
+      <RollValueField id="damage" label="Damage roll" parts={{}} onPartsChange={onPartsChange} />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'Add dice' }))
+    expect(onPartsChange).toHaveBeenCalledWith({ diceCount: 1, diceFaces: 6 })
+  })
+
   it('shows flat-only rolls with add dice affordance', () => {
     render(
       <RollValueField

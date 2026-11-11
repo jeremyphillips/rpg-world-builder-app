@@ -128,6 +128,27 @@ describe('normalizeMonsterFormValues', () => {
     expect(actions.find((action) => action.id === 'plain')).not.toHaveProperty('damage')
   })
 
+  it('does not invent a damage roll or melee reach', () => {
+    const input = {
+      ...resolveMonsterCreateDefaultValues(),
+      actions: [
+        {
+          id: 'slash',
+          kind: 'attack',
+          name: 'Slash',
+          modes: ['melee'],
+          damageType: 'slashing',
+        },
+      ],
+    }
+    const normalized = normalizeMonsterFormValues(input, { intent: 'publish', mode: 'create' })
+    const row = (normalized.actions as Array<{ damage?: unknown; reach?: unknown }>)?.[0]
+    expect(row?.damage).toBeUndefined()
+    expect(row?.reach).toBeUndefined()
+    const again = normalizeMonsterFormValues(input, { intent: 'publish', mode: 'create' })
+    expect(again.actions).toEqual(normalized.actions)
+  })
+
   it('matches the preview serializer', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Scout'

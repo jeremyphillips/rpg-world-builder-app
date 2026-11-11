@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useController, FormProvider, useForm, type UseFormReturn } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
@@ -13,6 +13,7 @@ import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
 } from '../../lib/monster-form-values'
+import { createMonsterActionFromAcquisition } from '../../lib/actions/monster-action-acquisition'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import { MonsterActionSections } from './monster-action-sections'
 
@@ -105,6 +106,80 @@ function biteRow(values: MonsterFormValues): MonsterActionDraftRow | undefined {
   }
   return undefined
 }
+
+describe('attack default ownership', () => {
+  it('keeps created attack damage across selection without storing reach', async () => {
+    const user = userEvent.setup()
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    const created = createMonsterActionFromAcquisition({ type: 'create', kind: 'attack' })
+    const attack = { ...created, name: 'Slash' }
+    const note = { id: 'note', kind: 'special' as const, name: 'Note' }
+
+    render(<Host values={valuesWith([note, attack])} formRef={formRef} />)
+
+    await waitFor(() => {
+      const row = formRef.current!.getValues().actions.find((item) => item.id === attack.id)
+      expect(row).toMatchObject({ damage: { dice: { count: 1, faces: 6 } } })
+      expect(row).not.toHaveProperty('reach')
+    })
+
+    await user.click(screen.getByRole('button', { name: /Slash/i }))
+    expect(screen.getByLabelText('Number of dice')).toHaveValue(1)
+    await user.click(screen.getByRole('button', { name: /Note/i }))
+
+    const after = formRef.current!.getValues().actions.find((item) => item.id === attack.id)
+    expect(after).toMatchObject({ damage: { dice: { count: 1, faces: 6 } } })
+    expect(after).not.toHaveProperty('reach')
+    expect(formRef.current!.getFieldState('actions.1.damage').isDirty).toBe(false)
+    expect(formRef.current!.getFieldState('actions.1.reach').isDirty).toBe(false)
+  })
+
+  it('leaves an incomplete saved attack incomplete and restores that baseline on reset', async () => {
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    const initial = valuesWith([{ id: 'old', kind: 'attack', name: 'Old', modes: ['melee'] }])
+    const baseline = structuredClone(initial)
+
+    render(<Host values={initial} formRef={formRef} />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Add dice' })).toBeInTheDocument()
+    })
+    const opened = formRef.current!.getValues().actions[0]
+    expect(opened).not.toHaveProperty('damage')
+    expect(opened?.reach).toBeUndefined()
+    expect(formRef.current!.formState.isDirty).toBe(false)
+
+    act(() => {
+      formRef.current!.setValue('actions.0.damage', { dice: { count: 2, faces: 8 } })
+      formRef.current!.reset(baseline)
+    })
+    await waitFor(() => {
+      expect(formRef.current!.getValues().actions[0]).not.toHaveProperty('damage')
+    })
+    expect(formRef.current!.getValues().actions[0]?.reach).toBeUndefined()
+  })
+
+  it('duplicates an attack without inventing reach or replacing its roll', async () => {
+    const user = userEvent.setup()
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    const created = createMonsterActionFromAcquisition({ type: 'create', kind: 'attack' })
+    const attack = { ...created, name: 'Slash', damage: { dice: { count: 2, faces: 8 } } }
+
+    render(<Host values={valuesWith([attack])} formRef={formRef} />)
+
+    await user.click(screen.getByRole('button', { name: 'Actions for Slash' }))
+    await user.click(screen.getByRole('menuitem', { name: /Duplicate/i }))
+
+    await waitFor(() => {
+      expect(formRef.current!.getValues().actions).toHaveLength(2)
+    })
+    const [source, copy] = formRef.current!.getValues().actions
+    expect(copy?.id).not.toBe(source?.id)
+    expect(copy).toMatchObject({ damage: { dice: { count: 2, faces: 8 } } })
+    expect(copy).not.toHaveProperty('reach')
+    expect(source).toMatchObject({ damage: { dice: { count: 2, faces: 8 } } })
+  })
+})
 
 describe('natural weapon action round trip', () => {
   it('keeps unmounted mechanics through switch, move, save, reload, and edit', async () => {

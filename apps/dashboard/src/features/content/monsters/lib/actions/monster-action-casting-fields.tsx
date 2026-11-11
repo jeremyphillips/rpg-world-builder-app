@@ -60,6 +60,7 @@ export function MonsterActionCastingAbilityField({
   labelPosition,
   sourceActionId,
   onBlocked,
+  required,
 }: {
   name: string
   sharedOptions: readonly { value: string; label: string }[]
@@ -67,6 +68,7 @@ export function MonsterActionCastingAbilityField({
   /** Set on the spell row that other actions share. Nested attack and save fields omit it. */
   sourceActionId?: string
   onBlocked?: (message: string) => void
+  required?: boolean
 }) {
   const controlSize = useFieldControlSize()
   const { getValues, setValue, formState } = useFormContext<MonsterFormValues>()
@@ -81,6 +83,7 @@ export function MonsterActionCastingAbilityField({
       name={name}
       label={SPELLCASTING_ABILITY_LABEL}
       labelPosition={labelPosition}
+      required={required}
       placeholder="Choose"
       options={monsterCastingAbilityOptions(sharedOptions)}
       value={value}

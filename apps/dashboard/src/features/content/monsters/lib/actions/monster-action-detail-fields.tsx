@@ -36,6 +36,7 @@ import {
   MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
   MONSTER_SAVE_THROW_SECTION_LEGEND,
   MONSTER_TRIGGER_LABEL,
+  MONSTER_ATTACK_BONUS_LABEL,
 } from '../monster-form-labels'
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
@@ -138,6 +139,12 @@ function abilityOptions() {
 
 type MonsterAbilitySourcePath = 'bonusSource' | 'dcSource'
 
+type MonsterAbilitySourceRequiredMarks = {
+  controller?: boolean
+  ability?: boolean
+  castingAbility?: boolean
+}
+
 function monsterAbilitySourceDependent(input: {
   sourcePath: MonsterAbilitySourcePath
   namePrefix: string
@@ -145,6 +152,7 @@ function monsterAbilitySourceDependent(input: {
   abilityFields: FormItem[]
   sharedCastingOptions: { value: string; label: string }[]
   dependentsChrome?: 'none'
+  required?: MonsterAbilitySourceRequiredMarks
 }): FormItem {
   const kindName = `${input.sourcePath}.kind`
   const abilityBranch = whenFieldEquals(kindName, 'ability')
@@ -160,6 +168,7 @@ function monsterAbilitySourceDependent(input: {
         { value: 'ability', label: MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL },
         { value: 'spell', label: MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL },
       ],
+      ...(input.required?.controller ? { required: true } : {}),
     },
     dependents: {
       ...(input.dependentsChrome ? { chrome: input.dependentsChrome } : {}),
@@ -174,6 +183,7 @@ function monsterAbilitySourceDependent(input: {
             <MonsterActionCastingAbilityField
               name={`${input.namePrefix}.${input.sourcePath}.castingAbility`}
               sharedOptions={input.sharedCastingOptions}
+              required={input.required?.castingAbility}
             />
           ),
         },
@@ -189,8 +199,9 @@ function monsterActionBonusSourceDependent(
   return monsterAbilitySourceDependent({
     sourcePath: 'bonusSource',
     namePrefix,
-    controllerLabel: 'Attack bonus',
+    controllerLabel: MONSTER_ATTACK_BONUS_LABEL,
     sharedCastingOptions,
+    required: { controller: true, ability: true, castingAbility: true },
     abilityFields: [
       {
         type: 'select',
@@ -198,6 +209,7 @@ function monsterActionBonusSourceDependent(
         label: 'Ability',
         placeholder: 'Choose',
         options: abilityOptions(),
+        required: true,
       },
       {
         type: 'switch',
@@ -369,7 +381,7 @@ function reachRangeFields(modeField: 'mode' | 'modes'): FormItem[] {
         name: 'reach',
         options: reachFeetOptions,
         digits: 2,
-        defaultValue: 5,
+        placeholder: '5',
         ariaLabel: 'Reach value',
       },
       end: {
@@ -382,6 +394,7 @@ function reachRangeFields(modeField: 'mode' | 'modes'): FormItem[] {
       normalName: 'range.normal',
       longName: 'range.long',
       visibility: rangedVisibility(modeField),
+      normalRequired: true,
     }),
   ]
 }
@@ -540,6 +553,7 @@ function monsterActionMechanicFields(input: {
         name: 'modes',
         label: 'Modes',
         options: modeOptions(),
+        required: true,
       },
       ...reachRangeFields('modes'),
       damageFieldGroup({

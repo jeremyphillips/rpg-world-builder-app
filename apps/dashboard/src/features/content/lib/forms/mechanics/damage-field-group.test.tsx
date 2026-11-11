@@ -40,12 +40,10 @@ describe('damageFieldGroup', () => {
     expect(damage).toHaveClass('mb-0')
     expect(damage).not.toHaveClass('mb-8')
     expect(damage.querySelector('legend')).toHaveClass('sr-only')
-    expect(
-      screen.getByRole('spinbutton', { name: 'Damage roll Number of dice' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add dice' })).toBeInTheDocument()
   })
 
-  it('does not turn roll defaults into a nested damage value', () => {
+  it('does not put roll suggestions into form defaults', () => {
     const fields = [
       damageFieldGroup({
         ctx: {},
@@ -55,7 +53,8 @@ describe('damageFieldGroup', () => {
       }),
     ]
     const defaults = buildDefaultValues(fields)
-    expect(defaults).toMatchObject({ 'damage.dice.count': 1, 'damage.dice.faces': 6 })
     expect(defaults.damage).toBeUndefined()
+    expect(defaults['damage.dice.count']).toBeUndefined()
+    expect(defaults['damage.dice.faces']).toBeUndefined()
   })
 })

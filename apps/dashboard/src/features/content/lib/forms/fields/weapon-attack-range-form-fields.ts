@@ -11,6 +11,7 @@ export function weaponAttackRangeGroup(options: {
   normalName: string
   longName: string
   visibility?: FieldVisibility
+  normalRequired?: boolean
 }): FormItem {
   return {
     kind: 'group',
@@ -26,6 +27,7 @@ export function weaponAttackRangeGroup(options: {
             label: 'Normal',
             presets: ATTACK_RANGE_FEET,
             allowCustom: true,
+            required: options.normalRequired,
           }),
           distanceJoinedPairField({
             amountName: options.longName,

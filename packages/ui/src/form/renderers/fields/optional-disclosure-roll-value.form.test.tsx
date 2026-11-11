@@ -74,7 +74,7 @@ describe('rollValue optionalDisclosure', () => {
           label: 'Damage roll',
         },
       ]),
-    ).toMatchObject({ 'damage.dice.count': 1, 'damage.dice.faces': 6 })
+    ).toEqual({})
   })
 
   it('seeds on add and returns to a clean absent value on remove', async () => {

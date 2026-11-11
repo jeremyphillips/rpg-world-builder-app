@@ -64,6 +64,13 @@ function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+/** Registration can leave `{ damage: { dice: { count: undefined } } }`. That is not authored data. */
+function hasDefinedLeaf(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(hasDefinedLeaf)
+  if (isPlainRecord(value)) return Object.values(value).some(hasDefinedLeaf)
+  return value !== undefined
+}
+
 type MissingPathEntry = { path: string; value: unknown }
 
 function collectMissingPaths(
@@ -111,7 +118,7 @@ function collectMissingRecordSnapshot(
     const liveValue = liveRecord[key]
     if (isPlainRecord(value) || Array.isArray(value)) {
       if (liveValue === undefined) {
-        missing.push({ path: childPath, value })
+        if (hasDefinedLeaf(value)) missing.push({ path: childPath, value })
         continue
       }
       collectMissingPaths(value, liveValue, childPath, missing)
@@ -138,7 +145,7 @@ function lostDefinedKeys(previous: unknown, next: unknown): boolean {
     return Object.entries(previous).some(([key, value]) => {
       // The recharge editor owns this key and may clear or replace it.
       if (key === 'limitedUse') return false
-      if (value === undefined) return false
+      if (!hasDefinedLeaf(value)) return false
       if (next[key] === undefined) return true
       return lostDefinedKeys(value, next[key])
     })

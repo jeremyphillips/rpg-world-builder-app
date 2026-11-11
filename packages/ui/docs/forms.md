@@ -531,6 +531,16 @@ request are **not** guaranteed — API idempotency keys remain a separate safegu
 />
 ```
 
+## Default kinds
+
+A displayed suggestion, a rules fallback, and a stored value are different.
+
+- **Authored values** are in React Hook Form before the control mounts. Create them on the entity or row. Do not wait for the field to mount, and do not refill a value the author cleared.
+- **Rules-derived values** stay out of the form until the author chooses one. Readers use the shared rules resolver. A select may show that fallback as a `placeholder`. Mounting the control does not store it. Choosing the same number does store it.
+- **Presentation suggestions** are placeholders or an explicit action such as Add dice. `rollValue` does not write `defaultCount` / `defaultFaces` into `defaultValues` or into form state on render. A roll with no stored dice shows Add dice. One stored die stays a value, and the missing die stays empty.
+
+Weapon damage rolls and spell effect rolls still use that display contract. Seeding those rows at creation is a follow-up. Closed optional disclosures stay absent until their add action runs `seedWhen`.
+
 ## The RHF boundary
 
 **Primitives never import `react-hook-form`.** They take `error?: string` and standard

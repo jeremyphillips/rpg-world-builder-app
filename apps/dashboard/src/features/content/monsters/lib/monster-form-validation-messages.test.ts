@@ -166,6 +166,22 @@ describe('monster publish validation messages', () => {
     expect(actions[1]?.damage).toEqual({})
   })
 
+  it('rejects a typed melee attack that has no stored roll and allows omitted reach', () => {
+    const result = publish([
+      {
+        id: 'slash',
+        kind: 'attack',
+        name: 'Slash',
+        modes: ['melee'],
+        damageType: 'slashing',
+        bonusSource: { kind: 'ability', ability: 'str', proficient: true },
+      },
+    ])
+    expect(messageAt(result, 'actions.0.damage')).toBe('Damage roll is required.')
+    expect(messageAt(result, 'actions.0.reach')).toBeUndefined()
+    expect(messageAt(result, 'actions.0.damageType')).toBeUndefined()
+  })
+
   it('publishes an unchecked proficiency and strips empty rules text', () => {
     const attack = publish([
       {

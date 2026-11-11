@@ -1859,15 +1859,6 @@ function assignDependentFieldDefaults(field: FieldConfig, values: Record<string,
     inlineField.selectDefaultValue ?? (inlineField.selectRequired ? '' : undefined)
 }
 
-function assignRollValueDefaults(
-  field: RollValueFieldConfig,
-  values: Record<string, unknown>,
-): void {
-  const base = field.name
-  values[`${base}.dice.count`] = field.defaultCount ?? 1
-  values[`${base}.dice.faces`] = field.defaultFaces ?? 6
-}
-
 function assignJoinedPairDefaults(
   field: JoinedPairFieldConfig,
   values: Record<string, unknown>,
@@ -1900,9 +1891,7 @@ function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unk
   }
 
   if (field.type === 'rollValue') {
-    const rollField = field as RollValueFieldConfig
-    if (rollField.optionalDisclosure) return
-    assignRollValueDefaults(rollField, values)
+    // Dice suggestions are presentation-only. They are not form defaultValues.
     return
   }
 

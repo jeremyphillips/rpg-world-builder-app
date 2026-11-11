@@ -246,6 +246,10 @@ export function getMonsterArmorSlotUiCopy(slot: CreatureArmorSlot): {
 
 export const MONSTER_ACTION_NAME_LABEL = 'Name'
 export const MONSTER_ATTACK_BONUS_LABEL = 'Attack bonus'
+
+export function formatMonsterActionAttackPreviewConfigureHint(fieldLabel: string): string {
+  return `Configure ${fieldLabel} to calculate this attack.`
+}
 export const MONSTER_ATTACK_BONUS_KIND_ABILITY_LABEL = 'Ability'
 export const MONSTER_ATTACK_BONUS_KIND_SPELL_LABEL = 'Spellcasting'
 export const MONSTER_ATTACK_BONUS_ABILITY_LABEL = 'Ability'

@@ -349,7 +349,7 @@ function resolveAuthoredProfile(
       proficiencyContribution: ability.proficient ? args.proficiencyBonus : 0,
       attackBonus,
       modes: [...modes],
-      ...(modes.includes('melee') && action.reach !== undefined ? { reach: action.reach } : {}),
+      ...(modes.includes('melee') ? { reach: action.reach ?? 5 } : {}),
       ...(modes.includes('ranged') && action.range ? { range: action.range } : {}),
       primary: {
         expression: primary.expression,

@@ -419,9 +419,6 @@ function refineAuthoredAttackShape(
   if (new Set(action.modes).size !== action.modes.length) {
     addCustomRefinementIssue(ctx, 'Attack modes must be unique.', [...path, 'modes'])
   }
-  if (action.modes.includes('melee') && action.reach === undefined) {
-    addCustomRefinementIssue(ctx, 'Melee attacks require reach.', [...path, 'reach'])
-  }
   if (action.modes.includes('ranged') && !action.range) {
     addCustomRefinementIssue(ctx, 'Ranged attacks require range.', [...path, 'range'])
   }

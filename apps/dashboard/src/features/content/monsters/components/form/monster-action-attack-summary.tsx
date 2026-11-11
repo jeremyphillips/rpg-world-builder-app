@@ -1,11 +1,12 @@
 import { MONSTER_ACTION_ATTACK_KINDS } from '@rpg/contracts'
-import { RulesPreview, Text } from '@rpg/ui'
+import { RulesPreview } from '@rpg/ui'
 import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   buildMonsterActionAttackPreview,
+  findMonsterFormActionDraft,
   resolveMonsterFormActionAttackProfile,
 } from '../../lib/actions/monster-action-attack-summary'
 import { MONSTER_ACTION_ATTACK_PREVIEW_LABEL } from '../../lib/monster-form-labels'
@@ -24,19 +25,20 @@ export function MonsterActionAttackSummary({
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const preview = useMemo(() => {
     if (!values || !ATTACK_PREVIEW_KINDS.includes(action.kind)) return null
-    return buildMonsterActionAttackPreview(
-      resolveMonsterFormActionAttackProfile(values, ctx, action.id),
-      values.abilityScores,
-    )
+    const draft = findMonsterFormActionDraft(values, ctx, action.id)
+    const profile = resolveMonsterFormActionAttackProfile(values, ctx, action.id)
+    const unavailableContext = draft ? { ctx, values, action: draft } : undefined
+    return buildMonsterActionAttackPreview(profile, values.abilityScores, unavailableContext)
   }, [action.id, action.kind, ctx, values])
 
   if (!preview) return null
 
   if (preview.status === 'unavailable') {
     return (
-      <Text as="p" variant="supporting">
-        {preview.message}
-      </Text>
+      <RulesPreview
+        label={MONSTER_ACTION_ATTACK_PREVIEW_LABEL}
+        content={{ kind: 'guidance', message: preview.guidance }}
+      />
     )
   }
 

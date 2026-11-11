@@ -68,4 +68,22 @@ describe('RulesPreview', () => {
     rerender(<RulesPreview label="Summary" content={{ kind: 'prose', text: '   ' }} />)
     expect(container).toBeEmptyDOMElement()
   })
+
+  it('renders guidance as neutral 12px copy inside the panel', () => {
+    render(
+      <RulesPreview
+        label="Attack preview"
+        content={{
+          kind: 'guidance',
+          message: 'Configure Attack bonus to calculate this attack.',
+        }}
+      />,
+    )
+
+    expect(screen.getByText('Attack preview')).toHaveClass('eyebrow-style-sm')
+    const message = screen.getByText('Configure Attack bonus to calculate this attack.')
+    expect(message.closest('.ui-semantic-text')).toHaveClass('ui-semantic-text--neutral')
+    expect(message.closest('.text-style-caption')).not.toBeNull()
+    expect(message.closest('.ui-panel')).toHaveClass('ui-panel--subtle')
+  })
 })

@@ -74,9 +74,13 @@ describe('monster action acquisition', () => {
   })
 
   it('creates the remaining kinds without extra rows', () => {
-    expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'attack' }).kind).toBe(
-      'attack',
-    )
+    const attack = createMonsterActionFromAcquisition({ type: 'create', kind: 'attack' })
+    expect(attack).toMatchObject({
+      kind: 'attack',
+      damage: { dice: { count: 1, faces: 6 } },
+    })
+    expect(attack).not.toHaveProperty('reach')
+    expect(attack).not.toHaveProperty('damageType')
     expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'spell' })).toMatchObject({
       kind: 'spell',
       spells: [],
@@ -92,8 +96,9 @@ describe('monster action acquisition', () => {
     expect(customNatural).toMatchObject({
       kind: 'natural-weapon',
       mode: 'melee',
-      reach: 5,
+      damage: { dice: { count: 1, faces: 6 } },
     })
+    expect(customNatural).not.toHaveProperty('reach')
     if (customNatural.kind === 'natural-weapon') {
       expect(customNatural.damageType).toBeUndefined()
       expect(customNatural.form).toBeUndefined()
@@ -277,6 +282,59 @@ describe('monster action detail fields', () => {
     expect(attack[0]).toBe('attackPreview')
     expect(attack[1]).toBe('buildAdvisories')
     expect(attack.indexOf('limitedUse')).toBeLessThan(attack.indexOf('bonusSource.kind'))
+    const attackBonus = attackItems.find(
+      (item) =>
+        'kind' in item &&
+        item.kind === 'dependent' &&
+        'controller' in item &&
+        item.controller.name === 'bonusSource.kind',
+    )
+    expect(
+      attackBonus && 'controller' in attackBonus ? attackBonus.controller : null,
+    ).toMatchObject({
+      required: true,
+    })
+    const attackBonusDependents =
+      attackBonus && 'dependents' in attackBonus ? attackBonus.dependents.fields : []
+    expect(
+      attackBonusDependents.find(
+        (field) => 'name' in field && field.name === 'bonusSource.ability',
+      ),
+    ).toMatchObject({ required: true })
+    expect(
+      attackBonusDependents.find(
+        (field) => 'name' in field && field.name === 'bonusSource.proficient',
+      ),
+    ).not.toHaveProperty('required', true)
+    expect(attackItems.find((item) => 'name' in item && item.name === 'modes')).toMatchObject({
+      required: true,
+    })
+    expect(
+      attackItems.find(
+        (item) => 'type' in item && item.type === 'joinedPair' && item.label === 'Reach',
+      ),
+    ).toMatchObject({
+      start: { name: 'reach', placeholder: '5' },
+    })
+    expect(
+      attackItems.find(
+        (item) => 'type' in item && item.type === 'joinedPair' && item.label === 'Reach',
+      ),
+    ).not.toHaveProperty('required', true)
+    const rangeGroup = attackItems.find(
+      (item) => 'kind' in item && item.kind === 'group' && item.legend === 'Range',
+    )
+    const rangeRow =
+      rangeGroup && 'fields' in rangeGroup
+        ? rangeGroup.fields.find((field) => 'kind' in field && field.kind === 'row')
+        : undefined
+    const normalRange =
+      rangeRow && 'fields' in rangeRow
+        ? rangeRow.fields.find(
+            (field) => 'type' in field && field.type === 'joinedPair' && field.label === 'Normal',
+          )
+        : undefined
+    expect(normalRange).toMatchObject({ required: true })
     expect(attack.indexOf('bonusSource.kind')).toBeLessThan(attack.indexOf('modes'))
     expect(attack.indexOf('modes')).toBeLessThan(attack.indexOf('damageType'))
     expect(attack.indexOf('onHit.additionalDamage')).toBeLessThan(attack.indexOf('description'))

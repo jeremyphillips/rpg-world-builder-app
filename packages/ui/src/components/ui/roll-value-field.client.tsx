@@ -136,6 +136,16 @@ export function RollValueField({
       modifierMode="optional"
       showModifierFields={showModifierFields}
       showDiceFields={showDiceFields}
+      diceAtoms={
+        showDiceFields
+          ? {
+              count: parts.diceCount ?? null,
+              faces: parts.diceFaces ?? null,
+              countPlaceholder: String(fieldDefaults.count),
+              facesPlaceholder: `d${fieldDefaults.faces}`,
+            }
+          : undefined
+      }
       countMin={countMin}
       countMax={countMax}
       modifierMin={modifierMin}

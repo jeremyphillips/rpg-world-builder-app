@@ -34,3 +34,14 @@ export const Prose: Story = {
     },
   },
 }
+
+export const Guidance: Story = {
+  args: {
+    label: 'Attack preview',
+    context: undefined,
+    content: {
+      kind: 'guidance',
+      message: 'Configure Attack bonus to calculate this attack.',
+    },
+  },
+}
