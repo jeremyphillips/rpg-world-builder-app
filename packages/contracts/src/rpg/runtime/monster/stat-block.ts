@@ -31,6 +31,7 @@ import {
   resolveMonsterActionAttackProfile,
   type MonsterActionAttackProfile,
   type ResolveMonsterActionAttackProfileInput,
+  type ResolvedOnHitEffect,
 } from './resolve-monster-action-attack-profile'
 
 export type DerivedMonsterAttackLine = {
@@ -42,11 +43,7 @@ export type DerivedMonsterAttackLine = {
   damage: string
   damageExpression?: string
   damageTypeId: string
-  additionalDamage?: Array<{
-    expression: string
-    average: number
-    damageTypeId: string
-  }>
+  onHit?: ResolvedOnHitEffect[]
   modes: Array<'melee' | 'ranged'>
   reach?: number
   range?: { normal: number; long?: number }
@@ -150,11 +147,6 @@ function attackLineFromProfile(
   id: string,
   section: DerivedMonsterAttackLine['section'],
 ): DerivedMonsterAttackLine {
-  const onHit = profile.onHit.map((part) => ({
-    expression: part.expression,
-    average: part.average,
-    damageTypeId: part.damageTypeId,
-  }))
   return {
     id,
     section,
@@ -164,7 +156,7 @@ function attackLineFromProfile(
     damage: String(profile.primary.average),
     ...(profile.primary.expression ? { damageExpression: profile.primary.expression } : {}),
     damageTypeId: profile.primary.damageTypeId,
-    ...(onHit.length > 0 ? { additionalDamage: onHit } : {}),
+    ...(profile.onHit.length > 0 ? { onHit: profile.onHit } : {}),
     modes: [...profile.modes],
     ...(profile.reach !== undefined ? { reach: profile.reach } : {}),
     ...(profile.range ? { range: profile.range } : {}),

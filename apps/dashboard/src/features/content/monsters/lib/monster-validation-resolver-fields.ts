@@ -43,10 +43,15 @@ export function monsterActionResolverFields(ctx: ContentFormCtx): FormItem[] {
     damageRows(ctx, 'damage', 'damageType'),
     {
       kind: 'array',
-      name: 'onHit.additionalDamage',
-      label: 'Damage entries',
-      item: { header: { fallback: (index) => `Damage entry #${index + 1}` } },
-      fields: [damageRows(ctx, 'roll', 'damageType')],
+      name: 'onHit.effects',
+      label: 'On hit',
+      item: { header: { fallback: (index) => `Effect #${index + 1}` } },
+      fields: [
+        { type: 'select', name: 'kind', label: 'Effect', options: [] },
+        damageRows(ctx, 'roll', 'damageType'),
+        { type: 'select', name: 'conditionId', label: 'Condition', options: [] },
+        { type: 'text', name: 'description', label: 'Details' },
+      ],
     },
     {
       kind: 'array',

@@ -63,11 +63,44 @@ describe('formatMonsterAttackAction', () => {
         line({
           damage: '7',
           damageExpression: '1d8+3',
-          additionalDamage: [{ average: 3, expression: '1d6-1', damageTypeId: 'fire' }],
+          onHit: [
+            {
+              kind: 'damage',
+              source: 'action',
+              average: 3,
+              expression: '1d6-1',
+              damageTypeId: 'fire',
+            },
+          ],
         }),
       ),
     ).toBe(
       'Melee Attack Roll: +5, reach 5 ft. Hit: 7 (1d8 + 3) Piercing damage plus 3 (1d6 - 1) Fire damage.',
+    )
+  })
+
+  it('prints a condition qualification and a note without changing the damage clause', () => {
+    expect(
+      formatMonsterAttackAction(
+        line({
+          attackBonus: 12,
+          attackBonusLabel: '+12',
+          damage: '15',
+          damageExpression: '3d6+5',
+          damageTypeId: 'cold',
+          onHit: [
+            {
+              kind: 'condition',
+              source: 'action',
+              conditionId: 'paralyzed',
+              description: "until the start of the lich's next turn",
+            },
+            { kind: 'note', source: 'action', description: 'The target starts burning' },
+          ],
+        }),
+      ),
+    ).toBe(
+      "Melee Attack Roll: +12, reach 5 ft. Hit: 15 (3d6 + 5) Cold damage, and the target has the Paralyzed condition until the start of the lich's next turn. The target starts burning.",
     )
   })
 

@@ -27,7 +27,7 @@ const weapon: MonsterActionDraftRow = {
   description: '<p>Keen</p>',
   damage: { dice: { count: 2, faces: 6 } },
   onHit: {
-    additionalDamage: [{ damageType: 'fire', roll: { dice: { count: 1, faces: 4 } } }],
+    effects: [{ kind: 'damage', damageType: 'fire', roll: { dice: { count: 1, faces: 4 } } }],
   },
 }
 
@@ -93,7 +93,7 @@ describe('monster action field order form state', () => {
     render(<Host formRef={formRef} />)
 
     const onHitHint = await screen.findByText(
-      'Additional damage dealt when this attack hits, beyond its primary damage.',
+      'Effects that apply when this attack hits, beyond its primary damage.',
     )
     const details = screen.getByRole('button', { name: 'Remove Additional details' })
     expect(
@@ -103,7 +103,7 @@ describe('monster action field order form state', () => {
       description: '<p>Keen</p>',
       damage: { dice: { count: 2, faces: 6 } },
       onHit: {
-        additionalDamage: [{ damageType: 'fire', roll: { dice: { count: 1, faces: 4 } } }],
+        effects: [{ kind: 'damage', damageType: 'fire', roll: { dice: { count: 1, faces: 4 } } }],
       },
     })
 
@@ -113,7 +113,7 @@ describe('monster action field order form state', () => {
       description: '<p>Keen</p>',
       damage: { dice: { count: 2, faces: 6 } },
       onHit: {
-        additionalDamage: [{ damageType: 'fire', roll: { dice: { count: 1, faces: 4 } } }],
+        effects: [{ kind: 'damage', damageType: 'fire', roll: { dice: { count: 1, faces: 4 } } }],
       },
     })
 
@@ -125,7 +125,7 @@ describe('monster action field order form state', () => {
     expect(shot(formRef.current!.getValues())).toMatchObject({
       damage: { dice: { count: 2, faces: 6 } },
       onHit: {
-        additionalDamage: [{ damageType: 'fire', roll: { dice: { count: 1, faces: 4 } } }],
+        effects: [{ kind: 'damage', damageType: 'fire', roll: { dice: { count: 1, faces: 4 } } }],
       },
     })
     await user.click(screen.getByRole('button', { name: 'Add additional details' }))

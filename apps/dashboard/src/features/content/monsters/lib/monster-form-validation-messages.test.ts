@@ -71,7 +71,7 @@ describe('monster publish validation messages', () => {
       { id: 'spell', kind: 'spell', spells: [] },
       { id: 'special', kind: 'special', name: '   ', description: '<p></p>' },
       { id: 'attack', kind: 'attack', name: 'Slash' },
-      { id: 'weapon', kind: 'weapon', onHit: { additionalDamage: [] } },
+      { id: 'weapon', kind: 'weapon', onHit: { effects: [] } },
       { id: 'multi', kind: 'multiattack', steps: [] },
       { id: 'step', kind: 'multiattack', steps: [{ actionIds: [] }] },
       {
@@ -144,7 +144,18 @@ describe('monster publish validation messages', () => {
             damage: { dice: { count: 1, faces: 6 } },
             damageType: 'piercing',
             onHit: {
-              additionalDamage: [{}, { damageType: 'fire', roll: { dice: { count: 1 } } }],
+              effects: [
+                {},
+                { kind: 'damage', damageType: 'fire', roll: { dice: { count: 1 } } },
+                { kind: 'condition' },
+                { kind: 'note', description: '   ' },
+                {
+                  kind: 'condition',
+                  conditionId: 'prone',
+                  damageType: 'fire',
+                  roll: { dice: { count: 2, faces: 6 } },
+                },
+              ],
             },
           },
           {
@@ -152,7 +163,7 @@ describe('monster publish validation messages', () => {
             kind: 'weapon',
             equipmentEntryId: 'bow',
             damage: {},
-            onHit: { additionalDamage: [] },
+            onHit: { effects: [] },
           },
         ],
       } as never,
@@ -160,7 +171,12 @@ describe('monster publish validation messages', () => {
     )
     const actions = normalized.actions as Record<string, unknown>[]
     expect(actions[0]?.onHit).toEqual({
-      additionalDamage: [{ damageType: 'fire', roll: { dice: { count: 1 } } }],
+      effects: [
+        { kind: 'damage', damageType: 'fire', roll: { dice: { count: 1 } } },
+        { kind: 'condition' },
+        { kind: 'note' },
+        { kind: 'condition', conditionId: 'prone' },
+      ],
     })
     expect(actions[1]?.onHit).toBeUndefined()
     expect(actions[1]?.damage).toEqual({})

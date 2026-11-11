@@ -22,7 +22,7 @@ describe('buildMonsterActionAttackPreview', () => {
         damageType: 'piercing',
         damage: { dice: { count: 1, faces: 8 } },
         onHit: {
-          additionalDamage: [{ roll: { dice: { count: 1, faces: 6 } }, damageType: 'fire' }],
+          effects: [{ kind: 'damage', roll: { dice: { count: 1, faces: 6 } }, damageType: 'fire' }],
         },
       },
       monster: {
@@ -72,6 +72,9 @@ describe('buildMonsterActionAttackPreview', () => {
     })
     expect(previewWithScores.rows[2]?.secondary).toMatch(/1d6.*fire/i)
     expect(previewWithScores.rows[3]).toMatchObject({ primary: '5 ft' })
+    expect(previewWithScores.sentence).toBe(
+      'Melee Attack Roll: +5, reach 5 ft. Hit: 7 (1d8 + 3) Piercing damage plus 3 (1d6) Fire damage.',
+    )
   })
 
   it('returns attack-bonus guidance when the profile is unavailable without context', () => {

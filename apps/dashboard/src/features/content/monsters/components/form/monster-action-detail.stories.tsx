@@ -80,7 +80,9 @@ export const WithDescriptionAndOnHit: Story = {
         ...claw,
         description: '<p>Rakes with both claws.</p>',
         onHit: {
-          additionalDamage: [{ damageType: 'poison', roll: { dice: { count: 1, faces: 4 } } }],
+          effects: [
+            { kind: 'damage', damageType: 'poison', roll: { dice: { count: 1, faces: 4 } } },
+          ],
         },
       }}
     />

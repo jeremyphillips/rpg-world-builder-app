@@ -1,4 +1,7 @@
 import {
+  CONDITION_TERM,
+  EFFECT_CONDITION_IDS,
+  getEffectConditionLabel,
   REST_KIND_ENTRIES,
   REST_KINDS,
   SPELL_COMPONENT_ENTRIES,
@@ -14,8 +17,14 @@ import {
   MONSTER_LIMIT_ADD_LABEL,
   MONSTER_LIMIT_RECHARGES_ON_LABEL,
   monsterLimitRechargesOnHint,
+  MONSTER_ON_HIT_ADD_LABEL,
+  MONSTER_ON_HIT_DETAILS_ADD_LABEL,
+  MONSTER_ON_HIT_DETAILS_LABEL,
   MONSTER_ON_HIT_HINT,
+  MONSTER_ON_HIT_KIND_LABEL,
   MONSTER_ON_HIT_LEGEND,
+  MONSTER_ON_HIT_NOTE_LABEL,
+  MONSTER_ACTION_DAMAGE_FIELD_LABEL,
 } from '../monster-form-labels'
 
 function limitVisibility(kind: 'uses' | 'recharge') {
@@ -123,21 +132,88 @@ export function monsterActionLimitedUseFields(): FormItem[] {
   ]
 }
 
+function effectKindVisible(kind: 'damage' | 'condition' | 'note') {
+  return {
+    dependsOn: ['kind'],
+    visibleWhen: (values: Record<string, unknown>) => values.kind === kind,
+  }
+}
+
+function onHitEffectTitle(values: Record<string, unknown>, index: number): string {
+  if (values.kind === 'damage') return MONSTER_ACTION_DAMAGE_FIELD_LABEL
+  if (values.kind === 'condition' && typeof values.conditionId === 'string') {
+    return getEffectConditionLabel(values.conditionId)
+  }
+  if (values.kind === 'condition') return vocabularyFieldLabel(CONDITION_TERM)
+  if (values.kind === 'note') return MONSTER_ON_HIT_NOTE_LABEL
+  return `Effect ${index + 1}`
+}
+
 export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
+  const damage = effectKindVisible('damage')
+  const condition = effectKindVisible('condition')
+  const note = effectKindVisible('note')
+  const qualified = {
+    dependsOn: ['kind'],
+    visibleWhen: (values: Record<string, unknown>) =>
+      values.kind === 'damage' || values.kind === 'condition',
+  }
   return {
     kind: 'array',
-    name: 'onHit.additionalDamage',
+    name: 'onHit.effects',
     label: MONSTER_ON_HIT_LEGEND,
     hint: MONSTER_ON_HIT_HINT,
-    addAction: { label: 'Add damage' },
-    item: { header: { fallback: (index) => `Damage ${index + 1}` } },
+    addAction: { label: MONSTER_ON_HIT_ADD_LABEL },
+    item: {
+      header: {
+        fallback: (index) => `Effect ${index + 1}`,
+        primary: (values, index) => onHitEffectTitle(values, index),
+      },
+    },
     fields: [
+      {
+        type: 'select',
+        name: 'kind',
+        label: MONSTER_ON_HIT_KIND_LABEL,
+        placeholder: 'Choose',
+        options: [
+          { value: 'damage', label: MONSTER_ACTION_DAMAGE_FIELD_LABEL },
+          { value: 'condition', label: vocabularyFieldLabel(CONDITION_TERM) },
+          { value: 'note', label: MONSTER_ON_HIT_NOTE_LABEL },
+        ],
+      },
       damageFieldGroup({
         ctx,
         damageTypeName: 'damageType',
         rollName: 'roll',
         legendVisibility: 'srOnly',
+        visibility: damage,
       }),
+      {
+        type: 'select',
+        name: 'conditionId',
+        label: vocabularyFieldLabel(CONDITION_TERM),
+        placeholder: 'Choose',
+        visibility: condition,
+        options: EFFECT_CONDITION_IDS.map((id) => ({
+          value: id,
+          label: getEffectConditionLabel(id),
+        })),
+      },
+      {
+        type: 'text',
+        name: 'description',
+        label: MONSTER_ON_HIT_DETAILS_LABEL,
+        visibility: qualified,
+        optionalDisclosure: { addLabel: MONSTER_ON_HIT_DETAILS_ADD_LABEL },
+      },
+      {
+        type: 'text',
+        name: 'description',
+        label: MONSTER_ON_HIT_DETAILS_LABEL,
+        visibility: note,
+        required: true,
+      },
     ],
   }
 }

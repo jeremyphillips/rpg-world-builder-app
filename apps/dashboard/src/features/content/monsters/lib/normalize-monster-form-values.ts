@@ -99,10 +99,7 @@ function applyRichTextFields(record: Record<string, unknown>): void {
   }
 }
 
-function onHitRowHasInput(row: unknown): boolean {
-  if (!isRecord(row)) return false
-  if (row.damageType !== undefined) return true
-  const roll = row.roll
+function rollHasInput(roll: unknown): boolean {
   if (!isRecord(roll)) return false
   if (typeof roll.flat === 'number') return true
   const dice = roll.dice
@@ -110,20 +107,57 @@ function onHitRowHasInput(row: unknown): boolean {
   return typeof dice.count === 'number' || typeof dice.faces === 'number'
 }
 
-/** Drops a mount-only on-hit list. A row with any damage input stays. */
+function effectRowHasInput(row: unknown): boolean {
+  if (!isRecord(row)) return false
+  if (typeof row.kind === 'string') return true
+  if (row.damageType !== undefined || row.conditionId !== undefined) return true
+  if (typeof row.description === 'string') return true
+  return rollHasInput(row.roll)
+}
+
+/** Keeps fields that belong to the selected kind. A row with no kind stays as authored. */
+function effectRowForKind(row: Record<string, unknown>): Record<string, unknown> {
+  const description = row.description
+  if (row.kind === 'damage') {
+    return {
+      kind: 'damage',
+      ...(row.roll !== undefined ? { roll: row.roll } : {}),
+      ...(row.damageType !== undefined ? { damageType: row.damageType } : {}),
+      ...(description !== undefined ? { description } : {}),
+    }
+  }
+  if (row.kind === 'condition') {
+    return {
+      kind: 'condition',
+      ...(row.conditionId !== undefined ? { conditionId: row.conditionId } : {}),
+      ...(description !== undefined ? { description } : {}),
+    }
+  }
+  if (row.kind === 'note') {
+    return {
+      kind: 'note',
+      ...(description !== undefined ? { description } : {}),
+    }
+  }
+  return row
+}
+
+/** Drops an untouched effect shell. A started row stays, including an incomplete one. */
 function omitEmptyOnHit(cleaned: Record<string, unknown>): void {
   if (!isRecord(cleaned.onHit)) return
-  const rows = cleaned.onHit.additionalDamage
+  const rows = cleaned.onHit.effects
   if (!Array.isArray(rows)) {
     delete cleaned.onHit
     return
   }
-  const authored = rows.filter(onHitRowHasInput)
+  const authored = rows
+    .filter(effectRowHasInput)
+    .map((row) => effectRowForKind(row as Record<string, unknown>))
   if (authored.length === 0) {
     delete cleaned.onHit
     return
   }
-  cleaned.onHit.additionalDamage = authored
+  cleaned.onHit.effects = authored
 }
 
 function applyLimitedUseDraft(cleaned: Record<string, unknown>): void {

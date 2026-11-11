@@ -4,10 +4,13 @@ import {
   derivedFieldReasonLabel,
   CHALLENGE_RATING_MECHANICS,
   formatProficiencyBonus,
+  formatMonsterAttackAction,
   formatSignedModifier,
   getAbilityCompactLabel,
   getContentTypeTerm,
   getDamageTypeLabel,
+  CONDITION_TERM,
+  getEffectConditionLabel,
   getWeaponModeLabel,
   getWeaponPropertyLabel,
   joinInlineMetadata,
@@ -23,6 +26,8 @@ import {
   type ResolveMonsterActionAttackProfileInput,
 } from '@rpg/contracts'
 
+import { vocabularyFieldLabel } from '@/features/vocabulary'
+
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { monsterEquipmentCatalog, monsterMagicPropertyProvider } from '../monster-form-derivation'
 import type { MonsterFormValues } from '../monster-form-values'
@@ -32,6 +37,7 @@ import {
   MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL,
   MONSTER_ACTION_ATTACK_PREVIEW_DAMAGE_LABEL,
   MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL,
+  MONSTER_ON_HIT_NOTE_LABEL,
   MONSTER_ACTION_ATTACK_PREVIEW_PROPERTIES_LABEL,
   MONSTER_ACTION_ATTACK_PREVIEW_RANGE_LABEL,
   MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL,
@@ -215,7 +221,13 @@ export type MonsterActionAttackPreviewUnavailableContext = MonsterActionAttackPr
 
 export type MonsterActionAttackPreview =
   | { status: 'unavailable'; guidance: string }
-  | { status: 'ready'; modeCaption: string; rows: readonly MonsterActionAttackPreviewRow[] }
+  | {
+      status: 'ready'
+      modeCaption: string
+      rows: readonly MonsterActionAttackPreviewRow[]
+      /** Same sentence the published stat block prints from this profile. */
+      sentence?: string
+    }
 
 function modeCaption(profile: MonsterActionAttackProfile): string {
   return profile.modes.map((mode) => getWeaponModeLabel(mode)).join(' or ')
@@ -259,6 +271,74 @@ function damagePreviewRow(id: string, label: string, roll: MonsterActionAttackRo
   }
 }
 
+function onHitPreviewRow(
+  effect: MonsterActionAttackProfile['onHit'][number],
+  index: number,
+): MonsterActionAttackPreviewRow {
+  if (effect.kind === 'damage') {
+    return damagePreviewRow(`on-hit-${index}`, MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL, effect)
+  }
+  if (effect.kind === 'condition') {
+    return {
+      id: `on-hit-${index}`,
+      label: vocabularyFieldLabel(CONDITION_TERM),
+      primary: getEffectConditionLabel(effect.conditionId),
+      ...(effect.description ? { secondary: effect.description } : {}),
+    }
+  }
+  return {
+    id: `on-hit-${index}`,
+    label: MONSTER_ON_HIT_NOTE_LABEL,
+    primary: effect.description,
+  }
+}
+
+function attackDistanceRows(value: MonsterActionAttackProfile): MonsterActionAttackPreviewRow[] {
+  const rows: MonsterActionAttackPreviewRow[] = []
+  if (value.reach !== undefined) {
+    rows.push({
+      id: 'reach',
+      label: MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL,
+      primary: `${value.reach} ft`,
+    })
+  }
+  if (value.range) {
+    rows.push({
+      id: 'range',
+      label: MONSTER_ACTION_ATTACK_PREVIEW_RANGE_LABEL,
+      primary: rangeLabel(value.range),
+    })
+  }
+  if (value.weaponProperties && value.weaponProperties.length > 0) {
+    rows.push({
+      id: 'properties',
+      label: MONSTER_ACTION_ATTACK_PREVIEW_PROPERTIES_LABEL,
+      primary: value.weaponProperties.map((id) => getWeaponPropertyLabel(id)).join(', '),
+    })
+  }
+  for (const capability of value.unresolvedCapabilities) {
+    rows.push({
+      id: `capability-${capability.id}`,
+      label: getWeaponPropertyLabel(capability.id),
+      primary: `Unavailable (${derivedFieldReasonLabel(capability.reason)})`,
+    })
+  }
+  return rows
+}
+
+function attackPreviewSentence(value: MonsterActionAttackProfile): string | undefined {
+  return formatMonsterAttackAction({
+    attackBonusLabel: formatSignedModifier(value.attackBonus),
+    damage: String(value.primary.average),
+    ...(value.primary.expression ? { damageExpression: value.primary.expression } : {}),
+    damageTypeId: value.primary.damageTypeId,
+    modes: [...value.modes],
+    ...(value.reach !== undefined ? { reach: value.reach } : {}),
+    ...(value.range ? { range: value.range } : {}),
+    ...(value.onHit.length > 0 ? { onHit: value.onHit } : {}),
+  })
+}
+
 export function buildMonsterActionAttackPreview(
   profile: DerivedField<MonsterActionAttackProfile>,
   abilityScores: Partial<Record<Ability, number>> | undefined,
@@ -284,45 +364,17 @@ export function buildMonsterActionAttackPreview(
     damagePreviewRow('damage', MONSTER_ACTION_ATTACK_PREVIEW_DAMAGE_LABEL, value.primary),
   ]
 
-  value.onHit.forEach((part, index) => {
-    rows.push(damagePreviewRow(`on-hit-${index}`, MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL, part))
+  value.onHit.forEach((effect, index) => {
+    rows.push(onHitPreviewRow(effect, index))
   })
+  rows.push(...attackDistanceRows(value))
 
-  if (value.reach !== undefined) {
-    rows.push({
-      id: 'reach',
-      label: MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL,
-      primary: `${value.reach} ft`,
-    })
-  }
-
-  if (value.range) {
-    rows.push({
-      id: 'range',
-      label: MONSTER_ACTION_ATTACK_PREVIEW_RANGE_LABEL,
-      primary: rangeLabel(value.range),
-    })
-  }
-
-  if (value.weaponProperties && value.weaponProperties.length > 0) {
-    rows.push({
-      id: 'properties',
-      label: MONSTER_ACTION_ATTACK_PREVIEW_PROPERTIES_LABEL,
-      primary: value.weaponProperties.map((id) => getWeaponPropertyLabel(id)).join(', '),
-    })
-  }
-
-  for (const capability of value.unresolvedCapabilities) {
-    rows.push({
-      id: `capability-${capability.id}`,
-      label: getWeaponPropertyLabel(capability.id),
-      primary: `Unavailable (${derivedFieldReasonLabel(capability.reason)})`,
-    })
-  }
+  const sentence = attackPreviewSentence(value)
 
   return {
     status: 'ready',
     modeCaption: modeCaption(value),
     rows,
+    ...(sentence ? { sentence } : {}),
   }
 }

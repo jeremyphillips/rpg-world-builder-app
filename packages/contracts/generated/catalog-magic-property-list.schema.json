@@ -69,6 +69,22 @@
             ],
             "additionalProperties": false
           }
+        },
+        "onHit": {
+          "type": "object",
+          "properties": {
+            "effects": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema2"
+              }
+            }
+          },
+          "required": [
+            "effects"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -89,6 +105,159 @@
         "shield"
       ],
       "description": "weapon | armor | shield"
+    },
+    "__schema2": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "roll": {
+              "type": "object",
+              "properties": {
+                "dice": {
+                  "$ref": "#/definitions/__schema3"
+                },
+                "flat": {
+                  "$ref": "#/definitions/__schema4"
+                }
+              },
+              "additionalProperties": false
+            },
+            "damageType": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:[-_][a-z0-9]+)*$"
+            },
+            "kind": {
+              "type": "string",
+              "const": "damage",
+              "description": "damage"
+            },
+            "description": {
+              "$ref": "#/definitions/__schema5"
+            }
+          },
+          "required": [
+            "roll",
+            "damageType",
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "condition",
+              "description": "condition"
+            },
+            "conditionId": {
+              "type": "string",
+              "enum": [
+                "blinded",
+                "charmed",
+                "deafened",
+                "exhaustion",
+                "frightened",
+                "grappled",
+                "incapacitated",
+                "invisible",
+                "paralyzed",
+                "petrified",
+                "poisoned",
+                "prone",
+                "restrained",
+                "stunned",
+                "unconscious"
+              ],
+              "description": "blinded | charmed | deafened | exhaustion | frightened | grappled | incapacitated | invisible | paralyzed | petrified | poisoned | prone | restrained | stunned | unconscious"
+            },
+            "description": {
+              "$ref": "#/definitions/__schema5"
+            }
+          },
+          "required": [
+            "kind",
+            "conditionId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "note",
+              "description": "note"
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "description"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "__schema3": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "faces": {
+          "anyOf": [
+            {
+              "type": "number",
+              "const": 4
+            },
+            {
+              "type": "number",
+              "const": 6
+            },
+            {
+              "type": "number",
+              "const": 8
+            },
+            {
+              "type": "number",
+              "const": 10
+            },
+            {
+              "type": "number",
+              "const": 12
+            },
+            {
+              "type": "number",
+              "const": 20
+            },
+            {
+              "type": "number",
+              "const": 100
+            }
+          ]
+        }
+      },
+      "required": [
+        "count",
+        "faces"
+      ],
+      "additionalProperties": false
+    },
+    "__schema4": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "__schema5": {
+      "type": "string",
+      "minLength": 1
     }
   }
 }

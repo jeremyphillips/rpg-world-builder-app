@@ -129,13 +129,21 @@ describe('SRD 5.2.1 monster seed', () => {
       attackBonus: 5,
       damage: '10',
       damageExpression: '2d6+3',
-      additionalDamage: [{ average: 4, expression: '1d8', damageTypeId: 'radiant' }],
+      onHit: [
+        {
+          kind: 'damage',
+          source: 'action',
+          average: 4,
+          expression: '1d8',
+          damageTypeId: 'radiant',
+        },
+      ],
     })
     expect(knight.attacks.find((line) => line.id === 'heavy-crossbow')).toMatchObject({
       attackBonus: 2,
       damage: '11',
       damageExpression: '2d10',
-      additionalDamage: [{ average: 4, expression: '1d8' }],
+      onHit: [{ kind: 'damage', source: 'action', average: 4, expression: '1d8' }],
     })
 
     const mage = derive('mage')
@@ -169,7 +177,7 @@ describe('SRD 5.2.1 monster seed', () => {
       attackBonus: 5,
       damage: '7',
       damageExpression: '1d8+3',
-      additionalDamage: [{ average: 3, expression: '1d6' }],
+      onHit: [{ kind: 'damage', source: 'action', average: 3, expression: '1d6' }],
     })
     expect(formatMonsterAttackAction(hound.attacks.find((line) => line.id === 'bite')!)).toBe(
       'Melee Attack Roll: +5, reach 5 ft. Hit: 7 (1d8 + 3) Piercing damage plus 3 (1d6) Fire damage.',

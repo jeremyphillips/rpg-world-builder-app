@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
-import { equipmentBonusEffectSchema } from './effect'
+import { attackOnHitSchema } from '../../../primitives/mechanics/attack-on-hit'
 import { magicPropertyCategorySchema } from '../../../vocab/magic-property/category'
+import { equipmentBonusEffectSchema } from './effect'
 
 export const MAGIC_PROPERTY_APPLIES_TO = ['weapon', 'armor', 'shield'] as const
 
@@ -17,6 +18,8 @@ export const magicPropertyDefinitionSchema = z
     category: magicPropertyCategorySchema,
     appliesTo: z.array(magicPropertyAppliesToSchema).min(1),
     effects: z.array(equipmentBonusEffectSchema).default([]),
+    /** Unconditional on-hit riders. Conditional activation stays in `description`. */
+    onHit: attackOnHitSchema.optional(),
   })
   .strict()
 

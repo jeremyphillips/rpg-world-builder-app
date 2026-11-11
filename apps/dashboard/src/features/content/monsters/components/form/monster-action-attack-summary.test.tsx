@@ -21,7 +21,7 @@ const bite: MonsterActionDraftRow = {
   damageType: 'piercing',
   damage: { dice: { count: 1, faces: 8 } },
   onHit: {
-    additionalDamage: [{ roll: { dice: { count: 1, faces: 6 } }, damageType: 'fire' }],
+    effects: [{ kind: 'damage', roll: { dice: { count: 1, faces: 6 } }, damageType: 'fire' }],
   },
 }
 

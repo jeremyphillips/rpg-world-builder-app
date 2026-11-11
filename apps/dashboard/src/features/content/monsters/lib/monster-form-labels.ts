@@ -120,7 +120,12 @@ export const MONSTER_WEAPON_DAMAGE_UNAVAILABLE_LABEL = 'Weapon unavailable'
 export const MONSTER_WEAPON_DAMAGE_NONE_LABEL = 'This weapon has no base damage.'
 export const MONSTER_ON_HIT_LEGEND = 'On hit'
 export const MONSTER_ON_HIT_HINT =
-  'Additional damage dealt when this attack hits, beyond its primary damage.'
+  'Effects that apply when this attack hits, beyond its primary damage.'
+export const MONSTER_ON_HIT_ADD_LABEL = 'Add effect'
+export const MONSTER_ON_HIT_KIND_LABEL = 'Effect'
+export const MONSTER_ON_HIT_NOTE_LABEL = 'Note'
+export const MONSTER_ON_HIT_DETAILS_LABEL = 'Details'
+export const MONSTER_ON_HIT_DETAILS_ADD_LABEL = 'Add details'
 export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
 export const MONSTER_TRAIT_PREVIEW_LABEL = 'Trait preview'
 /** Stat-block preview row — not action-economy {@link getActionEconomyLabel} “Action”. */

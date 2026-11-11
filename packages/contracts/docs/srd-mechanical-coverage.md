@@ -35,7 +35,7 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 - Concept: a saving-throw outcome that applies a condition such as grappled, restrained, or paralyzed.
 - Deficiency: missing structured capability on the shared effect envelope.
 - Evidence: monster saves accept damage only. Grapple or restraint stays in an outcome `note`. The spell roadmap already names the `condition` capability in [effect-capability-roadmap.md](./effect-resolution/effect-capability-roadmap.md).
-- Current fallback: outcome `note` for a rider. That fallback leaves this gap open.
+- Current fallback: outcome `note` for a rider. An on-hit condition id with a prose qualification is a separate stored rider and does not close this gap.
 - Importance: essential when the condition is the feature's main effect.
 - Owner: not chosen. The shared effect envelope is a candidate, along with spell outcomes and on-hit damage. A condition effect would also need duration, removal, repeat saves, and escape, which that envelope does not express. Monsters, spells, characters, and other creature abilities are all possible consumers. Dire Wolf's bite applies Prone on a hit, which is an on-hit consumer rather than a save. Do not add a monster-only condition effect.
 - Approval: open. Implementation: not started. Research only. No owner has been selected.
@@ -88,6 +88,8 @@ A monster SRD fixture is an assertion in `packages/catalog/src/monsters/index.te
 - Equipped weapon attack. Supported and resolved. Monster fixtures: Kobold dagger bonus 4. Knight greatsword and heavy crossbow bonuses.
 - Weapon damage override. Supported and resolved. Monster fixture: Knight heavy crossbow `2d10` with no ability modifier in the expression.
 - On-hit extra damage. Supported and resolved. Monster fixtures: Knight radiant `1d8`. Hell Hound bite fire `1d6`.
+- On-hit condition with a prose qualification, and an on-hit note. The attack profile stores and prints them. They do not change the attack bonus or the damage total. Contract fixture: Paralyzing Touch. This does not close `save-conditions`. Repeat saves, removal, and escape are still absent.
+- Unconditional magic-property on-hit damage. The same profile appends it after action effects. Contract fixture: an extra-fire preset. Flame Tongue's extra fire applies only while ablaze, so that damage stays descriptive.
 - Natural weapon. Supported and resolved. Monster fixture: Hell Hound bite.
 - Save damage and recharge. Supported and resolved. Monster fixture: Hell Hound Fire Breath.
 - Multiattack sentence. Supported and resolved. Monster fixtures: Knight, Mage, Hell Hound.

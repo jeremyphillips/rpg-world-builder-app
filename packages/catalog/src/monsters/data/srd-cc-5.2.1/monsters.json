@@ -287,8 +287,12 @@
         "kind": "weapon",
         "equipmentEntryId": "greatsword",
         "onHit": {
-          "additionalDamage": [
-            { "roll": { "dice": { "count": 1, "faces": 8 } }, "damageType": "radiant" }
+          "effects": [
+            {
+              "kind": "damage",
+              "roll": { "dice": { "count": 1, "faces": 8 } },
+              "damageType": "radiant"
+            }
           ]
         },
         "provenance": {
@@ -304,8 +308,12 @@
         "equipmentEntryId": "heavy-crossbow",
         "damage": { "dice": { "count": 2, "faces": 10 } },
         "onHit": {
-          "additionalDamage": [
-            { "roll": { "dice": { "count": 1, "faces": 8 } }, "damageType": "radiant" }
+          "effects": [
+            {
+              "kind": "damage",
+              "roll": { "dice": { "count": 1, "faces": 8 } },
+              "damageType": "radiant"
+            }
           ]
         },
         "provenance": {
@@ -584,8 +592,12 @@
         "damage": { "dice": { "count": 1, "faces": 8 } },
         "damageType": "piercing",
         "onHit": {
-          "additionalDamage": [
-            { "roll": { "dice": { "count": 1, "faces": 6 } }, "damageType": "fire" }
+          "effects": [
+            {
+              "kind": "damage",
+              "roll": { "dice": { "count": 1, "faces": 6 } },
+              "damageType": "fire"
+            }
           ]
         },
         "provenance": {

@@ -180,7 +180,7 @@ describe('monster action detail fields', () => {
       damageType: 'piercing',
     })
     expect(natural).toEqual(
-      expect.arrayContaining(['description', 'damage', 'damageType', 'onHit.additionalDamage']),
+      expect.arrayContaining(['description', 'damage', 'damageType', 'onHit.effects']),
     )
     expect(natural).toContain('limitedUse')
     for (const hidden of ['mode', 'properties', 'reach', 'limitedUse.kind', 'moveSection']) {
@@ -277,7 +277,7 @@ describe('monster action detail fields', () => {
     expect(natural[0]).toBe('attackPreview')
     expect(natural[1]).toBe('buildAdvisories')
     expect(natural.indexOf('limitedUse')).toBeLessThan(natural.indexOf('damageType'))
-    expect(natural.indexOf('onHit.additionalDamage')).toBeLessThan(natural.indexOf('description'))
+    expect(natural.indexOf('onHit.effects')).toBeLessThan(natural.indexOf('description'))
     expect(natural.at(-1)).toBe('description')
     expect(attack[0]).toBe('attackPreview')
     expect(attack[1]).toBe('buildAdvisories')
@@ -337,7 +337,7 @@ describe('monster action detail fields', () => {
     expect(normalRange).toMatchObject({ required: true })
     expect(attack.indexOf('bonusSource.kind')).toBeLessThan(attack.indexOf('modes'))
     expect(attack.indexOf('modes')).toBeLessThan(attack.indexOf('damageType'))
-    expect(attack.indexOf('onHit.additionalDamage')).toBeLessThan(attack.indexOf('description'))
+    expect(attack.indexOf('onHit.effects')).toBeLessThan(attack.indexOf('description'))
     expect(attack.at(-1)).toBe('description')
 
     const weapon = detailFields({ id: 'sword', kind: 'weapon', equipmentEntryId: 'sword' })
@@ -349,7 +349,7 @@ describe('monster action detail fields', () => {
     expect(weapon.indexOf('attackPreview')).toBe(weapon.indexOf('equipmentEntryId') + 1)
     expect(weapon.indexOf('buildAdvisories')).toBe(weapon.indexOf('attackPreview') + 1)
     expect(weapon.indexOf('damage')).toBe(weapon.indexOf('buildAdvisories') + 1)
-    expect(weapon.indexOf('onHit.additionalDamage')).toBeLessThan(weapon.indexOf('description'))
+    expect(weapon.indexOf('onHit.effects')).toBeLessThan(weapon.indexOf('description'))
     expect(weapon.at(-1)).toBe('description')
     const spellNames = detailFields({ id: 'cast', kind: 'spell' })
     expect(spellNames).not.toContain('attackPreview')

@@ -43,13 +43,28 @@ function strict<T extends z.ZodType, M extends MonsterActionMode>(
 
 const attackModes = ['melee', 'ranged'] as const
 
-const draftDamagePartSchema = z.object({
-  roll: weaponDamageDraftSchema.optional(),
-  damageType: damageTypeIdSchema.optional(),
-})
+const draftEffectDescriptionSchema = z.string().optional()
+
+const attackOnHitDraftEffectSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('damage'),
+    roll: weaponDamageDraftSchema.optional(),
+    damageType: damageTypeIdSchema.optional(),
+    description: draftEffectDescriptionSchema,
+  }),
+  z.object({
+    kind: z.literal('condition'),
+    conditionId: z.string().optional(),
+    description: draftEffectDescriptionSchema,
+  }),
+  z.object({
+    kind: z.literal('note'),
+    description: draftEffectDescriptionSchema,
+  }),
+])
 
 const attackOnHitDraftSchema = z.object({
-  additionalDamage: z.array(draftDamagePartSchema).optional(),
+  effects: z.array(attackOnHitDraftEffectSchema).optional(),
 })
 
 const multiattackDraftStepSchema = z.object({

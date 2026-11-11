@@ -8,6 +8,7 @@ import type {
   MonsterReactionDraft,
 } from '../../content/monster'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
+import { resolveEquipmentMagicProperties } from '../../content/equipment/instance/resolve-equipment-magic-properties'
 import type { WeaponDamage } from '../../content/equipment/weapon-variant'
 import { type RollValue } from '../../primitives/mechanics/roll'
 import type { Ability } from '../../vocab/ability'
@@ -43,6 +44,35 @@ export type MonsterActionAttackRoll = {
   damageTypeId: string
 }
 
+export type MonsterActionOnHitSource = 'action' | 'magic-property'
+
+type ResolvedOnHitOwner = {
+  source: MonsterActionOnHitSource
+  propertyId?: string
+}
+
+export type ResolvedOnHitDamage = ResolvedOnHitOwner & {
+  kind: 'damage'
+  expression: string
+  average: number
+  damageTypeId: string
+  description?: string
+}
+
+export type ResolvedOnHitCondition = ResolvedOnHitOwner & {
+  kind: 'condition'
+  conditionId: string
+  description?: string
+}
+
+export type ResolvedOnHitNote = ResolvedOnHitOwner & {
+  kind: 'note'
+  description: string
+}
+
+/** Ordered on-hit presentation. Damage entries are the only numeric riders. */
+export type ResolvedOnHitEffect = ResolvedOnHitDamage | ResolvedOnHitCondition | ResolvedOnHitNote
+
 export type MonsterActionAttackUnresolvedCapability = {
   id: 'versatile'
   reason: DerivedFieldReason
@@ -65,7 +95,7 @@ export type MonsterActionAttackProfile = {
   reach?: number
   range?: { normal: number; long?: number }
   primary: MonsterActionAttackRoll
-  onHit: MonsterActionAttackRoll[]
+  onHit: ResolvedOnHitEffect[]
   /** Catalog weapon properties. Absent for authored attacks. */
   weaponProperties?: readonly string[]
   /**
@@ -103,23 +133,98 @@ function hasDamageRoll(value: unknown): value is RollValue {
   return diceOk || typeof roll.flat === 'number'
 }
 
-function onHitRolls(onHit: unknown): MonsterActionAttackRoll[] {
-  if (!onHit || typeof onHit !== 'object' || !('additionalDamage' in onHit)) return []
-  const list = (onHit as { additionalDamage?: unknown }).additionalDamage
-  if (!Array.isArray(list)) return []
-  return list.flatMap((part) => {
-    if (!part || typeof part !== 'object') return []
-    const row = part as { roll?: unknown; damageType?: unknown }
-    if (!hasDamageRoll(row.roll) || typeof row.damageType !== 'string') return []
-    const resolved = resolveStatBlockDamagePart(row.roll, 0)
-    return [
-      {
-        expression: resolved.expression,
-        average: resolved.average,
-        damageTypeId: row.damageType,
-      },
-    ]
+function effectList(onHit: unknown): unknown[] {
+  if (!onHit || typeof onHit !== 'object' || !('effects' in onHit)) return []
+  const list = (onHit as { effects?: unknown }).effects
+  return Array.isArray(list) ? list : []
+}
+
+function trimmedDescription(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed : undefined
+}
+
+type OnHitEffectRow = {
+  kind?: unknown
+  roll?: unknown
+  damageType?: unknown
+  conditionId?: unknown
+  description?: unknown
+}
+
+function onHitOwner(owner: ResolvedOnHitOwner): ResolvedOnHitOwner {
+  return owner.propertyId ? owner : { source: owner.source }
+}
+
+function resolveDamageOnHit(
+  row: OnHitEffectRow,
+  owner: ResolvedOnHitOwner,
+  description: string | undefined,
+): ResolvedOnHitDamage | undefined {
+  if (!hasDamageRoll(row.roll) || typeof row.damageType !== 'string') return undefined
+  const resolved = resolveStatBlockDamagePart(row.roll, 0)
+  return {
+    ...onHitOwner(owner),
+    kind: 'damage',
+    expression: resolved.expression,
+    average: resolved.average,
+    damageTypeId: row.damageType,
+    ...(description ? { description } : {}),
+  }
+}
+
+function resolveConditionOnHit(
+  row: OnHitEffectRow,
+  owner: ResolvedOnHitOwner,
+  description: string | undefined,
+): ResolvedOnHitCondition | undefined {
+  if (typeof row.conditionId !== 'string' || !row.conditionId) return undefined
+  return {
+    ...onHitOwner(owner),
+    kind: 'condition',
+    conditionId: row.conditionId,
+    ...(description ? { description } : {}),
+  }
+}
+
+function resolveOnHitEffect(
+  effect: unknown,
+  owner: ResolvedOnHitOwner,
+): ResolvedOnHitEffect | undefined {
+  if (!effect || typeof effect !== 'object' || !('kind' in effect)) return undefined
+  const row = effect as OnHitEffectRow
+  const description = trimmedDescription(row.description)
+  if (row.kind === 'damage') return resolveDamageOnHit(row, owner, description)
+  if (row.kind === 'condition') return resolveConditionOnHit(row, owner, description)
+  if (row.kind === 'note' && description) return { ...onHitOwner(owner), kind: 'note', description }
+  return undefined
+}
+
+function resolveOnHitEffects(
+  actionOnHit: unknown,
+  propertyEffects: readonly { effect: unknown; propertyId: string }[],
+): ResolvedOnHitEffect[] {
+  const actionEffects = effectList(actionOnHit).flatMap((effect) => {
+    const resolved = resolveOnHitEffect(effect, { source: 'action' })
+    return resolved ? [resolved] : []
   })
+  const fromProperties = propertyEffects.flatMap(({ effect, propertyId }) => {
+    const resolved = resolveOnHitEffect(effect, { source: 'magic-property', propertyId })
+    return resolved ? [resolved] : []
+  })
+  return [...actionEffects, ...fromProperties]
+}
+
+function propertyOnHitEffects(
+  entry: MonsterBody['equipment'][number],
+  item: Equipment,
+  provider: MagicPropertyDefinitionProvider,
+): { effect: unknown; propertyId: string }[] {
+  const magic = resolveEquipmentMagicProperties(entry, item, provider)
+  return magic.resolved.flatMap(({ definition }) =>
+    effectList(definition.onHit).map((effect) => ({ effect, propertyId: definition.id })),
+  )
 }
 
 // fallow-ignore-next-line complexity
@@ -229,7 +334,10 @@ function resolveWeaponProfile(
       ...(reach !== undefined ? { reach } : {}),
       ...(modes.includes('ranged') && catalogItem.range ? { range: catalogItem.range } : {}),
       primary,
-      onHit: onHitRolls(action.onHit),
+      onHit: resolveOnHitEffects(
+        action.onHit,
+        propertyOnHitEffects(entry, catalogItem, args.magicPropertyProvider),
+      ),
       weaponProperties: catalogItem.properties,
       unresolvedCapabilities: unresolvedWeaponCapabilities(catalogItem.properties),
     },
@@ -272,7 +380,7 @@ function resolveNaturalProfile(
         average: primary.average,
         damageTypeId: action.damageType ?? '',
       },
-      onHit: onHitRolls(action.onHit),
+      onHit: resolveOnHitEffects(action.onHit, []),
       unresolvedCapabilities: [],
     },
   }
@@ -356,7 +464,7 @@ function resolveAuthoredProfile(
         average: primary.average,
         damageTypeId: action.damageType ?? '',
       },
-      onHit: onHitRolls(action.onHit),
+      onHit: resolveOnHitEffects(action.onHit, []),
       unresolvedCapabilities: [],
     },
   }

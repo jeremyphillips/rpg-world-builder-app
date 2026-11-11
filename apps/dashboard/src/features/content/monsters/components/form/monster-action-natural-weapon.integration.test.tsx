@@ -36,7 +36,7 @@ const customizedBite: MonsterActionDraftRow = {
   description: '<p>Venom</p>',
   limitedUse: { kind: 'recharge', minRoll: 5 },
   onHit: {
-    additionalDamage: [{ damageType: 'poison', roll: { dice: { count: 1, faces: 6 } } }],
+    effects: [{ kind: 'damage', damageType: 'poison', roll: { dice: { count: 1, faces: 6 } } }],
   },
 }
 
@@ -208,11 +208,11 @@ describe('natural weapon action round trip', () => {
       damageType: 'fire',
       description: '<p>Venom</p>',
       onHit: {
-        additionalDamage: [{ damageType: 'poison', roll: { dice: { count: 1, faces: 6 } } }],
+        effects: [{ kind: 'damage', damageType: 'poison', roll: { dice: { count: 1, faces: 6 } } }],
       },
     })
     const onHitHint = screen.getByText(
-      'Additional damage dealt when this attack hits, beyond its primary damage.',
+      'Effects that apply when this attack hits, beyond its primary damage.',
     )
     const details = screen.getByRole('button', { name: 'Remove Additional details' })
     expect(
@@ -229,7 +229,7 @@ describe('natural weapon action round trip', () => {
       description: '<p>Venom</p>',
       damage: { dice: { count: 2, faces: 6 } },
       onHit: {
-        additionalDamage: [{ damageType: 'poison', roll: { dice: { count: 1, faces: 6 } } }],
+        effects: [{ kind: 'damage', damageType: 'poison', roll: { dice: { count: 1, faces: 6 } } }],
       },
     })
 
@@ -335,7 +335,7 @@ describe('natural weapon action round trip', () => {
     expect(screen.queryByRole('button', { name: 'Add additional details' })).toBeInTheDocument()
     expect(screen.getByText('Ability modifiers are applied automatically.')).toBeInTheDocument()
     expect(
-      screen.getByText('Additional damage dealt when this attack hits, beyond its primary damage.'),
+      screen.getByText('Effects that apply when this attack hits, beyond its primary damage.'),
     ).toBeInTheDocument()
     expect(screen.queryByText('Mode')).not.toBeInTheDocument()
     expect(screen.queryByText('Limit')).not.toBeInTheDocument()

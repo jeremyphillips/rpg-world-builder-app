@@ -1,5 +1,17 @@
-import type { DerivedMonsterAttackLine } from './stat-block'
+import { getEffectConditionLabel } from '../../vocab/effect-condition'
 import { formatStatBlockDamageComponent } from './format-stat-block-damage'
+import type { ResolvedOnHitEffect } from './resolve-monster-action-attack-profile'
+
+export type FormattableMonsterAttack = {
+  attackBonusLabel: string
+  damage: string
+  damageExpression?: string
+  damageTypeId: string
+  modes: Array<'melee' | 'ranged'>
+  reach?: number
+  range?: { normal: number; long?: number }
+  onHit?: ResolvedOnHitEffect[]
+}
 
 function attackPrefix(modes: readonly ('melee' | 'ranged')[]): string | undefined {
   const labels: string[] = []
@@ -14,7 +26,7 @@ function rangeDistance(range: { normal: number; long?: number }): string {
   return `range ${span} ft.`
 }
 
-function distanceClause(line: DerivedMonsterAttackLine): string | undefined {
+function distanceClause(line: FormattableMonsterAttack): string | undefined {
   const parts: string[] = []
   if (line.modes.includes('melee') && line.reach != null) parts.push(`reach ${line.reach} ft.`)
   if (line.modes.includes('ranged') && line.range) parts.push(rangeDistance(line.range))
@@ -22,8 +34,14 @@ function distanceClause(line: DerivedMonsterAttackLine): string | undefined {
   return parts.join(' or ')
 }
 
-function hitClause(line: DerivedMonsterAttackLine): string | undefined {
-  const parts = [
+function conditionClause(effect: Extract<ResolvedOnHitEffect, { kind: 'condition' }>): string {
+  const label = getEffectConditionLabel(effect.conditionId)
+  const qualification = effect.description ? ` ${effect.description}` : ''
+  return `the target has the ${label} condition${qualification}`
+}
+
+function hitClause(line: FormattableMonsterAttack): string | undefined {
+  const damageParts = [
     ...(line.damageExpression
       ? [
           formatStatBlockDamageComponent({
@@ -33,14 +51,24 @@ function hitClause(line: DerivedMonsterAttackLine): string | undefined {
           }),
         ]
       : []),
-    ...(line.additionalDamage ?? []).map((part) => formatStatBlockDamageComponent(part)),
+    ...(line.onHit ?? [])
+      .filter((effect) => effect.kind === 'damage')
+      .map((effect) => formatStatBlockDamageComponent(effect)),
   ]
-  if (parts.length === 0) return undefined
-  return `Hit: ${parts.join(' plus ')}`
+  const conditions = (line.onHit ?? [])
+    .filter((effect) => effect.kind === 'condition')
+    .map((effect) => conditionClause(effect))
+  const notes = (line.onHit ?? [])
+    .filter((effect) => effect.kind === 'note')
+    .map((effect) => effect.description)
+  const lead = [damageParts.join(' plus '), ...conditions].filter((part) => part.length > 0)
+  const body = [...(lead.length > 0 ? [lead.join(', and ')] : []), ...notes]
+  if (body.length === 0) return undefined
+  return `Hit: ${body.join('. ')}`
 }
 
-/** SRD attack sentence from a derived line. Does not resolve the attack. */
-export function formatMonsterAttackAction(line: DerivedMonsterAttackLine): string | undefined {
+/** SRD attack sentence from a resolved attack line. Does not resolve the attack. */
+export function formatMonsterAttackAction(line: FormattableMonsterAttack): string | undefined {
   const prefix = attackPrefix(line.modes)
   if (!prefix) return undefined
   const distance = distanceClause(line)
