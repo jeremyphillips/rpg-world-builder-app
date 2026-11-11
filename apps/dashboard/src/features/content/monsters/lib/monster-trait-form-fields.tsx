@@ -1,5 +1,8 @@
 import { formatCreatureTrait, formatMonsterStatBlockSubject } from '@rpg/contracts'
-import { savingThrowFieldGroup } from '../../lib/forms/mechanics/saving-throw-field-group'
+import {
+  SAVING_THROW_SPELLCASTING_HINT,
+  savingThrowFieldGroup,
+} from '../../lib/forms/mechanics/saving-throw-field-group'
 import { MonsterActionCastingAbilityField } from './actions/monster-action-casting-fields'
 import { RulesPreview } from '@rpg/ui'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
@@ -55,6 +58,7 @@ export function monsterTraitItemFields(input?: {
             name={castingName}
             sharedOptions={input?.sharedCastingOptions ?? []}
             required={false}
+            hint={SAVING_THROW_SPELLCASTING_HINT}
           />
         ),
       }),

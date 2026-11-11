@@ -65,6 +65,7 @@ export function MonsterActionCastingAbilityField({
   onBlocked,
   required = true,
   profile = 'shared',
+  hint: hintOverride,
 }: {
   name: string
   sharedOptions: readonly { value: string; label: string }[]
@@ -74,6 +75,8 @@ export function MonsterActionCastingAbilityField({
   required?: boolean
   /** Primary defines the ability other actions reuse. Shared may choose that ability or its own. */
   profile?: 'primary' | 'shared'
+  /** Overrides the primary/shared spellcasting hints (for example save DC derivation). */
+  hint?: string
 }) {
   const controlSize = useFieldControlSize()
   const { getValues, setValue, formState } = useFormContext<MonsterFormValues>()
@@ -82,9 +85,10 @@ export function MonsterActionCastingAbilityField({
   const fieldId = `${name.replaceAll('.', '-')}-casting-ability`
   const error = resolveFieldErrorMessage(resolveNestedFieldErrorMessage(formState.errors, name))
   const hint =
-    profile === 'primary'
+    hintOverride ??
+    (profile === 'primary'
       ? MONSTER_SPELLCASTING_ABILITY_PRIMARY_HINT
-      : MONSTER_SPELLCASTING_ABILITY_SHARED_HINT
+      : MONSTER_SPELLCASTING_ABILITY_SHARED_HINT)
 
   return (
     <SelectField

@@ -29,12 +29,14 @@ import {
   MONSTER_DAMAGE_TYPE_CHANGE_LABEL,
   MONSTER_ACTION_REACH_FIELD_LABEL,
   MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
+  MONSTER_SAVE_ABILITY_HINT,
   MONSTER_SAVE_ABILITY_LABEL,
   MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL,
   MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL,
   MONSTER_SAVE_DC_ABILITY_LABEL,
   MONSTER_SAVE_DC_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
+  MONSTER_SPELLCASTING_ABILITY_SAVE_DC_HINT,
   MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
   MONSTER_SAVE_THROW_SECTION_LEGEND,
   MONSTER_TRIGGER_LABEL,
@@ -57,10 +59,7 @@ import {
   monsterActionOnHitFields,
   spellComponentField,
 } from './monster-action-on-hit-fields'
-import {
-  monsterSaveAbilityHintWhen,
-  monsterSaveDcAbilityHintWhen,
-} from './monster-action-save-field-hints'
+import { monsterSaveDcAbilityHintWhen } from './monster-action-save-field-hints'
 import { monsterWeaponDamageOverrideField } from './monster-weapon-damage-override'
 import type { MonsterFormValues } from '../monster-form-values'
 import {
@@ -170,6 +169,7 @@ function monsterAbilitySourceDependent(input: {
   sharedCastingOptions: { value: string; label: string }[]
   dependentsChrome?: 'none'
   required?: MonsterAbilitySourceRequiredMarks
+  spellcastingHint?: string
 }): FormItem {
   const kindName = `${input.sourcePath}.kind`
   const abilityBranch = whenFieldEquals(kindName, 'ability')
@@ -201,6 +201,7 @@ function monsterAbilitySourceDependent(input: {
               name={`${input.namePrefix}.${input.sourcePath}.castingAbility`}
               sharedOptions={input.sharedCastingOptions}
               required={input.required?.castingAbility}
+              hint={input.spellcastingHint}
             />
           ),
         },
@@ -247,6 +248,7 @@ function monsterActionSaveDcDependent(
     controllerLabel: MONSTER_SAVE_DC_LABEL,
     sharedCastingOptions,
     dependentsChrome: 'none',
+    spellcastingHint: MONSTER_SPELLCASTING_ABILITY_SAVE_DC_HINT,
     abilityFields: [
       {
         kind: 'row',
@@ -353,12 +355,7 @@ function monsterActionSaveSection(
         name: 'resolution.method.ability',
         label: MONSTER_SAVE_ABILITY_LABEL,
         options: abilityOptions(),
-        hint: {
-          resolve: {
-            dependsOn: ['resolution.method.ability'],
-            hintWhen: monsterSaveAbilityHintWhen,
-          },
-        },
+        hint: MONSTER_SAVE_ABILITY_HINT,
       },
       monsterActionSaveDcDependent(namePrefix, sharedCastingOptions),
       monsterActionSaveSelectionDependent(),
@@ -600,6 +597,7 @@ function monsterActionMechanicFields(input: {
                 name={`${namePrefix}.savingThrow.dcSource.castingAbility`}
                 sharedOptions={sharedCastingOptions}
                 required={false}
+                hint={MONSTER_SPELLCASTING_ABILITY_SAVE_DC_HINT}
               />
             ),
           }),

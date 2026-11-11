@@ -36,7 +36,7 @@ export function monsterActionResolverFields(ctx: ContentFormCtx): FormItem[] {
     choice('bonusSource.kind', 'Attack bonus'),
     choice('bonusSource.ability', 'Ability'),
     choice('bonusSource.castingAbility', SPELLCASTING_ABILITY),
-    choice('dcSource.kind', 'Save DC'),
+    choice('dcSource.kind', 'DC source'),
     choice('dcSource.ability', 'DC ability'),
     choice('dcSource.castingAbility', SPELLCASTING_ABILITY),
     { type: 'chips', name: 'modes', label: 'Modes', options: [] },
