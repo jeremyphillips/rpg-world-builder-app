@@ -1,4 +1,5 @@
 import {
+  isPrimarySpellcastingAction,
   monsterActionDraftSchema,
   monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
@@ -54,6 +55,19 @@ export function actionMoveDropsTrigger(
     to !== 'reactions' &&
     monsterActionTriggerText('trigger' in action ? action.trigger : undefined) !== undefined
   )
+}
+
+/** Whether Move to may place this row in `to`. Primary Spellcasting stays in Actions. */
+export function monsterActionSectionMoveAllowed(
+  action: { kind?: string; profile?: string },
+  from: MonsterActionSection,
+  to: MonsterActionSection,
+): boolean {
+  if (from === to) return false
+  if (from === 'legendaryActions' || to === 'legendaryActions') return false
+  if (action.kind === 'multiattack' && to !== 'actions') return false
+  if (isPrimarySpellcastingAction(action) && to !== 'actions') return false
+  return true
 }
 
 export function actionAfterSectionMove(

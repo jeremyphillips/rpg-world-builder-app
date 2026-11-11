@@ -14,7 +14,11 @@ import {
 } from '../lib/actions/monster-action-acquisition'
 import { createLegendaryActionDraft } from '../lib/actions/monster-legendary-action-acquisition'
 import { monsterCastingDependentLabels } from '../lib/actions/monster-action-casting-summary'
-import { actionAfterSectionMove, actionMoveDropsTrigger } from '../lib/actions/monster-action-kind'
+import {
+  actionAfterSectionMove,
+  actionMoveDropsTrigger,
+  monsterActionSectionMoveAllowed,
+} from '../lib/actions/monster-action-kind'
 import {
   multiattacksReferencingAction,
   stripMultiattackActionId,
@@ -414,9 +418,7 @@ export function useMonsterActionSections(entityId?: string) {
   const requestMove = useCallback(
     (to: MonsterActionSection) => {
       const located = locate(selectedActionId)
-      if (!located || located.section === to) return
-      if (located.section === 'legendaryActions' || to === 'legendaryActions') return
-      if (located.action.kind === 'multiattack' && to !== 'actions') return
+      if (!located || !monsterActionSectionMoveAllowed(located.action, located.section, to)) return
       const referenceRows = [
         ...rowsOf(getValues(), 'actions'),
         ...rowsOf(getValues(), 'legendaryActions'),

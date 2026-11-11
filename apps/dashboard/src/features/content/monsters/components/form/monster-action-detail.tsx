@@ -11,6 +11,7 @@ import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-s
 import { isLegendaryReferenceTarget } from '../../lib/actions/legendary-action-category'
 import { legendarySourceSpellOptions } from '../../lib/actions/monster-legendary-action-acquisition'
 import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
+import { monsterActionSectionMoveAllowed } from '../../lib/actions/monster-action-kind'
 import {
   monsterActionHeaderName,
   monsterActionEditorTitles,
@@ -20,6 +21,22 @@ import {
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
 import { MONSTER_MOVE_TO_LABEL } from '../../lib/monster-form-labels'
+
+function moveOverflowActions(
+  located: { section: MonsterActionSection; action: MonsterActionDraftRow } | null | undefined,
+  requestMove: (section: MonsterActionSection) => void,
+) {
+  if (!located) return undefined
+  const items = MONSTER_ACTION_SECTIONS.filter((section) =>
+    monsterActionSectionMoveAllowed(located.action, located.section, section),
+  ).map((section) => ({
+    id: `move-${section}`,
+    label: monsterActionSectionHeading(section),
+    onSelect: () => requestMove(section),
+  }))
+  if (items.length === 0) return undefined
+  return [{ id: 'move-to', label: MONSTER_MOVE_TO_LABEL, items }]
+}
 import { MonsterSpellPickerHost } from './monster-spell-picker-host'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import { monsterActionSectionHeading } from '../../lib/actions/monster-action-presets'
@@ -163,14 +180,18 @@ export function MonsterActionDetail({
               rowKey: editor.selectedFieldId ?? action.id,
               meta: rows.selectedIdentity?.meta,
               ...(headerName.sourceName ? { sourceName: headerName.sourceName } : {}),
-              inlineTitle: {
-                field: 'name',
-                fallback: headerName.fallback,
-                placeholder: headerName.placeholder,
-                mode: headerName.mode,
-                initialEdit,
-                ...(headerName.resetLabel ? { resetLabel: headerName.resetLabel } : {}),
-              },
+              ...(headerName.editable === false
+                ? {}
+                : {
+                    inlineTitle: {
+                      field: 'name' as const,
+                      fallback: headerName.fallback,
+                      placeholder: headerName.placeholder,
+                      mode: headerName.mode,
+                      initialEdit,
+                      ...(headerName.resetLabel ? { resetLabel: headerName.resetLabel } : {}),
+                    },
+                  }),
               deletable: rows.selectedIdentity?.deletable,
               availability: rows.selectedIdentity?.availability,
               onAvailabilityChange: rows.selectedIdentity?.onAvailabilityChange,
@@ -185,26 +206,7 @@ export function MonsterActionDetail({
       availabilityDialogRef={rows.availabilityDialogRef}
       onDelete={located ? () => sections.requestDelete(located.action.id) : undefined}
       onDuplicate={located ? sections.duplicateSelected : undefined}
-      overflowActions={
-        located && located.section !== 'legendaryActions'
-          ? [
-              {
-                id: 'move-to',
-                label: MONSTER_MOVE_TO_LABEL,
-                items: MONSTER_ACTION_SECTIONS.filter(
-                  (section) =>
-                    section !== located.section &&
-                    section !== 'legendaryActions' &&
-                    !(located.action.kind === 'multiattack' && section !== 'actions'),
-                ).map((section) => ({
-                  id: `move-${section}`,
-                  label: monsterActionSectionHeading(section),
-                  onSelect: () => sections.requestMove(section),
-                })),
-              },
-            ]
-          : undefined
-      }
+      overflowActions={moveOverflowActions(located, sections.requestMove)}
       detailLeading={
         sections.notice ? (
           <div id={action ? `monster-action-focus-${action.id}` : undefined} tabIndex={-1}>

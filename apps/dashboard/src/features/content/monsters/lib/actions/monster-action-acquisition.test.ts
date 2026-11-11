@@ -122,41 +122,28 @@ function spellDraft(
 }
 
 describe('createSpellActionDraft', () => {
-  it('names the first Actions spell row and leaves bonus and reaction rows unnamed', () => {
+  it('creates the primary profile only from Actions', () => {
     expect(spellDraft('actions', {})).toMatchObject({
       kind: 'spell',
+      profile: 'primary',
       name: 'Spellcasting',
       spells: [],
     })
-    expect(spellDraft('actions', {}).castingAbility).toBeUndefined()
+    expect(spellDraft('bonusActions', {}).profile).toBeUndefined()
     expect(spellDraft('bonusActions', {}).name).toBeUndefined()
     expect(spellDraft('reactions', {}).name).toBeUndefined()
   })
 
-  it('does not name a second Spellcasting row and shares the one conventional source', () => {
+  it('shares the primary profile and does not share a standalone spell', () => {
     const sections = {
       actions: [
         {
           id: 'spellcasting',
           kind: 'spell',
+          profile: 'primary',
           name: 'Spellcasting',
           castingAbility: { kind: 'ability', ability: 'int' },
         },
-      ],
-    }
-    expect(spellDraft('actions', sections)).toMatchObject({
-      castingAbility: { kind: 'shared', entryId: 'spellcasting' },
-    })
-    expect(spellDraft('actions', sections).name).toBeUndefined()
-    expect(spellDraft('bonusActions', sections).castingAbility).toEqual({
-      kind: 'shared',
-      entryId: 'spellcasting',
-    })
-  })
-
-  it('does not share a standalone source or an unfinished Spellcasting row', () => {
-    const standalone = {
-      actions: [
         {
           id: 'invisibility',
           kind: 'spell',
@@ -165,35 +152,43 @@ describe('createSpellActionDraft', () => {
         },
       ],
     }
-    const unfinished = {
-      actions: [{ id: 'spellcasting', kind: 'spell', name: 'Spellcasting', spells: [] }],
-    }
-    expect(spellDraft('actions', standalone).name).toBe('Spellcasting')
-    expect(spellDraft('actions', standalone).castingAbility).toBeUndefined()
-    expect(spellDraft('bonusActions', unfinished).name).toBeUndefined()
-    expect(spellDraft('bonusActions', unfinished).castingAbility).toBeUndefined()
-    expect(spellDraft('actions', unfinished).name).toBeUndefined()
+    expect(spellDraft('bonusActions', sections).castingAbility).toEqual({
+      kind: 'shared',
+      entryId: 'spellcasting',
+    })
+    expect(
+      spellDraft('reactions', { actions: [sections.actions[1]] }).castingAbility,
+    ).toBeUndefined()
   })
+})
 
-  it('leaves the ability unset when several conventional sources exist', () => {
-    const sections = {
-      actions: [
-        {
-          id: 'one',
-          kind: 'spell',
-          name: 'Spellcasting',
-          castingAbility: { kind: 'ability', ability: 'int' },
-        },
-      ],
-      bonusActions: [
-        {
-          id: 'two',
-          kind: 'spell',
-          name: 'Spellcasting',
-          castingAbility: { kind: 'ability', ability: 'wis' },
-        },
-      ],
-    }
-    expect(spellDraft('reactions', sections).castingAbility).toBeUndefined()
+describe('primary Spellcasting acquisition', () => {
+  it('offers Spellcasting only in Actions and disables a second profile', () => {
+    const actions = monsterActionAcquisitionItems({
+      weapons: [],
+      allowAddWeapon: true,
+      section: 'actions',
+    })
+    expect(actions.find((item) => item.id === 'create:spell')?.disabled).toBeUndefined()
+    expect(actions.find((item) => item.id === 'create:spell-standalone')).toBeUndefined()
+
+    const taken = monsterActionAcquisitionItems({
+      weapons: [],
+      allowAddWeapon: true,
+      section: 'actions',
+      primarySpellcasting: true,
+    })
+    expect(taken.find((item) => item.id === 'create:spell')).toMatchObject({
+      disabled: true,
+      note: 'Only one Spellcasting profile is allowed.',
+    })
+
+    const bonus = monsterActionAcquisitionItems({
+      weapons: [],
+      allowAddWeapon: true,
+      section: 'bonusActions',
+    })
+    expect(bonus.find((item) => item.id === 'create:spell')).toBeUndefined()
+    expect(bonus.find((item) => item.id === 'create:spell-standalone')?.label).toBe('Cast a spell')
   })
 })

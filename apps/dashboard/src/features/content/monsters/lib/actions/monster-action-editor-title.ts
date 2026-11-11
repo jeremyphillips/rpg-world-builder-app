@@ -1,5 +1,6 @@
 import {
   getMonsterActionKindLabel,
+  isPrimarySpellcastingAction,
   MONSTER_ACTION_UNRESOLVED_REFERENCE,
   MONSTER_SPELLCASTING_ACTION_NAME,
   monsterActionAuthoring,
@@ -37,6 +38,8 @@ export interface MonsterActionHeaderName {
   fallback: string
   placeholder: string
   mode: 'authored' | 'override'
+  /** Primary Spellcasting renders the canonical name with no editor. */
+  editable?: boolean
   resetLabel?: string
   sourceName?: string
 }
@@ -141,6 +144,15 @@ export function monsterActionHeaderName(input: {
   ctx: ContentFormCtx
   section?: MonsterActionSection
 }): MonsterActionHeaderName {
+  if (isPrimarySpellcastingAction(input.action)) {
+    return {
+      title: MONSTER_SPELLCASTING_ACTION_NAME,
+      fallback: MONSTER_SPELLCASTING_ACTION_NAME,
+      placeholder: MONSTER_SPELLCASTING_ACTION_NAME,
+      mode: 'authored',
+      editable: false,
+    }
+  }
   const identity = resolveMonsterFormActionIdentity(input.action, input.values, input.ctx)
   const titles = monsterActionEditorTitles(
     input.sectionRows,

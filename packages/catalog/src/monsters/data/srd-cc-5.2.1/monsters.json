@@ -424,6 +424,7 @@
       {
         "id": "spellcasting",
         "kind": "spell",
+        "profile": "primary",
         "name": "Spellcasting",
         "castingAbility": { "kind": "ability", "ability": "int" },
         "spells": [
@@ -754,6 +755,7 @@
       {
         "id": "spellcasting",
         "kind": "spell",
+        "profile": "primary",
         "name": "Spellcasting",
         "castingAbility": { "kind": "ability", "ability": "int" },
         "spells": [

@@ -13,6 +13,7 @@ import {
   monsterActionActiveKeys,
   actionMoveDropsTrigger,
   actionAfterSectionMove,
+  monsterActionSectionMoveAllowed,
 } from './monster-action-kind'
 import { monsterActionDetailFields } from './monster-action-detail-fields'
 import { monsterActionOnHitFields } from './monster-action-on-hit-fields'
@@ -487,6 +488,16 @@ describe('monster action section moves', () => {
       name: 'Parry',
     })
     expect(action.id).toBe('parry')
+    const profile = { id: 'spellcasting', kind: 'spell', profile: 'primary' }
+    expect(monsterActionSectionMoveAllowed(profile, 'actions', 'bonusActions')).toBe(false)
+    expect(monsterActionSectionMoveAllowed(profile, 'actions', 'reactions')).toBe(false)
+    expect(
+      monsterActionSectionMoveAllowed(
+        { id: 'shield', kind: 'spell', name: 'Shield' },
+        'bonusActions',
+        'actions',
+      ),
+    ).toBe(true)
   })
 
   it('derives active keys from the draft schema', () => {

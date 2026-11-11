@@ -896,6 +896,7 @@ describe('monster spellcasting lines', () => {
         {
           id: 'spellcasting',
           kind: 'spell',
+          profile: 'primary',
           name: 'Spellcasting',
           castingAbility: { kind: 'ability', ability: 'int' },
           spells: [{ spellId: `${RULESET}:mage-hand` }],

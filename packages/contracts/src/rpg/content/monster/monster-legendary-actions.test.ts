@@ -12,6 +12,7 @@ import { BITE_ACTION, MONSTER_TEST_INPUT, issueMessages } from './test-fixtures'
 const spellcastingAction = {
   id: 'spellcasting',
   kind: 'spell' as const,
+  profile: 'primary' as const,
   name: 'Spellcasting',
   castingAbility: { kind: 'ability' as const, ability: 'cha' as const },
   spells: [{ spellId: 'srd-cc-5.2.1:scorching-ray', castAtLevel: 3 }],

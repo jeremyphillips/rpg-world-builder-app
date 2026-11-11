@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import {
+  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
+  PRIMARY_SPELLCASTING_SECTION_MESSAGE,
+} from './spell-casting-source'
 import { createMonsterDraftInputSchema, createMonsterInputSchema } from '../monster'
 import { MONSTER_TEST_BODY } from './test-fixtures'
 
@@ -7,6 +11,7 @@ describe('monster spell entries', () => {
   const spellcasting = {
     id: 'spellcasting',
     kind: 'spell' as const,
+    profile: 'primary' as const,
     name: 'Spellcasting',
     castingAbility: { kind: 'ability' as const, ability: 'int' as const },
     spells: [{ spellId: 'srd-cc-5.2.1:mage-hand' }],
@@ -19,7 +24,9 @@ describe('monster spell entries', () => {
         ...MONSTER_TEST_BODY,
         actions: [spellcasting],
         bonusActions: [{ id: 'note', kind: 'special', name: 'Note', description: '<p>n</p>' }],
-        reactions: [{ ...spellcasting, id: 'react-spell', name: 'Protective Magic' }],
+        reactions: [
+          { ...spellcasting, id: 'react-spell', name: 'Protective Magic', profile: undefined },
+        ],
       }).success,
     ).toBe(true)
   })
@@ -58,18 +65,19 @@ describe('monster spell entries', () => {
   })
 
   it('rejects duplicate direct casting names when published and allows them on drafts', () => {
-    const second = { ...spellcasting, id: 'other-spellcasting' }
+    const second = { ...spellcasting, id: 'other-spellcasting', profile: undefined, name: 'Innate' }
+    const namedAgain = { ...second, id: 'innate-again' }
     expect(
       createMonsterDraftInputSchema.safeParse({
         slug: 'draft-dup-name',
         ...MONSTER_TEST_BODY,
-        actions: [spellcasting, second],
+        actions: [spellcasting, second, namedAgain],
       }).success,
     ).toBe(true)
     const published = createMonsterInputSchema.safeParse({
       slug: 'dup-name',
       ...MONSTER_TEST_BODY,
-      actions: [spellcasting, second],
+      actions: [spellcasting, second, namedAgain],
     })
     expect(published.success).toBe(false)
     if (!published.success) {
@@ -154,5 +162,48 @@ describe('monster spell entries', () => {
         ],
       }).success,
     ).toBe(false)
+  })
+
+  it('allows one primary Spellcasting profile and only in Actions', () => {
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'primary',
+        ...MONSTER_TEST_BODY,
+        actions: [spellcasting],
+        bonusActions: [
+          {
+            id: 'shield',
+            kind: 'spell',
+            name: 'Shield',
+            castingAbility: { kind: 'shared', entryId: 'spellcasting' },
+            spells: [{ spellId: 'srd-cc-5.2.1:shield' }],
+          },
+        ],
+      }).success,
+    ).toBe(true)
+    const duplicate = createMonsterInputSchema.safeParse({
+      slug: 'two',
+      ...MONSTER_TEST_BODY,
+      actions: [spellcasting, { ...spellcasting, id: 'again' }],
+    })
+    expect(duplicate.success).toBe(false)
+    if (!duplicate.success) {
+      expect(
+        duplicate.error.issues.some(
+          (issue) => issue.message === PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
+        ),
+      ).toBe(true)
+    }
+    const moved = createMonsterInputSchema.safeParse({
+      slug: 'bonus',
+      ...MONSTER_TEST_BODY,
+      bonusActions: [spellcasting],
+    })
+    expect(moved.success).toBe(false)
+    if (!moved.success) {
+      expect(
+        moved.error.issues.some((issue) => issue.message === PRIMARY_SPELLCASTING_SECTION_MESSAGE),
+      ).toBe(true)
+    }
   })
 })

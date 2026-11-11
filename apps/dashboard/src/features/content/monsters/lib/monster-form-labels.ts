@@ -223,6 +223,8 @@ export const MONSTER_RECHARGE_ADD_LABEL = 'Add recharge'
 export const MONSTER_ACQUISITION_SAVE_DESCRIPTION = 'Saving throw effect'
 export const MONSTER_ACQUISITION_ATTACK_DESCRIPTION = 'Custom attack'
 export const MONSTER_ACQUISITION_SPELL_DESCRIPTION = 'Cast spells'
+export const MONSTER_PRIMARY_SPELLCASTING_NOTE = 'Only one Spellcasting profile is allowed.'
+export const MONSTER_CAST_SPELL_LABEL = 'Cast a spell'
 export const MONSTER_ACQUISITION_SPECIAL_DESCRIPTION = 'Custom rules or effects'
 export const MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION =
   'Combine multiple attacks into one action'

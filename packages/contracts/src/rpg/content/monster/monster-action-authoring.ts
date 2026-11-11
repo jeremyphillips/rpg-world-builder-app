@@ -12,6 +12,7 @@ export type MonsterActionAuthoring = {
 type AuthoringSubject = {
   kind: string
   preset?: string
+  profile?: string
 }
 
 const AUTHORED_NAME: MonsterActionAuthoring = {
@@ -36,6 +37,9 @@ export function monsterActionAuthoring(action: AuthoringSubject): MonsterActionA
   }
   if (action.kind === 'special') {
     return { name: 'authored', description: 'authored', source: 'none' }
+  }
+  if (action.kind === 'spell' && action.profile === 'primary') {
+    return { name: 'derived', description: 'generated', source: 'none' }
   }
   if (action.kind === 'attack' || action.kind === 'spell' || action.kind === 'action-reference') {
     return AUTHORED_NAME

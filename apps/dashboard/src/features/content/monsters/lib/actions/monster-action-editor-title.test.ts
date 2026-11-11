@@ -71,4 +71,24 @@ describe('monsterActionEditorTitles', () => {
     expect(titles(rows).get('breath')).toBe('Fire Breath')
     expect(titles(rows).get('blank')).toBe('Saving Throw')
   })
+
+  it('keeps the primary Spellcasting name immutable', () => {
+    const action = {
+      id: 'spellcasting',
+      kind: 'spell',
+      profile: 'primary',
+      name: 'Spellcasting',
+    } as MonsterActionDraftRow
+    expect(
+      monsterActionHeaderName({
+        action,
+        sectionRows: [action],
+        values: { actions: [action] } as MonsterFormValues,
+        ctx,
+      }),
+    ).toMatchObject({
+      title: 'Spellcasting',
+      editable: false,
+    })
+  })
 })

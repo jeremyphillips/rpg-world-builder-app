@@ -26,6 +26,7 @@ import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
+import { primarySpellcastingProfile } from '../../lib/actions/monster-action-casting-summary'
 import { monsterActionEditorTitles } from '../../lib/actions/monster-action-editor-title'
 import { legendaryActionCategory } from '../../lib/actions/legendary-action-category'
 import {
@@ -117,6 +118,7 @@ function MonsterActionAddMenu({
           weaponActions,
           allowAddWeapon,
           section,
+          primarySpellcasting: primarySpellcastingProfile(values) != null,
         })
   const groups =
     section === 'legendaryActions'

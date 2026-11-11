@@ -125,6 +125,7 @@ describe('rules text or saving throw', () => {
         {
           id: 'cast',
           kind: 'spell',
+          profile: 'primary',
           name: 'Spellcasting',
           castingAbility: { kind: 'ability', ability: 'int' },
           spells: [{ spellId: MONSTER_FIXTURE_SPELLS.fireball.id }],

@@ -6,18 +6,18 @@ import {
   getDamageTypeLabel,
   listSpecialMenuActionPresetIds,
   MONSTER_SPELLCASTING_ACTION_NAME,
+  PRIMARY_SPELLCASTING_PROFILE,
   type ActionPresetId,
 } from '@rpg/contracts'
-import {
-  conventionalSpellcastingSources,
-  spellcastingNameTaken,
-} from './monster-action-casting-summary'
+import { conventionalSpellcastingSources } from './monster-action-casting-summary'
 import type { MonsterActionSection } from './monster-action-equipment-references'
 
 import {
   MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_DESCRIPTION,
+  MONSTER_CAST_SPELL_LABEL,
+  MONSTER_PRIMARY_SPELLCASTING_NOTE,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
   monsterAddWeaponShortcut,
 } from '../monster-form-labels'
@@ -71,6 +71,12 @@ const OTHER_ITEMS: readonly MonsterActionAcquisitionItem[] = [
     metadata: MONSTER_ACQUISITION_SPELL_DESCRIPTION,
   },
   {
+    id: 'create:spell-standalone',
+    label: MONSTER_CAST_SPELL_LABEL,
+    groupId: 'other',
+    metadata: MONSTER_ACQUISITION_SPELL_DESCRIPTION,
+  },
+  {
     id: 'create:special',
     label: 'Custom ability',
     groupId: 'other',
@@ -91,6 +97,7 @@ const EXACT_ACQUISITION_CHOICES: Record<string, MonsterActionAcquisitionChoice> 
   'add-weapon': { type: 'add-weapon' },
   'create:attack': { type: 'create', kind: 'attack' },
   'create:spell': { type: 'create', kind: 'spell' },
+  'create:spell-standalone': { type: 'create', kind: 'spell' },
   'create:special': { type: 'create', kind: 'special' },
   'natural:other': { type: 'other-natural' },
 }
@@ -138,6 +145,8 @@ export function monsterActionAcquisitionItems(input: {
   /** Weapon actions in section order. The first match is the row Already added opens. */
   weaponActions?: readonly { id: string; equipmentEntryId?: string }[]
   section?: MonsterActionSection
+  /** True when the monster already has its Actions Spellcasting profile. */
+  primarySpellcasting?: boolean
 }): MonsterActionAcquisitionItem[] {
   const equipped = input.weapons.map((weapon) => {
     const existing = input.weaponActions?.find(
@@ -214,7 +223,32 @@ export function monsterActionAcquisitionItems(input: {
       groupId: 'natural',
     },
     ...special,
-    ...OTHER_ITEMS,
+    ...generalAcquisitionItems(input.section, input.primarySpellcasting === true),
+  ]
+}
+
+function generalAcquisitionItems(
+  section: MonsterActionSection | undefined,
+  primarySpellcasting: boolean,
+): MonsterActionAcquisitionItem[] {
+  const standalone = OTHER_ITEMS.filter((item) => item.id === 'create:spell-standalone')
+  const rest = OTHER_ITEMS.filter(
+    (item) => item.id !== 'create:spell' && item.id !== 'create:spell-standalone',
+  )
+  const spellcasting = OTHER_ITEMS.find((item) => item.id === 'create:spell')
+  if (section === 'bonusActions' || section === 'reactions') return [...rest, ...standalone]
+  return [
+    ...rest,
+    ...(spellcasting
+      ? [
+          {
+            ...spellcasting,
+            ...(primarySpellcasting
+              ? { disabled: true, note: MONSTER_PRIMARY_SPELLCASTING_NOTE }
+              : {}),
+          },
+        ]
+      : []),
   ]
 }
 
@@ -296,11 +330,16 @@ export function createSpellActionDraft(
   },
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()
+  if (section === 'actions') {
+    return {
+      id,
+      kind: 'spell',
+      profile: PRIMARY_SPELLCASTING_PROFILE,
+      name: MONSTER_SPELLCASTING_ACTION_NAME,
+      spells: [],
+    } as MonsterActionDraftRow
+  }
   const conventional = conventionalSpellcastingSources(sections)
-  const name =
-    section === 'actions' && !spellcastingNameTaken(sections)
-      ? MONSTER_SPELLCASTING_ACTION_NAME
-      : undefined
   const castingAbility =
     conventional.length === 1
       ? { kind: 'shared' as const, entryId: conventional[0]!.id }
@@ -309,9 +348,8 @@ export function createSpellActionDraft(
     id,
     kind: 'spell',
     spells: [],
-    ...(name ? { name } : {}),
     ...(castingAbility ? { castingAbility } : {}),
-  }
+  } as MonsterActionDraftRow
 }
 
 /** Equipped catalog row and the weapon action that points at it. One commit, no orphan. */

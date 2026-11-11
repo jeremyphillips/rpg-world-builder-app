@@ -112,6 +112,7 @@ export const PROFICIENCY_BONUS_ACTION = {
 export const SPELLCASTING_ACTION = {
   id: 'spellcasting',
   kind: 'spell' as const,
+  profile: 'primary' as const,
   name: 'Spellcasting',
   castingAbility: { kind: 'ability' as const, ability: 'int' as const },
   omittedComponents: ['material' as const],

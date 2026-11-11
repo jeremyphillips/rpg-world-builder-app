@@ -1,8 +1,9 @@
 import {
   getAbilityLabel,
   getContentTypeSentenceForm,
+  isPrimarySpellcastingAction,
   listDirectSpellCastingSources,
-  MONSTER_SPELLCASTING_ACTION_NAME,
+  PRIMARY_SPELLCASTING_PROFILE,
   resolveMonsterActionIdentity,
   type Ability,
   type MonsterActionDraft,
@@ -156,18 +157,18 @@ function rowUsesCastingSource(row: CastingRow, sourceId: string): boolean {
 
 export function conventionalSpellcastingSources(sections: FormCastingSections) {
   return listDirectSpellCastingSources(asSpellCastingSections(sections)).filter(
-    (source) => source.name?.trim() === MONSTER_SPELLCASTING_ACTION_NAME,
+    (source) => source.profile === PRIMARY_SPELLCASTING_PROFILE,
   )
 }
 
-export function spellcastingNameTaken(sections: FormCastingSections): boolean {
+export function primarySpellcastingProfile(sections: FormCastingSections) {
   const resolved = asSpellCastingSections(sections)
   for (const section of ['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const) {
     for (const row of resolved[section] ?? []) {
-      if (row.kind === 'spell' && row.name?.trim() === MONSTER_SPELLCASTING_ACTION_NAME) return true
+      if (isPrimarySpellcastingAction(row)) return row
     }
   }
-  return false
+  return undefined
 }
 
 function spellCountFor(sections: FormCastingSections, entryId: string): number {

@@ -27,7 +27,16 @@ import {
 import { monsterActionAuthoring } from './monster-action-authoring'
 import { naturalAttackFormSchema } from '../../vocab/action/natural-attack-form'
 import { spellReferenceSchema } from '../spell/spell-reference'
-import { findSpellCastingSource, listDirectSpellCastingSources } from './spell-casting-source'
+import {
+  findSpellCastingSource,
+  isPrimarySpellcastingAction,
+  listDirectSpellCastingSources,
+  MONSTER_SPELLCASTING_ACTION_NAME,
+  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
+  PRIMARY_SPELLCASTING_NAME_MESSAGE,
+  PRIMARY_SPELLCASTING_PROFILE,
+  PRIMARY_SPELLCASTING_SECTION_MESSAGE,
+} from './spell-casting-source'
 import {
   weaponDamageDraftSchema,
   weaponDamageSchema,
@@ -232,6 +241,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       ...identity,
       kind: z.literal('spell'),
       name: strict(z.string().min(1), mode),
+      profile: z.literal(PRIMARY_SPELLCASTING_PROFILE).optional(),
       castingAbility: strict(castingAbilitySchema, mode),
       spellInvocation: z.literal('use-entry').optional(),
       omittedComponents: z.array(spellComponentIdSchema).optional(),
@@ -340,6 +350,7 @@ type SpellEntryLike = {
   id: string
   kind: string
   name?: string
+  profile?: string
   limitedUse?: unknown
   castingAbility?: { kind: string; entryId?: string; ability?: string }
   spellInvocation?: string
@@ -375,7 +386,87 @@ export function refineMonsterSpellEntries(
     refineOneSpellEntry(locatedEntry, spellsById, ctx, prefix, options?.published === true)
     if (options?.published) refineNestedSpellSource(locatedEntry, sections, ctx, prefix)
   }
+  refinePrimarySpellcastingProfiles(sections, ctx, prefix, options?.published === true)
   if (options?.published) refineUniqueDirectCastingNames(sections, ctx, prefix)
+}
+
+type LocatedSpell = { section: string; index: number; action: SpellEntryLike }
+
+function spellRows(sections: {
+  actions?: readonly SpellEntryLike[]
+  bonusActions?: readonly SpellEntryLike[]
+  reactions?: readonly SpellEntryLike[]
+  legendaryActions?: readonly SpellEntryLike[]
+}): LocatedSpell[] {
+  return (['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const).flatMap(
+    (section) => (sections[section] ?? []).map((action, index) => ({ section, index, action })),
+  )
+}
+
+function refineReservedSpellcastingName(
+  row: LocatedSpell,
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  if (row.action.kind !== 'spell') return
+  if (row.action.name?.trim() !== MONSTER_SPELLCASTING_ACTION_NAME) return
+  if (isPrimarySpellcastingAction(row.action)) return
+  addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_NAME_MESSAGE, [
+    ...prefix,
+    row.section,
+    row.index,
+    'name',
+  ])
+}
+
+function refineOnePrimarySpellcastingProfile(
+  row: LocatedSpell,
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+  requireCanonicalName: boolean,
+): void {
+  if (row.section !== 'actions') {
+    addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_SECTION_MESSAGE, [
+      ...prefix,
+      row.section,
+      row.index,
+      'profile',
+    ])
+  }
+  if (!requireCanonicalName || row.action.name?.trim() === MONSTER_SPELLCASTING_ACTION_NAME) return
+  addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_NAME_MESSAGE, [
+    ...prefix,
+    row.section,
+    row.index,
+    'name',
+  ])
+}
+
+function refinePrimarySpellcastingProfiles(
+  sections: {
+    actions?: readonly SpellEntryLike[]
+    bonusActions?: readonly SpellEntryLike[]
+    reactions?: readonly SpellEntryLike[]
+    legendaryActions?: readonly SpellEntryLike[]
+  },
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+  requireCanonicalName: boolean,
+): void {
+  const rows = spellRows(sections)
+  for (const row of rows) refineReservedSpellcastingName(row, ctx, prefix)
+  const profiles = rows.filter((row) => isPrimarySpellcastingAction(row.action))
+  for (const row of profiles) {
+    refineOnePrimarySpellcastingProfile(row, ctx, prefix, requireCanonicalName)
+  }
+  for (const extra of profiles.slice(1)) {
+    addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE, [
+      ...prefix,
+      extra.section,
+      extra.index,
+      'profile',
+    ])
+  }
 }
 
 function refineOneSpellEntry(
