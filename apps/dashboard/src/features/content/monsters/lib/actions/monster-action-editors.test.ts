@@ -350,37 +350,34 @@ describe('monster action detail fields', () => {
     expect(distanceGroup).toMatchObject({
       visibility: { dependsOn: ['modes'] },
     })
-    const reachField = distanceGroup.fields.find(
+    const distanceRows = distanceGroup.fields.filter(
+      (field) => 'kind' in field && field.kind === 'row',
+    )
+    expect(distanceRows.length).toBeGreaterThanOrEqual(3)
+    const dualRow = distanceRows.find(
+      (row) =>
+        'visibility' in row &&
+        row.visibility?.dependsOn?.includes('modes') &&
+        row.fields?.length === 3,
+    )
+    if (!dualRow || !('fields' in dualRow)) {
+      throw new Error('expected dual-mode distance row')
+    }
+    const reachField = dualRow.fields.find(
       (field) => 'type' in field && field.type === 'joinedPair' && field.label === 'Melee reach',
     )
     expect(reachField).toMatchObject({
       start: { name: 'reach', placeholder: '5' },
-    })
-    expect(reachField).not.toHaveProperty('required', true)
-    const rangedRangeGroup = distanceGroup.fields.find(
-      (field) => 'kind' in field && field.kind === 'group' && field.legend === 'Ranged range',
-    )
-    if (!rangedRangeGroup || !('fields' in rangedRangeGroup)) {
-      throw new Error('expected Ranged range group')
-    }
-    expect(rangedRangeGroup).toMatchObject({
-      headingScale: 'field',
       visibility: { dependsOn: ['modes'] },
     })
-    const rangeRow = rangedRangeGroup.fields[0]
-    const normalRange =
-      rangeRow && 'fields' in rangeRow
-        ? rangeRow.fields.find(
-            (field) => 'type' in field && field.type === 'joinedPair' && field.label === 'Normal',
-          )
-        : undefined
-    expect(normalRange).toMatchObject({ required: true })
-    const longRange =
-      rangeRow && 'fields' in rangeRow
-        ? rangeRow.fields.find(
-            (field) => 'type' in field && field.type === 'joinedPair' && field.label === 'Long',
-          )
-        : undefined
+    expect(reachField).not.toHaveProperty('required', true)
+    const normalRange = dualRow.fields.find(
+      (field) => 'type' in field && field.type === 'joinedPair' && field.label === 'Normal range',
+    )
+    expect(normalRange).toMatchObject({ required: true, visibility: { dependsOn: ['modes'] } })
+    const longRange = dualRow.fields.find(
+      (field) => 'type' in field && field.type === 'joinedPair' && field.label === 'Long range',
+    )
     if (!longRange || !('type' in longRange) || longRange.type !== 'joinedPair') {
       throw new Error('expected long range joined pair')
     }

@@ -14,13 +14,19 @@ export type AttackRangeRowOptions = {
   longName: string
   visibility?: FieldVisibility
   normalRequired?: boolean
+  normalLabel?: string
+  longLabel?: string
 }
 
-function attackRangeLongJoinedPair(longName: string, normalName: string): JoinedPairFieldConfig {
+function attackRangeLongJoinedPair(
+  longName: string,
+  normalName: string,
+  longLabel: string,
+): JoinedPairFieldConfig {
   return {
     ...distanceJoinedPairField({
       amountName: longName,
-      label: 'Long',
+      label: longLabel,
       presets: ATTACK_RANGE_FEET,
       allowCustom: true,
       clearable: true,
@@ -33,7 +39,7 @@ function attackRangeLongJoinedPair(longName: string, normalName: string): Joined
       digits: 3,
       allowCustom: true,
       clearable: true,
-      ariaLabel: 'Long value',
+      ariaLabel: `${longLabel} value`,
       optionsResolve: {
         dependsOn: [normalName],
         optionsWhen: (values) =>
@@ -51,22 +57,30 @@ function attackRangeLongJoinedPair(longName: string, normalName: string): Joined
   }
 }
 
+/** Shared Normal and Long joined-pair field configs (no row/group chrome). */
+export function attackRangeJoinedPairFields(
+  options: AttackRangeRowOptions,
+): [JoinedPairFieldConfig, JoinedPairFieldConfig] {
+  const normalLabel = options.normalLabel ?? 'Normal'
+  const longLabel = options.longLabel ?? 'Long'
+  return [
+    distanceJoinedPairField({
+      amountName: options.normalName,
+      label: normalLabel,
+      presets: ATTACK_RANGE_FEET,
+      allowCustom: true,
+      required: options.normalRequired,
+    }),
+    attackRangeLongJoinedPair(options.longName, options.normalName, longLabel),
+  ]
+}
+
 /** Normal and Long range controls without section chrome. */
 export function attackRangeRow(options: AttackRangeRowOptions): FormItem {
-  const { normalName, longName } = options
   return {
     kind: 'row',
     visibility: options.visibility,
-    fields: [
-      distanceJoinedPairField({
-        amountName: normalName,
-        label: 'Normal',
-        presets: ATTACK_RANGE_FEET,
-        allowCustom: true,
-        required: options.normalRequired,
-      }),
-      attackRangeLongJoinedPair(longName, normalName),
-    ],
+    fields: [...attackRangeJoinedPairFields(options)],
   }
 }
 

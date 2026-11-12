@@ -2,7 +2,11 @@ import { ATTACK_RANGE_FEET } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
-import { attackRangeRow, weaponAttackRangeGroup } from './weapon-attack-range-form-fields'
+import {
+  attackRangeJoinedPairFields,
+  attackRangeRow,
+  weaponAttackRangeGroup,
+} from './weapon-attack-range-form-fields'
 
 function assertAttackRangeRowFields(row: FormItem) {
   if (!('kind' in row) || row.kind !== 'row') {
@@ -46,6 +50,34 @@ function assertAttackRangeRowFields(row: FormItem) {
   expect(disclosure?.addGate?.disabledWhen({ 'range.normal': ATTACK_RANGE_FEET.at(-1) })).toBe(true)
   expect(disclosure?.addGate?.disabledWhen({ 'range.normal': 60 })).toBe(false)
 }
+
+describe('attackRangeJoinedPairFields', () => {
+  it('defaults Normal and Long labels', () => {
+    const [normal, long] = attackRangeJoinedPairFields({
+      normalName: 'range.normal',
+      longName: 'range.long',
+    })
+    expect(normal).toMatchObject({ label: 'Normal' })
+    expect(long).toMatchObject({ label: 'Long' })
+    if (long.start.kind === 'select') {
+      expect(long.start.ariaLabel).toBe('Long value')
+    }
+  })
+
+  it('accepts custom range labels', () => {
+    const [normal, long] = attackRangeJoinedPairFields({
+      normalName: 'range.normal',
+      longName: 'range.long',
+      normalLabel: 'Normal range',
+      longLabel: 'Long range',
+    })
+    expect(normal).toMatchObject({ label: 'Normal range' })
+    expect(long).toMatchObject({ label: 'Long range' })
+    if (long.start.kind === 'select') {
+      expect(long.start.ariaLabel).toBe('Long range value')
+    }
+  })
+})
 
 describe('attackRangeRow', () => {
   it('builds the shared Normal and Long joined pairs without section chrome', () => {

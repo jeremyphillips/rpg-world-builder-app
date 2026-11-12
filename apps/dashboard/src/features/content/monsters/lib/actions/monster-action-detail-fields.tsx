@@ -10,12 +10,18 @@ import {
   WEAPON_MODES,
   type Spell,
 } from '@rpg/contracts'
-import type { FieldVisibility, FormItem, SelectFieldConfig } from '@rpg/ui/form'
+import {
+  combineFieldVisibilityAll,
+  type FieldVisibility,
+  type FormItem,
+  type JoinedPairFieldConfig,
+  type SelectFieldConfig,
+} from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
 import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
-import { attackRangeRow } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
+import { attackRangeJoinedPairFields } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
 import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
 import { savingThrowFieldGroup } from '../../../lib/forms/mechanics/saving-throw-field-group'
 import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
@@ -28,7 +34,8 @@ import {
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_DAMAGE_TYPE_CHANGE_LABEL,
   MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
-  MONSTER_ACTION_RANGED_RANGE_LABEL,
+  MONSTER_ACTION_LONG_RANGE_LABEL,
+  MONSTER_ACTION_NORMAL_RANGE_LABEL,
   MONSTER_ACTION_REACH_FIELD_LABEL,
   MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
   MONSTER_SAVE_ABILITY_HINT,
@@ -114,6 +121,48 @@ function distanceVisibility(name: 'mode' | 'modes'): FieldVisibility {
 
 function arrayIncludes(value: unknown, mode: string): boolean {
   return Array.isArray(value) && value.includes(mode)
+}
+
+function withModeFieldVisibility<T extends { visibility?: FieldVisibility }>(
+  field: T,
+  modeVisibility: FieldVisibility,
+): T {
+  return {
+    ...field,
+    visibility: field.visibility
+      ? combineFieldVisibilityAll(field.visibility, modeVisibility)
+      : modeVisibility,
+  }
+}
+
+function dualAttackModesVisibility(name: 'mode' | 'modes'): FieldVisibility {
+  return {
+    dependsOn: [name],
+    visibleWhen: (values) =>
+      name === 'modes' &&
+      arrayIncludes(values.modes, 'melee') &&
+      arrayIncludes(values.modes, 'ranged'),
+  }
+}
+
+function meleeOnlyAttackModeVisibility(name: 'mode' | 'modes'): FieldVisibility {
+  return {
+    dependsOn: [name],
+    visibleWhen: (values) =>
+      name === 'mode'
+        ? values.mode === 'melee'
+        : arrayIncludes(values.modes, 'melee') && !arrayIncludes(values.modes, 'ranged'),
+  }
+}
+
+function rangedOnlyAttackModeVisibility(name: 'mode' | 'modes'): FieldVisibility {
+  return {
+    dependsOn: [name],
+    visibleWhen: (values) =>
+      name === 'mode'
+        ? values.mode === 'ranged'
+        : arrayIncludes(values.modes, 'ranged') && !arrayIncludes(values.modes, 'melee'),
+  }
 }
 
 const monsterActionOptionalDescriptionField = {
@@ -431,43 +480,60 @@ const reachFeetOptions = REACH_FEET.map((feet) => ({
   label: String(feet),
 }))
 
+function monsterAttackReachField(modeField: 'mode' | 'modes'): JoinedPairFieldConfig {
+  return {
+    type: 'joinedPair',
+    label: MONSTER_ACTION_REACH_FIELD_LABEL,
+    width: 'auto',
+    start: {
+      kind: 'select',
+      name: 'reach',
+      options: reachFeetOptions,
+      digits: 2,
+      placeholder: '5',
+      ariaLabel: 'Reach value',
+    },
+    end: {
+      kind: 'label',
+      text: 'ft.',
+      ariaLabel: 'Reach unit',
+    },
+  }
+}
+
+function monsterAttackRangeJoinedPairs(modeField: 'mode' | 'modes'): JoinedPairFieldConfig[] {
+  const ranged = rangedVisibility(modeField)
+  return attackRangeJoinedPairFields({
+    normalName: 'range.normal',
+    longName: 'range.long',
+    normalRequired: true,
+    normalLabel: MONSTER_ACTION_NORMAL_RANGE_LABEL,
+    longLabel: MONSTER_ACTION_LONG_RANGE_LABEL,
+  }).map((field) => withModeFieldVisibility(field, ranged))
+}
+
 function monsterAttackDistanceFields(modeField: 'mode' | 'modes'): FormItem {
+  const reach = monsterAttackReachField(modeField)
+  const rangeFields = monsterAttackRangeJoinedPairs(modeField)
   return {
     kind: 'group',
     legend: MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
     visibility: distanceVisibility(modeField),
     fields: [
       {
-        type: 'joinedPair',
-        label: MONSTER_ACTION_REACH_FIELD_LABEL,
-        width: 'auto',
-        visibility: meleeVisibility(modeField),
-        start: {
-          kind: 'select',
-          name: 'reach',
-          options: reachFeetOptions,
-          digits: 2,
-          placeholder: '5',
-          ariaLabel: 'Reach value',
-        },
-        end: {
-          kind: 'label',
-          text: 'ft.',
-          ariaLabel: 'Reach unit',
-        },
+        kind: 'row',
+        visibility: dualAttackModesVisibility(modeField),
+        fields: [withModeFieldVisibility(reach, meleeVisibility(modeField)), ...rangeFields],
       },
       {
-        kind: 'group',
-        legend: MONSTER_ACTION_RANGED_RANGE_LABEL,
-        headingScale: 'field',
-        visibility: rangedVisibility(modeField),
-        fields: [
-          attackRangeRow({
-            normalName: 'range.normal',
-            longName: 'range.long',
-            normalRequired: true,
-          }),
-        ],
+        kind: 'row',
+        visibility: meleeOnlyAttackModeVisibility(modeField),
+        fields: [withModeFieldVisibility(reach, meleeVisibility(modeField))],
+      },
+      {
+        kind: 'row',
+        visibility: rangedOnlyAttackModeVisibility(modeField),
+        fields: rangeFields,
       },
     ],
   }
