@@ -15,6 +15,7 @@ import {
   MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL,
   MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT,
   MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL,
+  MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL,
   MONSTER_SAVE_DC_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
 } from '../monster-form-labels'
@@ -107,30 +108,42 @@ describe('monster ability source fields', () => {
       />,
     )
 
-    expect(screen.queryByRole('switch', { name: 'Proficient' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('switch', { name: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL }),
+    ).not.toBeInTheDocument()
     expect(
       screen.queryByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }),
     ).not.toBeInTheDocument()
 
     await choose(user, 'Attack bonus', MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL)
     expect(screen.getByText(MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT)).toBeInTheDocument()
-    expect(screen.getByRole('switch', { name: 'Proficient' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('switch', { name: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL }),
+    ).toBeInTheDocument()
     expect(
       screen.queryByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }),
     ).not.toBeInTheDocument()
     expect(screen.queryByText(CONSTITUTION_DC_HINT)).not.toBeInTheDocument()
 
     await choose(user, 'Ability', 'Constitution')
-    await user.click(screen.getByRole('switch', { name: 'Proficient' }))
+    expect(
+      screen.getByRole('switch', { name: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL }),
+    ).toBeChecked()
     expect(formRef.current?.getValues('actions.0.bonusSource')).toEqual({
       kind: 'ability',
       ability: 'con',
       proficient: true,
     })
+    await user.click(
+      screen.getByRole('switch', { name: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL }),
+    )
+    expect(formRef.current?.getValues('actions.0.bonusSource.proficient')).toBe(false)
 
     await choose(user, 'Attack bonus', MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL)
     expect(screen.getByText(MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT)).toBeInTheDocument()
-    expect(screen.queryByRole('switch', { name: 'Proficient' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('switch', { name: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL }),
+    ).not.toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL })).toBeInTheDocument()
 
     await choose(user, SPELLCASTING_ABILITY_LABEL, 'Intelligence')
@@ -141,7 +154,9 @@ describe('monster ability source fields', () => {
 
     await choose(user, 'Attack bonus', MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL)
     expect(screen.getByText(MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT)).toBeInTheDocument()
-    expect(screen.getByRole('switch', { name: 'Proficient' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('switch', { name: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL }),
+    ).toBeInTheDocument()
     expect(
       screen.queryByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }),
     ).not.toBeInTheDocument()

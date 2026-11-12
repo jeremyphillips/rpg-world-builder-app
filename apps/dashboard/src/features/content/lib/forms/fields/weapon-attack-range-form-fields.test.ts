@@ -14,6 +14,7 @@ describe('weaponAttackRangeGroup', () => {
       kind: 'group',
       legend: 'Range',
     })
+    expect(group).not.toHaveProperty('description')
     if (!('kind' in group) || group.kind !== 'group') return
     const row = group.fields[0]
     if (!row || !('kind' in row) || row.kind !== 'row') {
@@ -29,6 +30,8 @@ describe('weaponAttackRangeGroup', () => {
     expect(row.fields[1]).toMatchObject({
       type: 'joinedPair',
       label: 'Long',
+      hint: { text: 'Disadvantage beyond normal range.', position: 'below-control' },
+      optionalDisclosure: { addLabel: 'Add long range' },
       start: { kind: 'select', name: 'range.long', allowCustom: true, clearable: true },
     })
     const normal = row.fields[0]

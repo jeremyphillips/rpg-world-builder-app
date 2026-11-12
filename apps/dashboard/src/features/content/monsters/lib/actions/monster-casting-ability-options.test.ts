@@ -175,4 +175,12 @@ describe('monsterAttackAbilitySelectOptions', () => {
       trailingText(monsterAttackAbilitySelectOptions(values, undefined), 'dex'),
     ).toBeUndefined()
   })
+
+  it('shows the modifier when proficiency is off or the challenge rating is unset', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.abilityScores = { ...values.abilityScores, str: 10, dex: 8 }
+    expect(abilityAttackTrailingForAbility(values, 'str', false)?.text).toBe('+0 to hit')
+    expect(abilityAttackTrailingForAbility(values, 'dex', false)?.text).toBe('-1 to hit')
+    expect(abilityAttackTrailingForAbility(values, 'str', true)?.text).toBe('+0 to hit')
+  })
 })

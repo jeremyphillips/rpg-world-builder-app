@@ -37,6 +37,9 @@ import {
   MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL,
   MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT,
   MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL,
+  MONSTER_ATTACK_BONUS_ADVANCED_LEGEND,
+  MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_HINT,
+  MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL,
   MONSTER_SAVE_DC_ABILITY_LABEL,
   MONSTER_SAVE_DC_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
@@ -225,6 +228,7 @@ function monsterActionBonusSourceDependent(namePrefix: string, currentActionId: 
     namePrefix,
     controllerLabel: MONSTER_ATTACK_BONUS_LABEL,
     currentActionId,
+    dependentsChrome: 'none',
     sourceOptions: [
       { value: 'ability', label: MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL },
       { value: 'spellcasting', label: MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL },
@@ -255,9 +259,19 @@ function monsterActionBonusSourceDependent(namePrefix: string, currentActionId: 
         ),
       },
       {
-        type: 'switch',
-        name: 'bonusSource.proficient',
-        label: 'Proficient',
+        kind: 'group',
+        legend: MONSTER_ATTACK_BONUS_ADVANCED_LEGEND,
+        headingScale: 'field',
+        disclosure: { variant: 'legend', defaultOpen: false, persistOpen: false },
+        fields: [
+          {
+            type: 'switch',
+            name: 'bonusSource.proficient',
+            label: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL,
+            hint: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_HINT,
+            defaultValue: true,
+          },
+        ],
       },
     ],
   })

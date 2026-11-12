@@ -12,6 +12,7 @@ export const OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS = [
   'textSuggestions',
   'richtext',
   'rollValue',
+  'joinedPair',
 ] as const
 export type OptionalDisclosureImplementedKind =
   (typeof OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS)[number]

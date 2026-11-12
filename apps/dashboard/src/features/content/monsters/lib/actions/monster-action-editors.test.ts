@@ -324,24 +324,33 @@ describe('monster action detail fields', () => {
         (field) => 'name' in field && field.name === 'bonusSource.ability',
       ),
     ).toMatchObject({ kind: 'slot' })
-    expect(
-      attackBonusDependents.find(
-        (field) => 'name' in field && field.name === 'bonusSource.proficient',
-      ),
-    ).not.toHaveProperty('required', true)
+    const advanced = attackBonusDependents.find(
+      (field) => 'kind' in field && field.kind === 'group' && field.legend === 'Advanced options',
+    )
+    const proficiency =
+      advanced && 'fields' in advanced
+        ? advanced.fields.find(
+            (field) => 'name' in field && field.name === 'bonusSource.proficient',
+          )
+        : undefined
+    expect(proficiency).toMatchObject({
+      label: 'Include proficiency bonus',
+      defaultValue: true,
+    })
+    expect(proficiency).not.toHaveProperty('required', true)
     expect(attackItems.find((item) => 'name' in item && item.name === 'modes')).toMatchObject({
       required: true,
     })
     expect(
       attackItems.find(
-        (item) => 'type' in item && item.type === 'joinedPair' && item.label === 'Reach',
+        (item) => 'type' in item && item.type === 'joinedPair' && item.label === 'Melee reach',
       ),
     ).toMatchObject({
       start: { name: 'reach', placeholder: '5' },
     })
     expect(
       attackItems.find(
-        (item) => 'type' in item && item.type === 'joinedPair' && item.label === 'Reach',
+        (item) => 'type' in item && item.type === 'joinedPair' && item.label === 'Melee reach',
       ),
     ).not.toHaveProperty('required', true)
     const rangeGroup = attackItems.find(

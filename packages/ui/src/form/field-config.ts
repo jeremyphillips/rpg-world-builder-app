@@ -449,6 +449,7 @@ export const OPTIONAL_DISCLOSURE_FIELD_KINDS = [
   'richtext',
   'select',
   'rollValue',
+  'joinedPair',
 ] as const
 export type OptionalDisclosureFieldKind = (typeof OPTIONAL_DISCLOSURE_FIELD_KINDS)[number]
 
@@ -811,6 +812,7 @@ export interface JoinedPairFieldConfig extends Omit<BaseFieldConfig, 'name'> {
   presetsByUnit?: Readonly<Record<string, readonly { value: number; label: string }[]>>
   /** Clears the start amount when the end unit changes. Does not convert the number. */
   clearAmountWhenUnitChanges?: boolean
+  optionalDisclosure?: OptionalDisclosureConfig
 }
 
 /**

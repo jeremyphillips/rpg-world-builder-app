@@ -59,6 +59,37 @@ describe('monster ability select reactivity', () => {
     expect(await screen.findByRole('option', { name: 'Strength +3 to hit' })).toBeInTheDocument()
   })
 
+  it('previews the default proficiency bonus before the switch is toggled', async () => {
+    const user = userEvent.setup()
+    const defaults = resolveMonsterCreateDefaultValues()
+    defaults.challengeRating = '5'
+    defaults.abilityScores.str = 20
+    defaults.reactions = [
+      {
+        id: 'slash',
+        kind: 'attack',
+        name: 'Slash',
+        bonusSource: { kind: 'ability', ability: 'str' },
+      },
+    ]
+
+    function Host() {
+      const form = useForm<MonsterFormValues>({ defaultValues: defaults })
+      return (
+        <FormProvider {...form}>
+          <MonsterActionAttackAbilityField
+            name="reactions.0.bonusSource.ability"
+            proficientName="reactions.0.bonusSource.proficient"
+          />
+        </FormProvider>
+      )
+    }
+
+    render(<Host />)
+    await user.click(screen.getByRole('combobox', { name: 'Ability' }))
+    expect(await screen.findByRole('option', { name: 'Strength +8 to hit' })).toBeInTheDocument()
+  })
+
   it('updates a trait save dc when the referenced spellcasting ability changes', async () => {
     const user = userEvent.setup()
     const defaults = resolveMonsterCreateDefaultValues()

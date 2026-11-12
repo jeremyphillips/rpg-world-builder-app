@@ -106,16 +106,22 @@ export function spellAttackTrailingForAbility(
   return formatAttackBonusTrailing(spellAttackBonus(score, prof))
 }
 
-/** Ability-based attack bonus. Omits a preview until proficiency is authored. */
+/**
+ * Ability-based attack bonus.
+ * The modifier is always shown once the score and proficiency flag exist.
+ * The challenge-rating proficiency bonus is added only when that rating is set.
+ */
 export function abilityAttackTrailingForAbility(
   values: MonsterFormValues,
   ability: Ability,
   proficient: boolean | undefined,
 ): SelectOptionTrailing | undefined {
-  const prof = proficiencyBonus(values.challengeRating)
   const score = abilityScore(values, ability)
-  if (prof === undefined || score === undefined || typeof proficient !== 'boolean') return undefined
-  return formatAttackBonusTrailing(weaponAttackBonus(abilityModifier(score), proficient, prof))
+  if (score === undefined || typeof proficient !== 'boolean') return undefined
+  const prof = proficient ? proficiencyBonus(values.challengeRating) : undefined
+  return formatAttackBonusTrailing(
+    weaponAttackBonus(abilityModifier(score), prof !== undefined, prof ?? 0),
+  )
 }
 
 function castingTrailingForAbility(

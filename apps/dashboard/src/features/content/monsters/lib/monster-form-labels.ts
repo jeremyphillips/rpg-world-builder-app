@@ -133,8 +133,8 @@ export const MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL = 'Attack'
 export const MONSTER_ACTION_DAMAGE_FIELD_LABEL = getSpellAtomicEffectKindLabel('damage')
 export const MONSTER_ACTION_ATTACK_PREVIEW_DAMAGE_LABEL = MONSTER_ACTION_DAMAGE_FIELD_LABEL
 export const MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL = 'Extra'
-export const MONSTER_ACTION_REACH_FIELD_LABEL = 'Reach'
-export const MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL = MONSTER_ACTION_REACH_FIELD_LABEL
+export const MONSTER_ACTION_REACH_FIELD_LABEL = 'Melee reach'
+export const MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL = 'Reach'
 export const MONSTER_ACTION_ATTACK_PREVIEW_RANGE_LABEL = 'Range'
 export const MONSTER_ACTION_ATTACK_PREVIEW_PROPERTIES_LABEL = 'Properties'
 export const MONSTER_DAMAGE_TYPE_CHANGE_LABEL = 'Change'
@@ -354,6 +354,10 @@ export const MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT =
   'Uses the selected ability modifier, with optional proficiency.'
 export const MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT =
   'Uses the selected spellcasting ability and proficiency bonus.'
+export const MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL = 'Include proficiency bonus'
+export const MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_HINT =
+  "Adds the creature's proficiency bonus to the attack roll. Normally enabled for custom attacks."
+export const MONSTER_ATTACK_BONUS_ADVANCED_LEGEND = 'Advanced options'
 export const MONSTER_SAVE_DC_ABILITY_LABEL = 'DC ability'
 export const MONSTER_SAVE_DC_PROFICIENCY_LABEL = 'Include proficiency bonus'
 export const MONSTER_LIMIT_RECHARGES_ON_LABEL = 'Recharges on'
