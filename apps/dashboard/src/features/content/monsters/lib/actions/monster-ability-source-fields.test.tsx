@@ -8,6 +8,8 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { SAVING_THROW_DC_SOURCE_LABEL } from '../../../lib/forms/mechanics/saving-throw-field-copy'
+import { SPELLCASTING_ABILITY_FIELD_LABEL } from '../../../lib/forms/mechanics/spellcasting-ability-field-copy'
 import {
   MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL,
   MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL,
@@ -16,7 +18,6 @@ import {
   MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT,
   MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL,
   MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL,
-  MONSTER_SAVE_DC_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
 } from '../monster-form-labels'
 import { resolveMonsterCreateDefaultValues, type MonsterFormValues } from '../monster-form-values'
@@ -35,7 +36,7 @@ beforeAll(() => {
   }
 })
 
-const SPELLCASTING_ABILITY_LABEL = 'Spellcasting ability'
+const SPELLCASTING_ABILITY_LABEL = SPELLCASTING_ABILITY_FIELD_LABEL
 const SHARED_CASTING_LABEL = 'Shared Fire Breath'
 const CONSTITUTION_DC_HINT = monsterSaveDcAbilityHintWhen({ 'dcSource.ability': 'con' })
 
@@ -179,7 +180,7 @@ describe('monster ability source fields', () => {
       screen.queryByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }),
     ).not.toBeInTheDocument()
 
-    await choose(user, MONSTER_SAVE_DC_LABEL, MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL)
+    await choose(user, SAVING_THROW_DC_SOURCE_LABEL, MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL)
     expect(
       screen.getByRole('switch', { name: MONSTER_SAVE_DC_PROFICIENCY_LABEL }),
     ).toBeInTheDocument()
@@ -196,7 +197,7 @@ describe('monster ability source fields', () => {
       proficient: true,
     })
 
-    await choose(user, MONSTER_SAVE_DC_LABEL, MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL)
+    await choose(user, SAVING_THROW_DC_SOURCE_LABEL, MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL)
     expect(
       screen.queryByRole('switch', { name: MONSTER_SAVE_DC_PROFICIENCY_LABEL }),
     ).not.toBeInTheDocument()
@@ -208,7 +209,7 @@ describe('monster ability source fields', () => {
       ability: 'int',
     })
 
-    await choose(user, MONSTER_SAVE_DC_LABEL, MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL)
+    await choose(user, SAVING_THROW_DC_SOURCE_LABEL, MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL)
     expect(
       screen.getByRole('switch', { name: MONSTER_SAVE_DC_PROFICIENCY_LABEL }),
     ).toBeInTheDocument()
@@ -228,7 +229,9 @@ describe('monster ability source fields', () => {
 
     expect(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL })).toBeInTheDocument()
     expect(screen.queryByRole('combobox', { name: 'Attack bonus' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('combobox', { name: MONSTER_SAVE_DC_LABEL })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('combobox', { name: SAVING_THROW_DC_SOURCE_LABEL }),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText(MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL)).not.toBeInTheDocument()
   })
 })

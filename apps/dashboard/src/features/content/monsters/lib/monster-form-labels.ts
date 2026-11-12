@@ -5,6 +5,8 @@ import {
   CHALLENGE_RATING_TERM,
   CREATURE_ARMOR_CLASS_KIND_TERM,
   getActionEconomyLabel,
+  getActionEconomySectionLabel,
+  getMonsterActionKindLabel,
   getSpellAtomicEffectKindLabel,
   getArmorCategoryLabel,
   getArmorCategorySentenceForm,
@@ -20,6 +22,7 @@ import {
   getTermLabelSingular,
   HIT_POINTS_TERM,
   LANGUAGE_TERM,
+  MONSTER_SPELLCASTING_ACTION_NAME,
   PASSIVE_PERCEPTION_TERM,
   PROFICIENCY_TERM,
   RECHARGE_DIE_FACES,
@@ -45,10 +48,6 @@ import { vocabularyFieldLabel } from '@/features/vocabulary'
 import type { MonsterActionSection } from './actions/monster-action-equipment-references'
 
 const armorClassLabel = CREATURE_ARMOR_CLASS_KIND_TERM.label
-
-function actionEconomySectionHeading(id: 'action' | 'bonus-action' | 'reaction'): string {
-  return `${getActionEconomyLabel(id)}s`
-}
 
 /** Shown beside a clamped hit-point formula. Owned here and reused by the detail display. */
 export const MONSTER_HP_MINIMUM_NOTE = '(minimum 1)'
@@ -137,8 +136,6 @@ export const MONSTER_ACTION_DAMAGE_FIELD_LABEL = getSpellAtomicEffectKindLabel('
 export const MONSTER_ACTION_ATTACK_PREVIEW_DAMAGE_LABEL = MONSTER_ACTION_DAMAGE_FIELD_LABEL
 export const MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL = 'Extra'
 export const MONSTER_ACTION_DISTANCE_SECTION_LEGEND = 'Distance'
-export const MONSTER_ACTION_NORMAL_RANGE_LABEL = 'Normal range'
-export const MONSTER_ACTION_LONG_RANGE_LABEL = 'Long range'
 export const MONSTER_ACTION_REACH_FIELD_LABEL = 'Melee reach'
 export const MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL = 'Reach'
 export const MONSTER_ACTION_ATTACK_PREVIEW_RANGE_LABEL = 'Range'
@@ -201,9 +198,9 @@ export const MONSTER_ACTION_ITEM_NOUN = defineMasterDetailItemNoun({
 })
 
 export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
-export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
-export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')
-export const MONSTER_REACTIONS_HEADING = actionEconomySectionHeading('reaction')
+export const MONSTER_ACTIONS_HEADING = getActionEconomySectionLabel('action')
+export const MONSTER_BONUS_ACTIONS_HEADING = getActionEconomySectionLabel('bonus-action')
+export const MONSTER_REACTIONS_HEADING = getActionEconomySectionLabel('reaction')
 export const MONSTER_LEGENDARY_ACTIONS_HEADING = 'Legendary Actions'
 export const MONSTER_LEGENDARY_USES_LABEL = 'Uses'
 export const MONSTER_LEGENDARY_LAIR_USES_LABEL = 'Uses in lair'
@@ -231,16 +228,13 @@ export const MONSTER_RECHARGE_ADD_LABEL = 'Add recharge'
 export const MONSTER_ACQUISITION_SAVE_DESCRIPTION = 'Saving throw effect'
 export const MONSTER_ACQUISITION_ATTACK_DESCRIPTION = 'Custom attack'
 export const MONSTER_ACQUISITION_SPELL_DESCRIPTION = 'Cast spells'
-export const MONSTER_PRIMARY_SPELLCASTING_NOTE = 'Only one Spellcasting profile is allowed.'
 export const MONSTER_CAST_SPELL_LABEL = 'Cast a spell'
 export const MONSTER_ACQUISITION_SPECIAL_DESCRIPTION = 'Custom rules or effects'
 export const MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION =
   'Combine multiple attacks into one action'
 
-export const LEGENDARY_REFERENCE_LABEL = 'Attack or ability'
 export const LEGENDARY_REFERENCE_DESCRIPTION = 'Use an action already defined for this creature.'
 export const LEGENDARY_REFERENCE_DISABLED_NOTE = 'No attacks or abilities in Actions'
-export const LEGENDARY_SPELLCASTING_LABEL = 'Spellcasting'
 export const LEGENDARY_SPELLCASTING_DEFAULT_NAME = 'Use Spellcasting'
 export const LEGENDARY_SPELLCASTING_DESCRIPTION =
   'Cast a spell from an existing Spellcasting action.'
@@ -253,14 +247,14 @@ export const LEGENDARY_CUSTOM_LABEL = 'Custom ability'
 export const LEGENDARY_CUSTOM_DESCRIPTION = 'Write a standalone legendary ability.'
 
 export const LEGENDARY_ACTION_CATEGORY_LABELS = {
-  reference: LEGENDARY_REFERENCE_LABEL,
-  spellcasting: LEGENDARY_SPELLCASTING_LABEL,
+  reference: getMonsterActionKindLabel('action-reference'),
+  spellcasting: MONSTER_SPELLCASTING_ACTION_NAME,
   'cast-spell': LEGENDARY_CAST_SPELL_LABEL,
   custom: LEGENDARY_CUSTOM_LABEL,
 } as const
 
 export const LEGENDARY_ACTION_DEFAULT_NAMES = {
-  reference: LEGENDARY_REFERENCE_LABEL,
+  reference: getMonsterActionKindLabel('action-reference'),
   spellcasting: LEGENDARY_SPELLCASTING_DEFAULT_NAME,
   'cast-spell': LEGENDARY_CAST_SPELL_DEFAULT_NAME,
   custom: LEGENDARY_CUSTOM_LABEL,
@@ -277,11 +271,6 @@ export const MONSTER_MOVEMENT_OPPORTUNITY_LABEL = 'Without provoking Opportunity
 export const MONSTER_LEGENDARY_SPELLCASTING_FIELD_LABEL = 'Source action'
 export const MONSTER_LEGENDARY_SPELLCASTING_FIELD_HINT =
   'Choose an existing action from Actions. Its spells and casting ability are reused.'
-export const MONSTER_SPELLCASTING_ABILITY_LABEL = 'Spellcasting ability'
-export const MONSTER_SPELLCASTING_ABILITY_PRIMARY_HINT =
-  'Choose the ability used to cast these spells. Other actions can reuse this ability.'
-export const MONSTER_SPELLCASTING_ABILITY_SHARED_HINT =
-  'Choose an ability or reuse one from an existing action.'
 export const MONSTER_SPELLCASTING_SPELL_HINT = 'Choose a spell from this Spellcasting action.'
 export const MONSTER_CAST_SPELL_HINT = 'Choose a spell from the catalog.'
 export const MONSTER_CAST_AT_LEVEL_HINT = 'Set only to cast a higher-level version.'
@@ -349,19 +338,12 @@ export function formatMonsterActionSpellPreviewConfigureHint(fieldLabel: string)
 export function formatMonsterActionMultiattackPreviewConfigureHint(fieldLabel: string): string {
   return `Configure ${fieldLabel} to preview this multiattack.`
 }
-export const MONSTER_ATTACK_BONUS_KIND_ABILITY_LABEL = 'Ability'
-export const MONSTER_ATTACK_BONUS_KIND_SPELL_LABEL = 'Spellcasting'
 export const MONSTER_ATTACK_BONUS_ABILITY_LABEL = 'Ability'
 export const MONSTER_ATTACK_BONUS_PROFICIENCY_LABEL = 'Proficient'
 export const MONSTER_SAVE_FAILURE_NOTE_LABEL = 'Failure note'
 export const MONSTER_SAVE_SUCCESS_AMOUNT_LABEL = 'On successful save'
-export const MONSTER_SAVE_THROW_SECTION_LEGEND = 'Saving throw'
 export const MONSTER_SAVE_THROW_SECTION_DESCRIPTION =
   'Set the saving throw target and how difficult it is to succeed.'
-export const MONSTER_SAVE_ABILITY_LABEL = 'Save ability'
-export const MONSTER_SAVE_ABILITY_HINT = 'The ability the target uses for the save.'
-export const MONSTER_SAVE_DC_LABEL = 'DC source'
-export const MONSTER_SPELLCASTING_ABILITY_SAVE_DC_HINT = 'Ability used to calculate the DC.'
 export const MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL = 'Ability-based'
 export const MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL = 'Spellcasting-based'
 export const MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL = 'Use an ability score'

@@ -21,9 +21,20 @@ import {
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
 import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
-import { attackRangeJoinedPairFields } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
+import {
+  ATTACK_RANGE_LONG_FIELD_LABEL,
+  ATTACK_RANGE_NORMAL_FIELD_LABEL,
+  attackRangeJoinedPairFields,
+} from '../../../lib/forms/fields/weapon-attack-range-form-fields'
 import { MonsterAttackRangeClusterSlot } from './monster-attack-range-cluster-slot.client'
 import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
+import {
+  SAVING_THROW_ABILITY_HINT,
+  SAVING_THROW_ABILITY_LABEL,
+  SAVING_THROW_DC_SOURCE_LABEL,
+  SAVING_THROW_SECTION_LEGEND,
+  SAVING_THROW_SPELLCASTING_HINT,
+} from '../../../lib/forms/mechanics/saving-throw-field-copy'
 import { savingThrowFieldGroup } from '../../../lib/forms/mechanics/saving-throw-field-group'
 import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
 import { MonsterActionMultiattackSummary } from '../../components/form/monster-action-multiattack-summary'
@@ -37,12 +48,8 @@ import {
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_DAMAGE_TYPE_CHANGE_LABEL,
   MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
-  MONSTER_ACTION_LONG_RANGE_LABEL,
-  MONSTER_ACTION_NORMAL_RANGE_LABEL,
   MONSTER_ACTION_REACH_FIELD_LABEL,
   MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
-  MONSTER_SAVE_ABILITY_HINT,
-  MONSTER_SAVE_ABILITY_LABEL,
   MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL,
   MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL,
   MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT,
@@ -53,11 +60,8 @@ import {
   MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_HINT,
   MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL,
   MONSTER_SAVE_DC_ABILITY_LABEL,
-  MONSTER_SAVE_DC_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
-  MONSTER_SPELLCASTING_ABILITY_SAVE_DC_HINT,
   MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
-  MONSTER_SAVE_THROW_SECTION_LEGEND,
   MONSTER_TRIGGER_LABEL,
   MONSTER_TURN_LIMIT_ADD_LABEL,
   MONSTER_TURN_LIMIT_EMPTY_LABEL,
@@ -343,10 +347,10 @@ function monsterActionSaveDcDependent(namePrefix: string, currentActionId: strin
   return monsterAbilitySourceDependent({
     sourcePath: 'dcSource',
     namePrefix,
-    controllerLabel: MONSTER_SAVE_DC_LABEL,
+    controllerLabel: SAVING_THROW_DC_SOURCE_LABEL,
     currentActionId,
     dependentsChrome: 'none',
-    spellcastingHint: MONSTER_SPELLCASTING_ABILITY_SAVE_DC_HINT,
+    spellcastingHint: SAVING_THROW_SPELLCASTING_HINT,
     abilityFields: [
       {
         kind: 'row',
@@ -445,15 +449,15 @@ function monsterActionSaveSection(
 ): FormItem {
   return {
     kind: 'group',
-    heading: { label: MONSTER_SAVE_THROW_SECTION_LEGEND },
+    heading: { label: SAVING_THROW_SECTION_LEGEND },
     description: MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
     fields: [
       {
         type: 'select',
         name: 'resolution.method.ability',
-        label: MONSTER_SAVE_ABILITY_LABEL,
+        label: SAVING_THROW_ABILITY_LABEL,
         options: abilityOptions(),
-        hint: MONSTER_SAVE_ABILITY_HINT,
+        hint: SAVING_THROW_ABILITY_HINT,
       },
       monsterActionSaveDcDependent(namePrefix, currentActionId),
       monsterActionSaveSelectionDependent(),
@@ -508,8 +512,8 @@ function monsterAttackRangeJoinedPairs(modeField: 'mode' | 'modes'): JoinedPairF
     normalName: 'range.normal',
     longName: 'range.long',
     normalRequired: true,
-    normalLabel: MONSTER_ACTION_NORMAL_RANGE_LABEL,
-    longLabel: MONSTER_ACTION_LONG_RANGE_LABEL,
+    normalLabel: ATTACK_RANGE_NORMAL_FIELD_LABEL,
+    longLabel: ATTACK_RANGE_LONG_FIELD_LABEL,
   }).map((field) => withModeFieldVisibility(field, ranged))
 }
 
@@ -768,7 +772,7 @@ function monsterActionMechanicFields(input: {
                 name={`${namePrefix}.savingThrow.dcSource.castingAbility`}
                 currentActionId={action.id}
                 required={false}
-                hint={MONSTER_SPELLCASTING_ABILITY_SAVE_DC_HINT}
+                hint={SAVING_THROW_SPELLCASTING_HINT}
                 preview="save-dc"
               />
             ),

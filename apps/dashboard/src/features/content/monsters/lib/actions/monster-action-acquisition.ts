@@ -6,6 +6,7 @@ import {
   getDamageTypeLabel,
   listSpecialMenuActionPresetIds,
   MONSTER_SPELLCASTING_ACTION_NAME,
+  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
   PRIMARY_SPELLCASTING_PROFILE,
   type ActionPresetId,
 } from '@rpg/contracts'
@@ -17,7 +18,6 @@ import {
   MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_DESCRIPTION,
   MONSTER_CAST_SPELL_LABEL,
-  MONSTER_PRIMARY_SPELLCASTING_NOTE,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
   monsterAddWeaponShortcut,
 } from '../monster-form-labels'
@@ -66,7 +66,7 @@ const OTHER_ITEMS: readonly MonsterActionAcquisitionItem[] = [
   },
   {
     id: 'create:spell',
-    label: 'Spellcasting',
+    label: MONSTER_SPELLCASTING_ACTION_NAME,
     groupId: 'other',
     metadata: MONSTER_ACQUISITION_SPELL_DESCRIPTION,
   },
@@ -244,7 +244,7 @@ function generalAcquisitionItems(
           {
             ...spellcasting,
             ...(primarySpellcasting
-              ? { disabled: true, note: MONSTER_PRIMARY_SPELLCASTING_NOTE }
+              ? { disabled: true, note: PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE }
               : {}),
           },
         ]

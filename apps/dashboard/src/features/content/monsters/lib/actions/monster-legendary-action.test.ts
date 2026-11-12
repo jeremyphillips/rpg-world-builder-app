@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { formatSpellCastAtLevelName } from '@rpg/contracts'
+import { formatSpellCastAtLevelName, getMonsterActionKindLabel } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
+  LEGENDARY_ACTION_CATEGORY_LABELS,
   LEGENDARY_CAST_SPELL_DISABLED_NOTE,
   LEGENDARY_REFERENCE_DISABLED_NOTE,
   LEGENDARY_SPELLCASTING_DISABLED_NOTE,
@@ -27,6 +28,12 @@ function names(fields: { name?: string }[]): string[] {
 }
 
 describe('legendary action acquisition', () => {
+  it('uses the action-reference kind label for the reference category', () => {
+    expect(LEGENDARY_ACTION_CATEGORY_LABELS.reference).toBe(
+      getMonsterActionKindLabel('action-reference'),
+    )
+  })
+
   it('groups the four choices and explains each disabled item', () => {
     const values = resolveMonsterCreateDefaultValues()
     const items = legendaryActionAcquisitionItems(values, ctx)

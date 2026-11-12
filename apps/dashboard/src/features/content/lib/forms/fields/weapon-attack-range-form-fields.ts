@@ -9,6 +9,10 @@ import {
 
 const WEAPON_ATTACK_LONG_RANGE_HINT = 'Disadvantage beyond normal range.'
 
+/** Full field labels for attack-range authoring (monsters); equipment may pass shorter labels. */
+export const ATTACK_RANGE_NORMAL_FIELD_LABEL = 'Normal range'
+export const ATTACK_RANGE_LONG_FIELD_LABEL = 'Long range'
+
 export type AttackRangeRowOptions = {
   normalName: string
   longName: string

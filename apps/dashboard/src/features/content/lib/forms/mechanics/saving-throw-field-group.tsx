@@ -8,17 +8,31 @@ import {
 import type { FormItem } from '@rpg/ui/form'
 import type { ReactNode } from 'react'
 
-export const SAVING_THROW_ADD_LABEL = 'Add saving throw'
-export const SAVING_THROW_REMOVE_LABEL = 'Remove saving throw'
-export const SAVING_THROW_SUCCESS_ADD_LABEL = 'Add success'
-export const SAVING_THROW_ABILITY_LABEL = 'Save ability'
-export const SAVING_THROW_DC_SOURCE_LABEL = 'DC source'
-export const SAVING_THROW_ABILITY_HINT = 'The ability the target uses for the save.'
-export const SAVING_THROW_SPELLCASTING_HINT = 'Ability used to calculate the DC.'
-export const SAVING_THROW_TARGETS_HINT = 'Who makes the save, including range or timing.'
-export const SAVING_THROW_TARGETS_PLACEHOLDER = 'each creature in a 20-foot Emanation'
-export const SAVING_THROW_FAILURE_PLACEHOLDER = '31 (9d6) Necrotic damage'
-export const SAVING_THROW_SUCCESS_PLACEHOLDER = 'Half damage'
+import {
+  SAVING_THROW_ADD_LABEL,
+  SAVING_THROW_ABILITY_HINT,
+  SAVING_THROW_ABILITY_LABEL,
+  SAVING_THROW_DC_SOURCE_LABEL,
+  SAVING_THROW_DC_SOURCE_SPELLCASTING_OPTION_LABEL,
+  SAVING_THROW_FAILURE_PLACEHOLDER,
+  SAVING_THROW_REMOVE_LABEL,
+  SAVING_THROW_SECTION_LEGEND,
+  SAVING_THROW_SUCCESS_ADD_LABEL,
+  SAVING_THROW_SUCCESS_PLACEHOLDER,
+  SAVING_THROW_TARGETS_HINT,
+  SAVING_THROW_TARGETS_PLACEHOLDER,
+} from './saving-throw-field-copy'
+
+export {
+  SAVING_THROW_ADD_LABEL,
+  SAVING_THROW_ABILITY_HINT,
+  SAVING_THROW_ABILITY_LABEL,
+  SAVING_THROW_DC_SOURCE_LABEL,
+  SAVING_THROW_SPELLCASTING_HINT,
+  SAVING_THROW_REMOVE_LABEL,
+  SAVING_THROW_SECTION_LEGEND,
+  SAVING_THROW_SUCCESS_ADD_LABEL,
+} from './saving-throw-field-copy'
 
 function abilityOptions() {
   return ABILITY_IDS.map((id) => ({ value: id, label: getAbilityLabel(id) }))
@@ -36,7 +50,7 @@ export function savingThrowFieldGroup(input: { renderCastingAbility: () => React
   return {
     kind: 'group',
     name: 'savingThrow',
-    legend: 'Saving throw',
+    legend: SAVING_THROW_SECTION_LEGEND,
     separator: 'subtle',
     optionalDisclosure: {
       addLabel: SAVING_THROW_ADD_LABEL,
@@ -68,7 +82,7 @@ export function savingThrowFieldGroup(input: { renderCastingAbility: () => React
             width: '1/2',
             options: [
               { value: 'fixed', label: 'Fixed' },
-              { value: 'spellcasting', label: 'Spellcasting' },
+              { value: 'spellcasting', label: SAVING_THROW_DC_SOURCE_SPELLCASTING_OPTION_LABEL },
             ],
           },
         ],

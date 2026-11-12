@@ -13,13 +13,13 @@ import { z } from 'zod'
 
 import { MonsterAttackRangeClusterSlot } from '../../../monsters/lib/actions/monster-attack-range-cluster-slot.client'
 import {
+  ATTACK_RANGE_LONG_FIELD_LABEL,
+  ATTACK_RANGE_NORMAL_FIELD_LABEL,
   attackRangeJoinedPairFields,
   weaponAttackRangeGroup,
 } from './weapon-attack-range-form-fields'
 import {
   MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
-  MONSTER_ACTION_LONG_RANGE_LABEL,
-  MONSTER_ACTION_NORMAL_RANGE_LABEL,
   MONSTER_ACTION_REACH_FIELD_LABEL,
 } from '../../../monsters/lib/monster-form-labels'
 
@@ -70,8 +70,8 @@ function monsterDistanceFields(): FormItem {
     normalName: 'range.normal',
     longName: 'range.long',
     normalRequired: true,
-    normalLabel: MONSTER_ACTION_NORMAL_RANGE_LABEL,
-    longLabel: MONSTER_ACTION_LONG_RANGE_LABEL,
+    normalLabel: ATTACK_RANGE_NORMAL_FIELD_LABEL,
+    longLabel: ATTACK_RANGE_LONG_FIELD_LABEL,
   }).map((field) => ({
     ...field,
     visibility: field.visibility
@@ -255,7 +255,7 @@ describe('monster distance inline range form', () => {
         onSubmit={vi.fn()}
       />,
     )
-    expect(screen.getByText(MONSTER_ACTION_NORMAL_RANGE_LABEL)).toBeInTheDocument()
+    expect(screen.getByText(ATTACK_RANGE_NORMAL_FIELD_LABEL)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add long range' })).toBeInTheDocument()
     expect(screen.queryByText(MONSTER_ACTION_REACH_FIELD_LABEL)).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Add long range' }))

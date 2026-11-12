@@ -23,8 +23,8 @@ import {
   MONSTER_LOADING_EQUIPMENT,
   MONSTER_LOADING_SPELLS,
   MONSTER_SPELL_CATALOG_ERROR,
-  MONSTER_SPELLCASTING_ABILITY_LABEL,
 } from '../monster-form-labels'
+import { SPELLCASTING_ABILITY_FIELD_LABEL } from '../../../lib/forms/mechanics/spellcasting-ability-field-copy'
 import type { MonsterFormValues } from '../monster-form-values'
 import { normalizeMonsterFormValues } from '../normalize-monster-form-values'
 import type { MonsterActionSection } from './monster-action-equipment-references'
@@ -93,13 +93,13 @@ export function resolveMonsterActionSpellPreviewGuidance({
 
   const spellsInBody = buildMonsterSpellsInBody(values)
   if (!castingAbilityConfigured(action, spellsInBody)) {
-    return configure(MONSTER_SPELLCASTING_ABILITY_LABEL)
+    return configure(SPELLCASTING_ABILITY_FIELD_LABEL)
   }
   if (!spellRowsPopulated(action)) {
     return configure(getContentTypeTerm('spells').label)
   }
   if (!values.challengeRating) return configure(MONSTER_CHALLENGE_HEADING)
-  return configure(MONSTER_SPELLCASTING_ABILITY_LABEL)
+  return configure(SPELLCASTING_ABILITY_FIELD_LABEL)
 }
 
 function tryDeriveSpellLine(

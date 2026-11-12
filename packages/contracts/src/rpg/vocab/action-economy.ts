@@ -31,6 +31,13 @@ export const ACTION_ECONOMY_ENTRIES = {
 
 export type ActionEconomyId = keyof typeof ACTION_ECONOMY_ENTRIES
 
+/** Stat-block and authoring section headings — explicit plurals, not naive `label + s`. */
+export const ACTION_ECONOMY_SECTION_LABELS = {
+  action: 'Actions',
+  'bonus-action': 'Bonus actions',
+  reaction: 'Reactions',
+} as const satisfies Record<ActionEconomyId, string>
+
 export const ACTION_ECONOMY_IDS = keysFromEntries(ACTION_ECONOMY_ENTRIES)
 
 export const actionEconomySchema = vocabEnumFromEntries(ACTION_ECONOMY_ENTRIES)
@@ -38,4 +45,9 @@ export const actionEconomySchema = vocabEnumFromEntries(ACTION_ECONOMY_ENTRIES)
 /** Returns the display label for an action economy id. Falls back to the raw value. */
 export function getActionEconomyLabel(id: string): string {
   return ACTION_ECONOMY_ENTRIES[id as ActionEconomyId]?.label ?? id
+}
+
+/** Section heading for a list of abilities in that action-economy slot. */
+export function getActionEconomySectionLabel(id: string): string {
+  return ACTION_ECONOMY_SECTION_LABELS[id as ActionEconomyId] ?? id
 }

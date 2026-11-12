@@ -41,7 +41,6 @@ const COPY_DERIVATION_BASELINE = [
   '1 apps/dashboard/src/features/content/locations/lib/connected-parties/location-connection-surface-copy.ts label-getter',
   '2 apps/dashboard/src/features/content/locations/lib/forms/location-classification-form-fields.ts label-identifier',
   '1 apps/dashboard/src/features/content/monsters/lib/actions/monster-weapon-damage-override.ts label-identifier',
-  '1 apps/dashboard/src/features/content/monsters/lib/monster-form-labels.ts naive-plural',
   '4 apps/dashboard/src/features/game-terms/routes/vocabulary-overview-content.tsx label-identifier',
   '2 apps/dashboard/src/features/game-terms/routes/vocabulary-term-detail-content.tsx label-identifier',
   '2 apps/dashboard/src/features/media/lib/media-role-confirm.lib.ts label-identifier',

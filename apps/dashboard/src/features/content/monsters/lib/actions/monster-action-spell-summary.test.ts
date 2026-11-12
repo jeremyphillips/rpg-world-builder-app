@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import {
-  MONSTER_SPELLCASTING_ABILITY_LABEL,
-  formatMonsterActionSpellPreviewConfigureHint,
-} from '../monster-form-labels'
+import { formatMonsterActionSpellPreviewConfigureHint } from '../monster-form-labels'
+import { SPELLCASTING_ABILITY_FIELD_LABEL } from '../../../lib/forms/mechanics/spellcasting-ability-field-copy'
 import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 import { buildMonsterActionSpellPreview } from './monster-action-spell-summary'
 
@@ -85,7 +83,7 @@ describe('buildMonsterActionSpellPreview', () => {
       }),
     ).toEqual({
       status: 'unavailable',
-      guidance: formatMonsterActionSpellPreviewConfigureHint(MONSTER_SPELLCASTING_ABILITY_LABEL),
+      guidance: formatMonsterActionSpellPreviewConfigureHint(SPELLCASTING_ABILITY_FIELD_LABEL),
     })
   })
 })

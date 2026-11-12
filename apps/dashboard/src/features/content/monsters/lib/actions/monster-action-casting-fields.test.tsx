@@ -3,12 +3,15 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
+import { SPELLCASTING_ABILITY_FIELD_LABEL } from '../../../lib/forms/mechanics/spellcasting-ability-field-copy'
 import type { MonsterFormValues } from '../monster-form-values'
 import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 import {
   MonsterActionCastingAbilityField,
   MonsterLegendarySpellcastingActionField,
 } from './monster-action-casting-fields'
+
+const SPELLCASTING_ABILITY_LABEL = SPELLCASTING_ABILITY_FIELD_LABEL
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
@@ -20,8 +23,6 @@ beforeAll(() => {
     HTMLElement.prototype.scrollIntoView = () => {}
   }
 })
-
-const SPELLCASTING_ABILITY_LABEL = 'Spellcasting ability'
 
 function Host({ name, currentActionId }: { name: string; currentActionId?: string }) {
   const form = useForm<MonsterFormValues>({ defaultValues: resolveMonsterCreateDefaultValues() })

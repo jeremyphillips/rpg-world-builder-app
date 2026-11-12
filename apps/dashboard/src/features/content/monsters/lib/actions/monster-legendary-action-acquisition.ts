@@ -13,13 +13,12 @@ import {
   LEGENDARY_CAST_SPELL_LABEL,
   LEGENDARY_CUSTOM_DESCRIPTION,
   LEGENDARY_CUSTOM_LABEL,
+  LEGENDARY_ACTION_CATEGORY_LABELS,
   LEGENDARY_REFERENCE_DESCRIPTION,
   LEGENDARY_REFERENCE_DISABLED_NOTE,
-  LEGENDARY_REFERENCE_LABEL,
   LEGENDARY_SPELLCASTING_DEFAULT_NAME,
   LEGENDARY_SPELLCASTING_DESCRIPTION,
   LEGENDARY_SPELLCASTING_DISABLED_NOTE,
-  LEGENDARY_SPELLCASTING_LABEL,
 } from '../monster-form-labels'
 import type { MonsterFormValues } from '../monster-form-values'
 import { createSpellActionDraft } from './monster-action-acquisition'
@@ -84,7 +83,7 @@ export function legendaryActionAcquisitionItems(
   return [
     {
       id: 'legendary:reference',
-      label: LEGENDARY_REFERENCE_LABEL,
+      label: LEGENDARY_ACTION_CATEGORY_LABELS.reference,
       groupId: 'existing',
       metadata: LEGENDARY_REFERENCE_DESCRIPTION,
       disabled: targets.length === 0,
@@ -92,7 +91,7 @@ export function legendaryActionAcquisitionItems(
     },
     {
       id: 'legendary:spellcasting',
-      label: LEGENDARY_SPELLCASTING_LABEL,
+      label: LEGENDARY_ACTION_CATEGORY_LABELS.spellcasting,
       groupId: 'existing',
       metadata: LEGENDARY_SPELLCASTING_DESCRIPTION,
       disabled: sources.length === 0,

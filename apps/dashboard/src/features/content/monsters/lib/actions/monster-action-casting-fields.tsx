@@ -8,7 +8,11 @@ import {
 import { useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { formatCastingSourceChangeNotice } from '../monster-form-labels'
+import {
+  formatCastingSourceChangeNotice,
+  MONSTER_LEGENDARY_SPELLCASTING_FIELD_HINT,
+  MONSTER_LEGENDARY_SPELLCASTING_FIELD_LABEL,
+} from '../monster-form-labels'
 import {
   legendarySpellcastingActionOptions,
   monsterCastingDependentLabels,
@@ -18,12 +22,10 @@ import {
   type MonsterCastingAbilityPreview,
 } from './monster-casting-ability-options'
 import {
-  MONSTER_LEGENDARY_SPELLCASTING_FIELD_HINT,
-  MONSTER_LEGENDARY_SPELLCASTING_FIELD_LABEL,
-  MONSTER_SPELLCASTING_ABILITY_LABEL,
-  MONSTER_SPELLCASTING_ABILITY_PRIMARY_HINT,
-  MONSTER_SPELLCASTING_ABILITY_SHARED_HINT,
-} from '../monster-form-labels'
+  SPELLCASTING_ABILITY_FIELD_LABEL,
+  SPELLCASTING_ABILITY_PRIMARY_HINT,
+  SPELLCASTING_ABILITY_SHARED_HINT,
+} from '../../../lib/forms/mechanics/spellcasting-ability-field-copy'
 import type { MonsterFormValues } from '../monster-form-values'
 
 function castingAbilityValue(value: unknown): string {
@@ -108,15 +110,13 @@ export function MonsterActionCastingAbilityField({
   const error = resolveFieldErrorMessage(resolveNestedFieldErrorMessage(formState.errors, name))
   const hint =
     hintOverride ??
-    (profile === 'primary'
-      ? MONSTER_SPELLCASTING_ABILITY_PRIMARY_HINT
-      : MONSTER_SPELLCASTING_ABILITY_SHARED_HINT)
+    (profile === 'primary' ? SPELLCASTING_ABILITY_PRIMARY_HINT : SPELLCASTING_ABILITY_SHARED_HINT)
 
   return (
     <SelectField
       id={fieldId}
       name={name}
-      label={MONSTER_SPELLCASTING_ABILITY_LABEL}
+      label={SPELLCASTING_ABILITY_FIELD_LABEL}
       required={required}
       placeholder="Choose"
       hint={hint}

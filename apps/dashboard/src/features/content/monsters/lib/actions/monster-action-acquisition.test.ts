@@ -1,3 +1,4 @@
+import { getMonsterActionKindLabel, PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -76,6 +77,9 @@ describe('monster action acquisition presentation', () => {
       label: 'Attack roll',
       metadata: MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
     })
+    expect(items.find((item) => item.id === 'create:attack')?.label).not.toBe(
+      getMonsterActionKindLabel('attack'),
+    )
     expect(items.find((item) => item.id === 'create:spell')).toMatchObject({
       metadata: MONSTER_ACQUISITION_SPELL_DESCRIPTION,
     })
@@ -83,6 +87,9 @@ describe('monster action acquisition presentation', () => {
       label: 'Custom ability',
       metadata: MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
     })
+    expect(items.find((item) => item.id === 'create:special')?.label).not.toBe(
+      getMonsterActionKindLabel('special'),
+    )
     expect(items.find((item) => item.id === 'create:save')).toBeUndefined()
     expect(parseMonsterActionAcquisitionId('create:save')).toBeUndefined()
     expect(items.find((item) => item.id === 'natural:other')?.metadata).toBeUndefined()
@@ -180,7 +187,7 @@ describe('primary Spellcasting acquisition', () => {
     })
     expect(taken.find((item) => item.id === 'create:spell')).toMatchObject({
       disabled: true,
-      note: 'Only one Spellcasting profile is allowed.',
+      note: PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
     })
 
     const bonus = monsterActionAcquisitionItems({
