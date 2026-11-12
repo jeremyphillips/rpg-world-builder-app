@@ -725,7 +725,7 @@ function monsterActionSpellMechanics(input: {
   ]
 }
 
-/** Trigger, usage, configuration, primary damage, then secondary effects. */
+/** Trigger and save setup, then configuration, on-hit, then usage (recharge / limits). */
 function monsterActionMechanicFields(input: {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
@@ -833,7 +833,7 @@ function monsterActionMechanicFields(input: {
       ],
     })
   }
-  return [...trigger, ...saveGroup, ...usage, ...kindFields]
+  return [...trigger, ...saveGroup, ...kindFields, ...usage]
 }
 
 function turnLimitField(): FormItem {

@@ -299,12 +299,12 @@ describe('monster action detail fields', () => {
     expect(attack).not.toContain('moveSection')
     expect(natural[0]).toBe('attackPreview')
     expect(natural[1]).toBe('buildAdvisories')
-    expect(natural.indexOf('limitedUse')).toBeLessThan(natural.indexOf('damageType'))
-    expect(natural.indexOf('onHit.effects')).toBeLessThan(natural.indexOf('description'))
+    expect(natural.indexOf('onHit.effects')).toBeLessThan(natural.indexOf('limitedUse'))
+    expect(natural.indexOf('limitedUse')).toBeLessThan(natural.lastIndexOf('description'))
     expect(natural.at(-1)).toBe('description')
     expect(attack[0]).toBe('attackPreview')
     expect(attack[1]).toBe('buildAdvisories')
-    expect(attack.indexOf('limitedUse')).toBeLessThan(attack.indexOf('modes'))
+    expect(attack.indexOf('onHit.effects')).toBeLessThan(attack.indexOf('limitedUse'))
     const attackBonus = attackItems.find(
       (item) =>
         'kind' in item &&
@@ -380,7 +380,7 @@ describe('monster action detail fields', () => {
     expect(attack.indexOf('bonusSource.kind')).toBeLessThan(attack.indexOf('reach'))
     expect(attack.indexOf('reach')).toBeLessThan(attack.indexOf('range.normal'))
     expect(attack.indexOf('range.normal')).toBeLessThan(attack.indexOf('damageType'))
-    expect(attack.indexOf('onHit.effects')).toBeLessThan(attack.indexOf('description'))
+    expect(attack.indexOf('limitedUse')).toBeLessThan(attack.lastIndexOf('description'))
     expect(attack.at(-1)).toBe('description')
 
     const weapon = detailFields({ id: 'sword', kind: 'weapon', equipmentEntryId: 'sword' })
@@ -471,7 +471,7 @@ describe('monster action detail fields', () => {
     const damageTypeIndex = names.indexOf('resolution.effects.0.damageType')
     const rollIndex = names.indexOf('resolution.effects.0.roll')
     expect(names[0]).toBe('buildAdvisories')
-    expect(names.indexOf('limitedUse')).toBeLessThan(names.indexOf('resolution.method.ability'))
+    expect(names.indexOf('_saveSuccessAmount')).toBeLessThan(names.indexOf('limitedUse'))
     expect(names.indexOf('resolution.method.ability')).toBeLessThan(
       names.indexOf('resolution.selectionMode'),
     )
