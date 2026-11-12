@@ -4,6 +4,8 @@ import {
   formatSpellLevel,
   formatSpellPickerMetadataGroupLabel,
   limitedUseSchema,
+  MAX_SPELL_LEVEL,
+  MIN_SPELL_LEVEL,
   type LimitedUse,
   type Spell,
 } from '@rpg/contracts'
@@ -92,13 +94,14 @@ export function spellFrequencyControlIsShared(
   )
 }
 
+/** Upcast is only meaningful below the top spell level slot column. */
 export function spellAllowsHigherCastLevel(level: number | undefined): boolean {
-  return level !== undefined && level >= 1 && level <= 8
+  return level !== undefined && level >= MIN_SPELL_LEVEL && level < MAX_SPELL_LEVEL
 }
 
 export function higherCastLevelOptions(spellLevel: number): SpellFrequencyOption[] {
   const options: SpellFrequencyOption[] = []
-  for (let level = spellLevel + 1; level <= 9; level += 1) {
+  for (let level = spellLevel + 1; level <= MAX_SPELL_LEVEL; level += 1) {
     options.push({ value: String(level), label: formatSpellLevel(level) })
   }
   return options

@@ -1,13 +1,18 @@
-import { MOVEMENT_ALLOWANCE_ENTRIES, MOVEMENT_ALLOWANCES, getContentTypeTerm } from '@rpg/contracts'
+import {
+  MOVEMENT_ALLOWANCE_ENTRIES,
+  MOVEMENT_ALLOWANCES,
+  getContentTypeTerm,
+  type Spell,
+} from '@rpg/contracts'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import {
   MonsterActionCastingAbilityField,
   MonsterLegendarySpellcastingActionField,
 } from './monster-action-casting-fields'
+import { monsterSpellCastAtLevelField } from './monster-spell-cast-at-level-form-fields'
 import { spellComponentField } from './monster-action-on-hit-fields'
 import {
-  MONSTER_CAST_AT_LEVEL_HINT,
   MONSTER_CAST_SPELL_HINT,
   MONSTER_MOVEMENT_ADD_LABEL,
   MONSTER_MOVEMENT_HINT,
@@ -36,17 +41,6 @@ export function monsterSpellIdField(
   }
 }
 
-export function monsterCastAtLevelField(name = 'castAtLevel'): FormItem {
-  return {
-    type: 'number',
-    name,
-    label: 'Cast at level',
-    min: 0,
-    max: 9,
-    hint: { text: MONSTER_CAST_AT_LEVEL_HINT },
-  }
-}
-
 /** Reference and spell editors for Legendary Actions. Custom ability stays on the shared path. */
 export function legendaryActionDetailFields(input: {
   category: Exclude<LegendaryActionCategory, 'custom'>
@@ -56,6 +50,7 @@ export function legendaryActionDetailFields(input: {
   referenceOptions: { value: string; label: string }[]
   catalogSpellOptions: { value: string; label: string }[]
   sourceSpellOptions: { value: string; label: string }[]
+  spellCatalogById?: ReadonlyMap<string, Spell>
   onCastingSourceBlocked?: (message: string) => void
 }): FormItem[] {
   if (input.category === 'reference') {
@@ -130,7 +125,11 @@ export function legendaryActionDetailFields(input: {
       hint: MONSTER_CAST_SPELL_HINT,
       required: true,
     }),
-    monsterCastAtLevelField('spells.0.castAtLevel'),
+    monsterSpellCastAtLevelField({
+      name: 'spells.0.castAtLevel',
+      spellIdField: 'spells.0.spellId',
+      catalog: input.spellCatalogById,
+    }),
     spellComponentField(),
   ]
 }

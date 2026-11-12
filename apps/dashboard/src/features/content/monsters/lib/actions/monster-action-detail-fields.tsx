@@ -63,8 +63,6 @@ import {
   MONSTER_TURN_LIMIT_LABEL,
   MONSTER_TURN_LIMIT_OPTION_LABEL,
   MONSTER_ATTACK_BONUS_LABEL,
-  MONSTER_SPELL_CAST_HIGHER_LEVEL_LABEL,
-  MONSTER_SPELL_CAST_LEVEL_PLACEHOLDER,
 } from '../monster-form-labels'
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
@@ -87,7 +85,7 @@ import {
 } from './monster-action-save-outcome-fields'
 import { legendaryActionCategory } from './legendary-action-category'
 import { legendaryActionDetailFields } from './monster-legendary-action-fields'
-import { spellAllowsHigherCastLevel, higherCastLevelOptions } from './monster-spell-frequency'
+import { monsterSpellCastAtLevelField } from './monster-spell-cast-at-level-form-fields'
 import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../components/form/monster-spell-picker-context'
 import {
   MonsterSpellChangeAction,
@@ -636,40 +634,6 @@ function monsterActionEquipmentField(
   }
 }
 
-function monsterSpellCastAtLevelField(
-  catalog: ReadonlyMap<string, Spell> | undefined,
-): SelectFieldConfig {
-  return {
-    type: 'select',
-    name: 'castAtLevel',
-    label: 'Cast at level',
-    labelVisibility: 'srOnly',
-    placeholder: MONSTER_SPELL_CAST_LEVEL_PLACEHOLDER,
-    width: '1/2',
-    optionalDisclosure: {
-      addLabel: MONSTER_SPELL_CAST_HIGHER_LEVEL_LABEL,
-      expandWhenPopulated: true,
-    },
-    optionsResolve: {
-      dependsOn: ['spellId'],
-      optionsWhen: (values) => {
-        const spellId = typeof values.spellId === 'string' ? values.spellId : ''
-        const spell = catalog?.get(spellId)
-        if (!spell || !spellAllowsHigherCastLevel(spell.level)) return []
-        return higherCastLevelOptions(spell.level)
-      },
-    },
-    visibility: {
-      dependsOn: ['spellId'],
-      visibleWhen: (values) => {
-        const spellId = typeof values.spellId === 'string' ? values.spellId : ''
-        const spell = catalog?.get(spellId)
-        return Boolean(spell && spellAllowsHigherCastLevel(spell.level))
-      },
-    },
-  }
-}
-
 function monsterActionSpellMechanics(input: {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
@@ -724,7 +688,12 @@ function monsterActionSpellMechanics(input: {
               width: '1/2',
               render: () => <MonsterSpellFrequencySlot />,
             },
-            monsterSpellCastAtLevelField(input.ctx.spellCatalogById),
+            monsterSpellCastAtLevelField({
+              catalog: input.ctx.spellCatalogById,
+              spellIdField: 'spellId',
+              labelVisibility: 'srOnly',
+              width: '1/2',
+            }),
           ],
         },
       ],
@@ -884,6 +853,7 @@ function legendaryAuthoringFields(input: {
       referenceOptions: input.referenceOptions ?? [],
       catalogSpellOptions: spellOptions(input.ctx),
       sourceSpellOptions: input.sourceSpellOptions ?? [],
+      spellCatalogById: input.ctx.spellCatalogById,
       onCastingSourceBlocked: input.onCastingSourceBlocked,
     }),
     turnLimitField(),
