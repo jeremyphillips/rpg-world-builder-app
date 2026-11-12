@@ -4,11 +4,13 @@ import { useMemo, useState } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
 
 import { OptionalFieldDisclosure } from '../../../components/ui/optional-field-disclosure.client'
+import { useFieldRowParticipation } from '../../../components/ui/field-row-anatomy.context'
 import { useFieldControlSize } from '../../context/form-section.context'
 import type { JoinedPairFieldConfig, OptionalDisclosureConfig } from '../../field-config'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { useConfirmBeforeClear } from '../../config/use-confirm-before-clear.client'
 import { JoinedPairFieldRenderer } from './joined-pair-field-renderer.client'
+import { JoinedPairDisclosureRowMessage } from './joined-pair-disclosure-row-message.client'
 import { resolveJoinedPairBoundPaths } from './joined-pair-field-renderer.lib'
 
 function hasAmount(value: unknown): boolean {
@@ -28,6 +30,7 @@ export function OptionalDisclosureJoinedPairFieldRenderer({
   namePrefix?: string
 }) {
   const { control } = useFormContext()
+  const inAnatomyRow = useFieldRowParticipation()
   const { startPath } = resolveJoinedPairBoundPaths(config, namePrefix)
   const watchedAmount = useWatch({ control, name: startPath })
   const { field } = useController({ control, name: startPath })
@@ -35,6 +38,14 @@ export function OptionalDisclosureJoinedPairFieldRenderer({
   const expandWhenPopulated = disclosure.expandWhenPopulated !== false
   const open = manualOpen || (expandWhenPopulated && hasAmount(watchedAmount))
   const controlSize = useFieldControlSize(config.controlSizeOverride)
+  const disclosureConfig = useMemo(
+    () => ({ ...config, labelVisibility: 'srOnly' as const }),
+    [config],
+  )
+  const hoistRowMessage = inAnatomyRow && open
+  const rowMessage = hoistRowMessage ? (
+    <JoinedPairDisclosureRowMessage config={disclosureConfig} id={id} namePrefix={namePrefix} />
+  ) : undefined
   const clearValue = () => {
     setManualOpen(false)
     field.onChange(undefined)
@@ -75,11 +86,14 @@ export function OptionalDisclosureJoinedPairFieldRenderer({
         size={controlSize}
         addDisabled={addDisabled}
         summary={collapsedSummary}
+        message={rowMessage}
       >
         <JoinedPairFieldRenderer
-          config={{ ...config, labelVisibility: 'srOnly' }}
+          config={disclosureConfig}
           id={id}
           namePrefix={namePrefix}
+          showLayoutMessage={!hoistRowMessage}
+          rowAwareHints={hoistRowMessage}
         />
       </OptionalFieldDisclosure>
       {confirmDialog}

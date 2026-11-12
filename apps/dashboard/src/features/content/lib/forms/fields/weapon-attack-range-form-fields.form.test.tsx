@@ -7,10 +7,11 @@ import {
 } from '@rpg/contracts'
 import { combineFieldVisibilityAll, Form, type FormItem } from '@rpg/ui/form'
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { z } from 'zod'
 
+import { MonsterAttackRangeClusterSlot } from '../../../monsters/lib/actions/monster-attack-range-cluster-slot.client'
 import {
   attackRangeJoinedPairFields,
   weaponAttackRangeGroup,
@@ -95,7 +96,20 @@ function monsterDistanceFields(): FormItem {
           visibleWhen: (values) =>
             arrayIncludes(values.modes, 'melee') && arrayIncludes(values.modes, 'ranged'),
         },
-        fields: [{ ...reach, visibility: meleeVisibility }, ...rangeFields],
+        fields: [
+          { ...reach, width: '1/3' as const, visibility: meleeVisibility },
+          {
+            kind: 'slot' as const,
+            name: 'attackRangeCluster',
+            width: '2/3' as const,
+            render: () => (
+              <MonsterAttackRangeClusterSlot
+                idPrefix="monster-distance"
+                fields={rangeFields.map((field) => ({ ...field, width: '1/2' as const }))}
+              />
+            ),
+          },
+        ],
       },
       {
         kind: 'row',
@@ -246,6 +260,27 @@ describe('monster distance inline range form', () => {
     expect(screen.queryByText(MONSTER_ACTION_REACH_FIELD_LABEL)).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Add long range' }))
     expect(screen.getByRole('combobox', { name: 'Long range value' })).toBeInTheDocument()
+  })
+
+  it('places expanded long range hint in the row message region for dual modes', () => {
+    const { container } = render(
+      <Form
+        schema={schema}
+        fields={[monsterDistanceFields()]}
+        defaultValues={{ modes: ['melee', 'ranged'], range: { normal: 120, long: 240 }, reach: 5 }}
+        onSubmit={vi.fn()}
+      />,
+    )
+    const hintText = 'Disadvantage beyond normal range.'
+    const participant = screen
+      .getByRole('combobox', { name: 'Long range value' })
+      .closest('[data-field-row-participant]')
+    if (!participant) throw new Error('expected long range participant')
+    const hint = within(participant as HTMLElement).getByText(hintText)
+    expect(hint.closest('[data-field-message-region]')).not.toBeNull()
+    expect(hint.closest('[data-field-control-region]')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Remove Long range' })).toBeInTheDocument()
+    expect(container.querySelector('[data-field-row-anatomy]')).toBeTruthy()
   })
 
   it('shows melee and ranged controls in one row when both modes are selected', () => {

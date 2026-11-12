@@ -95,6 +95,7 @@ export interface JoinedPairFieldFormProps {
       }
   startOccupant: JoinedPairStartOccupantConfig
   endOccupant: JoinedPairEndOccupantConfig
+  showLayoutMessage?: boolean
 }
 
 /** Standalone joined-pair field shell — label, occupants, and shared error slot. */
@@ -115,6 +116,7 @@ export function JoinedPairFieldForm({
   end,
   startOccupant,
   endOccupant,
+  showLayoutMessage = true,
 }: JoinedPairFieldFormProps) {
   assertAllowedJoinedPairComposition({ start: startOccupant, end: endOccupant })
   const labelId = `${id}-label`
@@ -139,6 +141,7 @@ export function JoinedPairFieldForm({
         wrapControl={false}
         chrome={chrome}
         size={size}
+        showMessageRegion={showLayoutMessage}
         label={<FormFieldLabel id={labelId} label={label} required={required} info={info} />}
         control={
           <JoinedPair.Root

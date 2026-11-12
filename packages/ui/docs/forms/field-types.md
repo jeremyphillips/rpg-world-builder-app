@@ -213,6 +213,9 @@ must be chosen first). Dice defaults are not written for a `rollValue` that uses
 - **Collapsed fields unmount** — empty values take no vertical space; populated values stay
   expanded by default.
 - Primitive: `OptionalFieldDisclosure` in `@rpg/ui` for bespoke composition outside
+  schema renderers. Pass `message` when open in an anatomy-grid row so hints/errors
+  render in the row message track (not nested under the control region). Joined-pair
+  optional fields hoist automatically via `OptionalDisclosureJoinedPairFieldRenderer`.
   `<Form>`.
 
 ## Rich text (`richtext`)

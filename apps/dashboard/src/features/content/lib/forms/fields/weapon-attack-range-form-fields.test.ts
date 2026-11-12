@@ -3,6 +3,7 @@ import type { FormItem } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
 import {
+  attackRangeClusterRow,
   attackRangeJoinedPairFields,
   attackRangeRow,
   weaponAttackRangeGroup,
@@ -87,6 +88,19 @@ describe('attackRangeRow', () => {
         longName: 'range.long',
       }),
     )
+  })
+})
+
+describe('attackRangeClusterRow', () => {
+  it('splits Normal and Long at half width for a parent 2/3 column', () => {
+    const row = attackRangeClusterRow({
+      normalName: 'range.normal',
+      longName: 'range.long',
+    })
+    expect(row).toMatchObject({ kind: 'row', spacing: 'compact' })
+    expect(row.fields).toHaveLength(2)
+    expect(row.fields[0]).toMatchObject({ width: '1/2', label: 'Normal' })
+    expect(row.fields[1]).toMatchObject({ width: '1/2', label: 'Long' })
   })
 })
 

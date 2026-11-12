@@ -358,7 +358,7 @@ describe('monster action detail fields', () => {
       (row) =>
         'visibility' in row &&
         row.visibility?.dependsOn?.includes('modes') &&
-        row.fields?.length === 3,
+        row.fields?.length === 2,
     )
     if (!dualRow || !('fields' in dualRow)) {
       throw new Error('expected dual-mode distance row')
@@ -369,21 +369,13 @@ describe('monster action detail fields', () => {
     expect(reachField).toMatchObject({
       start: { name: 'reach', placeholder: '5' },
       visibility: { dependsOn: ['modes'] },
+      width: '1/3',
     })
     expect(reachField).not.toHaveProperty('required', true)
-    const normalRange = dualRow.fields.find(
-      (field) => 'type' in field && field.type === 'joinedPair' && field.label === 'Normal range',
+    const rangeClusterSlot = dualRow.fields.find(
+      (field) => 'kind' in field && field.kind === 'slot' && field.name === 'attackRangeCluster',
     )
-    expect(normalRange).toMatchObject({ required: true, visibility: { dependsOn: ['modes'] } })
-    const longRange = dualRow.fields.find(
-      (field) => 'type' in field && field.type === 'joinedPair' && field.label === 'Long range',
-    )
-    if (!longRange || !('type' in longRange) || longRange.type !== 'joinedPair') {
-      throw new Error('expected long range joined pair')
-    }
-    if (longRange.start.kind !== 'select') throw new Error('expected long select start')
-    expect(longRange.start.optionsResolve?.dependsOn).toEqual(['range.normal'])
-    expect(longRange.optionalDisclosure?.addGate?.dependsOn).toEqual(['range.normal'])
+    expect(rangeClusterSlot).toMatchObject({ width: '2/3' })
     expect(attack.indexOf('modes')).toBeLessThan(attack.indexOf('bonusSource.kind'))
     expect(attack.indexOf('bonusSource.kind')).toBeLessThan(attack.indexOf('reach'))
     expect(attack.indexOf('reach')).toBeLessThan(attack.indexOf('range.normal'))

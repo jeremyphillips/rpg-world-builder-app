@@ -1,5 +1,5 @@
 import { ATTACK_RANGE_FEET } from '@rpg/contracts'
-import type { FieldVisibility, FormItem, JoinedPairFieldConfig } from '@rpg/ui/form'
+import type { FieldVisibility, FormItem, JoinedPairFieldConfig, RowConfig } from '@rpg/ui/form'
 
 import { distanceAmountOptions, distanceJoinedPairField } from './content-distance-form-fields'
 import {
@@ -81,6 +81,19 @@ export function attackRangeRow(options: AttackRangeRowOptions): FormItem {
     kind: 'row',
     visibility: options.visibility,
     fields: [...attackRangeJoinedPairFields(options)],
+  }
+}
+
+/** Normal + Long split evenly inside a parent `2/3` column (dual melee+ranged distance row). */
+export function attackRangeClusterRow(options: AttackRangeRowOptions): RowConfig {
+  return {
+    kind: 'row',
+    spacing: 'compact',
+    visibility: options.visibility,
+    fields: attackRangeJoinedPairFields(options).map((field) => ({
+      ...field,
+      width: '1/2',
+    })),
   }
 }
 

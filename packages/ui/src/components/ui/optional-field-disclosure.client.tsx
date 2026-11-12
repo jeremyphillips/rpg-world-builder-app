@@ -33,6 +33,8 @@ export type OptionalFieldDisclosureProps = {
   summary?: string
   /** Disables the add action while the disclosure is collapsed. */
   addDisabled?: boolean
+  /** Hint, validation, or summary rendered in the anatomy-row message track when open. */
+  message?: ReactNode
 }
 
 /** Collapses an optional field behind a compact add control until opened or populated. */
@@ -50,8 +52,13 @@ function disclosureLabelClass(size: FieldSize): string {
   return cn(fieldLabelVariants({ size }), 'self-center')
 }
 
-function DisclosureHeaderRow({ children }: { children: ReactNode }) {
-  return <div className="flex w-full items-center justify-between gap-2">{children}</div>
+function DisclosureHeaderRow({ label, action }: { label: ReactNode; action: ReactNode }) {
+  return (
+    <div className="flex w-full min-w-0 items-center justify-between gap-2">
+      <span className="min-w-0">{label}</span>
+      <span className="shrink-0">{action}</span>
+    </div>
+  )
 }
 
 /**
@@ -71,14 +78,16 @@ function DisclosureAnatomy({
   message?: ReactNode
 }) {
   return (
-    <div className={fieldRowParticipationClasses} data-field-row-participant="">
+    <div className={cn(fieldRowParticipationClasses, 'min-w-0')} data-field-row-participant="">
       <FieldLabelRegion size={size}>{label}</FieldLabelRegion>
       <FieldControlRegion>
         <FieldRowParticipationProvider participates={false}>
           {control}
         </FieldRowParticipationProvider>
       </FieldControlRegion>
-      <FieldMessageRegion size={size}>{message}</FieldMessageRegion>
+      <FieldMessageRegion size={size}>
+        {message ? <div className="min-w-0 max-w-full">{message}</div> : null}
+      </FieldMessageRegion>
     </div>
   )
 }
@@ -119,12 +128,14 @@ function CollapsedLabeledAddHeader({
   showAdd: boolean
 }) {
   return (
-    <DisclosureHeaderRow>
-      <span className={disclosureLabelClass(size)}>
-        <FieldLabelContent label={fieldLabel} />
-      </span>
-      {showAdd ? addButton : null}
-    </DisclosureHeaderRow>
+    <DisclosureHeaderRow
+      label={
+        <span className={disclosureLabelClass(size)}>
+          <FieldLabelContent label={fieldLabel} />
+        </span>
+      }
+      action={showAdd ? addButton : null}
+    />
   )
 }
 
@@ -235,25 +246,22 @@ function CollapsedOptionalFieldDisclosure({
   return <CollapsedDisclosureStack {...layoutProps} />
 }
 
-export function OptionalFieldDisclosure({
+function DisclosureAddButton({
   controlId,
-  fieldLabel,
   addLabel,
-  removeLabel = 'Remove',
-  open,
+  labeled,
+  summaryId,
+  addDisabled,
   onOpenChange,
-  onRemove,
-  size = 'md',
-  children,
-  labeled = false,
-  summary,
-  addDisabled = false,
-}: OptionalFieldDisclosureProps) {
-  const summaryId = `${controlId}-summary`
-  const inAnatomyRow = useFieldRowParticipation()
-  const summaryNode = <DisclosureSummary id={summaryId} summary={summary} />
-  const addButtonDescribedBy = summary ? summaryId : undefined
-  const addButton = (
+}: {
+  controlId: string
+  addLabel: string
+  labeled: boolean
+  summaryId?: string
+  addDisabled: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  return (
     <Button
       type="button"
       variant="text"
@@ -262,7 +270,7 @@ export function OptionalFieldDisclosure({
       {...(labeled ? formMicroActionButtonProps : {})}
       aria-controls={controlId}
       aria-expanded={false}
-      aria-describedby={addButtonDescribedBy}
+      aria-describedby={summaryId}
       disabled={addDisabled || undefined}
       onClick={() => {
         if (addDisabled) return
@@ -273,6 +281,31 @@ export function OptionalFieldDisclosure({
       {addLabel}
     </Button>
   )
+}
+
+function OpenOptionalFieldDisclosure({
+  size,
+  controlId,
+  fieldLabel,
+  removeLabel,
+  inAnatomyRow,
+  labeled,
+  message,
+  summaryNode,
+  onRemove,
+  children,
+}: {
+  size: FieldSize
+  controlId: string
+  fieldLabel: string
+  removeLabel: string
+  inAnatomyRow: boolean
+  labeled: boolean
+  message?: ReactNode
+  summaryNode: ReactNode
+  onRemove: () => void
+  children: ReactNode
+}) {
   const removeButton = (
     <Button
       {...formMicroActionButtonProps}
@@ -286,6 +319,59 @@ export function OptionalFieldDisclosure({
     <label htmlFor={controlId} className={disclosureLabelClass(size)}>
       <FieldLabelContent label={fieldLabel} />
     </label>
+  )
+  const header = <DisclosureHeaderRow label={fieldLabelNode} action={removeButton} />
+
+  if (inAnatomyRow) {
+    const showMessageTrack = message != null || labeled
+    const messageTrack = showMessageTrack ? (
+      <>
+        {labeled ? summaryNode : null}
+        {message}
+      </>
+    ) : null
+
+    return (
+      <DisclosureAnatomy size={size} label={header} control={children} message={messageTrack} />
+    )
+  }
+
+  return (
+    <div className={fieldAnatomyStackVariants({ size })}>
+      {header}
+      {children}
+      {labeled ? summaryNode : null}
+    </div>
+  )
+}
+
+export function OptionalFieldDisclosure({
+  controlId,
+  fieldLabel,
+  addLabel,
+  removeLabel = 'Remove',
+  open,
+  onOpenChange,
+  onRemove,
+  size = 'md',
+  children,
+  labeled = false,
+  summary,
+  addDisabled = false,
+  message,
+}: OptionalFieldDisclosureProps) {
+  const summaryId = `${controlId}-summary`
+  const inAnatomyRow = useFieldRowParticipation()
+  const summaryNode = <DisclosureSummary id={summaryId} summary={summary} />
+  const addButton = (
+    <DisclosureAddButton
+      controlId={controlId}
+      addLabel={addLabel}
+      labeled={labeled}
+      summaryId={summary ? summaryId : undefined}
+      addDisabled={addDisabled}
+      onOpenChange={onOpenChange}
+    />
   )
 
   if (!open) {
@@ -303,29 +389,19 @@ export function OptionalFieldDisclosure({
     )
   }
 
-  const header = (
-    <DisclosureHeaderRow>
-      {fieldLabelNode}
-      {removeButton}
-    </DisclosureHeaderRow>
-  )
-
-  if (inAnatomyRow) {
-    return (
-      <DisclosureAnatomy
-        size={size}
-        label={header}
-        control={children}
-        message={labeled ? summaryNode : null}
-      />
-    )
-  }
-
   return (
-    <div className={fieldAnatomyStackVariants({ size })}>
-      {header}
+    <OpenOptionalFieldDisclosure
+      size={size}
+      controlId={controlId}
+      fieldLabel={fieldLabel}
+      removeLabel={removeLabel}
+      inAnatomyRow={inAnatomyRow}
+      labeled={labeled}
+      message={message}
+      summaryNode={summaryNode}
+      onRemove={onRemove}
+    >
       {children}
-      {labeled ? summaryNode : null}
-    </div>
+    </OpenOptionalFieldDisclosure>
   )
 }

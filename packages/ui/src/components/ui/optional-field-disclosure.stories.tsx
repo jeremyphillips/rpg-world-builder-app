@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { action } from 'storybook/actions'
 import { useState } from 'react'
 
+import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
 import { TextareaField } from './textarea-field'
 import { OptionalFieldDisclosure } from './optional-field-disclosure.client'
 
@@ -68,5 +69,40 @@ export const Collapsed: Story = {
 export const Populated: Story = {
   render: () => (
     <DisclosureDemo initialValue="Targets cannot regain Hit Points until the start of your next turn." />
+  ),
+}
+
+export const OpenInAnatomyRowWithMessage: Story = {
+  render: () => (
+    <div className="max-w-xl">
+      <FieldRowAnatomyProvider>
+        <OptionalFieldDisclosure
+          controlId="story-long-range"
+          fieldLabel="Long range"
+          addLabel="Add long range"
+          removeLabel="Remove"
+          open
+          onOpenChange={action('onOpenChange')}
+          onRemove={action('onRemove')}
+          size="md"
+          message={
+            <p id="story-long-range-hint" className="text-style-caption min-w-0">
+              Disadvantage beyond normal range.
+            </p>
+          }
+        >
+          <TextareaField
+            id="story-long-range"
+            label=""
+            aria-label="Long range"
+            rows={1}
+            width="full"
+            size="md"
+            value="240"
+            onChange={action('onChange')}
+          />
+        </OptionalFieldDisclosure>
+      </FieldRowAnatomyProvider>
+    </div>
   ),
 }

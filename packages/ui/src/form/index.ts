@@ -13,6 +13,10 @@ export {
   SlotFieldRenderer,
   type SlotFieldRendererProps,
 } from './containers/form-items.client'
+export {
+  AnatomyFieldRowCluster,
+  type AnatomyFieldRowClusterProps,
+} from './presentation/anatomy-field-row-cluster.client'
 export { FormFieldStack, type FormFieldStackProps } from './containers/form-field-stack.client'
 export {
   FieldNode,

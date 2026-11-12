@@ -22,6 +22,7 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
 import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
 import { attackRangeJoinedPairFields } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
+import { MonsterAttackRangeClusterSlot } from './monster-attack-range-cluster-slot.client'
 import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
 import { savingThrowFieldGroup } from '../../../lib/forms/mechanics/saving-throw-field-group'
 import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
@@ -512,9 +513,22 @@ function monsterAttackRangeJoinedPairs(modeField: 'mode' | 'modes'): JoinedPairF
   }).map((field) => withModeFieldVisibility(field, ranged))
 }
 
-function monsterAttackDistanceFields(modeField: 'mode' | 'modes'): FormItem {
+type MonsterAttackDistanceFormScope = {
+  idPrefix: string
+  namePrefix: string
+}
+
+function monsterAttackDistanceFields(
+  modeField: 'mode' | 'modes',
+  formScope: MonsterAttackDistanceFormScope,
+): FormItem {
   const reach = monsterAttackReachField(modeField)
   const rangeFields = monsterAttackRangeJoinedPairs(modeField)
+  const rangeClusterRow = {
+    kind: 'row' as const,
+    spacing: 'compact' as const,
+    fields: rangeFields.map((field) => ({ ...field, width: '1/2' as const })),
+  }
   return {
     kind: 'group',
     legend: MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
@@ -523,7 +537,24 @@ function monsterAttackDistanceFields(modeField: 'mode' | 'modes'): FormItem {
       {
         kind: 'row',
         visibility: dualAttackModesVisibility(modeField),
-        fields: [withModeFieldVisibility(reach, meleeVisibility(modeField)), ...rangeFields],
+        fields: [
+          {
+            ...withModeFieldVisibility(reach, meleeVisibility(modeField)),
+            width: '1/3',
+          },
+          {
+            kind: 'slot',
+            name: 'attackRangeCluster',
+            width: '2/3',
+            render: () => (
+              <MonsterAttackRangeClusterSlot
+                idPrefix={formScope.idPrefix}
+                namePrefix={formScope.namePrefix}
+                fields={rangeClusterRow.fields}
+              />
+            ),
+          },
+        ],
       },
       {
         kind: 'row',
@@ -769,7 +800,10 @@ function monsterActionMechanicFields(input: {
         required: true,
       },
       monsterActionBonusSourceDependent(namePrefix, action.id),
-      monsterAttackDistanceFields('modes'),
+      monsterAttackDistanceFields('modes', {
+        idPrefix: `monster-action-${action.id}`,
+        namePrefix,
+      }),
       damageFieldGroup({
         ctx,
         damageTypeName: 'damageType',

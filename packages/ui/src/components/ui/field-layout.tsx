@@ -36,6 +36,11 @@ export interface FieldLayoutProps {
    * Do not default this to `'visible'` — that would shadow the root.
    */
   labelVisibility?: FieldLabelVisibility
+  /**
+   * When false, hint/error stay on {@link Field.Root} for `aria-describedby` but
+   * render outside this layout (e.g. optional-disclosure row message track).
+   */
+  showMessageRegion?: boolean
 }
 
 /**
@@ -59,6 +64,7 @@ export function FieldLayout({
   size = 'md',
   controlBand = 'single-line',
   labelVisibility,
+  showMessageRegion = true,
 }: FieldLayoutProps) {
   const visibility = useOwnedLabelVisibility(labelVisibility)
   const resolvedRecommendation = resolveFieldLayoutRecommendation(hintPosition, recommendation)
@@ -94,11 +100,13 @@ export function FieldLayout({
         />
       </FieldLabelRegion>
       <FieldControlRegion>{bandedControl}</FieldControlRegion>
-      <FieldMessageRegion size={size}>
-        <Field.DerivedMeta />
-        {hintPosition === 'below-control' ? <Field.Hint /> : null}
-        <Field.Error />
-      </FieldMessageRegion>
+      {showMessageRegion ? (
+        <FieldMessageRegion size={size}>
+          <Field.DerivedMeta />
+          {hintPosition === 'below-control' ? <Field.Hint /> : null}
+          <Field.Error />
+        </FieldMessageRegion>
+      ) : null}
     </>
   )
 
