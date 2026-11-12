@@ -2,29 +2,12 @@ import type { MonsterAction, MonsterLegendaryAction } from '../../content/monste
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import type { EquipmentInstance } from '../../content/equipment/instance/instance'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
+import { formatCardinalWord, joinNaturalList } from '../../primitives/prose'
 import { MOVEMENT_ALLOWANCE_ENTRIES, type MovementAllowance } from '../../vocab/movement-allowance'
 import { resolveMonsterActionIdentity } from './resolve-monster-action-identity'
 import { formatMonsterStatBlockSubject } from './spell-entry-presentation'
 
 type MultiattackAction = Extract<MonsterAction, { kind: 'multiattack' }>
-
-const COUNT_WORDS = [
-  'zero',
-  'one',
-  'two',
-  'three',
-  'four',
-  'five',
-  'six',
-  'seven',
-  'eight',
-  'nine',
-  'ten',
-] as const
-
-function countWord(count: number): string {
-  return COUNT_WORDS[count] ?? String(count)
-}
 
 function referencedActionName(
   id: string,
@@ -45,22 +28,15 @@ function referencedActionName(
   return identity.displayName || id
 }
 
-function combinationPhrase(names: readonly string[]): string {
-  if (names.length === 0) return ''
-  if (names.length === 1) return names[0] ?? ''
-  if (names.length === 2) return `${names[0]} or ${names[1]}`
-  return `${names.slice(0, -1).join(', ')}, or ${names[names.length - 1]}`
-}
-
 function formatAttackClause(args: { count: number; names: readonly string[] }): string {
-  const countLabel = countWord(args.count)
+  const countLabel = formatCardinalWord(args.count)
   if (args.names.length === 1) {
     const name = args.names[0]
     const noun = args.count === 1 ? 'attack' : 'attacks'
     return `makes ${countLabel} ${name} ${noun}`
   }
   const noun = args.count === 1 ? 'attack' : 'attacks'
-  return `makes ${countLabel} ${noun}, using ${combinationPhrase(args.names)} in any combination`
+  return `makes ${countLabel} ${noun}, using ${joinNaturalList(args.names, { conjunction: 'or' })} in any combination`
 }
 
 function formatStep(args: { subject: string; count: number; names: readonly string[] }): string {
@@ -104,7 +80,7 @@ function movementClause(allowance: MovementAllowance, withoutOpportunityAttacks?
 
 function referenceClause(names: readonly string[], kinds: readonly string[]): string {
   if (kinds.length > 0 && kinds.every((kind) => REFERENCE_ATTACK_KINDS.has(kind))) {
-    return `makes one ${combinationPhrase(names)} attack`
+    return `makes one ${joinNaturalList(names, { conjunction: 'or' })} attack`
   }
   return `uses ${names[0] ?? ''}`
 }

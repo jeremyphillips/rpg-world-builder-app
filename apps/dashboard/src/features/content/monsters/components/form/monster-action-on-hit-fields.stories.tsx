@@ -18,12 +18,15 @@ function Host() {
   const form = useForm<MonsterFormValues>({ defaultValues: resolveMonsterCreateDefaultValues() })
   return (
     <FormProvider {...form}>
-      <MonsterActionCastingAbilityField name="actions.0.castingAbility" sharedOptions={[]} />
+      <MonsterActionCastingAbilityField
+        name="actions.0.castingAbility"
+        currentActionId="spellcasting"
+      />
     </FormProvider>
   )
 }
 
 export const CastingAbility: Story = {
-  args: { name: 'actions.0.castingAbility', sharedOptions: [] },
+  args: { name: 'actions.0.castingAbility', currentActionId: 'spellcasting' },
   render: () => <Host />,
 }
