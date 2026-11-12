@@ -396,7 +396,8 @@ describe('monster action detail fields', () => {
     expect(weapon.at(-1)).toBe('description')
     const spellNames = detailFields({ id: 'cast', kind: 'spell' })
     expect(spellNames).not.toContain('attackPreview')
-    expect(spellNames[0]).toBe('buildAdvisories')
+    expect(spellNames[0]).toBe('spellPreview')
+    expect(spellNames[1]).toBe('buildAdvisories')
 
     const spell = detailFields({ id: 'cast', kind: 'spell', name: 'Spellcasting', spells: [] })
     expect(spell).not.toContain('name')

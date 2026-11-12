@@ -69,6 +69,22 @@ describe('RulesPreview', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
+  it('renders html with rich text paragraphs', () => {
+    render(
+      <RulesPreview
+        label="Spellcasting preview"
+        content={{
+          kind: 'html',
+          html: '<p>Intro.</p><p><strong>At Will</strong>: <em>Mage Hand</em></p>',
+        }}
+      />,
+    )
+
+    expect(screen.getByText('At Will').tagName).toBe('STRONG')
+    expect(screen.getByText('Intro.').closest('p')).not.toBeNull()
+    expect(screen.getByText('Mage Hand').tagName).toBe('EM')
+  })
+
   it('renders guidance as neutral 12px copy inside the panel', () => {
     render(
       <RulesPreview

@@ -127,6 +127,7 @@ export const MONSTER_ON_HIT_NOTE_LABEL = 'Note'
 export const MONSTER_ON_HIT_DETAILS_LABEL = 'Details'
 export const MONSTER_ON_HIT_DETAILS_ADD_LABEL = 'Add details'
 export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
+export const MONSTER_ACTION_SPELL_PREVIEW_LABEL = 'Spellcasting preview'
 export const MONSTER_TRAIT_PREVIEW_LABEL = 'Trait preview'
 /** Stat-block preview row — not action-economy {@link getActionEconomyLabel} “Action”. */
 export const MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL = 'Attack'
@@ -144,7 +145,9 @@ export const MONSTER_DAMAGE_TYPE_CHANGE_LABEL = 'Change'
 export const MONSTER_REMOVE_LABEL = 'Remove'
 export const MONSTER_CANCEL_LABEL = 'Cancel'
 export const MONSTER_LOADING_EQUIPMENT = `Loading ${getContentTypeMidSentenceLabel('equipment')}…`
+export const MONSTER_LOADING_SPELLS = `Loading ${getContentTypeMidSentenceLabel('spells')}…`
 export const MONSTER_EQUIPMENT_CATALOG_ERROR = formatContentLoadErrorMessage('equipment')
+export const MONSTER_SPELL_CATALOG_ERROR = formatContentLoadErrorMessage('spells')
 export const MONSTER_RETRY_LABEL = 'Retry'
 export const MONSTER_SKILL_LOADING = `Loading ${getContentTypeMidSentenceLabel('skill-proficiencies', { plural: true })}…`
 export const MONSTER_SKILL_ERROR = formatContentListLoadErrorMessage('skill-proficiencies')
@@ -335,6 +338,10 @@ export const MONSTER_ATTACK_BONUS_LABEL = 'Attack bonus'
 
 export function formatMonsterActionAttackPreviewConfigureHint(fieldLabel: string): string {
   return `Configure ${fieldLabel} to calculate this attack.`
+}
+
+export function formatMonsterActionSpellPreviewConfigureHint(fieldLabel: string): string {
+  return `Configure ${fieldLabel} to preview this spellcasting action.`
 }
 export const MONSTER_ATTACK_BONUS_KIND_ABILITY_LABEL = 'Ability'
 export const MONSTER_ATTACK_BONUS_KIND_SPELL_LABEL = 'Spellcasting'

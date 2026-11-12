@@ -26,6 +26,7 @@ import { MonsterAttackRangeClusterSlot } from './monster-attack-range-cluster-sl
 import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
 import { savingThrowFieldGroup } from '../../../lib/forms/mechanics/saving-throw-field-group'
 import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
+import { MonsterActionSpellSummary } from '../../components/form/monster-action-spell-summary'
 import {
   MONSTER_RULES_TEXT_LABEL,
   MONSTER_ADDITIONAL_CONDITION_HINT,
@@ -581,6 +582,18 @@ function monsterActionAttackPreviewSlot(
   }
 }
 
+function monsterActionSpellPreviewSlot(
+  ctx: ContentFormCtx,
+  action: MonsterActionDraftRow,
+  section: MonsterActionSection,
+): FormItem {
+  return {
+    kind: 'slot',
+    name: 'spellPreview',
+    render: () => <MonsterActionSpellSummary ctx={ctx} action={action} section={section} />,
+  }
+}
+
 function spellOptions(ctx: ContentFormCtx) {
   return [...(ctx.spellCatalogById?.values() ?? [])].map((spell) => ({
     value: spell.id,
@@ -895,7 +908,9 @@ function sharedAuthoringFields(input: {
   const preview =
     action.kind === 'weapon' || action.kind === 'natural-weapon' || action.kind === 'attack'
       ? [monsterActionAttackPreviewSlot(ctx, action)]
-      : []
+      : action.kind === 'spell'
+        ? [monsterActionSpellPreviewSlot(ctx, action, section)]
+        : []
   const primaryProse = action.kind === 'special' ? [monsterActionDescriptionField(action)] : []
   const supplemental = action.kind === 'special' ? [] : [monsterActionDescriptionField(action)]
   return [

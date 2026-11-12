@@ -1,4 +1,5 @@
 import { EmphasisDetailLine } from './emphasis-detail-line'
+import { RichTextContent } from './rich-text-content'
 import { Eyebrow } from './eyebrow'
 import { Icon } from './icon/icon'
 import { MetadataList } from './metadata-list'
@@ -16,6 +17,7 @@ export type RulesPreviewMetadataRow = {
 export type RulesPreviewContent =
   | { kind: 'metadata'; rows: readonly RulesPreviewMetadataRow[] }
   | { kind: 'prose'; text: string }
+  | { kind: 'html'; html: string }
   | { kind: 'guidance'; message: string }
 
 export type RulesPreviewProps = {
@@ -29,15 +31,52 @@ function metadataValue(row: RulesPreviewMetadataRow) {
   return <EmphasisDetailLine as="span" primary={row.primary} secondary={row.secondary} />
 }
 
+function rulesPreviewHasContent(content: RulesPreviewContent): boolean {
+  switch (content.kind) {
+    case 'prose':
+      return Boolean(content.text.trim())
+    case 'html':
+      return Boolean(content.html.trim())
+    case 'metadata':
+      return content.rows.length > 0
+    case 'guidance':
+      return Boolean(content.message.trim())
+  }
+}
+
+function RulesPreviewBody({ content }: { content: RulesPreviewContent }) {
+  if (content.kind === 'metadata') {
+    return (
+      <MetadataList
+        size="sm"
+        columnGap="sm"
+        valueTrack="fill"
+        emphasis="value"
+        divider={false}
+        items={content.rows.map((row) => ({
+          id: row.id,
+          label: row.label,
+          value: metadataValue(row),
+        }))}
+      />
+    )
+  }
+  if (content.kind === 'prose') return <Text>{content.text}</Text>
+  if (content.kind === 'html') {
+    return <RichTextContent html={content.html} size="sm" tone="muted" />
+  }
+  return (
+    <Text variant="caption">
+      <SemanticText tone="neutral" emphasis="low" icon={<Icon name="info" size="xs" />}>
+        {content.message}
+      </SemanticText>
+    </Text>
+  )
+}
+
 /** Compact rules panel. Callers supply the label and one content shape. */
 export function RulesPreview({ label, context, content }: RulesPreviewProps) {
-  if (content.kind === 'prose') {
-    if (!content.text.trim()) return null
-  } else if (content.kind === 'metadata' && content.rows.length === 0) {
-    return null
-  } else if (content.kind === 'guidance' && !content.message.trim()) {
-    return null
-  }
+  if (!rulesPreviewHasContent(content)) return null
 
   return (
     <Panel tone="subtle" density="compact">
@@ -50,28 +89,7 @@ export function RulesPreview({ label, context, content }: RulesPreviewProps) {
             </Text>
           ) : null}
         </div>
-        {content.kind === 'metadata' ? (
-          <MetadataList
-            size="sm"
-            columnGap="sm"
-            valueTrack="fill"
-            emphasis="value"
-            divider={false}
-            items={content.rows.map((row) => ({
-              id: row.id,
-              label: row.label,
-              value: metadataValue(row),
-            }))}
-          />
-        ) : content.kind === 'prose' ? (
-          <Text>{content.text}</Text>
-        ) : (
-          <Text variant="caption">
-            <SemanticText tone="neutral" emphasis="low" icon={<Icon name="info" size="xs" />}>
-              {content.message}
-            </SemanticText>
-          </Text>
-        )}
+        <RulesPreviewBody content={content} />
       </div>
     </Panel>
   )

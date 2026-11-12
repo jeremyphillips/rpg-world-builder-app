@@ -123,7 +123,7 @@ function groupLine(
   const label = limitedUse
     ? `${formatLimitedUseNotation(limitedUse, 'stat-block')}${each}`
     : 'At Will'
-  return `<p>${label}: ${names.join(', ')}</p>`
+  return `<p><strong>${label}</strong>: ${names.join(', ')}</p>`
 }
 
 function presentationGroups(spells: readonly SpellRow[]): Array<{

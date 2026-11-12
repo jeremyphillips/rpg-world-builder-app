@@ -31,9 +31,13 @@ describe('formatMonsterSpellEntry', () => {
       catalogStatus: 'ready',
       spellsInBody,
     })
-    expect(rendered.bodyHtml).toContain('At Will: <em>Mage Hand</em>, <em>Detect Magic</em>')
-    expect(rendered.bodyHtml).toContain('2/Day Each: <em>Fireball</em>, <em>Lightning Bolt</em>')
-    expect(rendered.bodyHtml).toContain('1/Day: <em>Raise Dead</em>')
+    expect(rendered.bodyHtml).toContain(
+      '<strong>At Will</strong>: <em>Mage Hand</em>, <em>Detect Magic</em>',
+    )
+    expect(rendered.bodyHtml).toContain(
+      '<strong>2/Day Each</strong>: <em>Fireball</em>, <em>Lightning Bolt</em>',
+    )
+    expect(rendered.bodyHtml).toContain('<strong>1/Day</strong>: <em>Raise Dead</em>')
     expect(rendered.bodyHtml).not.toContain('At Will Each')
     expect(rendered.bodyHtml).not.toContain('spell save DC')
   })
