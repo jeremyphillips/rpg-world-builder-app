@@ -35,7 +35,6 @@ import {
   resolveCreatureTraitGrants,
   resolveTraitDisplay,
   formatMonsterLimitedUseHeading,
-  formatMonsterMultiattack,
   formatMonsterSaveAction,
   formatMonsterSpellEntry,
   formatMonsterStatBlockSubject,
@@ -63,6 +62,7 @@ import {
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 
+import { buildMonsterMultiattackSentence } from './actions/monster-action-multiattack-summary'
 import { formatMonsterTemplateSentence } from './format-monster-template-sentence'
 import { MONSTER_HP_MINIMUM_NOTE } from './monster-form-labels'
 
@@ -315,7 +315,7 @@ function formatMultiattackActionBody(
   if (catalogState !== 'ready') {
     return catalogState === 'error' ? MONSTER_UNRESOLVED_CATALOG_REFERENCE : undefined
   }
-  const generated = formatMonsterMultiattack({
+  const generated = buildMonsterMultiattackSentence({
     monsterName: monster.name,
     action,
     actions: monster.actions,

@@ -26,6 +26,7 @@ import { MonsterAttackRangeClusterSlot } from './monster-attack-range-cluster-sl
 import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
 import { savingThrowFieldGroup } from '../../../lib/forms/mechanics/saving-throw-field-group'
 import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
+import { MonsterActionMultiattackSummary } from '../../components/form/monster-action-multiattack-summary'
 import { MonsterActionSpellSummary } from '../../components/form/monster-action-spell-summary'
 import {
   MONSTER_RULES_TEXT_LABEL,
@@ -592,6 +593,36 @@ function monsterActionSpellPreviewSlot(
   }
 }
 
+function monsterActionMultiattackPreviewSlot(
+  ctx: ContentFormCtx,
+  action: MonsterActionDraftRow,
+): FormItem {
+  return {
+    kind: 'slot',
+    name: 'multiattackPreview',
+    render: () => <MonsterActionMultiattackSummary ctx={ctx} action={action} />,
+  }
+}
+
+function monsterActionAuthoringPreviewSlots(
+  ctx: ContentFormCtx,
+  action: MonsterActionDraftRow,
+  section: MonsterActionSection,
+): FormItem[] {
+  switch (action.kind) {
+    case 'weapon':
+    case 'natural-weapon':
+    case 'attack':
+      return [monsterActionAttackPreviewSlot(ctx, action)]
+    case 'spell':
+      return [monsterActionSpellPreviewSlot(ctx, action, section)]
+    case 'multiattack':
+      return [monsterActionMultiattackPreviewSlot(ctx, action)]
+    default:
+      return []
+  }
+}
+
 function spellOptions(ctx: ContentFormCtx) {
   return [...(ctx.spellCatalogById?.values() ?? [])].map((spell) => ({
     value: spell.id,
@@ -875,12 +906,7 @@ function sharedAuthoringFields(input: {
   const { ctx, action, section, namePrefix } = input
   const source =
     action.kind === 'weapon' ? [monsterActionEquipmentField(input.equipmentOptions)] : []
-  const preview =
-    action.kind === 'weapon' || action.kind === 'natural-weapon' || action.kind === 'attack'
-      ? [monsterActionAttackPreviewSlot(ctx, action)]
-      : action.kind === 'spell'
-        ? [monsterActionSpellPreviewSlot(ctx, action, section)]
-        : []
+  const preview = monsterActionAuthoringPreviewSlots(ctx, action, section)
   const primaryProse = action.kind === 'special' ? [monsterActionDescriptionField(action)] : []
   const supplemental = action.kind === 'special' ? [] : [monsterActionDescriptionField(action)]
   return [

@@ -427,7 +427,8 @@ describe('monster action detail fields', () => {
       kind: 'multiattack',
       steps: [],
     })
-    expect(multiattack[0]).toBe('buildAdvisories')
+    expect(multiattack[0]).toBe('multiattackPreview')
+    expect(multiattack[1]).toBe('buildAdvisories')
     expect(multiattack.indexOf('steps')).toBeLessThan(multiattack.indexOf('description'))
     expect(multiattack.at(-1)).toBe('description')
     expect(multiattack).not.toContain('trigger.text')

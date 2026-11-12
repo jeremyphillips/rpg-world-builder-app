@@ -128,6 +128,8 @@ export const MONSTER_ON_HIT_DETAILS_LABEL = 'Details'
 export const MONSTER_ON_HIT_DETAILS_ADD_LABEL = 'Add details'
 export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
 export const MONSTER_ACTION_SPELL_PREVIEW_LABEL = 'Spellcasting preview'
+export const MONSTER_ACTION_MULTIATTACK_PREVIEW_LABEL = 'Multiattack preview'
+export const MONSTER_MULTIATTACK_STEPS_LABEL = 'Steps'
 export const MONSTER_TRAIT_PREVIEW_LABEL = 'Trait preview'
 /** Stat-block preview row — not action-economy {@link getActionEconomyLabel} “Action”. */
 export const MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL = 'Attack'
@@ -342,6 +344,10 @@ export function formatMonsterActionAttackPreviewConfigureHint(fieldLabel: string
 
 export function formatMonsterActionSpellPreviewConfigureHint(fieldLabel: string): string {
   return `Configure ${fieldLabel} to preview this spellcasting action.`
+}
+
+export function formatMonsterActionMultiattackPreviewConfigureHint(fieldLabel: string): string {
+  return `Configure ${fieldLabel} to preview this multiattack.`
 }
 export const MONSTER_ATTACK_BONUS_KIND_ABILITY_LABEL = 'Ability'
 export const MONSTER_ATTACK_BONUS_KIND_SPELL_LABEL = 'Spellcasting'
