@@ -20,6 +20,12 @@ function objectHasContent(value: unknown): boolean {
   })
 }
 
+function watchedHasContent(value: unknown): boolean {
+  if (typeof value === 'number') return Number.isFinite(value)
+  if (typeof value === 'string') return value.trim().length > 0
+  return objectHasContent(value)
+}
+
 type OptionalDisclosureGroupProps = {
   item: GroupConfig
   idPrefix: string
@@ -72,7 +78,7 @@ function OptionalDisclosureGroupBody({
   const fullName = namePrefix ? `${namePrefix}.${objectName}` : objectName
   const { setValue, unregister } = useFormContext()
   const watched = useWatch({ name: fullName })
-  const populated = objectHasContent(watched)
+  const populated = watchedHasContent(watched)
   const [manualOpen, setManualOpen] = useState(false)
   const { defaultValues } = useFormState({ name: fullName })
   const defaultsRef = useRef(defaultValues)
