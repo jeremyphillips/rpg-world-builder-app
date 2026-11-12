@@ -13,7 +13,10 @@ import {
   legendarySpellcastingActionOptions,
   monsterCastingDependentLabels,
 } from './monster-action-casting-summary'
-import { monsterCastingAbilitySelectOptions } from './monster-casting-ability-options'
+import {
+  monsterCastingAbilitySelectOptions,
+  type MonsterCastingAbilityPreview,
+} from './monster-casting-ability-options'
 import {
   MONSTER_LEGENDARY_SPELLCASTING_FIELD_HINT,
   MONSTER_LEGENDARY_SPELLCASTING_FIELD_LABEL,
@@ -37,6 +40,15 @@ function isDirectAbility(value: unknown): value is { kind: 'ability'; ability: A
   return ability.kind === 'ability' && ABILITY_IDS.some((id) => id === ability.ability)
 }
 
+const CASTING_PREVIEW_FIELDS = [
+  'abilityScores',
+  'challengeRating',
+  'actions',
+  'bonusActions',
+  'reactions',
+  'legendaryActions',
+] as const
+
 export function MonsterActionCastingAbilityField({
   name,
   currentActionId = '',
@@ -44,10 +56,11 @@ export function MonsterActionCastingAbilityField({
   onBlocked,
   required = true,
   profile = 'shared',
+  preview,
   hint: hintOverride,
 }: {
   name: string
-  /** Excludes this action from shared sources and resolves DC previews. */
+  /** Excludes this action from shared sources and resolves derived previews. */
   currentActionId?: string
   /** Set on the spell row that other actions share. Nested attack and save fields omit it. */
   sourceActionId?: string
@@ -55,16 +68,40 @@ export function MonsterActionCastingAbilityField({
   required?: boolean
   /** Primary defines the ability other actions reuse. Shared may choose that ability or its own. */
   profile?: 'primary' | 'shared'
+  /** Save DC and spell attack use the same options with different trailing values. */
+  preview: MonsterCastingAbilityPreview
   /** Overrides the primary/shared spellcasting hints (for example save DC derivation). */
   hint?: string
 }) {
   const controlSize = useFieldControlSize()
   const { getValues, setValue, formState } = useFormContext<MonsterFormValues>()
-  const formValues = (useWatch() ?? {}) as MonsterFormValues
+  const [abilityScores, challengeRating, actions, bonusActions, reactions, legendaryActions] =
+    useWatch({ name: [...CASTING_PREVIEW_FIELDS] })
   const current = useWatch({ name })
   const options = useMemo(
-    () => monsterCastingAbilitySelectOptions(formValues, currentActionId),
-    [formValues, currentActionId],
+    () =>
+      monsterCastingAbilitySelectOptions(
+        {
+          abilityScores,
+          challengeRating,
+          actions,
+          bonusActions,
+          reactions,
+          legendaryActions,
+        } as MonsterFormValues,
+        currentActionId,
+        preview,
+      ),
+    [
+      abilityScores,
+      actions,
+      bonusActions,
+      challengeRating,
+      currentActionId,
+      legendaryActions,
+      preview,
+      reactions,
+    ],
   )
   const value = castingAbilityValue(current)
   const fieldId = `${name.replaceAll('.', '-')}-casting-ability`

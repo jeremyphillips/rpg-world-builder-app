@@ -271,11 +271,17 @@ export interface FieldDynamicSuggestions {
   suggestionsWhen: (values: Record<string, unknown>) => readonly string[]
 }
 
-/** Resolves select options from watched form values (e.g. exclude archetype defaults). */
-export interface FieldDynamicSelectOptions {
+/** Resolves option lists from watched form values. */
+export interface FieldDynamicOptionSource<TOption> {
   dependsOn: readonly string[]
-  optionsWhen: (values: Record<string, unknown>) => readonly FieldOption[]
+  optionsWhen: (values: Record<string, unknown>) => readonly TOption[]
 }
+
+/** Dynamic select options. Groups are preserved through the schema select renderer. */
+export type FieldDynamicSelectOptions = FieldDynamicOptionSource<SelectFieldOptionListItem>
+
+/** Dynamic combobox options. Combobox panels stay flat. */
+export type FieldDynamicComboboxOptions = FieldDynamicOptionSource<FieldOption>
 
 /** Unrestricted dimension — resolver skips undefined or absent keys. */
 export type FilterDimensionValue = string | undefined
@@ -893,7 +899,7 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   /** Static options — omit when `optionsResolve` supplies the list at render time. */
   options?: FieldOption[]
   /** Dynamic options resolved from watched values; replaces `options` when set. */
-  optionsResolve?: FieldDynamicSelectOptions
+  optionsResolve?: FieldDynamicComboboxOptions
   /**
    * Single vs multi selection. Defaults to `true` (`string[]` value).
    * Set `false` for a single `string` value (optional enums use `undefined`, not `''`).
@@ -2037,7 +2043,7 @@ export function collectFieldDynamicDependsOn(field: {
   hint?: BaseFieldConfig['hint']
   derivedMeta?: BaseFieldConfig['derivedMeta']
   type?: FieldConfig['type']
-  optionsResolve?: FieldDynamicSelectOptions
+  optionsResolve?: { dependsOn: readonly string[] }
   filterSelectsResolve?: FieldDynamicComboboxFilterSelects
   recommendationResolve?: FieldDynamicRecommendation
 }): readonly string[] {
@@ -2180,6 +2186,25 @@ export function resolveSelectFieldConfigOptions(
     return [...config.optionsResolve.optionsWhen(values)]
   }
   return config.options ?? []
+}
+
+/** Applies a flat-option filter inside groups and drops groups that become empty. */
+export function filterSelectFieldOptionList(
+  options: readonly SelectFieldOptionListItem[],
+  filter: (options: FieldOption[]) => FieldOption[],
+): SelectFieldOptionListItem[] {
+  const next: SelectFieldOptionListItem[] = []
+  for (const item of options) {
+    if (isFieldOptionGroup(item)) {
+      const groupOptions = filter(item.options)
+      if (groupOptions.length === 0) continue
+      next.push({ ...item, options: groupOptions })
+      continue
+    }
+    const [option] = filter([item])
+    if (option) next.push(option)
+  }
+  return next
 }
 
 /** Resolves a select field's flat option list after dynamic resolution, availability, and array filters. */

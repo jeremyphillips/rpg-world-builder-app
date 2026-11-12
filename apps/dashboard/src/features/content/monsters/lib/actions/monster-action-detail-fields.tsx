@@ -33,6 +33,10 @@ import {
   MONSTER_SAVE_ABILITY_LABEL,
   MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL,
   MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL,
+  MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT,
+  MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL,
+  MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT,
+  MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL,
   MONSTER_SAVE_DC_ABILITY_LABEL,
   MONSTER_SAVE_DC_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
@@ -52,6 +56,7 @@ import type { MonsterActionSection } from '../../lib/actions/monster-action-equi
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterFormAdvisory } from '../monster-form-advisories'
 import { monsterFormAdvisorySlot } from '../monster-form-advisory-presentation'
+import { MonsterActionAttackAbilityField } from './monster-attack-ability-field'
 import { MonsterActionCastingAbilityField } from './monster-action-casting-fields'
 import { MonsterActionRechargeField } from './monster-action-recharge-field'
 import {
@@ -170,6 +175,8 @@ function monsterAbilitySourceDependent(input: {
   required?: MonsterAbilitySourceRequiredMarks
   spellcastingHint?: string
   currentActionId?: string
+  sourceOptions?: { value: string; label: string }[]
+  sourceHint?: SelectFieldConfig['hint']
 }): FormItem {
   const kindName = `${input.sourcePath}.kind`
   const abilityBranch = whenFieldEquals(kindName, 'ability')
@@ -181,10 +188,11 @@ function monsterAbilitySourceDependent(input: {
       name: kindName,
       label: input.controllerLabel,
       placeholder: 'Choose',
-      options: [
+      options: input.sourceOptions ?? [
         { value: 'ability', label: MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL },
         { value: 'spellcasting', label: MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL },
       ],
+      ...(input.sourceHint ? { hint: input.sourceHint } : {}),
       ...(input.required?.controller ? { required: true } : {}),
     },
     dependents: {
@@ -202,6 +210,7 @@ function monsterAbilitySourceDependent(input: {
               currentActionId={input.currentActionId ?? ''}
               required={input.required?.castingAbility}
               hint={input.spellcastingHint}
+              preview={input.sourcePath === 'bonusSource' ? 'attack-bonus' : 'save-dc'}
             />
           ),
         },
@@ -216,15 +225,34 @@ function monsterActionBonusSourceDependent(namePrefix: string, currentActionId: 
     namePrefix,
     controllerLabel: MONSTER_ATTACK_BONUS_LABEL,
     currentActionId,
+    sourceOptions: [
+      { value: 'ability', label: MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL },
+      { value: 'spellcasting', label: MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL },
+    ],
+    sourceHint: {
+      resolve: {
+        dependsOn: ['bonusSource.kind'],
+        hintWhen: (values) => {
+          if (values['bonusSource.kind'] === 'ability')
+            return MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT
+          if (values['bonusSource.kind'] === 'spellcasting') {
+            return MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT
+          }
+          return undefined
+        },
+      },
+    },
     required: { controller: true, ability: true, castingAbility: true },
     abilityFields: [
       {
-        type: 'select',
+        kind: 'slot',
         name: 'bonusSource.ability',
-        label: 'Ability',
-        placeholder: 'Choose',
-        options: abilityOptions(),
-        required: true,
+        render: () => (
+          <MonsterActionAttackAbilityField
+            name={`${namePrefix}.bonusSource.ability`}
+            proficientName={`${namePrefix}.bonusSource.proficient`}
+          />
+        ),
       },
       {
         type: 'switch',
@@ -512,6 +540,7 @@ function monsterActionSpellMechanics(input: {
           sourceActionId={input.action.id}
           onBlocked={input.onCastingSourceBlocked}
           profile="primary"
+          preview="save-dc"
         />
       ),
     },
@@ -572,7 +601,7 @@ function monsterActionMechanicFields(input: {
   equipment: MonsterFormValues['equipment']
   onCastingSourceBlocked?: (message: string) => void
 }): FormItem[] {
-  const { ctx, action, section, namePrefix, sharedCastingOptions } = input
+  const { ctx, action, section, namePrefix } = input
   const trigger =
     section === 'reactions' && action.kind !== 'multiattack'
       ? [monsterReactionConditionField(action)]
@@ -592,6 +621,7 @@ function monsterActionMechanicFields(input: {
                 currentActionId={action.id}
                 required={false}
                 hint={MONSTER_SPELLCASTING_ABILITY_SAVE_DC_HINT}
+                preview="save-dc"
               />
             ),
           }),
@@ -627,7 +657,6 @@ function monsterActionMechanicFields(input: {
   }
   if (action.kind === 'attack') {
     kindFields.push(
-      monsterActionBonusSourceDependent(namePrefix, action.id),
       {
         type: 'chips',
         name: 'modes',
@@ -635,6 +664,7 @@ function monsterActionMechanicFields(input: {
         options: modeOptions(),
         required: true,
       },
+      monsterActionBonusSourceDependent(namePrefix, action.id),
       ...reachRangeFields('modes'),
       damageFieldGroup({
         ctx,

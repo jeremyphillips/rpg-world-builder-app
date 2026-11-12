@@ -1,5 +1,7 @@
 /** Radix Select item values are strings — encode typed option values to avoid collisions. */
 
+import type { SelectOptionTrailing } from '../../form/field-config'
+
 export type TypedSelectOptionValue = string | number
 
 export type TypedSelectOption<T extends TypedSelectOptionValue = TypedSelectOptionValue> = {
@@ -7,6 +9,7 @@ export type TypedSelectOption<T extends TypedSelectOptionValue = TypedSelectOpti
   label: string
   disabled?: boolean
   disabledReason?: string
+  trailing?: SelectOptionTrailing
 }
 
 const NUMBER_PREFIX = 'n:'

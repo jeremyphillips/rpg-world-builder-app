@@ -159,7 +159,9 @@ values, dirty state, validation, or serialization.
 - **`reserveSpace: true`** — reserves **one metadata line** so empty → populated does not
   shift layout. Does not reserve multi-line or multi-row height.
 - **`optionsResolve`** — dynamic select options from watched values; returned options replace
-  a static `options` list (use to exclude values that would be semantic no-ops).
+  a static `options` list (use to exclude values that would be semantic no-ops). Select
+  `optionsWhen` may return groups. Schema selects keep those group labels. Combobox
+  options stay flat.
 - **Row alignment** — when any sibling in a `kind: 'row'` uses `reserveSpace`, the row
   defaults to `align: 'start'` (`items-start`) so sibling controls stay top-aligned while
   metadata extends below one field. Override with `RowConfig.align` when needed.

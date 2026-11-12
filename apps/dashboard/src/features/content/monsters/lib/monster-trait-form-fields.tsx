@@ -58,6 +58,7 @@ export function monsterTraitItemFields(input?: {
             name={castingName}
             required={false}
             hint={SAVING_THROW_SPELLCASTING_HINT}
+            preview="save-dc"
           />
         ),
       }),

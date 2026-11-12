@@ -304,7 +304,7 @@ describe('monster action detail fields', () => {
     expect(natural.at(-1)).toBe('description')
     expect(attack[0]).toBe('attackPreview')
     expect(attack[1]).toBe('buildAdvisories')
-    expect(attack.indexOf('limitedUse')).toBeLessThan(attack.indexOf('bonusSource.kind'))
+    expect(attack.indexOf('limitedUse')).toBeLessThan(attack.indexOf('modes'))
     const attackBonus = attackItems.find(
       (item) =>
         'kind' in item &&
@@ -323,7 +323,7 @@ describe('monster action detail fields', () => {
       attackBonusDependents.find(
         (field) => 'name' in field && field.name === 'bonusSource.ability',
       ),
-    ).toMatchObject({ required: true })
+    ).toMatchObject({ kind: 'slot' })
     expect(
       attackBonusDependents.find(
         (field) => 'name' in field && field.name === 'bonusSource.proficient',
@@ -358,8 +358,10 @@ describe('monster action detail fields', () => {
           )
         : undefined
     expect(normalRange).toMatchObject({ required: true })
-    expect(attack.indexOf('bonusSource.kind')).toBeLessThan(attack.indexOf('modes'))
-    expect(attack.indexOf('modes')).toBeLessThan(attack.indexOf('damageType'))
+    expect(attack.indexOf('modes')).toBeLessThan(attack.indexOf('bonusSource.kind'))
+    expect(attack.indexOf('bonusSource.kind')).toBeLessThan(attack.indexOf('reach'))
+    expect(attack.indexOf('reach')).toBeLessThan(attack.indexOf('range.normal'))
+    expect(attack.indexOf('range.normal')).toBeLessThan(attack.indexOf('damageType'))
     expect(attack.indexOf('onHit.effects')).toBeLessThan(attack.indexOf('description'))
     expect(attack.at(-1)).toBe('description')
 

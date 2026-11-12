@@ -21,12 +21,17 @@ function Host() {
       <MonsterActionCastingAbilityField
         name="actions.0.castingAbility"
         currentActionId="spellcasting"
+        preview="save-dc"
       />
     </FormProvider>
   )
 }
 
 export const CastingAbility: Story = {
-  args: { name: 'actions.0.castingAbility', currentActionId: 'spellcasting' },
+  args: {
+    name: 'actions.0.castingAbility',
+    currentActionId: 'spellcasting',
+    preview: 'save-dc',
+  },
   render: () => <Host />,
 }

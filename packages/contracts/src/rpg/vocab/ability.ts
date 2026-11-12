@@ -97,8 +97,8 @@ export const ADVANCED_SPELLCASTING_ABILITY_IDS = [
 ] as const satisfies readonly Ability[]
 
 export const SPELLCASTING_ABILITY_GROUP_LABELS = {
-  common: 'Common',
-  advanced: 'Advanced',
+  common: 'Common abilities',
+  advanced: 'Other abilities',
 } as const
 
 export type SpellcastingAbilityOptionGroup = {

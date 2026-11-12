@@ -27,7 +27,11 @@ function Host({ name, currentActionId }: { name: string; currentActionId?: strin
   const form = useForm<MonsterFormValues>({ defaultValues: resolveMonsterCreateDefaultValues() })
   return (
     <FormProvider {...form}>
-      <MonsterActionCastingAbilityField name={name} currentActionId={currentActionId} />
+      <MonsterActionCastingAbilityField
+        name={name}
+        currentActionId={currentActionId}
+        preview="save-dc"
+      />
     </FormProvider>
   )
 }
@@ -52,6 +56,7 @@ describe('MonsterActionCastingAbilityField', () => {
             name="actions.0.castingAbility"
             currentActionId="actions-0"
             profile="primary"
+            preview="save-dc"
           />
         </FormProvider>
       )
@@ -103,6 +108,7 @@ describe('MonsterActionCastingAbilityField', () => {
             currentActionId="spellcasting"
             sourceActionId="spellcasting"
             onBlocked={onBlocked}
+            preview="save-dc"
           />
         </FormProvider>
       )
@@ -111,10 +117,11 @@ describe('MonsterActionCastingAbilityField', () => {
     await user.click(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }))
     const listbox = screen.getByRole('listbox')
     const groupLabels = within(listbox).getAllByText(
-      /^Choose an ability$|^Use another action's ability$/,
+      /^Common abilities$|^Other abilities$|^Use another action's ability$/,
     )
     expect(groupLabels[0]).toHaveTextContent("Use another action's ability")
-    expect(groupLabels[1]).toHaveTextContent('Choose an ability')
+    expect(groupLabels[1]).toHaveTextContent('Common abilities')
+    expect(groupLabels[2]).toHaveTextContent('Other abilities')
     await user.click(await screen.findByRole('option', { name: 'Wisdom DC 11' }))
     expect(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL })).toHaveTextContent(
       'Wisdom',

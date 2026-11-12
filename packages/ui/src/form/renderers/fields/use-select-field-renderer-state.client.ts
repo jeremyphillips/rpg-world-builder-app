@@ -16,9 +16,10 @@ import type { SelectFieldConfig } from '../../field-config'
 import {
   fieldDefaultValue,
   collectFieldDynamicDependsOn,
+  filterSelectFieldOptionList,
+  flattenSelectFieldOptions,
   isSelectFieldReadOnly,
   resolveSelectFieldDisplayLabel,
-  resolveSelectFieldFlatOptions,
 } from '../../field-config'
 import { resolveFieldRenderConfig } from '../field-renderer-config.lib'
 import { soleSelectOptionValue } from './select-field-renderer.lib'
@@ -50,17 +51,15 @@ export function useSelectFieldRendererState(
 
   const resolvedOptions = useMemo(
     () =>
-      resolveSelectFieldFlatOptions(
-        renderConfig,
-        optionValues,
-        (options, fieldName) => applyArrayFilterSelectOptions(options, fieldName, arrayContext),
-        dynamicValues,
+      filterSelectFieldOptionList(renderConfig.options ?? [], (options) =>
+        applyArrayFilterSelectOptions(options, renderConfig.name, arrayContext),
       ),
-    [arrayContext, dynamicValues, optionValues, renderConfig],
+    [arrayContext, renderConfig.name, renderConfig.options],
   )
+  const flatOptions = useMemo(() => flattenSelectFieldOptions(resolvedOptions), [resolvedOptions])
 
-  const isReadOnly = isSelectFieldReadOnly(renderConfig, resolvedOptions)
-  const readOnlyValue = soleSelectOptionValue(resolvedOptions)
+  const isReadOnly = isSelectFieldReadOnly(renderConfig, flatOptions)
+  const readOnlyValue = soleSelectOptionValue(flatOptions)
 
   useEffect(() => {
     if (!isReadOnly || readOnlyValue == null || field.value === readOnlyValue) return
@@ -68,7 +67,7 @@ export function useSelectFieldRendererState(
   }, [field, isReadOnly, readOnlyValue])
 
   const displayValue =
-    resolveSelectFieldDisplayLabel(field.value, resolvedOptions) ?? String(field.value ?? '')
+    resolveSelectFieldDisplayLabel(field.value, flatOptions) ?? String(field.value ?? '')
 
   return {
     renderConfig,
@@ -78,6 +77,7 @@ export function useSelectFieldRendererState(
     field,
     validation,
     resolvedOptions,
+    flatOptions,
     isReadOnly,
     displayValue,
   }

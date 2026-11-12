@@ -121,6 +121,7 @@ export function legendaryActionDetailFields(input: {
           currentActionId={input.actionId}
           sourceActionId={input.actionId}
           onBlocked={input.onCastingSourceBlocked}
+          preview="save-dc"
         />
       ),
     },

@@ -38,7 +38,6 @@ type CastingRow = {
   }
 }
 
-export const MONSTER_CASTING_ABILITY_GROUP_LABEL = 'Choose an ability'
 export const MONSTER_CASTING_SHARE_GROUP_LABEL = "Use another action's ability"
 
 type SpellCountRow = {

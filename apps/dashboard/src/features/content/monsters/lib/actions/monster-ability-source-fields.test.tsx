@@ -11,6 +11,10 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import {
   MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL,
   MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL,
+  MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT,
+  MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL,
+  MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT,
+  MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL,
   MONSTER_SAVE_DC_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
 } from '../monster-form-labels'
@@ -108,7 +112,8 @@ describe('monster ability source fields', () => {
       screen.queryByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }),
     ).not.toBeInTheDocument()
 
-    await choose(user, 'Attack bonus', MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL)
+    await choose(user, 'Attack bonus', MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL)
+    expect(screen.getByText(MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT)).toBeInTheDocument()
     expect(screen.getByRole('switch', { name: 'Proficient' })).toBeInTheDocument()
     expect(
       screen.queryByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }),
@@ -123,17 +128,19 @@ describe('monster ability source fields', () => {
       proficient: true,
     })
 
-    await choose(user, 'Attack bonus', MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL)
+    await choose(user, 'Attack bonus', MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL)
+    expect(screen.getByText(MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT)).toBeInTheDocument()
     expect(screen.queryByRole('switch', { name: 'Proficient' })).not.toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL })).toBeInTheDocument()
 
-    await choose(user, SPELLCASTING_ABILITY_LABEL, SHARED_CASTING_LABEL)
+    await choose(user, SPELLCASTING_ABILITY_LABEL, 'Intelligence')
     expect(formRef.current?.getValues('actions.0.bonusSource.castingAbility')).toEqual({
-      kind: 'shared',
-      entryId: 'breath',
+      kind: 'ability',
+      ability: 'int',
     })
 
-    await choose(user, 'Attack bonus', MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL)
+    await choose(user, 'Attack bonus', MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL)
+    expect(screen.getByText(MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT)).toBeInTheDocument()
     expect(screen.getByRole('switch', { name: 'Proficient' })).toBeInTheDocument()
     expect(
       screen.queryByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }),
@@ -180,10 +187,10 @@ describe('monster ability source fields', () => {
     ).not.toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL })).toBeInTheDocument()
 
-    await choose(user, SPELLCASTING_ABILITY_LABEL, SHARED_CASTING_LABEL)
+    await choose(user, SPELLCASTING_ABILITY_LABEL, 'Intelligence')
     expect(formRef.current?.getValues('actions.0.dcSource.castingAbility')).toEqual({
-      kind: 'shared',
-      entryId: 'breath',
+      kind: 'ability',
+      ability: 'int',
     })
 
     await choose(user, MONSTER_SAVE_DC_LABEL, MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL)

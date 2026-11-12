@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  filterSelectFieldOptionList,
   flattenSelectFieldOptions,
   isSelectFieldReadOnly,
   resolveSelectFieldDisplayLabel,
@@ -28,6 +29,35 @@ describe('select read-only helpers', () => {
         },
       ]),
     ).toEqual([{ value: 'full', label: 'Full effect' }])
+  })
+
+  it('filters inside groups and drops an empty group', () => {
+    expect(
+      filterSelectFieldOptionList(
+        [
+          {
+            kind: 'group',
+            label: 'Kept',
+            options: [
+              { value: 'full', label: 'Full effect' },
+              { value: 'half', label: 'Half effect' },
+            ],
+          },
+          {
+            kind: 'group',
+            label: 'Removed',
+            options: [{ value: 'none', label: 'None' }],
+          },
+        ],
+        (options) => options.filter((option) => option.value !== 'none' && option.value !== 'half'),
+      ),
+    ).toEqual([
+      {
+        kind: 'group',
+        label: 'Kept',
+        options: [{ value: 'full', label: 'Full effect' }],
+      },
+    ])
   })
 
   it('detects read-only presentation from resolved options', () => {

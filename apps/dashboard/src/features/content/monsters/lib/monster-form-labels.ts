@@ -348,6 +348,12 @@ export const MONSTER_SAVE_DC_LABEL = 'DC source'
 export const MONSTER_SPELLCASTING_ABILITY_SAVE_DC_HINT = 'Ability used to calculate the DC.'
 export const MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL = 'Ability-based'
 export const MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL = 'Spellcasting-based'
+export const MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL = 'Use an ability score'
+export const MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL = 'Use a spellcasting ability'
+export const MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT =
+  'Uses the selected ability modifier, with optional proficiency.'
+export const MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT =
+  'Uses the selected spellcasting ability and proficiency bonus.'
 export const MONSTER_SAVE_DC_ABILITY_LABEL = 'DC ability'
 export const MONSTER_SAVE_DC_PROFICIENCY_LABEL = 'Include proficiency bonus'
 export const MONSTER_LIMIT_RECHARGES_ON_LABEL = 'Recharges on'

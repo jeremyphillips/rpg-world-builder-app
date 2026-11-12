@@ -44,7 +44,7 @@ export function SelectFieldRenderer({
     setCommittedValue(value)
     if (changing) setChanging(false)
   }
-  const committedLabel = resolveSelectFieldOptionLabel(state.field.value, state.resolvedOptions)
+  const committedLabel = resolveSelectFieldOptionLabel(state.field.value, state.flatOptions)
   const showEditor =
     !changeLabel || changing || value === '' || (value !== '' && committedLabel == null)
 
