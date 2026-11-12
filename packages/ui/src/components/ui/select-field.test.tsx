@@ -65,6 +65,32 @@ describe('SelectField', () => {
     expect(screen.getByLabelText('Level')).toBeInTheDocument()
   })
 
+  it('shows trailing metadata on the closed trigger', () => {
+    render(
+      <SelectField
+        id="casting"
+        label="Spellcasting ability"
+        value="int"
+        options={[
+          {
+            kind: 'group',
+            label: 'Choose an ability',
+            options: [
+              {
+                label: 'Intelligence',
+                value: 'int',
+                trailing: { text: 'DC 15', variant: 'strong' },
+              },
+            ],
+          },
+        ]}
+      />,
+    )
+    const trigger = screen.getByLabelText('Spellcasting ability')
+    expect(trigger).toHaveTextContent('Intelligence')
+    expect(trigger).toHaveTextContent('DC 15')
+  })
+
   it('uses compact unset placeholder for digit-sized unset selects', () => {
     render(
       <SelectField

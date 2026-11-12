@@ -166,10 +166,10 @@ function monsterAbilitySourceDependent(input: {
   namePrefix: string
   controllerLabel: string
   abilityFields: FormItem[]
-  sharedCastingOptions: { value: string; label: string }[]
   dependentsChrome?: 'none'
   required?: MonsterAbilitySourceRequiredMarks
   spellcastingHint?: string
+  currentActionId?: string
 }): FormItem {
   const kindName = `${input.sourcePath}.kind`
   const abilityBranch = whenFieldEquals(kindName, 'ability')
@@ -199,7 +199,7 @@ function monsterAbilitySourceDependent(input: {
           render: () => (
             <MonsterActionCastingAbilityField
               name={`${input.namePrefix}.${input.sourcePath}.castingAbility`}
-              sharedOptions={input.sharedCastingOptions}
+              currentActionId={input.currentActionId ?? ''}
               required={input.required?.castingAbility}
               hint={input.spellcastingHint}
             />
@@ -210,15 +210,12 @@ function monsterAbilitySourceDependent(input: {
   }
 }
 
-function monsterActionBonusSourceDependent(
-  namePrefix: string,
-  sharedCastingOptions: { value: string; label: string }[],
-): FormItem {
+function monsterActionBonusSourceDependent(namePrefix: string, currentActionId: string): FormItem {
   return monsterAbilitySourceDependent({
     sourcePath: 'bonusSource',
     namePrefix,
     controllerLabel: MONSTER_ATTACK_BONUS_LABEL,
-    sharedCastingOptions,
+    currentActionId,
     required: { controller: true, ability: true, castingAbility: true },
     abilityFields: [
       {
@@ -238,15 +235,12 @@ function monsterActionBonusSourceDependent(
   })
 }
 
-function monsterActionSaveDcDependent(
-  namePrefix: string,
-  sharedCastingOptions: { value: string; label: string }[],
-): FormItem {
+function monsterActionSaveDcDependent(namePrefix: string, currentActionId: string): FormItem {
   return monsterAbilitySourceDependent({
     sourcePath: 'dcSource',
     namePrefix,
     controllerLabel: MONSTER_SAVE_DC_LABEL,
-    sharedCastingOptions,
+    currentActionId,
     dependentsChrome: 'none',
     spellcastingHint: MONSTER_SPELLCASTING_ABILITY_SAVE_DC_HINT,
     abilityFields: [
@@ -343,7 +337,7 @@ function monsterActionSaveSelectionDependent(): FormItem {
 function monsterActionSaveSection(
   ctx: ContentFormCtx,
   namePrefix: string,
-  sharedCastingOptions: { value: string; label: string }[],
+  currentActionId: string,
 ): FormItem {
   return {
     kind: 'group',
@@ -357,7 +351,7 @@ function monsterActionSaveSection(
         options: abilityOptions(),
         hint: MONSTER_SAVE_ABILITY_HINT,
       },
-      monsterActionSaveDcDependent(namePrefix, sharedCastingOptions),
+      monsterActionSaveDcDependent(namePrefix, currentActionId),
       monsterActionSaveSelectionDependent(),
       monsterSaveResolutionDamageGroup(ctx),
       {
@@ -514,7 +508,7 @@ function monsterActionSpellMechanics(input: {
       render: () => (
         <MonsterActionCastingAbilityField
           name={`${input.namePrefix}.castingAbility`}
-          sharedOptions={input.sharedCastingOptions}
+          currentActionId={input.action.id}
           sourceActionId={input.action.id}
           onBlocked={input.onCastingSourceBlocked}
           profile="primary"
@@ -595,7 +589,7 @@ function monsterActionMechanicFields(input: {
             renderCastingAbility: () => (
               <MonsterActionCastingAbilityField
                 name={`${namePrefix}.savingThrow.dcSource.castingAbility`}
-                sharedOptions={sharedCastingOptions}
+                currentActionId={action.id}
                 required={false}
                 hint={MONSTER_SPELLCASTING_ABILITY_SAVE_DC_HINT}
               />
@@ -633,7 +627,7 @@ function monsterActionMechanicFields(input: {
   }
   if (action.kind === 'attack') {
     kindFields.push(
-      monsterActionBonusSourceDependent(namePrefix, sharedCastingOptions),
+      monsterActionBonusSourceDependent(namePrefix, action.id),
       {
         type: 'chips',
         name: 'modes',
@@ -651,7 +645,7 @@ function monsterActionMechanicFields(input: {
     )
   }
   if (action.kind === 'save') {
-    kindFields.push(monsterActionSaveSection(ctx, namePrefix, sharedCastingOptions))
+    kindFields.push(monsterActionSaveSection(ctx, namePrefix, action.id))
   }
   if (action.kind === 'multiattack') {
     kindFields.push({

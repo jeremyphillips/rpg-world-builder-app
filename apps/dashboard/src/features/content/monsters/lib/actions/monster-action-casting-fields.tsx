@@ -1,20 +1,19 @@
-import { ABILITY_IDS, getAbilityLabel, type Ability } from '@rpg/contracts'
+import { ABILITY_IDS, type Ability } from '@rpg/contracts'
 import { SelectField } from '@rpg/ui'
 import {
   resolveFieldErrorMessage,
   resolveNestedFieldErrorMessage,
   useFieldControlSize,
 } from '@rpg/ui/form'
-import type { SelectFieldOptionListItem } from '@rpg/ui/form'
+import { useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { formatCastingSourceChangeNotice } from '../monster-form-labels'
 import {
   legendarySpellcastingActionOptions,
-  MONSTER_CASTING_ABILITY_GROUP_LABEL,
-  MONSTER_CASTING_SHARE_GROUP_LABEL,
   monsterCastingDependentLabels,
 } from './monster-action-casting-summary'
+import { monsterCastingAbilitySelectOptions } from './monster-casting-ability-options'
 import {
   MONSTER_LEGENDARY_SPELLCASTING_FIELD_HINT,
   MONSTER_LEGENDARY_SPELLCASTING_FIELD_LABEL,
@@ -32,26 +31,6 @@ function castingAbilityValue(value: unknown): string {
   return ''
 }
 
-function monsterCastingAbilityOptions(
-  sharedOptions: readonly { value: string; label: string }[],
-): SelectFieldOptionListItem[] {
-  const abilities = {
-    kind: 'group' as const,
-    label: MONSTER_CASTING_ABILITY_GROUP_LABEL,
-    options: ABILITY_IDS.map((ability) => ({ value: ability, label: getAbilityLabel(ability) })),
-  }
-  const shared = {
-    kind: 'group' as const,
-    label: MONSTER_CASTING_SHARE_GROUP_LABEL,
-    options: sharedOptions.map((option) => ({
-      value: `shared:${option.value}`,
-      label: option.label,
-    })),
-  }
-  if (sharedOptions.length === 0) return [abilities]
-  return [abilities, shared]
-}
-
 function isDirectAbility(value: unknown): value is { kind: 'ability'; ability: Ability } {
   if (!value || typeof value !== 'object') return false
   const ability = value as { kind?: string; ability?: string }
@@ -60,7 +39,7 @@ function isDirectAbility(value: unknown): value is { kind: 'ability'; ability: A
 
 export function MonsterActionCastingAbilityField({
   name,
-  sharedOptions,
+  currentActionId = '',
   sourceActionId,
   onBlocked,
   required = true,
@@ -68,7 +47,8 @@ export function MonsterActionCastingAbilityField({
   hint: hintOverride,
 }: {
   name: string
-  sharedOptions: readonly { value: string; label: string }[]
+  /** Excludes this action from shared sources and resolves DC previews. */
+  currentActionId?: string
   /** Set on the spell row that other actions share. Nested attack and save fields omit it. */
   sourceActionId?: string
   onBlocked?: (message: string) => void
@@ -80,7 +60,12 @@ export function MonsterActionCastingAbilityField({
 }) {
   const controlSize = useFieldControlSize()
   const { getValues, setValue, formState } = useFormContext<MonsterFormValues>()
+  const formValues = (useWatch() ?? {}) as MonsterFormValues
   const current = useWatch({ name })
+  const options = useMemo(
+    () => monsterCastingAbilitySelectOptions(formValues, currentActionId),
+    [formValues, currentActionId],
+  )
   const value = castingAbilityValue(current)
   const fieldId = `${name.replaceAll('.', '-')}-casting-ability`
   const error = resolveFieldErrorMessage(resolveNestedFieldErrorMessage(formState.errors, name))
@@ -98,7 +83,7 @@ export function MonsterActionCastingAbilityField({
       required={required}
       placeholder="Choose"
       hint={hint}
-      options={monsterCastingAbilityOptions(sharedOptions)}
+      options={options}
       value={value}
       size={controlSize}
       width="full"

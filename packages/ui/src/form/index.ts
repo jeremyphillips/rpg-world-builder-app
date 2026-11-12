@@ -160,6 +160,7 @@ export {
   type FieldType,
   type FieldOption,
   type FieldOptionGroup,
+  type SelectOptionTrailing,
   type SelectFieldOptionListItem,
   isFieldOptionGroup,
   type FieldVisibility,

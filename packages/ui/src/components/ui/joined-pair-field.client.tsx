@@ -292,6 +292,7 @@ export function JoinedPairSelectOccupant({
                 value: String(option.value),
                 disabled: option.disabled,
                 disabledReason: option.disabledReason,
+                trailing: option.trailing,
               }}
               itemValue={encodeSelectOptionValue(option.value)}
             />

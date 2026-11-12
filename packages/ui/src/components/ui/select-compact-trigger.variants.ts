@@ -112,7 +112,11 @@ export function groupedValueSlotClasses(
     return cn(padding, selectValueSlotGridClasses, 'shrink-0 items-center')
   }
 
-  return cn('flex min-h-0 min-w-0 items-center text-left', padding, options.prose && 'flex-1')
+  return cn(
+    'flex min-h-0 min-w-0 w-full items-center text-left',
+    padding,
+    options.prose && 'flex-1',
+  )
 }
 
 /** @deprecated Use `groupedValueSlotClasses` — alias for select ValueSlot padding. */

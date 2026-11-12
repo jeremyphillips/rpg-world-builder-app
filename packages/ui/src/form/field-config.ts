@@ -130,6 +130,12 @@ export type FieldType =
   | 'levelRange'
   | 'rollValue'
 
+/** Trailing metadata for select option rows and the closed trigger (not combobox v1). */
+export type SelectOptionTrailing = {
+  text: string
+  variant?: 'strong' | 'quiet'
+}
+
 /** Option for the `select`, `radio`, `radioCard`, `chips`, and `combobox` field types. */
 export interface FieldOption {
   label: string
@@ -137,6 +143,8 @@ export interface FieldOption {
   disabled?: boolean
   /** Shown in select panels when the option is disabled (e.g. "Already used"). */
   disabledReason?: string
+  /** Inline trailing metadata for select rows and the closed trigger. Not persisted. */
+  trailing?: SelectOptionTrailing
   /** Secondary line text (e.g. source badge copy). Included in combobox search when opted in. */
   description?: string
   /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */

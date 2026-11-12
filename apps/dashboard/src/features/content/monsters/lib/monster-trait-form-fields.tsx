@@ -56,7 +56,6 @@ export function monsterTraitItemFields(input?: {
         renderCastingAbility: () => (
           <MonsterActionCastingAbilityField
             name={castingName}
-            sharedOptions={input?.sharedCastingOptions ?? []}
             required={false}
             hint={SAVING_THROW_SPELLCASTING_HINT}
           />

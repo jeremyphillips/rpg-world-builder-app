@@ -118,7 +118,7 @@ export function legendaryActionDetailFields(input: {
       render: () => (
         <MonsterActionCastingAbilityField
           name={`${input.namePrefix}.castingAbility`}
-          sharedOptions={input.sharedCastingOptions}
+          currentActionId={input.actionId}
           sourceActionId={input.actionId}
           onBlocked={input.onCastingSourceBlocked}
         />

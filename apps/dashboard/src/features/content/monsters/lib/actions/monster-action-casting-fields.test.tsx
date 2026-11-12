@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
@@ -23,11 +23,11 @@ beforeAll(() => {
 
 const SPELLCASTING_ABILITY_LABEL = 'Spellcasting ability'
 
-function Host({ name }: { name: string }) {
+function Host({ name, currentActionId }: { name: string; currentActionId?: string }) {
   const form = useForm<MonsterFormValues>({ defaultValues: resolveMonsterCreateDefaultValues() })
   return (
     <FormProvider {...form}>
-      <MonsterActionCastingAbilityField name={name} sharedOptions={[]} />
+      <MonsterActionCastingAbilityField name={name} currentActionId={currentActionId} />
     </FormProvider>
   )
 }
@@ -50,7 +50,7 @@ describe('MonsterActionCastingAbilityField', () => {
         <FormProvider {...form}>
           <MonsterActionCastingAbilityField
             name="actions.0.castingAbility"
-            sharedOptions={[]}
+            currentActionId="actions-0"
             profile="primary"
           />
         </FormProvider>
@@ -68,12 +68,20 @@ describe('MonsterActionCastingAbilityField', () => {
     const user = userEvent.setup()
     const onBlocked = vi.fn()
     const defaults = resolveMonsterCreateDefaultValues()
+    defaults.challengeRating = '5'
     defaults.actions = [
       {
         id: 'spellcasting',
         kind: 'spell',
         name: 'Spellcasting',
         castingAbility: { kind: 'ability', ability: 'int' },
+        spells: [],
+      },
+      {
+        id: 'hellfire',
+        kind: 'spell',
+        name: 'Hellfire Spellcasting',
+        castingAbility: { kind: 'ability', ability: 'cha' },
         spells: [],
       },
     ]
@@ -92,7 +100,7 @@ describe('MonsterActionCastingAbilityField', () => {
         <FormProvider {...form}>
           <MonsterActionCastingAbilityField
             name="actions.0.castingAbility"
-            sharedOptions={[{ value: 'other', label: 'Hellfire Spellcasting (Charisma)' }]}
+            currentActionId="spellcasting"
             sourceActionId="spellcasting"
             onBlocked={onBlocked}
           />
@@ -101,15 +109,24 @@ describe('MonsterActionCastingAbilityField', () => {
     }
     render(<Guarded />)
     await user.click(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }))
-    expect(screen.getByText('Choose an ability')).toBeInTheDocument()
-    expect(screen.getByText("Use another action's ability")).toBeInTheDocument()
-    await user.click(await screen.findByRole('option', { name: 'Wisdom' }))
+    const listbox = screen.getByRole('listbox')
+    const groupLabels = within(listbox).getAllByText(
+      /^Choose an ability$|^Use another action's ability$/,
+    )
+    expect(groupLabels[0]).toHaveTextContent("Use another action's ability")
+    expect(groupLabels[1]).toHaveTextContent('Choose an ability')
+    await user.click(await screen.findByRole('option', { name: 'Wisdom DC 11' }))
     expect(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL })).toHaveTextContent(
       'Wisdom',
     )
+    expect(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL })).toHaveTextContent(
+      'DC 11',
+    )
     await user.click(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }))
     await user.click(
-      await screen.findByRole('option', { name: 'Hellfire Spellcasting (Charisma)' }),
+      await screen.findByRole('option', {
+        name: 'Hellfire Spellcasting (Charisma) DC 11',
+      }),
     )
     expect(onBlocked).toHaveBeenCalledOnce()
     expect(screen.getByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL })).toHaveTextContent(

@@ -1,0 +1,72 @@
+@layer components {
+  /* Radix SelectValue wraps custom children in a shrink-to-fit span. */
+  [data-select-value-slot] > span {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  /*
+   * Radix ItemText is a shrink-to-fit span. Stretch it across the option row
+   * (class hook + last span child for items with an absolute check indicator).
+   */
+  .ui-select-item-text,
+  [role='option'] > span:last-of-type {
+    display: flex;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .ui-select-item-text > .ui-select-option-row,
+  [role='option'] > span:last-of-type > .ui-select-option-row {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .ui-select-option-row {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* Listbox item reserves space for the absolute check indicator (SelectItem pr-8). */
+  .ui-select-option-row--item {
+    padding-inline-end: 0.25rem;
+  }
+
+  .ui-select-option-row__label {
+    flex: 1 1 0%;
+    min-width: 0;
+  }
+
+  .ui-select-option-row__label--truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ui-select-option-trailing {
+    flex-shrink: 0;
+    margin-inline-start: auto;
+    text-align: end;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    color: var(--muted-foreground);
+  }
+
+  .ui-select-option-trailing--strong {
+    font-weight: var(--font-weight-semibold);
+    color: var(--foreground);
+  }
+
+  .ui-select-option-trailing--disabled-reason {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    color: var(--muted-foreground);
+  }
+}

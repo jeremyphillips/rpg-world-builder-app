@@ -25,6 +25,23 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 Multi-select chips/combobox fields with `min` / `max` also derive constraint hints from the
 shared copy resolver unless an explicit `hint` is provided.
 
+#### Select option trailing (`FieldOption.trailing`)
+
+Select options may carry display-only trailing metadata rendered in the dropdown row and
+on the closed trigger:
+
+```ts
+{
+  label: 'Intelligence',
+  value: 'int',
+  trailing: { text: 'DC 15', variant: 'strong' },
+}
+```
+
+`variant` is `strong` (foreground, semibold weight) or `quiet` (default, muted supporting).
+`disabledReason` stays separate and takes precedence when an option is disabled. Combobox
+fields ignore `trailing` until a later mapping; do not persist trailing text in form values.
+
 ### Text suggestions (`textSuggestions`)
 
 Advisory-only text field: persisted value is always a plain string, free entry is valid,

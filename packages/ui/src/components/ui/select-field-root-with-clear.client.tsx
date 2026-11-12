@@ -15,11 +15,13 @@ import {
 } from './select.client'
 import type { FieldDigits } from './field-digit-metrics'
 import {
+  flattenSelectFieldOptions,
   isFieldOptionGroup,
   type FieldOption,
   type SelectFieldOptionListItem,
 } from '../../form/field-config'
 import { SelectOptionItem } from './select-option-item.client'
+import { SelectOptionRowContent } from './select-option-row-content.client'
 
 function renderSelectOption(option: FieldOption) {
   return <SelectOptionItem key={option.value} option={option} />
@@ -87,6 +89,11 @@ export function SelectRootWithClear({
   options,
 }: SelectRootWithClearProps) {
   const triggerRef = React.useRef<HTMLButtonElement>(null)
+  const flatOptions = React.useMemo(() => flattenSelectFieldOptions(options), [options])
+  const selectedOption = React.useMemo(
+    () => flatOptions.find((option) => option.value === resolvedValue),
+    [flatOptions, resolvedValue],
+  )
   const showClear = clearable && resolvedValue !== undefined && !disabled
   const trigger = (
     <SelectTrigger
@@ -101,7 +108,17 @@ export function SelectRootWithClear({
       className={showClear ? 'min-w-0 w-full' : undefined}
       onBlur={triggerConfig.onBlur}
     >
-      <SelectValue placeholder={triggerConfig.placeholder} />
+      <SelectValue placeholder={triggerConfig.placeholder}>
+        {selectedOption ? (
+          <SelectOptionRowContent
+            label={selectedOption.label}
+            trailing={selectedOption.trailing}
+            disabled={selectedOption.disabled}
+            disabledReason={selectedOption.disabledReason}
+            mode="trigger"
+          />
+        ) : null}
+      </SelectValue>
     </SelectTrigger>
   )
   const select = (
