@@ -367,6 +367,18 @@ describe('monster action detail fields', () => {
           )
         : undefined
     expect(normalRange).toMatchObject({ required: true })
+    const longRange =
+      rangeRow && 'fields' in rangeRow
+        ? rangeRow.fields.find(
+            (field) => 'type' in field && field.type === 'joinedPair' && field.label === 'Long',
+          )
+        : undefined
+    if (!longRange || !('type' in longRange) || longRange.type !== 'joinedPair') {
+      throw new Error('expected long range joined pair')
+    }
+    if (longRange.start.kind !== 'select') throw new Error('expected long select start')
+    expect(longRange.start.optionsResolve?.dependsOn).toEqual(['range.normal'])
+    expect(longRange.optionalDisclosure?.addGate?.dependsOn).toEqual(['range.normal'])
     expect(attack.indexOf('modes')).toBeLessThan(attack.indexOf('bonusSource.kind'))
     expect(attack.indexOf('bonusSource.kind')).toBeLessThan(attack.indexOf('reach'))
     expect(attack.indexOf('reach')).toBeLessThan(attack.indexOf('range.normal'))

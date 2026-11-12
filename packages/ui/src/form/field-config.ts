@@ -476,6 +476,13 @@ export type OptionalDisclosureSummary = {
   resolve: (values: Record<string, unknown>, state: { open: boolean }) => string | undefined
 }
 
+/** Disables the add action from watched form values while collapsed. */
+export type OptionalDisclosureAddGate = {
+  dependsOn: readonly string[]
+  disabledWhen: (values: Record<string, unknown>) => boolean
+  disabledReasonWhen?: (values: Record<string, unknown>) => string | undefined
+}
+
 /** Collapse empty optional fields behind an add control (textarea and select). */
 export type OptionalDisclosureConfig = {
   addLabel: string
@@ -495,6 +502,8 @@ export type OptionalDisclosureConfig = {
   seedWhen?: (values: Record<string, unknown>) => unknown
   /** Disables the add action. Does not disable an open editor. */
   addDisabled?: boolean
+  /** Disables the add action from watched values; optional caption while collapsed. */
+  addGate?: OptionalDisclosureAddGate
 }
 
 /** Attached trailing action on a text-like field — operation failure stays outside RHF validation. */
@@ -2040,12 +2049,31 @@ function comboboxRecommendationDependsOn(field: {
   return field.recommendationResolve?.dependsOn ?? []
 }
 
+function joinedPairSelectOptionsResolveDependsOn(field: {
+  type?: FieldConfig['type']
+  start?: JoinedPairStartOccupantConfig
+  end?: JoinedPairEndOccupantConfig
+}): readonly string[] {
+  if (field.type !== 'joinedPair') return []
+  const names: string[] = []
+  if (field.start?.kind === 'select' && field.start.optionsResolve) {
+    names.push(...field.start.optionsResolve.dependsOn)
+  }
+  if (field.end?.kind === 'select' && field.end.optionsResolve) {
+    names.push(...field.end.optionsResolve.dependsOn)
+  }
+  return names
+}
+
 /** Collects watched field names for dynamic hint, derived metadata, and select options resolution. */
 export function collectFieldDynamicDependsOn(field: {
   hint?: BaseFieldConfig['hint']
   derivedMeta?: BaseFieldConfig['derivedMeta']
   type?: FieldConfig['type']
   optionsResolve?: { dependsOn: readonly string[] }
+  start?: JoinedPairStartOccupantConfig
+  end?: JoinedPairEndOccupantConfig
+  optionalDisclosure?: OptionalDisclosureConfig
   filterSelectsResolve?: FieldDynamicComboboxFilterSelects
   recommendationResolve?: FieldDynamicRecommendation
 }): readonly string[] {
@@ -2056,12 +2084,15 @@ export function collectFieldDynamicDependsOn(field: {
     field.optionsResolve
       ? field.optionsResolve.dependsOn
       : []
+  const addGateDependsOn = field.optionalDisclosure?.addGate?.dependsOn ?? []
 
   return [
     ...new Set([
       ...hintDependsOn,
       ...derivedMetaDependsOn,
       ...optionsResolveDependsOn,
+      ...joinedPairSelectOptionsResolveDependsOn(field),
+      ...addGateDependsOn,
       ...comboboxFilterDependsOn(field),
       ...comboboxRecommendationDependsOn(field),
     ]),

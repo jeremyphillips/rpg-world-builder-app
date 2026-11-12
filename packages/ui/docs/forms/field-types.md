@@ -180,8 +180,11 @@ with a **Remove** action that clears the value and collapses back to the add con
 `rollValue` treats the roll object as present even when dice or flat are incomplete.
 Add calls `seedWhen` and writes that value. Remove unsets the whole object. Set
 `labeled` to keep the section label and a `summary` line visible while collapsed.
-`addDisabled` disables only the add action. Dice defaults are not written for a
-`rollValue` that uses `optionalDisclosure`.
+`addDisabled` disables only the add action. **`addGate`** watches `dependsOn` fields and
+disables the add action while collapsed when `disabledWhen` is true; optional
+`disabledReasonWhen` renders caption copy under the add control (for example when another field
+must be chosen first). Dice defaults are not written for a `rollValue` that uses
+`optionalDisclosure`.
 
 ```ts
 {
@@ -385,6 +388,10 @@ species movement Speed above `[30 ▾][ft.]` while the sentence legend stays sr-
 Standalone `type: 'joinedPair'` fields bind RHF paths through occupant `name` values only — no
 wrapper `name`. Optional `controlId` sets control id segments when they must differ from the
 primary bound path. Arbitrary numeric authoring with optional unit select remains `inputSelect`.
+
+Select occupants may set **`optionsResolve`** (`dependsOn` + `optionsWhen`) to replace the
+static `options` list at render time. Stored amounts that are not in the resolved list remain
+visible in the select (same contract as `allowCustom` distance authoring).
 
 ### Deprecated inline composites
 

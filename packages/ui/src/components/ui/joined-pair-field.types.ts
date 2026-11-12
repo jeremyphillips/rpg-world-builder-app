@@ -15,10 +15,18 @@ export type JoinedPairNumberOccupantConfig = {
   ariaLabel: string
 }
 
+/** Dynamic select options for a joined-pair select occupant. */
+export type JoinedPairSelectOptionsResolve = {
+  dependsOn: readonly string[]
+  optionsWhen: (values: Record<string, unknown>) => readonly TypedSelectOption[]
+}
+
 export type JoinedPairSelectOccupantConfig = {
   kind: 'select'
   name: string
   options: readonly TypedSelectOption[]
+  /** When set, replaces `options` at render time from watched `dependsOn` values. */
+  optionsResolve?: JoinedPairSelectOptionsResolve
   defaultValue?: string | number
   digits?: FieldDigits
   sizingLabel?: string

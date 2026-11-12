@@ -83,6 +83,68 @@ function DisclosureAnatomy({
   )
 }
 
+function collapsedScalarAddControl(addButton: ReactNode, summaryNode: ReactNode, summary?: string) {
+  if (!summary) return addButton
+  return (
+    <div className="flex min-w-0 flex-col gap-1">
+      {addButton}
+      {summaryNode}
+    </div>
+  )
+}
+
+function CollapsedOptionalFieldDisclosure({
+  size,
+  fieldLabel,
+  labeled,
+  inAnatomyRow,
+  addButton,
+  summaryNode,
+  summary,
+}: {
+  size: FieldSize
+  fieldLabel: string
+  labeled: boolean
+  inAnatomyRow: boolean
+  addButton: ReactNode
+  summaryNode: ReactNode
+  summary?: string
+}) {
+  if (inAnatomyRow) {
+    return (
+      <DisclosureAnatomy
+        size={size}
+        label={
+          labeled ? (
+            <DisclosureHeaderRow>
+              <span className={disclosureLabelClass(size)}>
+                <FieldLabelContent label={fieldLabel} />
+              </span>
+              {addButton}
+            </DisclosureHeaderRow>
+          ) : null
+        }
+        control={labeled ? null : collapsedScalarAddControl(addButton, summaryNode, summary)}
+        message={labeled ? summaryNode : null}
+      />
+    )
+  }
+
+  if (!labeled) return collapsedScalarAddControl(addButton, summaryNode, summary)
+
+  return (
+    <div className={fieldAnatomyStackVariants({ size })}>
+      <DisclosureHeaderRow>
+        <span className={disclosureLabelClass(size)}>
+          <FieldLabelContent label={fieldLabel} />
+        </span>
+        {addButton}
+      </DisclosureHeaderRow>
+      {summaryNode}
+    </div>
+  )
+}
+
 export function OptionalFieldDisclosure({
   controlId,
   fieldLabel,
@@ -100,6 +162,7 @@ export function OptionalFieldDisclosure({
   const summaryId = `${controlId}-summary`
   const inAnatomyRow = useFieldRowParticipation()
   const summaryNode = <DisclosureSummary id={summaryId} summary={summary} />
+  const addButtonDescribedBy = summary ? summaryId : undefined
   const addButton = (
     <Button
       type="button"
@@ -109,9 +172,12 @@ export function OptionalFieldDisclosure({
       {...(labeled ? formMicroActionButtonProps : {})}
       aria-controls={controlId}
       aria-expanded={false}
-      aria-describedby={summary && labeled ? summaryId : undefined}
-      disabled={labeled ? addDisabled : undefined}
-      onClick={() => onOpenChange(true)}
+      aria-describedby={addButtonDescribedBy}
+      disabled={addDisabled || undefined}
+      onClick={() => {
+        if (addDisabled) return
+        onOpenChange(true)
+      }}
     >
       <ActionIcon action="add" size={labeled ? 'sm' : 'lg'} />
       {addLabel}
@@ -133,38 +199,16 @@ export function OptionalFieldDisclosure({
   )
 
   if (!open) {
-    if (inAnatomyRow) {
-      return (
-        <DisclosureAnatomy
-          size={size}
-          label={
-            labeled ? (
-              <DisclosureHeaderRow>
-                <span className={disclosureLabelClass(size)}>
-                  <FieldLabelContent label={fieldLabel} />
-                </span>
-                {addButton}
-              </DisclosureHeaderRow>
-            ) : null
-          }
-          control={labeled ? null : addButton}
-          message={labeled ? summaryNode : null}
-        />
-      )
-    }
-
-    if (!labeled) return addButton
-
     return (
-      <div className={fieldAnatomyStackVariants({ size })}>
-        <DisclosureHeaderRow>
-          <span className={disclosureLabelClass(size)}>
-            <FieldLabelContent label={fieldLabel} />
-          </span>
-          {addButton}
-        </DisclosureHeaderRow>
-        {summaryNode}
-      </div>
+      <CollapsedOptionalFieldDisclosure
+        size={size}
+        fieldLabel={fieldLabel}
+        labeled={labeled}
+        inAnatomyRow={inAnatomyRow}
+        addButton={addButton}
+        summaryNode={summaryNode}
+        summary={summary}
+      />
     )
   }
 

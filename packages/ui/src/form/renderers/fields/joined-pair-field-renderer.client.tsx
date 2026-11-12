@@ -1,8 +1,10 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useController } from 'react-hook-form'
 
 import { JoinedPairFieldForm } from '../../../components/ui/joined-pair-field-form.client'
+import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import type { JoinedPairFieldConfig } from '../../field-config'
 import { useFieldRowParticipation } from '../../../components/ui/field-row-anatomy.context'
@@ -16,6 +18,7 @@ import {
   resolveJoinedPairBoundPaths,
   resolveJoinedPairCombinedError,
   resolveJoinedPairControlIds,
+  resolveJoinedPairStartOccupant,
 } from './joined-pair-field-renderer.lib'
 
 export interface JoinedPairFieldRendererProps {
@@ -40,15 +43,13 @@ export function JoinedPairFieldRenderer({ config, id, namePrefix }: JoinedPairFi
     ...(endDefaultValue !== undefined ? { defaultValue: endDefaultValue } : {}),
   })
   const unitValue = endPath !== undefined ? endController.field.value : undefined
-  const startOccupant =
-    config.start.kind === 'select' && config.presetsByUnit
-      ? {
-          ...config.start,
-          options:
-            config.presetsByUnit[String(unitValue ?? endDefaultValue ?? '')] ??
-            config.start.options,
-        }
-      : config.start
+  const startOptionsDependsOn =
+    config.start.kind === 'select' ? (config.start.optionsResolve?.dependsOn ?? []) : []
+  const optionValues = useDependsOnValues(startOptionsDependsOn, namePrefix)
+  const startOccupant = useMemo(
+    () => resolveJoinedPairStartOccupant(config, optionValues, unitValue, endDefaultValue),
+    [config, endDefaultValue, optionValues, unitValue],
+  )
   const endField = {
     ...endController.field,
     onChange: (next: unknown) => {

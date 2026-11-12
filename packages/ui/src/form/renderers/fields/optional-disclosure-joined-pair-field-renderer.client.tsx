@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { useController } from 'react-hook-form'
+import { useMemo, useState } from 'react'
+import { useController, useFormContext, useWatch } from 'react-hook-form'
 
 import { OptionalFieldDisclosure } from '../../../components/ui/optional-field-disclosure.client'
 import { useFieldControlSize } from '../../context/form-section.context'
 import type { JoinedPairFieldConfig, OptionalDisclosureConfig } from '../../field-config'
+import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { useConfirmBeforeClear } from '../../config/use-confirm-before-clear.client'
 import { JoinedPairFieldRenderer } from './joined-pair-field-renderer.client'
 import { resolveJoinedPairBoundPaths } from './joined-pair-field-renderer.lib'
@@ -26,21 +27,40 @@ export function OptionalDisclosureJoinedPairFieldRenderer({
   id: string
   namePrefix?: string
 }) {
+  const { control } = useFormContext()
   const { startPath } = resolveJoinedPairBoundPaths(config, namePrefix)
-  const { field } = useController({ name: startPath })
+  const watchedAmount = useWatch({ control, name: startPath })
+  const { field } = useController({ control, name: startPath })
   const [manualOpen, setManualOpen] = useState(false)
   const expandWhenPopulated = disclosure.expandWhenPopulated !== false
-  const open = manualOpen || (expandWhenPopulated && hasAmount(field.value))
+  const open = manualOpen || (expandWhenPopulated && hasAmount(watchedAmount))
   const controlSize = useFieldControlSize(config.controlSizeOverride)
   const clearValue = () => {
-    field.onChange(undefined)
     setManualOpen(false)
+    field.onChange(undefined)
   }
   const { attemptClear, confirmDialog } = useConfirmBeforeClear({
     confirmBeforeClear: disclosure.confirmBeforeClear,
     clearingFields: [config],
     onClear: clearValue,
   })
+  const gateValues = useDependsOnValues(disclosure.addGate?.dependsOn ?? [], namePrefix)
+  const addDisabled = useMemo(() => {
+    if (disclosure.addDisabled) return true
+    const gate = disclosure.addGate
+    if (!gate) return false
+    return gate.disabledWhen(gateValues)
+  }, [disclosure.addDisabled, disclosure.addGate, gateValues])
+  const collapsedSummary = useMemo(() => {
+    const gate = disclosure.addGate
+    if (!gate?.disabledReasonWhen) return undefined
+    const reason = gate.disabledReasonWhen(gateValues)
+    return reason && addDisabled ? reason : undefined
+  }, [addDisabled, disclosure.addGate, gateValues])
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (nextOpen && addDisabled) return
+    setManualOpen(nextOpen)
+  }
 
   return (
     <>
@@ -50,9 +70,11 @@ export function OptionalDisclosureJoinedPairFieldRenderer({
         addLabel={disclosure.addLabel}
         removeLabel={disclosure.removeLabel}
         open={open}
-        onOpenChange={setManualOpen}
+        onOpenChange={handleOpenChange}
         onRemove={attemptClear}
         size={controlSize}
+        addDisabled={addDisabled}
+        summary={collapsedSummary}
       >
         <JoinedPairFieldRenderer
           config={{ ...config, labelVisibility: 'srOnly' }}
