@@ -52,7 +52,7 @@ describe('formatMonsterSpellEntry', () => {
       resolution: { method: { kind: 'saving-throw' } },
     })
     const rendered = formatMonsterSpellEntry({
-      entry: SPELLCASTING_ACTION,
+      entry: { ...SPELLCASTING_ACTION, omittedComponents: undefined },
       monsterName: 'Mage',
       section: 'actions',
       spellsById: withSave,
@@ -75,6 +75,32 @@ describe('formatMonsterSpellEntry', () => {
     })
     expect(shared.bodyHtml).not.toContain('spell save DC')
     expect(shared.bodyHtml).toContain('using the same spellcasting ability as Spellcasting')
+  })
+
+  it('renders grouped spellcasting intro with material-only omissions', () => {
+    const fireballId = 'srd-cc-5.2.1:fireball'
+    const withSave = new Map(spellsById)
+    const fireball = withSave.get(fireballId)
+    expect(fireball).toBeDefined()
+    withSave.set(fireballId, {
+      ...fireball!,
+      resolution: { method: { kind: 'saving-throw' } },
+    })
+    const rendered = formatMonsterSpellEntry({
+      entry: {
+        ...SPELLCASTING_ACTION,
+        omittedComponents: ['material'],
+      },
+      monsterName: 'Ancient Red Dragon',
+      section: 'actions',
+      spellsById: withSave,
+      catalogStatus: 'ready',
+      spellsInBody,
+      saveDc: 19,
+    })
+    expect(rendered.bodyHtml).toContain(
+      'The ancient red dragon casts one of the following spells, requiring no Material components and using Intelligence as the spellcasting ability (spell save DC 19):',
+    )
   })
 
   it('renders Protective Magic and Misty Step from structure', () => {
@@ -246,7 +272,6 @@ describe('formatMonsterSpellEntry', () => {
       castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
       resolution: { method: { kind: 'saving-throw' } },
     })
-    // SRD prints "requiring no spell components". This formatter lists the omitted component labels.
     const beguile = formatMonsterSpellEntry({
       entry: {
         id: 'beguile',
@@ -264,7 +289,7 @@ describe('formatMonsterSpellEntry', () => {
       saveDc: 17,
     })
     expect(beguile.bodyHtml).toContain('spell save DC 17')
-    expect(beguile.bodyHtml).toContain('without Verbal, Somatic, or Material components')
+    expect(beguile.bodyHtml).toContain('requiring no spell components')
   })
 })
 

@@ -833,8 +833,6 @@
         "kind": "spell",
         "name": "Protective Magic",
         "castingAbility": { "kind": "shared", "entryId": "spellcasting" },
-        "trigger": { "text": "The spell's trigger." },
-        "description": "<p>The lich casts Counterspell or Shield in response to the spell's trigger, using the same spellcasting ability as Spellcasting.</p>",
         "spells": [{ "spellId": "srd-cc-5.2.1:counterspell" }, { "spellId": "srd-cc-5.2.1:shield" }]
       }
     ]

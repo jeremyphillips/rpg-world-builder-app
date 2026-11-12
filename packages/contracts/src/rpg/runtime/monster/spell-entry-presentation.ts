@@ -6,7 +6,10 @@ import {
   type LimitedUse,
 } from '../../primitives/limited-use'
 import { getAbilityLabel } from '../../vocab/ability'
-import { SPELL_COMPONENT_ENTRIES, type SpellComponentId } from '../../vocab/spell/components'
+import {
+  formatMonsterSpellComponentOmissionClause,
+  joinMonsterSpellCastingIntroSegments,
+} from './spell-component-omission'
 import type { MonsterReferencedSpell } from './reaction-trigger'
 import { type MonsterActionSectionId } from '../../content/spell/casting-economy'
 import { formatSpellCastAtLevelName } from '../../content/spell/format-spell-cast-level'
@@ -94,12 +97,6 @@ function abilityPhrase(
   return 'using its spellcasting ability'
 }
 
-function componentPhrase(omitted: readonly SpellComponentId[] | undefined): string {
-  if (!omitted?.length) return ''
-  const labels = omitted.map((id) => SPELL_COMPONENT_ENTRIES[id].label)
-  return ` without ${listPhrase(labels)} components`
-}
-
 function spellName(
   spell: SpellRow,
   spellsById: ReadonlyMap<string, MonsterReferencedSpell> | undefined,
@@ -175,12 +172,13 @@ function castingSentence(args: {
   const subject = formatMonsterStatBlockSubject(args.monsterName)
   const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
   const response = args.section === 'reactions' ? " in response to the spell's trigger" : ''
-  const components = componentPhrase(args.entry.omittedComponents)
+  const omission = formatMonsterSpellComponentOmissionClause(args.entry.omittedComponents)
+  const omissionSegment = omission ? `, ${omission}` : ''
   if (args.entry.spellInvocation === 'use-entry' && args.entry.castingAbility?.kind === 'shared') {
     const target = args.spellsInBody.get(args.entry.castingAbility.entryId)
-    return `<p>${capitalSubject} uses ${target?.name ?? 'that entry'} to cast ${listPhrase(labels)}${components}.</p>`
+    return `<p>${capitalSubject} uses ${target?.name ?? 'that entry'} to cast ${listPhrase(labels)}${omissionSegment}.</p>`
   }
-  return `<p>${capitalSubject} casts ${listPhrase(labels)}${response}, ${abilityPhrase(args.entry, args.spellsInBody, args.saveDcSuffix)}${components}.</p>`
+  return `<p>${capitalSubject} casts ${listPhrase(labels)}${response}${omissionSegment}, ${abilityPhrase(args.entry, args.spellsInBody, args.saveDcSuffix)}.</p>`
 }
 
 export function formatLegendaryActionUsesIntro(args: {
@@ -235,10 +233,12 @@ export function formatMonsterSpellEntry(args: {
   const saveDcSuffix = directSaveDcSuffix(args)
   const subject = formatMonsterStatBlockSubject(args.monsterName)
   const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
-  const groupedIntro =
-    useGroupLabels && saveDcSuffix
-      ? `<p>${capitalSubject} casts one of the following spells, ${abilityPhrase(args.entry, args.spellsInBody, saveDcSuffix)}:</p>`
-      : ''
+  const omissionClause = formatMonsterSpellComponentOmissionClause(args.entry.omittedComponents)
+  const abilitySegment = abilityPhrase(args.entry, args.spellsInBody, saveDcSuffix)
+  const showGroupedIntro = useGroupLabels && (Boolean(saveDcSuffix) || Boolean(omissionClause))
+  const groupedIntro = showGroupedIntro
+    ? `<p>${capitalSubject} casts one of the following spells, ${joinMonsterSpellCastingIntroSegments(omissionClause, abilitySegment)}:</p>`
+    : ''
   const bodyHtml = useGroupLabels
     ? groupedIntro +
       groups

@@ -79,8 +79,8 @@ import { MonsterActionRechargeField } from './monster-action-recharge-field'
 import {
   monsterActionLimitedUseFields,
   monsterActionOnHitFields,
-  spellComponentField,
 } from './monster-action-on-hit-fields'
+import { monsterSpellComponentRequirementsField } from './monster-spell-component-form-fields'
 import { monsterSaveDcAbilityHintWhen } from './monster-action-save-field-hints'
 import { monsterWeaponDamageOverrideField } from './monster-weapon-damage-override'
 import type { MonsterFormValues } from '../monster-form-values'
@@ -733,7 +733,7 @@ function monsterActionSpellMechanics(input: {
         },
       ],
     },
-    spellComponentField(),
+    monsterSpellComponentRequirementsField(),
     ...monsterActionLimitedUseFields({
       addDisabled:
         input.action.kind === 'spell' &&

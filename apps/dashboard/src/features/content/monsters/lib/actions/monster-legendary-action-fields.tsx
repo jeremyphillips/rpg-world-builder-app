@@ -11,7 +11,7 @@ import {
   MonsterLegendarySpellcastingActionField,
 } from './monster-action-casting-fields'
 import { monsterSpellCastAtLevelField } from './monster-spell-cast-at-level-form-fields'
-import { spellComponentField } from './monster-action-on-hit-fields'
+import { monsterSpellComponentRequirementsField } from './monster-spell-component-form-fields'
 import {
   MONSTER_CAST_SPELL_HINT,
   MONSTER_MOVEMENT_ADD_LABEL,
@@ -130,6 +130,6 @@ export function legendaryActionDetailFields(input: {
       spellIdField: 'spells.0.spellId',
       catalog: input.spellCatalogById,
     }),
-    spellComponentField(),
+    monsterSpellComponentRequirementsField(),
   ]
 }

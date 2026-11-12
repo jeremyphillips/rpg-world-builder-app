@@ -4,8 +4,6 @@ import {
   getEffectConditionLabel,
   REST_KIND_ENTRIES,
   REST_KINDS,
-  SPELL_COMPONENT_ENTRIES,
-  SPELL_COMPONENT_IDS,
   PROFICIENCY_BONUS_TERM,
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
@@ -244,17 +242,5 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
         required: true,
       },
     ],
-  }
-}
-
-export function spellComponentField(): FormItem {
-  return {
-    type: 'chips',
-    name: 'omittedComponents',
-    label: 'Omitted components',
-    options: SPELL_COMPONENT_IDS.map((id) => ({
-      value: id,
-      label: SPELL_COMPONENT_ENTRIES[id].label,
-    })),
   }
 }
