@@ -93,6 +93,110 @@ function collapsedScalarAddControl(addButton: ReactNode, summaryNode: ReactNode,
   )
 }
 
+function showCollapsedAdd(addDisabled: boolean, summary?: string): boolean {
+  return !addDisabled || Boolean(summary)
+}
+
+function collapsedAddControl(
+  addButton: ReactNode,
+  summaryNode: ReactNode,
+  summary: string | undefined,
+  addDisabled: boolean,
+): ReactNode {
+  if (!showCollapsedAdd(addDisabled, summary)) return null
+  return collapsedScalarAddControl(addButton, summaryNode, summary)
+}
+
+function CollapsedLabeledAddHeader({
+  size,
+  fieldLabel,
+  addButton,
+  showAdd,
+}: {
+  size: FieldSize
+  fieldLabel: string
+  addButton: ReactNode
+  showAdd: boolean
+}) {
+  return (
+    <DisclosureHeaderRow>
+      <span className={disclosureLabelClass(size)}>
+        <FieldLabelContent label={fieldLabel} />
+      </span>
+      {showAdd ? addButton : null}
+    </DisclosureHeaderRow>
+  )
+}
+
+function CollapsedDisclosureInAnatomyRow({
+  size,
+  fieldLabel,
+  labeled,
+  addButton,
+  summaryNode,
+  collapsedAdd,
+  showAdd,
+}: {
+  size: FieldSize
+  fieldLabel: string
+  labeled: boolean
+  addButton: ReactNode
+  summaryNode: ReactNode
+  collapsedAdd: ReactNode
+  showAdd: boolean
+}) {
+  if (!labeled && collapsedAdd === null) return null
+  return (
+    <DisclosureAnatomy
+      size={size}
+      label={
+        labeled ? (
+          <CollapsedLabeledAddHeader
+            size={size}
+            fieldLabel={fieldLabel}
+            addButton={addButton}
+            showAdd={showAdd}
+          />
+        ) : null
+      }
+      control={labeled ? null : collapsedAdd}
+      message={labeled ? summaryNode : null}
+    />
+  )
+}
+
+function CollapsedDisclosureStack({
+  size,
+  fieldLabel,
+  labeled,
+  addButton,
+  summaryNode,
+  collapsedAdd,
+  showAdd,
+}: {
+  size: FieldSize
+  fieldLabel: string
+  labeled: boolean
+  addButton: ReactNode
+  summaryNode: ReactNode
+  collapsedAdd: ReactNode
+  showAdd: boolean
+}) {
+  if (!labeled) return collapsedAdd
+
+  return (
+    <div className={fieldAnatomyStackVariants({ size })}>
+      <CollapsedLabeledAddHeader
+        size={size}
+        fieldLabel={fieldLabel}
+        addButton={addButton}
+        showAdd={showAdd}
+      />
+      {summaryNode}
+    </div>
+  )
+}
+
 function CollapsedOptionalFieldDisclosure({
   size,
   fieldLabel,
@@ -101,6 +205,7 @@ function CollapsedOptionalFieldDisclosure({
   addButton,
   summaryNode,
   summary,
+  addDisabled,
 }: {
   size: FieldSize
   fieldLabel: string
@@ -109,40 +214,25 @@ function CollapsedOptionalFieldDisclosure({
   addButton: ReactNode
   summaryNode: ReactNode
   summary?: string
+  addDisabled: boolean
 }) {
-  if (inAnatomyRow) {
-    return (
-      <DisclosureAnatomy
-        size={size}
-        label={
-          labeled ? (
-            <DisclosureHeaderRow>
-              <span className={disclosureLabelClass(size)}>
-                <FieldLabelContent label={fieldLabel} />
-              </span>
-              {addButton}
-            </DisclosureHeaderRow>
-          ) : null
-        }
-        control={labeled ? null : collapsedScalarAddControl(addButton, summaryNode, summary)}
-        message={labeled ? summaryNode : null}
-      />
-    )
+  const showAdd = showCollapsedAdd(addDisabled, summary)
+  const collapsedAdd = collapsedAddControl(addButton, summaryNode, summary, addDisabled)
+  const layoutProps = {
+    size,
+    fieldLabel,
+    labeled,
+    addButton,
+    summaryNode,
+    collapsedAdd,
+    showAdd,
   }
 
-  if (!labeled) return collapsedScalarAddControl(addButton, summaryNode, summary)
+  if (inAnatomyRow) {
+    return <CollapsedDisclosureInAnatomyRow {...layoutProps} />
+  }
 
-  return (
-    <div className={fieldAnatomyStackVariants({ size })}>
-      <DisclosureHeaderRow>
-        <span className={disclosureLabelClass(size)}>
-          <FieldLabelContent label={fieldLabel} />
-        </span>
-        {addButton}
-      </DisclosureHeaderRow>
-      {summaryNode}
-    </div>
-  )
+  return <CollapsedDisclosureStack {...layoutProps} />
 }
 
 export function OptionalFieldDisclosure({
@@ -208,6 +298,7 @@ export function OptionalFieldDisclosure({
         addButton={addButton}
         summaryNode={summaryNode}
         summary={summary}
+        addDisabled={addDisabled}
       />
     )
   }

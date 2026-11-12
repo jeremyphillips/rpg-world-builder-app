@@ -341,25 +341,33 @@ describe('monster action detail fields', () => {
     expect(attackItems.find((item) => 'name' in item && item.name === 'modes')).toMatchObject({
       required: true,
     })
-    expect(
-      attackItems.find(
-        (item) => 'type' in item && item.type === 'joinedPair' && item.label === 'Melee reach',
-      ),
-    ).toMatchObject({
+    const distanceGroup = attackItems.find(
+      (item) => 'kind' in item && item.kind === 'group' && item.legend === 'Distance',
+    )
+    if (!distanceGroup || !('fields' in distanceGroup)) {
+      throw new Error('expected Distance group')
+    }
+    expect(distanceGroup).toMatchObject({
+      visibility: { dependsOn: ['modes'] },
+    })
+    const reachField = distanceGroup.fields.find(
+      (field) => 'type' in field && field.type === 'joinedPair' && field.label === 'Melee reach',
+    )
+    expect(reachField).toMatchObject({
       start: { name: 'reach', placeholder: '5' },
     })
-    expect(
-      attackItems.find(
-        (item) => 'type' in item && item.type === 'joinedPair' && item.label === 'Melee reach',
-      ),
-    ).not.toHaveProperty('required', true)
-    const rangeGroup = attackItems.find(
-      (item) => 'kind' in item && item.kind === 'group' && item.legend === 'Range',
+    expect(reachField).not.toHaveProperty('required', true)
+    const rangedRangeGroup = distanceGroup.fields.find(
+      (field) => 'kind' in field && field.kind === 'group' && field.legend === 'Ranged range',
     )
-    const rangeRow =
-      rangeGroup && 'fields' in rangeGroup
-        ? rangeGroup.fields.find((field) => 'kind' in field && field.kind === 'row')
-        : undefined
+    if (!rangedRangeGroup || !('fields' in rangedRangeGroup)) {
+      throw new Error('expected Ranged range group')
+    }
+    expect(rangedRangeGroup).toMatchObject({
+      headingScale: 'field',
+      visibility: { dependsOn: ['modes'] },
+    })
+    const rangeRow = rangedRangeGroup.fields[0]
     const normalRange =
       rangeRow && 'fields' in rangeRow
         ? rangeRow.fields.find(

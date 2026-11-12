@@ -15,7 +15,7 @@ import type { FieldVisibility, FormItem, SelectFieldConfig } from '@rpg/ui/form'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
 import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
-import { weaponAttackRangeGroup } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
+import { attackRangeRow } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
 import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
 import { savingThrowFieldGroup } from '../../../lib/forms/mechanics/saving-throw-field-group'
 import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
@@ -27,6 +27,8 @@ import {
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_DAMAGE_TYPE_CHANGE_LABEL,
+  MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
+  MONSTER_ACTION_RANGED_RANGE_LABEL,
   MONSTER_ACTION_REACH_FIELD_LABEL,
   MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
   MONSTER_SAVE_ABILITY_HINT,
@@ -97,6 +99,16 @@ function rangedVisibility(name: 'mode' | 'modes'): FieldVisibility {
     dependsOn: [name],
     visibleWhen: (values) =>
       name === 'mode' ? values.mode === 'ranged' : arrayIncludes(values.modes, 'ranged'),
+  }
+}
+
+function distanceVisibility(name: 'mode' | 'modes'): FieldVisibility {
+  return {
+    dependsOn: [name],
+    visibleWhen: (values) =>
+      name === 'mode'
+        ? values.mode === 'melee' || values.mode === 'ranged'
+        : arrayIncludes(values.modes, 'melee') || arrayIncludes(values.modes, 'ranged'),
   }
 }
 
@@ -419,34 +431,46 @@ const reachFeetOptions = REACH_FEET.map((feet) => ({
   label: String(feet),
 }))
 
-function reachRangeFields(modeField: 'mode' | 'modes'): FormItem[] {
-  return [
-    {
-      type: 'joinedPair',
-      label: MONSTER_ACTION_REACH_FIELD_LABEL,
-      width: 'auto',
-      visibility: meleeVisibility(modeField),
-      start: {
-        kind: 'select',
-        name: 'reach',
-        options: reachFeetOptions,
-        digits: 2,
-        placeholder: '5',
-        ariaLabel: 'Reach value',
+function monsterAttackDistanceFields(modeField: 'mode' | 'modes'): FormItem {
+  return {
+    kind: 'group',
+    legend: MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
+    visibility: distanceVisibility(modeField),
+    fields: [
+      {
+        type: 'joinedPair',
+        label: MONSTER_ACTION_REACH_FIELD_LABEL,
+        width: 'auto',
+        visibility: meleeVisibility(modeField),
+        start: {
+          kind: 'select',
+          name: 'reach',
+          options: reachFeetOptions,
+          digits: 2,
+          placeholder: '5',
+          ariaLabel: 'Reach value',
+        },
+        end: {
+          kind: 'label',
+          text: 'ft.',
+          ariaLabel: 'Reach unit',
+        },
       },
-      end: {
-        kind: 'label',
-        text: 'ft.',
-        ariaLabel: 'Reach unit',
+      {
+        kind: 'group',
+        legend: MONSTER_ACTION_RANGED_RANGE_LABEL,
+        headingScale: 'field',
+        visibility: rangedVisibility(modeField),
+        fields: [
+          attackRangeRow({
+            normalName: 'range.normal',
+            longName: 'range.long',
+            normalRequired: true,
+          }),
+        ],
       },
-    },
-    weaponAttackRangeGroup({
-      normalName: 'range.normal',
-      longName: 'range.long',
-      visibility: rangedVisibility(modeField),
-      normalRequired: true,
-    }),
-  ]
+    ],
+  }
 }
 
 function monsterActionAttackPreviewSlot(
@@ -679,7 +703,7 @@ function monsterActionMechanicFields(input: {
         required: true,
       },
       monsterActionBonusSourceDependent(namePrefix, action.id),
-      ...reachRangeFields('modes'),
+      monsterAttackDistanceFields('modes'),
       damageFieldGroup({
         ctx,
         damageTypeName: 'damageType',

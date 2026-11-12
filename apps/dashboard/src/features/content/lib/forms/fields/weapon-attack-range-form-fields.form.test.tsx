@@ -9,7 +9,11 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { z } from 'zod'
 
-import { weaponAttackRangeGroup } from './weapon-attack-range-form-fields'
+import { attackRangeRow, weaponAttackRangeGroup } from './weapon-attack-range-form-fields'
+import {
+  MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
+  MONSTER_ACTION_RANGED_RANGE_LABEL,
+} from '../../../monsters/lib/monster-form-labels'
 
 const longRangeMessage = formatFieldMessage(
   equipmentVariantValidationMessages.longRangeExceedsNormal(),
@@ -17,7 +21,40 @@ const longRangeMessage = formatFieldMessage(
 
 const schema = z.object({
   range: weaponRangeSchema,
+  modes: z.array(z.string()).optional(),
+  reach: z.number().optional(),
 })
+
+function monsterDistanceFields(): FormItem {
+  return {
+    kind: 'group',
+    legend: MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
+    visibility: {
+      dependsOn: ['modes'],
+      visibleWhen: (values) =>
+        Array.isArray(values.modes) &&
+        (values.modes.includes('melee') || values.modes.includes('ranged')),
+    },
+    fields: [
+      {
+        kind: 'group',
+        legend: MONSTER_ACTION_RANGED_RANGE_LABEL,
+        headingScale: 'field',
+        visibility: {
+          dependsOn: ['modes'],
+          visibleWhen: (values) => Array.isArray(values.modes) && values.modes.includes('ranged'),
+        },
+        fields: [
+          attackRangeRow({
+            normalName: 'range.normal',
+            longName: 'range.long',
+            normalRequired: true,
+          }),
+        ],
+      },
+    ],
+  }
+}
 
 function rangeFields(): FormItem[] {
   return [
@@ -34,7 +71,7 @@ describe('weaponAttackRangeGroup form', () => {
       <Form
         schema={schema}
         fields={rangeFields()}
-        defaultValues={{ range: { normal: undefined } }}
+        defaultValues={{ range: { normal: 60 } }}
         onSubmit={vi.fn()}
       />,
     )
@@ -42,7 +79,7 @@ describe('weaponAttackRangeGroup form', () => {
     expect(screen.queryByRole('combobox', { name: 'Long value' })).not.toBeInTheDocument()
   })
 
-  it('disables add long range until normal is chosen', () => {
+  it('hides add long range until normal is chosen', () => {
     render(
       <Form
         schema={schema}
@@ -51,11 +88,10 @@ describe('weaponAttackRangeGroup form', () => {
         onSubmit={vi.fn()}
       />,
     )
-    expect(screen.getByRole('button', { name: 'Add long range' })).toBeDisabled()
-    expect(screen.getByText('Choose a normal range first.')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add long range' })).not.toBeInTheDocument()
   })
 
-  it('disables add when no greater presets exist', () => {
+  it('hides add when no greater presets exist', () => {
     render(
       <Form
         schema={schema}
@@ -64,7 +100,20 @@ describe('weaponAttackRangeGroup form', () => {
         onSubmit={vi.fn()}
       />,
     )
-    expect(screen.getByRole('button', { name: 'Add long range' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Add long range' })).not.toBeInTheDocument()
+  })
+
+  it('keeps long visible when normal clears but long is authored', () => {
+    render(
+      <Form
+        schema={schema}
+        fields={rangeFields()}
+        defaultValues={{ range: { normal: undefined, long: 240 } }}
+        onSubmit={vi.fn()}
+      />,
+    )
+    expect(screen.queryByRole('button', { name: 'Add long range' })).not.toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Long value' })).toHaveTextContent('240')
   })
 
   it('opens an empty long select after add long range', async () => {
@@ -115,5 +164,22 @@ describe('weaponAttackRangeGroup form', () => {
       expect(screen.queryByRole('combobox', { name: 'Long value' })).not.toBeInTheDocument()
     })
     expect(screen.getByRole('button', { name: 'Add long range' })).toBeInTheDocument()
+  })
+})
+
+describe('monster distance nested range form', () => {
+  it('renders optional disclosure inside nested ranged range', async () => {
+    const user = userEvent.setup()
+    render(
+      <Form
+        schema={schema}
+        fields={[monsterDistanceFields()]}
+        defaultValues={{ modes: ['ranged'], range: { normal: 60 } }}
+        onSubmit={vi.fn()}
+      />,
+    )
+    expect(screen.getByText(MONSTER_ACTION_RANGED_RANGE_LABEL)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Add long range' }))
+    expect(screen.getByRole('combobox', { name: 'Long value' })).toBeInTheDocument()
   })
 })

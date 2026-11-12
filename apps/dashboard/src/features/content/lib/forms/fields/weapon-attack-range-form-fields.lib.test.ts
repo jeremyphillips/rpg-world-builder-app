@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest'
 import {
   attackLongRangeAddGate,
   attackLongRangePresetFeet,
-  CHOOSE_NORMAL_RANGE_FIRST_LABEL,
 } from './weapon-attack-range-form-fields.lib'
 
 describe('attack long range helpers', () => {
@@ -21,12 +20,9 @@ describe('attack long range helpers', () => {
   })
 
   it('gates add long range on a valid normal and available presets', () => {
-    expect(attackLongRangeAddGate(undefined)).toEqual({
-      disabled: true,
-      reason: CHOOSE_NORMAL_RANGE_FIRST_LABEL,
-    })
+    expect(attackLongRangeAddGate(undefined)).toBe(false)
     const maxNormal = ATTACK_RANGE_FEET.at(-1)!
-    expect(attackLongRangeAddGate(maxNormal)).toEqual({ disabled: true })
-    expect(attackLongRangeAddGate(60)).toEqual({ disabled: false })
+    expect(attackLongRangeAddGate(maxNormal)).toBe(false)
+    expect(attackLongRangeAddGate(60)).toBe(true)
   })
 })
