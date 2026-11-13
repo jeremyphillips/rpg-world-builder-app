@@ -6,14 +6,14 @@ stat-block sentences.
 
 ## Layers
 
-| Layer           | Home                            | Owns                                                                                                                                                           |
-| --------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Primitives      | `rpg/primitives/`               | Rolls, area geometry, limited use                                                                                                                              |
-| Closed sets     | `rpg/vocab/resolution/`         | Selection modes, target kinds, proximity, outcomes, application amounts, method kinds                                                                          |
-| Envelope        | `rpg/content/lib/resolution/`   | `effectResolutionSchema` — selection, method (`saving-throw` \| `automatic`), damage/healing/temporary hit points, outcomes                                    |
-| Spell adapter   | `rpg/content/spell/resolution/` | Spell attack methods, projectile pattern, progression. `spellResolutionSchema` spreads the envelope                                                            |
-| Monster actions | `rpg/content/monster/action.ts` | Kind union, section eligibility, `dcSource`, multiattack steps, `action-reference`, reaction `parry`, optional `preset` and natural `form`                     |
-| Stat block      | `rpg/runtime/monster/`          | Attack lines, `formatMonsterSaveAction`, `formatMonsterMultiattack`, `formatMonsterActionReference`, `formatMonsterParryTrigger`, `formatMonsterParryResponse` |
+| Layer           | Home                            | Owns                                                                                                                                                                                     |
+| --------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Primitives      | `rpg/primitives/`               | Rolls, area geometry, limited use                                                                                                                                                        |
+| Closed sets     | `rpg/vocab/resolution/`         | Selection modes, target kinds, proximity, outcomes, application amounts, method kinds                                                                                                    |
+| Envelope        | `rpg/content/lib/resolution/`   | `effectResolutionSchema` — selection, method (`saving-throw` \| `automatic`), damage/healing/temporary hit points, outcomes                                                              |
+| Spell adapter   | `rpg/content/spell/resolution/` | Spell attack methods, projectile pattern, progression. `spellResolutionSchema` spreads the envelope                                                                                      |
+| Monster actions | `rpg/content/monster/action.ts` | Kind union, section eligibility, `dcSource`, multiattack steps, `action-reference`, reaction `parry`, bonus `leap`, `teleport`, and `take-actions`, optional `preset` and natural `form` |
+| Stat block      | `rpg/runtime/monster/`          | Attack lines, save, multiattack, action reference, parry, leap, teleport, and take-actions sentences                                                                                     |
 
 Save DC is `abilitySaveDc` in `rpg/runtime/creature/spell-dc.ts` (8 + proficiency
 bonus + ability modifier). Area sentences for stat blocks use
@@ -22,12 +22,14 @@ bonus + ability modifier). Area sentences for stat blocks use
 ## Monster action kinds
 
 `weapon`, `natural-weapon`, `attack`, `save`, `multiattack`, `special`,
-`spell`, `action-reference`, and `parry`. Which kinds a section accepts is
-`MONSTER_SECTION_KINDS`. Actions keep the attack, save, spell, special, and
-multiattack kinds. Bonus Actions keep `attack`, `save`, `spell`, and `special`.
+`spell`, `action-reference`, `parry`, `leap`, `teleport`, and `take-actions`.
+Which kinds a section accepts is `MONSTER_SECTION_KINDS`. Actions keep the
+attack, save, spell, special, and multiattack kinds. Bonus Actions keep
+`attack`, `save`, `spell`, `special`, `leap`, `teleport`, and `take-actions`.
 Reactions keep `parry`, `action-reference`, `spell`, and `special`. Legendary
 Actions keep `action-reference`, `spell`, and `special`. `multiattack` is valid
-only in `actions`. Breath Weapon and Constrict presets are Actions presets even
+only in `actions`. `leap`, `teleport`, and `take-actions` are valid only in
+Bonus Actions. Breath Weapon and Constrict presets are Actions presets even
 though they store `kind: 'save'`. Rows do not move into or out of Legendary
 Actions, and a row cannot move into a section that does not allow its kind.
 
@@ -38,7 +40,13 @@ save, or a special ability. Optional legendary `movement.allowance` is
 trigger, and optional additional rules. It has no movement. `parry` stores an
 AC bonus and an optional follow-up attack id. Its trigger and response are
 generated from the current creature name. An unresolved reference id is not
-printed. Legendary actions spend one use from `legendaryActionUses`. An
+printed. `leap` stores two positive whole-foot values and prints the jump
+sentence. `teleport` stores a distance and an optional other-creature phrase
+with a second distance. The destination is always an unoccupied space the
+creature can see. `take-actions` stores Dash, Disengage, and Hide. One action
+prints that action. Two or more also store whether the creature chooses one or
+uses each. A missing choice prints nothing. None of the three kinds is an
+encounter movement or action resolver. Legendary actions spend one use from `legendaryActionUses`. An
 optional `legendaryActionUsesInLair` is printed only when it is greater than
 that pool. There is no per-option cost.
 `onceUntilNextTurn` prints one restriction sentence and is not `limitedUse`.

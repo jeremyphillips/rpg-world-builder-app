@@ -12,6 +12,7 @@ import {
 import {
   MONSTER_ACTION_ACQUISITION_GROUPS,
   MONSTER_ACTION_ALREADY_ADDED_NOTE,
+  createBonusActionDraft,
   createReactionActionDraft,
   createSpellActionDraft,
   monsterActionAcquisitionItems,
@@ -71,6 +72,7 @@ describe('monster action acquisition presentation', () => {
       'Equipped weapons',
       'Natural attacks',
       'Special actions',
+      'Movement',
       'General',
     ])
     expect(MONSTER_ACTION_ACQUISITION_GROUPS.find((group) => group.label === 'General')?.id).toBe(
@@ -115,6 +117,32 @@ describe('monster action acquisition presentation', () => {
     expect(bonus.find((item) => item.id === 'weapon-entry:sword-1')).toBeUndefined()
     expect(bonus.find((item) => item.id === 'create:save')).toMatchObject({
       metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
+    })
+    expect(bonus.map((item) => item.id)).toEqual([
+      'bonus:leap',
+      'bonus:teleport',
+      'bonus:take-actions',
+      'create:attack',
+      'create:special',
+      'create:save',
+      'create:spell-standalone',
+    ])
+    expect(createBonusActionDraft('leap')).toMatchObject({
+      kind: 'leap',
+      name: 'Leap',
+      distanceFeet: 30,
+      movementFeet: 10,
+    })
+    expect(createBonusActionDraft('teleport')).toMatchObject({ kind: 'teleport', name: 'Teleport' })
+    expect(createBonusActionDraft('teleport')).not.toHaveProperty('distanceFeet')
+    expect(createBonusActionDraft('take-actions')).toMatchObject({
+      kind: 'take-actions',
+      standardActions: [],
+    })
+    expect(createBonusActionDraft('take-actions')).not.toHaveProperty('name')
+    expect(parseMonsterActionAcquisitionId('bonus:leap')).toEqual({
+      type: 'bonus',
+      category: 'leap',
     })
     const reactions = monsterActionAcquisitionItems({
       weapons,

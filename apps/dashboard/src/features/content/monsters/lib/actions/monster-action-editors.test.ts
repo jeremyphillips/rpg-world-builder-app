@@ -154,7 +154,10 @@ function collectFieldNames(items: readonly FormItem[]): string[] {
   return names
 }
 
-function detailFields(action: MonsterActionDraftRow, section: 'actions' | 'reactions' = 'actions') {
+function detailFields(
+  action: MonsterActionDraftRow,
+  section: 'actions' | 'bonusActions' | 'reactions' = 'actions',
+) {
   return collectFieldNames(
     monsterActionDetailFields({
       ctx: detailCtx,
@@ -542,6 +545,44 @@ describe('monster action section moves', () => {
     expect(monsterActionActiveKeys('weapon', 'actions')).not.toContain('trigger')
     expect(monsterActionActiveKeys('weapon', 'reactions')).toEqual([])
     expect(monsterActionActiveKeys('special', 'reactions')).toContain('trigger')
+    expect(monsterActionActiveKeys('leap', 'bonusActions')).toContain('distanceFeet')
+    expect(monsterActionActiveKeys('leap', 'actions')).toEqual([])
+    expect(monsterActionSectionMoveAllowed({ kind: 'leap' }, 'bonusActions', 'actions')).toBe(false)
+    expect(monsterActionSectionMoveAllowed({ kind: 'teleport' }, 'bonusActions', 'reactions')).toBe(
+      false,
+    )
+    const leap = detailFields(
+      { id: 'leap', kind: 'leap', name: 'Leap', distanceFeet: 30, movementFeet: 10 },
+      'bonusActions',
+    )
+    expect(leap).toContain('bonusPreview')
+    expect(leap).toContain('distanceFeet')
+    expect(leap).toContain('movementFeet')
+    expect(leap).toContain('limitedUse.kind')
+    expect(leap).not.toContain('description')
+    const leapFields = monsterActionDetailFields({
+      ctx: detailCtx,
+      action: { id: 'leap', kind: 'leap', name: 'Leap', distanceFeet: 30, movementFeet: 10 },
+      section: 'bonusActions',
+      namePrefix: 'bonusActions.0',
+      equipmentOptions: [],
+      sharedCastingOptions: [],
+    })
+    const leapRow = leapFields.find((field) => 'kind' in field && field.kind === 'row')
+    expect(
+      leapRow && 'fields' in leapRow
+        ? leapRow.fields.map((field) =>
+            'start' in field && field.start && 'name' in field.start ? field.start.name : undefined,
+          )
+        : [],
+    ).toEqual(['distanceFeet', 'movementFeet'])
+    const take = detailFields(
+      { id: 'nimble', kind: 'take-actions', standardActions: ['disengage', 'hide'] },
+      'bonusActions',
+    )
+    expect(take).toContain('standardActions')
+    expect(take).toContain('combination')
+    expect(take).toContain('restriction')
     expect(monsterActionActiveKeys('parry', 'reactions')).toContain('acBonus')
     expect(monsterActionActiveKeys('parry', 'reactions')).not.toContain('trigger')
   })

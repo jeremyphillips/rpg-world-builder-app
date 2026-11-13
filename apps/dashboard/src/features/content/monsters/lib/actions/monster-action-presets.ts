@@ -1,5 +1,6 @@
 import type {
   MonsterActionDraft,
+  MonsterBonusActionDraft,
   MonsterLegendaryActionDraft,
   MonsterReactionDraft,
 } from '@rpg/contracts'
@@ -7,6 +8,7 @@ import type {
 /** Editor row for an action section before normalization. */
 export type MonsterActionDraftRow =
   | MonsterActionDraft
+  | MonsterBonusActionDraft
   | MonsterReactionDraft
   | MonsterLegendaryActionDraft
 

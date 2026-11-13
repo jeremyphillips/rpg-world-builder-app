@@ -4,6 +4,8 @@ import {
   createMonsterInputSchema,
   monsterActionDraftSchema,
   monsterActionSchema,
+  monsterBonusActionDraftSchema,
+  monsterBonusActionSchema,
   monsterReactionDraftSchema,
   monsterReactionSchema,
   type MonsterReaction,
@@ -155,6 +157,112 @@ describe('monsterActionSchema', () => {
     expect(reactionOptions(monsterReactionDraftSchema)).toEqual(
       reactionOptions(monsterReactionSchema),
     )
+  })
+})
+
+describe('monsterBonusActionSchema', () => {
+  it('publishes a leap and a self teleport and rejects them on other sections', () => {
+    expect(
+      monsterBonusActionSchema.parse({
+        id: 'leap',
+        kind: 'leap',
+        name: 'Leap',
+        distanceFeet: 30,
+        movementFeet: 10,
+      }),
+    ).toMatchObject({ distanceFeet: 30, movementFeet: 10 })
+    expect(
+      monsterBonusActionSchema.parse({
+        id: 'teleport',
+        kind: 'teleport',
+        name: 'Teleport',
+        distanceFeet: 120,
+        limitedUse: { kind: 'recharge', minRoll: 5 },
+      }),
+    ).toMatchObject({ distanceFeet: 120 })
+    expect(monsterActionSchema.safeParse({ id: 'leap', kind: 'leap', name: 'Leap' }).success).toBe(
+      false,
+    )
+    expect(
+      monsterBonusActionDraftSchema.parse({ id: 'leap', kind: 'leap', name: 'Leap' }),
+    ).toMatchObject({ kind: 'leap' })
+    expect(
+      monsterBonusActionSchema.safeParse({
+        id: 'leap',
+        kind: 'leap',
+        name: 'Leap',
+        distanceFeet: 7,
+        movementFeet: 200,
+      }).success,
+    ).toBe(true)
+    expect(
+      monsterBonusActionSchema.safeParse({
+        id: 'leap',
+        kind: 'leap',
+        name: 'Leap',
+        distanceFeet: 0,
+        movementFeet: 10,
+      }).success,
+    ).toBe(false)
+  })
+
+  it('requires the other creature when that disclosure is open', () => {
+    expect(
+      monsterBonusActionSchema.safeParse({
+        id: 'teleport',
+        kind: 'teleport',
+        name: 'Teleport',
+        distanceFeet: 60,
+        passenger: { withinFeet: 10 },
+      }).success,
+    ).toBe(false)
+    const balor = monsterBonusActionSchema.parse({
+      id: 'teleport',
+      kind: 'teleport',
+      name: 'Teleport',
+      distanceFeet: 60,
+      passenger: { phrase: 'a willing demon', withinFeet: 10 },
+    })
+    expect(balor.kind === 'teleport' && balor.passenger).toEqual({
+      phrase: 'a willing demon',
+      withinFeet: 10,
+    })
+  })
+
+  it('requires a combination only when two standard actions are selected', () => {
+    expect(
+      monsterBonusActionSchema.parse({
+        id: 'hide',
+        kind: 'take-actions',
+        name: 'Shadow Stealth',
+        standardActions: ['hide'],
+        restriction: 'While in Dim Light or darkness',
+      }),
+    ).not.toHaveProperty('combination')
+    expect(
+      monsterBonusActionSchema.safeParse({
+        id: 'cunning',
+        kind: 'take-actions',
+        name: 'Cunning Action',
+        standardActions: ['dash', 'disengage', 'hide'],
+      }).success,
+    ).toBe(false)
+    const cunning = monsterBonusActionSchema.parse({
+      id: 'cunning',
+      kind: 'take-actions',
+      name: 'Cunning Action',
+      standardActions: ['dash', 'disengage', 'hide'],
+      combination: 'one',
+    })
+    expect(cunning.kind === 'take-actions' && cunning.combination).toBe('one')
+    expect(
+      monsterBonusActionSchema.safeParse({
+        id: 'empty',
+        kind: 'take-actions',
+        name: 'Nimble Escape',
+        standardActions: [],
+      }).success,
+    ).toBe(false)
   })
 })
 

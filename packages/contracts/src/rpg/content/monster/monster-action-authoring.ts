@@ -38,7 +38,12 @@ export function monsterActionAuthoring(action: AuthoringSubject): MonsterActionA
   if (action.kind === 'special') {
     return { name: 'authored', description: 'authored', source: 'none' }
   }
-  if (action.kind === 'parry') {
+  if (
+    action.kind === 'parry' ||
+    action.kind === 'leap' ||
+    action.kind === 'teleport' ||
+    action.kind === 'take-actions'
+  ) {
     return { name: 'authored', description: 'generated', source: 'none' }
   }
   if (action.kind === 'spell' && action.profile === 'primary') {
@@ -86,7 +91,15 @@ export function monsterActionUsageCapability(
   action: AuthoringSubject,
 ): MonsterActionUsageCapability {
   if (action.kind === 'natural-weapon' || action.kind === 'attack') return OPTIONAL_RECHARGE
-  if (action.kind === 'special' || action.kind === 'spell') return OPTIONAL_FULL_LIMIT
+  if (
+    action.kind === 'special' ||
+    action.kind === 'spell' ||
+    action.kind === 'leap' ||
+    action.kind === 'teleport' ||
+    action.kind === 'take-actions'
+  ) {
+    return OPTIONAL_FULL_LIMIT
+  }
   if (action.kind !== 'save') return NO_USAGE
   if (action.preset === 'breath-weapon') return INCLUDED_RECHARGE
   if (action.preset === 'constrict') return NO_USAGE

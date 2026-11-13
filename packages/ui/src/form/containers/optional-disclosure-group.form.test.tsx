@@ -75,4 +75,26 @@ describe('group optionalDisclosure', () => {
       expect(state()).toEqual({ dirty: true, savingThrow: null })
     })
   })
+
+  it('writes seedWhen when the group opens', async () => {
+    const user = userEvent.setup()
+    const seeded = {
+      ...field,
+      optionalDisclosure: { addLabel: 'Add saving throw', seedWhen: () => ({ withinFeet: 10 }) },
+    } as const satisfies FormItem
+    function SeedHarness() {
+      const form = useForm({ defaultValues: {}, shouldUnregister: true })
+      return (
+        <FormProvider {...form}>
+          <StateProbe />
+          <FormItems items={[seeded]} idPrefix="seed" />
+        </FormProvider>
+      )
+    }
+    render(<SeedHarness />)
+    await user.click(screen.getByRole('button', { name: 'Add saving throw' }))
+    await waitFor(() => {
+      expect(state().savingThrow).toEqual({ withinFeet: 10 })
+    })
+  })
 })

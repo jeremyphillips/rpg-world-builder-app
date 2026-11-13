@@ -20,6 +20,7 @@ import {
 import { RESOLUTION_SELECTION_MODES } from '../../vocab/resolution'
 import { getActionPreset } from '../action/action-presets'
 import { MONSTER_SECTION_KINDS } from './action-section-eligibility'
+import { BONUS_ACTION_COMBINATIONS, BONUS_STANDARD_ACTION_IDS } from './bonus-standard-actions'
 import {
   castingAbilitySchema,
   savingThrowEffectDraftSchema,
@@ -320,10 +321,89 @@ export const monsterActionSchema = z.discriminatedUnion(
   omitActionKinds(publishedActionFields, omittedSectionKinds('actions')),
 )
 
-export const monsterBonusActionSchema = z.discriminatedUnion(
-  'kind',
-  omitActionKinds(publishedActionFields, omittedSectionKinds('bonusActions')),
-)
+const positiveWholeFeetSchema = z.number().int().min(1)
+
+const bonusPassengerSchema = z.object({
+  phrase: z.string().optional(),
+  withinFeet: positiveWholeFeetSchema.optional(),
+})
+
+function bonusLimitedUse<M extends MonsterActionMode>(mode: M) {
+  return (mode === 'draft' ? limitedUseDraftSchema : limitedUseSchema) as M extends 'draft'
+    ? typeof limitedUseDraftSchema
+    : typeof limitedUseSchema
+}
+
+function leapSchema<M extends MonsterActionMode>(mode: M) {
+  return z.object({
+    id: z.string().min(1),
+    kind: z.literal('leap'),
+    name: strict(z.string().min(1), mode),
+    distanceFeet: strict(positiveWholeFeetSchema, mode),
+    movementFeet: strict(positiveWholeFeetSchema, mode),
+    limitedUse: bonusLimitedUse(mode).optional(),
+    available: z.boolean().optional(),
+    ...entryProvenanceField,
+  })
+}
+
+function teleportSchema<M extends MonsterActionMode>(mode: M) {
+  return z
+    .object({
+      id: z.string().min(1),
+      kind: z.literal('teleport'),
+      name: strict(z.string().min(1), mode),
+      distanceFeet: strict(positiveWholeFeetSchema, mode),
+      /** Absent when Include another creature is closed. */
+      passenger: bonusPassengerSchema.optional(),
+      limitedUse: bonusLimitedUse(mode).optional(),
+      available: z.boolean().optional(),
+      ...entryProvenanceField,
+    })
+    .superRefine((action, ctx) => {
+      if (mode === 'draft' || !action.passenger) return
+      const phrase = action.passenger.phrase?.trim()
+      if (!phrase) {
+        addCustomRefinementIssue(ctx, 'Creature is required.', ['passenger', 'phrase'])
+      }
+      if (!action.passenger.withinFeet) {
+        addCustomRefinementIssue(ctx, 'Within is required.', ['passenger', 'withinFeet'])
+      }
+    })
+}
+
+function takeActionsSchema<M extends MonsterActionMode>(mode: M) {
+  const standardActions =
+    mode === 'draft'
+      ? z.array(z.enum(BONUS_STANDARD_ACTION_IDS)).default([])
+      : z.array(z.enum(BONUS_STANDARD_ACTION_IDS)).min(1)
+  return z
+    .object({
+      id: z.string().min(1),
+      kind: z.literal('take-actions'),
+      name: strict(z.string().min(1), mode),
+      standardActions,
+      /** Absent when fewer than two actions are selected. */
+      combination: z.enum(BONUS_ACTION_COMBINATIONS).optional(),
+      restriction: z.string().optional(),
+      limitedUse: bonusLimitedUse(mode).optional(),
+      available: z.boolean().optional(),
+      ...entryProvenanceField,
+    })
+    .superRefine((action, ctx) => {
+      if (mode === 'draft') return
+      if (action.standardActions.length >= 2 && !action.combination) {
+        addCustomRefinementIssue(ctx, 'Choose how these actions combine.', ['combination'])
+      }
+    })
+}
+
+export const monsterBonusActionSchema = z.discriminatedUnion('kind', [
+  ...omitActionKinds(publishedActionFields, omittedSectionKinds('bonusActions')),
+  leapSchema('published'),
+  teleportSchema('published'),
+  takeActionsSchema('published'),
+])
 
 export const monsterLegendaryActionSchema = z.discriminatedUnion(
   'kind',
@@ -419,10 +499,12 @@ export const monsterActionDraftSchema = z.discriminatedUnion(
   omitActionKinds(draftActionFields, omittedSectionKinds('actions')),
 )
 
-export const monsterBonusActionDraftSchema = z.discriminatedUnion(
-  'kind',
-  omitActionKinds(draftActionFields, omittedSectionKinds('bonusActions')),
-)
+export const monsterBonusActionDraftSchema = z.discriminatedUnion('kind', [
+  ...omitActionKinds(draftActionFields, omittedSectionKinds('bonusActions')),
+  leapSchema('draft'),
+  teleportSchema('draft'),
+  takeActionsSchema('draft'),
+])
 
 export const monsterLegendaryActionDraftSchema = z.discriminatedUnion(
   'kind',
@@ -857,7 +939,7 @@ function refineUnknownPreset(
 }
 
 function refineAuthoredActionName(
-  action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
+  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
@@ -868,7 +950,7 @@ function refineAuthoredActionName(
 }
 
 function refineSpecialRulesText(
-  action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
+  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
@@ -881,7 +963,7 @@ function refineSpecialRulesText(
 }
 
 export function refineMonsterActionShape(
-  action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
+  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {

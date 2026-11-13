@@ -21,6 +21,7 @@ import {
   type Monster,
   type SavingThrowEffect,
   type MonsterAction,
+  type MonsterBonusAction,
   type MonsterLegendaryAction,
   type MonsterReaction,
   type SkillProficiency,
@@ -30,8 +31,11 @@ import {
   formatCreatureTrait,
   formatMonsterAttackAction,
   formatMonsterActionReference,
+  formatMonsterLeap,
   formatMonsterParryResponse,
   formatMonsterParryTrigger,
+  formatMonsterTakeActions,
+  formatMonsterTeleport,
   formatLegendaryActionUsesIntro,
   formatOnceUntilNextTurnSentence,
   resolveCreatureSenses,
@@ -41,6 +45,7 @@ import {
   formatMonsterSaveAction,
   formatMonsterSpellEntry,
   formatMonsterStatBlockSubject,
+  type MonsterActionIdentitySubject,
   formatSavingThrowClauses,
   getAbilityLabel,
   monsterRichTextIsEmpty,
@@ -240,7 +245,7 @@ function withLimitedUseHeading(name: string, limitedUse: unknown): string {
 }
 
 function actionDisplayIdentity(
-  action: MonsterAction | MonsterReaction,
+  action: MonsterActionIdentitySubject,
   monster: Monster,
   equipmentById: Map<string, Equipment>,
   catalogState: MonsterCatalogLoadState,
@@ -542,7 +547,12 @@ function referenceSourceTitles(spells: SpellDisplayContext): Map<string, string>
 }
 
 function assignReferenceHeadings(
-  actions: readonly (MonsterAction | MonsterReaction | MonsterLegendaryAction)[],
+  actions: readonly (
+    | MonsterAction
+    | MonsterBonusAction
+    | MonsterReaction
+    | MonsterLegendaryAction
+  )[],
   sourceTitles: ReadonlyMap<string, string>,
   headings: Map<string, string>,
   taken: Set<string>,
@@ -568,7 +578,12 @@ function assignReferenceHeadings(
 }
 
 function actionReferenceHeadings(
-  actions: readonly (MonsterAction | MonsterReaction | MonsterLegendaryAction)[],
+  actions: readonly (
+    | MonsterAction
+    | MonsterBonusAction
+    | MonsterReaction
+    | MonsterLegendaryAction
+  )[],
   spells: SpellDisplayContext,
 ): Map<string, string> {
   if (!actions.some((action) => action.kind === 'action-reference')) return new Map()
@@ -580,8 +595,128 @@ function actionReferenceHeadings(
   return headings
 }
 
+function mapGeneratedBonusAction(
+  action: Extract<MonsterBonusAction, { kind: 'leap' | 'teleport' | 'take-actions' }>,
+  name: string,
+  monsterName: string,
+): MonsterActionItemViewModel {
+  const body =
+    action.kind === 'leap'
+      ? formatMonsterLeap({
+          monsterName,
+          distanceFeet: action.distanceFeet,
+          movementFeet: action.movementFeet,
+        })
+      : action.kind === 'teleport'
+        ? formatMonsterTeleport({
+            monsterName,
+            distanceFeet: action.distanceFeet,
+            passenger: action.passenger,
+          })
+        : formatMonsterTakeActions({
+            monsterName,
+            standardActions: action.standardActions,
+            combination: action.combination,
+            restriction: action.restriction,
+          })
+  return {
+    id: action.id,
+    name,
+    descriptionHtml: body ? `<p>${escapeStatBlockText(body)}</p>` : undefined,
+  }
+}
+
+function isGeneratedBonusAction(
+  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
+): action is Extract<MonsterBonusAction, { kind: 'leap' | 'teleport' | 'take-actions' }> {
+  return action.kind === 'leap' || action.kind === 'teleport' || action.kind === 'take-actions'
+}
+
+function mapSpecialActionItem(
+  action: Extract<MonsterAction | MonsterReaction, { kind: 'special' }>,
+  name: string,
+  derived: DerivedMonsterStatBlock | null | undefined,
+  spells: SpellDisplayContext,
+): MonsterActionItemViewModel {
+  const paragraph = proseSavingThrowParagraph(spells.monster, action.savingThrow, derived)
+  return {
+    id: action.id,
+    name,
+    descriptionHtml: withTurnLimit(
+      joinRulesAndSavingThrow(action.description, paragraph),
+      action,
+      spells.monsterName,
+      true,
+      Boolean(paragraph),
+    ),
+  }
+}
+
+function mapParryActionItem(
+  action: Extract<MonsterReaction, { kind: 'parry' }>,
+  name: string,
+  spells: SpellDisplayContext,
+): MonsterActionItemViewModel {
+  const response = formatMonsterParryResponse({
+    monsterName: spells.monsterName,
+    acBonus: action.acBonus,
+    followUpAttackName: parryFollowUpName(action, spells),
+  })
+  return {
+    id: action.id,
+    name,
+    descriptionHtml: response ? `<p>${escapeStatBlockText(response)}</p>` : undefined,
+  }
+}
+
+function mapAttackActionItem(
+  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
+  section: DerivedMonsterAttackLine['section'],
+  name: string,
+  derived: DerivedMonsterStatBlock | null | undefined,
+  catalogState: MonsterCatalogLoadState,
+  spells: SpellDisplayContext,
+): MonsterActionItemViewModel {
+  const attack = findAttackLine(derived, section, action.id)
+  return {
+    id: action.id,
+    name,
+    attackLine: resolveActionAttackLine(catalogState, attack),
+    descriptionHtml:
+      'description' in action
+        ? withTurnLimit(action.description, action, spells.monsterName, true)
+        : undefined,
+  }
+}
+
+function mapActionItemBody(
+  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
+  section: DerivedMonsterAttackLine['section'],
+  name: string,
+  identityName: string,
+  derived: DerivedMonsterStatBlock | null | undefined,
+  catalogState: MonsterCatalogLoadState,
+  spells: SpellDisplayContext,
+): MonsterActionItemViewModel {
+  if (action.kind === 'spell') {
+    return mapSpellActionItem(action, section, derived, spells, identityName)
+  }
+  if (action.kind === 'special') return mapSpecialActionItem(action, name, derived, spells)
+  if (action.kind === 'save') {
+    return mapSaveActionItem(action, name, derived, catalogState, spells, identityName)
+  }
+  if (action.kind === 'action-reference') return mapActionReferenceItem(action, name, spells)
+  if (isGeneratedBonusAction(action))
+    return mapGeneratedBonusAction(action, name, spells.monsterName)
+  if (action.kind === 'parry') return mapParryActionItem(action, name, spells)
+  if (action.kind === 'multiattack') {
+    return mapMultiattackActionItem(action, name, derived, catalogState, spells)
+  }
+  return mapAttackActionItem(action, section, name, derived, catalogState, spells)
+}
+
 function mapActionItem(
-  action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
+  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
   derived: DerivedMonsterStatBlock | null | undefined,
   catalogState: MonsterCatalogLoadState,
@@ -603,55 +738,24 @@ function mapActionItem(
     heading,
     'limitedUse' in action ? action.limitedUse : undefined,
   )
-
-  if (action.kind === 'spell') {
-    return mapSpellActionItem(action, section, derived, spells, identity.displayName)
-  }
-  if (action.kind === 'special') {
-    const paragraph = proseSavingThrowParagraph(spells.monster, action.savingThrow, derived)
-    return {
-      id: action.id,
-      name,
-      descriptionHtml: withTurnLimit(
-        joinRulesAndSavingThrow(action.description, paragraph),
-        action,
-        spells.monsterName,
-        true,
-        Boolean(paragraph),
-      ),
-    }
-  }
-  if (action.kind === 'save') {
-    return mapSaveActionItem(action, name, derived, catalogState, spells, identity.displayName)
-  }
-  if (action.kind === 'action-reference') return mapActionReferenceItem(action, name, spells)
-  if (action.kind === 'parry') {
-    const response = formatMonsterParryResponse({
-      monsterName: spells.monsterName,
-      acBonus: action.acBonus,
-      followUpAttackName: parryFollowUpName(action, spells),
-    })
-    return {
-      id: action.id,
-      name,
-      descriptionHtml: response ? `<p>${escapeStatBlockText(response)}</p>` : undefined,
-    }
-  }
-  if (action.kind === 'multiattack') {
-    return mapMultiattackActionItem(action, name, derived, catalogState, spells)
-  }
-
-  const attack = findAttackLine(derived, section, action.id)
-  return {
-    id: action.id,
+  return mapActionItemBody(
+    action,
+    section,
     name,
-    attackLine: resolveActionAttackLine(catalogState, attack),
-    descriptionHtml: withTurnLimit(action.description, action, spells.monsterName, true),
-  }
+    identity.displayName,
+    derived,
+    catalogState,
+    spells,
+  )
 }
 
 function mapActionItems(
-  actions: readonly (MonsterAction | MonsterReaction | MonsterLegendaryAction)[],
+  actions: readonly (
+    | MonsterAction
+    | MonsterBonusAction
+    | MonsterReaction
+    | MonsterLegendaryAction
+  )[],
   section: DerivedMonsterAttackLine['section'],
   derived: DerivedMonsterStatBlock | null | undefined,
   catalogState: MonsterCatalogLoadState,

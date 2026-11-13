@@ -5,6 +5,8 @@ import {
   getActionVocabularySearchTerms,
   getDamageTypeLabel,
   getMonsterActionKindLabel,
+  LEAP_DISTANCE_DEFAULT,
+  LEAP_MOVEMENT_DEFAULT,
   listSpecialMenuActionPresetIds,
   MONSTER_SPELLCASTING_ACTION_NAME,
   PARRY_AC_BONUS_DEFAULT,
@@ -24,7 +26,10 @@ import {
   MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION,
   MONSTER_CAST_SPELL_LABEL,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
+  MONSTER_LEAP_DESCRIPTION,
   MONSTER_PARRY_DESCRIPTION,
+  MONSTER_TAKE_ACTIONS_DESCRIPTION,
+  MONSTER_TELEPORT_DESCRIPTION,
   MONSTER_REACTION_CAST_SPELL_DESCRIPTION,
   MONSTER_REACTION_CUSTOM_DESCRIPTION,
   MONSTER_REACTION_CUSTOM_LABEL,
@@ -41,6 +46,7 @@ export const MONSTER_ACTION_ACQUISITION_GROUPS = [
   { id: 'equipped', label: 'Equipped weapons' },
   { id: 'natural', label: 'Natural attacks' },
   { id: 'special', label: 'Special actions' },
+  { id: 'movement', label: 'Movement' },
   { id: 'other', label: 'General' },
 ] as const
 
@@ -71,6 +77,7 @@ export type MonsterActionAcquisitionChoice =
   | { type: 'create'; kind: 'spell'; spellAcquisition: 'primary' | 'standalone' }
   | { type: 'legendary'; category: 'reference' | 'spellcasting' | 'cast-spell' }
   | { type: 'reaction'; category: 'reference' | 'parry' | 'cast-spell' | 'custom' }
+  | { type: 'bonus'; category: 'leap' | 'teleport' | 'take-actions' }
 
 const SPECIAL_MENU_ORDER = ['multiattack', 'constrict', 'breath-weapon'] as const
 
@@ -122,6 +129,9 @@ const EXACT_ACQUISITION_CHOICES: Record<string, MonsterActionAcquisitionChoice> 
   'reaction:parry': { type: 'reaction', category: 'parry' },
   'reaction:cast-spell': { type: 'reaction', category: 'cast-spell' },
   'reaction:custom': { type: 'reaction', category: 'custom' },
+  'bonus:leap': { type: 'bonus', category: 'leap' },
+  'bonus:teleport': { type: 'bonus', category: 'teleport' },
+  'bonus:take-actions': { type: 'bonus', category: 'take-actions' },
 }
 
 function legendaryAcquisitionChoice(value: string): MonsterActionAcquisitionChoice | undefined {
@@ -179,6 +189,23 @@ export function monsterActionAcquisitionItems(input: {
       input.spellCatalogReady !== false,
     )
   }
+  const bonusMovement =
+    input.section === 'bonusActions'
+      ? [
+          {
+            id: 'bonus:leap',
+            label: getMonsterActionKindLabel('leap'),
+            groupId: 'movement' as const,
+            metadata: MONSTER_LEAP_DESCRIPTION,
+          },
+          {
+            id: 'bonus:teleport',
+            label: getMonsterActionKindLabel('teleport'),
+            groupId: 'movement' as const,
+            metadata: MONSTER_TELEPORT_DESCRIPTION,
+          },
+        ]
+      : []
   const equipped = input.weapons.map((weapon) => {
     const existing = input.weaponActions?.find(
       (action) => action.equipmentEntryId === weapon.entryId,
@@ -255,6 +282,7 @@ export function monsterActionAcquisitionItems(input: {
         ]
       : []),
     ...special,
+    ...bonusMovement,
     ...generalAcquisitionItems(input.section, input.primarySpellcasting === true),
   ]
 }
@@ -310,7 +338,19 @@ function generalAcquisitionItems(
     groupId: 'other',
     metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
   }
-  if (section === 'bonusActions') return [...rest, saveItem, ...standalone]
+  if (section === 'bonusActions') {
+    return [
+      {
+        id: 'bonus:take-actions',
+        label: getMonsterActionKindLabel('take-actions'),
+        groupId: 'other' as const,
+        metadata: MONSTER_TAKE_ACTIONS_DESCRIPTION,
+      },
+      ...rest,
+      saveItem,
+      ...standalone,
+    ]
+  }
   if (section === 'reactions') return []
   return [
     ...rest,
@@ -367,6 +407,29 @@ function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
   }
 }
 
+export function createBonusActionDraft(
+  category: 'leap' | 'teleport' | 'take-actions',
+): MonsterActionDraftRow {
+  const id = createMonsterRowId()
+  if (category === 'leap') {
+    return {
+      id,
+      kind: 'leap',
+      name: getMonsterActionKindLabel('leap'),
+      distanceFeet: LEAP_DISTANCE_DEFAULT,
+      movementFeet: LEAP_MOVEMENT_DEFAULT,
+    }
+  }
+  if (category === 'teleport') {
+    return {
+      id,
+      kind: 'teleport',
+      name: getMonsterActionKindLabel('teleport'),
+    } as MonsterActionDraftRow
+  }
+  return { id, kind: 'take-actions', standardActions: [] } as MonsterActionDraftRow
+}
+
 export function createReactionActionDraft(
   category: 'reference' | 'parry' | 'cast-spell' | 'custom',
   sections: {
@@ -402,7 +465,7 @@ export function createReactionActionDraft(
 export function createMonsterActionFromAcquisition(
   choice: Exclude<
     MonsterActionAcquisitionChoice,
-    { type: 'add-weapon' } | { type: 'legendary' } | { type: 'reaction' }
+    { type: 'add-weapon' } | { type: 'legendary' } | { type: 'reaction' } | { type: 'bonus' }
   >,
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()
@@ -445,6 +508,7 @@ export function createSpellActionDraft(
   spellAcquisition: 'primary' | 'standalone' = 'standalone',
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()
+  void section
   if (spellAcquisition === 'primary') {
     return {
       id,

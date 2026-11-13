@@ -4,6 +4,8 @@ import type {
   MonsterAction,
   MonsterActionDraft,
   MonsterBody,
+  MonsterBonusAction,
+  MonsterBonusActionDraft,
   MonsterLegendaryAction,
   MonsterLegendaryActionDraft,
   MonsterReaction,
@@ -109,10 +111,12 @@ export type MonsterActionAttackProfile = {
 
 type ProfileAction =
   | MonsterAction
+  | MonsterBonusAction
   | MonsterReaction
   | MonsterLegendaryAction
   | MonsterLegendaryActionDraft
   | MonsterActionDraft
+  | MonsterBonusActionDraft
   | MonsterReactionDraft
 
 type ProfileMonster = {

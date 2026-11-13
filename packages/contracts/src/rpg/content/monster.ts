@@ -81,6 +81,16 @@ export {
   PARRY_AC_BONUS_MAX,
   PARRY_AC_BONUS_MIN,
 } from './monster/action'
+export {
+  BONUS_STANDARD_ACTION_IDS,
+  LEAP_DISTANCE_DEFAULT,
+  LEAP_MOVEMENT_DEFAULT,
+  TELEPORT_WITHIN_DEFAULT,
+} from './monster/bonus-standard-actions'
+export type {
+  BonusActionCombination,
+  BonusStandardActionId,
+} from './monster/bonus-standard-actions'
 export type {
   MonsterAction,
   MonsterActionDraft,

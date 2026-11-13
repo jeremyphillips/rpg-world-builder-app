@@ -4,6 +4,7 @@ import {
   creatureWeaponProficienciesSchema,
   creatureWeaponProficiencyTargetsFromGrantSet,
   monsterActionDraftSchema,
+  monsterBonusActionDraftSchema,
   omitEmptySavingThrow,
   monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
@@ -231,6 +232,7 @@ function stabilizeDraftActionKeys(
   active: Record<string, unknown>,
   schema:
     | typeof monsterActionDraftSchema
+    | typeof monsterBonusActionDraftSchema
     | typeof monsterReactionDraftSchema
     | typeof monsterLegendaryActionDraftSchema,
 ): unknown {
@@ -242,6 +244,34 @@ function stabilizeDraftActionKeys(
     if (parsedRecord[key] !== undefined) stable[key] = parsedRecord[key]
   }
   return stable
+}
+
+function omitTakeActionsCombination(cleaned: Record<string, unknown>): void {
+  if (cleaned.kind !== 'take-actions') return
+  const selected = Array.isArray(cleaned.standardActions) ? cleaned.standardActions : []
+  if (selected.length < 2) delete cleaned.combination
+}
+
+function normalizeWeaponActionDamage(cleaned: Record<string, unknown>): void {
+  if (cleaned.kind === 'weapon' && isRecord(cleaned.damage)) {
+    cleaned.damage = weaponActionDamageToDraft(cleaned.damage)
+  }
+}
+
+function omitEmptySavingThrowField(cleaned: Record<string, unknown>): void {
+  if (!('savingThrow' in cleaned)) return
+  const savingThrow = omitEmptySavingThrow(cleaned.savingThrow)
+  if (savingThrow === undefined) delete cleaned.savingThrow
+  else cleaned.savingThrow = savingThrow
+}
+
+function draftSchemaForSection(
+  section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
+) {
+  if (section === 'reactions') return monsterReactionDraftSchema
+  if (section === 'legendaryActions') return monsterLegendaryActionDraftSchema
+  if (section === 'bonusActions') return monsterBonusActionDraftSchema
+  return monsterActionDraftSchema
 }
 
 function normalizeAction(
@@ -257,25 +287,14 @@ function normalizeAction(
   applyTurnAndInvocationDraft(cleaned, section)
   applyLimitedUseDraft(cleaned)
   applySpellEntryDraft(cleaned)
-  if (cleaned.kind === 'weapon' && isRecord(cleaned.damage)) {
-    cleaned.damage = weaponActionDamageToDraft(cleaned.damage)
-  }
+  omitTakeActionsCombination(cleaned)
+  normalizeWeaponActionDamage(cleaned)
   applySaveOutcomeDraft(cleaned)
-  if ('savingThrow' in cleaned) {
-    const savingThrow = omitEmptySavingThrow(cleaned.savingThrow)
-    if (savingThrow === undefined) delete cleaned.savingThrow
-    else cleaned.savingThrow = savingThrow
-  }
+  omitEmptySavingThrowField(cleaned)
   const keys =
     typeof cleaned.kind === 'string' ? monsterActionActiveKeys(cleaned.kind, section) : []
   const active = keys.length > 0 ? pickKeys(cleaned, keys) : cleaned
-  const schema =
-    section === 'reactions'
-      ? monsterReactionDraftSchema
-      : section === 'legendaryActions'
-        ? monsterLegendaryActionDraftSchema
-        : monsterActionDraftSchema
-  return stabilizeDraftActionKeys(active, schema)
+  return stabilizeDraftActionKeys(active, draftSchemaForSection(section))
 }
 
 function normalizeArmorClass(

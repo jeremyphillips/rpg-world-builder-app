@@ -8,8 +8,11 @@ import {
   getContentTypeTerm,
   getWeaponModeLabel,
   isPrimarySpellcastingAction,
+  BONUS_STANDARD_ACTION_IDS,
+  getActionVocabularyEntry,
   MEASURED_RANGE_FEET,
   REACH_FEET,
+  TELEPORT_WITHIN_DEFAULT,
   WEAPON_MODES,
 } from '@rpg/contracts'
 import {
@@ -39,6 +42,7 @@ import {
 } from '../../../lib/forms/mechanics/saving-throw-field-copy'
 import { savingThrowFieldGroup } from '../../../lib/forms/mechanics/saving-throw-field-group'
 import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
+import { MonsterActionBonusSummary } from '../../components/form/monster-action-bonus-summary'
 import { MonsterActionParrySummary } from '../../components/form/monster-action-parry-summary'
 import { MonsterActionMultiattackSummary } from '../../components/form/monster-action-multiattack-summary'
 import { MonsterActionSpellSummary } from '../../components/form/monster-action-spell-summary'
@@ -72,6 +76,27 @@ import {
   MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
   MONSTER_PARRY_FOLLOW_UP_HINT,
   MONSTER_PARRY_FOLLOW_UP_LABEL,
+  MONSTER_LEAP_DISTANCE_HINT,
+  MONSTER_LEAP_DISTANCE_LABEL,
+  MONSTER_LEAP_MOVEMENT_HINT,
+  MONSTER_LEAP_MOVEMENT_LABEL,
+  MONSTER_TAKE_ACTIONS_ACTIONS_LABEL,
+  MONSTER_TAKE_ACTIONS_CHOICE_EACH,
+  MONSTER_TAKE_ACTIONS_CHOICE_LABEL,
+  MONSTER_TAKE_ACTIONS_CHOICE_ONE,
+  MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL,
+  MONSTER_TAKE_ACTIONS_RESTRICTION_HINT,
+  MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL,
+  MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER,
+  MONSTER_TELEPORT_CREATURE_HINT,
+  MONSTER_TELEPORT_CREATURE_LABEL,
+  MONSTER_TELEPORT_CREATURE_PLACEHOLDER,
+  MONSTER_TELEPORT_DISTANCE_HINT,
+  MONSTER_TELEPORT_DISTANCE_LABEL,
+  MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
+  MONSTER_TELEPORT_PASSENGER_LEGEND,
+  MONSTER_TELEPORT_WITHIN_HINT,
+  MONSTER_TELEPORT_WITHIN_LABEL,
   MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL,
   MONSTER_REACTION_ADDITIONAL_RULES_HINT,
   MONSTER_REACTION_ADDITIONAL_RULES_LABEL,
@@ -891,6 +916,131 @@ function monsterActionParryPreviewSlot(
   }
 }
 
+function bonusAuthoringFields(input: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  namePrefix: string
+}): FormItem[] | undefined {
+  if (input.section !== 'bonusActions') return undefined
+  const preview: FormItem = {
+    kind: 'slot',
+    name: 'bonusPreview',
+    render: () => <MonsterActionBonusSummary ctx={input.ctx} action={input.action} />,
+  }
+  const usage = monsterActionUsageEditor(input.action, input.namePrefix)
+  if (input.action.kind === 'leap') {
+    return [
+      preview,
+      {
+        kind: 'row',
+        fields: [
+          distanceJoinedPairField({
+            amountName: 'distanceFeet',
+            label: MONSTER_LEAP_DISTANCE_LABEL,
+            presets: MEASURED_RANGE_FEET,
+            allowCustom: true,
+            required: true,
+            hint: { text: MONSTER_LEAP_DISTANCE_HINT },
+          }),
+          distanceJoinedPairField({
+            amountName: 'movementFeet',
+            label: MONSTER_LEAP_MOVEMENT_LABEL,
+            presets: MEASURED_RANGE_FEET,
+            allowCustom: true,
+            required: true,
+            hint: { text: MONSTER_LEAP_MOVEMENT_HINT },
+          }),
+        ],
+      },
+      ...usage,
+    ]
+  }
+  if (input.action.kind === 'teleport') {
+    return [
+      preview,
+      distanceJoinedPairField({
+        amountName: 'distanceFeet',
+        label: MONSTER_TELEPORT_DISTANCE_LABEL,
+        presets: MEASURED_RANGE_FEET,
+        allowCustom: true,
+        required: true,
+        hint: { text: MONSTER_TELEPORT_DISTANCE_HINT },
+      }),
+      {
+        kind: 'group',
+        name: 'passenger',
+        legend: MONSTER_TELEPORT_PASSENGER_LEGEND,
+        optionalDisclosure: {
+          addLabel: MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
+          seedWhen: () => ({ withinFeet: TELEPORT_WITHIN_DEFAULT }),
+        },
+        fields: [
+          {
+            type: 'text',
+            name: 'passenger.phrase',
+            label: MONSTER_TELEPORT_CREATURE_LABEL,
+            hint: { text: MONSTER_TELEPORT_CREATURE_HINT },
+            placeholder: MONSTER_TELEPORT_CREATURE_PLACEHOLDER,
+            required: true,
+          },
+          distanceJoinedPairField({
+            amountName: 'passenger.withinFeet',
+            label: MONSTER_TELEPORT_WITHIN_LABEL,
+            presets: MEASURED_RANGE_FEET,
+            allowCustom: true,
+            required: true,
+            hint: { text: MONSTER_TELEPORT_WITHIN_HINT },
+          }),
+        ],
+      },
+      ...usage,
+    ]
+  }
+  if (input.action.kind === 'take-actions') {
+    return [
+      preview,
+      {
+        type: 'chips',
+        name: 'standardActions',
+        label: MONSTER_TAKE_ACTIONS_ACTIONS_LABEL,
+        noun: { singular: 'action', plural: 'actions' },
+        required: true,
+        options: BONUS_STANDARD_ACTION_IDS.map((id) => ({
+          value: id,
+          label: getActionVocabularyEntry(id)?.label ?? id,
+        })),
+      },
+      {
+        type: 'select',
+        name: 'combination',
+        label: MONSTER_TAKE_ACTIONS_CHOICE_LABEL,
+        placeholder: 'Choose',
+        required: true,
+        options: [
+          { value: 'one', label: MONSTER_TAKE_ACTIONS_CHOICE_ONE },
+          { value: 'each', label: MONSTER_TAKE_ACTIONS_CHOICE_EACH },
+        ],
+        visibility: {
+          dependsOn: ['standardActions'],
+          visibleWhen: (values) =>
+            Array.isArray(values.standardActions) && values.standardActions.length >= 2,
+        },
+      },
+      {
+        type: 'text',
+        name: 'restriction',
+        label: MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL,
+        hint: { text: MONSTER_TAKE_ACTIONS_RESTRICTION_HINT },
+        placeholder: MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER,
+        optionalDisclosure: { addLabel: MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL },
+      },
+      ...usage,
+    ]
+  }
+  return undefined
+}
+
 function reactionAuthoringFields(input: {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
@@ -1048,6 +1198,7 @@ export function monsterActionDetailFields(input: {
   return (
     reactionAuthoringFields(input) ??
     legendaryAuthoringFields(input) ??
+    bonusAuthoringFields(input) ??
     sharedAuthoringFields(input)
   )
 }

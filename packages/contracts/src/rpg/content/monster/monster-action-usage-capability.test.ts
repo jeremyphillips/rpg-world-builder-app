@@ -40,5 +40,8 @@ describe('monsterActionUsageCapability', () => {
     expect(monsterActionUsageCapability({ kind: 'save', preset: 'other' })).toEqual(full)
     expect(monsterActionUsageCapability({ kind: 'special' })).toEqual(full)
     expect(monsterActionUsageCapability({ kind: 'spell' })).toEqual(full)
+    expect(monsterActionUsageCapability({ kind: 'leap' })).toEqual(full)
+    expect(monsterActionUsageCapability({ kind: 'teleport' })).toEqual(full)
+    expect(monsterActionUsageCapability({ kind: 'take-actions' })).toEqual(full)
   })
 })

@@ -9,6 +9,7 @@ import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-
 import {
   createEquippedWeaponAcquisition,
   createMonsterActionFromAcquisition,
+  createBonusActionDraft,
   createReactionActionDraft,
   createSpellActionDraft,
   type MonsterActionAcquisitionChoice,
@@ -293,9 +294,11 @@ export function useMonsterActionSections(entityId?: string) {
           ? createLegendaryActionDraft(choice.category, getValues())
           : choice.type === 'reaction'
             ? createReactionActionDraft(choice.category, getValues())
-            : choice.type === 'create' && choice.kind === 'spell'
-              ? createSpellActionDraft(section, getValues(), choice.spellAcquisition)
-              : createMonsterActionFromAcquisition(choice)
+            : choice.type === 'bonus'
+              ? createBonusActionDraft(choice.category)
+              : choice.type === 'create' && choice.kind === 'spell'
+                ? createSpellActionDraft(section, getValues(), choice.spellAcquisition)
+                : createMonsterActionFromAcquisition(choice)
       const before =
         section === 'legendaryActions' ? rowsOf(getValues(), 'legendaryActions').length : 0
       editors[section].appendRow(row)

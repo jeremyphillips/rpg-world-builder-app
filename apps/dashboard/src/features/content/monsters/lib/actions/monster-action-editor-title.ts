@@ -29,6 +29,9 @@ import { resolveMonsterFormActionIdentity } from './monster-action-identity'
 const AUTHORED_FALLBACK_BASE = {
   attack: getMonsterActionKindLabel('attack'),
   special: 'Special Ability',
+  leap: getMonsterActionKindLabel('leap'),
+  teleport: getMonsterActionKindLabel('teleport'),
+  'take-actions': getMonsterActionKindLabel('take-actions'),
   save: 'Saving Throw',
   'natural-weapon': getMonsterActionKindLabel('natural-weapon'),
   'spell-primary': MONSTER_SPELLCASTING_ACTION_NAME,

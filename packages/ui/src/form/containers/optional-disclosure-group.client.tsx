@@ -33,7 +33,7 @@ type OptionalDisclosureGroupProps = {
   children: ReactNode
 }
 
-/** Optional object group. Opening does not write form state. Remove unsets the object. */
+/** Optional object group. Opening writes form state only when `seedWhen` is set. Remove unsets the object. */
 export function OptionalDisclosureGroup({
   item,
   idPrefix,
@@ -143,7 +143,15 @@ function OptionalDisclosureGroupBody({
         labeled={disclosure.labeled}
         addDisabled={disclosure.addDisabled}
         onOpenChange={(next) => {
-          if (next) setManualOpen(true)
+          if (!next) return
+          setManualOpen(true)
+          if (disclosure.seedWhen && !watchedHasContent(watched)) {
+            setValue(fullName, disclosure.seedWhen({}), {
+              shouldDirty: true,
+              shouldTouch: true,
+              shouldValidate: true,
+            })
+          }
         }}
         onRemove={attemptClear}
       >

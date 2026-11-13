@@ -1,6 +1,7 @@
 import {
   isPrimarySpellcastingAction,
   monsterActionDraftSchema,
+  monsterBonusActionDraftSchema,
   monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
   monsterSectionAllowsKind,
@@ -27,7 +28,9 @@ export function monsterActionActiveKeys(
       ? monsterReactionDraftSchema
       : section === 'legendaryActions'
         ? monsterLegendaryActionDraftSchema
-        : monsterActionDraftSchema
+        : section === 'bonusActions'
+          ? monsterBonusActionDraftSchema
+          : monsterActionDraftSchema
   return variantKeys(schema, kind)
 }
 

@@ -172,7 +172,12 @@ function attackLineFromProfile(
 
 function appendAttackLines(
   target: DerivedMonsterAttackLine[],
-  actions: readonly (MonsterAction | MonsterLegendaryAction | MonsterReaction)[],
+  actions: readonly (
+    | MonsterAction
+    | MonsterBonusAction
+    | MonsterLegendaryAction
+    | MonsterReaction
+  )[],
   args: Omit<ResolveMonsterActionAttackProfileInput, 'action'>,
   section: DerivedMonsterAttackLine['section'],
 ): void {
