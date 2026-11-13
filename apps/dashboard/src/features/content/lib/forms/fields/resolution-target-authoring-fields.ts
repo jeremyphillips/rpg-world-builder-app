@@ -464,7 +464,7 @@ function requirementArray(
   requirementsPath: string,
   creatureTypeOptions: readonly FieldOption[],
   visibility?: FieldVisibility,
-  options?: { label?: string; previewPath?: string },
+  options?: { label?: string; previewPath?: string; hint?: string },
 ): ArrayConfig {
   const labelFor = creatureTypeLabelFor(creatureTypeOptions)
   const conditionOptions = EFFECT_CONDITION_IDS.map((id) => ({
@@ -476,7 +476,7 @@ function requirementArray(
     kind: 'array',
     name: requirementsPath,
     label: options?.label ?? 'Requirements',
-    hint: REQUIREMENT_STAT_BLOCK_HINT,
+    hint: options?.hint ?? REQUIREMENT_STAT_BLOCK_HINT,
     emptyState: 'none',
     addAction: { label: 'Add a requirement', menu: buildResolutionRequirementAddMenu() },
     item: {
@@ -611,6 +611,7 @@ export function resolutionOccupantRequirementsFields(options: {
   visibility?: FieldVisibility
   legend?: string
   description?: string
+  hint?: string
   /** Embed only the requirement array inside an existing group. */
   fieldsOnly?: boolean
 }): FormItem[] {
@@ -621,6 +622,7 @@ export function resolutionOccupantRequirementsFields(options: {
     options.visibility,
     {
       label: 'Requirements',
+      hint: options.hint,
     },
   )
   if (options.fieldsOnly) {

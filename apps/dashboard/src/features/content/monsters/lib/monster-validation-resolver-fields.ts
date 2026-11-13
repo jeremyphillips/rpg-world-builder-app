@@ -7,6 +7,7 @@ import { resolutionTargetAuthoringFields } from '../../lib/forms/fields/resoluti
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { damageFieldGroup } from '../../lib/forms/mechanics/damage-field-group'
 import { monsterActionLimitedUseFields } from './actions/monster-action-on-hit-fields'
+import { MONSTER_SAVE_TARGETING_MODE_LABEL } from './monster-form-labels'
 import { monsterTraitItemFields, monsterTraitTemplateFields } from './monster-trait-form-fields'
 import { monsterTraitPresetFields } from './monster-trait-preset-fields'
 
@@ -71,7 +72,8 @@ export function monsterActionResolverFields(ctx: ContentFormCtx): FormItem[] {
       fields: [],
     },
     choice('resolution.method.ability', 'Save ability'),
-    choice('resolution.selectionMode', 'Selection'),
+    choice('resolution.selectionMode', MONSTER_SAVE_TARGETING_MODE_LABEL),
+    choice('resolution.areaOfEffect.shape', 'Shape'),
     ...resolutionTargetAuthoringFields({
       prefix: 'resolution.target',
       creatureTypeOptions: buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary),

@@ -1,7 +1,8 @@
 import { ACTION_PRESET_IDS, getActionPreset } from '@rpg/contracts'
-import type { FormItem } from '@rpg/ui/form'
+import type { ArrayConfig, FormItem, GroupConfig, SelectFieldConfig } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
+import { AREA_GEOMETRY_FORM_NONE } from '../../../lib/forms/fields/area-geometry-form-fields'
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 import { pickEquipment, pickMonster } from '@/test/fixtures/pick'
 
@@ -23,6 +24,10 @@ import {
   resolveFirstInvalidActionPath,
   resolveMonsterActionSelectionAfterRemoval,
 } from './monster-action-selection'
+import {
+  MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT,
+  MONSTER_SAVE_TARGETING_LEGEND,
+} from '../monster-form-labels'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   collectMonsterFormAdvisories,
@@ -142,6 +147,58 @@ describe('monster action acquisition', () => {
 const detailCtx = {
   damageTypeVocabulary: buildSeedDamageTypeVocabulary(),
 } as ContentFormCtx
+
+function walkFormItems(items: readonly FormItem[], visit: (item: FormItem) => void): void {
+  for (const item of items) {
+    visit(item)
+    if ('kind' in item && item.kind === 'dependent') {
+      walkFormItems([item.controller as FormItem], visit)
+      walkFormItems(item.dependents.fields, visit)
+      continue
+    }
+    if ('fields' in item && Array.isArray(item.fields)) {
+      walkFormItems(item.fields as FormItem[], visit)
+    }
+    if ('kind' in item && item.kind === 'row' && item.fields) {
+      walkFormItems(item.fields as FormItem[], visit)
+    }
+  }
+}
+
+function findSelectField(items: readonly FormItem[], name: string): SelectFieldConfig | undefined {
+  let found: SelectFieldConfig | undefined
+  walkFormItems(items, (item) => {
+    if (!found && 'type' in item && item.type === 'select' && item.name === name) {
+      found = item
+    }
+  })
+  return found
+}
+
+function findGroupByHeading(items: readonly FormItem[], label: string): GroupConfig | undefined {
+  let found: GroupConfig | undefined
+  walkFormItems(items, (item) => {
+    if (
+      !found &&
+      'kind' in item &&
+      item.kind === 'group' &&
+      (item.heading?.label === label || item.legend === label)
+    ) {
+      found = item
+    }
+  })
+  return found
+}
+
+function findArrayField(items: readonly FormItem[], name: string): ArrayConfig | undefined {
+  let found: ArrayConfig | undefined
+  walkFormItems(items, (item) => {
+    if (!found && 'kind' in item && item.kind === 'array' && item.name === name) {
+      found = item
+    }
+  })
+  return found
+}
 
 function collectFieldNames(items: readonly FormItem[]): string[] {
   const names: string[] = []
@@ -518,6 +575,47 @@ describe('monster action detail fields', () => {
     })
     expect(constrict).not.toContain('limitedUse')
     expect(constrict).not.toContain('limitedUse.kind')
+  })
+
+  it('configures monster save area targeting without an explicit None shape', () => {
+    const items = monsterActionDetailFields({
+      ctx: detailCtx,
+      action: {
+        id: 'breath',
+        kind: 'save',
+        name: 'Fire Breath',
+        preset: 'breath-weapon',
+      },
+      section: 'actions',
+      equipmentOptions: [],
+      sharedCastingOptions: [],
+      namePrefix: 'actions.0',
+    })
+    let selectionModeControl: FormItem | undefined
+    walkFormItems(items, (item) => {
+      if (
+        !selectionModeControl &&
+        'type' in item &&
+        item.type === 'segmentedControl' &&
+        item.name === 'resolution.selectionMode'
+      ) {
+        selectionModeControl = item
+      }
+    })
+    expect(selectionModeControl).toMatchObject({
+      type: 'segmentedControl',
+      fullWidth: true,
+      width: 'full',
+    })
+    const shape = findSelectField(items, 'resolution.areaOfEffect.shape')
+    expect(shape?.options?.some((option) => option.value === AREA_GEOMETRY_FORM_NONE)).toBe(false)
+    expect(shape?.required).toBe(true)
+    expect(shape?.placeholder).toBe('Choose a shape…')
+    const occupants = findArrayField(items, 'resolution.occupantRequirements')
+    expect(occupants?.hint).toBe(MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT)
+    expect(occupants?.visibility?.dependsOn).toEqual(['resolution.selectionMode'])
+    const targetingGroup = findGroupByHeading(items, MONSTER_SAVE_TARGETING_LEGEND)
+    expect(targetingGroup?.chrome).toEqual({ variant: 'panel', emphasis: 'faint' })
   })
 })
 

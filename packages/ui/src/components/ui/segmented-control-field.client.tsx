@@ -10,6 +10,7 @@ import type { FieldValidationProps } from './field-validation-props'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import type { FieldLabelPresentationProps } from './field-label-props'
 import type { FieldOption } from '../../form/field-config'
+import { cn } from '../../lib/utils'
 import { SegmentedControl, type SegmentedControlSize } from './segmented-control.client'
 import { RadioFieldShell } from './radio-field-shell'
 
@@ -72,12 +73,12 @@ export function SegmentedControlField({
       info={info}
       required={required}
       size={size}
-      width={width}
+      width={fullWidth ? 'full' : width}
       labelVisibility={labelVisibility}
       chrome={chrome}
     >
       {(labelId) => (
-        <div onBlur={onBlur}>
+        <div className={cn(fullWidth && 'w-full min-w-0')} onBlur={onBlur}>
           <SegmentedControl
             value={selected}
             options={options.map((option) => ({
@@ -88,7 +89,7 @@ export function SegmentedControlField({
             aria-labelledby={labelId}
             disabled={disabled}
             fullWidth={fullWidth}
-            segmentWidth="auto"
+            segmentWidth={fullWidth ? 'equal' : 'auto'}
             size={resolveSegmentedControlSize(size)}
             onValueChange={(next) => {
               onValueChange?.(next)

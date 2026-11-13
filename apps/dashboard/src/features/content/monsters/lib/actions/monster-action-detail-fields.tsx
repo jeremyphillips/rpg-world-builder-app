@@ -26,10 +26,7 @@ import {
 import { buildActiveCreatureTypeFieldOptions } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import {
-  AREA_GEOMETRY_FORM_NONE,
-  areaGeometryFormFields,
-} from '../../../lib/forms/fields/area-geometry-form-fields'
+import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
 import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
 import {
   resolutionOccupantRequirementsFields,
@@ -80,6 +77,10 @@ import {
   MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
   MONSTER_SAVE_TARGETING_DESCRIPTION,
   MONSTER_SAVE_TARGETING_LEGEND,
+  MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT,
+  MONSTER_SAVE_TARGETING_MODE_AREA_FROM_SELF,
+  MONSTER_SAVE_TARGETING_MODE_LABEL,
+  MONSTER_SAVE_TARGETING_MODE_SELECTED_TARGETS,
   MONSTER_TRIGGER_LABEL,
   MONSTER_TRIGGER_PLACEHOLDER,
   MONSTER_PARRY_AC_BONUS_HINT,
@@ -430,36 +431,27 @@ function monsterActionSaveDcDependent(namePrefix: string, currentActionId: strin
   })
 }
 
-function whenMonsterSaveHasArea(): FieldVisibility {
-  return {
-    dependsOn: ['resolution.selectionMode', 'resolution.areaOfEffect.shape'],
-    visibleWhen: (values) => {
-      if (values['resolution.selectionMode'] !== 'self') return false
-      const shape = values['resolution.areaOfEffect.shape']
-      return typeof shape === 'string' && shape.length > 0 && shape !== AREA_GEOMETRY_FORM_NONE
-    },
-  }
-}
-
 function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
   const selfMode = whenFieldEquals('resolution.selectionMode', 'self')
   const targetsMode = whenFieldEquals('resolution.selectionMode', 'targets')
   const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary)
-  const saveAreaOccupants = combineFieldVisibilityAll(selfMode, whenMonsterSaveHasArea())
   return {
     kind: 'group',
     heading: { label: MONSTER_SAVE_TARGETING_LEGEND },
     description: MONSTER_SAVE_TARGETING_DESCRIPTION,
+    chrome: { variant: 'panel', emphasis: 'faint' },
     fields: [
       {
         kind: 'dependent',
         controller: {
-          type: 'select',
+          type: 'segmentedControl',
           name: 'resolution.selectionMode',
-          label: 'Selection',
+          label: MONSTER_SAVE_TARGETING_MODE_LABEL,
+          fullWidth: true,
+          width: 'full',
           options: [
-            { value: 'self', label: 'Area from self' },
-            { value: 'targets', label: 'Creatures in reach' },
+            { value: 'targets', label: MONSTER_SAVE_TARGETING_MODE_SELECTED_TARGETS },
+            { value: 'self', label: MONSTER_SAVE_TARGETING_MODE_AREA_FROM_SELF },
           ],
           defaultValue: 'targets',
         },
@@ -473,6 +465,7 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
               legendVisibility: 'srOnly',
               shapeHint: 'Area measured from the monster.',
               visibility: selfMode,
+              includeExplicitNoneOption: false,
             }),
             ...resolutionTargetAuthoringFields({
               prefix: 'resolution.target',
@@ -482,7 +475,9 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
             ...resolutionOccupantRequirementsFields({
               requirementsPath: 'resolution.occupantRequirements',
               creatureTypeOptions,
-              visibility: saveAreaOccupants,
+              visibility: selfMode,
+              hint: MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT,
+              fieldsOnly: true,
             }),
           ],
         },

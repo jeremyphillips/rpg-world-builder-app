@@ -353,6 +353,11 @@ export const MONSTER_SAVE_THROW_SECTION_DESCRIPTION =
   'Set the saving throw target and how difficult it is to succeed.'
 export const MONSTER_SAVE_TARGETING_LEGEND = 'Targeting'
 export const MONSTER_SAVE_TARGETING_DESCRIPTION = 'Who makes the savings throw?'
+export const MONSTER_SAVE_TARGETING_MODE_LABEL = 'Targeting mode'
+export const MONSTER_SAVE_TARGETING_MODE_SELECTED_TARGETS = 'Selected targets'
+export const MONSTER_SAVE_TARGETING_MODE_AREA_FROM_SELF = 'Area from self'
+export const MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT =
+  'Optional restrictions on which creatures in the area are affected.'
 export const MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL = 'Ability-based'
 export const MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL = 'Spellcasting-based'
 export const MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL = 'Use an ability score'

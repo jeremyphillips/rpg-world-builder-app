@@ -652,6 +652,8 @@ export interface SegmentedControlFieldConfig extends BaseFieldConfig {
   options: FieldOption[]
   defaultValue?: string
   labelVisibility?: FieldLabelVisibility
+  /** Stretch the control to the field column; segments share width equally when true. */
+  fullWidth?: boolean
 }
 
 export interface RadioCardFieldConfig extends BaseFieldConfig {

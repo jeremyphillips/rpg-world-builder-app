@@ -320,6 +320,7 @@ const fieldRenderers: {
       width={config.width}
       disabled={config.disabled}
       size={controlSize}
+      fullWidth={config.fullWidth}
       value={field.value != null && field.value !== '' ? String(field.value) : ''}
       onValueChange={field.onChange}
       onBlur={field.onBlur}
