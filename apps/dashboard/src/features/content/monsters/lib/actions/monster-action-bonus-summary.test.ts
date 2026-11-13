@@ -20,6 +20,24 @@ describe('buildMonsterActionBonusPreview', () => {
     ).toBe('<p>Leap</p><p>The hezrou jumps up to 30 feet by spending 10 feet of movement.</p>')
     expect(
       buildMonsterActionBonusPreview({
+        values,
+        action: {
+          id: 'leap',
+          kind: 'leap',
+          name: 'Leap',
+          distanceFeet: 10,
+          movementFeet: 10,
+        },
+      })?.bodyHtml,
+    ).toContain('jumps up to 10 feet by spending 10 feet of movement.')
+    expect(
+      buildMonsterActionBonusPreview({
+        values,
+        action: { id: 'leap', kind: 'leap', name: 'Leap', distanceFeet: 30 },
+      }),
+    ).toBeNull()
+    expect(
+      buildMonsterActionBonusPreview({
         values: { name: 'Balor' } as MonsterFormValues,
         action: {
           id: 'teleport',

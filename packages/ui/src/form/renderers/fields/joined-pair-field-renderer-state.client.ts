@@ -9,7 +9,7 @@ import { useFieldControlSize } from '../../context/form-section.context'
 import { useFieldErrorPresentation } from '../../context/array-item-presentation.context'
 import { resolveRowAwareFieldHintPresentation } from '../../config/resolve-row-field-hint.lib'
 import { resolveFieldLabelVisibility } from '../../form-heading.lib'
-import type { JoinedPairFieldConfig } from '../../field-config'
+import { normalizeFieldHint, type JoinedPairFieldConfig } from '../../field-config'
 import {
   amountAfterJoinedPairUnitChange,
   buildJoinedPairControls,
@@ -22,6 +22,15 @@ import {
 export type JoinedPairFieldRendererStateOptions = {
   /** Row-hint normalization when the message is hoisted to a parent disclosure. */
   rowAwareHints?: boolean
+}
+
+function joinedPairStartOptionsDependsOn(config: JoinedPairFieldConfig): readonly string[] {
+  if (config.start.kind !== 'select') return []
+  return config.start.optionsResolve?.dependsOn ?? []
+}
+
+function joinedPairHintDependsOn(config: JoinedPairFieldConfig): readonly string[] {
+  return normalizeFieldHint(config.hint).resolve?.dependsOn ?? []
 }
 
 /** Shared RHF + presentation state for joined-pair field renderers. */
@@ -46,9 +55,9 @@ export function useJoinedPairFieldRendererState(
     ...(endDefaultValue !== undefined ? { defaultValue: endDefaultValue } : {}),
   })
   const unitValue = endPath !== undefined ? endController.field.value : undefined
-  const startOptionsDependsOn =
-    config.start.kind === 'select' ? (config.start.optionsResolve?.dependsOn ?? []) : []
+  const startOptionsDependsOn = joinedPairStartOptionsDependsOn(config)
   const optionValues = useDependsOnValues(startOptionsDependsOn, namePrefix)
+  const hintValues = useDependsOnValues(joinedPairHintDependsOn(config), namePrefix)
   const startOccupant = useMemo(
     () => resolveJoinedPairStartOccupant(config, optionValues, unitValue, endDefaultValue),
     [config, endDefaultValue, optionValues, unitValue],
@@ -76,7 +85,7 @@ export function useJoinedPairFieldRendererState(
     endPath,
   )
   const validation = useFieldErrorPresentation(combinedError, startPath)
-  const hintPresentation = resolveRowAwareFieldHintPresentation(config, {}, rowAwareHints)
+  const hintPresentation = resolveRowAwareFieldHintPresentation(config, hintValues, rowAwareHints)
   const labelVisibility = resolveFieldLabelVisibility(config)
   const controls = buildJoinedPairControls(
     { ...config, start: startOccupant },

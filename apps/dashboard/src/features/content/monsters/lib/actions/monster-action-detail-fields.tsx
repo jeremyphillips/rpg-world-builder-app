@@ -76,10 +76,6 @@ import {
   MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
   MONSTER_PARRY_FOLLOW_UP_HINT,
   MONSTER_PARRY_FOLLOW_UP_LABEL,
-  MONSTER_LEAP_DISTANCE_HINT,
-  MONSTER_LEAP_DISTANCE_LABEL,
-  MONSTER_LEAP_MOVEMENT_HINT,
-  MONSTER_LEAP_MOVEMENT_LABEL,
   MONSTER_TAKE_ACTIONS_ACTIONS_LABEL,
   MONSTER_TAKE_ACTIONS_CHOICE_EACH,
   MONSTER_TAKE_ACTIONS_CHOICE_LABEL,
@@ -128,6 +124,7 @@ import {
   MonsterActionSaveSuccessAmountField,
 } from './monster-action-save-outcome-fields'
 import { legendaryActionCategory } from './legendary-action-category'
+import { leapDistanceFields } from './leap-distance-options'
 import { legendaryActionDetailFields } from './monster-legendary-action-fields'
 import { monsterSpellCastAtLevelField } from './monster-spell-cast-at-level-form-fields'
 import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../components/form/monster-spell-picker-context'
@@ -934,24 +931,7 @@ function bonusAuthoringFields(input: {
       preview,
       {
         kind: 'row',
-        fields: [
-          distanceJoinedPairField({
-            amountName: 'distanceFeet',
-            label: MONSTER_LEAP_DISTANCE_LABEL,
-            presets: MEASURED_RANGE_FEET,
-            allowCustom: true,
-            required: true,
-            hint: { text: MONSTER_LEAP_DISTANCE_HINT },
-          }),
-          distanceJoinedPairField({
-            amountName: 'movementFeet',
-            label: MONSTER_LEAP_MOVEMENT_LABEL,
-            presets: MEASURED_RANGE_FEET,
-            allowCustom: true,
-            required: true,
-            hint: { text: MONSTER_LEAP_MOVEMENT_HINT },
-          }),
-        ],
+        fields: leapDistanceFields(),
       },
       ...usage,
     ]

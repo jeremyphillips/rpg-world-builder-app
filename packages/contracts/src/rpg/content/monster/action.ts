@@ -20,7 +20,13 @@ import {
 import { RESOLUTION_SELECTION_MODES } from '../../vocab/resolution'
 import { getActionPreset } from '../action/action-presets'
 import { MONSTER_SECTION_KINDS } from './action-section-eligibility'
-import { BONUS_ACTION_COMBINATIONS, BONUS_STANDARD_ACTION_IDS } from './bonus-standard-actions'
+import {
+  BONUS_ACTION_COMBINATIONS,
+  BONUS_STANDARD_ACTION_IDS,
+  LEAP_DISTANCE_EXCEEDS_MOVEMENT_MESSAGE,
+  LEAP_DISTANCE_MAX,
+  LEAP_MOVEMENT_MAX,
+} from './bonus-standard-actions'
 import {
   castingAbilitySchema,
   savingThrowEffectDraftSchema,
@@ -322,6 +328,8 @@ export const monsterActionSchema = z.discriminatedUnion(
 )
 
 const positiveWholeFeetSchema = z.number().int().min(1)
+const leapDistanceFeetSchema = positiveWholeFeetSchema.max(LEAP_DISTANCE_MAX)
+const leapMovementFeetSchema = positiveWholeFeetSchema.max(LEAP_MOVEMENT_MAX)
 
 const bonusPassengerSchema = z.object({
   phrase: z.string().optional(),
@@ -335,16 +343,25 @@ function bonusLimitedUse<M extends MonsterActionMode>(mode: M) {
 }
 
 function leapSchema<M extends MonsterActionMode>(mode: M) {
-  return z.object({
-    id: z.string().min(1),
-    kind: z.literal('leap'),
-    name: strict(z.string().min(1), mode),
-    distanceFeet: strict(positiveWholeFeetSchema, mode),
-    movementFeet: strict(positiveWholeFeetSchema, mode),
-    limitedUse: bonusLimitedUse(mode).optional(),
-    available: z.boolean().optional(),
-    ...entryProvenanceField,
-  })
+  return z
+    .object({
+      id: z.string().min(1),
+      kind: z.literal('leap'),
+      name: strict(z.string().min(1), mode),
+      distanceFeet: strict(leapDistanceFeetSchema, mode),
+      movementFeet: strict(leapMovementFeetSchema, mode),
+      limitedUse: bonusLimitedUse(mode).optional(),
+      available: z.boolean().optional(),
+      ...entryProvenanceField,
+    })
+    .superRefine((action, ctx) => {
+      const distance = action.distanceFeet
+      const movement = action.movementFeet
+      if (typeof distance !== 'number' || typeof movement !== 'number') return
+      if (!Number.isInteger(distance) || !Number.isInteger(movement)) return
+      if (distance > movement) return
+      addCustomRefinementIssue(ctx, LEAP_DISTANCE_EXCEEDS_MOVEMENT_MESSAGE, ['distanceFeet'])
+    })
 }
 
 function teleportSchema<M extends MonsterActionMode>(mode: M) {

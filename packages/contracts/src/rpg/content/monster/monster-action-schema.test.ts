@@ -2,6 +2,7 @@ import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import {
   createMonsterInputSchema,
+  LEAP_DISTANCE_EXCEEDS_MOVEMENT_MESSAGE,
   monsterActionDraftSchema,
   monsterActionSchema,
   monsterBonusActionDraftSchema,
@@ -161,6 +162,48 @@ describe('monsterActionSchema', () => {
 })
 
 describe('monsterBonusActionSchema', () => {
+  it('requires jump distance to exceed movement spent', () => {
+    const leap = {
+      id: 'leap',
+      kind: 'leap' as const,
+      name: 'Leap',
+      distanceFeet: 30,
+      movementFeet: 10,
+    }
+    expect(monsterBonusActionSchema.parse(leap)).toMatchObject(leap)
+    expect(
+      monsterBonusActionSchema.parse({ ...leap, distanceFeet: 300, movementFeet: 299 }),
+    ).toMatchObject({
+      distanceFeet: 300,
+      movementFeet: 299,
+    })
+    for (const pair of [
+      { distanceFeet: 10, movementFeet: 10 },
+      { distanceFeet: 10, movementFeet: 30 },
+      { distanceFeet: 30, movementFeet: 30 },
+    ]) {
+      const parsed = monsterBonusActionSchema.safeParse({ ...leap, ...pair })
+      expect(parsed.success).toBe(false)
+      if (!parsed.success) {
+        expect(
+          parsed.error.issues.some(
+            (issue) =>
+              issue.message === LEAP_DISTANCE_EXCEEDS_MOVEMENT_MESSAGE &&
+              issue.path.at(-1) === 'distanceFeet',
+          ),
+        ).toBe(true)
+      }
+    }
+    expect(
+      monsterBonusActionDraftSchema.safeParse({ ...leap, movementFeet: undefined }).success,
+    ).toBe(true)
+    expect(monsterBonusActionSchema.safeParse({ ...leap, distanceFeet: 301 }).success).toBe(false)
+    expect(monsterBonusActionSchema.safeParse({ ...leap, movementFeet: 300 }).success).toBe(false)
+    expect(
+      monsterBonusActionSchema.safeParse({ ...leap, distanceFeet: 40, movementFeet: 35 }).success,
+    ).toBe(true)
+  })
+
   it('publishes a leap and a self teleport and rejects them on other sections', () => {
     expect(
       monsterBonusActionSchema.parse({
@@ -194,7 +237,7 @@ describe('monsterBonusActionSchema', () => {
         distanceFeet: 7,
         movementFeet: 200,
       }).success,
-    ).toBe(true)
+    ).toBe(false)
     expect(
       monsterBonusActionSchema.safeParse({
         id: 'leap',

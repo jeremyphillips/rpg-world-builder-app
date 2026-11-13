@@ -17,6 +17,7 @@ import {
   type MonsterActionSection,
 } from './actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './actions/monster-action-presets'
+import { readWalkSpeed, isLeapWholeFeet } from './actions/leap-distance-options'
 import type { MonsterFormValues } from './monster-form-values'
 
 export const TUNNELER_MISSING_BURROW_SPEED_MESSAGE =
@@ -25,12 +26,23 @@ export const TUNNELER_MISSING_BURROW_SPEED_MESSAGE =
 export const FLYBY_MISSING_FLY_SPEED_MESSAGE =
   'Flyby only applies while flying, but this creature has no Fly Speed.'
 
+export const LEAP_MISSING_WALK_SPEED_MESSAGE =
+  'Leap spends movement, but no Walk Speed is configured.'
+
+export const LEAP_ZERO_WALK_SPEED_MESSAGE = 'Leap spends movement, but Walk Speed is 0.'
+
+export const LEAP_MOVEMENT_EXCEEDS_WALK_SPEED_MESSAGE =
+  "Movement spent is greater than this creature's Walk Speed."
+
 export type MonsterFormAdvisory = {
   code:
     | 'weapon-not-equipped'
     | 'weapon-not-proficient'
     | 'tunneler-missing-burrow-speed'
     | 'flyby-missing-fly-speed'
+    | 'leap-missing-walk-speed'
+    | 'leap-zero-walk-speed'
+    | 'leap-movement-exceeds-walk-speed'
     | 'multiattack-unavailable-action'
   message: string
   path: string
@@ -147,6 +159,42 @@ function appendWeaponAdvisories(
   })
 }
 
+function appendLeapAdvisories(
+  advisories: MonsterFormAdvisory[],
+  values: MonsterFormValues,
+  section: MonsterActionSection,
+  action: MonsterActionDraftRow,
+  index: number,
+): void {
+  if (action.kind !== 'leap') return
+  if (!isLeapWholeFeet(action.distanceFeet) || !isLeapWholeFeet(action.movementFeet)) return
+  const walk = readWalkSpeed(values.movement)
+  const path = `${section}.${index}`
+  if (walk.status === 'missing') {
+    advisories.push({
+      code: 'leap-missing-walk-speed',
+      message: LEAP_MISSING_WALK_SPEED_MESSAGE,
+      path,
+    })
+    return
+  }
+  if (walk.status === 'zero') {
+    advisories.push({
+      code: 'leap-zero-walk-speed',
+      message: LEAP_ZERO_WALK_SPEED_MESSAGE,
+      path,
+    })
+    return
+  }
+  if (walk.status === 'usable' && action.movementFeet > walk.feet) {
+    advisories.push({
+      code: 'leap-movement-exceeds-walk-speed',
+      message: LEAP_MOVEMENT_EXCEEDS_WALK_SPEED_MESSAGE,
+      path,
+    })
+  }
+}
+
 export function collectMonsterFormAdvisories(
   values: MonsterFormValues,
   equipmentById: ReadonlyMap<string, Equipment>,
@@ -160,6 +208,7 @@ export function collectMonsterFormAdvisories(
         return
       }
       appendWeaponAdvisories(advisories, values, equipmentById, section, action, index)
+      appendLeapAdvisories(advisories, values, section, action, index)
     })
   }
 

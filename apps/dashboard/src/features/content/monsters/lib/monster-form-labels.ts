@@ -398,7 +398,10 @@ export const MONSTER_LEAP_DESCRIPTION = 'Jump by spending movement.'
 export const MONSTER_LEAP_DISTANCE_LABEL = 'Jump distance'
 export const MONSTER_LEAP_DISTANCE_HINT = 'How far the creature jumps.'
 export const MONSTER_LEAP_MOVEMENT_LABEL = 'Movement spent'
-export const MONSTER_LEAP_MOVEMENT_HINT = 'Movement this jump spends.'
+export const MONSTER_LEAP_MOVEMENT_HINT = 'Movement required to make the jump.'
+export function formatLeapWalkSpeedHint(walkFeet: number): string {
+  return `${MONSTER_LEAP_MOVEMENT_HINT} Walk Speed: ${walkFeet} ft.`
+}
 export const MONSTER_TELEPORT_DESCRIPTION = 'Teleport to an unoccupied space it can see.'
 export const MONSTER_TELEPORT_DISTANCE_LABEL = 'Distance'
 export const MONSTER_TELEPORT_DISTANCE_HINT = 'How far it teleports.'
