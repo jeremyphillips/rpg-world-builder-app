@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
-import { Field, type FieldSize } from './field.client'
+import { Field, type FieldSize, useFieldRootContext } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import { FormField } from './form-field'
@@ -72,6 +72,11 @@ export interface FieldReadOnlyValueFieldProps extends FieldValidationProps, Fiel
   controlEnd?: ReactNode
 }
 
+function FieldReadOnlyDescribedValue(props: Omit<FieldReadOnlyValueProps, 'ariaDescribedBy'>) {
+  const { describedBy } = useFieldRootContext('FieldReadOnlyValueField')
+  return <FieldReadOnlyValue {...props} ariaDescribedBy={describedBy} />
+}
+
 /** Labelled read-only field — mirrors `SelectField` anatomy without an editable control. */
 export function FieldReadOnlyValueField({
   id,
@@ -94,7 +99,7 @@ export function FieldReadOnlyValueField({
 }: FieldReadOnlyValueFieldProps) {
   const labelId = `${id}-label`
   const valueNode = (
-    <FieldReadOnlyValue
+    <FieldReadOnlyDescribedValue
       id={controlEnd ? undefined : id}
       displayValue={displayValue}
       size={size}
@@ -142,6 +147,7 @@ export function FieldReadOnlyValueField({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       width={width}
       size={size}
@@ -149,7 +155,6 @@ export function FieldReadOnlyValueField({
     >
       {label.trim() ? (
         <FieldLayout
-          hintPosition={hintPosition}
           wrapControl={false}
           label={
             <Field.Label id={labelId}>

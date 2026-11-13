@@ -73,6 +73,7 @@ export function RichTextField({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       width={width}
       size={size}
@@ -80,7 +81,6 @@ export function RichTextField({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         label={<FormFieldLabel label={label} info={info} required={required} />}
         control={
           <RichTextEditor

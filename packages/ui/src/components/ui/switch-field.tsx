@@ -143,7 +143,6 @@ export function SwitchField({
         anatomy
       >
         <FieldLayout
-          hintPosition={resolvedHintPosition}
           label={labelNode}
           control={<Switch {...switchProps} />}
           chrome={chrome}

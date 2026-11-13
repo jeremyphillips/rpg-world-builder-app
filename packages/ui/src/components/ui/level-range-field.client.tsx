@@ -89,6 +89,7 @@ export function LevelRangeField({
       id={id}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       width={rootWidth}
       size={size}
@@ -96,7 +97,6 @@ export function LevelRangeField({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         wrapControl={false}
         chrome={chrome}
         size={size}

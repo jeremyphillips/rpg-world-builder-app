@@ -4,7 +4,7 @@ import { Icon } from './icon/icon'
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { cn } from '../../lib/utils'
-import { Field, type FieldSize } from './field.client'
+import { Field, type FieldSize, useOptionalFieldDescribedBy } from './field.client'
 import { FieldLayout } from './field-layout'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import type { FieldWidth } from './field-control.variants'
@@ -106,9 +106,10 @@ function RadixUnitSelect({
   unitPlaceholder,
   disabled,
   size,
+  describedBy,
   onUnitChange,
   onBlur,
-}: Omit<UnitSelectSegmentProps, 'searchable' | 'label' | 'hasError' | 'describedBy'>) {
+}: Omit<UnitSelectSegmentProps, 'searchable' | 'label' | 'hasError'>) {
   const sizingLabels = options.map((option) => option.label)
 
   return (
@@ -119,6 +120,7 @@ function RadixUnitSelect({
         grouped
         groupedPosition="end"
         sizingLabels={sizingLabels}
+        aria-describedby={describedBy}
         onBlur={onBlur}
       >
         <SelectValue placeholder={unitPlaceholder} />
@@ -269,12 +271,19 @@ function SearchableUnitSelect({
   )
 }
 
-function UnitSelectSegment({ searchable, hasError: _hasError, ...rest }: UnitSelectSegmentProps) {
+function UnitSelectSegment({
+  searchable,
+  hasError: _hasError,
+  describedBy,
+  ...rest
+}: UnitSelectSegmentProps) {
+  const contextDescribedBy = useOptionalFieldDescribedBy()
+  const resolvedDescribedBy = describedBy ?? contextDescribedBy
   if (searchable) {
-    return <SearchableUnitSelect {...rest} />
+    return <SearchableUnitSelect {...rest} describedBy={resolvedDescribedBy} />
   }
-  const { describedBy: _describedBy, label: _label, ...radixProps } = rest
-  return <RadixUnitSelect {...radixProps} />
+  const { label: _label, ...radixProps } = rest
+  return <RadixUnitSelect {...radixProps} describedBy={resolvedDescribedBy} />
 }
 
 /** Labelled field combining a value input (text or number) with a unit select in one control. */
@@ -318,7 +327,6 @@ export function InputSelectField({
   const valueId = `${id}-value`
   const unitId = `${id}-unit`
   const hasError = Boolean(error)
-  const describedBy = hasError ? `${id}-error` : hint ? `${id}-hint` : undefined
   const layout = inputType === 'number' && valueDigits != null ? 'intrinsic' : 'stretch'
   const isLabelUnit = unitMode === 'label'
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
@@ -328,6 +336,7 @@ export function InputSelectField({
       id={id}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       size={size}
       width={rootWidth}
@@ -335,7 +344,6 @@ export function InputSelectField({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         wrapControl={false}
         chrome={chrome}
         size={size}
@@ -370,7 +378,6 @@ export function InputSelectField({
                 formatGrouped={formatGrouped}
                 required={required}
                 hasError={hasError}
-                describedBy={describedBy}
                 onValueChange={onValueChange}
                 onBlur={onBlur}
               />
@@ -384,7 +391,6 @@ export function InputSelectField({
                 placeholder={placeholder}
                 required={required}
                 hasError={hasError}
-                describedBy={describedBy}
                 onValueChange={onValueChange}
                 onBlur={onBlur}
               />
@@ -409,7 +415,6 @@ export function InputSelectField({
                   disabled={disabled || unitDisabled}
                   size={size}
                   hasError={hasError}
-                  describedBy={describedBy}
                   onUnitChange={onUnitChange ?? (() => {})}
                   onBlur={onBlur}
                 />

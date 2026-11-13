@@ -41,7 +41,6 @@ describe('FieldLayout recommendation', () => {
     render(
       <Field.Root id="languages" hint="Supporting text." anatomy hintPosition="below-control">
         <FieldLayout
-          hintPosition="below-control"
           label={<Field.Label>Languages</Field.Label>}
           recommendation={recommendation}
           control={<Input aria-label="Languages control" />}

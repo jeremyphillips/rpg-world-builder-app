@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { Field } from './field.client'
+import { Field, useFieldRootContext } from './field.client'
 import { FieldLayout } from './field-layout'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import type { FieldHintPosition } from './field.variants'
@@ -34,6 +34,42 @@ export interface TextSuggestionsFieldProps {
   ariaLabel?: string
 }
 
+function TextSuggestionsInput({
+  id,
+  size,
+  disabled,
+  placeholder,
+  value,
+  ariaLabel,
+  onChange,
+  onBlur,
+}: {
+  id: string
+  size: React.ComponentProps<typeof Input>['size']
+  disabled: boolean
+  placeholder?: string
+  value: string
+  ariaLabel?: string
+  onChange: React.ChangeEventHandler<HTMLInputElement>
+  onBlur?: () => void
+}) {
+  const { describedBy, hasError } = useFieldRootContext('TextSuggestionsField')
+  return (
+    <Input
+      id={id}
+      size={size}
+      disabled={disabled}
+      placeholder={placeholder}
+      value={value}
+      aria-label={ariaLabel}
+      aria-invalid={hasError || undefined}
+      aria-describedby={describedBy}
+      onChange={onChange}
+      onBlur={onBlur}
+    />
+  )
+}
+
 /** Text input with optional inline advisory suggestions — free entry is always allowed. */
 export function TextSuggestionsField({
   id,
@@ -54,13 +90,8 @@ export function TextSuggestionsField({
   onBlur,
   ariaLabel,
 }: TextSuggestionsFieldProps) {
-  const hintId = `${id}-hint`
   const field = useTextSuggestionsField({ value, onValueChange, onBlur })
-  const hasError = Boolean(error)
   const showSuggestions = suggestions.length > 0 && !field.trimmedInput
-  const describedBy =
-    [hasError ? `${id}-error` : undefined, hint ? hintId : undefined].filter(Boolean).join(' ') ||
-    undefined
   const inputAriaLabel = ariaLabel ?? (label.trim() ? label : undefined)
   const showLabel = Boolean(label.trim())
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
@@ -70,13 +101,13 @@ export function TextSuggestionsField({
       id={id}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       size={size}
       width={rootWidth}
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         chrome={chrome}
         size={size}
         label={
@@ -88,15 +119,13 @@ export function TextSuggestionsField({
         }
         control={
           <div className={cn(fieldAnatomyStackClasses, 'gap-2')}>
-            <Input
+            <TextSuggestionsInput
               id={id}
               size={size}
               disabled={disabled}
               placeholder={placeholder}
               value={field.displayValue}
-              aria-label={inputAriaLabel}
-              aria-invalid={hasError || undefined}
-              aria-describedby={describedBy}
+              ariaLabel={inputAriaLabel}
               onChange={field.handleInputChange}
               onBlur={field.handleInputBlur}
             />

@@ -55,6 +55,7 @@ describe('leap distance fields', () => {
 
     await user.click(screen.getByRole('button', { name: 'Save' }))
     expect(screen.getByText(LEAP_DISTANCE_EXCEEDS_MOVEMENT_MESSAGE)).toBeInTheDocument()
+    expect(screen.queryByText('How far the creature jumps.')).not.toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Movement spent value' })).toHaveTextContent('10')
   })
 

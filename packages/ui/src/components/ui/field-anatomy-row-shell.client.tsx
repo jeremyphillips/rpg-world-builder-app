@@ -74,7 +74,6 @@ export function FieldAnatomyRowShell({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         wrapControl={false}
         chrome={chrome}
         size={size}

@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import type { FieldSize } from './field.client'
+import { useOptionalFieldDescribedBy, type FieldSize } from './field.client'
 import { groupedEndLabelSegmentShellClasses } from './select-compact-trigger.variants'
 import { SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import {
@@ -90,6 +90,8 @@ export function JoinedPairNumberOccupant({
   onValueChange,
   onBlur,
 }: JoinedPairNumberOccupantProps) {
+  const fieldDescribedBy = useOptionalFieldDescribedBy()
+  const resolvedDescribedBy = describedBy ?? fieldDescribedBy
   const displayValue = value ?? ''
 
   return (
@@ -112,7 +114,7 @@ export function JoinedPairNumberOccupant({
           value={displayValue}
           required={required}
           aria-invalid={hasError || undefined}
-          aria-describedby={describedBy}
+          aria-describedby={resolvedDescribedBy}
           onChange={(event) => onValueChange(parseNumberValue(event.target.value))}
           onBlur={onBlur}
           className="rounded-l-md rounded-r-none"
@@ -147,6 +149,8 @@ export function JoinedPairTextStartOccupant({
   onValueChange: (value: string) => void
   onBlur?: () => void
 }) {
+  const fieldDescribedBy = useOptionalFieldDescribedBy()
+  const resolvedDescribedBy = describedBy ?? fieldDescribedBy
   return (
     <>
       <label htmlFor={id} className="sr-only">
@@ -162,7 +166,7 @@ export function JoinedPairTextStartOccupant({
         value={value ?? ''}
         required={required}
         aria-invalid={hasError || undefined}
-        aria-describedby={describedBy}
+        aria-describedby={resolvedDescribedBy}
         onChange={(event) => onValueChange(event.target.value)}
         onBlur={onBlur}
         className={joinedPairStartTextSegmentVariants({ size })}
@@ -195,6 +199,8 @@ export function JoinedPairSelectOccupant({
   onValueChange,
   onBlur,
 }: JoinedPairSelectOccupantProps) {
+  const fieldDescribedBy = useOptionalFieldDescribedBy()
+  const resolvedDescribedBy = describedBy ?? fieldDescribedBy
   const [editingCustom, setEditingCustom] = React.useState(false)
   const [draft, setDraft] = React.useState<number | undefined | null>(null)
   const displayOptions = React.useMemo(() => {
@@ -223,7 +229,7 @@ export function JoinedPairSelectOccupant({
         max={customMax}
         digits={digits}
         hasError={hasError}
-        describedBy={describedBy}
+        describedBy={resolvedDescribedBy}
         onValueChange={(next) => {
           if (next !== undefined && isJoinedPairCustomAmountInBounds(next, customMin, customMax)) {
             setDraft(null)
@@ -278,7 +284,7 @@ export function JoinedPairSelectOccupant({
           sizingLabels={sizingLabels}
           hideCaret={hideCaret}
           aria-invalid={hasError || undefined}
-          aria-describedby={describedBy}
+          aria-describedby={resolvedDescribedBy}
           onBlur={onBlur}
         >
           <SelectValue placeholder={placeholder} />

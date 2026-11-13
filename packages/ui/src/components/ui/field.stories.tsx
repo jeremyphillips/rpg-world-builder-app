@@ -38,9 +38,13 @@ export const WithHint: Story = {
 
 export const HintBelowControl: Story = {
   render: () => (
-    <Field.Root id="name" hint="Legacy placement under the control." anatomy>
+    <Field.Root
+      id="name"
+      hint="Legacy placement under the control."
+      hintPosition="below-control"
+      anatomy
+    >
       <FieldLayout
-        hintPosition="below-control"
         label={<Field.Label>Character name</Field.Label>}
         control={<Input placeholder="Tasha" />}
       />

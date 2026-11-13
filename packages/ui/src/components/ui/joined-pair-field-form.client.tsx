@@ -129,6 +129,7 @@ export function JoinedPairFieldForm({
       id={id}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       width={resolveFieldAnatomyWidth(width, chrome)}
       size={size}
@@ -137,7 +138,6 @@ export function JoinedPairFieldForm({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         wrapControl={false}
         chrome={chrome}
         size={size}

@@ -185,12 +185,16 @@ Centralized in `Field.Root` context:
 
 **Hint vs error.** Hints are guidance; errors are validation. Never encode required-ness as a hint.
 
+Adapters resolve effective hint presentation once. `Field.Root` stores that `hintPosition`. `FieldLayout`, `Field.Hint`, and `aria-describedby` read it. Do not pass a second position into `FieldLayout`.
+
 | `hintPosition`          | Role                                   | When invalid                                   |
 | ----------------------- | -------------------------------------- | ---------------------------------------------- |
 | `below-label` (default) | Description / guidance under the label | Stays visible; error renders under the control |
 | `below-control`         | Supporting text under the control      | Replaced by the field error (same slot)        |
 
-**Hint placement.** `hintPosition`: `below-label` (default) or `below-control`.
+**Who owns what.** Zod and React Hook Form own whether a value is invalid and the message text. `useFieldErrorPresentation` owns whether that message is visible. `resolveFieldHintPresentation` owns hint text. Inside an anatomy row, `resolveRowAwareFieldHintPresentation` forces `below-control` (settings rows keep `below-label`) before the adapter creates `Field.Root`. `Field.Root` owns the stored position, message ids, and `aria-describedby`: a below-label hint stays linked beside the error id; a below-control hint yields to the error id only. `FieldLayout` owns which region renders the hint. `Field.Hint` hides a below-control hint while an error is visible. Fieldset shells (`ChooseCountFieldShell`, chips outside a row) are the other single-position path: one `hintPosition` drives the legend, the message region, and `resolveFieldDescribedBy`.
+
+**Hint placement.** `hintPosition`: `below-label` (default) or `below-control`. Pass it on the field adapter or `Field.Root`, not on `FieldLayout`.
 
 ### Field recommendations
 

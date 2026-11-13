@@ -54,9 +54,8 @@ function ParticipantField({
   width?: 'full' | 'auto' | '1/2' | '1/3'
 }) {
   return (
-    <Field.Root id={id} width={width} anatomy>
+    <Field.Root id={id} width={width} hintPosition="below-control" anatomy>
       <FieldLayout
-        hintPosition="below-control"
         label={<Field.Label>{label}</Field.Label>}
         control={<Input aria-label={label} />}
       />

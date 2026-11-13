@@ -109,6 +109,7 @@ export function JsonField({
       invalid={displayInvalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       width={width}
       size={size}
@@ -116,7 +117,6 @@ export function JsonField({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         label={
           example !== undefined ? (
             <div className="flex items-center justify-between gap-2">

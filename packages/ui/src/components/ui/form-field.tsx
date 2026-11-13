@@ -218,7 +218,6 @@ export function FormField({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         recommendation={recommendation}
         label={labelNode(label, info, required)}
         control={children}
