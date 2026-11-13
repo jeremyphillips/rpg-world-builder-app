@@ -7,6 +7,7 @@ import {
   getAbilityLabel,
   getContentTypeTerm,
   getWeaponModeLabel,
+  isPrimarySpellcastingAction,
   MEASURED_RANGE_FEET,
   REACH_FEET,
   WEAPON_MODES,
@@ -701,7 +702,7 @@ function monsterActionSpellMechanics(input: {
           currentActionId={input.action.id}
           sourceActionId={input.action.id}
           onBlocked={input.onCastingSourceBlocked}
-          profile="primary"
+          profile={isPrimarySpellcastingAction(input.action) ? 'primary' : 'shared'}
           preview="save-dc"
         />
       ),
