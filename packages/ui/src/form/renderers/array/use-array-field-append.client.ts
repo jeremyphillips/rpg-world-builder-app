@@ -10,7 +10,9 @@
 import * as React from 'react'
 import type { UseFieldArrayAppend, UseFieldArrayReturn } from 'react-hook-form'
 
+import type { ArrayAddMenuPresentationMap } from '../../config/array/array-add-menu.lib'
 import { buildArrayAddMenuItems } from '../../config/array/array-add-menu.lib'
+import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { resolveArrayAddAction } from '../../config/array/array-item-config.lib'
 import type { ValidationSessionExpandKey } from '../../errors'
 import type { ArrayConfig } from '../../field-config'
@@ -101,11 +103,16 @@ export function useArrayFieldAppend({
   )
 
   const addActionMenu = resolveArrayAddAction(config)?.menu
+  const menuContextValues = useDependsOnValues(addActionMenu?.contextDependsOn ?? [], fullName)
 
   const addActionMenuItems = React.useMemo(() => {
     if (!addActionMenu) return []
-    return buildArrayAddMenuItems(addActionMenu, watchedItems ?? [])
-  }, [addActionMenu, watchedItems])
+    let presentation: ArrayAddMenuPresentationMap | undefined
+    if (addActionMenu.presentationWhen) {
+      presentation = addActionMenu.presentationWhen(menuContextValues, watchedItems ?? [])
+    }
+    return buildArrayAddMenuItems(addActionMenu, watchedItems ?? [], { presentation })
+  }, [addActionMenu, menuContextValues, watchedItems])
 
   return { appendItem, appendItemWithDefaults, appendFromAddMenu, addActionMenuItems }
 }

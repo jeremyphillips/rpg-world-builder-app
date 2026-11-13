@@ -50,6 +50,11 @@ import type { SurfaceConfig } from '../components/ui/visual-vocabulary.types'
 import type { FieldGroupChrome } from '../components/ui/field-group-chrome.variants'
 import type { FieldGroupDisclosure } from '../components/ui/field-group-disclosure.types'
 import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
+
+export type {
+  ArrayAddMenuConfig,
+  ArrayAddMenuPresentationMap,
+} from './config/array/array-add-menu.lib'
 import type { ArrayItemShellRenderProps } from './config/array/array-item-shell-render.types'
 import {
   DEFAULT_FORM_COLUMNS_COLLAPSE_ORDER,

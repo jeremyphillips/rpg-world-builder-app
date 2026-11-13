@@ -61,10 +61,30 @@ describe('array-add-menu.lib', () => {
     expect(buildArrayAddMenuItems(menu, [{ grantType: 'movement' }])).toEqual([
       expect.objectContaining({
         id: 'movement-bonus',
-        metadata: 'Increase speed',
         disabled: true,
         note: 'Already added',
       }),
     ])
+  })
+
+  it('merges dynamic presentation when duplicate policy allows', () => {
+    const menu = {
+      groups: [{ id: 'g', label: 'G' }],
+      items: [
+        {
+          id: 'row',
+          label: 'Row',
+          appendDefaults: { kind: 'a' },
+        },
+      ],
+    }
+    const built = buildArrayAddMenuItems(menu, [], {
+      presentation: { row: { disabled: true, note: 'Only available for Creature targets' } },
+    })
+    expect(built[0]).toMatchObject({
+      disabled: true,
+      note: 'Only available for Creature targets',
+    })
+    expect(built[0]?.metadata).toBeUndefined()
   })
 })

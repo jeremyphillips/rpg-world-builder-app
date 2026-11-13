@@ -55,6 +55,28 @@ describe('resolutionFormSchema', () => {
     )
   })
 
+  it('rejects creature-only requirements on object targets at the requirement row', () => {
+    const defaults = createDefaultAttackResolutionFormValues()
+    const result = resolutionFormSchema.safeParse({
+      ...defaults,
+      target: {
+        ...defaults.target!,
+        kind: 'object',
+        requirements: [{ kind: 'size', bound: 'large', comparison: 'or-smaller' }],
+      },
+    })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['target', 'requirements', 0],
+        message: expect.stringContaining('Creature size only applies to creatures'),
+      }),
+    )
+  })
+
   it('requires target distance when proximity is distance', () => {
     const defaults = createDefaultAttackResolutionFormValues()
     const result = resolutionFormSchema.safeParse({

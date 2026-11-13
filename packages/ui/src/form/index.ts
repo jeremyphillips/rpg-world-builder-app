@@ -255,6 +255,8 @@ export {
   type DependentConfig,
   type DependentDependentsConfig,
   type ArrayAddActionConfig,
+  type ArrayAddMenuConfig,
+  type ArrayAddMenuPresentationMap,
   type ArrayRelationshipAddAction,
   type ArrayItemConfig,
   type ArrayItemHeaderVisibility,

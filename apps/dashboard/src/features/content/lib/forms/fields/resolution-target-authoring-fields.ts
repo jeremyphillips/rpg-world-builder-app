@@ -10,13 +10,17 @@ import {
   getCreatureSizeLabel,
   getEffectConditionLabel,
   getResolutionTargetKindLabel,
+  readRequirementCompatibilityInput,
   resolutionTargetCountSelectOptions,
+  resolveRequirementAddMenuDisabledNote,
   type ResolutionTarget,
   type ResolutionTargetKind,
   type ResolutionTargetProximity,
 } from '@rpg/contracts'
 import {
   combineFieldVisibilityAll,
+  type ArrayAddMenuConfig,
+  type ArrayAddMenuPresentationMap,
   type ArrayConfig,
   type FieldChrome,
   type FieldOption,
@@ -146,7 +150,6 @@ export function formatResolutionRequirementSummary(
 function menuItem(
   id: string,
   label: string,
-  description: string,
   searchTerms: readonly string[],
   appendDefaults: Record<string, unknown>,
   blockedBy: readonly string[],
@@ -154,7 +157,6 @@ function menuItem(
   return {
     id,
     label,
-    description,
     searchTerms,
     appendDefaults,
     duplicatePolicy: 'block' as const,
@@ -163,7 +165,7 @@ function menuItem(
 }
 
 /** Natural-language add menu. Adding a row does not fill in a placeholder value. */
-export function buildResolutionRequirementAddMenu() {
+export function buildResolutionRequirementAddMenu(): ArrayAddMenuConfig {
   return {
     groups: [{ id: 'requirement', label: 'Requirement' }],
     enableSearch: true,
@@ -171,31 +173,27 @@ export function buildResolutionRequirementAddMenu() {
       menuItem(
         'sight-actor',
         'You can see it',
-        'Dominate Mind: one creature you can see',
-        ['sight', 'see', 'dominate'],
+        ['sight', 'see', 'dominate', 'dominate mind'],
         { kind: 'sight', who: 'actor' },
         ['sight'],
       ),
       menuItem(
         'sight-target',
         'It can see you',
-        'Horrific Visage: a creature that can see you',
-        ['sight', 'see', 'visage'],
+        ['sight', 'see', 'visage', 'horrific'],
         { kind: 'sight', who: 'target' },
         ['sight'],
       ),
       menuItem(
         'sight-both',
-        'You can see each other',
-        'You can see it, and it can see you',
-        ['sight', 'see'],
+        'You and the target can see each other',
+        ['sight', 'see', 'mutual'],
         { kind: 'sight', who: 'both' },
         ['sight'],
       ),
       menuItem(
         'size',
         'Creature size',
-        'Constrict: one Large or smaller creature',
         ['size', 'large', 'smaller', 'constrict'],
         { kind: 'size', comparison: 'or-smaller' },
         ['size'],
@@ -203,36 +201,80 @@ export function buildResolutionRequirementAddMenu() {
       menuItem(
         'creature-type',
         'Creature type',
-        'Possession: one Humanoid',
         ['type', 'humanoid', 'undead', 'possession'],
         { kind: 'creature-type', mode: 'include' },
         ['creature-type'],
       ),
       menuItem(
         'condition',
-        'Has a condition',
-        'Trample: that has the Prone condition',
-        ['condition', 'prone', 'trample'],
+        'Condition',
+        ['condition', 'prone', 'trample', 'has'],
         { kind: 'condition', presence: 'has' },
         ['condition', 'any-of'],
       ),
-      menuItem(
-        'willing',
-        'Willing',
-        'Up to three willing creatures',
-        ['willing'],
-        { kind: 'willing' },
-        ['willing', 'any-of'],
-      ),
+      menuItem('willing', 'Willing', ['willing'], { kind: 'willing' }, ['willing', 'any-of']),
       menuItem(
         'written',
-        'Something else',
-        'A written clause, such as "that is a demon"',
-        ['written', 'demon', 'else'],
+        'Custom requirement',
+        ['written', 'custom', 'demon', 'clause'],
         { kind: 'written' },
         ['written'],
       ),
     ],
+  }
+}
+
+/** Parent-relative sibling of the requirements array — resolves to `{prefix}.kind`. */
+const REQUIREMENT_TARGET_KIND_DEPENDS_ON = '../kind' as const
+
+function resolveTargetKindFromWatched(
+  watched: Record<string, unknown>,
+  dependsOnKey: string | undefined,
+  fixedTargetKind: ResolutionTargetKind | undefined,
+): ResolutionTargetKind | undefined {
+  if (fixedTargetKind) return fixedTargetKind
+  if (!dependsOnKey) return undefined
+  const kind = watched[dependsOnKey]
+  if (kind === 'creature' || kind === 'object' || kind === 'creature-or-object') {
+    return kind
+  }
+  return undefined
+}
+
+function attachRequirementMenuPresentation(
+  menu: ArrayAddMenuConfig,
+  options: {
+    watchTargetKind?: boolean
+    fixedTargetKind?: ResolutionTargetKind
+  },
+): ArrayAddMenuConfig {
+  const dependsOnKey = options.watchTargetKind ? REQUIREMENT_TARGET_KIND_DEPENDS_ON : undefined
+  const contextDependsOn = dependsOnKey ? [dependsOnKey] : []
+  return {
+    ...menu,
+    contextDependsOn,
+    presentationWhen: (watched, items) => {
+      const targetKind = resolveTargetKindFromWatched(
+        watched,
+        dependsOnKey,
+        options.fixedTargetKind,
+      )
+      const presentation: ArrayAddMenuPresentationMap = {}
+      for (const item of menu.items) {
+        const appendInput = readRequirementCompatibilityInput(item.appendDefaults)
+        if (!appendInput) continue
+        const note = resolveRequirementAddMenuDisabledNote({
+          existingRows: items,
+          appendInput,
+          targetKind,
+          duplicateBlocked: false,
+        })
+        if (note) {
+          presentation[item.id] = { disabled: true, note }
+        }
+      }
+      return presentation
+    },
   }
 }
 
@@ -424,6 +466,8 @@ function requirementArray(
     previewPath?: string
     hint?: string
     fieldChrome?: FieldChrome
+    watchTargetKind?: boolean
+    fixedTargetKind?: ResolutionTargetKind
   },
 ): ArrayConfig {
   const labelFor = creatureTypeLabelFor(creatureTypeOptions)
@@ -439,7 +483,13 @@ function requirementArray(
     hint: options?.hint ?? REQUIREMENT_STAT_BLOCK_HINT,
     ...(options?.fieldChrome ? { fieldChrome: options.fieldChrome } : {}),
     emptyState: 'none',
-    addAction: { label: 'Add a requirement', menu: buildResolutionRequirementAddMenu() },
+    addAction: {
+      label: 'Add a requirement',
+      menu: attachRequirementMenuPresentation(buildResolutionRequirementAddMenu(), {
+        watchTargetKind: options?.watchTargetKind,
+        fixedTargetKind: options?.fixedTargetKind,
+      }),
+    },
     item: {
       collapsible: true,
       resolveCollapsible: resolveResolutionRequirementCollapsible,
@@ -563,6 +613,7 @@ export function resolutionTargetAuthoringFields(options: {
     }),
     requirementArray(requirementsPath, creatureTypeOptions, options.visibility, {
       fieldChrome: options.requirementsFieldChrome,
+      watchTargetKind: true,
     }),
   ]
 }
@@ -587,6 +638,7 @@ export function resolutionOccupantRequirementsFields(options: {
       label: 'Requirements',
       hint: options.hint,
       fieldChrome: options.requirementsFieldChrome,
+      fixedTargetKind: 'creature',
     },
   )
   if (options.fieldsOnly) {

@@ -86,12 +86,12 @@ describe('resolution target requirements', () => {
     ).toBe(true)
   })
 
-  it('keeps creature requirements visible in data but rejects them unless the kind is creature', () => {
+  it('keeps incompatible requirements in data but rejects them for object or either targets', () => {
     const parsed = target([{ kind: 'size', bound: 'large', comparison: 'or-smaller' }], 'object')
     expect(parsed.success).toBe(false)
     if (!parsed.success) {
       expect(parsed.error.issues.map((issue) => issue.message)).toContain(
-        resolutionTargetRequirementValidationMessages.creatureOnly(),
+        'Creature size only applies to creatures. Select Creature targeting or remove this requirement.',
       )
       expect(parsed.error.issues.some((issue) => issue.path.join('.') === 'requirements.0')).toBe(
         true,
@@ -108,5 +108,7 @@ describe('resolution target requirements', () => {
       ).success,
     ).toBe(true)
     expect(target([{ kind: 'willing' }], 'creature-or-object').success).toBe(false)
+    expect(target([{ kind: 'sight', who: 'target' }], 'creature-or-object').success).toBe(false)
+    expect(target([{ kind: 'sight', who: 'actor' }], 'creature-or-object').success).toBe(true)
   })
 })

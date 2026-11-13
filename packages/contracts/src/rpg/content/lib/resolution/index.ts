@@ -83,6 +83,32 @@ export {
   type ResolutionRequirementRowTitleOptions,
 } from './format-requirement-row-title'
 export {
+  collectRequirementListIssues,
+  formatRequirementTargetMenuNote,
+  getRequirementAllowedPopulations,
+  getRequirementAppendListConflict,
+  getRequirementTargetIncompatibility,
+  isRequirementCompatibleWithTargetKind,
+  readRequirementCompatibilityInput,
+  refineRequirementRowsForTargetKind,
+  resolveRequirementAddMenuDisabledNote,
+  type RequirementCompatibilityInput,
+  type RequirementListIssueCode,
+  type RequirementPopulation,
+  type RequirementTargetIncompatibilityReason,
+} from './requirement-target-compatibility'
+export {
+  formatRequirementTargetIncompatibilityMessage,
+  type RequirementTargetMessageTone,
+} from './requirement-target-messages'
+export {
+  refineRequirementsForTargetKind,
+  resolutionTargetRequirementSchema,
+  resolutionTargetRequirementsSchema,
+  resolutionTargetRequirementValidationMessages,
+  type ResolutionTargetRequirement,
+} from './target-requirements'
+export {
   formatEffectResolutionSummary,
   formatEffectResolutionSummarySections,
   formatResolutionEffectSummarySections,

@@ -7,6 +7,14 @@ import { creatureTypeSchema } from '../../../vocab/creature-type'
 import { effectConditionSchema } from '../../../vocab/effect-condition'
 import type { ResolutionTargetKind } from '../../../vocab/resolution'
 
+import {
+  collectRequirementListIssues,
+  getRequirementTargetIncompatibility,
+  readRequirementCompatibilityInput,
+  type RequirementListIssueCode,
+} from './requirement-target-compatibility'
+import { formatRequirementTargetIncompatibilityMessage } from './requirement-target-messages'
+
 /**
  * Who may be chosen. Rows combine with AND. Values inside one row do not:
  *
@@ -52,14 +60,6 @@ export const resolutionTargetRequirementValidationMessages = {
     () => 'Write a qualifying clause, such as "that is a demon."',
   ),
 } as const
-
-const CREATURE_ONLY_REQUIREMENT_KINDS = new Set([
-  'size',
-  'creature-type',
-  'condition',
-  'willing',
-  'any-of',
-])
 
 const sightRequirementSchema = z
   .object({
@@ -155,52 +155,52 @@ function refineUniqueIds(ids: readonly string[], ctx: z.RefinementCtx, path: Pro
   addCustomRefinementIssue(ctx, resolutionTargetRequirementValidationMessages.duplicateIds(), path)
 }
 
+function listIssueMessage(code: RequirementListIssueCode): string {
+  switch (code) {
+    case 'duplicate-kind':
+      return resolutionTargetRequirementValidationMessages.duplicateKind()
+    case 'willing-with-any-of':
+      return resolutionTargetRequirementValidationMessages.willingWithAnyOf()
+    case 'condition-with-any-of':
+      return resolutionTargetRequirementValidationMessages.conditionWithAnyOf()
+    default: {
+      const _exhaustive: never = code
+      return _exhaustive
+    }
+  }
+}
+
 function refineRequirementList(
   rows: readonly ResolutionTargetRequirement[],
   ctx: z.RefinementCtx,
 ): void {
-  const seen = new Map<ResolutionTargetRequirement['kind'], number>()
-  rows.forEach((row, index) => {
-    if (seen.has(row.kind)) {
-      addCustomRefinementIssue(ctx, resolutionTargetRequirementValidationMessages.duplicateKind(), [
-        index,
-      ])
-      return
-    }
-    seen.set(row.kind, index)
-  })
-
-  const anyOfIndex = seen.get('any-of')
-  if (anyOfIndex === undefined) return
-  if (seen.has('willing')) {
-    addCustomRefinementIssue(
-      ctx,
-      resolutionTargetRequirementValidationMessages.willingWithAnyOf(),
-      [anyOfIndex],
-    )
-  }
-  if (seen.has('condition')) {
-    addCustomRefinementIssue(
-      ctx,
-      resolutionTargetRequirementValidationMessages.conditionWithAnyOf(),
-      [anyOfIndex],
-    )
+  for (const issue of collectRequirementListIssues(rows)) {
+    addCustomRefinementIssue(ctx, listIssueMessage(issue.code), [issue.index])
   }
 }
 
-/** Creature-specific rows stay stored when the kind is not creature; publish rejects them. */
+function refinementMessageForRow(
+  row: ResolutionTargetRequirement,
+  targetKind: ResolutionTargetKind,
+): string | undefined {
+  const input = readRequirementCompatibilityInput(row)
+  if (!input) return undefined
+  const incompatibility = getRequirementTargetIncompatibility(input, targetKind)
+  if (!incompatibility) return undefined
+  return formatRequirementTargetIncompatibilityMessage(incompatibility, 'validation')
+}
+
+/** Incompatible rows stay stored when the kind changes; publish rejects them. */
 export function refineRequirementsForTargetKind(
-  kind: ResolutionTargetKind,
+  kind: ResolutionTargetKind | undefined,
   requirements: readonly ResolutionTargetRequirement[] | undefined,
   ctx: z.RefinementCtx,
   pathPrefix: (string | number)[] = ['requirements'],
 ): void {
-  if (kind === 'creature' || !requirements) return
+  if (!kind || !requirements) return
   requirements.forEach((row, index) => {
-    if (!CREATURE_ONLY_REQUIREMENT_KINDS.has(row.kind)) return
-    addCustomRefinementIssue(ctx, resolutionTargetRequirementValidationMessages.creatureOnly(), [
-      ...pathPrefix,
-      index,
-    ])
+    const message = refinementMessageForRow(row, kind)
+    if (!message) return
+    addCustomRefinementIssue(ctx, message, [...pathPrefix, index])
   })
 }

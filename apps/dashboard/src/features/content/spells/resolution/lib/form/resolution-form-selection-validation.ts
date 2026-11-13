@@ -12,6 +12,7 @@ import { SPELL_AREA_GEOMETRY_NONE } from '../../../lib/spell-form-labels'
 import { resolutionFormValidationMessages } from './resolution-form-messages'
 import type { ResolutionFormValues } from './resolution-form-schema'
 import { validateResolutionFormOutcomes } from './resolution-form-outcome-validation'
+import { validateResolutionFormTargetRequirements } from './resolution-form-target-requirements-validation'
 
 function validateResolutionFormMethodFields(
   values: ResolutionFormValues,
@@ -108,4 +109,5 @@ export function validateResolutionFormSelection(
   validateResolutionFormPointOrigin(values, ctx)
   validateResolutionFormProjectileCount(values, ctx)
   validateResolutionFormOutcomes(values, ctx)
+  validateResolutionFormTargetRequirements(values, ctx)
 }

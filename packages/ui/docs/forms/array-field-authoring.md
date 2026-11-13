@@ -263,6 +263,10 @@ start from an empty object. Prefer explicit `appendDefaults` over per-field
 `defaultValue` when only the first row should be pre-filled — see
 **`appendDefaults` vs form `defaultValues`** above.
 
+Optional `contextDependsOn` paths and `presentationWhen(watched, items)` refresh
+menu item `disabled` / `note` when watched form values change (alongside duplicate
+policy). Keep `presentationWhen` domain-free — callers map business rules to notes.
+
 ## Nested arrays
 
 `fields` may contain nested `kind: 'array'` items. Names cascade:

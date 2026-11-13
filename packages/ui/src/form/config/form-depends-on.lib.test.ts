@@ -30,4 +30,13 @@ describe('resolveDependsOnWatchName', () => {
   it('returns the field path when parent hops exceed namePrefix depth', () => {
     expect(resolveDependsOnWatchName('../../../../level', 'features.0.grants.0')).toBe('level')
   })
+
+  it('resolves target kind from nested monster action requirement arrays', () => {
+    expect(resolveDependsOnWatchName('../kind', 'actions.0.resolution.target.requirements')).toBe(
+      'actions.0.resolution.target.kind',
+    )
+    expect(resolveDependsOnWatchName('../kind', 'resolution.target.requirements')).toBe(
+      'resolution.target.kind',
+    )
+  })
 })

@@ -23,10 +23,20 @@ export type ArrayAddMenuItemConfig = {
   duplicatePolicy?: ArrayAddMenuDuplicatePolicy
 }
 
+export type ArrayAddMenuPresentationMap = Partial<
+  Record<string, { disabled?: boolean; note?: string }>
+>
+
 export type ArrayAddMenuConfig = {
   groups: { id: string; label: string }[]
   items: ArrayAddMenuItemConfig[]
   enableSearch?: boolean
+  /** Watched form paths used to refresh menu item presentation. */
+  contextDependsOn?: readonly string[]
+  presentationWhen?: (
+    watched: Record<string, unknown>,
+    items: unknown[],
+  ) => ArrayAddMenuPresentationMap | undefined
 }
 
 export function resolveArrayAddMenuAppendDefaults(
@@ -54,9 +64,15 @@ export function resolveArrayAddMenuItemPresentation(
 export function buildArrayAddMenuItems(
   addActionMenu: ArrayAddMenuConfig,
   currentItems: unknown[],
+  context?: {
+    presentation?: ArrayAddMenuPresentationMap
+  },
 ): ButtonDropdownItem[] {
   return addActionMenu.items.map((item) => {
     const presentation = resolveArrayAddMenuItemPresentation(item, currentItems)
+    const dynamic = context?.presentation?.[item.id]
+    const disabled = presentation.disabled || Boolean(dynamic?.disabled)
+    const note = presentation.disabled ? presentation.note : (dynamic?.note ?? presentation.note)
     return {
       id: item.id,
       label: item.label,
@@ -65,8 +81,8 @@ export function buildArrayAddMenuItems(
       searchTerms: item.searchTerms,
       aliases: item.aliases,
       search: item.search,
-      disabled: presentation.disabled,
-      note: presentation.note,
+      disabled,
+      ...(note !== undefined ? { note } : {}),
     }
   })
 }
