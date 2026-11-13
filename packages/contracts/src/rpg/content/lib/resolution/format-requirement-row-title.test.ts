@@ -17,11 +17,9 @@ describe('formatResolutionRequirementRowTitle', () => {
     expect(formatResolutionRequirementRowTitle({ kind: 'condition', presence: 'has' })).toBe(
       'Condition',
     )
-    expect(formatResolutionRequirementRowTitle({ kind: 'any-of' })).toBe(
-      'Willing or has a condition',
-    )
+    expect(formatResolutionRequirementRowTitle({ kind: 'any-of' })).toBe('Condition')
     expect(formatResolutionRequirementRowTitle({ kind: 'any-of', willing: false })).toBe(
-      'Willing or has a condition',
+      'Condition',
     )
     expect(formatResolutionRequirementRowTitle({ kind: 'written', text: '  ' })).toBe(
       'Custom requirement',

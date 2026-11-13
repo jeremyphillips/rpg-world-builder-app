@@ -88,6 +88,21 @@ function whenKind(kind: string): FieldVisibility {
   }
 }
 
+function whenConditionRequirementFamily(): FieldVisibility {
+  return {
+    dependsOn: ['kind'],
+    visibleWhen: (values) => values.kind === 'condition' || values.kind === 'any-of',
+  }
+}
+
+function whenConditionAllowsWillingAlternative(): FieldVisibility {
+  return {
+    dependsOn: ['kind', 'presence'],
+    visibleWhen: (values) =>
+      values.kind === 'any-of' || (values.kind === 'condition' && values.presence !== 'lacks'),
+  }
+}
+
 function applyFieldVisibility<T extends { visibility?: FieldVisibility }>(
   item: T,
   visibility?: FieldVisibility,
@@ -208,14 +223,6 @@ export function buildResolutionRequirementAddMenu() {
         ['willing'],
         { kind: 'willing' },
         ['willing', 'any-of'],
-      ),
-      menuItem(
-        'any-of',
-        'Willing or has a condition',
-        'Vampire Bite: willing, or Grappled, Incapacitated, or Restrained',
-        ['willing', 'vampire', 'grappled', 'bite'],
-        { kind: 'any-of' },
-        ['any-of', 'willing', 'condition'],
       ),
       menuItem(
         'written',
@@ -464,7 +471,16 @@ function requirementArray(
           { value: 'lacks', label: "Doesn't have" },
         ],
         defaultValue: 'has',
-        visibility: whenKind('condition'),
+        visibility: whenConditionRequirementFamily(),
+      },
+      {
+        type: 'combobox',
+        name: 'conditionIds',
+        label: 'Which ones',
+        noun: { singular: 'condition', plural: 'conditions' },
+        multiple: true,
+        options: conditionOptions,
+        visibility: whenKind('any-of'),
       },
       {
         type: 'combobox',
@@ -476,7 +492,7 @@ function requirementArray(
         optionsResolve: {
           dependsOn: ['kind'],
           optionsWhen: (values) =>
-            values.kind === 'condition' ? conditionOptions : [...creatureTypeOptions],
+            values.kind === 'creature-type' ? [...creatureTypeOptions] : conditionOptions,
         },
         visibility: {
           dependsOn: ['kind'],
@@ -484,18 +500,11 @@ function requirementArray(
         },
       },
       {
-        type: 'switch',
+        type: 'checkbox',
         name: 'willing',
-        label: 'Willing',
-        visibility: whenKind('any-of'),
-      },
-      {
-        type: 'chips',
-        name: 'conditionIds',
-        label: 'Conditions',
-        noun: { singular: 'condition', plural: 'conditions' },
-        options: conditionOptions,
-        visibility: whenKind('any-of'),
+        label: 'Also allow willing creatures',
+        hint: 'Willing creatures qualify even without any of the selected conditions.',
+        visibility: whenConditionAllowsWillingAlternative(),
       },
       {
         type: 'text',

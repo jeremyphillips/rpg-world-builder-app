@@ -1,6 +1,8 @@
 import { applyResolutionStructuralCleanup } from '@rpg/contracts'
 import type { FormValueSync } from '@rpg/ui/form'
 
+import { buildResolutionTargetRequirementValueSyncs } from '../../../../lib/forms/fields/resolution-target-requirement-form-sync.lib'
+
 import {
   resolutionFormToSelectionContext,
   selectionCleanupPatchToFormPatch,
@@ -53,7 +55,13 @@ function applyDefaultOutcomesWhenMissing(
 }
 
 /** Pass to `<Form valueSyncs={…}>` on spell create/edit routes. */
+const resolutionRequirementPaths = [
+  `${RESOLUTION_FIELD_NAME}.target.requirements`,
+  `${RESOLUTION_FIELD_NAME}.occupantRequirements`,
+] as const
+
 export const resolutionFormValueSyncs: FormValueSync[] = [
+  ...buildResolutionTargetRequirementValueSyncs(resolutionRequirementPaths),
   {
     dependsOn: [...RESOLUTION_SYNC_DEPENDS_ON],
     apply: (values, changedKeys) => {

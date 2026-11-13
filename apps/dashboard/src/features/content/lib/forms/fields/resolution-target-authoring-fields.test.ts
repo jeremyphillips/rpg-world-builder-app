@@ -127,6 +127,7 @@ describe('resolution target authoring fields', () => {
     expect(creatureType?.appendDefaults).toEqual({ kind: 'creature-type', mode: 'include' })
     expect(condition?.appendDefaults).toEqual({ kind: 'condition', presence: 'has' })
     expect(condition?.isDuplicate?.([{ kind: 'any-of' }])).toBe(true)
+    expect(menu.items.some((item) => item.id === 'any-of')).toBe(false)
   })
 
   it('disables disclosure when a requirement row has no editable fields', () => {

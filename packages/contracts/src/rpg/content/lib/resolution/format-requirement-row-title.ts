@@ -16,7 +16,7 @@ const INCOMPLETE_LABELS: Record<ResolutionTargetRequirement['kind'], string> = {
   'creature-type': 'Creature type',
   condition: 'Condition',
   willing: 'Willing',
-  'any-of': 'Willing or has a condition',
+  'any-of': 'Condition',
   written: 'Custom requirement',
 }
 
