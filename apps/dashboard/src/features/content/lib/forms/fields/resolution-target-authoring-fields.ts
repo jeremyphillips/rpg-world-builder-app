@@ -48,8 +48,37 @@ const WRITTEN_CLAUSE_HINT = 'A full clause, such as "that is a demon."'
 const SIZE_COMPARISON_OPTIONS = [
   { value: 'or-smaller', label: 'or smaller' },
   { value: 'or-larger', label: 'or larger' },
-  { value: 'only', label: 'exactly this size' },
+  { value: 'only', label: 'only' },
 ] as const
+
+function sizeRequirementRow(sizeOptions: readonly FieldOption[]): FormItem {
+  return {
+    kind: 'row',
+    heading: { label: 'Eligible sizes' },
+    visibility: whenKind('size'),
+    spacing: 'compact',
+    fields: [
+      {
+        type: 'select',
+        name: 'bound',
+        label: 'Size',
+        labelVisibility: 'srOnly',
+        placeholder: 'Choose a size...',
+        options: [...sizeOptions],
+        width: 'auto',
+      },
+      {
+        type: 'select',
+        name: 'comparison',
+        label: 'Size limit',
+        labelVisibility: 'srOnly',
+        defaultValue: 'or-smaller',
+        options: [...SIZE_COMPARISON_OPTIONS],
+        width: 'auto',
+      },
+    ],
+  }
+}
 
 function whenKind(kind: string): FieldVisibility {
   return {
@@ -235,7 +264,7 @@ export function buildResolutionRequirementAddMenu() {
         'Size limit',
         'Constrict: one Large or smaller creature',
         ['size', 'large', 'smaller', 'constrict'],
-        { kind: 'size' },
+        { kind: 'size', comparison: 'or-smaller' },
         ['size'],
       ),
       menuItem(
@@ -496,20 +525,7 @@ function requirementArray(
       },
     },
     fields: [
-      {
-        type: 'select',
-        name: 'bound',
-        label: 'Size',
-        options: sizeOptions,
-        visibility: whenKind('size'),
-      },
-      {
-        type: 'select',
-        name: 'comparison',
-        label: 'Size limit',
-        options: [...SIZE_COMPARISON_OPTIONS],
-        visibility: whenKind('size'),
-      },
+      sizeRequirementRow(sizeOptions),
       {
         type: 'select',
         name: 'mode',

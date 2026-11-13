@@ -114,7 +114,7 @@ describe('resolution target authoring fields', () => {
     const size = menu.items.find((item) => item.id === 'size')
     const condition = menu.items.find((item) => item.id === 'condition')
     expect(sight?.isDuplicate?.([{ kind: 'sight', who: 'actor' }])).toBe(true)
-    expect(size?.appendDefaults).toEqual({ kind: 'size' })
+    expect(size?.appendDefaults).toEqual({ kind: 'size', comparison: 'or-smaller' })
     const creatureType = menu.items.find((item) => item.id === 'creature-type')
     expect(creatureType?.appendDefaults).toEqual({ kind: 'creature-type', mode: 'include' })
     expect(condition?.appendDefaults).toEqual({ kind: 'condition', presence: 'has' })

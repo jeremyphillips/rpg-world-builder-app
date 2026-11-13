@@ -56,11 +56,13 @@ describe('resolution target authoring form', () => {
     await user.click(screen.getByRole('button', { name: 'Add a requirement' }))
     await user.click(screen.getByRole('menuitem', { name: /Size limit/i }))
 
+    expect(screen.getByText('Eligible sizes')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Size' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Size limit' })).toHaveTextContent('or smaller')
 
     await user.click(screen.getByRole('button', { name: 'Save' }))
     const requirements = onSubmit.mock.calls[0]?.[0]?.resolution.target.requirements
-    expect(requirements).toEqual([{ kind: 'size', comparison: '', bound: '' }])
+    expect(requirements).toEqual([{ kind: 'size', comparison: 'or-smaller', bound: '' }])
   })
 
   it('omits the bundled reach or range select when includeProximityKindSelect is false', () => {
