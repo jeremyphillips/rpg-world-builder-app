@@ -50,9 +50,7 @@ describe('resolution target authoring form', () => {
       />,
     )
 
-    expect(
-      screen.getByText('Shown on the stat block. Not checked during play yet.'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Optional restrictions on who can be targeted.')).toBeInTheDocument()
     expect(screen.getByText('One creature within 5 feet', { exact: false })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Add a requirement' }))
@@ -63,5 +61,32 @@ describe('resolution target authoring form', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
     const requirements = onSubmit.mock.calls[0]?.[0]?.resolution.target.requirements
     expect(requirements).toEqual([{ kind: 'size', comparison: '', bound: '' }])
+  })
+
+  it('omits the empty requirements well and hides disclosure for willing rows', () => {
+    render(
+      <Form
+        schema={schema}
+        fields={resolutionTargetAuthoringFields({
+          prefix: 'resolution.target',
+          creatureTypeOptions: [{ value: 'humanoid', label: 'Humanoid' }],
+        })}
+        defaultValues={{
+          resolution: {
+            target: {
+              count: 1,
+              kind: 'creature',
+              proximity: { kind: 'distance', distance: { value: 5, unit: 'ft' } },
+              requirements: [{ kind: 'willing' }],
+            },
+          },
+        }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.queryByText(/No requirement added/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Expand requirement/i })).not.toBeInTheDocument()
   })
 })

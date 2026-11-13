@@ -149,26 +149,32 @@ export function useArrayFieldRendererState({
   })
 
   const itemProps = React.useCallback(
-    (rhfField: Record<string, unknown>, index: number) => ({
-      config,
-      idPrefix,
-      fullName,
-      index,
-      itemId: resolveFieldArrayRowKey(rhfField, config.keyName),
-      legend: itemLegend,
-      itemBodyStackClasses,
-      canRemove,
-      showDefaultItemRemove,
-      showDragHandle: reorderConfigured,
-      fieldsLength: fields.length,
-      collapsible,
-      variant,
-      collapsedIds,
-      onToggleCollapse: toggleCollapse,
-      onRemove: () => {
-        remove(index)
-      },
-    }),
+    (rhfField: Record<string, unknown>, index: number) => {
+      const itemValues = (getValues(`${fullName}.${index}`) ?? {}) as Record<string, unknown>
+      const rowCollapsible =
+        collapsible &&
+        (itemConfig.resolveCollapsible ? itemConfig.resolveCollapsible(itemValues, index) : true)
+      return {
+        config,
+        idPrefix,
+        fullName,
+        index,
+        itemId: resolveFieldArrayRowKey(rhfField, config.keyName),
+        legend: itemLegend,
+        itemBodyStackClasses,
+        canRemove,
+        showDefaultItemRemove,
+        showDragHandle: reorderConfigured,
+        fieldsLength: fields.length,
+        collapsible: rowCollapsible,
+        variant,
+        collapsedIds,
+        onToggleCollapse: toggleCollapse,
+        onRemove: () => {
+          remove(index)
+        },
+      }
+    },
     [
       canRemove,
       showDefaultItemRemove,
@@ -177,11 +183,13 @@ export function useArrayFieldRendererState({
       config,
       fields.length,
       fullName,
+      getValues,
       idPrefix,
       itemBodyStackClasses,
-      sectionLabel,
+      itemConfig,
       remove,
       reorderConfigured,
+      sectionLabel,
       toggleCollapse,
       variant,
     ],

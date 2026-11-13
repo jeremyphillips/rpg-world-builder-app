@@ -5,10 +5,28 @@ import {
   formatTargetHeadNoun,
   formatTargetQualifyingClauses,
   formatTargetSightPhrase,
+  resolutionTargetCountSelectOptions,
 } from './format-target-composition'
 
 const withinFive = { kind: 'distance' as const, distance: { value: 5, unit: 'ft' as const } }
 const withinThirty = { kind: 'distance' as const, distance: { value: 30, unit: 'ft' as const } }
+
+describe('resolution target count select options', () => {
+  it('lists one through ten as word labels', () => {
+    expect(resolutionTargetCountSelectOptions()).toEqual([
+      { value: 1, label: 'One' },
+      { value: 2, label: 'Two' },
+      { value: 3, label: 'Three' },
+      { value: 4, label: 'Four' },
+      { value: 5, label: 'Five' },
+      { value: 6, label: 'Six' },
+      { value: 7, label: 'Seven' },
+      { value: 8, label: 'Eight' },
+      { value: 9, label: 'Nine' },
+      { value: 10, label: 'Ten' },
+    ])
+  })
+})
 
 describe('resolution target sentence composition', () => {
   it('places size and sight before the distance', () => {

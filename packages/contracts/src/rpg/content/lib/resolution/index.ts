@@ -16,6 +16,7 @@ export {
   resolutionSavingThrowMethodSchema,
   resolutionSelectionModeSchema,
   resolutionTargetProximitySchema,
+  DEFAULT_RESOLUTION_TARGET,
   resolutionTargetSchema,
   resolutionTemporaryHitPointsEffectSchema,
   validateEffectResolution,
@@ -66,6 +67,7 @@ export {
   formatResolutionTarget,
   formatResolutionTargetFromParts,
   formatResolutionTargetProximityPhrase,
+  resolutionTargetCountSelectOptions,
   RESOLUTION_AFFECTED_AREA_COPY,
   type ResolutionSelectionSection,
 } from './format-target'

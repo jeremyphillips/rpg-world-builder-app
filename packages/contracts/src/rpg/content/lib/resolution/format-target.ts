@@ -4,13 +4,18 @@ import type { ResolutionTargetCountKind } from '../../../vocab/resolution'
 import {
   formatResolutionTargetProximityPhrase,
   formatResolutionTargetSentence,
+  resolutionTargetCountSelectOptions,
   type ResolutionTargetFormatOptions,
 } from './format-target-composition'
 import type { ResolutionFormatInput, ResolutionTarget } from './schema'
 
 export const RESOLUTION_AFFECTED_AREA_COPY = 'Creatures and objects in the area'
 
-export { formatResolutionTargetProximityPhrase, type ResolutionTargetFormatOptions }
+export {
+  formatResolutionTargetProximityPhrase,
+  resolutionTargetCountSelectOptions,
+  type ResolutionTargetFormatOptions,
+}
 
 function formatDistanceFeet(distance: { value: number; unit: 'ft' }): string {
   return `${distance.value} feet`

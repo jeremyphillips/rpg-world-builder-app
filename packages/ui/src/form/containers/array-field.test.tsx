@@ -175,6 +175,29 @@ describe('ArrayFieldRenderer', () => {
     expect(fieldset).not.toHaveClass('mb-8')
   })
 
+  it('omits the empty panel when emptyState is none', () => {
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={[
+          {
+            kind: 'array',
+            name: 'traits',
+            label: 'Traits',
+            emptyState: 'none',
+            fields: traitFields,
+            addAction: { label: 'Add trait' },
+          },
+        ]}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.queryByText('No trait added.')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
+  })
+
   it('omits fieldset anatomy stack for sr-only labels without visible header chrome', () => {
     render(
       <Form<Values>

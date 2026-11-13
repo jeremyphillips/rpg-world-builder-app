@@ -72,6 +72,8 @@ import {
   MONSTER_SAVE_DC_ABILITY_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
   MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
+  MONSTER_SAVE_TARGETING_DESCRIPTION,
+  MONSTER_SAVE_TARGETING_LEGEND,
   MONSTER_TRIGGER_LABEL,
   MONSTER_TRIGGER_PLACEHOLDER,
   MONSTER_PARRY_AC_BONUS_HINT,
@@ -428,33 +430,42 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
   const selfMode = whenFieldEquals('resolution.selectionMode', 'self')
   const targetsMode = whenFieldEquals('resolution.selectionMode', 'targets')
   return {
-    kind: 'dependent',
-    controller: {
-      type: 'select',
-      name: 'resolution.selectionMode',
-      label: 'Selection',
-      options: [
-        { value: 'self', label: 'Area from self' },
-        { value: 'targets', label: 'Creatures in reach' },
-      ],
-    },
-    dependents: {
-      visibility: whenFieldIsOneOf('resolution.selectionMode', ['self', 'targets']),
-      fields: [
-        ...areaGeometryFormFields({
-          fieldPrefix: 'resolution.areaOfEffect',
-          legend: 'Area',
-          legendVisibility: 'srOnly',
-          shapeHint: 'Area measured from the monster.',
-          visibility: selfMode,
-        }),
-        ...resolutionTargetAuthoringFields({
-          prefix: 'resolution.target',
-          visibility: targetsMode,
-          creatureTypeOptions: buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary),
-        }),
-      ],
-    },
+    kind: 'group',
+    heading: { label: MONSTER_SAVE_TARGETING_LEGEND },
+    description: MONSTER_SAVE_TARGETING_DESCRIPTION,
+    fields: [
+      {
+        kind: 'dependent',
+        controller: {
+          type: 'select',
+          name: 'resolution.selectionMode',
+          label: 'Selection',
+          options: [
+            { value: 'self', label: 'Area from self' },
+            { value: 'targets', label: 'Creatures in reach' },
+          ],
+          defaultValue: 'targets',
+        },
+        dependents: {
+          chrome: 'none',
+          visibility: whenFieldIsOneOf('resolution.selectionMode', ['self', 'targets']),
+          fields: [
+            ...areaGeometryFormFields({
+              fieldPrefix: 'resolution.areaOfEffect',
+              legend: 'Area',
+              legendVisibility: 'srOnly',
+              shapeHint: 'Area measured from the monster.',
+              visibility: selfMode,
+            }),
+            ...resolutionTargetAuthoringFields({
+              prefix: 'resolution.target',
+              visibility: targetsMode,
+              creatureTypeOptions: buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary),
+            }),
+          ],
+        },
+      },
+    ],
   }
 }
 

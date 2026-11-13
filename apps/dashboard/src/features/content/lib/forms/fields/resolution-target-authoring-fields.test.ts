@@ -4,6 +4,7 @@ import {
   buildResolutionRequirementAddMenu,
   formatResolutionRequirementSummary,
   formatResolutionTargetAuthoringPreview,
+  resolveResolutionRequirementCollapsible,
 } from './resolution-target-authoring-fields'
 
 const creatureTypes = [
@@ -82,7 +83,15 @@ describe('resolution target authoring fields', () => {
     const condition = menu.items.find((item) => item.id === 'condition')
     expect(sight?.isDuplicate?.([{ kind: 'sight', who: 'actor' }])).toBe(true)
     expect(size?.appendDefaults).toEqual({ kind: 'size' })
-    expect(condition?.appendDefaults).toEqual({ kind: 'condition' })
+    const creatureType = menu.items.find((item) => item.id === 'creature-type')
+    expect(creatureType?.appendDefaults).toEqual({ kind: 'creature-type', mode: 'include' })
+    expect(condition?.appendDefaults).toEqual({ kind: 'condition', presence: 'has' })
     expect(condition?.isDuplicate?.([{ kind: 'any-of' }])).toBe(true)
+  })
+
+  it('disables disclosure when a requirement row has no editable fields', () => {
+    expect(resolveResolutionRequirementCollapsible({ kind: 'willing' })).toBe(false)
+    expect(resolveResolutionRequirementCollapsible({ kind: 'sight', who: 'actor' })).toBe(false)
+    expect(resolveResolutionRequirementCollapsible({ kind: 'size' })).toBe(true)
   })
 })

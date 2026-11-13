@@ -351,6 +351,8 @@ export const MONSTER_SAVE_FAILURE_NOTE_LABEL = 'Failure note'
 export const MONSTER_SAVE_SUCCESS_AMOUNT_LABEL = 'On successful save'
 export const MONSTER_SAVE_THROW_SECTION_DESCRIPTION =
   'Set the saving throw target and how difficult it is to succeed.'
+export const MONSTER_SAVE_TARGETING_LEGEND = 'Targeting'
+export const MONSTER_SAVE_TARGETING_DESCRIPTION = 'Who makes the savings throw?'
 export const MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL = 'Ability-based'
 export const MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL = 'Spellcasting-based'
 export const MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL = 'Use an ability score'

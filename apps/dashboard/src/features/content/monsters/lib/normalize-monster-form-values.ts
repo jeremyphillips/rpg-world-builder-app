@@ -15,6 +15,7 @@ import {
 import { normalizeLimitedUse } from '../../lib/forms/limited-use/normalize-limited-use'
 import { monsterActionActiveKeys, monsterActionTriggerText } from './actions/monster-action-kind'
 import { normalizeMonsterSaveOutcomes } from './actions/monster-action-save-outcomes'
+import { withDefaultSaveResolutionTarget } from './actions/monster-save-resolution-target.lib'
 import { weaponActionDamageToDraft } from './actions/monster-weapon-damage-form'
 
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
@@ -88,6 +89,12 @@ function applySaveOutcomeDraft(cleaned: Record<string, unknown>): void {
   const resolution = cleaned.resolution
   if (!Array.isArray(resolution.outcomes)) return
   resolution.outcomes = normalizeMonsterSaveOutcomes(resolution.outcomes)
+}
+
+function applySaveTargetDraft(cleaned: Record<string, unknown>): void {
+  const withTarget = withDefaultSaveResolutionTarget(cleaned)
+  if (withTarget === cleaned || !isRecord(withTarget.resolution)) return
+  cleaned.resolution = withTarget.resolution
 }
 
 const RICH_TEXT_KEYS = ['description', 'descriptionOverride'] as const
@@ -295,6 +302,7 @@ function normalizeAction(
   omitTakeActionsCombination(cleaned, intent)
   normalizeWeaponActionDamage(cleaned)
   applySaveOutcomeDraft(cleaned)
+  applySaveTargetDraft(cleaned)
   omitEmptySavingThrowField(cleaned)
   const keys =
     typeof cleaned.kind === 'string' ? monsterActionActiveKeys(cleaned.kind, section) : []

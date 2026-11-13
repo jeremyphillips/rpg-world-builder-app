@@ -99,6 +99,14 @@ describe('monster action acquisition', () => {
     expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'save' })).toEqual({
       id: expect.any(String),
       kind: 'save',
+      resolution: {
+        selectionMode: 'targets',
+        target: expect.objectContaining({
+          count: 1,
+          kind: 'creature',
+          proximity: { kind: 'distance', distance: { value: 5, unit: 'ft' } },
+        }),
+      },
     })
     const customNatural = createMonsterActionFromAcquisition({ type: 'other-natural' })
     expect(customNatural).toMatchObject({

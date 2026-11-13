@@ -139,6 +139,14 @@ export const resolutionTargetSchema = z
 
 export type ResolutionTarget = z.infer<typeof resolutionTargetSchema>
 
+/** Authoring default for creature targets at a distance — one creature within 5 feet. */
+export const DEFAULT_RESOLUTION_TARGET = {
+  count: 1,
+  countKind: 'exact',
+  kind: 'creature',
+  proximity: { kind: 'distance', distance: { value: 5, unit: 'ft' } },
+} as const satisfies ResolutionTarget
+
 export const resolutionOriginSchema = z.object({
   proximity: z.object({
     kind: z.literal('distance'),

@@ -1,5 +1,6 @@
 import {
   ACTION_PRESET_IDS,
+  DEFAULT_RESOLUTION_TARGET,
   getActionPreset,
   getActionVocabularyEntry,
   getActionVocabularySearchTerms,
@@ -495,7 +496,16 @@ export function createMonsterActionFromAcquisition(
       return createSpellActionDraft('actions', {}, spellAcquisition)
     }
     if (choice.kind === 'special') return { id, kind: 'special' } as MonsterActionDraftRow
-    if (choice.kind === 'save') return { id, kind: 'save' } as MonsterActionDraftRow
+    if (choice.kind === 'save') {
+      return {
+        id,
+        kind: 'save',
+        resolution: {
+          selectionMode: 'targets',
+          target: { ...DEFAULT_RESOLUTION_TARGET },
+        },
+      } as MonsterActionDraftRow
+    }
     return { id, kind: 'attack', damage: authoredStartingDamage() } as MonsterActionDraftRow
   }
   return { id, kind: 'special' } as MonsterActionDraftRow

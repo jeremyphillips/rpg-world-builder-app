@@ -1,5 +1,6 @@
 import {
   CREATURE_SIZES,
+  DEFAULT_RESOLUTION_TARGET,
   EFFECT_CONDITION_IDS,
   MEASURED_RANGE_FEET,
   RESOLUTION_TARGET_KINDS,
@@ -7,6 +8,7 @@ import {
   getCreatureSizeLabel,
   getEffectConditionLabel,
   getResolutionTargetKindLabel,
+  resolutionTargetCountSelectOptions,
   type ResolutionTarget,
   type ResolutionTargetKind,
   type ResolutionTargetProximity,
@@ -20,7 +22,25 @@ import {
   type InlineSentenceFieldConfig,
 } from '@rpg/ui/form'
 
-const REQUIREMENT_STAT_BLOCK_HINT = 'Shown on the stat block. Not checked during play yet.'
+const REQUIREMENT_STAT_BLOCK_HINT = 'Optional restrictions on who can be targeted.'
+const TARGET_DEFAULT_COUNT = DEFAULT_RESOLUTION_TARGET.count
+const TARGET_DEFAULT_KIND = DEFAULT_RESOLUTION_TARGET.kind
+const TARGET_DEFAULT_DISTANCE_FT = DEFAULT_RESOLUTION_TARGET.proximity.distance.value
+const TARGET_DEFAULT_PROXIMITY_KIND = DEFAULT_RESOLUTION_TARGET.proximity.kind
+
+const RESOLUTION_REQUIREMENT_EDITABLE_KINDS = new Set([
+  'size',
+  'creature-type',
+  'condition',
+  'any-of',
+  'written',
+])
+
+/** Rows without fields (sight, willing) stay summary-only — no disclosure caret. */
+export function resolveResolutionRequirementCollapsible(values: Record<string, unknown>): boolean {
+  const kind = values.kind
+  return typeof kind === 'string' && RESOLUTION_REQUIREMENT_EDITABLE_KINDS.has(kind)
+}
 const WRITTEN_CLAUSE_HINT = 'A full clause, such as "that is a demon."'
 
 const SIZE_COMPARISON_OPTIONS = [
@@ -221,7 +241,7 @@ export function buildResolutionRequirementAddMenu() {
         'Creature type',
         'Possession: one Humanoid',
         ['type', 'humanoid', 'undead', 'possession'],
-        { kind: 'creature-type' },
+        { kind: 'creature-type', mode: 'include' },
         ['creature-type'],
       ),
       menuItem(
@@ -229,7 +249,7 @@ export function buildResolutionRequirementAddMenu() {
         'Has a condition',
         'Trample: that has the Prone condition',
         ['condition', 'prone', 'trample'],
-        { kind: 'condition' },
+        { kind: 'condition', presence: 'has' },
         ['condition', 'any-of'],
       ),
       menuItem(
@@ -321,17 +341,18 @@ function targetSentenceField(
         ],
         ariaLabel: 'Count limit',
         width: 'sm',
-        visibility: {
-          dependsOn: [`${prefix}.count`],
-          visibleWhen: (values) => Number(values[`${prefix}.count`]) > 1,
-        },
+        defaultValue: 'exact',
       },
       {
-        kind: 'number',
+        kind: 'select',
         name: `${prefix}.count`,
-        min: 1,
-        digits: 2,
+        options: resolutionTargetCountSelectOptions().map((option) => ({
+          value: String(option.value),
+          label: option.label,
+        })),
         ariaLabel: 'Count',
+        width: 'sm',
+        defaultValue: String(TARGET_DEFAULT_COUNT),
       },
       {
         kind: 'select',
@@ -342,6 +363,7 @@ function targetSentenceField(
         })),
         ariaLabel: 'Target kind',
         width: 'lg',
+        defaultValue: TARGET_DEFAULT_KIND,
       },
       { kind: 'text', value: 'within', tone: 'label' },
       {
@@ -354,6 +376,7 @@ function targetSentenceField(
           digits: 3,
           allowCustom: true,
           ariaLabel: 'Distance',
+          defaultValue: TARGET_DEFAULT_DISTANCE_FT,
         },
         end: { kind: 'label', text: 'ft.', ariaLabel: 'Distance unit' },
       },
@@ -393,9 +416,11 @@ function requirementArray(
     name: `${prefix}.requirements`,
     label: 'Requirements',
     hint: REQUIREMENT_STAT_BLOCK_HINT,
+    emptyState: 'none',
     addAction: { label: 'Add a requirement', menu: buildResolutionRequirementAddMenu() },
     item: {
       collapsible: true,
+      resolveCollapsible: resolveResolutionRequirementCollapsible,
       reorder: false,
       header: {
         fallback: (index) => `Requirement ${index + 1}`,
@@ -405,16 +430,16 @@ function requirementArray(
     fields: [
       {
         type: 'select',
-        name: 'comparison',
-        label: 'Size limit',
-        options: [...SIZE_COMPARISON_OPTIONS],
+        name: 'bound',
+        label: 'Size',
+        options: sizeOptions,
         visibility: whenKind('size'),
       },
       {
         type: 'select',
-        name: 'bound',
-        label: 'Size',
-        options: sizeOptions,
+        name: 'comparison',
+        label: 'Size limit',
+        options: [...SIZE_COMPARISON_OPTIONS],
         visibility: whenKind('size'),
       },
       {
@@ -425,6 +450,7 @@ function requirementArray(
           { value: 'include', label: 'Is' },
           { value: 'exclude', label: "Isn't" },
         ],
+        defaultValue: 'include',
         visibility: whenKind('creature-type'),
       },
       {
@@ -435,6 +461,7 @@ function requirementArray(
           { value: 'has', label: 'Has' },
           { value: 'lacks', label: "Doesn't have" },
         ],
+        defaultValue: 'has',
         visibility: whenKind('condition'),
       },
       {
@@ -500,6 +527,7 @@ export function resolutionTargetAuthoringFields(options: {
       { value: 'reach', label: 'Reach' },
       { value: 'distance', label: 'Range' },
     ],
+    defaultValue: TARGET_DEFAULT_PROXIMITY_KIND,
   }
   return [
     applyFieldVisibility(proximity, options.visibility),

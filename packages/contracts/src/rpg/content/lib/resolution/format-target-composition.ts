@@ -21,6 +21,21 @@ const COUNT_WORDS = [
   'ten',
 ] as const
 
+const MAX_TARGET_COUNT_INDEX = 10
+
+function capitalizeWord(word: string): string {
+  if (word.length === 0) return word
+  return `${word.charAt(0).toUpperCase()}${word.slice(1)}`
+}
+
+/** Authoring select options for target counts one through ten. */
+export function resolutionTargetCountSelectOptions(): { value: number; label: string }[] {
+  return COUNT_WORDS.slice(1, MAX_TARGET_COUNT_INDEX + 1).map((word, index) => ({
+    value: index + 1,
+    label: capitalizeWord(word),
+  }))
+}
+
 export type ResolutionTargetFormatOptions = {
   /** Label for a creature-type id. Defaults to capitalizing the id. */
   creatureTypeLabel?: (id: string) => string

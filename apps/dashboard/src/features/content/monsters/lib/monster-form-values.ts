@@ -35,6 +35,7 @@ import {
   slugForInputParse,
 } from '../../lib/forms/registry/content-form-key-helpers'
 import { mapWeaponActionDamageToForm } from './actions/monster-weapon-damage-form'
+import { withDefaultSaveResolutionTarget } from './actions/monster-save-resolution-target.lib'
 import {
   normalizeMonsterFormValues,
   type MonsterNormalizeBaseline,
@@ -202,10 +203,18 @@ export function monsterToFormValues(
     defenses: entity.defenses,
     equipment: entity.equipment,
     traits: entity.traits,
-    actions: entity.actions.map(mapWeaponActionDamageToForm),
-    bonusActions: entity.bonusActions.map(mapWeaponActionDamageToForm),
-    reactions: entity.reactions.map(mapWeaponActionDamageToForm),
-    legendaryActions: entity.legendaryActions.map(mapWeaponActionDamageToForm),
+    actions: entity.actions
+      .map(mapWeaponActionDamageToForm)
+      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+    bonusActions: entity.bonusActions
+      .map(mapWeaponActionDamageToForm)
+      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+    reactions: entity.reactions
+      .map(mapWeaponActionDamageToForm)
+      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+    legendaryActions: entity.legendaryActions
+      .map(mapWeaponActionDamageToForm)
+      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
     ...(entity.legendaryActionUses !== undefined
       ? { legendaryActionUses: entity.legendaryActionUses }
       : {}),

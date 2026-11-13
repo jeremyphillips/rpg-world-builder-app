@@ -1571,6 +1571,11 @@ export interface ArrayItemConfig {
    * @default false
    */
   defaultCollapsed?: boolean
+  /**
+   * When `collapsible` is true, gates disclosure per row. Omit for every row
+   * collapsible when the array is collapsible.
+   */
+  resolveCollapsible?: (values: Record<string, unknown>, index: number) => boolean
   /** @default dragHandle */
   reorder?: ArrayItemReorder
   /** @default true */
@@ -1647,6 +1652,8 @@ interface ArrayConfigCore {
    */
   keyName?: string
   filterSelect?: ArrayFilterSelectConfig
+  /** Empty list presentation. @default 'panel' */
+  emptyState?: 'panel' | 'none'
   /** When append should stay visible but disabled (e.g. finite enum saturation). */
   resolveCanAppend?: (items: unknown[]) => ArrayCanAppendResult
   id?: string
