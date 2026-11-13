@@ -82,6 +82,26 @@ describe('resolve-field-error-presentation.lib', () => {
     ).toBe('Name is required')
   })
 
+  it('treats interactivity-disabled fields as inactive for presentation', () => {
+    const fields: FormItem[] = [
+      {
+        type: 'segmentedControl',
+        name: 'mode',
+        label: 'Mode',
+        options: [{ value: 'a', label: 'A' }],
+        interactivity: {
+          dependsOn: ['enabled'],
+          disabledWhen: (values) => values.enabled !== true,
+        },
+      },
+    ]
+
+    const inactive = collectInactiveFieldPaths(fields, { enabled: false })
+    expect(isFieldPathEligibleForPresentation('mode', inactive)).toBe(false)
+    const active = collectInactiveFieldPaths(fields, { enabled: true })
+    expect(isFieldPathEligibleForPresentation('mode', active)).toBe(true)
+  })
+
   it('gates field errors on touch until session expands', () => {
     const session = {
       validationPresentation: 'progressive' as const,

@@ -99,6 +99,7 @@ export function leapDistanceFields(): [JoinedPairFieldConfig, JoinedPairFieldCon
       customMin: 1,
       customMax: LEAP_DISTANCE_MAX,
       required: true,
+      width: 'full',
       hint: { text: MONSTER_LEAP_DISTANCE_HINT },
     }),
     {
@@ -115,6 +116,7 @@ export function leapDistanceFields(): [JoinedPairFieldConfig, JoinedPairFieldCon
       customMin: 1,
       customMax: LEAP_MOVEMENT_MAX,
       required: true,
+      width: 'full',
       hint: {
         position: 'below-control',
         resolve: {

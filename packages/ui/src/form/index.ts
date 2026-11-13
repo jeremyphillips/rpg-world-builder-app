@@ -189,6 +189,8 @@ export {
   OPTIONAL_DISCLOSURE_FIELD_KINDS,
   type SelectFieldConfig,
   type RadioFieldConfig,
+  type SegmentedControlFieldConfig,
+  type FieldInteractivity,
   type CheckboxFieldConfig,
   type SwitchFieldConfig,
   type JsonFieldConfig,

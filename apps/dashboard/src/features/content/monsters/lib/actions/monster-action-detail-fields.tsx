@@ -77,6 +77,7 @@ import {
   MONSTER_PARRY_FOLLOW_UP_HINT,
   MONSTER_PARRY_FOLLOW_UP_LABEL,
   MONSTER_TAKE_ACTIONS_ACTIONS_LABEL,
+  MONSTER_TAKE_ACTIONS_BEHAVIOR_HINT_DISABLED,
   MONSTER_TAKE_ACTIONS_CHOICE_EACH,
   MONSTER_TAKE_ACTIONS_CHOICE_LABEL,
   MONSTER_TAKE_ACTIONS_CHOICE_ONE,
@@ -927,14 +928,7 @@ function bonusAuthoringFields(input: {
   }
   const usage = monsterActionUsageEditor(input.action, input.namePrefix)
   if (input.action.kind === 'leap') {
-    return [
-      preview,
-      {
-        kind: 'row',
-        fields: leapDistanceFields(),
-      },
-      ...usage,
-    ]
+    return [preview, ...leapDistanceFields(), ...usage]
   }
   if (input.action.kind === 'teleport') {
     return [
@@ -981,6 +975,36 @@ function bonusAuthoringFields(input: {
     return [
       preview,
       {
+        type: 'segmentedControl',
+        name: 'combination',
+        label: MONSTER_TAKE_ACTIONS_CHOICE_LABEL,
+        defaultValue: 'one',
+        options: [
+          { value: 'one', label: MONSTER_TAKE_ACTIONS_CHOICE_ONE },
+          { value: 'each', label: MONSTER_TAKE_ACTIONS_CHOICE_EACH },
+        ],
+        interactivity: {
+          dependsOn: ['standardActions'],
+          disabledWhen: (values) => {
+            const selected = values.standardActions
+            return !Array.isArray(selected) || selected.length < 2
+          },
+        },
+        hint: {
+          position: 'below-control',
+          resolve: {
+            dependsOn: ['standardActions'],
+            hintWhen: (values) => {
+              const selected = values.standardActions
+              if (!Array.isArray(selected) || selected.length < 2) {
+                return MONSTER_TAKE_ACTIONS_BEHAVIOR_HINT_DISABLED
+              }
+              return undefined
+            },
+          },
+        },
+      },
+      {
         type: 'chips',
         name: 'standardActions',
         label: MONSTER_TAKE_ACTIONS_ACTIONS_LABEL,
@@ -990,22 +1014,6 @@ function bonusAuthoringFields(input: {
           value: id,
           label: getActionVocabularyEntry(id)?.label ?? id,
         })),
-      },
-      {
-        type: 'select',
-        name: 'combination',
-        label: MONSTER_TAKE_ACTIONS_CHOICE_LABEL,
-        placeholder: 'Choose',
-        required: true,
-        options: [
-          { value: 'one', label: MONSTER_TAKE_ACTIONS_CHOICE_ONE },
-          { value: 'each', label: MONSTER_TAKE_ACTIONS_CHOICE_EACH },
-        ],
-        visibility: {
-          dependsOn: ['standardActions'],
-          visibleWhen: (values) =>
-            Array.isArray(values.standardActions) && values.standardActions.length >= 2,
-        },
       },
       {
         type: 'text',

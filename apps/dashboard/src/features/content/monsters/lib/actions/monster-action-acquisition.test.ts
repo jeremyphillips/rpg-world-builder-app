@@ -138,6 +138,7 @@ describe('monster action acquisition presentation', () => {
     expect(createBonusActionDraft('take-actions')).toMatchObject({
       kind: 'take-actions',
       standardActions: [],
+      combination: 'one',
     })
     expect(createBonusActionDraft('take-actions')).not.toHaveProperty('name')
     expect(parseMonsterActionAcquisitionId('bonus:leap')).toEqual({

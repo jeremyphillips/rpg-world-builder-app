@@ -42,6 +42,19 @@ function orderedStandardLabels(ids: readonly string[]): string[] {
   })
 }
 
+/**
+ * Mechanical combination for stat-block phrasing only. One or zero standard actions
+ * ignore combination. With two or more, absent `combination` defaults to `one` for display.
+ */
+export function resolveTakeActionsEffectiveCombination(
+  standardActions: readonly string[] | undefined,
+  combination: BonusActionCombination | undefined,
+): BonusActionCombination | undefined {
+  const count = standardActions?.length ?? 0
+  if (count < 2) return undefined
+  return combination ?? 'one'
+}
+
 function takesClause(
   labels: readonly string[],
   combination: BonusActionCombination | undefined,
@@ -57,7 +70,7 @@ function takesClause(
 
 /**
  * Dash, Disengage, and Hide. One selected action ignores `combination`.
- * Two or more print nothing until the choice is stored.
+ * Two or more use {@link resolveTakeActionsEffectiveCombination} for phrasing.
  */
 export function formatMonsterTakeActions(args: {
   monsterName: string
@@ -65,7 +78,14 @@ export function formatMonsterTakeActions(args: {
   combination?: BonusActionCombination
   restriction?: string
 }): string | undefined {
-  const clause = takesClause(orderedStandardLabels(args.standardActions ?? []), args.combination)
+  const effectiveCombination = resolveTakeActionsEffectiveCombination(
+    args.standardActions,
+    args.combination,
+  )
+  const clause = takesClause(
+    orderedStandardLabels(args.standardActions ?? []),
+    effectiveCombination,
+  )
   if (!clause) return undefined
   const subject = formatMonsterStatBlockSubject(args.monsterName)
   const lead = leadingRestriction(args.restriction)

@@ -111,6 +111,7 @@ export type FieldType =
   | 'select'
   | 'radio'
   | 'radioCard'
+  | 'segmentedControl'
   | 'checkbox'
   | 'switch'
   | 'json'
@@ -220,6 +221,15 @@ export interface FieldVisibility {
   dependsOn: string[]
   /** Given the watched values, return whether this field should render. */
   visibleWhen: (watched: Record<string, unknown>) => boolean
+}
+
+/**
+ * Disables the control while keeping it mounted and registered. Does not affect
+ * resolver hidden-field omission — use `visibility` only when values should unregister.
+ */
+export type FieldInteractivity = {
+  dependsOn: readonly string[]
+  disabledWhen: (values: Record<string, unknown>) => boolean
 }
 
 /** Merges two visibility predicates with OR semantics and a deduped `dependsOn` list. */
@@ -417,6 +427,7 @@ interface BaseFieldConfig {
    * narrowly via `useWatch`.
    */
   visibility?: FieldVisibility
+  interactivity?: FieldInteractivity
   /** Trailing divider after this field — `faint` | `subtle` | `default` | `strong` (border ladder). */
   separator?: FieldSeparator
   /**
@@ -633,6 +644,13 @@ export interface RadioFieldConfig extends BaseFieldConfig {
   /** When `'horizontal'`, options lay out in a row (default `'vertical'`). */
   orientation?: 'horizontal' | 'vertical'
   /** Visually hide the label while keeping it available to screen readers. */
+  labelVisibility?: FieldLabelVisibility
+}
+
+export interface SegmentedControlFieldConfig extends BaseFieldConfig {
+  type: 'segmentedControl'
+  options: FieldOption[]
+  defaultValue?: string
   labelVisibility?: FieldLabelVisibility
 }
 
@@ -1122,6 +1140,7 @@ export type FieldConfig =
   | TextareaFieldConfig
   | SelectFieldConfig
   | RadioFieldConfig
+  | SegmentedControlFieldConfig
   | RadioCardFieldConfig
   | CheckboxFieldConfig
   | SwitchFieldConfig
@@ -1764,6 +1783,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   select: '',
   radio: '',
   radioCard: '',
+  segmentedControl: '',
   checkbox: false,
   switch: false,
   json: '',
@@ -1973,6 +1993,14 @@ export function isFieldVisible(field: FieldConfig, values: Record<string, unknow
   return field.visibility ? field.visibility.visibleWhen(values) : true
 }
 
+/** Whether interactivity gating has disabled the control (field stays mounted). */
+export function isFieldInteractivityDisabled(
+  field: FieldConfig,
+  values: Record<string, unknown>,
+): boolean {
+  return field.interactivity?.disabledWhen(values) ?? false
+}
+
 /** Applies a dotted path prefix to a leaf field config (occupant names for joinedPair). */
 export function prefixFieldConfig(field: FieldConfig, prefix: string): FieldConfig {
   const join = (name: string) => (prefix ? `${prefix}.${name}` : name)
@@ -2065,10 +2093,24 @@ function joinedPairSelectOptionsResolveDependsOn(field: {
   return names
 }
 
+function selectFieldOptionsResolveDependsOn(field: {
+  type?: FieldConfig['type']
+  optionsResolve?: { dependsOn: readonly string[] }
+}): readonly string[] {
+  if (
+    (field.type === 'select' || field.type === 'inlineSentence' || field.type === 'combobox') &&
+    field.optionsResolve
+  ) {
+    return field.optionsResolve.dependsOn
+  }
+  return []
+}
+
 /** Collects watched field names for dynamic hint, derived metadata, and select options resolution. */
 export function collectFieldDynamicDependsOn(field: {
   hint?: BaseFieldConfig['hint']
   derivedMeta?: BaseFieldConfig['derivedMeta']
+  interactivity?: FieldInteractivity
   type?: FieldConfig['type']
   optionsResolve?: { dependsOn: readonly string[] }
   start?: JoinedPairStartOccupantConfig
@@ -2077,24 +2119,16 @@ export function collectFieldDynamicDependsOn(field: {
   filterSelectsResolve?: FieldDynamicComboboxFilterSelects
   recommendationResolve?: FieldDynamicRecommendation
 }): readonly string[] {
-  const hintDependsOn = normalizeFieldHint(field.hint).resolve?.dependsOn ?? []
-  const derivedMetaDependsOn = field.derivedMeta?.dependsOn ?? []
-  const optionsResolveDependsOn =
-    (field.type === 'select' || field.type === 'inlineSentence' || field.type === 'combobox') &&
-    field.optionsResolve
-      ? field.optionsResolve.dependsOn
-      : []
-  const addGateDependsOn = field.optionalDisclosure?.addGate?.dependsOn ?? []
-
   return [
     ...new Set([
-      ...hintDependsOn,
-      ...derivedMetaDependsOn,
-      ...optionsResolveDependsOn,
+      ...(normalizeFieldHint(field.hint).resolve?.dependsOn ?? []),
+      ...(field.derivedMeta?.dependsOn ?? []),
+      ...selectFieldOptionsResolveDependsOn(field),
       ...joinedPairSelectOptionsResolveDependsOn(field),
-      ...addGateDependsOn,
+      ...(field.optionalDisclosure?.addGate?.dependsOn ?? []),
       ...comboboxFilterDependsOn(field),
       ...comboboxRecommendationDependsOn(field),
+      ...(field.interactivity?.dependsOn ?? []),
     ]),
   ]
 }

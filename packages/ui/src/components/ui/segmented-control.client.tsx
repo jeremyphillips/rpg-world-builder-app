@@ -42,6 +42,10 @@ export type SegmentedControlProps<TValue extends string> = {
   /** `sm` mirrors Button `size="xs"` (24px micro tier). */
   size?: SegmentedControlSize
   'aria-label'?: string
+  /** Preferred when a visible field label supplies the accessible name. */
+  'aria-labelledby'?: string
+  /** Disables every segment without unregistering form state in parent fields. */
+  disabled?: boolean
   className?: string
 }
 
@@ -66,6 +70,8 @@ export function SegmentedControl<TValue extends string>({
   segmentWidth = 'equal',
   size = 'default',
   'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  disabled: disabledAll = false,
   className,
 }: SegmentedControlProps<TValue>) {
   const buttonRefs = React.useRef<Array<HTMLButtonElement | null>>([])
@@ -117,7 +123,8 @@ export function SegmentedControl<TValue extends string>({
   return (
     <div
       role="group"
-      aria-label={ariaLabel}
+      aria-label={ariaLabelledBy ? undefined : ariaLabel}
+      aria-labelledby={ariaLabelledBy}
       className={cn(segmentedControlRootVariants({ fullWidth }), className)}
     >
       {options.map((option, index) => {
@@ -131,7 +138,7 @@ export function SegmentedControl<TValue extends string>({
             }}
             type="button"
             aria-pressed={isActive}
-            disabled={option.disabled}
+            disabled={disabledAll || option.disabled}
             tabIndex={activeIndex >= 0 && index === activeIndex ? 0 : -1}
             className={segmentedControlSegmentVariants({ active: isActive, segmentWidth, size })}
             onClick={() => selectSegment(index)}

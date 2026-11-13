@@ -174,6 +174,29 @@ describe('SegmentedControl', () => {
     expect(segment).toHaveAttribute('aria-controls', 'alpha-panel')
   })
 
+  it('supports aria-labelledby and disables every segment from the root', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+    render(
+      <>
+        <span id="mode-label">Mode</span>
+        <SegmentedControl
+          aria-labelledby="mode-label"
+          value="alpha"
+          disabled
+          options={options}
+          onValueChange={onValueChange}
+        />
+      </>,
+    )
+
+    const alpha = screen.getByRole('button', { name: /Alpha/ })
+    expect(screen.getByRole('group')).toHaveAttribute('aria-labelledby', 'mode-label')
+    expect(alpha).toBeDisabled()
+    await user.click(alpha)
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <SegmentedControl

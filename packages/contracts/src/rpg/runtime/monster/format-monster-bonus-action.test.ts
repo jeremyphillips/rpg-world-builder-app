@@ -4,6 +4,7 @@ import {
   formatMonsterLeap,
   formatMonsterTakeActions,
   formatMonsterTeleport,
+  resolveTakeActionsEffectiveCombination,
 } from './format-monster-bonus-action'
 
 describe('formatMonsterLeap', () => {
@@ -75,6 +76,14 @@ describe('formatMonsterTeleport', () => {
   })
 })
 
+describe('resolveTakeActionsEffectiveCombination', () => {
+  it('ignores combination below two actions and defaults to one when absent', () => {
+    expect(resolveTakeActionsEffectiveCombination(['hide'], 'each')).toBeUndefined()
+    expect(resolveTakeActionsEffectiveCombination(['dash', 'hide'], undefined)).toBe('one')
+    expect(resolveTakeActionsEffectiveCombination(['dash', 'hide'], 'each')).toBe('each')
+  })
+})
+
 describe('formatMonsterTakeActions', () => {
   it('prints one, or, and and', () => {
     expect(
@@ -125,13 +134,13 @@ describe('formatMonsterTakeActions', () => {
     ).toBe('While in Dim Light or darkness, the shadow takes the Hide action.')
   })
 
-  it('prints nothing until a choice exists for two actions', () => {
+  it('defaults combination to one for two or more actions when absent', () => {
     expect(
       formatMonsterTakeActions({
         monsterName: 'Assassin',
         standardActions: ['dash', 'disengage'],
       }),
-    ).toBeUndefined()
+    ).toBe('The assassin takes the Dash or Disengage action.')
     expect(
       formatMonsterTakeActions({ monsterName: 'Assassin', standardActions: [] }),
     ).toBeUndefined()

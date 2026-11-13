@@ -6,20 +6,21 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 
 ## Standard leaf types (brief)
 
-| `type`            | Value     | Notes                                                                                             |
-| ----------------- | --------- | ------------------------------------------------------------------------------------------------- |
-| `text`            | `string`  | Optional `inputType`, `autoComplete`                                                              |
-| `textSuggestions` | `string`  | Free entry with inline advisory suggestions; optional `optionalDisclosure`                        |
-| `number`          | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`                                                  |
-| `textarea`        | `string`  | `rows`, optional `optionalDisclosure`                                                             |
-| `select`          | `string`  | `options`, optional `optionalDisclosure`                                                          |
-| `select`          | `string`  | Flat or grouped options; `optionAvailability`; `presentation.readOnlyWhen`; `presentation.change` |
-| `radio`           | `string`  | `orientation`, `labelHidden`                                                                      |
-| `radioCard`       | `string`  | Card-style options with `meta` / `badge`                                                          |
-| `checkbox`        | `boolean` |                                                                                                   |
-| `switch`          | `boolean` | `labelPosition`: `inline`, `above`, `settings`                                                    |
-| `select`          | `string`  | `labelPosition`: `inline`, `above`, `settings`                                                    |
-| `file`            | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                                       |
+| `type`             | Value     | Notes                                                                                             |
+| ------------------ | --------- | ------------------------------------------------------------------------------------------------- |
+| `text`             | `string`  | Optional `inputType`, `autoComplete`                                                              |
+| `textSuggestions`  | `string`  | Free entry with inline advisory suggestions; optional `optionalDisclosure`                        |
+| `number`           | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`                                                  |
+| `textarea`         | `string`  | `rows`, optional `optionalDisclosure`                                                             |
+| `select`           | `string`  | `options`, optional `optionalDisclosure`                                                          |
+| `select`           | `string`  | Flat or grouped options; `optionAvailability`; `presentation.readOnlyWhen`; `presentation.change` |
+| `radio`            | `string`  | `orientation`, `labelHidden`                                                                      |
+| `segmentedControl` | `string`  | `interactivity` for mounted-but-disabled; `defaultValue`                                          |
+| `radioCard`        | `string`  | Card-style options with `meta` / `badge`                                                          |
+| `checkbox`         | `boolean` |                                                                                                   |
+| `switch`           | `boolean` | `labelPosition`: `inline`, `above`, `settings`                                                    |
+| `select`           | `string`  | `labelPosition`: `inline`, `above`, `settings`                                                    |
+| `file`             | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                                       |
 
 `select` and `combobox` fields default to `Choose {label}…` when `placeholder` is omitted.
 Multi-select chips/combobox fields with `min` / `max` also derive constraint hints from the

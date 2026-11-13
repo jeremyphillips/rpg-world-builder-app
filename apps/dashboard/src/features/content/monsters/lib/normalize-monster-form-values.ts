@@ -246,7 +246,11 @@ function stabilizeDraftActionKeys(
   return stable
 }
 
-function omitTakeActionsCombination(cleaned: Record<string, unknown>): void {
+function omitTakeActionsCombination(
+  cleaned: Record<string, unknown>,
+  intent: ContentValidationIntent,
+): void {
+  if (intent !== 'publish') return
   if (cleaned.kind !== 'take-actions') return
   const selected = Array.isArray(cleaned.standardActions) ? cleaned.standardActions : []
   if (selected.length < 2) delete cleaned.combination
@@ -277,6 +281,7 @@ function draftSchemaForSection(
 function normalizeAction(
   action: unknown,
   section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
+  intent: ContentValidationIntent,
 ): unknown {
   if (!isRecord(action)) return action
   const cleaned = omitEmptyStrings(action)
@@ -287,7 +292,7 @@ function normalizeAction(
   applyTurnAndInvocationDraft(cleaned, section)
   applyLimitedUseDraft(cleaned)
   applySpellEntryDraft(cleaned)
-  omitTakeActionsCombination(cleaned)
+  omitTakeActionsCombination(cleaned, intent)
   normalizeWeaponActionDamage(cleaned)
   applySaveOutcomeDraft(cleaned)
   omitEmptySavingThrowField(cleaned)
@@ -402,15 +407,20 @@ function normalizeTraitRichText(value: unknown): unknown {
  * Inactive AC, HP, and action-kind fields are dropped. Empty strings are absent.
  * Update payloads send `null` only for clearable keys the baseline actually had.
  */
-function normalizedActionSections(values: MonsterFormValues): Record<string, unknown> {
+function normalizedActionSections(
+  values: MonsterFormValues,
+  intent: ContentValidationIntent,
+): Record<string, unknown> {
   return {
-    actions: (values.actions ?? []).map((action) => normalizeAction(action, 'actions')),
+    actions: (values.actions ?? []).map((action) => normalizeAction(action, 'actions', intent)),
     bonusActions: (values.bonusActions ?? []).map((action) =>
-      normalizeAction(action, 'bonusActions'),
+      normalizeAction(action, 'bonusActions', intent),
     ),
-    reactions: (values.reactions ?? []).map((action) => normalizeAction(action, 'reactions')),
+    reactions: (values.reactions ?? []).map((action) =>
+      normalizeAction(action, 'reactions', intent),
+    ),
     legendaryActions: (values.legendaryActions ?? []).map((action) =>
-      normalizeAction(action, 'legendaryActions'),
+      normalizeAction(action, 'legendaryActions', intent),
     ),
   }
 }
@@ -452,7 +462,7 @@ export function normalizeMonsterFormValues(
     defenses: values.defenses,
     equipment: values.equipment,
     traits: normalizeTraitRichText(omitEmptyStrings(values.traits)),
-    ...normalizedActionSections(values),
+    ...normalizedActionSections(values, options.intent),
     ...legendaryUseFields(values),
   }
 

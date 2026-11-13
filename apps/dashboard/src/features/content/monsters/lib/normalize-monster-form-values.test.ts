@@ -149,6 +149,27 @@ describe('normalizeMonsterFormValues', () => {
     expect(again.actions).toEqual(normalized.actions)
   })
 
+  it('keeps take-actions combination on draft and omits it on publish when fewer than two actions', () => {
+    const values = {
+      ...resolveMonsterCreateDefaultValues(),
+      bonusActions: [
+        {
+          id: 'cunning',
+          kind: 'take-actions',
+          name: 'Cunning Action',
+          standardActions: ['hide'],
+          combination: 'each',
+        },
+      ],
+    }
+    const draft = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
+    const draftRow = (draft.bonusActions as Array<{ combination?: string }>)[0]
+    expect(draftRow?.combination).toBe('each')
+    const published = normalizeMonsterFormValues(values, { intent: 'publish', mode: 'create' })
+    const publishedRow = (published.bonusActions as Array<{ combination?: string }>)[0]
+    expect(publishedRow).not.toHaveProperty('combination')
+  })
+
   it('matches the preview serializer', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Scout'

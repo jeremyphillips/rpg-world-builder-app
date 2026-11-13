@@ -427,7 +427,12 @@ export function createBonusActionDraft(
       name: getMonsterActionKindLabel('teleport'),
     } as MonsterActionDraftRow
   }
-  return { id, kind: 'take-actions', standardActions: [] } as MonsterActionDraftRow
+  return {
+    id,
+    kind: 'take-actions',
+    standardActions: [],
+    combination: 'one',
+  } as MonsterActionDraftRow
 }
 
 export function createReactionActionDraft(
