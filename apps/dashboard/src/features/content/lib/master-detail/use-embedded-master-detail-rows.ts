@@ -35,9 +35,14 @@ export interface UseEmbeddedMasterDetailRowsParams {
   editor: UseMasterDetailArrayResult
   itemFields: FormItem[]
   itemNoun: MasterDetailItemNounTerm
-  mapListItem: (
-    ctx: FormEmbeddedMasterDetailMapListItemContext,
-  ) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string; kindLabel?: string }
+  mapListItem: (ctx: FormEmbeddedMasterDetailMapListItemContext) => Pick<
+    MasterDetailListItem,
+    'title'
+  > & {
+    eyebrow?: string
+    kindLabel?: string
+    summary?: string
+  }
   access?: FormEmbeddedMasterDetailAccessConfig
   resolveRowReasons?: (ctx: {
     row: unknown
@@ -123,6 +128,7 @@ export function useEmbeddedMasterDetailRows({
         title: masterDetailItemTitle(listDisplay.title, itemNoun),
         eyebrow: listDisplay.eyebrow,
         kindLabel: listDisplay.kindLabel,
+        summary: listDisplay.summary,
         sectionLabel,
         showDelete,
         extraReasons:

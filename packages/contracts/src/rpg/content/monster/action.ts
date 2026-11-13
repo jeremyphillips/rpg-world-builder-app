@@ -275,7 +275,7 @@ function monsterActionFields<M extends MonsterActionMode>(mode: M) {
     z.object({
       ...referenceIdentity,
       kind: z.literal('action-reference'),
-      name: strict(z.string().min(1), mode),
+      name: z.string().min(1).optional(),
       actionIds,
       movement: z
         .object({
@@ -340,7 +340,7 @@ function reactionReferenceSchema(mode: MonsterActionMode) {
   return z.object({
     id: z.string().min(1),
     kind: z.literal('action-reference'),
-    name: strict(z.string().min(1), mode),
+    name: z.string().min(1).optional(),
     trigger: activationTriggerSchema.optional(),
     description: z.string().optional(),
     actionIds,
@@ -861,6 +861,7 @@ function refineAuthoredActionName(
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
+  if (action.kind === 'action-reference') return
   if (monsterActionAuthoring(action).name === 'authored' && !action.name?.trim()) {
     addCustomRefinementIssue(ctx, 'Name is required.', [...path, 'name'])
   }

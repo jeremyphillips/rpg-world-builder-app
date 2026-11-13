@@ -15,6 +15,7 @@ export interface BuildEmbeddedMasterDetailListItemParams {
   title: string
   eyebrow?: string
   kindLabel?: string
+  summary?: string
   sectionLabel?: string
   showDelete?: boolean
   extraReasons?: readonly AvailabilityReason[]
@@ -32,6 +33,7 @@ export function buildEmbeddedMasterDetailListItem({
   title,
   eyebrow,
   kindLabel,
+  summary,
   sectionLabel,
   showDelete = true,
   extraReasons = [],
@@ -53,6 +55,7 @@ export function buildEmbeddedMasterDetailListItem({
       persistence: rowMeta.persistence,
       ...(eyebrow !== undefined ? { eyebrow } : {}),
       ...(kindLabel ? { kindLabel } : {}),
+      ...(summary ? { summary } : {}),
       ...(sectionLabel ? { sectionLabel } : {}),
     },
     deletable: showDelete && rowMeta.deletable,

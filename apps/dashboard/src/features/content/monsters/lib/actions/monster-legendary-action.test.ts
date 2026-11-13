@@ -38,7 +38,7 @@ describe('legendary action acquisition', () => {
     const values = resolveMonsterCreateDefaultValues()
     const items = legendaryActionAcquisitionItems(values, ctx)
     expect(items.map((item) => [item.groupId, item.label, item.metadata])).toEqual([
-      ['existing', 'Attack or ability', 'Use an action already defined for this creature.'],
+      ['existing', 'Use existing action', 'Use an action already defined for this creature.'],
       ['existing', 'Spellcasting', 'Cast a spell from an existing Spellcasting action.'],
       ['new', 'Cast a spell', 'Choose a spell from the catalog.'],
       ['new', 'Custom ability', 'Write a standalone legendary ability.'],

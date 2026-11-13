@@ -382,5 +382,41 @@ describe('monster-display', () => {
     })
     expect(viewModel.legendaryActionsIntro).toContain('Legendary Action Uses: 3')
     expect(viewModel.legendaryActions[0]?.descriptionHtml).toContain('makes one Rend attack')
+    expect(viewModel.legendaryActions[0]?.name).toBe('Tail Swipe')
+  })
+
+  it('heads an unnamed reference with the derived source title', () => {
+    const monster = {
+      ...pickMonster('hell-hound'),
+      name: 'Rust Monster',
+      actions: [
+        {
+          id: 'antennae',
+          kind: 'natural-weapon' as const,
+          name: 'Antennae',
+          mode: 'melee' as const,
+          properties: [] as const,
+          damage: { dice: { count: 1, faces: 6 } },
+          damageType: 'piercing',
+        },
+      ],
+      reactions: [
+        {
+          id: 'reflex',
+          kind: 'action-reference' as const,
+          actionIds: ['antennae'],
+          trigger: { text: 'The rust monster is hit by an attack.' },
+        },
+      ],
+    }
+    const viewModel = buildMonsterDetailViewModel({
+      monster: monster as unknown as Monster,
+      creatureTypeLabel: 'Monstrosity',
+      equipmentById: new Map(),
+      catalogState: 'pending',
+      derived: null,
+    })
+    expect(viewModel.reactions[0]?.name).toBe('Use Antennae')
+    expect(viewModel.reactions[0]?.descriptionHtml).toContain('makes one Antennae attack')
   })
 })

@@ -11,6 +11,7 @@ import {
 import {
   MONSTER_ACTION_ACQUISITION_GROUPS,
   MONSTER_ACTION_ALREADY_ADDED_NOTE,
+  createReactionActionDraft,
   createSpellActionDraft,
   monsterActionAcquisitionItems,
   parseMonsterActionAcquisitionId,
@@ -115,6 +116,15 @@ describe('monster action acquisition presentation', () => {
       'reaction:cast-spell',
       'reaction:custom',
     ])
+    expect(reactions.find((item) => item.id === 'reaction:reference')).toMatchObject({
+      label: 'Use existing action',
+      metadata: 'Use an action already defined for this creature.',
+    })
+    expect(createReactionActionDraft('reference', {})).toMatchObject({
+      kind: 'action-reference',
+      actionIds: [],
+    })
+    expect(createReactionActionDraft('reference', {})).not.toHaveProperty('name')
     expect(items.find((item) => item.id === 'natural:other')?.metadata).toBeUndefined()
   })
 

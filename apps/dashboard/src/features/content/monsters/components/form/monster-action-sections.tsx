@@ -28,6 +28,7 @@ import {
 } from '../../lib/actions/monster-action-equipment-references'
 import { primarySpellcastingProfile } from '../../lib/actions/monster-action-casting-summary'
 import { monsterActionEditorTitles } from '../../lib/actions/monster-action-editor-title'
+import { presentActionReference } from '../../lib/actions/monster-action-reference-presentation'
 import {
   isLegendaryReferenceTarget,
   legendaryActionCategory,
@@ -83,9 +84,18 @@ function mapActionListItem(
   index: number,
   titles: ReadonlyMap<string, string>,
   section: MonsterActionSection,
+  sourceTitles?: ReadonlyMap<string, string>,
 ) {
   const action = row as MonsterActionDraftRow | undefined
   const category = section === 'legendaryActions' ? legendaryActionCategory(action) : undefined
+  const reference =
+    action?.kind === 'action-reference' && sourceTitles
+      ? presentActionReference({
+          name: action.name,
+          actionIds: action.actionIds,
+          sourceTitles,
+        })
+      : undefined
   return {
     title: action ? (titles.get(action.id) ?? `Action ${index + 1}`) : `Action ${index + 1}`,
     kindLabel: category
@@ -93,6 +103,7 @@ function mapActionListItem(
       : action
         ? getMonsterActionKindLabel(action.kind)
         : undefined,
+    ...(reference?.summary ? { summary: reference.summary } : {}),
   }
 }
 
@@ -251,7 +262,8 @@ function useMonsterActionDetailRows(
     fieldName: 'reactions',
     editor: sections.editors.reactions,
     sectionLabel: SECTION_HEADINGS.reactions,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, reactionTitles, 'reactions'),
+    mapListItem: ({ row, index }) =>
+      mapActionListItem(row, index, reactionTitles, 'reactions', actionTitles),
   })
   const legendaryRows = useEmbeddedMasterDetailRows({
     ...shared,
@@ -259,7 +271,7 @@ function useMonsterActionDetailRows(
     editor: sections.editors.legendaryActions,
     sectionLabel: SECTION_HEADINGS.legendaryActions,
     mapListItem: ({ row, index }) =>
-      mapActionListItem(row, index, legendaryTitles, 'legendaryActions'),
+      mapActionListItem(row, index, legendaryTitles, 'legendaryActions', actionTitles),
   })
   return {
     titlesBySection: {

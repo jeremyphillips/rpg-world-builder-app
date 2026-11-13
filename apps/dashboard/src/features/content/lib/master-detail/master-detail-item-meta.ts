@@ -13,6 +13,11 @@ export interface MasterDetailItemMeta {
   persistence: MasterDetailPersistence
   /** Domain classification, such as "Natural weapon". */
   kindLabel?: string
+  /**
+   * List phrase when it differs from the kind. Detail keeps `kindLabel`.
+   * Omit it when the list should show the kind.
+   */
+  summary?: string
   /** Detail-only placement, such as "Actions". */
   sectionLabel?: string
   /** Leading list label, such as "Level 1". Not part of the detail caption. */
@@ -39,7 +44,7 @@ export function joinMasterDetailCaption(
   return joinInlineMetadata([
     surface === 'detail' ? sourceName : undefined,
     surface === 'detail' ? meta.eyebrow : undefined,
-    meta.kindLabel,
+    surface === 'list' ? (meta.summary ?? meta.kindLabel) : meta.kindLabel,
     surface === 'detail' ? meta.sectionLabel : undefined,
     state,
   ])

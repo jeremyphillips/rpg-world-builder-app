@@ -6,6 +6,7 @@ import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { MasterDetailEditorPanel } from '../../../components/master-detail/master-detail-editor-panel'
+import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-constants'
 import type { useEmbeddedMasterDetailRows } from '../../../lib/master-detail/use-embedded-master-detail-rows'
 import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-summary'
 import { isLegendaryReferenceTarget } from '../../lib/actions/legendary-action-category'
@@ -21,6 +22,16 @@ import {
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
 import { MONSTER_MOVE_TO_LABEL } from '../../lib/monster-form-labels'
+
+function referenceOptionLabels(values: MonsterFormValues, ctx: ContentFormCtx) {
+  const actionRows = (values.actions ?? []) as MonsterActionDraftRow[]
+  const titles = monsterActionEditorTitles(actionRows, values, ctx, 'actions')
+  const unnamed = masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
+  return actionRows.filter(isLegendaryReferenceTarget).map((row) => ({
+    value: row.id,
+    label: titles.get(row.id) ?? unnamed,
+  }))
+}
 
 function moveOverflowActions(
   located: { section: MonsterActionSection; action: MonsterActionDraftRow } | null | undefined,
@@ -122,6 +133,7 @@ export function MonsterActionDetail({
   const editor = located ? sections.editors[located.section] : sections.editors.actions
   const initialEdit = Boolean(
     headerName?.mode === 'authored' &&
+    liveAction?.kind !== 'action-reference' &&
     !liveAction?.name?.trim() &&
     editor.lastAddedFieldId &&
     editor.lastAddedFieldId === editor.selectedFieldId,
@@ -146,18 +158,7 @@ export function MonsterActionDetail({
         values,
         ctx,
       ),
-      referenceOptions: ((values.actions ?? []) as MonsterActionDraftRow[])
-        .filter(isLegendaryReferenceTarget)
-        .map((row) => ({
-          value: row.id,
-          label:
-            monsterActionEditorTitles(
-              (values.actions ?? []) as MonsterActionDraftRow[],
-              values,
-              ctx,
-              'actions',
-            ).get(row.id) ?? row.id,
-        })),
+      referenceOptions: referenceOptionLabels(values, ctx),
       sourceSpellOptions: legendarySourceSpellOptions(values, liveAction, ctx.spellCatalogById),
     })
   }, [action, ctx, liveAction, located, namePrefix, sections.setNotice, values])

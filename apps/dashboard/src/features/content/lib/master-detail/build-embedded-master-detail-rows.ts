@@ -34,7 +34,11 @@ export type BuildEmbeddedMasterDetailRowsParams = {
     row: unknown
     entityCatalogLayer: ContentFormCtx['entityCatalogLayer']
     getRowIssueCount: (index: number) => number
-  }) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string; kindLabel?: string }
+  }) => Pick<MasterDetailListItem, 'title'> & {
+    eyebrow?: string
+    kindLabel?: string
+    summary?: string
+  }
   getRowIssueCount: (index: number) => number
   persistedRowIds?: ReadonlySet<string>
   systemOriginRowIds?: ReadonlySet<string>
@@ -108,6 +112,7 @@ export function buildEmbeddedMasterDetailRows({
       title: masterDetailItemTitle(listDisplay.title, itemNoun),
       eyebrow: listDisplay.eyebrow,
       kindLabel: listDisplay.kindLabel,
+      summary: listDisplay.summary,
       sectionLabel,
       showDelete,
       extraReasons,

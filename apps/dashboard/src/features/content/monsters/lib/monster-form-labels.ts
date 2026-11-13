@@ -255,13 +255,12 @@ export const LEGENDARY_ACTION_CATEGORY_LABELS = {
 } as const
 
 export const LEGENDARY_ACTION_DEFAULT_NAMES = {
-  reference: getMonsterActionKindLabel('action-reference'),
   spellcasting: LEGENDARY_SPELLCASTING_DEFAULT_NAME,
   'cast-spell': LEGENDARY_CAST_SPELL_DEFAULT_NAME,
   custom: LEGENDARY_CUSTOM_LABEL,
 } as const
 
-export const MONSTER_REFERENCE_ACTION_LABEL = 'Action'
+export const MONSTER_REFERENCE_ACTION_LABEL = 'Source action'
 export const MONSTER_REFERENCE_ACTION_HINT =
   'Choose an attack or ability from Actions. If you select several attacks, the creature makes one of them.'
 export const MONSTER_MOVEMENT_LABEL = 'Movement'
@@ -391,7 +390,18 @@ export const MONSTER_PARRY_FOLLOW_UP_ADD_LABEL = 'Add attack on a miss'
 export const MONSTER_PARRY_FOLLOW_UP_LABEL = 'Attack'
 export const MONSTER_PARRY_FOLLOW_UP_HINT = 'Choose an existing attack from Actions.'
 export const MONSTER_PARRY_DESCRIPTION = 'Add a bonus to AC against the triggering attack.'
-export const MONSTER_REACTION_REFERENCE_LABEL = 'Existing action'
+export const MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL = 'Use existing action'
+export const MONSTER_ACTION_REFERENCE_UNNAMED_TITLE = 'Use action'
+export const MONSTER_ACTION_REFERENCE_CHOOSE_SOURCE = 'Choose a source action'
+export const MONSTER_ACTION_REFERENCE_SOURCE_UNAVAILABLE = 'Source action unavailable'
+
+export function formatMonsterActionReferenceUseTitle(names: string): string {
+  return `Use ${names}`
+}
+
+export function formatMonsterActionReferenceUsesSummary(names: string): string {
+  return `Uses ${names}`
+}
 export const MONSTER_REACTION_REFERENCE_HINT =
   'The reaction uses this action. The action stays in Actions.'
 export const MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL = 'Add additional rules'

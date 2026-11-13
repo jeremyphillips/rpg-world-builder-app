@@ -208,4 +208,60 @@ describe('monster action references', () => {
       }).success,
     ).toBe(true)
   })
+
+  it('publishes a valid reference without a stored name', () => {
+    expect(
+      createMonsterInputSchema.safeParse({
+        ...MONSTER_TEST_INPUT,
+        legendaryActionUses: 3,
+        actions: [BITE_ACTION],
+        legendaryActions: [{ id: 'pounce', kind: 'action-reference', actionIds: ['bite'] }],
+      }).success,
+    ).toBe(true)
+    expect(
+      createMonsterInputSchema.safeParse({
+        ...MONSTER_TEST_INPUT,
+        actions: [BITE_ACTION],
+        reactions: [
+          {
+            id: 'reflex',
+            kind: 'action-reference',
+            actionIds: ['bite'],
+            trigger: { text: 'The creature is hit by an attack.' },
+          },
+        ],
+      }).success,
+    ).toBe(true)
+    expect(
+      createMonsterInputSchema.safeParse({
+        ...MONSTER_TEST_INPUT,
+        actions: [{ id: 'slash', kind: 'attack' }],
+      }).success,
+    ).toBe(false)
+    expect(
+      createMonsterInputSchema.safeParse({
+        ...MONSTER_TEST_INPUT,
+        actions: [{ id: 'notes', kind: 'special' }],
+      }).success,
+    ).toBe(false)
+    expect(
+      createMonsterInputSchema.safeParse({
+        ...MONSTER_TEST_INPUT,
+        actions: [
+          {
+            id: 'cast',
+            kind: 'spell',
+            castingAbility: { kind: 'ability', ability: 'int' },
+            spells: [{ spellId: 'srd:fire-bolt' }],
+          },
+        ],
+      }).success,
+    ).toBe(false)
+    expect(
+      createMonsterInputSchema.safeParse({
+        ...MONSTER_TEST_INPUT,
+        reactions: [{ id: 'parry', kind: 'parry', acBonus: 2 }],
+      }).success,
+    ).toBe(false)
+  })
 })

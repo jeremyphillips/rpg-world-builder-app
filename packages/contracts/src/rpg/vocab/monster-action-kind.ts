@@ -38,7 +38,7 @@ export const MONSTER_ACTION_KIND_ENTRIES = {
     description: 'A sequence of attacks made in the Actions section.',
   },
   'action-reference': {
-    label: 'Attack or ability',
+    label: 'Action reference',
     description:
       'A reaction or legendary action that uses an attack or ability already listed under Actions.',
   },

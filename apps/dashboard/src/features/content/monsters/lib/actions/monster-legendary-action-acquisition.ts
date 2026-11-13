@@ -14,6 +14,7 @@ import {
   LEGENDARY_CUSTOM_DESCRIPTION,
   LEGENDARY_CUSTOM_LABEL,
   LEGENDARY_ACTION_CATEGORY_LABELS,
+  MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL,
   LEGENDARY_REFERENCE_DESCRIPTION,
   LEGENDARY_REFERENCE_DISABLED_NOTE,
   LEGENDARY_SPELLCASTING_DEFAULT_NAME,
@@ -83,7 +84,7 @@ export function legendaryActionAcquisitionItems(
   return [
     {
       id: 'legendary:reference',
-      label: LEGENDARY_ACTION_CATEGORY_LABELS.reference,
+      label: MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL,
       groupId: 'existing',
       metadata: LEGENDARY_REFERENCE_DESCRIPTION,
       disabled: targets.length === 0,

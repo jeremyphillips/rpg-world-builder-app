@@ -42,6 +42,21 @@ describe('joinMasterDetailCaption', () => {
     ).toBe('System')
   })
 
+  it('uses a list summary without changing the detail kind', () => {
+    const reference: MasterDetailItemMeta = {
+      provenance: 'homebrew',
+      persistence: 'persisted',
+      kindLabel: 'Action reference',
+      summary: 'Uses Antennae',
+      sectionLabel: 'Reactions',
+    }
+    expect(joinMasterDetailCaption(reference, 'list')).toBe('Uses Antennae')
+    expect(joinMasterDetailCaption(reference, 'detail')).toBe('Action reference · Reactions')
+    expect(joinMasterDetailCaption({ ...reference, persistence: 'new' }, 'list')).toBe(
+      'Uses Antennae · Unsaved',
+    )
+  })
+
   it('does not emit empty separators', () => {
     expect(
       joinMasterDetailCaption(

@@ -66,6 +66,10 @@ import {
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 
 import { buildMonsterMultiattackSentence } from './actions/monster-action-multiattack-summary'
+import {
+  nextDistinctTitle,
+  presentActionReference,
+} from './actions/monster-action-reference-presentation'
 import { formatMonsterTemplateSentence } from './format-monster-template-sentence'
 import { MONSTER_HP_MINIMUM_NOTE } from './monster-form-labels'
 
@@ -520,12 +524,69 @@ function mapMultiattackActionItem(
   }
 }
 
+function referenceSourceTitles(spells: SpellDisplayContext): Map<string, string> {
+  const sourceTitles = new Map<string, string>()
+  for (const action of spells.monster.actions) {
+    const name = actionDisplayIdentity(
+      action,
+      spells.monster,
+      spells.equipmentById,
+      spells.catalogState,
+      spells.magicPropertyProvider,
+    ).displayName.trim()
+    if (name && name !== action.id && name !== MONSTER_UNRESOLVED_CATALOG_REFERENCE) {
+      sourceTitles.set(action.id, name)
+    }
+  }
+  return sourceTitles
+}
+
+function assignReferenceHeadings(
+  actions: readonly (MonsterAction | MonsterReaction | MonsterLegendaryAction)[],
+  sourceTitles: ReadonlyMap<string, string>,
+  headings: Map<string, string>,
+  taken: Set<string>,
+  authored: boolean,
+): void {
+  for (const action of actions) {
+    if (action.kind !== 'action-reference') continue
+    const stored = action.name?.trim()
+    if (authored) {
+      if (!stored) continue
+      headings.set(action.id, stored)
+      taken.add(stored)
+      continue
+    }
+    if (stored) continue
+    const title = nextDistinctTitle(
+      presentActionReference({ actionIds: action.actionIds, sourceTitles }).fallbackTitle,
+      taken,
+    )
+    headings.set(action.id, title)
+    taken.add(title)
+  }
+}
+
+function actionReferenceHeadings(
+  actions: readonly (MonsterAction | MonsterReaction | MonsterLegendaryAction)[],
+  spells: SpellDisplayContext,
+): Map<string, string> {
+  if (!actions.some((action) => action.kind === 'action-reference')) return new Map()
+  const sourceTitles = referenceSourceTitles(spells)
+  const taken = new Set<string>()
+  const headings = new Map<string, string>()
+  assignReferenceHeadings(actions, sourceTitles, headings, taken, true)
+  assignReferenceHeadings(actions, sourceTitles, headings, taken, false)
+  return headings
+}
+
 function mapActionItem(
   action: MonsterAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
   derived: DerivedMonsterStatBlock | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
+  referenceHeadings: ReadonlyMap<string, string>,
 ): MonsterActionItemViewModel {
   const identity = actionDisplayIdentity(
     action,
@@ -534,8 +595,12 @@ function mapActionItem(
     spells.catalogState,
     spells.magicPropertyProvider,
   )
+  const heading =
+    action.kind === 'action-reference'
+      ? (referenceHeadings.get(action.id) ?? identity.displayName)
+      : identity.displayName
   const name = withLimitedUseHeading(
-    identity.displayName,
+    heading,
     'limitedUse' in action ? action.limitedUse : undefined,
   )
 
@@ -592,7 +657,10 @@ function mapActionItems(
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionItemViewModel[] {
-  return actions.map((action) => mapActionItem(action, section, derived, catalogState, spells))
+  const headings = actionReferenceHeadings(actions, spells)
+  return actions.map((action) =>
+    mapActionItem(action, section, derived, catalogState, spells, headings),
+  )
 }
 
 function mapReactionItems(
@@ -601,11 +669,12 @@ function mapReactionItems(
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionItemViewModel[] {
+  const headings = actionReferenceHeadings(reactions, spells)
   return reactions.map((action) => {
     const triggerText =
       action.kind === 'parry' ? formatMonsterParryTrigger(spells.monsterName) : action.trigger?.text
     return reactionItemView(
-      mapActionItems([action], 'reactions', derived, catalogState, spells)[0],
+      mapActionItem(action, 'reactions', derived, catalogState, spells, headings),
       triggerText,
     )
   })

@@ -27,7 +27,7 @@ import {
   MONSTER_REACTION_CAST_SPELL_DESCRIPTION,
   MONSTER_REACTION_CUSTOM_DESCRIPTION,
   MONSTER_REACTION_CUSTOM_LABEL,
-  MONSTER_REACTION_REFERENCE_LABEL,
+  MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL,
   LEGENDARY_CAST_SPELL_DISABLED_NOTE,
   LEGENDARY_REFERENCE_DESCRIPTION,
   LEGENDARY_REFERENCE_DISABLED_NOTE,
@@ -264,7 +264,7 @@ function reactionAcquisitionItems(
   return [
     {
       id: 'reaction:reference',
-      label: MONSTER_REACTION_REFERENCE_LABEL,
+      label: MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL,
       groupId: 'existing',
       metadata: LEGENDARY_REFERENCE_DESCRIPTION,
       disabled: !hasReferenceTargets,
@@ -377,7 +377,6 @@ export function createReactionActionDraft(
     return {
       id: createMonsterRowId(),
       kind: 'action-reference',
-      name: getMonsterActionKindLabel('action-reference'),
       actionIds: [],
     }
   }

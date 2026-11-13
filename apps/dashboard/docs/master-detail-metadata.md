@@ -9,6 +9,7 @@ List rows and detail headers share one resolved object. Domain editors supply cl
 | `provenance`   | Shared resolver           | `system` only when the row id was on a system entity at editor open. Otherwise `homebrew`.  |
 | `persistence`  | Shared resolver           | `persisted` when the row id is on the latest saved entity. Otherwise `new`.                 |
 | `kindLabel`    | Domain `mapListItem`      | What the row is, such as "Natural weapon".                                                  |
+| `summary`      | Domain `mapListItem`      | Optional list phrase when it differs from the kind. Detail still uses `kindLabel`.          |
 | `sectionLabel` | The editor for that array | Where it sits, such as "Actions". Shown on the detail caption only.                         |
 | `eyebrow`      | Domain `mapListItem`      | Leading list label, such as "Level 1". It stays above the title.                            |
 | `sourceName`   | Derived at render         | Original name while a custom name is stored. It is not saved again and is not a kind label. |
@@ -33,7 +34,7 @@ Reload limitation: a homebrew row saved onto a system creature in an earlier ses
 
 `joinMasterDetailCaption` chooses what to show. Omitting a fact does not change it. Separators are omitted for empty parts. Typography stays the caption style. Badges are not used.
 
-- List: kind, then `Unsaved` when new. With no kind: `Unsaved` when new, otherwise System or Homebrew.
+- List: `summary` when the domain set one, otherwise kind, then `Unsaved` when new. With no kind: `Unsaved` when new, otherwise System or Homebrew.
 - Detail: derived source name, eyebrow, kind, section, then the same token. The eyebrow stays a separate line in the list.
 - Provenance is hidden when a kind label or `Unsaved` is already shown.
 

@@ -115,6 +115,22 @@ describe('master detail inline title', () => {
     expect(formRef.current?.getFieldState('actions.0').isDirty).toBe(true)
   })
 
+  it('leaves an empty authored name unset when the edit blurs unchanged', async () => {
+    const user = userEvent.setup()
+    const formRef: { current: UseFormReturn<{ actions: { name?: string }[] }> | null } = {
+      current: null,
+    }
+    render(<Harness formRef={formRef} name="" fallback="Use Antennae" />)
+    await user.click(screen.getByRole('button', { name: 'Edit name' }))
+    const input = screen.getByRole('textbox', { name: 'Name' })
+    expect(input).toHaveValue('')
+    expect(input).toHaveAttribute('placeholder', 'Use Antennae')
+    await user.tab()
+    expect(formRef.current?.getValues('actions.0')).toEqual({ name: '' })
+    expect(formRef.current?.formState.isDirty).toBe(false)
+    expect(screen.getByText('Use Antennae')).toBeInTheDocument()
+  })
+
   it('restores a derived name from the overflow action', async () => {
     const user = userEvent.setup()
     const formRef: { current: UseFormReturn<{ actions: { name?: string }[] }> | null } = {

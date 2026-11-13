@@ -5940,7 +5940,6 @@
             "required": [
               "id",
               "kind",
-              "name",
               "actionIds"
             ],
             "additionalProperties": false
@@ -6092,7 +6091,6 @@
             "required": [
               "id",
               "kind",
-              "name",
               "actionIds"
             ],
             "additionalProperties": false

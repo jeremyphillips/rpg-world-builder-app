@@ -11,6 +11,11 @@ function titles(rows: MonsterActionDraftRow[]) {
   return monsterActionEditorTitles(rows, { actions: rows } as MonsterFormValues, ctx)
 }
 
+function titlesFor(section: 'reactions' | 'legendaryActions', values: MonsterFormValues) {
+  const rows = (values[section] ?? []) as MonsterActionDraftRow[]
+  return monsterActionEditorTitles(rows, values, ctx, section)
+}
+
 describe('monsterActionEditorTitles', () => {
   it('numbers empty authored actions in section order and skips stored names', () => {
     const rows = [
@@ -70,6 +75,68 @@ describe('monsterActionEditorTitles', () => {
     ] as MonsterActionDraftRow[]
     expect(titles(rows).get('breath')).toBe('Fire Breath')
     expect(titles(rows).get('blank')).toBe('Saving Throw')
+  })
+
+  it('names an action reference from its source without storing that title', () => {
+    const antennae = { id: 'antennae', kind: 'natural-weapon', name: 'Antennae' }
+    const bite = { id: 'bite', kind: 'natural-weapon', name: 'Bite' }
+    const reference = { id: 'reflex', kind: 'action-reference', actionIds: ['antennae'] }
+    const values = { actions: [antennae], reactions: [reference] } as MonsterFormValues
+
+    expect(titlesFor('reactions', values).get('reflex')).toBe('Use Antennae')
+    expect(reference).not.toHaveProperty('name')
+    const unnamedHeader = monsterActionHeaderName({
+      action: reference as MonsterActionDraftRow,
+      sectionRows: [reference] as MonsterActionDraftRow[],
+      values,
+      ctx,
+      section: 'reactions',
+    })
+    expect(unnamedHeader).toMatchObject({
+      title: 'Use Antennae',
+      fallback: 'Use Antennae',
+      mode: 'authored',
+    })
+    expect(unnamedHeader.resetLabel).toBeUndefined()
+    expect(unnamedHeader.sourceName).toBeUndefined()
+
+    const renamed = { ...antennae, name: 'Feelers' }
+    expect(
+      titlesFor('reactions', {
+        actions: [renamed],
+        reactions: [reference],
+      } as MonsterFormValues).get('reflex'),
+    ).toBe('Use Feelers')
+    expect(reference).not.toHaveProperty('name')
+
+    const replaced = { ...reference, actionIds: ['bite'] }
+    expect(
+      titlesFor('reactions', {
+        actions: [antennae, bite],
+        reactions: [replaced],
+      } as MonsterFormValues).get('reflex'),
+    ).toBe('Use Bite')
+
+    const authored = { ...reference, name: 'Reflexive Antennae' }
+    expect(
+      titlesFor('reactions', {
+        actions: [renamed],
+        reactions: [authored],
+      } as MonsterFormValues).get('reflex'),
+    ).toBe('Reflexive Antennae')
+    expect(
+      monsterActionHeaderName({
+        action: authored as MonsterActionDraftRow,
+        sectionRows: [authored] as MonsterActionDraftRow[],
+        values: { actions: [renamed], reactions: [authored] } as MonsterFormValues,
+        ctx,
+        section: 'reactions',
+      }),
+    ).toMatchObject({
+      title: 'Reflexive Antennae',
+      fallback: 'Use Feelers',
+      resetLabel: 'Use default name',
+    })
   })
 
   it('keeps the primary Spellcasting name immutable', () => {
