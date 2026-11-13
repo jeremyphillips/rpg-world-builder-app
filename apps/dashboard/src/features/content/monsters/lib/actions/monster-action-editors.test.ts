@@ -83,7 +83,13 @@ describe('monster action acquisition', () => {
     })
     expect(attack).not.toHaveProperty('reach')
     expect(attack).not.toHaveProperty('damageType')
-    expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'spell' })).toMatchObject({
+    expect(
+      createMonsterActionFromAcquisition({
+        type: 'create',
+        kind: 'spell',
+        spellAcquisition: 'standalone',
+      }),
+    ).toMatchObject({
       kind: 'spell',
       spells: [],
     })
@@ -703,7 +709,11 @@ describe('monster action draft round trip', () => {
       createMonsterActionFromAcquisition({ type: 'weapon-entry', entryId: 'greatsword' }),
       createMonsterActionFromAcquisition({ type: 'natural', presetId: 'bite' }),
       createMonsterActionFromAcquisition({ type: 'create', kind: 'attack' }),
-      createMonsterActionFromAcquisition({ type: 'create', kind: 'spell' }),
+      createMonsterActionFromAcquisition({
+        type: 'create',
+        kind: 'spell',
+        spellAcquisition: 'standalone',
+      }),
       createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
     ]
     const input = buildMonsterInput(values, undefined, 'draft')

@@ -20,7 +20,8 @@ import {
   MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SAVE_DESCRIPTION,
-  MONSTER_ACQUISITION_SPELL_DESCRIPTION,
+  MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION,
+  MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION,
   MONSTER_CAST_SPELL_LABEL,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
   MONSTER_PARRY_DESCRIPTION,
@@ -66,7 +67,8 @@ export type MonsterActionAcquisitionChoice =
   | { type: 'natural'; presetId: ActionPresetId }
   | { type: 'other-natural' }
   | { type: 'preset'; presetId: ActionPresetId }
-  | { type: 'create'; kind: 'attack' | 'spell' | 'special' | 'save' }
+  | { type: 'create'; kind: 'attack' | 'special' | 'save' }
+  | { type: 'create'; kind: 'spell'; spellAcquisition: 'primary' | 'standalone' }
   | { type: 'legendary'; category: 'reference' | 'spellcasting' | 'cast-spell' }
   | { type: 'reaction'; category: 'reference' | 'parry' | 'cast-spell' | 'custom' }
 
@@ -83,13 +85,13 @@ const OTHER_ITEMS: readonly MonsterActionAcquisitionItem[] = [
     id: 'create:spell',
     label: MONSTER_SPELLCASTING_ACTION_NAME,
     groupId: 'other',
-    metadata: MONSTER_ACQUISITION_SPELL_DESCRIPTION,
+    metadata: MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION,
   },
   {
     id: 'create:spell-standalone',
     label: MONSTER_CAST_SPELL_LABEL,
     groupId: 'other',
-    metadata: MONSTER_ACQUISITION_SPELL_DESCRIPTION,
+    metadata: MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION,
   },
   {
     id: 'create:special',
@@ -111,8 +113,8 @@ function isAttackRollPreset(id: ActionPresetId): boolean {
 const EXACT_ACQUISITION_CHOICES: Record<string, MonsterActionAcquisitionChoice> = {
   'add-weapon': { type: 'add-weapon' },
   'create:attack': { type: 'create', kind: 'attack' },
-  'create:spell': { type: 'create', kind: 'spell' },
-  'create:spell-standalone': { type: 'create', kind: 'spell' },
+  'create:spell': { type: 'create', kind: 'spell', spellAcquisition: 'primary' },
+  'create:spell-standalone': { type: 'create', kind: 'spell', spellAcquisition: 'standalone' },
   'create:special': { type: 'create', kind: 'special' },
   'create:save': { type: 'create', kind: 'save' },
   'natural:other': { type: 'other-natural' },
@@ -322,6 +324,7 @@ function generalAcquisitionItems(
           },
         ]
       : []),
+    ...standalone,
   ]
 }
 
@@ -389,7 +392,7 @@ export function createReactionActionDraft(
     }
   }
   if (category === 'cast-spell') {
-    const cast = createSpellActionDraft('reactions', sections)
+    const cast = createSpellActionDraft('reactions', sections, 'standalone')
     if (cast.kind !== 'spell') return cast
     return { ...cast, name: MONSTER_CAST_SPELL_LABEL }
   }
@@ -419,7 +422,10 @@ export function createMonsterActionFromAcquisition(
     throw new Error('focus-existing is not a create choice')
   }
   if (choice.type === 'create') {
-    if (choice.kind === 'spell') return { id, kind: 'spell', spells: [] } as MonsterActionDraftRow
+    if (choice.kind === 'spell') {
+      const spellAcquisition = choice.spellAcquisition ?? 'standalone'
+      return createSpellActionDraft('actions', {}, spellAcquisition)
+    }
     if (choice.kind === 'special') return { id, kind: 'special' } as MonsterActionDraftRow
     if (choice.kind === 'save') return { id, kind: 'save' } as MonsterActionDraftRow
     return { id, kind: 'attack', damage: authoredStartingDamage() } as MonsterActionDraftRow
@@ -427,7 +433,7 @@ export function createMonsterActionFromAcquisition(
   return { id, kind: 'special' } as MonsterActionDraftRow
 }
 
-/** Spell row for the add menu. Names Spellcasting only on Actions, and shares only that source. */
+/** Spell row for the add menu. Primary profile only when spellAcquisition is primary. */
 export function createSpellActionDraft(
   section: MonsterActionSection,
   sections: {
@@ -436,9 +442,10 @@ export function createSpellActionDraft(
     reactions?: readonly unknown[]
     legendaryActions?: readonly unknown[]
   },
+  spellAcquisition: 'primary' | 'standalone' = 'standalone',
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()
-  if (section === 'actions') {
+  if (spellAcquisition === 'primary') {
     return {
       id,
       kind: 'spell',

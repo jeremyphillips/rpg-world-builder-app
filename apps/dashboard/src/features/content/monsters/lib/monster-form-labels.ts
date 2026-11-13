@@ -228,7 +228,11 @@ export const MONSTER_LIMIT_ADD_LABEL = 'Add limit'
 export const MONSTER_RECHARGE_ADD_LABEL = 'Add recharge'
 export const MONSTER_ACQUISITION_SAVE_DESCRIPTION = 'Saving throw effect'
 export const MONSTER_ACQUISITION_ATTACK_DESCRIPTION = 'Custom attack'
-export const MONSTER_ACQUISITION_SPELL_DESCRIPTION = 'Cast spells'
+export const MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION =
+  'Create a spell list whose casting ability other actions can reuse.'
+export const MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION =
+  'Create a separate spell action with its own spell choices.'
+export const MONSTER_ACQUISITION_SPELL_DESCRIPTION = MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION
 export const MONSTER_CAST_SPELL_LABEL = 'Cast a spell'
 export const MONSTER_ACQUISITION_SPECIAL_DESCRIPTION = 'Custom rules or effects'
 export const MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION =
@@ -238,7 +242,7 @@ export const LEGENDARY_REFERENCE_DESCRIPTION = 'Use an action already defined fo
 export const LEGENDARY_REFERENCE_DISABLED_NOTE = 'No attacks or abilities in Actions'
 export const LEGENDARY_SPELLCASTING_DEFAULT_NAME = 'Use Spellcasting'
 export const LEGENDARY_SPELLCASTING_DESCRIPTION =
-  'Cast a spell from an existing Spellcasting action.'
+  'Cast a spell from an existing action that already lists spells.'
 export const LEGENDARY_SPELLCASTING_DISABLED_NOTE = 'No Spellcasting action with spells'
 export const LEGENDARY_CAST_SPELL_LABEL = 'Cast a spell'
 export const LEGENDARY_CAST_SPELL_DEFAULT_NAME = 'Cast a spell'
@@ -249,7 +253,7 @@ export const LEGENDARY_CUSTOM_DESCRIPTION = 'Write a standalone legendary abilit
 
 export const LEGENDARY_ACTION_CATEGORY_LABELS = {
   reference: getMonsterActionKindLabel('action-reference'),
-  spellcasting: MONSTER_SPELLCASTING_ACTION_NAME,
+  spellcasting: LEGENDARY_SPELLCASTING_DEFAULT_NAME,
   'cast-spell': LEGENDARY_CAST_SPELL_LABEL,
   custom: LEGENDARY_CUSTOM_LABEL,
 } as const

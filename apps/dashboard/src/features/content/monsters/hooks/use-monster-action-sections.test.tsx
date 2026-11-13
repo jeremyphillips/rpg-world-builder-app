@@ -59,13 +59,21 @@ describe('useMonsterActionSections', () => {
   it('names a first Actions spell and leaves a first bonus spell unnamed', () => {
     const { result } = renderHook(() => useMonsterActionSections(), { wrapper: wrapper() })
     act(() => {
-      result.current.addAcquisition('actions', { type: 'create', kind: 'spell' })
+      result.current.addAcquisition('actions', {
+        type: 'create',
+        kind: 'spell',
+        spellAcquisition: 'primary',
+      })
     })
     expect(result.current.locate(result.current.selectedActionId)?.action.name).toBe('Spellcasting')
 
     const bonus = renderHook(() => useMonsterActionSections(), { wrapper: wrapper() })
     act(() => {
-      bonus.result.current.addAcquisition('bonusActions', { type: 'create', kind: 'spell' })
+      bonus.result.current.addAcquisition('bonusActions', {
+        type: 'create',
+        kind: 'spell',
+        spellAcquisition: 'standalone',
+      })
     })
     expect(bonus.result.current.locate(bonus.result.current.selectedActionId)?.action.name).toBe(
       undefined,

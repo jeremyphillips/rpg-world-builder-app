@@ -4,7 +4,8 @@ import { describe, expect, it } from 'vitest'
 import {
   MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
-  MONSTER_ACQUISITION_SPELL_DESCRIPTION,
+  MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION,
+  MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION,
   MONSTER_ACQUISITION_SAVE_DESCRIPTION,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
 } from '../monster-form-labels'
@@ -83,7 +84,17 @@ describe('monster action acquisition presentation', () => {
       getMonsterActionKindLabel('attack'),
     )
     expect(items.find((item) => item.id === 'create:spell')).toMatchObject({
-      metadata: MONSTER_ACQUISITION_SPELL_DESCRIPTION,
+      metadata: MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION,
+    })
+    expect(parseMonsterActionAcquisitionId('create:spell')).toEqual({
+      type: 'create',
+      kind: 'spell',
+      spellAcquisition: 'primary',
+    })
+    expect(parseMonsterActionAcquisitionId('create:spell-standalone')).toEqual({
+      type: 'create',
+      kind: 'spell',
+      spellAcquisition: 'standalone',
     })
     expect(items.find((item) => item.id === 'create:special')).toMatchObject({
       label: 'Custom ability',
@@ -155,23 +166,30 @@ describe('monster action acquisition presentation', () => {
 function spellDraft(
   section: Parameters<typeof createSpellActionDraft>[0],
   sections?: Parameters<typeof createSpellActionDraft>[1],
+  spellAcquisition?: Parameters<typeof createSpellActionDraft>[2],
 ) {
-  const draft = createSpellActionDraft(section, sections ?? {})
+  const draft = createSpellActionDraft(section, sections ?? {}, spellAcquisition)
   if (draft.kind !== 'spell') throw new Error('expected spell draft')
   return draft
 }
 
 describe('createSpellActionDraft', () => {
-  it('creates the primary profile only from Actions', () => {
-    expect(spellDraft('actions', {})).toMatchObject({
+  it('creates the primary profile only when spellAcquisition is primary', () => {
+    expect(spellDraft('actions', {}, 'primary')).toMatchObject({
       kind: 'spell',
       profile: 'primary',
       name: 'Spellcasting',
       spells: [],
     })
-    expect(spellDraft('bonusActions', {}).profile).toBeUndefined()
-    expect(spellDraft('bonusActions', {}).name).toBeUndefined()
-    expect(spellDraft('reactions', {}).name).toBeUndefined()
+    expect(spellDraft('actions', {}, 'standalone')).toMatchObject({
+      kind: 'spell',
+      spells: [],
+    })
+    expect(spellDraft('actions', {}, 'standalone').profile).toBeUndefined()
+    expect(spellDraft('actions', {}, 'standalone').name).toBeUndefined()
+    expect(spellDraft('bonusActions', {}, 'standalone').profile).toBeUndefined()
+    expect(spellDraft('bonusActions', {}, 'standalone').name).toBeUndefined()
+    expect(spellDraft('reactions', {}, 'standalone').name).toBeUndefined()
   })
 
   it('shares the primary profile and does not share a standalone spell', () => {
@@ -192,12 +210,12 @@ describe('createSpellActionDraft', () => {
         },
       ],
     }
-    expect(spellDraft('bonusActions', sections).castingAbility).toEqual({
+    expect(spellDraft('bonusActions', sections, 'standalone').castingAbility).toEqual({
       kind: 'shared',
       entryId: 'spellcasting',
     })
     expect(
-      spellDraft('reactions', { actions: [sections.actions[1]] }).castingAbility,
+      spellDraft('reactions', { actions: [sections.actions[1]] }, 'standalone').castingAbility,
     ).toBeUndefined()
   })
 })
@@ -210,7 +228,10 @@ describe('primary Spellcasting acquisition', () => {
       section: 'actions',
     })
     expect(actions.find((item) => item.id === 'create:spell')?.disabled).toBeUndefined()
-    expect(actions.find((item) => item.id === 'create:spell-standalone')).toBeUndefined()
+    expect(actions.find((item) => item.id === 'create:spell-standalone')).toMatchObject({
+      label: 'Cast a spell',
+      metadata: MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION,
+    })
 
     const taken = monsterActionAcquisitionItems({
       weapons: [],

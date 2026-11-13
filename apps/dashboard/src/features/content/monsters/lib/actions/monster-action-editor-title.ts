@@ -12,6 +12,7 @@ import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-
 import {
   LEGENDARY_ACTION_DEFAULT_NAMES,
   MONSTER_ACTION_ITEM_NOUN,
+  MONSTER_CAST_SPELL_LABEL,
   MONSTER_USE_DEFAULT_NAME_LABEL,
 } from '../monster-form-labels'
 import { legendaryActionCategory } from './legendary-action-category'
@@ -30,7 +31,8 @@ const AUTHORED_FALLBACK_BASE = {
   special: 'Special Ability',
   save: 'Saving Throw',
   'natural-weapon': getMonsterActionKindLabel('natural-weapon'),
-  spell: MONSTER_SPELLCASTING_ACTION_NAME,
+  'spell-primary': MONSTER_SPELLCASTING_ACTION_NAME,
+  'spell-standalone': MONSTER_CAST_SPELL_LABEL,
   multiattack: getMonsterActionKindLabel('multiattack'),
 } as const
 
@@ -65,7 +67,13 @@ function queueUntitledAction(
   section?: MonsterActionSection,
 ): void {
   const category = section === 'legendaryActions' ? legendaryActionCategory(action) : undefined
-  const group = category ?? action.kind
+  const group =
+    category ??
+    (action.kind === 'spell'
+      ? isPrimarySpellcastingAction(action)
+        ? 'spell-primary'
+        : 'spell-standalone'
+      : action.kind)
   const ids = pendingByKind.get(group) ?? []
   ids.push(action.id)
   pendingByKind.set(group, ids)

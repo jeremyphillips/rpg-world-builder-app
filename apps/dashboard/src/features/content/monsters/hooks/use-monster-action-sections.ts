@@ -294,7 +294,7 @@ export function useMonsterActionSections(entityId?: string) {
           : choice.type === 'reaction'
             ? createReactionActionDraft(choice.category, getValues())
             : choice.type === 'create' && choice.kind === 'spell'
-              ? createSpellActionDraft(section, getValues())
+              ? createSpellActionDraft(section, getValues(), choice.spellAcquisition)
               : createMonsterActionFromAcquisition(choice)
       const before =
         section === 'legendaryActions' ? rowsOf(getValues(), 'legendaryActions').length : 0

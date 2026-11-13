@@ -139,6 +139,24 @@ describe('monsterActionEditorTitles', () => {
     })
   })
 
+  it('uses Cast a spell for untitled standalone spell rows', () => {
+    const rows = [
+      { id: 'primary', kind: 'spell', profile: 'primary', name: 'Spellcasting', spells: [] },
+      { id: 'standalone', kind: 'spell', spells: [] },
+    ] as MonsterActionDraftRow[]
+    expect(titles(rows).get('primary')).toBe('Spellcasting')
+    expect(titles(rows).get('standalone')).toBe('Cast a spell')
+    const bonus = [{ id: 'bonus-spell', kind: 'spell', spells: [] }] as MonsterActionDraftRow[]
+    expect(
+      monsterActionEditorTitles(
+        bonus,
+        { bonusActions: bonus } as MonsterFormValues,
+        ctx,
+        'bonusActions',
+      ).get('bonus-spell'),
+    ).toBe('Cast a spell')
+  })
+
   it('keeps the primary Spellcasting name immutable', () => {
     const action = {
       id: 'spellcasting',

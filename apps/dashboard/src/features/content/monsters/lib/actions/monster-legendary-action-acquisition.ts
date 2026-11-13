@@ -141,7 +141,7 @@ export function createLegendaryActionDraft(
         : {}),
     }
   }
-  const cast = createSpellActionDraft('legendaryActions', values)
+  const cast = createSpellActionDraft('legendaryActions', values, 'standalone')
   if (cast.kind !== 'spell') return cast
   return { ...cast, name: LEGENDARY_CAST_SPELL_DEFAULT_NAME, spells: [{ spellId: undefined }] }
 }

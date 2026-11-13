@@ -39,7 +39,11 @@ describe('legendary action acquisition', () => {
     const items = legendaryActionAcquisitionItems(values, ctx)
     expect(items.map((item) => [item.groupId, item.label, item.metadata])).toEqual([
       ['existing', 'Use existing action', 'Use an action already defined for this creature.'],
-      ['existing', 'Spellcasting', 'Cast a spell from an existing Spellcasting action.'],
+      [
+        'existing',
+        'Use Spellcasting',
+        'Cast a spell from an existing action that already lists spells.',
+      ],
       ['new', 'Cast a spell', 'Choose a spell from the catalog.'],
       ['new', 'Custom ability', 'Write a standalone legendary ability.'],
     ])
