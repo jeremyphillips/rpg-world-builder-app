@@ -38,6 +38,7 @@ import {
 } from '../../../lib/forms/mechanics/saving-throw-field-copy'
 import { savingThrowFieldGroup } from '../../../lib/forms/mechanics/saving-throw-field-group'
 import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
+import { MonsterActionParrySummary } from '../../components/form/monster-action-parry-summary'
 import { MonsterActionMultiattackSummary } from '../../components/form/monster-action-multiattack-summary'
 import { MonsterActionSpellSummary } from '../../components/form/monster-action-spell-summary'
 import {
@@ -878,7 +879,19 @@ function turnLimitField(): FormItem {
   }
 }
 
+function monsterActionParryPreviewSlot(
+  ctx: ContentFormCtx,
+  action: MonsterActionDraftRow,
+): FormItem {
+  return {
+    kind: 'slot',
+    name: 'parryPreview',
+    render: () => <MonsterActionParrySummary ctx={ctx} action={action} />,
+  }
+}
+
 function reactionAuthoringFields(input: {
+  ctx: ContentFormCtx
   action: MonsterActionDraftRow
   section: MonsterActionSection
   namePrefix: string
@@ -891,6 +904,7 @@ function reactionAuthoringFields(input: {
   const referenceOptions = input.referenceOptions ?? []
   if (input.action.kind === 'parry') {
     return [
+      monsterActionParryPreviewSlot(input.ctx, input.action),
       monsterFormAdvisorySlot(input.advisories ?? [], input.namePrefix),
       {
         type: 'number',

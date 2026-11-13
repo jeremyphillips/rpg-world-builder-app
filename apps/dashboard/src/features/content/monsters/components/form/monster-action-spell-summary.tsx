@@ -6,7 +6,10 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import { findMonsterFormActionDraft } from '../../lib/actions/monster-action-attack-summary'
 import { buildMonsterActionSpellPreview } from '../../lib/actions/monster-action-spell-summary'
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
-import { MONSTER_ACTION_SPELL_PREVIEW_LABEL } from '../../lib/monster-form-labels'
+import {
+  MONSTER_ACTION_SPELL_PREVIEW_LABEL,
+  MONSTER_REACTION_PREVIEW_LABEL,
+} from '../../lib/monster-form-labels'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 
@@ -36,19 +39,12 @@ export function MonsterActionSpellSummary({
 
   if (!preview) return null
 
+  const label =
+    section === 'reactions' ? MONSTER_REACTION_PREVIEW_LABEL : MONSTER_ACTION_SPELL_PREVIEW_LABEL
+
   if (preview.status === 'unavailable') {
-    return (
-      <RulesPreview
-        label={MONSTER_ACTION_SPELL_PREVIEW_LABEL}
-        content={{ kind: 'guidance', message: preview.guidance }}
-      />
-    )
+    return <RulesPreview label={label} content={{ kind: 'guidance', message: preview.guidance }} />
   }
 
-  return (
-    <RulesPreview
-      label={MONSTER_ACTION_SPELL_PREVIEW_LABEL}
-      content={{ kind: 'html', html: preview.bodyHtml }}
-    />
-  )
+  return <RulesPreview label={label} content={{ kind: 'html', html: preview.bodyHtml }} />
 }

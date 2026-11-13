@@ -51,10 +51,46 @@ function Host() {
   )
 }
 
+function ReactionHost() {
+  const reactionSpell: MonsterActionDraftRow = { ...spellcasting, id: 'protective-magic' }
+  const form = useForm<MonsterFormValues>({
+    defaultValues: {
+      ...resolveMonsterCreateDefaultValues(),
+      name: 'Mage',
+      challengeRating: '5',
+      abilityScores: { str: 10, dex: 10, con: 10, int: 18, wis: 10, cha: 10 },
+      reactions: [reactionSpell],
+    },
+  })
+  const ctx = {
+    entityCatalogLayer: 'homebrew',
+    equipmentCatalogStatus: 'ready',
+    equipmentCatalogById: new Map(),
+    spellCatalogStatus: 'ready',
+    spellCatalogById: new Map([
+      ['srd-cc-5.2.1:mage-hand', { id: 'srd-cc-5.2.1:mage-hand', name: 'Mage Hand' }],
+    ]),
+    armorClassRules: { mode: 'ascending', base: 10 },
+    options: { skills: { visible: [] } },
+    rulesetId: 'srd-cc-5.2.1',
+  } as ContentFormCtx
+  return (
+    <FormProvider {...form}>
+      <MonsterActionSpellSummary ctx={ctx} action={reactionSpell} section="reactions" />
+    </FormProvider>
+  )
+}
+
 describe('MonsterActionSpellSummary', () => {
   it('renders spellcasting preview prose', () => {
     render(<Host />)
     expect(screen.getByText('Spellcasting preview')).toBeInTheDocument()
     expect(screen.getByText('Mage Hand')).toBeInTheDocument()
+  })
+
+  it('uses the reaction preview heading for a spell reaction', () => {
+    render(<ReactionHost />)
+    expect(screen.getByText('Reaction preview')).toBeInTheDocument()
+    expect(screen.queryByText('Spellcasting preview')).not.toBeInTheDocument()
   })
 })

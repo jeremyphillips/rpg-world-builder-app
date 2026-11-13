@@ -221,6 +221,7 @@ describe('monster action detail fields', () => {
       { id: 'parry', kind: 'parry', name: 'Parry', acBonus: 2 },
       'reactions',
     )
+    expect(parry[0]).toBe('parryPreview')
     expect(parry).toContain('acBonus')
     expect(parry).toContain('followUpActionId')
     expect(parry).not.toContain('trigger.text')
