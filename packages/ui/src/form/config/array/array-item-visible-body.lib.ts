@@ -1,9 +1,10 @@
-import { flattenFields, isFieldVisible, type FormItem } from '../../field-config'
+import type { FormItem, RowConfig } from '../../field-config'
+import { formItemsHaveVisibleRenderableFields } from '../form-item-visibility.lib'
 
 /** Whether any item body field would render for the current row values. */
 export function arrayItemHasVisibleBodyFields(
-  items: FormItem[],
+  items: readonly (FormItem | RowConfig)[],
   values: Record<string, unknown>,
 ): boolean {
-  return flattenFields(items).some((field) => isFieldVisible(field, values))
+  return formItemsHaveVisibleRenderableFields(items, values)
 }

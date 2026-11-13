@@ -1288,6 +1288,68 @@ describe('ArrayFieldRenderer', () => {
     expect(populatedShell?.querySelector('[id$="-body"]')).not.toBeNull()
   })
 
+  it('omits body chrome when row-wrapped fields are hidden by container visibility', () => {
+    const requirementFields: FormItem[] = [
+      {
+        kind: 'row',
+        visibility: {
+          dependsOn: ['kind'],
+          visibleWhen: (values) => values.kind === 'size',
+        },
+        fields: [
+          { type: 'select', name: 'bound', label: 'Size', options: [] },
+          { type: 'select', name: 'comparison', label: 'Limit', options: [] },
+        ],
+      },
+    ]
+
+    const requirementArray = (
+      resolveCollapsible: (values: Record<string, unknown>) => boolean,
+    ): FormItem => ({
+      kind: 'array',
+      name: 'requirements',
+      label: 'Requirements',
+      reorder: false,
+      addAction: { label: 'Add a requirement' },
+      item: {
+        variant: 'detailed',
+        collapsible: true,
+        resolveCollapsible,
+        header: {
+          fallback: (index) => `Requirement ${index + 1}`,
+          primary: (values) => String(values.kind ?? ''),
+        },
+      },
+      fields: requirementFields,
+    })
+
+    const schema = z.object({
+      requirements: z.array(
+        z.object({
+          kind: z.string(),
+          comparison: z.string().optional(),
+        }),
+      ),
+    })
+
+    const willingView = render(
+      <Form
+        schema={schema}
+        fields={[requirementArray(() => false)]}
+        defaultValues={{ requirements: [{ kind: 'willing' }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(
+      willingView.container
+        .querySelector('[data-array-item-prefix="requirements.0"]')
+        ?.querySelector('[id$="-body"]'),
+    ).toBeNull()
+    willingView.unmount()
+  })
+
   it('stacks summary subheadlines with a 2px gap below the title row', async () => {
     const user = userEvent.setup()
 

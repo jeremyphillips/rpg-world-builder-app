@@ -6,12 +6,8 @@
  * best-effort scroll/focus into the new item.
  */
 import type { ArrayConfig, FormItem } from '../../field-config'
-import {
-  buildItemDefaultValues,
-  isFieldVisible,
-  resolveFieldConfigBoundNames,
-} from '../../field-config'
-import { resolveColumnsCollapseSequence } from '../../config/form-columns-collapse.lib'
+import { buildItemDefaultValues } from '../../field-config'
+import { collectHiddenFormItemBoundNames } from '../../config/form-item-visibility.lib'
 import {
   resolveArrayAddMenuAppendDefaults,
   type ArrayAddMenuItemConfig,
@@ -21,98 +17,6 @@ import {
   focusFirstEligibleArrayItemControl,
   scrollArrayItemElementIntoView,
 } from './array-field-item-focus.lib'
-
-function isContainerVisible(
-  item: Extract<FormItem, { kind: 'group' | 'row' | 'columns' | 'dependent' }>,
-  values: Record<string, unknown>,
-): boolean {
-  if (item.kind === 'dependent' && !isFieldVisible(item.controller, values)) {
-    return false
-  }
-  return item.visibility ? item.visibility.visibleWhen(values) : true
-}
-
-function containerChildItems(
-  item: Extract<FormItem, { kind: 'group' | 'row' | 'columns' }>,
-): FormItem[] {
-  if (item.kind === 'columns') {
-    return resolveColumnsCollapseSequence(item.columns, item.collapseOrder)
-  }
-  return item.fields as FormItem[]
-}
-
-function collectAllBoundNames(items: readonly FormItem[]): string[] {
-  const names: string[] = []
-
-  for (const item of items) {
-    if (!('kind' in item)) {
-      names.push(...resolveFieldConfigBoundNames(item))
-      continue
-    }
-
-    switch (item.kind) {
-      case 'group':
-      case 'row':
-      case 'columns':
-        names.push(...collectAllBoundNames(containerChildItems(item)))
-        break
-      case 'dependent':
-        names.push(...resolveFieldConfigBoundNames(item.controller))
-        names.push(...collectAllBoundNames(item.dependents.fields as FormItem[]))
-        break
-      default:
-        break
-    }
-  }
-
-  return names
-}
-
-function collectHiddenBoundNames(
-  items: readonly FormItem[],
-  values: Record<string, unknown>,
-): string[] {
-  const hidden: string[] = []
-
-  for (const item of items) {
-    if (!('kind' in item)) {
-      if (!isFieldVisible(item, values)) {
-        hidden.push(...resolveFieldConfigBoundNames(item))
-      }
-      continue
-    }
-
-    switch (item.kind) {
-      case 'group':
-      case 'row':
-      case 'columns': {
-        const children = containerChildItems(item)
-        if (!isContainerVisible(item, values)) {
-          hidden.push(...collectAllBoundNames(children))
-          break
-        }
-        hidden.push(...collectHiddenBoundNames(children, values))
-        break
-      }
-      case 'dependent': {
-        if (!isContainerVisible(item, values)) {
-          hidden.push(...resolveFieldConfigBoundNames(item.controller))
-          hidden.push(...collectAllBoundNames(item.dependents.fields as FormItem[]))
-          break
-        }
-        if (!isFieldVisible(item.controller, values)) {
-          hidden.push(...resolveFieldConfigBoundNames(item.controller))
-        }
-        hidden.push(...collectHiddenBoundNames(item.dependents.fields as FormItem[], values))
-        break
-      }
-      default:
-        break
-    }
-  }
-
-  return hidden
-}
 
 export type BuildVisibleItemDefaultsOptions = {
   /** Discriminator keys that must survive pruning even when their controls are hidden. */
@@ -129,7 +33,7 @@ export function buildVisibleItemDefaults(
   options: BuildVisibleItemDefaultsOptions = {},
 ): Record<string, unknown> {
   const preserve = new Set(options.preserveKeys ?? [])
-  const hidden = new Set(collectHiddenBoundNames(fields, values))
+  const hidden = new Set(collectHiddenFormItemBoundNames(fields, values))
   const nextValues = { ...values }
 
   for (const key of hidden) {

@@ -20,6 +20,19 @@ const items: FormItem[] = [
   },
 ]
 
+const sizeRequirementRow: FormItem = {
+  kind: 'row',
+  heading: { label: 'Eligible sizes' },
+  visibility: {
+    dependsOn: ['kind'],
+    visibleWhen: (values) => values.kind === 'size',
+  },
+  fields: [
+    { type: 'select', name: 'bound', label: 'Size', options: [] },
+    { type: 'select', name: 'comparison', label: 'Limit', options: [] },
+  ],
+}
+
 describe('arrayItemHasVisibleBodyFields', () => {
   it('returns true when at least one item field is visible', () => {
     expect(arrayItemHasVisibleBodyFields(items, { kind: 'editable' })).toBe(true)
@@ -28,5 +41,10 @@ describe('arrayItemHasVisibleBodyFields', () => {
 
   it('returns false when every item field is hidden', () => {
     expect(arrayItemHasVisibleBodyFields([items[1]!], { kind: 'sight' })).toBe(false)
+  })
+
+  it('returns false when row-wrapped fields are hidden by container visibility', () => {
+    expect(arrayItemHasVisibleBodyFields([sizeRequirementRow], { kind: 'willing' })).toBe(false)
+    expect(arrayItemHasVisibleBodyFields([sizeRequirementRow], { kind: 'size' })).toBe(true)
   })
 })
