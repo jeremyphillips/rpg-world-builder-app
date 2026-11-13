@@ -4,6 +4,8 @@ import {
   deriveMonsterStatBlock,
   formatMonsterAttackAction,
   formatMonsterMultiattack,
+  formatMonsterParryResponse,
+  formatMonsterParryTrigger,
   formatMonsterSaveAction,
   formatMonsterSpellEntry,
   resolveCreatureTraitGrants,
@@ -192,7 +194,17 @@ describe('SRD 5.2.1 monster seed', () => {
     expect(
       knight?.actions.find((action) => action.id === 'parry' || action.kind === 'special'),
     ).toBeUndefined()
-    expect(knight?.reactions.find((action) => action.id === 'parry')?.kind).toBe('special')
+    const parry = knight?.reactions.find((action) => action.id === 'parry')
+    expect(parry).toMatchObject({ kind: 'parry', acBonus: 2 })
+    expect(parry && 'trigger' in parry).toBe(false)
+    if (parry?.kind === 'parry') {
+      expect(formatMonsterParryTrigger(knight?.name ?? '')).toBe(
+        'The knight is hit by a melee attack roll while holding a weapon.',
+      )
+      expect(
+        formatMonsterParryResponse({ monsterName: knight?.name ?? '', acBonus: parry.acBonus }),
+      ).toBe('The knight adds 2 to its AC against that attack, possibly causing it to miss.')
+    }
 
     const formatMultiattack = (monster: NonNullable<typeof knight>) => {
       const action = monster.actions.find((entry) => entry.kind === 'multiattack')

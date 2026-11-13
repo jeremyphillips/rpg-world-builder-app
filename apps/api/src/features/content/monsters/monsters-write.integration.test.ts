@@ -77,9 +77,9 @@ describe('monster write validation', () => {
       },
       {
         equipment: [{ entryId: 'chain', equipmentId: chainId, quantity: 1, equipped: true }],
-        reactions: [{ id: 'parry', kind: 'weapon', equipmentEntryId: 'chain' }],
-        actions: [],
-        path: 'reactions.0.equipmentEntryId',
+        reactions: [],
+        actions: [{ id: 'parry', kind: 'weapon', equipmentEntryId: 'chain' }],
+        path: 'actions.0.equipmentEntryId',
       },
       {
         equipment: [

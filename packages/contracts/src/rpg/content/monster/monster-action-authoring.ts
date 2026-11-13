@@ -38,6 +38,9 @@ export function monsterActionAuthoring(action: AuthoringSubject): MonsterActionA
   if (action.kind === 'special') {
     return { name: 'authored', description: 'authored', source: 'none' }
   }
+  if (action.kind === 'parry') {
+    return { name: 'authored', description: 'generated', source: 'none' }
+  }
   if (action.kind === 'spell' && action.profile === 'primary') {
     return { name: 'derived', description: 'generated', source: 'none' }
   }

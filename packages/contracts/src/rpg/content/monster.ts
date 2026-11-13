@@ -49,6 +49,8 @@ import {
 import {
   monsterActionDraftSchema,
   monsterActionSchema,
+  monsterBonusActionDraftSchema,
+  monsterBonusActionSchema,
   monsterLegendaryActionDraftSchema,
   monsterLegendaryActionSchema,
   monsterReactionDraftSchema,
@@ -68,20 +70,33 @@ export type { MonsterActionSection } from './monster/action-sections'
 
 export {
   monsterActionSchema,
+  monsterBonusActionSchema,
   monsterLegendaryActionSchema,
   monsterReactionSchema,
   monsterActionDraftSchema,
+  monsterBonusActionDraftSchema,
   monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
+  PARRY_AC_BONUS_DEFAULT,
+  PARRY_AC_BONUS_MAX,
+  PARRY_AC_BONUS_MIN,
 } from './monster/action'
 export type {
   MonsterAction,
   MonsterActionDraft,
+  MonsterBonusAction,
+  MonsterBonusActionDraft,
   MonsterLegendaryAction,
   MonsterLegendaryActionDraft,
   MonsterReaction,
   MonsterReactionDraft,
 } from './monster/action'
+export {
+  ACTIONS_ONLY_PRESET_IDS,
+  MONSTER_SECTION_KINDS,
+  monsterSectionAllowsKind,
+  monsterSectionAllowsPreset,
+} from './monster/action-section-eligibility'
 import type { EquipmentInstance } from './equipment/instance/instance'
 import { normalizeEquipmentInstance } from './equipment/instance/normalize-equipment-instance'
 import { refineEquipmentInstanceInvariants } from './equipment/instance/instance-invariants'
@@ -269,7 +284,7 @@ export const monsterBodyFields = {
   equipment: z.array(monsterEquipmentEntrySchema).default([]),
   traits: z.array(monsterTraitSchema).default([]),
   actions: z.array(monsterActionSchema).default([]),
-  bonusActions: z.array(monsterActionSchema).default([]),
+  bonusActions: z.array(monsterBonusActionSchema).default([]),
   reactions: z.array(monsterReactionSchema).default([]),
   legendaryActionUses: z.number().int().min(1).optional(),
   legendaryActionUsesInLair: z.number().int().min(1).optional(),
@@ -293,7 +308,7 @@ const monsterBodyDraftSchemaBase = mediaBearingDraftAuthoredContentBodySchema(
   senses: creatureSensesDraftSchema.optional(),
   challengeRating: challengeRatingSchema.optional(),
   actions: z.array(monsterActionDraftSchema).default([]),
-  bonusActions: z.array(monsterActionDraftSchema).default([]),
+  bonusActions: z.array(monsterBonusActionDraftSchema).default([]),
   reactions: z.array(monsterReactionDraftSchema).default([]),
   legendaryActions: z.array(monsterLegendaryActionDraftSchema).default([]),
   traits: z.array(monsterTraitDraftSchema).default([]),
@@ -406,6 +421,8 @@ type ActionReferenceRow = {
   kind: string
   steps?: readonly { actionIds?: readonly string[] }[]
   actionIds?: readonly string[]
+  followUpActionId?: string
+  trigger?: { text?: string }
 }
 
 type ReferenceIdMessages = {
@@ -456,7 +473,7 @@ function refineMultiattackReferences(
   },
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
-  _options: { published: boolean },
+  options: { published: boolean },
 ): void {
   const actionsById = new Map(
     body.actions.flatMap((action) => (action.id ? [[action.id, action] as const] : [])),
@@ -469,62 +486,154 @@ function refineMultiattackReferences(
   ] as const
   for (const [section, entries] of sections) {
     entries.forEach((action, index) => {
-      const path = [...prefix, section, index]
-      if (action.kind === 'multiattack') {
-        if (section !== 'actions') {
-          addCustomRefinementIssue(ctx, 'Multiattack is only valid in Actions.', [...path, 'kind'])
-          return
-        }
-        const seen = new Set<string>()
-        const steps = Array.isArray(action.steps) ? action.steps : []
-        steps.forEach((step, stepIndex) => {
-          refineReferencedIdList(
-            action.id,
-            Array.isArray(step.actionIds) ? step.actionIds : [],
-            actionsById,
-            ctx,
-            (idIndex) => [...path, 'steps', stepIndex, 'actionIds', idIndex],
-            MULTIATTACK_ATTACK_KINDS,
-            {
-              self: 'A multiattack cannot reference itself.',
-              duplicate: 'Each attack can be referenced only once.',
-              missing: 'must reference an action in Actions',
-              invalidKind: 'invalid kind',
-            },
-            seen,
-          )
-        })
-        return
-      }
-      if (action.kind !== 'action-reference' || section !== 'legendaryActions') return
-      const actionIds = Array.isArray(action.actionIds) ? action.actionIds : []
-      refineReferencedIdList(
-        action.id,
-        actionIds,
+      refineOneActionReference(
+        action,
+        section,
+        [...prefix, section, index],
         actionsById,
         ctx,
-        (idIndex) => [...path, 'actionIds', idIndex],
-        LEGENDARY_REFERENCE_KINDS,
-        {
-          duplicate: 'Each action can be chosen only once.',
-          missing: 'Choose an attack or ability from Actions.',
-          invalidKind: "This action can't be used by a legendary action.",
-        },
-        new Set(),
+        options,
       )
-      if (actionIds.length < 2) return
-      actionIds.forEach((id, idIndex) => {
-        const target = actionsById.get(id)
-        if (!target || !LEGENDARY_REFERENCE_KINDS.has(target.kind)) return
-        if (MULTIATTACK_ATTACK_KINDS.has(target.kind)) return
-        addCustomRefinementIssue(ctx, 'Only attacks can be offered as a choice.', [
-          ...path,
-          'actionIds',
-          idIndex,
-        ])
-      })
     })
   }
+}
+
+function refineOneActionReference(
+  action: ActionReferenceRow,
+  section: string,
+  path: (string | number)[],
+  actionsById: ReadonlyMap<string, { kind: string }>,
+  ctx: z.RefinementCtx,
+  options: { published: boolean },
+): void {
+  if (action.kind === 'multiattack') {
+    refineMultiattackRow(action, section, path, actionsById, ctx)
+    return
+  }
+  if (action.kind === 'parry') {
+    refineParryFollowUp(action, path, actionsById, ctx, options.published)
+    return
+  }
+  if (action.kind === 'action-reference' && section === 'reactions') {
+    refineReactionActionReference(action, path, actionsById, ctx, options.published)
+    return
+  }
+  if (action.kind !== 'action-reference' || section !== 'legendaryActions') return
+  refineLegendaryActionReference(action, path, actionsById, ctx)
+}
+
+function refineMultiattackRow(
+  action: ActionReferenceRow,
+  section: string,
+  path: (string | number)[],
+  actionsById: ReadonlyMap<string, { kind: string }>,
+  ctx: z.RefinementCtx,
+): void {
+  if (section !== 'actions') {
+    addCustomRefinementIssue(ctx, 'Multiattack is only valid in Actions.', [...path, 'kind'])
+    return
+  }
+  const seen = new Set<string>()
+  const steps = Array.isArray(action.steps) ? action.steps : []
+  steps.forEach((step, stepIndex) => {
+    refineReferencedIdList(
+      action.id,
+      Array.isArray(step.actionIds) ? step.actionIds : [],
+      actionsById,
+      ctx,
+      (idIndex) => [...path, 'steps', stepIndex, 'actionIds', idIndex],
+      MULTIATTACK_ATTACK_KINDS,
+      {
+        self: 'A multiattack cannot reference itself.',
+        duplicate: 'Each attack can be referenced only once.',
+        missing: 'must reference an action in Actions',
+        invalidKind: 'invalid kind',
+      },
+      seen,
+    )
+  })
+}
+
+function refineParryFollowUp(
+  action: ActionReferenceRow,
+  path: (string | number)[],
+  actionsById: ReadonlyMap<string, { kind: string }>,
+  ctx: z.RefinementCtx,
+  published: boolean,
+): void {
+  if (!published || !action.followUpActionId) return
+  refineReferencedIdList(
+    action.id,
+    [action.followUpActionId],
+    actionsById,
+    ctx,
+    () => [...path, 'followUpActionId'],
+    MULTIATTACK_ATTACK_KINDS,
+    {
+      duplicate: 'Choose an attack from Actions.',
+      missing: 'Choose an attack from Actions.',
+      invalidKind: 'Choose an attack from Actions.',
+    },
+    new Set(),
+  )
+}
+
+function refineReactionActionReference(
+  action: ActionReferenceRow,
+  path: (string | number)[],
+  actionsById: ReadonlyMap<string, { kind: string }>,
+  ctx: z.RefinementCtx,
+  published: boolean,
+): void {
+  if (!published) return
+  refineReferencedIdList(
+    action.id,
+    Array.isArray(action.actionIds) ? action.actionIds : [],
+    actionsById,
+    ctx,
+    (idIndex) => [...path, 'actionIds', idIndex],
+    LEGENDARY_REFERENCE_KINDS,
+    {
+      duplicate: 'Each action can be chosen only once.',
+      missing: 'Choose an attack or ability from Actions.',
+      invalidKind: "This action can't be used by a reaction.",
+    },
+    new Set(),
+  )
+}
+
+function refineLegendaryActionReference(
+  action: ActionReferenceRow,
+  path: (string | number)[],
+  actionsById: ReadonlyMap<string, { kind: string }>,
+  ctx: z.RefinementCtx,
+): void {
+  const actionIds = Array.isArray(action.actionIds) ? action.actionIds : []
+  refineReferencedIdList(
+    action.id,
+    actionIds,
+    actionsById,
+    ctx,
+    (idIndex) => [...path, 'actionIds', idIndex],
+    LEGENDARY_REFERENCE_KINDS,
+    {
+      duplicate: 'Each action can be chosen only once.',
+      missing: 'Choose an attack or ability from Actions.',
+      invalidKind: "This action can't be used by a legendary action.",
+    },
+    new Set(),
+  )
+  if (actionIds.length < 2) return
+  actionIds.forEach((id, idIndex) => {
+    const target = actionsById.get(id)
+    if (!target || !LEGENDARY_REFERENCE_KINDS.has(target.kind)) return
+    if (MULTIATTACK_ATTACK_KINDS.has(target.kind)) return
+    addCustomRefinementIssue(ctx, 'Only attacks can be offered as a choice.', [
+      ...path,
+      'actionIds',
+      idIndex,
+    ])
+  })
 }
 
 function refineLegendaryActionPool(
@@ -610,6 +719,18 @@ function refineWeaponEntryReferences(
   }
 }
 
+function refinePublishedReactionTrigger(
+  action: { kind: string; trigger?: { text?: string } },
+  section: string,
+  path: (string | number)[],
+  ctx: z.RefinementCtx,
+): void {
+  if (section !== 'reactions') return
+  if (action.kind !== 'special' && action.kind !== 'action-reference') return
+  if (action.trigger?.text?.trim()) return
+  addCustomRefinementIssue(ctx, 'Trigger is required.', [...path, 'trigger'])
+}
+
 export function refineMonsterBody(
   body: MonsterBody,
   ctx: z.RefinementCtx,
@@ -638,7 +759,9 @@ export function refineMonsterBody(
 
   for (const section of MONSTER_ACTION_SECTIONS) {
     for (const [index, action] of body[section].entries()) {
-      refineMonsterActionShape(action, ctx, [...prefix, section, index])
+      const path = [...prefix, section, index]
+      refineMonsterActionShape(action, ctx, path)
+      refinePublishedReactionTrigger(action, section, path, ctx)
     }
   }
   refineMonsterSpellEntries(body, ctx, prefix, { published: true })

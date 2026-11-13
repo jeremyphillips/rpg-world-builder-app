@@ -5,6 +5,7 @@ import {
   MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_DESCRIPTION,
+  MONSTER_ACQUISITION_SAVE_DESCRIPTION,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
 } from '../monster-form-labels'
 import {
@@ -91,7 +92,29 @@ describe('monster action acquisition presentation', () => {
       getMonsterActionKindLabel('special'),
     )
     expect(items.find((item) => item.id === 'create:save')).toBeUndefined()
-    expect(parseMonsterActionAcquisitionId('create:save')).toBeUndefined()
+    expect(parseMonsterActionAcquisitionId('create:save')).toEqual({ type: 'create', kind: 'save' })
+    const bonus = monsterActionAcquisitionItems({
+      weapons: [],
+      allowAddWeapon: true,
+      section: 'bonusActions',
+    })
+    expect(bonus.find((item) => item.id === 'preset:breath-weapon')).toBeUndefined()
+    expect(bonus.find((item) => item.id === 'preset:constrict')).toBeUndefined()
+    expect(bonus.find((item) => item.id === 'weapon-entry:sword-1')).toBeUndefined()
+    expect(bonus.find((item) => item.id === 'create:save')).toMatchObject({
+      metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
+    })
+    const reactions = monsterActionAcquisitionItems({
+      weapons,
+      allowAddWeapon: true,
+      section: 'reactions',
+    })
+    expect(reactions.map((item) => item.id)).toEqual([
+      'reaction:reference',
+      'reaction:parry',
+      'reaction:cast-spell',
+      'reaction:custom',
+    ])
     expect(items.find((item) => item.id === 'natural:other')?.metadata).toBeUndefined()
   })
 

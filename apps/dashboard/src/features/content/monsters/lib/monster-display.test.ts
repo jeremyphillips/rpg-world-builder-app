@@ -203,6 +203,49 @@ describe('monster-display', () => {
     ])
   })
 
+  it('generates a parry trigger from the creature name and hides an unresolved follow-up', () => {
+    const monster = {
+      ...pickMonster('kobold-warrior'),
+      name: 'Knight',
+      reactions: [
+        {
+          id: 'parry',
+          kind: 'parry' as const,
+          name: 'Parry',
+          acBonus: 2,
+          followUpActionId: 'missing-rapier',
+        },
+      ],
+    }
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Humanoid',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+      derived: null,
+    })
+    expect(viewModel.reactions[0]).toEqual(
+      expect.objectContaining({
+        triggerLine: 'Trigger: The knight is hit by a melee attack roll while holding a weapon.',
+        responseLabel: 'Response:',
+        descriptionHtml:
+          '<p>The knight adds 2 to its AC against that attack, possibly causing it to miss.</p>',
+      }),
+    )
+    const renamed = buildMonsterDetailViewModel({
+      monster: { ...monster, name: 'Warrior Veteran' },
+      creatureTypeLabel: 'Humanoid',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+      derived: null,
+    })
+    expect(renamed.reactions[0]?.triggerLine).toBe(
+      'Trigger: The warrior veteran is hit by a melee attack roll while holding a weapon.',
+    )
+    expect(renamed.reactions[0]?.descriptionHtml).toContain('The warrior veteran adds 2')
+    expect(renamed.reactions[0]?.descriptionHtml).not.toContain('missing-rapier')
+  })
+
   it('leaves an unspecified reaction trigger unlabeled', () => {
     const monster = {
       ...pickMonster('kobold-warrior'),

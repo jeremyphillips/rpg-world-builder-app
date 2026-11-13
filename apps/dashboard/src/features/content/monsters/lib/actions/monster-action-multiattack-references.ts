@@ -5,6 +5,7 @@ function referencedIds(action: MonsterActionDraftRow): string[] {
     return (action.steps ?? []).flatMap((step) => step.actionIds ?? [])
   }
   if (action.kind === 'action-reference') return action.actionIds ?? []
+  if (action.kind === 'parry' && action.followUpActionId) return [action.followUpActionId]
   return []
 }
 
@@ -39,6 +40,10 @@ export function stripReferencedActionId(
     }
     if (action.kind === 'action-reference') {
       return { ...action, actionIds: withoutId(action.actionIds, actionId) }
+    }
+    if (action.kind === 'parry' && action.followUpActionId === actionId) {
+      const { followUpActionId: _followUp, ...rest } = action
+      return rest
     }
     return action
   })

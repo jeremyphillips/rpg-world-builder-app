@@ -2,13 +2,14 @@ import {
   ABILITY_IDS,
   monsterActionAuthoring,
   monsterActionUsageCapability,
+  PARRY_AC_BONUS_MAX,
+  PARRY_AC_BONUS_MIN,
   getAbilityLabel,
   getContentTypeTerm,
   getWeaponModeLabel,
   MEASURED_RANGE_FEET,
   REACH_FEET,
   WEAPON_MODES,
-  type Spell,
 } from '@rpg/contracts'
 import {
   combineFieldVisibilityAll,
@@ -63,6 +64,17 @@ import {
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
   MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
   MONSTER_TRIGGER_LABEL,
+  MONSTER_TRIGGER_PLACEHOLDER,
+  MONSTER_PARRY_AC_BONUS_HINT,
+  MONSTER_PARRY_AC_BONUS_LABEL,
+  MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
+  MONSTER_PARRY_FOLLOW_UP_HINT,
+  MONSTER_PARRY_FOLLOW_UP_LABEL,
+  MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL,
+  MONSTER_REACTION_ADDITIONAL_RULES_HINT,
+  MONSTER_REACTION_ADDITIONAL_RULES_LABEL,
+  MONSTER_REACTION_REFERENCE_HINT,
+  MONSTER_REFERENCE_ACTION_LABEL,
   MONSTER_TURN_LIMIT_ADD_LABEL,
   MONSTER_TURN_LIMIT_EMPTY_LABEL,
   MONSTER_TURN_LIMIT_LABEL,
@@ -179,11 +191,13 @@ const monsterActionOptionalDescriptionField = {
 } as const satisfies FormItem
 
 function monsterReactionConditionField(action: MonsterActionDraftRow): FormItem {
+  const spell = action.kind === 'spell'
   return {
     type: 'text',
     name: 'trigger.text',
-    label: action.kind === 'spell' ? MONSTER_ADDITIONAL_CONDITION_LABEL : MONSTER_TRIGGER_LABEL,
-    hint: action.kind === 'spell' ? MONSTER_ADDITIONAL_CONDITION_HINT : undefined,
+    label: spell ? MONSTER_ADDITIONAL_CONDITION_LABEL : MONSTER_TRIGGER_LABEL,
+    hint: spell ? MONSTER_ADDITIONAL_CONDITION_HINT : undefined,
+    ...(spell ? {} : { placeholder: MONSTER_TRIGGER_PLACEHOLDER, required: true }),
   }
 }
 
@@ -485,7 +499,7 @@ const reachFeetOptions = REACH_FEET.map((feet) => ({
   label: String(feet),
 }))
 
-function monsterAttackReachField(modeField: 'mode' | 'modes'): JoinedPairFieldConfig {
+function monsterAttackReachField(_modeField: 'mode' | 'modes'): JoinedPairFieldConfig {
   return {
     type: 'joinedPair',
     label: MONSTER_ACTION_REACH_FIELD_LABEL,
@@ -864,6 +878,70 @@ function turnLimitField(): FormItem {
   }
 }
 
+function reactionAuthoringFields(input: {
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  namePrefix: string
+  attackOptions?: { value: string; label: string }[]
+  referenceOptions?: { value: string; label: string }[]
+  advisories?: readonly MonsterFormAdvisory[]
+}): FormItem[] | undefined {
+  if (input.section !== 'reactions') return undefined
+  const attackOptions = input.attackOptions ?? []
+  const referenceOptions = input.referenceOptions ?? []
+  if (input.action.kind === 'parry') {
+    return [
+      monsterFormAdvisorySlot(input.advisories ?? [], input.namePrefix),
+      {
+        type: 'number',
+        name: 'acBonus',
+        label: MONSTER_PARRY_AC_BONUS_LABEL,
+        hint: { text: MONSTER_PARRY_AC_BONUS_HINT },
+        min: PARRY_AC_BONUS_MIN,
+        max: PARRY_AC_BONUS_MAX,
+        step: 1,
+        required: true,
+        control: 'stepper',
+      },
+      {
+        type: 'select',
+        name: 'followUpActionId',
+        label: MONSTER_PARRY_FOLLOW_UP_LABEL,
+        hint: { text: MONSTER_PARRY_FOLLOW_UP_HINT },
+        placeholder: 'Choose',
+        options: attackOptions,
+        optionalDisclosure: {
+          addLabel: MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
+          seedWhen: () => '',
+        },
+      },
+    ]
+  }
+  if (input.action.kind === 'action-reference') {
+    return [
+      monsterFormAdvisorySlot(input.advisories ?? [], input.namePrefix),
+      monsterReactionConditionField(input.action),
+      {
+        type: 'select',
+        name: 'actionIds.0',
+        label: MONSTER_REFERENCE_ACTION_LABEL,
+        hint: { text: MONSTER_REACTION_REFERENCE_HINT },
+        placeholder: 'Choose',
+        options: referenceOptions,
+        required: true,
+      },
+      {
+        type: 'richtext',
+        name: 'description',
+        label: MONSTER_REACTION_ADDITIONAL_RULES_LABEL,
+        hint: MONSTER_REACTION_ADDITIONAL_RULES_HINT,
+        optionalDisclosure: { addLabel: MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL },
+      },
+    ]
+  }
+  return undefined
+}
+
 function legendaryAuthoringFields(input: {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
@@ -952,5 +1030,9 @@ export function monsterActionDetailFields(input: {
   /** Already collected for this form. The advisory slot only filters this list. */
   advisories?: readonly MonsterFormAdvisory[]
 }): FormItem[] {
-  return legendaryAuthoringFields(input) ?? sharedAuthoringFields(input)
+  return (
+    reactionAuthoringFields(input) ??
+    legendaryAuthoringFields(input) ??
+    sharedAuthoringFields(input)
+  )
 }

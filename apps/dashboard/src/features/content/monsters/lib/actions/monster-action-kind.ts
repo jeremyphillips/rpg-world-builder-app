@@ -3,6 +3,7 @@ import {
   monsterActionDraftSchema,
   monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
+  monsterSectionAllowsKind,
 } from '@rpg/contracts'
 
 import type { MonsterActionSection } from './monster-action-equipment-references'
@@ -65,7 +66,7 @@ export function monsterActionSectionMoveAllowed(
 ): boolean {
   if (from === to) return false
   if (from === 'legendaryActions' || to === 'legendaryActions') return false
-  if (action.kind === 'multiattack' && to !== 'actions') return false
+  if (!action.kind || !monsterSectionAllowsKind(to, action.kind)) return false
   if (isPrimarySpellcastingAction(action) && to !== 'actions') return false
   return true
 }

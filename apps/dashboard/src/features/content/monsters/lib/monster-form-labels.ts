@@ -383,6 +383,24 @@ function normalizeRechargeMinRoll(minRoll: unknown): number | undefined {
   return value
 }
 export const MONSTER_TRIGGER_LABEL = getMonsterReactionFieldLabel('trigger')
+export const MONSTER_TRIGGER_PLACEHOLDER = 'When this reaction can be used'
+export const MONSTER_PARRY_AC_BONUS_LABEL = 'AC bonus'
+export const MONSTER_PARRY_AC_BONUS_HINT = 'Added against the triggering attack.'
+export const MONSTER_PARRY_FOLLOW_UP_ADD_LABEL = 'Add attack on a miss'
+export const MONSTER_PARRY_FOLLOW_UP_LABEL = 'Attack'
+export const MONSTER_PARRY_FOLLOW_UP_HINT = 'Choose an existing attack from Actions.'
+export const MONSTER_PARRY_DESCRIPTION = 'Add a bonus to AC against the triggering attack.'
+export const MONSTER_REACTION_REFERENCE_LABEL = 'Existing action'
+export const MONSTER_REACTION_REFERENCE_HINT =
+  'The reaction uses this action. The action stays in Actions.'
+export const MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL = 'Add additional rules'
+export const MONSTER_REACTION_ADDITIONAL_RULES_LABEL = 'Additional rules'
+export const MONSTER_REACTION_ADDITIONAL_RULES_HINT =
+  'Additional restrictions or effects when using the referenced action.'
+export const MONSTER_REACTION_CAST_SPELL_DESCRIPTION =
+  'Cast one or more spells in response to their triggers.'
+export const MONSTER_REACTION_CUSTOM_LABEL = 'Custom reaction'
+export const MONSTER_REACTION_CUSTOM_DESCRIPTION = 'Write the trigger and the response.'
 export const MONSTER_ADDITIONAL_CONDITION_LABEL =
   getMonsterReactionFieldLabel('additionalCondition')
 export const MONSTER_ADDITIONAL_CONDITION_HINT = "Each spell's own trigger always applies."

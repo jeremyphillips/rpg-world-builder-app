@@ -4,10 +4,13 @@ import {
   getActionVocabularyEntry,
   getActionVocabularySearchTerms,
   getDamageTypeLabel,
+  getMonsterActionKindLabel,
   listSpecialMenuActionPresetIds,
   MONSTER_SPELLCASTING_ACTION_NAME,
+  PARRY_AC_BONUS_DEFAULT,
   PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
   PRIMARY_SPELLCASTING_PROFILE,
+  monsterSectionAllowsPreset,
   type ActionPresetId,
 } from '@rpg/contracts'
 import { conventionalSpellcastingSources } from './monster-action-casting-summary'
@@ -16,9 +19,18 @@ import type { MonsterActionSection } from './monster-action-equipment-references
 import {
   MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
+  MONSTER_ACQUISITION_SAVE_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_DESCRIPTION,
   MONSTER_CAST_SPELL_LABEL,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
+  MONSTER_PARRY_DESCRIPTION,
+  MONSTER_REACTION_CAST_SPELL_DESCRIPTION,
+  MONSTER_REACTION_CUSTOM_DESCRIPTION,
+  MONSTER_REACTION_CUSTOM_LABEL,
+  MONSTER_REACTION_REFERENCE_LABEL,
+  LEGENDARY_CAST_SPELL_DISABLED_NOTE,
+  LEGENDARY_REFERENCE_DESCRIPTION,
+  LEGENDARY_REFERENCE_DISABLED_NOTE,
   monsterAddWeaponShortcut,
 } from '../monster-form-labels'
 import { createMonsterRowId } from '../monster-row-id'
@@ -32,7 +44,9 @@ export const MONSTER_ACTION_ACQUISITION_GROUPS = [
 ] as const
 
 export type MonsterActionAcquisitionGroupId =
-  (typeof MONSTER_ACTION_ACQUISITION_GROUPS)[number]['id']
+  | (typeof MONSTER_ACTION_ACQUISITION_GROUPS)[number]['id']
+  | 'existing'
+  | 'new'
 
 export type MonsterActionAcquisitionItem = {
   id: string
@@ -54,6 +68,7 @@ export type MonsterActionAcquisitionChoice =
   | { type: 'preset'; presetId: ActionPresetId }
   | { type: 'create'; kind: 'attack' | 'spell' | 'special' | 'save' }
   | { type: 'legendary'; category: 'reference' | 'spellcasting' | 'cast-spell' }
+  | { type: 'reaction'; category: 'reference' | 'parry' | 'cast-spell' | 'custom' }
 
 const SPECIAL_MENU_ORDER = ['multiattack', 'constrict', 'breath-weapon'] as const
 
@@ -99,7 +114,12 @@ const EXACT_ACQUISITION_CHOICES: Record<string, MonsterActionAcquisitionChoice> 
   'create:spell': { type: 'create', kind: 'spell' },
   'create:spell-standalone': { type: 'create', kind: 'spell' },
   'create:special': { type: 'create', kind: 'special' },
+  'create:save': { type: 'create', kind: 'save' },
   'natural:other': { type: 'other-natural' },
+  'reaction:reference': { type: 'reaction', category: 'reference' },
+  'reaction:parry': { type: 'reaction', category: 'parry' },
+  'reaction:cast-spell': { type: 'reaction', category: 'cast-spell' },
+  'reaction:custom': { type: 'reaction', category: 'custom' },
 }
 
 function legendaryAcquisitionChoice(value: string): MonsterActionAcquisitionChoice | undefined {
@@ -147,7 +167,16 @@ export function monsterActionAcquisitionItems(input: {
   section?: MonsterActionSection
   /** True when the monster already has its Actions Spellcasting profile. */
   primarySpellcasting?: boolean
+  /** Actions rows a reaction reference can use. */
+  hasReferenceTargets?: boolean
+  spellCatalogReady?: boolean
 }): MonsterActionAcquisitionItem[] {
+  if (input.section === 'reactions') {
+    return reactionAcquisitionItems(
+      input.hasReferenceTargets === true,
+      input.spellCatalogReady !== false,
+    )
+  }
   const equipped = input.weapons.map((weapon) => {
     const existing = input.weaponActions?.find(
       (action) => action.equipmentEntryId === weapon.entryId,
@@ -182,11 +211,7 @@ export function monsterActionAcquisitionItems(input: {
     }
   })
   const special = listSpecialMenuActionPresetIds()
-    .filter((presetId) => {
-      if (presetId === 'multiattack')
-        return input.section === undefined || input.section === 'actions'
-      return true
-    })
+    .filter((presetId) => monsterSectionAllowsPreset(input.section ?? 'actions', presetId))
     .map((presetId, index) => ({ presetId, index }))
     .sort(
       (left, right) =>
@@ -207,23 +232,64 @@ export function monsterActionAcquisitionItems(input: {
           : {}),
       }
     })
+  const weaponsAllowed = input.section === undefined || input.section === 'actions'
   return [
-    ...equipped,
-    {
-      id: 'add-weapon',
-      label: monsterAddWeaponShortcut(),
-      groupId: 'equipped',
-      disabled: !input.allowAddWeapon,
-      note: input.allowAddWeapon ? undefined : 'Equipment catalog is not ready',
-    },
-    ...natural,
-    {
-      id: 'natural:other',
-      label: 'Other natural attack',
-      groupId: 'natural',
-    },
+    ...(weaponsAllowed
+      ? [
+          ...equipped,
+          {
+            id: 'add-weapon',
+            label: monsterAddWeaponShortcut(),
+            groupId: 'equipped' as const,
+            disabled: !input.allowAddWeapon,
+            note: input.allowAddWeapon ? undefined : 'Equipment catalog is not ready',
+          },
+          ...natural,
+          {
+            id: 'natural:other',
+            label: 'Other natural attack',
+            groupId: 'natural' as const,
+          },
+        ]
+      : []),
     ...special,
     ...generalAcquisitionItems(input.section, input.primarySpellcasting === true),
+  ]
+}
+
+function reactionAcquisitionItems(
+  hasReferenceTargets: boolean,
+  spellCatalogReady: boolean,
+): MonsterActionAcquisitionItem[] {
+  return [
+    {
+      id: 'reaction:reference',
+      label: MONSTER_REACTION_REFERENCE_LABEL,
+      groupId: 'existing',
+      metadata: LEGENDARY_REFERENCE_DESCRIPTION,
+      disabled: !hasReferenceTargets,
+      note: hasReferenceTargets ? undefined : LEGENDARY_REFERENCE_DISABLED_NOTE,
+    },
+    {
+      id: 'reaction:parry',
+      label: getMonsterActionKindLabel('parry'),
+      groupId: 'new',
+      metadata: MONSTER_PARRY_DESCRIPTION,
+    },
+    {
+      id: 'reaction:cast-spell',
+      label: MONSTER_CAST_SPELL_LABEL,
+      groupId: 'new',
+      metadata: MONSTER_REACTION_CAST_SPELL_DESCRIPTION,
+      disabled: !spellCatalogReady,
+      note: spellCatalogReady ? undefined : LEGENDARY_CAST_SPELL_DISABLED_NOTE,
+    },
+    {
+      id: 'reaction:custom',
+      label: MONSTER_REACTION_CUSTOM_LABEL,
+      groupId: 'new',
+      metadata: MONSTER_REACTION_CUSTOM_DESCRIPTION,
+    },
   ]
 }
 
@@ -236,7 +302,14 @@ function generalAcquisitionItems(
     (item) => item.id !== 'create:spell' && item.id !== 'create:spell-standalone',
   )
   const spellcasting = OTHER_ITEMS.find((item) => item.id === 'create:spell')
-  if (section === 'bonusActions' || section === 'reactions') return [...rest, ...standalone]
+  const saveItem: MonsterActionAcquisitionItem = {
+    id: 'create:save',
+    label: 'Saving throw',
+    groupId: 'other',
+    metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
+  }
+  if (section === 'bonusActions') return [...rest, saveItem, ...standalone]
+  if (section === 'reactions') return []
   return [
     ...rest,
     ...(spellcasting
@@ -291,8 +364,44 @@ function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
   }
 }
 
+export function createReactionActionDraft(
+  category: 'reference' | 'parry' | 'cast-spell' | 'custom',
+  sections: {
+    actions?: readonly unknown[]
+    bonusActions?: readonly unknown[]
+    reactions?: readonly unknown[]
+    legendaryActions?: readonly unknown[]
+  },
+): MonsterActionDraftRow {
+  if (category === 'reference') {
+    return {
+      id: createMonsterRowId(),
+      kind: 'action-reference',
+      name: getMonsterActionKindLabel('action-reference'),
+      actionIds: [],
+    }
+  }
+  if (category === 'parry') {
+    return {
+      id: createMonsterRowId(),
+      kind: 'parry',
+      name: getMonsterActionKindLabel('parry'),
+      acBonus: PARRY_AC_BONUS_DEFAULT,
+    }
+  }
+  if (category === 'cast-spell') {
+    const cast = createSpellActionDraft('reactions', sections)
+    if (cast.kind !== 'spell') return cast
+    return { ...cast, name: MONSTER_CAST_SPELL_LABEL }
+  }
+  return { id: createMonsterRowId(), kind: 'special' }
+}
+
 export function createMonsterActionFromAcquisition(
-  choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' } | { type: 'legendary' }>,
+  choice: Exclude<
+    MonsterActionAcquisitionChoice,
+    { type: 'add-weapon' } | { type: 'legendary' } | { type: 'reaction' }
+  >,
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()
   if (choice.type === 'weapon-entry') {

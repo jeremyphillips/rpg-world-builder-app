@@ -3,7 +3,9 @@ import type {
   MonsterAction,
   MonsterActionSection,
   MonsterBody,
+  MonsterBonusAction,
   MonsterLegendaryAction,
+  MonsterReaction,
 } from '../../content/monster'
 import { findSpellCastingSource } from '../../content/monster/spell-casting-source'
 import { getSkillName } from '../../content/skill-proficiency'
@@ -170,13 +172,16 @@ function attackLineFromProfile(
 
 function appendAttackLines(
   target: DerivedMonsterAttackLine[],
-  actions: readonly (MonsterAction | MonsterLegendaryAction)[],
+  actions: readonly (MonsterAction | MonsterLegendaryAction | MonsterReaction)[],
   args: Omit<ResolveMonsterActionAttackProfileInput, 'action'>,
   section: DerivedMonsterAttackLine['section'],
 ): void {
   for (const action of actions) {
     if (!isMonsterActionAttackKind(action.kind)) continue
-    const profile = resolveMonsterActionAttackProfile({ ...args, action })
+    const profile = resolveMonsterActionAttackProfile({
+      ...args,
+      action: action as MonsterAction,
+    })
     if (profile.status !== 'resolved') {
       throw new Error(`Monster attack ${action.id} is unavailable.`)
     }
@@ -271,7 +276,13 @@ function deriveSpellcastingLines(
   const sections = ['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const
   const lines: DerivedMonsterSpellcastingLine[] = []
   for (const section of sections) {
-    for (const action of availableBodyRows(monster[section])) {
+    const rows = monster[section] as readonly (
+      | MonsterAction
+      | MonsterBonusAction
+      | MonsterReaction
+      | MonsterLegendaryAction
+    )[]
+    for (const action of availableBodyRows(rows)) {
       if (action.kind !== 'spell' || !action.castingAbility) continue
       const ability =
         action.castingAbility.kind === 'ability'
@@ -317,20 +328,23 @@ type DraftMonsterSource = {
   equipment?: MonsterBody['equipment']
   proficiencies?: MonsterBody['proficiencies']
   actions?: MonsterAction[]
-  bonusActions?: MonsterAction[]
-  reactions?: MonsterAction[]
+  bonusActions?: MonsterBonusAction[]
+  reactions?: MonsterReaction[]
   legendaryActions?: MonsterLegendaryAction[]
 }
 
 function draftAttackResult(args: {
-  action: MonsterAction | MonsterLegendaryAction
+  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction
   monster: MonsterBody
   equipmentCatalog: CreatureEquipmentCatalog
   proficiencyBonus: number | undefined
   section: DerivedMonsterAttackLine['section']
   magicPropertyProvider: MagicPropertyDefinitionProvider
 }): DerivedField<DerivedMonsterAttackLine> {
-  const profile = resolveMonsterActionAttackProfile(args)
+  const profile = resolveMonsterActionAttackProfile({
+    ...args,
+    action: args.action as MonsterAction,
+  })
   if (profile.status === 'unavailable') return profile
   return resolvedField(attackLineFromProfile(profile.value, args.action.id, args.section))
 }
@@ -349,7 +363,8 @@ function draftAttacks(
   ] as const
   const attacks: DerivedDraftAttack[] = []
   for (const [section, actions] of sections) {
-    for (const action of availableBodyRows(actions)) {
+    const rows = actions as readonly (MonsterAction | MonsterBonusAction | MonsterReaction)[]
+    for (const action of availableBodyRows(rows)) {
       if (
         action.kind !== 'weapon' &&
         action.kind !== 'natural-weapon' &&

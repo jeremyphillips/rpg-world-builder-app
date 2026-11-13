@@ -28,7 +28,10 @@ import {
 } from '../../lib/actions/monster-action-equipment-references'
 import { primarySpellcastingProfile } from '../../lib/actions/monster-action-casting-summary'
 import { monsterActionEditorTitles } from '../../lib/actions/monster-action-editor-title'
-import { legendaryActionCategory } from '../../lib/actions/legendary-action-category'
+import {
+  isLegendaryReferenceTarget,
+  legendaryActionCategory,
+} from '../../lib/actions/legendary-action-category'
 import {
   LEGENDARY_ACTION_ACQUISITION_GROUPS,
   legendaryActionAcquisitionItems,
@@ -119,11 +122,16 @@ function MonsterActionAddMenu({
           allowAddWeapon,
           section,
           primarySpellcasting: primarySpellcastingProfile(values) != null,
+          hasReferenceTargets: ((values.actions ?? []) as MonsterActionDraftRow[]).some(
+            isLegendaryReferenceTarget,
+          ),
+          spellCatalogReady: ctx.spellCatalogStatus === 'ready',
         })
-  const groups =
-    section === 'legendaryActions'
+  const groupSource =
+    section === 'legendaryActions' || section === 'reactions'
       ? [...LEGENDARY_ACTION_ACQUISITION_GROUPS]
       : [...MONSTER_ACTION_ACQUISITION_GROUPS]
+  const groups = groupSource.filter((group) => items.some((item) => item.groupId === group.id))
   return (
     <ButtonDropdown
       label={MONSTER_ADD_LABEL}

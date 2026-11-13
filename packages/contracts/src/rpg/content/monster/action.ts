@@ -19,6 +19,7 @@ import {
 } from '../lib/resolution/schema'
 import { RESOLUTION_SELECTION_MODES } from '../../vocab/resolution'
 import { getActionPreset } from '../action/action-presets'
+import { MONSTER_SECTION_KINDS } from './action-section-eligibility'
 import {
   castingAbilitySchema,
   savingThrowEffectDraftSchema,
@@ -42,6 +43,16 @@ import {
   weaponDamageSchema,
   weaponRangeSchema,
 } from '../equipment/weapon-variant'
+
+export const PARRY_AC_BONUS_MIN = 1
+export const PARRY_AC_BONUS_MAX = 10
+export const PARRY_AC_BONUS_DEFAULT = 2
+
+const parryAcBonusSchema = z
+  .number()
+  .int()
+  .min(PARRY_AC_BONUS_MIN, 'AC bonus must be at least 1.')
+  .max(PARRY_AC_BONUS_MAX, 'AC bonus cannot exceed 10.')
 
 export const NATURAL_WEAPON_PROPERTIES = ['finesse'] as const
 
@@ -286,65 +297,141 @@ function omitActionKinds<T extends { shape: { kind: z.ZodType } }>(
 }
 
 const publishedActionFields = monsterActionFields('published')
+const draftActionFields = monsterActionFields('draft')
 
-const sharedActionKinds = ['action-reference'] as const
-const legendaryOmittedKinds = ['weapon', 'natural-weapon', 'attack', 'save', 'multiattack'] as const
+const ACTION_FIELD_KINDS = [
+  'weapon',
+  'natural-weapon',
+  'attack',
+  'save',
+  'special',
+  'spell',
+  'multiattack',
+  'action-reference',
+] as const
+
+function omittedSectionKinds(section: 'actions' | 'bonusActions' | 'legendaryActions') {
+  const allowed = new Set<string>(MONSTER_SECTION_KINDS[section])
+  return ACTION_FIELD_KINDS.filter((kind) => !allowed.has(kind))
+}
 
 export const monsterActionSchema = z.discriminatedUnion(
   'kind',
-  omitActionKinds(publishedActionFields, sharedActionKinds),
+  omitActionKinds(publishedActionFields, omittedSectionKinds('actions')),
+)
+
+export const monsterBonusActionSchema = z.discriminatedUnion(
+  'kind',
+  omitActionKinds(publishedActionFields, omittedSectionKinds('bonusActions')),
 )
 
 export const monsterLegendaryActionSchema = z.discriminatedUnion(
   'kind',
-  omitActionKinds(publishedActionFields, legendaryOmittedKinds),
+  omitActionKinds(publishedActionFields, omittedSectionKinds('legendaryActions')),
 )
 
 const reactionTriggerField = { trigger: activationTriggerSchema.optional() } as const
 
-function reactionsFromActions<T extends { shape: { kind: z.ZodType } }>(options: readonly T[]) {
-  const extended = omitActionKinds(options, ['multiattack', 'action-reference']).map((option) =>
-    (option as unknown as z.ZodObject).extend(reactionTriggerField),
-  )
-  return z.discriminatedUnion(
-    'kind',
-    extended as unknown as [z.ZodObject, z.ZodObject, ...z.ZodObject[]],
-  )
+function reactionReferenceSchema(mode: MonsterActionMode) {
+  const actionIds =
+    mode === 'draft'
+      ? z.array(z.string().min(1)).max(1).default([])
+      : z.array(z.string().min(1)).min(1, 'Choose an attack or ability from Actions.').max(1)
+  return z.object({
+    id: z.string().min(1),
+    kind: z.literal('action-reference'),
+    name: strict(z.string().min(1), mode),
+    trigger: activationTriggerSchema.optional(),
+    description: z.string().optional(),
+    actionIds,
+    available: z.boolean().optional(),
+    ...entryProvenanceField,
+  })
 }
 
-type WithReactionTrigger<T> = T & {
-  trigger?: z.infer<typeof activationTriggerSchema>
+function parrySchema(mode: MonsterActionMode) {
+  return z.object({
+    id: z.string().min(1),
+    kind: z.literal('parry'),
+    name: strict(z.string().min(1), mode),
+    acBonus: mode === 'draft' ? parryAcBonusSchema.optional() : parryAcBonusSchema,
+    /** Absent when the on-miss disclosure is closed. An empty string is an open, unset attack. */
+    followUpActionId: z.string().min(1, 'Choose an attack.').optional(),
+    available: z.boolean().optional(),
+    ...entryProvenanceField,
+  })
 }
+
+function extendReactionSources<T extends { shape: { kind: z.ZodType } }>(options: readonly T[]) {
+  return omitActionKinds(options, [
+    'weapon',
+    'natural-weapon',
+    'attack',
+    'save',
+    'multiattack',
+    'action-reference',
+  ]).map((option) => (option as unknown as z.ZodObject).extend(reactionTriggerField))
+}
+
+const publishedReactionReferenceSchema = reactionReferenceSchema('published')
+const draftReactionReferenceSchema = reactionReferenceSchema('draft')
+const publishedParrySchema = parrySchema('published')
+const draftParrySchema = parrySchema('draft')
+
+function reactionSchema(mode: MonsterActionMode) {
+  const extended =
+    mode === 'published'
+      ? extendReactionSources(publishedActionFields)
+      : extendReactionSources(draftActionFields)
+  const reference =
+    mode === 'published' ? publishedReactionReferenceSchema : draftReactionReferenceSchema
+  const parry = mode === 'published' ? publishedParrySchema : draftParrySchema
+  return z.discriminatedUnion('kind', [...extended, reference, parry] as unknown as [
+    z.ZodObject,
+    z.ZodObject,
+    ...z.ZodObject[],
+  ])
+}
+
+type ReactionTrigger = { trigger?: { text: string } }
+
+export const monsterReactionSchema = reactionSchema(
+  'published',
+) as unknown as z.ZodType<MonsterReaction>
+export const monsterReactionDraftSchema = reactionSchema(
+  'draft',
+) as unknown as z.ZodType<MonsterReactionDraft>
 
 export type MonsterAction = z.infer<typeof monsterActionSchema>
+export type MonsterBonusAction = z.infer<typeof monsterBonusActionSchema>
 export type MonsterLegendaryAction = z.infer<typeof monsterLegendaryActionSchema>
-export type MonsterReaction = WithReactionTrigger<Exclude<MonsterAction, { kind: 'multiattack' }>>
-
-export const monsterReactionSchema = reactionsFromActions(
-  monsterActionSchema.options,
-) as unknown as z.ZodType<MonsterReaction>
-
-const draftActionFields = monsterActionFields('draft')
+export type MonsterReaction =
+  | (Extract<MonsterAction, { kind: 'spell' | 'special' }> & ReactionTrigger)
+  | z.infer<typeof publishedReactionReferenceSchema>
+  | z.infer<typeof publishedParrySchema>
+export type MonsterReactionDraft =
+  | (Extract<MonsterActionDraft, { kind: 'spell' | 'special' }> & ReactionTrigger)
+  | z.infer<typeof draftReactionReferenceSchema>
+  | z.infer<typeof draftParrySchema>
 
 export const monsterActionDraftSchema = z.discriminatedUnion(
   'kind',
-  omitActionKinds(draftActionFields, sharedActionKinds),
+  omitActionKinds(draftActionFields, omittedSectionKinds('actions')),
+)
+
+export const monsterBonusActionDraftSchema = z.discriminatedUnion(
+  'kind',
+  omitActionKinds(draftActionFields, omittedSectionKinds('bonusActions')),
 )
 
 export const monsterLegendaryActionDraftSchema = z.discriminatedUnion(
   'kind',
-  omitActionKinds(draftActionFields, legendaryOmittedKinds),
+  omitActionKinds(draftActionFields, omittedSectionKinds('legendaryActions')),
 )
 
 export type MonsterActionDraft = z.infer<typeof monsterActionDraftSchema>
+export type MonsterBonusActionDraft = z.infer<typeof monsterBonusActionDraftSchema>
 export type MonsterLegendaryActionDraft = z.infer<typeof monsterLegendaryActionDraftSchema>
-export type MonsterReactionDraft = WithReactionTrigger<
-  Exclude<MonsterActionDraft, { kind: 'multiattack' }>
->
-
-export const monsterReactionDraftSchema = reactionsFromActions(
-  monsterActionDraftSchema.options,
-) as unknown as z.ZodType<MonsterReactionDraft>
 
 type SpellEntryLike = {
   id: string
@@ -797,7 +884,7 @@ export function refineMonsterActionShape(
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
-  refineUnknownPreset(action, ctx, path)
+  refineUnknownPreset(action as { preset?: string }, ctx, path)
   refineAuthoredActionName(action, ctx, path)
   refineSpecialRulesText(action, ctx, path)
   if (action.kind === 'natural-weapon') refineNaturalWeaponShape(action, ctx, path)

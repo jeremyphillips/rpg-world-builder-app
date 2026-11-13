@@ -1,4 +1,4 @@
-import type { MonsterAction, MonsterLegendaryAction } from '../../content/monster/action'
+import type { MonsterAction } from '../../content/monster/action'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import type { EquipmentInstance } from '../../content/equipment/instance/instance'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
@@ -15,9 +15,9 @@ function referencedActionName(
   equipment: readonly EquipmentInstance[],
   equipmentCatalog: CreatureEquipmentCatalog,
   magicPropertyProvider: MagicPropertyDefinitionProvider,
-): string {
+): string | undefined {
   const action = actions.find((entry) => entry.id === id)
-  if (!action) return id
+  if (!action) return undefined
   const identity = resolveMonsterActionIdentity({
     action,
     equipment,
@@ -25,7 +25,8 @@ function referencedActionName(
     magicPropertyProvider,
     equipmentCatalogStatus: 'ready',
   })
-  return identity.displayName || id
+  const name = identity.displayName.trim()
+  return name.length > 0 ? name : undefined
 }
 
 function formatAttackClause(args: { count: number; names: readonly string[] }): string {
@@ -59,9 +60,16 @@ export function formatMonsterMultiattack(args: {
     formatStep({
       subject: capitalSubject,
       count: step.count,
-      names: step.actionIds.map((id) =>
-        referencedActionName(id, args.actions, args.equipment, args.equipmentCatalog, provider),
-      ),
+      names: step.actionIds.flatMap((id) => {
+        const name = referencedActionName(
+          id,
+          args.actions,
+          args.equipment,
+          args.equipmentCatalog,
+          provider,
+        )
+        return name ? [name] : [id]
+      }),
     }),
   )
   return sentences.join(' ')
@@ -69,7 +77,18 @@ export function formatMonsterMultiattack(args: {
 
 const REFERENCE_ATTACK_KINDS = new Set(['weapon', 'natural-weapon', 'attack'])
 
-type ActionReference = Extract<MonsterLegendaryAction, { kind: 'action-reference' }>
+type ActionReference = {
+  id?: string
+  kind?: string
+  name?: string
+  description?: string
+  onceUntilNextTurn?: boolean
+  actionIds: readonly string[]
+  movement?: {
+    allowance: MovementAllowance
+    withoutOpportunityAttacks?: true
+  }
+}
 
 function movementClause(allowance: MovementAllowance, withoutOpportunityAttacks?: true): string {
   const label = MOVEMENT_ALLOWANCE_ENTRIES[allowance].label
@@ -101,8 +120,9 @@ export function formatMonsterActionReference(args: {
     name: referencedActionName(id, args.actions, args.equipment, args.equipmentCatalog, provider),
     kind: args.actions.find((entry) => entry.id === id)?.kind ?? '',
   }))
+  if (targets.length === 0 || targets.some((target) => !target.name)) return ''
   const clause = referenceClause(
-    targets.map((target) => target.name),
+    targets.map((target) => target.name ?? ''),
     targets.map((target) => target.kind),
   )
   const movement = args.action.movement

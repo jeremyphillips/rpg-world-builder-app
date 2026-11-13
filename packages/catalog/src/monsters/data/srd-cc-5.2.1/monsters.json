@@ -328,10 +328,9 @@
     "reactions": [
       {
         "id": "parry",
-        "kind": "special",
+        "kind": "parry",
         "name": "Parry",
-        "trigger": { "text": "The knight is hit by a melee attack roll while holding a weapon." },
-        "description": "<p>The knight adds 2 to its AC against that attack, possibly causing it to miss.</p>",
+        "acBonus": 2,
         "provenance": {
           "excerpt": {
             "documentId": "srd-5.2.1",

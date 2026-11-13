@@ -211,12 +211,20 @@ describe('monster action detail fields', () => {
     }
 
     const reaction = detailFields(
-      { id: 'bite', kind: 'natural-weapon', name: 'Bite', mode: 'melee' },
+      { id: 'gaze', kind: 'special', name: 'Gaze', description: '<p>Looks.</p>' },
       'reactions',
     )
-    expect(reaction.indexOf('buildAdvisories')).toBeLessThan(reaction.indexOf('trigger.text'))
-    expect(reaction.indexOf('trigger.text')).toBeLessThan(reaction.indexOf('limitedUse'))
-    expect(reaction.at(-1)).toBe('description')
+    expect(reaction.indexOf('description')).toBeLessThan(reaction.indexOf('trigger.text'))
+    expect(reaction).toContain('trigger.text')
+
+    const parry = detailFields(
+      { id: 'parry', kind: 'parry', name: 'Parry', acBonus: 2 },
+      'reactions',
+    )
+    expect(parry).toContain('acBonus')
+    expect(parry).toContain('followUpActionId')
+    expect(parry).not.toContain('trigger.text')
+    expect(parry).not.toContain('description')
 
     const attack = detailFields({
       id: 'slash',
@@ -525,7 +533,10 @@ describe('monster action section moves', () => {
   it('derives active keys from the draft schema', () => {
     expect(monsterActionActiveKeys('weapon', 'actions')).toContain('equipmentEntryId')
     expect(monsterActionActiveKeys('weapon', 'actions')).not.toContain('trigger')
-    expect(monsterActionActiveKeys('weapon', 'reactions')).toContain('trigger')
+    expect(monsterActionActiveKeys('weapon', 'reactions')).toEqual([])
+    expect(monsterActionActiveKeys('special', 'reactions')).toContain('trigger')
+    expect(monsterActionActiveKeys('parry', 'reactions')).toContain('acBonus')
+    expect(monsterActionActiveKeys('parry', 'reactions')).not.toContain('trigger')
   })
 })
 

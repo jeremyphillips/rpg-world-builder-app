@@ -33,7 +33,7 @@ A free-cast entitlement has one `source` from `grantDerivedSelectionSourceSchema
 
 Spell casting time stores that object on `normal.trigger`. It is required when the unit is `reaction` and rejected for every other unit.
 
-Monster reactions store the same object. An absent trigger means the reaction's trigger is unspecified. Reactions with an authored trigger render as `Trigger:` followed by `Response:`. On a spell reaction, that field is an additional condition. Each referenced reaction spell keeps its own trigger.
+Custom reactions and reaction references store the same object. It is required when those rows are published. An authored trigger renders as `Trigger:` followed by `Response:`. On a spell reaction, that field is an additional condition and may be absent. Each referenced reaction spell keeps its own trigger. A parry does not store this object. Its trigger is generated.
 
 ## Monster actions
 

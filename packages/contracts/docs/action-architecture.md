@@ -6,14 +6,14 @@ stat-block sentences.
 
 ## Layers
 
-| Layer           | Home                            | Owns                                                                                                                        |
-| --------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Primitives      | `rpg/primitives/`               | Rolls, area geometry, limited use                                                                                           |
-| Closed sets     | `rpg/vocab/resolution/`         | Selection modes, target kinds, proximity, outcomes, application amounts, method kinds                                       |
-| Envelope        | `rpg/content/lib/resolution/`   | `effectResolutionSchema` — selection, method (`saving-throw` \| `automatic`), damage/healing/temporary hit points, outcomes |
-| Spell adapter   | `rpg/content/spell/resolution/` | Spell attack methods, projectile pattern, progression. `spellResolutionSchema` spreads the envelope                         |
-| Monster actions | `rpg/content/monster/action.ts` | Kind union, `dcSource`, multiattack steps, legendary `action-reference`, optional `preset` and natural `form`               |
-| Stat block      | `rpg/runtime/monster/`          | Attack lines, `formatMonsterSaveAction`, `formatMonsterMultiattack`, `formatMonsterActionReference`                         |
+| Layer           | Home                            | Owns                                                                                                                                                           |
+| --------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Primitives      | `rpg/primitives/`               | Rolls, area geometry, limited use                                                                                                                              |
+| Closed sets     | `rpg/vocab/resolution/`         | Selection modes, target kinds, proximity, outcomes, application amounts, method kinds                                                                          |
+| Envelope        | `rpg/content/lib/resolution/`   | `effectResolutionSchema` — selection, method (`saving-throw` \| `automatic`), damage/healing/temporary hit points, outcomes                                    |
+| Spell adapter   | `rpg/content/spell/resolution/` | Spell attack methods, projectile pattern, progression. `spellResolutionSchema` spreads the envelope                                                            |
+| Monster actions | `rpg/content/monster/action.ts` | Kind union, section eligibility, `dcSource`, multiattack steps, `action-reference`, reaction `parry`, optional `preset` and natural `form`                     |
+| Stat block      | `rpg/runtime/monster/`          | Attack lines, `formatMonsterSaveAction`, `formatMonsterMultiattack`, `formatMonsterActionReference`, `formatMonsterParryTrigger`, `formatMonsterParryResponse` |
 
 Save DC is `abilitySaveDc` in `rpg/runtime/creature/spell-dc.ts` (8 + proficiency
 bonus + ability modifier). Area sentences for stat blocks use
@@ -21,17 +21,26 @@ bonus + ability modifier). Area sentences for stat blocks use
 
 ## Monster action kinds
 
-`weapon`, `natural-weapon`, `attack`, `save`, `multiattack`, `special`, and
-`spell`, plus the legendary-only `action-reference`. The section (`actions`,
-`bonusActions`, `reactions`, `legendaryActions`) places the row. `multiattack`
-is valid only in `actions`. `action-reference` is valid only in
-`legendaryActions`, and rows do not move into or out of that section. A
-reference points at Actions rows by id. Several ids mean the creature makes one
-of those attacks. One id may be an attack, a save, or a special ability.
-Optional `movement.allowance` is `half-speed` or `speed`. Reactions omit
-`multiattack` and `action-reference`. Legendary actions spend one use from
-`legendaryActionUses`. An optional `legendaryActionUsesInLair` is printed only
-when it is greater than that pool. There is no per-option cost.
+`weapon`, `natural-weapon`, `attack`, `save`, `multiattack`, `special`,
+`spell`, `action-reference`, and `parry`. Which kinds a section accepts is
+`MONSTER_SECTION_KINDS`. Actions keep the attack, save, spell, special, and
+multiattack kinds. Bonus Actions keep `attack`, `save`, `spell`, and `special`.
+Reactions keep `parry`, `action-reference`, `spell`, and `special`. Legendary
+Actions keep `action-reference`, `spell`, and `special`. `multiattack` is valid
+only in `actions`. Breath Weapon and Constrict presets are Actions presets even
+though they store `kind: 'save'`. Rows do not move into or out of Legendary
+Actions, and a row cannot move into a section that does not allow its kind.
+
+`action-reference` points at Actions rows by id. A legendary reference may list
+several attacks, and the creature makes one of them. One id may be an attack, a
+save, or a special ability. Optional legendary `movement.allowance` is
+`half-speed` or `speed`. A reaction reference stores exactly one id, an authored
+trigger, and optional additional rules. It has no movement. `parry` stores an
+AC bonus and an optional follow-up attack id. Its trigger and response are
+generated from the current creature name. An unresolved reference id is not
+printed. Legendary actions spend one use from `legendaryActionUses`. An
+optional `legendaryActionUsesInLair` is printed only when it is greater than
+that pool. There is no per-option cost.
 `onceUntilNextTurn` prints one restriction sentence and is not `limitedUse`.
 `spellInvocation: 'use-entry'` is stored only on a legendary spell row and
 points at one spell on a shared spellcasting action. Omitting it shares only

@@ -156,7 +156,7 @@ describe('useMonsterActionSections', () => {
   it('lists a legendary reference when its Actions target is removed or moved', () => {
     const { result } = renderHook(() => useMonsterActionSections(), {
       wrapper: wrapper({
-        actions: [{ id: 'bite', kind: 'natural-weapon', name: 'Bite' }],
+        actions: [{ id: 'bite', kind: 'special', name: 'Bite', description: '<p>Bites.</p>' }],
         legendaryActionUses: 3,
         legendaryActions: [
           { id: 'pounce', kind: 'action-reference', name: 'Pounce', actionIds: ['bite'] },
@@ -177,7 +177,7 @@ describe('useMonsterActionSections', () => {
 
     const move = renderHook(() => useMonsterActionSections(), {
       wrapper: wrapper({
-        actions: [{ id: 'bite', kind: 'natural-weapon', name: 'Bite' }],
+        actions: [{ id: 'bite', kind: 'special', name: 'Bite', description: '<p>Bites.</p>' }],
         legendaryActionUses: 3,
         legendaryActions: [
           { id: 'pounce', kind: 'action-reference', name: 'Pounce', actionIds: ['bite'] },

@@ -139,7 +139,9 @@ export function MonsterActionDetail({
       advisories: collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx)),
       onCastingSourceBlocked: sections.setNotice,
       attackOptions: attackChipOptions(
-        (values[located.section] ?? []) as MonsterActionDraftRow[],
+        (located.section === 'reactions'
+          ? (values.actions ?? [])
+          : (values[located.section] ?? [])) as MonsterActionDraftRow[],
         action.id,
         values,
         ctx,

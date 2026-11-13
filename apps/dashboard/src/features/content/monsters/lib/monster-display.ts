@@ -26,9 +26,12 @@ import {
   type SkillProficiency,
   availableBodyRows,
   deriveMonsterStatBlock,
+  isMonsterActionAttackKind,
   formatCreatureTrait,
   formatMonsterAttackAction,
   formatMonsterActionReference,
+  formatMonsterParryResponse,
+  formatMonsterParryTrigger,
   formatLegendaryActionUsesIntro,
   formatOnceUntilNextTurnSentence,
   resolveCreatureSenses,
@@ -450,8 +453,29 @@ function mapSaveActionItem(
   }
 }
 
+function escapeStatBlockText(value: string): string {
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+}
+
+function parryFollowUpName(
+  action: Extract<MonsterReaction, { kind: 'parry' }>,
+  spells: SpellDisplayContext,
+): string | undefined {
+  if (!action.followUpActionId) return undefined
+  const target = spells.monster.actions.find((row) => row.id === action.followUpActionId)
+  if (!target || !isMonsterActionAttackKind(target.kind)) return undefined
+  const name = actionDisplayIdentity(
+    target,
+    spells.monster,
+    spells.equipmentById,
+    spells.catalogState,
+    spells.magicPropertyProvider,
+  ).displayName.trim()
+  return name.length > 0 ? name : undefined
+}
+
 function mapActionReferenceItem(
-  action: Extract<MonsterLegendaryAction, { kind: 'action-reference' }>,
+  action: Extract<MonsterLegendaryAction | MonsterReaction, { kind: 'action-reference' }>,
   name: string,
   spells: SpellDisplayContext,
 ): MonsterActionItemViewModel {
@@ -463,11 +487,13 @@ function mapActionReferenceItem(
     equipmentCatalog: spells.equipmentById,
     magicPropertyProvider: spells.magicPropertyProvider,
   })
-  const text = withTurnLimit(generated, action, spells.monsterName, false)
+  const text = generated ? withTurnLimit(generated, action, spells.monsterName, false) : ''
+  const rules = 'description' in action && action.description ? action.description : ''
+  const descriptionHtml = text ? `<p>${escapeStatBlockText(text)}</p>${rules}` : undefined
   return {
     id: action.id,
     name,
-    descriptionHtml: text ? `<p>${text}</p>` : undefined,
+    descriptionHtml,
   }
 }
 
@@ -534,6 +560,18 @@ function mapActionItem(
     return mapSaveActionItem(action, name, derived, catalogState, spells, identity.displayName)
   }
   if (action.kind === 'action-reference') return mapActionReferenceItem(action, name, spells)
+  if (action.kind === 'parry') {
+    const response = formatMonsterParryResponse({
+      monsterName: spells.monsterName,
+      acBonus: action.acBonus,
+      followUpAttackName: parryFollowUpName(action, spells),
+    })
+    return {
+      id: action.id,
+      name,
+      descriptionHtml: response ? `<p>${escapeStatBlockText(response)}</p>` : undefined,
+    }
+  }
   if (action.kind === 'multiattack') {
     return mapMultiattackActionItem(action, name, derived, catalogState, spells)
   }
@@ -563,22 +601,23 @@ function mapReactionItems(
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionItemViewModel[] {
-  return reactions.map((action) =>
-    reactionItemView(
-      action,
+  return reactions.map((action) => {
+    const triggerText =
+      action.kind === 'parry' ? formatMonsterParryTrigger(spells.monsterName) : action.trigger?.text
+    return reactionItemView(
       mapActionItems([action], 'reactions', derived, catalogState, spells)[0],
-    ),
-  )
+      triggerText,
+    )
+  })
 }
 
 function reactionItemView(
-  action: MonsterReaction,
   base: MonsterActionItemViewModel | undefined,
+  triggerText: string | undefined,
 ): MonsterActionItemViewModel {
-  const triggerText = action.trigger?.text
   const hasBody = Boolean(base?.attackLine || base?.descriptionHtml)
   return {
-    id: base?.id ?? action.id,
+    id: base?.id ?? '',
     name: base?.name ?? '',
     attackLine: base?.attackLine,
     descriptionHtml: base?.descriptionHtml,

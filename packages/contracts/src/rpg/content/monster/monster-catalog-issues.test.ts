@@ -88,7 +88,7 @@ describe('collectMonsterCatalogIssues', () => {
           modifiers: [{ kind: 'armor_class' as const, bonus: 1 }],
         },
       ],
-      reactions: [{ kind: 'weapon', equipmentEntryId: 'leather' }],
+      actions: [{ kind: 'weapon', equipmentEntryId: 'leather' }],
     }
     const issues = collectMonsterCatalogIssues(body, readyCatalogs(), 'draft')
     const expected = [
@@ -103,7 +103,7 @@ describe('collectMonsterCatalogIssues', () => {
         message: 'Armor Class adjustments are only allowed on armor or shields.',
       },
       {
-        path: 'reactions.0.equipmentEntryId',
+        path: 'actions.0.equipmentEntryId',
         code: MONSTER_CATALOG_ISSUE_CODE.weaponActionNotWeapon,
         message: 'Weapon action must reference a weapon.',
       },

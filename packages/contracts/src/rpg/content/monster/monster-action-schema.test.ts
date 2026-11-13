@@ -69,16 +69,41 @@ describe('monsterActionSchema', () => {
     ).toBe(true)
   })
 
-  it('parses reaction triggers on reactions only', () => {
+  it('stores a parry bonus without a trigger and requires it when published', () => {
     expect(
-      monsterReactionSchema.parse({
+      monsterReactionDraftSchema.parse({
         id: 'parry',
-        kind: 'special',
+        kind: 'parry',
         name: 'Parry',
-        description: '<p>Adds 2 to AC.</p>',
-        trigger: { text: 'When hit' },
-      }).trigger,
-    ).toEqual({ text: 'When hit' })
+        acBonus: 2,
+      }),
+    ).not.toHaveProperty('trigger')
+    expect(
+      monsterReactionSchema.safeParse({ id: 'parry', kind: 'parry', name: 'Parry' }).success,
+    ).toBe(false)
+    expect(
+      monsterReactionSchema.safeParse({
+        id: 'parry',
+        kind: 'parry',
+        name: 'Parry',
+        acBonus: 11,
+      }).success,
+    ).toBe(false)
+    expect(
+      monsterReactionSchema.safeParse({ id: 'parry', kind: 'weapon', equipmentEntryId: 'sword' })
+        .success,
+    ).toBe(false)
+  })
+
+  it('parses reaction triggers on reactions only', () => {
+    const reaction = monsterReactionSchema.parse({
+      id: 'parry',
+      kind: 'special',
+      name: 'Parry',
+      description: '<p>Adds 2 to AC.</p>',
+      trigger: { text: 'When hit' },
+    })
+    expect(reaction.kind === 'special' ? reaction.trigger : undefined).toEqual({ text: 'When hit' })
   })
 
   it('keeps special reaction rules text optional when a saving throw can stand alone', () => {

@@ -9,6 +9,7 @@ import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-
 import {
   createEquippedWeaponAcquisition,
   createMonsterActionFromAcquisition,
+  createReactionActionDraft,
   createSpellActionDraft,
   type MonsterActionAcquisitionChoice,
 } from '../lib/actions/monster-action-acquisition'
@@ -290,9 +291,11 @@ export function useMonsterActionSections(entityId?: string) {
       const row =
         choice.type === 'legendary'
           ? createLegendaryActionDraft(choice.category, getValues())
-          : choice.type === 'create' && choice.kind === 'spell'
-            ? createSpellActionDraft(section, getValues())
-            : createMonsterActionFromAcquisition(choice)
+          : choice.type === 'reaction'
+            ? createReactionActionDraft(choice.category, getValues())
+            : choice.type === 'create' && choice.kind === 'spell'
+              ? createSpellActionDraft(section, getValues())
+              : createMonsterActionFromAcquisition(choice)
       const before =
         section === 'legendaryActions' ? rowsOf(getValues(), 'legendaryActions').length : 0
       editors[section].appendRow(row)
@@ -350,6 +353,11 @@ export function useMonsterActionSections(entityId?: string) {
           stripMultiattackActionId(rowsOf(getValues(), 'legendaryActions'), actionId),
           { shouldDirty: true },
         )
+        setValue(
+          'reactions',
+          stripMultiattackActionId(rowsOf(getValues(), 'reactions'), actionId),
+          { shouldDirty: true },
+        )
       } else {
         editors[located.section].removeAt(located.index)
       }
@@ -375,7 +383,11 @@ export function useMonsterActionSections(entityId?: string) {
       const references =
         located.section === 'actions'
           ? multiattacksReferencingAction(
-              [...rowsOf(getValues(), 'actions'), ...rowsOf(getValues(), 'legendaryActions')],
+              [
+                ...rowsOf(getValues(), 'actions'),
+                ...rowsOf(getValues(), 'legendaryActions'),
+                ...rowsOf(getValues(), 'reactions'),
+              ],
               actionId,
             )
           : []
@@ -422,6 +434,7 @@ export function useMonsterActionSections(entityId?: string) {
       const referenceRows = [
         ...rowsOf(getValues(), 'actions'),
         ...rowsOf(getValues(), 'legendaryActions'),
+        ...rowsOf(getValues(), 'reactions'),
       ]
       if (
         located.section === 'actions' &&

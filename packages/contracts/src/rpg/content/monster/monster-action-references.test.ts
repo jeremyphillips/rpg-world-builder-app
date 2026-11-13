@@ -96,20 +96,18 @@ describe('monster action references', () => {
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
           actions: [multiattack([{ count: 1, actionIds: ['bite'] }])],
-          bonusActions: [BITE_ACTION],
+          bonusActions: [{ id: 'bite', kind: 'special', name: 'Bite', description: 'A bite.' }],
         }),
       ),
     ).toContain('must reference an action in Actions')
 
     expect(
-      issueMessages(
-        createMonsterInputSchema.safeParse({
-          ...MONSTER_TEST_INPUT,
-          bonusActions: [multiattack([{ count: 1, actionIds: ['bite'] }])],
-          actions: [BITE_ACTION],
-        }),
-      ),
-    ).toContain('Multiattack is only valid in Actions.')
+      createMonsterInputSchema.safeParse({
+        ...MONSTER_TEST_INPUT,
+        bonusActions: [multiattack([{ count: 1, actionIds: ['bite'] }])],
+        actions: [BITE_ACTION],
+      }).success,
+    ).toBe(false)
 
     expect(
       issueMessages(
@@ -153,9 +151,15 @@ describe('monster action references', () => {
         message.includes('Choose an attack or ability from Actions.'),
       ),
     ).toBe(true)
-    expect(issueMessages(withPool([], [reference(['bite'])], [BITE_ACTION]))).toContain(
-      'Choose an attack or ability from Actions.',
-    )
+    expect(
+      issueMessages(
+        withPool(
+          [],
+          [reference(['bite'])],
+          [{ id: 'bite', kind: 'special', name: 'Bite', description: 'A bite.' }],
+        ),
+      ),
+    ).toContain('Choose an attack or ability from Actions.')
     expect(
       issueMessages(
         withPool(
