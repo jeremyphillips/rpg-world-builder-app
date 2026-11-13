@@ -1,6 +1,9 @@
 import { CONFIGURABLE_CREATURE_TRAIT_PRESET_IDS, getContentTypeTerm } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
+import { buildActiveCreatureTypeFieldOptions } from '@/features/vocabulary'
+
+import { resolutionTargetAuthoringFields } from '../../lib/forms/fields/resolution-target-authoring-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { damageFieldGroup } from '../../lib/forms/mechanics/damage-field-group'
 import { monsterActionLimitedUseFields } from './actions/monster-action-on-hit-fields'
@@ -69,14 +72,10 @@ export function monsterActionResolverFields(ctx: ContentFormCtx): FormItem[] {
     },
     choice('resolution.method.ability', 'Save ability'),
     choice('resolution.selectionMode', 'Selection'),
-    { type: 'number', name: 'resolution.target.count', label: 'Target count', min: 1 },
-    choice('resolution.target.proximity.kind', 'Target distance'),
-    {
-      type: 'number',
-      name: 'resolution.target.proximity.distance.value',
-      label: 'Distance',
-      min: 1,
-    },
+    ...resolutionTargetAuthoringFields({
+      prefix: 'resolution.target',
+      creatureTypeOptions: buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary),
+    }),
     ...monsterActionLimitedUseFields(),
     { type: 'number', name: 'limitedUse.minRoll', label: 'Recharge roll', min: 2, max: 6 },
     {

@@ -1,0 +1,509 @@
+import {
+  CREATURE_SIZES,
+  EFFECT_CONDITION_IDS,
+  MEASURED_RANGE_FEET,
+  RESOLUTION_TARGET_KINDS,
+  formatResolutionTargetFromParts,
+  getCreatureSizeLabel,
+  getEffectConditionLabel,
+  getResolutionTargetKindLabel,
+  type ResolutionTarget,
+  type ResolutionTargetKind,
+  type ResolutionTargetProximity,
+} from '@rpg/contracts'
+import {
+  combineFieldVisibilityAll,
+  type ArrayConfig,
+  type FieldOption,
+  type FieldVisibility,
+  type FormItem,
+  type InlineSentenceFieldConfig,
+} from '@rpg/ui/form'
+
+const REQUIREMENT_STAT_BLOCK_HINT = 'Shown on the stat block. Not checked during play yet.'
+const WRITTEN_CLAUSE_HINT = 'A full clause, such as "that is a demon."'
+
+const SIZE_COMPARISON_OPTIONS = [
+  { value: 'or-smaller', label: 'or smaller' },
+  { value: 'or-larger', label: 'or larger' },
+  { value: 'only', label: 'exactly this size' },
+] as const
+
+function whenKind(kind: string): FieldVisibility {
+  return {
+    dependsOn: ['kind'],
+    visibleWhen: (values) => values.kind === kind,
+  }
+}
+
+function applyFieldVisibility<T extends { visibility?: FieldVisibility }>(
+  item: T,
+  visibility?: FieldVisibility,
+): T {
+  if (!visibility) return item
+  if (!item.visibility) return { ...item, visibility }
+  return { ...item, visibility: combineFieldVisibilityAll(item.visibility, visibility) }
+}
+
+function requirementKind(item: unknown): string | undefined {
+  if (!item || typeof item !== 'object') return undefined
+  const kind = (item as { kind?: unknown }).kind
+  return typeof kind === 'string' ? kind : undefined
+}
+
+function hasRequirementKind(items: unknown[], kinds: readonly string[]): boolean {
+  return items.some((item) => {
+    const kind = requirementKind(item)
+    return kind !== undefined && kinds.includes(kind)
+  })
+}
+
+function stringIds(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((id): id is string => typeof id === 'string' && id.length > 0)
+}
+
+function joinOr(items: readonly string[]): string {
+  if (items.length <= 1) return items[0] ?? ''
+  if (items.length === 2) return `${items[0]} or ${items[1]}`
+  return `${items.slice(0, -1).join(', ')}, or ${items.at(-1)}`
+}
+
+function creatureTypeLabelFor(options: readonly FieldOption[]): (id: string) => string {
+  const labels = new Map(options.map((option) => [String(option.value), option.label]))
+  return (id) => labels.get(id) ?? id
+}
+
+function summarizeSight(who: unknown): string {
+  if (who === 'target') return 'It can see you'
+  if (who === 'both') return 'You can see each other'
+  return 'You can see it'
+}
+
+function summarizeSize(record: Record<string, unknown>): string {
+  if (typeof record.bound !== 'string') return 'Size limit'
+  const label = getCreatureSizeLabel(record.bound)
+  if (record.comparison === 'or-smaller') return `${label} or smaller`
+  if (record.comparison === 'or-larger') return `${label} or larger`
+  if (record.comparison === 'only') return label
+  return 'Size limit'
+}
+
+function summarizeListed(
+  ids: unknown,
+  labelFor: (id: string) => string,
+  empty: string,
+  present: (list: string) => string,
+): string {
+  const labels = stringIds(ids).map(labelFor)
+  if (labels.length === 0) return empty
+  return present(joinOr(labels))
+}
+
+function summarizeAnyOf(record: Record<string, unknown>): string {
+  const labels = stringIds(record.conditionIds).map((id) => getEffectConditionLabel(id))
+  const willing = record.willing === true
+  if (willing && labels.length > 0) return `Willing, or ${joinOr(labels)}`
+  if (willing) return 'Willing'
+  if (labels.length > 0) return `Has the ${joinOr(labels)} condition`
+  return 'Willing or has a condition'
+}
+
+function summarizeCreatureType(
+  record: Record<string, unknown>,
+  creatureTypeLabel: (id: string) => string,
+): string {
+  return summarizeListed(record.ids, creatureTypeLabel, 'Creature type', (list) =>
+    record.mode === 'exclude' ? `Isn't ${list}` : list,
+  )
+}
+
+function summarizeCondition(record: Record<string, unknown>): string {
+  return summarizeListed(
+    record.ids,
+    (id) => getEffectConditionLabel(id),
+    'Has a condition',
+    (list) =>
+      record.presence === 'lacks'
+        ? `Doesn't have the ${list} condition`
+        : `Has the ${list} condition`,
+  )
+}
+
+function summarizeWritten(text: unknown): string {
+  const clause = typeof text === 'string' ? text.trim() : ''
+  return clause.length > 0 ? clause : 'Something else'
+}
+
+const REQUIREMENT_SUMMARIES: Record<
+  string,
+  (record: Record<string, unknown>, creatureTypeLabel: (id: string) => string) => string
+> = {
+  sight: (record) => summarizeSight(record.who),
+  size: (record) => summarizeSize(record),
+  'creature-type': summarizeCreatureType,
+  condition: (record) => summarizeCondition(record),
+  willing: () => 'Willing',
+  'any-of': (record) => summarizeAnyOf(record),
+  written: (record) => summarizeWritten(record.text),
+}
+
+/** Chip or row title for one requirement. Incomplete rows keep the menu label. */
+export function formatResolutionRequirementSummary(
+  row: unknown,
+  creatureTypeLabel: (id: string) => string,
+): string {
+  if (!row || typeof row !== 'object') return 'Requirement'
+  const record = row as Record<string, unknown>
+  const summarize = typeof record.kind === 'string' ? REQUIREMENT_SUMMARIES[record.kind] : undefined
+  return summarize ? summarize(record, creatureTypeLabel) : 'Requirement'
+}
+
+function menuItem(
+  id: string,
+  label: string,
+  description: string,
+  searchTerms: readonly string[],
+  appendDefaults: Record<string, unknown>,
+  blockedBy: readonly string[],
+) {
+  return {
+    id,
+    label,
+    description,
+    searchTerms,
+    appendDefaults,
+    duplicatePolicy: 'block' as const,
+    isDuplicate: (items: unknown[]) => hasRequirementKind(items, blockedBy),
+  }
+}
+
+/** Natural-language add menu. Adding a row does not fill in a placeholder value. */
+export function buildResolutionRequirementAddMenu() {
+  return {
+    groups: [{ id: 'requirement', label: 'Requirement' }],
+    enableSearch: true,
+    items: [
+      menuItem(
+        'sight-actor',
+        'You can see it',
+        'Dominate Mind: one creature you can see',
+        ['sight', 'see', 'dominate'],
+        { kind: 'sight', who: 'actor' },
+        ['sight'],
+      ),
+      menuItem(
+        'sight-target',
+        'It can see you',
+        'Horrific Visage: a creature that can see you',
+        ['sight', 'see', 'visage'],
+        { kind: 'sight', who: 'target' },
+        ['sight'],
+      ),
+      menuItem(
+        'sight-both',
+        'You can see each other',
+        'You can see it, and it can see you',
+        ['sight', 'see'],
+        { kind: 'sight', who: 'both' },
+        ['sight'],
+      ),
+      menuItem(
+        'size',
+        'Size limit',
+        'Constrict: one Large or smaller creature',
+        ['size', 'large', 'smaller', 'constrict'],
+        { kind: 'size' },
+        ['size'],
+      ),
+      menuItem(
+        'creature-type',
+        'Creature type',
+        'Possession: one Humanoid',
+        ['type', 'humanoid', 'undead', 'possession'],
+        { kind: 'creature-type' },
+        ['creature-type'],
+      ),
+      menuItem(
+        'condition',
+        'Has a condition',
+        'Trample: that has the Prone condition',
+        ['condition', 'prone', 'trample'],
+        { kind: 'condition' },
+        ['condition', 'any-of'],
+      ),
+      menuItem(
+        'willing',
+        'Willing',
+        'Up to three willing creatures',
+        ['willing'],
+        { kind: 'willing' },
+        ['willing', 'any-of'],
+      ),
+      menuItem(
+        'any-of',
+        'Willing or has a condition',
+        'Vampire Bite: willing, or Grappled, Incapacitated, or Restrained',
+        ['willing', 'vampire', 'grappled', 'bite'],
+        { kind: 'any-of' },
+        ['any-of', 'willing', 'condition'],
+      ),
+      menuItem(
+        'written',
+        'Something else',
+        'A written clause, such as "that is a demon"',
+        ['written', 'demon', 'else'],
+        { kind: 'written' },
+        ['written'],
+      ),
+    ],
+  }
+}
+
+function readProximity(value: unknown, distance: unknown): ResolutionTargetProximity | undefined {
+  if (value === 'touch') return { kind: 'touch' }
+  const measured =
+    typeof distance === 'number' && Number.isInteger(distance) && distance > 0
+      ? { value: distance, unit: 'ft' as const }
+      : undefined
+  if (value === 'reach') return measured ? { kind: 'reach', distance: measured } : { kind: 'reach' }
+  if (value === 'distance' && measured) return { kind: 'distance', distance: measured }
+  return undefined
+}
+
+/** Live stat-block sentence for the target fields. Incomplete targets return nothing. */
+export function formatResolutionTargetAuthoringPreview(
+  values: Record<string, unknown>,
+  prefix: string,
+  creatureTypeOptions: readonly FieldOption[] = [],
+): string | undefined {
+  const count = values[`${prefix}.count`]
+  const kind = values[`${prefix}.kind`]
+  if (typeof count !== 'number' || !Number.isInteger(count) || count < 1) return undefined
+  if (kind !== 'creature' && kind !== 'object' && kind !== 'creature-or-object') return undefined
+  const proximity = readProximity(
+    values[`${prefix}.proximity.kind`],
+    values[`${prefix}.proximity.distance.value`],
+  )
+  if (!proximity) return undefined
+  const countKind = values[`${prefix}.countKind`]
+  const requirements = values[`${prefix}.requirements`]
+  const target: ResolutionTarget = {
+    count,
+    kind: kind as ResolutionTargetKind,
+    proximity,
+    ...(countKind === 'exact' || countKind === 'up-to' ? { countKind } : {}),
+    ...(Array.isArray(requirements)
+      ? { requirements: requirements as ResolutionTarget['requirements'] }
+      : {}),
+  }
+  return formatResolutionTargetFromParts(target, {
+    creatureTypeLabel: creatureTypeLabelFor(creatureTypeOptions),
+  })
+}
+
+function targetSentenceField(
+  prefix: string,
+  creatureTypeOptions: readonly FieldOption[],
+  visibility?: FieldVisibility,
+): InlineSentenceFieldConfig {
+  const field: InlineSentenceFieldConfig = {
+    type: 'inlineSentence',
+    name: `_${prefix.replaceAll('.', '_')}_sentence`,
+    label: 'Target',
+    segments: [
+      {
+        kind: 'select',
+        name: `${prefix}.countKind`,
+        options: [
+          { value: 'exact', label: 'exactly' },
+          { value: 'up-to', label: 'up to' },
+        ],
+        ariaLabel: 'Count limit',
+        width: 'sm',
+        visibility: {
+          dependsOn: [`${prefix}.count`],
+          visibleWhen: (values) => Number(values[`${prefix}.count`]) > 1,
+        },
+      },
+      {
+        kind: 'number',
+        name: `${prefix}.count`,
+        min: 1,
+        digits: 2,
+        ariaLabel: 'Count',
+      },
+      {
+        kind: 'select',
+        name: `${prefix}.kind`,
+        options: RESOLUTION_TARGET_KINDS.map((kind) => ({
+          value: kind,
+          label: getResolutionTargetKindLabel(kind),
+        })),
+        ariaLabel: 'Target kind',
+        width: 'lg',
+      },
+      { kind: 'text', value: 'within', tone: 'label' },
+      {
+        kind: 'joinedPair',
+        ariaLabel: 'Distance',
+        start: {
+          kind: 'select',
+          name: `${prefix}.proximity.distance.value`,
+          options: MEASURED_RANGE_FEET.map((feet) => ({ value: feet, label: String(feet) })),
+          digits: 3,
+          allowCustom: true,
+          ariaLabel: 'Distance',
+        },
+        end: { kind: 'label', text: 'ft.', ariaLabel: 'Distance unit' },
+      },
+    ],
+    derivedMeta: {
+      dependsOn: [
+        `${prefix}.count`,
+        `${prefix}.countKind`,
+        `${prefix}.kind`,
+        `${prefix}.proximity.kind`,
+        `${prefix}.proximity.distance.value`,
+        `${prefix}.requirements`,
+      ],
+      metaWhen: (values) => {
+        const sentence = formatResolutionTargetAuthoringPreview(values, prefix, creatureTypeOptions)
+        if (!sentence) return undefined
+        return { rows: [{ label: 'Reads as', value: sentence }] }
+      },
+    },
+  }
+  return applyFieldVisibility(field, visibility)
+}
+
+function requirementArray(
+  prefix: string,
+  creatureTypeOptions: readonly FieldOption[],
+  visibility?: FieldVisibility,
+): ArrayConfig {
+  const labelFor = creatureTypeLabelFor(creatureTypeOptions)
+  const conditionOptions = EFFECT_CONDITION_IDS.map((id) => ({
+    value: id,
+    label: getEffectConditionLabel(id),
+  }))
+  const sizeOptions = CREATURE_SIZES.map((id) => ({ value: id, label: getCreatureSizeLabel(id) }))
+  const field: ArrayConfig = {
+    kind: 'array',
+    name: `${prefix}.requirements`,
+    label: 'Requirements',
+    hint: REQUIREMENT_STAT_BLOCK_HINT,
+    addAction: { label: 'Add a requirement', menu: buildResolutionRequirementAddMenu() },
+    item: {
+      collapsible: true,
+      reorder: false,
+      header: {
+        fallback: (index) => `Requirement ${index + 1}`,
+        primary: (values) => formatResolutionRequirementSummary(values, labelFor),
+      },
+    },
+    fields: [
+      {
+        type: 'select',
+        name: 'comparison',
+        label: 'Size limit',
+        options: [...SIZE_COMPARISON_OPTIONS],
+        visibility: whenKind('size'),
+      },
+      {
+        type: 'select',
+        name: 'bound',
+        label: 'Size',
+        options: sizeOptions,
+        visibility: whenKind('size'),
+      },
+      {
+        type: 'select',
+        name: 'mode',
+        label: 'Creature type',
+        options: [
+          { value: 'include', label: 'Is' },
+          { value: 'exclude', label: "Isn't" },
+        ],
+        visibility: whenKind('creature-type'),
+      },
+      {
+        type: 'select',
+        name: 'presence',
+        label: 'Condition',
+        options: [
+          { value: 'has', label: 'Has' },
+          { value: 'lacks', label: "Doesn't have" },
+        ],
+        visibility: whenKind('condition'),
+      },
+      {
+        type: 'combobox',
+        name: 'ids',
+        label: 'Which ones',
+        noun: { singular: 'option', plural: 'options' },
+        multiple: true,
+        options: [],
+        optionsResolve: {
+          dependsOn: ['kind'],
+          optionsWhen: (values) =>
+            values.kind === 'condition' ? conditionOptions : [...creatureTypeOptions],
+        },
+        visibility: {
+          dependsOn: ['kind'],
+          visibleWhen: (values) => values.kind === 'creature-type' || values.kind === 'condition',
+        },
+      },
+      {
+        type: 'switch',
+        name: 'willing',
+        label: 'Willing',
+        visibility: whenKind('any-of'),
+      },
+      {
+        type: 'chips',
+        name: 'conditionIds',
+        label: 'Conditions',
+        noun: { singular: 'condition', plural: 'conditions' },
+        options: conditionOptions,
+        visibility: whenKind('any-of'),
+      },
+      {
+        type: 'text',
+        name: 'text',
+        label: 'Clause',
+        placeholder: 'that is a demon',
+        hint: WRITTEN_CLAUSE_HINT,
+        visibility: whenKind('written'),
+      },
+    ],
+  }
+  return applyFieldVisibility(field, visibility)
+}
+
+/**
+ * Shared target sentence and requirement list. `prefix` is the resolution target
+ * path (`resolution.target`). Creature-specific rows stay on screen when the kind
+ * changes; validation reports them instead of clearing them.
+ */
+export function resolutionTargetAuthoringFields(options: {
+  prefix: string
+  creatureTypeOptions?: readonly FieldOption[]
+  visibility?: FieldVisibility
+}): FormItem[] {
+  const creatureTypeOptions = options.creatureTypeOptions ?? []
+  const proximity: FormItem = {
+    type: 'select',
+    name: `${options.prefix}.proximity.kind`,
+    label: 'Reach or range',
+    options: [
+      { value: 'reach', label: 'Reach' },
+      { value: 'distance', label: 'Range' },
+    ],
+  }
+  return [
+    applyFieldVisibility(proximity, options.visibility),
+    targetSentenceField(options.prefix, creatureTypeOptions, options.visibility),
+    requirementArray(options.prefix, creatureTypeOptions, options.visibility),
+  ]
+}

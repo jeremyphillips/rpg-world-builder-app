@@ -1,57 +1,19 @@
 import { formatAreaGeometry } from '../../../primitives/area-geometry'
-import type { ResolutionFormatInput, ResolutionTarget, ResolutionTargetProximity } from './schema'
 import { inferResolutionTargetCountKind } from '../../../vocab/resolution'
+import type { ResolutionTargetCountKind } from '../../../vocab/resolution'
 import {
-  type ResolutionTargetCountKind,
-  type ResolutionTargetKind,
-} from '../../../vocab/resolution'
+  formatResolutionTargetProximityPhrase,
+  formatResolutionTargetSentence,
+  type ResolutionTargetFormatOptions,
+} from './format-target-composition'
+import type { ResolutionFormatInput, ResolutionTarget } from './schema'
 
 export const RESOLUTION_AFFECTED_AREA_COPY = 'Creatures and objects in the area'
 
+export { formatResolutionTargetProximityPhrase, type ResolutionTargetFormatOptions }
+
 function formatDistanceFeet(distance: { value: number; unit: 'ft' }): string {
   return `${distance.value} feet`
-}
-
-function formatTargetCount(count: number, countKind?: ResolutionTargetCountKind): string {
-  const kind = inferResolutionTargetCountKind(count, countKind)
-  if (kind === 'exact' && count === 1) return 'One'
-  if (kind === 'exact') return String(count)
-  return `Up to ${count}`
-}
-
-function formatTargetKindPhrase(kind: ResolutionTargetKind): string {
-  switch (kind) {
-    case 'creature':
-      return 'creature'
-    case 'object':
-      return 'object'
-    case 'creature-or-object':
-      return 'creature or object'
-    default: {
-      const _exhaustive: never = kind
-      return _exhaustive
-    }
-  }
-}
-
-/** Proximity phrase only — e.g. "you touch" / "within your reach" / "within 60 feet". */
-export function formatResolutionTargetProximityPhrase(
-  proximity: ResolutionTargetProximity,
-): string {
-  switch (proximity.kind) {
-    case 'touch':
-      return 'you touch'
-    case 'reach':
-      return proximity.distance
-        ? `within your reach (${formatDistanceFeet(proximity.distance)})`
-        : 'within your reach'
-    case 'distance':
-      return `within ${formatDistanceFeet(proximity.distance)}`
-    default: {
-      const _exhaustive: never = proximity
-      return _exhaustive
-    }
-  }
 }
 
 function formatOriginDistancePhrase(resolution: ResolutionFormatInput): string {
@@ -66,16 +28,21 @@ function targetSelectionHeading(count: number, countKind?: ResolutionTargetCount
   return 'Targets'
 }
 
-/** Formats count, kind, and proximity without method context. */
-export function formatResolutionTargetFromParts(target: ResolutionTarget): string {
-  const { count, countKind, kind, proximity } = target
-  return `${formatTargetCount(count, countKind)} ${formatTargetKindPhrase(kind)} ${formatResolutionTargetProximityPhrase(proximity)}`
+/** Formats count, kind, proximity, and requirements without method context. */
+export function formatResolutionTargetFromParts(
+  target: ResolutionTarget,
+  options?: ResolutionTargetFormatOptions,
+): string {
+  return formatResolutionTargetSentence(target, options)
 }
 
 /** e.g. "One creature within 60 feet" — targets mode only. */
-export function formatResolutionTarget(resolution: ResolutionFormatInput): string {
+export function formatResolutionTarget(
+  resolution: ResolutionFormatInput,
+  options?: ResolutionTargetFormatOptions,
+): string {
   if (!resolution.target) return ''
-  return formatResolutionTargetFromParts(resolution.target)
+  return formatResolutionTargetFromParts(resolution.target, options)
 }
 
 export type ResolutionSelectionSection = {

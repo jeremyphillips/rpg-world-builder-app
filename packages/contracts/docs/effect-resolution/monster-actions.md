@@ -40,6 +40,13 @@ distance. Outcomes are `failed-save` and an optional `successful-save`.
 `automatic` methods, `point` selection, healing, and temporary hit points are
 rejected.
 
+A chosen creature may also carry `target.requirements`. Rows combine with
+and. Listed creature types and conditions match any or none, as documented on
+[`resolutionTargetRequirementsSchema`](../../src/rpg/content/lib/resolution/target-requirements.ts).
+The stat-block sentence comes from `formatResolutionTargetFromParts`. These
+requirements are authoring text. Play does not check them. Area occupants do
+not use the list yet.
+
 A future no-check effect would be its own kind holding the same envelope with
 `method.kind: 'automatic'`. Do not widen `save` for that.
 

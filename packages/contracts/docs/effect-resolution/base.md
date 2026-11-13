@@ -37,6 +37,10 @@ Implementation: [`deriveEffectRecipientFromResolution`](../../src/rpg/content/sp
 
 When `countKind` is omitted: `count === 1` → `exact`; otherwise → `up-to`.
 
+Optional `target.requirements` narrows who may be chosen. The list is shared
+with monster saves. See [monster-actions.md](./monster-actions.md). Spell
+authoring does not edit the list yet.
+
 ## Validation (per mode)
 
 | Mode      | Required | Forbidden                          |

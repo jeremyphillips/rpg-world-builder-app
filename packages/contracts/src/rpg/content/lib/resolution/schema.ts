@@ -25,6 +25,10 @@ import {
 import { validateResolutionMethodCompatibility } from './selection-method-compatibility'
 import { validateResolutionModeFields } from './selection-mode-validation'
 import { isResolutionEffectKind } from './selection-availability'
+import {
+  refineRequirementsForTargetKind,
+  resolutionTargetRequirementsSchema,
+} from './target-requirements'
 import { spellResolutionValidationMessages } from './validation-messages'
 
 const resolutionDistanceSchema = z.object({
@@ -126,9 +130,11 @@ export const resolutionTargetSchema = z
     countKind: z.enum(RESOLUTION_TARGET_COUNT_KINDS).optional(),
     kind: z.enum(RESOLUTION_TARGET_KINDS),
     proximity: resolutionTargetProximitySchema,
+    requirements: resolutionTargetRequirementsSchema.optional(),
   })
-  .superRefine((value) => {
+  .superRefine((value, ctx) => {
     value.countKind = inferResolutionTargetCountKind(value.count, value.countKind)
+    refineRequirementsForTargetKind(value.kind, value.requirements, ctx)
   })
 
 export type ResolutionTarget = z.infer<typeof resolutionTargetSchema>

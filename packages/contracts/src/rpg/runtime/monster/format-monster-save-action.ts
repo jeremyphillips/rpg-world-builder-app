@@ -1,4 +1,5 @@
 import type { MonsterAction } from '../../content/monster/action'
+import { formatResolutionTargetFromParts } from '../../content/lib/resolution/format-target'
 import { formatAreaGeometry } from '../../primitives/area-geometry'
 import { limitedUseSchema } from '../../primitives/limited-use'
 import type { Ability } from '../../vocab/ability'
@@ -65,14 +66,9 @@ function selectionPhrase(action: SaveAction): string {
     return `each creature in a ${formatAreaGeometry(resolution.areaOfEffect, 'stat-block')}`
   }
   if (resolution.selectionMode === 'targets' && resolution.target) {
-    const proximity = resolution.target.proximity
-    const distance =
-      proximity.kind === 'distance'
-        ? `${proximity.distance.value} feet`
-        : proximity.kind === 'reach' && proximity.distance
-          ? `${proximity.distance.value} feet`
-          : 'reach'
-    return `one creature within ${distance}`
+    const sentence = formatResolutionTargetFromParts(resolution.target)
+    if (!sentence) return 'the target'
+    return sentence.charAt(0).toLowerCase() + sentence.slice(1)
   }
   return 'the target'
 }

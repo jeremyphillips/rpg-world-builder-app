@@ -23,9 +23,12 @@ import {
   type SelectFieldConfig,
 } from '@rpg/ui/form'
 
+import { buildActiveCreatureTypeFieldOptions } from '@/features/vocabulary'
+
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
 import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
+import { resolutionTargetAuthoringFields } from '../../../lib/forms/fields/resolution-target-authoring-fields'
 import {
   ATTACK_RANGE_LONG_FIELD_LABEL,
   ATTACK_RANGE_NORMAL_FIELD_LABEL,
@@ -421,7 +424,7 @@ function monsterActionSaveDcDependent(namePrefix: string, currentActionId: strin
   })
 }
 
-function monsterActionSaveSelectionDependent(): FormItem {
+function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
   const selfMode = whenFieldEquals('resolution.selectionMode', 'self')
   const targetsMode = whenFieldEquals('resolution.selectionMode', 'targets')
   return {
@@ -445,36 +448,10 @@ function monsterActionSaveSelectionDependent(): FormItem {
           shapeHint: 'Area measured from the monster.',
           visibility: selfMode,
         }),
-        {
-          type: 'number',
-          name: 'resolution.target.count',
-          label: 'Target count',
-          min: 1,
-          digits: 2,
+        ...resolutionTargetAuthoringFields({
+          prefix: 'resolution.target',
           visibility: targetsMode,
-        },
-        {
-          type: 'select',
-          name: 'resolution.target.proximity.kind',
-          label: 'Target distance',
-          options: [
-            { value: 'reach', label: 'Reach' },
-            { value: 'distance', label: 'Range' },
-          ],
-          visibility: targetsMode,
-        },
-        distanceJoinedPairField({
-          amountName: 'resolution.target.proximity.distance.value',
-          label: 'Distance',
-          presets: MEASURED_RANGE_FEET,
-          allowCustom: true,
-          visibility: {
-            dependsOn: ['resolution.selectionMode', 'resolution.target.proximity.kind'],
-            visibleWhen: (values) =>
-              values['resolution.selectionMode'] === 'targets' &&
-              (values['resolution.target.proximity.kind'] === 'distance' ||
-                values['resolution.target.proximity.kind'] === 'reach'),
-          },
+          creatureTypeOptions: buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary),
         }),
       ],
     },
@@ -499,7 +476,7 @@ function monsterActionSaveSection(
         hint: SAVING_THROW_ABILITY_HINT,
       },
       monsterActionSaveDcDependent(namePrefix, currentActionId),
-      monsterActionSaveSelectionDependent(),
+      monsterActionSaveSelectionDependent(ctx),
       monsterSaveResolutionDamageGroup(ctx),
       {
         kind: 'slot',
