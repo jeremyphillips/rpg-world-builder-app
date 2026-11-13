@@ -110,10 +110,10 @@ export function visibleWhenAreaSelectionMode(): FieldVisibility {
 
 export function visibleWhenTargetCountEditable(): FieldVisibility {
   return {
-    dependsOn: [`${RESOLUTION_PREFIX}.targetCount`, RESOLUTION_SELECTION_MODE_PATH],
+    dependsOn: [`${RESOLUTION_PREFIX}.target.count`, RESOLUTION_SELECTION_MODE_PATH],
     visibleWhen: (values) => {
       if (readSelectionMode(values) !== 'targets') return false
-      const count = values[`${RESOLUTION_PREFIX}.targetCount`]
+      const count = values[`${RESOLUTION_PREFIX}.target.count`]
       return typeof count === 'number' && count !== 1
     },
   }
@@ -125,8 +125,8 @@ export function visibleWhenCountKindEditable(): FieldVisibility {
 
 export function visibleWhenProximityKind(kind: 'touch' | 'reach' | 'distance'): FieldVisibility {
   return combineFieldVisibility(visibleWhenSelectionMode('targets'), {
-    dependsOn: [`${RESOLUTION_PREFIX}.proximityKind`],
-    visibleWhen: (values) => values[`${RESOLUTION_PREFIX}.proximityKind`] === kind,
+    dependsOn: [`${RESOLUTION_PREFIX}.target.proximity.kind`],
+    visibleWhen: (values) => values[`${RESOLUTION_PREFIX}.target.proximity.kind`] === kind,
   })
 }
 

@@ -163,6 +163,7 @@ export const effectResolutionFieldShape = {
   target: resolutionTargetSchema.optional(),
   origin: resolutionOriginSchema.optional(),
   areaOfEffect: areaGeometrySchema.optional(),
+  occupantRequirements: resolutionTargetRequirementsSchema.optional(),
   effects: z.array(resolutionEffectSchema).min(1),
   outcomes: z.array(resolutionOutcomeSchema).min(1),
 }
@@ -172,6 +173,7 @@ export type EffectResolutionValidationInput = {
   target?: ResolutionTarget
   origin?: ResolutionOrigin
   areaOfEffect?: z.infer<typeof areaGeometrySchema>
+  occupantRequirements?: z.infer<typeof resolutionTargetRequirementsSchema>
   method: { kind: ResolutionMethodKind }
   effects: readonly ResolutionEffect[]
   outcomes: readonly {
@@ -181,11 +183,33 @@ export type EffectResolutionValidationInput = {
   }[]
 }
 
+function refineOccupantRequirementsFields(
+  resolution: EffectResolutionValidationInput,
+  ctx: z.RefinementCtx,
+): void {
+  const requirements = resolution.occupantRequirements
+  if (!requirements) return
+
+  const hasArea = Boolean(resolution.areaOfEffect)
+  const areaAllowed = resolution.selectionMode === 'self' || resolution.selectionMode === 'point'
+  if (!hasArea || !areaAllowed) {
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionValidationMessages.occupantRequirementsRequireArea(),
+      ['occupantRequirements'],
+    )
+    return
+  }
+
+  refineRequirementsForTargetKind('creature', requirements, ctx, ['occupantRequirements'])
+}
+
 export function validateEffectResolution(
   resolution: EffectResolutionValidationInput,
   ctx: z.RefinementCtx,
 ): void {
   validateResolutionModeFields(resolution, ctx)
+  refineOccupantRequirementsFields(resolution, ctx)
   validateResolutionMethodCompatibility(
     {
       selectionMode: resolution.selectionMode,

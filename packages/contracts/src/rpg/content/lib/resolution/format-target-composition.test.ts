@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  formatAreaOccupantCreaturePhrase,
   formatResolutionTargetSentence,
   formatTargetHeadNoun,
   formatTargetQualifyingClauses,
@@ -154,5 +155,16 @@ describe('resolution target sentence composition', () => {
         proximity: { kind: 'reach', distance: { value: 5, unit: 'ft' } },
       }),
     ).toBe('One creature within 5 feet')
+  })
+
+  it('formats area-occupant creatures with qualifying clauses', () => {
+    expect(
+      formatAreaOccupantCreaturePhrase([
+        { kind: 'creature-type', mode: 'exclude', ids: ['undead'] },
+      ]),
+    ).toBe("creature that isn't an Undead")
+    expect(formatAreaOccupantCreaturePhrase([{ kind: 'sight', who: 'target' }])).toBe(
+      'creature that can see you',
+    )
   })
 })

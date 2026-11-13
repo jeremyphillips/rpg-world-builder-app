@@ -63,6 +63,7 @@ export {
 } from './format-effect-lines'
 export { formatResolutionOutcomeLine, formatResolutionOutcomes } from './format-outcomes'
 export {
+  formatResolutionAffectedAreaCopy,
   formatResolutionSelectionSections,
   formatResolutionTarget,
   formatResolutionTargetFromParts,
@@ -71,6 +72,12 @@ export {
   RESOLUTION_AFFECTED_AREA_COPY,
   type ResolutionSelectionSection,
 } from './format-target'
+export {
+  formatAreaOccupantCreaturePhrase,
+  formatTargetHeadNoun,
+  formatTargetQualifyingClauses,
+  formatTargetSightPhrase,
+} from './format-target-composition'
 export {
   formatEffectResolutionSummary,
   formatEffectResolutionSummarySections,

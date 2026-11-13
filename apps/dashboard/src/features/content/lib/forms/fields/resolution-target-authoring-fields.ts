@@ -4,6 +4,7 @@ import {
   EFFECT_CONDITION_IDS,
   MEASURED_RANGE_FEET,
   RESOLUTION_TARGET_KINDS,
+  formatAreaOccupantCreaturePhrase,
   formatResolutionTargetFromParts,
   getCreatureSizeLabel,
   getEffectConditionLabel,
@@ -322,11 +323,53 @@ export function formatResolutionTargetAuthoringPreview(
   })
 }
 
+function whenTargetProximityKind(prefix: string, kind: string): FieldVisibility {
+  return {
+    dependsOn: [`${prefix}.proximity.kind`],
+    visibleWhen: (values) => values[`${prefix}.proximity.kind`] === kind,
+  }
+}
+
 function targetSentenceField(
   prefix: string,
   creatureTypeOptions: readonly FieldOption[],
-  visibility?: FieldVisibility,
+  options?: { visibility?: FieldVisibility; sentenceStyle?: 'monster' | 'spell' },
 ): InlineSentenceFieldConfig {
+  const sentenceStyle = options?.sentenceStyle ?? 'monster'
+  const touchSegment =
+    sentenceStyle === 'spell'
+      ? ([
+          {
+            kind: 'text' as const,
+            value: 'you touch',
+            tone: 'label' as const,
+            visibility: whenTargetProximityKind(prefix, 'touch'),
+          },
+        ] as const)
+      : []
+  const reachSegment =
+    sentenceStyle === 'spell'
+      ? ([
+          {
+            kind: 'text' as const,
+            value: 'within your reach',
+            tone: 'label' as const,
+            visibility: whenTargetProximityKind(prefix, 'reach'),
+          },
+        ] as const)
+      : []
+  const distanceLead =
+    sentenceStyle === 'spell'
+      ? ({
+          kind: 'text' as const,
+          value: 'within',
+          tone: 'label' as const,
+          visibility: whenTargetProximityKind(prefix, 'distance'),
+        } as const)
+      : { kind: 'text' as const, value: 'within', tone: 'label' as const }
+  const distancePairVisibility =
+    sentenceStyle === 'spell' ? whenTargetProximityKind(prefix, 'distance') : options?.visibility
+
   const field: InlineSentenceFieldConfig = {
     type: 'inlineSentence',
     name: `_${prefix.replaceAll('.', '_')}_sentence`,
@@ -365,10 +408,13 @@ function targetSentenceField(
         width: 'lg',
         defaultValue: TARGET_DEFAULT_KIND,
       },
-      { kind: 'text', value: 'within', tone: 'label' },
+      ...touchSegment,
+      ...reachSegment,
+      distanceLead,
       {
         kind: 'joinedPair',
         ariaLabel: 'Distance',
+        ...(distancePairVisibility ? { visibility: distancePairVisibility } : {}),
         start: {
           kind: 'select',
           name: `${prefix}.proximity.distance.value`,
@@ -397,13 +443,28 @@ function targetSentenceField(
       },
     },
   }
-  return applyFieldVisibility(field, visibility)
+  return applyFieldVisibility(field, options?.visibility)
+}
+
+/** Live preview for area-occupant requirement lists. */
+export function formatResolutionOccupantAuthoringPreview(
+  values: Record<string, unknown>,
+  requirementsPath: string,
+  creatureTypeOptions: readonly FieldOption[] = [],
+): string | undefined {
+  const requirements = values[requirementsPath]
+  if (!Array.isArray(requirements) || requirements.length === 0) return undefined
+  const phrase = formatAreaOccupantCreaturePhrase(requirements, {
+    creatureTypeLabel: creatureTypeLabelFor(creatureTypeOptions),
+  })
+  return `Each ${phrase} in the area`
 }
 
 function requirementArray(
-  prefix: string,
+  requirementsPath: string,
   creatureTypeOptions: readonly FieldOption[],
   visibility?: FieldVisibility,
+  options?: { label?: string; previewPath?: string },
 ): ArrayConfig {
   const labelFor = creatureTypeLabelFor(creatureTypeOptions)
   const conditionOptions = EFFECT_CONDITION_IDS.map((id) => ({
@@ -413,8 +474,8 @@ function requirementArray(
   const sizeOptions = CREATURE_SIZES.map((id) => ({ value: id, label: getCreatureSizeLabel(id) }))
   const field: ArrayConfig = {
     kind: 'array',
-    name: `${prefix}.requirements`,
-    label: 'Requirements',
+    name: requirementsPath,
+    label: options?.label ?? 'Requirements',
     hint: REQUIREMENT_STAT_BLOCK_HINT,
     emptyState: 'none',
     addAction: { label: 'Add a requirement', menu: buildResolutionRequirementAddMenu() },
@@ -517,8 +578,11 @@ export function resolutionTargetAuthoringFields(options: {
   prefix: string
   creatureTypeOptions?: readonly FieldOption[]
   visibility?: FieldVisibility
+  externalProximitySelect?: boolean
+  sentenceStyle?: 'monster' | 'spell'
 }): FormItem[] {
   const creatureTypeOptions = options.creatureTypeOptions ?? []
+  const requirementsPath = `${options.prefix}.requirements`
   const proximity: FormItem = {
     type: 'select',
     name: `${options.prefix}.proximity.kind`,
@@ -530,8 +594,34 @@ export function resolutionTargetAuthoringFields(options: {
     defaultValue: TARGET_DEFAULT_PROXIMITY_KIND,
   }
   return [
-    applyFieldVisibility(proximity, options.visibility),
-    targetSentenceField(options.prefix, creatureTypeOptions, options.visibility),
-    requirementArray(options.prefix, creatureTypeOptions, options.visibility),
+    ...(options.externalProximitySelect
+      ? []
+      : [applyFieldVisibility(proximity, options.visibility)]),
+    targetSentenceField(options.prefix, creatureTypeOptions, {
+      visibility: options.visibility,
+      sentenceStyle: options.sentenceStyle,
+    }),
+    requirementArray(requirementsPath, creatureTypeOptions, options.visibility),
+  ]
+}
+
+export function resolutionOccupantRequirementsFields(options: {
+  requirementsPath: string
+  creatureTypeOptions?: readonly FieldOption[]
+  visibility?: FieldVisibility
+}): FormItem[] {
+  const creatureTypeOptions = options.creatureTypeOptions ?? []
+  return [
+    {
+      kind: 'group',
+      legend: 'Creatures in the area',
+      description: REQUIREMENT_STAT_BLOCK_HINT,
+      visibility: options.visibility,
+      fields: [
+        requirementArray(options.requirementsPath, creatureTypeOptions, undefined, {
+          label: 'Requirements',
+        }),
+      ],
+    },
   ]
 }

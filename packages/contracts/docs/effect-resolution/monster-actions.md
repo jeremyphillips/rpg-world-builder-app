@@ -44,8 +44,9 @@ A chosen creature may also carry `target.requirements`. Rows combine with
 and. Listed creature types and conditions match any or none, as documented on
 [`resolutionTargetRequirementsSchema`](../../src/rpg/content/lib/resolution/target-requirements.ts).
 The stat-block sentence comes from `formatResolutionTargetFromParts`. These
-requirements are authoring text. Play does not check them. Area occupants do
-not use the list yet.
+requirements are authoring text. Play does not check them. Area occupants use
+`occupantRequirements` on the envelope (self or point with an area), with the
+same formatter composition helpers.
 
 A future no-check effect would be its own kind holding the same envelope with
 `method.kind: 'automatic'`. Do not widen `save` for that.

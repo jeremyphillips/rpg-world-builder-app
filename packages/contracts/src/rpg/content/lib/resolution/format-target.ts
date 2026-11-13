@@ -2,6 +2,7 @@ import { formatAreaGeometry } from '../../../primitives/area-geometry'
 import { inferResolutionTargetCountKind } from '../../../vocab/resolution'
 import type { ResolutionTargetCountKind } from '../../../vocab/resolution'
 import {
+  formatAreaOccupantCreaturePhrase,
   formatResolutionTargetProximityPhrase,
   formatResolutionTargetSentence,
   resolutionTargetCountSelectOptions,
@@ -55,12 +56,22 @@ export type ResolutionSelectionSection = {
   lines: string[]
 }
 
+export function formatResolutionAffectedAreaCopy(
+  resolution: Pick<ResolutionFormatInput, 'occupantRequirements'>,
+  options?: ResolutionTargetFormatOptions,
+): string {
+  const requirements = resolution.occupantRequirements
+  if (!requirements?.length) return RESOLUTION_AFFECTED_AREA_COPY
+  const phrase = formatAreaOccupantCreaturePhrase(requirements, options)
+  return `Each ${phrase} in the area`
+}
+
 function areaSections(resolution: ResolutionFormatInput): ResolutionSelectionSection[] {
   if (!resolution.areaOfEffect) return []
 
   return [
     { heading: 'Area', lines: [formatAreaGeometry(resolution.areaOfEffect)] },
-    { heading: 'Affected', lines: [RESOLUTION_AFFECTED_AREA_COPY] },
+    { heading: 'Affected', lines: [formatResolutionAffectedAreaCopy(resolution)] },
   ]
 }
 

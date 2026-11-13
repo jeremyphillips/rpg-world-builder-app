@@ -1,5 +1,4 @@
 import type { SpellResolution } from '@rpg/contracts'
-import { inferResolutionTargetCountKind } from '@rpg/contracts'
 
 import { applicationPatternToForm } from '../application-pattern/resolution-application-pattern.lib'
 import { EMPTY_RESOLUTION_AREA_OF_EFFECT, resolutionAreaToForm } from './resolution-area-values'
@@ -7,28 +6,21 @@ import { effectToForm } from './resolution-effect-values'
 import type { ResolutionFormValues } from './resolution-form-schema'
 import { applyMethodFields, buildMethodKind } from './resolution-method-values'
 import { storedOutcomesToForm } from './resolution-outcome-values'
-import { applyProximityFields } from './resolution-target-values'
+import { storedTargetToForm } from './resolution-form-target.lib'
 
 /** Maps stored resolution target/origin/area fields to form defaults. */
 export function buildResolutionFormSelectionFields(
   resolution: SpellResolution,
 ): Pick<
   ResolutionFormValues,
-  | 'selectionMode'
-  | 'targetCount'
-  | 'countKind'
-  | 'targetKind'
-  | 'proximityKind'
-  | 'originDistanceFt'
-  | 'areaOfEffect'
+  'selectionMode' | 'target' | 'occupantRequirements' | 'originDistanceFt' | 'areaOfEffect'
 > {
-  const target = resolution.target
   return {
     selectionMode: resolution.selectionMode,
-    targetCount: target?.count ?? 1,
-    countKind: target?.countKind ?? inferResolutionTargetCountKind(target?.count ?? 1),
-    targetKind: target?.kind ?? 'creature',
-    proximityKind: target?.proximity.kind ?? 'touch',
+    ...(resolution.target ? { target: storedTargetToForm(resolution.target) } : {}),
+    ...(resolution.occupantRequirements?.length
+      ? { occupantRequirements: [...resolution.occupantRequirements] }
+      : {}),
     originDistanceFt: resolution.origin?.proximity.distance.value,
     areaOfEffect: resolution.areaOfEffect
       ? resolutionAreaToForm(resolution.areaOfEffect)
@@ -55,8 +47,5 @@ export function applyResolutionFormDerivedFields(
   resolution: SpellResolution,
 ): ResolutionFormValues {
   applyMethodFields(form, resolution.method)
-  if (resolution.target) {
-    applyProximityFields(form, resolution.target.proximity)
-  }
   return form
 }

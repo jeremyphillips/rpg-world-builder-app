@@ -18,7 +18,7 @@ import { buildResolutionMethod } from './resolution-method-values'
 import { buildDefaultOutcomeFormSlots } from './resolution-outcome-slots.lib'
 import { buildOutcomes } from './resolution-outcome-values'
 import { progressionFromForm, progressionToForm } from './resolution-progression-values'
-import { buildTargetProximity } from './resolution-target-values'
+import { createDefaultResolutionFormTarget, formTargetToStored } from './resolution-form-target.lib'
 
 export { RESOLUTION_FIELD_NAME } from './resolution-form-constants'
 
@@ -38,16 +38,30 @@ export function resolutionToForm(
   return applyResolutionFormDerivedFields(form, resolution)
 }
 
+function occupantRequirementsFromForm(
+  values: ResolutionFormValues,
+): SpellResolution['occupantRequirements'] {
+  const rows = values.occupantRequirements
+  return rows?.length ? (rows as SpellResolution['occupantRequirements']) : undefined
+}
+
 function buildSelectionEnvelope(
   values: ResolutionFormValues,
-): Pick<SpellResolution, 'selectionMode' | 'target' | 'origin' | 'areaOfEffect'> | undefined {
+):
+  | Pick<
+      SpellResolution,
+      'selectionMode' | 'target' | 'origin' | 'areaOfEffect' | 'occupantRequirements'
+    >
+  | undefined {
   const areaOfEffect = resolutionAreaFromForm(values.areaOfEffect)
+  const occupantRequirements = occupantRequirementsFromForm(values)
 
   switch (values.selectionMode) {
     case 'self':
       return {
         selectionMode: 'self',
         ...(areaOfEffect ? { areaOfEffect } : {}),
+        ...(occupantRequirements ? { occupantRequirements } : {}),
       }
     case 'point': {
       if (values.originDistanceFt === undefined) return undefined
@@ -60,21 +74,17 @@ function buildSelectionEnvelope(
           },
         },
         ...(areaOfEffect ? { areaOfEffect } : {}),
+        ...(occupantRequirements ? { occupantRequirements } : {}),
       }
     }
     case 'none':
       return { selectionMode: 'none' }
     case 'targets': {
-      const proximity = buildTargetProximity(values)
-      if (!proximity) return undefined
+      const target = formTargetToStored(values.target)
+      if (!target) return undefined
       return {
         selectionMode: 'targets',
-        target: {
-          count: values.targetCount,
-          ...(values.targetCount !== 1 && values.countKind ? { countKind: values.countKind } : {}),
-          kind: values.targetKind,
-          proximity,
-        },
+        target,
       }
     }
     default: {
@@ -155,11 +165,11 @@ export function createDefaultAttackResolutionFormValues(
 ): ResolutionFormValues {
   return withDefaultOutcomes({
     selectionMode: 'targets',
-    targetCount: 1,
-    countKind: 'exact',
-    targetKind: 'creature-or-object',
-    proximityKind: attackType === 'ranged-spell' ? 'distance' : 'reach',
-    ...(attackType === 'ranged-spell' ? { proximityDistanceFt: 120 } : {}),
+    target: createDefaultResolutionFormTarget({
+      kind: 'creature-or-object',
+      proximityKind: attackType === 'ranged-spell' ? 'distance' : 'reach',
+      ...(attackType === 'ranged-spell' ? { proximityDistanceFt: 120 } : {}),
+    }),
     areaOfEffect: { ...EMPTY_RESOLUTION_AREA_OF_EFFECT },
     methodKind: 'attack',
     attackType,
@@ -176,10 +186,10 @@ export function createDefaultResolutionFormValues(): ResolutionFormValues {
 export function createDefaultSavingThrowResolutionFormValues(): ResolutionFormValues {
   return withDefaultOutcomes({
     selectionMode: 'targets',
-    targetCount: 1,
-    countKind: 'exact',
-    targetKind: 'creature',
-    proximityKind: 'touch',
+    target: createDefaultResolutionFormTarget({
+      kind: 'creature',
+      proximityKind: 'touch',
+    }),
     areaOfEffect: { ...EMPTY_RESOLUTION_AREA_OF_EFFECT },
     methodKind: 'saving-throw',
     saveAbility: 'con',
@@ -198,10 +208,10 @@ export function createDefaultSavingThrowResolutionFormValues(): ResolutionFormVa
 export function createDefaultAutomaticHealingResolutionFormValues(): ResolutionFormValues {
   return withDefaultOutcomes({
     selectionMode: 'targets',
-    targetCount: 1,
-    countKind: 'exact',
-    targetKind: 'creature',
-    proximityKind: 'touch',
+    target: createDefaultResolutionFormTarget({
+      kind: 'creature',
+      proximityKind: 'touch',
+    }),
     areaOfEffect: { ...EMPTY_RESOLUTION_AREA_OF_EFFECT },
     methodKind: 'automatic',
     applicationPatternKind: 'none',

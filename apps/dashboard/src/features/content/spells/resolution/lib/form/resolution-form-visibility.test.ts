@@ -82,13 +82,13 @@ describe('selection mode visibility matrix', () => {
     expect(
       visibleWhenCountKindEditable().visibleWhen({
         'resolution.selectionMode': 'targets',
-        'resolution.targetCount': 1,
+        'resolution.target.count': 1,
       }),
     ).toBe(false)
     expect(
       visibleWhenCountKindEditable().visibleWhen({
         'resolution.selectionMode': 'targets',
-        'resolution.targetCount': 6,
+        'resolution.target.count': 6,
       }),
     ).toBe(true)
   })
@@ -141,7 +141,7 @@ describe('selection mode visibility matrix', () => {
     expect(
       targetsOnly.visibleWhen({
         'resolution.selectionMode': 'none',
-        'resolution.targetCount': 6,
+        'resolution.target.count': 6,
       }),
     ).toBe(false)
   })

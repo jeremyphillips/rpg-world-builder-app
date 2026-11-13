@@ -18,15 +18,17 @@ export function SpellResolutionProximitySelect() {
 
   if (!resolution || resolution.selectionMode !== 'targets') return null
 
+  const proximityKind = resolution.target?.proximity.kind ?? 'touch'
+
   return (
     <SelectField
       id={id}
       label={RESOLUTION_FIELD_LABELS.proximityKind}
-      value={resolution.proximityKind}
+      value={proximityKind}
       onValueChange={(next) => {
         requestResolutionChange({
           field: 'proximityKind',
-          value: next as ResolutionFormValues['proximityKind'],
+          value: next as NonNullable<ResolutionFormValues['target']>['proximity']['kind'],
         })
       }}
       options={resolutionProximityKindOptions}

@@ -293,6 +293,22 @@ function formatIncludedTypeAsClause(
   return `that is ${joinOr(labels)}`
 }
 
+/** Area-occupant creature phrase — e.g. "creature that isn't an Undead". */
+export function formatAreaOccupantCreaturePhrase(
+  requirements: readonly unknown[] | undefined,
+  options?: ResolutionTargetFormatOptions,
+): string {
+  const head = formatTargetHeadNoun(
+    { count: 1, countKind: 'exact', kind: 'creature', requirements },
+    options,
+  )
+  const sight = formatTargetSightPhrase(requirements)
+  const core = [head, sight].filter((part): part is string => Boolean(part)).join(' ')
+  const clauses = formatTargetQualifyingClauses({ kind: 'creature', requirements }, options)
+  if (clauses.length === 0) return core
+  return `${core} ${clauses.join(' and ')}`
+}
+
 /** Count, head noun, sight, proximity, then qualifying clauses. */
 export function formatResolutionTargetSentence(
   target: Pick<ResolutionTarget, 'count' | 'countKind' | 'kind' | 'proximity'> & {

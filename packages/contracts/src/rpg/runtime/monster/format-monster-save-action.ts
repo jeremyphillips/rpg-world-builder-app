@@ -1,5 +1,6 @@
 import type { MonsterAction } from '../../content/monster/action'
 import { formatResolutionTargetFromParts } from '../../content/lib/resolution/format-target'
+import { formatAreaOccupantCreaturePhrase } from '../../content/lib/resolution/format-target-composition'
 import { formatAreaGeometry } from '../../primitives/area-geometry'
 import { limitedUseSchema } from '../../primitives/limited-use'
 import type { Ability } from '../../vocab/ability'
@@ -63,7 +64,8 @@ function outcomeSentence(
 function selectionPhrase(action: SaveAction): string {
   const resolution = action.resolution
   if (resolution.selectionMode === 'self' && resolution.areaOfEffect) {
-    return `each creature in a ${formatAreaGeometry(resolution.areaOfEffect, 'stat-block')}`
+    const occupant = formatAreaOccupantCreaturePhrase(resolution.occupantRequirements)
+    return `each ${occupant} in a ${formatAreaGeometry(resolution.areaOfEffect, 'stat-block')}`
   }
   if (resolution.selectionMode === 'targets' && resolution.target) {
     const sentence = formatResolutionTargetFromParts(resolution.target)

@@ -193,12 +193,13 @@ export function refineRequirementsForTargetKind(
   kind: ResolutionTargetKind,
   requirements: readonly ResolutionTargetRequirement[] | undefined,
   ctx: z.RefinementCtx,
+  pathPrefix: (string | number)[] = ['requirements'],
 ): void {
   if (kind === 'creature' || !requirements) return
   requirements.forEach((row, index) => {
     if (!CREATURE_ONLY_REQUIREMENT_KINDS.has(row.kind)) return
     addCustomRefinementIssue(ctx, resolutionTargetRequirementValidationMessages.creatureOnly(), [
-      'requirements',
+      ...pathPrefix,
       index,
     ])
   })

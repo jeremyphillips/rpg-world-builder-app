@@ -34,11 +34,14 @@ function validateResolutionFormTargetProximity(
   values: ResolutionFormValues,
   ctx: z.RefinementCtx,
 ): void {
-  if (values.selectionMode !== 'targets' || values.proximityKind !== 'distance') return
-  if (values.proximityDistanceFt !== undefined) return
+  if (values.selectionMode !== 'targets' || values.target?.proximity.kind !== 'distance') return
+  if (values.target.proximity.distance?.value !== undefined) return
 
   addCustomRefinementIssue(ctx, resolutionFormValidationMessages.proximityDistanceRequired(), [
-    'proximityDistanceFt',
+    'target',
+    'proximity',
+    'distance',
+    'value',
   ])
 }
 
