@@ -184,8 +184,8 @@ function formatConditionListPhrase(presence: string, labels: readonly string[]):
     return `Has the ${labels[0]} condition`
   }
   const list = joinOr(labels)
-  if (presence === 'lacks') return `Has none of these conditions: ${list}`
-  return `Has any of these conditions: ${list}`
+  if (presence === 'lacks') return `Does not have the ${list} condition`
+  return `Has the ${list} condition`
 }
 
 function formatConditionTitle(record: RequirementRecord): string {
@@ -197,7 +197,7 @@ function formatConditionTitle(record: RequirementRecord): string {
 function formatAnyOfConditionPhrase(labels: readonly string[]): string {
   if (labels.length === 0) return ''
   if (labels.length === 1) return `has the ${labels[0]} condition`
-  return `has any of these conditions: ${joinOr(labels)}`
+  return `has the ${joinOr(labels)} condition`
 }
 
 function formatAnyOfTitle(record: RequirementRecord): string {

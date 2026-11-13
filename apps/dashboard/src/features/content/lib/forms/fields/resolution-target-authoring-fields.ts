@@ -465,7 +465,8 @@ function requirementArray(
       {
         type: 'select',
         name: 'presence',
-        label: 'Condition',
+        label: 'Target conditions',
+        width: 'auto',
         options: [
           { value: 'has', label: 'Has' },
           { value: 'lacks', label: "Doesn't have" },
@@ -476,7 +477,9 @@ function requirementArray(
       {
         type: 'combobox',
         name: 'conditionIds',
-        label: 'Which ones',
+        label: 'Conditions',
+        labelVisibility: 'srOnly',
+        placeholder: 'Add conditions...',
         noun: { singular: 'condition', plural: 'conditions' },
         multiple: true,
         options: conditionOptions,
@@ -485,19 +488,22 @@ function requirementArray(
       {
         type: 'combobox',
         name: 'ids',
+        label: 'Conditions',
+        labelVisibility: 'srOnly',
+        placeholder: 'Add conditions...',
+        noun: { singular: 'condition', plural: 'conditions' },
+        multiple: true,
+        options: conditionOptions,
+        visibility: whenKind('condition'),
+      },
+      {
+        type: 'combobox',
+        name: 'ids',
         label: 'Which ones',
         noun: { singular: 'option', plural: 'options' },
         multiple: true,
-        options: [],
-        optionsResolve: {
-          dependsOn: ['kind'],
-          optionsWhen: (values) =>
-            values.kind === 'creature-type' ? [...creatureTypeOptions] : conditionOptions,
-        },
-        visibility: {
-          dependsOn: ['kind'],
-          visibleWhen: (values) => values.kind === 'creature-type' || values.kind === 'condition',
-        },
+        options: [...creatureTypeOptions],
+        visibility: whenKind('creature-type'),
       },
       {
         type: 'checkbox',

@@ -39,7 +39,7 @@ describe('resolution target authoring fields', () => {
         },
         label,
       ),
-    ).toBe('Willing or has any of these conditions: Grappled, Incapacitated, or Restrained')
+    ).toBe('Willing or has the Grappled, Incapacitated, or Restrained condition')
     expect(
       formatResolutionRequirementSummary({ kind: 'size', comparison: 'or-smaller' }, label),
     ).toBe('Creature size')

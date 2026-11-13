@@ -99,14 +99,14 @@ describe('formatResolutionRequirementRowTitle', () => {
         presence: 'has',
         ids: ['prone', 'grappled', 'restrained'],
       }),
-    ).toBe('Has any of these conditions: Prone, Grappled, or Restrained')
+    ).toBe('Has the Prone, Grappled, or Restrained condition')
     expect(
       formatResolutionRequirementRowTitle({
         kind: 'condition',
         presence: 'lacks',
         ids: ['prone', 'grappled'],
       }),
-    ).toBe('Has none of these conditions: Prone or Grappled')
+    ).toBe('Does not have the Prone or Grappled condition')
   })
 
   it('formats any-of branches without hiding incomplete intent', () => {
@@ -130,7 +130,7 @@ describe('formatResolutionRequirementRowTitle', () => {
         willing: true,
         conditionIds: ['grappled', 'restrained'],
       }),
-    ).toBe('Willing or has any of these conditions: Grappled or Restrained')
+    ).toBe('Willing or has the Grappled or Restrained condition')
   })
 
   it('falls back safely for unknown kinds and condition ids', () => {
