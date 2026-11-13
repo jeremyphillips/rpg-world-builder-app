@@ -95,6 +95,8 @@ List creatures:
 https://api.open5e.com/v2/creatures/?document__key=srd-2024&name__icontains=Goblin&fields=name,key,challenge_rating,type
 ```
 
+Creature reactions are not a `reactions` field. They are `actions` with `action_type` `REACTION`. Bonus actions use `BONUS_ACTION`, and legendary actions use `LEGENDARY_ACTION`.
+
 Search (discovery only — then re-fetch with `document__key=srd-2024`):
 
 ```text
