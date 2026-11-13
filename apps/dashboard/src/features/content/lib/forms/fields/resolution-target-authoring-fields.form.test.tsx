@@ -63,6 +63,32 @@ describe('resolution target authoring form', () => {
     expect(requirements).toEqual([{ kind: 'size', comparison: '', bound: '' }])
   })
 
+  it('omits the bundled reach or range select when includeProximityKindSelect is false', () => {
+    render(
+      <Form
+        schema={schema}
+        fields={resolutionTargetAuthoringFields({
+          prefix: 'resolution.target',
+          includeProximityKindSelect: false,
+        })}
+        defaultValues={{
+          resolution: {
+            target: {
+              count: 1,
+              kind: 'creature',
+              proximity: { kind: 'reach', distance: { value: 5, unit: 'ft' } },
+            },
+          },
+        }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.queryByLabelText('Reach or range')).not.toBeInTheDocument()
+    expect(screen.getByText('One creature within 5 feet', { exact: false })).toBeInTheDocument()
+  })
+
   it('omits the empty requirements well and hides disclosure for willing rows', () => {
     render(
       <Form

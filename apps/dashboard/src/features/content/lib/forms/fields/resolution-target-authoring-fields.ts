@@ -17,6 +17,7 @@ import {
 import {
   combineFieldVisibilityAll,
   type ArrayConfig,
+  type FieldChrome,
   type FieldOption,
   type FieldVisibility,
   type FormItem,
@@ -464,7 +465,12 @@ function requirementArray(
   requirementsPath: string,
   creatureTypeOptions: readonly FieldOption[],
   visibility?: FieldVisibility,
-  options?: { label?: string; previewPath?: string; hint?: string },
+  options?: {
+    label?: string
+    previewPath?: string
+    hint?: string
+    fieldChrome?: FieldChrome
+  },
 ): ArrayConfig {
   const labelFor = creatureTypeLabelFor(creatureTypeOptions)
   const conditionOptions = EFFECT_CONDITION_IDS.map((id) => ({
@@ -477,6 +483,7 @@ function requirementArray(
     name: requirementsPath,
     label: options?.label ?? 'Requirements',
     hint: options?.hint ?? REQUIREMENT_STAT_BLOCK_HINT,
+    ...(options?.fieldChrome ? { fieldChrome: options.fieldChrome } : {}),
     emptyState: 'none',
     addAction: { label: 'Add a requirement', menu: buildResolutionRequirementAddMenu() },
     item: {
@@ -578,11 +585,17 @@ export function resolutionTargetAuthoringFields(options: {
   prefix: string
   creatureTypeOptions?: readonly FieldOption[]
   visibility?: FieldVisibility
+  /** Spell resolution supplies its own proximity-kind select. */
   externalProximitySelect?: boolean
+  /** When false, proximity kind is not authored here (monster saves use inline feet only). Default true. */
+  includeProximityKindSelect?: boolean
   sentenceStyle?: 'monster' | 'spell'
+  requirementsFieldChrome?: FieldChrome
 }): FormItem[] {
   const creatureTypeOptions = options.creatureTypeOptions ?? []
   const requirementsPath = `${options.prefix}.requirements`
+  const showProximityKindSelect =
+    options.includeProximityKindSelect !== false && !options.externalProximitySelect
   const proximity: FormItem = {
     type: 'select',
     name: `${options.prefix}.proximity.kind`,
@@ -594,14 +607,14 @@ export function resolutionTargetAuthoringFields(options: {
     defaultValue: TARGET_DEFAULT_PROXIMITY_KIND,
   }
   return [
-    ...(options.externalProximitySelect
-      ? []
-      : [applyFieldVisibility(proximity, options.visibility)]),
+    ...(showProximityKindSelect ? [applyFieldVisibility(proximity, options.visibility)] : []),
     targetSentenceField(options.prefix, creatureTypeOptions, {
       visibility: options.visibility,
       sentenceStyle: options.sentenceStyle,
     }),
-    requirementArray(requirementsPath, creatureTypeOptions, options.visibility),
+    requirementArray(requirementsPath, creatureTypeOptions, options.visibility, {
+      fieldChrome: options.requirementsFieldChrome,
+    }),
   ]
 }
 
@@ -614,6 +627,7 @@ export function resolutionOccupantRequirementsFields(options: {
   hint?: string
   /** Embed only the requirement array inside an existing group. */
   fieldsOnly?: boolean
+  requirementsFieldChrome?: FieldChrome
 }): FormItem[] {
   const creatureTypeOptions = options.creatureTypeOptions ?? []
   const requirementField = requirementArray(
@@ -623,6 +637,7 @@ export function resolutionOccupantRequirementsFields(options: {
     {
       label: 'Requirements',
       hint: options.hint,
+      fieldChrome: options.requirementsFieldChrome,
     },
   )
   if (options.fieldsOnly) {

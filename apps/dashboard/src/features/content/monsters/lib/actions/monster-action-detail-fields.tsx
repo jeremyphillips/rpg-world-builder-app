@@ -439,7 +439,7 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
     kind: 'group',
     heading: { label: MONSTER_SAVE_TARGETING_LEGEND },
     description: MONSTER_SAVE_TARGETING_DESCRIPTION,
-    chrome: { variant: 'panel', emphasis: 'faint' },
+    fieldChrome: { variant: 'panel', elevation: 'canvas' },
     fields: [
       {
         kind: 'dependent',
@@ -471,6 +471,8 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
               prefix: 'resolution.target',
               visibility: targetsMode,
               creatureTypeOptions,
+              includeProximityKindSelect: false,
+              requirementsFieldChrome: { variant: 'panel', emphasis: 'faint' },
             }),
             ...resolutionOccupantRequirementsFields({
               requirementsPath: 'resolution.occupantRequirements',
@@ -478,6 +480,7 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
               visibility: selfMode,
               hint: MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT,
               fieldsOnly: true,
+              requirementsFieldChrome: { variant: 'panel', emphasis: 'faint' },
             }),
           ],
         },

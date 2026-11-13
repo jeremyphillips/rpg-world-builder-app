@@ -46,6 +46,38 @@ describe('resolution target authoring fields', () => {
     )
   })
 
+  it('previews reach and distance the same when both specify feet', () => {
+    const values = {
+      'resolution.target.count': 1,
+      'resolution.target.kind': 'creature',
+      'resolution.target.proximity.distance.value': 5,
+    }
+    expect(
+      formatResolutionTargetAuthoringPreview(
+        { ...values, 'resolution.target.proximity.kind': 'reach' },
+        'resolution.target',
+      ),
+    ).toBe(
+      formatResolutionTargetAuthoringPreview(
+        { ...values, 'resolution.target.proximity.kind': 'distance' },
+        'resolution.target',
+      ),
+    )
+  })
+
+  it('previews reach without distance as within your reach', () => {
+    expect(
+      formatResolutionTargetAuthoringPreview(
+        {
+          'resolution.target.count': 1,
+          'resolution.target.kind': 'creature',
+          'resolution.target.proximity.kind': 'reach',
+        },
+        'resolution.target',
+      ),
+    ).toBe('One creature within your reach')
+  })
+
   it('previews the stat-block sentence, including an awkward written noun', () => {
     expect(
       formatResolutionTargetAuthoringPreview(

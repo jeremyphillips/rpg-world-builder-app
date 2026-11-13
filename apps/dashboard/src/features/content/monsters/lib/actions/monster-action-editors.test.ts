@@ -1,4 +1,4 @@
-import { ACTION_PRESET_IDS, getActionPreset } from '@rpg/contracts'
+import { ACTION_PRESET_IDS, formatResolutionTargetFromParts, getActionPreset } from '@rpg/contracts'
 import type { ArrayConfig, FormItem, GroupConfig, SelectFieldConfig } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
@@ -607,6 +607,7 @@ describe('monster action detail fields', () => {
       fullWidth: true,
       width: 'full',
     })
+    expect(findSelectField(items, 'resolution.target.proximity.kind')).toBeUndefined()
     const shape = findSelectField(items, 'resolution.areaOfEffect.shape')
     expect(shape?.options?.some((option) => option.value === AREA_GEOMETRY_FORM_NONE)).toBe(false)
     expect(shape?.required).toBe(true)
@@ -614,8 +615,32 @@ describe('monster action detail fields', () => {
     const occupants = findArrayField(items, 'resolution.occupantRequirements')
     expect(occupants?.hint).toBe(MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT)
     expect(occupants?.visibility?.dependsOn).toEqual(['resolution.selectionMode'])
+    expect(occupants?.fieldChrome).toEqual({ variant: 'panel', emphasis: 'faint' })
+    const targetRequirements = findArrayField(items, 'resolution.target.requirements')
+    expect(targetRequirements?.fieldChrome).toEqual({ variant: 'panel', emphasis: 'faint' })
     const targetingGroup = findGroupByHeading(items, MONSTER_SAVE_TARGETING_LEGEND)
-    expect(targetingGroup?.chrome).toEqual({ variant: 'panel', emphasis: 'faint' })
+    expect(targetingGroup?.fieldChrome).toEqual({ variant: 'panel', elevation: 'canvas' })
+    expect(targetingGroup?.chrome).toBeUndefined()
+  })
+
+  it('keeps constrict reach proximity in preset data and stat-block copy', () => {
+    const constrict = createMonsterActionFromAcquisition({
+      type: 'preset',
+      presetId: 'constrict',
+    })
+    expect(constrict).toMatchObject({
+      kind: 'save',
+      resolution: {
+        selectionMode: 'targets',
+        target: {
+          proximity: { kind: 'reach', distance: { value: 5, unit: 'ft' } },
+        },
+      },
+    })
+    if (constrict.kind !== 'save' || !constrict.resolution?.target) throw new Error('expected save')
+    expect(formatResolutionTargetFromParts(constrict.resolution.target)).toBe(
+      'One creature within 5 feet',
+    )
   })
 })
 

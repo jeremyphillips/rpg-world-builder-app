@@ -83,6 +83,18 @@ describe('resolveEffectiveFieldChrome', () => {
     expect(resolveEffectiveFieldChrome({}, { fieldChromeSuppressed: true })).toBeUndefined()
   })
 
+  it('skips ancestor fieldChrome cascade when fieldChromeSuppressed is true', () => {
+    expect(
+      resolveEffectiveFieldChrome(
+        {},
+        {
+          fieldChromeCascade: { variant: 'panel', emphasis: 'faint' },
+          fieldChromeSuppressed: true,
+        },
+      ),
+    ).toBeUndefined()
+  })
+
   it('prefers explicit leaf chrome over cascade', () => {
     expect(
       resolveEffectiveFieldChrome(

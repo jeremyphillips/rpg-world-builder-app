@@ -400,9 +400,9 @@ Resolution order:
 
 1. Explicit `chrome` on the leaf, row, slot, or dependent — or `fieldChrome` on a group
    (`{ variant: 'none' }` opts out)
-2. Nearest ancestor `fieldChrome` cascade on a group, array, or dependent region
-3. Section suppression (anything nested under a top-level container unit; array item shells;
-   dependent panel/rail wrappers)
+2. Section suppression (anything nested under a chromed group/array/dependent shell; array
+   item shells; dependent panel/rail wrappers) — no cascade or default container
+3. Nearest ancestor `fieldChrome` cascade on a group, array, or dependent region
 4. Global default `{ variant: 'container' }` (top-level units only)
 
 | Authoring knob                                                                            | Applies to                                      |
