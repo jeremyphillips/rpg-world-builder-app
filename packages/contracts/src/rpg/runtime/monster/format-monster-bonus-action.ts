@@ -1,7 +1,9 @@
+import type { BonusTeleportPassenger } from '../../content/monster/action'
 import {
   BONUS_STANDARD_ACTION_IDS,
   type BonusActionCombination,
 } from '../../content/monster/bonus-standard-actions'
+import { formatAreaOccupantCreaturePhrase } from '../../content/lib/resolution/format-target-composition'
 import { joinNaturalList } from '../../primitives/prose'
 import { getActionVocabularyEntry } from '../../vocab/action/action-vocabulary'
 import { formatMonsterStatBlockSubject } from './spell-entry-presentation'
@@ -93,14 +95,26 @@ export function formatMonsterTakeActions(args: {
   return `${lead}, ${subject} ${clause}.`
 }
 
+function articleFor(label: string): 'a' | 'an' {
+  return /^[aeiou]/i.test(label) ? 'an' : 'a'
+}
+
+/** Noun phrase after “itself or”, including the article. */
+export function formatTeleportPassengerCreaturePhrase(
+  passenger: Pick<BonusTeleportPassenger, 'requirements'>,
+): string {
+  const core = formatAreaOccupantCreaturePhrase(passenger.requirements)
+  return `${articleFor(core)} ${core}`
+}
+
 /**
- * Self teleport, or self plus an authored creature phrase.
- * An open passenger without a phrase or a distance prints nothing, including no self-only sentence.
+ * Self teleport, or self plus a structured passenger.
+ * An open passenger without a distance prints nothing, including no self-only sentence.
  */
 export function formatMonsterTeleport(args: {
   monsterName: string
   distanceFeet: number | undefined
-  passenger?: { phrase?: string; withinFeet?: number }
+  passenger?: BonusTeleportPassenger
 }): string | undefined {
   if (!isPositiveWholeFeet(args.distanceFeet)) return undefined
   const subject = formatMonsterStatBlockSubject(args.monsterName)
@@ -108,7 +122,7 @@ export function formatMonsterTeleport(args: {
   if (!args.passenger) {
     return `${capital} teleports up to ${args.distanceFeet} feet to an unoccupied space it can see.`
   }
-  const phrase = args.passenger.phrase?.trim()
-  if (!phrase || !isPositiveWholeFeet(args.passenger.withinFeet)) return undefined
-  return `${capital} teleports itself or ${phrase} within ${args.passenger.withinFeet} feet of itself up to ${args.distanceFeet} feet to an unoccupied space ${subject} can see.`
+  if (!isPositiveWholeFeet(args.passenger.withinFeet)) return undefined
+  const creaturePhrase = formatTeleportPassengerCreaturePhrase(args.passenger)
+  return `${capital} teleports itself or ${creaturePhrase} within ${args.passenger.withinFeet} feet of itself up to ${args.distanceFeet} feet to an unoccupied space ${subject} can see.`
 }

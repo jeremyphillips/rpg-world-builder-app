@@ -43,15 +43,18 @@ describe('formatMonsterTeleport', () => {
     )
   })
 
-  it('prints Balor when the other creature phrase and distance are set', () => {
+  it('prints Balor when passenger distance and requirements are set', () => {
     expect(
       formatMonsterTeleport({
         monsterName: 'Balor',
         distanceFeet: 60,
-        passenger: { phrase: 'a willing demon', withinFeet: 10 },
+        passenger: {
+          withinFeet: 10,
+          requirements: [{ kind: 'willing' }, { kind: 'written', text: 'that is a demon' }],
+        },
       }),
     ).toBe(
-      'The balor teleports itself or a willing demon within 10 feet of itself up to 60 feet to an unoccupied space the balor can see.',
+      'The balor teleports itself or a willing creature that is a demon within 10 feet of itself up to 60 feet to an unoccupied space the balor can see.',
     )
   })
 
@@ -60,14 +63,14 @@ describe('formatMonsterTeleport', () => {
       formatMonsterTeleport({
         monsterName: 'Balor',
         distanceFeet: 60,
-        passenger: { withinFeet: 10 },
+        passenger: {},
       }),
     ).toBeUndefined()
     expect(
       formatMonsterTeleport({
         monsterName: 'Balor',
         distanceFeet: 60,
-        passenger: { phrase: 'a willing demon' },
+        passenger: { requirements: [{ kind: 'willing' }] },
       }),
     ).toBeUndefined()
     expect(formatMonsterTeleport({ monsterName: 'Blink Dog', distanceFeet: undefined })).toBe(

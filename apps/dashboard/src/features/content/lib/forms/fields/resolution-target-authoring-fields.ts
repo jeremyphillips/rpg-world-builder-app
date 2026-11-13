@@ -609,19 +609,30 @@ export function resolutionOccupantRequirementsFields(options: {
   requirementsPath: string
   creatureTypeOptions?: readonly FieldOption[]
   visibility?: FieldVisibility
+  legend?: string
+  description?: string
+  /** Embed only the requirement array inside an existing group. */
+  fieldsOnly?: boolean
 }): FormItem[] {
   const creatureTypeOptions = options.creatureTypeOptions ?? []
+  const requirementField = requirementArray(
+    options.requirementsPath,
+    creatureTypeOptions,
+    options.visibility,
+    {
+      label: 'Requirements',
+    },
+  )
+  if (options.fieldsOnly) {
+    return [requirementField]
+  }
   return [
     {
       kind: 'group',
-      legend: 'Creatures in the area',
-      description: REQUIREMENT_STAT_BLOCK_HINT,
+      legend: options.legend ?? 'Creatures in the area',
+      description: options.description ?? REQUIREMENT_STAT_BLOCK_HINT,
       visibility: options.visibility,
-      fields: [
-        requirementArray(options.requirementsPath, creatureTypeOptions, undefined, {
-          label: 'Requirements',
-        }),
-      ],
+      fields: [requirementField],
     },
   ]
 }

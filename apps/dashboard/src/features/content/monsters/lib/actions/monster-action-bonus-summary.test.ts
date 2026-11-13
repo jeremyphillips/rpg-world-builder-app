@@ -44,7 +44,7 @@ describe('buildMonsterActionBonusPreview', () => {
           kind: 'teleport',
           name: 'Teleport',
           distanceFeet: 60,
-          passenger: { withinFeet: 10 },
+          passenger: {},
         },
       }),
     ).toBeNull()

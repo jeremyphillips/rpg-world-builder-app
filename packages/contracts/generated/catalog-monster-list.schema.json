@@ -6259,13 +6259,17 @@
     "__schema245": {
       "type": "object",
       "properties": {
-        "phrase": {
-          "type": "string"
-        },
         "withinFeet": {
           "allOf": [
             {
               "$ref": "#/definitions/__schema238"
+            }
+          ]
+        },
+        "requirements": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/__schema205"
             }
           ]
         }

@@ -76,6 +76,20 @@ export function monsterActionResolverFields(ctx: ContentFormCtx): FormItem[] {
       prefix: 'resolution.target',
       creatureTypeOptions: buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary),
     }),
+    {
+      kind: 'array',
+      name: 'resolution.occupantRequirements',
+      label: 'Area occupants',
+      item: { header: { fallback: (index) => `Requirement ${index + 1}` } },
+      fields: [],
+    },
+    {
+      kind: 'array',
+      name: 'passenger.requirements',
+      label: 'Teleport passenger requirements',
+      item: { header: { fallback: (index) => `Requirement ${index + 1}` } },
+      fields: [],
+    },
     ...monsterActionLimitedUseFields(),
     { type: 'number', name: 'limitedUse.minRoll', label: 'Recharge roll', min: 2, max: 6 },
     {

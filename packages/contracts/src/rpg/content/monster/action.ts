@@ -17,6 +17,10 @@ import {
   effectResolutionSchema,
   validateEffectResolution,
 } from '../lib/resolution/schema'
+import {
+  refineRequirementsForTargetKind,
+  resolutionTargetRequirementsSchema,
+} from '../lib/resolution/target-requirements'
 import { RESOLUTION_SELECTION_MODES } from '../../vocab/resolution'
 import { getActionPreset } from '../action/action-presets'
 import { MONSTER_SECTION_KINDS } from './action-section-eligibility'
@@ -331,10 +335,12 @@ const positiveWholeFeetSchema = z.number().int().min(1)
 const leapDistanceFeetSchema = positiveWholeFeetSchema.max(LEAP_DISTANCE_MAX)
 const leapMovementFeetSchema = positiveWholeFeetSchema.max(LEAP_MOVEMENT_MAX)
 
-const bonusPassengerSchema = z.object({
-  phrase: z.string().optional(),
+export const bonusTeleportPassengerSchema = z.object({
   withinFeet: positiveWholeFeetSchema.optional(),
+  requirements: resolutionTargetRequirementsSchema.optional(),
 })
+
+export type BonusTeleportPassenger = z.infer<typeof bonusTeleportPassengerSchema>
 
 function bonusLimitedUse<M extends MonsterActionMode>(mode: M) {
   return (mode === 'draft' ? limitedUseDraftSchema : limitedUseSchema) as M extends 'draft'
@@ -355,8 +361,9 @@ function leapSchema<M extends MonsterActionMode>(mode: M) {
       ...entryProvenanceField,
     })
     .superRefine((action, ctx) => {
-      const distance = action.distanceFeet
-      const movement = action.movementFeet
+      const row = action as { distanceFeet?: number; movementFeet?: number }
+      const distance = row.distanceFeet
+      const movement = row.movementFeet
       if (typeof distance !== 'number' || typeof movement !== 'number') return
       if (!Number.isInteger(distance) || !Number.isInteger(movement)) return
       if (distance > movement) return
@@ -372,20 +379,20 @@ function teleportSchema<M extends MonsterActionMode>(mode: M) {
       name: strict(z.string().min(1), mode),
       distanceFeet: strict(positiveWholeFeetSchema, mode),
       /** Absent when Include another creature is closed. */
-      passenger: bonusPassengerSchema.optional(),
+      passenger: bonusTeleportPassengerSchema.optional(),
       limitedUse: bonusLimitedUse(mode).optional(),
       available: z.boolean().optional(),
       ...entryProvenanceField,
     })
     .superRefine((action, ctx) => {
       if (mode === 'draft' || !action.passenger) return
-      const phrase = action.passenger.phrase?.trim()
-      if (!phrase) {
-        addCustomRefinementIssue(ctx, 'Creature is required.', ['passenger', 'phrase'])
-      }
       if (!action.passenger.withinFeet) {
         addCustomRefinementIssue(ctx, 'Within is required.', ['passenger', 'withinFeet'])
       }
+      refineRequirementsForTargetKind('creature', action.passenger.requirements, ctx, [
+        'passenger',
+        'requirements',
+      ])
     })
 }
 

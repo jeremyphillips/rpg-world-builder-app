@@ -26,9 +26,15 @@ import {
 import { buildActiveCreatureTypeFieldOptions } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
+import {
+  AREA_GEOMETRY_FORM_NONE,
+  areaGeometryFormFields,
+} from '../../../lib/forms/fields/area-geometry-form-fields'
 import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
-import { resolutionTargetAuthoringFields } from '../../../lib/forms/fields/resolution-target-authoring-fields'
+import {
+  resolutionOccupantRequirementsFields,
+  resolutionTargetAuthoringFields,
+} from '../../../lib/forms/fields/resolution-target-authoring-fields'
 import {
   ATTACK_RANGE_LONG_FIELD_LABEL,
   ATTACK_RANGE_NORMAL_FIELD_LABEL,
@@ -90,9 +96,7 @@ import {
   MONSTER_TAKE_ACTIONS_RESTRICTION_HINT,
   MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL,
   MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER,
-  MONSTER_TELEPORT_CREATURE_HINT,
-  MONSTER_TELEPORT_CREATURE_LABEL,
-  MONSTER_TELEPORT_CREATURE_PLACEHOLDER,
+  MONSTER_TELEPORT_PASSENGER_HINT,
   MONSTER_TELEPORT_DISTANCE_HINT,
   MONSTER_TELEPORT_DISTANCE_LABEL,
   MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
@@ -426,9 +430,22 @@ function monsterActionSaveDcDependent(namePrefix: string, currentActionId: strin
   })
 }
 
+function whenMonsterSaveHasArea(): FieldVisibility {
+  return {
+    dependsOn: ['resolution.selectionMode', 'resolution.areaOfEffect.shape'],
+    visibleWhen: (values) => {
+      if (values['resolution.selectionMode'] !== 'self') return false
+      const shape = values['resolution.areaOfEffect.shape']
+      return typeof shape === 'string' && shape.length > 0 && shape !== AREA_GEOMETRY_FORM_NONE
+    },
+  }
+}
+
 function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
   const selfMode = whenFieldEquals('resolution.selectionMode', 'self')
   const targetsMode = whenFieldEquals('resolution.selectionMode', 'targets')
+  const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary)
+  const saveAreaOccupants = combineFieldVisibilityAll(selfMode, whenMonsterSaveHasArea())
   return {
     kind: 'group',
     heading: { label: MONSTER_SAVE_TARGETING_LEGEND },
@@ -460,7 +477,12 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
             ...resolutionTargetAuthoringFields({
               prefix: 'resolution.target',
               visibility: targetsMode,
-              creatureTypeOptions: buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary),
+              creatureTypeOptions,
+            }),
+            ...resolutionOccupantRequirementsFields({
+              requirementsPath: 'resolution.occupantRequirements',
+              creatureTypeOptions,
+              visibility: saveAreaOccupants,
             }),
           ],
         },
@@ -919,6 +941,9 @@ function bonusAuthoringFields(input: {
     return [preview, ...leapDistanceFields(), ...usage]
   }
   if (input.action.kind === 'teleport') {
+    const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(
+      input.ctx.creatureTypeVocabulary,
+    )
     return [
       preview,
       distanceJoinedPairField({
@@ -933,19 +958,12 @@ function bonusAuthoringFields(input: {
         kind: 'group',
         name: 'passenger',
         legend: MONSTER_TELEPORT_PASSENGER_LEGEND,
+        description: MONSTER_TELEPORT_PASSENGER_HINT,
         optionalDisclosure: {
           addLabel: MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
           seedWhen: () => ({ withinFeet: TELEPORT_WITHIN_DEFAULT }),
         },
         fields: [
-          {
-            type: 'text',
-            name: 'passenger.phrase',
-            label: MONSTER_TELEPORT_CREATURE_LABEL,
-            hint: { text: MONSTER_TELEPORT_CREATURE_HINT },
-            placeholder: MONSTER_TELEPORT_CREATURE_PLACEHOLDER,
-            required: true,
-          },
           distanceJoinedPairField({
             amountName: 'passenger.withinFeet',
             label: MONSTER_TELEPORT_WITHIN_LABEL,
@@ -953,6 +971,11 @@ function bonusAuthoringFields(input: {
             allowCustom: true,
             required: true,
             hint: { text: MONSTER_TELEPORT_WITHIN_HINT },
+          }),
+          ...resolutionOccupantRequirementsFields({
+            requirementsPath: 'passenger.requirements',
+            creatureTypeOptions,
+            fieldsOnly: true,
           }),
         ],
       },

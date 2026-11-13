@@ -249,7 +249,7 @@ describe('monsterBonusActionSchema', () => {
     ).toBe(false)
   })
 
-  it('requires the other creature when that disclosure is open', () => {
+  it('requires within distance when the passenger disclosure is open', () => {
     expect(
       monsterBonusActionSchema.safeParse({
         id: 'teleport',
@@ -258,17 +258,29 @@ describe('monsterBonusActionSchema', () => {
         distanceFeet: 60,
         passenger: { withinFeet: 10 },
       }).success,
+    ).toBe(true)
+    expect(
+      monsterBonusActionSchema.safeParse({
+        id: 'teleport',
+        kind: 'teleport',
+        name: 'Teleport',
+        distanceFeet: 60,
+        passenger: {},
+      }).success,
     ).toBe(false)
     const balor = monsterBonusActionSchema.parse({
       id: 'teleport',
       kind: 'teleport',
       name: 'Teleport',
       distanceFeet: 60,
-      passenger: { phrase: 'a willing demon', withinFeet: 10 },
+      passenger: {
+        withinFeet: 10,
+        requirements: [{ kind: 'willing' }, { kind: 'written', text: 'that is a demon' }],
+      },
     })
     expect(balor.kind === 'teleport' && balor.passenger).toEqual({
-      phrase: 'a willing demon',
       withinFeet: 10,
+      requirements: [{ kind: 'willing' }, { kind: 'written', text: 'that is a demon' }],
     })
   })
 
