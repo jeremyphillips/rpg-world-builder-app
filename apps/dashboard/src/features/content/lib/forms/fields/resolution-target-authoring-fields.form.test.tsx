@@ -54,7 +54,7 @@ describe('resolution target authoring form', () => {
     expect(screen.getByText('One creature within 5 feet', { exact: false })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Add a requirement' }))
-    await user.click(screen.getByRole('menuitem', { name: /Size limit/i }))
+    await user.click(screen.getByRole('menuitem', { name: /Creature size/i }))
 
     expect(screen.getByText('Eligible sizes')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Size' })).toBeInTheDocument()

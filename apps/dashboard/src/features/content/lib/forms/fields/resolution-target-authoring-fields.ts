@@ -5,6 +5,7 @@ import {
   MEASURED_RANGE_FEET,
   RESOLUTION_TARGET_KINDS,
   formatAreaOccupantCreaturePhrase,
+  formatResolutionRequirementRowTitle,
   formatResolutionTargetFromParts,
   getCreatureSizeLabel,
   getEffectConditionLabel,
@@ -114,100 +115,17 @@ function stringIds(value: unknown): string[] {
   return value.filter((id): id is string => typeof id === 'string' && id.length > 0)
 }
 
-function joinOr(items: readonly string[]): string {
-  if (items.length <= 1) return items[0] ?? ''
-  if (items.length === 2) return `${items[0]} or ${items[1]}`
-  return `${items.slice(0, -1).join(', ')}, or ${items.at(-1)}`
-}
-
 function creatureTypeLabelFor(options: readonly FieldOption[]): (id: string) => string {
   const labels = new Map(options.map((option) => [String(option.value), option.label]))
   return (id) => labels.get(id) ?? id
 }
 
-function summarizeSight(who: unknown): string {
-  if (who === 'target') return 'It can see you'
-  if (who === 'both') return 'You can see each other'
-  return 'You can see it'
-}
-
-function summarizeSize(record: Record<string, unknown>): string {
-  if (typeof record.bound !== 'string') return 'Size limit'
-  const label = getCreatureSizeLabel(record.bound)
-  if (record.comparison === 'or-smaller') return `${label} or smaller`
-  if (record.comparison === 'or-larger') return `${label} or larger`
-  if (record.comparison === 'only') return label
-  return 'Size limit'
-}
-
-function summarizeListed(
-  ids: unknown,
-  labelFor: (id: string) => string,
-  empty: string,
-  present: (list: string) => string,
-): string {
-  const labels = stringIds(ids).map(labelFor)
-  if (labels.length === 0) return empty
-  return present(joinOr(labels))
-}
-
-function summarizeAnyOf(record: Record<string, unknown>): string {
-  const labels = stringIds(record.conditionIds).map((id) => getEffectConditionLabel(id))
-  const willing = record.willing === true
-  if (willing && labels.length > 0) return `Willing, or ${joinOr(labels)}`
-  if (willing) return 'Willing'
-  if (labels.length > 0) return `Has the ${joinOr(labels)} condition`
-  return 'Willing or has a condition'
-}
-
-function summarizeCreatureType(
-  record: Record<string, unknown>,
-  creatureTypeLabel: (id: string) => string,
-): string {
-  return summarizeListed(record.ids, creatureTypeLabel, 'Creature type', (list) =>
-    record.mode === 'exclude' ? `Isn't ${list}` : list,
-  )
-}
-
-function summarizeCondition(record: Record<string, unknown>): string {
-  return summarizeListed(
-    record.ids,
-    (id) => getEffectConditionLabel(id),
-    'Has a condition',
-    (list) =>
-      record.presence === 'lacks'
-        ? `Doesn't have the ${list} condition`
-        : `Has the ${list} condition`,
-  )
-}
-
-function summarizeWritten(text: unknown): string {
-  const clause = typeof text === 'string' ? text.trim() : ''
-  return clause.length > 0 ? clause : 'Something else'
-}
-
-const REQUIREMENT_SUMMARIES: Record<
-  string,
-  (record: Record<string, unknown>, creatureTypeLabel: (id: string) => string) => string
-> = {
-  sight: (record) => summarizeSight(record.who),
-  size: (record) => summarizeSize(record),
-  'creature-type': summarizeCreatureType,
-  condition: (record) => summarizeCondition(record),
-  willing: () => 'Willing',
-  'any-of': (record) => summarizeAnyOf(record),
-  written: (record) => summarizeWritten(record.text),
-}
-
-/** Chip or row title for one requirement. Incomplete rows keep the menu label. */
+/** Chip or row title for one requirement — incomplete type label or configured copy. */
 export function formatResolutionRequirementSummary(
   row: unknown,
   creatureTypeLabel: (id: string) => string,
 ): string {
-  if (!row || typeof row !== 'object') return 'Requirement'
-  const record = row as Record<string, unknown>
-  const summarize = typeof record.kind === 'string' ? REQUIREMENT_SUMMARIES[record.kind] : undefined
-  return summarize ? summarize(record, creatureTypeLabel) : 'Requirement'
+  return formatResolutionRequirementRowTitle(row, { creatureTypeLabel })
 }
 
 function menuItem(
@@ -261,7 +179,7 @@ export function buildResolutionRequirementAddMenu() {
       ),
       menuItem(
         'size',
-        'Size limit',
+        'Creature size',
         'Constrict: one Large or smaller creature',
         ['size', 'large', 'smaller', 'constrict'],
         { kind: 'size', comparison: 'or-smaller' },

@@ -39,8 +39,16 @@ describe('resolution target authoring fields', () => {
         },
         label,
       ),
-    ).toBe('Willing, or Grappled, Incapacitated, or Restrained')
-    expect(formatResolutionRequirementSummary({ kind: 'size' }, label)).toBe('Size limit')
+    ).toBe('Willing or has any of these conditions: Grappled, Incapacitated, or Restrained')
+    expect(
+      formatResolutionRequirementSummary({ kind: 'size', comparison: 'or-smaller' }, label),
+    ).toBe('Creature size')
+    expect(
+      formatResolutionRequirementSummary(
+        { kind: 'size', bound: 'huge', comparison: 'only' },
+        label,
+      ),
+    ).toBe('Huge only')
     expect(formatResolutionRequirementSummary({ kind: 'written', text: 'demon' }, label)).toBe(
       'demon',
     )

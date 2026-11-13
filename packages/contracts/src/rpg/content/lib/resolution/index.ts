@@ -79,6 +79,10 @@ export {
   formatTargetSightPhrase,
 } from './format-target-composition'
 export {
+  formatResolutionRequirementRowTitle,
+  type ResolutionRequirementRowTitleOptions,
+} from './format-requirement-row-title'
+export {
   formatEffectResolutionSummary,
   formatEffectResolutionSummarySections,
   formatResolutionEffectSummarySections,
