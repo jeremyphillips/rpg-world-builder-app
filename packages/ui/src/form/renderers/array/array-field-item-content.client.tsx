@@ -16,6 +16,7 @@ import { ArrayItemHeaderContent, ArrayItemHeaderSummary } from './array-item-hea
 import { ArrayItemActionsContent, ArrayItemActionsRail } from './array-item-shell.client'
 import type { ArrayItemIssueSummaryProps } from './array-item-issue.client'
 import { FlatNoHeaderArrayFieldItem } from './flat-no-header-array-field-item.client'
+import { arrayItemHasVisibleBodyFields } from '../../config/array/array-item-visible-body.lib'
 import { useArrayFieldItemContentState } from './use-array-field-item-content-state.client'
 
 export interface ArrayFieldItemContentProps {
@@ -112,7 +113,7 @@ interface FlatLabeledArrayFieldItemProps extends ArrayFieldItemChromeProps {
   sortableEnabled: boolean
   dragHandleProps?: ArrayFieldItemContentProps['dragHandleProps']
   issueSummary?: ArrayItemIssueSummaryProps
-  fieldsNode: React.ReactNode
+  itemBody?: React.ReactNode
   actionsRail: React.ReactNode
 }
 
@@ -131,7 +132,7 @@ function FlatLabeledArrayFieldItem({
   sortableEnabled,
   dragHandleProps,
   issueSummary,
-  fieldsNode,
+  itemBody,
   actionsRail,
 }: FlatLabeledArrayFieldItemProps) {
   const { arrayItemSurface, arrayItemTone } = useFormSectionContext()
@@ -178,7 +179,7 @@ function FlatLabeledArrayFieldItem({
       className={shellClassName}
       header={<ArrayItemHeaderContent header={header} />}
       summary={summaryNode}
-      body={fieldsNode}
+      body={itemBody}
       actions={actionsRail}
     />
   )
@@ -197,7 +198,7 @@ interface DetailedArrayFieldItemProps extends ArrayFieldItemChromeProps {
   onToggleCollapse: () => void
   bodyId: string
   issueSummary?: ArrayItemIssueSummaryProps
-  fieldsNode: React.ReactNode
+  itemBody?: React.ReactNode
   leadingChrome: { reserveDragHandleSlot: boolean; showDragHandle: boolean; collapsible: boolean }
   actionsRail: React.ReactNode
 }
@@ -220,7 +221,7 @@ function DetailedArrayFieldItem({
   onToggleCollapse,
   bodyId,
   issueSummary,
-  fieldsNode,
+  itemBody,
   leadingChrome,
   actionsRail,
 }: DetailedArrayFieldItemProps) {
@@ -264,7 +265,7 @@ function DetailedArrayFieldItem({
       tone={arrayItemTone}
       header={<ArrayItemHeaderContent header={header} />}
       summary={summaryNode}
-      body={fieldsNode}
+      body={itemBody}
       actions={actionsRail}
     />
   )
@@ -378,6 +379,8 @@ export function ArrayFieldItemContent({
     </ArrayItemPresentationContext.Provider>
   )
 
+  const itemBody = arrayItemHasVisibleBodyFields(config.fields, itemValues) ? fieldsNode : undefined
+
   const customRemove = renderArrayItemUtilitySlot(itemConfig.removeSlot, arrayContext)
   const beforeRemove = renderArrayItemUtilitySlot(itemConfig.beforeRemove, arrayContext)
 
@@ -447,7 +450,7 @@ export function ArrayFieldItemContent({
       sortableEnabled,
       dragHandleProps,
       issueSummary,
-      fieldsNode,
+      itemBody,
       actionsRail,
     },
     disclosure: {
@@ -464,7 +467,7 @@ export function ArrayFieldItemContent({
       onToggleCollapse,
       bodyId,
       issueSummary,
-      fieldsNode,
+      itemBody,
       leadingChrome,
       actionsRail,
     },

@@ -1225,6 +1225,69 @@ describe('ArrayFieldRenderer', () => {
     expect(body).not.toHaveClass('pl-[var(--content-column-indent)]')
   })
 
+  it('omits collapsible list item body chrome when no item fields are visible', () => {
+    const mixedSchema = z.object({
+      rows: z.array(
+        z.object({
+          title: z.string(),
+          showDetail: z.boolean(),
+          detail: z.string().optional(),
+        }),
+      ),
+    })
+
+    const mixedFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'rows',
+        label: 'Rows',
+        reorder: false,
+        addAction: { label: 'Add row' },
+        item: {
+          variant: 'detailed',
+          header: {
+            fallback: (index) => `Row ${index + 1}`,
+            primary: (values) => values.title as string,
+          },
+        },
+        fields: [
+          {
+            type: 'text',
+            name: 'detail',
+            label: 'Detail',
+            visibility: {
+              dependsOn: ['showDetail'],
+              visibleWhen: (values) => values.showDetail === true,
+            },
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form
+        schema={mixedSchema}
+        fields={mixedFields}
+        defaultValues={{
+          rows: [
+            { title: 'Summary only', showDetail: false },
+            { title: 'With body', showDetail: true, detail: 'Has detail' },
+          ],
+        }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const summaryOnlyShell = document.querySelector('[data-array-item-prefix="rows.0"]')
+    expect(summaryOnlyShell).not.toBeNull()
+    expect(summaryOnlyShell?.querySelector('[id$="-body"]')).toBeNull()
+
+    const populatedShell = document.querySelector('[data-array-item-prefix="rows.1"]')
+    expect(populatedShell).not.toBeNull()
+    expect(populatedShell?.querySelector('[id$="-body"]')).not.toBeNull()
+  })
+
   it('stacks summary subheadlines with a 2px gap below the title row', async () => {
     const user = userEvent.setup()
 
