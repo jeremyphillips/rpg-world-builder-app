@@ -8,28 +8,24 @@ import { FieldReadOnlyValueField } from '../../../../components/ui/field-read-on
 import { SelectField } from '../../../../components/ui/select-field'
 import type { FieldCopyContext } from '../../../config/field-copy-context.lib'
 import { formMicroActionButtonProps } from '../../../form-micro-action'
-import type { pickSelectFieldChromeProps } from './select-field-renderer.lib'
+import type { SelectFieldChromeProps } from './select-field-renderer.lib'
 import type { useSelectFieldRendererState } from './use-select-field-renderer-state.client'
 
-type SelectChrome = ReturnType<typeof pickSelectFieldChromeProps>
+type SelectChrome = SelectFieldChromeProps
 type SelectState = ReturnType<typeof useSelectFieldRendererState>
 
 type SelectFieldReadOnlyViewProps = {
   chrome: SelectChrome
   displayValue: string
-  fieldId: string
   validation: SelectState['validation']
 }
 
 export function SelectFieldReadOnlyView({
   chrome,
   displayValue,
-  fieldId,
   validation,
 }: SelectFieldReadOnlyViewProps) {
-  return (
-    <FieldReadOnlyValueField id={fieldId} displayValue={displayValue} {...chrome} {...validation} />
-  )
+  return <FieldReadOnlyValueField displayValue={displayValue} {...chrome} {...validation} />
 }
 
 type SelectFieldCommittedViewProps = {
@@ -39,7 +35,6 @@ type SelectFieldCommittedViewProps = {
   committedLabel: string | null
   displayValue: string
   disabled: boolean | undefined
-  fieldId: string
   fieldLabel: string
   onBeginChange: () => void
   validation: SelectState['validation']
@@ -52,14 +47,12 @@ export function SelectFieldCommittedView({
   committedLabel,
   displayValue,
   disabled,
-  fieldId,
   fieldLabel,
   onBeginChange,
   validation,
 }: SelectFieldCommittedViewProps) {
   return (
     <FieldReadOnlyValueField
-      id={fieldId}
       displayValue={committedLabel ?? displayValue}
       className="px-0"
       controlEnd={
@@ -84,7 +77,6 @@ type SelectFieldEditorViewProps = {
   chrome: SelectChrome
   copyContext: FieldCopyContext
   field: ControllerRenderProps
-  fieldId: string
   onBlur: () => void
   onOpenChange: (open: boolean) => void
   onValueChange: (next: string) => void
@@ -98,7 +90,6 @@ export function SelectFieldEditorView({
   chrome,
   copyContext,
   field,
-  fieldId,
   onBlur,
   onOpenChange,
   onValueChange,
@@ -109,7 +100,6 @@ export function SelectFieldEditorView({
 }: SelectFieldEditorViewProps) {
   return (
     <SelectField
-      id={fieldId}
       options={resolvedOptions}
       placeholder={renderConfig.placeholder}
       noun={copyContext.noun}

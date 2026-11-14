@@ -2,7 +2,12 @@
  * Pure helpers that prepare a `FieldConfig` for `FieldRenderer`.
  */
 import type { FieldSize } from '../../components/ui/field.client'
-import type { FieldConfig, FieldDerivedMeta, JoinedPairFieldConfig } from '../field-config'
+import type {
+  FieldConfig,
+  FieldDerivedMeta,
+  JoinedPairFieldConfig,
+  TextSuggestionsFieldConfig,
+} from '../field-config'
 import { resolveFieldConfigPrimaryName } from '../field-config'
 import { resolveFieldCopyContext } from '../config/field-copy-context.lib'
 import { resolveFieldInstruction } from '../config/field-instruction.lib'
@@ -62,6 +67,15 @@ export interface ResolvedFieldRenderConfig {
   hintIcon?: ReturnType<typeof resolveFieldHintPresentation>['icon']
   derivedMeta?: FieldDerivedMeta
   derivedMetaReserveSpace?: boolean
+  /** Text-suggestion strings resolved from `suggestions.suggestionsWhen`. */
+  resolvedSuggestions?: readonly string[]
+}
+
+function resolveTextSuggestions(
+  config: TextSuggestionsFieldConfig,
+  values: Record<string, unknown>,
+): readonly string[] {
+  return config.suggestions.suggestionsWhen(values)
 }
 
 function resolveDerivedMetaPresentation(
@@ -148,6 +162,14 @@ export function resolveFieldRenderConfig(
         ...(resolvedOptions !== undefined ? { options: resolvedOptions } : {}),
       } as FieldConfig,
       ...basePresentation,
+    }
+  }
+
+  if (config.type === 'textSuggestions') {
+    return {
+      config,
+      ...basePresentation,
+      resolvedSuggestions: resolveTextSuggestions(config, dynamicValues),
     }
   }
 

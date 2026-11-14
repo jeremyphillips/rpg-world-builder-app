@@ -1,659 +1,27 @@
 'use client'
 
 import * as React from 'react'
-import {
-  useController,
-  useFormContext,
-  useFormState,
-  type ControllerRenderProps,
-} from 'react-hook-form'
 
-import { CheckboxField } from '../../components/ui/checkbox-field'
-import { ChipsField } from '../../components/ui/chips-field.client'
-import { ComboboxFieldRenderer } from './fields/combobox/combobox-field-renderer.client'
-import { FormField } from '../../components/ui/form-field'
-import { NumberField } from '../../components/ui/number-field'
-import { NumberStepper } from '../../components/ui/number-stepper.client'
-import { resolveNumberStepperSizeFromFieldSize } from '../../components/ui/number-stepper.variants'
-import { RadioCardField } from '../../components/ui/radio-card-field'
-import { RadioGroupField } from '../../components/ui/radio-group-field'
-import { SegmentedControlField } from '../../components/ui/segmented-control-field.client'
-import { SwitchField } from '../../components/ui/switch-field'
-import { TextareaField } from '../../components/ui/textarea-field'
-import { TextField } from '../../components/ui/text-field'
-import { MarkdownField } from '../../components/ui/markdown-field.client'
-import type { FieldHintPosition } from '../../components/ui/field.variants'
-import type { FieldSize } from '../../components/ui/field.client'
-import { useFileFieldRemotePreview } from '../context/file-field-props.context'
-import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
-import { resolveFieldConfigBoundNames } from '../field-config'
+import { FieldDerivedMetaProvider } from '../../components/ui/field-derived-meta-context.client'
+import { resolveFieldChromeProps } from '../../components/ui/field-chrome.variants'
+import { useFieldRowParticipation } from '../../components/ui/field-row-anatomy.context'
+import { collectFieldDynamicDependsOn, type FieldConfig } from '../field-config'
+import { useDependsOnValues } from '../config/form-depends-on.client'
+import { useFormSectionContext } from '../context/form-section.context'
 import { mergeFieldConfigWithInteractivity } from './field-renderer-interactivity.lib'
-import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import {
   buildFieldRendererIds,
   buildJoinedPairRendererIds,
   resolveFieldRenderConfig,
 } from './field-renderer-config.lib'
-import {
-  pickFieldChromeProps,
-  resolveFieldChromeProps,
-} from '../../components/ui/field-chrome.variants'
-import { collectFieldDynamicDependsOn } from '../field-config'
-import { FieldDerivedMetaProvider } from '../../components/ui/field-derived-meta-context.client'
-import { renderSpecializedField } from './fields/field-renderer-specialized.client'
-import {
-  OptionalDisclosureRichTextFieldRenderer,
-  OptionalDisclosureSelectFieldRenderer,
-  OptionalDisclosureTextFieldRenderer,
-  OptionalDisclosureTextareaFieldRenderer,
-  OptionalDisclosureTextSuggestionsFieldRenderer,
-} from './fields/optional-disclosure/optional-disclosure-field-renderer.client'
+import { isMultiControllerField } from './field-renderer-families.lib'
+import type { ResolvedFieldRender } from './field-resolved-render.types'
 import { SelectFieldRenderer } from './fields/select/select-field-renderer.client'
+import { renderSpecializedField } from './fields/field-renderer-specialized.client'
 import { TextSuggestionsFieldRenderer } from './fields/text-suggestions-field-renderer.client'
-import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
-import type {
-  FieldConfig,
-  FieldType,
-  InputSelectFieldConfig,
-  SelectFieldConfig,
-  TextSuggestionsFieldConfig,
-  InlineSentenceFieldConfig,
-  ChooseFromChipsFieldConfig,
-  InputUnitFieldConfig,
-  JoinedPairFieldConfig,
-  LevelRangeFieldConfig,
-  RollValueFieldConfig,
-} from '../field-config'
-import { fieldDefaultValue, resolveFieldConfigPrimaryName } from '../field-config'
-import { assertOptionalDisclosureFieldConfig } from '../config/optional-disclosure-config.lib'
-import { useDependsOnValues } from '../config/form-depends-on.client'
-import { useFieldRowParticipation } from '../../components/ui/field-row-anatomy.context'
-import { useFormSectionContext } from '../context/form-section.context'
-import { resolveFieldLabelVisibility, type FieldLabelVisibility } from '../form-heading.lib'
-import type { JsonFieldProps } from '../../components/ui/json-field.client'
-import type { RichTextFieldProps } from '../../components/ui/rich-text-field'
-import type { FileFieldProps } from '../../components/ui/file-field.client'
-import type { EditableGridFieldRendererProps } from './fields/editable-grid-field-renderer.client'
+import { StandardFieldRenderer } from './standard-field-renderer.client'
 
-const LazyJsonField = lazyFieldComponent<JsonFieldProps>(
-  () => import('../../components/ui/json-field.client'),
-  'JsonField',
-)
-const LazyRichTextField = lazyFieldComponent<RichTextFieldProps>(
-  () => import('../../components/ui/rich-text-field'),
-  'RichTextField',
-)
-const LazyFileField = lazyFieldComponent<FileFieldProps>(
-  () => import('../../components/ui/file-field.client'),
-  'FileField',
-)
-const LazyEditableGridFieldRenderer = lazyFieldComponent<EditableGridFieldRendererProps>(
-  () => import('./fields/editable-grid-field-renderer.client'),
-  'EditableGridFieldRenderer',
-)
-
-/**
- * Steppers with a `defaultValue` keep the numeric fallback. A stepper with no
- * default, such as Base AC, stays blank until the author steps or types a number.
- */
-function resolveNumberStepperBinding(
-  fieldValue: unknown,
-  config: { defaultValue?: number; min?: number },
-): { value: number; unbound: boolean } {
-  if (typeof fieldValue === 'number') return { value: fieldValue, unbound: false }
-  if (config.defaultValue !== undefined) {
-    return { value: config.defaultValue ?? config.min ?? 0, unbound: false }
-  }
-  return { value: 0, unbound: true }
-}
-
-/** Parses a numeric `<input>` value into `number | undefined` (option A). */
-function parseNumber(raw: string): number | undefined {
-  if (raw.trim() === '') return undefined
-  const parsed = Number(raw)
-  return Number.isNaN(parsed) ? undefined : parsed
-}
-
-interface RenderArgs<K extends FieldType> {
-  config: Extract<FieldConfig, { type: K }>
-  presentationSize: FieldSize
-  controlSize: FieldSize
-  field: ControllerRenderProps
-  id: string
-  hint?: string
-  hintPosition?: FieldHintPosition
-  hintIcon?: 'info'
-  labelVisibility: FieldLabelVisibility
-  error?: string
-  invalid?: boolean
-  describedBy?: string
-  remotePreview?: ReturnType<typeof useFileFieldRemotePreview>
-  namePrefix?: string
-}
-
-function fieldValidationProps({
-  error,
-  invalid,
-  describedBy,
-}: Pick<RenderArgs<FieldType>, 'error' | 'invalid' | 'describedBy'>) {
-  return { error, invalid, describedBy }
-}
-
-/**
- * Per-type adapter registry: the single place that bridges RHF's `field`
- * (`{ value, onChange, onBlur, ref }`) to each wrapper's prop contract. Adding a
- * new control = adding one entry here. Notable per-type quirks handled below:
- * `number` coerces to `number | undefined`; `select`/`radio`/`radioCard` use `onValueChange`;
- * `checkbox`/`switch` use `onCheckedChange` (and checkbox coerces to a boolean).
- */
-const fieldRenderers: {
-  [K in Exclude<
-    FieldType,
-    | 'inputSelect'
-    | 'select'
-    | 'levelRange'
-    | 'inlineSentence'
-    | 'joinedPair'
-    | 'inlineChooseCount'
-    | 'chooseFromChips'
-    | 'inputUnit'
-    | 'rollValue'
-    | 'textSuggestions'
-  >]: (args: RenderArgs<K>) => React.ReactElement
-} = {
-  text: ({
-    config,
-    presentationSize,
-    controlSize,
-    field,
-    id,
-    hint,
-    hintPosition,
-    labelVisibility,
-    ...validation
-  }) => (
-    <TextField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      {...fieldValidationProps(validation)}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={presentationSize}
-      controlSize={controlSize}
-      type={config.inputType}
-      placeholder={config.placeholder}
-      autoComplete={config.autoComplete}
-      disabled={config.disabled}
-      trailingAction={config.trailingAction}
-      ref={field.ref}
-      value={field.value ?? ''}
-      onChange={field.onChange}
-      onBlur={field.onBlur}
-    />
-  ),
-  number: ({
-    config,
-    presentationSize,
-    controlSize,
-    field,
-    id,
-    hint,
-    hintPosition,
-    hintIcon,
-    labelVisibility,
-    ...validation
-  }) =>
-    config.control === 'stepper' ? (
-      <FormField
-        id={id}
-        {...pickFieldChromeProps(config)}
-        label={config.label}
-        labelVisibility={labelVisibility}
-        labelPosition={config.labelPosition}
-        {...fieldValidationProps(validation)}
-        hint={hint}
-        hintPosition={hintPosition}
-        hintIcon={hintIcon}
-        info={config.info}
-        required={config.required}
-        width={config.width}
-        size={presentationSize}
-        controlSize={controlSize}
-      >
-        <NumberStepper
-          id={id}
-          {...resolveNumberStepperBinding(field.value, config)}
-          onChange={field.onChange}
-          emptySeed={config.emptySeed}
-          min={config.min}
-          max={config.max}
-          step={config.step}
-          digits={config.digits}
-          size={resolveNumberStepperSizeFromFieldSize(controlSize)}
-          disabled={config.disabled}
-          aria-label={config.label}
-          aria-invalid={validation.invalid || undefined}
-          onBlur={field.onBlur}
-        />
-      </FormField>
-    ) : (
-      <NumberField
-        id={id}
-        {...pickFieldChromeProps(config)}
-        label={config.label}
-        labelVisibility={labelVisibility}
-        {...fieldValidationProps(validation)}
-        hint={hint}
-        hintPosition={hintPosition}
-        info={config.info}
-        required={config.required}
-        width={config.width}
-        inputWidth={config.inputWidth}
-        size={presentationSize}
-        controlSize={controlSize}
-        placeholder={config.placeholder}
-        disabled={config.disabled}
-        step={config.step}
-        stepperMin={config.min}
-        stepperMax={config.max}
-        digits={config.digits}
-        labelPosition={config.labelPosition}
-        ref={field.ref}
-        value={field.value ?? ''}
-        onChange={(event) => field.onChange(parseNumber(event.target.value))}
-        onBlur={field.onBlur}
-      />
-    ),
-  textarea: ({
-    config,
-    presentationSize,
-    controlSize,
-    field,
-    id,
-    hint,
-    hintPosition,
-    labelVisibility,
-    ...validation
-  }) => (
-    <TextareaField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      {...fieldValidationProps(validation)}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={presentationSize}
-      controlSize={controlSize}
-      placeholder={config.placeholder}
-      rows={config.rows}
-      disabled={config.disabled}
-      ref={field.ref}
-      value={field.value ?? ''}
-      onChange={field.onChange}
-      onBlur={field.onBlur}
-    />
-  ),
-  segmentedControl: ({
-    config,
-    presentationSize,
-    controlSize,
-    field,
-    id,
-    hint,
-    hintPosition,
-    labelVisibility,
-    ...validation
-  }) => (
-    <SegmentedControlField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      options={config.options}
-      {...fieldValidationProps(validation)}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      disabled={config.disabled}
-      size={presentationSize}
-      controlSize={controlSize}
-      fullWidth={config.fullWidth}
-      value={field.value != null && field.value !== '' ? String(field.value) : ''}
-      onValueChange={field.onChange}
-      onBlur={field.onBlur}
-    />
-  ),
-  radio: ({ config, field, id, hint, hintPosition, labelVisibility, ...validation }) => (
-    <RadioGroupField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      options={config.options}
-      {...fieldValidationProps(validation)}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      disabled={config.disabled}
-      orientation={config.orientation}
-      value={field.value ?? ''}
-      onValueChange={field.onChange}
-      onBlur={field.onBlur}
-    />
-  ),
-  radioCard: ({ config, field, id, hint, hintPosition, labelVisibility, ...validation }) => (
-    <RadioCardField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      options={config.options}
-      {...fieldValidationProps(validation)}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      disabled={config.disabled}
-      value={field.value ?? ''}
-      onValueChange={field.onChange}
-      onBlur={field.onBlur}
-    />
-  ),
-  checkbox: ({
-    config,
-    presentationSize,
-    controlSize,
-    field,
-    id,
-    hint,
-    hintPosition: _hintPosition,
-    labelVisibility,
-    ...validation
-  }) => (
-    <CheckboxField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      {...fieldValidationProps(validation)}
-      hint={hint}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={presentationSize}
-      controlSize={controlSize}
-      disabled={config.disabled}
-      checked={field.value ?? false}
-      onCheckedChange={(checked) => field.onChange(checked === true)}
-      onBlur={field.onBlur}
-    />
-  ),
-  switch: ({
-    config,
-    presentationSize,
-    controlSize,
-    field,
-    id,
-    hint,
-    hintPosition,
-    labelVisibility,
-    ...validation
-  }) => (
-    <SwitchField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      labelPosition={config.labelPosition}
-      {...fieldValidationProps(validation)}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={presentationSize}
-      controlSize={controlSize}
-      disabled={config.disabled}
-      checked={field.value ?? false}
-      onCheckedChange={field.onChange}
-      onBlur={field.onBlur}
-    />
-  ),
-  json: ({
-    config,
-    presentationSize,
-    controlSize,
-    field,
-    id,
-    hint,
-    hintPosition,
-    labelVisibility,
-    ...validation
-  }) => (
-    <LazyFieldSuspense>
-      <LazyJsonField
-        id={id}
-        {...pickFieldChromeProps(config)}
-        label={config.label}
-        labelVisibility={labelVisibility}
-        {...fieldValidationProps(validation)}
-        hint={hint}
-        hintPosition={hintPosition}
-        info={config.info}
-        required={config.required}
-        width={config.width}
-        size={presentationSize}
-        controlSize={controlSize}
-        placeholder={config.placeholder}
-        example={config.example}
-        disabled={config.disabled}
-        value={field.value ?? ''}
-        onChange={field.onChange}
-        onBlur={field.onBlur}
-      />
-    </LazyFieldSuspense>
-  ),
-  richtext: ({
-    config,
-    presentationSize,
-    controlSize,
-    field,
-    id,
-    hint,
-    hintPosition,
-    labelVisibility,
-    ...validation
-  }) => (
-    <LazyFieldSuspense>
-      <LazyRichTextField
-        id={id}
-        {...pickFieldChromeProps(config)}
-        label={config.label}
-        labelVisibility={labelVisibility}
-        {...fieldValidationProps(validation)}
-        hint={hint}
-        hintPosition={hintPosition}
-        info={config.info}
-        required={config.required}
-        width={config.width}
-        size={presentationSize}
-        controlSize={controlSize}
-        linkable={config.linkable}
-        codeBlocks={config.codeBlocks}
-        tables={config.tables}
-        internalLinkOptions={config.internalLinkOptions}
-        contentTypeOptions={config.contentTypeOptions}
-        disabled={config.disabled}
-        value={field.value ?? ''}
-        onChange={field.onChange}
-        onBlur={field.onBlur}
-      />
-    </LazyFieldSuspense>
-  ),
-  markdown: ({
-    config,
-    presentationSize,
-    controlSize,
-    field,
-    id,
-    hint,
-    hintPosition,
-    labelVisibility,
-    ...validation
-  }) => (
-    <MarkdownField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      {...fieldValidationProps(validation)}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={presentationSize}
-      controlSize={controlSize}
-      rows={config.rows}
-      placeholder={config.placeholder}
-      disabled={config.disabled}
-      value={field.value ?? ''}
-      onChange={field.onChange}
-      onBlur={field.onBlur}
-    />
-  ),
-  file: ({
-    config,
-    field,
-    id,
-    hint,
-    hintPosition,
-    labelVisibility,
-    remotePreview,
-    ...validation
-  }) => (
-    <LazyFieldSuspense>
-      <LazyFileField
-        id={id}
-        {...pickFieldChromeProps(config)}
-        label={config.label}
-        labelVisibility={labelVisibility}
-        {...fieldValidationProps(validation)}
-        hint={hint}
-        hintPosition={hintPosition}
-        info={config.info}
-        required={config.required}
-        width={config.width}
-        accept={config.accept}
-        multiple={config.multiple}
-        maxFiles={config.maxFiles}
-        maxSize={config.maxSize}
-        disabled={config.disabled}
-        value={field.value ?? []}
-        onChange={field.onChange}
-        existingImageUrl={remotePreview?.existingImageUrl}
-        existingImageLabel={remotePreview?.existingImageLabel}
-        onClearExisting={remotePreview?.onClearExisting}
-      />
-    </LazyFieldSuspense>
-  ),
-  chips: ({
-    config,
-    presentationSize,
-    controlSize,
-    field,
-    id,
-    hint,
-    hintPosition,
-    labelVisibility,
-    ...validation
-  }) => (
-    <ChipsField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      introText={config.introText}
-      options={config.options}
-      multiple={config.multiple}
-      max={config.max}
-      {...fieldValidationProps(validation)}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      size={presentationSize}
-      controlSize={controlSize}
-      chipSize={config.chipSize}
-      width={config.width}
-      disabled={config.disabled}
-      value={field.value ?? fieldDefaultValue(config)}
-      onChange={field.onChange}
-      onBlur={field.onBlur}
-    />
-  ),
-  combobox: ({
-    config,
-    presentationSize,
-    controlSize,
-    field,
-    id,
-    hint,
-    hintPosition,
-    labelVisibility,
-    namePrefix,
-    ...validation
-  }) => (
-    <ComboboxFieldRenderer
-      config={config}
-      presentationSize={presentationSize}
-      controlSize={controlSize}
-      field={field}
-      id={id}
-      hint={hint}
-      hintPosition={hintPosition}
-      labelVisibility={labelVisibility}
-      namePrefix={namePrefix}
-      {...fieldValidationProps(validation)}
-    />
-  ),
-  editableGrid: ({ config, field, id, namePrefix, ...validation }) => (
-    <LazyFieldSuspense>
-      <LazyEditableGridFieldRenderer
-        config={config}
-        field={field}
-        id={id}
-        {...fieldValidationProps(validation)}
-        namePrefix={namePrefix}
-      />
-    </LazyFieldSuspense>
-  ),
-  diceFormula: ({ config, field, id, hint, hintPosition, namePrefix, ...validation }) => (
-    <DiceFormulaFieldRenderer
-      config={config}
-      field={field}
-      id={id}
-      hint={hint}
-      hintPosition={hintPosition}
-      {...fieldValidationProps(validation)}
-      namePrefix={namePrefix}
-    />
-  ),
-}
+export type { ResolvedFieldRender } from './field-resolved-render.types'
 
 export interface FieldRendererProps {
   config: FieldConfig
@@ -669,7 +37,7 @@ export interface FieldRendererProps {
 
 function wrapFieldDerivedMetaPresentation(
   node: React.ReactElement,
-  resolved: ReturnType<typeof resolveFieldRenderConfig>,
+  resolved: Pick<ResolvedFieldRender, 'derivedMeta' | 'derivedMetaReserveSpace'>,
 ) {
   if (!resolved.derivedMeta && !resolved.derivedMetaReserveSpace) return node
 
@@ -683,10 +51,16 @@ function wrapFieldDerivedMetaPresentation(
   )
 }
 
+function optionAvailabilityDependsOn(config: FieldConfig): readonly string[] {
+  if (config.type === 'chips' || config.type === 'select' || config.type === 'combobox') {
+    return config.optionAvailability?.dependsOn ?? []
+  }
+  return []
+}
+
 /**
- * Binds one `FieldConfig` to react-hook-form via `useController` (so only this
- * field re-renders on its own value/error change) and dispatches to the matching
- * adapter. Must be rendered inside a `FormProvider` (the `<Form>` renderer).
+ * Resolves one `FieldConfig` and dispatches to the binding family that owns it.
+ * Must be rendered inside a `FormProvider` (the `<Form>` renderer).
  */
 export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererProps) {
   const sectionContext = useFormSectionContext()
@@ -700,241 +74,51 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
       : buildFieldRendererIds(chromedConfig, idPrefix, namePrefix)
 
   const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(chromedConfig), namePrefix)
-  const optionAvailability =
-    chromedConfig.type === 'chips' || chromedConfig.type === 'select'
-      ? chromedConfig.optionAvailability
-      : undefined
-  const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
-  const resolved = resolveFieldRenderConfig(
+  const optionValues = useDependsOnValues(optionAvailabilityDependsOn(chromedConfig), namePrefix)
+  const resolvedConfig = resolveFieldRenderConfig(
     chromedConfig,
     { density, defaultControlSize },
     dynamicValues,
     optionValues,
     { inAnatomyRow },
   )
-  const mergedRenderConfig = mergeFieldConfigWithInteractivity(
-    chromedConfig,
-    resolved.config,
-    dynamicValues,
-  )
-
-  const specialized = renderSpecializedField({
-    renderConfig: resolved.config,
+  const resolved: ResolvedFieldRender = {
+    authored: config,
+    config: resolvedConfig.config,
+    presentationSize: resolvedConfig.presentationSize,
+    controlSize: resolvedConfig.controlSize,
+    hint: resolvedConfig.hint,
+    hintPosition: resolvedConfig.hintPosition,
+    hintIcon: resolvedConfig.hintIcon,
+    derivedMeta: resolvedConfig.derivedMeta,
+    derivedMetaReserveSpace: resolvedConfig.derivedMetaReserveSpace,
+    resolvedSuggestions: resolvedConfig.resolvedSuggestions,
     fullName,
     id,
     namePrefix,
-    hint: resolved.hint,
-    hintPosition: resolved.hintPosition,
-  })
-  if (specialized) {
-    return wrapFieldDerivedMetaPresentation(specialized, resolved)
   }
 
-  if (chromedConfig.type === 'select') {
-    if (chromedConfig.optionalDisclosure) {
-      assertOptionalDisclosureFieldConfig(chromedConfig)
-      return wrapFieldDerivedMetaPresentation(
-        <OptionalDisclosureSelectFieldRenderer
-          config={chromedConfig}
-          disclosure={chromedConfig.optionalDisclosure}
-          fullName={fullName}
-          id={id}
-          namePrefix={namePrefix}
-        />,
-        resolved,
-      )
-    }
-
-    return wrapFieldDerivedMetaPresentation(
-      <SelectFieldRenderer
-        config={chromedConfig}
-        fullName={fullName}
-        id={id}
-        namePrefix={namePrefix}
-      />,
-      resolved,
-    )
-  }
-
-  if (chromedConfig.type === 'textSuggestions') {
-    if (chromedConfig.optionalDisclosure) {
-      assertOptionalDisclosureFieldConfig(chromedConfig)
-      return wrapFieldDerivedMetaPresentation(
-        <OptionalDisclosureTextSuggestionsFieldRenderer
-          config={chromedConfig}
-          disclosure={chromedConfig.optionalDisclosure}
-          fullName={fullName}
-          id={id}
-          namePrefix={namePrefix}
-        />,
-        resolved,
-      )
-    }
-
-    return wrapFieldDerivedMetaPresentation(
-      <TextSuggestionsFieldRenderer
-        config={chromedConfig}
-        fullName={fullName}
-        id={id}
-        namePrefix={namePrefix}
-      />,
-      resolved,
-    )
-  }
-
-  return wrapFieldDerivedMetaPresentation(
-    <StandardFieldRenderer
-      config={chromedConfig}
-      renderConfig={mergedRenderConfig as StandardFieldConfig}
-      presentationSize={resolved.presentationSize}
-      controlSize={resolved.controlSize}
-      hint={resolved.hint}
-      hintPosition={resolved.hintPosition}
-      hintIcon={resolved.hintIcon}
-      fullName={fullName}
-      id={id}
-      namePrefix={namePrefix}
-    />,
-    resolved,
+  const node = renderResolvedField(resolved, () =>
+    mergeFieldConfigWithInteractivity(chromedConfig, resolved.config, dynamicValues),
   )
+  return wrapFieldDerivedMetaPresentation(node, resolved)
 }
 
-type StandardFieldConfig = Exclude<
-  FieldConfig,
-  | InputSelectFieldConfig
-  | SelectFieldConfig
-  | TextSuggestionsFieldConfig
-  | LevelRangeFieldConfig
-  | InlineSentenceFieldConfig
-  | Extract<FieldConfig, { type: 'inlineChooseCount' }>
-  | ChooseFromChipsFieldConfig
-  | InputUnitFieldConfig
-  | JoinedPairFieldConfig
-  | RollValueFieldConfig
->
-
-interface StandardFieldRendererProps {
-  config: FieldConfig
-  renderConfig: StandardFieldConfig
-  presentationSize: FieldSize
-  controlSize: FieldSize
-  hint?: string
-  hintPosition?: FieldHintPosition
-  hintIcon?: 'info'
-  fullName: string
-  id: string
-  namePrefix?: string
-}
-
-function StandardFieldRenderer({
-  config,
-  renderConfig,
-  presentationSize,
-  controlSize,
-  hint,
-  hintPosition,
-  hintIcon,
-  fullName,
-  id,
-  namePrefix,
-}: StandardFieldRendererProps) {
-  const { getFieldState, trigger } = useFormContext()
-  const { field, fieldState } = useController({
-    name: fullName,
-    defaultValue: fieldDefaultValue(config),
-  })
-  const formState = useFormState({ name: fullName, exact: true })
-  const liveError = getFieldState(fullName, formState).error
-  const boundPaths = React.useMemo(
-    () =>
-      resolveFieldConfigBoundNames(renderConfig).map((name) =>
-        namePrefix ? `${namePrefix}.${name}` : name,
-      ),
-    [namePrefix, renderConfig],
-  )
-  const runFieldTrigger = React.useCallback(() => {
-    void trigger(boundPaths.length === 1 ? boundPaths[0]! : boundPaths, { shouldFocus: false })
-  }, [boundPaths, trigger])
-  const progressiveField = {
-    ...field,
-    onBlur: () => {
-      field.onBlur()
-      runFieldTrigger()
-    },
-    onChange: (value: Parameters<typeof field.onChange>[0]) => {
-      field.onChange(value)
-      if (getFieldState(fullName, formState).isTouched) {
-        runFieldTrigger()
-      }
-    },
-  }
-  const remotePreview = useFileFieldRemotePreview(resolveFieldConfigPrimaryName(config))
-  const validation = useFieldErrorPresentation(
-    liveError?.message ?? fieldState.error?.message,
-    fullName,
-  )
-  assertOptionalDisclosureFieldConfig(config)
-  const labelVisibility = resolveFieldLabelVisibility(config)
-
-  if (renderConfig.type === 'text' && renderConfig.optionalDisclosure) {
-    return (
-      <OptionalDisclosureTextFieldRenderer
-        config={renderConfig}
-        disclosure={renderConfig.optionalDisclosure}
-        field={progressiveField}
-        id={id}
-        hint={hint}
-        hintPosition={hintPosition}
-        {...validation}
-      />
-    )
+function renderResolvedField(
+  resolved: ResolvedFieldRender,
+  mergeStandardConfig: () => FieldConfig,
+): React.ReactElement {
+  if (isMultiControllerField(resolved.config)) {
+    return renderSpecializedField({ resolved: { ...resolved, config: resolved.config } })
   }
 
-  if (renderConfig.type === 'textarea' && renderConfig.optionalDisclosure) {
-    return (
-      <OptionalDisclosureTextareaFieldRenderer
-        config={renderConfig}
-        disclosure={renderConfig.optionalDisclosure}
-        field={progressiveField}
-        id={id}
-        hint={hint}
-        hintPosition={hintPosition}
-        {...validation}
-      />
-    )
+  if (resolved.config.type === 'select') {
+    return <SelectFieldRenderer resolved={resolved} />
   }
 
-  if (renderConfig.type === 'richtext' && renderConfig.optionalDisclosure) {
-    return (
-      <OptionalDisclosureRichTextFieldRenderer
-        config={renderConfig}
-        disclosure={renderConfig.optionalDisclosure}
-        field={progressiveField}
-        id={id}
-        hint={hint}
-        hintPosition={hintPosition}
-        {...validation}
-      />
-    )
+  if (resolved.config.type === 'textSuggestions') {
+    return <TextSuggestionsFieldRenderer resolved={resolved} />
   }
 
-  // The registry is keyed by the literal type; TS can't prove the union element
-  // matches a single entry, so widen the call signature at this one boundary.
-  const render = fieldRenderers[renderConfig.type] as (
-    args: RenderArgs<FieldType>,
-  ) => React.ReactElement
-  return render({
-    config: renderConfig,
-    presentationSize,
-    controlSize,
-    field: progressiveField,
-    id,
-    hint,
-    hintPosition,
-    hintIcon,
-    labelVisibility,
-    ...validation,
-    remotePreview,
-    namePrefix,
-  })
+  return <StandardFieldRenderer resolved={{ ...resolved, config: mergeStandardConfig() }} />
 }

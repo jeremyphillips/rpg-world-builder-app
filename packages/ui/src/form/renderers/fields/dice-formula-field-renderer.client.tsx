@@ -3,11 +3,10 @@
 import { useController } from 'react-hook-form'
 
 import { DiceFormulaField } from '../../../components/ui/dice-formula-field.client'
-import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
+import { buildFieldShellProps } from '../field-shell-props.lib'
 import type { DiceFormulaValue } from '../../../components/ui/dice-formula-field.lib'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { DiceFormulaFieldConfig } from '../../field-config'
-import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 import { useFieldControlSize } from '../../context/form-section.context'
 
 export interface DiceFormulaFieldRendererProps {
@@ -55,18 +54,19 @@ export function DiceFormulaFieldRenderer({
 
   return (
     <DiceFormulaField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={resolveFieldLabelVisibility(config)}
-      error={error}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
+      {...buildFieldShellProps(
+        {
+          config,
+          id,
+          hint,
+          hintPosition,
+          presentationSize: controlSize,
+          controlSize,
+        },
+        { error },
+        { sizes: 'none', label: 'visible' },
+      )}
       size={controlSize}
-      disabled={config.disabled}
       labelPosition={config.labelPosition}
       modifierMode={config.modifierMode}
       faces={config.faces}

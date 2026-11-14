@@ -1,11 +1,11 @@
 'use client'
 
-import type { FieldHintPosition } from '../../../components/ui/field.variants'
-import type { FieldConfig } from '../../field-config'
 import {
   chooseFromChipsToInlineSentence,
   inlineChooseCountToInlineSentence,
 } from '../../config/inline-sentence-legacy-config.lib'
+import type { MultiControllerFieldConfig } from '../field-renderer-families.lib'
+import type { ResolvedFieldRender } from '../field-resolved-render.types'
 import { InlineSentenceFieldRenderer } from './inline-sentence/inline-sentence-field-renderer.client'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
@@ -15,24 +15,13 @@ import { OptionalDisclosureJoinedPairFieldRenderer } from './joined-pair/optiona
 import { OptionalDisclosureRollValueFieldRenderer } from './optional-disclosure/optional-disclosure-roll-value-field-renderer.client'
 import { RollValueFieldRenderer } from './roll-value-field-renderer.client'
 
-type SpecializedFieldRendererProps = {
-  renderConfig: FieldConfig
-  fullName: string
-  id: string
-  namePrefix?: string
-  hint?: string
-  hintPosition?: FieldHintPosition
-}
-
-/** Renders field types that bypass the standard `useController` registry path. */
+/** Renders field types that register more than one controller. */
 export function renderSpecializedField({
-  renderConfig,
-  fullName,
-  id,
-  namePrefix,
-  hint,
-  hintPosition,
-}: SpecializedFieldRendererProps) {
+  resolved,
+}: {
+  resolved: ResolvedFieldRender & { config: MultiControllerFieldConfig }
+}) {
+  const { config: renderConfig, fullName, id, namePrefix, hint, hintPosition } = resolved
   switch (renderConfig.type) {
     case 'inputSelect':
       return (
@@ -110,7 +99,9 @@ export function renderSpecializedField({
           hintPosition={hintPosition}
         />
       )
-    default:
-      return null
+    default: {
+      const unreachable: never = renderConfig
+      return unreachable
+    }
   }
 }

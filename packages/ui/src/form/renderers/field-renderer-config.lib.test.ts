@@ -36,4 +36,21 @@ describe('resolveFieldRenderConfig', () => {
 
     expect(resolved.hint).toBe('Pick your two best stats.')
   })
+
+  it('resolves text suggestion strings from watched values', () => {
+    const config: FieldConfig = {
+      type: 'textSuggestions',
+      name: 'refinement',
+      label: 'Refinement',
+      suggestions: {
+        dependsOn: ['driver'],
+        suggestionsWhen: (values) => (values.driver === 'inn' ? ['coaching inn'] : []),
+      },
+    }
+
+    expect(
+      resolveFieldRenderConfig(config, { density: 'comfortable' }, { driver: 'inn' }, {})
+        .resolvedSuggestions,
+    ).toEqual(['coaching inn'])
+  })
 })

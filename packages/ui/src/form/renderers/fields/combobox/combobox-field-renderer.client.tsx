@@ -13,7 +13,7 @@ import type {
 } from '../../../field-config'
 import { fieldDefaultValue } from '../../../field-config'
 import type { FieldValidationProps } from '../../../../components/ui/field-validation-props'
-import { pickFieldChromeProps } from '../../../../components/ui/field-chrome.variants'
+import { buildFieldShellProps } from '../../field-shell-props.lib'
 import { ComboboxFilterToolbar } from './combobox-filter-toolbar.client'
 import type { ResolveComboboxFilteredOptions } from '../../../../components/ui/combobox-field.types'
 import {
@@ -75,7 +75,6 @@ export function ComboboxFieldRenderer({
   id,
   hint,
   hintPosition,
-  labelVisibility,
   namePrefix,
   ...validation
 }: ComboboxFieldRendererProps) {
@@ -116,10 +115,18 @@ export function ComboboxFieldRenderer({
 
   return (
     <ComboboxField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
+      {...buildFieldShellProps(
+        {
+          config,
+          id,
+          hint,
+          hintPosition,
+          presentationSize,
+          controlSize,
+        },
+        validation,
+        { sizes: 'both', label: 'visible' },
+      )}
       options={comboboxOptions}
       multiple={config.multiple}
       max={config.max}
@@ -127,16 +134,7 @@ export function ComboboxFieldRenderer({
       closedPlaceholderIntent={config.closedPlaceholderIntent}
       noun={config.noun}
       searchPlaceholder={config.searchPlaceholder}
-      {...validation}
-      hint={hint}
-      hintPosition={hintPosition}
       recommendation={recommendation}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={presentationSize}
-      controlSize={controlSize}
-      disabled={config.disabled}
       value={field.value ?? fieldDefaultValue(config)}
       onChange={field.onChange}
       onBlur={field.onBlur}

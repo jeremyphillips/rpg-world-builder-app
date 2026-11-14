@@ -1,6 +1,6 @@
 'use client'
 
-import { pickFieldChromeProps } from '../../../../components/ui/field-chrome.variants'
+import { buildFieldShellProps } from '../../field-shell-props.lib'
 import type { JoinedPairFieldConfig } from '../../../field-config'
 import { JoinedPairFieldForm } from '../../../../components/ui/joined-pair-field-form.client'
 import { useJoinedPairFieldRendererState } from './joined-pair-field-renderer-state.client'
@@ -34,18 +34,20 @@ export function JoinedPairFieldRenderer({
 
   return (
     <JoinedPairFieldForm
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
+      {...buildFieldShellProps(
+        {
+          config,
+          id,
+          hint: hintPresentation.text,
+          hintPosition: hintPresentation.position,
+          presentationSize: controlSize,
+          controlSize,
+        },
+        { error: validation.error },
+        { sizes: 'none', label: 'visible' },
+      )}
       labelVisibility={labelVisibility}
-      error={validation.error}
-      hint={hintPresentation.text}
-      hintPosition={hintPresentation.position}
-      info={config.info}
-      required={config.required}
-      disabled={config.disabled}
       size={controlSize}
-      width={config.width}
       showLayoutMessage={showLayoutMessage}
       start={controls.start}
       end={controls.end}

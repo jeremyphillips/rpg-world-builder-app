@@ -4,7 +4,7 @@ import { useContext, useEffect, useMemo, useRef } from 'react'
 import { useController, type UseControllerReturn } from 'react-hook-form'
 
 import { InlineSentenceField } from '../../../../components/ui/inline-sentence-field.client'
-import { pickFieldChromeProps } from '../../../../components/ui/field-chrome.variants'
+import { buildFieldShellProps } from '../../field-shell-props.lib'
 import { assertAllowedJoinedPairComposition } from '../../../../components/ui/joined-pair-field.lib'
 import {
   coerceInlineSentenceSelectValue,
@@ -518,22 +518,24 @@ export function InlineSentenceFieldRenderer({
 
   return (
     <InlineSentenceField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
+      {...buildFieldShellProps(
+        {
+          config,
+          id,
+          hint: hintPresentation.text,
+          hintPosition: hintPresentation.position,
+          presentationSize: controlSize,
+          controlSize,
+        },
+        { error: combinedError },
+        { sizes: 'none', label: 'visible' },
+      )}
       fieldName={config.name}
       segments={visibleSegments}
       controls={controls}
       below={config.below}
       belowControl={belowControl}
-      error={combinedError}
-      hint={hintPresentation.text}
-      hintPosition={hintPresentation.position}
-      info={config.info}
-      required={config.required}
-      disabled={config.disabled}
       size={controlSize}
-      width={config.width}
       labelVisibility={config.labelVisibility}
       chipSize={config.chipSize}
     />

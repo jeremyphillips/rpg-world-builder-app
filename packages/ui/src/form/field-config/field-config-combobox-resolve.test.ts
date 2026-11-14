@@ -78,7 +78,7 @@ describe('resolveComboboxFieldConfig', () => {
     expect(firstOption?.filterValues?.kind).toBe('district')
   })
 
-  it('collects recommendationResolve dependsOn for combobox fields', () => {
+  it('leaves recommendationResolve dependsOn to the combobox renderer', () => {
     const config: ComboboxFieldConfig = {
       type: 'combobox',
       name: 'items',
@@ -90,6 +90,6 @@ describe('resolveComboboxFieldConfig', () => {
       },
     }
 
-    expect(collectFieldDynamicDependsOn(config)).toEqual(['equipment', 'mode'])
+    expect(collectFieldDynamicDependsOn(config)).toEqual([])
   })
 })

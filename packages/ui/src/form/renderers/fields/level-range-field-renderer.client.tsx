@@ -13,7 +13,7 @@ import {
   flattenSelectFieldOptions,
   LevelRangeField,
 } from '../../../components/ui/level-range-field.client'
-import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
+import { buildFieldShellProps } from '../field-shell-props.lib'
 import {
   applyArrayFilterSelectOptions,
   useArrayFieldContext,
@@ -22,8 +22,6 @@ import { useFieldControlSize } from '../../context/form-section.context'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { LevelRangeFieldConfig } from '../../field-config'
-import { resolveFieldLabelVisibility } from '../../form-heading.lib'
-
 export interface LevelRangeFieldRendererProps {
   config: LevelRangeFieldConfig
   id: string
@@ -187,10 +185,18 @@ export function LevelRangeFieldRenderer({
 
   return (
     <LevelRangeField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={resolveFieldLabelVisibility(config)}
+      {...buildFieldShellProps(
+        {
+          config,
+          id,
+          hint,
+          hintPosition,
+          presentationSize: controlSize,
+          controlSize,
+        },
+        { error: combinedError },
+        { sizes: 'none', label: 'visible' },
+      )}
       minId={minId}
       maxId={maxId}
       minValue={minLevel}
@@ -198,14 +204,7 @@ export function LevelRangeFieldRenderer({
       minOptions={minOptions}
       maxOptions={maxOptions}
       connector={config.connector}
-      error={combinedError}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      disabled={config.disabled}
       size={controlSize}
-      width={config.width}
       digits={config.digits}
       onMinChange={onMinChange}
       onMaxChange={onMaxChange}

@@ -1,7 +1,5 @@
-import type { FieldSize } from '../../../../components/ui/field.client'
-import type { FieldHintPosition } from '../../../../components/ui/field.variants'
 import type { FieldOption, SelectFieldConfig } from '../../../field-config'
-import { resolveFieldLabelVisibility } from '../../../form-heading.lib'
+import type { FieldShellProps } from '../../field-shell-props.lib'
 import type { FieldValidationProps } from '../../../../components/ui/field-validation-props'
 
 export function soleSelectOptionValue(options: readonly FieldOption[]): string | undefined {
@@ -12,43 +10,12 @@ export function normalizedSelectFieldValue(value: unknown): string {
   return value != null && value !== '' ? String(value) : ''
 }
 
-export type SelectFieldChromeProps = {
-  label: string
-  hint?: string
-  hintPosition?: FieldHintPosition
-  info?: SelectFieldConfig['info']
-  required?: boolean
-  width?: SelectFieldConfig['width']
-  size?: FieldSize
-  controlSize?: FieldSize
+/** Shell props plus select sizing extras. Built beside `buildFieldShellProps`, not by a second picker. */
+export type SelectFieldChromeProps = FieldShellProps & {
   digits?: SelectFieldConfig['digits']
   sizingLabel?: SelectFieldConfig['sizingLabel']
   sizingLabels?: SelectFieldConfig['sizingLabels']
   labelPosition?: SelectFieldConfig['labelPosition']
-  labelVisibility?: SelectFieldConfig['labelVisibility']
-  chrome?: SelectFieldConfig['chrome']
-}
-
-export function pickSelectFieldChromeProps(
-  config: SelectFieldConfig,
-  presentation?: Pick<SelectFieldChromeProps, 'hint' | 'hintPosition' | 'size' | 'controlSize'>,
-): SelectFieldChromeProps {
-  return {
-    label: config.label,
-    hint: presentation?.hint,
-    hintPosition: presentation?.hintPosition,
-    info: config.info,
-    required: config.required,
-    width: config.width,
-    size: presentation?.size,
-    controlSize: presentation?.controlSize,
-    digits: config.digits,
-    sizingLabel: config.sizingLabel,
-    sizingLabels: config.sizingLabels,
-    labelPosition: config.labelPosition,
-    labelVisibility: resolveFieldLabelVisibility(config),
-    chrome: config.chrome,
-  }
 }
 
 export type SelectFieldPresentationProps = SelectFieldChromeProps &

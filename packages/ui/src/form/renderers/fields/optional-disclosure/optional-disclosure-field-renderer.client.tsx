@@ -5,10 +5,10 @@ import type { ControllerRenderProps } from 'react-hook-form'
 import { useController, useFormState } from 'react-hook-form'
 
 import { normalizeRichTextHtml } from '../../../../components/ui/rich-text-html'
-import type { RichTextFieldProps } from '../../../../components/ui/rich-text-field'
 import { FieldReadOnlyValueField } from '../../../../components/ui/field-read-only-value.client'
 import { OptionalFieldDisclosure } from '../../../../components/ui/optional-field-disclosure.client'
-import { pickFieldChromeProps } from '../../../../components/ui/field-chrome.variants'
+import { buildFieldShellProps } from '../../field-shell-props.lib'
+import type { ResolvedFieldRender } from '../../field-resolved-render.types'
 import { SelectField } from '../../../../components/ui/select-field'
 import { TextField } from '../../../../components/ui/text-field'
 import { TextareaField } from '../../../../components/ui/textarea-field'
@@ -26,19 +26,12 @@ import type {
   TextareaFieldConfig,
   TextSuggestionsFieldConfig,
 } from '../../../field-config'
-import { LazyFieldSuspense, lazyFieldComponent } from '../../lazy-field.client'
+import { LazyFieldSuspense } from '../../lazy-field.client'
+import { LazyRichTextField } from '../lazy-rich-text-field.client'
 import { fieldDefaultValue, resolveFieldHintPresentation } from '../../../field-config'
 import { useConfirmBeforeClear } from '../../../config/use-confirm-before-clear.client'
-import {
-  normalizedSelectFieldValue,
-  pickSelectFieldChromeProps,
-} from '../select/select-field-renderer.lib'
+import { normalizedSelectFieldValue } from '../select/select-field-renderer.lib'
 import { useSelectFieldRendererState } from '../select/use-select-field-renderer-state.client'
-
-const LazyRichTextField = lazyFieldComponent<RichTextFieldProps>(
-  () => import('../../../../components/ui/rich-text-field'),
-  'RichTextField',
-)
 
 function richTextHtml(value: unknown): string {
   return normalizeRichTextHtml(typeof value === 'string' ? value : undefined)
@@ -104,18 +97,18 @@ export function OptionalDisclosureTextareaFieldRenderer({
         size={controlSize}
       >
         <TextareaField
-          id={id}
-          {...pickFieldChromeProps(config)}
-          label=""
-          aria-label={config.label}
-          error={error}
-          invalid={invalid}
-          describedBy={describedBy}
-          hint={hint}
-          hintPosition={hintPosition}
-          info={config.info}
-          required={config.required}
-          width={config.width}
+          {...buildFieldShellProps(
+            {
+              config,
+              id,
+              hint,
+              hintPosition,
+              presentationSize: controlSize,
+              controlSize,
+            },
+            { error, invalid, describedBy },
+            { sizes: 'none', label: 'accessible-name' },
+          )}
           size={controlSize}
           placeholder={config.placeholder}
           rows={config.rows}
@@ -197,18 +190,18 @@ export function OptionalDisclosureTextFieldRenderer({
         size={controlSize}
       >
         <TextField
-          id={id}
-          {...pickFieldChromeProps(config)}
-          label=""
-          aria-label={config.label}
-          error={error}
-          invalid={invalid}
-          describedBy={describedBy}
-          hint={hint}
-          hintPosition={hintPosition}
-          info={config.info}
-          required={config.required}
-          width={config.width}
+          {...buildFieldShellProps(
+            {
+              config,
+              id,
+              hint,
+              hintPosition,
+              presentationSize: controlSize,
+              controlSize,
+            },
+            { error, invalid, describedBy },
+            { sizes: 'none', label: 'accessible-name' },
+          )}
           size={controlSize}
           placeholder={config.placeholder}
           disabled={config.disabled}
@@ -226,9 +219,7 @@ export function OptionalDisclosureTextFieldRenderer({
 export type OptionalDisclosureSelectFieldRendererProps = {
   config: SelectFieldConfig
   disclosure: OptionalDisclosureConfig
-  fullName: string
-  id: string
-  namePrefix?: string
+  resolved: ResolvedFieldRender
 }
 
 function selectFieldHasValue(value: unknown): boolean {
@@ -239,20 +230,40 @@ function selectFieldHasValue(value: unknown): boolean {
 export function OptionalDisclosureSelectFieldRenderer({
   config,
   disclosure,
-  fullName,
-  id,
-  namePrefix,
+  resolved,
 }: OptionalDisclosureSelectFieldRendererProps) {
-  const state = useSelectFieldRendererState(config, fullName, namePrefix)
+  const state = useSelectFieldRendererState({
+    config,
+    presentationSize: resolved.presentationSize,
+    controlSize: resolved.controlSize,
+    hint: resolved.hint,
+    hintPosition: resolved.hintPosition,
+    fullName: resolved.fullName,
+    namePrefix: resolved.namePrefix,
+  })
   const [manualOpen, setManualOpen] = useState(false)
   const expandWhenPopulated = disclosure.expandWhenPopulated !== false
   const hasValue = selectFieldHasValue(state.field.value)
   const open = manualOpen || (expandWhenPopulated && hasValue)
-  const chrome = pickSelectFieldChromeProps(state.renderConfig, {
-    hint: state.hint,
-    hintPosition: state.hintPosition,
+  const chrome = {
+    ...buildFieldShellProps(
+      {
+        config: state.renderConfig,
+        id: resolved.id,
+        hint: state.hint,
+        hintPosition: state.hintPosition,
+        presentationSize: state.presentationSize,
+        controlSize: state.controlSize,
+      },
+      state.validation,
+      { sizes: 'none', label: 'visible' },
+    ),
     size: state.controlSize,
-  })
+    digits: state.renderConfig.digits,
+    sizingLabel: state.renderConfig.sizingLabel,
+    sizingLabels: state.renderConfig.sizingLabels,
+    labelPosition: state.renderConfig.labelPosition,
+  }
 
   const clearValue = () => {
     state.field.onChange('')
@@ -267,7 +278,6 @@ export function OptionalDisclosureSelectFieldRenderer({
   if (state.isReadOnly) {
     return (
       <FieldReadOnlyValueField
-        id={id}
         displayValue={state.displayValue}
         {...chrome}
         {...state.validation}
@@ -278,7 +288,7 @@ export function OptionalDisclosureSelectFieldRenderer({
   return (
     <>
       <OptionalFieldDisclosure
-        controlId={id}
+        controlId={resolved.id}
         fieldLabel={state.renderConfig.label}
         addLabel={disclosure.addLabel}
         removeLabel={disclosure.removeLabel}
@@ -288,7 +298,6 @@ export function OptionalDisclosureSelectFieldRenderer({
         size={state.controlSize}
       >
         <SelectField
-          id={id}
           options={state.resolvedOptions}
           placeholder={state.renderConfig.placeholder}
           name={state.field.name}
@@ -310,6 +319,7 @@ export function OptionalDisclosureSelectFieldRenderer({
 export type OptionalDisclosureTextSuggestionsFieldRendererProps = {
   config: TextSuggestionsFieldConfig
   disclosure: OptionalDisclosureConfig
+  suggestions: readonly string[]
   fullName: string
   id: string
   namePrefix?: string
@@ -319,6 +329,7 @@ export type OptionalDisclosureTextSuggestionsFieldRendererProps = {
 export function OptionalDisclosureTextSuggestionsFieldRenderer({
   config,
   disclosure,
+  suggestions,
   fullName,
   id,
   namePrefix,
@@ -328,7 +339,6 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
   const hintDependsOn =
     typeof config.hint === 'object' && config.hint?.resolve ? config.hint.resolve.dependsOn : []
   const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
-  const suggestions = config.suggestions.suggestionsWhen(suggestionValues)
   const hintPresentation = resolveFieldHintPresentation(config, hintValues)
   const controlSize = useFieldControlSize(config.controlSizeOverride)
 
@@ -394,19 +404,21 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
         size={controlSize}
       >
         <TextSuggestionsField
-          id={id}
-          {...pickFieldChromeProps(config)}
-          label=""
-          ariaLabel={config.label}
+          {...buildFieldShellProps(
+            {
+              config,
+              id,
+              hint: hintPresentation.text,
+              hintPosition: hintPresentation.position,
+              presentationSize: controlSize,
+              controlSize,
+            },
+            validation,
+            { sizes: 'none', label: 'accessible-name' },
+          )}
           suggestions={suggestions}
           placeholder={config.placeholder}
-          hint={hintPresentation.text}
-          hintPosition={hintPresentation.position}
-          info={config.info}
-          required={config.required}
-          disabled={config.disabled}
           size={controlSize}
-          width={config.width}
           value={field.value ?? fieldDefaultValue(config)}
           onValueChange={field.onChange}
           onBlur={field.onBlur}
@@ -484,18 +496,19 @@ export function OptionalDisclosureRichTextFieldRenderer({
       >
         <LazyFieldSuspense>
           <LazyRichTextField
-            id={id}
-            {...pickFieldChromeProps(config)}
-            label={config.label}
+            {...buildFieldShellProps(
+              {
+                config,
+                id,
+                hint,
+                hintPosition,
+                presentationSize: controlSize,
+                controlSize,
+              },
+              { error, invalid, describedBy },
+              { sizes: 'none', label: 'visible' },
+            )}
             labelVisibility="srOnly"
-            error={error}
-            invalid={invalid}
-            describedBy={describedBy}
-            hint={hint}
-            hintPosition={hintPosition}
-            info={config.info}
-            required={config.required}
-            width={config.width}
             size={controlSize}
             linkable={config.linkable}
             codeBlocks={config.codeBlocks}

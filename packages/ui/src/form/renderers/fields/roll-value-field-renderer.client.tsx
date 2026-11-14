@@ -6,11 +6,10 @@ import { useController, useFormContext, useWatch } from 'react-hook-form'
 import { DIE_FACES } from '@rpg/contracts/primitives'
 
 import { RollValueField } from '../../../components/ui/roll-value-field.client'
-import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
+import { buildFieldShellProps } from '../field-shell-props.lib'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { RollValueFieldPatchResult } from '../../../components/ui/roll-value-field.lib'
 import type { RollValueFieldConfig } from '../../field-config'
-import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 import { useFieldControlSize } from '../../context/form-section.context'
 import { useFieldIssue } from '../../hooks/use-field-issue.client'
 
@@ -93,19 +92,20 @@ function UnstoredRollValueField({
 
   return (
     <RollValueField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={resolveFieldLabelVisibility(config)}
+      {...buildFieldShellProps(
+        {
+          config,
+          id,
+          hint,
+          hintPosition,
+          presentationSize: controlSize,
+          controlSize,
+        },
+        { error: routed.message },
+        { sizes: 'none', label: 'visible' },
+      )}
       parts={{}}
-      error={routed.message}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      disabled={config.disabled}
       size={controlSize}
-      width={config.width}
       faces={config.faces ?? DIE_FACES}
       countMin={config.countMin}
       countMax={config.countMax}
@@ -172,19 +172,20 @@ function StoredRollValueField({
 
   return (
     <RollValueField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={resolveFieldLabelVisibility(config)}
+      {...buildFieldShellProps(
+        {
+          config,
+          id,
+          hint,
+          hintPosition,
+          presentationSize: controlSize,
+          controlSize,
+        },
+        { error: combinedError },
+        { sizes: 'none', label: 'visible' },
+      )}
       parts={parts}
-      error={combinedError}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      disabled={config.disabled}
       size={controlSize}
-      width={config.width}
       faces={config.faces ?? DIE_FACES}
       countMin={config.countMin}
       countMax={config.countMax}

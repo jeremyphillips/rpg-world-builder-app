@@ -4,16 +4,9 @@ import type { FieldConfig } from './field-config.types'
 import type { ComboboxFieldConfig } from './choice-fields.types'
 import type { InlineSentenceFieldConfig } from './composite-fields.types'
 import type { EditableGridColumnConfig } from './composite-fields.types'
-import type {
-  FieldDynamicComboboxFilterSelects,
-  FieldDynamicRecommendation,
-} from './field-dynamic.types'
+import type { FieldDynamicComboboxFilterSelects } from './field-dynamic.types'
 import type { FieldInteractivity } from './field-visibility'
 import type { SelectFieldOptionListItem } from './field-options'
-import type {
-  JoinedPairEndOccupantConfig,
-  JoinedPairStartOccupantConfig,
-} from '../../components/ui/joined-pair-field.types'
 import type { DependentConfig } from './form-item.types'
 import type { FieldVisibility } from './field-visibility'
 
@@ -37,28 +30,12 @@ function comboboxFilterDependsOn(field: {
   return field.filterSelectsResolve?.dependsOn ?? []
 }
 
-function comboboxRecommendationDependsOn(field: {
+function textSuggestionsDependsOn(field: {
   type?: FieldConfig['type']
-  recommendationResolve?: FieldDynamicRecommendation
+  suggestions?: { dependsOn: readonly string[] }
 }): readonly string[] {
-  if (field.type !== 'combobox') return []
-  return field.recommendationResolve?.dependsOn ?? []
-}
-
-function joinedPairSelectOptionsResolveDependsOn(field: {
-  type?: FieldConfig['type']
-  start?: JoinedPairStartOccupantConfig
-  end?: JoinedPairEndOccupantConfig
-}): readonly string[] {
-  if (field.type !== 'joinedPair') return []
-  const names: string[] = []
-  if (field.start?.kind === 'select' && field.start.optionsResolve) {
-    names.push(...field.start.optionsResolve.dependsOn)
-  }
-  if (field.end?.kind === 'select' && field.end.optionsResolve) {
-    names.push(...field.end.optionsResolve.dependsOn)
-  }
-  return names
+  if (field.type !== 'textSuggestions') return []
+  return field.suggestions?.dependsOn ?? []
 }
 
 function selectFieldOptionsResolveDependsOn(field: {
@@ -81,21 +58,18 @@ export function collectFieldDynamicDependsOn(field: {
   interactivity?: FieldInteractivity
   type?: FieldConfig['type']
   optionsResolve?: { dependsOn: readonly string[] }
-  start?: JoinedPairStartOccupantConfig
-  end?: JoinedPairEndOccupantConfig
+  suggestions?: { dependsOn: readonly string[] }
   optionalDisclosure?: OptionalDisclosureConfig
   filterSelectsResolve?: FieldDynamicComboboxFilterSelects
-  recommendationResolve?: FieldDynamicRecommendation
 }): readonly string[] {
   return [
     ...new Set([
       ...(normalizeFieldHint(field.hint).resolve?.dependsOn ?? []),
       ...(field.derivedMeta?.dependsOn ?? []),
       ...selectFieldOptionsResolveDependsOn(field),
-      ...joinedPairSelectOptionsResolveDependsOn(field),
+      ...textSuggestionsDependsOn(field),
       ...(field.optionalDisclosure?.addGate?.dependsOn ?? []),
       ...comboboxFilterDependsOn(field),
-      ...comboboxRecommendationDependsOn(field),
       ...(field.interactivity?.dependsOn ?? []),
     ]),
   ]

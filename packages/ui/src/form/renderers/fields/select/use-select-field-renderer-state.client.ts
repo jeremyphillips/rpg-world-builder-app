@@ -8,41 +8,39 @@ import {
   useArrayFieldContext,
 } from '../../../context/array-field.context'
 import { useFieldErrorPresentation } from '../../../context/array-item-presentation.context'
-import { useFieldRowParticipation } from '../../../../components/ui/field-row-anatomy.context'
-import { useFormSectionContext } from '../../../context/form-section.context'
-import { useDependsOnValues } from '../../../config/form-depends-on.client'
+import type { FieldSize } from '../../../../components/ui/field.client'
+import type { FieldHintPosition } from '../../../../components/ui/field.variants'
 import type { SelectFieldConfig } from '../../../field-config'
 import {
   fieldDefaultValue,
-  collectFieldDynamicDependsOn,
   filterSelectFieldOptionList,
   flattenSelectFieldOptions,
   isSelectFieldReadOnly,
   resolveSelectFieldDisplayLabel,
 } from '../../../field-config'
-import { resolveFieldRenderConfig } from '../../field-renderer-config.lib'
 import { soleSelectOptionValue } from './select-field-renderer.lib'
 
-export function useSelectFieldRendererState(
-  config: SelectFieldConfig,
-  fullName: string,
-  namePrefix?: string,
-) {
-  const { density, defaultControlSize } = useFormSectionContext()
-  const inAnatomyRow = useFieldRowParticipation()
+/** Parent-resolved select config. Array filtering and read-only commit stay in this hook. */
+export type SelectFieldResolvedStateInput = {
+  config: SelectFieldConfig
+  presentationSize: FieldSize
+  controlSize: FieldSize
+  hint?: string
+  hintPosition?: FieldHintPosition
+  fullName: string
+  namePrefix?: string
+}
+
+export function useSelectFieldRendererState({
+  config,
+  presentationSize,
+  controlSize,
+  hint,
+  hintPosition,
+  fullName,
+}: SelectFieldResolvedStateInput) {
   const arrayContext = useArrayFieldContext()
-  const optionValues = useDependsOnValues(config.optionAvailability?.dependsOn ?? [], namePrefix)
-  const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(config), namePrefix)
-  const resolved = resolveFieldRenderConfig(
-    config,
-    { density, defaultControlSize },
-    dynamicValues,
-    optionValues,
-    {
-      inAnatomyRow,
-    },
-  )
-  const renderConfig = resolved.config as SelectFieldConfig
+  const renderConfig = config
 
   const { field, fieldState } = useController({
     name: fullName,
@@ -72,10 +70,10 @@ export function useSelectFieldRendererState(
 
   return {
     renderConfig,
-    presentationSize: resolved.presentationSize,
-    controlSize: resolved.controlSize,
-    hint: resolved.hint,
-    hintPosition: resolved.hintPosition,
+    presentationSize,
+    controlSize,
+    hint,
+    hintPosition,
     field,
     validation,
     resolvedOptions,
