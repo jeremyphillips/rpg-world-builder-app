@@ -70,7 +70,7 @@ export function CollapsibleListItemCollapseButton({
       <Icon
         name="chevron-down"
         size="lg"
-        className="transition-transform collapsed && -rotate-90"
+        className={cn('transition-transform', collapsed && '-rotate-90')}
       />
     </button>
   )

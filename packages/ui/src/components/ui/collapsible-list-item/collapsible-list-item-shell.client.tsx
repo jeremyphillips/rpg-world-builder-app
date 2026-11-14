@@ -114,6 +114,7 @@ export function CollapsibleListItemShell({
     shellLayout,
     collapsible,
     preset,
+    resolvedBody != null,
   )
 
   return (

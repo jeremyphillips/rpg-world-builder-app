@@ -33,6 +33,34 @@ describe('CollapsibleListItem', () => {
     expect(container.firstChild).toHaveClass('flex-col', collapsibleListItemFlatShellPaddingClasses)
   })
 
+  it('keeps disclosure padding when a body is mounted without a caret', () => {
+    const { container } = render(
+      <CollapsibleListItem
+        itemId="alpha-body"
+        titleId="alpha-body-title"
+        toolbarAriaLabel="Alpha body item"
+        collapsible={false}
+        collapsed={false}
+        onToggleCollapse={vi.fn()}
+        header={<span>Alpha header</span>}
+        body={<p>Expanded details</p>}
+        actions={<Button type="button">Remove</Button>}
+      />,
+    )
+
+    const shell = container.firstChild as HTMLElement
+    const headerRow = shell.firstElementChild as HTMLElement
+    const body = screen.getByText('Expanded details').parentElement
+
+    expect(shell).toHaveClass('flex-col', collapsibleListItemDisclosureShellPaddingClasses)
+    expect(shell).toHaveClass('pb-0')
+    expect(shell).not.toHaveClass('py-2')
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
+    expect(body).toHaveClass('bg-background', '-ml-2')
+  })
+
   it('wires collapse button aria attributes and toggles expanded body', async () => {
     const user = userEvent.setup()
     const onToggleCollapse = vi.fn()
@@ -53,6 +81,7 @@ describe('CollapsibleListItem', () => {
     const collapseButton = screen.getByRole('button', { name: 'Expand Beta item' })
     expect(collapseButton).toHaveAttribute('aria-expanded', 'false')
     expect(collapseButton).toHaveAttribute('aria-controls', 'beta-body')
+    expect(collapseButton.querySelector('svg')).toHaveClass('-rotate-90')
     expect(screen.getByText('Expanded details').parentElement).toHaveAttribute('hidden')
 
     await user.click(collapseButton)

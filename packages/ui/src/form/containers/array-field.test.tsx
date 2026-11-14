@@ -665,7 +665,9 @@ describe('ArrayFieldRenderer', () => {
       'border-border',
       'bg-surface-subtle',
       'pl-2',
-      'py-2',
+      'pr-3',
+      'pt-0',
+      'pb-0',
     )
   })
 
@@ -1765,7 +1767,7 @@ describe('ArrayFieldRenderer', () => {
       <Form<z.infer<typeof exampleSchema>>
         schema={exampleSchema}
         fields={centeredCompactRowFields}
-        defaultValues={{ examples: [{ value: '' }] }}
+        defaultValues={{ examples: [{ value: '' }, { value: 'Second' }] }}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
       />,
@@ -1815,16 +1817,13 @@ describe('ArrayFieldRenderer', () => {
       expect(anatomyGrid).toBeInTheDocument()
       expect(anatomyGrid?.querySelector('[data-field-row-anatomy]')).toBeNull()
 
-      const grip = document.querySelector('[data-array-item-anatomy-grip]') as HTMLElement | null
       const actions = document.querySelector(
         '[data-array-item-anatomy-actions]',
       ) as HTMLElement | null
 
-      expect(grip).toHaveStyle({ gridRow: '1 / -1' })
+      expect(document.querySelector('[data-array-item-anatomy-grip]')).toBeNull()
       expect(actions).toHaveStyle({ gridRow: '1 / -1' })
-      expect(grip).toHaveClass('items-center')
       expect(actions).toHaveClass('items-center')
-      expect(anatomyGrid).toContainElement(grip)
       expect(anatomyGrid).toContainElement(actions)
     }
 
@@ -2624,7 +2623,7 @@ describe('ArrayFieldRenderer', () => {
       }
     })
 
-    it('reserves drag-handle geometry when reorder is configured but only one item exists', async () => {
+    it('shows a drag handle only when more than one item can be reordered', async () => {
       const user = userEvent.setup()
       const fields: FormItem[] = [
         {
@@ -2653,19 +2652,21 @@ describe('ArrayFieldRenderer', () => {
       await user.click(screen.getByRole('button', { name: 'Add tag' }))
       const anatomyGrid = document.querySelector('[data-array-item-anatomy-grid]') as HTMLElement
       expect(anatomyGrid).toBeInTheDocument()
-      expect(anatomyGrid.style.gridTemplateColumns).toContain('var(--leading-chrome-size)')
-      expect(
-        anatomyGrid.querySelector('[aria-hidden="true"][class*="opacity-0"]'),
-      ).toBeInTheDocument()
+      expect(anatomyGrid.style.gridTemplateColumns).not.toContain('var(--leading-chrome-size)')
+      expect(anatomyGrid.querySelector('[aria-hidden="true"][class*="opacity-0"]')).toBeNull()
 
       await user.click(screen.getByRole('button', { name: 'Add tag' }))
       expect(screen.getAllByLabelText(/Drag to reorder/i)).toHaveLength(2)
+      expect(
+        (document.querySelector('[data-array-item-anatomy-grid]') as HTMLElement).style
+          .gridTemplateColumns,
+      ).toContain('var(--leading-chrome-size)')
 
       await user.click(screen.getAllByRole('button', { name: /Remove/i })[1]!)
       expect(
         (document.querySelector('[data-array-item-anatomy-grid]') as HTMLElement).style
           .gridTemplateColumns,
-      ).toContain('var(--leading-chrome-size)')
+      ).not.toContain('var(--leading-chrome-size)')
     })
   })
 })
