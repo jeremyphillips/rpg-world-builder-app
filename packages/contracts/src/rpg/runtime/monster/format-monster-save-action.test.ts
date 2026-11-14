@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { monsterActionSchema } from '../../content/monster/action'
+import { monsterActionSchema } from '../../content/monster/action/index'
 import { formatMonsterSaveAction } from './format-monster-save-action'
 
 const scores = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }

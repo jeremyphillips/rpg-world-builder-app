@@ -1,7 +1,7 @@
 import {
   findActionsReferencingEntry,
   type MonsterEquipmentActionReference,
-} from '../actions/monster-action-equipment-references'
+} from '../actions/references/monster-action-equipment-references'
 import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../monster-form-values'
 import { equipmentEntryHasMeaningfulCustomization } from './equipment-entry-customization.lib'
 

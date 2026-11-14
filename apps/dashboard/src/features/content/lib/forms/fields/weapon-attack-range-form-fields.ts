@@ -13,6 +13,9 @@ const WEAPON_ATTACK_LONG_RANGE_HINT = 'Disadvantage beyond normal range.'
 export const ATTACK_RANGE_NORMAL_FIELD_LABEL = 'Normal range'
 export const ATTACK_RANGE_LONG_FIELD_LABEL = 'Long range'
 
+/** Slot name used by dual melee+ranged distance rows when a consumer supplies cluster chrome. */
+export const ATTACK_RANGE_CLUSTER_SLOT_NAME = 'attackRangeCluster'
+
 export type AttackRangeRowOptions = {
   normalName: string
   longName: string

@@ -1,4 +1,4 @@
-import type { MonsterAction } from '../../content/monster/action'
+import type { MonsterAction } from '../../content/monster/action/index'
 import { formatResolutionTargetFromParts } from '../../content/lib/resolution/format-target'
 import { formatAreaOccupantCreaturePhrase } from '../../content/lib/resolution/format-target-composition'
 import { formatAreaGeometry } from '../../primitives/area-geometry'

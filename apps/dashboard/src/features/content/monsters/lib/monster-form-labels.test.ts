@@ -19,6 +19,7 @@ const source = readFileSync(
 
 import {
   LEGENDARY_ACTION_CATEGORY_LABELS,
+  MONSTER_ACTION_EDITOR_FALLBACK_TITLES,
   MONSTER_ACTIONS_HEADING,
   MONSTER_BONUS_ACTIONS_HEADING,
   MONSTER_REACTIONS_HEADING,
@@ -35,6 +36,15 @@ describe('monster-form-labels', () => {
     expect(LEGENDARY_ACTION_CATEGORY_LABELS.reference).toBe(
       getMonsterActionKindLabel('action-reference'),
     )
+  })
+
+  it('keeps editor fallback titles distinct from kind vocabulary labels', () => {
+    expect(MONSTER_ACTION_EDITOR_FALLBACK_TITLES.special).not.toBe(
+      getMonsterActionKindLabel('special'),
+    )
+    expect(MONSTER_ACTION_EDITOR_FALLBACK_TITLES.save).not.toBe(getMonsterActionKindLabel('save'))
+    expect(MONSTER_ACTION_EDITOR_FALLBACK_TITLES.special).toBe('Special Ability')
+    expect(MONSTER_ACTION_EDITOR_FALLBACK_TITLES.save).toBe('Saving Throw')
   })
 
   it('does not duplicate the primary spellcasting validation message', () => {

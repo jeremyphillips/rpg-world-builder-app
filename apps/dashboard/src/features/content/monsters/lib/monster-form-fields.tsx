@@ -20,6 +20,7 @@ import { movementWithHoverGroup } from '../../lib/forms/fields/content-movement-
 import { MonsterChallengeRatingHint } from '../components/form/monster-challenge-rating-hint'
 import { creatureDetailsFields } from './creature-details/monster-creature-details-form-fields'
 import { MonsterEquipmentPanel } from '../components/form/monster-equipment-panel'
+import { MonsterPublishCatalogWriteGate } from '../components/form/monster-publish-catalog-write-gate'
 import { MonsterActionSections } from '../components/form/monster-action-sections'
 import { MonsterTraitsEditor } from '../components/form/monster-traits-editor'
 import { MonsterStatisticsPanel } from '../components/form/monster-statistics-panel'
@@ -72,6 +73,11 @@ function ownedSlot(name: string): FormItem {
 
 export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   const identity: FormItem[] = [
+    {
+      kind: 'slot',
+      name: 'publishCatalogWriteGate',
+      render: () => <MonsterPublishCatalogWriteGate ctx={ctx} />,
+    },
     {
       kind: 'group',
       heading: { label: 'Identity' },

@@ -1,4 +1,4 @@
-import { PARRY_AC_BONUS_MAX, PARRY_AC_BONUS_MIN } from '../../content/monster/action'
+import { PARRY_AC_BONUS_MAX, PARRY_AC_BONUS_MIN } from '../../content/monster/action/index'
 import { formatMonsterStatBlockSubject } from './spell-entry-presentation'
 
 function capitalSubject(monsterName: string): string {
