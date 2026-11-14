@@ -30,6 +30,7 @@ const EMPTY_FILTER_SELECTS: readonly ComboboxFilterDimensionConfig[] = []
 
 export interface ComboboxFieldRendererProps extends FieldValidationProps {
   config: ComboboxFieldConfig
+  presentationSize: FieldSize
   controlSize: FieldSize
   field: ControllerRenderProps
   id: string
@@ -68,6 +69,7 @@ function useComboboxDimensionFilters(config: ComboboxFieldConfig) {
 /** RHF adapter for `ComboboxField` with optional dimension filter toolbar support. */
 export function ComboboxFieldRenderer({
   config,
+  presentationSize,
   controlSize,
   field,
   id,
@@ -132,7 +134,8 @@ export function ComboboxFieldRenderer({
       info={config.info}
       required={config.required}
       width={config.width}
-      size={controlSize}
+      size={presentationSize}
+      controlSize={controlSize}
       disabled={config.disabled}
       value={field.value ?? fieldDefaultValue(config)}
       onChange={field.onChange}

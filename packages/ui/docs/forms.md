@@ -263,8 +263,12 @@ Slot `render()` components and hand-built editors should call `useFormSectionCon
 (e.g. `RequirementEditor` → `FieldGroup`).
 
 **Array legends:** inherit parent section density unless the array sets `density` explicitly.
-Item bodies still default to `compact`. Legend typography follows the legend scale
-(`compact`/`sm` → `text-xs`; `comfortable`/`md` → `text-md`).
+Item **controls** and list/body stack gaps still default to compact via
+`FormSectionContext.defaultControlSize` and array chrome — not via presentation `density`.
+Legend and in-item **labels** follow inherited presentation density.
+
+**Presentation vs control:** `Field.Root` / `FormField` `size` is presentation (labels, hints).
+Optional `controlSize` (or section `defaultControlSize` + `controlSizeOverride`) sets control geometry.
 
 Dense chip fields stack full-width — don't cram many options into a `FieldRow`.
 

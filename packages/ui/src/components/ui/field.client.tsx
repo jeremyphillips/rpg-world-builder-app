@@ -35,6 +35,7 @@ interface FieldContextValue {
   describedBy: string | undefined
   hintPosition: FieldHintPosition
   size: FieldSize
+  controlSize: FieldSize
   required: boolean
   /** Owned-label visibility. Undefined means the slot falls through to visible. */
   labelVisibility?: FieldLabelVisibility
@@ -58,6 +59,11 @@ export function useFieldRootContext(part = 'useFieldRootContext'): FieldContextV
   return useFieldContext(part)
 }
 
+/** Resolved control scale from the nearest field root (presentation size is separate). */
+export function useResolvedFieldControlSize(): FieldSize {
+  return useFieldRootContext('useResolvedFieldControlSize').controlSize
+}
+
 /** Owned-label visibility from the nearest field root. Undefined outside a root. */
 export function useOptionalFieldLabelVisibility(): FieldLabelVisibility | undefined {
   return React.useContext(FieldContext)?.labelVisibility
@@ -74,6 +80,8 @@ export interface FieldRootProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Field name — surfaced as a `data-field` hook for the schema renderer. */
   name?: string
   size?: FieldSize
+  /** Control geometry; defaults to {@link size} when omitted. */
+  controlSize?: FieldSize
   width?: FieldWidth
   required?: boolean
   /** Field-level validation message; presence drives the error state + aria. */
@@ -116,6 +124,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
       id,
       name,
       size = 'md',
+      controlSize,
       width = 'full',
       required = false,
       error,
@@ -154,6 +163,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
           hintPosition,
           hintIcon,
           size,
+          controlSize,
           required,
           hasDerivedMeta,
           labelVisibility,
@@ -167,6 +177,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
         hintPosition,
         hintIcon,
         size,
+        controlSize,
         required,
         hasDerivedMeta,
         labelVisibility,

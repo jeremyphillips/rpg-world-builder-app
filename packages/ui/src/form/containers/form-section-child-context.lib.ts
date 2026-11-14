@@ -4,9 +4,9 @@ import {
   type FormSectionContextValue,
 } from '../context/form-section.context'
 import type { ArrayConfig } from '../field-config'
-import { DEFAULT_ARRAY_SECTION_DENSITY, resolveSectionDensity } from '../form-density'
 import { resolveNamedGroupDepthAfterEntering } from '../form-heading.lib'
 import { hasNamedArrayHeading } from '../config/array/resolve-array-heading.lib'
+import { resolveArraySectionDensities } from '../config/array/resolve-array-section-densities.lib'
 
 export function buildArraySectionChildContext(
   parent: FormSectionContextValue,
@@ -20,12 +20,10 @@ export function buildArraySectionChildContext(
     hasNamedHeading,
     parent.namedGroupDepth,
   )
+  const { presentationDensity, defaultControlSize } = resolveArraySectionDensities(config, parent)
   return buildFormSectionChildContext(parent, depth, {
-    density: resolveSectionDensity({
-      explicit: config.density,
-      inherited: parent.density,
-      sectionDefault: DEFAULT_ARRAY_SECTION_DENSITY,
-    }),
+    density: presentationDensity,
+    defaultControlSize,
     arrayItemSurface: chrome.surface ?? parent.arrayItemSurface,
     arrayItemTone: chrome.tone ?? parent.arrayItemTone,
     namedGroupDepth: childNamedGroupDepth,

@@ -21,7 +21,7 @@ describe('resolveArrayFieldRendererChrome', () => {
   it('keeps collapse wiring for renderShell arrays inside nested sections', () => {
     const chrome = resolveArrayFieldRendererChrome({
       config: nestedGrantArray,
-      parentDensity: 'comfortable',
+      parentContext: { density: 'comfortable' },
       depth: 2,
       inRhythmStack: undefined,
       fieldsLength: 2,
@@ -40,7 +40,7 @@ describe('resolveArrayFieldRendererChrome', () => {
         item: { collapsible: true, variant: 'compact' },
         fields: [{ type: 'text', name: 'value', label: 'Value' }],
       },
-      parentDensity: 'comfortable',
+      parentContext: { density: 'comfortable' },
       depth: 0,
       inRhythmStack: undefined,
       fieldsLength: 1,
@@ -52,7 +52,7 @@ describe('resolveArrayFieldRendererChrome', () => {
   it('uses parent density for legend when the array omits density', () => {
     const chrome = resolveArrayFieldRendererChrome({
       config: nestedGrantArray,
-      parentDensity: 'comfortable',
+      parentContext: { density: 'comfortable' },
       depth: 0,
       inRhythmStack: undefined,
       fieldsLength: 1,
@@ -66,7 +66,7 @@ describe('resolveArrayFieldRendererChrome', () => {
   it('uses explicit array density for legend and item bodies', () => {
     const chrome = resolveArrayFieldRendererChrome({
       config: { ...nestedGrantArray, density: 'compact' },
-      parentDensity: 'comfortable',
+      parentContext: { density: 'comfortable' },
       depth: 0,
       inRhythmStack: undefined,
       fieldsLength: 1,
@@ -84,7 +84,7 @@ describe('resolveArrayFieldRendererChrome', () => {
         heading: { label: 'Tags' },
         fields: [{ type: 'text', name: 'label', label: 'Label' }],
       },
-      parentDensity: 'comfortable',
+      parentContext: { density: 'comfortable' },
       depth: 2,
       inRhythmStack: undefined,
       fieldsLength: 1,

@@ -55,10 +55,11 @@ export function useArrayFieldRendererState({
 }: UseArrayFieldRendererStateOptions) {
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
-  const { density: parentDensity, depth, inRhythmStack } = useFormSectionContext()
+  const parentContext = useFormSectionContext()
+  const { depth, inRhythmStack } = parentContext
   const chrome = resolveArrayFieldRendererChrome({
     config,
-    parentDensity,
+    parentContext,
     depth,
     inRhythmStack,
     fieldsLength: fields.length,

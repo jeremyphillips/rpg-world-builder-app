@@ -25,6 +25,7 @@ export interface TextFieldProps
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
+  controlSize?: FieldSize
   trailingAction?: TrailingFieldActionConfig
 }
 
@@ -48,6 +49,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>((pro
       required,
       width,
       size = 'md',
+      controlSize,
       chrome,
       trailingAction,
       disabled,
@@ -69,6 +71,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>((pro
         required={required}
         width={width}
         size={size}
+        controlSize={controlSize}
         chrome={chrome}
         trailingAction={trailingAction}
         disabled={disabled}
@@ -91,6 +94,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>((pro
     required,
     width,
     size = 'md',
+    controlSize,
     chrome,
     trailingAction: _trailingAction,
     ...inputProps
@@ -110,9 +114,10 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>((pro
       required={required}
       width={width}
       size={size}
+      controlSize={controlSize}
       chrome={chrome}
     >
-      <Input ref={ref} size={size} {...inputProps} />
+      <Input ref={ref} size={controlSize ?? size} {...inputProps} />
     </FormField>
   )
 })

@@ -18,4 +18,8 @@ describe('resolveFieldControlSize', () => {
   it('allows xs override for entity-card utility controls', () => {
     expect(resolveFieldControlSize({ density: 'comfortable', override: 'xs' })).toBe('xs')
   })
+
+  it('prefers defaultControlSize over presentation density', () => {
+    expect(resolveFieldControlSize({ density: 'comfortable', defaultControlSize: 'sm' })).toBe('sm')
+  })
 })

@@ -19,6 +19,7 @@ export type FieldRootContextInput = {
   hintPosition: FieldHintPosition
   hintIcon?: 'info'
   size: FieldSize
+  controlSize?: FieldSize
   required: boolean
   hasDerivedMeta: boolean
   /** Omitted on the root means readers fall through to visible. Nested roots do not inherit. */
@@ -50,6 +51,7 @@ export function buildFieldRootContextValue(input: FieldRootContextInput) {
     describedBy,
     hintPosition: input.hintPosition,
     size: input.size,
+    controlSize: input.controlSize ?? input.size,
     required: input.required,
     labelVisibility: input.labelVisibility,
     error: input.error,

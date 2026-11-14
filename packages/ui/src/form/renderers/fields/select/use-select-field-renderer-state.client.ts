@@ -28,14 +28,20 @@ export function useSelectFieldRendererState(
   fullName: string,
   namePrefix?: string,
 ) {
-  const { density } = useFormSectionContext()
+  const { density, defaultControlSize } = useFormSectionContext()
   const inAnatomyRow = useFieldRowParticipation()
   const arrayContext = useArrayFieldContext()
   const optionValues = useDependsOnValues(config.optionAvailability?.dependsOn ?? [], namePrefix)
   const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(config), namePrefix)
-  const resolved = resolveFieldRenderConfig(config, density, dynamicValues, optionValues, {
-    inAnatomyRow,
-  })
+  const resolved = resolveFieldRenderConfig(
+    config,
+    { density, defaultControlSize },
+    dynamicValues,
+    optionValues,
+    {
+      inAnatomyRow,
+    },
+  )
   const renderConfig = resolved.config as SelectFieldConfig
 
   const { field, fieldState } = useController({
@@ -66,6 +72,7 @@ export function useSelectFieldRendererState(
 
   return {
     renderConfig,
+    presentationSize: resolved.presentationSize,
     controlSize: resolved.controlSize,
     hint: resolved.hint,
     hintPosition: resolved.hintPosition,

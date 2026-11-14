@@ -33,6 +33,7 @@ export interface CheckboxFieldProps
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
+  controlSize?: FieldSize
 }
 
 /** A single checkbox with an inline label, bound to the compound `Field`. */
@@ -48,6 +49,7 @@ export function CheckboxField({
   required,
   width,
   size = 'md',
+  controlSize,
   chrome,
   ...checkboxProps
 }: CheckboxFieldProps) {
@@ -55,6 +57,7 @@ export function CheckboxField({
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
   const presentation = resolveFieldPresentation({
     size,
+    controlSize,
     labelLayout: 'inline',
     controlBand: inAnatomyRow ? 'single-line' : 'content-sized',
   })
@@ -115,6 +118,7 @@ export function CheckboxField({
       required={required}
       width={rootWidth}
       size={size}
+      controlSize={controlSize}
       anatomy
     >
       <FieldChromeShell chrome={chrome} size={size} className={cn('flex flex-col')}>

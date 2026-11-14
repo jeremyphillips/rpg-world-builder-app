@@ -15,6 +15,7 @@ import {
   resolveArrayItemHeaderLabels,
   type ResolvedArrayItemHeader,
 } from '../../../config/array/array-item-config.lib'
+import { useFormSectionContext } from '../../../context/form-section.context'
 import {
   arrayItemChromeColumnClasses,
   arrayItemHeaderContentClasses,
@@ -42,10 +43,13 @@ export function ArrayItemDragHandle(props: ArrayItemDragHandleProps) {
   return <CollapsibleListItemDragHandle {...props} />
 }
 
-export function renderArrayItemTitleLine(header: ResolvedArrayItemHeader): React.ReactNode {
+export function renderArrayItemTitleLine(
+  header: ResolvedArrayItemHeader,
+  metadataDensity: 'compact' | 'comfortable' = 'comfortable',
+): React.ReactNode {
   if (header.primary) {
     return (
-      <InlineMetadata role="heading" density="compact" wrap={false}>
+      <InlineMetadata role="heading" density={metadataDensity} wrap={false}>
         <InlineMetadata.Item>{header.primary}</InlineMetadata.Item>
         {header.showFallbackInTitle ? (
           <InlineMetadata.Item className={arrayItemHeaderFallbackClasses}>
@@ -97,6 +101,8 @@ function ArrayItemTitleContent({
   collapsible,
   children,
 }: ArrayItemTitleContentProps) {
+  const { density } = useFormSectionContext()
+  const metadataDensity = density === 'compact' ? 'compact' : 'comfortable'
   if (compact) {
     return (
       <>
@@ -108,7 +114,11 @@ function ArrayItemTitleContent({
 
   if (header.srOnly) return <span className="sr-only">{header.ariaLabel}</span>
 
-  return <div className={arrayItemHeaderTitleClasses}>{renderArrayItemTitleLine(header)}</div>
+  return (
+    <div className={arrayItemHeaderTitleClasses}>
+      {renderArrayItemTitleLine(header, metadataDensity)}
+    </div>
+  )
 }
 
 interface ArrayItemTitleRowProps {
@@ -181,9 +191,15 @@ export interface ArrayItemHeaderContentProps {
 
 /** Visible title line for detailed array items — grip/caret live in CollapsibleListItemToolbar. */
 export function ArrayItemHeaderContent({ header }: ArrayItemHeaderContentProps) {
+  const { density } = useFormSectionContext()
+  const metadataDensity = density === 'compact' ? 'compact' : 'comfortable'
   if (header.srOnly) return <span className="sr-only">{header.ariaLabel}</span>
 
-  return <div className={arrayItemHeaderTitleClasses}>{renderArrayItemTitleLine(header)}</div>
+  return (
+    <div className={arrayItemHeaderTitleClasses}>
+      {renderArrayItemTitleLine(header, metadataDensity)}
+    </div>
+  )
 }
 
 export interface ArrayItemHeaderSummaryProps {

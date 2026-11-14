@@ -26,6 +26,7 @@ export interface JsonFieldProps
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
+  controlSize?: FieldSize
   placeholder?: string
   disabled?: boolean
   name?: string
@@ -60,6 +61,7 @@ export function JsonField({
   required,
   width,
   size = 'md',
+  controlSize,
   placeholder,
   disabled,
   name,
@@ -113,6 +115,7 @@ export function JsonField({
       required={required}
       width={width}
       size={size}
+      controlSize={controlSize}
       labelVisibility={labelVisibility}
       anatomy
     >
@@ -138,7 +141,7 @@ export function JsonField({
         control={
           <Textarea
             name={name}
-            size={size}
+            size={controlSize ?? size}
             disabled={disabled}
             placeholder={placeholder}
             spellCheck={false}
@@ -153,6 +156,7 @@ export function JsonField({
         }
         chrome={chrome}
         size={size}
+        controlSize={controlSize}
       />
     </Field.Root>
   )

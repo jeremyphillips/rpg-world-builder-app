@@ -43,6 +43,7 @@ export interface FormFieldProps {
   info?: ReactNode
   required?: boolean
   size?: FieldSize
+  controlSize?: FieldSize
   width?: FieldWidth
   /** @default 'visible' */
   labelVisibility?: FieldLabelVisibility
@@ -71,6 +72,7 @@ function FormFieldSettingsRoot({
   info,
   required,
   size,
+  controlSize,
   width,
   labelVisibility,
   chrome,
@@ -84,6 +86,7 @@ function FormFieldSettingsRoot({
 }) {
   const presentation = resolveFieldPresentation({
     size: size ?? 'md',
+    controlSize,
     labelLayout: headerHasVisibleContent ? mapFormLabelPositionToLayout('settings') : 'hidden',
     controlBand,
   })
@@ -136,6 +139,7 @@ function FormFieldSettingsRoot({
       hintIcon={hintIcon}
       required={required}
       size={size}
+      controlSize={controlSize}
       width={width}
       labelVisibility={labelVisibility}
     >
@@ -163,6 +167,7 @@ export function FormField({
   info,
   required,
   size = 'md',
+  controlSize,
   width,
   labelVisibility = 'visible',
   labelPosition = 'above',
@@ -190,6 +195,7 @@ export function FormField({
         info={info}
         required={required}
         size={size}
+        controlSize={controlSize}
         width={rootWidth}
         labelVisibility={labelVisibility}
         chrome={chrome}
@@ -213,6 +219,7 @@ export function FormField({
       hintIcon={hintIcon}
       required={required}
       size={size}
+      controlSize={controlSize}
       width={rootWidth}
       labelVisibility={labelVisibility}
       anatomy
@@ -223,6 +230,7 @@ export function FormField({
         control={children}
         chrome={chrome}
         size={size}
+        controlSize={controlSize}
         controlBand={controlBand}
       />
     </Field.Root>

@@ -17,7 +17,7 @@ describe('resolveFieldRenderConfig', () => {
       },
     }
 
-    const resolved = resolveFieldRenderConfig(config, 'comfortable', {}, {})
+    const resolved = resolveFieldRenderConfig(config, { density: 'comfortable' }, {}, {})
 
     expect(resolved.hint).toBe('Choose up to 2 primary abilities.')
   })
@@ -32,7 +32,7 @@ describe('resolveFieldRenderConfig', () => {
       hint: 'Pick your two best stats.',
     }
 
-    const resolved = resolveFieldRenderConfig(config, 'comfortable', {}, {})
+    const resolved = resolveFieldRenderConfig(config, { density: 'comfortable' }, {}, {})
 
     expect(resolved.hint).toBe('Pick your two best stats.')
   })

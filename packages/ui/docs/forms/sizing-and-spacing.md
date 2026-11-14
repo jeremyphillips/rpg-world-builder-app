@@ -312,10 +312,12 @@ the intrinsic shell is not the responsiveness mechanism for digit+label pairs.
 
 `resolveArrayFieldRendererChrome` splits array chrome density:
 
-| Region                                             | Resolver                                                  | Default when `density` omitted |
-| -------------------------------------------------- | --------------------------------------------------------- | ------------------------------ |
-| Section header (`FormSectionHeader` in `<legend>`) | `config.density ?? parent.density`                        | Follows parent section         |
-| Item list + child `FormSectionContext`             | `resolveSectionDensity` + `DEFAULT_ARRAY_SECTION_DENSITY` | **`compact`**                  |
+| Region                                             | Resolver                                               | Default when `density` omitted       |
+| -------------------------------------------------- | ------------------------------------------------------ | ------------------------------------ |
+| Section header (`FormSectionHeader` in `<legend>`) | `config.density ?? parent.density`                     | Follows parent section               |
+| Item list + body stack gaps (chrome)               | `resolveArraySectionDensities` → `bodyLayoutDensity`   | **`compact`** when `density` omitted |
+| Child `FormSectionContext` presentation            | `resolveArraySectionDensities` → `presentationDensity` | Inherits parent                      |
+| Child `defaultControlSize`                         | SSOT helper when array omits `density`                 | **`sm`**                             |
 
 Explicit `density` on the array config aligns header and body. `labelMode` affects legend DOM only —
 it does not branch density. Label modes: see [array-field-authoring.md](./array-field-authoring.md).

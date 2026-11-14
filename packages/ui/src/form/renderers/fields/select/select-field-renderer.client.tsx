@@ -30,7 +30,8 @@ export function SelectFieldRenderer({
   const chrome = pickSelectFieldChromeProps(state.renderConfig, {
     hint: state.hint,
     hintPosition: state.hintPosition,
-    size: state.controlSize,
+    size: state.presentationSize,
+    controlSize: state.controlSize,
   })
   const changeLabel = state.renderConfig.presentation?.change?.label
   const changePresentation = useSelectFieldChangePresentation({

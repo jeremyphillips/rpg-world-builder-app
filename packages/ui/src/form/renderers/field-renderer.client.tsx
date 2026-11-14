@@ -117,6 +117,7 @@ function parseNumber(raw: string): number | undefined {
 
 interface RenderArgs<K extends FieldType> {
   config: Extract<FieldConfig, { type: K }>
+  presentationSize: FieldSize
   controlSize: FieldSize
   field: ControllerRenderProps
   id: string
@@ -163,6 +164,7 @@ const fieldRenderers: {
 } = {
   text: ({
     config,
+    presentationSize,
     controlSize,
     field,
     id,
@@ -182,7 +184,8 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
-      size={controlSize}
+      size={presentationSize}
+      controlSize={controlSize}
       type={config.inputType}
       placeholder={config.placeholder}
       autoComplete={config.autoComplete}
@@ -196,6 +199,7 @@ const fieldRenderers: {
   ),
   number: ({
     config,
+    presentationSize,
     controlSize,
     field,
     id,
@@ -219,7 +223,8 @@ const fieldRenderers: {
         info={config.info}
         required={config.required}
         width={config.width}
-        size={controlSize}
+        size={presentationSize}
+        controlSize={controlSize}
       >
         <NumberStepper
           id={id}
@@ -250,7 +255,8 @@ const fieldRenderers: {
         required={config.required}
         width={config.width}
         inputWidth={config.inputWidth}
-        size={controlSize}
+        size={presentationSize}
+        controlSize={controlSize}
         placeholder={config.placeholder}
         disabled={config.disabled}
         step={config.step}
@@ -266,6 +272,7 @@ const fieldRenderers: {
     ),
   textarea: ({
     config,
+    presentationSize,
     controlSize,
     field,
     id,
@@ -285,7 +292,8 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
-      size={controlSize}
+      size={presentationSize}
+      controlSize={controlSize}
       placeholder={config.placeholder}
       rows={config.rows}
       disabled={config.disabled}
@@ -297,6 +305,7 @@ const fieldRenderers: {
   ),
   segmentedControl: ({
     config,
+    presentationSize,
     controlSize,
     field,
     id,
@@ -318,7 +327,8 @@ const fieldRenderers: {
       required={config.required}
       width={config.width}
       disabled={config.disabled}
-      size={controlSize}
+      size={presentationSize}
+      controlSize={controlSize}
       fullWidth={config.fullWidth}
       value={field.value != null && field.value !== '' ? String(field.value) : ''}
       onValueChange={field.onChange}
@@ -366,6 +376,7 @@ const fieldRenderers: {
   ),
   checkbox: ({
     config,
+    presentationSize,
     controlSize,
     field,
     id,
@@ -384,7 +395,8 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
-      size={controlSize}
+      size={presentationSize}
+      controlSize={controlSize}
       disabled={config.disabled}
       checked={field.value ?? false}
       onCheckedChange={(checked) => field.onChange(checked === true)}
@@ -393,6 +405,7 @@ const fieldRenderers: {
   ),
   switch: ({
     config,
+    presentationSize,
     controlSize,
     field,
     id,
@@ -413,7 +426,8 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
-      size={controlSize}
+      size={presentationSize}
+      controlSize={controlSize}
       disabled={config.disabled}
       checked={field.value ?? false}
       onCheckedChange={field.onChange}
@@ -422,6 +436,7 @@ const fieldRenderers: {
   ),
   json: ({
     config,
+    presentationSize,
     controlSize,
     field,
     id,
@@ -442,7 +457,8 @@ const fieldRenderers: {
         info={config.info}
         required={config.required}
         width={config.width}
-        size={controlSize}
+        size={presentationSize}
+        controlSize={controlSize}
         placeholder={config.placeholder}
         example={config.example}
         disabled={config.disabled}
@@ -454,6 +470,7 @@ const fieldRenderers: {
   ),
   richtext: ({
     config,
+    presentationSize,
     controlSize,
     field,
     id,
@@ -474,7 +491,8 @@ const fieldRenderers: {
         info={config.info}
         required={config.required}
         width={config.width}
-        size={controlSize}
+        size={presentationSize}
+        controlSize={controlSize}
         linkable={config.linkable}
         codeBlocks={config.codeBlocks}
         tables={config.tables}
@@ -489,6 +507,7 @@ const fieldRenderers: {
   ),
   markdown: ({
     config,
+    presentationSize,
     controlSize,
     field,
     id,
@@ -508,7 +527,8 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
-      size={controlSize}
+      size={presentationSize}
+      controlSize={controlSize}
       rows={config.rows}
       placeholder={config.placeholder}
       disabled={config.disabled}
@@ -554,6 +574,7 @@ const fieldRenderers: {
   ),
   chips: ({
     config,
+    presentationSize,
     controlSize,
     field,
     id,
@@ -576,7 +597,8 @@ const fieldRenderers: {
       hintPosition={hintPosition}
       info={config.info}
       required={config.required}
-      size={controlSize}
+      size={presentationSize}
+      controlSize={controlSize}
       chipSize={config.chipSize}
       width={config.width}
       disabled={config.disabled}
@@ -587,6 +609,7 @@ const fieldRenderers: {
   ),
   combobox: ({
     config,
+    presentationSize,
     controlSize,
     field,
     id,
@@ -598,6 +621,7 @@ const fieldRenderers: {
   }) => (
     <ComboboxFieldRenderer
       config={config}
+      presentationSize={presentationSize}
       controlSize={controlSize}
       field={field}
       id={id}
@@ -668,7 +692,7 @@ function wrapFieldDerivedMetaPresentation(
 export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererProps) {
   const sectionContext = useFormSectionContext()
   const inAnatomyRow = useFieldRowParticipation()
-  const { density } = sectionContext
+  const { density, defaultControlSize } = sectionContext
   const chromeProps = resolveFieldChromeProps(config, sectionContext)
   const chromedConfig = { ...config, ...chromeProps } as FieldConfig
   const { fullName, id } =
@@ -682,9 +706,13 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
       ? chromedConfig.optionAvailability
       : undefined
   const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
-  const resolved = resolveFieldRenderConfig(chromedConfig, density, dynamicValues, optionValues, {
-    inAnatomyRow,
-  })
+  const resolved = resolveFieldRenderConfig(
+    chromedConfig,
+    { density, defaultControlSize },
+    dynamicValues,
+    optionValues,
+    { inAnatomyRow },
+  )
   const mergedRenderConfig = mergeFieldConfigWithInteractivity(
     chromedConfig,
     resolved.config,
@@ -759,6 +787,7 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     <StandardFieldRenderer
       config={chromedConfig}
       renderConfig={mergedRenderConfig as StandardFieldConfig}
+      presentationSize={resolved.presentationSize}
       controlSize={resolved.controlSize}
       hint={resolved.hint}
       hintPosition={resolved.hintPosition}
@@ -788,6 +817,7 @@ type StandardFieldConfig = Exclude<
 interface StandardFieldRendererProps {
   config: FieldConfig
   renderConfig: StandardFieldConfig
+  presentationSize: FieldSize
   controlSize: FieldSize
   hint?: string
   hintPosition?: FieldHintPosition
@@ -800,6 +830,7 @@ interface StandardFieldRendererProps {
 function StandardFieldRenderer({
   config,
   renderConfig,
+  presentationSize,
   controlSize,
   hint,
   hintPosition,
@@ -895,6 +926,7 @@ function StandardFieldRenderer({
   ) => React.ReactElement
   return render({
     config: renderConfig,
+    presentationSize,
     controlSize,
     field: progressiveField,
     id,

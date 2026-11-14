@@ -18,18 +18,15 @@ import {
 } from '../../config/array/array-item-config.lib'
 import { resolveArrayItemPresentation } from '../../config/array/array-item-presentation.lib'
 import type { ArrayConfig } from '../../field-config'
-import {
-  DEFAULT_ARRAY_SECTION_DENSITY,
-  resolveFormDensity,
-  resolveSectionDensity,
-  type FormDensity,
-} from '../../form-density'
+import { resolveFormDensity } from '../../form-density'
+import { resolveArraySectionDensities } from '../../config/array/resolve-array-section-densities.lib'
+import type { FormSectionContextValue } from '../../context/form-section.context'
 import { resolveArrayEmptyItemLabel } from './array-field-empty-state.lib'
 
 type ResolveArrayFieldRendererChromeInput = {
   config: ArrayConfig
-  /** Parent section density before array item defaults apply. */
-  parentDensity: FormDensity
+  /** Parent section context before array defaults apply. */
+  parentContext: Pick<FormSectionContextValue, 'density' | 'defaultControlSize'>
   depth: number
   inRhythmStack: boolean | undefined
   fieldsLength: number
@@ -38,22 +35,18 @@ type ResolveArrayFieldRendererChromeInput = {
 
 export function resolveArrayFieldRendererChrome({
   config,
-  parentDensity,
+  parentContext,
   depth,
   inRhythmStack,
   fieldsLength,
   wrapSectionChrome = false,
 }: ResolveArrayFieldRendererChromeInput) {
-  // Header density: explicit config.density → parent context (label modes do not branch density).
-  const headerDensity = config.density ?? parentDensity
-  // Body density: resolveSectionDensity with array default compact when unset.
-  const arrayBodyDensity = resolveSectionDensity({
-    explicit: config.density,
-    inherited: parentDensity,
-    sectionDefault: DEFAULT_ARRAY_SECTION_DENSITY,
-  })
+  const {
+    bodyLayoutDensity: arrayBodyDensity,
+    legendRhythm,
+    legendFieldSize,
+  } = resolveArraySectionDensities(config, parentContext)
   const { rhythm, size } = resolveFormDensity(arrayBodyDensity)
-  const { rhythm: legendRhythm, size: legendFieldSize } = resolveFormDensity(headerDensity)
   const itemConfig = resolveArrayItemConfig(config)
   const addAction = resolveArrayAddAction(config)
   const {

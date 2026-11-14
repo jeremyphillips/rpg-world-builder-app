@@ -14,7 +14,7 @@ import {
   resolveComboboxFieldConfig,
   resolveSelectFieldConfigOptions,
 } from '../field-config'
-import type { FormDensity } from '../form-density'
+import { resolveFormDensity, type FormDensity } from '../form-density'
 import { resolveFieldControlSize } from '../resolve-field-control-size.lib'
 
 export function buildFieldRendererIds(
@@ -48,8 +48,14 @@ export function buildJoinedPairRendererIds(
   return { fullName, id, boundNames }
 }
 
+export type FormSectionFieldSizing = {
+  density: FormDensity
+  defaultControlSize?: FieldSize
+}
+
 export interface ResolvedFieldRenderConfig {
   config: FieldConfig
+  presentationSize: FieldSize
   controlSize: FieldSize
   hint?: string
   hintPosition: ReturnType<typeof resolveFieldHintPresentation>['position']
@@ -79,13 +85,15 @@ export type ResolveFieldRenderConfigOptions = {
 // fallow-ignore-next-line complexity
 export function resolveFieldRenderConfig(
   config: FieldConfig,
-  density: FormDensity,
+  sectionSizing: FormSectionFieldSizing,
   dynamicValues: Record<string, unknown>,
   optionValues: Record<string, unknown>,
   options: ResolveFieldRenderConfigOptions = {},
 ): ResolvedFieldRenderConfig {
+  const presentationSize = resolveFormDensity(sectionSizing.density).size
   const controlSize = resolveFieldControlSize({
-    density,
+    density: sectionSizing.density,
+    defaultControlSize: sectionSizing.defaultControlSize,
     override: config.controlSizeOverride,
   })
   const hintPresentation = options.inAnatomyRow
@@ -96,6 +104,7 @@ export function resolveFieldRenderConfig(
     hintPresentation.text ?? resolveFieldInstruction(resolveFieldCopyContext(config))
 
   const basePresentation = {
+    presentationSize,
     controlSize,
     hint: resolvedHint,
     hintPosition: hintPresentation.position,

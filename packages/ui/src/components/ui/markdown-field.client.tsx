@@ -32,6 +32,7 @@ export interface MarkdownFieldProps
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
+  controlSize?: FieldSize
   hintPosition?: FieldHintPosition
   rows?: number
   placeholder?: string
@@ -70,6 +71,7 @@ export function MarkdownField({
   required,
   width,
   size = 'md',
+  controlSize,
   hintPosition,
   rows = 8,
   placeholder,
@@ -93,6 +95,7 @@ export function MarkdownField({
       required={required}
       width={width}
       size={size}
+      controlSize={controlSize}
       labelVisibility={labelVisibility}
       anatomy
     >
@@ -110,7 +113,7 @@ export function MarkdownField({
               <Field.Control>
                 <Textarea
                   aria-label={label}
-                  size={size}
+                  size={controlSize ?? size}
                   rows={rows}
                   placeholder={placeholder}
                   disabled={disabled}
@@ -128,6 +131,7 @@ export function MarkdownField({
         }
         chrome={chrome}
         size={size}
+        controlSize={controlSize}
       />
     </Field.Root>
   )

@@ -58,6 +58,7 @@ export interface ComboboxFieldProps
   loading?: boolean
   width?: FieldWidth
   size?: FieldSize
+  controlSize?: FieldSize
   placeholder?: string
   /** Closed-state copy when `placeholder` is omitted — see `ComboboxFieldConfig`. */
   closedPlaceholderIntent?: 'choice' | 'add'
@@ -212,6 +213,7 @@ export function ComboboxField({
   loading,
   width,
   size: sizeProp,
+  controlSize,
   placeholder,
   closedPlaceholderIntent,
   noun,
@@ -260,6 +262,7 @@ export function ComboboxField({
       required={required}
       width={rootWidth}
       size={size}
+      controlSize={controlSize}
       labelVisibility={labelVisibility}
       anatomy
     >
@@ -278,7 +281,7 @@ export function ComboboxField({
             onBlur={onBlur}
             disabled={disabled}
             loading={loading}
-            size={size}
+            size={controlSize ?? size}
             placeholder={resolvedPlaceholder ?? ''}
             searchPlaceholder={resolvedSearchPlaceholder}
             emptyMessage={emptyMessage}
@@ -296,6 +299,7 @@ export function ComboboxField({
         }
         chrome={chrome}
         size={size}
+        controlSize={controlSize}
       />
     </Field.Root>
   )

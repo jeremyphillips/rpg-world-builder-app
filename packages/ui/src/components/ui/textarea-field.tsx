@@ -23,6 +23,7 @@ export interface TextareaFieldProps
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
+  controlSize?: FieldSize
 }
 
 /** Labelled multi-line text input bound to the compound `Field`. */
@@ -41,6 +42,7 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
       required,
       width,
       size = 'md',
+      controlSize,
       chrome,
       ...textareaProps
     },
@@ -60,10 +62,11 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
         required={required}
         width={width}
         size={size}
+        controlSize={controlSize}
         chrome={chrome}
         controlBand="content-sized"
       >
-        <Textarea ref={ref} size={size} {...textareaProps} />
+        <Textarea ref={ref} size={controlSize ?? size} {...textareaProps} />
       </FormField>
     )
   },
