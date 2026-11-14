@@ -58,7 +58,6 @@ import type {
   SelectFieldConfig,
   TextSuggestionsFieldConfig,
   InlineSentenceFieldConfig,
-  InlineChooseCountFieldConfig,
   ChooseFromChipsFieldConfig,
   InputUnitFieldConfig,
   JoinedPairFieldConfig,
@@ -807,7 +806,7 @@ type StandardFieldConfig = Exclude<
   | TextSuggestionsFieldConfig
   | LevelRangeFieldConfig
   | InlineSentenceFieldConfig
-  | InlineChooseCountFieldConfig
+  | Extract<FieldConfig, { type: 'inlineChooseCount' }>
   | ChooseFromChipsFieldConfig
   | InputUnitFieldConfig
   | JoinedPairFieldConfig

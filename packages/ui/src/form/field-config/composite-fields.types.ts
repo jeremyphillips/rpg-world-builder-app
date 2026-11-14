@@ -161,11 +161,7 @@ export interface InputSelectFieldConfig extends BaseFieldConfig {
   defaultValue?: Record<string, unknown>
 }
 
-/**
- * Scalar number + fixed unit label (walk speed, weapon range, spell distance, …).
- *
- * @deprecated Prefer `inlineSentence` with a number segment and trailing text.
- */
+/** Scalar number + fixed unit label (walk speed, weapon range, spell distance, …). */
 export interface InputUnitFieldConfig extends BaseFieldConfig {
   type: 'inputUnit'
   /** Defaults to `number`. */
