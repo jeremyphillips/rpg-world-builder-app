@@ -84,6 +84,7 @@ export function useArrayFieldRendererState({
     labelMode,
     legendFieldSize,
     legendRhythm,
+    headingScale,
     max,
     nested,
     omitSectionBottomMargin,
@@ -240,6 +241,7 @@ export function useArrayFieldRendererState({
     labelMode,
     legendFieldSize,
     legendRhythm,
+    headingScale,
     nested,
     omitSectionBottomMargin,
     showSectionHeader: resolveArrayShowSectionHeader({

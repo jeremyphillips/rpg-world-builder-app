@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event'
 import {
   ArrayItemIssueButton,
   ArrayItemIssueSummary,
-  ArrayLegendIssueLink,
+  ArrayIssueLink,
   arrayLegendIssueLabel,
 } from './array-item-issue.client'
 
@@ -94,7 +94,7 @@ describe('array-item-issue', () => {
     const onPress = vi.fn()
 
     render(
-      <ArrayLegendIssueLink
+      <ArrayIssueLink
         issueCount={2}
         invalidRowCount={1}
         sectionLabel="Magic item grants"

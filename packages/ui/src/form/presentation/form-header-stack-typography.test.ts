@@ -51,6 +51,25 @@ describe('resolveFormHeaderStackTypography', () => {
     expect(stack.labelHintStackClass).toContain('gap-2')
   })
 
+  it('pairs section compact legend and description', () => {
+    const stack = resolveFormHeaderStackTypography({
+      headingScale: 'section',
+      rhythm: 'compact',
+    })
+    expect(stack.labelClass).toBe('text-style-field-legend-compact')
+    expect(stack.hintClass).toBe('text-style-field-section-description-compact')
+    expect(stack.labelHintStackClass).toContain('gap-1')
+  })
+
+  it('pairs subsection comfortable legend and description', () => {
+    const stack = resolveFormHeaderStackTypography({
+      headingScale: 'subsection',
+      rhythm: 'comfortable',
+    })
+    expect(stack.labelClass).toBe('text-style-field-legend-sub')
+    expect(stack.hintClass).toBe('text-style-field-subsection-description')
+  })
+
   it('pairs subsection compact legend and description', () => {
     const stack = resolveFormHeaderStackTypography({
       headingScale: 'subsection',

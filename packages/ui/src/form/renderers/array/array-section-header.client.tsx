@@ -11,7 +11,8 @@ import { cn } from '../../../lib/utils'
 import type { ArrayAddActionLayout, FieldHintConfig } from '../../field-config'
 import type { ArrayLabelMode } from '../../config/array/resolve-array-heading.lib'
 import { FormSectionHeader } from '../../presentation/form-section-header.client'
-import { ArrayLegendIssueLink } from './array-item-issue.client'
+import type { GroupHeadingScale } from '../../../components/ui/field.variants'
+import { ArrayIssueLink } from './array-item-issue.client'
 
 export interface ArraySectionHeaderProps {
   labelMode: ArrayLabelMode
@@ -21,6 +22,7 @@ export interface ArraySectionHeaderProps {
   hint?: string | FieldHintConfig
   legendFieldSize: FieldSizeToken
   legendRhythm: FieldRhythm
+  headingScale?: GroupHeadingScale
   addActionLayout: ArrayAddActionLayout
   required?: boolean
   arrayIssueCount: number
@@ -36,7 +38,7 @@ function resolveVisibleHeaderChrome(props: ArraySectionHeaderProps): {
 } {
   const inlineAction = props.addActionLayout === 'inline' ? props.addControl : undefined
   const labelAccessory = (
-    <ArrayLegendIssueLink
+    <ArrayIssueLink
       issueCount={props.arrayIssueCount}
       invalidRowCount={props.invalidRowCount}
       hasContainerIssue={props.hasContainerIssue}
@@ -56,6 +58,7 @@ export function ArraySectionHeader(props: ArraySectionHeaderProps) {
     hint,
     legendFieldSize,
     legendRhythm,
+    headingScale = 'field',
     required,
   } = props
   const { labelAccessory, inlineAction } = resolveVisibleHeaderChrome(props)
@@ -64,7 +67,7 @@ export function ArraySectionHeader(props: ArraySectionHeaderProps) {
     <FormSectionHeader
       label={sectionLabel}
       hint={hint}
-      headingScale="field"
+      headingScale={headingScale}
       rhythm={legendRhythm}
       size={legendFieldSize}
       action={inlineAction}
@@ -80,7 +83,7 @@ export function ArraySectionHeader(props: ArraySectionHeaderProps) {
         <FormSectionHeader
           label={sectionLabel}
           hint={hint}
-          headingScale="field"
+          headingScale={headingScale}
           rhythm={legendRhythm}
           size={legendFieldSize}
           action={inlineAction}
@@ -101,7 +104,7 @@ export function ArraySectionHeader(props: ArraySectionHeaderProps) {
             <FormSectionHeader
               label={sectionLabel}
               hint={hint}
-              headingScale="field"
+              headingScale={headingScale}
               rhythm={legendRhythm}
               size={legendFieldSize}
               action={inlineAction}

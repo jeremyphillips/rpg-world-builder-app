@@ -419,7 +419,11 @@ this table when completing a form-lib alignment phase.
 ### Form config first (no parallel layout paths)
 
 **Rule:** Do not hand-build form section chrome (legends, disclosure headers, settings rows,
-panel/outline stacks) in feature components when `FormItem[]` can express it.
+panel/outline stacks) in feature components when `FormItem[]` can express it. Use `@rpg/ui/form`
+**`FormSectionHeader`** for standalone sections (`role="group"` + `id` for `aria-labelledby`).
+Named arrays and groups use renderer-owned headers; optional **`headingScale`** on group/array config
+changes presentation only (default array header scale is **`field`**). Pass `rhythm`/`size` from
+`resolveFormDensity(useFormSectionContext().density)` on custom dashboard fields.
 
 - **Fields** — `type` / `kind: 'slot'` entries in `*-form-fields.ts`; labels, hints, `info`,
   `labelPosition`, `separator`, and disabled state live in config.

@@ -230,7 +230,7 @@ Before marking a migration wave **Complete**:
 | `EntitySummaryStatusItemView`                        | complete  | View-owned density (`comfortable` default) + `EntityRowInlineBadge`; leading icons `size="owner"` — `entity-summary-status.tsx` |
 | `LinkBadge` / `StaticBadge`                          | complete  | Dashboard navigation metadata — `link-badge.tsx`, `link-badge.test.tsx`                                                         |
 | `ArrayItemIssueButton`                               | complete  | `Badge asChild` — `array-item-issue.test.tsx`                                                                                   |
-| `ArrayLegendIssueLink`                               | complete  | Text destructive control (not Badge) — `array-item-issue.client.tsx`                                                            |
+| `ArrayIssueLink`                                     | complete  | Text destructive control (not Badge) — `array-item-issue.client.tsx`                                                            |
 | `notification-unread-badge`                          | exception | `ui-notification-unread-badge.css` — bell trigger count                                                                         |
 
 ## Card-like shells grouped in W2

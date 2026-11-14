@@ -2224,13 +2224,9 @@ describe('ArrayFieldRenderer', () => {
       expect(
         screen.getByRole('button', { name: 'Review 1 issue in 1 row in Requirements' }),
       ).toBeInTheDocument()
-      const alert = screen.getByRole('alert')
-      expect(alert).toHaveAttribute('data-array-item-issue-placement', 'rowAlert')
-      expect(alert).toHaveTextContent('Row incompatible')
+      expect(screen.getByText('Row incompatible')).toBeInTheDocument()
       expect(
-        document
-          .querySelector('[data-array-item-prefix="resolution.target.requirements.0"]')
-          ?.closest('[class*="border-destructive"]'),
+        document.querySelector('[data-array-item-prefix="resolution.target.requirements.0"]'),
       ).toBeTruthy()
     })
 

@@ -208,9 +208,8 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 | `text-sm`       | 14             | Compact UI chrome (buttons, menus, data tables)                            |
 | `text-md`       | 15             | Secondary body (`prose-md`, emphasis, option)                              |
 | `text-base`     | 16             | Primary body default                                                       |
-| `text-lg`       | 18             | Lead copy; subsection and card headings                                    |
-| `text-xl`       | 20             | Dialog title from `md`; sheet section headings                             |
-| `text-2xl`      | 24             | Form group legends (`--text-field-group-legend`)                           |
+| `text-lg`       | 18             | Lead copy; subsection legends, card headings                               |
+| `text-xl`       | 20             | Dialog title from `md`; sheet sections; section form legends               |
 | `text-3xl`      | 28             | Section headings (curated; not the 30px default)                           |
 | `text-4xl`      | 34             | Page headings (curated; not the 36px default)                              |
 
@@ -220,11 +219,14 @@ Fine (10–13px) and standard (`text-xs` through `text-4xl`) are one scale. Noth
 
 Legend sizes live on `:root` and are read by `text-style-field-legend` composites. They do not emit `text-field-*` utilities.
 
-| Token                          | px @ 16px root | Typical use                                                 |
-| ------------------------------ | -------------- | ----------------------------------------------------------- |
-| `--text-field-group-legend`    | 24             | Top-level form group legends, collapsible section triggers  |
-| `--text-field-subgroup-legend` | 20             | Nested `kind: 'group'` legends (`legendSize: 'subsection'`) |
-| `--text-field-array-legend`    | 18             | Repeatable `kind: 'array'` section legends (default)        |
+| Token                            | px @ 16px root | Typical use                                                                        |
+| -------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| `--text-field-section-legend`    | 20             | Top-level named group / section headers (`headingScale: 'section'`)                |
+| `--text-field-subsection-legend` | 18             | Nested named group headers (`headingScale: 'subsection'` or depth-derived default) |
+
+Named `kind: 'array'` section headers default to **field** presentation (`text-style-field-label-*` +
+`text-style-field-hint*`) via `FormSectionHeader` — not a separate array legend scale. Optional
+`headingScale` on the array config can opt into structural section/subsection typography when needed.
 
 ## Heading size tokens
 

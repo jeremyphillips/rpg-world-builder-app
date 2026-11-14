@@ -70,6 +70,7 @@ export function resolveArrayFieldRendererChrome({
   const itemLegend = resolvedHeading?.label ?? ''
   const sectionLabel = resolvedHeading?.label ?? resolveArraySectionLabelForDisplay(config)
   const sectionHint = resolvedHeading?.hint
+  const headingScale = config.headingScale ?? 'field'
   const labelMode = resolveArrayLabelMode(config)
   const { min = 0, max } = config
   const itemCollapsible = itemConfig.collapsible
@@ -118,6 +119,7 @@ export function resolveArrayFieldRendererChrome({
     labelMode,
     legendFieldSize,
     legendRhythm,
+    headingScale,
     max,
     min,
     nested,

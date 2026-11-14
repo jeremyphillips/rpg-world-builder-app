@@ -57,6 +57,22 @@ describe('FormSectionHeader', () => {
     expect(screen.getByText('Add the columns for this table.')).toHaveClass('text-style-field-hint')
   })
 
+  it('applies structural subsection typography with an explicit headingScale', () => {
+    render(
+      <FormSectionHeader
+        label="Preview"
+        hint="Rendered values for this table."
+        headingScale="subsection"
+        rhythm="comfortable"
+      />,
+    )
+
+    expect(screen.getByText('Preview')).toHaveClass('text-style-field-legend-sub')
+    expect(screen.getByText('Rendered values for this table.')).toHaveClass(
+      'text-style-field-subsection-description',
+    )
+  })
+
   it('composes an in-flow legend for field-scale array headers', () => {
     const { container } = render(
       <fieldset className={fieldAnatomyStackVariants({ size: 'md' })}>

@@ -101,6 +101,7 @@ export function ArrayFieldRendererFieldset({
           hint={state.sectionHint}
           legendFieldSize={state.legendFieldSize}
           legendRhythm={state.legendRhythm}
+          headingScale={state.headingScale}
           addActionLayout={state.addActionLayout}
           required={state.required}
           arrayIssueCount={state.arrayIssueCount}

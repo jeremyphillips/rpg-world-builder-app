@@ -484,6 +484,10 @@ interface ArrayConfigCore {
   kind: 'array'
   name: string
   /**
+   * Section header presentation scale — defaults to `'field'` (field label + hint).
+   */
+  headingScale?: GroupHeadingScale
+  /**
    * Section density for this array subtree. Defaults to `compact` when omitted.
    */
   density?: FormDensity

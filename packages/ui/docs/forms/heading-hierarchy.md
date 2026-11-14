@@ -13,18 +13,37 @@
 | `kind: 'slot'` or `kind: 'row'` with `heading`              | `leaf`                                      |
 | Leaf field                                                  | `leaf`                                      |
 
-Array legend typography derives from **parent** named-group depth plus section `density` (compact → smaller array legend). No feature-level `legendSize` / `arrayLegendTier` knobs at steady state.
+Named `kind: 'array'` section headers use **`FormSectionHeader`** with default **`headingScale: 'field'`**
+(field label + field hint utilities). Legend **size** and **rhythm** resolve at render from
+`config.density ?? parent.density` (item bodies still default to compact section density when
+`density` is omitted). Optional `headingScale` on the array config can opt into structural
+section/subsection typography — there is no array-specific legend token or context channel.
 
 `headingScale: 'field'` replaces structural legend and description type with the field label and hint scale for that group's density, and applies `fieldAnatomyStackVariants` on the fieldset for legend→body spacing (including when a collapsible group is closed). It is not a `legendSize` and does not change tier resolution or disclosure.
 
 `headingScale: 'subsection'` forces structural subsection legend typography when a flat sibling list would otherwise resolve as section (for example a named group at `namedGroupDepth === 0`). Description stays on the group description scale. Do not use this on shared field builders solely to fit master-detail detail rails — dashboard [`MasterDetailDetailFormScope`](../../../../apps/dashboard/src/features/content/lib/master-detail/master-detail-detail-form-scope.tsx) floors `namedGroupDepth` for those bodies instead (no SR-only nesting fieldsets).
 
-## Semantic layers
+## Presentation vs hierarchy
 
-1. **Typography** — `resolveHeadingTypography` / `HeadingPresentation`
-2. **Container semantics** — `FieldGroup` (fieldset), `CompositeGroup` (fieldset or `role="group"`), `FormFieldLabel` (control labels)
+Three axes stay independent:
 
-Heading presentation does not force container choice. Slots use leaf-tier `CompositeGroup` with `useFieldset={false}`. Leaf headings use `fieldLabelHintStackClasses` for label→hint and the shared anatomy token for heading cluster→body (same 6px comfortable gap as fields).
+| Axis             | Source                                              | Affects                                                 |
+| ---------------- | --------------------------------------------------- | ------------------------------------------------------- |
+| **Presentation** | `headingScale` → `resolveFormHeaderStackTypography` | Legend label + hint utilities, in-header stack gap      |
+| **Hierarchy**    | `namedGroupDepth` / `legendSize`                    | Body gaps, fieldset anatomy, child tier bookkeeping     |
+| **Density**      | `density` / `resolveFormDensity`                    | Control `size`, structural `rhythm`, field-hint compact |
+
+**Typography SSOT:** [`resolveFormHeaderStackTypography`](../../src/form/presentation/form-header-stack-typography.lib.ts) +
+[`FormSectionHeader`](../../src/form/presentation/form-section-header.client.tsx) for all section headers
+(groups, arrays, dashboard slots, `CompositeGroup`). Containers own `<legend>` / `role="group"` markup;
+the header component is presentation-only.
+
+`headingScale: 'field'` on a named group replaces structural legend + description utilities with field
+label + hint, and applies `fieldAnatomyStackVariants` on the fieldset body. It does **not** change
+`legendSize`, `namedGroupDepth`, or disclosure behavior.
+
+Explicit `headingScale: 'subsection'` at depth `0` changes **type only** — section body gap and
+`legendSize` stay on the section tier unless nesting warrants subsection spacing.
 
 ## Label visibility
 

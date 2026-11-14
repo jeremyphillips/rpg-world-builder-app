@@ -30,7 +30,7 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `fieldChipWrapGapClasses` — chip pill row gap only (no vertical pad) inside `ChipsField`
  * - structural section hints use `text-style-field-section-description*` / `text-style-field-subsection-description*`
  * - `fieldGroupLegendHeaderStackClasses` — vertical gap between a group legend and its hint
- * - `fieldGroupLegendHeaderMarginVariants` — legacy legend bottom margin (HeadingPresentation, editable-grid — not FieldGroup body spacing)
+ * - `fieldGroupLegendHeaderMarginVariants` — legacy legend bottom margin (editable-grid — not FieldGroup body spacing)
  * - `fieldGroupBodyGapVariants` / `resolveFieldGroupBodyGap` — legend→body spacing scale for FieldGroup (applied on the body relationship)
  * - `fieldArrayItemVariants` — chrome around one repeatable array item
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
@@ -227,13 +227,6 @@ export const fieldLabelTypographyVariants = cva('', {
     size: 'md',
   },
 })
-
-/**
- * @deprecated Prefer {@link formSectionHeaderActionLayoutClasses} from form presentation.
- * Retained for class drift tests only.
- */
-export const arrayFieldLegendInlineLayoutClasses = 'flex w-full items-center justify-between gap-4'
-export const arrayFieldLegendInlineLabelClasses = 'flex min-w-0 items-center gap-2'
 
 export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
 

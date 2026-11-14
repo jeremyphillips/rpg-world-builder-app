@@ -151,7 +151,7 @@ export function ArrayItemIssueSummary({
   )
 }
 
-export interface ArrayLegendIssueLinkProps {
+export interface ArrayIssueLinkProps {
   issueCount: number
   invalidRowCount: number
   hasContainerIssue?: boolean
@@ -160,7 +160,7 @@ export interface ArrayLegendIssueLinkProps {
   prominence?: Extract<ArrayItemIssueProminence, 'nav' | 'aggregate'>
 }
 
-function resolveArrayLegendIssueLabel(
+function resolveArrayIssueLinkLabel(
   issueCount: number,
   invalidRowCount: number,
   hasContainerIssue: boolean,
@@ -174,18 +174,19 @@ function resolveArrayLegendIssueLabel(
   return issueCountLabel(issueCount)
 }
 
-export function ArrayLegendIssueLink({
+/** Aggregate invalid-row affordance beside a named array section header. */
+export function ArrayIssueLink({
   issueCount,
   invalidRowCount,
   hasContainerIssue = false,
   sectionLabel,
   onPress,
   prominence = 'nav',
-}: ArrayLegendIssueLinkProps) {
+}: ArrayIssueLinkProps) {
   if (issueCount <= 0) return null
   if (invalidRowCount <= 0 && !hasContainerIssue) return null
 
-  const label = resolveArrayLegendIssueLabel(issueCount, invalidRowCount, hasContainerIssue)
+  const label = resolveArrayIssueLinkLabel(issueCount, invalidRowCount, hasContainerIssue)
 
   return (
     <button
