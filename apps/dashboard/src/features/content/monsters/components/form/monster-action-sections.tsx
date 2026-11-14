@@ -298,7 +298,9 @@ function useMonsterActionDetailRows(
 }
 
 export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
-  const sections = useMonsterActionSections(ctx.entityId)
+  const sections = useMonsterActionSections(ctx.entityId, {
+    equipmentCatalogStatus: ctx.equipmentCatalogStatus,
+  })
   const { getValues } = useFormContext<MonsterFormValues>()
   const [weaponPickerSection, setWeaponPickerSection] = useState<MonsterActionSection | null>(null)
   const values = sections.values ?? getValues()

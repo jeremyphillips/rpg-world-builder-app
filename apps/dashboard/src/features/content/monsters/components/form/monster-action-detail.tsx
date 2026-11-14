@@ -11,7 +11,7 @@ import type { useEmbeddedMasterDetailRows } from '../../../lib/master-detail/use
 import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-summary'
 import { isLegendaryReferenceTarget } from '../../lib/actions/legendary-action-category'
 import { legendarySourceSpellOptions } from '../../lib/actions/monster-legendary-action-acquisition'
-import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
+import { monsterActionDetailFields } from '../../lib/actions/detail-fields/monster-action-detail-fields'
 import { monsterActionSectionMoveAllowed } from '../../lib/actions/monster-action-kind'
 import {
   monsterActionHeaderName,

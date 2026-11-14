@@ -1,4 +1,4 @@
-import type { BonusTeleportPassenger } from '../../content/monster/action'
+import type { BonusTeleportPassenger } from '../../content/monster/action/index'
 import {
   BONUS_STANDARD_ACTION_IDS,
   type BonusActionCombination,

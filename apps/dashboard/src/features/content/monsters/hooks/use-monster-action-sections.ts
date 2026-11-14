@@ -15,7 +15,8 @@ import {
   type MonsterActionAcquisitionChoice,
 } from '../lib/actions/monster-action-acquisition'
 import { createLegendaryActionDraft } from '../lib/actions/monster-legendary-action-acquisition'
-import { monsterCastingDependentLabels } from '../lib/actions/monster-action-casting-summary'
+import { monsterCastingDependentLabels } from '../lib/casting/monster-casting-dependents.lib'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   actionAfterSectionMove,
   actionMoveDropsTrigger,
@@ -39,15 +40,26 @@ import {
   formatAddedEquipmentNotice,
   formatCastingSourceDeleteNotice,
 } from '../lib/monster-form-labels'
+import {
+  collectMonsterActionSnapshotMissing,
+  lostDefinedKeys,
+} from '../lib/actions/monster-action-row-snapshot.lib'
+import type { MonsterFormValues } from '../lib/monster-form-values'
 
-function monsterActionReferenceTitle(action: MonsterActionDraftRow): string {
+type UseMonsterActionSectionsOptions = {
+  equipmentCatalogStatus?: ContentFormCtx['equipmentCatalogStatus']
+}
+
+function monsterActionReferenceTitle(
+  action: MonsterActionDraftRow,
+  equipmentCatalogStatus: ContentFormCtx['equipmentCatalogStatus'],
+): string {
   const identity = resolveMonsterActionIdentity({
     action,
-    equipmentCatalogStatus: 'pending',
+    equipmentCatalogStatus: equipmentCatalogStatus ?? 'pending',
   })
   return identity.displayName.trim() || masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
 }
-import type { MonsterFormValues } from '../lib/monster-form-values'
 
 type TriggerPending = {
   type: 'trigger'
@@ -67,99 +79,6 @@ type MultiattackPending = {
 
 export type MonsterActionPending = TriggerPending | MultiattackPending
 
-function isPlainRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
-/** Registration can leave `{ damage: { dice: { count: undefined } } }`. That is not authored data. */
-function hasDefinedLeaf(value: unknown): boolean {
-  if (Array.isArray(value)) return value.some(hasDefinedLeaf)
-  if (isPlainRecord(value)) return Object.values(value).some(hasDefinedLeaf)
-  return value !== undefined
-}
-
-type MissingPathEntry = { path: string; value: unknown }
-
-function collectMissingPaths(
-  snapshot: unknown,
-  live: unknown,
-  path: string,
-  missing: MissingPathEntry[],
-) {
-  if (Array.isArray(snapshot)) {
-    collectMissingArraySnapshot(snapshot, live, path, missing)
-    return
-  }
-  if (isPlainRecord(snapshot)) {
-    collectMissingRecordSnapshot(snapshot, live, path, missing)
-  }
-}
-
-function collectMissingArraySnapshot(
-  snapshot: unknown[],
-  live: unknown,
-  path: string,
-  missing: MissingPathEntry[],
-) {
-  if (!Array.isArray(live)) {
-    missing.push({ path, value: snapshot })
-    return
-  }
-  live.forEach((item, index) => {
-    const source = sourceForLiveItem(snapshot, item)
-    if (source === undefined || !isPlainRecord(item) || typeof item.id !== 'string') return
-    collectMissingPaths(source, item, `${path}.${index}`, missing)
-  })
-}
-
-function collectMissingRecordSnapshot(
-  snapshot: Record<string, unknown>,
-  live: unknown,
-  path: string,
-  missing: MissingPathEntry[],
-) {
-  const liveRecord = isPlainRecord(live) ? live : {}
-  for (const [key, value] of Object.entries(snapshot)) {
-    if (key === 'limitedUse') continue
-    const childPath = path ? `${path}.${key}` : key
-    const liveValue = liveRecord[key]
-    if (isPlainRecord(value) || Array.isArray(value)) {
-      if (liveValue === undefined) {
-        if (hasDefinedLeaf(value)) missing.push({ path: childPath, value })
-        continue
-      }
-      collectMissingPaths(value, liveValue, childPath, missing)
-      continue
-    }
-    if (liveValue === undefined && value !== undefined) {
-      missing.push({ path: childPath, value })
-    }
-  }
-}
-
-function sourceForLiveItem(snapshot: unknown[], live: unknown): unknown {
-  if (!isPlainRecord(live) || typeof live.id !== 'string') return undefined
-  return snapshot.find((item) => isPlainRecord(item) && item.id === live.id)
-}
-
-function lostDefinedKeys(previous: unknown, next: unknown): boolean {
-  if (Array.isArray(previous)) {
-    if (!Array.isArray(next) || next.length < previous.length) return true
-    return previous.some((item, index) => lostDefinedKeys(item, next[index]))
-  }
-  if (isPlainRecord(previous)) {
-    if (!isPlainRecord(next)) return true
-    return Object.entries(previous).some(([key, value]) => {
-      // The recharge editor owns this key and may clear or replace it.
-      if (key === 'limitedUse') return false
-      if (!hasDefinedLeaf(value)) return false
-      if (next[key] === undefined) return true
-      return lostDefinedKeys(value, next[key])
-    })
-  }
-  return false
-}
-
 function legendaryUsesUnset(value: unknown): boolean {
   return value === undefined || value === null || value === ''
 }
@@ -172,7 +91,11 @@ function rowsOf(
   return Array.isArray(rows) ? (rows as MonsterActionDraftRow[]) : []
 }
 
-export function useMonsterActionSections(entityId?: string) {
+export function useMonsterActionSections(
+  entityId?: string,
+  options?: UseMonsterActionSectionsOptions,
+) {
+  const equipmentCatalogStatus = options?.equipmentCatalogStatus ?? 'pending'
   const { getValues, setValue, clearErrors, trigger, formState } =
     useFormContext<MonsterFormValues>()
   const watched = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
@@ -208,10 +131,7 @@ export function useMonsterActionSections(entityId?: string) {
     const snapshot = rowSnapshot.current
     if (!snapshot) return
     const live = getValues()
-    const missing: { path: string; value: unknown }[] = []
-    for (const section of MONSTER_ACTION_SECTIONS) {
-      collectMissingPaths(snapshot[section], live[section], section, missing)
-    }
+    const missing = collectMonsterActionSnapshotMissing(snapshot, live)
     for (const entry of missing) {
       setValue(entry.path as never, entry.value as never, {
         shouldDirty: false,
@@ -378,7 +298,11 @@ export function useMonsterActionSections(entityId?: string) {
     (actionId: string) => {
       const located = locate(actionId)
       if (!located) return
-      const castingDependents = monsterCastingDependentLabels(getValues(), actionId)
+      const castingDependents = monsterCastingDependentLabels(
+        getValues(),
+        actionId,
+        equipmentCatalogStatus ?? 'pending',
+      )
       if (castingDependents.length > 0) {
         setNotice(formatCastingSourceDeleteNotice(castingDependents))
         return
@@ -398,7 +322,9 @@ export function useMonsterActionSections(entityId?: string) {
         setPending({
           type: 'multiattack-delete',
           actionId,
-          names: references.map((action) => monsterActionReferenceTitle(action)),
+          names: references.map((action) =>
+            monsterActionReferenceTitle(action, equipmentCatalogStatus),
+          ),
           from: located.section,
           index: located.index,
         })
@@ -448,7 +374,9 @@ export function useMonsterActionSections(entityId?: string) {
         setPending({
           type: 'multiattack-move',
           actionId: located.action.id,
-          names: references.map((action) => monsterActionReferenceTitle(action)),
+          names: references.map((action) =>
+            monsterActionReferenceTitle(action, equipmentCatalogStatus),
+          ),
           from: located.section,
           to,
           index: located.index,

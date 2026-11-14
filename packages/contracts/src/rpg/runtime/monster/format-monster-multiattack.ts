@@ -1,4 +1,4 @@
-import type { MonsterAction } from '../../content/monster/action'
+import type { MonsterAction } from '../../content/monster/action/index'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import type { EquipmentInstance } from '../../content/equipment/instance/instance'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'

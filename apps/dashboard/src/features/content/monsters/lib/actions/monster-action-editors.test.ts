@@ -16,7 +16,7 @@ import {
   actionAfterSectionMove,
   monsterActionSectionMoveAllowed,
 } from './monster-action-kind'
-import { monsterActionDetailFields } from './monster-action-detail-fields'
+import { monsterActionDetailFields } from './detail-fields/monster-action-detail-fields'
 import { monsterActionOnHitFields } from './monster-action-on-hit-fields'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 import { createMonsterRowId } from '../monster-row-id'

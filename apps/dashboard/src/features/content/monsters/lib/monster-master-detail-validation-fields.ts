@@ -4,7 +4,7 @@ import type { ContentFormCtx } from '../../lib/forms/registry/content-form-regis
 import { collectMonsterFormAdvisories } from './monster-form-advisories'
 import { monsterEquipmentCatalog } from './monster-form-derivation'
 import type { MonsterFormValues } from './monster-form-values'
-import { monsterActionDetailFields } from './actions/monster-action-detail-fields'
+import { monsterActionDetailFields } from './actions/detail-fields/monster-action-detail-fields'
 import type { MonsterActionSection } from './actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './actions/monster-action-presets'
 import { sharedCastingOptions } from './actions/monster-action-casting-summary'

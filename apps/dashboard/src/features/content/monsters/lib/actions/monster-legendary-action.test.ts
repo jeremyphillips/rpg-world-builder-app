@@ -9,7 +9,7 @@ import {
   LEGENDARY_SPELLCASTING_DISABLED_NOTE,
 } from '../monster-form-labels'
 import type { MonsterFormValues } from '../monster-form-values'
-import { monsterActionDetailFields } from './monster-action-detail-fields'
+import { monsterActionDetailFields } from './detail-fields/monster-action-detail-fields'
 import {
   createLegendaryActionDraft,
   legendaryActionAcquisitionItems,

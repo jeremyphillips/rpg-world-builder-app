@@ -25,33 +25,33 @@ import {
 
 import { buildActiveCreatureTypeFieldOptions } from '@/features/vocabulary'
 
-import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
-import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
+import { areaGeometryFormFields } from '../../../../lib/forms/fields/area-geometry-form-fields'
+import { distanceJoinedPairField } from '../../../../lib/forms/fields/content-distance-form-fields'
 import {
   resolutionOccupantRequirementsFields,
   resolutionTargetAuthoringFields,
-} from '../../../lib/forms/fields/resolution-target-authoring-fields'
+} from '../../../../lib/forms/fields/resolution-target-authoring-fields'
 import {
   ATTACK_RANGE_LONG_FIELD_LABEL,
   ATTACK_RANGE_NORMAL_FIELD_LABEL,
   attackRangeJoinedPairFields,
-} from '../../../lib/forms/fields/weapon-attack-range-form-fields'
-import { MonsterAttackRangeClusterSlot } from './monster-attack-range-cluster-slot.client'
-import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
+} from '../../../../lib/forms/fields/weapon-attack-range-form-fields'
+import { MonsterAttackRangeClusterSlot } from '../monster-attack-range-cluster-slot.client'
+import { damageFieldGroup } from '../../../../lib/forms/mechanics/damage-field-group'
 import {
   SAVING_THROW_ABILITY_HINT,
   SAVING_THROW_ABILITY_LABEL,
   SAVING_THROW_DC_SOURCE_LABEL,
   SAVING_THROW_SECTION_LEGEND,
   SAVING_THROW_SPELLCASTING_HINT,
-} from '../../../lib/forms/mechanics/saving-throw-field-copy'
-import { savingThrowFieldGroup } from '../../../lib/forms/mechanics/saving-throw-field-group'
-import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
-import { MonsterActionBonusSummary } from '../../components/form/monster-action-bonus-summary'
-import { MonsterActionParrySummary } from '../../components/form/monster-action-parry-summary'
-import { MonsterActionMultiattackSummary } from '../../components/form/monster-action-multiattack-summary'
-import { MonsterActionSpellSummary } from '../../components/form/monster-action-spell-summary'
+} from '../../../../lib/forms/mechanics/saving-throw-field-copy'
+import { savingThrowFieldGroup } from '../../../../lib/forms/mechanics/saving-throw-field-group'
+import { MonsterActionAttackSummary } from '../../../components/form/monster-action-attack-summary'
+import { MonsterActionBonusSummary } from '../../../components/form/monster-action-bonus-summary'
+import { MonsterActionParrySummary } from '../../../components/form/monster-action-parry-summary'
+import { MonsterActionMultiattackSummary } from '../../../components/form/monster-action-multiattack-summary'
+import { MonsterActionSpellSummary } from '../../../components/form/monster-action-spell-summary'
 import {
   MONSTER_RULES_TEXT_LABEL,
   MONSTER_ADDITIONAL_CONDITION_HINT,
@@ -114,36 +114,36 @@ import {
   MONSTER_TURN_LIMIT_LABEL,
   MONSTER_TURN_LIMIT_OPTION_LABEL,
   MONSTER_ATTACK_BONUS_LABEL,
-} from '../monster-form-labels'
-import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
-import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
-import type { MonsterFormAdvisory } from '../monster-form-advisories'
-import { monsterFormAdvisorySlot } from '../monster-form-advisory-presentation'
-import { MonsterActionAttackAbilityField } from './monster-attack-ability-field'
-import { MonsterActionCastingAbilityField } from './monster-action-casting-fields'
-import { MonsterActionRechargeField } from './monster-action-recharge-field'
+} from '../../monster-form-labels'
+import type { MonsterActionSection } from '../monster-action-equipment-references'
+import type { MonsterActionDraftRow } from '../monster-action-presets'
+import type { MonsterFormAdvisory } from '../../monster-form-advisories'
+import { monsterFormAdvisorySlot } from '../../monster-form-advisory-presentation'
+import { MonsterActionAttackAbilityField } from '../monster-attack-ability-field'
+import { MonsterActionCastingAbilityField } from '../monster-action-casting-fields'
+import { MonsterActionRechargeField } from '../monster-action-recharge-field'
 import {
   monsterActionLimitedUseFields,
   monsterActionOnHitFields,
-} from './monster-action-on-hit-fields'
-import { monsterSpellComponentRequirementsField } from './monster-spell-component-form-fields'
-import { monsterSaveDcAbilityHintWhen } from './monster-action-save-field-hints'
-import { monsterWeaponDamageOverrideField } from './monster-weapon-damage-override'
-import type { MonsterFormValues } from '../monster-form-values'
+} from '../monster-action-on-hit-fields'
+import { monsterSpellComponentRequirementsField } from '../monster-spell-component-form-fields'
+import { monsterSaveDcAbilityHintWhen } from '../monster-action-save-field-hints'
+import { monsterWeaponDamageOverrideField } from '../monster-weapon-damage-override'
+import type { MonsterFormValues } from '../../monster-form-values'
 import {
   MonsterActionSaveFailureNoteField,
   MonsterActionSaveSuccessAmountField,
-} from './monster-action-save-outcome-fields'
-import { legendaryActionCategory } from './legendary-action-category'
-import { leapDistanceFields } from './leap-distance-options'
-import { legendaryActionDetailFields } from './monster-legendary-action-fields'
-import { monsterSpellCastAtLevelField } from './monster-spell-cast-at-level-form-fields'
-import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../components/form/monster-spell-picker-context'
+} from '../monster-action-save-outcome-fields'
+import { legendaryActionCategory } from '../legendary-action-category'
+import { leapDistanceFields } from '../leap-distance-options'
+import { legendaryActionDetailFields } from '../monster-legendary-action-fields'
+import { monsterSpellCastAtLevelField } from '../monster-spell-cast-at-level-form-fields'
+import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../../components/form/monster-spell-picker-context'
 import {
   MonsterSpellChangeAction,
   MonsterSpellEntryCard,
   MonsterSpellFrequencySlot,
-} from '../../components/form/monster-spell-entry-card'
+} from '../../../components/form/monster-spell-entry-card'
 
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {
   return {

@@ -1,10 +1,10 @@
 import {
-  isPrimarySpellcastingAction,
   monsterActionDraftSchema,
+  monsterActionMoveDataLoss,
+  monsterActionSectionMoveEligibility,
   monsterBonusActionDraftSchema,
   monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
-  monsterSectionAllowsKind,
 } from '@rpg/contracts'
 
 import type { MonsterActionSection } from './monster-action-equipment-references'
@@ -54,11 +54,7 @@ export function actionMoveDropsTrigger(
   from: MonsterActionSection,
   to: MonsterActionSection,
 ): boolean {
-  return (
-    from === 'reactions' &&
-    to !== 'reactions' &&
-    monsterActionTriggerText('trigger' in action ? action.trigger : undefined) !== undefined
-  )
+  return monsterActionMoveDataLoss(action, from, to).dropsTrigger
 }
 
 /** Whether Move to may place this row in `to`. Primary Spellcasting stays in Actions. */
@@ -67,11 +63,7 @@ export function monsterActionSectionMoveAllowed(
   from: MonsterActionSection,
   to: MonsterActionSection,
 ): boolean {
-  if (from === to) return false
-  if (from === 'legendaryActions' || to === 'legendaryActions') return false
-  if (!action.kind || !monsterSectionAllowsKind(to, action.kind)) return false
-  if (isPrimarySpellcastingAction(action) && to !== 'actions') return false
-  return true
+  return monsterActionSectionMoveEligibility(action, from, to).allowed
 }
 
 export function actionAfterSectionMove(

@@ -5,7 +5,7 @@ import {
   monsterActionDraftSchema,
   monsterActionSchema,
   RULES_OR_SAVING_THROW_MESSAGE,
-} from '../../monster/action'
+} from '../../monster/action/index'
 import {
   MONSTER_FIXTURE_SPELLS,
   MONSTER_TEST_INPUT,

@@ -21,7 +21,7 @@ import {
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
 } from '../monster-form-labels'
 import { resolveMonsterCreateDefaultValues, type MonsterFormValues } from '../monster-form-values'
-import { monsterActionDetailFields } from './monster-action-detail-fields'
+import { monsterActionDetailFields } from './detail-fields/monster-action-detail-fields'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 import { monsterSaveDcAbilityHintWhen } from './monster-action-save-field-hints'
 
