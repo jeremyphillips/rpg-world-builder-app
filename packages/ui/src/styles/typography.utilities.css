@@ -213,7 +213,7 @@
 }
 
 @utility text-style-field-label-sm {
-  font-size: var(--text-xs);
+  font-size: var(--text-fine-md);
   line-height: 1;
   font-weight: var(--font-weight-field-label);
 }
@@ -245,15 +245,15 @@
 }
 
 @utility text-style-field-legend-compact {
-  font-size: var(--text-base);
-  line-height: var(--text-base--line-height);
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
   font-weight: var(--font-weight-heading);
   color: var(--foreground);
 }
 
 @utility text-style-field-legend-sub-compact {
-  font-size: var(--text-sm);
-  line-height: var(--text-sm--line-height);
+  font-size: var(--text-md);
+  line-height: var(--text-md--line-height);
   font-weight: var(--font-weight-heading);
   color: var(--foreground);
 }
@@ -280,8 +280,8 @@
 }
 
 @utility text-style-field-section-description-compact {
-  font-size: var(--text-fine-md);
-  line-height: var(--leading-normal);
+  font-size: var(--text-md);
+  line-height: var(--text-md--line-height);
   font-weight: var(--font-weight-normal);
   color: var(--muted-foreground);
 }
@@ -294,8 +294,8 @@
 }
 
 @utility text-style-field-subsection-description-compact {
-  font-size: var(--text-xs);
-  line-height: var(--text-xs--line-height);
+  font-size: var(--text-fine-md);
+  line-height: var(--leading-normal);
   font-weight: var(--font-weight-normal);
   color: var(--muted-foreground);
 }

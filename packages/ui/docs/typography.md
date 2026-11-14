@@ -228,6 +228,17 @@ Named `kind: 'array'` section headers default to **field** presentation (`text-s
 `text-style-field-hint*`) via `FormSectionHeader` — not a separate array legend scale. Optional
 `headingScale` on the array config can opt into structural section/subsection typography when needed.
 
+### Compact form heading pairs (`rhythm: compact`)
+
+| Role                         | Utility                                           | px  |
+| ---------------------------- | ------------------------------------------------- | --- |
+| Field label (`size` sm / xs) | `text-style-field-label-sm`                       | 13  |
+| Field hint                   | `text-style-field-hint-compact`                   | 12  |
+| Section legend               | `text-style-field-legend-compact`                 | 18  |
+| Section hint                 | `text-style-field-section-description-compact`    | 15  |
+| Subsection legend            | `text-style-field-legend-sub-compact`             | 15  |
+| Subsection hint              | `text-style-field-subsection-description-compact` | 13  |
+
 ## Heading size tokens
 
 Role tokens live on `:root` in [`styles/tokens/typography-roles.css`](../src/styles/tokens/typography-roles.css). They share a primitive pair (size and line-height). Display (42px) is the only off-scale literal. Retune a role by pointing it at another primitive, not by adding a numbered heading token.

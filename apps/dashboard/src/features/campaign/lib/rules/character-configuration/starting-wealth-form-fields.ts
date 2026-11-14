@@ -113,7 +113,6 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
     label: STARTING_WEALTH_TIERS_LEGEND,
     min: STARTING_WEALTH_TIER_COUNT,
     max: STARTING_WEALTH_TIER_COUNT,
-    density: 'comfortable',
     itemVariant: 'detailed',
     itemCollapsible: true,
     itemHeader: {
