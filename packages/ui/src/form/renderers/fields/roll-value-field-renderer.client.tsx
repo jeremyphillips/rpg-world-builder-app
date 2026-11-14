@@ -13,6 +13,7 @@ import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-
 import type { RollValueFieldConfig } from '../../field-config'
 import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 import { useFieldControlSize } from '../../context/form-section.context'
+import { useFieldIssue } from '../../hooks/use-field-issue.client'
 
 export interface RollValueFieldRendererProps {
   config: RollValueFieldConfig
@@ -81,6 +82,7 @@ function UnstoredRollValueField({
 }: RollValueFieldRendererProps) {
   const controlSize = useFieldControlSize(config.controlSizeOverride)
   const { setValue } = useFormContext()
+  const routed = useFieldIssue(fullName, { rhfMessage: error })
   const names = {
     count: subPath(fullName, 'dice.count'),
     faces: subPath(fullName, 'dice.faces'),
@@ -98,7 +100,7 @@ function UnstoredRollValueField({
       label={config.label}
       labelVisibility={resolveFieldLabelVisibility(config)}
       parts={{}}
-      error={error}
+      error={routed.message ?? error}
       hint={hint}
       hintPosition={hintPosition}
       info={config.info}
@@ -161,13 +163,15 @@ function StoredRollValueField({
     setValue(name, value, ROLL_VALUE_SET_OPTIONS)
   }
 
-  const combinedError = resolveFirstFieldErrorMessage(
+  const rhfError = resolveFirstFieldErrorMessage(
     diceCount.fieldState.error?.message,
     diceFaces.fieldState.error?.message,
     flatOperator.fieldState.error?.message,
     flatAmount.fieldState.error?.message,
     error,
   )
+  const routed = useFieldIssue(fullName, { rhfMessage: rhfError })
+  const combinedError = routed.message ?? rhfError
 
   const handleBlur = () => {
     diceCount.field.onBlur()

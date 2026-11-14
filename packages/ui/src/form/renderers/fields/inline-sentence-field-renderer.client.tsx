@@ -1,7 +1,7 @@
 'use client'
 
 import { useContext, useEffect, useMemo, useRef } from 'react'
-import { useController, useFormState, type UseControllerReturn } from 'react-hook-form'
+import { useController, type UseControllerReturn } from 'react-hook-form'
 
 import { InlineSentenceField } from '../../../components/ui/inline-sentence-field.client'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
@@ -32,10 +32,7 @@ import {
   ArrayItemPresentationContext,
   resolvePresentedFieldValidation,
 } from '../../context/array-item-presentation.context'
-import {
-  resolveFirstFieldErrorMessage,
-  resolveNestedFieldErrorMessage,
-} from '../../errors/resolve-field-error-message'
+import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
 import { resolveRowAwareFieldHintPresentation } from '../../config/resolve-row-field-hint.lib'
 import { resolveFieldPlaceholder } from '../../config/field-placeholder.lib'
@@ -337,7 +334,6 @@ export function InlineSentenceFieldRenderer({
   }, [controllers, uniqueBoundNames])
 
   const presentation = useFormValidationPresentation()
-  const { errors } = useFormState()
   const { suppressFieldErrorText, rowSummaryId } = useContext(ArrayItemPresentationContext)
 
   const boundValidations = useMemo(() => {
@@ -346,8 +342,7 @@ export function InlineSentenceFieldRenderer({
     for (const name of uniqueBoundNames) {
       const fullPath = resolveFullName(namePrefix, name)
       const controller = controllerByName.get(name)
-      const rhfMessage =
-        resolveNestedFieldErrorMessage(errors, fullPath) ?? controller?.fieldState.error?.message
+      const rhfMessage = controller?.fieldState.error?.message
 
       validations.set(
         name,
@@ -364,7 +359,6 @@ export function InlineSentenceFieldRenderer({
     return validations
   }, [
     controllerByName,
-    errors,
     namePrefix,
     presentation,
     rowSummaryId,

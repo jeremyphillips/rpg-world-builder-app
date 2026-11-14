@@ -370,6 +370,8 @@ export {
   useDebouncedArrayItemValidationTrigger,
   useDebouncedArrayValidationTrigger,
 } from './hooks/use-form-validation-presentation.client'
+export { useFieldIssue, type FieldIssuePresentation } from './hooks/use-field-issue.client'
+export { useSlotIssues, type SlotIssuePresentation } from './context/slot-issue.context'
 export { useProgressiveFieldValidationTrigger } from './hooks/use-progressive-field-validation-trigger.client'
 export {
   flattenPatchToLeafSetValues,

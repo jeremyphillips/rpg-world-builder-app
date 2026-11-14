@@ -36,8 +36,34 @@ function appendFieldPath(field: FieldConfig, prefix: string, paths: string[]): v
   )
 }
 
+function appendSlotOrderPaths(
+  slot: Extract<FormItem, { kind: 'slot' }>,
+  prefix: string,
+  paths: string[],
+): void {
+  paths.push(prefix ? `${prefix}.${slot.name}` : slot.name)
+  if (!slot.issuePaths?.length) return
+  for (const issuePath of slot.issuePaths) {
+    paths.push(prefix ? `${prefix}.${issuePath}` : issuePath)
+  }
+}
+
 function walkContainerItem(item: FieldOrderContainer, prefix: string, paths: string[]): void {
-  if (item.kind === 'slot') return
+  if (item.kind === 'slot') {
+    appendSlotOrderPaths(item, prefix, paths)
+    return
+  }
+
+  if (item.kind === 'row') {
+    for (const field of item.fields) {
+      if ('kind' in field && field.kind === 'slot') {
+        appendSlotOrderPaths(field, prefix, paths)
+        continue
+      }
+      appendFieldPath(field as FieldConfig, prefix, paths)
+    }
+    return
+  }
 
   if (item.kind === 'dependent') {
     walkItems([item.controller, ...item.dependents.fields], prefix, paths)

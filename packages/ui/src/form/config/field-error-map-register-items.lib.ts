@@ -48,6 +48,15 @@ function registerSlotItem(
     category: 'text',
     exactPath: true,
   })
+  if (!item.issuePaths?.length) return
+  for (const issuePath of item.issuePaths) {
+    const ownedKey = prefix ? `${prefix}.${issuePath}` : issuePath
+    registry.set(ownedKey, {
+      label: item.heading?.label ?? item.label ?? item.name,
+      category: 'text',
+      exactPath: true,
+    })
+  }
 }
 
 function registerDependentItem(

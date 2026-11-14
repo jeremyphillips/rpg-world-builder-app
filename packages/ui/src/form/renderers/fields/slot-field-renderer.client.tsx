@@ -20,6 +20,7 @@ import {
   FieldSeparatorWrapper,
 } from '../../containers/form-conditional.client'
 import { buildSlotSectionChildContext } from '../../containers/form-section-child-context.lib'
+import { SlotIssueContext } from '../../context/slot-issue.context'
 import { buildSlotFieldBody, wrapSlotFieldBody } from './slot-field-renderer.lib'
 
 export interface SlotFieldRendererProps {
@@ -68,16 +69,28 @@ interface SlotFormItemSectionProps {
   namePrefix?: string
 }
 
-function SlotFormItemSectionInner({ item, parentContext, depth }: SlotFormItemSectionProps) {
+function SlotFormItemSectionInner({
+  item,
+  parentContext,
+  depth,
+  namePrefix,
+}: SlotFormItemSectionProps) {
   const slotChildContext = React.useMemo(
     () => buildSlotSectionChildContext(parentContext, depth),
     [parentContext, depth],
   )
+  const slotPath = namePrefix ? `${namePrefix}.${item.name}` : item.name
+  const slotIssueContext = React.useMemo(
+    () => ({ slotPath, issuePaths: item.issuePaths }),
+    [item.issuePaths, slotPath],
+  )
 
   return (
-    <FormSectionContext.Provider value={slotChildContext}>
-      <SlotFieldRenderer config={item} />
-    </FormSectionContext.Provider>
+    <SlotIssueContext.Provider value={slotIssueContext}>
+      <FormSectionContext.Provider value={slotChildContext}>
+        <SlotFieldRenderer config={item} />
+      </FormSectionContext.Provider>
+    </SlotIssueContext.Provider>
   )
 }
 

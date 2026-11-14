@@ -27,7 +27,6 @@ import type { FieldSize } from '../../components/ui/field.client'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
 import { resolveFieldConfigBoundNames } from '../field-config'
-import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { mergeFieldConfigWithInteractivity } from './field-renderer-interactivity.lib'
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import {
@@ -815,7 +814,6 @@ function StandardFieldRenderer({
     defaultValue: fieldDefaultValue(config),
   })
   const formState = useFormState({ name: fullName, exact: true })
-  const { errors } = useFormState()
   const liveError = getFieldState(fullName, formState).error
   const boundPaths = React.useMemo(
     () =>
@@ -842,9 +840,7 @@ function StandardFieldRenderer({
   }
   const remotePreview = useFileFieldRemotePreview(resolveFieldConfigPrimaryName(config))
   const validation = useFieldErrorPresentation(
-    liveError?.message ??
-      fieldState.error?.message ??
-      resolveNestedFieldErrorMessage(errors, fullName),
+    liveError?.message ?? fieldState.error?.message,
     fullName,
   )
   assertOptionalDisclosureFieldConfig(config)

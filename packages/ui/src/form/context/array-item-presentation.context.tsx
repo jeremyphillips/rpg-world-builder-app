@@ -4,8 +4,11 @@ import * as React from 'react'
 
 import { resolveFieldErrorMessage } from '../errors/resolve-field-error-message'
 import {
+  findRoutedIssueForFieldPath,
+  resolveFieldIssueDisplayMessage,
+} from '../errors/resolve-field-issue.lib'
+import {
   isFieldPathEligibleForPresentation,
-  issueMatchesFieldPath,
   shouldShowFieldErrorPresentation,
 } from '../errors/resolve-field-error-presentation.lib'
 import { useFormValidationPresentation } from '../hooks/use-form-validation-presentation.client'
@@ -41,17 +44,6 @@ export interface FieldErrorPresentation {
   describedBy: string | undefined
 }
 
-function resolvePublishIssueMessage(
-  fieldPath: string | undefined,
-  issues: ReturnType<typeof useFormValidationPresentation>['issues'],
-  publishPresentationEnabled: boolean,
-  hasAttemptedPublish: boolean,
-): string | undefined {
-  if (!publishPresentationEnabled || !hasAttemptedPublish || !fieldPath) return undefined
-  const issue = issues.find((entry) => issueMatchesFieldPath(entry, fieldPath))
-  return resolveFieldErrorMessage(issue?.message)
-}
-
 export type FieldValidationPresentationState = Pick<
   ReturnType<typeof useFormValidationPresentation>,
   | 'issues'
@@ -68,14 +60,11 @@ export function resolvePresentedFieldError(
   fieldPath: string | undefined,
   presentation: FieldValidationPresentationState,
 ): Pick<FieldErrorPresentation, 'error' | 'invalid'> & { hasError: boolean } {
-  const resolvedError = resolveFieldErrorMessage(typeof message === 'string' ? message : undefined)
-  const publishMessage = resolvePublishIssueMessage(
-    fieldPath,
-    presentation.issues,
-    presentation.publishPresentationEnabled,
-    presentation.hasAttemptedPublish,
-  )
-  const underlyingMessage = resolvedError ?? publishMessage
+  const rhfMessage = typeof message === 'string' ? message : undefined
+  const underlyingMessage =
+    fieldPath !== undefined
+      ? resolveFieldIssueDisplayMessage(fieldPath, presentation.issues, rhfMessage)
+      : resolveFieldErrorMessage(rhfMessage)
   const session = {
     validationPresentation: presentation.validationPresentation,
     hasAttemptedSubmit: presentation.hasAttemptedSubmit,
@@ -88,7 +77,7 @@ export function resolvePresentedFieldError(
   const hasUnderlyingIssue =
     Boolean(underlyingMessage) ||
     (fieldPath !== undefined &&
-      presentation.issues.some((issue) => issueMatchesFieldPath(issue, fieldPath)))
+      findRoutedIssueForFieldPath(presentation.issues, fieldPath) !== undefined)
   const hasError = hasUnderlyingIssue && eligible
   const showMessage =
     fieldPath !== undefined

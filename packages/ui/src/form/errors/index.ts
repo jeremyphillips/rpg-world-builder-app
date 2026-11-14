@@ -42,6 +42,11 @@ export {
   resolveNestedFieldErrorMessage,
 } from './resolve-field-error-message'
 export {
+  findRoutedIssueForFieldPath,
+  findRoutedIssuesForSlot,
+  resolveFieldIssueDisplayMessage,
+} from './resolve-field-issue.lib'
+export {
   enrichFormIssuesWithPresentationPaths,
   resolveFormIssuePresentationPath,
 } from './resolve-form-issue-presentation-path.lib'
