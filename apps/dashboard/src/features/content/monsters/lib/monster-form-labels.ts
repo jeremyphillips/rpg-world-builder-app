@@ -234,6 +234,16 @@ export const MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION =
   'Create a separate spell action with its own spell choices.'
 export const MONSTER_ACQUISITION_SPELL_DESCRIPTION = MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION
 export const MONSTER_CAST_SPELL_LABEL = 'Cast a spell'
+
+/**
+ * Master-detail list titles when a row has no authored name. `special` and `save`
+ * intentionally differ from `getMonsterActionKindLabel` presentation copy.
+ */
+export const MONSTER_ACTION_EDITOR_FALLBACK_TITLES = {
+  special: 'Special Ability',
+  save: 'Saving Throw',
+} as const
+
 export const MONSTER_ACQUISITION_SPECIAL_DESCRIPTION = 'Custom rules or effects'
 export const MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION =
   'Combine multiple attacks into one action'

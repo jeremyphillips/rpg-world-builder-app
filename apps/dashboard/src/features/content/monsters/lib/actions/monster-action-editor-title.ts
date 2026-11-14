@@ -11,6 +11,7 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-constants'
 import {
   LEGENDARY_ACTION_DEFAULT_NAMES,
+  MONSTER_ACTION_EDITOR_FALLBACK_TITLES,
   MONSTER_ACTION_ITEM_NOUN,
   MONSTER_CAST_SPELL_LABEL,
   MONSTER_USE_DEFAULT_NAME_LABEL,
@@ -25,17 +26,14 @@ import type { MonsterFormValues } from '../monster-form-values'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 import { resolveMonsterFormActionIdentity } from './monster-action-identity'
 
-/**
- * Editor-only labels. `Special` and `Saving throw` stay the vocabulary labels in metadata.
- * These headings are not published names.
- */
+/** Editor-only list titles; not published stat-block names. */
 const AUTHORED_FALLBACK_BASE = {
   attack: getMonsterActionKindLabel('attack'),
-  special: 'Special Ability',
+  special: MONSTER_ACTION_EDITOR_FALLBACK_TITLES.special,
   leap: getMonsterActionKindLabel('leap'),
   teleport: getMonsterActionKindLabel('teleport'),
   'take-actions': getMonsterActionKindLabel('take-actions'),
-  save: 'Saving Throw',
+  save: MONSTER_ACTION_EDITOR_FALLBACK_TITLES.save,
   'natural-weapon': getMonsterActionKindLabel('natural-weapon'),
   'spell-primary': MONSTER_SPELLCASTING_ACTION_NAME,
   'spell-standalone': MONSTER_CAST_SPELL_LABEL,

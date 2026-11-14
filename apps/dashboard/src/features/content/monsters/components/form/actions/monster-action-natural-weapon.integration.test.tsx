@@ -15,7 +15,7 @@ import {
 } from '../../../lib/monster-form-values'
 import { createMonsterActionFromAcquisition } from '../../../lib/actions/acquisition/monster-action-acquisition'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
-import { MonsterActionSections } from './monster-action-sections'
+import { MonsterActionSections } from '../monster-action-sections'
 
 const ctx = {
   entityCatalogLayer: 'homebrew',
