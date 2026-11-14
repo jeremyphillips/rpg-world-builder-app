@@ -1,5 +1,12 @@
 import { ABILITY_IDS, getAbilityLabel } from '@rpg/contracts'
-import type { FieldVisibility, FormItem, SelectFieldConfig } from '@rpg/ui/form'
+import type {
+  FieldConfig,
+  FieldSeparator,
+  FieldVisibility,
+  FormHeadingScale,
+  FormItem,
+  SelectFieldConfig,
+} from '@rpg/ui/form'
 
 import { buildActiveCreatureTypeFieldOptions } from '@/features/vocabulary'
 
@@ -74,35 +81,67 @@ type MonsterAbilitySourceRequiredMarks = {
   castingAbility?: boolean
 }
 
-export function monsterAbilitySourceDependent(input: {
+type MonsterAbilitySourceDependentInput = {
   sourcePath: MonsterAbilitySourcePath
   namePrefix: string
   controllerLabel: string
   abilityFields: FormItem[]
+  controllerVariant?: 'select' | 'segmentedControl'
   dependentsChrome?: 'none'
   required?: MonsterAbilitySourceRequiredMarks
+  sectionLegend?: { headingScale?: FormHeadingScale; separator?: FieldSeparator }
   spellcastingHint?: string
   currentActionId?: string
   sourceOptions?: { value: string; label: string }[]
   sourceHint?: SelectFieldConfig['hint']
-}): FormItem {
+}
+
+function defaultMonsterAbilitySourceOptions() {
+  return [
+    { value: 'ability', label: MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL },
+    { value: 'spellcasting', label: MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL },
+  ]
+}
+
+function buildMonsterAbilitySourceController(
+  input: MonsterAbilitySourceDependentInput,
+  kindName: string,
+  sourceOptions: { value: string; label: string }[],
+  useSectionLegend: boolean,
+): FieldConfig {
+  const required = input.required?.controller ? { required: true as const } : {}
+  if (input.controllerVariant === 'segmentedControl') {
+    return {
+      type: 'segmentedControl',
+      name: kindName,
+      label: input.controllerLabel,
+      labelVisibility: useSectionLegend ? 'srOnly' : undefined,
+      options: sourceOptions,
+      fullWidth: true,
+      ...required,
+    }
+  }
+  return {
+    type: 'select',
+    name: kindName,
+    label: input.controllerLabel,
+    placeholder: 'Choose',
+    options: sourceOptions,
+    ...(!useSectionLegend && input.sourceHint ? { hint: input.sourceHint } : {}),
+    ...required,
+  }
+}
+
+function buildMonsterAbilitySourceDependent(
+  input: MonsterAbilitySourceDependentInput,
+  controller: FieldConfig,
+): FormItem {
   const kindName = `${input.sourcePath}.kind`
   const abilityBranch = whenFieldEquals(kindName, 'ability')
   const spellBranch = whenFieldEquals(kindName, 'spellcasting')
   return {
     kind: 'dependent',
-    controller: {
-      type: 'select',
-      name: kindName,
-      label: input.controllerLabel,
-      placeholder: 'Choose',
-      options: input.sourceOptions ?? [
-        { value: 'ability', label: MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL },
-        { value: 'spellcasting', label: MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL },
-      ],
-      ...(input.sourceHint ? { hint: input.sourceHint } : {}),
-      ...(input.required?.controller ? { required: true } : {}),
-    },
+    controller,
     dependents: {
       ...(input.dependentsChrome ? { chrome: input.dependentsChrome } : {}),
       visibility: whenFieldIsOneOf(kindName, ['ability', 'spellcasting']),
@@ -125,6 +164,38 @@ export function monsterAbilitySourceDependent(input: {
       ],
     },
   }
+}
+
+function wrapMonsterAbilitySourceSectionLegend(
+  input: MonsterAbilitySourceDependentInput,
+  dependent: FormItem,
+): FormItem {
+  const sectionLegend = input.sectionLegend
+  if (!sectionLegend) return dependent
+  return {
+    kind: 'group',
+    headingScale: sectionLegend.headingScale ?? 'subsection',
+    heading: {
+      label: input.controllerLabel,
+      ...(input.sourceHint ? { hint: input.sourceHint } : {}),
+    },
+    ...(sectionLegend.separator ? { separator: sectionLegend.separator } : {}),
+    fields: [dependent],
+  }
+}
+
+export function monsterAbilitySourceDependent(input: MonsterAbilitySourceDependentInput): FormItem {
+  const kindName = `${input.sourcePath}.kind`
+  const sourceOptions = input.sourceOptions ?? defaultMonsterAbilitySourceOptions()
+  const useSectionLegend = input.sectionLegend != null
+  const controller = buildMonsterAbilitySourceController(
+    input,
+    kindName,
+    sourceOptions,
+    useSectionLegend,
+  )
+  const dependent = buildMonsterAbilitySourceDependent(input, controller)
+  return wrapMonsterAbilitySourceSectionLegend(input, dependent)
 }
 
 function monsterActionSaveDcDependent(namePrefix: string, currentActionId: string): FormItem {

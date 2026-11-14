@@ -19,7 +19,6 @@ import {
   MONSTER_ON_HIT_DETAILS_ADD_LABEL,
   MONSTER_ON_HIT_DETAILS_LABEL,
   MONSTER_ON_HIT_HINT,
-  MONSTER_ON_HIT_KIND_LABEL,
   MONSTER_ON_HIT_LEGEND,
   MONSTER_ON_HIT_NOTE_LABEL,
   MONSTER_ACTION_DAMAGE_FIELD_LABEL,
@@ -163,6 +162,7 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
     kind: 'array',
     name: 'onHit.effects',
     heading: { label: MONSTER_ON_HIT_LEGEND, hint: MONSTER_ON_HIT_HINT },
+    density: 'compact',
     addAction: {
       label: MONSTER_ON_HIT_ADD_LABEL,
       menu: {
@@ -197,17 +197,6 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
       },
     },
     fields: [
-      {
-        type: 'select',
-        name: 'kind',
-        label: MONSTER_ON_HIT_KIND_LABEL,
-        placeholder: 'Choose',
-        options: [
-          { value: 'damage', label: MONSTER_ACTION_DAMAGE_FIELD_LABEL },
-          { value: 'condition', label: vocabularyFieldLabel(CONDITION_TERM) },
-          { value: 'note', label: MONSTER_ON_HIT_NOTE_LABEL },
-        ],
-      },
       damageFieldGroup({
         ctx,
         damageTypeName: 'damageType',

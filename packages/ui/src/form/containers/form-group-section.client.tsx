@@ -44,7 +44,9 @@ import { FieldSeparatorWrapper, useVisibilityValues } from './form-conditional.c
 import { OptionalDisclosureGroup } from './optional-disclosure-group.client'
 import type { RenderNestedFormItems } from './form-dependent-section.client'
 import type { FieldChrome } from '../../components/ui/field-chrome.variants'
+import { useDependsOnValues } from '../config/form-depends-on.client'
 import {
+  resolveGroupHeadingHintDependsOn,
   resolveGroupSectionDescription,
   resolveGroupSectionFieldChromeSuppressed,
 } from './form-group-section.lib'
@@ -189,7 +191,12 @@ export function GroupFieldSection({
       groupFieldChrome,
     ],
   )
-  const description = React.useMemo(() => resolveGroupSectionDescription(heading), [heading])
+  const hintDependsOn = resolveGroupHeadingHintDependsOn(heading)
+  const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
+  const description = React.useMemo(
+    () => resolveGroupSectionDescription(heading, hintValues),
+    [heading, hintValues],
+  )
 
   const nestedFields = (
     <FormSectionContext.Provider value={childContext}>

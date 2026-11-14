@@ -1,10 +1,11 @@
 import { ACTION_PRESET_IDS, formatResolutionTargetFromParts, getActionPreset } from '@rpg/contracts'
-import type {
-  ArrayConfig,
-  FormItem,
-  GroupConfig,
-  JoinedPairFieldConfig,
-  SelectFieldConfig,
+import {
+  resolveFieldConfigPrimaryName,
+  type ArrayConfig,
+  type FormItem,
+  type GroupConfig,
+  type JoinedPairFieldConfig,
+  type SelectFieldConfig,
 } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
@@ -258,21 +259,29 @@ describe('monster action detail fields', () => {
     const onHit = monsterActionOnHitFields(detailCtx)
     expect(onHit.kind).toBe('array')
     if (onHit.kind !== 'array') return
-    expect(onHit.addAction).toMatchObject({
-      label: 'Add effect',
-      menu: {
-        enableSearch: false,
-        items: [
-          {
-            id: 'damage',
-            label: 'Damage',
-            appendDefaults: { kind: 'damage', roll: { dice: { count: 1, faces: 6 } } },
-          },
-          { id: 'condition', label: 'Condition', appendDefaults: { kind: 'condition' } },
-          { id: 'note', label: 'Note', appendDefaults: { kind: 'note' } },
-        ],
+    expect(onHit).toMatchObject({
+      density: 'compact',
+      addAction: {
+        label: 'Add effect',
+        menu: {
+          enableSearch: false,
+          items: [
+            {
+              id: 'damage',
+              label: 'Damage',
+              appendDefaults: { kind: 'damage', roll: { dice: { count: 1, faces: 6 } } },
+            },
+            { id: 'condition', label: 'Condition', appendDefaults: { kind: 'condition' } },
+            { id: 'note', label: 'Note', appendDefaults: { kind: 'note' } },
+          ],
+        },
       },
     })
+    expect(
+      onHit.fields.find(
+        (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'kind',
+      ),
+    ).toBeUndefined()
   })
 
   it('shows only the natural-weapon editors and keeps attack editors', () => {
@@ -328,6 +337,11 @@ describe('monster action detail fields', () => {
       (item) => 'kind' in item && item.kind === 'group' && item.heading?.label === 'Damage',
     )
     expect(attackDamage).toMatchObject({ heading: { label: 'Damage' } })
+    expect(
+      attackItems.find(
+        (item) => 'kind' in item && item.kind === 'array' && item.name === 'onHit.effects',
+      ),
+    ).toMatchObject({ separator: 'subtle' })
     const damageRow =
       attackDamage && 'fields' in attackDamage
         ? attackDamage.fields.find((field) => 'kind' in field && field.kind === 'row')
@@ -395,17 +409,24 @@ describe('monster action detail fields', () => {
     expect(attack[0]).toBe('attackPreview')
     expect(attack[1]).toBe('buildAdvisories')
     expect(attack.indexOf('onHit.effects')).toBeLessThan(attack.indexOf('limitedUse'))
-    const attackBonus = attackItems.find(
-      (item) =>
-        'kind' in item &&
-        item.kind === 'dependent' &&
-        'controller' in item &&
-        item.controller.name === 'bonusSource.kind',
+    const attackBonusSection = attackItems.find(
+      (item) => 'kind' in item && item.kind === 'group' && item.heading?.label === 'Attack bonus',
     )
+    expect(attackBonusSection).toMatchObject({
+      headingScale: 'subsection',
+      separator: 'subtle',
+    })
+    const attackBonus =
+      attackBonusSection && 'fields' in attackBonusSection
+        ? attackBonusSection.fields[0]
+        : undefined
     expect(
       attackBonus && 'controller' in attackBonus ? attackBonus.controller : null,
     ).toMatchObject({
+      type: 'segmentedControl',
       required: true,
+      fullWidth: true,
+      labelVisibility: 'srOnly',
     })
     const attackBonusDependents =
       attackBonus && 'dependents' in attackBonus ? attackBonus.dependents.fields : []
@@ -440,6 +461,7 @@ describe('monster action detail fields', () => {
     }
     expect(distanceGroup).toMatchObject({
       visibility: { dependsOn: ['modes'] },
+      separator: 'subtle',
     })
     const distanceRows = distanceGroup.fields.filter(
       (field) => 'kind' in field && field.kind === 'row',

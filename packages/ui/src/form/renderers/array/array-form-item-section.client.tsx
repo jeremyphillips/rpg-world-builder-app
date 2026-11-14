@@ -13,6 +13,7 @@ import {
   type FormSectionContextValue,
 } from '../../context/form-section.context'
 import { buildArraySectionChildContext } from '../../containers/form-section-child-context.lib'
+import { FieldSeparatorWrapper } from '../../containers/form-conditional.client'
 import { resolveFormDensity } from '../../form-density'
 import type { ArrayConfig } from '../../field-config'
 import { ArrayFieldRenderer } from './array-field-renderer.client'
@@ -65,9 +66,7 @@ export function ArrayFormItemSection({
     </FormSectionContext.Provider>
   )
 
-  if (!wrapSectionChrome) return renderer
-
-  return (
+  const content = wrapSectionChrome ? (
     <FormFieldChromeShell
       chrome={arrayFieldChrome}
       size={arraySize}
@@ -75,5 +74,9 @@ export function ArrayFormItemSection({
     >
       {renderer}
     </FormFieldChromeShell>
+  ) : (
+    renderer
   )
+
+  return <FieldSeparatorWrapper separator={item.separator}>{content}</FieldSeparatorWrapper>
 }

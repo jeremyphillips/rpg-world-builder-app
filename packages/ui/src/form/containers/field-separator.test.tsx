@@ -68,7 +68,39 @@ function renderForm(defaultValues: Partial<Values> = { featureEnabled: true, fea
   )
 }
 
+const arraySeparatorFields: FormItem[] = [
+  {
+    kind: 'array',
+    name: 'effects',
+    heading: { label: 'On hit' },
+    separator: 'subtle',
+    fields: [{ type: 'text', name: 'note', label: 'Note' }],
+    addAction: { label: 'Add effect' },
+  },
+  { type: 'text', name: 'after', label: 'After section' },
+]
+
 describe('field separator', () => {
+  it('wraps a named array section with a trailing separator', () => {
+    const schema = z.object({
+      effects: z.array(z.object({ note: z.string().optional() })),
+      after: z.string().optional(),
+    })
+    const { container } = render(
+      <Form
+        schema={schema}
+        fields={arraySeparatorFields}
+        defaultValues={{ effects: [], after: '' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const separator = container.querySelector('[data-field-separator]')
+    expect(separator).toBeInTheDocument()
+    expect(separator).toHaveClass('border-b', 'ui-border--subtle')
+    expect(separator).toContainElement(screen.getByText('On hit'))
+    expect(separator).not.toContainElement(screen.getByLabelText('After section'))
+  })
   it('wraps a leaf field with trailing separator classes', async () => {
     const user = userEvent.setup()
     const { container } = renderForm({ featureEnabled: false })

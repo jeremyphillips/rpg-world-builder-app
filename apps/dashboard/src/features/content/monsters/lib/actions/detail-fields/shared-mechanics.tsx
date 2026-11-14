@@ -150,6 +150,8 @@ function monsterActionBonusSourceDependent(namePrefix: string, currentActionId: 
     sourcePath: 'bonusSource',
     namePrefix,
     controllerLabel: MONSTER_ATTACK_BONUS_LABEL,
+    controllerVariant: 'segmentedControl',
+    sectionLegend: { headingScale: 'subsection', separator: 'subtle' },
     currentActionId,
     dependentsChrome: 'none',
     sourceOptions: [
@@ -261,6 +263,7 @@ function monsterAttackDistanceFields(
     kind: 'group',
     heading: { label: MONSTER_ACTION_DISTANCE_SECTION_LEGEND },
     visibility: distanceVisibility(modeField),
+    separator: 'subtle',
     fields: [
       {
         kind: 'row',
@@ -479,7 +482,10 @@ export function monsterActionMechanicFields(input: {
         damageTypeName: 'damageType',
         rollName: 'damage',
       }),
-      monsterActionOnHitFields(ctx),
+      {
+        ...monsterActionOnHitFields(ctx),
+        separator: 'subtle',
+      },
     )
   }
   if (action.kind === 'save') {

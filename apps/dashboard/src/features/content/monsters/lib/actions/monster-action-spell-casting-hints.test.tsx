@@ -125,10 +125,7 @@ describe('monsterActionSpellMechanics spellcasting hints', () => {
       'actions',
     )
 
-    await user.click(screen.getByRole('combobox', { name: 'Attack bonus' }))
-    await user.click(
-      await screen.findByRole('option', { name: MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL }),
-    )
+    await user.click(screen.getByRole('button', { name: MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL }))
 
     expect(screen.getByText(MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT)).toBeInTheDocument()
     expect(screen.getByText(SPELLCASTING_ABILITY_SHARED_HINT)).toBeInTheDocument()

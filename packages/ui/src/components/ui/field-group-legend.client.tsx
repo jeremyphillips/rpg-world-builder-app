@@ -115,24 +115,27 @@ function CollapsibleFieldGroupLegend({
   )
 
   const toggleRow = (
-    <div className="flex w-full min-w-0 items-start gap-2">
+    <div
+      className={cn('flex w-full min-w-0 gap-2', hasStackedHint ? 'items-start' : 'items-center')}
+    >
       <button
         type="button"
         aria-expanded={open}
         onClick={onToggle}
-        className={fieldGroupLegendDisclosureTriggerVariants({ rhythm })}
+        className={cn(
+          fieldGroupLegendDisclosureTriggerVariants({ rhythm }),
+          hasStackedHint && 'items-start',
+        )}
       >
-        <span className="flex w-full min-w-0 items-start gap-2">
-          {headingInTrigger}
-          <Icon
-            name="chevron-down"
-            size="lg"
-            className={cn(
-              'shrink-0 text-muted-foreground transition-transform',
-              open && 'rotate-180',
-            )}
-          />
-        </span>
+        <div className="min-w-0 flex-1">{headingInTrigger}</div>
+        <Icon
+          name="chevron-down"
+          size="lg"
+          className={cn(
+            'shrink-0 text-muted-foreground transition-transform',
+            open && 'rotate-180',
+          )}
+        />
       </button>
       {legendAccessory ? <span className="shrink-0 pt-0.5">{legendAccessory}</span> : null}
     </div>

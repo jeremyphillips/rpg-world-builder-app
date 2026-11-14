@@ -1,13 +1,21 @@
 import { hasActiveFieldChrome, type FieldChrome } from '../../components/ui/field-chrome.variants'
-import { normalizeFieldHint } from '../field-config'
+import { normalizeFieldHint, resolveFieldHintPresentation } from '../field-config'
 import type { FormHeading } from '../form-heading.lib'
+
+export function resolveGroupHeadingHintDependsOn(
+  heading: FormHeading | undefined,
+): readonly string[] {
+  const hint = heading?.hint
+  if (!hint || typeof hint === 'string') return []
+  return normalizeFieldHint(hint).resolve?.dependsOn ?? []
+}
 
 export function resolveGroupSectionDescription(
   heading: FormHeading | undefined,
+  values: Record<string, unknown> = {},
 ): string | undefined {
-  const hint = heading?.hint
-  if (!hint) return undefined
-  return typeof hint === 'string' ? hint : normalizeFieldHint(hint).text
+  if (!heading?.hint) return undefined
+  return resolveFieldHintPresentation({ hint: heading.hint }, values).text
 }
 
 export function resolveGroupSectionFieldChromeSuppressed(

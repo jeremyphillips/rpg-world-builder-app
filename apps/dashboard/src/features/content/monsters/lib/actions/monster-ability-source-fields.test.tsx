@@ -98,6 +98,13 @@ async function choose(
   await user.click(await screen.findByRole('option', { name: optionName }))
 }
 
+async function chooseAttackBonusSource(
+  user: ReturnType<typeof userEvent.setup>,
+  optionName: string,
+) {
+  await user.click(screen.getByRole('button', { name: optionName }))
+}
+
 describe('monster ability source fields', () => {
   it('switches an attack bonus between ability and spellcasting', async () => {
     const user = userEvent.setup()
@@ -116,7 +123,7 @@ describe('monster ability source fields', () => {
       screen.queryByRole('combobox', { name: SPELLCASTING_ABILITY_LABEL }),
     ).not.toBeInTheDocument()
 
-    await choose(user, 'Attack bonus', MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL)
+    await chooseAttackBonusSource(user, MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL)
     expect(screen.getByText(MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT)).toBeInTheDocument()
     expect(
       screen.getByRole('switch', { name: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL }),
@@ -140,7 +147,7 @@ describe('monster ability source fields', () => {
     )
     expect(formRef.current?.getValues('actions.0.bonusSource.proficient')).toBe(false)
 
-    await choose(user, 'Attack bonus', MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL)
+    await chooseAttackBonusSource(user, MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL)
     expect(screen.getByText(MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT)).toBeInTheDocument()
     expect(
       screen.queryByRole('switch', { name: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL }),
@@ -153,7 +160,7 @@ describe('monster ability source fields', () => {
       ability: 'int',
     })
 
-    await choose(user, 'Attack bonus', MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL)
+    await chooseAttackBonusSource(user, MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL)
     expect(screen.getByText(MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT)).toBeInTheDocument()
     expect(
       screen.getByRole('switch', { name: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL }),
